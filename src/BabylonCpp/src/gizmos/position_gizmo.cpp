@@ -1,24 +1,24 @@
 #include <babylon/gizmos/position_gizmo.h>
 
+#include <babylon/core/logging.h>
 #include <babylon/gizmos/axis_drag_gizmo.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
-PositionGizmo::PositionGizmo(UtilityLayerRenderer* iGizmoLayer)
+PositionGizmo::PositionGizmo(
+  const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
-    , updateGizmoRotationToMatchAttachedMesh{this,
-                                             &PositionGizmo::
-                                               get_updateGizmoRotationToMatchAttachedMesh,
-                                             &PositionGizmo::
-                                               set_updateGizmoRotationToMatchAttachedMesh}
-    , _xDrag{::std::make_unique<AxisDragGizmo>(
-        iGizmoLayer, Vector3(1.f, 0.f, 0.f), Color3::Green().scale(0.5f))}
-    , _yDrag{::std::make_unique<AxisDragGizmo>(
-        iGizmoLayer, Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f))}
-    , _zDrag{::std::make_unique<AxisDragGizmo>(
-        iGizmoLayer, Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f))}
+    , xGizmo{::std::make_unique<AxisDragGizmo>(
+        Vector3(1.f, 0.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}
+    , yGizmo{::std::make_unique<AxisDragGizmo>(
+        Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
+    , zGizmo{::std::make_unique<AxisDragGizmo>(
+        Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
+    , updateGizmoRotationToMatchAttachedMesh{
+        this, &PositionGizmo::get_updateGizmoRotationToMatchAttachedMesh,
+        &PositionGizmo::set_updateGizmoRotationToMatchAttachedMesh}
 {
   attachedMesh = nullptr;
 }
@@ -29,33 +29,41 @@ PositionGizmo::~PositionGizmo()
 
 void PositionGizmo::set_attachedMesh(AbstractMesh* const& mesh)
 {
-  if (_xDrag) {
-    _xDrag->attachedMesh = mesh;
-    _yDrag->attachedMesh = mesh;
-    _zDrag->attachedMesh = mesh;
+  if (xGizmo) {
+    xGizmo->attachedMesh = mesh;
+    yGizmo->attachedMesh = mesh;
+    zGizmo->attachedMesh = mesh;
   }
 }
 
 void PositionGizmo::set_updateGizmoRotationToMatchAttachedMesh(bool value)
 {
-  if (_xDrag) {
-    _xDrag->updateGizmoRotationToMatchAttachedMesh = value;
-    _yDrag->updateGizmoRotationToMatchAttachedMesh = value;
-    _zDrag->updateGizmoRotationToMatchAttachedMesh = value;
+  if (xGizmo) {
+    xGizmo->updateGizmoRotationToMatchAttachedMesh = value;
+    yGizmo->updateGizmoRotationToMatchAttachedMesh = value;
+    zGizmo->updateGizmoRotationToMatchAttachedMesh = value;
   }
 }
 
 bool PositionGizmo::get_updateGizmoRotationToMatchAttachedMesh() const
 {
-  return _xDrag->updateGizmoRotationToMatchAttachedMesh;
+  return xGizmo->updateGizmoRotationToMatchAttachedMesh;
 }
 
 void PositionGizmo::dispose(bool /*doNotRecurse*/,
                             bool /*disposeMaterialAndTextures*/)
 {
-  _xDrag->dispose();
-  _yDrag->dispose();
-  _zDrag->dispose();
+  xGizmo->dispose();
+  yGizmo->dispose();
+  zGizmo->dispose();
+}
+
+void PositionGizmo::setCustomMesh(Mesh* /*mesh*/)
+{
+  BABYLON_LOG_ERROR("PositionGizmo",
+                    "Custom meshes are not supported on this gizmo, please set "
+                    "the custom meshes on the gizmos contained within this one "
+                    "(gizmo.xGizmo, gizmo.yGizmo, gizmo.zGizmo)");
 }
 
 } // end of namespace BABYLON

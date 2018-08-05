@@ -4,6 +4,8 @@
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
+#include <babylon/math/color3.h>
+#include <babylon/rendering/utility_layer_renderer.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
@@ -21,8 +23,10 @@ public:
    * rotate on
    * @param color The color of the gizmo
    */
-  PlaneRotationGizmo(UtilityLayerRenderer* gizmoLayer,
-                     const Vector3& planeNormal, const Color3& color);
+  PlaneRotationGizmo(const Vector3& planeNormal,
+                     const Color3& color = Color3::Gray(),
+                     const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer
+                     = UtilityLayerRenderer::DefaultUtilityLayer());
   ~PlaneRotationGizmo() override;
 
   /**
@@ -36,6 +40,11 @@ protected:
 
 public:
   /**
+   * Drag behavior responsible for the gizmos dragging interactions
+   */
+  unique_ptr_t<PointerDragBehavior> dragBehavior;
+
+  /**
    * Rotation distance in radians that the gizmo will snap to (Default: 0)
    */
   float snapDistance;
@@ -47,10 +56,9 @@ public:
   Observable<SnapEvent> onSnapObservable;
 
 private:
-  unique_ptr_t<PointerDragBehavior> _dragBehavior;
   Observer<PointerInfo>::Ptr _pointerObserver;
 
-  Nullable<Vector3> _lastDragPosition;
+  Vector3 _lastDragPosition;
   Matrix _rotationMatrix;
   Vector3 _planeNormalTowardsCamera;
   Vector3 _localPlaneNormalTowardsCamera;

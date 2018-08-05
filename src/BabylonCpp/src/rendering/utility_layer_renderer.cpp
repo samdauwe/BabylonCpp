@@ -1,10 +1,47 @@
 #include <babylon/rendering/utility_layer_renderer.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/cameras/camera.h>
+#include <babylon/cameras/free_camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 
 namespace BABYLON {
+
+shared_ptr_t<UtilityLayerRenderer> UtilityLayerRenderer::_DefaultUtilityLayer
+  = nullptr;
+shared_ptr_t<UtilityLayerRenderer>
+  UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer = nullptr;
+
+shared_ptr_t<UtilityLayerRenderer>& UtilityLayerRenderer::DefaultUtilityLayer()
+{
+  if (UtilityLayerRenderer::_DefaultUtilityLayer == nullptr) {
+    UtilityLayerRenderer::_DefaultUtilityLayer
+      = UtilityLayerRenderer::New(Engine::LastCreatedScene());
+    UtilityLayerRenderer::_DefaultUtilityLayer->originalScene
+      ->onDisposeObservable.addOnce([](Scene* /*scene*/, EventState& /*es*/) {
+        UtilityLayerRenderer::_DefaultUtilityLayer = nullptr;
+      });
+  }
+  return UtilityLayerRenderer::_DefaultUtilityLayer;
+}
+
+shared_ptr_t<UtilityLayerRenderer>&
+UtilityLayerRenderer::DefaultKeepDepthUtilityLayer()
+{
+  if (UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer == nullptr) {
+    UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer
+      = UtilityLayerRenderer::New(Engine::LastCreatedScene());
+    UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer->utilityLayerScene
+      ->autoClearDepthAndStencil
+      = false;
+    UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer->originalScene
+      ->onDisposeObservable.addOnce([](Scene* /*scene*/, EventState& /*es*/) {
+        UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer = nullptr;
+      });
+  }
+  return UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer;
+}
 
 UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
     : utilityLayerScene{nullptr}
@@ -20,6 +57,7 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
   // Create scene which will be rendered in the foreground and remove it from
   // being referenced by engine to avoid interfering with existing app
   utilityLayerScene = Scene::New(iOriginalScene->getEngine());
+  utilityLayerScene->_allowPostProcessClear = false;
   iOriginalScene->getEngine()->scenes.pop_back();
 
   // Detach controls on utility scene, events will be fired by logic below to
@@ -37,6 +75,7 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
 
       auto pointerEvent = prePointerInfo->pointerEvent;
       if (originalScene->isPointerCaptured(pointerEvent.pointerId)) {
+        _pointerCaptures[pointerEvent.pointerId] = false;
         return;
       }
 
@@ -118,8 +157,11 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
             // We pick something in utility scene or the pick in utility is
             // closer than the one in main scene
             _notifyObservers(*prePointerInfo, *utilityScenePick, pointerEvent);
-            prePointerInfo->skipOnPointerObservable
-              = (*utilityScenePick).distance > 0.f;
+            // If a previous utility layer set this, do not unset this
+            if (!prePointerInfo->skipOnPointerObservable) {
+              prePointerInfo->skipOnPointerObservable
+                = (*utilityScenePick).distance > 0.f;
+            }
           }
           else if (stl_util::contains(_pointerCaptures, pointerEvent.pointerId)
                    && !_pointerCaptures[pointerEvent.pointerId]
@@ -187,7 +229,29 @@ void UtilityLayerRenderer::_notifyObservers(
 void UtilityLayerRenderer::render()
 {
   _updateCamera();
-  utilityLayerScene->render(false);
+  if (utilityLayerScene->activeCamera) {
+    // Set the camera's scene to utility layers scene
+    auto oldScene  = utilityLayerScene->activeCamera->getScene();
+    auto camera    = utilityLayerScene->activeCamera;
+    camera->_scene = utilityLayerScene.get();
+    if (camera->leftCamera()) {
+      camera->leftCamera()->_scene = utilityLayerScene.get();
+    }
+    if (camera->rightCamera()) {
+      camera->rightCamera()->_scene = utilityLayerScene.get();
+    }
+
+    utilityLayerScene->render(false);
+
+    // Reset camera's scene back to original
+    camera->_scene = oldScene;
+    if (camera->leftCamera()) {
+      camera->leftCamera()->_scene = oldScene;
+    }
+    if (camera->rightCamera()) {
+      camera->rightCamera()->_scene = oldScene;
+    }
+  }
 }
 
 void UtilityLayerRenderer::dispose(bool /*doNotRecurse*/,

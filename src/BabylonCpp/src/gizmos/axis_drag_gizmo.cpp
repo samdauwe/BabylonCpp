@@ -4,15 +4,17 @@
 #include <babylon/behaviors/mesh/pointer_drag_behavior.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/mesh/lines_mesh.h>
 #include <babylon/mesh/mesh_builder.h>
 #include <babylon/mesh/vertex_data_options.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
-AxisDragGizmo::AxisDragGizmo(UtilityLayerRenderer* gizmoLayer,
-                             const Vector3& dragAxis, const Color3& color)
-    : Gizmo{gizmoLayer}
+AxisDragGizmo::AxisDragGizmo(
+  const Vector3& dragAxis, const Color3& color,
+  const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+    : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , _pointerObserver{nullptr}
     , _currentSnapDragDistance{0.f}
@@ -32,16 +34,17 @@ AxisDragGizmo::AxisDragGizmo(UtilityLayerRenderer* gizmoLayer,
   // Build mesh on root node
   auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   CylinderOptions arrowMeshOptions;
-  arrowMeshOptions.diameterTop  = 0.f;
-  arrowMeshOptions.height       = 2.f;
+  arrowMeshOptions.diameterTop  = 0.75f;
+  arrowMeshOptions.height       = 1.5f;
   arrowMeshOptions.tessellation = 96;
   auto arrowMesh                = MeshBuilder::CreateCylinder(
     "yPosMesh", arrowMeshOptions, gizmoLayer->utilityLayerScene.get());
-  CylinderOptions arrowTailOptions{0.015f};
-  arrowTailOptions.height       = 0.3f;
-  arrowTailOptions.tessellation = 96;
-  auto arrowTail                = MeshBuilder::CreateCylinder(
+
+  LinesOptions arrowTailOptions;
+  arrowTailOptions.points = {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.5f, 0.f)};
+  auto arrowTail          = MeshBuilder::CreateLines(
     "yPosMesh", arrowTailOptions, gizmoLayer->utilityLayerScene.get());
+  arrowTail->color = coloredMaterial->emissiveColor;
   arrow->addChild(arrowMesh);
   arrow->addChild(arrowTail);
 
@@ -50,9 +53,9 @@ AxisDragGizmo::AxisDragGizmo(UtilityLayerRenderer* gizmoLayer,
   arrowMesh->material     = coloredMaterial;
   arrowMesh->rotation().x = Math::PI_2;
   arrowMesh->position().z += 0.3f;
+  arrowTail->scaling().scaleInPlace(0.2f);
   arrowTail->rotation().x = Math::PI_2;
   arrowTail->material     = coloredMaterial;
-  arrowTail->position().z += 0.15f;
   arrow->lookAt(_rootMesh->position().subtract(dragAxis));
 
   _rootMesh->addChild(arrow);
@@ -90,17 +93,21 @@ AxisDragGizmo::AxisDragGizmo(UtilityLayerRenderer* gizmoLayer,
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
     [&](PointerInfo* pointerInfo, EventState& /*es*/) {
-      if (stl_util::contains(_rootMesh->getChildMeshes(),
-                             pointerInfo->pickInfo.pickedMesh)) {
-        for (auto& m : _rootMesh->getChildMeshes()) {
-          m->material = hoverMaterial;
-        }
+      if (_customMeshSet) {
+        return;
       }
-      else {
-        for (auto& m : _rootMesh->getChildMeshes()) {
-          m->material = coloredMaterial;
+      auto isHovered = stl_util::contains(
+        _rootMesh->getChildMeshes(),
+        static_cast<Mesh*>(pointerInfo->pickInfo.pickedMesh));
+      auto material = isHovered ? hoverMaterial : coloredMaterial;
+      for (auto& m : _rootMesh->getChildMeshes()) {
+        m->material    = material;
+        auto linesMesh = static_cast<LinesMesh*>(m);
+        // if (linesMesh->color)
+        {
+          linesMesh->color = material->emissiveColor;
         }
-      }
+      };
     });
 }
 

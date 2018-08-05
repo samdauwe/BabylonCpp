@@ -16,10 +16,26 @@ class BABYLON_SHARED_EXPORT UtilityLayerRenderer : public IDisposable {
 
 public:
   /**
-   * @brief Instantiates a UtilityLayerRenderer.
-   * @param originalScene the original scene that will be rendered on top of
+   * @brief A shared utility layer that can be used to overlay objects into a
+   * scene (Depth map of the previous scene is cleared before drawing on top of
+   * it).
    */
-  UtilityLayerRenderer(Scene* originalScene);
+  static shared_ptr_t<UtilityLayerRenderer>& DefaultUtilityLayer();
+
+  /**
+   * @brief A shared utility layer that can be used to embed objects into a
+   * scene (Depth map of the previous scene is not cleared before drawing on top
+   * of it).
+   */
+  static shared_ptr_t<UtilityLayerRenderer>& DefaultKeepDepthUtilityLayer();
+
+public:
+  template <typename... Ts>
+  static shared_ptr_t<UtilityLayerRenderer> New(Ts&&... args)
+  {
+    auto renderer = new UtilityLayerRenderer(::std::forward<Ts>(args)...);
+    return static_cast<shared_ptr_t<UtilityLayerRenderer>>(renderer);
+  }
   virtual ~UtilityLayerRenderer();
 
   /**
@@ -32,6 +48,13 @@ public:
    */
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
+
+protected:
+  /**
+   * @brief Instantiates a UtilityLayerRenderer.
+   * @param originalScene the original scene that will be rendered on top of
+   */
+  UtilityLayerRenderer(Scene* originalScene);
 
 private:
   void _notifyObservers(const PointerInfoPre& prePointerInfo,
@@ -79,6 +102,10 @@ public:
    * present in the main scene
    */
   ::std::function<bool(AbstractMesh* mesh)> mainSceneTrackerPredicate;
+
+private:
+  static shared_ptr_t<UtilityLayerRenderer> _DefaultUtilityLayer;
+  static shared_ptr_t<UtilityLayerRenderer> _DefaultKeepDepthUtilityLayer;
 
 private:
   unordered_map_t<int, bool> _pointerCaptures;

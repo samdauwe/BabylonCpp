@@ -1,75 +1,70 @@
 #include <babylon/gizmos/gizmo_manager.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/behaviors/mesh/six_dof_drag_behavior.h>
 #include <babylon/engine/scene.h>
+#include <babylon/gizmos/bounding_box_gizmo.h>
 #include <babylon/gizmos/position_gizmo.h>
 #include <babylon/gizmos/rotation_gizmo.h>
+#include <babylon/gizmos/scale_gizmo.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
-GizmoManager::GizmoManager(Scene* iScene, Nullable<GizmoManagerOptions> options)
-    : _scene{iScene}, _gizmoLayer{nullptr}, _pointerObserver{nullptr}
+GizmoManager::GizmoManager(Scene* iScene)
+    : attachableMeshes{nullopt_t}
+    , usePointerToAttachGizmos{true}
+    , positionGizmoEnabled{this, &GizmoManager::get_positionGizmoEnabled,
+                           &GizmoManager::set_positionGizmoEnabled}
+    , rotationGizmoEnabled{this, &GizmoManager::get_rotationGizmoEnabled,
+                           &GizmoManager::set_rotationGizmoEnabled}
+    , scaleGizmoEnabled{this, &GizmoManager::get_scaleGizmoEnabled,
+                        &GizmoManager::set_scaleGizmoEnabled}
+    , boundingBoxGizmoEnabled{this, &GizmoManager::get_boundingBoxGizmoEnabled,
+                              &GizmoManager::set_boundingBoxGizmoEnabled}
+    , _scene{iScene}
+    , _gizmosEnabled{false, false, false, false}
+    , _gizmoLayer{UtilityLayerRenderer::New(iScene)}
+    , _pointerObserver{nullptr}
+    , _attachedMesh{nullptr}
+    , _boundingBoxColor{Color3::FromHexString("#0984e3")}
+    , _dragBehavior{::std::make_unique<SixDofDragBehavior>()}
 {
-  _gizmoLayer = ::std::make_unique<UtilityLayerRenderer>(_scene);
-
-  // Options parsing
-  if (!options) {
-    options = GizmoManagerOptions{};
-  }
-  if ((*options).singleGizmo.isNull()) {
-    auto _options        = *options;
-    _options.singleGizmo = true;
-    options              = _options;
-  }
-
   // Instatiate/dispose gizmos based on pointer actions
   _pointerObserver = _scene->onPointerObservable.add(
-    [&, options](PointerInfo* pointerInfo, EventState& /*es*/) {
+    [this](PointerInfo* pointerInfo, EventState& /*es*/) {
+      if (!usePointerToAttachGizmos) {
+        return;
+      }
       if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
         if (pointerInfo->pickInfo.pickedMesh) {
-          if (!stl_util::contains(_gizmoSet,
-                                  pointerInfo->pickInfo.pickedMesh->uniqueId)) {
-            if ((*options).singleGizmo) {
-              _clearGizmos();
+          Node* node = pointerInfo->pickInfo.pickedMesh;
+          if (attachableMeshes == nullopt_t) {
+            // Attach to the most parent node
+            while (node && node->parent != nullptr) {
+              node = node->parent();
             }
-            // Enable gizmo when mesh is selected
-            _gizmoSet[pointerInfo->pickInfo.pickedMesh->uniqueId] = {
-              ::std::make_unique<PositionGizmo>(
-                _gizmoLayer.get()), // positionGizmo
-              ::std::make_unique<RotationGizmo>(
-                _gizmoLayer.get()) // rotationGizmo
-            };
-            _gizmoSet[pointerInfo->pickInfo.pickedMesh->uniqueId]
-              .positionGizmo->attachedMesh
-              = pointerInfo->pickInfo.pickedMesh;
-            _gizmoSet[pointerInfo->pickInfo.pickedMesh->uniqueId]
-              .rotationGizmo->attachedMesh
-              = pointerInfo->pickInfo.pickedMesh;
           }
           else {
-            if (!(*options).singleGizmo) {
-              // Disable gizmo when clicked again
-              _gizmoSet[pointerInfo->pickInfo.pickedMesh->uniqueId]
-                .positionGizmo->dispose();
-              _gizmoSet[pointerInfo->pickInfo.pickedMesh->uniqueId]
-                .rotationGizmo->dispose();
-              _gizmoSet.erase(pointerInfo->pickInfo.pickedMesh->uniqueId);
+            // Attach to the parent node that is an attachableMesh
+            auto found = false;
+            for (auto& mesh : *attachableMeshes) {
+              if (node && (node == mesh || node->isDescendantOf(mesh))) {
+                node  = mesh;
+                found = true;
+              }
             }
+            if (!found) {
+              node = nullptr;
+            }
+          }
+          if (node && node->type() == IReflect::Type::ABSTRACTMESH) {
+            attachToMesh(static_cast<AbstractMesh*>(node));
           }
         }
         else {
-          if ((*options).singleGizmo) {
-            // Disable gizmo when clicked away
-            if (pointerInfo->pickInfo.ray) {
-              auto gizmoPick = _gizmoLayer->utilityLayerScene->pickWithRay(
-                *pointerInfo->pickInfo.ray);
-              if (gizmoPick && !(*gizmoPick).hit) {
-                _clearGizmos();
-              }
-            }
-          }
+          attachToMesh(nullptr);
         }
       }
     });
@@ -79,25 +74,137 @@ GizmoManager::~GizmoManager()
 {
 }
 
+void GizmoManager::attachToMesh(AbstractMesh* mesh)
+{
+  if (_attachedMesh) {
+    // _attachedMesh->removeBehavior(_dragBehavior);
+  }
+  _attachedMesh = mesh;
+
+  if (gizmos.positionGizmo && _gizmosEnabled.positionGizmo) {
+    gizmos.positionGizmo->attachedMesh = mesh;
+  }
+  if (gizmos.rotationGizmo && _gizmosEnabled.rotationGizmo) {
+    gizmos.rotationGizmo->attachedMesh = mesh;
+  }
+  if (gizmos.scaleGizmo && _gizmosEnabled.scaleGizmo) {
+    gizmos.scaleGizmo->attachedMesh = mesh;
+  }
+  if (gizmos.boundingBoxGizmo && _gizmosEnabled.boundingBoxGizmo) {
+    gizmos.boundingBoxGizmo->attachedMesh = mesh;
+  }
+
+  if (boundingBoxGizmoEnabled && _attachedMesh) {
+    //  _attachedMesh.addBehavior(_dragBehavior);
+  }
+}
+
+void GizmoManager::set_positionGizmoEnabled(bool value)
+{
+  if (value) {
+    if (!gizmos.positionGizmo) {
+      gizmos.positionGizmo = ::std::make_unique<PositionGizmo>();
+    }
+    gizmos.positionGizmo->updateGizmoRotationToMatchAttachedMesh = false;
+    gizmos.positionGizmo->attachedMesh = _attachedMesh;
+  }
+  else if (gizmos.positionGizmo) {
+    gizmos.positionGizmo->attachedMesh = nullptr;
+  }
+  _gizmosEnabled.positionGizmo = value;
+}
+
+bool GizmoManager::get_positionGizmoEnabled() const
+{
+  return _gizmosEnabled.positionGizmo;
+}
+
+void GizmoManager::set_rotationGizmoEnabled(bool value)
+{
+  if (value) {
+    if (!gizmos.rotationGizmo) {
+      gizmos.rotationGizmo = ::std::make_unique<RotationGizmo>();
+    }
+    gizmos.rotationGizmo->updateGizmoRotationToMatchAttachedMesh = false;
+    gizmos.rotationGizmo->attachedMesh = _attachedMesh;
+  }
+  else if (gizmos.rotationGizmo) {
+    gizmos.rotationGizmo->attachedMesh = nullptr;
+  }
+  _gizmosEnabled.rotationGizmo = value;
+}
+
+bool GizmoManager::get_rotationGizmoEnabled() const
+{
+  return _gizmosEnabled.rotationGizmo;
+}
+
+void GizmoManager::set_scaleGizmoEnabled(bool value)
+{
+  if (value) {
+    if (!gizmos.scaleGizmo) {
+      gizmos.scaleGizmo = ::std::make_unique<ScaleGizmo>();
+    }
+    gizmos.scaleGizmo->attachedMesh = _attachedMesh;
+  }
+  else if (gizmos.scaleGizmo) {
+    gizmos.scaleGizmo->attachedMesh = nullptr;
+  }
+  _gizmosEnabled.scaleGizmo = value;
+}
+
+bool GizmoManager::get_scaleGizmoEnabled() const
+{
+  return _gizmosEnabled.scaleGizmo;
+}
+
+void GizmoManager::set_boundingBoxGizmoEnabled(bool value)
+{
+  if (value) {
+    if (!gizmos.boundingBoxGizmo) {
+      gizmos.boundingBoxGizmo
+        = ::std::make_unique<BoundingBoxGizmo>(_boundingBoxColor);
+    }
+    gizmos.boundingBoxGizmo->attachedMesh = _attachedMesh;
+    if (_attachedMesh) {
+      // _attachedMesh->removeBehavior(_dragBehavior);
+      // _attachedMesh->addBehavior(_dragBehavior);
+    }
+  }
+  else if (gizmos.boundingBoxGizmo) {
+    gizmos.boundingBoxGizmo->attachedMesh = nullptr;
+  }
+  _gizmosEnabled.boundingBoxGizmo = value;
+}
+
+bool GizmoManager::get_boundingBoxGizmoEnabled() const
+{
+  return _gizmosEnabled.boundingBoxGizmo;
+}
+
 void GizmoManager::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   _scene->onPointerObservable.remove(_pointerObserver);
-  _clearGizmos();
-  _gizmoLayer->dispose(doNotRecurse, disposeMaterialAndTextures);
-}
 
-void GizmoManager::_clearGizmos()
-{
-  for (auto& item : _gizmoSet) {
-    auto& value = item.second;
-    if (value.positionGizmo) {
-      value.positionGizmo->dispose();
-    }
-    if (value.rotationGizmo) {
-      value.rotationGizmo->dispose();
-    }
+  if (gizmos.positionGizmo) {
+    gizmos.positionGizmo->dispose();
+    gizmos.positionGizmo = nullptr;
   }
-  _gizmoSet.clear();
+  if (gizmos.rotationGizmo) {
+    gizmos.rotationGizmo->dispose();
+    gizmos.rotationGizmo = nullptr;
+  }
+  if (gizmos.scaleGizmo) {
+    gizmos.scaleGizmo->dispose();
+    gizmos.scaleGizmo = nullptr;
+  }
+  if (gizmos.boundingBoxGizmo) {
+    gizmos.boundingBoxGizmo->dispose();
+    gizmos.boundingBoxGizmo = nullptr;
+  }
+
+  _dragBehavior->detach();
+  _gizmoLayer->dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 } // end of namespace BABYLON

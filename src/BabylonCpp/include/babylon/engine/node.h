@@ -20,6 +20,8 @@ class BABYLON_SHARED_EXPORT Node : public IAnimatable,
                                    public IBehaviorAware<Node>,
                                    public IDisposable {
 
+    friend class UtilityLayerRenderer;
+
 public:
   /**
    * @brief Creates a new Node.

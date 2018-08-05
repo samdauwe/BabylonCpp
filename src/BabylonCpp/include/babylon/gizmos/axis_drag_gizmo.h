@@ -4,6 +4,8 @@
 #include <babylon/babylon_global.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
+#include <babylon/math/color3.h>
+#include <babylon/rendering/utility_layer_renderer.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
@@ -16,12 +18,13 @@ class BABYLON_SHARED_EXPORT AxisDragGizmo : public Gizmo {
 public:
   /**
    * @brief Creates an AxisDragGizmo.
-   * @param gizmoLayer The utility layer the gizmo will be added to
    * @param dragAxis The axis which the gizmo will be able to drag on
    * @param color The color of the gizmo
+   * @param gizmoLayer The utility layer the gizmo will be added to
    */
-  AxisDragGizmo(UtilityLayerRenderer* gizmoLayer, const Vector3& dragAxis,
-                const Color3& color);
+  AxisDragGizmo(const Vector3& dragAxis, const Color3& color = Color3::Gray(),
+                const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer
+                = UtilityLayerRenderer::DefaultUtilityLayer());
   ~AxisDragGizmo() override;
 
   /**
@@ -35,6 +38,11 @@ protected:
 
 public:
   /**
+   * Drag behavior responsible for the gizmos dragging interactions
+   */
+  unique_ptr_t<PointerDragBehavior> _dragBehavior;
+
+  /**
    * Drag distance in babylon units that the gizmo will snap to when dragged
    * (Default: 0)
    */
@@ -47,7 +55,6 @@ public:
   Observable<SnapEvent> onSnapObservable;
 
 private:
-  unique_ptr_t<PointerDragBehavior> _dragBehavior;
   Observer<PointerInfo>::Ptr _pointerObserver;
 
   float _currentSnapDragDistance;

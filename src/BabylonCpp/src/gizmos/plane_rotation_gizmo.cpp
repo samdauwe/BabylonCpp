@@ -5,18 +5,18 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/mesh/lines_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
-PlaneRotationGizmo::PlaneRotationGizmo(UtilityLayerRenderer* gizmoLayer,
-                                       const Vector3& planeNormal,
-                                       const Color3& color)
-    : Gizmo{gizmoLayer}
+PlaneRotationGizmo::PlaneRotationGizmo(
+  const Vector3& planeNormal, const Color3& color,
+  const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+    : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , _pointerObserver{nullptr}
-    , _lastDragPosition{nullptr}
     , _tmpSnapEvent{0.f}
 {
   // Create Material
@@ -32,8 +32,19 @@ PlaneRotationGizmo::PlaneRotationGizmo(UtilityLayerRenderer* gizmoLayer,
 
   // Build mesh on root node
   auto parentMesh = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
-  auto rotationMesh = Mesh::CreateTorus(
-    "torus", 3, 0.15f, 20, gizmoLayer->utilityLayerScene.get(), false);
+
+  // Create circle out of lines
+  auto tessellation = 20ul;
+  auto radius       = 2.f;
+  vector_t<Vector3> points;
+  for (size_t i = 0; i < tessellation; ++i) {
+    auto radian = (Math::PI2) * (i / (tessellation - 1));
+    points.emplace_back(
+      Vector3(radius * ::std::sin(radian), 0.f, radius * ::std::cos(radian)));
+  }
+  auto rotationMesh
+    = Mesh::CreateLines("", points, gizmoLayer->utilityLayerScene.get());
+  rotationMesh->color = coloredMaterial->emissiveColor;
 
   // Position arrow pointing in its drag axis
   rotationMesh->scaling().scaleInPlace(0.1f);
@@ -45,24 +56,28 @@ PlaneRotationGizmo::PlaneRotationGizmo(UtilityLayerRenderer* gizmoLayer,
   _rootMesh->addChild(parentMesh);
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
-  options.dragPlaneNormal = planeNormal;
-  PointerDragBehavior _dragBehavior(options);
-  _dragBehavior.moveAttached = false;
-  _rootMesh->addBehavior(&_dragBehavior);
+  options.dragPlaneNormal    = planeNormal;
+  dragBehavior               = ::std::make_unique<PointerDragBehavior>(options);
+  dragBehavior->moveAttached = false;
+  dragBehavior->maxDragAngle = Math::PI * 9.f / 20.f;
+  dragBehavior->_useAlternatePickedPointAboveMaxDragAngle = true;
+  _rootMesh->addBehavior(dragBehavior.get());
 
-  _dragBehavior.onDragStartObservable.add(
+  dragBehavior->onDragStartObservable.add(
     [&](DragStartOrEndEvent* e, EventState& /*es*/) {
       if (attachedMesh) {
-        _lastDragPosition = e->dragPlanePoint;
+        _lastDragPosition.copyFrom(e->dragPlanePoint);
       }
     });
 
   auto currentSnapDragDistance = 0.f;
-  _dragBehavior.onDragObservable.add([&](DragMoveEvent* event,
+  dragBehavior->onDragObservable.add([&](DragMoveEvent* event,
                                          EventState& /*es*/) {
-    if (attachedMesh && _lastDragPosition) {
+    if (attachedMesh) {
       if (!attachedMesh()->rotationQuaternion()) {
-        attachedMesh()->setRotationQuaternion(Quaternion());
+        attachedMesh()->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
+          attachedMesh()->rotation().y, attachedMesh()->rotation().x,
+          attachedMesh()->rotation().z));
       }
       // Calc angle over full 360 degree
       // (https://stackoverflow.com/questions/43493711/the-angle-between-two-3d-vectors-with-a-result-range-0-360)
@@ -70,7 +85,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(UtilityLayerRenderer* gizmoLayer,
         = event->dragPlanePoint.subtract(attachedMesh()->position())
             .normalize();
       auto originalVector
-        = (*_lastDragPosition).subtract(attachedMesh()->position()).normalize();
+        = _lastDragPosition.subtract(attachedMesh()->position()).normalize();
       auto cross = Vector3::Cross(newVector, originalVector);
       auto dot   = Vector3::Dot(newVector, originalVector);
       auto angle = ::std::atan2(cross.length(), dot);
@@ -121,11 +136,18 @@ PlaneRotationGizmo::PlaneRotationGizmo(UtilityLayerRenderer* gizmoLayer,
                      _planeNormalTowardsCamera.z * quaternionCoefficient,
                      ::std::cos(angle / 2.f));
 
-      // Rotate selected mesh quaternion over fixed axis
-      attachedMesh()->rotationQuaternion()->multiplyToRef(
-        amountToRotate, *attachedMesh()->rotationQuaternion());
+      if (updateGizmoRotationToMatchAttachedMesh) {
+        // Rotate selected mesh quaternion over fixed axis
+        attachedMesh()->rotationQuaternion()->multiplyToRef(
+          amountToRotate, *attachedMesh()->rotationQuaternion());
+      }
+      else {
+        // Rotate selected mesh quaternion over rotated axis
+        amountToRotate.multiplyToRef(*attachedMesh()->rotationQuaternion(),
+                                     *attachedMesh()->rotationQuaternion());
+      }
 
-      _lastDragPosition = event->dragPlanePoint;
+      _lastDragPosition.copyFrom(event->dragPlanePoint);
       if (snapped) {
         _tmpSnapEvent.snapDistance = angle;
         onSnapObservable.notifyObservers(&_tmpSnapEvent);
@@ -135,17 +157,19 @@ PlaneRotationGizmo::PlaneRotationGizmo(UtilityLayerRenderer* gizmoLayer,
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
     [&](PointerInfo* pointerInfo, EventState& /*es*/) {
-      if (stl_util::contains(_rootMesh->getChildMeshes(),
-                             pointerInfo->pickInfo.pickedMesh)) {
-        for (auto& m : _rootMesh->getChildMeshes()) {
-          m->material = hoverMaterial;
-        }
+      if (_customMeshSet) {
+        return;
       }
-      else {
-        for (auto& m : _rootMesh->getChildMeshes()) {
-          m->material = coloredMaterial;
+      auto isHovered = stl_util::contains(_rootMesh->getChildMeshes(),
+                                          pointerInfo->pickInfo.pickedMesh);
+      auto material  = isHovered ? hoverMaterial : coloredMaterial;
+      for (auto& m : _rootMesh->getChildMeshes()) {
+        m->material = material;
+        // if ((static_cast<LinesMesh*>(m))->color)
+        {
+          static_cast<LinesMesh*>(m)->color = material->emissiveColor;
         }
-      }
+      };
     });
 }
 
@@ -155,8 +179,8 @@ PlaneRotationGizmo::~PlaneRotationGizmo()
 
 void PlaneRotationGizmo::_attachedMeshChanged(AbstractMesh* value)
 {
-  if (_dragBehavior) {
-    _dragBehavior->enabled = value ? true : false;
+  if (dragBehavior) {
+    dragBehavior->enabled = value ? true : false;
   }
 }
 
@@ -165,7 +189,7 @@ void PlaneRotationGizmo::dispose(bool doNotRecurse,
 {
   onSnapObservable.clear();
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
-  _dragBehavior->detach();
+  dragBehavior->detach();
   Gizmo::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 

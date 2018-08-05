@@ -3,6 +3,8 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/math/matrix.h>
+#include <babylon/math/vector3.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
@@ -18,8 +20,15 @@ public:
    * @brief Creates a gizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
-  Gizmo(UtilityLayerRenderer* gizmoLayer);
+  Gizmo(const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer);
   virtual ~Gizmo();
+
+  /**
+   * @brief Disposes and replaces the current meshes in the gizmo with the
+   * specified mesh.
+   * @param mesh The mesh to replace the default mesh of the gizmo
+   */
+  virtual void setCustomMesh(Mesh* mesh);
 
   /**
    * @brief Disposes of the gizmo.
@@ -42,6 +51,12 @@ protected:
 
   virtual void _attachedMeshChanged(AbstractMesh* value);
 
+  /**
+   * Hidden
+   * @brief Updates the gizmo to match the attached mesh's position/rotation.
+   */
+  void _update();
+
 public:
   /**
    * Mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that
@@ -53,7 +68,7 @@ public:
   /**
    * The utility layer the gizmo will be added to
    */
-  UtilityLayerRenderer* gizmoLayer;
+  shared_ptr_t<UtilityLayerRenderer> gizmoLayer;
 
   /**
    * If set the gizmo's rotation will be updated to match the attached mesh each
@@ -74,6 +89,11 @@ protected:
   Mesh* _rootMesh;
 
   /**
+   * If a custom mesh has been set (Default: false)
+   */
+  bool _customMeshSet;
+
+  /**
    * When set, the gizmo will always appear the same size no matter where the
    * camera is (default: false)
    */
@@ -82,6 +102,9 @@ protected:
 
 private:
   AbstractMesh* _attachedMesh;
+  float _scaleFactor;
+  Matrix _tmpMatrix;
+  Vector3 _tempVector;
   Observer<Scene>::Ptr _beforeRenderObserver;
 
 }; // end of class Gizmo

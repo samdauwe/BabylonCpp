@@ -5,15 +5,17 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/mesh/lines_mesh.h>
 #include <babylon/mesh/mesh_builder.h>
 #include <babylon/mesh/vertex_data_options.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
-AxisScaleGizmo::AxisScaleGizmo(UtilityLayerRenderer* gizmoLayer,
-                               const Vector3& dragAxis, const Color3& color)
-    : Gizmo{gizmoLayer}
+AxisScaleGizmo::AxisScaleGizmo(
+  const Vector3& dragAxis, const Color3& color,
+  const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+    : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , _pointerObserver{nullptr}
     , _currentSnapDragDistance{0.f}
@@ -32,14 +34,15 @@ AxisScaleGizmo::AxisScaleGizmo(UtilityLayerRenderer* gizmoLayer,
 
   // Build mesh on root node
   auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
-  BoxOptions boxOptions{0.5f};
+  BoxOptions boxOptions{0.4f};
   auto arrowMesh = MeshBuilder::CreateBox("yPosMesh", boxOptions,
                                           gizmoLayer->utilityLayerScene.get());
-  CylinderOptions cylinderOptions{0.015f};
-  cylinderOptions.height       = 0.3f;
-  cylinderOptions.tessellation = 96;
-  auto arrowTail               = MeshBuilder::CreateCylinder(
-    "yPosMesh", cylinderOptions, gizmoLayer->utilityLayerScene.get());
+
+  LinesOptions arrowTailOptions;
+  arrowTailOptions.points = {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.5f, 0.f)};
+  auto arrowTail          = MeshBuilder::CreateLines(
+    "yPosMesh", arrowTailOptions, gizmoLayer->utilityLayerScene.get());
+  arrowTail->color = coloredMaterial->emissiveColor;
   arrow->addChild(arrowMesh);
   arrow->addChild(arrowTail);
 
@@ -48,9 +51,9 @@ AxisScaleGizmo::AxisScaleGizmo(UtilityLayerRenderer* gizmoLayer,
   arrowMesh->material     = coloredMaterial;
   arrowMesh->rotation().x = Math::PI_2;
   arrowMesh->position().z += 0.3f;
+  arrowTail->scaling().scaleInPlace(0.2f);
   arrowTail->rotation().x = Math::PI_2;
   arrowTail->material     = coloredMaterial;
-  arrowTail->position().z += 0.15f;
   arrow->lookAt(_rootMesh->position().subtract(dragAxis));
   _rootMesh->addChild(arrow);
 
@@ -85,22 +88,7 @@ AxisScaleGizmo::AxisScaleGizmo(UtilityLayerRenderer* gizmoLayer,
           }
         }
 
-        auto invertCount = 0;
-        if (attachedMesh()->scaling().x < 0.f) {
-          invertCount++;
-        }
-        if (attachedMesh()->scaling().y < 0.f) {
-          invertCount++;
-        }
-        if (attachedMesh()->scaling().z < 0.f) {
-          invertCount++;
-        }
-        if (invertCount % 2 == 0) {
-          attachedMesh()->scaling().addInPlace(_tmpVector);
-        }
-        else {
-          attachedMesh()->scaling().subtractInPlace(_tmpVector);
-        }
+        attachedMesh()->scaling().addInPlace(_tmpVector);
 
         if (snapped) {
           _tmpSnapEvent.snapDistance = snapDistance * dragSteps;
@@ -111,17 +99,21 @@ AxisScaleGizmo::AxisScaleGizmo(UtilityLayerRenderer* gizmoLayer,
 
   _pointerObserver = gizmoLayer->utilityLayerScene->onPointerObservable.add(
     [&](PointerInfo* pointerInfo, EventState& /*es*/) {
-      if (stl_util::contains(_rootMesh->getChildMeshes(),
-                             pointerInfo->pickInfo.pickedMesh)) {
-        for (auto& m : _rootMesh->getChildMeshes()) {
-          m->material = hoverMaterial;
-        }
+      if (_customMeshSet) {
+        return;
       }
-      else {
-        for (auto& m : _rootMesh->getChildMeshes()) {
-          m->material = coloredMaterial;
+      auto isHovered = stl_util::contains(
+        _rootMesh->getChildMeshes(),
+        static_cast<Mesh*>(pointerInfo->pickInfo.pickedMesh));
+      auto material = isHovered ? hoverMaterial : coloredMaterial;
+      for (auto& m : _rootMesh->getChildMeshes()) {
+        m->material    = material;
+        auto linesMesh = static_cast<LinesMesh*>(m);
+        // if (linesMesh->color)
+        {
+          linesMesh->color = material->emissiveColor;
         }
-      }
+      };
     });
 }
 

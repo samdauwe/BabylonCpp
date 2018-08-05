@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_global.h>
 #include <babylon/gizmos/gizmo.h>
+#include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
@@ -16,7 +17,8 @@ public:
    * @brief Creates a ScaleGizmo
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
-  ScaleGizmo(UtilityLayerRenderer* gizmoLayer);
+  ScaleGizmo(const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer
+             = UtilityLayerRenderer::DefaultUtilityLayer());
   ~ScaleGizmo() override;
 
   /**
@@ -31,12 +33,22 @@ protected:
   bool get_updateGizmoRotationToMatchAttachedMesh() const;
 
 public:
-  Property<ScaleGizmo, bool> updateGizmoRotationToMatchAttachedMesh;
+  /**
+   * Internal gizmo used for interactions on the x axis
+   */
+  unique_ptr_t<AxisScaleGizmo> xGizmo;
 
-private:
-  unique_ptr_t<AxisScaleGizmo> _xDrag;
-  unique_ptr_t<AxisScaleGizmo> _yDrag;
-  unique_ptr_t<AxisScaleGizmo> _zDrag;
+  /**
+   * Internal gizmo used for interactions on the y axis
+   */
+  unique_ptr_t<AxisScaleGizmo> yGizmo;
+
+  /**
+   * Internal gizmo used for interactions on the z axis
+   */
+  unique_ptr_t<AxisScaleGizmo> zGizmo;
+
+  Property<ScaleGizmo, bool> updateGizmoRotationToMatchAttachedMesh;
 
 }; // end of class ScaleGizmo
 

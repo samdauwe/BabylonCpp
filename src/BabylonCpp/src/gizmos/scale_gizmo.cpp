@@ -6,19 +6,17 @@
 
 namespace BABYLON {
 
-ScaleGizmo::ScaleGizmo(UtilityLayerRenderer* gizmoLayer)
-    : Gizmo{gizmoLayer}
-    , updateGizmoRotationToMatchAttachedMesh{this,
-                                             &ScaleGizmo::
-                                               get_updateGizmoRotationToMatchAttachedMesh,
-                                             &ScaleGizmo::
-                                               set_updateGizmoRotationToMatchAttachedMesh}
-    , _xDrag{::std::make_unique<AxisScaleGizmo>(
-        gizmoLayer, Vector3(1.f, 0.f, 0.f), Color3::Green().scale(0.5f))}
-    , _yDrag{::std::make_unique<AxisScaleGizmo>(
-        gizmoLayer, Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f))}
-    , _zDrag{::std::make_unique<AxisScaleGizmo>(
-        gizmoLayer, Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f))}
+ScaleGizmo::ScaleGizmo(const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+    : Gizmo{iGizmoLayer}
+    , xGizmo{::std::make_unique<AxisScaleGizmo>(
+        Vector3(1.f, 0.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}
+    , yGizmo{::std::make_unique<AxisScaleGizmo>(
+        Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
+    , zGizmo{::std::make_unique<AxisScaleGizmo>(
+        Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
+    , updateGizmoRotationToMatchAttachedMesh{
+        this, &ScaleGizmo::get_updateGizmoRotationToMatchAttachedMesh,
+        &ScaleGizmo::set_updateGizmoRotationToMatchAttachedMesh}
 {
   attachedMesh = nullptr;
 }
@@ -29,32 +27,32 @@ ScaleGizmo::~ScaleGizmo()
 
 void ScaleGizmo::set_attachedMesh(AbstractMesh* const& mesh)
 {
-  if (_xDrag) {
-    _xDrag->attachedMesh = mesh;
-    _yDrag->attachedMesh = mesh;
-    _zDrag->attachedMesh = mesh;
+  if (xGizmo) {
+    xGizmo->attachedMesh = mesh;
+    yGizmo->attachedMesh = mesh;
+    zGizmo->attachedMesh = mesh;
   }
 }
 
 void ScaleGizmo::set_updateGizmoRotationToMatchAttachedMesh(bool value)
 {
-  if (_xDrag) {
-    _xDrag->updateGizmoRotationToMatchAttachedMesh = value;
-    _yDrag->updateGizmoRotationToMatchAttachedMesh = value;
-    _zDrag->updateGizmoRotationToMatchAttachedMesh = value;
+  if (xGizmo) {
+    xGizmo->updateGizmoRotationToMatchAttachedMesh = value;
+    yGizmo->updateGizmoRotationToMatchAttachedMesh = value;
+    zGizmo->updateGizmoRotationToMatchAttachedMesh = value;
   }
 }
 
 bool ScaleGizmo::get_updateGizmoRotationToMatchAttachedMesh() const
 {
-  return _xDrag->updateGizmoRotationToMatchAttachedMesh;
+  return xGizmo->updateGizmoRotationToMatchAttachedMesh;
 }
 
 void ScaleGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
-  _xDrag->dispose(doNotRecurse, disposeMaterialAndTextures);
-  _yDrag->dispose(doNotRecurse, disposeMaterialAndTextures);
-  _zDrag->dispose(doNotRecurse, disposeMaterialAndTextures);
+  xGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
+  yGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
+  zGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 } // end of namespace BABYLON
