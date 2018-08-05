@@ -32,6 +32,13 @@ public:
    */
   void reConstruct(const Vector3& min, const Vector3& max);
 
+  /**
+   * @brief Scale the current bounding box by applying a scale factor.
+   * @param factor defines the scale factor to apply
+   * @returns the current bounding box
+   */
+  BoundingBox& scale(float factor);
+
   Matrix& getWorldMatrix();
   BoundingBox& setWorldMatrix(const Matrix& matrix);
   void _update(const Matrix& world);

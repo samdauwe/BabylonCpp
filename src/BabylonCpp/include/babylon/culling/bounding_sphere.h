@@ -29,6 +29,13 @@ public:
    */
   void reConstruct(const Vector3& min, const Vector3& max);
 
+  /**
+   * @brief Scale the current bounding sphere by applying a scale factor.
+   * @param factor defines the scale factor to apply
+   * @returns the current bounding box
+   */
+  BoundingSphere& scale(float factor);
+
   /** Methods **/
   void _update(const Matrix& world);
   bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) const;

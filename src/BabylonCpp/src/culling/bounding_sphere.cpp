@@ -85,6 +85,19 @@ void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max)
   _update(Matrix::Identity());
 }
 
+BoundingSphere& BoundingSphere::scale(float factor)
+{
+  auto newRadius = radius * factor;
+  Vector3 newRadiusVector(newRadius, newRadius, newRadius);
+
+  auto min = center.subtract(newRadiusVector);
+  auto max = center.add(newRadiusVector);
+
+  reConstruct(min, max);
+
+  return *this;
+}
+
 // Methods
 void BoundingSphere::_update(const Matrix& world)
 {
@@ -118,7 +131,7 @@ bool BoundingSphere::intersectsPoint(const Vector3& point)
 
   const float distance = ::std::sqrt((x * x) + (y * y) + (z * z));
 
-  if (::std::abs(radiusWorld - distance) < Math::Epsilon) {
+  if (radiusWorld < distance) {
     return false;
   }
 

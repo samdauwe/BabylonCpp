@@ -11,6 +11,7 @@ BoundingInfo::BoundingInfo(const Vector3& iMinimum, const Vector3& iMaximum)
     , maximum{iMaximum}
     , boundingBox{BoundingBox(iMinimum, iMaximum)}
     , boundingSphere{BoundingSphere(iMinimum, iMaximum)}
+    , isLocked{this, &BoundingInfo::get_isLocked, &BoundingInfo::set_isLocked}
     , _isLocked{false}
 {
 }
@@ -20,6 +21,7 @@ BoundingInfo::BoundingInfo(const BoundingInfo& boundingInfo)
     , maximum{boundingInfo.maximum}
     , boundingBox{BoundingBox(boundingInfo.boundingBox)}
     , boundingSphere{BoundingSphere(boundingInfo.boundingSphere)}
+    , isLocked{this, &BoundingInfo::get_isLocked, &BoundingInfo::set_isLocked}
     , _isLocked{boundingInfo._isLocked}
 {
 }
@@ -29,6 +31,7 @@ BoundingInfo::BoundingInfo(BoundingInfo&& other)
     , maximum{::std::move(other.maximum)}
     , boundingBox{BoundingBox(::std::move(other.boundingBox))}
     , boundingSphere{BoundingSphere(::std::move(other.boundingSphere))}
+    , isLocked{this, &BoundingInfo::get_isLocked, &BoundingInfo::set_isLocked}
     , _isLocked{::std::move(other._isLocked)}
 {
 }
@@ -63,12 +66,12 @@ BoundingInfo::~BoundingInfo()
 {
 }
 
-bool BoundingInfo::isLocked() const
+bool BoundingInfo::get_isLocked() const
 {
   return _isLocked;
 }
 
-void BoundingInfo::setIsLocked(bool value)
+void BoundingInfo::set_isLocked(bool value)
 {
   _isLocked = value;
 }
@@ -91,6 +94,14 @@ BoundingInfo& BoundingInfo::centerOn(const Vector3& center,
 
   boundingBox    = BoundingBox(minimum, maximum);
   boundingSphere = BoundingSphere(minimum, maximum);
+
+  return *this;
+}
+
+BoundingInfo& BoundingInfo::scale(float factor)
+{
+  boundingBox.scale(factor);
+  boundingSphere.scale(factor);
 
   return *this;
 }

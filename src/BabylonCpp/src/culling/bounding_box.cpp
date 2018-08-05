@@ -126,6 +126,21 @@ BoundingBox::~BoundingBox()
 {
 }
 
+BoundingBox& BoundingBox::scale(float factor)
+{
+  auto diff     = maximum.subtract(minimum);
+  auto distance = diff.length() * factor;
+  diff.normalize();
+  auto newRadius = diff.scale(distance / 2.f);
+
+  auto min = center.subtract(newRadius);
+  auto max = center.add(newRadius);
+
+  reConstruct(min, max);
+
+  return *this;
+}
+
 Matrix& BoundingBox::getWorldMatrix()
 {
   return _worldMatrix;
@@ -269,7 +284,7 @@ bool BoundingBox::IntersectsSphere(const Vector3& minPoint,
                                    float sphereRadius)
 {
   auto vector = Vector3::Clamp(sphereCenter, minPoint, maxPoint);
-  float num   = Vector3::DistanceSquared(sphereCenter, vector);
+  auto num    = Vector3::DistanceSquared(sphereCenter, vector);
   return (num <= (sphereRadius * sphereRadius));
 }
 
@@ -292,6 +307,7 @@ bool BoundingBox::IsInFrustum(const vector_t<Vector3>& boundingVectors,
 {
   for (size_t p = 0; p < 6; ++p) {
     auto inCount = 8;
+
     for (size_t i = 0; i < 8; ++i) {
       if (frustumPlanes[p].dotCoordinate(boundingVectors[i]) < 0) {
         --inCount;
