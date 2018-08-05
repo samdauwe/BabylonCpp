@@ -752,7 +752,7 @@ public:
    * @brief Adds the given action manager to this scene.
    * @param newActionManager The action manager to add
    */
-  void addActionManager(unique_ptr_t<ActionManager>&& newActionManager);
+  void addActionManager(const shared_ptr_t<ActionManager>& newActionManager);
 
   /**
    * @brief Adds the given texture to this scene.
@@ -2754,7 +2754,7 @@ public:
   ActionManager* actionManager;
 
   /** Hidden */
-  vector_t<unique_ptr_t<ActionManager>> _actionManagers;
+  vector_t<shared_ptr_t<ActionManager>> actionManagers;
 
   // Procedural textures
 
@@ -2946,6 +2946,11 @@ public:
    * Gets if the scene is already disposed
    */
   ReadOnlyProperty<Scene, bool> isDisposed;
+
+  /**
+   * Hidden
+   */
+  bool _allowPostProcessClear;
 
 protected:
   /** Hidden */

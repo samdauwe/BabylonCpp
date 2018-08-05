@@ -1226,7 +1226,7 @@ void SolidParticleSystem::setIsVisibilityBoxLocked(bool val)
 
   auto boundingInfo = mesh->getBoundingInfo();
 
-  boundingInfo.setIsLocked(val);
+  boundingInfo.isLocked = val;
 }
 
 bool SolidParticleSystem::SolidParticleSystem::isVisibilityBoxLocked() const

@@ -16,14 +16,6 @@ array_t<unsigned int, 17> ActionManager::Triggers{
 size_t ActionManager::DragMovementThreshold = 10;  // in pixels
 size_t ActionManager::LongPressDelay        = 500; // in milliseconds
 
-template <typename... Ts>
-ActionManager* ActionManager::New(Ts&&... args)
-{
-  auto actionManager = ::std::make_unique<Action>(std::forward<Ts>(args)...);
-  actionManager->_scene->_actionManagers.emplace_back(actionManager);
-  return actionManager.get();
-}
-
 ActionManager::ActionManager(Scene* scene)
     : hoverCursor{""}, _scene{scene ? scene : Engine::LastCreatedScene()}
 {
@@ -31,6 +23,12 @@ ActionManager::ActionManager(Scene* scene)
 
 ActionManager::~ActionManager()
 {
+}
+
+void ActionManager::addToScene(
+  const shared_ptr_t<ActionManager>& newActionManager)
+{
+  _scene->actionManagers.emplace_back(newActionManager);
 }
 
 void ActionManager::dispose()
@@ -42,13 +40,13 @@ void ActionManager::dispose()
     }
   }
 
-  _scene->_actionManagers.erase(
-    ::std::remove_if(_scene->_actionManagers.begin(),
-                     _scene->_actionManagers.end(),
-                     [this](const unique_ptr_t<ActionManager>& actionManager) {
+  _scene->actionManagers.erase(
+    ::std::remove_if(_scene->actionManagers.begin(),
+                     _scene->actionManagers.end(),
+                     [this](const shared_ptr_t<ActionManager>& actionManager) {
                        return actionManager.get() == this;
                      }),
-    _scene->_actionManagers.end());
+    _scene->actionManagers.end());
 }
 
 Scene* ActionManager::getScene() const

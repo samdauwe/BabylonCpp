@@ -37,6 +37,13 @@ public:
   ~GearVRController() override;
 
   /**
+   * @brief Updates the state of the pose enbaled controller based on the raw
+   * pose data from the device
+   * @param poseData raw pose fromthe device
+   */
+  void updateFromDevice(const DevicePose& poseData) override;
+
+  /**
    * @brief Implements abstract method on WebVRController class, loading
    * controller meshes and calling this.attachToMesh if successful.
    * @param scene scene in which to add meshes
@@ -59,6 +66,9 @@ protected:
                            const GamepadButtonChanges& changes) override;
 
 private:
+  float _maxRotationDistFromHeadset;
+  float _draggedRoomRotation;
+  Vector3 _tmpVector;
   const array_t<string_t, 2> _buttonIndexToObservableNameMap;
 
 }; // end of class GearVRController

@@ -347,7 +347,8 @@ InternalTexture* PostProcess::activate(Camera* camera,
   onActivateObservable.notifyObservers(camera);
 
   // Clear
-  if (autoClear && alphaMode == EngineConstants::ALPHA_DISABLE) {
+  if (scene->_allowPostProcessClear && autoClear
+      && alphaMode == EngineConstants::ALPHA_DISABLE) {
     _engine->clear(clearColor ? *clearColor : scene->clearColor, true, true,
                    true);
   }

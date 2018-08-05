@@ -229,11 +229,16 @@ public:
   virtual void dispose(Camera* camera = nullptr);
 
 public:
+  /**
+   * Name of the PostProcess
+   */
   string_t name;
+
   /**
    * Width of the texture to apply the post process on
    */
   int width;
+
   /**
    * Height of the texture to apply the post process on
    */
@@ -250,35 +255,42 @@ public:
    * See https://doc.babylonjs.com/classes/3.1/texture
    */
   unsigned int renderTargetSamplingMode;
+
   /**
    * Clear color to use when screen clearing
    */
   unique_ptr_t<Color4> clearColor;
+
   /**
    * If the buffer needs to be cleared before applying the post process.
    * (default: true) Should be set to false if shader will overwrite all
    * previous pixels.
    */
   bool autoClear;
+
   /**
    * Type of alpha mode to use when performing the post process (default:
    * Engine.ALPHA_DISABLE)
    */
   unsigned int alphaMode;
+
   /**
    * Sets the setAlphaBlendConstants of the babylon engine
    */
   Nullable<Color4> alphaConstants;
+
   /**
    * Animations to be used for the post processing
    */
   vector_t<Animation*> animations;
+
   /**
    * Enable Pixel Perfect mode where texture is not scaled to be power of 2.
    * Can only be used on a single postprocess or on the last one of a chain.
    * (default: false)
    */
   bool enablePixelPerfectMode;
+
   /**
    * Force the postprocess to be applied without taking in account viewport
    */
@@ -297,23 +309,28 @@ public:
    * *** http://doc.babylonjs.com/api/classes/babylon.engine#scalemode_ceiling
    */
   unsigned int scaleMode;
+
   /**
    * Force textures to be a power of two (default: false)
    */
   bool alwaysForcePOT;
+
   /**
    * Number of sample textures (default: 1)
    */
   unsigned int samples;
+
   /**
    * Modify the scale of the post process to be the same as the viewport
    * (default: false)
    */
   bool adaptScaleToCurrentViewport;
+
   /**
    * Smart array of input and output textures for the post process.
    */
   vector_t<InternalTexture*> _textures;
+
   /**
    * The index in _textures that corresponds to the output texture.
    */
@@ -325,18 +342,22 @@ public:
    * An event triggered when the postprocess is activated.
    */
   Observable<Camera> onActivateObservable;
+
   /**
    * An event triggered when the postprocess changes its size.
    */
   Observable<PostProcess> onSizeChangedObservable;
+
   /**
    * An event triggered when the postprocess applies its effect.
    */
   Observable<Effect> onApplyObservable;
+
   /**
    * An event triggered before rendering the postprocess
    */
   Observable<Effect> onBeforeRenderObservable;
+
   /**
    * An event triggered after rendering the postprocess
    */

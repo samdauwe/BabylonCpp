@@ -187,6 +187,7 @@ Scene::Scene(Engine* engine)
     , audioEnabled{this, &Scene::get_audioEnabled, &Scene::set_audioEnabled}
     , headphone{this, &Scene::get_headphone, &Scene::set_headphone}
     , isDisposed{this, &Scene::get_isDisposed}
+    , _allowPostProcessClear{true}
     , _environmentTexture{nullptr}
     , _animationPropertiesOverride{nullptr}
     , _spritePredicate{nullptr}
@@ -2532,13 +2533,13 @@ int Scene::removeLensFlareSystem(LensFlareSystem* toRemove)
 int Scene::removeActionManager(ActionManager* toRemove)
 {
   auto it = ::std::find_if(
-    _actionManagers.begin(), _actionManagers.end(),
-    [&toRemove](const unique_ptr_t<ActionManager>& actionManager) {
+    actionManagers.begin(), actionManagers.end(),
+    [&toRemove](const shared_ptr_t<ActionManager>& actionManager) {
       return actionManager.get() == toRemove;
     });
-  int index = static_cast<int>(it - _actionManagers.begin());
-  if (it != _actionManagers.end()) {
-    _actionManagers.erase(it);
+  int index = static_cast<int>(it - actionManagers.begin());
+  if (it != actionManagers.end()) {
+    actionManagers.erase(it);
   }
   return index;
 }
@@ -2658,9 +2659,10 @@ void Scene::addEffectLayer(unique_ptr_t<EffectLayer>&& newEffectLayer)
   effectLayers.emplace_back(::std::move(newEffectLayer));
 }
 
-void Scene::addActionManager(unique_ptr_t<ActionManager>&& newActionManager)
+void Scene::addActionManager(
+  const shared_ptr_t<ActionManager>& newActionManager)
 {
-  _actionManagers.emplace_back(::std::move(newActionManager));
+  actionManagers.emplace_back(newActionManager);
 }
 
 void Scene::addTexture(unique_ptr_t<BaseTexture>&& newTexture)

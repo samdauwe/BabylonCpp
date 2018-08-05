@@ -196,10 +196,19 @@ public:
   static size_t LongPressDelay;        // in milliseconds
 
   template <typename... Ts>
-  static ActionManager* New(Ts&&... args);
+  static shared_ptr_t<ActionManager> New(Ts&&... args)
+  {
+    auto actionManagerRawPtr = new ActionManager(std::forward<Ts>(args)...);
+    auto actionManager
+      = static_cast<shared_ptr_t<ActionManager>>(actionManagerRawPtr);
+    actionManager->addToScene(actionManager);
+    return actionManager;
+  }
   virtual ~ActionManager();
 
   /** Methods **/
+
+  void addToScene(const shared_ptr_t<ActionManager>& newActionManager);
 
   /**
    * @brief Releases all associated resources.

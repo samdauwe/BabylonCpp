@@ -72,6 +72,9 @@ public:
   ~ConvolutionPostProcess();
 
 public:
+  /**
+   * Array of 9 values corrisponding to the 3x3 kernel to be applied
+   */
   Float32Array kernel;
 
 }; // end of class ConvolutionPostProcess
