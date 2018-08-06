@@ -15,6 +15,27 @@
 
 namespace BABYLON {
 
+void Node::AddNodeConstructor(const string_t& type,
+                              const NodeConstructor& constructorFunc)
+{
+  _NodeConstructors[type] = constructorFunc;
+}
+
+::std::function<Node*()>
+Node::Construct(const string_t& type, const string_t& name, Scene* scene,
+                const nullable_t<Json::object>& options)
+{
+  if (!stl_util::contains(_NodeConstructors, type)) {
+    return nullptr;
+  }
+
+  auto& constructorFunc = _NodeConstructors[type];
+
+  return [name, scene, options, constructorFunc]() {
+    return constructorFunc(name, scene, options);
+  };
+}
+
 Node::Node(const string_t& iName, Scene* scene)
     : name{iName}
     , id{iName}

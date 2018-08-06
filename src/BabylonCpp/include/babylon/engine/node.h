@@ -13,6 +13,12 @@
 namespace BABYLON {
 
 /**
+ * Defines how a node can be built from a string name.
+ */
+using NodeConstructor = ::std::function<Node*(
+  const string_t& name, Scene* scene, const nullable_t<Json::object>& options)>;
+
+/**
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera,
  * etc.).
  */
@@ -20,7 +26,31 @@ class BABYLON_SHARED_EXPORT Node : public IAnimatable,
                                    public IBehaviorAware<Node>,
                                    public IDisposable {
 
-    friend class UtilityLayerRenderer;
+  friend class UtilityLayerRenderer;
+
+private:
+  static unordered_map_t<string_t, NodeConstructor> _NodeConstructors;
+
+public:
+  /**
+   * @brief Add a new node constructor.
+   * @param type defines the type name of the node to construct
+   * @param constructorFunc defines the constructor function
+   */
+  static void AddNodeConstructor(const string_t& type,
+                                 const NodeConstructor& constructorFunc);
+
+  /**
+   * @brief Returns a node constructor based on type name.
+   * @param type defines the type name
+   * @param name defines the new node name
+   * @param scene defines the hosting scene
+   * @param options defines optional options to transmit to constructors
+   * @returns the new constructor or null
+   */
+  static ::std::function<Node*()>
+  Construct(const string_t& type, const string_t& name, Scene* scene,
+            const nullable_t<Json::object>& options = nullopt_t);
 
 public:
   /**
@@ -407,6 +437,11 @@ public:
   int _currentRenderId;
   string_t parentId;
   string_t _waitingParentId;
+
+  /** Hidden */
+  Scene* _scene;
+
+  /** Hidden */
   NodeCache _cache;
 
   /**
@@ -438,7 +473,6 @@ private:
   bool _isEnabled;
   bool _isReady;
   int _parentRenderId;
-  Scene* _scene;
   Node* _parentNode;
   vector_t<Node*> _children;
   AnimationPropertiesOverride* _animationPropertiesOverride;
