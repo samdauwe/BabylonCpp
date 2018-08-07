@@ -18,10 +18,13 @@ public:
   /**
    * @brief Creates a new instance of SphereParticleEmitter.
    * @param radius the radius of the emission sphere (1 by default)
+   * @param radiusRange the range of the emission sphere [0-1] 0 Surface only, 1
+   * Entire Radius (1 by default)
    * @param directionRandomizer defines how much to randomize the particle
    * direction [0-1]
    */
-  SphereParticleEmitter(float radius = 1.f, float directionRandomizer = 0.f);
+  SphereParticleEmitter(float radius = 1.f, float radiusRange = 1.f,
+                        float directionRandomizer = 0.f);
   virtual ~SphereParticleEmitter();
 
   /**
@@ -53,7 +56,7 @@ public:
   virtual unique_ptr_t<IParticleEmitterType> clone() const override;
 
   /**
-   * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update shader
+   * @brief Called by the GPUParticleSystem to setup the update shader
    * @param effect defines the update shader
    */
   void applyToShader(Effect* effect) override;
@@ -84,14 +87,15 @@ public:
 
 public:
   /**
-   * Gets or sets a value indicating where on the radius the start position
-   * should be picked (1 = everywhere, 0 = only surface)
-   */
-  float radiusRange;
-  /**
    * The radius of the emission sphere
    */
   float radius;
+
+  /**
+   * The range of emission [0-1] 0 Surface only, 1 Entire Radius.
+   */
+  float radiusRange;
+
   /**
    * How much to randomize the particle direction [0-1]
    */

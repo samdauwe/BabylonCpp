@@ -9,10 +9,10 @@
 
 namespace BABYLON {
 
-SphereParticleEmitter::SphereParticleEmitter(float iRadius,
+SphereParticleEmitter::SphereParticleEmitter(float iRadius, float iRadiusRange,
                                              float iDirectionRandomizer)
-    : radiusRange{1.f}
-    , radius{iRadius}
+    : radius{iRadius}
+    , radiusRange{iRadiusRange}
     , directionRandomizer{iDirectionRandomizer}
 {
 }

@@ -54,8 +54,7 @@ public:
   unique_ptr_t<IParticleEmitterType> clone() const override;
 
   /**
-   * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update
-   * shader.
+   * @brief Called by the GPUParticleSystem to setup the update shader
    * @param effect defines the update shader
    */
   void applyToShader(Effect* effect) override;
@@ -109,6 +108,24 @@ private:
   void _buildHeight();
 
 public:
+  /**
+   * Gets or sets a value indicating where on the radius the start position
+   * should be picked (1 = everywhere, 0 = only surface)
+   */
+  float radiusRange;
+
+  /**
+   * Gets or sets a value indicating where on the height the start position
+   * should be picked (1 = everywhere, 0 = only surface)
+   */
+  float heightRange;
+
+  /**
+   * Gets or sets a value indicating if all the particles should be emitted from
+   * the spawn point only (the base of the cone)
+   */
+  bool emitFromSpawnPointOnly;
+
   /**
    * The radius of the emission cone
    */

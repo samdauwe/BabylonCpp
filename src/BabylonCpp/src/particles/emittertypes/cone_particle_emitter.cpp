@@ -11,7 +11,10 @@ namespace BABYLON {
 
 ConeParticleEmitter::ConeParticleEmitter(float iRadius, float iAngle,
                                          float iDirectionRandomizer)
-    : radius{this, &ConeParticleEmitter::get_radius,
+    : radiusRange{1.f}
+    , heightRange{1.f}
+    , emitFromSpawnPointOnly{false}
+    , radius{this, &ConeParticleEmitter::get_radius,
              &ConeParticleEmitter::set_radius}
     , angle{this, &ConeParticleEmitter::get_angle,
             &ConeParticleEmitter::set_angle}
@@ -61,7 +64,7 @@ void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                  Vector3& directionToUpdate,
                                                  Particle* particle)
 {
-  if (_angle == 0.f) {
+  if (std::abs(std::cos(_angle)) == 1.f) {
     Vector3::TransformNormalFromFloatsToRef(0, 1.0, 0, worldMatrix,
                                             directionToUpdate);
   }
@@ -87,10 +90,17 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
                                                 Particle* /*particle*/)
 {
   const auto s = Scalar::RandomRange(0.f, Math::PI2);
-  auto h       = Scalar::RandomRange(0.f, 1.f);
-  // Better distribution in a cone at normal angles.
-  h           = 1.f - h * h;
-  auto radius = Scalar::RandomRange(0.f, _radius);
+  float h      = 0.f;
+
+  if (!emitFromSpawnPointOnly) {
+    h = Scalar::RandomRange(0.f, heightRange);
+    // Better distribution in a cone at normal angles.
+    h = 1.f - h * h;
+  }
+  else {
+    h = 0.0001f;
+  }
+  auto radius = _radius - Scalar::RandomRange(0.f, _radius * radiusRange);
   radius      = radius * h;
 
   const auto randX = radius * ::std::sin(s);
@@ -111,15 +121,21 @@ unique_ptr_t<IParticleEmitterType> ConeParticleEmitter::clone() const
 
 void ConeParticleEmitter::applyToShader(Effect* effect)
 {
-  effect->setFloat("radius", _radius);
+  effect->setFloat2("radius", _radius, radiusRange);
   effect->setFloat("coneAngle", _angle);
-  effect->setFloat("height", _height);
+  effect->setFloat2("height", _height, heightRange);
   effect->setFloat("directionRandomizer", directionRandomizer);
 }
 
 const char* ConeParticleEmitter::getEffectDefines() const
 {
-  return "#define CONEEMITTER";
+  string_t defines = "#define CONEEMITTER";
+
+  if (emitFromSpawnPointOnly) {
+    defines += "\n#define CONEEMITTERSPAWNPOINT";
+  }
+
+  return defines.c_str();
 }
 
 const char* ConeParticleEmitter::getClassName() const
