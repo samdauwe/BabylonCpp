@@ -88,53 +88,7 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
    */
   static constexpr unsigned int DELAYLOADSTATE_NOTLOADED = 4;
 
-  /**
-   * ALPHA */
-  static constexpr unsigned int TEXTUREFORMAT_ALPHA = 0;
-
-  /**
-   * LUMINANCE
-   */
-  static constexpr unsigned int TEXTUREFORMAT_LUMINANCE = 1;
-
-  /**
-   * LUMINANCE_ALPHA
-   */
-  static constexpr unsigned int TEXTUREFORMAT_LUMINANCE_ALPHA = 2;
-
-  /**
-   * RGB
-   */
-  static constexpr unsigned int TEXTUREFORMAT_RGB = 4;
-
-  /** RGBA
-   */
-  static constexpr unsigned int TEXTUREFORMAT_RGBA = 5;
-
-  /**
-   * R
-   */
-  static constexpr unsigned int TEXTUREFORMAT_R = 6;
-
-  /**
-   * RG
-   */
-  static constexpr unsigned int TEXTUREFORMAT_RG = 7;
-
-  /**
-   * UNSIGNED_INT
-   */
-  static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT = 0;
-
-  /**
-   * FLOAT
-   */
-  static constexpr unsigned int TEXTURETYPE_FLOAT = 1;
-
-  /**
-   * HALF_FLOAT
-   */
-  static constexpr unsigned int TEXTURETYPE_HALF_FLOAT = 2;
+  // Depht or Stencil test Constants.
 
   /**
    * Depth or Stencil test Constants.
@@ -228,6 +182,196 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
    * decremented with wrapping
    */
   static constexpr unsigned int DECR_WRAP = 0x8508;
+
+  /**
+   * Texture is not repeating outside of 0..1 UVs
+   */
+  static constexpr unsigned int TEXTURE_CLAMP_ADDRESSMODE = 0;
+
+  /**
+   * Texture is repeating outside of 0..1 UVs
+   */
+  static constexpr unsigned int TEXTURE_WRAP_ADDRESSMODE = 1;
+
+  /**
+   * Texture is repeating and mirrored
+   */
+  static constexpr unsigned int TEXTURE_MIRROR_ADDRESSMODE = 2;
+
+  /**
+   * ALPHA
+   */
+  static constexpr unsigned int TEXTUREFORMAT_ALPHA = 0;
+
+  /**
+   * LUMINANCE
+   */
+  static constexpr unsigned int TEXTUREFORMAT_LUMINANCE = 1;
+
+  /**
+   * LUMINANCE_ALPHA
+   */
+  static constexpr unsigned int TEXTUREFORMAT_LUMINANCE_ALPHA = 2;
+
+  /**
+   * RGB
+   */
+  static constexpr unsigned int TEXTUREFORMAT_RGB = 4;
+
+  /**
+   * RGBA
+   */
+  static constexpr unsigned int TEXTUREFORMAT_RGBA = 5;
+
+  /**
+   * R
+   */
+  static constexpr unsigned int TEXTUREFORMAT_R = 6;
+
+  /**
+   * RG
+   */
+  static constexpr unsigned int TEXTUREFORMAT_RG = 7;
+
+  /**
+   * UNSIGNED_INT
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT = 0;
+
+  /**
+   * FLOAT
+   */
+  static constexpr unsigned int TEXTURETYPE_FLOAT = 1;
+
+  /**
+   * HALF_FLOAT
+   */
+  static constexpr unsigned int TEXTURETYPE_HALF_FLOAT = 2;
+
+  /**
+   * nearest is mag = nearest and min = nearest and mip = linear
+   */
+  static constexpr unsigned int TEXTURE_NEAREST_SAMPLINGMODE = 1;
+
+  /**
+   * Bilinear is mag = linear and min = linear and mip = nearest
+   */
+  static constexpr unsigned int TEXTURE_BILINEAR_SAMPLINGMODE = 2;
+
+  /**
+   * Trilinear is mag = linear and min = linear and mip = linear
+   */
+  static constexpr unsigned int TEXTURE_TRILINEAR_SAMPLINGMODE = 3;
+
+  /**
+   * nearest is mag = nearest and min = nearest and mip = linear
+   */
+  static constexpr unsigned int TEXTURE_NEAREST_NEAREST_MIPLINEAR = 1;
+
+  /**
+   * Bilinear is mag = linear and min = linear and mip = nearest
+   */
+  static constexpr unsigned int TEXTURE_LINEAR_LINEAR_MIPNEAREST = 2;
+
+  /**
+   * Trilinear is mag = linear and min = linear and mip = linear
+   */
+  static constexpr unsigned int TEXTURE_LINEAR_LINEAR_MIPLINEAR = 3;
+
+  /**
+   * mag = nearest and min = nearest and mip = nearest
+   */
+  static constexpr unsigned int TEXTURE_NEAREST_NEAREST_MIPNEAREST = 4;
+
+  /**
+   * mag = nearest and min = linear and mip = nearest
+   */
+  static constexpr unsigned int TEXTURE_NEAREST_LINEAR_MIPNEAREST = 5;
+
+  /**
+   * mag = nearest and min = linear and mip = linear
+   */
+  static constexpr unsigned int TEXTURE_NEAREST_LINEAR_MIPLINEAR = 6;
+
+  /**
+   * mag = nearest and min = linear and mip = none
+   */
+  static constexpr unsigned int TEXTURE_NEAREST_LINEAR = 7;
+
+  /**
+   * mag = nearest and min = nearest and mip = none
+   */
+  static constexpr unsigned int TEXTURE_NEAREST_NEAREST = 8;
+
+  /**
+   * mag = linear and min = nearest and mip = nearest
+   */
+  static constexpr unsigned int TEXTURE_LINEAR_NEAREST_MIPNEAREST = 9;
+
+  /**
+   * mag = linear and min = nearest and mip = linear
+   */
+  static constexpr unsigned int TEXTURE_LINEAR_NEAREST_MIPLINEAR = 10;
+
+  /**
+   * mag = linear and min = linear and mip = none
+   */
+  static constexpr unsigned int TEXTURE_LINEAR_LINEAR = 11;
+
+  /**
+   * mag = linear and min = nearest and mip = none
+   */
+  static constexpr unsigned int TEXTURE_LINEAR_NEAREST = 12;
+
+  /**
+   * Explicit coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_EXPLICIT_MODE = 0;
+
+  /**
+   * Spherical coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_SPHERICAL_MODE = 1;
+
+  /**
+   * Planar coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_PLANAR_MODE = 2;
+
+  /**
+   * Cubic coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_CUBIC_MODE = 3;
+
+  /**
+   * Projection coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_PROJECTION_MODE = 4;
+
+  /**
+   * Skybox coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_SKYBOX_MODE = 5;
+
+  /**
+   * Inverse Cubic coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_INVCUBIC_MODE = 6;
+
+  /**
+   * Equirectangular coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_EQUIRECTANGULAR_MODE = 7;
+
+  /**
+   * Equirectangular Fixed coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_FIXED_EQUIRECTANGULAR_MODE = 8;
+
+  /**
+   * Equirectangular Fixed Mirrored coordinates mode
+   */
+  static constexpr unsigned int TEXTURE_FIXED_EQUIRECTANGULAR_MIRRORED_MODE = 9;
 
   // Texture rescaling mode
 
