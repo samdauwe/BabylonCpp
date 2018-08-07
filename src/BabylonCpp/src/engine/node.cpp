@@ -15,6 +15,8 @@
 
 namespace BABYLON {
 
+unordered_map_t<string_t, NodeConstructor> Node::_NodeConstructors;
+
 void Node::AddNodeConstructor(const string_t& type,
                               const NodeConstructor& constructorFunc)
 {

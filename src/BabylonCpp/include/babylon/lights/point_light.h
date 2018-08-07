@@ -20,6 +20,9 @@ public:
   {
     auto light = new PointLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<unique_ptr_t<Light>>(light));
+    if (!PointLight::NodeConstructorAdded && PointLight::AddNodeConstructor) {
+      PointLight::AddNodeConstructor();
+    }
 
     return light;
   }
@@ -97,6 +100,14 @@ public:
    */
   void transferToEffect(Effect* effect, const string_t& lightIndex) override;
 
+  /**
+   * @brief Prepares the list of defines specific to the light type.
+   * @param defines the list of defines
+   * @param lightIndex defines the index of the light for the effect
+   */
+  void prepareLightSpecificDefines(MaterialDefines& defines,
+                                   unsigned int lightIndex) override;
+
 protected:
   /**
    * @brief Creates a PointLight object from the passed name and position
@@ -129,6 +140,9 @@ protected:
 
 private:
   float _shadowAngle;
+
+  static bool NodeConstructorAdded;
+  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class PointLight
 

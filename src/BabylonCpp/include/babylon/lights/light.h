@@ -18,130 +18,103 @@ namespace BABYLON {
  */
 class BABYLON_SHARED_EXPORT Light : public Node {
 
-private:
-  // lightmapMode Consts
-  static constexpr unsigned int _LIGHTMAP_DEFAULT     = 0;
-  static constexpr unsigned int _LIGHTMAP_SPECULAR    = 1;
-  static constexpr unsigned int _LIGHTMAP_SHADOWSONLY = 2;
-
-  // Intensity Mode Consts
-  static constexpr unsigned int _INTENSITYMODE_AUTOMATIC         = 0;
-  static constexpr unsigned int _INTENSITYMODE_LUMINOUSPOWER     = 1;
-  static constexpr unsigned int _INTENSITYMODE_LUMINOUSINTENSITY = 2;
-  static constexpr unsigned int _INTENSITYMODE_ILLUMINANCE       = 3;
-  static constexpr unsigned int _INTENSITYMODE_LUMINANCE         = 4;
-
-  // Light types ids const.
-  static constexpr unsigned int _LIGHTTYPEID_POINTLIGHT       = 0;
-  static constexpr unsigned int _LIGHTTYPEID_DIRECTIONALLIGHT = 1;
-  static constexpr unsigned int _LIGHTTYPEID_SPOTLIGHT        = 2;
-  static constexpr unsigned int _LIGHTTYPEID_HEMISPHERICLIGHT = 3;
-
 public:
   /**
-   * @brief If every light affecting the material is in this lightmapMode,
-   * material.lightmapTexture adds or multiplies
-   * (depends on material.useLightmapAsShadowmap)
-   * after every other light calculations.
+   * Falloff Default: light is falling off following the material specification:
+   * standard material is using standard falloff whereas pbr material can
+   * request special falloff per materials.
    */
-  static constexpr unsigned int LIGHTMAP_DEFAULT()
-  {
-    return Light::_LIGHTMAP_DEFAULT;
-  }
+  static constexpr unsigned int FALLOFF_DEFAULT = 0;
 
   /**
-   * @brief material.lightmapTexture as only diffuse lighting from this light
-   * adds only specular lighting from this light
-   * adds dynamic shadows
+   * Falloff Physical: light is falling off following the inverse squared
+   * distance law.
    */
-  static constexpr unsigned int LIGHTMAP_SPECULAR()
-  {
-    return Light::_LIGHTMAP_SPECULAR;
-  }
+  static constexpr unsigned int FALLOFF_PHYSICAL = 1;
 
   /**
-   * @brief material.lightmapTexture as only lighting
-   * no light calculation from this light
-   * only adds dynamic shadows from this light
+   * Falloff gltf: light is falling off as described in the gltf moving to PBR
+   * document to enhance interoperability with other engines.
    */
-  static constexpr unsigned int LIGHTMAP_SHADOWSONLY()
-  {
-    return Light::_LIGHTMAP_SHADOWSONLY;
-  }
+  static constexpr unsigned int FALLOFF_GLTF = 2;
 
   /**
-   * @brief Each light type uses the default quantity according to its type:
+   * Falloff Standard: light is falling off like in the standard material
+   * to enhance interoperability with other materials.
+   */
+  static constexpr unsigned int FALLOFF_STANDARD = 3;
+
+  // lightmapMode Consts
+
+  /**
+   * If every light affecting the material is in this lightmapMode,
+   * material.lightmapTexture adds or multiplies (depends on
+   * material.useLightmapAsShadowmap) after every other light calculations.
+   */
+  static constexpr unsigned int LIGHTMAP_DEFAULT = 0;
+
+  /**
+   * material.lightmapTexture as only diffuse lighting from this light adds only
+   * specular lighting from this light adds dynamic shadows.
+   */
+  static constexpr unsigned int LIGHTMAP_SPECULAR = 1;
+
+  /**
+   * material.lightmapTexture as only lighting no light calculation from this
+   * light only adds dynamic shadows from this light.
+   */
+  static constexpr unsigned int LIGHTMAP_SHADOWSONLY = 2;
+
+  // Intensity Mode Consts
+
+  /**
+   * Each light type uses the default quantity according to its type:
    *      point/spot lights use luminous intensity
    *      directional lights use illuminance
    */
-  static constexpr unsigned int INTENSITYMODE_AUTOMATIC()
-  {
-    return Light::_INTENSITYMODE_AUTOMATIC;
-  }
+  static constexpr unsigned int INTENSITYMODE_AUTOMATIC = 0;
 
   /**
-   * @brief lumen (lm)
+   * lumen (lm)
    */
-  static constexpr unsigned int INTENSITYMODE_LUMINOUSPOWER()
-  {
-    return Light::_INTENSITYMODE_LUMINOUSPOWER;
-  }
+  static constexpr unsigned int INTENSITYMODE_LUMINOUSPOWER = 1;
 
   /**
-   * @brief candela (lm/sr)
+   * candela (lm/sr)
    */
-  static constexpr unsigned int INTENSITYMODE_LUMINOUSINTENSITY()
-  {
-    return Light::_INTENSITYMODE_LUMINOUSINTENSITY;
-  }
+  static constexpr unsigned int INTENSITYMODE_LUMINOUSINTENSITY = 2;
 
   /**
-   * @brief lux (lm/m^2)
+   * lux (lm/m^2)
    */
-  static constexpr unsigned int INTENSITYMODE_ILLUMINANCE()
-  {
-    return Light::_INTENSITYMODE_ILLUMINANCE;
-  }
+  static constexpr unsigned int INTENSITYMODE_ILLUMINANCE = 3;
 
   /**
-   * @brief nit (cd/m^2)
+   * nit (cd/m^2)
    */
-  static constexpr unsigned int INTENSITYMODE_LUMINANCE()
-  {
-    return Light::_INTENSITYMODE_LUMINANCE;
-  }
+  static constexpr unsigned int INTENSITYMODE_LUMINANCE = 4;
+
+  // Light types ids const.
 
   /**
-   * @brief Light type const id of the point light.
+   * Light type const id of the point light.
    */
-  static constexpr unsigned int LIGHTTYPEID_POINTLIGHT()
-  {
-    return Light::_LIGHTTYPEID_POINTLIGHT;
-  }
+  static constexpr unsigned int LIGHTTYPEID_POINTLIGHT = 0;
 
   /**
-   * @brief Light type const id of the directional light.
+   * Light type const id of the directional light.
    */
-  static constexpr unsigned int LIGHTTYPEID_DIRECTIONALLIGHT()
-  {
-    return Light::_LIGHTTYPEID_DIRECTIONALLIGHT;
-  }
+  static constexpr unsigned int LIGHTTYPEID_DIRECTIONALLIGHT = 1;
 
   /**
-   * @brief Light type const id of the spot light.
+   * Light type const id of the spot light.
    */
-  static constexpr unsigned int LIGHTTYPEID_SPOTLIGHT()
-  {
-    return Light::_LIGHTTYPEID_SPOTLIGHT;
-  }
+  static constexpr unsigned int LIGHTTYPEID_SPOTLIGHT = 2;
 
   /**
-   * @brief Light type const id of the hemispheric light.
+   * Light type const id of the hemispheric light.
    */
-  static constexpr unsigned int LIGHTTYPEID_HEMISPHERICLIGHT()
-  {
-    return Light::_LIGHTTYPEID_HEMISPHERICLIGHT;
-  }
+  static constexpr unsigned int LIGHTTYPEID_HEMISPHERICLIGHT = 3;
 
 public:
   ~Light() override;
@@ -261,6 +234,15 @@ public:
   void _reorderLightsInScene();
 
   /**
+   * @brief Prepares the list of defines specific to the light type.
+   * @param defines the list of defines
+   * @param lightIndex defines the index of the light for the effect
+   */
+  virtual void prepareLightSpecificDefines(MaterialDefines& defines,
+                                           unsigned int lightIndex)
+    = 0;
+
+  /**
    * @brief Sort function to order lights for rendering.
    * @param a First Light object to compare to second.
    * @param b Second Light object to compare first.
@@ -278,8 +260,8 @@ public:
    * @param scene The scene the new light will belong to
    * @returns the constructor function
    */
-  static Light* GetConstructorFromName(unsigned int type, const string_t& name,
-                                       Scene* scene);
+  static ::std::function<Light*()>
+  GetConstructorFromName(unsigned int type, const string_t& name, Scene* scene);
 
   /**
    * @brief Parses the passed "parsedLight" and returns a new instanced Light
@@ -298,6 +280,20 @@ protected:
    * @param scene The scene the light belongs too
    */
   Light(const string_t& name, Scene* scene);
+
+  /**
+   * @brief Defines how far from the source the light is impacting in scene
+   * units. Note: Unused in PBR material as the distance light falloff is
+   * defined following the inverse squared falloff.
+   */
+  float get_range() const;
+
+  /**
+   * @brief Defines how far from the source the light is impacting in scene
+   * units. Note: Unused in PBR material as the distance light falloff is
+   * defined following the inverse squared falloff.
+   */
+  void set_range(float value);
 
   /**
    * @brief Gets the photometric scale used to interpret the intensity.
@@ -436,19 +432,29 @@ public:
   Color3 specular;
 
   /**
+   * Defines how far from the source the light is impacting in scene units.
+   * Note: Unused in PBR material as the distance light falloff is defined
+   * following the inverse squared falloff.
+   */
+  Property<Light, float> range;
+
+  /**
+   * Defines the falloff type for this light. This lets overrriding how punctual
+   * light are falling off base on range or angle. This can be set to any values
+   * in Light.FALLOFF_x.
+   *
+   * Note: This is only usefull for PBR Materials at the moment. This could be
+   * extended if required to other types of materials.
+   */
+  unsigned int falloffType;
+
+  /**
    * Strength of the light.
    * Note: By default it is define in the framework own unit.
    * Note: In PBR materials the intensityMode can be use to chose what unit the
    * intensity is defined in.
    */
   float intensity;
-
-  /**
-   * Defines how far from the source the light is impacting in scene units.
-   * Note: Unused in PBR material as the distance light falloff is defined
-   * following the inverse squared falloff.
-   */
-  float range;
 
   /**
    * Shadow generator associted to the light.
@@ -519,7 +525,12 @@ public:
    */
   Property<Light, unsigned int> lightmapMode;
 
+protected:
+  float _inverseSquaredRange;
+
 private:
+  float _range;
+
   /**
    * Cached photometric scale default to 1.0 as the automatic intensity mode
    * defaults to 1.0 for every type

@@ -4,9 +4,21 @@
 #include <babylon/engine/scene.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material_defines.h>
 #include <babylon/materials/uniform_buffer.h>
 
 namespace BABYLON {
+
+bool PointLight::NodeConstructorAdded = false;
+
+::std::function<void()> PointLight::AddNodeConstructor = []() {
+  Node::AddNodeConstructor(
+    "Light_Type_0", [](const string_t& name, Scene* scene,
+                       const nullable_t<Json::object>& /*options*/) {
+      return PointLight::New(name, Vector3::Zero(), scene);
+    });
+  PointLight::NodeConstructorAdded = true;
+};
 
 PointLight::PointLight(const string_t& iName, const Vector3& iPosition,
                        Scene* scene)
@@ -56,7 +68,7 @@ const string_t PointLight::getClassName() const
 
 unsigned int PointLight::getTypeID() const
 {
-  return Light::LIGHTTYPEID_POINTLIGHT();
+  return Light::LIGHTTYPEID_POINTLIGHT;
 }
 
 bool PointLight::needCube() const
@@ -110,6 +122,7 @@ void PointLight::_buildUniformLayout()
   _uniformBuffer->addUniform("vLightData", 4);
   _uniformBuffer->addUniform("vLightDiffuse", 4);
   _uniformBuffer->addUniform("vLightSpecular", 3);
+  _uniformBuffer->addUniform("vLightFalloff", 4);
   _uniformBuffer->addUniform("shadowsInfo", 3);
   _uniformBuffer->addUniform("depthValues", 2);
   _uniformBuffer->create();
@@ -125,11 +138,26 @@ void PointLight::transferToEffect(Effect* /*effect*/,
                                  transformedPosition().z, //
                                  0.f,                     //
                                  lightIndex);
-    return;
+  }
+  else {
+    _uniformBuffer->updateFloat4("vLightData", position().x, position().y,
+                                 position().z, 0, lightIndex);
   }
 
-  _uniformBuffer->updateFloat4("vLightData", position().x, position().y,
-                               position().z, 0, lightIndex);
+  _uniformBuffer->updateFloat4("vLightFalloff",      //
+                               range(),              //
+                               _inverseSquaredRange, //
+                               0.f,                  //
+                               0.f,                  //
+                               lightIndex            //
+  );
+}
+
+void PointLight::prepareLightSpecificDefines(MaterialDefines& defines,
+                                             unsigned int lightIndex)
+{
+  defines.resizeLights(lightIndex);
+  defines.pointlights[lightIndex] = true;
 }
 
 } // end of namespace BABYLON

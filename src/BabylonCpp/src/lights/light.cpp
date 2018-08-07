@@ -18,8 +18,9 @@ Light::Light(const string_t& iName, Scene* scene)
     : Node{iName, scene}
     , diffuse{Color3(1.f, 1.f, 1.f)}
     , specular{Color3(1.f, 1.f, 1.f)}
+    , range{this, &Light::get_range, &Light::set_range}
+    , falloffType{Light::FALLOFF_DEFAULT}
     , intensity{1.f}
-    , range{numeric_limits_t<float>::max()}
     , _shadowGenerator{nullptr}
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , intensityMode{this, &Light::get_intensityMode, &Light::set_intensityMode}
@@ -36,8 +37,10 @@ Light::Light(const string_t& iName, Scene* scene)
     , includeOnlyWithLayerMask{this, &Light::get_includeOnlyWithLayerMask,
                                &Light::set_includeOnlyWithLayerMask}
     , lightmapMode{this, &Light::get_lightmapMode, &Light::set_lightmapMode}
+    , _inverseSquaredRange{0.f}
+    , _range{numeric_limits_t<float>::max()}
     , _photometricScale{1.f}
-    , _intensityMode{Light::INTENSITYMODE_AUTOMATIC()}
+    , _intensityMode{Light::INTENSITYMODE_AUTOMATIC}
     , _radius{0.00001f}
     , _renderPriority{0}
     , _shadowEnabled{true}
@@ -98,6 +101,17 @@ void Light::setEnabled(bool value)
 {
   Node::setEnabled(value);
   _resyncMeshes();
+}
+
+float Light::get_range() const
+{
+  return _range;
+}
+
+void Light::set_range(float value)
+{
+  _range               = value;
+  _inverseSquaredRange = 1.f / (range * range);
 }
 
 unsigned int Light::get_intensityMode() const
@@ -332,21 +346,19 @@ Json::object Light::serialize() const
   return Json::object();
 }
 
-Light* Light::GetConstructorFromName(unsigned int type, const string_t& name,
-                                     Scene* scene)
+::std::function<Light*()> Light::GetConstructorFromName(unsigned int type,
+                                                        const string_t& name,
+                                                        Scene* scene)
 {
-  switch (type) {
-    case Light::LIGHTTYPEID_POINTLIGHT():
-      return PointLight::New(name, Vector3::Zero(), scene);
-    case Light::LIGHTTYPEID_DIRECTIONALLIGHT():
-      return DirectionalLight::New(name, Vector3::Zero(), scene);
-    case Light::LIGHTTYPEID_SPOTLIGHT():
-      return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
-                            scene);
-    case Light::LIGHTTYPEID_HEMISPHERICLIGHT():
-      return HemisphericLight::New(name, Vector3::Zero(), scene);
+  auto constructorFunc
+    = Node::Construct("Light_Type_" + ::std::to_string(type), name, scene);
+
+  if (constructorFunc) {
+    return
+      [constructorFunc]() { return static_cast<Light*>(constructorFunc()); };
   }
 
+  // Default to no light for none present once.
   return nullptr;
 }
 
@@ -359,7 +371,7 @@ Light* Light::Parse(const Json::value& parsedLight, Scene* scene)
     return nullptr;
   }
 
-  auto light = SerializationHelper::Parse(constructor, parsedLight, scene);
+  auto light = SerializationHelper::Parse(constructor(), parsedLight, scene);
   if (!light) {
     return nullptr;
   }
@@ -436,38 +448,38 @@ float Light::_getPhotometricScale()
 
   // get photometric mode
   auto photometricMode = intensityMode();
-  if (photometricMode == Light::INTENSITYMODE_AUTOMATIC()) {
-    if (lightTypeID == Light::LIGHTTYPEID_DIRECTIONALLIGHT()) {
-      photometricMode = Light::INTENSITYMODE_ILLUMINANCE();
+  if (photometricMode == Light::INTENSITYMODE_AUTOMATIC) {
+    if (lightTypeID == Light::LIGHTTYPEID_DIRECTIONALLIGHT) {
+      photometricMode = Light::INTENSITYMODE_ILLUMINANCE;
     }
     else {
-      photometricMode = Light::INTENSITYMODE_LUMINOUSINTENSITY();
+      photometricMode = Light::INTENSITYMODE_LUMINOUSINTENSITY;
     }
   }
 
   // compute photometric scale
   switch (lightTypeID) {
-    case Light::LIGHTTYPEID_POINTLIGHT():
-    case Light::LIGHTTYPEID_SPOTLIGHT():
+    case Light::LIGHTTYPEID_POINTLIGHT:
+    case Light::LIGHTTYPEID_SPOTLIGHT:
       switch (photometricMode) {
-        case Light::INTENSITYMODE_LUMINOUSPOWER():
+        case Light::INTENSITYMODE_LUMINOUSPOWER:
           photometricScale = 1.f / (4.f * Math::PI);
           break;
-        case Light::INTENSITYMODE_LUMINOUSINTENSITY():
+        case Light::INTENSITYMODE_LUMINOUSINTENSITY:
           photometricScale = 1.f;
           break;
-        case Light::INTENSITYMODE_LUMINANCE():
+        case Light::INTENSITYMODE_LUMINANCE:
           photometricScale = radius() * radius();
           break;
       }
       break;
 
-    case Light::LIGHTTYPEID_DIRECTIONALLIGHT():
+    case Light::LIGHTTYPEID_DIRECTIONALLIGHT:
       switch (photometricMode) {
-        case Light::INTENSITYMODE_ILLUMINANCE():
+        case Light::INTENSITYMODE_ILLUMINANCE:
           photometricScale = 1.f;
           break;
-        case Light::INTENSITYMODE_LUMINANCE():
+        case Light::INTENSITYMODE_LUMINANCE:
           // When radius (and therefore solid angle) is non-zero a directional
           // lights brightness can be specified via central (peak) luminance.
           // For a directional light the 'radius' defines the angular radius (in
@@ -484,7 +496,7 @@ float Light::_getPhotometricScale()
       }
       break;
 
-    case Light::LIGHTTYPEID_HEMISPHERICLIGHT():
+    case Light::LIGHTTYPEID_HEMISPHERICLIGHT:
       // No fall off in hemisperic light.
       photometricScale = 1.f;
       break;

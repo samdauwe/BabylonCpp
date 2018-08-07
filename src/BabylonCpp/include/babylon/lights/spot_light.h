@@ -23,6 +23,9 @@ public:
   {
     auto light = new SpotLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<unique_ptr_t<Light>>(light));
+    if (!SpotLight::NodeConstructorAdded && SpotLight::AddNodeConstructor) {
+      SpotLight::AddNodeConstructor();
+    }
 
     return light;
   }
@@ -57,6 +60,14 @@ public:
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 
+  /**
+   * @brief Prepares the list of defines specific to the light type.
+   * @param defines the list of defines
+   * @param lightIndex defines the index of the light for the effect
+   */
+  void prepareLightSpecificDefines(MaterialDefines& defines,
+                                   unsigned int lightIndex) override;
+
 protected:
   /**
    * @brief Creates a SpotLight object in the scene. A spot light is a simply
@@ -83,6 +94,20 @@ protected:
    * @brief Sets the cone angle of the spot light in Radians.
    */
   void set_angle(float value);
+
+  /**
+   * @brief Only used in gltf falloff mode, this defines the angle where
+   * the directional falloff will start before cutting at angle which could be
+   * seen as outer angle.
+   */
+  float get_innerAngle() const;
+
+  /**
+   * @brief Only used in gltf falloff mode, this defines the angle where
+   * the directional falloff will start before cutting at angle which could be
+   * seen as outer angle.
+   */
+  void set_innerAngle(float value);
 
   /**
    * @brief Allows scaling the angle of the light for shadow generation only.
@@ -171,6 +196,9 @@ protected:
 
   void _buildUniformLayout() override;
 
+private:
+  void _computeAngleValues();
+
 public:
   /**
    * The light decay speed with the distance from the emission spot
@@ -181,6 +209,13 @@ public:
    * The cone angle of the spot light in Radians
    */
   Property<SpotLight, float> angle;
+
+  /**
+   * Only used in gltf falloff mode, this defines the angle where the
+   * directional falloff will start before cutting at angle which could be seen
+   * as outer angle.
+   */
+  Property<SpotLight, float> innerAngle;
 
   /**
    * Allows scaling the angle of the light for shadow generation only
@@ -233,6 +268,11 @@ private:
    * projection.
    */
   float _angle;
+  float _innerAngle;
+  float _cosHalfAngle;
+  float _lightAngleScale;
+  float _lightAngleOffset;
+
   Nullable<float> _shadowAngleScale;
   Matrix _projectionTextureMatrix;
   BaseTexture* _projectionTexture;
@@ -243,6 +283,9 @@ private:
   Matrix _projectionTextureViewLightMatrix;
   Matrix _projectionTextureProjectionLightMatrix;
   Matrix _projectionTextureScalingMatrix;
+
+  static bool NodeConstructorAdded;
+  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class SpotLight
 

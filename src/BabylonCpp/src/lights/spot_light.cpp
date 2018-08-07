@@ -2,11 +2,24 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/axis.h>
 
 namespace BABYLON {
+
+bool SpotLight::NodeConstructorAdded = false;
+
+::std::function<void()> SpotLight::AddNodeConstructor = []() {
+  Node::AddNodeConstructor(
+    "Light_Type_2", [](const string_t& name, Scene* scene,
+                       const nullable_t<Json::object>& /*options*/) {
+      return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
+                            scene);
+    });
+  SpotLight::NodeConstructorAdded = true;
+};
 
 SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
                      const Vector3& direction, float iAngle, float iExponent,
@@ -14,6 +27,7 @@ SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
     : ShadowLight{iName, scene}
     , exponent{iExponent}
     , angle{this, &SpotLight::get_angle, &SpotLight::set_angle}
+    , innerAngle{this, &SpotLight::get_innerAngle, &SpotLight::set_innerAngle}
     , shadowAngleScale{this, &SpotLight::get_shadowAngleScale,
                        &SpotLight::set_shadowAngleScale}
     , projectionTextureMatrix{this, &SpotLight::get_projectionTextureMatrix}
@@ -30,6 +44,7 @@ SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
     , _projectionTextureLightNear{1e-6f}
     , _projectionTextureLightFar{1000.f}
     , _projectionTextureUpDirection{Vector3::Up()}
+    , _innerAngle{0.f}
     , _projectionTextureMatrix{Matrix::Zero()}
     , _projectionTexture{nullptr}
     , _projectionTextureViewLightDirty{true}
@@ -66,7 +81,7 @@ const string_t SpotLight::getClassName() const
 
 unsigned int SpotLight::getTypeID() const
 {
-  return Light::LIGHTTYPEID_SPOTLIGHT();
+  return Light::LIGHTTYPEID_SPOTLIGHT;
 }
 
 float SpotLight::get_angle() const
@@ -77,8 +92,21 @@ float SpotLight::get_angle() const
 void SpotLight::set_angle(float value)
 {
   _angle                                 = value;
+  _cosHalfAngle                          = std::cos(value * 0.5f);
   _projectionTextureProjectionLightDirty = true;
   forceProjectionMatrixCompute();
+  _computeAngleValues();
+}
+
+float SpotLight::get_innerAngle() const
+{
+  return _angle;
+}
+
+void SpotLight::set_innerAngle(float value)
+{
+  _innerAngle = value;
+  _computeAngleValues();
 }
 
 float SpotLight::get_shadowAngleScale() const
@@ -218,9 +246,18 @@ void SpotLight::_buildUniformLayout()
   _uniformBuffer->addUniform("vLightDiffuse", 4);
   _uniformBuffer->addUniform("vLightSpecular", 3);
   _uniformBuffer->addUniform("vLightDirection", 3);
+  _uniformBuffer->addUniform("vLightFalloff", 4);
   _uniformBuffer->addUniform("shadowsInfo", 3);
   _uniformBuffer->addUniform("depthValues", 2);
   _uniformBuffer->create();
+}
+
+void SpotLight::_computeAngleValues()
+{
+  _lightAngleScale
+    = 1.f
+      / ::std::max(0.001f, (::std::cos(_innerAngle * 0.5f) - _cosHalfAngle));
+  _lightAngleOffset = -_cosHalfAngle * _lightAngleScale;
 }
 
 void SpotLight::transferToEffect(Effect* effect, const string_t& lightIndex)
@@ -233,7 +270,8 @@ void SpotLight::transferToEffect(Effect* effect, const string_t& lightIndex)
                                  transformedPosition().y, // Y
                                  transformedPosition().z, // Z
                                  exponent,                // Value
-                                 lightIndex);             // Index
+                                 lightIndex               // Index
+    );
 
     normalizeDirection = Vector3::Normalize(transformedDirection());
   }
@@ -243,17 +281,27 @@ void SpotLight::transferToEffect(Effect* effect, const string_t& lightIndex)
                                  position().y, // Y
                                  position().z, // Z
                                  exponent,     // Value
-                                 lightIndex);  // Index
+                                 lightIndex    // Index
+    );
 
     normalizeDirection = Vector3::Normalize(direction());
   }
 
-  _uniformBuffer->updateFloat4("vLightDirection",          // Name
-                               normalizeDirection.x,       // X
-                               normalizeDirection.y,       // Y
-                               normalizeDirection.z,       // Z
-                               ::std::cos(angle() * 0.5f), // Value
-                               lightIndex);                // Index
+  _uniformBuffer->updateFloat4("vLightDirection",    // Name
+                               normalizeDirection.x, // X
+                               normalizeDirection.y, // Y
+                               normalizeDirection.z, // Z
+                               _cosHalfAngle,        // Value
+                               lightIndex            // Index
+  );
+
+  _uniformBuffer->updateFloat4("vLightFalloff",      // Name
+                               range,                // X
+                               _inverseSquaredRange, // Y
+                               _lightAngleScale,     // Z
+                               _lightAngleOffset,    // Value
+                               lightIndex            // Index
+  );
 
   if (projectionTexture() && projectionTexture()->isReady()) {
     if (_projectionTextureViewLightDirty) {
@@ -278,6 +326,14 @@ void SpotLight::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   if (_projectionTexture) {
     _projectionTexture->dispose();
   }
+}
+
+void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines,
+                                            unsigned int lightIndex)
+{
+  defines.resizeLights(lightIndex);
+  defines.spotlights[lightIndex]            = true;
+  defines.projectedLightTexture[lightIndex] = projectionTexture ? true : false;
 }
 
 } // end of namespace BABYLON

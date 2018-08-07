@@ -19,6 +19,10 @@ public:
   {
     auto light = new HemisphericLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<unique_ptr_t<Light>>(light));
+    if (!HemisphericLight::NodeConstructorAdded
+        && HemisphericLight::AddNodeConstructor) {
+      HemisphericLight::AddNodeConstructor();
+    }
 
     return light;
   }
@@ -67,6 +71,14 @@ public:
    */
   unsigned int getTypeID() const override;
 
+  /**
+   * @brief Prepares the list of defines specific to the light type.
+   * @param defines the list of defines
+   * @param lightIndex defines the index of the light for the effect
+   */
+  void prepareLightSpecificDefines(MaterialDefines& defines,
+                                   unsigned int lightIndex) override;
+
 protected:
   /**
    * @brief Creates a HemisphericLight object in the scene according to the
@@ -100,6 +112,9 @@ public:
 
 private:
   unique_ptr_t<Matrix> _worldMatrix;
+
+  static bool NodeConstructorAdded;
+  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class HemisphericLight
 

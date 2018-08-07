@@ -3,9 +3,21 @@
 #include <babylon/core/json.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material_defines.h>
 #include <babylon/materials/uniform_buffer.h>
 
 namespace BABYLON {
+
+bool HemisphericLight::NodeConstructorAdded = false;
+
+::std::function<void()> HemisphericLight::AddNodeConstructor = []() {
+  Node::AddNodeConstructor(
+    "Light_Type_3", [](const string_t& name, Scene* scene,
+                       const nullable_t<Json::object>& /*options*/) {
+      return HemisphericLight::New(name, Vector3::Zero(), scene);
+    });
+  HemisphericLight::NodeConstructorAdded = true;
+};
 
 HemisphericLight::HemisphericLight(const string_t& iName, Scene* scene)
     : HemisphericLight(iName, Vector3::Up(), scene)
@@ -84,7 +96,14 @@ Matrix* HemisphericLight::_getWorldMatrix()
 
 unsigned int HemisphericLight::getTypeID() const
 {
-  return Light::LIGHTTYPEID_HEMISPHERICLIGHT();
+  return Light::LIGHTTYPEID_HEMISPHERICLIGHT;
+}
+
+void HemisphericLight::prepareLightSpecificDefines(MaterialDefines& defines,
+                                                   unsigned int lightIndex)
+{
+  defines.resizeLights(lightIndex);
+  defines.hemilights[lightIndex] = true;
 }
 
 } // end of namespace BABYLON

@@ -5,10 +5,22 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/material_defines.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
+
+bool DirectionalLight::NodeConstructorAdded = false;
+
+::std::function<void()> DirectionalLight::AddNodeConstructor = []() {
+  Node::AddNodeConstructor(
+    "Light_Type_1", [](const string_t& name, Scene* scene,
+                       const nullable_t<Json::object>& /*options*/) {
+      return DirectionalLight::New(name, Vector3::Zero(), scene);
+    });
+  DirectionalLight::NodeConstructorAdded = true;
+};
 
 DirectionalLight::DirectionalLight(const string_t& iName,
                                    const Vector3& direction, Scene* scene)
@@ -45,7 +57,7 @@ const string_t DirectionalLight::getClassName() const
 
 unsigned int DirectionalLight::getTypeID() const
 {
-  return Light::LIGHTTYPEID_DIRECTIONALLIGHT();
+  return Light::LIGHTTYPEID_DIRECTIONALLIGHT;
 }
 
 float DirectionalLight::get_shadowFrustumSize() const
@@ -191,6 +203,13 @@ float DirectionalLight::getDepthMinZ(Camera* /*activeCamera*/) const
 float DirectionalLight::getDepthMaxZ(Camera* /*activeCamera*/) const
 {
   return 1.f;
+}
+
+void DirectionalLight::prepareLightSpecificDefines(MaterialDefines& defines,
+                                                   unsigned int lightIndex)
+{
+  defines.resizeLights(lightIndex);
+  defines.dirlights[lightIndex] = true;
 }
 
 } // end of namespace BABYLON

@@ -757,7 +757,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
     _effect->setFloat3("biasAndScale", bias(), normalBias(), depthScale());
 
     _effect->setMatrix("viewProjection", getTransformMatrix());
-    if (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT()) {
+    if (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT) {
       _effect->setVector3("lightData", _cachedDirection);
     }
     else {
@@ -911,7 +911,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     if (mesh->nonUniformScaling()) {
       defines.emplace_back("#define NONUNIFORMSCALING");
     }
-    if (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT()) {
+    if (getLight()->getTypeID() == Light::LIGHTTYPEID_DIRECTIONALLIGHT) {
       defines.emplace_back("#define DIRECTIONINLIGHTDATA");
     }
   }

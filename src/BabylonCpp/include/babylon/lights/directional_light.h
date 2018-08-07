@@ -24,6 +24,10 @@ public:
   {
     auto light = new DirectionalLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<unique_ptr_t<Light>>(light));
+    if (!DirectionalLight::NodeConstructorAdded
+        && DirectionalLight::AddNodeConstructor) {
+      DirectionalLight::AddNodeConstructor();
+    }
 
     return light;
   }
@@ -71,6 +75,14 @@ public:
    * @returns the depth max z
    */
   float getDepthMaxZ(Camera* activeCamera) const override;
+
+  /**
+   * @brief Prepares the list of defines specific to the light type.
+   * @param defines the list of defines
+   * @param lightIndex defines the index of the light for the effect
+   */
+  void prepareLightSpecificDefines(MaterialDefines& defines,
+                                   unsigned int lightIndex) override;
 
 protected:
   /**
@@ -166,6 +178,9 @@ private:
   float _orthoRight;
   float _orthoTop;
   float _orthoBottom;
+
+  static bool NodeConstructorAdded;
+  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class DirectionalLight
 
