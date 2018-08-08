@@ -5,6 +5,7 @@
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
 #include <babylon/behaviors/ibehavior_aware.h>
+#include <babylon/core/json.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
@@ -16,7 +17,7 @@ namespace BABYLON {
  * Defines how a node can be built from a string name.
  */
 using NodeConstructor = ::std::function<Node*(
-  const string_t& name, Scene* scene, const nullable_t<Json::object>& options)>;
+  const string_t& name, Scene* scene, const nullable_t<Json::value>& options)>;
 
 /**
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera,
@@ -50,7 +51,7 @@ public:
    */
   static ::std::function<Node*()>
   Construct(const string_t& type, const string_t& name, Scene* scene,
-            const nullable_t<Json::object>& options = nullopt_t);
+            const nullable_t<Json::value>& options = nullopt_t);
 
 public:
   /**

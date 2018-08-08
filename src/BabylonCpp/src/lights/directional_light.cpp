@@ -16,7 +16,7 @@ bool DirectionalLight::NodeConstructorAdded = false;
 ::std::function<void()> DirectionalLight::AddNodeConstructor = []() {
   Node::AddNodeConstructor(
     "Light_Type_1", [](const string_t& name, Scene* scene,
-                       const nullable_t<Json::object>& /*options*/) {
+                       const nullable_t<Json::value>& /*options*/) {
       return DirectionalLight::New(name, Vector3::Zero(), scene);
     });
   DirectionalLight::NodeConstructorAdded = true;

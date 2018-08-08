@@ -14,7 +14,7 @@ bool SpotLight::NodeConstructorAdded = false;
 ::std::function<void()> SpotLight::AddNodeConstructor = []() {
   Node::AddNodeConstructor(
     "Light_Type_2", [](const string_t& name, Scene* scene,
-                       const nullable_t<Json::object>& /*options*/) {
+                       const nullable_t<Json::value>& /*options*/) {
       return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
                             scene);
     });

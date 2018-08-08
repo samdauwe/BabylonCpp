@@ -87,6 +87,7 @@ file(GLOB BEHAVIORS_HDR_FILES       ${INCLUDE_PATH}/behaviors/*.h
 file(GLOB BONES_HDR_FILES           ${INCLUDE_PATH}/bones/*.h)
 file(GLOB CAMERAS_HDR_FILES         ${INCLUDE_PATH}/cameras/*.h
                                     ${INCLUDE_PATH}/cameras/inputs/*.h
+                                    ${INCLUDE_PATH}/cameras/stereoscopic/*.h
                                     ${INCLUDE_PATH}/cameras/vr/*.h)
 file(GLOB COLLISIONS_HDR_FILES      ${INCLUDE_PATH}/collisions/*.h)
 file(GLOB COMMON_HDR_FILES          ${INCLUDE_PATH}/*.h)
@@ -210,6 +211,7 @@ file(GLOB BEHAVIORS_SRC_FILES       ${SOURCE_PATH}/behaviors/*.cpp
 file(GLOB BONES_SRC_FILES           ${SOURCE_PATH}/bones/*.cpp)
 file(GLOB CAMERAS_SRC_FILES         ${SOURCE_PATH}/cameras/*.cpp
                                     ${SOURCE_PATH}/cameras/inputs/*.cpp
+                                    ${SOURCE_PATH}/cameras/stereoscopic/*.cpp
                                     ${SOURCE_PATH}/cameras/vr/*.cpp)
 file(GLOB COLLISIONS_SRC_FILES      ${SOURCE_PATH}/collisions/*.cpp)
 file(GLOB COMMON_SRC_FILES          ${SOURCE_PATH}/*.cpp)

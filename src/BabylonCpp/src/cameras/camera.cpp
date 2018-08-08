@@ -619,7 +619,7 @@ Vector3* Camera::getRightTarget()
   return &static_cast<TargetCamera*>(_rigCameras[1])->getTarget();
 }
 
-void Camera::setCameraRigMode(int /*iMode*/, const string_t& /*rigParams*/)
+void Camera::setCameraRigMode(int /*iMode*/, const Json::value& /*rigParams*/)
 {
 }
 

@@ -104,6 +104,11 @@ class ArcRotateCameraMouseWheelInput;
 class ArcRotateCameraPointersInput;
 class FreeCameraKeyboardMoveInput;
 class FreeCameraMouseInput;
+// - Stereoscopic
+class AnaglyphArcRotateCamera;
+class AnaglyphFreeCamera;
+class StereoscopicArcRotateCamera;
+class StereoscopicFreeCamera;
 // - VR
 struct DevicePose;
 struct PoseControlled;

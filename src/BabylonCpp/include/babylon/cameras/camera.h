@@ -195,7 +195,7 @@ public:
   FreeCamera* rightCamera();
   Vector3* getLeftTarget();
   Vector3* getRightTarget();
-  void setCameraRigMode(int mode, const string_t& rigParams);
+  void setCameraRigMode(int mode, const Json::value& rigParams);
   void setCameraRigParameter(const string_t& name, float value);
   virtual Camera* createRigCamera(const string_t& name, int cameraIndex);
   virtual void _updateRigCameras();

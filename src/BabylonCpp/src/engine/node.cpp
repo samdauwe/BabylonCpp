@@ -5,7 +5,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/light.h>
@@ -23,9 +22,9 @@ void Node::AddNodeConstructor(const string_t& type,
   _NodeConstructors[type] = constructorFunc;
 }
 
-::std::function<Node*()>
-Node::Construct(const string_t& type, const string_t& name, Scene* scene,
-                const nullable_t<Json::object>& options)
+::std::function<Node*()> Node::Construct(const string_t& type,
+                                         const string_t& name, Scene* scene,
+                                         const nullable_t<Json::value>& options)
 {
   if (!stl_util::contains(_NodeConstructors, type)) {
     return nullptr;
