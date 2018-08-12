@@ -14,15 +14,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT HemisphericLight : public Light {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static HemisphericLight* New(Ts&&... args)
   {
     auto light = new HemisphericLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<unique_ptr_t<Light>>(light));
-    if (!HemisphericLight::NodeConstructorAdded
-        && HemisphericLight::AddNodeConstructor) {
-      HemisphericLight::AddNodeConstructor();
-    }
 
     return light;
   }
@@ -114,7 +113,6 @@ private:
   unique_ptr_t<Matrix> _worldMatrix;
 
   static bool NodeConstructorAdded;
-  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class HemisphericLight
 

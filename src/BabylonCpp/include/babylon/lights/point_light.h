@@ -15,14 +15,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PointLight : public ShadowLight {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static PointLight* New(Ts&&... args)
   {
     auto light = new PointLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<unique_ptr_t<Light>>(light));
-    if (!PointLight::NodeConstructorAdded && PointLight::AddNodeConstructor) {
-      PointLight::AddNodeConstructor();
-    }
 
     return light;
   }
@@ -142,7 +142,6 @@ private:
   float _shadowAngle;
 
   static bool NodeConstructorAdded;
-  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class PointLight
 

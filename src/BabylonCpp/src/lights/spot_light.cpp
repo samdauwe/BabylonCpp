@@ -11,7 +11,8 @@ namespace BABYLON {
 
 bool SpotLight::NodeConstructorAdded = false;
 
-::std::function<void()> SpotLight::AddNodeConstructor = []() {
+void SpotLight::AddNodeConstructor()
+{
   Node::AddNodeConstructor(
     "Light_Type_2", [](const string_t& name, Scene* scene,
                        const nullable_t<Json::value>& /*options*/) {
@@ -19,7 +20,7 @@ bool SpotLight::NodeConstructorAdded = false;
                             scene);
     });
   SpotLight::NodeConstructorAdded = true;
-};
+}
 
 SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
                      const Vector3& direction, float iAngle, float iExponent,

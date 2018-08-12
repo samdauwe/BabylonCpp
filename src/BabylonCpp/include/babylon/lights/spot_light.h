@@ -18,14 +18,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT SpotLight : public ShadowLight {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static SpotLight* New(Ts&&... args)
   {
     auto light = new SpotLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<unique_ptr_t<Light>>(light));
-    if (!SpotLight::NodeConstructorAdded && SpotLight::AddNodeConstructor) {
-      SpotLight::AddNodeConstructor();
-    }
 
     return light;
   }
@@ -285,7 +285,6 @@ private:
   Matrix _projectionTextureScalingMatrix;
 
   static bool NodeConstructorAdded;
-  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class SpotLight
 

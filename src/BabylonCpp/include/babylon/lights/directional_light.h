@@ -19,15 +19,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT DirectionalLight : public ShadowLight {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static DirectionalLight* New(Ts&&... args)
   {
     auto light = new DirectionalLight(::std::forward<Ts>(args)...);
     light->addToScene(static_cast<unique_ptr_t<Light>>(light));
-    if (!DirectionalLight::NodeConstructorAdded
-        && DirectionalLight::AddNodeConstructor) {
-      DirectionalLight::AddNodeConstructor();
-    }
 
     return light;
   }
@@ -180,7 +179,6 @@ private:
   float _orthoBottom;
 
   static bool NodeConstructorAdded;
-  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class DirectionalLight
 
