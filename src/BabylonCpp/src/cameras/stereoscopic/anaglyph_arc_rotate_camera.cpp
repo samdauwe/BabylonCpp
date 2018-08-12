@@ -6,7 +6,8 @@ namespace BABYLON {
 
 bool AnaglyphArcRotateCamera::NodeConstructorAdded = false;
 
-::std::function<void()> AnaglyphArcRotateCamera::AddNodeConstructor = []() {
+void AnaglyphArcRotateCamera::AddNodeConstructor()
+{
   Node::AddNodeConstructor(
     "AnaglyphArcRotateCamera", [](const string_t& name, Scene* scene,
                                   const nullable_t<Json::value>& options) {
@@ -19,7 +20,7 @@ bool AnaglyphArcRotateCamera::NodeConstructorAdded = false;
                                           interaxialDistance, scene);
     });
   AnaglyphArcRotateCamera::NodeConstructorAdded = true;
-};
+}
 
 AnaglyphArcRotateCamera::AnaglyphArcRotateCamera(
   const string_t& name, float alpha, float beta, float radius,

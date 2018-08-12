@@ -7,6 +7,7 @@
 #include <babylon/cameras/camera_inputs_manager.h>
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/cameras/free_camera.h>
+#include <babylon/cameras/universal_camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
@@ -475,7 +476,7 @@ Matrix& Camera::getProjectionMatrix(bool force)
   return _projectionMatrix;
 }
 
-Matrix& Camera::getTranformationMatrix()
+Matrix& Camera::getTransformationMatrix()
 {
   _computedViewMatrix.multiplyToRef(_projectionMatrix, _transformMatrix);
   return _transformMatrix;
@@ -487,7 +488,7 @@ void Camera::updateFrustumPlanes()
     return;
   }
 
-  getTranformationMatrix();
+  getTransformationMatrix();
 
   if (_frustumPlanes.empty()) {
     _frustumPlanes = Frustum::GetPlanes(_transformMatrix);
@@ -738,23 +739,24 @@ Matrix& Camera::computeWorldMatrix(bool /*force*/)
 
 Camera* Camera::GetConstructorFromName(const string_t& type,
                                        const string_t& name, Scene* scene,
-                                       float /*interaxial_distance*/,
-                                       bool /*isStereoscopicSideBySide*/)
+                                       float interaxial_distance,
+                                       bool isStereoscopicSideBySide)
 {
-  if (type == "ArcRotateCamera") {
-    return ArcRotateCamera::New(name, 0.f, 0.f, 1.f, Vector3::Zero(), scene);
-  }
-  else if (type == "FollowCamera") {
-    return FollowCamera::New(name, Vector3::Zero(), scene);
-  }
-  else if (type == "ArcFollowCamera") {
-    return ArcFollowCamera::New(name, 0.f, 0.f, 1.f, nullptr, scene);
-  }
-  else if (type == "FreeCamera") {
-    return FreeCamera::New(name, Vector3::Zero(), scene);
+  Json::object options;
+  options["interaxial_distance"]
+    = picojson::value(static_cast<double>(interaxial_distance));
+  options["isStereoscopicSideBySide"]
+    = picojson::value(isStereoscopicSideBySide);
+
+  auto constructorFunc
+    = Node::Construct(type, name, scene, Json::value(options));
+
+  if (constructorFunc) {
+    return static_cast<Camera*>(constructorFunc());
   }
 
-  return nullptr;
+  // Default to universal camera
+  return UniversalCamera::New(name, Vector3::Zero(), scene);
 }
 
 Camera* Camera::Parse(const Json::value& parsedCamera, Scene* scene)

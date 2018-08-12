@@ -172,7 +172,14 @@ public:
   void freezeProjectionMatrix(const Matrix& projection);
   void unfreezeProjectionMatrix();
   Matrix& getProjectionMatrix(bool force = false);
-  Matrix& getTranformationMatrix();
+
+  /**
+   * @brief Gets the transformation matrix (ie. the multiplication of view by
+   * projection matrices).
+   * @returns a Matrix
+   */
+  Matrix& getTransformationMatrix();
+
   bool isInFrustum(ICullable* target);
   bool isCompletelyInFrustum(ICullable* target);
   Ray getForwardRay(float length = 100.f);

@@ -4,6 +4,18 @@
 
 namespace BABYLON {
 
+bool FollowCamera::NodeConstructorAdded = false;
+
+void FollowCamera::AddNodeConstructor()
+{
+  Node::AddNodeConstructor(
+    "FollowCamera", [](const string_t& name, Scene* scene,
+                       const nullable_t<Json::value>& /*options*/) {
+      return FollowCamera::New(name, Vector3::Zero(), scene);
+    });
+  FollowCamera::NodeConstructorAdded = true;
+}
+
 FollowCamera::FollowCamera(const string_t& iName, const Vector3& iPosition,
                            Scene* scene, AbstractMesh* iLockedTarget)
     : TargetCamera{iName, iPosition, scene}

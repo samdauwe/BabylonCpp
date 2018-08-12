@@ -1,6 +1,7 @@
 #include <babylon/cameras/free_camera.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/cameras/universal_camera.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/core/json.h>
@@ -9,6 +10,19 @@
 #include <babylon/interfaces/icanvas.h>
 
 namespace BABYLON {
+
+bool FreeCamera::NodeConstructorAdded = false;
+
+void FreeCamera::AddNodeConstructor()
+{
+  Node::AddNodeConstructor(
+    "FreeCamera", [](const string_t& name, Scene* scene,
+                     const nullable_t<Json::value>& /*options*/) {
+      // Forcing to use the Universal camera
+      return UniversalCamera::New(name, Vector3::Zero(), scene);
+    });
+  FreeCamera::NodeConstructorAdded = true;
+}
 
 FreeCamera::FreeCamera(const string_t& iName, const Vector3& iPosition,
                        Scene* scene, bool setActiveOnSceneIfNoneActive)

@@ -29,31 +29,31 @@ void CameraInputsManager<TCamera>::add(
   shared_ptr_t<ICameraInput<TCamera>>&& input)
 {
   const string_t type = input->getSimpleName();
-  if (stl_util::contains(attached, type)) {
+  if (stl_util::contains(_attached, type)) {
     BABYLON_LOGF_WARN("CameraInputsManager",
                       "camera input of type %s already exists on camera",
                       type.c_str());
     return;
   }
 
-  attached[type] = ::std::move(input);
+  _attached[type] = ::std::move(input);
 
-  attached[type]->camera = camera;
+  _attached[type]->camera = camera;
 
   if (attachedElement) {
-    attached[type]->attachControl(attachedElement);
+    _attached[type]->attachControl(attachedElement);
   }
 }
 
 template <class TCamera>
 void CameraInputsManager<TCamera>::remove(ICameraInput<TCamera>* inputToRemove)
 {
-  for (auto& item : attached) {
+  for (auto& item : _attached) {
     auto& input = item.second;
     if (input.get() == inputToRemove) {
       input->detachControl(attachedElement);
       input->camera = nullptr;
-      attached.erase(item.first);
+      _attached.erase(item.first);
       rebuildInputCheck();
     }
   }
@@ -62,12 +62,12 @@ void CameraInputsManager<TCamera>::remove(ICameraInput<TCamera>* inputToRemove)
 template <class TCamera>
 void CameraInputsManager<TCamera>::removeByType(const string_t& inputType)
 {
-  for (auto& item : attached) {
+  for (auto& item : _attached) {
     auto& input = item.second;
     if (input->getClassName() == inputType) {
       input->detachControl(attachedElement);
       input->camera = nullptr;
-      attached.erase(item.first);
+      _attached.erase(item.first);
       rebuildInputCheck();
     }
   }
@@ -102,7 +102,7 @@ void CameraInputsManager<TCamera>::attachElement(ICanvas* canvas,
   attachedElement  = canvas;
   noPreventDefault = _noPreventDefault;
 
-  for (auto& item : attached) {
+  for (auto& item : _attached) {
     item.second->attachControl(canvas, noPreventDefault);
   }
 }
@@ -115,7 +115,7 @@ void CameraInputsManager<TCamera>::detachElement(ICanvas* canvas,
     return;
   }
 
-  for (auto& item : attached) {
+  for (auto& item : _attached) {
     item.second->detachControl(canvas);
 
     if (disconnect) {
@@ -134,7 +134,7 @@ void CameraInputsManager<TCamera>::rebuildInputCheck()
 template <class TCamera>
 void CameraInputsManager<TCamera>::checkInputs()
 {
-  for (auto& item : attached) {
+  for (auto& item : _attached) {
     auto& input = item.second;
     if (input->hasCheckInputs) {
       input->checkInputs();
@@ -143,12 +143,19 @@ void CameraInputsManager<TCamera>::checkInputs()
 }
 
 template <class TCamera>
+unordered_map_t<string_t, shared_ptr_t<ICameraInput<TCamera>>>&
+CameraInputsManager<TCamera>::attached()
+{
+  return _attached;
+}
+
+template <class TCamera>
 void CameraInputsManager<TCamera>::clear()
 {
   if (attachedElement) {
     detachElement(attachedElement, true);
   }
-  attached.clear();
+  _attached.clear();
   attachedElement = nullptr;
 }
 

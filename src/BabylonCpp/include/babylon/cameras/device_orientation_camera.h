@@ -15,6 +15,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT DeviceOrientationCamera : public FreeCamera {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static DeviceOrientationCamera* New(Ts&&... args)
   {
@@ -60,6 +63,8 @@ protected:
 private:
   unique_ptr_t<Quaternion> _initialQuaternion;
   unique_ptr_t<Quaternion> _quaternionCache;
+
+  static bool NodeConstructorAdded;
 
 }; // end of class ArcFollowCamera
 

@@ -170,6 +170,10 @@ void TargetCamera::setTarget(const Vector3& target)
 {
   upVector.normalize();
 
+  if (stl_util::almost_equal(position.z, target.z)) {
+    position.z += Math::Epsilon;
+  }
+
   Matrix::LookAtLHToRef(position, target, upVector, _camMatrix);
   _camMatrix.invert();
 

@@ -1,15 +1,15 @@
-#include <babylon/cameras/stereoscopic/stereoscopic_arc_rotate_camera.h>
+#include <babylon/cameras/stereoscopic/stereoscopic_universal_camera.h>
 
 #include <babylon/core/json.h>
 
 namespace BABYLON {
 
-bool StereoscopicArcRotateCamera::NodeConstructorAdded = false;
+bool StereoscopicUniversalCamera::NodeConstructorAdded = false;
 
-void StereoscopicArcRotateCamera::AddNodeConstructor()
+void StereoscopicUniversalCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "StereoscopicArcRotateCamera", [](const string_t& name, Scene* scene,
+    "StereoscopicUniversalCamera", [](const string_t& name, Scene* scene,
                                       const nullable_t<Json::value>& options) {
       float interaxialDistance      = 0.f;
       bool isStereoscopicSideBySide = false;
@@ -19,18 +19,17 @@ void StereoscopicArcRotateCamera::AddNodeConstructor()
         isStereoscopicSideBySide
           = Json::GetBool(*options, "isStereoscopicSideBySide");
       }
-      return StereoscopicArcRotateCamera::New(
-        name, 0.f, 0.f, 1.f, Vector3::Zero(), interaxialDistance,
-        isStereoscopicSideBySide, scene);
+      return StereoscopicUniversalCamera::New(name, Vector3::Zero(),
+                                              interaxialDistance,
+                                              isStereoscopicSideBySide, scene);
     });
-  StereoscopicArcRotateCamera::NodeConstructorAdded = true;
+  StereoscopicUniversalCamera::NodeConstructorAdded = true;
 }
 
-StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
-  const string_t& name, float alpha, float beta, float radius,
-  const Vector3& target, float iInteraxialDistance,
+StereoscopicUniversalCamera::StereoscopicUniversalCamera(
+  const string_t& name, const Vector3& position, float iInteraxialDistance,
   bool iIsStereoscopicSideBySide, Scene* scene)
-    : ArcRotateCamera{name, alpha, beta, radius, target, scene}
+    : UniversalCamera{name, position, scene}
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;
@@ -43,13 +42,13 @@ StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
                    Json::value(rigParams));
 }
 
-StereoscopicArcRotateCamera::~StereoscopicArcRotateCamera()
+StereoscopicUniversalCamera::~StereoscopicUniversalCamera()
 {
 }
 
-const string_t StereoscopicArcRotateCamera::getClassName() const
+const string_t StereoscopicUniversalCamera::getClassName() const
 {
-  return "StereoscopicArcRotateCamera";
+  return "StereoscopicUniversalCamera";
 }
 
 } // end of namespace BABYLON

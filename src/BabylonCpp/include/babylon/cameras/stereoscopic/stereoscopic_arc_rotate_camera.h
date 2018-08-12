@@ -14,15 +14,14 @@ class BABYLON_SHARED_EXPORT StereoscopicArcRotateCamera
     : public ArcRotateCamera {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static StereoscopicArcRotateCamera* New(Ts&&... args)
   {
     auto camera = new StereoscopicArcRotateCamera(std::forward<Ts>(args)...);
     camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
-    if (!StereoscopicArcRotateCamera::NodeConstructorAdded
-        && StereoscopicArcRotateCamera::AddNodeConstructor) {
-      StereoscopicArcRotateCamera::AddNodeConstructor();
-    }
 
     return camera;
   }
@@ -54,7 +53,6 @@ protected:
 
 private:
   static bool NodeConstructorAdded;
-  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class StereoscopicArcRotateCamera
 

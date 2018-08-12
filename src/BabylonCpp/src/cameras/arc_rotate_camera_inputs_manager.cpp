@@ -34,4 +34,10 @@ ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addKeyboard()
   return *this;
 }
 
+ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addGamepad()
+{
+  // add(::std::make_shared<ArcRotateCameraGamepadInput>());
+  return *this;
+}
+
 } // end of namespace BABYLON

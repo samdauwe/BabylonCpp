@@ -7,14 +7,17 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT FreeCameraInputsManager
-  : public CameraInputsManager<FreeCamera> {
+    : public CameraInputsManager<FreeCamera> {
 
   FreeCameraInputsManager(FreeCamera* _camera);
   ~FreeCameraInputsManager();
 
   FreeCameraInputsManager& addKeyboard();
   FreeCameraInputsManager& addMouse(bool touchEnabled = true);
+  FreeCameraInputsManager& addGamepad();
   FreeCameraInputsManager& addDeviceOrientation();
+  FreeCameraInputsManager& addTouch();
+  FreeCameraInputsManager& addVirtualJoystick();
 
 }; // end of struct FreeCameraInputsManager
 

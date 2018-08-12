@@ -274,7 +274,7 @@ ISceneSize EnvironmentHelper::_getSceneSize()
   if (_options.sizeAuto) {
     if (_scene->activeCamera->type() == IReflect::Type::ARCROTATECAMERA) {
       auto activecamera = static_cast<ArcRotateCamera*>(_scene->activeCamera);
-      groundSize = static_cast<int>(activecamera->upperRadiusLimit * 2.f);
+      groundSize = static_cast<int>(*activecamera->upperRadiusLimit * 2.f);
       skyboxSize = groundSize;
     }
 

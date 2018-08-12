@@ -10,6 +10,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ArcFollowCamera : public TargetCamera {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static ArcFollowCamera* New(Ts&&... args)
   {
@@ -40,6 +43,8 @@ public:
 
 private:
   Vector3 _cartesianCoordinates;
+
+  static bool NodeConstructorAdded;
 
 }; // end of class ArcFollowCamera
 

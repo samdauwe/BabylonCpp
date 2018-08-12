@@ -95,20 +95,30 @@ class DeviceOrientationCamera;
 class FollowCamera;
 class FreeCamera;
 struct FreeCameraInputsManager;
+class GamepadCamera;
 template <class TCamera>
 struct ICameraInput;
 class TargetCamera;
+class TouchCamera;
+class UniversalCamera;
+class VirtualJoysticksCamera;
 // - Inputs
 class ArcRotateCameraKeyboardMoveInput;
 class ArcRotateCameraMouseWheelInput;
 class ArcRotateCameraPointersInput;
 class FreeCameraKeyboardMoveInput;
+class FreeCameraGamepadInput;
 class FreeCameraMouseInput;
+class FreeCameraTouchInput;
 // - Stereoscopic
 class AnaglyphArcRotateCamera;
 class AnaglyphFreeCamera;
+class AnaglyphGamepadCamera;
+class AnaglyphUniversalCamera;
 class StereoscopicArcRotateCamera;
 class StereoscopicFreeCamera;
+class StereoscopicGamepadCamera;
+class StereoscopicUniversalCamera;
 // - VR
 struct DevicePose;
 struct PoseControlled;

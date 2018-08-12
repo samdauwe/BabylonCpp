@@ -1,16 +1,16 @@
-#include <babylon/cameras/stereoscopic/stereoscopic_arc_rotate_camera.h>
+#include <babylon/cameras/stereoscopic/stereoscopic_gamepad_camera.h>
 
 #include <babylon/core/json.h>
 
 namespace BABYLON {
 
-bool StereoscopicArcRotateCamera::NodeConstructorAdded = false;
+bool StereoscopicGamepadCamera::NodeConstructorAdded = false;
 
-void StereoscopicArcRotateCamera::AddNodeConstructor()
+void StereoscopicGamepadCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "StereoscopicArcRotateCamera", [](const string_t& name, Scene* scene,
-                                      const nullable_t<Json::value>& options) {
+    "StereoscopicGamepadCamera", [](const string_t& name, Scene* scene,
+                                    const nullable_t<Json::value>& options) {
       float interaxialDistance      = 0.f;
       bool isStereoscopicSideBySide = false;
       if (options) {
@@ -19,18 +19,17 @@ void StereoscopicArcRotateCamera::AddNodeConstructor()
         isStereoscopicSideBySide
           = Json::GetBool(*options, "isStereoscopicSideBySide");
       }
-      return StereoscopicArcRotateCamera::New(
-        name, 0.f, 0.f, 1.f, Vector3::Zero(), interaxialDistance,
-        isStereoscopicSideBySide, scene);
+      return StereoscopicGamepadCamera::New(name, Vector3::Zero(),
+                                            interaxialDistance,
+                                            isStereoscopicSideBySide, scene);
     });
-  StereoscopicArcRotateCamera::NodeConstructorAdded = true;
+  StereoscopicGamepadCamera::NodeConstructorAdded = true;
 }
 
-StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
-  const string_t& name, float alpha, float beta, float radius,
-  const Vector3& target, float iInteraxialDistance,
+StereoscopicGamepadCamera::StereoscopicGamepadCamera(
+  const string_t& name, const Vector3& position, float iInteraxialDistance,
   bool iIsStereoscopicSideBySide, Scene* scene)
-    : ArcRotateCamera{name, alpha, beta, radius, target, scene}
+    : GamepadCamera{name, position, scene}
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;
@@ -43,13 +42,13 @@ StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
                    Json::value(rigParams));
 }
 
-StereoscopicArcRotateCamera::~StereoscopicArcRotateCamera()
+StereoscopicGamepadCamera::~StereoscopicGamepadCamera()
 {
 }
 
-const string_t StereoscopicArcRotateCamera::getClassName() const
+const string_t StereoscopicGamepadCamera::getClassName() const
 {
-  return "StereoscopicArcRotateCamera";
+  return "StereoscopicGamepadCamera";
 }
 
 } // end of namespace BABYLON

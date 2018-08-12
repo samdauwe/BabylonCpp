@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT ArcRotateCameraInputsManager
-  : public CameraInputsManager<ArcRotateCamera> {
+    : public CameraInputsManager<ArcRotateCamera> {
 
   ArcRotateCameraInputsManager(ArcRotateCamera* camera);
   ~ArcRotateCameraInputsManager();
@@ -15,6 +15,7 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraInputsManager
   ArcRotateCameraInputsManager& addMouseWheel();
   ArcRotateCameraInputsManager& addPointers();
   ArcRotateCameraInputsManager& addKeyboard();
+  ArcRotateCameraInputsManager& addGamepad();
 }; // end of struct ArcRotateCameraInputsManager
 
 } // end of namespace BABYLON

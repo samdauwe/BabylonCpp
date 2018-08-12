@@ -2,6 +2,18 @@
 
 namespace BABYLON {
 
+bool DeviceOrientationCamera::NodeConstructorAdded = false;
+
+void DeviceOrientationCamera::AddNodeConstructor()
+{
+  Node::AddNodeConstructor(
+    "DeviceOrientationCamera", [](const string_t& name, Scene* scene,
+                                  const nullable_t<Json::value>& /*options*/) {
+      return DeviceOrientationCamera::New(name, Vector3::Zero(), scene);
+    });
+  DeviceOrientationCamera::NodeConstructorAdded = true;
+}
+
 DeviceOrientationCamera::DeviceOrientationCamera(const string_t& iName,
                                                  const Vector3& position,
                                                  Scene* scene)

@@ -6,7 +6,8 @@ namespace BABYLON {
 
 bool AnaglyphFreeCamera::NodeConstructorAdded = false;
 
-::std::function<void()> AnaglyphFreeCamera::AddNodeConstructor = []() {
+void AnaglyphFreeCamera::AddNodeConstructor()
+{
   Node::AddNodeConstructor(
     "AnaglyphFreeCamera", [](const string_t& name, Scene* scene,
                              const nullable_t<Json::value>& options) {
@@ -19,7 +20,7 @@ bool AnaglyphFreeCamera::NodeConstructorAdded = false;
                                      scene);
     });
   AnaglyphFreeCamera::NodeConstructorAdded = true;
-};
+}
 
 AnaglyphFreeCamera::AnaglyphFreeCamera(const string_t& name,
                                        const Vector3& position,

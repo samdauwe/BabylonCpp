@@ -12,9 +12,22 @@
 
 namespace BABYLON {
 
+bool ArcRotateCamera::NodeConstructorAdded = false;
+
+void ArcRotateCamera::AddNodeConstructor()
+{
+  Node::AddNodeConstructor(
+    "ArcRotateCamera", [](const string_t& name, Scene* scene,
+                          const nullable_t<Json::value>& /*options*/) {
+      return ArcRotateCamera::New(name, 0.f, 0.f, 1.f, Vector3::Zero(), scene);
+    });
+  ArcRotateCamera::NodeConstructorAdded = true;
+}
+
 ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
                                  float iBeta, float iRadius,
-                                 const Nullable<Vector3>& iTarget, Scene* scene,
+                                 const nullable_t<Vector3>& iTarget,
+                                 Scene* scene,
                                  bool setActiveOnSceneIfNoneActive)
     : TargetCamera{iName, Vector3::Zero(), scene, setActiveOnSceneIfNoneActive}
     , alpha{iAlpha}
@@ -24,15 +37,16 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , inertialAlphaOffset{0.f}
     , inertialBetaOffset{0.f}
     , inertialRadiusOffset{0.f}
-    , lowerAlphaLimit{0.f}
-    , upperAlphaLimit{0.f}
+    , lowerAlphaLimit{nullopt_t}
+    , upperAlphaLimit{nullopt_t}
     , lowerBetaLimit{0.01f}
     , upperBetaLimit{Math::PI}
-    , lowerRadiusLimit{0.f}
-    , upperRadiusLimit{0.f}
+    , lowerRadiusLimit{nullopt_t}
+    , upperRadiusLimit{nullopt_t}
     , inertialPanningX{0.f}
     , inertialPanningY{0.f}
     , pinchToPanMaxDistance{20.f}
+    , panningDistanceLimit{nullopt_t}
     , panningOriginTarget{Vector3::Zero()}
     , panningInertia{0.9f}
     , zoomOnFactor{1.f}
@@ -260,11 +274,12 @@ void ArcRotateCamera::_checkInputs()
     }
 
     if (!_targetHost) {
-      if (panningDistanceLimit) {
+      if (panningDistanceLimit.has_value()) {
         _transformedDirection.addInPlace(_target);
         auto distanceSquared = Vector3::DistanceSquared(_transformedDirection,
                                                         panningOriginTarget);
-        if (distanceSquared <= (panningDistanceLimit * panningDistanceLimit)) {
+        if (distanceSquared
+            <= (*panningDistanceLimit * *panningDistanceLimit)) {
           _target.copyFrom(_transformedDirection);
         }
       }
@@ -314,22 +329,18 @@ void ArcRotateCamera::_checkLimits()
     }
   }
 
-  if ((!stl_util::almost_equal(lowerAlphaLimit, 0.f))
-      && alpha < lowerAlphaLimit) {
-    alpha = lowerAlphaLimit;
+  if (lowerAlphaLimit.has_value() && alpha < lowerAlphaLimit) {
+    alpha = *lowerAlphaLimit;
   }
-  if ((!stl_util::almost_equal(upperAlphaLimit, 0.f))
-      && alpha > upperAlphaLimit) {
-    alpha = upperAlphaLimit;
+  if (upperAlphaLimit.has_value() && alpha > upperAlphaLimit) {
+    alpha = *upperAlphaLimit;
   }
 
-  if ((!stl_util::almost_equal(lowerRadiusLimit, 0.f))
-      && radius < lowerRadiusLimit) {
-    radius = lowerRadiusLimit;
+  if (lowerRadiusLimit.has_value() && radius < lowerRadiusLimit) {
+    radius = *lowerRadiusLimit;
   }
-  if ((!stl_util::almost_equal(upperRadiusLimit, 0.f))
-      && radius > upperRadiusLimit) {
-    radius = upperRadiusLimit;
+  if (upperRadiusLimit.has_value() && radius > upperRadiusLimit) {
+    radius = *upperRadiusLimit;
   }
 }
 

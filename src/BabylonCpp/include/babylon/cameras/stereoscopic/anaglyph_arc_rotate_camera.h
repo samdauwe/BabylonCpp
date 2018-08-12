@@ -13,15 +13,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT AnaglyphArcRotateCamera : public ArcRotateCamera {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static AnaglyphArcRotateCamera* New(Ts&&... args)
   {
     auto camera = new AnaglyphArcRotateCamera(std::forward<Ts>(args)...);
     camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
-    if (!AnaglyphArcRotateCamera::NodeConstructorAdded
-        && AnaglyphArcRotateCamera::AddNodeConstructor) {
-      AnaglyphArcRotateCamera::AddNodeConstructor();
-    }
 
     return camera;
   }
@@ -50,7 +49,6 @@ protected:
 
 private:
   static bool NodeConstructorAdded;
-  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class AnaglyphArcRotateCamera
 

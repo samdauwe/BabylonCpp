@@ -365,17 +365,19 @@ float FramingBehavior::_calculateLowerRadiusFromModelBoundingSphere(
     return 0.f;
   }
 
-  if (camera->lowerRadiusLimit != 0.f
+  if (camera->lowerRadiusLimit.has_value()
       && _mode == FramingBehavior::IgnoreBoundsSizeMode) {
     // Don't exceed the requested limit
-    distance = distance < camera->lowerRadiusLimit ? camera->lowerRadiusLimit :
-                                                     distance;
+    distance = distance < *camera->lowerRadiusLimit ?
+                 *camera->lowerRadiusLimit :
+                 distance;
   }
 
   // Don't exceed the upper radius limit
-  if (camera->upperRadiusLimit != 0.f) {
-    distance = distance > camera->upperRadiusLimit ? camera->upperRadiusLimit :
-                                                     distance;
+  if (camera->upperRadiusLimit.has_value()) {
+    distance = distance > *camera->upperRadiusLimit ?
+                 *camera->upperRadiusLimit :
+                 distance;
   }
 
   return distance;

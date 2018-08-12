@@ -4,7 +4,6 @@
 #include <babylon/babylon_global.h>
 #include <babylon/cameras/arc_rotate_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
-#include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector2.h>
@@ -13,6 +12,9 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT ArcRotateCamera : public TargetCamera {
+
+public:
+  static void AddNodeConstructor();
 
 public:
   template <typename... Ts>
@@ -69,7 +71,7 @@ public:
 
 protected:
   ArcRotateCamera(const string_t& name, float alpha, float beta, float radius,
-                  const Nullable<Vector3>& target, Scene* scene,
+                  const nullable_t<Vector3>& target, Scene* scene,
                   bool setActiveOnSceneIfNoneActive = true);
 
   Vector3 _getTargetPosition();
@@ -98,16 +100,16 @@ public:
   float inertialAlphaOffset;
   float inertialBetaOffset;
   float inertialRadiusOffset;
-  float lowerAlphaLimit;
-  float upperAlphaLimit;
+  nullable_t<float> lowerAlphaLimit;
+  nullable_t<float> upperAlphaLimit;
   float lowerBetaLimit;
   float upperBetaLimit;
-  float lowerRadiusLimit;
-  float upperRadiusLimit;
+  nullable_t<float> lowerRadiusLimit;
+  nullable_t<float> upperRadiusLimit;
   float inertialPanningX;
   float inertialPanningY;
   float pinchToPanMaxDistance;
-  Nullable<float> panningDistanceLimit;
+  nullable_t<float> panningDistanceLimit;
   Vector3 panningOriginTarget;
   float panningInertia;
   float zoomOnFactor;
@@ -168,6 +170,8 @@ private:
   float _storedBeta;
   float _storedRadius;
   Vector3 _storedTarget;
+
+  static bool NodeConstructorAdded;
 
 }; // end of class ArcRotateCamera
 

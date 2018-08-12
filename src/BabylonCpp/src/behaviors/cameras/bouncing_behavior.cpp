@@ -87,12 +87,12 @@ void BouncingBehavior::attach(ArcRotateCamera* camera)
         }
 
         // Add the bounce animation to the lower radius limit
-        if (_isRadiusAtLimit(_attachedCamera->lowerRadiusLimit)) {
+        if (_isRadiusAtLimit(*_attachedCamera->lowerRadiusLimit)) {
           _applyBoundRadiusAnimation(lowerRadiusTransitionRange);
         }
 
         // Add the bounce animation to the upper radius limit
-        if (_isRadiusAtLimit(_attachedCamera->upperRadiusLimit)) {
+        if (_isRadiusAtLimit(*_attachedCamera->upperRadiusLimit)) {
           _applyBoundRadiusAnimation(upperRadiusTransitionRange);
         }
       });

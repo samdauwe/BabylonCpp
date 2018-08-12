@@ -12,15 +12,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT StereoscopicFreeCamera : public FreeCamera {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static StereoscopicFreeCamera* New(Ts&&... args)
   {
     auto camera = new StereoscopicFreeCamera(std::forward<Ts>(args)...);
     camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
-    if (!StereoscopicFreeCamera::NodeConstructorAdded
-        && StereoscopicFreeCamera::AddNodeConstructor) {
-      StereoscopicFreeCamera::AddNodeConstructor();
-    }
 
     return camera;
   }
@@ -48,7 +47,6 @@ protected:
 
 private:
   static bool NodeConstructorAdded;
-  static ::std::function<void()> AddNodeConstructor;
 
 }; // end of class StereoscopicFreeCamera
 

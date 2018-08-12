@@ -9,6 +9,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT FollowCamera : public TargetCamera {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static FollowCamera* New(Ts&&... args)
   {
@@ -40,6 +43,8 @@ public:
   float cameraAcceleration;
   float maxCameraSpeed;
   AbstractMesh* lockedTarget;
+
+  static bool NodeConstructorAdded;
 
 }; // end of class FollowCamera
 

@@ -23,14 +23,30 @@ FreeCameraInputsManager& FreeCameraInputsManager::addKeyboard()
 FreeCameraInputsManager& FreeCameraInputsManager::addMouse(bool touchEnabled)
 {
   add(::std::make_unique<FreeCameraMouseInput>(touchEnabled));
-  if (touchEnabled) {
-    return *this;
-  }
+  return *this;
+}
+
+FreeCameraInputsManager& FreeCameraInputsManager::addGamepad()
+{
+  // add(::std::make_unique<FreeCameraGamepadInput>());
   return *this;
 }
 
 FreeCameraInputsManager& FreeCameraInputsManager::addDeviceOrientation()
 {
+  // add(::std::make_unique<FreeCameraDeviceOrientationInput>());
+  return *this;
+}
+
+FreeCameraInputsManager& FreeCameraInputsManager::addTouch()
+{
+  // add(::std::make_unique<FreeCameraTouchInput>());
+  return *this;
+}
+
+FreeCameraInputsManager& FreeCameraInputsManager::addVirtualJoystick()
+{
+  // add(::std::make_unique<FreeCameraVirtualJoystickInput>());
   return *this;
 }
 

@@ -11,6 +11,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT FreeCamera : public TargetCamera {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static FreeCamera* New(Ts&&... args)
   {
@@ -70,6 +73,8 @@ private:
   Vector3 _oldPosition;
   Vector3 _diffPosition;
   Vector3 _newPosition;
+
+  static bool NodeConstructorAdded;
 
 }; // end of class FreeCamera
 

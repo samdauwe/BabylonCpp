@@ -4,6 +4,18 @@
 
 namespace BABYLON {
 
+bool ArcFollowCamera::NodeConstructorAdded = false;
+
+void ArcFollowCamera::AddNodeConstructor()
+{
+  Node::AddNodeConstructor(
+    "ArcFollowCamera", [](const string_t& name, Scene* scene,
+                          const nullable_t<Json::value>& /*options*/) {
+      return ArcFollowCamera::New(name, 0.f, 0.f, 1.f, nullptr, scene);
+    });
+  ArcFollowCamera::NodeConstructorAdded = true;
+}
+
 ArcFollowCamera::ArcFollowCamera(const string_t& iName, float iAlpha,
                                  float iBeta, float iRadius,
                                  AbstractMesh* iTarget, Scene* scene)

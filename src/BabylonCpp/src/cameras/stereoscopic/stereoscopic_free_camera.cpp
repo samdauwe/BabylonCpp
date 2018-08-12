@@ -6,7 +6,8 @@ namespace BABYLON {
 
 bool StereoscopicFreeCamera::NodeConstructorAdded = false;
 
-::std::function<void()> StereoscopicFreeCamera::AddNodeConstructor = []() {
+void StereoscopicFreeCamera::AddNodeConstructor()
+{
   Node::AddNodeConstructor(
     "StereoscopicFreeCamera", [](const string_t& name, Scene* scene,
                                  const nullable_t<Json::value>& options) {
@@ -23,7 +24,7 @@ bool StereoscopicFreeCamera::NodeConstructorAdded = false;
                                          isStereoscopicSideBySide, scene);
     });
   StereoscopicFreeCamera::NodeConstructorAdded = true;
-};
+}
 
 StereoscopicFreeCamera::StereoscopicFreeCamera(const string_t& name,
                                                const Vector3& position,

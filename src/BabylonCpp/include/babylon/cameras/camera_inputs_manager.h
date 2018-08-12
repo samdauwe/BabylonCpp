@@ -15,10 +15,8 @@ public:
   ~CameraInputsManager();
 
   /**
-   * @brief Add an input method to a camera.
-   * builtin inputs example: camera.inputs.addGamepad();
-   * custom inputs example: camera.inputs.add(new
-   * BABYLON.FreeCameraGamepadInput());
+   * Add an input method to a camera.
+   * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
    * @param input camera input method
    */
   void add(shared_ptr_t<ICameraInput<TCamera>>&& input);
@@ -37,6 +35,7 @@ public:
   void detachElement(ICanvas* canvas, bool disconnect = false);
   void rebuildInputCheck();
   void checkInputs();
+  unordered_map_t<string_t, shared_ptr_t<ICameraInput<TCamera>>>& attached();
 
   /**
    * @brief Remove all attached input methods from a camera
@@ -52,7 +51,7 @@ public:
   TCamera* camera;
 
 private:
-  unordered_map_t<string_t, shared_ptr_t<ICameraInput<TCamera>>> attached;
+  unordered_map_t<string_t, shared_ptr_t<ICameraInput<TCamera>>> _attached;
 
 }; // end of class CameraInputsManager<TCamera>
 
