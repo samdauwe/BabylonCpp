@@ -385,7 +385,7 @@ Mesh* CSG::CSG::toMesh(const string_t& name, Material* material, Scene* scene,
   mesh->position().copyFrom(position);
   mesh->rotation().copyFrom(*rotation);
   if (rotationQuaternion) {
-    mesh->setRotationQuaternion(*rotationQuaternion);
+    mesh->rotationQuaternion = *rotationQuaternion;
   }
   mesh->scaling().copyFrom(scaling);
   mesh->computeWorldMatrix(true);

@@ -41,8 +41,8 @@ CrowdSimulationUtils::createAgentMeshes(Scene* scene, size_t totalNoAgents)
 AbstractMesh* CrowdSimulationUtils::createWayPointMesh(Scene* scene,
                                                        const Vector2& position)
 {
-  auto mesh = Mesh::CreateSphere("", 8, 5.f, scene);
-  mesh->setPosition(Vector3(position.x, 2, position.y));
+  auto mesh      = Mesh::CreateSphere("", 8, 5.f, scene);
+  mesh->position = Vector3(position.x, 2, position.y);
 
   return mesh;
 }

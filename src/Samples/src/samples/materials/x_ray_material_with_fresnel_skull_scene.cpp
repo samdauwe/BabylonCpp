@@ -71,8 +71,8 @@ void XRayMaterialWithFresnelSkullScene::initializeScene(ICanvas* canvas,
         auto mesh = newMeshes[0];
 
         mesh->material = _xrayMat;
-        mesh->setPosition(Vector3(0.f, 4.f, 0.f));
-        mesh->setScaling(Vector3(0.1f, 0.1f, 0.1f));
+        mesh->position = Vector3(0.f, 4.f, 0.f);
+        mesh->scaling  = Vector3(0.1f, 0.1f, 0.1f);
 
         // reset mesh color
         Float32Array colors;

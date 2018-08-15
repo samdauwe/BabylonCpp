@@ -79,8 +79,8 @@ void ShaderMaterialTilesScene::initializeScene(ICanvas* canvas, Scene* scene)
     options.sideOrientation = Mesh::DEFAULTSIDE();
     options.updatable       = false;
     options.height          = options.height * 0.01f;
-    auto box = MeshBuilder::CreateBox("box" + id, options, scene);
-    box->setPosition(boxPositions[i]);
+    auto box               = MeshBuilder::CreateBox("box" + id, options, scene);
+    box->position          = boxPositions[i];
     box->edgesWidth        = 2.f;
     _boxTopFaceResolution  = Vector2(options.width, options.depth);
     _boxTopFaceAspectRatio = _boxTopFaceResolution.x / _boxTopFaceResolution.y;

@@ -1606,7 +1606,7 @@ Mesh& Mesh::bakeCurrentTransformIntoVertices()
   rotation().copyFromFloats(0.f, 0.f, 0.f);
   // only if quaternion is already set
   if (rotationQuaternion()) {
-    setRotationQuaternion(Quaternion::Identity());
+    rotationQuaternion = Quaternion::Identity();
   }
   _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
   return *this;
@@ -2050,8 +2050,8 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   // Tags.AddTagsTo(mesh, parsedMesh.tags);
 
   if (parsedMesh.contains("position")) {
-    mesh->setPosition(
-      Vector3::FromArray(Json::ToArray<float>(parsedMesh, "position")));
+    mesh->position
+      = Vector3::FromArray(Json::ToArray<float>(parsedMesh, "position"));
   }
 
   if (parsedMesh.contains("metadata")) {
@@ -2059,17 +2059,17 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   if (parsedMesh.contains("rotationQuaternion")) {
-    mesh->setRotationQuaternion(Quaternion::FromArray(
-      Json::ToArray<float>(parsedMesh, "rotationQuaternion")));
+    mesh->rotationQuaternion = Quaternion::FromArray(
+      Json::ToArray<float>(parsedMesh, "rotationQuaternion"));
   }
   else if (parsedMesh.contains("rotation")) {
-    mesh->setRotation(
-      Vector3::FromArray(Json::ToArray<float>(parsedMesh, "rotation")));
+    mesh->rotation
+      = Vector3::FromArray(Json::ToArray<float>(parsedMesh, "rotation"));
   }
 
   if (parsedMesh.contains("scaling")) {
-    mesh->setPosition(
-      Vector3::FromArray(Json::ToArray<float>(parsedMesh, "scaling")));
+    mesh->position
+      = Vector3::FromArray(Json::ToArray<float>(parsedMesh, "scaling"));
   }
 
   if (parsedMesh.contains("localMatrix")) {
@@ -2284,8 +2284,8 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
       // Tags.AddTagsTo(instance, parsedInstance.tags);
 
-      mesh->setPosition(
-        Vector3::FromArray(Json::ToArray<float>(parsedInstance, "position")));
+      mesh->position
+        = Vector3::FromArray(Json::ToArray<float>(parsedInstance, "position"));
 
       if (parsedInstance.contains("parentId")) {
         instance->_waitingParentId
@@ -2293,17 +2293,17 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
       }
 
       if (parsedInstance.contains("rotationQuaternion")) {
-        instance->setRotationQuaternion(Quaternion::FromArray(
-          Json::ToArray<float>(parsedInstance, "rotationQuaternion")));
+        instance->rotationQuaternion = Quaternion::FromArray(
+          Json::ToArray<float>(parsedInstance, "rotationQuaternion"));
       }
       else if (parsedInstance.contains("rotation")) {
-        instance->setRotation(
-          Vector3::FromArray(Json::ToArray<float>(parsedInstance, "rotation")));
+        instance->rotation = Vector3::FromArray(
+          Json::ToArray<float>(parsedInstance, "rotation"));
       }
 
       if (parsedMesh.contains("scaling")) {
-        instance->setPosition(
-          Vector3::FromArray(Json::ToArray<float>(parsedInstance, "scaling")));
+        instance->position
+          = Vector3::FromArray(Json::ToArray<float>(parsedInstance, "scaling"));
       }
 
       instance->setCheckCollisions(

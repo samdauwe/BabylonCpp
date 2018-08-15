@@ -91,13 +91,13 @@ void BasicElementsScene::initializeScene(ICanvas* canvas, Scene* scene)
     = Mesh::CreateRibbon("ribbon", arrayOfPaths, false, false, 0, scene);
 
   // Moving elements
-  box->setPosition(Vector3(-10.f, 0.f, 0.f));   // Using a vector
-  sphere->setPosition(Vector3(0.f, 10.f, 0.f)); // Using a vector
+  box->position          = Vector3(-10.f, 0.f, 0.f); // Using a vector
+  sphere->position       = Vector3(0.f, 10.f, 0.f);  // Using a vector
   plane->position().z    = 10.f; // Using a single coordinate component
   cylinder->position().z = -10.f;
   torus->position().x    = 10.f;
   knot->position().y     = -10.f;
-  ribbon->setPosition(Vector3(-10, -10, 20));
+  ribbon->position       = Vector3(-10, -10, 20);
 }
 
 } // end of namespace Samples

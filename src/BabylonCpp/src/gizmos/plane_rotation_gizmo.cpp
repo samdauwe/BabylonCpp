@@ -75,9 +75,9 @@ PlaneRotationGizmo::PlaneRotationGizmo(
                                          EventState& /*es*/) {
     if (attachedMesh) {
       if (!attachedMesh()->rotationQuaternion()) {
-        attachedMesh()->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
+        attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
           attachedMesh()->rotation().y, attachedMesh()->rotation().x,
-          attachedMesh()->rotation().z));
+          attachedMesh()->rotation().z);
       }
       // Calc angle over full 360 degree
       // (https://stackoverflow.com/questions/43493711/the-angle-between-two-3d-vectors-with-a-result-range-0-360)

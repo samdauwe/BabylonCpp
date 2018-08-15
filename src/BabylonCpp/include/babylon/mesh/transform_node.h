@@ -47,67 +47,10 @@ public:
   IReflect::Type type() const override;
 
   /**
-   * @brief Gets a string idenfifying the name of the class.
+   * @brief Gets a string identifying the name of the class.
    * @returns "TransformNode" string
    */
   const string_t getClassName() const override;
-
-  Vector3& position();
-  const Vector3& position() const;
-  void setPosition(const Vector3& newPosition);
-
-  /**
-   * @brief Rotation property : a Vector3 depicting the rotation value in
-   * radians around each local axis X, Y, Z.
-   * If rotation quaternion is set, this Vector3 will (almost always) be the
-   * Zero vector!
-   * Default : (0.0, 0.0, 0.0)
-   */
-  Vector3& rotation();
-  const Vector3& rotation() const;
-  void setRotation(const Vector3& newRotation);
-
-  /**
-   * @brief Scaling property : a Vector3 depicting the mesh scaling along each
-   * local axis X, Y, Z.
-   * Default : (1.0, 1.0, 1.0)
-   */
-  virtual Vector3& scaling();
-  const Vector3& scaling() const;
-
-  /**
-   * @brief Scaling property : a Vector3 depicting the mesh scaling along each
-   * local axis X, Y, Z.
-   * Default : (1.0, 1.0, 1.0)
-   */
-  void setScaling(const Vector3& newScaling);
-
-  /**
-   * @brief Rotation Quaternion property : this a Quaternion object depicting
-   * the mesh rotation by using a unit quaternion.
-   * It's null by default.
-   * If set, only the rotationQuaternion is then used to compute the mesh
-   * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
-   * 0.0)
-   */
-  unique_ptr_t<Quaternion>& rotationQuaternion();
-  const unique_ptr_t<Quaternion>& rotationQuaternion() const;
-  void setRotationQuaternion(const Nullable<Quaternion>& quaternion);
-
-  /**
-   * @brief The forward direction of that transform in world space.
-   */
-  Vector3 forward();
-
-  /**
-   * @brief The up direction of that transform in world space.
-   */
-  Vector3 up();
-
-  /**
-   * @brief The right direction of that transform in world space.
-   */
-  Vector3 right();
 
   /**
    * @brief Returns the latest update of the World matrix.
@@ -121,15 +64,8 @@ public:
   float _getWorldMatrixDeterminant() const override;
 
   /**
-   * @brief Returns directly the latest state of the mesh World matrix.
-   * A Matrix is returned.
-   */
-  Matrix& worldMatrixFromCache();
-  const Matrix& worldMatrixFromCache() const;
-
-  /**
-   * @brief Copies the paramater passed Matrix into the mesh Pose matrix.
-   * @returns the TransformNode.
+   * @brief Copies the parameter passed Matrix into the mesh Pose matrix.
+   * Returns the TransformNode.
    */
   TransformNode& updatePoseMatrix(const Matrix& matrix);
 
@@ -142,14 +78,7 @@ public:
 
   bool _isSynchronized() override;
   void _initCache() override;
-  TransformNode& _markAsDirty(const string_t& property);
-
-  /**
-   * @brief Returns the current mesh absolute position.
-   * @returns a Vector3.
-   */
-  Vector3& absolutePosition();
-  const Vector3& absolutePosition() const;
+  TransformNode& markAsDirty(const string_t& property) override;
 
   /**
    * @brief Sets a new matrix to apply before all other transformation
@@ -191,14 +120,8 @@ public:
   TransformNode& unfreezeWorldMatrix();
 
   /**
-   * @brief True if the World matrix has been frozen.
-   * @returns a boolean.
-   */
-  bool isWorldMatrixFrozen() const;
-
-  /**
    * @brief Retuns the mesh absolute position in the World.
-   * @returns a Vector3.
+   * Returns a Vector3.
    */
   Vector3& getAbsolutePosition();
 
@@ -301,8 +224,6 @@ public:
    * @returns the TransformNode.
    */
   TransformNode& setParent(Node* node);
-
-  bool nonUniformScaling() const;
 
   virtual bool _updateNonUniformScalingState(bool value);
 
@@ -436,6 +357,86 @@ public:
 protected:
   virtual void _afterComputeWorldMatrix();
 
+  /**
+   * @brief Gets the position property.
+   */
+  Vector3& get_position();
+
+  /**
+   * @brief Sets the position property.
+   */
+  void set_position(const Vector3& newPosition);
+
+  /**
+   * @brief Rotation property : a Vector3 depicting the rotation value in
+   * radians around each local axis X, Y, Z.
+   * If rotation quaternion is set, this Vector3 will (almost always) be the
+   * Zero vector!
+   * Default : (0.0, 0.0, 0.0)
+   */
+  Vector3& get_rotation();
+  void set_rotation(const Vector3& newRotation);
+
+  /**
+   * @brief Scaling property : a Vector3 depicting the mesh scaling along each
+   * local axis X, Y, Z.
+   * Default : (1.0, 1.0, 1.0)
+   */
+  virtual Vector3& get_scaling();
+
+  /**
+   * @brief Scaling property : a Vector3 depicting the mesh scaling along each
+   * local axis X, Y, Z.
+   * Default : (1.0, 1.0, 1.0)
+   */
+  virtual void set_scaling(const Vector3& newScaling);
+
+  /**
+   * @brief Rotation Quaternion property : this a Quaternion object depicting
+   * the mesh rotation by using a unit quaternion.
+   * It's null by default.
+   * If set, only the rotationQuaternion is then used to compute the mesh
+   * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
+   * 0.0)
+   */
+  nullable_t<Quaternion>& get_rotationQuaternion();
+  void set_rotationQuaternion(const nullable_t<Quaternion>& quaternion);
+
+  /**
+   * @brief The forward direction of that transform in world space.
+   */
+  Vector3& get_forward();
+
+  /**
+   * @brief The up direction of that transform in world space.
+   */
+  Vector3& get_up();
+
+  /**
+   * @brief The right direction of that transform in world space.
+   */
+  Vector3& get_right();
+
+  /**
+   * @brief Returns directly the latest state of the mesh World matrix.
+   * A Matrix is returned.
+   */
+  Matrix& get_worldMatrixFromCache();
+
+  /**
+   * @brief Retuns the mesh absolute position in the World.
+   * @returns a Vector3.
+   */
+  Vector3& get_absolutePosition();
+
+  /**
+   * @brief True if the World matrix has been frozen.
+   * @returns a boolean.
+   */
+  bool get_isWorldMatrixFrozen() const;
+
+  bool get_nonUniformScaling() const;
+
 public:
   /**
    * Set the billboard mode. Default is 0.
@@ -465,6 +466,69 @@ public:
   unique_ptr_t<Matrix> _worldMatrix;
   float _worldMatrixDeterminant;
 
+  /**
+   * Position property
+   */
+  Property<TransformNode, Vector3> position;
+
+  /**
+   * Rotation property : a Vector3 depicting the rotation value in radians
+   * around each local axis X, Y, Z. If rotation quaternion is set, this Vector3
+   * will (almost always) be the Zero vector! Default : (0.0, 0.0, 0.0)
+   */
+  Property<TransformNode, Vector3> rotation;
+
+  /**
+   * Scaling property : a Vector3 depicting the mesh scaling along each local
+   * axis X, Y, Z. Default : (1.0, 1.0, 1.0)
+   */
+  Property<TransformNode, Vector3> scaling;
+
+  /**
+   * @brief Rotation Quaternion property : this a Quaternion object depicting
+   * the mesh rotation by using a unit quaternion.
+   * It's null by default.
+   * If set, only the rotationQuaternion is then used to compute the mesh
+   * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
+   * 0.0)
+   */
+  Property<TransformNode, nullable_t<Quaternion>> rotationQuaternion;
+
+  /**
+   * @brief The forward direction of that transform in world space.
+   */
+  ReadOnlyProperty<TransformNode, Vector3> forward;
+
+  /**
+   * @brief The up direction of that transform in world space.
+   */
+  ReadOnlyProperty<TransformNode, Vector3> up;
+
+  /**
+   * @brief The right direction of that transform in world space.
+   */
+  ReadOnlyProperty<TransformNode, Vector3> right;
+
+  /**
+   * @brief Returns directly the latest state of the mesh World matrix.
+   * A Matrix is returned.
+   */
+  ReadOnlyProperty<TransformNode, Matrix> worldMatrixFromCache;
+
+  /**
+   * @brief Retuns the mesh absolute position in the World.
+   * @returns a Vector3.
+   */
+  ReadOnlyProperty<TransformNode, Vector3> absolutePosition;
+
+  /**
+   * @brief True if the World matrix has been frozen.
+   * @returns a boolean.
+   */
+  ReadOnlyProperty<TransformNode, bool> isWorldMatrixFrozen;
+
+  ReadOnlyProperty<TransformNode, bool> nonUniformScaling;
+
 protected:
   // Properties
   Vector3 _scaling;
@@ -483,15 +547,18 @@ private:
 
 private:
   Vector3 _forward;
+  Vector3 _forwardNormalized;
   Vector3 _forwardInverted;
   Vector3 _up;
+  Vector3 _upNormalized;
   Vector3 _right;
+  Vector3 _rightNormalized;
   Vector3 _rightInverted;
 
   // Properties
   Vector3 _position;
   Vector3 _rotation;
-  unique_ptr_t<Quaternion> _rotationQuaternion;
+  nullable_t<Quaternion> _rotationQuaternion;
   TransformNode* _transformToBoneReferal;
   Matrix _localWorld;
   Vector3 _absolutePosition;

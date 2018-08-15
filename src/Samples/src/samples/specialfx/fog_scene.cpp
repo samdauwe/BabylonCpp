@@ -49,7 +49,7 @@ void FogScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto material0          = StandardMaterial::New("mat0", scene);
   material0->diffuseColor = Color3(1.f, 0.f, 0.f);
   _sphere0->material      = material0;
-  _sphere0->setPosition(Vector3(-10.f, 0.f, 0.f));
+  _sphere0->position      = Vector3(-10.f, 0.f, 0.f);
 
   auto material1          = StandardMaterial::New("mat1", scene);
   material1->diffuseColor = Color3(1.f, 1.f, 0.f);
@@ -58,7 +58,7 @@ void FogScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto material2          = StandardMaterial::New("mat2", scene);
   material2->diffuseColor = Color3(1.f, 0.f, 1.f);
   _sphere2->material      = material2;
-  _sphere2->setPosition(Vector3(10.f, 0.f, 0.f));
+  _sphere2->position      = Vector3(10.f, 0.f, 0.f);
 
   _sphere1->convertToFlatShadedMesh();
 

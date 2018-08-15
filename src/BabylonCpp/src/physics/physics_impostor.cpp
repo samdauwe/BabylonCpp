@@ -68,11 +68,11 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
     // Set the object's quaternion, if not set
     if (!object->rotationQuaternion()) {
       if (object->rotation() == Vector3::Zero()) {
-        object->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
-          object->rotation().y, object->rotation().x, object->rotation().z));
+        object->rotationQuaternion = Quaternion::RotationYawPitchRoll(
+          object->rotation().y, object->rotation().x, object->rotation().z);
       }
       else {
-        object->setRotationQuaternion(Quaternion());
+        object->rotationQuaternion = Quaternion();
       }
     }
     // Default options params
@@ -175,7 +175,7 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
   if (object->hasBoundingInfo()) {
     auto& q = object->rotationQuaternion();
     // reset rotation
-    object->setRotationQuaternion(PhysicsImpostor::IDENTITY_QUATERNION);
+    object->rotationQuaternion = PhysicsImpostor::IDENTITY_QUATERNION;
     // calculate the world matrix with no rotation
     object->computeWorldMatrix();
     object->computeWorldMatrix(true);
@@ -183,7 +183,7 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
     auto size          = boundingInfo.boundingBox.extendSizeWorld.scale(2.f);
 
     // bring back the rotation
-    object->setRotationQuaternion(*q);
+    object->rotationQuaternion = *q;
     // calculate the world matrix with the new rotation
     object->computeWorldMatrix();
     object->computeWorldMatrix(true);

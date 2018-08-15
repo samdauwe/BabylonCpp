@@ -108,8 +108,8 @@ bool PhysicsRadialExplosionEvent::_intersectsWithSphere(
 
   _prepareSphere();
 
-  _sphere->setPosition(origin);
-  _sphere->setScaling(Vector3(radius * 2.f, radius * 2.f, radius * 2.f));
+  _sphere->position = origin;
+  _sphere->scaling  = Vector3(radius * 2.f, radius * 2.f, radius * 2.f);
   _sphere->_updateBoundingInfo();
   _sphere->computeWorldMatrix(true);
 

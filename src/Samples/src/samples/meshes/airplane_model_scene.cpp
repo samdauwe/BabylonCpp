@@ -121,32 +121,32 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto formHStab = _makeFormAppendage(1.f, 1.f, 12.f, 6.75f, 0.65f, 10.f, 10.f);
 
   nose->rotation().z = 133.f * Math::PI / 256.f;
-  nose->setScaling(Vector3(0.5f, 0.65f, 0.5f));
-  nose->setPosition(
-    Vector3((0.16f - 1.60f - fuselageXer) * radius, -0.090f * radius, 0.f));
+  nose->scaling      = Vector3(0.5f, 0.65f, 0.5f);
+  nose->position
+    = Vector3((0.16f - 1.60f - fuselageXer) * radius, -0.090f * radius, 0.f);
 
   nosecone->rotation().z = 133.f * Math::PI / 256.f;
-  nosecone->setScaling(Vector3(1.f, 0.8f, 1.f));
-  nosecone->setPosition(
-    Vector3((0.16f - 0.90f - fuselageXer) * radius, -0.055f * radius, 0.f));
+  nosecone->scaling      = Vector3(1.f, 0.8f, 1.f);
+  nosecone->position
+    = Vector3((0.16f - 0.90f - fuselageXer) * radius, -0.055f * radius, 0.f);
 
-  flightdeck->setScaling(Vector3(2.f, 1.f, 0.8f));
-  flightdeck->setPosition(
-    Vector3((1.04f - fuselageXer) * radius, 0.4f * radius, 0.f));
+  flightdeck->scaling = Vector3(2.f, 1.f, 0.8f);
+  flightdeck->position
+    = Vector3((1.04f - fuselageXer) * radius, 0.4f * radius, 0.f);
 
-  flightdecktaper->setPosition(
-    Vector3(0.2f * radius * fuselageXer, 0.36f * radius, 0.f));
+  flightdecktaper->position
+    = Vector3(0.2f * radius * fuselageXer, 0.36f * radius, 0.f);
   flightdecktaper->rotation().z
     = (128.f - (16.f / fuselageXer)) * Math::PI / 256.f;
-  flightdecktaper->setScaling(Vector3(1.f, 1.f, 1.f));
+  flightdecktaper->scaling = Vector3(1.f, 1.f, 1.f);
 
   fuselage->rotation().z = Math::PI_2;
-  fuselage->setScaling(Vector3(1.f, 1.f, 1.f));
+  fuselage->scaling      = Vector3(1.f, 1.f, 1.f);
 
   taper->rotation().z = 0.f - 7.f * Math::PI / 16.f;
-  taper->setScaling(Vector3(1.f, 4.f, 1.f));
-  taper->setPosition(
-    Vector3((fuselageXer - 0.85f) * radius, 0.f - 0.14f * radius, 0.f));
+  taper->scaling      = Vector3(1.f, 4.f, 1.f);
+  taper->position
+    = Vector3((fuselageXer - 0.85f) * radius, 0.f - 0.14f * radius, 0.f);
 
   leftwing                = formWing(leftwing, radius, fuselageXer, false);
   leftwing->rotation().x  = Math::PI_2;
@@ -229,7 +229,7 @@ AirplaneModelScene::MakeWingFunction AirplaneModelScene::_makeFormAppendage(
         auto q = wingYorigin;
         auto r = backBaseVtop;
 
-        mesh->setPosition(Vector3::Zero());
+        mesh->position = Vector3::Zero();
 
         Float32Array positions{
           a,

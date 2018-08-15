@@ -41,8 +41,8 @@ AttachToBoxBehavior::_closestFace(const Vector3& targetDirection)
   // targetDirection
   for (auto& v : _faceVectors) {
     if (!_target->rotationQuaternion()) {
-      _target->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
-        _target->rotation().y, _target->rotation().x, _target->rotation().z));
+      _target->rotationQuaternion = Quaternion::RotationYawPitchRoll(
+        _target->rotation().y, _target->rotation().x, _target->rotation().z);
     }
     _target->rotationQuaternion()->toRotationMatrix(_tmpMatrix);
     Vector3::TransformCoordinatesToRef(v.direction, _tmpMatrix,
@@ -148,8 +148,8 @@ void AttachToBoxBehavior::attach(Mesh* target)
 
       // Rotate to be oriented properly to the camera
       if (!ui->rotationQuaternion()) {
-        ui->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
-          ui->rotation().y, ui->rotation().x, ui->rotation().z));
+        ui->rotationQuaternion = Quaternion::RotationYawPitchRoll(
+          ui->rotation().y, ui->rotation().x, ui->rotation().z);
       }
       facing.rotatedDirection.scaleToRef(-1, _tmpVector);
       _lookAtToRef(_tmpVector, *ui->rotationQuaternion(),

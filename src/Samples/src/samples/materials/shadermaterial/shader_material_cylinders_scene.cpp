@@ -76,7 +76,7 @@ void ShaderMaterialCylindersScene::initializeScene(ICanvas* canvas,
     auto id = std::to_string(i + 1);
     auto cylinder
       = Mesh::CreateCylinder("cylinder", 1, 1, 1, 6, 1, scene, false);
-    cylinder->setPosition(boxPositions[i]);
+    cylinder->position = boxPositions[i];
     // box->enableEdgesRendering(0.99f);
     cylinder->edgesWidth = 2.f;
     // Create shader material

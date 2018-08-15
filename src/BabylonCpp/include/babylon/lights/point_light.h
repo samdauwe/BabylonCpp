@@ -31,37 +31,17 @@ public:
   IReflect::Type type() const override;
 
   /**
-   * @brief Getter: In case of direction provided, the shadow will not use a
-   * cube texture but simulate a spot shadow as a fallback
-   * This specifies what angle the shadow will use to be created.
-   *
-   * It default to 90 degrees to work nicely with the cube texture generation
-   * for point lights shadow maps.
-   */
-  float shadowAngle() const;
-
-  /**
-   * @brief Setter: In case of direction provided, the shadow will not use a
-   * cube texture but simulate a spot shadow as a fallback
-   * This specifies what angle the shadow will use to be created.
-   *
-   * It default to 90 degrees to work nicely with the cube texture generation
-   * for point lights shadow maps.
-   */
-  void setShadowAngle(float value);
-
-  /**
    * @brief Gets the direction if it has been set.
    * In case of direction provided, the shadow will not use a cube texture but
    * simulate a spot shadow as a fallback
    */
-  Vector3& direction() override;
+  Vector3& get_direction() override;
 
   /**
    * @brief In case of direction provided, the shadow will not use a cube
    * texture but simulate a spot shadow as a fallback
    */
-  void setDirection(const Vector3& value);
+  void set_direction(const Vector3& value) override;
 
   /**
    * @brief Returns the string "PointLight"
@@ -137,6 +117,29 @@ protected:
     const vector_t<AbstractMesh*>& renderList) override;
 
   void _buildUniformLayout() override;
+
+  /**
+   * @brief Getter: In case of direction provided, the shadow will not use a
+   * cube texture but simulate a spot shadow as a fallback
+   * This specifies what angle the shadow will use to be created.
+   *
+   * It default to 90 degrees to work nicely with the cube texture generation
+   * for point lights shadow maps.
+   */
+  float get_shadowAngle() const;
+
+  /**
+   * @brief Setter: In case of direction provided, the shadow will not use a
+   * cube texture but simulate a spot shadow as a fallback
+   * This specifies what angle the shadow will use to be created.
+   *
+   * It default to 90 degrees to work nicely with the cube texture generation
+   * for point lights shadow maps.
+   */
+  void set_shadowAngle(float value);
+
+public:
+  Property<PointLight, float> shadowAngle;
 
 private:
   float _shadowAngle;

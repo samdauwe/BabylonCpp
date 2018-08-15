@@ -71,9 +71,9 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   for (unsigned int i = 0; i < 1; ++i) {
     sphereLights.emplace_back(sphereLight->clone(""));
-    sphereLights[i + 1]->setPosition(Vector3(lightPositions[3 * i],
-                                             lightPositions[3 * i + 1],
-                                             lightPositions[3 * i + 2]));
+    sphereLights[i + 1]->position
+      = Vector3(lightPositions[3 * i], lightPositions[3 * i + 1],
+                lightPositions[3 * i + 2]);
   }
 
   vector_t<SpotLight*> spotLights(sphereLights.size());

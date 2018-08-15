@@ -103,7 +103,7 @@ void PoseEnabledController::attachToMesh(AbstractMesh* mesh)
     // _mesh->setParent(_poseControlledCamera);
   }
   if (!_mesh->rotationQuaternion()) {
-    _mesh->setRotationQuaternion(Quaternion());
+    _mesh->rotationQuaternion = Quaternion();
   }
 
   // Sync controller mesh and pointing pose node's state with controller, this

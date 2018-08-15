@@ -164,9 +164,9 @@ RadixFeatures Radix::intersect(const Vector2& pos)
 void Radix::setWorld(const Vector3& position, const Quaternion& rotation,
                      const Vector3& scale)
 {
-  _rootMesh->setPosition(position);
-  _rootMesh->setRotationQuaternion(rotation);
-  _rootMesh->setScaling(scale);
+  _rootMesh->position           = position;
+  _rootMesh->rotationQuaternion = rotation;
+  _rootMesh->scaling            = scale;
 }
 
 void Radix::show()
@@ -275,8 +275,8 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
   stl_util::concat(points, {0.f, hasRot ? _coneLength : 0.f, 0.f});
   stl_util::concat(points, {0.f, _arrowLength - _coneLength, 0.f});
 
-  auto wireMesh = LinesMesh::New(name + "Wire", _scene);
-  wireMesh->setRotationQuaternion(rotation);
+  auto wireMesh                = LinesMesh::New(name + "Wire", _scene);
+  wireMesh->rotationQuaternion = rotation;
   wireMesh->setParent(_rootMesh);
   wireMesh->color                 = mtl->diffuseColor;
   wireMesh->renderingGroupId      = 1;
@@ -290,10 +290,10 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
 
   auto arrow = Mesh::CreateCylinder(name + "Cone", _coneLength, 0, _coneRadius,
                                     18, 1, _scene, false);
-  arrow->setPosition(Vector3::TransformCoordinates(
-    Vector3(0, _arrowLength - (_coneLength / 2.f), 0.f), transform));
-  arrow->setRotationQuaternion(rotation);
-  arrow->material = mtl;
+  arrow->position = Vector3::TransformCoordinates(
+    Vector3(0, _arrowLength - (_coneLength / 2.f), 0.f), transform);
+  arrow->rotationQuaternion = rotation;
+  arrow->material           = mtl;
   arrow->setParent(_rootMesh);
   arrow->renderingGroupId = 1;
   arrow->isPickable       = false;
@@ -316,8 +316,8 @@ void Radix::constructPlaneSelection(RadixFeatures /*feature*/,
 
   auto wireMesh = Mesh::CreateLines(name + "Plane", points, _scene);
   wireMesh->setParent(_rootMesh);
-  wireMesh->color = mtl->diffuseColor;
-  wireMesh->setRotationQuaternion(Quaternion::FromRotationMatrix(transform));
+  wireMesh->color                 = mtl->diffuseColor;
+  wireMesh->rotationQuaternion    = Quaternion::FromRotationMatrix(transform);
   wireMesh->renderingGroupId      = 1;
   wireMesh->intersectionThreshold = wireSelectionThreshold();
   wireMesh->isPickable            = false;
@@ -332,9 +332,9 @@ void Radix::constructRotation(RadixFeatures /*feature*/,
     = Mesh::CreateCylinder(name + "Cylinder", _coneLength, _coneRadius,
                            _coneRadius, 18, 1, _scene, false);
   rotCyl->material = mtl;
-  rotCyl->setPosition(Vector3::TransformCoordinates(
-    Vector3(0.f, _coneLength / 2.f, 0.f), transform));
-  rotCyl->setRotationQuaternion(Quaternion::FromRotationMatrix(transform));
+  rotCyl->position = Vector3::TransformCoordinates(
+    Vector3(0.f, _coneLength / 2.f, 0.f), transform);
+  rotCyl->rotationQuaternion = Quaternion::FromRotationMatrix(transform);
   rotCyl->setParent(_rootMesh);
   rotCyl->renderingGroupId = 1;
   rotCyl->isPickable       = false;

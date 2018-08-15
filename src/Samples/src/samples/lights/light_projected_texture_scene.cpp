@@ -61,8 +61,8 @@ void LightProjectedTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Animations
   scene->registerBeforeRender([&](Scene* /*scene*/, EventState& /*es*/) {
-    _spotLight->setPosition(
-      Vector3(::std::cos(_alpha) * 60.f, 40.f, ::std::sin(_alpha) * 60.f));
+    _spotLight->position
+      = Vector3(::std::cos(_alpha) * 60.f, 40.f, ::std::sin(_alpha) * 60.f);
     _spotLight->setDirectionToTarget(Vector3::Zero());
     _alpha += 0.01f;
   });

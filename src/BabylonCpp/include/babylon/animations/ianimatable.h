@@ -39,6 +39,10 @@ public:
   {
     return false;
   }
+  virtual IAnimatable& markAsDirty(const string_t& /*property*/ = "")
+  {
+    return *this;
+  }
   virtual void markAsDirty(unsigned int /*flag*/)
   {
   }

@@ -123,9 +123,9 @@ EditControl::EditControl(Mesh* iMesh, Camera* camera, ICanvas* iCanvas,
   mesh->computeWorldMatrix(true);
   theParent = Mesh::New("EditControl", scene);
   mesh->getAbsolutePivotPointToRef(theParent->position());
-  theParent->setRotationQuaternion(*mesh->rotationQuaternion());
-  theParent->visibility = 0.f;
-  theParent->isPickable = false;
+  theParent->rotationQuaternion = mesh->rotationQuaternion();
+  theParent->visibility         = 0.f;
+  theParent->isPickable         = false;
   createMaterials(scene);
   createGuideAxes();
   guideCtl->setParent(theParent);
@@ -156,8 +156,8 @@ void EditControl::renderLoopProcess()
 void EditControl::switchTo(Mesh* iMesh)
 {
   iMesh->computeWorldMatrix(true);
-  mesh = iMesh;
-  theParent->setRotationQuaternion(*iMesh->rotationQuaternion());
+  mesh                          = iMesh;
+  theParent->rotationQuaternion = iMesh->rotationQuaternion();
   setLocalAxes(iMesh);
   actHist = ActHist(iMesh, 10);
 }
@@ -791,8 +791,8 @@ void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
     }
     setLocalAxes(mesh);
     if ((eulerian)) {
-      mesh->setRotation(mesh->rotationQuaternion()->toEulerAngles());
-      mesh->setRotationQuaternion(nullptr);
+      mesh->rotation           = mesh->rotationQuaternion()->toEulerAngles();
+      mesh->rotationQuaternion = nullopt_t;
     }
   }
 }
@@ -1419,10 +1419,10 @@ void EditControl::setLocal(bool l)
   }
   local = l;
   if (local) {
-    theParent->setRotationQuaternion(*mesh->rotationQuaternion());
+    theParent->rotationQuaternion = mesh->rotationQuaternion();
   }
   else {
-    theParent->setRotationQuaternion(Quaternion::Identity());
+    theParent->rotationQuaternion = Quaternion::Identity();
   }
 }
 

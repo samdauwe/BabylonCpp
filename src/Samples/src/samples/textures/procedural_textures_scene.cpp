@@ -48,12 +48,12 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
   const auto CreateBosquet
     = [](const std::string& name, float x, float y, float z, Scene* scene,
          ShadowGenerator* shadowGenerator, Material* grassMaterial) {
-        auto bosquet = Mesh::CreateBox(name, 2.f, scene);
-        bosquet->setPosition(Vector3(x, y, z));
+        auto bosquet      = Mesh::CreateBox(name, 2.f, scene);
+        bosquet->position = Vector3(x, y, z);
         bosquet->material = grassMaterial;
 
-        auto bosquetbawl = Mesh::CreateBox(name + "bawl", 1, scene);
-        bosquetbawl->setPosition(Vector3(x, y + 1, z));
+        auto bosquetbawl      = Mesh::CreateBox(name + "bawl", 1, scene);
+        bosquetbawl->position = Vector3(x, y + 1, z);
         bosquetbawl->material = grassMaterial;
 
         shadowGenerator->getShadowMap()->renderList.emplace_back(bosquet);
@@ -64,11 +64,11 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
                              Scene* scene, ShadowGenerator* shadowGenerator,
                              Material* woodMaterial, Material* grassMaterial) {
     auto trunk = Mesh::CreateCylinder(name + "trunk", 7, 2, 2, 12, 1, scene);
-    trunk->setPosition(Vector3(x, y, z));
+    trunk->position = Vector3(x, y, z);
     trunk->material = woodMaterial;
 
-    auto leafs = Mesh::CreateSphere(name + "leafs", 20, 7, scene);
-    leafs->setPosition(Vector3(x, y + 5.f, z));
+    auto leafs      = Mesh::CreateSphere(name + "leafs", 20, 7, scene);
+    leafs->position = Vector3(x, y + 5.f, z);
     leafs->material = grassMaterial;
 
     shadowGenerator->getShadowMap()->renderList.emplace_back(trunk);
@@ -80,23 +80,23 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
                                 ShadowGenerator* shadowGenerator,
                                 Material* marbleMaterial,
                                 Material* fireMaterial) {
-    auto torus = Mesh::CreateTorus(name + "torus", 5, 1, 20, scene);
-    torus->setPosition(Vector3(x, y, z));
+    auto torus      = Mesh::CreateTorus(name + "torus", 5, 1, 20, scene);
+    torus->position = Vector3(x, y, z);
     torus->material = marbleMaterial;
 
-    auto fontainGround = Mesh::CreateBox(name + "fontainGround", 4, scene);
-    fontainGround->setPosition(Vector3(x, y - 2, z));
+    auto fontainGround      = Mesh::CreateBox(name + "fontainGround", 4, scene);
+    fontainGround->position = Vector3(x, y - 2, z);
     fontainGround->material = marbleMaterial;
 
     auto fontainSculptur1
       = Mesh::CreateCylinder(name + "fontainSculptur1", 2, 2, 1, 10, 1, scene);
-    fontainSculptur1->setPosition(Vector3(x, y, z));
+    fontainSculptur1->position = Vector3(x, y, z);
     fontainSculptur1->material = marbleMaterial;
 
     Vector3 rotateAxis(1.f, 0.f, 0.f);
     auto fontainSculptur2
       = Mesh::CreateSphere(name + "fontainSculptur2", 7, 1.7f, scene);
-    fontainSculptur2->setPosition(Vector3(x, y + 0.9f, z));
+    fontainSculptur2->position = Vector3(x, y + 0.9f, z);
     fontainSculptur2->material = fireMaterial;
     fontainSculptur2->rotate(rotateAxis, Math::PI_2, Space::LOCAL);
 
@@ -110,19 +110,19 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
          ShadowGenerator* shadowGenerator, Material* brickMaterial,
          Material* woodMaterial, Material* grassMaterial) {
         // createBrickBlock
-        auto brickblock = Mesh::CreateBox(name + "brickblock", 1, scene);
-        brickblock->setPosition(Vector3(x, y, z));
+        auto brickblock      = Mesh::CreateBox(name + "brickblock", 1, scene);
+        brickblock->position = Vector3(x, y, z);
         brickblock->material = brickMaterial;
 
         // createWood
         auto torchwood = Mesh::CreateCylinder(name + "torchwood", 2, 0.25, 0.1f,
                                               12, 1, scene);
-        torchwood->setPosition(Vector3(x, y + 1, z));
+        torchwood->position = Vector3(x, y + 1, z);
         torchwood->material = woodMaterial;
 
         // leafs
-        auto leafs2 = Mesh::CreateSphere(name + "leafs2", 10, 1.2f, scene);
-        leafs2->setPosition(Vector3(x, y + 2, z));
+        auto leafs2      = Mesh::CreateSphere(name + "leafs2", 10, 1.2f, scene);
+        leafs2->position = Vector3(x, y + 2, z);
         leafs2->material = grassMaterial;
 
         shadowGenerator->getShadowMap()->renderList.emplace_back(torchwood);
@@ -168,11 +168,11 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->diffuse  = Color3(1, 1, 1);
   light->specular = Color3(1, 1, 1);
   // light->groundColor = Color3(0, 0, 0);
-  light->setPosition(Vector3(20, 40, 20));
+  light->position = Vector3(20, 40, 20);
 
   // Create a square of grass using a custom procedural texture
-  auto square = Mesh::CreateGround("square", 20, 20, 2, scene);
-  square->setPosition(Vector3(0, 0, 0));
+  auto square         = Mesh::CreateGround("square", 20, 20, 2, scene);
+  square->position    = Vector3(0, 0, 0);
   auto customMaterial = StandardMaterial::New("custommat", scene);
   auto customProcText = CustomProceduralTexture::New(
     "customtext", "textures/customProceduralTextures/land", 1024, scene);
@@ -194,8 +194,8 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
              grassMaterial);
 
   // Creating macadam
-  auto macadam = Mesh::CreateGround("square", 20, 20, 2, scene);
-  macadam->setPosition(Vector3(20, 0, 0));
+  auto macadam               = Mesh::CreateGround("square", 20, 20, 2, scene);
+  macadam->position          = Vector3(20, 0, 0);
   auto customMaterialmacadam = StandardMaterial::New("macadam", scene);
   auto customProcTextmacadam
     = RoadProceduralTexture::New("customtext", 512, scene);
@@ -216,8 +216,8 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
               woodMaterial, grassMaterial);
 
   // Using a procedural texture to create the sky
-  auto boxCloud = Mesh::CreateSphere("boxCloud", 100, 1000, scene);
-  boxCloud->setPosition(Vector3(0.f, 0.f, 12.f));
+  auto boxCloud      = Mesh::CreateSphere("boxCloud", 100, 1000, scene);
+  boxCloud->position = Vector3(0.f, 0.f, 12.f);
   auto cloudMaterial = StandardMaterial::New("cloudMat", scene);
   auto cloudProcText = CloudProceduralTexture::New("cloud", 1024, scene);
   cloudMaterial->setEmissiveTexture(cloudProcText);

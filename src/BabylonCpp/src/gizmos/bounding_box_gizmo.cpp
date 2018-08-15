@@ -51,7 +51,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
 
   // Build bounding box out of lines
   _lineBoundingBox = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
-  _lineBoundingBox->setRotationQuaternion(Quaternion());
+  _lineBoundingBox->rotationQuaternion = Quaternion();
   vector_t<LinesMesh*> lines;
   vector_t<vector_t<Vector3>> linesPoints{
     {Vector3(0.f, 0.f, 0.f), Vector3(_boundingDimensions.x, 0.f, 0.f)},
@@ -98,13 +98,13 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   // Create rotation spheres
   _rotateSpheresParent
     = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
-  _rotateSpheresParent->setRotationQuaternion(Quaternion());
+  _rotateSpheresParent->rotationQuaternion = Quaternion();
   for (unsigned int i = 0; i < 12; ++i) {
     SphereOptions sphereOptions{1.f};
     auto sphere = MeshBuilder::CreateSphere(
       "", sphereOptions, gizmoLayer->utilityLayerScene.get());
-    sphere->setRotationQuaternion(Quaternion());
-    sphere->material = coloredMaterial;
+    sphere->rotationQuaternion = Quaternion();
+    sphere->material           = coloredMaterial;
 
     // Drag behavior
     PointerDragBehavior _dragBehavior;
@@ -118,62 +118,61 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         startingTurnDirection.copyFrom(sphere->forward());
         totalTurnAmountOfDrag = 0;
       });
-    _dragBehavior.onDragObservable.add(
-      [&](DragMoveEvent* event, EventState& /*es*/) {
-        if (attachedMesh) {
-          auto worldDragDirection = startingTurnDirection;
+    _dragBehavior.onDragObservable.add([&](DragMoveEvent* event,
+                                           EventState& /*es*/) {
+      if (attachedMesh) {
+        auto worldDragDirection = startingTurnDirection;
 
-          // Project the world right on to the drag plane
-          auto toSub = event->dragPlaneNormal.scale(
-            Vector3::Dot(event->dragPlaneNormal, worldDragDirection));
-          auto dragAxis = worldDragDirection.subtract(toSub).normalizeToNew();
+        // Project the world right on to the drag plane
+        auto toSub = event->dragPlaneNormal.scale(
+          Vector3::Dot(event->dragPlaneNormal, worldDragDirection));
+        auto dragAxis = worldDragDirection.subtract(toSub).normalizeToNew();
 
-          // project drag delta on to the resulting drag axis and rotate based
-          // on that
-          auto projectDist = -Vector3::Dot(dragAxis, event->delta);
+        // project drag delta on to the resulting drag axis and rotate based
+        // on that
+        auto projectDist = -Vector3::Dot(dragAxis, event->delta);
 
-          // Make rotation relative to size of mesh.
-          projectDist = (projectDist / _boundingDimensions.length())
-                        * _anchorMesh->scaling().length();
+        // Make rotation relative to size of mesh.
+        projectDist = (projectDist / _boundingDimensions.length())
+                      * _anchorMesh->scaling().length();
 
-          // Rotate based on axis
-          if (!attachedMesh()->rotationQuaternion()) {
-            attachedMesh()->setRotationQuaternion(
-              Quaternion::RotationYawPitchRoll(attachedMesh()->rotation().y,
-                                               attachedMesh()->rotation().x,
-                                               attachedMesh()->rotation().z));
-          }
-          if (!_anchorMesh->rotationQuaternion()) {
-            _anchorMesh->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
-              _anchorMesh->rotation().y, _anchorMesh->rotation().x,
-              _anchorMesh->rotation().z));
-          }
-
-          // Do not allow the object to turn more than a full circle
-          totalTurnAmountOfDrag += projectDist;
-          if (::std::abs(totalTurnAmountOfDrag) <= Math::PI2) {
-            if (i >= 8) {
-              Quaternion::RotationYawPitchRollToRef(0.f, 0.f, projectDist,
-                                                    _tmpQuaternion);
-            }
-            else if (i >= 4) {
-              Quaternion::RotationYawPitchRollToRef(projectDist, 0.f, 0.f,
-                                                    _tmpQuaternion);
-            }
-            else {
-              Quaternion::RotationYawPitchRollToRef(0.f, projectDist, 0.f,
-                                                    _tmpQuaternion);
-            }
-
-            // Rotate around center of bounding box
-            _anchorMesh->addChild(attachedMesh);
-            _anchorMesh->rotationQuaternion()->multiplyToRef(
-              _tmpQuaternion, *_anchorMesh->rotationQuaternion());
-            _anchorMesh->removeChild(attachedMesh);
-          }
-          updateBoundingBox();
+        // Rotate based on axis
+        if (!attachedMesh()->rotationQuaternion()) {
+          attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
+            attachedMesh()->rotation().y, attachedMesh()->rotation().x,
+            attachedMesh()->rotation().z);
         }
-      });
+        if (!_anchorMesh->rotationQuaternion()) {
+          _anchorMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
+            _anchorMesh->rotation().y, _anchorMesh->rotation().x,
+            _anchorMesh->rotation().z);
+        }
+
+        // Do not allow the object to turn more than a full circle
+        totalTurnAmountOfDrag += projectDist;
+        if (::std::abs(totalTurnAmountOfDrag) <= Math::PI2) {
+          if (i >= 8) {
+            Quaternion::RotationYawPitchRollToRef(0.f, 0.f, projectDist,
+                                                  _tmpQuaternion);
+          }
+          else if (i >= 4) {
+            Quaternion::RotationYawPitchRollToRef(projectDist, 0.f, 0.f,
+                                                  _tmpQuaternion);
+          }
+          else {
+            Quaternion::RotationYawPitchRollToRef(0.f, projectDist, 0.f,
+                                                  _tmpQuaternion);
+          }
+
+          // Rotate around center of bounding box
+          _anchorMesh->addChild(attachedMesh);
+          _anchorMesh->rotationQuaternion()->multiplyToRef(
+            _tmpQuaternion, *_anchorMesh->rotationQuaternion());
+          _anchorMesh->removeChild(attachedMesh);
+        }
+        updateBoundingBox();
+      }
+    });
 
     // Selection/deselection
     _dragBehavior.onDragStartObservable.add(
@@ -192,7 +191,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   // Create scale cubes
   _scaleBoxesParent
     = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
-  _scaleBoxesParent->setRotationQuaternion(Quaternion());
+  _scaleBoxesParent->rotationQuaternion = Quaternion();
   for (unsigned int i = 0; i < 2; i++) {
     for (unsigned int j = 0; j < 2; j++) {
       for (unsigned int k = 0; k < 2; k++) {
@@ -335,14 +334,14 @@ void BoundingBoxGizmo::updateBoundingBox()
   if (attachedMesh) {
     // Rotate based on axis
     if (!attachedMesh()->rotationQuaternion()) {
-      attachedMesh()->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
+      attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
         attachedMesh()->rotation().y, attachedMesh()->rotation().x,
-        attachedMesh()->rotation().z));
+        attachedMesh()->rotation().z);
     }
     if (!_anchorMesh->rotationQuaternion()) {
-      _anchorMesh->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
+      _anchorMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
         _anchorMesh->rotation().y, _anchorMesh->rotation().x,
-        _anchorMesh->rotation().z));
+        _anchorMesh->rotation().z);
     }
     _anchorMesh->rotationQuaternion()->copyFrom(
       *attachedMesh()->rotationQuaternion());
@@ -522,8 +521,8 @@ Mesh* BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
 
   // Reset position to get boudning box from origin with no rotation
   if (!mesh->rotationQuaternion()) {
-    mesh->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
-      mesh->rotation().y, mesh->rotation().x, mesh->rotation().z));
+    mesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
+      mesh->rotation().y, mesh->rotation().x, mesh->rotation().z);
   }
   auto oldPos = mesh->position();
   auto oldRot = *mesh->rotationQuaternion();

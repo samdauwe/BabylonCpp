@@ -24,17 +24,33 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , _poseMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _worldMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
     , _worldMatrixDeterminant{0.f}
+
+    , position{this, &TransformNode::get_position, &TransformNode::set_position}
+    , rotation{this, &TransformNode::get_rotation, &TransformNode::set_rotation}
+    , scaling{this, &TransformNode::get_scaling, &TransformNode::set_scaling}
+    , rotationQuaternion{this, &TransformNode::get_rotationQuaternion,
+                         &TransformNode::set_rotationQuaternion}
+    , forward{this, &TransformNode::get_forward}
+    , up{this, &TransformNode::get_up}
+    , right{this, &TransformNode::get_right}
+    , worldMatrixFromCache{this, &TransformNode::get_worldMatrixFromCache}
+    , absolutePosition{this, &TransformNode::get_absolutePosition}
+    , isWorldMatrixFrozen{this, &TransformNode::get_isWorldMatrixFrozen}
+    , nonUniformScaling{this, &TransformNode::get_nonUniformScaling}
     , _scaling{Vector3::One()}
     , _isDirty{false}
     , _isWorldMatrixFrozen{false}
     , _forward{Vector3{0.f, 0.f, 1.f}}
+    , _forwardNormalized{Vector3{0.f, 0.f, 1.f}}
     , _forwardInverted{Vector3{0.f, 0.f, -1.f}}
     , _up{Vector3{0.f, 1.f, 0.f}}
+    , _upNormalized{Vector3{0.f, 1.f, 0.f}}
     , _right{Vector3{1.f, 0.f, 0.f}}
+    , _rightNormalized{Vector3{1.f, 0.f, 0.f}}
     , _rightInverted{Vector3{-1.f, 0.f, 0.f}}
     , _position{Vector3::Zero()}
     , _rotation{Vector3::Zero()}
-    , _rotationQuaternion{nullptr}
+    , _rotationQuaternion{nullopt_t}
     , _transformToBoneReferal{nullptr}
     , _localWorld{Matrix::Zero()}
     , _absolutePosition{Vector3::Zero()}
@@ -62,93 +78,76 @@ const string_t TransformNode::getClassName() const
   return "TransformNode";
 }
 
-Vector3& TransformNode::position()
+Vector3& TransformNode::get_position()
 {
   return _position;
 }
 
-const Vector3& TransformNode::position() const
-{
-  return _position;
-}
-
-void TransformNode::setPosition(const Vector3& newPosition)
+void TransformNode::set_position(const Vector3& newPosition)
 {
   _position = newPosition;
 }
 
-Vector3& TransformNode::rotation()
+Vector3& TransformNode::get_rotation()
 {
   return _rotation;
 }
 
-const Vector3& TransformNode::rotation() const
-{
-  return _rotation;
-}
-
-void TransformNode::setRotation(const Vector3& newRotation)
+void TransformNode::set_rotation(const Vector3& newRotation)
 {
   _rotation = newRotation;
 }
 
-Vector3& TransformNode::scaling()
+Vector3& TransformNode::get_scaling()
 {
   return _scaling;
 }
 
-const Vector3& TransformNode::scaling() const
-{
-  return _scaling;
-}
-
-void TransformNode::setScaling(const Vector3& newScaling)
+void TransformNode::set_scaling(const Vector3& newScaling)
 {
   _scaling = newScaling;
 }
 
-unique_ptr_t<Quaternion>& TransformNode::rotationQuaternion()
+nullable_t<Quaternion>& TransformNode::get_rotationQuaternion()
 {
   return _rotationQuaternion;
 }
 
-const unique_ptr_t<Quaternion>& TransformNode::rotationQuaternion() const
+void TransformNode::set_rotationQuaternion(
+  const nullable_t<Quaternion>& quaternion)
 {
-  return _rotationQuaternion;
-}
-
-void TransformNode::setRotationQuaternion(
-  const Nullable<Quaternion>& quaternion)
-{
-  _rotationQuaternion
-    = quaternion ? ::std::make_unique<Quaternion>(*quaternion) : nullptr;
+  _rotationQuaternion = quaternion;
   // reset the rotation vector.
   if (quaternion && !stl_util::almost_equal(rotation().length(), 0.f)) {
     rotation().copyFromFloats(0.f, 0.f, 0.f);
   }
 }
 
-Vector3 TransformNode::forward()
+Vector3& TransformNode::get_forward()
 {
-  return Vector3::Normalize(Vector3::TransformNormal(
+  _forwardNormalized = Vector3::Normalize(Vector3::TransformNormal(
     getScene()->useRightHandedSystem() ? _forwardInverted : _forward, //
     *getWorldMatrix()                                                 //
     ));
+  return _forwardNormalized;
 }
 
-Vector3 TransformNode::up()
+Vector3& TransformNode::get_up()
 {
-  return Vector3::Normalize(Vector3::TransformNormal(_up,              //
-                                                     *getWorldMatrix() //
-                                                     ));
+  _upNormalized
+    = Vector3::Normalize(Vector3::TransformNormal(_up,              //
+                                                  *getWorldMatrix() //
+                                                  ));
+  return _upNormalized;
 }
 
-Vector3 TransformNode::right()
+Vector3& TransformNode::get_right()
 {
-  return Vector3::Normalize(Vector3::TransformNormal(
+  _rightNormalized = Vector3::Normalize(Vector3::TransformNormal(
     getScene()->useRightHandedSystem() ? _rightInverted : _right, //
     *getWorldMatrix()                                             //
     ));
+  return _rightNormalized;
 }
 
 Matrix* TransformNode::getWorldMatrix()
@@ -164,12 +163,7 @@ float TransformNode::_getWorldMatrixDeterminant() const
   return _worldMatrixDeterminant;
 }
 
-Matrix& TransformNode::worldMatrixFromCache()
-{
-  return *_worldMatrix.get();
-}
-
-const Matrix& TransformNode::worldMatrixFromCache() const
+Matrix& TransformNode::get_worldMatrixFromCache()
 {
   return *_worldMatrix.get();
 }
@@ -208,7 +202,7 @@ bool TransformNode::_isSynchronized()
     return false;
   }
 
-  if (!_cache.position.equals(_position)) {
+  if (!_cache.position.equals(position)) {
     return false;
   }
 
@@ -241,22 +235,17 @@ void TransformNode::_initCache()
   _cache.billboardMode      = AbstractMesh::BILLBOARDMODE_NONE;
 }
 
-TransformNode& TransformNode::_markAsDirty(const string_t& property)
+TransformNode& TransformNode::markAsDirty(const string_t& property)
 {
   if (property == "rotation") {
-    setRotationQuaternion(nullptr);
+    rotationQuaternion = nullopt_t;
   }
   _currentRenderId = numeric_limits_t<int>::max();
   _isDirty         = true;
   return *this;
 }
 
-Vector3& TransformNode::absolutePosition()
-{
-  return _absolutePosition;
-}
-
-const Vector3& TransformNode::absolutePosition() const
+Vector3& TransformNode::get_absolutePosition()
 {
   return _absolutePosition;
 }
@@ -311,7 +300,7 @@ TransformNode& TransformNode::unfreezeWorldMatrix()
   return *this;
 }
 
-bool TransformNode::isWorldMatrixFrozen() const
+bool TransformNode::get_isWorldMatrixFrozen() const
 {
   return _isWorldMatrixFrozen;
 }
@@ -337,13 +326,13 @@ TransformNode::setAbsolutePosition(const Nullable<Vector3>& absolutePosition)
     invertParentWorldMatrix.invert();
     Vector3 worldPosition{absolutePositionX, absolutePositionY,
                           absolutePositionZ};
-    _position
+    position
       = Vector3::TransformCoordinates(worldPosition, invertParentWorldMatrix);
   }
   else {
-    _position.x = absolutePositionX;
-    _position.y = absolutePositionY;
-    _position.z = absolutePositionZ;
+    position().x = absolutePositionX;
+    position().y = absolutePositionY;
+    position().z = absolutePositionZ;
   }
   return *this;
 }
@@ -351,7 +340,7 @@ TransformNode::setAbsolutePosition(const Nullable<Vector3>& absolutePosition)
 TransformNode& TransformNode::setPositionWithLocalVector(const Vector3& vector3)
 {
   computeWorldMatrix();
-  _position = Vector3::TransformNormal(vector3, _localWorld);
+  position = Vector3::TransformNormal(vector3, _localWorld);
   return *this;
 }
 
@@ -361,13 +350,13 @@ Vector3 TransformNode::getPositionExpressedInLocalSpace()
   auto invLocalWorldMatrix = _localWorld;
   invLocalWorldMatrix.invert();
 
-  return Vector3::TransformNormal(_position, invLocalWorldMatrix);
+  return Vector3::TransformNormal(position, invLocalWorldMatrix);
 }
 
 TransformNode& TransformNode::locallyTranslate(const Vector3& vector3)
 {
   computeWorldMatrix(true);
-  _position = Vector3::TransformCoordinates(vector3, _localWorld);
+  position = Vector3::TransformCoordinates(vector3, _localWorld);
   return *this;
 }
 
@@ -375,7 +364,7 @@ TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor,
                                      float pitchCor, float rollCor, Space space)
 {
   auto& dv = *TransformNode::_lookAtVectorCache;
-  auto pos = (space == Space::LOCAL) ? _position : getAbsolutePosition();
+  auto pos = (space == Space::LOCAL) ? position : getAbsolutePosition();
   targetPoint.subtractToRef(pos, dv);
   auto yaw   = -::std::atan2(dv.z, dv.x) - Math::PI_2;
   auto len   = ::std::sqrt(dv.x * dv.x + dv.z * dv.z);
@@ -464,15 +453,15 @@ TransformNode& TransformNode::setParent(Node* node)
     return *this;
   }
   if (!node) {
-    auto& rotation = Tmp::QuaternionArray[0];
-    auto& position = Tmp::Vector3Array[0];
-    auto& scale    = Tmp::Vector3Array[1];
+    auto& rotation    = Tmp::QuaternionArray[0];
+    auto& newPosition = Tmp::Vector3Array[0];
+    auto& scale       = Tmp::Vector3Array[1];
 
     if (parent()) {
       parent()->computeWorldMatrix(true);
     }
     computeWorldMatrix(true);
-    getWorldMatrix()->decompose(scale, rotation, position);
+    getWorldMatrix()->decompose(scale, rotation, newPosition);
 
     if (rotationQuaternion()) {
       (*rotationQuaternion()).copyFrom(rotation);
@@ -481,17 +470,17 @@ TransformNode& TransformNode::setParent(Node* node)
       rotation.toEulerAnglesToRef(this->rotation());
     }
 
-    this->scaling().x = scale.x;
-    this->scaling().y = scale.y;
-    this->scaling().z = scale.z;
+    scaling().x = scale.x;
+    scaling().y = scale.y;
+    scaling().z = scale.z;
 
-    this->position().x = position.x;
-    this->position().y = position.y;
-    this->position().z = position.z;
+    position().x = newPosition.x;
+    position().y = newPosition.y;
+    position().z = newPosition.z;
   }
   else {
     auto& rotation        = Tmp::QuaternionArray[0];
-    auto& position        = Tmp::Vector3Array[0];
+    auto& newPosition     = Tmp::Vector3Array[0];
     auto& scale           = Tmp::Vector3Array[1];
     auto& diffMatrix      = Tmp::MatrixArray[0];
     auto& invParentMatrix = Tmp::MatrixArray[1];
@@ -501,7 +490,7 @@ TransformNode& TransformNode::setParent(Node* node)
 
     node->getWorldMatrix()->invertToRef(invParentMatrix);
     getWorldMatrix()->multiplyToRef(invParentMatrix, diffMatrix);
-    diffMatrix.decompose(scale, rotation, position);
+    diffMatrix.decompose(scale, rotation, newPosition);
 
     if (rotationQuaternion()) {
       (*rotationQuaternion()).copyFrom(rotation);
@@ -510,20 +499,20 @@ TransformNode& TransformNode::setParent(Node* node)
       rotation.toEulerAnglesToRef(this->rotation());
     }
 
-    this->position().x = position.x;
-    this->position().y = position.y;
-    this->position().z = position.z;
+    position().x = newPosition.x;
+    position().y = newPosition.y;
+    position().z = newPosition.z;
 
-    this->scaling().x = scale.x;
-    this->scaling().y = scale.y;
-    this->scaling().z = scale.z;
+    scaling().x = scale.x;
+    scaling().y = scale.y;
+    scaling().z = scale.z;
   }
 
   Node::set_parent(node);
   return *this;
 }
 
-bool TransformNode::nonUniformScaling() const
+bool TransformNode::get_nonUniformScaling() const
 {
   return _nonUniformScaling;
 }
@@ -568,9 +557,9 @@ TransformNode& TransformNode::rotate(Vector3& axis, float amount, Space space)
 {
   axis.normalize();
   if (!rotationQuaternion()) {
-    setRotationQuaternion(Quaternion::RotationYawPitchRoll(
-      rotation().y, rotation().x, rotation().z));
-    setRotation(Vector3::Zero());
+    rotationQuaternion = Quaternion::RotationYawPitchRoll(
+      rotation().y, rotation().x, rotation().z);
+    rotation = Vector3::Zero();
   }
   Quaternion rotationQuaternion;
   if (space == Space::LOCAL) {
@@ -598,11 +587,11 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
 {
   axis.normalize();
   if (!rotationQuaternion()) {
-    setRotationQuaternion(Quaternion::RotationYawPitchRoll(
-      rotation().y, rotation().x, rotation().z));
-    rotation().copyFromFloats(0, 0, 0);
+    rotationQuaternion = Quaternion::RotationYawPitchRoll(
+      rotation().y, rotation().x, rotation().z);
+    rotation().copyFromFloats(0.f, 0.f, 0.f);
   }
-  point.subtractToRef(_position, Tmp::Vector3Array[0]);
+  point.subtractToRef(position, Tmp::Vector3Array[0]);
   Matrix::TranslationToRef(Tmp::Vector3Array[0].x, Tmp::Vector3Array[0].y,
                            Tmp::Vector3Array[0].z, Tmp::MatrixArray[0]);
   Tmp::MatrixArray[0].invertToRef(Tmp::MatrixArray[2]);
@@ -613,7 +602,7 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
   Tmp::MatrixArray[2].decompose(Tmp::Vector3Array[0], Tmp::QuaternionArray[0],
                                 Tmp::Vector3Array[1]);
 
-  _position.addInPlace(Tmp::Vector3Array[1]);
+  position().addInPlace(Tmp::Vector3Array[1]);
   Tmp::QuaternionArray[0].multiplyToRef(*rotationQuaternion(),
                                         *rotationQuaternion());
 
@@ -665,7 +654,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
     return *_worldMatrix;
   }
 
-  _cache.position.copyFrom(_position);
+  _cache.position.copyFrom(position);
   _cache.scaling.copyFrom(scaling());
   _cache.pivotMatrixUpdated = false;
   _cache.billboardMode      = billboardMode;
@@ -712,13 +701,13 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
                                  cameraWorldMatrix.m[13],
                                  cameraWorldMatrix.m[14]);
 
-    Matrix::TranslationToRef(_position.x + cameraGlobalPosition.x,
-                             _position.y + cameraGlobalPosition.y,
-                             _position.z + cameraGlobalPosition.z,
+    Matrix::TranslationToRef(position().x + cameraGlobalPosition.x,
+                             position().y + cameraGlobalPosition.y,
+                             position().z + cameraGlobalPosition.z,
                              Tmp::MatrixArray[2]);
   }
   else {
-    Matrix::TranslationToRef(_position.x, _position.y, _position.z,
+    Matrix::TranslationToRef(position().x, position().y, position().z,
                              Tmp::MatrixArray[2]);
   }
 
@@ -737,16 +726,16 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
         if (_transformToBoneReferal) {
           parent()->getWorldMatrix()->multiplyToRef(
             *_transformToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
-          Vector3::TransformCoordinatesToRef(_position, Tmp::MatrixArray[6],
+          Vector3::TransformCoordinatesToRef(position, Tmp::MatrixArray[6],
                                              currentPosition);
         }
         else {
           Vector3::TransformCoordinatesToRef(
-            _position, *parent()->getWorldMatrix(), currentPosition);
+            position, *parent()->getWorldMatrix(), currentPosition);
         }
       }
       else {
-        currentPosition.copyFrom(_position);
+        currentPosition.copyFrom(position);
       }
 
       currentPosition.subtractInPlace(camera->globalPosition());
@@ -779,6 +768,12 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
 
     Tmp::MatrixArray[1].copyFrom(Tmp::MatrixArray[5]);
     Tmp::MatrixArray[1].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[5]);
+  }
+
+  // Post multiply inverse of pivotMatrix
+  if (_postMultiplyPivotMatrix) {
+    Tmp::MatrixArray[5].multiplyToRef(*_pivotMatrixInverse,
+                                      Tmp::MatrixArray[5]);
   }
 
   // Local world
@@ -817,11 +812,6 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
   }
   else {
     _worldMatrix->copyFrom(_localWorld);
-  }
-
-  // Post multiply inverse of pivotMatrix
-  if (_postMultiplyPivotMatrix) {
-    _worldMatrix->multiplyToRef(*_pivotMatrixInverse, *_worldMatrix);
   }
 
   // Normal matrix

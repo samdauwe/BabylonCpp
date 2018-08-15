@@ -2,7 +2,6 @@
 #define BABYLON_LIGHTS_SHADOW_LIGHT_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
 
@@ -20,30 +19,6 @@ public:
   ~ShadowLight() override;
 
   /**
-   * @brief Gets the position the shadow will be casted from. Also use as the
-   * light position for both point and spot lights.
-   */
-  Vector3& position();
-
-  /**
-   * @brief Sets the position the shadow will be casted from. Also use as the
-   * light position for both point and spot lights.
-   */
-  void setPosition(const Vector3& value);
-
-  /**
-   * @brief In 2d mode (needCube being false), gets the direction used to cast
-   * the shadow. Also use as the light direction on spot and directional lights.
-   */
-  Vector3& direction() override;
-
-  /**
-   * @brief In 2d mode (needCube being false), sets the direction used to cast
-   * the shadow. Also use as the light direction on spot and directional lights.
-   */
-  void setDirection(const Vector3& value);
-
-  /**
    * @brief Gets the transformed position. Position of the light in world space
    * taking parenting in account.
    */
@@ -54,26 +29,6 @@ public:
    * space taking parenting in account.
    */
   Vector3& transformedDirection() override;
-
-  /**
-   * @brief Gets the shadow projection clipping minimum z value.
-   */
-  const Nullable<float>& shadowMinZ() const;
-
-  /**
-   * @brief Sets the shadow projection clipping minimum z value.
-   */
-  void setShadowMinZ(float value);
-
-  /**
-   * @brief Sets the shadow projection clipping maximum z value.
-   */
-  const Nullable<float>& shadowMaxZ() const;
-
-  /**
-   * @brief Gets the shadow projection clipping maximum z value.
-   */
-  void setShadowMaxZ(float value);
 
   /**
    * @brief Computes the transformed information (transformedPosition and
@@ -184,13 +139,57 @@ protected:
                                     const vector_t<AbstractMesh*>& renderList)
     = 0;
 
-  virtual void _setDirection(const Vector3& value);
-
   /**
    * @brief Sets the position the shadow will be casted from. Also use as the
    * light position for both point and spot lights.
    */
   virtual void _setPosition(const Vector3& value);
+
+  /**
+   * @brief Gets the position the shadow will be casted from. Also use as the
+   * light position for both point and spot lights.
+   */
+  Vector3& get_position() override;
+
+  /**
+   * @brief Sets the position the shadow will be casted from. Also use as the
+   * light position for both point and spot lights.
+   */
+  void set_position(const Vector3& value) override;
+
+  virtual void _setDirection(const Vector3& value);
+
+  /**
+   * @brief In 2d mode (needCube being false), gets the direction used to cast
+   * the shadow. Also use as the light direction on spot and directional lights.
+   */
+  Vector3& get_direction() override;
+
+  /**
+   * @brief In 2d mode (needCube being false), sets the direction used to cast
+   * the shadow. Also use as the light direction on spot and directional lights.
+   */
+  void set_direction(const Vector3& value) override;
+
+  /**
+   * @brief Gets the shadow projection clipping minimum z value.
+   */
+  nullable_t<float>& get_shadowMinZ();
+
+  /**
+   * @brief Sets the shadow projection clipping minimum z value.
+   */
+  void set_shadowMinZ(const nullable_t<float>& value);
+
+  /**
+   * @brief Sets the shadow projection clipping maximum z value.
+   */
+  nullable_t<float>& get_shadowMaxZ();
+
+  /**
+   * @brief Gets the shadow projection clipping maximum z value.
+   */
+  void set_shadowMaxZ(const nullable_t<float>& value);
 
 public:
   /**
@@ -201,6 +200,16 @@ public:
                        const vector_t<AbstractMesh*>& renderList,
                        Matrix& result)>
     customProjectionMatrixBuilder;
+
+  /**
+   * The shadow projection clipping minimum z value.
+   */
+  Property<ShadowLight, nullable_t<float>> shadowMinZ;
+
+  /**
+   * The shadow projection clipping maximum z value.
+   */
+  Property<ShadowLight, nullable_t<float>> shadowMaxZ;
 
 protected:
   Vector3 _position;
@@ -219,8 +228,8 @@ protected:
   unique_ptr_t<Vector3> _transformedDirection;
 
 private:
-  Nullable<float> _shadowMinZ;
-  Nullable<float> _shadowMaxZ;
+  nullable_t<float> _shadowMinZ;
+  nullable_t<float> _shadowMaxZ;
   unique_ptr_t<Matrix> _worldMatrix;
   bool _needProjectionMatrixCompute;
 

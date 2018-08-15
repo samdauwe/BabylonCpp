@@ -1133,7 +1133,7 @@ Matrix ShadowGenerator::getTransformMatrix()
   _currentRenderID       = scene->getRenderId();
   _currentFaceIndexCache = _currentFaceIndex;
 
-  auto lightPosition = _light->position;
+  auto lightPosition = _light->position();
   if (_light->computeTransformedInformation()) {
     lightPosition = _light->transformedPosition();
   }

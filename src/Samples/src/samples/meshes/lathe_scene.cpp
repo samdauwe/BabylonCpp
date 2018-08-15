@@ -47,7 +47,7 @@ void LatheScene::initializeScene(ICanvas* canvas, Scene* scene)
   for (auto& point : points) {
     auto sphere = Mesh::CreateSphere("sphere" + std::to_string(i++), 8, 0.15f,
                                      scene, true);
-    sphere->setPosition(point[0]);
+    sphere->position = point[0];
   }
 
   // Function for creating a spline segment from the point-tangent array
@@ -69,7 +69,7 @@ void LatheScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Add a tube to visualize the spline
   auto tube = Mesh::CreateTube("tube", spline.getPoints(), 0.025f, 16, radius,
                                1, scene, false);
-  tube->setPosition(Vector3(0.0125f, 0.f, 0.f));
+  tube->position = Vector3(0.0125f, 0.f, 0.f);
 
   // Create a lathe from the spline
   auto lathe

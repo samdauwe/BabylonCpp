@@ -1009,7 +1009,7 @@ Mesh* MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
   vertexData->applyToMesh(decal);
 
   // decal->setPosition(position.clone());
-  decal->setRotation(Vector3(pitch, yaw, angle));
+  decal->rotation = Vector3(pitch, yaw, angle);
 
   return decal;
 }

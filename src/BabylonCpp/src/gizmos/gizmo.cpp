@@ -63,9 +63,9 @@ void Gizmo::_update()
   if (attachedMesh) {
     if (updateGizmoRotationToMatchAttachedMesh) {
       if (!_rootMesh->rotationQuaternion()) {
-        _rootMesh->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
+        _rootMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
           _rootMesh->rotation().y, _rootMesh->rotation().x,
-          _rootMesh->rotation().z));
+          _rootMesh->rotation().z);
       }
 
       // Remove scaling before getting rotation matrix to get rotation matrix

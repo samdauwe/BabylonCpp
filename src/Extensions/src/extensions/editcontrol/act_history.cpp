@@ -12,8 +12,8 @@ ActHist::ActHist(AbstractMesh* iMesh, int capacity)
 {
   if (!mesh->rotationQuaternion()) {
     const auto& rotation = mesh->rotation();
-    mesh->setRotationQuaternion(
-      Quaternion::RotationYawPitchRoll(rotation.y, rotation.x, rotation.z));
+    mesh->rotationQuaternion
+      = Quaternion::RotationYawPitchRoll(rotation.y, rotation.x, rotation.z);
   }
   add();
 }

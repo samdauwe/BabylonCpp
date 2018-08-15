@@ -20,10 +20,14 @@ public:
   virtual ~IShadowLight();
 
   /**
-   * @brief In 2d mode (needCube being false), the direction used to cast the
-   * shadow.
+   * The position the shdow will be casted from.
    */
-  virtual Vector3& direction() = 0;
+  Property<IShadowLight, Vector3> position;
+
+  /**
+   * In 2d mode (needCube being false), the direction used to cast the shadow.
+   */
+  Property<IShadowLight, Vector3> direction;
 
   /**
    * @brief The transformed position. Position of the light in world space
@@ -116,11 +120,28 @@ public:
    */
   virtual float getDepthMaxZ(Camera* activeCamera) const = 0;
 
-public:
+protected:
   /**
-   * The position the shdow will be casted from.
+   * @brief Gets the position the shadow will be casted from.
    */
-  Vector3 position;
+  virtual Vector3& get_position() = 0;
+
+  /**
+   * @brief Sets the position the shadow will be casted from.
+   */
+  virtual void set_position(const Vector3& value) = 0;
+
+  /**
+   * @brief In 2d mode (needCube being false), gets the direction used to cast
+   * the shadow. Also use as the light direction on spot and directional lights.
+   */
+  virtual Vector3& get_direction() = 0;
+
+  /**
+   * @brief In 2d mode (needCube being false), sets the direction used to cast
+   * the shadow. Also use as the light direction on spot and directional lights.
+   */
+  virtual void set_direction(const Vector3& value) = 0;
 
 }; // end of class IShadowLight
 

@@ -163,7 +163,7 @@ bool PhysicsVortexEvent::_intersectsWithCylinder(PhysicsImpostor* impostor)
 
   _prepareCylinder();
 
-  _cylinder->setPosition(_cylinderPosition);
+  _cylinder->position = _cylinderPosition;
 
   return _cylinder->intersectsMesh(impostorObject, true);
 }

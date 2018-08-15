@@ -24,7 +24,7 @@ void DirectionalLight::AddNodeConstructor()
 }
 
 DirectionalLight::DirectionalLight(const string_t& iName,
-                                   const Vector3& direction, Scene* scene)
+                                   const Vector3& iDirection, Scene* scene)
     : ShadowLight{iName, scene}
     , shadowFrustumSize{this, &DirectionalLight::get_shadowFrustumSize,
                         &DirectionalLight::set_shadowFrustumSize}
@@ -38,8 +38,8 @@ DirectionalLight::DirectionalLight(const string_t& iName,
     , _orthoTop{numeric_limits_t<float>::min()}
     , _orthoBottom{numeric_limits_t<float>::max()}
 {
-  setPosition(direction.scale(-1.f));
-  setDirection(direction);
+  position  = iDirection.scale(-1.f);
+  direction = iDirection;
 }
 
 DirectionalLight::~DirectionalLight()

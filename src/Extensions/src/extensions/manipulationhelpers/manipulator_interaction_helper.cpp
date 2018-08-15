@@ -369,9 +369,9 @@ void ManipulatorInteractionHelper::setManipulatedNodeWorldMatrix(Matrix mtx)
     auto scale = Vector3::Zero();
     Quaternion rot;
     mtx.decompose(scale, rot, pos);
-    mesh->setPosition(pos);
-    mesh->setRotationQuaternion(rot);
-    mesh->setScaling(scale);
+    mesh->position           = pos;
+    mesh->rotationQuaternion = rot;
+    mesh->scaling            = scale;
   }
 }
 

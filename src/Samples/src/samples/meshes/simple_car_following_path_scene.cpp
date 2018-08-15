@@ -96,7 +96,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
     auto axis = Axis::X();
     wheel->rotate(axis, Math::PI_2, Space::WORLD);
     wheel->setParent(_carBody);
-    wheel->setPosition(position);
+    wheel->position = position;
     return wheel;
   };
 
@@ -169,7 +169,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
     _iteration = i;
 
     if (i == 0) {
-      _carBody->setRotationQuaternion(_startRotation);
+      _carBody->rotationQuaternion = _startRotation;
     }
   });
   /*----------------------- End Animation Loop -------------------------------*/

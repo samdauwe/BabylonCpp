@@ -71,7 +71,7 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Sun animation
   scene->registerBeforeRender([&](Scene* /*scene*/, EventState& /*es*/) {
-    _sun->setPosition(_spot->position());
+    _sun->position = _spot->position();
     _spot->position().x -= _positionStepX;
     if (_spot->position().x < -90.f) {
       if (reverseSun) {

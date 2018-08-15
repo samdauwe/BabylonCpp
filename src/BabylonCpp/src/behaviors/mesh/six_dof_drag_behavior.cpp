@@ -55,10 +55,10 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
   // scene
   _virtualOriginMesh
     = AbstractMesh::New("", SixDofDragBehavior::_virtualScene.get());
-  _virtualOriginMesh->setRotationQuaternion(Quaternion());
+  _virtualOriginMesh->rotationQuaternion = Quaternion();
   _virtualDragMesh
     = AbstractMesh::New("", SixDofDragBehavior::_virtualScene.get());
-  _virtualDragMesh->setRotationQuaternion(Quaternion());
+  _virtualDragMesh->rotationQuaternion = Quaternion();
 
   const auto pickPredicate = [this](AbstractMesh* m) {
     return _ownerNode == m || m->isDescendantOf(_ownerNode);
@@ -94,9 +94,9 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
         _virtualOriginMesh->removeChild(_virtualDragMesh);
         _virtualDragMesh->position().copyFrom(pickedMesh->absolutePosition());
         if (!pickedMesh->rotationQuaternion()) {
-          pickedMesh->setRotationQuaternion(Quaternion::RotationYawPitchRoll(
+          pickedMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
             pickedMesh->rotation().y, pickedMesh->rotation().x,
-            pickedMesh->rotation().z));
+            pickedMesh->rotation().z);
         }
         auto oldParent = pickedMesh->parent();
         pickedMesh->setParent(nullptr);

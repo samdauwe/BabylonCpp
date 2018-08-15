@@ -128,13 +128,13 @@ public:
    * @brief Gets a Vector3 depicting the mesh scaling along each local axis X,
    * Y, Z.  Default is (1.0, 1.0, 1.0).
    */
-  Vector3& scaling() override;
+  Vector3& get_scaling() override;
 
   /**
    * @brief Sets a Vector3 depicting the mesh scaling along each local axis X,
    * Y, Z.  Default is (1.0, 1.0, 1.0).
    */
-  void setScaling(const Vector3& newScaling);
+  void set_scaling(const Vector3& newScaling) override;
 
   void resetRotationQuaternion();
   virtual AbstractMesh* getParent();
@@ -413,7 +413,7 @@ public:
   /**
    * @brief Hidden
    */
-  AbstractMesh& _updateSubMeshesBoundingInfo(Matrix& matrix);
+  AbstractMesh& _updateSubMeshesBoundingInfo(const Matrix& matrix);
 
   /**
    * @brief Returns `true` if the mesh is within the frustum defined by the

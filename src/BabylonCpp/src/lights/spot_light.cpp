@@ -23,7 +23,7 @@ void SpotLight::AddNodeConstructor()
 }
 
 SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
-                     const Vector3& direction, float iAngle, float iExponent,
+                     const Vector3& iDirection, float iAngle, float iExponent,
                      Scene* scene)
     : ShadowLight{iName, scene}
     , exponent{iExponent}
@@ -61,8 +61,8 @@ SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
         0.5f, 0.5f, 0.5f, 1.f                             //
         )}
 {
-  setPosition(iPosition);
-  setDirection(direction);
+  position  = iPosition;
+  direction = iDirection;
   set_angle(iAngle);
 }
 

@@ -131,7 +131,7 @@ public:
   /**
    * @brief Flag the bone as dirty (Forcing it to update everything).
    */
-  void markAsDirty(unsigned int property = 0) override;
+  Bone& markAsDirty(const string_t& property = "") override;
 
   /**
    * @brief Copy an animation range from another bone.

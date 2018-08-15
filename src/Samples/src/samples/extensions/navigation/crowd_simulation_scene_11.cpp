@@ -132,8 +132,8 @@ void CrowdSimulationScene11::setupScenario(Scene* scene)
   };
 
   for (unsigned int i = 0; i < boxPositions.size(); ++i) {
-    auto box = Mesh::CreateBox("", 1.f, scene);
-    box->setScaling(scalings[i]);
+    auto box     = Mesh::CreateBox("", 1.f, scene);
+    box->scaling = scalings[i];
     _crowdSimulation->addObstacleByBoundingBox(box, boxPositions[i]);
   }
 

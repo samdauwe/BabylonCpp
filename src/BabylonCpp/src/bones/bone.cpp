@@ -278,11 +278,13 @@ void Bone::_updateDifferenceMatrix(const Nullable<Matrix>& rootMatrix,
   _scalingDeterminant = (_absoluteTransform.determinant() < 0.f ? -1.f : 1.f);
 }
 
-void Bone::markAsDirty(unsigned int /*property*/)
+Bone& Bone::markAsDirty(const string_t& /*property*/)
 {
   ++_currentRenderId;
   ++_childRenderId;
   _skeleton->_markAsDirty();
+
+  return *this;
 }
 
 void Bone::_markAsDirtyAndCompose()

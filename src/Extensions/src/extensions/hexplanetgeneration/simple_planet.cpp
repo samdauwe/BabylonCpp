@@ -57,7 +57,7 @@ void SimplePlanet::revolve()
   _planet.mesh->rotation().y += -0.00005f * _scene->getAnimationRatio();
 
   if (_planet.selectedBorder) {
-    _planet.selectedBorder->setRotation(_planet.mesh->rotation());
+    _planet.selectedBorder->rotation = _planet.mesh->rotation();
   }
 }
 

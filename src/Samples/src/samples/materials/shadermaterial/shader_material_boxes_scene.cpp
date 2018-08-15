@@ -72,9 +72,9 @@ void ShaderMaterialBoxesScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Create boxes
   for (unsigned int i = 0; i < boxPositions.size(); ++i) {
     // Create box
-    auto id  = std::to_string(i + 1);
-    auto box = Mesh::CreateBox("box" + id, 1.f, scene);
-    box->setPosition(boxPositions[i]);
+    auto id       = std::to_string(i + 1);
+    auto box      = Mesh::CreateBox("box" + id, 1.f, scene);
+    box->position = boxPositions[i];
     // box->enableEdgesRendering(0.99f);
     box->edgesWidth = 2.f;
     // Create shader material

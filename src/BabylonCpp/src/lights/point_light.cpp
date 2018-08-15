@@ -23,9 +23,12 @@ void PointLight::AddNodeConstructor()
 
 PointLight::PointLight(const string_t& iName, const Vector3& iPosition,
                        Scene* scene)
-    : ShadowLight{iName, scene}, _shadowAngle{Math::PI_2}
+    : ShadowLight{iName, scene}
+    , shadowAngle{this, &PointLight::get_shadowAngle,
+                  &PointLight::set_shadowAngle}
+    , _shadowAngle{Math::PI_2}
 {
-  setPosition(iPosition);
+  position = iPosition;
 }
 
 PointLight::~PointLight()
@@ -37,23 +40,23 @@ IReflect::Type PointLight::type() const
   return IReflect::Type::POINTLIGHT;
 }
 
-float PointLight::shadowAngle() const
+float PointLight::get_shadowAngle() const
 {
   return _shadowAngle;
 }
 
-void PointLight::setShadowAngle(float value)
+void PointLight::set_shadowAngle(float value)
 {
   _shadowAngle = value;
   forceProjectionMatrixCompute();
 }
 
-Vector3& PointLight::direction()
+Vector3& PointLight::get_direction()
 {
   return *_direction;
 }
 
-void PointLight::setDirection(const Vector3& value)
+void PointLight::set_direction(const Vector3& value)
 {
   auto previousNeedCube = needCube();
   _direction            = ::std::make_unique<Vector3>(value);

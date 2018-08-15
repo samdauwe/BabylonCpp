@@ -109,7 +109,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   frontWeight->parent       = parentObject;
   frontWeight->position().y = 3.f;
   frontWeight->position().z = -2.3f;
-  frontWeight->setScaling(Vector3(3.f, 1.6f, 0.3f));
+  frontWeight->scaling      = Vector3(3.f, 1.6f, 0.3f);
 
   auto frontPivot          = Mesh::CreateBox("frontPivot", 0.5f, scene);
   frontPivot->parent       = parentObject;
@@ -120,7 +120,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   frontStick->parent       = frontPivot;
   frontStick->position().x = -(lengthOfStick / 2.f);
   frontStick->position().z = -0.3f;
-  frontStick->setScaling(Vector3(lengthOfStick, 0.2f, 0.2f));
+  frontStick->scaling      = Vector3(lengthOfStick, 0.2f, 0.2f);
 
   auto frontStickAnimation
     = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
@@ -156,7 +156,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   backWeight->parent       = parentObject;
   backWeight->position().y = 3.f;
   backWeight->position().z = 2.3f;
-  backWeight->setScaling(Vector3(3.f, 1.6f, 0.3f));
+  backWeight->scaling      = Vector3(3.f, 1.6f, 0.3f);
 
   auto backPivot          = Mesh::CreateBox("backPivot", 0.5f, scene);
   backPivot->parent       = parentObject;
@@ -167,7 +167,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   backStick->parent       = backPivot;
   backStick->position().x = -(lengthOfStick / 2.f);
   backStick->position().z = 0.3f;
-  backStick->setScaling(Vector3(lengthOfStick, 0.2f, 0.2f));
+  backStick->scaling      = Vector3(lengthOfStick, 0.2f, 0.2f);
 
   auto backStickAnimation
     = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
@@ -191,8 +191,8 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Top Pieces //
   //############//
 
-  auto topStick = Mesh::CreateBox("topStick", 1, scene);
-  topStick->setScaling(Vector3(lengthOfTopStick, 0.2f, 0.2f));
+  auto topStick          = Mesh::CreateBox("topStick", 1, scene);
+  topStick->scaling      = Vector3(lengthOfTopStick, 0.2f, 0.2f);
   topStick->position().x = -lengthOfTopStick / 2.f;
   topStick->position().y = lengthOfStick;
 
@@ -219,13 +219,13 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
     = Mesh::CreateCylinder("topBar", 5.5f, 0.7f, 0.7f, 24, 1, scene, true, 0);
   topBar->parent       = topStick;
   topBar->position().x = 0.5f;
-  topBar->setScaling(Vector3(1.f / lengthOfTopStick, 5.f, 5.f));
+  topBar->scaling      = Vector3(1.f / lengthOfTopStick, 5.f, 5.f);
   topBar->rotation().x = Math::PI_2;
 
   auto topBall          = Mesh::CreateSphere("topBall", 12, 1, scene, true, 0);
   topBall->parent       = topStick;
   topBall->position().x = -0.5f;
-  topBall->setScaling(Vector3(1.f / lengthOfTopStick, 5.f, 5.f));
+  topBall->scaling      = Vector3(1.f / lengthOfTopStick, 5.f, 5.f);
 
   //############//
   // Pump Stick //
@@ -233,7 +233,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto pumpStick          = Mesh::CreateBox("pumpStick", 1.f, scene);
   pumpStick->position().x = -lengthOfTopStick;
-  pumpStick->setScaling(Vector3(0.2f, lengthOfPumpStick, 0.2f));
+  pumpStick->scaling      = Vector3(0.2f, lengthOfPumpStick, 0.2f);
 
   auto pumpStickAnimation
     = new Animation("anim", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),

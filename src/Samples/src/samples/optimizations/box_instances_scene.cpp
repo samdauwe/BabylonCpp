@@ -46,9 +46,9 @@ void BoxInstancesScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto boxInstance2 = box->createInstance("boxInstance2");
 
   // Moving elements
-  box->setPosition(Vector3(-10.f, 0.f, 0.f));
-  boxInstance1->setPosition(Vector3(0.f, 0.f, 0.f));
-  boxInstance2->setPosition(Vector3(10.f, 0.f, 0.f));
+  box->position          = Vector3(-10.f, 0.f, 0.f);
+  boxInstance1->position = Vector3(0.f, 0.f, 0.f);
+  boxInstance2->position = Vector3(10.f, 0.f, 0.f);
 }
 
 } // end of namespace Samples

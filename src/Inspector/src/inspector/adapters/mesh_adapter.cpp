@@ -205,15 +205,15 @@ void MeshAdapter::_buildPropertiesView()
   // - position
   view.addVector3Property(
     "position", [&]() -> Vector3 const& { return _abstractMesh->position(); },
-    [&](const Vector3& value) { _abstractMesh->setPosition(value); });
+    [&](const Vector3& value) { _abstractMesh->position = value; });
   // - rotation
   view.addVector3Property(
     "rotation", [&]() -> Vector3 const& { return _abstractMesh->rotation(); },
-    [&](const Vector3& value) { _abstractMesh->setRotation(value); });
+    [&](const Vector3& value) { _abstractMesh->rotation = value; });
   // - scaling
   view.addVector3Property(
     "scaling", [&]() -> Vector3 const& { return _abstractMesh->scaling(); },
-    [&](const Vector3& value) { _abstractMesh->setScaling(value); });
+    [&](const Vector3& value) { _abstractMesh->scaling = value; });
   // - scalingDeterminant
   view.addFloatProperty(
     "scalingDeterminant",

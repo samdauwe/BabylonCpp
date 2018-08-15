@@ -72,8 +72,8 @@ public:
 private:
   Vector3* _getVector3Property(AbstractMesh* target,
                                const string_t& targetProperty);
-  Quaternion* _getQuaternionProperty(AbstractMesh* target,
-                                     const string_t& targetProperty);
+  nullable_t<Quaternion> _getQuaternionProperty(AbstractMesh* target,
+                                                const string_t& targetProperty);
 
 }; // end of class IReflect
 

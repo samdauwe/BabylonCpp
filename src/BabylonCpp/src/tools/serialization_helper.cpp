@@ -184,8 +184,8 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       auto pointLight = dynamic_cast<PointLight*>(light);
       // position
       if (parsedLight.contains("position")) {
-        pointLight->setPosition(
-          Vector3::FromArray(Json::ToArray<float>(parsedLight, "position")));
+        pointLight->position
+          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
       }
     } break;
     case 1: {
@@ -193,13 +193,13 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       auto directionalLight = dynamic_cast<DirectionalLight*>(light);
       // position
       if (parsedLight.contains("position")) {
-        directionalLight->setPosition(
-          Vector3::FromArray(Json::ToArray<float>(parsedLight, "position")));
+        directionalLight->position
+          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
       }
       // direction
       if (parsedLight.contains("direction")) {
-        directionalLight->setDirection(
-          Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction")));
+        directionalLight->direction
+          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction"));
       }
       // shadowOrthoScale
       if (parsedLight.contains("shadowOrthoScale")) {
@@ -217,13 +217,13 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
       auto spotLight = dynamic_cast<SpotLight*>(light);
       // position
       if (parsedLight.contains("position")) {
-        spotLight->setPosition(
-          Vector3::FromArray(Json::ToArray<float>(parsedLight, "position")));
+        spotLight->position
+          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
       }
       // direction
       if (parsedLight.contains("direction")) {
-        spotLight->setDirection(
-          Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction")));
+        spotLight->direction
+          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction"));
       }
       // angle
       if (parsedLight.contains("angle")) {

@@ -48,7 +48,7 @@ void ImportMeshesSkullScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Move the light with the camera
   scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
-    _light->setPosition(_camera->position);
+    _light->position = _camera->position;
   });
 }
 

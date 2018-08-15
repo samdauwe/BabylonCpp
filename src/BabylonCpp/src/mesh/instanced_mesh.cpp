@@ -22,7 +22,7 @@ InstancedMesh::InstancedMesh(const string_t& _name, Mesh* source)
   scaling().copyFrom(source->scaling());
 
   if (source->rotationQuaternion()) {
-    setRotationQuaternion(*source->rotationQuaternion());
+    rotationQuaternion = source->rotationQuaternion();
   }
 
   infiniteDistance = source->infiniteDistance;

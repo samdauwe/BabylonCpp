@@ -86,7 +86,7 @@ void CrowdSimulation::addObstacleByBoundingBox(AbstractMesh* mesh,
                                                const Vector3& position,
                                                bool isVisible)
 {
-  mesh->setPosition(position);
+  mesh->position  = position;
   mesh->isVisible = isVisible;
 
   mesh->getBoundingInfo().update(*mesh->getWorldMatrix());

@@ -7,7 +7,12 @@
 namespace BABYLON {
 
 ShadowLight::ShadowLight(const string_t& name, Scene* scene)
-    : IShadowLight{name, scene}, _needProjectionMatrixCompute{true}
+    : IShadowLight{name, scene}
+    , shadowMinZ{this, &ShadowLight::get_shadowMinZ,
+                 &ShadowLight::set_shadowMinZ}
+    , shadowMaxZ{this, &ShadowLight::get_shadowMaxZ,
+                 &ShadowLight::set_shadowMaxZ}
+    , _needProjectionMatrixCompute{true}
 {
 }
 
@@ -15,22 +20,22 @@ ShadowLight::~ShadowLight()
 {
 }
 
-Vector3& ShadowLight::position()
+Vector3& ShadowLight::get_position()
 {
   return _position;
 }
 
-void ShadowLight::setPosition(const Vector3& value)
+void ShadowLight::set_position(const Vector3& value)
 {
   _setPosition(value);
 }
 
-Vector3& ShadowLight::direction()
+Vector3& ShadowLight::get_direction()
 {
   return *_direction;
 }
 
-void ShadowLight::setDirection(const Vector3& value)
+void ShadowLight::set_direction(const Vector3& value)
 {
   _direction = ::std::make_unique<Vector3>(value);
 }
@@ -55,23 +60,23 @@ void ShadowLight::_setPosition(const Vector3& value)
   _position = value;
 }
 
-const Nullable<float>& ShadowLight::shadowMinZ() const
+nullable_t<float>& ShadowLight::get_shadowMinZ()
 {
   return _shadowMinZ;
 }
 
-void ShadowLight::setShadowMinZ(float value)
+void ShadowLight::set_shadowMinZ(const nullable_t<float>& value)
 {
   _shadowMinZ = value;
   forceProjectionMatrixCompute();
 }
 
-const Nullable<float>& ShadowLight::shadowMaxZ() const
+nullable_t<float>& ShadowLight::get_shadowMaxZ()
 {
   return _shadowMaxZ;
 }
 
-void ShadowLight::setShadowMaxZ(float value)
+void ShadowLight::set_shadowMaxZ(const nullable_t<float>& value)
 {
   _shadowMaxZ = value;
   forceProjectionMatrixCompute();
@@ -83,7 +88,7 @@ bool ShadowLight::computeTransformedInformation()
     if (!_transformedPosition) {
       _transformedPosition = ::std::make_unique<Vector3>(Vector3::Zero());
     }
-    Vector3::TransformCoordinatesToRef(position(), *parent()->getWorldMatrix(),
+    Vector3::TransformCoordinatesToRef(position, *parent()->getWorldMatrix(),
                                        *_transformedPosition);
 
     // In case the direction is present.
@@ -116,12 +121,12 @@ Vector3 ShadowLight::getShadowDirection(unsigned int /*faceIndex*/)
 
 Vector3 ShadowLight::getAbsolutePosition()
 {
-  return _transformedPosition ? *_transformedPosition : position();
+  return _transformedPosition ? *_transformedPosition : position;
 }
 
 Vector3 ShadowLight::setDirectionToTarget(const Vector3& target)
 {
-  setDirection(Vector3::Normalize(target.subtract(position())));
+  direction = Vector3::Normalize(target.subtract(position));
   return direction();
 }
 
@@ -162,12 +167,12 @@ Matrix* ShadowLight::_getWorldMatrix()
 
 float ShadowLight::getDepthMinZ(Camera* activeCamera) const
 {
-  return shadowMinZ() ? *shadowMinZ() : activeCamera->minZ;
+  return shadowMinZ().has_value() ? *shadowMinZ() : activeCamera->minZ;
 }
 
 float ShadowLight::getDepthMaxZ(Camera* activeCamera) const
 {
-  return shadowMaxZ() ? *shadowMaxZ() : activeCamera->maxZ;
+  return shadowMaxZ().has_value() ? *shadowMaxZ() : activeCamera->maxZ;
 }
 
 IShadowLight* ShadowLight::setShadowProjectionMatrix(

@@ -275,12 +275,13 @@ Vector3* IReflect::_getVector3Property(AbstractMesh* target,
   return vector3Property;
 }
 
-Quaternion* IReflect::_getQuaternionProperty(AbstractMesh* target,
-                                             const string_t& targetProperty)
+nullable_t<Quaternion>
+IReflect::_getQuaternionProperty(AbstractMesh* target,
+                                 const string_t& targetProperty)
 {
-  Quaternion* quaternionProperty = nullptr;
+  nullable_t<Quaternion> quaternionProperty = nullopt_t;
   if (targetProperty == "rotationQuaternion" && target->rotationQuaternion()) {
-    quaternionProperty = target->rotationQuaternion().get();
+    quaternionProperty = target->rotationQuaternion();
   }
   return quaternionProperty;
 }

@@ -596,12 +596,12 @@ Skeleton*& AbstractMesh::get_skeleton()
   return _skeleton;
 }
 
-Vector3& AbstractMesh::scaling()
+Vector3& AbstractMesh::get_scaling()
 {
   return _scaling;
 }
 
-void AbstractMesh::setScaling(const Vector3& newScaling)
+void AbstractMesh::set_scaling(const Vector3& newScaling)
 {
   _scaling = newScaling;
   if (physicsImpostor) {
@@ -891,7 +891,7 @@ AbstractMesh& AbstractMesh::_updateBoundingInfo()
   return *this;
 }
 
-AbstractMesh& AbstractMesh::_updateSubMeshesBoundingInfo(Matrix& matrix)
+AbstractMesh& AbstractMesh::_updateSubMeshesBoundingInfo(const Matrix& matrix)
 {
   if (subMeshes.empty()) {
     return *this;
@@ -1774,7 +1774,7 @@ AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,
     auto rotationQuat = *rotationQuaternion();
     Quaternion::RotationQuaternionFromAxisToRef(axisX, normal, axisZ,
                                                 rotationQuat);
-    setRotationQuaternion(rotationQuat);
+    rotationQuaternion = rotationQuat;
   }
   else {
     Vector3::RotationFromAxisToRef(axisX, normal, axisZ, rotation());

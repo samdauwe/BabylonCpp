@@ -96,7 +96,7 @@ void MandelbrotFractalScene::initializeScene(ICanvas* canvas, Scene* scene)
   ribbon->position().z -= yrf / 2.f;
 
   _scene->registerBeforeRender(
-    [this](Scene*, EventState&) { _pl->setPosition(_camera->position); });
+    [this](Scene*, EventState&) { _pl->position = _camera->position; });
 }
 
 } // end of namespace Samples
