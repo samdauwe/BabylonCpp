@@ -67,6 +67,8 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , alphaIndex{numeric_limits_t<int>::max()}
     , isVisible{true}
     , isPickable{true}
+    , showBoundingBox{this, &AbstractMesh::get_showBoundingBox,
+                      &AbstractMesh::set_showBoundingBox}
     , showSubMeshesBoundingBox{false}
     , isBlocker{false}
     , enablePointerMoveEvents{false}
@@ -151,6 +153,7 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _collisionsTransformMatrix{Matrix::Zero()}
     , _collisionsScalingMatrix{Matrix::Zero()}
     , _skeleton{nullptr}
+    , _showBoundingBox{false}
 {
   _resyncLightSources();
 }
@@ -406,6 +409,20 @@ void AbstractMesh::set_visibility(float value)
 
   _visibility = value;
   _markSubMeshesAsMiscDirty();
+}
+
+bool AbstractMesh::get_showBoundingBox() const
+{
+  return _showBoundingBox;
+}
+
+void AbstractMesh::set_showBoundingBox(bool value)
+{
+  _showBoundingBox = value;
+  // Lazyly creates a BB renderer if needed.
+  if (value) {
+    getScene()->getBoundingBoxRenderer();
+  }
 }
 
 int AbstractMesh::get_collisionMask() const

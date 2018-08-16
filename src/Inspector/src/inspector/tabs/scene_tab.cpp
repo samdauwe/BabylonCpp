@@ -280,7 +280,9 @@ void SceneTab::_renderActions()
 {
   // General
   if (ImGui::CollapsingHeader("General", "General", true, true)) {
-    ImGui::Checkbox("Bounding boxes", &_scene->forceShowBoundingBoxes);
+    bool forceShowBoundingBoxes;
+    ImGui::Checkbox("Bounding boxes", &forceShowBoundingBoxes);
+    _scene->forceShowBoundingBoxes = forceShowBoundingBoxes;
   }
   // Rendering Mode
   if (ImGui::CollapsingHeader("Rendering Mode", "Rendering Mode", true, true)) {

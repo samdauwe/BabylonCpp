@@ -905,6 +905,18 @@ protected:
   void set_visibility(float value);
 
   /**
+   * @brief Gets a boolean indicating if the bounding box must be rendered as
+   * well (false by default).
+   */
+  bool get_showBoundingBox() const;
+
+  /**
+   * @brief Sets a boolean indicating if the bounding box must be rendered as
+   * well (false by default).
+   */
+  void set_showBoundingBox(bool value);
+
+  /**
    * @brief Gets current material.
    */
   virtual Material*& get_material();
@@ -1276,6 +1288,12 @@ public:
   bool isPickable;
 
   /**
+   * Gets or sets a boolean indicating if the bounding box must be rendered as
+   * well (false by default).
+   */
+  Property<AbstractMesh, bool> showBoundingBox;
+
+  /**
    * Gets or sets a boolean indicating that bounding boxes of subMeshes must be
    * rendered as well (false by default)
    */
@@ -1605,6 +1623,8 @@ private:
   Matrix _collisionsScalingMatrix;
   // Skeleton
   Skeleton* _skeleton;
+  // Rendering
+  bool _showBoundingBox;
 
 }; // end of class AbstractMesh
 

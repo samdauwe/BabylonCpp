@@ -2,23 +2,48 @@
 #define BABYLON_RENDERING_BOUNDING_BOX_RENDERER_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/engine/iscene_component.h>
+#include <babylon/engine/scene_component_constants.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT BoundingBoxRenderer {
+class BABYLON_SHARED_EXPORT BoundingBoxRenderer : public ISceneComponent {
 
 public:
-  BoundingBoxRenderer(Scene* scene);
+  /**
+   * The component name helpfull to identify the component in the list of scene
+   * components.
+   */
+  static constexpr const char* name
+    = SceneComponentConstants::NAME_BOUNDINGBOXRENDERER;
+
+public:
+  template <typename... Ts>
+  static BoundingBoxRendererPtr New(Ts&&... args)
+  {
+    return shared_ptr_t<BoundingBoxRenderer>(
+      new BoundingBoxRenderer(::std::forward<Ts>(args)...));
+  }
   virtual ~BoundingBoxRenderer();
 
-  void _rebuild();
+  /**
+   * @brief Registers the component in a given scene.
+   */
+  void _register() override;
+
+  void rebuild() override;
   void reset();
   void render();
   void renderOcclusionBoundingBox(AbstractMesh* mesh);
-  void dispose();
+  void dispose() override;
+
+protected:
+  BoundingBoxRenderer(Scene* scene);
 
 private:
+  void _evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh);
+  void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
   void _prepareResources();
   void _createIndexBuffer();
 
@@ -29,7 +54,6 @@ public:
   vector_t<BoundingBox> renderList;
 
 private:
-  Scene* _scene;
   ShaderMaterial* _colorShader;
   vector_t<unique_ptr_t<VertexBuffer>> _vertexBuffers;
   unordered_map_t<string_t, VertexBuffer*> _vertexBuffersMap;

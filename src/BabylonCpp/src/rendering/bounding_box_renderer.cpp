@@ -6,25 +6,69 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/materials/shader_material_options.h>
+#include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
 
 namespace BABYLON {
 
-BoundingBoxRenderer::BoundingBoxRenderer(Scene* scene)
+BoundingBoxRenderer::BoundingBoxRenderer(Scene* iScene)
     : frontColor{Color3(1.f, 1.f, 1.f)}
     , backColor{Color3(0.1f, 0.1f, 0.1f)}
     , showBackLines{true}
-    , _scene{scene}
     , _colorShader{nullptr}
     , _indexBuffer{nullptr}
 {
+  scene = iScene;
   renderList.reserve(32);
+  scene->_addComponent(shared_from_this());
 }
 
 BoundingBoxRenderer::~BoundingBoxRenderer()
 {
+}
+
+void BoundingBoxRenderer::_register()
+{
+  scene->_beforeEvaluateActiveMeshStage.registerStep(
+    SceneComponentConstants::STEP_BEFOREEVALUATEACTIVEMESH_BOUNDINGBOXRENDERER,
+    this, [this]() { reset(); });
+
+  scene->_activeMeshStage.registerStep(
+    SceneComponentConstants::STEP_ACTIVEMESH_BOUNDINGBOXRENDERER, this,
+    [this](AbstractMesh* sourceMesh, AbstractMesh* mesh) {
+      _activeMesh(sourceMesh, mesh);
+    });
+
+  scene->_evaluateSubMeshStage.registerStep(
+    SceneComponentConstants::STEP_EVALUATESUBMESH_BOUNDINGBOXRENDERER, this,
+    [this](AbstractMesh* mesh, SubMesh* subMesh) {
+      _evaluateSubMesh(mesh, subMesh);
+    });
+
+  scene->_afterCameraDrawStage.registerStep(
+    SceneComponentConstants::STEP_AFTERCAMERADRAW_BOUNDINGBOXRENDERER, this,
+    [this](Camera* /*camera*/) { render(); });
+}
+
+void BoundingBoxRenderer::_evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh)
+{
+  if (mesh->showSubMeshesBoundingBox) {
+    const auto& boundingInfo = subMesh->getBoundingInfo();
+
+    renderList.emplace_back(boundingInfo.boundingBox);
+  }
+}
+
+void BoundingBoxRenderer::_activeMesh(AbstractMesh* sourceMesh,
+                                      AbstractMesh* /*mesh*/)
+{
+  if (sourceMesh->showBoundingBox || scene->forceShowBoundingBoxes) {
+    const auto& boundingInfo = sourceMesh->getBoundingInfo();
+
+    renderList.emplace_back(boundingInfo.boundingBox);
+  }
 }
 
 void BoundingBoxRenderer::_prepareResources()
@@ -37,10 +81,10 @@ void BoundingBoxRenderer::_prepareResources()
   shaderMaterialOptions.attributes = {VertexBuffer::PositionKindChars};
   shaderMaterialOptions.uniforms   = {"world", "viewProjection", "color"};
 
-  _colorShader = ShaderMaterial::New("colorShader", _scene, "color",
-                                     shaderMaterialOptions);
+  _colorShader
+    = ShaderMaterial::New("colorShader", scene, "color", shaderMaterialOptions);
 
-  auto engine = _scene->getEngine();
+  auto engine = scene->getEngine();
   BoxOptions options(1.f);
   auto boxdata = VertexData::CreateBox(options);
   _vertexBuffers.resize(VertexBuffer::PositionKind + 1);
@@ -54,13 +98,13 @@ void BoundingBoxRenderer::_prepareResources()
 
 void BoundingBoxRenderer::_createIndexBuffer()
 {
-  auto engine = _scene->getEngine();
+  auto engine = scene->getEngine();
   const Uint32Array indices{0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6,
                             6, 7, 7, 4, 0, 7, 1, 6, 2, 5, 3, 4};
   _indexBuffer = engine->createIndexBuffer(indices);
 }
 
-void BoundingBoxRenderer::_rebuild()
+void BoundingBoxRenderer::rebuild()
 {
   if (VertexBuffer::PositionKind < _vertexBuffers.size()) {
     auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
@@ -88,7 +132,7 @@ void BoundingBoxRenderer::render()
     return;
   }
 
-  auto engine = _scene->getEngine();
+  auto engine = scene->getEngine();
   engine->setDepthWrite(false);
   _colorShader->_preBind();
   for (auto& boundingBox : renderList) {
@@ -109,7 +153,7 @@ void BoundingBoxRenderer::render()
     if (showBackLines) {
       // Back
       engine->setDepthFunctionToGreaterOrEqual();
-      _scene->resetCachedMaterial();
+      scene->resetCachedMaterial();
       _colorShader->setColor4("color", backColor.toColor4());
       _colorShader->bind(&worldMatrix, nullptr);
 
@@ -119,7 +163,7 @@ void BoundingBoxRenderer::render()
 
     // Front
     engine->setDepthFunctionToLess();
-    _scene->resetCachedMaterial();
+    scene->resetCachedMaterial();
     _colorShader->setColor4("color", frontColor.toColor4());
     _colorShader->bind(&worldMatrix);
 
@@ -139,7 +183,7 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
     return;
   }
 
-  auto engine = _scene->getEngine();
+  auto engine = scene->getEngine();
   engine->setDepthWrite(false);
   engine->setColorWrite(false);
   _colorShader->_preBind();
@@ -159,7 +203,7 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
                       _colorShader->getEffect());
 
   engine->setDepthFunctionToLess();
-  _scene->resetCachedMaterial();
+  scene->resetCachedMaterial();
   _colorShader->bind(&worldMatrix);
 
   engine->drawElementsType(Material::LineListDrawMode(), 0, 24);
@@ -189,7 +233,7 @@ void BoundingBoxRenderer::dispose()
     }
   }
 
-  _scene->getEngine()->_releaseBuffer(_indexBuffer.get());
+  scene->getEngine()->_releaseBuffer(_indexBuffer.get());
 }
 
 } // end of namespace BABYLON
