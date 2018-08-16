@@ -30,9 +30,6 @@ public:
 
   IReflect::Type type() const override;
 
-  Material* getMaterial() override;
-  void setMaterial(Material* material);
-  bool checkCollisions();
   InstancedMesh* createInstance(const string_t& name);
   void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode) override;
   void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
@@ -51,6 +48,21 @@ protected:
   LinesMesh(const string_t& name, Scene* scene, Node* parent = nullptr,
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
             bool useVertexColor = false, bool useVertexAlpha = false);
+
+  /**
+   * Hidden
+   */
+  Material*& get_material() override;
+
+  /**
+   * Hidden
+   */
+  void set_material(Material* const& material) override;
+
+  /**
+   * Hidden
+   */
+  bool get_checkCollisions() const override;
 
   /**
    * @brief The intersection Threshold is the margin applied when intersection a
@@ -84,6 +96,7 @@ public:
 
 private:
   float _intersectionThreshold;
+  Material* _colorShaderMaterial;
   ShaderMaterial* _colorShader;
 
 }; // end of class LinesMesh

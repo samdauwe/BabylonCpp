@@ -3428,7 +3428,7 @@ void Scene::_activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh)
     }
   }
 
-  if (sourceMesh->showBoundingBox || forceShowBoundingBoxes) {
+  if (/*sourceMesh->showBoundingBox || */ forceShowBoundingBoxes) {
     auto boundingInfo = sourceMesh->getBoundingInfo();
     getBoundingBoxRenderer()->renderList.emplace_back(boundingInfo.boundingBox);
   }

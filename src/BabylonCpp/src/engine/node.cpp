@@ -132,7 +132,7 @@ void Node::set_onDispose(
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-Scene* Node::getScene()
+Scene* Node::getScene() const
 {
   return _scene;
 }

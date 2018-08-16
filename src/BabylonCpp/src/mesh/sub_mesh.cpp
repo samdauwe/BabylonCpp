@@ -150,7 +150,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
   else {
     extend = Tools::ExtractMinAndMaxIndexed(
       data, indices, indexStart, indexCount,
-      _renderingMesh->geometry()->boundingBias());
+      *_renderingMesh->geometry()->boundingBias());
   }
   _boundingInfo = ::std::make_unique<BoundingInfo>(extend.min, extend.max);
 

@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
-               Nullable<size_t> stride, bool postponeInternalCreation,
+               nullable_t<size_t> stride, bool postponeInternalCreation,
                bool instanced, bool useBytes)
     : _data{data}
     , _engine{engine ? engine : Engine::LastCreatedEngine()}
@@ -17,7 +17,7 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
     , _updatable{updatable}
     , _instanced{instanced}
 {
-  if (!stride) {
+  if (!stride.has_value()) {
     stride = 0ul;
   }
 
@@ -29,7 +29,7 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
 }
 
 Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
-               Nullable<size_t> stride, bool postponeInternalCreation,
+               nullable_t<size_t> stride, bool postponeInternalCreation,
                bool instanced, bool useBytes)
     : _data{data}
     , _engine{mesh->getScene()->getEngine()}
@@ -37,7 +37,7 @@ Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
     , _updatable{updatable}
     , _instanced{instanced}
 {
-  if (!stride) {
+  if (!stride.has_value()) {
     stride = 0ul;
   }
 
@@ -52,21 +52,21 @@ Buffer::~Buffer()
 {
 }
 
-unique_ptr_t<VertexBuffer> Buffer::createVertexBuffer(unsigned int kind,
-                                                      size_t offset, int size,
-                                                      Nullable<size_t> stride,
-                                                      Nullable<bool> instanced,
-                                                      bool useBytes)
+unique_ptr_t<VertexBuffer>
+Buffer::createVertexBuffer(unsigned int kind, size_t offset, int size,
+                           nullable_t<size_t> stride,
+                           nullable_t<bool> instanced, bool useBytes)
 {
   const auto _byteOffset = useBytes ? offset : offset * sizeof(float);
-  const auto _byteStride
-    = stride ? (useBytes ? *stride : *stride * sizeof(float)) : byteStride;
+  const auto _byteStride = stride.has_value() ?
+                             (useBytes ? *stride : *stride * sizeof(float)) :
+                             byteStride;
 
   // a lot of these parameters are ignored as they are overriden by the buffer
   return ::std::make_unique<VertexBuffer>(
     _engine, ToVariant<Float32Array, Buffer*>(this), kind, _updatable, true,
-    _byteStride, instanced.isNull() ? _instanced : _byteOffset, offset, size,
-    nullptr, false, true);
+    _byteStride, !instanced.has_value() ? _instanced : _byteOffset, offset,
+    size, nullopt_t, false, true);
 }
 
 // Properties
@@ -134,7 +134,7 @@ GL::IGLBuffer* Buffer::update(const Float32Array& data)
 }
 
 GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, size_t offset,
-                                      const Nullable<size_t>& vertexCount,
+                                      const nullable_t<size_t>& vertexCount,
                                       bool useBytes)
 {
   if (!_buffer) {
@@ -146,7 +146,8 @@ GL::IGLBuffer* Buffer::updateDirectly(const Float32Array& data, size_t offset,
       _buffer, data,
       useBytes ? static_cast<int>(offset) :
                  static_cast<int>(offset * sizeof(float)),
-      (vertexCount ? static_cast<int>(*vertexCount * byteStride) : -1));
+      (vertexCount.has_value() ? static_cast<int>(*vertexCount * byteStride) :
+                                 -1));
     _data.clear();
   }
 

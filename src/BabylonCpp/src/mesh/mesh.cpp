@@ -46,13 +46,25 @@ namespace BABYLON {
 Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
            bool doNotCloneChildren, bool clonePhysicsImpostor)
     : AbstractMesh{iName, scene}
+    , onBeforeRenderObservable{this, &Mesh::get_onBeforeDrawObservable}
+    , onAfterRenderObservable{this, &Mesh::get_onAfterRenderObservable}
+    , onBeforeDrawObservable{this, &Mesh::get_onBeforeDrawObservable}
+    , onBeforeDraw{this, &Mesh::set_onBeforeDraw}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , onLODLevelSelection{nullptr}
+    , morphTargetManager{this, &Mesh::get_morphTargetManager,
+                         &Mesh::set_morphTargetManager}
     , _geometry{nullptr}
     , _visibleInstances{nullptr}
     , _shouldGenerateFlatShading{false}
     , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE()}
-    , overrideMaterialSideOrientation{nullptr}
+    , overrideMaterialSideOrientation{nullopt_t}
+    , source{this, &Mesh::get_source}
+    , isUnIndexed{this, &Mesh::get_isUnIndexed, &Mesh::set_isUnIndexed}
+    , hasLODLevels{this, &Mesh::get_hasLODLevels}
+    , geometry{this, &Mesh::get_geometry}
+    , areNormalsFrozen{this, &Mesh::get_areNormalsFrozen}
+    , _positions{this, &Mesh::get__positions}
     , _onBeforeDrawObserver{nullptr}
     , _morphTargetManager{nullptr}
     , _batchCache{::std::make_unique<_InstancesBatch>()}
@@ -84,9 +96,11 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
                     [
                       "name", "material", "skeleton", "instances", "parent",
                       "uniqueId", "source", "metadata", "hasLODLevels",
-                      "geometry", "isBlocked", "areNormalsFrozen"
+                      "geometry", "isBlocked", "areNormalsFrozen",
+                      "onBeforeDrawObservable", "onBeforeRenderObservable",
+                      "onAfterRenderObservable", "onBeforeDraw"
                     ],
-                    [ "_poseMatrix", "_source" ]);
+                    ["_poseMatrix"]);
 #endif
 
     // Source mesh
@@ -143,12 +157,12 @@ Mesh::~Mesh()
 {
 }
 
-MorphTargetManager* Mesh::morphTargetManager()
+MorphTargetManager*& Mesh::get_morphTargetManager()
 {
   return _morphTargetManager;
 }
 
-void Mesh::setMorphTargetManager(MorphTargetManager* value)
+void Mesh::set_morphTargetManager(MorphTargetManager* const& value)
 {
   if (_morphTargetManager == value) {
     return;
@@ -157,17 +171,17 @@ void Mesh::setMorphTargetManager(MorphTargetManager* value)
   _syncGeometryWithMorphTargetManager();
 }
 
-Mesh* Mesh::source()
+Mesh*& Mesh::get_source()
 {
   return _source;
 }
 
-bool Mesh::isUnIndexed() const
+bool Mesh::get_isUnIndexed() const
 {
   return _unIndexed;
 }
 
-void Mesh::setIsUnIndexed(bool value)
+void Mesh::set_isUnIndexed(bool value)
 {
   if (_unIndexed != value) {
     _unIndexed = value;
@@ -185,13 +199,28 @@ IReflect::Type Mesh::type() const
   return IReflect::Type::MESH;
 }
 
-void Mesh::setOnBeforeDraw(
+Observable<Mesh>& Mesh::get_onBeforeRenderObservable()
+{
+  return _onBeforeRenderObservable;
+}
+
+Observable<Mesh>& Mesh::get_onAfterRenderObservable()
+{
+  return _onAfterRenderObservable;
+}
+
+Observable<Mesh>& Mesh::get_onBeforeDrawObservable()
+{
+  return _onBeforeDrawObservable;
+}
+
+void Mesh::set_onBeforeDraw(
   const ::std::function<void(Mesh*, EventState&)>& callback)
 {
   if (_onBeforeDrawObserver) {
-    onBeforeDrawObservable.remove(_onBeforeDrawObserver);
+    onBeforeDrawObservable().remove(_onBeforeDrawObserver);
   }
-  _onBeforeDrawObserver = onBeforeDrawObservable.add(callback);
+  _onBeforeDrawObserver = onBeforeDrawObservable().add(callback);
 }
 
 string_t Mesh::toString(bool fullDetails)
@@ -240,7 +269,7 @@ void Mesh::_unBindEffect()
   }
 }
 
-bool Mesh::hasLODLevels() const
+bool Mesh::get_hasLODLevels() const
 {
   return _LODLevels.size() > 0;
 }
@@ -357,7 +386,7 @@ AbstractMesh* Mesh::getLOD(Camera* camera, BoundingSphere* boundingSphere)
   return this;
 }
 
-Geometry* Mesh::geometry() const
+Geometry*& Mesh::get_geometry()
 {
   return _geometry;
 }
@@ -392,7 +421,7 @@ VertexBuffer* Mesh::getVertexBuffer(unsigned int kind) const
   return _geometry->getVertexBuffer(kind);
 }
 
-bool Mesh::isVerticesDataPresent(unsigned int kind)
+bool Mesh::isVerticesDataPresent(unsigned int kind) const
 {
   if (!_geometry) {
     if (!_delayInfo.empty()) {
@@ -452,7 +481,7 @@ IndicesArray Mesh::getIndices(bool copyWhenShared)
   return _geometry->getIndices(copyWhenShared);
 }
 
-bool Mesh::isBlocked() const
+bool Mesh::get_isBlocked() const
 {
   return _masterMesh != nullptr;
 }
@@ -533,7 +562,7 @@ bool Mesh::isReady(bool completeCheck, bool forceInstanceSupport)
   return true;
 }
 
-bool Mesh::areNormalsFrozen() const
+bool Mesh::get_areNormalsFrozen() const
 {
   return _areNormalsFrozen;
 }
@@ -652,28 +681,26 @@ Float32Array Mesh::_getPositionData(bool applySkeleton)
         float weight     = 0.f;
         for (inf = 0; inf < 4; inf++) {
           weight = matricesWeightsData[matWeightIdx + inf];
-          if (weight <= 0.f) {
-            break;
+          if (weight > 0) {
+            Matrix::FromFloat32ArrayToRefScaled(
+              skeletonMatrices,
+              static_cast<unsigned int>(
+                ::std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
+              weight, tempMatrix);
+            finalMatrix.addToSelf(tempMatrix);
           }
-          Matrix::FromFloat32ArrayToRefScaled(
-            skeletonMatrices,
-            static_cast<unsigned int>(
-              ::std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
-            weight, tempMatrix);
-          finalMatrix.addToSelf(tempMatrix);
         }
         if (needExtras) {
           for (inf = 0; inf < 4; inf++) {
             weight = matricesWeightsExtraData[matWeightIdx + inf];
-            if (weight <= 0.f) {
-              break;
+            if (weight > 0) {
+              Matrix::FromFloat32ArrayToRefScaled(
+                skeletonMatrices,
+                static_cast<unsigned int>(::std::floor(
+                  matricesIndicesExtraData[matWeightIdx + inf] * 16)),
+                weight, tempMatrix);
+              finalMatrix.addToSelf(tempMatrix);
             }
-            Matrix::FromFloat32ArrayToRefScaled(
-              skeletonMatrices,
-              static_cast<unsigned int>(::std::floor(
-                matricesIndicesExtraData[matWeightIdx + inf] * 16)),
-              weight, tempMatrix);
-            finalMatrix.addToSelf(tempMatrix);
           }
         }
 
@@ -765,7 +792,7 @@ void Mesh::subdivide(size_t count)
 }
 
 Mesh* Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
-                            bool updatable, const Nullable<size_t>& stride)
+                            bool updatable, const nullable_t<size_t>& stride)
 {
   if (!_geometry) {
     auto vertexData = ::std::make_unique<VertexData>();
@@ -941,7 +968,7 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
     return;
   }
 
-  onBeforeDrawObservable.notifyObservers(this);
+  onBeforeDrawObservable().notifyObservers(this);
 
   auto scene  = getScene();
   auto engine = scene->getEngine();
@@ -988,28 +1015,28 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
 Mesh& Mesh::registerBeforeRender(
   const ::std::function<void(Mesh* mesh, EventState&)>& func)
 {
-  onBeforeRenderObservable.add(func);
+  onBeforeRenderObservable().add(func);
   return *this;
 }
 
 Mesh& Mesh::unregisterBeforeRender(
   const ::std::function<void(Mesh* mesh, EventState&)>& func)
 {
-  onBeforeRenderObservable.removeCallback(func);
+  onBeforeRenderObservable().removeCallback(func);
   return *this;
 }
 
 Mesh& Mesh::registerAfterRender(
   const ::std::function<void(Mesh* mesh, EventState&)>& func)
 {
-  onAfterRenderObservable.add(func);
+  onAfterRenderObservable().add(func);
   return *this;
 }
 
 Mesh& Mesh::unregisterAfterRender(
   const ::std::function<void(Mesh* mesh, EventState&)>& func)
 {
-  onAfterRenderObservable.removeCallback(func);
+  onAfterRenderObservable().removeCallback(func);
   return *this;
 }
 
@@ -1184,10 +1211,10 @@ Mesh& Mesh::_processRendering(
 
 Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 {
-  _checkOcclusionQuery();
-  if (_isOccluded) {
-    return *this;
-  }
+  // _checkOcclusionQuery();
+  // if (_isOccluded) {
+  //  return *this;
+  // }
 
   auto scene = getScene();
 
@@ -1204,7 +1231,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     return *this;
   }
 
-  onBeforeRenderObservable.notifyObservers(this);
+  onBeforeRenderObservable().notifyObservers(this);
 
   auto engine = scene->getEngine();
   auto hardwareInstancedRendering
@@ -1259,7 +1286,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   }
 
   auto sideOrientation = overrideMaterialSideOrientation;
-  if (sideOrientation == nullptr) {
+  if (!sideOrientation.has_value()) {
     sideOrientation
       = static_cast<unsigned>(_effectiveMaterial->sideOrientation);
     if (_getWorldMatrixDeterminant() < 0) {
@@ -1270,7 +1297,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     }
   }
 
-  auto reverse = _effectiveMaterial->_preBind(effect, sideOrientation);
+  auto reverse = _effectiveMaterial->_preBind(effect, *sideOrientation);
 
   if (_effectiveMaterial->forceDepthWrite) {
     engine->setDepthWrite(true);
@@ -1336,7 +1363,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     engine->setAlphaMode(currentMode);
   }
 
-  onAfterRenderObservable.notifyObservers(this);
+  onAfterRenderObservable().notifyObservers(this);
 
   return *this;
 }
@@ -1613,7 +1640,7 @@ Mesh& Mesh::bakeCurrentTransformIntoVertices()
 }
 
 // Cache
-vector_t<Vector3>& Mesh::_positions()
+vector_t<Vector3>& Mesh::get__positions()
 {
   if (_geometry) {
     return _geometry->_positions;
@@ -1647,11 +1674,15 @@ Mesh* Mesh::clone(const string_t& iName, Node* newParent,
 
 void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
-  setMorphTargetManager(nullptr);
+  morphTargetManager = nullptr;
 
   if (_geometry) {
     _geometry->releaseForMesh(this, true);
   }
+
+  onBeforeDrawObservable().clear();
+  onBeforeRenderObservable().clear();
+  onAfterRenderObservable().clear();
 
   // Sources
   for (auto& mesh : getScene()->meshes) {
@@ -1673,19 +1704,6 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   for (auto& instance : instances) {
     instance->dispose();
   }
-
-  // Effect layers.
-  auto& effectLayers = getScene()->effectLayers;
-  for (auto& effectLayer : effectLayers) {
-    if (effectLayer) {
-      effectLayer->_disposeMesh(this);
-    }
-  }
-
-  // Events
-  onBeforeRenderObservable.clear();
-  onAfterRenderObservable.clear();
-  onBeforeDrawObservable.clear();
 
   AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
@@ -2087,7 +2105,6 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   mesh->isVisible        = Json::GetBool(parsedMesh, "isVisible", true);
   mesh->infiniteDistance = Json::GetBool(parsedMesh, "infiniteDistance");
 
-  mesh->showBoundingBox = Json::GetBool(parsedMesh, "showBoundingBox");
   mesh->showSubMeshesBoundingBox
     = Json::GetBool(parsedMesh, "showSubMeshesBoundingBox");
 
@@ -2112,7 +2129,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
     mesh->visibility = Json::GetNumber(parsedMesh, "visibility", 1.f);
   }
 
-  mesh->setCheckCollisions(Json::GetBool(parsedMesh, "checkCollisions"));
+  mesh->checkCollisions = Json::GetBool(parsedMesh, "checkCollisions");
 
   if (parsedMesh.contains("isBlocker")) {
     mesh->isBlocker = Json::GetBool(parsedMesh, "isBlocker");
@@ -2152,7 +2169,7 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   // Geometry
-  mesh->setIsUnIndexed(Json::GetBool(parsedMesh, "isUnIndexed", false));
+  mesh->isUnIndexed    = Json::GetBool(parsedMesh, "isUnIndexed", false);
   mesh->hasVertexAlpha = Json::GetBool(parsedMesh, "hasVertexAlpha", false);
 
   if (parsedMesh.contains("delayLoadingFile")) {
@@ -2228,8 +2245,8 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   const int morphTargetManagerId
     = Json::GetNumber(parsedMesh, "morphTargetManagerId", -1);
   if (morphTargetManagerId > -1) {
-    mesh->setMorphTargetManager(scene->getMorphTargetManagerById(
-      static_cast<unsigned>(morphTargetManagerId)));
+    mesh->morphTargetManager = scene->getMorphTargetManagerById(
+      static_cast<unsigned>(morphTargetManagerId));
   }
 
   // Skeleton
@@ -2306,8 +2323,8 @@ Mesh* Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
           = Vector3::FromArray(Json::ToArray<float>(parsedInstance, "scaling"));
       }
 
-      instance->setCheckCollisions(
-        Json::GetBool(parsedInstance, "checkCollisions"));
+      instance->checkCollisions
+        = Json::GetBool(parsedInstance, "checkCollisions");
 
       if (parsedMesh.contains("animations")) {
         for (auto& parsedAnimation : Json::GetArray(parsedMesh, "animations")) {
@@ -2776,9 +2793,6 @@ Mesh* Mesh::applySkeleton(Skeleton* skeleton)
           weight, tempMatrix);
         finalMatrix.addToSelf(tempMatrix);
       }
-      else {
-        break;
-      }
     }
     if (needExtras) {
       for (inf = 0; inf < 4; ++inf) {
@@ -2790,9 +2804,6 @@ Mesh* Mesh::applySkeleton(Skeleton* skeleton)
               ::std::floor(matricesIndicesExtraData[matWeightIdx + inf] * 16)),
             weight, tempMatrix);
           finalMatrix.addToSelf(tempMatrix);
-        }
-        else {
-          break;
         }
       }
     }
@@ -2924,8 +2935,8 @@ Mesh* Mesh::MergeMeshes(const vector_t<Mesh*>& meshes, bool disposeSource,
   vertexData->applyToMesh(meshSubclass);
 
   // Setting properties
-  meshSubclass->material = source->getMaterial();
-  meshSubclass->setCheckCollisions(source->checkCollisions());
+  meshSubclass->material        = source->getMaterial();
+  meshSubclass->checkCollisions = source->checkCollisions();
 
   // Cleaning
   if (disposeSource) {

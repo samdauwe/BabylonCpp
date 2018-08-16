@@ -54,6 +54,10 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
                                     OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE}
     , occlusionType{AbstractMesh::OCCLUSION_TYPE_NONE}
     , occlusionRetryCount{-1}
+    , _occlusionInternalRetryCounter{0}
+    , _isOccluded{false}
+    , _isOcclusionQueryInProgress{false}
+    , _occlusionQuery{nullptr}
     , isOccluded{this, &AbstractMesh::get_isOccluded,
                  &AbstractMesh::set_isOccluded}
     , isOcclusionQueryInProgress{this,
@@ -63,7 +67,6 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , alphaIndex{numeric_limits_t<int>::max()}
     , isVisible{true}
     , isPickable{true}
-    , showBoundingBox{false}
     , showSubMeshesBoundingBox{false}
     , isBlocker{false}
     , enablePointerMoveEvents{false}
@@ -110,9 +113,14 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _renderId{0}
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
-    , _waitingFreezeWorldMatrix{nullptr}
+    , _waitingFreezeWorldMatrix{nullopt_t}
     , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
-    , _isOccluded{false}
+    , edgesRenderer{this, &AbstractMesh::get_edgesRenderer}
+    , isBlocked{this, &AbstractMesh::get_isBlocked}
+    , useBones{this, &AbstractMesh::get_useBones}
+    , checkCollisions{this, &AbstractMesh::get_checkCollisions,
+                      &AbstractMesh::set_checkCollisions}
+    , collider{this, &AbstractMesh::get_collider}
     , _facetNb{0}
     , _partitioningSubdivisions{10}
     , _partitioningBBoxRatio{1.01f}
@@ -125,9 +133,6 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _facetDepthSortFrom{::std::make_unique<Vector3>(Vector3::Zero())}
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
-    , _occlusionInternalRetryCounter{0}
-    , _isOcclusionQueryInProgress{false}
-    , _occlusionQuery{nullptr}
     , _visibility{1.f}
     , _material{nullptr}
     , _receiveShadows{false}
@@ -448,7 +453,11 @@ string_t AbstractMesh::toString(bool fullDetails) const
       oss << "null";
     }
     oss << ", freeze wrld mat: "
-        << (_isWorldMatrixFrozen || _waitingFreezeWorldMatrix ? "YES" : "NO");
+        << (_isWorldMatrixFrozen
+                || (_waitingFreezeWorldMatrix.has_value()
+                    && *_waitingFreezeWorldMatrix) ?
+              "YES" :
+              "NO");
   }
   return oss.str();
 }
@@ -567,7 +576,7 @@ void AbstractMesh::_markSubMeshesAsMiscDirty()
   }
 }
 
-Scene* AbstractMesh::getScene()
+Scene* AbstractMesh::getScene() const
 {
   return Node::getScene();
 }
@@ -644,12 +653,12 @@ AbstractMesh::enableEdgesRendering(float epsilon,
   return *this;
 }
 
-unique_ptr_t<EdgesRenderer>& AbstractMesh::edgesRenderer()
+unique_ptr_t<EdgesRenderer>& AbstractMesh::get_edgesRenderer()
 {
   return _edgesRenderer;
 }
 
-bool AbstractMesh::isBlocked() const
+bool AbstractMesh::get_isBlocked() const
 {
   return false;
 }
@@ -677,10 +686,10 @@ Float32Array AbstractMesh::getVerticesData(unsigned int /*kind*/,
   return Float32Array();
 }
 
-AbstractMesh* AbstractMesh::setVerticesData(unsigned int /*kind*/,
-                                            const Float32Array& /*data*/,
-                                            bool /*updatable*/,
-                                            const Nullable<size_t>& /*stride*/)
+AbstractMesh*
+AbstractMesh::setVerticesData(unsigned int /*kind*/,
+                              const Float32Array& /*data*/, bool /*updatable*/,
+                              const nullable_t<size_t>& /*stride*/)
 {
   return this;
 }
@@ -700,7 +709,7 @@ AbstractMesh* AbstractMesh::setIndices(const IndicesArray& /*indices*/,
   return this;
 }
 
-bool AbstractMesh::isVerticesDataPresent(unsigned int /*kind*/)
+bool AbstractMesh::isVerticesDataPresent(unsigned int /*kind*/) const
 {
   return false;
 }
@@ -742,7 +751,7 @@ AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
   return *this;
 }
 
-bool AbstractMesh::useBones()
+bool AbstractMesh::get_useBones() const
 {
   return _skeleton && getScene()->skeletonsEnabled()
          && isVerticesDataPresent(VertexBuffer::MatricesIndicesKind)
@@ -1025,12 +1034,12 @@ AbstractMesh& AbstractMesh::setPhysicsLinkWith(Mesh* otherMesh,
   return *this;
 }
 
-bool AbstractMesh::checkCollisions() const
+bool AbstractMesh::get_checkCollisions() const
 {
   return _checkCollisions;
 }
 
-void AbstractMesh::setCheckCollisions(bool collisionEnabled)
+void AbstractMesh::set_checkCollisions(bool collisionEnabled)
 {
   _checkCollisions = collisionEnabled;
   if (getScene()->workerCollisions()) {
@@ -1038,9 +1047,9 @@ void AbstractMesh::setCheckCollisions(bool collisionEnabled)
   }
 }
 
-Collider* AbstractMesh::collider() const
+unique_ptr_t<Collider>& AbstractMesh::get_collider()
 {
-  return _collider.get();
+  return _collider;
 }
 
 AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)

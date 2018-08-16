@@ -391,11 +391,11 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
     IHighlightLayerExcludedMesh meshExcluded;
     meshExcluded.mesh = mesh;
     meshExcluded.beforeRender
-      = mesh->onBeforeRenderObservable.add([](Mesh* mesh, EventState&) {
+      = mesh->onBeforeRenderObservable().add([](Mesh* mesh, EventState&) {
           mesh->getEngine()->setStencilBuffer(false);
         });
     meshExcluded.afterRender
-      = mesh->onAfterRenderObservable.add([](Mesh* mesh, EventState&) {
+      = mesh->onAfterRenderObservable().add([](Mesh* mesh, EventState&) {
           mesh->getEngine()->setStencilBuffer(true);
         });
     _excludedMeshes[mesh->uniqueId] = meshExcluded;
@@ -411,11 +411,11 @@ void HighlightLayer::removeExcludedMesh(Mesh* mesh)
   if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     auto& meshExcluded = _excludedMeshes[mesh->uniqueId];
     if (meshExcluded.beforeRender) {
-      mesh->onBeforeRenderObservable.remove(meshExcluded.beforeRender);
+      mesh->onBeforeRenderObservable().remove(meshExcluded.beforeRender);
     }
 
     if (meshExcluded.afterRender) {
-      mesh->onAfterRenderObservable.remove(meshExcluded.afterRender);
+      mesh->onAfterRenderObservable().remove(meshExcluded.afterRender);
     }
 
     _excludedMeshes.erase(mesh->uniqueId);
@@ -447,7 +447,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
     newMesh.color = color;
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
-      = mesh->onBeforeRenderObservable.add([&](Mesh* mesh, EventState&) {
+      = mesh->onBeforeRenderObservable().add([&](Mesh* mesh, EventState&) {
           if (!_excludedMeshes.empty()
               && stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
             _defaultStencilReference(mesh);
@@ -457,7 +457,7 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
               static_cast<int>(_instanceGlowingMeshStencilReference));
           }
         });
-    newMesh.observerDefault = mesh->onAfterRenderObservable.add(
+    newMesh.observerDefault = mesh->onAfterRenderObservable().add(
       [&](Mesh* mesh, EventState&) { _defaultStencilReference(mesh); });
     newMesh.glowEmissiveOnly = glowEmissiveOnly;
     _meshes[mesh->uniqueId]  = newMesh;
@@ -475,11 +475,11 @@ void HighlightLayer::removeMesh(Mesh* mesh)
   if (stl_util::contains(_meshes, mesh->uniqueId)) {
     auto& meshHighlight = _meshes[mesh->uniqueId];
     if (meshHighlight.observerHighlight) {
-      mesh->onBeforeRenderObservable.remove(meshHighlight.observerHighlight);
+      mesh->onBeforeRenderObservable().remove(meshHighlight.observerHighlight);
     }
 
     if (meshHighlight.observerDefault) {
-      mesh->onAfterRenderObservable.remove(meshHighlight.observerDefault);
+      mesh->onAfterRenderObservable().remove(meshHighlight.observerDefault);
     }
 
     _meshes.erase(mesh->uniqueId);
@@ -514,11 +514,11 @@ void HighlightLayer::dispose()
       auto& meshHighlight = item.second;
       if (meshHighlight.mesh) {
         if (meshHighlight.observerHighlight) {
-          meshHighlight.mesh->onBeforeRenderObservable.remove(
+          meshHighlight.mesh->onBeforeRenderObservable().remove(
             meshHighlight.observerHighlight);
         }
         if (meshHighlight.observerDefault) {
-          meshHighlight.mesh->onAfterRenderObservable.remove(
+          meshHighlight.mesh->onAfterRenderObservable().remove(
             meshHighlight.observerDefault);
         }
       }
@@ -530,11 +530,11 @@ void HighlightLayer::dispose()
     for (auto item : _excludedMeshes) {
       auto& meshHighlight = item.second;
       if (meshHighlight.beforeRender) {
-        meshHighlight.mesh->onBeforeRenderObservable.remove(
+        meshHighlight.mesh->onBeforeRenderObservable().remove(
           meshHighlight.beforeRender);
       }
       if (meshHighlight.afterRender) {
-        meshHighlight.mesh->onAfterRenderObservable.remove(
+        meshHighlight.mesh->onAfterRenderObservable().remove(
           meshHighlight.afterRender);
       }
     }

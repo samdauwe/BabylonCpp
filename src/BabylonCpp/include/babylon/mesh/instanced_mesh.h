@@ -90,8 +90,8 @@ public:
    */
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
-                                const Nullable<size_t>& stride
-                                = nullptr) override;
+                                const nullable_t<size_t>& stride
+                                = nullopt_t) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -142,7 +142,7 @@ public:
   /**
    * @brief Returns if the mesh owns the requested kind of data.
    */
-  bool isVerticesDataPresent(unsigned int kind) override;
+  bool isVerticesDataPresent(unsigned int kind) const override;
 
   /**
    * @brief Returns an array of indices (IndicesArray).

@@ -313,6 +313,7 @@ Vector4 LatheOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
 LatheOptions::LatheOptions()
     : radius{1.f}
     , tessellation{64}
+    , clip{0}
     , closed{true}
     , updatable{false}
     , sideOrientation{Mesh::DEFAULTSIDE()}

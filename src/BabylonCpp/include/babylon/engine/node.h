@@ -80,7 +80,7 @@ public:
    * @brief Gets the scene of the node.
    * @returns a {BABYLON.Scene}
    */
-  virtual Scene* getScene();
+  virtual Scene* getScene() const;
 
   /**
    * @brief Gets the engine of the node.

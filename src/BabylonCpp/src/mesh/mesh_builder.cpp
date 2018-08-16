@@ -439,12 +439,13 @@ Mesh* MeshBuilder::ExtrudeShapeCustom(const string_t& name,
 Mesh* MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
                                Scene* scene)
 {
-  const auto arc           = options.arc();
-  const auto& closed       = options.closed;
-  const auto& shape        = options.shape;
-  const auto& radius       = options.radius;
-  const auto& tessellation = static_cast<float>(options.tessellation);
-  const auto& updatable    = options.updatable;
+  const auto arc          = options.arc();
+  const auto& closed      = options.closed;
+  const auto& shape       = options.shape;
+  const auto& radius      = options.radius;
+  const auto tessellation = static_cast<float>(options.tessellation);
+  const auto clip         = static_cast<float>(options.clip);
+  const auto& updatable   = options.updatable;
 
   const unsigned int sideOrientation
     = MeshBuilder::updateSideOrientation(options.sideOrientation);
@@ -455,7 +456,7 @@ Mesh* MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
 
   const float step = pi2 / tessellation * arc;
   Vector3 rotated;
-  for (float i = 0.f; i <= tessellation; ++i) {
+  for (float i = 0.f; i <= tessellation - clip; ++i) {
     vector_t<Vector3> path;
     if (cap == Mesh::CAP_START() || cap == Mesh::CAP_ALL()) {
       path.emplace_back(Vector3(0.f, shape[0].y, 0.f));

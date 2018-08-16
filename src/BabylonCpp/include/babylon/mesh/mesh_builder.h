@@ -508,6 +508,8 @@ public:
    * the lathe
    * * The parameter `tessellation` (positive integer, default 64) is the side
    * number of the lathe
+   * * The parameter `clip` (positive integer, default 0) is the number of sides
+   * to not create without effecting the general shape of the sides
    * * The parameter `arc` (positive float, default 1) is the ratio of the
    * lathe. 0.5 builds for instance half a lathe, so an opened shape
    * * The parameter `closed` (boolean, default true) opens/closes the lathe
@@ -522,7 +524,7 @@ public:
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/tutorials/02._Discover_Basic_Elements#side-orientation
+   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The optional parameter `invertUV` (boolean, default false) swaps in the
    * geometry the U and V coordinates to apply a texture
    * * The mesh can be set to updatable with the boolean parameter `updatable`
@@ -531,8 +533,7 @@ public:
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene
    * @returns the lathe mesh
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#lathe
+   * @see http://doc.babylonjs.com/how_to/parametric_shapes#lathe
    */
   static Mesh* CreateLathe(const string_t& name, LatheOptions& options,
                            Scene* scene);

@@ -55,8 +55,8 @@ public:
 
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
-                                const Nullable<size_t>& stride
-                                = nullptr) override;
+                                const nullable_t<size_t>& stride
+                                = nullopt_t) override;
 
   // to override
   virtual unique_ptr_t<VertexData> _regenerateVertexData() = 0;

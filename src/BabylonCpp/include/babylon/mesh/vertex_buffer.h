@@ -2,7 +2,6 @@
 #define BABYLON_MESH_VERTEX_BUFFER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/core/variant.h>
 
 namespace BABYLON {
@@ -131,13 +130,13 @@ public:
    */
   VertexBuffer(Engine* engine, const Variant<Float32Array, Buffer*> data,
                unsigned int kind, bool updatable,
-               const Nullable<bool>& postponeInternalCreation = nullptr,
-               Nullable<size_t> stride                        = nullptr,
-               const Nullable<bool>& instanced                = nullptr,
-               const Nullable<unsigned int>& offset           = nullptr,
-               const Nullable<size_t>& size                   = nullptr,
-               Nullable<unsigned int> type = nullptr, bool normalized = false,
-               bool useBytes = false);
+               const nullable_t<bool>& postponeInternalCreation = nullopt_t,
+               nullable_t<size_t> stride                        = nullopt_t,
+               const nullable_t<bool>& instanced                = nullopt_t,
+               const nullable_t<unsigned int>& offset           = nullopt_t,
+               const nullable_t<size_t>& size                   = nullopt_t,
+               nullable_t<unsigned int> type                    = nullopt_t,
+               bool normalized = false, bool useBytes = false);
   virtual ~VertexBuffer();
 
   /** Statics **/

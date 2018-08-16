@@ -89,23 +89,7 @@ public:
     return Mesh::_CAP_ALL;
   }
 
-  /** Events **/
-
-  /**
-   * An event triggered before rendering the mesh
-   */
-  Observable<Mesh> onBeforeRenderObservable;
-
-  /**
-   * An event triggered after rendering the mesh
-   */
-  Observable<Mesh> onAfterRenderObservable;
-
-  /**
-   * An event triggered before drawing the mesh
-   */
-  Observable<Mesh> onBeforeDrawObservable;
-
+public:
   template <typename... Ts>
   static Mesh* New(Ts&&... args)
   {
@@ -116,14 +100,6 @@ public:
   }
   ~Mesh() override;
 
-  MorphTargetManager* morphTargetManager();
-  void setMorphTargetManager(MorphTargetManager* value);
-
-  Mesh* source();
-
-  bool isUnIndexed() const;
-  void setIsUnIndexed(bool value);
-
   /**
    * @brief Returns the string "Mesh".
    */
@@ -132,8 +108,6 @@ public:
   virtual IReflect::Type type() const override;
 
   /** Methods **/
-  void
-  setOnBeforeDraw(const ::std::function<void(Mesh*, EventState&)>& callback);
 
   /**
    * @brief Returns a string.
@@ -145,11 +119,6 @@ public:
   void addSubMesh(SubMesh* subMesh);
 
   void _unBindEffect() override;
-
-  /**
-   * @brief Returns if the mesh has some Levels Of Details (LOD).
-   */
-  bool hasLODLevels() const;
 
   /**
    * @brief Gets the list of {BABYLON.MeshLODLevel} associated with the current
@@ -192,11 +161,6 @@ public:
    */
   AbstractMesh* getLOD(Camera* camera,
                        BoundingSphere* boundingSphere = nullptr) override;
-
-  /**
-   * @brief Returns the mesh internal Geometry object.
-   */
-  Geometry* geometry() const;
 
   void setGeometry(Geometry* geometry);
 
@@ -251,7 +215,7 @@ public:
    */
   VertexBuffer* getVertexBuffer(unsigned int kind) const;
 
-  bool isVerticesDataPresent(unsigned int kind) override;
+  bool isVerticesDataPresent(unsigned int kind) const override;
 
   /**
    * @brief Returns a boolean defining if the vertex data for the requested
@@ -307,8 +271,6 @@ public:
    */
   IndicesArray getIndices(bool copyWhenShared = false) override;
 
-  bool isBlocked() const;
-
   /**
    * @brief Determine if the current mesh is ready to be rendered
    * @param completeCheck defines if a complete check (including materials and
@@ -320,13 +282,6 @@ public:
    */
   bool isReady(bool completeCheck        = false,
                bool forceInstanceSupport = false) override;
-
-  /**
-   * @brief Returns true if the normals aren't to be recomputed on next mesh
-   * `positions` array update.
-   * This property is pertinent only for updatable parametric shapes.
-   */
-  bool areNormalsFrozen() const;
 
   /**
    * @brief This function affects parametric shapes on vertex position update
@@ -371,8 +326,8 @@ public:
   void subdivide(size_t count);
 
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                        bool updatable                 = false,
-                        const Nullable<size_t>& stride = nullptr) override;
+                        bool updatable                   = false,
+                        const nullable_t<size_t>& stride = nullopt_t) override;
 
   void markVerticesDataAsUpdatable(unsigned int kind, bool updatable = true);
 
@@ -480,21 +435,23 @@ public:
                     Material* effectiveMaterial = nullptr);
 
   /**
-   * @brief Triggers the draw call for the mesh.
-   * Usually, you don't need to call this method by your own because the mesh
-   * rendering is handled by the scene rendering manager.
-   * @returns Returns the Mesh.
+   * @brief Triggers the draw call for the mesh. Usually, you don't need to call
+   * this method by your own because the mesh rendering is handled by the scene
+   * rendering manager.
+   * @param subMesh defines the subMesh to render
+   * @param enableAlphaMode defines if alpha mode can be changed
+   * @returns the current mesh
    */
   Mesh& render(SubMesh* subMesh, bool enableAlphaMode);
 
   /**
-   * @brief Returns an array populated with ParticleSystem objects whose the
+   * @brief Returns an array populated with IParticleSystem objects whose the
    * mesh is the emitter.
    */
   vector_t<IParticleSystem*> getEmittedParticleSystems();
 
   /**
-   * @brief Returns an array populated with ParticleSystem objects whose the
+   * @brief Returns an array populated with IParticleSystem objects whose the
    * mesh or its children are the emitter.
    */
   vector_t<IParticleSystem*> getHierarchyEmittedParticleSystems();
@@ -552,7 +509,6 @@ public:
   Mesh& bakeCurrentTransformIntoVertices();
 
   /** Cache **/
-  vector_t<Vector3>& _positions();
   Mesh& _resetPointsArrayCache();
   bool _generatePointsArray() override;
 
@@ -1380,6 +1336,53 @@ protected:
        Mesh* source = nullptr, bool doNotCloneChildren = true,
        bool clonePhysicsImpostor = true);
 
+  /**
+   * An event triggered before rendering the mesh
+   */
+  Observable<Mesh>& get_onBeforeRenderObservable();
+
+  /**
+   * An event triggered after rendering the mesh
+   */
+  Observable<Mesh>& get_onAfterRenderObservable();
+
+  /**
+   * An event triggered before drawing the mesh
+   */
+  Observable<Mesh>& get_onBeforeDrawObservable();
+
+  void
+  set_onBeforeDraw(const ::std::function<void(Mesh*, EventState&)>& callback);
+
+  MorphTargetManager*& get_morphTargetManager();
+  void set_morphTargetManager(MorphTargetManager* const& value);
+
+  Mesh*& get_source();
+
+  bool get_isUnIndexed() const;
+  void set_isUnIndexed(bool value);
+
+  /**
+   * @brief Returns if the mesh has some Levels Of Details (LOD).
+   */
+  bool get_hasLODLevels() const;
+
+  /**
+   * @brief Returns the mesh internal Geometry object.
+   */
+  Geometry*& get_geometry();
+
+  bool get_isBlocked() const override;
+
+  /**
+   * @brief Returns true if the normals aren't to be recomputed on next mesh
+   * `positions` array update.
+   * This property is pertinent only for updatable parametric shapes.
+   */
+  bool get_areNormalsFrozen() const;
+
+  vector_t<Vector3>& get__positions();
+
 private:
   void _sortLODLevels();
   Float32Array _getPositionData(bool applySkeleton);
@@ -1388,12 +1391,37 @@ private:
   Mesh& _queueLoad(Scene* scene);
 
 public:
+  /** Events **/
+
+  /**
+   * An event triggered before rendering the mesh
+   */
+  ReadOnlyProperty<Mesh, Observable<Mesh>> onBeforeRenderObservable;
+
+  /**
+   * An event triggered after rendering the mesh
+   */
+  ReadOnlyProperty<Mesh, Observable<Mesh>> onAfterRenderObservable;
+
+  /**
+   * An event triggered before drawing the mesh
+   */
+  ReadOnlyProperty<Mesh, Observable<Mesh>> onBeforeDrawObservable;
+
+  WriteOnlyProperty<Mesh, ::std::function<void(Mesh*, EventState&)>>
+    onBeforeDraw;
+
+  // Members
   int delayLoadState;
   vector_t<InstancedMesh*> instances;
   string_t delayLoadingFile;
   string_t _binaryInfo;
   ::std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
     onLODLevelSelection;
+
+  // Morph
+  Property<Mesh, MorphTargetManager*> morphTargetManager;
+
   Geometry* _geometry;
   Uint32Array _delayInfoKinds;
   ::std::function<void(const Json::value& parsedGeometry, Mesh* mesh)>
@@ -1402,9 +1430,44 @@ public:
   bool _shouldGenerateFlatShading;
   // Use by builder only to know what orientation were the mesh build in.
   unsigned int _originalBuilderSideOrientation;
-  Nullable<unsigned int> overrideMaterialSideOrientation;
+  nullable_t<unsigned int> overrideMaterialSideOrientation;
+
+  /**
+   * Will be used to save a source mesh reference, If any
+   */
+  ReadOnlyProperty<Mesh, Mesh*> source;
+
+  Property<Mesh, bool> isUnIndexed;
+
+  /**
+   * True if the mesh has some Levels Of Details (LOD)
+   * @returns a boolean.
+   */
+  ReadOnlyProperty<Mesh, bool> hasLODLevels;
+
+  /**
+   * Returns the mesh internal Geometry object
+   */
+  ReadOnlyProperty<Mesh, Geometry*> geometry;
+
+  /**
+   * Boolean : true if the normals aren't to be recomputed on next mesh
+   * `positions` array update. This property is pertinent only for updatable
+   * parametric shapes.
+   */
+  ReadOnlyProperty<Mesh, bool> areNormalsFrozen;
+
+  /**
+   * Cache
+   */
+  ReadOnlyProperty<Mesh, vector_t<Vector3>> _positions;
 
 private:
+  // Events
+  Observable<Mesh> _onBeforeRenderObservable;
+  Observable<Mesh> _onAfterRenderObservable;
+  Observable<Mesh> _onBeforeDrawObservable;
+  // Members
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
   vector_t<unique_ptr_t<MeshLODLevel>> _LODLevels;
   vector_t<Vector3> _emptyPositions;

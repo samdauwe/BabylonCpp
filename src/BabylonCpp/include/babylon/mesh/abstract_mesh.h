@@ -122,19 +122,7 @@ public:
   /**
    * @brief Hidden
    */
-  Scene* getScene() override;
-
-  /**
-   * @brief Gets a Vector3 depicting the mesh scaling along each local axis X,
-   * Y, Z.  Default is (1.0, 1.0, 1.0).
-   */
-  Vector3& get_scaling() override;
-
-  /**
-   * @brief Sets a Vector3 depicting the mesh scaling along each local axis X,
-   * Y, Z.  Default is (1.0, 1.0, 1.0).
-   */
-  void set_scaling(const Vector3& newScaling) override;
+  Scene* getScene() const override;
 
   void resetRotationQuaternion();
   virtual AbstractMesh* getParent();
@@ -161,16 +149,6 @@ public:
   AbstractMesh& enableEdgesRendering(float epsilon = 0.95f,
                                      bool checkVerticesInsteadOfIndices
                                      = false);
-
-  /**
-   * @brief Gets the edgesRenderer associated with the mesh.
-   */
-  unique_ptr_t<EdgesRenderer>& edgesRenderer();
-
-  /**
-   * @brief Returns true if the mesh is blocked. Implemented by child classes.
-   */
-  bool isBlocked() const;
 
   /**
    * @brief Returns the mesh itself by default. Implemented by child classes.
@@ -231,8 +209,8 @@ public:
    */
   virtual AbstractMesh*
   setVerticesData(unsigned int kind, const Float32Array& data,
-                  bool updatable                 = false,
-                  const Nullable<size_t>& stride = nullptr) override;
+                  bool updatable                   = false,
+                  const nullable_t<size_t>& stride = nullopt_t) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -282,7 +260,7 @@ public:
    * @param kind defines the vertex data kind to use
    * @returns true is data kind is present
    */
-  virtual bool isVerticesDataPresent(unsigned int kind) override;
+  virtual bool isVerticesDataPresent(unsigned int kind) const override;
 
   /**
    * @brief Returns the mesh BoundingInfo object or creates a new one and
@@ -306,12 +284,6 @@ public:
    * @returns the current mesh
    */
   AbstractMesh& setBoundingInfo(const BoundingInfo& boundingInfo);
-
-  /**
-   * @brief Gets a boolean indicating if this mesh has skinning data and an
-   * attached skeleton.
-   */
-  bool useBones();
 
   /**
    * @brief Hidden
@@ -514,29 +486,6 @@ public:
                                    const PhysicsParams& options);
 
   /** Collisions **/
-
-  /**
-   * @brief Gets a boolean indicating that this mesh can be used in the
-   * collision engine.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
-   */
-  bool checkCollisions() const;
-
-  /**
-   * @brief Sets a boolean indicating that this mesh can be used in the
-   * collision engine.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
-   */
-  void setCheckCollisions(bool collisionEnabled);
-
-  /**
-   * @brief Gets Collider object used to compute collisions (not physics).
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
-   */
-  Collider* collider() const;
 
   /**
    * @brief Move the mesh using collision engine.
@@ -812,6 +761,11 @@ public:
   AbstractMesh& alignWithNormal(Vector3& normal,
                                 const Vector3& upDirection = Axis::Y());
 
+  /**
+   * @brief Hidden
+   */
+  void _checkOcclusionQuery();
+
 protected:
   // Constructor
 
@@ -826,11 +780,6 @@ protected:
    * @brief Hidden
    */
   void _afterComputeWorldMatrix() override;
-
-  /**
-   * @brief Hidden
-   */
-  void _checkOcclusionQuery();
 
 protected:
   /**
@@ -958,12 +907,12 @@ protected:
   /**
    * @brief Gets current material.
    */
-  Material*& get_material();
+  virtual Material*& get_material();
 
   /**
    * @brief Sets current material.
    */
-  void set_material(Material* const& value);
+  virtual void set_material(Material* const& value);
 
   /**
    * @brief Gets a boolean indicating that this mesh can receive realtime
@@ -1088,6 +1037,59 @@ protected:
    * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
   virtual Skeleton*& get_skeleton();
+
+  /**
+   * @brief Gets a Vector3 depicting the mesh scaling along each local axis X,
+   * Y, Z.  Default is (1.0, 1.0, 1.0).
+   */
+  Vector3& get_scaling() override;
+
+  /**
+   * @brief Sets a Vector3 depicting the mesh scaling along each local axis X,
+   * Y, Z.  Default is (1.0, 1.0, 1.0).
+   */
+  void set_scaling(const Vector3& newScaling) override;
+
+  /**
+   * @brief Gets the edgesRenderer associated with the mesh.
+   */
+  unique_ptr_t<EdgesRenderer>& get_edgesRenderer();
+
+  /**
+   * @brief Returns true if the mesh is blocked. Implemented by child classes.
+   */
+  virtual bool get_isBlocked() const;
+
+  /**
+   * @brief Gets a boolean indicating if this mesh has skinning data and an
+   * attached skeleton.
+   */
+  bool get_useBones() const;
+
+  /** Collisions **/
+
+  /**
+   * @brief Gets a boolean indicating that this mesh can be used in the
+   * collision engine.
+   * @see
+   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   */
+  virtual bool get_checkCollisions() const;
+
+  /**
+   * @brief Sets a boolean indicating that this mesh can be used in the
+   * collision engine.
+   * @see
+   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   */
+  void set_checkCollisions(bool collisionEnabled);
+
+  /**
+   * @brief Gets Collider object used to compute collisions (not physics).
+   * @see
+   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   */
+  unique_ptr_t<Collider>& get_collider();
 
 private:
   /**
@@ -1219,6 +1221,26 @@ public:
   int occlusionRetryCount;
 
   /**
+   * Hidden
+   */
+  int _occlusionInternalRetryCounter;
+
+  /**
+   * Hidden
+   */
+  bool _isOccluded;
+
+  /**
+   * Hidden
+   */
+  bool _isOcclusionQueryInProgress;
+
+  /**
+   * Hidden
+   */
+  unique_ptr_t<GL::IGLQuery> _occlusionQuery;
+
+  /**
    * Whether the mesh is occluded or not, it is used also to set the intial
    * state of the mesh to be occluded or not
    */
@@ -1252,12 +1274,6 @@ public:
    * for instance or through actions). Default is true
    */
   bool isPickable;
-
-  /**
-   * Gets or sets a boolean indicating if the bounding box must be rendered as
-   * well (false by default)
-   */
-  bool showBoundingBox;
 
   /**
    * Gets or sets a boolean indicating that bounding boxes of subMeshes must be
@@ -1482,7 +1498,7 @@ public:
   vector_t<Json::value> _waitingActions;
 
   /** Hidden */
-  Nullable<bool> _waitingFreezeWorldMatrix;
+  nullable_t<bool> _waitingFreezeWorldMatrix;
 
   // Skeleton
 
@@ -1494,8 +1510,37 @@ public:
    */
   Property<AbstractMesh, Skeleton*> skeleton;
 
-protected:
-  bool _isOccluded;
+  /**
+   * Gets the edgesRenderer associated with the mesh
+   */
+  ReadOnlyProperty<AbstractMesh, unique_ptr_t<EdgesRenderer>> edgesRenderer;
+
+  /**
+   * Returns true if the mesh is blocked. Implemented by child classes
+   */
+  ReadOnlyProperty<AbstractMesh, bool> isBlocked;
+
+  /**
+   * Gets a boolean indicating if this mesh has skinning data and an attached
+   * skeleton
+   */
+  ReadOnlyProperty<AbstractMesh, bool> useBones;
+
+  /** Collisions **/
+
+  /**
+   * A boolean indicating that this mesh can be used in the collision engine.
+   * @see
+   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   */
+  Property<AbstractMesh, bool> checkCollisions;
+
+  /**
+   * @brief Gets Collider object used to compute collisions (not physics).
+   * @see
+   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
+   */
+  ReadOnlyProperty<AbstractMesh, unique_ptr_t<Collider>> collider;
 
 private:
   // FacetData private properties
@@ -1539,9 +1584,6 @@ private:
   Observer<AbstractMesh>::Ptr _onCollideObserver;
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
   // Properties
-  int _occlusionInternalRetryCounter;
-  bool _isOcclusionQueryInProgress;
-  unique_ptr_t<GL::IGLQuery> _occlusionQuery;
   float _visibility;
   Material* _material;
   bool _receiveShadows;

@@ -2,7 +2,6 @@
 #define BABYLON_MESH_BUFFER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -24,7 +23,7 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    */
   Buffer(Engine* engine, const Float32Array& data, bool updatable,
-         Nullable<size_t> stride       = nullptr,
+         nullable_t<size_t> stride     = nullopt_t,
          bool postponeInternalCreation = false, bool instanced = false,
          bool useBytes = false);
 
@@ -40,7 +39,7 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    */
   Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
-         Nullable<size_t> stride       = nullptr,
+         nullable_t<size_t> stride     = nullopt_t,
          bool postponeInternalCreation = false, bool instanced = false,
          bool useBytes = false);
 
@@ -60,8 +59,9 @@ public:
    */
   unique_ptr_t<VertexBuffer>
   createVertexBuffer(unsigned int kind, size_t offset, int size,
-                     Nullable<size_t> stride  = nullptr,
-                     Nullable<bool> instanced = nullptr, bool useBytes = false);
+                     nullable_t<size_t> stride  = nullopt_t,
+                     nullable_t<bool> instanced = nullopt_t,
+                     bool useBytes              = false);
 
   // Properties
   bool isUpdatable() const;
@@ -89,8 +89,9 @@ public:
    * @param useBytes set to true if the offset is in bytes
    */
   GL::IGLBuffer* updateDirectly(const Float32Array& data, size_t offset,
-                                const Nullable<size_t>& vertexCount = nullptr,
-                                bool useBytes                       = false);
+                                const nullable_t<size_t>& vertexCount
+                                = nullopt_t,
+                                bool useBytes = false);
 
   void dispose();
 

@@ -74,10 +74,10 @@ constexpr const unsigned int VertexBuffer::FLOAT;
 
 VertexBuffer::VertexBuffer(
   Engine* engine, const Variant<Float32Array, Buffer*> data, unsigned int kind,
-  bool updatable, const Nullable<bool>& postponeInternalCreation,
-  Nullable<size_t> stride, const Nullable<bool>& instanced,
-  const Nullable<unsigned int>& offset, const Nullable<size_t>& size,
-  Nullable<unsigned int> iType, bool iNormalized, bool useBytes)
+  bool updatable, const nullable_t<bool>& postponeInternalCreation,
+  nullable_t<size_t> stride, const nullable_t<bool>& instanced,
+  const nullable_t<unsigned int>& offset, const nullable_t<size_t>& size,
+  nullable_t<unsigned int> iType, bool iNormalized, bool useBytes)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor,
                       &VertexBuffer::set_instanceDivisor}
 {
@@ -89,14 +89,15 @@ VertexBuffer::VertexBuffer(
   else {
     _ownedBuffer = ::std::make_unique<Buffer>(
       engine, data.get<Float32Array>(), updatable, stride,
-      postponeInternalCreation ? *postponeInternalCreation : false, instanced);
+      postponeInternalCreation.has_value() ? *postponeInternalCreation : false,
+      instanced.has_value() ? *instanced : false);
     _buffer     = nullptr;
     _ownsBuffer = true;
   }
 
   _kind = kind;
 
-  if (iType.isNull()) {
+  if (!iType.has_value()) {
     type = VertexBuffer::FLOAT;
   }
   else {
@@ -107,26 +108,30 @@ VertexBuffer::VertexBuffer(
 
   auto buffer = _buffer ? _buffer : _ownedBuffer.get();
   if (useBytes) {
-    _size = size ? *size :
-                   (stride ? (*stride / typeByteLength) :
-                             VertexBuffer::DeduceStride(kind));
-    byteStride = stride ? *stride :
-                          buffer->byteStride ? buffer->byteStride :
-                                               (_size * typeByteLength);
-    byteOffset = offset ? *offset : 0;
+    _size = size.has_value() ? *size :
+                               (stride ? (*stride / typeByteLength) :
+                                         VertexBuffer::DeduceStride(kind));
+    byteStride
+      = stride.has_value() ?
+          *stride :
+          buffer->byteStride ? buffer->byteStride : (_size * typeByteLength);
+    byteOffset = offset.has_value() ? *offset : 0;
   }
   else {
-    _size = size ? *size : stride ? *stride : VertexBuffer::DeduceStride(kind);
-    byteStride = stride ? (*stride * typeByteLength) :
-                          (buffer->byteStride != 0 ? buffer->byteStride :
-                                                     (_size * typeByteLength));
-    byteOffset = (offset ? *offset : 0) * typeByteLength;
+    _size = size.has_value() ?
+              *size :
+              stride ? *stride : VertexBuffer::DeduceStride(kind);
+    byteStride = stride.has_value() ?
+                   (*stride * typeByteLength) :
+                   (buffer->byteStride != 0 ? buffer->byteStride :
+                                              (_size * typeByteLength));
+    byteOffset = (offset.has_value() ? *offset : 0) * typeByteLength;
   }
 
   normalized = iNormalized;
 
-  _instanced       = instanced.hasValue() ? *instanced : false;
-  _instanceDivisor = instanced ? 1 : 0;
+  _instanced       = instanced.has_value() ? *instanced : false;
+  _instanceDivisor = _instanced ? 1 : 0;
 }
 
 VertexBuffer::~VertexBuffer()
@@ -296,7 +301,7 @@ GL::IGLBuffer* VertexBuffer::update(const Float32Array& data)
 GL::IGLBuffer* VertexBuffer::updateDirectly(const Float32Array& data,
                                             size_t offset, bool useBytes)
 {
-  return _getBuffer()->updateDirectly(data, offset, nullptr, useBytes);
+  return _getBuffer()->updateDirectly(data, offset, nullopt_t, useBytes);
 }
 
 void VertexBuffer::dispose()

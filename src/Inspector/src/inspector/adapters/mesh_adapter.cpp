@@ -92,13 +92,19 @@ bool MeshAdapter::isVisible() const
 
 bool MeshAdapter::isBoxVisible() const
 {
+#if 0
   return _abstractMesh ? _abstractMesh->showBoundingBox : false;
+#else
+  return false;
+#endif
 }
 
-void MeshAdapter::setBoxVisible(bool b)
+void MeshAdapter::setBoxVisible(bool /*b*/)
 {
   if (_abstractMesh) {
+#if 0
     _abstractMesh->showBoundingBox = b;
+#endif
   }
 }
 
@@ -239,7 +245,7 @@ void MeshAdapter::_buildPropertiesView()
   view.addBoolProperty(
     "checkCollisions",
     [&]() -> bool { return _abstractMesh->checkCollisions(); },
-    [&](const bool& value) { _abstractMesh->setCheckCollisions(value); });
+    [&](const bool& value) { _abstractMesh->checkCollisions = value; });
   // - collisionGroup
   view.addIntProperty(
     "collisionGroup", [&]() -> int { return _abstractMesh->collisionGroup(); },
@@ -406,9 +412,11 @@ void MeshAdapter::_buildPropertiesView()
     "renderOverlay", [&]() -> bool { return _abstractMesh->renderOverlay; },
     [&](const bool& value) { _abstractMesh->renderOverlay = value; });
   // - showBoundingBox
+#if 0
   view.addBoolProperty(
     "showBoundingBox", [&]() -> bool { return _abstractMesh->showBoundingBox; },
     [&](const bool& value) { _abstractMesh->showBoundingBox = value; });
+#endif
   // - showSubMeshesBoundingBox
   view.addBoolProperty(
     "showSubMeshesBoundingBox",
@@ -459,7 +467,7 @@ void MeshAdapter::_buildPropertiesView()
     // - isUnIndexed
     view.addBoolProperty(
       "isUnIndexed", [&]() -> bool { return _mesh->isUnIndexed(); },
-      [&](const bool& value) { _mesh->setIsUnIndexed(value); });
+      [&](const bool& value) { _mesh->isUnIndexed = value; });
   }
   /** GroundMesh properties **/
   if (_groundMesh) {

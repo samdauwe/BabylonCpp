@@ -50,7 +50,7 @@ void _PrimitiveGeometry::setAllVerticesData(VertexData* vertexData,
 AbstractMesh*
 _PrimitiveGeometry::setVerticesData(unsigned int kind, const Float32Array& data,
                                     bool /*updatable*/,
-                                    const Nullable<size_t>& /*stride*/)
+                                    const nullable_t<size_t>& /*stride*/)
 {
   if (!_beingRegenerated) {
     return nullptr;

@@ -2,7 +2,6 @@
 #define BABYLON_MESH_GEOMETRY_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 
@@ -41,11 +40,6 @@ public:
   static Geometry* CreateGeometryForMesh(Mesh* mesh);
 
   /**
-   * @brief Gets the current extend of the geometry.
-   */
-  const MinMax& extend() const;
-
-  /**
    * @brief Gets the hosting scene.
    * @returns the hosting {BABYLON.Scene}
    */
@@ -62,11 +56,6 @@ public:
    * @returns true if the geometry is ready to be used
    */
   bool isReady() const;
-
-  /**
-   * @brief Gets a value indicating that the geometry should not be serialized.
-   */
-  bool doNotSerialize() const;
 
   /**
    * @brief Hidden
@@ -92,8 +81,8 @@ public:
    */
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
-                                const Nullable<size_t>& stride
-                                = nullptr) override;
+                                const nullable_t<size_t>& stride
+                                = nullopt_t) override;
 
   /**
    * @brief Removes a specific vertex data.
@@ -109,7 +98,7 @@ public:
    * (could be null)
    */
   void setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
-                         const Nullable<size_t>& totalVertices = nullptr);
+                         const nullable_t<size_t>& totalVertices = nullopt_t);
 
   /**
    * @brief Update a specific vertex buffer.
@@ -187,7 +176,7 @@ public:
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns true if data is present
    */
-  bool isVerticesDataPresent(unsigned int kind) override;
+  bool isVerticesDataPresent(unsigned int kind) const override;
 
   /**
    * @brief Gets a list of all attached data kinds (Position, normal, etc...).
@@ -374,14 +363,24 @@ protected:
    * as v -= v * bias.x + bias.y
    * @returns The Bias Vector
    */
-  Nullable<Vector2>& get_boundingBias();
+  nullable_t<Vector2>& get_boundingBias();
 
   /**
    *  @brief Sets the Bias Vector to apply on the bounding elements.
    * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the
    * min is computed as v -= v * bias.x + bias.y
    */
-  void set_boundingBias(const Nullable<Vector2>& value);
+  void set_boundingBias(const nullable_t<Vector2>& value);
+
+  /**
+   * @brief Gets the current extend of the geometry.
+   */
+  MinMax& get_extend();
+
+  /**
+   * @brief Gets a value indicating that the geometry should not be serialized.
+   */
+  bool get_doNotSerialize() const;
 
 private:
   void _updateBoundingInfo(bool updateExtends, const Float32Array& data);
@@ -433,17 +432,28 @@ public:
   // Cache
   /** Hidden */
   vector_t<Vector3> _positions;
+
+  /**
+   *  Gets or sets the Bias Vector to apply on the bounding elements
+   * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the
+   * min is computed as v -= v * bias.x + bias.y
+   */
+  Property<Geometry, nullable_t<Vector2>> boundingBias;
+
   unordered_map_t<string_t, unique_ptr_t<GL::IGLVertexArrayObject>>
     _vertexArrayObjects;
   bool _updatable;
   vector_t<Vector3> centroids;
 
   /**
-   * Bias Vector to apply on the bounding elements (box/sphere), the max extend
-   * is computed as v += v * bias.x + bias.y, the min is computed as v -= v *
-   * bias.x + bias.y
+   * Gets the current extend of the geometry
    */
-  Property<Geometry, Nullable<Vector2>> boundingBias;
+  ReadOnlyProperty<Geometry, MinMax> extend;
+
+  /**
+   * Gets a value indicating that the geometry should not be serialized
+   */
+  ReadOnlyProperty<Geometry, bool> doNotSerialize;
 
 private:
   Scene* _scene;
@@ -451,8 +461,8 @@ private:
   vector_t<Mesh*> _meshes;
   size_t _totalVertices;
   bool _isDisposed;
-  Nullable<MinMax> _extend;
-  Nullable<Vector2> _boundingBias;
+  nullable_t<MinMax> _extend;
+  nullable_t<Vector2> _boundingBias;
   unique_ptr_t<GL::IGLBuffer> _indexBuffer;
   bool _indexBufferIsUpdatable;
 

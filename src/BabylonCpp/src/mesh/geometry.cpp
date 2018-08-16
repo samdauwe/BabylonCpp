@@ -22,9 +22,11 @@ Geometry::Geometry(const string_t& iId, Scene* scene, VertexData* vertexData,
                    bool updatable, Mesh* mesh)
     : id{iId}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
-    , _updatable{updatable}
     , boundingBias(this, &Geometry::get_boundingBias,
                    &Geometry::set_boundingBias)
+    , _updatable{updatable}
+    , extend(this, &Geometry::get_extend)
+    , doNotSerialize(this, &Geometry::get_doNotSerialize)
     , _scene{scene}
     , _engine{scene->getEngine()}
     , _totalVertices{0}
@@ -72,12 +74,12 @@ void Geometry::addToScene(unique_ptr_t<Geometry>&& newGeometry)
   _scene->pushGeometry(::std::move(newGeometry), true);
 }
 
-Nullable<Vector2>& Geometry::get_boundingBias()
+nullable_t<Vector2>& Geometry::get_boundingBias()
 {
   return _boundingBias;
 }
 
-void Geometry::set_boundingBias(const Nullable<Vector2>& value)
+void Geometry::set_boundingBias(const nullable_t<Vector2>& value)
 {
   if (_boundingBias && (*_boundingBias).equals(*value)) {
     return;
@@ -97,8 +99,11 @@ Geometry* Geometry::CreateGeometryForMesh(Mesh* mesh)
   return geometry;
 }
 
-const MinMax& Geometry::extend() const
+MinMax& Geometry::get_extend()
 {
+  if (!_extend) {
+    _updateExtend(Float32Array());
+  }
   return *_extend;
 }
 
@@ -118,7 +123,7 @@ bool Geometry::isReady() const
          || delayLoadState == EngineConstants::DELAYLOADSTATE_NONE;
 }
 
-bool Geometry::doNotSerialize() const
+bool Geometry::get_doNotSerialize() const
 {
   for (const auto& mesh : _meshes) {
     if (!mesh->doNotSerialize) {
@@ -155,7 +160,7 @@ void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
 AbstractMesh* Geometry::setVerticesData(unsigned int kind,
                                         const Float32Array& data,
                                         bool updatable,
-                                        const Nullable<size_t>& stride)
+                                        const nullable_t<size_t>& stride)
 {
   auto buffer = ::std::make_unique<VertexBuffer>(
     _engine, ToVariant<Float32Array, Buffer*>(data), kind, updatable,
@@ -175,7 +180,7 @@ void Geometry::removeVerticesData(unsigned int kind)
 }
 
 void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
-                                 const Nullable<size_t>& totalVertices)
+                                 const nullable_t<size_t>& totalVertices)
 {
   auto kind = buffer->getKind();
   if (stl_util::contains(_vertexBuffers, kind)) {
@@ -188,7 +193,7 @@ void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
   if (kind == VertexBuffer::PositionKind) {
     auto& data = _buffer->getData();
 
-    if (totalVertices != nullptr) {
+    if (totalVertices.has_value()) {
       _totalVertices = *totalVertices;
     }
     else {
@@ -387,7 +392,7 @@ unordered_map_t<string_t, VertexBuffer*> Geometry::getVertexBuffers()
   return vertexBuffers;
 }
 
-bool Geometry::isVerticesDataPresent(unsigned int kind)
+bool Geometry::isVerticesDataPresent(unsigned int kind) const
 {
   if (_vertexBuffers.empty()) {
     if (!_delayInfo.empty()) {
@@ -552,7 +557,8 @@ void Geometry::_updateExtend(Float32Array data)
     data = getVerticesData(VertexBuffer::PositionKind);
   }
 
-  _extend = Tools::ExtractMinAndMax(data, 0, _totalVertices, boundingBias(), 3);
+  _extend
+    = Tools::ExtractMinAndMax(data, 0, _totalVertices, *boundingBias(), 3);
 }
 
 void Geometry::_applyToMesh(Mesh* mesh)

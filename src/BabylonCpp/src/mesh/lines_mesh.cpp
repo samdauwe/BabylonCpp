@@ -22,7 +22,7 @@ LinesMesh::LinesMesh(const string_t& iName, Scene* scene, Node* iParent,
     , alpha{1.f}
     , intersectionThreshold{this, &LinesMesh::get_intersectionThreshold,
                             &LinesMesh::set_intersectionThreshold}
-    , _intersectionThreshold{0.1f}
+    , _colorShaderMaterial{nullptr}
 {
   if (source) {
     color          = source->color;
@@ -30,6 +30,8 @@ LinesMesh::LinesMesh(const string_t& iName, Scene* scene, Node* iParent,
     useVertexColor = source->useVertexColor;
     useVertexAlpha = source->useVertexAlpha;
   }
+
+  _intersectionThreshold = 0.1f;
 
   vector_t<string_t> defines;
   ShaderMaterialOptions options;
@@ -85,17 +87,18 @@ void LinesMesh::set_intersectionThreshold(float value)
   }
 }
 
-Material* LinesMesh::getMaterial()
+Material*& LinesMesh::get_material()
 {
-  return _colorShader;
+  _colorShaderMaterial = static_cast<Material*>(_colorShader);
+  return _colorShaderMaterial;
 }
 
-void LinesMesh::setMaterial(Material* /*material*/)
+void LinesMesh::set_material(Material* const& /*material*/)
 {
   // Do nothing
 }
 
-bool LinesMesh::checkCollisions()
+bool LinesMesh::get_checkCollisions() const
 {
   return false;
 }

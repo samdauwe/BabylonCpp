@@ -267,13 +267,23 @@ public:
     return (_object->*_getter)();
   }
 
+  operator T&()
+  {
+    return (_object->*_getter)();
+  }
+
   const T& operator()() const
   {
     return (_object->*_getter)();
   }
 
+  T& operator()()
+  {
+    return (_object->*_getter)();
+  }
+
 private:
-  C* const _object;
+  C* /*const*/ _object;
   TGetter const _getter;
 };
 
@@ -478,7 +488,7 @@ template <class T>
 using nullable_t = ::std::optional<T>;
 
 constexpr auto nullopt_t = ::std::nullopt;
-using nullptr_t = ::std::nullptr_t;
+using nullptr_t          = ::std::nullptr_t;
 
 template <class T1, class T2>
 using pair_t = ::std::pair<T1, T2>;

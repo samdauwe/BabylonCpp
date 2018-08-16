@@ -344,6 +344,7 @@ public:
   vector_t<Vector3> shape;
   float radius;
   unsigned int tessellation;
+  unsigned int clip;
   bool closed;
   bool updatable;
   unsigned int sideOrientation;
