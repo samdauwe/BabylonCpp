@@ -6,6 +6,7 @@
 #include <babylon/core/structs.h>
 #include <babylon/core/variant.h>
 #include <babylon/culling/octrees/octree.h>
+#include <babylon/engine/stage.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info.h>
 #include <babylon/events/pointer_info_pre.h>
@@ -103,6 +104,21 @@ public:
 
   IReflect::Type type() const override;
 
+  /**
+   * @brief Add a component to the scene.
+   * Note that the component could be registered on th next frame if this is
+   * called after the register component stage.
+   * @param component Defines the component to add to the scene
+   */
+  void _addComponent(const ISceneComponentPtr& component);
+
+  /**
+   * @brief Gets a component from the scene.
+   * @param name defines the name of the component to retrieve
+   * @returns the component or null if not present
+   */
+  ISceneComponentPtr _getComponent(const string_t& name);
+
   /** Properties **/
 
   /**
@@ -164,7 +180,7 @@ public:
    * @brief Gets the bounding box renderer associated with the scene.
    * @returns a BoundingBoxRenderer
    */
-  BoundingBoxRenderer* getBoundingBoxRenderer();
+  BoundingBoxRendererPtr& getBoundingBoxRenderer();
 
   /**
    * @brief Gets the outline renderer associated with the scene.
@@ -1571,6 +1587,11 @@ protected:
   explicit Scene(Engine* engine);
 
 private:
+  /**
+   * @brief Registers the transient components if needed.
+   */
+  void _registerTransientComponents();
+
   void _updatePointerPosition(const PointerEvent evt);
   void _createUbo();
   void _createAlternateUbo();
@@ -1683,6 +1704,16 @@ protected:
    * cloud.
    */
   bool get_forcePointsCloud() const;
+
+  /**
+   * Sets a boolean indicating if all bounding boxes must be rendered.
+   */
+  void set_forceShowBoundingBoxes(bool value);
+
+  /**
+   * Gets  a boolean indicating if all bounding boxes must be rendered.
+   */
+  bool get_forceShowBoundingBoxes() const;
 
   /**
    * @brief Gets the animation properties override.
@@ -2316,7 +2347,7 @@ public:
   /**
    * Gets or sets a boolean indicating if all bounding boxes must be rendered
    */
-  bool forceShowBoundingBoxes;
+  Property<Scene, bool> forceShowBoundingBoxes;
 
   /**
    * Gets or sets the active clipplane
@@ -2849,6 +2880,16 @@ public:
   bool requireLightSorting;
 
   /**
+   * Backing store of defined scene components
+   */
+  vector_t<ISceneComponentPtr> _components;
+
+  /**
+   * Backing store of defined scene components
+   */
+  vector_t<ISceneSerializableComponentPtr> _serializableComponents;
+
+  /**
    * Gets the current geometry buffer associated to the scene
    */
   Property<Scene, shared_ptr_t<GeometryBufferRenderer>> geometryBufferRenderer;
@@ -2951,6 +2992,56 @@ public:
    * Hidden
    */
   bool _allowPostProcessClear;
+
+  /**
+   * Defines the actions happening before camera updates
+   */
+  Stage<SimpleStageAction> _beforeCameraUpdateStage;
+
+  /**
+   * Defines the actions happening during the per mesh ready checks
+   */
+  Stage<MeshStageAction> _isReadyForMeshStage;
+
+  /**
+   * Defines the actions happening before evaluate active mesh checks
+   */
+  Stage<SimpleStageAction> _beforeEvaluateActiveMeshStage;
+
+  /**
+   * Defines the actions happening during the evaluate sub mesh checks
+   */
+  Stage<EvaluateSubMeshStageAction> _evaluateSubMeshStage;
+
+  /**
+   * Defines the actions happening during the active mesh stage
+   */
+  Stage<ActiveMeshStageAction> _activeMeshStage;
+
+  /**
+   * Defines the actions happening during the per camera render target step
+   */
+  Stage<CameraStageAction> _cameraDrawRenderTargetStage;
+
+  /**
+   * Defines the actions happening just before the active camera is drawing
+   */
+  Stage<CameraStageAction> _beforeCameraDrawStage;
+
+  /**
+   * Defines the actions happening just before a rendering group is drawing
+   */
+  Stage<RenderingGroupStageAction> _beforeRenderingGroupDrawStage;
+
+  /**
+   * Defines the actions happening just after a rendering group has been drawn
+   */
+  Stage<RenderingGroupStageAction> _afterRenderingGroupDrawStage;
+
+  /**
+   * Defines the actions happening just after the active camera has been drawn
+   */
+  Stage<CameraStageAction> _afterCameraDrawStage;
 
 protected:
   /** Hidden */
@@ -3091,7 +3182,13 @@ private:
   unique_ptr_t<UniformBuffer> _sceneUbo;
   unique_ptr_t<UniformBuffer> _alternateSceneUbo;
   unique_ptr_t<Matrix> _pickWithRayInverseMatrix;
-  unique_ptr_t<BoundingBoxRenderer> _boundingBoxRenderer;
+
+  /** Hidden (Backing field) */
+  BoundingBoxRendererPtr _boundingBoxRenderer;
+
+  /** Hidden (Backing field) */
+  bool _forceShowBoundingBoxes;
+
   unique_ptr_t<OutlineRenderer> _outlineRenderer;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
@@ -3113,6 +3210,12 @@ private:
   AbstractMesh* _pickedUpMesh;
   Sprite* _pickedDownSprite;
   string_t _uid;
+
+  /**
+   * List of components to register on the next registration step
+   */
+  vector_t<ISceneComponentPtr> _transientComponents;
+
   unique_ptr_t<Ray> _tempPickingRay;
   unique_ptr_t<Ray> _cachedRayForTransform;
 

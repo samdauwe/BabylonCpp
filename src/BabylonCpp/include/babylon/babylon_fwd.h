@@ -177,6 +177,7 @@ class PhysicsViewer;
 class SkeletonViewer;
 } // end of namespace Debug
 // --- Engine ---
+class AbstractScene;
 class ClickInfo;
 struct DepthTextureCreationOptions;
 class Engine;
@@ -184,6 +185,11 @@ struct EngineCapabilities;
 struct EngineOptions;
 struct IActiveMeshCandidateProvider;
 struct InstancingAttributeInfo;
+struct ISceneSerializableComponent;
+using ISceneSerializableComponentPtr
+  = shared_ptr_t<ISceneSerializableComponent>;
+struct ISceneComponent;
+using ISceneComponentPtr = shared_ptr_t<ISceneComponent>;
 class Node;
 class Scene;
 // --- Events ---
@@ -555,6 +561,7 @@ class StandardRenderingPipeline;
 class ReflectionProbe;
 // --- Rendering ---
 class BoundingBoxRenderer;
+using BoundingBoxRendererPtr = shared_ptr_t<BoundingBoxRenderer>;
 class DepthRenderer;
 class EdgesRenderer;
 class FaceAdjacencies;

@@ -24,6 +24,8 @@
 #include <babylon/engine/click_info.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/iactive_mesh_candidate_provider.h>
+#include <babylon/engine/iscene_component.h>
+#include <babylon/engine/iscene_serializable_component.h>
 #include <babylon/events/keyboard_event_types.h>
 #include <babylon/events/keyboard_info_pre.h>
 #include <babylon/events/pointer_event_types.h>
@@ -107,7 +109,8 @@ Scene::Scene(Engine* engine)
                      &Scene::set_forceWireframe}
     , forcePointsCloud{this, &Scene::get_forcePointsCloud,
                        &Scene::set_forcePointsCloud}
-    , forceShowBoundingBoxes{false}
+    , forceShowBoundingBoxes{this, &Scene::get_forceShowBoundingBoxes,
+                             &Scene::set_forceShowBoundingBoxes}
     , _clipPlane{nullptr}
     , animationsEnabled{true}
     , animationPropertiesOverride{this, &Scene::get_animationPropertiesOverride,
@@ -257,6 +260,7 @@ Scene::Scene(Engine* engine)
     , _alternateSceneUbo{nullptr}
     , _pickWithRayInverseMatrix{nullptr}
     , _boundingBoxRenderer{nullptr}
+    , _forceShowBoundingBoxes{false}
     , _outlineRenderer{nullptr}
     , _alternateTransformMatrix{nullptr}
     , _useAlternateCameraConfiguration{false}
@@ -314,6 +318,38 @@ Scene::~Scene()
 IReflect::Type Scene::type() const
 {
   return IReflect::Type::SCENE;
+}
+
+void Scene::_registerTransientComponents()
+{
+  // Register components that have been associated lately to the scene.
+  if (!_transientComponents.empty()) {
+    for (const auto& component : _transientComponents) {
+      component->_register();
+    }
+    _transientComponents.clear();
+  }
+}
+
+void Scene::_addComponent(const ISceneComponentPtr& component)
+{
+  _components.emplace_back(component);
+  _transientComponents.emplace_back(component);
+
+  auto serializableComponent
+    = ::std::dynamic_pointer_cast<ISceneSerializableComponentPtr>(component);
+  if (serializableComponent) {
+    // _serializableComponents.emplace_back(serializableComponent);
+  }
+}
+
+ISceneComponentPtr Scene::_getComponent(const string_t& name)
+{
+  auto it = ::std::find_if(_components.begin(), _components.end(),
+                           [&name](const ISceneComponentPtr& component) {
+                             return component->name == name;
+                           });
+  return (it == _components.end()) ? nullptr : *it;
 }
 
 // Events
@@ -464,6 +500,20 @@ void Scene::set_forcePointsCloud(bool value)
   }
   _forcePointsCloud = value;
   markAllMaterialsAsDirty(Material::MiscDirtyFlag());
+}
+
+bool Scene::get_forceShowBoundingBoxes() const
+{
+  return _forceShowBoundingBoxes;
+}
+
+void Scene::set_forceShowBoundingBoxes(bool value)
+{
+  _forceShowBoundingBoxes = value;
+  // Lazyly creates a BB renderer if needed.
+  if (value) {
+    getBoundingBoxRenderer();
+  }
 }
 
 AnimationPropertiesOverride*& Scene::get_animationPropertiesOverride()
@@ -724,13 +774,13 @@ bool Scene::isCachedMaterialInvalid(Material* material, Effect* effect,
          || !stl_util::almost_equal(*_cachedVisibility, visibility);
 }
 
-BoundingBoxRenderer* Scene::getBoundingBoxRenderer()
+BoundingBoxRendererPtr& Scene::getBoundingBoxRenderer()
 {
   if (!_boundingBoxRenderer) {
-    _boundingBoxRenderer = ::std::make_unique<BoundingBoxRenderer>(this);
+    _boundingBoxRenderer = BoundingBoxRenderer::New(this);
   }
 
-  return _boundingBoxRenderer.get();
+  return _boundingBoxRenderer;
 }
 
 OutlineRenderer* Scene::getOutlineRenderer()
@@ -4802,7 +4852,7 @@ void Scene::_rebuildGeometries()
   }
 
   if (_boundingBoxRenderer) {
-    _boundingBoxRenderer->_rebuild();
+    _boundingBoxRenderer->rebuild();
   }
 
   for (auto& system : particleSystems) {
