@@ -27,7 +27,9 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , doNotSerialize{false}
     , storeEffectOnSubMeshes{false}
     , onDispose{this, &Material::set_onDispose}
+    , onBindObservable{this, &Material::get_onBindObservable}
     , onBind{this, &Material::set_onBind}
+    , onUnBindObservable{this, &Material::get_onUnBindObservable}
     , alphaMode{this, &Material::get_alphaMode, &Material::set_alphaMode}
     , needDepthPrePass{this, &Material::get_needDepthPrePass,
                        &Material::set_needDepthPrePass}
@@ -42,10 +44,13 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
     , _effect{nullptr}
     , _wasPreviouslyReady{false}
+    , useLogarithmicDepth{this, &Material::get_useLogarithmicDepth,
+                          &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
     , _backFaceCulling{true}
     , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
     , _onDisposeObserver{nullptr}
+    , _onUnBindObservable{nullptr}
     , _onBindObserver{nullptr}
     , _alphaMode{EngineConstants::ALPHA_COMBINE}
     , _needDepthPrePass{false}
@@ -162,27 +167,12 @@ void Material::set_fogEnabled(bool value)
   markAsDirty(Material::MiscDirtyFlag());
 }
 
-bool Material::useLogarithmicDepth() const
+bool Material::get_useLogarithmicDepth() const
 {
   return false;
 }
 
-void Material::setUseLogarithmicDepth(bool /*value*/)
-{
-}
-
-void Material::setAmbientColor(const Color3& /*color*/)
-{
-}
-
-void Material::setDiffuseColor(const Color3& /*color*/)
-{
-}
-
-void Material::setSpecularColor(const Color3& /*color*/)
-{
-}
-void Material::setEmissiveColor(const Color3& /*color*/)
+void Material::set_useLogarithmicDepth(bool /*value*/)
 {
 }
 
@@ -202,13 +192,23 @@ void Material::set_onDispose(
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
+Observable<AbstractMesh>& Material::get_onBindObservable()
+{
+  return _onBindObservable;
+}
+
 void Material::set_onBind(
   const ::std::function<void(AbstractMesh*, EventState&)>& callback)
 {
   if (_onBindObserver) {
-    onBindObservable.remove(_onBindObserver);
+    onBindObservable().remove(_onBindObserver);
   }
-  _onBindObserver = onBindObservable.add(callback);
+  _onBindObserver = onBindObservable().add(callback);
+}
+
+Observable<Material>& Material::get_onUnBindObservable()
+{
+  return _onUnBindObservable;
 }
 
 void Material::set_wireframe(bool value)
@@ -415,7 +415,7 @@ void Material::_afterBind(Mesh* mesh)
   }
 
   if (mesh) {
-    onBindObservable.notifyObservers(mesh);
+    onBindObservable().notifyObservers(mesh);
   }
 
   if (disableDepthWrite) {
@@ -427,7 +427,7 @@ void Material::_afterBind(Mesh* mesh)
 
 void Material::unbind()
 {
-  onUnBindObservable.notifyObservers(this);
+  onUnBindObservable().notifyObservers(this);
 
   if (disableDepthWrite) {
     auto engine = _scene->getEngine();
@@ -668,8 +668,8 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
   onDisposeObservable.notifyObservers(this);
 
   onDisposeObservable.clear();
-  onBindObservable.clear();
-  onUnBindObservable.clear();
+  onBindObservable().clear();
+  onUnBindObservable().clear();
 }
 
 void Material::copyTo(Material* other) const

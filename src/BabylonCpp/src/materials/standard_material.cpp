@@ -58,6 +58,33 @@ StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
     , invertRefractionY{true}
     , alphaCutOff{0.4f}
     , customShaderNameResolve{nullptr}
+    , imageProcessingConfiguration{this,
+                                   &StandardMaterial::
+                                     get_imageProcessingConfiguration,
+                                   &StandardMaterial::
+                                     set_imageProcessingConfiguration}
+    , cameraColorCurvesEnabled{this,
+                               &StandardMaterial::get_cameraColorCurvesEnabled,
+                               &StandardMaterial::set_cameraColorCurvesEnabled}
+    , cameraColorGradingEnabled{this,
+                                &StandardMaterial::
+                                  get_cameraColorGradingEnabled,
+                                &StandardMaterial::
+                                  set_cameraColorGradingEnabled}
+    , cameraToneMappingEnabled{this,
+                               &StandardMaterial::get_cameraToneMappingEnabled,
+                               &StandardMaterial::set_cameraToneMappingEnabled}
+    , cameraExposure{this, &StandardMaterial::get_cameraExposure,
+                     &StandardMaterial::set_cameraExposure}
+    , cameraContrast{this, &StandardMaterial::get_cameraContrast,
+                     &StandardMaterial::set_cameraContrast}
+    , cameraColorGradingTexture{this,
+                                &StandardMaterial::
+                                  get_cameraColorGradingTexture,
+                                &StandardMaterial::
+                                  set_cameraColorGradingTexture}
+    , cameraColorCurves{this, &StandardMaterial::get_cameraColorCurves,
+                        &StandardMaterial::set_cameraColorCurves}
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _globalAmbientColor{Color3(0.f, 0.f, 0.f)}
     , _useLogarithmicDepth{false}
@@ -119,6 +146,33 @@ StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
 
 StandardMaterial::StandardMaterial(const StandardMaterial& other)
     : PushMaterial{other.name, other.getScene()}
+    , imageProcessingConfiguration{this,
+                                   &StandardMaterial::
+                                     get_imageProcessingConfiguration,
+                                   &StandardMaterial::
+                                     set_imageProcessingConfiguration}
+    , cameraColorCurvesEnabled{this,
+                               &StandardMaterial::get_cameraColorCurvesEnabled,
+                               &StandardMaterial::set_cameraColorCurvesEnabled}
+    , cameraColorGradingEnabled{this,
+                                &StandardMaterial::
+                                  get_cameraColorGradingEnabled,
+                                &StandardMaterial::
+                                  set_cameraColorGradingEnabled}
+    , cameraToneMappingEnabled{this,
+                               &StandardMaterial::get_cameraToneMappingEnabled,
+                               &StandardMaterial::set_cameraToneMappingEnabled}
+    , cameraExposure{this, &StandardMaterial::get_cameraExposure,
+                     &StandardMaterial::set_cameraExposure}
+    , cameraContrast{this, &StandardMaterial::get_cameraContrast,
+                     &StandardMaterial::set_cameraContrast}
+    , cameraColorGradingTexture{this,
+                                &StandardMaterial::
+                                  get_cameraColorGradingTexture,
+                                &StandardMaterial::
+                                  set_cameraColorGradingTexture}
+    , cameraColorCurves{this, &StandardMaterial::get_cameraColorCurves,
+                        &StandardMaterial::set_cameraColorCurves}
 {
   // Base material
   other.copyTo(dynamic_cast<PushMaterial*>(this));
@@ -197,31 +251,12 @@ IReflect::Type StandardMaterial::type() const
   return IReflect::Type::STANDARDMATERIAL;
 }
 
-void StandardMaterial::setAmbientColor(const Color3& color)
-{
-  ambientColor = color;
-}
-
-void StandardMaterial::setDiffuseColor(const Color3& color)
-{
-  diffuseColor = color;
-}
-
-void StandardMaterial::setSpecularColor(const Color3& color)
-{
-  specularColor = color;
-}
-void StandardMaterial::setEmissiveColor(const Color3& color)
-{
-  emissiveColor = color;
-}
-
-bool StandardMaterial::useLogarithmicDepth() const
+bool StandardMaterial::get_useLogarithmicDepth() const
 {
   return _useLogarithmicDepth;
 }
 
-void StandardMaterial::setUseLogarithmicDepth(bool value)
+void StandardMaterial::set_useLogarithmicDepth(bool value)
 {
   _useLogarithmicDepth
     = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
@@ -257,7 +292,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                          bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
-    if (_wasPreviouslyReady && subMesh->effect()) {
+    if (_wasPreviouslyReady) {
       return true;
     }
   }
@@ -1714,14 +1749,14 @@ void StandardMaterial::setTwoSidedLighting(bool value)
   _twoSidedLighting = value;
 }
 
-ImageProcessingConfiguration*
-StandardMaterial::imageProcessingConfiguration() const
+ImageProcessingConfiguration*&
+StandardMaterial::get_imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
 }
 
-void StandardMaterial::setImageProcessingConfiguration(
-  ImageProcessingConfiguration* value)
+void StandardMaterial::set_imageProcessingConfiguration(
+  ImageProcessingConfiguration* const& value)
 {
   _attachImageProcessingConfiguration(value);
 
@@ -1761,72 +1796,72 @@ void StandardMaterial::_attachImageProcessingConfiguration(
   }
 }
 
-bool StandardMaterial::cameraColorCurvesEnabled() const
+bool StandardMaterial::get_cameraColorCurvesEnabled() const
 {
   return imageProcessingConfiguration()->colorCurvesEnabled();
 }
 
-void StandardMaterial::setCameraColorCurvesEnabled(bool value)
+void StandardMaterial::set_cameraColorCurvesEnabled(bool value)
 {
   imageProcessingConfiguration()->colorCurvesEnabled = value;
 }
 
-bool StandardMaterial::cameraColorGradingEnabled() const
+bool StandardMaterial::get_cameraColorGradingEnabled() const
 {
   return imageProcessingConfiguration()->colorGradingEnabled();
 }
 
-void StandardMaterial::setCameraColorGradingEnabled(bool value)
+void StandardMaterial::set_cameraColorGradingEnabled(bool value)
 {
   imageProcessingConfiguration()->colorGradingEnabled = value;
 }
 
-bool StandardMaterial::cameraToneMappingEnabled() const
+bool StandardMaterial::get_cameraToneMappingEnabled() const
 {
   return _imageProcessingConfiguration->toneMappingEnabled();
 }
 
-void StandardMaterial::setCameraToneMappingEnabled(bool value)
+void StandardMaterial::set_cameraToneMappingEnabled(bool value)
 {
   _imageProcessingConfiguration->toneMappingEnabled = value;
 }
 
-float StandardMaterial::cameraExposure() const
+float StandardMaterial::get_cameraExposure() const
 {
   return _imageProcessingConfiguration->exposure();
 }
 
-void StandardMaterial::setCameraExposure(float value)
+void StandardMaterial::set_cameraExposure(float value)
 {
   _imageProcessingConfiguration->exposure = value;
 }
 
-float StandardMaterial::cameraContrast() const
+float StandardMaterial::get_cameraContrast() const
 {
   return _imageProcessingConfiguration->contrast();
 }
 
-void StandardMaterial::setCameraContrast(float value)
+void StandardMaterial::set_cameraContrast(float value)
 {
   _imageProcessingConfiguration->contrast = value;
 }
 
-BaseTexture* StandardMaterial::cameraColorGradingTexture() const
+BaseTexture*& StandardMaterial::get_cameraColorGradingTexture()
 {
   return _imageProcessingConfiguration->colorGradingTexture;
 }
 
-void StandardMaterial::setCameraColorGradingTexture(BaseTexture* value)
+void StandardMaterial::set_cameraColorGradingTexture(BaseTexture* const& value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
 }
 
-shared_ptr_t<ColorCurves>& StandardMaterial::cameraColorCurves() const
+shared_ptr_t<ColorCurves>& StandardMaterial::get_cameraColorCurves()
 {
   return _imageProcessingConfiguration->colorCurves;
 }
 
-void StandardMaterial::setCameraColorCurves(
+void StandardMaterial::set_cameraColorCurves(
   const shared_ptr_t<ColorCurves>& value)
 {
   _imageProcessingConfiguration->colorCurves = value;

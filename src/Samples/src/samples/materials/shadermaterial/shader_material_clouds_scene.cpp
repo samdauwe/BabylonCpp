@@ -4,6 +4,7 @@
 #include <babylon/core/random.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/materials/textures/texture.h>
@@ -20,14 +21,11 @@ ShaderMaterialCloudsScene::ShaderMaterialCloudsScene(ICanvas* iCanvas)
     , _cloudMaterial{nullptr}
     , _startTime{Time::unixtimeInMs()}
 {
-  // Reference to the shaders contained in the shader store
-  auto& shaders = _effectShadersStore.shaders();
-
   // Vertex shader
-  shaders["cloudVertexShader"] = cloudVertexShader;
+  Effect::ShadersStore["cloudVertexShader"] = cloudVertexShader;
 
   // Fragment shader
-  shaders["cloudFragmentShader"] = cloudFragmentShader;
+  Effect::ShadersStore["cloudFragmentShader"] = cloudFragmentShader;
 }
 
 ShaderMaterialCloudsScene::~ShaderMaterialCloudsScene()

@@ -2,7 +2,6 @@
 #define BABYLON_SAMPLES_MATERIALS_SHADER_MATERIAL_CHAINS_AND_GEARS_SCENE_H
 
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/materials/effect_shaders_store.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -393,7 +392,8 @@ public:
       "\n"
       "#define kRaymarchEpsilon 0.01\n"
       "// This is an excellent resource on ray marching ->\n"
-      "// http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm\n"
+      "// "
+      "http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm\n"
       "void Raymarch(const in C_Ray ray, out C_HitInfo result,\n"
       "              const int maxIter) {\n"
       "  result.fDistance = GetRayFirstStep(ray);\n"
@@ -785,7 +785,6 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  EffectShadersStore _effectShadersStore;
   float _time;
   ShaderMaterial* _shaderMaterial;
 

@@ -5,8 +5,18 @@
 
 namespace BABYLON {
 
-struct BABYLON_SHARED_EXPORT EffectIncludesShadersStore {
-  static unordered_map_t<string_t, const char*> Shaders;
+class BABYLON_SHARED_EXPORT EffectIncludesShadersStore {
+
+public:
+  EffectIncludesShadersStore();
+  ~EffectIncludesShadersStore();
+
+  unordered_map_t<string_t, const char*>& shaders();
+  const unordered_map_t<string_t, const char*>& shaders() const;
+
+private:
+  static unordered_map_t<string_t, const char*> _shaders;
+
 }; // end of struct EffectIncludesShadersStore
 
 } // end of namespace BABYLON

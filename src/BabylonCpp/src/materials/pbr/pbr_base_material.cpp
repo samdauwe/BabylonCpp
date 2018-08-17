@@ -71,7 +71,7 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _useAmbientOcclusionFromMetallicTextureRed{false}
     , _useAmbientInGrayScale{false}
     , _useAutoMicroSurfaceFromReflectivityMap{false}
-    , _usePhysicalLightFalloff{true}
+    , _lightFalloff{PBRBaseMaterial::LIGHTFALLOFF_PHYSICAL}
     , _useRadianceOverAlpha{true}
     , _useObjectSpaceNormalMap{false}
     , _useParallax{false}
@@ -162,12 +162,12 @@ const string_t PBRBaseMaterial::getClassName() const
   return "PBRBaseMaterial";
 }
 
-bool PBRBaseMaterial::useLogarithmicDepth() const
+bool PBRBaseMaterial::get_useLogarithmicDepth() const
 {
   return _useLogarithmicDepth;
 }
 
-void PBRBaseMaterial::setUseLogarithmicDepth(bool value)
+void PBRBaseMaterial::set_useLogarithmicDepth(bool value)
 {
   _useLogarithmicDepth
     = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
@@ -863,7 +863,18 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
     defines.defines[PMD::SPECULAROVERALPHA] = _useSpecularOverAlpha;
 
-    defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = _usePhysicalLightFalloff;
+    if (_lightFalloff == PBRBaseMaterial::LIGHTFALLOFF_STANDARD) {
+      defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = false;
+      defines.defines[PMD::USEGLTFLIGHTFALLOFF]     = false;
+    }
+    else if (_lightFalloff == PBRBaseMaterial::LIGHTFALLOFF_GLTF) {
+      defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = false;
+      defines.defines[PMD::USEGLTFLIGHTFALLOFF]     = true;
+    }
+    else {
+      defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = true;
+      defines.defines[PMD::USEGLTFLIGHTFALLOFF]     = false;
+    }
 
     defines.defines[PMD::RADIANCEOVERALPHA] = _useRadianceOverAlpha;
 
@@ -1356,9 +1367,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   if (mustRebind || !isFrozen()) {
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
-      MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
-                                 _maxSimultaneousLights,
-                                 _usePhysicalLightFalloff);
+      MaterialHelper::BindLights(
+        scene, mesh, _activeEffect, defines, _maxSimultaneousLights,
+        _lightFalloff != PBRBaseMaterial::LIGHTFALLOFF_STANDARD);
     }
 
     // View

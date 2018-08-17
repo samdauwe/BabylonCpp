@@ -40,51 +40,60 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.7f;
 
   // Create 4 boxes
-  auto box1      = Mesh::CreateBox("box1", 2, scene);
-  box1->material = StandardMaterial::New("b1mat", scene);
-  box1->material()->setDiffuseColor(Color3(1, 0, 0));
-  box1->position = Vector3(-5, 1, 5);
+  auto box1                  = Mesh::CreateBox("box1", 2, scene);
+  auto box1Material          = StandardMaterial::New("b1mat", scene);
+  box1Material->diffuseColor = Color3(1, 0, 0);
+  box1->position             = Vector3(-5, 1, 5);
+  box1->material             = box1Material;
 
-  auto box2      = Mesh::CreateBox("box2", 2, scene);
-  box2->material = StandardMaterial::New("b2mat", scene);
-  box2->material()->setDiffuseColor(Color3(1, 0, 0));
-  box2->position = Vector3(5, 1, 5);
+  auto box2                  = Mesh::CreateBox("box2", 2, scene);
+  auto box2Material          = StandardMaterial::New("b2mat", scene);
+  box2Material->diffuseColor = Color3(1, 0, 0);
+  box2->position             = Vector3(5, 1, 5);
+  box2->material             = box2Material;
 
-  auto box3      = Mesh::CreateBox("box3", 2, scene);
-  box3->material = StandardMaterial::New("b3mat", scene);
-  box3->material()->setDiffuseColor(Color3(1, 0, 0));
-  box3->position = Vector3(-5, 1, -5);
+  auto box3                  = Mesh::CreateBox("box3", 2, scene);
+  auto box3Material          = StandardMaterial::New("b3mat", scene);
+  box3Material->diffuseColor = Color3(1, 0, 0);
+  box3->position             = Vector3(-5, 1, -5);
+  box3->material             = box3Material;
 
-  auto box4      = Mesh::CreateBox("box4", 2, scene);
-  box4->material = StandardMaterial::New("b4mat", scene);
-  box4->material()->setDiffuseColor(Color3(1, 0, 0));
-  box4->position = Vector3(5, 1, -5);
+  auto box4                  = Mesh::CreateBox("box4", 2, scene);
+  auto box4Material          = StandardMaterial::New("b4mat", scene);
+  box4Material->diffuseColor = Color3(1, 0, 0);
+  box4->position             = Vector3(5, 1, -5);
+  box4->material             = box4Material;
 
   // Create 4 cylinders
   auto shape5 = Mesh::CreateCylinder("cyl5", 3.f, 3.f, 0.f, 6, 1, scene, false);
-  shape5->material = StandardMaterial::New("c5mat", scene);
-  shape5->material()->setDiffuseColor(Color3(0, 1, 1));
-  shape5->position = Vector3(-1.75f, 1.f, 1.75f);
+  auto shape5Material          = StandardMaterial::New("c5mat", scene);
+  shape5Material->diffuseColor = Color3(0, 1, 1);
+  shape5->position             = Vector3(-1.75f, 1.f, 1.75f);
+  shape5->material             = shape5Material;
 
   auto shape6 = Mesh::CreateCylinder("cyl6", 3.f, 3.f, 0.f, 6, 1, scene, false);
-  shape6->material = StandardMaterial::New("c6mat", scene);
-  shape6->material()->setDiffuseColor(Color3(1, 0, 1));
-  shape6->position = Vector3(1.75f, 1.f, 1.75f);
+  auto shape6Material          = StandardMaterial::New("c6mat", scene);
+  shape6Material->diffuseColor = Color3(1, 0, 1);
+  shape6->position             = Vector3(1.75f, 1.f, 1.75f);
+  shape6->material             = shape6Material;
 
   auto shape7 = Mesh::CreateCylinder("cyl7", 3.f, 3.f, 0.f, 6, 1, scene, false);
-  shape7->material = StandardMaterial::New("c7mat", scene);
-  shape7->material()->setDiffuseColor(Color3(0.3f, 0.3f, 1));
-  shape7->position = Vector3(-1.75f, 1.f, -1.75f);
+  auto shape7Material          = StandardMaterial::New("c7mat", scene);
+  shape7Material->diffuseColor = Color3(0.3f, 0.3f, 1);
+  shape7->position             = Vector3(-1.75f, 1.f, -1.75f);
+  shape7->material             = shape7Material;
 
   auto shape8 = Mesh::CreateCylinder("cyl8", 3.f, 3.f, 0.f, 6, 1, scene, false);
-  shape8->material = StandardMaterial::New("c8mat", scene);
-  shape8->material()->setDiffuseColor(Color3(0.9f, 0.9f, 0.f));
-  shape8->position = Vector3(1.75f, 1.f, -1.75f);
+  auto shape8Material          = StandardMaterial::New("c8mat", scene);
+  shape8Material->diffuseColor = Color3(0.9f, 0.9f, 0.f);
+  shape8->position             = Vector3(1.75f, 1.f, -1.75f);
+  shape8->material             = shape8Material;
 
   // Create the ground mesh
-  auto ground      = Mesh::CreateGround("ground1", 20, 20, 2, scene);
-  ground->material = StandardMaterial::New("gmat", scene);
-  ground->material()->setDiffuseColor(Color3(0.1f, 0.2f, 0.f));
+  auto ground         = Mesh::CreateGround("ground1", 20, 20, 2, scene);
+  auto groundMaterial = StandardMaterial::New("gmat", scene);
+  groundMaterial->diffuseColor = Color3(0.1f, 0.2f, 0.f);
+  ground->material             = groundMaterial;
 
   // Create 6 animations keys
   std::vector<IAnimationKey> keys1{

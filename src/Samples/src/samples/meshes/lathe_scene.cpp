@@ -76,11 +76,11 @@ void LatheScene::initializeScene(ICanvas* canvas, Scene* scene)
     = Mesh::CreateLathe("tube", spline.getPoints(), 1, 16, scene, false);
 
   // Materials
-  auto material1 = StandardMaterial::New("material1", scene);
-  material1->setDiffuseColor(Color3(1.f, 0.5f, 0.5f));
-  auto material2 = StandardMaterial::New("material2", scene);
-  material2->setDiffuseColor(Color3(0.f, 0.5f, 1.f));
-  material2->wireframe = true;
+  auto material1          = StandardMaterial::New("material1", scene);
+  material1->diffuseColor = Color3(1.f, 0.5f, 0.5f);
+  auto material2          = StandardMaterial::New("material2", scene);
+  material2->diffuseColor = Color3(0.f, 0.5f, 1.f);
+  material2->wireframe    = true;
 
   // Set object materials
   tube->material  = material1;

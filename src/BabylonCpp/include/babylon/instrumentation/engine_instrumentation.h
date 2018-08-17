@@ -7,8 +7,6 @@
 #include <babylon/tools/observer.h>
 #include <babylon/tools/perf_counter.h>
 
-#include <babylon/core/nullable.h>
-
 namespace BABYLON {
 
 /**
@@ -83,7 +81,7 @@ private:
   Engine* _engine;
 
   bool _captureGPUFrameTime = false;
-  Nullable<_TimeToken> _gpuFrameTimeToken;
+  nullable_t<_TimeToken> _gpuFrameTimeToken;
   PerfCounter _gpuFrameTime;
 
   bool _captureShaderCompilationTime;

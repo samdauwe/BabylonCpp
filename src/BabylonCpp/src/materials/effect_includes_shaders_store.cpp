@@ -58,7 +58,26 @@
 
 namespace BABYLON {
 
-unordered_map_t<string_t, const char*> EffectIncludesShadersStore::Shaders = {
+EffectIncludesShadersStore::EffectIncludesShadersStore()
+{
+}
+
+EffectIncludesShadersStore::~EffectIncludesShadersStore()
+{
+}
+
+unordered_map_t<string_t, const char*>& EffectIncludesShadersStore::shaders()
+{
+  return _shaders;
+}
+
+const unordered_map_t<string_t, const char*>&
+EffectIncludesShadersStore::shaders() const
+{
+  return _shaders;
+}
+
+unordered_map_t<string_t, const char*> EffectIncludesShadersStore::_shaders = {
   {"backgroundFragmentDeclaration", backgroundFragmentDeclaration},
   {"backgroundUboDeclaration", backgroundUboDeclaration},
   {"backgroundVertexDeclaration", backgroundVertexDeclaration},

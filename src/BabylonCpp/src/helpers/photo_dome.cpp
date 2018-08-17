@@ -36,6 +36,8 @@ PhotoDome::PhotoDome(string_t iName, const string_t& urlOfPhoto,
     _useDirectMapping = *options.useDirectMapping;
   }
 
+  _setReady(false);
+
   // create
   auto material = _material
     = BackgroundMaterial::New(name + "_material", scene);
@@ -48,6 +50,9 @@ PhotoDome::PhotoDome(string_t iName, const string_t& urlOfPhoto,
   material->setFovMultiplier(1.f);
 
   photoTexture = Texture::New(urlOfPhoto, scene, true, !_useDirectMapping);
+
+  photoTexture()->onLoadObservable().addOnce(
+    [this](Texture* /*texture*/, EventState& /*es*/) { _setReady(true); });
 
   // configure mesh
   _mesh->material = material;

@@ -86,8 +86,8 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example: https://www.babylonjs-playground.com/#RNASML
    */
-  void set_boundingBoxSize(const Nullable<Vector3>& value) override;
-  Nullable<Vector3>& get_boundingBoxSize() override;
+  void set_boundingBoxSize(const nullable_t<Vector3>& value) override;
+  nullable_t<Vector3>& get_boundingBoxSize() override;
 
   /**
    * @brief Sets texture matrix rotation angle around Y axis in radians.
@@ -103,7 +103,6 @@ protected:
 
 public:
   string_t url;
-  unsigned int coordinatesMode;
 
   /**
    * Gets or sets the center of the bounding box associated with the cube
@@ -120,7 +119,7 @@ public:
   bool _prefiltered;
 
 private:
-  Nullable<Vector3> _boundingBoxSize;
+  nullable_t<Vector3> _boundingBoxSize;
   float _rotationY;
   bool _noMipmap;
   vector_t<string_t> _files;

@@ -60,11 +60,12 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Lights
   SphereOptions spereOptions(0.2f);
   auto sphereLight = MeshBuilder::CreateSphere("sphere", spereOptions, scene);
-  sphereLight->material = StandardMaterial::New("", scene);
-  sphereLight->material()->setEmissiveColor(Color3(1, 1, 1));
-  sphereLight->position().x = 2.f;
-  sphereLight->position().y = 3.f;
-  sphereLight->position().z = 0.1f;
+  auto sphereMaterial           = StandardMaterial::New("", scene);
+  sphereMaterial->emissiveColor = Color3(1, 1, 1);
+  sphereLight->material         = sphereMaterial;
+  sphereLight->position().x     = 2.f;
+  sphereLight->position().y     = 3.f;
+  sphereLight->position().z     = 0.1f;
 
   vector_t<Mesh*> sphereLights{sphereLight};
   Float32Array lightPositions{-2.f, 3.f, 6.9f};

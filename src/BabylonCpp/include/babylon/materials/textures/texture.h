@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_TEXTURES_TEXTURE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -49,7 +48,7 @@ public:
    * @param buffer the buffer of the texture (defaults to null)
    */
   void updateURL(const string_t& iUrl,
-                 const Nullable<Variant<ArrayBuffer, Image>>& buffer);
+                 const nullable_t<Variant<ArrayBuffer, Image>>& buffer);
 
   void delayLoad() override;
   void updateSamplingMode(unsigned int samplingMode);
@@ -70,7 +69,7 @@ public:
   static unique_ptr_t<BaseTexture> Parse(const Json::value& parsedTexture,
                                          Scene* scene, const string_t& rootUrl);
   static Texture* LoadFromDataString(
-    const string_t& name, const Nullable<Variant<ArrayBuffer, Image>>& buffer,
+    const string_t& name, const nullable_t<Variant<ArrayBuffer, Image>>& buffer,
     Scene* scene, bool deleteBuffer = false, bool noMipmap = false,
     bool invertY              = true,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
@@ -82,17 +81,17 @@ protected:
   Texture(const string_t& url, Scene* scene, bool noMipmap = false,
           bool invertY              = true,
           unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-          const ::std::function<void()>& onLoad               = nullptr,
-          const ::std::function<void()>& onError              = nullptr,
-          const Nullable<Variant<ArrayBuffer, Image>>& buffer = nullptr,
-          bool deleteBuffer                                   = false,
-          const Nullable<unsigned int>& format                = nullptr);
+          const ::std::function<void()>& onLoad                 = nullptr,
+          const ::std::function<void()>& onError                = nullptr,
+          const nullable_t<Variant<ArrayBuffer, Image>>& buffer = nullopt_t,
+          bool deleteBuffer                                     = false,
+          const nullable_t<unsigned int>& format                = nullopt_t);
 
   bool get_noMipmap() const;
   void set_isBlocking(bool value) override;
   bool get_isBlocking() const override;
   unsigned int get_samplingMode() const;
-  Nullable<Observable<Texture>>& get_onLoadObservable();
+  Observable<Texture>& get_onLoadObservable();
 
 private:
   void _prepareRowForTextureGeneration(float x, float y, float z, Vector3& t);
@@ -128,11 +127,11 @@ public:
   unsigned int _samplingMode;
 
   ReadOnlyProperty<Texture, unsigned int> samplingMode;
-  ReadOnlyProperty<Texture, Nullable<Observable<Texture>>> onLoadObservable;
+  ReadOnlyProperty<Texture, Observable<Texture>> onLoadObservable;
 
 protected:
-  const Nullable<unsigned int> _format;
-  Nullable<Observable<Texture>> _onLoadObservable;
+  const nullable_t<unsigned int> _format;
+  Observable<Texture> _onLoadObservable;
   bool _isBlocking;
 
 private:
@@ -153,7 +152,7 @@ private:
   float _cachedWAng;
   int _cachedProjectionMatrixId;
   unsigned int _cachedCoordinatesMode;
-  Nullable<Variant<ArrayBuffer, Image>> _buffer;
+  nullable_t<Variant<ArrayBuffer, Image>> _buffer;
   bool _deleteBuffer;
   ::std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
   ::std::function<void()> _delayedOnError;

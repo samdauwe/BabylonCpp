@@ -46,8 +46,8 @@ void MandelbrotFractalScene::initializeScene(ICanvas* canvas, Scene* scene)
   _pl->diffuse   = Color3(1.f, 1.f, 0.f);
   _pl->intensity = 0.5f;
 
-  auto mat = StandardMaterial::New("mat1", scene);
-  mat->setDiffuseColor(Color3(0.8f, 0.8f, 0.5f));
+  auto mat          = StandardMaterial::New("mat1", scene);
+  mat->diffuseColor = Color3(0.8f, 0.8f, 0.5f);
 
   // inspired from
   // http://code.activestate.com/recipes/577277-mandelbrot-fractal-using-html5-canvas/

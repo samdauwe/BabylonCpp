@@ -154,31 +154,31 @@ void MaterialAdapter::_buildPropertiesView()
       "cameraColorCurvesEnabled",
       [&]() -> bool { return _standardMaterial->cameraColorCurvesEnabled(); },
       [&](const bool& value) {
-        _standardMaterial->setCameraColorCurvesEnabled(value);
+        _standardMaterial->cameraColorCurvesEnabled = value;
       });
     // - cameraColorGradingEnabled
     view.addBoolProperty(
       "cameraColorGradingEnabled",
       [&]() -> bool { return _standardMaterial->cameraColorGradingEnabled(); },
       [&](const bool& value) {
-        _standardMaterial->setCameraColorGradingEnabled(value);
+        _standardMaterial->cameraColorGradingEnabled = value;
       });
     // - cameraContrast
     view.addFloatProperty(
       "cameraContrast",
       [&]() -> float { return _standardMaterial->cameraContrast(); },
-      [&](const float& value) { _standardMaterial->setCameraContrast(value); });
+      [&](const float& value) { _standardMaterial->cameraContrast = value; });
     // - cameraExposure
     view.addFloatProperty(
       "cameraExposure",
       [&]() -> float { return _standardMaterial->cameraExposure(); },
-      [&](const float& value) { _standardMaterial->setCameraExposure(value); });
+      [&](const float& value) { _standardMaterial->cameraExposure = value; });
     // - cameraToneMappingEnabled
     view.addBoolProperty(
       "cameraToneMappingEnabled",
       [&]() -> bool { return _standardMaterial->cameraToneMappingEnabled(); },
       [&](const bool& value) {
-        _standardMaterial->setCameraToneMappingEnabled(value);
+        _standardMaterial->cameraToneMappingEnabled = value;
       });
     // - cameraColorCurves
     if (_standardMaterial->cameraColorCurves()) {
@@ -312,7 +312,7 @@ void MaterialAdapter::_buildPropertiesView()
       "useLogarithmicDepth",
       [&]() -> bool { return _standardMaterial->useLogarithmicDepth(); },
       [&](const bool& value) {
-        _standardMaterial->setUseLogarithmicDepth(value);
+        _standardMaterial->useLogarithmicDepth = value;
       });
     // - useObjectSpaceNormalMap
     view.addBoolProperty(

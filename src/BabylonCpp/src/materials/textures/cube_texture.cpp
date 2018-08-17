@@ -49,11 +49,10 @@ CubeTexture::CubeTexture(
   float lodOffset)
     : BaseTexture{scene}
     , url{rootUrl}
-    , coordinatesMode{TextureConstants::CUBIC_MODE}
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
     , _prefiltered{false}
-    , _boundingBoxSize{nullptr}
+    , _boundingBoxSize{nullopt_t}
     , _rotationY{0.f}
     , _noMipmap{noMipmap}
     , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
@@ -62,8 +61,9 @@ CubeTexture::CubeTexture(
 {
   isCube = true;
 
-  name     = rootUrl;
-  hasAlpha = false;
+  name            = rootUrl;
+  hasAlpha        = false;
+  coordinatesMode = TextureConstants::CUBIC_MODE;
 
   if (rootUrl.empty() && iFiles.empty()) {
     return;
@@ -146,7 +146,7 @@ CubeTexture::~CubeTexture()
 {
 }
 
-void CubeTexture::set_boundingBoxSize(const Nullable<Vector3>& value)
+void CubeTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
 {
   if (_boundingBoxSize && (*_boundingBoxSize).equals(*value)) {
     return;
@@ -158,7 +158,7 @@ void CubeTexture::set_boundingBoxSize(const Nullable<Vector3>& value)
   }
 }
 
-Nullable<Vector3>& CubeTexture::get_boundingBoxSize()
+nullable_t<Vector3>& CubeTexture::get_boundingBoxSize()
 {
   return _boundingBoxSize;
 }

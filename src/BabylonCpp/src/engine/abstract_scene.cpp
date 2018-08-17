@@ -4,6 +4,10 @@
 
 namespace BABYLON {
 
+unordered_map_t<string_t, BabylonFileParser> AbstractScene::_BabylonFileParsers;
+unordered_map_t<string_t, IndividualBabylonFileParser>
+  AbstractScene::_IndividualBabylonFileParsers;
+
 void AbstractScene::AddParser(const string_t& name,
                               const BabylonFileParser& parser)
 {

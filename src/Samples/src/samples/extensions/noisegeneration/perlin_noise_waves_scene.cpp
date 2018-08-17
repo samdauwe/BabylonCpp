@@ -46,13 +46,15 @@ void PerlinNoiseWavesScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.7f;
 
   // Create ground meshes
-  _ground           = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
-  _ground->material = StandardMaterial::New("gmat", scene);
-  _ground->material()->setDiffuseColor(Color3::FromInts(255, 140, 0));
+  _ground             = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
+  auto groundMaterial = StandardMaterial::New("gmat", scene);
+  groundMaterial->diffuseColor = Color3::FromInts(255, 140, 0);
+  _ground->material            = groundMaterial;
   _ground->position().y += 50;
-  _ground2           = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
-  _ground2->material = StandardMaterial::New("gmat2", scene);
-  _ground2->material()->setDiffuseColor(Color3::FromInts(255, 140, 0));
+  _ground2 = Mesh::CreateGround("ground", 650, 400, 16, scene, true);
+  auto ground2Material            = StandardMaterial::New("gmat2", scene);
+  ground2Material->diffuseColor   = Color3::FromInts(255, 140, 0);
+  _ground2->material              = ground2Material;
   _ground2->material()->wireframe = true;
   _ground2->position().y          = _ground->position().y;
 

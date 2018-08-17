@@ -121,8 +121,9 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto torus0          = Mesh::CreateTorus("torus", 8, 2, 32, scene, false);
   torus0->position().x = 25.f;
   torus0->position().z = -30.f;
-  torus0->material     = StandardMaterial::New("texture1", scene);
-  torus0->material()->setDiffuseColor(Color3(0.f, 1.f, 0.f)); // Green
+  auto torus0Material  = StandardMaterial::New("texture1", scene);
+  torus0Material->diffuseColor = Color3(0.f, 1.f, 0.f); // Green
+  torus0->material             = torus0Material;
 
   Animation::CreateAndStartAnimation(
     "anim", torus0, "position", 30, 120, AnimationValue(torus0->position()),

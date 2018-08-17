@@ -56,11 +56,11 @@ void TiledGroundScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Part 2 : Create the multi material
   // Create different materials
-  auto whiteMaterial = StandardMaterial::New("White", scene);
-  whiteMaterial->setDiffuseColor(Color3::White());
+  auto whiteMaterial          = StandardMaterial::New("White", scene);
+  whiteMaterial->diffuseColor = Color3::White();
 
-  auto blackMaterial = StandardMaterial::New("Black", scene);
-  blackMaterial->setDiffuseColor(Color3::Black());
+  auto blackMaterial          = StandardMaterial::New("Black", scene);
+  blackMaterial->diffuseColor = Color3::Black();
 
   // Create Multi Material
   auto multimat = MultiMaterial::New("multi", scene);

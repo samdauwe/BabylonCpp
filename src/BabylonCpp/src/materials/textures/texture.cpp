@@ -17,8 +17,8 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
                  bool invertY, unsigned int samplingMode,
                  const ::std::function<void()>& onLoad,
                  const ::std::function<void()>& onError,
-                 const Nullable<Variant<ArrayBuffer, Image>>& buffer,
-                 bool deleteBuffer, const Nullable<unsigned int>& format)
+                 const nullable_t<Variant<ArrayBuffer, Image>>& buffer,
+                 bool deleteBuffer, const nullable_t<unsigned int>& format)
     : BaseTexture{scene}
     , url{_url}
     , uOffset{0.f}
@@ -54,9 +54,8 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
   scene->getEngine()->onBeforeTextureInitObservable.notifyObservers(this);
 
   _load = [this](InternalTexture*, EventState&) {
-    auto onLoadObservable = *_onLoadObservable;
-    if (onLoadObservable.hasObservers()) {
-      onLoadObservable.notifyObservers(this);
+    if (_onLoadObservable.hasObservers()) {
+      _onLoadObservable.notifyObservers(this);
     }
     if (_onLoad) {
       _onLoad();
@@ -82,7 +81,7 @@ Texture::Texture(const string_t& _url, Scene* scene, bool noMipmap,
         url, noMipmap, invertY, scene, _samplingMode, _load, onError, _buffer,
         nullptr, _format);
       if (deleteBuffer) {
-        _buffer = nullptr;
+        _buffer = nullopt_t;
       }
     }
     else {
@@ -140,7 +139,7 @@ bool Texture::get_noMipmap() const
 }
 
 void Texture::updateURL(const string_t& iUrl,
-                        const Nullable<Variant<ArrayBuffer, Image>>& buffer)
+                        const nullable_t<Variant<ArrayBuffer, Image>>& buffer)
 {
   if (iUrl.empty()) {
     throw ::std::runtime_error("URL is already set");
@@ -388,7 +387,7 @@ Texture* Texture::clone() const
   return newTexture;
 }
 
-Nullable<Observable<Texture>>& Texture::get_onLoadObservable()
+Observable<Texture>& Texture::get_onLoadObservable()
 {
   return _onLoadObservable;
 }
@@ -402,11 +401,7 @@ void Texture::dispose()
 {
   BaseTexture::dispose();
 
-  if (_onLoadObservable) {
-    auto observable = *_onLoadObservable;
-    observable.clear();
-    _onLoadObservable.resetValue();
-  }
+  _onLoadObservable.clear();
 
   _delayedOnLoad  = nullptr;
   _delayedOnError = nullptr;
@@ -421,7 +416,7 @@ Texture* Texture::CreateFromBase64String(const string_t& /*data*/,
                                          unsigned int format)
 {
   return Texture::New("data:" + name, scene, noMipmap, invertY, samplingMode,
-                      onLoad, onError, nullptr, false, format);
+                      onLoad, onError, nullopt_t, false, format);
 }
 
 unique_ptr_t<BaseTexture> Texture::Parse(const Json::value& /*parsedTexture*/,
@@ -432,7 +427,7 @@ unique_ptr_t<BaseTexture> Texture::Parse(const Json::value& /*parsedTexture*/,
 }
 
 Texture* Texture::LoadFromDataString(
-  const string_t& name, const Nullable<Variant<ArrayBuffer, Image>>& buffer,
+  const string_t& name, const nullable_t<Variant<ArrayBuffer, Image>>& buffer,
   Scene* scene, bool deleteBuffer, bool noMipmap, bool invertY,
   unsigned int samplingMode, const ::std::function<void()>& onLoad,
   const ::std::function<void()>& onError, unsigned int format)

@@ -17,6 +17,18 @@ class BABYLON_SHARED_EXPORT Effect {
 
 public:
   /**
+   * Store of each shader (The can be looked up using effect.key)
+   */
+  static unordered_map_t<string_t, const char*>& ShadersStore;
+
+  /**
+   * Store of each included file for a shader (The can be looked up using
+   * effect.key)
+   */
+  static unordered_map_t<string_t, const char*>& IncludesShadersStore;
+
+public:
+  /**
    * @brief Instantiates an effect.
    * An effect can be used to create/manage/execute vertex and fragment shaders.
    * @param baseName Name of the effect.
@@ -128,12 +140,25 @@ public:
    */
   void executeWhenCompiled(const ::std::function<void(Effect* effect)>& func);
 
+  /**
+   * @brief Hidden
+   */
   void
   _loadVertexShader(const string_t& vertex,
                     const ::std::function<void(const string_t&)>& callback);
+
+  /**
+   * @brief Hidden
+   */
   void
   _loadFragmentShader(const string_t& fragment,
                       const ::std::function<void(const string_t&)>& callback);
+
+  /**
+   * @brief Hidden
+   */
+  void _dumpShadersSource(string_t vertexCode, string_t fragmentCode,
+                          string_t defines);
 
   /**
    * @brief Recompiles the webGL program
@@ -492,13 +517,28 @@ public:
   // Statics
 
   /**
+   * @brief This function will add a new shader to the shader store.
+   * @param name the name of the shader
+   * @param pixelShader optional pixel shader content
+   * @param vertexShader optional vertex shader content
+   */
+  static void
+  RegisterShader(const string_t& name,
+                 const nullable_t<string_t>& pixelShader  = nullopt_t,
+                 const nullable_t<string_t>& vertexShader = nullopt_t);
+
+  /**
    * @brief Resets the cache of effects.
    */
   static void ResetCache();
 
+protected:
+  /**
+   * @brief Observable that will be called when effect is bound.
+   */
+  Observable<Effect>& get_onBindObservable();
+
 private:
-  void _dumpShadersSource(string_t vertexCode, string_t fragmentCode,
-                          string_t defines);
   void _processShaderConversion(
     const string_t& sourceCode, bool isFragment,
     const ::std::function<void(const string_t&)>& callback);
@@ -542,11 +582,15 @@ public:
    */
   Observable<Effect> onErrorObservable;
   /**
-   * Observable that will be called when effect is bound.
+   * Hidden
    */
-  Observable<Effect> onBindObservable;
+  Observable<Effect> _onBindObservable;
   /** Hidden */
   bool _bonesComputationForcedToCPU;
+  /**
+   * Observable that will be called when effect is bound.
+   */
+  ReadOnlyProperty<Effect, Observable<Effect>> onBindObservable;
   /**
    * Key for the effect.
    */

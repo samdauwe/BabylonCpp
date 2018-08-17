@@ -309,7 +309,7 @@ class ColorCurves;
 class Effect;
 struct EffectCreationOptions;
 class EffectFallbacks;
-struct EffectIncludesShadersStore;
+class EffectIncludesShadersStore;
 class EffectShadersStore;
 class FresnelParameters;
 struct IImageProcessingConfigurationDefines;

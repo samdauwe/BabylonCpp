@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_TEXTURES_RENDER_TARGET_TEXTURE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
@@ -160,8 +159,8 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example: https://www.babylonjs-playground.com/#RNASML
    */
-  virtual void set_boundingBoxSize(const Nullable<Vector3>& value) override;
-  virtual Nullable<Vector3>& get_boundingBoxSize() override;
+  virtual void set_boundingBoxSize(const nullable_t<Vector3>& value) override;
+  virtual nullable_t<Vector3>& get_boundingBoxSize() override;
 
   /** Events **/
   void set_onAfterUnbind(
@@ -214,7 +213,7 @@ public:
     customRenderFunction;
   bool useCameraPostProcesses;
   bool ignoreCameraViewport;
-  Nullable<Color4> clearColor;
+  nullable_t<Color4> clearColor;
   bool _generateMipMaps;
   vector_t<string_t> _waitingRenderList;
   // ::std::function<void()> onAfterRender;
@@ -305,7 +304,7 @@ private:
   Observer<Engine>::Ptr _onClearObserver;
   // Properties
   int _faceIndex;
-  Nullable<Vector3> _boundingBoxSize;
+  nullable_t<Vector3> _boundingBoxSize;
 
 }; // end of class RenderTargetTexture
 

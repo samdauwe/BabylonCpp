@@ -51,11 +51,12 @@ void LightsScene::initializeScene(ICanvas* canvas, Scene* scene)
     // Create light sphere
     auto lightSphere = Mesh::CreateSphere(
       String::concat("Sphere", _lightSpheres.size()), 16, 0.5f, _scene.get());
-    lightSphere->material = StandardMaterial::New(
+    auto lightSphereMaterial = StandardMaterial::New(
       String::concat("mat", _lightSpheres.size()), _scene.get());
-    lightSphere->material()->setDiffuseColor(Color3::Black());
-    lightSphere->material()->setSpecularColor(Color3::Black());
-    lightSphere->material()->setEmissiveColor(color);
+    lightSphereMaterial->diffuseColor  = Color3::Black();
+    lightSphereMaterial->specularColor = Color3::Black();
+    lightSphereMaterial->emissiveColor = color;
+    lightSphere->material              = lightSphereMaterial;
     // Store created object
     _lightSpheres.emplace_back(lightSphere);
   };

@@ -340,7 +340,7 @@ InternalTexture* PostProcess::activate(Camera* camera,
   }
   else {
     _scaleRatio.copyFromFloats(1.f, 1.f);
-    _engine->bindFramebuffer(target, 0u, nullptr, nullptr,
+    _engine->bindFramebuffer(target, 0u, nullopt_t, nullopt_t,
                              forceFullscreenViewport);
   }
 

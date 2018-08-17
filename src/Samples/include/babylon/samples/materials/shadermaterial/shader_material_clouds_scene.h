@@ -2,7 +2,6 @@
 #define BABYLON_SAMPLES_MATERIALS_SHADER_MATERIAL_CLOUDS_SCENE_H
 
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/materials/effect_shaders_store.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -72,7 +71,6 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  EffectShadersStore _effectShadersStore;
   FreeCamera* _camera;
   ShaderMaterial* _cloudMaterial;
   long _startTime;

@@ -13,7 +13,7 @@ DynamicTexture::DynamicTexture(const string_t& iName,
                                Scene* scene, bool generateMipMaps,
                                unsigned int samplingMode, unsigned int format)
     : Texture{nullptr, scene,   !generateMipMaps, true,  samplingMode,
-              nullptr, nullptr, nullptr,          false, format}
+              nullptr, nullptr, nullopt_t,        false, format}
     , canRescale{this, &DynamicTexture::get_canRescale}
     , _generateMipMaps{generateMipMaps}
 {
@@ -95,7 +95,7 @@ void DynamicTexture::clear()
 void DynamicTexture::update(bool invertY, bool premulAlpha)
 {
   _engine->updateDynamicTexture(_texture, _canvas, invertY, premulAlpha,
-                                _format);
+                                *_format);
 }
 
 void DynamicTexture::drawText(const string_t& text, int x, int y,

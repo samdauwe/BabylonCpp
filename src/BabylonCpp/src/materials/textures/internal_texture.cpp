@@ -20,6 +20,7 @@ constexpr unsigned int InternalTexture::DATASOURCE_CUBERAW;
 constexpr unsigned int InternalTexture::DATASOURCE_CUBEPREFILTERED;
 constexpr unsigned int InternalTexture::DATASOURCE_RAW3D;
 constexpr unsigned int InternalTexture::DATASOURCE_DEPTHTEXTURE;
+constexpr unsigned int InternalTexture::DATASOURCE_CUBERAW_RGBD;
 
 InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     : isCube{false}

@@ -3,6 +3,7 @@
 #include <babylon/cameras/free_camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/lights/hemispheric_light.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/mesh/mesh.h>
@@ -16,14 +17,11 @@ ShaderMaterialLuminescenceScene::ShaderMaterialLuminescenceScene(
   ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _time{0.f}, _shaderMaterial{nullptr}
 {
-  // Reference to the shaders contained in the shader store
-  auto& shaders = _effectShadersStore.shaders();
-
   // Vertex shader
-  shaders["customVertexShader"] = customVertexShader;
+  Effect::ShadersStore["customVertexShader"] = customVertexShader;
 
   // Fragment shader
-  shaders["customFragmentShader"] = customFragmentShader;
+  Effect::ShadersStore["customFragmentShader"] = customFragmentShader;
 }
 
 ShaderMaterialLuminescenceScene::~ShaderMaterialLuminescenceScene()

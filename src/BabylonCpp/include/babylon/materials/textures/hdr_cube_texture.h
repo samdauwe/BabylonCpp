@@ -77,7 +77,7 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example https://www.babylonjs-playground.com/#RNASML
    */
-  void set_boundingBoxSize(const Nullable<Vector3>& value) override;
+  void set_boundingBoxSize(const nullable_t<Vector3>& value) override;
 
   /**
    * @brief Gets the size of the bounding box associated with the cube texture.
@@ -86,7 +86,7 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example https://www.babylonjs-playground.com/#RNASML
    */
-  Nullable<Vector3>& get_boundingBoxSize() override;
+  nullable_t<Vector3>& get_boundingBoxSize() override;
 
 private:
   /**
@@ -141,7 +141,7 @@ private:
   ::std::function<void()> _onLoad;
   ::std::function<void(const string_t& message, const string_t& exception)>
     _onError;
-  Nullable<Vector3> _boundingBoxSize;
+  nullable_t<Vector3> _boundingBoxSize;
 
 }; // end of class HDRCubeTexture
 

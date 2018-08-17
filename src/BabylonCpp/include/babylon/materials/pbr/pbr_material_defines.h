@@ -123,18 +123,19 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
   static constexpr unsigned int EXPOSURE                   = 89;
 
   static constexpr unsigned int USEPHYSICALLIGHTFALLOFF = 90;
-  static constexpr unsigned int TWOSIDEDLIGHTING        = 91;
-  static constexpr unsigned int SHADOWFLOAT             = 92;
-  static constexpr unsigned int CLIPPLANE               = 93;
-  static constexpr unsigned int POINTSIZE               = 94;
-  static constexpr unsigned int FOG                     = 95;
-  static constexpr unsigned int LOGARITHMICDEPTH        = 96;
+  static constexpr unsigned int USEGLTFLIGHTFALLOFF     = 91;
+  static constexpr unsigned int TWOSIDEDLIGHTING        = 92;
+  static constexpr unsigned int SHADOWFLOAT             = 93;
+  static constexpr unsigned int CLIPPLANE               = 94;
+  static constexpr unsigned int POINTSIZE               = 95;
+  static constexpr unsigned int FOG                     = 96;
+  static constexpr unsigned int LOGARITHMICDEPTH        = 97;
 
-  static constexpr unsigned int FORCENORMALFORWARD = 97;
+  static constexpr unsigned int FORCENORMALFORWARD = 98;
 
-  static constexpr unsigned int SPECULARAA = 98;
+  static constexpr unsigned int SPECULARAA = 99;
 
-  static constexpr unsigned int UNLIT = 99;
+  static constexpr unsigned int UNLIT = 100;
 
   /**
    * @brief Initializes the PBR Material defines.

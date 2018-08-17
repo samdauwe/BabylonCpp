@@ -2,7 +2,6 @@
 #define BABYLON_SAMPLES_MATERIALS_SHADER_MATERIAL_CYLINDERS_SCENE_H
 
 #include <babylon/interfaces/irenderable_scene.h>
-#include <babylon/materials/effect_shaders_store.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -672,7 +671,6 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  EffectShadersStore _effectShadersStore;
   float _time;
   std::array<ShaderMaterial*, 9> _shaderMaterials;
 

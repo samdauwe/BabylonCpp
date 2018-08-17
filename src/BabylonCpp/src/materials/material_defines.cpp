@@ -73,6 +73,9 @@ void MaterialDefines::resizeLights(unsigned int lightIndex)
       shadowhighqualities.emplace_back(false);
       lightmapexcluded.emplace_back(false);
       lightmapnospecular.emplace_back(false);
+      lightfalloffphysicals.emplace_back(false);
+      lightfalloffgltfs.emplace_back(false);
+      lightfalloffstandards.emplace_back(false);
     }
   }
 }
@@ -210,6 +213,24 @@ std::ostream& operator<<(std::ostream& os,
     }
   }
 
+  for (size_t i = 0; i < materialDefines.lightfalloffphysicals.size(); ++i) {
+    if (materialDefines.lightfalloffphysicals[i]) {
+      os << "#define LIGHT_FALLOFF_PHYSICAL" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.lightfalloffgltfs.size(); ++i) {
+    if (materialDefines.lightfalloffgltfs[i]) {
+      os << "#define LIGHT_FALLOFF_GLTF" << i << "\n";
+    }
+  }
+
+  for (size_t i = 0; i < materialDefines.lightfalloffstandards.size(); ++i) {
+    if (materialDefines.lightfalloffstandards[i]) {
+      os << "#define LIGHT_FALLOFF_STANDARD" << i << "\n";
+    }
+  }
+
   // The direct UV channel to use
   os << "#define DIFFUSEDIRECTUV " << materialDefines.DIFFUSEDIRECTUV << "\n";
   os << "#define AMBIENTDIRECTUV " << materialDefines.AMBIENTDIRECTUV << "\n";
@@ -334,7 +355,10 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
       || (shadowmediumqualities.size() != other.shadowmediumqualities.size())
       || (shadowhighqualities.size() != other.shadowhighqualities.size())
       || (lightmapexcluded.size() != other.lightmapexcluded.size())
-      || (lightmapnospecular.size() != other.lightmapnospecular.size())) {
+      || (lightmapnospecular.size() != other.lightmapnospecular.size())
+      || (lightfalloffphysicals.size() != other.lightfalloffphysicals.size())
+      || (lightfalloffgltfs.size() != other.lightfalloffgltfs.size())
+      || (lightfalloffstandards.size() != other.lightfalloffstandards.size())) {
     return false;
   }
 
@@ -482,6 +506,24 @@ bool MaterialDefines::isEqual(const MaterialDefines& other) const
     }
   }
 
+  for (size_t i = 0; i < lightfalloffphysicals.size(); ++i) {
+    if (lightfalloffphysicals[i] != other.lightfalloffphysicals[i]) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < lightfalloffgltfs.size(); ++i) {
+    if (lightfalloffgltfs[i] != other.lightfalloffgltfs[i]) {
+      return false;
+    }
+  }
+
+  for (size_t i = 0; i < lightfalloffstandards.size(); ++i) {
+    if (lightfalloffstandards[i] != other.lightfalloffstandards[i]) {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -534,6 +576,9 @@ void MaterialDefines::cloneTo(MaterialDefines& other)
   other.shadowhighqualities   = shadowhighqualities;
   other.lightmapexcluded      = lightmapexcluded;
   other.lightmapnospecular    = lightmapnospecular;
+  other.lightfalloffphysicals = lightfalloffphysicals;
+  other.lightfalloffgltfs     = lightfalloffgltfs;
+  other.lightfalloffstandards = lightfalloffstandards;
 }
 
 void MaterialDefines::reset()
@@ -586,6 +631,9 @@ void MaterialDefines::reset()
   shadowhighqualities.clear();
   lightmapexcluded.clear();
   lightmapnospecular.clear();
+  lightfalloffphysicals.clear();
+  lightfalloffgltfs.clear();
+  lightfalloffstandards.clear();
 }
 
 string_t MaterialDefines::toString() const

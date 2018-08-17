@@ -406,12 +406,6 @@ public:
 
   void addMaterialToScene(unique_ptr_t<Material>&& newMaterial);
   void addMultiMaterialToScene(unique_ptr_t<MultiMaterial>&& newMultiMaterial);
-  virtual bool useLogarithmicDepth() const;
-  virtual void setUseLogarithmicDepth(bool value);
-  virtual void setAmbientColor(const Color3& color);
-  virtual void setDiffuseColor(const Color3& color);
-  virtual void setSpecularColor(const Color3& color);
-  virtual void setEmissiveColor(const Color3& color);
   virtual vector_t<Animation*> getAnimations() override;
   void copyTo(Material* other) const;
 
@@ -471,10 +465,20 @@ protected:
   set_onDispose(const ::std::function<void(Material*, EventState&)>& callback);
 
   /**
+   * @brief An event triggered when the material is bound.
+   */
+  Observable<AbstractMesh>& get_onBindObservable();
+
+  /**
    * @brief Called during a bind event.
    */
   void
   set_onBind(const ::std::function<void(AbstractMesh*, EventState&)>& callback);
+
+  /**
+   * @brief An event triggered when the material is unbound.
+   */
+  Observable<Material>& get_onUnBindObservable();
 
   /**
    * @brief Sets the value of the alpha mode.
@@ -551,6 +555,16 @@ protected:
    */
   unsigned int get_fillMode() const;
 
+  /**
+   * @brief Gets the logarithmic depth setting.
+   */
+  virtual bool get_useLogarithmicDepth() const;
+
+  /**
+   * @brief Sets the logarithmic depth setting.
+   */
+  virtual void set_useLogarithmicDepth(bool value);
+
 protected:
   /**
    * @brief Specifies if material alpha testing should be turned on for the
@@ -624,14 +638,6 @@ public:
    * An event triggered when the material is disposed
    */
   Observable<Material> onDisposeObservable;
-  /**
-   * An event triggered when the material is bound
-   */
-  Observable<AbstractMesh> onBindObservable;
-  /**
-   * An event triggered when the material is unbound
-   */
-  Observable<Material> onUnBindObservable;
 
   /**
    * The ID of the material
@@ -710,10 +716,20 @@ public:
     onDispose;
 
   /**
+   * An event triggered when the material is bound
+   */
+  ReadOnlyProperty<Material, Observable<AbstractMesh>> onBindObservable;
+
+  /**
    * Called during a bind event
    */
   WriteOnlyProperty<Material, ::std::function<void(AbstractMesh*, EventState&)>>
     onBind;
+
+  /**
+   * An event triggered when the material is unbound
+   */
+  ReadOnlyProperty<Material, Observable<Material>> onUnBindObservable;
 
   /**
    * The value of the alpha mode
@@ -780,6 +796,11 @@ public:
    */
   bool _wasPreviouslyReady;
 
+  /**
+   * The logarithmic depth setting.
+   */
+  Property<Material, bool> useLogarithmicDepth;
+
 protected:
   /**
    * The alpha value of the material
@@ -801,6 +822,9 @@ private:
    * An observer which watches for dispose events
    */
   Observer<Material>::Ptr _onDisposeObserver;
+
+  Observable<Material> _onUnBindObservable;
+  Observable<AbstractMesh> _onBindObservable;
 
   /**
    * An observer which watches for bind events

@@ -17,7 +17,7 @@ EngineInstrumentation::EngineInstrumentation(Engine* engine)
                                      set_captureShaderCompilationTime}
     , _engine{engine}
     , _captureGPUFrameTime{false}
-    , _gpuFrameTimeToken{nullptr}
+    , _gpuFrameTimeToken{nullopt_t}
     , _captureShaderCompilationTime{false}
     , _onBeginFrameObserver{nullptr}
     , _onEndFrameObserver{nullptr}
@@ -64,7 +64,7 @@ void EngineInstrumentation::set_captureGPUFrameTime(bool value)
         auto time = _engine->endTimeQuery(_gpuFrameTimeToken);
 
         if (time > -1) {
-          _gpuFrameTimeToken = nullptr;
+          _gpuFrameTimeToken = nullopt_t;
           _gpuFrameTime.fetchNewFrame();
           _gpuFrameTime.addCount(static_cast<size_t>(time), true);
         }

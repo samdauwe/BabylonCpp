@@ -508,10 +508,10 @@ ICanvas* Engine::getRenderingCanvas()
   return _renderingCanvas;
 }
 
-Nullable<ClientRect> Engine::getRenderingCanvasClientRect()
+nullable_t<ClientRect> Engine::getRenderingCanvasClientRect()
 {
   if (!_renderingCanvas) {
-    return nullptr;
+    return nullopt_t;
   }
 
   return _renderingCanvas->getBoundingClientRect();
@@ -545,12 +545,12 @@ size_t Engine::drawCalls() const
   return 0;
 }
 
-Nullable<PerfCounter> Engine::drawCallsPerfCounter()
+nullable_t<PerfCounter> Engine::drawCallsPerfCounter()
 {
   BABYLON_LOG_WARN("Engine",
                    "drawCallsPerfCounter is deprecated. Please use "
                    "SceneInstrumentation class");
-  return nullptr;
+  return nullopt_t;
 }
 
 // Methods
@@ -944,10 +944,10 @@ void Engine::_getVRDisplays()
 }
 
 void Engine::bindFramebuffer(InternalTexture* texture,
-                             Nullable<unsigned int> faceIndex,
-                             Nullable<int> requiredWidth,
-                             Nullable<int> requiredHeight,
-                             Nullable<bool> forceFullscreenViewport,
+                             nullable_t<unsigned int> faceIndex,
+                             nullable_t<int> requiredWidth,
+                             nullable_t<int> requiredHeight,
+                             nullable_t<bool> forceFullscreenViewport,
                              InternalTexture* depthStencilTexture, int lodLevel)
 {
   if (_currentRenderTarget) {
@@ -958,7 +958,7 @@ void Engine::bindFramebuffer(InternalTexture* texture,
                            texture->_MSAAFramebuffer.get() :
                            texture->_framebuffer.get());
   if (texture->isCube) {
-    if (faceIndex.isNull()) {
+    if (!faceIndex.has_value()) {
       faceIndex = 0u;
     }
     _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
@@ -968,25 +968,27 @@ void Engine::bindFramebuffer(InternalTexture* texture,
     if (depthStencilTexture) {
       if (depthStencilTexture->_generateStencilBuffer) {
         _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_STENCIL_ATTACHMENT,
-                                  GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+                                  GL::TEXTURE_CUBE_MAP_POSITIVE_X + *faceIndex,
                                   depthStencilTexture->_webGLTexture.get(),
                                   lodLevel);
       }
       else {
         _gl->framebufferTexture2D(GL::FRAMEBUFFER, GL::DEPTH_ATTACHMENT,
-                                  GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex,
+                                  GL::TEXTURE_CUBE_MAP_POSITIVE_X + *faceIndex,
                                   depthStencilTexture->_webGLTexture.get(),
                                   lodLevel);
       }
     }
   }
 
-  if (_cachedViewport && !forceFullscreenViewport) {
-    setViewport(*_cachedViewport, requiredWidth, requiredHeight);
+  if (_cachedViewport && !forceFullscreenViewport
+      && requiredHeight.has_value()) {
+    setViewport(*_cachedViewport, *requiredWidth, *requiredHeight);
   }
   else {
     _gl->viewport(0, 0, requiredWidth ? *requiredWidth : texture->width,
-                  requiredHeight ? *requiredHeight : texture->height);
+                  requiredHeight.has_value() ? *requiredHeight :
+                                               texture->height);
   }
 
   wipeCaches();
@@ -2011,7 +2013,7 @@ void Engine::enableEffect(Effect* effect)
   if (effect->onBind) {
     effect->onBind(effect);
   }
-  effect->onBindObservable.notifyObservers(effect);
+  effect->onBindObservable().notifyObservers(effect);
 }
 
 void Engine::setIntArray(GL::IGLUniformLocation* uniform,
@@ -2476,8 +2478,8 @@ InternalTexture* Engine::createTexture(
   unsigned int samplingMode,
   const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
   const ::std::function<void()>& onError,
-  const Nullable<Variant<ArrayBuffer, Image>>& /*buffer*/,
-  InternalTexture* fallback, const Nullable<unsigned int>& format)
+  const nullable_t<Variant<ArrayBuffer, Image>>& /*buffer*/,
+  InternalTexture* fallback, const nullable_t<unsigned int>& format)
 {
   // assign a new string, so that the original is still available in case of
   // fallback
@@ -3959,7 +3961,7 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
 
 void Engine::_prepareWebGLTexture(
   InternalTexture* texture, Scene* scene, int width, int height,
-  Nullable<bool> invertY, bool noMipmap, bool isCompressed,
+  nullable_t<bool> invertY, bool noMipmap, bool isCompressed,
   const ::std::function<
     bool(int width, int height,
          const ::std::function<void()>& continuationCallback)>& processFunction,
@@ -3987,7 +3989,7 @@ void Engine::_prepareWebGLTexture(
 
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
   _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL,
-                   invertY.isNull() ? 1 : (*invertY ? 1 : 0));
+                   !invertY.has_value() ? 1 : (*invertY ? 1 : 0));
 
   texture->baseWidth  = width;
   texture->baseHeight = height;
@@ -4970,7 +4972,7 @@ GL::GLenum Engine::_getWebGLTextureType(unsigned int type) const
 }
 
 GL::GLenum Engine::_getRGBABufferInternalSizedFormat(
-  unsigned int type, const Nullable<unsigned int>& format) const
+  unsigned int type, const nullable_t<unsigned int>& format) const
 {
   if (_webGLVersion == 1.f) {
     if (format) {
@@ -5079,12 +5081,12 @@ Engine& Engine::endOcclusionQuery(unsigned int algorithmType)
   return *this;
 }
 
-Nullable<_TimeToken> Engine::startTimeQuery()
+nullable_t<_TimeToken> Engine::startTimeQuery()
 {
-  return nullptr;
+  return nullopt_t;
 }
 
-int Engine::endTimeQuery(Nullable<_TimeToken>& /*token*/)
+int Engine::endTimeQuery(nullable_t<_TimeToken>& /*token*/)
 {
   return -1;
 }

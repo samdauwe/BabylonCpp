@@ -1,6 +1,7 @@
 #include <babylon/samples/materials/shadermaterial/shader_material_warp_speed_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/mesh/mesh.h>
@@ -11,14 +12,11 @@ namespace Samples {
 ShaderMaterialWarpSpeedScene::ShaderMaterialWarpSpeedScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _time{0.f}, _shaderMaterial{nullptr}
 {
-  // Reference to the shaders contained in the shader store
-  auto& shaders = _effectShadersStore.shaders();
-
   // Vertex shader
-  shaders["customVertexShader"] = customVertexShader;
+  Effect::ShadersStore["customVertexShader"] = customVertexShader;
 
   // Fragment shader
-  shaders["customFragmentShader"] = customFragmentShader;
+  Effect::ShadersStore["customFragmentShader"] = customFragmentShader;
 }
 
 ShaderMaterialWarpSpeedScene::~ShaderMaterialWarpSpeedScene()

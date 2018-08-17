@@ -151,6 +151,11 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   vector_t<bool> lightmapexcluded;
   vector_t<bool> lightmapnospecular;
 
+  // FallOff
+  vector_t<bool> lightfalloffphysicals;
+  vector_t<bool> lightfalloffgltfs;
+  vector_t<bool> lightfalloffstandards;
+
   bool USERIGHTHANDEDSYSTEM;
 
   bool _isDirty;

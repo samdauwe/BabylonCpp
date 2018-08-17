@@ -52,9 +52,10 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
   ground->material = groundMaterial;
 
   // Sphere to see the light's position
-  _sun           = Mesh::CreateSphere("sun", 10, 4, scene);
-  _sun->material = StandardMaterial::New("sun", scene);
-  _sun->material()->setEmissiveColor(Color3(1.f, 1.f, 0.f));
+  _sun                        = Mesh::CreateSphere("sun", 10, 4, scene);
+  auto _sunMaterial           = StandardMaterial::New("sun", scene);
+  _sunMaterial->emissiveColor = Color3(1.f, 1.f, 0.f);
+  _sun->material              = _sunMaterial;
 
   // Skybox
   auto skybox                     = Mesh::CreateBox("skyBox", 800.f, scene);

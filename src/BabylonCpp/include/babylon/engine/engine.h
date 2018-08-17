@@ -233,7 +233,7 @@ public:
    * webGL context.
    * @returns a client rectanglee
    */
-  Nullable<ClientRect> getRenderingCanvasClientRect();
+  nullable_t<ClientRect> getRenderingCanvasClientRect();
 
   /**
    * @brief Defines the hardware scaling level.
@@ -275,7 +275,7 @@ public:
   /**
    * @brief Hidden
    */
-  Nullable<PerfCounter> drawCallsPerfCounter();
+  nullable_t<PerfCounter> drawCallsPerfCounter();
 
   /** Methods **/
 
@@ -557,12 +557,12 @@ public:
    * @param lodLevel defines le lod level to bind to the frame buffer
    */
   void bindFramebuffer(InternalTexture* texture,
-                       Nullable<unsigned int> faceIndex       = nullptr,
-                       Nullable<int> requiredWidth            = nullptr,
-                       Nullable<int> requiredHeight           = nullptr,
-                       Nullable<bool> forceFullscreenViewport = nullptr,
-                       InternalTexture* depthStencilTexture   = nullptr,
-                       int lodLevel                           = 0);
+                       nullable_t<unsigned int> faceIndex       = nullopt_t,
+                       nullable_t<int> requiredWidth            = nullopt_t,
+                       nullable_t<int> requiredHeight           = nullopt_t,
+                       nullable_t<bool> forceFullscreenViewport = nullopt_t,
+                       InternalTexture* depthStencilTexture     = nullptr,
+                       int lodLevel                             = 0);
 
   /**
    * @brief Unbind the current render target texture from the webGL context.
@@ -1387,10 +1387,10 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
-    const ::std::function<void()>& onError              = nullptr,
-    const Nullable<Variant<ArrayBuffer, Image>>& buffer = nullptr,
-    InternalTexture* fallBack                           = nullptr,
-    const Nullable<unsigned int>& format                = nullptr);
+    const ::std::function<void()>& onError                = nullptr,
+    const nullable_t<Variant<ArrayBuffer, Image>>& buffer = nullopt_t,
+    InternalTexture* fallBack                             = nullptr,
+    const nullable_t<unsigned int>& format                = nullopt_t);
 
   /**
    * @brief Update a raw texture.
@@ -1929,8 +1929,10 @@ public:
   /**
    * @brief Hidden
    */
-  GL::GLenum _getRGBABufferInternalSizedFormat(
-    unsigned int type, const Nullable<unsigned int>& format = nullptr) const;
+  GL::GLenum
+  _getRGBABufferInternalSizedFormat(unsigned int type,
+                                    const nullable_t<unsigned int>& format
+                                    = nullopt_t) const;
 
   /**
    * @brief Hidden
@@ -1992,14 +1994,14 @@ public:
    * specific frame). Please note that only one query can be issued at a time
    * @returns a time token used to track the time span
    */
-  Nullable<_TimeToken> startTimeQuery();
+  nullable_t<_TimeToken> startTimeQuery();
 
   /**
    * @brief Ends a time query.
    * @param token defines the token used to measure the time span
    * @returns the time spent (in ns)
    */
-  int endTimeQuery(Nullable<_TimeToken>& token);
+  int endTimeQuery(nullable_t<_TimeToken>& token);
 
   /** Transform feedback **/
 
@@ -2206,7 +2208,7 @@ private:
                                         unsigned int samplingMode);
   void _prepareWebGLTexture(
     InternalTexture* texture, Scene* scene, int width, int height,
-    Nullable<bool> invertY, bool noMipmap, bool isCompressed,
+    nullable_t<bool> invertY, bool noMipmap, bool isCompressed,
     const ::std::function<bool(
       int width, int height,
       const ::std::function<void()>& continuationCallback)>& processFunction,

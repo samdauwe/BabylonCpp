@@ -88,8 +88,8 @@ protected:
 
   virtual bool get_isBlocking() const;
   virtual void set_isBlocking(bool value);
-  virtual void set_boundingBoxSize(const Nullable<Vector3>& value);
-  virtual Nullable<Vector3>& get_boundingBoxSize();
+  virtual void set_boundingBoxSize(const nullable_t<Vector3>& value);
+  virtual nullable_t<Vector3>& get_boundingBoxSize();
   float get_lodGenerationOffset() const;
   void set_lodGenerationOffset(float value);
   float get_lodGenerationScale() const;
@@ -178,7 +178,7 @@ public:
   /**
    * Size of the bounding box associated with the texture (when in cube mode)
    */
-  Property<BaseTexture, Nullable<Vector3>> boundingBoxSize;
+  Property<BaseTexture, nullable_t<Vector3>> boundingBoxSize;
 
 private:
   bool _hasAlpha;
@@ -188,7 +188,7 @@ private:
   Observer<BaseTexture>::Ptr _onDisposeObserver;
   Matrix _textureMatrix;
   Matrix _reflectionTextureMatrix;
-  Nullable<Vector3> emptyVector3;
+  nullable_t<Vector3> emptyVector3;
   ISize _cachedSize;
 
 }; // end of class BaseTexture

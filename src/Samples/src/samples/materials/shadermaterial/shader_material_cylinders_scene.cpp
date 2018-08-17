@@ -3,6 +3,7 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/point_light.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/mesh/mesh.h>
@@ -14,30 +15,27 @@ namespace Samples {
 ShaderMaterialCylindersScene::ShaderMaterialCylindersScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _time{0.f}
 {
-  // Reference to the shaders contained in the shader store
-  auto& shaders = _effectShadersStore.shaders();
-
   // Vertex shaders
-  shaders["custom1VertexShader"] = customVertexShader;
-  shaders["custom2VertexShader"] = customVertexShader;
-  shaders["custom3VertexShader"] = customVertexShader;
-  shaders["custom4VertexShader"] = customVertexShader;
-  shaders["custom5VertexShader"] = customVertexShader;
-  shaders["custom6VertexShader"] = customVertexShader;
-  shaders["custom7VertexShader"] = customVertexShader;
-  shaders["custom8VertexShader"] = customVertexShader;
-  shaders["custom9VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom1VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom2VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom3VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom4VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom5VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom6VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom7VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom8VertexShader"] = customVertexShader;
+  Effect::ShadersStore["custom9VertexShader"] = customVertexShader;
 
   // Fragment shaders
-  shaders["custom1FragmentShader"] = custom1FragmentShader;
-  shaders["custom2FragmentShader"] = custom2FragmentShader;
-  shaders["custom3FragmentShader"] = custom3FragmentShader;
-  shaders["custom4FragmentShader"] = custom4FragmentShader;
-  shaders["custom5FragmentShader"] = custom5FragmentShader;
-  shaders["custom6FragmentShader"] = custom6FragmentShader;
-  shaders["custom7FragmentShader"] = custom7FragmentShader;
-  shaders["custom8FragmentShader"] = custom8FragmentShader;
-  shaders["custom9FragmentShader"] = custom9FragmentShader;
+  Effect::ShadersStore["custom1FragmentShader"] = custom1FragmentShader;
+  Effect::ShadersStore["custom2FragmentShader"] = custom2FragmentShader;
+  Effect::ShadersStore["custom3FragmentShader"] = custom3FragmentShader;
+  Effect::ShadersStore["custom4FragmentShader"] = custom4FragmentShader;
+  Effect::ShadersStore["custom5FragmentShader"] = custom5FragmentShader;
+  Effect::ShadersStore["custom6FragmentShader"] = custom6FragmentShader;
+  Effect::ShadersStore["custom7FragmentShader"] = custom7FragmentShader;
+  Effect::ShadersStore["custom8FragmentShader"] = custom8FragmentShader;
+  Effect::ShadersStore["custom9FragmentShader"] = custom9FragmentShader;
 }
 
 ShaderMaterialCylindersScene::~ShaderMaterialCylindersScene()

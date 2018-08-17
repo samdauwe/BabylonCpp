@@ -33,11 +33,11 @@ void SimplePineScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Material declarations
-  auto trunkMaterial = StandardMaterial::New("woodMaterial", scene);
-  trunkMaterial->setDiffuseColor(Color3::FromInts(102, 51, 0));
+  auto trunkMaterial          = StandardMaterial::New("woodMaterial", scene);
+  trunkMaterial->diffuseColor = Color3::FromInts(102, 51, 0);
 
-  auto leafMaterial = StandardMaterial::New("leafMaterial", scene);
-  leafMaterial->setDiffuseColor(Color3(0.5f, 1.f, 0.5f));
+  auto leafMaterial          = StandardMaterial::New("leafMaterial", scene);
+  leafMaterial->diffuseColor = Color3(0.5f, 1.f, 0.5f);
 
   // Create a light
   auto light

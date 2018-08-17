@@ -51,9 +51,9 @@ void CrowdSimulationScene09::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create the ground material
   auto groundMaterial = StandardMaterial::New("groundMaterial", scene);
-  groundMaterial->setEmissiveColor(Color3::Black());
-  groundMaterial->setSpecularColor(Color3::Black());
-  groundMaterial->setDiffuseColor(Color3(0.36f, 0.36f, 0.36f));
+  groundMaterial->emissiveColor = Color3::Black();
+  groundMaterial->specularColor = Color3::Black();
+  groundMaterial->diffuseColor  = Color3(0.36f, 0.36f, 0.36f);
 
   // Create the ground
   auto ground            = Mesh::CreateBox("ground", 600.f, scene);

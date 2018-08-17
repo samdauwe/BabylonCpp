@@ -47,7 +47,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
     , _reflectionTextureMatrix{Matrix::IdentityReadOnly()}
-    , emptyVector3{nullptr}
+    , emptyVector3{nullopt_t}
     , _cachedSize{Size::Zero()}
 {
 }
@@ -283,11 +283,11 @@ void BaseTexture::delayLoad()
 {
 }
 
-void BaseTexture::set_boundingBoxSize(const Nullable<Vector3>& /*value*/)
+void BaseTexture::set_boundingBoxSize(const nullable_t<Vector3>& /*value*/)
 {
 }
 
-Nullable<Vector3>& BaseTexture::get_boundingBoxSize()
+nullable_t<Vector3>& BaseTexture::get_boundingBoxSize()
 {
   return emptyVector3;
 }
@@ -461,7 +461,7 @@ void BaseTexture::WhenAllReady(const vector_t<BaseTexture*>& textures,
     }
     else {
       auto onLoadObservable
-        = *(static_cast<Texture*>(texture))->onLoadObservable();
+        = static_cast<Texture*>(texture)->onLoadObservable();
 
       const ::std::function<void(Texture*, EventState&)> onLoadCallback
         = [&](Texture*, EventState&) {

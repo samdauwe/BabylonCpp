@@ -41,7 +41,7 @@ HDRCubeTexture::HDRCubeTexture(
     , _size{size}
     , _onLoad{onLoad}
     , _onError{onError}
-    , _boundingBoxSize{nullptr}
+    , _boundingBoxSize{nullopt_t}
 {
   if (iUrl.empty()) {
     return;
@@ -96,7 +96,7 @@ float HDRCubeTexture::get_rotationY() const
   return _rotationY;
 }
 
-void HDRCubeTexture::set_boundingBoxSize(const Nullable<Vector3>& value)
+void HDRCubeTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
 {
   if (!value) {
     return;
@@ -112,7 +112,7 @@ void HDRCubeTexture::set_boundingBoxSize(const Nullable<Vector3>& value)
   }
 }
 
-Nullable<Vector3>& HDRCubeTexture::get_boundingBoxSize()
+nullable_t<Vector3>& HDRCubeTexture::get_boundingBoxSize()
 {
   return _boundingBoxSize;
 }

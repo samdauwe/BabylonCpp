@@ -13,14 +13,11 @@ namespace Samples {
 ShaderMaterialWithFogScene::ShaderMaterialWithFogScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
 {
-  // Reference to the shaders contained in the shader store
-  auto& shaders = _effectShadersStore.shaders();
-
   // Vertex shader
-  shaders["customVertexShader"] = customVertexShader;
+  Effect::ShadersStore["customVertexShader"] = customVertexShader;
 
   // Fragment shader
-  shaders["customFragmentShader"] = customFragmentShader;
+  Effect::ShadersStore["customFragmentShader"] = customFragmentShader;
 }
 
 ShaderMaterialWithFogScene::~ShaderMaterialWithFogScene()

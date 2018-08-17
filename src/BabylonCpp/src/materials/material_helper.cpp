@@ -253,24 +253,23 @@ bool MaterialHelper::PrepareDefinesForLights(
       defines.pointlights[lightIndex] = false;
       defines.dirlights[lightIndex]   = false;
 
-      if (light->getTypeID() == Light::LIGHTTYPEID_SPOTLIGHT) {
-        defines.spotlights[lightIndex] = true;
-        if (auto spotLight = static_cast<SpotLight*>(light)) {
-          if (lightIndex >= defines.projectedLightTexture.size()) {
-            defines.projectedLightTexture.resize(lightIndex + 1);
-          }
-          defines.projectedLightTexture[lightIndex]
-            = spotLight->projectionTexture() ? true : false;
-        }
-      }
-      else if (light->getTypeID() == Light::LIGHTTYPEID_HEMISPHERICLIGHT) {
-        defines.hemilights[lightIndex] = true;
-      }
-      else if (light->getTypeID() == Light::LIGHTTYPEID_POINTLIGHT) {
-        defines.pointlights[lightIndex] = true;
-      }
-      else {
-        defines.dirlights[lightIndex] = true;
+      light->prepareLightSpecificDefines(defines, lightIndex);
+
+      // FallOff.
+      defines.lightfalloffphysicals[lightIndex] = false;
+      defines.lightfalloffgltfs[lightIndex]     = false;
+      defines.lightfalloffstandards[lightIndex] = false;
+
+      switch (light->falloffType) {
+        case Light::FALLOFF_GLTF:
+          defines.lightfalloffgltfs[lightIndex] = true;
+          break;
+        case Light::FALLOFF_PHYSICAL:
+          defines.lightfalloffphysicals[lightIndex] = true;
+          break;
+        case Light::FALLOFF_STANDARD:
+          defines.lightfalloffstandards[lightIndex] = true;
+          break;
       }
 
       // Specular
@@ -290,10 +289,15 @@ bool MaterialHelper::PrepareDefinesForLights(
 
       if (mesh && mesh->receiveShadows() && scene->shadowsEnabled()
           && light->shadowEnabled) {
-        auto shadowGenerator = light->getShadowGenerator();
+        const auto& shadowGenerator = light->getShadowGenerator();
         if (shadowGenerator) {
-          shadowEnabled = true;
-          shadowGenerator->prepareDefines(defines, lightIndex);
+          const auto& shadowMap = shadowGenerator->getShadowMap();
+          if (shadowMap) {
+            if (!shadowMap->renderList.empty()) {
+              shadowEnabled = true;
+              shadowGenerator->prepareDefines(defines, lightIndex);
+            }
+          }
         }
       }
 
@@ -362,6 +366,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
                        "vLightDiffuse" + lightIndexStr,   //
                        "vLightSpecular" + lightIndexStr,  //
                        "vLightDirection" + lightIndexStr, //
+                       "vLightFalloff" + lightIndexStr,   //
                        "vLightGround" + lightIndexStr,    //
                        "lightMatrix" + lightIndexStr,     //
                        "shadowsInfo" + lightIndexStr,     //

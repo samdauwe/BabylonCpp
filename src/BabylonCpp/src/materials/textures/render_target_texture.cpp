@@ -52,7 +52,7 @@ RenderTargetTexture::RenderTargetTexture(
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
     , _onClearObserver{nullptr}
-    , _boundingBoxSize{nullptr}
+    , _boundingBoxSize{nullopt_t}
 {
   if (!scene) {
     return;
@@ -111,7 +111,7 @@ void RenderTargetTexture::_onRatioRescale()
   }
 }
 
-void RenderTargetTexture::set_boundingBoxSize(const Nullable<Vector3>& value)
+void RenderTargetTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
 {
   if (_boundingBoxSize && (*_boundingBoxSize).equals(*value)) {
     return;
@@ -123,7 +123,7 @@ void RenderTargetTexture::set_boundingBoxSize(const Nullable<Vector3>& value)
   }
 }
 
-Nullable<Vector3>& RenderTargetTexture::get_boundingBoxSize()
+nullable_t<Vector3>& RenderTargetTexture::get_boundingBoxSize()
 {
   return _boundingBoxSize;
 }
@@ -557,12 +557,12 @@ void RenderTargetTexture::renderToTarget(
   else if (!useCameraPostProcess
            || !scene->postProcessManager->_prepareFrame(_texture)) {
     if (_texture) {
-      Nullable<unsigned int> faceIndexVal = nullptr;
+      nullable_t<unsigned int> faceIndexVal = nullopt_t;
       if (isCube) {
         faceIndexVal = faceIndex;
       }
       engine->bindFramebuffer(
-        _texture, faceIndexVal, nullptr, nullptr, ignoreCameraViewport,
+        _texture, faceIndexVal, nullopt_t, nullopt_t, ignoreCameraViewport,
         depthStencilTexture ? depthStencilTexture.get() : nullptr);
     }
   }
@@ -575,8 +575,8 @@ void RenderTargetTexture::renderToTarget(
     onClearObservable.notifyObservers(engine);
   }
   else {
-    engine->clear(!clearColor.isNull() ? *clearColor : scene->clearColor, true,
-                  true, true);
+    engine->clear(clearColor.has_value() ? *clearColor : scene->clearColor,
+                  true, true, true);
   }
 
   if (!_doNotChangeAspectRatio) {

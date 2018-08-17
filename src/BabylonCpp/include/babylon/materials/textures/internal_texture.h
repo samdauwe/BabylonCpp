@@ -71,6 +71,11 @@ public:
    */
   static constexpr unsigned int DATASOURCE_DEPTHTEXTURE = 11;
 
+  /**
+   * Texture data comes from a raw cube data encoded with RGBD
+   */
+  static constexpr unsigned int DATASOURCE_CUBERAW_RGBD = 12;
+
 public:
   /**
    * @brief Creates a new InternalTexture.
@@ -199,6 +204,7 @@ public:
   Variant<ArrayBuffer, Image> _buffer;
   ArrayBuffer _bufferView;
   vector_t<ArrayBuffer> _bufferViewArray;
+  vector_t<vector_t<ArrayBuffer>> _bufferViewArrayArray;
   int _size;
   string_t _extension;
   vector_t<string_t> _files;

@@ -105,7 +105,7 @@ void PostProcessManager::directRender(
     }
     else {
       if (targetTexture) {
-        engine->bindFramebuffer(targetTexture, faceIndex, nullptr, nullptr,
+        engine->bindFramebuffer(targetTexture, faceIndex, nullopt_t, nullopt_t,
                                 forceFullscreenViewport, nullptr, lodLevel);
       }
       else {

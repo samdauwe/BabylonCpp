@@ -24,12 +24,12 @@ AxisDragGizmo::AxisDragGizmo(
   auto coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   coloredMaterial->setDisableLighting(true);
-  coloredMaterial->setEmissiveColor(color);
+  coloredMaterial->emissiveColor = color;
 
   auto hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   hoverMaterial->setDisableLighting(true);
-  hoverMaterial->setEmissiveColor(color.add(Color3(0.2f, 0.2f, 0.2f)));
+  hoverMaterial->emissiveColor = color.add(Color3(0.2f, 0.2f, 0.2f));
 
   // Build mesh on root node
   auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());

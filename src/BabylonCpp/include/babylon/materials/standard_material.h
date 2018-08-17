@@ -46,13 +46,6 @@ public:
 
   IReflect::Type type() const override;
 
-  void setAmbientColor(const Color3& color) override;
-  void setDiffuseColor(const Color3& color) override;
-  void setSpecularColor(const Color3& color) override;
-  void setEmissiveColor(const Color3& color) override;
-
-  bool useLogarithmicDepth() const override;
-  void setUseLogarithmicDepth(bool value) override;
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
   BaseTexture* getAlphaTestTexture() override;
@@ -135,116 +128,6 @@ public:
   bool twoSidedLighting() const;
   void setTwoSidedLighting(bool value);
 
-  /**
-   * @brief Gets the image processing configuration used either in this
-   * material.
-   */
-  ImageProcessingConfiguration* imageProcessingConfiguration() const;
-
-  /**
-   * @brief Sets the Default image processing configuration used either in the
-   * this material.
-   *
-   * If sets to null, the scene one is in use.
-   */
-  void setImageProcessingConfiguration(ImageProcessingConfiguration* value);
-
-  /**
-   * @brief Gets whether the color curves effect is enabled.
-   */
-  bool cameraColorCurvesEnabled() const;
-
-  /**
-   * @brief Sets whether the color curves effect is enabled.
-   */
-  void setCameraColorCurvesEnabled(bool value);
-
-  /**
-   * @brief Gets wether the color grading effect is enabled.
-   */
-  bool cameraColorGradingEnabled() const;
-
-  /**
-   * @brief Gets wether the color grading effect is enabled.
-   */
-  void setCameraColorGradingEnabled(bool value);
-
-  /**
-   * @brief Gets wether tonemapping is enabled or not.
-   */
-  bool cameraToneMappingEnabled() const;
-
-  /**
-   * @brief Sets wether tonemapping is enabled or not
-   */
-  void setCameraToneMappingEnabled(bool value);
-
-  /**
-   * @brief The camera exposure used on this material.
-   * This property is here and not in the camera to allow controlling exposure
-   * without full screen post process.
-   * This corresponds to a photographic exposure.
-   */
-  float cameraExposure() const;
-
-  /**
-   * @brief The camera exposure used on this material.
-   * This property is here and not in the camera to allow controlling exposure
-   * without full screen post process.
-   * This corresponds to a photographic exposure.
-   */
-  void setCameraExposure(float value);
-
-  /**
-   * @brief Gets The camera contrast used on this material.
-   */
-  float cameraContrast() const;
-
-  /**
-   * @brief Sets The camera contrast used on this material.
-   */
-  void setCameraContrast(float value);
-
-  /**
-   * @brief Gets the Color Grading 2D Lookup Texture.
-   */
-  BaseTexture* cameraColorGradingTexture() const;
-
-  /**
-   * @brief Sets the Color Grading 2D Lookup Texture.
-   */
-  void setCameraColorGradingTexture(BaseTexture* value);
-
-  /**
-   * @brief The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
-   */
-  shared_ptr_t<ColorCurves>& cameraColorCurves() const;
-
-  /**
-   * @brief The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
-   */
-  void setCameraColorCurves(const shared_ptr_t<ColorCurves>& value);
-
   // Statics
   static StandardMaterial* Parse(const Json::value& source, Scene* scene,
                                  const string_t& rootUrl);
@@ -274,6 +157,127 @@ public:
 protected:
   StandardMaterial(const string_t& name, Scene* scene);
   StandardMaterial(const StandardMaterial& other);
+
+  /**
+   * @brief Gets the image processing configuration used either in this
+   * material.
+   */
+  ImageProcessingConfiguration*& get_imageProcessingConfiguration();
+
+  /**
+   * @brief Sets the Default image processing configuration used either in the
+   * this material.
+   *
+   * If sets to null, the scene one is in use.
+   */
+  void
+  set_imageProcessingConfiguration(ImageProcessingConfiguration* const& value);
+
+  /**
+   * @brief Gets whether the color curves effect is enabled.
+   */
+  bool get_cameraColorCurvesEnabled() const;
+
+  /**
+   * @brief Sets whether the color curves effect is enabled.
+   */
+  void set_cameraColorCurvesEnabled(bool value);
+
+  /**
+   * @brief Gets wether the color grading effect is enabled.
+   */
+  bool get_cameraColorGradingEnabled() const;
+
+  /**
+   * @brief Gets wether the color grading effect is enabled.
+   */
+  void set_cameraColorGradingEnabled(bool value);
+
+  /**
+   * @brief Gets wether tonemapping is enabled or not.
+   */
+  bool get_cameraToneMappingEnabled() const;
+
+  /**
+   * @brief Sets wether tonemapping is enabled or not
+   */
+  void set_cameraToneMappingEnabled(bool value);
+
+  /**
+   * @brief The camera exposure used on this material.
+   * This property is here and not in the camera to allow controlling exposure
+   * without full screen post process.
+   * This corresponds to a photographic exposure.
+   */
+  float get_cameraExposure() const;
+
+  /**
+   * @brief The camera exposure used on this material.
+   * This property is here and not in the camera to allow controlling exposure
+   * without full screen post process.
+   * This corresponds to a photographic exposure.
+   */
+  void set_cameraExposure(float value);
+
+  /**
+   * @brief Gets The camera contrast used on this material.
+   */
+  float get_cameraContrast() const;
+
+  /**
+   * @brief Sets The camera contrast used on this material.
+   */
+  void set_cameraContrast(float value);
+
+  /**
+   * @brief Gets the Color Grading 2D Lookup Texture.
+   */
+  BaseTexture*& get_cameraColorGradingTexture();
+
+  /**
+   * @brief Sets the Color Grading 2D Lookup Texture.
+   */
+  void set_cameraColorGradingTexture(BaseTexture* const& value);
+
+  /**
+   * @brief The color grading curves provide additional color adjustmnent that
+   * is applied after any color grading transform (3D LUT).
+   * They allow basic adjustment of saturation and small exposure adjustments,
+   * along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects.
+   * These are similar to controls found in many professional imaging or
+   * colorist software. The global controls are applied to the entire image. For
+   * advanced tuning, extra controls are provided to adjust the shadow, midtone
+   * and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas
+   * respectively.
+   */
+  shared_ptr_t<ColorCurves>& get_cameraColorCurves();
+
+  /**
+   * @brief The color grading curves provide additional color adjustmnent that
+   * is applied after any color grading transform (3D LUT).
+   * They allow basic adjustment of saturation and small exposure adjustments,
+   * along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects.
+   * These are similar to controls found in many professional imaging or
+   * colorist software. The global controls are applied to the entire image. For
+   * advanced tuning, extra controls are provided to adjust the shadow, midtone
+   * and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas
+   * respectively.
+   */
+  void set_cameraColorCurves(const shared_ptr_t<ColorCurves>& value);
+
+  /**
+   * @brief Gets the logarithmic depth setting.
+   */
+  bool get_useLogarithmicDepth() const override;
+
+  /**
+   * @brief Sets the logarithmic depth setting.
+   */
+  void set_useLogarithmicDepth(bool value) override;
 
 protected:
   /**
@@ -306,6 +310,60 @@ public:
     vector_t<string_t>& uniformBuffers, vector_t<string_t>& samplers,
     StandardMaterialDefines& defines)>
     customShaderNameResolve;
+
+  /**
+   * The image processing configuration used either in this material
+   */
+  Property<StandardMaterial, ImageProcessingConfiguration*>
+    imageProcessingConfiguration;
+
+  /**
+   * Whether the color curves effect is enabled
+   */
+  Property<StandardMaterial, bool> cameraColorCurvesEnabled;
+
+  /**
+   * Wether the color grading effect is enabled
+   */
+  Property<StandardMaterial, bool> cameraColorGradingEnabled;
+
+  /**
+   * Wether tonemapping is enabled or not
+   */
+  Property<StandardMaterial, bool> cameraToneMappingEnabled;
+
+  /**
+   * The camera exposure used on this material
+   * This property is here and not in the camera to allow controlling exposure
+   * without full screen post process.
+   * This corresponds to a photographic exposure.
+   */
+  Property<StandardMaterial, float> cameraExposure;
+
+  /**
+   * The camera contrast used on this material.
+   */
+  Property<StandardMaterial, float> cameraContrast;
+
+  /**
+   * The Color Grading 2D Lookup Texture.
+   */
+  Property<StandardMaterial, BaseTexture*> cameraColorGradingTexture;
+
+  /**
+   * The color grading curves provide additional color adjustmnent that
+   * is applied after any color grading transform (3D LUT).
+   * They allow basic adjustment of saturation and small exposure adjustments,
+   * along with color filter tinting to provide white balance adjustment or more
+   * stylistic effects.
+   * These are similar to controls found in many professional imaging or
+   * colorist software. The global controls are applied to the entire image. For
+   * advanced tuning, extra controls are provided to adjust the shadow, midtone
+   * and highlight areas of the image;
+   * corresponding to low luminance, medium luminance, and high luminance areas
+   * respectively.
+   */
+  Property<StandardMaterial, shared_ptr_t<ColorCurves>> cameraColorCurves;
 
 protected:
   vector_t<RenderTargetTexture*> _renderTargets;

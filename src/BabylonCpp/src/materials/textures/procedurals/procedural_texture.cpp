@@ -444,7 +444,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
 
   if (isCube) {
     for (unsigned int face = 0; face < 6; ++face) {
-      engine->bindFramebuffer(_texture, face, nullptr, nullptr, true);
+      engine->bindFramebuffer(_texture, face, nullopt_t, nullopt_t, true);
 
       // VBOs
       engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
@@ -465,7 +465,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     }
   }
   else {
-    engine->bindFramebuffer(_texture, 0u, nullptr, nullptr, true);
+    engine->bindFramebuffer(_texture, 0u, nullopt_t, nullopt_t, true);
 
     // VBOs
     engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),

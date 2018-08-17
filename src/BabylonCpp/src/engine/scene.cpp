@@ -4383,7 +4383,7 @@ void Scene::cleanCachedTextureBuffer()
       auto buffer = texture->_buffer;
 
       if (buffer) {
-        texture->_buffer = nullptr;
+        texture->_buffer = nullopt_t;
       }
     }
   }

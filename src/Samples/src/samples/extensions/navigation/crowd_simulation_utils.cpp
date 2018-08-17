@@ -18,10 +18,10 @@ CrowdSimulationUtils::createAgentMeshes(Scene* scene, size_t totalNoAgents)
 
     // Create the mesh material
     auto material = StandardMaterial::New("m", scene);
-    material->setEmissiveColor(
-      Color3(1.f, 0.7f - (agentNof / totalNoAgentsf), 0.f));
-    material->setDiffuseColor(
-      Color3(1.f, 0.7f - (agentNof / totalNoAgentsf), 0.f));
+    material->emissiveColor
+      = Color3(1.f, 0.7f - (agentNof / totalNoAgentsf), 0.f);
+    material->diffuseColor
+      = Color3(1.f, 0.7f - (agentNof / totalNoAgentsf), 0.f);
 
     // Create the mesh
     auto mesh = Mesh::CreateCylinder("_", 15, 3.f, 3.f, 5, 1, scene, false);

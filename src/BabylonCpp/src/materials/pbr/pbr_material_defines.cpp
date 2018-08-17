@@ -95,6 +95,7 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
            "IMAGEPROCESSINGPOSTPROCESS",
            "EXPOSURE",
            "USEPHYSICALLIGHTFALLOFF",
+           "USEGLTFLIGHTFALLOFF",
            "TWOSIDEDLIGHTING",
            "SHADOWFLOAT",
            "CLIPPLANE",

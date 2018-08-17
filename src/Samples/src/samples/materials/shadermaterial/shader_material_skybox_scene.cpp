@@ -2,6 +2,7 @@
 
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/mesh/mesh.h>
@@ -12,14 +13,11 @@ namespace Samples {
 ShaderMaterialSkyboxScene::ShaderMaterialSkyboxScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _shaderMaterial{nullptr}
 {
-  // Reference to the shaders contained in the shader store
-  auto& shaders = _effectShadersStore.shaders();
-
   // Vertex shader
-  shaders["gradientVertexShader"] = gradientVertexShader;
+  Effect::ShadersStore["gradientVertexShader"] = gradientVertexShader;
 
   // Pixel (Fragment) Shader
-  shaders["gradientFragmentShader"] = gradientPixelShader;
+  Effect::ShadersStore["gradientFragmentShader"] = gradientPixelShader;
 }
 
 ShaderMaterialSkyboxScene::~ShaderMaterialSkyboxScene()

@@ -1,6 +1,7 @@
 #include <babylon/samples/materials/shadermaterial/shader_material_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/mesh/mesh.h>
@@ -16,14 +17,11 @@ ShaderMaterialScene::ShaderMaterialScene(ICanvas* iCanvas)
     , _shaderMaterial{nullptr}
     , _polyhedron{nullptr}
 {
-  // Reference to the shaders contained in the shader store
-  auto& shaders = _effectShadersStore.shaders();
-
   // Vertex shader
-  shaders["customVertexShader"] = customVertexShader;
+  Effect::ShadersStore["customVertexShader"] = customVertexShader;
 
   // Fragment shader
-  shaders["customFragmentShader"] = customFragmentShader;
+  Effect::ShadersStore["customFragmentShader"] = customFragmentShader;
 }
 
 ShaderMaterialScene::~ShaderMaterialScene()

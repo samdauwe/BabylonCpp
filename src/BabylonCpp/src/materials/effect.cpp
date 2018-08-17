@@ -18,6 +18,11 @@
 
 namespace BABYLON {
 
+unordered_map_t<string_t, const char*>& Effect::ShadersStore
+  = EffectShadersStore().shaders();
+unordered_map_t<string_t, const char*>& Effect::IncludesShadersStore
+  = EffectIncludesShadersStore().shaders();
+
 std::size_t Effect::_uniqueIdSeed = 0;
 unordered_map_t<unsigned int, GL::IGLBuffer*> Effect::_baseCache{};
 
@@ -30,6 +35,7 @@ Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
     , onBind{nullptr}
     , uniqueId{Effect::_uniqueIdSeed++}
     , _bonesComputationForcedToCPU{false}
+    , onBindObservable{this, &Effect::get_onBindObservable}
     , _program{nullptr}
     , _onCompileObserver{nullptr}
     , _engine{engine}
@@ -100,6 +106,8 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
     , onError{options.onError}
     , onBind{nullptr}
     , uniqueId{Effect::_uniqueIdSeed++}
+    , _bonesComputationForcedToCPU{false}
+    , onBindObservable{this, &Effect::get_onBindObservable}
     , _program{nullptr}
     , _onCompileObserver{nullptr}
     , _engine{engine}
@@ -185,6 +193,11 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
 
 Effect::~Effect()
 {
+}
+
+Observable<Effect>& Effect::get_onBindObservable()
+{
+  return _onBindObservable;
 }
 
 string_t Effect::key() const
@@ -281,10 +294,9 @@ void Effect::_loadVertexShader(
 
   // Is in local store ?
   const string_t vertexShaderName = vertex + "VertexShader";
-  EffectShadersStore effectShadersStore;
-  if (stl_util::contains(effectShadersStore.shaders(), vertexShaderName)) {
+  if (stl_util::contains(Effect::ShadersStore, vertexShaderName)) {
     const string_t vertexShaderName = vertex + "VertexShader";
-    callback(string_t(effectShadersStore.shaders()[vertexShaderName]));
+    callback(string_t(Effect::ShadersStore[vertexShaderName]));
     return;
   }
 
@@ -315,15 +327,14 @@ void Effect::_loadFragmentShader(
 
   // Is in local store ?
   string_t fragmentShaderName = fragment + "PixelShader";
-  EffectShadersStore effectShadersStore;
-  if (stl_util::contains(effectShadersStore.shaders(), fragmentShaderName)) {
-    callback(string_t(effectShadersStore.shaders()[fragmentShaderName]));
+  if (stl_util::contains(Effect::ShadersStore, fragmentShaderName)) {
+    callback(string_t(Effect::ShadersStore[fragmentShaderName]));
     return;
   }
 
   fragmentShaderName = fragment + "FragmentShader";
-  if (stl_util::contains(effectShadersStore.shaders(), fragmentShaderName)) {
-    callback(string_t(effectShadersStore.shaders()[fragmentShaderName]));
+  if (stl_util::contains(Effect::ShadersStore, fragmentShaderName)) {
+    callback(string_t(Effect::ShadersStore[fragmentShaderName]));
     return;
   }
 
@@ -467,10 +478,9 @@ void Effect::_processIncludes(
       includeFile += "Declaration";
     }
 
-    if (stl_util::contains(EffectIncludesShadersStore::Shaders, includeFile)) {
+    if (stl_util::contains(Effect::IncludesShadersStore, includeFile)) {
       // Substitution
-      string_t includeContent
-        = EffectIncludesShadersStore::Shaders[includeFile];
+      string_t includeContent = Effect::IncludesShadersStore[includeFile];
       if (!match[2].empty()) {
         auto splits = String::split(match[3], ',');
 
@@ -703,7 +713,7 @@ void Effect::_prepareEffect()
     // Let's go through fallbacks then
     BABYLON_LOG_ERROR("Effect", "Unable to compile effect: ");
     BABYLON_LOGF_ERROR("Effect", "Defines: %s", defines.c_str());
-    _dumpShadersSource(_vertexSourceCode, _fragmentSourceCode, defines);
+    // _dumpShadersSource(_vertexSourceCode, _fragmentSourceCode, defines);
     BABYLON_LOGF_ERROR("Effect", "Uniforms: %s",
                        String::join(_uniformsNames, ' ').c_str());
     BABYLON_LOGF_ERROR("Effect", "Attributes: %s",
@@ -1181,6 +1191,21 @@ Effect& Effect::setDirectColor4(const string_t& uniformName,
   }
 
   return *this;
+}
+
+void Effect::RegisterShader(const string_t& name,
+                            const nullable_t<string_t>& pixelShader,
+                            const nullable_t<string_t>& vertexShader)
+{
+  if (pixelShader.has_value()) {
+    Effect::ShadersStore[String::concat(name, "PixelShader")]
+      = (*pixelShader).c_str();
+  }
+
+  if (vertexShader) {
+    Effect::ShadersStore[String::concat(name, "VertexShader")]
+      = (*vertexShader).c_str();
+  }
 }
 
 void Effect::ResetCache()

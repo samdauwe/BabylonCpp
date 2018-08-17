@@ -427,8 +427,8 @@ Mesh* VolumetricLightScatteringPostProcess::CreateDefaultMesh(
   auto mesh           = Mesh::CreatePlane(name, 1.f, scene);
   mesh->billboardMode = AbstractMesh::BILLBOARDMODE_ALL;
 
-  auto material = StandardMaterial::New(name + "Material", scene);
-  material->setEmissiveColor(Color3(1.f, 1.f, 1.f));
+  auto material           = StandardMaterial::New(name + "Material", scene);
+  material->emissiveColor = Color3(1.f, 1.f, 1.f);
 
   mesh->material = material;
 

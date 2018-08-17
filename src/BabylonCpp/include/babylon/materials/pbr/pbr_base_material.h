@@ -19,6 +19,24 @@ class BABYLON_SHARED_EXPORT PBRBaseMaterial : public PushMaterial {
 public:
   using PMD = PBRMaterialDefines;
 
+  /**
+   * PBRMaterialLightFalloff Physical: light is falling off following the
+   * inverse squared distance law.
+   */
+  static constexpr unsigned int LIGHTFALLOFF_PHYSICAL = 0;
+
+  /**
+   * PBRMaterialLightFalloff gltf: light is falling off as described in the gltf
+   * moving to PBR document to enhance interoperability with other engines.
+   */
+  static constexpr unsigned int LIGHTFALLOFF_GLTF = 1;
+
+  /**
+   * PBRMaterialLightFalloff Standard: light is falling off like in the standard
+   * material to enhance interoperability with other materials.
+   */
+  static constexpr unsigned int LIGHTFALLOFF_STANDARD = 2;
+
 public:
   /**
    * @brief Instantiates a new PBRMaterial instance.
@@ -33,18 +51,6 @@ public:
    * @brief Gets the name of the material class.
    */
   const string_t getClassName() const override;
-
-  /**
-   * @brief Enabled the use of logarithmic depth buffers, which is good for wide
-   * depth buffers.
-   */
-  bool useLogarithmicDepth() const override;
-
-  /**
-   * @brief Enabled the use of logarithmic depth buffers, which is good for wide
-   * depth buffers.
-   */
-  void setUseLogarithmicDepth(bool value) override;
 
   /**
    * @brief Gets the current transparency mode.
@@ -157,6 +163,18 @@ protected:
     ImageProcessingConfiguration* configuration);
 
   bool _shouldUseAlphaFromAlbedoTexture() const;
+
+  /**
+   * @brief Enabled the use of logarithmic depth buffers, which is good for wide
+   * depth buffers.
+   */
+  bool get_useLogarithmicDepth() const override;
+
+  /**
+   * @brief Enabled the use of logarithmic depth buffers, which is good for wide
+   * depth buffers.
+   */
+  void set_useLogarithmicDepth(bool value) override;
 
 private:
   Effect* _prepareEffect(
@@ -420,13 +438,10 @@ protected:
   bool _useAutoMicroSurfaceFromReflectivityMap;
 
   /**
-   * BJS is using an harcoded light falloff based on a manually sets up range.
-   * In PBR, one way to represents the fallof is to use the inverse squared root
-   * algorythm.
-   * This parameter can help you switch back to the BJS mode in order to create
-   * scenes using both materials.
+   * Defines the  falloff type used in this material.
+   * It by default is Physical.
    */
-  bool _usePhysicalLightFalloff;
+  unsigned int _lightFalloff;
 
   /**
    * Specifies that the material will keeps the reflection highlights over a
