@@ -10,6 +10,7 @@ namespace BABYLON {
 class Action;
 class ActionEvent;
 class ActionManager;
+using ActionManagerPtr = shared_ptr_t<ActionManager>;
 class Condition;
 // - Conditions
 class PredicateCondition;
@@ -33,8 +34,10 @@ class InterpolateValueAction;
 // --- Animations ---
 class Animatable;
 class Animation;
+using AnimationPtr = shared_ptr_t<Animation>;
 class AnimationEvent;
 class AnimationGroup;
+using AnimationGroupPtr = shared_ptr_t<AnimationGroup>;
 struct AnimationPropertiesOverride;
 class AnimationRange;
 class AnimationValue;
@@ -62,7 +65,9 @@ class SineEase;
 class Analyser;
 class AudioEngine;
 class Sound;
+using SoundPtr = shared_ptr_t<Sound>;
 class SoundTrack;
+class WeightedSound;
 // --- Behaviors ---
 template <class T>
 struct Behavior;
@@ -84,11 +89,13 @@ class Bone;
 class BoneIKController;
 class BoneLookController;
 class Skeleton;
+using SkeletonPtr = shared_ptr_t<Skeleton>;
 // --- Cameras ---
 class ArcFollowCamera;
 class ArcRotateCamera;
 struct ArcRotateCameraInputsManager;
 class Camera;
+using CameraPtr = shared_ptr_t<Camera>;
 template <class TCamera>
 class CameraInputsManager;
 class DeviceOrientationCamera;
@@ -178,6 +185,7 @@ class SkeletonViewer;
 } // end of namespace Debug
 // --- Engine ---
 class AbstractScene;
+using AbstractScenePtr = shared_ptr_t<AbstractScene>;
 class ClickInfo;
 struct DepthTextureCreationOptions;
 class Engine;
@@ -280,6 +288,7 @@ class DirectionalLight;
 class HemisphericLight;
 class IShadowLight;
 class Light;
+using LightPtr = shared_ptr_t<Light>;
 class PointLight;
 class ShadowLight;
 class SpotLight;
@@ -307,9 +316,11 @@ struct IImageProcessingConfigurationDefines;
 class ImageProcessingConfiguration;
 struct IMaterialDefines;
 class Material;
+using MaterialPtr = shared_ptr_t<Material>;
 struct MaterialDefines;
 struct MaterialHelper;
 class MultiMaterial;
+using MultiMaterialPtr = shared_ptr_t<MultiMaterial>;
 class PushMaterial;
 class ShaderMaterial;
 struct ShaderMaterialOptions;
@@ -328,6 +339,7 @@ class PBRMetallicRoughnessMaterial;
 class PBRSpecularGlossinessMaterial;
 // - Textures
 class BaseTexture;
+using BaseTexturePtr = shared_ptr_t<BaseTexture>;
 class ColorGradingTexture;
 class CubeTexture;
 struct DummyInternalTextureTracker;
@@ -384,11 +396,13 @@ struct SIMDVector3;
 class _InstancesBatch;
 class _VisibleInstances;
 class AbstractMesh;
+using AbstractMeshPtr = shared_ptr_t<AbstractMesh>;
 class BaseSubMesh;
 class Buffer;
 struct BufferPointer;
 struct FacetParameters;
 class Geometry;
+using GeometryPtr = shared_ptr_t<Geometry>;
 class GroundMesh;
 struct IGetSetVerticesData;
 class InstancedMesh;
@@ -398,6 +412,7 @@ class MeshBuilder;
 class MeshLODLevel;
 class SubMesh;
 class TransformNode;
+using TransformNodePtr = shared_ptr_t<TransformNode>;
 class VertexBuffer;
 class VertexData;
 // - Options
@@ -462,11 +477,13 @@ class SimplificationSettings;
 // --- Morph ---
 class MorphTarget;
 class MorphTargetManager;
+using MorphTargetManagerPtr = shared_ptr_t<MorphTargetManager>;
 // --- Particles ---
 struct DepthSortedParticle;
 struct EmitterCreationOptions;
 class GPUParticleSystem;
 struct IParticleSystem;
+using IParticleSystemPtr = shared_ptr_t<IParticleSystem>;
 class ModelShape;
 class Particle;
 struct ParticleHelper;
