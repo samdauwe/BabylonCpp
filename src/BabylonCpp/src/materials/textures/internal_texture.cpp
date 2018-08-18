@@ -181,6 +181,19 @@ void InternalTexture::_rebuild()
       isReady = true;
     }
       return;
+    case InternalTexture::DATASOURCE_CUBERAW_RGBD: {
+      proxy = _engine->createRawCubeTexture({}, width, format, type,
+                                            generateMipMaps, invertY,
+                                            samplingMode, _compression);
+#if 0
+      RawCubeTexture::_UpdateRGBDAsync(
+        proxy, _bufferViewArrayArray !, _sphericalPolynomial,
+        _lodGenerationScale, _lodGenerationOffset)
+        .then(() = > { isReady = true; });
+#endif
+      proxy->_swapAndDie(this);
+    }
+      return;
     case InternalTexture::DATASOURCE_CUBEPREFILTERED: {
       proxy = _engine->createPrefilteredCubeTexture(
         url, nullptr, _lodGenerationScale, _lodGenerationOffset,

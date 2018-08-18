@@ -15,70 +15,31 @@ namespace BABYLON {
  */
 class BABYLON_SHARED_EXPORT PBRMaterial : public PBRBaseMaterial {
 
-private:
-  /**
-   * No transparency mode, Alpha channel is not use.
-   */
-  static constexpr unsigned int _PBRMATERIAL_OPAQUE = 0;
-
-  /**
-   * Alpha Test mode, pixel are discarded below a certain threshold defined by
-   * the alpha cutoff value.
-   */
-  static constexpr unsigned int _PBRMATERIAL_ALPHATEST = 1;
-
-  /**
-   * Represents the value for Alpha Blend.  Pixels are blended (according to the
-   * alpha mode) with the already drawn pixels in the current frame buffer.
-   */
-  static constexpr unsigned int _PBRMATERIAL_ALPHABLEND = 2;
-
-  /**
-   * Represents the value for Alpha Test and Blend.  Pixels are blended
-   * (according to the alpha mode) with the already drawn pixels in the current
-   * frame buffer. They are also discarded below the alpha cutoff threshold to
-   * improve performances.
-   */
-  static constexpr unsigned int _PBRMATERIAL_ALPHATESTANDBLEND = 3;
-
 public:
   /**
-   * @brief PBRMaterialTransparencyMode: No transparency mode, Alpha channel is
-   * not use.
+   * PBRMaterialTransparencyMode: No transparency mode, Alpha channel is not
+   * use.
    */
-  static constexpr unsigned int PBRMATERIAL_OPAQUE()
-  {
-    return PBRMaterial::_PBRMATERIAL_OPAQUE;
-  }
+  static constexpr unsigned int PBRMATERIAL_OPAQUE = 0;
 
   /**
-   * @brief PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded
-   * below a certain threshold defined by the alpha cutoff value.
+   * PBRMaterialTransparencyMode: Alpha Test mode, pixel are discarded below a
+   * certain threshold defined by the alpha cutoff value.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATEST()
-  {
-    return PBRMaterial::_PBRMATERIAL_ALPHATEST;
-  }
+  static constexpr unsigned int PBRMATERIAL_ALPHATEST = 1;
 
   /**
-   * @brief PBRMaterialTransparencyMode: Pixels are blended (according to the
-   * alpha mode) with the already drawn pixels in the current frame buffer.
+   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
+   * mode) with the already drawn pixels in the current frame buffer.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHABLEND()
-  {
-    return PBRMaterial::_PBRMATERIAL_ALPHABLEND;
-  }
+  static constexpr unsigned int PBRMATERIAL_ALPHABLEND = 2;
 
   /**
-   * @brief PBRMaterialTransparencyMode: Pixels are blended (according to the
-   * alpha mode) with the already drawn pixels in the current frame buffer. They
-   * are also discarded below the alpha cutoff threshold to improve
-   * performances.
+   * PBRMaterialTransparencyMode: Pixels are blended (according to the alpha
+   * mode) with the already drawn pixels in the current frame buffer. They are
+   * also discarded below the alpha cutoff threshold to improve performances.
    */
-  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND()
-  {
-    return PBRMaterial::_PBRMATERIAL_ALPHATESTANDBLEND;
-  }
+  static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND = 3;
 
 public:
   /**
@@ -133,6 +94,34 @@ public:
                             const string_t& rootUrl);
 
   // Getters / Setters
+
+  /**
+   * @brief BJS is using an harcoded light falloff based on a manually sets up
+   * range. In PBR, one way to represents the fallof is to use the inverse
+   * squared root algorythm. This parameter can help you switch back to the BJS
+   * mode in order to create scenes using both materials.
+   */
+  bool usePhysicalLightFalloff() const;
+
+  /**
+   * @brief BJS is using an harcoded light falloff based on a manually sets up
+   * range. In PBR, one way to represents the fallof is to use the inverse
+   * squared root algorythm. This parameter can help you switch back to the BJS
+   * mode in order to create scenes using both materials.
+   */
+  void setUsePhysicalLightFalloff(bool value);
+
+  /**
+   * @brief In order to support the falloff compatibility with gltf, a special
+   * mode has been added to reproduce the gltf light falloff.
+   */
+  bool useGLTFLightFalloff() const;
+
+  /**
+   * @brief In order to support the falloff compatibility with gltf, a special
+   * mode has been added to reproduce the gltf light falloff.
+   */
+  void setUseGLTFLightFalloff(bool value);
 
   /**
    * @brief Gets the image processing configuration used either in this
@@ -474,15 +463,6 @@ public:
    * The material will try to infer what glossiness each pixel should be.
    */
   bool useAutoMicroSurfaceFromReflectivityMap;
-
-  /**
-   * BJS is using an harcoded light falloff based on a manually sets up range.
-   * In PBR, one way to represents the fallof is to use the inverse squared root
-   * algorythm.
-   * This parameter can help you switch back to the BJS mode in order to create
-   * scenes using both materials.
-   */
-  bool usePhysicalLightFalloff;
 
   /**
    * Specifies that the material will keeps the reflection highlights over a

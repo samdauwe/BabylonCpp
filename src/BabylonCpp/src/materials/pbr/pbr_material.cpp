@@ -49,7 +49,6 @@ PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
     , useAmbientOcclusionFromMetallicTextureRed{false}
     , useAmbientInGrayScale{false}
     , useAutoMicroSurfaceFromReflectivityMap{false}
-    , usePhysicalLightFalloff{true}
     , useRadianceOverAlpha{true}
     , useObjectSpaceNormalMap{false}
     , useParallax{false}
@@ -76,6 +75,46 @@ PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
 
 PBRMaterial::~PBRMaterial()
 {
+}
+
+bool PBRMaterial::usePhysicalLightFalloff() const
+{
+  return _lightFalloff == PBRBaseMaterial::LIGHTFALLOFF_PHYSICAL;
+}
+
+void PBRMaterial::setUsePhysicalLightFalloff(bool value)
+{
+  if (value != usePhysicalLightFalloff()) {
+    // Ensure the effect will be rebuilt.
+    _markAllSubMeshesAsTexturesDirty();
+
+    if (value) {
+      _lightFalloff = PBRBaseMaterial::LIGHTFALLOFF_PHYSICAL;
+    }
+    else {
+      _lightFalloff = PBRBaseMaterial::LIGHTFALLOFF_STANDARD;
+    }
+  }
+}
+
+bool PBRMaterial::useGLTFLightFalloff() const
+{
+  return _lightFalloff == PBRBaseMaterial::LIGHTFALLOFF_GLTF;
+}
+
+void PBRMaterial::setUseGLTFLightFalloff(bool value)
+{
+  if (value != useGLTFLightFalloff()) {
+    // Ensure the effect will be rebuilt.
+    _markAllSubMeshesAsTexturesDirty();
+
+    if (value) {
+      _lightFalloff = PBRBaseMaterial::LIGHTFALLOFF_GLTF;
+    }
+    else {
+      _lightFalloff = PBRBaseMaterial::LIGHTFALLOFF_STANDARD;
+    }
+  }
 }
 
 ImageProcessingConfiguration* PBRMaterial::imageProcessingConfiguration()

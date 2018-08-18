@@ -53,7 +53,7 @@ void PBRBaseSimpleMaterial::setDoubleSided(bool value)
 bool PBRBaseSimpleMaterial::_shouldUseAlphaFromAlbedoTexture() const
 {
   return _albedoTexture && _albedoTexture->hasAlpha()
-         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE();
+         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
 vector_t<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const

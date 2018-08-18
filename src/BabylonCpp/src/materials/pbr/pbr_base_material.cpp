@@ -186,7 +186,7 @@ void PBRBaseMaterial::setTransparencyMode(const Nullable<unsigned int>& value)
 
   _transparencyMode = value;
 
-  _forceAlphaTest = (*value == PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND());
+  _forceAlphaTest = (*value == PBRMaterial::PBRMATERIAL_ALPHATESTANDBLEND);
 
   _markAllSubMeshesAsTexturesAndMiscDirty();
 }
@@ -194,8 +194,8 @@ void PBRBaseMaterial::setTransparencyMode(const Nullable<unsigned int>& value)
 bool PBRBaseMaterial::_disableAlphaBlending() const
 {
   return (_linkRefractionWithTransparency
-          || _transparencyMode == PBRMaterial::PBRMATERIAL_OPAQUE()
-          || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST());
+          || _transparencyMode == PBRMaterial::PBRMATERIAL_OPAQUE
+          || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
 }
 
 bool PBRBaseMaterial::needAlphaBlending() const
@@ -228,14 +228,14 @@ bool PBRBaseMaterial::needAlphaTesting() const
 
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
          && (_transparencyMode == nullptr
-             || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST());
+             || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
 }
 
 bool PBRBaseMaterial::_shouldUseAlphaFromAlbedoTexture() const
 {
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
          && _useAlphaFromAlbedoTexture
-         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE();
+         && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
 BaseTexture* PBRBaseMaterial::getAlphaTestTexture()
@@ -931,9 +931,9 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(
     mesh, defines, true, true, true,
-    _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE(), PMD::NORMAL,
-    PMD::UV1, PMD::UV2, PMD::VERTEXCOLOR, PMD::VERTEXALPHA,
-    PMD::MORPHTARGETS_TANGENT, PMD::MORPHTARGETS_NORMAL, PMD::MORPHTARGETS);
+    _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE, PMD::NORMAL, PMD::UV1,
+    PMD::UV2, PMD::VERTEXCOLOR, PMD::VERTEXALPHA, PMD::MORPHTARGETS_TANGENT,
+    PMD::MORPHTARGETS_NORMAL, PMD::MORPHTARGETS);
 }
 
 void PBRBaseMaterial::forceCompilation(
