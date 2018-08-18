@@ -6,8 +6,7 @@
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/color_gradient.h>
-
-#include <babylon/core/nullable.h>
+#include <babylon/tools/factor_gradient.h>
 
 namespace BABYLON {
 
@@ -31,6 +30,11 @@ public:
   Particle* clone() const;
 
   /**
+   * @brief Defines how the sprite cell index is updated for the particle.
+   */
+  void updateCellIndex();
+
+  /**
    * @brief Copy the properties of particle to another one.
    * @param other the particle to copy the information to.
    */
@@ -38,8 +42,6 @@ public:
 
 private:
   void updateCellInfoFromSystem();
-  void _updateCellIndexWithSpeedCalculated(float scaledUpdateSpeed);
-  void _updateCellIndexWithCustomSpeed();
 
 public:
   /**
@@ -98,23 +100,39 @@ public:
   unsigned int cellIndex;
 
   /** Hidden */
-  Nullable<Vector3> _initialDirection;
+  nullable_t<Vector3> _initialDirection;
 
   /** Hidden */
-  float _initialSize;
+  unsigned int _initialStartSpriteCellID;
+  unsigned int _initialEndSpriteCellID;
 
   /** Hidden */
-  Nullable<ColorGradient> _currentColorGradient;
+  nullable_t<ColorGradient> _currentColorGradient;
   /** Hidden */
   Color4 _currentColor1;
   /** Hidden */
   Color4 _currentColor2;
 
-  /**
-   * Defines how the sprite cell index is updated for the particle. This is
-   * defined as a callback.
-   */
-  ::std::function<void(float scaledUpdateSpeed)> updateCellIndex;
+  /** Hidden */
+  nullable_t<FactorGradient> _currentSizeGradient;
+  /** Hidden */
+  float _currentSize1;
+  /** Hidden */
+  float _currentSize2;
+
+  /** Hidden */
+  nullable_t<FactorGradient> _currentAngularSpeedGradient;
+  /** Hidden */
+  float _currentAngularSpeed1;
+  /** Hidden */
+  float _currentAngularSpeed2;
+
+  /** Hidden */
+  nullable_t<FactorGradient> _currentVelocityGradient;
+  /** Hidden */
+  float _currentVelocity1;
+  /** Hidden */
+  float _currentVelocity2;
 
   /**
    * The particle system the particle belongs to.

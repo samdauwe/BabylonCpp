@@ -11,12 +11,17 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT FactorGradient : public IValueGradient {
 
+  float getFactor() const;
+
   /**
    * Gets or sets associated factor
    */
   float factor;
 
 }; // end of struct FactorGradient
+
+bool operator==(const FactorGradient& lhs, const FactorGradient& rhs);
+bool operator!=(const FactorGradient& lhs, const FactorGradient& rhs);
 
 } // end of namespace BABYLON
 

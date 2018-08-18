@@ -30,6 +30,7 @@ constexpr unsigned int VertexBuffer::AgeKind;
 constexpr unsigned int VertexBuffer::LifeKind;
 constexpr unsigned int VertexBuffer::VelocityKind;
 constexpr unsigned int VertexBuffer::DirectionKind;
+constexpr unsigned int VertexBuffer::InitialDirectionKind;
 constexpr unsigned int VertexBuffer::OffsetKind;
 constexpr unsigned int VertexBuffer::SeedKind;
 constexpr unsigned int VertexBuffer::SizeKind;
@@ -59,6 +60,7 @@ constexpr const char* VertexBuffer::AgeKindChars;
 constexpr const char* VertexBuffer::LifeKindChars;
 constexpr const char* VertexBuffer::VelocityKindChars;
 constexpr const char* VertexBuffer::DirectionKindChars;
+constexpr const char* VertexBuffer::InitialDirectionKindChars;
 constexpr const char* VertexBuffer::OffsetKindChars;
 constexpr const char* VertexBuffer::SeedKindChars;
 constexpr const char* VertexBuffer::SizeKindChars;
@@ -207,6 +209,8 @@ string_t VertexBuffer::KindAsString(unsigned int kind)
       return string_t(VertexBuffer::VelocityKindChars);
     case VertexBuffer::DirectionKind:
       return string_t(VertexBuffer::DirectionKindChars);
+    case VertexBuffer::InitialDirectionKind:
+      return string_t(VertexBuffer::InitialDirectionKindChars);
     case VertexBuffer::OffsetKind:
       return string_t(VertexBuffer::OffsetKindChars);
     case VertexBuffer::SeedKind:

@@ -31,12 +31,15 @@ public:
    * phenomena like fire, smoke, water, or abstract visual effects like magic
    * glitter and faery dust.
    * @param name The name of the particle system
-   * @param capacity The max number of particles alive at the same time
+   * @param options The options used to create the system
    * @param scene The scene the particle system belongs to
+   * @param isAnimationSheetEnabled Must be true if using a spritesheet to
+   * animate the particles texture
    */
   GPUParticleSystem(const string_t& name, size_t capacity = 5000,
-                    Nullable<int> randomTextureSize = nullptr,
-                    Scene* scene                    = nullptr);
+                    nullable_t<int> randomTextureSize = nullopt_t,
+                    Scene* scene                      = nullptr,
+                    bool isAnimationSheetEnabled      = false);
   virtual ~GPUParticleSystem() override;
 
   /**
@@ -58,9 +61,11 @@ public:
   bool isStarted() const override;
 
   /**
-   * @brief Starts the particle system and begins to emit.
+   * @brief Starts the particle system and begins to emit
+   * @param delay defines the delay in milliseconds before starting the system
+   * (0 by default)
    */
-  void start() override;
+  void start(size_t delay = 0) override;
 
   /**
    * @brief Stops the particle system.
@@ -78,21 +83,130 @@ public:
    */
   const char* getClassName() const;
 
+  /**
+   * @brief Gets the current list of color gradients.
+   * You must use addColorGradient and removeColorGradient to udpate this list
+   * @returns the list of color gradients
+   */
+  vector_t<ColorGradient>& getColorGradients() override;
+
+  /**
+   * @brief Gets the current list of size gradients.
+   * You must use addSizeGradient and removeSizeGradient to udpate this list
+   * @returns the list of size gradients
+   */
+  vector_t<FactorGradient>& getSizeGradients() override;
+
+  /**
+   * @brief Gets the current list of angular speed gradients.
+   * You must use addAngularSpeedGradient and removeAngularSpeedGradient to
+   * udpate this list
+   * @returns the list of angular speed gradients
+   */
+  vector_t<FactorGradient>& getAngularSpeedGradients() override;
+
+  /**
+   * @brief Gets the current list of velocity gradients.
+   * You must use addVelocityGradient and removeVelocityGradient to udpate this
+   * list
+   * @returns the list of angular speed gradients
+   */
+  vector_t<FactorGradient>& getVelocityGradients() override;
+
+  /**
+   * @brief Adds a new color gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param color defines the color to affect to the specified gradient
+   * @param color2 defines an additional color used to define a range ([color,
+   * color2]) with main color to pick the final color from
+   * @returns the current particle system
+   */
+  GPUParticleSystem& addColorGradient(float gradient, const Color4& color1,
+                                      const nullable_t<Color4>& color2
+                                      = nullopt_t) override;
+
+  /**
+   * @brief Remove a specific color gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  GPUParticleSystem& removeColorGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new size gradient
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the size factor to affect to the specified gradient
+   * @returns the current particle system
+   */
+  GPUParticleSystem& addSizeGradient(float gradient, float factor,
+                                     const nullable_t<float>& factor2
+                                     = nullopt_t) override;
+
+  /**
+   * @brief Remove a specific size gradient
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  GPUParticleSystem& removeSizeGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new angular speed gradient
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the size factor to affect to the specified gradient
+   * @returns the current particle system
+   */
+  GPUParticleSystem& addAngularSpeedGradient(float gradient, float factor,
+                                             const nullable_t<float>& factor2
+                                             = nullopt_t) override;
+
+  /**
+   * @brief Remove a specific angular speed gradient
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  GPUParticleSystem& removeAngularSpeedGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new velocity gradient
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the size factor to affect to the specified gradient
+   * @returns the current particle system
+   */
+  GPUParticleSystem& addVelocityGradient(float gradient, float factor,
+                                         const nullable_t<float>& factor2
+                                         = nullopt_t) override;
+
+  /**
+   * @brief Remove a specific velocity gradient
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  GPUParticleSystem& removeVelocityGradient(float gradient) override;
+
+  /**
+   * @brief Hidden
+   */
   void _recreateUpdateEffect();
 
+  /**
+   * @brief Hidden
+   */
   void _recreateRenderEffect();
 
   /**
    * @brief Animates the particle system for the current frame by emitting new
    * particles and or animating the living ones.
+   * @param preWarm defines if we are in the pre-warmimg phase
    */
-  void animate();
+  void animate(bool preWarm = false) override;
 
   /**
-   * @brief Renders the particle system in its current state.
-   * @returns the current number of particles.
+   * @brief Renders the particle system in its current state
+   * @param preWarm defines if the system should only update the particles but
+   * not render them
+   * @returns the current number of particles
    */
-  size_t render() override;
+  size_t render(bool preWarm = false) override;
 
   /**
    * @brief Rebuilds the particle system
@@ -145,36 +259,52 @@ protected:
   size_t get_activeParticleCount() const;
   void set_activeParticleCount(size_t value);
 
+  /**
+   * @brief Gets whether an animation sprite sheet is enabled or not on the
+   * particle system.
+   */
+  bool get_isAnimationSheetEnabled() const;
+
+  /**
+   * @brief Gets a boolean indicating if the particles must be rendered as
+   * billboard or aligned with the direction
+   */
+  bool get_isBillboardBased() const override;
+
+  /**
+   * @brief Sets a boolean indicating if the particles must be rendered as
+   * billboard or aligned with the direction
+   */
+  void set_isBillboardBased(bool value) override;
+
 private:
+  template <typename T>
+  GPUParticleSystem& _removeGradient(float gradient, vector_t<T>& gradients,
+                                     RawTexture* texture);
+  void _addFactorGradient(vector_t<FactorGradient>& factorGradients,
+                          float gradient, float factor);
   unique_ptr_t<GL::IGLVertexArrayObject> _createUpdateVAO(Buffer* source);
   unique_ptr_t<GL::IGLVertexArrayObject> _createRenderVAO(Buffer* source,
                                                           Buffer* spriteSource);
   void _initialize(bool force = false);
+  RawTexture* _getRawTextureByName(const string_t& textureName);
+  void _setRawTextureByName(const string_t& textureName,
+                            unique_ptr_t<RawTexture>&& rawTexture);
+  template <typename T>
+  void _createFactorGradientTexture(const vector_t<T>& factorGradients,
+                                    const string_t& textureName);
+  void _createSizeGradientTexture();
+  void _createAngularSpeedGradientTexture();
+  void _createVelocityGradientTexture();
+  void _createColorGradientTexture();
   void _releaseBuffers();
   void _releaseVAOs();
 
 public:
   /**
-   * List of animations used by the particle system.
-   */
-  vector_t<Animation*> animations;
-
-  /**
    * An event triggered when the system is disposed.
    */
   Observable<GPUParticleSystem> onDisposeObservable;
-
-  /**
-   * Minimum angular speed of emitting particles (Z-axis rotation for each
-   * particle).
-   */
-  float minAngularSpeed;
-
-  /**
-   * Maximum angular speed of emitting particles (Z-axis rotation for each
-   * particle).
-   */
-  float maxAngularSpeed;
 
   /**
    * Random direction of each particle after it has been emitted, between
@@ -217,10 +347,17 @@ public:
    */
   Property<GPUParticleSystem, size_t> activeParticleCount;
 
+  /**
+   * Gets whether an animation sprite sheet is enabled or not on the particle
+   * system
+   */
+  ReadOnlyProperty<GPUParticleSystem, bool> isAnimationSheetEnabled;
+
 private:
   size_t _capacity;
   size_t _activeCount;
   size_t _currentActiveCount;
+  size_t _accumulatedCount;
   unique_ptr_t<Effect> _renderEffect;
   unique_ptr_t<Effect> _updateEffect;
 
@@ -244,6 +381,7 @@ private:
   float _timeDelta;
 
   unique_ptr_t<RawTexture> _randomTexture;
+  unique_ptr_t<RawTexture> _randomTexture2;
 
   int _attributesStrideSize;
   EffectCreationOptions* _updateEffectOptions;
@@ -252,6 +390,22 @@ private:
   int _actualFrame;
 
   Vector3 _zeroVector3;
+  unsigned int _rawTextureWidth;
+  bool _preWarmDone;
+  bool _isAnimationSheetEnabled;
+  bool _isBillboardBased;
+
+  vector_t<ColorGradient> _colorGradients;
+  unique_ptr_t<RawTexture> _colorGradientsTexture;
+
+  vector_t<FactorGradient> _angularSpeedGradients;
+  unique_ptr_t<RawTexture> _angularSpeedGradientsTexture;
+
+  vector_t<FactorGradient> _sizeGradients;
+  unique_ptr_t<RawTexture> _sizeGradientsTexture;
+
+  vector_t<FactorGradient> _velocityGradients;
+  unique_ptr_t<RawTexture> _velocityGradientsTexture;
 
 }; // end of class GPUParticleSystem
 

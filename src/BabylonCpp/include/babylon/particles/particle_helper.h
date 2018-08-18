@@ -2,6 +2,7 @@
 #define BABYLON_PARTICLES_PARTICLE_HELPER_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/variant.h>
 
 namespace BABYLON {
 
@@ -16,6 +17,17 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    */
   static constexpr const char* BaseAssetsUrl
     = "https://assets.babylonjs.com/particles";
+
+  /**
+   * @brief Create a default particle system that you can tweak.
+   * @param emitter defines the emitter to use
+   * @param capacity defines the system capacity (default is 500 particles)
+   * @param scene defines the hosting scene
+   * @returns the new Particle system
+   */
+  static ParticleSystem*
+  CreateDefault(const Variant<AbstractMesh*, Vector3>& emitter,
+                size_t capacity = 500, Scene* scene = nullptr);
 
   /**
    * @brief This is the main static method (one-liner) of this helper to create
@@ -36,7 +48,7 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    * @param system defines the particle systems to export
    */
   static unique_ptr_t<ParticleSystemSet>
-  _createSystem(const vector_t<IParticleSystem*>& systems);
+  ExportSet(const vector_t<IParticleSystem*>& systems);
 
 }; // end of class ParticleHelper
 

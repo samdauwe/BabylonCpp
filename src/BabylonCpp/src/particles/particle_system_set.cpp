@@ -10,8 +10,8 @@
 namespace BABYLON {
 
 ParticleSystemSet::ParticleSystemSet()
-    : emitterMesh{this, &ParticleSystemSet::get_emitterMesh}
-    , _emitterMesh{nullptr}
+    : emitterNode{this, &ParticleSystemSet::get_emitterNode}
+    , _emitterNode{nullptr}
 {
 }
 
@@ -19,17 +19,17 @@ ParticleSystemSet::~ParticleSystemSet()
 {
 }
 
-Mesh*& ParticleSystemSet::get_emitterMesh()
+TransformNode*& ParticleSystemSet::get_emitterNode()
 {
-  return _emitterMesh;
+  return _emitterNode;
 }
 
 void ParticleSystemSet::setEmitterAsSphere(
   const EmitterCreationOptions& options, unsigned int renderingGroupId,
   Scene* scene)
 {
-  if (_emitterMesh) {
-    _emitterMesh->dispose();
+  if (_emitterNode) {
+    _emitterNode->dispose();
   }
 
   _emitterCreationOptions = {
@@ -41,17 +41,19 @@ void ParticleSystemSet::setEmitterAsSphere(
   SphereOptions sphereOptions(options.diameter);
   sphereOptions.segments = options.segments;
 
-  _emitterMesh
+  auto emitterMesh
     = MeshBuilder::CreateSphere("emitterSphere", sphereOptions, scene);
-  _emitterMesh->renderingGroupId = renderingGroupId;
+  emitterMesh->renderingGroupId = renderingGroupId;
 
   auto material = StandardMaterial::New("emitterSphereMaterial", scene);
   material->emissiveColor = options.color;
-  _emitterMesh->material  = material;
+  emitterMesh->material   = material;
 
   for (auto& system : systems) {
-    system->emitter.set<AbstractMesh*>(_emitterMesh);
+    system->emitter.set<AbstractMesh*>(emitterMesh);
   }
+
+  _emitterNode = emitterMesh;
 }
 
 void ParticleSystemSet::start(AbstractMesh* emitter)
@@ -73,9 +75,9 @@ void ParticleSystemSet::dispose(bool doNotRecurse,
 
   systems.clear();
 
-  if (_emitterMesh) {
-    _emitterMesh->dispose();
-    _emitterMesh = nullptr;
+  if (_emitterNode) {
+    _emitterNode->dispose();
+    _emitterNode = nullptr;
   }
 }
 

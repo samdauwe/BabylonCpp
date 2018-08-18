@@ -15,6 +15,10 @@ struct BABYLON_SHARED_EXPORT IValueGradient {
    */
   float gradient;
 
+  float factor1;
+
+  nullable_t<float> factor2;
+
 }; // end of struct IValueGradient
 
 } // end of namespace BABYLON

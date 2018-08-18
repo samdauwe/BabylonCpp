@@ -39,10 +39,11 @@ public:
   static constexpr unsigned int LifeKind                 = 23;
   static constexpr unsigned int VelocityKind             = 24;
   static constexpr unsigned int DirectionKind            = 25;
-  static constexpr unsigned int OffsetKind               = 26;
-  static constexpr unsigned int SeedKind                 = 27;
-  static constexpr unsigned int SizeKind                 = 28;
-  static constexpr unsigned int AngleKind                = 29;
+  static constexpr unsigned int InitialDirectionKind     = 26;
+  static constexpr unsigned int OffsetKind               = 27;
+  static constexpr unsigned int SeedKind                 = 28;
+  static constexpr unsigned int SizeKind                 = 29;
+  static constexpr unsigned int AngleKind                = 30;
 
   static constexpr const char* PositionKindChars        = "position";
   static constexpr const char* NormalKindChars          = "normal";
@@ -60,21 +61,22 @@ public:
     = "matricesIndicesExtra";
   static constexpr const char* MatricesWeightsExtraKindChars
     = "matricesWeightsExtra";
-  static constexpr const char* World0KindChars    = "world0";
-  static constexpr const char* World1KindChars    = "world1";
-  static constexpr const char* World2KindChars    = "world2";
-  static constexpr const char* World3KindChars    = "world3";
-  static constexpr const char* CellInfoKindChars  = "cellInfo";
-  static constexpr const char* CellIndexKindChars = "cellIndex";
-  static constexpr const char* OptionsKindChars   = "options";
-  static constexpr const char* AgeKindChars       = "age";
-  static constexpr const char* LifeKindChars      = "life";
-  static constexpr const char* VelocityKindChars  = "velocity";
-  static constexpr const char* DirectionKindChars = "direction";
-  static constexpr const char* OffsetKindChars    = "offset";
-  static constexpr const char* SeedKindChars      = "seed";
-  static constexpr const char* SizeKindChars      = "size";
-  static constexpr const char* AngleKindChars     = "angle";
+  static constexpr const char* World0KindChars           = "world0";
+  static constexpr const char* World1KindChars           = "world1";
+  static constexpr const char* World2KindChars           = "world2";
+  static constexpr const char* World3KindChars           = "world3";
+  static constexpr const char* CellInfoKindChars         = "cellInfo";
+  static constexpr const char* CellIndexKindChars        = "cellIndex";
+  static constexpr const char* OptionsKindChars          = "options";
+  static constexpr const char* AgeKindChars              = "age";
+  static constexpr const char* LifeKindChars             = "life";
+  static constexpr const char* VelocityKindChars         = "velocity";
+  static constexpr const char* DirectionKindChars        = "direction";
+  static constexpr const char* InitialDirectionKindChars = "initialDirection";
+  static constexpr const char* OffsetKindChars           = "offset";
+  static constexpr const char* SeedKindChars             = "seed";
+  static constexpr const char* SizeKindChars             = "size";
+  static constexpr const char* AngleKindChars            = "angle";
 
   /**
    * The byte type.

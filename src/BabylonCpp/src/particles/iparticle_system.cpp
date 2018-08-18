@@ -4,6 +4,12 @@
 
 namespace BABYLON {
 
+IParticleSystem::IParticleSystem()
+    : isBillboardBased{this, &IParticleSystem::get_isBillboardBased,
+                       &IParticleSystem::set_isBillboardBased}
+{
+}
+
 IParticleSystem::~IParticleSystem()
 {
 }

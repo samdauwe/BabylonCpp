@@ -1,5 +1,6 @@
 #include <babylon/particles/particle_system.h>
 
+#include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/random.h>
 #include <babylon/core/string.h>
@@ -11,11 +12,14 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/scalar.h>
+#include <babylon/math/tmp.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/cone_particle_emitter.h>
+#include <babylon/particles/emittertypes/hemispheric_particle_emitter.h>
+#include <babylon/particles/emittertypes/point_particle_emitter.h>
 #include <babylon/particles/emittertypes/sphere_directed_particle_emitter.h>
 #include <babylon/particles/emittertypes/sphere_particle_emitter.h>
 #include <babylon/particles/particle.h>
@@ -28,8 +32,6 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
                                bool isAnimationSheetEnabled, float epsilon)
     : manualEmitCount{-1}
     , disposeOnStop{false}
-    , minAngularSpeed{0.f}
-    , maxAngularSpeed{0.f}
     , preventAutoStart{false}
     , updateFunction{nullptr}
     , onAnimationEnd{nullptr}
@@ -43,17 +45,10 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , maxEmitBox{this, &ParticleSystem::get_maxEmitBox,
                  &ParticleSystem::set_maxEmitBox}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
-    , spriteCellLoop{true}
-    , spriteCellChangeSpeed{0.f}
-    , startSpriteCellID{0}
-    , endSpriteCellID{0}
-    , spriteCellWidth{0}
-    , spriteCellHeight{0}
     , onDispose{this, &ParticleSystem::set_onDispose}
     , isAnimationSheetEnabled{this,
-                              &ParticleSystem::get_isAnimationSheetEnabled}
-    , isBillboardBased{this, &ParticleSystem::get_isBillboardBased,
-                       &ParticleSystem::set_isBillboardBased}
+                              &ParticleSystem::get_isAnimationSheetEnabled,
+                              &ParticleSystem::set_isAnimationSheetEnabled}
     , _vertexBufferSize{11}
     , _epsilon{epsilon}
     , _capacity{capacity}
@@ -76,28 +71,39 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
 {
   // IParticleSystem
   {
-    id                  = iName;
-    name                = iName;
-    renderingGroupId    = 0;
-    emitRate            = 10.f;
-    updateSpeed         = 0.01f;
-    targetStopDuration  = 0;
-    particleTexture     = nullptr;
-    blendMode           = ParticleSystem::BLENDMODE_ONEONE;
-    minLifeTime         = 1.f;
-    maxLifeTime         = 1.f;
-    minSize             = 1.f;
-    maxSize             = 1.f;
-    layerMask           = 0x0FFFFFFF;
-    color1              = Color4{1.f, 1.f, 1.f, 1.f};
-    color2              = Color4{1.f, 1.f, 1.f, 1.f};
-    colorDead           = Color4{0.f, 0.f, 0.f, 1.f};
-    textureMask         = Color4{1.f, 1.f, 1.f, 1.f};
-    emitRate            = 100;
-    gravity             = Vector3::Zero();
-    minEmitPower        = 1.f;
-    maxEmitPower        = 1.f;
-    particleEmitterType = nullptr;
+    id                    = iName;
+    name                  = iName;
+    renderingGroupId      = 0;
+    emitRate              = 10.f;
+    updateSpeed           = 0.01f;
+    targetStopDuration    = 0;
+    particleTexture       = nullptr;
+    blendMode             = ParticleSystem::BLENDMODE_ONEONE;
+    minLifeTime           = 1.f;
+    maxLifeTime           = 1.f;
+    minSize               = 1.f;
+    maxSize               = 1.f;
+    layerMask             = 0x0FFFFFFF;
+    color1                = Color4{1.f, 1.f, 1.f, 1.f};
+    color2                = Color4{1.f, 1.f, 1.f, 1.f};
+    colorDead             = Color4{0.f, 0.f, 0.f, 1.f};
+    textureMask           = Color4{1.f, 1.f, 1.f, 1.f};
+    emitRate              = 100;
+    gravity               = Vector3::Zero();
+    minEmitPower          = 1.f;
+    maxEmitPower          = 1.f;
+    minAngularSpeed       = 0.f;
+    maxAngularSpeed       = 0.f;
+    particleEmitterType   = nullptr;
+    spriteCellChangeSpeed = 1.f;
+    startSpriteCellID     = 0;
+    endSpriteCellID       = 0;
+    spriteCellWidth       = 0;
+    spriteCellHeight      = 0;
+    preWarmCycles         = 0;
+    preWarmStepOffset     = 1;
+    translationPivot      = Vector2(0.f, 0.f);
+    billboardMode         = AbstractMesh::BILLBOARDMODE_ALL;
   }
 
   _scene->particleSystems.emplace_back(this);
@@ -111,6 +117,14 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
   particleEmitterType = ::std::make_unique<BoxParticleEmitter>();
 
   updateFunction = [this](vector_t<Particle*>& _particles) {
+    nullable_t<Uint8Array> noiseTextureData;
+    nullable_t<ISize> noiseTextureSize = nullopt_t;
+
+    if (noiseTexture) { // We need to get texture data back to CPU
+      noiseTextureData = noiseTexture->readPixels().uint8Array;
+      noiseTextureSize = noiseTexture->getSize();
+    }
+
     for (unsigned int index = 0; index < _particles.size(); ++index) {
       auto particle = _particles[index];
       particle->age += static_cast<float>(_scaledUpdateSpeed);
@@ -123,16 +137,15 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
         continue;
       }
       else {
-        // auto ratio = particle->age / particle->lifeTime;
+        auto ratio = particle->age / particle->lifeTime;
 
         // Color
         if (!_colorGradients.empty()) {
-#if 0
-          Tools::GetCurrentGradient(
+          Tools::GetCurrentGradient<ColorGradient>(
             ratio, _colorGradients,
             [&](ColorGradient& currentGradient, ColorGradient& nextGradient,
                 float scale) {
-              if (currentGradient != particle->_currentColorGradient) {
+              if (currentGradient != *particle->_currentColorGradient) {
                 particle->_currentColor1.copyFrom(particle->_currentColor2);
                 static_cast<ColorGradient&>(nextGradient)
                   .getColorToRef(particle->_currentColor2);
@@ -143,7 +156,6 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
                                 particle->_currentColor2, scale,
                                 particle->color);
             });
-#endif
         }
         else {
           particle->colorStep.scaleToRef(_scaledUpdateSpeed, _scaledColorStep);
@@ -154,33 +166,98 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
           }
         }
 
-        particle->angle
-          += particle->angularSpeed * static_cast<float>(_scaledUpdateSpeed);
+        // Angular speed
+        if (!_angularSpeedGradients.empty()) {
+          Tools::GetCurrentGradient<FactorGradient>(
+            ratio, _angularSpeedGradients,
+            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+                float scale) {
+              if (currentGradient != particle->_currentAngularSpeedGradient) {
+                particle->_currentAngularSpeed1
+                  = particle->_currentAngularSpeed2;
+                particle->_currentAngularSpeed2 = nextGradient.getFactor();
+                particle->_currentAngularSpeedGradient = currentGradient;
+              }
+              particle->angularSpeed
+                = Scalar::Lerp(particle->_currentAngularSpeed1,
+                               particle->_currentAngularSpeed2, scale);
+            });
+        }
+        particle->angle += particle->angularSpeed * _scaledUpdateSpeed;
 
-        particle->direction.scaleToRef(_scaledUpdateSpeed, _scaledDirection);
+        // Direction
+        auto directionScale = _scaledUpdateSpeed;
+        if (_velocityGradients.size() > 0) {
+          Tools::GetCurrentGradient<FactorGradient>(
+            ratio, _velocityGradients,
+            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+                float scale) {
+              if (currentGradient != particle->_currentVelocityGradient) {
+                particle->_currentVelocity1 = particle->_currentVelocity2;
+                particle->_currentVelocity2 = nextGradient.getFactor();
+                particle->_currentVelocityGradient = currentGradient;
+              }
+              directionScale
+                *= Scalar::Lerp(particle->_currentVelocity1,
+                                particle->_currentVelocity2, scale);
+            });
+        }
+        particle->direction.scaleToRef(directionScale, _scaledDirection);
         particle->position.addInPlace(_scaledDirection);
 
+        // Noise
+        if (noiseTextureData && noiseTextureSize) {
+          auto& localPosition   = Tmp::Vector3Array[0];
+          auto& emitterPosition = Tmp::Vector3Array[1];
+
+          _emitterWorldMatrix.getTranslationToRef(emitterPosition);
+          particle->position.subtractToRef(emitterPosition, localPosition);
+
+          auto fetchedColorR
+            = _fetchR(localPosition.y, localPosition.z, noiseTextureSize->width,
+                      noiseTextureSize->height, *noiseTextureData);
+          auto fetchedColorG
+            = _fetchR(localPosition.x + 0.33f, localPosition.z + 0.33f,
+                      noiseTextureSize->width, noiseTextureSize->height,
+                      *noiseTextureData);
+          auto fetchedColorB
+            = _fetchR(localPosition.x - 0.3f, localPosition.y - 0.33f,
+                      noiseTextureSize->width, noiseTextureSize->height,
+                      *noiseTextureData);
+
+          auto& force       = Tmp::Vector3Array[0];
+          auto& scaledForce = Tmp::Vector3Array[1];
+
+          force.copyFromFloats((2.f * fetchedColorR - 1.f) * noiseStrength.x,
+                               (2.f * fetchedColorG - 1.f) * noiseStrength.y,
+                               (2.f * fetchedColorB - 1.f) * noiseStrength.z);
+
+          force.scaleToRef(_scaledUpdateSpeed, scaledForce);
+          particle->direction.addInPlace(scaledForce);
+        }
+
+        // Gravity
         gravity.scaleToRef(_scaledUpdateSpeed, _scaledGravity);
         particle->direction.addInPlace(_scaledGravity);
 
-        // Gradient
+        // Size
         if (!_sizeGradients.empty()) {
-#if 0
-          Tools::GetCurrentGradient(
+          Tools::GetCurrentGradient<FactorGradient>(
             ratio, _sizeGradients,
             [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
                 float scale) {
-              particle->size
-                = particle->_initialSize
-                  * Scalar::Lerp(
-                      static_cast<FactorGradient&>(currentGradient).factor,
-                      static_cast<FactorGradient&>(nextGradient).factor, scale);
+              if (currentGradient != particle->_currentSizeGradient) {
+                particle->_currentSize1        = particle->_currentSize2;
+                particle->_currentSize2        = nextGradient.getFactor();
+                particle->_currentSizeGradient = currentGradient;
+              }
+              particle->size = Scalar::Lerp(particle->_currentSize1,
+                                            particle->_currentSize2, scale);
             });
-#endif
         }
 
         if (_isAnimationSheetEnabled) {
-          particle->updateCellIndex(_scaledUpdateSpeed);
+          particle->updateCellIndex();
         }
       }
     }
@@ -201,6 +278,11 @@ const char* ParticleSystem::getClassName() const
   return "ParticleSystem";
 }
 
+Scene* ParticleSystem::getScene() const
+{
+  return _scene;
+}
+
 vector_t<Particle*>& ParticleSystem::particles()
 {
   return _particles;
@@ -214,6 +296,21 @@ vector_t<ColorGradient>& ParticleSystem::getColorGradients()
 vector_t<FactorGradient>& ParticleSystem::getSizeGradients()
 {
   return _sizeGradients;
+}
+
+vector_t<FactorGradient>& ParticleSystem::getLifeTimeGradients()
+{
+  return _lifeTimeGradients;
+}
+
+vector_t<FactorGradient>& ParticleSystem::getAngularSpeedGradients()
+{
+  return _angularSpeedGradients;
+}
+
+vector_t<FactorGradient>& ParticleSystem::getVelocityGradients()
+{
+  return _velocityGradients;
 }
 
 Vector3& ParticleSystem::get_direction1()
@@ -302,6 +399,16 @@ bool ParticleSystem::get_isAnimationSheetEnabled() const
   return _isAnimationSheetEnabled;
 }
 
+void ParticleSystem::set_isAnimationSheetEnabled(bool value)
+{
+  if (_isAnimationSheetEnabled == value) {
+    return;
+  }
+
+  _isAnimationSheetEnabled = value;
+  _resetEffect();
+}
+
 bool ParticleSystem::get_isBillboardBased() const
 {
   return _isBillboardBased;
@@ -317,14 +424,30 @@ void ParticleSystem::set_isBillboardBased(bool value)
   _resetEffect();
 }
 
-IParticleSystem& ParticleSystem::addSizeGradient(float gradient, float factor)
+float ParticleSystem::_fetchR(float u, float v, float width, float height,
+                              const Uint8Array& pixels)
 {
-  FactorGradient sizeGradient;
-  sizeGradient.gradient = gradient;
-  sizeGradient.factor   = factor;
-  _sizeGradients.emplace_back(sizeGradient);
+  u = ::std::abs(u) * 0.5f + 0.5f;
+  v = ::std::abs(v) * 0.5f + 0.5f;
 
-  ::std::sort(_sizeGradients.begin(), _sizeGradients.end(),
+  auto wrappedU = ::std::fmod((u * width), width);
+  auto wrappedV = ::std::fmod((v * height), height);
+
+  auto position = static_cast<size_t>((wrappedU + wrappedV * width) * 4);
+  return static_cast<float>(pixels[position]) / 255.f;
+}
+
+void ParticleSystem::_addFactorGradient(
+  vector_t<FactorGradient>& factorGradients, float gradient, float factor,
+  const nullable_t<float>& factor2)
+{
+  FactorGradient newGradient;
+  newGradient.gradient = gradient;
+  newGradient.factor1  = factor;
+  newGradient.factor2  = factor2;
+  factorGradients.emplace_back(newGradient);
+
+  ::std::sort(factorGradients.begin(), factorGradients.end(),
               [](const FactorGradient& a, const FactorGradient& b) {
                 if (a.gradient < b.gradient) {
                   return -1;
@@ -335,26 +458,91 @@ IParticleSystem& ParticleSystem::addSizeGradient(float gradient, float factor)
 
                 return 0;
               });
+}
+
+void ParticleSystem::_removeFactorGradient(
+  vector_t<FactorGradient>& factorGradients, float gradient)
+{
+  if (factorGradients.empty()) {
+    return;
+  }
+
+  factorGradients.erase(
+    ::std::remove_if(factorGradients.begin(), factorGradients.end(),
+                     [&gradient](const FactorGradient& factorGradient) {
+                       return stl_util::almost_equal(factorGradient.gradient,
+                                                     gradient);
+                     }),
+    factorGradients.end());
+}
+
+ParticleSystem&
+ParticleSystem::addLifeTimeGradient(float gradient, float factor,
+                                    const nullable_t<float>& factor2)
+{
+  _addFactorGradient(_lifeTimeGradients, gradient, factor, factor2);
 
   return *this;
 }
 
-IParticleSystem& ParticleSystem::removeSizeGradient(float /*gradient*/)
+ParticleSystem& ParticleSystem::removeLifeTimeGradient(float gradient)
 {
-  if (_sizeGradients.empty()) {
-    return *this;
-  }
-#if 0
-  _sizeGradients.erase(
-    ::std::remove(_sizeGradients.begin(), _sizeGradients.end(), gradient),
-    _sizeGradients.end());
-#endif
+  _removeFactorGradient(_lifeTimeGradients, gradient);
+
+  return *this;
+}
+
+ParticleSystem&
+ParticleSystem::addSizeGradient(float gradient, float factor,
+                                const nullable_t<float>& factor2)
+{
+  _addFactorGradient(_sizeGradients, gradient, factor, factor2);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeSizeGradient(float gradient)
+{
+  _removeFactorGradient(_sizeGradients, gradient);
+
+  return *this;
+}
+
+IParticleSystem&
+ParticleSystem::addAngularSpeedGradient(float gradient, float factor,
+                                        const nullable_t<float>& factor2)
+{
+  _addFactorGradient(_angularSpeedGradients, gradient, factor, factor2);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeAngularSpeedGradient(float gradient)
+{
+  _removeFactorGradient(_angularSpeedGradients, gradient);
+
+  return *this;
+}
+
+IParticleSystem&
+ParticleSystem::addVelocityGradient(float gradient, float factor,
+                                    const nullable_t<float>& factor2)
+{
+  _addFactorGradient(_velocityGradients, gradient, factor, factor2);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeVelocityGradient(float gradient)
+{
+  _removeFactorGradient(_velocityGradients, gradient);
+
   return *this;
 }
 
 IParticleSystem&
 ParticleSystem::addColorGradient(float gradient, const Color4& color,
-                                 const Nullable<Color4>& color2)
+                                 const nullable_t<Color4>& color2)
 {
   ColorGradient colorGradient;
   colorGradient.gradient = gradient;
@@ -377,16 +565,20 @@ ParticleSystem::addColorGradient(float gradient, const Color4& color,
   return *this;
 }
 
-IParticleSystem& ParticleSystem::removeColorGradient(float /*gradient*/)
+IParticleSystem& ParticleSystem::removeColorGradient(float gradient)
 {
   if (_colorGradients.empty()) {
     return *this;
   }
-#if 0
+
   _colorGradients.erase(
-    ::std::remove(_colorGradients.begin(), _colorGradients.end(), gradient),
+    ::std::remove_if(_colorGradients.begin(), _colorGradients.end(),
+                     [&gradient](const ColorGradient& colorGradient) {
+                       return stl_util::almost_equal(colorGradient.gradient,
+                                                     gradient);
+                     }),
     _colorGradients.end());
-#endif
+
   return *this;
 }
 
@@ -512,8 +704,12 @@ bool ParticleSystem::isStarted() const
   return _started;
 }
 
-void ParticleSystem::start()
+void ParticleSystem::start(size_t delay)
 {
+  if (delay > 0) {
+    // Timeout
+  }
+
   _started     = true;
   _stopped     = false;
   _actualFrame = 0;
@@ -639,7 +835,7 @@ Particle* ParticleSystem::_createParticle()
     particle = _stockParticles.back();
     _stockParticles.pop_back();
     particle->age                   = 0;
-    particle->_currentColorGradient = nullptr;
+    particle->_currentColorGradient = nullopt_t;
     particle->cellIndex             = startSpriteCellID;
   }
   else {
@@ -682,21 +878,19 @@ void ParticleSystem::_update(int newParticles)
   // Update current
   _alive = !_particles.empty();
 
-  updateFunction(_particles);
-
-  // Add new ones
-  Matrix worldMatrix;
-
   if (emitter.is<AbstractMesh*>()) {
-    auto emitterMesh = emitter.get<AbstractMesh*>();
-    worldMatrix      = *emitterMesh->getWorldMatrix();
+    auto emitterMesh    = emitter.get<AbstractMesh*>();
+    _emitterWorldMatrix = *emitterMesh->getWorldMatrix();
   }
   else {
     auto emitterPosition = emitter.get<Vector3>();
-    worldMatrix = Matrix::Translation(emitterPosition.x, emitterPosition.y,
-                                      emitterPosition.z);
+    _emitterWorldMatrix  = Matrix::Translation(
+      emitterPosition.x, emitterPosition.y, emitterPosition.z);
   }
 
+  updateFunction(_particles);
+
+  // Add new ones
   Particle* particle = nullptr;
   for (int index = 0; index < newParticles; ++index) {
     if (_particles.size() == _capacity) {
@@ -707,22 +901,24 @@ void ParticleSystem::_update(int newParticles)
 
     _particles.emplace_back(particle);
 
+    // Emitter
     auto emitPower = Scalar::RandomRange(minEmitPower, maxEmitPower);
 
     if (startPositionFunction) {
-      startPositionFunction(worldMatrix, particle->position, particle);
+      startPositionFunction(_emitterWorldMatrix, particle->position, particle);
     }
     else {
-      particleEmitterType->startPositionFunction(worldMatrix,
+      particleEmitterType->startPositionFunction(_emitterWorldMatrix,
                                                  particle->position, particle);
     }
 
     if (startDirectionFunction) {
-      startDirectionFunction(worldMatrix, particle->direction, particle);
+      startDirectionFunction(_emitterWorldMatrix, particle->direction,
+                             particle);
     }
     else {
       particleEmitterType->startDirectionFunction(
-        worldMatrix, particle->direction, particle);
+        _emitterWorldMatrix, particle->direction, particle);
     }
 
     if (emitPower == 0.f) {
@@ -734,23 +930,88 @@ void ParticleSystem::_update(int newParticles)
       }
     }
     else {
-      particle->_initialDirection = nullptr;
+      particle->_initialDirection = nullopt_t;
     }
 
     particle->direction.scaleInPlace(emitPower);
 
-    particle->lifeTime = Scalar::RandomRange(minLifeTime, maxLifeTime);
+    // Life time
+    if (targetStopDuration && !_lifeTimeGradients.empty()) {
+      auto ratio = Scalar::Clamp(_actualFrame / targetStopDuration);
+      Tools::GetCurrentGradient<FactorGradient>(
+        ratio, _lifeTimeGradients,
+        [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+            float /*scale*/) {
+          auto& factorGradient1 = currentGradient;
+          auto& factorGradient2 = nextGradient;
+          auto lifeTime1        = factorGradient1.getFactor();
+          auto lifeTime2        = factorGradient2.getFactor();
+          auto gradient
+            = (ratio - factorGradient1.gradient)
+              / (factorGradient2.gradient - factorGradient1.gradient);
+          particle->lifeTime = Scalar::Lerp(lifeTime1, lifeTime2, gradient);
+        });
+    }
+    else {
+      particle->lifeTime = Scalar::RandomRange(minLifeTime, maxLifeTime);
+    }
 
-    particle->size         = Scalar::RandomRange(minSize, maxSize);
-    particle->_initialSize = particle->size;
+    // Size
+    if (!_sizeGradients.empty()) {
+      particle->size = Scalar::RandomRange(minSize, maxSize);
+    }
+    else {
+      particle->_currentSizeGradient = _sizeGradients[0];
+      particle->_currentSize1 = (*particle->_currentSizeGradient).getFactor();
+      particle->size          = particle->_currentSize1;
+
+      if (_sizeGradients.size() > 1) {
+        particle->_currentSize2 = _sizeGradients[1].getFactor();
+      }
+      else {
+        particle->_currentSize2 = particle->_currentSize1;
+      }
+    }
+    // Size and scale
     particle->scale.copyFromFloats(Scalar::RandomRange(minScaleX, maxScaleX),
                                    Scalar::RandomRange(minScaleY, maxScaleY));
-    particle->angularSpeed
-      = Scalar::RandomRange(minAngularSpeed, maxAngularSpeed);
 
+    // Angle
+    if (!_angularSpeedGradients.empty()) {
+      particle->angularSpeed
+        = Scalar::RandomRange(minAngularSpeed, maxAngularSpeed);
+    }
+    else {
+      particle->_currentAngularSpeedGradient = _angularSpeedGradients[0];
+      particle->angularSpeed
+        = (*particle->_currentAngularSpeedGradient).getFactor();
+      particle->_currentAngularSpeed1 = particle->angularSpeed;
+
+      if (_angularSpeedGradients.size() > 1) {
+        particle->_currentAngularSpeed2 = _angularSpeedGradients[1].getFactor();
+      }
+      else {
+        particle->_currentAngularSpeed2 = particle->_currentAngularSpeed1;
+      }
+    }
     particle->angle
       = Scalar::RandomRange(minInitialRotation, maxInitialRotation);
 
+    // Velocity
+    if (!_velocityGradients.empty()) {
+      particle->_currentVelocityGradient = _velocityGradients[0];
+      particle->_currentVelocity1
+        = (*particle->_currentVelocityGradient).getFactor();
+
+      if (_velocityGradients.size() > 1) {
+        particle->_currentVelocity2 = _velocityGradients[1].getFactor();
+      }
+      else {
+        particle->_currentVelocity2 = particle->_currentVelocity1;
+      }
+    }
+
+    // Color
     if (_colorGradients.empty()) {
       auto step = Scalar::RandomRange(0.f, 1.f);
 
@@ -771,6 +1032,12 @@ void ParticleSystem::_update(int newParticles)
       else {
         particle->_currentColor2.copyFrom(particle->color);
       }
+    }
+
+    // Sheet
+    if (_isAnimationSheetEnabled) {
+      particle->_initialStartSpriteCellID = startSpriteCellID;
+      particle->_initialEndSpriteCellID   = endSpriteCellID;
     }
   }
 }
@@ -797,8 +1064,9 @@ ParticleSystem::_GetAttributeNamesOrOptions(bool isAnimationSheetEnabled,
 vector_t<string_t>
 ParticleSystem::_GetEffectCreationOptions(bool isAnimationSheetEnabled)
 {
-  vector_t<string_t> effectCreationOption{"invView", "view", "projection",
-                                          "vClipPlane", "textureMask"};
+  vector_t<string_t> effectCreationOption{
+    "invView",          "view",       "projection", "vClipPlane", "textureMask",
+    "translationPivot", "eyePosition"};
 
   if (isAnimationSheetEnabled) {
     effectCreationOption.emplace_back("particlesInfos");
@@ -825,6 +1093,15 @@ Effect* ParticleSystem::_getEffect()
 
   if (_isBillboardBased) {
     defines.emplace_back("#define BILLBOARD");
+
+    switch (billboardMode) {
+      case AbstractMesh::BILLBOARDMODE_Y:
+        defines.emplace_back("#define BILLBOARDY");
+        break;
+      case AbstractMesh::BILLBOARDMODE_ALL:
+      default:
+        break;
+    }
   }
 
   // Effect
@@ -967,7 +1244,7 @@ bool ParticleSystem::isReady()
   return true;
 }
 
-size_t ParticleSystem::render()
+size_t ParticleSystem::render(bool /*preWarm*/)
 {
   auto effect = _getEffect();
 
@@ -995,8 +1272,14 @@ size_t ParticleSystem::render()
                       static_cast<float>(baseSize.width) / spriteCellWidth);
   }
 
+  effect->setVector2("translationPivot", translationPivot);
   effect->setFloat4("textureMask", textureMask.r, textureMask.g, textureMask.b,
                     textureMask.a);
+
+  if (_isBillboardBased) {
+    auto camera = _scene->activeCamera;
+    effect->setVector3("eyePosition", camera->globalPosition);
+  }
 
   if (_scene->clipPlane()) {
     auto clipPlane = _scene->clipPlane();
@@ -1066,6 +1349,11 @@ void ParticleSystem::dispose(bool disposeTexture,
     particleTexture = nullptr;
   }
 
+  if (disposeTexture && noiseTexture) {
+    noiseTexture->dispose();
+    noiseTexture = nullptr;
+  }
+
   _removeFromRoot();
 
   // Remove from scene
@@ -1087,10 +1375,33 @@ vector_t<Animation*> ParticleSystem::getAnimations()
   return animations;
 }
 
-SphereParticleEmitter* ParticleSystem::createSphereEmitter(float radius)
+PointParticleEmitter*
+ParticleSystem::createPointEmitter(const Vector3& direction1,
+                                   const Vector3& direction2)
 {
-  auto particleEmitter = ::std::make_unique<SphereParticleEmitter>(radius);
-  particleEmitterType  = ::std::move(particleEmitter);
+  auto particleEmitter        = ::std::make_unique<PointParticleEmitter>();
+  particleEmitter->direction1 = direction1;
+  particleEmitter->direction2 = direction2;
+
+  particleEmitterType = ::std::move(particleEmitter);
+  return particleEmitter.get();
+}
+
+HemisphericParticleEmitter*
+ParticleSystem::createHemisphericEmitter(float radius, float radiusRange)
+{
+  auto particleEmitter
+    = ::std::make_unique<HemisphericParticleEmitter>(radius, radiusRange);
+  particleEmitterType = ::std::move(particleEmitter);
+  return particleEmitter.get();
+}
+
+SphereParticleEmitter* ParticleSystem::createSphereEmitter(float radius,
+                                                           float radiusRange)
+{
+  auto particleEmitter
+    = ::std::make_unique<SphereParticleEmitter>(radius, radiusRange);
+  particleEmitterType = ::std::move(particleEmitter);
   return particleEmitter.get();
 }
 
@@ -1267,10 +1578,8 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
     = Json::GetNumber<unsigned>(parsedParticleSystem, "startSpriteCellID", 0u);
   particleSystem->endSpriteCellID
     = Json::GetNumber<unsigned>(parsedParticleSystem, "endSpriteCellID", 0u);
-  particleSystem->spriteCellLoop
-    = Json::GetBool(parsedParticleSystem, "spriteCellLoop", true);
   particleSystem->spriteCellChangeSpeed = Json::GetNumber<float>(
-    parsedParticleSystem, "spriteCellChangeSpeed", 0.f);
+    parsedParticleSystem, "spriteCellChangeSpeed", 1.f);
   particleSystem->spriteCellWidth
     = Json::GetNumber<unsigned>(parsedParticleSystem, "spriteCellWidth", 0u);
   particleSystem->spriteCellHeight

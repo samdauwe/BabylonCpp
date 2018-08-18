@@ -5,8 +5,6 @@
 #include <babylon/math/color4.h>
 #include <babylon/tools/ivalue_gradient.h>
 
-#include <babylon/core/nullable.h>
-
 namespace BABYLON {
 
 /**
@@ -34,9 +32,12 @@ public:
   /**
    * Gets or sets second associated color
    */
-  Nullable<Color4> color2;
+  nullable_t<Color4> color2;
 
 }; // end of class ColorGradient
+
+bool operator==(const ColorGradient& lhs, const ColorGradient& rhs);
+bool operator!=(const ColorGradient& lhs, const ColorGradient& rhs);
 
 } // end of namespace BABYLON
 

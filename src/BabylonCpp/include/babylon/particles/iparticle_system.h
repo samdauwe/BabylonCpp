@@ -5,22 +5,22 @@
 #include <babylon/core/variant.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
+#include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/color_gradient.h>
 #include <babylon/tools/factor_gradient.h>
 
-#include <babylon/core/nullable.h>
-
 namespace BABYLON {
 
 /**
- * @brief Interface representing a particle system in Babylon.
+ * @brief Interface representing a particle system in Babylon.js.
  * This groups the common functionalities that needs to be implemented in order
  * to create a particle system. A particle system represents a way to manage
  * particles from their emission to their animation and rendering.
  */
 struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
+  IParticleSystem();
   virtual ~IParticleSystem();
 
   /**
@@ -45,10 +45,22 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   Variant<AbstractMesh*, Vector3> emitter;
 
   /**
+   * @brief Gets or sets a boolean indicating if the particles must be rendered
+   * as billboard or aligned with the direction.
+   */
+  virtual bool get_isBillboardBased() const = 0;
+
+  /**
+   * @brief Sets a boolean indicating if the particles must be rendered as
+   * billboard or aligned with the direction.
+   */
+  virtual void set_isBillboardBased(bool value) = 0;
+
+  /**
    * Gets or sets a boolean indicating if the particles must be rendered as
    * billboard or aligned with the direction
    */
-  bool isBillboardBased;
+  Property<IParticleSystem, bool> isBillboardBased;
 
   /**
    * The rendering group used by the Particle system to chose when to render.
@@ -204,6 +216,61 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   size_t preWarmStepOffset;
 
   /**
+   * If using a spritesheet (isAnimationSheetEnabled) defines the speed of the
+   * sprite loop (default is 1 meaning the animation will play once during the
+   * entire particle lifetime)
+   */
+  float spriteCellChangeSpeed;
+
+  /**
+   * If using a spritesheet (isAnimationSheetEnabled) defines the first sprite
+   * cell to display
+   */
+  unsigned int startSpriteCellID;
+
+  /**
+   * If using a spritesheet (isAnimationSheetEnabled) defines the last sprite
+   * cell to display
+   */
+  unsigned int endSpriteCellID;
+
+  /**
+   * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell
+   * width to use
+   */
+  unsigned int spriteCellWidth;
+
+  /**
+   * If using a spritesheet (isAnimationSheetEnabled), defines the sprite cell
+   * height to use
+   */
+  unsigned int spriteCellHeight;
+
+  /**
+   * Gets or sets a Vector2 used to move the pivot (by default (0,0))
+   */
+  Vector2 translationPivot;
+
+  /**
+   *
+   * Gets or sets a texture used to add random noise to particle positions
+   */
+  BaseTexture* noiseTexture = nullptr;
+
+  /**
+   * Gets or sets the strength to apply to the noise value (default is (10, 10,
+   * 10))
+   */
+  Vector3 noiseStrength;
+
+  /**
+   * Gets or sets the billboard mode to use when isBillboardBased = true.
+   * Only BABYLON.AbstractMesh.BILLBOARDMODE_ALL and
+   * AbstractMesh.BILLBOARDMODE_Y are supported so far
+   */
+  unsigned int billboardMode;
+
+  /**
    * @brief Returns whether or not the particle system has an emitter.
    * @return Whether or not the particle system has an emitter
    */
@@ -232,7 +299,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @brief Renders the particle system in its current state.
    * @returns the current number of particles.
    */
-  virtual size_t render() = 0;
+  virtual size_t render(bool preWarm = false) = 0;
 
   /**
    * @brief Dispose the particle system and frees its associated resources.
@@ -264,8 +331,10 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
   /**
    * @brief Starts the particle system and begins to emit.
+   * @param delay defines the delay in milliseconds before starting the system
+   * (0 by default)
    */
-  virtual void start() = 0;
+  virtual void start(size_t delay = 0) = 0;
 
   /**
    * @brief Stops the particle system.
@@ -289,15 +358,17 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @param color defines the color to affect to the specified gradient
    * @param color2 defines an additional color used to define a range ([color,
    * color2]) with main color to pick the final color from
+   * @returns the current particle system
    */
   virtual IParticleSystem&
   addColorGradient(float gradient, const Color4& color1,
-                   const Nullable<Color4>& color2 = nullptr)
+                   const nullable_t<Color4>& color2 = nullopt_t)
     = 0;
 
   /**
    * @brief Remove a specific color gradient
    * @param gradient defines the gradient to remove
+   * @returns the current particle system
    */
   virtual IParticleSystem& removeColorGradient(float gradient) = 0;
 
@@ -305,12 +376,19 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @brief Adds a new size gradient
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the size factor to affect to the specified gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
    */
-  virtual IParticleSystem& addSizeGradient(float gradient, float factor) = 0;
+  virtual IParticleSystem& addSizeGradient(float gradient, float factor,
+                                           const nullable_t<float>& factor2
+                                           = nullopt_t)
+    = 0;
 
   /**
    * @brief Remove a specific size gradient
    * @param gradient defines the gradient to remove
+   * @returns the current particle system
    */
   virtual IParticleSystem& removeSizeGradient(float gradient) = 0;
 
@@ -327,6 +405,62 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @returns the list of size gradients
    */
   virtual vector_t<FactorGradient>& getSizeGradients() = 0;
+
+  /**
+   * @brief Gets the current list of angular speed gradients.
+   * You must use addAngularSpeedGradient and removeAngularSpeedGradient to
+   * udpate this list
+   * @returns the list of angular speed gradients
+   */
+  virtual vector_t<FactorGradient>& getAngularSpeedGradients() = 0;
+
+  /**
+   * @brief Adds a new angular speed gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the size factor to affect to the specified gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  virtual IParticleSystem&
+  addAngularSpeedGradient(float gradient, float factor,
+                          const nullable_t<float>& factor2 = nullopt_t)
+    = 0;
+
+  /**
+   * @brief Remove a specific angular speed gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  virtual IParticleSystem& removeAngularSpeedGradient(float gradient) = 0;
+
+  /**
+   * @brief Gets the current list of velocity gradients.
+   * You must use addVelocityGradient and removeVelocityGradient to udpate this
+   * list
+   * @returns the list of velocity gradients
+   */
+  virtual vector_t<FactorGradient>& getVelocityGradients() = 0;
+
+  /**
+   * @brief Adds a new velocity gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the size factor to affect to the specified gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  virtual IParticleSystem& addVelocityGradient(float gradient, float factor,
+                                               const nullable_t<float>& factor2
+                                               = nullopt_t)
+    = 0;
+
+  /**
+   * @brief Remove a specific velocity gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  virtual IParticleSystem& removeVelocityGradient(float gradient) = 0;
 
 }; // end of struct IParticleSystem
 

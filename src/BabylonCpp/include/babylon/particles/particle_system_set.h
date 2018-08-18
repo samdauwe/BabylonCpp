@@ -57,9 +57,9 @@ public:
 
 protected:
   /**
-   * @brief Gets the emitter mesh used with this set.
+   * @brief Gets the emitter node used with this set.
    */
-  Mesh*& get_emitterMesh();
+  TransformNode*& get_emitterNode();
 
 public:
   /**
@@ -68,13 +68,13 @@ public:
   vector_t<IParticleSystem*> systems;
 
   /**
-   * Gets the emitter mesh used with this set.
+   * Gets the emitter node used with this set.
    */
-  ReadOnlyProperty<ParticleSystemSet, Mesh*> emitterMesh;
+  ReadOnlyProperty<ParticleSystemSet, TransformNode*> emitterNode;
 
 private:
   ParticleSystemSetEmitterCreationOptions _emitterCreationOptions;
-  Mesh* _emitterMesh;
+  TransformNode* _emitterNode;
 
 }; // end of class ParticleSystemSetEmitterCreationOptions
 
