@@ -352,6 +352,7 @@ struct IRenderTargetOptions;
 using RenderTargetCreationOptions = IRenderTargetOptions;
 class MirrorTexture;
 class MultiRenderTarget;
+struct RawCubeTexture;
 class RawTexture;
 class RawTexture3D;
 class RefractionTexture;
