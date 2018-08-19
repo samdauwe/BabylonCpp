@@ -78,7 +78,7 @@ def main():
         "3.3.0-alpha.13": "3.3.0_2018_07_24",
     }
     # List containing the files to ignore
-    whiteList = ["babylon.assetContainer.ts", "babylon.nullEngine.ts",
+    whiteList = ["babylon.nullEngine.ts", "babylon.khronosTextureContainer.ts",
                  "babylon.assetsManager.ts", "babylon.virtualJoystick.ts",
                  "babylon.decorators.ts", "babylon.andOrNotEvaluator.ts",
                  "babylon.dracoCompression.ts", "babylon.vrExperienceHelper.ts",
@@ -86,8 +86,7 @@ def main():
                  "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts",
                  "babylon.videoTexture.ts", "babylon.database.ts",
                  "babylon.promise.ts", "babylon.videoDome.ts",
-                 "babylon.sound.ts", "babylon.khronosTextureContainer.ts",
-                 "babylon.environmentTextureTools.ts",
+                 "babylon.sound.ts", "babylon.environmentTextureTools.ts",
                  "babylon.vrDeviceOrientationGamepadCamera.ts",
                  "babylon.vrDeviceOrientationFreeCamera.ts",
                  "babylon.vrDeviceOrientationArcRotateCamera.ts"]
