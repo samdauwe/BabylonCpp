@@ -33,6 +33,7 @@ class SwitchBooleanAction;
 class InterpolateValueAction;
 // --- Animations ---
 class Animatable;
+using AnimatablePtr = shared_ptr_t<Animatable>;
 class Animation;
 using AnimationPtr = shared_ptr_t<Animation>;
 class AnimationEvent;
@@ -86,6 +87,7 @@ struct PointerDragBehaviorOptions;
 class SixDofDragBehavior;
 // --- Bones ---
 class Bone;
+using BonePtr = shared_ptr_t<Bone>;
 class BoneIKController;
 class BoneLookController;
 class Skeleton;
@@ -106,6 +108,7 @@ class GamepadCamera;
 template <class TCamera>
 struct ICameraInput;
 class TargetCamera;
+using TargetCameraPtr = shared_ptr_t<TargetCamera>;
 class TouchCamera;
 class UniversalCamera;
 class VirtualJoysticksCamera;
@@ -186,6 +189,8 @@ class SkeletonViewer;
 // --- Engine ---
 class AbstractScene;
 using AbstractScenePtr = shared_ptr_t<AbstractScene>;
+class AssetContainer;
+using AssetContainerPtr = shared_ptr_t<AssetContainer>;
 class ClickInfo;
 struct DepthTextureCreationOptions;
 class Engine;
@@ -199,6 +204,7 @@ using ISceneSerializableComponentPtr
 struct ISceneComponent;
 using ISceneComponentPtr = shared_ptr_t<ISceneComponent>;
 class Node;
+using NodePtr = shared_ptr_t<Node>;
 class Scene;
 // --- Events ---
 struct KeyboardEventTypes;
@@ -213,6 +219,9 @@ class Gamepad;
 struct GamepadButtonChanges;
 class GamepadManager;
 struct GamepadPose;
+class GamepadSystemSceneComponent;
+using GamepadSystemSceneComponentPtr
+  = shared_ptr_t<GamepadSystemSceneComponent>;
 class GenericPad;
 struct StickValues;
 class Xbox360Pad;
@@ -271,18 +280,30 @@ class IGLVertexArrayObject;
 class ILoadingScreen;
 class IRenderableScene;
 // --- Layer ---
+class EffectLayerSceneComponent;
+using EffectLayerSceneComponentPtr = shared_ptr_t<EffectLayerSceneComponent>;
 class EffectLayer;
+using EffectLayerPtr = shared_ptr_t<EffectLayer>;
 class GlowLayer;
+using GlowLayerPtr = shared_ptr_t<GlowLayer>;
 class HighlightLayer;
+using HighlightLayerPtr = shared_ptr_t<HighlightLayer>;
 struct IEffectLayerOptions;
 struct IGlowLayerOptions;
 struct IHighlightLayerExcludedMesh;
 struct IHighlightLayerMesh;
 struct IHighlightLayerOptions;
 class Layer;
+using LayerPtr = shared_ptr_t<Layer>;
+class LayerSceneComponent;
+using LayerSceneComponentPtr = shared_ptr_t<LayerSceneComponent>;
 // --- Lensflare ---
 class LensFlare;
 class LensFlareSystem;
+using LensFlareSystemPtr = shared_ptr_t<LensFlareSystem>;
+class LensFlareSystemSceneComponent;
+using LensFlareSystemSceneComponentPtr
+  = shared_ptr_t<LensFlareSystemSceneComponent>;
 // --- Lights ---
 class DirectionalLight;
 class HemisphericLight;
@@ -409,9 +430,11 @@ struct IGetSetVerticesData;
 class InstancedMesh;
 class LinesMesh;
 class Mesh;
+using MeshPtr = shared_ptr_t<Mesh>;
 class MeshBuilder;
 class MeshLODLevel;
 class SubMesh;
+using SubMeshPtr = shared_ptr_t<SubMesh>;
 class TransformNode;
 using TransformNodePtr = shared_ptr_t<TransformNode>;
 class VertexBuffer;
