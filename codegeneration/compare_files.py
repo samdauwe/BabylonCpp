@@ -85,11 +85,15 @@ def main():
                  "babylon.webVRCamera.ts", "babylon.analyser.ts",
                  "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts",
                  "babylon.videoTexture.ts", "babylon.database.ts",
-                 "babylon.promise.ts", "babylon.videoDome.ts",
+                 "babylon.promise.ts", "babylon.videoDome.ts", "babylon.tga.ts",
                  "babylon.sound.ts", "babylon.environmentTextureTools.ts",
                  "babylon.vrDeviceOrientationGamepadCamera.ts",
                  "babylon.vrDeviceOrientationFreeCamera.ts",
-                 "babylon.vrDeviceOrientationArcRotateCamera.ts"]
+                 "babylon.vrDeviceOrientationArcRotateCamera.ts",
+                 "babylon.internalTextureLoader.ts",
+                 "babylon.ddsTextureLoader.ts", "babylon.ktxTextureLoader.ts",
+                 "babylon.tgaTextureLoader.ts", "babylon.envTextureLoader.ts",
+                 "babylon.babylonFileLoader.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         fullPath = os.path.join(os.path.expanduser('~'), "Projects",
