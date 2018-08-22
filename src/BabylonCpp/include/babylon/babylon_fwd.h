@@ -10,8 +10,9 @@ namespace BABYLON {
 class Action;
 class ActionEvent;
 class ActionManager;
-using ActionManagerPtr = shared_ptr_t<ActionManager>;
 class Condition;
+// --- Actions aliases ---
+using ActionManagerPtr = shared_ptr_t<ActionManager>;
 // - Conditions
 class PredicateCondition;
 class StateCondition;
@@ -33,12 +34,9 @@ class SwitchBooleanAction;
 class InterpolateValueAction;
 // --- Animations ---
 class Animatable;
-using AnimatablePtr = shared_ptr_t<Animatable>;
 class Animation;
-using AnimationPtr = shared_ptr_t<Animation>;
 class AnimationEvent;
 class AnimationGroup;
-using AnimationGroupPtr = shared_ptr_t<AnimationGroup>;
 struct AnimationPropertiesOverride;
 class AnimationRange;
 class AnimationValue;
@@ -47,6 +45,12 @@ struct IAnimationKey;
 class PathCursor;
 class RuntimeAnimation;
 struct TargetedAnimation;
+// --- Animations aliases ---
+using AnimatablePtr       = shared_ptr_t<Animatable>;
+using AnimationPtr        = shared_ptr_t<Animation>;
+using AnimationGroupPtr   = shared_ptr_t<AnimationGroup>;
+using IAnimatablePtr      = shared_ptr_t<IAnimatable>;
+using RuntimeAnimationPtr = shared_ptr_t<RuntimeAnimation>;
 // - Easing
 class BackEase;
 class BezierCurveEase;
@@ -66,9 +70,10 @@ class SineEase;
 class Analyser;
 class AudioEngine;
 class Sound;
-using SoundPtr = shared_ptr_t<Sound>;
 class SoundTrack;
 class WeightedSound;
+// --- Audio aliases ---
+using SoundPtr = shared_ptr_t<Sound>;
 // --- Behaviors ---
 template <class T>
 struct Behavior;
@@ -87,17 +92,17 @@ struct PointerDragBehaviorOptions;
 class SixDofDragBehavior;
 // --- Bones ---
 class Bone;
-using BonePtr = shared_ptr_t<Bone>;
 class BoneIKController;
 class BoneLookController;
 class Skeleton;
+// --- Bones aliases ---
+using BonePtr     = shared_ptr_t<Bone>;
 using SkeletonPtr = shared_ptr_t<Skeleton>;
 // --- Cameras ---
 class ArcFollowCamera;
 class ArcRotateCamera;
 struct ArcRotateCameraInputsManager;
 class Camera;
-using CameraPtr = shared_ptr_t<Camera>;
 template <class TCamera>
 class CameraInputsManager;
 class DeviceOrientationCamera;
@@ -108,10 +113,21 @@ class GamepadCamera;
 template <class TCamera>
 struct ICameraInput;
 class TargetCamera;
-using TargetCameraPtr = shared_ptr_t<TargetCamera>;
 class TouchCamera;
 class UniversalCamera;
 class VirtualJoysticksCamera;
+// --- Cameras aliases ---
+using ArcFollowCameraPtr         = shared_ptr_t<ArcFollowCamera>;
+using ArcRotateCameraPtr         = shared_ptr_t<ArcRotateCamera>;
+using CameraPtr                  = shared_ptr_t<Camera>;
+using DeviceOrientationCameraPtr = shared_ptr_t<DeviceOrientationCamera>;
+using FollowCameraPtr            = shared_ptr_t<FollowCamera>;
+using FreeCameraPtr              = shared_ptr_t<FreeCamera>;
+using GamepadCameraPtr           = shared_ptr_t<GamepadCamera>;
+using TargetCameraPtr            = shared_ptr_t<TargetCamera>;
+using TouchCameraPtr             = shared_ptr_t<TouchCamera>;
+using UniversalCameraPtr         = shared_ptr_t<UniversalCamera>;
+using VirtualJoysticksCameraPtr  = shared_ptr_t<VirtualJoysticksCamera>;
 // - Inputs
 class ArcRotateCameraKeyboardMoveInput;
 class ArcRotateCameraMouseWheelInput;
@@ -129,6 +145,17 @@ class StereoscopicArcRotateCamera;
 class StereoscopicFreeCamera;
 class StereoscopicGamepadCamera;
 class StereoscopicUniversalCamera;
+// --- Stereoscopic aliases ---
+using AnaglyphArcRotateCameraPtr = shared_ptr_t<AnaglyphArcRotateCamera>;
+using AnaglyphFreeCameraPtr      = shared_ptr_t<AnaglyphFreeCamera>;
+using AnaglyphGamepadCameraPtr   = shared_ptr_t<AnaglyphGamepadCamera>;
+using AnaglyphUniversalCameraPtr = shared_ptr_t<AnaglyphUniversalCamera>;
+using StereoscopicArcRotateCameraPtr
+  = shared_ptr_t<StereoscopicArcRotateCamera>;
+using StereoscopicFreeCameraPtr    = shared_ptr_t<StereoscopicFreeCamera>;
+using StereoscopicGamepadCameraPtr = shared_ptr_t<StereoscopicGamepadCamera>;
+using StereoscopicUniversalCameraPtr
+  = shared_ptr_t<StereoscopicUniversalCamera>;
 // - VR
 struct DevicePose;
 struct PoseControlled;
@@ -188,9 +215,7 @@ class SkeletonViewer;
 } // end of namespace Debug
 // --- Engine ---
 class AbstractScene;
-using AbstractScenePtr = shared_ptr_t<AbstractScene>;
 class AssetContainer;
-using AssetContainerPtr = shared_ptr_t<AssetContainer>;
 class ClickInfo;
 struct DepthTextureCreationOptions;
 class Engine;
@@ -199,13 +224,16 @@ struct EngineOptions;
 struct IActiveMeshCandidateProvider;
 struct InstancingAttributeInfo;
 struct ISceneSerializableComponent;
+struct ISceneComponent;
+class Node;
+class Scene;
+// --- Engine aliases ---
+using AbstractScenePtr  = shared_ptr_t<AbstractScene>;
+using AssetContainerPtr = shared_ptr_t<AssetContainer>;
 using ISceneSerializableComponentPtr
   = shared_ptr_t<ISceneSerializableComponent>;
-struct ISceneComponent;
 using ISceneComponentPtr = shared_ptr_t<ISceneComponent>;
-class Node;
-using NodePtr = shared_ptr_t<Node>;
-class Scene;
+using NodePtr            = shared_ptr_t<Node>;
 // --- Events ---
 struct KeyboardEventTypes;
 class KeyboardInfo;
@@ -281,27 +309,29 @@ class ILoadingScreen;
 class IRenderableScene;
 // --- Layer ---
 class EffectLayerSceneComponent;
-using EffectLayerSceneComponentPtr = shared_ptr_t<EffectLayerSceneComponent>;
 class EffectLayer;
-using EffectLayerPtr = shared_ptr_t<EffectLayer>;
 class GlowLayer;
-using GlowLayerPtr = shared_ptr_t<GlowLayer>;
 class HighlightLayer;
-using HighlightLayerPtr = shared_ptr_t<HighlightLayer>;
 struct IEffectLayerOptions;
 struct IGlowLayerOptions;
 struct IHighlightLayerExcludedMesh;
 struct IHighlightLayerMesh;
 struct IHighlightLayerOptions;
 class Layer;
-using LayerPtr = shared_ptr_t<Layer>;
 class LayerSceneComponent;
-using LayerSceneComponentPtr = shared_ptr_t<LayerSceneComponent>;
+// --- Layer aliases ---
+using EffectLayerSceneComponentPtr = shared_ptr_t<EffectLayerSceneComponent>;
+using EffectLayerPtr               = shared_ptr_t<EffectLayer>;
+using GlowLayerPtr                 = shared_ptr_t<GlowLayer>;
+using HighlightLayerPtr            = shared_ptr_t<HighlightLayer>;
+using LayerPtr                     = shared_ptr_t<Layer>;
+using LayerSceneComponentPtr       = shared_ptr_t<LayerSceneComponent>;
 // --- Lensflare ---
 class LensFlare;
 class LensFlareSystem;
-using LensFlareSystemPtr = shared_ptr_t<LensFlareSystem>;
 class LensFlareSystemSceneComponent;
+// --- Lensflare aliases ---
+using LensFlareSystemPtr = shared_ptr_t<LensFlareSystem>;
 using LensFlareSystemSceneComponentPtr
   = shared_ptr_t<LensFlareSystemSceneComponent>;
 // --- Lights ---
@@ -309,10 +339,16 @@ class DirectionalLight;
 class HemisphericLight;
 class IShadowLight;
 class Light;
-using LightPtr = shared_ptr_t<Light>;
 class PointLight;
 class ShadowLight;
 class SpotLight;
+// --- Lights aliases ---
+using DirectionalLightPtr = shared_ptr_t<DirectionalLight>;
+using HemisphericLightPtr = shared_ptr_t<HemisphericLight>;
+using IShadowLightPtr     = shared_ptr_t<IShadowLight>;
+using LightPtr            = shared_ptr_t<Light>;
+using PointLightPtr       = shared_ptr_t<PointLight>;
+using SpotLightPtr        = shared_ptr_t<SpotLight>;
 // - Shadows
 class ShadowGenerator;
 // --- Loading ---
@@ -337,20 +373,26 @@ struct IImageProcessingConfigurationDefines;
 class ImageProcessingConfiguration;
 struct IMaterialDefines;
 class Material;
-using MaterialPtr = shared_ptr_t<Material>;
 struct MaterialDefines;
 struct MaterialHelper;
 class MultiMaterial;
-using MultiMaterialPtr = shared_ptr_t<MultiMaterial>;
 class PushMaterial;
 class ShaderMaterial;
 struct ShaderMaterialOptions;
 class StandardMaterial;
 struct StandardMaterialDefines;
 class UniformBuffer;
+// - Common aliases
+using MaterialPtr         = shared_ptr_t<Material>;
+using MultiMaterialPtr    = shared_ptr_t<MultiMaterial>;
+using PushMaterialPtr     = shared_ptr_t<PushMaterial>;
+using ShaderMaterialPtr   = shared_ptr_t<ShaderMaterial>;
+using StandardMaterialPtr = shared_ptr_t<StandardMaterial>;
 // - Background
 class BackgroundMaterial;
 struct BackgroundMaterialDefines;
+// - Background aliases
+using BackgroundMaterialPtr = shared_ptr_t<BackgroundMaterial>;
 // - PBR
 class PBRBaseMaterial;
 class PBRBaseSimpleMaterial;
@@ -358,6 +400,8 @@ class PBRMaterial;
 struct PBRMaterialDefines;
 class PBRMetallicRoughnessMaterial;
 class PBRSpecularGlossinessMaterial;
+// PBR aliases
+using PBRMaterialPtr = shared_ptr_t<PBRMaterial>;
 // - Textures
 class BaseTexture;
 using BaseTexturePtr = shared_ptr_t<BaseTexture>;
@@ -418,27 +462,31 @@ struct SIMDVector3;
 class _InstancesBatch;
 class _VisibleInstances;
 class AbstractMesh;
-using AbstractMeshPtr = shared_ptr_t<AbstractMesh>;
 class BaseSubMesh;
 class Buffer;
 struct BufferPointer;
 struct FacetParameters;
 class Geometry;
-using GeometryPtr = shared_ptr_t<Geometry>;
 class GroundMesh;
 struct IGetSetVerticesData;
 class InstancedMesh;
 class LinesMesh;
 class Mesh;
-using MeshPtr = shared_ptr_t<Mesh>;
 class MeshBuilder;
 class MeshLODLevel;
 class SubMesh;
-using SubMeshPtr = shared_ptr_t<SubMesh>;
 class TransformNode;
-using TransformNodePtr = shared_ptr_t<TransformNode>;
 class VertexBuffer;
 class VertexData;
+// -- Mesh aliases --
+using AbstractMeshPtr  = shared_ptr_t<AbstractMesh>;
+using GroundMeshPtr    = shared_ptr_t<GroundMesh>;
+using GeometryPtr      = shared_ptr_t<Geometry>;
+using InstancedMeshPtr = shared_ptr_t<InstancedMesh>;
+using LinesMeshPtr     = shared_ptr_t<LinesMesh>;
+using MeshPtr          = shared_ptr_t<Mesh>;
+using SubMeshPtr       = shared_ptr_t<SubMesh>;
+using TransformNodePtr = shared_ptr_t<TransformNode>;
 // - Options
 class BoxOptions;
 class CylinderOptions;
