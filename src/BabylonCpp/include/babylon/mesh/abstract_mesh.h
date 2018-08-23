@@ -48,17 +48,18 @@ public:
   static Vector3 _lookAtVectorCache;
 
   template <typename... Ts>
-  static AbstractMesh* New(Ts&&... args)
+  static AbstractMeshPtr New(Ts&&... args)
   {
-    auto mesh = new AbstractMesh(::std::forward<Ts>(args)...);
-    mesh->addToScene(static_cast<unique_ptr_t<AbstractMesh>>(mesh));
+    auto mesh = shared_ptr_t<AbstractMesh>(
+      new AbstractMesh(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
     return mesh;
   }
   ~AbstractMesh() override;
 
   virtual IReflect::Type type() const override;
-  void addToScene(unique_ptr_t<AbstractMesh>&& newMesh);
+  void addToScene(const AbstractMeshPtr& newMesh);
 
   /**
    * @brief Hidden
@@ -102,6 +103,7 @@ public:
   /**
    * @brief Hidden
    */
+  void _removeLightSource(const LightPtr& light);
   void _removeLightSource(Light* light);
 
   /**
@@ -128,7 +130,7 @@ public:
   virtual AbstractMesh* getParent();
 
   /** Methods **/
-  virtual Material* getMaterial();
+  virtual MaterialPtr getMaterial();
 
   /**
    * @brief Disables the mesh edge rendering mode.
@@ -155,7 +157,7 @@ public:
    * @param camera defines the camera to use to pick the right LOD level
    * @returns the currentAbstractMesh
    */
-  virtual AbstractMesh* getLOD(Camera* camera,
+  virtual AbstractMesh* getLOD(const CameraPtr& camera,
                                BoundingSphere* boundingSphere = nullptr);
 
   /**
@@ -454,14 +456,14 @@ public:
    * @param camera defines the camera to use
    * @returns a position
    */
-  Vector3 getPositionInCameraSpace(Camera* camera = nullptr);
+  Vector3 getPositionInCameraSpace(CameraPtr camera = nullptr);
 
   /**
    * @brief Returns the distance from the mesh to the active camera.
    * @param camera defines the camera to use
    * @returns the distance
    */
-  float getDistanceToCamera(Camera* camera = nullptr);
+  float getDistanceToCamera(CameraPtr camera = nullptr);
 
   /**
    * @brief Apply a physic impulse to the mesh.
@@ -582,14 +584,14 @@ public:
    * @param mesh defines the child mesh
    * @returns the current mesh
    */
-  AbstractMesh& addChild(AbstractMesh* mesh);
+  AbstractMesh& addChild(AbstractMesh& mesh);
 
   /**
    * @brief Removes the passed mesh from the current mesh children list.
    * @param mesh defines the child mesh
    * @returns the current mesh
    */
-  AbstractMesh& removeChild(AbstractMesh* mesh);
+  AbstractMesh& removeChild(AbstractMesh& mesh);
 
   // Facet data
 
@@ -919,12 +921,12 @@ protected:
   /**
    * @brief Gets current material.
    */
-  virtual Material*& get_material();
+  virtual MaterialPtr& get_material();
 
   /**
    * @brief Sets current material.
    */
-  virtual void set_material(Material* const& value);
+  virtual void set_material(const MaterialPtr& value);
 
   /**
    * @brief Gets a boolean indicating that this mesh can receive realtime
@@ -1042,13 +1044,13 @@ protected:
    * @brief Sets a skeleton to apply skining transformations.
    * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
-  void set_skeleton(Skeleton* const& value);
+  void set_skeleton(const SkeletonPtr& value);
 
   /**
    * @brief Gets a skeleton to apply skining transformations.
    * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
-  virtual Skeleton*& get_skeleton();
+  virtual SkeletonPtr& get_skeleton();
 
   /**
    * @brief Gets a Vector3 depicting the mesh scaling along each local axis X,
@@ -1317,12 +1319,12 @@ public:
    * @see
    * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#rendering-groups
    */
-  unsigned int renderingGroupId;
+  int renderingGroupId;
 
   /**
    * The current material
    */
-  Property<AbstractMesh, Material*> material;
+  Property<AbstractMesh, MaterialPtr> material;
 
   /**
    * A boolean indicating that this mesh can receive realtime shadows.
@@ -1508,7 +1510,7 @@ public:
   bool _unIndexed;
 
   /** Hidden */
-  vector_t<Light*> _lightSources;
+  vector_t<LightPtr> _lightSources;
 
   // Loading properties
 
@@ -1526,7 +1528,7 @@ public:
   /**
    * A skeleton to apply skining transformations
    */
-  Property<AbstractMesh, Skeleton*> skeleton;
+  Property<AbstractMesh, SkeletonPtr> skeleton;
 
   /**
    * Gets the edgesRenderer associated with the mesh
@@ -1603,7 +1605,7 @@ private:
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
   // Properties
   float _visibility;
-  Material* _material;
+  MaterialPtr _material;
   bool _receiveShadows;
   bool _hasVertexAlpha;
   bool _useVertexColors;
@@ -1622,7 +1624,7 @@ private:
   Matrix _collisionsTransformMatrix;
   Matrix _collisionsScalingMatrix;
   // Skeleton
-  Skeleton* _skeleton;
+  SkeletonPtr _skeleton;
   // Rendering
   bool _showBoundingBox;
 

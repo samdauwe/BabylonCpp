@@ -17,10 +17,11 @@ public:
 
 public:
   template <typename... Ts>
-  static AnaglyphArcRotateCamera* New(Ts&&... args)
+  static AnaglyphArcRotateCameraPtr New(Ts&&... args)
   {
-    auto camera = new AnaglyphArcRotateCamera(std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera = shared_ptr_t<AnaglyphArcRotateCamera>(
+      new AnaglyphArcRotateCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }

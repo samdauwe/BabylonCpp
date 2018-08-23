@@ -68,7 +68,7 @@ void PointerDragBehavior::init()
 {
 }
 
-void PointerDragBehavior::attach(Node* ownerNode)
+void PointerDragBehavior::attach(const NodePtr& ownerNode)
 {
   _scene        = ownerNode->getScene();
   _attachedNode = ownerNode;
@@ -99,8 +99,8 @@ void PointerDragBehavior::attach(Node* ownerNode)
   float dragLength = 0.f;
   Vector3 targetPosition{0.f, 0.f, 0.f};
 
-  const auto& pickPredicate = [this](AbstractMesh* m) -> bool {
-    return _attachedNode == m || m->isDescendantOf(_attachedNode);
+  const auto& pickPredicate = [this](const AbstractMeshPtr& m) -> bool {
+    return _attachedNode == m || m->isDescendantOf(_attachedNode.get());
   };
 
   ICanvas* attachedElement = nullptr;
@@ -126,7 +126,8 @@ void PointerDragBehavior::attach(Node* ownerNode)
             event.pointerId      = currentDraggingPointerID;
             onDragStartObservable.notifyObservers(&event);
             targetPosition.copyFrom(
-              static_cast<Mesh*>(_attachedNode)->absolutePosition());
+              ::std::static_pointer_cast<Mesh>(_attachedNode)
+                ->absolutePosition());
 
             // Dettach camera controls
             if (detachCameraControls && _scene->activeCamera
@@ -201,12 +202,14 @@ void PointerDragBehavior::attach(Node* ownerNode)
       if (_moving && moveAttached) {
         // Slowly move mesh to avoid jitter
         targetPosition.subtractToRef(
-          static_cast<Mesh*>(_attachedNode)->absolutePosition(), _tmpVector);
+          ::std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition(),
+          _tmpVector);
         _tmpVector.scaleInPlace(0.2f);
-        static_cast<Mesh*>(_attachedNode)
+        ::std::static_pointer_cast<Mesh>(_attachedNode)
           ->getAbsolutePosition()
           .addToRef(_tmpVector, _tmpVector);
-        static_cast<Mesh*>(_attachedNode)->setAbsolutePosition(_tmpVector);
+        ::std::static_pointer_cast<Mesh>(_attachedNode)
+          ->setAbsolutePosition(_tmpVector);
       }
     });
 }
@@ -243,7 +246,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const Nullable<Ray>& ray)
     if (_useAlternatePickedPointAboveMaxDragAngle) {
       // Invert ray direction along the towards object axis
       _tmpVector.copyFrom((*ray).direction);
-      static_cast<Mesh*>(_attachedNode)
+      ::std::static_pointer_cast<Mesh>(_attachedNode)
         ->absolutePosition()
         .subtractToRef((*ray).origin, _alternatePickedPoint);
       _alternatePickedPoint.normalize();
@@ -257,7 +260,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const Nullable<Ray>& ray)
       _dragPlane->forward().scaleToRef(-dot, _alternatePickedPoint);
       _alternatePickedPoint.addInPlace(_tmpVector);
       _alternatePickedPoint.addInPlace(
-        static_cast<Mesh*>(_attachedNode)->absolutePosition());
+        ::std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition());
       return _alternatePickedPoint;
     }
     else {
@@ -266,7 +269,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const Nullable<Ray>& ray)
   }
 
   auto pickResult = PointerDragBehavior::_planeScene->pickWithRay(
-    *ray, [this](AbstractMesh* m) -> bool { return m == _dragPlane; });
+    *ray, [this](const AbstractMeshPtr& m) -> bool { return m == _dragPlane; });
   if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh
       && (*pickResult).pickedPoint) {
     return (*pickResult).pickedPoint;

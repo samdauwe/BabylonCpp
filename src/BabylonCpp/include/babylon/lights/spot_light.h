@@ -22,10 +22,11 @@ public:
 
 public:
   template <typename... Ts>
-  static SpotLight* New(Ts&&... args)
+  static SpotLightPtr New(Ts&&... args)
   {
-    auto light = new SpotLight(::std::forward<Ts>(args)...);
-    light->addToScene(static_cast<unique_ptr_t<Light>>(light));
+    auto light
+      = shared_ptr_t<SpotLight>(new SpotLight(::std::forward<Ts>(args)...));
+    light->addToScene(light);
 
     return light;
   }
@@ -157,12 +158,12 @@ protected:
   /**
    * @brief Gets the projection texture of the light.
    */
-  BaseTexture*& get_projectionTexture();
+  BaseTexturePtr& get_projectionTexture();
 
   /**
    * @brief Sets the projection texture of the light.
    */
-  void set_projectionTexture(BaseTexture* const& value);
+  void set_projectionTexture(const BaseTexturePtr& value);
 
   /**
    * @brief Overrides the direction setter to recompute the projection texture
@@ -184,7 +185,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const vector_t<AbstractMesh*>& renderList) override;
+    const vector_t<AbstractMeshPtr>& renderList) override;
 
   void _computeProjectionTextureViewLightMatrix();
   void _computeProjectionTextureProjectionLightMatrix();
@@ -245,7 +246,7 @@ public:
   /**
    * The projection texture of the light
    */
-  Property<SpotLight, BaseTexture*> projectionTexture;
+  Property<SpotLight, BaseTexturePtr> projectionTexture;
 
 protected:
   float _projectionTextureLightNear;
@@ -275,7 +276,7 @@ private:
 
   Nullable<float> _shadowAngleScale;
   Matrix _projectionTextureMatrix;
-  BaseTexture* _projectionTexture;
+  BaseTexturePtr _projectionTexture;
   bool _projectionTextureViewLightDirty;
   bool _projectionTextureProjectionLightDirty;
   bool _projectionTextureDirty;

@@ -12,21 +12,23 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT RuntimeAnimation {
 
 public:
-  /**
-   * @brief Create a new RuntimeAnimation object.
-   * @param target defines the target of the animation
-   * @param animation defines the source animation object
-   * @param scene defines the hosting scene
-   * @param host defines the initiating Animatable
-   */
-  RuntimeAnimation(IAnimatable* target, Animation* animation, Scene* scene,
-                   Animatable* host);
+  template <typename... Ts>
+  static RuntimeAnimationPtr New(Ts&&... args)
+  {
+    auto animation = shared_ptr_t<RuntimeAnimation>(
+      new RuntimeAnimation(::std::forward<Ts>(args)...));
+    animation->addToRuntimeAnimations(animation);
+
+    return animation;
+  }
   ~RuntimeAnimation();
+
+  void addToRuntimeAnimations(const RuntimeAnimationPtr& animation);
 
   /**
    * @brief Gets the animation from the runtime animation.
    */
-  Animation* animation();
+  AnimationPtr& animation();
 
   /**
    * @brief Resets the runtime animation to the beginning.
@@ -57,7 +59,7 @@ public:
    * @brief Gets the loop pmode of the runtime animation
    * @returns Loop Mode
    */
-  Nullable<unsigned int> _getCorrectLoopMode() const;
+  nullable_t<unsigned int> _getCorrectLoopMode() const;
 
   /**
    * @brief Move the current animation to a given frame.
@@ -79,16 +81,26 @@ public:
    * @param speedRatio defines the current speed ratio
    * @param weight defines the weight of the animation (default is -1 so no
    * weight)
-   * @returns a boolean indicating if the animation has ended
+   * @returns a boolean indicating if the animation is running
    */
-  bool animate(millisecond_t delay, int from, int to, bool loop,
+  bool animate(millisecond_t delay, float from, float to, bool loop,
                float speedRatio, float weight = -1.f);
 
 protected:
   /**
+   * @brief Create a new RuntimeAnimation object.
+   * @param target defines the target of the animation
+   * @param animation defines the source animation object
+   * @param scene defines the hosting scene
+   * @param host defines the initiating Animatable
+   */
+  RuntimeAnimation(const IAnimatablePtr& target, const AnimationPtr& animation,
+                   Scene* scene, Animatable* host);
+
+  /**
    * @brief Gets the current frame of the runtime animation.
    */
-  int get_currentFrame() const;
+  float get_currentFrame() const;
 
   /**
    * @brief Gets the weight of the runtime animation.
@@ -98,7 +110,7 @@ protected:
   /**
    * @brief Gets the current value of the runtime animation.
    */
-  Nullable<AnimationValue>& get_currentValue();
+  nullable_t<AnimationValue>& get_currentValue();
 
   /**
    * @brief Gets the target path of the runtime animation.
@@ -121,18 +133,19 @@ private:
    * @returns The interpolated value
    */
   AnimationValue
-  _interpolate(int currentFrame, int repeatCount, unsigned int loopMode,
+  _interpolate(float currentFrame, int repeatCount, unsigned int loopMode,
                const AnimationValue& offsetValue    = AnimationValue(),
                const AnimationValue& highLimitValue = AnimationValue());
 
-  void _setValue(IAnimatable* target, const AnimationValue& currentValue,
-                 float weight, unsigned int targetIndex = 0);
+  void _setValue(const IAnimatablePtr& target,
+                 const AnimationValue& currentValue, float weight,
+                 unsigned int targetIndex = 0);
 
 public:
   /**
    * Current frame of the runtime animation
    */
-  ReadOnlyProperty<RuntimeAnimation, int> currentFrame;
+  ReadOnlyProperty<RuntimeAnimation, float> currentFrame;
 
   /**
    * Weight of the runtime animation
@@ -142,12 +155,12 @@ public:
   /**
    * Current value of the runtime animation
    */
-  ReadOnlyProperty<RuntimeAnimation, Nullable<AnimationValue>> currentValue;
+  ReadOnlyProperty<RuntimeAnimation, nullable_t<AnimationValue>> currentValue;
 
   /**
    * Hidden
    */
-  Nullable<AnimationValue> _workValue;
+  nullable_t<AnimationValue> _workValue;
 
   /**
    * Target path of the runtime animation
@@ -165,17 +178,17 @@ private:
   /**
    * The current frame of the runtime animation
    */
-  int _currentFrame;
+  float _currentFrame;
 
   /**
    * The animation used by the runtime animation
    */
-  Animation* _animation;
+  AnimationPtr _animation;
 
   /**
    * The target of the runtime animation
    */
-  IAnimatable* _target;
+  IAnimatablePtr _target;
 
   /**
    * The initiating animatable
@@ -185,7 +198,7 @@ private:
   /**
    * The original value of the runtime animation
    */
-  vector_t<Nullable<AnimationValue>> _originalValue;
+  vector_t<nullable_t<AnimationValue>> _originalValue;
 
   /**
    * The original blend value of the runtime animation
@@ -220,7 +233,7 @@ private:
   /**
    * The current value of the runtime animation
    */
-  Nullable<AnimationValue> _currentValue;
+  nullable_t<AnimationValue> _currentValue;
 
   /**
    * The active target of the runtime animation

@@ -28,7 +28,7 @@ MergeMeshesOptimization::~MergeMeshesOptimization()
 {
 }
 
-bool MergeMeshesOptimization::_canBeMerged(AbstractMesh* abstractMesh)
+bool MergeMeshesOptimization::_canBeMerged(const AbstractMeshPtr& abstractMesh)
 {
   // Check if instance of Mesh
   if (!((abstractMesh->type() == IReflect::Type::MESH)
@@ -37,7 +37,11 @@ bool MergeMeshesOptimization::_canBeMerged(AbstractMesh* abstractMesh)
     return false;
   }
 
-  auto mesh = dynamic_cast<Mesh*>(abstractMesh);
+  auto mesh = ::std::static_pointer_cast<Mesh>(abstractMesh);
+
+  if (mesh->isDisposed()) {
+    return false;
+  }
 
   if (!mesh->isVisible || !mesh->isEnabled()) {
     return false;
@@ -48,10 +52,6 @@ bool MergeMeshesOptimization::_canBeMerged(AbstractMesh* abstractMesh)
   }
 
   if (mesh->skeleton() || mesh->hasLODLevels()) {
-    return false;
-  }
-
-  if (mesh->parent()) {
     return false;
   }
 
@@ -70,15 +70,15 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
   auto globalLength = globalPool.size();
 
   for (size_t index = 0; index < globalLength; ++index) {
-    vector_t<Mesh*> currentPool;
+    vector_t<MeshPtr> currentPool;
     auto current = globalPool[index];
 
     // Checks
-    if (!_canBeMerged(dynamic_cast<Mesh*>(current))) {
+    if (!_canBeMerged(::std::static_pointer_cast<Mesh>(current))) {
       continue;
     }
 
-    currentPool.emplace_back(dynamic_cast<Mesh*>(current));
+    currentPool.emplace_back(::std::static_pointer_cast<Mesh>(current));
 
     // Find compatible meshes
     for (size_t subIndex = index + 1; subIndex < globalLength; ++subIndex) {
@@ -96,7 +96,7 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
         continue;
       }
 
-      currentPool.emplace_back(static_cast<Mesh*>(otherMesh));
+      currentPool.emplace_back(::std::static_pointer_cast<Mesh>(otherMesh));
       --globalLength;
 
       stl_util::splice(globalPool, static_cast<int>(subIndex), 1);

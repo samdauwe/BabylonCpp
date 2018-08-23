@@ -10,14 +10,17 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT Layer {
+class BABYLON_SHARED_EXPORT Layer
+    : public ::std::enable_shared_from_this<Layer> {
 
   using LayerCallbackType = ::std::function<void(Layer*, EventState&)>;
 
 public:
-  Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
-        bool isBackground   = true,
-        const Color4& color = Color4(1.f, 1.f, 1.f, 1.f));
+  template <typename... Ts>
+  static LayerPtr New(Ts&&... args)
+  {
+    return shared_ptr_t<Layer>(new Layer(::std::forward<Ts>(args)...));
+  }
   virtual ~Layer();
 
   void _rebuild();
@@ -25,6 +28,10 @@ public:
   void dispose();
 
 protected:
+  Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
+        bool isBackground   = true,
+        const Color4& color = Color4(1.f, 1.f, 1.f, 1.f));
+
   // Events
   void set_onDispose(const LayerCallbackType& callback);
   void set_onBeforeRender(const LayerCallbackType& callback);
@@ -52,7 +59,7 @@ public:
   Observable<Layer> onAfterRenderObservable;
 
   // Properties
-  Texture* texture;
+  TexturePtr texture;
   bool isBackground;
   Color4 color;
   Vector2 scale;

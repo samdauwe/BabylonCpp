@@ -383,6 +383,7 @@ class StandardMaterial;
 struct StandardMaterialDefines;
 class UniformBuffer;
 // - Common aliases
+using ColorCurvesPtr      = shared_ptr_t<ColorCurves>;
 using MaterialPtr         = shared_ptr_t<Material>;
 using MultiMaterialPtr    = shared_ptr_t<MultiMaterial>;
 using PushMaterialPtr     = shared_ptr_t<PushMaterial>;
@@ -404,7 +405,6 @@ class PBRSpecularGlossinessMaterial;
 using PBRMaterialPtr = shared_ptr_t<PBRMaterial>;
 // - Textures
 class BaseTexture;
-using BaseTexturePtr = shared_ptr_t<BaseTexture>;
 class ColorGradingTexture;
 class CubeTexture;
 struct DummyInternalTextureTracker;
@@ -423,6 +423,14 @@ class RawTexture3D;
 class RefractionTexture;
 class RenderTargetTexture;
 class Texture;
+// -- Textures aliase
+using BaseTexturePtr         = shared_ptr_t<BaseTexture>;
+using CubeTexturePtr         = shared_ptr_t<CubeTexture>;
+using DynamicTexturePtr      = shared_ptr_t<DynamicTexture>;
+using MirrorTexturePtr       = shared_ptr_t<MirrorTexture>;
+using RenderTargetTexturePtr = shared_ptr_t<RenderTargetTexture>;
+using TexturePtr             = shared_ptr_t<Texture>;
+using RawTexturePtr          = shared_ptr_t<RawTexture>;
 // - Textures / Procedurals
 class CustomProceduralTexture;
 class NoiseProceduralTexture;
@@ -549,13 +557,13 @@ class SimplificationSettings;
 // --- Morph ---
 class MorphTarget;
 class MorphTargetManager;
+// -- Morph aliases --
 using MorphTargetManagerPtr = shared_ptr_t<MorphTargetManager>;
 // --- Particles ---
 struct DepthSortedParticle;
 struct EmitterCreationOptions;
 class GPUParticleSystem;
 struct IParticleSystem;
-using IParticleSystemPtr = shared_ptr_t<IParticleSystem>;
 class ModelShape;
 class Particle;
 struct ParticleHelper;
@@ -564,6 +572,8 @@ class ParticleSystemSet;
 struct ParticleSystemSetEmitterCreationOptions;
 class SolidParticle;
 class SolidParticleSystem;
+// -- Particles aliases --
+using IParticleSystemPtr = shared_ptr_t<IParticleSystem>;
 // - EmitterTypes
 class BoxParticleEmitter;
 class ConeParticleEmitter;
@@ -650,7 +660,6 @@ class StandardRenderingPipeline;
 class ReflectionProbe;
 // --- Rendering ---
 class BoundingBoxRenderer;
-using BoundingBoxRendererPtr = shared_ptr_t<BoundingBoxRenderer>;
 class DepthRenderer;
 class EdgesRenderer;
 class FaceAdjacencies;
@@ -660,6 +669,8 @@ class OutlineRenderer;
 class RenderingGroup;
 class RenderingManager;
 class UtilityLayerRenderer;
+// -- Rendering aliases --
+using BoundingBoxRendererPtr = shared_ptr_t<BoundingBoxRenderer>;
 // --- Sprites ---
 class Sprite;
 class SpriteManager;

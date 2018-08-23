@@ -85,7 +85,7 @@ public:
    * @brief Specifies if the mesh will require alpha blending.
    * @param mesh - BJS mesh.
    */
-  bool needAlphaBlendingForMesh(AbstractMesh* mesh) const override;
+  bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
 
   /**
    * @brief Specifies whether or not this material should be rendered in alpha
@@ -96,7 +96,7 @@ public:
   /**
    * @brief Gets the texture used for the alpha test.
    */
-  BaseTexture* getAlphaTestTexture() override;
+  BaseTexturePtr getAlphaTestTexture() override;
 
   /**
    * @brief Specifies that the submesh is ready to be used.
@@ -144,7 +144,7 @@ public:
    * @brief Returns the animatable textures.
    * @returns - Array of animatable textures.
    */
-  vector_t<IAnimatable*> getAnimatables() const;
+  vector_t<IAnimatablePtr> getAnimatables() const;
 
   /**
    * @brief Disposes the resources of the material.
@@ -193,7 +193,7 @@ private:
    * @returns - Reflection texture if present.  Otherwise, returns the
    * environment texture.
    */
-  BaseTexture* _getReflectionTexture() const;
+  BaseTexturePtr _getReflectionTexture() const;
 
   /**
    * @brief Returns the texture used for refraction or null if none is used.
@@ -201,7 +201,7 @@ private:
    * refraction is linked with transparency, returns environment texture.
    * Otherwise, returns null.
    */
-  BaseTexture* _getRefractionTexture() const;
+  BaseTexturePtr _getRefractionTexture() const;
 
 protected:
   /**
@@ -240,12 +240,12 @@ protected:
   /**
    * AKA Diffuse Texture in standard nomenclature.
    */
-  BaseTexture* _albedoTexture;
+  BaseTexturePtr _albedoTexture;
 
   /**
    * AKA Occlusion Texture in other nomenclature.
    */
-  BaseTexture* _ambientTexture;
+  BaseTexturePtr _ambientTexture;
 
   /**
    * AKA Occlusion Texture Intensity in other nomenclature.
@@ -255,32 +255,32 @@ protected:
   /**
    * Stores the alpha values in a texture.
    */
-  BaseTexture* _opacityTexture;
+  BaseTexturePtr _opacityTexture;
 
   /**
    * Stores the reflection values in a texture.
    */
-  BaseTexture* _reflectionTexture;
+  BaseTexturePtr _reflectionTexture;
 
   /**
    * Stores the refraction values in a texture.
    */
-  BaseTexture* _refractionTexture;
+  BaseTexturePtr _refractionTexture;
 
   /**
    * Stores the emissive values in a texture.
    */
-  BaseTexture* _emissiveTexture;
+  BaseTexturePtr _emissiveTexture;
 
   /**
    * AKA Specular texture in other nomenclature.
    */
-  BaseTexture* _reflectivityTexture;
+  BaseTexturePtr _reflectivityTexture;
 
   /**
    * Used to switch from specular/glossiness to metallic/roughness workflow.
    */
-  BaseTexture* _metallicTexture;
+  BaseTexturePtr _metallicTexture;
 
   /**
    * Specifies the metallic scalar of the metallic/roughness workflow.
@@ -300,17 +300,17 @@ protected:
    * Gray Scale represents roughness in metallic mode and glossiness in specular
    * mode.
    */
-  BaseTexture* _microSurfaceTexture;
+  BaseTexturePtr _microSurfaceTexture;
 
   /**
    * Stores surface normal data used to displace a mesh in a texture.
    */
-  BaseTexture* _bumpTexture;
+  BaseTexturePtr _bumpTexture;
 
   /**
    * Stores the pre-calculated light information of a mesh in a texture.
    */
-  BaseTexture* _lightmapTexture;
+  BaseTexturePtr _lightmapTexture;
 
   /**
    * The color of a material in ambient lighting.
@@ -536,7 +536,7 @@ protected:
    * from cos thetav and roughness:
    * http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
    */
-  BaseTexture* _environmentBRDFTexture;
+  BaseTexturePtr _environmentBRDFTexture;
 
   /**
    * Force the shader to compute irradiance in the fragment shader in order to
@@ -581,7 +581,7 @@ private:
   /**
    * Stores the available render targets.
    */
-  vector_t<RenderTargetTexture*> _renderTargets;
+  vector_t<RenderTargetTexturePtr> _renderTargets;
 
   /**
    * Sets the global ambient color for the material used in lighting

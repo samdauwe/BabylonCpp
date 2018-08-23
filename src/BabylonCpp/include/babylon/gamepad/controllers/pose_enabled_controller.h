@@ -68,7 +68,7 @@ public:
    * @brief Attaches a mesh to the controller.
    * @param mesh the mesh to be attached
    */
-  void attachToMesh(AbstractMesh* mesh);
+  void attachToMesh(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Attaches the controllers mesh to a camera.
@@ -100,7 +100,7 @@ protected:
   /**
    * @brief The mesh that is attached to the controller.
    */
-  AbstractMesh*& get_mesh();
+  AbstractMeshPtr& get_mesh();
 
 public:
   /**
@@ -111,7 +111,7 @@ public:
   /**
    * Internal, the mesh attached to the controller
    */
-  AbstractMesh* _mesh; // a node that will be attached to this Gamepad
+  AbstractMeshPtr _mesh; // a node that will be attached to this Gamepad
 
   /**
    * Internal, matrix used to convert room space to babylon space
@@ -126,7 +126,7 @@ public:
   /**
    * The mesh that is attached to the controller.
    */
-  ReadOnlyProperty<PoseEnabledController, AbstractMesh*> mesh;
+  ReadOnlyProperty<PoseEnabledController, AbstractMeshPtr> mesh;
 
   /**
    * Hidden

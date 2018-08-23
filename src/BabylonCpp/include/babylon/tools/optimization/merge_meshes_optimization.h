@@ -20,7 +20,7 @@ public:
   bool _apply(Scene* scene, bool updateSelectionTree = false);
 
 private:
-  bool _canBeMerged(AbstractMesh* abstractMesh);
+  bool _canBeMerged(const AbstractMeshPtr& abstractMesh);
 
 private:
   static bool _UpdateSelectionTree;

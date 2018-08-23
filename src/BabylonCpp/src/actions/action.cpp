@@ -104,8 +104,8 @@ string_t Action::_getProperty(const string_t& propertyPath)
   return _actionManager->_getProperty(propertyPath);
 }
 
-IAnimatable* Action::_getEffectiveTarget(IAnimatable* target,
-                                         const string_t& propertyPath)
+IAnimatablePtr Action::_getEffectiveTarget(const IAnimatablePtr& target,
+                                           const string_t& propertyPath)
 {
   return _actionManager->_getEffectiveTarget(target, propertyPath);
 }
@@ -178,7 +178,7 @@ string_t Action::_SerializeValueAsString(const AnimationValue& value)
   }
 }
 
-Json::object Action::_GetTargetProperty(IAnimatable* target)
+Json::object Action::_GetTargetProperty(const IAnimatablePtr& target)
 {
   const string_t targetType
     = (target->animatableType() == IAnimatable::Type::MESH) ?
@@ -191,7 +191,7 @@ Json::object Action::_GetTargetProperty(IAnimatable* target)
   const string_t value
     = (target->animatableType() == IAnimatable::Type::SCENE) ?
         "Scene" :
-        dynamic_cast<Node*>(target)->name;
+        ::std::static_pointer_cast<Node>(target)->name;
   return Json::object({Json::Pair("name", "target"),
                        Json::Pair("targetType", targetType),
                        Json::Pair("value", value)});

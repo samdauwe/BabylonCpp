@@ -23,7 +23,8 @@ const string_t PBRSpecularGlossinessMaterial::getClassName() const
   return "PBRSpecularGlossinessMaterial";
 }
 
-vector_t<BaseTexture*> PBRSpecularGlossinessMaterial::getActiveTextures() const
+vector_t<BaseTexturePtr>
+PBRSpecularGlossinessMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseSimpleMaterial::getActiveTextures();
 
@@ -38,7 +39,8 @@ vector_t<BaseTexture*> PBRSpecularGlossinessMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool PBRSpecularGlossinessMaterial::hasTexture(BaseTexture* texture) const
+bool PBRSpecularGlossinessMaterial::hasTexture(
+  const BaseTexturePtr& texture) const
 {
   if (PBRBaseSimpleMaterial::hasTexture(texture)) {
     return true;
@@ -55,9 +57,8 @@ bool PBRSpecularGlossinessMaterial::hasTexture(BaseTexture* texture) const
   return false;
 }
 
-PBRSpecularGlossinessMaterial*
-PBRSpecularGlossinessMaterial::clone(const string_t& /*name*/,
-                                     bool /*cloneChildren*/) const
+MaterialPtr PBRSpecularGlossinessMaterial::clone(const string_t& /*name*/,
+                                                 bool /*cloneChildren*/) const
 {
   return nullptr;
 }

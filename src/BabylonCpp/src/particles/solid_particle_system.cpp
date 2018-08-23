@@ -55,7 +55,7 @@ SolidParticleSystem::SolidParticleSystem(
     , _axisX{Axis::X()}
     , _axisY{Axis::Y()}
     , _axisZ{Axis::Z()}
-    , _camera{dynamic_cast<TargetCamera*>(scene->activeCamera)}
+    , _camera{::std::static_pointer_cast<TargetCamera>(scene->activeCamera)}
     , _camDir{Vector3::Zero()}
     , _camInvertedPosition{Vector3::Zero()}
     , _rotated{Vector3::Zero()}
@@ -97,7 +97,7 @@ SolidParticleSystem::~SolidParticleSystem()
 {
 }
 
-Mesh* SolidParticleSystem::buildMesh()
+MeshPtr SolidParticleSystem::buildMesh()
 {
   if (nbParticles == 0) {
     DiscOptions options;
@@ -134,7 +134,7 @@ Mesh* SolidParticleSystem::buildMesh()
     vertexData->set(_colors32, VertexBuffer::ColorKind);
   }
   auto _mesh = Mesh::New(name, _scene);
-  vertexData->applyToMesh(_mesh, _updatable);
+  vertexData->applyToMesh(*_mesh, _updatable);
   mesh             = _mesh;
   mesh->isPickable = _pickable;
 
@@ -466,7 +466,8 @@ SolidParticle* SolidParticleSystem::_addParticle(
 }
 
 int SolidParticleSystem::addShape(
-  Mesh* iMesh, size_t nb, const SolidParticleSystemMeshBuilderOptions& options)
+  const MeshPtr& iMesh, size_t nb,
+  const SolidParticleSystemMeshBuilderOptions& options)
 {
   Float32Array meshPos = iMesh->getVerticesData(VertexBuffer::PositionKind);
   Uint32Array meshInd  = iMesh->getIndices();

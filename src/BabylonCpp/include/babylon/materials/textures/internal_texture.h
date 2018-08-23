@@ -233,9 +233,9 @@ public:
   // In environment not supporting the textureLOD extension like EDGE. They are
   // for internal use only.
   // They are at the level of the gl texture to benefit from the cache.
-  BaseTexture* _lodTextureHigh;
-  BaseTexture* _lodTextureMid;
-  BaseTexture* _lodTextureLow;
+  BaseTexturePtr _lodTextureHigh;
+  BaseTexturePtr _lodTextureMid;
+  BaseTexturePtr _lodTextureLow;
   bool _isRGBD;
 
   shared_ptr_t<GL::IGLTexture> _webGLTexture;

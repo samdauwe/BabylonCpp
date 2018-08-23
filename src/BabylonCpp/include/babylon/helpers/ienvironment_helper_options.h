@@ -131,7 +131,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
    *
    * Remarks: Can be either a texture or a url.
    */
-  Variant<string_t, BaseTexture*> skyboxTexture;
+  Variant<string_t, BaseTexturePtr> skyboxTexture;
 
   /**
    * The color mixed in the skybox texture by default.
@@ -169,7 +169,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
    *
    * Remarks: Can be either a texture or a url.
    */
-  Variant<string_t, BaseTexture*> environmentTexture;
+  Variant<string_t, BaseTexturePtr> environmentTexture;
 
   /**
    * The value of the exposure to apply to the scene.

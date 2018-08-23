@@ -68,7 +68,7 @@ PolygonMeshBuilder& PolygonMeshBuilder::addHole(const vector_t<Vector2>& hole)
   return *this;
 }
 
-Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
+MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
 {
   auto result = Mesh::New(_name, _scene);
 
@@ -81,9 +81,8 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
   for (const auto& p : pointElements) {
     stl_util::concat(normals, {0.f, 1.f, 0.f});
     stl_util::concat(positions, {p.x, 0.f, p.y});
-    stl_util::concat(uvs,
-                     {(p.x - bounds.min.x) / bounds.width,
-                      (p.y - bounds.min.y) / bounds.height});
+    stl_util::concat(uvs, {(p.x - bounds.min.x) / bounds.width,
+                           (p.y - bounds.min.y) / bounds.height});
   }
 
   vector_t<vector_t<Point2D>> polygon;
@@ -103,9 +102,8 @@ Mesh* PolygonMeshBuilder::build(bool updatable, float depth)
     for (const auto& p : pointElements) { // add the elements at the depth
       stl_util::concat(normals, {0.f, -1.f, 0.f});
       stl_util::concat(positions, {p.x, -depth, p.y});
-      stl_util::concat(uvs,
-                       {1.f - (p.x - bounds.min.x) / bounds.width,
-                        1.f - (p.y - bounds.min.y) / bounds.height});
+      stl_util::concat(uvs, {1.f - (p.x - bounds.min.x) / bounds.width,
+                             1.f - (p.y - bounds.min.y) / bounds.height});
     }
 
     size_t totalCount = indices.size();
@@ -149,9 +147,8 @@ PolygonMeshBuilder::buildWall(const Vector3& wall0Corner,
   }
   const auto& pointElements = _points.elements;
   for (const auto& p : pointElements) {
-    stl_util::concat(positions,
-                     {p.x * ::std::cos(angle) + wall0Corner.x, p.y,
-                      p.x * ::std::sin(angle) + wall0Corner.z});
+    stl_util::concat(positions, {p.x * ::std::cos(angle) + wall0Corner.x, p.y,
+                                 p.x * ::std::sin(angle) + wall0Corner.z});
   };
   vector_t<vector_t<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array

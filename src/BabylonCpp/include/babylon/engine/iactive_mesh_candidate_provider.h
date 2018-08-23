@@ -16,7 +16,7 @@ struct BABYLON_SHARED_EXPORT IActiveMeshCandidateProvider {
    * @param scene defines the current scene
    * @returns the list of active meshes
    */
-  virtual vector_t<AbstractMesh*> getMeshes(Scene* scene) = 0;
+  virtual vector_t<AbstractMeshPtr> getMeshes(Scene* scene) = 0;
 
   /**
    * @brief Indicates if the meshes have been checked to make sure they are

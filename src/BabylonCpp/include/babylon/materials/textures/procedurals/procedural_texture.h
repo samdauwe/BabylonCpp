@@ -34,7 +34,8 @@ public:
   const Size& getRenderSize() const;
   void resize(const Size& size, bool generateMipMaps);
   void _checkUniform(const string_t& uniformName);
-  ProceduralTexture& setTexture(const string_t& name, Texture* texture);
+  ProceduralTexture& setTexture(const string_t& name,
+                                const TexturePtr& texture);
   ProceduralTexture& setFloat(const string_t& name, float value);
 
   /**
@@ -95,7 +96,7 @@ private:
   vector_t<string_t> _uniforms;
   vector_t<string_t> _samplers;
   unordered_map_t<string_t, string_t> _fragment;
-  unordered_map_t<string_t, Texture*> _textures;
+  unordered_map_t<string_t, TexturePtr> _textures;
   unordered_map_t<string_t, float> _floats;
   unordered_map_t<string_t, int> _ints;
   unordered_map_t<string_t, Float32Array> _floatsArrays;

@@ -12,9 +12,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BlackAndWhitePostProcess : public PostProcess {
 
 public:
-  BlackAndWhitePostProcess(const string_t& name, float ratio, Camera* camera,
-                           unsigned int samplingMode, Engine* engine,
-                           bool reusable = false);
+  BlackAndWhitePostProcess(const string_t& name, float ratio,
+                           const CameraPtr& camera, unsigned int samplingMode,
+                           Engine* engine, bool reusable = false);
   ~BlackAndWhitePostProcess();
 
 public:

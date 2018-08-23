@@ -133,7 +133,7 @@ public:
   }
 
   /**
-   *@brief  Get the Vectpr2 animation type.
+   *@brief  Get the Vector2 animation type.
    */
   static constexpr unsigned int ANIMATIONTYPE_VECTOR2()
   {
@@ -228,7 +228,7 @@ public:
   /**
    * @brief Hidden Internal use.
    */
-  static Animation* _PrepareAnimation(
+  static AnimationPtr _PrepareAnimation(
     const string_t& name, const string_t& targetProperty, size_t framePerSecond,
     int totalFrame, const AnimationValue& from, const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE(),
@@ -242,9 +242,10 @@ public:
    * @param easingFunction The easing function used in the animation
    * @returns The created animation
    */
-  static Animation* CreateAnimation(const string_t& property, int animationType,
-                                    std::size_t framePerSecond,
-                                    IEasingFunction* easingFunction = nullptr);
+  static AnimationPtr
+  CreateAnimation(const string_t& property, int animationType,
+                  std::size_t framePerSecond,
+                  IEasingFunction* easingFunction = nullptr);
 
   /**
    * @brief Create and start an animation on a node.
@@ -262,8 +263,8 @@ public:
    * @param onAnimationEnd defines the callback to call when animation end
    * @returns the animatable created for this animation
    */
-  static Animatable* CreateAndStartAnimation(
-    const string_t& name, Node* node, const string_t& targetProperty,
+  static AnimatablePtr CreateAndStartAnimation(
+    const string_t& name, const NodePtr& node, const string_t& targetProperty,
     size_t framePerSecond, int totalFrame, const AnimationValue& from,
     const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE(),
@@ -291,8 +292,8 @@ public:
    * @returns the list of animatables created for all nodes
    * Example https://www.babylonjs-playground.com/#MH0VLI
    */
-  static vector_t<Animatable*> CreateAndStartHierarchyAnimation(
-    const string_t& name, Node* node, bool directDescendantsOnly,
+  static vector_t<AnimatablePtr> CreateAndStartHierarchyAnimation(
+    const string_t& name, const NodePtr& node, bool directDescendantsOnly,
     const string_t& targetProperty, size_t framePerSecond, int totalFrame,
     const AnimationValue& from, const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE(),
@@ -315,8 +316,8 @@ public:
    * @param onAnimationEnd Callback to run once the animation is complete
    * @returns Nullable animation
    */
-  static Animatable* CreateMergeAndStartAnimation(
-    const string_t& name, Node* node, const string_t& targetProperty,
+  static AnimatablePtr CreateMergeAndStartAnimation(
+    const string_t& name, const NodePtr& node, const string_t& targetProperty,
     size_t framePerSecond, int totalFrame, const AnimationValue& from,
     const AnimationValue& to,
     unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE(),
@@ -338,13 +339,18 @@ public:
   static Animatable*
   TransitionTo(const string_t& property, const AnimationValue& targetValue,
                const AnimationValue& host, Scene* scene, float frameRate,
-               Animation* transition, float duration,
+               const AnimationPtr& transition, float duration,
                const ::std::function<void()>& onAnimationEnd = nullptr);
 
 public:
-  Animation(const string_t& name, const string_t& targetProperty,
-            size_t framePerSecond, int dataType,
-            unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE());
+  template <typename... Ts>
+  static AnimationPtr New(Ts&&... args)
+  {
+    auto animation
+      = shared_ptr_t<Animation>(new Animation(::std::forward<Ts>(args)...));
+
+    return animation;
+  }
   ~Animation();
 
   /** Methods **/
@@ -367,7 +373,7 @@ public:
    * @brief Return the array of runtime animations currently using this
    * animation.
    */
-  vector_t<RuntimeAnimation*>& runtimeAnimations();
+  vector_t<RuntimeAnimationPtr>& runtimeAnimations();
 
   /**
    * @brief Remove all events found at the given frame.
@@ -417,7 +423,7 @@ public:
    * @brief Gets the highest frame rate of the animation.
    * @returns Highest frame rate of the animation
    */
-  int getHighestFrame() const;
+  float getHighestFrame() const;
 
   /**
    * @brief Gets the easing function of the animation.
@@ -561,8 +567,8 @@ public:
    * @brief Hidden Internal use only.
    */
   AnimationValue
-  _interpolate(int currentFrame, int repeatCount,
-               Nullable<AnimationValue>& workValue, unsigned int loopMode,
+  _interpolate(float currentFrame, int repeatCount,
+               nullable_t<AnimationValue>& workValue, unsigned int loopMode,
                const AnimationValue& offsetValue    = AnimationValue(),
                const AnimationValue& highLimitValue = AnimationValue());
 
@@ -592,7 +598,7 @@ public:
    * @brief Makes a copy of the animation.
    * @returns Cloned animation
    */
-  unique_ptr_t<Animation> clone() const;
+  AnimationPtr clone() const;
 
   /**
    * @brief Sets the key frames of the animation.
@@ -620,6 +626,20 @@ public:
    */
   static void AppendSerializedAnimations(IAnimatable* source,
                                          picojson::object& destination);
+
+protected:
+  /**
+   * @brief Initializes the animation.
+   * @param name Name of the animation
+   * @param targetProperty Property to animate
+   * @param framePerSecond The frames per second of the animation
+   * @param dataType The data type of the animation
+   * @param loopMode The loop mode of the animation
+   * @param enableBlendings Specifies if blending should be enabled
+   */
+  Animation(const string_t& name, const string_t& targetProperty,
+            size_t framePerSecond, int dataType,
+            unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE());
 
 private:
   /**
@@ -655,7 +675,7 @@ public:
   /**
    * Hidden Internal use only
    */
-  vector_t<RuntimeAnimation*> _runtimeAnimations;
+  vector_t<RuntimeAnimationPtr> _runtimeAnimations;
 
   /**
    * Stores an array of target property paths

@@ -10,6 +10,7 @@
 #include <babylon/engine/instancing_attribute_info.h>
 #include <babylon/instrumentation/_time_token.h>
 #include <babylon/interfaces/icanvas.h>
+#include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/interfaces/iloading_screen.h>
 #include <babylon/materials/effect.h>
@@ -27,6 +28,7 @@
 #include <babylon/math/color4.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/particles/particle_system.h>
 #include <babylon/postprocess/pass_post_process.h>
 #include <babylon/postprocess/post_process.h>
 #include <babylon/postprocess/post_process_manager.h>
@@ -62,6 +64,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _vrDisplayEnabled{false}
     , disableUniformBuffers{false}
     , disablePerformanceMonitorInBackground{false}
+    , premultipliedAlpha{options.premultipliedAlpha}
     , _depthCullingState{::std::make_unique<_DepthCullingState>()}
     , _stencilState{::std::make_unique<_StencilState>()}
     , _alphaState{::std::make_unique<_AlphaState>()}
@@ -108,6 +111,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _emptyCubeTexture{nullptr}
     , _emptyTexture3D{nullptr}
     , _maxSimultaneousTextures{0}
+    , _unpackFlipYCached{nullopt_t}
 {
   Engine::Instances.emplace_back(this);
 
@@ -433,6 +437,20 @@ bool Engine::isStencilEnable() const
   return _isStencilEnable;
 }
 
+void Engine::_prepareWorkingCanvas()
+{
+  if (_workingCanvas) {
+    return;
+  }
+
+  _workingCanvas = _renderingCanvas;
+  auto context   = _workingCanvas->getContext2d();
+
+  if (context) {
+    _workingContext = context;
+  }
+}
+
 void Engine::resetTextureCache()
 {
   for (auto& boundTextureItem : _boundTexturesCache) {
@@ -472,9 +490,9 @@ GL::GLInfo Engine::getGlInfo()
   };
 }
 
-float Engine::getAspectRatio(Camera* camera, bool useScreen)
+float Engine::getAspectRatio(const Camera& camera, bool useScreen)
 {
-  const auto& viewport = camera->viewport;
+  const auto& viewport = camera.viewport;
   return static_cast<float>(getRenderWidth(useScreen) * viewport.width)
          / static_cast<float>(getRenderHeight(useScreen) * viewport.height);
 }
@@ -849,6 +867,21 @@ void Engine::scissorClear(int x, int y, int width, int height,
   }
 }
 
+void Engine::_viewport(int x, int y, int width, int height)
+{
+  if (x != static_cast<int>(_viewportCached.x)
+      || y != static_cast<int>(_viewportCached.y)
+      || width != static_cast<int>(_viewportCached.z)
+      || height != static_cast<int>(_viewportCached.w)) {
+    _viewportCached.x = x;
+    _viewportCached.y = y;
+    _viewportCached.z = width;
+    _viewportCached.w = height;
+
+    _gl->viewport(x, y, width, height);
+  }
+}
+
 void Engine::setViewport(Viewport& viewport, int requiredWidth,
                          int requiredHeight)
 {
@@ -856,6 +889,8 @@ void Engine::setViewport(Viewport& viewport, int requiredWidth,
   if (_renderingCanvas->onlyRenderBoundingClientRect()) {
     const auto& rec = _renderingCanvas->getBoundingClientRect();
     _gl->viewport(rec.left, rec.bottom, rec.width, rec.height);
+
+    _cachedViewport = &viewport;
   }
   else {
     int width  = requiredWidth != 0 ? requiredWidth : getRenderWidth();
@@ -863,11 +898,11 @@ void Engine::setViewport(Viewport& viewport, int requiredWidth,
     int x      = viewport.x;
     int y      = viewport.y;
 
-    _gl->viewport(x * width, y * height, width * viewport.width,
-                  height * viewport.height);
-  }
+    _cachedViewport = &viewport;
 
-  _cachedViewport = &viewport;
+    _viewport(x * width, y * height, width * viewport.width,
+              height * viewport.height);
+  }
 }
 
 Viewport& Engine::setDirectViewport(int x, int y, int width, int height)
@@ -875,7 +910,7 @@ Viewport& Engine::setDirectViewport(int x, int y, int width, int height)
   auto currentViewport = _cachedViewport;
   _cachedViewport      = nullptr;
 
-  _gl->viewport(x, y, width, height);
+  _viewport(x, y, width, height);
 
   return *currentViewport;
 }
@@ -986,9 +1021,20 @@ void Engine::bindFramebuffer(InternalTexture* texture,
     setViewport(*_cachedViewport, *requiredWidth, *requiredHeight);
   }
   else {
-    _gl->viewport(0, 0, requiredWidth ? *requiredWidth : texture->width,
-                  requiredHeight.has_value() ? *requiredHeight :
-                                               texture->height);
+    if (!requiredWidth) {
+      requiredWidth = texture->width;
+      if (lodLevel) {
+        requiredWidth = *requiredWidth / std::pow(2, lodLevel);
+      }
+    }
+    if (!requiredHeight) {
+      requiredHeight = texture->height;
+      if (lodLevel) {
+        requiredHeight = *requiredHeight / std::pow(2, lodLevel);
+      }
+    }
+
+    _viewport(0, 0, *requiredWidth, *requiredHeight);
   }
 
   wipeCaches();
@@ -1862,26 +1908,32 @@ Effect* Engine::createEffect(unordered_map_t<string_t, string_t>& baseName,
 }
 
 Effect* Engine::createEffectForParticles(
-  const string_t& fragmentName, const vector_t<string_t>& uniformsNames,
-  const vector_t<string_t>& samplers, const string_t& defines,
-  EffectFallbacks* fallbacks,
+  const string_t& fragmentName, vector_t<string_t> uniformsNames,
+  vector_t<string_t> samplers, string_t defines, EffectFallbacks* fallbacks,
   const ::std::function<void(const Effect* effect)>& onCompiled,
   const ::std::function<void(const Effect* effect, const string_t& errors)>&
     onError)
 {
+  auto attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions();
+  auto effectCreationOption     = ParticleSystem::_GetEffectCreationOptions();
+
+  if (!String::contains(defines, " BILLBOARD")) {
+    defines += "\n#define BILLBOARD\n";
+  }
+
+  if (!stl_util::contains(samplers, "diffuseSampler")) {
+    samplers.emplace_back("diffuseSampler");
+  }
+
   unordered_map_t<string_t, string_t> baseName{
     {"vertex", "particles"}, {"fragmentElement", fragmentName}};
-  vector_t<string_t> attributesNames{"position", "color", "options"};
-  vector_t<string_t> _uniformsNames = {"view", "projection"};
-  stl_util::concat(_uniformsNames, uniformsNames);
-  vector_t<string_t> _samplers = {"diffuseSampler"};
-  stl_util::concat(_samplers, samplers);
+  stl_util::concat(effectCreationOption, uniformsNames);
 
   EffectCreationOptions options;
-  options.attributes    = ::std::move(attributesNames);
-  options.uniformsNames = ::std::move(_uniformsNames);
-  options.samplers      = ::std::move(_samplers);
-  options.defines       = defines;
+  options.attributes    = ::std::move(attributesNamesOrOptions);
+  options.uniformsNames = ::std::move(effectCreationOption);
+  options.samplers      = ::std::move(samplers);
+  options.defines       = ::std::move(defines);
   options.fallbacks     = ::std::make_unique<EffectFallbacks>(*fallbacks);
   options.onCompiled    = onCompiled;
   options.onError       = onError;
@@ -2406,12 +2458,23 @@ _StencilState* Engine::stencilState()
 }
 
 // Textures
+
+void Engine::clearInternalTexturesCache()
+{
+  _internalTexturesCache.clear();
+}
+
 void Engine::wipeCaches(bool bruteForce)
 {
   if (preventCacheWipeBetweenFrames && !bruteForce) {
     return;
   }
-  _currentEffect = nullptr;
+  _currentEffect     = nullptr;
+  _unpackFlipYCached = nullopt_t;
+  _viewportCached.x  = 0;
+  _viewportCached.y  = 0;
+  _viewportCached.z  = 0;
+  _viewportCached.w  = 0;
 
   if (bruteForce) {
     resetTextureCache();
@@ -2478,7 +2541,7 @@ InternalTexture* Engine::createTexture(
   unsigned int samplingMode,
   const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
   const ::std::function<void()>& onError,
-  const nullable_t<Variant<ArrayBuffer, Image>>& /*buffer*/,
+  const nullable_t<Variant<ArrayBuffer, Image>>& buffer,
   InternalTexture* fallback, const nullable_t<unsigned int>& format)
 {
   // assign a new string, so that the original is still available in case of
@@ -2502,7 +2565,7 @@ InternalTexture* Engine::createTexture(
 
   // determine if a ktx file should be substituted
   auto isKTX = false;
-  if (!_textureFormatInUse.empty() && !isBase64 && !fallback) {
+  if (!_textureFormatInUse.empty() && !isBase64 && !fallback && !buffer) {
     url   = url.substr(0, lastDot) + _textureFormatInUse;
     isKTX = true;
   }
@@ -2520,8 +2583,9 @@ InternalTexture* Engine::createTexture(
     // texture->_buffer = buffer;
   }
 
+  Observer<InternalTexture>::Ptr onLoadObserver = nullptr;
   if (onLoad && !fallback) {
-    texture->onLoadedObservable.add(onLoad);
+    onLoadObserver = texture->onLoadedObservable.add(onLoad);
   }
 
   if (!fallback) {
@@ -2531,6 +2595,12 @@ InternalTexture* Engine::createTexture(
   const auto _onerror = [&](const string_t& /*msg*/) {
     if (scene) {
       scene->_removePendingData(texture);
+    }
+
+    if (onLoadObserver && !isKTX) {
+      // dont remove the observer if its a ktx file, since the fallback
+      // createTexture call will require it.
+      texture->onLoadedObservable.remove(onLoadObserver);
     }
 
     // fallback for when compressed file not found to try again.  For instance,
@@ -2576,29 +2646,53 @@ InternalTexture* Engine::createTexture(
             return false;
           }
 
-          // Using shaders to rescale because canvas.drawImage is lossy
-          auto source
-            = new InternalTexture(this, InternalTexture::DATASOURCE_TEMP);
-          _bindTextureDirectly(GL::TEXTURE_2D, source);
-          _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
-                          img.width, img.height, 0, GL::RGBA, GL::UNSIGNED_BYTE,
-                          img.data);
+          auto maxTextureSize = _caps.maxTextureSize;
 
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER,
-                             GL::LINEAR);
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER,
-                             GL::LINEAR);
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
-                             GL::CLAMP_TO_EDGE);
-          _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
-                             GL::CLAMP_TO_EDGE);
+          if (img.width > maxTextureSize || img.height > maxTextureSize) {
+            _prepareWorkingCanvas();
+            if (!_workingCanvas || !_workingContext) {
+              return false;
+            }
 
-          _rescaleTexture(source, texture, scene, internalFormat, [&]() {
-            _releaseTexture(source);
-            _bindTextureDirectly(GL::TEXTURE_2D, texture);
+            _workingCanvas->width  = potWidth;
+            _workingCanvas->height = potHeight;
 
-            continuationCallback();
-          });
+            _workingContext->drawImage(img, 0, 0, img.width, img.height, 0, 0,
+                                       potWidth, potHeight);
+            _gl->texImage2D(GL::TEXTURE_2D, 0, internalFormat, internalFormat,
+                            GL::UNSIGNED_BYTE, _workingCanvas);
+
+            texture->width  = potWidth;
+            texture->height = potHeight;
+
+            return false;
+          }
+          else {
+            // Using shaders when possible to rescale because canvas.drawImage
+            // is lossy
+            auto source
+              = new InternalTexture(this, InternalTexture::DATASOURCE_TEMP);
+            _bindTextureDirectly(GL::TEXTURE_2D, source);
+            _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
+                            img.width, img.height, 0, GL::RGBA,
+                            GL::UNSIGNED_BYTE, img.data);
+
+            _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER,
+                               GL::LINEAR);
+            _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER,
+                               GL::LINEAR);
+            _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S,
+                               GL::CLAMP_TO_EDGE);
+            _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T,
+                               GL::CLAMP_TO_EDGE);
+
+            _rescaleTexture(source, texture, scene, internalFormat, [&]() {
+              _releaseTexture(source);
+              _bindTextureDirectly(GL::TEXTURE_2D, texture);
+
+              continuationCallback();
+            });
+          }
 
           return true;
         },
@@ -2676,10 +2770,10 @@ void Engine::updateRawTexture(InternalTexture* texture, const Uint8Array& data,
   auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type, format);
   // babylon's internalFormat but gl's texImage2D format
   auto internalFormat = _getInternalFormat(format);
-
-  auto textureType = _getWebGLTextureType(type);
+  auto textureType    = _getWebGLTextureType(type);
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
-  _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
+
+  _unpackFlipY(invertY ? true : false);
 
   if (!_doNotHandleContextLost) {
     texture->_bufferView  = data;
@@ -2758,6 +2852,19 @@ InternalTexture* Engine::createRawTexture(const Uint8Array& data, int width,
   return _texture;
 }
 
+int Engine::_getUnpackAlignement() const
+{
+  return _gl->getParameteri(GL::UNPACK_ALIGNMENT);
+}
+
+void Engine::_unpackFlipY(bool value)
+{
+  if (!_unpackFlipYCached.has_value() || *_unpackFlipYCached != value) {
+    _unpackFlipYCached = value;
+    _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, value ? 1 : 0);
+  }
+}
+
 InternalTexture* Engine::createDynamicTexture(int width, int height,
                                               bool generateMipMaps,
                                               unsigned int samplingMode)
@@ -2830,7 +2937,8 @@ void Engine::updateDynamicTexture(InternalTexture* texture, ICanvas* canvas,
   }
 
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
-  _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
+
+  _unpackFlipY(invertY);
   if (premulAlpha) {
     _gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
   }
@@ -3555,6 +3663,20 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
   return samples;
 }
 
+void Engine::_uploadCompressedDataToTextureDirectly(
+  InternalTexture* /*texture*/, unsigned int /*internalFormat*/,
+  float /*width*/, float /*height*/, const Uint8Array& /*data*/,
+  unsigned int /*faceIndex*/, int /*lod*/)
+{
+}
+
+void Engine::_uploadDataToTextureDirectly(InternalTexture* /*texture*/,
+                                          const Uint8Array& /*imageData*/,
+                                          unsigned int /*faceIndex*/,
+                                          int /*lod*/)
+{
+}
+
 void Engine::_uploadDataToTexture(unsigned int target, int lod,
                                   int internalFormat, int width, int height,
                                   unsigned int format, unsigned int type,
@@ -3571,6 +3693,30 @@ void Engine::_uploadCompressedDataToTexture(unsigned int target, int lod,
 {
   _gl->compressedTexImage2D(target, lod, internalFormat, width, height, 0,
                             data);
+}
+
+void Engine::_uploadImageToTexture(InternalTexture* texture,
+                                   unsigned int faceIndex, int lod,
+                                   ICanvas* image)
+{
+  auto textureType = _getWebGLTextureType(texture->type);
+  auto format      = _getInternalFormat(texture->format);
+  auto internalFormat
+    = _getRGBABufferInternalSizedFormat(texture->type, format);
+
+  auto bindTarget = texture->isCube ? GL::TEXTURE_CUBE_MAP : GL::TEXTURE_2D;
+
+  _bindTextureDirectly(bindTarget, texture, true);
+  _unpackFlipY(texture->invertY);
+
+  GL::GLenum target = GL::TEXTURE_2D;
+  if (texture->isCube) {
+    target
+      = static_cast<GL::GLenum>(GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex);
+  }
+
+  _gl->texImage2D(target, lod, internalFormat, format, textureType, image);
+  _bindTextureDirectly(bindTarget, nullptr, true);
 }
 
 InternalTexture* Engine::createRenderTargetCubeTexture(
@@ -3654,7 +3800,7 @@ InternalTexture* Engine::createPrefilteredCubeTexture(
 
 InternalTexture* Engine::createCubeTexture(
   const string_t& /*rootUrl*/, Scene* /*scene*/,
-  const vector_t<string_t>& /*extensions*/, bool /*noMipmap*/,
+  const vector_t<string_t>& /*files*/, bool /*noMipmap*/,
   const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
   const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
   const string_t& /*forcedExtension*/, bool /*createPolynomials*/,
@@ -3702,7 +3848,8 @@ void Engine::updateRawCubeTexture(InternalTexture* texture,
   }
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
-  _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
+
+  _unpackFlipY(invertY ? true : false);
 
   if (texture->width % 4 != 0) {
     _gl->pixelStorei(GL::UNPACK_ALIGNMENT, 1);
@@ -3853,7 +4000,8 @@ void Engine::updateRawTexture3D(InternalTexture* texture,
     = _getRGBABufferInternalSizedFormat(textureType, format);
 
   _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
-  _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, invertY ? 1 : 0);
+
+  _unpackFlipY(invertY ? true : false);
 
   if (!_doNotHandleContextLost) {
     texture->_bufferView  = _data;
@@ -3967,12 +4115,14 @@ void Engine::_prepareWebGLTexture(
          const ::std::function<void()>& continuationCallback)>& processFunction,
   unsigned int samplingMode)
 {
-  auto potWidth = needPOTTextures() ?
-                    Tools::GetExponentOfTwo(width, getCaps().maxTextureSize) :
-                    width;
-  auto potHeight = needPOTTextures() ?
-                     Tools::GetExponentOfTwo(height, getCaps().maxTextureSize) :
-                     height;
+  auto maxTextureSize = getCaps().maxTextureSize;
+  auto potWidth       = ::std::min(
+    maxTextureSize,
+    needPOTTextures() ? Tools::GetExponentOfTwo(width, maxTextureSize) : width);
+  auto potHeight = ::std::min(
+    maxTextureSize, needPOTTextures() ?
+                      Tools::GetExponentOfTwo(height, maxTextureSize) :
+                      height);
 
   if (!_gl) {
     return;
@@ -3988,8 +4138,8 @@ void Engine::_prepareWebGLTexture(
   }
 
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
-  _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL,
-                   !invertY.has_value() ? 1 : (*invertY ? 1 : 0));
+
+  _unpackFlipY(invertY ? true : false);
 
   texture->baseWidth  = width;
   texture->baseHeight = height;
@@ -4246,9 +4396,10 @@ void Engine::_activateCurrentTexture()
   }
 }
 
-void Engine::_bindTextureDirectly(unsigned int target, InternalTexture* texture,
+bool Engine::_bindTextureDirectly(unsigned int target, InternalTexture* texture,
                                   bool forTextureDataUpdate, bool force)
 {
+  bool wasPreviouslyBound = false;
   if (forTextureDataUpdate && texture && texture->_designatedSlot > -1) {
     _activeChannel = texture->_designatedSlot;
   }
@@ -4281,12 +4432,15 @@ void Engine::_bindTextureDirectly(unsigned int target, InternalTexture* texture,
     }
   }
   else if (forTextureDataUpdate) {
+    wasPreviouslyBound = true;
     _activateCurrentTexture();
   }
 
   if (isTextureForRendering && !forTextureDataUpdate && texture) {
     _bindSamplerUniformToChannel(texture->_initialSlot, _activeChannel);
   }
+
+  return wasPreviouslyBound;
 }
 
 void Engine::_bindTexture(int channel, InternalTexture* texture)
@@ -4329,7 +4483,7 @@ void Engine::unbindAllTextures()
 }
 
 void Engine::setTexture(int channel, GL::IGLUniformLocation* uniform,
-                        BaseTexture* texture)
+                        const BaseTexturePtr& texture)
 {
   if (channel < 0) {
     return;
@@ -4344,7 +4498,7 @@ void Engine::setTexture(int channel, GL::IGLUniformLocation* uniform,
 
 void Engine::setDepthStencilTexture(int channel,
                                     GL::IGLUniformLocation* uniform,
-                                    RenderTargetTexture* texture)
+                                    const RenderTargetTexturePtr& texture)
 {
   if (channel < 0) {
     return;
@@ -4385,7 +4539,7 @@ unsigned int Engine::_getTextureWrapMode(unsigned int mode) const
   return GL::REPEAT;
 }
 
-bool Engine::_setTexture(int channel, BaseTexture* texture,
+bool Engine::_setTexture(int channel, const BaseTexturePtr& texture,
                          bool isPartOfTextureArray, bool depthStencilTexture)
 {
   // Not ready?
@@ -4411,8 +4565,8 @@ bool Engine::_setTexture(int channel, BaseTexture* texture,
 
   InternalTexture* internalTexture = nullptr;
   if (depthStencilTexture) {
-    internalTexture
-      = static_cast<RenderTargetTexture*>(texture)->depthStencilTexture.get();
+    internalTexture = ::std::static_pointer_cast<RenderTargetTexture>(texture)
+                        ->depthStencilTexture.get();
   }
   else if (texture->isReady()) {
     internalTexture = texture->getInternalTexture();
@@ -4523,7 +4677,7 @@ bool Engine::_setTexture(int channel, BaseTexture* texture,
 }
 
 void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
-                             const vector_t<BaseTexture*>& textures)
+                             const vector_t<BaseTexturePtr>& textures)
 {
   if (channel < 0 || !uniform) {
     return;
@@ -4546,7 +4700,8 @@ void Engine::setTextureArray(int channel, GL::IGLUniformLocation* uniform,
   }
 }
 
-void Engine::_setAnisotropicLevel(unsigned int target, BaseTexture* texture)
+void Engine::_setAnisotropicLevel(unsigned int target,
+                                  const BaseTexturePtr& texture)
 {
   auto internalTexture = texture->getInternalTexture();
 

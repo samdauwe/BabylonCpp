@@ -36,8 +36,8 @@ public:
   /**
    * @brief Internal only.
    */
-  IAnimatable* _getEffectiveTarget(IAnimatable* target,
-                                   const string_t& propertyPath);
+  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
+                                     const string_t& propertyPath);
 
   /**
    * @brief Serialize placeholder for child classes.

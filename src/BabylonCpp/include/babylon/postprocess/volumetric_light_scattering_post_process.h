@@ -34,8 +34,8 @@ public:
    * "scene" must be provided
    */
   VolumetricLightScatteringPostProcess(
-    const string_t& name, float ratio, Camera* camera, Mesh* mesh,
-    unsigned int samples      = 100,
+    const string_t& name, float ratio, const CameraPtr& camera,
+    const MeshPtr& mesh, unsigned int samples = 100,
     unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false, Scene* scene = nullptr);
   ~VolumetricLightScatteringPostProcess();
@@ -67,7 +67,7 @@ public:
    * @return {BABYLON.RenderTargetTexture} The render target texture used by the
    * post-process
    */
-  RenderTargetTexture* getPass();
+  RenderTargetTexturePtr& getPass();
 
   //** Static methods **/ /
   /**
@@ -76,11 +76,11 @@ public:
    * @param {BABYLON.Scene} The scene where to create the mesh
    * @return {BABYLON.Mesh} the default mesh
    */
-  static Mesh* CreateDefaultMesh(const string_t& name, Scene* scene);
+  static MeshPtr CreateDefaultMesh(const string_t& name, Scene* scene);
 
 private:
-  bool _isReady(SubMesh* subMesh, bool useInstances);
-  bool _meshExcluded(AbstractMesh* mesh);
+  bool _isReady(const SubMeshPtr& subMesh, bool useInstances);
+  bool _meshExcluded(const AbstractMeshPtr& mesh);
   void _createPass(Scene* scene, float ratio);
   void _updateMeshScreenCoordinates(Scene* scene);
 
@@ -107,7 +107,7 @@ public:
   /**
    * The internal mesh used by the post-process
    */
-  Mesh* mesh;
+  MeshPtr mesh;
   /**
    * Set to true to use the diffuseColor instead of the diffuseTexture
    */
@@ -115,7 +115,7 @@ public:
   /**
    * Array containing the excluded meshes not rendered in the internal pass
    */
-  vector_t<AbstractMesh*> excludedMeshes;
+  vector_t<AbstractMeshPtr> excludedMeshes;
   /**
    * Controls the overall intensity of the post-process
    */
@@ -135,7 +135,7 @@ public:
 
 private:
   Effect* _volumetricLightScatteringPass;
-  RenderTargetTexture* _volumetricLightScatteringRTT;
+  RenderTargetTexturePtr _volumetricLightScatteringRTT;
   Viewport _viewPort;
   Vector2 _screenCoordinates;
   string_t _cachedDefines;

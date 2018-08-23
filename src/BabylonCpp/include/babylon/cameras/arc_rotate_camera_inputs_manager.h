@@ -16,6 +16,7 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraInputsManager
   ArcRotateCameraInputsManager& addPointers();
   ArcRotateCameraInputsManager& addKeyboard();
   ArcRotateCameraInputsManager& addGamepad();
+
 }; // end of struct ArcRotateCameraInputsManager
 
 } // end of namespace BABYLON

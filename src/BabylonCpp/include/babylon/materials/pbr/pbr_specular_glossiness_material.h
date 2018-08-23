@@ -33,21 +33,21 @@ public:
   /**
    * @brief Return the active textures of the material.
    */
-  vector_t<BaseTexture*> getActiveTextures() const override;
+  vector_t<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(BaseTexture* texture) const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  PBRSpecularGlossinessMaterial*
-  clone(const string_t& name, bool cloneChildren = false) const override;
+  MaterialPtr clone(const string_t& name,
+                    bool cloneChildren = false) const override;
 
   /**
    * @brief Serialize the material to a parsable JSON object.
@@ -70,7 +70,7 @@ public:
    * Specifies the diffuse texture of the material. This can also contains the
    * opcity value in its alpha channel.
    */
-  BaseTexture* diffuseTexture;
+  BaseTexturePtr diffuseTexture;
 
   /**
    * Specifies the specular color of the material. This indicates how reflective
@@ -88,7 +88,7 @@ public:
    * Specifies both the specular color RGB and the glossiness A of the material
    * per pixels.
    */
-  BaseTexture* specularGlossinessTexture;
+  BaseTexturePtr specularGlossinessTexture;
 
 }; // end of class PBRSpecularGlossinessMaterial
 

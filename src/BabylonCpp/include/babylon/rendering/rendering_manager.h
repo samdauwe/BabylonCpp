@@ -29,13 +29,13 @@ public:
   ~RenderingManager();
 
   void render(
-    ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
-                         const vector_t<SubMesh*>& alphaTestSubMeshes,
-                         const vector_t<SubMesh*>& transparentSubMeshes,
-                         const vector_t<SubMesh*>& depthOnlySubMeshes,
+    ::std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
+                         const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+                         const vector_t<SubMeshPtr>& transparentSubMeshes,
+                         const vector_t<SubMeshPtr>& depthOnlySubMeshes,
                          const ::std::function<void()>& beforeTransparents)>
       customRenderFunction,
-    const vector_t<AbstractMesh*>& activeMeshes, bool renderParticles,
+    const vector_t<AbstractMeshPtr>& activeMeshes, bool renderParticles,
     bool renderSprites);
   void reset();
   void dispose();
@@ -56,8 +56,8 @@ public:
    * @param [material] Optional reference to the submeshes's material. Provide
    * if you have an exiting reference to improve performance.
    */
-  void dispatch(SubMesh* subMesh, AbstractMesh* mesh = nullptr,
-                Material* material = nullptr);
+  void dispatch(const SubMeshPtr& subMesh, AbstractMesh* mesh = nullptr,
+                const MaterialPtr& material = nullptr);
 
   /**
    * @brief Overrides the default sort function applied in the renderging group
@@ -75,11 +75,14 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      opaqueSortCompareFn
     = nullptr,
-    const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      alphaTestSortCompareFn
     = nullptr,
-    const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      transparentSortCompareFn
     = nullptr);
 
   /**
@@ -124,11 +127,11 @@ private:
   bool _depthStencilBufferAlreadyCleaned;
 
   vector_t<IRenderingManagerAutoClearSetup> _autoClearDepthStencil;
-  vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
+  vector_t<::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customOpaqueSortCompareFn;
-  vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
+  vector_t<::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customAlphaTestSortCompareFn;
-  vector_t<::std::function<int(SubMesh* a, SubMesh* b)>>
+  vector_t<::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customTransparentSortCompareFn;
   unique_ptr_t<RenderingGroupInfo> _renderingGroupInfo;
 

@@ -20,7 +20,7 @@ namespace BABYLON {
 
 LensRenderingPipeline::LensRenderingPipeline(
   const string_t& name, const LensRenderingPipelineParameters& parameters,
-  Scene* scene, float ratio, const vector_t<Camera*>& cameras)
+  Scene* scene, float ratio, const vector_t<CameraPtr>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name), _scene{scene}
 {
   // Fetch texture samplers
@@ -68,7 +68,7 @@ LensRenderingPipeline::LensRenderingPipeline(
     true));
 
   if (stl_util::almost_equal(_highlightsGain, -1.f)) {
-    _disableEffect(HighlightsEnhancingEffect, vector_t<Camera*>());
+    _disableEffect(HighlightsEnhancingEffect, vector_t<CameraPtr>());
   }
 
   // Finish
@@ -299,13 +299,14 @@ void LensRenderingPipeline::_createGrainTexture()
   options.width  = static_cast<int>(size);
   options.height = static_cast<int>(size);
 
-  _grainTexture = new DynamicTexture("LensNoiseTexture", options, _scene, false,
-                                     TextureConstants::BILINEAR_SAMPLINGMODE);
+  _grainTexture
+    = DynamicTexture::New("LensNoiseTexture", options, _scene, false,
+                          TextureConstants::BILINEAR_SAMPLINGMODE);
   _grainTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _grainTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
   ICanvasRenderingContext2D* context
-    = dynamic_cast<DynamicTexture*>(_grainTexture)->getContext();
+    = ::std::static_pointer_cast<DynamicTexture>(_grainTexture)->getContext();
 
   auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
@@ -319,7 +320,7 @@ void LensRenderingPipeline::_createGrainTexture()
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     }
   }
-  dynamic_cast<DynamicTexture*>(_grainTexture)->update(false);
+  ::std::static_pointer_cast<DynamicTexture>(_grainTexture)->update(false);
 }
 
 } // end of namespace BABYLON

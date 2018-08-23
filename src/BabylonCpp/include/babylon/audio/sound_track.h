@@ -12,6 +12,12 @@ public:
       : _scene{scene}, _mainTrack{mainTrack}
   {
   }
+  void AddSound(const SoundPtr& /*sound*/)
+  {
+  }
+  void RemoveSound(const SoundPtr& /*sound*/)
+  {
+  }
 
 public:
   Scene* _scene;

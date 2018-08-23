@@ -136,12 +136,12 @@ void SpriteManager::setOnDispose(
   _onDisposeObserver = onDisposeObservable.add(callback);
 }
 
-Texture*& SpriteManager::get_texture()
+TexturePtr& SpriteManager::get_texture()
 {
   return _spriteTexture;
 }
 
-void SpriteManager::set_texture(Texture* const& value)
+void SpriteManager::set_texture(const TexturePtr& value)
 {
   _spriteTexture = value;
 }
@@ -190,8 +190,8 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite* sprite,
   _vertexData[arrayOffset + 15] = sprite->color->a;
 }
 
-PickingInfo*
-SpriteManager::intersects(const Ray ray, Camera* camera,
+nullable_t<PickingInfo>
+SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
                           ::std::function<bool(Sprite* sprite)> predicate,
                           bool fastCheck)
 {
@@ -245,16 +245,16 @@ SpriteManager::intersects(const Ray ray, Camera* camera,
   }
 
   if (currentSprite) {
-    PickingInfo* result = new PickingInfo();
+    PickingInfo result;
 
-    result->hit          = true;
-    result->pickedSprite = currentSprite;
-    result->distance     = distance;
+    result.hit          = true;
+    result.pickedSprite = currentSprite;
+    result.distance     = distance;
 
     return result;
   }
 
-  return nullptr;
+  return nullopt_t;
 }
 
 void SpriteManager::render()

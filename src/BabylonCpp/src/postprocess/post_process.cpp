@@ -16,7 +16,7 @@ namespace BABYLON {
 PostProcess::PostProcess(
   const string_t& iName, const string_t& fragmentUrl,
   const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
-  const Variant<float, PostProcessOptions>& options, Camera* camera,
+  const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   const string_t& defines, unsigned int textureType, const string_t& vertexUrl,
   const unordered_map_t<string_t, unsigned int>& indexParameters,
@@ -140,7 +140,7 @@ void PostProcess::setInputTexture(InternalTexture* value)
   _forcedOutputTexture = value;
 }
 
-Camera* PostProcess::getCamera()
+CameraPtr& PostProcess::getCamera()
 {
   return _camera;
 }
@@ -219,7 +219,7 @@ void PostProcess::markTextureDirty()
   width = -1;
 }
 
-InternalTexture* PostProcess::activate(Camera* camera,
+InternalTexture* PostProcess::activate(const CameraPtr& camera,
                                        InternalTexture* sourceTexture,
                                        bool forceDepthStencil)
 {
@@ -344,7 +344,7 @@ InternalTexture* PostProcess::activate(Camera* camera,
                              forceFullscreenViewport);
   }
 
-  onActivateObservable.notifyObservers(camera);
+  onActivateObservable.notifyObservers(camera.get());
 
   // Clear
   if (scene->_allowPostProcessClear && autoClear
@@ -443,7 +443,7 @@ void PostProcess::_disposeTextures()
 
 void PostProcess::dispose(Camera* camera)
 {
-  auto pCamera = camera ? camera : _camera;
+  auto pCamera = camera ? camera : _camera.get();
 
   _disposeTextures();
 

@@ -36,7 +36,7 @@ public:
    */
   ChromaticAberrationPostProcess(
     const string_t& name, int screenWidth, int screenHeight,
-    const Variant<float, PostProcessOptions>& options, Camera* camera,
+    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
     unsigned int samplingMode, Engine* engine, bool reusable = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     bool blockCompilation    = false);

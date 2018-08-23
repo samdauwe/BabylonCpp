@@ -203,7 +203,7 @@ public:
    * @param channel Name of the sampler variable.
    * @param texture Texture to set.
    */
-  void setTexture(const string_t& channel, BaseTexture* texture);
+  void setTexture(const string_t& channel, const BaseTexturePtr& texture);
 
   /**
    * @brief Sets a depth stencil texture from a render target on the engine to
@@ -212,7 +212,7 @@ public:
    * @param texture Texture to set.
    */
   void setDepthStencilTexture(const string_t& channel,
-                              RenderTargetTexture* texture);
+                              const RenderTargetTexturePtr& texture);
 
   /**
    * @brief Sets an array of textures on the engine to be used in the shader.
@@ -220,7 +220,7 @@ public:
    * @param textures Textures to set.
    */
   void setTextureArray(const string_t& channel,
-                       const vector_t<BaseTexture*>& textures);
+                       const vector_t<BaseTexturePtr>& textures);
 
   /**
    * @brief Sets a texture to be the input of the specified post process. (To

@@ -26,7 +26,7 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    * @returns the new Particle system
    */
   static ParticleSystem*
-  CreateDefault(const Variant<AbstractMesh*, Vector3>& emitter,
+  CreateDefault(const Variant<AbstractMeshPtr, Vector3>& emitter,
                 size_t capacity = 500, Scene* scene = nullptr);
 
   /**

@@ -52,7 +52,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   // Build bounding box out of lines
   _lineBoundingBox = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _lineBoundingBox->rotationQuaternion = Quaternion();
-  vector_t<LinesMesh*> lines;
+  vector_t<LinesMeshPtr> lines;
   vector_t<vector_t<Vector3>> linesPoints{
     {Vector3(0.f, 0.f, 0.f), Vector3(_boundingDimensions.x, 0.f, 0.f)},
     {Vector3(0.f, 0.f, 0.f), Vector3(0.f, _boundingDimensions.y, 0.f)},
@@ -91,9 +91,9 @@ BoundingBoxGizmo::BoundingBoxGizmo(
                                      -_boundingDimensions.y / 2.f,
                                      -_boundingDimensions.z / 2.f));
     l->isPickable = false;
-    _lineBoundingBox->addChild(l);
+    _lineBoundingBox->addChild(*l);
   }
-  _rootMesh->addChild(_lineBoundingBox);
+  _rootMesh->addChild(*_lineBoundingBox);
 
   // Create rotation spheres
   _rotateSpheresParent
@@ -165,10 +165,10 @@ BoundingBoxGizmo::BoundingBoxGizmo(
           }
 
           // Rotate around center of bounding box
-          _anchorMesh->addChild(attachedMesh);
+          _anchorMesh->addChild(*attachedMesh);
           _anchorMesh->rotationQuaternion()->multiplyToRef(
             _tmpQuaternion, *_anchorMesh->rotationQuaternion());
-          _anchorMesh->removeChild(attachedMesh);
+          _anchorMesh->removeChild(*attachedMesh);
         }
         updateBoundingBox();
       }
@@ -184,9 +184,9 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         _selectNode(nullptr);
       });
 
-    _rotateSpheresParent->addChild(sphere);
+    _rotateSpheresParent->addChild(*sphere);
   }
-  _rootMesh->addChild(_rotateSpheresParent);
+  _rootMesh->addChild(*_rotateSpheresParent);
 
   // Create scale cubes
   _scaleBoxesParent
@@ -248,21 +248,21 @@ BoundingBoxGizmo::BoundingBoxGizmo(
             _selectNode(nullptr);
           });
 
-        _scaleBoxesParent->addChild(box);
+        _scaleBoxesParent->addChild(*box);
       }
     }
   }
-  _rootMesh->addChild(_scaleBoxesParent);
+  _rootMesh->addChild(*_scaleBoxesParent);
 
   // Hover color change
-  unordered_map_t<int, AbstractMesh*> pointerIds;
+  unordered_map_t<int, AbstractMeshPtr> pointerIds;
   _pointerObserver
     = gizmoLayer->utilityLayerScene.get()->onPointerObservable.add(
       [&](PointerInfo* pointerInfo, EventState& /*es*/) {
         if (!stl_util::contains(pointerIds,
                                 (pointerInfo->pointerEvent).pointerId)) {
           const auto changeHoverColor
-            = [&](const vector_t<AbstractMesh*>& meshes) {
+            = [&](const vector_t<AbstractMeshPtr>& meshes) {
                 for (auto& mesh : meshes) {
                   if (pointerInfo->pickInfo.pickedMesh == mesh) {
                     pointerIds[(pointerInfo->pointerEvent).pointerId] = mesh;
@@ -306,13 +306,13 @@ void BoundingBoxGizmo::_attachedMeshChanged(AbstractMesh* value)
   if (value) {
     // Reset anchor mesh to match attached mesh's scale
     // This is needed to avoid invalid box/sphere position on first drag
-    _anchorMesh->addChild(value);
-    _anchorMesh->removeChild(value);
+    _anchorMesh->addChild(*value);
+    _anchorMesh->removeChild(*value);
     updateBoundingBox();
   }
 }
 
-void BoundingBoxGizmo::_selectNode(Mesh* selectedMesh)
+void BoundingBoxGizmo::_selectNode(const MeshPtr& selectedMesh)
 {
   auto childMeshes = _rotateSpheresParent->getChildMeshes();
   for (auto& m : _scaleBoxesParent->getChildMeshes()) {
@@ -324,7 +324,7 @@ void BoundingBoxGizmo::_recurseComputeWorld(AbstractMesh* mesh)
 {
   mesh->computeWorldMatrix(true);
   for (auto& m : mesh->getChildMeshes()) {
-    _recurseComputeWorld(m);
+    _recurseComputeWorld(m.get());
   }
 }
 
@@ -508,13 +508,13 @@ void BoundingBoxGizmo::dispose(bool doNotRecurse,
   Gizmo::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-Mesh* BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
+MeshPtr BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
 {
   ::std::function<void(AbstractMesh * root)> makeNotPickable;
   makeNotPickable = [&makeNotPickable](AbstractMesh* root) {
     root->isPickable = false;
     for (auto& c : root->getChildMeshes()) {
-      makeNotPickable(c);
+      makeNotPickable(c.get());
     };
   };
   makeNotPickable(mesh);
@@ -539,13 +539,13 @@ Mesh* BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
                       (boundingMinMax.max.z + boundingMinMax.min.z) / 2.f);
 
   // Restore original positions
-  mesh->addChild(box);
+  mesh->addChild(*box);
   mesh->rotationQuaternion()->copyFrom(oldRot);
   mesh->position().copyFrom(oldPos);
 
   // Reverse parenting
-  mesh->removeChild(box);
-  box->addChild(mesh);
+  mesh->removeChild(*box);
+  box->addChild(*mesh);
   box->visibility = 0.f;
   return box;
 }

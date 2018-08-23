@@ -20,16 +20,16 @@ public:
    */
   const char* getClassName() const;
 
-  vector_t<Camera*> getCameras() const;
+  vector_t<CameraPtr> getCameras() const;
   bool isSupported() const;
   void addEffect(PostProcessRenderEffect* renderEffect);
   virtual void _rebuild();
   void _enableEffect(const string_t& renderEffectName,
-                     const vector_t<Camera*>& cameras);
+                     const vector_t<CameraPtr>& cameras);
   void _disableEffect(const string_t& renderEffectName,
-                      const vector_t<Camera*>& cameras);
-  void _attachCameras(const vector_t<Camera*>& cameras, bool unique);
-  void _detachCameras(const vector_t<Camera*>& cameras);
+                      const vector_t<CameraPtr>& cameras);
+  void _attachCameras(const vector_t<CameraPtr>& cameras, bool unique);
+  void _detachCameras(const vector_t<CameraPtr>& cameras);
   void _update();
   void _reset();
   virtual void dispose(bool doNotRecurse               = false,
@@ -42,7 +42,7 @@ public:
   string_t _name;
 
 protected:
-  unordered_map_t<string_t, Camera*> _cameras;
+  unordered_map_t<string_t, CameraPtr> _cameras;
 
 private:
   Engine* engine;

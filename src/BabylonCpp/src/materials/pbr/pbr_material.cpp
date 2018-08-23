@@ -187,19 +187,19 @@ void PBRMaterial::setCameraContrast(float value)
   _imageProcessingConfiguration->contrast = value;
 }
 
-BaseTexture* PBRMaterial::cameraColorGradingTexture() const
+BaseTexturePtr& PBRMaterial::cameraColorGradingTexture()
 {
   return _imageProcessingConfiguration->colorGradingTexture;
 }
 
-void PBRMaterial::setCameraColorGradingTexture(BaseTexture* value)
+void PBRMaterial::setCameraColorGradingTexture(const BaseTexturePtr& value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
 }
 
-ColorCurves* PBRMaterial::cameraColorCurves()
+ColorCurvesPtr& PBRMaterial::cameraColorCurves()
 {
-  return _imageProcessingConfiguration->colorCurves.get();
+  return _imageProcessingConfiguration->colorCurves;
 }
 
 void PBRMaterial::setCameraColorCurves(ColorCurves* /*value*/)
@@ -212,7 +212,7 @@ const string_t PBRMaterial::getClassName() const
   return "PBRMaterial";
 }
 
-vector_t<BaseTexture*> PBRMaterial::getActiveTextures() const
+vector_t<BaseTexturePtr> PBRMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseMaterial::getActiveTextures();
 
@@ -263,7 +263,7 @@ vector_t<BaseTexture*> PBRMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool PBRMaterial::hasTexture(BaseTexture* texture) const
+bool PBRMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
   if (PBRBaseMaterial::hasTexture(texture)) {
     return true;
@@ -312,8 +312,8 @@ bool PBRMaterial::hasTexture(BaseTexture* texture) const
   return false;
 }
 
-PBRMaterial* PBRMaterial::clone(const string_t& /*name*/,
-                                bool /*cloneChildren*/) const
+MaterialPtr PBRMaterial::clone(const string_t& /*name*/,
+                               bool /*cloneChildren*/) const
 {
   return nullptr;
 }

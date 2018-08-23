@@ -29,22 +29,22 @@ IReflect::Type MultiMaterial::type() const
 }
 
 // Properties
-vector_t<Material*>& MultiMaterial::subMaterials()
+vector_t<MaterialPtr>& MultiMaterial::subMaterials()
 {
   return _subMaterials;
 }
 
-void MultiMaterial::setSubMaterials(const vector_t<Material*>& value)
+void MultiMaterial::setSubMaterials(const vector_t<MaterialPtr>& value)
 {
   _subMaterials = value;
   _hookArray(value);
 }
 
-void MultiMaterial::_hookArray(const vector_t<Material*>& /*array*/)
+void MultiMaterial::_hookArray(const vector_t<MaterialPtr>& /*array*/)
 {
 }
 
-Material* MultiMaterial::getSubMaterial(unsigned int index)
+MaterialPtr& MultiMaterial::getSubMaterial(unsigned int index)
 {
   if (index >= _subMaterials.size()) {
     return getScene()->defaultMaterial();
@@ -53,7 +53,7 @@ Material* MultiMaterial::getSubMaterial(unsigned int index)
   return _subMaterials[index];
 }
 
-vector_t<BaseTexture*> MultiMaterial::getActiveTextures() const
+vector_t<BaseTexturePtr> MultiMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
   for (auto& subMaterial : _subMaterials) {
@@ -83,12 +83,13 @@ bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   return true;
 }
 
-Material* MultiMaterial::clone(const string_t& iName, bool cloneChildren) const
+MaterialPtr MultiMaterial::clone(const string_t& iName,
+                                 bool cloneChildren) const
 {
   auto newMultiMaterial = MultiMaterial::New(iName, getScene());
 
   for (auto& subMaterial : _subMaterials) {
-    Material* newSubMaterial = nullptr;
+    MaterialPtr newSubMaterial = nullptr;
     if (cloneChildren) {
       newSubMaterial = subMaterial->clone(name + "-" + subMaterial->name);
     }
@@ -116,7 +117,7 @@ void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
   // Remove from scene
   scene->multiMaterials.erase(
     ::std::remove_if(scene->multiMaterials.begin(), scene->multiMaterials.end(),
-                     [this](const unique_ptr_t<MultiMaterial>& multiMaterial) {
+                     [this](const MultiMaterialPtr& multiMaterial) {
                        return multiMaterial.get() == this;
                      }),
     scene->multiMaterials.end());

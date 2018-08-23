@@ -32,10 +32,10 @@ BabylonFileLoader::~BabylonFileLoader()
 {
 }
 
-Material* BabylonFileLoader::parseMaterialById(const string_t& id,
-                                               const Json::value& parsedData,
-                                               Scene* scene,
-                                               const string_t& rootUrl) const
+MaterialPtr BabylonFileLoader::parseMaterialById(const string_t& id,
+                                                 const Json::value& parsedData,
+                                                 Scene* scene,
+                                                 const string_t& rootUrl) const
 {
   for (const auto& parsedMaterial : Json::GetArray(parsedData, "materials")) {
     if (Json::GetString(parsedData, "id") == id) {
@@ -79,8 +79,9 @@ string_t BabylonFileLoader::logOperation(const string_t& operation,
 
 bool BabylonFileLoader::importMesh(
   const vector_t<string_t>& meshesNames, Scene* scene, const string_t& data,
-  const string_t& rootUrl, vector_t<AbstractMesh*>& meshes,
-  vector_t<ParticleSystem*>& particleSystems, vector_t<Skeleton*>& skeletons,
+  const string_t& rootUrl, vector_t<AbstractMeshPtr>& meshes,
+  vector_t<IParticleSystemPtr>& particleSystems,
+  vector_t<SkeletonPtr>& skeletons,
   const ::std::function<void(const string_t& message,
                              const string_t& exception)>& onError) const
 {
@@ -285,8 +286,8 @@ bool BabylonFileLoader::importMesh(
     // Connecting parents
     for (auto& currentMesh : scene->meshes) {
       if (!currentMesh->_waitingParentId.empty()) {
-        static_cast<Node*>(currentMesh.get())->parent
-          = scene->getLastEntryByID(currentMesh->_waitingParentId);
+        ::std::static_pointer_cast<Node>(currentMesh)->parent
+          = scene->getLastEntryByID(currentMesh->_waitingParentId).get();
         currentMesh->_waitingParentId = "";
       }
     }
@@ -430,11 +431,13 @@ bool BabylonFileLoader::load(
   }
 
   if (Json::GetBool(parsedData, "autoAnimate", false)) {
+#if 0
     scene->beginAnimation(scene,
                           Json::GetNumber(parsedData, "autoAnimateFrom", 0),
                           Json::GetNumber(parsedData, "autoAnimateTo", 0),
                           Json::GetBool(parsedData, "autoAnimateLoop"),
                           Json::GetNumber(parsedData, "autoAnimateFrom", 1.f));
+#endif
   }
 
   // Materials
@@ -535,14 +538,14 @@ bool BabylonFileLoader::load(
   // Browsing all the graph to connect the dots
   for (auto& camera : scene->cameras) {
     if (!camera->_waitingParentId.empty()) {
-      camera->parent = scene->getLastEntryByID(camera->_waitingParentId);
+      camera->parent = scene->getLastEntryByID(camera->_waitingParentId).get();
       camera->_waitingParentId.clear();
     }
   }
 
   for (auto& light : scene->lights) {
     if (!light->_waitingParentId.empty()) {
-      light->parent = scene->getLastEntryByID(light->_waitingParentId);
+      light->parent = scene->getLastEntryByID(light->_waitingParentId).get();
       light->_waitingParentId.clear();
     }
   }
@@ -553,7 +556,7 @@ bool BabylonFileLoader::load(
   for (auto& mesh : scene->meshes) {
     if (!mesh->_waitingParentId.empty()) {
       static_cast<Node*>(mesh.get())->parent
-        = scene->getLastEntryByID(mesh->_waitingParentId);
+        = scene->getLastEntryByID(mesh->_waitingParentId).get();
       mesh->_waitingParentId.clear();
     }
     if (!mesh->_waitingActions.empty()) {

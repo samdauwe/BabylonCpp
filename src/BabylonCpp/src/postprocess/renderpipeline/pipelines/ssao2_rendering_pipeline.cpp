@@ -25,17 +25,16 @@
 
 namespace BABYLON {
 
-SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
-                                               Scene* scene, float ratio,
-                                               const vector_t<Camera*>& cameras)
+SSAO2RenderingPipeline::SSAO2RenderingPipeline(
+  const string_t& name, Scene* scene, float ratio,
+  const vector_t<CameraPtr>& cameras)
     : SSAO2RenderingPipeline(name, scene, {ratio, ratio}, cameras)
 {
 }
 
-SSAO2RenderingPipeline::SSAO2RenderingPipeline(const string_t& name,
-                                               Scene* scene,
-                                               const SSAO2Ratio& iRatio,
-                                               const vector_t<Camera*>& cameras)
+SSAO2RenderingPipeline::SSAO2RenderingPipeline(
+  const string_t& name, Scene* scene, const SSAO2Ratio& iRatio,
+  const vector_t<CameraPtr>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name)
     , totalStrength{1.f}
     , maxZ{100.f}
@@ -179,7 +178,7 @@ void SSAO2RenderingPipeline::dispose(bool disableGeometryBufferRenderer,
   }
 
   _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
-    _name, stl_util::to_raw_ptr_vector(_scene->cameras));
+    _name, _scene->cameras);
 }
 
 void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
@@ -310,7 +309,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setFloat("far", _scene->activeCamera->maxZ);
     effect->setFloat("xViewport", ::std::tan(_scene->activeCamera->fov / 2.f)
                                     * _scene->getEngine()->getAspectRatio(
-                                        _scene->activeCamera, true));
+                                        *_scene->activeCamera, true));
     effect->setFloat("yViewport", ::std::tan(_scene->activeCamera->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 
@@ -348,12 +347,13 @@ void SSAO2RenderingPipeline::_createRandomTexture()
   options.height = static_cast<int>(size);
 
   _randomTexture
-    = new DynamicTexture("SSAORandomTexture", options, _scene, false,
-                         TextureConstants::TRILINEAR_SAMPLINGMODE);
+    = DynamicTexture::New("SSAORandomTexture", options, _scene, false,
+                          TextureConstants::TRILINEAR_SAMPLINGMODE);
   _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
-  auto context = dynamic_cast<DynamicTexture*>(_randomTexture)->getContext();
+  auto context
+    = ::std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
 
   const auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };

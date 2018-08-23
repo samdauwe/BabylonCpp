@@ -19,10 +19,11 @@ public:
 
 public:
   template <typename... Ts>
-  static PointLight* New(Ts&&... args)
+  static PointLightPtr New(Ts&&... args)
   {
-    auto light = new PointLight(::std::forward<Ts>(args)...);
-    light->addToScene(static_cast<unique_ptr_t<Light>>(light));
+    auto light
+      = shared_ptr_t<PointLight>(new PointLight(::std::forward<Ts>(args)...));
+    light->addToScene(light);
 
     return light;
   }
@@ -114,7 +115,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const vector_t<AbstractMesh*>& renderList) override;
+    const vector_t<AbstractMeshPtr>& renderList) override;
 
   void _buildUniformLayout() override;
 

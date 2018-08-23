@@ -286,7 +286,7 @@ void CollisionCoordinatorWorker::_onMessageFromWorker(
           = _scene->getMeshByUniqueID(returnPayload.collidedMeshUniqueId);
         if (mesh) {
           auto newPosition = Vector3::FromArray(returnPayload.newPosition);
-          callback(returnPayload.collisionId, newPosition, mesh);
+          callback(returnPayload.collisionId, newPosition, mesh.get());
         }
       }
       // cleanup

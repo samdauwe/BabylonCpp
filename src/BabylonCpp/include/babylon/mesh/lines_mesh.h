@@ -14,10 +14,11 @@ class BABYLON_SHARED_EXPORT LinesMesh : public Mesh {
 
 public:
   template <typename... Ts>
-  static LinesMesh* New(Ts&&... args)
+  static LinesMeshPtr New(Ts&&... args)
   {
-    auto mesh = new LinesMesh(std::forward<Ts>(args)...);
-    mesh->addToScene(static_cast<unique_ptr_t<AbstractMesh>>(mesh));
+    auto mesh
+      = shared_ptr_t<LinesMesh>(new LinesMesh(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
     return mesh;
   }
@@ -41,8 +42,8 @@ public:
   /**
    * @brief Returns a new LineMesh object cloned from the current one.
    */
-  LinesMesh* clone(const string_t& name, Node* newParent = nullptr,
-                   bool doNotCloneChildren = false);
+  LinesMeshPtr clone(const string_t& name, Node* newParent = nullptr,
+                     bool doNotCloneChildren = false);
 
 protected:
   LinesMesh(const string_t& name, Scene* scene, Node* parent = nullptr,
@@ -52,12 +53,12 @@ protected:
   /**
    * Hidden
    */
-  Material*& get_material() override;
+  MaterialPtr& get_material() override;
 
   /**
    * Hidden
    */
-  void set_material(Material* const& material) override;
+  void set_material(const MaterialPtr& material) override;
 
   /**
    * Hidden
@@ -96,8 +97,8 @@ public:
 
 private:
   float _intersectionThreshold;
-  Material* _colorShaderMaterial;
-  ShaderMaterial* _colorShader;
+  MaterialPtr _colorShaderMaterial;
+  ShaderMaterialPtr _colorShader;
 
 }; // end of class LinesMesh
 

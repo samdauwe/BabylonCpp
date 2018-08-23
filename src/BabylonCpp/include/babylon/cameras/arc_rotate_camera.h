@@ -18,10 +18,11 @@ public:
 
 public:
   template <typename... Ts>
-  static ArcRotateCamera* New(Ts&&... args)
+  static ArcRotateCameraPtr New(Ts&&... args)
   {
-    auto camera = new ArcRotateCamera(::std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera = shared_ptr_t<ArcRotateCamera>(
+      new ArcRotateCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }
@@ -58,11 +59,11 @@ public:
   void setTarget(const Vector3& target, bool toBoundingCenter = false,
                  bool allowSamePosition = false);
   Matrix _getViewMatrix() override;
-  void zoomOn(const vector_t<AbstractMesh*> meshes,
+  void zoomOn(const vector_t<AbstractMeshPtr> meshes,
               bool doNotUpdateMaxZ = false);
   void focusOn(const MinMaxDistance& meshesOrMinMaxVectorAndDistance,
                bool doNotUpdateMaxZ = false);
-  Camera* createRigCamera(const string_t& name, int cameraIndex) override;
+  CameraPtr createRigCamera(const string_t& name, int cameraIndex) override;
   void _updateRigCameras() override;
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;

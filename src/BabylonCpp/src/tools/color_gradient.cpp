@@ -1,5 +1,6 @@
 #include <babylon/tools/color_gradient.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
 
 namespace BABYLON {
@@ -24,7 +25,8 @@ void ColorGradient::getColorToRef(Color4& result)
 
 bool operator==(const ColorGradient& lhs, const ColorGradient& rhs)
 {
-  return lhs.color1 == rhs.color1 && lhs.color2 == rhs.color2;
+  return stl_util::almost_equal(lhs.gradient, rhs.gradient)
+         && lhs.color1 == rhs.color1 && lhs.color2 == rhs.color2;
 }
 
 bool operator!=(const ColorGradient& lhs, const ColorGradient& rhs)

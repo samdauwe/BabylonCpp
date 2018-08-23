@@ -80,7 +80,7 @@ public:
    * current value of the property
    * @param operator the conditional operator, default ValueCondition.IsEqual
    */
-  ValueCondition(ActionManager* actionManager, IAnimatable* target,
+  ValueCondition(ActionManager* actionManager, const IAnimatablePtr& target,
                  const string_t& propertyPath, AnimationValue* value,
                  unsigned int operatorType = ValueCondition::IsEqual());
   virtual ~ValueCondition() override;
@@ -116,12 +116,12 @@ private:
   /**
    * Internal only
    */
-  IAnimatable* _target;
+  IAnimatablePtr _target;
 
   /**
    * Internal only
    */
-  IAnimatable* _effectiveTarget;
+  IAnimatablePtr _effectiveTarget;
 
   /**
    * Internal only

@@ -158,8 +158,8 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const string_t& _name,
   if (stl_util::contains(_ranges, _name) || !source->getAnimationRange(_name)) {
     return false;
   }
-  bool ret        = true;
-  int frameOffset = _getHighestAnimationFrame() + 1;
+  bool ret         = true;
+  auto frameOffset = _getHighestAnimationFrame() + 1;
 
   // make a dictionary of source skeleton's bones, so exact same order or
   // doublely nested loop is not required
@@ -186,9 +186,10 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const string_t& _name,
   for (auto& bone : bones) {
     if (stl_util::contains(boneDict, bone->name)) {
       ret = ret
-            && bone->copyAnimationRange(
-                 boneDict[bone->name], _name, frameOffset, rescaleAsRequired,
-                 skelDimensionsRatio, hasSkelDimensionsRatio);
+            && bone->copyAnimationRange(boneDict[bone->name], _name,
+                                        static_cast<int>(frameOffset),
+                                        rescaleAsRequired, skelDimensionsRatio,
+                                        hasSkelDimensionsRatio);
     }
     else {
       BABYLON_LOGF_WARN(
@@ -214,12 +215,12 @@ void Skeleton::returnToRest()
   }
 }
 
-int Skeleton::_getHighestAnimationFrame()
+float Skeleton::_getHighestAnimationFrame()
 {
-  int ret = 0;
+  float ret = 0.f;
   for (auto& bone : bones) {
     if (!bone->animations.empty() && bone->animations[0]) {
-      int highest = bone->animations[0]->getHighestFrame();
+      auto highest = bone->animations[0]->getHighestFrame();
       if (ret < highest) {
         ret = highest;
       }
@@ -349,22 +350,22 @@ void Skeleton::prepare()
   _scene->_activeBones.addCount(bones.size(), false);
 }
 
-vector_t<IAnimatable*> Skeleton::getAnimatables()
+vector_t<IAnimatablePtr> Skeleton::getAnimatables()
 {
   if (_animatables.size() != bones.size()) {
     _animatables.clear();
 
-    /*for (auto& bone : bones) {
+    for (auto& bone : bones) {
       _animatables.emplace_back(bone);
-    }*/
+    }
   }
 
   return _animatables;
 }
 
-vector_t<Animation*> Skeleton::getAnimations()
+vector_t<AnimationPtr> Skeleton::getAnimations()
 {
-  return vector_t<Animation*>();
+  return vector_t<AnimationPtr>();
 }
 
 unique_ptr_t<Skeleton> Skeleton::clone(const string_t& /*iName*/,
@@ -530,7 +531,7 @@ void Skeleton::_sortBones(unsigned int index, vector_t<Bone*>& iBones,
   const auto boneIndexOf = [this](Bone* iBone) {
     auto it = ::std::find_if(
       bones.begin(), bones.end(),
-      [&iBone](const unique_ptr_t<Bone>& bone) { return bone.get() == iBone; });
+      [&iBone](const BonePtr& bone) { return bone.get() == iBone; });
     if (it != bones.end()) {
       return static_cast<int>(it - bones.begin());
     }

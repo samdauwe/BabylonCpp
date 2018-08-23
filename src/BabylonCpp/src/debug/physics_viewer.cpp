@@ -50,7 +50,7 @@ void PhysicsViewer::_updateDebugMeshes()
       auto& mesh = _meshes[i];
 
       if (mesh && plugin) {
-        plugin->syncMeshWithImpostor(mesh, impostor);
+        plugin->syncMeshWithImpostor(mesh.get(), impostor);
       }
     }
   }
@@ -122,7 +122,7 @@ void PhysicsViewer::hideImpostor(PhysicsImpostor* impostor)
   }
 }
 
-Material* PhysicsViewer::_getDebugMaterial(Scene* scene)
+MaterialPtr PhysicsViewer::_getDebugMaterial(Scene* scene)
 {
   if (!_debugMaterial) {
     _debugMaterial            = StandardMaterial::New("", scene);
@@ -132,7 +132,7 @@ Material* PhysicsViewer::_getDebugMaterial(Scene* scene)
   return _debugMaterial;
 }
 
-AbstractMesh* PhysicsViewer::_getDebugBoxMesh(Scene* scene)
+AbstractMeshPtr PhysicsViewer::_getDebugBoxMesh(Scene* scene)
 {
   if (!_debugBoxMesh) {
     BoxOptions options(1.f);
@@ -147,7 +147,7 @@ AbstractMesh* PhysicsViewer::_getDebugBoxMesh(Scene* scene)
   return _debugBoxMesh->createInstance("physicsBodyBoxViewInstance");
 }
 
-AbstractMesh* PhysicsViewer::_getDebugSphereMesh(Scene* scene)
+AbstractMeshPtr PhysicsViewer::_getDebugSphereMesh(Scene* scene)
 {
   if (!_debugSphereMesh) {
     SphereOptions options(1.f);
@@ -162,10 +162,10 @@ AbstractMesh* PhysicsViewer::_getDebugSphereMesh(Scene* scene)
   return _debugSphereMesh->createInstance("physicsBodyBoxViewInstance");
 }
 
-AbstractMesh* PhysicsViewer::_getDebugMesh(PhysicsImpostor* impostor,
-                                           Scene* scene)
+AbstractMeshPtr PhysicsViewer::_getDebugMesh(PhysicsImpostor* impostor,
+                                             Scene* scene)
 {
-  AbstractMesh* mesh = nullptr;
+  AbstractMeshPtr mesh = nullptr;
 
   if (impostor->type() == PhysicsImpostor::BoxImpostor) {
     mesh = _getDebugBoxMesh(scene);

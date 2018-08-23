@@ -32,13 +32,25 @@ public:
    */
   void _register() override;
 
+  /**
+   * @brief Rebuilds the elements related to this component in case of
+   * context lost for instance.
+   */
   void rebuild() override;
   void reset();
   void render();
   void renderOcclusionBoundingBox(AbstractMesh* mesh);
+
+  /**
+   * @brief Disposes the component and the associated resources.
+   */
   void dispose() override;
 
 protected:
+  /**
+   * @brief Creates a new instance of the component for the given scene.
+   * @param scene Defines the scene to register the component in
+   */
   BoundingBoxRenderer(Scene* scene);
 
 private:
@@ -54,7 +66,7 @@ public:
   vector_t<BoundingBox> renderList;
 
 private:
-  ShaderMaterial* _colorShader;
+  ShaderMaterialPtr _colorShader;
   vector_t<unique_ptr_t<VertexBuffer>> _vertexBuffers;
   unordered_map_t<string_t, VertexBuffer*> _vertexBuffersMap;
   unique_ptr_t<GL::IGLBuffer> _indexBuffer;

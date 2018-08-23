@@ -32,10 +32,9 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param defines The defines to update
    * @param key The chanel key "diffuse", "specular"... used in the shader
    */
-  static void
-  PrepareDefinesForMergedUV(BaseTexture* texture, MaterialDefines& defines,
-                            unsigned int key, const string_t& keyString,
-                            unsigned int MAINUV1, unsigned int MAINUV2);
+  static void PrepareDefinesForMergedUV(
+    const BaseTexturePtr& texture, MaterialDefines& defines, unsigned int key,
+    const string_t& keyString, unsigned int MAINUV1, unsigned int MAINUV2);
 
   /**
    * @brief Binds a texture matrix value to its corrsponding uniform
@@ -207,7 +206,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param lightIndex The light index in the effect used to render the mesh
    * @param effect The effect we are binding the data to
    */
-  static void BindLightShadow(Light* light, Scene* scene, AbstractMesh* mesh,
+  static void BindLightShadow(Light& light, Scene* scene, AbstractMesh& mesh,
                               unsigned int lightIndex, Effect* effect);
 
   /**
@@ -216,7 +215,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param lightIndex The light index in the effect used to render
    */
-  static void BindLightProperties(Light* light, Effect* effect,
+  static void BindLightProperties(Light& light, Effect* effect,
                                   unsigned int lightIndex);
 
   /**

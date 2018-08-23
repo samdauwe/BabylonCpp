@@ -13,10 +13,11 @@ class BABYLON_SHARED_EXPORT InstancedMesh : public AbstractMesh {
 
 public:
   template <typename... Ts>
-  static InstancedMesh* New(Ts&&... args)
+  static InstancedMeshPtr New(Ts&&... args)
   {
-    auto mesh = new InstancedMesh(std::forward<Ts>(args)...);
-    mesh->addToScene(static_cast<unique_ptr_t<AbstractMesh>>(mesh));
+    auto mesh = shared_ptr_t<InstancedMesh>(
+      new InstancedMesh(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
     return mesh;
   }
@@ -31,9 +32,9 @@ public:
 
   /** Methods **/
   bool receiveShadows() const;
-  Material* material() const;
+  MaterialPtr& material() const;
   float visibility() const;
-  Skeleton*& get_skeleton() override;
+  SkeletonPtr& get_skeleton() override;
 
   /**
    * @brief Returns the total number of vertices (integer).
@@ -164,7 +165,7 @@ public:
   /**
    * @brief Returns the current associated LOD AbstractMesh.
    */
-  AbstractMesh* getLOD(Camera* camera,
+  AbstractMesh* getLOD(const CameraPtr& camera,
                        BoundingSphere* boundingSphere = nullptr) override;
 
   InstancedMesh& _syncSubMeshes();
@@ -180,8 +181,8 @@ public:
    * the model children aren't cloned.
    * @returns The clone.
    */
-  InstancedMesh* clone(const string_t& name, Node* newParent,
-                       bool doNotCloneChildren = false);
+  InstancedMeshPtr clone(const string_t& name, Node* newParent,
+                         bool doNotCloneChildren = false);
 
   /**
    * @brief Disposes the InstancedMesh.
@@ -193,11 +194,11 @@ protected:
   InstancedMesh(const string_t& name, Mesh* source);
 
 private:
-  unsigned int get_renderingGroupId() const;
-  void set_renderingGroupId(unsigned int value);
+  int get_renderingGroupId() const;
+  void set_renderingGroupId(int value);
 
 public:
-  Property<InstancedMesh, unsigned int> renderingGroupId;
+  Property<InstancedMesh, int> renderingGroupId;
 
 private:
   Mesh* _sourceMesh;

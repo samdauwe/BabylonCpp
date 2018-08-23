@@ -10,13 +10,14 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT InterpolateValueAction : public Action {
 
 public:
-  InterpolateValueAction(unsigned int triggerOptions, IAnimatable* target,
+  InterpolateValueAction(unsigned int triggerOptions,
+                         const IAnimatablePtr& target,
                          const string_t& propertyPath, AnimationValue* value,
                          int duration = 1000, Condition* condition = nullptr,
                          bool stopOtherAnimations = false,
                          const ::std::function<void()>& onInterpolationDone
                          = nullptr);
-  ~InterpolateValueAction();
+  ~InterpolateValueAction() override;
 
   void _prepare() override;
   void execute(const ActionEvent& evt) override;
@@ -32,8 +33,8 @@ public:
   Observable<InterpolateValueAction> onInterpolationDoneObservable;
 
 private:
-  IAnimatable* _target;
-  IAnimatable* _effectiveTarget;
+  IAnimatablePtr _target;
+  IAnimatablePtr _effectiveTarget;
   string_t _property;
 
 }; // end of class InterpolateValueAction

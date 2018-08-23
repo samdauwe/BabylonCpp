@@ -24,8 +24,9 @@ public:
    * per frame
    */
   AnaglyphPostProcess(const string_t& name, float ratio,
-                      vector_t<Camera*> rigCameras, unsigned int samplingMode,
-                      Engine* engine, bool reusable = false);
+                      const vector_t<CameraPtr>& rigCameras,
+                      unsigned int samplingMode, Engine* engine,
+                      bool reusable = false);
   ~AnaglyphPostProcess();
 
 private:

@@ -24,12 +24,12 @@ class BABYLON_SHARED_EXPORT ColorCorrectionPostProcess : public PostProcess {
 public:
   ColorCorrectionPostProcess(const string_t& name,
                              const string_t& colorTableUrl, float ratio,
-                             Camera* camera, unsigned int samplingMode,
+                             const CameraPtr& camera, unsigned int samplingMode,
                              Engine* engine, bool reusable = false);
   ~ColorCorrectionPostProcess();
 
 private:
-  Texture* _colorTableTexture;
+  TexturePtr _colorTableTexture;
 
 }; // end of class ColorCorrectionPostProcess
 

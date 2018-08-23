@@ -1,5 +1,6 @@
 #include <babylon/materials/textures/dynamic_texture.h>
 
+#include <babylon/core/json.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -132,7 +133,7 @@ void DynamicTexture::drawText(const string_t& text, int x, int y,
   }
 }
 
-unique_ptr_t<DynamicTexture> DynamicTexture::clone()
+DynamicTexturePtr DynamicTexture::clone()
 {
   auto scene = getScene();
   if (!scene) {
@@ -144,8 +145,7 @@ unique_ptr_t<DynamicTexture> DynamicTexture::clone()
   options.canvas  = _canvas;
   options.width   = textureSize.width;
   options.height  = textureSize.height;
-  auto newTexture = ::std::make_unique<DynamicTexture>(name, options, scene,
-                                                       _generateMipMaps);
+  auto newTexture = DynamicTexture::New(name, options, scene, _generateMipMaps);
 
   // Base texture
   newTexture->hasAlpha = hasAlpha();
@@ -156,6 +156,11 @@ unique_ptr_t<DynamicTexture> DynamicTexture::clone()
   newTexture->wrapV = wrapV;
 
   return newTexture;
+}
+
+Json::object DynamicTexture::serialize() const
+{
+  return Json::object();
 }
 
 void DynamicTexture::_rebuild()

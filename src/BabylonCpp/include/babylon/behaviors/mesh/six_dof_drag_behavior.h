@@ -36,7 +36,7 @@ public:
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
    */
-  void attach(Mesh* ownerNode) override;
+  void attach(const MeshPtr& ownerNode) override;
 
   /**
    * @brief Detaches the behavior from the mesh.
@@ -68,12 +68,12 @@ public:
 
 private:
   static unique_ptr_t<Scene> _virtualScene;
-  Mesh* _ownerNode;
+  MeshPtr _ownerNode;
   Observer<Scene>::Ptr _sceneRenderObserver;
   Scene* _scene;
   Vector3 _targetPosition;
-  AbstractMesh* _virtualOriginMesh;
-  AbstractMesh* _virtualDragMesh;
+  AbstractMeshPtr _virtualOriginMesh;
+  AbstractMeshPtr _virtualDragMesh;
   Observer<PointerInfo>::Ptr _pointerObserver;
   bool _moving;
   Quaternion _startingOrientation;

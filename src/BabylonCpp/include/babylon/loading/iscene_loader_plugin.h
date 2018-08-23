@@ -22,13 +22,15 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
    * @param onError The callback when import fails
    * @returns True if successful or false otherwise
    */
-  virtual bool importMesh(
-    const vector_t<string_t>& meshesNames, Scene* scene, const string_t& data,
-    const string_t& rootUrl, vector_t<AbstractMesh*>& meshes,
-    vector_t<ParticleSystem*>& particleSystems, vector_t<Skeleton*>& skeletons,
-    const ::std::function<void(const string_t& message,
-                               const string_t& exception)>& onError
-    = nullptr) const = 0;
+  virtual bool
+  importMesh(const vector_t<string_t>& meshesNames, Scene* scene,
+             const string_t& data, const string_t& rootUrl,
+             vector_t<AbstractMeshPtr>& meshes,
+             vector_t<IParticleSystemPtr>& particleSystems,
+             vector_t<SkeletonPtr>& skeletons,
+             const ::std::function<void(const string_t& message,
+                                        const string_t& exception)>& onError
+             = nullptr) const = 0;
 
   /**
    * @brief Load into a scene.

@@ -91,7 +91,7 @@ void AutoRotationBehavior::init()
   // Do nothing
 }
 
-void AutoRotationBehavior::attach(ArcRotateCamera* camera)
+void AutoRotationBehavior::attach(const ArcRotateCameraPtr& camera)
 {
   _attachedCamera = camera;
   auto scene      = _attachedCamera->getScene();

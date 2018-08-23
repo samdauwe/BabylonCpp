@@ -282,8 +282,8 @@ public:
   void processTrigger(unsigned int trigger) const;
 
   /** hidden */
-  IAnimatable* _getEffectiveTarget(IAnimatable* target,
-                                   const string_t& propertyPath) const;
+  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
+                                     const string_t& propertyPath) const;
 
   /** hidden */
   string_t _getProperty(const string_t& propertyPath) const;

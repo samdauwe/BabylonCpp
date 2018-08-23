@@ -10,8 +10,6 @@
 #pragma GCC diagnostic ignored "-Wshift-negative-value"
 #endif
 #if __GNUC__ > 6
-// Use of GNU statement expression extension
-#pragma GCC diagnostic ignored "-Wgnu"
 #endif
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
@@ -26,6 +24,7 @@
 #include <babylon/core/string.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/loading/progress_event.h>
+#include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -48,6 +47,19 @@ namespace BABYLON {
       }
       return url;
     };
+
+void Tools::FetchToRef(int u, int v, int width, int height,
+                       const Uint8Array& pixels, Color4& color)
+{
+  auto wrappedU = ((::std::abs(u) * width) % width);
+  auto wrappedV = ((::std::abs(v) * height) % height);
+
+  auto position = static_cast<size_t>((wrappedU + wrappedV * width) * 4);
+  color.r       = pixels[position] / 255;
+  color.g       = pixels[position + 1] / 255;
+  color.b       = pixels[position + 2] / 255;
+  color.a       = pixels[position + 3] / 255;
+}
 
 float Tools::Mix(float a, float b, float alpha)
 {

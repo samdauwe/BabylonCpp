@@ -53,7 +53,7 @@ private:
   float _strength;
   PhysicsRadialImpulseFalloff _falloff;
   ::std::function<void(Scene* scene, EventState& es)> _tickCallback;
-  Mesh* _sphere;
+  MeshPtr _sphere;
   // check if the has been fetched the data. If not, do cleanup
   bool _dataFetched;
 

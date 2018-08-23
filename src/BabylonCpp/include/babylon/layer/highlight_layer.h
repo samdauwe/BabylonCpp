@@ -47,7 +47,11 @@ public:
 
 public:
   template <typename... Ts>
-  static HighlightLayer* New(Ts&&... args);
+  static HighlightLayerPtr New(Ts&&... args)
+  {
+    return shared_ptr_t<HighlightLayer>(
+      new HighlightLayer(::std::forward<Ts>(args)...));
+  }
   ~HighlightLayer() override;
 
   /**
@@ -188,14 +192,14 @@ protected:
    * @param mesh The mesh to render
    * @returns true if it should render otherwise false
    */
-  bool _shouldRenderMesh(Mesh* mesh) const override;
+  bool _shouldRenderMesh(const MeshPtr& mesh) const override;
 
   /**
    * @brief Sets the required values for both the emissive texture and and the
    * main color.
    */
-  void _setEmissiveTextureAndColor(Mesh* mesh, SubMesh* subMesh,
-                                   Material* material) override;
+  void _setEmissiveTextureAndColor(const MeshPtr& mesh, SubMesh* subMesh,
+                                   const MaterialPtr& material) override;
 
 private:
   /**
@@ -261,7 +265,7 @@ private:
   unique_ptr_t<PassPostProcess> _downSamplePostprocess;
   unique_ptr_t<GlowBlurPostProcess> _horizontalBlurPostprocess;
   unique_ptr_t<GlowBlurPostProcess> _verticalBlurPostprocess;
-  unique_ptr_t<RenderTargetTexture> _blurTexture;
+  RenderTargetTexturePtr _blurTexture;
   unordered_map_t<size_t, IHighlightLayerMesh> _meshes;
   unordered_map_t<size_t, IHighlightLayerExcludedMesh> _excludedMeshes;
 

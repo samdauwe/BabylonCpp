@@ -33,21 +33,21 @@ public:
   /**
    * @brief Return the active textures of the material.
    */
-  vector_t<BaseTexture*> getActiveTextures() const override;
+  vector_t<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(BaseTexture* texture) const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  PBRMetallicRoughnessMaterial*
-  clone(const string_t& name, bool cloneChildren = false) const override;
+  MaterialPtr clone(const string_t& name,
+                    bool cloneChildren = false) const override;
 
   /**
    * @brief Serialize the material to a parsable JSON object.
@@ -74,7 +74,7 @@ public:
    * Base texture of the metallic workflow. It contains both the baseColor
    * information in RGB as well as opacity information in the alpha channel.
    */
-  BaseTexture* baseTexture;
+  BaseTexturePtr baseTexture;
 
   /**
    * Specifies the metallic scalar value of the material.
@@ -92,7 +92,7 @@ public:
    * Texture containing both the metallic value in the B channel and the
    * roughness value in the G channel to keep better precision.
    */
-  BaseTexture* metallicRoughnessTexture;
+  BaseTexturePtr metallicRoughnessTexture;
 
 }; // end of class PBRMetallicRoughnessMaterial
 

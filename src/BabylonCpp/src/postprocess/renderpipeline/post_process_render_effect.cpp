@@ -40,7 +40,7 @@ void PostProcessRenderEffect::_update()
 {
 }
 
-void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
+void PostProcessRenderEffect::_attachCameras(const vector_t<CameraPtr>& cameras)
 {
   string_t cameraKey;
 
@@ -83,7 +83,7 @@ void PostProcessRenderEffect::_attachCameras(const vector_t<Camera*>& cameras)
   }
 }
 
-void PostProcessRenderEffect::_detachCameras(const vector_t<Camera*>& cameras)
+void PostProcessRenderEffect::_detachCameras(const vector_t<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -106,7 +106,7 @@ void PostProcessRenderEffect::_detachCameras(const vector_t<Camera*>& cameras)
   }
 }
 
-void PostProcessRenderEffect::_enable(const vector_t<Camera*> cameras)
+void PostProcessRenderEffect::_enable(const vector_t<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -131,7 +131,7 @@ void PostProcessRenderEffect::_enable(const vector_t<Camera*> cameras)
   }
 }
 
-void PostProcessRenderEffect::_disable(vector_t<Camera*> cameras)
+void PostProcessRenderEffect::_disable(const vector_t<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 

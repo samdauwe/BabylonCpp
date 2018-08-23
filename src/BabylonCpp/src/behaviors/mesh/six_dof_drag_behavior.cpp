@@ -39,7 +39,7 @@ void SixDofDragBehavior::init()
 {
 }
 
-void SixDofDragBehavior::attach(Mesh* ownerNode)
+void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
 {
   _ownerNode = ownerNode;
   _scene     = _ownerNode->getScene();
@@ -48,7 +48,7 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
     _scene->getEngine()->scenes.pop_back();
   }
 
-  AbstractMesh* pickedMesh = nullptr;
+  AbstractMeshPtr pickedMesh = nullptr;
   Vector3 lastSixDofOriginPosition(0, 0, 0);
 
   // Setup virtual meshes to be used for dragging without dirtying the existing
@@ -60,8 +60,8 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
     = AbstractMesh::New("", SixDofDragBehavior::_virtualScene.get());
   _virtualDragMesh->rotationQuaternion = Quaternion();
 
-  const auto pickPredicate = [this](AbstractMesh* m) {
-    return _ownerNode == m || m->isDescendantOf(_ownerNode);
+  const auto pickPredicate = [this](const AbstractMeshPtr& m) {
+    return _ownerNode == m || m->isDescendantOf(_ownerNode.get());
   };
 
   ICanvas* attachedElement = nullptr;
@@ -91,7 +91,7 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
 
         // Attach the virtual drag mesh to the virtual origin mesh so it can be
         // dragged
-        _virtualOriginMesh->removeChild(_virtualDragMesh);
+        _virtualOriginMesh->removeChild(*_virtualDragMesh);
         _virtualDragMesh->position().copyFrom(pickedMesh->absolutePosition());
         if (!pickedMesh->rotationQuaternion()) {
           pickedMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
@@ -103,7 +103,7 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
         _virtualDragMesh->rotationQuaternion()->copyFrom(
           *pickedMesh->rotationQuaternion());
         pickedMesh->setParent(oldParent);
-        _virtualOriginMesh->addChild(_virtualDragMesh);
+        _virtualOriginMesh->addChild(*_virtualDragMesh);
 
         // Update state
         _targetPosition.copyFrom(_virtualDragMesh->absolutePosition());
@@ -130,7 +130,7 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
         _moving                  = false;
         currentDraggingPointerID = -1;
         pickedMesh               = nullptr;
-        _virtualOriginMesh->removeChild(_virtualDragMesh);
+        _virtualOriginMesh->removeChild(*_virtualDragMesh);
 
         // Reattach camera controls
         if (detachCameraControls && attachedElement && _scene->activeCamera
@@ -160,7 +160,7 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
         auto localOriginDragDifference = -Vector3::Dot(
           originDragDifference, (*pointerInfo->pickInfo.ray).direction);
 
-        _virtualOriginMesh->addChild(_virtualDragMesh);
+        _virtualOriginMesh->addChild(*_virtualDragMesh);
         // Determine how much the controller moved to/away towards the dragged
         // object and use this to move the object further when its further away
         _virtualDragMesh->position().z
@@ -178,7 +178,7 @@ void SixDofDragBehavior::attach(Mesh* ownerNode)
         _virtualOriginMesh->lookAt(
           (*pointerInfo->pickInfo.ray)
             .origin.subtract((*pointerInfo->pickInfo.ray).direction));
-        _virtualOriginMesh->removeChild(_virtualDragMesh);
+        _virtualOriginMesh->removeChild(*_virtualDragMesh);
 
         // Move the virtualObjectsPosition into the picked mesh's space if
         // needed

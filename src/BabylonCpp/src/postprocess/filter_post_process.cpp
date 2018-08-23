@@ -7,8 +7,9 @@ namespace BABYLON {
 
 FilterPostProcess::FilterPostProcess(const string_t& iName,
                                      const Matrix& _kernelMatrix, float ratio,
-                                     Camera* camera, unsigned int samplingMode,
-                                     Engine* engine, bool reusable)
+                                     const CameraPtr& camera,
+                                     unsigned int samplingMode, Engine* engine,
+                                     bool reusable)
     : PostProcess{iName,
                   "filter",
                   {"kernelMatrix"},

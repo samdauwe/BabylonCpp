@@ -17,8 +17,8 @@ public:
   ~MultiRenderTarget() override;
 
   bool isSupported() const;
-  vector_t<Texture*>& textures();
-  Texture* depthTexture();
+  vector_t<TexturePtr>& textures();
+  TexturePtr depthTexture();
 
   void setWrapU(unsigned int wrap);
   void setWrapV(unsigned int wrap);
@@ -38,7 +38,7 @@ private:
 
 private:
   vector_t<InternalTexture*> _internalTextures;
-  vector_t<Texture*> _textures;
+  vector_t<TexturePtr> _textures;
   IMultiRenderTargetOptions _multiRenderTargetOptions;
 
 }; // end of class MultiRenderTarget

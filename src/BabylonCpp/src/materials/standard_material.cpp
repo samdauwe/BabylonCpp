@@ -131,13 +131,13 @@ StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
     if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
         && _reflectionTexture->isRenderTarget) {
       _renderTargets.emplace_back(
-        static_cast<RenderTargetTexture*>(_reflectionTexture));
+        ::std::static_pointer_cast<RenderTargetTexture>(_reflectionTexture));
     }
 
     if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
         && _refractionTexture->isRenderTarget) {
       _renderTargets.emplace_back(
-        static_cast<RenderTargetTexture*>(_refractionTexture));
+        ::std::static_pointer_cast<RenderTargetTexture>(_refractionTexture));
     }
 
     return _renderTargets;
@@ -282,7 +282,7 @@ bool StandardMaterial::_shouldUseAlphaFromDiffuseTexture() const
          && _useAlphaFromDiffuseTexture;
 }
 
-BaseTexture* StandardMaterial::getAlphaTestTexture()
+BaseTexturePtr StandardMaterial::getAlphaTestTexture()
 {
   return _diffuseTexture;
 }
@@ -1014,7 +1014,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
           if (_reflectionTexture->boundingBoxSize()) {
             if (auto cubeTexture
-                = static_cast<CubeTexture*>(_reflectionTexture)) {
+                = ::std::static_pointer_cast<CubeTexture>(_reflectionTexture)) {
               _uniformBuffer->updateVector3("vReflectionPosition",
                                             cubeTexture->boundingBoxPosition);
               _uniformBuffer->updateVector3("vReflectionSize",
@@ -1077,7 +1077,8 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
               "refractionMatrix",
               *_refractionTexture->getReflectionTextureMatrix());
             auto refractionTextureTmp
-              = static_cast<RefractionTexture*>(_refractionTexture);
+              = ::std::static_pointer_cast<RefractionTexture>(
+                _refractionTexture);
             if (refractionTextureTmp) {
               depth = refractionTextureTmp->depth;
             }
@@ -1199,9 +1200,9 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _afterBind(mesh, _activeEffect);
 }
 
-vector_t<IAnimatable*> StandardMaterial::getAnimatables()
+vector_t<IAnimatablePtr> StandardMaterial::getAnimatables()
 {
-  vector_t<IAnimatable*> results;
+  vector_t<IAnimatablePtr> results;
 
   if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
     results.emplace_back(_diffuseTexture);
@@ -1242,7 +1243,7 @@ vector_t<IAnimatable*> StandardMaterial::getAnimatables()
   return results;
 }
 
-vector_t<BaseTexture*> StandardMaterial::getActiveTextures() const
+vector_t<BaseTexturePtr> StandardMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
 
@@ -1285,7 +1286,7 @@ vector_t<BaseTexture*> StandardMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool StandardMaterial::hasTexture(BaseTexture* texture) const
+bool StandardMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
   if (PushMaterial::hasTexture(texture)) {
     return true;
@@ -1379,8 +1380,8 @@ void StandardMaterial::dispose(bool forceDisposeEffect,
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* StandardMaterial::clone(const string_t& _name,
-                                  bool /*cloneChildren*/) const
+MaterialPtr StandardMaterial::clone(const string_t& _name,
+                                    bool /*cloneChildren*/) const
 {
   auto standardMaterial  = StandardMaterial::New(*this);
   standardMaterial->name = _name;
@@ -1393,92 +1394,92 @@ Json::object StandardMaterial::serialize() const
   return Json::object();
 }
 
-BaseTexture* StandardMaterial::diffuseTexture() const
+BaseTexturePtr& StandardMaterial::diffuseTexture()
 {
   return _diffuseTexture;
 }
 
-void StandardMaterial::setDiffuseTexture(BaseTexture* value)
+void StandardMaterial::setDiffuseTexture(const BaseTexturePtr& value)
 {
   _diffuseTexture = value;
 }
 
-BaseTexture* StandardMaterial::ambientTexture() const
+BaseTexturePtr& StandardMaterial::ambientTexture()
 {
   return _ambientTexture;
 }
 
-void StandardMaterial::setAmbientTexture(BaseTexture* value)
+void StandardMaterial::setAmbientTexture(const BaseTexturePtr& value)
 {
   _ambientTexture = value;
 }
 
-BaseTexture* StandardMaterial::opacityTexture() const
+BaseTexturePtr& StandardMaterial::opacityTexture()
 {
   return _opacityTexture;
 }
 
-void StandardMaterial::setOpacityTexture(BaseTexture* value)
+void StandardMaterial::setOpacityTexture(const BaseTexturePtr& value)
 {
   _opacityTexture = value;
 }
 
-BaseTexture* StandardMaterial::reflectionTexture() const
+BaseTexturePtr& StandardMaterial::reflectionTexture()
 {
   return _reflectionTexture;
 }
 
-void StandardMaterial::setReflectionTexture(BaseTexture* value)
+void StandardMaterial::setReflectionTexture(const BaseTexturePtr& value)
 {
   _reflectionTexture = value;
 }
 
-BaseTexture* StandardMaterial::emissiveTexture() const
+BaseTexturePtr& StandardMaterial::emissiveTexture()
 {
   return _emissiveTexture;
 }
 
-void StandardMaterial::setEmissiveTexture(BaseTexture* value)
+void StandardMaterial::setEmissiveTexture(const BaseTexturePtr& value)
 {
   _emissiveTexture = value;
 }
 
-BaseTexture* StandardMaterial::specularTexture() const
+BaseTexturePtr& StandardMaterial::specularTexture()
 {
   return _specularTexture;
 }
 
-void StandardMaterial::setSpecularTexture(BaseTexture* value)
+void StandardMaterial::setSpecularTexture(const BaseTexturePtr& value)
 {
   _specularTexture = value;
 }
 
-BaseTexture* StandardMaterial::bumpTexture() const
+BaseTexturePtr& StandardMaterial::bumpTexture()
 {
   return _bumpTexture;
 }
 
-void StandardMaterial::setBumpTexture(BaseTexture* value)
+void StandardMaterial::setBumpTexture(const BaseTexturePtr& value)
 {
   _bumpTexture = value;
 }
 
-BaseTexture* StandardMaterial::lightmapTexture() const
+BaseTexturePtr& StandardMaterial::lightmapTexture()
 {
   return _lightmapTexture;
 }
 
-void StandardMaterial::setLightmapTexture(BaseTexture* value)
+void StandardMaterial::setLightmapTexture(const BaseTexturePtr& value)
 {
   _lightmapTexture = value;
 }
 
-BaseTexture* StandardMaterial::refractionTexture() const
+BaseTexturePtr& StandardMaterial::refractionTexture()
 {
   return _refractionTexture;
 }
 
-void StandardMaterial::setRefractionTexture(BaseTexture* value)
+void StandardMaterial::setRefractionTexture(const BaseTexturePtr& value)
 {
   _refractionTexture = value;
 }
@@ -1846,12 +1847,13 @@ void StandardMaterial::set_cameraContrast(float value)
   _imageProcessingConfiguration->contrast = value;
 }
 
-BaseTexture*& StandardMaterial::get_cameraColorGradingTexture()
+BaseTexturePtr& StandardMaterial::get_cameraColorGradingTexture()
 {
   return _imageProcessingConfiguration->colorGradingTexture;
 }
 
-void StandardMaterial::set_cameraColorGradingTexture(BaseTexture* const& value)
+void StandardMaterial::set_cameraColorGradingTexture(
+  const BaseTexturePtr& value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
 }
@@ -1867,8 +1869,9 @@ void StandardMaterial::set_cameraColorCurves(
   _imageProcessingConfiguration->colorCurves = value;
 }
 
-StandardMaterial* StandardMaterial::Parse(const Json::value& source,
-                                          Scene* scene, const string_t& rootUrl)
+StandardMaterialPtr StandardMaterial::Parse(const Json::value& source,
+                                            Scene* scene,
+                                            const string_t& rootUrl)
 {
   return SerializationHelper::Parse(
     StandardMaterial::New(Json::GetString(source, "name"), scene), source,

@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT ImageProcessingPostProcess : public PostProcess {
 
 public:
   ImageProcessingPostProcess(
-    const string_t& name, float renderRatio, Camera* camera,
+    const string_t& name, float renderRatio, const CameraPtr& camera,
     unsigned int samplingMode, Engine* engine, bool reusable = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
@@ -70,13 +70,13 @@ protected:
    * @brief Gets Color grading LUT texture used in the effect if
    * colorGradingEnabled is set to true.
    */
-  BaseTexture*& get_colorGradingTexture();
+  BaseTexturePtr& get_colorGradingTexture();
 
   /**
    * @brief Sets Color grading LUT texture used in the effect if
    * colorGradingEnabled is set to true.
    */
-  void set_colorGradingTexture(BaseTexture* const& value);
+  void set_colorGradingTexture(const BaseTexturePtr& value);
 
   /**
    * @brief Gets wether the color grading effect is enabled.
@@ -241,7 +241,7 @@ public:
    * Color grading LUT texture used in the effect if colorGradingEnabled is set
    * to true.
    */
-  Property<ImageProcessingPostProcess, BaseTexture*> colorGradingTexture;
+  Property<ImageProcessingPostProcess, BaseTexturePtr> colorGradingTexture;
 
   /**
    * Wether the color grading effect is enabled.

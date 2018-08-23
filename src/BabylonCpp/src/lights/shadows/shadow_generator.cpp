@@ -34,13 +34,14 @@
 
 namespace BABYLON {
 
-ShadowGenerator::ShadowGenerator(int mapSize, IShadowLight* light,
+ShadowGenerator::ShadowGenerator(int mapSize, const IShadowLightPtr& light,
                                  bool useFullFloatFirst)
     : ShadowGenerator(ISize{mapSize, mapSize}, light, useFullFloatFirst)
 {
 }
 
-ShadowGenerator::ShadowGenerator(const ISize& mapSize, IShadowLight* light,
+ShadowGenerator::ShadowGenerator(const ISize& mapSize,
+                                 const IShadowLightPtr& light,
                                  bool useFullFloatFirst)
     : bias{this, &ShadowGenerator::get_bias, &ShadowGenerator::set_bias}
     , normalBias{this, &ShadowGenerator::get_normalBias,
@@ -491,18 +492,18 @@ ShadowGenerator& ShadowGenerator::setTransparencyShadow(bool transparent)
   return *this;
 }
 
-RenderTargetTexture* ShadowGenerator::getShadowMap()
+RenderTargetTexturePtr ShadowGenerator::getShadowMap()
 {
-  return _shadowMap.get();
+  return _shadowMap;
 }
 
-RenderTargetTexture* ShadowGenerator::getShadowMapForRendering()
+RenderTargetTexturePtr ShadowGenerator::getShadowMapForRendering()
 {
   if (_shadowMap2) {
-    return _shadowMap2.get();
+    return _shadowMap2;
   }
 
-  return _shadowMap.get();
+  return _shadowMap;
 }
 
 ShadowGenerator& ShadowGenerator::addShadowCaster(AbstractMesh* mesh,
@@ -512,30 +513,31 @@ ShadowGenerator& ShadowGenerator::addShadowCaster(AbstractMesh* mesh,
     return *this;
   }
 
-  _shadowMap->renderList.emplace_back(mesh);
+  _shadowMap->renderList().emplace_back(mesh);
 
   if (includeDescendants) {
-    stl_util::concat(_shadowMap->renderList, mesh->getChildMeshes(false));
+    stl_util::concat(_shadowMap->renderList(), mesh->getChildMeshes(false));
   }
 
   return *this;
 }
 
-ShadowGenerator& ShadowGenerator::removeShadowCaster(AbstractMesh* mesh,
-                                                     bool includeDescendants)
+ShadowGenerator&
+ShadowGenerator::removeShadowCaster(const AbstractMeshPtr& mesh,
+                                    bool includeDescendants)
 {
-  if (!_shadowMap || !_shadowMap->renderList.empty()) {
+  if (!_shadowMap || !_shadowMap->renderList().empty()) {
     return *this;
   }
 
-  _shadowMap->renderList.erase(::std::remove(_shadowMap->renderList.begin(),
-                                             _shadowMap->renderList.end(),
-                                             mesh),
-                               _shadowMap->renderList.end());
+  _shadowMap->renderList().erase(::std::remove(_shadowMap->renderList().begin(),
+                                               _shadowMap->renderList().end(),
+                                               mesh),
+                                 _shadowMap->renderList().end());
 
   if (includeDescendants) {
     for (auto& child : mesh->getChildren()) {
-      if (auto childMesh = static_cast<AbstractMesh*>(child)) {
+      if (auto childMesh = ::std::static_pointer_cast<AbstractMesh>(child)) {
         removeShadowCaster(childMesh);
       }
     }
@@ -544,7 +546,7 @@ ShadowGenerator& ShadowGenerator::removeShadowCaster(AbstractMesh* mesh,
   return *this;
 }
 
-IShadowLight* ShadowGenerator::getLight()
+IShadowLightPtr& ShadowGenerator::getLight()
 {
   return _light;
 }
@@ -560,16 +562,16 @@ void ShadowGenerator::_initializeShadowMap()
   // Render target
   auto engine = _scene->getEngine();
   if (engine->webGLVersion() > 1.f) {
-    _shadowMap = ::std::make_unique<RenderTargetTexture>(
+    _shadowMap = RenderTargetTexture::New(
       _light->name + "_shadowMap", _mapSize, _scene, false, true, _textureType,
       _light->needCube(), TextureConstants::TRILINEAR_SAMPLINGMODE, false,
       false);
     _shadowMap->createDepthStencilTexture(EngineConstants::LESS, true);
   }
   else {
-    _shadowMap = ::std::make_unique<RenderTargetTexture>(
-      _light->name + "_shadowMap", _mapSize, _scene, false, true, _textureType,
-      _light->needCube());
+    _shadowMap
+      = RenderTargetTexture::New(_light->name + "_shadowMap", _mapSize, _scene,
+                                 false, true, _textureType, _light->needCube());
   }
   _shadowMap->wrapU                     = TextureConstants::CLAMP_ADDRESSMODE;
   _shadowMap->wrapV                     = TextureConstants::CLAMP_ADDRESSMODE;
@@ -588,10 +590,10 @@ void ShadowGenerator::_initializeShadowMap()
 
   // Custom render function.
   _shadowMap->customRenderFunction
-    = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
-             const vector_t<SubMesh*>& alphaTestSubMeshes,
-             const vector_t<SubMesh*>& transparentSubMeshes,
-             const vector_t<SubMesh*>& depthOnlySubMeshes,
+    = [this](const vector_t<SubMeshPtr>& opaqueSubMeshes,
+             const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+             const vector_t<SubMeshPtr>& transparentSubMeshes,
+             const vector_t<SubMeshPtr>& depthOnlySubMeshes,
              const ::std::function<void()>& /*beforeTransparents*/) {
         _renderForShadowMap(opaqueSubMeshes, transparentSubMeshes,
                             alphaTestSubMeshes, depthOnlySubMeshes);
@@ -637,9 +639,9 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
   int targetSize = static_cast<int>(_mapSize.width / blurScale());
 
   if (!useKernelBlur() || blurScale() != 1.f) {
-    _shadowMap2 = ::std::make_unique<RenderTargetTexture>(
-      _light->name + "_shadowMap2", ISize{targetSize, targetSize}, _scene,
-      false, true, _textureType);
+    _shadowMap2        = RenderTargetTexture::New(_light->name + "_shadowMap2",
+                                           ISize{targetSize, targetSize},
+                                           _scene, false, true, _textureType);
     _shadowMap2->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
     _shadowMap2->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
     _shadowMap2->updateSamplingMode(TextureConstants::BILINEAR_SAMPLINGMODE);
@@ -654,7 +656,7 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
     _kernelBlurXPostprocess->height = targetSize;
     _kernelBlurXPostprocess->onApplyObservable.add(
       [this](Effect* effect, EventState&) {
-        effect->setTexture("textureSampler", _shadowMap.get());
+        effect->setTexture("textureSampler", _shadowMap);
       });
 
     _kernelBlurYPostprocess = ::std::make_unique<BlurPostProcess>(
@@ -696,10 +698,10 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
 }
 
 void ShadowGenerator::_renderForShadowMap(
-  const vector_t<SubMesh*>& opaqueSubMeshes,
-  const vector_t<SubMesh*>& alphaTestSubMeshes,
-  const vector_t<SubMesh*>& transparentSubMeshes,
-  const vector_t<SubMesh*>& depthOnlySubMeshes)
+  const vector_t<SubMeshPtr>& opaqueSubMeshes,
+  const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+  const vector_t<SubMeshPtr>& transparentSubMeshes,
+  const vector_t<SubMeshPtr>& depthOnlySubMeshes)
 {
   auto engine = _scene->getEngine();
 
@@ -726,7 +728,7 @@ void ShadowGenerator::_renderForShadowMap(
   }
 }
 
-void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
+void ShadowGenerator::_renderSubMeshForShadowMap(const SubMeshPtr& subMesh)
 {
   auto mesh     = subMesh->getRenderingMesh();
   auto scene    = _scene;
@@ -750,9 +752,9 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
     = (engine->getCaps().instancedArrays)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty());
-  if (isReady(subMesh, hardwareInstancedRendering)) {
+  if (isReady(subMesh.get(), hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
-    mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
+    mesh->_bind(subMesh.get(), _effect, Material::TriangleFillMode());
 
     _effect->setFloat3("biasAndScale", bias(), normalBias(), depthScale());
 
@@ -766,9 +768,9 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
 
     if (scene->activeCamera) {
       _effect->setFloat2("depthValues",
-                         getLight()->getDepthMinZ(scene->activeCamera),
-                         getLight()->getDepthMinZ(scene->activeCamera)
-                           + getLight()->getDepthMaxZ(scene->activeCamera));
+                         getLight()->getDepthMinZ(*scene->activeCamera),
+                         getLight()->getDepthMinZ(*scene->activeCamera)
+                           + getLight()->getDepthMaxZ(*scene->activeCamera));
     }
 
     // Alpha test
@@ -786,11 +788,11 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
     // Bones
     if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
       _effect->setMatrices("mBones",
-                           mesh->skeleton()->getTransformMatrices(mesh));
+                           mesh->skeleton()->getTransformMatrices(mesh.get()));
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(mesh, _effect);
+    MaterialHelper::BindMorphTargetParameters(mesh.get(), _effect);
 
     if (forceBackFacesOnly) {
       engine->setState(true, 0, false, true);
@@ -798,7 +800,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
 
     // Draw
     mesh->_processRendering(
-      subMesh, _effect, Material::TriangleFillMode(), batch,
+      subMesh.get(), _effect, Material::TriangleFillMode(), batch,
       hardwareInstancedRendering,
       [&](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
         _effect->setMatrix("world", world);
@@ -844,7 +846,7 @@ void ShadowGenerator::forceCompilation(
   }
 
   auto& renderList = shadowMap->renderList;
-  if (renderList.empty()) {
+  if (renderList().empty()) {
     if (onCompiled) {
       onCompiled(this);
     }
@@ -852,7 +854,7 @@ void ShadowGenerator::forceCompilation(
   }
 
   vector_t<SubMesh*> subMeshes;
-  for (auto& mesh : renderList) {
+  for (auto& mesh : renderList()) {
     stl_util::concat(subMeshes, stl_util::to_raw_ptr_vector(mesh->subMeshes));
   }
   if (subMeshes.empty()) {
@@ -953,7 +955,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Morph targets
-  auto manager = (static_cast<Mesh*>(mesh))->morphTargetManager();
+  auto manager = (::std::static_pointer_cast<Mesh>(mesh))->morphTargetManager();
   unsigned int morphInfluencers = 0;
   if (manager) {
     if (manager->numInfluencers() > 0) {
@@ -963,8 +965,8 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
                            + ::std::to_string(morphInfluencers));
       MaterialDefines defines;
       defines.NUM_MORPH_INFLUENCERS = morphInfluencers;
-      MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
-                                                       0);
+      MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
+                                                       defines, 0);
     }
   }
 
@@ -1117,8 +1119,8 @@ void ShadowGenerator::bindShadowLight(const string_t& lightIndex,
   }
 
   light->_uniformBuffer->updateFloat2(
-    "depthValues", getLight()->getDepthMinZ(camera),
-    getLight()->getDepthMinZ(camera) + getLight()->getDepthMaxZ(camera),
+    "depthValues", getLight()->getDepthMinZ(*camera),
+    getLight()->getDepthMinZ(*camera) + getLight()->getDepthMaxZ(*camera),
     lightIndex);
 }
 
@@ -1162,9 +1164,9 @@ Matrix ShadowGenerator::getTransformMatrix()
 
     if (shadowMap) {
       auto& renderList = shadowMap->renderList;
-      if (!renderList.empty()) {
+      if (!renderList().empty()) {
         _light->setShadowProjectionMatrix(_projectionMatrix, _viewMatrix,
-                                          renderList);
+                                          renderList());
       }
     }
 
@@ -1181,7 +1183,7 @@ void ShadowGenerator::recreateShadowMap()
     return;
   }
   // Track render list.
-  auto& renderList = shadowMap->renderList;
+  auto& renderList = shadowMap->renderList();
   // Clean up existing data.
   _disposeRTTandPostProcesses();
   // Reinitializes.
@@ -1256,7 +1258,7 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
     return nullptr;
   }
 
-  auto light = dynamic_cast<PointLight*>(
+  auto light = ::std::static_pointer_cast<PointLight>(
     scene->getLightByID(parsedShadowGeneratorLightId));
 
   if (!light) {
@@ -1274,7 +1276,7 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
       if (!shadowMap) {
         continue;
       }
-      shadowMap->renderList.emplace_back(mesh);
+      shadowMap->renderList().emplace_back(mesh);
     }
   }
 

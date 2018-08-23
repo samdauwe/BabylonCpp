@@ -85,7 +85,7 @@ void DirectionalLight::set_shadowOrthoScale(float value)
 
 void DirectionalLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
-  const vector_t<AbstractMesh*>& renderList)
+  const vector_t<AbstractMeshPtr>& renderList)
 {
   if (shadowFrustumSize() > 0.f) {
     _setDefaultFixedFrustumShadowProjectionMatrix(matrix, viewMatrix);
@@ -112,7 +112,7 @@ void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
 
 void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
-  const vector_t<AbstractMesh*>& renderList)
+  const vector_t<AbstractMeshPtr>& renderList)
 {
   auto& activeCamera = getScene()->activeCamera;
 
@@ -196,12 +196,12 @@ void DirectionalLight::transferToEffect(Effect* /*effect*/,
                                _direction.z, 1, lightIndex);
 }
 
-float DirectionalLight::getDepthMinZ(Camera* /*activeCamera*/) const
+float DirectionalLight::getDepthMinZ(const Camera& /*activeCamera*/) const
 {
   return 1.f;
 }
 
-float DirectionalLight::getDepthMaxZ(Camera* /*activeCamera*/) const
+float DirectionalLight::getDepthMaxZ(const Camera& /*activeCamera*/) const
 {
   return 1.f;
 }

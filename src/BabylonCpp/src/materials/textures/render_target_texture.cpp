@@ -25,9 +25,11 @@ RenderTargetTexture::RenderTargetTexture(
   unsigned int samplingMode, bool generateDepthBuffer,
   bool generateStencilBuffer, bool isMulti, unsigned int format)
     : Texture{"", scene, !generateMipMaps}
+    , renderListPredicate{nullptr}
+    , renderList{this, &RenderTargetTexture::get_renderList,
+                 &RenderTargetTexture::set_renderList}
     , renderParticles{true}
     , renderSprites{false}
-    , coordinatesMode{TextureConstants::PROJECTION_MODE}
     , activeCamera{nullptr}
     , ignoreCameraViewport{false}
     , _generateMipMaps{generateMipMaps ? true : false}
@@ -57,10 +59,11 @@ RenderTargetTexture::RenderTargetTexture(
   if (!scene) {
     return;
   }
-  _engine        = scene->getEngine();
-  name           = iName;
-  isRenderTarget = true;
-  isCube         = iIsCube;
+  _engine         = scene->getEngine();
+  name            = iName;
+  isRenderTarget  = true;
+  isCube          = iIsCube;
+  coordinatesMode = TextureConstants::PROJECTION_MODE;
 
   _initialSizeParameter = size;
 
@@ -71,6 +74,7 @@ RenderTargetTexture::RenderTargetTexture(
 
   // Rendering groups
   _renderingManager = ::std::make_unique<RenderingManager>(scene);
+  _renderingManager->_useSceneAutoClearSetup = true;
 
   if (isMulti) {
     return;
@@ -109,6 +113,16 @@ void RenderTargetTexture::_onRatioRescale()
   if (_sizeRatio != 0.f) {
     resize(_initialSizeParameter);
   }
+}
+
+vector_t<AbstractMeshPtr>& RenderTargetTexture::get_renderList()
+{
+  return _renderList;
+}
+
+void RenderTargetTexture::set_renderList(const vector_t<AbstractMeshPtr>& value)
+{
+  _renderList = value;
 }
 
 void RenderTargetTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
@@ -378,11 +392,11 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   auto engine = scene->getEngine();
 
   if (!_waitingRenderList.empty()) {
-    renderList.clear();
+    renderList().clear();
     for (auto& id : _waitingRenderList) {
       auto mesh = scene->getMeshByID(id);
       if (mesh) {
-        renderList.emplace_back(mesh);
+        renderList().emplace_back(mesh);
       }
     }
 
@@ -391,7 +405,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   // Is predicate defined?
   if (renderListPredicate) {
-    renderList.clear(); // Clear previous renderList
+    renderList().clear(); // Clear previous renderList
 
     auto scene = getScene();
     if (!scene) {
@@ -402,7 +416,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
     for (auto& mesh : sceneMeshes) {
       if (renderListPredicate(mesh.get())) {
-        renderList.emplace_back(mesh.get());
+        renderList().emplace_back(mesh);
       }
     }
   }
@@ -411,7 +425,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   // Set custom projection.
   // Needs to be before binding to prevent changing the aspect ratio.
-  Camera* camera = nullptr;
+  CameraPtr camera = nullptr;
   if (activeCamera) {
     camera = activeCamera;
     engine->setViewport(activeCamera->viewport, getRenderWidth(),
@@ -434,15 +448,16 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   _renderingManager->reset();
 
   auto& currentRenderList = renderList;
-  if (renderList.empty()) {
+  if (renderList().empty()) {
     auto& activeMeshes = scene->getActiveMeshes();
     for (auto& mesh : activeMeshes) {
-      currentRenderList.emplace_back(dynamic_cast<AbstractMesh*>(mesh));
+      currentRenderList().emplace_back(
+        ::std::static_pointer_cast<AbstractMesh>(mesh));
     }
   }
-  auto currentRenderListLength = currentRenderList.size();
+  auto currentRenderListLength = currentRenderList().size();
   auto sceneRenderId           = scene->getRenderId();
-  for (auto& mesh : currentRenderList) {
+  for (auto& mesh : currentRenderList()) {
     if (mesh) {
       if (!mesh->isReady(refreshRate() == 0)) {
         resetRefreshCounter();
@@ -452,7 +467,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
       mesh->_preActivateForIntermediateRendering(sceneRenderId);
 
       bool isMasked;
-      if (renderList.empty() && camera) {
+      if (renderList().empty() && camera) {
         isMasked = ((mesh->layerMask() & camera->layerMask) == 0);
       }
       else {
@@ -464,7 +479,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
         mesh->_activate(scene->getRenderId());
         for (auto& subMesh : mesh->subMeshes) {
           scene->_activeIndices.addCount(subMesh->indexCount, false);
-          _renderingManager->dispatch(subMesh.get(), mesh);
+          _renderingManager->dispatch(subMesh, mesh.get());
         }
       }
     }
@@ -472,12 +487,12 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   for (auto& particleSystem : scene->particleSystems) {
     if (!particleSystem->isStarted() || !particleSystem->hasEmitter()
-        || !(particleSystem->emitter.is<AbstractMesh*>()
-             && particleSystem->emitter.get<AbstractMesh*>()->isEnabled())) {
+        || !(particleSystem->emitter.is<AbstractMeshPtr>()
+             && particleSystem->emitter.get<AbstractMeshPtr>()->isEnabled())) {
       continue;
     }
-    if (stl_util::index_of(currentRenderList,
-                           particleSystem->emitter.get<AbstractMesh*>())
+    if (stl_util::index_of(currentRenderList(),
+                           particleSystem->emitter.get<AbstractMeshPtr>())
         >= 0) {
       _renderingManager->dispatchParticles(particleSystem.get());
     }
@@ -485,14 +500,14 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   if (isCube) {
     for (unsigned int face = 0; face < 6; ++face) {
-      renderToTarget(face, currentRenderList, currentRenderListLength,
+      renderToTarget(face, currentRenderList(), currentRenderListLength,
                      useCameraPostProcess, dumpForDebug);
       scene->incrementRenderId();
       scene->resetCachedMaterial();
     }
   }
   else {
-    renderToTarget(0, currentRenderList, currentRenderListLength,
+    renderToTarget(0, currentRenderList(), currentRenderListLength,
                    useCameraPostProcess, dumpForDebug);
   }
 
@@ -534,7 +549,7 @@ void RenderTargetTexture::unbindFrameBuffer(Engine* engine,
 }
 
 void RenderTargetTexture::renderToTarget(
-  unsigned int faceIndex, const vector_t<AbstractMesh*>& currentRenderList,
+  unsigned int faceIndex, const vector_t<AbstractMeshPtr>& currentRenderList,
   size_t /*currentRenderListLength*/, bool useCameraPostProcess,
   bool dumpForDebug)
 
@@ -622,9 +637,12 @@ void RenderTargetTexture::renderToTarget(
 
 void RenderTargetTexture::setRenderingOrder(
   unsigned int renderingGroupId,
-  const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn,
-  const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn,
-  const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn)
+  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    opaqueSortCompareFn,
+  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    alphaTestSortCompareFn,
+  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    transparentSortCompareFn)
 {
   _renderingManager->setRenderingOrder(renderingGroupId, opaqueSortCompareFn,
                                        alphaTestSortCompareFn,
@@ -636,31 +654,32 @@ void RenderTargetTexture::setRenderingAutoClearDepthStencil(
 {
   _renderingManager->setRenderingAutoClearDepthStencil(renderingGroupId,
                                                        autoClearDepthStencil);
+  _renderingManager->_useSceneAutoClearSetup = false;
 }
 
-unique_ptr_t<RenderTargetTexture> RenderTargetTexture::clone()
+RenderTargetTexturePtr RenderTargetTexture::clone()
 {
   auto textureSize = getSize();
-  auto newTexture  = ::std::make_unique<RenderTargetTexture>(
-    name,                                      //
-    textureSize, getScene(),                   //
-    _renderTargetOptions.generateMipMaps,      //
-    _doNotChangeAspectRatio,                   //
-    _renderTargetOptions.type,                 //
-    isCube,                                    //
-    _renderTargetOptions.samplingMode,         //
-    _renderTargetOptions.generateDepthBuffer,  //
-    _renderTargetOptions.generateStencilBuffer //
-  );
+  auto newTexture
+    = RenderTargetTexture::New(name,                                      //
+                               textureSize, getScene(),                   //
+                               _renderTargetOptions.generateMipMaps,      //
+                               _doNotChangeAspectRatio,                   //
+                               _renderTargetOptions.type,                 //
+                               isCube,                                    //
+                               _renderTargetOptions.samplingMode,         //
+                               _renderTargetOptions.generateDepthBuffer,  //
+                               _renderTargetOptions.generateStencilBuffer //
+    );
 
   // Base texture
   newTexture->hasAlpha = hasAlpha();
   newTexture->level    = level;
 
   // RenderTarget Texture
-  newTexture->coordinatesMode = coordinatesMode;
-  if (!renderList.empty()) {
-    newTexture->renderList = renderList;
+  newTexture->coordinatesMode = coordinatesMode();
+  if (!renderList().empty()) {
+    newTexture->renderList = renderList();
   }
 
   return newTexture;
@@ -694,7 +713,7 @@ void RenderTargetTexture::dispose()
     _resizeObserver = nullptr;
   }
 
-  renderList.clear();
+  renderList().clear();
 
   // Remove from custom render targets
   auto scene = getScene();
@@ -703,10 +722,22 @@ void RenderTargetTexture::dispose()
     return;
   }
 
-  stl_util::erase(scene->customRenderTargets, this);
+  scene->customRenderTargets.erase(
+    ::std::remove_if(
+      scene->customRenderTargets.begin(), scene->customRenderTargets.end(),
+      [this](const RenderTargetTexturePtr& renderTargetTexturePtr) {
+        return renderTargetTexturePtr.get() == this;
+      }),
+    scene->customRenderTargets.end());
 
   for (auto& camera : scene->cameras) {
-    stl_util::erase(camera->customRenderTargets, this);
+    camera->customRenderTargets.erase(
+      ::std::remove_if(
+        camera->customRenderTargets.begin(), camera->customRenderTargets.end(),
+        [this](const RenderTargetTexturePtr& renderTargetTexturePtr) {
+          return renderTargetTexturePtr.get() == this;
+        }),
+      camera->customRenderTargets.end());
   }
 
   Texture::dispose();

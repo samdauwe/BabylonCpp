@@ -282,8 +282,9 @@ Matrix* Texture::getTextureMatrix()
   }
 
   scene->markAllMaterialsAsDirty(
-    Material::TextureDirtyFlag(),
-    [this](Material* mat) { return mat->hasTexture(this); });
+    Material::TextureDirtyFlag(), [this](Material* mat) {
+      return mat->hasTexture(shared_from_base<Texture>());
+    });
 
   return _cachedTextureMatrix.get();
 }
@@ -362,7 +363,7 @@ Matrix* Texture::getReflectionTextureMatrix()
   return _cachedTextureMatrix.get();
 }
 
-Texture* Texture::clone() const
+TexturePtr Texture::clone() const
 {
   auto newTexture = Texture::New(_texture ? _texture->url : nullptr, getScene(),
                                  _noMipmap, _invertY, _samplingMode);
@@ -407,13 +408,11 @@ void Texture::dispose()
   _delayedOnError = nullptr;
 }
 
-Texture* Texture::CreateFromBase64String(const string_t& /*data*/,
-                                         const string_t& name, Scene* scene,
-                                         bool noMipmap, bool invertY,
-                                         unsigned int samplingMode,
-                                         const ::std::function<void()>& onLoad,
-                                         const ::std::function<void()>& onError,
-                                         unsigned int format)
+TexturePtr Texture::CreateFromBase64String(
+  const string_t& /*data*/, const string_t& name, Scene* scene, bool noMipmap,
+  bool invertY, unsigned int samplingMode,
+  const ::std::function<void()>& onLoad, const ::std::function<void()>& onError,
+  unsigned int format)
 {
   return Texture::New("data:" + name, scene, noMipmap, invertY, samplingMode,
                       onLoad, onError, nullopt_t, false, format);
@@ -426,7 +425,7 @@ unique_ptr_t<BaseTexture> Texture::Parse(const Json::value& /*parsedTexture*/,
   return nullptr;
 }
 
-Texture* Texture::LoadFromDataString(
+TexturePtr Texture::LoadFromDataString(
   const string_t& name, const nullable_t<Variant<ArrayBuffer, Image>>& buffer,
   Scene* scene, bool deleteBuffer, bool noMipmap, bool invertY,
   unsigned int samplingMode, const ::std::function<void()>& onLoad,

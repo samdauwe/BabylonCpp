@@ -21,8 +21,8 @@ namespace BABYLON {
 
 SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
                  size_t iVerticesCount, unsigned int iIndexStart,
-                 size_t iIndexCount, AbstractMesh* mesh, Mesh* renderingMesh,
-                 bool iCreateBoundingBox)
+                 size_t iIndexCount, const AbstractMeshPtr& mesh,
+                 Mesh* renderingMesh, bool iCreateBoundingBox)
     : BaseSubMesh{}
     , materialIndex{iMaterialIndex}
     , verticesStart{iVerticesStart}
@@ -38,7 +38,7 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
     , _currentMaterial{nullptr}
 {
   if (!renderingMesh) {
-    _renderingMesh = static_cast<Mesh*>(mesh);
+    _renderingMesh = ::std::static_pointer_cast<Mesh>(mesh);
   }
 
   _id = mesh->subMeshes.size() /*- 1*/; // Submesh is not yet to the list
@@ -58,11 +58,11 @@ void SubMesh::addToMesh(const shared_ptr_t<SubMesh>& newSubMesh)
   _mesh->subMeshes.emplace_back(newSubMesh);
 }
 
-shared_ptr_t<SubMesh>
-SubMesh::AddToMesh(unsigned int materialIndex, unsigned int verticesStart,
-                   size_t verticesCount, unsigned int indexStart,
-                   size_t indexCount, AbstractMesh* mesh, Mesh* renderingMesh,
-                   bool createBoundingBox)
+SubMeshPtr SubMesh::AddToMesh(unsigned int materialIndex,
+                              unsigned int verticesStart, size_t verticesCount,
+                              unsigned int indexStart, size_t indexCount,
+                              const AbstractMeshPtr& mesh, Mesh* renderingMesh,
+                              bool createBoundingBox)
 {
   return SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart,
                       indexCount, mesh, renderingMesh, createBoundingBox);
@@ -88,17 +88,17 @@ SubMesh& SubMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
   return *this;
 }
 
-AbstractMesh* SubMesh::getMesh()
+AbstractMeshPtr& SubMesh::getMesh()
 {
   return _mesh;
 }
 
-Mesh* SubMesh::getRenderingMesh()
+MeshPtr& SubMesh::getRenderingMesh()
 {
   return _renderingMesh;
 }
 
-Material* SubMesh::getMaterial()
+MaterialPtr SubMesh::getMaterial()
 {
   auto rootMaterial = _renderingMesh->getMaterial();
 
@@ -107,7 +107,8 @@ Material* SubMesh::getMaterial()
   }
   else if (rootMaterial
            && (rootMaterial->type() == IReflect::Type::MULTIMATERIAL)) {
-    auto multiMaterial     = static_cast<MultiMaterial*>(rootMaterial);
+    auto multiMaterial
+      = ::std::static_pointer_cast<MultiMaterial>(rootMaterial);
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
     if (_currentMaterial != effectiveMaterial) {
       _currentMaterial = effectiveMaterial;
@@ -260,7 +261,7 @@ SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
 
   // LineMesh first as it's also a Mesh...
   if (_mesh->type() == IReflect::Type::LINESMESH) {
-    auto lineMesh = static_cast<LinesMesh*>(_mesh);
+    auto lineMesh = ::std::static_pointer_cast<LinesMesh>(_mesh);
 
     // Line test
     float length;
@@ -323,8 +324,8 @@ void SubMesh::_rebuild()
 }
 
 // Clone
-shared_ptr_t<SubMesh> SubMesh::clone(AbstractMesh* newMesh,
-                                     Mesh* newRenderingMesh) const
+SubMeshPtr SubMesh::clone(const AbstractMeshPtr& newMesh,
+                          Mesh* newRenderingMesh) const
 {
   auto result
     = SubMesh::New(materialIndex, verticesStart, verticesCount, indexStart,
@@ -362,17 +363,17 @@ void SubMesh::dispose()
 }
 
 // Statics
-shared_ptr_t<SubMesh> SubMesh::CreateFromIndices(unsigned int materialIndex,
-                                                 unsigned int startIndex,
-                                                 size_t indexCount,
-                                                 AbstractMesh* mesh,
-                                                 Mesh* renderingMesh)
+SubMeshPtr SubMesh::CreateFromIndices(unsigned int materialIndex,
+                                      unsigned int startIndex,
+                                      size_t indexCount,
+                                      const AbstractMeshPtr& mesh,
+                                      Mesh* renderingMesh)
 {
   unsigned int minVertexIndex = numeric_limits_t<unsigned>::max();
   unsigned int maxVertexIndex = numeric_limits_t<unsigned>::min();
 
   auto _renderingMesh
-    = renderingMesh ? renderingMesh : static_cast<Mesh*>(mesh);
+    = renderingMesh ? renderingMesh : static_cast<Mesh*>(mesh.get());
   auto indices = _renderingMesh->getIndices();
 
   for (size_t index = startIndex; index < startIndex + indexCount; ++index) {

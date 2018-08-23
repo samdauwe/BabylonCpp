@@ -39,7 +39,9 @@ GizmoManager::GizmoManager(Scene* iScene)
       }
       if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
         if (pointerInfo->pickInfo.pickedMesh) {
-          Node* node = pointerInfo->pickInfo.pickedMesh;
+          Node* node = pointerInfo->pickInfo.pickedMesh ?
+                         pointerInfo->pickInfo.pickedMesh.get() :
+                         nullptr;
           if (attachableMeshes == nullopt_t) {
             // Attach to the most parent node
             while (node && node->parent != nullptr) {

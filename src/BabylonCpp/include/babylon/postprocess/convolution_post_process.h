@@ -65,8 +65,9 @@ public:
    * (default: 0)
    */
   ConvolutionPostProcess(const string_t& name, const Float32Array& kernel,
-                         float ratio, Camera* camera, unsigned int samplingMode,
-                         Engine* engine, bool reusable = false,
+                         float ratio, const CameraPtr& camera,
+                         unsigned int samplingMode, Engine* engine,
+                         bool reusable = false,
                          unsigned int textureType
                          = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   ~ConvolutionPostProcess();

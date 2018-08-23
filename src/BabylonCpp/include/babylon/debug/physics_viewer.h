@@ -43,10 +43,10 @@ protected:
   void _updateDebugMeshes();
 
 private:
-  Material* _getDebugMaterial(Scene* scene);
-  AbstractMesh* _getDebugBoxMesh(Scene* scene);
-  AbstractMesh* _getDebugSphereMesh(Scene* scene);
-  AbstractMesh* _getDebugMesh(PhysicsImpostor* impostor, Scene* scene);
+  MaterialPtr _getDebugMaterial(Scene* scene);
+  AbstractMeshPtr _getDebugBoxMesh(Scene* scene);
+  AbstractMeshPtr _getDebugSphereMesh(Scene* scene);
+  AbstractMeshPtr _getDebugMesh(PhysicsImpostor* impostor, Scene* scene);
 
 protected:
   /**
@@ -57,7 +57,7 @@ protected:
   /**
    * @brief Hidden
    */
-  vector_t<AbstractMesh*> _meshes;
+  vector_t<AbstractMeshPtr> _meshes;
 
   /**
    * @brief Hidden
@@ -76,9 +76,9 @@ protected:
 
 private:
   ::std::function<void(Scene* scene, EventState& es)> _renderFunction;
-  Mesh* _debugBoxMesh;
-  Mesh* _debugSphereMesh;
-  StandardMaterial* _debugMaterial;
+  MeshPtr _debugBoxMesh;
+  MeshPtr _debugSphereMesh;
+  StandardMaterialPtr _debugMaterial;
 
 }; // end of class PhysicsViewer
 

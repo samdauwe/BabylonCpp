@@ -86,7 +86,7 @@ protected:
   /**
    * The root mesh of the gizmo
    */
-  Mesh* _rootMesh;
+  MeshPtr _rootMesh;
 
   /**
    * If a custom mesh has been set (Default: false)

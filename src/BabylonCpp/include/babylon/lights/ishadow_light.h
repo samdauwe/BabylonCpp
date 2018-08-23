@@ -17,7 +17,7 @@ class BABYLON_SHARED_EXPORT IShadowLight : public Light {
 
 public:
   IShadowLight(const string_t& name, Scene* scene);
-  virtual ~IShadowLight();
+  virtual ~IShadowLight() override;
 
   /**
    * The position the shdow will be casted from.
@@ -53,7 +53,7 @@ public:
    * Gets the scene the light belongs to.
    * @returns The scene
    */
-  virtual Scene* getScene() = 0;
+  virtual Scene* getScene() const override = 0;
 
   /**
    * @brief Sets the shadow projection matrix in parameter to the generated
@@ -65,7 +65,7 @@ public:
    */
   virtual IShadowLight*
   setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
-                            const vector_t<AbstractMesh*>& renderList)
+                            const vector_t<AbstractMeshPtr>& renderList)
     = 0;
 
   /**
@@ -110,7 +110,7 @@ public:
    * @param activeCamera The camera we are returning the min for
    * @returns the depth min z
    */
-  virtual float getDepthMinZ(Camera* activeCamera) const = 0;
+  virtual float getDepthMinZ(const Camera& activeCamera) const = 0;
 
   /**
    * @brief Gets the maxZ used for shadow according to both the scene and the
@@ -118,7 +118,7 @@ public:
    * @param activeCamera The camera we are returning the max for
    * @returns the depth max z
    */
-  virtual float getDepthMaxZ(Camera* activeCamera) const = 0;
+  virtual float getDepthMaxZ(const Camera& activeCamera) const = 0;
 
 protected:
   /**

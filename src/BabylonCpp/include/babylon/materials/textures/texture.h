@@ -25,10 +25,11 @@ public:
 
 public:
   template <typename... Ts>
-  static Texture* New(Ts&&... args)
+  static TexturePtr New(Ts&&... args)
   {
-    auto texture = new Texture(::std::forward<Ts>(args)...);
-    texture->addToScene(static_cast<unique_ptr_t<BaseTexture>>(texture));
+    auto texture
+      = shared_ptr_t<Texture>(new Texture(::std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }
@@ -54,12 +55,12 @@ public:
   void updateSamplingMode(unsigned int samplingMode);
   Matrix* getTextureMatrix() override;
   Matrix* getReflectionTextureMatrix() override;
-  Texture* clone() const;
+  TexturePtr clone() const;
   Json::object serialize() const;
   void dispose() override;
 
   /** Statics **/
-  static Texture* CreateFromBase64String(
+  static TexturePtr CreateFromBase64String(
     const string_t& data, const string_t& name, Scene* scene,
     bool noMipmap = false, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
@@ -68,7 +69,7 @@ public:
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   static unique_ptr_t<BaseTexture> Parse(const Json::value& parsedTexture,
                                          Scene* scene, const string_t& rootUrl);
-  static Texture* LoadFromDataString(
+  static TexturePtr LoadFromDataString(
     const string_t& name, const nullable_t<Variant<ArrayBuffer, Image>>& buffer,
     Scene* scene, bool deleteBuffer = false, bool noMipmap = false,
     bool invertY              = true,

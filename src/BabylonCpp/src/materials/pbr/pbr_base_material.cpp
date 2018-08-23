@@ -106,13 +106,13 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
         && _reflectionTexture->isRenderTarget) {
       _renderTargets.emplace_back(
-        static_cast<RenderTargetTexture*>(_reflectionTexture));
+        ::std::static_pointer_cast<RenderTargetTexture>(_reflectionTexture));
     }
 
     if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
         && _refractionTexture->isRenderTarget) {
       _renderTargets.emplace_back(
-        static_cast<RenderTargetTexture*>(_refractionTexture));
+        ::std::static_pointer_cast<RenderTargetTexture>(_refractionTexture));
     }
 
     return _renderTargets;
@@ -207,7 +207,7 @@ bool PBRBaseMaterial::needAlphaBlending() const
          || _shouldUseAlphaFromAlbedoTexture();
 }
 
-bool PBRBaseMaterial::needAlphaBlendingForMesh(AbstractMesh* mesh) const
+bool PBRBaseMaterial::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
 {
   if (_disableAlphaBlending()) {
     return false;
@@ -238,7 +238,7 @@ bool PBRBaseMaterial::_shouldUseAlphaFromAlbedoTexture() const
          && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
-BaseTexture* PBRBaseMaterial::getAlphaTestTexture()
+BaseTexturePtr PBRBaseMaterial::getAlphaTestTexture()
 {
   return _albedoTexture;
 }
@@ -890,7 +890,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
     defines.defines[PMD::PREMULTIPLYALPHA]
       = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
          || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
-    defines.defines[PMD::ALPHABLEND] = needAlphaBlendingForMesh(mesh);
+    defines.defines[PMD::ALPHABLEND] = needAlphaBlendingForMesh(*mesh);
     defines.defines[PMD::ALPHAFRESNEL]
       = _useAlphaFresnel || _useLinearAlphaFresnel;
     defines.defines[PMD::LINEARALPHAFRESNEL] = _useLinearAlphaFresnel;
@@ -1093,7 +1093,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
           if (reflectionTexture->boundingBoxSize()) {
             if (auto cubeTexture
-                = static_cast<CubeTexture*>(reflectionTexture)) {
+                = ::std::static_pointer_cast<CubeTexture>(reflectionTexture)) {
               _uniformBuffer->updateVector3("vReflectionPosition",
                                             cubeTexture->boundingBoxPosition);
               _uniformBuffer->updateVector3("vReflectionSize",
@@ -1209,7 +1209,8 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           float depth = 1.f;
           if (!_refractionTexture->isCube) {
             auto refractionTextureTmp
-              = static_cast<RefractionTexture*>(_refractionTexture);
+              = ::std::static_pointer_cast<RefractionTexture>(
+                _refractionTexture);
             if (refractionTextureTmp) {
               depth = refractionTextureTmp->depth;
             }
@@ -1400,9 +1401,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _afterBind(mesh, _activeEffect);
 }
 
-vector_t<IAnimatable*> PBRBaseMaterial::getAnimatables() const
+vector_t<IAnimatablePtr> PBRBaseMaterial::getAnimatables() const
 {
-  vector_t<IAnimatable*> results;
+  vector_t<IAnimatablePtr> results;
 
   if (_albedoTexture && _albedoTexture->animations.size() > 0) {
     results.emplace_back(_albedoTexture);
@@ -1447,7 +1448,7 @@ vector_t<IAnimatable*> PBRBaseMaterial::getAnimatables() const
   return results;
 }
 
-BaseTexture* PBRBaseMaterial::_getReflectionTexture() const
+BaseTexturePtr PBRBaseMaterial::_getReflectionTexture() const
 {
   if (_reflectionTexture) {
     return _reflectionTexture;
@@ -1456,7 +1457,7 @@ BaseTexture* PBRBaseMaterial::_getReflectionTexture() const
   return getScene()->environmentTexture();
 }
 
-BaseTexture* PBRBaseMaterial::_getRefractionTexture() const
+BaseTexturePtr PBRBaseMaterial::_getRefractionTexture() const
 {
   if (_refractionTexture) {
     return _refractionTexture;

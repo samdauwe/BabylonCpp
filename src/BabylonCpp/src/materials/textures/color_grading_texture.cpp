@@ -68,6 +68,7 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
 
   _texture = texture;
 
+#if 0
   const auto callback = [&](Variant<string_t, ArrayBuffer>& iText) {
     if (!iText.is<string_t>()) {
       return;
@@ -160,6 +161,7 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
                                 EngineConstants::TEXTUREFORMAT_RGBA, false);
     }
   };
+#endif
 
   auto scene = getScene();
   if (scene) {

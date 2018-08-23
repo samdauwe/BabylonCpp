@@ -17,7 +17,7 @@ public:
   GlowBlurPostProcess(const string_t& name, const Vector2& direction,
                       float kernel,
                       const Variant<float, PostProcessOptions>& options,
-                      Camera* camera,
+                      const CameraPtr& camera,
                       unsigned int samplingMode
                       = TextureConstants::BILINEAR_SAMPLINGMODE,
                       Engine* engine = nullptr, bool reusable = false);

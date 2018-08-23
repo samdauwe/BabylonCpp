@@ -11,15 +11,23 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT BaseTexture : public IAnimatable {
+class BABYLON_SHARED_EXPORT BaseTexture
+    : public ::std::enable_shared_from_this<BaseTexture>,
+      public IAnimatable {
 public:
   static constexpr unsigned int DEFAULT_ANISOTROPIC_FILTERING_LEVEL = 4;
 
 public:
   virtual ~BaseTexture() override;
 
+  template <typename Derived>
+  shared_ptr_t<Derived> shared_from_base()
+  {
+    return std::static_pointer_cast<Derived>(shared_from_this());
+  }
+
   virtual IReflect::Type type() const override;
-  void addToScene(unique_ptr_t<BaseTexture>&& newTexture);
+  void addToScene(const BaseTexturePtr& newTexture);
 
   string_t uid();
   virtual string_t toString() const;
@@ -45,7 +53,7 @@ public:
                                  unsigned int sampling = 0);
   virtual void _rebuild();
   virtual void delayLoad();
-  vector_t<Animation*> getAnimations() override;
+  vector_t<AnimationPtr> getAnimations() override;
   unique_ptr_t<BaseTexture> clone() const;
   unsigned int textureType() const;
   unsigned int textureFormat() const;
@@ -64,9 +72,9 @@ public:
   void releaseInternalTexture();
   SphericalPolynomial* sphericalPolynomial();
   void setSphericalPolynomial(const SphericalPolynomial& value);
-  BaseTexture* _lodTextureHigh() const;
-  BaseTexture* _lodTextureMid() const;
-  BaseTexture* _lodTextureLow() const;
+  BaseTexturePtr _lodTextureHigh() const;
+  BaseTexturePtr _lodTextureMid() const;
+  BaseTexturePtr _lodTextureLow() const;
   virtual void dispose();
   Json::object serialize() const;
 
@@ -167,7 +175,7 @@ public:
   Property<BaseTexture, float> lodGenerationScale;
 
   bool isRenderTarget;
-  vector_t<Animation*> animations;
+  vector_t<AnimationPtr> animations;
   /**
    * An event triggered when the texture is disposed.
    */

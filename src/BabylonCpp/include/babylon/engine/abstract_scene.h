@@ -2,6 +2,7 @@
 #define BABYLON_ENGINE_ABSTRACT_SCENE_H
 
 #include <babylon/babylon_global.h>
+#include <babylon/core/any.h>
 
 namespace BABYLON {
 
@@ -10,15 +11,16 @@ namespace BABYLON {
  * These parsers are used to parse a list of specific assets (like particle
  * systems, etc..)
  */
-using BabylonFileParser = std::function<void(
-  Json::value& parsedData, Scene* scene, const string_t& rootUrl)>;
+using BabylonFileParser
+  = std::function<void(const Json::value& parsedData, Scene* scene,
+                       AssetContainer& container, const string_t& rootUrl)>;
 
 /**
  * Defines how the individual parser contract is defined.
  * These parser can parse an individual asset
  */
-using IndividualBabylonFileParser = std::function<void(
-  Json::value& parsedData, Scene* scene, const string_t& rootUrl)>;
+using IndividualBabylonFileParser = std::function<any(
+  const Json::value& parsedData, Scene* scene, const string_t& rootUrl)>;
 
 /**
  * @brief Base class of the scene acting as a container for the different
@@ -30,6 +32,12 @@ class BABYLON_SHARED_EXPORT AbstractScene
     : public ::std::enable_shared_from_this<AbstractScene> {
 
 public:
+  /**
+   * @brief Constructor
+   */
+  AbstractScene();
+  ~AbstractScene();
+
   /**
    * @brief Adds a parser in the list of available ones.
    * @param name Defines the name of the parser
@@ -69,7 +77,72 @@ public:
    * @param rootUrl Defines the root url of the data
    */
   static void Parse(Json::value& jsonData, Scene* scene,
-                    const string_t& rootUrl);
+                    AssetContainer& container, const string_t& rootUrl);
+
+  /**
+   * @brief Removes the given effect layer from this scene.
+   * @param toRemove defines the effect layer to remove
+   * @returns the index of the removed effect layer
+   */
+  int removeEffectLayer(const EffectLayerPtr& toRemove);
+
+  /**
+   * @brief Adds the given effect layer to this scene.
+   * @param newEffectLayer defines the effect layer to add
+   */
+  void addEffectLayer(const EffectLayerPtr& newEffectLayer);
+
+  /**
+   * @brief Return a the first highlight layer of the scene with a given name.
+   * @param name The name of the highlight layer to look for.
+   * @return The highlight layer if found otherwise null.
+   */
+  GlowLayerPtr getGlowLayerByName(const string_t& name);
+
+  /**
+   * @brief Return a the first highlight layer of the scene with a given name.
+   * @param name The name of the highlight layer to look for.
+   * @return The highlight layer if found otherwise null.
+   */
+  HighlightLayerPtr getHighlightLayerByName(const string_t& name);
+
+  /**
+   * @brief Removes the given lens flare system from this scene.
+   * @param toRemove The lens flare system to remove
+   * @returns The index of the removed lens flare system
+   */
+  int removeLensFlareSystem(const LensFlareSystemPtr& toRemove);
+
+  /**
+   * @brief Adds the given lens flare system to this scene.
+   * @param newLensFlareSystem The lens flare system to add
+   */
+  void addLensFlareSystem(const LensFlareSystemPtr& newLensFlareSystem);
+
+  /**
+   * @brief Gets a lens flare system using its name.
+   * @param name defines the name to look for
+   * @returns the lens flare system or null if not found
+   */
+  LensFlareSystemPtr getLensFlareSystemByName(const string_t& name);
+
+  /**
+   * @brief Gets a lens flare system using its id.
+   * @param id defines the id to look for
+   * @returns the lens flare system or null if not found
+   */
+  LensFlareSystemPtr getLensFlareSystemByID(const string_t& id);
+
+private:
+  /**
+   * @brief Adds the individual component parser to the scene parsers.
+   */
+  void _addIndividualParsers();
+
+  /**
+   * @brief Adds the component parser to the scene parsers.
+   */
+  void _addParsers();
 
 public:
   /**
@@ -156,6 +229,24 @@ public:
    */
   vector_t<BaseTexturePtr> textures;
 
+  /**
+   * The list of effect layers (highlights/glow) added to the scene
+   * @see http://doc.babylonjs.com/how_to/highlight_layer
+   * @see http://doc.babylonjs.com/how_to/glow_layer
+   */
+  vector_t<EffectLayerPtr> effectLayers;
+
+  /**
+   * The list of layers (background and foreground) of the scene
+   */
+  vector_t<LayerPtr> layers;
+
+  /**
+   * The list of lens flare system added to the scene
+   * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
+   */
+  vector_t<LensFlareSystemPtr> lensFlareSystems;
+
 private:
   /**
    * Stores the list of available parsers in the application.
@@ -168,7 +259,7 @@ private:
   static unordered_map_t<string_t, IndividualBabylonFileParser>
     _IndividualBabylonFileParsers;
 
-}; // end of class PointerInfo
+}; // end of class AbstractScene
 
 } // end of namespace BABYLON
 

@@ -9,8 +9,9 @@
 
 namespace BABYLON {
 
-RuntimeAnimation::RuntimeAnimation(IAnimatable* target, Animation* animation,
-                                   Scene* scene, Animatable* host)
+RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& target,
+                                   const AnimationPtr& animation, Scene* scene,
+                                   Animatable* host)
     : currentFrame{this, &RuntimeAnimation::get_currentFrame}
     , weight{this, &RuntimeAnimation::get_weight}
     , currentValue{this, &RuntimeAnimation::get_currentValue}
@@ -30,8 +31,6 @@ RuntimeAnimation::RuntimeAnimation(IAnimatable* target, Animation* animation,
     , _previousDelay{millisecond_t{0}}
     , _previousRatio{0.f}
 {
-  animation->_runtimeAnimations.emplace_back(this);
-
   // Cloning events locally
   const auto& events = animation->getEvents();
   if (!events.empty()) {
@@ -45,7 +44,13 @@ RuntimeAnimation::~RuntimeAnimation()
 {
 }
 
-int RuntimeAnimation::get_currentFrame() const
+void RuntimeAnimation::addToRuntimeAnimations(
+  const RuntimeAnimationPtr& animation)
+{
+  _animation->_runtimeAnimations.emplace_back(animation);
+}
+
+float RuntimeAnimation::get_currentFrame() const
 {
   return _currentFrame;
 }
@@ -55,7 +60,7 @@ float RuntimeAnimation::get_weight() const
   return _weight;
 }
 
-Nullable<AnimationValue>& RuntimeAnimation::get_currentValue()
+nullable_t<AnimationValue>& RuntimeAnimation::get_currentValue()
 {
   return _currentValue;
 }
@@ -70,7 +75,7 @@ IAnimatable*& RuntimeAnimation::get_target()
   return _activeTarget;
 }
 
-Animation* RuntimeAnimation::animation()
+AnimationPtr& RuntimeAnimation::animation()
 {
   return _animation;
 }
@@ -78,7 +83,7 @@ Animation* RuntimeAnimation::animation()
 void RuntimeAnimation::reset(bool restoreOriginal)
 {
   if (restoreOriginal) {
-    if (!_originalValue.empty() && _originalValue[0] != nullptr) {
+    if (!_originalValue.empty() && _originalValue[0] != nullopt_t) {
       // _setValue(_target, _originalValue[0], -1);
     }
   }
@@ -104,12 +109,15 @@ void RuntimeAnimation::dispose()
 {
   auto& runtimeAnimations = _animation->runtimeAnimations();
   runtimeAnimations.erase(
-    ::std::remove(runtimeAnimations.begin(), runtimeAnimations.end(), this),
+    ::std::remove_if(runtimeAnimations.begin(), runtimeAnimations.end(),
+                     [this](const RuntimeAnimationPtr& runtimeAnimation) {
+                       return runtimeAnimation.get() == this;
+                     }),
     runtimeAnimations.end());
 }
 
 AnimationValue RuntimeAnimation::_interpolate(
-  int iCurrentFrame, int repeatCount, unsigned int loopMode,
+  float iCurrentFrame, int repeatCount, unsigned int loopMode,
   const AnimationValue& offsetValue, const AnimationValue& highLimitValue)
 {
   _currentFrame = iCurrentFrame;
@@ -129,7 +137,7 @@ void RuntimeAnimation::setValue(const AnimationValue& currentValue,
   _setValue(_target, currentValue, weight);
 }
 
-void RuntimeAnimation::_setValue(IAnimatable* target,
+void RuntimeAnimation::_setValue(const IAnimatablePtr& target,
                                  const AnimationValue& currentValue,
                                  float weight, unsigned int targetIndex)
 {
@@ -160,7 +168,7 @@ void RuntimeAnimation::_setValue(IAnimatable* target,
 
   if (targetIndex >= _originalValue.size()) {
     _originalValue.resize(targetIndex + 1);
-    _originalValue[targetIndex] = nullptr;
+    _originalValue[targetIndex] = nullopt_t;
   }
 
   // Blending
@@ -179,7 +187,7 @@ void RuntimeAnimation::_setValue(IAnimatable* target,
   }
 }
 
-Nullable<unsigned int> RuntimeAnimation::_getCorrectLoopMode() const
+nullable_t<unsigned int> RuntimeAnimation::_getCorrectLoopMode() const
 {
   return 0u;
 }
@@ -188,7 +196,7 @@ void RuntimeAnimation::goToFrame(int frame)
 {
   auto& keys = _animation->getKeys();
 
-  int _frame = frame;
+  float _frame = frame;
   if (_frame < keys[0].frame) {
     _frame = keys[0].frame;
   }
@@ -208,8 +216,8 @@ void RuntimeAnimation::_prepareForSpeedRatioChange(float newSpeedRatio)
   _ratioOffset = _previousRatio - newRatio;
 }
 
-bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
-                               float speedRatio, float iWeight)
+bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
+                               bool loop, float speedRatio, float iWeight)
 {
   const auto& targetPropertyPath = _animation->targetPropertyPath;
   if (targetPropertyPath.empty()) {
@@ -217,19 +225,17 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
     return false;
   }
 
+  auto returnValue = true;
+
   auto& keys = _animation->getKeys();
 
-  // Return immediately if there is only one key frame.
-  if (keys.size() == 1) {
-    setValue(keys[0].value, iWeight);
-    return !loop;
-  }
-
-  bool returnValue = true;
-
   // Adding a start key at frame 0 if missing
-  if (keys[0].frame != 0) {
+  if (keys[0].frame > 0.f) {
     keys.insert(keys.begin(), IAnimationKey(0, keys[0].value));
+  }
+  // Adding a duplicate key when there is only one key at frame zero
+  else if (keys.size() == 1) {
+    keys.emplace_back(IAnimationKey(0.001f, keys[0].value));
   }
 
   // Check limits
@@ -241,7 +247,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   }
 
   // to and from cannot be the same key
-  if (from == to) {
+  if (stl_util::almost_equal(from, to)) {
     if (from > keys[0].frame) {
       from--;
     }
@@ -347,9 +353,8 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   }
 
   // Compute value
-  auto repeatCount = static_cast<int>(ratio / range);
-  auto _currentFrame
-    = returnValue ? from + static_cast<int>(ratio) % range : to;
+  auto repeatCount   = static_cast<int>(ratio / range);
+  auto _currentFrame = returnValue ? from + ::std::fmod(ratio, range) : to;
 
   // Need to normalize?
   if (_host && _host->syncRoot) {
@@ -373,7 +378,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
   }
 
   auto currentValue
-    = _interpolate(_currentFrame, repeatCount, _getCorrectLoopMode(),
+    = _interpolate(_currentFrame, repeatCount, *_getCorrectLoopMode(),
                    offsetValue, highLimitValue);
 
   // Set value
@@ -396,7 +401,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, int from, int to, bool loop,
           --index;
         }
         event.isDone = true;
-        event.action();
+        event.action(currentFrame);
       } // Don't do anything if the event has already be done.
     }
   }

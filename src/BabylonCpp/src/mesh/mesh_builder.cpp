@@ -18,8 +18,8 @@
 
 namespace BABYLON {
 
-Mesh* MeshBuilder::CreateBox(const string_t& name, BoxOptions& options,
-                             Scene* scene)
+MeshPtr MeshBuilder::CreateBox(const string_t& name, BoxOptions& options,
+                               Scene* scene)
 {
   auto box = Mesh::New(name, scene);
 
@@ -29,13 +29,13 @@ Mesh* MeshBuilder::CreateBox(const string_t& name, BoxOptions& options,
 
   auto vertexData = VertexData::CreateBox(options);
 
-  vertexData->applyToMesh(box, options.updatable);
+  vertexData->applyToMesh(*box, options.updatable);
 
   return box;
 }
 
-Mesh* MeshBuilder::CreateSphere(const string_t& name, SphereOptions& options,
-                                Scene* scene)
+MeshPtr MeshBuilder::CreateSphere(const string_t& name, SphereOptions& options,
+                                  Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
 
@@ -45,13 +45,13 @@ Mesh* MeshBuilder::CreateSphere(const string_t& name, SphereOptions& options,
 
   auto vertexData = VertexData::CreateSphere(options);
 
-  vertexData->applyToMesh(sphere, options.updatable);
+  vertexData->applyToMesh(*sphere, options.updatable);
 
   return sphere;
 }
 
-Mesh* MeshBuilder::CreateDisc(const string_t& name, DiscOptions& options,
-                              Scene* scene)
+MeshPtr MeshBuilder::CreateDisc(const string_t& name, DiscOptions& options,
+                                Scene* scene)
 {
   auto disc = Mesh::New(name, scene);
 
@@ -61,13 +61,13 @@ Mesh* MeshBuilder::CreateDisc(const string_t& name, DiscOptions& options,
 
   auto vertexData = VertexData::CreateDisc(options);
 
-  vertexData->applyToMesh(disc, options.updatable);
+  vertexData->applyToMesh(*disc, options.updatable);
 
   return disc;
 }
 
-Mesh* MeshBuilder::CreateIcoSphere(const string_t& name,
-                                   IcoSphereOptions& options, Scene* scene)
+MeshPtr MeshBuilder::CreateIcoSphere(const string_t& name,
+                                     IcoSphereOptions& options, Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
 
@@ -77,13 +77,13 @@ Mesh* MeshBuilder::CreateIcoSphere(const string_t& name,
 
   auto vertexData = VertexData::CreateIcoSphere(options);
 
-  vertexData->applyToMesh(sphere, options.updatable);
+  vertexData->applyToMesh(*sphere, options.updatable);
 
   return sphere;
 }
 
-Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
-                                Scene* scene)
+MeshPtr MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
+                                  Scene* scene)
 
 {
   const auto& pathArray  = options.pathArray();
@@ -232,14 +232,14 @@ Mesh* MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
     ribbon->_closePath  = closePath;
     ribbon->_closeArray = closeArray;
 
-    vertexData->applyToMesh(ribbon, updatable);
+    vertexData->applyToMesh(*ribbon, updatable);
 
     return ribbon;
   }
 }
 
-Mesh* MeshBuilder::CreateCylinder(const string_t& name,
-                                  CylinderOptions& options, Scene* scene)
+MeshPtr MeshBuilder::CreateCylinder(const string_t& name,
+                                    CylinderOptions& options, Scene* scene)
 {
   auto cylinder = Mesh::New(name, scene);
 
@@ -249,13 +249,13 @@ Mesh* MeshBuilder::CreateCylinder(const string_t& name,
 
   auto vertexData = VertexData::CreateCylinder(options);
 
-  vertexData->applyToMesh(cylinder, options.updatable);
+  vertexData->applyToMesh(*cylinder, options.updatable);
 
   return cylinder;
 }
 
-Mesh* MeshBuilder::CreateTorus(const string_t& name, TorusOptions& options,
-                               Scene* scene)
+MeshPtr MeshBuilder::CreateTorus(const string_t& name, TorusOptions& options,
+                                 Scene* scene)
 {
   auto torus = Mesh::New(name, scene);
 
@@ -265,13 +265,13 @@ Mesh* MeshBuilder::CreateTorus(const string_t& name, TorusOptions& options,
 
   auto vertexData = VertexData::CreateTorus(options);
 
-  vertexData->applyToMesh(torus, options.updatable);
+  vertexData->applyToMesh(*torus, options.updatable);
 
   return torus;
 }
 
-Mesh* MeshBuilder::CreateTorusKnot(const string_t& name,
-                                   TorusKnotOptions& options, Scene* scene)
+MeshPtr MeshBuilder::CreateTorusKnot(const string_t& name,
+                                     TorusKnotOptions& options, Scene* scene)
 {
   auto torusKnot = Mesh::New(name, scene);
 
@@ -281,14 +281,14 @@ Mesh* MeshBuilder::CreateTorusKnot(const string_t& name,
 
   auto vertexData = VertexData::CreateTorusKnot(options);
 
-  vertexData->applyToMesh(torusKnot, options.updatable);
+  vertexData->applyToMesh(*torusKnot, options.updatable);
 
   return torusKnot;
 }
 
-LinesMesh* MeshBuilder::CreateLineSystem(const string_t& name,
-                                         LineSystemOptions& options,
-                                         Scene* scene)
+LinesMeshPtr MeshBuilder::CreateLineSystem(const string_t& name,
+                                           LineSystemOptions& options,
+                                           Scene* scene)
 {
   const auto& instance = options.instance;
   const auto& lines    = options.lines;
@@ -334,20 +334,20 @@ LinesMesh* MeshBuilder::CreateLineSystem(const string_t& name,
   auto lineSystem     = LinesMesh::New(name, scene, nullptr, nullptr, true,
                                    useVertexColor, options.useVertexAlpha);
   auto vertexData     = VertexData::CreateLineSystem(options);
-  vertexData->applyToMesh(lineSystem, options.updatable);
+  vertexData->applyToMesh(*lineSystem, options.updatable);
   return lineSystem;
 }
 
-LinesMesh* MeshBuilder::CreateLines(const string_t& name, LinesOptions& options,
-                                    Scene* scene)
+LinesMeshPtr MeshBuilder::CreateLines(const string_t& name,
+                                      LinesOptions& options, Scene* scene)
 {
   LineSystemOptions lineSystemOptions(options);
   return MeshBuilder::CreateLineSystem(name, lineSystemOptions, scene);
 }
 
-LinesMesh* MeshBuilder::CreateDashedLines(const string_t& name,
-                                          DashedLinesOptions& options,
-                                          Scene* scene)
+LinesMeshPtr MeshBuilder::CreateDashedLines(const string_t& name,
+                                            DashedLinesOptions& options,
+                                            Scene* scene)
 {
   const auto& points   = options.points;
   const auto& instance = options.instance;
@@ -403,14 +403,14 @@ LinesMesh* MeshBuilder::CreateDashedLines(const string_t& name,
   // dashed lines creation
   auto dashedLines = LinesMesh::New(name, scene);
   auto vertexData  = VertexData::CreateDashedLines(options);
-  vertexData->applyToMesh(dashedLines, options.updatable);
+  vertexData->applyToMesh(*dashedLines, options.updatable);
   dashedLines->dashSize = dashSize;
   dashedLines->gapSize  = gapSize;
   return dashedLines;
 }
 
-Mesh* MeshBuilder::ExtrudeShape(const string_t& name,
-                                ExtrudeShapeOptions& options, Scene* scene)
+MeshPtr MeshBuilder::ExtrudeShape(const string_t& name,
+                                  ExtrudeShapeOptions& options, Scene* scene)
 {
   options.sideOrientation
     = MeshBuilder::updateSideOrientation(options.sideOrientation);
@@ -422,9 +422,9 @@ Mesh* MeshBuilder::ExtrudeShape(const string_t& name,
     options.frontUVs, options.backUVs);
 }
 
-Mesh* MeshBuilder::ExtrudeShapeCustom(const string_t& name,
-                                      ExtrudeShapeCustomOptions& options,
-                                      Scene* scene)
+MeshPtr MeshBuilder::ExtrudeShapeCustom(const string_t& name,
+                                        ExtrudeShapeCustomOptions& options,
+                                        Scene* scene)
 {
   options.sideOrientation
     = MeshBuilder::updateSideOrientation(options.sideOrientation);
@@ -436,8 +436,8 @@ Mesh* MeshBuilder::ExtrudeShapeCustom(const string_t& name,
     options.instance, options.invertUV, options.frontUVs, options.backUVs);
 }
 
-Mesh* MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
-                               Scene* scene)
+MeshPtr MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
+                                 Scene* scene)
 {
   const auto arc          = options.arc();
   const auto& closed      = options.closed;
@@ -489,8 +489,8 @@ Mesh* MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
   return lathe;
 }
 
-Mesh* MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
-                               Scene* scene)
+MeshPtr MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
+                                 Scene* scene)
 {
   auto plane = Mesh::New(name, scene);
 
@@ -500,7 +500,7 @@ Mesh* MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
 
   auto vertexData = VertexData::CreatePlane(options);
 
-  vertexData->applyToMesh(plane, options.updatable);
+  vertexData->applyToMesh(*plane, options.updatable);
 
   if (options.sourcePlane) {
     plane->translate(options.sourcePlane->normal, options.sourcePlane->d);
@@ -515,8 +515,8 @@ Mesh* MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
   return plane;
 }
 
-Mesh* MeshBuilder::CreateGround(const string_t& name, GroundOptions& options,
-                                Scene* scene)
+MeshPtr MeshBuilder::CreateGround(const string_t& name, GroundOptions& options,
+                                  Scene* scene)
 {
   auto ground = GroundMesh::New(name, scene);
   ground->_setReady(false);
@@ -531,26 +531,27 @@ Mesh* MeshBuilder::CreateGround(const string_t& name, GroundOptions& options,
 
   auto vertexData = VertexData::CreateGround(options);
 
-  vertexData->applyToMesh(ground, options.updatable);
+  vertexData->applyToMesh(*ground, options.updatable);
 
   ground->_setReady(true);
 
   return ground;
 }
 
-Mesh* MeshBuilder::CreateTiledGround(const string_t& name,
-                                     TiledGroundOptions& options, Scene* scene)
+MeshPtr MeshBuilder::CreateTiledGround(const string_t& name,
+                                       TiledGroundOptions& options,
+                                       Scene* scene)
 {
   auto tiledGround = Mesh::New(name, scene);
 
   auto vertexData = VertexData::CreateTiledGround(options);
 
-  vertexData->applyToMesh(tiledGround, options.updatable);
+  vertexData->applyToMesh(*tiledGround, options.updatable);
 
   return tiledGround;
 }
 
-GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
+GroundMeshPtr MeshBuilder::CreateGroundFromHeightMap(
   const string_t& name, const string_t& url,
   GroundFromHeightMapOptions& options, Scene* scene)
 {
@@ -581,11 +582,11 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
 
     auto vertexData = VertexData::CreateGroundFromHeightMap(options);
 
-    vertexData->applyToMesh(ground, options.updatable);
+    vertexData->applyToMesh(*ground, options.updatable);
 
     // execute ready callback, if set
     if (options.onReady) {
-      options.onReady(ground);
+      options.onReady(ground.get());
     }
 
     ground->_setReady(true);
@@ -599,8 +600,8 @@ GroundMesh* MeshBuilder::CreateGroundFromHeightMap(
   return ground;
 }
 
-Mesh* MeshBuilder::CreatePolygon(const string_t& name, PolygonOptions& options,
-                                 Scene* scene)
+MeshPtr MeshBuilder::CreatePolygon(const string_t& name,
+                                   PolygonOptions& options, Scene* scene)
 {
   options.sideOrientation
     = MeshBuilder::updateSideOrientation(options.sideOrientation);
@@ -628,21 +629,21 @@ Mesh* MeshBuilder::CreatePolygon(const string_t& name, PolygonOptions& options,
   auto polygon = polygonTriangulation.build(options.updatable, depth);
   polygon->_originalBuilderSideOrientation = options.sideOrientation;
   auto vertexData                          = VertexData::CreatePolygon(
-    polygon, options.sideOrientation, options.faceUV, options.faceColors,
+    polygon.get(), options.sideOrientation, options.faceUV, options.faceColors,
     options.frontUVs, options.backUVs);
-  vertexData->applyToMesh(polygon, options.updatable);
+  vertexData->applyToMesh(*polygon, options.updatable);
 
   return polygon;
 }
 
-Mesh* MeshBuilder::ExtrudePolygon(const string_t& name, PolygonOptions& options,
-                                  Scene* scene)
+MeshPtr MeshBuilder::ExtrudePolygon(const string_t& name,
+                                    PolygonOptions& options, Scene* scene)
 {
   return MeshBuilder::CreatePolygon(name, options, scene);
 }
 
-Mesh* MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
-                              Scene* scene)
+MeshPtr MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
+                                Scene* scene)
 {
   const auto& path           = options.path;
   const auto& radius         = options.radius;
@@ -766,8 +767,8 @@ Mesh* MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
   return tube;
 }
 
-Mesh* MeshBuilder::CreatePolyhedron(const string_t& name,
-                                    PolyhedronOptions& options, Scene* scene)
+MeshPtr MeshBuilder::CreatePolyhedron(const string_t& name,
+                                      PolyhedronOptions& options, Scene* scene)
 {
   auto polyhedron = Mesh::New(name, scene);
 
@@ -777,13 +778,13 @@ Mesh* MeshBuilder::CreatePolyhedron(const string_t& name,
 
   auto vertexData = VertexData::CreatePolyhedron(options);
 
-  vertexData->applyToMesh(polyhedron, options.updatable);
+  vertexData->applyToMesh(*polyhedron, options.updatable);
 
   return polyhedron;
 }
 
-Mesh* MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
-                               DecalOptions& options)
+MeshPtr MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
+                                 DecalOptions& options)
 {
   const auto indices = sourceMesh->getIndices();
   const auto positions
@@ -1007,7 +1008,7 @@ Mesh* MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
 
   // Return mesh
   auto decal = Mesh::New(name, sourceMesh->getScene());
-  vertexData->applyToMesh(decal);
+  vertexData->applyToMesh(*decal);
 
   // decal->setPosition(position.clone());
   decal->rotation = Vector3(pitch, yaw, angle);
@@ -1015,13 +1016,13 @@ Mesh* MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
   return decal;
 }
 
-Mesh* MeshBuilder::_ExtrudeShapeGeneric(
+MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
   const string_t& name, const vector_t<Vector3>& shape,
   const vector_t<Vector3>& curve, float scale, float rotation,
   const ::std::function<float(float i, float distance)>& scaleFunction,
   const ::std::function<float(float i, float distance)>& rotateFunction,
   bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
-  bool updtbl, unsigned int side, Mesh* instance, bool invertUV,
+  bool updtbl, unsigned int side, MeshPtr instance, bool invertUV,
   Vector4& frontUVs, Vector4& backUVs)
 {
   // extrusion geometry

@@ -141,9 +141,9 @@ public:
    * @brief Gets the list of animatables currently running for this skeleton.
    * @returns an array of animatables
    */
-  vector_t<IAnimatable*> getAnimatables();
+  vector_t<IAnimatablePtr> getAnimatables();
 
-  vector_t<Animation*> getAnimations() override;
+  vector_t<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Clone the current skeleton.
@@ -213,7 +213,7 @@ protected:
   set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
 
 private:
-  int _getHighestAnimationFrame();
+  float _getHighestAnimationFrame();
   void _sortBones(unsigned int index, vector_t<Bone*>& bones,
                   vector_t<bool>& visited);
 
@@ -221,7 +221,7 @@ public:
   /**
    * Gets the list of child bones
    */
-  vector_t<unique_ptr_t<Bone>> bones;
+  vector_t<BonePtr> bones;
 
   /**
    * Gets an estimate of the dimension of the skeleton at rest
@@ -259,7 +259,7 @@ private:
   bool _isDirty;
   Float32Array _transformMatrices;
   vector_t<AbstractMesh*> _meshesWithPoseMatrix;
-  vector_t<IAnimatable*> _animatables;
+  vector_t<IAnimatablePtr> _animatables;
   Matrix _identity;
   AbstractMesh* _synchronizedWithMesh;
   unordered_map_t<string_t, AnimationRange> _ranges;

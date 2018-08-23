@@ -53,10 +53,10 @@ public:
    * pipeline will be attached to
    */
   SSAORenderingPipeline(const string_t& name, Scene* scene, float ratio,
-                        const vector_t<Camera*>& cameras);
+                        const vector_t<CameraPtr>& cameras);
   SSAORenderingPipeline(const string_t& name, Scene* scene,
                         const SSARatio& ratio,
-                        const vector_t<Camera*>& cameras);
+                        const vector_t<CameraPtr>& cameras);
   virtual ~SSAORenderingPipeline() override;
 
   /** Methods */
@@ -109,8 +109,8 @@ public:
 
 private:
   Scene* _scene;
-  RenderTargetTexture* _depthTexture;
-  DynamicTexture* _randomTexture;
+  RenderTargetTexturePtr _depthTexture;
+  DynamicTexturePtr _randomTexture;
 
   PassPostProcess* _originalColorPostProcess;
   PostProcess* _ssaoPostProcess;

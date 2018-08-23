@@ -40,25 +40,25 @@ public:
    * @brief Attaches the effect on cameras.
    * @param cameras The camera to attach to.
    */
-  void _attachCameras(const vector_t<Camera*>& cameras);
+  void _attachCameras(const vector_t<CameraPtr>& cameras);
 
   /**
    * @brief Detatches the effect on cameras.
    * @param cameras The camera to detatch from.
    */
-  void _detachCameras(const vector_t<Camera*>& cameras);
+  void _detachCameras(const vector_t<CameraPtr>& cameras);
 
   /**
    * @brief Enables the effect on given cameras.
    * @param cameras The camera to enable.
    */
-  void _enable(const vector_t<Camera*> cameras);
+  void _enable(const vector_t<CameraPtr>& cameras);
 
   /**
    * @brief Disables the effect on the given cameras.
    * @param cameras The camera to disable.
    */
-  void _disable(vector_t<Camera*> cameras);
+  void _disable(const vector_t<CameraPtr>& cameras);
 
   /**
    * @brief Gets a list of the post processes contained in the effect.
@@ -90,7 +90,7 @@ private:
   unordered_map_t<string_t, vector_t<PostProcess*>> _postProcesses;
   ::std::function<vector_t<PostProcess*>()> _getPostProcesses;
   bool _singleInstance;
-  unordered_map_t<string_t, Camera*> _cameras;
+  unordered_map_t<string_t, CameraPtr> _cameras;
   unordered_map_t<string_t, IndicesArray> _indicesForCamera;
 
 }; // end of class PostProcessRenderEffect

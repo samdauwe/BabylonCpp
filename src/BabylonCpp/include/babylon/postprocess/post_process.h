@@ -52,7 +52,7 @@ public:
   PostProcess(
     const string_t& name, const string_t& fragmentUrl,
     const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
-    const Variant<float, PostProcessOptions>& options, Camera* camera,
+    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
     unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
     const string_t& defines   = "",
@@ -107,7 +107,7 @@ public:
    * @brief Gets the camera which post process is applied to.
    * @returns The camera the post process is applied to.
    */
-  Camera* getCamera();
+  CameraPtr& getCamera();
 
   /**
    * @brief Gets the texel size of the postprocess.
@@ -192,7 +192,7 @@ public:
    * generated. (default: false)
    * @returns The target texture that was bound to be written to.
    */
-  InternalTexture* activate(Camera* camera,
+  InternalTexture* activate(const CameraPtr& camera,
                             InternalTexture* sourceTexture = nullptr,
                             bool forceDepthStencil         = false);
 
@@ -367,7 +367,7 @@ protected:
   unordered_map_t<string_t, unsigned int> _indexParameters;
 
 private:
-  Camera* _camera;
+  CameraPtr _camera;
   Scene* _scene;
   Engine* _engine;
   float _renderRatio;

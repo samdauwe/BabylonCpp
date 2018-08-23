@@ -233,8 +233,8 @@ unique_ptr_t<MirrorTexture> MirrorTexture::clone()
 
   // Mirror Texture
   newTexture->mirrorPlane = mirrorPlane;
-  if (!renderList.empty()) {
-    newTexture->renderList = renderList;
+  if (!renderList().empty()) {
+    newTexture->renderList = renderList();
   }
 
   return newTexture;

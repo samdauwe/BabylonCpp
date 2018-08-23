@@ -10,7 +10,7 @@
 namespace BABYLON {
 
 ImageProcessingPostProcess::ImageProcessingPostProcess(
-  const string_t& iName, float renderRatio, Camera* camera,
+  const string_t& iName, float renderRatio, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType,
   ImageProcessingConfiguration* imageProcessingConfiguration)
@@ -188,13 +188,13 @@ void ImageProcessingPostProcess::set_colorCurvesEnabled(bool value)
   _imageProcessingConfiguration->colorCurvesEnabled = value;
 }
 
-BaseTexture*& ImageProcessingPostProcess::get_colorGradingTexture()
+BaseTexturePtr& ImageProcessingPostProcess::get_colorGradingTexture()
 {
   return _imageProcessingConfiguration->colorGradingTexture;
 }
 
 void ImageProcessingPostProcess::set_colorGradingTexture(
-  BaseTexture* const& value)
+  const BaseTexturePtr& value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
 }

@@ -44,17 +44,17 @@ public:
   /**
    * @brief Returns the mesh of the current submesh.
    */
-  AbstractMesh* getMesh();
+  AbstractMeshPtr& getMesh();
 
   /**
    * @brief Returns the rendering mesh of the submesh.
    */
-  Mesh* getRenderingMesh();
+  MeshPtr& getRenderingMesh();
 
   /**
    * @brief Returns the submesh material.
    */
-  Material* getMaterial();
+  MaterialPtr getMaterial();
 
   /** Methods **/
 
@@ -118,8 +118,8 @@ public:
   /**
    * @brief Creates a new Submesh from the passed Mesh.
    */
-  shared_ptr_t<SubMesh> clone(AbstractMesh* newMesh,
-                              Mesh* newRenderingMesh) const;
+  SubMeshPtr clone(const AbstractMeshPtr& newMesh,
+                   Mesh* newRenderingMesh) const;
 
   /** Dispose **/
 
@@ -130,11 +130,12 @@ public:
 
   /** Statics **/
 
-  static shared_ptr_t<SubMesh>
-  AddToMesh(unsigned int materialIndex, unsigned int verticesStart,
-            size_t verticesCount, unsigned int indexStart, size_t indexCount,
-            AbstractMesh* mesh, Mesh* renderingMesh = nullptr,
-            bool createBoundingBox = true);
+  static SubMeshPtr AddToMesh(unsigned int materialIndex,
+                              unsigned int verticesStart, size_t verticesCount,
+                              unsigned int indexStart, size_t indexCount,
+                              const AbstractMeshPtr& mesh,
+                              Mesh* renderingMesh    = nullptr,
+                              bool createBoundingBox = true);
 
   /**
    * @brief Creates a new Submesh from the passed parameters.
@@ -147,16 +148,16 @@ public:
    * @param renderingMesh (optional Mesh) : rendering mesh.
    * @return The created SubMesh object.
    */
-  static shared_ptr_t<SubMesh> CreateFromIndices(unsigned int materialIndex,
-                                                 unsigned int startIndex,
-                                                 size_t indexCount,
-                                                 AbstractMesh* mesh,
-                                                 Mesh* renderingMesh = nullptr);
+  static SubMeshPtr CreateFromIndices(unsigned int materialIndex,
+                                      unsigned int startIndex,
+                                      size_t indexCount,
+                                      const AbstractMeshPtr& mesh,
+                                      Mesh* renderingMesh = nullptr);
 
 protected:
   SubMesh(unsigned int materialIndex, unsigned int verticesStart,
           size_t verticesCount, unsigned int indexStart, size_t indexCount,
-          AbstractMesh* mesh, Mesh* renderingMesh = nullptr,
+          const AbstractMeshPtr& mesh, Mesh* renderingMesh = nullptr,
           bool createBoundingBox = true);
 
 public:
@@ -176,11 +177,11 @@ public:
   size_t _id;
 
 private:
-  AbstractMesh* _mesh;
-  Mesh* _renderingMesh;
+  AbstractMeshPtr _mesh;
+  MeshPtr _renderingMesh;
   unique_ptr_t<BoundingInfo> _boundingInfo;
   unique_ptr_t<GL::IGLBuffer> _linesIndexBuffer;
-  Material* _currentMaterial;
+  MaterialPtr _currentMaterial;
 
 }; // end of class SubMesh
 

@@ -31,7 +31,7 @@ unsigned int StandardRenderingPipeline::LuminanceSteps = 6;
 
 StandardRenderingPipeline::StandardRenderingPipeline(
   const string_t& iName, Scene* scene, float ratio,
-  PostProcess* iOriginalPostProcess, const vector_t<Camera*>& cameras)
+  PostProcess* iOriginalPostProcess, const vector_t<CameraPtr>& cameras)
     : PostProcessRenderPipeline{scene->getEngine(), iName}
     , originalPostProcess{iOriginalPostProcess}
     , downSampleX4PostProcess{nullptr}
@@ -574,34 +574,36 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
       + ::std::to_string(::std::round(_volumetricLightStepsCount * 10.f)
                          / 10.f));
 
-  volumetricLightPostProcess->setOnApply([&](Effect* effect,
-                                             EventState& /*es*/) {
-    if (sourceLight && sourceLight->getShadowGenerator()
-        && _scene->activeCamera) {
-      auto depthValues = Vector2::Zero();
-      auto generator   = sourceLight->getShadowGenerator();
+  volumetricLightPostProcess->setOnApply(
+    [&](Effect* effect, EventState& /*es*/) {
+      if (sourceLight && sourceLight->getShadowGenerator()
+          && _scene->activeCamera) {
+        auto depthValues = Vector2::Zero();
+        auto generator   = sourceLight->getShadowGenerator();
 
-      effect->setTexture("shadowMapSampler", generator->getShadowMap());
-      effect->setTexture("positionSampler", geometry->textures()[2]);
+        effect->setTexture("shadowMapSampler", generator->getShadowMap());
+        effect->setTexture("positionSampler", geometry->textures()[2]);
 
-      effect->setColor3("sunColor", sourceLight->diffuse);
-      effect->setVector3(
-        "sunDirection",
-        static_cast<IShadowLight*>(sourceLight)->getShadowDirection());
+        effect->setColor3("sunColor", sourceLight->diffuse);
+        effect->setVector3(
+          "sunDirection",
+          static_cast<IShadowLight*>(sourceLight)->getShadowDirection());
 
-      effect->setVector3("cameraPosition",
-                         scene->activeCamera->globalPosition());
-      effect->setMatrix("shadowViewProjection",
-                        generator->getTransformMatrix());
+        effect->setVector3("cameraPosition",
+                           scene->activeCamera->globalPosition());
+        effect->setMatrix("shadowViewProjection",
+                          generator->getTransformMatrix());
 
-      effect->setFloat("scatteringCoefficient", volumetricLightCoefficient);
-      effect->setFloat("scatteringPower", volumetricLightPower);
+        effect->setFloat("scatteringCoefficient", volumetricLightCoefficient);
+        effect->setFloat("scatteringPower", volumetricLightPower);
 
-      depthValues.x = generator->getLight()->getDepthMinZ(_scene->activeCamera);
-      depthValues.y = generator->getLight()->getDepthMaxZ(_scene->activeCamera);
-      effect->setVector2("depthValues", depthValues);
-    }
-  });
+        depthValues.x
+          = generator->getLight()->getDepthMinZ(*_scene->activeCamera);
+        depthValues.y
+          = generator->getLight()->getDepthMaxZ(*_scene->activeCamera);
+        effect->setVector2("depthValues", depthValues);
+      }
+    });
 
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRVLS",
@@ -953,7 +955,7 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
     [&]() -> vector_t<PostProcess*> { return {motionBlurPostProcess}; }, true));
 }
 
-Texture* StandardRenderingPipeline::_getDepthTexture()
+TexturePtr StandardRenderingPipeline::_getDepthTexture()
 {
   if (_scene->getEngine()->getCaps().drawBuffersExtension) {
     auto renderer = _scene->enableGeometryBufferRenderer();
@@ -966,7 +968,7 @@ Texture* StandardRenderingPipeline::_getDepthTexture()
 void StandardRenderingPipeline::_disposePostProcesses()
 {
   for (auto& item : _cameras) {
-    auto camera = item.second;
+    auto camera = item.second.get();
 
     if (originalPostProcess) {
       originalPostProcess->dispose(camera);

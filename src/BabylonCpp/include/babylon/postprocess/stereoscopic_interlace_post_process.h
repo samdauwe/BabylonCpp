@@ -15,15 +15,11 @@ class BABYLON_SHARED_EXPORT StereoscopicInterlacePostProcess
 
 public:
   StereoscopicInterlacePostProcess(const string_t& name,
-                                   vector_t<Camera*> rigCameras,
+                                   const vector_t<CameraPtr>& rigCameras,
                                    bool isStereoscopicHoriz,
                                    unsigned int samplingMode, Engine* engine,
                                    bool reusable = false);
   virtual ~StereoscopicInterlacePostProcess();
-
-public:
-  int width;
-  int height;
 
 private:
   Vector2 _stepSize;

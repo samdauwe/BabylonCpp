@@ -34,9 +34,9 @@ bool PostProcessRenderPipeline::isSupported() const
   return true;
 }
 
-vector_t<Camera*> PostProcessRenderPipeline::getCameras() const
+vector_t<CameraPtr> PostProcessRenderPipeline::getCameras() const
 {
-  vector_t<Camera*> cameras;
+  vector_t<CameraPtr> cameras;
   cameras.reserve(_cameras.size());
   for (auto& item : _cameras) {
     cameras.emplace_back(item.second);
@@ -53,8 +53,8 @@ void PostProcessRenderPipeline::_rebuild()
 {
 }
 
-void PostProcessRenderPipeline::_enableEffect(const string_t& renderEffectName,
-                                              const vector_t<Camera*>& cameras)
+void PostProcessRenderPipeline::_enableEffect(
+  const string_t& renderEffectName, const vector_t<CameraPtr>& cameras)
 {
   auto& renderEffects = _renderEffects[renderEffectName];
 
@@ -66,8 +66,8 @@ void PostProcessRenderPipeline::_enableEffect(const string_t& renderEffectName,
   renderEffects->_enable(_cam);
 }
 
-void PostProcessRenderPipeline::_disableEffect(const string_t& renderEffectName,
-                                               const vector_t<Camera*>& cameras)
+void PostProcessRenderPipeline::_disableEffect(
+  const string_t& renderEffectName, const vector_t<CameraPtr>& cameras)
 {
   if (!stl_util::contains(_renderEffects, renderEffectName)) {
     return;
@@ -77,8 +77,8 @@ void PostProcessRenderPipeline::_disableEffect(const string_t& renderEffectName,
   _renderEffects[renderEffectName]->_disable(_cam);
 }
 
-void PostProcessRenderPipeline::_attachCameras(const vector_t<Camera*>& cameras,
-                                               bool unique)
+void PostProcessRenderPipeline::_attachCameras(
+  const vector_t<CameraPtr>& cameras, bool unique)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -86,7 +86,7 @@ void PostProcessRenderPipeline::_attachCameras(const vector_t<Camera*>& cameras,
     return;
   }
 
-  vector_t<Camera*> camerasToDelete;
+  vector_t<CameraPtr> camerasToDelete;
   for (auto& camera : cams) {
     const auto& cameraName = camera->name;
 
@@ -109,7 +109,8 @@ void PostProcessRenderPipeline::_attachCameras(const vector_t<Camera*>& cameras,
   }
 }
 
-void PostProcessRenderPipeline::_detachCameras(const vector_t<Camera*>& cameras)
+void PostProcessRenderPipeline::_detachCameras(
+  const vector_t<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 

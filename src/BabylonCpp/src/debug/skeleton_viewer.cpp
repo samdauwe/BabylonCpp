@@ -14,7 +14,7 @@ namespace Debug {
 
 SkeletonViewer::SkeletonViewer(Skeleton* iSkeleton, AbstractMesh* iMesh,
                                Scene* iScene, bool iAutoUpdateBonesMatrices,
-                               unsigned int iRenderingGroupId)
+                               int iRenderingGroupId)
     : color{Color3::White()}
     , skeleton{iSkeleton}
     , mesh{iMesh}
@@ -55,13 +55,13 @@ bool SkeletonViewer::get_isEnabled() const
   return _isEnabled;
 }
 
-void SkeletonViewer::_getBonePosition(Vector3& position, Bone* bone,
+void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone,
                                       const Matrix& meshMat, float x, float y,
                                       float z) const
 {
-  auto& tmat      = Tmp::MatrixArray[0];
-  auto parentBone = bone->getParent();
-  tmat.copyFrom(bone->getLocalMatrix());
+  auto& tmat            = Tmp::MatrixArray[0];
+  const auto parentBone = bone.getParent();
+  tmat.copyFrom(bone.getLocalMatrix());
 
   if (!stl_util::almost_equal(x, 0.f) || !stl_util::almost_equal(y, 0.f)
       || !stl_util::almost_equal(z, 0.f)) {
@@ -84,8 +84,8 @@ void SkeletonViewer::_getBonePosition(Vector3& position, Bone* bone,
   position.z = tmat.m[14];
 }
 
-void SkeletonViewer::_getLinesForBonesWithLength(
-  const vector_t<unique_ptr_t<Bone>>& bones, const Matrix& meshMat)
+void SkeletonViewer::_getLinesForBonesWithLength(const vector_t<BonePtr>& bones,
+                                                 const Matrix& meshMat)
 {
   _resizeDebugLines(bones.size());
 
@@ -93,8 +93,8 @@ void SkeletonViewer::_getLinesForBonesWithLength(
   unsigned int i = 0;
   for (auto& bone : bones) {
     auto& points = _debugLines[i];
-    _getBonePosition(points[0], bone.get(), meshMat);
-    _getBonePosition(points[1], bone.get(), meshMat, 0.f,
+    _getBonePosition(points[0], *bone, meshMat);
+    _getBonePosition(points[1], *bone, meshMat, 0.f,
                      static_cast<float>(bones.size()), 0.f);
     points[0].subtractInPlace(meshPos);
     points[1].subtractInPlace(meshPos);
@@ -102,8 +102,8 @@ void SkeletonViewer::_getLinesForBonesWithLength(
   }
 }
 
-void SkeletonViewer::_getLinesForBonesNoLength(
-  const vector_t<unique_ptr_t<Bone>>& bones, const Matrix& /*meshMat*/)
+void SkeletonViewer::_getLinesForBonesNoLength(const vector_t<BonePtr>& bones,
+                                               const Matrix& /*meshMat*/)
 {
   _resizeDebugLines(bones.size());
 

@@ -8,11 +8,13 @@
 
 namespace BABYLON {
 
-Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
-                       int iToFrame, bool iLoopAnimation, float iSpeedRatio,
+Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget,
+                       int iFromFrame, int iToFrame, bool iLoopAnimation,
+                       float iSpeedRatio,
                        const ::std::function<void()>& iOnAnimationEnd,
-                       const vector_t<Animation*>& animations)
+                       const vector_t<AnimationPtr>& animations)
     : target{iTarget}
+    , disposeOnEnd{true}
     , animationStarted{false}
     , fromFrame{iFromFrame}
     , toFrame{iToFrame}
@@ -22,11 +24,10 @@ Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
     , masterFrame{this, &Animatable::get_masterFrame}
     , weight{this, &Animatable::get_weight, &Animatable::set_weight}
     , speedRatio{this, &Animatable::get_speedRatio, &Animatable::set_speedRatio}
-    , _localDelayOffset{nullptr}
-    , _pausedDelay{nullptr}
+    , _localDelayOffset{nullopt_t}
+    , _pausedDelay{nullopt_t}
     , _paused{false}
     , _scene{scene}
-    , _speedRatio{iSpeedRatio}
     , _weight{-1.f}
     , _syncRoot{nullptr}
 {
@@ -34,7 +35,8 @@ Animatable::Animatable(Scene* scene, IAnimatable* iTarget, int iFromFrame,
     appendAnimations(target, animations);
   }
 
-  scene->_activeAnimatables.emplace_back(this);
+  _speedRatio = iSpeedRatio;
+  scene->_activeAnimatables.emplace_back(shared_from_this());
 }
 
 Animatable::~Animatable()
@@ -46,10 +48,10 @@ Animatable*& Animatable::get_syncRoot()
   return _syncRoot;
 }
 
-int Animatable::get_masterFrame() const
+float Animatable::get_masterFrame() const
 {
   if (_runtimeAnimations.empty()) {
-    return 0;
+    return 0.f;
   }
 
   return _runtimeAnimations[0]->currentFrame;
@@ -91,48 +93,49 @@ Animatable& Animatable::syncWith(Animatable* root)
 
   if (root) {
     // Make sure this animatable will animate after the root
-    auto index = stl_util::index_of(_scene->_activeAnimatables, this);
+    auto index
+      = stl_util::index_of(_scene->_activeAnimatables, shared_from_this());
     if (index > -1) {
       stl_util::splice(_scene->_activeAnimatables, index, 1);
-      _scene->_activeAnimatables.emplace_back(this);
+      _scene->_activeAnimatables.emplace_back(shared_from_this());
     }
   }
 
   return *this;
 }
 
-vector_t<RuntimeAnimation*>& Animatable::getAnimations()
+vector_t<RuntimeAnimationPtr>& Animatable::getAnimations()
 {
   return _runtimeAnimations;
 }
 
-void Animatable::appendAnimations(IAnimatable* /*iTarget*/,
-                                  const vector_t<Animation*>& animations)
+void Animatable::appendAnimations(const IAnimatablePtr& iTarget,
+                                  const vector_t<AnimationPtr>& animations)
 {
   for (auto& animation : animations) {
     _runtimeAnimations.emplace_back(
-      new RuntimeAnimation(target, animation, _scene, this));
+      RuntimeAnimation::New(iTarget, animation, _scene, this));
   }
 }
 
-Animation*
+AnimationPtr
 Animatable::getAnimationByTargetProperty(const string_t& property) const
 {
   auto it = ::std::find_if(
     _runtimeAnimations.begin(), _runtimeAnimations.end(),
-    [&property](RuntimeAnimation* runtimeAnimation) {
+    [&property](const RuntimeAnimationPtr& runtimeAnimation) {
       return runtimeAnimation->animation()->targetProperty == property;
     });
 
   return (it == _runtimeAnimations.end()) ? nullptr : (*it)->animation();
 }
 
-RuntimeAnimation*
+RuntimeAnimationPtr
 Animatable::getRuntimeAnimationByTargetProperty(const string_t& property) const
 {
   auto it = ::std::find_if(
     _runtimeAnimations.begin(), _runtimeAnimations.end(),
-    [&property](RuntimeAnimation* runtimeAnimation) {
+    [&property](const RuntimeAnimationPtr& runtimeAnimation) {
       return runtimeAnimation->animation()->targetProperty == property;
     });
 
@@ -145,8 +148,8 @@ void Animatable::reset()
     runtimeAnimation->reset(true);
   }
 
-  _localDelayOffset = nullptr;
-  _pausedDelay      = nullptr;
+  _localDelayOffset = nullopt_t;
+  _pausedDelay      = nullopt_t;
 }
 
 void Animatable::enableBlending(float blendingSpeed)
@@ -172,7 +175,7 @@ void Animatable::goToFrame(int frame)
     auto adjustTime   = frame - currentFrame;
     auto delay        = static_cast<float>(adjustTime) * 1000.f
                  / (static_cast<float>(fps) * speedRatio);
-    if (_localDelayOffset == nullptr) {
+    if (_localDelayOffset == nullopt_t) {
       _localDelayOffset = millisecond_t(0);
     }
     _localDelayOffset = (*_localDelayOffset)
@@ -206,16 +209,24 @@ void Animatable::_raiseOnAnimationEnd()
   onAnimationEndObservable.notifyObservers(this);
 }
 
-void Animatable::stop(const string_t& animationName)
+void Animatable::stop(
+  const string_t& animationName,
+  const ::std::function<bool(IAnimatable* target)>& targetMask)
 {
-  if (!animationName.empty()) {
-    auto idx = stl_util::index_of(_scene->_activeAnimatables, this);
+  if (!animationName.empty() || targetMask) {
+    auto idx
+      = stl_util::index_of(_scene->_activeAnimatables, shared_from_this());
     if (idx > -1) {
       for (size_t index = _runtimeAnimations.size(); index-- > 0;) {
-        if (_runtimeAnimations[index]->animation()->name != animationName) {
+        const auto& runtimeAnimation = _runtimeAnimations[index];
+        if (runtimeAnimation->animation()->name != animationName) {
           continue;
         }
-        _runtimeAnimations[index]->dispose();
+        if (targetMask && !targetMask(runtimeAnimation->target)) {
+          continue;
+        }
+
+        runtimeAnimation->dispose();
         stl_util::splice(_runtimeAnimations, static_cast<int>(index), 1);
       }
       if (_runtimeAnimations.empty()) {
@@ -225,7 +236,8 @@ void Animatable::stop(const string_t& animationName)
     }
   }
   else {
-    auto index = stl_util::index_of(_scene->_activeAnimatables, this);
+    auto index
+      = stl_util::index_of(_scene->_activeAnimatables, shared_from_this());
     if (index > -1) {
       stl_util::splice(_scene->_activeAnimatables, index, 1);
       for (auto& runtimeAnimation : _runtimeAnimations) {
@@ -240,19 +252,19 @@ bool Animatable::_animate(const millisecond_t& delay)
 {
   if (_paused) {
     animationStarted = false;
-    if (_pausedDelay == nullptr) {
+    if (_pausedDelay == nullopt_t) {
       _pausedDelay = delay;
     }
     return true;
   }
 
-  if (_localDelayOffset == nullptr) {
+  if (_localDelayOffset == nullopt_t) {
     _localDelayOffset = delay;
-    _pausedDelay      = nullptr;
+    _pausedDelay      = nullopt_t;
   }
-  else if (_pausedDelay != nullptr) {
+  else if (_pausedDelay != nullopt_t) {
     _localDelayOffset = (*_localDelayOffset) + delay - (*_pausedDelay);
-    _pausedDelay      = nullptr;
+    _pausedDelay      = nullopt_t;
   }
 
   if (_weight == 0.f) { // We consider that an animation with a weight === 0 is
@@ -273,21 +285,25 @@ bool Animatable::_animate(const millisecond_t& delay)
   animationStarted = running;
 
   if (!running) {
-    // Remove from active animatables
-    _scene->_activeAnimatables.erase(
-      ::std::remove_if(
-        _scene->_activeAnimatables.begin(), _scene->_activeAnimatables.end(),
-        [this](const Animatable* animatable) { return animatable == this; }),
-      _scene->_activeAnimatables.end());
+    if (disposeOnEnd) {
+      // Remove from active animatables
+      _scene->_activeAnimatables.erase(
+        ::std::remove(_scene->_activeAnimatables.begin(),
+                      _scene->_activeAnimatables.end(), shared_from_this()),
+        _scene->_activeAnimatables.end());
 
-    // Dispose all runtime animations
-    for (auto& runtimeAnimation : _runtimeAnimations) {
-      runtimeAnimation->dispose();
+      // Dispose all runtime animations
+      for (auto& runtimeAnimation : _runtimeAnimations) {
+        runtimeAnimation->dispose();
+      }
     }
 
     _raiseOnAnimationEnd();
-    onAnimationEnd = nullptr;
-    onAnimationEndObservable.clear();
+
+    if (disposeOnEnd) {
+      onAnimationEnd = nullptr;
+      onAnimationEndObservable.clear();
+    }
   }
 
   return running;

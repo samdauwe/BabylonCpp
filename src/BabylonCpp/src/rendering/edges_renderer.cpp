@@ -384,7 +384,7 @@ void EdgesRenderer::render()
   }
 
   _lineShader->setFloat("aspectRatio",
-                        engine->getAspectRatio(scene->activeCamera));
+                        engine->getAspectRatio(*scene->activeCamera));
   _lineShader->bind(_source->getWorldMatrix());
 
   // Draw order

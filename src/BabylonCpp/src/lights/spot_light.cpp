@@ -159,12 +159,12 @@ void SpotLight::set_projectionTextureUpDirection(const Vector3& value)
   _projectionTextureProjectionLightDirty = true;
 }
 
-BaseTexture*& SpotLight::get_projectionTexture()
+BaseTexturePtr& SpotLight::get_projectionTexture()
 {
   return _projectionTexture;
 }
 
-void SpotLight::set_projectionTexture(BaseTexture* const& value)
+void SpotLight::set_projectionTexture(const BaseTexturePtr& value)
 {
   _projectionTexture      = value;
   _projectionTextureDirty = true;
@@ -184,7 +184,7 @@ void SpotLight::_setPosition(const Vector3& value)
 
 void SpotLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const vector_t<AbstractMesh*>& /*renderList*/)
+  const vector_t<AbstractMeshPtr>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
 
@@ -195,8 +195,8 @@ void SpotLight::_setDefaultShadowProjectionMatrix(
   _shadowAngleScale = _shadowAngleScale ? *_shadowAngleScale : 1.f;
   auto angle        = _shadowAngleScale * _angle;
 
-  Matrix::PerspectiveFovLHToRef(angle, 1.f, getDepthMinZ(activeCamera),
-                                getDepthMaxZ(activeCamera), matrix);
+  Matrix::PerspectiveFovLHToRef(angle, 1.f, getDepthMinZ(*activeCamera),
+                                getDepthMaxZ(*activeCamera), matrix);
 }
 
 void SpotLight::_computeProjectionTextureViewLightMatrix()
@@ -333,8 +333,9 @@ void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                             unsigned int lightIndex)
 {
   defines.resizeLights(lightIndex);
-  defines.spotlights[lightIndex]            = true;
-  defines.projectedLightTexture[lightIndex] = projectionTexture ? true : false;
+  defines.spotlights[lightIndex] = true;
+  defines.projectedLightTexture[lightIndex]
+    = projectionTexture() ? true : false;
 }
 
 } // end of namespace BABYLON

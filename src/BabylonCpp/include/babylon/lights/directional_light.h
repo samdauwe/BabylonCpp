@@ -23,10 +23,11 @@ public:
 
 public:
   template <typename... Ts>
-  static DirectionalLight* New(Ts&&... args)
+  static DirectionalLightPtr New(Ts&&... args)
   {
-    auto light = new DirectionalLight(::std::forward<Ts>(args)...);
-    light->addToScene(static_cast<unique_ptr_t<Light>>(light));
+    auto light = shared_ptr_t<DirectionalLight>(
+      new DirectionalLight(::std::forward<Ts>(args)...));
+    light->addToScene(light);
 
     return light;
   }
@@ -63,7 +64,7 @@ public:
    * @param activeCamera The camera we are returning the min for
    * @returns the depth min z
    */
-  float getDepthMinZ(Camera* activeCamera) const override;
+  float getDepthMinZ(const Camera& activeCamera) const override;
 
   /**
    * @brief Gets the maxZ used for shadow according to both the scene and the
@@ -73,7 +74,7 @@ public:
    * @param activeCamera The camera we are returning the max for
    * @returns the depth max z
    */
-  float getDepthMaxZ(Camera* activeCamera) const override;
+  float getDepthMaxZ(const Camera& activeCamera) const override;
 
   /**
    * @brief Prepares the list of defines specific to the light type.
@@ -103,7 +104,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const vector_t<AbstractMesh*>& renderList) override;
+    const vector_t<AbstractMeshPtr>& renderList) override;
 
   /**
    * @brief Sets the passed matrix "matrix" as fixed frustum projection matrix
@@ -120,7 +121,7 @@ protected:
    */
   void _setDefaultAutoExtendShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const vector_t<AbstractMesh*>& renderList);
+    const vector_t<AbstractMeshPtr>& renderList);
 
   void _buildUniformLayout() override;
 

@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 HighlightsPostProcess::HighlightsPostProcess(const string_t& iName, float ratio,
-                                             Camera* camera,
+                                             const CameraPtr& camera,
                                              unsigned int samplingMode,
                                              Engine* engine, bool reusable,
                                              unsigned int textureType)

@@ -220,12 +220,13 @@ void BackgroundMaterial::setCameraContrast(float value)
   _imageProcessingConfiguration->contrast = value;
 }
 
-BaseTexture* BackgroundMaterial::cameraColorGradingTexture() const
+BaseTexturePtr& BackgroundMaterial::cameraColorGradingTexture()
 {
   return _imageProcessingConfiguration->colorGradingTexture;
 }
 
-void BackgroundMaterial::setCameraColorGradingTexture(BaseTexture* value)
+void BackgroundMaterial::setCameraColorGradingTexture(
+  const BaseTexturePtr& value)
 {
   _imageProcessingConfiguration->colorGradingTexture = value;
 }
@@ -821,8 +822,8 @@ void BackgroundMaterial::dispose(bool forceDisposeEffect,
   PushMaterial::dispose(forceDisposeEffect);
 }
 
-BackgroundMaterial* BackgroundMaterial::clone(const string_t& /*name*/,
-                                              bool /*cloneChildren*/) const
+MaterialPtr BackgroundMaterial::clone(const string_t& /*name*/,
+                                      bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -890,22 +891,23 @@ void BackgroundMaterial::setPrimaryColorHighlightLevel(float value)
   _markAllSubMeshesAsLightsDirty();
 }
 
-BaseTexture* BackgroundMaterial::reflectionTexture() const
+BaseTexturePtr BackgroundMaterial::reflectionTexture()
 {
-  return _reflectionTexture;
+  return ::std::static_pointer_cast<BaseTexture>(_reflectionTexture);
 }
 
-void BackgroundMaterial::setReflectionTexture(RenderTargetTexture* value)
+void BackgroundMaterial::setReflectionTexture(
+  const RenderTargetTexturePtr& value)
 {
   _reflectionTexture = value;
 }
 
-BaseTexture* BackgroundMaterial::diffuseTexture() const
+BaseTexturePtr BackgroundMaterial::diffuseTexture()
 {
-  return _diffuseTexture;
+  return ::std::static_pointer_cast<BaseTexture>(_diffuseTexture);
 }
 
-void BackgroundMaterial::setDiffuseTexture(RenderTargetTexture* value)
+void BackgroundMaterial::setDiffuseTexture(const RenderTargetTexturePtr& value)
 {
   _diffuseTexture = value;
 }

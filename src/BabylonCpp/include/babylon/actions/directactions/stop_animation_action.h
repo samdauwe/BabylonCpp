@@ -9,7 +9,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT StopAnimationAction : public Action {
 
 public:
-  StopAnimationAction(unsigned int triggerOptions, IAnimatable* target,
+  StopAnimationAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                       Condition* condition = nullptr);
   ~StopAnimationAction() override;
 
@@ -18,7 +18,7 @@ public:
   Json::object serialize(Json::object& parent) const override;
 
 private:
-  IAnimatable* _target;
+  IAnimatablePtr _target;
 
 }; // end of class StopAnimationAction
 

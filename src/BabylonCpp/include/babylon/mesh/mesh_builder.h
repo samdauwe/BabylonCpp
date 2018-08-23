@@ -40,8 +40,8 @@ public:
    * @param scene defines the hosting scene
    * @returns the box mesh
    */
-  static Mesh* CreateBox(const string_t& name, BoxOptions& options,
-                         Scene* scene);
+  static MeshPtr CreateBox(const string_t& name, BoxOptions& options,
+                           Scene* scene);
 
   /**
    * @brief Creates a sphere mesh.
@@ -74,8 +74,8 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#sphere
    */
-  static Mesh* CreateSphere(const string_t& name, SphereOptions& options,
-                            Scene* scene);
+  static MeshPtr CreateSphere(const string_t& name, SphereOptions& options,
+                              Scene* scene);
 
   /**
    * @brief Creates a plane polygonal mesh.  By default, this is a disc.
@@ -102,8 +102,8 @@ public:
    * @returns the plane polygonal mesh
    * @see http://doc.babylonjs.com/how_to/set_shapes#disc-or-regular-polygon
    */
-  static Mesh* CreateDisc(const string_t& name, DiscOptions& options,
-                          Scene* scene);
+  static MeshPtr CreateDisc(const string_t& name, DiscOptions& options,
+                            Scene* scene);
 
   /**
    * @brief Creates a sphere based upon an icosahedron with 20 triangular faces
@@ -134,8 +134,8 @@ public:
    * @returns the icosahedron mesh
    * @see http://doc.babylonjs.com/how_to/polyhedra_shapes#icosphere
    */
-  static Mesh* CreateIcoSphere(const string_t& name, IcoSphereOptions& options,
-                               Scene* scene);
+  static MeshPtr CreateIcoSphere(const string_t& name,
+                                 IcoSphereOptions& options, Scene* scene);
 
   /**
    * @brief Creates a ribbon mesh. The ribbon is a parametric shape.  It has no
@@ -184,8 +184,8 @@ public:
    * @see http://doc.babylonjs.com/tutorials/Ribbon_Tutorial
    * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes
    */
-  static Mesh* CreateRibbon(const string_t& name, RibbonOptions& options,
-                            Scene* scene = nullptr);
+  static MeshPtr CreateRibbon(const string_t& name, RibbonOptions& options,
+                              Scene* scene = nullptr);
 
   /**
    * @brief Creates a cylinder or a cone mesh.
@@ -241,8 +241,8 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#cylinder-or-cone
    */
-  static Mesh* CreateCylinder(const string_t& name, CylinderOptions& options,
-                              Scene* scene);
+  static MeshPtr CreateCylinder(const string_t& name, CylinderOptions& options,
+                                Scene* scene);
 
   /**
    * @brief Creates a torus mesh.
@@ -269,8 +269,8 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#torus
    */
-  static Mesh* CreateTorus(const string_t& name, TorusOptions& options,
-                           Scene* scene);
+  static MeshPtr CreateTorus(const string_t& name, TorusOptions& options,
+                             Scene* scene);
 
   /**
    * @brief Creates a torus knot mesh.
@@ -299,8 +299,8 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#torus-knot
    */
-  static Mesh* CreateTorusKnot(const string_t& name, TorusKnotOptions& options,
-                               Scene* scene);
+  static MeshPtr CreateTorusKnot(const string_t& name,
+                                 TorusKnotOptions& options, Scene* scene);
 
   /**
    * @brief Creates a line system mesh. A line system is a pool of many lines
@@ -331,8 +331,9 @@ public:
    * @param scene defines the hosting scene
    * @returns a new line system mesh
    */
-  static LinesMesh* CreateLineSystem(const string_t& name,
-                                     LineSystemOptions& options, Scene* scene);
+  static LinesMeshPtr CreateLineSystem(const string_t& name,
+                                       LineSystemOptions& options,
+                                       Scene* scene);
 
   /**
    * @brief Creates a line mesh.
@@ -359,8 +360,8 @@ public:
    * @param scene defines the hosting scene
    * @returns a new line mesh
    */
-  static LinesMesh* CreateLines(const string_t& name, LinesOptions& options,
-                                Scene* scene);
+  static LinesMeshPtr CreateLines(const string_t& name, LinesOptions& options,
+                                  Scene* scene);
 
   /**
    * @brief Creates a dashed line mesh.
@@ -389,9 +390,9 @@ public:
    * @returns the dashed line mesh
    * @see http://doc.babylonjs.com/how_to/parametric_shapes#dashed-lines
    */
-  static LinesMesh* CreateDashedLines(const string_t& name,
-                                      DashedLinesOptions& options,
-                                      Scene* scene);
+  static LinesMeshPtr CreateDashedLines(const string_t& name,
+                                        DashedLinesOptions& options,
+                                        Scene* scene);
 
   /**
    * @brief Creates an extruded shape mesh. The extrusion is a parametric shape.
@@ -435,8 +436,8 @@ public:
    * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    */
-  static Mesh* ExtrudeShape(const string_t& name, ExtrudeShapeOptions& options,
-                            Scene* scene);
+  static MeshPtr ExtrudeShape(const string_t& name,
+                              ExtrudeShapeOptions& options, Scene* scene);
 
   /**
    * @brief Creates an custom extruded shape mesh.
@@ -492,9 +493,9 @@ public:
    * @see http://doc.babylonjs.com/tutorials/Parametric_Shapes
    * @see http://doc.babylonjs.com/how_to/parametric_shapes#extruded-shapes
    */
-  static Mesh* ExtrudeShapeCustom(const string_t& name,
-                                  ExtrudeShapeCustomOptions& options,
-                                  Scene* scene);
+  static MeshPtr ExtrudeShapeCustom(const string_t& name,
+                                    ExtrudeShapeCustomOptions& options,
+                                    Scene* scene);
 
   /**
    * @brief Creates lathe mesh.
@@ -535,8 +536,8 @@ public:
    * @returns the lathe mesh
    * @see http://doc.babylonjs.com/how_to/parametric_shapes#lathe
    */
-  static Mesh* CreateLathe(const string_t& name, LatheOptions& options,
-                           Scene* scene);
+  static MeshPtr CreateLathe(const string_t& name, LatheOptions& options,
+                             Scene* scene);
 
   /**
    * @brief Creates a plane mesh.
@@ -562,8 +563,8 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#plane
    */
-  static Mesh* CreatePlane(const string_t& name, PlaneOptions& options,
-                           Scene* scene);
+  static MeshPtr CreatePlane(const string_t& name, PlaneOptions& options,
+                             Scene* scene);
 
   /**
    * @brief Creates a ground mesh.
@@ -580,8 +581,8 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#plane
    */
-  static Mesh* CreateGround(const string_t& name, GroundOptions& options,
-                            Scene* scene);
+  static MeshPtr CreateGround(const string_t& name, GroundOptions& options,
+                              Scene* scene);
 
   /**
    * @brief Creates a tiled ground mesh.
@@ -606,8 +607,8 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#tiled-ground
    */
-  static Mesh* CreateTiledGround(const string_t& name,
-                                 TiledGroundOptions& options, Scene* scene);
+  static MeshPtr CreateTiledGround(const string_t& name,
+                                   TiledGroundOptions& options, Scene* scene);
 
   /**
    * @brief Creates a ground mesh from a height map.
@@ -637,7 +638,7 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#ground-from-a-height-map
    */
-  static GroundMesh*
+  static GroundMeshPtr
   CreateGroundFromHeightMap(const string_t& name, const string_t& url,
                             GroundFromHeightMapOptions& options, Scene* scene);
 
@@ -663,8 +664,8 @@ public:
    * @param scene defines the hosting scene
    * @returns the polygon mesh
    */
-  static Mesh* CreatePolygon(const string_t& name, PolygonOptions& options,
-                             Scene* scene);
+  static MeshPtr CreatePolygon(const string_t& name, PolygonOptions& options,
+                               Scene* scene);
 
   /**
    * @brief Creates an extruded polygon mesh, with depth in the Y direction.
@@ -678,8 +679,8 @@ public:
    * @param scene defines the hosting scene
    * @returns the polygon mesh
    */
-  static Mesh* ExtrudePolygon(const string_t& name, PolygonOptions& options,
-                              Scene* scene);
+  static MeshPtr ExtrudePolygon(const string_t& name, PolygonOptions& options,
+                                Scene* scene);
 
   /**
    * @brief Creates a tube mesh.
@@ -724,8 +725,8 @@ public:
    * @see
    * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#tube
    */
-  static Mesh* CreateTube(const string_t& name, TubeOptions& options,
-                          Scene* scene = nullptr);
+  static MeshPtr CreateTube(const string_t& name, TubeOptions& options,
+                            Scene* scene = nullptr);
 
   /**
    * @brief Creates a polyhedron mesh.
@@ -766,8 +767,8 @@ public:
    * @returns the polyhedron mesh
    * @see http://doc.babylonjs.com/how_to/polyhedra_shapes
    */
-  static Mesh* CreatePolyhedron(const string_t& name,
-                                PolyhedronOptions& options, Scene* scene);
+  static MeshPtr CreatePolyhedron(const string_t& name,
+                                  PolyhedronOptions& options, Scene* scene);
   /**
    * @brief Creates a decal mesh.
    * A decal is a mesh usually applied as a model onto the surface of another
@@ -787,17 +788,17 @@ public:
    * @returns the decal mesh
    * @see http://doc.babylonjs.com/how_to/decals
    */
-  static Mesh* CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
-                           DecalOptions& options);
+  static MeshPtr CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
+                             DecalOptions& options);
 
 private:
-  static Mesh* _ExtrudeShapeGeneric(
+  static MeshPtr _ExtrudeShapeGeneric(
     const string_t& name, const vector_t<Vector3>& shape,
     const vector_t<Vector3>& curve, float scale, float rotation,
     const ::std::function<float(float i, float distance)>& scaleFunction,
     const ::std::function<float(float i, float distance)>& rotateFunction,
     bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
-    bool updtbl, unsigned int side, Mesh* instance, bool invertUV,
+    bool updtbl, unsigned int side, MeshPtr instance, bool invertUV,
     Vector4& frontUVs, Vector4& backUVs);
   static unsigned int updateSideOrientation(unsigned int orientation
                                             = Mesh::FRONTSIDE());

@@ -30,8 +30,8 @@ public:
    * pipeline will be attached to
    */
   StandardRenderingPipeline(const string_t& name, Scene* scene, float ratio,
-                            PostProcess* originalPostProcess = nullptr,
-                            const vector_t<Camera*>& cameras = {});
+                            PostProcess* originalPostProcess   = nullptr,
+                            const vector_t<CameraPtr>& cameras = {});
   virtual ~StandardRenderingPipeline() override;
 
   float operator[](const string_t& key) const;
@@ -97,7 +97,7 @@ private:
   void _createDepthOfFieldPostProcess(Scene* scene, float ratio);
   // Create motion blur post-process
   void _createMotionBlurPostProcess(Scene* scene, float ratio);
-  Texture* _getDepthTexture();
+  TexturePtr _getDepthTexture();
   void _disposePostProcesses();
 
 public:
@@ -128,7 +128,7 @@ public:
   float blurWidth;
   bool horizontalBlur;
   float exposure;
-  Texture* lensTexture;
+  TexturePtr lensTexture;
   float volumetricLightCoefficient;
   float volumetricLightPower;
   float volumetricLightBlurScale;
@@ -136,13 +136,13 @@ public:
   float hdrMinimumLuminance;
   float hdrDecreaseRate;
   float hdrIncreaseRate;
-  Texture* lensColorTexture;
+  TexturePtr lensColorTexture;
   float lensFlareStrength;
   float lensFlareGhostDispersal;
   float lensFlareHaloWidth;
   float lensFlareDistortionStrength;
-  Texture* lensStarTexture;
-  Texture* lensFlareDirtTexture;
+  TexturePtr lensStarTexture;
+  TexturePtr lensFlareDirtTexture;
   float depthOfFieldDistance;
   float depthOfFieldBlurWidth;
   float motionStrength;

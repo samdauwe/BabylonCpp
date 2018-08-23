@@ -48,27 +48,27 @@ public:
   /**
    * @brief Gets the root mesh created by the helper.
    */
-  Mesh* rootMesh();
+  MeshPtr& rootMesh();
 
   /**
    * @brief Gets the skybox created by the helper.
    */
-  Mesh* skybox();
+  MeshPtr& skybox();
 
   /**
    * @brief Gets the skybox texture created by the helper.
    */
-  BaseTexture* skyboxTexture();
+  BaseTexturePtr skyboxTexture();
 
   /**
    * @brief Gets the skybox material created by the helper.
    */
-  BackgroundMaterial* skyboxMaterial();
+  BackgroundMaterialPtr& skyboxMaterial();
 
   /**
    * @brief Gets the ground mesh created by the helper.
    */
-  Mesh* ground();
+  MeshPtr& ground();
 
   /**
    * @brief Gets the ground texture created by the helper.
@@ -78,18 +78,18 @@ public:
   /**
    * @brief Gets the ground mirror created by the helper.
    */
-  MirrorTexture* groundMirror();
+  MirrorTexturePtr& groundMirror();
 
   /**
    * @brief Gets the ground mirror render list to helps pushing the meshes
    * you wish in the ground reflection.
    */
-  vector_t<AbstractMesh*>& groundMirrorRenderList();
+  vector_t<AbstractMeshPtr>& groundMirrorRenderList();
 
   /**
    * @brief Gets the ground material created by the helper.
    */
-  BackgroundMaterial* groundMaterial();
+  BackgroundMaterialPtr& groundMaterial();
 
   /**
    * @brief Dispose all the elements created by the Helper.
@@ -193,15 +193,15 @@ private:
     = "https://assets.babylonjs.com/environments/environmentSpecular.env";
 
 private:
-  Mesh* _rootMesh;
-  Mesh* _skybox;
-  RenderTargetTexture* _skyboxTexture;
-  BackgroundMaterial* _skyboxMaterial;
-  Mesh* _ground;
+  MeshPtr _rootMesh;
+  MeshPtr _skybox;
+  RenderTargetTexturePtr _skyboxTexture;
+  BackgroundMaterialPtr _skyboxMaterial;
+  MeshPtr _ground;
   BaseTexture* _groundTexture;
-  MirrorTexture* _groundMirror;
-  BackgroundMaterial* _groundMaterial;
-  vector_t<AbstractMesh*> _emptyGroundMirrorRenderList;
+  MirrorTexturePtr _groundMirror;
+  BackgroundMaterialPtr _groundMaterial;
+  vector_t<AbstractMeshPtr> _emptyGroundMirrorRenderList;
 
   /**
    * Stores the creation options.

@@ -20,7 +20,7 @@ public:
 
   void init() override;
 
-  void attach(ArcRotateCamera* camera) override;
+  void attach(const ArcRotateCameraPtr& camera) override;
 
   void detach() override;
 
@@ -129,7 +129,7 @@ private:
   // Default behavior functions
   Observer<PointerInfoPre>::Ptr _onPrePointerObservableObserver;
   Observer<Camera>::Ptr _onAfterCheckInputsObserver;
-  ArcRotateCamera* _attachedCamera;
+  ArcRotateCameraPtr _attachedCamera;
   bool _isPointerDown;
   Nullable<high_res_time_point_t> _lastFrameTime;
   high_res_time_point_t _lastInteractionTime;

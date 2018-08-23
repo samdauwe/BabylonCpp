@@ -109,7 +109,7 @@ Vector3 PointLight::getShadowDirection(unsigned int faceIndex)
 
 void PointLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const vector_t<AbstractMesh*>& /*renderList*/)
+  const vector_t<AbstractMeshPtr>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
 
@@ -117,8 +117,8 @@ void PointLight::_setDefaultShadowProjectionMatrix(
     return;
   }
 
-  Matrix::PerspectiveFovLHToRef(shadowAngle(), 1.f, getDepthMinZ(activeCamera),
-                                getDepthMaxZ(activeCamera), matrix);
+  Matrix::PerspectiveFovLHToRef(shadowAngle(), 1.f, getDepthMinZ(*activeCamera),
+                                getDepthMaxZ(*activeCamera), matrix);
 }
 
 void PointLight::_buildUniformLayout()

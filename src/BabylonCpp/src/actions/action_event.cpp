@@ -5,8 +5,9 @@
 
 namespace BABYLON {
 
-ActionEvent::ActionEvent(AbstractMesh* iSource, int iPointerX, int iPointerY,
-                         AbstractMesh* iMeshUnderPointer,
+ActionEvent::ActionEvent(const AbstractMeshPtr& iSource, int iPointerX,
+                         int iPointerY,
+                         const AbstractMeshPtr& iMeshUnderPointer,
                          const Nullable<Event>& iSourceEvent,
                          const string_t& iAdditionalData)
     : source{iSource}
@@ -74,7 +75,7 @@ ActionEvent::~ActionEvent()
 {
 }
 
-ActionEvent ActionEvent::CreateNew(AbstractMesh* iSource,
+ActionEvent ActionEvent::CreateNew(const AbstractMeshPtr& iSource,
                                    const Nullable<Event>& evt)
 {
   auto scene = iSource->getScene();
@@ -97,7 +98,7 @@ ActionEvent ActionEvent::CreateNewFromScene(Scene* scene, const Event& evt)
                      scene->meshUnderPointer(), evt);
 }
 
-ActionEvent ActionEvent::CreateNewFromPrimitive(AbstractMesh* prim,
+ActionEvent ActionEvent::CreateNewFromPrimitive(const AbstractMeshPtr& prim,
                                                 const Vector2& pointerPos,
                                                 const Event& evt,
                                                 const string_t& additionalData)

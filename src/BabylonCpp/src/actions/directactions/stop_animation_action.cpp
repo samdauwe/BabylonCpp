@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 StopAnimationAction::StopAnimationAction(unsigned int triggerOptions,
-                                         IAnimatable* target,
+                                         const IAnimatablePtr& target,
                                          Condition* condition)
     : Action(triggerOptions, condition), _target{target}
 {

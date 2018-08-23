@@ -33,10 +33,11 @@ public:
 
 public:
   template <typename... Ts>
-  static BackgroundMaterial* New(Ts&&... args)
+  static BackgroundMaterialPtr New(Ts&&... args)
   {
-    auto material = new BackgroundMaterial(std::forward<Ts>(args)...);
-    material->addMaterialToScene(static_cast<unique_ptr_t<Material>>(material));
+    auto material = shared_ptr_t<BackgroundMaterial>(
+      new BackgroundMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
 
     return material;
   }
@@ -137,12 +138,12 @@ public:
   /**
    * @brief Gets the Color Grading 2D Lookup Texture.
    */
-  BaseTexture* cameraColorGradingTexture() const;
+  BaseTexturePtr& cameraColorGradingTexture();
 
   /**
    * @brief Sets the Color Grading 2D Lookup Texture.
    */
-  void setCameraColorGradingTexture(BaseTexture* value);
+  void setCameraColorGradingTexture(const BaseTexturePtr& value);
 
   /**
    * @brief The color grading curves provide additional color adjustmnent that
@@ -234,8 +235,8 @@ public:
    * @param name The cloned name.
    * @returns The cloned material.
    */
-  BackgroundMaterial* clone(const string_t& name,
-                            bool cloneChildren = false) const override;
+  MaterialPtr clone(const string_t& name,
+                    bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes the current material to its JSON representation.
@@ -268,10 +269,10 @@ public:
   void setPrimaryColorShadowLevel(float value);
   float primaryColorHighlightLevel() const;
   void setPrimaryColorHighlightLevel(float value);
-  BaseTexture* reflectionTexture() const;
-  void setReflectionTexture(RenderTargetTexture* value);
-  BaseTexture* diffuseTexture() const;
-  void setDiffuseTexture(RenderTargetTexture* value);
+  BaseTexturePtr reflectionTexture();
+  void setReflectionTexture(const RenderTargetTexturePtr& value);
+  BaseTexturePtr diffuseTexture();
+  void setDiffuseTexture(const RenderTargetTexturePtr& value);
   float shadowLevel() const;
   void setShadowLevel(float value);
   const Vector3& sceneCenter() const;
@@ -364,7 +365,7 @@ protected:
    * Should be author in a specific way for the best result (refer to the
    * documentation).
    */
-  RenderTargetTexture* _reflectionTexture;
+  RenderTargetTexturePtr _reflectionTexture;
 
   /**
    * Reflection Texture level of blur.
@@ -380,7 +381,7 @@ protected:
    * Should be author in a specific way for the best result (refer to the
    * documentation).
    */
-  RenderTargetTexture* _diffuseTexture;
+  RenderTargetTexturePtr _diffuseTexture;
 
   /**
    * Specify the list of lights casting shadow on the material.

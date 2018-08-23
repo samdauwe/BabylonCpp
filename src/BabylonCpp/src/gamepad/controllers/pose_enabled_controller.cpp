@@ -93,7 +93,7 @@ void PoseEnabledController::updateFromDevice(const DevicePose& poseData)
   }
 }
 
-void PoseEnabledController::attachToMesh(AbstractMesh* mesh)
+void PoseEnabledController::attachToMesh(const AbstractMeshPtr& mesh)
 {
   if (_mesh) {
     _mesh->setParent(nullptr);
@@ -122,7 +122,7 @@ void PoseEnabledController::attachToMesh(AbstractMesh* mesh)
     }
   }
 
-  _meshAttachedObservable.notifyObservers(mesh);
+  _meshAttachedObservable.notifyObservers(mesh.get());
 }
 
 void PoseEnabledController::attachToPoseControlledCamera(TargetCamera* camera)
@@ -143,7 +143,7 @@ void PoseEnabledController::dispose()
   Gamepad::dispose();
 }
 
-AbstractMesh*& PoseEnabledController::get_mesh()
+AbstractMeshPtr& PoseEnabledController::get_mesh()
 {
   return _mesh;
 }

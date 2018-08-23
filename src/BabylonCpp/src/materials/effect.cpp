@@ -758,21 +758,21 @@ void Effect::_bindTexture(const string_t& channel, InternalTexture* texture)
   _engine->_bindTexture(stl_util::index_of(_samplers, channel), texture);
 }
 
-void Effect::setTexture(const string_t& channel, BaseTexture* texture)
+void Effect::setTexture(const string_t& channel, const BaseTexturePtr& texture)
 {
   _engine->setTexture(stl_util::index_of(_samplers, channel),
                       getUniform(channel), texture);
 }
 
 void Effect::setDepthStencilTexture(const string_t& channel,
-                                    RenderTargetTexture* texture)
+                                    const RenderTargetTexturePtr& texture)
 {
   _engine->setDepthStencilTexture(stl_util::index_of(_samplers, channel),
                                   getUniform(channel), texture);
 }
 
 void Effect::setTextureArray(const string_t& channel,
-                             const vector_t<BaseTexture*>& textures)
+                             const vector_t<BaseTexturePtr>& textures)
 {
   if (stl_util::index_of(_samplers, channel + "Ex") == -1) {
     auto initialPos = stl_util::index_of(_samplers, channel);

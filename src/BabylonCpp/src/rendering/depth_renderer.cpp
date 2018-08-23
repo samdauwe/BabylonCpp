@@ -19,20 +19,21 @@
 
 namespace BABYLON {
 
-DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, Camera* camera)
+DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
+                             const CameraPtr& camera)
     : _scene{scene}, _depthMap{nullptr}, _effect{nullptr}, _camera{camera}
 {
   auto engine = scene->getEngine();
 
   // Render target
-  _depthMap = ::std::make_unique<RenderTargetTexture>(
+  _depthMap = RenderTargetTexture::New(
     "depthMap", ISize{engine->getRenderWidth(), engine->getRenderHeight()},
     _scene, false, true, type);
   _depthMap->wrapU           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->wrapV           = TextureConstants::CLAMP_ADDRESSMODE;
   _depthMap->refreshRate     = 1;
   _depthMap->renderParticles = false;
-  _depthMap->renderList.clear();
+  _depthMap->renderList().clear();
 
   // Camera to get depth map from to support multiple concurrent cameras
   _depthMap->activeCamera           = _camera;
@@ -45,7 +46,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, Camera* camera)
   });
 
   // Custom render function
-  auto renderSubMesh = [this](SubMesh* subMesh) {
+  auto renderSubMesh = [this](const SubMeshPtr& subMesh) {
     auto mesh     = subMesh->getRenderingMesh();
     auto scene    = _scene;
     auto engine   = scene->getEngine();
@@ -72,9 +73,9 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, Camera* camera)
             != batch->visibleInstances.end());
 
     auto camera = (!_camera) ? _camera : scene->activeCamera;
-    if (isReady(subMesh, hardwareInstancedRendering) && camera) {
+    if (isReady(subMesh.get(), hardwareInstancedRendering) && camera) {
       engine->enableEffect(_effect);
-      mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
+      mesh->_bind(subMesh.get(), _effect, Material::TriangleFillMode());
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
@@ -94,13 +95,14 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, Camera* camera)
       // Bones
       if (mesh->useBones() && mesh->computeBonesUsingShaders()
           && mesh->skeleton()) {
-        _effect->setMatrices("mBones",
-                             mesh->skeleton()->getTransformMatrices(mesh));
+        _effect->setMatrices(
+          "mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
       }
 
       // Draw
-      mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
-                              batch, hardwareInstancedRendering,
+      mesh->_processRendering(subMesh.get(), _effect,
+                              Material::TriangleFillMode(), batch,
+                              hardwareInstancedRendering,
                               [this](bool /*isInstance*/, Matrix world,
                                      Material* /*effectiveMaterial*/) {
                                 _effect->setMatrix("world", world);
@@ -110,12 +112,11 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type, Camera* camera)
 
   _depthMap->customRenderFunction
     = [engine,
-       renderSubMesh](const vector_t<SubMesh*>& opaqueSubMeshes,
-                      const vector_t<SubMesh*>& alphaTestSubMeshes,
-                      const vector_t<SubMesh*>& /*transparentSubMeshes*/,
-                      const vector_t<SubMesh*>& depthOnlySubMeshes,
+       renderSubMesh](const vector_t<SubMeshPtr>& opaqueSubMeshes,
+                      const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+                      const vector_t<SubMeshPtr>& /*transparentSubMeshes*/,
+                      const vector_t<SubMeshPtr>& depthOnlySubMeshes,
                       const ::std::function<void()>& /*beforeTransparents*/) {
-
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
           for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
@@ -212,9 +213,9 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
   return _effect->isReady();
 }
 
-RenderTargetTexture* DepthRenderer::getDepthMap()
+RenderTargetTexturePtr& DepthRenderer::getDepthMap()
 {
-  return _depthMap.get();
+  return _depthMap;
 }
 
 void DepthRenderer::dispose()

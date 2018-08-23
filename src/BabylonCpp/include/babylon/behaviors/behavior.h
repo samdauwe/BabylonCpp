@@ -24,7 +24,7 @@ struct BABYLON_SHARED_EXPORT Behavior {
    * @brief Called when the behavior is attached to a target.
    * @param target defines the target where the behavior is attached to
    */
-  virtual void attach(T* target) = 0;
+  virtual void attach(const shared_ptr_t<T>& target) = 0;
   /**
    * @brief Called when the behavior is detached from its target.
    */

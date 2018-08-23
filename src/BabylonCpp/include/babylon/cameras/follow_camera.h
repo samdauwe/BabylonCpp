@@ -13,10 +13,11 @@ public:
 
 public:
   template <typename... Ts>
-  static FollowCamera* New(Ts&&... args)
+  static FollowCameraPtr New(Ts&&... args)
   {
-    auto camera = new FollowCamera(std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera = shared_ptr_t<FollowCamera>(
+      new FollowCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }

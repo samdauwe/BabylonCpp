@@ -10,6 +10,46 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT CubeTexture : public BaseTexture {
 
 public:
+  template <typename... Ts>
+  static CubeTexturePtr New(Ts&&... args)
+  {
+    auto texture
+      = shared_ptr_t<CubeTexture>(new CubeTexture(::std::forward<Ts>(args)...));
+    texture->addToScene(texture);
+
+    return texture;
+  }
+  ~CubeTexture() override;
+
+  void delayLoad() override;
+  Matrix* getReflectionTextureMatrix() override;
+  void setReflectionTextureMatrix(const Matrix& value);
+  CubeTexturePtr clone() const;
+
+  /** Static methods **/
+  static CubeTexturePtr CreateFromImages(const vector_t<string_t>& files,
+                                         Scene* scene, bool noMipmap = false);
+
+  /**
+   * @brief Creates and return a texture created from prefilterd data by tools
+   * like IBL Baker or Lys.
+   * @param url defines the url of the prefiltered texture
+   * @param scene defines the scene the texture is attached to
+   * @param forcedExtension defines the extension of the file if different from
+   * the url
+   * @param createPolynomials defines whether or not to create polynomial
+   * harmonics from the texture data if necessary
+   * @return the prefiltered texture
+   */
+  static CubeTexturePtr
+  CreateFromPrefilteredData(const string_t& url, Scene* scene,
+                            const string_t& forcedExtension = "",
+                            bool createPolynomials          = true);
+
+  static CubeTexturePtr Parse(const Json::value& parsedTexture, Scene* scene,
+                              const string_t& rootUrl);
+
+protected:
   /**
    * Creates a cube texture to use with reflection for instance. It can be based
    * upon dds or six images as well as prefiltered data.
@@ -47,38 +87,7 @@ public:
               bool prefiltered = false, const string_t& forcedExtension = "",
               bool createPolynomials = false, float lodScale = 0.8f,
               float lodOffset = 0.f);
-  ~CubeTexture() override;
 
-  void delayLoad() override;
-  Matrix* getReflectionTextureMatrix() override;
-  void setReflectionTextureMatrix(const Matrix& value);
-  unique_ptr_t<CubeTexture> clone() const;
-
-  /** Static methods **/
-  static unique_ptr_t<CubeTexture>
-  CreateFromImages(const vector_t<string_t>& files, Scene* scene,
-                   bool noMipmap = false);
-
-  /**
-   * @brief Creates and return a texture created from prefilterd data by tools
-   * like IBL Baker or Lys.
-   * @param url defines the url of the prefiltered texture
-   * @param scene defines the scene the texture is attached to
-   * @param forcedExtension defines the extension of the file if different from
-   * the url
-   * @param createPolynomials defines whether or not to create polynomial
-   * harmonics from the texture data if necessary
-   * @return the prefiltered texture
-   */
-  static unique_ptr_t<CubeTexture>
-  CreateFromPrefilteredData(const string_t& url, Scene* scene,
-                            const string_t& forcedExtension = "",
-                            bool createPolynomials          = true);
-
-  static unique_ptr_t<CubeTexture> Parse(const Json::value& parsedTexture,
-                                         Scene* scene, const string_t& rootUrl);
-
-protected:
   /**
    * @brief Gets or sets the size of the bounding box associated with the cube
    * texture When defined, the cubemap will switch to local mode

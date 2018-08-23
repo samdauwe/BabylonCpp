@@ -51,9 +51,9 @@ private:
   vector_t<Vector3> _yline;
   vector_t<Vector3> _zline;
 
-  LinesMesh* _xmesh;
-  LinesMesh* _ymesh;
-  LinesMesh* _zmesh;
+  LinesMeshPtr _xmesh;
+  LinesMeshPtr _ymesh;
+  LinesMeshPtr _zmesh;
 
 }; // end of class AxesViewer
 

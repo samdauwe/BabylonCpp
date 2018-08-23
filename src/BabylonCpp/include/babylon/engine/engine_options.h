@@ -56,6 +56,11 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
    * the page to restore rendering
    */
   bool doNotHandleContextLost = false;
+  /**
+   * Defines whether the engine has been created with the premultipliedAlpha
+   * option on or not.
+   */
+  bool premultipliedAlpha = true;
 }; // end of struct EngineOptions
 
 } // end of namespace BABYLON

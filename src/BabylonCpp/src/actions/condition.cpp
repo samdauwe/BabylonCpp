@@ -60,8 +60,8 @@ string_t Condition::_getProperty(const string_t& propertyPath)
   return _actionManager->_getProperty(propertyPath);
 }
 
-IAnimatable* Condition::_getEffectiveTarget(IAnimatable* target,
-                                            const string_t& propertyPath)
+IAnimatablePtr Condition::_getEffectiveTarget(const IAnimatablePtr& target,
+                                              const string_t& propertyPath)
 {
   return _actionManager->_getEffectiveTarget(target, propertyPath);
 }

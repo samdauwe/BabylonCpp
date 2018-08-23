@@ -25,7 +25,7 @@ public:
    * (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
    */
   TonemapPostProcess(const string_t& name, const TonemappingOperator& operator_,
-                     float exposureAdjustment, Camera* camera,
+                     float exposureAdjustment, const CameraPtr& camera,
                      unsigned int samplingMode
                      = TextureConstants::BILINEAR_SAMPLINGMODE,
                      Engine* engine = nullptr,

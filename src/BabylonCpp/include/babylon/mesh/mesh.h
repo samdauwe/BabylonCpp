@@ -91,10 +91,10 @@ public:
 
 public:
   template <typename... Ts>
-  static Mesh* New(Ts&&... args)
+  static MeshPtr New(Ts&&... args)
   {
-    auto mesh = new Mesh(::std::forward<Ts>(args)...);
-    mesh->addToScene(static_cast<unique_ptr_t<AbstractMesh>>(mesh));
+    auto mesh = shared_ptr_t<Mesh>(new Mesh(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
     return mesh;
   }
@@ -159,7 +159,7 @@ public:
    * position if any, else returns the current mesh.
    * tuto : http://doc.babylonjs.com/how_to/how_to_use_lod
    */
-  AbstractMesh* getLOD(Camera* camera,
+  AbstractMesh* getLOD(const CameraPtr& camera,
                        BoundingSphere* boundingSphere = nullptr) override;
 
   void setGeometry(Geometry* geometry);
@@ -448,13 +448,13 @@ public:
    * @brief Returns an array populated with IParticleSystem objects whose the
    * mesh is the emitter.
    */
-  vector_t<IParticleSystem*> getEmittedParticleSystems();
+  vector_t<IParticleSystemPtr> getEmittedParticleSystems();
 
   /**
    * @brief Returns an array populated with IParticleSystem objects whose the
    * mesh or its children are the emitter.
    */
-  vector_t<IParticleSystem*> getHierarchyEmittedParticleSystems();
+  vector_t<IParticleSystemPtr> getHierarchyEmittedParticleSystems();
 
   /**
    * @brief Normalize matrix weights so that all vertices have a total weight
@@ -484,7 +484,7 @@ public:
    * @brief Returns as a new array populated with the mesh material and/or
    * skeleton, if any.
    */
-  vector_t<IAnimatable*> getAnimatables();
+  vector_t<IAnimatablePtr> getAnimatables();
 
   /**
    * @brief Modifies the mesh geometry according to the passed transformation
@@ -527,9 +527,9 @@ public:
    * cloning in the same time of the original mesh `body` used by the physics
    * engine, if any.
    */
-  Mesh* clone(const string_t& name, Node* newParent = nullptr,
-              bool doNotCloneChildren   = false,
-              bool clonePhysicsImpostor = true);
+  MeshPtr clone(const string_t& name, Node* newParent = nullptr,
+                bool doNotCloneChildren   = false,
+                bool clonePhysicsImpostor = true);
 
   /** Dispose **/
 
@@ -631,7 +631,7 @@ public:
    * tuto : http://doc.babylonjs.com/tutorials/How_to_use_Instances
    * Warning : this method is not supported for Line mesh and LineSystem
    */
-  InstancedMesh* createInstance(const string_t& name);
+  InstancedMeshPtr createInstance(const string_t& name);
 
   /**
    * @brief Synchronises all the mesh instance submeshes to the current mesh
@@ -680,8 +680,8 @@ public:
    * The parameter `rootUrl` is a string, it's the root URL to prefix the
    * `delayLoadingFile` property with
    */
-  static Mesh* Parse(const Json::value& parsedMesh, Scene* scene,
-                     const string_t& rootUrl);
+  static MeshPtr Parse(const Json::value& parsedMesh, Scene* scene,
+                       const string_t& rootUrl);
 
   /**
    * @brief Creates a ribbon mesh.
@@ -713,13 +713,13 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateRibbon(const string_t& name,
-                            const vector_t<vector_t<Vector3>>& pathArray,
-                            bool closeArray = false, bool closePath = false,
-                            int offset = -1, Scene* = nullptr,
-                            bool updatable               = false,
-                            unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
-                            Mesh* ribbonInstance         = nullptr);
+  static MeshPtr
+  CreateRibbon(const string_t& name,
+               const vector_t<vector_t<Vector3>>& pathArray,
+               bool closeArray = false, bool closePath = false, int offset = -1,
+               Scene* = nullptr, bool updatable = false,
+               unsigned int sideOrientation  = Mesh::DEFAULTSIDE(),
+               const MeshPtr& ribbonInstance = nullptr);
 
   /**
    * @brief Creates a plane polygonal mesh.  By default, this is a disc.
@@ -735,10 +735,10 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateDisc(const string_t& name, float radius = 0.5f,
-                          unsigned int tessellation = 64, Scene* = nullptr,
-                          bool updatable               = false,
-                          unsigned int sideOrientation = Mesh::DEFAULTSIDE());
+  static MeshPtr CreateDisc(const string_t& name, float radius = 0.5f,
+                            unsigned int tessellation = 64, Scene* = nullptr,
+                            bool updatable               = false,
+                            unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a box mesh.
@@ -752,9 +752,9 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateBox(const string_t& name, float size = 1.f,
-                         Scene* = nullptr, bool updatable = false,
-                         unsigned int sideOrientation = Mesh::DEFAULTSIDE());
+  static MeshPtr CreateBox(const string_t& name, float size = 1.f,
+                           Scene* = nullptr, bool updatable = false,
+                           unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a sphere mesh.
@@ -769,10 +769,10 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateSphere(const string_t& name, unsigned int segments = 32,
-                            float diameter = 1.f, Scene* = nullptr,
-                            bool updatable               = false,
-                            unsigned int sideOrientation = Mesh::DEFAULTSIDE());
+  static MeshPtr
+  CreateSphere(const string_t& name, unsigned int segments = 32,
+               float diameter = 1.f, Scene* = nullptr, bool updatable = false,
+               unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a cylinder or a cone mesh.
@@ -793,7 +793,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh*
+  static MeshPtr
   CreateCylinder(const string_t& name, float height = 2.f,
                  float diameterTop = 1.f, float diameterBottom = 1.f,
                  unsigned int tessellation = 24, unsigned int subdivisions = 1,
@@ -815,11 +815,11 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTorus(const string_t& name, float diameter = 1.f,
-                           float thickness           = 0.5f,
-                           unsigned int tessellation = 16, Scene* = nullptr,
-                           bool updatable               = false,
-                           unsigned int sideOrientation = Mesh::DEFAULTSIDE());
+  static MeshPtr
+  CreateTorus(const string_t& name, float diameter = 1.f,
+              float thickness = 0.5f, unsigned int tessellation = 16,
+              Scene* = nullptr, bool updatable = false,
+              unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a torus knot mesh.
@@ -837,7 +837,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh*
+  static MeshPtr
   CreateTorusKnot(const string_t& name, float radius = 2.f, float tube = 0.5f,
                   unsigned int radialSegments  = 32,
                   unsigned int tubularSegments = 32, float p = 2.f,
@@ -862,10 +862,10 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static LinesMesh* CreateLines(const string_t& name,
-                                const vector_t<Vector3>& points, Scene*,
-                                bool updatable           = false,
-                                LinesMesh* linesInstance = nullptr);
+  static LinesMeshPtr CreateLines(const string_t& name,
+                                  const vector_t<Vector3>& points, Scene*,
+                                  bool updatable                    = false,
+                                  const LinesMeshPtr& linesInstance = nullptr);
 
   /**
    * @brief Creates a dashed line mesh.
@@ -891,12 +891,10 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static LinesMesh* CreateDashedLines(const string_t& name,
-                                      vector_t<Vector3>& points,
-                                      float dashSize = 3.f, float gapSize = 1.f,
-                                      unsigned int dashNb = 200,
-                                      Scene* = nullptr, bool updatable = false,
-                                      LinesMesh* linesInstance = nullptr);
+  static LinesMeshPtr CreateDashedLines(
+    const string_t& name, vector_t<Vector3>& points, float dashSize = 3.f,
+    float gapSize = 1.f, unsigned int dashNb = 200, Scene* = nullptr,
+    bool updatable = false, const LinesMeshPtr& instance = nullptr);
   /**
    * @brief Creates a polygon mesh.
    * Please consider using the same method from the MeshBuilder class instead.
@@ -914,7 +912,7 @@ public:
    * Remember you can only change the shape positions, not their number when
    * updating a polygon.
    */
-  static Mesh*
+  static MeshPtr
   CreatePolygon(const string_t& name, const vector_t<Vector3>& shape,
                 Scene* scene, const vector_t<vector_t<Vector3>>& holes,
                 bool updatable               = false,
@@ -924,7 +922,7 @@ public:
    * @brief Creates an extruded polygon mesh, with depth in the Y direction.
    * Please consider using the same method from the MeshBuilder class instead.
    */
-  static Mesh* ExtrudePolygon(
+  static MeshPtr ExtrudePolygon(
     const string_t& name, const vector_t<Vector3>& shape, float depth,
     Scene* scene, const vector_t<vector_t<Vector3>>& holes,
     bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE());
@@ -961,13 +959,12 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* ExtrudeShape(const string_t& name,
-                            const vector_t<Vector3>& shape,
-                            const vector_t<Vector3>& path, float scale,
-                            float rotation, unsigned int cap, Scene*,
-                            bool updatable               = false,
-                            unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
-                            Mesh* instance               = nullptr);
+  static MeshPtr
+  ExtrudeShape(const string_t& name, const vector_t<Vector3>& shape,
+               const vector_t<Vector3>& path, float scale, float rotation,
+               unsigned int cap, Scene*, bool updatable = false,
+               unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
+               const MeshPtr& instance      = nullptr);
 
   /**
    * @brief Creates an custom extruded shape mesh.
@@ -1022,14 +1019,14 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* ExtrudeShapeCustom(
+  static MeshPtr ExtrudeShapeCustom(
     const string_t& name, const vector_t<Vector3>& shape,
     const vector_t<Vector3>& path,
     const ::std::function<float(float i, float distance)>& scaleFunction,
     const ::std::function<float(float i, float distance)>& rotationFunction,
     bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
     bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
-    Mesh* instance = nullptr);
+    const MeshPtr& instance = nullptr);
 
   /**
    * @brief Creates lathe mesh.
@@ -1049,10 +1046,11 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateLathe(const string_t& name, const vector_t<Vector3>& shape,
-                           float radius, unsigned int tessellation,
-                           Scene* = nullptr, bool updatable = false,
-                           unsigned int sideOrientation = Mesh::DEFAULTSIDE());
+  static MeshPtr
+  CreateLathe(const string_t& name, const vector_t<Vector3>& shape,
+              float radius, unsigned int tessellation, Scene* = nullptr,
+              bool updatable               = false,
+              unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a plane mesh.
@@ -1066,9 +1064,10 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreatePlane(const string_t& name, float size, Scene* = nullptr,
-                           bool updatable               = false,
-                           unsigned int sideOrientation = Mesh::DEFAULTSIDE());
+  static MeshPtr CreatePlane(const string_t& name, float size, Scene* = nullptr,
+                             bool updatable = false,
+                             unsigned int sideOrientation
+                             = Mesh::DEFAULTSIDE());
 
   /**
    * @brief Creates a ground mesh.
@@ -1081,10 +1080,10 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateGround(const string_t& name, unsigned int width = 1,
-                            unsigned int height       = 1,
-                            unsigned int subdivisions = 1, Scene* = nullptr,
-                            bool updatable = false);
+  static MeshPtr CreateGround(const string_t& name, unsigned int width = 1,
+                              unsigned int height       = 1,
+                              unsigned int subdivisions = 1, Scene* = nullptr,
+                              bool updatable = false);
 
   /**
    * @brief Creates a ground mesh from a height map.
@@ -1107,11 +1106,11 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTiledGround(const string_t& name, float xmin, float zmin,
-                                 float xmax, float zmax,
-                                 const ISize& subdivisions = ISize(1, 1),
-                                 const ISize& precision    = ISize(1, 1),
-                                 Scene* = nullptr, bool updatable = false);
+  static MeshPtr CreateTiledGround(const string_t& name, float xmin, float zmin,
+                                   float xmax, float zmax,
+                                   const ISize& subdivisions = ISize(1, 1),
+                                   const ISize& precision    = ISize(1, 1),
+                                   Scene* = nullptr, bool updatable = false);
 
   /**
    * @brief Creates a ground mesh from a height map.
@@ -1138,7 +1137,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static GroundMesh* CreateGroundFromHeightMap(
+  static GroundMeshPtr CreateGroundFromHeightMap(
     const string_t& name, const string_t& url, unsigned int width,
     unsigned int height, unsigned int subdivisions, unsigned int minHeight,
     unsigned int maxHeight, Scene*, bool updatable = false,
@@ -1179,14 +1178,14 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateTube(
+  static MeshPtr CreateTube(
     const string_t& name, const vector_t<Vector3>& path, float radius = 1.f,
     unsigned int tessellation = 64,
     const ::std::function<float(unsigned int i, float distance)>& radiusFunction
     = nullptr,
     unsigned int cap = Mesh::NO_CAP(), Scene* = nullptr, bool updatable = false,
     unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
-    Mesh* instance               = nullptr);
+    const MeshPtr& instance      = nullptr);
 
   /**
    * @brief Creates a polyhedron mesh.
@@ -1218,8 +1217,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreatePolyhedron(const string_t& name,
-                                PolyhedronOptions& options, Scene*);
+  static MeshPtr CreatePolyhedron(const string_t& name,
+                                  PolyhedronOptions& options, Scene*);
 
   /**
    * @brief Creates a sphere based upon an icosahedron with 20 triangular faces
@@ -1240,8 +1239,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static Mesh* CreateIcoSphere(const string_t& name, IcoSphereOptions& options,
-                               Scene*);
+  static MeshPtr CreateIcoSphere(const string_t& name,
+                                 IcoSphereOptions& options, Scene*);
 
   /**
    * @brief Creates a decal mesh.
@@ -1256,9 +1255,9 @@ public:
    * The parameter `angle` (float in radian, default 0) sets the angle to rotate
    * the decal.
    */
-  static Mesh* CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
-                           const Vector3& position, const Vector3& normal,
-                           const Vector3& size, float angle = 0.f);
+  static MeshPtr CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
+                             const Vector3& position, const Vector3& normal,
+                             const Vector3& size, float angle = 0.f);
 
   /** Skeletons **/
 
@@ -1278,7 +1277,7 @@ public:
    * @brief Update the vertex buffers by applying transformation from the bones.
    * @param {skeleton} skeleton to apply
    */
-  Mesh* applySkeleton(Skeleton* skeleton);
+  Mesh* applySkeleton(const SkeletonPtr& skeleton);
 
   /** Tools **/
 
@@ -1287,7 +1286,7 @@ public:
    * This min and max Vector3 are the minimum and maximum vectors of each mesh
    * bounding box from the passed array, in the World system
    */
-  static MinMax GetMinMax(const vector_t<AbstractMesh*>& meshes);
+  static MinMax GetMinMax(const vector_t<AbstractMeshPtr>& meshes);
 
   /**
    * @brief Returns a Vector3, the center of the `{min:` Vector3`, max:`
@@ -1295,7 +1294,7 @@ public:
    */
   static Vector3 Center(const MinMaxDistance& MinMaxVectorAndDistance);
   static Vector3 Center(const MinMax& minMaxVector);
-  static Vector3 Center(const vector_t<AbstractMesh*>& meshes);
+  static Vector3 Center(const vector_t<AbstractMeshPtr>& meshes);
 
   /**
    * @brief Merge the array of meshes into a single mesh for performance
@@ -1311,11 +1310,11 @@ public:
    * @param {boolean} subdivideWithSubMeshes - When true (false default),
    * subdivide mesh to his subMesh array with meshes source.
    */
-  static Mesh* MergeMeshes(const vector_t<Mesh*>& meshes,
-                           bool disposeSource          = true,
-                           bool allow32BitsIndices     = true,
-                           Mesh* meshSubclass          = nullptr,
-                           bool subdivideWithSubMeshes = false);
+  static MeshPtr MergeMeshes(const vector_t<MeshPtr>& meshes,
+                             bool disposeSource          = true,
+                             bool allow32BitsIndices     = true,
+                             MeshPtr meshSubclass        = nullptr,
+                             bool subdivideWithSubMeshes = false);
 
 protected:
   /**
@@ -1354,8 +1353,8 @@ protected:
   void
   set_onBeforeDraw(const ::std::function<void(Mesh*, EventState&)>& callback);
 
-  MorphTargetManager*& get_morphTargetManager();
-  void set_morphTargetManager(MorphTargetManager* const& value);
+  MorphTargetManagerPtr& get_morphTargetManager();
+  void set_morphTargetManager(const MorphTargetManagerPtr& value);
 
   Mesh*& get_source();
 
@@ -1420,11 +1419,11 @@ public:
     onLODLevelSelection;
 
   // Morph
-  Property<Mesh, MorphTargetManager*> morphTargetManager;
+  Property<Mesh, MorphTargetManagerPtr> morphTargetManager;
 
   Geometry* _geometry;
   Uint32Array _delayInfoKinds;
-  ::std::function<void(const Json::value& parsedGeometry, Mesh* mesh)>
+  ::std::function<void(const Json::value& parsedGeometry, const MeshPtr& mesh)>
     _delayLoadingFunction;
   unique_ptr_t<_VisibleInstances> _visibleInstances;
   bool _shouldGenerateFlatShading;
@@ -1472,7 +1471,7 @@ private:
   vector_t<unique_ptr_t<MeshLODLevel>> _LODLevels;
   vector_t<Vector3> _emptyPositions;
   // Morph
-  MorphTargetManager* _morphTargetManager;
+  MorphTargetManagerPtr _morphTargetManager;
   vector_t<VertexBuffer*> _delayInfo;
   Int32Array _renderIdForInstances;
   unique_ptr_t<_InstancesBatch> _batchCache;
@@ -1480,7 +1479,7 @@ private:
   unique_ptr_t<Buffer> _instancesBuffer;
   Float32Array _instancesData;
   size_t _overridenInstanceCount;
-  Material* _effectiveMaterial;
+  MaterialPtr _effectiveMaterial;
   int _preActivateId;
   // Will be used by ribbons mainly
   bool _areNormalsFrozen;

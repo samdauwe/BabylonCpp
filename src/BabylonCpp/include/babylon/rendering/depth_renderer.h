@@ -24,8 +24,8 @@ public:
    * scene's active camera)
    */
   DepthRenderer(Scene* scene,
-                unsigned int type = EngineConstants::TEXTURETYPE_FLOAT,
-                Camera* camera    = nullptr);
+                unsigned int type       = EngineConstants::TEXTURETYPE_FLOAT,
+                const CameraPtr& camera = nullptr);
   virtual ~DepthRenderer();
 
   /**
@@ -41,7 +41,7 @@ public:
    * @brief Gets the texture which the depth map will be written to.
    * @returns The depth map texture
    */
-  RenderTargetTexture* getDepthMap();
+  RenderTargetTexturePtr& getDepthMap();
 
   /**
    * @brief Disposes of the depth renderer.
@@ -50,10 +50,10 @@ public:
 
 private:
   Scene* _scene;
-  unique_ptr_t<RenderTargetTexture> _depthMap;
+  RenderTargetTexturePtr _depthMap;
   Effect* _effect;
   string_t _cachedDefines;
-  Camera* _camera;
+  CameraPtr _camera;
 
 }; // end of class DepthRenderer
 

@@ -30,7 +30,7 @@ namespace BABYLON {
 
 DefaultRenderingPipeline::DefaultRenderingPipeline(
   const string_t& iName, bool hdr, Scene* scene,
-  const unordered_map_t<string_t, Camera*>& cameras, bool automaticBuild)
+  const unordered_map_t<string_t, CameraPtr>& cameras, bool automaticBuild)
     : PostProcessRenderPipeline(scene ? scene->getEngine() :
                                         Engine::LastCreatedScene()->getEngine(),
                                 iName)
@@ -96,8 +96,8 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     , _prevPostProcess{nullptr}
     , _prevPrevPostProcess{nullptr}
 {
-  _cameras         = cameras;
-  _originalCameras = stl_util::extract_values(_cameras);
+  _cameras             = cameras;
+  _camerasToBeAttached = stl_util::extract_values(_cameras);
 
   // Initialize
   _scene           = scene ? scene : Engine::LastCreatedScene();
@@ -272,7 +272,7 @@ void DefaultRenderingPipeline::_rebuildBloom()
                           _defaultPipelineTextureType, false);
   bloom->threshold = oldBloom->threshold();
   for (auto& item : _cameras) {
-    oldBloom->disposeEffects(item.second);
+    oldBloom->disposeEffects(item.second.get());
   }
 }
 
@@ -316,7 +316,7 @@ void DefaultRenderingPipeline::set_depthOfFieldBlurLevel(
   depthOfField->lensSize      = oldDof->lensSize();
 
   for (auto& camera : _cameras) {
-    oldDof->disposeEffects(camera.second);
+    oldDof->disposeEffects(camera.second.get());
   }
 
   _buildPipeline();
@@ -464,7 +464,7 @@ void DefaultRenderingPipeline::_buildPipeline()
       _name, stl_util::extract_values(_cameras));
     // get back cameras to be used to reattach pipeline
     _cameras.clear();
-    for (auto& camera : _originalCameras) {
+    for (auto& camera : _camerasToBeAttached) {
       _cameras[camera->name] = camera;
     }
   }
@@ -558,7 +558,7 @@ void DefaultRenderingPipeline::_buildPipeline()
 void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
 {
   for (auto& item : _cameras) {
-    auto camera = item.second;
+    auto camera = item.second.get();
 
     if (imageProcessing) {
       imageProcessing->dispose(camera);
@@ -615,15 +615,17 @@ void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
 
 void DefaultRenderingPipeline::addCamera(Camera* camera)
 {
-  _originalCameras.emplace_back(camera);
+  _camerasToBeAttached.emplace_back(camera);
   _buildPipeline();
 }
 
 void DefaultRenderingPipeline::removeCamera(Camera* camera)
 {
-  _originalCameras.erase(
-    ::std::remove(_originalCameras.begin(), _originalCameras.end(), camera),
-    _originalCameras.end());
+  _camerasToBeAttached.erase(
+    ::std::remove_if(
+      _camerasToBeAttached.begin(), _camerasToBeAttached.end(),
+      [camera](const CameraPtr& _camera) { return _camera.get() == camera; }),
+    _camerasToBeAttached.end());
   _buildPipeline();
 }
 

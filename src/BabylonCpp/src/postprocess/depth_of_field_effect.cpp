@@ -13,7 +13,7 @@
 namespace BABYLON {
 
 DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
-                                       RenderTargetTexture* depthTexture,
+                                       RenderTargetTexture* iDepthTexture,
                                        DepthOfFieldEffectBlurLevel blurLevel,
                                        unsigned int pipelineTextureType,
                                        bool blockCompilation)
@@ -35,7 +35,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
   // Circle of confusion value for each pixel is used to determine how
   // much to blur that pixel
   _circleOfConfusion = ::std::make_unique<CircleOfConfusionPostProcess>(
-    "circleOfConfusion", depthTexture,
+    "circleOfConfusion", iDepthTexture,
     ToVariant<float, PostProcessOptions>(1.f), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     pipelineTextureType, blockCompilation);
@@ -99,7 +99,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
     _effects.emplace_back(_depthOfFieldBlurX[i].get());
   }
 
-    // Merge blurred images with original image based on circleOfConfusion
+  // Merge blurred images with original image based on circleOfConfusion
 #if 0
   _dofMerge = ::std::make_unique<DepthOfFieldMergePostProcess>(
     "dofMerge", _circleOfConfusion.get(), _circleOfConfusion.get(),
@@ -156,7 +156,7 @@ float DepthOfFieldEffect::get_lensSize() const
   return _circleOfConfusion->lensSize;
 }
 
-void DepthOfFieldEffect::set_depthTexture(RenderTargetTexture* const& value)
+void DepthOfFieldEffect::set_depthTexture(const RenderTargetTexturePtr& value)
 {
   _circleOfConfusion->depthTexture = value;
 }

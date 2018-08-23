@@ -37,7 +37,7 @@ public:
    */
   CircleOfConfusionPostProcess(
     const string_t& name, RenderTargetTexture* depthTexture,
-    const Variant<float, PostProcessOptions>& options, Camera* camera,
+    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
     unsigned int samplingMode = 0, Engine* engine = nullptr,
     bool reusable            = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
@@ -50,7 +50,7 @@ protected:
    * must be set here or in the constructor in order for the post process to
    * function.
    */
-  void set_depthTexture(RenderTargetTexture* const& value);
+  void set_depthTexture(const RenderTargetTexturePtr& value);
 
 public:
   /**
@@ -82,11 +82,11 @@ public:
    * Depth texture to be used to compute the circle of confusion. This must be
    * set here or in the constructor in order for the post process to function.
    */
-  WriteOnlyProperty<CircleOfConfusionPostProcess, RenderTargetTexture*>
+  WriteOnlyProperty<CircleOfConfusionPostProcess, RenderTargetTexturePtr>
     depthTexture;
 
 private:
-  RenderTargetTexture* _depthTexture;
+  RenderTargetTexturePtr _depthTexture;
 
 }; // end of class DepthOfFieldMergePostProcess
 

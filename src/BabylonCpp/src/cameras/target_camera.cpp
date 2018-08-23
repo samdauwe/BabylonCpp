@@ -364,8 +364,8 @@ void TargetCamera::_computeViewMatrix(const Vector3& position,
 }
 
 /** Camera rigs section **/
-Camera* TargetCamera::createRigCamera(const string_t& iName,
-                                      int /*cameraIndex*/)
+CameraPtr TargetCamera::createRigCamera(const string_t& iName,
+                                        int /*cameraIndex*/)
 {
   if (cameraRigMode != Camera::RIG_MODE_NONE()) {
     auto rigCamera = TargetCamera::New(iName, position, getScene());
@@ -384,8 +384,8 @@ Camera* TargetCamera::createRigCamera(const string_t& iName,
 
 void TargetCamera::_updateRigCameras()
 {
-  auto camLeft  = dynamic_cast<TargetCamera*>(_rigCameras[0]);
-  auto camRight = dynamic_cast<TargetCamera*>(_rigCameras[1]);
+  auto camLeft  = ::std::static_pointer_cast<TargetCamera>(_rigCameras[0]);
+  auto camRight = ::std::static_pointer_cast<TargetCamera>(_rigCameras[1]);
 
   switch (cameraRigMode) {
     case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH():

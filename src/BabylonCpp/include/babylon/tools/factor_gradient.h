@@ -11,12 +11,25 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT FactorGradient : public IValueGradient {
 
-  float getFactor() const;
+  FactorGradient();
+  ~FactorGradient();
 
   /**
-   * Gets or sets associated factor
+   * Gets or sets first associated factor
    */
-  float factor;
+  float factor1;
+
+  /**
+   * Gets or sets second associated factor
+   */
+  nullable_t<float> factor2;
+
+  /**
+   * Will get a number picked randomly between factor1 and factor2.
+   * If factor2 is undefined then factor1 will be used
+   * @returns the picked number
+   */
+  float getFactor() const;
 
 }; // end of struct FactorGradient
 

@@ -329,8 +329,8 @@ public:
    * @param doNotCloneChildren Do not clone children hierarchy
    * @returns the new transform node
    */
-  TransformNode* clone(const string_t& name, Node* newParent,
-                       bool doNotCloneChildren = false);
+  TransformNodePtr clone(const string_t& name, Node* newParent,
+                         bool doNotCloneChildren = false);
 
   Json::object serialize(Json::object& currentSerializationObject);
 
@@ -341,8 +341,8 @@ public:
    * @param `rootUrl` is a string, it's the root URL to prefix the
    * `delayLoadingFile` property with
    */
-  static TransformNode* Parse(const Json::value& parsedTransformNode,
-                              Scene* scene, const string_t& rootUrl);
+  static TransformNodePtr Parse(const Json::value& parsedTransformNode,
+                                Scene* scene, const string_t& rootUrl);
 
   /**
    * @brief Releases resources associated with this transform node.

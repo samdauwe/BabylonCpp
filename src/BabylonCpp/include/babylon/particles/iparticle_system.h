@@ -26,7 +26,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   /**
    * List of animations used by the particle system.
    */
-  vector_t<Animation*> animations;
+  vector_t<AnimationPtr> animations;
 
   /**
    * The id of the Particle system.
@@ -42,7 +42,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * The emitter represents the Mesh or position we are attaching the particle
    * system to.
    */
-  Variant<AbstractMesh*, Vector3> emitter;
+  Variant<AbstractMeshPtr, Vector3> emitter;
 
   /**
    * @brief Gets or sets a boolean indicating if the particles must be rendered
@@ -87,7 +87,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   /**
    * The texture used to render each particle. (this can be a spritesheet)
    */
-  Texture* particleTexture = nullptr;
+  TexturePtr particleTexture = nullptr;
 
   /**
    * Blend mode use to render the particle, it can be either
@@ -255,7 +255,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    *
    * Gets or sets a texture used to add random noise to particle positions
    */
-  BaseTexture* noiseTexture = nullptr;
+  BaseTexturePtr noiseTexture = nullptr;
 
   /**
    * Gets or sets the strength to apply to the noise value (default is (10, 10,

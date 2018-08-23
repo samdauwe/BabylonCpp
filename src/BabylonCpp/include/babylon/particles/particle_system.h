@@ -319,7 +319,7 @@ public:
   void dispose(bool disposeTexture             = true,
                bool disposeMaterialAndTextures = false) override;
 
-  vector_t<Animation*> getAnimations() override;
+  vector_t<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Creates a Point Emitter for the particle system (emits directly from

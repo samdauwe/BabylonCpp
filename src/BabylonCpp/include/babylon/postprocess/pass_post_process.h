@@ -13,7 +13,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PassPostProcess : public PostProcess {
 
 public:
-  PassPostProcess(const string_t& name, float ratio, Camera* camera,
+  PassPostProcess(const string_t& name, float ratio, const CameraPtr& camera,
                   unsigned int samplingMode, Engine* engine,
                   bool reusable = false,
                   unsigned int textureType

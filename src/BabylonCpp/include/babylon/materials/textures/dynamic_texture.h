@@ -20,24 +20,15 @@ struct DynamicTextureOptions {
 class BABYLON_SHARED_EXPORT DynamicTexture : public Texture {
 
 public:
-  /**
-   * @brief Creates a {BABYLON.DynamicTexture}.
-   * @param name defines the name of the texture
-   * @param options provides 3 alternatives for width and height of texture, a
-   * canvas, object with width and height properties, number for both width and
-   * height
-   * @param scene defines the scene where you want the texture
-   * @param generateMipMaps defines the use of MinMaps or not (default is false)
-   * @param samplingMode defines the sampling mode to use (default is
-   * BABYLON.Texture.TRILINEAR_SAMPLINGMODE)
-   * @param format defines the texture format to use (default is
-   * BABYLON.Engine.TEXTUREFORMAT_RGBA)
-   */
-  DynamicTexture(const string_t& name, const DynamicTextureOptions& options,
-                 Scene* scene, bool generateMipMaps,
-                 unsigned int samplingMode
-                 = TextureConstants::TRILINEAR_SAMPLINGMODE,
-                 unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+  template <typename... Ts>
+  static DynamicTexturePtr New(Ts&&... args)
+  {
+    auto texture = shared_ptr_t<DynamicTexture>(
+      new DynamicTexture(::std::forward<Ts>(args)...));
+    texture->addToScene(texture);
+
+    return texture;
+  }
   ~DynamicTexture() override;
 
   /**
@@ -97,11 +88,40 @@ public:
    * @brief Clones the texture.
    * @returns the clone of the texture.
    */
-  unique_ptr_t<DynamicTexture> clone();
+  DynamicTexturePtr clone();
 
+  /**
+   * @brief Serializes the dynamic texture.  The scene should be ready before
+   * the dynamic texture is serialized.
+   * @returns a serialized dynamic texture object
+   */
+  Json::object serialize() const;
+
+  /**
+   * @brief Hidden
+   */
   void _rebuild() override;
 
 protected:
+  /**
+   * @brief Creates a {BABYLON.DynamicTexture}.
+   * @param name defines the name of the texture
+   * @param options provides 3 alternatives for width and height of texture, a
+   * canvas, object with width and height properties, number for both width and
+   * height
+   * @param scene defines the scene where you want the texture
+   * @param generateMipMaps defines the use of MinMaps or not (default is false)
+   * @param samplingMode defines the sampling mode to use (default is
+   * BABYLON.Texture.TRILINEAR_SAMPLINGMODE)
+   * @param format defines the texture format to use (default is
+   * BABYLON.Engine.TEXTUREFORMAT_RGBA)
+   */
+  DynamicTexture(const string_t& name, const DynamicTextureOptions& options,
+                 Scene* scene, bool generateMipMaps,
+                 unsigned int samplingMode
+                 = TextureConstants::TRILINEAR_SAMPLINGMODE,
+                 unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+
   /**
    * @brief Gets the current state of canRescale.
    */

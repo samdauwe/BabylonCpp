@@ -13,12 +13,12 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT IAnimationKey {
 
-  IAnimationKey(int frame, AnimationValue value);
+  IAnimationKey(float frame, AnimationValue value);
 
   /**
    * Frame of the key frame
    */
-  int frame;
+  float frame;
 
   /**
    * Value at the specifies key frame

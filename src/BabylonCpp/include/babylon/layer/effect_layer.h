@@ -10,7 +10,7 @@
 namespace BABYLON {
 
 struct EmissiveTextureAndColor {
-  BaseTexture* texture = nullptr;
+  BaseTexturePtr texture = nullptr;
   Color4 color;
 }; // end of struct EmissiveTextureAndColor
 
@@ -24,16 +24,11 @@ struct EmissiveTextureAndColor {
  * The effect layer class can not be used directly and is intented to inherited
  * from to be customized per effects.
  */
-class BABYLON_SHARED_EXPORT EffectLayer {
+class BABYLON_SHARED_EXPORT EffectLayer
+    : public ::std::enable_shared_from_this<EffectLayer> {
 
 public:
-  void addToScene(unique_ptr_t<EffectLayer>&& newEffectLayer);
   virtual ~EffectLayer();
-
-  /**
-   * @brief Gets the camera attached to the layer.
-   */
-  Camera* camera() const;
 
   /**
    * @brief Get the effect name of the layer.
@@ -127,6 +122,16 @@ protected:
   EffectLayer(const string_t& name, Scene* scene);
 
   /**
+   * @brief Gets the camera attached to the layer.
+   */
+  CameraPtr& get_camera();
+
+  /**
+   * @brief Gets the rendering group id the layer should render in.
+   */
+  int get_renderingGroupId() const;
+
+  /**
    * @brief Create the merge effect. This is the shader use to blit the
    * information back to the main canvas at the end of the scene rendering.
    * @returns The effect containing the shader used to merge the effect on the
@@ -151,8 +156,9 @@ protected:
    * @brief Sets the required values for both the emissive texture and and the
    * main color.
    */
-  virtual void _setEmissiveTextureAndColor(Mesh* mesh, SubMesh* subMesh,
-                                           Material* material)
+  virtual void _setEmissiveTextureAndColor(const MeshPtr& mesh,
+                                           SubMesh* subMesh,
+                                           const MaterialPtr& material)
     = 0;
 
   /**
@@ -177,14 +183,14 @@ protected:
    * @return true if ready otherwise, false
    */
   bool _isReady(SubMesh* subMesh, bool useInstances,
-                BaseTexture* emissiveTexture);
+                const BaseTexturePtr& emissiveTexture);
 
   /**
    * @brief Returns true if the mesh should render, otherwise false.
    * @param mesh The mesh to render
    * @returns true if it should render otherwise false
    */
-  virtual bool _shouldRenderMesh(Mesh* mesh) const;
+  virtual bool _shouldRenderMesh(const MeshPtr& mesh) const;
 
   /**
    * @brief Returns true if the mesh should render, otherwise false.
@@ -196,7 +202,7 @@ protected:
   /**
    * @brief Renders the submesh passed in parameter to the generation map.
    */
-  void _renderSubMesh(SubMesh* subMesh);
+  void _renderSubMesh(const SubMeshPtr& subMesh);
 
 private:
   /**
@@ -224,7 +230,7 @@ private:
 
 public:
   /**
-   * The name of the layer.
+   * The Friendly of the effect in the scene.
    */
   string_t name;
 
@@ -237,6 +243,16 @@ public:
    * Specifies wether the highlight layer is enabled or not.
    */
   bool isEnabled;
+
+  /**
+   * Gets the camera attached to the layer.
+   */
+  ReadOnlyProperty<EffectLayer, CameraPtr> camera;
+
+  /**
+   * Gets the rendering group id the layer should render in.
+   */
+  ReadOnlyProperty<EffectLayer, int> renderingGroupId;
 
   /**
    * An event triggered when the effect layer has been disposed.
@@ -264,15 +280,16 @@ public:
    */
   Observable<EffectLayer> onSizeChangedObservable;
 
+  RenderTargetTexturePtr _mainTexture;
+
 protected:
   Scene* _scene;
   Engine* _engine;
   int _maxSize;
   ISize _mainTextureDesiredSize;
-  unique_ptr_t<RenderTargetTexture> _mainTexture;
   bool _shouldRender;
   vector_t<PostProcess*> _postProcesses;
-  vector_t<BaseTexture*> _textures;
+  vector_t<BaseTexturePtr> _textures;
   EmissiveTextureAndColor _emissiveTextureAndColor;
 
 private:

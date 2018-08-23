@@ -106,7 +106,7 @@ public:
   virtual ~Camera() override;
 
   virtual IReflect::Type type() const override;
-  void addToScene(unique_ptr_t<Camera>&& newCamera);
+  void addToScene(const CameraPtr& newCamera);
 
   /**
    * @brief Store current camera state (fov, position, etc..).
@@ -124,8 +124,8 @@ public:
    */
   string_t toString(bool fullDetails = false) const;
 
-  vector_t<AbstractMesh*>& getActiveMeshes();
-  bool isActiveMesh(AbstractMesh* mesh);
+  vector_t<AbstractMeshPtr>& getActiveMeshes();
+  bool isActiveMesh(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Is this camera ready to be used/rendered.
@@ -153,8 +153,8 @@ public:
   virtual void detachControl(ICanvas* canvas);
   void update();
   virtual void _checkInputs();
-  vector_t<Camera*>& rigCameras();
-  const vector_t<Camera*>& rigCameras() const;
+  vector_t<CameraPtr>& rigCameras();
+  const vector_t<CameraPtr>& rigCameras() const;
   PostProcess* rigPostProcess();
 
   /**
@@ -198,13 +198,13 @@ public:
                        bool disposeMaterialAndTextures = false) override;
 
   /** Camera rigs section **/
-  FreeCamera* leftCamera();
-  FreeCamera* rightCamera();
+  FreeCameraPtr leftCamera();
+  FreeCameraPtr rightCamera();
   Vector3* getLeftTarget();
   Vector3* getRightTarget();
   void setCameraRigMode(int mode, const Json::value& rigParams);
   void setCameraRigParameter(const string_t& name, float value);
-  virtual Camera* createRigCamera(const string_t& name, int cameraIndex);
+  virtual CameraPtr createRigCamera(const string_t& name, int cameraIndex);
   virtual void _updateRigCameras();
   virtual void _setupInputs();
   virtual Json::object serialize() const;
@@ -215,11 +215,11 @@ public:
   Matrix& computeWorldMatrix(bool force = false) override;
 
   // Statics
-  static Camera* GetConstructorFromName(const string_t& type,
-                                        const string_t& name, Scene* scene,
-                                        float interaxial_distance     = 0.f,
-                                        bool isStereoscopicSideBySide = true);
-  static Camera* Parse(const Json::value& parsedCamera, Scene* scene);
+  static CameraPtr GetConstructorFromName(const string_t& type,
+                                          const string_t& name, Scene* scene,
+                                          float interaxial_distance     = 0.f,
+                                          bool isStereoscopicSideBySide = true);
+  static CameraPtr Parse(const Json::value& parsedCamera, Scene* scene);
 
 protected:
   Camera(const string_t& name, const Vector3& position, Scene* scene,
@@ -284,11 +284,11 @@ public:
   float interaxialDistance;
   bool isStereoscopicSideBySide;
   CameraRigParams _cameraRigParams;
-  vector_t<Camera*> _rigCameras;
+  vector_t<CameraPtr> _rigCameras;
   PostProcess* _rigPostProcess;
   bool _skipRendering;
   Camera* _alternateCamera;
-  vector_t<RenderTargetTexture*> customRenderTargets;
+  vector_t<RenderTargetTexturePtr> customRenderTargets;
 
   /** Observables **/
   Observable<Camera> onViewMatrixChangedObservable;
@@ -300,7 +300,7 @@ public:
   Matrix _projectionMatrix;
   vector_t<PostProcess*> _postProcesses;
   Uint32Array _postProcessesTakenIndices;
-  vector_t<AbstractMesh*> _activeMeshes;
+  vector_t<AbstractMeshPtr> _activeMeshes;
 
   ReadOnlyProperty<Camera, Vector3> globalPosition;
 

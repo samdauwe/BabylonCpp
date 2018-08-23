@@ -1058,8 +1058,8 @@ size_t GPUParticleSystem::render(bool preWarm)
   _updateEffect->setFloat("currentCount", _currentActiveCount);
   _updateEffect->setFloat("timeDelta", _timeDelta);
   _updateEffect->setFloat("stopFactor", _stopped ? 0.f : 1.f);
-  _updateEffect->setTexture("randomSampler", _randomTexture.get());
-  _updateEffect->setTexture("randomSampler2", _randomTexture2.get());
+  _updateEffect->setTexture("randomSampler", _randomTexture);
+  _updateEffect->setTexture("randomSampler2", _randomTexture2);
   _updateEffect->setFloat2("lifeTime", minLifeTime, maxLifeTime);
   _updateEffect->setFloat2("emitPower", minEmitPower, maxEmitPower);
   if (!_colorGradientsTexture) {
@@ -1074,18 +1074,17 @@ size_t GPUParticleSystem::render(bool preWarm)
   _updateEffect->setVector3("gravity", gravity);
 
   if (_sizeGradientsTexture) {
-    _updateEffect->setTexture("sizeGradientSampler",
-                              _sizeGradientsTexture.get());
+    _updateEffect->setTexture("sizeGradientSampler", _sizeGradientsTexture);
   }
 
   if (_angularSpeedGradientsTexture) {
     _updateEffect->setTexture("angularSpeedGradientSampler",
-                              _angularSpeedGradientsTexture.get());
+                              _angularSpeedGradientsTexture);
   }
 
   if (_velocityGradientsTexture) {
     _updateEffect->setTexture("velocityGradientSampler",
-                              _velocityGradientsTexture.get());
+                              _velocityGradientsTexture);
   }
 
   if (particleEmitterType) {
@@ -1102,8 +1101,8 @@ size_t GPUParticleSystem::render(bool preWarm)
   }
 
   Matrix emitterWM;
-  if (emitter.is<AbstractMesh*>()) {
-    auto emitterMesh = emitter.get<AbstractMesh*>();
+  if (emitter.is<AbstractMeshPtr>()) {
+    auto emitterMesh = emitter.get<AbstractMeshPtr>();
     emitterWM        = *emitterMesh->getWorldMatrix();
   }
   else {
@@ -1135,8 +1134,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     _renderEffect->setTexture("textureSampler", particleTexture);
     _renderEffect->setVector2("translationPivot", translationPivot);
     if (_colorGradientsTexture) {
-      _renderEffect->setTexture("colorGradientSampler",
-                                _colorGradientsTexture.get());
+      _renderEffect->setTexture("colorGradientSampler", _colorGradientsTexture);
     }
     else {
       _renderEffect->setDirectColor4("colorDead", colorDead);
@@ -1249,11 +1247,11 @@ void GPUParticleSystem::dispose(bool disposeTexture,
 {
   // Remove from scene
   _scene->particleSystems.erase(
-    ::std::remove_if(
-      _scene->particleSystems.begin(), _scene->particleSystems.end(),
-      [this](const unique_ptr_t<IParticleSystem>& particleSystem) {
-        return particleSystem.get() == this;
-      }),
+    ::std::remove_if(_scene->particleSystems.begin(),
+                     _scene->particleSystems.end(),
+                     [this](const IParticleSystemPtr& particleSystem) {
+                       return particleSystem.get() == this;
+                     }),
     _scene->particleSystems.end());
 
   _releaseBuffers();
@@ -1315,7 +1313,7 @@ Json::object GPUParticleSystem::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<GPUParticleSystem>
+IParticleSystem*
 GPUParticleSystem::Parse(const Json::value& /*parsedParticleSystem*/,
                          Scene* /*scene*/, const string_t& /*rootUrl*/)
 {

@@ -261,10 +261,10 @@ WindowsMotionController::processModel(Scene* scene,
   }
 
   if (childMesh) {
-    childMesh->setParent(parentMesh);
+    childMesh->setParent(parentMesh.get());
 
     // Create our mesh info. Note that this method will always return non-null.
-    loadedMeshInfo = createMeshInfo(parentMesh);
+    loadedMeshInfo = createMeshInfo(parentMesh.get());
   }
   else {
     BABYLON_LOG_WARN("WindowsMotionController",

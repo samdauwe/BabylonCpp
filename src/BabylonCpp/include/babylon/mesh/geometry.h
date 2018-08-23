@@ -324,13 +324,14 @@ public:
   /**
    * @brief Hidden
    */
-  static void _ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh);
+  static void _ImportGeometry(const Json::value& parsedGeometry,
+                              const MeshPtr& mesh);
 
   /**
    * @brief Hidden
    */
   static void _CleanMatricesWeights(const Json::value& parsedGeometry,
-                                    Mesh* mesh);
+                                    const MeshPtr& mesh);
 
   /**
    * @brief Create a new geometry from persisted data (Using .babylon file

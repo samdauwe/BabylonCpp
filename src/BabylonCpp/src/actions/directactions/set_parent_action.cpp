@@ -6,8 +6,8 @@
 namespace BABYLON {
 
 SetParentAction::SetParentAction(unsigned int triggerOptions,
-                                 IAnimatable* target, IAnimatable* parent,
-                                 Condition* condition)
+                                 const IAnimatablePtr& target,
+                                 IAnimatable* parent, Condition* condition)
     : Action(triggerOptions, condition), _target{target}, _parent{parent}
 {
 }

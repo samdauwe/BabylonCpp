@@ -18,15 +18,16 @@ public:
 
   Gamepad* getGamepadByType(unsigned int type = Gamepad::XBOX);
   void dispose();
-
-private:
   Gamepad* _addNewGamepad(Gamepad* gamepad);
   void _startMonitoringGamepads();
   void _stopMonitoringGamepads();
   void _checkGamepadsStatus();
+
+private:
   void _updateGamepadObjects();
 
 public:
+  bool _isMonitoring;
   Observable<Gamepad> onGamepadConnectedObservable;
   Observable<Gamepad> onGamepadDisconnectedObservable;
 
@@ -36,7 +37,6 @@ private:
   vector_t<shared_ptr_t<Gamepad>> _babylonGamepads;
   bool _oneGamepadConnected;
 
-  bool _isMonitoring;
   bool _gamepadEventSupported;
 
   ::std::function<void(Event&& evt)> _onGamepadConnectedEvent;

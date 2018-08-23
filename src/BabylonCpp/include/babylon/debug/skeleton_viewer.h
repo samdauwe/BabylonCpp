@@ -26,8 +26,7 @@ public:
    * viewer
    */
   SkeletonViewer(Skeleton* skeleton, AbstractMesh* mesh, Scene* scene,
-                 bool autoUpdateBonesMatrices  = true,
-                 unsigned int renderingGroupId = 1);
+                 bool autoUpdateBonesMatrices = true, int renderingGroupId = 1);
   ~SkeletonViewer();
 
   /**
@@ -52,12 +51,13 @@ protected:
   bool get_isEnabled() const;
 
 private:
-  void _getBonePosition(Vector3& position, Bone* bone, const Matrix& meshMat,
-                        float x = 0.f, float y = 0.f, float z = 0.f) const;
-  void _getLinesForBonesWithLength(const vector_t<unique_ptr_t<Bone>>& bones,
+  void _getBonePosition(Vector3& position, const Bone& bone,
+                        const Matrix& meshMat, float x = 0.f, float y = 0.f,
+                        float z = 0.f) const;
+  void _getLinesForBonesWithLength(const vector_t<BonePtr>& bones,
                                    const Matrix& meshMat);
   void _resizeDebugLines(size_t bonesSize);
-  void _getLinesForBonesNoLength(const vector_t<unique_ptr_t<Bone>>& bones,
+  void _getLinesForBonesNoLength(const vector_t<BonePtr>& bones,
                                  const Matrix& meshMat);
 
 public:
@@ -85,14 +85,14 @@ public:
   /**
    * Defines the rendering group id to use with the viewer
    */
-  unsigned int renderingGroupId;
+  int renderingGroupId;
 
   Property<SkeletonViewer, bool> isEnabled;
 
 private:
   Scene* _scene;
   vector_t<vector_t<Vector3>> _debugLines;
-  LinesMesh* _debugMesh;
+  LinesMeshPtr _debugMesh;
   bool _isEnabled;
   ::std::function<void(Scene*, EventState&)> _renderFunction;
 

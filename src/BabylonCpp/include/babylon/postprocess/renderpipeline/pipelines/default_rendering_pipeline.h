@@ -61,7 +61,7 @@ public:
    */
   DefaultRenderingPipeline(const string_t& name = "", bool hdr = true,
                            Scene* scene = nullptr,
-                           const unordered_map_t<string_t, Camera*>& cameras
+                           const unordered_map_t<string_t, CameraPtr>& cameras
                            = {},
                            bool automaticBuild = true);
   virtual ~DefaultRenderingPipeline() override;
@@ -321,7 +321,7 @@ private:
   /**
    * Glow post process which adds a glow to emmisive areas of the image
    */
-  GlowLayer* _glowLayer;
+  GlowLayerPtr _glowLayer;
 
   Observer<ImageProcessingConfiguration>::Ptr
     _imageProcessingConfigurationObserver;
@@ -353,7 +353,7 @@ private:
   bool _hdr;
   unsigned int _samples;
   Scene* _scene;
-  vector_t<Camera*> _originalCameras;
+  vector_t<CameraPtr> _camerasToBeAttached;
 
   bool _hasCleared;
   PostProcess* _prevPostProcess;

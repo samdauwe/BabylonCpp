@@ -38,7 +38,7 @@ public:
   BloomMergePostProcess(const string_t& name, PostProcess* originalFromInput,
                         PostProcess* blurred, float weight,
                         const Variant<float, PostProcessOptions>& options,
-                        Camera* camera, unsigned int samplingMode,
+                        const CameraPtr& camera, unsigned int samplingMode,
                         Engine* engine, bool reusable = false,
                         unsigned int textureType
                         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,

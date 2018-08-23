@@ -9,7 +9,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PlayAnimationAction : public Action {
 
 public:
-  PlayAnimationAction(unsigned int triggerOptions, IAnimatable* target,
+  PlayAnimationAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                       int from, int to, bool loop = false,
                       Condition* condition = nullptr);
   ~PlayAnimationAction() override;
@@ -24,7 +24,7 @@ public:
   bool loop;
 
 private:
-  IAnimatable* _target;
+  IAnimatablePtr _target;
 
 }; // end of class PlayAnimationAction
 

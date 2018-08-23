@@ -7,7 +7,7 @@ namespace BABYLON {
 DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
   const string_t& name, PostProcess* originalFromInput,
   PostProcess* circleOfConfusion, const vector_t<PostProcess*>& iBlurSteps,
-  const Variant<float, PostProcessOptions>& options, Camera* camera,
+  const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType, bool blockCompilation)
     : PostProcess{name,

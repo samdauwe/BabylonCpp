@@ -22,7 +22,7 @@ public:
   ~PolygonMeshBuilder();
 
   PolygonMeshBuilder& addHole(const vector_t<Vector2>& hole);
-  Mesh* build(bool updatable = false, float depth = 0.f);
+  MeshPtr build(bool updatable = false, float depth = 0.f);
   ::std::pair<Float32Array, Uint32Array> buildWall(const Vector3& wall0Corner,
                                                    const Vector3& wall1Corner);
 

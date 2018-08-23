@@ -87,13 +87,13 @@ void LinesMesh::set_intersectionThreshold(float value)
   }
 }
 
-Material*& LinesMesh::get_material()
+MaterialPtr& LinesMesh::get_material()
 {
-  _colorShaderMaterial = static_cast<Material*>(_colorShader);
+  _colorShaderMaterial = ::std::static_pointer_cast<Material>(_colorShader);
   return _colorShaderMaterial;
 }
 
-void LinesMesh::set_material(Material* const& /*material*/)
+void LinesMesh::set_material(const MaterialPtr& /*material*/)
 {
   // Do nothing
 }
@@ -153,8 +153,8 @@ void LinesMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   Mesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-LinesMesh* LinesMesh::clone(const string_t& iName, Node* newParent,
-                            bool doNotCloneChildren)
+LinesMeshPtr LinesMesh::clone(const string_t& iName, Node* newParent,
+                              bool doNotCloneChildren)
 {
   return LinesMesh::New(iName, getScene(), newParent, this, doNotCloneChildren);
 }

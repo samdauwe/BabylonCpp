@@ -17,11 +17,10 @@ struct BABYLON_SHARED_EXPORT TextureTools {
    * @param height Desired height
    * @return Generated texture
    */
-  static unique_ptr_t<Texture> CreateResizedCopy(Texture* texture, int width,
-                                                 int height,
-                                                 bool useBilinearMode = true);
+  static TexturePtr CreateResizedCopy(const TexturePtr& texture, int width,
+                                      int height, bool useBilinearMode = true);
 
-  static BaseTexture* GetEnvironmentBRDFTexture(Scene* scene);
+  static BaseTexturePtr& GetEnvironmentBRDFTexture(Scene* scene);
 
   static string_t _environmentBRDFBase64Texture;
 

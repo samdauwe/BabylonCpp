@@ -53,10 +53,10 @@ public:
    * pipeline will be attached to
    */
   SSAO2RenderingPipeline(const string_t& name, Scene* scene, float ratio,
-                         const vector_t<Camera*>& cameras);
+                         const vector_t<CameraPtr>& cameras);
   SSAO2RenderingPipeline(const string_t& name, Scene* scene,
                          const SSAO2Ratio& ratio,
-                         const vector_t<Camera*>& cameras);
+                         const vector_t<CameraPtr>& cameras);
   virtual ~SSAO2RenderingPipeline() override;
 
   /** Methods */
@@ -181,9 +181,9 @@ private:
   bool _expensiveBlur;
 
   Scene* _scene;
-  Texture* _depthTexture;
-  Texture* _normalTexture;
-  DynamicTexture* _randomTexture;
+  TexturePtr _depthTexture;
+  TexturePtr _normalTexture;
+  DynamicTexturePtr _randomTexture;
 
   PassPostProcess* _originalColorPostProcess;
   PostProcess* _ssaoPostProcess;

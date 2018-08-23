@@ -48,7 +48,7 @@ private:
   Uint32Array _linesIndices;
   float _epsilon;
   size_t _indicesCount;
-  ShaderMaterial* _lineShader;
+  ShaderMaterialPtr _lineShader;
   unique_ptr_t<GL::IGLBuffer> _ib;
   unordered_map_t<unsigned int, unique_ptr_t<VertexBuffer>> _buffers;
   unordered_map_t<string_t, VertexBuffer*> _bufferPtrs;

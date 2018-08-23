@@ -40,7 +40,7 @@ public:
   DepthOfFieldMergePostProcess(
     const string_t& name, PostProcess* originalFromInput,
     PostProcess* circleOfConfusion, const vector_t<PostProcess*>& blurSteps,
-    const Variant<float, PostProcessOptions>& options, Camera* camera,
+    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
     unsigned int samplingMode = 0, Engine* engine = nullptr,
     bool reusable            = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,

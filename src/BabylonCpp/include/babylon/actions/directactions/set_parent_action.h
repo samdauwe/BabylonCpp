@@ -9,7 +9,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT SetParentAction : public Action {
 
 public:
-  SetParentAction(unsigned int triggerOptions, IAnimatable* target,
+  SetParentAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                   IAnimatable* parent, Condition* condition = nullptr);
   ~SetParentAction() override;
 
@@ -18,8 +18,8 @@ public:
   Json::object serialize(Json::object& parent) const override;
 
 private:
-  IAnimatable* _target;
-  IAnimatable* _parent;
+  IAnimatablePtr _target;
+  IAnimatablePtr _parent;
 
 }; // end of class SetParentAction
 

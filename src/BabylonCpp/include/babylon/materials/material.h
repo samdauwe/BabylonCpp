@@ -266,7 +266,7 @@ public:
    * @param mesh defines the mesh to check
    * @returns a boolean specifying if alpha blending is needed for the mesh
    */
-  virtual bool needAlphaBlendingForMesh(AbstractMesh* mesh) const;
+  virtual bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const;
 
   /**
    * @brief Specifies if this material should be rendered in alpha test mode.
@@ -278,7 +278,7 @@ public:
    * @brief Gets the texture used for the alpha test.
    * @returns the texture to use for alpha testing
    */
-  virtual BaseTexture* getAlphaTestTexture();
+  virtual BaseTexturePtr getAlphaTestTexture();
 
   /**
    * @brief Marks the material to indicate that it needs to be re-calculated.
@@ -340,22 +340,22 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  virtual vector_t<BaseTexture*> getActiveTextures() const;
+  virtual vector_t<BaseTexturePtr> getActiveTextures() const;
 
   /**
    * @brief Specifies if the material uses a texture.
    * @param texture defines the texture to check against the material
    * @returns a boolean specifying if the material uses the texture
    */
-  virtual bool hasTexture(BaseTexture* texture) const;
+  virtual bool hasTexture(const BaseTexturePtr& texture) const;
 
   /**
    * @brief akes a duplicate of the material, and gives it a new name.
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  virtual Material* clone(const string_t& name,
-                          bool cloneChildren = false) const;
+  virtual MaterialPtr clone(const string_t& name,
+                            bool cloneChildren = false) const;
 
   /**
    * @brief Gets the meshes bound to the material.
@@ -404,9 +404,9 @@ public:
     const ::std::function<void(const Effect* effect, const string_t& errors)>&
       onError);
 
-  void addMaterialToScene(unique_ptr_t<Material>&& newMaterial);
-  void addMultiMaterialToScene(unique_ptr_t<MultiMaterial>&& newMultiMaterial);
-  virtual vector_t<Animation*> getAnimations() override;
+  void addMaterialToScene(const MaterialPtr& newMaterial);
+  void addMultiMaterialToScene(const MultiMaterialPtr& newMultiMaterial);
+  vector_t<AnimationPtr> getAnimations() override;
   void copyTo(Material* other) const;
 
   /**
@@ -415,7 +415,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new MultiMaterial
    */
-  static MultiMaterial*
+  static MultiMaterialPtr
   ParseMultiMaterial(const Json::value& parsedMultiMaterial, Scene* scene);
 
   /**
@@ -425,8 +425,8 @@ public:
    * @param rootUrl defines the root URL to use to load textures
    * @returns a new material
    */
-  static Material* Parse(const Json::value& parsedMaterial, Scene* scene,
-                         const string_t& rootUrl);
+  static MaterialPtr Parse(const Json::value& parsedMaterial, Scene* scene,
+                           const string_t& rootUrl);
 
 protected:
   /**
@@ -692,7 +692,7 @@ public:
   /**
    * Callback triggered to get the render target textures
    */
-  ::std::function<vector_t<RenderTargetTexture*>()> getRenderTargetTextures;
+  ::std::function<vector_t<RenderTargetTexturePtr>()> getRenderTargetTextures;
 
   /**
    * Specifies if the material should be serialized

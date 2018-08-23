@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 IncrementValueAction::IncrementValueAction(unsigned int triggerOptions,
-                                           IAnimatable* target,
+                                           const IAnimatablePtr& target,
                                            const string_t& propertyPath,
                                            AnimationValue* value,
                                            Condition* condition)

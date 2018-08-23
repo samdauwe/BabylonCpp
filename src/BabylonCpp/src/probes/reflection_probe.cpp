@@ -23,9 +23,9 @@ ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
     , _attachedMesh{nullptr}
     , _invertYAxis{false}
 {
-  _renderTargetTexture = ::std::make_unique<RenderTargetTexture>(
-    name, size, scene, generateMipMaps, true,
-    EngineConstants::TEXTURETYPE_UNSIGNED_INT, true);
+  _renderTargetTexture
+    = RenderTargetTexture::New(name, size, scene, generateMipMaps, true,
+                               EngineConstants::TEXTURETYPE_UNSIGNED_INT, true);
 
   _renderTargetTexture->onBeforeRenderObservable.add(
     [this](int* faceIndex, EventState&) {
@@ -117,7 +117,7 @@ RenderTargetTexture* ReflectionProbe::cubeTexture()
   return _renderTargetTexture.get();
 }
 
-vector_t<AbstractMesh*>& ReflectionProbe::get_renderList()
+vector_t<AbstractMeshPtr>& ReflectionProbe::get_renderList()
 {
   return _renderTargetTexture->renderList;
 }
@@ -147,7 +147,7 @@ void ReflectionProbe::dispose()
 
   if (_renderTargetTexture) {
     _renderTargetTexture->dispose();
-    _renderTargetTexture.reset(nullptr);
+    _renderTargetTexture = nullptr;
   }
 }
 

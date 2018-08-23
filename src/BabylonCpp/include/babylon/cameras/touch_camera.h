@@ -16,10 +16,11 @@ public:
 
 public:
   template <typename... Ts>
-  static TouchCamera* New(Ts&&... args)
+  static TouchCameraPtr New(Ts&&... args)
   {
-    auto camera = new TouchCamera(::std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera
+      = shared_ptr_t<TouchCamera>(new TouchCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }

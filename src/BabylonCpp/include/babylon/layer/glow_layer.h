@@ -36,12 +36,9 @@ public:
 
 public:
   template <typename... Ts>
-  static GlowLayer* New(Ts&&... args)
+  static GlowLayerPtr New(Ts&&... args)
   {
-    auto glowLayer = new GlowLayer(::std::forward<Ts>(args)...);
-    glowLayer->addToScene(static_cast<unique_ptr_t<EffectLayer>>(glowLayer));
-
-    return glowLayer;
+    return shared_ptr_t<GlowLayer>(new GlowLayer(::std::forward<Ts>(args)...));
   }
   ~GlowLayer() override;
 
@@ -167,15 +164,15 @@ protected:
    * @brief Sets the required values for both the emissive texture and and the
    * main color.
    */
-  void _setEmissiveTextureAndColor(Mesh* mesh, SubMesh* subMesh,
-                                   Material* material) override;
+  void _setEmissiveTextureAndColor(const MeshPtr& mesh, SubMesh* subMesh,
+                                   const MaterialPtr& material) override;
 
   /**
    * @brief Returns true if the mesh should render, otherwise false.
    * @param mesh The mesh to render
    * @returns true if it should render otherwise false
    */
-  bool _shouldRenderMesh(Mesh* mesh) const override;
+  bool _shouldRenderMesh(const MeshPtr& mesh) const override;
 
 private:
   /**
@@ -203,14 +200,15 @@ public:
    * Callback used to let the user override the color selection on a per mesh
    * basis
    */
-  ::std::function<void(Mesh* mesh, SubMesh* subMesh, Material* material,
-                       Color4& result)>
+  ::std::function<void(const MeshPtr& mesh, SubMesh* subMesh,
+                       Material* material, Color4& result)>
     customEmissiveColorSelector;
   /**
    * Callback used to let the user override the texture selection on a per mesh
    * basis
    */
-  ::std::function<Texture*(Mesh* mesh, SubMesh* subMesh, Material* material)>
+  ::std::function<TexturePtr(const MeshPtr& mesh, SubMesh* subMesh,
+                             const MaterialPtr& material)>
     customEmissiveTextureSelector;
 
 private:
@@ -222,8 +220,8 @@ private:
   unique_ptr_t<BlurPostProcess> _verticalBlurPostprocess1;
   unique_ptr_t<BlurPostProcess> _horizontalBlurPostprocess2;
   unique_ptr_t<BlurPostProcess> _verticalBlurPostprocess2;
-  unique_ptr_t<RenderTargetTexture> _blurTexture1;
-  unique_ptr_t<RenderTargetTexture> _blurTexture2;
+  RenderTargetTexturePtr _blurTexture1;
+  RenderTargetTexturePtr _blurTexture2;
   vector_t<PostProcess*> _postProcesses1;
   vector_t<PostProcess*> _postProcesses2;
 

@@ -12,7 +12,7 @@ namespace BABYLON {
 constexpr const char* ParticleHelper::BaseAssetsUrl;
 
 ParticleSystem*
-ParticleHelper::CreateDefault(const Variant<AbstractMesh*, Vector3>& emitter,
+ParticleHelper::CreateDefault(const Variant<AbstractMeshPtr, Vector3>& emitter,
                               size_t capacity, Scene* scene)
 {
   auto system = new ParticleSystem("default system", capacity, scene);

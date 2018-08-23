@@ -14,8 +14,9 @@ class BABYLON_SHARED_EXPORT FilterPostProcess : public PostProcess {
 
 public:
   FilterPostProcess(const string_t& name, const Matrix& kernelMatrix,
-                    float ratio, Camera* camera, unsigned int samplingMode,
-                    Engine* engine, bool reusable = false);
+                    float ratio, const CameraPtr& camera,
+                    unsigned int samplingMode, Engine* engine,
+                    bool reusable = false);
   ~FilterPostProcess();
 
 public:

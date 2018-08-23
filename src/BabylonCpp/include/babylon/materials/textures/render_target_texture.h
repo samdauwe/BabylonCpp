@@ -34,37 +34,15 @@ public:
   }
 
 public:
-  /**
-   * @brief Instantiate a render target texture. This is mainly to render of
-   * screen the scene to for instance apply post processse or used a shadow,
-   * depth texture...
-   * @param name The friendly name of the texture
-   * @param size The size of the RTT (number if square, or {with: number,
-   * height:number} or {ratio:} to define a ratio from the main scene)
-   * @param scene The scene the RTT belongs to. The latest created scene will be
-   * used if not precised.
-   * @param generateMipMaps True if mip maps need to be generated after render.
-   * @param doNotChangeAspectRatio True to not change the aspect ratio of the
-   * scene in the RTT
-   * @param type The type of the buffer in the RTT (int, half float, float...)
-   * @param isCube True if a cube texture needs to be created
-   * @param samplingMode The sampling mode to be usedwith the render target
-   * (Linear, Nearest...)
-   * @param generateDepthBuffer True to generate a depth buffer
-   * @param generateStencilBuffer True to generate a stencil buffer
-   * @param isMulti True if multiple textures need to be created (Draw Buffers)
-   * @param format The internal format of the buffer in the RTT (RED, RG, RGB,
-   * RGBA, ALPHA...)
-   */
-  RenderTargetTexture(
-    const string_t& name, const ISize& size, Scene* scene,
-    bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
-    unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    bool isCube               = false,
-    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    bool generateDepthBuffer = true, bool generateStencilBuffer = false,
-    bool isMulti        = false,
-    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+  template <typename... Ts>
+  static RenderTargetTexturePtr New(Ts&&... args)
+  {
+    auto texture = shared_ptr_t<RenderTargetTexture>(
+      new RenderTargetTexture(::std::forward<Ts>(args)...));
+    texture->addToScene(texture);
+
+    return texture;
+  }
   ~RenderTargetTexture() override;
 
   /**
@@ -116,11 +94,14 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const ::std::function<int(SubMesh* a, SubMesh* b)>& opaqueSortCompareFn
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      opaqueSortCompareFn
     = nullptr,
-    const ::std::function<int(SubMesh* a, SubMesh* b)>& alphaTestSortCompareFn
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      alphaTestSortCompareFn
     = nullptr,
-    const ::std::function<int(SubMesh* a, SubMesh* b)>& transparentSortCompareFn
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      transparentSortCompareFn
     = nullptr);
 
   /**
@@ -132,7 +113,7 @@ public:
    */
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
                                          bool autoClearDepthStencil);
-  unique_ptr_t<RenderTargetTexture> clone();
+  RenderTargetTexturePtr clone();
   Json::object serialize() const;
 
   /**
@@ -151,6 +132,44 @@ public:
   void freeRenderingGroups();
 
 protected:
+  /**
+   * @brief Instantiate a render target texture. This is mainly to render of
+   * screen the scene to for instance apply post processse or used a shadow,
+   * depth texture...
+   * @param name The friendly name of the texture
+   * @param size The size of the RTT (number if square, or {with: number,
+   * height:number} or {ratio:} to define a ratio from the main scene)
+   * @param scene The scene the RTT belongs to. The latest created scene will be
+   * used if not precised.
+   * @param generateMipMaps True if mip maps need to be generated after render.
+   * @param doNotChangeAspectRatio True to not change the aspect ratio of the
+   * scene in the RTT
+   * @param type The type of the buffer in the RTT (int, half float, float...)
+   * @param isCube True if a cube texture needs to be created
+   * @param samplingMode The sampling mode to be usedwith the render target
+   * (Linear, Nearest...)
+   * @param generateDepthBuffer True to generate a depth buffer
+   * @param generateStencilBuffer True to generate a stencil buffer
+   * @param isMulti True if multiple textures need to be created (Draw Buffers)
+   * @param format The internal format of the buffer in the RTT (RED, RG, RGB,
+   * RGBA, ALPHA...)
+   */
+  RenderTargetTexture(
+    const string_t& name, const ISize& size, Scene* scene,
+    bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
+    unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    bool isCube               = false,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    bool generateDepthBuffer = true, bool generateStencilBuffer = false,
+    bool isMulti        = false,
+    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+
+  /**
+   * @brief Use this list to define the list of mesh you want to render.
+   */
+  vector_t<AbstractMeshPtr>& get_renderList();
+  void set_renderList(const vector_t<AbstractMeshPtr>& value);
+
   /**
    * @brief Gets or sets the size of the bounding box associated with the
    * texture (when in cube mode) When defined, the cubemap will switch to local
@@ -184,7 +203,7 @@ private:
   int _bestReflectionRenderTargetDimension(int renderDimension,
                                            float scale) const;
   void renderToTarget(unsigned int faceIndex,
-                      const vector_t<AbstractMesh*>& currentRenderList,
+                      const vector_t<AbstractMeshPtr>& currentRenderList,
                       size_t currentRenderListLength, bool useCameraPostProcess,
                       bool dumpForDebug);
 
@@ -197,18 +216,17 @@ public:
   ::std::function<bool(AbstractMesh*)> renderListPredicate;
 
   /**
-   * Use this list to define the list of mesh you want to render.
+   * Use this list to define the list of mesh you want to render
    */
-  vector_t<AbstractMesh*> renderList;
+  Property<RenderTargetTexture, vector_t<AbstractMeshPtr>> renderList;
 
   bool renderParticles;
   bool renderSprites;
-  unsigned int coordinatesMode;
-  Camera* activeCamera;
-  ::std::function<void(const vector_t<SubMesh*>& opaqueSubMeshes,
-                       const vector_t<SubMesh*>& alphaTestSubMeshes,
-                       const vector_t<SubMesh*>& transparentSubMeshes,
-                       const vector_t<SubMesh*>& depthOnlySubMeshes,
+  CameraPtr activeCamera;
+  ::std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
+                       const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+                       const vector_t<SubMeshPtr>& transparentSubMeshes,
+                       const vector_t<SubMeshPtr>& depthOnlySubMeshes,
                        const ::std::function<void()>& beforeTransparents)>
     customRenderFunction;
   bool useCameraPostProcesses;
@@ -294,6 +312,7 @@ protected:
   Engine* _engine;
 
 private:
+  vector_t<AbstractMeshPtr> _renderList;
   unique_ptr_t<PostProcessManager> _postProcessManager;
   vector_t<PostProcess*> _postProcesses;
   Observer<Engine>::Ptr _resizeObserver;

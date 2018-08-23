@@ -172,8 +172,8 @@ void MorphTargetManager::synchronize()
   }
   // Flag meshes as dirty to resync with the active targets
   for (auto& abstractMesh : _scene->meshes) {
-    auto mesh = static_cast<Mesh*>(abstractMesh.get());
-    if (mesh && (mesh->morphTargetManager() == this)) {
+    auto mesh = ::std::static_pointer_cast<Mesh>(abstractMesh);
+    if (mesh && (mesh->morphTargetManager().get() == this)) {
       mesh->_syncGeometryWithMorphTargetManager();
     }
   }

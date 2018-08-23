@@ -23,14 +23,15 @@ void GenericController::initControllerMesh(
   SceneLoader::ImportMesh(
     {}, GenericController::MODEL_BASE_URL, GenericController::MODEL_FILENAME,
     scene,
-    [this, &meshLoaded](const vector_t<AbstractMesh*>& newMeshes,
-                        const vector_t<ParticleSystem*>& /*particleSystems*/,
-                        const vector_t<Skeleton*>& /*skeletons*/,
-                        const vector_t<AnimationGroup*>& /*animationGroups*/) {
+    [this,
+     &meshLoaded](const vector_t<AbstractMeshPtr>& newMeshes,
+                  const vector_t<IParticleSystemPtr>& /*particleSystems*/,
+                  const vector_t<SkeletonPtr>& /*skeletons*/,
+                  const vector_t<AnimationGroupPtr>& /*animationGroups*/) {
       _defaultModel = newMeshes[1];
       attachToMesh(_defaultModel);
       if (meshLoaded) {
-        meshLoaded(_defaultModel);
+        meshLoaded(_defaultModel.get());
       }
     });
 }

@@ -10,7 +10,8 @@ namespace BABYLON {
 RefractionPostProcess::RefractionPostProcess(
   const string_t& iName, const string_t& refractionTextureUrl,
   const Color3& iColor, float iDepth, int iColorLevel, float ratio,
-  Camera* camera, unsigned int samplingMode, Engine* engine, bool reusable)
+  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+  bool reusable)
     : PostProcess{iName,
                   "refraction",
                   {"baseColor", "depth", "colorLevel"},
@@ -46,12 +47,12 @@ RefractionPostProcess::~RefractionPostProcess()
 {
 }
 
-Texture*& RefractionPostProcess::get_refractionTexture()
+TexturePtr& RefractionPostProcess::get_refractionTexture()
 {
   return _refTexture;
 }
 
-void RefractionPostProcess::set_refractionTexture(Texture* const& value)
+void RefractionPostProcess::set_refractionTexture(const TexturePtr& value)
 {
   if (_refTexture && _ownRefractionTexture) {
     _refTexture->dispose();

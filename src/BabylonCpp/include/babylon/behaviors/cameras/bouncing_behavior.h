@@ -35,7 +35,7 @@ public:
 
   void init() override;
 
-  void attach(ArcRotateCamera* camera) override;
+  void attach(const ArcRotateCameraPtr& camera) override;
 
   void detach() override;
 
@@ -110,13 +110,13 @@ private:
   bool _autoTransitionRange;
 
   // Connection
-  ArcRotateCamera* _attachedCamera;
+  ArcRotateCameraPtr _attachedCamera;
   Observer<Camera>::Ptr _onAfterCheckInputsObserver;
   Observer<AbstractMesh>::Ptr _onMeshTargetChangedObserver;
 
   // Animations
   bool _radiusIsAnimating;
-  Animation* _radiusBounceTransition;
+  AnimationPtr _radiusBounceTransition;
   vector_t<Animatable*> _animatables;
   float _cachedWheelPrecision;
 

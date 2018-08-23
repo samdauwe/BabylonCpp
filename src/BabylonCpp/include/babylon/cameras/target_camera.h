@@ -11,10 +11,11 @@ class BABYLON_SHARED_EXPORT TargetCamera : public Camera {
 
 public:
   template <typename... Ts>
-  static TargetCamera* New(Ts&&... args)
+  static TargetCameraPtr New(Ts&&... args)
   {
-    auto camera = new TargetCamera(::std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera = shared_ptr_t<TargetCamera>(
+      new TargetCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }
@@ -60,7 +61,7 @@ public:
   Matrix _getViewMatrix() override;
 
   /** Camera rigs section **/
-  Camera* createRigCamera(const string_t& name, int cameraIndex) override;
+  CameraPtr createRigCamera(const string_t& name, int cameraIndex) override;
   void _updateRigCameras() override;
   const string_t getClassName() const override;
   virtual Json::object serialize() const override;

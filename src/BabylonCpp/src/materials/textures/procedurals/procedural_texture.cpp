@@ -296,7 +296,7 @@ void ProceduralTexture::_checkUniform(const string_t& uniformName)
 }
 
 ProceduralTexture& ProceduralTexture::setTexture(const string_t& iName,
-                                                 Texture* texture)
+                                                 const TexturePtr& texture)
 {
   auto it = ::std::find(_samplers.begin(), _samplers.end(), iName);
   if (it == _samplers.end()) {

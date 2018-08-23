@@ -5,23 +5,17 @@
 
 namespace BABYLON {
 
-class BABYLON_SHARED_EXPORT LensFlareSystem {
+class BABYLON_SHARED_EXPORT LensFlareSystem
+    : public ::std::enable_shared_from_this<LensFlareSystem> {
 
 public:
   template <typename... Ts>
-  static LensFlareSystem* New(Ts&&... /*args*/)
+  static LensFlareSystemPtr New(Ts&&... args)
   {
-#if 0
-    auto lensFlareSystem = new LensFlareSystem(std::forward<Ts>(args)...);
-    lensFlareSystem->addToScene(
-      static_cast<unique_ptr_t<LensFlareSystem>>(lensFlareSystem));
-    return lensFlareSystem;
-#endif
-    return nullptr;
+    return shared_ptr_t<LensFlareSystem>(
+      new LensFlareSystem(::std::forward<Ts>(args)...));
   }
   virtual ~LensFlareSystem();
-
-  void addToScene(unique_ptr_t<LensFlareSystem>&& lensFlareSystem);
 
   Scene* getScene();
   Mesh* getEmitter();
@@ -34,8 +28,8 @@ public:
   Json::object serialize() const;
 
   // Statics
-  static LensFlareSystem* Parse(const Json::value& parsedLensFlareSystem,
-                                Scene* scene, const string_t& rootUrl);
+  static LensFlareSystemPtr Parse(const Json::value& parsedLensFlareSystem,
+                                  Scene* scene, const string_t& rootUrl);
 
 protected:
   LensFlareSystem(const string_t name, Mesh* emitter, Scene* scene);
@@ -50,7 +44,7 @@ public:
   vector_t<unique_ptr_t<LensFlare>> lensFlares;
   int borderLimit;
   float viewportBorder;
-  ::std::function<bool(AbstractMesh* mesh)> meshesSelectionPredicate;
+  ::std::function<bool(const AbstractMeshPtr& mesh)> meshesSelectionPredicate;
   unsigned int layerMask;
   Property<LensFlareSystem, bool> isEnabled;
 

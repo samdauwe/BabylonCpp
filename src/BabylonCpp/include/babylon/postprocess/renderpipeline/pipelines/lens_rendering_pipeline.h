@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 struct LensRenderingPipelineParameters {
-  Texture* grain_texture;
+  TexturePtr grain_texture   = nullptr;
   float edge_blur            = 0;
   float grain_amount         = 0;
   float chromatic_aberration = 0;
@@ -105,7 +105,7 @@ public:
   LensRenderingPipeline(const string_t& name,
                         const LensRenderingPipelineParameters& parameters,
                         Scene* scene, float ratio = 1.f,
-                        const vector_t<Camera*>& cameras = vector_t<Camera*>());
+                        const vector_t<CameraPtr>& cameras = {});
   virtual ~LensRenderingPipeline();
 
   /** Methods **/
@@ -156,8 +156,8 @@ private:
 
 private:
   Scene* _scene;
-  RenderTargetTexture* _depthTexture;
-  Texture* _grainTexture;
+  RenderTargetTexturePtr _depthTexture;
+  TexturePtr _grainTexture;
 
   PostProcess* _chromaticAberrationPostProcess;
   PostProcess* _highlightsPostProcess;

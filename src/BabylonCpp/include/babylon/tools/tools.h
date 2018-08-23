@@ -17,6 +17,19 @@ struct BABYLON_SHARED_EXPORT Tools {
   /** Statics **/
 
   /**
+   * @brief Read the content of a byte array at a specified coordinates (taking
+   * in account wrapping).
+   * @param u defines the coordinate on X axis
+   * @param v defines the coordinate on Y axis
+   * @param width defines the width of the source data
+   * @param height defines the height of the source data
+   * @param pixels defines the source byte array
+   * @param color defines the output color
+   */
+  static void FetchToRef(int u, int v, int width, int height,
+                         const Uint8Array& pixels, Color4& color);
+
+  /**
    * @brief Interpolates between a and b via alpha.
    * @param a The lower value (returned when alpha = 0)
    * @param b The upper value (returned when alpha = 1)
@@ -24,6 +37,7 @@ struct BABYLON_SHARED_EXPORT Tools {
    * @return The mixed value
    */
   static float Mix(float a, float b, float alpha);
+
   static bool IsExponentOfTwo(size_t value);
 
   /**

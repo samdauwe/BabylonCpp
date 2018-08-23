@@ -14,8 +14,8 @@ class BABYLON_SHARED_EXPORT VRDistortionCorrectionPostProcess
     : public PostProcess {
 
 public:
-  VRDistortionCorrectionPostProcess(const string_t& name, Camera* camera,
-                                    bool isRightEye,
+  VRDistortionCorrectionPostProcess(const string_t& name,
+                                    const CameraPtr& camera, bool isRightEye,
                                     const VRCameraMetrics& vrMetrics);
   ~VRDistortionCorrectionPostProcess();
 

@@ -80,7 +80,7 @@ Skeleton* Bone::getSkeleton() const
   return _skeleton;
 }
 
-Bone* Bone::getParent()
+Bone* Bone::getParent() const
 {
   return _parent;
 }
@@ -199,7 +199,7 @@ void Bone::set_scaling(const Nullable<Vector3>& newScaling)
   setScale(*newScaling);
 }
 
-vector_t<Animation*> Bone::getAnimations()
+vector_t<AnimationPtr> Bone::getAnimations()
 {
   return animations;
 }

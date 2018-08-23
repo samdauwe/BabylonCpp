@@ -112,15 +112,14 @@ IReflect::Type Material::type() const
   return IReflect::Type::MATERIAL;
 }
 
-void Material::addMaterialToScene(unique_ptr_t<Material>&& newMaterial)
+void Material::addMaterialToScene(const MaterialPtr& newMaterial)
 {
-  _scene->materials.emplace_back(::std::move(newMaterial));
+  _scene->materials.emplace_back(newMaterial);
 }
 
-void Material::addMultiMaterialToScene(
-  unique_ptr_t<MultiMaterial>&& newMultiMaterial)
+void Material::addMultiMaterialToScene(const MultiMaterialPtr& newMultiMaterial)
 {
-  _scene->multiMaterials.emplace_back(::std::move(newMultiMaterial));
+  _scene->multiMaterials.emplace_back(newMultiMaterial);
 }
 
 unsigned int Material::get_alphaMode() const
@@ -177,9 +176,9 @@ void Material::set_useLogarithmicDepth(bool /*value*/)
 }
 
 // Methods
-vector_t<Animation*> Material::getAnimations()
+vector_t<AnimationPtr> Material::getAnimations()
 {
-  return vector_t<Animation*>();
+  return vector_t<AnimationPtr>();
 }
 
 // Events
@@ -317,10 +316,10 @@ bool Material::needAlphaBlending() const
   return (_alpha < 1.f);
 }
 
-bool Material::needAlphaBlendingForMesh(AbstractMesh* mesh) const
+bool Material::needAlphaBlendingForMesh(const AbstractMesh& mesh) const
 {
-  return needAlphaBlending() || (mesh->visibility() < 1.f)
-         || mesh->hasVertexAlpha();
+  return needAlphaBlending() || (mesh.visibility() < 1.f)
+         || mesh.hasVertexAlpha();
 }
 
 bool Material::needAlphaTesting() const
@@ -328,7 +327,7 @@ bool Material::needAlphaTesting() const
   return false;
 }
 
-BaseTexture* Material::getAlphaTestTexture()
+BaseTexturePtr Material::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -401,7 +400,7 @@ void Material::bindViewProjection(Effect* effect)
 
 bool Material::_shouldTurnAlphaTestOn(AbstractMesh* mesh) const
 {
-  return (!needAlphaBlendingForMesh(mesh) && needAlphaTesting());
+  return (!needAlphaBlendingForMesh(*mesh) && needAlphaTesting());
 }
 
 void Material::_afterBind(Mesh* mesh)
@@ -435,18 +434,18 @@ void Material::unbind()
   }
 }
 
-vector_t<BaseTexture*> Material::getActiveTextures() const
+vector_t<BaseTexturePtr> Material::getActiveTextures() const
 {
   return {};
 }
 
-bool Material::hasTexture(BaseTexture* /*texture*/) const
+bool Material::hasTexture(const BaseTexturePtr& /*texture*/) const
 {
   return false;
 }
 
-Material* Material::clone(const string_t& /*name*/,
-                          bool /*cloneChildren*/) const
+MaterialPtr Material::clone(const string_t& /*name*/,
+                            bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -456,7 +455,7 @@ vector_t<AbstractMesh*> Material::getBindedMeshes()
   vector_t<AbstractMesh*> result;
 
   for (auto& mesh : _scene->meshes) {
-    if (mesh->material() == this) {
+    if (mesh->material().get() == this) {
       result.emplace_back(mesh.get());
     }
   }
@@ -549,7 +548,7 @@ void Material::_markAllSubMeshesAsDirty(
       continue;
     }
     for (auto& subMesh : mesh->subMeshes) {
-      if (subMesh->getMaterial() != this) {
+      if (subMesh->getMaterial().get() != this) {
         continue;
       }
 
@@ -621,17 +620,17 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
   getScene()->freeProcessedMaterials();
 
   // Remove from scene
-  _scene->materials.erase(
-    ::std::remove_if(_scene->materials.begin(), _scene->materials.end(),
-                     [this](const unique_ptr_t<Material>& material) {
-                       return material.get() == this;
-                     }),
-    _scene->materials.end());
+  _scene->materials.erase(::std::remove_if(_scene->materials.begin(),
+                                           _scene->materials.end(),
+                                           [this](const MaterialPtr& material) {
+                                             return material.get() == this;
+                                           }),
+                          _scene->materials.end());
 
   // Remove from meshes
   Mesh* _mesh = nullptr;
   for (auto& mesh : _scene->meshes) {
-    if (mesh->material() == this) {
+    if (mesh->material().get() == this) {
       mesh->material = nullptr;
 
       _mesh = static_cast<Mesh*>(mesh.get());
@@ -694,7 +693,7 @@ Json::object Material::serialize() const
   return Json::object();
 }
 
-MultiMaterial*
+MultiMaterialPtr
 Material::ParseMultiMaterial(const Json::value& parsedMultiMaterial,
                              Scene* scene)
 {
@@ -719,8 +718,8 @@ Material::ParseMultiMaterial(const Json::value& parsedMultiMaterial,
   return multiMaterial;
 }
 
-Material* Material::Parse(const Json::value& parsedMaterial, Scene* scene,
-                          const string_t& rootUrl)
+MaterialPtr Material::Parse(const Json::value& parsedMaterial, Scene* scene,
+                            const string_t& rootUrl)
 {
   if (!parsedMaterial.contains("customType")
       || Json::GetString(parsedMaterial, "customType")

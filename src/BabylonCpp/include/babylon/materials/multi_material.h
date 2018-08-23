@@ -10,11 +10,11 @@ class BABYLON_SHARED_EXPORT MultiMaterial : public Material {
 
 public:
   template <typename... Ts>
-  static MultiMaterial* New(Ts&&... args)
+  static MultiMaterialPtr New(Ts&&... args)
   {
-    auto material = new MultiMaterial(::std::forward<Ts>(args)...);
-    material->addMultiMaterialToScene(
-      static_cast<unique_ptr_t<MultiMaterial>>(material));
+    auto material = shared_ptr_t<MultiMaterial>(
+      new MultiMaterial(::std::forward<Ts>(args)...));
+    material->addMultiMaterialToScene(material);
 
     return material;
   }
@@ -28,16 +28,16 @@ public:
   IReflect::Type type() const override;
 
   /** Properties **/
-  vector_t<Material*>& subMaterials();
-  void setSubMaterials(const vector_t<Material*>& value);
-  Material* getSubMaterial(unsigned int index);
-  vector_t<BaseTexture*> getActiveTextures() const override;
+  vector_t<MaterialPtr>& subMaterials();
+  void setSubMaterials(const vector_t<MaterialPtr>& value);
+  MaterialPtr& getSubMaterial(unsigned int index);
+  vector_t<BaseTexturePtr> getActiveTextures() const override;
 
   /** Methods **/
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
-  Material* clone(const string_t& _name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const string_t& _name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
   void dispose(bool forceDisposeEffect   = false,
                bool forceDisposeTextures = false) override;
@@ -46,10 +46,10 @@ protected:
   MultiMaterial(const string_t name, Scene* scene);
 
 private:
-  void _hookArray(const vector_t<Material*>& array);
+  void _hookArray(const vector_t<MaterialPtr>& array);
 
 private:
-  vector_t<Material*> _subMaterials;
+  vector_t<MaterialPtr> _subMaterials;
 
 }; // end of class MultiMaterial
 

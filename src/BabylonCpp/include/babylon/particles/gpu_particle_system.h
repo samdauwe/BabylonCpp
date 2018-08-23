@@ -243,9 +243,8 @@ public:
    * texture
    * @returns the parsed GPU particle system
    */
-  static unique_ptr_t<GPUParticleSystem>
-  Parse(const Json::value& parsedParticleSystem, Scene* scene,
-        const string_t& rootUrl);
+  static IParticleSystem* Parse(const Json::value& parsedParticleSystem,
+                                Scene* scene, const string_t& rootUrl);
 
 protected:
   Vector3& get_direction1();
@@ -380,8 +379,8 @@ private:
 
   float _timeDelta;
 
-  unique_ptr_t<RawTexture> _randomTexture;
-  unique_ptr_t<RawTexture> _randomTexture2;
+  RawTexturePtr _randomTexture;
+  RawTexturePtr _randomTexture2;
 
   int _attributesStrideSize;
   EffectCreationOptions* _updateEffectOptions;
@@ -396,16 +395,16 @@ private:
   bool _isBillboardBased;
 
   vector_t<ColorGradient> _colorGradients;
-  unique_ptr_t<RawTexture> _colorGradientsTexture;
+  RawTexturePtr _colorGradientsTexture;
 
   vector_t<FactorGradient> _angularSpeedGradients;
-  unique_ptr_t<RawTexture> _angularSpeedGradientsTexture;
+  RawTexturePtr _angularSpeedGradientsTexture;
 
   vector_t<FactorGradient> _sizeGradients;
-  unique_ptr_t<RawTexture> _sizeGradientsTexture;
+  RawTexturePtr _sizeGradientsTexture;
 
   vector_t<FactorGradient> _velocityGradients;
-  unique_ptr_t<RawTexture> _velocityGradientsTexture;
+  RawTexturePtr _velocityGradientsTexture;
 
 }; // end of class GPUParticleSystem
 

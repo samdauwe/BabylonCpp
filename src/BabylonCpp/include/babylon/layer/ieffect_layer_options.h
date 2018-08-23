@@ -2,7 +2,6 @@
 #define BABYLON_LAYER_IEFFECT_LAYER_OPTIONS_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {
@@ -22,7 +21,7 @@ struct BABYLON_SHARED_EXPORT IEffectLayerOptions {
   /**
    * Enforces a fixed size texture to ensure effect stability across devices.
    */
-  Nullable<int> mainTextureFixedSize = nullptr;
+  nullable_t<int> mainTextureFixedSize = nullopt_t;
 
   /**
    * Alpha blending mode used to apply the blur. Default depends of the
@@ -33,7 +32,12 @@ struct BABYLON_SHARED_EXPORT IEffectLayerOptions {
   /**
    * The camera attached to the layer.
    */
-  Camera* camera = nullptr;
+  CameraPtr camera = nullptr;
+
+  /**
+   * The rendering group to draw the layer in.
+   */
+  int renderingGroupId = -1;
 
 }; // end of struct IEffectLayerOptions
 

@@ -31,7 +31,7 @@ public:
    * @param emitter defines an optional mesh to use as emitter for the particle
    * systems
    */
-  void start(AbstractMesh* emitter = nullptr);
+  void start(const AbstractMeshPtr& emitter = nullptr);
 
   /**
    * @brief Release all associated resources.
@@ -59,7 +59,7 @@ protected:
   /**
    * @brief Gets the emitter node used with this set.
    */
-  TransformNode*& get_emitterNode();
+  TransformNodePtr& get_emitterNode();
 
 public:
   /**
@@ -70,11 +70,11 @@ public:
   /**
    * Gets the emitter node used with this set.
    */
-  ReadOnlyProperty<ParticleSystemSet, TransformNode*> emitterNode;
+  ReadOnlyProperty<ParticleSystemSet, TransformNodePtr> emitterNode;
 
 private:
   ParticleSystemSetEmitterCreationOptions _emitterCreationOptions;
-  TransformNode* _emitterNode;
+  TransformNodePtr _emitterNode;
 
 }; // end of class ParticleSystemSetEmitterCreationOptions
 

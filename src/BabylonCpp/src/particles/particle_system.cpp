@@ -878,8 +878,8 @@ void ParticleSystem::_update(int newParticles)
   // Update current
   _alive = !_particles.empty();
 
-  if (emitter.is<AbstractMesh*>()) {
-    auto emitterMesh    = emitter.get<AbstractMesh*>();
+  if (emitter.is<AbstractMeshPtr>()) {
+    auto emitterMesh    = emitter.get<AbstractMeshPtr>();
     _emitterWorldMatrix = *emitterMesh->getWorldMatrix();
   }
   else {
@@ -1358,11 +1358,11 @@ void ParticleSystem::dispose(bool disposeTexture,
 
   // Remove from scene
   _scene->particleSystems.erase(
-    ::std::remove_if(
-      _scene->particleSystems.begin(), _scene->particleSystems.end(),
-      [this](const unique_ptr_t<IParticleSystem>& particleSystem) {
-        return particleSystem.get() == this;
-      }),
+    ::std::remove_if(_scene->particleSystems.begin(),
+                     _scene->particleSystems.end(),
+                     [this](const IParticleSystemPtr& particleSystem) {
+                       return particleSystem.get() == this;
+                     }),
     _scene->particleSystems.end());
 
   // Callback
@@ -1370,7 +1370,7 @@ void ParticleSystem::dispose(bool disposeTexture,
   onDisposeObservable.clear();
 }
 
-vector_t<Animation*> ParticleSystem::getAnimations()
+vector_t<AnimationPtr> ParticleSystem::getAnimations()
 {
   return animations;
 }
@@ -1505,7 +1505,7 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
 
   // Emitter
   if (parsedParticleSystem.contains("emitterId")) {
-    particleSystem->emitter.set<AbstractMesh*>(scene->getLastMeshByID(
+    particleSystem->emitter.set<AbstractMeshPtr>(scene->getLastMeshByID(
       Json::GetString(parsedParticleSystem, "emitterId")));
   }
   else {
@@ -1522,12 +1522,14 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
   }
 
   if (parsedParticleSystem.contains("autoAnimate")) {
+#if 0
     scene->beginAnimation(
       particleSystem,
       Json::GetNumber(parsedParticleSystem, "autoAnimateFrom", 0),
       Json::GetNumber(parsedParticleSystem, "autoAnimateTo", 0),
       Json::GetBool(parsedParticleSystem, "autoAnimateLoop"),
       Json::GetNumber(parsedParticleSystem, "autoAnimateSpeed", 1.f));
+#endif
   }
 
   // Particle system

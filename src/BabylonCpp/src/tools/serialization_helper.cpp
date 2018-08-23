@@ -22,9 +22,9 @@ SerializationHelper::Parse(BaseTexture* baseTexture,
   return baseTexture;
 }
 
-Camera* SerializationHelper::Parse(Camera* camera,
-                                   const Json::value& parsedCamera,
-                                   Scene* /*scene*/)
+CameraPtr SerializationHelper::Parse(const CameraPtr& camera,
+                                     const Json::value& parsedCamera,
+                                     Scene* /*scene*/)
 {
   if (!camera) {
     return nullptr;
@@ -33,7 +33,7 @@ Camera* SerializationHelper::Parse(Camera* camera,
   string_t cameraClassName{camera->getClassName()};
   if (cameraClassName == "ArcRotateCamera") {
     /** ArcRotateCamera **/
-    auto arcRotateCamera = dynamic_cast<ArcRotateCamera*>(camera);
+    auto arcRotateCamera = ::std::static_pointer_cast<ArcRotateCamera>(camera);
     // alpha
     if (parsedCamera.contains("alpha")) {
       arcRotateCamera->alpha
@@ -122,7 +122,7 @@ Camera* SerializationHelper::Parse(Camera* camera,
   else if ((cameraClassName == "FollowCamera")
            || (cameraClassName == "ArcFollowCamera")) {
     /** FollowCamera / ArcFollowCamera **/
-    auto followCamera = dynamic_cast<FollowCamera*>(camera);
+    auto followCamera = ::std::static_pointer_cast<FollowCamera>(camera);
     // zoomOnFactor
     if (parsedCamera.contains("radius")) {
       followCamera->radius
@@ -151,7 +151,7 @@ Camera* SerializationHelper::Parse(Camera* camera,
   }
   else if (cameraClassName == "FreeCamera") {
     /** FreeCamera **/
-    auto freeCamera = dynamic_cast<FreeCamera*>(camera);
+    auto freeCamera = ::std::static_pointer_cast<FreeCamera>(camera);
     // ellipsoid
     if (parsedCamera.contains("ellipsoid")) {
       freeCamera->ellipsoid
@@ -171,8 +171,9 @@ Camera* SerializationHelper::Parse(Camera* camera,
   return camera;
 }
 
-Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
-                                  Scene* /*scene*/)
+LightPtr SerializationHelper::Parse(const LightPtr& light,
+                                    const Json::value& parsedLight,
+                                    Scene* /*scene*/)
 {
   if (!light) {
     return nullptr;
@@ -181,7 +182,7 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
   switch (light->getTypeID()) {
     case 0: {
       /** PointLight **/
-      auto pointLight = dynamic_cast<PointLight*>(light);
+      auto pointLight = ::std::static_pointer_cast<PointLight>(light);
       // position
       if (parsedLight.contains("position")) {
         pointLight->position
@@ -190,7 +191,8 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
     } break;
     case 1: {
       /** DirectionalLight **/
-      auto directionalLight = dynamic_cast<DirectionalLight*>(light);
+      auto directionalLight
+        = ::std::static_pointer_cast<DirectionalLight>(light);
       // position
       if (parsedLight.contains("position")) {
         directionalLight->position
@@ -214,7 +216,7 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
     } break;
     case 2: {
       /** SpotLight **/
-      auto spotLight = dynamic_cast<SpotLight*>(light);
+      auto spotLight = ::std::static_pointer_cast<SpotLight>(light);
       // position
       if (parsedLight.contains("position")) {
         spotLight->position
@@ -236,7 +238,8 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
     } break;
     case 3: {
       /** HemisphericLight **/
-      auto hemisphericLight = dynamic_cast<HemisphericLight*>(light);
+      auto hemisphericLight
+        = ::std::static_pointer_cast<HemisphericLight>(light);
       // groundColor
       if (parsedLight.contains("groundColor")) {
         hemisphericLight->groundColor
@@ -255,10 +258,10 @@ Light* SerializationHelper::Parse(Light* light, const Json::value& parsedLight,
   return light;
 }
 
-StandardMaterial* SerializationHelper::Parse(StandardMaterial* standardMaterial,
-                                             const Json::value& parsedMaterial,
-                                             Scene* /*scene*/,
-                                             const string_t& /*rootUrl*/)
+StandardMaterialPtr
+SerializationHelper::Parse(const StandardMaterialPtr& standardMaterial,
+                           const Json::value& parsedMaterial, Scene* /*scene*/,
+                           const string_t& /*rootUrl*/)
 {
   if (!standardMaterial) {
     return nullptr;

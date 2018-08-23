@@ -16,10 +16,11 @@ public:
 
 public:
   template <typename... Ts>
-  static GamepadCamera* New(Ts&&... args)
+  static GamepadCameraPtr New(Ts&&... args)
   {
-    auto camera = new GamepadCamera(::std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera = shared_ptr_t<GamepadCamera>(
+      new GamepadCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }

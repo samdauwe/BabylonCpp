@@ -31,9 +31,9 @@ public:
   {
     return Type::UNKNOWN;
   }
-  virtual vector_t<Animation*> getAnimations()
+  virtual vector_t<AnimationPtr> getAnimations()
   {
-    return vector_t<Animation*>();
+    return vector_t<AnimationPtr>();
   }
   virtual bool markTargetAsDirty() const
   {

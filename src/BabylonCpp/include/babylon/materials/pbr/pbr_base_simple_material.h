@@ -45,9 +45,9 @@ public:
   /**
    * @brief Return the active textures of the material.
    */
-  vector_t<BaseTexture*> getActiveTextures() const override;
+  vector_t<BaseTexturePtr> getActiveTextures() const override;
 
-  bool hasTexture(BaseTexture* texture) const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
 
 protected:
   /**
@@ -113,7 +113,7 @@ public:
    */
   float alphaCutOff;
 
-  BaseTexture* lightmapTexture;
+  BaseTexturePtr lightmapTexture;
 
   bool useLightmapAsShadowmap;
 

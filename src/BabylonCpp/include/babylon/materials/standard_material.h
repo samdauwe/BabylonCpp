@@ -30,10 +30,11 @@ private:
 
 public:
   template <typename... Ts>
-  static StandardMaterial* New(Ts&&... args)
+  static StandardMaterialPtr New(Ts&&... args)
   {
-    auto material = new StandardMaterial(std::forward<Ts>(args)...);
-    material->addMaterialToScene(static_cast<unique_ptr_t<Material>>(material));
+    auto material = shared_ptr_t<StandardMaterial>(
+      new StandardMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
 
     return material;
   }
@@ -48,7 +49,7 @@ public:
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
-  BaseTexture* getAlphaTestTexture() override;
+  BaseTexturePtr getAlphaTestTexture() override;
 
   /**
    * Child classes can use it to update shaders
@@ -58,34 +59,34 @@ public:
   void buildUniformLayout();
   void unbind() override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  vector_t<IAnimatable*> getAnimatables();
-  vector_t<BaseTexture*> getActiveTextures() const override;
-  bool hasTexture(BaseTexture* texture) const override;
+  vector_t<IAnimatablePtr> getAnimatables();
+  vector_t<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const string_t& name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const string_t& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   // Getters / Setters
-  BaseTexture* diffuseTexture() const;
-  void setDiffuseTexture(BaseTexture* value);
-  BaseTexture* ambientTexture() const;
-  void setAmbientTexture(BaseTexture* value);
-  BaseTexture* opacityTexture() const;
-  void setOpacityTexture(BaseTexture* value);
-  BaseTexture* reflectionTexture() const;
-  void setReflectionTexture(BaseTexture* value);
-  BaseTexture* emissiveTexture() const;
-  void setEmissiveTexture(BaseTexture* value);
-  BaseTexture* specularTexture() const;
-  void setSpecularTexture(BaseTexture* value);
-  BaseTexture* bumpTexture() const;
-  void setBumpTexture(BaseTexture* value);
-  BaseTexture* lightmapTexture() const;
-  void setLightmapTexture(BaseTexture* value);
-  BaseTexture* refractionTexture() const;
-  void setRefractionTexture(BaseTexture* value);
+  BaseTexturePtr& diffuseTexture();
+  void setDiffuseTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& ambientTexture();
+  void setAmbientTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& opacityTexture();
+  void setOpacityTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& reflectionTexture();
+  void setReflectionTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& emissiveTexture();
+  void setEmissiveTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& specularTexture();
+  void setSpecularTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& bumpTexture();
+  void setBumpTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& lightmapTexture();
+  void setLightmapTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& refractionTexture();
+  void setRefractionTexture(const BaseTexturePtr& value);
   bool useAlphaFromDiffuseTexture() const;
   void setUseAlphaFromDiffuseTexture(bool value);
   bool useEmissiveAsIllumination() const;
@@ -129,8 +130,8 @@ public:
   void setTwoSidedLighting(bool value);
 
   // Statics
-  static StandardMaterial* Parse(const Json::value& source, Scene* scene,
-                                 const string_t& rootUrl);
+  static StandardMaterialPtr Parse(const Json::value& source, Scene* scene,
+                                   const string_t& rootUrl);
   static bool DiffuseTextureEnabled();
   static void SetDiffuseTextureEnabled(bool value);
   static bool AmbientTextureEnabled();
@@ -232,12 +233,12 @@ protected:
   /**
    * @brief Gets the Color Grading 2D Lookup Texture.
    */
-  BaseTexture*& get_cameraColorGradingTexture();
+  BaseTexturePtr& get_cameraColorGradingTexture();
 
   /**
    * @brief Sets the Color Grading 2D Lookup Texture.
    */
-  void set_cameraColorGradingTexture(BaseTexture* const& value);
+  void set_cameraColorGradingTexture(const BaseTexturePtr& value);
 
   /**
    * @brief The color grading curves provide additional color adjustmnent that
@@ -348,7 +349,7 @@ public:
   /**
    * The Color Grading 2D Lookup Texture.
    */
-  Property<StandardMaterial, BaseTexture*> cameraColorGradingTexture;
+  Property<StandardMaterial, BaseTexturePtr> cameraColorGradingTexture;
 
   /**
    * The color grading curves provide additional color adjustmnent that
@@ -366,7 +367,7 @@ public:
   Property<StandardMaterial, shared_ptr_t<ColorCurves>> cameraColorCurves;
 
 protected:
-  vector_t<RenderTargetTexture*> _renderTargets;
+  vector_t<RenderTargetTexturePtr> _renderTargets;
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
   bool _useLogarithmicDepth;
@@ -377,15 +378,15 @@ protected:
   ImageProcessingConfiguration* _imageProcessingConfiguration;
 
 private:
-  BaseTexture* _diffuseTexture;
-  BaseTexture* _ambientTexture;
-  BaseTexture* _opacityTexture;
-  BaseTexture* _reflectionTexture;
-  BaseTexture* _emissiveTexture;
-  BaseTexture* _specularTexture;
-  BaseTexture* _bumpTexture;
-  BaseTexture* _lightmapTexture;
-  BaseTexture* _refractionTexture;
+  BaseTexturePtr _diffuseTexture;
+  BaseTexturePtr _ambientTexture;
+  BaseTexturePtr _opacityTexture;
+  BaseTexturePtr _reflectionTexture;
+  BaseTexturePtr _emissiveTexture;
+  BaseTexturePtr _specularTexture;
+  BaseTexturePtr _bumpTexture;
+  BaseTexturePtr _lightmapTexture;
+  BaseTexturePtr _refractionTexture;
   bool _useAlphaFromDiffuseTexture;
   bool _useEmissiveAsIllumination;
   bool _linkEmissiveWithDiffuse;

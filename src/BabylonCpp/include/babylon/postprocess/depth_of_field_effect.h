@@ -86,7 +86,7 @@ protected:
    * must be set here or in the constructor in order for the post process to
    * function.
    */
-  void set_depthTexture(RenderTargetTexture* const& value);
+  void set_depthTexture(const RenderTargetTexturePtr& value);
 
 public:
   /**
@@ -127,7 +127,7 @@ public:
    * Depth texture to be used to compute the circle of confusion. This must be
    * set here or in the constructor in order for the post process to function.
    */
-  WriteOnlyProperty<DepthOfFieldEffect, RenderTargetTexture*> depthTexture;
+  WriteOnlyProperty<DepthOfFieldEffect, RenderTargetTexturePtr> depthTexture;
 
 private:
   unique_ptr_t<DepthOfFieldMergePostProcess> _dofMerge;

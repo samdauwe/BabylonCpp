@@ -40,7 +40,7 @@ public:
    * @brief Gets parent bone.
    * @returns a bone or null if the bone is the root of the bone hierarchy
    */
-  Bone* getParent();
+  Bone* getParent() const;
 
   /**
    * @brief Sets the parent bone.
@@ -110,7 +110,7 @@ public:
   /**
    * @brief Gets the animations.
    */
-  vector_t<Animation*> getAnimations() override;
+  vector_t<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Update the base and local matrices.

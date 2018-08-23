@@ -56,7 +56,7 @@ bool PBRBaseSimpleMaterial::_shouldUseAlphaFromAlbedoTexture() const
          && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
-vector_t<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const
+vector_t<BaseTexturePtr> PBRBaseSimpleMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseMaterial::getActiveTextures();
 
@@ -83,7 +83,7 @@ vector_t<BaseTexture*> PBRBaseSimpleMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool PBRBaseSimpleMaterial::hasTexture(BaseTexture* texture) const
+bool PBRBaseSimpleMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
   if (PBRBaseMaterial::hasTexture(texture)) {
     return true;

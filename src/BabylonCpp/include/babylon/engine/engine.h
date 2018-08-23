@@ -9,6 +9,7 @@
 #include <babylon/engine/engine_options.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/size.h>
+#include <babylon/math/vector4.h>
 #include <babylon/math/viewport.h>
 #include <babylon/mesh/buffer_pointer.h>
 #include <babylon/tools/ifile_request.h>
@@ -198,7 +199,7 @@ public:
    * target if any)
    * @returns a number defining the aspect ratio
    */
-  float getAspectRatio(Camera* camera, bool useScreen = false);
+  float getAspectRatio(const Camera& camera, bool useScreen = false);
 
   /**
    * @brief Gets current screen aspect ratio.
@@ -498,6 +499,11 @@ public:
    */
   void scissorClear(int x, int y, int width, int height,
                     const Color4& clearColor);
+
+  /**
+   * @brief Hidden
+   */
+  void _viewport(int x, int y, int width, int height);
 
   /**
    * @brief Set the WebGL's viewport.
@@ -941,6 +947,8 @@ public:
 
   /**
    * @brief Create an effect to use with particle systems.
+   * Please note that some parameters like animation sheets or not being
+   * billboard are not supported in this configuration
    * @param fragmentName defines the base name of the effect (The name of file
    * without .fragment.fx)
    * @param uniformsNames defines a list of attribute names
@@ -956,8 +964,8 @@ public:
    * @returns the new Effect
    */
   Effect* createEffectForParticles(
-    const string_t& fragmentName, const vector_t<string_t>& uniformsNames,
-    const vector_t<string_t>& samplers, const string_t& defines = "",
+    const string_t& fragmentName, vector_t<string_t> uniformsNames,
+    vector_t<string_t> samplers, string_t defines = "",
     EffectFallbacks* fallbacks                                    = nullptr,
     const ::std::function<void(const Effect* effect)>& onCompiled = nullptr,
     const ::std::function<void(const Effect* effect, const string_t& errors)>&
@@ -1309,6 +1317,12 @@ public:
   /** Textures **/
 
   /**
+   * @brief Clears the list of texture accessible through engine.
+   * This can help preventing texture load conflict due to name collision.
+   */
+  void clearInternalTexturesCache();
+
+  /**
    * @brief Force the entire cache to be cleared.
    * You should not have to use this function unless your engine needs to share
    * the webGL context with another engine
@@ -1431,6 +1445,16 @@ public:
                    = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
+   * @brief hidden
+   */
+  int _getUnpackAlignement() const;
+
+  /**
+   * @brief hidden
+   */
+  void _unpackFlipY(bool value);
+
+  /**
    * @brief Creates a dynamic texture.
    * @param width defines the width of the texture
    * @param height defines the height of the texture
@@ -1540,6 +1564,23 @@ public:
   /**
    * @brief Hidden
    */
+  void _uploadCompressedDataToTextureDirectly(InternalTexture* texture,
+                                              unsigned int internalFormat,
+                                              float width, float height,
+                                              const Uint8Array& data,
+                                              unsigned int faceIndex = 0,
+                                              int lod                = 0);
+
+  /**
+   * @brief Hidden
+   */
+  void _uploadDataToTextureDirectly(InternalTexture* texture,
+                                    const Uint8Array& imageData,
+                                    unsigned int faceIndex = 0, int lod = 0);
+
+  /**
+   * @brief Hidden
+   */
   void _uploadDataToTexture(unsigned int target, int lod, int internalFormat,
                             int width, int height, unsigned int format,
                             unsigned int type, const Uint8Array& data);
@@ -1550,6 +1591,12 @@ public:
   void _uploadCompressedDataToTexture(unsigned int target, int lod,
                                       unsigned int internalFormat, int width,
                                       int height, const Uint8Array& data);
+
+  /**
+   * @brief Hidden
+   */
+  void _uploadImageToTexture(InternalTexture* texture, unsigned int faceIndex,
+                             int lod, ICanvas* image);
 
   /**
    * @brief Creates a new render target cube texture.
@@ -1566,8 +1613,8 @@ public:
    * ready to use data for PBR reflection).
    * @param rootUrl defines the url where the file to load is located
    * @param scene defines the current scene
-   * @param scale defines scale to apply to the mip map selection
-   * @param offset defines offset to apply to the mip map selection
+   * @param lodScale defines scale to apply to the mip map selection
+   * @param lodOffset defines offset to apply to the mip map selection
    * @param onLoad defines an optional callback raised when the texture is
    * loaded
    * @param onError defines an optional callback raised if there is an issue to
@@ -1580,7 +1627,7 @@ public:
    * @returns the cube texture as an InternalTexture
    */
   InternalTexture* createPrefilteredCubeTexture(
-    const string_t& rootUrl, Scene* scene, float scale, float offset,
+    const string_t& rootUrl, Scene* scene, float lodScale, float lodOffset,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
     const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
@@ -1611,7 +1658,7 @@ public:
    * @returns the cube texture as an InternalTexture
    */
   InternalTexture* createCubeTexture(
-    const string_t& rootUrl, Scene* scene, const vector_t<string_t>& extensions,
+    const string_t& rootUrl, Scene* scene, const vector_t<string_t>& files,
     bool noMipmap,
     const ::std::function<void(InternalTexture*, EventState&)>& onLoad
     = nullptr,
@@ -1777,7 +1824,7 @@ public:
    * @param texture The texture to apply
    */
   void setTexture(int channel, GL::IGLUniformLocation* uniform,
-                  BaseTexture* texture);
+                  const BaseTexturePtr& texture);
 
   /**
    * @brief Sets a depth stencil texture from a render target to the according
@@ -1788,7 +1835,7 @@ public:
    * texture to apply
    */
   void setDepthStencilTexture(int channel, GL::IGLUniformLocation* uniform,
-                              RenderTargetTexture* texture);
+                              const RenderTargetTexturePtr& texture);
 
   /**
    * @brief Sets an array of texture to the webGL context.
@@ -1797,12 +1844,12 @@ public:
    * @param textures defines the array of textures to bind
    */
   void setTextureArray(int channel, GL::IGLUniformLocation* uniform,
-                       const vector_t<BaseTexture*>& textures);
+                       const vector_t<BaseTexturePtr>& textures);
 
   /**
    * @brief Hidden
    */
-  void _setAnisotropicLevel(unsigned int target, BaseTexture* texture);
+  void _setAnisotropicLevel(unsigned int target, const BaseTexturePtr& texture);
 
   /**
    * @brief Reads pixels from the current frame buffer. Please note that this
@@ -2120,11 +2167,12 @@ protected:
   /**
    * @brief Hidden
    */
-  void _bindTextureDirectly(unsigned int target, InternalTexture* texture,
+  bool _bindTextureDirectly(unsigned int target, InternalTexture* texture,
                             bool forTextureDataUpdate = false,
                             bool force                = false);
 
 private:
+  void _prepareWorkingCanvas();
   void _rebuildInternalTextures();
   void _rebuildEffects();
   void _rebuildBuffers();
@@ -2133,7 +2181,7 @@ private:
   void _getVRDisplays();
   void _bindSamplerUniformToChannel(int sourceSlot, int destination);
   unsigned int _getTextureWrapMode(unsigned int mode) const;
-  bool _setTexture(int channel, BaseTexture* texture,
+  bool _setTexture(int channel, const BaseTexturePtr& texture,
                    bool isPartOfTextureArray = false,
                    bool depthStencilTexture  = false);
   void _setTextureParameterFloat(unsigned int target, unsigned int parameter,
@@ -2413,6 +2461,12 @@ public:
    */
   bool disablePerformanceMonitorInBackground;
 
+  /**
+   * Defines whether the engine has been created with the premultipliedAlpha
+   * option on or not.
+   */
+  bool premultipliedAlpha;
+
 protected:
   /**
    * Hidden
@@ -2583,6 +2637,8 @@ private:
   unsigned int _maxSimultaneousTextures;
   string_t _textureFormatInUse;
   unordered_map_t<int, GL::IGLUniformLocation*> _boundUniforms;
+  Vector4 _viewportCached;
+  nullable_t<bool> _unpackFlipYCached;
 
 }; // end of class Engine
 

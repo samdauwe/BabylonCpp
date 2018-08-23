@@ -37,7 +37,7 @@ public:
 
 private:
   vector_t<Vector3> _renderPoints;
-  LinesMesh* _renderLine;
+  LinesMeshPtr _renderLine;
   ::std::function<void(Scene*, EventState&)> _renderFunction;
   Scene* _scene;
 

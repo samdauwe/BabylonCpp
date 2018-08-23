@@ -43,7 +43,7 @@ public:
 
   void init() override;
 
-  void attach(ArcRotateCamera* camera) override;
+  void attach(const ArcRotateCameraPtr& camera) override;
 
   void detach() override;
 
@@ -315,7 +315,7 @@ private:
   Observer<PointerInfoPre>::Ptr _onPrePointerObservableObserver;
   Observer<Camera>::Ptr _onAfterCheckInputsObserver;
   Observer<AbstractMesh>::Ptr _onMeshTargetChangedObserver;
-  ArcRotateCamera* _attachedCamera;
+  ArcRotateCameraPtr _attachedCamera;
   bool _isPointerDown;
   Nullable<high_res_time_point_t> _lastFrameTime;
   high_res_time_point_t _lastInteractionTime;
@@ -323,9 +323,9 @@ private:
   // Framing control
   vector_t<Animatable*> _animatables;
   bool _betaIsAnimating;
-  Animation* _betaTransition;
-  Animation* _radiusTransition;
-  Animation* _vectorTransition;
+  AnimationPtr _betaTransition;
+  AnimationPtr _radiusTransition;
+  AnimationPtr _vectorTransition;
 
 }; // end of class FramingBehavior
 

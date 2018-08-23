@@ -66,7 +66,7 @@ private:
   Vector3 _originDirection;
   float _updraftMultiplier;
   ::std::function<void(Scene* scene, EventState& es)> _tickCallback;
-  Mesh* _cylinder;
+  MeshPtr _cylinder;
   // to keep the cylinders position, because normally the origin is in the
   // center and not on the bottom
   Vector3 _cylinderPosition;

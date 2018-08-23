@@ -2,6 +2,8 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene_component_constants.h>
+#include <babylon/layer/layer_scene_component.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -30,8 +32,14 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
 {
   texture = !imgUrl.empty() ? Texture::New(imgUrl, scene, true) : nullptr;
 
-  _scene = scene ? scene : Engine::LastCreatedScene();
-  _scene->layers.emplace_back(this);
+  _scene              = scene ? scene : Engine::LastCreatedScene();
+  auto layerComponent = ::std::static_pointer_cast<LayerSceneComponent>(
+    _scene->_getComponent(SceneComponentConstants::NAME_LAYER));
+  if (!layerComponent) {
+    layerComponent = LayerSceneComponent::New(_scene);
+    _scene->_addComponent(layerComponent);
+  }
+  _scene->layers.emplace_back(shared_from_this());
 
   auto engine = scene->getEngine();
 
@@ -196,7 +204,10 @@ void Layer::dispose()
 
   // Remove from scene
   auto& layers = _scene->layers;
-  layers.erase(std::remove(layers.begin(), layers.end(), this), layers.end());
+  layers.erase(std::remove_if(
+                 layers.begin(), layers.end(),
+                 [this](const LayerPtr& layer) { return layer.get() == this; }),
+               layers.end());
 
   // Callback
   onDisposeObservable.notifyObservers(this);

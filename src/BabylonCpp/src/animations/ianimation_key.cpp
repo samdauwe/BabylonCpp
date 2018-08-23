@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-IAnimationKey::IAnimationKey(int iFrame, AnimationValue iValue)
+IAnimationKey::IAnimationKey(float iFrame, AnimationValue iValue)
     : frame{iFrame}, value{iValue}
 {
 }

@@ -41,7 +41,7 @@ public:
    * @brief Attaches the AttachToBoxBehavior to the passed in mesh
    * @param target The mesh that the specified node will be attached to
    */
-  void attach(Mesh* target) override;
+  void attach(const MeshPtr& target) override;
 
   /**
    * @brief Detaches the behavior from the mesh.
@@ -69,7 +69,7 @@ public:
 private:
   TransformNode* ui;
   array_t<FaceDirectionInfo, 6> _faceVectors;
-  Mesh* _target;
+  MeshPtr _target;
   Scene* _scene;
   Observer<Scene>::Ptr _onRenderObserver;
   Matrix _tmpMatrix;

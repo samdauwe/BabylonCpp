@@ -77,7 +77,7 @@ void BouncingBehavior::init()
   // Do nothing
 }
 
-void BouncingBehavior::attach(ArcRotateCamera* camera)
+void BouncingBehavior::attach(const ArcRotateCameraPtr& camera)
 {
   _attachedCamera = camera;
   _onAfterCheckInputsObserver
@@ -149,7 +149,7 @@ void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)
   stopAllAnimations();
   _radiusIsAnimating = true;
   auto animatable    = Animation::TransitionTo(
-    "radius", _attachedCamera->radius + radiusDelta, _attachedCamera,
+    "radius", _attachedCamera->radius + radiusDelta, _attachedCamera.get(),
     _attachedCamera->getScene(), 60, _radiusBounceTransition,
     transitionDuration, [this]() { _clearAnimationLocks(); });
 

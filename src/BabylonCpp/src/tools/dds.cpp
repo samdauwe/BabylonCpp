@@ -4,6 +4,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/interfaces/igl_rendering_context.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/math/scalar.h>
 #include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 
@@ -343,7 +344,7 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
   return byteArray;
 }
 
-void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
+void DDSTools::UploadDDSLevels(Engine* engine, InternalTexture* texture,
                                const Uint8Array& arrayBuffer, DDSInfo& info,
                                bool loadMipmaps, unsigned int faces,
                                int lodIndex, int currentFace)
@@ -360,8 +361,8 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
     reinterpret_cast<const int*>(arrayBuffer.data() + DDS::headerLengthInt));
   int fourCC = 0;
   Uint8Array byteArray;
-  int blockBytes      = 1;
-  unsigned int format = 0, internalFormat = 0;
+  int blockBytes                        = 1;
+  unsigned int internalCompressedFormat = 0;
   float width = 0.f, height = 0.f;
   size_t dataOffset = 0, dataLength = 0;
 
@@ -391,16 +392,16 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
     fourCC = header[off_pfFourCC];
     switch (fourCC) {
       case DDS::FOURCC_DXT1:
-        blockBytes     = 8;
-        internalFormat = RGB_S3TC_DXT1_Format;
+        blockBytes               = 8;
+        internalCompressedFormat = RGB_S3TC_DXT1_Format;
         break;
       case DDS::FOURCC_DXT3:
-        blockBytes     = 16;
-        internalFormat = RGBA_S3TC_DXT3_Format;
+        blockBytes               = 16;
+        internalCompressedFormat = RGBA_S3TC_DXT3_Format;
         break;
       case DDS::FOURCC_DXT5:
-        blockBytes     = 16;
-        internalFormat = RGBA_S3TC_DXT5_Format;
+        blockBytes               = 16;
+        internalCompressedFormat = RGBA_S3TC_DXT5_Format;
         break;
       case DDS::FOURCC_D3DFMT_R16G16B16A16F:
         computeFormats = true;
@@ -441,8 +442,7 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
   auto aOffset = DDSTools::_ExtractLongWordOrder(header[off_AMask]);
 
   if (computeFormats) {
-    format = engine->_getWebGLTextureType(info.textureType);
-    internalFormat
+    internalCompressedFormat
       = engine->_getRGBABufferInternalSizedFormat(info.textureType);
   }
 
@@ -452,12 +452,6 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
   }
 
   for (unsigned int face = 0; face < faces; ++face) {
-    auto sampler
-      = (faces == 1) ?
-          GL::TEXTURE_2D :
-          (GL::TEXTURE_CUBE_MAP_POSITIVE_X + face
-           + ((currentFace > 0) ? static_cast<unsigned int>(currentFace) : 0));
-
     width      = static_cast<float>(header[off_width]);
     height     = static_cast<float>(header[off_height]);
     dataOffset = static_cast<size_t>(header[off_size] + 4);
@@ -469,37 +463,28 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
 
         if (!info.isCompressed && info.isFourCC) {
           // Not implemeted yet
-          ArrayBufferView buffer;
-
-          if (!buffer.uint8Array.empty()) {
-            engine->_uploadDataToTexture(
-              sampler, i, static_cast<int>(internalFormat),
-              static_cast<int>(width), static_cast<int>(height), GL::RGBA,
-              format, buffer.uint8Array);
-          }
         }
         else if (info.isRGB) {
+          texture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
           if (bpp == 24) {
-            dataLength = static_cast<size_t>(width * height * 3);
-            byteArray  = DDSTools::_GetRGBArrayBuffer(width, height, dataOffset,
+            texture->format = EngineConstants::TEXTUREFORMAT_RGB;
+            dataLength      = static_cast<size_t>(width * height * 3);
+            byteArray = DDSTools::_GetRGBArrayBuffer(width, height, dataOffset,
                                                      dataLength, arrayBuffer,
                                                      rOffset, gOffset, bOffset);
-            gl->texImage2D(sampler, i, GL::RGB, static_cast<int>(width),
-                           static_cast<int>(height), 0, GL::RGB,
-                           GL::UNSIGNED_BYTE, byteArray);
+            engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
           }
           else { // 32
-            dataLength = static_cast<size_t>(width * height * 4);
-            byteArray  = DDSTools::_GetRGBAArrayBuffer(
+            texture->format = EngineConstants::TEXTUREFORMAT_RGBA;
+            dataLength      = static_cast<size_t>(width * height * 4);
+            byteArray       = DDSTools::_GetRGBAArrayBuffer(
               width, height, dataOffset, dataLength, arrayBuffer, rOffset,
               gOffset, bOffset, aOffset);
-            gl->texImage2D(sampler, i, GL::RGBA, static_cast<int>(width),
-                           static_cast<int>(height), 0, GL::RGBA,
-                           GL::UNSIGNED_BYTE, byteArray);
+            engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
           }
         }
         else if (info.isLuminance) {
-          int unpackAlignment   = gl->getParameteri(GL::UNPACK_ALIGNMENT);
+          int unpackAlignment   = engine->_getUnpackAlignement();
           float unpaddedRowSize = width;
           float paddedRowSize
             = ::std::floor((width + unpackAlignment - 1) / unpackAlignment)
@@ -509,9 +494,11 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
 
           byteArray = DDSTools::_GetLuminanceArrayBuffer(
             width, height, dataOffset, dataLength, arrayBuffer);
-          gl->texImage2D(sampler, i, GL::LUMINANCE, static_cast<int>(width),
-                         static_cast<int>(height), 0, GL::LUMINANCE,
-                         GL::UNSIGNED_BYTE, byteArray);
+
+          texture->format = EngineConstants::TEXTUREFORMAT_LUMINANCE;
+          texture->type   = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+
+          engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
         }
         else {
           dataLength
@@ -520,9 +507,11 @@ void DDSTools::UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
           byteArray = Uint8Array(
             reinterpret_cast<const int*>(arrayBuffer.data() + dataOffset),
             reinterpret_cast<const int*>(arrayBuffer.data() + dataLength));
-          gl->compressedTexImage2D(sampler, i, internalFormat,
-                                   static_cast<int>(width),
-                                   static_cast<int>(height), 0, byteArray);
+
+          texture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+          engine->_uploadCompressedDataToTextureDirectly(
+            texture, internalCompressedFormat, width, height, byteArray, face,
+            i);
         }
       }
       dataOffset += bpp ? (width * height * (bpp / 8)) : dataLength;

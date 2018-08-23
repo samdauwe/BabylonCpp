@@ -235,8 +235,8 @@ CSG::CSG& CSG::CSG::copyTransformAttributes(const BABYLON::CSG::CSG& csg)
   return *this;
 }
 
-Mesh* CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
-                                  bool keepSubMeshes)
+MeshPtr CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
+                                    bool keepSubMeshes)
 {
   Matrix _matrix = matrix;
   _matrix.invert();
@@ -375,8 +375,8 @@ Mesh* CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
   return mesh;
 }
 
-Mesh* CSG::CSG::toMesh(const string_t& name, Material* material, Scene* scene,
-                       bool keepSubMeshes)
+MeshPtr CSG::CSG::toMesh(const string_t& name, const MaterialPtr& material,
+                         Scene* scene, bool keepSubMeshes)
 {
   auto mesh = buildMeshGeometry(name, scene, keepSubMeshes);
 

@@ -18,7 +18,7 @@ public:
    * @param target of the condition
    * @param value to compare with target state
    */
-  StateCondition(ActionManager* actionManager, IAnimatable* target,
+  StateCondition(ActionManager* actionManager, const IAnimatablePtr &target,
                  AnimationValue* value);
   virtual ~StateCondition() override;
 
@@ -44,7 +44,7 @@ private:
   /**
    * Internal only
    */
-  IAnimatable* _target;
+  IAnimatablePtr _target;
 
 }; // end of class StateCondition
 

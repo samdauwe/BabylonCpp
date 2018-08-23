@@ -83,7 +83,7 @@ void AttachToBoxBehavior::_lookAtToRef(const Vector3& pos, Quaternion& ref,
   Quaternion::FromRotationMatrixToRef(_lookAtTmpMatrix, ref);
 }
 
-void AttachToBoxBehavior::attach(Mesh* target)
+void AttachToBoxBehavior::attach(const MeshPtr& target)
 {
   _target = target;
   _scene  = _target->getScene();
@@ -110,15 +110,15 @@ void AttachToBoxBehavior::attach(Mesh* target)
 
       // Get camera up direction
       Vector3::TransformCoordinatesToRef(Vector3::Up(), _tmpMatrix, _tmpVector);
-      // Ignore faces to not select a parrelel face for the up vector of the UI
+      // Ignore faces to not select a parallel face for the up vector of the UI
       for (auto& v : _faceVectors) {
-        if (facing.direction.x && v.direction.x) {
+        if (facing.direction.x != 0.f && v.direction.x != 0.f) {
           v.ignore = true;
         }
-        if (facing.direction.y && v.direction.y) {
+        if (facing.direction.y != 0.f && v.direction.y != 0.f) {
           v.ignore = true;
         }
-        if (facing.direction.z && v.direction.z) {
+        if (facing.direction.z != 0.f && v.direction.z != 0.f) {
           v.ignore = true;
         }
       }

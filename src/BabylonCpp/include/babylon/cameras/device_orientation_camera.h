@@ -19,10 +19,11 @@ public:
 
 public:
   template <typename... Ts>
-  static DeviceOrientationCamera* New(Ts&&... args)
+  static DeviceOrientationCameraPtr New(Ts&&... args)
   {
-    auto camera = new DeviceOrientationCamera(std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera = shared_ptr_t<DeviceOrientationCamera>(
+      new DeviceOrientationCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }

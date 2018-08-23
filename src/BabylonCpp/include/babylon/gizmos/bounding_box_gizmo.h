@@ -53,7 +53,7 @@ public:
    * @param mesh the mesh to wrap in the bounding box mesh and make not pickable
    * @returns the bounding box mesh with the passed in mesh as a child
    */
-  static Mesh* MakeNotPickableAndWrapInBoundingBox(Mesh* mesh);
+  static MeshPtr MakeNotPickableAndWrapInBoundingBox(Mesh* mesh);
 
   /**
    * @brief CustomMeshes are not supported by this gizmo.
@@ -65,7 +65,7 @@ protected:
   void _attachedMeshChanged(AbstractMesh* value) override;
 
 private:
-  void _selectNode(Mesh* selectedMesh);
+  void _selectNode(const MeshPtr& selectedMesh);
   void _recurseComputeWorld(AbstractMesh* mesh);
 
 public:
@@ -104,9 +104,9 @@ public:
   Observable<DragStartOrEndEvent> onDragEndObservable;
 
 private:
-  AbstractMesh* _lineBoundingBox;
-  AbstractMesh* _rotateSpheresParent;
-  AbstractMesh* _scaleBoxesParent;
+  AbstractMeshPtr _lineBoundingBox;
+  AbstractMeshPtr _rotateSpheresParent;
+  AbstractMeshPtr _scaleBoxesParent;
   Vector3 _boundingDimensions;
   Observer<Scene>::Ptr _renderObserver;
   Observer<PointerInfo>::Ptr _pointerObserver;
@@ -115,7 +115,7 @@ private:
   Quaternion _tmpQuaternion;
   Vector3 _tmpVector;
 
-  AbstractMesh* _anchorMesh;
+  AbstractMeshPtr _anchorMesh;
   Vector3 _existingMeshScale;
 
 }; // end of class BoundingBoxGizmo

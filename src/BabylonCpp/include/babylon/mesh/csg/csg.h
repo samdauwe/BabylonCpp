@@ -43,12 +43,12 @@ public:
 
   // Build Raw mesh from CSG
   // Coordinates here are in world space
-  Mesh* buildMeshGeometry(const string_t& name, Scene* scene,
-                          bool keepSubMeshes);
+  MeshPtr buildMeshGeometry(const string_t& name, Scene* scene,
+                            bool keepSubMeshes);
 
   // Build Mesh from CSG taking material and transforms into account
-  Mesh* toMesh(const string_t& name, Material* material, Scene* scene,
-               bool keepSubMeshes = false);
+  MeshPtr toMesh(const string_t& name, const MaterialPtr& material,
+                 Scene* scene, bool keepSubMeshes = false);
 
 private:
   // Construct a BABYLON.CSG solid from a list of `BABYLON.CSG.Polygon`

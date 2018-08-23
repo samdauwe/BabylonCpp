@@ -108,7 +108,7 @@ public:
   unsigned int dashNb;
   vector_t<Vector3> points;
   bool updatable;
-  LinesMesh* instance;
+  LinesMeshPtr instance;
 
 }; // end of class DashedLinesOptions
 
@@ -192,7 +192,7 @@ public:
   float rotation;
   float scale;
   unsigned int cap;
-  Mesh* instance;
+  MeshPtr instance;
   bool invertUV;
   unsigned int sideOrientation;
   Vector4 frontUVs;
@@ -227,7 +227,7 @@ public:
   bool ribbonCloseArray;
   bool ribbonClosePath;
   unsigned int cap;
-  Mesh* instance;
+  MeshPtr instance;
   bool invertUV;
   unsigned int sideOrientation;
   Vector4 frontUVs;
@@ -376,7 +376,7 @@ public:
   vector_t<Color4> colors;
   bool updatable;
   bool useVertexAlpha;
-  LinesMesh* instance;
+  LinesMeshPtr instance;
 
 }; // end of class LinesOptions
 
@@ -399,7 +399,7 @@ public:
   vector_t<vector_t<Color4>> colors;
   bool updatable;
   bool useVertexAlpha;
-  LinesMesh* instance;
+  LinesMeshPtr instance;
 
 }; // end of class LineSystemOptions
 
@@ -530,7 +530,7 @@ public:
   Vector4 frontUVs;
   Vector4 backUVs;
   bool updatable;
-  Mesh* instance;
+  MeshPtr instance;
   vector_t<Vector2> uvs;
   vector_t<Color4> colors;
 
@@ -693,7 +693,7 @@ public:
   unsigned int sideOrientation;
   Vector4 frontUVs;
   Vector4 backUVs;
-  Mesh* instance;
+  MeshPtr instance;
   bool invertUV;
   bool updatable;
 

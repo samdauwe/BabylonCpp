@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT PhysicsRadialExplosionEventData {
-  Mesh* sphere;
+  MeshPtr sphere;
   vector_t<Ray> rays;
 }; // end of struct PhysicsRadialExplosionEventData
 

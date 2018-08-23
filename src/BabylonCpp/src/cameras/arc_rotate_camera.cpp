@@ -594,7 +594,7 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   _collisionTriggered = false;
 }
 
-void ArcRotateCamera::zoomOn(const vector_t<AbstractMesh*> meshes,
+void ArcRotateCamera::zoomOn(const vector_t<AbstractMeshPtr> meshes,
                              bool doNotUpdateMaxZ)
 {
   auto _meshes = meshes.empty() ? getScene()->getMeshes() : meshes;
@@ -617,7 +617,8 @@ void ArcRotateCamera::focusOn(
   }
 }
 
-Camera* ArcRotateCamera::createRigCamera(const string_t& iName, int cameraIndex)
+CameraPtr ArcRotateCamera::createRigCamera(const string_t& iName,
+                                           int cameraIndex)
 {
   float alphaShift = 0.f;
 
@@ -644,8 +645,8 @@ Camera* ArcRotateCamera::createRigCamera(const string_t& iName, int cameraIndex)
 
 void ArcRotateCamera::_updateRigCameras()
 {
-  auto camLeft  = dynamic_cast<ArcRotateCamera*>(_rigCameras[0]);
-  auto camRight = dynamic_cast<ArcRotateCamera*>(_rigCameras[1]);
+  auto camLeft  = ::std::static_pointer_cast<ArcRotateCamera>(_rigCameras[0]);
+  auto camRight = ::std::static_pointer_cast<ArcRotateCamera>(_rigCameras[1]);
 
   camLeft->beta = camRight->beta = beta;
   camLeft->radius = camRight->radius = radius;

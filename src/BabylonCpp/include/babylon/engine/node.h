@@ -16,14 +16,15 @@ namespace BABYLON {
 /**
  * Defines how a node can be built from a string name.
  */
-using NodeConstructor = ::std::function<Node*(
+using NodeConstructor = ::std::function<NodePtr(
   const string_t& name, Scene* scene, const nullable_t<Json::value>& options)>;
 
 /**
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera,
  * etc.).
  */
-class BABYLON_SHARED_EXPORT Node : public IAnimatable,
+class BABYLON_SHARED_EXPORT Node : public ::std::enable_shared_from_this<Node>,
+                                   public IAnimatable,
                                    public IBehaviorAware<Node>,
                                    public IDisposable {
 
@@ -49,7 +50,7 @@ public:
    * @param options defines optional options to transmit to constructors
    * @returns the new constructor or null
    */
-  static ::std::function<Node*()>
+  static ::std::function<NodePtr()>
   Construct(const string_t& type, const string_t& name, Scene* scene,
             const nullable_t<Json::value>& options = nullopt_t);
 
@@ -61,6 +62,12 @@ public:
    */
   Node(const string_t& name, Scene* scene = nullptr);
   virtual ~Node() override;
+
+  template <typename Derived>
+  shared_ptr_t<Derived> shared_from_base()
+  {
+    return std::static_pointer_cast<Derived>(shared_from_this());
+  }
 
   virtual IReflect::Type type() const override;
 
@@ -214,9 +221,9 @@ public:
    * part of the result, otherwise it will be ignored.
    */
   template <typename T>
-  void
-  _getDescendants(vector_t<T*>& results, bool directDescendantsOnly = false,
-                  const ::std::function<bool(Node* node)>& predicate = nullptr);
+  void _getDescendants(
+    vector_t<shared_ptr_t<T>>& results, bool directDescendantsOnly = false,
+    const ::std::function<bool(const NodePtr& node)>& predicate = nullptr);
 
   /**
    * @brief Will return all nodes that have this node as ascendant.
@@ -229,9 +236,10 @@ public:
    * part of the result, otherwise it will be ignored
    * @return all children nodes of all types
    */
-  vector_t<Node*>
-  getDescendants(bool directDescendantsOnly                         = false,
-                 const ::std::function<bool(Node* node)>& predicate = nullptr);
+  vector_t<NodePtr>
+  getDescendants(bool directDescendantsOnly = false,
+                 const ::std::function<bool(const NodePtr& node)>& predicate
+                 = nullptr);
 
   /**
    * @brief Get all child-meshes of this node.
@@ -244,9 +252,10 @@ public:
    * part of the result, otherwise it will be ignored
    * @returns an array of {BABYLON.AbstractMesh}
    */
-  virtual vector_t<AbstractMesh*>
-  getChildMeshes(bool directDescendantsOnly                         = false,
-                 const ::std::function<bool(Node* node)>& predicate = nullptr);
+  virtual vector_t<AbstractMeshPtr>
+  getChildMeshes(bool directDescendantsOnly = false,
+                 const ::std::function<bool(const NodePtr& node)>& predicate
+                 = nullptr);
 
   /**
    * @brief Get all child-transformNodes of this node.
@@ -259,10 +268,9 @@ public:
    * part of the result, otherwise it will be ignored
    * @returns an array of {BABYLON.TransformNode}
    */
-  virtual vector_t<TransformNode*>
-  getChildTransformNodes(bool directDescendantsOnly = false,
-                         const ::std::function<bool(Node* node)>& predicate
-                         = nullptr);
+  virtual vector_t<TransformNodePtr> getChildTransformNodes(
+    bool directDescendantsOnly                                  = false,
+    const ::std::function<bool(const NodePtr& node)>& predicate = nullptr);
 
   /**
    * @brief Get all direct children of this node.
@@ -271,8 +279,9 @@ public:
    * part of the result, otherwise it will be ignored
    * @returns an array of {BABYLON.Node}
    */
-  vector_t<Node*> getChildren(const ::std::function<bool(Node* node)>& predicate
-                              = nullptr);
+  vector_t<NodePtr>
+  getChildren(const ::std::function<bool(const NodePtr& node)>& predicate
+              = nullptr);
 
   /**
    * @brief Hidden
@@ -282,14 +291,14 @@ public:
   /**
    * @brief Hidden
    */
-  virtual vector_t<Animation*> getAnimations() override;
+  virtual vector_t<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Get an animation by name.
    * @param name defines the name of the animation to look for
    * @returns null if not found else the requested animation
    */
-  Animation* getAnimationByName(const string_t& name);
+  AnimationPtr getAnimationByName(const string_t& name);
 
   /**
    * @brief Creates an animation range for this node.
@@ -325,9 +334,10 @@ public:
    * @returns the object created for this animation. If range does not exist, it
    * will return null
    */
-  Animatable* beginAnimation(const string_t& name, bool loop = false,
-                             float speedRatio                       = 1.f,
-                             ::std::function<void()> onAnimationEnd = nullptr);
+  AnimatablePtr beginAnimation(const string_t& name, bool loop = false,
+                               float speedRatio = 1.f,
+                               ::std::function<void()> onAnimationEnd
+                               = nullptr);
 
   /**
    * @brief Serialize animation ranges into a JSON compatible object.
@@ -360,7 +370,7 @@ public:
    * @param parsedNode defines the serialization object to read data from
    * @param scene defines the hosting scene
    */
-  static void ParseAnimationRanges(Node* node, const Json::value& parsedNode,
+  static void ParseAnimationRanges(Node& node, const Json::value& parsedNode,
                                    Scene* scene);
 
 protected:
@@ -428,7 +438,7 @@ public:
   /**
    * Gets a list of Animations associated with the node.
    */
-  vector_t<Animation*> animations;
+  vector_t<AnimationPtr> animations;
 
   /**
    * Callback raised when the node is ready to be used
@@ -475,7 +485,7 @@ private:
   bool _isReady;
   int _parentRenderId;
   Node* _parentNode;
-  vector_t<Node*> _children;
+  vector_t<NodePtr> _children;
   AnimationPropertiesOverride* _animationPropertiesOverride;
   unique_ptr_t<Matrix> _worldMatrix;
   Observer<Node>::Ptr _onDisposeObserver;

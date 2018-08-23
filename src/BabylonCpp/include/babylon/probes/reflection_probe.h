@@ -49,17 +49,17 @@ private:
   void set_samples(unsigned int value);
   int get_refreshRate() const;
   void set_refreshRate(int value);
-  vector_t<AbstractMesh*>& get_renderList();
+  vector_t<AbstractMeshPtr>& get_renderList();
 
 public:
   Vector3 position;
   Property<ReflectionProbe, unsigned int> samples;
   Property<ReflectionProbe, int> refreshRate;
-  ReadOnlyProperty<ReflectionProbe, vector_t<AbstractMesh*>> renderList;
+  ReadOnlyProperty<ReflectionProbe, vector_t<AbstractMeshPtr>> renderList;
 
 private:
   Scene* _scene;
-  unique_ptr_t<RenderTargetTexture> _renderTargetTexture;
+  RenderTargetTexturePtr _renderTargetTexture;
   Matrix _projectionMatrix;
   Matrix _viewMatrix;
   Vector3 _target;

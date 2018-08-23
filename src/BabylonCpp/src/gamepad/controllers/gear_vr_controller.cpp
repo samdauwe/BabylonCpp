@@ -42,18 +42,18 @@ void GearVRController::initControllerMesh(
     {}, GearVRController::MODEL_BASE_URL, GearVRController::MODEL_FILENAME,
     scene,
     [this, &scene,
-     &meshLoaded](const vector_t<AbstractMesh*>& newMeshes,
-                  const vector_t<ParticleSystem*>& /*particleSystems*/,
-                  const vector_t<Skeleton*>& /*skeletons*/,
-                  const vector_t<AnimationGroup*>& /*animationGroups*/) {
+     &meshLoaded](const vector_t<AbstractMeshPtr>& newMeshes,
+                  const vector_t<IParticleSystemPtr>& /*particleSystems*/,
+                  const vector_t<SkeletonPtr>& /*skeletons*/,
+                  const vector_t<AnimationGroupPtr>& /*animationGroups*/) {
       // Offset the controller so it will rotate around the users wrist
       auto mesh                  = Mesh::New("", scene);
-      newMeshes[1]->parent       = mesh;
+      newMeshes[1]->parent       = mesh.get();
       newMeshes[1]->position().z = -0.15f;
       _defaultModel              = newMeshes[1];
       attachToMesh(_defaultModel);
       if (meshLoaded) {
-        meshLoaded(_defaultModel);
+        meshLoaded(_defaultModel.get());
       }
     });
 }

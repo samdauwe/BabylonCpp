@@ -20,8 +20,8 @@ AnimationGroup::AnimationGroup(const string_t& iName, Scene* scene)
     , targetedAnimations{this, &AnimationGroup::get_targetedAnimations}
     , animatables{this, &AnimationGroup::get_animatables}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
-    , _from{numeric_limits_t<int>::max()}
-    , _to{numeric_limits_t<int>::lowest()}
+    , _from{numeric_limits_t<float>::max()}
+    , _to{numeric_limits_t<float>::lowest()}
     , _isStarted{false}
     , _speedRatio{1.f}
 {
@@ -37,12 +37,12 @@ void AnimationGroup::addToScene(
   _scene->animationGroups.emplace_back(::std::move(newAnimationGroup));
 }
 
-int AnimationGroup::get_from() const
+float AnimationGroup::get_from() const
 {
   return _from;
 }
 
-int AnimationGroup::get_to() const
+float AnimationGroup::get_to() const
 {
   return _to;
 }
@@ -76,13 +76,14 @@ AnimationGroup::get_targetedAnimations()
   return _targetedAnimations;
 }
 
-vector_t<Animatable*>& AnimationGroup::get_animatables()
+vector_t<AnimatablePtr>& AnimationGroup::get_animatables()
 {
   return _animatables;
 }
 
-TargetedAnimation AnimationGroup::addTargetedAnimation(Animation* animation,
-                                                       IAnimatable* target)
+TargetedAnimation
+AnimationGroup::addTargetedAnimation(const AnimationPtr& animation,
+                                     const IAnimatablePtr& target)
 {
   TargetedAnimation targetedAnimation{
     animation, // animation,
@@ -104,8 +105,8 @@ TargetedAnimation AnimationGroup::addTargetedAnimation(Animation* animation,
   return targetedAnimation;
 }
 
-AnimationGroup& AnimationGroup::normalize(const Nullable<int>& iBeginFrame,
-                                          const Nullable<int>& iEndFrame)
+AnimationGroup& AnimationGroup::normalize(const nullable_t<int>& iBeginFrame,
+                                          const nullable_t<int>& iEndFrame)
 {
   auto beginFrame = iBeginFrame ? *iBeginFrame : _from;
   auto endFrame   = iEndFrame ? *iEndFrame : _to;
@@ -139,7 +140,8 @@ AnimationGroup& AnimationGroup::normalize(const Nullable<int>& iBeginFrame,
 }
 
 AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
-                                      Nullable<int> from, Nullable<int> to)
+                                      nullable_t<float> from,
+                                      nullable_t<float> to)
 {
   if (_isStarted || _targetedAnimations.empty()) {
     return *this;
@@ -148,7 +150,7 @@ AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
   for (auto& targetedAnimation : _targetedAnimations) {
     auto animatable = _scene->beginDirectAnimation(
       targetedAnimation->target, {targetedAnimation->animation},
-      from.hasValue() ? *from : _from, to.hasValue() ? *to : _to, loop,
+      from.has_value() ? *from : _from, to.has_value() ? *to : _to, loop,
       speedRatio);
     animatable->onAnimationEnd = [&]() {
       onAnimationEndObservable.notifyObservers(targetedAnimation.get());
@@ -173,6 +175,8 @@ AnimationGroup& AnimationGroup::pause()
   for (auto& animatable : _animatables) {
     animatable->pause();
   }
+
+  onAnimationGroupPauseObservable.notifyObservers(this);
 
   return *this;
 }
@@ -277,15 +281,15 @@ void AnimationGroup::dispose(bool /*doNotRecurse*/,
   _animatables.clear();
 
   _scene->animationGroups.erase(
-    ::std::remove_if(
-      _scene->animationGroups.begin(), _scene->animationGroups.end(),
-      [this](const unique_ptr_t<AnimationGroup>& animationGroup) {
-        return animationGroup.get() == this;
-      }),
+    ::std::remove_if(_scene->animationGroups.begin(),
+                     _scene->animationGroups.end(),
+                     [this](const AnimationGroupPtr& animationGroup) {
+                       return animationGroup.get() == this;
+                     }),
     _scene->animationGroups.end());
 }
 
-void AnimationGroup::_checkAnimationGroupEnded(Animatable* animatable)
+void AnimationGroup::_checkAnimationGroupEnded(const AnimatablePtr& animatable)
 {
   // animatable should be taken out of the array
   _animatables.erase(

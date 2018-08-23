@@ -167,9 +167,9 @@ IReflect::Type AbstractMesh::type() const
   return IReflect::Type::ABSTRACTMESH;
 }
 
-void AbstractMesh::addToScene(unique_ptr_t<AbstractMesh>&& newMesh)
+void AbstractMesh::addToScene(const AbstractMeshPtr& newMesh)
 {
-  getScene()->addMesh(::std::move(newMesh));
+  getScene()->addMesh(newMesh);
 }
 
 size_t AbstractMesh::get_facetNb() const
@@ -251,12 +251,12 @@ void AbstractMesh::set_onCollisionPositionChange(
     = onCollisionPositionChangeObservable.add(callback);
 }
 
-Material*& AbstractMesh::get_material()
+MaterialPtr& AbstractMesh::get_material()
 {
   return _material;
 }
 
-void AbstractMesh::set_material(Material* const& value)
+void AbstractMesh::set_material(const MaterialPtr& value)
 {
   if (_material == value) {
     return;
@@ -519,7 +519,10 @@ void AbstractMesh::_resyncLighSource(Light* light)
 {
   bool isIn = light->isEnabled() && light->canAffectMesh(this);
 
-  auto index = ::std::find(_lightSources.begin(), _lightSources.end(), light);
+  auto index = ::std::find_if(_lightSources.begin(), _lightSources.end(),
+                              [light](const LightPtr& lightSource) {
+                                return lightSource.get() == light;
+                              });
 
   if (index != _lightSources.end()) {
     if (!isIn) {
@@ -544,9 +547,16 @@ void AbstractMesh::_unBindEffect()
   }
 }
 
+void AbstractMesh::_removeLightSource(const LightPtr& light)
+{
+  return _removeLightSource(light.get());
+}
+
 void AbstractMesh::_removeLightSource(Light* light)
 {
-  auto index = ::std::find(_lightSources.begin(), _lightSources.end(), light);
+  auto index = ::std::find_if(
+    _lightSources.begin(), _lightSources.end(),
+    [light](const LightPtr& _light) { return _light.get() == light; });
 
   if (index == _lightSources.end()) {
     return;
@@ -598,7 +608,7 @@ Scene* AbstractMesh::getScene() const
   return Node::getScene();
 }
 
-void AbstractMesh::set_skeleton(Skeleton* const& value)
+void AbstractMesh::set_skeleton(const SkeletonPtr& value)
 {
   if (_skeleton && _skeleton->needInitialSkinMatrix) {
     _skeleton->_unregisterMeshWithPoseMatrix(this);
@@ -617,7 +627,7 @@ void AbstractMesh::set_skeleton(Skeleton* const& value)
   _markSubMeshesAsAttributesDirty();
 }
 
-Skeleton*& AbstractMesh::get_skeleton()
+SkeletonPtr& AbstractMesh::get_skeleton()
 {
   return _skeleton;
 }
@@ -644,7 +654,7 @@ AbstractMesh* AbstractMesh::getParent()
   return nullptr;
 }
 
-Material* AbstractMesh::getMaterial()
+MaterialPtr AbstractMesh::getMaterial()
 {
   return material();
 }
@@ -680,7 +690,7 @@ bool AbstractMesh::get_isBlocked() const
   return false;
 }
 
-AbstractMesh* AbstractMesh::getLOD(Camera* /*camera*/,
+AbstractMesh* AbstractMesh::getLOD(const CameraPtr& /*camera*/,
                                    BoundingSphere* /*boundingSphere*/)
 {
   return this;
@@ -876,12 +886,13 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
     auto descendants = getDescendants(false);
 
     for (auto& descendant : descendants) {
-      auto childMesh = static_cast<class AbstractMesh*>(descendant);
+      auto childMesh
+        = ::std::static_pointer_cast<class AbstractMesh>(descendant);
 
       childMesh->computeWorldMatrix(true);
 
       // Filters meshes based on custom predicate function.
-      if (predicate && !predicate(childMesh)) {
+      if (predicate && !predicate(childMesh.get())) {
         continue;
       }
 
@@ -1008,7 +1019,7 @@ PhysicsImpostor* AbstractMesh::getPhysicsImpostor()
   return physicsImpostor ? physicsImpostor.get() : nullptr;
 }
 
-Vector3 AbstractMesh::getPositionInCameraSpace(Camera* camera)
+Vector3 AbstractMesh::getPositionInCameraSpace(CameraPtr camera)
 {
   if (!camera) {
     camera = getScene()->activeCamera;
@@ -1018,7 +1029,7 @@ Vector3 AbstractMesh::getPositionInCameraSpace(Camera* camera)
                                        camera->getViewMatrix());
 }
 
-float AbstractMesh::getDistanceToCamera(Camera* camera)
+float AbstractMesh::getDistanceToCamera(CameraPtr camera)
 {
   if (!camera) {
     camera = getScene()->activeCamera;
@@ -1370,9 +1381,10 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     auto generator = light->getShadowGenerator();
     if (generator) {
       auto shadowMap = generator->getShadowMap();
-      if (shadowMap && !shadowMap->renderList.empty()) {
-        ::std::remove(shadowMap->renderList.begin(),
-                      shadowMap->renderList.end(), this);
+      if (shadowMap && !shadowMap->renderList().empty()) {
+        ::std::remove_if(
+          shadowMap->renderList().begin(), shadowMap->renderList().end(),
+          [this](const AbstractMeshPtr& mesh) { return mesh.get() == this; });
       }
     }
   }
@@ -1391,10 +1403,13 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Octree
   auto sceneOctree = getScene()->selectionOctree();
   if (sceneOctree) {
+#if 0
     sceneOctree->dynamicContent.erase(
-      ::std::remove(sceneOctree->dynamicContent.begin(),
-                    sceneOctree->dynamicContent.end(), this),
+      ::std::remove_if(
+        sceneOctree->dynamicContent.begin(), sceneOctree->dynamicContent.end(),
+        [this](const AbstractMeshPtr& mesh) { return mesh.get() == this; }),
       sceneOctree->dynamicContent.end());
+#endif
   }
 
   // Query
@@ -1419,8 +1434,8 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     for (size_t index = 0; index < getScene()->particleSystems.size();
          ++index) {
       auto& emitter = getScene()->particleSystems[index]->emitter;
-      if (emitter.is<AbstractMesh*>()
-          && (emitter.get<AbstractMesh*>() == this)) {
+      if (emitter.is<AbstractMeshPtr>()
+          && (emitter.get<AbstractMeshPtr>().get() == this)) {
         getScene()->particleSystems[index]->dispose();
         --index;
       }
@@ -1444,15 +1459,15 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   getScene()->removeMesh(this);
 }
 
-AbstractMesh& AbstractMesh::addChild(AbstractMesh* mesh)
+AbstractMesh& AbstractMesh::addChild(AbstractMesh& mesh)
 {
-  mesh->setParent(this);
+  mesh.setParent(this);
   return *this;
 }
 
-AbstractMesh& AbstractMesh::removeChild(AbstractMesh* mesh)
+AbstractMesh& AbstractMesh::removeChild(AbstractMesh& mesh)
 {
-  mesh->setParent(nullptr);
+  mesh.setParent(nullptr);
   return *this;
 }
 

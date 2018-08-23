@@ -57,7 +57,7 @@ protected:
   /**
    * @brief The default controller model for the controller.
    */
-  AbstractMesh*& get_defaultModel();
+  AbstractMeshPtr& get_defaultModel();
 
   /**
    * @brief Function to be called when a button is modified.
@@ -116,13 +116,13 @@ public:
   /**
    * The default controller model for the controller
    */
-  ReadOnlyProperty<WebVRController, AbstractMesh*> defaultModel;
+  ReadOnlyProperty<WebVRController, AbstractMeshPtr> defaultModel;
 
 protected:
   /**
    * Internal, the default controller model for the controller
    */
-  AbstractMesh* _defaultModel;
+  AbstractMeshPtr _defaultModel;
 
   /**
    * Array of button availible on the controller

@@ -45,8 +45,8 @@ AxisDragGizmo::AxisDragGizmo(
   auto arrowTail          = MeshBuilder::CreateLines(
     "yPosMesh", arrowTailOptions, gizmoLayer->utilityLayerScene.get());
   arrowTail->color = coloredMaterial->emissiveColor;
-  arrow->addChild(arrowMesh);
-  arrow->addChild(arrowTail);
+  arrow->addChild(*arrowMesh);
+  arrow->addChild(*arrowTail);
 
   // Position arrow pointing in its drag axis
   arrowMesh->scaling().scaleInPlace(0.05f);
@@ -58,7 +58,7 @@ AxisDragGizmo::AxisDragGizmo(
   arrowTail->material     = coloredMaterial;
   arrow->lookAt(_rootMesh->position().subtract(dragAxis));
 
-  _rootMesh->addChild(arrow);
+  _rootMesh->addChild(*arrow);
 
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
@@ -98,13 +98,12 @@ AxisDragGizmo::AxisDragGizmo(
       }
       auto isHovered = stl_util::contains(
         _rootMesh->getChildMeshes(),
-        static_cast<Mesh*>(pointerInfo->pickInfo.pickedMesh));
+        ::std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh));
       auto material = isHovered ? hoverMaterial : coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material    = material;
-        auto linesMesh = static_cast<LinesMesh*>(m);
-        // if (linesMesh->color)
-        {
+        auto linesMesh = ::std::static_pointer_cast<LinesMesh>(m);
+        if (linesMesh) {
           linesMesh->color = material->emissiveColor;
         }
       };

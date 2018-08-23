@@ -27,9 +27,9 @@ public:
 
   void setOnDispose(
     const ::std::function<void(SpriteManager*, EventState&)>& callback);
-  PickingInfo* intersects(const Ray ray, Camera* camera,
-                          ::std::function<bool(Sprite* sprite)> predicate,
-                          bool fastCheck);
+  nullable_t<PickingInfo>
+  intersects(const Ray ray, const CameraPtr& camera,
+             ::std::function<bool(Sprite* sprite)> predicate, bool fastCheck);
   void render();
   void dispose();
 
@@ -40,8 +40,8 @@ protected:
                 unsigned int samplingMode
                 = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
-  Texture*& get_texture();
-  void set_texture(Texture* const& value);
+  TexturePtr& get_texture();
+  void set_texture(const TexturePtr& value);
 
 private:
   void _appendSpriteVertex(size_t index, Sprite* sprite, int offsetX,
@@ -63,12 +63,12 @@ public:
    */
   Observable<SpriteManager> onDisposeObservable;
 
-  Property<SpriteManager, Texture*> texture;
+  Property<SpriteManager, TexturePtr> texture;
 
 private:
   Observer<SpriteManager>::Ptr _onDisposeObserver;
   size_t _capacity;
-  Texture* _spriteTexture;
+  TexturePtr _spriteTexture;
   Scene* _scene;
   Float32Array _vertexData;
   unique_ptr_t<Buffer> _buffer;

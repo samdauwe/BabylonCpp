@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT PhysicsGravitationalFieldEventData {
-  Mesh* sphere;
+  MeshPtr sphere;
 }; // end of struct PhysicsGravitationalFieldEventData
 
 } // end of namespace BABYLON

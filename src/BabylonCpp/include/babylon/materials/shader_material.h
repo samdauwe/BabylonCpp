@@ -17,10 +17,11 @@ class BABYLON_SHARED_EXPORT ShaderMaterial : public Material {
 
 public:
   template <typename... Ts>
-  static ShaderMaterial* New(Ts&&... args)
+  static ShaderMaterialPtr New(Ts&&... args)
   {
-    auto material = new ShaderMaterial(::std::forward<Ts>(args)...);
-    material->addMaterialToScene(static_cast<unique_ptr_t<Material>>(material));
+    auto material = shared_ptr_t<ShaderMaterial>(
+      new ShaderMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
 
     return material;
   }
@@ -35,9 +36,9 @@ public:
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
-  ShaderMaterial& setTexture(const string_t& name, Texture* texture);
+  ShaderMaterial& setTexture(const string_t& name, const TexturePtr& texture);
   ShaderMaterial& setTextureArray(const string_t& iName,
-                                  const vector_t<BaseTexture*>& textures);
+                                  const vector_t<BaseTexturePtr>& textures);
   ShaderMaterial& setInt(const string_t& name, int value);
   ShaderMaterial& setFloat(const string_t& name, float value);
   ShaderMaterial& setFloats(const string_t& name, const Float32Array& value);
@@ -57,10 +58,10 @@ public:
                bool useInstances  = false) override;
   void bindOnlyWorldMatrix(Matrix& world) override;
   void bind(Matrix* world, Mesh* mesh = nullptr) override;
-  vector_t<BaseTexture*> getActiveTextures() const override;
-  bool hasTexture(BaseTexture* texture) const override;
-  Material* clone(const string_t& name,
-                  bool cloneChildren = false) const override;
+  vector_t<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+  MaterialPtr clone(const string_t& name,
+                    bool cloneChildren = false) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   Json::object serialize() const;
@@ -80,8 +81,8 @@ private:
 private:
   string_t _shaderPath;
   ShaderMaterialOptions _options;
-  unordered_map_t<string_t, Texture*> _textures;
-  unordered_map_t<string_t, vector_t<BaseTexture*>> _textureArrays;
+  unordered_map_t<string_t, TexturePtr> _textures;
+  unordered_map_t<string_t, vector_t<BaseTexturePtr>> _textureArrays;
   unordered_map_t<string_t, float> _floats;
   unordered_map_t<string_t, int> _ints;
   unordered_map_t<string_t, Float32Array> _floatsArrays;

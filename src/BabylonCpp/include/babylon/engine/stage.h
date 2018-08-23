@@ -32,8 +32,7 @@ using CameraStageAction = ::std::function<void(Camera* camera)>;
 /**
  * Strong typing of a RenderingGroup related stage step action
  */
-using RenderingGroupStageAction
-  = ::std::function<void(unsigned int renderingGroupId)>;
+using RenderingGroupStageAction = ::std::function<void(int renderingGroupId)>;
 
 /**
  * Strong typing of a simple stage step action
@@ -56,6 +55,19 @@ struct BABYLON_SHARED_EXPORT Step {
  */
 template <class T>
 class BABYLON_SHARED_EXPORT Stage {
+
+public:
+  using iterator = typename vector_t<Step<T>>::iterator;
+
+  iterator begin()
+  {
+    return _steps.begin();
+  }
+
+  iterator end()
+  {
+    return _steps.end();
+  }
 
 public:
   Stage()

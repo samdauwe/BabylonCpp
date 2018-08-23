@@ -520,7 +520,8 @@ void UniformBuffer::_updateColor4ForUniform(const string_t& name,
   updateUniform(name, UniformBuffer::_tempBuffer, 4);
 }
 
-void UniformBuffer::setTexture(const string_t& name, BaseTexture* texture)
+void UniformBuffer::setTexture(const string_t& name,
+                               const BaseTexturePtr& texture)
 {
   _currentEffect->setTexture(name, texture);
 }

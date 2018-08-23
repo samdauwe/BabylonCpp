@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 ValueCondition::ValueCondition(ActionManager* actionManager,
-                               IAnimatable* target,
+                               const IAnimatablePtr& target,
                                const string_t& propertyPath,
                                AnimationValue* value, unsigned int operatorType)
     : Condition{actionManager}

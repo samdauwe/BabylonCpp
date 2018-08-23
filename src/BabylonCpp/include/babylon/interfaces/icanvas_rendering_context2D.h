@@ -28,6 +28,11 @@ public:
     ::std::cout << text << ", " << '\n';
     return ISize(0, 0);
   }
+  void drawImage(const Image& /*img*/, int /*sx*/, int /*sy*/, int /*sWidth*/,
+                 int /*sHeight*/, int /*dx*/, int /*dy*/, int /*dWidth*/,
+                 int /*dHeight*/)
+  {
+  }
 
 }; // end of class ICanvasRenderingContext2D
 

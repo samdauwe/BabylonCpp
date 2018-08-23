@@ -16,16 +16,16 @@ public:
 
   void addPipeline(PostProcessRenderPipeline* renderPipeline);
   void attachCamerasToRenderPipeline(const string_t& renderPipelineName,
-                                     const vector_t<Camera*>& cameras,
+                                     const vector_t<CameraPtr>& cameras,
                                      bool unique = false);
   void detachCamerasFromRenderPipeline(const string_t& renderPipelineName,
-                                       const vector_t<Camera*>& cameras);
+                                       const vector_t<CameraPtr>& cameras);
   void enableEffectInPipeline(const string_t& renderPipelineName,
                               const string_t& renderEffectName,
-                              const vector_t<Camera*>& cameras);
+                              const vector_t<CameraPtr>& cameras);
   void disableEffectInPipeline(const string_t& renderPipelineName,
                                const string_t& renderEffectName,
-                               const vector_t<Camera*>& cameras);
+                               const vector_t<CameraPtr>& cameras);
   void update();
   void _rebuild();
   void dispose();

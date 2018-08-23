@@ -52,7 +52,7 @@ bool InstancedMesh::receiveShadows() const
   return _sourceMesh->receiveShadows();
 }
 
-Material* InstancedMesh::material() const
+MaterialPtr& InstancedMesh::material() const
 {
   return _sourceMesh->material();
 }
@@ -62,17 +62,17 @@ float InstancedMesh::visibility() const
   return _sourceMesh->visibility();
 }
 
-Skeleton*& InstancedMesh::get_skeleton()
+SkeletonPtr& InstancedMesh::get_skeleton()
 {
   return _sourceMesh->skeleton();
 }
 
-unsigned int InstancedMesh::get_renderingGroupId() const
+int InstancedMesh::get_renderingGroupId() const
 {
   return _sourceMesh->renderingGroupId;
 }
 
-void InstancedMesh::set_renderingGroupId(unsigned int value)
+void InstancedMesh::set_renderingGroupId(int value)
 {
   if (!_sourceMesh || value == _sourceMesh->renderingGroupId) {
     return;
@@ -178,7 +178,7 @@ void InstancedMesh::_activate(int renderId)
   }
 }
 
-AbstractMesh* InstancedMesh::getLOD(Camera* camera,
+AbstractMesh* InstancedMesh::getLOD(const CameraPtr& camera,
                                     BoundingSphere* /*boundingSphere*/)
 {
   if (!camera) {
@@ -203,7 +203,7 @@ InstancedMesh& InstancedMesh::_syncSubMeshes()
   releaseSubMeshes();
   if (!_sourceMesh->subMeshes.empty()) {
     for (auto& subMesh : _sourceMesh->subMeshes) {
-      subMesh->clone(this, _sourceMesh);
+      subMesh->clone(shared_from_base<InstancedMesh>(), _sourceMesh);
     }
   }
 
@@ -215,8 +215,8 @@ bool InstancedMesh::_generatePointsArray()
   return _sourceMesh->_generatePointsArray();
 }
 
-InstancedMesh* InstancedMesh::clone(const string_t& /*iNname*/, Node* newParent,
-                                    bool doNotCloneChildren)
+InstancedMeshPtr InstancedMesh::clone(const string_t& /*iNname*/,
+                                      Node* newParent, bool doNotCloneChildren)
 {
   auto result = _sourceMesh->createInstance(name);
 
@@ -228,14 +228,14 @@ InstancedMesh* InstancedMesh::clone(const string_t& /*iNname*/, Node* newParent,
 
   // Parent
   if (newParent) {
-    static_cast<Node*>(result)->parent = newParent;
+    ::std::static_pointer_cast<Node>(result)->parent = newParent;
   }
 
   if (!doNotCloneChildren) {
     // Children
     for (auto& mesh : getScene()->meshes) {
       if (mesh->parent() == this) {
-        mesh->clone(mesh->name, dynamic_cast<Node*>(result));
+        // mesh->clone(mesh->name, ::std::static_pointer_cast<Node>(result));
       }
     }
   }

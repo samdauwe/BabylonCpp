@@ -178,7 +178,11 @@ private:
 
 public:
   static DDSInfo GetDDSInfo(const Uint8Array& arrayBuffer);
-  static void UploadDDSLevels(Engine* engine, GL::IGLRenderingContext* gl,
+
+  /**
+   * @brief Uploads DDS Levels to a Babylon Texture.
+   */
+  static void UploadDDSLevels(Engine* engine, InternalTexture* texture,
                               const Uint8Array& arrayBuffer, DDSInfo& info,
                               bool loadMipmaps, unsigned int faces,
                               int lodIndex = -1, int currentFace = -1);

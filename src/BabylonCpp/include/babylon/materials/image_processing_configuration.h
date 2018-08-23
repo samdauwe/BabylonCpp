@@ -282,13 +282,13 @@ public:
   /**
    * Color curves setup used in the effect if colorCurvesEnabled is set to true
    */
-  shared_ptr_t<ColorCurves> colorCurves;
+  ColorCurvesPtr colorCurves;
 
   /**
    * Color grading LUT texture used in the effect if colorGradingEnabled is set
    * to true.
    */
-  BaseTexture* colorGradingTexture;
+  BaseTexturePtr colorGradingTexture;
 
   float _exposure;
 

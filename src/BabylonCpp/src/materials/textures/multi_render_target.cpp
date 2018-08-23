@@ -92,12 +92,12 @@ bool MultiRenderTarget::isSupported() const
          || (_engine->getCaps().drawBuffersExtension);
 }
 
-vector_t<Texture*>& MultiRenderTarget::textures()
+vector_t<TexturePtr>& MultiRenderTarget::textures()
 {
   return _textures;
 }
 
-Texture* MultiRenderTarget::depthTexture()
+TexturePtr MultiRenderTarget::depthTexture()
 {
   return (!_textures.empty()) ? _textures.back() : nullptr;
 }

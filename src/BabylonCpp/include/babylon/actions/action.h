@@ -76,8 +76,8 @@ public:
   /**
    * @brief Internal only.
    */
-  IAnimatable* _getEffectiveTarget(IAnimatable* target,
-                                   const string_t& propertyPath);
+  IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
+                                     const string_t& propertyPath);
 
   /**
    * @brief Serialize placeholder for child classes.
@@ -96,7 +96,7 @@ public:
   /**
    * @brief Internal only.
    */
-  static Json::object _GetTargetProperty(IAnimatable* target);
+  static Json::object _GetTargetProperty(const IAnimatablePtr& target);
 
 protected:
   /**

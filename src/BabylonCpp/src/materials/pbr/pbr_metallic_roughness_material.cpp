@@ -29,7 +29,7 @@ const string_t PBRMetallicRoughnessMaterial::getClassName() const
   return "PBRMetallicRoughnessMaterial";
 }
 
-vector_t<BaseTexture*> PBRMetallicRoughnessMaterial::getActiveTextures() const
+vector_t<BaseTexturePtr> PBRMetallicRoughnessMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseSimpleMaterial::getActiveTextures();
 
@@ -44,7 +44,8 @@ vector_t<BaseTexture*> PBRMetallicRoughnessMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool PBRMetallicRoughnessMaterial::hasTexture(BaseTexture* texture) const
+bool PBRMetallicRoughnessMaterial::hasTexture(
+  const BaseTexturePtr& texture) const
 {
   if (PBRBaseSimpleMaterial::hasTexture(texture)) {
     return true;
@@ -61,9 +62,8 @@ bool PBRMetallicRoughnessMaterial::hasTexture(BaseTexture* texture) const
   return false;
 }
 
-PBRMetallicRoughnessMaterial*
-PBRMetallicRoughnessMaterial::clone(const string_t& /*name*/,
-                                    bool /*cloneChildren*/) const
+MaterialPtr PBRMetallicRoughnessMaterial::clone(const string_t& /*name*/,
+                                                bool /*cloneChildren*/) const
 {
   return nullptr;
 }

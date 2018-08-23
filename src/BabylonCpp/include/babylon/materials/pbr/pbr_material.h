@@ -42,13 +42,15 @@ public:
   static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND = 3;
 
 public:
-  /**
-   * @brief Instantiates a new PBRMaterial instance.
-   *
-   * @param name The material name
-   * @param scene The scene the material will be use in.
-   */
-  PBRMaterial(const string_t& name, Scene* scene);
+  template <typename... Ts>
+  static PBRMaterialPtr New(Ts&&... args)
+  {
+    auto material
+      = shared_ptr_t<PBRMaterial>(new PBRMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~PBRMaterial() override;
 
   /**
@@ -60,21 +62,21 @@ public:
    * @brief Returns an array of the actively used textures.
    * @returns - Array of BaseTextures
    */
-  vector_t<BaseTexture*> getActiveTextures() const override;
+  vector_t<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param texture - Base texture to use.
    * @returns - Boolean specifying if a texture is used in the material.
    */
-  bool hasTexture(BaseTexture* texture) const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
 
   /**
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  PBRMaterial* clone(const string_t& name,
-                     bool cloneChildren = false) const override;
+  MaterialPtr clone(const string_t& name,
+                    bool cloneChildren = false) const override;
 
   /**
    * @brief Serializes this PBR Material.
@@ -197,12 +199,12 @@ public:
   /**
    * @brief Gets the Color Grading 2D Lookup Texture.
    */
-  BaseTexture* cameraColorGradingTexture() const;
+  BaseTexturePtr& cameraColorGradingTexture();
 
   /**
    * @brief Sets the Color Grading 2D Lookup Texture.
    */
-  void setCameraColorGradingTexture(BaseTexture* value);
+  void setCameraColorGradingTexture(const BaseTexturePtr& value);
 
   /**
    * @brief The color grading curves provide additional color adjustmnent that
@@ -217,7 +219,7 @@ public:
    * corresponding to low luminance, medium luminance, and high luminance areas
    * respectively.
    */
-  ColorCurves* cameraColorCurves();
+  ColorCurvesPtr& cameraColorCurves();
 
   /**
    * @brief The color grading curves provide additional color adjustmnent that
@@ -233,6 +235,15 @@ public:
    * respectively.
    */
   void setCameraColorCurves(ColorCurves* value);
+
+protected:
+  /**
+   * @brief Instantiates a new PBRMaterial instance.
+   *
+   * @param name The material name
+   * @param scene The scene the material will be use in.
+   */
+  PBRMaterial(const string_t& name, Scene* scene);
 
 public:
   /**
@@ -293,7 +304,7 @@ public:
   /**
    * Stores the reflection values in a texture.
    */
-  BaseTexture* reflectionTexture;
+  BaseTexturePtr reflectionTexture;
 
   /**
    * Stores the emissive values in a texture.

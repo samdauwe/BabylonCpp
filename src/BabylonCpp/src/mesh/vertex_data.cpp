@@ -72,13 +72,13 @@ void VertexData::set(const Float32Array& data, unsigned int kind)
   }
 }
 
-VertexData& VertexData::applyToMesh(Mesh* mesh, bool updatable)
+VertexData& VertexData::applyToMesh(Mesh& mesh, bool updatable)
 {
   _applyTo(mesh, updatable);
   return *this;
 }
 
-VertexData& VertexData::applyToGeometry(Geometry* geometry, bool updatable)
+VertexData& VertexData::applyToGeometry(Geometry& geometry, bool updatable)
 {
   _applyTo(geometry, updatable);
   return *this;
@@ -98,77 +98,77 @@ VertexData& VertexData::updateGeometry(Geometry* geometry, bool updateExtends,
   return *this;
 }
 
-VertexData& VertexData::_applyTo(IGetSetVerticesData* meshOrGeometry,
+VertexData& VertexData::_applyTo(IGetSetVerticesData& meshOrGeometry,
                                  bool updatable)
 {
   if (!positions.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::PositionKind, positions,
-                                    updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::PositionKind, positions,
+                                   updatable);
   }
 
   if (!normals.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::NormalKind, normals,
-                                    updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::NormalKind, normals,
+                                   updatable);
   }
 
   if (!tangents.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::TangentKind, tangents,
-                                    updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::TangentKind, tangents,
+                                   updatable);
   }
 
   if (!uvs.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::UVKind, uvs, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::UVKind, uvs, updatable);
   }
 
   if (!uvs2.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::UV2Kind, uvs2, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::UV2Kind, uvs2, updatable);
   }
 
   if (!uvs3.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::UV3Kind, uvs3, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::UV3Kind, uvs3, updatable);
   }
 
   if (!uvs4.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::UV4Kind, uvs4, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::UV4Kind, uvs4, updatable);
   }
 
   if (!uvs5.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::UV5Kind, uvs5, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::UV5Kind, uvs5, updatable);
   }
 
   if (!uvs6.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::UV6Kind, uvs6, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::UV6Kind, uvs6, updatable);
   }
 
   if (!colors.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::ColorKind, colors, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::ColorKind, colors, updatable);
   }
 
   if (!matricesIndices.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::MatricesIndicesKind,
-                                    matricesIndices, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::MatricesIndicesKind,
+                                   matricesIndices, updatable);
   }
 
   if (!matricesWeights.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::MatricesWeightsKind,
-                                    matricesWeights, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::MatricesWeightsKind,
+                                   matricesWeights, updatable);
   }
 
   if (!matricesIndicesExtra.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::MatricesIndicesExtraKind,
-                                    matricesIndicesExtra, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::MatricesIndicesExtraKind,
+                                   matricesIndicesExtra, updatable);
   }
 
   if (!matricesWeightsExtra.empty()) {
-    meshOrGeometry->setVerticesData(VertexBuffer::MatricesWeightsExtraKind,
-                                    matricesWeightsExtra, updatable);
+    meshOrGeometry.setVerticesData(VertexBuffer::MatricesWeightsExtraKind,
+                                   matricesWeightsExtra, updatable);
   }
 
   if (!indices.empty()) {
-    meshOrGeometry->setIndices(indices, 0, updatable);
+    meshOrGeometry.setIndices(indices, 0, updatable);
   }
   else {
-    meshOrGeometry->setIndices({}, 0);
+    meshOrGeometry.setIndices({}, 0);
   }
 
   return *this;

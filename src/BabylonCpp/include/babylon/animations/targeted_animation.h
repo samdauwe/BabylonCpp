@@ -10,8 +10,8 @@ namespace BABYLON {
  * target.
  */
 struct BABYLON_SHARED_EXPORT TargetedAnimation {
-  Animation* animation = nullptr;
-  IAnimatable* target  = nullptr;
+  AnimationPtr animation = nullptr;
+  IAnimatablePtr target  = nullptr;
 }; // end of class TargetedAnimation
 
 } // end of namespace BABYLON

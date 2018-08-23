@@ -607,24 +607,22 @@ string_t TextureTools::_environmentBRDFBase64Texture
     "BLavolXEyAM6obnTMzHEqoMuc09HxKv2rbTPAVYZO/ydUbXfkKP4/"
     "BnecprBuissAAAAASUVORK5CYII=";
 
-unique_ptr_t<Texture> TextureTools::CreateResizedCopy(Texture* texture,
-                                                      int width, int height,
-                                                      bool useBilinearMode)
+TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
+                                           int height, bool useBilinearMode)
 {
   auto scene  = texture->getScene();
   auto engine = scene->getEngine();
 
-  auto rtt
-    = ::std::make_unique<RenderTargetTexture>("resized" + texture->name, //
-                                              ISize{width, height},      //
-                                              scene,                     //
-                                              !texture->noMipmap(),      //
-                                              true,                      //
-                                              texture->_texture->type,   //
-                                              false,                     //
-                                              texture->_samplingMode,    //
-                                              false                      //
-                                              );
+  auto rtt = RenderTargetTexture::New("resized" + texture->name, //
+                                      ISize{width, height},      //
+                                      scene,                     //
+                                      !texture->noMipmap(),      //
+                                      true,                      //
+                                      texture->_texture->type,   //
+                                      false,                     //
+                                      texture->_samplingMode,    //
+                                      false                      //
+  );
 
   rtt->wrapU                     = texture->wrapU;
   rtt->wrapV                     = texture->wrapV;
@@ -670,7 +668,7 @@ unique_ptr_t<Texture> TextureTools::CreateResizedCopy(Texture* texture,
   return rtt;
 }
 
-BaseTexture* TextureTools::GetEnvironmentBRDFTexture(Scene* scene)
+BaseTexturePtr& TextureTools::GetEnvironmentBRDFTexture(Scene* scene)
 {
   if (!scene->_environmentBRDFTexture) {
     auto texture = Texture::New(_environmentBRDFBase64Texture, scene, true,

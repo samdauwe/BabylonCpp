@@ -9,7 +9,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT SetValueAction : public Action {
 
 public:
-  SetValueAction(unsigned int triggerOptions, IAnimatable* target,
+  SetValueAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                  const string_t& propertyPath, AnimationValue* value,
                  Condition* condition = nullptr);
   ~SetValueAction() override;
@@ -19,8 +19,8 @@ public:
   Json::object serialize(Json::object& parent) const override;
 
 private:
-  IAnimatable* _target;
-  IAnimatable* _effectiveTarget;
+  IAnimatablePtr _target;
+  IAnimatablePtr _effectiveTarget;
   string_t _property;
   string_t _propertyPath;
   AnimationValue* _value;

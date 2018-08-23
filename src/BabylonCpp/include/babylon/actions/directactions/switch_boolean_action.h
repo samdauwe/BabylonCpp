@@ -9,7 +9,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT SwitchBooleanAction : public Action {
 
 public:
-  SwitchBooleanAction(unsigned int triggerOptions, IAnimatable* target,
+  SwitchBooleanAction(unsigned int triggerOptions, const IAnimatablePtr& target,
                       const string_t& propertyPath,
                       Condition* condition = nullptr);
   ~SwitchBooleanAction() override;
@@ -19,8 +19,8 @@ public:
   Json::object serialize(Json::object& parent) const override;
 
 private:
-  IAnimatable* _target;
-  IAnimatable* _effectiveTarget;
+  IAnimatablePtr _target;
+  IAnimatablePtr _effectiveTarget;
   string_t _property;
   string_t _propertyPath;
 

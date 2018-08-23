@@ -68,7 +68,7 @@ void ShaderMaterial::_checkUniform(const string_t& uniformName)
 }
 
 ShaderMaterial& ShaderMaterial::setTexture(const string_t& iName,
-                                           Texture* texture)
+                                           const TexturePtr& texture)
 {
   if (!stl_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
@@ -80,7 +80,7 @@ ShaderMaterial& ShaderMaterial::setTexture(const string_t& iName,
 
 ShaderMaterial&
 ShaderMaterial::setTextureArray(const string_t& iName,
-                                const vector_t<BaseTexture*>& textures)
+                                const vector_t<BaseTexturePtr>& textures)
 {
   if (!stl_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
@@ -465,7 +465,7 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
   _afterBind(mesh);
 }
 
-vector_t<BaseTexture*> ShaderMaterial::getActiveTextures() const
+vector_t<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
 
@@ -483,23 +483,24 @@ vector_t<BaseTexture*> ShaderMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool ShaderMaterial::hasTexture(BaseTexture* texture) const
+bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
   if (Material::hasTexture(texture)) {
     return true;
   }
 
-  auto it1 = ::std::find_if(_textures.begin(), _textures.end(),
-                            [&texture](const pair_t<string_t, Texture*>& tex) {
-                              return tex.second == texture;
-                            });
+  auto it1
+    = ::std::find_if(_textures.begin(), _textures.end(),
+                     [&texture](const pair_t<string_t, TexturePtr>& tex) {
+                       return tex.second == texture;
+                     });
   if (it1 != _textures.end()) {
     return true;
   }
 
   auto it2 = ::std::find_if(
     _textureArrays.begin(), _textureArrays.end(),
-    [&texture](const pair_t<string_t, vector_t<BaseTexture*>>& textures) {
+    [&texture](const pair_t<string_t, vector_t<BaseTexturePtr>>& textures) {
       return stl_util::contains(textures.second, texture);
     });
   if (it2 != _textureArrays.end()) {
@@ -509,8 +510,8 @@ bool ShaderMaterial::hasTexture(BaseTexture* texture) const
   return false;
 }
 
-Material* ShaderMaterial::clone(const string_t& iName,
-                                bool /*cloneChildren*/) const
+MaterialPtr ShaderMaterial::clone(const string_t& iName,
+                                  bool /*cloneChildren*/) const
 {
   return ShaderMaterial::New(iName, getScene(), _shaderPath, _options);
 }

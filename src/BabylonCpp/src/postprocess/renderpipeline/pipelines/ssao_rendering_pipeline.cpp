@@ -21,14 +21,14 @@ namespace BABYLON {
 
 SSAORenderingPipeline::SSAORenderingPipeline(const string_t& name, Scene* scene,
                                              float ratio,
-                                             const vector_t<Camera*>& cameras)
+                                             const vector_t<CameraPtr>& cameras)
     : SSAORenderingPipeline(name, scene, {ratio, ratio}, cameras)
 {
 }
 
 SSAORenderingPipeline::SSAORenderingPipeline(const string_t& name, Scene* scene,
                                              const SSARatio& ratio,
-                                             const vector_t<Camera*>& cameras)
+                                             const vector_t<CameraPtr>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name)
     , totalStrength{1.f}
     , radius{0.0001f}
@@ -217,12 +217,13 @@ void SSAORenderingPipeline::_createRandomTexture()
   options.height = static_cast<int>(size);
 
   _randomTexture
-    = new DynamicTexture("SSAORandomTexture", options, _scene, false,
-                         TextureConstants::TRILINEAR_SAMPLINGMODE);
+    = DynamicTexture::New("SSAORandomTexture", options, _scene, false,
+                          TextureConstants::TRILINEAR_SAMPLINGMODE);
   _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
-  auto context = dynamic_cast<DynamicTexture*>(_randomTexture)->getContext();
+  auto context
+    = ::std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
 
   const auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };

@@ -32,8 +32,8 @@ public:
    */
   GrainPostProcess(const string_t& name,
                    const Variant<float, PostProcessOptions>& options,
-                   Camera* camera, unsigned int samplingMode, Engine* engine,
-                   bool reusable = false,
+                   const CameraPtr& camera, unsigned int samplingMode,
+                   Engine* engine, bool reusable = false,
                    unsigned int textureType
                    = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                    bool blockCompilation = false);

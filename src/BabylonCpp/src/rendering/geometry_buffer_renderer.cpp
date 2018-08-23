@@ -40,12 +40,12 @@ GeometryBufferRenderer::~GeometryBufferRenderer()
 {
 }
 
-void GeometryBufferRenderer::set_renderList(const vector_t<Mesh*>& meshes)
+void GeometryBufferRenderer::set_renderList(const vector_t<MeshPtr>& meshes)
 {
-  _multiRenderTarget->renderList.clear();
-  _multiRenderTarget->renderList.reserve(meshes.size());
+  _multiRenderTarget->renderList().clear();
+  _multiRenderTarget->renderList().reserve(meshes.size());
   for (auto& mesh : meshes) {
-    _multiRenderTarget->renderList.emplace_back(mesh);
+    _multiRenderTarget->renderList().emplace_back(mesh);
   }
 }
 
@@ -212,12 +212,11 @@ void GeometryBufferRenderer::_createRenderTargets()
 
   // Custom render function
   _multiRenderTarget->customRenderFunction
-    = [this, engine](const vector_t<SubMesh*>& opaqueSubMeshes,
-                     const vector_t<SubMesh*>& alphaTestSubMeshes,
-                     const vector_t<SubMesh*>& /*transparentSubMeshes*/,
-                     const vector_t<SubMesh*>& depthOnlySubMeshes,
+    = [this, engine](const vector_t<SubMeshPtr>& opaqueSubMeshes,
+                     const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+                     const vector_t<SubMeshPtr>& /*transparentSubMeshes*/,
+                     const vector_t<SubMeshPtr>& depthOnlySubMeshes,
                      const ::std::function<void()>& /*beforeTransparents*/) {
-
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
           for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
@@ -236,7 +235,7 @@ void GeometryBufferRenderer::_createRenderTargets()
       };
 }
 
-void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
+void GeometryBufferRenderer::renderSubMesh(const SubMeshPtr& subMesh)
 {
   auto mesh     = subMesh->getRenderingMesh();
   auto scene    = _scene;
@@ -263,9 +262,9 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty());
 
-  if (isReady(subMesh, hardwareInstancedRendering)) {
+  if (isReady(subMesh.get(), hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
-    mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
+    mesh->_bind(subMesh.get(), _effect, Material::TriangleFillMode());
 
     _effect->setMatrix("viewProjection", scene->getTransformMatrix());
     _effect->setMatrix("view", scene->getViewMatrix());
@@ -283,12 +282,13 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     if (mesh->useBones() && mesh->computeBonesUsingShaders()
         && mesh->skeleton()) {
       _effect->setMatrices("mBones",
-                           mesh->skeleton()->getTransformMatrices(mesh));
+                           mesh->skeleton()->getTransformMatrices(mesh.get()));
     }
 
     // Draw
-    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
-                            batch, hardwareInstancedRendering,
+    mesh->_processRendering(subMesh.get(), _effect,
+                            Material::TriangleFillMode(), batch,
+                            hardwareInstancedRendering,
                             [this](bool /*isInstance*/, Matrix world,
                                    Material* /*effectiveMaterial*/) {
                               _effect->setMatrix("world", world);

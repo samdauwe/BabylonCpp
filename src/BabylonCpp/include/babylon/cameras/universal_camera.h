@@ -13,10 +13,11 @@ class BABYLON_SHARED_EXPORT UniversalCamera : public TouchCamera {
 
 public:
   template <typename... Ts>
-  static UniversalCamera* New(Ts&&... args)
+  static UniversalCameraPtr New(Ts&&... args)
   {
-    auto camera = new UniversalCamera(::std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera = shared_ptr_t<UniversalCamera>(
+      new UniversalCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }

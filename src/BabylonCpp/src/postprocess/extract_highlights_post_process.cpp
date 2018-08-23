@@ -6,8 +6,8 @@ namespace BABYLON {
 
 ExtractHighlightsPostProcess::ExtractHighlightsPostProcess(
   const string_t& iName, const Variant<float, PostProcessOptions>& options,
-  Camera* camera, unsigned int samplingMode, Engine* engine, bool reusable,
-  unsigned int textureType, bool blockCompilation)
+  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+  bool reusable, unsigned int textureType, bool blockCompilation)
     : PostProcess{iName,
                   "extractHighlights",
                   {"threshold", "exposure"},

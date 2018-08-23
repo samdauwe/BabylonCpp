@@ -63,11 +63,11 @@ IReflect::Type Light::type() const
   return IReflect::Type::LIGHT;
 }
 
-void Light::addToScene(unique_ptr_t<Light>&& newLight)
+void Light::addToScene(const LightPtr& newLight)
 {
   newLight->_buildUniformLayout();
   newLight->_resyncMeshes();
-  getScene()->addLight(::std::move(newLight));
+  getScene()->addLight(newLight);
 }
 
 const string_t Light::getClassName() const
@@ -346,23 +346,24 @@ Json::object Light::serialize() const
   return Json::object();
 }
 
-::std::function<Light*()> Light::GetConstructorFromName(unsigned int type,
-                                                        const string_t& name,
-                                                        Scene* scene)
+::std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
+                                                          const string_t& name,
+                                                          Scene* scene)
 {
   auto constructorFunc
     = Node::Construct("Light_Type_" + ::std::to_string(type), name, scene);
 
   if (constructorFunc) {
-    return
-      [constructorFunc]() { return static_cast<Light*>(constructorFunc()); };
+    return [constructorFunc]() {
+      return ::std::static_pointer_cast<Light>(constructorFunc());
+    };
   }
 
   // Default to no light for none present once.
   return nullptr;
 }
 
-Light* Light::Parse(const Json::value& parsedLight, Scene* scene)
+LightPtr Light::Parse(const Json::value& parsedLight, Scene* scene)
 {
   auto constructor = Light::GetConstructorFromName(
     Json::GetNumber(parsedLight, "type", 0u),
@@ -397,7 +398,7 @@ Light* Light::Parse(const Json::value& parsedLight, Scene* scene)
     for (auto parsedAnimation : Json::GetArray(parsedLight, "animations")) {
       light->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
-    Node::ParseAnimationRanges(light, parsedLight, scene);
+    Node::ParseAnimationRanges(*light, parsedLight, scene);
   }
 
   if (parsedLight.contains("autoAnimate")) {

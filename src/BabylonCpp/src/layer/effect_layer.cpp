@@ -5,6 +5,8 @@
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/engine/scene_component_constants.h>
+#include <babylon/layer/effect_layer_scene_component.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/material.h>
@@ -23,17 +25,27 @@ namespace BABYLON {
 EffectLayer::EffectLayer(const string_t& iName, Scene* scene)
     : name{iName}
     , isEnabled{true}
+    , camera{this, &EffectLayer::get_camera}
+    , renderingGroupId{this, &EffectLayer::get_renderingGroupId}
+    , _mainTexture{nullptr}
     , _maxSize{0}
     , _mainTextureDesiredSize{ISize{0, 0}}
-    , _mainTexture{nullptr}
     , _shouldRender{true}
     , _indexBuffer{nullptr}
     , _effectLayerMapGenerationEffect{nullptr}
     , _mergeEffect{nullptr}
 {
-  _scene   = scene ? scene : Engine::LastCreatedScene();
+  _scene         = scene ? scene : Engine::LastCreatedScene();
+  auto component = ::std::static_pointer_cast<EffectLayerSceneComponent>(
+    _scene->_getComponent(SceneComponentConstants::NAME_EFFECTLAYER));
+  if (!component) {
+    component = EffectLayerSceneComponent::New(_scene);
+    _scene->_addComponent(component);
+  }
+
   _engine  = scene->getEngine();
   _maxSize = _engine->getCaps().maxTextureSize;
+  _scene->effectLayers.emplace_back(shared_from_this());
 
   // Generate Buffers
   _generateIndexBuffer();
@@ -44,14 +56,14 @@ EffectLayer::~EffectLayer()
 {
 }
 
-void EffectLayer::addToScene(unique_ptr_t<EffectLayer>&& newEffectLayer)
-{
-  _scene->effectLayers.emplace_back(::std::move(newEffectLayer));
-}
-
-Camera* EffectLayer::camera() const
+CameraPtr& EffectLayer::get_camera()
 {
   return _effectLayerOptions.camera;
+}
+
+int EffectLayer::get_renderingGroupId() const
+{
+  return _effectLayerOptions.renderingGroupId;
 }
 
 void EffectLayer::_init(const IEffectLayerOptions& options)
@@ -97,9 +109,9 @@ void EffectLayer::_generateVertexBuffer()
 
 void EffectLayer::_setMainTextureSize()
 {
-  if (_effectLayerOptions.mainTextureFixedSize) {
-    _mainTextureDesiredSize.width  = _effectLayerOptions.mainTextureFixedSize;
-    _mainTextureDesiredSize.height = _effectLayerOptions.mainTextureFixedSize;
+  if (_effectLayerOptions.mainTextureFixedSize.has_value()) {
+    _mainTextureDesiredSize.width  = *_effectLayerOptions.mainTextureFixedSize;
+    _mainTextureDesiredSize.height = *_effectLayerOptions.mainTextureFixedSize;
   }
   else {
     _mainTextureDesiredSize.width = static_cast<int>(
@@ -125,7 +137,7 @@ void EffectLayer::_setMainTextureSize()
 
 void EffectLayer::_createMainTexture()
 {
-  _mainTexture = ::std::make_unique<RenderTargetTexture>(
+  _mainTexture = RenderTargetTexture::New(
     "HighlightLayerMainRTT",
     ISize{_mainTextureDesiredSize.width, _mainTextureDesiredSize.height},
     _scene, false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
@@ -140,10 +152,10 @@ void EffectLayer::_createMainTexture()
 
   // Custom render function
   _mainTexture->customRenderFunction
-    = [this](const vector_t<SubMesh*>& opaqueSubMeshes,
-             const vector_t<SubMesh*>& alphaTestSubMeshes,
-             const vector_t<SubMesh*>& transparentSubMeshes,
-             const vector_t<SubMesh*>& depthOnlySubMeshes,
+    = [this](const vector_t<SubMeshPtr>& opaqueSubMeshes,
+             const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+             const vector_t<SubMeshPtr>& transparentSubMeshes,
+             const vector_t<SubMeshPtr>& depthOnlySubMeshes,
              const ::std::function<void()>& /*beforeTransparents*/) {
         onBeforeRenderMainTextureObservable.notifyObservers(this);
 
@@ -177,7 +189,7 @@ void EffectLayer::_createMainTexture()
 }
 
 bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
-                           BaseTexture* emissiveTexture)
+                           const BaseTexturePtr& emissiveTexture)
 {
   auto material = subMesh->getMaterial();
 
@@ -185,7 +197,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     return false;
   }
 
-  if (!material->isReady(subMesh->getMesh(), useInstances)) {
+  if (!material->isReady(subMesh->getMesh().get(), useInstances)) {
     return false;
   }
 
@@ -258,7 +270,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
 
   // Morph targets
   unsigned int morphInfluencers = 0;
-  if (auto _mesh = static_cast<Mesh*>(mesh)) {
+  if (auto _mesh = ::std::static_pointer_cast<Mesh>(mesh)) {
     auto manager = _mesh->morphTargetManager();
     if (manager) {
       if (manager->numInfluencers > 0) {
@@ -268,8 +280,8 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
                              + ::std::to_string(morphInfluencers));
         MaterialDefines defines;
         defines.NUM_MORPH_INFLUENCERS = morphInfluencers;
-        MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
-                                                         0);
+        MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
+                                                         defines, 0);
       }
     }
   }
@@ -359,9 +371,12 @@ void EffectLayer::render()
   }
 }
 
-bool EffectLayer::hasMesh(AbstractMesh* /*mesh*/) const
+bool EffectLayer::hasMesh(AbstractMesh* mesh) const
 {
-  return true;
+  if (renderingGroupId() == -1 || mesh->renderingGroupId == renderingGroupId) {
+    return true;
+  }
+  return false;
 }
 
 bool EffectLayer::shouldRender() const
@@ -369,7 +384,7 @@ bool EffectLayer::shouldRender() const
   return isEnabled && _shouldRender;
 }
 
-bool EffectLayer::_shouldRenderMesh(Mesh* /*mesh*/) const
+bool EffectLayer::_shouldRenderMesh(const MeshPtr& /*mesh*/) const
 {
   return true;
 }
@@ -379,7 +394,7 @@ bool EffectLayer::_shouldRenderEmissiveTextureForMesh(Mesh* /*mesh*/) const
   return true;
 }
 
-void EffectLayer::_renderSubMesh(SubMesh* subMesh)
+void EffectLayer::_renderSubMesh(const SubMeshPtr& subMesh)
 {
   if (!shouldRender()) {
     return;
@@ -395,7 +410,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
   }
 
   // Do not block in blend mode.
-  if (material->needAlphaBlendingForMesh(mesh)) {
+  if (material->needAlphaBlendingForMesh(*mesh)) {
     return;
   }
 
@@ -418,12 +433,12 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty());
 
-  _setEmissiveTextureAndColor(mesh, subMesh, material);
+  _setEmissiveTextureAndColor(mesh, subMesh.get(), material);
 
-  if (_isReady(subMesh, hardwareInstancedRendering,
+  if (_isReady(subMesh.get(), hardwareInstancedRendering,
                _emissiveTextureAndColor.texture)) {
     engine->enableEffect(_effectLayerMapGenerationEffect);
-    mesh->_bind(subMesh, _effectLayerMapGenerationEffect,
+    mesh->_bind(subMesh.get(), _effectLayerMapGenerationEffect,
                 Material::TriangleFillMode());
 
     _effectLayerMapGenerationEffect->setMatrix("viewProjection",
@@ -465,24 +480,24 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
     if (mesh->useBones() && mesh->computeBonesUsingShaders()
         && mesh->skeleton()) {
       _effectLayerMapGenerationEffect->setMatrices(
-        "mBones", mesh->skeleton()->getTransformMatrices(mesh));
+        "mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
     }
 
     // Morph targets
-    MaterialHelper::BindMorphTargetParameters(mesh,
+    MaterialHelper::BindMorphTargetParameters(mesh.get(),
                                               _effectLayerMapGenerationEffect);
 
     // Draw
     mesh->_processRendering(
-      subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode(),
-      batch, hardwareInstancedRendering,
+      subMesh.get(), _effectLayerMapGenerationEffect,
+      Material::TriangleFillMode(), batch, hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world,
           Material* /*effectiveMaterial*/) {
         _effectLayerMapGenerationEffect->setMatrix("world", world);
       });
   }
   else {
-    // Need to reset refresh rate of the shadowMap
+    // Need to reset refresh rate of the main map
     _mainTexture->resetRefreshCounter();
   }
 }
@@ -540,7 +555,7 @@ void EffectLayer::dispose()
   // Remove from scene
   _scene->effectLayers.erase(
     ::std::remove_if(_scene->effectLayers.begin(), _scene->effectLayers.end(),
-                     [this](const unique_ptr_t<EffectLayer>& effectLayer) {
+                     [this](const EffectLayerPtr& effectLayer) {
                        return effectLayer.get() == this;
                      }),
     _scene->effectLayers.end());

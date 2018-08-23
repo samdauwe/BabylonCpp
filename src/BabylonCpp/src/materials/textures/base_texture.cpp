@@ -61,10 +61,10 @@ IReflect::Type BaseTexture::type() const
   return IReflect::Type::BASETEXTURE;
 }
 
-void BaseTexture::addToScene(unique_ptr_t<BaseTexture>&& newTexture)
+void BaseTexture::addToScene(const BaseTexturePtr& newTexture)
 {
   if (_scene) {
-    _scene->textures.emplace_back(::std::move(newTexture));
+    _scene->textures.emplace_back(newTexture);
   }
 }
 
@@ -292,7 +292,7 @@ nullable_t<Vector3>& BaseTexture::get_boundingBoxSize()
   return emptyVector3;
 }
 
-vector_t<Animation*> BaseTexture::getAnimations()
+vector_t<AnimationPtr> BaseTexture::getAnimations()
 {
   return animations;
 }
@@ -386,7 +386,7 @@ void BaseTexture::setSphericalPolynomial(const SphericalPolynomial& value)
   }
 }
 
-BaseTexture* BaseTexture::_lodTextureHigh() const
+BaseTexturePtr BaseTexture::_lodTextureHigh() const
 {
   if (_texture) {
     return _texture->_lodTextureHigh;
@@ -394,7 +394,7 @@ BaseTexture* BaseTexture::_lodTextureHigh() const
   return nullptr;
 }
 
-BaseTexture* BaseTexture::_lodTextureMid() const
+BaseTexturePtr BaseTexture::_lodTextureMid() const
 {
   if (_texture) {
     return _texture->_lodTextureMid;
@@ -402,7 +402,7 @@ BaseTexture* BaseTexture::_lodTextureMid() const
   return nullptr;
 }
 
-BaseTexture* BaseTexture::_lodTextureLow() const
+BaseTexturePtr BaseTexture::_lodTextureLow() const
 {
   if (_texture) {
     return _texture->_lodTextureLow;
@@ -422,7 +422,7 @@ void BaseTexture::dispose()
   // Remove from scene
   _scene->textures.erase(
     ::std::remove_if(_scene->textures.begin(), _scene->textures.end(),
-                     [this](const unique_ptr_t<BaseTexture>& baseTexture) {
+                     [this](const BaseTexturePtr& baseTexture) {
                        return baseTexture.get() == this;
                      }),
     _scene->textures.end());

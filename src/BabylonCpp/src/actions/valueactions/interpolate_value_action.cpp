@@ -13,7 +13,7 @@
 namespace BABYLON {
 
 InterpolateValueAction::InterpolateValueAction(
-  unsigned int triggerOptions, IAnimatable* target,
+  unsigned int triggerOptions, const IAnimatablePtr& target,
   const string_t& iPropertyPath, AnimationValue* iValue, int iDuration,
   Condition* condition, bool iStopOtherAnimations,
   const ::std::function<void()>& iOnInterpolationDone)
@@ -51,9 +51,10 @@ void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
                      "InterpolateValueAction: Unsupported type");
   }
 
-  Animation* animation = nullptr; /*std::make_shared<Animation>(
-    "InterpolateValueAction", _property, 100 * (1000.0 / duration), dataType,
-    Animation::ANIMATIONLOOPMODE_CONSTANT);*/
+  AnimationPtr animation
+    = Animation::New("InterpolateValueAction", _property,
+                     static_cast<size_t>(100 * (1000.0 / duration)), dataType,
+                     Animation::ANIMATIONLOOPMODE_CONSTANT());
   animation->setKeys(keys);
 
   if (stopOtherAnimations) {
@@ -74,18 +75,19 @@ void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
 Json::object InterpolateValueAction::serialize(Json::object& parent) const
 {
   return Action::_serialize(
-    Json::object({Json::Pair("name", "InterpolateValueAction"),
-                  Json::Pair("properties", Json::array({{/*
-           Action::_GetTargetProperty(_target),
-           Json::NameValuePair("propertyPath", propertyPath),
-           Json::NameValuePair("value", Action::_SerializeValueAsString(value)),
-           Json::NameValuePair("duration", Action::_SerializeValueAsString(
-                                             AnimationValue(duration))),
-           Json::NameValuePair("stopOtherAnimations",
-                               Action::_SerializeValueAsString(
-                                 AnimationValue(stopOtherAnimations))),
+    Json::object(
+      {Json::Pair("name", "InterpolateValueAction"),
+       Json::Pair("properties", Json::array({{/*
+Action::_GetTargetProperty(_target),
+Json::NameValuePair("propertyPath", propertyPath),
+Json::NameValuePair("value", Action::_SerializeValueAsString(value)),
+Json::NameValuePair("duration", Action::_SerializeValueAsString(
+                                  AnimationValue(duration))),
+Json::NameValuePair("stopOtherAnimations",
+                    Action::_SerializeValueAsString(
+                      AnimationValue(stopOtherAnimations))),
 
-         */}}))}),
+*/}}))}),
     parent);
 }
 

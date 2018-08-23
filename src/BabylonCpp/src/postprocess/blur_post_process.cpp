@@ -10,7 +10,7 @@ namespace BABYLON {
 
 BlurPostProcess::BlurPostProcess(
   const string_t& iName, const Vector2& iDrection, float kernel,
-  const Variant<float, PostProcessOptions>& options, Camera* camera,
+  const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType, const string_t& defines, bool iBlockCompilation)
     : PostProcess{iName,

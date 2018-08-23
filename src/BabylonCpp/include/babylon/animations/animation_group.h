@@ -2,7 +2,6 @@
 #define BABYLON_ANIMATIONS_ANIMATION_GROUP_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
 
@@ -33,8 +32,8 @@ public:
    * @param target defines the target of the animation
    * @returns the {BABYLON.TargetedAnimation} object
    */
-  TargetedAnimation addTargetedAnimation(Animation* animation,
-                                         IAnimatable* target);
+  TargetedAnimation addTargetedAnimation(const AnimationPtr& animation,
+                                         const IAnimatablePtr& target);
 
   /**
    * @brief This function will normalize every animation in the group to make
@@ -45,8 +44,8 @@ public:
    * @param endFrame defines the new end frame for all animations or the largest
    * end frame of all animations if null (defaults to null)
    */
-  AnimationGroup& normalize(const Nullable<int>& beginFrame = nullptr,
-                            const Nullable<int>& endFrame   = nullptr);
+  AnimationGroup& normalize(const nullable_t<int>& beginFrame = nullopt_t,
+                            const nullable_t<int>& endFrame   = nullopt_t);
 
   /**
    * @brief Start all animations on given targets.
@@ -58,8 +57,8 @@ public:
    * @returns the current animation group
    */
   AnimationGroup& start(bool loop = false, float speedRatio = 1.f,
-                        Nullable<int> from = nullptr,
-                        Nullable<int> to   = nullptr);
+                        nullable_t<float> from = nullopt_t,
+                        nullable_t<float> to   = nullopt_t);
 
   /**
    * @brief Pause all animations.
@@ -126,12 +125,12 @@ private:
   /**
    * @brief Gets the first frame.
    */
-  int get_from() const;
+  float get_from() const;
 
   /**
    * @brief Gets the last frame.
    */
-  int get_to() const;
+  float get_to() const;
 
   /**
    * @brief Define if the animations are started.
@@ -157,9 +156,9 @@ private:
    * @brief Returning the list of animatables controlled by this animation
    * group.
    */
-  vector_t<Animatable*>& get_animatables();
+  vector_t<AnimatablePtr>& get_animatables();
 
-  void _checkAnimationGroupEnded(Animatable* animatable);
+  void _checkAnimationGroupEnded(const AnimatablePtr& animatable);
 
 public:
   string_t name;
@@ -171,14 +170,19 @@ public:
   Observable<AnimationGroup> onAnimationGroupEndObservable;
 
   /**
+   * This observable will notify when all animations have paused.
+   */
+  Observable<AnimationGroup> onAnimationGroupPauseObservable;
+
+  /**
    * Gets the first frame
    */
-  ReadOnlyProperty<AnimationGroup, int> from;
+  ReadOnlyProperty<AnimationGroup, float> from;
 
   /**
    * Gets the last frame
    */
-  ReadOnlyProperty<AnimationGroup, int> to;
+  ReadOnlyProperty<AnimationGroup, float> to;
 
   /**
    * Define if the animations are started.
@@ -199,14 +203,14 @@ public:
   /**
    * Animatables controlled by this animation group.
    */
-  ReadOnlyProperty<AnimationGroup, vector_t<Animatable*>> animatables;
+  ReadOnlyProperty<AnimationGroup, vector_t<AnimatablePtr>> animatables;
 
 private:
   Scene* _scene;
   vector_t<unique_ptr_t<TargetedAnimation>> _targetedAnimations;
-  vector_t<Animatable*> _animatables;
-  int _from;
-  int _to;
+  vector_t<AnimatablePtr> _animatables;
+  float _from;
+  float _to;
   bool _isStarted;
   float _speedRatio;
 

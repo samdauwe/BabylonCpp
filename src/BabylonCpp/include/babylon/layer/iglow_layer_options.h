@@ -2,7 +2,6 @@
 #define BABYLON_LAYER_IGLOW_LAYER_OPTIONS_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -21,7 +20,7 @@ struct BABYLON_SHARED_EXPORT IGlowLayerOptions {
   /**
    * Enforces a fixed size texture to ensure resize independant blur.
    */
-  Nullable<int> mainTextureFixedSize = nullptr;
+  nullable_t<int> mainTextureFixedSize = nullopt_t;
 
   /**
    * How big is the kernel of the blur texture.
@@ -31,12 +30,17 @@ struct BABYLON_SHARED_EXPORT IGlowLayerOptions {
   /**
    * The camera attached to the layer.
    */
-  Camera* camera = nullptr;
+  CameraPtr camera = nullptr;
 
   /**
    * Enable MSAA by chosing the number of samples.
    */
-  Nullable<int> mainTextureSamples = 1;
+  nullable_t<int> mainTextureSamples = 1;
+
+  /**
+   * The rendering group to draw the layer in.
+   */
+  int renderingGroupId = -1;
 
 }; // end of struct IGlowLayerOptions
 

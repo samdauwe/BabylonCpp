@@ -39,8 +39,8 @@ unique_ptr_t<RefractionTexture> RefractionTexture::clone()
 
   // Mirror Texture
   newTexture->refractionPlane = refractionPlane;
-  if (!renderList.empty()) {
-    newTexture->renderList = renderList;
+  if (!renderList().empty()) {
+    newTexture->renderList = renderList();
   }
   newTexture->depth = depth;
 

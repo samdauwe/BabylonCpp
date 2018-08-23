@@ -238,7 +238,7 @@ Json::object GroundMesh::serialize(Json::object& /*serializationObject*/) const
   return Json::object();
 }
 
-GroundMesh* GroundMesh::Parse(const Json::value& parsedMesh, Scene* scene)
+GroundMeshPtr GroundMesh::Parse(const Json::value& parsedMesh, Scene* scene)
 {
   auto result = GroundMesh::New(Json::GetString(parsedMesh, "name"), scene);
 

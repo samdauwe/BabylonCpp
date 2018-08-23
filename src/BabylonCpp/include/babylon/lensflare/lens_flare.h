@@ -25,7 +25,7 @@ public:
   float size;
   Vector3 position;
   Color3 color;
-  Texture* texture;
+  TexturePtr texture;
   unsigned int alphaMode;
 
 private:

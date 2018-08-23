@@ -60,7 +60,7 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , _nonUniformScaling{false}
 {
   if (isPure) {
-    getScene()->addTransformNode(this);
+    getScene()->addTransformNode(shared_from_base<TransformNode>());
   }
 }
 
@@ -869,9 +869,9 @@ TransformNode& TransformNode::unregisterAfterWorldMatrixUpdate(
   return *this;
 }
 
-TransformNode* TransformNode::clone(const string_t& /*name*/,
-                                    Node* /*newParent*/,
-                                    bool /*doNotCloneChildren*/)
+TransformNodePtr TransformNode::clone(const string_t& /*name*/,
+                                      Node* /*newParent*/,
+                                      bool /*doNotCloneChildren*/)
 {
   return nullptr;
 }
@@ -882,9 +882,9 @@ TransformNode::serialize(Json::object& /*currentSerializationObject*/)
   return Json::object();
 }
 
-TransformNode* TransformNode::Parse(const Json::value& /*parsedTransformNode*/,
-                                    Scene* /*scene*/,
-                                    const string_t& /*rootUrl*/)
+TransformNodePtr
+TransformNode::Parse(const Json::value& /*parsedTransformNode*/,
+                     Scene* /*scene*/, const string_t& /*rootUrl*/)
 {
   return nullptr;
 }

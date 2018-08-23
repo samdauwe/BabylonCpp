@@ -22,10 +22,11 @@ class BABYLON_SHARED_EXPORT GroundMesh : public Mesh {
 
 public:
   template <typename... Ts>
-  static GroundMesh* New(Ts&&... args)
+  static GroundMeshPtr New(Ts&&... args)
   {
-    auto mesh = new GroundMesh(::std::forward<Ts>(args)...);
-    mesh->addToScene(static_cast<unique_ptr_t<AbstractMesh>>(mesh));
+    auto mesh
+      = shared_ptr_t<GroundMesh>(new GroundMesh(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
     return mesh;
   }
@@ -78,7 +79,7 @@ public:
 
   Json::object serialize(Json::object& serializationObject) const;
 
-  static GroundMesh* Parse(const Json::value& parsedMesh, Scene* scene);
+  static GroundMeshPtr Parse(const Json::value& parsedMesh, Scene* scene);
 
 private:
   size_t get_subdivisions() const;

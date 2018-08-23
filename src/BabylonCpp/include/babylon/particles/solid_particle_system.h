@@ -82,7 +82,7 @@ public:
    * triangular plane.
    * @returns the created mesh
    */
-  Mesh* buildMesh();
+  MeshPtr buildMesh();
 
   /**
    * @brief Digests the mesh and generates as many solid particles in the system
@@ -117,7 +117,7 @@ public:
    * creation
    * @returns the number of shapes in the system
    */
-  int addShape(Mesh* mesh, size_t nb,
+  int addShape(const MeshPtr& mesh, size_t nb,
                const SolidParticleSystemMeshBuilderOptions& options);
 
   /**
@@ -450,7 +450,7 @@ public:
    * The SPS mesh. It's a standard BJS Mesh, so all the methods from the Mesh
    * class are avalaible.
    */
-  Mesh* mesh;
+  MeshPtr mesh;
 
   /**
    * This array is populated when the SPS is set as 'pickable'.
@@ -521,7 +521,7 @@ private:
   Vector3 _axisX;
   Vector3 _axisY;
   Vector3 _axisZ;
-  TargetCamera* _camera;
+  TargetCameraPtr _camera;
   SolidParticle* _particle;
   Vector3 _camDir;
   Vector3 _camInvertedPosition;

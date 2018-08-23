@@ -5,7 +5,9 @@
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene_component_constants.h>
 #include <babylon/lensflare/lens_flare.h>
+#include <babylon/lensflare/lens_flare_system_scene_component.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -20,19 +22,29 @@ namespace BABYLON {
 
 LensFlareSystem::LensFlareSystem(const string_t iName, Mesh* emitter,
                                  Scene* scene)
-    : id{iName}
-    , name{iName}
+    : name{iName}
     , borderLimit{300}
     , viewportBorder{0.f}
     , layerMask{0x0FFFFFFF}
     , isEnabled{this, &LensFlareSystem::get_isEnabled,
                 &LensFlareSystem::set_isEnabled}
-    , _scene{scene}
-    , _emitter{emitter}
     , _indexBuffer{nullptr}
     , _isEnabled{true}
 {
-  meshesSelectionPredicate = [this](AbstractMesh* m) {
+  _scene = scene ? scene : Engine::LastCreatedScene();
+
+  auto component = ::std::static_pointer_cast<LensFlareSystemSceneComponent>(
+    _scene->_getComponent(SceneComponentConstants::NAME_LENSFLARESYSTEM));
+  if (!component) {
+    component = LensFlareSystemSceneComponent::New(_scene);
+    scene->_addComponent(component);
+  }
+
+  _emitter = emitter;
+  id       = iName;
+  scene->lensFlareSystems.emplace_back(shared_from_this());
+
+  meshesSelectionPredicate = [this](const AbstractMeshPtr& m) {
     return _scene->activeCamera && m->material() && m->isVisible
            && m->isEnabled() && m->isBlocker
            && ((m->layerMask() & _scene->activeCamera->layerMask) != 0);
@@ -74,12 +86,6 @@ LensFlareSystem::LensFlareSystem(const string_t iName, Mesh* emitter,
 
 LensFlareSystem::~LensFlareSystem()
 {
-}
-
-void LensFlareSystem::addToScene(
-  unique_ptr_t<LensFlareSystem>&& lensFlareSystem)
-{
-  _scene->lensFlareSystems.emplace_back(::std::move(lensFlareSystem));
 }
 
 bool LensFlareSystem::get_isEnabled() const
@@ -279,7 +285,7 @@ bool LensFlareSystem::render()
     auto y = centerY - (distY * flare->position.y);
 
     auto cw = flare->size;
-    auto ch = flare->size * engine->getAspectRatio(_scene->activeCamera);
+    auto ch = flare->size * engine->getAspectRatio(*_scene->activeCamera);
     auto cx = 2.f * (x / (globalViewport_width + globalViewport_x * 2.f)) - 1.f;
     auto cy
       = 1.f - 2.f * (y / (globalViewport_height + globalViewport_y * 2.f));
@@ -332,16 +338,13 @@ void LensFlareSystem::dispose()
   lensFlares.clear();
 
   // Remove from scene
-  _scene->lensFlareSystems.erase(
-    ::std::remove_if(
-      _scene->lensFlareSystems.begin(), _scene->lensFlareSystems.end(),
-      [this](const unique_ptr_t<LensFlareSystem>& lensFlareSystem) {
-        return lensFlareSystem.get() == this;
-      }),
-    _scene->lensFlareSystems.end());
+  _scene->lensFlareSystems.erase(::std::remove(_scene->lensFlareSystems.begin(),
+                                               _scene->lensFlareSystems.end(),
+                                               shared_from_this()),
+                                 _scene->lensFlareSystems.end());
 }
 
-LensFlareSystem*
+LensFlareSystemPtr
 LensFlareSystem::Parse(const Json::value& /*parsedLensFlareSystem*/,
                        Scene* /*scene*/, const string_t& /*rootUrl*/)
 {

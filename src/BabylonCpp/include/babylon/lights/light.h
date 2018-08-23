@@ -120,7 +120,7 @@ public:
   ~Light() override;
 
   virtual IReflect::Type type() const override;
-  void addToScene(unique_ptr_t<Light>&& newLight);
+  void addToScene(const LightPtr& newLight);
 
   /**
    * @brief Returns the string "Light".
@@ -260,7 +260,7 @@ public:
    * @param scene The scene the new light will belong to
    * @returns the constructor function
    */
-  static ::std::function<Light*()>
+  static ::std::function<LightPtr()>
   GetConstructorFromName(unsigned int type, const string_t& name, Scene* scene);
 
   /**
@@ -270,7 +270,7 @@ public:
    * @param scene The scene to create the parsed light in
    * @returns the created light after parsing
    */
-  static Light* Parse(const Json::value& parsedLight, Scene* scene);
+  static LightPtr Parse(const Json::value& parsedLight, Scene* scene);
 
 protected:
   /**

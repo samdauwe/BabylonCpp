@@ -29,7 +29,7 @@ WebVRController::~WebVRController()
 {
 }
 
-AbstractMesh*& WebVRController::get_defaultModel()
+AbstractMeshPtr& WebVRController::get_defaultModel()
 {
   return _defaultModel;
 }

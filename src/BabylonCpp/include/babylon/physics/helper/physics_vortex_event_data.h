@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT PhysicsVortexEventData {
-  Mesh* cylinder;
+  MeshPtr cylinder;
 }; // end of struct PhysicsVortexEventData
 
 } // end of namespace BABYLON

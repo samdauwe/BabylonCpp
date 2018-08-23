@@ -104,7 +104,7 @@ bool ShadowLight::computeTransformedInformation()
   return false;
 }
 
-Scene* ShadowLight::getScene()
+Scene* ShadowLight::getScene() const
 {
   return Node::getScene();
 }
@@ -165,18 +165,19 @@ Matrix* ShadowLight::_getWorldMatrix()
   return _worldMatrix.get();
 }
 
-float ShadowLight::getDepthMinZ(Camera* activeCamera) const
+float ShadowLight::getDepthMinZ(const Camera& activeCamera) const
 {
-  return shadowMinZ().has_value() ? *shadowMinZ() : activeCamera->minZ;
+  return shadowMinZ().has_value() ? *shadowMinZ() : activeCamera.minZ;
 }
 
-float ShadowLight::getDepthMaxZ(Camera* activeCamera) const
+float ShadowLight::getDepthMaxZ(const Camera& activeCamera) const
 {
-  return shadowMaxZ().has_value() ? *shadowMaxZ() : activeCamera->maxZ;
+  return shadowMaxZ().has_value() ? *shadowMaxZ() : activeCamera.maxZ;
 }
 
 IShadowLight* ShadowLight::setShadowProjectionMatrix(
-  Matrix& matrix, Matrix& viewMatrix, const vector_t<AbstractMesh*>& renderList)
+  Matrix& matrix, Matrix& viewMatrix,
+  const vector_t<AbstractMeshPtr>& renderList)
 {
   if (customProjectionMatrixBuilder) {
     customProjectionMatrixBuilder(viewMatrix, renderList, matrix);

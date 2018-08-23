@@ -146,7 +146,7 @@ void FramingBehavior::init()
   // Do nothing
 }
 
-void FramingBehavior::attach(ArcRotateCamera* camera)
+void FramingBehavior::attach(const ArcRotateCameraPtr& camera)
 {
   _attachedCamera = camera;
   auto scene      = _attachedCamera->getScene();
@@ -283,8 +283,8 @@ void FramingBehavior::zoomOnBoundingInfo(
 
   _betaIsAnimating = true;
   auto animatable  = Animation::TransitionTo(
-    "target", zoomTarget, _attachedCamera, _attachedCamera->getScene(), 60,
-    _vectorTransition, _framingTime);
+    "target", zoomTarget, _attachedCamera.get(), _attachedCamera->getScene(),
+    60, _vectorTransition, _framingTime);
 
   if (animatable) {
     _animatables.emplace_back(animatable);
@@ -322,7 +322,7 @@ void FramingBehavior::zoomOnBoundingInfo(
   }
 
   animatable = Animation::TransitionTo(
-    "radius", radius, _attachedCamera, _attachedCamera->getScene(), 60,
+    "radius", radius, _attachedCamera.get(), _attachedCamera->getScene(), 60,
     _radiusTransition, _framingTime, [this, &onAnimationEnd]() {
       stopAllAnimations();
       if (onAnimationEnd) {
@@ -410,8 +410,8 @@ void FramingBehavior::_maintainCameraAboveGround()
     }
 
     auto animatabe = Animation::TransitionTo(
-      "beta", defaultBeta, _attachedCamera, _attachedCamera->getScene(), 60,
-      _betaTransition, _elevationReturnTime, [this]() {
+      "beta", defaultBeta, _attachedCamera.get(), _attachedCamera->getScene(),
+      60, _betaTransition, _elevationReturnTime, [this]() {
         _clearAnimationLocks();
         stopAllAnimations();
       });
@@ -433,7 +433,7 @@ Vector2 FramingBehavior::_getFrustumSlope() const
   }
 
   auto engine      = camera->getScene()->getEngine();
-  auto aspectRatio = engine->getAspectRatio(camera);
+  auto aspectRatio = engine->getAspectRatio(*camera);
 
   // Camera FOV is the vertical field of view (top-bottom) in radians.
   // Slope of the frustum top/bottom planes in view space, relative to the

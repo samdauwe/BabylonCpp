@@ -37,7 +37,7 @@ void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene)
 }
 
 void MaterialHelper::PrepareDefinesForMergedUV(
-  BaseTexture* texture, MaterialDefines& defines, unsigned int key,
+  const BaseTexturePtr& texture, MaterialDefines& defines, unsigned int key,
   const string_t& keyString, unsigned int MAINUV1, unsigned int MAINUV2)
 {
   const auto updateDirectUV = [&defines, &keyString](unsigned int value) {
@@ -293,7 +293,7 @@ bool MaterialHelper::PrepareDefinesForLights(
         if (shadowGenerator) {
           const auto& shadowMap = shadowGenerator->getShadowMap();
           if (shadowMap) {
-            if (!shadowMap->renderList.empty()) {
+            if (!shadowMap->renderList().empty()) {
               shadowEnabled = true;
               shadowGenerator->prepareDefines(defines, lightIndex);
             }
@@ -545,22 +545,22 @@ void MaterialHelper::PrepareAttributesForInstances(vector_t<string_t>& attribs,
   }
 }
 
-void MaterialHelper::BindLightShadow(Light* light, Scene* /*scene*/,
-                                     AbstractMesh* mesh,
+void MaterialHelper::BindLightShadow(Light& light, Scene* /*scene*/,
+                                     AbstractMesh& mesh,
                                      unsigned int lightIndex, Effect* effect)
 {
-  if (light->shadowEnabled && mesh->receiveShadows()) {
-    auto shadowGenerator = light->getShadowGenerator();
+  if (light.shadowEnabled && mesh.receiveShadows()) {
+    auto shadowGenerator = light.getShadowGenerator();
     if (shadowGenerator) {
       shadowGenerator->bindShadowLight(::std::to_string(lightIndex), effect);
     }
   }
 }
 
-void MaterialHelper::BindLightProperties(Light* light, Effect* effect,
+void MaterialHelper::BindLightProperties(Light& light, Effect* effect,
                                          unsigned int lightIndex)
 {
-  light->transferToEffect(effect, ::std::to_string(lightIndex));
+  light.transferToEffect(effect, ::std::to_string(lightIndex));
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
@@ -580,7 +580,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
     auto scaledIntensity = light->getScaledIntensity();
     light->_uniformBuffer->bindToEffect(effect, "Light" + iAsString);
 
-    MaterialHelper::BindLightProperties(light, effect, i);
+    MaterialHelper::BindLightProperties(*light, effect, i);
 
     light->diffuse.scaleToRef(scaledIntensity, Tmp::Color3Array[0]);
     light->_uniformBuffer->updateColor4(
@@ -594,7 +594,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
 
     // Shadows
     if (scene->shadowsEnabled()) {
-      BindLightShadow(light, scene, mesh, i, effect);
+      BindLightShadow(*light, scene, *mesh, i, effect);
     }
     light->_uniformBuffer->update();
   }

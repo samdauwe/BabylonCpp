@@ -65,7 +65,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   if (mesh->useBones() && mesh->computeBonesUsingShaders()
       && mesh->skeleton()) {
     _effect->setMatrices("mBones",
-                         mesh->skeleton()->getTransformMatrices(mesh));
+                         mesh->skeleton()->getTransformMatrices(mesh.get()));
   }
 
   mesh->_bind(subMesh, _effect, Material::TriangleFillMode());

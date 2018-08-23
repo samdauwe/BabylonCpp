@@ -20,7 +20,7 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * from the light point of view).
    * @returns The render target texture if present otherwise, null
    */
-  virtual RenderTargetTexture* getShadowMap() = 0;
+  virtual RenderTargetTexturePtr getShadowMap() = 0;
 
   /**
    * @brief Gets the RTT used during rendering (can be a blurred version of the
@@ -28,7 +28,7 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * @returns The render target texture if the shadow map is present otherwise,
    * null
    */
-  virtual RenderTargetTexture* getShadowMapForRendering() = 0;
+  virtual RenderTargetTexturePtr getShadowMapForRendering() = 0;
 
   /**
    * @brief Determine wheter the shadow generator is ready or not (mainly all

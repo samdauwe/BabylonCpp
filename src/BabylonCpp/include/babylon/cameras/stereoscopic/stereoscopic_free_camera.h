@@ -16,10 +16,11 @@ public:
 
 public:
   template <typename... Ts>
-  static StereoscopicFreeCamera* New(Ts&&... args)
+  static StereoscopicFreeCameraPtr New(Ts&&... args)
   {
-    auto camera = new StereoscopicFreeCamera(std::forward<Ts>(args)...);
-    camera->addToScene(static_cast<unique_ptr_t<Camera>>(camera));
+    auto camera = shared_ptr_t<StereoscopicFreeCamera>(
+      new StereoscopicFreeCamera(::std::forward<Ts>(args)...));
+    camera->addToScene(camera);
 
     return camera;
   }

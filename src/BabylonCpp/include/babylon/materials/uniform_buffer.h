@@ -20,7 +20,7 @@ public:
    * https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
    */
   UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
-                bool dynamic          = false);
+                bool dynamic = false);
   UniformBuffer(UniformBuffer& other) = delete;
   ~UniformBuffer();
 
@@ -163,7 +163,7 @@ public:
    * @param {string} name Name of the sampler.
    * @param {Texture} texture
    */
-  void setTexture(const string_t& name, BaseTexture* texture);
+  void setTexture(const string_t& name, const BaseTexturePtr& texture);
 
   /**
    * @brief Directly updates the value of the uniform in the cache AND on the

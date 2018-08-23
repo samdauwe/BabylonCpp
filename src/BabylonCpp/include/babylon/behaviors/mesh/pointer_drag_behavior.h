@@ -41,7 +41,7 @@ public:
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
    */
-  void attach(Node* ownerNode) override;
+  void attach(const NodePtr& ownerNode) override;
 
   void releaseDrag();
 
@@ -131,8 +131,8 @@ public:
   static unique_ptr_t<Scene> _planeScene;
 
 private:
-  Node* _attachedNode;
-  Mesh* _dragPlane;
+  NodePtr _attachedNode;
+  MeshPtr _dragPlane;
   Scene* _scene;
   Observer<PointerInfo>::Ptr _pointerObserver;
   Observer<Scene>::Ptr _beforeRenderObserver;

@@ -45,7 +45,7 @@ protected:
   /**
    * @brief Set the render list (meshes to be rendered) used in the G buffer.
    */
-  void set_renderList(const vector_t<Mesh*>& meshes);
+  void set_renderList(const vector_t<MeshPtr>& meshes);
 
   /**
    * @brief Gets wether or not G buffer are supported by the running hardware.
@@ -93,13 +93,13 @@ private:
    * @brief Custom render function.
    * @param subMesh
    */
-  void renderSubMesh(SubMesh* subMesh);
+  void renderSubMesh(const SubMeshPtr& subMesh);
 
 public:
   /**
    * The render list (meshes to be rendered) used in the G buffer.
    */
-  WriteOnlyProperty<GeometryBufferRenderer, vector_t<Mesh*>> renderList;
+  WriteOnlyProperty<GeometryBufferRenderer, vector_t<MeshPtr>> renderList;
 
   /**
    * Wether or not G buffer are supported by the running hardware.

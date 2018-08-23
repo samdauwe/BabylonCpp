@@ -153,7 +153,7 @@ void Geometry::_rebuild()
 
 void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
 {
-  vertexData->applyToGeometry(this, updatable);
+  vertexData->applyToGeometry(*this, updatable);
   notifyUpdate();
 }
 
@@ -812,15 +812,16 @@ string_t Geometry::RandomId()
   return Tools::RandomId();
 }
 
-void Geometry::_ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
+void Geometry::_ImportGeometry(const Json::value& parsedGeometry,
+                               const MeshPtr& mesh)
 {
   auto scene = mesh->getScene();
 
   if (parsedGeometry.contains("geometryId")) {
     string_t geometryId = Json::GetString(parsedGeometry, "geometryId", "");
-    Geometry* geometry  = scene->getGeometryByID(geometryId);
+    auto geometry       = scene->getGeometryByID(geometryId);
     if (geometry) {
-      geometry->applyToMesh(mesh);
+      geometry->applyToMesh(mesh.get());
     }
   }
   else if (parsedGeometry.contains("positions")
@@ -937,7 +938,7 @@ void Geometry::_ImportGeometry(const Json::value& parsedGeometry, Mesh* mesh)
 }
 
 void Geometry::_CleanMatricesWeights(const Json::value& parsedGeometry,
-                                     Mesh* mesh)
+                                     const MeshPtr& mesh)
 {
   const auto epsilon = 1e-3f;
   if (!SceneLoader::CleanBoneMatrixWeights()) {

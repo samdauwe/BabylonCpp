@@ -35,7 +35,7 @@ bool Animation::AllowMatrixDecomposeForInterpolation()
   return _AllowMatrixDecomposeForInterpolation;
 }
 
-Animation* Animation::_PrepareAnimation(
+AnimationPtr Animation::_PrepareAnimation(
   const string_t& name, const string_t& targetProperty, size_t framePerSecond,
   int totalFrame, const AnimationValue& from, const AnimationValue& to,
   unsigned int loopMode, IEasingFunction* easingFunction)
@@ -47,7 +47,7 @@ Animation* Animation::_PrepareAnimation(
   }
 
   auto animation
-    = new Animation(name, targetProperty, framePerSecond, dataType, loopMode);
+    = Animation::New(name, targetProperty, framePerSecond, dataType, loopMode);
 
   animation->setKeys({
     IAnimationKey(0, from),
@@ -61,22 +61,22 @@ Animation* Animation::_PrepareAnimation(
   return animation;
 }
 
-Animation* Animation::CreateAnimation(const string_t& property,
-                                      int animationType,
-                                      std::size_t framePerSecond,
-                                      IEasingFunction* easingFunction)
+AnimationPtr Animation::CreateAnimation(const string_t& property,
+                                        int animationType,
+                                        std::size_t framePerSecond,
+                                        IEasingFunction* easingFunction)
 {
   auto animation
-    = new Animation(property + "Animation", property, framePerSecond,
-                    animationType, Animation::ANIMATIONLOOPMODE_CONSTANT());
+    = Animation::New(property + "Animation", property, framePerSecond,
+                     animationType, Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   animation->setEasingFunction(easingFunction);
 
   return animation;
 }
 
-Animatable* Animation::CreateAndStartAnimation(
-  const string_t& name, Node* node, const string_t& targetProperty,
+AnimatablePtr Animation::CreateAndStartAnimation(
+  const string_t& name, const NodePtr& node, const string_t& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   IEasingFunction* easingFunction,
@@ -96,8 +96,8 @@ Animatable* Animation::CreateAndStartAnimation(
     onAnimationEnd);
 }
 
-vector_t<Animatable*> Animation::CreateAndStartHierarchyAnimation(
-  const string_t& name, Node* node, bool directDescendantsOnly,
+vector_t<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
+  const string_t& name, const NodePtr& node, bool directDescendantsOnly,
   const string_t& targetProperty, size_t framePerSecond, int totalFrame,
   const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
   IEasingFunction* easingFunction,
@@ -117,8 +117,8 @@ vector_t<Animatable*> Animation::CreateAndStartHierarchyAnimation(
     (animation->loopMode == 1), 1.f, onAnimationEnd);
 }
 
-Animatable* Animation::CreateMergeAndStartAnimation(
-  const string_t& name, Node* node, const string_t& targetProperty,
+AnimatablePtr Animation::CreateMergeAndStartAnimation(
+  const string_t& name, const NodePtr& node, const string_t& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   IEasingFunction* easingFunction,
@@ -141,13 +141,13 @@ Animatable* Animation::CreateMergeAndStartAnimation(
 Animatable* Animation::TransitionTo(
   const string_t& /*property*/, const AnimationValue& /*targetValue*/,
   const AnimationValue& /*host*/, Scene* /*scene*/, float /*frameRate*/,
-  Animation* /*transition*/, float /*duration*/,
+  const AnimationPtr& /*transition*/, float /*duration*/,
   const ::std::function<void()>& /*onAnimationEnd*/)
 {
   return nullptr;
 }
 
-vector_t<RuntimeAnimation*>& Animation::runtimeAnimations()
+vector_t<RuntimeAnimationPtr>& Animation::runtimeAnimations()
 {
   return _runtimeAnimations;
 }
@@ -271,9 +271,9 @@ vector_t<IAnimationKey>& Animation::getKeys()
   return _keys;
 }
 
-int Animation::getHighestFrame() const
+float Animation::getHighestFrame() const
 {
-  int ret = 0;
+  float ret = 0;
   for (auto& key : _keys) {
     if (ret < key.frame) {
       ret = key.frame;
@@ -373,8 +373,8 @@ AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
   return value;
 }
 
-AnimationValue Animation::_interpolate(int currentFrame, int repeatCount,
-                                       Nullable<AnimationValue>& workValue,
+AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
+                                       nullable_t<AnimationValue>& workValue,
                                        unsigned int loopMode,
                                        const AnimationValue& offsetValue,
                                        const AnimationValue& highLimitValue)
@@ -622,11 +622,11 @@ Matrix Animation::matrixInterpolateFunction(Matrix& startValue,
   return result;
 }
 
-unique_ptr_t<Animation> Animation::clone() const
+AnimationPtr Animation::clone() const
 {
   auto clonedAnimation
-    = ::std::make_unique<Animation>(name, String::join(targetPropertyPath, '.'),
-                                    framePerSecond, dataType, loopMode);
+    = Animation::New(name, String::join(targetPropertyPath, '.'),
+                     framePerSecond, dataType, loopMode);
 
   clonedAnimation->enableBlending = enableBlending;
   clonedAnimation->blendingSpeed  = blendingSpeed;
@@ -681,9 +681,9 @@ Json::object Animation::serialize() const
         break;
     }
 
-    keys.emplace_back(
-      Json::value(Json::object({Json::Pair<int>("frame", animationKey.frame), //
-                                /*Json::Pair("values", keyValues)*/})));
+    keys.emplace_back(Json::value(
+      Json::object({Json::Pair<float>("frame", animationKey.frame), //
+                    /*Json::Pair("values", keyValues)*/})));
   }
   serializationObject["keys"] = Json::value(keys);
 

@@ -19,7 +19,7 @@ ParticleSystemSet::~ParticleSystemSet()
 {
 }
 
-TransformNode*& ParticleSystemSet::get_emitterNode()
+TransformNodePtr& ParticleSystemSet::get_emitterNode()
 {
   return _emitterNode;
 }
@@ -50,17 +50,17 @@ void ParticleSystemSet::setEmitterAsSphere(
   emitterMesh->material   = material;
 
   for (auto& system : systems) {
-    system->emitter.set<AbstractMesh*>(emitterMesh);
+    system->emitter.set<AbstractMeshPtr>(emitterMesh);
   }
 
   _emitterNode = emitterMesh;
 }
 
-void ParticleSystemSet::start(AbstractMesh* emitter)
+void ParticleSystemSet::start(const AbstractMeshPtr& emitter)
 {
   for (auto& system : systems) {
     if (emitter) {
-      system->emitter.set<AbstractMesh*>(emitter);
+      system->emitter.set<AbstractMeshPtr>(emitter);
     }
     system->start();
   }

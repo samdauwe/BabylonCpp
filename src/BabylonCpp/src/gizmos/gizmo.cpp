@@ -50,7 +50,7 @@ void Gizmo::setCustomMesh(Mesh* mesh)
   for (auto& c : _rootMesh->getChildMeshes()) {
     c->dispose();
   }
-  mesh->parent   = _rootMesh;
+  mesh->parent   = _rootMesh.get();
   _customMeshSet = true;
 }
 

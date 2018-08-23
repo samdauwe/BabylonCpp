@@ -101,7 +101,7 @@ public:
    * Gets or sets a predicate that will be used to indicate utility meshes
    * present in the main scene
    */
-  ::std::function<bool(AbstractMesh* mesh)> mainSceneTrackerPredicate;
+  ::std::function<bool(const AbstractMeshPtr& mesh)> mainSceneTrackerPredicate;
 
 private:
   static shared_ptr_t<UtilityLayerRenderer> _DefaultUtilityLayer;

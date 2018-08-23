@@ -210,8 +210,8 @@ void ActionManager::processTrigger(unsigned int /*trigger*/) const
 {
 }
 
-IAnimatable*
-ActionManager::_getEffectiveTarget(IAnimatable* target,
+IAnimatablePtr
+ActionManager::_getEffectiveTarget(const IAnimatablePtr& target,
                                    const string_t& propertyPath) const
 {
   vector_t<string_t> properties = String::split(propertyPath, '.');

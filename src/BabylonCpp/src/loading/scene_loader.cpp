@@ -216,11 +216,11 @@ void SceneLoader::RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin)
 shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
   const vector_t<string_t>& meshNames, string_t rootUrl, string_t sceneFilename,
   Scene* scene,
-  const ::std::function<void(const vector_t<AbstractMesh*>& meshes,
-                             const vector_t<ParticleSystem*>& particleSystems,
-                             const vector_t<Skeleton*>& skeletons,
-                             const vector_t<AnimationGroup*>& animationGroups)>&
-    onSuccess,
+  const ::std::function<
+    void(const vector_t<AbstractMeshPtr>& meshes,
+         const vector_t<IParticleSystemPtr>& particleSystems,
+         const vector_t<SkeletonPtr>& skeletons,
+         const vector_t<AnimationGroupPtr>& animationGroups)>& onSuccess,
   const ::std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
   const ::std::function<void(Scene* scene, const string_t& message,
@@ -277,10 +277,10 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
   }
 
   const auto successHandler
-    = [&](const vector_t<AbstractMesh*>& meshes,
-          const vector_t<ParticleSystem*>& particleSystems,
-          const vector_t<Skeleton*>& skeletons,
-          const vector_t<AnimationGroup*>& animationGroups) {
+    = [&](const vector_t<AbstractMeshPtr>& meshes,
+          const vector_t<IParticleSystemPtr>& particleSystems,
+          const vector_t<SkeletonPtr>& skeletons,
+          const vector_t<AnimationGroupPtr>& animationGroups) {
         if (onSuccess) {
           try {
             onSuccess(meshes, particleSystems, skeletons, animationGroups);
@@ -306,10 +306,10 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
       }
 
       auto& syncedPlugin = plugin;
-      vector_t<AbstractMesh*> meshes;
-      vector_t<ParticleSystem*> particleSystems;
-      vector_t<Skeleton*> skeletons;
-      vector_t<AnimationGroup*> animationGroups;
+      vector_t<AbstractMeshPtr> meshes;
+      vector_t<IParticleSystemPtr> particleSystems;
+      vector_t<SkeletonPtr> skeletons;
+      vector_t<AnimationGroupPtr> animationGroups;
 
       if (!syncedPlugin->importMesh(meshNames, scene, data, rootUrl, meshes,
                                     particleSystems, skeletons, errorHandler)) {

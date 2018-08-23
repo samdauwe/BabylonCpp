@@ -18,10 +18,11 @@ public:
 
 public:
   template <typename... Ts>
-  static HemisphericLight* New(Ts&&... args)
+  static HemisphericLightPtr New(Ts&&... args)
   {
-    auto light = new HemisphericLight(::std::forward<Ts>(args)...);
-    light->addToScene(static_cast<unique_ptr_t<Light>>(light));
+    auto light = shared_ptr_t<HemisphericLight>(
+      new HemisphericLight(::std::forward<Ts>(args)...));
+    light->addToScene(light);
 
     return light;
   }

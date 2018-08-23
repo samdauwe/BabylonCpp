@@ -21,9 +21,9 @@
 namespace BABYLON {
 
 VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
-  const string_t& iName, float ratio, Camera* camera, Mesh* iMesh,
-  unsigned int samples, unsigned int samplingMode, Engine* engine,
-  bool reusable, Scene* scene)
+  const string_t& iName, float ratio, const CameraPtr& camera,
+  const MeshPtr& iMesh, unsigned int samples, unsigned int samplingMode,
+  Engine* engine, bool reusable, Scene* scene)
     : PostProcess(
         iName, "volumetricLightScattering",
         {"decay", "exposure", "weight", "meshPositionOnScreen", "density"},
@@ -86,14 +86,14 @@ const char* VolumetricLightScatteringPostProcess::getClassName() const
   return "VolumetricLightScatteringPostProcess";
 }
 
-bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
+bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
                                                     bool useInstances)
 {
   auto _mesh = subMesh->getMesh();
 
   // Render mesh as default
   if (_mesh == mesh && _mesh->material()) {
-    return _mesh->material()->isReady(mesh);
+    return _mesh->material()->isReady(mesh.get());
   }
 
   vector_t<string_t> defines;
@@ -186,12 +186,13 @@ void VolumetricLightScatteringPostProcess::dispose(Camera* camera)
   PostProcess::dispose(camera);
 }
 
-RenderTargetTexture* VolumetricLightScatteringPostProcess::getPass()
+RenderTargetTexturePtr& VolumetricLightScatteringPostProcess::getPass()
 {
   return _volumetricLightScatteringRTT;
 }
 
-bool VolumetricLightScatteringPostProcess::_meshExcluded(AbstractMesh* mesh_)
+bool VolumetricLightScatteringPostProcess::_meshExcluded(
+  const AbstractMeshPtr& mesh_)
 {
   if (!excludedMeshes.empty()
       && (stl_util::index_of(excludedMeshes, mesh_) != -1)) {
@@ -206,7 +207,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
 {
   auto engine = scene->getEngine();
 
-  _volumetricLightScatteringRTT = new RenderTargetTexture(
+  _volumetricLightScatteringRTT = RenderTargetTexture::New(
     "volumetricLightScatteringMap",
     ISize(
       static_cast<int>(static_cast<float>(engine->getRenderWidth()) * ratio),
@@ -214,7 +215,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     scene, false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   _volumetricLightScatteringRTT->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
-  _volumetricLightScatteringRTT->renderList.clear();
+  _volumetricLightScatteringRTT->renderList().clear();
   _volumetricLightScatteringRTT->renderParticles      = false;
   _volumetricLightScatteringRTT->ignoreCameraViewport = true;
 
@@ -227,7 +228,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   }
 
   // Custom render function for submeshes
-  auto renderSubMesh = [&](SubMesh* subMesh) {
+  auto renderSubMesh = [&](const SubMeshPtr& subMesh) {
     auto _mesh = subMesh->getRenderingMesh();
     if (_meshExcluded(_mesh)) {
       return;
@@ -264,10 +265,10 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       }
 
       engine_->enableEffect(effect);
-      _mesh->_bind(subMesh, effect, Material::TriangleFillMode());
+      _mesh->_bind(subMesh.get(), effect, Material::TriangleFillMode());
 
       if (_mesh == mesh) {
-        material->bind(_mesh->getWorldMatrix(), _mesh);
+        material->bind(_mesh->getWorldMatrix(), _mesh.get());
       }
       else {
         auto material = subMesh->getMaterial();
@@ -292,12 +293,12 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
         if (mesh->useBones() && mesh->computeBonesUsingShaders()
             && mesh->skeleton()) {
           _volumetricLightScatteringPass->setMatrices(
-            "mBones", mesh->skeleton()->getTransformMatrices(mesh));
+            "mBones", mesh->skeleton()->getTransformMatrices(mesh.get()));
         }
       }
 
       // Draw
-      mesh->_processRendering(subMesh, _volumetricLightScatteringPass,
+      mesh->_processRendering(subMesh.get(), _volumetricLightScatteringPass,
                               Material::TriangleFillMode(), batch,
                               hardwareInstancedRendering,
                               [&](bool /*isInstance*/, Matrix world,
@@ -321,10 +322,10 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     [&](int*, EventState&) { scene->clearColor = savedSceneClearColor; });
 
   _volumetricLightScatteringRTT->customRenderFunction
-    = [&](const vector_t<SubMesh*>& opaqueSubMeshes,
-          const vector_t<SubMesh*>& alphaTestSubMeshes,
-          const vector_t<SubMesh*>& transparentSubMeshes,
-          const vector_t<SubMesh*>& depthOnlySubMeshes,
+    = [&](const vector_t<SubMeshPtr>& opaqueSubMeshes,
+          const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+          const vector_t<SubMeshPtr>& transparentSubMeshes,
+          const vector_t<SubMeshPtr>& depthOnlySubMeshes,
           const ::std::function<void()>& /*beforeTransparents*/) {
         auto pEngine = scene->getEngine();
 
@@ -362,7 +363,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
             = stl_util::slice(transparentSubMeshes, 0,
                               static_cast<int>(transparentSubMeshes.size()));
           ::std::sort(sortedArray.begin(), sortedArray.end(),
-                      [](const SubMesh* a, const SubMesh* b) {
+                      [](const SubMeshPtr& a, const SubMeshPtr& b) {
                         // Alpha index first
                         if (a->_alphaIndex > b->_alphaIndex) {
                           return 1;
@@ -421,8 +422,9 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
   }
 }
 
-Mesh* VolumetricLightScatteringPostProcess::CreateDefaultMesh(
-  const string_t& name, Scene* scene)
+MeshPtr
+VolumetricLightScatteringPostProcess::CreateDefaultMesh(const string_t& name,
+                                                        Scene* scene)
 {
   auto mesh           = Mesh::CreatePlane(name, 1.f, scene);
   mesh->billboardMode = AbstractMesh::BILLBOARDMODE_ALL;

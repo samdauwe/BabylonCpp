@@ -71,13 +71,13 @@ IReflect::Type Camera::type() const
   return IReflect::Type::CAMERA;
 }
 
-void Camera::addToScene(unique_ptr_t<Camera>&& newCamera)
+void Camera::addToScene(const CameraPtr& newCamera)
 {
   if (_setActiveOnSceneIfNoneActive && !getScene()->activeCamera) {
-    getScene()->activeCamera = newCamera.get();
+    getScene()->activeCamera = newCamera;
   }
 
-  getScene()->addCamera(::std::move(newCamera));
+  getScene()->addCamera(newCamera);
 }
 
 Camera& Camera::storeState()
@@ -130,12 +130,12 @@ Vector3& Camera::get_globalPosition()
   return _globalPosition;
 }
 
-vector_t<AbstractMesh*>& Camera::getActiveMeshes()
+vector_t<AbstractMeshPtr>& Camera::getActiveMeshes()
 {
   return _activeMeshes;
 }
 
-bool Camera::isActiveMesh(AbstractMesh* mesh)
+bool Camera::isActiveMesh(const AbstractMeshPtr& mesh)
 {
   return ::std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
          != _activeMeshes.end();
@@ -220,7 +220,7 @@ bool Camera::_isSynchronizedProjectionMatrix()
   if (mode == Camera::PERSPECTIVE_CAMERA()) {
     check = stl_util::almost_equal(_cache.fov, fov) && _cache.fovMode == fovMode
             && stl_util::almost_equal(_cache.aspectRatio,
-                                      engine->getAspectRatio(this));
+                                      engine->getAspectRatio(*this));
   }
   else {
     check = stl_util::almost_equal(_cache.orthoLeft, orthoLeft)
@@ -258,12 +258,12 @@ void Camera::_checkInputs()
   onAfterCheckInputsObservable.notifyObservers(this);
 }
 
-vector_t<Camera*>& Camera::rigCameras()
+vector_t<CameraPtr>& Camera::rigCameras()
 {
   return _rigCameras;
 }
 
-const vector_t<Camera*>& Camera::rigCameras() const
+const vector_t<CameraPtr>& Camera::rigCameras() const
 {
   return _rigCameras;
 }
@@ -426,7 +426,7 @@ Matrix& Camera::getProjectionMatrix(bool force)
   if (mode == Camera::PERSPECTIVE_CAMERA()) {
     _cache.fov         = fov;
     _cache.fovMode     = fovMode;
-    _cache.aspectRatio = engine->getAspectRatio(this);
+    _cache.aspectRatio = engine->getAspectRatio(*this);
 
     if (minZ <= 0.f) {
       minZ = 0.1f;
@@ -434,12 +434,12 @@ Matrix& Camera::getProjectionMatrix(bool force)
 
     if (scene->useRightHandedSystem()) {
       Matrix::PerspectiveFovRHToRef(
-        fov, engine->getAspectRatio(this), minZ, maxZ, _projectionMatrix,
+        fov, engine->getAspectRatio(*this), minZ, maxZ, _projectionMatrix,
         fovMode == Camera::FOVMODE_VERTICAL_FIXED());
     }
     else {
       Matrix::PerspectiveFovLHToRef(
-        fov, engine->getAspectRatio(this), minZ, maxZ, _projectionMatrix,
+        fov, engine->getAspectRatio(*this), minZ, maxZ, _projectionMatrix,
         fovMode == Camera::FOVMODE_VERTICAL_FIXED());
     }
   }
@@ -588,20 +588,20 @@ void Camera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 }
 
 // ---- Camera rigs section ----
-FreeCamera* Camera::leftCamera()
+FreeCameraPtr Camera::leftCamera()
 {
   if (_rigCameras.size() < 1) {
     return nullptr;
   }
-  return static_cast<FreeCamera*>(_rigCameras[0]);
+  return ::std::static_pointer_cast<FreeCamera>(_rigCameras[0]);
 }
 
-FreeCamera* Camera::rightCamera()
+FreeCameraPtr Camera::rightCamera()
 {
   if (_rigCameras.size() < 2) {
     return nullptr;
   }
-  return static_cast<FreeCamera*>(_rigCameras[1]);
+  return ::std::static_pointer_cast<FreeCamera>(_rigCameras[1]);
 }
 
 Vector3* Camera::getLeftTarget()
@@ -609,7 +609,7 @@ Vector3* Camera::getLeftTarget()
   if (_rigCameras.size() < 1) {
     return nullptr;
   }
-  return &static_cast<TargetCamera*>(_rigCameras[0])->getTarget();
+  return &::std::static_pointer_cast<TargetCamera>(_rigCameras[0])->getTarget();
 }
 
 Vector3* Camera::getRightTarget()
@@ -617,7 +617,7 @@ Vector3* Camera::getRightTarget()
   if (_rigCameras.size() < 2) {
     return nullptr;
   }
-  return &static_cast<TargetCamera*>(_rigCameras[1])->getTarget();
+  return &::std::static_pointer_cast<TargetCamera>(_rigCameras[1])->getTarget();
 }
 
 void Camera::setCameraRigMode(int /*iMode*/, const Json::value& /*rigParams*/)
@@ -677,7 +677,7 @@ void Camera::setCameraRigParameter(const string_t& _name, float value)
  * May needs to be overridden by children so sub has required properties
  * to be copied
  */
-Camera* Camera::createRigCamera(const string_t& /*name*/, int /*cameraIndex*/)
+CameraPtr Camera::createRigCamera(const string_t& /*name*/, int /*cameraIndex*/)
 {
   return nullptr;
 }
@@ -737,10 +737,10 @@ Matrix& Camera::computeWorldMatrix(bool /*force*/)
   return *getWorldMatrix();
 }
 
-Camera* Camera::GetConstructorFromName(const string_t& type,
-                                       const string_t& name, Scene* scene,
-                                       float interaxial_distance,
-                                       bool isStereoscopicSideBySide)
+CameraPtr Camera::GetConstructorFromName(const string_t& type,
+                                         const string_t& name, Scene* scene,
+                                         float interaxial_distance,
+                                         bool isStereoscopicSideBySide)
 {
   Json::object options;
   options["interaxial_distance"]
@@ -752,14 +752,14 @@ Camera* Camera::GetConstructorFromName(const string_t& type,
     = Node::Construct(type, name, scene, Json::value(options));
 
   if (constructorFunc) {
-    return static_cast<Camera*>(constructorFunc());
+    return ::std::static_pointer_cast<Camera>(constructorFunc());
   }
 
   // Default to universal camera
   return UniversalCamera::New(name, Vector3::Zero(), scene);
 }
 
-Camera* Camera::Parse(const Json::value& parsedCamera, Scene* scene)
+CameraPtr Camera::Parse(const Json::value& parsedCamera, Scene* scene)
 {
   auto type      = Json::GetString(parsedCamera, "type");
   auto construct = Camera::GetConstructorFromName(
@@ -782,7 +782,7 @@ Camera* Camera::Parse(const Json::value& parsedCamera, Scene* scene)
     for (auto parsedAnimation : Json::GetArray(parsedCamera, "animations")) {
       camera->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
-    Node::ParseAnimationRanges(camera, parsedCamera, scene);
+    Node::ParseAnimationRanges(*camera, parsedCamera, scene);
   }
 
   if (parsedCamera.contains("autoAnimate")) {

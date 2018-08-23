@@ -10,10 +10,11 @@ class BABYLON_SHARED_EXPORT PushMaterial : public Material {
 
 public:
   template <typename... Ts>
-  static PushMaterial* New(Ts&&... args)
+  static PushMaterialPtr New(Ts&&... args)
   {
-    auto material = new PushMaterial(std::forward<Ts>(args)...);
-    material->addMaterialToScene(static_cast<unique_ptr_t<Material>>(material));
+    auto material = shared_ptr_t<PushMaterial>(
+      new PushMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
 
     return material;
   }

@@ -33,7 +33,7 @@ public:
    * update the vertexData
    * @returns the VertexData
    */
-  VertexData& applyToMesh(Mesh* mesh, bool updatable = false);
+  VertexData& applyToMesh(Mesh& mesh, bool updatable = false);
 
   /**
    * @brief Associates the vertexData to the passed Geometry.
@@ -43,7 +43,7 @@ public:
    * update the vertexData
    * @returns VertexData
    */
-  VertexData& applyToGeometry(Geometry* geometry, bool updatable = false);
+  VertexData& applyToGeometry(Geometry& geometry, bool updatable = false);
 
   /**
    * @brief Updates the associated mesh.
@@ -547,7 +547,7 @@ public:
                 const Vector4& backUVs  = Vector4(0.f, 0.f, 1.f, 1.f));
 
 private:
-  VertexData& _applyTo(IGetSetVerticesData* meshOrGeometry,
+  VertexData& _applyTo(IGetSetVerticesData& meshOrGeometry,
                        bool updatable = false);
   VertexData& _update(IGetSetVerticesData* meshOrGeometry,
                       bool updateExtends = false, bool makeItUnique = false);

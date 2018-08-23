@@ -69,14 +69,35 @@ public:
   static ISceneLoaderPlugin* GetPluginForExtension(const string_t& extension);
   static bool IsPluginForExtensionAvailable(const string_t& extension);
   static void RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin);
+
+  /**
+   * @brief Import meshes into a scene.
+   * @param meshNames an array of mesh names, a single mesh name, or empty
+   * string for all meshes that filter what meshes are imported
+   * @param rootUrl a string that defines the root url for scene and resources
+   * OR the concatenation of rootURL and filename (eg.
+   * http://example.com/test.glb)
+   * @param sceneFilename a string that defines the name of the scene file. can
+   * start with "data:" following by the stringified version of the scene
+   * (default: empty string)
+   * @param scene the instance of BABYLON.Scene to append to
+   * @param onSuccess a callback with a list of imported meshes,
+   * particleSystems, and skeletons when import succeeds
+   * @param onProgress a callback with a progress event for each file being
+   * loaded
+   * @param onError a callback with the scene, a message, and possibly an
+   * exception when import fails
+   * @param pluginExtension the extension used to determine the plugin
+   * @returns The loaded plugin
+   */
   static shared_ptr_t<ISceneLoaderPlugin>
   ImportMesh(const vector_t<string_t>& meshNames, string_t rootUrl,
              string_t sceneFilename, Scene* scene = nullptr,
              const ::std::function<void(
-               const vector_t<AbstractMesh*>& meshes,
-               const vector_t<ParticleSystem*>& particleSystems,
-               const vector_t<Skeleton*>& skeletons,
-               const vector_t<AnimationGroup*>& animationGroups)>& onSuccess
+               const vector_t<AbstractMeshPtr>& meshes,
+               const vector_t<IParticleSystemPtr>& particleSystems,
+               const vector_t<SkeletonPtr>& skeletons,
+               const vector_t<AnimationGroupPtr>& animationGroups)>& onSuccess
              = nullptr,
              const ::std::function<void(const SceneLoaderProgressEvent& event)>&
                onProgress

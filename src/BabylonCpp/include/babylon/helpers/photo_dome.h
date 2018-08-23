@@ -44,12 +44,12 @@ protected:
   /**
    * @brief Gets the texture being displayed on the sphere.
    */
-  Texture*& get_photoTexture();
+  TexturePtr& get_photoTexture();
 
   /**
    * @brief Sets the texture being displayed on the sphere.
    */
-  void set_photoTexture(Texture* const& value);
+  void set_photoTexture(const TexturePtr& value);
 
   /**
    * @brief Gets the current fov(field of view) multiplier, 0.0 - 2.0. Defaults
@@ -69,7 +69,7 @@ public:
   /**
    * The texture being displayed on the sphere
    */
-  Property<PhotoDome, Texture*> photoTexture;
+  Property<PhotoDome, TexturePtr> photoTexture;
 
   /**
    * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults
@@ -82,17 +82,17 @@ protected:
   /**
    * The texture being displayed on the sphere
    */
-  Texture* _photoTexture;
+  TexturePtr _photoTexture;
 
   /**
    * The skybox material
    */
-  BackgroundMaterial* _material;
+  BackgroundMaterialPtr _material;
 
   /**
    * The surface used for the skybox
    */
-  Mesh* _mesh;
+  MeshPtr _mesh;
 
 private:
   bool _useDirectMapping;

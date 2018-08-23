@@ -35,7 +35,7 @@ public:
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
    */
-  void attach(Mesh* ownerNode) override;
+  void attach(const MeshPtr& ownerNode) override;
 
   /**
    * @brief Detaches the behavior from the mesh.
@@ -51,7 +51,7 @@ private:
   float _startDistance;
   Vector3 _initialScale;
   Vector3 _targetScale;
-  Mesh* _ownerNode;
+  MeshPtr _ownerNode;
   Observer<Scene>::Ptr _sceneRenderObserver;
 
 }; // end of class MultiPointerScaleBehavior

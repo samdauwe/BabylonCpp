@@ -10,7 +10,7 @@ namespace BABYLON {
 
 CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
   const string_t& name, RenderTargetTexture* depthTexture,
-  const Variant<float, PostProcessOptions>& options, Camera* camera,
+  const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType, bool blockCompilation)
     : PostProcess{name,
@@ -66,7 +66,7 @@ CircleOfConfusionPostProcess::~CircleOfConfusionPostProcess()
 }
 
 void CircleOfConfusionPostProcess::set_depthTexture(
-  RenderTargetTexture* const& value)
+  const RenderTargetTexturePtr& value)
 {
   _depthTexture = value;
 }

@@ -50,10 +50,10 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   rotationMesh->scaling().scaleInPlace(0.1f);
   rotationMesh->material     = coloredMaterial;
   rotationMesh->rotation().x = Math::PI_2;
-  parentMesh->addChild(rotationMesh);
+  parentMesh->addChild(*rotationMesh);
   parentMesh->lookAt(_rootMesh->position().subtract(planeNormal));
 
-  _rootMesh->addChild(parentMesh);
+  _rootMesh->addChild(*parentMesh);
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
   options.dragPlaneNormal    = planeNormal;
@@ -167,7 +167,8 @@ PlaneRotationGizmo::PlaneRotationGizmo(
         m->material = material;
         // if ((static_cast<LinesMesh*>(m))->color)
         {
-          static_cast<LinesMesh*>(m)->color = material->emissiveColor;
+          ::std::static_pointer_cast<LinesMesh>(m)->color
+            = material->emissiveColor;
         }
       };
     });

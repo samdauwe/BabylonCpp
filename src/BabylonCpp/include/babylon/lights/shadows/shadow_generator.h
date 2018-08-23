@@ -160,9 +160,9 @@ public:
    * float textures but if you need precision (for self shadowing for instance),
    * you can use this option to enforce full float texture.
    */
-  ShadowGenerator(int mapSize, IShadowLight* light,
+  ShadowGenerator(int mapSize, const IShadowLightPtr& light,
                   bool useFullFloatFirst = false);
-  ShadowGenerator(const ISize& mapSize, IShadowLight* light,
+  ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& light,
                   bool useFullFloatFirst = false);
   virtual ~ShadowGenerator();
 
@@ -194,7 +194,7 @@ public:
    * from the light point of view).
    * @returns The render target texture if present otherwise, null
    */
-  RenderTargetTexture* getShadowMap() override;
+  RenderTargetTexturePtr getShadowMap() override;
 
   /**
    * @brief Gets the RTT used during rendering (can be a blurred version of the
@@ -202,7 +202,7 @@ public:
    * @returns The render target texture if the shadow map is present otherwise,
    * null
    */
-  RenderTargetTexture* getShadowMapForRendering() override;
+  RenderTargetTexturePtr getShadowMapForRendering() override;
 
   /**
    * @brief Helper function to add a mesh and its descendants to the list of
@@ -223,14 +223,14 @@ public:
    * removed. Default to true
    * @returns the Shadow Generator itself
    */
-  ShadowGenerator& removeShadowCaster(AbstractMesh* mesh,
+  ShadowGenerator& removeShadowCaster(const AbstractMeshPtr& mesh,
                                       bool includeDescendants = true);
 
   /**
    * @brief Returns the associated light object.
    * @returns the light generating the shadow
    */
-  IShadowLight* getLight();
+  IShadowLightPtr& getLight();
 
   /**
    * @brief Forces all the attached effect to compile to enable rendering only
@@ -551,11 +551,11 @@ private:
   void _initializeGenerator();
   void _initializeShadowMap();
   void _initializeBlurRTTAndPostProcesses();
-  void _renderForShadowMap(const vector_t<SubMesh*>& opaqueSubMeshes,
-                           const vector_t<SubMesh*>& alphaTestSubMeshes,
-                           const vector_t<SubMesh*>& transparentSubMeshes,
-                           const vector_t<SubMesh*>& depthOnlySubMeshes);
-  void _renderSubMeshForShadowMap(SubMesh* subMesh);
+  void _renderForShadowMap(const vector_t<SubMeshPtr>& opaqueSubMeshes,
+                           const vector_t<SubMeshPtr>& alphaTestSubMeshes,
+                           const vector_t<SubMeshPtr>& transparentSubMeshes,
+                           const vector_t<SubMeshPtr>& depthOnlySubMeshes);
+  void _renderSubMeshForShadowMap(const SubMeshPtr& subMesh);
   void _applyFilterValues();
   void _disposeBlurPostProcesses();
   void _disposeRTTandPostProcesses();
@@ -699,9 +699,9 @@ private:
   float _contactHardeningLightSizeUVRatio;
   float _darkness;
   bool _transparencyShadow;
-  unique_ptr_t<RenderTargetTexture> _shadowMap;
-  unique_ptr_t<RenderTargetTexture> _shadowMap2;
-  IShadowLight* _light;
+  RenderTargetTexturePtr _shadowMap;
+  RenderTargetTexturePtr _shadowMap2;
+  IShadowLightPtr _light;
   Scene* _scene;
   Vector3 _lightDirection;
   Effect* _effect;

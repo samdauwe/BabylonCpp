@@ -55,7 +55,7 @@ private:
 private:
   Scene* _scene;
   // create a sphere, so we can get the intersecting meshes inside
-  Mesh* _sphere;
+  MeshPtr _sphere;
   SphereOptions _sphereOptions;
   vector_t<Ray> _rays;
   // check if the data has been fetched. If not, do cleanup

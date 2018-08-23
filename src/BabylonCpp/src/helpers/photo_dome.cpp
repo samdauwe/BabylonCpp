@@ -63,12 +63,12 @@ PhotoDome::~PhotoDome()
 {
 }
 
-Texture*& PhotoDome::get_photoTexture()
+TexturePtr& PhotoDome::get_photoTexture()
 {
   return _photoTexture;
 }
 
-void PhotoDome::set_photoTexture(Texture* const& value)
+void PhotoDome::set_photoTexture(const TexturePtr& value)
 {
   if (_photoTexture == value) {
     return;
