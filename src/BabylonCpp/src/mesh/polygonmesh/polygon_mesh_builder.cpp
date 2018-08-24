@@ -12,7 +12,6 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 #if __GNUC__ > 6
 // Use of GNU statement expression extension
-#pragma GCC diagnostic ignored "-Wgnu"
 #endif
 #endif
 #include <earcut.hpp>

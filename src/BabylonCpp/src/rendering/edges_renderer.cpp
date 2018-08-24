@@ -12,8 +12,9 @@
 
 namespace BABYLON {
 
-EdgesRenderer::EdgesRenderer(AbstractMesh* source, float epsilon,
-                             bool checkVerticesInsteadOfIndices)
+EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
+                             bool checkVerticesInsteadOfIndices,
+                             bool generateEdgesLines)
     : edgesWidthScalerForOrthographic{1000.f}
     , edgesWidthScalerForPerspective{50.f}
     , isEnabled{true}
@@ -24,7 +25,9 @@ EdgesRenderer::EdgesRenderer(AbstractMesh* source, float epsilon,
     , _checkVerticesInsteadOfIndices{checkVerticesInsteadOfIndices}
 {
   _prepareResources();
-  _generateEdgesLines();
+  if (generateEdgesLines) {
+    _generateEdgesLines();
+  }
 }
 
 EdgesRenderer::~EdgesRenderer()
@@ -134,9 +137,9 @@ int EdgesRenderer::_processEdgeForAdjacenciesWithVertices(const Vector3& pa,
   return -1;
 }
 
-void EdgesRenderer::_checkEdge(unsigned int faceIndex, int edge,
-                               vector_t<Vector3> faceNormals, const Vector3& p0,
-                               const Vector3& p1)
+void EdgesRenderer::_checkEdge(size_t faceIndex, int edge,
+                               const vector_t<Vector3>& faceNormals,
+                               const Vector3& p0, const Vector3& p1)
 {
   auto needToCreateLine = false;
 
@@ -193,10 +196,10 @@ void EdgesRenderer::_checkEdge(unsigned int faceIndex, int edge,
     _linesNormals.emplace_back(1.f);
 
     // Indices
-    _linesIndices.emplace_back(offset + 0);
+    _linesIndices.emplace_back(offset);
     _linesIndices.emplace_back(offset + 1);
     _linesIndices.emplace_back(offset + 2);
-    _linesIndices.emplace_back(offset + 0);
+    _linesIndices.emplace_back(offset);
     _linesIndices.emplace_back(offset + 2);
     _linesIndices.emplace_back(offset + 3);
   }
@@ -368,6 +371,13 @@ void EdgesRenderer::render()
   auto engine = scene->getEngine();
   _lineShader->_preBind();
 
+  if (_source->edgesColor.a != 1.f) {
+    engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+  }
+  else {
+    engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+  }
+
   // VBOs
   engine->bindBuffers(_bufferPtrs, _ib.get(), _lineShader->getEffect());
 
@@ -391,7 +401,6 @@ void EdgesRenderer::render()
   engine->drawElementsType(Material::TriangleFillMode(), 0,
                            static_cast<int>(_indicesCount));
   _lineShader->unbind();
-  engine->setDepthWrite(true);
 }
 
 } // end of namespace BABYLON

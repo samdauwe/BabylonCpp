@@ -6,6 +6,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief FaceAdjacencies Helper class to generate edges.
+ */
 class BABYLON_SHARED_EXPORT FaceAdjacencies {
 
 public:
@@ -13,7 +16,7 @@ public:
   Vector3 p0;
   Vector3 p1;
   Vector3 p2;
-  int edgesConnectedCount;
+  int edgesConnectedCount = 0;
 
 }; // end of class FaceAdjacencies
 

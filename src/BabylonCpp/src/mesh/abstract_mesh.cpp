@@ -675,7 +675,7 @@ AbstractMesh::enableEdgesRendering(float epsilon,
   disableEdgesRendering();
 
   _edgesRenderer = ::std::make_unique<EdgesRenderer>(
-    this, epsilon, checkVerticesInsteadOfIndices);
+    shared_from_base<AbstractMesh>(), epsilon, checkVerticesInsteadOfIndices);
 
   return *this;
 }

@@ -86,6 +86,7 @@ class FramingBehavior;
 // - Mesh
 class AttachToBoxBehavior;
 struct FaceDirectionInfo;
+class FadeInOutBehavior;
 class MultiPointerScaleBehavior;
 class PointerDragBehavior;
 struct PointerDragBehaviorOptions;
@@ -666,6 +667,7 @@ class FaceAdjacencies;
 class GeometryBufferRenderer;
 struct IRenderingManagerAutoClearSetup;
 class OutlineRenderer;
+class LineEdgesRenderer;
 class RenderingGroup;
 class RenderingManager;
 class UtilityLayerRenderer;

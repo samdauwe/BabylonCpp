@@ -10,6 +10,7 @@
 #pragma GCC diagnostic ignored "-Wshift-negative-value"
 #endif
 #if __GNUC__ > 6
+// Use of GNU statement expression extension
 #endif
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
