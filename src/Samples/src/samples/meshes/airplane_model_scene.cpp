@@ -181,13 +181,13 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   airplane->material = am1;
 }
 
-void AirplaneModelScene::_reBake(Mesh* mesh)
+void AirplaneModelScene::_reBake(const MeshPtr& mesh)
 {
   mesh->bakeCurrentTransformIntoVertices();
   mesh->updateFacetData();
-  auto myVertexData = VertexData::ExtractFromMesh(mesh, true);
+  auto myVertexData = VertexData::ExtractFromMesh(mesh.get(), true);
   myVertexData->transform(*mesh->getWorldMatrix());
-  myVertexData->applyToMesh(mesh);
+  myVertexData->applyToMesh(*mesh);
 }
 
 AirplaneModelScene::MakeWingFunction AirplaneModelScene::_makeFormAppendage(
@@ -196,7 +196,7 @@ AirplaneModelScene::MakeWingFunction AirplaneModelScene::_makeFormAppendage(
 {
 
   const auto makeWing
-    = [=](Mesh* mesh, float radius, float fuselageXer, bool invertY) {
+    = [=](const MeshPtr& mesh, float radius, float fuselageXer, bool invertY) {
         auto yMultiplier      = invertY == true ? -1.f : 1.f;
         auto frontBaseVtop    = frontBaseV;
         auto frontBaseVbottom = 0.f - frontBaseV;
@@ -308,7 +308,7 @@ AirplaneModelScene::MakeWingFunction AirplaneModelScene::_makeFormAppendage(
         vertexData->uvs       = uvs;
 
         // Use the vertexData object.. to shape-ify blankmesh
-        vertexData->applyToMesh(mesh, true);
+        vertexData->applyToMesh(*mesh, true);
         return mesh;
       };
   return makeWing;

@@ -20,8 +20,8 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  PointLight* _light;
-  ArcRotateCamera* _camera;
+  PointLightPtr _light;
+  ArcRotateCameraPtr _camera;
 
 }; // end of class ImportMeshesSkullScene
 

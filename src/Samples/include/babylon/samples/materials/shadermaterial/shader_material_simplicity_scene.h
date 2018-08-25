@@ -91,7 +91,7 @@ public:
 
 private:
   float _time;
-  ShaderMaterial* _shaderMaterial;
+  ShaderMaterialPtr _shaderMaterial;
 
 }; // end of class ShaderMaterialSimplicityScene
 

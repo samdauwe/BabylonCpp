@@ -36,7 +36,7 @@ void MandelbrotFractalScene::initializeScene(ICanvas* canvas, Scene* scene)
   _camera->attachControl(canvas, true);
 
   // Create a basic light, aiming 0,1,0 - meaning, to the sky
-  Light* light = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
+  auto light = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
 
   // Default intensity is 1. Let's dim the light
   light->intensity = 0.3f;

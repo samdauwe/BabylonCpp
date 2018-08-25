@@ -58,8 +58,8 @@ void HexIcosphereScene::initializeScene(ICanvas* canvas, Scene* scene)
   });
 }
 
-Mesh* HexIcosphereScene::_createHexIcosphere(std::size_t degree, float scale,
-                                             Scene* scene)
+MeshPtr HexIcosphereScene::_createHexIcosphere(std::size_t degree, float scale,
+                                               Scene* scene)
 {
   auto material = StandardMaterial::New("mat", scene);
   Extensions::XorShift128 random;
@@ -102,7 +102,7 @@ Mesh* HexIcosphereScene::_createHexIcosphere(std::size_t degree, float scale,
   Float32Array normals;
   VertexData::ComputeNormals(positions, indices, normals);
   vertexData->normals = std::move(normals);
-  vertexData->applyToMesh(mesh, false);
+  vertexData->applyToMesh(*mesh, false);
 
   mesh->material = material;
 

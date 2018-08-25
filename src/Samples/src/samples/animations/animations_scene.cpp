@@ -69,9 +69,9 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Creation of a scaling animation with box 1
   //-------------------------------------------
   // Create a scaling animation at 30 FPS
-  auto animationBox1 = new Animation("scalingAnimation", "scaling.x", 30,
-                                     Animation::ANIMATIONTYPE_FLOAT(),
-                                     Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto animationBox1 = Animation::New("scalingAnimation", "scaling.x", 30,
+                                      Animation::ANIMATIONTYPE_FLOAT(),
+                                      Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> keysBox1{
@@ -96,9 +96,9 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Creation of a rotation animation with box 2
   //--------------------------------------------
   // Create a scaling animation at 30 FPS
-  auto animationBox2RotX = new Animation("rotationAnimation", "rotation.x", 30,
-                                         Animation::ANIMATIONTYPE_FLOAT(),
-                                         Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto animationBox2RotX = Animation::New("rotationAnimation", "rotation.x", 30,
+                                          Animation::ANIMATIONTYPE_FLOAT(),
+                                          Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> keysRotation{
@@ -120,15 +120,15 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Creation of a rotation animation with box 3
   //--------------------------------------------
   // Create a scaling animation at 30 FPS
-  auto animationBox3RotX = new Animation("rotationAnimation", "rotation.x", 30,
-                                         Animation::ANIMATIONTYPE_FLOAT(),
-                                         Animation::ANIMATIONLOOPMODE_CYCLE());
-  auto animationBox3RotY = new Animation("rotationAnimation", "rotation.y", 30,
-                                         Animation::ANIMATIONTYPE_FLOAT(),
-                                         Animation::ANIMATIONLOOPMODE_CYCLE());
-  auto animationBox3RotZ = new Animation("rotationAnimation", "rotation.z", 30,
-                                         Animation::ANIMATIONTYPE_FLOAT(),
-                                         Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto animationBox3RotX = Animation::New("rotationAnimation", "rotation.x", 30,
+                                          Animation::ANIMATIONTYPE_FLOAT(),
+                                          Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto animationBox3RotY = Animation::New("rotationAnimation", "rotation.y", 30,
+                                          Animation::ANIMATIONTYPE_FLOAT(),
+                                          Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto animationBox3RotZ = Animation::New("rotationAnimation", "rotation.z", 30,
+                                          Animation::ANIMATIONTYPE_FLOAT(),
+                                          Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   keysRotation = {

@@ -79,9 +79,9 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
   cube->rotationQuaternion = Quaternion::Identity();
 
   // Animation on position
-  auto cubeAnimation = new Animation("myAnimation", "position", 30,
-                                     Animation::ANIMATIONTYPE_VECTOR3(),
-                                     Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto cubeAnimation = Animation::New("myAnimation", "position", 30,
+                                      Animation::ANIMATIONTYPE_VECTOR3(),
+                                      Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> keys;
@@ -96,9 +96,9 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Animation on rotation
   auto cubeRotationAnimation
-    = new Animation("rotateAnimation", "rotationQuaternion", 30,
-                    Animation::ANIMATIONTYPE_QUATERNION(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("rotateAnimation", "rotationQuaternion", 30,
+                     Animation::ANIMATIONTYPE_QUATERNION(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> rotationKeys;

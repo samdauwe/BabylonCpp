@@ -38,7 +38,7 @@ void MeshNormalsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Show normals function
   auto showNormals
-    = [](Mesh* mesh, float size, const Color3& color, Scene* scene) {
+    = [](const MeshPtr& mesh, float size, const Color3& color, Scene* scene) {
         auto normals   = mesh->getVerticesData(VertexBuffer::NormalKind);
         auto positions = mesh->getVerticesData(VertexBuffer::PositionKind);
 

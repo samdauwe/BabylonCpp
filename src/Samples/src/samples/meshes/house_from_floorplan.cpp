@@ -86,10 +86,10 @@ void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene)
   });
 }
 
-Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
-                                             float height,
-                                             BuildFromPlanOptions& options,
-                                             Scene* scene)
+MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
+                                               float height,
+                                               BuildFromPlanOptions& options,
+                                               Scene* scene)
 {
   // Arrays for vertex positions and indices
   Float32Array positions;
@@ -971,7 +971,7 @@ Mesh* HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
   vertexData->colors    = ::std::move(colors);
 
   // Apply vertexData to custom mesh
-  vertexData->applyToMesh(customMesh);
+  vertexData->applyToMesh(*customMesh);
 
   return customMesh;
 }

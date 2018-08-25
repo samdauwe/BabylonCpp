@@ -18,8 +18,8 @@ struct Ring {
 
   void addTube(const std::vector<Vector3>& points);
 
-  Mesh* center;
-  std::vector<Mesh*> tubes;
+  MeshPtr center;
+  std::vector<MeshPtr> tubes;
   float angle;
 }; // end of struct Ring
 

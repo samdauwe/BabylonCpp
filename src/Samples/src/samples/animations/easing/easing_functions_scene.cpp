@@ -47,9 +47,9 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
   torus->position().z = 30.f;
 
   // Create a Vector3 animation at 30 FPS
-  auto animationTorus = new Animation("torusEasingAnimation", "position", 30,
-                                      Animation::ANIMATIONTYPE_VECTOR3(),
-                                      Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto animationTorus = Animation::New("torusEasingAnimation", "position", 30,
+                                       Animation::ANIMATIONTYPE_VECTOR3(),
+                                       Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // the torus destination position
   auto nextPos = torus->position().add(Vector3(-80.f, 0.f, 0.f));
@@ -102,7 +102,7 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
   bezierTorus->position().z = 0.f;
 
   // Create the animation
-  auto animationBezierTorus = new Animation(
+  auto animationBezierTorus = Animation::New(
     "animationBezierTorus", "position", 30, Animation::ANIMATIONTYPE_VECTOR3(),
     Animation::ANIMATIONLOOPMODE_CYCLE());
   std::vector<IAnimationKey> keysBezierTorus{

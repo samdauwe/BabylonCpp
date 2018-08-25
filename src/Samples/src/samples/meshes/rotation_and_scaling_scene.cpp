@@ -68,7 +68,7 @@ void RotationAndScalingScene::initializeScene(ICanvas* canvas, Scene* scene)
   box6->scaling().z = 2.f;
 
   // Moving box7 relatively to box1
-  box7->setParent(box1);
+  box7->setParent(box1.get());
   box7->position().z = -10.f;
 }
 

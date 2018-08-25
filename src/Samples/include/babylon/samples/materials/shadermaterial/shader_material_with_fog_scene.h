@@ -90,7 +90,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  ShaderMaterial* _boxMaterial;
+  ShaderMaterialPtr _boxMaterial;
 
 }; // end of class ShaderMaterialWithFogScene
 

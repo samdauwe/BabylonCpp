@@ -16,7 +16,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  LinesMesh* _circle;
+  LinesMeshPtr _circle;
 
 }; // end of class LinesMeshSpiralScene
 

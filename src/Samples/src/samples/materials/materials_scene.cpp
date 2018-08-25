@@ -70,7 +70,8 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Creation of a material with translated texture
   auto materialSphere4 = StandardMaterial::New("texture4", scene);
   materialSphere4->setDiffuseTexture(Texture::New("textures/misc.jpg", scene));
-  auto texture     = static_cast<Texture*>(materialSphere4->diffuseTexture());
+  auto texture
+    = ::std::static_pointer_cast<Texture>(materialSphere4->diffuseTexture());
   texture->vOffset = 0.1f; // Vertical offset of 10%
   texture->uOffset = 0.4f; // Horizontal offset of 40%
 
@@ -90,7 +91,8 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   materialPlane->backFaceCulling
     = false; // Always show the front and the back of an element
   materialPlane->setDiffuseTexture(Texture::New("textures/grass.jpg", scene));
-  texture         = static_cast<Texture*>(materialPlane->diffuseTexture());
+  texture
+    = ::std::static_pointer_cast<Texture>(materialPlane->diffuseTexture());
   texture->uScale = 5.f; // Repeat 5 times on the Vertical Axes
   texture->vScale = 5.f; // Repeat 5 times on the Horizontal Axes
   materialPlane->backFaceCulling

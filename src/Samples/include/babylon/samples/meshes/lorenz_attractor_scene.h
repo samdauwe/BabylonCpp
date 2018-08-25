@@ -16,7 +16,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  LinesMesh* lorenz;
+  LinesMeshPtr lorenz;
 
 }; // end of class LorenzAttractorScene
 

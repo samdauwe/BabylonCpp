@@ -16,8 +16,8 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  std::vector<PointLight*> _lights;
-  std::vector<Mesh*> _lightSpheres;
+  std::vector<PointLightPtr> _lights;
+  std::vector<MeshPtr> _lightSpheres;
   float _alpha;
 
 }; // end of class LightsScene

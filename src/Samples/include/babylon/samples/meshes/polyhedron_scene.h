@@ -20,9 +20,9 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  ArcRotateCamera* _camera;
-  PointLight* _pointLight;
-  std::vector<Mesh*> _polygons;
+  ArcRotateCameraPtr _camera;
+  PointLightPtr _pointLight;
+  std::vector<MeshPtr> _polygons;
   std::vector<float> _rotations;
 
 }; // end of class PolyhedronScene

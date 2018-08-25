@@ -64,7 +64,7 @@ void ColoredTriangleScene::initializeScene(ICanvas* canvas, Scene* scene)
     0, 0, 1  //
   };
 
-  vertexData->applyToMesh(customMesh);
+  vertexData->applyToMesh(*customMesh);
   customMesh->flipFaces(true);
 }
 

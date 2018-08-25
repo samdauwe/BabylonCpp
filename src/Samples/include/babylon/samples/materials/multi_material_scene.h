@@ -21,7 +21,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  Mesh* _sphere;
+  MeshPtr _sphere;
 
 }; // end of class MultiMaterialScene
 

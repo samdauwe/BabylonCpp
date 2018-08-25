@@ -7,11 +7,11 @@
 namespace BABYLON {
 namespace Samples {
 
-vector_t<AbstractMesh*>
+vector_t<AbstractMeshPtr>
 CrowdSimulationUtils::createAgentMeshes(Scene* scene, size_t totalNoAgents)
 {
   const float totalNoAgentsf = static_cast<float>(totalNoAgents);
-  vector_t<AbstractMesh*> agentsMesh(totalNoAgents);
+  vector_t<AbstractMeshPtr> agentsMesh(totalNoAgents);
 
   for (size_t i = 0; i < totalNoAgents; ++i) {
     const auto agentNof = static_cast<float>(i);
@@ -38,8 +38,8 @@ CrowdSimulationUtils::createAgentMeshes(Scene* scene, size_t totalNoAgents)
   return agentsMesh;
 }
 
-AbstractMesh* CrowdSimulationUtils::createWayPointMesh(Scene* scene,
-                                                       const Vector2& position)
+AbstractMeshPtr
+CrowdSimulationUtils::createWayPointMesh(Scene* scene, const Vector2& position)
 {
   auto mesh      = Mesh::CreateSphere("", 8, 5.f, scene);
   mesh->position = Vector3(position.x, 2, position.y);

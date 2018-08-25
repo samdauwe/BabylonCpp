@@ -21,7 +21,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  SpotLight* _spotLight;
+  SpotLightPtr _spotLight;
   float _alpha;
 
 }; // end of class LightProjectedTextureScene

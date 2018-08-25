@@ -65,7 +65,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  ShaderMaterial* _shaderMaterial;
+  ShaderMaterialPtr _shaderMaterial;
 
 }; // end of class ShaderMaterialSkyboxScene
 

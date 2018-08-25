@@ -16,7 +16,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  ArcRotateCamera* _camera;
+  ArcRotateCameraPtr _camera;
 
 }; // end of class ShapeEasingsScene
 

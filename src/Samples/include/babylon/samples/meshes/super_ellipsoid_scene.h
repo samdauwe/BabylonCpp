@@ -20,8 +20,9 @@ private:
                                 float scaleX, float scaleY, float scaleZ) const;
   Vector3 _calculateNormal(float phi, float beta, float n1, float n2,
                            float scaleX, float scaleY, float scaleZ) const;
-  Mesh* _createSuperEllipsoid(size_t samples, float n1, float n2, float scalex,
-                              float scaley, float scalez, Scene* scene);
+  MeshPtr _createSuperEllipsoid(size_t samples, float n1, float n2,
+                                float scalex, float scaley, float scalez,
+                                Scene* scene);
 
 }; // end of class SuperEllipsoidScene
 

@@ -136,23 +136,23 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create 8 animations
   auto a1
-    = new Animation("at", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("at", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a2
-    = new Animation("a2", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("a2", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a3
-    = new Animation("a3", "rotation.x", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
-  auto a4 = new Animation("a4", "material.diffuseColor", 30,
-                          Animation::ANIMATIONTYPE_COLOR3(),
-                          Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("a3", "rotation.x", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto a4 = Animation::New("a4", "material.diffuseColor", 30,
+                           Animation::ANIMATIONTYPE_COLOR3(),
+                           Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a5
-    = new Animation("a5", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("a5", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
   auto a6
-    = new Animation("a6", "rotation.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("a6", "rotation.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Set the animation keys
   a1->setKeys(keys1);
@@ -175,8 +175,10 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // -- Make an Animatable --
   // params: (scene, target, fromFrame, toFrame, loopAnimation, speedRatio,
   // onAnimationEnd, animations)
-  auto aa1 = new Animatable(scene, box1, 1000, 1120, 1, 1.f, nullptr, {a1});
-  auto aa2 = new Animatable(scene, box2, 1000, 1120, 1, 1.f, nullptr, {a2});
+  auto aa1 = Animatable::New(scene, box1, 1000, 1120, 1, 1.f, nullptr,
+                             vector_t<AnimationPtr>{a1});
+  auto aa2 = Animatable::New(scene, box2, 1000, 1120, 1, 1.f, nullptr,
+                             vector_t<AnimationPtr>{a2});
   // Start the animatables
   aa1->_animate(millisecond_t(1));
   aa2->_animate(millisecond_t(1));
@@ -194,13 +196,13 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
   /** a7a - a7b - easing animations on shape 7 **/
 
   // Create animations at7 and at7b
-  auto a7a = new Animation("shape7EasingAnimation", "position", 30,
-                           Animation::ANIMATIONTYPE_VECTOR3(),
-                           Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto a7a = Animation::New("shape7EasingAnimation", "position", 30,
+                            Animation::ANIMATIONTYPE_VECTOR3(),
+                            Animation::ANIMATIONLOOPMODE_CYCLE());
 
-  auto a7b = new Animation("shape7EasingAnimationb", "rotation", 30,
-                           Animation::ANIMATIONTYPE_VECTOR3(),
-                           Animation::ANIMATIONLOOPMODE_CYCLE());
+  auto a7b = Animation::New("shape7EasingAnimationb", "rotation", 30,
+                            Animation::ANIMATIONTYPE_VECTOR3(),
+                            Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> keys7{

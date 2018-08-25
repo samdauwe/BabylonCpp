@@ -12,8 +12,8 @@ namespace Samples {
  */
 class AirplaneModelScene : public IRenderableScene {
 
-  using MakeWingFunction = ::std::function<Mesh*(
-    Mesh* mesh, float radius, float fuselageXer, bool invertY)>;
+  using MakeWingFunction = ::std::function<MeshPtr(
+    const MeshPtr& mesh, float radius, float fuselageXer, bool invertY)>;
 
 public:
   AirplaneModelScene(ICanvas* iCanvas);
@@ -23,7 +23,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  void _reBake(Mesh* mesh);
+  void _reBake(const MeshPtr& mesh);
   MakeWingFunction _makeFormAppendage(float frontBaseV, float backBaseV,
                                       float ySize, float xOrigin, float yOrigin,
                                       float baseXsize, float xSweepback);

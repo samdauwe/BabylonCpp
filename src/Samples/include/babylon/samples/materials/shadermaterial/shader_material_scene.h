@@ -79,9 +79,9 @@ public:
 
 private:
   int _j;
-  ArcRotateCamera* _camera;
-  ShaderMaterial* _shaderMaterial;
-  Mesh* _polyhedron;
+  ArcRotateCameraPtr _camera;
+  ShaderMaterialPtr _shaderMaterial;
+  MeshPtr _polyhedron;
 
 }; // end of class ShaderMaterialScene
 

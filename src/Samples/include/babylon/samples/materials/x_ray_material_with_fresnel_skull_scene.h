@@ -21,8 +21,8 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  FreeCamera* _camera;
-  StandardMaterial* _xrayMat;
+  FreeCameraPtr _camera;
+  StandardMaterialPtr _xrayMat;
 
 }; // end of class XRayMaterialWithFresnelSkullScene
 

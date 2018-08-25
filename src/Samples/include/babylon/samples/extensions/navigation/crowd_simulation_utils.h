@@ -8,10 +8,10 @@ namespace Samples {
 
 struct CrowdSimulationUtils {
 
-  static vector_t<AbstractMesh*> createAgentMeshes(Scene* scene,
-                                                   size_t totalNoAgents);
-  static AbstractMesh* createWayPointMesh(Scene* scene,
-                                          const Vector2& position);
+  static vector_t<AbstractMeshPtr> createAgentMeshes(Scene* scene,
+                                                     size_t totalNoAgents);
+  static AbstractMeshPtr createWayPointMesh(Scene* scene,
+                                            const Vector2& position);
 
 }; // end of struct CrowdSimulationScene1
 

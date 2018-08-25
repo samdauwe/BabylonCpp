@@ -53,7 +53,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   BoxOptions hingeOptions;
   auto hinge       = MeshBuilder::CreateBox("hinge", hingeOptions, scene);
   hinge->isVisible = false;
-  door->setParent(hinge);
+  door->setParent(hinge.get());
   hinge->position().y = 2.f;
   door->position().x  = -1.f;
 
@@ -67,7 +67,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   sphereLight->position().y     = 3.f;
   sphereLight->position().z     = 0.1f;
 
-  vector_t<Mesh*> sphereLights{sphereLight};
+  vector_t<MeshPtr> sphereLights{sphereLight};
   Float32Array lightPositions{-2.f, 3.f, 6.9f};
 
   for (unsigned int i = 0; i < 1; ++i) {
@@ -77,7 +77,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
                 lightPositions[3 * i + 2]);
   }
 
-  vector_t<SpotLight*> spotLights(sphereLights.size());
+  vector_t<SpotLightPtr> spotLights(sphereLights.size());
   Float32Array lightDirections{-0.5f, -0.25f, 1.f, 0.f, 0.f, -1.f};
   for (unsigned int i = 0; i < sphereLights.size(); ++i) {
     auto iStr     = ::std::to_string(i);
@@ -94,9 +94,9 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   /********* Animations *************/
 
   // -- For camera to sweep round --
-  auto rotate = new Animation("rotate", "rotation.y", frameRate,
-                              Animation::ANIMATIONTYPE_FLOAT(),
-                              Animation::ANIMATIONLOOPMODE_CONSTANT());
+  auto rotate = Animation::New("rotate", "rotation.y", frameRate,
+                               Animation::ANIMATIONTYPE_FLOAT(),
+                               Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create rotate animation keys
   auto frameRateInt = static_cast<int>(frameRate);
@@ -110,9 +110,9 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   rotate->setKeys(rotateKeys);
 
   // -- For camera move forward --
-  auto movein = new Animation("movein", "position", frameRate,
-                              Animation::ANIMATIONTYPE_VECTOR3(),
-                              Animation::ANIMATIONLOOPMODE_CONSTANT());
+  auto movein = Animation::New("movein", "position", frameRate,
+                               Animation::ANIMATIONTYPE_VECTOR3(),
+                               Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create movein animation keys
   std::vector<IAnimationKey> moveinKeys{
@@ -126,9 +126,9 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   movein->setKeys(moveinKeys);
 
   // -- For door to open and close --
-  auto sweep = new Animation("sweep", "rotation.y", frameRate,
-                             Animation::ANIMATIONTYPE_FLOAT(),
-                             Animation::ANIMATIONLOOPMODE_CONSTANT());
+  auto sweep = Animation::New("sweep", "rotation.y", frameRate,
+                              Animation::ANIMATIONTYPE_FLOAT(),
+                              Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create sweep animation keys
   std::vector<IAnimationKey> sweepKeys{
@@ -143,9 +143,9 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   sweep->setKeys(sweepKeys);
 
   // -- For light to brighten and dim --
-  auto lightDimmer = new Animation("dimmer", "intensity", frameRate,
-                                   Animation::ANIMATIONTYPE_FLOAT(),
-                                   Animation::ANIMATIONLOOPMODE_CONSTANT());
+  auto lightDimmer = Animation::New("dimmer", "intensity", frameRate,
+                                    Animation::ANIMATIONTYPE_FLOAT(),
+                                    Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create light dimmer animation keys
   std::vector<IAnimationKey> lightKeys{

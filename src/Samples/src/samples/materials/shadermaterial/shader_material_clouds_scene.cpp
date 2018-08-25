@@ -96,11 +96,11 @@ void ShaderMaterialCloudsScene::initializeScene(ICanvas* /*canvas*/,
   }
 
   auto clouds1 = Mesh::New("Clouds1", scene);
-  globalVertexData->applyToMesh(clouds1);
+  globalVertexData->applyToMesh(*clouds1);
   clouds1->material = _cloudMaterial;
 
   auto clouds2 = Mesh::New("Clouds2", scene);
-  globalVertexData->applyToMesh(clouds2);
+  globalVertexData->applyToMesh(*clouds2);
   clouds2->material     = _cloudMaterial;
   clouds2->position().z = -500.f;
 

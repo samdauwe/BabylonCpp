@@ -49,8 +49,8 @@ void CuboidScene::initializeScene(ICanvas* canvas, Scene* scene)
   });
 }
 
-Mesh* CuboidScene::CreateCuboid(const std::string& name, float length,
-                                float width, float height, Scene* scene)
+MeshPtr CuboidScene::CreateCuboid(const std::string& name, float length,
+                                  float width, float height, Scene* scene)
 {
   auto cuboid                        = Mesh::New(name, scene);
   std::vector<Vector3> normalsSource = {

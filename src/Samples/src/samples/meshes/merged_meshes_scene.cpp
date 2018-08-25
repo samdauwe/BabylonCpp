@@ -84,7 +84,7 @@ void MergedMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
       };
 
   // Create map
-  std::vector<Mesh*> arrayOfMeshes;
+  std::vector<MeshPtr> arrayOfMeshes;
   unsigned int blockNr = 0;
   for (auto& blockOfMap : Json::GetArray(world, "map")) {
     const auto blockType = Json::GetString(blockOfMap, "terrain");

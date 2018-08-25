@@ -76,11 +76,11 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto motorAxis
     = Mesh::CreateCylinder("motorAxis", 5, 0.5f, 0.5f, 24, 1, scene, true, 0);
   motorAxis->rotation().x = Math::PI_2;
-  motorAxis->parent       = parentObject;
+  motorAxis->parent       = parentObject.get();
 
   auto motorAnimation
-    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> motorIAnimationKeys{
@@ -98,7 +98,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   //###########//
 
   auto frontArmPaddle          = Mesh::CreateBox("frontArmPaddle", 2.f, scene);
-  frontArmPaddle->parent       = parentObject;
+  frontArmPaddle->parent       = parentObject.get();
   frontArmPaddle->scaling().y  = 2.f;
   frontArmPaddle->scaling().z  = 0.1f;
   frontArmPaddle->scaling().x  = 0.5f;
@@ -106,25 +106,25 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   frontArmPaddle->position().z = -2.3f;
 
   auto frontWeight          = Mesh::CreateBox("frontWeight", 1.f, scene);
-  frontWeight->parent       = parentObject;
+  frontWeight->parent       = parentObject.get();
   frontWeight->position().y = 3.f;
   frontWeight->position().z = -2.3f;
   frontWeight->scaling      = Vector3(3.f, 1.6f, 0.3f);
 
   auto frontPivot          = Mesh::CreateBox("frontPivot", 0.5f, scene);
-  frontPivot->parent       = parentObject;
+  frontPivot->parent       = parentObject.get();
   frontPivot->position().y = distanceOfStick;
   frontPivot->position().z = -2.3f;
 
   auto frontStick          = Mesh::CreateBox("frontStick", 1.f, scene);
-  frontStick->parent       = frontPivot;
+  frontStick->parent       = frontPivot.get();
   frontStick->position().x = -(lengthOfStick / 2.f);
   frontStick->position().z = -0.3f;
   frontStick->scaling      = Vector3(lengthOfStick, 0.2f, 0.2f);
 
   auto frontStickAnimation
-    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> frontStickIAnimationKeys{
@@ -145,7 +145,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   //###########//
 
   auto backArmPaddle          = Mesh::CreateBox("backArmPaddle", 2.f, scene);
-  backArmPaddle->parent       = parentObject;
+  backArmPaddle->parent       = parentObject.get();
   backArmPaddle->scaling().y  = 2.f;
   backArmPaddle->scaling().z  = 0.1f;
   backArmPaddle->scaling().x  = 0.5f;
@@ -153,25 +153,25 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   backArmPaddle->position().z = 2.3f;
 
   auto backWeight          = Mesh::CreateBox("backWeight", 1.f, scene);
-  backWeight->parent       = parentObject;
+  backWeight->parent       = parentObject.get();
   backWeight->position().y = 3.f;
   backWeight->position().z = 2.3f;
   backWeight->scaling      = Vector3(3.f, 1.6f, 0.3f);
 
   auto backPivot          = Mesh::CreateBox("backPivot", 0.5f, scene);
-  backPivot->parent       = parentObject;
+  backPivot->parent       = parentObject.get();
   backPivot->position().y = distanceOfStick;
   backPivot->position().z = 2.3f;
 
   auto backStick          = Mesh::CreateBox("backStick", 1.f, scene);
-  backStick->parent       = backPivot;
+  backStick->parent       = backPivot.get();
   backStick->position().x = -(lengthOfStick / 2.f);
   backStick->position().z = 0.3f;
   backStick->scaling      = Vector3(lengthOfStick, 0.2f, 0.2f);
 
   auto backStickAnimation
-    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> backStickIAnimationKeys{
@@ -197,8 +197,8 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   topStick->position().y = lengthOfStick;
 
   auto topStickAnimation
-    = new Animation("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("anim", "rotation.z", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   float moveAngle = std::asin((2.f * distanceOfStick) / lengthOfTopStick);
 
@@ -217,13 +217,13 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto topBar
     = Mesh::CreateCylinder("topBar", 5.5f, 0.7f, 0.7f, 24, 1, scene, true, 0);
-  topBar->parent       = topStick;
+  topBar->parent       = topStick.get();
   topBar->position().x = 0.5f;
   topBar->scaling      = Vector3(1.f / lengthOfTopStick, 5.f, 5.f);
   topBar->rotation().x = Math::PI_2;
 
   auto topBall          = Mesh::CreateSphere("topBall", 12, 1, scene, true, 0);
-  topBall->parent       = topStick;
+  topBall->parent       = topStick.get();
   topBall->position().x = -0.5f;
   topBall->scaling      = Vector3(1.f / lengthOfTopStick, 5.f, 5.f);
 
@@ -236,8 +236,8 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   pumpStick->scaling      = Vector3(0.2f, lengthOfPumpStick, 0.2f);
 
   auto pumpStickAnimation
-    = new Animation("anim", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
-                    Animation::ANIMATIONLOOPMODE_CYCLE());
+    = Animation::New("anim", "position.y", 30, Animation::ANIMATIONTYPE_FLOAT(),
+                     Animation::ANIMATIONLOOPMODE_CYCLE());
 
   // Animation keys
   std::vector<IAnimationKey> pumpStickIAnimationKeys{

@@ -672,7 +672,7 @@ public:
 
 private:
   float _time;
-  std::array<ShaderMaterial*, 9> _shaderMaterials;
+  std::array<ShaderMaterialPtr, 9> _shaderMaterials;
 
 }; // end of class ShaderMaterialCylindersScene
 

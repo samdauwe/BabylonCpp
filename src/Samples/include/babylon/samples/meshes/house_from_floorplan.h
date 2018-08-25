@@ -70,12 +70,12 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  Mesh* buildFromPlan(vector_t<Wall>& walls, float ply, float height,
-                      BuildFromPlanOptions& options, Scene* scene);
+  MeshPtr buildFromPlan(vector_t<Wall>& walls, float ply, float height,
+                        BuildFromPlanOptions& options, Scene* scene);
 
 private:
   float _alpha;
-  Mesh* _house;
+  MeshPtr _house;
 
 }; // end of class HouseFromFloorplanScene
 

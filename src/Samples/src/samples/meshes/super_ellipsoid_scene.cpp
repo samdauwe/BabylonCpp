@@ -113,10 +113,10 @@ Vector3 SuperEllipsoidScene::_calculateNormal(float phi, float beta, float n1,
   return normal;
 }
 
-Mesh* SuperEllipsoidScene::_createSuperEllipsoid(size_t samples, float n1,
-                                                 float n2, float scalex,
-                                                 float scaley, float scalez,
-                                                 Scene* scene)
+MeshPtr SuperEllipsoidScene::_createSuperEllipsoid(size_t samples, float n1,
+                                                   float n2, float scalex,
+                                                   float scaley, float scalez,
+                                                   Scene* scene)
 {
   auto superello = Mesh::New("superello", scene);
   float phi = 0.f, beta = 0.f;
@@ -174,7 +174,7 @@ Mesh* SuperEllipsoidScene::_createSuperEllipsoid(size_t samples, float n1,
     shapeReturned->normals.emplace_back(normals[i].y);
     shapeReturned->normals.emplace_back(normals[i].z);
   }
-  shapeReturned->applyToMesh(superello);
+  shapeReturned->applyToMesh(*superello);
   return superello;
 }
 

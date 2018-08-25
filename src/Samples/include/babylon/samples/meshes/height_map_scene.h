@@ -23,8 +23,8 @@ public:
 private:
   float _positionStepX;
   bool reverseSun;
-  Mesh* _sun;
-  PointLight* _spot;
+  MeshPtr _sun;
+  PointLightPtr _spot;
 
 }; // end of class HeightMapScene
 

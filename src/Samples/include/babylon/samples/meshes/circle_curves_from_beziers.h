@@ -17,7 +17,7 @@ public:
 
 private:
   float _speed;
-  LinesMesh *_circle1, *_circle2;
+  LinesMeshPtr _circle1, _circle2;
 
 }; // end of class CircleCurvesFromBeziersScene
 

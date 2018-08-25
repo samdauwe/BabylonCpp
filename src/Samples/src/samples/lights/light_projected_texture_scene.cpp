@@ -52,7 +52,8 @@ void LightProjectedTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
     "ground", "textures/heightMap.png", 100, 100, 100, 0, 10, scene, false);
   auto groundMaterial = StandardMaterial::New("ground", scene);
   groundMaterial->setDiffuseTexture(Texture::New("textures/ground.jpg", scene));
-  auto diffuseTexture = static_cast<Texture*>(groundMaterial->diffuseTexture());
+  auto diffuseTexture
+    = ::std::static_pointer_cast<Texture>(groundMaterial->diffuseTexture());
   diffuseTexture->uScale        = 6.f;
   diffuseTexture->vScale        = 6.f;
   groundMaterial->specularColor = Color3(0.f, 0.f, 0.f);

@@ -33,14 +33,14 @@ void CrowdSimulation::setTimeStep(float timeStep)
   _simulator->setTimeStep(timeStep);
 }
 
-size_t CrowdSimulation::addAgent(AbstractMesh* mesh)
+size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh)
 {
   BABYLON::Vector2 position(mesh->position().x, mesh->position().z);
   return addAgent(mesh, position);
 }
 
-size_t CrowdSimulation::addAgent(AbstractMesh* mesh,
-                                 const BABYLON::Vector2& position)
+size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh,
+                                 const Vector2& position)
 {
   // Create the crowd agent entity
   auto agent = _world.createEntity();
@@ -67,9 +67,10 @@ size_t CrowdSimulation::addAgent(AbstractMesh* mesh,
   return agentComp.id();
 }
 
-size_t CrowdSimulation::addAgent(AbstractMesh* mesh, const Vector3& position)
+size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh,
+                                 const Vector3& position)
 {
-  return addAgent(mesh, BABYLON::Vector2(position.x, position.z));
+  return addAgent(mesh, Vector2(position.x, position.z));
 }
 
 void CrowdSimulation::setAgentGoal(size_t agentId, const BABYLON::Vector2& goal)
@@ -82,7 +83,7 @@ void CrowdSimulation::setAgentMaxSpeed(size_t agentId, float speed)
   _simulator->setAgentMaxSpeed(agentId, speed);
 }
 
-void CrowdSimulation::addObstacleByBoundingBox(AbstractMesh* mesh,
+void CrowdSimulation::addObstacleByBoundingBox(const AbstractMeshPtr& mesh,
                                                const Vector3& position,
                                                bool isVisible)
 {

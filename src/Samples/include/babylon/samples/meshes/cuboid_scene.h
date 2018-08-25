@@ -29,11 +29,11 @@ public:
    * @param scene scene
    * @return cuboid
    */
-  static Mesh* CreateCuboid(const std::string& name, float length, float width,
-                            float height, Scene* scene);
+  static MeshPtr CreateCuboid(const std::string& name, float length,
+                              float width, float height, Scene* scene);
 
 private:
-  Mesh* _cuboid;
+  MeshPtr _cuboid;
 
 }; // end of class CuboidScene
 

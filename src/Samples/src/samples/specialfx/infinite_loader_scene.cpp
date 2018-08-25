@@ -27,7 +27,7 @@ void Ring::addTube(const std::vector<Vector3>& points)
 {
   auto tube = Mesh::CreateTube("tube", points, 1, 3, nullptr, Mesh::CAP_ALL(),
                                center->getScene(), false, Mesh::FRONTSIDE());
-  tube->parent = center;
+  tube->parent = center.get();
   tubes.emplace_back(tube);
 }
 
@@ -87,7 +87,7 @@ void InfiniteLoaderScene::initializeScene(ICanvas* canvas, Scene* scene)
   float w              = 5.f;
   float angle          = 0.005f;
 
-  std::array<StandardMaterial*, 2> materials;
+  std::array<StandardMaterialPtr, 2> materials;
 
   auto mat1          = StandardMaterial::New("mat1", scene);
   mat1->diffuseColor = Color3::White();

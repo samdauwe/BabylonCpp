@@ -32,8 +32,8 @@ private:
   unsigned int _curveNumberOfPoints;
   unsigned int _iteration;
   Quaternion _startRotation;
-  Mesh* _carBody;
-  Mesh *_wheelFI, *_wheelFO, *_wheelRI, *_wheelRO;
+  MeshPtr _carBody;
+  MeshPtr _wheelFI, _wheelFO, _wheelRI, _wheelRO;
   vector_t<Vector3> _points, _normals;
 
 }; // end of class SimpleCarFollowingPathScene

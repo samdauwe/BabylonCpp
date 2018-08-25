@@ -16,9 +16,9 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  ArcRotateCamera* _camera;
-  PointLight* _pointLight;
-  std::vector<Mesh*> _polygons;
+  ArcRotateCameraPtr _camera;
+  PointLightPtr _pointLight;
+  std::vector<MeshPtr> _polygons;
   Float32Array _rotations;
 
 }; // end of struct PolyhedraScene

@@ -16,8 +16,8 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  ArcRotateCamera* _camera;
-  PointLight* _pl;
+  ArcRotateCameraPtr _camera;
+  PointLightPtr _pl;
 
 }; // end of class MandelbrotFractalScene
 

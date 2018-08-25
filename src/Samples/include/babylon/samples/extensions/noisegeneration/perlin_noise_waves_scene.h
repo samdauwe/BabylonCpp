@@ -20,8 +20,8 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  Mesh* _ground;
-  Mesh* _ground2;
+  MeshPtr _ground;
+  MeshPtr _ground2;
   Float32Array _positions;
   Uint32Array _indices;
   Extensions::PerlinNoise _perlineNoise;

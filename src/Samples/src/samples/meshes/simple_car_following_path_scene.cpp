@@ -95,7 +95,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
     // Rotate wheel so tread in xz plane
     auto axis = Axis::X();
     wheel->rotate(axis, Math::PI_2, Space::WORLD);
-    wheel->setParent(_carBody);
+    wheel->setParent(_carBody.get());
     wheel->position = position;
     return wheel;
   };

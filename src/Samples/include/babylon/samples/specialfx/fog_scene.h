@@ -22,9 +22,9 @@ public:
 
 private:
   float _alpha;
-  Mesh* _sphere0;
-  Mesh* _sphere1;
-  Mesh* _sphere2;
+  MeshPtr _sphere0;
+  MeshPtr _sphere1;
+  MeshPtr _sphere2;
 
 }; // end of class FogScene
 

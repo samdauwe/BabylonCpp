@@ -16,10 +16,10 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  Mesh* _createHexIcosphere(std::size_t degree, float scale, Scene* scene);
+  MeshPtr _createHexIcosphere(std::size_t degree, float scale, Scene* scene);
 
 private:
-  Mesh* _hexIcosphere;
+  MeshPtr _hexIcosphere;
 
 }; // end of class HexIcosphereScene
 

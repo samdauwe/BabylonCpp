@@ -970,7 +970,7 @@ public:
 
 private:
   float _time;
-  std::array<ShaderMaterial*, 9> _shaderMaterials;
+  std::array<ShaderMaterialPtr, 9> _shaderMaterials;
   Vector2 _boxTopFaceResolution;
   float _boxTopFaceAspectRatio;
 

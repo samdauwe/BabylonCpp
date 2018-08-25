@@ -36,13 +36,13 @@ void ImportMeshesSkullScene::initializeScene(ICanvas* canvas, Scene* scene)
   // import all meshes
   SceneLoader::ImportMesh(
     {}, "scenes/", "skull.babylon", scene,
-    [this](const vector_t<AbstractMesh*>& newMeshes,
-           const vector_t<ParticleSystem*>& /*newParticleSystems*/,
-           const vector_t<Skeleton*>& /*newSkeletons*/,
-           const vector_t<AnimationGroup*>& /*newAnimationGroups*/) {
+    [this](const vector_t<AbstractMeshPtr>& newMeshes,
+           const vector_t<IParticleSystemPtr>& /*newParticleSystems*/,
+           const vector_t<SkeletonPtr>& /*newSkeletons*/,
+           const vector_t<AnimationGroupPtr>& /*newAnimationGroups*/) {
       // Set the target of the camera to the first imported mesh
       if (!newMeshes.empty()) {
-        _camera->setTarget(newMeshes[0]);
+        _camera->setTarget(newMeshes[0].get());
       }
     });
 

@@ -62,7 +62,7 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto skyboxMaterial             = StandardMaterial::New("skyBox", scene);
   skyboxMaterial->backFaceCulling = false;
   skyboxMaterial->setReflectionTexture(
-    new CubeTexture("textures/skybox", scene));
+    CubeTexture::New("textures/skybox", scene));
   skyboxMaterial->reflectionTexture()->coordinatesMode
     = TextureConstants::SKYBOX_MODE;
   skyboxMaterial->diffuseColor  = Color3(0.f, 0.f, 0.f);

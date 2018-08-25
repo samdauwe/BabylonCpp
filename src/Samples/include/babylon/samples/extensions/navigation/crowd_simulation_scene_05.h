@@ -35,7 +35,7 @@ private:
 
 private:
   std::unique_ptr<Extensions::CrowdSimulation> _crowdSimulation;
-  std::vector<AbstractMesh*> _agentMeshes;
+  std::vector<AbstractMeshPtr> _agentMeshes;
 
 }; // end of class CrowdSimulationScene05
 

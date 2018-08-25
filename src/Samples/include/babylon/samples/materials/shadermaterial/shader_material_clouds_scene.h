@@ -71,8 +71,8 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  FreeCamera* _camera;
-  ShaderMaterial* _cloudMaterial;
+  FreeCameraPtr _camera;
+  ShaderMaterialPtr _cloudMaterial;
   long _startTime;
 
 }; // end of class ShaderMaterialCloudsScene
