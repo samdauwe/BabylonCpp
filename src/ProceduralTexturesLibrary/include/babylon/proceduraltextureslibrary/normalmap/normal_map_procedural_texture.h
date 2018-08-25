@@ -50,14 +50,14 @@ protected:
                              Scene* scene, Texture* fallbackTexture = nullptr,
                              bool generateMipMaps = false);
 
-  Texture*& get_baseTexture();
-  void set_baseTexture(Texture* const& texture);
+  TexturePtr& get_baseTexture();
+  void set_baseTexture(const TexturePtr& texture);
 
 public:
-  Property<NormalMapProceduralTexture, Texture*> baseTexture;
+  Property<NormalMapProceduralTexture, TexturePtr> baseTexture;
 
 private:
-  Texture* _baseTexture;
+  TexturePtr _baseTexture;
 
 }; // end of class NormalMapProceduralTexture
 

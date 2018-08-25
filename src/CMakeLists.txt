@@ -9,7 +9,7 @@ add_subdirectory(BabylonCpp)
 add_subdirectory(Extensions)
 #add_subdirectory(Loaders)
 #add_subdirectory(MaterialsLibrary)
-###add_subdirectory(ProceduralTexturesLibrary)
+add_subdirectory(ProceduralTexturesLibrary)
 
 # Applications
 #add_subdirectory(Editor)
