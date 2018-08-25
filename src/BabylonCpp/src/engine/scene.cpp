@@ -65,6 +65,7 @@
 #include <babylon/postprocess/post_process.h>
 #include <babylon/postprocess/post_process_manager.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
+#include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager_scene_component.h>
 #include <babylon/probes/reflection_probe.h>
 #include <babylon/rendering/bounding_box_renderer.h>
 #include <babylon/rendering/depth_renderer.h>
@@ -621,6 +622,14 @@ unique_ptr_t<PostProcessRenderPipelineManager>&
 Scene::get_postProcessRenderPipelineManager()
 {
   if (!_postProcessRenderPipelineManager) {
+    // Register the G Buffer component to the scene.
+    auto component = ::std::static_pointer_cast<
+      PostProcessRenderPipelineManagerSceneComponent>(_getComponent(
+      SceneComponentConstants::NAME_POSTPROCESSRENDERPIPELINEMANAGER));
+    if (!component) {
+      component = PostProcessRenderPipelineManagerSceneComponent::New(this);
+      _addComponent(component);
+    }
     _postProcessRenderPipelineManager
       = ::std::make_unique<PostProcessRenderPipelineManager>();
   }
@@ -4021,6 +4030,7 @@ void Scene::dispose()
   _afterRenderingGroupDrawStage.clear();
   _afterCameraDrawStage.clear();
   _beforeCameraUpdateStage.clear();
+  _gatherRenderTargetsStage.clear();
   for (const auto& component : _components) {
     component->dispose();
   }

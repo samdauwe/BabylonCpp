@@ -182,11 +182,11 @@ private:
     const ::std::function<void(Effect* effect)> onCompiled = nullptr,
     ::std::function<void(Effect* effect, const string_t& errors)> onError
     = nullptr,
-    const nullable_t<bool>& useInstances = nullptr,
-    const nullable_t<bool>& useClipPlane = nullptr);
+    const nullable_t<bool>& useInstances = nullopt_t,
+    const nullable_t<bool>& useClipPlane = nullopt_t);
   void _prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
-                       const nullable_t<bool>& useInstances = nullptr,
-                       const nullable_t<bool>& useClipPlane = nullptr);
+                       const nullable_t<bool>& useInstances = nullopt_t,
+                       const nullable_t<bool>& useClipPlane = nullopt_t);
 
   /**
    * @brief Returns the texture used for reflections.

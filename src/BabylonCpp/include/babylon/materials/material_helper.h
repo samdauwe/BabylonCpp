@@ -74,7 +74,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   static void PrepareDefinesForFrameBoundValues(
     Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
     unsigned int CLIPPLANE, unsigned int DEPTHPREPASS, unsigned int INSTANCES,
-    nullable_t<bool> useClipPlane = nullptr);
+    nullable_t<bool> useClipPlane = nullopt_t);
 
   /**
    * @brief Prepares the defines used in the shader depending on the attributes

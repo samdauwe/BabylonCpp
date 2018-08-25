@@ -2886,6 +2886,11 @@ public:
   Stage<SimpleStageAction> _beforeCameraUpdateStage;
 
   /**
+   * Defines the actions happening before camera updates.
+   */
+  Stage<RenderTargetsStageAction> _gatherRenderTargetsStage;
+
+  /**
    * Defines the actions happening during the per mesh ready checks
    */
   Stage<MeshStageAction> _isReadyForMeshStage;

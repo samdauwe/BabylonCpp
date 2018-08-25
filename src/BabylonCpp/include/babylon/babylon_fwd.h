@@ -651,6 +651,12 @@ class VRDistortionCorrectionPostProcess;
 class PostProcessRenderEffect;
 class PostProcessRenderPipeline;
 class PostProcessRenderPipelineManager;
+class PostProcessRenderPipelineManagerSceneComponent;
+// - Render Pipeline aliases --
+using PostProcessRenderPipelineManagerPtr
+  = shared_ptr_t<PostProcessRenderPipelineManager>;
+using PostProcessRenderPipelineManagerSceneComponentPtr
+  = shared_ptr_t<PostProcessRenderPipelineManagerSceneComponent>;
 // -- Pipelines
 class DefaultRenderingPipeline;
 class LensRenderingPipeline;

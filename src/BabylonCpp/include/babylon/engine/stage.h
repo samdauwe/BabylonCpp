@@ -40,6 +40,12 @@ using RenderingGroupStageAction = ::std::function<void(int renderingGroupId)>;
 using SimpleStageAction = ::std::function<void()>;
 
 /**
+ * Strong typing of a render target action.
+ */
+using RenderTargetsStageAction
+  = ::std::function<void(const vector_t<RenderTargetTexture*>& renderTargets)>;
+
+/**
  * @brief Representation of a step.
  */
 template <class T>

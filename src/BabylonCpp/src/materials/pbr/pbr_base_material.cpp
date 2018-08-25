@@ -942,7 +942,7 @@ void PBRBaseMaterial::forceCompilation(
 {
   PBRMaterialDefines defines;
   auto effect
-    = _prepareEffect(mesh, defines, nullptr, nullptr, nullptr, clipPlane);
+    = _prepareEffect(mesh, defines, nullptr, nullptr, nullopt_t, clipPlane);
   if (effect->isReady()) {
     if (onCompiled) {
       onCompiled(this);

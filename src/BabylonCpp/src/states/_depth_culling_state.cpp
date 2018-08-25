@@ -157,7 +157,7 @@ void _DepthCullingState::reset()
   _depthTest = true;
   _depthFunc = nullopt_t;
   _cullFace  = nullopt_t;
-  _cull      = nullptr;
+  _cull      = nullopt_t;
   _zOffset   = 0.f;
   _frontFace = nullopt_t;
 
