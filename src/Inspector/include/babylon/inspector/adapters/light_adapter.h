@@ -1,8 +1,8 @@
 #ifndef BABYLON_INSPECTOR_ADAPTERS_LIGHT_ADAPTER_H
 #define BABYLON_INSPECTOR_ADAPTERS_LIGHT_ADAPTER_H
 
+#include <babylon/babylon_fwd.h>
 #include <babylon/babylon_stl.h>
-
 #include <babylon/inspector/adapters/adapter.h>
 #include <babylon/inspector/treetools/itool_visible.h>
 
@@ -14,7 +14,7 @@ class Light;
 class LightAdapter : public Adapter, public IToolVisible {
 
 public:
-  LightAdapter(Light* light);
+  LightAdapter(const LightPtr& light);
   ~LightAdapter() override;
 
   /**
@@ -45,8 +45,8 @@ private:
   void _buildPropertiesView();
 
 private:
-  Light* _light;
-  HemisphericLight* _hemispericLight;
+  LightPtr _light;
+  HemisphericLightPtr _hemispericLight;
   unique_ptr_t<PropertiesView> _properties;
   vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
 

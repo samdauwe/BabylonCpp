@@ -27,7 +27,7 @@ class MeshAdapter : public Adapter,
                     public IToolInfo {
 
 public:
-  MeshAdapter(Node* obj);
+  MeshAdapter(const NodePtr& obj);
   ~MeshAdapter() override;
 
   /**
@@ -78,10 +78,10 @@ private:
   void _buildPropertiesView();
 
 private:
-  Node* _obj;
-  AbstractMesh* _abstractMesh;
-  Mesh* _mesh;
-  GroundMesh* _groundMesh;
+  NodePtr _obj;
+  AbstractMeshPtr _abstractMesh;
+  MeshPtr _mesh;
+  GroundMeshPtr _groundMesh;
   unique_ptr_t<PropertiesView> _properties;
   vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
   /** Keep track of the axis of the actual object */

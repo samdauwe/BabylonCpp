@@ -1,8 +1,8 @@
 #ifndef BABYLON_INSPECTOR_ADAPTERS_MATERIAL_ADAPTER_H
 #define BABYLON_INSPECTOR_ADAPTERS_MATERIAL_ADAPTER_H
 
+#include <babylon/babylon_fwd.h>
 #include <babylon/babylon_stl.h>
-
 #include <babylon/inspector/adapters/adapter.h>
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
 
@@ -14,7 +14,7 @@ class StandardMaterial;
 class MaterialAdapter : public Adapter {
 
 public:
-  MaterialAdapter(Material* material);
+  MaterialAdapter(const MaterialPtr& material);
   ~MaterialAdapter() override;
 
   /**
@@ -41,8 +41,8 @@ private:
   void _buildPropertiesView();
 
 private:
-  Material* _material;
-  StandardMaterial* _standardMaterial;
+  MaterialPtr _material;
+  StandardMaterialPtr _standardMaterial;
   unique_ptr_t<PropertiesView> _properties;
   vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
 

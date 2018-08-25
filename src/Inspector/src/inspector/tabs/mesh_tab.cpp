@@ -31,11 +31,11 @@ void MeshTab::_buildTree()
   // Create meshes alias
   auto& arr = _meshes;
   // Tab containing mesh already in results
-  vector_t<Node*> alreadyIn;
+  vector_t<NodePtr> alreadyIn;
 
   // Recursive method building the tree panel
-  ::std::function<TreeItem<MeshAdapter>(Node*)> createNode
-    = [&](Node* obj) -> TreeItem<MeshAdapter> {
+  ::std::function<TreeItem<MeshAdapter>(NodePtr)> createNode
+    = [&](const NodePtr& obj) -> TreeItem<MeshAdapter> {
     auto descendants = obj->getDescendants(true);
 
     auto node
@@ -78,7 +78,7 @@ void MeshTab::_buildTree()
   }
 
   // Find top of hierarchy for meshes...
-  vector_t<Node*> meshWithoutAnyParent;
+  vector_t<NodePtr> meshWithoutAnyParent;
   for (auto& mesh : scene->meshes) {
     // Not already in the array, not system name and no parent
     auto _mesh = static_cast<Node*>(mesh.get());
@@ -90,7 +90,7 @@ void MeshTab::_buildTree()
   // ... and for transforms
   for (auto& tn : scene->transformNodes) {
     // Not already in the array, not system name and no parent
-    auto _tn = static_cast<Node*>(tn);
+    auto _tn = ::std::static_pointer_cast<Node>(tn);
     if (!stl_util::contains(meshWithoutAnyParent, _tn)
         && !Helpers::IsSystemName(_tn->name) && !_tn->parent) {
       meshWithoutAnyParent.emplace_back(_tn);

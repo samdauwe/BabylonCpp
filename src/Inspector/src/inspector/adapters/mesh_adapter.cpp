@@ -14,7 +14,7 @@
 
 namespace BABYLON {
 
-MeshAdapter::MeshAdapter(Node* obj)
+MeshAdapter::MeshAdapter(const NodePtr& obj)
     : _obj{obj}
     , _abstractMesh{nullptr}
     , _mesh{nullptr}
@@ -29,16 +29,16 @@ MeshAdapter::MeshAdapter(Node* obj)
   _tools.emplace_back(::std::make_unique<Checkbox>(this));
   _tools.emplace_back(::std::make_unique<DebugArea>(this));
   // Cast mesh
-  _abstractMesh = dynamic_cast<AbstractMesh*>(obj);
+  _abstractMesh = ::std::static_pointer_cast<AbstractMesh>(obj);
   if (_abstractMesh) {
     // Mesh
     if (_abstractMesh->type() == IReflect::Type::MESH) {
-      _mesh = static_cast<Mesh*>(obj);
+      _mesh = ::std::static_pointer_cast<Mesh>(obj);
     }
     // GroundMesh
     if (_abstractMesh->type() == IReflect::Type::GROUNDMESH) {
-      _mesh       = static_cast<Mesh*>(obj);
-      _groundMesh = static_cast<GroundMesh*>(obj);
+      _mesh       = ::std::static_pointer_cast<Mesh>(obj);
+      _groundMesh = ::std::static_pointer_cast<GroundMesh>(obj);
     }
     // Bounding box
     if (_abstractMesh->getTotalVertices() > 0) {
@@ -142,7 +142,7 @@ void MeshAdapter::_drawAxis()
 
   onBeforeRenderObserver = _obj->getScene()->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
-      if (auto mesh = dynamic_cast<TransformNode*>(_obj)) {
+      if (auto mesh = ::std::static_pointer_cast<TransformNode>(_obj)) {
         auto matrix = *mesh->getWorldMatrix();
         Vector3 extend(1.f, 1.f, 1.f);
         if (_abstractMesh) {

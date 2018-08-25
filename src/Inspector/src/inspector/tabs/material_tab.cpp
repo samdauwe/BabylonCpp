@@ -35,7 +35,7 @@ void MaterialTab::_buildTree()
   _materials.clear();
   for (const auto& mat : scene->materials) {
     _materials.emplace_back(TreeItem<MaterialAdapter>{
-      *this, ::std::make_unique<MaterialAdapter>(mat.get())});
+      *this, ::std::make_unique<MaterialAdapter>(mat)});
   }
 
   // Set initialized flag

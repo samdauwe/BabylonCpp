@@ -8,13 +8,13 @@
 
 namespace BABYLON {
 
-LightAdapter::LightAdapter(Light* light)
+LightAdapter::LightAdapter(const LightPtr& light)
     : _light{light}, _hemispericLight{nullptr}
 {
   _tools.emplace_back(::std::make_unique<Checkbox>(this));
   // Cast light
   if (_light->type() == IReflect::Type::HEMISPHERICLIGHT) {
-    _hemispericLight = static_cast<HemisphericLight*>(_light);
+    _hemispericLight = ::std::static_pointer_cast<HemisphericLight>(_light);
   }
   // Build properties view
   _properties = ::std::make_unique<PropertiesView>();

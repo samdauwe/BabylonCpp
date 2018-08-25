@@ -7,12 +7,12 @@
 
 namespace BABYLON {
 
-MaterialAdapter::MaterialAdapter(Material* material)
+MaterialAdapter::MaterialAdapter(const MaterialPtr& material)
     : _material{material}, _standardMaterial{nullptr}, _properties{nullptr}
 {
   // Cast material
   if (_material->type() == IReflect::Type::STANDARDMATERIAL) {
-    _standardMaterial = static_cast<StandardMaterial*>(_material);
+    _standardMaterial = ::std::static_pointer_cast<StandardMaterial>(_material);
   }
   // Build properties view
   _properties = ::std::make_unique<PropertiesView>();
