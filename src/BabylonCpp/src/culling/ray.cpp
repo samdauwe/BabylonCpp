@@ -264,19 +264,19 @@ unique_ptr_t<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
   return ::std::make_unique<IntersectionInfo>(bu, bv, distance);
 }
 
-Nullable<float> Ray::intersectsPlane(const Plane& plane)
+nullable_t<float> Ray::intersectsPlane(const Plane& plane)
 {
   float distance;
   float result1 = Vector3::Dot(plane.normal, direction);
   if (::std::abs(result1) < 9.99999997475243E-07f) {
-    return nullptr;
+    return nullopt_t;
   }
   else {
     const float result2 = Vector3::Dot(plane.normal, origin);
     distance            = (-plane.d - result2) / result1;
     if (distance < 0.f) {
       if (distance < -9.99999997475243E-07f) {
-        return nullptr;
+        return nullopt_t;
       }
       else {
         return 0.f;

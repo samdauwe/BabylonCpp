@@ -112,7 +112,7 @@ void SpotLight::set_innerAngle(float value)
 
 float SpotLight::get_shadowAngleScale() const
 {
-  return _shadowAngleScale;
+  return *_shadowAngleScale;
 }
 
 void SpotLight::set_shadowAngleScale(float value)
@@ -193,7 +193,7 @@ void SpotLight::_setDefaultShadowProjectionMatrix(
   }
 
   _shadowAngleScale = _shadowAngleScale ? *_shadowAngleScale : 1.f;
-  auto angle        = _shadowAngleScale * _angle;
+  auto angle        = *_shadowAngleScale * _angle;
 
   Matrix::PerspectiveFovLHToRef(angle, 1.f, getDepthMinZ(*activeCamera),
                                 getDepthMaxZ(*activeCamera), matrix);

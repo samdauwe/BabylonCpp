@@ -7,23 +7,21 @@
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 
-#include <babylon/core/nullable.h>
-
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT BoneLookControllerOptions {
-  Nullable<float> maxYaw;
-  Nullable<float> minYaw;
-  Nullable<float> maxPitch;
-  Nullable<float> minPitch;
-  Nullable<float> slerpAmount;
-  Nullable<Vector3> upAxis;
-  Nullable<Space> upAxisSpace;
-  Nullable<Vector3> yawAxis;
-  Nullable<Vector3> pitchAxis;
-  Nullable<float> adjustYaw;
-  Nullable<float> adjustPitch;
-  Nullable<float> adjustRoll;
+  nullable_t<float> maxYaw;
+  nullable_t<float> minYaw;
+  nullable_t<float> maxPitch;
+  nullable_t<float> minPitch;
+  nullable_t<float> slerpAmount;
+  nullable_t<Vector3> upAxis;
+  nullable_t<Space> upAxisSpace;
+  nullable_t<Vector3> yawAxis;
+  nullable_t<Vector3> pitchAxis;
+  nullable_t<float> adjustYaw;
+  nullable_t<float> adjustPitch;
+  nullable_t<float> adjustRoll;
 }; // end of struct BoneLookControllerOptions
 
 /**
@@ -56,8 +54,8 @@ public:
    * * adjustRoll: used to make an adjustment to the roll of the bone
    **/
   BoneLookController(AbstractMesh* mesh, Bone* bone, const Vector3& target,
-                     const Nullable<BoneLookControllerOptions>& options
-                     = nullptr);
+                     const nullable_t<BoneLookControllerOptions>& options
+                     = nullopt_t);
   ~BoneLookController();
 
   /**
@@ -201,7 +199,7 @@ private:
   float _maxPitchTan;
   Quaternion _boneQuat;
   bool _slerping;
-  Nullable<Matrix> _transformYawPitch;
+  nullable_t<Matrix> _transformYawPitch;
   Matrix _transformYawPitchInv;
   bool _firstFrameSkipped;
   float _yawRange;

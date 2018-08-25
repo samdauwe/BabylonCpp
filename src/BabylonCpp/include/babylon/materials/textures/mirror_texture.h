@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_TEXTURES_MIRROR_TEXTURE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/matrix.h>

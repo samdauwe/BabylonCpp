@@ -4,7 +4,6 @@
 #include <babylon/babylon_global.h>
 
 #include <babylon/animations/ianimatable.h>
-#include <babylon/core/nullable.h>
 #include <babylon/engine/node.h>
 
 namespace BABYLON {
@@ -125,8 +124,8 @@ public:
   /**
    * @brief Hidden
    */
-  void _updateDifferenceMatrix(const Nullable<Matrix>& rootMatrix = nullptr,
-                               bool updateChildren                = true);
+  void _updateDifferenceMatrix(const nullable_t<Matrix>& rootMatrix = nullopt_t,
+                               bool updateChildren                  = true);
 
   /**
    * @brief Flag the bone as dirty (Forcing it to update everything).
@@ -195,7 +194,7 @@ public:
    * @brief Gets the current scaling in local space.
    * @returns the current scaling vector
    */
-  Nullable<Vector3>& getScale();
+  nullable_t<Vector3>& getScale();
 
   /**
    * @brief Gets the current scaling in local space and stores it in a target
@@ -450,10 +449,10 @@ protected:
    * @param index defines index of the bone in the hiearchy
    */
   Bone(const string_t& name, Skeleton* skeleton, Bone* parentBone = nullptr,
-       const Nullable<Matrix>& localMatrix = nullptr,
-       const Nullable<Matrix>& restPose    = nullptr,
-       const Nullable<Matrix>& baseMatrix  = nullptr,
-       Nullable<int> index                 = nullptr);
+       const nullable_t<Matrix>& localMatrix = nullopt_t,
+       const nullable_t<Matrix>& restPose    = nullopt_t,
+       const nullable_t<Matrix>& baseMatrix  = nullopt_t,
+       nullable_t<int> index                 = nullopt_t);
 
   /**
    * @brief Hidden
@@ -500,12 +499,12 @@ protected:
   /**
    * @brief Gets current scaling (in local space).
    */
-  Nullable<Vector3>& get_scaling();
+  nullable_t<Vector3>& get_scaling();
 
   /**
    * @brief Sets current scaling (in local space).
    */
-  void set_scaling(const Nullable<Vector3>& newScaling);
+  void set_scaling(const nullable_t<Vector3>& newScaling);
 
   /**
    * @brief Gets the animation properties override.
@@ -539,7 +538,7 @@ public:
    * matrices Set this value to -1 to exclude the bone from the transform
    * matrices
    */
-  Nullable<int> _index;
+  nullable_t<int> _index;
 
   /**
    * Hidden
@@ -564,7 +563,7 @@ public:
   /**
    * Current scaling (in local space)
    */
-  Property<Bone, Nullable<Vector3>> scaling;
+  Property<Bone, nullable_t<Vector3>> scaling;
 
   /**
    * Animation properties override
@@ -591,7 +590,7 @@ private:
   Vector3 _negateScaleChildren;
   float _scalingDeterminant;
   unique_ptr_t<Matrix> _worldTransform;
-  Nullable<Vector3> _localScaling;
+  nullable_t<Vector3> _localScaling;
   Quaternion _localRotation;
   Vector3 _localPosition;
   bool _needToDecompose;

@@ -24,7 +24,7 @@ public:
    */
   ActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
               const AbstractMeshPtr& meshUnderPointer,
-              const Nullable<Event>& sourceEvent,
+              const nullable_t<Event>& sourceEvent,
               const string_t& additionalData = "");
   ActionEvent(const ActionEvent& other);
   ActionEvent(ActionEvent&& other);
@@ -40,7 +40,7 @@ public:
    * @returns the new ActionEvent
    */
   static ActionEvent CreateNew(const AbstractMeshPtr& source,
-                               const Nullable<Event>& evt = nullptr);
+                               const nullable_t<Event>& evt = nullopt_t);
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a source sprite.
@@ -86,7 +86,7 @@ public:
   /** The mesh that is currently pointed at (can be null) */
   AbstractMeshPtr meshUnderPointer;
   /** The original (browser) event that triggered the ActionEvent */
-  Nullable<Event> sourceEvent;
+  nullable_t<Event> sourceEvent;
   /** Additional data for the event */
   string_t additionalData;
 

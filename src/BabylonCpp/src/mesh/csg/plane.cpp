@@ -155,15 +155,15 @@ void BABYLON::CSG::Plane::splitPolygon(
   }
 }
 
-Nullable<CSG::Plane> CSG::Plane::FromPoints(const Vector3& a, const Vector3& b,
-                                            const Vector3& c)
+nullable_t<CSG::Plane>
+CSG::Plane::FromPoints(const Vector3& a, const Vector3& b, const Vector3& c)
 {
   const auto v0 = c.subtract(a);
   const auto v1 = b.subtract(a);
 
   if (stl_util::almost_equal(v0.lengthSquared(), 0.f)
       || stl_util::almost_equal(v1.lengthSquared(), 0.f)) {
-    return nullptr;
+    return nullopt_t;
   }
 
   const Vector3 n = Vector3::Normalize(Vector3::Cross(v0, v1));

@@ -2,14 +2,13 @@
 #define BABYLON_PHYSICS_PHYSICS_IMPOSTOR_PARAMETERS_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT PhysicsImpostorParameters {
-  Nullable<float> mass                    = nullptr;
-  Nullable<float> friction                = nullptr;
-  Nullable<float> restitution             = nullptr;
+  nullable_t<float> mass                  = nullopt_t;
+  nullable_t<float> friction              = nullopt_t;
+  nullable_t<float> restitution           = nullopt_t;
   bool ignoreParent                       = false;
   bool disableBidirectionalTransformation = false;
   unordered_map_t<string_t, float> nativeOptions;

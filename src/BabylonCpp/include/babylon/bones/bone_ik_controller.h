@@ -9,14 +9,14 @@
 namespace BABYLON {
 
 struct BoneIKControllerOptions {
-  AbstractMesh* targetMesh                = nullptr;
-  AbstractMesh* poleTargetMesh            = nullptr;
-  Bone* poleTargetBone                    = nullptr;
-  Nullable<Vector3> poleTargetLocalOffset = nullptr;
-  Nullable<float> poleAngle               = nullptr;
-  Nullable<Vector3> bendAxis              = nullptr;
-  Nullable<float> maxAngle                = nullptr;
-  Nullable<float> slerpAmount             = nullptr;
+  AbstractMesh* targetMesh                  = nullptr;
+  AbstractMesh* poleTargetMesh              = nullptr;
+  Bone* poleTargetBone                      = nullptr;
+  nullable_t<Vector3> poleTargetLocalOffset = nullopt_t;
+  nullable_t<float> poleAngle               = nullopt_t;
+  nullable_t<Vector3> bendAxis              = nullopt_t;
+  nullable_t<float> maxAngle                = nullopt_t;
+  nullable_t<float> slerpAmount             = nullopt_t;
 }; // end of struct BoneIKControllerOptions
 
 /**
@@ -34,7 +34,7 @@ public:
    * @param options defines options to set up the controller
    */
   BoneIKController(AbstractMesh* mesh, Bone* bone,
-                   const Nullable<BoneIKControllerOptions>& options);
+                   const nullable_t<BoneIKControllerOptions>& options);
   ~BoneIKController();
 
   /**

@@ -76,11 +76,11 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
       }
     }
     // Default options params
-    _options.mass = (_options.mass == nullptr) ? 0.f : *_options.mass;
+    _options.mass = (_options.mass == nullopt_t) ? 0.f : *_options.mass;
     _options.friction
-      = (_options.friction == nullptr) ? 0.2f : *_options.friction;
+      = (_options.friction == nullopt_t) ? 0.2f : *_options.friction;
     _options.restitution
-      = (_options.restitution == nullptr) ? 0.2f : *_options.restitution;
+      = (_options.restitution == nullopt_t) ? 0.2f : *_options.restitution;
 
     // If the mesh has a parent, don't initialize the physicsBody. Instead wait
     // for the parent to do that.
@@ -561,8 +561,8 @@ float PhysicsImpostor::getRadius() const
 }
 
 void PhysicsImpostor::syncBoneWithImpostor(
-  Bone* bone, AbstractMesh* boneMesh, const Nullable<Vector3>& jointPivot,
-  Nullable<float> distToJoint, const Nullable<Quaternion>& adjustRotation)
+  Bone* bone, AbstractMesh* boneMesh, const nullable_t<Vector3>& jointPivot,
+  nullable_t<float> distToJoint, const nullable_t<Quaternion>& adjustRotation)
 {
   auto& tempVec = PhysicsImpostor::_tmpVecs[0];
   auto mesh     = static_cast<AbstractMesh*>(object);
@@ -591,13 +591,13 @@ void PhysicsImpostor::syncBoneWithImpostor(
 
     bone->getDirectionToRef(tempVec, tempVec, boneMesh);
 
-    if (distToJoint.isNull()) {
+    if (!distToJoint.has_value()) {
       distToJoint = (*jointPivot).length();
     }
 
-    tempVec.x *= distToJoint;
-    tempVec.y *= distToJoint;
-    tempVec.z *= distToJoint;
+    tempVec.x *= *distToJoint;
+    tempVec.y *= *distToJoint;
+    tempVec.z *= *distToJoint;
   }
 
   if (bone->getParent()) {
@@ -613,9 +613,9 @@ void PhysicsImpostor::syncBoneWithImpostor(
 }
 
 void PhysicsImpostor::syncImpostorWithBone(
-  Bone* bone, AbstractMesh* boneMesh, const Nullable<Vector3>& jointPivot,
-  Nullable<float> distToJoint, const Nullable<Quaternion>& adjustRotation,
-  Nullable<Vector3>& boneAxis)
+  Bone* bone, AbstractMesh* boneMesh, const nullable_t<Vector3>& jointPivot,
+  nullable_t<float> distToJoint, const nullable_t<Quaternion>& adjustRotation,
+  nullable_t<Vector3>& boneAxis)
 {
   auto mesh = static_cast<AbstractMesh*>(object);
 
@@ -645,11 +645,11 @@ void PhysicsImpostor::syncImpostorWithBone(
   bone->getDirectionToRef(*boneAxis, boneDir, boneMesh);
   bone->getAbsolutePositionToRef(boneMesh, pos);
 
-  if ((distToJoint.isNull()) && jointPivot) {
+  if ((!distToJoint.has_value()) && jointPivot) {
     distToJoint = (*jointPivot).length();
   }
 
-  if (!distToJoint.isNull()) {
+  if (distToJoint.has_value()) {
     float _distToJoint = *distToJoint;
     pos.x += boneDir.x * _distToJoint;
     pos.y += boneDir.y * _distToJoint;

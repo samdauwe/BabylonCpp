@@ -2,7 +2,6 @@
 #define BABYLON_MATERIALS_MATERIAL_HELPER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -75,7 +74,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   static void PrepareDefinesForFrameBoundValues(
     Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
     unsigned int CLIPPLANE, unsigned int DEPTHPREPASS, unsigned int INSTANCES,
-    Nullable<bool> useClipPlane = nullptr);
+    nullable_t<bool> useClipPlane = nullptr);
 
   /**
    * @brief Prepares the defines used in the shader depending on the attributes

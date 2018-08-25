@@ -2,7 +2,6 @@
 #define BABYLON_ALPHA_STATE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -38,9 +37,9 @@ private:
   bool _isBlendEquationParametersDirty;
   bool _isBlendConstantsDirty;
   bool _alphaBlend;
-  array_t<Nullable<unsigned int>, 4> _blendFunctionParameters;
-  array_t<Nullable<unsigned int>, 2> _blendEquationParameters;
-  array_t<Nullable<float>, 4> _blendConstants;
+  array_t<nullable_t<unsigned int>, 4> _blendFunctionParameters;
+  array_t<nullable_t<unsigned int>, 2> _blendEquationParameters;
+  array_t<nullable_t<float>, 4> _blendConstants;
 
 }; // end of class _AlphaState
 

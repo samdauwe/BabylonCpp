@@ -4,7 +4,6 @@
 #include <babylon/babylon_global.h>
 
 #include <babylon/animations/animation_value.h>
-#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 
@@ -28,17 +27,17 @@ struct BABYLON_SHARED_EXPORT IAnimationKey {
   /**
    * The input tangent for the cubic hermite spline
    */
-  Nullable<AnimationValue> inTangent;
+  nullable_t<AnimationValue> inTangent;
 
   /**
    * The output tangent for the cubic hermite spline
    */
-  Nullable<AnimationValue> outTangent;
+  nullable_t<AnimationValue> outTangent;
 
   /**
    * The animation interpolation type
    */
-  Nullable<AnimationValue> interpolation;
+  nullable_t<AnimationValue> interpolation;
 
 }; // end of struct AnimationKey
 

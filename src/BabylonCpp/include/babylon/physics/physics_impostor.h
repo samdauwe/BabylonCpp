@@ -209,9 +209,9 @@ public:
    * of the bone.
    */
   void syncBoneWithImpostor(Bone* bone, AbstractMesh* boneMesh,
-                            const Nullable<Vector3>& jointPivot,
-                            Nullable<float> distToJoint,
-                            const Nullable<Quaternion>& adjustRotation);
+                            const nullable_t<Vector3>& jointPivot,
+                            nullable_t<float> distToJoint,
+                            const nullable_t<Quaternion>& adjustRotation);
 
   /**
    * @brief Sync impostor to a bone.
@@ -224,10 +224,10 @@ public:
    * @param boneAxis Optional vector3 axis the bone is aligned with
    */
   void syncImpostorWithBone(Bone* bone, AbstractMesh* boneMesh,
-                            const Nullable<Vector3>& jointPivot,
-                            Nullable<float> distToJoint,
-                            const Nullable<Quaternion>& adjustRotation,
-                            Nullable<Vector3>& boneAxis);
+                            const nullable_t<Vector3>& jointPivot,
+                            nullable_t<float> distToJoint,
+                            const nullable_t<Quaternion>& adjustRotation,
+                            nullable_t<Vector3>& boneAxis);
 
 private:
   static array_t<Vector3, 3> _tmpVecs;

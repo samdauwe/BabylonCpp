@@ -225,11 +225,11 @@ void PointerDragBehavior::releaseDrag()
   _moving                  = false;
 }
 
-Nullable<Vector3>
-PointerDragBehavior::_pickWithRayOnDragPlane(const Nullable<Ray>& ray)
+nullable_t<Vector3>
+PointerDragBehavior::_pickWithRayOnDragPlane(const nullable_t<Ray>& ray)
 {
   if (!ray) {
-    return nullptr;
+    return nullopt_t;
   }
 
   // Calculate angle between plane normal and ray
@@ -264,7 +264,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const Nullable<Ray>& ray)
       return _alternatePickedPoint;
     }
     else {
-      return nullptr;
+      return nullopt_t;
     }
   }
 
@@ -275,7 +275,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const Nullable<Ray>& ray)
     return (*pickResult).pickedPoint;
   }
   else {
-    return nullptr;
+    return nullopt_t;
   }
 }
 

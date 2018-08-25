@@ -163,7 +163,7 @@ float Tools::ToRadians(float angle)
 MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
                                       const Uint32Array& indices,
                                       size_t indexStart, size_t indexCount,
-                                      const Nullable<Vector2>& bias)
+                                      const nullable_t<Vector2>& bias)
 {
   Vector3 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max(),
@@ -195,8 +195,8 @@ MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
 }
 
 MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
-                               size_t count, const Nullable<Vector2>& bias,
-                               Nullable<unsigned int> stride)
+                               size_t count, const nullable_t<Vector2>& bias,
+                               nullable_t<unsigned int> stride)
 {
   Vector3 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max(),
@@ -232,8 +232,8 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
 }
 
 MinMaxVector2 Tools::ExtractMinAndMaxVector2(
-  const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder,
-  const Nullable<Vector2>& bias)
+  const ::std::function<nullable_t<Vector2>(std::size_t index)>& feeder,
+  const nullable_t<Vector2>& bias)
 {
   Vector2 minimum(numeric_limits_t<float>::max(),
                   numeric_limits_t<float>::max());

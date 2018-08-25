@@ -2,7 +2,6 @@
 #define BABYLON_POSTPROCESS_POST_PROCESS_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine_constants.h>
@@ -277,7 +276,7 @@ public:
   /**
    * Sets the setAlphaBlendConstants of the babylon engine
    */
-  Nullable<Color4> alphaConstants;
+  nullable_t<Color4> alphaConstants;
 
   /**
    * Animations to be used for the post processing

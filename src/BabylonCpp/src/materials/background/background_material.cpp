@@ -37,7 +37,7 @@ BackgroundMaterial::BackgroundMaterial(const string_t& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , useEquirectangularFOV{false}
     , _primaryColor{Color3::White()}
-    , __perceptualColor{nullptr}
+    , __perceptualColor{nullopt_t}
     , _primaryColorShadowLevel{0.f}
     , _primaryColorHighlightLevel{0.f}
     , _reflectionTexture{nullptr}
@@ -855,12 +855,12 @@ void BackgroundMaterial::setPrimaryColor(const Color3& value)
   _primaryColor = value;
 }
 
-Nullable<Color3>& BackgroundMaterial::_perceptualColor()
+nullable_t<Color3>& BackgroundMaterial::_perceptualColor()
 {
   return __perceptualColor;
 }
 
-void BackgroundMaterial::setPerceptualColor(const Nullable<Color3>& value)
+void BackgroundMaterial::setPerceptualColor(const nullable_t<Color3>& value)
 {
   __perceptualColor = value;
   _computePrimaryColorFromPerceptualColor();

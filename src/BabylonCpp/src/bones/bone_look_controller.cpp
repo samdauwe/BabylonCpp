@@ -17,7 +17,7 @@ array_t<Matrix, 5> BoneLookController::_tmpMats{
 
 BoneLookController::BoneLookController(
   AbstractMesh* iMesh, Bone* iBone, const Vector3& iTarget,
-  const Nullable<BoneLookControllerOptions>& iOptions)
+  const nullable_t<BoneLookControllerOptions>& iOptions)
     : target{iTarget}
     , mesh{iMesh}
     , bone{iBone}
@@ -43,71 +43,71 @@ BoneLookController::BoneLookController(
     , _fowardAxis{Vector3::Forward()}
 {
   if (iOptions) {
-    const auto& options = iOptions.value;
+    const auto& options = iOptions.value();
     if (options.adjustYaw) {
-      adjustYaw = options.adjustYaw.value;
+      adjustYaw = options.adjustYaw.value();
     }
 
     if (options.adjustPitch) {
-      adjustPitch = options.adjustPitch.value;
+      adjustPitch = options.adjustPitch.value();
     }
 
     if (options.adjustRoll) {
-      adjustRoll = options.adjustRoll.value;
+      adjustRoll = options.adjustRoll.value();
     }
 
-    if (options.maxYaw.hasValue()) {
-      maxYaw = options.maxYaw.value;
+    if (options.maxYaw.has_value()) {
+      maxYaw = options.maxYaw.value();
     }
     else {
       maxYaw = Math::PI;
     }
 
-    if (options.minYaw.hasValue()) {
-      minYaw = options.minYaw.value;
+    if (options.minYaw.has_value()) {
+      minYaw = options.minYaw.value();
     }
     else {
       minYaw = -Math::PI;
     }
 
-    if (options.maxPitch.hasValue()) {
-      maxPitch = options.maxPitch.value;
+    if (options.maxPitch.has_value()) {
+      maxPitch = options.maxPitch.value();
     }
     else {
       maxPitch = Math::PI;
     }
 
-    if (options.minPitch.hasValue()) {
-      minPitch = options.minPitch.value;
+    if (options.minPitch.has_value()) {
+      minPitch = options.minPitch.value();
     }
     else {
       minPitch = -Math::PI;
     }
 
-    if (options.slerpAmount.hasValue()) {
-      slerpAmount = options.slerpAmount.value;
+    if (options.slerpAmount.has_value()) {
+      slerpAmount = options.slerpAmount.value();
     }
 
-    if (options.upAxis.hasValue()) {
-      upAxis = options.upAxis.value;
+    if (options.upAxis.has_value()) {
+      upAxis = options.upAxis.value();
     }
 
-    if (options.upAxisSpace.hasValue()) {
-      upAxisSpace = options.upAxisSpace.value;
+    if (options.upAxisSpace.has_value()) {
+      upAxisSpace = options.upAxisSpace.value();
     }
 
-    if (options.yawAxis.hasValue() || options.pitchAxis.hasValue()) {
+    if (options.yawAxis.has_value() || options.pitchAxis.has_value()) {
 
       auto newYawAxis   = Axis::Y();
       auto newPitchAxis = Axis::X();
 
-      if (options.yawAxis.hasValue()) {
-        newYawAxis = options.yawAxis.value;
+      if (options.yawAxis.has_value()) {
+        newYawAxis = options.yawAxis.value();
         newYawAxis.normalize();
       }
 
-      if (options.pitchAxis.hasValue()) {
-        newPitchAxis = options.pitchAxis.value;
+      if (options.pitchAxis.has_value()) {
+        newPitchAxis = options.pitchAxis.value();
         newPitchAxis.normalize();
       }
 
@@ -428,7 +428,7 @@ void BoneLookController::update()
       bone->getRotationQuaternionToRef(_boneQuat, Space::WORLD, mesh);
     }
     if (_transformYawPitch) {
-      Matrix transformYawPitch = _transformYawPitch.value;
+      Matrix transformYawPitch = _transformYawPitch.value();
       transformYawPitch.multiplyToRef(_tmpMat1, _tmpMat1);
       _transformYawPitch = ::std::move(transformYawPitch);
     }
@@ -440,7 +440,7 @@ void BoneLookController::update()
   }
   else {
     if (_transformYawPitch) {
-      Matrix transformYawPitch = _transformYawPitch.value;
+      Matrix transformYawPitch = _transformYawPitch.value();
       transformYawPitch.multiplyToRef(_tmpMat1, _tmpMat1);
       _transformYawPitch = ::std::move(transformYawPitch);
     }

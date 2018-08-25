@@ -2,7 +2,6 @@
 #define BABYLON_TOOLS_TOOLS_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/tools/ivalue_gradient.h>
@@ -72,15 +71,15 @@ struct BABYLON_SHARED_EXPORT Tools {
   static MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,
                                         const Uint32Array& indices,
                                         size_t indexStart, size_t indexCount,
-                                        const Nullable<Vector2>& bias
-                                        = nullptr);
+                                        const nullable_t<Vector2>& bias
+                                        = nullopt_t);
   static MinMax ExtractMinAndMax(const Float32Array& positions, size_t start,
                                  size_t count,
-                                 const Nullable<Vector2>& bias = nullptr,
-                                 Nullable<unsigned int> stride = nullptr);
+                                 const nullable_t<Vector2>& bias = nullopt_t,
+                                 nullable_t<unsigned int> stride = nullopt_t);
   static MinMaxVector2 ExtractMinAndMaxVector2(
-    const ::std::function<Nullable<Vector2>(std::size_t index)>& feeder,
-    const Nullable<Vector2>& bias = nullptr);
+    const ::std::function<nullable_t<Vector2>(std::size_t index)>& feeder,
+    const nullable_t<Vector2>& bias = nullopt_t);
   static Image CreateCheckerboardImage(unsigned int size = 256);
   static Image CreateNoiseImage(unsigned int size = 8);
   // External files

@@ -53,12 +53,12 @@ protected:
   /**
    * @brief Sets wether or not the texture is blocking during loading.
    */
-  void set_isBlocking(bool value);
+  void set_isBlocking(bool value) override;
 
   /**
    * @brief Gets wether or not the texture is blocking during loading.
    */
-  bool get_isBlocking() const;
+  bool get_isBlocking() const override;
 
   /**
    * @brief Sets texture matrix rotation angle around Y axis in radians.

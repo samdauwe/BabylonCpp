@@ -15,9 +15,9 @@ array_t<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
                                    Matrix::Identity()}};
 
 Bone::Bone(const string_t& iName, Skeleton* skeleton, Bone* parentBone,
-           const Nullable<Matrix>& localMatrix,
-           const Nullable<Matrix>& restPose, const Nullable<Matrix>& baseMatrix,
-           Nullable<int> index)
+           const nullable_t<Matrix>& localMatrix,
+           const nullable_t<Matrix>& restPose,
+           const nullable_t<Matrix>& baseMatrix, nullable_t<int> index)
     : Node{iName, skeleton->getScene()}
     , length{-1}
     , _index{index}
@@ -189,12 +189,12 @@ void Bone::set_rotationQuaternion(const Quaternion& newRotation)
   setRotationQuaternion(newRotation);
 }
 
-Nullable<Vector3>& Bone::get_scaling()
+nullable_t<Vector3>& Bone::get_scaling()
 {
   return getScale();
 }
 
-void Bone::set_scaling(const Nullable<Vector3>& newScaling)
+void Bone::set_scaling(const nullable_t<Vector3>& newScaling)
 {
   setScale(*newScaling);
 }
@@ -254,7 +254,7 @@ void Bone::updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix,
   }
 }
 
-void Bone::_updateDifferenceMatrix(const Nullable<Matrix>& rootMatrix,
+void Bone::_updateDifferenceMatrix(const nullable_t<Matrix>& rootMatrix,
                                    bool updateChildren)
 {
   auto _rootMatrix = rootMatrix ? *rootMatrix : _baseMatrix;
@@ -516,7 +516,7 @@ void Bone::setScale(const Vector3& scale)
   _markAsDirtyAndCompose();
 }
 
-Nullable<Vector3>& Bone::getScale()
+nullable_t<Vector3>& Bone::getScale()
 {
   _decompose();
   return _localScaling;

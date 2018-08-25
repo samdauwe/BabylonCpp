@@ -34,7 +34,7 @@ WindowsMotionController::WindowsMotionController(
     , onTouchpadValuesChangedObservable{this,
         &WindowsMotionController::get_onTouchpadValuesChangedObservable}
     , trackpad{0.f,0.f}
-    , _loadedMeshInfo{nullptr}
+    , _loadedMeshInfo{nullopt_t}
     ,_mappingButtons{"thumbstick", "trigger", "grip", "menu", "trackpad"}
     , _mappingButtonMeshNames{              //
         {"trigger", "SELECT"},              //

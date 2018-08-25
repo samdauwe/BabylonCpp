@@ -2,7 +2,6 @@
 #define BABYLON_LIGHTS_DIRECTIONAL_LIGHT_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadow_light.h>
 

@@ -312,7 +312,7 @@ Vector3& TransformNode::getAbsolutePosition()
 }
 
 TransformNode&
-TransformNode::setAbsolutePosition(const Nullable<Vector3>& absolutePosition)
+TransformNode::setAbsolutePosition(const nullable_t<Vector3>& absolutePosition)
 {
   if (!absolutePosition) {
     return *this;

@@ -2,7 +2,6 @@
 #define BABYLON_INTERFACES_IBROWSER_GAMEPAD_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/gamepad/gamepad_pose.h>
 
 namespace BABYLON {
@@ -23,7 +22,7 @@ public:
   int index;
   Float32Array axes;
   vector_t<IGamepadButton> buttons;
-  Nullable<GamepadPose> pose;
+  nullable_t<GamepadPose> pose;
 
 }; // end of class IBrowserGamepad
 

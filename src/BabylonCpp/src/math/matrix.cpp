@@ -479,8 +479,9 @@ bool Matrix::equals(const Matrix& other) const
           && stl_util::almost_equal(m[15], other.m[15]));
 }
 
-bool Matrix::decompose(Nullable<Vector3> scale, Nullable<Quaternion> rotation,
-                       Nullable<Vector3> translation) const
+bool Matrix::decompose(nullable_t<Vector3> scale,
+                       nullable_t<Quaternion> rotation,
+                       nullable_t<Vector3> translation) const
 {
   if (translation) {
     translation = Vector3{
@@ -530,10 +531,10 @@ bool Matrix::decompose(Nullable<Vector3> scale, Nullable<Quaternion> rotation,
   return true;
 }
 
-Nullable<Vector4> Matrix::getRow(unsigned int index) const
+nullable_t<Vector4> Matrix::getRow(unsigned int index) const
 {
   if (index > 3) {
-    return nullptr;
+    return nullopt_t;
   }
 
   const unsigned int i = index * 4;

@@ -12,8 +12,8 @@ class BABYLON_SHARED_EXPORT MultiRenderTarget : public RenderTargetTexture {
 public:
   MultiRenderTarget(const string_t& name, Size size, std::size_t count,
                     Scene* scene,
-                    const Nullable<IMultiRenderTargetOptions>& options
-                    = nullptr);
+                    const nullable_t<IMultiRenderTargetOptions>& options
+                    = nullopt_t);
   ~MultiRenderTarget() override;
 
   bool isSupported() const;

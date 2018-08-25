@@ -12,7 +12,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-class Icosphere;
+struct Icosphere;
 class Terrain;
 
 struct PlanetCorner {

@@ -2,7 +2,6 @@
 #define BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/lights/shadows/ishadow_generator.h>
 #include <babylon/math/isize.h>
 #include <babylon/math/matrix.h>
@@ -693,7 +692,7 @@ private:
   float _blurScale;
   float _blurKernel;
   bool _useKernelBlur;
-  Nullable<float> _depthScale;
+  nullable_t<float> _depthScale;
   unsigned int _filter;
   unsigned int _filteringQuality;
   float _contactHardeningLightSizeUVRatio;

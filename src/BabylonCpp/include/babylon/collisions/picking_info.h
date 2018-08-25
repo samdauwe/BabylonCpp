@@ -5,8 +5,6 @@
 #include <babylon/culling/ray.h>
 #include <babylon/math/vector3.h>
 
-#include <babylon/core/nullable.h>
-
 namespace BABYLON {
 
 /**
@@ -27,14 +25,14 @@ public:
    * calculate the normal instead of the normal map
    * @returns The normal corrispodning to the face the pick collided with
    */
-  Nullable<Vector3> getNormal(bool useWorldCoordinates = false,
-                              bool useVerticesNormals  = true);
+  nullable_t<Vector3> getNormal(bool useWorldCoordinates = false,
+                                bool useVerticesNormals  = true);
 
   /**
    * @brief Gets the texture coordinates of where the pick occured.
    * @returns the vector containing the coordnates of the texture
    */
-  Nullable<Vector2> getTextureCoordinates();
+  nullable_t<Vector2> getTextureCoordinates();
 
 public:
   /**
@@ -50,7 +48,7 @@ public:
   /**
    * The location of pick collision
    */
-  Nullable<Vector3> pickedPoint;
+  nullable_t<Vector3> pickedPoint;
 
   /**
    * The mesh corrisponding the the pick collision
@@ -93,7 +91,7 @@ public:
   /**
    * The ray that was used to perform the picking.
    */
-  Nullable<Ray> ray;
+  nullable_t<Ray> ray;
 
 }; // end of class PickingInfo
 

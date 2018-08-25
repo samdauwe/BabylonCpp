@@ -58,8 +58,8 @@ private:
 public:
   Matrix matrix;
   Vector3 position;
-  Nullable<Vector3> rotation;
-  Nullable<Quaternion> rotationQuaternion;
+  nullable_t<Vector3> rotation;
+  nullable_t<Quaternion> rotationQuaternion;
   Vector3 scaling;
 
 private:

@@ -22,7 +22,7 @@ namespace BABYLON {
 
 SolidParticleSystem::SolidParticleSystem(
   const string_t& iName, Scene* scene,
-  const Nullable<SolidParticleSystemOptions>& options)
+  const nullable_t<SolidParticleSystemOptions>& options)
     : nbParticles{0}
     , billboard{false}
     , recomputeNormals{true}
@@ -308,7 +308,7 @@ void SolidParticleSystem::_resetCopy()
   _copy->uvs.y              = 0.f;
   _copy->uvs.z              = 1.f;
   _copy->uvs.w              = 1.f;
-  _copy->color              = nullptr;
+  _copy->color              = nullopt_t;
   _copy->translateFromPivot = false;
 }
 
@@ -596,7 +596,7 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
   particle->pivot.y            = 0.f;
   particle->pivot.z            = 0.f;
   particle->translateFromPivot = false;
-  particle->parentId           = nullptr;
+  particle->parentId           = nullopt_t;
 }
 
 SolidParticleSystem& SolidParticleSystem::rebuildMesh()
@@ -738,7 +738,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     if (_particle->isVisible) {
       _particle->_stillInvisible = false; // un-mark permanent invisibility
 
-      _particleHasParent = (_particle->parentId != nullptr);
+      _particleHasParent = (_particle->parentId != nullopt_t);
 
       _scaledPivot.x = _particle->pivot.x * _particle->scaling.x;
       _scaledPivot.y = _particle->pivot.y * _particle->scaling.y;
@@ -763,7 +763,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       }
 
       if (_particleHasParent && _particle->parentId < particles.size()) {
-        _parent    = particles[_particle->parentId].get();
+        _parent    = particles[*_particle->parentId].get();
         _rotated.x = _particle->position.x * _parent->_rotationMatrix[0]
                      + _particle->position.y * _parent->_rotationMatrix[3]
                      + _particle->position.z * _parent->_rotationMatrix[6];

@@ -54,12 +54,12 @@ void Gamepad::setOnrightstickchanged(
   _onrightstickchanged = callback;
 }
 
-Nullable<StickValues>& Gamepad::get_leftStick()
+nullable_t<StickValues>& Gamepad::get_leftStick()
 {
   return _leftStick;
 }
 
-void Gamepad::set_leftStick(const Nullable<StickValues>& newValues)
+void Gamepad::set_leftStick(const nullable_t<StickValues>& newValues)
 {
   if (_onleftstickchanged
       && (!stl_util::almost_equal((*_leftStick).x, (*newValues).x)
@@ -69,12 +69,12 @@ void Gamepad::set_leftStick(const Nullable<StickValues>& newValues)
   _leftStick = newValues;
 }
 
-Nullable<StickValues>& Gamepad::get_rightStick()
+nullable_t<StickValues>& Gamepad::get_rightStick()
 {
   return _rightStick;
 }
 
-void Gamepad::set_rightStick(const Nullable<StickValues>& newValues)
+void Gamepad::set_rightStick(const nullable_t<StickValues>& newValues)
 {
   if (_onrightstickchanged
       && (!stl_util::almost_equal((*_rightStick).x, (*newValues).x)

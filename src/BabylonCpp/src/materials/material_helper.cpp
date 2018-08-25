@@ -120,11 +120,11 @@ void MaterialHelper::PrepareDefinesForMisc(
 void MaterialHelper::PrepareDefinesForFrameBoundValues(
   Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
   unsigned int CLIPPLANE, unsigned int DEPTHPREPASS, unsigned int INSTANCES,
-  Nullable<bool> useClipPlane)
+  nullable_t<bool> useClipPlane)
 {
   bool changed = false;
 
-  if (useClipPlane == nullptr) {
+  if (useClipPlane == nullopt_t) {
     useClipPlane = (scene->clipPlane() != nullptr);
   }
 

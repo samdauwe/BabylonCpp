@@ -8,7 +8,7 @@ namespace BABYLON {
 
 MultiRenderTarget::MultiRenderTarget(
   const string_t& name, Size size, std::size_t count, Scene* scene,
-  const Nullable<IMultiRenderTargetOptions>& options)
+  const nullable_t<IMultiRenderTargetOptions>& options)
     : RenderTargetTexture{name, size, scene,
                           options && (*options).generateMipMaps ?
                             *(*options).generateMipMaps :
@@ -56,11 +56,11 @@ MultiRenderTarget::MultiRenderTarget(
   }
 
   const auto generateDepthBuffer
-    = !options || (*options).generateDepthBuffer == nullptr ?
+    = !options || (*options).generateDepthBuffer == nullopt_t ?
         true :
         *(*options).generateDepthBuffer;
   const auto generateStencilBuffer
-    = !options || (*options).generateStencilBuffer == nullptr ?
+    = !options || (*options).generateStencilBuffer == nullopt_t ?
         false :
         *(*options).generateStencilBuffer;
 

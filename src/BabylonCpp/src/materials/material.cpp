@@ -345,11 +345,11 @@ void Material::markDirty()
 }
 
 bool Material::_preBind(Effect* effect,
-                        Nullable<unsigned int> overrideOrientation)
+                        nullable_t<unsigned int> overrideOrientation)
 {
   auto engine = _scene->getEngine();
 
-  auto orientation = (overrideOrientation.isNull()) ?
+  auto orientation = (!overrideOrientation.has_value()) ?
                        static_cast<unsigned>(sideOrientation) :
                        *overrideOrientation;
   const bool reverse = orientation == Material::ClockWiseSideOrientation();
@@ -466,7 +466,7 @@ vector_t<AbstractMesh*> Material::getBindedMeshes()
 void Material::forceCompilation(
   AbstractMesh* mesh,
   const ::std::function<void(Material* material)>& onCompiled,
-  Nullable<bool> clipPlane)
+  nullable_t<bool> clipPlane)
 {
   auto subMesh = ::std::make_unique<BaseSubMesh>();
   auto scene   = getScene();
@@ -507,7 +507,7 @@ void Material::forceCompilation(
       }
     }
 
-    if (!clipPlane.isNull() && (*clipPlane)) {
+    if (clipPlane.has_value() && (*clipPlane)) {
       scene->setClipPlane(clipPlaneState);
     }
   };

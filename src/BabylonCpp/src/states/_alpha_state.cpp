@@ -96,18 +96,18 @@ void _AlphaState::setAlphaEquationParameters(unsigned int rgb,
 void _AlphaState::reset()
 {
   _alphaBlend                 = false;
-  _blendFunctionParameters[0] = nullptr;
-  _blendFunctionParameters[1] = nullptr;
-  _blendFunctionParameters[2] = nullptr;
-  _blendFunctionParameters[3] = nullptr;
+  _blendFunctionParameters[0] = nullopt_t;
+  _blendFunctionParameters[1] = nullopt_t;
+  _blendFunctionParameters[2] = nullopt_t;
+  _blendFunctionParameters[3] = nullopt_t;
 
-  _blendEquationParameters[0] = nullptr;
-  _blendEquationParameters[1] = nullptr;
+  _blendEquationParameters[0] = nullopt_t;
+  _blendEquationParameters[1] = nullopt_t;
 
-  _blendConstants[0] = nullptr;
-  _blendConstants[1] = nullptr;
-  _blendConstants[2] = nullptr;
-  _blendConstants[3] = nullptr;
+  _blendConstants[0] = nullopt_t;
+  _blendConstants[1] = nullopt_t;
+  _blendConstants[2] = nullopt_t;
+  _blendConstants[3] = nullopt_t;
 
   _isAlphaBlendDirty              = true;
   _isBlendFunctionParametersDirty = false;

@@ -8,8 +8,6 @@
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>
 
-#include <babylon/core/nullable.h>
-
 namespace BABYLON {
 
 /**
@@ -39,7 +37,7 @@ public:
   SolidParticle(unsigned int particleIndex, unsigned int positionIndex,
                 unsigned int indiceIndex, ModelShape* model, int shapeId,
                 unsigned int idxInShape, SolidParticleSystem* sps,
-                const Nullable<BoundingInfo>& modelBoundingInfo = nullptr);
+                const nullable_t<BoundingInfo>& modelBoundingInfo = nullopt_t);
   ~SolidParticle();
 
   /**
@@ -61,7 +59,7 @@ public:
   /**
    * The color of the particle
    */
-  Nullable<Color4> color;
+  nullable_t<Color4> color;
   /**
    * The world space position of the particle.
    */
@@ -149,7 +147,7 @@ public:
    * Parent particle Id, if any.
    * Default null.
    */
-  Nullable<unsigned int> parentId;
+  nullable_t<unsigned int> parentId;
   /**
    * Internal global position in the SPS.
    */

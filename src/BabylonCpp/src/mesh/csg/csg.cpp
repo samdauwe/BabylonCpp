@@ -31,7 +31,7 @@ unique_ptr_t<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
   Matrix matrix;
   Vector3 meshPosition;
   Vector3 meshRotation;
-  Nullable<Quaternion> meshRotationQuaternion = nullptr;
+  nullable_t<Quaternion> meshRotationQuaternion = nullopt_t;
   Vector3 meshScaling;
 
   mesh->computeWorldMatrix(true);

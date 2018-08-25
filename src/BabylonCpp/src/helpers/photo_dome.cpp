@@ -29,7 +29,7 @@ PhotoDome::PhotoDome(string_t iName, const string_t& urlOfPhoto,
                       static_cast<unsigned>(scene->activeCamera->maxZ * 0.48f) :
                       1000u);
 
-  if (options.useDirectMapping.isNull()) {
+  if (!options.useDirectMapping.has_value()) {
     _useDirectMapping = true;
   }
   else {

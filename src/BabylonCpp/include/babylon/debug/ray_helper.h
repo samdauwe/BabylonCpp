@@ -19,7 +19,7 @@ public:
   RayHelper(const Ray& ray);
   ~RayHelper();
 
-  void show(Scene* scene, const Nullable<Color3>& color);
+  void show(Scene* scene, const nullable_t<Color3>& color);
   void hide();
   void attachToMesh(AbstractMesh* mesh,
                     const Vector3& meshSpaceDirection = Vector3::Zero(),

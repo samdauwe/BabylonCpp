@@ -2,7 +2,6 @@
 #define BABYLON_CULLING_RAY_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
@@ -37,7 +36,7 @@ public:
   unique_ptr_t<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
                                                     const Vector3& vertex1,
                                                     const Vector3& vertex2);
-  Nullable<float> intersectsPlane(const Plane& plane);
+  nullable_t<float> intersectsPlane(const Plane& plane);
   PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck = false);
   vector_t<PickingInfo> intersectsMeshes(vector_t<AbstractMesh*>& meshes,
                                          bool fastCheck,

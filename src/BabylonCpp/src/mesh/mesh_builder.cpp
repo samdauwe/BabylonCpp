@@ -869,15 +869,15 @@ MeshPtr MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
 
     bool v1Out, v2Out, v3Out;
     unsigned int total;
-    Nullable<PositionNormalVertex> nV1, nV2, nV3, nV4;
+    nullable_t<PositionNormalVertex> nV1, nV2, nV3, nV4;
     float d1, d2, d3;
     for (std::size_t index = 0; index < vertices.size(); index += 3) {
       total = 0;
 
-      nV1 = nullptr;
-      nV2 = nullptr;
-      nV3 = nullptr;
-      nV4 = nullptr;
+      nV1 = nullopt_t;
+      nV2 = nullopt_t;
+      nV3 = nullopt_t;
+      nV4 = nullopt_t;
 
       d1 = Vector3::Dot(vertices[index].position, axis) - clipSize;
       d2 = Vector3::Dot(vertices[index + 1].position, axis) - clipSize;

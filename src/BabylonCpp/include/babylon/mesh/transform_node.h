@@ -130,7 +130,8 @@ public:
    * Array(3).
    * @returns the TransformNode.
    */
-  TransformNode& setAbsolutePosition(const Nullable<Vector3>& absolutePosition);
+  TransformNode&
+  setAbsolutePosition(const nullable_t<Vector3>& absolutePosition);
 
   /**
    * @brief Sets the mesh position in its local space.

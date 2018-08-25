@@ -112,7 +112,7 @@ void AutoRotationBehavior::attach(const ArcRotateCameraPtr& camera)
     = camera->onAfterCheckInputsObservable.add([this](Camera*, EventState&) {
         auto now = Time::highresTimepointNow();
         auto dt  = 0.f;
-        if (!_lastFrameTime.isNull()) {
+        if (_lastFrameTime.has_value()) {
           dt = Time::fpTimeDiff<float, ::std::milli>(now, *_lastFrameTime);
         }
         _lastFrameTime = now;

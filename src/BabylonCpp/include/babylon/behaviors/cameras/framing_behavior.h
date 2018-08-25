@@ -5,7 +5,6 @@
 
 #include <babylon/animations/easing/exponential_ease.h>
 #include <babylon/behaviors/behavior.h>
-#include <babylon/core/nullable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
@@ -317,7 +316,7 @@ private:
   Observer<AbstractMesh>::Ptr _onMeshTargetChangedObserver;
   ArcRotateCameraPtr _attachedCamera;
   bool _isPointerDown;
-  Nullable<high_res_time_point_t> _lastFrameTime;
+  nullable_t<high_res_time_point_t> _lastFrameTime;
   high_res_time_point_t _lastInteractionTime;
 
   // Framing control

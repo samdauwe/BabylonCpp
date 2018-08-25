@@ -8,7 +8,7 @@ PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
     : PointerInfoBase(_type, event)
     , localPosition{Vector2(localX, localY)}
     , skipOnPointerObservable{false}
-    , ray{nullptr}
+    , ray{nullopt_t}
 {
 }
 
@@ -18,7 +18,7 @@ PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
     : PointerInfoBase(_type, event)
     , localPosition{Vector2(localX, localY)}
     , skipOnPointerObservable{false}
-    , ray{nullptr}
+    , ray{nullopt_t}
 {
 }
 

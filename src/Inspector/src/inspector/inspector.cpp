@@ -143,8 +143,7 @@ void Inspector::_fileMenu()
 
 void Inspector::_addActions()
 {
-  _actionStore->addAction("exit", ICON_FA_POWER_OFF, "Exit", "Alt+F4",
-                          [this]() {});
+  _actionStore->addAction("exit", ICON_FA_POWER_OFF, "Exit", "Alt+F4", []() {});
 }
 
 void Inspector::_doMenuItem(InspectorAction& a, bool enabled)

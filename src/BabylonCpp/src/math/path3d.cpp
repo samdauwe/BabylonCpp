@@ -11,7 +11,7 @@ Path3D::Path3D()
 }
 
 Path3D::Path3D(const vector_t<Vector3>& iPath,
-               const Nullable<Vector3>& firstNormal, bool raw)
+               const nullable_t<Vector3>& firstNormal, bool raw)
     : path{iPath}, _raw{raw}
 {
   for (auto& vector : iPath) {
@@ -154,7 +154,7 @@ Float32Array& Path3D::getDistances()
 }
 
 Path3D& Path3D::update(const vector_t<Vector3>& path,
-                       const Nullable<Vector3>& firstNormal)
+                       const nullable_t<Vector3>& firstNormal)
 {
   for (unsigned int p = 0; p < path.size(); ++p) {
     _curve[p].x = path[p].x;
@@ -165,7 +165,7 @@ Path3D& Path3D::update(const vector_t<Vector3>& path,
   return *this;
 }
 
-void Path3D::_compute(const Nullable<Vector3>& firstNormal)
+void Path3D::_compute(const nullable_t<Vector3>& firstNormal)
 {
   const auto l = _curve.size();
 
@@ -254,7 +254,7 @@ Vector3 Path3D::_getLastNonNullVector(unsigned int index)
 }
 
 Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
-                              const Nullable<Vector3>& va)
+                              const nullable_t<Vector3>& va)
 {
   Vector3 normal0;
   float tgl = vt.length();
@@ -262,7 +262,7 @@ Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
     tgl = 1.f;
   }
 
-  if (va == nullptr) {
+  if (va == nullopt_t) {
     Vector3 point;
     if (!Scalar::WithinEpsilon(
           ::std::abs(vt.y) / tgl, 1.f,

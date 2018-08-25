@@ -2,7 +2,6 @@
 #define BABYLON_INTERFACES_IGL_RENDERING_CONTEXT_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 
 namespace BABYLON {
 namespace GL {
@@ -638,8 +637,8 @@ public:
   bool isReady;
   bool generateMipMaps;
   bool noMipmap;
-  Nullable<unsigned int> type;
-  Nullable<unsigned int> format;
+  nullable_t<unsigned int> type;
+  nullable_t<unsigned int> format;
   unsigned int _cachedWrapU;
   unsigned int _cachedWrapV;
   unsigned int _cachedCoordinatesMode;

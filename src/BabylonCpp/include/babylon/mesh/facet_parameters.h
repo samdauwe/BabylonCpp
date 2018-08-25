@@ -32,9 +32,9 @@ struct BABYLON_SHARED_EXPORT FacetParameters {
   SubdivisionsPerAxis subDiv;
   // Partitioning ratio / bounding box, required for facetPartitioning
   // computation
-  Nullable<float> ratio;
+  nullable_t<float> ratio;
   // Bounding box size data, required for facetPartitioning computation
-  Nullable<Vector3> bbSize;
+  nullable_t<Vector3> bbSize;
   // Bounding info, required for facetPartitioning computation
   BoundingInfo bInfo;
   // Whether or not to use a right-handed coordinate system
@@ -42,7 +42,7 @@ struct BABYLON_SHARED_EXPORT FacetParameters {
   // Whether or not to enable the facet depth sort computation
   bool depthSort;
   // Vector3 to compute the facet depth from this location
-  Nullable<Vector3> distanceTo;
+  nullable_t<Vector3> distanceTo;
   // Array of depthSortedFacets to store the facet distances from the reference
   // location
   vector_t<DepthSortedFacet> depthSortedFacets;

@@ -15,7 +15,7 @@ array_t<Matrix, 2> BoneIKController::_tmpMats{
 
 BoneIKController::BoneIKController(
   AbstractMesh* iMesh, Bone* bone,
-  const Nullable<BoneIKControllerOptions>& iOptions)
+  const nullable_t<BoneIKControllerOptions>& iOptions)
     : targetMesh{nullptr}
     , poleTargetMesh{nullptr}
     , targetPosition{Vector3::Zero()}

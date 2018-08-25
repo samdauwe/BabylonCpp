@@ -31,7 +31,7 @@ RayHelper::~RayHelper()
 {
 }
 
-void RayHelper::show(Scene* scene, const Nullable<Color3>& color)
+void RayHelper::show(Scene* scene, const nullable_t<Color3>& color)
 {
   if (!_renderFunction && ray) {
     _renderFunction = [this](Scene*, EventState&) { _render(); };

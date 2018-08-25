@@ -263,8 +263,8 @@ public:
   /** Getters / Setters **/
   const Color3& primaryColor() const;
   void setPrimaryColor(const Color3& value);
-  Nullable<Color3>& _perceptualColor();
-  void setPerceptualColor(const Nullable<Color3>& value);
+  nullable_t<Color3>& _perceptualColor();
+  void setPerceptualColor(const nullable_t<Color3>& value);
   float primaryColorShadowLevel() const;
   void setPrimaryColorShadowLevel(float value);
   float primaryColorHighlightLevel() const;
@@ -344,7 +344,7 @@ protected:
    * color grading and color curves as they are considered post effect and not
    * directly part of lighting setup.)
    */
-  Nullable<Color3> __perceptualColor;
+  nullable_t<Color3> __perceptualColor;
 
   /**
    * Defines the level of the shadows (dark area of the reflection map) in order

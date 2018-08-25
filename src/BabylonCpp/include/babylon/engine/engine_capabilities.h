@@ -49,7 +49,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   /** Defines if standard derivates (dx/dy) are supported */
   bool standardDerivatives;
   /** Defines if s3tc texture compression is supported */
-  Nullable<GL::WEBGL_compressed_texture_s3tc> s3tc;
+  nullable_t<GL::WEBGL_compressed_texture_s3tc> s3tc;
   /** Defines if pvrtc texture compression is supported */
   GL::any pvrtc; // WEBGL_compressed_texture_pvrtc;
   /** Defines if etc1 texture compression is supported */
@@ -65,7 +65,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   /**
    * Gets the webgl extension for anisotropic filtering (null if not supported)
    */
-  Nullable<GL::EXT_texture_filter_anisotropic>
+  nullable_t<GL::EXT_texture_filter_anisotropic>
     textureAnisotropicFilterExtension;
   /** Gets the maximum level of anisotropy supported */
   unsigned int maxAnisotropy;

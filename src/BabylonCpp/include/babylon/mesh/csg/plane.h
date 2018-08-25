@@ -2,7 +2,6 @@
 #define BABYLON_MESH_CSG_PLANE_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -50,8 +49,8 @@ public:
                     vector_t<Polygon>& coplanarBack, vector_t<Polygon>& front,
                     vector_t<Polygon>& back);
 
-  static Nullable<Plane> FromPoints(const Vector3& a, const Vector3& b,
-                                    const Vector3& c);
+  static nullable_t<Plane> FromPoints(const Vector3& a, const Vector3& b,
+                                      const Vector3& c);
 
 public:
   Vector3 normal;

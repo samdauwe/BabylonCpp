@@ -68,8 +68,8 @@ protected:
     = 0;
 
 private:
-  void _setButtonValue(Nullable<ExtendedGamepadButton> newState,
-                       const Nullable<ExtendedGamepadButton>& currentState,
+  void _setButtonValue(nullable_t<ExtendedGamepadButton> newState,
+                       const nullable_t<ExtendedGamepadButton>& currentState,
                        unsigned int buttonIndex);
   GamepadButtonChanges&
   _checkChanges(const ExtendedGamepadButton& newState,

@@ -584,7 +584,7 @@ void Engine::restoreGLState()
 
 int Engine::getDepthFunction() const
 {
-  return _depthCullingState->depthFunc();
+  return *_depthCullingState->depthFunc();
 }
 
 void Engine::setDepthFunction(int depthFunc)
@@ -3083,8 +3083,8 @@ Engine::_createDepthStencilTexture(const Variant<int, ISize>& size,
   _bindTextureDirectly(GL::TEXTURE_2D, internalTexture.get(), true);
 
   _setupDepthStencilTexture(
-    internalTexture.get(), size, internalOptions.generateStencil,
-    internalOptions.bilinearFiltering, internalOptions.comparisonFunction);
+    internalTexture.get(), size, *internalOptions.generateStencil,
+    *internalOptions.bilinearFiltering, *internalOptions.comparisonFunction);
 
   if (webGLVersion() > 1.f) {
     if (internalOptions.generateStencil) {
@@ -3140,9 +3140,9 @@ unique_ptr_t<InternalTexture> Engine::_createDepthStencilCubeTexture(
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture.get(), true);
 
   _setupDepthStencilTexture(internalTexture.get(), ToVariant<int, ISize>(size),
-                            internalOptions.generateStencil,
-                            internalOptions.bilinearFiltering,
-                            internalOptions.comparisonFunction);
+                            *internalOptions.generateStencil,
+                            *internalOptions.bilinearFiltering,
+                            *internalOptions.comparisonFunction);
 
   // Create the depth/stencil buffer
   for (unsigned int face = 0; face < 6; ++face) {
@@ -3324,7 +3324,7 @@ Engine::createMultipleRenderTarget(ISize size,
   vector_t<GL::GLenum> attachments;
 
   auto depthStencilBuffer = _setupFramebufferDepthAttachments(
-    generateStencilBuffer, generateDepthBuffer, width, height);
+    *generateStencilBuffer, *generateDepthBuffer, width, height);
 
   for (unsigned int i = 0; i < textureCount; ++i) {
     const auto iStr = ::std::to_string(i);
@@ -3344,7 +3344,7 @@ Engine::createMultipleRenderTarget(ISize size,
       samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
     }
 
-    auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
+    auto filters = GetSamplingParameters(samplingMode, *generateMipMaps);
     if (type == EngineConstants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
       type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
       BABYLON_LOG_WARN("Engine",
@@ -3390,11 +3390,11 @@ Engine::createMultipleRenderTarget(ISize size,
     texture->height                 = height;
     texture->isReady                = true;
     texture->samples                = 1;
-    texture->generateMipMaps        = generateMipMaps;
+    texture->generateMipMaps        = *generateMipMaps;
     texture->samplingMode           = samplingMode;
     texture->type                   = type;
-    texture->_generateDepthBuffer   = generateDepthBuffer;
-    texture->_generateStencilBuffer = generateStencilBuffer;
+    texture->_generateDepthBuffer   = *generateDepthBuffer;
+    texture->_generateStencilBuffer = *generateStencilBuffer;
     texture->_attachments           = attachments;
 
     _internalTexturesCache.emplace_back(texture.get());
@@ -3436,10 +3436,10 @@ Engine::createMultipleRenderTarget(ISize size,
     depthTexture->height                 = height;
     depthTexture->isReady                = true;
     depthTexture->samples                = 1;
-    depthTexture->generateMipMaps        = generateMipMaps;
+    depthTexture->generateMipMaps        = *generateMipMaps;
     depthTexture->samplingMode           = GL::NEAREST;
-    depthTexture->_generateDepthBuffer   = generateDepthBuffer;
-    depthTexture->_generateStencilBuffer = generateStencilBuffer;
+    depthTexture->_generateDepthBuffer   = *generateDepthBuffer;
+    depthTexture->_generateStencilBuffer = *generateStencilBuffer;
 
     textures.emplace_back(depthTexture.get());
     _internalTexturesCache.emplace_back(::std::move(depthTexture));

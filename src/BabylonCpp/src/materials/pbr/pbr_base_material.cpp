@@ -86,7 +86,7 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _forceAlphaTest{false}
     , _useAlphaFresnel{false}
     , _useLinearAlphaFresnel{false}
-    , _transparencyMode{nullptr}
+    , _transparencyMode{nullopt_t}
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
@@ -173,12 +173,12 @@ void PBRBaseMaterial::set_useLogarithmicDepth(bool value)
     = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
 }
 
-Nullable<unsigned int> PBRBaseMaterial::transparencyMode() const
+nullable_t<unsigned int> PBRBaseMaterial::transparencyMode() const
 {
   return _transparencyMode;
 }
 
-void PBRBaseMaterial::setTransparencyMode(const Nullable<unsigned int>& value)
+void PBRBaseMaterial::setTransparencyMode(const nullable_t<unsigned int>& value)
 {
   if (_transparencyMode == value) {
     return;
@@ -227,7 +227,7 @@ bool PBRBaseMaterial::needAlphaTesting() const
   }
 
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
-         && (_transparencyMode == nullptr
+         && (_transparencyMode == nullopt_t
              || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
 }
 
@@ -395,7 +395,7 @@ Effect* PBRBaseMaterial::_prepareEffect(
   AbstractMesh* mesh, PBRMaterialDefines& defines,
   const ::std::function<void(Effect* effect)> onCompiled,
   ::std::function<void(Effect* effect, const string_t& errors)> onError,
-  const Nullable<bool>& useInstances, const Nullable<bool>& useClipPlane)
+  const nullable_t<bool>& useInstances, const nullable_t<bool>& useClipPlane)
 {
   _prepareDefines(mesh, defines, useInstances, useClipPlane);
   if (!defines.isDirty()) {
@@ -606,8 +606,8 @@ Effect* PBRBaseMaterial::_prepareEffect(
 
 void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
                                       PBRMaterialDefines& defines,
-                                      const Nullable<bool>& useInstances,
-                                      const Nullable<bool>& useClipPlane)
+                                      const nullable_t<bool>& useInstances,
+                                      const nullable_t<bool>& useClipPlane)
 {
   auto scene  = getScene();
   auto engine = scene->getEngine();

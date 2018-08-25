@@ -2,7 +2,6 @@
 #define BABYLON_LIGHTS_SPOT_LIGHT_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
@@ -274,7 +273,7 @@ private:
   float _lightAngleScale;
   float _lightAngleOffset;
 
-  Nullable<float> _shadowAngleScale;
+  nullable_t<float> _shadowAngleScale;
   Matrix _projectionTextureMatrix;
   BaseTexturePtr _projectionTexture;
   bool _projectionTextureViewLightDirty;

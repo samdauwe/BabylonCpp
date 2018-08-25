@@ -51,7 +51,7 @@ public:
   void detach() override;
 
 private:
-  Nullable<Vector3> _pickWithRayOnDragPlane(const Nullable<Ray>& ray);
+  nullable_t<Vector3> _pickWithRayOnDragPlane(const nullable_t<Ray>& ray);
 
   /**
    * @brief Position the drag plane based on the attached mesh position, for

@@ -4,8 +4,6 @@
 #include <babylon/babylon_global.h>
 #include <babylon/gamepad/stick_values.h>
 
-#include <babylon/core/nullable.h>
-
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Gamepad {
@@ -37,8 +35,8 @@ public:
   bool _isConnected;
 
   ReadOnlyProperty<Gamepad, bool> isConnected;
-  Property<Gamepad, Nullable<StickValues>> leftStick;
-  Property<Gamepad, Nullable<StickValues>> rightStick;
+  Property<Gamepad, nullable_t<StickValues>> leftStick;
+  Property<Gamepad, nullable_t<StickValues>> rightStick;
 
 protected:
   bool _invertLeftStickY;
@@ -46,12 +44,12 @@ protected:
 
 private:
   bool get_isConnected() const;
-  Nullable<StickValues>& get_leftStick();
-  void set_leftStick(const Nullable<StickValues>& newValues);
-  Nullable<StickValues>& get_rightStick();
-  void set_rightStick(const Nullable<StickValues>& newValues);
-  Nullable<StickValues> _leftStick;
-  Nullable<StickValues> _rightStick;
+  nullable_t<StickValues>& get_leftStick();
+  void set_leftStick(const nullable_t<StickValues>& newValues);
+  nullable_t<StickValues>& get_rightStick();
+  void set_rightStick(const nullable_t<StickValues>& newValues);
+  nullable_t<StickValues> _leftStick;
+  nullable_t<StickValues> _rightStick;
 
   unsigned int _leftStickAxisX;
   unsigned int _leftStickAxisY;

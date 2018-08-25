@@ -2,7 +2,6 @@
 #define BABYLON_MESH_CSG_POLYGON_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/mesh/csg/plane.h>
 
 namespace BABYLON {
@@ -40,7 +39,7 @@ public:
 public:
   vector_t<Vertex> vertices;
   PolygonOptions shared;
-  Nullable<Plane> plane;
+  nullable_t<Plane> plane;
 
 }; // end of class Polygon
 

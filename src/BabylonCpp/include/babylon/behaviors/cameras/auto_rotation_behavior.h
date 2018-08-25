@@ -4,7 +4,6 @@
 #include <babylon/babylon_global.h>
 
 #include <babylon/behaviors/behavior.h>
-#include <babylon/core/nullable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
@@ -131,7 +130,7 @@ private:
   Observer<Camera>::Ptr _onAfterCheckInputsObserver;
   ArcRotateCameraPtr _attachedCamera;
   bool _isPointerDown;
-  Nullable<high_res_time_point_t> _lastFrameTime;
+  nullable_t<high_res_time_point_t> _lastFrameTime;
   high_res_time_point_t _lastInteractionTime;
   float _cameraRotationSpeed;
   float _lastFrameRadius;

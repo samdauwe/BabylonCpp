@@ -2,7 +2,6 @@
 #define BABYLON_GAMEPAD_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
 namespace BABYLON {
@@ -67,11 +66,11 @@ struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
   /**
    * Map of the button meshes contained in the controller
    */
-  unordered_map_t<string_t, Nullable<IButtonMeshInfo>> buttonMeshes;
+  unordered_map_t<string_t, nullable_t<IButtonMeshInfo>> buttonMeshes;
   /**
    * Map of the axis meshes contained in the controller
    */
-  unordered_map_t<unsigned int, Nullable<IAxisMeshInfo>> axisMeshes;
+  unordered_map_t<unsigned int, nullable_t<IAxisMeshInfo>> axisMeshes;
 }; // end of struct LoadedMeshInfo
 
 /**
@@ -268,7 +267,7 @@ public:
   StickValues trackpad;
 
 private:
-  Nullable<LoadedMeshInfo> _loadedMeshInfo;
+  nullable_t<LoadedMeshInfo> _loadedMeshInfo;
   // Mappings
 
   // Semantic button names

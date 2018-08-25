@@ -2,7 +2,6 @@
 #define BABYLON_TOOLS_PERFORMANCE_MONITOR_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/tools/rolling_average.h>
 
 namespace BABYLON {
@@ -100,8 +99,8 @@ public:
 protected:
   bool _enabled;
   RollingAverage _rollingFrameTime;
-  Nullable<high_res_time_point_t> _lastFrameTimeMs;
-  Nullable<high_res_time_point_t> _lastChangeTimeMs;
+  nullable_t<high_res_time_point_t> _lastFrameTimeMs;
+  nullable_t<high_res_time_point_t> _lastChangeTimeMs;
 
 }; // end of struct PerformanceMonitor
 

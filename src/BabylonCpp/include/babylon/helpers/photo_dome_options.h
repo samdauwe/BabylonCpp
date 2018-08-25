@@ -1,15 +1,14 @@
 #ifndef BABYLON_HELPERS_PHOTO_DOME_OPTIONS_H
 #define BABYLON_HELPERS_PHOTO_DOME_OPTIONS_H
 
-#include <babylon/babylon_api.h>
-#include <babylon/core/nullable.h>
+#include <babylon/babylon_global.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT PhotoDomeOptions {
-  Nullable<unsigned int> resolution = nullptr;
-  Nullable<unsigned int> size       = nullptr;
-  Nullable<bool> useDirectMapping   = nullptr;
+  nullable_t<unsigned int> resolution = nullopt_t;
+  nullable_t<unsigned int> size       = nullopt_t;
+  nullable_t<bool> useDirectMapping   = nullopt_t;
 }; // end of struct PhotoDomeOptions
 
 } // end of namespace BABYLON

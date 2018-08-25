@@ -2,7 +2,6 @@
 #define BABYLON_MATH_MATRIX_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 
 // SIMD
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
@@ -258,15 +257,15 @@ public:
    * update
    * @returns true if operation was successful
    */
-  bool decompose(Nullable<Vector3> scale, Nullable<Quaternion> rotation,
-                 Nullable<Vector3> translation) const;
+  bool decompose(nullable_t<Vector3> scale, nullable_t<Quaternion> rotation,
+                 nullable_t<Vector3> translation) const;
 
   /**
    * @brief Gets specific row of the matrix.
    * @param index defines the number of the row to get
    * @returns the index-th row of the current matrix as a new Vector4
    */
-  Nullable<Vector4> getRow(unsigned int index) const;
+  nullable_t<Vector4> getRow(unsigned int index) const;
 
   /**
    * @brief Sets the index-th row of the current matrix to the vector4 values.

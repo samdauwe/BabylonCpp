@@ -901,7 +901,7 @@ nullable_t<PickingInfo> Scene::_pickSpriteButKeepRay(
   auto result = pickSprite(x, y, predicate, fastCheck, camera);
   if (result) {
     auto _result = *result;
-    _result.ray  = originalPointerInfo ? _result.ray : nullptr;
+    _result.ray  = originalPointerInfo ? _result.ray : nullopt_t;
     result       = _result;
   }
   return result;

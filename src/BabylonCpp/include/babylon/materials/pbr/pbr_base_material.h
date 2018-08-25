@@ -55,7 +55,7 @@ public:
   /**
    * @brief Gets the current transparency mode.
    */
-  Nullable<unsigned int> transparencyMode() const;
+  nullable_t<unsigned int> transparencyMode() const;
 
   /**
    * @brief Sets the transparency mode of the material.
@@ -68,7 +68,7 @@ public:
    * | 3     | ALPHATESTANDBLEND                   |             |
    *
    */
-  void setTransparencyMode(const Nullable<unsigned int>& value);
+  void setTransparencyMode(const nullable_t<unsigned int>& value);
 
   /**
    * @brief Returns true if alpha blending should be disabled.
@@ -182,11 +182,11 @@ private:
     const ::std::function<void(Effect* effect)> onCompiled = nullptr,
     ::std::function<void(Effect* effect, const string_t& errors)> onError
     = nullptr,
-    const Nullable<bool>& useInstances = nullptr,
-    const Nullable<bool>& useClipPlane = nullptr);
+    const nullable_t<bool>& useInstances = nullptr,
+    const nullable_t<bool>& useClipPlane = nullptr);
   void _prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
-                       const Nullable<bool>& useInstances = nullptr,
-                       const Nullable<bool>& useClipPlane = nullptr);
+                       const nullable_t<bool>& useInstances = nullptr,
+                       const nullable_t<bool>& useClipPlane = nullptr);
 
   /**
    * @brief Returns the texture used for reflections.
@@ -528,7 +528,7 @@ protected:
   /**
    * The transparency mode of the material.
    */
-  Nullable<unsigned int> _transparencyMode;
+  nullable_t<unsigned int> _transparencyMode;
 
   /**
    * Specifies the environment BRDF texture used to comput the scale and offset

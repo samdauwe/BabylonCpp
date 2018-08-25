@@ -3,7 +3,6 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -288,8 +287,8 @@ public:
   /**
    * @brief Hidden
    */
-  bool _preBind(Effect* effect                             = nullptr,
-                Nullable<unsigned int> overrideOrientation = nullptr);
+  bool _preBind(Effect* effect                               = nullptr,
+                nullable_t<unsigned int> overrideOrientation = nullopt_t);
 
   /**
    * @brief Binds the material to the mesh.
@@ -373,7 +372,7 @@ public:
   void
   forceCompilation(AbstractMesh* mesh,
                    const ::std::function<void(Material* material)>& onCompiled,
-                   Nullable<bool> clipPlane = false);
+                   nullable_t<bool> clipPlane = false);
 
   /**
    * @brief Marks a define in the material to indicate that it needs to be

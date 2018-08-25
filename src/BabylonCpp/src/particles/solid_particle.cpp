@@ -10,7 +10,7 @@ SolidParticle::SolidParticle(unsigned int particleIndex,
                              unsigned int iIndiceIndex, ModelShape* model,
                              int iShapeId, unsigned int iIdxInShape,
                              SolidParticleSystem* sps,
-                             const Nullable<BoundingInfo>& modelBoundingInfo)
+                             const nullable_t<BoundingInfo>& modelBoundingInfo)
     : idx{particleIndex}
     , color{Color4(1.f, 1.f, 1.f, 1.f)}
     , position{Vector3::Zero()}
@@ -31,7 +31,7 @@ SolidParticle::SolidParticle(unsigned int particleIndex,
     , _sps{sps}
     , _stillInvisible{false}
     , _rotationMatrix{{1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}}
-    , parentId{nullptr}
+    , parentId{nullopt_t}
     , _globalPosition{Vector3::Zero()}
 {
   if (modelBoundingInfo) {

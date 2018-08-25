@@ -292,8 +292,7 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
     }
 
     if (*bone->_index != -1) {
-      auto mappedIndex = bone->_index.isNull() ?
-
+      auto mappedIndex = !bone->_index.has_value() ?
                            index :
                            static_cast<unsigned int>(*bone->_index);
       bone->getInvertedAbsoluteTransform().multiplyToArray(
@@ -524,7 +523,7 @@ void Skeleton::_sortBones(unsigned int index, vector_t<Bone*>& iBones,
   visited[index] = true;
 
   auto& bone = bones[index];
-  if (bone->_index.isNull()) {
+  if (!bone->_index.has_value()) {
     bone->_index = static_cast<int>(index);
   }
 

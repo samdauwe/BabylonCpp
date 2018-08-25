@@ -639,8 +639,8 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   // vertical distances (v)
   vector_t<Vector3> path1;
   vector_t<Vector3> path2;
-  Nullable<Vector3> vertex1 = nullptr;
-  Nullable<Vector3> vertex2 = nullptr;
+  nullable_t<Vector3> vertex1 = nullopt_t;
+  nullable_t<Vector3> vertex2 = nullopt_t;
   for (i = 0, ul = minlg + closePathCorr; i < ul; ++i) {
     vTotalDistance.emplace_back(0.f);
     vs.emplace_back(0);
@@ -1178,8 +1178,8 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     float _angle;
     Vector3 circleVector;
     Vector2 textureCoordinate;
-    Vector4 u          = (isTop) ? faceUV[surfaceNb - 1] : faceUV[0];
-    Nullable<Color4> c = nullptr;
+    Vector4 u            = (isTop) ? faceUV[surfaceNb - 1] : faceUV[0];
+    nullable_t<Color4> c = nullopt_t;
     if (!faceColors.empty()) {
       c = (isTop) ? faceColors[surfaceNb - 1] : faceColors[0];
     }
@@ -2652,7 +2652,7 @@ unique_ptr_t<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
 void VertexData::ComputeNormals(const Float32Array& positions,
                                 const Uint32Array& indices,
                                 Float32Array& normals,
-                                Nullable<FacetParameters> iOptions)
+                                nullable_t<FacetParameters> iOptions)
 {
   if (normals.size() < positions.size()) {
     normals.resize(positions.size());
@@ -2681,11 +2681,11 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   unsigned int v3z           = 0;   // vector3 z index in the positions array
   bool computeFacetNormals   = false;
   bool computeFacetPositions = false;
-  bool computeFacetPartitioning = false;
-  bool computeDepthSort         = false;
-  float faceNormalSign          = 1.f;
-  float ratio                   = 0;
-  Nullable<Vector3> distanceTo  = nullptr;
+  bool computeFacetPartitioning  = false;
+  bool computeDepthSort          = false;
+  float faceNormalSign           = 1.f;
+  float ratio                    = 0;
+  nullable_t<Vector3> distanceTo = nullopt_t;
   vector_t<DepthSortedFacet> depthSortedFacets;
   if (iOptions) {
     const auto& options   = *iOptions;
@@ -2698,7 +2698,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     computeDepthSort = (options.depthSort) ? true : false;
     distanceTo       = options.distanceTo;
     if (computeDepthSort) {
-      if (distanceTo.isNull()) {
+      if (!distanceTo.has_value()) {
         distanceTo = Vector3::Zero();
       }
       depthSortedFacets = options.depthSortedFacets;

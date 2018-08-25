@@ -440,8 +440,9 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           const auto floatValue
             = useTangent ?
                 floatInterpolateFunctionWithTangents(
-                  startValue.floatData, startKey.outTangent * frameDelta,
-                  endValue.floatData, endKey.inTangent * frameDelta, gradient) :
+                  startValue.floatData, *startKey.outTangent * frameDelta,
+                  endValue.floatData, *endKey.inTangent * frameDelta,
+                  gradient) :
                 floatInterpolateFunction(startValue.floatData,
                                          endValue.floatData, gradient);
           switch (loopMode) {

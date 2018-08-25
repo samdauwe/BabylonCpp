@@ -529,7 +529,7 @@ public:
    */
   static void ComputeNormals(const Float32Array& positions,
                              const Uint32Array& indices, Float32Array& normals,
-                             Nullable<FacetParameters> options = nullptr);
+                             nullable_t<FacetParameters> options = nullopt_t);
 
   /**
    * @brief Applies VertexData created from the imported parameters to the

@@ -57,8 +57,9 @@ void WebVRController::update()
 }
 
 void WebVRController::_setButtonValue(
-  Nullable<ExtendedGamepadButton> newState,
-  const Nullable<ExtendedGamepadButton>& currentState, unsigned int buttonIndex)
+  nullable_t<ExtendedGamepadButton> newState,
+  const nullable_t<ExtendedGamepadButton>& currentState,
+  unsigned int buttonIndex)
 {
   if (!newState) {
     newState = ExtendedGamepadButton(0, false, false);

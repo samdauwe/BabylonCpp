@@ -31,7 +31,7 @@ public:
   /**
    * Ray from a pointer if available (eg. 6dof controller)
    */
-  Nullable<Ray> ray;
+  nullable_t<Ray> ray;
 
 }; // end of class PointerInfoPre
 

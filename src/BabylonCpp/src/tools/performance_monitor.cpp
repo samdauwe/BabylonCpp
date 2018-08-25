@@ -25,7 +25,7 @@ void PerformanceMonitor::sampleFrame(high_res_time_point_t timeMs)
     return;
   }
 
-  if (!_lastFrameTimeMs.isNull()) {
+  if (_lastFrameTimeMs.has_value()) {
     auto dt = Time::fpTimeDiff<float, ::std::milli>(*_lastFrameTimeMs, timeMs);
     _rollingFrameTime.add(dt);
   }
@@ -79,8 +79,8 @@ void PerformanceMonitor::disable()
   _enabled = false;
   // clear last sample to avoid interpolating over the disabled period when next
   // enabled
-  _lastFrameTimeMs  = nullptr;
-  _lastChangeTimeMs = nullptr;
+  _lastFrameTimeMs  = nullopt_t;
+  _lastChangeTimeMs = nullopt_t;
 }
 
 bool PerformanceMonitor::isEnabled() const
@@ -92,8 +92,8 @@ void PerformanceMonitor::reset()
 {
   // clear last sample to avoid interpolating over the disabled period when next
   // enabled
-  _lastFrameTimeMs  = nullptr;
-  _lastChangeTimeMs = nullptr;
+  _lastFrameTimeMs  = nullopt_t;
+  _lastChangeTimeMs = nullopt_t;
   // wipe record
   _rollingFrameTime.reset();
 }
