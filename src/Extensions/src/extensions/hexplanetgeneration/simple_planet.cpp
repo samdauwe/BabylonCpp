@@ -171,7 +171,7 @@ void SimplePlanet::render()
   vertexData->indices   = std::move(indices);
   vertexData->positions = std::move(positions);
   vertexData->colors    = std::move(colors);
-  vertexData->applyToMesh(_planet.mesh, false);
+  vertexData->applyToMesh(*_planet.mesh, false);
 
   _planet.mesh->material = material;
 }

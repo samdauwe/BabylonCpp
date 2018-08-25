@@ -28,8 +28,8 @@ struct PlanetTile {
 
 struct PlanetData {
   Uint32Array faceToTile;
-  Mesh* mesh;
-  LinesMesh* selectedBorder = nullptr;
+  MeshPtr mesh                = nullptr;
+  LinesMeshPtr selectedBorder = nullptr;
   std::vector<PlanetTile> tiles;
 };
 

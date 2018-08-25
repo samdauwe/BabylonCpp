@@ -156,7 +156,7 @@ public:
    * @param z
    * @return
    */
-  bool contains(float x, float z) const;
+  bool contains(float x, float z);
 
   /**
    * @brief Returns a new data map from the passed heightmap image file.
@@ -234,13 +234,13 @@ public:
   /**
    * The logical terrain underlying mesh.
    */
-  Mesh* mesh() const;
+  MeshPtr& mesh();
 
   /**
    * The camera the terrain is linked to
    */
-  Camera* camera() const;
-  void setCamera(Camera* val);
+  CameraPtr& camera();
+  void setCamera(const CameraPtr& val);
 
   /**
    * Number of cells flought over by the cam on the X axis before the terrain is
@@ -437,7 +437,7 @@ public:
    * This should return a positive integer or zero.
    * Returns zero by default.
    */
-  virtual unsigned int updateCameraLOD(Camera* terrainCamera);
+  virtual unsigned int updateCameraLOD(const CameraPtr& terrainCamera);
 
   /**
    * @brief Custom function called before each terrain update.
@@ -504,7 +504,7 @@ private:
   // former correction
   unsigned int _oldCorrection;
   // camera linked to the terrain
-  Camera* _terrainCamera;
+  CameraPtr _terrainCamera;
   IndicesArray _indices;
   Float32Array _positions;
   Float32Array _normals;
@@ -567,7 +567,7 @@ private:
   // map z size
   float _mapSizeZ;
   // reference to the ribbon
-  Mesh* _terrain;
+  MeshPtr _terrain;
   bool _isAlwaysVisible;
   bool _precomputeNormalsFromMap;
   // tmp vectors

@@ -11,9 +11,11 @@
 namespace BABYLON {
 namespace Extensions {
 
-Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
-                                     float radius, Material* trunkMaterial,
-                                     Material* leafMaterial, Scene* scene)
+MeshPtr QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
+                                       float radius,
+                                       const MaterialPtr& trunkMaterial,
+                                       const MaterialPtr& leafMaterial,
+                                       Scene* scene)
 {
   auto tree       = Mesh::New("tree", scene);
   tree->isVisible = false;
@@ -24,7 +26,7 @@ Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
   options.segments = 4;
   auto vertexData  = VertexData::CreateSphere(options);
 
-  vertexData->applyToMesh(leaves, false);
+  vertexData->applyToMesh(*leaves, false);
 
   auto positions      = leaves->getVerticesData(VertexBuffer::PositionKind);
   auto indices        = leaves->getIndices();
@@ -99,8 +101,8 @@ Mesh* QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
   trunk->material = trunkMaterial;
   trunk->convertToFlatShadedMesh();
 
-  leaves->setParent(tree);
-  trunk->setParent(tree);
+  leaves->setParent(tree.get());
+  trunk->setParent(tree.get());
   return tree;
 }
 

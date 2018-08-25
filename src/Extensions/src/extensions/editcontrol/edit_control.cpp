@@ -16,7 +16,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-EditControl::EditControl(Mesh* iMesh, Camera* camera, ICanvas* iCanvas,
+EditControl::EditControl(const MeshPtr& iMesh, Camera* camera, ICanvas* iCanvas,
                          float scale)
     : mesh{iMesh}
     , canvas{iCanvas}
@@ -128,9 +128,9 @@ EditControl::EditControl(Mesh* iMesh, Camera* camera, ICanvas* iCanvas,
   theParent->isPickable         = false;
   createMaterials(scene);
   createGuideAxes();
-  guideCtl->setParent(theParent);
+  guideCtl->setParent(theParent.get());
   createPickPlanes();
-  pickPlanes->setParent(theParent);
+  pickPlanes->setParent(theParent.get());
   // pointerdown = (evt) => { return onPointerDown(evt) };
   // pointerup = (evt) => { return onPointerUp(evt) };
   // pointermove = (evt) => { return onPointerMove(evt) };
@@ -153,7 +153,7 @@ void EditControl::renderLoopProcess()
   onPointerOver();
 }
 
-void EditControl::switchTo(Mesh* iMesh)
+void EditControl::switchTo(const MeshPtr& iMesh)
 {
   iMesh->computeWorldMatrix(true);
   mesh                          = iMesh;
@@ -206,7 +206,7 @@ void EditControl::onPointerDown(PointerEvent& evt)
 
   auto pickResult = scene->pick(
     scene->pointerX(), scene->pointerY(),
-    [this](AbstractMesh* mesh) {
+    [this](const AbstractMeshPtr& mesh) {
       if (transEnabled) {
         if ((mesh == tX) || (mesh == tY) || (mesh == tZ) || (mesh == tXZ)
             || (mesh == tZY) || (mesh == tYX) || (mesh == tAll)) {
@@ -229,10 +229,10 @@ void EditControl::onPointerDown(PointerEvent& evt)
     false, mainCamera);
 
   if ((*pickResult).hit) {
-    axisPicked  = static_cast<Mesh*>((*pickResult).pickedMesh);
+    axisPicked  = ::std::static_pointer_cast<Mesh>((*pickResult).pickedMesh);
     auto childs = axisPicked->getChildren();
     if (!childs.empty()) {
-      static_cast<Mesh*>(childs[0])->visibility = visibility;
+      ::std::static_pointer_cast<Mesh>(childs[0])->visibility = visibility;
     }
     else {
       axisPicked->visibility = visibility;
@@ -273,7 +273,7 @@ void EditControl::onPointerDown(PointerEvent& evt)
     if (hasPos) {
       prevPos = _prevPos;
     }
-    detachControl(mainCamera, canvas);
+    detachControl(mainCamera.get(), canvas);
   }
 }
 
@@ -300,7 +300,7 @@ void EditControl::onPointerOver()
 
   auto pickResult = scene->pick(
     scene->pointerX(), scene->pointerY(),
-    [this](AbstractMesh* mesh) {
+    [this](const AbstractMeshPtr& mesh) {
       if (transEnabled) {
         if ((mesh == tX) || (mesh == tY) || (mesh == tZ) || (mesh == tXZ)
             || (mesh == tZY) || (mesh == tYX) || (mesh == tAll)) {
@@ -323,24 +323,27 @@ void EditControl::onPointerOver()
     false, mainCamera);
 
   if ((*pickResult).hit) {
-    if (static_cast<Mesh*>((*pickResult).pickedMesh) != prevOverMesh) {
+    if (::std::static_pointer_cast<Mesh>((*pickResult).pickedMesh)
+        != prevOverMesh) {
       pointerIsOver = true;
       if (prevOverMesh != nullptr) {
         prevOverMesh->visibility = 0.f;
         restoreColor(prevOverMesh);
       }
-      prevOverMesh = static_cast<Mesh*>((*pickResult).pickedMesh);
+      prevOverMesh = ::std::static_pointer_cast<Mesh>((*pickResult).pickedMesh);
       if (rotEnabled) {
-        savedCol
-          = (static_cast<LinesMesh*>(prevOverMesh->getChildren()[0])->color);
-        static_cast<LinesMesh*>(prevOverMesh->getChildren()[0])->color
+        savedCol = (::std::static_pointer_cast<LinesMesh>(
+                      prevOverMesh->getChildren()[0])
+                      ->color);
+        ::std::static_pointer_cast<LinesMesh>(prevOverMesh->getChildren()[0])
+          ->color
           = Color3::White();
       }
       else {
         auto childs = prevOverMesh->getChildren();
         if (!childs.empty()) {
-          savedMat = static_cast<Mesh*>(childs[0])->material();
-          static_cast<Mesh*>(childs[0])->material = whiteMat;
+          savedMat = ::std::static_pointer_cast<Mesh>(childs[0])->material();
+          ::std::static_pointer_cast<Mesh>(childs[0])->material = whiteMat;
         }
         else {
           savedMat               = prevOverMesh->material();
@@ -367,7 +370,7 @@ void EditControl::onPointerOver()
   }
 }
 
-void EditControl::restoreColor(Mesh* mesh)
+void EditControl::restoreColor(const MeshPtr& mesh)
 {
   const auto& meshName = mesh->name;
   if (meshName == "X") {
@@ -381,12 +384,13 @@ void EditControl::restoreColor(Mesh* mesh)
   }
 
   if (rotEnabled) {
-    static_cast<LinesMesh*>(mesh->getChildren()[0])->color = savedCol;
+    ::std::static_pointer_cast<LinesMesh>(mesh->getChildren()[0])->color
+      = savedCol;
   }
   else {
     auto childs = mesh->getChildren();
     if (!childs.empty()) {
-      static_cast<Mesh*>(childs[0])->material = savedMat;
+      ::std::static_pointer_cast<Mesh>(childs[0])->material = savedMat;
     }
     else {
       mesh->material = savedMat;
@@ -441,7 +445,7 @@ void EditControl::onPointerMove(const Event& /*evt*/)
   prevPos = newPos;
 }
 
-Mesh* EditControl::getPickPlane(Mesh* axis)
+MeshPtr EditControl::getPickPlane(const MeshPtr& axis)
 {
   const auto& n = axis->name;
   if (transEnabled || scaleEnabled) {
@@ -547,7 +551,7 @@ void EditControl::doTranslation(const Vector3& diff)
   mesh->computeWorldMatrix(true);
 }
 
-void EditControl::transWithSnap(Mesh* mesh, Vector3& trans, bool local)
+void EditControl::transWithSnap(const MeshPtr& mesh, Vector3& trans, bool local)
 {
   if (snapT) {
     bool snapit = false;
@@ -630,7 +634,7 @@ void EditControl::doScaling(const Vector3& diff)
   scaleWithSnap(mesh, scale);
 }
 
-void EditControl::scaleWithSnap(Mesh* mesh, Vector3& p)
+void EditControl::scaleWithSnap(const MeshPtr& mesh, Vector3& p)
 {
   if (snapS) {
     bool snapit = false;
@@ -683,7 +687,8 @@ void EditControl::scaleWithSnap(Mesh* mesh, Vector3& p)
   mesh->scaling().addInPlace(p);
 }
 
-void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
+void EditControl::doRotation(const MeshPtr& mesh, const MeshPtr& axis,
+                             const Vector3& newPos)
 {
   auto cN = Vector3::TransformNormal(Axis::Z(), *mainCamera->getWorldMatrix());
   auto angle
@@ -799,10 +804,10 @@ void EditControl::doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos)
 
 std::tuple<Vector3, bool> EditControl::getPosOnPickPlane()
 {
-  auto pickinfo
-    = scene->pick(scene->pointerX(), scene->pointerY(),
-                  [this](AbstractMesh* mesh) { return mesh == pickPlane; },
-                  false, mainCamera);
+  auto pickinfo = scene->pick(
+    scene->pointerX(), scene->pointerY(),
+    [this](const AbstractMeshPtr& mesh) { return mesh == pickPlane; }, false,
+    mainCamera);
   if ((*pickinfo).hit) {
     return std::make_tuple(*(*pickinfo).pickedPoint, true);
   }
@@ -827,7 +832,7 @@ void EditControl::enableTranslation()
 {
   if (tX == nullptr) {
     createTransAxes();
-    tCtl->setParent(theParent);
+    tCtl->setParent(theParent.get());
   }
   if (!transEnabled) {
     tEndX->visibility   = visibility;
@@ -871,7 +876,7 @@ void EditControl::enableRotation()
 {
   if (rX == nullptr) {
     createRotAxes();
-    rCtl->setParent(theParent);
+    rCtl->setParent(theParent.get());
   }
   if (!rotEnabled) {
     rEndX->visibility   = visibility;
@@ -904,7 +909,7 @@ void EditControl::enableScaling()
 {
   if (sX == nullptr) {
     createScaleAxes();
-    sCtl->setParent(theParent);
+    sCtl->setParent(theParent.get());
   }
   if (!scaleEnabled) {
     sEndX->visibility   = visibility;
@@ -951,9 +956,9 @@ void EditControl::createGuideAxes()
   bYaxis->isPickable = false;
   bZaxis->isPickable = false;
 
-  bXaxis->setParent(guideCtl);
-  bYaxis->setParent(guideCtl);
-  bZaxis->setParent(guideCtl);
+  bXaxis->setParent(guideCtl.get());
+  bYaxis->setParent(guideCtl.get());
+  bZaxis->setParent(guideCtl.get());
   bXaxis->color = Color3::Red();
   bYaxis->color = Color3::Green();
   bZaxis->color = Color3::Blue();
@@ -973,9 +978,9 @@ void EditControl::createGuideAxes()
   yaxis->isPickable = false;
   zaxis->isPickable = false;
 
-  xaxis->setParent(guideCtl);
-  yaxis->setParent(guideCtl);
-  zaxis->setParent(guideCtl);
+  xaxis->setParent(guideCtl.get());
+  yaxis->setParent(guideCtl.get());
+  zaxis->setParent(guideCtl.get());
   xaxis->color            = Color3::Red();
   yaxis->color            = Color3::Green();
   zaxis->color            = Color3::Blue();
@@ -1013,10 +1018,10 @@ void EditControl::createPickPlanes()
   pZY->rotate(axis, 1.57f);
 
   pickPlanes = Mesh::New("pickPlanes", scene);
-  pALL->setParent(theParent);
-  pXZ->setParent(pickPlanes);
-  pZY->setParent(pickPlanes);
-  pYX->setParent(pickPlanes);
+  pALL->setParent(theParent.get());
+  pXZ->setParent(pickPlanes.get());
+  pZY->setParent(pickPlanes.get());
+  pYX->setParent(pickPlanes.get());
 }
 
 void EditControl::createTransAxes()
@@ -1051,13 +1056,13 @@ void EditControl::createTransAxes()
 
   tAll = Mesh::CreateBox("ALL", r * 2.f, scene);
 
-  tX->setParent(tCtl);
-  tY->setParent(tCtl);
-  tZ->setParent(tCtl);
-  tXZ->setParent(tCtl);
-  tZY->setParent(tCtl);
-  tYX->setParent(tCtl);
-  tAll->setParent(tCtl);
+  tX->setParent(tCtl.get());
+  tY->setParent(tCtl.get());
+  tZ->setParent(tCtl.get());
+  tXZ->setParent(tCtl.get());
+  tZY->setParent(tCtl.get());
+  tYX->setParent(tCtl.get());
+  tAll->setParent(tCtl.get());
 
   tX->rotation().y = 1.57f;
   tY->rotation().x -= 1.57f;
@@ -1110,13 +1115,13 @@ void EditControl::createTransAxes()
   tEndZY->rotation().x = -1.57f;
   tEndYX->rotation().x = -1.57f;
 
-  tEndX->setParent(tX);
-  tEndY->setParent(tY);
-  tEndZ->setParent(tZ);
-  tEndXZ->setParent(tXZ);
-  tEndZY->setParent(tZY);
-  tEndYX->setParent(tYX);
-  tEndAll->setParent(tAll);
+  tEndX->setParent(tX.get());
+  tEndY->setParent(tY.get());
+  tEndZ->setParent(tZ.get());
+  tEndXZ->setParent(tXZ.get());
+  tEndZY->setParent(tZY.get());
+  tEndYX->setParent(tYX.get());
+  tEndAll->setParent(tAll.get());
 
   tEndX->position().z = l - cl / 2;
   tEndY->position().z = l - cl / 2;
@@ -1147,8 +1152,8 @@ void EditControl::createTransAxes()
   tEndAll->isPickable = false;
 }
 
-Mesh* EditControl::createTriangle(const std::string& name, float w,
-                                  Scene* scene) const
+MeshPtr EditControl::createTriangle(const std::string& name, float w,
+                                    Scene* scene) const
 {
   auto p = Path2(w / 2.f, -w / 2.f)
              .addLineTo(w / 2.f, w / 2.f)
@@ -1171,10 +1176,10 @@ void EditControl::createRotAxes()
   rAll       = createTube(d / 1.75f, 360);
   rAll->name = "ALL";
 
-  rX->setParent(rCtl);
-  rY->setParent(rCtl);
-  rZ->setParent(rCtl);
-  rAll->setParent(pALL);
+  rX->setParent(rCtl.get());
+  rY->setParent(rCtl.get());
+  rZ->setParent(rCtl.get());
+  rAll->setParent(pALL.get());
 
   rX->rotation().z   = 1.57f;
   rZ->rotation().x   = -1.57f;
@@ -1203,10 +1208,10 @@ void EditControl::createRotAxes()
   rEndZ          = rEndX->clone("");
   rEndAll        = createCircle(cl / 1.75f, 360);
 
-  rEndX->setParent(rX);
-  rEndY->setParent(rY);
-  rEndZ->setParent(rZ);
-  rEndAll->setParent(rAll);
+  rEndX->setParent(rX.get());
+  rEndY->setParent(rY.get());
+  rEndZ->setParent(rZ.get());
+  rEndAll->setParent(rAll.get());
 
   rEndX->color   = Color3::Red();
   rEndY->color   = Color3::Green();
@@ -1224,7 +1229,7 @@ void EditControl::createRotAxes()
   rEndAll->isPickable = false;
 }
 
-Mesh* EditControl::extrudeBox(float w, float l) const
+MeshPtr EditControl::extrudeBox(float w, float l) const
 {
   const std::vector<Vector3> shape
     = {Vector3(w, w, 0), Vector3(-w, w, 0), Vector3(-w, -w, 0),
@@ -1234,7 +1239,7 @@ Mesh* EditControl::extrudeBox(float w, float l) const
   return box;
 }
 
-LinesMesh* EditControl::createCircle(float r, int t) const
+LinesMeshPtr EditControl::createCircle(float r, int t) const
 {
   std::vector<Vector3> points;
   float x;
@@ -1257,7 +1262,7 @@ LinesMesh* EditControl::createCircle(float r, int t) const
   return circle;
 }
 
-Mesh* EditControl::createTube(float r, int t) const
+MeshPtr EditControl::createTube(float r, int t) const
 {
   std::vector<Vector3> points;
   float x;
@@ -1316,13 +1321,13 @@ void EditControl::createScaleAxes()
   sZ->material   = blueMat;
   sAll->material = yellowMat;
 
-  sX->setParent(sCtl);
-  sY->setParent(sCtl);
-  sZ->setParent(sCtl);
-  sAll->setParent(sCtl);
-  sXZ->setParent(sCtl);
-  sZY->setParent(sCtl);
-  sYX->setParent(sCtl);
+  sX->setParent(sCtl.get());
+  sY->setParent(sCtl.get());
+  sZ->setParent(sCtl.get());
+  sAll->setParent(sCtl.get());
+  sXZ->setParent(sCtl.get());
+  sZY->setParent(sCtl.get());
+  sYX->setParent(sCtl.get());
 
   sX->rotation().y = 1.57f;
   sY->rotation().x -= 1.57f;
@@ -1368,13 +1373,13 @@ void EditControl::createScaleAxes()
   sEndZY->rotation().x = -1.57f;
   sEndYX->rotation().x = -1.57f;
 
-  sEndX->setParent(sX);
-  sEndY->setParent(sY);
-  sEndZ->setParent(sZ);
-  sEndXZ->setParent(sXZ);
-  sEndZY->setParent(sZY);
-  sEndYX->setParent(sYX);
-  sEndAll->setParent(sAll);
+  sEndX->setParent(sX.get());
+  sEndY->setParent(sY.get());
+  sEndZ->setParent(sZ.get());
+  sEndXZ->setParent(sXZ.get());
+  sEndZY->setParent(sZY.get());
+  sEndYX->setParent(sYX.get());
+  sEndAll->setParent(sAll.get());
 
   sEndX->position().z = l - cr / 2.f;
   sEndY->position().z = l - cr / 2.f;
@@ -1404,7 +1409,7 @@ void EditControl::createScaleAxes()
   sEndAll->isPickable = false;
 }
 
-void EditControl::setLocalAxes(Mesh* mesh)
+void EditControl::setLocalAxes(const MeshPtr& mesh)
 {
   auto meshMatrix = *mesh->getWorldMatrix();
   Vector3::FromArrayToRef(meshMatrix.asArray(), 0, localX);
@@ -1510,9 +1515,9 @@ void EditControl::disposeMaterials()
   yellowMat->dispose();
 }
 
-StandardMaterial* EditControl::getStandardMaterial(const std::string& name,
-                                                   const Color3& col,
-                                                   Scene* scene)
+StandardMaterialPtr EditControl::getStandardMaterial(const std::string& name,
+                                                     const Color3& col,
+                                                     Scene* scene)
 {
   auto mat             = StandardMaterial::New(name, scene);
   mat->emissiveColor   = col;

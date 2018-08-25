@@ -11,12 +11,12 @@
 namespace BABYLON {
 namespace Extensions {
 
-Mesh* SPSTreeGenerator::CreateTree(
+MeshPtr SPSTreeGenerator::CreateTree(
   float trunkHeight, float trunkTaper, size_t trunkSlices,
-  Material* trunkMaterial, unsigned int iBoughs, unsigned int forks,
+  const MaterialPtr& trunkMaterial, unsigned int iBoughs, unsigned int forks,
   float forkAngle, float forkRatio, unsigned int branches, float branchAngle,
   unsigned int bowFreq, float bowHeight, unsigned int leavesOnBranch,
-  float leafWHRatio, Material* leafMaterial, Scene* scene)
+  float leafWHRatio, const MaterialPtr& leafMaterial, Scene* scene)
 {
   auto boughs = iBoughs;
   if (!(boughs == 1 || boughs == 2)) {
@@ -234,9 +234,9 @@ Mesh* SPSTreeGenerator::CreateTree(
   BoxOptions boxOptions;
   auto _root       = MeshBuilder::CreateBox("", boxOptions, scene);
   _root->isVisible = false;
-  _base.tree->setParent(_root);
-  _tree_crown->setParent(_root);
-  _leaves_crown->setParent(_root);
+  _base.tree->setParent(_root.get());
+  _tree_crown->setParent(_root.get());
+  _leaves_crown->setParent(_root.get());
 
   return _root;
 }
@@ -344,7 +344,7 @@ SPSTreeBase SPSTreeGenerator::createTreeBase(
   auto _trunk_sys = coordSystem(_trunk_direction);
   Vector3 _trunk_root_at(0.f, 0.f, 0.f);
   // Array holding the mesh of each branch
-  std::vector<Mesh*> _tree_branches;
+  std::vector<MeshPtr> _tree_branches;
   // Array holding the central core points for each branch created
   std::vector<std::vector<Vector3>> _tree_paths;
   // Array holding the branch radius for each branch created

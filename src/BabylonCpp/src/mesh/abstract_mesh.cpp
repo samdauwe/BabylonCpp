@@ -489,7 +489,7 @@ void AbstractMesh::_resyncLightSources()
     }
 
     if (light->canAffectMesh(this)) {
-      _lightSources.emplace_back(light.get());
+      _lightSources.emplace_back(light);
     }
   }
 

@@ -10,7 +10,7 @@ namespace Extensions {
 class ActHist {
 
 public:
-  ActHist(AbstractMesh* mesh, int capacity);
+  ActHist(const AbstractMeshPtr& mesh, int capacity);
   ~ActHist();
 
   void setCapacity(int c);
@@ -19,7 +19,7 @@ public:
   void redo();
 
 private:
-  AbstractMesh* mesh;
+  AbstractMeshPtr mesh;
   int lastMax;
   std::vector<Act> acts;
   int last;

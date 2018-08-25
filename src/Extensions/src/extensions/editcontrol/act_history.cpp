@@ -7,7 +7,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-ActHist::ActHist(AbstractMesh* iMesh, int capacity)
+ActHist::ActHist(const AbstractMeshPtr& iMesh, int capacity)
     : mesh{iMesh}, lastMax{capacity - 1}, last{-1}, current{-1}
 {
   if (!mesh->rotationQuaternion()) {

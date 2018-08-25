@@ -14,13 +14,13 @@ struct CoordSystem {
 }; // end of CoordSystem
 
 struct SPSTreeBranch {
-  Mesh* branch;
+  MeshPtr branch = nullptr;
   std::vector<Vector3> core;
   Float32Array _radii;
 }; // end of SPSTreeBranch
 
 struct SPSTreeBase {
-  Mesh* tree;
+  MeshPtr tree = nullptr;
   std::vector<std::vector<Vector3>> paths;
   std::vector<Float32Array> radii;
   std::vector<CoordSystem> directions;
@@ -71,14 +71,13 @@ struct BABYLON_SHARED_EXPORT SPSTreeGenerator {
    * @param leafMaterial - material used for all leaves.
    * @param scene - BABYLON scene.
    */
-  static Mesh* CreateTree(float trunkHeight, float trunkTaper,
-                          size_t trunkSlices, Material* trunkMaterial,
-                          unsigned int boughs, unsigned int forks,
-                          float forkAngle, float forkRatio,
-                          unsigned int branches, float branchAngle,
-                          unsigned int bowFreq, float bowHeight,
-                          unsigned int leavesOnBranch, float leafWHRatio,
-                          Material* leafMaterial, Scene* scene);
+  static MeshPtr
+  CreateTree(float trunkHeight, float trunkTaper, size_t trunkSlices,
+             const MaterialPtr& trunkMaterial, unsigned int boughs,
+             unsigned int forks, float forkAngle, float forkRatio,
+             unsigned int branches, float branchAngle, unsigned int bowFreq,
+             float bowHeight, unsigned int leavesOnBranch, float leafWHRatio,
+             const MaterialPtr& leafMaterial, Scene* scene);
 
   /**
    * @brief Creates an x, y, z coordinate system using the parameter vec3 for

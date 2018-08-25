@@ -7,11 +7,12 @@
 namespace BABYLON {
 namespace Extensions {
 
-Mesh* SimplePineGenerator::CreateTree(Scene* scene, Material* trunkMaterial,
-                                      Material* leafMaterial,
-                                      unsigned int canopies, float baseRadius,
-                                      float height, unsigned int tessellation,
-                                      float twist)
+MeshPtr SimplePineGenerator::CreateTree(Scene* scene,
+                                        const MaterialPtr& trunkMaterial,
+                                        const MaterialPtr& leafMaterial,
+                                        unsigned int canopies, float baseRadius,
+                                        float height, unsigned int tessellation,
+                                        float twist)
 {
   if (twist < 0.f || twist > 1.f) {
     twist = 0.f;
@@ -63,8 +64,8 @@ Mesh* SimplePineGenerator::CreateTree(Scene* scene, Material* trunkMaterial,
   auto tree       = Mesh::CreateBox("", 1.f, scene);
   tree->isVisible = false;
 
-  leaves->setParent(tree);
-  trunk->setParent(tree);
+  leaves->setParent(tree.get());
+  trunk->setParent(tree.get());
 
   return tree;
 }

@@ -28,7 +28,7 @@ struct DynamicTerrainOptions {
   bool invertSide = false;
   // camera the camera to link the terrain to. Optional, by default the scene
   // active camera
-  Camera* camera = nullptr;
+  CameraPtr camera = nullptr;
 }; // end of class DynamicTerrain
 
 } // end of namespace Extensions

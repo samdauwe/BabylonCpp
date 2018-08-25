@@ -39,7 +39,7 @@ private:
   static float CameratorSwitchThreshold;
 
 private:
-  Node* _pickedNode;
+  NodePtr _pickedNode;
   std::vector<SIHCurrentAction> _actionStack;
   Scene* _scene;
   Observer<PointerInfo>::Ptr _pointerObserver;

@@ -277,7 +277,7 @@ public:
   RadixFeatures features() const;
 
 private:
-  void setVisibleState(AbstractMesh* mesh, bool state);
+  void setVisibleState(const AbstractMeshPtr& mesh, bool state);
   float intersectMeshes(const Vector2& pos, const std::string& startName,
                         float currentClosest);
   void constructGraphicalObjects();
@@ -287,14 +287,14 @@ private:
                                const Matrix& transform);
   void constructRotation(RadixFeatures feature, const std::string& name,
                          const Matrix& transform);
-  void addSymbolicMeshToLit(AbstractMesh* mesh);
+  void addSymbolicMeshToLit(const AbstractMeshPtr& mesh);
   bool hasFeature(RadixFeatures value);
   bool hasHighlightedFeature(RadixFeatures value);
   void updateMaterial(const std::string& name, const Color3& color);
   void updateMaterialFromHighlighted(RadixFeatures feature,
                                      RadixFeatures highlighted,
                                      const std::string& name);
-  StandardMaterial* getMaterial(const std::string& name);
+  StandardMaterialPtr getMaterial(const std::string& name);
 
 private:
   static float pc;
@@ -305,12 +305,12 @@ private:
   float _coneLength;
   float _coneRadius;
   float _planeSelectionLength;
-  PointLight* _light1;
-  PointLight* _light2;
-  Mesh* _rootMesh;
+  PointLightPtr _light1;
+  PointLightPtr _light2;
+  MeshPtr _rootMesh;
   RadixFeatures _features;
   Scene* _scene;
-  std::unordered_map<std::string, Material*> _materials;
+  std::unordered_map<std::string, MaterialPtr> _materials;
   float _wireSelectionThreshold;
   Color3 _xArrowColor;
   Color3 _yArrowColor;

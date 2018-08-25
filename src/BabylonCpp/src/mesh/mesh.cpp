@@ -1492,12 +1492,12 @@ void Mesh::cleanMatrixWeights()
   }
 }
 
-vector_t<BABYLON::Node*> Mesh::getChildren()
+vector_t<NodePtr> Mesh::getChildren()
 {
-  vector_t<Node*> results;
+  vector_t<NodePtr> results;
   for (auto& mesh : getScene()->meshes) {
     if (mesh->parent() == this) {
-      results.emplace_back(mesh.get());
+      results.emplace_back(mesh);
     }
   }
 

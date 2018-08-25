@@ -179,7 +179,7 @@ void Radix::hide()
   setVisibleState(_rootMesh, false);
 }
 
-void Radix::setVisibleState(AbstractMesh* mesh, bool state)
+void Radix::setVisibleState(const AbstractMeshPtr& mesh, bool state)
 {
   mesh->isVisible = state;
   for (auto& childMesh : mesh->getChildMeshes(true)) {
@@ -190,9 +190,10 @@ void Radix::setVisibleState(AbstractMesh* mesh, bool state)
 float Radix::intersectMeshes(const Vector2& pos, const std::string& startName,
                              float currentClosest)
 {
-  auto meshes = _rootMesh->getChildMeshes(true, [&startName](Node* node) {
-    return String::startsWith(node->name, startName);
-  });
+  auto meshes
+    = _rootMesh->getChildMeshes(true, [&startName](const NodePtr& node) {
+        return String::startsWith(node->name, startName);
+      });
   for (auto& mesh : meshes) {
     auto ray = _scene->createPickingRay(
       static_cast<int>(pos.x), static_cast<int>(pos.y), mesh->getWorldMatrix(),
@@ -277,7 +278,7 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
 
   auto wireMesh                = LinesMesh::New(name + "Wire", _scene);
   wireMesh->rotationQuaternion = rotation;
-  wireMesh->setParent(_rootMesh);
+  wireMesh->setParent(_rootMesh.get());
   wireMesh->color                 = mtl->diffuseColor;
   wireMesh->renderingGroupId      = 1;
   wireMesh->intersectionThreshold = wireSelectionThreshold();
@@ -286,7 +287,7 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
   auto vd       = std::make_unique<VertexData>();
   vd->positions = points;
   vd->indices   = {0, 1};
-  vd->applyToMesh(wireMesh);
+  vd->applyToMesh(*wireMesh);
 
   auto arrow = Mesh::CreateCylinder(name + "Cone", _coneLength, 0, _coneRadius,
                                     18, 1, _scene, false);
@@ -294,7 +295,7 @@ void Radix::constructArrow(RadixFeatures feature, const std::string& name,
     Vector3(0, _arrowLength - (_coneLength / 2.f), 0.f), transform);
   arrow->rotationQuaternion = rotation;
   arrow->material           = mtl;
-  arrow->setParent(_rootMesh);
+  arrow->setParent(_rootMesh.get());
   arrow->renderingGroupId = 1;
   arrow->isPickable       = false;
   addSymbolicMeshToLit(arrow);
@@ -315,7 +316,7 @@ void Radix::constructPlaneSelection(RadixFeatures /*feature*/,
     Vector3(_arrowLength, _arrowLength - _planeSelectionLength, 0));
 
   auto wireMesh = Mesh::CreateLines(name + "Plane", points, _scene);
-  wireMesh->setParent(_rootMesh);
+  wireMesh->setParent(_rootMesh.get());
   wireMesh->color                 = mtl->diffuseColor;
   wireMesh->rotationQuaternion    = Quaternion::FromRotationMatrix(transform);
   wireMesh->renderingGroupId      = 1;
@@ -335,19 +336,19 @@ void Radix::constructRotation(RadixFeatures /*feature*/,
   rotCyl->position = Vector3::TransformCoordinates(
     Vector3(0.f, _coneLength / 2.f, 0.f), transform);
   rotCyl->rotationQuaternion = Quaternion::FromRotationMatrix(transform);
-  rotCyl->setParent(_rootMesh);
+  rotCyl->setParent(_rootMesh.get());
   rotCyl->renderingGroupId = 1;
   rotCyl->isPickable       = false;
   addSymbolicMeshToLit(rotCyl);
 }
 
-void Radix::addSymbolicMeshToLit(AbstractMesh* mesh)
+void Radix::addSymbolicMeshToLit(const AbstractMeshPtr& mesh)
 {
-  _light1->includedOnlyMeshes().emplace_back(mesh);
-  _light2->includedOnlyMeshes().emplace_back(mesh);
+  _light1->includedOnlyMeshes().emplace_back(mesh.get());
+  _light2->includedOnlyMeshes().emplace_back(mesh.get());
   for (auto& l : _scene->lights) {
-    if ((l.get() != _light1) && (l.get() != _light2)) {
-      l->excludedMeshes().emplace_back(mesh);
+    if ((l != _light1) && (l != _light2)) {
+      l->excludedMeshes().emplace_back(mesh.get());
     }
   }
 }
@@ -393,13 +394,13 @@ void Radix::updateMaterialFromHighlighted(RadixFeatures feature,
   }
 }
 
-StandardMaterial* Radix::getMaterial(const std::string& name)
+StandardMaterialPtr Radix::getMaterial(const std::string& name)
 {
   if (!stl_util::contains(_materials, name)) {
     return nullptr;
   }
 
-  return static_cast<StandardMaterial*>(_materials[name]);
+  return ::std::static_pointer_cast<StandardMaterial>(_materials[name]);
 }
 
 /** Getters / Setters **/
@@ -413,10 +414,11 @@ void Radix::setWireSelectionThreshold(float value)
 {
   _wireSelectionThreshold = value;
 
-  auto meshes = _rootMesh->getChildMeshes(
-    true, [](Node* node) { return node->type() == IReflect::Type::LINESMESH; });
+  auto meshes = _rootMesh->getChildMeshes(true, [](const NodePtr& node) {
+    return node->type() == IReflect::Type::LINESMESH;
+  });
   for (auto mesh : meshes) {
-    auto lm = static_cast<LinesMesh*>(mesh);
+    auto lm = ::std::static_pointer_cast<LinesMesh>(mesh);
     if (lm) {
       lm->intersectionThreshold = value;
     }

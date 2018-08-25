@@ -626,7 +626,7 @@ DynamicTerrain& DynamicTerrain::computeNormalsFromMap()
   return *this;
 }
 
-bool DynamicTerrain::contains(float x, float z) const
+bool DynamicTerrain::contains(float x, float z)
 {
   if (x < _positions[0] + mesh()->position().x
       || x > _positions[3 * _terrainIdx] + mesh()->position().x) {
@@ -757,17 +757,17 @@ void DynamicTerrain::setRefreshEveryFrame(bool val)
   _refreshEveryFrame = val;
 }
 
-Mesh* DynamicTerrain::mesh() const
+MeshPtr& DynamicTerrain::mesh()
 {
   return _terrain;
 }
 
-Camera* DynamicTerrain::camera() const
+CameraPtr& DynamicTerrain::camera()
 {
   return _terrainCamera;
 }
 
-void DynamicTerrain::setCamera(Camera* val)
+void DynamicTerrain::setCamera(const CameraPtr& val)
 {
   _terrainCamera = val;
 }
@@ -986,7 +986,7 @@ void DynamicTerrain::updateVertex(DynamicTerrainVertex& /*vertex*/,
 {
 }
 
-unsigned int DynamicTerrain::updateCameraLOD(Camera* /*terrainCamera*/)
+unsigned int DynamicTerrain::updateCameraLOD(const CameraPtr& /*terrainCamera*/)
 {
   // LOD value increases with camera altitude
   unsigned int camLOD = 0;

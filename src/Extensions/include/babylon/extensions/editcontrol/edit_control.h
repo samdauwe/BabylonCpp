@@ -14,10 +14,11 @@ namespace Extensions {
 class EditControl {
 
 public:
-  EditControl(Mesh* mesh, Camera* camera, ICanvas* canvas, float scale = 1.f);
+  EditControl(const MeshPtr& mesh, Camera* camera, ICanvas* canvas,
+              float scale = 1.f);
   ~EditControl();
 
-  void switchTo(Mesh* mesh);
+  void switchTo(const MeshPtr& mesh);
   void setUndoCount(int c);
   void undo();
   void redo();
@@ -49,15 +50,16 @@ private:
   void onPointerDown(PointerEvent& event);
   void detachControl(Camera* cam, ICanvas* can);
   void onPointerOver();
-  void restoreColor(Mesh* mesh);
+  void restoreColor(const MeshPtr& mesh);
   void onPointerUp(const Event& event);
   void onPointerMove(const Event& event);
-  Mesh* getPickPlane(Mesh* axis);
+  MeshPtr getPickPlane(const MeshPtr& axis);
   void doTranslation(const Vector3& diff);
-  void transWithSnap(Mesh* mesh, Vector3& trans, bool local);
+  void transWithSnap(const MeshPtr& mesh, Vector3& trans, bool local);
   void doScaling(const Vector3& diff);
-  void scaleWithSnap(Mesh* mesh, Vector3& p);
-  void doRotation(Mesh* mesh, Mesh* axis, const Vector3& newPos);
+  void scaleWithSnap(const MeshPtr& mesh, Vector3& p);
+  void doRotation(const MeshPtr& mesh, const MeshPtr& axis,
+                  const Vector3& newPos);
   std::tuple<Vector3, bool> getPosOnPickPlane();
   void hideBaxis();
   /**
@@ -67,11 +69,11 @@ private:
   void createGuideAxes();
   void createPickPlanes();
   void createTransAxes();
-  Mesh* createTriangle(const std::string& name, float w, Scene* scene) const;
+  MeshPtr createTriangle(const std::string& name, float w, Scene* scene) const;
   void createRotAxes();
-  Mesh* extrudeBox(float w, float l) const;
-  LinesMesh* createCircle(float r, int t = 360) const;
-  Mesh* createTube(float r, int t = 360) const;
+  MeshPtr extrudeBox(float w, float l) const;
+  LinesMeshPtr createCircle(float r, int t = 360) const;
+  MeshPtr createTube(float r, int t = 360) const;
   void createScaleAxes();
   /**
    * @brief this would be call during rotation as the local axes direction owuld
@@ -82,21 +84,21 @@ private:
    * TODO should use world pivotmatrix instead of worldmatrix - incase pivot
    * axes were rotated?
    */
-  void setLocalAxes(Mesh* mesh);
+  void setLocalAxes(const MeshPtr& mesh);
   void setAxesScale();
   static float getAngle(const Vector3& p1, const Vector3& p2, const Vector3& p,
                         const Vector3& cN);
   void createMaterials(Scene* scene);
   void disposeMaterials();
-  static StandardMaterial* getStandardMaterial(const std::string& name,
-                                               const Color3& col, Scene* scene);
+  static StandardMaterialPtr
+  getStandardMaterial(const std::string& name, const Color3& col, Scene* scene);
 
 private:
-  Mesh* mesh;
+  MeshPtr mesh;
   ICanvas* canvas;
   Scene* scene;
-  Camera* mainCamera;
-  Mesh* theParent;
+  CameraPtr mainCamera;
+  MeshPtr theParent;
   bool local;
   bool snapT;
   bool snapR;
@@ -104,11 +106,11 @@ private:
   float rotSnap;
   float axesLen;
   float axesScale;
-  StandardMaterial* redMat;
-  StandardMaterial* greenMat;
-  StandardMaterial* blueMat;
-  StandardMaterial* whiteMat;
-  StandardMaterial* yellowMat;
+  StandardMaterialPtr redMat;
+  StandardMaterialPtr greenMat;
+  StandardMaterialPtr blueMat;
+  StandardMaterialPtr whiteMat;
+  StandardMaterialPtr yellowMat;
   ActHist actHist;
   ::std::function<void(Scene* scene, EventState& es)> renderer;
   // EventListener* pointerdown;
@@ -118,10 +120,10 @@ private:
   float visibility;
   // Picking
   bool pDown;
-  Mesh* axisPicked;
-  Mesh* prevOverMesh;
+  MeshPtr axisPicked;
+  MeshPtr prevOverMesh;
   bool pointerIsOver;
-  Material* savedMat;
+  MaterialPtr savedMat;
   Color3 savedCol;
   bool editing;
   Vector3 prevPos;
@@ -143,58 +145,58 @@ private:
   bool transEnabled;
   bool rotEnabled;
   bool scaleEnabled;
-  LinesMesh* bXaxis;
-  LinesMesh* bYaxis;
-  LinesMesh* bZaxis;
-  LinesMesh* xaxis;
-  LinesMesh* yaxis;
-  LinesMesh* zaxis;
-  Mesh* guideCtl;
-  Mesh* pickPlanes;
-  Mesh* pickPlane;
-  Mesh* pALL;
-  Mesh* pXZ;
-  Mesh* pZY;
-  Mesh* pYX;
-  Mesh* tCtl;
-  Mesh* tX;
-  Mesh* tY;
-  Mesh* tZ;
-  Mesh* tXZ;
-  Mesh* tZY;
-  Mesh* tYX;
-  Mesh* tAll;
-  Mesh* tEndX;
-  Mesh* tEndY;
-  Mesh* tEndZ;
-  Mesh* tEndXZ;
-  Mesh* tEndZY;
-  Mesh* tEndYX;
-  Mesh* tEndAll;
-  Mesh* rCtl;
-  Mesh* rX;
-  Mesh* rY;
-  Mesh* rZ;
-  Mesh* rAll;
-  LinesMesh* rEndX;
-  LinesMesh* rEndY;
-  LinesMesh* rEndZ;
-  LinesMesh* rEndAll;
-  Mesh* sCtl;
-  Mesh* sX;
-  Mesh* sY;
-  Mesh* sZ;
-  Mesh* sXZ;
-  Mesh* sZY;
-  Mesh* sYX;
-  Mesh* sAll;
-  Mesh* sEndX;
-  Mesh* sEndY;
-  Mesh* sEndZ;
-  Mesh* sEndXZ;
-  Mesh* sEndZY;
-  Mesh* sEndYX;
-  Mesh* sEndAll;
+  LinesMeshPtr bXaxis;
+  LinesMeshPtr bYaxis;
+  LinesMeshPtr bZaxis;
+  LinesMeshPtr xaxis;
+  LinesMeshPtr yaxis;
+  LinesMeshPtr zaxis;
+  MeshPtr guideCtl;
+  MeshPtr pickPlanes;
+  MeshPtr pickPlane;
+  MeshPtr pALL;
+  MeshPtr pXZ;
+  MeshPtr pZY;
+  MeshPtr pYX;
+  MeshPtr tCtl;
+  MeshPtr tX;
+  MeshPtr tY;
+  MeshPtr tZ;
+  MeshPtr tXZ;
+  MeshPtr tZY;
+  MeshPtr tYX;
+  MeshPtr tAll;
+  MeshPtr tEndX;
+  MeshPtr tEndY;
+  MeshPtr tEndZ;
+  MeshPtr tEndXZ;
+  MeshPtr tEndZY;
+  MeshPtr tEndYX;
+  MeshPtr tEndAll;
+  MeshPtr rCtl;
+  MeshPtr rX;
+  MeshPtr rY;
+  MeshPtr rZ;
+  MeshPtr rAll;
+  LinesMeshPtr rEndX;
+  LinesMeshPtr rEndY;
+  LinesMeshPtr rEndZ;
+  LinesMeshPtr rEndAll;
+  MeshPtr sCtl;
+  MeshPtr sX;
+  MeshPtr sY;
+  MeshPtr sZ;
+  MeshPtr sXZ;
+  MeshPtr sZY;
+  MeshPtr sYX;
+  MeshPtr sAll;
+  MeshPtr sEndX;
+  MeshPtr sEndY;
+  MeshPtr sEndZ;
+  MeshPtr sEndXZ;
+  MeshPtr sEndZY;
+  MeshPtr sEndYX;
+  MeshPtr sEndAll;
   Vector3 localX;
   Vector3 localY;
   Vector3 localZ;

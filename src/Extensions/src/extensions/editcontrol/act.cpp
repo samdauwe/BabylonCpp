@@ -5,7 +5,8 @@
 namespace BABYLON {
 namespace Extensions {
 
-Act::Act(AbstractMesh* mesh) : p{mesh->position()}, rSet{false}, rESet{false}
+Act::Act(const AbstractMeshPtr& mesh)
+    : p{mesh->position()}, rSet{false}, rESet{false}
 {
   if (!mesh->rotationQuaternion()) {
     rE    = mesh->rotation();
@@ -70,7 +71,7 @@ Act::~Act()
 {
 }
 
-void Act::perform(AbstractMesh* mesh)
+void Act::perform(const AbstractMeshPtr& mesh)
 {
   mesh->position().copyFrom(p);
   // Check if we are doing euler or quaternion now also check what were we doing

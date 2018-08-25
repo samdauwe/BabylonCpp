@@ -22,9 +22,9 @@ struct BABYLON_SHARED_EXPORT QuickTreeGenerator {
    * @param leafMaterial - material for canopies.
    * @param scene - BABYLON scene.
    */
-  static Mesh* CreateTree(float sizeBranch, float sizeTrunk, float radius,
-                          Material* trunkMaterial, Material* leafMaterial,
-                          Scene* scene);
+  static MeshPtr CreateTree(float sizeBranch, float sizeTrunk, float radius,
+                            const MaterialPtr& trunkMaterial,
+                            const MaterialPtr& leafMaterial, Scene* scene);
 
 }; // end of struct QuickTreeGenerator
 

@@ -462,7 +462,7 @@ public:
    */
   void cleanMatrixWeights();
 
-  vector_t<Node*> getChildren();
+  vector_t<NodePtr> getChildren();
   Mesh& _checkDelayState();
 
   /**

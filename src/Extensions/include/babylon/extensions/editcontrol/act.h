@@ -11,14 +11,14 @@ namespace Extensions {
 class Act {
 
 public:
-  Act(AbstractMesh* mesh);
+  Act(const AbstractMeshPtr& mesh);
   Act(const Act& otherAct);
   Act(Act&& otherAct);
   Act& operator=(const Act& otherAct);
   Act& operator=(Act&& otherAct);
   ~Act();
 
-  void perform(AbstractMesh* mesh);
+  void perform(const AbstractMeshPtr& mesh);
 
 private:
   Vector3 p;
