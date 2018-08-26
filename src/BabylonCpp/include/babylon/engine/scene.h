@@ -1144,7 +1144,7 @@ public:
    * default which means same resolution)
    * @returns the GeometryBufferRenderer
    */
-  GeometryBufferRenderer* enableGeometryBufferRenderer(float ratio = 1.f);
+  GeometryBufferRendererPtr& enableGeometryBufferRenderer(float ratio = 1.f);
 
   /**
    * @brief Disables the GeometryBufferRender associated with the scene.
@@ -1877,15 +1877,19 @@ protected:
   array_t<Plane, 6>& get_frustumPlanes();
 
   /**
+   * @brief Hidden (Backing field)
+   */
+  unordered_map_t<string_t, unique_ptr_t<DepthRenderer>>& get_depthRenderer();
+
+  /**
    * @brief Gets the current geometry buffer associated to the scene.
    */
-  shared_ptr_t<GeometryBufferRenderer>& get_geometryBufferRenderer();
+  GeometryBufferRendererPtr& get_geometryBufferRenderer();
 
   /**
    * @brief Sets the current geometry buffer for the scene.
    */
-  void set_geometryBufferRenderer(
-    const shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer);
+  void set_geometryBufferRenderer(const GeometryBufferRendererPtr& value);
 
   /**
    * @brief Gets the debug layer (aka Inspector) associated with the scene.
@@ -2782,9 +2786,16 @@ public:
   vector_t<ISceneSerializableComponentPtr> _serializableComponents;
 
   /**
+   * Gets the depth renderer object.
+   */
+  ReadOnlyProperty<Scene,
+                   unordered_map_t<string_t, unique_ptr_t<DepthRenderer>>>
+    depthRenderer;
+
+  /**
    * Gets the current geometry buffer associated to the scene
    */
-  Property<Scene, shared_ptr_t<GeometryBufferRenderer>> geometryBufferRenderer;
+  Property<Scene, GeometryBufferRendererPtr> geometryBufferRenderer;
 
   /**
    * Gets the debug layer (aka Inspector) associated with the scene
@@ -3095,7 +3106,7 @@ private:
   Sprite* _pointerOverSprite;
   unique_ptr_t<DebugLayer> _debugLayer;
   unordered_map_t<string_t, unique_ptr_t<DepthRenderer>> _depthRenderer;
-  shared_ptr_t<GeometryBufferRenderer> _geometryBufferRenderer;
+  GeometryBufferRendererPtr _geometryBufferRenderer;
   AbstractMeshPtr _pickedDownMesh;
   AbstractMeshPtr _pickedUpMesh;
   Sprite* _pickedDownSprite;

@@ -429,6 +429,7 @@ using BaseTexturePtr         = shared_ptr_t<BaseTexture>;
 using CubeTexturePtr         = shared_ptr_t<CubeTexture>;
 using DynamicTexturePtr      = shared_ptr_t<DynamicTexture>;
 using MirrorTexturePtr       = shared_ptr_t<MirrorTexture>;
+using MultiRenderTargetPtr   = shared_ptr_t<MultiRenderTarget>;
 using RenderTargetTexturePtr = shared_ptr_t<RenderTargetTexture>;
 using TexturePtr             = shared_ptr_t<Texture>;
 using RawTexturePtr          = shared_ptr_t<RawTexture>;
@@ -578,6 +579,7 @@ using IParticleSystemPtr = shared_ptr_t<IParticleSystem>;
 // - EmitterTypes
 class BoxParticleEmitter;
 class ConeParticleEmitter;
+class CylinderParticleEmitter;
 class HemisphericParticleEmitter;
 struct IParticleEmitterType;
 class PointParticleEmitter;
@@ -668,9 +670,11 @@ class ReflectionProbe;
 // --- Rendering ---
 class BoundingBoxRenderer;
 class DepthRenderer;
+class DepthRendererSceneComponent;
 class EdgesRenderer;
 class FaceAdjacencies;
 class GeometryBufferRenderer;
+class GeometryBufferRendererSceneComponent;
 struct IRenderingManagerAutoClearSetup;
 class OutlineRenderer;
 class LineEdgesRenderer;
@@ -679,6 +683,11 @@ class RenderingManager;
 class UtilityLayerRenderer;
 // -- Rendering aliases --
 using BoundingBoxRendererPtr = shared_ptr_t<BoundingBoxRenderer>;
+using DepthRendererSceneComponentPtr
+  = shared_ptr_t<DepthRendererSceneComponent>;
+using GeometryBufferRendererPtr = shared_ptr_t<GeometryBufferRenderer>;
+using GeometryBufferRendererSceneComponentPtr
+  = shared_ptr_t<GeometryBufferRendererSceneComponent>;
 // --- Sprites ---
 class Sprite;
 class SpriteManager;

@@ -160,9 +160,9 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   return _effect->isReady();
 }
 
-MultiRenderTarget* GeometryBufferRenderer::getGBuffer() const
+MultiRenderTargetPtr GeometryBufferRenderer::getGBuffer() const
 {
-  return _multiRenderTarget.get();
+  return _multiRenderTarget;
 }
 
 unsigned int GeometryBufferRenderer::get_samples() const
@@ -190,7 +190,7 @@ void GeometryBufferRenderer::_createRenderTargets()
   options.generateMipMaps      = false;
   options.generateDepthTexture = true;
   options.defaultType          = EngineConstants::TEXTURETYPE_FLOAT;
-  _multiRenderTarget           = ::std::make_unique<MultiRenderTarget>(
+  _multiRenderTarget           = ::std::make_shared<MultiRenderTarget>(
     "gBuffer",
     Size{static_cast<int>(engine->getRenderWidth() * _ratio),
          static_cast<int>(engine->getRenderHeight() * _ratio)},

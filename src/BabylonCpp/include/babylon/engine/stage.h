@@ -43,7 +43,7 @@ using SimpleStageAction = ::std::function<void()>;
  * Strong typing of a render target action.
  */
 using RenderTargetsStageAction
-  = ::std::function<void(const vector_t<RenderTargetTexture*>& renderTargets)>;
+  = ::std::function<void(vector_t<RenderTargetTexturePtr>& renderTargets)>;
 
 /**
  * @brief Representation of a step.

@@ -173,6 +173,7 @@ Scene::Scene(Engine* engine)
                                    &Scene::get_isAlternateRenderingEnabled}
     , frustumPlanes{this, &Scene::get_frustumPlanes}
     , requireLightSorting{false}
+    , depthRenderer{this, &Scene::get_depthRenderer}
     , geometryBufferRenderer{this, &Scene::get_geometryBufferRenderer,
                              &Scene::set_geometryBufferRenderer}
     , debugLayer{this, &Scene::get_debugLayer}
@@ -646,16 +647,21 @@ unique_ptr_t<SoundTrack>& Scene::get_mainSoundTrack()
   return _mainSoundTrack;
 }
 
-shared_ptr_t<GeometryBufferRenderer>& Scene::get_geometryBufferRenderer()
+unordered_map_t<string_t, unique_ptr_t<DepthRenderer>>&
+Scene::get_depthRenderer()
+{
+  return _depthRenderer;
+}
+
+GeometryBufferRendererPtr& Scene::get_geometryBufferRenderer()
 {
   return _geometryBufferRenderer;
 }
 
-void Scene::set_geometryBufferRenderer(
-  const shared_ptr_t<GeometryBufferRenderer>& geometryBufferRenderer)
+void Scene::set_geometryBufferRenderer(const GeometryBufferRendererPtr& value)
 {
-  if (geometryBufferRenderer && geometryBufferRenderer->isSupported()) {
-    _geometryBufferRenderer = geometryBufferRenderer;
+  if (value && value->isSupported()) {
+    _geometryBufferRenderer = value;
   }
 }
 
@@ -3973,19 +3979,19 @@ void Scene::disableDepthRenderer(const CameraPtr& camera)
   _depthRenderer.erase(camera->id);
 }
 
-GeometryBufferRenderer* Scene::enableGeometryBufferRenderer(float ratio)
+GeometryBufferRendererPtr& Scene::enableGeometryBufferRenderer(float ratio)
 {
   if (_geometryBufferRenderer) {
-    return _geometryBufferRenderer.get();
+    return _geometryBufferRenderer;
   }
 
   _geometryBufferRenderer
-    = ::std::make_unique<GeometryBufferRenderer>(this, ratio);
+    = ::std::make_shared<GeometryBufferRenderer>(this, ratio);
   if (!_geometryBufferRenderer->isSupported()) {
     _geometryBufferRenderer = nullptr;
   }
 
-  return _geometryBufferRenderer.get();
+  return _geometryBufferRenderer;
 }
 
 void Scene::disableGeometryBufferRenderer()

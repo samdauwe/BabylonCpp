@@ -34,7 +34,7 @@ public:
    * @brief Gets the current underlying G Buffer.
    * @returns the buffer
    */
-  MultiRenderTarget* getGBuffer() const;
+  MultiRenderTargetPtr getGBuffer() const;
 
   /**
    * @brief Disposes the renderer and frees up associated resources.
@@ -134,7 +134,7 @@ protected:
 
 private:
   Scene* _scene;
-  unique_ptr_t<MultiRenderTarget> _multiRenderTarget;
+  MultiRenderTargetPtr _multiRenderTarget;
   float _ratio;
   bool _enablePosition;
 
