@@ -458,7 +458,7 @@ public:
 
   /**
    * Shadow generator associted to the light.
-   * Internal use only.
+   * Hidden Internal use only.
    */
   ShadowGenerator* _shadowGenerator;
 

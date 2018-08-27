@@ -16,13 +16,23 @@
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/rendering/depth_renderer.h>
+#include <babylon/rendering/depth_renderer_scene_component.h>
 
 namespace BABYLON {
 
 DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
                              const CameraPtr& camera)
-    : _scene{scene}, _depthMap{nullptr}, _effect{nullptr}, _camera{camera}
+    : _scene{scene}, _depthMap{nullptr}, _effect{nullptr}
 {
+  // Register the G Buffer component to the scene.
+  auto component = ::std::static_pointer_cast<DepthRendererSceneComponent>(
+    scene->_getComponent(SceneComponentConstants::NAME_DEPTHRENDERER));
+  if (!component) {
+    component = DepthRendererSceneComponent::New(scene);
+    scene->_addComponent(component);
+  }
+
+  _camera     = camera;
   auto engine = scene->getEngine();
 
   // Render target

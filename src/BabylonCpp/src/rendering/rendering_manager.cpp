@@ -221,12 +221,12 @@ void RenderingManager::setRenderingOrder(
   _customTransparentSortCompareFn[renderingGroupId] = transparentSortCompareFn;
 
   if (_renderingGroups[renderingGroupId]) {
-    auto& group = _renderingGroups[renderingGroupId];
-    group->setOpaqueSortCompareFn(_customOpaqueSortCompareFn[renderingGroupId]);
-    group->setAlphaTestSortCompareFn(
-      _customAlphaTestSortCompareFn[renderingGroupId]);
-    group->setTransparentSortCompareFn(
-      _customTransparentSortCompareFn[renderingGroupId]);
+    auto& group                = _renderingGroups[renderingGroupId];
+    group->opaqueSortCompareFn = _customOpaqueSortCompareFn[renderingGroupId];
+    group->alphaTestSortCompareFn
+      = _customAlphaTestSortCompareFn[renderingGroupId];
+    group->transparentSortCompareFn
+      = _customTransparentSortCompareFn[renderingGroupId];
   }
 }
 

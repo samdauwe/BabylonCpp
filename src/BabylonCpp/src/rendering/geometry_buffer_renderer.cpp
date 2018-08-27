@@ -13,6 +13,7 @@
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/rendering/geometry_buffer_renderer_scene_component.h>
 
 namespace BABYLON {
 
@@ -27,11 +28,22 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
               &GeometryBufferRenderer::set_samples}
     , _effect{nullptr}
     , _cachedDefines{""}
-    , _scene{scene}
     , _multiRenderTarget{nullptr}
-    , _ratio{ratio}
     , _enablePosition{false}
 {
+  _scene = scene;
+  _ratio = ratio;
+
+  // Register the G Buffer component to the scene.
+  auto component
+    = ::std::static_pointer_cast<GeometryBufferRendererSceneComponent>(
+      scene->_getComponent(
+        SceneComponentConstants::NAME_GEOMETRYBUFFERRENDERER));
+  if (!component) {
+    component = GeometryBufferRendererSceneComponent::New(scene);
+    scene->_addComponent(component);
+  }
+
   // Render target
   _createRenderTargets();
 }
@@ -172,7 +184,7 @@ unsigned int GeometryBufferRenderer::get_samples() const
 
 void GeometryBufferRenderer::set_samples(unsigned int value)
 {
-  _multiRenderTarget->setSamples(value);
+  _multiRenderTarget->samples = value;
 }
 
 void GeometryBufferRenderer::dispose()
@@ -199,8 +211,8 @@ void GeometryBufferRenderer::_createRenderTargets()
     return;
   }
 
-  _multiRenderTarget->setWrapU(TextureConstants::CLAMP_ADDRESSMODE);
-  _multiRenderTarget->setWrapV(TextureConstants::CLAMP_ADDRESSMODE);
+  _multiRenderTarget->wrapU           = TextureConstants::CLAMP_ADDRESSMODE;
+  _multiRenderTarget->wrapV           = TextureConstants::CLAMP_ADDRESSMODE;
   _multiRenderTarget->refreshRate     = 1;
   _multiRenderTarget->renderParticles = false;
   _multiRenderTarget->renderList      = {};

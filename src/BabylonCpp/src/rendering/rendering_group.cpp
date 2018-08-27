@@ -18,13 +18,17 @@ namespace BABYLON {
 RenderingGroup::RenderingGroup(
   unsigned int iIndex, Scene* scene,
   const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
-    opaqueSortCompareFn,
+    iOpaqueSortCompareFn,
   const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
-    alphaTestSortCompareFn,
+    iAlphaTestSortCompareFn,
   const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
-    transparentSortCompareFn)
+    iTransparentSortCompareFn)
     : index{iIndex}
     , onBeforeTransparentRendering{nullptr}
+    , opaqueSortCompareFn{this, &RenderingGroup::set_opaqueSortCompareFn}
+    , alphaTestSortCompareFn{this, &RenderingGroup::set_alphaTestSortCompareFn}
+    , transparentSortCompareFn{this,
+                               &RenderingGroup::set_transparentSortCompareFn}
     , _scene{scene}
     , _opaqueSortCompareFn{nullptr}
     , _alphaTestSortCompareFn{nullptr}
@@ -42,16 +46,16 @@ RenderingGroup::RenderingGroup(
 
   _edgesRenderers.reserve(16);
 
-  setOpaqueSortCompareFn(opaqueSortCompareFn);
-  setAlphaTestSortCompareFn(alphaTestSortCompareFn);
-  setTransparentSortCompareFn(transparentSortCompareFn);
+  opaqueSortCompareFn      = iOpaqueSortCompareFn;
+  alphaTestSortCompareFn   = iAlphaTestSortCompareFn;
+  transparentSortCompareFn = iTransparentSortCompareFn;
 }
 
 RenderingGroup::~RenderingGroup()
 {
 }
 
-void RenderingGroup::setOpaqueSortCompareFn(
+void RenderingGroup::set_opaqueSortCompareFn(
   const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>& value)
 {
   _opaqueSortCompareFn = value;
@@ -67,7 +71,7 @@ void RenderingGroup::setOpaqueSortCompareFn(
   }
 }
 
-void RenderingGroup::setAlphaTestSortCompareFn(
+void RenderingGroup::set_alphaTestSortCompareFn(
   const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>& value)
 {
   _alphaTestSortCompareFn = value;
@@ -83,7 +87,7 @@ void RenderingGroup::setAlphaTestSortCompareFn(
   }
 }
 
-void RenderingGroup::setTransparentSortCompareFn(
+void RenderingGroup::set_transparentSortCompareFn(
   const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>& value)
 {
   if (value) {
@@ -161,8 +165,12 @@ void RenderingGroup::render(
   engine->setStencilBuffer(false);
 
   // Edges
-  for (auto& edgesRenderer : _edgesRenderers) {
-    edgesRenderer->render();
+  if (!_edgesRenderers.empty()) {
+    for (auto& edgesRenderer : _edgesRenderers) {
+      edgesRenderer->render();
+    }
+
+    engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   }
 
   // Restore Stencil state.

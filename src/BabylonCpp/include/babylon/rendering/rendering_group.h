@@ -32,30 +32,6 @@ public:
   ~RenderingGroup();
 
   /**
-   * @brief Set the opaque sort comparison function.
-   * If null the sub meshes will be render in the order they were created
-   */
-  void setOpaqueSortCompareFn(
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
-      value);
-
-  /**
-   * @brief Set the alpha test sort comparison function.
-   * If null the sub meshes will be render in the order they were created
-   */
-  void setAlphaTestSortCompareFn(
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
-      value);
-
-  /**
-   * @brief Set the transparent sort comparison function.
-   * If null the sub meshes will be render in the order they were created
-   */
-  void setTransparentSortCompareFn(
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
-      value);
-
-  /**
    * @brief Render all the sub meshes contained in the group.
    * @param customRenderFunction Used to override the default render behaviour
    * of the group.
@@ -171,9 +147,58 @@ private:
    */
   static void renderUnsorted(const vector_t<SubMeshPtr>& subMeshes);
 
+protected:
+  /**
+   * @brief Set the opaque sort comparison function.
+   * If null the sub meshes will be render in the order they were created
+   */
+  void set_opaqueSortCompareFn(
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      value);
+
+  /**
+   * @brief Set the alpha test sort comparison function.
+   * If null the sub meshes will be render in the order they were created
+   */
+  void set_alphaTestSortCompareFn(
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      value);
+
+  /**
+   * @brief Set the transparent sort comparison function.
+   * If null the sub meshes will be render in the order they were created
+   */
+  void set_transparentSortCompareFn(
+    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+      value);
+
 public:
   unsigned int index;
   ::std::function<void()> onBeforeTransparentRendering;
+
+  /**
+   * Sets the opaque sort comparison function
+   * If null the sub meshes will be render in the order they were created
+   */
+  WriteOnlyProperty<RenderingGroup, ::std::function<int(const SubMeshPtr& a,
+                                                        const SubMeshPtr& b)>>
+    opaqueSortCompareFn;
+
+  /**
+   * Sets the alpha test sort comparison function.
+   * If null the sub meshes will be render in the order they were created
+   */
+  WriteOnlyProperty<RenderingGroup, ::std::function<int(const SubMeshPtr& a,
+                                                        const SubMeshPtr& b)>>
+    alphaTestSortCompareFn;
+
+  /**
+   * Sets the transparent sort comparison function
+   * If null the sub meshes will be render in the order they were created
+   */
+  WriteOnlyProperty<RenderingGroup, ::std::function<int(const SubMeshPtr& a,
+                                                        const SubMeshPtr& b)>>
+    transparentSortCompareFn;
 
 private:
   Scene* _scene;
