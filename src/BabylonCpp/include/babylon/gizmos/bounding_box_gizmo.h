@@ -59,16 +59,25 @@ public:
    * @brief CustomMeshes are not supported by this gizmo.
    * @param mesh The mesh to replace the default mesh of the gizmo
    */
-  void setCustomMesh(Mesh* mesh) override;
+  void setCustomMesh(const MeshPtr& mesh,
+                     bool useGizmoMaterial = false) override;
 
 protected:
-  void _attachedMeshChanged(AbstractMesh* value) override;
+  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
 
 private:
+  void removeAndStorePivotPoint();
+  void restorePivotPoint();
   void _selectNode(const MeshPtr& selectedMesh);
-  void _recurseComputeWorld(AbstractMesh* mesh);
+  void _recurseComputeWorld(const NodePtr& node);
 
 public:
+  /**
+   * If child meshes should be ignored when calculating the boudning box. This
+   * should be set to true to avoid perf hits with heavily nested meshes
+   * (Default: false)
+   */
+  bool ignoreChildren;
   /**
    * The size of the rotation spheres attached to the bounding box (Default:
    * 0.1)
@@ -95,13 +104,27 @@ public:
    */
   Observable<DragStartOrEndEvent> onDragStartObservable;
   /**
-   * Fired when a rotation sphere or scale box drag is started
+   * Fired when a scale box is dragged
    */
-  Observable<DragMoveEvent> onDragObservable;
+  Observable<DragMoveEvent> onScaleBoxDragObservable;
   /**
-   * Fired when a rotation sphere or scale box drag is needed
+   * Fired when a scale box drag is ended
    */
-  Observable<DragStartOrEndEvent> onDragEndObservable;
+  Observable<DragStartOrEndEvent> onScaleBoxDragEndObservable;
+  /**
+   * Fired when a rotation sphere is dragged
+   */
+  Observable<DragStartOrEndEvent> onRotationSphereDragObservable;
+  /**
+   * Fired when a rotation sphere drag is ended
+   */
+  Observable<DragStartOrEndEvent> onRotationSphereDragEndObservable;
+  /**
+   * Relative bounding box pivot used when scaling the attached mesh. When null
+   * object with scale from the opposite corner. 0.5,0.5,0.5 for center and
+   * 0.5,0,0.5 for bottom (Default: null)
+   */
+  nullable_t<Vector3> scalePivot;
 
 private:
   AbstractMeshPtr _lineBoundingBox;
@@ -114,9 +137,13 @@ private:
 
   Quaternion _tmpQuaternion;
   Vector3 _tmpVector;
+  Matrix _tmpRotationMatrix;
 
   AbstractMeshPtr _anchorMesh;
   Vector3 _existingMeshScale;
+
+  Vector3 _oldPivotPoint;
+  Vector3 _pivotTranslation;
 
 }; // end of class BoundingBoxGizmo
 

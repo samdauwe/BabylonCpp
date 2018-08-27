@@ -253,7 +253,7 @@ struct MouseEvent {
 }; // end of struct MouseEvent
 
 struct NodeCache {
-  Node* parent;
+  Node* parent = nullptr;
   // AbstractMesh
   Vector3 position;
   Vector3 scaling;

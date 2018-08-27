@@ -39,7 +39,7 @@ public:
    * @brief Attaches a set of gizmos to the specified mesh.
    * @param mesh The mesh the gizmo's should be attached to
    */
-  void attachToMesh(AbstractMesh* mesh);
+  void attachToMesh(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Disposes of the gizmo manager.
@@ -83,7 +83,7 @@ public:
    * Array of meshes which will have the gizmo attached when a pointer selected
    * them. If null, all meshes are attachable. (Default: null)
    */
-  nullable_t<vector_t<AbstractMesh*>> attachableMeshes;
+  nullable_t<vector_t<AbstractMeshPtr>> attachableMeshes;
 
   /**
    * If pointer events should perform attaching/detaching a gizmo, if false this
@@ -114,9 +114,8 @@ public:
 private:
   Scene* _scene;
   GizmosEnabledSettings _gizmosEnabled;
-  shared_ptr_t<UtilityLayerRenderer> _gizmoLayer;
   Observer<PointerInfo>::Ptr _pointerObserver;
-  AbstractMesh* _attachedMesh;
+  AbstractMeshPtr _attachedMesh;
   Color3 _boundingBoxColor;
   unique_ptr_t<SixDofDragBehavior> _dragBehavior;
 

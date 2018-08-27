@@ -16,6 +16,10 @@ PositionGizmo::PositionGizmo(
         Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
     , zGizmo{::std::make_unique<AxisDragGizmo>(
         Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
+    , snapDistance{this, &PositionGizmo::get_snapDistance,
+                   &PositionGizmo::set_snapDistance}
+    , scaleRatio{this, &PositionGizmo::get_scaleRatio,
+                 &PositionGizmo::set_scaleRatio}
     , updateGizmoRotationToMatchAttachedMesh{
         this, &PositionGizmo::get_updateGizmoRotationToMatchAttachedMesh,
         &PositionGizmo::set_updateGizmoRotationToMatchAttachedMesh}
@@ -27,7 +31,7 @@ PositionGizmo::~PositionGizmo()
 {
 }
 
-void PositionGizmo::set_attachedMesh(AbstractMesh* const& mesh)
+void PositionGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   if (xGizmo) {
     xGizmo->attachedMesh = mesh;
@@ -50,6 +54,34 @@ bool PositionGizmo::get_updateGizmoRotationToMatchAttachedMesh() const
   return xGizmo->updateGizmoRotationToMatchAttachedMesh;
 }
 
+void PositionGizmo::set_snapDistance(float value)
+{
+  if (xGizmo) {
+    xGizmo->snapDistance = value;
+    yGizmo->snapDistance = value;
+    zGizmo->snapDistance = value;
+  }
+}
+
+float PositionGizmo::get_snapDistance() const
+{
+  return xGizmo->snapDistance;
+}
+
+void PositionGizmo::set_scaleRatio(float value)
+{
+  if (xGizmo) {
+    xGizmo->scaleRatio = value;
+    yGizmo->scaleRatio = value;
+    zGizmo->scaleRatio = value;
+  }
+}
+
+float PositionGizmo::get_scaleRatio() const
+{
+  return xGizmo->scaleRatio;
+}
+
 void PositionGizmo::dispose(bool /*doNotRecurse*/,
                             bool /*disposeMaterialAndTextures*/)
 {
@@ -58,7 +90,8 @@ void PositionGizmo::dispose(bool /*doNotRecurse*/,
   zGizmo->dispose();
 }
 
-void PositionGizmo::setCustomMesh(Mesh* /*mesh*/)
+void PositionGizmo::setCustomMesh(const MeshPtr& /*mesh*/,
+                                  bool /*useGizmoMaterial*/)
 {
   BABYLON_LOG_ERROR("PositionGizmo",
                     "Custom meshes are not supported on this gizmo, please set "

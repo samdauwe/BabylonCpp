@@ -28,14 +28,14 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   auto hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   hoverMaterial->setDisableLighting(true);
-  hoverMaterial->emissiveColor = color.add(Color3(0.2f, 0.2f, 0.2f));
+  hoverMaterial->emissiveColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   auto parentMesh = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
 
   // Create circle out of lines
   auto tessellation = 20ul;
-  auto radius       = 2.f;
+  auto radius       = 0.8f;
   vector_t<Vector3> points;
   for (size_t i = 0; i < tessellation; ++i) {
     auto radian = (Math::PI2) * (i / (tessellation - 1));
@@ -47,13 +47,14 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   rotationMesh->color = coloredMaterial->emissiveColor;
 
   // Position arrow pointing in its drag axis
-  rotationMesh->scaling().scaleInPlace(0.1f);
+  rotationMesh->scaling().scaleInPlace(0.26f);
   rotationMesh->material     = coloredMaterial;
   rotationMesh->rotation().x = Math::PI_2;
   parentMesh->addChild(*rotationMesh);
   parentMesh->lookAt(_rootMesh->position().subtract(planeNormal));
 
   _rootMesh->addChild(*parentMesh);
+  parentMesh->scaling().scaleInPlace(1.f / 3.f);
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
   options.dragPlaneNormal    = planeNormal;
@@ -65,15 +66,15 @@ PlaneRotationGizmo::PlaneRotationGizmo(
 
   dragBehavior->onDragStartObservable.add(
     [&](DragStartOrEndEvent* e, EventState& /*es*/) {
-      if (attachedMesh) {
+      if (attachedMesh()) {
         _lastDragPosition.copyFrom(e->dragPlanePoint);
       }
     });
 
-  auto currentSnapDragDistance = 0.f;
+  _currentSnapDragDistance = 0.f;
   dragBehavior->onDragObservable.add([&](DragMoveEvent* event,
                                          EventState& /*es*/) {
-    if (attachedMesh) {
+    if (attachedMesh()) {
       if (!attachedMesh()->rotationQuaternion()) {
         attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
           attachedMesh()->rotation().y, attachedMesh()->rotation().x,
@@ -82,10 +83,11 @@ PlaneRotationGizmo::PlaneRotationGizmo(
       // Calc angle over full 360 degree
       // (https://stackoverflow.com/questions/43493711/the-angle-between-two-3d-vectors-with-a-result-range-0-360)
       auto newVector
-        = event->dragPlanePoint.subtract(attachedMesh()->position())
+        = event->dragPlanePoint.subtract(attachedMesh()->absolutePosition)
             .normalize();
       auto originalVector
-        = _lastDragPosition.subtract(attachedMesh()->position()).normalize();
+        = _lastDragPosition.subtract(attachedMesh()->absolutePosition)
+            .normalize();
       auto cross = Vector3::Cross(newVector, originalVector);
       auto dot   = Vector3::Dot(newVector, originalVector);
       auto angle = ::std::atan2(cross.length(), dot);
@@ -115,11 +117,12 @@ PlaneRotationGizmo::PlaneRotationGizmo(
       // Snapping logic
       auto snapped = false;
       if (snapDistance != 0.f) {
-        currentSnapDragDistance += angle;
-        if (::std::abs(currentSnapDragDistance) > snapDistance) {
-          auto dragSteps = ::std::floor(currentSnapDragDistance / snapDistance);
-          currentSnapDragDistance
-            = ::std::fmod(currentSnapDragDistance, snapDistance);
+        _currentSnapDragDistance += angle;
+        if (::std::abs(_currentSnapDragDistance) > snapDistance) {
+          auto dragSteps
+            = ::std::floor(_currentSnapDragDistance / snapDistance);
+          _currentSnapDragDistance
+            = ::std::fmod(_currentSnapDragDistance, snapDistance);
           angle   = snapDistance * dragSteps;
           snapped = true;
         }
@@ -127,24 +130,42 @@ PlaneRotationGizmo::PlaneRotationGizmo(
           angle = 0;
         }
       }
+
+      // If the mesh has a parent, convert needed world rotation to local
+      // rotation
+      _tmpMatrix.reset();
+      if (attachedMesh()->parent) {
+        attachedMesh()->parent()->computeWorldMatrix().invertToRef(_tmpMatrix);
+        _tmpMatrix.getRotationMatrixToRef(_tmpMatrix);
+        Vector3::TransformCoordinatesToRef(
+          _planeNormalTowardsCamera, _tmpMatrix, _planeNormalTowardsCamera);
+      }
+
       // Convert angle and axis to quaternion
       // (http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm)
       auto quaternionCoefficient = ::std::sin(angle / 2.f);
-      auto amountToRotate
-        = Quaternion(_planeNormalTowardsCamera.x * quaternionCoefficient,
-                     _planeNormalTowardsCamera.y * quaternionCoefficient,
-                     _planeNormalTowardsCamera.z * quaternionCoefficient,
-                     ::std::cos(angle / 2.f));
+      _amountToRotate.set(_planeNormalTowardsCamera.x * quaternionCoefficient,
+                          _planeNormalTowardsCamera.y * quaternionCoefficient,
+                          _planeNormalTowardsCamera.z * quaternionCoefficient,
+                          ::std::cos(angle / 2.f));
+
+      // If the meshes local scale is inverted (eg. loaded gltf file parent with
+      // z scale of -1) the rotation needs to be inverted on the y axis
+      if (_tmpMatrix.determinant() > 0) {
+        _amountToRotate.toEulerAnglesToRef(_tmpVector);
+        Quaternion::RotationYawPitchRollToRef(_tmpVector.y, -_tmpVector.x,
+                                              -_tmpVector.z, _amountToRotate);
+      }
 
       if (updateGizmoRotationToMatchAttachedMesh) {
         // Rotate selected mesh quaternion over fixed axis
         attachedMesh()->rotationQuaternion()->multiplyToRef(
-          amountToRotate, *attachedMesh()->rotationQuaternion());
+          _amountToRotate, *attachedMesh()->rotationQuaternion());
       }
       else {
         // Rotate selected mesh quaternion over rotated axis
-        amountToRotate.multiplyToRef(*attachedMesh()->rotationQuaternion(),
-                                     *attachedMesh()->rotationQuaternion());
+        _amountToRotate.multiplyToRef(*attachedMesh()->rotationQuaternion(),
+                                      *attachedMesh()->rotationQuaternion());
       }
 
       _lastDragPosition.copyFrom(event->dragPlanePoint);
@@ -178,7 +199,7 @@ PlaneRotationGizmo::~PlaneRotationGizmo()
 {
 }
 
-void PlaneRotationGizmo::_attachedMeshChanged(AbstractMesh* value)
+void PlaneRotationGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (dragBehavior) {
     dragBehavior->enabled = value ? true : false;

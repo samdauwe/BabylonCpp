@@ -33,8 +33,18 @@ public:
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 
+  /**
+   * @brief Disposes and replaces the current meshes in the gizmo with the
+   * specified mesh.
+   * @param mesh The mesh to replace the default mesh of the gizmo
+   * @param useGizmoMaterial If the gizmo's default material should be used
+   * (default: false)
+   */
+  void setCustomMesh(const MeshPtr& mesh,
+                     bool useGizmoMaterial = false) override;
+
 protected:
-  void _attachedMeshChanged(AbstractMesh* value) override;
+  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
 
 public:
   /**
@@ -54,7 +64,13 @@ public:
    */
   Observable<SnapEvent> onSnapObservable;
 
+  /**
+   * If the scaling operation should be done on all axis (default: false)
+   */
+  bool uniformScaling;
+
 private:
+  StandardMaterialPtr _coloredMaterial;
   Observer<PointerInfo>::Ptr _pointerObserver;
 
   float _currentSnapDragDistance;

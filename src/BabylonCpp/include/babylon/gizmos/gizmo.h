@@ -27,8 +27,11 @@ public:
    * @brief Disposes and replaces the current meshes in the gizmo with the
    * specified mesh.
    * @param mesh The mesh to replace the default mesh of the gizmo
+   * @param useGizmoMaterial If the gizmo's default material should be used
+   * (default: false)
    */
-  virtual void setCustomMesh(Mesh* mesh);
+  virtual void setCustomMesh(const MeshPtr& mesh,
+                             bool useGizmoMaterial = false);
 
   /**
    * @brief Disposes of the gizmo.
@@ -41,15 +44,15 @@ protected:
    * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag
    * gizmo the mesh that will be dragged).
    */
-  AbstractMesh*& get_attachedMesh();
+  AbstractMeshPtr& get_attachedMesh();
 
   /**
    * @brief Sets the mesh that the gizmo will be attached to. (eg. on a drag
    * gizmo the mesh that will be dragged).
    */
-  virtual void set_attachedMesh(AbstractMesh* const& value);
+  virtual void set_attachedMesh(const AbstractMeshPtr& value);
 
-  virtual void _attachedMeshChanged(AbstractMesh* value);
+  virtual void _attachedMeshChanged(const AbstractMeshPtr& value);
 
   /**
    * Hidden
@@ -59,11 +62,16 @@ protected:
 
 public:
   /**
+   * Ratio for the scale of the gizmo (Default: 1)
+   */
+  float scaleRatio;
+
+  /**
    * Mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that
    * will be dragged)
    * * When set, interactions will be enabled
    */
-  Property<Gizmo, AbstractMesh*> attachedMesh;
+  Property<Gizmo, AbstractMeshPtr> attachedMesh;
 
   /**
    * The utility layer the gizmo will be added to
@@ -101,8 +109,7 @@ protected:
   bool _interactionsEnabled;
 
 private:
-  AbstractMesh* _attachedMesh;
-  float _scaleFactor;
+  AbstractMeshPtr _attachedMesh;
   Matrix _tmpMatrix;
   Vector3 _tempVector;
   Observer<Scene>::Ptr _beforeRenderObserver;

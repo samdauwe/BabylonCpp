@@ -25,7 +25,6 @@ GizmoManager::GizmoManager(Scene* iScene)
                               &GizmoManager::set_boundingBoxGizmoEnabled}
     , _scene{iScene}
     , _gizmosEnabled{false, false, false, false}
-    , _gizmoLayer{UtilityLayerRenderer::New(iScene)}
     , _pointerObserver{nullptr}
     , _attachedMesh{nullptr}
     , _boundingBoxColor{Color3::FromHexString("#0984e3")}
@@ -39,20 +38,20 @@ GizmoManager::GizmoManager(Scene* iScene)
       }
       if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
         if (pointerInfo->pickInfo.pickedMesh) {
-          Node* node = pointerInfo->pickInfo.pickedMesh ?
-                         pointerInfo->pickInfo.pickedMesh.get() :
-                         nullptr;
+          NodePtr node = pointerInfo->pickInfo.pickedMesh ?
+                           pointerInfo->pickInfo.pickedMesh :
+                           nullptr;
           if (attachableMeshes == nullopt_t) {
             // Attach to the most parent node
-            while (node && node->parent != nullptr) {
-              node = node->parent();
+            while (node && node->parent() != nullptr) {
+              // node = node->parent();
             }
           }
           else {
             // Attach to the parent node that is an attachableMesh
             auto found = false;
             for (auto& mesh : *attachableMeshes) {
-              if (node && (node == mesh || node->isDescendantOf(mesh))) {
+              if (node && (node == mesh || node->isDescendantOf(mesh.get()))) {
                 node  = mesh;
                 found = true;
               }
@@ -62,7 +61,10 @@ GizmoManager::GizmoManager(Scene* iScene)
             }
           }
           if (node && node->type() == IReflect::Type::ABSTRACTMESH) {
-            attachToMesh(static_cast<AbstractMesh*>(node));
+            attachToMesh(::std::static_pointer_cast<AbstractMesh>(node));
+          }
+          else {
+            attachToMesh(nullptr);
           }
         }
         else {
@@ -76,7 +78,7 @@ GizmoManager::~GizmoManager()
 {
 }
 
-void GizmoManager::attachToMesh(AbstractMesh* mesh)
+void GizmoManager::attachToMesh(const AbstractMeshPtr& mesh)
 {
   if (_attachedMesh) {
     // _attachedMesh->removeBehavior(_dragBehavior);
@@ -106,8 +108,8 @@ void GizmoManager::set_positionGizmoEnabled(bool value)
   if (value) {
     if (!gizmos.positionGizmo) {
       gizmos.positionGizmo = ::std::make_unique<PositionGizmo>();
+      gizmos.positionGizmo->updateGizmoRotationToMatchAttachedMesh = false;
     }
-    gizmos.positionGizmo->updateGizmoRotationToMatchAttachedMesh = false;
     gizmos.positionGizmo->attachedMesh = _attachedMesh;
   }
   else if (gizmos.positionGizmo) {
@@ -184,7 +186,8 @@ bool GizmoManager::get_boundingBoxGizmoEnabled() const
   return _gizmosEnabled.boundingBoxGizmo;
 }
 
-void GizmoManager::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
+void GizmoManager::dispose(bool /*doNotRecurse*/,
+                           bool /*disposeMaterialAndTextures*/)
 {
   _scene->onPointerObservable.remove(_pointerObserver);
 
@@ -206,7 +209,6 @@ void GizmoManager::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 
   _dragBehavior->detach();
-  _gizmoLayer->dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 } // end of namespace BABYLON

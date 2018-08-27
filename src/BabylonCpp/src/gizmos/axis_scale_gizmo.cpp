@@ -17,20 +17,21 @@ AxisScaleGizmo::AxisScaleGizmo(
   const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
+    , uniformScaling{false}
     , _pointerObserver{nullptr}
     , _currentSnapDragDistance{0.f}
     , _tmpSnapEvent{0.f}
 {
   // Create Material
-  auto coloredMaterial
+  _coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  coloredMaterial->setDisableLighting(true);
-  coloredMaterial->emissiveColor = color;
+  _coloredMaterial->setDisableLighting(true);
+  _coloredMaterial->emissiveColor = color;
 
   auto hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   hoverMaterial->setDisableLighting(true);
-  hoverMaterial->emissiveColor = color.add(Color3(0.2f, 0.2f, 0.2f));
+  hoverMaterial->emissiveColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
@@ -39,23 +40,24 @@ AxisScaleGizmo::AxisScaleGizmo(
                                           gizmoLayer->utilityLayerScene.get());
 
   LinesOptions arrowTailOptions;
-  arrowTailOptions.points = {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.5f, 0.f)};
+  arrowTailOptions.points = {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.1f, 0.f)};
   auto arrowTail          = MeshBuilder::CreateLines(
     "yPosMesh", arrowTailOptions, gizmoLayer->utilityLayerScene.get());
-  arrowTail->color = coloredMaterial->emissiveColor;
+  arrowTail->color = _coloredMaterial->emissiveColor;
   arrow->addChild(*arrowMesh);
   arrow->addChild(*arrowTail);
 
   // Position arrow pointing in its drag axis
   arrowMesh->scaling().scaleInPlace(0.1f);
-  arrowMesh->material     = coloredMaterial;
+  arrowMesh->material     = _coloredMaterial;
   arrowMesh->rotation().x = Math::PI_2;
   arrowMesh->position().z += 0.3f;
-  arrowTail->scaling().scaleInPlace(0.2f);
+  arrowTail->scaling().scaleInPlace(0.26f);
   arrowTail->rotation().x = Math::PI_2;
-  arrowTail->material     = coloredMaterial;
+  arrowTail->material     = _coloredMaterial;
   arrow->lookAt(_rootMesh->position().subtract(dragAxis));
   _rootMesh->addChild(*arrow);
+  arrow->scaling().scaleInPlace(1.f / 3.f);
 
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
@@ -66,12 +68,21 @@ AxisScaleGizmo::AxisScaleGizmo(
 
   _dragBehavior->onDragObservable.add(
     [&](DragMoveEvent* event, EventState& /*es*/) {
-      if (attachedMesh) {
+      if (attachedMesh()) {
         // Snapping logic
         auto snapped   = false;
         auto dragSteps = 0;
+        if (uniformScaling) {
+          attachedMesh()->scaling().normalizeToRef(_tmpVector);
+          if (_tmpVector.y < 0.f) {
+            _tmpVector.scaleInPlace(-1.f);
+          }
+        }
+        else {
+          _tmpVector.copyFrom(dragAxis);
+        }
         if (snapDistance == 0.f) {
-          dragAxis.scaleToRef(event->dragDistance, _tmpVector);
+          _tmpVector.scaleToRef(event->dragDistance, _tmpVector);
         }
         else {
           _currentSnapDragDistance += event->dragDistance;
@@ -80,7 +91,7 @@ AxisScaleGizmo::AxisScaleGizmo(
               ::std::floor(_currentSnapDragDistance / snapDistance));
             _currentSnapDragDistance
               = ::std::fmod(_currentSnapDragDistance, snapDistance);
-            dragAxis.scaleToRef(snapDistance * dragSteps, _tmpVector);
+            _tmpVector.scaleToRef(snapDistance * dragSteps, _tmpVector);
             snapped = true;
           }
           else {
@@ -105,7 +116,7 @@ AxisScaleGizmo::AxisScaleGizmo(
       auto isHovered = stl_util::contains(
         _rootMesh->getChildMeshes(),
         ::std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh));
-      auto material = isHovered ? hoverMaterial : coloredMaterial;
+      auto material = isHovered ? hoverMaterial : _coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material    = material;
         auto linesMesh = ::std::static_pointer_cast<LinesMesh>(m);
@@ -120,7 +131,7 @@ AxisScaleGizmo::~AxisScaleGizmo()
 {
 }
 
-void AxisScaleGizmo::_attachedMeshChanged(AbstractMesh* value)
+void AxisScaleGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (_dragBehavior) {
     _dragBehavior->enabled = value ? true : false;
@@ -133,6 +144,20 @@ void AxisScaleGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
   _dragBehavior->detach();
   Gizmo::dispose(doNotRecurse, disposeMaterialAndTextures);
+}
+
+void AxisScaleGizmo::setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial)
+{
+  Gizmo::setCustomMesh(mesh);
+  if (useGizmoMaterial) {
+    for (const auto& m : _rootMesh->getChildMeshes()) {
+      m->material = _coloredMaterial;
+      if (auto lm = ::std::static_pointer_cast<LinesMesh>(m)) {
+        lm->color = _coloredMaterial->emissiveColor;
+      }
+    }
+    _customMeshSet = false;
+  }
 }
 
 } // end of namespace BABYLON

@@ -8,14 +8,14 @@
 namespace BABYLON {
 
 Gizmo::Gizmo(const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
-    : attachedMesh{this, &Gizmo::get_attachedMesh, &Gizmo::set_attachedMesh}
+    : scaleRatio{1.f}
+    , attachedMesh{this, &Gizmo::get_attachedMesh, &Gizmo::set_attachedMesh}
     , gizmoLayer{iGizmoLayer}
     , updateGizmoRotationToMatchAttachedMesh{true}
     , updateGizmoPositionToMatchAttachedMesh{true}
     , _customMeshSet{false}
     , _updateScale{true}
     , _interactionsEnabled{true}
-    , _scaleFactor{3.f}
 {
   _rootMesh = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
   _beforeRenderObserver
@@ -28,19 +28,19 @@ Gizmo::~Gizmo()
 {
 }
 
-AbstractMesh*& Gizmo::get_attachedMesh()
+AbstractMeshPtr& Gizmo::get_attachedMesh()
 {
   return _attachedMesh;
 }
 
-void Gizmo::set_attachedMesh(AbstractMesh* const& value)
+void Gizmo::set_attachedMesh(const AbstractMeshPtr& value)
 {
   _attachedMesh = value;
   _rootMesh->setEnabled(value ? true : false);
   _attachedMeshChanged(value);
 }
 
-void Gizmo::setCustomMesh(Mesh* mesh)
+void Gizmo::setCustomMesh(const MeshPtr& mesh, bool /*useGizmoMaterial*/)
 {
   if (mesh->getScene() != gizmoLayer->utilityLayerScene.get()) {
     throw ::std::runtime_error(
@@ -54,13 +54,13 @@ void Gizmo::setCustomMesh(Mesh* mesh)
   _customMeshSet = true;
 }
 
-void Gizmo::_attachedMeshChanged(AbstractMesh* /*value*/)
+void Gizmo::_attachedMeshChanged(const AbstractMeshPtr& /*value*/)
 {
 }
 
 void Gizmo::_update()
 {
-  if (attachedMesh) {
+  if (attachedMesh()) {
     if (updateGizmoRotationToMatchAttachedMesh) {
       if (!_rootMesh->rotationQuaternion()) {
         _rootMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
@@ -86,11 +86,14 @@ void Gizmo::_update()
       Quaternion::FromRotationMatrixToRef(_tmpMatrix,
                                           *_rootMesh->rotationQuaternion());
     }
+    else if (_rootMesh->rotationQuaternion()) {
+      _rootMesh->rotationQuaternion()->set(0.f, 0.f, 0.f, 1.f);
+    }
     if (updateGizmoPositionToMatchAttachedMesh) {
       _rootMesh->position().copyFrom(attachedMesh()->absolutePosition());
     }
     if (_updateScale && gizmoLayer->utilityLayerScene->activeCamera
-        && attachedMesh) {
+        && attachedMesh()) {
       auto cameraPosition
         = gizmoLayer->utilityLayerScene->activeCamera->position;
       /*
@@ -99,7 +102,7 @@ void Gizmo::_update()
       (<WebVRFreeCamera>gizmoLayer.utilityLayerScene.activeCamera).devicePosition;
       }*/
       _rootMesh->position().subtractToRef(cameraPosition, _tempVector);
-      auto dist = _tempVector.length() / _scaleFactor;
+      auto dist = _tempVector.length() * scaleRatio;
       _rootMesh->scaling().set(dist, dist, dist);
     }
   }

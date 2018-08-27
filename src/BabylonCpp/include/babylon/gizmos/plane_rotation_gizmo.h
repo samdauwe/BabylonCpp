@@ -36,7 +36,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  void _attachedMeshChanged(AbstractMesh* value) override;
+  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
 
 public:
   /**
@@ -63,6 +63,10 @@ private:
   Vector3 _planeNormalTowardsCamera;
   Vector3 _localPlaneNormalTowardsCamera;
   SnapEvent _tmpSnapEvent;
+  float _currentSnapDragDistance;
+  Matrix _tmpMatrix;
+  Vector3 _tmpVector;
+  Quaternion _amountToRotate;
 
 }; // end of class PlaneRotationGizmo
 

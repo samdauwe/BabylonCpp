@@ -28,15 +28,23 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
   /**
-   * @brief CustomMeshes are not supported by this gizmo.
+   * @brief Disposes and replaces the current meshes in the gizmo with the
+   * specified mesh.
    * @param mesh The mesh to replace the default mesh of the gizmo
+   * @param useGizmoMaterial If the gizmo's default material should be used
+   * (default: false)
    */
-  void setCustomMesh(Mesh* mesh) override;
+  void setCustomMesh(const MeshPtr& mesh,
+                     bool useGizmoMaterial = false) override;
 
 protected:
-  void set_attachedMesh(AbstractMesh* const& mesh) override;
+  void set_attachedMesh(const AbstractMeshPtr& mesh) override;
   void set_updateGizmoRotationToMatchAttachedMesh(bool value);
   bool get_updateGizmoRotationToMatchAttachedMesh() const;
+  void set_snapDistance(float value);
+  float get_snapDistance() const;
+  void set_scaleRatio(float value);
+  float get_scaleRatio() const;
 
 public:
   /**
@@ -53,6 +61,17 @@ public:
    * Internal gizmo used for interactions on the z axis
    */
   unique_ptr_t<PlaneRotationGizmo> zGizmo;
+
+  /**
+   * Drag distance in babylon units that the gizmo will snap to when dragged
+   * (Default: 0)
+   */
+  Property<RotationGizmo, float> snapDistance;
+
+  /**
+   * Ratio for the scale of the gizmo (Default: 1)
+   */
+  Property<RotationGizmo, float> scaleRatio;
 
   Property<RotationGizmo, bool> updateGizmoRotationToMatchAttachedMesh;
 

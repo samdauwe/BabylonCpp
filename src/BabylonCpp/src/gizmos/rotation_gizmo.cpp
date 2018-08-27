@@ -16,6 +16,10 @@ RotationGizmo::RotationGizmo(
         Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
     , zGizmo{::std::make_unique<PlaneRotationGizmo>(
         Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
+    , snapDistance{this, &RotationGizmo::get_snapDistance,
+                   &RotationGizmo::set_snapDistance}
+    , scaleRatio{this, &RotationGizmo::get_scaleRatio,
+                 &RotationGizmo::set_scaleRatio}
     , updateGizmoRotationToMatchAttachedMesh{
         this, &RotationGizmo::get_updateGizmoRotationToMatchAttachedMesh,
         &RotationGizmo::set_updateGizmoRotationToMatchAttachedMesh}
@@ -27,7 +31,7 @@ RotationGizmo::~RotationGizmo()
 {
 }
 
-void RotationGizmo::set_attachedMesh(AbstractMesh* const& mesh)
+void RotationGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   if (xGizmo) {
     xGizmo->attachedMesh = mesh;
@@ -50,6 +54,34 @@ bool RotationGizmo::get_updateGizmoRotationToMatchAttachedMesh() const
   return xGizmo->updateGizmoRotationToMatchAttachedMesh;
 }
 
+void RotationGizmo::set_snapDistance(float value)
+{
+  if (xGizmo) {
+    xGizmo->snapDistance = value;
+    yGizmo->snapDistance = value;
+    zGizmo->snapDistance = value;
+  }
+}
+
+float RotationGizmo::get_snapDistance() const
+{
+  return xGizmo->snapDistance;
+}
+
+void RotationGizmo::set_scaleRatio(float value)
+{
+  if (xGizmo) {
+    xGizmo->scaleRatio = value;
+    yGizmo->scaleRatio = value;
+    zGizmo->scaleRatio = value;
+  }
+}
+
+float RotationGizmo::get_scaleRatio() const
+{
+  return xGizmo->scaleRatio;
+}
+
 void RotationGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   xGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
@@ -57,7 +89,8 @@ void RotationGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   zGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-void RotationGizmo::setCustomMesh(Mesh* /*mesh*/)
+void RotationGizmo::setCustomMesh(const MeshPtr& /*mesh*/,
+                                  bool /*useGizmoMaterial*/)
 {
   BABYLON_LOG_ERROR("RotationGizmo",
                     "Custom meshes are not supported on this gizmo, please set "

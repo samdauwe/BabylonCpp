@@ -197,6 +197,9 @@ using unique_ptr_t = ::std::unique_ptr<T, Deleter>;
 template <class T>
 using shared_ptr_t = ::std::shared_ptr<T>;
 
+template <class T>
+using weak_ptr_t = ::std::weak_ptr<T>;
+
 // -- Input/output library -- //
 using ostream_t       = ::std::basic_ostream<char>;
 using ostringstream_t = ::std::basic_ostringstream<char>;

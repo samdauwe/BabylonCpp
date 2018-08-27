@@ -29,7 +29,7 @@ AxisDragGizmo::AxisDragGizmo(
   auto hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   hoverMaterial->setDisableLighting(true);
-  hoverMaterial->emissiveColor = color.add(Color3(0.2f, 0.2f, 0.2f));
+  hoverMaterial->emissiveColor = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
@@ -41,7 +41,7 @@ AxisDragGizmo::AxisDragGizmo(
     "yPosMesh", arrowMeshOptions, gizmoLayer->utilityLayerScene.get());
 
   LinesOptions arrowTailOptions;
-  arrowTailOptions.points = {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.5f, 0.f)};
+  arrowTailOptions.points = {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 1.1f, 0.f)};
   auto arrowTail          = MeshBuilder::CreateLines(
     "yPosMesh", arrowTailOptions, gizmoLayer->utilityLayerScene.get());
   arrowTail->color = coloredMaterial->emissiveColor;
@@ -53,10 +53,11 @@ AxisDragGizmo::AxisDragGizmo(
   arrowMesh->material     = coloredMaterial;
   arrowMesh->rotation().x = Math::PI_2;
   arrowMesh->position().z += 0.3f;
-  arrowTail->scaling().scaleInPlace(0.2f);
+  arrowTail->scaling().scaleInPlace(0.26f);
   arrowTail->rotation().x = Math::PI_2;
   arrowTail->material     = coloredMaterial;
   arrow->lookAt(_rootMesh->position().subtract(dragAxis));
+  arrow->scaling().scaleInPlace(1.f / 3.f);
 
   _rootMesh->addChild(*arrow);
 
@@ -69,10 +70,20 @@ AxisDragGizmo::AxisDragGizmo(
   _rootMesh->addBehavior(_dragBehavior.get());
   _dragBehavior->onDragObservable.add([&](DragMoveEvent* event,
                                           EventState& /*es*/) {
-    if (attachedMesh) {
+    if (attachedMesh()) {
+      // Convert delta to local translation if it has a parent
+      if (attachedMesh()->parent()) {
+        attachedMesh()->parent()->computeWorldMatrix().invertToRef(_tmpMatrix);
+        _tmpMatrix.setTranslationFromFloats(0.f, 0.f, 0.f);
+        Vector3::TransformCoordinatesToRef(event->delta, _tmpMatrix,
+                                           _localDelta);
+      }
+      else {
+        _localDelta.copyFrom(event->delta);
+      }
       // Snapping logic
       if (snapDistance == 0.f) {
-        attachedMesh()->position().addInPlace(event->delta);
+        attachedMesh()->position().addInPlace(_localDelta);
       }
       else {
         _currentSnapDragDistance += event->dragDistance;
@@ -81,7 +92,7 @@ AxisDragGizmo::AxisDragGizmo(
             = ::std::floor(::std::abs(_currentSnapDragDistance) / snapDistance);
           _currentSnapDragDistance
             = std::fmod(_currentSnapDragDistance, snapDistance);
-          event->delta.normalizeToRef(_tmpVector);
+          _localDelta.normalizeToRef(_tmpVector);
           _tmpVector.scaleInPlace(snapDistance * dragSteps);
           attachedMesh()->position().addInPlace(_tmpVector);
           _tmpSnapEvent.snapDistance = snapDistance * dragSteps;
@@ -114,7 +125,7 @@ AxisDragGizmo::~AxisDragGizmo()
 {
 }
 
-void AxisDragGizmo::_attachedMeshChanged(AbstractMesh* value)
+void AxisDragGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (_dragBehavior) {
     _dragBehavior->enabled = value ? true : false;

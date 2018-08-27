@@ -34,7 +34,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  void _attachedMeshChanged(AbstractMesh* value) override;
+  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
 
 public:
   /**
@@ -60,6 +60,8 @@ private:
   float _currentSnapDragDistance;
   Vector3 _tmpVector;
   SnapEvent _tmpSnapEvent;
+  Vector3 _localDelta;
+  Matrix _tmpMatrix;
 
 }; // end of class PositionGizmo
 

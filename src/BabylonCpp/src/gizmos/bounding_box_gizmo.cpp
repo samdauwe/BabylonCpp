@@ -19,10 +19,12 @@ namespace BABYLON {
 BoundingBoxGizmo::BoundingBoxGizmo(
   const Color3& color, const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
+    , ignoreChildren{false}
     , rotationSphereSize{0.1f}
     , scaleBoxSize{0.1f}
     , fixedDragMeshScreenSize{false}
     , fixedDragMeshScreenSizeDistanceFactor{10.f}
+    , scalePivot{nullopt_t}
     , _lineBoundingBox{nullptr}
     , _rotateSpheresParent{nullptr}
     , _scaleBoxesParent{nullptr}
@@ -47,7 +49,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
   hoverColoredMaterial->setDisableLighting(true);
   hoverColoredMaterial->emissiveColor
-    = color.copy().add(Color3(0.2f, 0.2f, 0.2f));
+    = color.copy().add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build bounding box out of lines
   _lineBoundingBox = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
@@ -120,7 +122,10 @@ BoundingBoxGizmo::BoundingBoxGizmo(
       });
     _dragBehavior.onDragObservable.add([&](DragMoveEvent* event,
                                            EventState& /*es*/) {
-      if (attachedMesh) {
+      onRotationSphereDragObservable.notifyObservers({});
+      if (attachedMesh()) {
+        removeAndStorePivotPoint();
+
         auto worldDragDirection = startingTurnDirection;
 
         // Project the world right on to the drag plane
@@ -165,22 +170,26 @@ BoundingBoxGizmo::BoundingBoxGizmo(
           }
 
           // Rotate around center of bounding box
-          _anchorMesh->addChild(*attachedMesh);
+          _anchorMesh->addChild(*attachedMesh());
           _anchorMesh->rotationQuaternion()->multiplyToRef(
             _tmpQuaternion, *_anchorMesh->rotationQuaternion());
-          _anchorMesh->removeChild(*attachedMesh);
+          _anchorMesh->removeChild(*attachedMesh());
         }
         updateBoundingBox();
+
+        restorePivotPoint();
       }
     });
 
     // Selection/deselection
     _dragBehavior.onDragStartObservable.add(
       [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+        onDragStartObservable.notifyObservers(nullptr);
         _selectNode(sphere);
       });
     _dragBehavior.onDragEndObservable.add(
       [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+        onRotationSphereDragEndObservable.notifyObservers(nullptr);
         _selectNode(nullptr);
       });
 
@@ -208,43 +217,62 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         PointerDragBehavior _dragBehavior(options);
         _dragBehavior.moveAttached = false;
         box->addBehavior(&_dragBehavior);
-        _dragBehavior.onDragObservable.add(
-          [&](DragMoveEvent* event, EventState& /*es*/) {
-            if (attachedMesh) {
-              // Current bounding box dimensions
-              auto boundingInfo = attachedMesh()->getBoundingInfo().boundingBox;
-              auto boundBoxDimensions
-                = boundingInfo.maximum.subtract(boundingInfo.minimum)
-                    .multiplyInPlace(attachedMesh()->scaling());
+        _dragBehavior.onDragObservable.add([&](DragMoveEvent* event,
+                                               EventState& /*es*/) {
+          onScaleBoxDragObservable.notifyObservers(nullptr);
+          if (attachedMesh()) {
+            removeAndStorePivotPoint();
 
-              // Get the change in bounding box size/2 and add this to the
-              // mesh's position to offset from scaling with center pivot point
-              auto deltaScale = new Vector3(
-                event->dragDistance, event->dragDistance, event->dragDistance);
-              deltaScale->scaleInPlace(_scaleDragSpeed);
-              auto scaleRatio = deltaScale->divide(attachedMesh()->scaling())
-                                  .scaleInPlace(0.5f);
-              auto moveDirection = boundBoxDimensions.multiply(scaleRatio)
-                                     .multiplyInPlace(dragAxis);
-              auto worldMoveDirection = Vector3::TransformCoordinates(
-                moveDirection,
-                attachedMesh()->getWorldMatrix()->getRotationMatrix());
+            auto relativeDragDistance
+              = (event->dragDistance / _boundingDimensions.length())
+                * _anchorMesh->scaling().length();
+            Vector3 deltaScale(relativeDragDistance, relativeDragDistance,
+                               relativeDragDistance);
+            deltaScale.scaleInPlace(_scaleDragSpeed);
+            updateBoundingBox();
 
-              // Update scale and position
-              attachedMesh()->scaling().addInPlace(*deltaScale);
-              attachedMesh()->getAbsolutePosition().addToRef(worldMoveDirection,
-                                                             _tmpVector);
-              attachedMesh()->setAbsolutePosition(_tmpVector);
+            if (scalePivot) {
+              attachedMesh()->getWorldMatrix()->getRotationMatrixToRef(
+                _tmpRotationMatrix);
+              // Move anchor to desired pivot point (Bottom left corner +
+              // dimension/2)
+              _boundingDimensions.scaleToRef(0.5f, _tmpVector);
+              Vector3::TransformCoordinatesToRef(_tmpVector, _tmpRotationMatrix,
+                                                 _tmpVector);
+              _anchorMesh->position().subtractInPlace(_tmpVector);
+              _boundingDimensions.multiplyToRef(*scalePivot, _tmpVector);
+              Vector3::TransformCoordinatesToRef(_tmpVector, _tmpRotationMatrix,
+                                                 _tmpVector);
+              _anchorMesh->position().addInPlace(_tmpVector);
             }
-          });
+            else {
+              // Scale from the position of the opposite corner
+              box->absolutePosition().subtractToRef(_anchorMesh->position(),
+                                                    _tmpVector);
+              _anchorMesh->position().subtractInPlace(_tmpVector);
+            }
+
+            _anchorMesh->addChild(*attachedMesh());
+            _anchorMesh->scaling().addInPlace(deltaScale);
+            if (_anchorMesh->scaling().x < 0.f || _anchorMesh->scaling().y < 0.f
+                || _anchorMesh->scaling().z < 0.f) {
+              _anchorMesh->scaling().subtractInPlace(deltaScale);
+            }
+            _anchorMesh->removeChild(*attachedMesh());
+
+            restorePivotPoint();
+          }
+        });
 
         // Selection/deselection
         _dragBehavior.onDragStartObservable.add(
           [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+            onDragStartObservable.notifyObservers(nullptr);
             _selectNode(box);
           });
         _dragBehavior.onDragEndObservable.add(
           [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+            onScaleBoxDragEndObservable.notifyObservers(nullptr);
             _selectNode(nullptr);
           });
 
@@ -289,7 +317,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   _renderObserver = gizmoLayer->originalScene->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
       // Only update the bouding box if scaling has changed
-      if (attachedMesh
+      if (attachedMesh()
           && !_existingMeshScale.equals(attachedMesh()->scaling())) {
         updateBoundingBox();
       }
@@ -301,7 +329,39 @@ BoundingBoxGizmo::~BoundingBoxGizmo()
 {
 }
 
-void BoundingBoxGizmo::_attachedMeshChanged(AbstractMesh* value)
+void BoundingBoxGizmo::removeAndStorePivotPoint()
+{
+  if (attachedMesh()) {
+    // Save old pivot and set pivot to 0,0,0
+    attachedMesh()->getPivotPointToRef(_oldPivotPoint);
+    if (_oldPivotPoint.equalsToFloats(0.f, 0.f, 0.f)) {
+      return;
+    }
+    auto identityReadOnly = Matrix::IdentityReadOnly();
+    attachedMesh()->setPivotMatrix(identityReadOnly);
+    _oldPivotPoint.subtractToRef(attachedMesh()->getPivotPoint(),
+                                 _pivotTranslation);
+    _tmpVector.copyFromFloats(1.f, 1.f, 1.f);
+    _tmpVector.subtractInPlace(attachedMesh()->scaling());
+    _tmpVector.multiplyInPlace(_pivotTranslation);
+    attachedMesh()->position().addInPlace(_tmpVector);
+  }
+}
+
+void BoundingBoxGizmo::restorePivotPoint()
+{
+  if (attachedMesh() && !_oldPivotPoint.equalsToFloats(0, 0, 0)) {
+    attachedMesh()->setPivotPoint(_oldPivotPoint);
+    _oldPivotPoint.subtractToRef(attachedMesh()->getPivotPoint(),
+                                 _pivotTranslation);
+    _tmpVector.copyFromFloats(1, 1, 1);
+    _tmpVector.subtractInPlace(attachedMesh()->scaling());
+    _tmpVector.multiplyInPlace(_pivotTranslation);
+    attachedMesh()->position().subtractInPlace(_tmpVector);
+  }
+}
+
+void BoundingBoxGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (value) {
     // Reset anchor mesh to match attached mesh's scale
@@ -315,23 +375,28 @@ void BoundingBoxGizmo::_attachedMeshChanged(AbstractMesh* value)
 void BoundingBoxGizmo::_selectNode(const MeshPtr& selectedMesh)
 {
   auto childMeshes = _rotateSpheresParent->getChildMeshes();
-  for (auto& m : _scaleBoxesParent->getChildMeshes()) {
+  for (const auto& m : _scaleBoxesParent->getChildMeshes()) {
     m->isVisible = (!selectedMesh || m == selectedMesh);
   }
 }
 
-void BoundingBoxGizmo::_recurseComputeWorld(AbstractMesh* mesh)
+void BoundingBoxGizmo::_recurseComputeWorld(const NodePtr& node)
 {
-  mesh->computeWorldMatrix(true);
-  for (auto& m : mesh->getChildMeshes()) {
-    _recurseComputeWorld(m.get());
+  node->computeWorldMatrix(true);
+
+  if (!ignoreChildren) {
+    for (const auto& n : node->getDescendants()) {
+      _recurseComputeWorld(n);
+    }
   }
 }
 
 void BoundingBoxGizmo::updateBoundingBox()
 {
-  _update();
-  if (attachedMesh) {
+  if (attachedMesh()) {
+    removeAndStorePivotPoint();
+    _update();
+
     // Rotate based on axis
     if (!attachedMesh()->rotationQuaternion()) {
       attachedMesh()->rotationQuaternion = Quaternion::RotationYawPitchRoll(
@@ -354,8 +419,8 @@ void BoundingBoxGizmo::updateBoundingBox()
     attachedMesh()->position().set(0.f, 0.f, 0.f);
 
     // Update bounding dimensions/positions
-    auto boundingMinMax = attachedMesh()->getHierarchyBoundingVectors();
-
+    auto boundingMinMax
+      = attachedMesh()->getHierarchyBoundingVectors(!ignoreChildren);
     boundingMinMax.max.subtractToRef(boundingMinMax.min, _boundingDimensions);
 
     // Update gizmo to match bounding box scaling and rotation
@@ -372,7 +437,7 @@ void BoundingBoxGizmo::updateBoundingBox()
     // restore position/rotation values
     attachedMesh()->rotationQuaternion()->copyFrom(_tmpQuaternion);
     attachedMesh()->position().copyFrom(_tmpVector);
-    _recurseComputeWorld(attachedMesh);
+    _recurseComputeWorld(attachedMesh());
   }
 
   // Update rotation sphere locations
@@ -475,8 +540,9 @@ void BoundingBoxGizmo::updateBoundingBox()
       }
     }
   }
-  if (attachedMesh) {
+  if (attachedMesh()) {
     _existingMeshScale.copyFrom(attachedMesh()->scaling());
+    restorePivotPoint();
   }
 }
 
@@ -550,7 +616,8 @@ MeshPtr BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
   return box;
 }
 
-void BoundingBoxGizmo::setCustomMesh(Mesh* /*mesh*/)
+void BoundingBoxGizmo::setCustomMesh(const MeshPtr& /*mesh*/,
+                                     bool /*useGizmoMaterial*/)
 {
   BABYLON_LOG_ERROR("BoundingBoxGizmo",
                     "Custom meshes are not supported on this gizmo");
