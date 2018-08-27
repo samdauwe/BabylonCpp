@@ -348,7 +348,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
             defines.defines[BMD::REFLECTIONMAP_PROJECTION] = true;
             break;
           case TextureConstants::SKYBOX_MODE:
-            defines.defines[BMD::REFLECTIONMAP_SKYBOX] = true;
+            defines.defines[BMD::REFLECTIONMAP_SKYBOX]             = true;
+            defines.defines[BMD::REFLECTIONMAP_SKYBOX_TRANSFORMED] = true;
             break;
           case TextureConstants::SPHERICAL_MODE:
             defines.defines[BMD::REFLECTIONMAP_SPHERICAL] = true;
@@ -396,6 +397,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.defines[BMD::REFLECTIONMAP_CUBIC]                 = false;
         defines.defines[BMD::REFLECTIONMAP_PROJECTION]            = false;
         defines.defines[BMD::REFLECTIONMAP_SKYBOX]                = false;
+        defines.defines[BMD::REFLECTIONMAP_SKYBOX_TRANSFORMED]    = false;
         defines.defines[BMD::REFLECTIONMAP_EXPLICIT]              = false;
         defines.defines[BMD::REFLECTIONMAP_EQUIRECTANGULAR]       = false;
         defines.defines[BMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED] = false;
@@ -512,6 +514,9 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "vFogColor",
                                 "pointSize",
                                 "vClipPlane",
+                                "vClipPlane2",
+                                "vClipPlane3",
+                                "vClipPlane4",
                                 "mBones",
                                 "vPrimaryColor",
                                 "vPrimaryColorShadow",

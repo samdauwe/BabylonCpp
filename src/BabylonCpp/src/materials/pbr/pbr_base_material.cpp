@@ -39,14 +39,16 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _albedoTexture{nullptr}
     , _ambientTexture{nullptr}
     , _ambientTextureStrength{1.f}
+    , _ambientTextureImpactOnAnalyticalLights{PBRMaterial::
+                                                DEFAULT_AO_ON_ANALYTICAL_LIGHTS}
     , _opacityTexture{nullptr}
     , _reflectionTexture{nullptr}
     , _refractionTexture{nullptr}
     , _emissiveTexture{nullptr}
     , _reflectivityTexture{nullptr}
     , _metallicTexture{nullptr}
-    , _metallic{0.f}
-    , _roughness{0.f}
+    , _metallic{nullopt_t}
+    , _roughness{nullopt_t}
     , _microSurfaceTexture{nullptr}
     , _bumpTexture{nullptr}
     , _lightmapTexture{nullptr}
@@ -540,6 +542,9 @@ Effect* PBRBaseMaterial::_prepareEffect(
                               "vRefractionInfos",
                               "mBones",
                               "vClipPlane",
+                              "vClipPlane2",
+                              "vClipPlane3",
+                              "vClipPlane4",
                               "albedoMatrix",
                               "ambientMatrix",
                               "opacityMatrix",
@@ -721,6 +726,10 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
             }
           }
         }
+        else {
+          defines.defines[PMD::REFLECTIONMAP_SKYBOX_TRANSFORMED]
+            = !reflectionTexture->getReflectionTextureMatrix()->isIdentity();
+        }
       }
       else {
         defines.defines[PMD::REFLECTION]                          = false;
@@ -731,6 +740,7 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
         defines.defines[PMD::USE_LOCAL_REFLECTIONMAP_CUBIC]       = false;
         defines.defines[PMD::REFLECTIONMAP_PROJECTION]            = false;
         defines.defines[PMD::REFLECTIONMAP_SKYBOX]                = false;
+        defines.defines[PMD::REFLECTIONMAP_SKYBOX_TRANSFORMED]    = false;
         defines.defines[PMD::REFLECTIONMAP_EXPLICIT]              = false;
         defines.defines[PMD::REFLECTIONMAP_EQUIRECTANGULAR]       = false;
         defines.defines[PMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED] = false;
@@ -962,7 +972,7 @@ void PBRBaseMaterial::buildUniformLayout()
 {
   // Order is important !
   _uniformBuffer->addUniform("vAlbedoInfos", 2);
-  _uniformBuffer->addUniform("vAmbientInfos", 3);
+  _uniformBuffer->addUniform("vAmbientInfos", 4);
   _uniformBuffer->addUniform("vOpacityInfos", 2);
   _uniformBuffer->addUniform("vEmissiveInfos", 2);
   _uniformBuffer->addUniform("vLightmapInfos", 2);
@@ -1066,11 +1076,11 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         }
 
         if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
-          _uniformBuffer->updateFloat3(
+          _uniformBuffer->updateFloat4(
             "vAmbientInfos",
             static_cast<float>(_ambientTexture->coordinatesIndex),
             static_cast<float>(_ambientTexture->level), _ambientTextureStrength,
-            "");
+            static_cast<float>(_ambientTextureImpactOnAnalyticalLights), "");
           MaterialHelper::BindTextureMatrix(*_ambientTexture, *_uniformBuffer,
                                             "ambient");
         }
@@ -1234,9 +1244,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       // Colors
       if (defines.defines[PMD::METALLICWORKFLOW]) {
         PBRMaterial::_scaledReflectivity.r
-          = (_metallic == 0.f || _metallic == 0.f) ? 1 : _metallic;
+          = (!_metallic.has_value()) ? 1 : *_metallic;
         PBRMaterial::_scaledReflectivity.g
-          = (_roughness == 0.f || _roughness == 0.f) ? 1 : _roughness;
+          = (!_roughness.has_value()) ? 1 : *_roughness;
         _uniformBuffer->updateColor4("vReflectivityColor",
                                      PBRMaterial::_scaledReflectivity, 0, "");
       }

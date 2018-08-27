@@ -41,6 +41,12 @@ public:
    */
   static constexpr unsigned int PBRMATERIAL_ALPHATESTANDBLEND = 3;
 
+  /**
+   * Defines the default value of how much AO map is occluding the analytical
+   * lights (point spot...).
+   */
+  static constexpr unsigned int DEFAULT_AO_ON_ANALYTICAL_LIGHTS = 1;
+
 public:
   template <typename... Ts>
   static PBRMaterialPtr New(Ts&&... args)
@@ -297,6 +303,12 @@ public:
   float ambientTextureStrength;
 
   /**
+   * Defines how much the AO map is occluding the analytical lights (point
+   * spot...). 1 means it completely occludes it 0 mean it has no impact
+   */
+  unsigned int ambientTextureImpactOnAnalyticalLights;
+
+  /**
    * Stores the alpha values in a texture.
    */
   BaseTexture* opacityTexture;
@@ -325,13 +337,13 @@ public:
    * Specifies the metallic scalar of the metallic/roughness workflow.
    * Can also be used to scale the metalness values of the metallic texture.
    */
-  float metallic;
+  nullable_t<float> metallic;
 
   /**
    * Specifies the roughness scalar of the metallic/roughness workflow.
    * Can also be used to scale the roughness values of the metallic texture.
    */
-  float roughness;
+  nullable_t<float> roughness;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate chanel depending

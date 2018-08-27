@@ -16,6 +16,12 @@ MultiRenderTarget::MultiRenderTarget(
                           options && (*options).doNotChangeAspectRatio ?
                             *(*options).doNotChangeAspectRatio :
                             true}
+    , isSupported{this, &MultiRenderTarget::get_isSupported}
+    , textures{this, &MultiRenderTarget::get_textures}
+    , depthTexture{this, &MultiRenderTarget::get_depthTexture}
+    , wrapU{this, &MultiRenderTarget::set_wrapU}
+    , wrapV{this, &MultiRenderTarget::set_wrapV}
+    , _nullTexture{nullptr}
 {
   auto generateMipMaps = options && (*options).generateMipMaps ?
                            *(*options).generateMipMaps :
@@ -86,23 +92,23 @@ MultiRenderTarget::~MultiRenderTarget()
 {
 }
 
-bool MultiRenderTarget::isSupported() const
+bool MultiRenderTarget::get_isSupported() const
 {
   return (_engine->webGLVersion() > 1.f)
          || (_engine->getCaps().drawBuffersExtension);
 }
 
-vector_t<TexturePtr>& MultiRenderTarget::textures()
+vector_t<TexturePtr>& MultiRenderTarget::get_textures()
 {
   return _textures;
 }
 
-TexturePtr MultiRenderTarget::depthTexture()
+TexturePtr& MultiRenderTarget::get_depthTexture()
 {
-  return (!_textures.empty()) ? _textures.back() : nullptr;
+  return (!_textures.empty()) ? _textures.back() : _nullTexture;
 }
 
-void MultiRenderTarget::setWrapU(unsigned int wrap)
+void MultiRenderTarget::set_wrapU(unsigned int wrap)
 {
   if (!_textures.empty()) {
     for (auto& texture : _textures) {
@@ -111,7 +117,7 @@ void MultiRenderTarget::setWrapU(unsigned int wrap)
   }
 }
 
-void MultiRenderTarget::setWrapV(unsigned int wrap)
+void MultiRenderTarget::set_wrapV(unsigned int wrap)
 {
   if (!_textures.empty()) {
     for (auto& texture : _textures) {
@@ -153,12 +159,12 @@ void MultiRenderTarget::_createTextures()
   _texture = (!_internalTextures.empty()) ? _internalTextures[0] : nullptr;
 }
 
-unsigned int MultiRenderTarget::samples() const
+unsigned int MultiRenderTarget::get_samples() const
 {
   return _samples;
 }
 
-void MultiRenderTarget::setSamples(unsigned int value)
+void MultiRenderTarget::set_samples(unsigned int value)
 {
   if (_samples == value) {
     return;

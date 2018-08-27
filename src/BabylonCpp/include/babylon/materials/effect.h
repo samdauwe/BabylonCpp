@@ -166,6 +166,7 @@ public:
    * @param fragmentSourceCode The source code for the fragment shader.
    * @param onCompiled Callback called when completed.
    * @param onError Callback called on error.
+   * Hidden
    */
   void _rebuildProgram(
     const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
@@ -182,6 +183,7 @@ public:
 
   /**
    * @brief Prepares the effect
+   * Hidden
    */
   void _prepareEffect();
 
@@ -195,6 +197,7 @@ public:
    * @brief Binds a texture to the engine to be used as output of the shader.
    * @param channel Name of the output variable.
    * @param texture Texture to bind.
+   * Hidden
    */
   void _bindTexture(const string_t& channel, InternalTexture* texture);
 
@@ -593,10 +596,12 @@ public:
   ReadOnlyProperty<Effect, Observable<Effect>> onBindObservable;
   /**
    * Key for the effect.
+   * Hidden
    */
   string_t _key;
   /**
    * Compiled shader to webGL program.
+   * Hidden
    */
   unique_ptr_t<GL::IGLProgram> _program;
 

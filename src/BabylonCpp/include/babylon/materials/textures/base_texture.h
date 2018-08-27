@@ -49,8 +49,10 @@ public:
   ISize getBaseSize();
   virtual void scale(float ratio);
   bool canRescale();
+  /** Hidden */
   InternalTexture* _getFromCache(const string_t& url, bool noMipmap,
                                  unsigned int sampling = 0);
+  /** Hidden */
   virtual void _rebuild();
   virtual void delayLoad();
   vector_t<AnimationPtr> getAnimations() override;
@@ -181,6 +183,7 @@ public:
    */
   Observable<BaseTexture> onDisposeObservable;
   unsigned int delayLoadState;
+  /** Hidden */
   InternalTexture* _texture;
 
   /**

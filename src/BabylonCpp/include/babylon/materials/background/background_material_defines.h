@@ -109,38 +109,42 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialDefines
   static constexpr unsigned int REFLECTIONMAP_CUBIC                 = 30;
   static constexpr unsigned int REFLECTIONMAP_PROJECTION            = 31;
   static constexpr unsigned int REFLECTIONMAP_SKYBOX                = 32;
-  static constexpr unsigned int REFLECTIONMAP_EXPLICIT              = 33;
-  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR       = 34;
-  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR_FIXED = 35;
+  static constexpr unsigned int REFLECTIONMAP_SKYBOX_TRANSFORMED    = 33;
+  static constexpr unsigned int REFLECTIONMAP_EXPLICIT              = 34;
+  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR       = 35;
+  static constexpr unsigned int REFLECTIONMAP_EQUIRECTANGULAR_FIXED = 36;
   static constexpr unsigned int REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED
-    = 36;
-  static constexpr unsigned int INVERTCUBICMAP                 = 37;
-  static constexpr unsigned int REFLECTIONMAP_OPPOSITEZ        = 38;
-  static constexpr unsigned int LODINREFLECTIONALPHA           = 39;
-  static constexpr unsigned int GAMMAREFLECTION                = 40;
-  static constexpr unsigned int RGBDREFLECTION                 = 41;
-  static constexpr unsigned int EQUIRECTANGULAR_RELFECTION_FOV = 42;
+    = 37;
+  static constexpr unsigned int INVERTCUBICMAP                 = 38;
+  static constexpr unsigned int REFLECTIONMAP_OPPOSITEZ        = 39;
+  static constexpr unsigned int LODINREFLECTIONALPHA           = 40;
+  static constexpr unsigned int GAMMAREFLECTION                = 41;
+  static constexpr unsigned int RGBDREFLECTION                 = 42;
+  static constexpr unsigned int EQUIRECTANGULAR_RELFECTION_FOV = 43;
 
   // Default BJS.
-  static constexpr unsigned int MAINUV1             = 43;
-  static constexpr unsigned int MAINUV2             = 44;
-  static constexpr unsigned int UV1                 = 45;
-  static constexpr unsigned int UV2                 = 46;
-  static constexpr unsigned int CLIPPLANE           = 47;
-  static constexpr unsigned int POINTSIZE           = 48;
-  static constexpr unsigned int LOGARITHMICDEPTH    = 49;
-  static constexpr unsigned int FOG                 = 50;
-  static constexpr unsigned int NORMAL              = 51;
-  static constexpr unsigned int INSTANCES           = 52;
-  static constexpr unsigned int SHADOWFLOAT         = 53;
-  static constexpr unsigned int SPECULARTERM        = 54;
-  static constexpr unsigned int VERTEXCOLOR         = 55;
-  static constexpr unsigned int VERTEXALPHA         = 56;
-  static constexpr unsigned int MORPHTARGETS_NORMAL = 57;
-  static constexpr unsigned int MORPHTARGETS        = 58;
-  static constexpr unsigned int ALPHATEST           = 59;
-  static constexpr unsigned int DEPTHPREPASS        = 60;
-  static constexpr unsigned int NONUNIFORMSCALING   = 61;
+  static constexpr unsigned int MAINUV1             = 44;
+  static constexpr unsigned int MAINUV2             = 45;
+  static constexpr unsigned int UV1                 = 46;
+  static constexpr unsigned int UV2                 = 47;
+  static constexpr unsigned int CLIPPLANE           = 48;
+  static constexpr unsigned int CLIPPLANE2          = 49;
+  static constexpr unsigned int CLIPPLANE3          = 50;
+  static constexpr unsigned int CLIPPLANE4          = 51;
+  static constexpr unsigned int POINTSIZE           = 52;
+  static constexpr unsigned int LOGARITHMICDEPTH    = 53;
+  static constexpr unsigned int FOG                 = 54;
+  static constexpr unsigned int NORMAL              = 55;
+  static constexpr unsigned int INSTANCES           = 56;
+  static constexpr unsigned int SHADOWFLOAT         = 57;
+  static constexpr unsigned int SPECULARTERM        = 58;
+  static constexpr unsigned int VERTEXCOLOR         = 59;
+  static constexpr unsigned int VERTEXALPHA         = 60;
+  static constexpr unsigned int MORPHTARGETS_NORMAL = 61;
+  static constexpr unsigned int MORPHTARGETS        = 62;
+  static constexpr unsigned int ALPHATEST           = 63;
+  static constexpr unsigned int DEPTHPREPASS        = 64;
+  static constexpr unsigned int NONUNIFORMSCALING   = 65;
 
   /**
    * @brief Constructor of the defines.

@@ -17,6 +17,8 @@ PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
     , albedoTexture{nullptr}
     , ambientTexture{nullptr}
     , ambientTextureStrength{1.f}
+    , ambientTextureImpactOnAnalyticalLights{PBRMaterial::
+                                               DEFAULT_AO_ON_ANALYTICAL_LIGHTS}
     , opacityTexture{nullptr}
     , reflectionTexture{nullptr}
     , emissiveTexture{nullptr}

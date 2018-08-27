@@ -117,6 +117,9 @@ public:
    */
   void _rebuild();
 
+  /**
+   * @brief Hidden
+   */
   void _swapAndDie(InternalTexture* target);
 
   /**

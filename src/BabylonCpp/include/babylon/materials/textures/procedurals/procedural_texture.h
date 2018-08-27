@@ -23,12 +23,14 @@ public:
 
   void addToScene(unique_ptr_t<ProceduralTexture>&& newTexture);
 
+  /** Hidden */
   void _rebuild() override;
   void reset();
   bool isReady() override;
   void resetRefreshCounter();
   void setFragment(const unordered_map_t<string_t, string_t>& fragment);
   void setFragment(const string_t& fragment);
+  /** Hidden */
   bool _shouldRender();
   Size& getRenderSize();
   const Size& getRenderSize() const;
@@ -79,6 +81,7 @@ private:
   void _createIndexBuffer();
 
 public:
+  /** Hidden */
   bool _generateMipMaps;
   bool isEnabled;
   ::std::function<void()> onGenerated;
@@ -96,6 +99,7 @@ private:
   vector_t<string_t> _uniforms;
   vector_t<string_t> _samplers;
   unordered_map_t<string_t, string_t> _fragment;
+  /** Hidden */
   unordered_map_t<string_t, TexturePtr> _textures;
   unordered_map_t<string_t, float> _floats;
   unordered_map_t<string_t, int> _ints;

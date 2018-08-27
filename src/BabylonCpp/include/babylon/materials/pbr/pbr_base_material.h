@@ -253,6 +253,14 @@ protected:
   float _ambientTextureStrength;
 
   /**
+   * Defines how much the AO map is occluding the analytical lights (point
+   * spot...).
+   * 1 means it completely occludes it
+   * 0 mean it has no impact
+   */
+  unsigned int _ambientTextureImpactOnAnalyticalLights;
+
+  /**
    * Stores the alpha values in a texture.
    */
   BaseTexturePtr _opacityTexture;
@@ -286,13 +294,13 @@ protected:
    * Specifies the metallic scalar of the metallic/roughness workflow.
    * Can also be used to scale the metalness values of the metallic texture.
    */
-  float _metallic;
+  nullable_t<float> _metallic;
 
   /**
    * Specifies the roughness scalar of the metallic/roughness workflow.
    * Can also be used to scale the roughness values of the metallic texture.
    */
-  float _roughness;
+  nullable_t<float> _roughness;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate chanel depending

@@ -68,6 +68,7 @@ public:
   void addPostProcess(PostProcess* postProcess);
   void clearPostProcesses(bool dispose = false);
   void removePostProcess(PostProcess* postProcess);
+  /** Hidden */
   bool _shouldRender();
   bool isReady() override;
   ISize& getRenderSize();
@@ -123,6 +124,7 @@ public:
   void disposeFramebufferObjects();
 
   void dispose() override;
+  /** Hidden */
   void _rebuild() override;
 
   /**
@@ -191,8 +193,8 @@ protected:
   void set_onClear(
     const ::std::function<void(Engine* engine, EventState&)>& callback);
 
-  unsigned int get_samples() const;
-  void set_samples(unsigned int value);
+  virtual unsigned int get_samples() const;
+  virtual void set_samples(unsigned int value);
   int get_refreshRate() const;
   void set_refreshRate(int value);
 
@@ -232,7 +234,9 @@ public:
   bool useCameraPostProcesses;
   bool ignoreCameraViewport;
   nullable_t<Color4> clearColor;
+  /** Hidden */
   bool _generateMipMaps;
+  /** Hidden */
   vector_t<string_t> _waitingRenderList;
   // ::std::function<void()> onAfterRender;
   // ::std::function<void()> onBeforeRender;
