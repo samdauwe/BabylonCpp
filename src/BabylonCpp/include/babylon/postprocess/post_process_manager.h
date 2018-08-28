@@ -22,7 +22,8 @@ public:
 
   /** Methods **/
   /**
-   * Rebuilds the vertex buffers of the manager.
+   * @brief Rebuilds the vertex buffers of the manager.
+   * Hidden
    */
   void _rebuild();
 
@@ -32,6 +33,7 @@ public:
    * null)
    * @param postProcesses An array of post processes to be run. (default: null)
    * @returns True if the post processes were able to be run.
+   * Hidden
    */
   bool _prepareFrame(InternalTexture* sourceTexture              = nullptr,
                      const vector_t<PostProcess*>& postProcesses = {});
@@ -59,6 +61,7 @@ public:
    * @param postProcesses The array of post processes to render.
    * @param forceFullscreenViewport force gl.viewport to be full screen eg.
    * 0,0,textureWidth,textureHeight (default: false)
+   * Hidden
    */
   void _finalizeFrame(bool doNotPresent,
                       InternalTexture* targetTexture = nullptr,

@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT FreeCameraKeyboardMoveInput
-  : public ICameraInput<FreeCamera> {
+    : public ICameraInput<FreeCamera> {
 
 public:
   FreeCameraKeyboardMoveInput();
@@ -20,6 +20,7 @@ public:
   void checkInputs() override;
   const char* getClassName() const override;
   const char* getSimpleName() const override;
+  /** Hidden */
   void _onLostFocus(const FocusEvent& e);
 
 public:

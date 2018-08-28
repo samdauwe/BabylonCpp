@@ -25,6 +25,7 @@ public:
 
   IReflect::Type type() const override;
 
+  /** Hidden */
   void _checkInputs() override;
   const string_t getClassName() const override;
   Json::object serialize() const override;

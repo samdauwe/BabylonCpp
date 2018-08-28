@@ -61,6 +61,7 @@ public:
 
   /** Methods */
 
+  /** Hidden */
   void _rebuild() override;
 
   /**

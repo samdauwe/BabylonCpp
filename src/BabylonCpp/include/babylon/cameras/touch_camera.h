@@ -27,6 +27,7 @@ public:
   ~TouchCamera() override;
 
   const string_t getClassName() const override;
+  /** Hidden */
   void _setupInputs() override;
 
 protected:

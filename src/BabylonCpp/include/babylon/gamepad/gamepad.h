@@ -32,6 +32,7 @@ public:
   string_t id;
   int index;
   unsigned int type;
+  /** Hidden */
   bool _isConnected;
 
   ReadOnlyProperty<Gamepad, bool> isConnected;
@@ -42,7 +43,6 @@ protected:
   bool _invertLeftStickY;
   shared_ptr_t<IBrowserGamepad> _browserGamepad;
 
-private:
   bool get_isConnected() const;
   nullable_t<StickValues>& get_leftStick();
   void set_leftStick(const nullable_t<StickValues>& newValues);
@@ -51,6 +51,7 @@ private:
   nullable_t<StickValues> _leftStick;
   nullable_t<StickValues> _rightStick;
 
+private:
   unsigned int _leftStickAxisX;
   unsigned int _leftStickAxisY;
   unsigned int _rightStickAxisX;

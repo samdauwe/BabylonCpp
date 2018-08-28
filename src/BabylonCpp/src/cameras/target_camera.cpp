@@ -28,7 +28,8 @@ TargetCamera::TargetCamera(const string_t& iName, const Vector3& iPosition,
     , _transformedReferencePoint{Vector3::Zero()}
     , _globalCurrentTarget{Vector3::Zero()}
     , _globalCurrentUpVector{Vector3::Zero()}
-    , _currentUpVector{::std::make_unique<Vector3>(0.f, 1.f, 0.f)}
+    , _defaultUp{Vector3::Up()}
+    , _cachedRotationZ{0.f}
 {
   _initCache();
 }
@@ -174,7 +175,7 @@ void TargetCamera::setTarget(const Vector3& target)
     position.z += Math::Epsilon;
   }
 
-  Matrix::LookAtLHToRef(position, target, upVector, _camMatrix);
+  Matrix::LookAtLHToRef(position, target, _defaultUp, _camMatrix);
   _camMatrix.invert();
 
   rotation->x = ::std::atan(_camMatrix.m[6] / _camMatrix.m[10]);
@@ -307,9 +308,12 @@ void TargetCamera::_updateCameraRotationMatrix()
     Matrix::RotationYawPitchRollToRef(rotation->y, rotation->x, rotation->z,
                                       _cameraRotationMatrix);
   }
-  // update the up vector!
-  Vector3::TransformNormalToRef(upVector, _cameraRotationMatrix,
-                                *_currentUpVector);
+}
+
+TargetCamera& TargetCamera::_rotateUpVectorWithCameraRotationMatrix()
+{
+  Vector3::TransformNormalToRef(_defaultUp, _cameraRotationMatrix, upVector);
+  return *this;
 }
 
 Matrix TargetCamera::_getViewMatrix()
@@ -323,13 +327,19 @@ Matrix TargetCamera::_getViewMatrix()
   // Compute
   _updateCameraRotationMatrix();
 
+  // Apply the changed rotation to the upVector.
+  if (!stl_util::almost_equal(_cachedRotationZ, rotation->z)) {
+    _rotateUpVectorWithCameraRotationMatrix();
+    _cachedRotationZ = rotation->z;
+  }
+
   Vector3::TransformCoordinatesToRef(*_referencePoint, _cameraRotationMatrix,
                                      _transformedReferencePoint);
 
   // Computing target and final matrix
   position.addToRef(_transformedReferencePoint, _currentTarget);
 
-  _computeViewMatrix(position, _currentTarget, *_currentUpVector);
+  _computeViewMatrix(position, _currentTarget, upVector);
 
   return _viewMatrix;
 }

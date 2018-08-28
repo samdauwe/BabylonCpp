@@ -41,13 +41,16 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(
     , minZAspect{0.2f}
     , samples{this, &SSAO2RenderingPipeline::get_samples,
               &SSAO2RenderingPipeline::set_samples}
+    , textureSamples{this, &SSAO2RenderingPipeline::get_textureSamples,
+                     &SSAO2RenderingPipeline::set_textureSamples}
     , expensiveBlur{this, &SSAO2RenderingPipeline::get_expensiveBlur,
                     &SSAO2RenderingPipeline::set_expensiveBlur}
     , radius{2.f}
     , area{0.0075f}
     , fallOff{0.000001f}
-    , base{0.1f}
+    , base{0.f}
     , _samples{8}
+    , _textureSamples{1}
     , _ratio{iRatio}
     , _expensiveBlur{true}
     , _scene{scene}
@@ -67,6 +70,8 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(
     return;
   }
 
+  _bits.resize(1);
+
   auto ssaoRatio = _ratio.ssaoRatio;
   auto blurRatio = _ratio.blurRatio;
 
@@ -79,6 +84,7 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(
   _originalColorPostProcess = new PassPostProcess(
     "SSAOOriginalSceneColor", 1.f, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
+  _originalColorPostProcess->samples = textureSamples;
   _createSSAOPostProcess(1.0);
   _createBlurPostProcess(ssaoRatio, blurRatio);
   _createSSAOCombinePostProcess(blurRatio);
@@ -128,6 +134,22 @@ void SSAO2RenderingPipeline::set_samples(unsigned int n)
 unsigned int SSAO2RenderingPipeline::get_samples() const
 {
   return _samples;
+}
+
+void SSAO2RenderingPipeline::set_textureSamples(unsigned int n)
+{
+  _textureSamples = n;
+
+  _originalColorPostProcess->samples = n;
+  _blurHPostProcess->samples         = n;
+  _blurVPostProcess->samples         = n;
+  _ssaoPostProcess->samples          = n;
+  _ssaoCombinePostProcess->samples   = n;
+}
+
+unsigned int SSAO2RenderingPipeline::get_textureSamples() const
+{
+  return _textureSamples;
 }
 
 void SSAO2RenderingPipeline::set_expensiveBlur(bool b)
@@ -237,6 +259,9 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
       _firstUpdate = false;
     }
   });
+
+  _blurHPostProcess->samples = textureSamples;
+  _blurVPostProcess->samples = textureSamples;
 }
 
 void SSAO2RenderingPipeline::_rebuild()
@@ -245,22 +270,52 @@ void SSAO2RenderingPipeline::_rebuild()
   PostProcessRenderPipeline::_rebuild();
 }
 
+float SSAO2RenderingPipeline::_radicalInverse_VdC(uint32_t i)
+{
+  _bits[0] = i;
+  _bits[0] = ((_bits[0] << 16) | (_bits[0] >> 16)) >> 0;
+  _bits[0]
+    = ((_bits[0] & 0x55555555) << 1) | ((_bits[0] & 0xAAAAAAAA) >> 1) >> 0;
+  _bits[0]
+    = ((_bits[0] & 0x33333333) << 2) | ((_bits[0] & 0xCCCCCCCC) >> 2) >> 0;
+  _bits[0]
+    = ((_bits[0] & 0x0F0F0F0F) << 4) | ((_bits[0] & 0xF0F0F0F0) >> 4) >> 0;
+  _bits[0]
+    = ((_bits[0] & 0x00FF00FF) << 8) | ((_bits[0] & 0xFF00FF00) >> 8) >> 0;
+  return _bits[0] * 2.3283064365386963e-10f; // / 0x100000000 or / 4294967296
+}
+
+array_t<float, 2> SSAO2RenderingPipeline::_hammersley(uint32_t i, uint32_t n)
+{
+  return {
+    {static_cast<float>(i) / static_cast<float>(n), _radicalInverse_VdC(i)}};
+}
+
+Vector3 SSAO2RenderingPipeline::_hemisphereSample_uniform(float u, float v)
+{
+  auto phi = v * 2.f * Math::PI;
+  // rejecting samples that are close to tangent plane to avoid z-fighting
+  // artifacts
+  auto cosTheta = 1.f - (u * 0.85f + 0.15f);
+  auto sinTheta = ::std::sqrt(1.f - cosTheta * cosTheta);
+  return Vector3(::std::cos(phi) * sinTheta, ::std::sin(phi) * sinTheta,
+                 cosTheta);
+}
+
 Float32Array SSAO2RenderingPipeline::_generateHemisphere()
 {
   auto numSamples = samples();
   Float32Array result;
   Vector3 vector;
-  float scale = 0.f;
-
-  const auto rand
-    = [](float min, float max) { return Math::random() * (max - min) + min; };
 
   for (unsigned int i = 0; i < numSamples; ++i) {
-    vector = Vector3(rand(-1.f, 1.f), rand(-1.f, 1.f), rand(0.3f, 1.f));
-    vector.normalize();
-    scale = static_cast<float>(i) / static_cast<float>(numSamples);
-    scale = Scalar::Lerp(0.1f, 1.f, scale * scale);
-    vector.scaleInPlace(scale);
+    if (numSamples < 16) {
+      vector = _hemisphereSample_uniform(Math::random(), Math::random());
+    }
+    else {
+      auto rand = _hammersley(i, numSamples);
+      vector    = _hemisphereSample_uniform(rand[0], rand[1]);
+    }
 
     stl_util::concat(result, {vector.x, vector.y, vector.z});
   }
@@ -289,7 +344,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
   _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
     if (_firstUpdate) {
       effect->setArray3("sampleSphere", sampleSphere);
-      effect->setFloat("randTextureTiles", 4.f);
+      effect->setFloat("randTextureTiles", 32.f);
     }
 
     if (!_scene->activeCamera) {
@@ -317,6 +372,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setTexture("normalSampler", _normalTexture);
     effect->setTexture("randomSampler", _randomTexture);
   });
+  _ssaoPostProcess->samples = textureSamples;
 }
 
 void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
@@ -336,11 +392,12 @@ void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
     effect->setTextureFromPostProcess("originalColor",
                                       _originalColorPostProcess);
   });
+  _ssaoCombinePostProcess->samples = textureSamples;
 }
 
 void SSAO2RenderingPipeline::_createRandomTexture()
 {
-  size_t size = 512;
+  size_t size = 128;
 
   DynamicTextureOptions options;
   options.width  = static_cast<int>(size);

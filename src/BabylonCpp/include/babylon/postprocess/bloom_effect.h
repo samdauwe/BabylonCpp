@@ -40,13 +40,14 @@ public:
   void disposeEffects(Camera* camera);
 
   /**
-   * @brief Internal
+   * @brief Hidden Internal
    */
   void _updateEffects();
 
   /**
    * @brief Internal
    * @returns if all the contained post processes are ready.
+   * Hidden
    */
   bool _isReady() const;
 
@@ -91,12 +92,12 @@ public:
   unsigned int pipelineTextureType;
 
   /**
-   * Internal
+   * Hidden Internal
    */
   vector_t<PostProcess*> _effects;
 
   /**
-   * Internal
+   * Hidden Internal
    */
   ExtractHighlightsPostProcess* _downscale;
 

@@ -31,9 +31,10 @@ PostProcess::PostProcess(
     , forceFullscreenViewport{true}
     , scaleMode{EngineConstants::SCALEMODE_FLOOR}
     , alwaysForcePOT{false}
-    , samples{1}
+    , samples{this, &PostProcess::get_samples, &PostProcess::set_samples}
     , adaptScaleToCurrentViewport{false}
     , _currentRenderTextureInd{0}
+    , _samples{1}
     , _renderRatio{1.f}
     , _options{options}
     , _reusable{false}
@@ -81,6 +82,22 @@ PostProcess::PostProcess(
 
 PostProcess::~PostProcess()
 {
+}
+
+unsigned int PostProcess::get_samples() const
+{
+  return _samples;
+}
+
+void PostProcess::set_samples(unsigned int n)
+{
+  _samples = n;
+
+  for (const auto& texture : _textures) {
+    if (texture->samples != _samples) {
+      _engine->updateRenderTargetTextureSampleCount(texture, _samples);
+    }
+  }
 }
 
 void PostProcess::setOnActivate(

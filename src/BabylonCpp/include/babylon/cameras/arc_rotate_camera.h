@@ -31,7 +31,9 @@ public:
   virtual IReflect::Type type() const override;
 
   // Cache
+  /** Hidden */
   void _initCache() override;
+  /** Hidden */
   void _updateCache(bool ignoreParentClass) override;
 
   // State
@@ -39,10 +41,12 @@ public:
 
   /**
    * Restored camera state. You must call storeState() first
+   * Hidden
    */
   bool _restoreStateValues() override;
 
   // Synchronized
+  /** Hidden */
   bool _isSynchronizedViewMatrix() override;
 
   // Methods
@@ -51,6 +55,7 @@ public:
                      MouseButtonType panningMouseButton
                      = MouseButtonType::RIGHT) override;
   void detachControl(ICanvas* canvas) override;
+  /** Hidden */
   void _checkInputs() override;
   void rebuildAnglesAndRadius();
   void setPosition(const Vector3& position);
@@ -58,11 +63,13 @@ public:
                  bool allowSamePosition = false);
   void setTarget(const Vector3& target, bool toBoundingCenter = false,
                  bool allowSamePosition = false);
+  /** Hidden */
   Matrix _getViewMatrix() override;
   void zoomOn(const vector_t<AbstractMeshPtr> meshes,
               bool doNotUpdateMaxZ = false);
   void focusOn(const MinMaxDistance& meshesOrMinMaxVectorAndDistance,
                bool doNotUpdateMaxZ = false);
+  /** Hidden */
   CameraPtr createRigCamera(const string_t& name, int cameraIndex) override;
   void _updateRigCameras() override;
   void dispose(bool doNotRecurse               = false,
@@ -117,7 +124,9 @@ public:
   float wheelPrecision;
   Vector2 targetScreenOffset;
   bool allowUpsideDown;
+  /** Hidden */
   bool _useCtrlForPanning;
+  /** Hidden */
   MouseButtonType _panningMouseButton;
   unique_ptr_t<ArcRotateCameraInputsManager> inputs;
   // Panning

@@ -29,12 +29,14 @@ public:
   float threshold;
 
   /**
-   * Internal
+   * Hidden
    */
   float _exposure;
+
   /**
    * Post process which has the input texture to be used when performing
    * highlight extraction
+   * Hidden
    */
   PostProcess* _inputPostProcess;
 

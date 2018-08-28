@@ -41,13 +41,14 @@ public:
   void disposeEffects(Camera* camera);
 
   /**
-   * @brief Internal
+   * @brief Hidden Internal
    */
   void _updateEffects();
 
   /**
    * @brief Internal
    * @returns if all the contained post processes are ready.
+   * Hidden
    */
   bool _isReady() const;
 
@@ -90,12 +91,12 @@ protected:
 
 public:
   /**
-   * Internal, blurs from high to low
+   * Hidden Internal, blurs from high to low
    */
   std::vector<unique_ptr_t<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurX;
 
   /**
-   * Internal post processes in depth of field effect
+   * Hidden Internal post processes in depth of field effect
    */
   vector_t<PostProcess*> _effects;
 

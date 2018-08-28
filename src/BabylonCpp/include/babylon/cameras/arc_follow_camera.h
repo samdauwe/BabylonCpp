@@ -26,6 +26,7 @@ public:
 
   virtual IReflect::Type type() const override;
 
+  /** Hidden */
   void _checkInputs() override;
   const string_t getClassName() const override;
 

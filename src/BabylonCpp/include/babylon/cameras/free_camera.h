@@ -33,9 +33,13 @@ public:
                      MouseButtonType panningMouseButton
                      = MouseButtonType::RIGHT) override;
   void detachControl(ICanvas* canvas) override;
+  /** Hidden */
   void _collideWithWorld(Vector3& displacement);
+  /** Hidden */
   void _checkInputs() override;
+  /** Hidden */
   bool _decideIfNeedsToMove() override;
+  /** Hidden */
   void _updatePosition() override;
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
@@ -61,7 +65,9 @@ public:
   // Collisions
   ::std::function<void(AbstractMesh* collidedMesh)> onCollide;
   // Direction
+  /** Hidden */
   unique_ptr_t<Vector3> _localDirection;
+  /** Hidden */
   Vector3 _transformedDirection;
 
   Property<FreeCamera, int> collisionMask;

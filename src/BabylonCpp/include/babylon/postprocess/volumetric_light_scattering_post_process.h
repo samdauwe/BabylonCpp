@@ -30,8 +30,8 @@ public:
    * @param {BABYLON.Engine} engine - The babylon engine
    * @param {boolean} reusable - If the post-process is reusable
    * @param {BABYLON.Scene} scene - The constructor needs a scene reference to
-   * initialize internal components. If "camera" is null (RenderPipelineà,
-   * "scene" must be provided
+   * initialize internal components. If "camera" is null a "scene" must be
+   * provided
    */
   VolumetricLightScatteringPostProcess(
     const string_t& name, float ratio, const CameraPtr& camera,

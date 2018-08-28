@@ -24,29 +24,37 @@ public:
   virtual IReflect::Type type() const override;
 
   Vector3 getFrontPosition(float distance);
+  /** Hidden */
   Vector3* _getLockedTargetPosition();
 
   /** State */
   Camera& storeState() override;
 
   /**
-   * @brief Restored camera state. You must call storeState() first
+   * @brief Restored camera state. You must call storeState() first.
+   * @returns whether it was successful or not
+   * Hidden
    */
   bool _restoreStateValues() override;
 
   /** Cache */
+  /** Hidden */
   void _initCache() override;
+  /** Hidden */
   void _updateCache(bool ignoreParentClass) override;
 
   /** Synchronized **/
+  /** Hidden */
   bool _isSynchronizedViewMatrix() override;
 
   /** Methods **/
+  /** Hidden */
   float _computeLocalCameraSpeed();
 
   /** Target **/
   void setRotation(const Vector3& rotation);
   Vector3& getRotation();
+  /** Hidden */
   void setTarget(const Vector3& target);
 
   /**
@@ -55,13 +63,18 @@ public:
    */
   Vector3& getTarget();
 
+  /** Hidden */
   virtual bool _decideIfNeedsToMove();
+  /** Hidden */
   virtual void _updatePosition();
+  /** Hidden */
   void _checkInputs() override;
+  /** Hidden */
   Matrix _getViewMatrix() override;
 
   /** Camera rigs section **/
   CameraPtr createRigCamera(const string_t& name, int cameraIndex) override;
+  /** Hidden */
   void _updateRigCameras() override;
   const string_t getClassName() const override;
   virtual Json::object serialize() const override;
@@ -74,6 +87,14 @@ protected:
                           const Vector3& up);
 
 private:
+  /**
+   * @brief Update the up vector to apply the rotation of the camera (So if you
+   * changed the camera rotation.z this will let you update the up vector as
+   * well).
+   * @returns the current camera
+   */
+  TargetCamera& _rotateUpVectorWithCameraRotationMatrix();
+
   void _getRigCamPosition(float halfSpace, Vector3& result);
   void _updateCameraRotationMatrix() override;
 
@@ -88,14 +109,21 @@ public:
   bool noRotationConstraint;
   Vector3* lockedTarget;
 
+  /** Hidden */
   Vector3 _currentTarget;
+  /** Hidden */
   Matrix _viewMatrix;
+  /** Hidden */
   Matrix _camMatrix;
+  /** Hidden */
   Matrix _cameraTransformMatrix;
+  /** Hidden */
   Matrix _cameraRotationMatrix;
+  /** Hidden */
   unique_ptr_t<Vector3> _referencePoint;
+  /** Hidden */
   Vector3 _transformedReferencePoint;
-
+  /** Hidden */
   ::std::function<void()> _reset;
   string_t _waitingLockedTargetId;
 
@@ -105,7 +133,8 @@ protected:
 
 private:
   Matrix _rigCamTransformMatrix;
-  unique_ptr_t<Vector3> _currentUpVector;
+  Vector3 _defaultUp;
+  float _cachedRotationZ;
   /**
    * Store current camera state (fov, position, etc..)
    */

@@ -477,10 +477,10 @@ public:
   ReadOnlyProperty<Node, vector_t<Behavior<Node>*>> behaviors;
 
 protected:
+  unordered_map_t<string_t, unique_ptr_t<AnimationRange>> _ranges;
   int _childRenderId;
 
 private:
-  unordered_map_t<string_t, unique_ptr_t<AnimationRange>> _ranges;
   bool _isEnabled;
   bool _isReady;
   int _parentRenderId;

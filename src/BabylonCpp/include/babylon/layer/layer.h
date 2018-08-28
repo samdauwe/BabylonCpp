@@ -23,6 +23,7 @@ public:
   }
   virtual ~Layer();
 
+  /** Hidden */
   void _rebuild();
   void render();
   void dispose();

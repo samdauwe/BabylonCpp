@@ -29,19 +29,25 @@ public:
   Vector3& slidePlaneNormal();
 
   /** Methods **/
+  /** Hidden */
   void _initialize(Vector3& source, Vector3& dir, float e);
+  /** Hidden */
   bool _checkPointInTriangle(const Vector3& point, const Vector3& pa,
                              const Vector3& pb, const Vector3& pc,
                              const Vector3& n);
+  /** Hidden */
   bool _canDoCollision(const Vector3& sphereCenter, float sphereRadius,
                        const Vector3& vecMin, const Vector3& vecMax) const;
+  /** Hidden */
   void _testTriangle(size_t faceIndex, vector_t<Plane>& trianglePlaneArray,
                      const Vector3& p1, const Vector3& p2, const Vector3& p3,
                      bool hasMaterial);
+  /** Hidden */
   void _collide(vector_t<Plane>& trianglePlaneArray,
                 const vector_t<Vector3> pts, const IndicesArray& indices,
                 size_t indexStart, size_t indexEnd, unsigned int decal,
                 bool hasMaterial);
+  /** Hidden */
   void _getResponse(Vector3& pos, Vector3& vel);
 
 public:
@@ -62,11 +68,17 @@ public:
   AbstractMesh* collidedMesh;
 
   unsigned int collidedMeshId;
+  /** Hidden */
   Vector3 _radius;
+  /** Hidden */
   unsigned int _retry;
+  /** Hidden */
   float _velocityWorldLength;
+  /** Hidden */
   Vector3 _basePointWorld;
+  /** Hidden */
   Vector3 _initialVelocity;
+  /** Hidden */
   Vector3 _initialPosition;
 
 private:

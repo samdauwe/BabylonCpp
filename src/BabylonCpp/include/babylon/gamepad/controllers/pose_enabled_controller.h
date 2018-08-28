@@ -110,16 +110,19 @@ public:
 
   /**
    * Internal, the mesh attached to the controller
+   * Hidden
    */
   AbstractMeshPtr _mesh; // a node that will be attached to this Gamepad
 
   /**
    * Internal, matrix used to convert room space to babylon space
+   * Hidden
    */
   Matrix _deviceToWorld;
 
   /**
    * Node to be used when casting a ray from the controller
+   * Hidden
    */
   AbstractMesh* _pointingPoseNode;
 

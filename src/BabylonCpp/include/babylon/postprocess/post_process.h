@@ -227,6 +227,17 @@ public:
    */
   virtual void dispose(Camera* camera = nullptr);
 
+protected:
+  /**
+   * @brief Gets the number of sample textures (default: 1)
+   */
+  unsigned int get_samples() const;
+
+  /**
+   * @brief Sets the number of sample textures (default: 1)
+   */
+  void set_samples(unsigned int n);
+
 public:
   /**
    * Name of the PostProcess
@@ -246,6 +257,7 @@ public:
   /**
    * Internal, reference to the location where this postprocess was output to.
    * (Typically the texture on the next postprocess in the chain)
+   * Hidden
    */
   InternalTexture* _outputTexture;
 
@@ -317,7 +329,7 @@ public:
   /**
    * Number of sample textures (default: 1)
    */
-  unsigned int samples;
+  Property<PostProcess, unsigned int> samples;
 
   /**
    * Modify the scale of the post process to be the same as the viewport
@@ -327,11 +339,13 @@ public:
 
   /**
    * Smart array of input and output textures for the post process.
+   * Hidden
    */
   vector_t<InternalTexture*> _textures;
 
   /**
    * The index in _textures that corresponds to the output texture.
+   * Hidden
    */
   unsigned int _currentRenderTextureInd;
 
@@ -366,6 +380,7 @@ protected:
   unordered_map_t<string_t, unsigned int> _indexParameters;
 
 private:
+  unsigned int _samples;
   CameraPtr _camera;
   Scene* _scene;
   Engine* _engine;

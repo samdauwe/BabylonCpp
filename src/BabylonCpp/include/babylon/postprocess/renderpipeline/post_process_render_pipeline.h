@@ -23,14 +23,20 @@ public:
   vector_t<CameraPtr> getCameras() const;
   bool isSupported() const;
   void addEffect(PostProcessRenderEffect* renderEffect);
+  /** Hidden */
   virtual void _rebuild();
+  /** Hidden */
   void _enableEffect(const string_t& renderEffectName,
                      const vector_t<CameraPtr>& cameras);
   void _disableEffect(const string_t& renderEffectName,
                       const vector_t<CameraPtr>& cameras);
+  /** Hidden */
   void _attachCameras(const vector_t<CameraPtr>& cameras, bool unique);
+  /** Hidden */
   void _detachCameras(const vector_t<CameraPtr>& cameras);
+  /** Hidden */
   void _update();
+  /** Hidden */
   void _reset();
   virtual void dispose(bool doNotRecurse               = false,
                        bool disposeMaterialAndTextures = false) override;
@@ -39,6 +45,7 @@ protected:
   bool _enableMSAAOnFirstPostProcess(unsigned int sampleCount);
 
 public:
+  /** Hidden */
   string_t _name;
 
 protected:

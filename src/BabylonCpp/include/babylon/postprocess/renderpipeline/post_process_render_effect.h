@@ -33,30 +33,35 @@ public:
 
   /**
    * @brief Updates the current state of the effect.
+   * Hidden
    */
   void _update();
 
   /**
    * @brief Attaches the effect on cameras.
    * @param cameras The camera to attach to.
+   * Hidden
    */
   void _attachCameras(const vector_t<CameraPtr>& cameras);
 
   /**
    * @brief Detatches the effect on cameras.
    * @param cameras The camera to detatch from.
+   * Hidden
    */
   void _detachCameras(const vector_t<CameraPtr>& cameras);
 
   /**
    * @brief Enables the effect on given cameras.
    * @param cameras The camera to enable.
+   * Hidden
    */
   void _enable(const vector_t<CameraPtr>& cameras);
 
   /**
    * @brief Disables the effect on the given cameras.
    * @param cameras The camera to disable.
+   * Hidden
    */
   void _disable(const vector_t<CameraPtr>& cameras);
 
@@ -76,6 +81,7 @@ protected:
 public:
   /**
    * Name of the effect
+   * Hidden
    */
   string_t _name;
 

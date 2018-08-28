@@ -125,6 +125,7 @@ public:
    * Free any resources and references associated to a mesh.
    * Internal use
    * @param mesh The mesh to free.
+   * Hidden
    */
   void _disposeMesh(Mesh* mesh) override;
 

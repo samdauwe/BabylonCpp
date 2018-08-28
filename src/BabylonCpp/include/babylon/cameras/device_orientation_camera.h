@@ -40,7 +40,7 @@ public:
 
   /**
    * @brief Checks and applies the current values of the inputs to the camera.
-   * (Internal use only)
+   * Hidden
    */
   void _checkInputs() override;
 

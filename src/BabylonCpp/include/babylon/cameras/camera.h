@@ -137,11 +137,15 @@ public:
                bool forceInstanceSupport = false) override;
 
   /** Cache **/
+  /** Hidden */
   virtual void _initCache() override;
+  /** Hidden */
   void _updateCache(bool ignoreParentClass = false) override;
 
   /** Synchronized **/
+  /** Hidden */
   bool _isSynchronized() override;
+  /** Hidden */
   virtual bool _isSynchronizedViewMatrix();
   bool _isSynchronizedProjectionMatrix();
 
@@ -152,6 +156,7 @@ public:
                              = MouseButtonType::RIGHT);
   virtual void detachControl(ICanvas* canvas);
   void update();
+  /** Hidden */
   virtual void _checkInputs();
   vector_t<CameraPtr>& rigCameras();
   const vector_t<CameraPtr>& rigCameras() const;
@@ -166,6 +171,7 @@ public:
   int attachPostProcess(PostProcess* postProcess, int insertAt = -1);
   void detachPostProcess(PostProcess* postProcess);
   Matrix* getWorldMatrix() override;
+  /** Hidden */
   virtual Matrix _getViewMatrix();
   Matrix& getViewMatrix(bool force = false);
   void freezeProjectionMatrix();
@@ -205,7 +211,9 @@ public:
   void setCameraRigMode(int mode, const Json::value& rigParams);
   void setCameraRigParameter(const string_t& name, float value);
   virtual CameraPtr createRigCamera(const string_t& name, int cameraIndex);
+  /** Hidden */
   virtual void _updateRigCameras();
+  /** Hidden */
   virtual void _setupInputs();
   virtual Json::object serialize() const;
   virtual const string_t getClassName() const override;
@@ -283,10 +291,15 @@ public:
   unsigned int cameraRigMode;
   float interaxialDistance;
   bool isStereoscopicSideBySide;
+  /** Hidden */
   CameraRigParams _cameraRigParams;
+  /** Hidden */
   vector_t<CameraPtr> _rigCameras;
+  /** Hidden */
   PostProcess* _rigPostProcess;
+  /** Hidden */
   bool _skipRendering;
+  /** Hidden */
   Camera* _alternateCamera;
   vector_t<RenderTargetTexturePtr> customRenderTargets;
 

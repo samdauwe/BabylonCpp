@@ -18,12 +18,12 @@ public:
   ~PickingInfo();
 
   /**
-   * @brief Gets the normal corrispodning to the face the pick collided with.
+   * @brief Gets the normal corresponding to the face the pick collided with
    * @param useWorldCoordinates If the resulting normal should be relative to
    * the world (default: false)
    * @param useVerticesNormals If the vertices normals should be used to
    * calculate the normal instead of the normal map
-   * @returns The normal corrispodning to the face the pick collided with
+   * @returns The normal corresponding to the face the pick collided with
    */
   nullable_t<Vector3> getNormal(bool useWorldCoordinates = false,
                                 bool useVerticesNormals  = true);
@@ -51,7 +51,7 @@ public:
   nullable_t<Vector3> pickedPoint;
 
   /**
-   * The mesh corrisponding the the pick collision
+   * The mesh corresponding the the pick collision
    */
   AbstractMeshPtr pickedMesh = nullptr;
 

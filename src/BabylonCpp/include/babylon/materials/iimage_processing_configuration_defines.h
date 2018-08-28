@@ -15,6 +15,7 @@ struct BABYLON_SHARED_EXPORT IImageProcessingConfigurationDefines {
   bool VIGNETTEBLENDMODEMULTIPLY  = false;
   bool VIGNETTEBLENDMODEOPAQUE    = false;
   bool TONEMAPPING                = false;
+  bool TONEMAPPING_ACES           = false;
   bool CONTRAST                   = false;
   bool EXPOSURE                   = false;
   bool COLORCURVES                = false;

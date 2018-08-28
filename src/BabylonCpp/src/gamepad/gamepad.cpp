@@ -18,6 +18,8 @@ Gamepad::Gamepad(const string_t& iId, int iIndex,
     , rightStick{this, &Gamepad::get_rightStick, &Gamepad::set_rightStick}
     , _invertLeftStickY{false}
     , _browserGamepad{browserGamepad}
+    , _leftStick{StickValues(0.f, 0.f)}
+    , _rightStick{StickValues(0.f, 0.f)}
     , _leftStickAxisX{leftStickX}
     , _leftStickAxisY{leftStickY}
     , _rightStickAxisX{rightStickX}

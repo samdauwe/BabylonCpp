@@ -27,6 +27,7 @@ public:
                                const string_t& renderEffectName,
                                const vector_t<CameraPtr>& cameras);
   void update();
+  /** Hidden */
   void _rebuild();
   void dispose();
 

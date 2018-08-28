@@ -21,12 +21,14 @@ public:
   Gamepad* _addNewGamepad(Gamepad* gamepad);
   void _startMonitoringGamepads();
   void _stopMonitoringGamepads();
+  /** Hidden */
   void _checkGamepadsStatus();
 
 private:
   void _updateGamepadObjects();
 
 public:
+  /** Hidden */
   bool _isMonitoring;
   Observable<Gamepad> onGamepadConnectedObservable;
   Observable<Gamepad> onGamepadDisconnectedObservable;

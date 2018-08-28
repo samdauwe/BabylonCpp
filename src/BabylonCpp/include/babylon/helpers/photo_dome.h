@@ -2,19 +2,19 @@
 #define BABYLON_HELPERS_PHOTO_DOME_H
 
 #include <babylon/babylon_global.h>
-#include <babylon/engine/node.h>
+#include <babylon/mesh/transform_node.h>
 
 namespace BABYLON {
 
 /**
  * @brief Display a 360 degree photo on an approximately spherical surface,
- * useful for VR applications or skyboxes. As a subclass of Node, this allow
- * parenting to the camera with different locations in the scene. This class
- * achieves its effect with a Texture and a correctly configured
+ * useful for VR applications or skyboxes. As a subclass of TransformNode, this
+ * allow parenting to the camera with different locations in the scene. This
+ * class achieves its effect with a Texture and a correctly configured
  * BackgroundMaterial on an inverted sphere. Potential additions to this helper
  * include zoom and and non-infinite distance rendering effects.
  */
-class BABYLON_SHARED_EXPORT PhotoDome : public Node {
+class BABYLON_SHARED_EXPORT PhotoDome : public TransformNode {
 
 public:
   /**
@@ -22,12 +22,16 @@ public:
    * the relevant classes, Texture, StandardMaterial, and Mesh.
    * @param name Element's name, child elements will append suffixes for their
    * own names.
-   * @param urlsOfPhoto define the url of the photo to display
-   * @param options An object containing optional or exposed sub element
+   * @param urlsOfPhoto defines the url of the photo to display
+   * @param options defines an object containing optional or exposed sub element
    * properties
+   * @param onError defines a callback called when an error occured while
+   * loading the texture
    */
   PhotoDome(string_t name, const string_t& urlOfPhoto, PhotoDomeOptions options,
-            Scene* scene);
+            Scene* scene,
+            const ::std::function<void(const string_t& message)>& onError
+            = nullptr);
   ~PhotoDome() override;
 
   /**
@@ -70,6 +74,11 @@ public:
    * The texture being displayed on the sphere
    */
   Property<PhotoDome, TexturePtr> photoTexture;
+
+  /**
+   * Observable raised when an error occured while loading the 360 image
+   */
+  Observable<string_t> onLoadErrorObservable;
 
   /**
    * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults

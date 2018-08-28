@@ -61,6 +61,7 @@ public:
 
   /** Methods */
   static bool IsSupported();
+  /** Hidden */
   void _rebuild() override;
 
   /**
@@ -89,9 +90,15 @@ public:
 private:
   void set_samples(unsigned int n);
   unsigned int get_samples() const;
+  void set_textureSamples(unsigned int n);
+  unsigned int get_textureSamples() const;
   void set_expensiveBlur(bool b);
   bool get_expensiveBlur() const;
   void _createBlurPostProcess(float ssaoRatio, float blurRatio);
+  // Van der Corput radical inverse
+  float _radicalInverse_VdC(uint32_t i);
+  array_t<float, 2> _hammersley(uint32_t i, uint32_t n);
+  Vector3 _hemisphereSample_uniform(float u, float v);
   Float32Array _generateHemisphere();
   void _createSSAOPostProcess(float ratio);
   void _createSSAOCombinePostProcess(float ratio);
@@ -119,6 +126,11 @@ public:
    * Number of samples used for the SSAO calculations.
    */
   Property<SSAO2RenderingPipeline, unsigned int> samples;
+
+  /**
+   * Number of samples to use for antialiasing
+   */
+  Property<SSAO2RenderingPipeline, unsigned int> textureSamples;
 
   /**
    * Are we using bilateral blur ?
@@ -160,6 +172,11 @@ private:
   unsigned int _samples;
 
   /**
+   * Number of samples to use for antialiasing
+   */
+  unsigned int _textureSamples;
+
+  /**
    * Ratio object used for SSAO ratio and blur ratio
    */
   SSAO2Ratio _ratio;
@@ -192,6 +209,7 @@ private:
   PostProcess* _ssaoCombinePostProcess;
 
   bool _firstUpdate;
+  Uint32Array _bits;
 
 }; // end of class SSAORenderingPipeline
 

@@ -11,9 +11,11 @@
 
 namespace BABYLON {
 
-PhotoDome::PhotoDome(string_t iName, const string_t& urlOfPhoto,
-                     PhotoDomeOptions options, Scene* scene)
-    : Node{iName, scene}
+PhotoDome::PhotoDome(
+  string_t iName, const string_t& urlOfPhoto, PhotoDomeOptions options,
+  Scene* scene,
+  const ::std::function<void(const string_t& message)>& /*onError*/)
+    : TransformNode{iName, scene}
     , photoTexture{this, &PhotoDome::get_photoTexture,
                    &PhotoDome::set_photoTexture}
     , fovMultiplier{this, &PhotoDome::get_fovMultiplier,
@@ -104,7 +106,9 @@ void PhotoDome::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _mesh->dispose();
   _material->dispose();
 
-  Node::dispose(doNotRecurse, disposeMaterialAndTextures);
+  onLoadErrorObservable.clear();
+
+  TransformNode::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
 } // end of namespace BABYLON
