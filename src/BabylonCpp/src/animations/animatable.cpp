@@ -36,11 +36,15 @@ Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget,
   }
 
   _speedRatio = iSpeedRatio;
-  scene->_activeAnimatables.emplace_back(shared_from_this());
 }
 
 Animatable::~Animatable()
 {
+}
+
+void Animatable::addToScene(const AnimatablePtr& newAnimatable)
+{
+  _scene->_activeAnimatables.emplace_back(newAnimatable);
 }
 
 Animatable*& Animatable::get_syncRoot()

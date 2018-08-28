@@ -231,8 +231,8 @@ public:
   static AnimationPtr _PrepareAnimation(
     const string_t& name, const string_t& targetProperty, size_t framePerSecond,
     int totalFrame, const AnimationValue& from, const AnimationValue& to,
-    unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    IEasingFunction* easingFunction = nullptr);
+    unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+    const IEasingFunctionPtr& easingFunction = nullptr);
 
   /**
    * @brief Sets up an animation.
@@ -245,7 +245,7 @@ public:
   static AnimationPtr
   CreateAnimation(const string_t& property, int animationType,
                   std::size_t framePerSecond,
-                  IEasingFunction* easingFunction = nullptr);
+                  const IEasingFunctionPtr& easingFunction = nullptr);
 
   /**
    * @brief Create and start an animation on a node.
@@ -267,8 +267,8 @@ public:
     const string_t& name, const NodePtr& node, const string_t& targetProperty,
     size_t framePerSecond, int totalFrame, const AnimationValue& from,
     const AnimationValue& to,
-    unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    IEasingFunction* easingFunction = nullptr,
+    unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+    const IEasingFunctionPtr& easingFunction      = nullptr,
     const ::std::function<void()>& onAnimationEnd = nullptr);
 
   /**
@@ -296,8 +296,8 @@ public:
     const string_t& name, const NodePtr& node, bool directDescendantsOnly,
     const string_t& targetProperty, size_t framePerSecond, int totalFrame,
     const AnimationValue& from, const AnimationValue& to,
-    unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    IEasingFunction* easingFunction = nullptr,
+    unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+    const IEasingFunctionPtr& easingFunction      = nullptr,
     const ::std::function<void()>& onAnimationEnd = nullptr);
 
   /**
@@ -320,8 +320,8 @@ public:
     const string_t& name, const NodePtr& node, const string_t& targetProperty,
     size_t framePerSecond, int totalFrame, const AnimationValue& from,
     const AnimationValue& to,
-    unsigned int loopMode           = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    IEasingFunction* easingFunction = nullptr,
+    unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
+    const IEasingFunctionPtr& easingFunction      = nullptr,
     const ::std::function<void()>& onAnimationEnd = nullptr);
 
   /**
@@ -429,13 +429,13 @@ public:
    * @brief Gets the easing function of the animation.
    * @returns Easing function of the animation
    */
-  IEasingFunction* getEasingFunction();
+  IEasingFunctionPtr& getEasingFunction();
 
   /**
    * @brief Sets the easing function of the animation.
    * @param easingFunction A custom mathematical formula for animation
    */
-  void setEasingFunction(IEasingFunction* easingFunction);
+  void setEasingFunction(const IEasingFunctionPtr& easingFunction);
 
   /**
    * @brief Interpolates a scalar linearly.
@@ -721,7 +721,7 @@ private:
   /**
    * Stores the easing function of the animation
    */
-  IEasingFunction* _easingFunction;
+  IEasingFunctionPtr _easingFunction;
 
   /**
    * The set of event that will be linked to this animation

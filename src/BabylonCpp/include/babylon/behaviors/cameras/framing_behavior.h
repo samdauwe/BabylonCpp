@@ -16,7 +16,7 @@ public:
   /**
    * The easing function used by animations
    */
-  static ExponentialEase _EasingFunction;
+  static ExponentialEasePtr _EasingFunction;
 
   /**
    * The easing mode used by animations

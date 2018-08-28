@@ -8,8 +8,8 @@
 
 namespace BABYLON {
 
-BackEase BouncingBehavior::_EasingFunction = BackEase(0.3f);
-unsigned int BouncingBehavior::EasingMode  = EasingFunction::EASINGMODE_EASEOUT;
+BackEasePtr BouncingBehavior::_EasingFunction = BackEase::New(0.3f);
+unsigned int BouncingBehavior::EasingMode = EasingFunction::EASINGMODE_EASEOUT;
 
 BouncingBehavior::BouncingBehavior()
     : transitionDuration{450}
@@ -134,11 +134,11 @@ void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)
   }
 
   if (!_radiusBounceTransition) {
-    BouncingBehavior::_EasingFunction.setEasingMode(
+    BouncingBehavior::_EasingFunction->setEasingMode(
       BouncingBehavior::EasingMode);
     _radiusBounceTransition
       = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT(),
-                                   60, &BouncingBehavior::_EasingFunction);
+                                   60, BouncingBehavior::_EasingFunction);
   }
   // Prevent zoom until bounce has completed
   _cachedWheelPrecision                 = _attachedCamera->wheelPrecision;

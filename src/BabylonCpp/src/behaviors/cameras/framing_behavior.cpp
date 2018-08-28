@@ -12,7 +12,7 @@
 
 namespace BABYLON {
 
-ExponentialEase FramingBehavior::_EasingFunction = ExponentialEase();
+ExponentialEasePtr FramingBehavior::_EasingFunction = ExponentialEase::New();
 unsigned int FramingBehavior::EasingMode = EasingFunction::EASINGMODE_EASEINOUT;
 
 FramingBehavior::FramingBehavior()
@@ -151,7 +151,7 @@ void FramingBehavior::attach(const ArcRotateCameraPtr& camera)
   _attachedCamera = camera;
   auto scene      = _attachedCamera->getScene();
 
-  FramingBehavior::_EasingFunction.setEasingMode(FramingBehavior::EasingMode);
+  FramingBehavior::_EasingFunction->setEasingMode(FramingBehavior::EasingMode);
 
   _onPrePointerObservableObserver = scene->onPrePointerObservable.add(
     [this](PointerInfoPre* pointerInfoPre, EventState&) {
@@ -278,7 +278,7 @@ void FramingBehavior::zoomOnBoundingInfo(
   if (!_vectorTransition) {
     _vectorTransition
       = Animation::CreateAnimation("target", Animation::ANIMATIONTYPE_VECTOR3(),
-                                   60, &FramingBehavior::_EasingFunction);
+                                   60, FramingBehavior::_EasingFunction);
   }
 
   _betaIsAnimating = true;
@@ -318,7 +318,7 @@ void FramingBehavior::zoomOnBoundingInfo(
   if (!_radiusTransition) {
     _radiusTransition
       = Animation::CreateAnimation("radius", Animation::ANIMATIONTYPE_FLOAT(),
-                                   60, &FramingBehavior::_EasingFunction);
+                                   60, FramingBehavior::_EasingFunction);
   }
 
   animatable = Animation::TransitionTo(
@@ -406,7 +406,7 @@ void FramingBehavior::_maintainCameraAboveGround()
     if (!_betaTransition) {
       _betaTransition
         = Animation::CreateAnimation("beta", Animation::ANIMATIONTYPE_FLOAT(),
-                                     60, &FramingBehavior::_EasingFunction);
+                                     60, FramingBehavior::_EasingFunction);
     }
 
     auto animatabe = Animation::TransitionTo(

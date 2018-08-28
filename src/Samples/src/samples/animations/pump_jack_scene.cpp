@@ -53,7 +53,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   unsigned int moveDirection = 1;
 
   // Create custom easing function
-  auto myEase = new FunnyEase(distanceOfStick, lengthOfStick);
+  auto myEase = ::std::make_shared<FunnyEase>(distanceOfStick, lengthOfStick);
 
   // Initialization
   auto camera = FreeCamera::New("camera1", Vector3(0.f, 10.f, -25.f), scene);
@@ -211,7 +211,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   topStickAnimation->setKeys(topStickIAnimationKeys);
   topStickAnimation->setEasingFunction(
-    new BezierCurveEase(0.35f, 0.1f, 0.65f, 0.9f));
+    BezierCurveEase::New(0.35f, 0.1f, 0.65f, 0.9f));
   topStick->animations.emplace_back(topStickAnimation);
   scene->beginAnimation(topStick, 0, animationFrames, true);
 
@@ -253,7 +253,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   pumpStickAnimation->setKeys(pumpStickIAnimationKeys);
   pumpStickAnimation->setEasingFunction(
-    new BezierCurveEase(0.35f, 0.1f, 0.65f, 0.9f));
+    BezierCurveEase::New(0.35f, 0.1f, 0.65f, 0.9f));
 
   pumpStick->animations.emplace_back(pumpStickAnimation);
   scene->beginAnimation(pumpStick, 0, animationFrames, true);

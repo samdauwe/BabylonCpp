@@ -76,7 +76,7 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // 11. SineEase()
   // And if you want a total control, you can use a Bezier Curve animation
   // 12.   BezierCurveEase(x1, y1, x2, y2)
-  auto easingFunction = new CircleEase();
+  auto easingFunction = CircleEase::New();
 
   // For each easing function, you can choose beetween EASEIN (default),
   // EASEOUT, EASEINOUT
@@ -110,7 +110,7 @@ void EasingFunctionsScene::initializeScene(ICanvas* canvas, Scene* scene)
     IAnimationKey(
       120, AnimationValue(bezierTorus->position().add(Vector3(-80, 0, 0))))};
   animationBezierTorus->setKeys(keysBezierTorus);
-  auto bezierEase = new BezierCurveEase(0.32f, -0.73f, 0.69f, 1.59f);
+  auto bezierEase = BezierCurveEase::New(0.32f, -0.73f, 0.69f, 1.59f);
   animationBezierTorus->setEasingFunction(bezierEase);
   bezierTorus->animations.emplace_back(animationBezierTorus);
   scene->beginAnimation(bezierTorus, 0, 120, true);

@@ -26,7 +26,7 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
                         });                                             //
   // Infinite Loader Scene
   _samples["InfiniteLoaderScene"] = ::std::make_tuple(
-    true,                                                      //
+    false,                                                     //
     [](ICanvas* iCanvas) {                                     //
       return ::std::make_unique<InfiniteLoaderScene>(iCanvas); //
     });                                                        //

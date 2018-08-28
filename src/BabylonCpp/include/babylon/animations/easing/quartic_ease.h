@@ -10,10 +10,18 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT QuarticEase : public EasingFunction {
 
 public:
-  QuarticEase();
-  ~QuarticEase();
+  template <typename... Ts>
+  static QuarticEasePtr New(Ts&&... args)
+  {
+    return shared_ptr_t<QuarticEase>(
+      new QuarticEase(::std::forward<Ts>(args)...));
+  }
+  ~QuarticEase() override;
 
   float easeInCore(float gradient) const override;
+
+protected:
+  QuarticEase();
 
 }; // end of class QuarticEase
 

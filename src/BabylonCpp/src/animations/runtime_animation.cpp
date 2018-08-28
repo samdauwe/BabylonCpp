@@ -15,7 +15,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& target,
     : currentFrame{this, &RuntimeAnimation::get_currentFrame}
     , weight{this, &RuntimeAnimation::get_weight}
     , currentValue{this, &RuntimeAnimation::get_currentValue}
-    , _workValue{nullptr}
+    , _workValue{nullopt_t}
     , targetPath{this, &RuntimeAnimation::get_targetPath}
     , target{this, &RuntimeAnimation::get_target}
     , _currentFrame{0}
@@ -25,6 +25,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& target,
     , _stopped{false}
     , _blendingFactor{0.f}
     , _scene{scene}
+    , _currentValue{nullopt_t}
     , _targetPath{""}
     , _weight{1.f}
     , _ratioOffset{0.f}

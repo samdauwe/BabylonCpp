@@ -16,10 +16,15 @@ public:
   template <typename... Ts>
   static AnimatablePtr New(Ts&&... args)
   {
-    return shared_ptr_t<Animatable>(
-      new Animatable(::std::forward<Ts>(args)...));
+    auto animatable
+      = shared_ptr_t<Animatable>(new Animatable(::std::forward<Ts>(args)...));
+    animatable->addToScene(animatable);
+
+    return animatable;
   }
   ~Animatable();
+
+  void addToScene(const AnimatablePtr& newAnimatable);
 
   /** Methods **/
 

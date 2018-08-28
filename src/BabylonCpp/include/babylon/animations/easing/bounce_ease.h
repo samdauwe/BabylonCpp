@@ -10,10 +10,18 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BounceEase : public EasingFunction {
 
 public:
-  BounceEase(int bounces = 3, float bounciness = 2.f);
-  ~BounceEase();
+  template <typename... Ts>
+  static BounceEasePtr New(Ts&&... args)
+  {
+    return shared_ptr_t<BounceEase>(
+      new BounceEase(::std::forward<Ts>(args)...));
+  }
+  ~BounceEase() override;
 
   float easeInCore(float gradient) const override;
+
+protected:
+  BounceEase(int bounces = 3, float bounciness = 2.f);
 
 public:
   float bounces;

@@ -1996,13 +1996,13 @@ AnimatablePtr Scene::beginAnimation(
 
   // Children animations
   vector_t<IAnimatablePtr> animatables;
-  if (auto s = ::std::static_pointer_cast<Skeleton>(target)) {
+  if (auto s = ::std::dynamic_pointer_cast<Skeleton>(target)) {
     animatables = s->getAnimatables();
   }
-  else if (auto _s = ::std::static_pointer_cast<StandardMaterial>(target)) {
-    animatables = _s->getAnimatables();
+  else if (auto s = ::std::dynamic_pointer_cast<StandardMaterial>(target)) {
+    animatables = s->getAnimatables();
   }
-  else if (auto m = ::std::static_pointer_cast<Mesh>(target)) {
+  else if (auto m = ::std::dynamic_pointer_cast<Mesh>(target)) {
     animatables = m->getAnimatables();
   }
 
@@ -2652,8 +2652,8 @@ void Scene::addLight(const LightPtr& newLight)
   // Add light to all meshes (To support if the light is removed and then
   // readded)
   for (auto& mesh : meshes) {
-    if (!stl_util::contains(mesh->_lightSources, newLight.get())) {
-      mesh->_lightSources.emplace_back(newLight.get());
+    if (!stl_util::contains(mesh->_lightSources, newLight)) {
+      mesh->_lightSources.emplace_back(newLight);
       mesh->_resyncLightSources();
     }
   }

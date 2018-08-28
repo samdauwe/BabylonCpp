@@ -66,6 +66,21 @@ class QuadraticEase;
 class QuarticEase;
 class QuinticEase;
 class SineEase;
+// - Easing aliases
+using BackEasePtr        = shared_ptr_t<BackEase>;
+using BezierCurveEasePtr = shared_ptr_t<BezierCurveEase>;
+using BounceEasePtr      = shared_ptr_t<BounceEase>;
+using CircleEasePtr      = shared_ptr_t<CircleEase>;
+using CubicEasePtr       = shared_ptr_t<CubicEase>;
+using EasingFunctionPtr  = shared_ptr_t<EasingFunction>;
+using ElasticEasePtr     = shared_ptr_t<ElasticEase>;
+using ExponentialEasePtr = shared_ptr_t<ExponentialEase>;
+using IEasingFunctionPtr = shared_ptr_t<IEasingFunction>;
+using PowerEasePtr       = shared_ptr_t<PowerEase>;
+using QuadraticEasePtr   = shared_ptr_t<QuadraticEase>;
+using QuarticEasePtr     = shared_ptr_t<QuarticEase>;
+using QuinticEasePtr     = shared_ptr_t<QuinticEase>;
+using SineEasePtr        = shared_ptr_t<SineEase>;
 // --- Audio ---
 class Analyser;
 class AudioEngine;

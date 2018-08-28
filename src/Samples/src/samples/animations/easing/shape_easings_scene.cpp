@@ -224,8 +224,8 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
   a7b->setKeys(keys7b);
 
   // Create the easing functions
-  auto myease1 = new CubicEase();
-  auto myease2 = new QuadraticEase();
+  auto myease1 = CubicEase::New();
+  auto myease2 = QuadraticEase::New();
 
   // For each easing function, you can choose beetween EASEIN (default),
   // EASEOUT, EASEINOUT
@@ -246,7 +246,7 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // create the camera animation
   scene->onBeforeCameraRenderObservable.add([this](Camera*, EventState&) {
-    // _camera->alpha += 0.01f * getScene()->getAnimationRatio();
+    _camera->alpha += 0.01f * getScene()->getAnimationRatio();
   });
 }
 

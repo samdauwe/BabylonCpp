@@ -110,7 +110,7 @@ _ExtensionsSamplesIndex::_ExtensionsSamplesIndex()
   // -- Noise generation examples --
   // Perlin Noise Waves Scene
   _samples["PerlinNoiseWavesScene"] = ::std::make_tuple(
-    true,                                                        //
+    false,                                                       //
     [](ICanvas* iCanvas) {                                       //
       return ::std::make_unique<PerlinNoiseWavesScene>(iCanvas); //
     });                                                          //
@@ -128,13 +128,13 @@ _ExtensionsSamplesIndex::_ExtensionsSamplesIndex()
 
   // Simple Oak Tree Scene
   _samples["SimpleOakTreeScene"] = ::std::make_tuple(
-    true,                                                     //
+    false,                                                    //
     [](ICanvas* iCanvas) {                                    //
       return ::std::make_unique<SimpleOakTreeScene>(iCanvas); //
     });                                                       //
   // Simple Pine Scene
   _samples["SimplePineScene"] = ::std::make_tuple(
-    true,                                                  //
+    false,                                                 //
     [](ICanvas* iCanvas) {                                 //
       return ::std::make_unique<SimplePineScene>(iCanvas); //
     });                                                    //

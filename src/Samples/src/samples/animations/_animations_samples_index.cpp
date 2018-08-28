@@ -34,7 +34,7 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
                         });                                                  //
   // Tube Animation Scene
   _samples["TubeAnimationScene"] = ::std::make_tuple(
-    true,                                                     //
+    false,                                                    //
     [](ICanvas* iCanvas) {                                    //
       return ::std::make_unique<TubeAnimationScene>(iCanvas); //
     });                                                       //
@@ -43,13 +43,13 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 
   // Easing Functions Scene
   _samples["EasingFunctionsScene"] = ::std::make_tuple(
-    true,                                                       //
+    false,                                                      //
     [](ICanvas* iCanvas) {                                      //
       return ::std::make_unique<EasingFunctionsScene>(iCanvas); //
     });                                                         //
   // Shape Easings Scene
   _samples["ShapeEasingsScene"] = ::std::make_tuple(
-    true,                                                    //
+    false,                                                   //
     [](ICanvas* iCanvas) {                                   //
       return ::std::make_unique<ShapeEasingsScene>(iCanvas); //
     });                                                      //

@@ -38,7 +38,7 @@ bool Animation::AllowMatrixDecomposeForInterpolation()
 AnimationPtr Animation::_PrepareAnimation(
   const string_t& name, const string_t& targetProperty, size_t framePerSecond,
   int totalFrame, const AnimationValue& from, const AnimationValue& to,
-  unsigned int loopMode, IEasingFunction* easingFunction)
+  unsigned int loopMode, const IEasingFunctionPtr& easingFunction)
 {
   auto dataType = from.dataType;
 
@@ -61,10 +61,10 @@ AnimationPtr Animation::_PrepareAnimation(
   return animation;
 }
 
-AnimationPtr Animation::CreateAnimation(const string_t& property,
-                                        int animationType,
-                                        std::size_t framePerSecond,
-                                        IEasingFunction* easingFunction)
+AnimationPtr
+Animation::CreateAnimation(const string_t& property, int animationType,
+                           std::size_t framePerSecond,
+                           const IEasingFunctionPtr& easingFunction)
 {
   auto animation
     = Animation::New(property + "Animation", property, framePerSecond,
@@ -79,7 +79,7 @@ AnimatablePtr Animation::CreateAndStartAnimation(
   const string_t& name, const NodePtr& node, const string_t& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
-  IEasingFunction* easingFunction,
+  const IEasingFunctionPtr& easingFunction,
   const ::std::function<void()>& onAnimationEnd)
 {
 
@@ -100,7 +100,7 @@ vector_t<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
   const string_t& name, const NodePtr& node, bool directDescendantsOnly,
   const string_t& targetProperty, size_t framePerSecond, int totalFrame,
   const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
-  IEasingFunction* easingFunction,
+  const IEasingFunctionPtr& easingFunction,
   const ::std::function<void()>& onAnimationEnd)
 {
   auto animation = Animation::_PrepareAnimation(
@@ -121,7 +121,7 @@ AnimatablePtr Animation::CreateMergeAndStartAnimation(
   const string_t& name, const NodePtr& node, const string_t& targetProperty,
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
-  IEasingFunction* easingFunction,
+  const IEasingFunctionPtr& easingFunction,
   const ::std::function<void()>& onAnimationEnd)
 {
   auto animation = Animation::_PrepareAnimation(
@@ -282,12 +282,12 @@ float Animation::getHighestFrame() const
   return ret;
 }
 
-IEasingFunction* Animation::getEasingFunction()
+IEasingFunctionPtr& Animation::getEasingFunction()
 {
   return _easingFunction;
 }
 
-void Animation::setEasingFunction(IEasingFunction* easingFunction)
+void Animation::setEasingFunction(const IEasingFunctionPtr& easingFunction)
 {
   _easingFunction = easingFunction;
 }

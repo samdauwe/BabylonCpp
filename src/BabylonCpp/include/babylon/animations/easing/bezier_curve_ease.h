@@ -10,11 +10,19 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BezierCurveEase : public EasingFunction {
 
 public:
-  BezierCurveEase(float x1 = 0.f, float y1 = 0.f, float x2 = 1.f,
-                  float y2 = 1.f);
-  ~BezierCurveEase();
+  template <typename... Ts>
+  static BezierCurveEasePtr New(Ts&&... args)
+  {
+    return shared_ptr_t<BezierCurveEase>(
+      new BezierCurveEase(::std::forward<Ts>(args)...));
+  }
+  ~BezierCurveEase() override;
 
   float easeInCore(float gradient) const override;
+
+protected:
+  BezierCurveEase(float x1 = 0.f, float y1 = 0.f, float x2 = 1.f,
+                  float y2 = 1.f);
 
 public:
   float x1;

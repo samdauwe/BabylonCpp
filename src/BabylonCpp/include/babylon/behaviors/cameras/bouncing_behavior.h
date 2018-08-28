@@ -20,7 +20,7 @@ public:
   /**
    * The easing function used by animations
    */
-  static BackEase _EasingFunction;
+  static BackEasePtr _EasingFunction;
 
   /**
    * The easing mode used by animations

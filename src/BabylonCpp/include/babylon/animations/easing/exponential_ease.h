@@ -10,10 +10,18 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ExponentialEase : public EasingFunction {
 
 public:
-  ExponentialEase(int exponent = 2);
-  ~ExponentialEase();
+  template <typename... Ts>
+  static ExponentialEasePtr New(Ts&&... args)
+  {
+    return shared_ptr_t<ExponentialEase>(
+      new ExponentialEase(::std::forward<Ts>(args)...));
+  }
+  ~ExponentialEase() override;
 
   float easeInCore(float gradient) const override;
+
+protected:
+  ExponentialEase(int exponent = 2);
 
 public:
   float exponent;

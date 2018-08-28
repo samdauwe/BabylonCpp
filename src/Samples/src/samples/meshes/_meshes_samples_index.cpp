@@ -40,13 +40,13 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
 
   // Airplane Model Scene
   _samples["AirplaneModelScene"] = ::std::make_tuple(
-    true,                                                     //
+    false,                                                    //
     [](ICanvas* iCanvas) {                                    //
       return ::std::make_unique<AirplaneModelScene>(iCanvas); //
     });                                                       //
   // Basic Elements Scene
   _samples["BasicElementsScene"] = ::std::make_tuple(
-    true,                                                     //
+    false,                                                    //
     [](ICanvas* iCanvas) {                                    //
       return ::std::make_unique<BasicElementsScene>(iCanvas); //
     });                                                       //
@@ -156,7 +156,7 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
     });                                                    //
   // Ribbon Scene
   _samples["RibbonScene"]
-    = ::std::make_tuple(true,                                              //
+    = ::std::make_tuple(false,                                             //
                         [](ICanvas* iCanvas) {                             //
                           return ::std::make_unique<RibbonScene>(iCanvas); //
                         });                                                //
@@ -180,7 +180,7 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
     });                                                        //
   // Tiled Ground Scene
   _samples["TiledGroundScene"] = ::std::make_tuple(
-    false,                                                  //
+    true,                                                  //
     [](ICanvas* iCanvas) {                                  //
       return ::std::make_unique<TiledGroundScene>(iCanvas); //
     });                                                     //

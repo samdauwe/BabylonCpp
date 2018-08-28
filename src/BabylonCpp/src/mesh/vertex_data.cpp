@@ -2652,7 +2652,7 @@ unique_ptr_t<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
 void VertexData::ComputeNormals(const Float32Array& positions,
                                 const Uint32Array& indices,
                                 Float32Array& normals,
-                                nullable_t<FacetParameters> iOptions)
+                                nullable_t<FacetParameters> options)
 {
   if (normals.size() < positions.size()) {
     normals.resize(positions.size());
@@ -2684,24 +2684,23 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   bool computeFacetPartitioning  = false;
   bool computeDepthSort          = false;
   float faceNormalSign           = 1.f;
-  float ratio                    = 0;
+  float ratio                    = 0.f;
   nullable_t<Vector3> distanceTo = nullopt_t;
   vector_t<DepthSortedFacet> depthSortedFacets;
-  if (iOptions) {
-    const auto& options   = *iOptions;
-    computeFacetNormals   = (!options.facetNormals.empty()) ? true : false;
-    computeFacetPositions = (!options.facetPositions.empty()) ? true : false;
+  if (options) {
+    computeFacetNormals   = (!options->facetNormals.empty()) ? true : false;
+    computeFacetPositions = (!options->facetPositions.empty()) ? true : false;
     computeFacetPartitioning
-      = (!options.facetPartitioning.empty()) ? true : false;
-    faceNormalSign   = (options.useRightHandedSystem == true) ? -1.f : 1.f;
-    ratio            = options.ratio ? *options.ratio : 0.f;
-    computeDepthSort = (options.depthSort) ? true : false;
-    distanceTo       = options.distanceTo;
+      = (!options->facetPartitioning.empty()) ? true : false;
+    faceNormalSign   = (options->useRightHandedSystem == true) ? -1.f : 1.f;
+    ratio            = options->ratio ? *options->ratio : 0.f;
+    computeDepthSort = (options->depthSort) ? true : false;
+    distanceTo       = options->distanceTo;
     if (computeDepthSort) {
       if (!distanceTo.has_value()) {
         distanceTo = Vector3::Zero();
       }
-      depthSortedFacets = options.depthSortedFacets;
+      depthSortedFacets = options->depthSortedFacets;
     }
   }
 
@@ -2728,16 +2727,15 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   unsigned int block_idx_v2 = 0; // v2 vertex block index
   unsigned int block_idx_v3 = 0; // v3 vertex block index
 
-  auto options = *iOptions;
-  if (computeFacetPartitioning && iOptions && (*iOptions).bbSize) {
-    const auto& bbSize = *options.bbSize;
+  if (computeFacetPartitioning && options && (*options).bbSize) {
+    const auto& bbSize = *options->bbSize;
     float bbSizeMax    = (bbSize.x > bbSize.y) ? bbSize.x : bbSize.y;
     bbSizeMax          = (bbSizeMax > bbSize.z) ? bbSizeMax : bbSize.z;
-    xSubRatio          = options.subDiv.X * ratio / bbSize.x;
-    ySubRatio          = options.subDiv.Y * ratio / bbSize.y;
-    zSubRatio          = options.subDiv.Z * ratio / bbSize.z;
-    subSq              = options.subDiv.max * options.subDiv.max;
-    options.facetPartitioning.clear();
+    xSubRatio          = options->subDiv.X * ratio / bbSize.x;
+    ySubRatio          = options->subDiv.Y * ratio / bbSize.y;
+    zSubRatio          = options->subDiv.Z * ratio / bbSize.z;
+    subSq              = options->subDiv.max * options->subDiv.max;
+    options->facetPartitioning.clear();
   }
 
   // reset the normals
@@ -2781,91 +2779,91 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     faceNormaly /= length;
     faceNormalz /= length;
 
-    if (computeFacetNormals && iOptions) {
-      options.facetNormals[index].x = faceNormalx;
-      options.facetNormals[index].y = faceNormaly;
-      options.facetNormals[index].z = faceNormalz;
+    if (computeFacetNormals && options) {
+      options->facetNormals[index].x = faceNormalx;
+      options->facetNormals[index].y = faceNormaly;
+      options->facetNormals[index].z = faceNormalz;
     }
 
-    if (computeFacetPositions && iOptions) {
+    if (computeFacetPositions && options) {
       // compute and the facet barycenter coordinates in the array
       // facetPositions
-      options.facetPositions[index].x
+      options->facetPositions[index].x
         = (positions[v1x] + positions[v2x] + positions[v3x]) / 3.f;
-      options.facetPositions[index].y
+      options->facetPositions[index].y
         = (positions[v1y] + positions[v2y] + positions[v3y]) / 3.f;
-      options.facetPositions[index].z
+      options->facetPositions[index].z
         = (positions[v1z] + positions[v2z] + positions[v3z]) / 3.f;
     }
 
-    if (computeFacetPartitioning && iOptions) {
+    if (computeFacetPartitioning && options) {
       // store the facet indexes in arrays in the main facetPartitioning array :
       // compute each facet vertex (+ facet barycenter) index in the partiniong
       // array
       ox  = static_cast<unsigned>(::std::floor(
-        (options.facetPositions[index].x - options.bInfo.minimum.x * ratio)
+        (options->facetPositions[index].x - options->bInfo.minimum.x * ratio)
         * xSubRatio));
       oy  = static_cast<unsigned>(::std::floor(
-        (options.facetPositions[index].y - options.bInfo.minimum.y * ratio)
+        (options->facetPositions[index].y - options->bInfo.minimum.y * ratio)
         * ySubRatio));
       oz  = static_cast<unsigned>(::std::floor(
-        (options.facetPositions[index].z - options.bInfo.minimum.z * ratio)
+        (options->facetPositions[index].z - options->bInfo.minimum.z * ratio)
         * zSubRatio));
       b1x = static_cast<unsigned>(::std::floor(
-        (positions[v1x] - options.bInfo.minimum.x * ratio) * xSubRatio));
+        (positions[v1x] - options->bInfo.minimum.x * ratio) * xSubRatio));
       b1y = static_cast<unsigned>(::std::floor(
-        (positions[v1y] - options.bInfo.minimum.y * ratio) * ySubRatio));
+        (positions[v1y] - options->bInfo.minimum.y * ratio) * ySubRatio));
       b1z = static_cast<unsigned>(::std::floor(
-        (positions[v1z] - options.bInfo.minimum.z * ratio) * zSubRatio));
+        (positions[v1z] - options->bInfo.minimum.z * ratio) * zSubRatio));
       b2x = static_cast<unsigned>(::std::floor(
-        (positions[v2x] - options.bInfo.minimum.x * ratio) * xSubRatio));
+        (positions[v2x] - options->bInfo.minimum.x * ratio) * xSubRatio));
       b2y = static_cast<unsigned>(::std::floor(
-        (positions[v2y] - options.bInfo.minimum.y * ratio) * ySubRatio));
+        (positions[v2y] - options->bInfo.minimum.y * ratio) * ySubRatio));
       b2z = static_cast<unsigned>(::std::floor(
-        (positions[v2z] - options.bInfo.minimum.z * ratio) * zSubRatio));
+        (positions[v2z] - options->bInfo.minimum.z * ratio) * zSubRatio));
       b3x = static_cast<unsigned>(::std::floor(
-        (positions[v3x] - options.bInfo.minimum.x * ratio) * xSubRatio));
+        (positions[v3x] - options->bInfo.minimum.x * ratio) * xSubRatio));
       b3y = static_cast<unsigned>(::std::floor(
-        (positions[v3y] - options.bInfo.minimum.y * ratio) * ySubRatio));
+        (positions[v3y] - options->bInfo.minimum.y * ratio) * ySubRatio));
       b3z = static_cast<unsigned>(::std::floor(
-        (positions[v3z] - options.bInfo.minimum.z * ratio) * zSubRatio));
+        (positions[v3z] - options->bInfo.minimum.z * ratio) * zSubRatio));
 
-      block_idx_v1 = b1x + options.subDiv.max * b1y + subSq * b1z;
-      block_idx_v2 = b2x + options.subDiv.max * b2y + subSq * b2z;
-      block_idx_v3 = b3x + options.subDiv.max * b3y + subSq * b3z;
-      block_idx_o  = ox + options.subDiv.max * oy + subSq * oz;
+      block_idx_v1 = b1x + options->subDiv.max * b1y + subSq * b1z;
+      block_idx_v2 = b2x + options->subDiv.max * b2y + subSq * b2z;
+      block_idx_v3 = b3x + options->subDiv.max * b3y + subSq * b3z;
+      block_idx_o  = ox + options->subDiv.max * oy + subSq * oz;
 
       const array_t<unsigned int, 4> block_idxs{
         {block_idx_o, block_idx_v1, block_idx_v2, block_idx_v3}};
       for (auto& block_idx : block_idxs) {
         // Check if facetPartitioning needs to be resized
-        if (options.facetPartitioning.size() <= block_idx) {
-          options.facetPartitioning.resize(block_idx + 1);
+        if (options->facetPartitioning.size() <= block_idx) {
+          options->facetPartitioning.resize(block_idx + 1);
         }
       }
 
       // push each facet index in each block containing the vertex
-      options.facetPartitioning[block_idx_v1].emplace_back(index);
+      options->facetPartitioning[block_idx_v1].emplace_back(index);
       if (block_idx_v2 != block_idx_v1) {
-        options.facetPartitioning[block_idx_v2].emplace_back(index);
+        options->facetPartitioning[block_idx_v2].emplace_back(index);
       }
       if (!(block_idx_v3 == block_idx_v2 || block_idx_v3 == block_idx_v1)) {
-        options.facetPartitioning[block_idx_v3].emplace_back(index);
+        options->facetPartitioning[block_idx_v3].emplace_back(index);
       }
       if (!(block_idx_o == block_idx_v1 || block_idx_o == block_idx_v2
             || block_idx_o == block_idx_v3)) {
-        options.facetPartitioning[block_idx_o].emplace_back(index);
+        options->facetPartitioning[block_idx_o].emplace_back(index);
       }
     }
 
-    if (computeDepthSort && iOptions && !options.facetPositions.empty()) {
+    if (computeDepthSort && options && !options->facetPositions.empty()) {
       if (nbFaces >= depthSortedFacets.size()) {
         depthSortedFacets.resize(nbFaces);
       }
       auto& dsf = depthSortedFacets[index];
       dsf.ind   = index * 3;
       dsf.sqDistance
-        = Vector3::DistanceSquared(options.facetPositions[index], *distanceTo);
+        = Vector3::DistanceSquared(options->facetPositions[index], *distanceTo);
     }
 
     // compute the normals anyway
