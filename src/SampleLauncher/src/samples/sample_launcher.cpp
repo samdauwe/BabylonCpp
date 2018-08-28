@@ -16,6 +16,7 @@
 
 // Babylon
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/impl/canvas.h>
@@ -336,11 +337,9 @@ SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
   _sceneWindow.sceneIntialized = false;
   _sceneWindow.renderCanvas    = std::make_unique<BABYLON::impl::Canvas>();
   _sceneWindow.renderableScene = nullptr;
-  _sceneWindow.lastTime        = glfwGetTime();
   if (options.showInspectorWindow) {
-    _inspectorWindow          = Window();
-    _inspectorWindow.title    = "Inspector";
-    _inspectorWindow.lastTime = glfwGetTime();
+    _inspectorWindow       = Window();
+    _inspectorWindow.title = "Inspector";
   }
 }
 
@@ -365,15 +364,19 @@ bool SampleLauncher::intialize()
   return true;
 }
 
-int SampleLauncher::run()
+int SampleLauncher::run(long runTime)
 {
   _sampleLauncherState = State::RUNNING;
+  auto startTime       = Time::unixtimeInMs();
+
   // Check if there is a renderable scene
   if (!_sceneWindow.renderableScene) {
     _sampleLauncherState = SampleLauncher::State::ERROR;
     return 1;
   }
 
+  // Run sample
+  bool windowClosed = false, maxRunTimeReached = false;
   while (_sampleLauncherState == State::RUNNING) {
     //*** Scene Window ***//
     {
@@ -400,17 +403,19 @@ int SampleLauncher::run()
     // Process events
     glfwPollEvents();
     // Check if should close
-    _sampleLauncherState
-      = (glfwWindowShouldClose(_sceneWindow.glfwWindow)
-         || (_showInspectorWindow ?
-               glfwWindowShouldClose(_inspectorWindow.glfwWindow) :
-               false)
-         || (_sampleLauncherState == State::FINISHED)) ?
-          State::FINISHED :
-          _sampleLauncherState;
+    maxRunTimeReached
+      = (runTime > 0 && (Time::unixtimeInMs() - startTime > runTime));
+    windowClosed = glfwWindowShouldClose(_sceneWindow.glfwWindow)
+                   || (_showInspectorWindow ?
+                         glfwWindowShouldClose(_inspectorWindow.glfwWindow) :
+                         false);
+    _sampleLauncherState = (maxRunTimeReached || windowClosed
+                            || (_sampleLauncherState == State::FINISHED)) ?
+                             State::FINISHED :
+                             _sampleLauncherState;
   }
 
-  return 0;
+  return windowClosed ? 0 : 1;
 }
 
 void SampleLauncher::destroy()
@@ -485,11 +490,13 @@ int SampleLauncher::initGLFW()
   // Create the scene window
   CreateWindow(_sceneWindow, _defaultWinResX, _defaultWinResY,
                _sceneWindow.title.c_str(), nullptr, nullptr);
+  _sceneWindow.lastTime = glfwGetTime();
 
   // Create the inspector window
   if (_showInspectorWindow) {
     CreateWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
                  _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
+    _inspectorWindow.lastTime = glfwGetTime();
     _inspector = ::std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
     _inspector->intialize();
   }

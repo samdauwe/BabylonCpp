@@ -60,7 +60,15 @@ public:
   ~SampleLauncher();
 
   bool intialize();
-  int run();
+
+  /**
+   * @brief Runs the sample.
+   * @param runTime time in millseconds to run the sample, When set to 0, the
+   * sample runs until the window is closed.
+   * @return exit code
+   */
+  int run(long runTimeMillis = 0);
+
   void destroy();
 
   ICanvas* getRenderCanvas();

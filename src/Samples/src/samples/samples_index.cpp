@@ -1,6 +1,7 @@
 #include <babylon/samples/samples_index.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/string.h>
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/samples/animations/_animations_samples_index.h>
 #include <babylon/samples/cameras/_cameras_samples_index.h>
@@ -69,17 +70,6 @@ bool SamplesIndex::sampleExists(const string_t& sampleName)
   return false;
 }
 
-::std::vector<string_t> SamplesIndex::getCategoryNames() const
-{
-  // Extract the categpry names
-  auto categoryNames = stl_util::extract_keys(_samplesIndex);
-
-  // Sort the vector with category names in ascending order
-  std::sort(categoryNames.begin(), categoryNames.end());
-
-  return categoryNames;
-}
-
 std::vector<string_t> SamplesIndex::getSampleNames() const
 {
   // Extract the enabled sample names from the map
@@ -97,6 +87,35 @@ std::vector<string_t> SamplesIndex::getSampleNames() const
   std::sort(sampleNames.begin(), sampleNames.end());
 
   return sampleNames;
+}
+
+::std::vector<string_t> SamplesIndex::getCategoryNames() const
+{
+  // Extract the category names
+  auto categoryNames = stl_util::extract_keys(_samplesIndex);
+
+  // Sort the vector with category names in ascending order
+  std::sort(categoryNames.begin(), categoryNames.end());
+
+  return categoryNames;
+}
+
+bool SamplesIndex::categoryExists(const string_t& categoryNameToSearch)
+{
+  bool _categoryExists = false;
+
+  // Extract the category names
+  auto categoryNames = stl_util::extract_keys(_samplesIndex);
+
+  // Search for sample
+  for (const auto& categoryName : categoryNames) {
+    if (categoryName == categoryNameToSearch) {
+      _categoryExists = true;
+      break;
+    }
+  }
+
+  return _categoryExists;
 }
 
 ::std::vector<string_t>

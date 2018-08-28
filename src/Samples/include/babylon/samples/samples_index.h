@@ -21,11 +21,17 @@ public:
   bool isSampleEnabled(const string_t& sampleName);
 
   /**
-   * @brief Returns whether or not the example is exists.
+   * @brief Returns whether or not the example exists.
    * @param sampleName the name of the sample to check
-   * @return whether or not the example is exists
+   * @return whether or not the example exists
    */
   bool sampleExists(const string_t& sampleName);
+
+  /**
+   * @brief Returns a sorted list containing the enabled examples.
+   * @return a sorted list containing the enabled examples.
+   */
+  ::std::vector<string_t> getSampleNames() const;
 
   /**
    * @brief Returns a sorted list containing the category names.
@@ -34,10 +40,11 @@ public:
   ::std::vector<string_t> getCategoryNames() const;
 
   /**
-   * @brief Returns a sorted list containing the enabled examples.
-   * @return a sorted list containing the enabled examples.
+   * @brief Returns whether or not the category exists.
+   * @param categoryNameToSearch the name of the category to check
+   * @return whether or not the category exists
    */
-  ::std::vector<string_t> getSampleNames() const;
+  bool categoryExists(const string_t& categoryNameToSearch);
 
   /**
    * @brief Returns a sorted list containing the enabled examples in the

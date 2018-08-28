@@ -2,6 +2,7 @@
 #include <babylon/babylon_version.h>
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/logging.h>
+#include <babylon/core/string.h>
 #include <babylon/samples/sample_launcher.h>
 #include <babylon/samples/samples_index.h>
 #include <sstream>
@@ -52,13 +53,42 @@ void initializeLogging()
 }
 
 /**
+ * @brief Runs a sample with the specified name
+ * @param samples list with available samples
+ * @param sampleName name of the sample to run
+ * @param showInspectorWindow whether or not to shoz the inspector window
+ * @return exit code
+ */
+int runSample(const BABYLON::Samples::SamplesIndex& samples,
+              const ::std::string& sampleName, bool showInspectorWindow,
+              long runTimeMillis = 0)
+{
+  using namespace BABYLON::Samples;
+  int exitcode = 0;
+  // Create the sample launcher
+  SampleLauncherOptions options;
+  options.showInspectorWindow = showInspectorWindow;
+  SampleLauncher sampleLauncher{options};
+  if (sampleLauncher.intialize()) {
+    // Create the renderable scene
+    auto canvas = sampleLauncher.getRenderCanvas();
+    auto scene  = samples.createRenderableScene(sampleName, canvas);
+    sampleLauncher.setRenderableScene(scene);
+    // Run the example
+    exitcode = sampleLauncher.run(runTimeMillis);
+  }
+  return exitcode;
+}
+
+/**
  * @brief The sample launcher.
  * @param l list samples if l > 0
  * @param v enable verbose mode if v > 0
  * @param sample name of the sample to run
  * @return exit code
  */
-int sampleLauncherMain(int l, int v, int i, const char* sample)
+int sampleLauncherMain(int l, int v, int i, const char* sampleGroup,
+                       const char* sample)
 {
   using namespace BABYLON::Samples;
   SamplesIndex samples;
@@ -80,7 +110,7 @@ int sampleLauncherMain(int l, int v, int i, const char* sample)
       else if (sampleNames.size() < 100) {
         oss << sampleNames.size();
       }
-      oss << " sample(s) in category " << categoryName.c_str() << "\n";
+      oss << " sample(s) in category \"" << categoryName.c_str() << "\"\n";
       for (const auto& sampleName : sampleNames) {
         oss << "           |- " << sampleName.c_str() << "\n";
       }
@@ -92,27 +122,40 @@ int sampleLauncherMain(int l, int v, int i, const char* sample)
       // Enable console logging
       initializeLogging();
     }
-    // Check if sample exists and is enabled
-    const std::string sampleName{sample};
-    if (!samples.sampleExists(sampleName)) {
-      printf("Sample with name \"%s\" does not exists.\n", sample);
-      return 1;
+    // Check for rendering of sample group
+    const std::string categoryName{sampleGroup};
+    if (!categoryName.empty()
+        && (samples.categoryExists(categoryName) || categoryName == "All")) {
+      ::std::vector<::std::string> categoryNames;
+      if (categoryName == "All") {
+        categoryNames = samples.getCategoryNames();
+      }
+      else {
+        categoryNames = {categoryName};
+      }
+      for (const auto& categoryName : categoryNames) {
+        const auto sampleNames = samples.getSampleNamesInCategory(categoryName);
+        for (const auto& sampleName : sampleNames) {
+          exitcode = runSample(samples, sampleName, i > 0, 10000);
+          if (exitcode == 0) {
+            break;
+          }
+        }
+      }
     }
-    if (!samples.isSampleEnabled(sampleName)) {
-      printf("Sample with name \"%s\" is not enabled.\n", sample);
-      return 1;
-    }
-    // Create the sample launcher
-    SampleLauncherOptions options;
-    options.showInspectorWindow = (i > 0);
-    SampleLauncher sampleLauncher{options};
-    if (sampleLauncher.intialize()) {
-      // Create the renderable scene
-      auto canvas = sampleLauncher.getRenderCanvas();
-      auto scene  = samples.createRenderableScene(sampleName, canvas);
-      sampleLauncher.setRenderableScene(scene);
-      // Run the example
-      exitcode = sampleLauncher.run();
+    else {
+      // Check for rendering of sample
+      const std::string sampleName{sample};
+      if (!samples.sampleExists(sampleName)) {
+        printf("Sample with name \"%s\" does not exists.\n", sample);
+        return 1;
+      }
+      if (!samples.isSampleEnabled(sampleName)) {
+        printf("Sample with name \"%s\" is not enabled.\n", sample);
+        return 1;
+      }
+      // Run the sample
+      exitcode = runSample(samples, sampleName, i > 0);
     }
   }
   return exitcode;
@@ -124,14 +167,18 @@ int main(int argc, char** argv)
   struct arg_lit* list   = arg_lit0("lL", NULL, "list samples");
   struct arg_str* sample = arg_str0(
     "S", "sample", "<SAMPE>", "sample to launch (default is \"BasicScene\")");
+  struct arg_str* sampleGroup = arg_str0(
+    "G", "sample-group", "<SAMPE-GROUP>",
+    "sample group to launch (sample-group \"All\" contains all samples)");
   struct arg_lit* verbose = arg_lit0("v", "verbose,debug", "verbose messages");
   struct arg_lit* inspector
     = arg_lit0("i", "inspector", "show inspector window");
   struct arg_lit* help = arg_lit0(NULL, "help", "print this help and exit");
   struct arg_lit* version
     = arg_lit0(NULL, "version", "print version information and exit");
-  struct arg_end* end  = arg_end(20);
-  void* argtable[]     = {list, sample, verbose, inspector, help, version, end};
+  struct arg_end* end = arg_end(20);
+  void* argtable[]
+    = {list, sample, sampleGroup, verbose, inspector, help, version, end};
   const char* progname = "SampleLauncher";
   int nerrors;
   int exitcode = 0;
@@ -148,6 +195,9 @@ int main(int argc, char** argv)
   /** Set the default sample values prior to parsing **/
   sample->sval[0] = "BasicScene";
 
+  /**  Set the default sample group prior to parsing */
+  sampleGroup->sval[0] = "";
+
   /** Parse the command line as defined by argtable[] **/
   nerrors = arg_parse(argc, argv, argtable);
 
@@ -158,7 +208,7 @@ int main(int argc, char** argv)
     printf(
       "This program acts as a sample launcher for demonstrating the usage of "
       "the BabylonCpp library\n");
-    arg_print_glossary(stdout, argtable, "  %-25s %s\n");
+    arg_print_glossary(stdout, argtable, "  %-35s %s\n");
     exitcode = 0;
     arg_freetable(argtable, sizeof(argtable) / sizeof(argtable[0]));
     return exitcode;
@@ -184,7 +234,7 @@ int main(int argc, char** argv)
 
   /** Normal case: run sample **/
   exitcode = sampleLauncherMain(list->count, verbose->count, inspector->count,
-                                sample->sval[0]);
+                                sampleGroup->sval[0], sample->sval[0]);
 
   /** Deallocate each non-null entry in argtable[] **/
   arg_freetable(argtable, sizeof(argtable) / sizeof(argtable[0]));
