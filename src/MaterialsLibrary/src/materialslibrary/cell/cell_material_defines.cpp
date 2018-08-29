@@ -5,31 +5,31 @@ namespace MaterialsLibrary {
 
 CellMaterialDefines::CellMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"DIFFUSE",
-           "CLIPPLANE",
-           "ALPHATEST",
-           "POINTSIZE",
-           "FOG",
-           "NORMAL",
-           "UV1",
-           "UV2",
-           "VERTEXCOLOR",
-           "VERTEXALPHA",
-           "INSTANCES",
-           "NDOTL",
-           "CUSTOMUSERLIGHTING",
-           "CELLBASIC",
-           "LOGARITHMICDEPTH",
-           "SPECULARTERM",
-           "SHADOWFULLFLOAT"};
-  rebuild();
+  boolDef = {
+    {"DIFFUSE", false},           //
+    {"CLIPPLANE", false},         //
+    {"CLIPPLANE2", false},        //
+    {"CLIPPLANE3", false},        //
+    {"CLIPPLANE4", false},        //
+    {"ALPHATEST", false},         //
+    {"POINTSIZE", false},         //
+    {"FOG", false},               //
+    {"NORMAL", false},            //
+    {"UV1", false},               //
+    {"UV2", false},               //
+    {"VERTEXCOLOR", false},       //
+    {"VERTEXALPHA", false},       //
+    {"INSTANCES", false},         //
+    {"NDOTL", true},              //
+    {"CUSTOMUSERLIGHTING", true}, //
+    {"CELLBASIC", true},          //
+    {"DEPTHPREPASS", false}       //
+  };
 
-  const std::array<unsigned int, 3> activatedProps{
-    {NDOTL, CUSTOMUSERLIGHTING, CELLBASIC}};
-
-  for (const auto& activatedProp : activatedProps) {
-    defines[activatedProp] = true;
-  }
+  intDef = {
+    {"NUM_BONE_INFLUENCERS", 0}, //
+    {"BonesPerMesh", 0}          //
+  };
 }
 
 CellMaterialDefines::~CellMaterialDefines()

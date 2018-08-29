@@ -17,32 +17,47 @@ public:
 
 public:
   CellMaterial(const std::string& name, Scene* scene);
-  ~CellMaterial();
+  ~CellMaterial() override;
 
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
-  BaseTexture* getAlphaTestTexture() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
+  BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables();
-  std::vector<BaseTexture*> getActiveTextures() const override;
-  bool hasTexture(BaseTexture* texture) const override;
+  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  const string_t getClassName() const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/
   static CellMaterial* Parse(const Json::value& source, Scene* scene,
                              const std::string& rootUrl);
 
+protected:
+  BaseTexturePtr& get_diffuseTexture();
+  void set_diffuseTexture(const BaseTexturePtr& value);
+  bool get_computeHighLevel() const;
+  void set_computeHighLevel(bool value);
+  bool get_disableLighting() const;
+  void set_disableLighting(bool value);
+  unsigned int get_maxSimultaneousLights() const;
+  void set_maxSimultaneousLights(unsigned int value);
+
 public:
+  Property<CellMaterial, BaseTexturePtr> diffuseTexture;
   Color3 diffuseColor;
+  Property<CellMaterial, bool> computeHighLevel;
+  Property<CellMaterial, bool> disableLighting;
+  Property<CellMaterial, unsigned int> maxSimultaneousLights;
 
 private:
-  BaseTexture* _diffuseTexture;
+  BaseTexturePtr _diffuseTexture;
   bool _computeHighLevel;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;

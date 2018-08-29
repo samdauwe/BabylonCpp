@@ -20,7 +20,15 @@ namespace MaterialsLibrary {
 
 CellMaterial::CellMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , diffuseTexture{this, &CellMaterial::get_diffuseTexture,
+                     &CellMaterial::set_diffuseTexture}
     , diffuseColor{Color3(1, 1, 1)}
+    , computeHighLevel{this, &CellMaterial::get_computeHighLevel,
+                       &CellMaterial::set_computeHighLevel}
+    , disableLighting{this, &CellMaterial::get_disableLighting,
+                      &CellMaterial::set_disableLighting}
+    , maxSimultaneousLights{this, &CellMaterial::get_maxSimultaneousLights,
+                            &CellMaterial::set_maxSimultaneousLights}
     , _diffuseTexture{nullptr}
     , _computeHighLevel{false}
     , _disableLighting{false}
@@ -34,17 +42,69 @@ CellMaterial::~CellMaterial()
 {
 }
 
-bool CellMaterial::needAlphaBlending()
+BaseTexturePtr& CellMaterial::get_diffuseTexture()
+{
+  return _diffuseTexture;
+}
+
+void CellMaterial::set_diffuseTexture(const BaseTexturePtr& value)
+{
+  if (_diffuseTexture != value) {
+    _diffuseTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+bool CellMaterial::get_computeHighLevel() const
+{
+  return _computeHighLevel;
+}
+
+void CellMaterial::set_computeHighLevel(bool value)
+{
+  if (_computeHighLevel != value) {
+    _computeHighLevel = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+bool CellMaterial::get_disableLighting() const
+{
+  return _disableLighting;
+}
+
+void CellMaterial::set_disableLighting(bool value)
+{
+  if (_disableLighting != value) {
+    _disableLighting = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+unsigned int CellMaterial::get_maxSimultaneousLights() const
+{
+  return _maxSimultaneousLights;
+}
+
+void CellMaterial::set_maxSimultaneousLights(unsigned int value)
+{
+  if (_maxSimultaneousLights != value) {
+    _maxSimultaneousLights = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+bool CellMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
 
-bool CellMaterial::needAlphaTesting()
+bool CellMaterial::needAlphaTesting() const
 {
   return false;
 }
 
-BaseTexture* CellMaterial::getAlphaTestTexture()
+BaseTexturePtr CellMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -83,35 +143,31 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
           return false;
         }
         else {
-          defines._needUVs              = true;
-          defines.defines[CMD::DIFFUSE] = true;
+          defines._needUVs           = true;
+          defines.boolDef["DIFFUSE"] = true;
         }
       }
     }
   }
 
   // High level
-  defines.defines[CMD::CELLBASIC] = !_computeHighLevel;
+  defines.boolDef["CELLBASIC"] = !_computeHighLevel;
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    CMD::LOGARITHMICDEPTH, CMD::POINTSIZE, CMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting,
-    CMD::SPECULARTERM, CMD::SHADOWFULLFLOAT);
+    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, CMD::CLIPPLANE, CMD::ALPHATEST,
-    CMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, false, CMD::NORMAL, CMD::UV1, CMD::UV2,
-    CMD::VERTEXCOLOR, CMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -120,48 +176,47 @@ bool CellMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[CMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
                                               _maxSimultaneousLights);
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[CMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[CMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[CMD::UV2]) {
+    if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (defines[CMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  CMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     const std::string shaderName{"cell"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",         "view",          "viewProjection", "vEyePosition",
-      "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",     "vDiffuseInfos", "mBones",         "vClipPlane",
-      "diffuseMatrix", "depthValues"};
+      "world",        "view",          "viewProjection", "vEyePosition",
+      "vLightsType",  "vDiffuseColor", "vFogInfos",      "vFogColor",
+      "pointSize",    "vDiffuseInfos", "mBones",         "vClipPlane",
+      "diffuseMatrix"};
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
@@ -204,7 +259,10 @@ void CellMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -234,10 +292,7 @@ void CellMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", static_cast<float>(pointSize));
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor,
@@ -246,12 +301,12 @@ void CellMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   // Lights
   if (scene->lightsEnabled() && !_disableLighting) {
     MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
-                               _maxSimultaneousLights, CMD::SPECULARTERM);
+                               _maxSimultaneousLights);
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -261,9 +316,9 @@ void CellMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> CellMaterial::getAnimatables()
+std::vector<IAnimatablePtr> CellMaterial::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  std::vector<IAnimatablePtr> results;
 
   if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
     results.emplace_back(_diffuseTexture);
@@ -272,9 +327,9 @@ std::vector<IAnimatable*> CellMaterial::getAnimatables()
   return results;
 }
 
-std::vector<BaseTexture*> CellMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> CellMaterial::getActiveTextures() const
 {
-  auto activeTextures = Material::getActiveTextures();
+  auto activeTextures = PushMaterial::getActiveTextures();
 
   if (_diffuseTexture) {
     activeTextures.emplace_back(_diffuseTexture);
@@ -283,9 +338,9 @@ std::vector<BaseTexture*> CellMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool CellMaterial::hasTexture(BaseTexture* texture) const
+bool CellMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
-  if (Material::hasTexture(texture)) {
+  if (PushMaterial::hasTexture(texture)) {
     return true;
   }
 
@@ -301,8 +356,13 @@ void CellMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* CellMaterial::clone(const std::string& /*name*/,
-                              bool /*cloneChildren*/) const
+const string_t CellMaterial::getClassName() const
+{
+  return "CellMaterial";
+}
+
+MaterialPtr CellMaterial::clone(const std::string& /*name*/,
+                                bool /*cloneChildren*/) const
 {
   return nullptr;
 }
