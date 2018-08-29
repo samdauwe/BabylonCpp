@@ -88,16 +88,23 @@ def main():
                  "babylon.babylonFileLoader.ts", "babylon.videoRecorder.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
-        fullPath = os.path.join(os.path.expanduser('~'), "Projects",
-                                "Babylon.js-%s" % BabylonJsVersions[version],
-                                "src")
-        BabylonJsVersions[version] = fullPath
+        modules = {
+          "Babylonjs": os.path.join(os.path.expanduser('~'), "Projects",
+                                  "Babylon.js-%s" % BabylonJsVersions[version],
+                                  "src"),
+          "MaterialsLibrary": os.path.join(os.path.expanduser('~'), "Projects",
+                                  "Babylon.js-%s" % BabylonJsVersions[version],
+                                  "materialsLibrary", "src"),
+        }
+        BabylonJsVersions[version] = modules
     # Perform comparison
-    previous = BabylonJsVersions[previous]
-    current = BabylonJsVersions[current]
-    files = getFilesRecursively(current)
-    fileComparisonDict = compareFiles(current, previous, files, whiteList)
-    print(fileComparisonToStr(fileComparisonDict))
+    for key, val in BabylonJsVersions[current].items():
+      print("### %s ###" % key)
+      prev = BabylonJsVersions[previous][key]
+      curr = BabylonJsVersions[current][key]
+      files = getFilesRecursively(curr)
+      fileComparisonDict = compareFiles(curr, prev, files, whiteList)
+      print(fileComparisonToStr(fileComparisonDict))
 
 if __name__ == "__main__":
     main()
