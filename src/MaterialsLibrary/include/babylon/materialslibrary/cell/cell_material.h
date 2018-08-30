@@ -13,9 +13,6 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT CellMaterial : public PushMaterial {
 
 public:
-  using CMD = CellMaterialDefines;
-
-public:
   CellMaterial(const std::string& name, Scene* scene);
   ~CellMaterial() override;
 

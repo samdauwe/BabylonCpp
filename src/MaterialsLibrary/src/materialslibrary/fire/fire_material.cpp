@@ -22,6 +22,12 @@ unsigned int FireMaterial::maxSimultaneousLights = 4;
 
 FireMaterial::FireMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , diffuseTexture{this, &FireMaterial::get_diffuseTexture,
+                     &FireMaterial::set_diffuseTexture}
+    , distortionTexture{this, &FireMaterial::get_distortionTexture,
+                        &FireMaterial::set_distortionTexture}
+    , opacityTexture{this, &FireMaterial::get_opacityTexture,
+                     &FireMaterial::set_opacityTexture}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , speed{1.f}
     , _diffuseTexture{nullptr}
@@ -36,17 +42,56 @@ FireMaterial::~FireMaterial()
 {
 }
 
-bool FireMaterial::needAlphaBlending()
+BaseTexturePtr& FireMaterial::get_diffuseTexture()
+{
+  return _diffuseTexture;
+}
+
+void FireMaterial::set_diffuseTexture(const BaseTexturePtr& value)
+{
+  if (_diffuseTexture != value) {
+    _diffuseTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+BaseTexturePtr& FireMaterial::get_distortionTexture()
+{
+  return _distortionTexture;
+}
+
+void FireMaterial::set_distortionTexture(const BaseTexturePtr& value)
+{
+  if (_distortionTexture != value) {
+    _distortionTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+BaseTexturePtr& FireMaterial::get_opacityTexture()
+{
+  return _opacityTexture;
+}
+
+void FireMaterial::set_opacityTexture(const BaseTexturePtr& value)
+{
+  if (_opacityTexture != value) {
+    _opacityTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+bool FireMaterial::needAlphaBlending() const
 {
   return false;
 }
 
-bool FireMaterial::needAlphaTesting()
+bool FireMaterial::needAlphaTesting() const
 {
   return true;
 }
 
-BaseTexture* FireMaterial::getAlphaTestTexture()
+BaseTexturePtr FireMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -84,30 +129,29 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
         return false;
       }
       else {
-        defines._needUVs               = true;
-        _defines.defines[FMD::DIFFUSE] = true;
+        defines._needUVs            = true;
+        _defines.boolDef["DIFFUSE"] = true;
       }
     }
   }
 
+  _defines.boolDef["ALPHATEST"] = _opacityTexture ? true : false;
+
   // Misc.
   if (defines._areMiscDirty) {
-    _defines.defines[FMD::POINTSIZE]
+    _defines.boolDef["POINTSIZE"]
       = (pointsCloud() || scene->forcePointsCloud());
-    _defines.defines[FMD::FOG]
+    _defines.boolDef["FOG"]
       = (scene->fogEnabled() && mesh->applyFog()
-         && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled());
+         && scene->fogMode() != Scene::FOGMODE_NONE() && fogEnabled());
   }
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, FMD::CLIPPLANE, FMD::ALPHATEST,
-    FMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, false, true, FMD::NORMAL, FMD::UV1, FMD::UV2,
-    FMD::VERTEXCOLOR, FMD::VERTEXALPHA, 0, 0);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -117,29 +161,28 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     // Fallbacks
     auto fallbacks = std::unique_ptr<EffectFallbacks>();
-    if (defines[FMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[FMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[FMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  FMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"fire"};
@@ -149,16 +192,17 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.uniformsNames
       = {"world", "view", "viewProjection", "vEyePosition", "vFogInfos",
          "vFogColor", "pointSize", "vDiffuseInfos", "mBones", "vClipPlane",
-         "diffuseMatrix",
+         "vClipPlane2", "vClipPlane3", "vClipPlane4", "diffuseMatrix",
          // Fire
          "time", "speed"};
-    options.samplers   = {"diffuseSampler",
+    options.samplers              = {"diffuseSampler",
                         // Fire
                         "distortionSampler", "opacitySampler"};
-    options.defines    = std::move(join);
-    options.fallbacks  = std::move(fallbacks);
-    options.onCompiled = onCompiled;
-    options.onError    = onError;
+    options.defines               = std::move(join);
+    options.fallbacks             = std::move(fallbacks);
+    options.onCompiled            = onCompiled;
+    options.onError               = onError;
+    options.maxSimultaneousLights = 4;
 
     subMesh->setEffect(
       scene->getEngine()->createEffect(shaderName, options, engine), defines);
@@ -184,7 +228,10 @@ void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -210,22 +257,14 @@ void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     }
 
     // Clip plane
-    if (scene->clipPlane()) {
-      auto clipPlane = scene->clipPlane();
-      _activeEffect->setFloat4("vClipPlane", clipPlane->normal.x,
-                               clipPlane->normal.y, clipPlane->normal.z,
-                               clipPlane->d);
-    }
+    MaterialHelper::BindClipPlane(_activeEffect, scene);
 
     // Point size
     if (pointsCloud()) {
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse,
@@ -233,7 +272,7 @@ void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -250,9 +289,9 @@ void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> FireMaterial::getAnimatables()
+std::vector<IAnimatablePtr> FireMaterial::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  std::vector<IAnimatablePtr> results;
 
   if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
     results.emplace_back(_diffuseTexture);
@@ -269,7 +308,7 @@ std::vector<IAnimatable*> FireMaterial::getAnimatables()
   return results;
 }
 
-std::vector<BaseTexture*> FireMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> FireMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
 
@@ -288,9 +327,9 @@ std::vector<BaseTexture*> FireMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool FireMaterial::hasTexture(BaseTexture* texture) const
+bool FireMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
-  if (Material::hasTexture(texture)) {
+  if (PushMaterial::hasTexture(texture)) {
     return true;
   }
 
@@ -309,6 +348,11 @@ bool FireMaterial::hasTexture(BaseTexture* texture) const
   return false;
 }
 
+const string_t FireMaterial::getClassName() const
+{
+  return "FireMaterial";
+}
+
 void FireMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 {
   if (_diffuseTexture) {
@@ -319,11 +363,11 @@ void FireMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
     _distortionTexture->dispose();
   }
 
-  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+  PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* FireMaterial::clone(const std::string& /*name*/,
-                              bool /*cloneChildren*/) const
+MaterialPtr FireMaterial::clone(const std::string& /*name*/,
+                                bool /*cloneChildren*/) const
 {
   return nullptr;
 }
