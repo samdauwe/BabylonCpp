@@ -71,6 +71,7 @@ file(GLOB MATERIALS_HDR_FILES   ${INCLUDE_PATH}/materialslibrary/cell/*.h
                                 ${INCLUDE_PATH}/materialslibrary/gradient/*.h
                                 ${INCLUDE_PATH}/materialslibrary/grid/*.h
                                 ${INCLUDE_PATH}/materialslibrary/lava/*.h
+                                ${INCLUDE_PATH}/materialslibrary/mix/*.h
                                 ${INCLUDE_PATH}/materialslibrary/normal/*.h
                                 ${INCLUDE_PATH}/materialslibrary/shadowonly/*.h
                                 ${INCLUDE_PATH}/materialslibrary/simple/*.h
@@ -91,6 +92,7 @@ file(GLOB MATERIALS_SRC_FILES   ${SOURCE_PATH}/materialslibrary/cell/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/gradient/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/grid/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/lava/*.cpp
+                                ${SOURCE_PATH}/materialslibrary/mix/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/normal/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/shadowonly/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/simple/*.cpp
