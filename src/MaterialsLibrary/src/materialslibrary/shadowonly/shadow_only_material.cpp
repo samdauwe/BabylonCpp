@@ -1,8 +1,10 @@
 #include <babylon/materialslibrary/shadowonly/shadow_only_material.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/lights/light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -15,8 +17,11 @@ namespace MaterialsLibrary {
 
 ShadowOnlyMaterial::ShadowOnlyMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , _worldViewProjectionMatrix{Matrix::Zero()}
+    , shadowColor{Color3::Black()}
+    , activeLight{this, &ShadowOnlyMaterial::get_activeLight,
+                  &ShadowOnlyMaterial::set_activeLight}
     , _renderId{-1}
+    , _activeLight{nullptr}
 {
 }
 
@@ -24,17 +29,27 @@ ShadowOnlyMaterial::~ShadowOnlyMaterial()
 {
 }
 
-bool ShadowOnlyMaterial::needAlphaBlending()
+IShadowLightPtr& ShadowOnlyMaterial::get_activeLight()
+{
+  return _activeLight;
+}
+
+void ShadowOnlyMaterial::set_activeLight(const IShadowLightPtr& light)
+{
+  _activeLight = light;
+}
+
+bool ShadowOnlyMaterial::needAlphaBlending() const
 {
   return true;
 }
 
-bool ShadowOnlyMaterial::needAlphaTesting()
+bool ShadowOnlyMaterial::needAlphaTesting() const
 {
   return false;
 }
 
-BaseTexture* ShadowOnlyMaterial::getAlphaTestTexture()
+BaseTexturePtr ShadowOnlyMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -65,22 +80,39 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   auto engine = scene->getEngine();
 
+  // Ensure that active light is the first shadow light
+  if (_activeLight) {
+    for (const auto& light : mesh->_lightSources) {
+      if (light->shadowEnabled) {
+        if (_activeLight == light) {
+          break; // We are good
+        }
+
+        auto activeLight = ::std::dynamic_pointer_cast<Light>(_activeLight);
+        auto it          = ::std::find(mesh->_lightSources.begin(),
+                              mesh->_lightSources.end(), activeLight);
+
+        if (it != mesh->_lightSources.end()) {
+          mesh->_lightSources.erase(it);
+          mesh->_lightSources.insert(mesh->_lightSources.begin(), activeLight);
+        }
+        break;
+      }
+    }
+  }
+
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, SMD::CLIPPLANE, SMD::ALPHATEST,
-    SMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    SMD::LOGARITHMICDEPTH, SMD::POINTSIZE, SMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
-  defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, 1, false, SMD::SPECULARTERM,
-    SMD::SHADOWFULLFLOAT);
+  defines._needNormals
+    = MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, false, 1);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, false, true, false, SMD::NORMAL, SMD::UV1, SMD::UV2,
-    SMD::VERTEXCOLOR, SMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -90,36 +122,36 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[SMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks, 1);
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[SMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  SMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     const std::string shaderName{"shadowOnly"};
     auto join = defines.toString();
     EffectCreationOptions options;
     options.attributes = std::move(attribs);
     options.uniformsNames
-      = {"world",       "view",       "viewProjection", "vEyePosition",
-         "vLightsType", "vFogInfos",  "vFogColor",      "pointSize",
-         "mBones",      "vClipPlane", "depthValues"};
+      = {"world",       "view",        "viewProjection", "vEyePosition",
+         "vLightsType", "vFogInfos",   "vFogColor",      "pointSize",
+         "alpha",       "shadowColor", "mBones",         "vClipPlane",
+         "vClipPlane2", "vClipPlane3", "vClipPlane4"};
     options.uniformBuffersNames   = {};
     options.samplers              = {};
     options.defines               = std::move(join);
@@ -154,7 +186,10 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -173,21 +208,20 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    _activeEffect->setFloat("alpha", alpha);
+    _activeEffect->setColor3("shadowColor", shadowColor);
+
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   // Lights
   if (scene->lightsEnabled()) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, 1,
-                               SMD::SPECULARTERM);
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines, 1);
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -197,8 +231,8 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _afterBind(mesh, _activeEffect);
 }
 
-Material* ShadowOnlyMaterial::clone(const std::string& /*name*/,
-                                    bool /*cloneChildren*/) const
+MaterialPtr ShadowOnlyMaterial::clone(const std::string& /*name*/,
+                                      bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -206,6 +240,11 @@ Material* ShadowOnlyMaterial::clone(const std::string& /*name*/,
 Json::object ShadowOnlyMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t ShadowOnlyMaterial::getClassName() const
+{
+  return "ShadowOnlyMaterial";
 }
 
 ShadowOnlyMaterial* ShadowOnlyMaterial::Parse(const Json::value& /*source*/,

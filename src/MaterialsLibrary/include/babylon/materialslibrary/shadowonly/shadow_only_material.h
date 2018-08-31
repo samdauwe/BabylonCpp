@@ -13,30 +13,35 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT ShadowOnlyMaterial : public PushMaterial {
 
 public:
-  using SMD = ShadowOnlyMaterialDefines;
-
-public:
   ShadowOnlyMaterial(const std::string& name, Scene* scene);
-  ~ShadowOnlyMaterial();
+  ~ShadowOnlyMaterial() override;
 
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
-  BaseTexture* getAlphaTestTexture() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
+  BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  const string_t getClassName() const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/
   static ShadowOnlyMaterial* Parse(const Json::value& source, Scene* scene,
                                    const std::string& rootUrl);
 
+protected:
+  IShadowLightPtr& get_activeLight();
+  void set_activeLight(const IShadowLightPtr& light);
+
+public:
+  Color3 shadowColor;
+  Property<ShadowOnlyMaterial, IShadowLightPtr> activeLight;
+
 private:
-  Matrix _worldViewProjectionMatrix;
-  Color3 _scaledDiffuse;
   int _renderId;
+  IShadowLightPtr _activeLight;
 
 }; // end of class ShadowOnlyMaterial
 

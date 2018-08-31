@@ -20,11 +20,16 @@ namespace MaterialsLibrary {
 
 NormalMaterial::NormalMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , diffuseTexture{this, &NormalMaterial::get_diffuseTexture,
+                     &NormalMaterial::set_diffuseTexture}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
+    , disableLighting{this, &NormalMaterial::get_disableLighting,
+                      &NormalMaterial::set_disableLighting}
+    , maxSimultaneousLights{this, &NormalMaterial::get_maxSimultaneousLights,
+                            &NormalMaterial::set_maxSimultaneousLights}
     , _diffuseTexture{nullptr}
     , _disableLighting{false}
     , _maxSimultaneousLights{4}
-    , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
 {
 }
@@ -38,22 +43,56 @@ IReflect::Type NormalMaterial::type() const
   return IReflect::Type::NORMALMATERIAL;
 }
 
-void NormalMaterial::setDiffuseColor(const Color3& color)
+BaseTexturePtr& NormalMaterial::get_diffuseTexture()
 {
-  diffuseColor = color;
+  return _diffuseTexture;
 }
 
-bool NormalMaterial::needAlphaBlending()
+void NormalMaterial::set_diffuseTexture(const BaseTexturePtr& value)
+{
+  if (_diffuseTexture != value) {
+    _diffuseTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+bool NormalMaterial::get_disableLighting() const
+{
+  return _disableLighting;
+}
+
+void NormalMaterial::set_disableLighting(bool value)
+{
+  if (_disableLighting != value) {
+    _disableLighting = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+unsigned int NormalMaterial::get_maxSimultaneousLights() const
+{
+  return _maxSimultaneousLights;
+}
+
+void NormalMaterial::set_maxSimultaneousLights(unsigned int value)
+{
+  if (_maxSimultaneousLights != value) {
+    _maxSimultaneousLights = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+bool NormalMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
 
-bool NormalMaterial::needAlphaTesting()
+bool NormalMaterial::needAlphaTesting() const
 {
   return false;
 }
 
-BaseTexture* NormalMaterial::getAlphaTestTexture()
+BaseTexturePtr NormalMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -92,32 +131,28 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
           return false;
         }
         else {
-          defines._needUVs              = true;
-          defines.defines[NMD::DIFFUSE] = true;
+          defines._needUVs           = true;
+          defines.boolDef["DIFFUSE"] = true;
         }
       }
     }
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    NMD::LOGARITHMICDEPTH, NMD::POINTSIZE, NMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting,
-    NMD::SPECULARTERM, NMD::SHADOWFULLFLOAT);
+    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, NMD::CLIPPLANE, NMD::ALPHATEST,
-    NMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, false, NMD::NORMAL, NMD::UV1, NMD::UV2,
-    NMD::VERTEXCOLOR, NMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -127,49 +162,47 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[NMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks);
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs = {VertexBuffer::PositionKindChars};
 
-    if (defines[NMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[NMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[NMD::UV2]) {
+    if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (defines[NMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  NMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     const std::string shaderName{"normal"};
     auto join = defines.toString();
 
     const std::vector<std::string> uniforms{
-      "world",         "view",          "viewProjection", "vEyePosition",
-      "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",     "vDiffuseInfos", "mBones",         "vClipPlane",
-      "diffuseMatrix", "depthValues"};
+      "world",       "view",          "viewProjection", "vEyePosition",
+      "vLightsType", "vDiffuseColor", "vFogInfos",      "vFogColor",
+      "pointSize",   "vDiffuseInfos", "mBones",         "vClipPlane",
+      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "diffuseMatrix"};
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
@@ -184,8 +217,7 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters
-      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
+    options.indexParameters       = {{"maxSimultaneousLights", 4}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
     subMesh->setEffect(
@@ -212,7 +244,10 @@ void NormalMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -242,10 +277,7 @@ void NormalMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor,
@@ -253,13 +285,12 @@ void NormalMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   // Lights
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
-                               _maxSimultaneousLights, NMD::SPECULARTERM);
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines);
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -269,9 +300,9 @@ void NormalMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> NormalMaterial::getAnimatables()
+std::vector<IAnimatablePtr> NormalMaterial::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  std::vector<IAnimatablePtr> results;
 
   if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
     results.emplace_back(_diffuseTexture);
@@ -280,9 +311,9 @@ std::vector<IAnimatable*> NormalMaterial::getAnimatables()
   return results;
 }
 
-std::vector<BaseTexture*> NormalMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> NormalMaterial::getActiveTextures() const
 {
-  auto activeTextures = Material::getActiveTextures();
+  auto activeTextures = PushMaterial::getActiveTextures();
 
   if (_diffuseTexture) {
     activeTextures.emplace_back(_diffuseTexture);
@@ -291,9 +322,9 @@ std::vector<BaseTexture*> NormalMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool NormalMaterial::hasTexture(BaseTexture* texture) const
+bool NormalMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
-  if (Material::hasTexture(texture)) {
+  if (PushMaterial::hasTexture(texture)) {
     return true;
   }
 
@@ -310,11 +341,11 @@ void NormalMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
     _diffuseTexture->dispose();
   }
 
-  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+  PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* NormalMaterial::clone(const std::string& /*name*/,
-                                bool /*cloneChildren*/) const
+MaterialPtr NormalMaterial::clone(const std::string& /*name*/,
+                                  bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -322,6 +353,11 @@ Material* NormalMaterial::clone(const std::string& /*name*/,
 Json::object NormalMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t NormalMaterial::getClassName() const
+{
+  return "NormalMaterial";
 }
 
 NormalMaterial* NormalMaterial::Parse(const Json::value& /*source*/,

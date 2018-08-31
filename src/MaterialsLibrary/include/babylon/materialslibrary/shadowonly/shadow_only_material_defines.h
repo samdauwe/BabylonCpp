@@ -8,21 +8,7 @@ namespace BABYLON {
 namespace MaterialsLibrary {
 
 struct BABYLON_SHARED_EXPORT ShadowOnlyMaterialDefines
-  : public MaterialDefines {
-
-  static constexpr unsigned int CLIPPLANE        = 0;
-  static constexpr unsigned int POINTSIZE        = 1;
-  static constexpr unsigned int FOG              = 2;
-  static constexpr unsigned int NORMAL           = 3;
-  static constexpr unsigned int INSTANCES        = 4;
-  static constexpr unsigned int ALPHATEST        = 5;
-  static constexpr unsigned int LOGARITHMICDEPTH = 6;
-  static constexpr unsigned int SHADOWFULLFLOAT  = 7;
-  static constexpr unsigned int SPECULARTERM     = 8;
-  static constexpr unsigned int UV1              = 9;
-  static constexpr unsigned int UV2              = 10;
-  static constexpr unsigned int VERTEXCOLOR      = 11;
-  static constexpr unsigned int VERTEXALPHA      = 12;
+    : public MaterialDefines {
 
   ShadowOnlyMaterialDefines();
   ~ShadowOnlyMaterialDefines();

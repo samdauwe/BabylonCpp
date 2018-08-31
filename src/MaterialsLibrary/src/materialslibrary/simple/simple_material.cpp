@@ -20,11 +20,16 @@ namespace MaterialsLibrary {
 
 SimpleMaterial::SimpleMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , diffuseTexture{this, &SimpleMaterial::get_diffuseTexture,
+                     &SimpleMaterial::set_diffuseTexture}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
+    , disableLighting{this, &SimpleMaterial::get_disableLighting,
+                      &SimpleMaterial::set_disableLighting}
+    , maxSimultaneousLights{this, &SimpleMaterial::get_maxSimultaneousLights,
+                            &SimpleMaterial::set_maxSimultaneousLights}
     , _diffuseTexture{nullptr}
     , _disableLighting{false}
     , _maxSimultaneousLights{4}
-    , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
 {
 }
@@ -33,17 +38,56 @@ SimpleMaterial::~SimpleMaterial()
 {
 }
 
-bool SimpleMaterial::needAlphaBlending()
+BaseTexturePtr& SimpleMaterial::get_diffuseTexture()
+{
+  return _diffuseTexture;
+}
+
+void SimpleMaterial::set_diffuseTexture(const BaseTexturePtr& value)
+{
+  if (_diffuseTexture != value) {
+    _diffuseTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+bool SimpleMaterial::get_disableLighting() const
+{
+  return _disableLighting;
+}
+
+void SimpleMaterial::set_disableLighting(bool value)
+{
+  if (_disableLighting != value) {
+    _disableLighting = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+unsigned int SimpleMaterial::get_maxSimultaneousLights() const
+{
+  return _maxSimultaneousLights;
+}
+
+void SimpleMaterial::set_maxSimultaneousLights(unsigned int value)
+{
+  if (_maxSimultaneousLights != value) {
+    _maxSimultaneousLights = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+bool SimpleMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
 
-bool SimpleMaterial::needAlphaTesting()
+bool SimpleMaterial::needAlphaTesting() const
 {
   return false;
 }
 
-BaseTexture* SimpleMaterial::getAlphaTestTexture()
+BaseTexturePtr SimpleMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -82,32 +126,28 @@ bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
           return false;
         }
         else {
-          defines._needUVs              = true;
-          defines.defines[SMD::DIFFUSE] = true;
+          defines._needUVs           = true;
+          defines.boolDef["DIFFUSE"] = true;
         }
       }
     }
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    SMD::LOGARITHMICDEPTH, SMD::POINTSIZE, SMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting,
-    SMD::SPECULARTERM, SMD::SHADOWFULLFLOAT);
+    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, SMD::CLIPPLANE, SMD::ALPHATEST,
-    SMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, false, SMD::NORMAL, SMD::UV1, SMD::UV2,
-    SMD::VERTEXCOLOR, SMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -116,48 +156,47 @@ bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[SMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+                                              maxSimultaneousLights());
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[SMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[SMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[SMD::UV2]) {
+    if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (defines[SMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  SMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     const std::string shaderName{"simple"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",         "view",          "viewProjection", "vEyePosition",
-      "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",     "vDiffuseInfos", "mBones",         "vClipPlane",
-      "diffuseMatrix", "depthValues"};
+      "world",       "view",          "viewProjection", "vEyePosition",
+      "vLightsType", "vDiffuseColor", "vFogInfos",      "vFogColor",
+      "pointSize",   "vDiffuseInfos", "mBones",         "vClipPlane",
+      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "diffuseMatrix"};
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
@@ -168,12 +207,12 @@ bool SimpleMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.samplers              = std::move(samplers);
     options.materialDefines       = &defines;
     options.defines               = std::move(join);
-    options.maxSimultaneousLights = _maxSimultaneousLights;
+    options.maxSimultaneousLights = maxSimultaneousLights();
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
     options.indexParameters
-      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
+      = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
     subMesh->setEffect(
@@ -200,7 +239,10 @@ void SimpleMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -230,10 +272,7 @@ void SimpleMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor,
@@ -242,12 +281,12 @@ void SimpleMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   // Lights
   if (scene->lightsEnabled() && !_disableLighting) {
     MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
-                               _maxSimultaneousLights, SMD::SPECULARTERM);
+                               maxSimultaneousLights());
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -257,9 +296,9 @@ void SimpleMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> SimpleMaterial::getAnimatables()
+std::vector<IAnimatablePtr> SimpleMaterial::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  std::vector<IAnimatablePtr> results;
 
   if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
     results.emplace_back(_diffuseTexture);
@@ -268,9 +307,9 @@ std::vector<IAnimatable*> SimpleMaterial::getAnimatables()
   return results;
 }
 
-std::vector<BaseTexture*> SimpleMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> SimpleMaterial::getActiveTextures() const
 {
-  auto activeTextures = Material::getActiveTextures();
+  auto activeTextures = PushMaterial::getActiveTextures();
 
   if (_diffuseTexture) {
     activeTextures.emplace_back(_diffuseTexture);
@@ -279,9 +318,9 @@ std::vector<BaseTexture*> SimpleMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool SimpleMaterial::hasTexture(BaseTexture* texture) const
+bool SimpleMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
-  if (Material::hasTexture(texture)) {
+  if (PushMaterial::hasTexture(texture)) {
     return true;
   }
 
@@ -298,11 +337,11 @@ void SimpleMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
     _diffuseTexture->dispose();
   }
 
-  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+  PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* SimpleMaterial::clone(const std::string& /*name*/,
-                                bool /*cloneChildren*/) const
+MaterialPtr SimpleMaterial::clone(const std::string& /*name*/,
+                                  bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -310,6 +349,11 @@ Material* SimpleMaterial::clone(const std::string& /*name*/,
 Json::object SimpleMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t SimpleMaterial::getClassName() const
+{
+  return "SimpleMaterial";
 }
 
 SimpleMaterial* SimpleMaterial::Parse(const Json::value& /*source*/,

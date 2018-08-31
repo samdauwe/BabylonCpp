@@ -13,43 +13,49 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT NormalMaterial : public PushMaterial {
 
 public:
-  using NMD = NormalMaterialDefines;
-
-public:
   NormalMaterial(const std::string& name, Scene* scene);
-  ~NormalMaterial();
+  ~NormalMaterial() override;
 
   IReflect::Type type() const override;
-  void setDiffuseColor(const Color3& color) override;
 
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
-  BaseTexture* getAlphaTestTexture() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
+  BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables();
-  std::vector<BaseTexture*> getActiveTextures() const override;
-  bool hasTexture(BaseTexture* texture) const override;
+  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+  const string_t getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/
   static NormalMaterial* Parse(const Json::value& source, Scene* scene,
                                const std::string& rootUrl);
 
+protected:
+  BaseTexturePtr& get_diffuseTexture();
+  void set_diffuseTexture(const BaseTexturePtr& value);
+  bool get_disableLighting() const;
+  void set_disableLighting(bool value);
+  unsigned int get_maxSimultaneousLights() const;
+  void set_maxSimultaneousLights(unsigned int value);
+
 public:
+  Property<NormalMaterial, BaseTexturePtr> diffuseTexture;
   Color3 diffuseColor;
+  Property<NormalMaterial, bool> disableLighting;
+  Property<NormalMaterial, unsigned int> maxSimultaneousLights;
 
 private:
-  BaseTexture* _diffuseTexture;
+  BaseTexturePtr _diffuseTexture;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
-  Matrix _worldViewProjectionMatrix;
-  Color3 _scaledDiffuse;
   int _renderId;
 
 }; // end of class NormalMaterial

@@ -13,44 +13,57 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT LavaMaterial : public PushMaterial {
 
 public:
-  using LMD = LavaMaterialDefines;
-
-public:
   LavaMaterial(const std::string& name, Scene* scene);
-  ~LavaMaterial();
+  ~LavaMaterial() override;
 
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
-  BaseTexture* getAlphaTestTexture() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
+  BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables();
-  std::vector<BaseTexture*> getActiveTextures() const override;
-  bool hasTexture(BaseTexture* texture) const override;
+  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+  const string_t getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/
   static LavaMaterial* Parse(const Json::value& source, Scene* scene,
                              const std::string& rootUrl);
 
+protected:
+  BaseTexturePtr& get_diffuseTexture();
+  void set_diffuseTexture(const BaseTexturePtr& value);
+  bool get_disableLighting() const;
+  void set_disableLighting(bool value);
+  bool get_unlit() const;
+  void set_unlit(bool value);
+  unsigned int get_maxSimultaneousLights() const;
+  void set_maxSimultaneousLights(unsigned int value);
+
 public:
-  BaseTexture* noiseTexture;
-  std::unique_ptr<Color3> fogColor;
+  Property<LavaMaterial, BaseTexturePtr> diffuseTexture;
+  BaseTexturePtr noiseTexture;
+  nullable_t<Color3> fogColor;
   float speed;
   float movingSpeed;
   float lowFrequencySpeed;
   float fogDensity;
   Color3 diffuseColor;
+  Property<LavaMaterial, bool> disableLighting;
+  Property<LavaMaterial, bool> unlit;
+  Property<LavaMaterial, unsigned int> maxSimultaneousLights;
 
 private:
-  BaseTexture* _diffuseTexture;
+  BaseTexturePtr _diffuseTexture;
   float _lastTime;
   bool _disableLighting;
+  bool _unlit;
   unsigned int _maxSimultaneousLights;
   Matrix _worldViewProjectionMatrix;
   Color3 _scaledDiffuse;

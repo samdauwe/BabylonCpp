@@ -5,11 +5,28 @@ namespace MaterialsLibrary {
 
 SimpleMaterialDefines::SimpleMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"DIFFUSE",      "CLIPPLANE",      "ALPHATEST", "POINTSIZE",
-           "FOG",          "NORMAL",         "UV1",       "UV2",
-           "VERTEXCOLOR",  "VERTEXALPHA",    "INSTANCES", "LOGARITHMICDEPTH",
-           "SPECULARTERM", "SHADOWFULLFLOAT"};
-  rebuild();
+  boolDef = {
+    {"DIFFUSE", false},      //
+    {"CLIPPLANE", false},    //
+    {"CLIPPLANE2", false},   //
+    {"CLIPPLANE3", false},   //
+    {"CLIPPLANE4", false},   //
+    {"ALPHATEST", false},    //
+    {"DEPTHPREPASS", false}, //
+    {"POINTSIZE", false},    //
+    {"FOG", false},          //
+    {"NORMAL", false},       //
+    {"UV1", false},          //
+    {"UV2", false},          //
+    {"VERTEXCOLOR", false},  //
+    {"VERTEXALPHA", false},  //
+    {"INSTANCES", false},    //
+  };
+
+  intDef = {
+    {"NUM_BONE_INFLUENCERS", 0}, //
+    {"BonesPerMesh", 0}          //
+  };
 }
 
 SimpleMaterialDefines::~SimpleMaterialDefines()

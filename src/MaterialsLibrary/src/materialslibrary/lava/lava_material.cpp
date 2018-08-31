@@ -21,13 +21,20 @@ namespace MaterialsLibrary {
 
 LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , diffuseTexture{this, &LavaMaterial::get_diffuseTexture,
+                     &LavaMaterial::set_diffuseTexture}
     , noiseTexture{nullptr}
-    , fogColor{nullptr}
+    , fogColor{nullopt_t}
     , speed{1.f}
     , movingSpeed{1.f}
     , lowFrequencySpeed{1.f}
     , fogDensity{0.15f}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
+    , disableLighting{this, &LavaMaterial::get_disableLighting,
+                      &LavaMaterial::set_disableLighting}
+    , unlit{this, &LavaMaterial::get_unlit, &LavaMaterial::set_unlit}
+    , maxSimultaneousLights{this, &LavaMaterial::get_maxSimultaneousLights,
+                            &LavaMaterial::set_maxSimultaneousLights}
     , _diffuseTexture{nullptr}
     , _lastTime{0.f}
     , _disableLighting{false}
@@ -41,17 +48,69 @@ LavaMaterial::~LavaMaterial()
 {
 }
 
-bool LavaMaterial::needAlphaBlending()
+BaseTexturePtr& LavaMaterial::get_diffuseTexture()
+{
+  return _diffuseTexture;
+}
+
+void LavaMaterial::set_diffuseTexture(const BaseTexturePtr& value)
+{
+  if (_diffuseTexture != value) {
+    _diffuseTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+bool LavaMaterial::get_disableLighting() const
+{
+  return _disableLighting;
+}
+
+void LavaMaterial::set_disableLighting(bool value)
+{
+  if (_disableLighting != value) {
+    _disableLighting = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+bool LavaMaterial::get_unlit() const
+{
+  return _unlit;
+}
+
+void LavaMaterial::set_unlit(bool value)
+{
+  if (_unlit != value) {
+    _unlit = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+unsigned int LavaMaterial::get_maxSimultaneousLights() const
+{
+  return _maxSimultaneousLights;
+}
+
+void LavaMaterial::set_maxSimultaneousLights(unsigned int value)
+{
+  if (_maxSimultaneousLights != value) {
+    _maxSimultaneousLights = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+bool LavaMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
 
-bool LavaMaterial::needAlphaTesting()
+bool LavaMaterial::needAlphaTesting() const
 {
   return false;
 }
 
-BaseTexture* LavaMaterial::getAlphaTestTexture()
+BaseTexturePtr LavaMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -90,32 +149,30 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
           return false;
         }
         else {
-          defines._needUVs              = true;
-          defines.defines[LMD::DIFFUSE] = true;
+          defines._needUVs           = true;
+          defines.boolDef["DIFFUSE"] = true;
         }
       }
     }
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    LMD::LOGARITHMICDEPTH, LMD::POINTSIZE, LMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
+  defines._needNormals = true;
+
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting,
-    LMD::SPECULARTERM, LMD::SHADOWFULLFLOAT);
+    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, LMD::CLIPPLANE, LMD::ALPHATEST,
-    LMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, false, LMD::NORMAL, LMD::UV1, LMD::UV2,
-    LMD::VERTEXCOLOR, LMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -124,51 +181,55 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[LMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks);
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs = {VertexBuffer::PositionKindChars};
 
-    if (defines[LMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[LMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[LMD::UV2]) {
+    if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (defines[LMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  LMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"lava"};
     auto join = defines.toString();
 
     const std::vector<std::string> uniforms{
-      "world",         "view",          "viewProjection", "vEyePosition",
-      "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",     "vDiffuseInfos", "mBones",         "vClipPlane",
-      "diffuseMatrix", "depthValues",   "time",           "speed",
-      "movingSpeed",   "fogColor",      "fogDensity",     "lowFrequencySpeed"};
+      "world",          "view",
+      "viewProjection", "vEyePosition",
+      "vLightsType",    "vDiffuseColor",
+      "vFogInfos",      "vFogColor",
+      "pointSize",      "vDiffuseInfos",
+      "mBones",         "vClipPlane",
+      "vClipPlane2",    "vClipPlane3",
+      "vClipPlane4",    "diffuseMatrix",
+      "time",           "speed",
+      "movingSpeed",    "fogColor",
+      "fogDensity",     "lowFrequencySpeed"};
 
     const std::vector<std::string> samplers{"diffuseSampler", "noiseTexture"};
     const std::vector<std::string> uniformBuffers{};
@@ -180,12 +241,12 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.samplers              = std::move(samplers);
     options.materialDefines       = &defines;
     options.defines               = std::move(join);
-    options.maxSimultaneousLights = _maxSimultaneousLights;
+    options.maxSimultaneousLights = maxSimultaneousLights();
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
     options.indexParameters
-      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
+      = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
     subMesh->setEffect(
@@ -212,8 +273,14 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
+
+  defines->boolDef["UNLIT"] = _unlit;
 
   // Matrices
   bindOnlyWorldMatrix(*world);
@@ -246,23 +313,19 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse,
                            alpha * mesh->visibility);
 
   if (scene->lightsEnabled() && !_disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
-                               _maxSimultaneousLights, LMD::SPECULARTERM);
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines);
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -272,8 +335,8 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _lastTime += scene->getEngine()->getDeltaTime();
   _effect->setFloat("time", _lastTime * speed / 1000.f);
 
-  if (!fogColor) {
-    fogColor = std::make_unique<Color3>(Color3::Black());
+  if (!fogColor.has_value()) {
+    fogColor = Color3::Black();
   }
   _activeEffect->setColor3("fogColor", *fogColor);
   _activeEffect->setFloat("fogDensity", fogDensity);
@@ -284,9 +347,9 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> LavaMaterial::getAnimatables()
+std::vector<IAnimatablePtr> LavaMaterial::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  std::vector<IAnimatablePtr> results;
 
   if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
     results.emplace_back(_diffuseTexture);
@@ -299,9 +362,9 @@ std::vector<IAnimatable*> LavaMaterial::getAnimatables()
   return results;
 }
 
-std::vector<BaseTexture*> LavaMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> LavaMaterial::getActiveTextures() const
 {
-  auto activeTextures = Material::getActiveTextures();
+  auto activeTextures = PushMaterial::getActiveTextures();
   if (_diffuseTexture) {
     activeTextures.emplace_back(_diffuseTexture);
   }
@@ -309,7 +372,7 @@ std::vector<BaseTexture*> LavaMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool LavaMaterial::hasTexture(BaseTexture* texture) const
+bool LavaMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
   if (Material::hasTexture(texture)) {
     return true;
@@ -332,11 +395,11 @@ void LavaMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
     noiseTexture->dispose();
   }
 
-  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+  PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* LavaMaterial::clone(const std::string& /*name*/,
-                              bool /*cloneChildren*/) const
+MaterialPtr LavaMaterial::clone(const std::string& /*name*/,
+                                bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -344,6 +407,11 @@ Material* LavaMaterial::clone(const std::string& /*name*/,
 Json::object LavaMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t LavaMaterial::getClassName() const
+{
+  return "LavaMaterial";
 }
 
 LavaMaterial* LavaMaterial::Parse(const Json::value& /*source*/,
