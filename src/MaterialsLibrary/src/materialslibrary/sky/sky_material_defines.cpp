@@ -5,12 +5,16 @@ namespace MaterialsLibrary {
 
 SkyMaterialDefines::SkyMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"CLIPPLANE",        "POINTSIZE", "FOG", "VERTEXCOLOR", "VERTEXALPHA",
-           "LOGARITHMICDEPTH", "NORMAL",    "UV1", "UV2"};
-  defines.resize(_keys.size());
-  for (size_t i = 0; i < _keys.size(); ++i) {
-    defines[i] = false;
-  }
+  boolDef = {
+    {"CLIPPLANE", false},   //
+    {"CLIPPLANE2", false},  //
+    {"CLIPPLANE3", false},  //
+    {"CLIPPLANE4", false},  //
+    {"POINTSIZE", false},   //
+    {"FOG", false},         //
+    {"VERTEXCOLOR", false}, //
+    {"VERTEXALPHA", false}  //
+  };
 }
 
 SkyMaterialDefines::~SkyMaterialDefines()

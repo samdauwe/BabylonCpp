@@ -224,7 +224,7 @@ bool NormalMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
 
-  if (!subMesh->effect()->isReady()) {
+  if (!subMesh->effect() || !subMesh->effect()->isReady()) {
     return false;
   }
 

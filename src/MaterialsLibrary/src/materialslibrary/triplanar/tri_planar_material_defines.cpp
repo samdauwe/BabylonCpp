@@ -5,25 +5,34 @@ namespace MaterialsLibrary {
 
 TriPlanarMaterialDefines::TriPlanarMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"DIFFUSEX",
-           "DIFFUSEY",
-           "DIFFUSEZ",
-           "BUMPX",
-           "BUMPY",
-           "BUMPZ",
-           "CLIPPLANE",
-           "ALPHATEST",
-           "POINTSIZE",
-           "FOG",
-           "SPECULARTERM",
-           "NORMAL",
-           "VERTEXCOLOR",
-           "VERTEXALPHA",
-           "INSTANCES",
-           "SHADOWS",
-           "LOGARITHMICDEPTH",
-           "SHADOWFULLFLOAT"};
-  rebuild();
+  boolDef = {
+    {"DIFFUSEX", false}, //
+    {"DIFFUSEY", false}, //
+    {"DIFFUSEZ", false}, //
+
+    {"BUMPX", false}, //
+    {"BUMPY", false}, //
+    {"BUMPZ", false}, //
+
+    {"CLIPPLANE", false},    //
+    {"CLIPPLANE2", false},   //
+    {"CLIPPLANE3", false},   //
+    {"CLIPPLANE4", false},   //
+    {"ALPHATEST", false},    //
+    {"DEPTHPREPASS", false}, //
+    {"POINTSIZE", false},    //
+    {"FOG", false},          //
+    {"SPECULARTERM", false}, //
+    {"NORMAL", false},       //
+    {"VERTEXCOLOR", false},  //
+    {"VERTEXALPHA", false},  //
+    {"INSTANCES", false},    //
+  };
+
+  intDef = {
+    {"NUM_BONE_INFLUENCERS", 0}, //
+    {"BonesPerMesh", 0}          //
+  };
 }
 
 TriPlanarMaterialDefines::~TriPlanarMaterialDefines()

@@ -37,17 +37,17 @@ SkyMaterial::~SkyMaterial()
 {
 }
 
-bool SkyMaterial::needAlphaBlending()
+bool SkyMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
 
-bool SkyMaterial::needAlphaTesting()
+bool SkyMaterial::needAlphaTesting() const
 {
   return false;
 }
 
-BaseTexture* SkyMaterial::getAlphaTestTexture()
+BaseTexturePtr SkyMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -77,14 +77,11 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
   auto engine = scene->getEngine();
 
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    SMD::LOGARITHMICDEPTH, SMD::POINTSIZE, SMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(), false, defines);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, false, false, SMD::NORMAL, SMD::UV1, SMD::UV2,
-    SMD::VERTEXCOLOR, SMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, false);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -94,23 +91,25 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[SMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[SMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     const std::string shaderName{"sky"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",       "viewProjection", "view",           "vFogInfos",
-      "vFogColor",   "pointSize",      "vClipPlane",     "luminance",
-      "turbidity",   "rayleigh",       "mieCoefficient", "mieDirectionalG",
+      "world",       "viewProjection", "view",
+      "vFogInfos",   "vFogColor",      "pointSize",
+      "vClipPlane",  "vClipPlane2",    "vClipPlane3",
+      "vClipPlane4", "luminance",      "turbidity",
+      "rayleigh",    "mieCoefficient", "mieDirectionalG",
       "sunPosition", "cameraPosition"};
     const std::vector<std::string> samplers{};
     const std::vector<std::string> uniformBuffers{};
@@ -130,7 +129,7 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
 
-  if (!subMesh->effect()->isReady()) {
+  if (!subMesh->effect() || !subMesh->effect()->isReady()) {
     return false;
   }
 
@@ -150,7 +149,10 @@ void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -159,12 +161,7 @@ void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   if (_mustRebind(scene, effect)) {
     // Clip plane
-    if (scene->clipPlane()) {
-      auto clipPlane = scene->clipPlane();
-      _activeEffect->setFloat4("vClipPlane", clipPlane->normal.x,
-                               clipPlane->normal.y, clipPlane->normal.z,
-                               clipPlane->d);
-    }
+    MaterialHelper::BindClipPlane(_activeEffect, scene);
 
     // Point size
     if (pointsCloud()) {
@@ -174,7 +171,7 @@ void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -191,7 +188,7 @@ void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     _activeEffect->setVector3("cameraPosition", _cameraPosition);
   }
 
-  if (luminance > 0) {
+  if (luminance > 0.f) {
     _activeEffect->setFloat("luminance", luminance);
   }
 
@@ -202,7 +199,7 @@ void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   if (!useSunPosition) {
     auto theta = Math::PI * (inclination - 0.5f);
-    auto phi   = 2 * Math::PI * (azimuth - 0.5f);
+    auto phi   = 2.f * Math::PI * (azimuth - 0.5f);
 
     sunPosition.x = distance * std::cos(phi);
     sunPosition.y = distance * std::sin(phi) * std::sin(theta);
@@ -214,9 +211,9 @@ void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> SkyMaterial::getAnimatables()
+std::vector<IAnimatablePtr> SkyMaterial::getAnimatables()
 {
-  return std::vector<IAnimatable*>();
+  return std::vector<IAnimatablePtr>();
 }
 
 void SkyMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
@@ -224,8 +221,8 @@ void SkyMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* SkyMaterial::clone(const std::string& /*name*/,
-                             bool /*cloneChildren*/) const
+MaterialPtr SkyMaterial::clone(const std::string& /*name*/,
+                               bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -233,6 +230,11 @@ Material* SkyMaterial::clone(const std::string& /*name*/,
 Json::object SkyMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t SkyMaterial::getClassName() const
+{
+  return "SkyMaterial";
 }
 
 SkyMaterial* SkyMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,

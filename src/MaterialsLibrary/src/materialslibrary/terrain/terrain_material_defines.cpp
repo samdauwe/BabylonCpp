@@ -5,11 +5,30 @@ namespace MaterialsLibrary {
 
 TerrainMaterialDefines::TerrainMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"DIFFUSE",   "BUMP",    "CLIPPLANE",        "ALPHATEST",
-           "POINTSIZE", "FOG",     "SPECULARTERM",     "NORMAL",
-           "UV1",       "UV2",     "VERTEXCOLOR",      "VERTEXALPHA",
-           "INSTANCES", "SHADOWS", "LOGARITHMICDEPTH", "SHADOWFULLFLOAT"};
-  rebuild();
+  boolDef = {
+    {"DIFFUSE", false},      //
+    {"BUMP", false},         //
+    {"CLIPPLANE", false},    //
+    {"CLIPPLANE2", false},   //
+    {"CLIPPLANE3", false},   //
+    {"CLIPPLANE4", false},   //
+    {"ALPHATEST", false},    //
+    {"DEPTHPREPASS", false}, //
+    {"POINTSIZE", false},    //
+    {"FOG", false},          //
+    {"SPECULARTERM", false}, //
+    {"NORMAL", false},       //
+    {"UV1", false},          //
+    {"UV2", false},          //
+    {"VERTEXCOLOR", false},  //
+    {"VERTEXALPHA", false},  //
+    {"INSTANCES", false},    //
+  };
+
+  intDef = {
+    {"NUM_BONE_INFLUENCERS", 0}, //
+    {"BonesPerMesh", 0}          //
+  };
 }
 
 TerrainMaterialDefines::~TerrainMaterialDefines()

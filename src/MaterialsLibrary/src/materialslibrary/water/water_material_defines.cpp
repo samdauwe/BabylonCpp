@@ -5,26 +5,34 @@ namespace MaterialsLibrary {
 
 WaterMaterialDefines::WaterMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"BUMP",
-           "REFLECTION",
-           "CLIPPLANE",
-           "ALPHATEST",
-           "POINTSIZE",
-           "FOG",
-           "NORMAL",
-           "UV1",
-           "UV2",
-           "VERTEXCOLOR",
-           "VERTEXALPHA",
-           "INSTANCES",
-           "SPECULARTERM",
-           "LOGARITHMICDEPTH",
-           "FRESNELSEPARATE",
-           "BUMPSUPERIMPOSE",
-           "BUMPAFFECTSREFLECTION",
-           "SHADOWS",
-           "SHADOWFULLFLOAT"};
-  rebuild();
+  boolDef = {
+    {"BUMP", false},                  //
+    {"REFLECTION", false},            //
+    {"CLIPPLANE", false},             //
+    {"CLIPPLANE2", false},            //
+    {"CLIPPLANE3", false},            //
+    {"CLIPPLANE4", false},            //
+    {"ALPHATEST", false},             //
+    {"DEPTHPREPASS", false},          //
+    {"POINTSIZE", false},             //
+    {"FOG", false},                   //
+    {"NORMAL", false},                //
+    {"UV1", false},                   //
+    {"UV2", false},                   //
+    {"VERTEXCOLOR", false},           //
+    {"VERTEXALPHA", false},           //
+    {"INSTANCES", false},             //
+    {"SPECULARTERM", false},          //
+    {"LOGARITHMICDEPTH", false},      //
+    {"FRESNELSEPARATE", false},       //
+    {"BUMPSUPERIMPOSE", false},       //
+    {"BUMPAFFECTSREFLECTION", false}, //
+  };
+
+  intDef = {
+    {"NUM_BONE_INFLUENCERS", 0}, //
+    {"BonesPerMesh", 0}          //
+  };
 }
 
 WaterMaterialDefines::~WaterMaterialDefines()

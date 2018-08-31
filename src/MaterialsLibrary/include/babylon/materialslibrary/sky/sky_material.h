@@ -12,23 +12,21 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT SkyMaterial : public PushMaterial {
 
 public:
-  using SMD = SkyMaterialDefines;
-
-public:
   SkyMaterial(const std::string& name, Scene* scene);
-  ~SkyMaterial();
+  ~SkyMaterial() override;
 
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
-  BaseTexture* getAlphaTestTexture() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
+  BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables();
+  std::vector<IAnimatablePtr> getAnimatables();
+  const string_t getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/

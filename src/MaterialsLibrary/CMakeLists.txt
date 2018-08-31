@@ -74,11 +74,10 @@ file(GLOB MATERIALS_HDR_FILES   ${INCLUDE_PATH}/materialslibrary/cell/*.h
                                 ${INCLUDE_PATH}/materialslibrary/normal/*.h
                                 ${INCLUDE_PATH}/materialslibrary/shadowonly/*.h
                                 ${INCLUDE_PATH}/materialslibrary/simple/*.h
-                                #${INCLUDE_PATH}/materialslibrary/sky/*.h
-                                #${INCLUDE_PATH}/materialslibrary/terrain/*.h
-                                #${INCLUDE_PATH}/materialslibrary/triplanar/*.h
-                                #${INCLUDE_PATH}/materialslibrary/water/*.h
-                                )
+                                ${INCLUDE_PATH}/materialslibrary/sky/*.h
+                                ${INCLUDE_PATH}/materialslibrary/terrain/*.h
+                                ${INCLUDE_PATH}/materialslibrary/triplanar/*.h
+                                ${INCLUDE_PATH}/materialslibrary/water/*.h)
 
 set(BABYLON_MATERIALS_HEADERS
     ${MATERIALS_HDR_FILES}
@@ -95,11 +94,10 @@ file(GLOB MATERIALS_SRC_FILES   ${SOURCE_PATH}/materialslibrary/cell/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/normal/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/shadowonly/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/simple/*.cpp
-                                #${SOURCE_PATH}/materialslibrary/sky/*.cpp
-                                #${SOURCE_PATH}/materialslibrary/terrain/*.cpp
-                                #${SOURCE_PATH}/materialslibrary/triplanar/*.cpp
-                                #${SOURCE_PATH}/materialslibrary/water/*.cpp
-                                )
+                                ${SOURCE_PATH}/materialslibrary/sky/*.cpp
+                                ${SOURCE_PATH}/materialslibrary/terrain/*.cpp
+                                ${SOURCE_PATH}/materialslibrary/triplanar/*.cpp
+                                ${SOURCE_PATH}/materialslibrary/water/*.cpp)
 
 set(BABYLON_MATERIALS_SOURCES
     ${MATERIALS_SRC_FILES}

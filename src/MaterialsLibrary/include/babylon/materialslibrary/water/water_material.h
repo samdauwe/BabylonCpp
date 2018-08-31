@@ -14,96 +14,128 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT WaterMaterial : public PushMaterial {
 
 public:
-  using WMD = WaterMaterialDefines;
-
-public:
   WaterMaterial(const std::string& name, Scene* scene,
                 const Vector2& renderTargetSize = Vector2(512.f, 512.f));
-  ~WaterMaterial();
-
-  // Get / Set
-  bool useLogarithmicDepth() const override;
-  void setUseLogarithmicDepth(bool value) override;
-  RenderTargetTexture* refractionTexture();
-  RenderTargetTexture* reflectionTexture();
+  ~WaterMaterial() override;
 
   // Methods
-  void addToRenderList(AbstractMesh* node);
+  void addToRenderList(const AbstractMeshPtr& node);
   void enableRenderTargets(bool enable);
-  std::vector<AbstractMesh*>& getRenderList();
-  bool renderTargetsEnabled() const;
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
-  BaseTexture* getAlphaTestTexture() override;
+  std::vector<AbstractMeshPtr>& getRenderList();
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
+  BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables();
-  std::vector<BaseTexture*> getActiveTextures() const override;
-  bool hasTexture(BaseTexture* texture) const override;
+  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+  const string_t getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/
   static WaterMaterial* Parse(const Json::value& source, Scene* scene,
                               const std::string& rootUrl);
-  static Mesh* CreateDefaultMesh(const std::string& name, Scene* scene);
+  static MeshPtr CreateDefaultMesh(const std::string& name, Scene* scene);
+
+protected:
+  BaseTexturePtr& get_bumpTexture();
+  void set_bumpTexture(const BaseTexturePtr& value);
+  bool get_disableLighting() const;
+  void set_disableLighting(bool value);
+  unsigned int get_maxSimultaneousLights() const;
+  void set_maxSimultaneousLights(unsigned int value);
+  bool get_bumpSuperimpose() const;
+  void set_bumpSuperimpose(bool value);
+  bool get_fresnelSeparate() const;
+  void set_fresnelSeparate(bool value);
+  bool get_bumpAffectsReflection() const;
+  void set_bumpAffectsReflection(bool value);
+  bool get_useLogarithmicDepth() const override;
+  void set_useLogarithmicDepth(bool value) override;
+  RenderTargetTexturePtr& get_refractionTexture();
+  RenderTargetTexturePtr& get_reflectionTexture();
+  bool get_renderTargetsEnabled() const;
 
 private:
   void _createRenderTargets(Scene* scene, const Vector2& renderTargetSize);
 
 public:
+  /*
+   * Public members
+   */
+  Property<WaterMaterial, BaseTexturePtr> bumpTexture;
   Color3 diffuseColor;
   Color3 specularColor;
   float specularPower;
+  Property<WaterMaterial, bool> disableLighting;
+  Property<WaterMaterial, unsigned int> maxSimultaneousLights;
   /**
-   * @param Represents the wind force
+   * Represents the wind force
    */
   float windForce;
   /**
-   * @param The direction of the wind in the plane (X, Z)
+   * The direction of the wind in the plane (X, Z)
    */
   Vector2 windDirection;
   /**
-   * @param Wave height, represents the height of the waves
+   * Wave height, represents the height of the waves
    */
   float waveHeight;
   /**
-   * @param Bump height, represents the bump height related to the
+   * Bump height, represents the bump height related to the
    * bump map
    */
   float bumpHeight;
   /**
-   * @param The water color blended with the reflection and refraction samplers
+   * Add a smaller moving bump to less steady waves
+   */
+  Property<WaterMaterial, bool> bumpSuperimpose;
+  /**
+   * Color refraction and reflection differently with .waterColor2 and
+   * .colorBlendFactor2. Non-linear (physically correct) fresnel
+   */
+  Property<WaterMaterial, bool> fresnelSeparate;
+  /**
+   * Bump Waves modify the reflection
+   */
+  Property<WaterMaterial, bool> bumpAffectsReflection;
+  /**
+   * The water color blended with the reflection and refraction samplers
    */
   Color3 waterColor;
   /**
-   * @param The blend factor related to the water color
+   * The blend factor related to the water color
    */
   float colorBlendFactor;
   /**
-   * @param The water color blended with the reflection (far)
+   * The water color blended with the reflection (far)
    */
   Color3 waterColor2;
   /**
-   * @param The blend factor related to the water color (reflection,
-   * far)
+   * The blend factor related to the water color (reflection, far)
    */
   float colorBlendFactor2;
   /**
-   * @param Represents the maximum length of a wave
+   * Represents the maximum length of a wave
    */
   float waveLength;
   /**
-   * @param Defines the waves speed
+   * Defines the waves speed
    */
   float waveSpeed;
 
+  ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> refractionTexture;
+  ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> reflectionTexture;
+  ReadOnlyProperty<WaterMaterial, bool> renderTargetsEnabled;
+
 private:
-  BaseTexture* _bumpTexture;
+  BaseTexturePtr _bumpTexture;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
 
@@ -111,27 +143,29 @@ private:
    * @param Add a smaller moving bump to less steady waves.
    */
   bool _bumpSuperimpose;
+
   /**
    * @param Color refraction and reflection differently with .waterColor2 and
    * .colorBlendFactor2. Non-linear (physically correct)
    * fresnel.
    */
   bool _fresnelSeparate;
+
   /**
    * @param Bump Waves modify the reflection.
    */
   bool _bumpAffectsReflection;
 
   AbstractMesh* _mesh;
-  std::unique_ptr<RenderTargetTexture> _refractionRTT;
-  std::unique_ptr<RenderTargetTexture> _reflectionRTT;
-  ShaderMaterial* _material;
+  RenderTargetTexturePtr _refractionRTT;
+  RenderTargetTexturePtr _reflectionRTT;
   Matrix _reflectionTransform;
   float _lastTime;
+  float _lastDeltaTime;
   int _renderId;
   // Needed for callbacks
   bool _isVisible;
-  Plane* _clipPlane;
+  nullable_t<Plane> _clipPlane;
   Matrix _savedViewMatrix;
   Matrix _mirrorMatrix;
   bool _useLogarithmicDepth;

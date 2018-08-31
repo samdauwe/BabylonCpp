@@ -13,47 +13,73 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT TerrainMaterial : public PushMaterial {
 
 public:
-  using TMD = TerrainMaterialDefines;
-
-public:
   TerrainMaterial(const std::string& name, Scene* scene);
-  ~TerrainMaterial();
+  ~TerrainMaterial() override;
 
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
-  BaseTexture* getAlphaTestTexture() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
+  BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables();
-  std::vector<BaseTexture*> getActiveTextures() const override;
-  bool hasTexture(BaseTexture* texture) const override;
+  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+  const string_t getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/
   static TerrainMaterial* Parse(const Json::value& source, Scene* scene,
                                 const std::string& rootUrl);
 
+protected:
+  BaseTexturePtr& get_mixTexture();
+  void set_mixTexture(const BaseTexturePtr& value);
+  TexturePtr& get_diffuseTexture1();
+  void set_diffuseTexture1(const TexturePtr& value);
+  TexturePtr& get_diffuseTexture2();
+  void set_diffuseTexture2(const TexturePtr& value);
+  TexturePtr& get_diffuseTexture3();
+  void set_diffuseTexture3(const TexturePtr& value);
+  TexturePtr& get_bumpTexture1();
+  void set_bumpTexture1(const TexturePtr& value);
+  TexturePtr& get_bumpTexture2();
+  void set_bumpTexture2(const TexturePtr& value);
+  TexturePtr& get_bumpTexture3();
+  void set_bumpTexture3(const TexturePtr& value);
+  bool get_disableLighting() const;
+  void set_disableLighting(bool value);
+  unsigned int get_maxSimultaneousLights() const;
+  void set_maxSimultaneousLights(unsigned int value);
+
 public:
+  Property<TerrainMaterial, BaseTexturePtr> mixTexture;
+  Property<TerrainMaterial, TexturePtr> diffuseTexture1;
+  Property<TerrainMaterial, TexturePtr> diffuseTexture2;
+  Property<TerrainMaterial, TexturePtr> diffuseTexture3;
+  Property<TerrainMaterial, TexturePtr> bumpTexture1;
+  Property<TerrainMaterial, TexturePtr> bumpTexture2;
+  Property<TerrainMaterial, TexturePtr> bumpTexture3;
   Color3 diffuseColor;
   Color3 specularColor;
   float specularPower;
+  Property<TerrainMaterial, bool> disableLighting;
+  Property<TerrainMaterial, unsigned int> maxSimultaneousLights;
 
 private:
-  BaseTexture* _mixTexture;
-  Texture* _diffuseTexture1;
-  Texture* _diffuseTexture2;
-  Texture* _diffuseTexture3;
-  Texture* _bumpTexture1;
-  Texture* _bumpTexture2;
-  Texture* _bumpTexture3;
+  BaseTexturePtr _mixTexture;
+  TexturePtr _diffuseTexture1;
+  TexturePtr _diffuseTexture2;
+  TexturePtr _diffuseTexture3;
+  TexturePtr _bumpTexture1;
+  TexturePtr _bumpTexture2;
+  TexturePtr _bumpTexture3;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
-  Matrix _worldViewProjectionMatrix;
   int _renderId;
 
 }; // end of class TerrainMaterial

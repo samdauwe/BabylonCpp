@@ -20,10 +20,28 @@ namespace MaterialsLibrary {
 
 TriPlanarMaterial::TriPlanarMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , mixTexture{this, &TriPlanarMaterial::get_mixTexture,
+                 &TriPlanarMaterial::set_mixTexture}
+    , diffuseTextureX{this, &TriPlanarMaterial::get_diffuseTextureX,
+                      &TriPlanarMaterial::set_diffuseTextureX}
+    , diffuseTextureY{this, &TriPlanarMaterial::get_diffuseTextureY,
+                      &TriPlanarMaterial::set_diffuseTextureY}
+    , diffuseTextureZ{this, &TriPlanarMaterial::get_diffuseTextureZ,
+                      &TriPlanarMaterial::set_diffuseTextureZ}
+    , normalTextureX{this, &TriPlanarMaterial::get_normalTextureX,
+                     &TriPlanarMaterial::set_normalTextureX}
+    , normalTextureY{this, &TriPlanarMaterial::get_normalTextureY,
+                     &TriPlanarMaterial::set_normalTextureY}
+    , normalTextureZ{this, &TriPlanarMaterial::get_normalTextureZ,
+                     &TriPlanarMaterial::set_normalTextureZ}
     , tileSize{1.f}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , specularColor{Color3(0.2f, 0.2f, 0.2f)}
     , specularPower{64.f}
+    , disableLighting{this, &TriPlanarMaterial::get_disableLighting,
+                      &TriPlanarMaterial::set_disableLighting}
+    , maxSimultaneousLights{this, &TriPlanarMaterial::get_maxSimultaneousLights,
+                            &TriPlanarMaterial::set_maxSimultaneousLights}
     , _mixTexture{nullptr}
     , _diffuseTextureX{nullptr}
     , _diffuseTextureY{nullptr}
@@ -42,17 +60,134 @@ TriPlanarMaterial::~TriPlanarMaterial()
 {
 }
 
-bool TriPlanarMaterial::needAlphaBlending()
+BaseTexturePtr& TriPlanarMaterial::get_mixTexture()
+{
+  return _mixTexture;
+}
+
+void TriPlanarMaterial::set_mixTexture(const BaseTexturePtr& value)
+{
+  if (_mixTexture != value) {
+    _mixTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+TexturePtr& TriPlanarMaterial::get_diffuseTextureX()
+{
+  return _diffuseTextureX;
+}
+
+void TriPlanarMaterial::set_diffuseTextureX(const TexturePtr& value)
+{
+  if (_diffuseTextureX != value) {
+    _diffuseTextureX = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+TexturePtr& TriPlanarMaterial::get_diffuseTextureY()
+{
+  return _diffuseTextureY;
+}
+
+void TriPlanarMaterial::set_diffuseTextureY(const TexturePtr& value)
+{
+  if (_diffuseTextureY != value) {
+    _diffuseTextureY = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+TexturePtr& TriPlanarMaterial::get_diffuseTextureZ()
+{
+  return _diffuseTextureZ;
+}
+
+void TriPlanarMaterial::set_diffuseTextureZ(const TexturePtr& value)
+{
+  if (_diffuseTextureZ != value) {
+    _diffuseTextureZ = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+TexturePtr& TriPlanarMaterial::get_normalTextureX()
+{
+  return _normalTextureX;
+}
+
+void TriPlanarMaterial::set_normalTextureX(const TexturePtr& value)
+{
+  if (_normalTextureX != value) {
+    _normalTextureX = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+TexturePtr& TriPlanarMaterial::get_normalTextureY()
+{
+  return _normalTextureY;
+}
+
+void TriPlanarMaterial::set_normalTextureY(const TexturePtr& value)
+{
+  if (_normalTextureY != value) {
+    _normalTextureY = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+TexturePtr& TriPlanarMaterial::get_normalTextureZ()
+{
+  return _normalTextureZ;
+}
+
+void TriPlanarMaterial::set_normalTextureZ(const TexturePtr& value)
+{
+  if (_normalTextureZ != value) {
+    _normalTextureZ = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+bool TriPlanarMaterial::get_disableLighting() const
+{
+  return _disableLighting;
+}
+
+void TriPlanarMaterial::set_disableLighting(bool value)
+{
+  if (_disableLighting != value) {
+    _disableLighting = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+unsigned int TriPlanarMaterial::get_maxSimultaneousLights() const
+{
+  return _maxSimultaneousLights;
+}
+
+void TriPlanarMaterial::set_maxSimultaneousLights(unsigned int value)
+{
+  if (_maxSimultaneousLights != value) {
+    _maxSimultaneousLights = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+bool TriPlanarMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
 
-bool TriPlanarMaterial::needAlphaTesting()
+bool TriPlanarMaterial::needAlphaTesting() const
 {
   return false;
 }
 
-BaseTexture* TriPlanarMaterial::getAlphaTestTexture()
+BaseTexturePtr TriPlanarMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -87,25 +222,10 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   if (defines._areTexturesDirty) {
     if (scene->texturesEnabled()) {
       if (StandardMaterial::DiffuseTextureEnabled()) {
-        std::vector<Texture*> textures{_diffuseTextureX, _diffuseTextureY,
-                                       _diffuseTextureZ};
-        const Uint32Array textureDefines{TPMD::DIFFUSEX, TPMD::DIFFUSEY,
-                                         TPMD::DIFFUSEZ};
-        for (unsigned int i = 0; i < textures.size(); i++) {
-          if (textures[i]) {
-            if (!textures[i]->isReady()) {
-              return false;
-            }
-            else {
-              defines.defines[textureDefines[i]] = true;
-            }
-          }
-        }
-      }
-      if (StandardMaterial::BumpTextureEnabled()) {
-        std::vector<Texture*> textures{_normalTextureX, _normalTextureY,
-                                       _normalTextureZ};
-        const Uint32Array textureDefines{TPMD::BUMPX, TPMD::BUMPY, TPMD::BUMPZ};
+        const std::vector<TexturePtr> textures{
+          _diffuseTextureX, _diffuseTextureY, _diffuseTextureZ};
+        const std::vector<std::string> textureDefines{"DIFFUSEX", "DIFFUSEY",
+                                                      "DIFFUSEZ"};
 
         for (unsigned int i = 0; i < textures.size(); i++) {
           if (textures[i]) {
@@ -113,7 +233,24 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
               return false;
             }
             else {
-              defines.defines[textureDefines[i]] = true;
+              defines.boolDef[textureDefines[i]] = true;
+            }
+          }
+        }
+      }
+      if (StandardMaterial::BumpTextureEnabled()) {
+        const std::vector<TexturePtr> textures{_normalTextureX, _normalTextureY,
+                                               _normalTextureZ};
+        const std::vector<std::string> textureDefines{"BUMPX", "BUMPY",
+                                                      "BUMPZ"};
+
+        for (unsigned int i = 0; i < textures.size(); i++) {
+          if (textures[i]) {
+            if (!textures[i]->isReady()) {
+              return false;
+            }
+            else {
+              defines.boolDef[textureDefines[i]] = true;
             }
           }
         }
@@ -122,24 +259,20 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    TPMD::LOGARITHMICDEPTH, TPMD::POINTSIZE, TPMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting,
-    TPMD::SPECULARTERM, TPMD::SHADOWFULLFLOAT);
+    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, TPMD::CLIPPLANE, TPMD::ALPHATEST,
-    TPMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, false, TPMD::NORMAL, TPMD::UV1, TPMD::UV2,
-    TPMD::VERTEXCOLOR, TPMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -148,32 +281,31 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[TPMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+                                              maxSimultaneousLights());
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs = {VertexBuffer::PositionKindChars};
 
-    if (defines[TPMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[TPMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  TPMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"triplanar"};
@@ -183,7 +315,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       "world",       "view",          "viewProjection", "vEyePosition",
       "vLightsType", "vDiffuseColor", "vSpecularColor", "vFogInfos",
       "vFogColor",   "pointSize",     "mBones",         "vClipPlane",
-      "tileSize"};
+      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "tileSize"};
 
     const std::vector<std::string> samplers{
       "diffuseSamplerX", "diffuseSamplerY", "diffuseSamplerZ",
@@ -209,7 +341,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       scene->getEngine()->createEffect(shaderName, options, engine), defines);
   }
 
-  if (!subMesh->effect()->isReady()) {
+  if (!subMesh->effect() || !subMesh->effect()->isReady()) {
     return false;
   }
 
@@ -231,7 +363,10 @@ void TriPlanarMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   }
   auto defines = *_defines;
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -271,27 +406,24 @@ void TriPlanarMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor,
                            alpha * mesh->visibility);
 
-  if (defines[TPMD::SPECULARTERM]) {
+  if (defines["SPECULARTERM"]) {
     _activeEffect->setColor4("vSpecularColor", specularColor, specularPower);
   }
 
   if (scene->lightsEnabled() && !_disableLighting) {
     MaterialHelper::BindLights(scene, mesh, _activeEffect, defines,
-                               _maxSimultaneousLights, TPMD::SPECULARTERM);
+                               maxSimultaneousLights());
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -301,9 +433,9 @@ void TriPlanarMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> TriPlanarMaterial::getAnimatables()
+std::vector<IAnimatablePtr> TriPlanarMaterial::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  std::vector<IAnimatablePtr> results;
 
   if (_mixTexture && _mixTexture->animations.size() > 0) {
     results.emplace_back(_mixTexture);
@@ -312,9 +444,9 @@ std::vector<IAnimatable*> TriPlanarMaterial::getAnimatables()
   return results;
 }
 
-std::vector<BaseTexture*> TriPlanarMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> TriPlanarMaterial::getActiveTextures() const
 {
-  auto activeTextures = Material::getActiveTextures();
+  auto activeTextures = PushMaterial::getActiveTextures();
 
   if (_diffuseTextureX) {
     activeTextures.emplace_back(_diffuseTextureX);
@@ -343,7 +475,7 @@ std::vector<BaseTexture*> TriPlanarMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool TriPlanarMaterial::hasTexture(BaseTexture* texture) const
+bool TriPlanarMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
   if (Material::hasTexture(texture)) {
     return true;
@@ -383,11 +515,11 @@ void TriPlanarMaterial::dispose(bool forceDisposeEffect,
     _mixTexture->dispose();
   }
 
-  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+  PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* TriPlanarMaterial::clone(const std::string& /*name*/,
-                                   bool /*cloneChildren*/) const
+MaterialPtr TriPlanarMaterial::clone(const std::string& /*name*/,
+                                     bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -395,6 +527,11 @@ Material* TriPlanarMaterial::clone(const std::string& /*name*/,
 Json::object TriPlanarMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t TriPlanarMaterial::getClassName() const
+{
+  return "TriPlanarMaterial";
 }
 
 TriPlanarMaterial* TriPlanarMaterial::Parse(const Json::value& /*source*/,
