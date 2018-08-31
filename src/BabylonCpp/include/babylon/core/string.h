@@ -483,6 +483,26 @@ inline string_t repeat(const string_t& str, size_t count)
  * by the new value.
  * @param search Required. The value that will be replaced by the replace value.
  * @param replace Required. The value to replace the search value with.
+ * @return A string in which the specified value has been replaced.
+ */
+inline string_t replace(string_t source, const string_t& search,
+                        const string_t& replace)
+{
+  size_t pos = 0;
+  while ((pos = source.find(search, pos)) != string_t::npos) {
+    source.replace(pos, search.length(), replace);
+    pos += replace.length();
+  }
+  return source;
+}
+
+/**
+ * @brief Searches a string for a specified value and replaces the specified
+ * values.
+ * @param source The source string where the specified value(s) should replaced
+ * by the new value.
+ * @param search Required. The value that will be replaced by the replace value.
+ * @param replace Required. The value to replace the search value with.
  */
 inline void replaceInPlace(string_t& source, const string_t& search,
                            const string_t& replace)
