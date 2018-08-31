@@ -374,7 +374,7 @@ std::vector<BaseTexturePtr> LavaMaterial::getActiveTextures() const
 
 bool LavaMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
-  if (Material::hasTexture(texture)) {
+  if (PushMaterial::hasTexture(texture)) {
     return true;
   }
 

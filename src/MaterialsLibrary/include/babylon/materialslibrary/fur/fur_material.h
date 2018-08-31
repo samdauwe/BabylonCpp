@@ -5,7 +5,6 @@
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/fur/fur_material_defines.h>
 #include <babylon/math/color3.h>
-#include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {

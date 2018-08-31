@@ -5,7 +5,6 @@
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/normal/normal_material_defines.h>
 #include <babylon/math/color3.h>
-#include <babylon/math/matrix.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {

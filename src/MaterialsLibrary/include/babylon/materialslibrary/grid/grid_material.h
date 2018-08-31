@@ -17,9 +17,6 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT GridMaterial : public PushMaterial {
 
 public:
-  using GMD = GridMaterialDefines;
-
-public:
   /**
    * @brief Constructor
    * @param name The name given to the material in order to identify it
