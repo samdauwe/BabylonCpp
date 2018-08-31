@@ -17,14 +17,17 @@ namespace MaterialsLibrary {
 
 GridMaterial::GridMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
-    , mainColor{Color3::White()}
-    , lineColor{Color3::Black()}
+    , mainColor{Color3::Black()}
+    , lineColor{Color3::Teal()}
     , gridRatio{1.f}
+    , gridOffset{Vector3::Zero()}
     , majorUnitFrequency{10.f}
     , minorUnitVisibility{0.33f}
     , opacity{1.f}
-    , _gridControl{
-        Vector4(gridRatio, majorUnitFrequency, minorUnitVisibility, opacity)}
+    , preMultiplyAlpha{false}
+    , _gridControl{Vector4(gridRatio, majorUnitFrequency, minorUnitVisibility,
+                           opacity)}
+    , _renderId{-1}
 {
 }
 
@@ -32,7 +35,7 @@ GridMaterial::~GridMaterial()
 {
 }
 
-bool GridMaterial::needAlphaBlending()
+bool GridMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
@@ -62,14 +65,18 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
   auto engine = scene->getEngine();
 
-  if (opacity < 1.f && !defines[GMD::TRANSPARENT]) {
-    defines.defines[GMD::TRANSPARENT] = true;
+  if (defines["TRANSPARENT"] != (opacity < 1.f)) {
+    defines.boolDef["TRANSPARENT"] = !defines["TRANSPARENT"];
+    defines.markAsUnprocessed();
+  }
+
+  if (defines["PREMULTIPLYALPHA"] != preMultiplyAlpha) {
+    defines.boolDef["PREMULTIPLYALPHA"] = !defines["PREMULTIPLYALPHA"];
     defines.markAsUnprocessed();
   }
 
   MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, false, fogEnabled(),
-                                        defines, GMD::LOGARITHMICDEPTH,
-                                        GMD::POINTSIZE, GMD::FOG);
+                                        false, defines);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -90,8 +97,8 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     // Uniforms
     const std::vector<std::string> uniforms{
-      "worldViewProjection", "mainColor", "lineColor", "gridControl",
-      "vFogInfos",           "vFogColor", "world",     "view"};
+      "projection", "worldView", "mainColor", "lineColor", "gridControl",
+      "gridOffset", "vFogInfos", "vFogColor", "world",     "view"};
 
     // Samplers
     const std::vector<std::string> samplers{};
@@ -131,19 +138,25 @@ void GridMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
   bindOnlyWorldMatrix(*world);
-  _activeEffect->setMatrix("worldViewProjection",
-                           world->multiply(scene->getTransformMatrix()));
+  _activeEffect->setMatrix("worldView",
+                           world->multiply(scene->getViewMatrix()));
   _activeEffect->setMatrix("view", scene->getViewMatrix());
+  _activeEffect->setMatrix("projection", scene->getProjectionMatrix());
 
   // Uniforms
   if (_mustRebind(scene, effect)) {
     _activeEffect->setColor3("mainColor", mainColor);
     _activeEffect->setColor3("lineColor", lineColor);
+
+    _activeEffect->setVector3("gridOffset", gridOffset);
 
     _gridControl.x = gridRatio;
     _gridControl.y = std::round(majorUnitFrequency);
@@ -162,8 +175,8 @@ void GridMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* GridMaterial::clone(const std::string& /*name*/,
-                              bool /*cloneChildren*/) const
+MaterialPtr GridMaterial::clone(const std::string& /*name*/,
+                                bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -171,6 +184,11 @@ Material* GridMaterial::clone(const std::string& /*name*/,
 Json::object GridMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t GridMaterial::getClassName() const
+{
+  return "GridMaterial";
 }
 
 GridMaterial* GridMaterial::Parse(const Json::value& /*source*/,

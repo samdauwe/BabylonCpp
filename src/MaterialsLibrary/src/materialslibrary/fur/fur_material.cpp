@@ -21,6 +21,10 @@ namespace MaterialsLibrary {
 
 FurMaterial::FurMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , diffuseTexture{this, &FurMaterial::get_diffuseTexture,
+                     &FurMaterial::set_diffuseTexture}
+    , heightTexture{this, &FurMaterial::get_heightTexture,
+                    &FurMaterial::set_heightTexture}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , furLength{1.f}
     , furAngle{0.f}
@@ -30,13 +34,18 @@ FurMaterial::FurMaterial(const std::string& iName, Scene* scene)
     , furGravity{Vector3(0.f, 0.f, 0.f)}
     , furSpeed{100.f}
     , furDensity{20.f}
+    , furOcclusion{0.f}
     , furTexture{nullptr}
+    , disableLighting{this, &FurMaterial::get_disableLighting,
+                      &FurMaterial::set_disableLighting}
+    , maxSimultaneousLights{this, &FurMaterial::get_maxSimultaneousLights,
+                            &FurMaterial::set_maxSimultaneousLights}
     , highLevelFur{true}
+    , furTime{this, &FurMaterial::get_furTime, &FurMaterial::set_furTime}
     , _diffuseTexture{nullptr}
     , _heightTexture{nullptr}
     , _disableLighting{false}
     , _maxSimultaneousLights{4}
-    , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
     , _furTime{0.f}
 {
@@ -46,46 +55,99 @@ FurMaterial::~FurMaterial()
 {
 }
 
-float FurMaterial::furTime() const
+BaseTexturePtr& FurMaterial::get_diffuseTexture()
+{
+  return _diffuseTexture;
+}
+
+void FurMaterial::set_diffuseTexture(const BaseTexturePtr& value)
+{
+  if (_diffuseTexture != value) {
+    _diffuseTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+BaseTexturePtr& FurMaterial::get_heightTexture()
+{
+  return _heightTexture;
+}
+
+void FurMaterial::set_heightTexture(const BaseTexturePtr& value)
+{
+  if (_heightTexture != value) {
+    _heightTexture = value;
+    _markAllSubMeshesAsTexturesDirty();
+  }
+}
+
+bool FurMaterial::get_disableLighting() const
+{
+  return _disableLighting;
+}
+
+void FurMaterial::set_disableLighting(bool value)
+{
+  if (_disableLighting != value) {
+    _disableLighting = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+unsigned int FurMaterial::get_maxSimultaneousLights() const
+{
+  return _maxSimultaneousLights;
+}
+
+void FurMaterial::set_maxSimultaneousLights(unsigned int value)
+{
+  if (_maxSimultaneousLights != value) {
+    _maxSimultaneousLights = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+float FurMaterial::get_furTime() const
 {
   return _furTime;
 }
 
-void FurMaterial::setFurTime(float newFurTime)
+void FurMaterial::set_furTime(float newFurTime)
 {
   _furTime = newFurTime;
 }
 
-bool FurMaterial::needAlphaBlending()
+bool FurMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f);
 }
 
-bool FurMaterial::needAlphaTesting()
+bool FurMaterial::needAlphaTesting() const
 {
   return false;
 }
 
-BaseTexture* FurMaterial::getAlphaTestTexture()
+BaseTexturePtr FurMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
 
 void FurMaterial::updateFur()
 {
-  for (unsigned int i = 1; i < _meshes.size(); ++i) {
-    if (auto offsetFur = static_cast<FurMaterial*>(_meshes[i]->material())) {
-      offsetFur->furLength       = furLength;
-      offsetFur->furAngle        = furAngle;
-      offsetFur->furGravity      = furGravity;
-      offsetFur->furSpacing      = furSpacing;
-      offsetFur->furSpeed        = furSpeed;
-      offsetFur->furColor        = furColor;
-      offsetFur->_diffuseTexture = _diffuseTexture;
-      offsetFur->furTexture      = furTexture;
-      offsetFur->highLevelFur    = highLevelFur;
-      offsetFur->setFurTime(furTime());
-      offsetFur->furDensity = furDensity;
+  for (const auto& mesh : _meshes) {
+    if (auto offsetFur
+        = ::std::dynamic_pointer_cast<FurMaterial>(mesh->material())) {
+      offsetFur->furLength      = furLength;
+      offsetFur->furAngle       = furAngle;
+      offsetFur->furGravity     = furGravity;
+      offsetFur->furSpacing     = furSpacing;
+      offsetFur->furSpeed       = furSpeed;
+      offsetFur->furColor       = furColor;
+      offsetFur->diffuseTexture = diffuseTexture();
+      offsetFur->furTexture     = furTexture;
+      offsetFur->highLevelFur   = highLevelFur;
+      offsetFur->furTime        = furTime();
+      offsetFur->furDensity     = furDensity;
     }
   }
 }
@@ -123,8 +185,8 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
           return false;
         }
         else {
-          defines._needUVs              = true;
-          defines.defines[FMD::DIFFUSE] = true;
+          defines._needUVs           = true;
+          defines.boolDef["DIFFUSE"] = true;
         }
       }
       if (_heightTexture && engine->getCaps().maxVertexTextureImageUnits) {
@@ -132,38 +194,34 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
           return false;
         }
         else {
-          defines._needUVs                = true;
-          defines.defines[FMD::HEIGHTMAP] = true;
+          defines._needUVs             = true;
+          defines.boolDef["HEIGHTMAP"] = true;
         }
       }
     }
   }
 
   // High level
-  if (highLevelFur != defines[FMD::HIGHLEVEL]) {
-    defines.defines[FMD::HIGHLEVEL] = true;
+  if (highLevelFur != defines["HIGHLEVEL"]) {
+    defines.boolDef["HIGHLEVEL"] = true;
     defines.markAsUnprocessed();
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    FMD::LOGARITHMICDEPTH, FMD::POINTSIZE, FMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   // Lights
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights, _disableLighting,
-    FMD::SPECULARTERM, FMD::SHADOWFULLFLOAT);
+    scene, mesh, defines, false, maxSimultaneousLights(), _disableLighting);
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, FMD::CLIPPLANE, FMD::ALPHATEST,
-    FMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, false, FMD::NORMAL, FMD::UV1, FMD::UV2,
-    FMD::VERTEXCOLOR, FMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -173,51 +231,51 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[FMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+                                              maxSimultaneousLights());
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[FMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[FMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[FMD::UV2]) {
+    if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (defines[FMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  FMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"fur"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",         "view",          "viewProjection", "vEyePosition",
-      "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",     "vDiffuseInfos", "mBones",         "vClipPlane",
-      "diffuseMatrix", "furLength",     "furAngle",       "furColor",
-      "furOffset",     "furGravity",    "furTime",        "furSpacing",
-      "furDensity"};
+      "world",       "view",          "viewProjection", "vEyePosition",
+      "vLightsType", "vDiffuseColor", "vFogInfos",      "vFogColor",
+      "pointSize",   "vDiffuseInfos", "mBones",         "vClipPlane",
+      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "diffuseMatrix",
+      "furLength",   "furAngle",      "furColor",       "furOffset",
+      "furGravity",  "furTime",       "furSpacing",     "furDensity",
+      "furOcclusion"};
     const std::vector<std::string> samplers{"diffuseSampler", "heightTexture",
                                             "furTexture"};
     const std::vector<std::string> uniformBuffers{};
@@ -229,12 +287,12 @@ bool FurMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.samplers              = std::move(samplers);
     options.materialDefines       = &defines;
     options.defines               = std::move(join);
-    options.maxSimultaneousLights = _maxSimultaneousLights;
+    options.maxSimultaneousLights = maxSimultaneousLights();
     options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
     options.indexParameters
-      = {{"maxSimultaneousLights", _maxSimultaneousLights}};
+      = {{"maxSimultaneousLights", maxSimultaneousLights()}};
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
     subMesh->setEffect(
@@ -261,7 +319,10 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
   _activeEffect = effect;
 
   // Matrices
@@ -295,10 +356,7 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", diffuseColor,
@@ -306,12 +364,12 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   if (scene->lightsEnabled() && !_disableLighting) {
     MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
-                               _maxSimultaneousLights, FMD::SPECULARTERM);
+                               maxSimultaneousLights());
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -327,6 +385,7 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
     _activeEffect->setFloat("furOffset", furOffset);
     _activeEffect->setFloat("furSpacing", furSpacing);
     _activeEffect->setFloat("furDensity", furDensity);
+    _activeEffect->setFloat("furOcclusion", furOcclusion);
 
     _furTime += getScene()->getEngine()->getDeltaTime() / furSpeed;
     _activeEffect->setFloat("furTime", _furTime);
@@ -337,9 +396,9 @@ void FurMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> FurMaterial::getAnimatables()
+std::vector<IAnimatablePtr> FurMaterial::getAnimatables()
 {
-  std::vector<IAnimatable*> results;
+  std::vector<IAnimatablePtr> results;
 
   if (_diffuseTexture && _diffuseTexture->animations.size() > 0) {
     results.emplace_back(_diffuseTexture);
@@ -352,7 +411,7 @@ std::vector<IAnimatable*> FurMaterial::getAnimatables()
   return results;
 }
 
-std::vector<BaseTexture*> FurMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> FurMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
 
@@ -367,9 +426,9 @@ std::vector<BaseTexture*> FurMaterial::getActiveTextures() const
   return activeTextures;
 }
 
-bool FurMaterial::hasTexture(BaseTexture* texture) const
+bool FurMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
-  if (Material::hasTexture(texture)) {
+  if (PushMaterial::hasTexture(texture)) {
     return true;
   }
 
@@ -400,8 +459,8 @@ void FurMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* FurMaterial::clone(const std::string& /*name*/,
-                             bool /*cloneChildren*/) const
+MaterialPtr FurMaterial::clone(const std::string& /*name*/,
+                               bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -409,6 +468,11 @@ Material* FurMaterial::clone(const std::string& /*name*/,
 Json::object FurMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t FurMaterial::getClassName() const
+{
+  return "FurMaterial";
 }
 
 FurMaterial* FurMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,

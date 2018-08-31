@@ -21,25 +21,26 @@ public:
 
 public:
   /**
-   * @brief constructor
+   * @brief Constructor
    * @param name The name given to the material in order to identify it
    * afterwards.
    * @param scene The scene the material is used in.
    */
   GridMaterial(const std::string& name, Scene* scene);
-  ~GridMaterial();
+  ~GridMaterial() override;
 
   /**
    * Returns whether or not the grid requires alpha blending.
    */
-  bool needAlphaBlending() override;
+  bool needAlphaBlending() const override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
+  const string_t getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/
@@ -63,6 +64,11 @@ public:
   float gridRatio;
 
   /**
+   * Allows setting an offset for the grid lines.
+   */
+  Vector3 gridOffset;
+
+  /**
    * The frequency of thicker lines.
    */
   float majorUnitFrequency;
@@ -76,6 +82,11 @@ public:
    * The grid opacity outside of the lines.
    */
   float opacity;
+
+  /**
+   * Determine RBG output is premultiplied by alpha value.
+   */
+  bool preMultiplyAlpha;
 
 private:
   Vector4 _gridControl;

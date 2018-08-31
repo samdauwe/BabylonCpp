@@ -14,28 +14,24 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT FurMaterial : public PushMaterial {
 
 public:
-  using FMD = FurMaterialDefines;
-
-public:
   FurMaterial(const std::string& name, Scene* scene);
-  ~FurMaterial();
+  ~FurMaterial() override;
 
-  float furTime() const;
-  void setFurTime(float newFurTime);
-  bool needAlphaBlending() override;
-  bool needAlphaTesting() override;
-  BaseTexture* getAlphaTestTexture() override;
+  bool needAlphaBlending() const override;
+  bool needAlphaTesting() const override;
+  BaseTexturePtr getAlphaTestTexture() override;
   void updateFur();
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  std::vector<IAnimatable*> getAnimatables();
-  std::vector<BaseTexture*> getActiveTextures() const override;
-  bool hasTexture(BaseTexture* texture) const override;
+  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
+  bool hasTexture(const BaseTexturePtr& texture) const override;
+  const string_t getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Material* clone(const std::string& name,
-                  bool cloneChildren = false) const override;
+  MaterialPtr clone(const std::string& name,
+                    bool cloneChildren = false) const override;
   Json::object serialize() const;
 
   /** Statics **/
@@ -50,7 +46,21 @@ public:
    */
   static std::vector<Mesh*> FurifyMesh(Mesh* sourceMesh, unsigned int quality);
 
+protected:
+  BaseTexturePtr& get_diffuseTexture();
+  void set_diffuseTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_heightTexture();
+  void set_heightTexture(const BaseTexturePtr& value);
+  bool get_disableLighting() const;
+  void set_disableLighting(bool value);
+  unsigned int get_maxSimultaneousLights() const;
+  void set_maxSimultaneousLights(unsigned int value);
+  float get_furTime() const;
+  void set_furTime(float newFurTime);
+
 public:
+  Property<FurMaterial, BaseTexturePtr> diffuseTexture;
+  Property<FurMaterial, BaseTexturePtr> heightTexture;
   Color3 diffuseColor;
   float furLength;
   float furAngle;
@@ -60,16 +70,19 @@ public:
   Vector3 furGravity;
   float furSpeed;
   float furDensity;
-  DynamicTexture* furTexture;
+  float furOcclusion;
+  DynamicTexturePtr furTexture;
+  Property<FurMaterial, bool> disableLighting;
+  Property<FurMaterial, unsigned int> maxSimultaneousLights;
   bool highLevelFur;
-  std::vector<AbstractMesh*> _meshes;
+  std::vector<AbstractMeshPtr> _meshes;
+  Property<FurMaterial, float> furTime;
 
 private:
-  BaseTexture* _diffuseTexture;
-  BaseTexture* _heightTexture;
+  BaseTexturePtr _diffuseTexture;
+  BaseTexturePtr _heightTexture;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
-  Matrix _worldViewProjectionMatrix;
   int _renderId;
   float _furTime;
   FurMaterialDefines _defines;

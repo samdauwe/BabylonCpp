@@ -18,15 +18,17 @@ namespace MaterialsLibrary {
 
 GradientMaterial::GradientMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , maxSimultaneousLights{this, &GradientMaterial::get_maxSimultaneousLights,
+                            &GradientMaterial::set_maxSimultaneousLights}
     , topColor{Color3(1.f, 0.f, 0.f)}
     , topColorAlpha{1.f}
     , bottomColor{Color3(0.f, 0.f, 1.f)}
     , bottomColorAlpha{1.f}
     , offset{0}
+    , scale{1.f}
     , smoothness{1.f}
     , disableLighting{false}
     , _maxSimultaneousLights{4}
-    , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
 {
 }
@@ -34,18 +36,30 @@ GradientMaterial::GradientMaterial(const std::string& iName, Scene* scene)
 GradientMaterial::~GradientMaterial()
 {
 }
+unsigned int GradientMaterial::get_maxSimultaneousLights() const
+{
+  return _maxSimultaneousLights;
+}
 
-bool GradientMaterial::needAlphaBlending()
+void GradientMaterial::set_maxSimultaneousLights(unsigned int value)
+{
+  if (_maxSimultaneousLights != value) {
+    _maxSimultaneousLights = value;
+    _markAllSubMeshesAsLightsDirty();
+  }
+}
+
+bool GradientMaterial::needAlphaBlending() const
 {
   return (alpha < 1.f || topColorAlpha < 1.f || bottomColorAlpha < 1.f);
 }
 
-bool GradientMaterial::needAlphaTesting()
+bool GradientMaterial::needAlphaTesting() const
 {
   return true;
 }
 
-BaseTexture* GradientMaterial::getAlphaTestTexture()
+BaseTexturePtr GradientMaterial::getAlphaTestTexture()
 {
   return nullptr;
 }
@@ -77,21 +91,17 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   auto engine = scene->getEngine();
 
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, GMD::CLIPPLANE, GMD::ALPHATEST,
-    GMD::INSTANCES);
+    scene, engine, defines, useInstances ? true : false);
 
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(), defines,
-    GMD::LOGARITHMICDEPTH, GMD::POINTSIZE, GMD::FOG);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, false, _maxSimultaneousLights, false,
-    GMD::SPECULARTERM, GMD::SHADOWFULLFLOAT);
+    scene, mesh, defines, false, _maxSimultaneousLights);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, false, true, false, GMD::NORMAL, GMD::UV1, GMD::UV2,
-    GMD::VERTEXCOLOR, GMD::VERTEXALPHA);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -101,50 +111,49 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
-    if (defines[GMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
-                                              _maxSimultaneousLights);
+    MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks);
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[GMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[GMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[GMD::UV2]) {
+    if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (defines[GMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  GMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
     const std::string shaderName{"gradient"};
     auto join = defines.toString();
     const std::vector<std::string> uniforms{
-      "world",         "view",          "viewProjection", "vEyePosition",
-      "vLightsType",   "vDiffuseColor", "vFogInfos",      "vFogColor",
-      "pointSize",     "vDiffuseInfos", "mBones",         "vClipPlane",
-      "diffuseMatrix", "depthValues",   "topColor",       "bottomColor",
-      "offset",        "smoothness"};
+      "world",       "view",          "viewProjection", "vEyePosition",
+      "vLightsType", "vDiffuseColor", "vFogInfos",      "vFogColor",
+      "pointSize",   "vDiffuseInfos", "mBones",         "vClipPlane",
+      "vClipPlane2", "vClipPlane3",   "vClipPlane4",    "diffuseMatrix",
+      "topColor",    "bottomColor",   "offset",         "smoothness",
+      "scale"};
     const std::vector<std::string> samplers{"diffuseSampler"};
     const std::vector<std::string> uniformBuffers{};
 
@@ -187,7 +196,11 @@ void GradientMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     return;
   }
 
-  auto effect   = subMesh->effect();
+  auto effect = subMesh->effect();
+  if (!effect) {
+    return;
+  }
+
   _activeEffect = effect;
 
   // Matrices
@@ -195,34 +208,30 @@ void GradientMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
-  MaterialHelper::BindBonesParameters(mesh, _effect);
+  MaterialHelper::BindBonesParameters(mesh, effect);
 
   if (_mustRebind(scene, effect)) {
     // Clip plane
-    MaterialHelper::BindClipPlane(_effect, scene);
+    MaterialHelper::BindClipPlane(effect, scene);
 
     // Point size
     if (pointsCloud()) {
       _activeEffect->setFloat("pointSize", pointSize);
     }
 
-    _activeEffect->setVector3("vEyePosition",
-                              scene->_mirroredCameraPosition ?
-                                *scene->_mirroredCameraPosition :
-                                scene->activeCamera->position);
+    MaterialHelper::BindEyePosition(effect, scene);
   }
 
   _activeEffect->setColor4("vDiffuseColor", _scaledDiffuse,
                            alpha * mesh->visibility);
 
   if (scene->lightsEnabled() && !disableLighting) {
-    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines,
-                               _maxSimultaneousLights, GMD::SPECULARTERM);
+    MaterialHelper::BindLights(scene, mesh, _activeEffect, *defines);
   }
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE) {
+      && scene->fogMode() != Scene::FOGMODE_NONE()) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 
@@ -232,24 +241,25 @@ void GradientMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _activeEffect->setColor4("topColor", topColor, topColorAlpha);
   _activeEffect->setColor4("bottomColor", bottomColor, bottomColorAlpha);
   _activeEffect->setFloat("offset", offset);
+  _activeEffect->setFloat("scale", scale);
   _activeEffect->setFloat("smoothness", smoothness);
 
   _afterBind(mesh, _activeEffect);
 }
 
-std::vector<IAnimatable*> GradientMaterial::getAnimatables()
+std::vector<IAnimatablePtr> GradientMaterial::getAnimatables()
 {
-  return std::vector<IAnimatable*>();
+  return std::vector<IAnimatablePtr>();
 }
 
 void GradientMaterial::dispose(bool forceDisposeEffect,
                                bool forceDisposeTextures)
 {
-  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+  PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Material* GradientMaterial::clone(const std::string& /*name*/,
-                                  bool /*cloneChildren*/) const
+MaterialPtr GradientMaterial::clone(const std::string& /*name*/,
+                                    bool /*cloneChildren*/) const
 {
   return nullptr;
 }
@@ -257,6 +267,11 @@ Material* GradientMaterial::clone(const std::string& /*name*/,
 Json::object GradientMaterial::serialize() const
 {
   return Json::object();
+}
+
+const string_t GradientMaterial::getClassName() const
+{
+  return "GradientMaterial";
 }
 
 GradientMaterial* GradientMaterial::Parse(const Json::value& /*source*/,

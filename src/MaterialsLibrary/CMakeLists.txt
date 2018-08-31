@@ -67,9 +67,9 @@ set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 file(GLOB MATERIALS_HDR_FILES   ${INCLUDE_PATH}/materialslibrary/cell/*.h
                                 ${INCLUDE_PATH}/materialslibrary/custom/*.h
                                 ${INCLUDE_PATH}/materialslibrary/fire/*.h
-                                #${INCLUDE_PATH}/materialslibrary/fur/*.h
-                                #${INCLUDE_PATH}/materialslibrary/gradient/*.h
-                                #${INCLUDE_PATH}/materialslibrary/grid/*.h
+                                ${INCLUDE_PATH}/materialslibrary/fur/*.h
+                                ${INCLUDE_PATH}/materialslibrary/gradient/*.h
+                                ${INCLUDE_PATH}/materialslibrary/grid/*.h
                                 #${INCLUDE_PATH}/materialslibrary/lava/*.h
                                 #${INCLUDE_PATH}/materialslibrary/normal/*.h
                                 #${INCLUDE_PATH}/materialslibrary/shadowonly/*.h
@@ -88,9 +88,9 @@ set(BABYLON_MATERIALS_HEADERS
 file(GLOB MATERIALS_SRC_FILES   ${SOURCE_PATH}/materialslibrary/cell/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/custom/*.cpp
                                 ${SOURCE_PATH}/materialslibrary/fire/*.cpp
-                                #${SOURCE_PATH}/materialslibrary/fur/*.cpp
-                                #${SOURCE_PATH}/materialslibrary/gradient/*.cpp
-                                #${SOURCE_PATH}/materialslibrary/grid/*.cpp
+                                ${SOURCE_PATH}/materialslibrary/fur/*.cpp
+                                ${SOURCE_PATH}/materialslibrary/gradient/*.cpp
+                                ${SOURCE_PATH}/materialslibrary/grid/*.cpp
                                 #${SOURCE_PATH}/materialslibrary/lava/*.cpp
                                 #${SOURCE_PATH}/materialslibrary/normal/*.cpp
                                 #${SOURCE_PATH}/materialslibrary/shadowonly/*.cpp

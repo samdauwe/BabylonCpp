@@ -5,8 +5,11 @@ namespace MaterialsLibrary {
 
 GridMaterialDefines::GridMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"TRANSPARENT", "FOG", "LOGARITHMICDEPTH", "POINTSIZE"};
-  rebuild();
+  boolDef = {
+    {"TRANSPARENT", false},     //
+    {"FOG", false},             //
+    {"PREMULTIPLYALPHA", false} //
+  };
 }
 
 GridMaterialDefines::~GridMaterialDefines()

@@ -9,11 +9,6 @@ namespace MaterialsLibrary {
 
 struct BABYLON_SHARED_EXPORT GridMaterialDefines : public MaterialDefines {
 
-  static constexpr unsigned int TRANSPARENT      = 0;
-  static constexpr unsigned int FOG              = 1;
-  static constexpr unsigned int LOGARITHMICDEPTH = 2;
-  static constexpr unsigned int POINTSIZE        = 3;
-
   GridMaterialDefines();
   ~GridMaterialDefines();
 
