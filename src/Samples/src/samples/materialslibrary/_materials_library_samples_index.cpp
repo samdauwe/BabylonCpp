@@ -5,6 +5,7 @@
 #include <babylon/samples/materialslibrary/gradient_material_sphere_scene.h>
 #include <babylon/samples/materialslibrary/grid_material_scene.h>
 #include <babylon/samples/materialslibrary/normal_material_scene.h>
+#include <babylon/samples/materialslibrary/simple_material_scene.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -42,6 +43,12 @@ _MaterialsLibrarySamplesIndex::_MaterialsLibrarySamplesIndex()
     true,                                                      //
     [](ICanvas* iCanvas) {                                     //
       return ::std::make_unique<NormalMaterialScene>(iCanvas); //
+    });                                                        //
+  // Simple Material Scene
+  _samples["SimpleMaterialScene"] = ::std::make_tuple(
+    true,                                                      //
+    [](ICanvas* iCanvas) {                                     //
+      return ::std::make_unique<SimpleMaterialScene>(iCanvas); //
     });                                                        //
 }
 

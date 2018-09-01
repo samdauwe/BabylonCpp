@@ -9,7 +9,9 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/texture.h>
+#include <babylon/materialslibrary/simple/simple_fragment_fx.h>
+#include <babylon/materialslibrary/simple/simple_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -32,18 +34,23 @@ SimpleMaterial::SimpleMaterial(const std::string& iName, Scene* scene)
     , _maxSimultaneousLights{4}
     , _renderId{-1}
 {
+  // Vertex shader
+  Effect::ShadersStore["simpleVertexShader"] = simpleVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore["simplePixelShader"] = simplePixelShader;
 }
 
 SimpleMaterial::~SimpleMaterial()
 {
 }
 
-BaseTexturePtr& SimpleMaterial::get_diffuseTexture()
+TexturePtr& SimpleMaterial::get_diffuseTexture()
 {
   return _diffuseTexture;
 }
 
-void SimpleMaterial::set_diffuseTexture(const BaseTexturePtr& value)
+void SimpleMaterial::set_diffuseTexture(const TexturePtr& value)
 {
   if (_diffuseTexture != value) {
     _diffuseTexture = value;

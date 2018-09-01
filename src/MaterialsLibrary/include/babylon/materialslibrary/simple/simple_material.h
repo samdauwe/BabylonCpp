@@ -9,10 +9,21 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class SimpleMaterial;
+using SimpleMaterialPtr = shared_ptr_t<SimpleMaterial>;
+
 class BABYLON_SHARED_EXPORT SimpleMaterial : public PushMaterial {
 
 public:
-  SimpleMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static SimpleMaterialPtr New(Ts&&... args)
+  {
+    auto material = shared_ptr_t<SimpleMaterial>(
+      new SimpleMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~SimpleMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -36,21 +47,23 @@ public:
                                const std::string& rootUrl);
 
 protected:
-  BaseTexturePtr& get_diffuseTexture();
-  void set_diffuseTexture(const BaseTexturePtr& value);
+  SimpleMaterial(const std::string& name, Scene* scene);
+
+  TexturePtr& get_diffuseTexture();
+  void set_diffuseTexture(const TexturePtr& value);
   bool get_disableLighting() const;
   void set_disableLighting(bool value);
   unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
 
 public:
-  Property<SimpleMaterial, BaseTexturePtr> diffuseTexture;
+  Property<SimpleMaterial, TexturePtr> diffuseTexture;
   Color3 diffuseColor;
   Property<SimpleMaterial, bool> disableLighting;
   Property<SimpleMaterial, unsigned int> maxSimultaneousLights;
 
 private:
-  BaseTexturePtr _diffuseTexture;
+  TexturePtr _diffuseTexture;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;
   int _renderId;
