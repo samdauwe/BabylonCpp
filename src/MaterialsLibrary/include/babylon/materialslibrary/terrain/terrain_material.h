@@ -9,10 +9,21 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class TerrainMaterial;
+using TerrainMaterialPtr = shared_ptr_t<TerrainMaterial>;
+
 class BABYLON_SHARED_EXPORT TerrainMaterial : public PushMaterial {
 
 public:
-  TerrainMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static TerrainMaterialPtr New(Ts&&... args)
+  {
+    auto material = shared_ptr_t<TerrainMaterial>(
+      new TerrainMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~TerrainMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -36,6 +47,8 @@ public:
                                 const std::string& rootUrl);
 
 protected:
+  TerrainMaterial(const std::string& name, Scene* scene);
+
   BaseTexturePtr& get_mixTexture();
   void set_mixTexture(const BaseTexturePtr& value);
   TexturePtr& get_diffuseTexture1();
