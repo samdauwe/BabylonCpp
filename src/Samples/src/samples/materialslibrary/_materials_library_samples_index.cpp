@@ -3,6 +3,7 @@
 #include <babylon/samples/materialslibrary/cell_material_scene.h>
 #include <babylon/samples/materialslibrary/gradient_material_scene.h>
 #include <babylon/samples/materialslibrary/gradient_material_sphere_scene.h>
+#include <babylon/samples/materialslibrary/grid_material_scene.h>
 #include <babylon/samples/materialslibrary/normal_material_scene.h>
 
 namespace BABYLON {
@@ -30,6 +31,12 @@ _MaterialsLibrarySamplesIndex::_MaterialsLibrarySamplesIndex()
     [](ICanvas* iCanvas) {                                             //
       return ::std::make_unique<GradientMaterialSphereScene>(iCanvas); //
     });                                                                //
+  // Grid Material Scene
+  _samples["GridMaterialScene"] = ::std::make_tuple(
+    true,                                                    //
+    [](ICanvas* iCanvas) {                                   //
+      return ::std::make_unique<GridMaterialScene>(iCanvas); //
+    });                                                      //
   // Normal Material Scene
   _samples["NormalMaterialScene"] = ::std::make_tuple(
     true,                                                      //

@@ -7,6 +7,8 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materialslibrary/grid/grid_fragment_fx.h>
+#include <babylon/materialslibrary/grid/grid_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -29,6 +31,11 @@ GridMaterial::GridMaterial(const std::string& iName, Scene* scene)
                            opacity)}
     , _renderId{-1}
 {
+  // Vertex shader
+  Effect::ShadersStore["gridVertexShader"] = gridVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore["gridPixelShader"] = gridPixelShader;
 }
 
 GridMaterial::~GridMaterial()
@@ -37,7 +44,12 @@ GridMaterial::~GridMaterial()
 
 bool GridMaterial::needAlphaBlending() const
 {
-  return (alpha < 1.f);
+  return (opacity < 1.f);
+}
+
+bool GridMaterial::needAlphaBlendingForMesh(const AbstractMesh& /*mesh*/) const
+{
+  return needAlphaBlending();
 }
 
 bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
@@ -87,11 +99,6 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     std::vector<std::string> attribs{VertexBuffer::PositionKindChars,
                                      VertexBuffer::NormalKindChars};
 
-    // Effect
-    auto shaderName = scene->getEngine()->getCaps().standardDerivatives ?
-                        "grid" :
-                        "legacygrid";
-
     // Defines
     const std::string join = defines.toString();
 
@@ -115,7 +122,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.onError               = onError;
 
     subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine), defines);
+      scene->getEngine()->createEffect("grid", options, engine), defines);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {

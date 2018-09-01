@@ -10,6 +10,9 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class GridMaterial;
+using GridMaterialPtr = shared_ptr_t<GridMaterial>;
+
 /**
  * @brief The grid materials allows you to wrap any shape with a grid.
  * Colors are customizable.
@@ -17,19 +20,22 @@ namespace MaterialsLibrary {
 class BABYLON_SHARED_EXPORT GridMaterial : public PushMaterial {
 
 public:
-  /**
-   * @brief Constructor
-   * @param name The name given to the material in order to identify it
-   * afterwards.
-   * @param scene The scene the material is used in.
-   */
-  GridMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static GridMaterialPtr New(Ts&&... args)
+  {
+    auto material = shared_ptr_t<GridMaterial>(
+      new GridMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~GridMaterial() override;
 
   /**
    * Returns whether or not the grid requires alpha blending.
    */
   bool needAlphaBlending() const override;
+  bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
@@ -43,6 +49,15 @@ public:
   /** Statics **/
   static GridMaterial* Parse(const Json::value& source, Scene* scene,
                              const std::string& rootUrl);
+
+protected:
+  /**
+   * @brief Constructor
+   * @param name The name given to the material in order to identify it
+   * afterwards.
+   * @param scene The scene the material is used in.
+   */
+  GridMaterial(const std::string& name, Scene* scene);
 
 public:
   /**
