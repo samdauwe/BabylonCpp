@@ -1,11 +1,11 @@
-﻿#ifndef BABYLON_MATERIALS_LIBRARY_TERRAIN_TERRAIN_VERTEX_FX_H
-#define BABYLON_MATERIALS_LIBRARY_TERRAIN_TERRAIN_VERTEX_FX_H
+﻿#ifndef BABYLON_MATERIALS_LIBRARY_MIX_MIX_VERTEX_FX_H
+#define BABYLON_MATERIALS_LIBRARY_MIX_MIX_VERTEX_FX_H
 
 namespace BABYLON {
 
-extern const char* terrainVertexShader;
+extern const char* mixVertexShader;
 
-const char* terrainVertexShader
+const char* mixVertexShader
   = "#ifdef GL_ES\n"
     "precision highp float;\n"
     "#endif\n"
@@ -111,4 +111,4 @@ const char* terrainVertexShader
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_MATERIALS_LIBRARY_TERRAIN_TERRAIN_VERTEX_FX_H
+#endif // end of BABYLON_MATERIALS_LIBRARY_MIX_MIX_VERTEX_FX_H
