@@ -18,9 +18,9 @@
 
 namespace BABYLON {
 
-unordered_map_t<string_t, const char*>& Effect::ShadersStore
+unordered_map_t<string_t, string_t>& Effect::ShadersStore
   = EffectShadersStore().shaders();
-unordered_map_t<string_t, const char*>& Effect::IncludesShadersStore
+unordered_map_t<string_t, string_t>& Effect::IncludesShadersStore
   = EffectIncludesShadersStore().shaders();
 
 std::size_t Effect::_uniqueIdSeed = 0;
@@ -296,7 +296,7 @@ void Effect::_loadVertexShader(
   const string_t vertexShaderName = vertex + "VertexShader";
   if (stl_util::contains(Effect::ShadersStore, vertexShaderName)) {
     const string_t vertexShaderName = vertex + "VertexShader";
-    callback(string_t(Effect::ShadersStore[vertexShaderName]));
+    callback(Effect::ShadersStore[vertexShaderName]);
     return;
   }
 
@@ -328,13 +328,13 @@ void Effect::_loadFragmentShader(
   // Is in local store ?
   string_t fragmentShaderName = fragment + "PixelShader";
   if (stl_util::contains(Effect::ShadersStore, fragmentShaderName)) {
-    callback(string_t(Effect::ShadersStore[fragmentShaderName]));
+    callback(Effect::ShadersStore[fragmentShaderName]);
     return;
   }
 
   fragmentShaderName = fragment + "FragmentShader";
   if (stl_util::contains(Effect::ShadersStore, fragmentShaderName)) {
-    callback(string_t(Effect::ShadersStore[fragmentShaderName]));
+    callback(Effect::ShadersStore[fragmentShaderName]);
     return;
   }
 

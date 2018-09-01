@@ -11,7 +11,7 @@ const char* pbrUboDeclaration
     "uniform Material\n"
     "{\n"
     "  uniform vec2 vAlbedoInfos;\n"
-    "  uniform vec3 vAmbientInfos;\n"
+    "  uniform vec4 vAmbientInfos;\n"
     "  uniform vec2 vOpacityInfos;\n"
     "  uniform vec2 vEmissiveInfos;\n"
     "  uniform vec2 vLightmapInfos;\n"

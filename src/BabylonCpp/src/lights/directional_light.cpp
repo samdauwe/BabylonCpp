@@ -209,8 +209,7 @@ float DirectionalLight::getDepthMaxZ(const Camera& /*activeCamera*/) const
 void DirectionalLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                                    unsigned int lightIndex)
 {
-  defines.resizeLights(lightIndex);
-  defines.dirlights[lightIndex] = true;
+  defines.boolDef["DIRLIGHT" + ::std::to_string(lightIndex)] = true;
 }
 
 } // end of namespace BABYLON

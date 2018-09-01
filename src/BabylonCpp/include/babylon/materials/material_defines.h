@@ -14,10 +14,9 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   MaterialDefines();
   virtual ~MaterialDefines();
 
-  bool operator[](unsigned int define) const;
+  bool operator[](const string_t& define) const;
   bool operator==(const MaterialDefines& rhs) const;
   bool operator!=(const MaterialDefines& rhs) const;
-  void resizeLights(unsigned int lightIndex);
   friend std::ostream& operator<<(std::ostream& os,
                                   const MaterialDefines& materialDefines);
 
@@ -104,59 +103,10 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   virtual string_t toString() const override;
 
   // Properties
-  vector_t<bool> defines;
-  vector_t<string_t> _keys;
-
-  unsigned int NUM_BONE_INFLUENCERS;
-  unsigned int BonesPerMesh;
-  unsigned int NUM_MORPH_INFLUENCERS;
-
-  /**
-   * The direct UV channel to use.
-   */
-  unsigned int DIFFUSEDIRECTUV;
-  unsigned int AMBIENTDIRECTUV;
-  unsigned int OPACITYDIRECTUV;
-  unsigned int EMISSIVEDIRECTUV;
-  unsigned int SPECULARDIRECTUV;
-  unsigned int BUMPDIRECTUV;
-  unsigned int LIGHTMAPDIRECTUV;
-
-  // PBR Material
-  unsigned int ALBEDODIRECTUV;
-  unsigned int REFLECTIVITYDIRECTUV;
-  unsigned int MICROSURFACEMAPDIRECTUV;
-  string_t ALPHATESTVALUE;
-
-  vector_t<bool> lights;
-  vector_t<bool> pointlights;
-  vector_t<bool> dirlights;
-  vector_t<bool> hemilights;
-  vector_t<bool> spotlights;
-  vector_t<bool> shadows;
-  vector_t<bool> shadowesms;
-  vector_t<bool> shadowcloseesms;
-  vector_t<bool> shadowpcsss;
-  vector_t<bool> shadowpcfs;
-  vector_t<bool> shadowpoissons;
-  vector_t<bool> shadowcubes;
-  vector_t<bool> projectedLightTexture;
-  vector_t<bool> shadowlowqualities;
-  vector_t<bool> shadowmediumqualities;
-  vector_t<bool> shadowhighqualities;
-
-  bool TANGENT;
-  bool SHADOWS;
-  bool LIGHTMAPEXCLUDED;
-  vector_t<bool> lightmapexcluded;
-  vector_t<bool> lightmapnospecular;
-
-  // FallOff
-  vector_t<bool> lightfalloffphysicals;
-  vector_t<bool> lightfalloffgltfs;
-  vector_t<bool> lightfalloffstandards;
-
-  bool USERIGHTHANDEDSYSTEM;
+  unordered_map_t<string_t, bool> boolDef;
+  unordered_map_t<string_t, unsigned int> intDef;
+  unordered_map_t<string_t, float> floatDef;
+  unordered_map_t<string_t, string_t> stringDef;
 
   bool _isDirty;
   /** Hidden */

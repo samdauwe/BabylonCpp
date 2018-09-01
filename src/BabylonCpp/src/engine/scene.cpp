@@ -112,9 +112,12 @@ Scene::Scene(Engine* engine)
                      &Scene::set_forceWireframe}
     , forcePointsCloud{this, &Scene::get_forcePointsCloud,
                        &Scene::set_forcePointsCloud}
+    , clipPlane{nullopt_t}
+    , clipPlane2{nullopt_t}
+    , clipPlane3{nullopt_t}
+    , clipPlane4{nullopt_t}
     , forceShowBoundingBoxes{this, &Scene::get_forceShowBoundingBoxes,
                              &Scene::set_forceShowBoundingBoxes}
-    , _clipPlane{nullptr}
     , animationsEnabled{true}
     , animationPropertiesOverride{this, &Scene::get_animationPropertiesOverride,
                                   &Scene::set_animationPropertiesOverride}
@@ -663,21 +666,6 @@ void Scene::set_geometryBufferRenderer(const GeometryBufferRendererPtr& value)
   if (value && value->isSupported()) {
     _geometryBufferRenderer = value;
   }
-}
-
-Plane* Scene::clipPlane()
-{
-  return _clipPlane ? _clipPlane.get() : nullptr;
-}
-
-void Scene::setClipPlane(const Plane& plane)
-{
-  _clipPlane = ::std::make_unique<Plane>(plane);
-}
-
-void Scene::resetClipPlane()
-{
-  _clipPlane.reset(nullptr);
 }
 
 void Scene::setMirroredCameraPosition(const Vector3& newPosition)

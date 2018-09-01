@@ -143,9 +143,6 @@ public:
    */
   unsigned int getInternalStep() const;
 
-  Plane* clipPlane();
-  void setClipPlane(const Plane& plane);
-  void resetClipPlane();
   void setMirroredCameraPosition(const Vector3& newPosition);
 
   /**
@@ -2329,14 +2326,29 @@ public:
   Property<Scene, bool> forcePointsCloud;
 
   /**
+   * Gets or sets the active clipplane 1
+   */
+  nullable_t<Plane> clipPlane;
+
+  /**
+   * Gets or sets the active clipplane 2
+   */
+  nullable_t<Plane> clipPlane2;
+
+  /**
+   * Gets or sets the active clipplane 3
+   */
+  nullable_t<Plane> clipPlane3;
+
+  /**
+   * Gets or sets the active clipplane 4
+   */
+  nullable_t<Plane> clipPlane4;
+
+  /**
    * Gets or sets a boolean indicating if all bounding boxes must be rendered
    */
   Property<Scene, bool> forceShowBoundingBoxes;
-
-  /**
-   * Gets or sets the active clipplane
-   */
-  unique_ptr_t<Plane> _clipPlane;
 
   /**
    * Gets or sets a boolean indicating if animations are enabled

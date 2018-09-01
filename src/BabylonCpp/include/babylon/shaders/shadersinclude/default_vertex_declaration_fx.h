@@ -45,6 +45,10 @@ const char* defaultVertexDeclaration
     "uniform mat4 bumpMatrix;\n"
     "#endif\n"
     "\n"
+    "#ifdef REFLECTION\n"
+    "uniform mat4 reflectionMatrix;\n"
+    "#endif\n"
+    "\n"
     "#ifdef POINTSIZE\n"
     "  uniform float pointSize;\n"
     "#endif\n";

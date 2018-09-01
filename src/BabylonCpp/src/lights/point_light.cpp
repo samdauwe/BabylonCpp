@@ -160,8 +160,7 @@ void PointLight::transferToEffect(Effect* /*effect*/,
 void PointLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                              unsigned int lightIndex)
 {
-  defines.resizeLights(lightIndex);
-  defines.pointlights[lightIndex] = true;
+  defines.boolDef["POINTLIGHT" + ::std::to_string(lightIndex)] = true;
 }
 
 } // end of namespace BABYLON

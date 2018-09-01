@@ -255,7 +255,7 @@ bool BackgroundMaterial::needAlphaBlending() const
 
 bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                            BaseSubMesh* subMesh,
-                                           bool /*useInstances*/)
+                                           bool useInstances)
 {
   if (subMesh->effect() && isFrozen()) {
     if (_wasPreviouslyReady) {
@@ -280,8 +280,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Lights
   MaterialHelper::PrepareDefinesForLights(scene, mesh, defines, false,
-                                          _maxSimultaneousLights, false,
-                                          BMD::SPECULARTERM, BMD::SHADOWFLOAT);
+                                          _maxSimultaneousLights);
   defines._needNormals = true;
 
   // Textures
@@ -289,7 +288,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     defines._needUVs = false;
     if (scene->texturesEnabled()) {
       if (scene->getEngine()->getCaps().textureLOD) {
-        defines.defines[BMD::TEXTURELODSUPPORT] = true;
+        defines.boolDef["TEXTURELODSUPPORT"] = true;
       }
 
       if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
@@ -298,17 +297,16 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
 
         MaterialHelper::PrepareDefinesForMergedUV(_diffuseTexture, defines,
-                                                  BMD::DIFFUSE, "DIFFUSE",
-                                                  BMD::MAINUV1, BMD::MAINUV2);
-        defines.defines[BMD::DIFFUSEHASALPHA] = _diffuseTexture->hasAlpha();
-        defines.defines[BMD::GAMMADIFFUSE]    = _diffuseTexture->gammaSpace;
-        defines.defines[BMD::OPACITYFRESNEL]  = _opacityFresnel;
+                                                  "DIFFUSE");
+        defines.boolDef["DIFFUSEHASALPHA"] = _diffuseTexture->hasAlpha();
+        defines.boolDef["GAMMADIFFUSE"]    = _diffuseTexture->gammaSpace;
+        defines.boolDef["OPACITYFRESNEL"]  = _opacityFresnel;
       }
       else {
-        defines.defines[BMD::DIFFUSE]         = false;
-        defines.defines[BMD::DIFFUSEHASALPHA] = false;
-        defines.defines[BMD::GAMMADIFFUSE]    = false;
-        defines.defines[BMD::OPACITYFRESNEL]  = false;
+        defines.boolDef["DIFFUSE"]         = false;
+        defines.boolDef["DIFFUSEHASALPHA"] = false;
+        defines.boolDef["GAMMADIFFUSE"]    = false;
+        defines.boolDef["OPACITYFRESNEL"]  = false;
       }
 
       auto reflectionTexture = _reflectionTexture;
@@ -317,63 +315,64 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
 
-        defines.defines[BMD::REFLECTION]      = true;
-        defines.defines[BMD::GAMMAREFLECTION] = reflectionTexture->gammaSpace;
-        defines.defines[BMD::RGBDREFLECTION]  = reflectionTexture->isRGBD();
-        defines.defines[BMD::REFLECTIONBLUR]  = _reflectionBlur > 0;
-        defines.defines[BMD::REFLECTIONMAP_OPPOSITEZ]
+        defines.boolDef["REFLECTION"]      = true;
+        defines.boolDef["GAMMAREFLECTION"] = reflectionTexture->gammaSpace;
+        defines.boolDef["RGBDREFLECTION"]  = reflectionTexture->isRGBD();
+        defines.boolDef["REFLECTIONBLUR"]  = _reflectionBlur > 0;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]
           = getScene()->useRightHandedSystem() ? !reflectionTexture->invertZ :
                                                  reflectionTexture->invertZ;
-        defines.defines[BMD::LODINREFLECTIONALPHA]
+        defines.boolDef["LODINREFLECTIONALPHA"]
           = reflectionTexture->lodLevelInAlpha;
-        defines.defines[BMD::EQUIRECTANGULAR_RELFECTION_FOV]
+        defines.boolDef["EQUIRECTANGULAR_RELFECTION_FOV"]
           = useEquirectangularFOV;
-        defines.defines[BMD::REFLECTIONBGR] = switchToBGR;
+        defines.boolDef["REFLECTIONBGR"] = switchToBGR;
 
         if (reflectionTexture->coordinatesMode
             == TextureConstants::INVCUBIC_MODE) {
-          defines.defines[BMD::INVERTCUBICMAP] = true;
+          defines.boolDef["INVERTCUBICMAP"] = true;
         }
 
-        defines.defines[BMD::REFLECTIONMAP_3D] = reflectionTexture->isCube;
+        defines.boolDef["REFLECTIONMAP_3D"] = reflectionTexture->isCube;
 
         switch (reflectionTexture->coordinatesMode) {
           case TextureConstants::EXPLICIT_MODE:
-            defines.defines[BMD::REFLECTIONMAP_EXPLICIT] = true;
+            defines.boolDef["REFLECTIONMAP_EXPLICIT"] = true;
             break;
           case TextureConstants::PLANAR_MODE:
-            defines.defines[BMD::REFLECTIONMAP_PLANAR] = true;
+            defines.boolDef["REFLECTIONMAP_PLANAR"] = true;
             break;
           case TextureConstants::PROJECTION_MODE:
-            defines.defines[BMD::REFLECTIONMAP_PROJECTION] = true;
+            defines.boolDef["REFLECTIONMAP_PROJECTION"] = true;
             break;
           case TextureConstants::SKYBOX_MODE:
-            defines.defines[BMD::REFLECTIONMAP_SKYBOX]             = true;
-            defines.defines[BMD::REFLECTIONMAP_SKYBOX_TRANSFORMED] = true;
+            defines.boolDef["REFLECTIONMAP_SKYBOX"] = true;
+            defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]
+              = !reflectionTexture->getReflectionTextureMatrix()->isIdentity();
             break;
           case TextureConstants::SPHERICAL_MODE:
-            defines.defines[BMD::REFLECTIONMAP_SPHERICAL] = true;
+            defines.boolDef["REFLECTIONMAP_SPHERICAL"] = true;
             break;
           case TextureConstants::EQUIRECTANGULAR_MODE:
-            defines.defines[BMD::REFLECTIONMAP_EQUIRECTANGULAR] = true;
+            defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR"] = true;
             break;
           case TextureConstants::FIXED_EQUIRECTANGULAR_MODE:
-            defines.defines[BMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED] = true;
+            defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR_FIXED"] = true;
             break;
           case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
-            defines.defines[BMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED]
+            defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"]
               = true;
             break;
           case TextureConstants::CUBIC_MODE:
           case TextureConstants::INVCUBIC_MODE:
           default:
-            defines.defines[BMD::REFLECTIONMAP_CUBIC] = true;
+            defines.boolDef["REFLECTIONMAP_CUBIC"] = true;
             break;
         }
 
         if (reflectionFresnel()) {
-          defines.defines[BMD::REFLECTIONFRESNEL] = true;
-          defines.defines[BMD::REFLECTIONFALLOFF]
+          defines.boolDef["REFLECTIONFRESNEL"] = true;
+          defines.boolDef["REFLECTIONFALLOFF"]
             = reflectionFalloffDistance() > 0;
 
           _reflectionControls.x = reflectionAmount();
@@ -382,44 +381,43 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           _reflectionControls.w = 1.f / reflectionFalloffDistance();
         }
         else {
-          defines.defines[BMD::REFLECTIONFRESNEL] = false;
-          defines.defines[BMD::REFLECTIONFALLOFF] = false;
+          defines.boolDef["REFLECTIONFRESNEL"] = false;
+          defines.boolDef["REFLECTIONFALLOFF"] = false;
         }
       }
       else {
-        defines.defines[BMD::REFLECTION]                          = false;
-        defines.defines[BMD::REFLECTIONFRESNEL]                   = false;
-        defines.defines[BMD::REFLECTIONFALLOFF]                   = false;
-        defines.defines[BMD::REFLECTIONBLUR]                      = false;
-        defines.defines[BMD::REFLECTIONMAP_3D]                    = false;
-        defines.defines[BMD::REFLECTIONMAP_SPHERICAL]             = false;
-        defines.defines[BMD::REFLECTIONMAP_PLANAR]                = false;
-        defines.defines[BMD::REFLECTIONMAP_CUBIC]                 = false;
-        defines.defines[BMD::REFLECTIONMAP_PROJECTION]            = false;
-        defines.defines[BMD::REFLECTIONMAP_SKYBOX]                = false;
-        defines.defines[BMD::REFLECTIONMAP_SKYBOX_TRANSFORMED]    = false;
-        defines.defines[BMD::REFLECTIONMAP_EXPLICIT]              = false;
-        defines.defines[BMD::REFLECTIONMAP_EQUIRECTANGULAR]       = false;
-        defines.defines[BMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED] = false;
-        defines.defines[BMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED]
-          = false;
-        defines.defines[BMD::INVERTCUBICMAP]          = false;
-        defines.defines[BMD::REFLECTIONMAP_OPPOSITEZ] = false;
-        defines.defines[BMD::LODINREFLECTIONALPHA]    = false;
-        defines.defines[BMD::GAMMAREFLECTION]         = false;
-        defines.defines[BMD::RGBDREFLECTION]          = false;
+        defines.boolDef["REFLECTION"]                                  = false;
+        defines.boolDef["REFLECTIONFRESNEL"]                           = false;
+        defines.boolDef["REFLECTIONFALLOFF"]                           = false;
+        defines.boolDef["REFLECTIONBLUR"]                              = false;
+        defines.boolDef["REFLECTIONMAP_3D"]                            = false;
+        defines.boolDef["REFLECTIONMAP_SPHERICAL"]                     = false;
+        defines.boolDef["REFLECTIONMAP_PLANAR"]                        = false;
+        defines.boolDef["REFLECTIONMAP_CUBIC"]                         = false;
+        defines.boolDef["REFLECTIONMAP_PROJECTION"]                    = false;
+        defines.boolDef["REFLECTIONMAP_SKYBOX"]                        = false;
+        defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]            = false;
+        defines.boolDef["REFLECTIONMAP_EXPLICIT"]                      = false;
+        defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR"]               = false;
+        defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR_FIXED"]         = false;
+        defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"] = false;
+        defines.boolDef["INVERTCUBICMAP"]                              = false;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]                     = false;
+        defines.boolDef["LODINREFLECTIONALPHA"]                        = false;
+        defines.boolDef["GAMMAREFLECTION"]                             = false;
+        defines.boolDef["RGBDREFLECTION"]                              = false;
       }
     }
 
-    defines.defines[BMD::PREMULTIPLYALPHA]
+    defines.boolDef["PREMULTIPLYALPHA"]
       = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
          || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
-    defines.defines[BMD::USERGBCOLOR] = _useRGBColor;
-    defines.defines[BMD::NOISE]       = _enableNoise;
+    defines.boolDef["USERGBCOLOR"] = _useRGBColor;
+    defines.boolDef["NOISE"]       = _enableNoise;
   }
 
   if (defines._areLightsDirty) {
-    defines.defines[BMD::USEHIGHLIGHTANDSHADOWCOLORS]
+    defines.boolDef["USEHIGHLIGHTANDSHADOWCOLORS"]
       = !_useRGBColor
         && (_primaryColorShadowLevel != 0.f
             || _primaryColorHighlightLevel != 0.f);
@@ -434,23 +432,17 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   // Misc.
-#if 0
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, false, pointsCloud(), fogEnabled(),
-    _shouldTurnAlphaTestOn(mesh), defines,
-    BMD::LOGARITHMICDEPTH, BMD::POINTSIZE, BMD::FOG, BMD::NONUNIFORMSCALING);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, false, pointsCloud(),
+                                        fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, BMD::CLIPPLANE, BMD::ALPHATEST,
-    BMD::DEPTHPREPASS, BMD::INSTANCES);
-#endif
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines,
+                                                    useInstances);
 
   // Attribs
-  if (MaterialHelper::PrepareDefinesForAttributes(
-        mesh, defines, false, true, false, BMD::NORMAL, BMD::UV1, BMD::UV2,
-        BMD::VERTEXCOLOR, BMD::VERTEXALPHA, BMD::MORPHTARGETS_NORMAL,
-        BMD::MORPHTARGETS)) {
+  if (MaterialHelper::PrepareDefinesForAttributes(mesh, defines, false, true,
+                                                  false)) {
     if (mesh) {
       if (!scene->getEngine()->getCaps().standardDerivatives
           && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
@@ -470,40 +462,39 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     // Fallbacks
     auto fallbacks = ::std::make_unique<EffectFallbacks>();
-    if (defines[BMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(0, "FOG");
     }
 
-    if (defines[BMD::POINTSIZE]) {
+    if (defines["POINTSIZE"]) {
       fallbacks->addFallback(1, "POINTSIZE");
     }
 
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
                                               _maxSimultaneousLights);
 
-    if (defines.NUM_BONE_INFLUENCERS > 0) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
       fallbacks->addCPUSkinningFallback(0, mesh);
     }
 
     // Attributes
     vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[BMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[BMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[BMD::UV2]) {
+    if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  BMD::INSTANCES);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     vector_t<string_t> uniforms{"world",
                                 "view",
@@ -725,7 +716,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         _uniformBuffer->updateFloat("pointSize", pointSize);
       }
 
-      if (defines.defines[BMD::USEHIGHLIGHTANDSHADOWCOLORS]) {
+      if (defines.boolDef["USEHIGHLIGHTANDSHADOWCOLORS"]) {
         _uniformBuffer->updateColor4("vPrimaryColor", _primaryHighlightColor,
                                      1.f, "");
         _uniformBuffer->updateColor4("vPrimaryColorShadow", _primaryShadowColor,
@@ -745,10 +736,10 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       }
 
       if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
-        if (defines[BMD::REFLECTIONBLUR] && defines[BMD::TEXTURELODSUPPORT]) {
+        if (defines["REFLECTIONBLUR"] && defines["TEXTURELODSUPPORT"]) {
           _uniformBuffer->setTexture("reflectionSampler", reflectionTexture);
         }
-        else if (!defines[BMD::REFLECTIONBLUR]) {
+        else if (!defines["REFLECTIONBLUR"]) {
           _uniformBuffer->setTexture("reflectionSampler", reflectionTexture);
         }
         else {
@@ -766,7 +757,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
                                        reflectionTexture);
         }
 
-        if (defines[BMD::REFLECTIONFRESNEL]) {
+        if (defines["REFLECTIONFRESNEL"]) {
           _uniformBuffer->updateFloat3("vBackgroundCenter", sceneCenter().x,
                                        sceneCenter().y, sceneCenter().z, "");
           _uniformBuffer->updateFloat4(

@@ -4,118 +4,130 @@ namespace BABYLON {
 
 StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
 {
-  _keys = {"MAINUV1",
-           "MAINUV2",
-           "DIFFUSE",
-           "AMBIENT",
-           "OPACITY",
-           "OPACITYRGB",
-           "REFLECTION",
-           "EMISSIVE",
-           "SPECULAR",
-           "BUMP",
-           "PARALLAX",
-           "PARALLAXOCCLUSION",
-           "SPECULAROVERALPHA",
-           "CLIPPLANE",
-           "ALPHATEST",
-           "DEPTHPREPASS",
-           "ALPHAFROMDIFFUSE",
-           "POINTSIZE",
-           "FOG",
-           "SPECULARTERM",
-           "DIFFUSEFRESNEL",
-           "OPACITYFRESNEL",
-           "REFLECTIONFRESNEL",
-           "REFRACTIONFRESNEL",
-           "EMISSIVEFRESNEL",
-           "FRESNEL",
-           "NORMAL",
-           "UV1",
-           "UV2",
-           "VERTEXCOLOR",
-           "VERTEXALPHA",
-           "INSTANCES",
-           "GLOSSINESS",
-           "ROUGHNESS",
-           "EMISSIVEASILLUMINATION",
-           "LINKEMISSIVEWITHDIFFUSE",
-           "REFLECTIONFRESNELFROMSPECULAR",
-           "LIGHTMAP",
-           "OBJECTSPACE_NORMALMAP",
-           "USELIGHTMAPASSHADOWMAP",
-           "REFLECTIONMAP_3D",
-           "REFLECTIONMAP_SPHERICAL",
-           "REFLECTIONMAP_PLANAR",
-           "REFLECTIONMAP_CUBIC",
-           "USE_LOCAL_REFLECTIONMAP_CUBIC",
-           "REFLECTIONMAP_PROJECTION",
-           "REFLECTIONMAP_SKYBOX",
-           "REFLECTIONMAP_EXPLICIT",
-           "REFLECTIONMAP_EQUIRECTANGULAR",
-           "REFLECTIONMAP_EQUIRECTANGULAR_FIXED",
-           "REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED",
-           "INVERTCUBICMAP",
-           "LOGARITHMICDEPTH",
-           "REFRACTION",
-           "REFRACTIONMAP_3D",
-           "REFLECTIONOVERALPHA",
-           "TWOSIDEDLIGHTING",
-           "SHADOWFLOAT",
-           "MORPHTARGETS",
-           "MORPHTARGETS_NORMAL",
-           "MORPHTARGETS_TANGENT",
-           "NONUNIFORMSCALING",
-           "PREMULTIPLYALPHA",
-           "IMAGEPROCESSING",
-           "VIGNETTE",
-           "VIGNETTEBLENDMODEMULTIPLY",
-           "VIGNETTEBLENDMODEOPAQUE",
-           "TONEMAPPING",
-           "CONTRAST",
-           "COLORCURVES",
-           "COLORGRADING",
-           "COLORGRADING3D",
-           "SAMPLER3DGREENDEPTH",
-           "SAMPLER3DBGRMAP",
-           "IMAGEPROCESSINGPOSTPROCESS",
-           "IS_REFLECTION_LINEAR",
-           "IS_REFRACTION_LINEAR",
-           "EXPOSURE"};
-  rebuild();
+  boolDef = {
+    {"MAINUV1", false},                                     //
+    {"MAINUV2", false},                                     //
+    {"DIFFUSE", false},                                     //
+    {"AMBIENT", false},                                     //
+    {"OPACITY", false},                                     //
+    {"OPACITYRGB", false},                                  //
+    {"REFLECTION", false},                                  //
+    {"EMISSIVE", false},                                    //
+    {"SPECULAR", false},                                    //
+    {"BUMP", false},                                        //
+    {"PARALLAX", false},                                    //
+    {"PARALLAXOCCLUSION", false},                           //
+    {"SPECULAROVERALPHA", false},                           //
+    {"CLIPPLANE", false},                                   //
+    {"CLIPPLANE2", false},                                  //
+    {"CLIPPLANE3", false},                                  //
+    {"CLIPPLANE4", false},                                  //
+    {"ALPHATEST", false},                                   //
+    {"DEPTHPREPASS", false},                                //
+    {"ALPHAFROMDIFFUSE", false},                            //
+    {"POINTSIZE", false},                                   //
+    {"FOG", false},                                         //
+    {"SPECULARTERM", false},                                //
+    {"DIFFUSEFRESNEL", false},                              //
+    {"OPACITYFRESNEL", false},                              //
+    {"REFLECTIONFRESNEL", false},                           //
+    {"REFRACTIONFRESNEL", false},                           //
+    {"EMISSIVEFRESNEL", false},                             //
+    {"FRESNEL", false},                                     //
+    {"NORMAL", false},                                      //
+    {"UV1", false},                                         //
+    {"UV2", false},                                         //
+    {"VERTEXCOLOR", false},                                 //
+    {"VERTEXALPHA", false},                                 //
+    {"INSTANCES", false},                                   //
+    {"GLOSSINESS", false},                                  //
+    {"ROUGHNESS", false},                                   //
+    {"EMISSIVEASILLUMINATION", false},                      //
+    {"LINKEMISSIVEWITHDIFFUSE", false},                     //
+    {"REFLECTIONFRESNELFROMSPECULAR", false},               //
+    {"LIGHTMAP", false},                                    //
+    {"OBJECTSPACE_NORMALMAP", false},                       //
+    {"USELIGHTMAPASSHADOWMAP", false},                      //
+    {"REFLECTIONMAP_3D", false},                            //
+    {"REFLECTIONMAP_SPHERICAL", false},                     //
+    {"REFLECTIONMAP_PLANAR", false},                        //
+    {"REFLECTIONMAP_CUBIC", false},                         //
+    {"USE_LOCAL_REFLECTIONMAP_CUBIC", false},               //
+    {"REFLECTIONMAP_PROJECTION", false},                    //
+    {"REFLECTIONMAP_SKYBOX", false},                        //
+    {"REFLECTIONMAP_SKYBOX_TRANSFORMED", false},            //
+    {"REFLECTIONMAP_EXPLICIT", false},                      //
+    {"REFLECTIONMAP_EQUIRECTANGULAR", false},               //
+    {"REFLECTIONMAP_EQUIRECTANGULAR_FIXED", false},         //
+    {"REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED", false}, //
+    {"INVERTCUBICMAP", false},                              //
+    {"LOGARITHMICDEPTH", false},                            //
+    {"REFRACTION", false},                                  //
+    {"REFRACTIONMAP_3D", false},                            //
+    {"REFLECTIONOVERALPHA", false},                         //
+    {"TWOSIDEDLIGHTING", false},                            //
+    {"SHADOWFLOAT", false},                                 //
+    {"MORPHTARGETS", false},                                //
+    {"MORPHTARGETS_NORMAL", false},                         //
+    {"MORPHTARGETS_TANGENT", false},                        //
+    {"NONUNIFORMSCALING", false}, // https://playground.babylonjs.com#V6DWIH
+    {"PREMULTIPLYALPHA", false},  // https://playground.babylonjs.com#LNVJJ7
 
-  DIFFUSEDIRECTUV       = 0;
-  AMBIENTDIRECTUV       = 0;
-  OPACITYDIRECTUV       = 0;
-  EMISSIVEDIRECTUV      = 0;
-  SPECULARDIRECTUV      = 0;
-  BUMPDIRECTUV          = 0;
-  NUM_BONE_INFLUENCERS  = 0;
-  BonesPerMesh          = 0;
-  LIGHTMAPDIRECTUV      = 0;
-  NUM_MORPH_INFLUENCERS = 0;
+    {"IMAGEPROCESSING", false},            //
+    {"VIGNETTE", false},                   //
+    {"VIGNETTEBLENDMODEMULTIPLY", false},  //
+    {"VIGNETTEBLENDMODEOPAQUE", false},    //
+    {"TONEMAPPING", false},                //
+    {"TONEMAPPING_ACES", false},           //
+    {"CONTRAST", false},                   //
+    {"COLORCURVES", false},                //
+    {"COLORGRADING", false},               //
+    {"COLORGRADING3D", false},             //
+    {"SAMPLER3DGREENDEPTH", false},        //
+    {"SAMPLER3DBGRMAP", false},            //
+    {"IMAGEPROCESSINGPOSTPROCESS", false}, //
+    /**
+     * If the reflection texture on this material is in linear color space
+     * @hidden
+     */
+    {"IS_REFLECTION_LINEAR", false}, //
+    /**
+     * If the refraction texture on this material is in linear color space
+     * @hidden
+     */
+    {"IS_REFRACTION_LINEAR", false}, //
+    {"EXPOSURE", false},             //
+  };
+
+  intDef = {
+    {"DIFFUSEDIRECTUV", 0},       //
+    {"AMBIENTDIRECTUV", 0},       //
+    {"OPACITYDIRECTUV", 0},       //
+    {"EMISSIVEDIRECTUV", 0},      //
+    {"SPECULARDIRECTUV", 0},      //
+    {"BUMPDIRECTUV", 0},          //
+    {"NUM_BONE_INFLUENCERS", 0},  //
+    {"BonesPerMesh", 0},          //
+    {"LIGHTMAPDIRECTUV", 0},      //
+    {"NUM_MORPH_INFLUENCERS", 0}, //
+  };
 }
 
 StandardMaterialDefines::~StandardMaterialDefines()
 {
 }
 
-void StandardMaterialDefines::setReflectionMode(unsigned int modeToEnable)
+void StandardMaterialDefines::setReflectionMode(const string_t& modeToEnable)
 {
-  static const array_t<unsigned int, 9> modes{{
-    REFLECTIONMAP_CUBIC,
-    REFLECTIONMAP_EXPLICIT,
-    REFLECTIONMAP_PLANAR,
-    REFLECTIONMAP_PROJECTION,
-    REFLECTIONMAP_SKYBOX,
-    REFLECTIONMAP_SPHERICAL,
-    REFLECTIONMAP_EQUIRECTANGULAR,
-    REFLECTIONMAP_EQUIRECTANGULAR_FIXED,
-    REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED,
-  }};
+  static const array_t<string_t, 10> modes{
+    {"REFLECTIONMAP_CUBIC", "REFLECTIONMAP_EXPLICIT", "REFLECTIONMAP_PLANAR",
+     "REFLECTIONMAP_PROJECTION", "REFLECTIONMAP_PROJECTION",
+     "REFLECTIONMAP_SKYBOX", "REFLECTIONMAP_SPHERICAL",
+     "REFLECTIONMAP_EQUIRECTANGULAR", "REFLECTIONMAP_EQUIRECTANGULAR_FIXED",
+     "REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"}};
 
   for (auto& mode : modes) {
-    defines[mode] = (mode == modeToEnable);
+    boolDef[mode] = (mode == modeToEnable);
   }
 }
 

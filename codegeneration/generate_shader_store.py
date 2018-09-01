@@ -136,11 +136,11 @@ def generateShadersStore(shaderFiles, outputDir,
     output += "public:%s" % eol
     output += "  EffectShadersStore();%s" % eol
     output += "  ~EffectShadersStore();%s%s" % (eol,eol)
-    output += "  unordered_map_t<string_t, const char*>& shaders();%s" % eol
-    output += "  const unordered_map_t<string_t, const char*>& shaders() const;"
+    output += "  unordered_map_t<string_t, string_t>& shaders();%s" % eol
+    output += "  const unordered_map_t<string_t, string_t>& shaders() const;"
     output += "%s%s" % (eol, eol)
     output += "private:%s" % eol
-    output += "  static unordered_map_t<string_t, const char*> _shaders;"
+    output += "  static unordered_map_t<string_t, string_t> _shaders;"
     output += "%s%s" % (eol,eol)
     output += "}; // end of class EffectShadersStore%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s#endif " % (eol, eol)
@@ -165,14 +165,14 @@ def generateShadersStore(shaderFiles, outputDir,
     output += "{%s}%s%s" % (eol, eol, eol)
     output += "EffectShadersStore::~EffectShadersStore()%s" % eol
     output += "{%s}%s%s" % (eol, eol, eol)
-    output += "unordered_map_t<string_t, const char*>& "
+    output += "unordered_map_t<string_t, string_t>& "
     output += "EffectShadersStore::shaders()%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
-    output += "const unordered_map_t<string_t, const char*>&%s" % eol
+    output += "const unordered_map_t<string_t, string_t>&%s" % eol
     output += "EffectShadersStore::shaders() const%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
     # create shader name to shared source mapping
-    output += "unordered_map_t<string_t, const char*> "
+    output += "unordered_map_t<string_t, string_t> "
     output += "EffectShadersStore::_shaders%s" % eol
     shaderMapping = ""
     for shaderName in shaderNames:
@@ -210,11 +210,11 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     output += "public:%s" % eol
     output += "  EffectIncludesShadersStore();%s" % eol
     output += "  ~EffectIncludesShadersStore();%s%s" % (eol,eol)
-    output += "  unordered_map_t<string_t, const char*>& shaders();%s" % eol
-    output += "  const unordered_map_t<string_t, const char*>& shaders() const;"
+    output += "  unordered_map_t<string_t, string_t>& shaders();%s" % eol
+    output += "  const unordered_map_t<string_t, string_t>& shaders() const;"
     output += "%s%s" % (eol, eol)
     output += "private:%s" % eol
-    output += "  static unordered_map_t<string_t, const char*> _shaders;"
+    output += "  static unordered_map_t<string_t, string_t> _shaders;"
     output += "%s%s" % (eol,eol)
     output += "}; // end of class EffectIncludesShadersStore%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s#endif " % (eol, eol)
@@ -239,14 +239,14 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     output += "{%s}%s%s" % (eol, eol, eol)
     output += "EffectIncludesShadersStore::~EffectIncludesShadersStore()%s" % eol
     output += "{%s}%s%s" % (eol, eol, eol)
-    output += "unordered_map_t<string_t, const char*>& "
+    output += "unordered_map_t<string_t, string_t>& "
     output += "EffectIncludesShadersStore::shaders()%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
-    output += "const unordered_map_t<string_t, const char*>&%s" % eol
+    output += "const unordered_map_t<string_t, string_t>&%s" % eol
     output += "EffectIncludesShadersStore::shaders() const%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
     # create shader include name to shared source mapping
-    output += "unordered_map_t<string_t, const char*> "
+    output += "unordered_map_t<string_t, string_t> "
     output += "EffectIncludesShadersStore::_shaders = {%s" % eol
     for shaderName in shaderNames:
         output += "{\"%s\", %s},%s   " % (shaderName, shaderName, eol)
@@ -422,7 +422,7 @@ if __name__ == "__main__":
     # set default values when input is missing
     if not options.inputDir:
         options.inputDir = os.path.join(os.getcwd(), "..", "..", "..",
-                                    "Projects", "Babylon.js-3.2.0_2018_05_01")
+                                    "Projects", "Babylon.js-3.3.0_2018_08_24")
         args += [options.inputDir]
     if not options.outputDir:
         options.outputDir = os.path.join(os.getcwd(), "..", "src", "BabylonCpp")

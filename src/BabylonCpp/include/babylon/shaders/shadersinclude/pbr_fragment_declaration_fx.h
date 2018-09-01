@@ -21,7 +21,7 @@ const char* pbrFragmentDeclaration
     "#endif\n"
     "\n"
     "#ifdef AMBIENT\n"
-    "uniform vec3 vAmbientInfos;\n"
+    "uniform vec4 vAmbientInfos;\n"
     "#endif\n"
     "\n"
     "#ifdef BUMP\n"

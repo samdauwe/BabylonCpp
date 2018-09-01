@@ -36,56 +36,23 @@ void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene)
                                        scene->activeCamera->globalPosition());
 }
 
-void MaterialHelper::PrepareDefinesForMergedUV(
-  const BaseTexturePtr& texture, MaterialDefines& defines, unsigned int key,
-  const string_t& keyString, unsigned int MAINUV1, unsigned int MAINUV2)
+void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
+                                               MaterialDefines& defines,
+                                               const string_t& key)
 {
-  const auto updateDirectUV = [&defines, &keyString](unsigned int value) {
-    if (keyString == "DIFFUSE") {
-      defines.DIFFUSEDIRECTUV = value;
-    }
-    else if (keyString == "AMBIENT") {
-      defines.AMBIENTDIRECTUV = value;
-    }
-    else if (keyString == "OPACITY") {
-      defines.OPACITYDIRECTUV = value;
-    }
-    else if (keyString == "EMISSIVE") {
-      defines.EMISSIVEDIRECTUV = value;
-    }
-    else if (keyString == "SPECULAR") {
-      defines.SPECULARDIRECTUV = value;
-    }
-    else if (keyString == "BUMP") {
-      defines.BUMPDIRECTUV = value;
-    }
-    else if (keyString == "LIGHTMAP") {
-      defines.LIGHTMAPDIRECTUV = value;
-    }
-    else if (keyString == "ALBEDO") {
-      defines.ALBEDODIRECTUV = value;
-    }
-    else if (keyString == "REFLECTIVITY") {
-      defines.REFLECTIVITYDIRECTUV = value;
-    }
-    else if (keyString == "MICROSURFACEMAP") {
-      defines.MICROSURFACEMAPDIRECTUV = value;
-    }
-  };
-
   defines._needUVs     = true;
-  defines.defines[key] = true;
+  defines.boolDef[key] = true;
   if (texture->getTextureMatrix()->isIdentity(true)) {
-    updateDirectUV(texture->coordinatesIndex + 1);
+    defines.intDef[key + "DIRECTUV"] = texture->coordinatesIndex + 1;
     if (texture->coordinatesIndex == 0) {
-      defines.defines[MAINUV1] = true;
+      defines.boolDef["MAINUV1"] = true;
     }
     else {
-      defines.defines[MAINUV2] = true;
+      defines.boolDef["MAINUV1"] = true;
     }
   }
   else {
-    updateDirectUV(0);
+    defines.intDef[key + "DIRECTUV"] = 0;
   }
 }
 
@@ -100,47 +67,70 @@ void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
   }
 }
 
-void MaterialHelper::PrepareDefinesForMisc(
-  AbstractMesh* mesh, Scene* scene, bool useLogarithmicDepth, bool pointsCloud,
-  bool fogEnabled, bool alphaTest, MaterialDefines& defines,
-  unsigned int LOGARITHMICDEPTH, unsigned int POINTSIZE, unsigned int FOG,
-  unsigned int NONUNIFORMSCALING, unsigned int ALPHATEST)
+void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
+                                           bool useLogarithmicDepth,
+                                           bool pointsCloud, bool fogEnabled,
+                                           bool alphaTest,
+                                           MaterialDefines& defines)
 {
   if (defines._areMiscDirty) {
-    defines.defines[LOGARITHMICDEPTH] = useLogarithmicDepth;
-    defines.defines[POINTSIZE]        = pointsCloud;
-    defines.defines[FOG]
+    defines.boolDef["LOGARITHMICDEPTH"] = useLogarithmicDepth;
+    defines.boolDef["POINTSIZE"]        = pointsCloud;
+    defines.boolDef["FOG"]
       = (scene->fogEnabled() && mesh->applyFog()
          && scene->fogMode() != Scene::FOGMODE_NONE() && fogEnabled);
-    defines.defines[NONUNIFORMSCALING] = mesh->nonUniformScaling();
-    defines.defines[ALPHATEST]         = alphaTest;
+    defines.boolDef["NONUNIFORMSCALING"] = mesh->nonUniformScaling();
+    defines.boolDef["ALPHATEST"]         = alphaTest;
   }
 }
 
 void MaterialHelper::PrepareDefinesForFrameBoundValues(
   Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-  unsigned int CLIPPLANE, unsigned int DEPTHPREPASS, unsigned int INSTANCES,
   nullable_t<bool> useClipPlane)
 {
-  bool changed = false;
+  auto changed       = false;
+  auto useClipPlane1 = false;
+  auto useClipPlane2 = false;
+  auto useClipPlane3 = false;
+  auto useClipPlane4 = false;
 
-  if (useClipPlane == nullopt_t) {
-    useClipPlane = (scene->clipPlane() != nullptr);
+  useClipPlane1 = useClipPlane == nullopt_t ? (scene->clipPlane != nullopt_t) :
+                                              *useClipPlane;
+  useClipPlane2 = useClipPlane == nullopt_t ? (scene->clipPlane2 != nullopt_t) :
+                                              *useClipPlane;
+  useClipPlane3 = useClipPlane == nullopt_t ? (scene->clipPlane3 != nullopt_t) :
+                                              *useClipPlane;
+  useClipPlane4 = useClipPlane == nullopt_t ? (scene->clipPlane4 != nullopt_t) :
+                                              *useClipPlane;
+
+  if (defines["CLIPPLANE"] != useClipPlane1) {
+    defines.boolDef["CLIPPLANE"] = useClipPlane1;
+    changed                      = true;
   }
 
-  if (defines[CLIPPLANE] != *useClipPlane) {
-    defines.defines[CLIPPLANE] = *useClipPlane;
-    changed                    = true;
-  }
-
-  if (defines[DEPTHPREPASS] != !engine->getColorWrite()) {
-    defines.defines[DEPTHPREPASS] = !defines[DEPTHPREPASS];
+  if (defines["CLIPPLANE2"] != useClipPlane2) {
+    defines.boolDef["CLIPPLANE2"] = useClipPlane2;
     changed                       = true;
   }
 
-  if (defines[INSTANCES] != useInstances) {
-    defines.defines[INSTANCES] = useInstances;
-    changed                    = true;
+  if (defines["CLIPPLANE3"] != useClipPlane3) {
+    defines.boolDef["CLIPPLANE3"] = useClipPlane3;
+    changed                       = true;
+  }
+
+  if (defines["CLIPPLANE4"] != useClipPlane4) {
+    defines.boolDef["CLIPPLANE4"] = useClipPlane4;
+    changed                       = true;
+  }
+
+  if (defines["DEPTHPREPASS"] != !engine->getColorWrite()) {
+    defines.boolDef["DEPTHPREPASS"] = !defines["DEPTHPREPASS"];
+    changed                         = true;
+  }
+
+  if (defines["INSTANCES"] != useInstances) {
+    defines.boolDef["INSTANCES"] = useInstances;
+    changed                      = true;
   }
 
   if (changed) {
@@ -150,10 +140,7 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
 
 bool MaterialHelper::PrepareDefinesForAttributes(
   AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
-  bool useBones, bool useMorphTargets, bool useVertexAlpha, unsigned int NORMAL,
-  unsigned int UV1, unsigned int UV2, unsigned int VERTEXCOLOR,
-  unsigned int VERTEXALPHA, unsigned int MORPHTARGETS_TANGENT,
-  unsigned int MORPHTARGETS_NORMAL, unsigned int MORPHTARGETS)
+  bool useBones, bool useMorphTargets, bool useVertexAlpha)
 {
   if (!defines._areAttributesDirty && defines._needNormals == defines._normals
       && defines._needUVs == defines._uvs) {
@@ -163,42 +150,43 @@ bool MaterialHelper::PrepareDefinesForAttributes(
   defines._normals = defines._needNormals;
   defines._uvs     = defines._needUVs;
 
-  defines.defines[NORMAL]
+  defines.boolDef["NORMAL"]
     = (defines._needNormals
        && mesh->isVerticesDataPresent(VertexBuffer::NormalKind));
 
   if (defines._needNormals
       && mesh->isVerticesDataPresent(VertexBuffer::TangentKind)) {
-    defines.TANGENT = true;
+    defines.boolDef["TANGENT"] = true;
   }
 
   if (defines._needUVs) {
-    defines.defines[UV1] = mesh->isVerticesDataPresent(VertexBuffer::UVKind);
-    defines.defines[UV2] = mesh->isVerticesDataPresent(VertexBuffer::UV2Kind);
+    defines.boolDef["UV1"] = mesh->isVerticesDataPresent(VertexBuffer::UVKind);
+    defines.boolDef["UV2"] = mesh->isVerticesDataPresent(VertexBuffer::UV2Kind);
   }
   else {
-    defines.defines[UV1] = false;
-    defines.defines[UV2] = false;
+    defines.boolDef["UV1"] = false;
+    defines.boolDef["UV2"] = false;
   }
 
   if (useVertexColor) {
     auto hasVertexColors
       = mesh->useVertexColors()
         && mesh->isVerticesDataPresent(VertexBuffer::ColorKind);
-    defines.defines[VERTEXCOLOR] = hasVertexColors;
-    defines.defines[VERTEXALPHA] = mesh->hasVertexAlpha() && useVertexAlpha;
+    defines.boolDef["VERTEXCOLOR"] = hasVertexColors;
+    defines.boolDef["VERTEXALPHA"]
+      = mesh->hasVertexAlpha() && hasVertexColors && useVertexAlpha;
   }
 
   if (useBones) {
     if (mesh->useBones() && mesh->computeBonesUsingShaders()
         && mesh->skeleton()) {
-      defines.NUM_BONE_INFLUENCERS = mesh->numBoneInfluencers();
-      defines.BonesPerMesh
+      defines.intDef["NUM_BONE_INFLUENCERS"] = mesh->numBoneInfluencers();
+      defines.intDef["BonesPerMesh"]
         = static_cast<unsigned>(mesh->skeleton()->bones.size() + 1);
     }
     else {
-      defines.NUM_BONE_INFLUENCERS = 0;
-      defines.BonesPerMesh         = 0;
+      defines.intDef["NUM_BONE_INFLUENCERS"] = 0;
+      defines.intDef["BonesPerMesh"]         = 0;
     }
   }
 
@@ -206,29 +194,30 @@ bool MaterialHelper::PrepareDefinesForAttributes(
     auto _mesh   = static_cast<Mesh*>(mesh);
     auto manager = _mesh ? _mesh->morphTargetManager() : nullptr;
     if (manager) {
-      defines.defines[MORPHTARGETS_TANGENT]
-        = manager->supportsTangents() && defines.TANGENT;
-      defines.defines[MORPHTARGETS_NORMAL]
-        = manager->supportsNormals() && defines[NORMAL];
-      defines.defines[MORPHTARGETS] = (manager->numInfluencers() > 0);
-      defines.NUM_MORPH_INFLUENCERS
+      defines.boolDef["MORPHTARGETS_TANGENT"]
+        = manager->supportsTangents() && defines["TANGENT"];
+      defines.boolDef["MORPHTARGETS_NORMAL"]
+        = manager->supportsNormals() && defines["NORMAL"];
+      defines.boolDef["MORPHTARGETS"] = (manager->numInfluencers() > 0);
+      defines.intDef["NUM_BONE_INFLUENCERS"]
         = static_cast<unsigned>(manager->numInfluencers());
     }
     else {
-      defines.defines[MORPHTARGETS_TANGENT] = false;
-      defines.defines[MORPHTARGETS_NORMAL]  = false;
-      defines.defines[MORPHTARGETS]         = false;
-      defines.NUM_MORPH_INFLUENCERS         = 0;
+      defines.boolDef["MORPHTARGETS_TANGENT"] = false;
+      defines.boolDef["MORPHTARGETS_NORMAL"]  = false;
+      defines.boolDef["MORPHTARGETS"]         = false;
+      defines.intDef["NUM_BONE_INFLUENCERS"]  = 0;
     }
   }
 
   return true;
 }
 
-bool MaterialHelper::PrepareDefinesForLights(
-  Scene* scene, AbstractMesh* mesh, MaterialDefines& defines,
-  bool specularSupported, unsigned int maxSimultaneousLights,
-  bool disableLighting, unsigned int SPECULARTERM, unsigned int SHADOWFLOAT)
+bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
+                                             MaterialDefines& defines,
+                                             bool specularSupported,
+                                             unsigned int maxSimultaneousLights,
+                                             bool disableLighting)
 {
   if (!defines._areLightsDirty) {
     return defines._needNormals;
@@ -240,35 +229,40 @@ bool MaterialHelper::PrepareDefinesForLights(
   bool lightmapMode       = false;
   bool shadowEnabled      = false;
   bool specularEnabled    = false;
-  defines.resizeLights(maxSimultaneousLights - 1);
 
   if (scene->lightsEnabled() && !disableLighting) {
     for (auto& light : mesh->_lightSources) {
       needNormals = true;
 
-      defines.lights[lightIndex] = true;
+      auto lightIndexStr = ::std::to_string(lightIndex);
 
-      defines.spotlights[lightIndex]  = false;
-      defines.hemilights[lightIndex]  = false;
-      defines.pointlights[lightIndex] = false;
-      defines.dirlights[lightIndex]   = false;
+      if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
+        needRebuild = true;
+      }
+
+      defines.boolDef["LIGHT" + lightIndexStr] = true;
+
+      defines.boolDef["SPOTLIGHT" + lightIndexStr]  = false;
+      defines.boolDef["HEMILIGHT" + lightIndexStr]  = false;
+      defines.boolDef["POINTLIGHT" + lightIndexStr] = false;
+      defines.boolDef["DIRLIGHT" + lightIndexStr]   = false;
 
       light->prepareLightSpecificDefines(defines, lightIndex);
 
       // FallOff.
-      defines.lightfalloffphysicals[lightIndex] = false;
-      defines.lightfalloffgltfs[lightIndex]     = false;
-      defines.lightfalloffstandards[lightIndex] = false;
+      defines.boolDef["LIGHT_FALLOFF_PHYSICAL" + lightIndexStr] = false;
+      defines.boolDef["LIGHT_FALLOFF_GLTF" + lightIndexStr]     = false;
+      defines.boolDef["LIGHT_FALLOFF_STANDARD" + lightIndexStr] = false;
 
       switch (light->falloffType) {
         case Light::FALLOFF_GLTF:
-          defines.lightfalloffgltfs[lightIndex] = true;
+          defines.boolDef["LIGHT_FALLOFF_GLTF" + lightIndexStr] = true;
           break;
         case Light::FALLOFF_PHYSICAL:
-          defines.lightfalloffphysicals[lightIndex] = true;
+          defines.boolDef["LIGHT_FALLOFF_PHYSICAL" + lightIndexStr] = true;
           break;
         case Light::FALLOFF_STANDARD:
-          defines.lightfalloffstandards[lightIndex] = true;
+          defines.boolDef["LIGHT_FALLOFF_STANDARD" + lightIndexStr] = true;
           break;
       }
 
@@ -278,14 +272,14 @@ bool MaterialHelper::PrepareDefinesForLights(
       }
 
       // Shadows
-      defines.shadows[lightIndex]               = false;
-      defines.shadowpcfs[lightIndex]            = false;
-      defines.shadowpcsss[lightIndex]           = false;
-      defines.shadowpoissons[lightIndex]        = false;
-      defines.shadowesms[lightIndex]            = false;
-      defines.shadowcubes[lightIndex]           = false;
-      defines.shadowlowqualities[lightIndex]    = false;
-      defines.shadowmediumqualities[lightIndex] = false;
+      defines.boolDef["SHADOW" + lightIndexStr]              = false;
+      defines.boolDef["SHADOWPCF" + lightIndexStr]           = false;
+      defines.boolDef["SHADOWPCSS" + lightIndexStr]          = false;
+      defines.boolDef["SHADOWPOISSON" + lightIndexStr]       = false;
+      defines.boolDef["SHADOWESM" + lightIndexStr]           = false;
+      defines.boolDef["SHADOWCUBE" + lightIndexStr]          = false;
+      defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr]    = false;
+      defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr] = false;
 
       if (mesh && mesh->receiveShadows() && scene->shadowsEnabled()
           && light->shadowEnabled) {
@@ -302,14 +296,14 @@ bool MaterialHelper::PrepareDefinesForLights(
       }
 
       if (light->lightmapMode() != Light::LIGHTMAP_DEFAULT) {
-        lightmapMode                         = true;
-        defines.lightmapexcluded[lightIndex] = true;
-        defines.lightmapnospecular[lightIndex]
-          = (light->lightmapMode() == Light::LIGHTMAP_SHADOWSONLY);
+        lightmapMode                                        = true;
+        defines.boolDef["LIGHTMAPEXCLUDED" + lightIndexStr] = true;
+        defines.boolDef["LIGHTMAPNOSPECULAR" + lightIndexStr]
+          = (light->lightmapMode == Light::LIGHTMAP_SHADOWSONLY);
       }
       else {
-        defines.lightmapexcluded[lightIndex]   = false;
-        defines.lightmapnospecular[lightIndex] = false;
+        defines.boolDef["LIGHTMAPEXCLUDED" + lightIndexStr]   = false;
+        defines.boolDef["LIGHTMAPNOSPECULAR" + lightIndexStr] = false;
       }
 
       ++lightIndex;
@@ -319,28 +313,36 @@ bool MaterialHelper::PrepareDefinesForLights(
     }
   }
 
-  defines.defines[SPECULARTERM] = specularEnabled;
-  defines.SHADOWS               = shadowEnabled;
+  defines.boolDef["SPECULARTERM"] = specularEnabled;
+  defines.boolDef["SHADOWS"]      = shadowEnabled;
 
   // Resetting all other lights if any
+  auto lightIndexStr = ::std::to_string(lightIndex);
   for (unsigned int index = lightIndex; index < maxSimultaneousLights;
        ++index) {
-    defines.lights[lightIndex]      = false;
-    defines.hemilights[lightIndex]  = false;
-    defines.pointlights[lightIndex] = false;
-    defines.dirlights[lightIndex]   = false;
-    defines.spotlights[lightIndex]  = false;
-    defines.shadows[lightIndex]     = false;
+    auto indexStr = ::std::to_string(index);
+    if (!stl_util::contains(defines.boolDef, "LIGHT" + indexStr)) {
+      defines.boolDef["LIGHT" + indexStr]           = false;
+      defines.boolDef["HEMILIGHT" + lightIndexStr]  = false;
+      defines.boolDef["POINTLIGHT" + lightIndexStr] = false;
+      defines.boolDef["DIRLIGHT" + lightIndexStr]   = false;
+      defines.boolDef["SPOTLIGHT" + lightIndexStr]  = false;
+      defines.boolDef["SHADOW" + lightIndexStr]     = false;
+    }
   }
 
   auto caps = scene->getEngine()->getCaps();
 
-  defines.defines[SHADOWFLOAT]
+  if (!stl_util::contains(defines.boolDef, "SHADOWFLOAT")) {
+    needRebuild = true;
+  }
+
+  defines.boolDef["SHADOWFLOAT"]
     = shadowEnabled
       && ((caps.textureFloatRender && caps.textureFloatLinearFiltering)
           || (caps.textureHalfFloatRender
               && caps.textureHalfFloatLinearFiltering));
-  defines.LIGHTMAPEXCLUDED = lightmapMode;
+  defines.boolDef["LIGHTMAPEXCLUDED"] = lightmapMode;
 
   if (needRebuild) {
     defines.rebuild();
@@ -353,13 +355,16 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
   vector_t<string_t>& uniformsList, vector_t<string_t>& samplersList,
   MaterialDefines& defines, unsigned int maxSimultaneousLights)
 {
+  vector_t<string_t> uniformBuffersList;
+
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    if (lightIndex >= defines.lights.size() || !defines.lights[lightIndex]) {
+    const string_t lightIndexStr = ::std::to_string(lightIndex);
+
+    if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
       break;
     }
 
-    const string_t lightIndexStr = ::std::to_string(lightIndex);
     stl_util::concat(uniformsList,
                      {
                        "vLightData" + lightIndexStr,      //
@@ -373,17 +378,23 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
                        "depthValues" + lightIndexStr      //
                      });
 
+    if (uniformBuffersList.empty()) {
+      uniformBuffersList.emplace_back("Light" + lightIndexStr);
+    }
+
     samplersList.emplace_back("shadowSampler" + lightIndexStr);
     samplersList.emplace_back("depthSampler" + lightIndexStr);
 
-    if (lightIndex < defines.projectedLightTexture.size()
-        || !defines.projectedLightTexture[lightIndex]) {
+    if (stl_util::contains(defines.boolDef,
+                           "PROJECTEDLIGHTTEXTURE" + lightIndexStr)
+        && defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]) {
       samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
       uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
     }
   }
 
-  if (defines.NUM_MORPH_INFLUENCERS > 0) {
+  if (stl_util::contains(defines.intDef, "NUM_MORPH_INFLUENCERS")
+      && defines.intDef["NUM_MORPH_INFLUENCERS"]) {
     uniformsList.emplace_back("morphTargetInfluences");
   }
 }
@@ -394,43 +405,47 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
   auto& uniformsList          = options.uniformsNames;
   auto& uniformBuffersList    = options.uniformBuffersNames;
   auto& samplersList          = options.samplers;
-  auto& defines               = options.materialDefines;
+  auto& defines               = *options.materialDefines;
   auto& maxSimultaneousLights = options.maxSimultaneousLights;
 
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    if (defines
-        && (lightIndex >= defines->lights.size()
-            || !defines->lights[lightIndex])) {
+    const string_t lightIndexStr = ::std::to_string(lightIndex);
+
+    if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
       break;
     }
 
-    const string_t lightIndexStr = ::std::to_string(lightIndex);
     stl_util::concat(uniformsList,
                      {
                        "vLightData" + lightIndexStr,      //
                        "vLightDiffuse" + lightIndexStr,   //
                        "vLightSpecular" + lightIndexStr,  //
                        "vLightDirection" + lightIndexStr, //
+                       "vLightFalloff" + lightIndexStr,   //
                        "vLightGround" + lightIndexStr,    //
                        "lightMatrix" + lightIndexStr,     //
                        "shadowsInfo" + lightIndexStr,     //
                        "depthValues" + lightIndexStr      //
                      });
 
-    uniformBuffersList.emplace_back("Light" + lightIndexStr);
+    if (uniformBuffersList.empty()) {
+      uniformBuffersList.emplace_back("Light" + lightIndexStr);
+    }
 
     samplersList.emplace_back("shadowSampler" + lightIndexStr);
     samplersList.emplace_back("depthSampler" + lightIndexStr);
 
-    if (lightIndex < defines->projectedLightTexture.size()
-        && defines->projectedLightTexture[lightIndex]) {
+    if (stl_util::contains(defines.boolDef,
+                           "PROJECTEDLIGHTTEXTURE" + lightIndexStr)
+        && defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]) {
       samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
       uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
     }
   }
 
-  if (defines->NUM_MORPH_INFLUENCERS > 0) {
+  if (stl_util::contains(defines.intDef, "NUM_MORPH_INFLUENCERS")
+      && defines.intDef["NUM_MORPH_INFLUENCERS"]) {
     uniformsList.emplace_back("morphTargetInfluences");
   }
 }
@@ -442,35 +457,35 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
   unsigned int lightFallbackRank = 0;
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    if (lightIndex >= defines.lights.size() || !defines.lights[lightIndex]) {
+    const string_t lightIndexStr = ::std::to_string(lightIndex);
+
+    if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
       break;
     }
-
-    const string_t lightIndexStr = ::std::to_string(lightIndex);
 
     if (lightIndex > 0) {
       lightFallbackRank = rank + lightIndex;
       fallbacks.addFallback(lightFallbackRank, "LIGHT" + lightIndexStr);
     }
 
-    if (!defines.SHADOWS) {
-      if (defines.shadows[lightIndex]) {
+    if (!defines["SHADOWS"]) {
+      if (defines["SHADOW" + lightIndexStr]) {
         fallbacks.addFallback(rank, "SHADOW" + lightIndexStr);
       }
 
-      if (defines.shadowpcfs[lightIndex]) {
+      if (defines["SHADOWPCF" + lightIndexStr]) {
         fallbacks.addFallback(rank, "SHADOWPCF" + lightIndexStr);
       }
 
-      if (defines.shadowpcsss[lightIndex]) {
+      if (defines["SHADOWPCSS" + lightIndexStr]) {
         fallbacks.addFallback(rank, "SHADOWPCSS" + lightIndexStr);
       }
 
-      if (defines.shadowpoissons[lightIndex]) {
+      if (defines["SHADOWPOISSON" + lightIndexStr]) {
         fallbacks.addFallback(rank, "SHADOWPOISSON" + lightIndexStr);
       }
 
-      if (defines.shadowesms[lightIndex]) {
+      if (defines["SHADOWESM" + lightIndexStr]) {
         fallbacks.addFallback(rank, "SHADOWESM" + lightIndexStr);
       }
     }
@@ -479,10 +494,9 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
 }
 
 void MaterialHelper::PrepareAttributesForMorphTargets(
-  vector_t<string_t>& attribs, AbstractMesh* mesh, MaterialDefines& defines,
-  unsigned int NORMAL)
+  vector_t<string_t>& attribs, AbstractMesh* mesh, MaterialDefines& defines)
 {
-  auto influencers = defines.NUM_MORPH_INFLUENCERS;
+  auto influencers = defines.intDef["NUM_MORPH_INFLUENCERS"];
 
   auto engine = Engine::LastCreatedEngine();
   auto _mesh  = static_cast<Mesh*>(mesh);
@@ -490,9 +504,9 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
     auto maxAttributesCount
       = static_cast<unsigned>(engine->getCaps().maxVertexAttribs);
     auto manager = _mesh->morphTargetManager();
-    auto normal  = manager && manager->supportsNormals() && defines[NORMAL];
-    auto tangent = manager && manager->supportsNormals() && defines.TANGENT;
-    for (unsigned int index = 0; index < influencers; index++) {
+    auto normal  = manager && manager->supportsNormals() && defines["NORMAL"];
+    auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
+    for (unsigned int index = 0; index < influencers; ++index) {
       const auto indexStr = ::std::to_string(index);
       attribs.emplace_back(string_t(VertexBuffer::PositionKindChars)
                            + indexStr);
@@ -521,12 +535,12 @@ void MaterialHelper::PrepareAttributesForBones(vector_t<string_t>& attribs,
                                                MaterialDefines& defines,
                                                EffectFallbacks& fallbacks)
 {
-  if (defines.NUM_BONE_INFLUENCERS > 0) {
+  if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
     fallbacks.addCPUSkinningFallback(0, mesh);
 
     attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
-    if (defines.NUM_BONE_INFLUENCERS > 4) {
+    if (defines.intDef["NUM_BONE_INFLUENCERS"] > 4) {
       attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
@@ -534,10 +548,9 @@ void MaterialHelper::PrepareAttributesForBones(vector_t<string_t>& attribs,
 }
 
 void MaterialHelper::PrepareAttributesForInstances(vector_t<string_t>& attribs,
-                                                   MaterialDefines& defines,
-                                                   unsigned int INSTANCES)
+                                                   MaterialDefines& defines)
 {
-  if (defines[INSTANCES]) {
+  if (defines["INSTANCES"]) {
     attribs.emplace_back(VertexBuffer::World0KindChars);
     attribs.emplace_back(VertexBuffer::World1KindChars);
     attribs.emplace_back(VertexBuffer::World2KindChars);
@@ -566,13 +579,12 @@ void MaterialHelper::BindLightProperties(Light& light, Effect* effect,
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
                                 Effect* effect, MaterialDefines& defines,
                                 unsigned int maxSimultaneousLights,
-                                unsigned int SPECULARTERM,
                                 bool usePhysicalLightFalloff)
 {
   auto len = ::std::min(mesh->_lightSources.size(),
                         static_cast<size_t>(maxSimultaneousLights));
 
-  for (unsigned int i = 0; i < len; i++) {
+  for (unsigned int i = 0; i < len; ++i) {
 
     auto& light    = mesh->_lightSources[i];
     auto iAsString = ::std::to_string(i);
@@ -586,7 +598,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
     light->_uniformBuffer->updateColor4(
       "vLightDiffuse", Tmp::Color3Array[0],
       usePhysicalLightFalloff ? light->radius() : light->range, iAsString);
-    if (defines[SPECULARTERM]) {
+    if (defines["SPECULARTERM"]) {
       light->specular.scaleToRef(scaledIntensity, Tmp::Color3Array[1]);
       light->_uniformBuffer->updateColor3("vLightSpecular", Tmp::Color3Array[1],
                                           iAsString);
@@ -646,9 +658,9 @@ void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh,
 }
 
 void MaterialHelper::BindLogDepth(MaterialDefines& defines, Effect* effect,
-                                  Scene* scene, unsigned int LOGARITHMICDEPTH)
+                                  Scene* scene)
 {
-  if (defines[LOGARITHMICDEPTH]) {
+  if (defines["LOGARITHMICDEPTH"]) {
     effect->setFloat(
       "logarithmicDepthConstant",
       2.f / (::std::log(scene->activeCamera->maxZ + 1.f) / Math::LN2));
@@ -657,10 +669,25 @@ void MaterialHelper::BindLogDepth(MaterialDefines& defines, Effect* effect,
 
 void MaterialHelper::BindClipPlane(Effect* effect, Scene* scene)
 {
-  if (scene->clipPlane()) {
-    auto clipPlane = scene->clipPlane();
-    effect->setFloat4("vClipPlane", clipPlane->normal.x, clipPlane->normal.y,
-                      clipPlane->normal.z, clipPlane->d);
+  if (scene->clipPlane) {
+    const auto& clipPlane = *scene->clipPlane;
+    effect->setFloat4("vClipPlane", clipPlane.normal.x, clipPlane.normal.y,
+                      clipPlane.normal.z, clipPlane.d);
+  }
+  if (scene->clipPlane2) {
+    const auto& clipPlane = *scene->clipPlane2;
+    effect->setFloat4("vClipPlane2", clipPlane.normal.x, clipPlane.normal.y,
+                      clipPlane.normal.z, clipPlane.d);
+  }
+  if (scene->clipPlane3) {
+    const auto& clipPlane = *scene->clipPlane3;
+    effect->setFloat4("vClipPlane3", clipPlane.normal.x, clipPlane.normal.y,
+                      clipPlane.normal.z, clipPlane.d);
+  }
+  if (scene->clipPlane4) {
+    const auto& clipPlane = *scene->clipPlane4;
+    effect->setFloat4("vClipPlane4", clipPlane.normal.x, clipPlane.normal.y,
+                      clipPlane.normal.z, clipPlane.d);
   }
 }
 

@@ -480,10 +480,10 @@ void Material::forceCompilation(
       subMesh->_materialDefines->_renderId = -1;
     }
 
-    auto clipPlaneState = *scene->clipPlane();
+    auto clipPlaneState = scene->clipPlane;
 
     if (clipPlane) {
-      scene->setClipPlane(Plane(0.f, 0.f, 0.f, 1.f));
+      scene->clipPlane = Plane(0.f, 0.f, 0.f, 1.f);
     }
 
     if (storeEffectOnSubMeshes) {
@@ -508,7 +508,7 @@ void Material::forceCompilation(
     }
 
     if (clipPlane.has_value() && (*clipPlane)) {
-      scene->setClipPlane(clipPlaneState);
+      scene->clipPlane = clipPlaneState;
     }
   };
 

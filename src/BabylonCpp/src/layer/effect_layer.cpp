@@ -279,9 +279,9 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
         defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
                              + ::std::to_string(morphInfluencers));
         MaterialDefines defines;
-        defines.NUM_MORPH_INFLUENCERS = morphInfluencers;
+        defines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
         MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
-                                                         defines, 0);
+                                                         defines);
       }
     }
   }

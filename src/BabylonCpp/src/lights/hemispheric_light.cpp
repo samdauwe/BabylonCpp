@@ -103,8 +103,7 @@ unsigned int HemisphericLight::getTypeID() const
 void HemisphericLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                                    unsigned int lightIndex)
 {
-  defines.resizeLights(lightIndex);
-  defines.hemilights[lightIndex] = true;
+  defines.boolDef["HEMILIGHT" + ::std::to_string(lightIndex)] = true;
 }
 
 } // end of namespace BABYLON

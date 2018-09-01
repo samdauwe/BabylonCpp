@@ -31,9 +31,9 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param defines The defines to update
    * @param key The chanel key "diffuse", "specular"... used in the shader
    */
-  static void PrepareDefinesForMergedUV(
-    const BaseTexturePtr& texture, MaterialDefines& defines, unsigned int key,
-    const string_t& keyString, unsigned int MAINUV1, unsigned int MAINUV2);
+  static void PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
+                                        MaterialDefines& defines,
+                                        const string_t& key);
 
   /**
    * @brief Binds a texture matrix value to its corrsponding uniform
@@ -56,11 +56,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param alphaTest defines if alpha testing has to be turned on
    * @param defines defines the current list of defines
    */
-  static void PrepareDefinesForMisc(
-    AbstractMesh* mesh, Scene* scene, bool useLogarithmicDepth,
-    bool pointsCloud, bool fogEnabled, bool alphaTest, MaterialDefines& defines,
-    unsigned int LOGARITHMICDEPTH, unsigned int POINTSIZE, unsigned int FOG,
-    unsigned int NONUNIFORMSCALING, unsigned int ALPHATEST);
+  static void PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
+                                    bool useLogarithmicDepth, bool pointsCloud,
+                                    bool fogEnabled, bool alphaTest,
+                                    MaterialDefines& defines);
 
   /**
    * @brief Helper used to prepare the list of defines associated with frame
@@ -71,10 +70,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param useInstances defines if instances have to be turned on
    * @param useClipPlane defines if clip plane have to be turned on
    */
-  static void PrepareDefinesForFrameBoundValues(
-    Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-    unsigned int CLIPPLANE, unsigned int DEPTHPREPASS, unsigned int INSTANCES,
-    nullable_t<bool> useClipPlane = nullopt_t);
+  static void
+  PrepareDefinesForFrameBoundValues(Scene* scene, Engine* engine,
+                                    MaterialDefines& defines, bool useInstances,
+                                    nullable_t<bool> useClipPlane = nullopt_t);
 
   /**
    * @brief Prepares the defines used in the shader depending on the attributes
@@ -92,13 +91,11 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @returns false if defines are considered not dirty and have not been
    * checked
    */
-  static bool PrepareDefinesForAttributes(
-    AbstractMesh* mesh, MaterialDefines& defines, bool useVertexColor,
-    bool useBones, bool useMorphTargets, bool useVertexAlpha,
-    unsigned int NORMAL, unsigned int UV1, unsigned int UV2,
-    unsigned int VERTEXCOLOR, unsigned int VERTEXALPHA,
-    unsigned int MORPHTARGETS_TANGENT = 0, unsigned int MORPHTARGETS_NORMAL = 0,
-    unsigned int MORPHTARGETS = 0);
+  static bool PrepareDefinesForAttributes(AbstractMesh* mesh,
+                                          MaterialDefines& defines,
+                                          bool useVertexColor, bool useBones,
+                                          bool useMorphTargets = false,
+                                          bool useVertexAlpha  = true);
 
   /**
    * @brief Prepares the defines related to the light information passed in
@@ -114,10 +111,11 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * scene and light)
    * @returns true if normals will be required for the rest of the effect
    */
-  static bool PrepareDefinesForLights(
-    Scene* scene, AbstractMesh* mesh, MaterialDefines& defines,
-    bool specularSupported, unsigned int maxSimultaneousLights,
-    bool disableLighting, unsigned int SPECULARTERM, unsigned int SHADOWFLOAT);
+  static bool PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
+                                      MaterialDefines& defines,
+                                      bool specularSupported,
+                                      unsigned int maxSimultaneousLights = 4,
+                                      bool disableLighting = false);
 
   /**
    * @brief Prepares the uniforms and samplers list to be used in the effect.
@@ -171,8 +169,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    */
   static void PrepareAttributesForMorphTargets(vector_t<string_t>& attribs,
                                                AbstractMesh* mesh,
-                                               MaterialDefines& defines,
-                                               unsigned int NORMAL);
+                                               MaterialDefines& defines);
 
   /**
    * @brief Prepares the list of attributes required for bones according to the
@@ -194,8 +191,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param defines The current Defines of the effect
    */
   static void PrepareAttributesForInstances(vector_t<string_t>& attribs,
-                                            MaterialDefines& defines,
-                                            unsigned int INSTANCES);
+                                            MaterialDefines& defines);
 
   /**
    * @brief Binds the light shadow information to the effect for the given mesh.
@@ -231,9 +227,8 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    */
   static void BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
                          MaterialDefines& defines,
-                         unsigned int maxSimultaneousLights,
-                         unsigned int SPECULARTERM,
-                         bool usePhysicalLightFalloff = false);
+                         unsigned int maxSimultaneousLights = 4,
+                         bool usePhysicalLightFalloff       = false);
 
   /**
    * @brief Binds the fog information from the scene to the effect for the given
@@ -268,7 +263,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param scene The scene we are willing to render with logarithmic scale for
    */
   static void BindLogDepth(MaterialDefines& defines, Effect* effect,
-                           Scene* scene, unsigned int LOGARITHMICDEPTH);
+                           Scene* scene);
 
   /**
    * @brief Binds the clip plane information from the scene to the effect.

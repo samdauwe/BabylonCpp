@@ -11,11 +11,11 @@ public:
   EffectShadersStore();
   ~EffectShadersStore();
 
-  unordered_map_t<string_t, const char*>& shaders();
-  const unordered_map_t<string_t, const char*>& shaders() const;
+  unordered_map_t<string_t, string_t>& shaders();
+  const unordered_map_t<string_t, string_t>& shaders() const;
 
 private:
-  static unordered_map_t<string_t, const char*> _shaders;
+  static unordered_map_t<string_t, string_t> _shaders;
 
 }; // end of class EffectShadersStore
 

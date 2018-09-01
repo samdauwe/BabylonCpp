@@ -12,10 +12,10 @@ RefractionTexture::RefractionTexture(const string_t& iName, ISize size,
     , depth{2.f}
 {
   onBeforeRenderObservable.add(
-    [this](int*, EventState&) { getScene()->setClipPlane(refractionPlane); });
+    [this](int*, EventState&) { getScene()->clipPlane = refractionPlane; });
 
   onAfterRenderObservable.add(
-    [this](int*, EventState&) { getScene()->resetClipPlane(); });
+    [this](int*, EventState&) { getScene()->clipPlane = nullopt_t; });
 }
 
 RefractionTexture::~RefractionTexture()

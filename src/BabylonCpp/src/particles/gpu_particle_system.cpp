@@ -830,7 +830,7 @@ void GPUParticleSystem::_recreateUpdateEffect()
 void GPUParticleSystem::_recreateRenderEffect()
 {
   ostringstream_t definesStream;
-  if (_scene->clipPlane()) {
+  if (_scene->clipPlane.has_value()) {
     definesStream << "\n#define CLIPPLANE";
   }
 
@@ -1156,14 +1156,14 @@ size_t GPUParticleSystem::render(bool preWarm)
       _renderEffect->setVector3("eyePosition", camera->globalPosition);
     }
 
-    if (_scene->clipPlane()) {
-      auto clipPlane = _scene->clipPlane();
+    if (_scene->clipPlane.has_value()) {
+      auto clipPlane = *_scene->clipPlane;
       auto invView   = viewMatrix;
       invView.invert();
       _renderEffect->setMatrix("invView", invView);
-      _renderEffect->setFloat4("vClipPlane", clipPlane->normal.x,
-                               clipPlane->normal.y, clipPlane->normal.z,
-                               clipPlane->d);
+      _renderEffect->setFloat4("vClipPlane", clipPlane.normal.x,
+                               clipPlane.normal.y, clipPlane.normal.z,
+                               clipPlane.d);
     }
 
     // Draw order

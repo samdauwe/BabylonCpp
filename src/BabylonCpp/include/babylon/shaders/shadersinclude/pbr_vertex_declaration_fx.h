@@ -16,7 +16,7 @@ const char* pbrVertexDeclaration
     "\n"
     "#ifdef AMBIENT\n"
     "uniform mat4 ambientMatrix;\n"
-    "uniform vec3 vAmbientInfos;\n"
+    "uniform vec4 vAmbientInfos;\n"
     "#endif\n"
     "\n"
     "#ifdef OPACITY\n"

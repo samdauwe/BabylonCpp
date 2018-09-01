@@ -55,7 +55,7 @@ MirrorTexture::MirrorTexture(const string_t& iName, const ISize& size,
     _savedViewMatrix = scene->getViewMatrix();
     _mirrorMatrix.multiplyToRef(_savedViewMatrix, _transformMatrix);
     scene->setTransformMatrix(_transformMatrix, scene->getProjectionMatrix());
-    scene->setClipPlane(mirrorPlane);
+    scene->clipPlane                  = mirrorPlane;
     scene->getEngine()->cullBackFaces = false;
     scene->setMirroredCameraPosition(Vector3::TransformCoordinates(
       scene->activeCamera->globalPosition(), _mirrorMatrix));

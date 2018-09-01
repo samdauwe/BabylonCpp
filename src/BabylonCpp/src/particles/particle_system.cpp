@@ -1083,7 +1083,7 @@ Effect* ParticleSystem::_getEffect()
 
   vector_t<string_t> defines;
 
-  if (_scene->clipPlane()) {
+  if (_scene->clipPlane.has_value()) {
     defines.emplace_back("#define CLIPPLANE");
   }
 
@@ -1281,13 +1281,13 @@ size_t ParticleSystem::render(bool /*preWarm*/)
     effect->setVector3("eyePosition", camera->globalPosition);
   }
 
-  if (_scene->clipPlane()) {
-    auto clipPlane = _scene->clipPlane();
+  if (_scene->clipPlane.has_value()) {
+    auto clipPlane = *_scene->clipPlane;
     auto invView   = viewMatrix;
     invView.invert();
     effect->setMatrix("invView", invView);
-    effect->setFloat4("vClipPlane", clipPlane->normal.x, clipPlane->normal.y,
-                      clipPlane->normal.z, clipPlane->d);
+    effect->setFloat4("vClipPlane", clipPlane.normal.x, clipPlane.normal.y,
+                      clipPlane.normal.z, clipPlane.d);
   }
 
   // VBOs

@@ -314,14 +314,13 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
   // Lights
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting,
-    SMD::SPECULARTERM, SMD::SHADOWFLOAT);
+    scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting);
 
   // Textures
   if (defines._areTexturesDirty) {
-    defines._needUVs              = false;
-    defines.defines[SMD::MAINUV1] = false;
-    defines.defines[SMD::MAINUV2] = false;
+    defines._needUVs           = false;
+    defines.boolDef["MAINUV1"] = false;
+    defines.boolDef["MAINUV2"] = false;
     if (scene->texturesEnabled()) {
       if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReadyOrNotBlocking()) {
@@ -329,12 +328,11 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
         else {
           MaterialHelper::PrepareDefinesForMergedUV(_diffuseTexture, defines,
-                                                    SMD::DIFFUSE, "DIFFUSE",
-                                                    SMD::MAINUV1, SMD::MAINUV2);
+                                                    "DIFFUSE");
         }
       }
       else {
-        defines.defines[SMD::DIFFUSE] = false;
+        defines.boolDef["DIFFUSE"] = false;
       }
 
       if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
@@ -343,12 +341,11 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
         else {
           MaterialHelper::PrepareDefinesForMergedUV(_ambientTexture, defines,
-                                                    SMD::AMBIENT, "AMBIENT",
-                                                    SMD::MAINUV1, SMD::MAINUV2);
+                                                    "AMBIENT");
         }
       }
       else {
-        defines.defines[SMD::AMBIENT] = false;
+        defines.boolDef["AMBIENT"] = false;
       }
 
       if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
@@ -357,13 +354,12 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
         else {
           MaterialHelper::PrepareDefinesForMergedUV(_opacityTexture, defines,
-                                                    SMD::OPACITY, "OPACITY",
-                                                    SMD::MAINUV1, SMD::MAINUV2);
-          defines.defines[SMD::OPACITYRGB] = _opacityTexture->getAlphaFromRGB;
+                                                    "OPACITY");
+          defines.boolDef["OPACITYRGB"] = _opacityTexture->getAlphaFromRGB;
         }
       }
       else {
-        defines.defines[SMD::OPACITY] = false;
+        defines.boolDef["OPACITY"] = false;
       }
 
       if (_reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
@@ -371,55 +367,57 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         else {
-          defines._needNormals             = true;
-          defines.defines[SMD::REFLECTION] = true;
+          defines._needNormals          = true;
+          defines.boolDef["REFLECTION"] = true;
 
-          defines.defines[SMD::ROUGHNESS]           = (_roughness > 0);
-          defines.defines[SMD::REFLECTIONOVERALPHA] = _useReflectionOverAlpha;
-          defines.defines[SMD::INVERTCUBICMAP]
+          defines.boolDef["ROUGHNESS"]           = (_roughness > 0);
+          defines.boolDef["REFLECTIONOVERALPHA"] = _useReflectionOverAlpha;
+          defines.boolDef["INVERTCUBICMAP"]
             = (_reflectionTexture->coordinatesMode()
                == TextureConstants::INVCUBIC_MODE);
-          defines.defines[SMD::REFLECTIONMAP_3D] = _reflectionTexture->isCube;
+          defines.boolDef["REFLECTIONMAP_3D"] = _reflectionTexture->isCube;
 
           switch (_reflectionTexture->coordinatesMode()) {
             case TextureConstants::EXPLICIT_MODE:
-              defines.setReflectionMode(SMD::REFLECTIONMAP_EXPLICIT);
+              defines.setReflectionMode("REFLECTIONMAP_EXPLICIT");
               break;
             case TextureConstants::PLANAR_MODE:
-              defines.setReflectionMode(SMD::REFLECTIONMAP_PLANAR);
+              defines.setReflectionMode("REFLECTIONMAP_PLANAR");
               break;
             case TextureConstants::PROJECTION_MODE:
-              defines.setReflectionMode(SMD::REFLECTIONMAP_PROJECTION);
+              defines.setReflectionMode("REFLECTIONMAP_PROJECTION");
               break;
             case TextureConstants::SKYBOX_MODE:
-              defines.setReflectionMode(SMD::REFLECTIONMAP_SKYBOX);
+              defines.setReflectionMode("REFLECTIONMAP_SKYBOX");
+              defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]
+                = !_reflectionTexture->getReflectionTextureMatrix()
+                     ->isIdentity();
               break;
             case TextureConstants::SPHERICAL_MODE:
-              defines.setReflectionMode(SMD::REFLECTIONMAP_SPHERICAL);
+              defines.setReflectionMode("REFLECTIONMAP_SPHERICAL");
               break;
             case TextureConstants::EQUIRECTANGULAR_MODE:
-              defines.setReflectionMode(SMD::REFLECTIONMAP_EQUIRECTANGULAR);
+              defines.setReflectionMode("REFLECTIONMAP_EQUIRECTANGULAR");
               break;
             case TextureConstants::FIXED_EQUIRECTANGULAR_MODE:
-              defines.setReflectionMode(
-                SMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED);
+              defines.setReflectionMode("REFLECTIONMAP_EQUIRECTANGULAR_FIXED");
               break;
             case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
               defines.setReflectionMode(
-                SMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED);
+                "REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED");
               break;
             case TextureConstants::CUBIC_MODE:
             case TextureConstants::INVCUBIC_MODE:
-              defines.setReflectionMode(SMD::REFLECTIONMAP_CUBIC);
+              defines.setReflectionMode("REFLECTIONMAP_CUBIC");
               break;
           }
 
-          defines.defines[SMD::USE_LOCAL_REFLECTIONMAP_CUBIC]
+          defines.boolDef["USE_LOCAL_REFLECTIONMAP_CUBIC"]
             = _reflectionTexture->boundingBoxSize() ? true : false;
         }
       }
       else {
-        defines.defines[SMD::REFLECTION] = false;
+        defines.boolDef["REFLECTION"] = false;
       }
 
       if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
@@ -428,12 +426,11 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
         else {
           MaterialHelper::PrepareDefinesForMergedUV(_emissiveTexture, defines,
-                                                    SMD::EMISSIVE, "EMISSIVE",
-                                                    SMD::MAINUV1, SMD::MAINUV2);
+                                                    "EMISSIVE");
         }
       }
       else {
-        defines.defines[SMD::EMISSIVE] = false;
+        defines.boolDef["EMISSIVE"] = false;
       }
 
       if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
@@ -442,14 +439,12 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
         else {
           MaterialHelper::PrepareDefinesForMergedUV(_lightmapTexture, defines,
-                                                    SMD::LIGHTMAP, "LIGHTMAP",
-                                                    SMD::MAINUV1, SMD::MAINUV2);
-          defines.defines[SMD::USELIGHTMAPASSHADOWMAP]
-            = _useLightmapAsShadowmap;
+                                                    "LIGHTMAP");
+          defines.boolDef["USELIGHTMAPASSHADOWMAP"] = _useLightmapAsShadowmap;
         }
       }
       else {
-        defines.defines[SMD::LIGHTMAP] = false;
+        defines.boolDef["LIGHTMAP"] = false;
       }
 
       if (_specularTexture && StandardMaterial::SpecularTextureEnabled()) {
@@ -458,13 +453,12 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
         else {
           MaterialHelper::PrepareDefinesForMergedUV(_specularTexture, defines,
-                                                    SMD::SPECULAR, "SPECULAR",
-                                                    SMD::MAINUV1, SMD::MAINUV2);
-          defines.defines[SMD::GLOSSINESS] = _useGlossinessFromSpecularMapAlpha;
+                                                    "SPECULAR");
+          defines.boolDef["GLOSSINESS"] = _useGlossinessFromSpecularMapAlpha;
         }
       }
       else {
-        defines.defines[SMD::SPECULAR] = false;
+        defines.boolDef["SPECULAR"] = false;
       }
 
       if (scene->getEngine()->getCaps().standardDerivatives && _bumpTexture
@@ -475,17 +469,16 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         }
         else {
           MaterialHelper::PrepareDefinesForMergedUV(_bumpTexture, defines,
-                                                    SMD::BUMP, "BUMP",
-                                                    SMD::MAINUV1, SMD::MAINUV2);
+                                                    "BUMP");
 
-          defines.defines[SMD::PARALLAX]          = _useParallax;
-          defines.defines[SMD::PARALLAXOCCLUSION] = _useParallaxOcclusion;
+          defines.boolDef["PARALLAX"]          = _useParallax;
+          defines.boolDef["PARALLAXOCCLUSION"] = _useParallaxOcclusion;
         }
 
-        defines.defines[SMD::OBJECTSPACE_NORMALMAP] = _useObjectSpaceNormalMap;
+        defines.boolDef["OBJECTSPACE_NORMALMAP"] = _useObjectSpaceNormalMap;
       }
       else {
-        defines.defines[SMD::BUMP] = false;
+        defines.boolDef["BUMP"] = false;
       }
 
       if (_refractionTexture && StandardMaterial::RefractionTextureEnabled()) {
@@ -493,40 +486,39 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           return false;
         }
         else {
-          defines._needUVs                 = true;
-          defines.defines[SMD::REFRACTION] = true;
+          defines._needUVs              = true;
+          defines.boolDef["REFRACTION"] = true;
 
-          defines.defines[SMD::REFRACTIONMAP_3D] = _refractionTexture->isCube;
+          defines.boolDef["REFRACTIONMAP_3D"] = _refractionTexture->isCube;
         }
       }
       else {
-        defines.defines[SMD::REFRACTION] = false;
+        defines.boolDef["REFRACTION"] = false;
       }
 
-      defines.defines[SMD::TWOSIDEDLIGHTING]
+      defines.boolDef["TWOSIDEDLIGHTING"]
         = !_backFaceCulling && _twoSidedLighting;
     }
     else {
-      defines.defines[SMD::DIFFUSE]    = false;
-      defines.defines[SMD::AMBIENT]    = false;
-      defines.defines[SMD::OPACITY]    = false;
-      defines.defines[SMD::REFLECTION] = false;
-      defines.defines[SMD::EMISSIVE]   = false;
-      defines.defines[SMD::LIGHTMAP]   = false;
-      defines.defines[SMD::BUMP]       = false;
-      defines.defines[SMD::REFRACTION] = false;
+      defines.boolDef["DIFFUSE"]    = false;
+      defines.boolDef["AMBIENT"]    = false;
+      defines.boolDef["OPACITY"]    = false;
+      defines.boolDef["REFLECTION"] = false;
+      defines.boolDef["EMISSIVE"]   = false;
+      defines.boolDef["LIGHTMAP"]   = false;
+      defines.boolDef["BUMP"]       = false;
+      defines.boolDef["REFRACTION"] = false;
     }
 
-    defines.defines[SMD::ALPHAFROMDIFFUSE]
-      = _shouldUseAlphaFromDiffuseTexture();
+    defines.boolDef["ALPHAFROMDIFFUSE"] = _shouldUseAlphaFromDiffuseTexture();
 
-    defines.defines[SMD::EMISSIVEASILLUMINATION] = _useEmissiveAsIllumination;
+    defines.boolDef["EMISSIVEASILLUMINATION"] = _useEmissiveAsIllumination;
 
-    defines.defines[SMD::LINKEMISSIVEWITHDIFFUSE] = _linkEmissiveWithDiffuse;
+    defines.boolDef["LINKEMISSIVEWITHDIFFUSE"] = _linkEmissiveWithDiffuse;
 
-    defines.defines[SMD::SPECULAROVERALPHA] = _useSpecularOverAlpha;
+    defines.boolDef["SPECULAROVERALPHA"] = _useSpecularOverAlpha;
 
-    defines.defines[SMD::PREMULTIPLYALPHA]
+    defines.boolDef["PREMULTIPLYALPHA"]
       = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
          || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
   }
@@ -538,30 +530,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     _imageProcessingConfiguration->prepareDefines(defines);
 
-    // Synchronize settings
-    {
-      auto ipcd = static_cast<IImageProcessingConfigurationDefines>(defines);
-      defines.defines[SMD::IMAGEPROCESSING] = ipcd.IMAGEPROCESSING;
-      defines.defines[SMD::VIGNETTE]        = ipcd.VIGNETTE;
-      defines.defines[SMD::VIGNETTEBLENDMODEMULTIPLY]
-        = ipcd.VIGNETTEBLENDMODEMULTIPLY;
-      defines.defines[SMD::VIGNETTEBLENDMODEOPAQUE]
-        = ipcd.VIGNETTEBLENDMODEOPAQUE;
-      defines.defines[SMD::TONEMAPPING]         = ipcd.TONEMAPPING;
-      defines.defines[SMD::CONTRAST]            = ipcd.CONTRAST;
-      defines.defines[SMD::EXPOSURE]            = ipcd.EXPOSURE;
-      defines.defines[SMD::COLORCURVES]         = ipcd.COLORCURVES;
-      defines.defines[SMD::COLORGRADING]        = ipcd.COLORGRADING;
-      defines.defines[SMD::COLORGRADING3D]      = ipcd.COLORGRADING3D;
-      defines.defines[SMD::SAMPLER3DGREENDEPTH] = ipcd.SAMPLER3DGREENDEPTH;
-      defines.defines[SMD::SAMPLER3DBGRMAP]     = ipcd.SAMPLER3DBGRMAP;
-      defines.defines[SMD::IMAGEPROCESSINGPOSTPROCESS]
-        = ipcd.IMAGEPROCESSINGPOSTPROCESS;
-    }
-
-    defines.defines[SMD::IS_REFLECTION_LINEAR]
+    defines.boolDef["IS_REFLECTION_LINEAR"]
       = (reflectionTexture() != nullptr && !reflectionTexture()->gammaSpace);
-    defines.defines[SMD::IS_REFRACTION_LINEAR]
+    defines.boolDef["IS_REFRACTION_LINEAR"]
       = (refractionTexture() != nullptr && !refractionTexture()->gammaSpace);
   }
 
@@ -572,54 +543,50 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           || _emissiveFresnelParameters || _refractionFresnelParameters
           || _reflectionFresnelParameters) {
 
-        defines.defines[SMD::DIFFUSEFRESNEL]
+        defines.boolDef["DIFFUSEFRESNEL"]
           = (_diffuseFresnelParameters
              && _diffuseFresnelParameters->isEnabled());
 
-        defines.defines[SMD::OPACITYFRESNEL]
+        defines.boolDef["OPACITYFRESNEL"]
           = (_opacityFresnelParameters
              && _opacityFresnelParameters->isEnabled());
 
-        defines.defines[SMD::REFLECTIONFRESNEL]
+        defines.boolDef["REFLECTIONFRESNEL"]
           = (_reflectionFresnelParameters
              && _reflectionFresnelParameters->isEnabled());
 
-        defines.defines[SMD::REFLECTIONFRESNELFROMSPECULAR]
+        defines.boolDef["REFLECTIONFRESNELFROMSPECULAR"]
           = _useReflectionFresnelFromSpecular;
 
-        defines.defines[SMD::REFRACTIONFRESNEL]
+        defines.boolDef["REFRACTIONFRESNEL"]
           = (_refractionFresnelParameters
              && _refractionFresnelParameters->isEnabled());
 
-        defines.defines[SMD::EMISSIVEFRESNEL]
+        defines.boolDef["EMISSIVEFRESNEL"]
           = (_emissiveFresnelParameters
              && _emissiveFresnelParameters->isEnabled());
 
-        defines._needNormals          = true;
-        defines.defines[SMD::FRESNEL] = true;
+        defines._needNormals       = true;
+        defines.boolDef["FRESNEL"] = true;
       }
     }
     else {
-      defines.defines[SMD::FRESNEL] = false;
+      defines.boolDef["FRESNEL"] = false;
     }
   }
 
   // Misc.
-  MaterialHelper::PrepareDefinesForMisc(
-    mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(),
-    _shouldTurnAlphaTestOn(mesh), defines, SMD::LOGARITHMICDEPTH,
-    SMD::POINTSIZE, SMD::FOG, SMD::NONUNIFORMSCALING, SMD::ALPHATEST);
+  MaterialHelper::PrepareDefinesForMisc(mesh, scene, _useLogarithmicDepth,
+                                        pointsCloud(), fogEnabled(),
+                                        _shouldTurnAlphaTestOn(mesh), defines);
 
   // Attribs
-  MaterialHelper::PrepareDefinesForAttributes(
-    mesh, defines, true, true, true, true, SMD::NORMAL, SMD::UV1, SMD::UV2,
-    SMD::VERTEXCOLOR, SMD::VERTEXALPHA, SMD::MORPHTARGETS_TANGENT,
-    SMD::MORPHTARGETS_NORMAL, SMD::MORPHTARGETS);
+  MaterialHelper::PrepareDefinesForAttributes(mesh, defines, true, true, true,
+                                              true);
 
   // Values that need to be evaluated on every frame
-  MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances, SMD::CLIPPLANE, SMD::DEPTHPREPASS,
-    SMD::INSTANCES);
+  MaterialHelper::PrepareDefinesForFrameBoundValues(scene, engine, defines,
+                                                    useInstances);
 
   // Get correct effect
   if (defines.isDirty()) {
@@ -628,94 +595,92 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     // Fallbacks
     auto fallbacks = ::std::make_unique<EffectFallbacks>();
-    if (defines[SMD::REFLECTION]) {
+    if (defines["REFLECTION"]) {
       fallbacks->addFallback(0, "REFLECTION");
     }
 
-    if (defines[SMD::SPECULAR]) {
+    if (defines["SPECULAR"]) {
       fallbacks->addFallback(0, "SPECULAR");
     }
 
-    if (defines[SMD::BUMP]) {
+    if (defines["BUMP"]) {
       fallbacks->addFallback(0, "BUMP");
     }
 
-    if (defines[SMD::PARALLAX]) {
+    if (defines["PARALLAX"]) {
       fallbacks->addFallback(1, "PARALLAX");
     }
 
-    if (defines[SMD::PARALLAXOCCLUSION]) {
+    if (defines["PARALLAXOCCLUSION"]) {
       fallbacks->addFallback(0, "PARALLAXOCCLUSION");
     }
 
-    if (defines[SMD::SPECULAROVERALPHA]) {
+    if (defines["SPECULAROVERALPHA"]) {
       fallbacks->addFallback(0, "SPECULAROVERALPHA");
     }
 
-    if (defines[SMD::FOG]) {
+    if (defines["FOG"]) {
       fallbacks->addFallback(1, "FOG");
     }
 
-    if (defines[SMD::POINTSIZE]) {
+    if (defines["POINTSIZE"]) {
       fallbacks->addFallback(0, "POINTSIZE");
     }
 
-    if (defines[SMD::LOGARITHMICDEPTH]) {
+    if (defines["LOGARITHMICDEPTH"]) {
       fallbacks->addFallback(0, "LOGARITHMICDEPTH");
     }
 
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
                                               _maxSimultaneousLights);
 
-    if (defines[SMD::SPECULARTERM]) {
+    if (defines["SPECULARTERM"]) {
       fallbacks->addFallback(0, "SPECULARTERM");
     }
 
-    if (defines[SMD::DIFFUSEFRESNEL]) {
+    if (defines["DIFFUSEFRESNEL"]) {
       fallbacks->addFallback(1, "DIFFUSEFRESNEL");
     }
 
-    if (defines[SMD::OPACITYFRESNEL]) {
+    if (defines["OPACITYFRESNEL"]) {
       fallbacks->addFallback(2, "OPACITYFRESNEL");
     }
 
-    if (defines[SMD::REFLECTIONFRESNEL]) {
+    if (defines["REFLECTIONFRESNEL"]) {
       fallbacks->addFallback(3, "REFLECTIONFRESNEL");
     }
 
-    if (defines[SMD::EMISSIVEFRESNEL]) {
+    if (defines["EMISSIVEFRESNEL"]) {
       fallbacks->addFallback(4, "EMISSIVEFRESNEL");
     }
 
-    if (defines[SMD::FRESNEL]) {
+    if (defines["FRESNEL"]) {
       fallbacks->addFallback(4, "FRESNEL");
     }
 
     // Attributes
     vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
 
-    if (defines[SMD::NORMAL]) {
+    if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
     }
 
-    if (defines[SMD::UV1]) {
+    if (defines["UV1"]) {
       attribs.emplace_back(VertexBuffer::UVKindChars);
     }
 
-    if (defines[SMD::UV2]) {
+    if (defines["UV2"]) {
       attribs.emplace_back(VertexBuffer::UV2KindChars);
     }
 
-    if (defines[SMD::VERTEXCOLOR]) {
+    if (defines["VERTEXCOLOR"]) {
       attribs.emplace_back(VertexBuffer::ColorKindChars);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,
                                               *fallbacks);
-    MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                  SMD::INSTANCES);
-    MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
-                                                     SMD::NORMAL);
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
+    MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines);
 
     string_t shaderName{"default"};
     const auto join = defines.toString();
@@ -742,6 +707,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                 "vRefractionInfos",
                                 "mBones",
                                 "vClipPlane",
+                                "vClipPlane2",
+                                "vClipPlane3",
+                                "vClipPlane4",
                                 "diffuseMatrix",
                                 "ambientMatrix",
                                 "opacityMatrix",
@@ -778,7 +746,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     unordered_map_t<string_t, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights},
-      {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
+      {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
     EffectCreationOptions options;
     options.attributes            = ::std::move(attribs);
@@ -903,7 +871,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   bindOnlyWorldMatrix(*world);
 
   // Normal Matrix
-  if (defines.defines[SMD::OBJECTSPACE_NORMALMAP]) {
+  if (defines["OBJECTSPACE_NORMALMAP"]) {
     world->toNormalMatrix(_normalMatrix);
     bindOnlyNormalMatrix(_normalMatrix);
   }
@@ -918,7 +886,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     bindViewProjection(effect);
     if (!_uniformBuffer->useUbo() || !isFrozen() || !_uniformBuffer->isSync()) {
 
-      if (StandardMaterial::FresnelEnabled() && defines[SMD::FRESNEL]) {
+      if (StandardMaterial::FresnelEnabled() && defines["FRESNEL"]) {
         // Fresnel
         if (_diffuseFresnelParameters
             && _diffuseFresnelParameters->isEnabled()) {
@@ -1094,7 +1062,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         _uniformBuffer->updateFloat("pointSize", pointSize);
       }
 
-      if (defines.SPECULARTERM) {
+      if (defines["SPECULARTERM"]) {
         _uniformBuffer->updateColor4("vSpecularColor", specularColor,
                                      specularPower, "");
       }
@@ -1168,7 +1136,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     // Lights
     if (scene->lightsEnabled() && !_disableLighting) {
       MaterialHelper::BindLights(scene, mesh, effect, defines,
-                                 _maxSimultaneousLights, SMD::SPECULARTERM);
+                                 _maxSimultaneousLights);
     }
 
     // View
@@ -1182,12 +1150,12 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     MaterialHelper::BindFogParameters(scene, mesh, effect);
 
     // Morph targets
-    if (defines.NUM_MORPH_INFLUENCERS) {
+    if (defines.intDef["NUM_MORPH_INFLUENCERS"]) {
       MaterialHelper::BindMorphTargetParameters(mesh, effect);
     }
 
     // Log. depth
-    MaterialHelper::BindLogDepth(defines, effect, scene, SMD::LOGARITHMICDEPTH);
+    MaterialHelper::BindLogDepth(defines, effect, scene);
 
     // Image processing
     if (_imageProcessingConfiguration

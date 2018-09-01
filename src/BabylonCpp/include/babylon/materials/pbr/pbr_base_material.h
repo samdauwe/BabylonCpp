@@ -17,8 +17,6 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PBRBaseMaterial : public PushMaterial {
 
 public:
-  using PMD = PBRMaterialDefines;
-
   /**
    * PBRMaterialLightFalloff Physical: light is falling off following the
    * inverse squared distance law.

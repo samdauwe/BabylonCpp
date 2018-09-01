@@ -332,9 +332,10 @@ void SpotLight::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                             unsigned int lightIndex)
 {
-  defines.resizeLights(lightIndex);
-  defines.spotlights[lightIndex] = true;
-  defines.projectedLightTexture[lightIndex]
+  const auto lightIndexStr = ::std::to_string(lightIndex);
+
+  defines.boolDef["SPOTLIGHT" + lightIndexStr] = true;
+  defines.boolDef["PROJECTEDLIGHTTEXTURE" + lightIndexStr]
     = projectionTexture() ? true : false;
 }
 

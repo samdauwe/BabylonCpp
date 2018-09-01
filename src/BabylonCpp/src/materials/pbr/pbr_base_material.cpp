@@ -412,108 +412,106 @@ Effect* PBRBaseMaterial::_prepareEffect(
   // Fallbacks
   auto fallbacks    = ::std::make_unique<EffectFallbacks>();
   auto fallbackRank = 0u;
-  if (defines[PMD::USESPHERICALINVERTEX]) {
+  if (defines["USESPHERICALINVERTEX"]) {
     fallbacks->addFallback(fallbackRank++, "USESPHERICALINVERTEX");
   }
 
-  if (defines[PMD::FOG]) {
+  if (defines["FOG"]) {
     fallbacks->addFallback(fallbackRank, "FOG");
   }
-  if (defines[PMD::SPECULARAA]) {
+  if (defines["SPECULARAA"]) {
     fallbacks->addFallback(fallbackRank, "SPECULARAA");
   }
-  if (defines[PMD::POINTSIZE]) {
+  if (defines["POINTSIZE"]) {
     fallbacks->addFallback(fallbackRank, "POINTSIZE");
   }
-  if (defines[PMD::LOGARITHMICDEPTH]) {
+  if (defines["LOGARITHMICDEPTH"]) {
     fallbacks->addFallback(fallbackRank, "LOGARITHMICDEPTH");
   }
-  if (defines[PMD::PARALLAX]) {
+  if (defines["PARALLAX"]) {
     fallbacks->addFallback(fallbackRank, "PARALLAX");
   }
-  if (defines[PMD::PARALLAXOCCLUSION]) {
+  if (defines["PARALLAXOCCLUSION"]) {
     fallbacks->addFallback(fallbackRank++, "PARALLAXOCCLUSION");
   }
 
-  if (defines[PMD::ENVIRONMENTBRDF]) {
+  if (defines["ENVIRONMENTBRDF"]) {
     fallbacks->addFallback(fallbackRank++, "ENVIRONMENTBRDF");
   }
 
-  if (defines[PMD::TANGENT]) {
+  if (defines["TANGENT"]) {
     fallbacks->addFallback(fallbackRank++, "TANGENT");
   }
 
-  if (defines[PMD::BUMP]) {
+  if (defines["BUMP"]) {
     fallbacks->addFallback(fallbackRank++, "BUMP");
   }
 
   fallbackRank = MaterialHelper::HandleFallbacksForShadows(
     defines, *fallbacks, _maxSimultaneousLights, fallbackRank++);
 
-  if (defines[PMD::SPECULARTERM]) {
+  if (defines["SPECULARTERM"]) {
     fallbacks->addFallback(fallbackRank++, "SPECULARTERM");
   }
 
-  if (defines[PMD::USESPHERICALFROMREFLECTIONMAP]) {
+  if (defines["USESPHERICALFROMREFLECTIONMAP"]) {
     fallbacks->addFallback(fallbackRank++, "USESPHERICALFROMREFLECTIONMAP");
   }
 
-  if (defines[PMD::LIGHTMAP]) {
+  if (defines["LIGHTMAP"]) {
     fallbacks->addFallback(fallbackRank++, "LIGHTMAP");
   }
 
-  if (defines[PMD::NORMAL]) {
+  if (defines["NORMAL"]) {
     fallbacks->addFallback(fallbackRank++, "NORMAL");
   }
 
-  if (defines[PMD::AMBIENT]) {
+  if (defines["AMBIENT"]) {
     fallbacks->addFallback(fallbackRank++, "AMBIENT");
   }
 
-  if (defines[PMD::EMISSIVE]) {
+  if (defines["EMISSIVE"]) {
     fallbacks->addFallback(fallbackRank++, "EMISSIVE");
   }
 
-  if (defines[PMD::VERTEXCOLOR]) {
+  if (defines["VERTEXCOLOR"]) {
     fallbacks->addFallback(fallbackRank++, "VERTEXCOLOR");
   }
 
-  if (defines.NUM_BONE_INFLUENCERS > 0) {
+  if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
     fallbacks->addCPUSkinningFallback(fallbackRank++, mesh);
   }
 
-  if (defines[PMD::MORPHTARGETS]) {
+  if (defines["MORPHTARGETS"]) {
     fallbacks->addFallback(fallbackRank++, "MORPHTARGETS");
   }
 
   // Attributes
   vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
 
-  if (defines[PMD::NORMAL]) {
+  if (defines["NORMAL"]) {
     attribs.emplace_back(VertexBuffer::NormalKindChars);
   }
 
-  if (defines[PMD::TANGENT]) {
+  if (defines["TANGENT"]) {
     attribs.emplace_back(VertexBuffer::TangentKindChars);
   }
 
-  if (defines[PMD::UV1]) {
+  if (defines["UV1"]) {
     attribs.emplace_back(VertexBuffer::UVKindChars);
   }
 
-  if (defines[PMD::UV2]) {
+  if (defines["UV2"]) {
     attribs.emplace_back(VertexBuffer::UV2KindChars);
   }
 
-  if (defines[PMD::VERTEXCOLOR]) {
+  if (defines["VERTEXCOLOR"]) {
     attribs.emplace_back(VertexBuffer::ColorKindChars);
   }
 
   MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);
-  MaterialHelper::PrepareAttributesForInstances(attribs, defines,
-                                                PMD::INSTANCES);
-  MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines,
-                                                   PMD::NORMAL);
+  MaterialHelper::PrepareAttributesForInstances(attribs, defines);
+  MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines);
 
   vector_t<string_t> uniforms{"world",
                               "view",
@@ -587,7 +585,7 @@ Effect* PBRBaseMaterial::_prepareEffect(
 
   unordered_map_t<string_t, unsigned int> indexParameters{
     {"maxSimultaneousLights", _maxSimultaneousLights},
-    {"maxSimultaneousMorphTargets", defines.NUM_MORPH_INFLUENCERS}};
+    {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
   auto join = defines.toString();
 
@@ -619,96 +617,92 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
   // Lights
   MaterialHelper::PrepareDefinesForLights(
-    scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting,
-    PMD::SPECULARTERM, PMD::SHADOWFLOAT);
+    scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting);
   defines._needNormals = true;
 
   // Textures
-  defines.defines[PMD::METALLICWORKFLOW] = isMetallicWorkflow();
+  defines.boolDef["METALLICWORKFLOW"] = isMetallicWorkflow();
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
     if (scene->texturesEnabled()) {
       if (scene->getEngine()->getCaps().textureLOD) {
-        defines.defines[PMD::LODBASEDMICROSFURACE] = true;
+        defines.boolDef["LODBASEDMICROSFURACE"] = true;
       }
 
       if (_albedoTexture && StandardMaterial::DiffuseTextureEnabled()) {
         MaterialHelper::PrepareDefinesForMergedUV(_albedoTexture, defines,
-                                                  PMD::ALBEDO, "ALBEDO",
-                                                  PMD::MAINUV1, PMD::MAINUV2);
+                                                  "ALBEDO");
       }
       else {
-        defines.defines[PMD::ALBEDO] = false;
+        defines.boolDef["ALBEDO"] = false;
       }
 
       if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
         MaterialHelper::PrepareDefinesForMergedUV(_ambientTexture, defines,
-                                                  PMD::AMBIENT, "AMBIENT",
-                                                  PMD::MAINUV1, PMD::MAINUV2);
-        defines.defines[PMD::AMBIENTINGRAYSCALE] = _useAmbientInGrayScale;
+                                                  "AMBIENT");
+        defines.boolDef["AMBIENTINGRAYSCALE"] = _useAmbientInGrayScale;
       }
       else {
-        defines.defines[PMD::AMBIENT] = false;
+        defines.boolDef["AMBIENT"] = false;
       }
 
       if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
         MaterialHelper::PrepareDefinesForMergedUV(_opacityTexture, defines,
-                                                  PMD::OPACITY, "OPACITY",
-                                                  PMD::MAINUV1, PMD::MAINUV2);
-        defines.defines[PMD::OPACITYRGB] = _opacityTexture->getAlphaFromRGB;
+                                                  "OPACITY");
+        defines.boolDef["OPACITYRGB"] = _opacityTexture->getAlphaFromRGB;
       }
       else {
-        defines.defines[PMD::OPACITY] = false;
+        defines.boolDef["OPACITY"] = false;
       }
 
       auto reflectionTexture = _getReflectionTexture();
       if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
-        defines.defines[PMD::REFLECTION]      = true;
-        defines.defines[PMD::GAMMAREFLECTION] = reflectionTexture->gammaSpace;
-        defines.defines[PMD::RGBDREFLECTION]  = reflectionTexture->isRGBD;
-        defines.defines[PMD::REFLECTIONMAP_OPPOSITEZ]
+        defines.boolDef["REFLECTION"]      = true;
+        defines.boolDef["GAMMAREFLECTION"] = reflectionTexture->gammaSpace;
+        defines.boolDef["RGBDREFLECTION"]  = reflectionTexture->isRGBD;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]
           = getScene()->useRightHandedSystem() ? !reflectionTexture->invertZ :
                                                  reflectionTexture->invertZ;
-        defines.defines[PMD::LODINREFLECTIONALPHA]
+        defines.boolDef["LODINREFLECTIONALPHA"]
           = reflectionTexture->lodLevelInAlpha;
 
         if (reflectionTexture->coordinatesMode()
             == TextureConstants::INVCUBIC_MODE) {
-          defines.defines[PMD::INVERTCUBICMAP] = true;
+          defines.boolDef["INVERTCUBICMAP"] = true;
         }
 
-        defines.defines[PMD::REFLECTIONMAP_3D] = reflectionTexture->isCube;
+        defines.boolDef["REFLECTIONMAP_3D"] = reflectionTexture->isCube;
 
         switch (reflectionTexture->coordinatesMode()) {
           case TextureConstants::EXPLICIT_MODE:
-            defines.defines[PMD::REFLECTIONMAP_EXPLICIT] = true;
+            defines.boolDef["REFLECTIONMAP_EXPLICIT"] = true;
             break;
           case TextureConstants::PLANAR_MODE:
-            defines.defines[PMD::REFLECTIONMAP_PLANAR] = true;
+            defines.boolDef["REFLECTIONMAP_PLANAR"] = true;
             break;
           case TextureConstants::PROJECTION_MODE:
-            defines.defines[PMD::REFLECTIONMAP_PROJECTION] = true;
+            defines.boolDef["REFLECTIONMAP_PROJECTION"] = true;
             break;
           case TextureConstants::SKYBOX_MODE:
-            defines.defines[PMD::REFLECTIONMAP_SKYBOX] = true;
+            defines.boolDef["REFLECTIONMAP_SKYBOX"] = true;
             break;
           case TextureConstants::SPHERICAL_MODE:
-            defines.defines[PMD::REFLECTIONMAP_SPHERICAL] = true;
+            defines.boolDef["REFLECTIONMAP_SPHERICAL"] = true;
             break;
           case TextureConstants::EQUIRECTANGULAR_MODE:
-            defines.defines[PMD::REFLECTIONMAP_EQUIRECTANGULAR] = true;
+            defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR"] = true;
             break;
           case TextureConstants::FIXED_EQUIRECTANGULAR_MODE:
-            defines.defines[PMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED] = true;
+            defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR_FIXED"] = true;
             break;
           case TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE:
-            defines.defines[PMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED]
+            defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"]
               = true;
             break;
           case TextureConstants::CUBIC_MODE:
           case TextureConstants::INVCUBIC_MODE:
-            defines.defines[PMD::REFLECTIONMAP_CUBIC] = true;
-            defines.defines[PMD::USE_LOCAL_REFLECTIONMAP_CUBIC]
+            defines.boolDef["REFLECTIONMAP_CUBIC"] = true;
+            defines.boolDef["USE_LOCAL_REFLECTIONMAP_CUBIC"]
               = reflectionTexture->boundingBoxSize() ? true : false;
             break;
         }
@@ -716,196 +710,190 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
         if (reflectionTexture->coordinatesMode()
             != TextureConstants::SKYBOX_MODE) {
           if (reflectionTexture->sphericalPolynomial()) {
-            defines.defines[PMD::USESPHERICALFROMREFLECTIONMAP] = true;
+            defines.boolDef["USESPHERICALFROMREFLECTIONMAP"] = true;
             if (_forceIrradianceInFragment
                 || scene->getEngine()->getCaps().maxVaryingVectors <= 8) {
-              defines.defines[PMD::USESPHERICALINVERTEX] = false;
+              defines.boolDef["USESPHERICALINVERTEX"] = false;
             }
             else {
-              defines.defines[PMD::USESPHERICALINVERTEX] = true;
+              defines.boolDef["USESPHERICALINVERTEX"] = true;
             }
           }
         }
         else {
-          defines.defines[PMD::REFLECTIONMAP_SKYBOX_TRANSFORMED]
+          defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]
             = !reflectionTexture->getReflectionTextureMatrix()->isIdentity();
         }
       }
       else {
-        defines.defines[PMD::REFLECTION]                          = false;
-        defines.defines[PMD::REFLECTIONMAP_3D]                    = false;
-        defines.defines[PMD::REFLECTIONMAP_SPHERICAL]             = false;
-        defines.defines[PMD::REFLECTIONMAP_PLANAR]                = false;
-        defines.defines[PMD::REFLECTIONMAP_CUBIC]                 = false;
-        defines.defines[PMD::USE_LOCAL_REFLECTIONMAP_CUBIC]       = false;
-        defines.defines[PMD::REFLECTIONMAP_PROJECTION]            = false;
-        defines.defines[PMD::REFLECTIONMAP_SKYBOX]                = false;
-        defines.defines[PMD::REFLECTIONMAP_SKYBOX_TRANSFORMED]    = false;
-        defines.defines[PMD::REFLECTIONMAP_EXPLICIT]              = false;
-        defines.defines[PMD::REFLECTIONMAP_EQUIRECTANGULAR]       = false;
-        defines.defines[PMD::REFLECTIONMAP_EQUIRECTANGULAR_FIXED] = false;
-        defines.defines[PMD::REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED]
-          = false;
-        defines.defines[PMD::INVERTCUBICMAP]                = false;
-        defines.defines[PMD::USESPHERICALFROMREFLECTIONMAP] = false;
-        defines.defines[PMD::USESPHERICALINVERTEX]          = false;
-        defines.defines[PMD::REFLECTIONMAP_OPPOSITEZ]       = false;
-        defines.defines[PMD::LODINREFLECTIONALPHA]          = false;
-        defines.defines[PMD::GAMMAREFLECTION]               = false;
-        defines.defines[PMD::RGBDREFLECTION]                = false;
+        defines.boolDef["REFLECTION"]                                  = false;
+        defines.boolDef["REFLECTIONMAP_3D"]                            = false;
+        defines.boolDef["REFLECTIONMAP_SPHERICAL"]                     = false;
+        defines.boolDef["REFLECTIONMAP_PLANAR"]                        = false;
+        defines.boolDef["REFLECTIONMAP_CUBIC"]                         = false;
+        defines.boolDef["USE_LOCAL_REFLECTIONMAP_CUBIC"]               = false;
+        defines.boolDef["REFLECTIONMAP_PROJECTION"]                    = false;
+        defines.boolDef["REFLECTIONMAP_SKYBOX"]                        = false;
+        defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]            = false;
+        defines.boolDef["REFLECTIONMAP_EXPLICIT"]                      = false;
+        defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR"]               = false;
+        defines.boolDef["REFLECTIONMAP_EQUIRECTANGULAR_FIXED"]         = false;
+        defines.boolDef["REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"] = false;
+        defines.boolDef["INVERTCUBICMAP"]                              = false;
+        defines.boolDef["USESPHERICALFROMREFLECTIONMAP"]               = false;
+        defines.boolDef["USESPHERICALINVERTEX"]                        = false;
+        defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]                     = false;
+        defines.boolDef["LODINREFLECTIONALPHA"]                        = false;
+        defines.boolDef["GAMMAREFLECTION"]                             = false;
+        defines.boolDef["RGBDREFLECTION"]                              = false;
       }
 
       if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
         MaterialHelper::PrepareDefinesForMergedUV(_lightmapTexture, defines,
-                                                  PMD::LIGHTMAP, "LIGHTMAP",
-                                                  PMD::MAINUV1, PMD::MAINUV2);
-        defines.defines[PMD::USELIGHTMAPASSHADOWMAP] = _useLightmapAsShadowmap;
-        defines.defines[PMD::GAMMALIGHTMAP] = _lightmapTexture->gammaSpace;
+                                                  "LIGHTMAP");
+        defines.boolDef["USELIGHTMAPASSHADOWMAP"] = _useLightmapAsShadowmap;
+        defines.boolDef["GAMMALIGHTMAP"] = _lightmapTexture->gammaSpace;
       }
       else {
-        defines.defines[PMD::LIGHTMAP] = false;
+        defines.boolDef["LIGHTMAP"] = false;
       }
 
       if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
         MaterialHelper::PrepareDefinesForMergedUV(_emissiveTexture, defines,
-                                                  PMD::EMISSIVE, "EMISSIVE",
-                                                  PMD::MAINUV1, PMD::MAINUV2);
+                                                  "EMISSIVE");
       }
       else {
-        defines.defines[PMD::EMISSIVE] = false;
+        defines.boolDef["EMISSIVE"] = false;
       }
 
       if (StandardMaterial::SpecularTextureEnabled()) {
         if (_metallicTexture) {
-          MaterialHelper::PrepareDefinesForMergedUV(
-            _metallicTexture, defines, PMD::REFLECTIVITY, "REFLECTIVITY",
-            PMD::MAINUV1, PMD::MAINUV2);
-          defines.defines[PMD::ROUGHNESSSTOREINMETALMAPALPHA]
+          MaterialHelper::PrepareDefinesForMergedUV(_metallicTexture, defines,
+                                                    "REFLECTIVITY");
+          defines.boolDef["ROUGHNESSSTOREINMETALMAPALPHA"]
             = _useRoughnessFromMetallicTextureAlpha;
-          defines.defines[PMD::ROUGHNESSSTOREINMETALMAPGREEN]
+          defines.boolDef["ROUGHNESSSTOREINMETALMAPGREEN"]
             = !_useRoughnessFromMetallicTextureAlpha
               && _useRoughnessFromMetallicTextureGreen;
-          defines.defines[PMD::METALLNESSSTOREINMETALMAPBLUE]
+          defines.boolDef["METALLNESSSTOREINMETALMAPBLUE"]
             = _useMetallnessFromMetallicTextureBlue;
-          defines.defines[PMD::AOSTOREINMETALMAPRED]
+          defines.boolDef["AOSTOREINMETALMAPRED"]
             = _useAmbientOcclusionFromMetallicTextureRed;
         }
         else if (_reflectivityTexture) {
-          MaterialHelper::PrepareDefinesForMergedUV(
-            _reflectivityTexture, defines, PMD::REFLECTIVITY, "REFLECTIVITY",
-            PMD::MAINUV1, PMD::MAINUV2);
-          defines.defines[PMD::MICROSURFACEFROMREFLECTIVITYMAP]
+          MaterialHelper::PrepareDefinesForMergedUV(_reflectivityTexture,
+                                                    defines, "REFLECTIVITY");
+          defines.boolDef["MICROSURFACEFROMREFLECTIVITYMAP"]
             = _useMicroSurfaceFromReflectivityMapAlpha;
-          defines.defines[PMD::MICROSURFACEAUTOMATIC]
+          defines.boolDef["MICROSURFACEAUTOMATIC"]
             = _useAutoMicroSurfaceFromReflectivityMap;
         }
         else {
-          defines.defines[PMD::REFLECTIVITY] = false;
+          defines.boolDef["REFLECTIVITY"] = false;
         }
 
         if (_microSurfaceTexture) {
-          MaterialHelper::PrepareDefinesForMergedUV(
-            _microSurfaceTexture, defines, PMD::MICROSURFACEMAP,
-            "MICROSURFACEMAP", PMD::MAINUV1, PMD::MAINUV2);
+          MaterialHelper::PrepareDefinesForMergedUV(_microSurfaceTexture,
+                                                    defines, "MICROSURFACEMAP");
         }
         else {
-          defines.defines[PMD::MICROSURFACEMAP] = false;
+          defines.boolDef["MICROSURFACEMAP"] = false;
         }
       }
       else {
-        defines.defines[PMD::REFLECTIVITY]    = false;
-        defines.defines[PMD::MICROSURFACEMAP] = false;
+        defines.boolDef["REFLECTIVITY"]    = false;
+        defines.boolDef["MICROSURFACEMAP"] = false;
       }
 
       if (scene->getEngine()->getCaps().standardDerivatives && _bumpTexture
           && StandardMaterial::BumpTextureEnabled() && !_disableBumpMap) {
-        MaterialHelper::PrepareDefinesForMergedUV(
-          _bumpTexture, defines, PMD::BUMP, "BUMP", PMD::MAINUV1, PMD::MAINUV2);
+        MaterialHelper::PrepareDefinesForMergedUV(_bumpTexture, defines,
+                                                  "BUMP");
 
         if (_useParallax && _albedoTexture
             && StandardMaterial::DiffuseTextureEnabled()) {
-          defines.defines[PMD::PARALLAX]          = true;
-          defines.defines[PMD::PARALLAXOCCLUSION] = !!_useParallaxOcclusion;
+          defines.boolDef["PARALLAX"]          = true;
+          defines.boolDef["PARALLAXOCCLUSION"] = !!_useParallaxOcclusion;
         }
         else {
-          defines.defines[PMD::PARALLAX] = false;
+          defines.boolDef["PARALLAX"] = false;
         }
-        defines.defines[PMD::OBJECTSPACE_NORMALMAP] = _useObjectSpaceNormalMap;
+        defines.boolDef["OBJECTSPACE_NORMALMAP"] = _useObjectSpaceNormalMap;
       }
       else {
-        defines.defines[PMD::BUMP] = false;
+        defines.boolDef["BUMP"] = false;
       }
 
       auto refractionTexture = _getRefractionTexture();
       if (refractionTexture && StandardMaterial::RefractionTextureEnabled()) {
-        defines.defines[PMD::REFRACTION]       = true;
-        defines.defines[PMD::REFRACTIONMAP_3D] = refractionTexture->isCube;
-        defines.defines[PMD::GAMMAREFRACTION]  = refractionTexture->gammaSpace;
-        defines.defines[PMD::RGBDREFRACTION]   = refractionTexture->isRGBD;
-        defines.defines[PMD::REFRACTIONMAP_OPPOSITEZ]
-          = refractionTexture->invertZ;
-        defines.defines[PMD::LODINREFRACTIONALPHA]
+        defines.boolDef["REFRACTION"]       = true;
+        defines.boolDef["REFRACTIONMAP_3D"] = refractionTexture->isCube;
+        defines.boolDef["GAMMAREFRACTION"]  = refractionTexture->gammaSpace;
+        defines.boolDef["RGBDREFRACTION"]   = refractionTexture->isRGBD;
+        defines.boolDef["REFRACTIONMAP_OPPOSITEZ"] = refractionTexture->invertZ;
+        defines.boolDef["LODINREFRACTIONALPHA"]
           = refractionTexture->lodLevelInAlpha;
 
         if (_linkRefractionWithTransparency) {
-          defines.defines[PMD::LINKREFRACTIONTOTRANSPARENCY] = true;
+          defines.boolDef["LINKREFRACTIONTOTRANSPARENCY"] = true;
         }
       }
       else {
-        defines.defines[PMD::REFRACTION] = false;
+        defines.boolDef["REFRACTION"] = false;
       }
 
       if (_environmentBRDFTexture
           && StandardMaterial::ReflectionTextureEnabled()) {
-        defines.defines[PMD::ENVIRONMENTBRDF] = true;
+        defines.boolDef["ENVIRONMENTBRDF"] = true;
       }
       else {
-        defines.defines[PMD::ENVIRONMENTBRDF] = false;
+        defines.boolDef["ENVIRONMENTBRDF"] = false;
       }
 
       if (_shouldUseAlphaFromAlbedoTexture()) {
-        defines.defines[PMD::ALPHAFROMALBEDO] = true;
+        defines.boolDef["ALPHAFROMALBEDO"] = true;
       }
       else {
-        defines.defines[PMD::ALPHAFROMALBEDO] = false;
+        defines.boolDef["ALPHAFROMALBEDO"] = false;
       }
     }
 
-    defines.defines[PMD::SPECULAROVERALPHA] = _useSpecularOverAlpha;
+    defines.boolDef["SPECULAROVERALPHA"] = _useSpecularOverAlpha;
 
     if (_lightFalloff == PBRBaseMaterial::LIGHTFALLOFF_STANDARD) {
-      defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = false;
-      defines.defines[PMD::USEGLTFLIGHTFALLOFF]     = false;
+      defines.boolDef["USEPHYSICALLIGHTFALLOFF"] = false;
+      defines.boolDef["USEGLTFLIGHTFALLOFF"]     = false;
     }
     else if (_lightFalloff == PBRBaseMaterial::LIGHTFALLOFF_GLTF) {
-      defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = false;
-      defines.defines[PMD::USEGLTFLIGHTFALLOFF]     = true;
+      defines.boolDef["USEPHYSICALLIGHTFALLOFF"] = false;
+      defines.boolDef["USEGLTFLIGHTFALLOFF"]     = true;
     }
     else {
-      defines.defines[PMD::USEPHYSICALLIGHTFALLOFF] = true;
-      defines.defines[PMD::USEGLTFLIGHTFALLOFF]     = false;
+      defines.boolDef["USEPHYSICALLIGHTFALLOFF"] = true;
+      defines.boolDef["USEGLTFLIGHTFALLOFF"]     = false;
     }
 
-    defines.defines[PMD::RADIANCEOVERALPHA] = _useRadianceOverAlpha;
+    defines.boolDef["RADIANCEOVERALPHA"] = _useRadianceOverAlpha;
 
     if (!backFaceCulling() && _twoSidedLighting) {
-      defines.defines[PMD::TWOSIDEDLIGHTING] = true;
+      defines.boolDef["TWOSIDEDLIGHTING"] = true;
     }
     else {
-      defines.defines[PMD::TWOSIDEDLIGHTING] = false;
+      defines.boolDef["TWOSIDEDLIGHTING"] = false;
     }
 
-    defines.ALPHATESTVALUE
-      = "${_alphaCutOff}${_alphaCutOff % 1 === 0 ? \".\" : \"\"}";
-    defines.defines[PMD::PREMULTIPLYALPHA]
+    defines.stringDef["ALPHATESTVALUE"]
+      = ::std::to_string(_alphaCutOff)
+        + (::std::fmod(_alphaCutOff, 1.f) == 0.f ? "." : "");
+    defines.boolDef["PREMULTIPLYALPHA"]
       = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
          || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
-    defines.defines[PMD::ALPHABLEND] = needAlphaBlendingForMesh(*mesh);
-    defines.defines[PMD::ALPHAFRESNEL]
+    defines.boolDef["ALPHABLEND"] = needAlphaBlendingForMesh(*mesh);
+    defines.boolDef["ALPHAFRESNEL"]
       = _useAlphaFresnel || _useLinearAlphaFresnel;
-    defines.defines[PMD::LINEARALPHAFRESNEL] = _useLinearAlphaFresnel;
+    defines.boolDef["LINEARALPHAFRESNEL"] = _useLinearAlphaFresnel;
 
-    defines.defines[PMD::SPECULARAA]
+    defines.boolDef["SPECULARAA"]
       = scene->getEngine()->getCaps().standardDerivatives
         && _enableSpecularAntiAliasing;
   }
@@ -914,20 +902,18 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
     _imageProcessingConfiguration->prepareDefines(defines);
   }
 
-  defines.defines[PMD::FORCENORMALFORWARD] = _forceNormalForward;
+  defines.boolDef["FORCENORMALFORWARD"] = _forceNormalForward;
 
-  defines.defines[PMD::RADIANCEOCCLUSION] = _useRadianceOcclusion;
+  defines.boolDef["RADIANCEOCCLUSION"] = _useRadianceOcclusion;
 
-  defines.defines[PMD::HORIZONOCCLUSION] = _useHorizonOcclusion;
+  defines.boolDef["HORIZONOCCLUSION"] = _useHorizonOcclusion;
 
   // Misc.
   if (defines._areMiscDirty) {
     MaterialHelper::PrepareDefinesForMisc(
       mesh, scene, _useLogarithmicDepth, pointsCloud(), fogEnabled(),
-      _shouldTurnAlphaTestOn(mesh) || _forceAlphaTest, defines,
-      PMD::LOGARITHMICDEPTH, PMD::POINTSIZE, PMD::FOG, PMD::NONUNIFORMSCALING,
-      PMD::ALPHATEST);
-    defines.defines[PMD::UNLIT]
+      _shouldTurnAlphaTestOn(mesh) || _forceAlphaTest, defines);
+    defines.boolDef["UNLIT"]
       = _unlit
         || ((pointsCloud() || wireframe())
             && !mesh->isVerticesDataPresent(VertexBuffer::NormalKind));
@@ -935,15 +921,12 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false, PMD::CLIPPLANE,
-    PMD::ALPHATEST, PMD::INSTANCES, useClipPlane);
+    scene, engine, defines, useInstances ? true : false, useClipPlane);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(
     mesh, defines, true, true, true,
-    _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE, PMD::NORMAL, PMD::UV1,
-    PMD::UV2, PMD::VERTEXCOLOR, PMD::VERTEXALPHA, PMD::MORPHTARGETS_TANGENT,
-    PMD::MORPHTARGETS_NORMAL, PMD::MORPHTARGETS);
+    _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE);
 }
 
 void PBRBaseMaterial::forceCompilation(
@@ -1044,7 +1027,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   bindOnlyWorldMatrix(*world);
 
   // Normal Matrix
-  if (defines.defines[PMD::OBJECTSPACE_NORMALMAP]) {
+  if (defines["OBJECTSPACE_NORMALMAP"]) {
     world->toNormalMatrix(_normalMatrix);
     bindOnlyNormalMatrix(_normalMatrix);
   }
@@ -1242,7 +1225,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       }
 
       // Colors
-      if (defines.defines[PMD::METALLICWORKFLOW]) {
+      if (defines["METALLICWORKFLOW"]) {
         PBRMaterial::_scaledReflectivity.r
           = (!_metallic.has_value()) ? 1 : *_metallic;
         PBRMaterial::_scaledReflectivity.g
@@ -1284,7 +1267,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       }
 
       if (_reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
-        if (defines.defines[PMD::LODBASEDMICROSFURACE]) {
+        if (defines["LODBASEDMICROSFURACE"]) {
           _uniformBuffer->setTexture("reflectionSampler", _reflectionTexture);
         }
         else {
@@ -1303,7 +1286,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
         }
       }
 
-      if (defines.defines[PMD::ENVIRONMENTBRDF]) {
+      if (defines["ENVIRONMENTBRDF"]) {
         _uniformBuffer->setTexture("environmentBrdfSampler",
                                    _environmentBRDFTexture);
       }
@@ -1394,7 +1377,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
     // Morph targets
-    if (defines.NUM_MORPH_INFLUENCERS) {
+    if (defines.intDef["NUM_MORPH_INFLUENCERS"]) {
       MaterialHelper::BindMorphTargetParameters(mesh, _activeEffect);
     }
 
@@ -1402,8 +1385,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     _imageProcessingConfiguration->bind(_activeEffect);
 
     // Log. depth
-    MaterialHelper::BindLogDepth(defines, _activeEffect, scene,
-                                 PMD::LOGARITHMICDEPTH);
+    MaterialHelper::BindLogDepth(defines, _activeEffect, scene);
   }
 
   _uniformBuffer->update();

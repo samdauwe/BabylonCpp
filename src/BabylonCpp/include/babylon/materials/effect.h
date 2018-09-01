@@ -19,13 +19,13 @@ public:
   /**
    * Store of each shader (The can be looked up using effect.key)
    */
-  static unordered_map_t<string_t, const char*>& ShadersStore;
+  static unordered_map_t<string_t, string_t>& ShadersStore;
 
   /**
    * Store of each included file for a shader (The can be looked up using
    * effect.key)
    */
-  static unordered_map_t<string_t, const char*>& IncludesShadersStore;
+  static unordered_map_t<string_t, string_t>& IncludesShadersStore;
 
 public:
   /**

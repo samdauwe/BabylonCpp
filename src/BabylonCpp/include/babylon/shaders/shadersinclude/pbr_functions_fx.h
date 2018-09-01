@@ -89,7 +89,7 @@ const char* pbrFunctions
     "\n"
     "float adjustRoughnessFromLightProperties(float roughness, float lightRadius, float lightDistance)\n"
     "{\n"
-    "  #ifdef USEPHYSICALLIGHTFALLOFF\n"
+    "  #if defined(USEPHYSICALLIGHTFALLOFF) || defined(USEGLTFLIGHTFALLOFF)\n"
     "  // At small angle this approximation works. \n"
     "  float lightRoughness = lightRadius / lightDistance;\n"
     "  // Distribution can sum.\n"

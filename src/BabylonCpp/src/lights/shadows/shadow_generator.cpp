@@ -964,9 +964,9 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
       defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
                            + ::std::to_string(morphInfluencers));
       MaterialDefines defines;
-      defines.NUM_MORPH_INFLUENCERS = morphInfluencers;
+      defines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
       MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
-                                                       defines, 0);
+                                                       defines);
     }
   }
 
@@ -1031,41 +1031,43 @@ void ShadowGenerator::prepareDefines(MaterialDefines& defines,
     return;
   }
 
-  defines.shadows[lightIndex] = true;
+  const auto lightIndexStr = ::std::to_string(lightIndex);
+
+  defines.boolDef["SHADOW" + lightIndexStr] = true;
 
   if (useContactHardeningShadow()) {
-    defines.shadowpcsss[lightIndex] = true;
+    defines.boolDef["SHADOWPCSS" + lightIndexStr] = true;
     if (_filteringQuality == ShadowGenerator::QUALITY_LOW()) {
-      defines.shadowlowqualities[lightIndex] = true;
+      defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr] = true;
     }
     else if (_filteringQuality == ShadowGenerator::QUALITY_MEDIUM()) {
-      defines.shadowmediumqualities[lightIndex] = true;
+      defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr] = true;
     }
     // else default to high.
   }
   if (usePercentageCloserFiltering()) {
-    defines.shadowpcfs[lightIndex] = true;
+    defines.boolDef["SHADOWPCF" + lightIndexStr] = true;
     if (_filteringQuality == ShadowGenerator::QUALITY_LOW()) {
-      defines.shadowlowqualities[lightIndex] = true;
+      defines.boolDef["SHADOWLOWQUALITY" + lightIndexStr] = true;
     }
     else if (_filteringQuality == ShadowGenerator::QUALITY_MEDIUM()) {
-      defines.shadowmediumqualities[lightIndex] = true;
+      defines.boolDef["SHADOWMEDIUMQUALITY" + lightIndexStr] = true;
     }
     // else default to high.
   }
   else if (usePoissonSampling()) {
-    defines.shadowpoissons[lightIndex] = true;
+    defines.boolDef["SHADOWPOISSON" + lightIndexStr] = true;
   }
   else if (useExponentialShadowMap() || useBlurExponentialShadowMap()) {
-    defines.shadowesms[lightIndex] = true;
+    defines.boolDef["SHADOWESM" + lightIndexStr] = true;
   }
   else if (useCloseExponentialShadowMap()
            || useBlurCloseExponentialShadowMap()) {
-    defines.shadowcloseesms[lightIndex] = true;
+    defines.boolDef["SHADOWCLOSEESM" + lightIndexStr] = true;
   }
 
   if (light->needCube()) {
-    defines.shadowcubes[lightIndex] = true;
+    defines.boolDef["SHADOWCUBE" + lightIndexStr] = true;
   }
 }
 

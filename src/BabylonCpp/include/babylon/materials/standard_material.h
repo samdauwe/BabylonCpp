@@ -10,9 +10,6 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT StandardMaterial : public PushMaterial {
 
-public:
-  using SMD = StandardMaterialDefines;
-
 private:
   // Flags used to enable or disable a type of texture for all Standard
   // Materials

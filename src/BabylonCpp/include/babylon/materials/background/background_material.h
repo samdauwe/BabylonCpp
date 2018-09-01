@@ -18,9 +18,6 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BackgroundMaterial : public PushMaterial {
 
 public:
-  using BMD = BackgroundMaterialDefines;
-
-public:
   /**
    * @brief Returns Standard reflectance value at parallel view angle.
    */
