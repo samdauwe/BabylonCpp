@@ -134,14 +134,11 @@ set_target_properties(${TARGET}
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../Extensions/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../MaterialsLibrary/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../ProceduralTexturesLibrary/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../ProceduralTexturesLibrary/include
     PUBLIC
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -153,6 +150,7 @@ target_link_libraries(${TARGET}
     PRIVATE
     BabylonCpp
     Extensions
+    MaterialsLibrary
     ProceduralTexturesLibrary
 )
 

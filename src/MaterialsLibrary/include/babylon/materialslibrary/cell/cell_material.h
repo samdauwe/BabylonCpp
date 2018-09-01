@@ -9,10 +9,21 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class CellMaterial;
+using CellMaterialPtr = shared_ptr_t<CellMaterial>;
+
 class BABYLON_SHARED_EXPORT CellMaterial : public PushMaterial {
 
 public:
-  CellMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static CellMaterialPtr New(Ts&&... args)
+  {
+    auto material = shared_ptr_t<CellMaterial>(
+      new CellMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~CellMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -36,8 +47,10 @@ public:
                              const std::string& rootUrl);
 
 protected:
-  BaseTexturePtr& get_diffuseTexture();
-  void set_diffuseTexture(const BaseTexturePtr& value);
+  CellMaterial(const std::string& name, Scene* scene);
+
+  TexturePtr& get_diffuseTexture();
+  void set_diffuseTexture(const TexturePtr& value);
   bool get_computeHighLevel() const;
   void set_computeHighLevel(bool value);
   bool get_disableLighting() const;
@@ -46,14 +59,14 @@ protected:
   void set_maxSimultaneousLights(unsigned int value);
 
 public:
-  Property<CellMaterial, BaseTexturePtr> diffuseTexture;
+  Property<CellMaterial, TexturePtr> diffuseTexture;
   Color3 diffuseColor;
   Property<CellMaterial, bool> computeHighLevel;
   Property<CellMaterial, bool> disableLighting;
   Property<CellMaterial, unsigned int> maxSimultaneousLights;
 
 private:
-  BaseTexturePtr _diffuseTexture;
+  TexturePtr _diffuseTexture;
   bool _computeHighLevel;
   bool _disableLighting;
   unsigned int _maxSimultaneousLights;

@@ -9,7 +9,9 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/texture.h>
+#include <babylon/materialslibrary/cell/cell_fragment_fx.h>
+#include <babylon/materialslibrary/cell/cell_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -36,18 +38,23 @@ CellMaterial::CellMaterial(const std::string& iName, Scene* scene)
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
 {
+  // Vertex shader
+  Effect::ShadersStore["cellVertexShader"] = cellVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore["cellPixelShader"] = cellPixelShader;
 }
 
 CellMaterial::~CellMaterial()
 {
 }
 
-BaseTexturePtr& CellMaterial::get_diffuseTexture()
+TexturePtr& CellMaterial::get_diffuseTexture()
 {
   return _diffuseTexture;
 }
 
-void CellMaterial::set_diffuseTexture(const BaseTexturePtr& value)
+void CellMaterial::set_diffuseTexture(const TexturePtr& value)
 {
   if (_diffuseTexture != value) {
     _diffuseTexture = value;
