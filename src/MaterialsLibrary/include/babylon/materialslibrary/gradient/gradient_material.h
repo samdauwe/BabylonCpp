@@ -9,16 +9,21 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class GradientMaterial;
+using GradientMaterialPtr = shared_ptr_t<GradientMaterial>;
+
 class BABYLON_SHARED_EXPORT GradientMaterial : public PushMaterial {
 
 public:
-  /**
-   * constructor
-   * @param name The name given to the material in order to identify it
-   * afterwards.
-   * @param scene The scene the material is used in.
-   */
-  GradientMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static GradientMaterialPtr New(Ts&&... args)
+  {
+    auto material = shared_ptr_t<GradientMaterial>(
+      new GradientMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~GradientMaterial() override;
 
   /**
@@ -43,6 +48,14 @@ public:
                                  const std::string& rootUrl);
 
 protected:
+  /**
+   * Constructor
+   * @param name The name given to the material in order to identify it
+   * afterwards.
+   * @param scene The scene the material is used in.
+   */
+  GradientMaterial(const std::string& name, Scene* scene);
+
   unsigned int get_maxSimultaneousLights() const;
   void set_maxSimultaneousLights(unsigned int value);
 
