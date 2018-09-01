@@ -11,6 +11,8 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materialslibrary/lava/lava_fragment_fx.h>
+#include <babylon/materialslibrary/lava/lava_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -42,6 +44,11 @@ LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
 {
+  // Vertex shader
+  Effect::ShadersStore["lavaVertexShader"] = lavaVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore["lavaPixelShader"] = lavaPixelShader;
 }
 
 LavaMaterial::~LavaMaterial()
@@ -333,7 +340,7 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
 
   _lastTime += scene->getEngine()->getDeltaTime();
-  _effect->setFloat("time", _lastTime * speed / 1000.f);
+  _activeEffect->setFloat("time", _lastTime * speed / 1000.f);
 
   if (!fogColor.has_value()) {
     fogColor = Color3::Black();

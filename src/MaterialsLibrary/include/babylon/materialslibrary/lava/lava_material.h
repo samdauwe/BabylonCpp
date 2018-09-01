@@ -9,10 +9,21 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class LavaMaterial;
+using LavaMaterialPtr = shared_ptr_t<LavaMaterial>;
+
 class BABYLON_SHARED_EXPORT LavaMaterial : public PushMaterial {
 
 public:
-  LavaMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static LavaMaterialPtr New(Ts&&... args)
+  {
+    auto material = shared_ptr_t<LavaMaterial>(
+      new LavaMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~LavaMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -36,6 +47,8 @@ public:
                              const std::string& rootUrl);
 
 protected:
+  LavaMaterial(const std::string& name, Scene* scene);
+
   BaseTexturePtr& get_diffuseTexture();
   void set_diffuseTexture(const BaseTexturePtr& value);
   bool get_disableLighting() const;
