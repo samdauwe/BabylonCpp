@@ -321,7 +321,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
   for (unsigned int index = lightIndex; index < maxSimultaneousLights;
        ++index) {
     auto indexStr = ::std::to_string(index);
-    if (!stl_util::contains(defines.boolDef, "LIGHT" + indexStr)) {
+    if (stl_util::contains(defines.boolDef, "LIGHT" + indexStr)) {
       defines.boolDef["LIGHT" + indexStr]           = false;
       defines.boolDef["HEMILIGHT" + lightIndexStr]  = false;
       defines.boolDef["POINTLIGHT" + lightIndexStr] = false;
@@ -412,7 +412,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
        ++lightIndex) {
     const string_t lightIndexStr = ::std::to_string(lightIndex);
 
-    if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
+    if (!defines["LIGHT" + lightIndexStr]) {
       break;
     }
 
@@ -429,16 +429,14 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
                        "depthValues" + lightIndexStr      //
                      });
 
-    if (uniformBuffersList.empty()) {
+    {
       uniformBuffersList.emplace_back("Light" + lightIndexStr);
     }
 
     samplersList.emplace_back("shadowSampler" + lightIndexStr);
     samplersList.emplace_back("depthSampler" + lightIndexStr);
 
-    if (stl_util::contains(defines.boolDef,
-                           "PROJECTEDLIGHTTEXTURE" + lightIndexStr)
-        && defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]) {
+    if (defines["PROJECTEDLIGHTTEXTURE" + lightIndexStr]) {
       samplersList.emplace_back("projectionLightSampler" + lightIndexStr);
       uniformsList.emplace_back("textureProjectionMatrix" + lightIndexStr);
     }

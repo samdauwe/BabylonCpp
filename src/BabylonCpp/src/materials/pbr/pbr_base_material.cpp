@@ -1095,7 +1095,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           }
 
           auto _polynomials = reflectionTexture->sphericalPolynomial();
-          if (defines.USESPHERICALFROMREFLECTIONMAP && _polynomials) {
+          if (defines["USESPHERICALFROMREFLECTIONMAP"] && _polynomials) {
             auto polynomials = *_polynomials;
             _activeEffect->setFloat3("vSphericalX", polynomials.x.x,
                                      polynomials.x.y, polynomials.x.z);
@@ -1292,7 +1292,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
       }
 
       if (_refractionTexture && StandardMaterial::RefractionTextureEnabled()) {
-        if (defines.LODBASEDMICROSFURACE) {
+        if (defines["LODBASEDMICROSFURACE"]) {
           _uniformBuffer->setTexture("refractionSampler", _refractionTexture);
         }
         else {
