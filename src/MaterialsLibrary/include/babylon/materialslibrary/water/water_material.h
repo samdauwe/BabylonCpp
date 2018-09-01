@@ -6,6 +6,7 @@
 #include <babylon/materialslibrary/water/water_material_defines.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
+#include <babylon/math/plane.h>
 #include <babylon/math/vector2.h>
 
 namespace BABYLON {

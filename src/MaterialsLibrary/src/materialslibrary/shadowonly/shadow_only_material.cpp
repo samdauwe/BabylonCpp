@@ -4,6 +4,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
@@ -84,12 +85,12 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   if (_activeLight) {
     for (const auto& light : mesh->_lightSources) {
       if (light->shadowEnabled) {
-        if (_activeLight == light) {
+        auto activeLight = ::std::dynamic_pointer_cast<Light>(_activeLight);
+        if (activeLight == light) {
           break; // We are good
         }
 
-        auto activeLight = ::std::dynamic_pointer_cast<Light>(_activeLight);
-        auto it          = ::std::find(mesh->_lightSources.begin(),
+        auto it = ::std::find(mesh->_lightSources.begin(),
                               mesh->_lightSources.end(), activeLight);
 
         if (it != mesh->_lightSources.end()) {

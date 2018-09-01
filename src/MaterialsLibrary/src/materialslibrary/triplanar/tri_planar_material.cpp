@@ -477,7 +477,7 @@ std::vector<BaseTexturePtr> TriPlanarMaterial::getActiveTextures() const
 
 bool TriPlanarMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
-  if (Material::hasTexture(texture)) {
+  if (PushMaterial::hasTexture(texture)) {
     return true;
   }
 

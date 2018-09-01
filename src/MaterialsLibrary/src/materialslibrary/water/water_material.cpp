@@ -65,7 +65,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , _lastDeltaTime{0.f}
     , _renderId{-1}
     , _isVisible{false}
-    , _clipPlane{nullptr}
+    , _clipPlane{nullopt_t}
     , _savedViewMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
     , _useLogarithmicDepth{false}
@@ -555,7 +555,7 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
           Vector3(0.f, positiony - 0.05f, 0.f), normal);
 
         // Transform
-        Matrix::ReflectionToRef(*scene->clipPlane(), _mirrorMatrix);
+        Matrix::ReflectionToRef(*scene->clipPlane, _mirrorMatrix);
         _savedViewMatrix = scene->getViewMatrix();
 
         _mirrorMatrix.multiplyToRef(_savedViewMatrix, _reflectionTransform);
@@ -613,7 +613,7 @@ std::vector<BaseTexturePtr> WaterMaterial::getActiveTextures() const
 
 bool WaterMaterial::hasTexture(const BaseTexturePtr& texture) const
 {
-  if (Material::PushMaterial(texture)) {
+  if (PushMaterial::hasTexture(texture)) {
     return true;
   }
 
@@ -632,12 +632,12 @@ void WaterMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 
   getScene()->customRenderTargets.erase(
     std::remove(getScene()->customRenderTargets.begin(),
-                getScene()->customRenderTargets.end(), _refractionRTT.get()),
+                getScene()->customRenderTargets.end(), _refractionRTT),
     getScene()->customRenderTargets.end());
 
   getScene()->customRenderTargets.erase(
     std::remove(getScene()->customRenderTargets.begin(),
-                getScene()->customRenderTargets.end(), _reflectionRTT.get()),
+                getScene()->customRenderTargets.end(), _reflectionRTT),
     getScene()->customRenderTargets.end());
 
   if (_reflectionRTT) {
