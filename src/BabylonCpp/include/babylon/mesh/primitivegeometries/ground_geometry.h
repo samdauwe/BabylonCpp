@@ -15,21 +15,27 @@ class BABYLON_SHARED_EXPORT GroundGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static GroundGeometry* New(Ts&&... args)
+  static GroundGeometryPtr New(Ts&&... args)
   {
-    auto ground = new GroundGeometry(::std::forward<Ts>(args)...);
-    ground->addToScene(static_cast<unique_ptr_t<Geometry>>(ground));
+    auto mesh = shared_ptr_t<GroundGeometry>(
+      new GroundGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return ground;
+    return mesh;
   }
   ~GroundGeometry() override;
 
+  /**
+   * @brief Hidden
+   * @return
+   */
   unique_ptr_t<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const string_t& id) override;
+
+  GeometryPtr copy(const string_t& id) override;
   Json::object serialize() const override;
 
   // Statics
-  static GroundGeometry* Parse(const Json::value& parsedGround, Scene* scene);
+  static GroundGeometryPtr Parse(const Json::value& parsedGround, Scene* scene);
 
 protected:
   /**
@@ -48,8 +54,19 @@ protected:
                  bool canBeRegenerated, Mesh* mesh = nullptr);
 
 public:
+  /**
+   * Defines the width of the ground
+   */
   unsigned int width;
+
+  /**
+   * Defines the height of the ground
+   */
   unsigned int height;
+
+  /**
+   * Defines the subdivisions to apply to the ground
+   */
   unsigned int subdivisions;
 
 }; // end of class GroundGeometry

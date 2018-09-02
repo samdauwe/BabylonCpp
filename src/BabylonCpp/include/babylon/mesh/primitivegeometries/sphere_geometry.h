@@ -15,21 +15,27 @@ class BABYLON_SHARED_EXPORT SphereGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static SphereGeometry* New(Ts&&... args)
+  static SphereGeometryPtr New(Ts&&... args)
   {
-    auto sphere = new SphereGeometry(::std::forward<Ts>(args)...);
-    sphere->addToScene(static_cast<unique_ptr_t<Geometry>>(sphere));
+    auto mesh = shared_ptr_t<SphereGeometry>(
+      new SphereGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return sphere;
+    return mesh;
   }
   ~SphereGeometry() override;
 
+  /**
+   * @brief Hidden
+   * @return
+   */
   unique_ptr_t<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const string_t& id) override;
+
+  GeometryPtr copy(const string_t& id) override;
   Json::object serialize() const override;
 
   // Statics
-  static SphereGeometry* Parse(const Json::value& parsedSphere, Scene* scene);
+  static SphereGeometryPtr Parse(const Json::value& parsedSphere, Scene* scene);
 
 protected:
   /**
@@ -49,8 +55,20 @@ protected:
                  unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
+  /**
+   * Defines the number of segments to use to create the sphere
+   */
   unsigned int segments;
+
+  /**
+   * Defines the diameter of the sphere
+   */
   float diameter;
+
+  /**
+   * Defines if the created geometry is double sided or not (default is
+   * BABYLON.Mesh.DEFAULTSIDE)
+   */
   unsigned int side;
 
 }; // end of class SphereGeometry

@@ -15,22 +15,28 @@ class BABYLON_SHARED_EXPORT TorusKnotGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static TorusKnotGeometry* New(Ts&&... args)
+  static TorusKnotGeometryPtr New(Ts&&... args)
   {
-    auto torusKnot = new TorusKnotGeometry(::std::forward<Ts>(args)...);
-    torusKnot->addToScene(static_cast<unique_ptr_t<Geometry>>(torusKnot));
+    auto mesh = shared_ptr_t<TorusKnotGeometry>(
+      new TorusKnotGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return torusKnot;
+    return mesh;
   }
   ~TorusKnotGeometry() override;
 
+  /**
+   * @brief Hidden
+   * @return
+   */
   unique_ptr_t<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const string_t& id) override;
+
+  GeometryPtr copy(const string_t& id) override;
   Json::object serialize() const override;
 
   // Statics
-  static TorusKnotGeometry* Parse(const Json::value& parsedTorusKnot,
-                                  Scene* scene);
+  static TorusKnotGeometryPtr Parse(const Json::value& parsedTorusKnot,
+                                    Scene* scene);
 
 protected:
   /**
@@ -56,12 +62,40 @@ protected:
                     unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
+  /**
+   * Defines the radius of the torus knot
+   */
   float radius;
+
+  /**
+   * Defines the thickness of the torus knot tube
+   */
   float tube;
+
+  /**
+   * Defines the number of radial segments
+   */
   unsigned int radialSegments;
+
+  /**
+   * Defines the number of tubular segments
+   */
   unsigned int tubularSegments;
+
+  /**
+   * Defines the first number of windings
+   */
   float p;
+
+  /**
+   * Defines the second number of windings
+   */
   float q;
+
+  /**
+   * Defines if the created geometry is double sided or not (default is
+   * BABYLON.Mesh.DEFAULTSIDE)
+   */
   unsigned int side;
 
 }; // end of class TorusKnotGeometry

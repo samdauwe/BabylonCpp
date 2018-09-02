@@ -39,7 +39,7 @@ unique_ptr_t<VertexData> TiledGroundGeometry::_regenerateVertexData()
   return VertexData::CreateTiledGround(options);
 }
 
-Geometry* TiledGroundGeometry::copy(const string_t& _id)
+GeometryPtr TiledGroundGeometry::copy(const string_t& _id)
 {
   return TiledGroundGeometry::New(_id, getScene(), xmin, zmin, xmax, zmax,
                                   subdivisions, precision, canBeRegenerated(),

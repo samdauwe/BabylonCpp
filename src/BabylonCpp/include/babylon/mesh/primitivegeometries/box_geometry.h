@@ -15,21 +15,27 @@ class BABYLON_SHARED_EXPORT BoxGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static BoxGeometry* New(Ts&&... args)
+  static BoxGeometryPtr New(Ts&&... args)
   {
-    auto box = new BoxGeometry(::std::forward<Ts>(args)...);
-    box->addToScene(static_cast<unique_ptr_t<Geometry>>(box));
+    auto mesh
+      = shared_ptr_t<BoxGeometry>(new BoxGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return box;
+    return mesh;
   }
   ~BoxGeometry() override;
 
+  /**
+   * @brief Hidden
+   * @return
+   */
   unique_ptr_t<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const string_t& id) override;
+
+  GeometryPtr copy(const string_t& id) override;
   Json::object serialize() const override;
 
   // Statics
-  static BoxGeometry* Parse(const Json::value& parsedBox, Scene* scene);
+  static BoxGeometryPtr Parse(const Json::value& parsedBox, Scene* scene);
 
 protected:
   /**
@@ -49,7 +55,15 @@ protected:
               unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
+  /**
+   * Defines the zise of the box (width, height and depth are the same)
+   */
   float size;
+
+  /**
+   * Defines if the created geometry is double sided or not (default is
+   * BABYLON.Mesh.DEFAULTSIDE)
+   */
   unsigned int side;
 
 }; // end of class BoxGeometry

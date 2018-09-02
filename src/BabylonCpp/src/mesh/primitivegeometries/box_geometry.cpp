@@ -27,7 +27,7 @@ unique_ptr_t<VertexData> BoxGeometry::_regenerateVertexData()
   return VertexData::CreateBox(options);
 }
 
-Geometry* BoxGeometry::copy(const string_t& _id)
+GeometryPtr BoxGeometry::copy(const string_t& _id)
 {
   return BoxGeometry::New(_id, getScene(), size, canBeRegenerated(), nullptr,
                           side);
@@ -42,7 +42,7 @@ Json::object BoxGeometry::serialize() const
   return serializationObject;
 }
 
-BoxGeometry* BoxGeometry::Parse(const Json::value& parsedBox, Scene* scene)
+BoxGeometryPtr BoxGeometry::Parse(const Json::value& parsedBox, Scene* scene)
 {
   const auto parsedBoxId = Json::GetString(parsedBox, "id");
   if (parsedBoxId.empty() || scene->getGeometryByID(parsedBoxId)) {

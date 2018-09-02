@@ -38,7 +38,7 @@ unique_ptr_t<VertexData> CylinderGeometry::_regenerateVertexData()
   return VertexData::CreateCylinder(options);
 }
 
-Geometry* CylinderGeometry::copy(const string_t& _id)
+GeometryPtr CylinderGeometry::copy(const string_t& _id)
 {
   return CylinderGeometry::New(_id, getScene(), height, diameterTop,
                                diameterBottom, tessellation, subdivisions,
@@ -60,8 +60,8 @@ Json::object CylinderGeometry::serialize() const
   return serializationObject;
 }
 
-CylinderGeometry* CylinderGeometry::Parse(const Json::value& parsedCylinder,
-                                          Scene* scene)
+CylinderGeometryPtr CylinderGeometry::Parse(const Json::value& parsedCylinder,
+                                            Scene* scene)
 {
   const auto parsedCylinderId = Json::GetString(parsedCylinder, "id");
   if (parsedCylinderId.empty() || scene->getGeometryByID(parsedCylinderId)) {

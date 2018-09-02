@@ -17,12 +17,13 @@ class BABYLON_SHARED_EXPORT RibbonGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static RibbonGeometry* New(Ts&&... args)
+  static RibbonGeometryPtr New(Ts&&... args)
   {
-    auto ribbon = new RibbonGeometry(::std::forward<Ts>(args)...);
-    ribbon->addToScene(static_cast<unique_ptr_t<Geometry>>(ribbon));
+    auto mesh = shared_ptr_t<RibbonGeometry>(
+      new RibbonGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return ribbon;
+    return mesh;
   }
   ~RibbonGeometry();
 
@@ -31,7 +32,7 @@ public:
    */
   unique_ptr_t<VertexData> _regenerateVertexData();
 
-  Geometry* copy(const string_t& id);
+  GeometryPtr copy(const string_t& id);
 
 protected:
   /**
@@ -56,10 +57,32 @@ protected:
                  unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
+  /**
+   * Defines the array of paths to use
+   */
   vector_t<vector_t<Vector3>> pathArray;
+
+  /**
+   * Defines if the last and first points of each path in your pathArray must be
+   * joined
+   */
   bool closeArray;
+
+  /**
+   * Defines if the last and first points of each path in your pathArray must be
+   * joined
+   */
   bool closePath;
+
+  /**
+   * Defines the offset between points
+   */
   int offset;
+
+  /**
+   * Defines if the created geometry is double sided or not (default is
+   * BABYLON.Mesh.DEFAULTSIDE)
+   */
   unsigned int side;
 
 }; // end of class RibbonGeometry

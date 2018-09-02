@@ -44,7 +44,7 @@ public:
    * @param id defines the unique ID of the new geometry
    * @returns the new geometry
    */
-  Geometry* asNewGeometry(const string_t& id);
+  GeometryPtr asNewGeometry(const string_t& id);
 
   // overrides
 
@@ -60,7 +60,7 @@ public:
 
   // to override
   virtual unique_ptr_t<VertexData> _regenerateVertexData() = 0;
-  virtual Geometry* copy(const string_t& id)               = 0;
+  virtual GeometryPtr copy(const string_t& id)             = 0;
   virtual Json::object serialize() const;
 
 private:

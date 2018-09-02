@@ -15,17 +15,23 @@ class BABYLON_SHARED_EXPORT DiscGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static DiscGeometry* New(Ts&&... args)
+  static DiscGeometryPtr New(Ts&&... args)
   {
-    auto disc = new DiscGeometry(::std::forward<Ts>(args)...);
-    disc->addToScene(static_cast<unique_ptr_t<Geometry>>(disc));
+    auto mesh = shared_ptr_t<DiscGeometry>(
+      new DiscGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return disc;
+    return mesh;
   }
   ~DiscGeometry() override;
 
+  /**
+   * @brief Hidden
+   * @return
+   */
   unique_ptr_t<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const string_t& id) override;
+
+  GeometryPtr copy(const string_t& id) override;
 
 protected:
   /**
@@ -45,8 +51,20 @@ protected:
                Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
+  /**
+   * Defines the radius of the disc
+   */
   float radius;
+
+  /**
+   * Defines the tesselation factor to apply to the disc
+   */
   unsigned int tessellation;
+
+  /**
+   * Defines if the created geometry is double sided or not (default is
+   * BABYLON.Mesh.DEFAULTSIDE)
+   */
   unsigned int side;
 
 }; // end of class DiscGeometry

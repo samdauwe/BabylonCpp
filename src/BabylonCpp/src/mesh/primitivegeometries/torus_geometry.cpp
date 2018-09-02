@@ -34,7 +34,7 @@ unique_ptr_t<VertexData> TorusGeometry::_regenerateVertexData()
   return VertexData::CreateTorus(options);
 }
 
-Geometry* TorusGeometry::copy(const string_t& _id)
+GeometryPtr TorusGeometry::copy(const string_t& _id)
 {
   return TorusGeometry::New(_id, getScene(), diameter, thickness, tessellation,
                             canBeRegenerated(), nullptr, side);
@@ -54,8 +54,8 @@ Json::object TorusGeometry::serialize() const
   return serializationObject;
 }
 
-TorusGeometry* TorusGeometry::Parse(const Json::value& parsedTorus,
-                                    Scene* scene)
+TorusGeometryPtr TorusGeometry::Parse(const Json::value& parsedTorus,
+                                      Scene* scene)
 {
   const auto parsedTorusId = Json::GetString(parsedTorus, "id");
   if (parsedTorusId.empty() || scene->getGeometryByID(parsedTorusId)) {

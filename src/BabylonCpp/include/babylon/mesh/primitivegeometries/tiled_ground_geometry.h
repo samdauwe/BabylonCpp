@@ -15,17 +15,23 @@ class BABYLON_SHARED_EXPORT TiledGroundGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static TiledGroundGeometry* New(Ts&&... args)
+  static TiledGroundGeometryPtr New(Ts&&... args)
   {
-    auto tiledGround = new TiledGroundGeometry(::std::forward<Ts>(args)...);
-    tiledGround->addToScene(static_cast<unique_ptr_t<Geometry>>(tiledGround));
+    auto mesh = shared_ptr_t<TiledGroundGeometry>(
+      new TiledGroundGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return tiledGround;
+    return mesh;
   }
   ~TiledGroundGeometry() override;
 
+  /**
+   * @brief Hidden
+   * @return
+   */
   unique_ptr_t<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const string_t& id) override;
+
+  GeometryPtr copy(const string_t& id) override;
 
 protected:
   /**
@@ -49,11 +55,34 @@ protected:
                       Mesh* mesh = nullptr);
 
 private:
+  /**
+   * Defines the minimum value on X axis
+   */
   float xmin;
+
+  /**
+   * Defines the minimum value on Z axis
+   */
   float zmin;
+
+  /**
+   * Defines the maximum value on X axis
+   */
   float xmax;
+
+  /**
+   * Defines the maximum value on Z axis
+   */
   float zmax;
+
+  /**
+   * Defines the subdivisions to apply to the ground
+   */
   ISize subdivisions;
+
+  /**
+   * Defines the precision to use when computing the tiles
+   */
   ISize precision;
 
 }; // end of class TiledGroundGeometry

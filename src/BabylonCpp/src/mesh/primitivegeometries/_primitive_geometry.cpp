@@ -33,7 +33,7 @@ void _PrimitiveGeometry::regenerate()
   _beingRegenerated = false;
 }
 
-Geometry* _PrimitiveGeometry::asNewGeometry(const string_t& iId)
+GeometryPtr _PrimitiveGeometry::asNewGeometry(const string_t& iId)
 {
   return Geometry::copy(iId);
 }

@@ -33,7 +33,7 @@ unique_ptr_t<VertexData> RibbonGeometry::_regenerateVertexData()
   return VertexData::CreateRibbon(options);
 }
 
-Geometry* RibbonGeometry::copy(const string_t& _id)
+GeometryPtr RibbonGeometry::copy(const string_t& _id)
 {
   return RibbonGeometry::New(_id, getScene(), pathArray, closeArray, closePath,
                              offset, canBeRegenerated(), nullptr, side);

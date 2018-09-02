@@ -42,7 +42,7 @@ unique_ptr_t<VertexData> TorusKnotGeometry::_regenerateVertexData()
   return VertexData::CreateTorusKnot(options);
 }
 
-Geometry* TorusKnotGeometry::copy(const string_t& _id)
+GeometryPtr TorusKnotGeometry::copy(const string_t& _id)
 {
   return TorusKnotGeometry::New(_id, getScene(), radius, tube, radialSegments,
                                 tubularSegments, p, q, canBeRegenerated(),
@@ -65,8 +65,8 @@ Json::object TorusKnotGeometry::serialize() const
   return serializationObject;
 }
 
-TorusKnotGeometry* TorusKnotGeometry::Parse(const Json::value& parsedTorusKnot,
-                                            Scene* scene)
+TorusKnotGeometryPtr
+TorusKnotGeometry::Parse(const Json::value& parsedTorusKnot, Scene* scene)
 {
   const auto parsedTorusKnotId = Json::GetString(parsedTorusKnot, "id");
   if (parsedTorusKnotId.empty() || scene->getGeometryByID(parsedTorusKnotId)) {

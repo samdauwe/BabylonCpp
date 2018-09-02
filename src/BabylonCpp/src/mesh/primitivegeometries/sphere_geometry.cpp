@@ -31,7 +31,7 @@ unique_ptr_t<VertexData> SphereGeometry::_regenerateVertexData()
   return VertexData::CreateSphere(options);
 }
 
-Geometry* SphereGeometry::copy(const string_t& _id)
+GeometryPtr SphereGeometry::copy(const string_t& _id)
 {
   return SphereGeometry::New(_id, getScene(), segments, diameter,
                              canBeRegenerated(), nullptr, side);
@@ -49,8 +49,8 @@ Json::object SphereGeometry::serialize() const
   return serializationObject;
 }
 
-SphereGeometry* SphereGeometry::Parse(const Json::value& parsedSphere,
-                                      Scene* scene)
+SphereGeometryPtr SphereGeometry::Parse(const Json::value& parsedSphere,
+                                        Scene* scene)
 {
   const auto parsedSphereId = Json::GetString(parsedSphere, "id");
   if (parsedSphereId.empty() || scene->getGeometryByID(parsedSphereId)) {

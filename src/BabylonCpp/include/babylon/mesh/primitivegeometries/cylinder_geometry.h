@@ -15,22 +15,27 @@ class BABYLON_SHARED_EXPORT CylinderGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static CylinderGeometry* New(Ts&&... args)
+  static CylinderGeometryPtr New(Ts&&... args)
   {
-    auto cylinder = new CylinderGeometry(::std::forward<Ts>(args)...);
-    cylinder->addToScene(static_cast<unique_ptr_t<Geometry>>(cylinder));
+    auto mesh = shared_ptr_t<CylinderGeometry>(
+      new CylinderGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return cylinder;
+    return mesh;
   }
   ~CylinderGeometry() override;
 
+  /**
+   * @brief Hidden
+   * @return
+   */
   unique_ptr_t<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const string_t& id) override;
+  GeometryPtr copy(const string_t& id) override;
   Json::object serialize() const override;
 
   // Statics
-  static CylinderGeometry* Parse(const Json::value& parsedCylinder,
-                                 Scene* scene);
+  static CylinderGeometryPtr Parse(const Json::value& parsedCylinder,
+                                   Scene* scene);
 
 protected:
   /**
@@ -57,11 +62,35 @@ protected:
                    unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
+  /**
+   * Defines the height of the cylinder
+   */
   float height;
+
+  /**
+   * Defines the diameter of the cylinder's top cap
+   */
   float diameterTop;
+
+  /**
+   * Defines the diameter of the cylinder's bottom cap
+   */
   float diameterBottom;
+
+  /**
+   * Defines the tessellation factor to apply to the cylinder
+   */
   unsigned int tessellation;
+
+  /**
+   * Defines the number of subdivisions to apply to the cylinder (1 by default)
+   */
   unsigned int subdivisions;
+
+  /**
+   * Defines if the created geometry is double sided or not (default is
+   * BABYLON.Mesh.DEFAULTSIDE)
+   */
   unsigned int side;
 
 }; // end of class CylinderGeometry

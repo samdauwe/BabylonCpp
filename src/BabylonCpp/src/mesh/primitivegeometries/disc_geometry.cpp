@@ -29,7 +29,7 @@ unique_ptr_t<VertexData> DiscGeometry::_regenerateVertexData()
   return VertexData::CreateDisc(options);
 }
 
-Geometry* DiscGeometry::copy(const string_t& _id)
+GeometryPtr DiscGeometry::copy(const string_t& _id)
 {
   return DiscGeometry::New(_id, getScene(), radius, tessellation,
                            canBeRegenerated(), nullptr, side);

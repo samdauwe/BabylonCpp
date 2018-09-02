@@ -555,6 +555,17 @@ class SphereGeometry;
 class TiledGroundGeometry;
 class TorusGeometry;
 class TorusKnotGeometry;
+// -- Primitive Geometries aliases --
+using BoxGeometryPtr         = shared_ptr_t<BoxGeometry>;
+using CylinderGeometryPtr    = shared_ptr_t<CylinderGeometry>;
+using DiscGeometryPtr        = shared_ptr_t<DiscGeometry>;
+using GroundGeometryPtr      = shared_ptr_t<GroundGeometry>;
+using PlaneGeometryPtr       = shared_ptr_t<PlaneGeometry>;
+using RibbonGeometryPtr      = shared_ptr_t<RibbonGeometry>;
+using SphereGeometryPtr      = shared_ptr_t<SphereGeometry>;
+using TiledGroundGeometryPtr = shared_ptr_t<TiledGroundGeometry>;
+using TorusGeometryPtr       = shared_ptr_t<TorusGeometry>;
+using TorusKnotGeometryPtr   = shared_ptr_t<TorusKnotGeometry>;
 // - Polygon Mesh
 class IndexedVector2;
 struct Polygon;

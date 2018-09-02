@@ -15,21 +15,27 @@ class BABYLON_SHARED_EXPORT PlaneGeometry : public _PrimitiveGeometry {
 
 public:
   template <typename... Ts>
-  static PlaneGeometry* New(Ts&&... args)
+  static PlaneGeometryPtr New(Ts&&... args)
   {
-    auto plane = new PlaneGeometry(::std::forward<Ts>(args)...);
-    plane->addToScene(static_cast<unique_ptr_t<Geometry>>(plane));
+    auto mesh = shared_ptr_t<PlaneGeometry>(
+      new PlaneGeometry(::std::forward<Ts>(args)...));
+    mesh->addToScene(mesh);
 
-    return plane;
+    return mesh;
   }
   ~PlaneGeometry() override;
 
+  /**
+   * @brief Hidden
+   * @return
+   */
   unique_ptr_t<VertexData> _regenerateVertexData() override;
-  Geometry* copy(const string_t& id) override;
+
+  GeometryPtr copy(const string_t& id) override;
   Json::object serialize() const override;
 
   // Statics
-  static PlaneGeometry* Parse(const Json::value& parsedPlane, Scene* scene);
+  static PlaneGeometryPtr Parse(const Json::value& parsedPlane, Scene* scene);
 
 protected:
   /**
@@ -48,7 +54,15 @@ protected:
                 unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
+  /**
+   * Defines the size of the plane (width === height)
+   */
   float size;
+
+  /**
+   * Defines if the created geometry is double sided or not (default is
+   * BABYLON.Mesh.DEFAULTSIDE)
+   */
   unsigned int side;
 
 }; // end of class PlaneGeometry

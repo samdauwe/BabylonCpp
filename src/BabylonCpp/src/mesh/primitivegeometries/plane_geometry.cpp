@@ -28,7 +28,7 @@ unique_ptr_t<VertexData> PlaneGeometry::_regenerateVertexData()
   return VertexData::CreatePlane(options);
 }
 
-Geometry* PlaneGeometry::copy(const string_t& _id)
+GeometryPtr PlaneGeometry::copy(const string_t& _id)
 {
   return PlaneGeometry::New(_id, getScene(), size, canBeRegenerated(), nullptr,
                             side);
@@ -43,8 +43,8 @@ Json::object PlaneGeometry::serialize() const
   return serializationObject;
 }
 
-PlaneGeometry* PlaneGeometry::Parse(const Json::value& parsedPlane,
-                                    Scene* scene)
+PlaneGeometryPtr PlaneGeometry::Parse(const Json::value& parsedPlane,
+                                      Scene* scene)
 {
   const auto parsedPlaneId = Json::GetString(parsedPlane, "id");
   if (parsedPlaneId.empty() || scene->getGeometryByID(parsedPlaneId)) {

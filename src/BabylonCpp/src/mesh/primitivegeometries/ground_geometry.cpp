@@ -31,7 +31,7 @@ unique_ptr_t<VertexData> GroundGeometry::_regenerateVertexData()
   return VertexData::CreateGround(options);
 }
 
-Geometry* GroundGeometry::copy(const string_t& _id)
+GeometryPtr GroundGeometry::copy(const string_t& _id)
 {
   return GroundGeometry::New(_id, getScene(), width, height, subdivisions,
                              canBeRegenerated(), nullptr);
@@ -49,8 +49,8 @@ Json::object GroundGeometry::serialize() const
   return serializationObject;
 }
 
-GroundGeometry* GroundGeometry::Parse(const Json::value& parsedGround,
-                                      Scene* scene)
+GroundGeometryPtr GroundGeometry::Parse(const Json::value& parsedGround,
+                                        Scene* scene)
 {
   const auto parsedGroundId = Json::GetString(parsedGround, "id");
   if (parsedGroundId.empty() || scene->getGeometryByID(parsedGroundId)) {
