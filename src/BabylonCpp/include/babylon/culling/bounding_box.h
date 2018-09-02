@@ -41,8 +41,14 @@ public:
 
   Matrix& getWorldMatrix();
   BoundingBox& setWorldMatrix(const Matrix& matrix);
+
+  /**
+   * @brief Hidden
+   */
   void _update(const Matrix& world);
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
+
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                   unsigned int strategy = 0) override;
   bool
   isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
   bool intersectsPoint(const Vector3& point);

@@ -2,7 +2,7 @@
 #define BABYLON_CULLING_BOUNDING_SPHERE_H
 
 #include <babylon/babylon_global.h>
-
+#include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -37,7 +37,12 @@ public:
   BoundingSphere& scale(float factor);
 
   /** Methods **/
+
+  /**
+   * @brief Hidden
+   */
   void _update(const Matrix& world);
+
   bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) const;
   bool intersectsPoint(const Vector3& point);
 
@@ -54,6 +59,8 @@ public:
   Vector3 maximum;
 
 private:
+  // This matrix is used as a value to reset the bounding box.
+  Matrix _identityMatrix;
   Vector3 _tempRadiusVector;
 
 }; // end of class BoundingSphere

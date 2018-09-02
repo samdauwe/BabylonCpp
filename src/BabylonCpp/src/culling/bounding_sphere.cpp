@@ -6,10 +6,11 @@
 namespace BABYLON {
 
 BoundingSphere::BoundingSphere(const Vector3& min, const Vector3& max)
-    : center{Vector3::Lerp(minimum, maximum, 0.5f)}
-    , radius{Vector3::Distance(minimum, maximum) * 0.5f}
+    : center{Vector3::Zero()}
+    , radius{0.f}
     , centerWorld{Vector3::Zero()}
     , radiusWorld{0.f}
+    , _identityMatrix{Matrix::Identity()}
     , _tempRadiusVector{Vector3::Zero()}
 {
   reConstruct(min, max);
@@ -22,6 +23,7 @@ BoundingSphere::BoundingSphere(const BoundingSphere& other)
     , radiusWorld{other.radiusWorld}
     , minimum{other.minimum}
     , maximum{other.maximum}
+    , _identityMatrix{other._identityMatrix}
     , _tempRadiusVector{other._tempRadiusVector}
 {
 }
@@ -33,6 +35,7 @@ BoundingSphere::BoundingSphere(BoundingSphere&& other)
     , radiusWorld{::std::move(other.radiusWorld)}
     , minimum{::std::move(other.minimum)}
     , maximum{::std::move(other.maximum)}
+    , _identityMatrix{::std::move(other._identityMatrix)}
     , _tempRadiusVector{::std::move(other._tempRadiusVector)}
 {
 }
@@ -46,6 +49,7 @@ BoundingSphere& BoundingSphere::operator=(const BoundingSphere& other)
     radiusWorld       = other.radiusWorld;
     minimum           = other.minimum;
     maximum           = other.maximum;
+    _identityMatrix   = other._identityMatrix;
     _tempRadiusVector = other._tempRadiusVector;
   }
 
@@ -61,6 +65,7 @@ BoundingSphere& BoundingSphere::operator=(BoundingSphere&& other)
     radiusWorld       = ::std::move(other.radiusWorld);
     minimum           = ::std::move(other.minimum);
     maximum           = ::std::move(other.maximum);
+    _identityMatrix   = ::std::move(other._identityMatrix);
     _tempRadiusVector = ::std::move(other._tempRadiusVector);
   }
 
@@ -78,20 +83,20 @@ void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max)
 
   auto distance = Vector3::Distance(min, max);
 
-  center = Vector3::Lerp(min, max, 0.5f);
+  Vector3::LerpToRef(min, max, 0.5f, center);
   radius = distance * 0.5f;
 
-  centerWorld = Vector3::Zero();
-  _update(Matrix::Identity());
+  centerWorld.set(0.f, 0.f, 0.f);
+  _update(_identityMatrix);
 }
 
 BoundingSphere& BoundingSphere::scale(float factor)
 {
   auto newRadius = radius * factor;
-  Vector3 newRadiusVector(newRadius, newRadius, newRadius);
+  _tempRadiusVector.set(newRadius, newRadius, newRadius);
 
-  auto min = center.subtract(newRadiusVector);
-  auto max = center.add(newRadiusVector);
+  auto min = center.subtract(_tempRadiusVector);
+  auto max = center.add(_tempRadiusVector);
 
   reConstruct(min, max);
 

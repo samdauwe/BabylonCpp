@@ -3,6 +3,7 @@
 #include <babylon/collisions/collider.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_sphere.h>
+#include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
 
@@ -106,10 +107,15 @@ BoundingInfo& BoundingInfo::scale(float factor)
   return *this;
 }
 
-bool BoundingInfo::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
+bool BoundingInfo::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                               unsigned int strategy)
 {
   if (!boundingSphere.isInFrustum(frustumPlanes)) {
     return false;
+  }
+
+  if (strategy == AbstractMesh::CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY) {
+    return true;
   }
 
   return boundingBox.isInFrustum(frustumPlanes);

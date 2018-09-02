@@ -37,7 +37,17 @@ public:
    */
   BoundingInfo& scale(float factor);
 
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
+  /**
+   * @brief Returns `true` if the bounding info is within the frustum defined by
+   * the passed array of planes.
+   * @param frustumPlanes defines the frustum to test
+   * @param strategy defines the strategy to use for the culling (default is
+   * BABYLON.Scene.CULLINGSTRATEGY_STANDARD)
+   * @returns true if the bounding info is in the frustum planes
+   */
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                   unsigned int strategy
+                   = 0 /*AbstractMesh::CULLINGSTRATEGY_STANDARD*/) override;
 
   /**
    * @brief Gets the world distance between the min and max points of the
@@ -47,7 +57,12 @@ public:
 
   bool
   isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
+
+  /**
+   * @brief Hidden
+   */
   bool _checkCollision(const Collider& collider) const;
+
   bool intersectsPoint(const Vector3& point);
   bool intersects(const BoundingInfo& boundingInfo, bool precise);
 

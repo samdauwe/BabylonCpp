@@ -17,26 +17,22 @@ void BoundingBox::reConstruct(const Vector3& min, const Vector3& max)
   minimum = min;
   maximum = max;
   // Bounding vectors
-  vectors.reserve(8);
-  vectors.emplace_back(minimum);
-  vectors.emplace_back(maximum);
+  vectors = {
+    minimum, //
+    maximum, //
+    minimum, //
+    minimum, //
+    minimum, //
+    maximum, //
+    maximum, //
+    maximum  //
+  };
 
-  vectors.emplace_back(minimum);
   vectors[2].x = maximum.x;
-
-  vectors.emplace_back(minimum);
   vectors[3].y = maximum.y;
-
-  vectors.emplace_back(minimum);
   vectors[4].z = maximum.z;
-
-  vectors.emplace_back(maximum);
   vectors[5].z = minimum.z;
-
-  vectors.emplace_back(maximum);
   vectors[6].x = minimum.x;
-
-  vectors.emplace_back(maximum);
   vectors[7].y = minimum.y;
 
   // OBB
@@ -204,7 +200,8 @@ void BoundingBox::_update(const Matrix& world)
   _worldMatrix = world;
 }
 
-bool BoundingBox::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
+bool BoundingBox::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                              unsigned int /*strategy*/)
 {
   return BoundingBox::IsInFrustum(vectorsWorld, frustumPlanes);
 }
