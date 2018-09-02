@@ -148,8 +148,12 @@ public:
   /**
    * @brief Returns an array of indices (IndicesArray).
    */
-  IndicesArray getIndices(bool copyWhenShared = false) override;
+  IndicesArray getIndices(bool copyWhenShared = false,
+                          bool forceCopy      = false) override;
 
+  /**
+   * @brief Hidden
+   */
   vector_t<Vector3>& _positions();
 
   /**
@@ -158,8 +162,14 @@ public:
    */
   InstancedMesh& refreshBoundingInfo();
 
+  /**
+   * @brief Hidden
+   */
   void _preActivate() override;
 
+  /**
+   * @brief Hidden
+   */
   void _activate(int renderId) override;
 
   /**
@@ -168,8 +178,14 @@ public:
   AbstractMesh* getLOD(const CameraPtr& camera,
                        BoundingSphere* boundingSphere = nullptr) override;
 
+  /**
+   * @brief Hidden
+   */
   InstancedMesh& _syncSubMeshes();
 
+  /**
+   * @brief Hidden
+   */
   bool _generatePointsArray() override;
 
   /**

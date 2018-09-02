@@ -312,7 +312,7 @@ VertexData& VertexData::transform(const Matrix& matrix)
   return *this;
 }
 
-VertexData& VertexData::merge(VertexData& other)
+VertexData& VertexData::merge(VertexData& other, bool /*use32BitsIndices*/)
 {
   _validate();
   other._validate();
@@ -537,7 +537,7 @@ VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
       VertexBuffer::MatricesWeightsExtraKind, copyWhenShared, forceCopy);
   }
 
-  result->indices = meshOrGeometry->getIndices(copyWhenShared);
+  result->indices = meshOrGeometry->getIndices(copyWhenShared, forceCopy);
 
   return result;
 }
@@ -2958,7 +2958,7 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
 }
 
 void VertexData::ImportVertexData(const Json::value& parsedVertexData,
-                                  Geometry* geometry)
+                                  Geometry& geometry)
 {
   auto vertexData = ::std::make_unique<VertexData>();
 
@@ -3041,7 +3041,7 @@ void VertexData::ImportVertexData(const Json::value& parsedVertexData,
     vertexData->indices = Json::ToArray<uint32_t>(parsedVertexData, "indices");
   }
 
-  geometry->setAllVerticesData(
+  geometry.setAllVerticesData(
     vertexData.get(), Json::GetBool(parsedVertexData, "updatable", false));
 }
 

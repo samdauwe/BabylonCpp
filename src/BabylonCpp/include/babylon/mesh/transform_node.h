@@ -76,8 +76,16 @@ public:
   Matrix& getPoseMatrix();
   const Matrix& getPoseMatrix() const;
 
+  /**
+   * @brief Hidden
+   */
   bool _isSynchronized() override;
+
+  /**
+   * @brief Hidden
+   */
   void _initCache() override;
+
   TransformNode& markAsDirty(const string_t& property) override;
 
   /**
@@ -226,6 +234,9 @@ public:
    */
   TransformNode& setParent(Node* node);
 
+  /**
+   * @brief Hidden
+   */
   virtual bool _updateNonUniformScalingState(bool value);
 
   /**
@@ -463,8 +474,11 @@ public:
   bool ignoreNonUniformScaling;
 
   // Cache
+  /** Hidden */
   unique_ptr_t<Matrix> _poseMatrix;
+  /** Hidden */
   unique_ptr_t<Matrix> _worldMatrix;
+  /** Hidden */
   float _worldMatrixDeterminant;
 
   /**

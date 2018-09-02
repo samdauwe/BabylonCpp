@@ -15,7 +15,19 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
                                        bool copyWhenShared = false,
                                        bool forceCopy      = false)
     = 0;
-  virtual IndicesArray getIndices(bool copyWhenShared = false) = 0;
+  /**
+   * @brief Returns an array of integers or a typed array (Int32Array,
+   * Uint32Array, Uint16Array) populated with the mesh indices.
+   * @param copyWhenShared If true (default false) and and if the mesh geometry
+   * is shared among some other meshes, the returned array is a copy of the
+   * internal one.
+   * @param forceCopy defines a boolean indicating that the returned array must
+   * be cloned upon returning it
+   * @returns the indices array or an empty array if the mesh has no geometry
+   */
+  virtual IndicesArray getIndices(bool copyWhenShared = false,
+                                  bool forceCopy      = false)
+    = 0;
   virtual AbstractMesh*
   setVerticesData(unsigned int kind, const Float32Array& data,
                   bool updatable                   = false,

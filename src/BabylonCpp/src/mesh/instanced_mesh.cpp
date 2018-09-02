@@ -142,7 +142,8 @@ bool InstancedMesh::isVerticesDataPresent(unsigned int kind) const
   return _sourceMesh->isVerticesDataPresent(kind);
 }
 
-IndicesArray InstancedMesh::getIndices(bool /*copyWhenShared*/)
+IndicesArray InstancedMesh::getIndices(bool /*copyWhenShared*/,
+                                       bool /*forceCopy*/)
 {
   return _sourceMesh->getIndices();
 }

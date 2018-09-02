@@ -118,6 +118,9 @@ public:
 
   void addSubMesh(SubMesh* subMesh);
 
+  /**
+   * @brief Hidden
+   */
   void _unBindEffect() override;
 
   /**
@@ -263,13 +266,17 @@ public:
   size_t getTotalIndices() const;
 
   /**
-   * @brief Returns an IndicesArray populated with the mesh indices.
-   * If the parameter `copyWhenShared` is true (default false) and and if the
-   * mesh geometry is shared among some other meshes, the returned array is a
-   * copy of the internal one.
-   * @returns An empty array if the mesh has no geometry.
+   * @brief Returns an array of integers or a typed array (Int32Array,
+   * Uint32Array, Uint16Array) populated with the mesh indices.
+   * @param copyWhenShared If true (default false) and and if the mesh geometry
+   * is shared among some other meshes, the returned array is a copy of the
+   * internal one.
+   * @param forceCopy defines a boolean indicating that the returned array must
+   * be cloned upon returning it
+   * @returns the indices array or an empty array if the mesh has no geometry
    */
-  IndicesArray getIndices(bool copyWhenShared = false) override;
+  IndicesArray getIndices(bool copyWhenShared = false,
+                          bool forceCopy      = false) override;
 
   /**
    * @brief Determine if the current mesh is ready to be rendered
@@ -309,8 +316,20 @@ public:
   void setOverridenInstanceCount(size_t count);
 
   /** Methods **/
+
+  /**
+   * @brief Hidden
+   */
   void _preActivate() override;
+
+  /**
+   * @brief Hidden
+   */
   void _preActivateForIntermediateRendering(int renderId) override;
+
+  /**
+   * @brief Hidden
+   */
   Mesh& _registerInstanceForRenderId(InstancedMesh* instance, int renderId);
 
   /**
@@ -320,11 +339,18 @@ public:
    * @returns The Mesh.
    */
   Mesh& refreshBoundingInfo();
+
+  /**
+   * @brief Hidden
+   */
   Mesh& _refreshBoundingInfo(bool applySkeleton);
 
+  /**
+   * @brief Hidden
+   */
   shared_ptr_t<SubMesh> _createGlobalSubMesh(bool force);
-  void subdivide(size_t count);
 
+  void subdivide(size_t count);
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
                         bool updatable                   = false,
                         const nullable_t<size_t>& stride = nullopt_t) override;
@@ -382,7 +408,14 @@ public:
    */
   Mesh& toLeftHanded();
 
+  /**
+   * @brief Hidden
+   */
   virtual void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode);
+
+  /**
+   * @brief Hidden
+   */
   virtual void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
                      bool alternate = false);
 
@@ -422,10 +455,21 @@ public:
   Mesh& unregisterAfterRender(
     const ::std::function<void(Mesh* mesh, EventState&)>& func);
 
+  /**
+   * @brief Hidden
+   */
   _InstancesBatch* _getInstancesRenderList(size_t subMeshId);
+
+  /**
+   * @brief Hidden
+   */
   Mesh& _renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
                              _InstancesBatch* batch, Effect* effect,
                              Engine* engine);
+
+  /**
+   * @brief Hidden
+   */
   Mesh&
   _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
                     _InstancesBatch* batch, bool hardwareInstancedRendering,
@@ -463,13 +507,21 @@ public:
   void cleanMatrixWeights();
 
   vector_t<NodePtr> getChildren();
+
+  /**
+   * @brief Hidden
+   */
   Mesh& _checkDelayState();
 
   /**
-   * @brief Returns true if the mesh in the frustum defined by the Plane objects
-   * from the `frustumPlanes` array parameter.
+   * @brief Returns `true` if the mesh is within the frustum defined by the
+   * passed array of planes. A mesh is in the frustum if its bounding box
+   * intersects the frustum
+   * @param frustumPlanes defines the frustum to test
+   * @returns true if the mesh is in the frustum planes
    */
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                   unsigned int strategy = 0) override;
 
   /**
    * @brief Sets the mesh material by the material or multiMaterial `id`
@@ -489,8 +541,8 @@ public:
   /**
    * @brief Modifies the mesh geometry according to the passed transformation
    * matrix. This method returns nothing but it really modifies the mesh even if
-   * it's originally not set as updatable. The mesh normals are modified
-   * accordingly the same transformation. tuto :
+   * it's originally not set as updatable. The mesh normals are modified using
+   * the same transformation. tuto :
    * http://doc.babylonjs.com/resources/baking_transformations Note that, under
    * the hood, this method sets a new VertexBuffer each call. Returns the Mesh.
    */
@@ -509,7 +561,15 @@ public:
   Mesh& bakeCurrentTransformIntoVertices();
 
   /** Cache **/
+
+  /**
+   * @brief Hidden
+   */
   Mesh& _resetPointsArrayCache();
+
+  /**
+   * @brief Hidden
+   */
   bool _generatePointsArray() override;
 
   /** Clone **/
@@ -549,41 +609,56 @@ public:
    * @brief Modifies the mesh geometry according to a displacement map.
    * A displacement map is a colored image. Each pixel color value (actually a
    * gradient computed from red, green, blue values) will give the displacement
-   * to apply to each mesh vertex.
-   * The mesh must be set as updatable. Its internal geometry is directly
-   * modified, no new buffer are allocated.
-   * This method returns nothing.
-   * The parameter `url` is a string, the URL from the image file is to be
-   * downloaded.
-   * The parameters `minHeight` and `maxHeight` are the lower and upper limits
-   * of the displacement.
-   * The parameter `onSuccess` is an optional Javascript function to be called
-   * just after the mesh is modified. It is passed the modified mesh and must
-   * return nothing.
+   * to apply to each mesh vertex. The mesh must be set as updatable. Its
+   * internal geometry is directly modified, no new buffer are allocated. This
+   * method returns nothing.
+   * @param url is a string, the URL from the image file is to be downloaded.
+   * @param minHeight is the lower limit of the displacement.
+   * @param maxHeight is the upper limit of the displacement.
+   * @param onSuccess is an optional Javascript function to be called just after
+   * the mesh is modified. It is passed the modified mesh and must return
+   * nothing.
+   * @param uvOffset is an optional vector2 used to offset UV.
+   * @param uvScale is an optional vector2 used to scale UV.
+   * @param forceUpdate defines whether or not to force an update of the
+   * generated buffers. This is usefull to apply on a deserialized model for
+   * instance.
+   * @returns the Mesh.
    */
   void applyDisplacementMap(const string_t& url, int minHeight, int maxHeight,
-                            const ::std::function<void(Mesh* mesh)> onSuccess);
+                            const ::std::function<void(Mesh* mesh)> onSuccess
+                            = nullptr,
+                            const nullable_t<Vector2>& uvOffset = nullopt_t,
+                            const nullable_t<Vector2>& uvScale  = nullopt_t,
+                            bool boolforceUpdate                = false);
 
   /**
    * @brief Modifies the mesh geometry according to a displacementMap buffer.
    * A displacement map is a colored image. Each pixel color value (actually a
    * gradient computed from red, green, blue values) will give the displacement
-   * to apply to each mesh vertex.
-   * The mesh must be set as updatable. Its internal geometry is directly
-   * modified, no new buffer are allocated.
-   * This method returns nothing.
-   * The parameter `buffer` is a `Uint8Array` buffer containing series of
-   * `Uint8` lower than 255, the red, green, blue and alpha values of each
-   * successive pixel.
-   * The parameters `heightMapWidth` and `heightMapHeight` are positive integers
-   * to set the width and height of the buffer image.
-   * The parameters `minHeight` and `maxHeight` are the lower and upper limits
-   * of the displacement.
+   * to apply to each mesh vertex. The mesh must be set as updatable. Its
+   * internal geometry is directly modified, no new buffer are allocated.
+   * @param buffer is a `Uint8Array` buffer containing series of `Uint8` lower
+   * than 255, the red, green, blue and alpha values of each successive pixel.
+   * @param heightMapWidth is the width of the buffer image.
+   * @param heightMapHeight is the height of the buffer image.
+   * @param minHeight is the lower limit of the displacement.
+   * @param maxHeight is the upper limit of the displacement.
+   * @param onSuccess is an optional Javascript function to be called just after
+   * the mesh is modified. It is passed the modified mesh and must return
+   * nothing.
+   * @param uvOffset is an optional vector2 used to offset UV.
+   * @param uvScale is an optional vector2 used to scale UV.
+   * @param forceUpdate defines whether or not to force an update of the
+   * generated buffers. This is usefull to apply on a deserialized model for
+   * instance.
+   * @returns the Mesh.
    */
-  void applyDisplacementMapFromBuffer(const Uint8Array& buffer,
-                                      unsigned int heightMapWidth,
-                                      unsigned int heightMapHeight,
-                                      int minHeight, int maxHeight);
+  void applyDisplacementMapFromBuffer(
+    const Uint8Array& buffer, unsigned int heightMapWidth,
+    unsigned int heightMapHeight, int minHeight, int maxHeight,
+    const nullable_t<Vector2>& uvOffset = nullopt_t,
+    const nullable_t<Vector2>& uvScale = nullopt_t, bool forceUpdate = false);
 
   /**
    * @brief Modify the mesh to get a flat shading rendering.
@@ -621,14 +696,16 @@ public:
   /**
    * @brief Creates a new InstancedMesh object from the mesh model.
    * An instance shares the same properties and the same material than its
-   * model.
-   * Only these properties of each instance can then be set individually :
+   * model. Please make sure to call mesh.makeGeometryUnique() if you are
+   * calling createInstance on a previously cloned mesh. Only these properties
+   * of each instance can then be set individually :
    * - position
    * - rotation
    * - rotationQuaternion
    * - setPivotMatrix
    * - scaling
-   * tuto : http://doc.babylonjs.com/tutorials/How_to_use_Instances
+   *
+   * @see http://doc.babylonjs.com/how_to/how_to_use_instances
    * Warning : this method is not supported for Line mesh and LineSystem
    */
   InstancedMeshPtr createInstance(const string_t& name);
@@ -643,22 +720,6 @@ public:
   Mesh& synchronizeInstances();
 
   /**
-   * @brief Simplify the mesh according to the given array of settings.
-   * Function will return immediately and will simplify async.
-   * @param settings a collection of simplification settings.
-   * @param parallelProcessing should all levels calculate parallel or one after
-   * the other.
-   * @param type the type of simplification to run.
-   * @param successCallback optional success callback to be called after the
-   * simplification finished processing all settings.
-   */
-  /*void
-  simplify(const vector_t<ISimplificationSettings*>& settings,
-           ::std::function<void(Mesh* mesh, int submeshIndex)>& successCallback,
-           bool parallelProcessing = true, SimplificationType simplificationType
-                                           = SimplificationType::QUADRATIC);*/
-
-  /**
    * @brief Optimization of the mesh's indices, in case a mesh has duplicated
    * vertices. The function will only reorder the indices and will not remove
    * unused vertices to avoid problems with submeshes.
@@ -670,6 +731,9 @@ public:
   void
   optimizeIndices(const ::std::function<void(Mesh* mesh)>& successCallback);
 
+  /**
+   * @brief Hidden
+   */
   void _syncGeometryWithMorphTargetManager();
 
   /** Statics **/
@@ -687,7 +751,7 @@ public:
    * @brief Creates a ribbon mesh.
    * Please consider using the same method from the MeshBuilder class instead.
    * The ribbon is a parametric shape :
-   * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
+   * http://doc.babylonjs.com/how_to/parametric_shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters.
    *
    * Please read this full tutorial to understand how to design a ribbon :
@@ -930,7 +994,7 @@ public:
   /**
    * @brief Creates an extruded shape mesh.
    * The extrusion is a parametric shape :
-   * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
+   * http://doc.babylonjs.com/how_to/parametric_shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters. Please consider
    * using the same method from the MeshBuilder class instead.
    *
@@ -969,7 +1033,7 @@ public:
   /**
    * @brief Creates an custom extruded shape mesh.
    * The custom extrusion is a parametric shape :
-   * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
+   * http://doc.babylonjs.com/how_to/parametric_shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters. Please consider
    * using the same method from the MeshBuilder class instead.
    *
@@ -1146,7 +1210,7 @@ public:
   /**
    * @brief Creates a tube mesh.
    * The tube is a parametric shape :
-   * http://doc.babylonjs.com/tutorials/Parametric_Shapes.  It has no predefined
+   * http://doc.babylonjs.com/how_to/parametric_shapes.  It has no predefined
    * shape. Its final shape will depend on the input parameters. Please consider
    * using the same method from the MeshBuilder class instead. The parameter
    * `path` is a required array of successive Vector3. It is the curve used as
@@ -1299,16 +1363,16 @@ public:
   /**
    * @brief Merge the array of meshes into a single mesh for performance
    * reasons.
-   * @param {Array<Mesh>} meshes - The vertices source.  They should all be of
-   * the same material.  Entries can empty
-   * @param {boolean} disposeSource - When true (default), dispose of the
-   * vertices from the source meshes
-   * @param {boolean} allow32BitsIndices - When the sum of the vertices > 64k,
-   * this must be set to true.
-   * @param {Mesh} meshSubclass - When set, vertices inserted into this Mesh.
-   * Meshes can then be merged into a Mesh sub-class.
-   * @param {boolean} subdivideWithSubMeshes - When true (false default),
-   * subdivide mesh to his subMesh array with meshes source.
+   * @param meshes - The vertices source.  They should all be of the same
+   * material.  Entries can empty
+   * @param disposeSource - When true (default), dispose of the vertices from
+   * the source meshes
+   * @param allow32BitsIndices - When the sum of the vertices > 64k, this must
+   * be set to true.
+   * @param meshSubclass - When set, vertices inserted into this Mesh.  Meshes
+   * can then be merged into a Mesh sub-class.
+   * @param subdivideWithSubMeshes - When true (false default), subdivide mesh
+   * to his subMesh array with meshes source.
    */
   static MeshPtr MergeMeshes(const vector_t<MeshPtr>& meshes,
                              bool disposeSource          = true,
@@ -1414,6 +1478,7 @@ public:
   int delayLoadState;
   vector_t<InstancedMesh*> instances;
   string_t delayLoadingFile;
+  /** Hidden */
   string_t _binaryInfo;
   ::std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
     onLODLevelSelection;
@@ -1421,13 +1486,19 @@ public:
   // Morph
   Property<Mesh, MorphTargetManagerPtr> morphTargetManager;
 
+  /** Hidden */
   Geometry* _geometry;
+  /** Hidden */
   Uint32Array _delayInfoKinds;
+  /** Hidden */
   ::std::function<void(const Json::value& parsedGeometry, const MeshPtr& mesh)>
     _delayLoadingFunction;
+  /** Hidden */
   unique_ptr_t<_VisibleInstances> _visibleInstances;
+  /** Hidden */
   bool _shouldGenerateFlatShading;
   // Use by builder only to know what orientation were the mesh build in.
+  /** Hidden */
   unsigned int _originalBuilderSideOrientation;
   nullable_t<unsigned int> overrideMaterialSideOrientation;
 

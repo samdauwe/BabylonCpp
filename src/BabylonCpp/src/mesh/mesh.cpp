@@ -474,12 +474,12 @@ size_t Mesh::getTotalIndices() const
   return _geometry->getTotalIndices();
 }
 
-IndicesArray Mesh::getIndices(bool copyWhenShared)
+IndicesArray Mesh::getIndices(bool copyWhenShared, bool forceCopy)
 {
   if (!_geometry) {
     return Uint32Array();
   }
-  return _geometry->getIndices(copyWhenShared);
+  return _geometry->getIndices(copyWhenShared, forceCopy);
 }
 
 bool Mesh::get_isBlocked() const
@@ -826,7 +826,7 @@ void Mesh::markVerticesDataAsUpdatable(unsigned int kind, bool updatable)
 Mesh& Mesh::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer)
 {
   if (!_geometry) {
-    _geometry = Geometry::CreateGeometryForMesh(this);
+    _geometry = Geometry::CreateGeometryForMesh(this).get();
   }
 
   _geometry->setVerticesBuffer(::std::move(buffer));
@@ -1213,10 +1213,10 @@ Mesh& Mesh::_processRendering(
 
 Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 {
-  // _checkOcclusionQuery();
-  // if (_isOccluded) {
-  //  return *this;
-  // }
+  _checkOcclusionQuery();
+  if (_isOccluded) {
+    return *this;
+  }
 
   auto scene = getScene();
 
@@ -1526,7 +1526,8 @@ Mesh& Mesh::_queueLoad(Scene* scene)
   return *this;
 }
 
-bool Mesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
+bool Mesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                       unsigned int /*strategy*/)
 {
   if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return false;
@@ -1602,18 +1603,17 @@ Mesh& Mesh::bakeTransformIntoVertices(const Matrix& transform)
                   getVertexBuffer(VertexBuffer::PositionKind)->isUpdatable());
 
   // Normals
-  if (!isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    return *this;
+  if (isVerticesDataPresent(VertexBuffer::NormalKind)) {
+    data = getVerticesData(VertexBuffer::NormalKind);
+    temp.clear();
+    for (index = 0; index < data.size(); index += 3) {
+      Vector3::TransformNormal(Vector3::FromArray(data, index), transform)
+        .normalize()
+        .toArray(temp, index);
+    }
+    setVerticesData(VertexBuffer::NormalKind, temp,
+                    getVertexBuffer(VertexBuffer::NormalKind)->isUpdatable());
   }
-  data = getVerticesData(VertexBuffer::NormalKind);
-  temp.clear();
-  for (index = 0; index < data.size(); index += 3) {
-    Vector3::TransformNormal(Vector3::FromArray(data, index), transform)
-      .normalize()
-      .toArray(temp, index);
-  }
-  setVerticesData(VertexBuffer::NormalKind, temp,
-                  getVertexBuffer(VertexBuffer::NormalKind)->isUpdatable());
 
   // flip faces?
   if (transform.m[0] * transform.m[5] * transform.m[10] < 0) {
@@ -1713,7 +1713,9 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
 void Mesh::applyDisplacementMap(
   const string_t& url, int minHeight, int maxHeight,
-  const ::std::function<void(Mesh* mesh)> onSuccess)
+  const ::std::function<void(Mesh* mesh)> onSuccess,
+  const nullable_t<Vector2>& /*uvOffset*/,
+  const nullable_t<Vector2>& /*uvScale*/, bool /*boolforceUpdate*/)
 {
   ::std::cout << url << minHeight << maxHeight;
   onSuccess(nullptr);
@@ -1722,7 +1724,10 @@ void Mesh::applyDisplacementMap(
 void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
                                           unsigned int heightMapWidth,
                                           unsigned int heightMapHeight,
-                                          int minHeight, int maxHeight)
+                                          int minHeight, int maxHeight,
+                                          const nullable_t<Vector2>& iUvOffset,
+                                          const nullable_t<Vector2>& iUvScale,
+                                          bool forceUpdate)
 {
   if (!isVerticesDataPresent(VertexBuffer::PositionKind)
       || !isVerticesDataPresent(VertexBuffer::NormalKind)
@@ -1733,12 +1738,15 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
     return;
   }
 
-  auto positions = getVerticesData(VertexBuffer::PositionKind);
+  auto positions = getVerticesData(VertexBuffer::PositionKind, true, true);
   auto normals   = getVerticesData(VertexBuffer::NormalKind);
   auto uvs       = getVerticesData(VertexBuffer::UVKind);
   auto position  = Vector3::Zero();
   auto normal    = Vector3::Zero();
   auto uv        = Vector2::Zero();
+
+  Vector2 uvOffset = iUvOffset.has_value() ? *iUvOffset : Vector2::Zero();
+  Vector2 uvScale  = iUvScale.has_value() ? *iUvScale : Vector2(1.f, 1.f);
 
   for (unsigned int index = 0; index < positions.size(); index += 3) {
     Vector3::FromArrayToRef(positions, index, position);
@@ -1746,10 +1754,14 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
     Vector2::FromArrayToRef(uvs, (index / 3) * 2, uv);
 
     // Compute height
-    auto u = (static_cast<unsigned int>(::std::abs(uv.x)) * heightMapWidth)
-             % heightMapWidth;
-    auto v = (static_cast<unsigned int>(::std::abs(uv.y)) * heightMapHeight)
-             % heightMapHeight;
+    auto u
+      = (static_cast<unsigned int>(::std::abs(uv.x * uvScale.x + uvOffset.x))
+         * heightMapWidth)
+        % heightMapWidth;
+    auto v
+      = (static_cast<unsigned int>(::std::abs(uv.y * uvScale.y + uvOffset.y))
+         * heightMapHeight)
+        % heightMapHeight;
 
     auto pos = (u + v * heightMapWidth) * 4;
     auto r   = buffer[pos] / 255.f;
@@ -1769,8 +1781,14 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
 
   VertexData::ComputeNormals(positions, getIndices(), normals);
 
-  updateVerticesData(VertexBuffer::PositionKind, positions);
-  updateVerticesData(VertexBuffer::NormalKind, normals);
+  if (forceUpdate) {
+    setVerticesData(VertexBuffer::PositionKind, positions);
+    setVerticesData(VertexBuffer::NormalKind, normals);
+  }
+  else {
+    updateVerticesData(VertexBuffer::PositionKind, positions);
+    updateVerticesData(VertexBuffer::NormalKind, normals);
+  }
 }
 
 Mesh& Mesh::convertToFlatShadedMesh()
@@ -1974,16 +1992,6 @@ Mesh& Mesh::synchronizeInstances()
   }
   return *this;
 }
-
-/*void Mesh::simplify(
-  const vector_t<ISimplificationSettings*>& settings,
-  bool parallelProcessing, SimplificationType simplificationType,
-  ::std::function<void(Mesh* mesh, int submeshIndex)>& successCallback)
-{
-  settings(nullptr);
-  std::cout << parallelProcessing << simplificationType;
-  successCallback(nullptr, 0);
-}*/
 
 void Mesh::optimizeIndices(
   const ::std::function<void(Mesh* mesh)>& successCallback)
@@ -2912,12 +2920,13 @@ MeshPtr Mesh::MergeMeshes(const vector_t<MeshPtr>& meshes, bool disposeSource,
   MeshPtr source = nullptr;
   for (auto& mesh : meshes) {
     if (mesh) {
-      mesh->computeWorldMatrix(true);
+      const auto& wm  = mesh->computeWorldMatrix(true);
       otherVertexData = VertexData::ExtractFromMesh(mesh.get(), true, true);
-      otherVertexData->transform(*mesh->getWorldMatrix());
+
+      otherVertexData->transform(wm);
 
       if (vertexData) {
-        vertexData->merge(*otherVertexData.get());
+        vertexData->merge(*otherVertexData.get(), allow32BitsIndices);
       }
       else {
         vertexData = ::std::move(otherVertexData);

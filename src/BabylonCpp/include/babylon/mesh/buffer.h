@@ -77,6 +77,10 @@ public:
   size_t getStrideSize() const;
 
   // Methods
+
+  /**
+   * @brief Hidden
+   */
   void _rebuild();
   GL::IGLBuffer* create(Float32Array data = {});
   GL::IGLBuffer* update(const Float32Array& data);

@@ -80,11 +80,13 @@ public:
   VertexData& transform(const Matrix& matrix);
 
   /**
-   * @brief Merges the passed VertexData into the current one.
+   * @brief Merges the passed VertexData into the current one
    * @param other the VertexData to be merged into the current one
+   * @param use32BitsIndices defines a boolean indicating if indices must be
+   * store in a 32 bits array
    * @returns the modified VertexData
    */
-  VertexData& merge(VertexData& other);
+  VertexData& merge(VertexData& other, bool use32BitsIndices = false);
 
   /**
    * @brief Serializes the VertexData.
@@ -538,7 +540,7 @@ public:
    * @param geometry the geometry to apply the VertexData to
    */
   static void ImportVertexData(const Json::value& parsedVertexData,
-                               Geometry* geometry);
+                               Geometry& geometry);
 
   static void
   _ComputeSides(unsigned int sideOrientation, Float32Array& positions,

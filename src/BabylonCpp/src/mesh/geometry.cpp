@@ -69,9 +69,9 @@ Geometry::~Geometry()
 {
 }
 
-void Geometry::addToScene(unique_ptr_t<Geometry>&& newGeometry)
+void Geometry::addToScene(const GeometryPtr& newGeometry)
 {
-  _scene->pushGeometry(::std::move(newGeometry), true);
+  _scene->pushGeometry(newGeometry, true);
 }
 
 nullable_t<Vector2>& Geometry::get_boundingBias()
@@ -90,7 +90,7 @@ void Geometry::set_boundingBias(const nullable_t<Vector2>& value)
   _updateBoundingInfo(true, Float32Array());
 }
 
-Geometry* Geometry::CreateGeometryForMesh(Mesh* mesh)
+GeometryPtr Geometry::CreateGeometryForMesh(Mesh* mesh)
 {
   auto geometry = Geometry::New(Geometry::RandomId(), mesh->getScene());
 
@@ -472,12 +472,12 @@ size_t Geometry::getTotalIndices()
   return _indices.size();
 }
 
-IndicesArray Geometry::getIndices(bool copyWhenShared)
+IndicesArray Geometry::getIndices(bool copyWhenShared, bool forceCopy)
 {
   if (!isReady()) {
     return IndicesArray();
   }
-  if (!copyWhenShared || _meshes.size() == 1) {
+  if (!forceCopy && (!copyWhenShared || _meshes.size() == 1)) {
     return _indices;
   }
   else {
@@ -742,7 +742,7 @@ void Geometry::dispose()
   _isDisposed = true;
 }
 
-Geometry* Geometry::copy(const string_t& iId)
+GeometryPtr Geometry::copy(const string_t& iId)
 {
   auto vertexData = ::std::make_unique<VertexData>();
 
@@ -796,7 +796,7 @@ Json::object Geometry::serializeVerticeData() const
   return Json::object();
 }
 
-Geometry* Geometry::ExtractFromMesh(Mesh* mesh, const string_t& id)
+GeometryPtr Geometry::ExtractFromMesh(Mesh* mesh, const string_t& id)
 {
   auto geometry = mesh->geometry();
 
@@ -1024,8 +1024,8 @@ void Geometry::_CleanMatricesWeights(const Json::value& parsedGeometry,
   }
 }
 
-Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
-                          const string_t& rootUrl)
+GeometryPtr Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
+                            const string_t& rootUrl)
 {
   const auto parsedVertexDataId = Json::GetString(parsedVertexData, "id");
   if (parsedVertexDataId.empty()
@@ -1089,7 +1089,7 @@ Geometry* Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
     geometry->_delayLoadingFunction = VertexData::ImportVertexData;
   }
   else {
-    VertexData::ImportVertexData(parsedVertexData, geometry);
+    VertexData::ImportVertexData(parsedVertexData, *geometry);
   }
 
   return geometry;

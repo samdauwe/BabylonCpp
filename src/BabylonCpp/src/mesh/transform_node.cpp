@@ -206,8 +206,8 @@ bool TransformNode::_isSynchronized()
     return false;
   }
 
-  if (rotationQuaternion()) {
-    if (!_cache.rotationQuaternion.equals(*rotationQuaternion())) {
+  if (_rotationQuaternion.has_value()) {
+    if (!_cache.rotationQuaternion.equals(*_rotationQuaternion)) {
       return false;
     }
   }

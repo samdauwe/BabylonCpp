@@ -151,7 +151,9 @@ public:
    */
   static size_t DeduceStride(unsigned int kind);
 
-  /** Rebuild **/
+  /**
+   * @brief Hidden
+   */
   void _rebuild();
 
   /** Properties **/

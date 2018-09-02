@@ -17,10 +17,11 @@ public:
 
 public:
   template <typename... Ts>
-  static Geometry* New(Ts&&... args)
+  static GeometryPtr New(Ts&&... args)
   {
-    auto geometry = new Geometry(::std::forward<Ts>(args)...);
-    geometry->addToScene(static_cast<unique_ptr_t<Geometry>>(geometry));
+    auto geometry
+      = shared_ptr_t<Geometry>(new Geometry(::std::forward<Ts>(args)...));
+    geometry->addToScene(geometry);
 
     return geometry;
   }
@@ -30,14 +31,14 @@ public:
    * @brief Adds the geometry to the scene.
    * @param newGeometry
    */
-  void addToScene(unique_ptr_t<Geometry>&& newGeometry);
+  void addToScene(const GeometryPtr& newGeometry);
 
   /**
    * @brief Static function used to attach a new empty geometry to a mesh.
    * @param mesh defines the mesh to attach the geometry to
    * @returns the new {BABYLON.Geometry}
    */
-  static Geometry* CreateGeometryForMesh(Mesh* mesh);
+  static GeometryPtr CreateGeometryForMesh(Mesh* mesh);
 
   /**
    * @brief Gets the hosting scene.
@@ -210,12 +211,15 @@ public:
   size_t getTotalIndices();
 
   /**
-   * @brief Gets the index buffer array.
+   * @brief Gets the index buffer array
    * @param copyWhenShared defines if the returned array must be cloned upon
    * returning it if the current geometry is shared between multiple meshes
+   * @param forceCopy defines a boolean indicating that the returned array must
+   * be cloned upon returning it
    * @returns the index buffer array
    */
-  IndicesArray getIndices(bool copyWhenShared = false) override;
+  IndicesArray getIndices(bool copyWhenShared = false,
+                          bool forceCopy      = false) override;
 
   /**
    * @brief Gets the index buffer.
@@ -283,7 +287,7 @@ public:
    * @param id defines the unique ID of the new geometry
    * @returns a new geometry object
    */
-  Geometry* copy(const string_t& id);
+  GeometryPtr copy(const string_t& id);
 
   /**
    * @brief Serialize the current geometry info (and not the vertices data) into
@@ -307,7 +311,7 @@ public:
    * @param id defines the unique ID of the new geometry object
    * @returns the new geometry object
    */
-  static Geometry* ExtractFromMesh(Mesh* mesh, const string_t& id);
+  static GeometryPtr ExtractFromMesh(Mesh* mesh, const string_t& id);
 
   /**
    * @brief You should now use Tools.RandomId(), this method is still here for
@@ -342,8 +346,8 @@ public:
    * data)
    * @returns the new geometry object
    */
-  static Geometry* Parse(const Json::value& parsedVertexData, Scene* scene,
-                         const string_t& rootUrl);
+  static GeometryPtr Parse(const Json::value& parsedVertexData, Scene* scene,
+                           const string_t& rootUrl);
 
 protected:
   /**
@@ -426,7 +430,7 @@ public:
   /** Hidden */
   unique_ptr_t<BoundingInfo> _boundingInfo;
   /** Hidden */
-  ::std::function<void(const Json::value& parsedVertexData, Geometry* geometry)>
+  ::std::function<void(const Json::value& parsedVertexData, Geometry& geometry)>
     _delayLoadingFunction;
   /** Hidden */
   int _softwareSkinningRenderId;

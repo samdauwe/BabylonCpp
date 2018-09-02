@@ -45,6 +45,12 @@ public:
   /** Use a conservative occlusion algorithm */
   static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE = 1;
 
+  /** Default culling strategy with bounding box and bounding sphere and then
+   * frustum culling */
+  static constexpr unsigned int CULLINGSTRATEGY_STANDARD = 0;
+  /** Culling strategy with bounding sphere only and then frustum culling */
+  static constexpr unsigned int CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY = 1;
+
   static Vector3 _lookAtVectorCache;
 
   template <typename... Ts>
@@ -170,7 +176,8 @@ public:
    * @brief Returns null by default. Implemented by child classes.
    * @returns null
    */
-  virtual Uint32Array getIndices(bool copyWhenShared = false) override;
+  virtual Uint32Array getIndices(bool copyWhenShared = false,
+                                 bool forceCopy      = false) override;
 
   /**
    * @brief Returns the array of the requested vertex data kind. Implemented by
@@ -396,7 +403,8 @@ public:
    * @param frustumPlanes defines the frustum to test
    * @returns true if the mesh is in the frustum planes
    */
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                   unsigned int strategy = 0) override;
 
   /**
    * @brief Returns `true` if the mesh is completely in the frustum defined be
@@ -1125,6 +1133,11 @@ private:
   AbstractMesh& _initFacetData();
 
 public:
+  /**
+   * Gets ot sets the culling strategy to use to find visible meshes
+   */
+  unsigned int cullingStrategy;
+
   /**
    * The number of facets in the mesh
    */

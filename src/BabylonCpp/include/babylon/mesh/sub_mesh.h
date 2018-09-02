@@ -64,6 +64,9 @@ public:
    */
   SubMesh& refreshBoundingInfo();
 
+  /**
+   * @brief Hidden
+   */
   bool _checkCollision(const Collider& collider);
 
   /**
@@ -76,7 +79,8 @@ public:
    * @brief Returns if the submesh bounding box intersects the frustum defined
    * by the passed array of planes.
    */
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) override;
+  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                   unsigned int strategy = 0) override;
 
   /**
    * @brief Returns if the submesh bounding box is completely inside the frustum
@@ -111,6 +115,9 @@ public:
                                             const Uint32Array& indices,
                                             bool fastCheck);
 
+  /**
+   * @brief Hidden
+   */
   void _rebuild();
 
   /** Clone **/
@@ -168,12 +175,19 @@ public:
   size_t indexCount;
   bool createBoundingBox;
   size_t linesIndexCount;
+  /** Hidden */
   vector_t<Vector3> _lastColliderWorldVertices;
+  /** Hidden */
   vector_t<Plane> _trianglePlanes;
+  /** Hidden */
   Matrix _lastColliderTransformMatrix;
+  /** Hidden */
   int _renderId;
+  /** Hidden */
   int _alphaIndex;
+  /** Hidden */
   float _distanceToCamera;
+  /** Hidden */
   size_t _id;
 
 private:

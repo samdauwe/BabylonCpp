@@ -32,9 +32,18 @@ public:
   IReflect::Type type() const override;
 
   InstancedMesh* createInstance(const string_t& name);
+
+  /**
+   * @brief Hidden
+   */
   void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode) override;
+
+  /**
+   * @brief Hidden
+   */
   void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
              bool alternate = false) override;
+
   PickingInfo intersects(const Ray& ray, bool fastCheck = true) override;
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
@@ -44,6 +53,20 @@ public:
    */
   LinesMeshPtr clone(const string_t& name, Node* newParent = nullptr,
                      bool doNotCloneChildren = false);
+
+  /**
+   * @brief Enables the edge rendering mode on the mesh.
+   * This mode makes the mesh edges visible
+   * @param epsilon defines the maximal distance between two angles to detect a
+   * face
+   * @param checkVerticesInsteadOfIndices indicates that we should check vertex
+   * list directly instead of faces
+   * @returns the currentAbstractMesh
+   * @see https://www.babylonjs-playground.com/#19O9TU#0
+   */
+  AbstractMesh& enableEdgesRendering(float epsilon = 0.95f,
+                                     bool checkVerticesInsteadOfIndices
+                                     = false);
 
 protected:
   LinesMesh(const string_t& name, Scene* scene, Node* parent = nullptr,

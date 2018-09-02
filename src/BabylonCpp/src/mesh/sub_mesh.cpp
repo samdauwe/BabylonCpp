@@ -178,7 +178,8 @@ SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
   return *this;
 }
 
-bool SubMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
+bool SubMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                          unsigned int /*strategy*/)
 {
   auto boundingInfo = getBoundingInfo();
 

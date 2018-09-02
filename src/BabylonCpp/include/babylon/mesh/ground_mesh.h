@@ -127,13 +127,21 @@ protected:
 
 public:
   bool generateOctree;
+  /** Hidden */
   size_t _subdivisionsX;
+  /** Hidden */
   size_t _subdivisionsY;
+  /** Hidden */
   float _width;
+  /** Hidden */
   float _height;
+  /** Hidden */
   float _minX;
+  /** Hidden */
   float _maxX;
+  /** Hidden */
   float _minZ;
+  /** Hidden */
   float _maxZ;
 
   ReadOnlyProperty<GroundMesh, size_t> subdivisions;

@@ -9,6 +9,7 @@
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/rendering/line_edges_renderer.h>
 
 namespace BABYLON {
 
@@ -157,6 +158,16 @@ LinesMeshPtr LinesMesh::clone(const string_t& iName, Node* newParent,
                               bool doNotCloneChildren)
 {
   return LinesMesh::New(iName, getScene(), newParent, this, doNotCloneChildren);
+}
+
+AbstractMesh&
+LinesMesh::enableEdgesRendering(float epsilon,
+                                bool checkVerticesInsteadOfIndices)
+{
+  disableEdgesRendering();
+  _edgesRenderer = ::std::make_unique<LineEdgesRenderer>(
+    shared_from_base<LinesMesh>(), epsilon, checkVerticesInsteadOfIndices);
+  return *this;
 }
 
 } // end of namespace BABYLON

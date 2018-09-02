@@ -16,7 +16,9 @@ public:
   void setEffect(Effect* effect, const MaterialDefines& defines);
 
 public:
+  /** Hidden */
   unique_ptr_t<MaterialDefines> _materialDefines;
+  /** Hidden */
   Effect* _materialEffect;
 
 }; // end of class BaseSubMesh

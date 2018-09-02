@@ -35,6 +35,7 @@ Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
 AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     : TransformNode(iName, scene, false)
+    , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_STANDARD}
     , facetNb{this, &AbstractMesh::get_facetNb}
     , partitioningSubdivisions{this,
                                &AbstractMesh::get_partitioningSubdivisions,
@@ -701,7 +702,8 @@ size_t AbstractMesh::getTotalVertices() const
   return 0;
 }
 
-Uint32Array AbstractMesh::getIndices(bool /*copyWhenShared*/)
+Uint32Array AbstractMesh::getIndices(bool /*copyWhenShared*/,
+                                     bool /*forceCopy*/)
 {
   return Uint32Array();
 }
@@ -949,9 +951,11 @@ void AbstractMesh::_afterComputeWorldMatrix()
   _updateBoundingInfo();
 }
 
-bool AbstractMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes)
+bool AbstractMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+                               unsigned int /*strategy*/)
 {
-  return _boundingInfo != nullptr && _boundingInfo->isInFrustum(frustumPlanes);
+  return _boundingInfo != nullptr
+         && _boundingInfo->isInFrustum(frustumPlanes, cullingStrategy);
 }
 
 bool AbstractMesh::isCompletelyInFrustum(
