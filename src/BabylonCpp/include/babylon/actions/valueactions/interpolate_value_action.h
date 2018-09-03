@@ -19,7 +19,11 @@ public:
                          = nullptr);
   ~InterpolateValueAction() override;
 
+  /**
+   * @brief Hidden
+   */
   void _prepare() override;
+
   void execute(const ActionEvent& evt) override;
   Json::object serialize(Json::object& parent) const override;
 

@@ -65,6 +65,18 @@ bool ActionManager::hasSpecificTriggers(const Uint32Array& triggers) const
          != actions.end();
 }
 
+bool ActionManager::hasSpecificTriggers2(unsigned int triggerA,
+                                         unsigned int triggerB) const
+{
+  for (const auto& action : actions) {
+    if (triggerA == action->trigger || triggerB == action->trigger) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool ActionManager::hasSpecificTrigger(
   unsigned int trigger,
   const ::std::function<bool(const string_t& parameter)>& parameterPredicate)

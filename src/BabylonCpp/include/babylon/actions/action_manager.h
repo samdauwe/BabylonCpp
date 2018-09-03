@@ -231,6 +231,16 @@ public:
   bool hasSpecificTriggers(const Uint32Array& triggers) const;
 
   /**
+   * @brief Does this action manager handles actions of any of the given
+   * triggers. This function takes two arguments for speed.
+   * @param triggerA defines the trigger to be tested
+   * @param triggerB defines the trigger to be tested
+   * @return a boolean indicating whether one (or more) of the triggers is
+   * handled
+   */
+  bool hasSpecificTriggers2(unsigned int triggerA, unsigned int triggerB) const;
+
+  /**
    * @brief Does this action manager handles actions of a given trigger.
    * @param trigger defines the trigger to be tested
    * @param parameterPredicate defines an optional predicate to filter triggers

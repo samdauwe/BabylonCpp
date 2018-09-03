@@ -22,7 +22,12 @@ public:
   void setEmitter(Mesh* newEmitter);
   Vector3 getEmitterPosition();
   bool computeEffectivePosition(Viewport& globalViewport);
+
+  /**
+   * @brief Hidden
+   */
   bool _isVisible();
+
   bool render();
   void dispose();
   Json::object serialize() const;

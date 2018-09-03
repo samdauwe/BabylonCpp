@@ -8,9 +8,11 @@
 
 namespace BABYLON {
 
-ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
-                                 Scene* scene, bool generateMipMaps)
-    : position{Vector3::Zero()}
+ReflectionProbe::ReflectionProbe(const string_t& iName, const ISize& size,
+                                 Scene* scene, bool generateMipMaps,
+                                 bool useFloat)
+    : name{iName}
+    , position{Vector3::Zero()}
     , samples{this, &ReflectionProbe::get_samples,
               &ReflectionProbe::set_samples}
     , refreshRate{this, &ReflectionProbe::get_refreshRate,
@@ -23,9 +25,11 @@ ReflectionProbe::ReflectionProbe(const string_t& name, const ISize& size,
     , _attachedMesh{nullptr}
     , _invertYAxis{false}
 {
-  _renderTargetTexture
-    = RenderTargetTexture::New(name, size, scene, generateMipMaps, true,
-                               EngineConstants::TEXTURETYPE_UNSIGNED_INT, true);
+  _renderTargetTexture = RenderTargetTexture::New(
+    iName, size, scene, generateMipMaps, true,
+    useFloat ? EngineConstants::TEXTURETYPE_FLOAT :
+               EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    true);
 
   _renderTargetTexture->onBeforeRenderObservable.add(
     [this](int* faceIndex, EventState&) {

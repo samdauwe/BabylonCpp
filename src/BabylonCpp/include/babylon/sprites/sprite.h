@@ -27,6 +27,10 @@ public:
   void playAnimation(int from, int to, bool loop, float delay,
                      const ::std::function<void()>& onAnimationEnd);
   void stopAnimation();
+
+  /**
+   * @brief Hidden
+   */
   void _animate(float deltaTime);
   void dispose();
 
