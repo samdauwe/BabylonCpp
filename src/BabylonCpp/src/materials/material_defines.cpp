@@ -133,23 +133,6 @@ void MaterialDefines::markAsMiscDirty()
 
 void MaterialDefines::rebuild()
 {
-#if 0
-  for (const auto& item : boolDef) {
-    boolDef[item.first] = false;
-  }
-
-  for (const auto& item : intDef) {
-    intDef[item.first] = 0;
-  }
-
-  for (const auto& item : floatDef) {
-    floatDef[item.first] = 0.f;
-  }
-
-  for (const auto& item : stringDef) {
-    stringDef[item.first] = "";
-  }
-#endif
 }
 
 bool MaterialDefines::isEqual(const MaterialDefines& other) const
@@ -215,22 +198,6 @@ void MaterialDefines::reset()
   _uvs                = false;
   _needNormals        = false;
   _needUVs            = false;
-
-  /*for (const auto& item : boolDef) {
-    boolDef[item.first] = false;
-  }
-
-  for (const auto& item : intDef) {
-    intDef[item.first] = 0;
-  }
-
-  for (const auto& item : floatDef) {
-    floatDef[item.first] = 0.f;
-  }
-
-  for (const auto& item : stringDef) {
-    stringDef[item.first] = "";
-  }*/
 }
 
 string_t MaterialDefines::toString() const

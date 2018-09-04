@@ -40,6 +40,7 @@ public:
    * It will create a new body - but only if this mesh has no parent.
    * If it has, this impostor will not be used other than to define the impostor
    * of the child mesh.
+   * Hidden
    */
   void _init();
 

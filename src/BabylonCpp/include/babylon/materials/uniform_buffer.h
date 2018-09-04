@@ -138,6 +138,9 @@ public:
    */
   void create();
 
+  /**
+   * @brief Hidden
+   */
   void _rebuild();
 
   /**

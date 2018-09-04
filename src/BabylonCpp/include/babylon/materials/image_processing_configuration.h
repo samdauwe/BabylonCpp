@@ -21,6 +21,17 @@ private:
 
 public:
   /**
+   * Default tone mapping applied in BabylonJS.
+   */
+  static constexpr unsigned int TONEMAPPING_STANDARD = 0;
+
+  /**
+   * ACES Tone mapping (used by default in unreal and unity). This can help
+   * getting closer to other engines rendering to increase portability.
+   */
+  static constexpr unsigned int TONEMAPPING_ACES = 1;
+
+  /**
    * @brief Used to apply the vignette as a mix with the pixel color.
    */
   static constexpr unsigned int VIGNETTEMODE_MULTIPLY()
@@ -167,6 +178,16 @@ protected:
   void set_toneMappingEnabled(bool value);
 
   /**
+   *  @brief Gets the type of tone mapping effect.
+   */
+  unsigned int get_toneMappingType() const;
+
+  /**
+   *  @brief Sets the type of tone mapping effect used in BabylonJS.
+   */
+  void set_toneMappingType(unsigned int value);
+
+  /**
    * @brief Gets the contrast used in the effect.
    */
   float get_contrast() const;
@@ -255,6 +276,11 @@ public:
   Property<ImageProcessingConfiguration, bool> toneMappingEnabled;
 
   /**
+   * The type of tone mapping effect used in BabylonJS
+   */
+  Property<ImageProcessingConfiguration, unsigned int> toneMappingType;
+
+  /**
    * Contrast used in the effect.
    */
   Property<ImageProcessingConfiguration, float> contrast;
@@ -290,6 +316,9 @@ public:
    */
   BaseTexturePtr colorGradingTexture;
 
+  /**
+   * Hidden
+   */
   float _exposure;
 
   /**
@@ -338,6 +367,7 @@ private:
   bool _colorGradingWithGreenDepth;
   bool _colorGradingBGR;
   bool _toneMappingEnabled;
+  unsigned int _toneMappingType;
   unsigned int _vignetteBlendMode;
   bool _vignetteEnabled;
   bool _applyByPostProcess;

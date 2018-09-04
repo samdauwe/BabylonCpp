@@ -787,11 +787,13 @@ public:
 
   /**
    * Stores the effects for the material
+   * Hidden
    */
   Effect* _effect;
 
   /**
    * Specifies if the material was previously ready
+   * Hidden
    */
   bool _wasPreviouslyReady;
 

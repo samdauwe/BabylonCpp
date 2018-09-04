@@ -33,6 +33,8 @@ ImageProcessingConfiguration::ImageProcessingConfiguration()
     , toneMappingEnabled{this,
                          &ImageProcessingConfiguration::get_toneMappingEnabled,
                          &ImageProcessingConfiguration::set_toneMappingEnabled}
+    , toneMappingType{this, &ImageProcessingConfiguration::get_toneMappingType,
+                      &ImageProcessingConfiguration::set_toneMappingType}
     , contrast{this, &ImageProcessingConfiguration::get_contrast,
                &ImageProcessingConfiguration::set_contrast}
     , vignetteBlendMode{this,
@@ -60,6 +62,7 @@ ImageProcessingConfiguration::ImageProcessingConfiguration()
     , _colorGradingWithGreenDepth{true}
     , _colorGradingBGR{true}
     , _toneMappingEnabled{false}
+    , _toneMappingType{ImageProcessingConfiguration::TONEMAPPING_STANDARD}
     , _vignetteBlendMode{ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY()}
     , _vignetteEnabled{false}
     , _applyByPostProcess{false}
@@ -158,6 +161,21 @@ void ImageProcessingConfiguration::set_toneMappingEnabled(bool value)
   }
 
   _toneMappingEnabled = value;
+  _updateParameters();
+}
+
+unsigned int ImageProcessingConfiguration::get_toneMappingType() const
+{
+  return _toneMappingType;
+}
+
+void ImageProcessingConfiguration::set_toneMappingType(unsigned int value)
+{
+  if (_toneMappingType == value) {
+    return;
+  }
+
+  _toneMappingType = value;
   _updateParameters();
 }
 
@@ -284,6 +302,7 @@ void ImageProcessingConfiguration::prepareDefines(
   if (forPostProcess != applyByPostProcess() || !_isEnabled) {
     defines.VIGNETTE                   = false;
     defines.TONEMAPPING                = false;
+    defines.TONEMAPPING_ACES           = false;
     defines.CONTRAST                   = false;
     defines.EXPOSURE                   = false;
     defines.COLORCURVES                = false;
@@ -298,10 +317,17 @@ void ImageProcessingConfiguration::prepareDefines(
     = (vignetteBlendMode()
        == ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY());
   defines.VIGNETTEBLENDMODEOPAQUE = !defines.VIGNETTEBLENDMODEMULTIPLY;
-  defines.TONEMAPPING             = toneMappingEnabled();
-  defines.CONTRAST                = (contrast() != 1.f);
-  defines.EXPOSURE                = (exposure() != 1.f);
-  defines.COLORCURVES             = (colorCurvesEnabled() && !colorCurves);
+
+  defines.TONEMAPPING = toneMappingEnabled();
+  switch (_toneMappingType) {
+    case ImageProcessingConfiguration::TONEMAPPING_ACES:
+      defines.TONEMAPPING_ACES = true;
+      break;
+  }
+
+  defines.CONTRAST     = (contrast() != 1.f);
+  defines.EXPOSURE     = (exposure() != 1.f);
+  defines.COLORCURVES  = (colorCurvesEnabled() && !colorCurves);
   defines.COLORGRADING = (colorGradingEnabled() && !colorGradingTexture);
   if (defines.COLORGRADING) {
     defines.COLORGRADING3D = colorGradingTexture->is3D;

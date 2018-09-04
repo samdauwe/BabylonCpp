@@ -64,6 +64,7 @@ public:
 
   /**
    * @brief Called by the scene. no need to call it.
+   * Hidden
    */
   void _step(float delta);
 
