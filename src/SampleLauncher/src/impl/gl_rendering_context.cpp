@@ -374,6 +374,33 @@ void GLRenderingContext::clear(GLbitfield mask)
   glClear(mask);
 }
 
+void GLRenderingContext::clearBufferfv(GLenum buffer, GLint drawbuffer,
+                                       const vector_t<GLfloat>& values,
+                                       GLint /*srcOffset*/)
+{
+  glClearBufferfv(buffer, drawbuffer, values.data());
+}
+
+void GLRenderingContext::clearBufferiv(GLenum buffer, GLint drawbuffer,
+                                       const vector_t<GLint>& values,
+                                       GLint /*srcOffset*/)
+{
+  glClearBufferiv(buffer, drawbuffer, values.data());
+}
+
+void GLRenderingContext::clearBufferuiv(GLenum buffer, GLint drawbuffer,
+                                        const vector_t<GLuint>& values,
+                                        GLint /*srcOffset*/)
+{
+  glClearBufferuiv(buffer, drawbuffer, values.data());
+}
+
+void GLRenderingContext::clearBufferfi(GLenum buffer, GLint drawbuffer,
+                                       GLfloat depth, GLint stencil)
+{
+  glClearBufferfi(buffer, drawbuffer, depth, stencil);
+}
+
 void GLRenderingContext::clearColor(GLclampf red, GLclampf green, GLclampf blue,
                                     GLclampf alpha)
 {

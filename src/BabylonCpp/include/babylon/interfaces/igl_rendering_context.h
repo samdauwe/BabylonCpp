@@ -988,6 +988,54 @@ public:
   virtual void clear(GLbitfield mask) = 0;
 
   /**
+   * @brief Clears buffers from the currently bound framebuffer.
+   * @param buffer A GLenum specifying the buffer to clear.
+   * @param drawbuffer A GLint specifying the draw buffer to clear.
+   * @param values Specifying the values to clear to.
+   * @param srcOffset optional source offset
+   */
+  virtual void clearBufferfv(GLenum buffer, GLint drawbuffer,
+                             const vector_t<GLfloat>& values,
+                             GLint srcOffset = 0)
+    = 0;
+
+  /**
+   * @brief Clears buffers from the currently bound framebuffer.
+   * @param buffer A GLenum specifying the buffer to clear.
+   * @param drawbuffer A GLint specifying the draw buffer to clear.
+   * @param values Specifying the values to clear to.
+   * @param srcOffset optional source offset
+   */
+  virtual void clearBufferiv(GLenum buffer, GLint drawbuffer,
+                             const vector_t<GLint>& values, GLint srcOffset = 0)
+    = 0;
+
+  /**
+   * @brief Clears buffers from the currently bound framebuffer.
+   * @param buffer A GLenum specifying the buffer to clear.
+   * @param drawbuffer A GLint specifying the draw buffer to clear.
+   * @param values Specifying the values to clear to.
+   * @param srcOffset An optional source offset
+   */
+  virtual void clearBufferuiv(GLenum buffer, GLint drawbuffer,
+                              const vector_t<GLuint>& values,
+                              GLint srcOffset = 0)
+    = 0;
+
+  /**
+   * @brief Clears buffers from the currently bound framebuffer.
+   * @param buffer A GLenum specifying the buffer to clear.
+   * @param drawbuffer A GLint specifying the draw buffer to clear.
+   * @param depth A GLfloat specifying the value to clear a depth render buffer
+   * to.
+   * @param stencil A GLint specifying the value to clear the stencil render
+   * buffer to.
+   */
+  virtual void clearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth,
+                             GLint stencil)
+    = 0;
+
+  /**
    * @brief Specifies the color values used when clearing color buffers.
    * @param red A GLclampf specifying the red color value used when the color
    * buffers are cleared.
