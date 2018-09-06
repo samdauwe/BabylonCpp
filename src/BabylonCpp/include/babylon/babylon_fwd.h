@@ -581,7 +581,12 @@ class QuadraticErrorSimplification;
 class QuadraticMatrix;
 class Reference;
 class SimplificationQueue;
+class SimplicationQueueSceneComponent;
 class SimplificationSettings;
+// -- Simplification aliases
+using SimplificationQueuePtr = shared_ptr_t<SimplificationQueue>;
+using SimplicationQueueSceneComponentPtr
+  = shared_ptr_t<SimplicationQueueSceneComponent>;
 // --- Morph ---
 class MorphTarget;
 class MorphTargetManager;

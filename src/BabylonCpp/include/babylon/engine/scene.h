@@ -1864,6 +1864,18 @@ protected:
   unique_ptr_t<SoundTrack>& get_mainSoundTrack();
 
   /**
+   * Gets the simplification queue attached to the scene.
+   * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+   */
+  SimplificationQueuePtr& get_simplificationQueue();
+
+  /**
+   * Sets the simplification queue attached to the scene.
+   * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
+   */
+  void set_simplificationQueue(const SimplificationQueuePtr& value);
+
+  /**
    * @brief Hidden
    */
   bool get_isAlternateRenderingEnabled() const;
@@ -2728,7 +2740,7 @@ public:
    * Gets or sets the simplification queue attached to the scene
    * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
    */
-  unique_ptr_t<SimplificationQueue> simplificationQueue;
+  Property<Scene, SimplificationQueuePtr> simplificationQueue;
 
   // Performance counters
 
@@ -3095,6 +3107,9 @@ private:
   unique_ptr_t<UniformBuffer> _sceneUbo;
   unique_ptr_t<UniformBuffer> _alternateSceneUbo;
   unique_ptr_t<Matrix> _pickWithRayInverseMatrix;
+
+  /** Hidden (Backing field) */
+  SimplificationQueuePtr _simplificationQueue;
 
   /** Hidden (Backing field) */
   BoundingBoxRendererPtr _boundingBoxRenderer;

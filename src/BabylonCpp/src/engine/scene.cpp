@@ -56,6 +56,7 @@
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/geometry.h>
+#include <babylon/mesh/mesh_simplification_scene_component.h>
 #include <babylon/mesh/simplification/simplification_queue.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -165,7 +166,8 @@ Scene::Scene(Engine* engine)
     , actionManager{nullptr}
     , proceduralTexturesEnabled{true}
     , mainSoundTrack{this, &Scene::get_mainSoundTrack}
-    , simplificationQueue{nullptr}
+    , simplificationQueue{this, &Scene::get_simplificationQueue,
+                          &Scene::set_simplificationQueue}
     , animationTimeScale{1}
     , _cachedMaterial{nullptr}
     , _cachedEffect{nullptr}
@@ -264,6 +266,7 @@ Scene::Scene(Engine* engine)
     , _sceneUbo{nullptr}
     , _alternateSceneUbo{nullptr}
     , _pickWithRayInverseMatrix{nullptr}
+    , _simplificationQueue{nullptr}
     , _boundingBoxRenderer{nullptr}
     , _forceShowBoundingBoxes{false}
     , _outlineRenderer{nullptr}
@@ -298,9 +301,6 @@ Scene::Scene(Engine* engine)
   }
 
   attachControl();
-
-  // simplification queue
-  simplificationQueue = ::std::make_unique<SimplificationQueue>();
 
   // Collision coordinator initialization.
   workerCollisions = false;
@@ -648,6 +648,26 @@ unique_ptr_t<SoundTrack>& Scene::get_mainSoundTrack()
   }
 
   return _mainSoundTrack;
+}
+
+SimplificationQueuePtr& Scene::get_simplificationQueue()
+{
+  if (!_simplificationQueue) {
+    _simplificationQueue = ::std::make_shared<SimplificationQueue>();
+    auto component
+      = ::std::static_pointer_cast<SimplicationQueueSceneComponent>(
+        _getComponent(SceneComponentConstants::NAME_SIMPLIFICATIONQUEUE));
+    if (!component) {
+      component = SimplicationQueueSceneComponent::New(this);
+      _addComponent(component);
+    }
+  }
+  return _simplificationQueue;
+}
+
+void Scene::set_simplificationQueue(const SimplificationQueuePtr& value)
+{
+  _simplificationQueue = value;
 }
 
 unordered_map_t<string_t, unique_ptr_t<DepthRenderer>>&
@@ -3606,8 +3626,8 @@ void Scene::render(bool updateCameras)
   }
 
   // Simplification Queue
-  if (simplificationQueue && !simplificationQueue->running) {
-    simplificationQueue->executeNext();
+  if (simplificationQueue() && !simplificationQueue()->running) {
+    simplificationQueue()->executeNext();
   }
 
   if (_engine->isDeterministicLockStep()) {
