@@ -1,7 +1,9 @@
 #ifndef BABYLON_TOOLS_EVENT_STATE_H
 #define BABYLON_TOOLS_EVENT_STATE_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/any.h>
 
 namespace BABYLON {
@@ -12,7 +14,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT EventState {
 
 public:
-  using UPtr = unique_ptr_t<EventState>;
+  using UPtr = ::std::unique_ptr<EventState>;
 
 public:
   /**

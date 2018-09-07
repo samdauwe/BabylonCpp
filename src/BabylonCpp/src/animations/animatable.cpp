@@ -11,7 +11,7 @@ namespace BABYLON {
 Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget,
                        int iFromFrame, int iToFrame, bool iLoopAnimation,
                        float iSpeedRatio,
-                       const ::std::function<void()>& iOnAnimationEnd,
+                       const std::function<void()>& iOnAnimationEnd,
                        const vector_t<AnimationPtr>& animations)
     : target{iTarget}
     , disposeOnEnd{true}
@@ -74,7 +74,7 @@ void Animatable::set_weight(float value)
   }
 
   // Else weight must be in [0, 1] range
-  _weight = ::std::min(std::max(value, 0.f), 1.f);
+  _weight = std::min(std::max(value, 0.f), 1.f);
 }
 
 float Animatable::get_speedRatio() const
@@ -96,6 +96,7 @@ Animatable& Animatable::syncWith(Animatable* root)
   _syncRoot = root;
 
   if (root) {
+#if 0
     // Make sure this animatable will animate after the root
     auto index
       = stl_util::index_of(_scene->_activeAnimatables, shared_from_this());
@@ -103,6 +104,7 @@ Animatable& Animatable::syncWith(Animatable* root)
       stl_util::splice(_scene->_activeAnimatables, index, 1);
       _scene->_activeAnimatables.emplace_back(shared_from_this());
     }
+#endif
   }
 
   return *this;
@@ -125,7 +127,7 @@ void Animatable::appendAnimations(const IAnimatablePtr& iTarget,
 AnimationPtr
 Animatable::getAnimationByTargetProperty(const string_t& property) const
 {
-  auto it = ::std::find_if(
+  auto it = std::find_if(
     _runtimeAnimations.begin(), _runtimeAnimations.end(),
     [&property](const RuntimeAnimationPtr& runtimeAnimation) {
       return runtimeAnimation->animation()->targetProperty == property;
@@ -137,7 +139,7 @@ Animatable::getAnimationByTargetProperty(const string_t& property) const
 RuntimeAnimationPtr
 Animatable::getRuntimeAnimationByTargetProperty(const string_t& property) const
 {
-  auto it = ::std::find_if(
+  auto it = std::find_if(
     _runtimeAnimations.begin(), _runtimeAnimations.end(),
     [&property](const RuntimeAnimationPtr& runtimeAnimation) {
       return runtimeAnimation->animation()->targetProperty == property;
@@ -215,11 +217,10 @@ void Animatable::_raiseOnAnimationEnd()
 
 void Animatable::stop(
   const string_t& animationName,
-  const ::std::function<bool(IAnimatable* target)>& targetMask)
+  const std::function<bool(IAnimatable* target)>& targetMask)
 {
   if (!animationName.empty() || targetMask) {
-    auto idx
-      = stl_util::index_of(_scene->_activeAnimatables, shared_from_this());
+    auto idx = stl_util::index_of_ptr(_scene->_activeAnimatables, this);
     if (idx > -1) {
       for (size_t index = _runtimeAnimations.size(); index-- > 0;) {
         const auto& runtimeAnimation = _runtimeAnimations[index];
@@ -240,8 +241,7 @@ void Animatable::stop(
     }
   }
   else {
-    auto index
-      = stl_util::index_of(_scene->_activeAnimatables, shared_from_this());
+    auto index = stl_util::index_of_ptr(_scene->_activeAnimatables, this);
     if (index > -1) {
       stl_util::splice(_scene->_activeAnimatables, index, 1);
       for (auto& runtimeAnimation : _runtimeAnimations) {
@@ -292,8 +292,11 @@ bool Animatable::_animate(const millisecond_t& delay)
     if (disposeOnEnd) {
       // Remove from active animatables
       _scene->_activeAnimatables.erase(
-        ::std::remove(_scene->_activeAnimatables.begin(),
-                      _scene->_activeAnimatables.end(), shared_from_this()),
+        std::remove_if(_scene->_activeAnimatables.begin(),
+                       _scene->_activeAnimatables.end(),
+                       [this](const AnimatablePtr& animatable) {
+                         return animatable.get() == this;
+                       }),
         _scene->_activeAnimatables.end());
 
       // Dispose all runtime animations

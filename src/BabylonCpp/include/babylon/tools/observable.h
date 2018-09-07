@@ -1,7 +1,6 @@
 #ifndef BABYLON_TOOLS_OBSERVABLE_H
 #define BABYLON_TOOLS_OBSERVABLE_H
 
-#include <babylon/babylon_global.h>
 #include <babylon/tools/event_state.h>
 #include <babylon/tools/observer.h>
 
@@ -27,8 +26,8 @@ class Observable {
 
 public:
   using CallbackFunc
-    = ::std::function<void(T* eventData, EventState& eventState)>;
-  using SPtr = shared_ptr_t<Observable<T>>;
+    = std::function<void(T* eventData, EventState& eventState)>;
+  using SPtr = std::shared_ptr<Observable<T>>;
 
 public:
   /**
@@ -43,7 +42,7 @@ public:
    * @param onObserverAdded defines a callback to call when a new observer is
    * added
    */
-  Observable(const ::std::function<void(typename Observer<T>::Ptr& observer)>&
+  Observable(const std::function<void(typename Observer<T>::Ptr& observer)>&
                onObserverAdded)
       : _eventState{0}, _onObserverAdded{onObserverAdded}
   {
@@ -154,10 +153,10 @@ public:
       return false;
     }
 
-    auto it = ::std::find_if(_observers.begin(), _observers.end(),
-                             [observer](const typename Observer<T>::Ptr& obs) {
-                               return obs == observer;
-                             });
+    auto it = std::find_if(_observers.begin(), _observers.end(),
+                           [observer](const typename Observer<T>::Ptr& obs) {
+                             return obs == observer;
+                           });
 
     if (it != _observers.end()) {
       _deferUnregister(*it);
@@ -175,14 +174,14 @@ public:
    */
   bool removeCallback(const CallbackFunc& callback)
   {
-    auto it
-      = ::std::find_if(_observers.begin(), _observers.end(),
-                       [callback](const typename Observer<T>::Ptr& obs) {
-                         auto ptr1
-                           = obs->callback.template target<CallbackFunc>();
-                         auto ptr2 = callback.template target<CallbackFunc>();
-                         return ptr1 < ptr2;
-                       });
+    auto it = std::find_if(_observers.begin(), _observers.end(),
+                           [callback](const typename Observer<T>::Ptr& obs) {
+                             auto ptr1
+                               = obs->callback.template target<CallbackFunc>();
+                             auto ptr2
+                               = callback.template target<CallbackFunc>();
+                             return ptr1 < ptr2;
+                           });
 
     if (it != _observers.end()) {
       _deferUnregister(*it);
@@ -207,7 +206,7 @@ private:
       return false;
     }
 
-    auto index = ::std::find(_observers.begin(), _observers.end(), observer);
+    auto index = std::find(_observers.begin(), _observers.end(), observer);
 
     if (index != _observers.end()) {
       _observers.erase(index);
@@ -303,7 +302,7 @@ public:
    * @brief Clone the current observable.
    * @returns a new observable
    */
-  shared_ptr_t<Observable<T>> clone() const
+  std::shared_ptr<Observable<T>> clone() const
   {
     Observable<T>::SPtr result = std::make_shared<Observable<T>>();
 
@@ -329,9 +328,9 @@ public:
   }
 
 private:
-  vector_t<typename Observer<T>::Ptr> _observers;
+  std::vector<typename Observer<T>::Ptr> _observers;
   EventState _eventState;
-  ::std::function<void(typename Observer<T>::Ptr& observer)> _onObserverAdded;
+  std::function<void(typename Observer<T>::Ptr& observer)> _onObserverAdded;
 
 }; // end of class Observable
 

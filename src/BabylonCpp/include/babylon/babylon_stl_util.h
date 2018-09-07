@@ -12,26 +12,25 @@ namespace stl_util {
 
 // -- Implementation of make_unique function in C++11 --
 template <typename T, typename... Args>
-inline unique_ptr_t<T> make_unique_helper(::std::false_type, Args&&... args)
+inline unique_ptr_t<T> make_unique_helper(std::false_type, Args&&... args)
 {
-  return unique_ptr_t<T>(new T(::std::forward<Args>(args)...));
+  return unique_ptr_t<T>(new T(std::forward<Args>(args)...));
 }
 
 template <typename T, typename... Args>
-inline unique_ptr_t<T> make_unique_helper(::std::true_type, Args&&... args)
+inline unique_ptr_t<T> make_unique_helper(std::true_type, Args&&... args)
 {
   static_assert(
-    ::std::extent<T>::value == 0,
+    std::extent<T>::value == 0,
     "make_unique<T[N]>() is forbidden, please use make_unique<T[]>(),");
-  typedef typename ::std::remove_extent<T>::type U;
-  return unique_ptr_t<T>(new U[sizeof...(Args)]{::std::forward<Args>(args)...});
+  typedef typename std::remove_extent<T>::type U;
+  return unique_ptr_t<T>(new U[sizeof...(Args)]{std::forward<Args>(args)...});
 }
 
 template <typename T, typename... Args>
 inline unique_ptr_t<T> make_unique(Args&&... args)
 {
-  return make_unique_helper<T>(::std::is_array<T>(),
-                               ::std::forward<Args>(args)...);
+  return make_unique_helper<T>(std::is_array<T>(), std::forward<Args>(args)...);
 }
 
 // Bitsets
@@ -44,16 +43,16 @@ inline unique_ptr_t<T> make_unique(Args&&... args)
  * |     |- Exponent (8 bits)
  * |- Sign (1 bit)
  */
-inline ::std::bitset<32> to_bitset(float number)
+inline std::bitset<32> to_bitset(float number)
 {
-  ::std::bitset<32> result;
+  std::bitset<32> result;
   if (sizeof(number) != 4) {
     return result;
   }
 
   char* bits = reinterpret_cast<char*>(&number);
-  for (::std::size_t n = 0; n < sizeof(number); ++n) {
-    ::std::bitset<8> octet(static_cast<size_t>(bits[n]));
+  for (std::size_t n = 0; n < sizeof(number); ++n) {
+    std::bitset<8> octet(static_cast<size_t>(bits[n]));
     for (unsigned int i = 0; i < 8; ++i) {
       result[n * 8 + i] = octet[i];
     }
@@ -63,11 +62,11 @@ inline ::std::bitset<32> to_bitset(float number)
 
 inline string_t to_hex_string(const string_t& bit_string)
 {
-  ::std::ostringstream oss;
-  oss << "0x" << ::std::hex;
+  std::ostringstream oss;
+  oss << "0x" << std::hex;
   for (size_t i = 0, idx = 0, ul = bit_string.size() / 4; i < ul;
        ++i, idx += 4) {
-    ::std::bitset<4> nibble(bit_string.substr(idx, idx + 4));
+    std::bitset<4> nibble(bit_string.substr(idx, idx + 4));
     oss << nibble.to_ulong();
   }
   return oss.str();
@@ -75,7 +74,7 @@ inline string_t to_hex_string(const string_t& bit_string)
 
 inline unsigned int hex_string_to_uint(const string_t& hex_string)
 {
-  return static_cast<unsigned int>(::std::stoul(hex_string, nullptr, 16));
+  return static_cast<unsigned int>(std::stoul(hex_string, nullptr, 16));
 }
 
 inline float hex_to_float(unsigned int hex_value)
@@ -96,14 +95,16 @@ inline float hex_to_float(const string_t& hex_string)
 
 // byte conversion
 
+using byte = unsigned char;
+
 template <typename T>
 array_t<byte, sizeof(T)> to_bytes(const T& object)
 {
   array_t<byte, sizeof(T)> bytes;
 
-  const byte* begin = reinterpret_cast<const byte*>(::std::addressof(object));
+  const byte* begin = reinterpret_cast<const byte*>(std::addressof(object));
   const byte* end   = begin + sizeof(T);
-  ::std::copy(begin, end, ::std::begin(bytes));
+  std::copy(begin, end, std::begin(bytes));
 
   return bytes;
 }
@@ -112,11 +113,11 @@ template <typename T>
 T& from_bytes(const array_t<byte, sizeof(T)>& bytes, T& object)
 {
   // http://en.cppreference.com/w/cpp/types/is_trivially_copyable
-  static_assert(::std::is_trivially_copyable<T>::value,
+  static_assert(std::is_trivially_copyable<T>::value,
                 "not a TriviallyCopyable type");
 
-  byte* begin_object = reinterpret_cast<byte*>(::std::addressof(object));
-  ::std::copy(::std::begin(bytes), ::std::end(bytes), begin_object);
+  byte* begin_object = reinterpret_cast<byte*>(std::addressof(object));
+  std::copy(std::begin(bytes), std::end(bytes), begin_object);
 
   return object;
 }
@@ -136,22 +137,21 @@ constexpr int c_strcmp(char const* lhs, char const* rhs)
 // Floating point comparison
 
 template <class T>
-constexpr
-  typename ::std::enable_if<!numeric_limits_t<T>::is_integer, bool>::type
-  almost_equal(T x, T y, int ulp = 4)
+constexpr typename std::enable_if<!numeric_limits_t<T>::is_integer, bool>::type
+almost_equal(T x, T y, int ulp = 4)
 {
   // the machine epsilon has to be scaled to the magnitude of the values used
   // and multiplied by the desired precision in ULPs (units in the last place)
-  return ::std::abs(x - y) < numeric_limits_t<T>::epsilon() * ::std::abs(x + y)
-                               * static_cast<T>(ulp)
+  return std::abs(x - y) < numeric_limits_t<T>::epsilon() * std::abs(x + y)
+                             * static_cast<T>(ulp)
          // unless the result is subnormal
-         || ::std::abs(x - y) < numeric_limits_t<T>::min();
+         || std::abs(x - y) < numeric_limits_t<T>::min();
 }
 
 // Used for lambda comparison
 
 template <typename T, typename... U>
-size_t get_address(::std::function<T(U...)> f)
+size_t get_address(std::function<T(U...)> f)
 {
   typedef T(fnType)(U...);
   fnType** fnPointer = f.template target<fnType*>();
@@ -161,17 +161,15 @@ size_t get_address(::std::function<T(U...)> f)
 // Finding of a minimum and maximum with variadic templates and C++11
 
 template <typename... Ts>
-auto min(Ts... ts) -> typename ::std::common_type<Ts...>::type
+auto min(Ts... ts) -> typename std::common_type<Ts...>::type
 {
-  return ::std::min(
-    {static_cast<typename ::std::common_type<Ts...>::type>(ts)...});
+  return std::min({static_cast<typename std::common_type<Ts...>::type>(ts)...});
 }
 
 template <typename... Ts>
-auto max(Ts... ts) -> typename ::std::common_type<Ts...>::type
+auto max(Ts... ts) -> typename std::common_type<Ts...>::type
 {
-  return ::std::max(
-    {static_cast<typename ::std::common_type<Ts...>::type>(ts)...});
+  return std::max({static_cast<typename std::common_type<Ts...>::type>(ts)...});
 }
 
 // Three-way comparison
@@ -192,7 +190,7 @@ auto max(Ts... ts) -> typename ::std::common_type<Ts...>::type
  */
 template <typename T,
           typename
-          = typename ::std::enable_if<::std::is_arithmetic<T>::value, T>::type>
+          = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
 constexpr int spaceship(const T& lhs, const T& rhs)
 {
   return (lhs < rhs) ? -1 : (rhs < lhs) ? 1 : 0;
@@ -220,8 +218,8 @@ inline vector_t<T*> to_raw_ptr_vector(const vector_t<unique_ptr_t<T>>& c)
 {
   vector_t<T*> result;
   result.reserve(c.size());
-  ::std::transform(c.begin(), c.end(), ::std::back_inserter(result),
-                   [](const unique_ptr_t<T>& ci) { return ci.get(); });
+  std::transform(c.begin(), c.end(), std::back_inserter(result),
+                 [](const unique_ptr_t<T>& ci) { return ci.get(); });
   return result;
 }
 
@@ -230,8 +228,8 @@ inline vector_t<T*> to_raw_ptr_vector(const vector_t<shared_ptr_t<T>>& c)
 {
   vector_t<T*> result;
   result.reserve(c.size());
-  ::std::transform(c.begin(), c.end(), ::std::back_inserter(result),
-                   [](const shared_ptr_t<T>& ci) { return ci.get(); });
+  std::transform(c.begin(), c.end(), std::back_inserter(result),
+                 [](const shared_ptr_t<T>& ci) { return ci.get(); });
   return result;
 }
 
@@ -269,23 +267,23 @@ inline C& concat_with_no_duplicates(C& a, const C& b)
   concat(a, b);
 
   // Remove duplicates
-  ::std::sort(a.begin(), a.end());
-  a.erase(::std::unique(a.begin(), a.end()), a.end());
+  std::sort(a.begin(), a.end());
+  a.erase(std::unique(a.begin(), a.end()), a.end());
 
   return a;
 }
 
-// Sequence (i.e. vector_t or ::std::list)
+// Sequence (i.e. vector_t or std::list)
 template <template <typename, typename> class C, template <typename> class A,
           typename T, typename V>
 constexpr bool contains(const C<T, A<T>>& c, const V& elem)
 {
-  return ::std::find(c.begin(), c.end(), T(elem)) != c.end();
+  return std::find(c.begin(), c.end(), T(elem)) != c.end();
 }
 
 // Set
 template <typename C, typename A>
-constexpr bool contains(const ::std::set<C>& c, const A& elem)
+constexpr bool contains(const std::set<C>& c, const A& elem)
 {
   return c.find(C(elem)) != c.end();
 }
@@ -330,7 +328,7 @@ inline vector_t<V> extract_values(unordered_map_t<K, V> const& inputMap)
 template <typename C, typename T>
 inline bool erase(C& c, const T& elem)
 {
-  auto i = ::std::find(c.begin(), c.end(), elem);
+  auto i = std::find(c.begin(), c.end(), elem);
   if (i != c.end()) {
     c.erase(i);
     return true;
@@ -365,11 +363,11 @@ void erase_if(C& container, P predicate)
 template <typename T>
 vector_t<T> remove_duplicates(const vector_t<T>& v)
 {
-  ::std::set<T> tmpSet;
+  std::set<T> tmpSet;
   vector_t<T> res; // Resultant vector
 
-  ::std::remove_copy_if(v.begin(), v.end(), ::std::back_inserter(res),
-                        [&tmpSet](T x) { return !tmpSet.insert(x).second; });
+  std::remove_copy_if(v.begin(), v.end(), std::back_inserter(res),
+                      [&tmpSet](T x) { return !tmpSet.insert(x).second; });
 
   return res;
 }
@@ -387,7 +385,30 @@ vector_t<T> remove_duplicates(const vector_t<T>& v)
 template <typename C, typename T>
 inline int index_of(C& c, const T& elem)
 {
-  auto i = ::std::find(c.begin(), c.end(), elem);
+  auto i = std::find(c.begin(), c.end(), elem);
+  if (i != c.end()) {
+    return static_cast<int>(i - c.begin());
+  }
+  return -1;
+}
+
+/**
+ * Searches the array for the specified item, and returns its position.
+ * Returns -1 if the item is not found.
+ * If the item is present more than once, the indexOf method returns the
+ * position of the first occurence.
+ * @param c Required. The container to search in.
+ * @param elem Required. The item to search for.
+ * @return A Number, representing the position of the specified item, otherwise
+ * -1
+ */
+template <typename C, typename T>
+inline int index_of_ptr(const vector_t<shared_ptr_t<C>>& c, T* elem)
+{
+  auto i
+    = std::find_if(c.begin(), c.end(), [elem](const shared_ptr_t<C>& cElem) {
+        return cElem.get() == elem;
+      });
   if (i != c.end()) {
     return static_cast<int>(i - c.begin());
   }
@@ -404,8 +425,8 @@ template <typename T, class UnaryPredicate>
 inline vector_t<T> filter(const vector_t<T>& original, UnaryPredicate pred)
 {
   vector_t<T> filtered;
-  ::std::copy_if(original.begin(), original.end(),
-                 ::std::back_inserter(filtered), pred);
+  std::copy_if(original.begin(), original.end(), std::back_inserter(filtered),
+               pred);
   return filtered;
 }
 
@@ -421,8 +442,8 @@ inline vector_t<T> map(const vector_t<T>& original,
                        UnaryOperation mappingFunction)
 {
   vector_t<T> mapped;
-  ::std::transform(original.begin(), original.end(),
-                   ::std::back_inserter(mapped), mappingFunction);
+  std::transform(original.begin(), original.end(), std::back_inserter(mapped),
+                 mappingFunction);
   return mapped;
 }
 
@@ -496,8 +517,8 @@ inline vector_t<T> splice(vector_t<T>& v, int index = 0, int howmany = 0,
                           const vector_t<T>& itemsToAdd = vector_t<T>())
 {
   if (index < 0) {
-    const auto start = ::std::max(v.begin(), v.end() + index);
-    const auto end   = ::std::min(v.end(), start + howmany);
+    const auto start = std::max(v.begin(), v.end() + index);
+    const auto end   = std::min(v.end(), start + howmany);
     vector_t<T> removedItems(start, end);
     v.erase(start, end);
     v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
@@ -505,8 +526,8 @@ inline vector_t<T> splice(vector_t<T>& v, int index = 0, int howmany = 0,
     return removedItems;
   }
   else {
-    const auto start = ::std::min(v.end(), v.begin() + index);
-    const auto end   = ::std::min(v.end(), start + howmany);
+    const auto start = std::min(v.end(), v.begin() + index);
+    const auto end   = std::min(v.end(), start + howmany);
     vector_t<T> removedItems(start, end);
     v.erase(start, end);
     v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
@@ -524,14 +545,14 @@ inline void remove(vector_t<T>& vec, size_t pos)
 template <typename C, typename P>
 inline void remove_if(C& c, const P& p)
 {
-  c.erase(::std::remove_if(::std::begin(c), ::std::end(c), p), ::std::end(c));
+  c.erase(std::remove_if(std::begin(c), std::end(c), p), std::end(c));
 }
 
 template <typename C, typename T>
 inline bool push_unique(C& c, T&& elem)
 {
   if (!contains(c, elem)) {
-    c.push_back(::std::move(elem));
+    c.push_back(std::move(elem));
     return true;
   }
   return false;
@@ -543,7 +564,7 @@ public:
     friend class range;
 
   public:
-    ::std::size_t operator*() const
+    std::size_t operator*() const
     {
       return i_;
     }
@@ -569,12 +590,12 @@ public:
     }
 
   protected:
-    iterator(::std::size_t start) : i_(start)
+    iterator(std::size_t start) : i_(start)
     {
     }
 
   private:
-    ::std::size_t i_;
+    std::size_t i_;
   };
 
   iterator begin() const
@@ -585,7 +606,7 @@ public:
   {
     return end_;
   }
-  range(::std::size_t begin, ::std::size_t end) : begin_(begin), end_(end)
+  range(std::size_t begin, std::size_t end) : begin_(begin), end_(end)
   {
   }
 

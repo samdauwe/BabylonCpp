@@ -9,6 +9,7 @@
 #endif
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/babylon_constants.h>
 #include <babylon/babylon_enums.h>
 #include <babylon/babylon_fwd.h>

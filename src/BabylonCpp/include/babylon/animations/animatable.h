@@ -1,23 +1,37 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATABLE_H
 #define BABYLON_ANIMATIONS_ANIMATABLE_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <memory>
+#include <optional>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
+class Animatable;
+class Animation;
+class IAnimatable;
+class RuntimeAnimation;
+class Scene;
+using AnimatablePtr       = std::shared_ptr<Animatable>;
+using AnimationPtr        = std::shared_ptr<Animation>;
+using IAnimatablePtr      = std::shared_ptr<IAnimatable>;
+using RuntimeAnimationPtr = std::shared_ptr<RuntimeAnimation>;
+
 /**
  * @brief Class used to store an actual running animation.
  */
-class BABYLON_SHARED_EXPORT Animatable
-    : public ::std::enable_shared_from_this<Animatable> {
+class BABYLON_SHARED_EXPORT Animatable {
 
 public:
   template <typename... Ts>
   static AnimatablePtr New(Ts&&... args)
   {
     auto animatable
-      = shared_ptr_t<Animatable>(new Animatable(::std::forward<Ts>(args)...));
+      = std::shared_ptr<Animatable>(new Animatable(std::forward<Ts>(args)...));
     animatable->addToScene(animatable);
 
     return animatable;
@@ -41,7 +55,7 @@ public:
    * Gets the list of runtime animations
    * @returns an array of RuntimeAnimation
    */
-  vector_t<RuntimeAnimationPtr>& getAnimations();
+  std::vector<RuntimeAnimationPtr>& getAnimations();
 
   /**
    * @brief Adds more animations to the current animatable.
@@ -49,14 +63,14 @@ public:
    * @param animations defines the new animations to add
    */
   void appendAnimations(const IAnimatablePtr& target,
-                        const vector_t<AnimationPtr>& animations);
+                        const std::vector<AnimationPtr>& animations);
 
   /**
    * @brief Gets the source animation for a specific property.
    * @param property defines the propertyu to look for
    * @returns null or the source animation for the given property
    */
-  AnimationPtr getAnimationByTargetProperty(const string_t& property) const;
+  AnimationPtr getAnimationByTargetProperty(const std::string& property) const;
 
   /**
    * @brief Gets the runtime animation for a specific property.
@@ -64,7 +78,7 @@ public:
    * @returns null or the runtime animation for the given property
    */
   RuntimeAnimationPtr
-  getRuntimeAnimationByTargetProperty(const string_t& property) const;
+  getRuntimeAnimationByTargetProperty(const std::string& property) const;
 
   /**
    * @brief Resets the animatable to its original state.
@@ -108,8 +122,8 @@ public:
    * stopped based on its target (all animations will be stopped if both this
    * and animationName are empty)
    */
-  void stop(const string_t& animationName = "",
-            const ::std::function<bool(IAnimatable* target)>& targetMask
+  void stop(const std::string& animationName = "",
+            const std::function<bool(IAnimatable* target)>& targetMask
             = nullptr);
 
   /**
@@ -133,9 +147,9 @@ protected:
    */
   Animatable(Scene* scene, const IAnimatablePtr& target, int fromFrame = 0,
              int toFrame = 100, bool loopAnimation = false,
-             float speedRatio                              = 1.f,
-             const ::std::function<void()>& onAnimationEnd = nullptr,
-             const vector_t<AnimationPtr>& animations      = {});
+             float speedRatio                            = 1.f,
+             const std::function<void()>& onAnimationEnd = nullptr,
+             const std::vector<AnimationPtr>& animations = {});
 
 private:
   /**
@@ -208,7 +222,7 @@ public:
   /**
    * Defines a callback to call when animation ends if it is not looping
    */
-  ::std::function<void()> onAnimationEnd;
+  std::function<void()> onAnimationEnd;
 
   /**
    * Observer raised when the animation ends
@@ -236,9 +250,9 @@ public:
   Property<Animatable, float> speedRatio;
 
 private:
-  nullable_t<millisecond_t> _localDelayOffset;
-  nullable_t<millisecond_t> _pausedDelay;
-  vector_t<RuntimeAnimationPtr> _runtimeAnimations;
+  std::optional<millisecond_t> _localDelayOffset;
+  std::optional<millisecond_t> _pausedDelay;
+  std::vector<RuntimeAnimationPtr> _runtimeAnimations;
   bool _paused;
   Scene* _scene;
   float _speedRatio;

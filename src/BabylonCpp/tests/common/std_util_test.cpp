@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <babylon/babylon_common.h>
 #include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl.h>
 #include <babylon/babylon_stl_util.h>
@@ -62,7 +63,7 @@ TEST(TestStdUtil, to_bytes__from_bytes)
     const auto array_bytes = stl_util::to_bytes(arr);
     ::std::ostringstream oss;
     oss << ::std::hex << ::std::setfill('0');
-    for (BABYLON::byte b : array_bytes) {
+    for (byte b : array_bytes) {
       oss << ::std::setw(2) << int(b) << ' ';
     }
     EXPECT_EQ(String::trimCopy(oss.str()),

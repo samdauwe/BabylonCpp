@@ -1,6 +1,7 @@
 #ifndef BABYLON_CORE_TIME_H
 #define BABYLON_CORE_TIME_H
 
+#include <babylon/babylon_common.h>
 #include <babylon/babylon_stl.h>
 
 namespace BABYLON {

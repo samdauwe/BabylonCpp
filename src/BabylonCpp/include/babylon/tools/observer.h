@@ -1,7 +1,9 @@
 #ifndef BABYLON_TOOLS_OBSERVER_H
 #define BABYLON_TOOLS_OBSERVER_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/tools/event_state.h>
 
 namespace BABYLON {
@@ -14,8 +16,8 @@ class BABYLON_SHARED_EXPORT Observer {
 
 public:
   using CallbackFunc
-    = ::std::function<void(T* eventData, EventState& eventState)>;
-  using Ptr = shared_ptr_t<Observer<T>>;
+    = std::function<void(T* eventData, EventState& eventState)>;
+  using Ptr = std::shared_ptr<Observer<T>>;
 
 public:
   /**

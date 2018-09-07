@@ -1,6 +1,7 @@
 #ifndef BABYLON_INSPECTOR_ADAPTERS_ADAPTER_H
 #define BABYLON_INSPECTOR_ADAPTERS_ADAPTER_H
 
+#include <babylon/babylon_common.h>
 #include <babylon/babylon_stl.h>
 
 namespace BABYLON {
