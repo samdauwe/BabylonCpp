@@ -1,9 +1,8 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_RANGE_H
 #define BABYLON_ANIMATIONS_ANIMATION_RANGE_H
 
-#include <babylon/babylon_global.h>
-
 #include <babylon/animations/animation_value.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -20,7 +19,7 @@ public:
    * @param to The ending frame of the animation
    */
   AnimationRange();
-  AnimationRange(const string_t& name, float from, float to);
+  AnimationRange(const std::string& name, float from, float to);
   AnimationRange(const AnimationRange& other);
   ~AnimationRange();
 
@@ -30,11 +29,11 @@ public:
    * Makes a copy of the animation range.
    * @returns A copy of the animation range
    */
-  unique_ptr_t<AnimationRange> clone() const;
+  std::unique_ptr<AnimationRange> clone() const;
 
 public:
   /** The name of the animation range **/
-  string_t name;
+  std::string name;
   /** The starting frame of the animation */
   float from;
   /** The ending frame of the animation */

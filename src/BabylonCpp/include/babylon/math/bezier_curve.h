@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATH_BEZIERCURVE_H
 #define BABYLON_MATH_BEZIERCURVE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

@@ -1,11 +1,16 @@
 #ifndef BABYLON_MATH_PLANE_H
 #define BABYLON_MATH_PLANE_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+#include <memory>
 
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Matrix;
 
 /**
  * @brief Represents a Plane.
@@ -30,7 +35,7 @@ public:
   /**
    * @brief Returns a new plane copied from the current Plane.
    */
-  unique_ptr_t<Plane> clone() const;
+  std::unique_ptr<Plane> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Plane& plane);
 
@@ -48,7 +53,7 @@ public:
    * @brief Returns the plane coordinates as a new array of 4 elements [a, b, c,
    * d].
    */
-  array_t<float, 4> asArray() const;
+  std::array<float, 4> asArray() const;
 
   /** Methods **/
 

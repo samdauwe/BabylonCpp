@@ -1,9 +1,16 @@
 #ifndef BABYLON_ANIMATIONS_TARGETED_ANIMATION_H
 #define BABYLON_ANIMATIONS_TARGETED_ANIMATION_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Animation;
+class IAnimatable;
+using AnimationPtr   = std::shared_ptr<Animation>;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 /**
  * @brief This class defines the direct association between an animation and a

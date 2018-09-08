@@ -1,8 +1,10 @@
 #ifndef BABYLON_MATH_SCALAR_H
 #define BABYLON_MATH_SCALAR_H
 
-#include <babylon/babylon_global.h>
-#include <babylon/babylon_stl_util.h>
+#include <iomanip>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_constants.h>
 #include <babylon/core/random.h>
 #include <babylon/core/string.h>
 
@@ -25,16 +27,16 @@ constexpr float TwoPi()
 template <typename T>
 constexpr bool WithinEpsilon(T a, T b, T epsilon = 1.401298E-45f)
 {
-  return ::std::abs(a - b) <= epsilon;
+  return std::abs(a - b) <= epsilon;
 }
 
 /**
  * @brief Returns the upper case translation of the number i to hexadecimal.
  */
-inline string_t ToHex(int i)
+inline std::string ToHex(int i)
 {
   std::ostringstream stream;
-  stream << ::std::setfill('0') << ::std::setw(2) << ::std::hex << i;
+  stream << std::setfill('0') << std::setw(2) << std::hex << i;
   return String::toUpperCase(stream.str());
 }
 
@@ -66,7 +68,7 @@ constexpr float Signf(T x)
 template <typename T>
 constexpr T Clamp(T value, T min, T max)
 {
-  return ::std::min(max, ::std::max(min, value));
+  return std::min(max, std::max(min, value));
 }
 
 /**
@@ -75,7 +77,7 @@ constexpr T Clamp(T value, T min, T max)
 template <typename T>
 constexpr T Clamp(T value)
 {
-  return ::std::min(static_cast<T>(1), ::std::max(static_cast<T>(0), value));
+  return std::min(static_cast<T>(1), std::max(static_cast<T>(0), value));
 }
 
 /**
@@ -91,12 +93,12 @@ constexpr int IMul(int a, int b)
 {
   // the shift by 0 fixes the sign on the high part
   // the final |0 converts the unsigned value into a signed value
-  return (
-    (((a & 0xffff) * (b & 0xffff)) + (((((a >> 16) & 0xffff) * (b & 0xffff)
-                                        + (a & 0xffff) * ((b >> 16) & 0xffff))
-                                       << 16)
-                                      >> 0))
-    | 0);
+  return ((((a & 0xffff) * (b & 0xffff))
+           + (((((a >> 16) & 0xffff) * (b & 0xffff)
+                + (a & 0xffff) * ((b >> 16) & 0xffff))
+               << 16)
+              >> 0))
+          | 0);
 }
 
 /**
@@ -112,7 +114,7 @@ constexpr int IMul(int a, int b)
  */
 inline float Repeat(float value, float length)
 {
-  return value - ::std::floor(value / length) * length;
+  return value - std::floor(value / length) * length;
 }
 
 /**
@@ -153,7 +155,7 @@ inline float DeltaAngle(float current, float target)
 inline float PingPong(float tx, float length)
 {
   const auto t = Scalar::Repeat(tx, length * 2.f);
-  return length - ::std::abs(t - length);
+  return length - std::abs(t - length);
 }
 
 /**
@@ -181,7 +183,7 @@ constexpr float SmoothStep(float from, float to, float tx)
 inline float MoveTowards(float current, float target, float maxDelta)
 {
   auto result = 0.f;
-  if (::std::abs(target - current) <= maxDelta) {
+  if (std::abs(target - current) <= maxDelta) {
     result = target;
   }
   else {
@@ -243,7 +245,7 @@ inline float LerpAngle(float start, float end, float amount)
 constexpr float InverseLerp(float a, float b, float value)
 {
   auto result = 0.f;
-  if (!stl_util::almost_equal(a, b)) {
+  if (a != b) {
     result = Scalar::Clamp((value - a) / (b - a));
   }
   else {
@@ -275,7 +277,7 @@ constexpr float Hermite(float value1, float tangent1, float value2,
  */
 inline float RandomRange(float min, float max)
 {
-  if (stl_util::almost_equal(min, max)) {
+  if (min == max) {
     return min;
   }
   return ((Math::random() * (max - min)) + min);
@@ -319,8 +321,7 @@ constexpr float NormalizeRadians(float angle)
   //	angle -= Tools.TwoPi;
   //}
 
-  angle
-    -= (Scalar::TwoPi() * ::std::floor((angle + Math::PI) / Scalar::TwoPi()));
+  angle -= (Scalar::TwoPi() * std::floor((angle + Math::PI) / Scalar::TwoPi()));
 
   return angle;
 }

@@ -1,5 +1,7 @@
 #include <babylon/animations/easing/easing_function.h>
 
+#include <cmath>
+
 namespace BABYLON {
 
 EasingFunction::EasingFunction()
@@ -13,7 +15,7 @@ EasingFunction::~EasingFunction()
 
 void EasingFunction::setEasingMode(unsigned int easingMode)
 {
-  _easingMode = ::std::min(easingMode, 2u);
+  _easingMode = std::min(easingMode, 2u);
 }
 
 unsigned int EasingFunction::getEasingMode() const

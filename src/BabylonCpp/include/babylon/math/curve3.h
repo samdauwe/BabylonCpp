@@ -1,9 +1,14 @@
 #ifndef BABYLON_MATH_CURVE3_H
 #define BABYLON_MATH_CURVE3_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Vector3;
 
 /**
  * @brief Represents an Curve3.
@@ -18,20 +23,20 @@ public:
    * A Curve3 is designed from a series of successive Vector3.
    * Tuto : http://doc.babylonjs.com/tutorials/How_to_use_Curve3#curve3-object
    */
-  Curve3(const vector_t<Vector3>& points);
+  Curve3(const std::vector<Vector3>& points);
   Curve3(const Curve3& otherCurve);
   Curve3(Curve3&& otherCurve);
   Curve3& operator=(const Curve3& otherCurve);
   Curve3& operator=(Curve3&& otherCurve);
   ~Curve3();
   Curve3 copy() const;
-  unique_ptr_t<Curve3> clone() const;
+  std::unique_ptr<Curve3> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Curve3& curve);
 
   /**
    * @brief Returns the Curve3 stored array of successive Vector3
    */
-  vector_t<Vector3>& getPoints();
+  std::vector<Vector3>& getPoints();
 
   /**
    * @brief Returns the computed length (float) of the curve.
@@ -95,14 +100,14 @@ public:
    * @param closed (boolean) optional with default false, when true forms a
    * closed loop from the points
    */
-  static Curve3 CreateCatmullRomSpline(const vector_t<Vector3>& points,
+  static Curve3 CreateCatmullRomSpline(const std::vector<Vector3>& points,
                                        size_t nbPoints, bool closed = false);
 
 private:
-  float computeLength(const vector_t<Vector3>& path);
+  float computeLength(const std::vector<Vector3>& path);
 
 private:
-  vector_t<Vector3> _points;
+  std::vector<Vector3> _points;
   float _length;
 
 }; // end of class Curve3

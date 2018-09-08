@@ -1,7 +1,9 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_EVENT_H
 #define BABYLON_ANIMATIONS_ANIMATION_EVENT_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

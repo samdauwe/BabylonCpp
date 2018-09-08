@@ -5,9 +5,9 @@
 
 namespace BABYLON {
 
-array_t<Plane, 6> Frustum::GetPlanes(const Matrix& transform)
+std::array<Plane, 6> Frustum::GetPlanes(const Matrix& transform)
 {
-  array_t<Plane, 6> frustumPlanes{
+  std::array<Plane, 6> frustumPlanes{
     {Plane(0.f, 0.f, 0.f, 0.f), Plane(0.f, 0.f, 0.f, 0.f),
      Plane(0.f, 0.f, 0.f, 0.f), Plane(0.f, 0.f, 0.f, 0.f),
      Plane(0.f, 0.f, 0.f, 0.f), Plane(0.f, 0.f, 0.f, 0.f)}};
@@ -72,7 +72,7 @@ void Frustum::GetBottomPlaneToRef(const Matrix& transform, Plane& frustumPlane)
 }
 
 void Frustum::GetPlanesToRef(const Matrix& transform,
-                             array_t<Plane, 6>& frustumPlanes)
+                             std::array<Plane, 6>& frustumPlanes)
 {
   // Near
   Frustum::GetNearPlaneToRef(transform, frustumPlanes[0]);

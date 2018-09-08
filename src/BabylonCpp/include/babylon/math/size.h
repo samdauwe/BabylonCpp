@@ -1,7 +1,9 @@
 #ifndef BABYLON_MATH_SIZE_H
 #define BABYLON_MATH_SIZE_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/isize.h>
 
 namespace BABYLON {
@@ -23,14 +25,14 @@ public:
   /**
    * @brief Returns a new Size copied from the given one.
    */
-  unique_ptr_t<Size> clone() const;
+  std::unique_ptr<Size> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Size& size);
 
   /**
    * @brief Returns a string with the Size width and height.
    */
-  string_t toString() const;
+  std::string toString() const;
 
   /**
    * @brief Returns the string "Size"

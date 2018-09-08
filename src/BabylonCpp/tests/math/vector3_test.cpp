@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <cmath>
+
 #include <babylon/math/vector3.h>
 
 namespace {
@@ -68,7 +70,7 @@ TEST(TestVector3, GetHashCode)
 {
   using namespace BABYLON;
 
-  ::std::array<Vector3, 8> vects{{
+  std::array<Vector3, 8> vects{{
     Vector3{x, y, z},   // 000
     Vector3{x, y, -z},  // 001
     Vector3{x, -y, z},  // 010
@@ -302,7 +304,7 @@ TEST(TestVector3, Length)
   EXPECT_FLOAT_EQ(d.length(), 0.f);
 
   a.copyFromFloats(x, y, z);
-  EXPECT_FLOAT_EQ(a.length(), ::std::sqrt(x * x + y * y + z * z));
+  EXPECT_FLOAT_EQ(a.length(), std::sqrt(x * x + y * y + z * z));
 }
 
 TEST(TestVector3, LengthSquared)

@@ -1,12 +1,40 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_H
 #define BABYLON_ANIMATIONS_ANIMATION_H
 
+#include <map>
+
 #include <babylon/animations/animation_event.h>
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/animation_value.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
 
 namespace BABYLON {
+
+class Animatable;
+class Animation;
+class IAnimatable;
+struct IAnimationKey;
+class IEasingFunction;
+class Node;
+class RuntimeAnimation;
+class Scene;
+using AnimatablePtr       = std::shared_ptr<Animatable>;
+using AnimationPtr        = std::shared_ptr<Animation>;
+using IEasingFunctionPtr  = std::shared_ptr<IEasingFunction>;
+using NodePtr             = std::shared_ptr<Node>;
+using RuntimeAnimationPtr = std::shared_ptr<RuntimeAnimation>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Class used to store any kind of animation.
@@ -228,11 +256,13 @@ public:
   /**
    * @brief Hidden Internal use.
    */
-  static AnimationPtr _PrepareAnimation(
-    const string_t& name, const string_t& targetProperty, size_t framePerSecond,
-    int totalFrame, const AnimationValue& from, const AnimationValue& to,
-    unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    const IEasingFunctionPtr& easingFunction = nullptr);
+  static AnimationPtr
+  _PrepareAnimation(const std::string& name, const std::string& targetProperty,
+                    size_t framePerSecond, int totalFrame,
+                    const AnimationValue& from, const AnimationValue& to,
+                    unsigned int loopMode
+                    = Animation::ANIMATIONLOOPMODE_CYCLE(),
+                    const IEasingFunctionPtr& easingFunction = nullptr);
 
   /**
    * @brief Sets up an animation.
@@ -243,7 +273,7 @@ public:
    * @returns The created animation
    */
   static AnimationPtr
-  CreateAnimation(const string_t& property, int animationType,
+  CreateAnimation(const std::string& property, int animationType,
                   std::size_t framePerSecond,
                   const IEasingFunctionPtr& easingFunction = nullptr);
 
@@ -264,12 +294,12 @@ public:
    * @returns the animatable created for this animation
    */
   static AnimatablePtr CreateAndStartAnimation(
-    const string_t& name, const NodePtr& node, const string_t& targetProperty,
-    size_t framePerSecond, int totalFrame, const AnimationValue& from,
-    const AnimationValue& to,
+    const std::string& name, const NodePtr& node,
+    const std::string& targetProperty, size_t framePerSecond, int totalFrame,
+    const AnimationValue& from, const AnimationValue& to,
     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    const IEasingFunctionPtr& easingFunction      = nullptr,
-    const ::std::function<void()>& onAnimationEnd = nullptr);
+    const IEasingFunctionPtr& easingFunction    = nullptr,
+    const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Create and start an animation on a node and its descendants.
@@ -292,13 +322,13 @@ public:
    * @returns the list of animatables created for all nodes
    * Example https://www.babylonjs-playground.com/#MH0VLI
    */
-  static vector_t<AnimatablePtr> CreateAndStartHierarchyAnimation(
-    const string_t& name, const NodePtr& node, bool directDescendantsOnly,
-    const string_t& targetProperty, size_t framePerSecond, int totalFrame,
+  static std::vector<AnimatablePtr> CreateAndStartHierarchyAnimation(
+    const std::string& name, const NodePtr& node, bool directDescendantsOnly,
+    const std::string& targetProperty, size_t framePerSecond, int totalFrame,
     const AnimationValue& from, const AnimationValue& to,
     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    const IEasingFunctionPtr& easingFunction      = nullptr,
-    const ::std::function<void()>& onAnimationEnd = nullptr);
+    const IEasingFunctionPtr& easingFunction    = nullptr,
+    const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Creates a new animation, merges it with the existing animations and
@@ -317,12 +347,12 @@ public:
    * @returns Nullable animation
    */
   static AnimatablePtr CreateMergeAndStartAnimation(
-    const string_t& name, const NodePtr& node, const string_t& targetProperty,
-    size_t framePerSecond, int totalFrame, const AnimationValue& from,
-    const AnimationValue& to,
+    const std::string& name, const NodePtr& node,
+    const std::string& targetProperty, size_t framePerSecond, int totalFrame,
+    const AnimationValue& from, const AnimationValue& to,
     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
-    const IEasingFunctionPtr& easingFunction      = nullptr,
-    const ::std::function<void()>& onAnimationEnd = nullptr);
+    const IEasingFunctionPtr& easingFunction    = nullptr,
+    const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Transition property of an host to the target Value.
@@ -337,17 +367,17 @@ public:
    * @returns Nullable animation
    */
   static Animatable*
-  TransitionTo(const string_t& property, const AnimationValue& targetValue,
+  TransitionTo(const std::string& property, const AnimationValue& targetValue,
                const AnimationValue& host, Scene* scene, float frameRate,
                const AnimationPtr& transition, float duration,
-               const ::std::function<void()>& onAnimationEnd = nullptr);
+               const std::function<void()>& onAnimationEnd = nullptr);
 
 public:
   template <typename... Ts>
   static AnimationPtr New(Ts&&... args)
   {
     auto animation
-      = shared_ptr_t<Animation>(new Animation(::std::forward<Ts>(args)...));
+      = std::shared_ptr<Animation>(new Animation(std::forward<Ts>(args)...));
 
     return animation;
   }
@@ -361,7 +391,7 @@ public:
    * loading
    * @returns String form of the animation
    */
-  string_t toString(bool fullDetails = false) const;
+  std::string toString(bool fullDetails = false) const;
 
   /**
    * @param Add an event to this animation.
@@ -373,7 +403,7 @@ public:
    * @brief Return the array of runtime animations currently using this
    * animation.
    */
-  vector_t<RuntimeAnimationPtr>& runtimeAnimations();
+  std::vector<RuntimeAnimationPtr>& runtimeAnimations();
 
   /**
    * @brief Remove all events found at the given frame.
@@ -385,7 +415,7 @@ public:
    * @brief Retrieves all the events from the animation.
    * @returns Events from the animation
    */
-  vector_t<AnimationEvent>& getEvents();
+  std::vector<AnimationEvent>& getEvents();
 
   /**
    * @brief Creates an animation range.
@@ -393,7 +423,7 @@ public:
    * @param from Starting frame of the animation range
    * @param to Ending frame of the animation
    */
-  void createRange(const string_t& name, float from, float to);
+  void createRange(const std::string& name, float from, float to);
 
   /**
    * @brief Deletes an animation range by name.
@@ -401,14 +431,14 @@ public:
    * @param deleteFrames Specifies if the key frames for the range should also
    * be deleted (true) or not (false)
    */
-  void deleteRange(const string_t& name, bool deleteFrames = true);
+  void deleteRange(const std::string& name, bool deleteFrames = true);
 
   /**
    * @brief Gets the animation range by name, or null if not defined.
    * @param name Name of the animation range
    * @returns Nullable animation range
    */
-  AnimationRange& getRange(const string_t& name);
+  AnimationRange& getRange(const std::string& name);
 
   void reset();
   bool isStopped() const;
@@ -417,7 +447,7 @@ public:
    * @brief Gets the key frames from the animation.
    * @returns The key frames of the animation
    */
-  vector_t<IAnimationKey>& getKeys();
+  std::vector<IAnimationKey>& getKeys();
 
   /**
    * @brief Gets the highest frame rate of the animation.
@@ -568,7 +598,7 @@ public:
    */
   AnimationValue
   _interpolate(float currentFrame, int repeatCount,
-               nullable_t<AnimationValue>& workValue, unsigned int loopMode,
+               std::optional<AnimationValue>& workValue, unsigned int loopMode,
                const AnimationValue& offsetValue    = AnimationValue(),
                const AnimationValue& highLimitValue = AnimationValue());
 
@@ -604,7 +634,7 @@ public:
    * @brief Sets the key frames of the animation.
    * @param values The animation key frames to set
    */
-  void setKeys(const vector_t<IAnimationKey>& values);
+  void setKeys(const std::vector<IAnimationKey>& values);
 
   /**
    * @brief Serializes the animation to an object.
@@ -637,7 +667,7 @@ protected:
    * @param loopMode The loop mode of the animation
    * @param enableBlendings Specifies if blending should be enabled
    */
-  Animation(const string_t& name, const string_t& targetProperty,
+  Animation(const std::string& name, const std::string& targetProperty,
             size_t framePerSecond, int dataType,
             unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE());
 
@@ -665,22 +695,22 @@ public:
   /**
    * Name of the animation
    */
-  string_t name;
+  std::string name;
 
   /**
    * Property to animate
    */
-  string_t targetProperty;
+  std::string targetProperty;
 
   /**
    * Hidden Internal use only
    */
-  vector_t<RuntimeAnimationPtr> _runtimeAnimations;
+  std::vector<RuntimeAnimationPtr> _runtimeAnimations;
 
   /**
    * Stores an array of target property paths
    */
-  vector_t<string_t> targetPropertyPath;
+  std::vector<std::string> targetPropertyPath;
 
   /**
    * The frames per second of the animation
@@ -716,7 +746,7 @@ private:
   /**
    * Stores the key frames of the animation
    */
-  vector_t<IAnimationKey> _keys;
+  std::vector<IAnimationKey> _keys;
 
   /**
    * Stores the easing function of the animation
@@ -726,12 +756,12 @@ private:
   /**
    * The set of event that will be linked to this animation
    */
-  vector_t<AnimationEvent> _events;
+  std::vector<AnimationEvent> _events;
 
   /**
    * Stores the animation ranges for the animation
    */
-  unordered_map_t<string_t, AnimationRange> _ranges;
+  std::unordered_map<std::string, AnimationRange> _ranges;
 
 }; // end of class Animation
 

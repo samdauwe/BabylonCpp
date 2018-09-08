@@ -1,10 +1,16 @@
 #ifndef BABYLON_MATH_SPHERICAL_HARMONICS_H
 #define BABYLON_MATH_SPHERICAL_HARMONICS_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Color3;
+class SphericalPolynomial;
 
 /**
  * @brief Class representing spherical harmonics coefficients to the 3rd degree.
@@ -19,7 +25,7 @@ public:
   SphericalHarmonics& operator=(SphericalHarmonics&& other);
   ~SphericalHarmonics();
   SphericalHarmonics copy() const;
-  unique_ptr_t<SphericalHarmonics> clone() const;
+  std::unique_ptr<SphericalHarmonics> clone() const;
 
   /**
    * @brief Adds a light to the spherical harmonics.
@@ -78,7 +84,7 @@ public:
    * l20, l21, l22)
    * @returns the spherical harmonics
    */
-  static SphericalHarmonics FromArray(const vector_t<Float32Array>& data);
+  static SphericalHarmonics FromArray(const std::vector<Float32Array>& data);
 
 public:
   /**

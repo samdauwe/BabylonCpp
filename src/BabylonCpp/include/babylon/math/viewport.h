@@ -1,7 +1,10 @@
 #ifndef BABYLON_MATH_VIEWPORT_H
 #define BABYLON_MATH_VIEWPORT_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <ostream>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -27,7 +30,7 @@ public:
   /**
    * @brief Returns a new Viewport copied from the current one.
    */
-  unique_ptr_t<Viewport> clone() const;
+  std::unique_ptr<Viewport> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Viewport& viewport);
 

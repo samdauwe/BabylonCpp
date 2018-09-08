@@ -1,9 +1,16 @@
 #ifndef BABYLON_MATH_VECTOR2_H
 #define BABYLON_MATH_VECTOR2_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
+#include <babylon/babylon_constants.h>
 
 namespace BABYLON {
+
+class Matrix;
+class Vector3;
 
 /**
  * @brief Class representing a vector containing 2 coordinates.
@@ -28,13 +35,13 @@ public:
    * @brief Gets a new Vector2 copied from the Vector2.
    * @returns a new Vector2
    */
-  unique_ptr_t<Vector2> clone() const;
+  std::unique_ptr<Vector2> clone() const;
 
   /**
    * @brief Gets a string with the Vector2 coordinates.
    * @returns a string with the Vector2 coordinates
    */
-  string_t toString() const;
+  std::string toString() const;
 
   /**
    * @brief Gets class name.

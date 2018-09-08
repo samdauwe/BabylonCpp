@@ -1,9 +1,14 @@
 #ifndef BABYLON_MATH_COLOR4_H
 #define BABYLON_MATH_COLOR4_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Color3;
 
 /**
  * @brief Class used to hold a RBGA color.
@@ -36,7 +41,7 @@ public:
    * @brief Creates a new Color4 copied from the current one.
    * @returns a new Color4 object
    */
-  unique_ptr_t<Color4> clone() const;
+  std::unique_ptr<Color4> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Color4& color);
 
   /**
@@ -173,7 +178,7 @@ public:
    * @brief Creates a string with the Color4 current values.
    * @returns the string representation of the Color4 object
    */
-  string_t toString() const;
+  std::string toString() const;
 
   /**
    * @brief Copies the given Color4 values into the current one.
@@ -207,7 +212,7 @@ public:
    * @returns a string containing the hexadecimal representation of the Color4
    * object
    */
-  string_t toHexString() const;
+  std::string toHexString() const;
 
   /**
    * @brief Computes a new Color4 converted from the current one to linear
@@ -257,7 +262,7 @@ public:
    * @param hex defines a string containing valid hexadecimal values
    * @returns a new Color4 object
    */
-  static Color4 FromHexString(const string_t& hex);
+  static Color4 FromHexString(const std::string& hex);
 
   /**
    * @brief Creates a new Color4 object set with the linearly interpolated

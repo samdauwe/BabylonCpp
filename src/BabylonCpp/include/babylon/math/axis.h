@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATH_AXIS_H
 #define BABYLON_MATH_AXIS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {

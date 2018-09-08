@@ -1,10 +1,16 @@
 #ifndef BABYLON_INTERFACES_IREFLECT_H
 #define BABYLON_INTERFACES_IREFLECT_H
 
-#include <babylon/babylon_global.h>
+#include <optional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/any.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Quaternion;
+class Vector3;
 
 /**
  * @brief
@@ -62,18 +68,19 @@ public:
   virtual ~IReflect();
 
   virtual Type type() const = 0;
-  static string_t TypeToString(Type type);
+  static std::string TypeToString(Type type);
 
-  any getProperty(const string_t& targetPropertyPath);
-  any getProperty(const any& property, const string_t& targetProperty);
-  void setProperty(const any& oldProperty, const string_t& targetProperty,
+  any getProperty(const std::string& targetPropertyPath);
+  any getProperty(const any& property, const std::string& targetProperty);
+  void setProperty(const any& oldProperty, const std::string& targetProperty,
                    const any& property);
 
 private:
   Vector3* _getVector3Property(AbstractMesh* target,
-                               const string_t& targetProperty);
-  nullable_t<Quaternion> _getQuaternionProperty(AbstractMesh* target,
-                                                const string_t& targetProperty);
+                               const std::string& targetProperty);
+  std::optional<Quaternion>
+  _getQuaternionProperty(AbstractMesh* target,
+                         const std::string& targetProperty);
 
 }; // end of class IReflect
 

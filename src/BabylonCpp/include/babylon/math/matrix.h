@@ -1,7 +1,11 @@
 #ifndef BABYLON_MATH_MATRIX_H
 #define BABYLON_MATH_MATRIX_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <optional>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 // SIMD
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
@@ -9,6 +13,13 @@
 #endif
 
 namespace BABYLON {
+
+class Plane;
+class Quaternion;
+class Vector3;
+class Vector4;
+class Viewport;
+struct VRFov;
 
 /**
  * @brief Class used to store matrix data (4x4).
@@ -31,7 +42,7 @@ public:
    * @brief Clone the current matrix.
    * @returns a new matrix from the current matrix
    */
-  unique_ptr_t<Matrix> clone() const;
+  std::unique_ptr<Matrix> clone() const;
 
   /**
    * @brief Returns the name of the current matrix class.
@@ -193,7 +204,7 @@ public:
    * values
    * @returns the current matrix
    */
-  const Matrix& copyToArray(array_t<float, 16>& array,
+  const Matrix& copyToArray(std::array<float, 16>& array,
                             unsigned int offset = 0) const;
 
   /**
@@ -224,7 +235,8 @@ public:
    * values
    * @returns the current matrix
    */
-  const Matrix& multiplyToArray(const Matrix& other, array_t<float, 16>& result,
+  const Matrix& multiplyToArray(const Matrix& other,
+                                std::array<float, 16>& result,
                                 unsigned int offset) const;
 
   /**
@@ -257,15 +269,16 @@ public:
    * update
    * @returns true if operation was successful
    */
-  bool decompose(nullable_t<Vector3> scale, nullable_t<Quaternion> rotation,
-                 nullable_t<Vector3> translation) const;
+  bool decompose(std::optional<Vector3> scale,
+                 std::optional<Quaternion> rotation,
+                 std::optional<Vector3> translation) const;
 
   /**
    * @brief Gets specific row of the matrix.
    * @param index defines the number of the row to get
    * @returns the index-th row of the current matrix as a new Vector4
    */
-  nullable_t<Vector4> getRow(unsigned int index) const;
+  std::optional<Vector4> getRow(unsigned int index) const;
 
   /**
    * @brief Sets the index-th row of the current matrix to the vector4 values.
@@ -961,7 +974,7 @@ public:
   /**
    * Gets or sets the internal data of the matrix
    */
-  array_t<float, 16> m;
+  std::array<float, 16> m;
 
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   SIMD::SIMDMatrix simdMatrix;

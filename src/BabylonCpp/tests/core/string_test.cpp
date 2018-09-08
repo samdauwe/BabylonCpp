@@ -9,8 +9,8 @@ TEST(TestString, toCharCodes)
   using namespace BABYLON;
 
   const ::std::string s("Babylon.js");
-  const vector_t<uint8_t> expected{66,  97,  98, 121, 108,
-                                   111, 110, 46, 106, 115};
+  const std::vector<uint8_t> expected{66,  97,  98, 121, 108,
+                                      111, 110, 46, 106, 115};
   EXPECT_THAT(String::toCharCodes(s), ::testing::ContainerEq(expected));
 }
 

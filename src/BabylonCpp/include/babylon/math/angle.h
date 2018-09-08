@@ -1,9 +1,13 @@
 #ifndef BABYLON_MATH_ANGLE_H
 #define BABYLON_MATH_ANGLE_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Vector2;
 
 /**
  * @brief Defines angle representation.
@@ -22,7 +26,7 @@ public:
   Angle& operator=(Angle&& otherAngle);
   ~Angle();
   Angle copy() const;
-  unique_ptr_t<Angle> clone() const;
+  std::unique_ptr<Angle> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Angle& angle);
   friend bool operator==(const Angle& lhs, const Angle& rhs);
   friend bool operator!=(const Angle& lhs, const Angle& rhs);

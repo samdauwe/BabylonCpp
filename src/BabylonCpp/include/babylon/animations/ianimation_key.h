@@ -1,9 +1,8 @@
 #ifndef BABYLON_ANIMATIONS_IANIMATION_KEY_H
 #define BABYLON_ANIMATIONS_IANIMATION_KEY_H
 
-#include <babylon/babylon_global.h>
-
 #include <babylon/animations/animation_value.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -27,17 +26,17 @@ struct BABYLON_SHARED_EXPORT IAnimationKey {
   /**
    * The input tangent for the cubic hermite spline
    */
-  nullable_t<AnimationValue> inTangent;
+  std::optional<AnimationValue> inTangent;
 
   /**
    * The output tangent for the cubic hermite spline
    */
-  nullable_t<AnimationValue> outTangent;
+  std::optional<AnimationValue> outTangent;
 
   /**
    * The animation interpolation type
    */
-  nullable_t<AnimationValue> interpolation;
+  std::optional<AnimationValue> interpolation;
 
 }; // end of struct AnimationKey
 

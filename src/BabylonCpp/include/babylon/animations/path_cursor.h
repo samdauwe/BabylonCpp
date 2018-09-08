@@ -1,10 +1,15 @@
 #ifndef BABYLON_ANIMATIONS_PATH_CURSOR_H
 #define BABYLON_ANIMATIONS_PATH_CURSOR_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/path2.h>
 
 namespace BABYLON {
+
+class Animation;
+class Vector3;
 
 /**
  * @brief A cursor which tracks a point on a path.
@@ -49,8 +54,7 @@ public:
   PathCursor& move(float step);
 
   // used by animation engine
-  PathCursor&
-  onchange(const ::std::function<void(const PathCursor& cursor)>& f);
+  PathCursor& onchange(const std::function<void(const PathCursor& cursor)>& f);
 
 private:
   /**
@@ -71,7 +75,7 @@ private:
    * @param f A path cursor onchange callback
    * @returns This path cursor
    */
-  vector_t<::std::function<void(const PathCursor& cursor)>> _onchange;
+  std::vector<std::function<void(const PathCursor& cursor)>> _onchange;
 
   /**
    * The path to track
@@ -86,7 +90,7 @@ private:
   /**
    * The animation array of the path cursor
    */
-  vector_t<Animation*> animations;
+  std::vector<Animation*> animations;
 
 }; // end of class PathCursor
 

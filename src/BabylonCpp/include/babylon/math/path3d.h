@@ -1,7 +1,11 @@
 #ifndef BABYLON_MATH_PATH3D_H
 #define BABYLON_MATH_PATH3D_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <optional>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -22,38 +26,39 @@ public:
    *                                 normalized. Useful to depict path
    *                                 acceleration or speed.
    */
-  Path3D(const vector_t<Vector3>& path,
-         const nullable_t<Vector3>& firstNormal = nullopt_t, bool raw = false);
+  Path3D(const std::vector<Vector3>& path,
+         const std::optional<Vector3>& firstNormal = std::nullopt,
+         bool raw                                  = false);
   Path3D(const Path3D& otherPath);
   Path3D(Path3D&& otherPath);
   Path3D& operator=(const Path3D& otherPath);
   Path3D& operator=(Path3D&& otherPath);
   ~Path3D();
   Path3D copy() const;
-  unique_ptr_t<Path3D> clone() const;
+  std::unique_ptr<Path3D> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Path3D& path);
 
   /**
    * @brief Returns the Path3D array of successive Vector3 designing its curve.
    */
-  vector_t<Vector3>& getCurve();
+  std::vector<Vector3>& getCurve();
 
   /**
    * Returns an array populated with tangent vectors on each Path3D curve point.
    */
-  vector_t<Vector3>& getTangents();
+  std::vector<Vector3>& getTangents();
 
   /**
    * @brief Returns an array populated with normal vectors on each Path3D curve
    * point.
    */
-  vector_t<Vector3>& getNormals();
+  std::vector<Vector3>& getNormals();
 
   /**
    * @brief Returns an array populated with binormal vectors on each Path3D
    * curve point.
    */
-  vector_t<Vector3>& getBinormals();
+  std::vector<Vector3>& getBinormals();
 
   /**
    * @brief Returns an array populated with distances (float) of the i-th point
@@ -66,14 +71,14 @@ public:
    * recomputation.
    * @returns The same object updated.
    */
-  Path3D& update(const vector_t<Vector3>& path,
-                 const nullable_t<Vector3>& firstNormal = nullopt_t);
+  Path3D& update(const std::vector<Vector3>& path,
+                 const std::optional<Vector3>& firstNormal = std::nullopt);
 
 private:
   /**
    * @brief Computes tangents, normals and binormals.
    */
-  void _compute(const nullable_t<Vector3>& firstNormal);
+  void _compute(const std::optional<Vector3>& firstNormal);
 
   /**
    * @brief Returns the first non null vector from index : curve[index +
@@ -93,17 +98,17 @@ private:
    * projection on the plane orthogonal to vt at the point v0.
    */
   Vector3 _normalVector(const Vector3& v0, const Vector3& vt,
-                        const nullable_t<Vector3>& va);
+                        const std::optional<Vector3>& va);
 
 public:
-  vector_t<Vector3> path;
+  std::vector<Vector3> path;
 
 private:
-  vector_t<Vector3> _curve;
+  std::vector<Vector3> _curve;
   Float32Array _distances;
-  vector_t<Vector3> _tangents;
-  vector_t<Vector3> _normals;
-  vector_t<Vector3> _binormals;
+  std::vector<Vector3> _tangents;
+  std::vector<Vector3> _normals;
+  std::vector<Vector3> _binormals;
   bool _raw;
 
 }; // end of class Path3D

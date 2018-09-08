@@ -1,9 +1,15 @@
 #ifndef BABYLON_MATH_PATH2_H
 #define BABYLON_MATH_PATH2_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <ostream>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Vector2;
 
 /**
  * @brief Represents a Path2.
@@ -22,7 +28,7 @@ public:
   Path2& operator=(Path2&& otherPath);
   ~Path2();
   Path2 copy() const;
-  unique_ptr_t<Path2> clone() const;
+  std::unique_ptr<Path2> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Path2& path);
 
   /**
@@ -55,8 +61,8 @@ public:
   /**
    * @brief Returns the Path2 internal array of points.
    */
-  vector_t<Vector2>& getPoints();
-  const vector_t<Vector2>& getPoints() const;
+  std::vector<Vector2>& getPoints();
+  const std::vector<Vector2>& getPoints() const;
 
   /**
    * @brief Returns a new Vector2 located at a percentage of the Path2 total
@@ -75,7 +81,7 @@ public:
   bool closed;
 
 private:
-  vector_t<Vector2> _points;
+  std::vector<Vector2> _points;
   float _length;
 
 }; // end of class Path2

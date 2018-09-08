@@ -1,7 +1,9 @@
 #ifndef BABYLON_MATH_ISIZE_H
 #define BABYLON_MATH_ISIZE_H
 
-#include <babylon/babylon_global.h>
+#include <ostream>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

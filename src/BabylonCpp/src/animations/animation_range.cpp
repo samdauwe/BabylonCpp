@@ -6,7 +6,7 @@ AnimationRange::AnimationRange() : name{""}, from{0.f}, to{0.f}
 {
 }
 
-AnimationRange::AnimationRange(const string_t& iName, float iFrom, float iTo)
+AnimationRange::AnimationRange(const std::string& iName, float iFrom, float iTo)
     : name{iName}, from{iFrom}, to{iTo}
 {
 }
@@ -25,9 +25,9 @@ AnimationRange AnimationRange::copy() const
   return AnimationRange(name, from, to);
 }
 
-unique_ptr_t<AnimationRange> AnimationRange::clone() const
+std::unique_ptr<AnimationRange> AnimationRange::clone() const
 {
-  return ::std::make_unique<AnimationRange>(name, from, to);
+  return std::make_unique<AnimationRange>(name, from, to);
 }
 
 } // end of namespace BABYLON

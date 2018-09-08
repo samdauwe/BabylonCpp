@@ -1,7 +1,7 @@
 #ifndef BABYLON_ANIMATIONS_EASING_IEASING_FUNCTION_H
 #define BABYLON_ANIMATIONS_EASING_IEASING_FUNCTION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

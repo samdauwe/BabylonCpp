@@ -1,10 +1,16 @@
 #ifndef BABYLON_MATH_SPHERICAL_POLYNOMIAL_H
 #define BABYLON_MATH_SPHERICAL_POLYNOMIAL_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Color3;
+class SphericalHarmonics;
 
 /**
  * @brief Class representing spherical polynomial coefficients to the 3rd
@@ -20,7 +26,7 @@ public:
   SphericalPolynomial& operator=(SphericalPolynomial&& other);
   ~SphericalPolynomial();
   SphericalPolynomial copy() const;
-  unique_ptr_t<SphericalPolynomial> clone() const;
+  std::unique_ptr<SphericalPolynomial> clone() const;
 
   /**
    * @brief Adds an ambient color to the spherical polynomial.
@@ -48,7 +54,7 @@ public:
    * @param data defines the 9x3 coefficients (x, y, z, xx, yy, zz, yz, zx, xy)
    * @returns the spherical polynomial
    */
-  static SphericalPolynomial FromArray(const vector_t<Float32Array>& data);
+  static SphericalPolynomial FromArray(const std::vector<Float32Array>& data);
 
 public:
   /**

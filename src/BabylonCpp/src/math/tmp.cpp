@@ -10,21 +10,21 @@
 
 namespace BABYLON {
 
-array_t<Color3, 3> Tmp::Color3Array{
+std::array<Color3, 3> Tmp::Color3Array{
   {Color3::Black(), Color3::Black(), Color3::Black()}};
-array_t<Color4, 2> Tmp::Color4Array{
+std::array<Color4, 2> Tmp::Color4Array{
   {Color4(0.f, 0.f, 0.f, 0.f), Color4(0.f, 0.f, 0.f, 0.f)}};
-array_t<Vector2, 3> Tmp::Vector2Array{
+std::array<Vector2, 3> Tmp::Vector2Array{
   {Vector2::Zero(), Vector2::Zero(), Vector2::Zero()}};
-array_t<Vector3, 9> Tmp::Vector3Array{
+std::array<Vector3, 9> Tmp::Vector3Array{
   {Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
    Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
    Vector3::Zero()}};
-array_t<Vector4, 3> Tmp::Vector4Array{
+std::array<Vector4, 3> Tmp::Vector4Array{
   {Vector4::Zero(), Vector4::Zero(), Vector4::Zero()}};
-array_t<Quaternion, 2> Tmp::QuaternionArray{
+std::array<Quaternion, 2> Tmp::QuaternionArray{
   {Quaternion::Zero(), Quaternion::Zero()}};
-array_t<Matrix, 8> Tmp::MatrixArray{
+std::array<Matrix, 8> Tmp::MatrixArray{
   {Matrix::Zero(), Matrix::Zero(), Matrix::Zero(), Matrix::Zero(),
    Matrix::Zero(), Matrix::Zero(), Matrix::Zero(), Matrix::Zero()}};
 

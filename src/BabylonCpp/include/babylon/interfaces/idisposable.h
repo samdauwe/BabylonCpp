@@ -1,7 +1,7 @@
 #ifndef BABYLON_INTERFACES_IDISPOSABLE_H
 #define BABYLON_INTERFACES_IDISPOSABLE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

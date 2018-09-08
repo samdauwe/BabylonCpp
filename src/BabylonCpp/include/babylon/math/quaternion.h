@@ -1,9 +1,15 @@
 #ifndef BABYLON_MATH_QUATERNION_H
 #define BABYLON_MATH_QUATERNION_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Matrix;
+class Vector3;
 
 /**
  * @brief Class used to store quaternion data.
@@ -32,13 +38,13 @@ public:
    * @brief Clone the current quaternion.
    * @returns a new quaternion copied from the current one
    */
-  unique_ptr_t<Quaternion> clone() const;
+  std::unique_ptr<Quaternion> clone() const;
 
   /**
    * @brief Gets a string representation for the current quaternion.
    * @returns a string with the Quaternion coordinates
    */
-  string_t toString() const;
+  std::string toString() const;
 
   /**
    * @brief Gets the class name of the quaternion.
@@ -216,7 +222,7 @@ public:
    * @param order is a reserved parameter and is ignore for now
    * @returns a new Vector3 containing the Euler angles
    */
-  Vector3 toEulerAngles(const string_t& order = "YZX") const;
+  Vector3 toEulerAngles(const std::string& order = "YZX") const;
 
   /**
    * @brief Sets the given vector3 "result" with the Euler angles translated
@@ -226,7 +232,7 @@ public:
    * @returns the current unchanged quaternion
    */
   const Quaternion& toEulerAnglesToRef(Vector3& result,
-                                       const string_t& order = "YZX") const;
+                                       const std::string& order = "YZX") const;
 
   /**
    * @brief Updates the given rotation matrix with the current quaternion

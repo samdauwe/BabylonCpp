@@ -1,5 +1,6 @@
 #include <babylon/animations/easing/elastic_ease.h>
 
+#include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {
@@ -18,16 +19,16 @@ ElasticEase::~ElasticEase()
 float ElasticEase::easeInCore(float gradient) const
 {
   float num2 = 0.f;
-  float num3 = ::std::max(0.f, oscillations);
-  float num  = ::std::max(0.f, springiness);
+  float num3 = std::max(0.f, oscillations);
+  float num  = std::max(0.f, springiness);
 
   if (stl_util::almost_equal(num, 0.f)) {
     num2 = gradient;
   }
   else {
-    num2 = (::std::exp(num * gradient) - 1.f) / (::std::exp(num) - 1.f);
+    num2 = (std::exp(num * gradient) - 1.f) / (std::exp(num) - 1.f);
   }
-  return (num2 * ::std::sin(((Math::PI2 * num3) + Math::PI_2) * gradient));
+  return (num2 * std::sin(((Math::PI2 * num3) + Math::PI_2) * gradient));
 }
 
 } // end of namespace BABYLON

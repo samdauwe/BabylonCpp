@@ -1,8 +1,10 @@
 #ifndef BABYLON_MATH_ARC2_H
 #define BABYLON_MATH_ARC2_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
 
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_enums.h>
 #include <babylon/math/angle.h>
 #include <babylon/math/vector2.h>
 
@@ -26,7 +28,7 @@ public:
   Arc2& operator=(Arc2&& otherArc);
   ~Arc2();
   Arc2 copy() const;
-  unique_ptr_t<Arc2> clone() const;
+  std::unique_ptr<Arc2> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Arc2& arc);
   friend bool operator==(const Arc2& lhs, const Arc2& rhs);
   friend bool operator!=(const Arc2& lhs, const Arc2& rhs);

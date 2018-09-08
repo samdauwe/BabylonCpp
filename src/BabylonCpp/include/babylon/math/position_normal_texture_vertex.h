@@ -1,8 +1,10 @@
 #ifndef BABYLON_MATH_POSITION_NORMAL_TEXTURE_VERTEX_H
 #define BABYLON_MATH_POSITION_NORMAL_TEXTURE_VERTEX_H
 
-#include <babylon/babylon_global.h>
+#include <iostream>
+#include <memory>
 
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 
@@ -24,7 +26,7 @@ public:
   PositionNormalTextureVertex& operator=(PositionNormalTextureVertex&& other);
   ~PositionNormalTextureVertex();
   PositionNormalTextureVertex copy() const;
-  unique_ptr_t<PositionNormalTextureVertex> clone() const;
+  std::unique_ptr<PositionNormalTextureVertex> clone() const;
   friend std::ostream&
   operator<<(std::ostream& os,
              const PositionNormalTextureVertex& positionNormalTextureVertex);

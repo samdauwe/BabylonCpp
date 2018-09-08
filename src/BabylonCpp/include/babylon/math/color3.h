@@ -1,9 +1,14 @@
 #ifndef BABYLON_MATH_COLOR3_H
 #define BABYLON_MATH_COLOR3_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Color4;
 
 /**
  * @brief Class used to hold a RBG color.
@@ -30,13 +35,13 @@ public:
    * @brief Copy the current object.
    * @returns a new Color3 copied the current one
    */
-  unique_ptr_t<Color3> clone() const;
+  std::unique_ptr<Color3> clone() const;
 
   /**
    * @brief Creates a string with the Color3 current values.
    * @returns the string representation of the Color3 object
    */
-  string_t toString() const;
+  std::string toString() const;
 
   /**
    * @brief Returns the string "Color3".
@@ -217,7 +222,7 @@ public:
    * @returns a string containing the hexadecimal representation of the Color3
    * object
    */
-  string_t toHexString() const;
+  std::string toHexString() const;
 
   /**
    * @brief Computes a new Color3 converted from the current one to linear
@@ -266,7 +271,7 @@ public:
    * @param hex defines a string containing valid hexadecimal values
    * @returns a new Color3 object
    */
-  static Color3 FromHexString(const string_t& hex);
+  static Color3 FromHexString(const std::string& hex);
 
   /**
    * @brief Creates a new Vector3 from the starting index of the given array.

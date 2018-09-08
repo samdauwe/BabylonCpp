@@ -1,11 +1,21 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_GROUP_H
 #define BABYLON_ANIMATIONS_ANIMATION_GROUP_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class Animatable;
+class Animation;
+class IAnimatable;
+class TargetedAnimation;
+class Scene;
+using AnimatablePtr  = std::shared_ptr<Animatable>;
+using AnimationPtr   = std::shared_ptr<Animation>;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 /**
  * @brief Use this class to create coordinated animations on multiple targets.
@@ -18,13 +28,13 @@ public:
   {
     auto animationGroup = new AnimationGroup(::std::forward<Ts>(args)...);
     animationGroup->addToScene(
-      static_cast<unique_ptr_t<AnimationGroup>>(animationGroup));
+      static_cast<std::unique_ptr<AnimationGroup>>(animationGroup));
 
     return animationGroup;
   }
   virtual ~AnimationGroup();
 
-  void addToScene(unique_ptr_t<AnimationGroup>&& newAnimationGroup);
+  void addToScene(std::unique_ptr<AnimationGroup>&& newAnimationGroup);
 
   /**
    * @brief Add an animation (with its target) in the group.
@@ -44,8 +54,8 @@ public:
    * @param endFrame defines the new end frame for all animations or the largest
    * end frame of all animations if null (defaults to null)
    */
-  AnimationGroup& normalize(const nullable_t<int>& beginFrame = nullopt_t,
-                            const nullable_t<int>& endFrame   = nullopt_t);
+  AnimationGroup& normalize(const std::optional<int>& beginFrame = std::nullopt,
+                            const std::optional<int>& endFrame = std::nullopt);
 
   /**
    * @brief Start all animations on given targets.
@@ -57,8 +67,8 @@ public:
    * @returns the current animation group
    */
   AnimationGroup& start(bool loop = false, float speedRatio = 1.f,
-                        nullable_t<float> from = nullopt_t,
-                        nullable_t<float> to   = nullopt_t);
+                        std::optional<float> from = std::nullopt,
+                        std::optional<float> to   = std::nullopt);
 
   /**
    * @brief Pause all animations.
@@ -119,7 +129,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  AnimationGroup(const string_t& name, Scene* scene = nullptr);
+  AnimationGroup(const std::string& name, Scene* scene = nullptr);
 
 private:
   /**
@@ -150,18 +160,18 @@ private:
   /**
    * @brief Gets the targeted animations for this animation group.
    */
-  vector_t<unique_ptr_t<TargetedAnimation>>& get_targetedAnimations();
+  std::vector<std::unique_ptr<TargetedAnimation>>& get_targetedAnimations();
 
   /**
    * @brief Returning the list of animatables controlled by this animation
    * group.
    */
-  vector_t<AnimatablePtr>& get_animatables();
+  std::vector<AnimatablePtr>& get_animatables();
 
   void _checkAnimationGroupEnded(const AnimatablePtr& animatable);
 
 public:
-  string_t name;
+  std::string name;
   Observable<TargetedAnimation> onAnimationEndObservable;
 
   /**
@@ -197,18 +207,19 @@ public:
   /**
    * Targeted animations for this animation group.
    */
-  ReadOnlyProperty<AnimationGroup, vector_t<unique_ptr_t<TargetedAnimation>>>
+  ReadOnlyProperty<AnimationGroup,
+                   std::vector<std::unique_ptr<TargetedAnimation>>>
     targetedAnimations;
 
   /**
    * Animatables controlled by this animation group.
    */
-  ReadOnlyProperty<AnimationGroup, vector_t<AnimatablePtr>> animatables;
+  ReadOnlyProperty<AnimationGroup, std::vector<AnimatablePtr>> animatables;
 
 private:
   Scene* _scene;
-  vector_t<unique_ptr_t<TargetedAnimation>> _targetedAnimations;
-  vector_t<AnimatablePtr> _animatables;
+  std::vector<std::unique_ptr<TargetedAnimation>> _targetedAnimations;
+  std::vector<AnimatablePtr> _animatables;
   float _from;
   float _to;
   bool _isStarted;

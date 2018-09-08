@@ -1,10 +1,22 @@
 #ifndef BABYLON_ANIMATIONS_RUNTIME_ANIMATION_H
 #define BABYLON_ANIMATIONS_RUNTIME_ANIMATION_H
 
+#include <unordered_map>
+
 #include <babylon/animations/animation_value.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Animatable;
+class Animation;
+class AnimationEvent;
+class IAnimatable;
+class RuntimeAnimation;
+class Scene;
+using AnimationPtr        = std::shared_ptr<Animation>;
+using IAnimatablePtr      = std::shared_ptr<IAnimatable>;
+using RuntimeAnimationPtr = std::shared_ptr<RuntimeAnimation>;
 
 /**
  * @brief Defines a runtime animation.
@@ -15,7 +27,7 @@ public:
   template <typename... Ts>
   static RuntimeAnimationPtr New(Ts&&... args)
   {
-    auto animation = shared_ptr_t<RuntimeAnimation>(
+    auto animation = std::shared_ptr<RuntimeAnimation>(
       new RuntimeAnimation(::std::forward<Ts>(args)...));
     animation->addToRuntimeAnimations(animation);
 
@@ -59,7 +71,7 @@ public:
    * @brief Gets the loop pmode of the runtime animation
    * @returns Loop Mode
    */
-  nullable_t<unsigned int> _getCorrectLoopMode() const;
+  std::optional<unsigned int> _getCorrectLoopMode() const;
 
   /**
    * @brief Move the current animation to a given frame.
@@ -110,12 +122,12 @@ protected:
   /**
    * @brief Gets the current value of the runtime animation.
    */
-  nullable_t<AnimationValue>& get_currentValue();
+  std::optional<AnimationValue>& get_currentValue();
 
   /**
    * @brief Gets the target path of the runtime animation.
    */
-  string_t get_targetPath() const;
+  std::string get_targetPath() const;
 
   /**
    * @brief Gets the actual target of the runtime animation.
@@ -155,17 +167,18 @@ public:
   /**
    * Current value of the runtime animation
    */
-  ReadOnlyProperty<RuntimeAnimation, nullable_t<AnimationValue>> currentValue;
+  ReadOnlyProperty<RuntimeAnimation, std::optional<AnimationValue>>
+    currentValue;
 
   /**
    * Hidden
    */
-  nullable_t<AnimationValue> _workValue;
+  std::optional<AnimationValue> _workValue;
 
   /**
    * Target path of the runtime animation
    */
-  ReadOnlyProperty<RuntimeAnimation, string_t> targetPath;
+  ReadOnlyProperty<RuntimeAnimation, std::string> targetPath;
 
   /**
    * Actual target of the runtime animation
@@ -173,7 +186,7 @@ public:
   ReadOnlyProperty<RuntimeAnimation, IAnimatable*> target;
 
 private:
-  vector_t<AnimationEvent> _events;
+  std::vector<AnimationEvent> _events;
 
   /**
    * The current frame of the runtime animation
@@ -198,7 +211,7 @@ private:
   /**
    * The original value of the runtime animation
    */
-  vector_t<nullable_t<AnimationValue>> _originalValue;
+  std::vector<std::optional<AnimationValue>> _originalValue;
 
   /**
    * The original blend value of the runtime animation
@@ -208,12 +221,12 @@ private:
   /**
    * The offsets cache of the runtime animation
    */
-  unordered_map_t<string_t, AnimationValue> _offsetsCache;
+  std::unordered_map<std::string, AnimationValue> _offsetsCache;
 
   /**
    * The high limits cache of the runtime animation
    */
-  unordered_map_t<string_t, AnimationValue> _highLimitsCache;
+  std::unordered_map<std::string, AnimationValue> _highLimitsCache;
 
   /**
    * Specifies if the runtime animation has been stopped
@@ -233,7 +246,7 @@ private:
   /**
    * The current value of the runtime animation
    */
-  nullable_t<AnimationValue> _currentValue;
+  std::optional<AnimationValue> _currentValue;
 
   /**
    * The active target of the runtime animation
@@ -243,7 +256,7 @@ private:
   /**
    * The target path of the runtime animation
    */
-  string_t _targetPath;
+  std::string _targetPath;
 
   /**
    * The weight of the runtime animation

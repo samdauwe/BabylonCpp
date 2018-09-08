@@ -32,15 +32,15 @@ SphericalHarmonics::SphericalHarmonics(const SphericalHarmonics& other)
 }
 
 SphericalHarmonics::SphericalHarmonics(SphericalHarmonics&& other)
-    : l00{::std::move(other.l00)}
-    , l1_1{::std::move(other.l1_1)}
-    , l10{::std::move(other.l10)}
-    , l11{::std::move(other.l11)}
-    , l2_2{::std::move(other.l2_2)}
-    , l2_1{::std::move(other.l2_1)}
-    , l20{::std::move(other.l20)}
-    , l21{::std::move(other.l21)}
-    , lL22{::std::move(other.lL22)}
+    : l00{std::move(other.l00)}
+    , l1_1{std::move(other.l1_1)}
+    , l10{std::move(other.l10)}
+    , l11{std::move(other.l11)}
+    , l2_2{std::move(other.l2_2)}
+    , l2_1{std::move(other.l2_1)}
+    , l20{std::move(other.l20)}
+    , l21{std::move(other.l21)}
+    , lL22{std::move(other.lL22)}
 {
 }
 
@@ -65,15 +65,15 @@ operator=(const SphericalHarmonics& other)
 SphericalHarmonics& SphericalHarmonics::operator=(SphericalHarmonics&& other)
 {
   if (&other != this) {
-    l00  = ::std::move(other.l00);
-    l1_1 = ::std::move(other.l1_1);
-    l10  = ::std::move(other.l10);
-    l11  = ::std::move(other.l11);
-    l2_2 = ::std::move(other.l2_2);
-    l2_1 = ::std::move(other.l2_1);
-    l20  = ::std::move(other.l20);
-    l21  = ::std::move(other.l21);
-    lL22 = ::std::move(other.lL22);
+    l00  = std::move(other.l00);
+    l1_1 = std::move(other.l1_1);
+    l10  = std::move(other.l10);
+    l11  = std::move(other.l11);
+    l2_2 = std::move(other.l2_2);
+    l2_1 = std::move(other.l2_1);
+    l20  = std::move(other.l20);
+    l21  = std::move(other.l21);
+    lL22 = std::move(other.lL22);
   }
 
   return *this;
@@ -88,9 +88,9 @@ SphericalHarmonics SphericalHarmonics::copy() const
   return SphericalHarmonics(*this);
 }
 
-unique_ptr_t<SphericalHarmonics> SphericalHarmonics::clone() const
+std::unique_ptr<SphericalHarmonics> SphericalHarmonics::clone() const
 {
-  return ::std::make_unique<SphericalHarmonics>(*this);
+  return std::make_unique<SphericalHarmonics>(*this);
 }
 
 void SphericalHarmonics::addLight(const Vector3& direction, const Color3& color,
@@ -180,7 +180,7 @@ SphericalHarmonics::FromPolynomial(const SphericalPolynomial& polynomial)
 }
 
 SphericalHarmonics
-SphericalHarmonics::FromArray(const vector_t<Float32Array>& data)
+SphericalHarmonics::FromArray(const std::vector<Float32Array>& data)
 {
   SphericalHarmonics sh;
   if (data.size() < 9) {

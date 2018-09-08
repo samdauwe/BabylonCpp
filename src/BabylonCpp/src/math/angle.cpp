@@ -1,5 +1,6 @@
 #include <babylon/math/angle.h>
 
+#include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/math/vector2.h>
 

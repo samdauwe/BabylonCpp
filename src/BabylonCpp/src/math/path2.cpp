@@ -1,5 +1,6 @@
 #include <babylon/math/path2.h>
 
+#include <babylon/babylon_stl.h>
 #include <babylon/math/arc2.h>
 #include <babylon/math/vector2.h>
 

@@ -1,5 +1,7 @@
 #include <babylon/math/size.h>
 
+#include <sstream>
+
 namespace BABYLON {
 
 Size::Size(int _width, int _height) : ISize(_width, _height)
@@ -33,8 +35,8 @@ Size& Size::operator=(const Size& otherSize)
 Size& Size::operator=(Size&& otherSize)
 {
   if (&otherSize != this) {
-    width  = ::std::move(otherSize.width);
-    height = ::std::move(otherSize.height);
+    width  = std::move(otherSize.width);
+    height = std::move(otherSize.height);
   }
 
   return *this;
@@ -45,9 +47,9 @@ Size Size::copy() const
   return Size(*this);
 }
 
-unique_ptr_t<Size> Size::clone() const
+std::unique_ptr<Size> Size::clone() const
 {
-  return ::std::make_unique<Size>(*this);
+  return std::make_unique<Size>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Size& size)
@@ -56,7 +58,7 @@ std::ostream& operator<<(std::ostream& os, const Size& size)
   return os;
 }
 
-string_t Size::toString() const
+std::string Size::toString() const
 {
   std::ostringstream oss;
   oss << *this;

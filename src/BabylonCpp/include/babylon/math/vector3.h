@@ -1,9 +1,18 @@
 #ifndef BABYLON_MATH_VECTOR3_H
 #define BABYLON_MATH_VECTOR3_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
+#include <babylon/babylon_constants.h>
 
 namespace BABYLON {
+
+class Matrix;
+class Quaternion;
+class Viewport;
 
 /**
  * @brief Classed used to store (x,y,z) vector representation.
@@ -33,13 +42,13 @@ public:
    * @brief Creates a new Vector3 copied from the current Vector3.
    * @returns the new Vector3
    */
-  unique_ptr_t<Vector3> clone() const;
+  std::unique_ptr<Vector3> clone() const;
 
   /**
    * @brief Creates a string representation of the Vector3.
    * @returns a string with the Vector3 coordinates.
    */
-  string_t toString() const;
+  std::string toString() const;
 
   /**
    * @brief Gets the class name.
@@ -456,7 +465,7 @@ public:
    * @param offset defines the offset in the source array
    * @param result defines the Vector3 where to store the result
    */
-  static void FromArrayToRef(const array_t<float, 16>& array,
+  static void FromArrayToRef(const std::array<float, 16>& array,
                              unsigned int offset, Vector3& result);
 
   /**

@@ -1,8 +1,9 @@
 #ifndef BABYLON_CORE_RANDOM_H
 #define BABYLON_CORE_RANDOM_H
 
-#include <babylon/babylon_stl.h>
-#include <babylon/babylon_stl_util.h>
+#include <limits>
+#include <random>
+#include <vector>
 
 namespace BABYLON {
 namespace Math {
@@ -11,23 +12,23 @@ namespace Math {
 template <typename T>
 inline T randomNumber(T min, T max)
 {
-  if (stl_util::almost_equal(min, max)) {
+  if (min == max) {
     return min;
   }
 
-  ::std::random_device rd;
-  ::std::mt19937 gen(static_cast<int>(rd()));
-  ::std::uniform_real_distribution<T> dis(min, max);
+  std::random_device rd;
+  std::mt19937 gen(static_cast<int>(rd()));
+  std::uniform_real_distribution<T> dis(min, max);
   return dis(gen);
 }
 
 template <typename T>
-inline vector_t<T> randomList(T min, T max, size_t nbrOfElements = 1)
+inline std::vector<T> randomList(T min, T max, size_t nbrOfElements = 1)
 {
-  ::std::random_device rd;
-  ::std::mt19937 gen(static_cast<int>(rd()));
-  ::std::uniform_real_distribution<T> dis(min, max);
-  vector_t<T> result;
+  std::random_device rd;
+  std::mt19937 gen(static_cast<int>(rd()));
+  std::uniform_real_distribution<T> dis(min, max);
+  std::vector<T> result;
   const size_t cnt = (nbrOfElements < 1) ? 1 : nbrOfElements;
   for (size_t n = 0; n < cnt; ++n) {
     result.emplace_back(dis(gen));
@@ -68,12 +69,12 @@ struct PCG {
 
   static result_type constexpr min()
   {
-    return numeric_limits_t<result_type>::min();
+    return std::numeric_limits<result_type>::min();
   }
 
   static result_type constexpr max()
   {
-    return numeric_limits_t<result_type>::min();
+    return std::numeric_limits<result_type>::min();
   }
 
 private:
@@ -102,8 +103,8 @@ template <typename T, typename Gen>
 constexpr auto distribution(Gen& g, T min, T max)
 {
   const auto range          = max - min + 1;
-  const auto bias_remainder = numeric_limits_t<T>::max() % range;
-  const auto unbiased_max   = numeric_limits_t<T>::max() - bias_remainder - 1;
+  const auto bias_remainder = std::numeric_limits<T>::max() % range;
+  const auto unbiased_max = std::numeric_limits<T>::max() - bias_remainder - 1;
 
   auto r = g();
   for (; r > unbiased_max; r = g())

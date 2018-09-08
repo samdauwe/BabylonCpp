@@ -2,10 +2,14 @@
 #define BABYLON_ANIMATIONS_IANIMATABLE_H
 
 #include <babylon/animations/animation_value.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/ireflect.h>
 
 namespace BABYLON {
+
+class Animation;
+class Node;
+using AnimationPtr = std::shared_ptr<Animation>;
 
 class BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
 
@@ -25,21 +29,21 @@ public:
   /**
    * Gets or sets a string used to store user defined state for the node
    */
-  string_t state;
+  std::string state;
 
   virtual Type animatableType() const
   {
     return Type::UNKNOWN;
   }
-  virtual vector_t<AnimationPtr> getAnimations()
+  virtual std::vector<AnimationPtr> getAnimations()
   {
-    return vector_t<AnimationPtr>();
+    return std::vector<AnimationPtr>();
   }
   virtual bool markTargetAsDirty() const
   {
     return false;
   }
-  virtual IAnimatable& markAsDirty(const string_t& /*property*/ = "")
+  virtual IAnimatable& markAsDirty(const std::string& /*property*/ = "")
   {
     return *this;
   }
@@ -50,7 +54,7 @@ public:
   {
     return nullptr;
   }
-  virtual AnimationValue operator[](const string_t& /*key*/)
+  virtual AnimationValue operator[](const std::string& /*key*/)
   {
     return AnimationValue(true);
   }

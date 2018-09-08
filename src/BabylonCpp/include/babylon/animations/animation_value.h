@@ -1,7 +1,7 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_VALUE_H
 #define BABYLON_ANIMATIONS_ANIMATION_VALUE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/any.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
@@ -26,7 +26,7 @@ public:
   AnimationValue(const Size& value);
   AnimationValue(bool value);
   AnimationValue(int value);
-  AnimationValue(const string_t& value);
+  AnimationValue(const std::string& value);
   AnimationValue(const Color4& value);
   AnimationValue(const Float32Array& value);
   AnimationValue(const AnimationValue& other);
@@ -38,7 +38,7 @@ public:
   AnimationValue subtract(const AnimationValue& fromValue);
   AnimationValue operator-(const AnimationValue& fromValue);
   AnimationValue operator!();
-  AnimationValue operator[](const string_t& property);
+  AnimationValue operator[](const std::string& property);
   AnimationValue copy() const;
 
   operator bool() const
@@ -59,7 +59,7 @@ public:
   Size sizeData;
   bool boolData;
   int intData;
-  string_t stringData;
+  std::string stringData;
   Color4 color4Data;
   Float32Array float32ArrayData;
 

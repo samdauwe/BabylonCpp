@@ -14,7 +14,14 @@
 namespace BABYLON {
 
 class AbstractMesh;
+class GroundMesh;
+class Mesh;
 class Node;
+class Scene;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using GroundMeshPtr   = std::shared_ptr<GroundMesh>;
+using MeshPtr         = std::shared_ptr<Mesh>;
+using NodePtr         = std::shared_ptr<Node>;
 
 namespace Debug {
 class AxesViewer;

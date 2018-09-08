@@ -1,9 +1,14 @@
 #ifndef BABYLON_MATH_FRUSTUM_H
 #define BABYLON_MATH_FRUSTUM_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Matrix;
+class Plane;
 
 /**
  * @brief Represents a Frustum.
@@ -17,7 +22,7 @@ public:
    * @brief Returns a new array of 6 Frustum planes computed by the given
    * transformation matrix.
    */
-  static array_t<Plane, 6> GetPlanes(const Matrix& transform);
+  static std::array<Plane, 6> GetPlanes(const Matrix& transform);
 
   static void GetNearPlaneToRef(const Matrix& transform, Plane& frustumPlane);
   static void GetFarPlaneToRef(const Matrix& transform, Plane& frustumPlane);
@@ -31,7 +36,7 @@ public:
    * computed by the given transformation matrix.
    */
   static void GetPlanesToRef(const Matrix& transform,
-                             array_t<Plane, 6>& frustumPlanes);
+                             std::array<Plane, 6>& frustumPlanes);
 
 }; // end of class Frustum
 

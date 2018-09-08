@@ -1,8 +1,14 @@
 #ifndef BABYLON_CORE_STRING_H
 #define BABYLON_CORE_STRING_H
 
-#include <babylon/babylon_stl.h>
-#include <babylon/babylon_stl_util.h>
+#include <algorithm>
+#include <ostream>
+#include <random>
+#include <regex>
+#include <sstream>
+#include <unordered_map>
+
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 namespace String {
@@ -27,7 +33,7 @@ inline void toString(std::ostream& o, const T& t0, const Ts&... ts)
  * @return A new String, containing the text of the values.
  */
 template <class... T>
-inline string_t concat(const T&... t0)
+inline std::string concat(const T&... t0)
 {
   std::ostringstream o;
   toString(o, t0...);
@@ -40,9 +46,9 @@ inline string_t concat(const T&... t0)
  * @param toCheck. The substring to search for.
  * @return A boolean value, whether or not the string contains the substring.
  */
-inline bool contains(const string_t& s, const string_t& toCheck)
+inline bool contains(const std::string& s, const std::string& toCheck)
 {
-  return (s.find(toCheck) != string_t::npos);
+  return (s.find(toCheck) != std::string::npos);
 }
 
 /**
@@ -52,11 +58,11 @@ inline bool contains(const string_t& s, const string_t& toCheck)
  * @param str. The string to search for and count.
  * @return A number, representing the number of occurrences of the string str.
  */
-inline size_t count(const string_t& s, const string_t& str)
+inline size_t count(const std::string& s, const std::string& str)
 {
   size_t count = 0;
   size_t nPos  = s.find(str, 0); // first occurrence
-  while (nPos != string_t::npos) {
+  while (nPos != std::string::npos) {
     ++count;
     nPos = s.find(str, nPos + 1);
   }
@@ -82,16 +88,16 @@ inline void charCodeToString(std::ostream& o, const T& t0, const Ts&... ts)
  * @param character The character to escape.
  * @return The escaped character.
  */
-inline string_t escape(char character)
+inline std::string escape(char character)
 {
-  static const unordered_map_t<char, string_t> escapedSpecialCharacters
+  static const std::unordered_map<char, std::string> escapedSpecialCharacters
     = {{'.', "\\."}, {'|', "\\|"}, {'*', "\\*"}, {'?', "\\?"},  {'+', "\\+"},
        {'(', "\\("}, {')', "\\)"}, {'{', "\\{"}, {'}', "\\}"},  {'[', "\\["},
        {']', "\\]"}, {'^', "\\^"}, {'$', "\\$"}, {'\\', "\\\\"}};
 
   auto it = escapedSpecialCharacters.find(character);
   if (it == escapedSpecialCharacters.end()) {
-    return string_t(1, character);
+    return std::string(1, character);
   }
 
   return it->second;
@@ -102,10 +108,10 @@ inline string_t escape(char character)
  * @param s The string to escape.
  * @return The escaped string.
  */
-inline string_t escape(const string_t& s)
+inline std::string escape(const std::string& s)
 {
   std::ostringstream ostream;
-  ::std::for_each(s.begin(), s.end(), [&ostream](const char character) {
+  std::for_each(s.begin(), s.end(), [&ostream](const char character) {
     ostream << escape(character);
   });
   return ostream.str();
@@ -116,9 +122,12 @@ inline string_t escape(const string_t& s)
  * @param ss The list of string to escape.
  * @return The escaped list of string.
  */
-inline vector_t<string_t> escape(const vector_t<string_t>& ss)
+inline std::vector<std::string> escape(const std::vector<std::string>& ss)
 {
-  return stl_util::map(ss, [](const string_t& s) { return escape(s); });
+  std::vector<std::string> mapped;
+  std::transform(ss.begin(), ss.end(), std::back_inserter(mapped),
+                 [](const std::string& s) { return escape(s); });
+  return mapped;
 }
 
 /**
@@ -128,12 +137,12 @@ inline vector_t<string_t> escape(const vector_t<string_t>& ss)
  * @return A boolean value, whether or not the string starts with the prefix
  * string.
  */
-inline bool startsWith(const string_t& s, const string_t& prefix)
+inline bool startsWith(const std::string& s, const std::string& prefix)
 {
   if (prefix.size() > s.size()) {
     return false;
   }
-  return ::std::equal(prefix.begin(), prefix.end(), s.begin());
+  return std::equal(prefix.begin(), prefix.end(), s.begin());
 }
 
 /**
@@ -143,12 +152,12 @@ inline bool startsWith(const string_t& s, const string_t& prefix)
  * @return A boolean value, whether or not the string ends with the postfix
  * string.
  */
-inline bool endsWith(const string_t& s, const string_t& postfix)
+inline bool endsWith(const std::string& s, const std::string& postfix)
 {
   if (postfix.size() > s.size()) {
     return false;
   }
-  return ::std::equal(postfix.rbegin(), postfix.rend(), s.rbegin());
+  return std::equal(postfix.rbegin(), postfix.rend(), s.rbegin());
 }
 
 /**
@@ -158,7 +167,7 @@ inline bool endsWith(const string_t& s, const string_t& postfix)
  * unicode number(s).
  */
 template <class... T>
-inline string_t fromCharCode(const T&... t0)
+inline std::string fromCharCode(const T&... t0)
 {
   std::ostringstream o;
   charCodeToString(o, t0...);
@@ -174,11 +183,11 @@ inline string_t fromCharCode(const T&... t0)
  * @return A Number, representing the unicode of the character at the specified
  * index.
  */
-inline uint8_t charCodeAt(const string_t& str, size_t index)
+inline uint8_t charCodeAt(const std::string& str, size_t index)
 {
   if (index < str.size()) {
-    const string_t s = ::std::to_string(str[index]);
-    return static_cast<uint8_t>(::std::stoi(s));
+    const std::string s = std::to_string(str[index]);
+    return static_cast<uint8_t>(std::stoi(s));
   }
 
   return 0;
@@ -189,9 +198,9 @@ inline uint8_t charCodeAt(const string_t& str, size_t index)
  * @param str The source string to convert to the unicode array.
  * @return The unicode array representing the characters of the string.
  */
-inline vector_t<uint8_t> toCharCodes(const string_t& str)
+inline std::vector<uint8_t> toCharCodes(const std::string& str)
 {
-  vector_t<uint8_t> charCodes(str.size());
+  std::vector<uint8_t> charCodes(str.size());
   for (size_t i = 0; i < str.size(); ++i) {
     charCodes[i] = charCodeAt(str, i);
   }
@@ -208,12 +217,12 @@ inline vector_t<uint8_t> toCharCodes(const string_t& str)
  * @return A Number, representing the position where the specified searchvalue
  * occurs for the first time, or -1 if it never occurs.
  */
-inline int indexOf(const string_t& src, const string_t& searchvalue,
+inline int indexOf(const std::string& src, const std::string& searchvalue,
                    size_t start = 0)
 {
-  int index               = -1;
-  string_t::size_type loc = src.find(searchvalue, start);
-  if (loc != string_t::npos) {
+  int index                  = -1;
+  std::string::size_type loc = src.find(searchvalue, start);
+  if (loc != std::string::npos) {
     index = static_cast<int>(loc);
   }
   return index;
@@ -227,12 +236,12 @@ inline int indexOf(const string_t& src, const string_t& searchvalue,
 template <typename T>
 inline bool isDigit(T x)
 {
-  string_t s;
-  ::std::regex e("^-?\\d+", ::std::regex::optimize);
-  ::std::stringstream ss;
+  std::string s;
+  std::regex e("^-?\\d+", std::regex::optimize);
+  std::stringstream ss;
   ss << x;
   ss >> s;
-  if (::std::regex_match(s, e)) {
+  if (std::regex_match(s, e)) {
     return true;
   }
   else {
@@ -247,7 +256,7 @@ inline bool isDigit(T x)
  * @return A new String, containing the joined list.
  */
 template <typename T>
-inline string_t join(const T& v, char delim)
+inline std::string join(const T& v, char delim)
 {
   std::ostringstream s;
   for (const auto& i : v) {
@@ -269,18 +278,18 @@ inline string_t join(const T& v, char delim)
  * @return A Number, representing the position where the specified searchvalue
  * occurs for the first time, or -1 if it never occurs.
  */
-inline int lastIndexOf(const string_t& src, const string_t& searchvalue,
+inline int lastIndexOf(const std::string& src, const std::string& searchvalue,
                        size_t start)
 {
-  int index               = -1;
-  string_t::size_type loc = src.rfind(searchvalue, start);
-  if (loc != string_t::npos) {
+  int index                  = -1;
+  std::string::size_type loc = src.rfind(searchvalue, start);
+  if (loc != std::string::npos) {
     index = static_cast<int>(loc);
   }
   return index;
 }
 
-inline int lastIndexOf(const string_t& src, const string_t& searchvalue)
+inline int lastIndexOf(const std::string& src, const std::string& searchvalue)
 {
   return lastIndexOf(src, searchvalue, src.size());
 }
@@ -303,7 +312,8 @@ inline char nthChar(const char (&arr)[N], unsigned i)
  * width.
  */
 template <typename T>
-void pad(basic_string_t<T>& s, typename basic_string_t<T>::size_type n, T c)
+void pad(std::basic_string<T>& s, typename std::basic_string<T>::size_type n,
+         T c)
 {
   if (n > s.length()) {
     s.append(n - s.length(), c);
@@ -314,12 +324,12 @@ void pad(basic_string_t<T>& s, typename basic_string_t<T>::size_type n, T c)
  * @brief String formatting like sprintf.
  */
 template <typename... Args>
-inline string_t printf(const string_t& format, Args... args)
+inline std::string printf(const std::string& format, Args... args)
 {
   size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1;
-  unique_ptr_t<char[]> buf(new char[size]);
+  std::unique_ptr<char[]> buf(new char[size]);
   snprintf(buf.get(), size, format.c_str(), args...);
-  return string_t(buf.get(), buf.get() + size - 1);
+  return std::string(buf.get(), buf.get() + size - 1);
 }
 
 /**
@@ -327,27 +337,25 @@ inline string_t printf(const string_t& format, Args... args)
  * @param s1 The string to update.
  * @param s2 The string to prepend.
  */
-inline void pushFront(string_t& s1, const string_t& s2)
+inline void pushFront(std::string& s1, const std::string& s2)
 {
   s1.insert(0, s2);
 }
 
 namespace {
-const string_t defaultChars
+const std::string defaultChars
   = "abcdefghijklmnaoqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 }
 
-inline string_t randomString(std::size_t len              = 64,
-                             const string_t& allowedChars = defaultChars)
+inline std::string randomString(std::size_t len                 = 64,
+                                const std::string& allowedChars = defaultChars)
 {
-  ::std::mt19937_64 gen{
-    static_cast<::std::mt19937_64>(::std::random_device()())};
-  ::std::uniform_int_distribution<std::size_t> dist{0,
-                                                    allowedChars.length() - 1};
-  string_t ret;
+  std::mt19937_64 gen{static_cast<std::mt19937_64>(std::random_device()())};
+  std::uniform_int_distribution<std::size_t> dist{0, allowedChars.length() - 1};
+  std::string ret;
   ret.reserve(len);
-  ::std::generate_n(::std::back_inserter(ret), len,
-                    [&] { return allowedChars[dist(gen)]; });
+  std::generate_n(std::back_inserter(ret), len,
+                  [&] { return allowedChars[dist(gen)]; });
   return ret;
 }
 
@@ -357,10 +365,10 @@ inline string_t randomString(std::size_t len              = 64,
  * @param subStr. The substring to remove.
  * @return Reference to the updated string.
  */
-inline string_t& removeSubstring(string_t& s, const string_t& subStr)
+inline std::string& removeSubstring(std::string& s, const std::string& subStr)
 {
   auto n = subStr.length();
-  for (auto i = s.find(subStr); i != string_t::npos; i = s.find(subStr)) {
+  for (auto i = s.find(subStr); i != std::string::npos; i = s.find(subStr)) {
     s.erase(i, n);
   }
   return s;
@@ -374,34 +382,33 @@ inline string_t& removeSubstring(string_t& s, const string_t& subStr)
  * @return List with matches.
  */
 template <typename T>
-inline vector_t<T> regexMatch(const T& s, const ::std::regex& re)
+inline std::vector<T> regexMatch(const T& s, const std::regex& re)
 {
-  vector_t<T> result;
-  ::std::smatch smatch;
+  std::vector<T> result;
+  std::smatch smatch;
   if (regex_search(s, smatch, re)) {
-    ::std::copy(smatch.begin(), smatch.end(), ::std::back_inserter(result));
+    std::copy(smatch.begin(), smatch.end(), std::back_inserter(result));
   }
 
   return result;
 }
 
 template <class BidirIt, class Traits, class CharT, class UnaryFunction>
-basic_string_t<CharT> inline regexReplace(
-  BidirIt first, BidirIt last, const ::std::basic_regex<CharT, Traits>& re,
+std::basic_string<CharT> inline regexReplace(
+  BidirIt first, BidirIt last, const std::basic_regex<CharT, Traits>& re,
   UnaryFunction f)
 {
-  basic_string_t<CharT> s;
+  std::basic_string<CharT> s;
 
-  typename ::std::match_results<BidirIt>::difference_type positionOfLastMatch
-    = 0;
+  typename std::match_results<BidirIt>::difference_type positionOfLastMatch = 0;
   auto endOfLastMatch = first;
 
-  auto callback = [&](const ::std::match_results<BidirIt>& match) {
+  auto callback = [&](const std::match_results<BidirIt>& match) {
     auto positionOfThisMatch = match.position(0);
     auto diff                = positionOfThisMatch - positionOfLastMatch;
 
     auto startOfThisMatch = endOfLastMatch;
-    ::std::advance(startOfThisMatch, diff);
+    std::advance(startOfThisMatch, diff);
 
     s.append(endOfLastMatch, startOfThisMatch);
     s.append(f(match));
@@ -411,11 +418,11 @@ basic_string_t<CharT> inline regexReplace(
     positionOfLastMatch = positionOfThisMatch + lengthOfMatch;
 
     endOfLastMatch = startOfThisMatch;
-    ::std::advance(endOfLastMatch, lengthOfMatch);
+    std::advance(endOfLastMatch, lengthOfMatch);
   };
 
-  ::std::sregex_iterator begin(first, last, re), end;
-  ::std::for_each(begin, end, callback);
+  std::sregex_iterator begin(first, last, re), end;
+  std::for_each(begin, end, callback);
 
   s.append(endOfLastMatch, last);
 
@@ -431,13 +438,14 @@ basic_string_t<CharT> inline regexReplace(
  * @param replace The regex replacement format string.
  * @return Result of the replacement.
  */
-inline string_t regexReplace(const string_t& source, const string_t& reSearch,
-                             const string_t& replace)
+inline std::string regexReplace(const std::string& source,
+                                const std::string& reSearch,
+                                const std::string& replace)
 {
-  string_t result;
-  ::std::regex regex(reSearch, ::std::regex::optimize);
-  ::std::regex_replace(::std::back_inserter(result), source.begin(),
-                       source.end(), regex, replace);
+  std::string result;
+  std::regex regex(reSearch, std::regex::optimize);
+  std::regex_replace(std::back_inserter(result), source.begin(), source.end(),
+                     regex, replace);
   return result;
 }
 
@@ -451,9 +459,9 @@ inline string_t regexReplace(const string_t& source, const string_t& reSearch,
  * @return Result of the replacement.
  */
 template <class Traits, class CharT, class UnaryFunction>
-inline string_t regexReplace(const string_t& source,
-                             const ::std::basic_regex<CharT, Traits>& reSearch,
-                             UnaryFunction f)
+inline std::string regexReplace(const std::string& source,
+                                const std::basic_regex<CharT, Traits>& reSearch,
+                                UnaryFunction f)
 {
   return regexReplace(source.cbegin(), source.cend(), reSearch, f);
 }
@@ -466,9 +474,9 @@ inline string_t regexReplace(const string_t& source,
  * in the new string.
  * @return A String, a new string containing copies of the original string.
  */
-inline string_t repeat(const string_t& str, size_t count)
+inline std::string repeat(const std::string& str, size_t count)
 {
-  string_t result;
+  std::string result;
   result.reserve(count * str.length());
   for (size_t i = 0; i < count; ++i) {
     result += str;
@@ -485,11 +493,11 @@ inline string_t repeat(const string_t& str, size_t count)
  * @param replace Required. The value to replace the search value with.
  * @return A string in which the specified value has been replaced.
  */
-inline string_t replace(string_t source, const string_t& search,
-                        const string_t& replace)
+inline std::string replace(std::string source, const std::string& search,
+                           const std::string& replace)
 {
   size_t pos = 0;
-  while ((pos = source.find(search, pos)) != string_t::npos) {
+  while ((pos = source.find(search, pos)) != std::string::npos) {
     source.replace(pos, search.length(), replace);
     pos += replace.length();
   }
@@ -504,17 +512,17 @@ inline string_t replace(string_t source, const string_t& search,
  * @param search Required. The value that will be replaced by the replace value.
  * @param replace Required. The value to replace the search value with.
  */
-inline void replaceInPlace(string_t& source, const string_t& search,
-                           const string_t& replace)
+inline void replaceInPlace(std::string& source, const std::string& search,
+                           const std::string& replace)
 {
   size_t pos = 0;
-  while ((pos = source.find(search, pos)) != string_t::npos) {
+  while ((pos = source.find(search, pos)) != std::string::npos) {
     source.replace(pos, search.length(), replace);
     pos += replace.length();
   }
 }
 
-inline string_t slice(const string_t& s, size_t start = 0)
+inline std::string slice(const std::string& s, size_t start = 0)
 {
   return s.substr(start);
 }
@@ -526,12 +534,12 @@ inline string_t slice(const string_t& s, size_t start = 0)
  * string.
  * @return An Array, containing the splitted values.
  */
-inline vector_t<string_t> split(const string_t& value, char separator)
+inline std::vector<std::string> split(const std::string& value, char separator)
 {
-  vector_t<string_t> result;
-  string_t::size_type p = 0;
-  string_t::size_type q;
-  while ((q = value.find(separator, p)) != string_t::npos) {
+  std::vector<std::string> result;
+  std::string::size_type p = 0;
+  std::string::size_type q;
+  while ((q = value.find(separator, p)) != std::string::npos) {
     result.emplace_back(value, p, q - p);
     p = q + 1;
   }
@@ -544,10 +552,10 @@ inline vector_t<string_t> split(const string_t& value, char separator)
  * @param source Required. The string to convert.
  * @return A String, representing the value of a string converted to lowercase.
  */
-inline string_t toLowerCase(const string_t& source)
+inline std::string toLowerCase(const std::string& source)
 {
-  string_t lcs = source;
-  ::std::transform(lcs.begin(), lcs.end(), lcs.begin(), ::tolower);
+  std::string lcs = source;
+  std::transform(lcs.begin(), lcs.end(), lcs.begin(), ::tolower);
   return lcs;
 }
 
@@ -556,10 +564,10 @@ inline string_t toLowerCase(const string_t& source)
  * @param source Required. The string to convert.
  * @return A String, representing the value of a string converted to uppercase.
  */
-inline string_t toUpperCase(const string_t& source)
+inline std::string toUpperCase(const std::string& source)
 {
-  string_t ucs = source;
-  ::std::transform(ucs.begin(), ucs.end(), ucs.begin(), ::toupper);
+  std::string ucs = source;
+  std::transform(ucs.begin(), ucs.end(), ucs.begin(), ::toupper);
   return ucs;
 }
 
@@ -569,10 +577,10 @@ inline string_t toUpperCase(const string_t& source)
  * @return A number, representing the numeric value of the string.
  */
 template <typename T>
-inline T toNumber(const string_t& str)
+inline T toNumber(const std::string& str)
 {
   T value;
-  ::std::stringstream ss(str);
+  std::stringstream ss(str);
   ss >> value;
   return value;
 }
@@ -583,9 +591,9 @@ inline T toNumber(const string_t& str)
  * @return A string, representing the string value of the number.
  */
 template <typename T>
-inline string_t toString(const T& number)
+inline std::string toString(const T& number)
 {
-  ::std::stringstream ss;
+  std::stringstream ss;
   ss << number;
   return ss.str();
 }
@@ -594,7 +602,7 @@ inline string_t toString(const T& number)
  * @brief Upper-cases the first letter of each word.
  * @param str. The string to titlecase.
  */
-inline string_t& toTitleCase(string_t& str)
+inline std::string& toTitleCase(std::string& str)
 {
   auto it = str.begin();
   *it     = static_cast<char>(toupper(*it));
@@ -611,10 +619,10 @@ inline string_t& toTitleCase(string_t& str)
  * @param str The input string.
  * @return Returns a string with whitespace stripped from the beginning of str.
  */
-inline string_t& trimLeft(string_t& str)
+inline std::string& trimLeft(std::string& str)
 {
-  auto it2 = ::std::find_if(str.begin(), str.end(), [](char ch) {
-    return !::std::isspace<char>(ch, ::std::locale::classic());
+  auto it2 = std::find_if(str.begin(), str.end(), [](char ch) {
+    return !std::isspace<char>(ch, std::locale::classic());
   });
   str.erase(str.begin(), it2);
   return str;
@@ -625,10 +633,10 @@ inline string_t& trimLeft(string_t& str)
  * @param str The input string.
  * @return A string with whitespace stripped from the end of str.
  */
-inline string_t& trimRight(string_t& str)
+inline std::string& trimRight(std::string& str)
 {
-  auto it1 = ::std::find_if(str.rbegin(), str.rend(), [](char ch) {
-    return !::std::isspace<char>(ch, ::std::locale::classic());
+  auto it1 = std::find_if(str.rbegin(), str.rend(), [](char ch) {
+    return !std::isspace<char>(ch, std::locale::classic());
   });
   str.erase(it1.base(), str.end());
   return str;
@@ -639,7 +647,7 @@ inline string_t& trimRight(string_t& str)
  * @param str The input string.
  * @return The string with whitespace stripped from the beginning end of str.
  */
-inline string_t& trim(string_t& str)
+inline std::string& trim(std::string& str)
 {
   return trimLeft(trimRight(str));
 }
@@ -650,7 +658,7 @@ inline string_t& trim(string_t& str)
  * @return A copy of the string with whitespace stripped from the beginning end
  * of str.
  */
-inline string_t trimCopy(const string_t& str)
+inline std::string trimCopy(const std::string& str)
 {
   auto s = str;
   return trimLeft(trimRight(s));

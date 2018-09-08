@@ -1,8 +1,10 @@
 #ifndef BABYLON_MATH_POSITION_NORMAL_VERTEX_H
 #define BABYLON_MATH_POSITION_NORMAL_VERTEX_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <ostream>
 
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -21,7 +23,7 @@ public:
   PositionNormalVertex& operator=(PositionNormalVertex&& other);
   ~PositionNormalVertex();
   PositionNormalVertex copy() const;
-  unique_ptr_t<PositionNormalVertex> clone() const;
+  std::unique_ptr<PositionNormalVertex> clone() const;
   friend std::ostream&
   operator<<(std::ostream& os,
              const PositionNormalVertex& positionNormalVertex);
