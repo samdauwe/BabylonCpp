@@ -6,22 +6,26 @@
 
 namespace BABYLON {
 
+class ProceduralTexture;
+using ProceduralTexturePtr = shared_ptr_t<ProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT ProceduralTexture : public Texture {
 
   friend class CustomProceduralTexture;
 
 public:
   template <typename... Ts>
-  static ProceduralTexture* New(Ts&&... args)
+  static ProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new ProceduralTexture(::std::forward<Ts>(args)...);
-    texture->addToScene(static_cast<unique_ptr_t<ProceduralTexture>>(texture));
+    auto texture = shared_ptr_t<ProceduralTexture>(
+      new ProceduralTexture(::std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }
   ~ProceduralTexture() override;
 
-  void addToScene(unique_ptr_t<ProceduralTexture>&& newTexture);
+  void addToScene(const ProceduralTexturePtr& newTexture);
 
   /** Hidden */
   void _rebuild() override;
@@ -55,7 +59,7 @@ public:
   ProceduralTexture& setVector3(const string_t& name, const Vector3& value);
   ProceduralTexture& setMatrix(const string_t& name, const Matrix& value);
   virtual void render(bool useCameraPostProcess = false);
-  ProceduralTexture* clone();
+  ProceduralTexturePtr clone();
   void dispose() override;
 
 protected:

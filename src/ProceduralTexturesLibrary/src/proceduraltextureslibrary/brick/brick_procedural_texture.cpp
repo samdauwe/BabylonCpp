@@ -1,6 +1,8 @@
 #include <babylon/proceduraltextureslibrary/brick/brick_procedural_texture.h>
 
 #include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/brick/brick_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -30,6 +32,10 @@ BrickProceduralTexture::BrickProceduralTexture(const std::string& iName,
     , _jointColor{Color3(0.72f, 0.72f, 0.72f)}
     , _brickColor{Color3(0.77f, 0.47f, 0.40f)}
 {
+  // Fragment shader
+  Effect::ShadersStore["brickProceduralTexturePixelShader"]
+    = brickProceduralTexturePixelShader;
+
   updateShaderUniforms();
 }
 

@@ -121,9 +121,9 @@ ProceduralTexture::~ProceduralTexture()
 {
 }
 
-void ProceduralTexture::addToScene(unique_ptr_t<ProceduralTexture>&& newTexture)
+void ProceduralTexture::addToScene(const ProceduralTexturePtr& newTexture)
 {
-  getScene()->proceduralTextures.emplace_back(::std::move(newTexture));
+  getScene()->proceduralTextures.emplace_back(newTexture);
 }
 
 void ProceduralTexture::_createIndexBuffer()
@@ -486,7 +486,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   }
 }
 
-ProceduralTexture* ProceduralTexture::clone()
+ProceduralTexturePtr ProceduralTexture::clone()
 {
   auto textureSize = getSize();
   auto newTexture
@@ -512,11 +512,11 @@ void ProceduralTexture::dispose()
   }
 
   scene->proceduralTextures.erase(
-    ::std::remove_if(
-      scene->proceduralTextures.begin(), scene->proceduralTextures.end(),
-      [this](const unique_ptr_t<ProceduralTexture>& proceduralTexture) {
-        return proceduralTexture.get() == this;
-      }),
+    ::std::remove_if(scene->proceduralTextures.begin(),
+                     scene->proceduralTextures.end(),
+                     [this](const ProceduralTexturePtr& proceduralTexture) {
+                       return proceduralTexture.get() == this;
+                     }),
     scene->proceduralTextures.end());
 
   auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];

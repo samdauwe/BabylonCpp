@@ -22,6 +22,9 @@
 
 namespace BABYLON {
 
+class ProceduralTexture;
+using ProceduralTexturePtr = shared_ptr_t<ProceduralTexture>;
+
 /**
  * @brief Represents a scene to be rendered by the engine.
  * @see http://doc.babylonjs.com/features/scene
@@ -2719,7 +2722,7 @@ public:
    * The list of procedural textures added to the scene
    * @see http://doc.babylonjs.com/how_to/how_to_use_procedural_textures
    */
-  vector_t<unique_ptr_t<ProceduralTexture>> proceduralTextures;
+  vector_t<ProceduralTexturePtr> proceduralTextures;
 
   // Sound Tracks
 
