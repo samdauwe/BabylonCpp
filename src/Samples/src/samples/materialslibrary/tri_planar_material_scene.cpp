@@ -14,6 +14,9 @@ namespace Samples {
 
 TriPlanarMaterialScene::TriPlanarMaterialScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
+    , _triPlanarMaterial{nullptr}
+    , _defaultMaterial{nullptr}
+    , _ground{nullptr}
 {
 }
 

@@ -15,6 +15,9 @@ namespace Samples {
 /**
  * @brief Scene demonstrating the use of the Tri-Planar material from the
  * materials library.
+ * Press the following keys:
+ * - 1: to activate the Tri-Planar material (by default)
+ * - 2: to active the default material
  * @see https://www.babylonjs-playground.com/#E6OZX#9
  */
 class TriPlanarMaterialScene : public IRenderableScene {
