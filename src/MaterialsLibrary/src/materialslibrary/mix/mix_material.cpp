@@ -12,7 +12,9 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/materialslibrary/mix/mix_fragment_fx.h>
 #include <babylon/materialslibrary/mix/mix_material_defines.h>
+#include <babylon/materialslibrary/mix/mix_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -54,6 +56,11 @@ MixMaterial::MixMaterial(const std::string& iName, Scene* scene)
     , _maxSimultaneousLights{4}
     , _renderId{-1}
 {
+  // Vertex shader
+  Effect::ShadersStore["mixVertexShader"] = mixVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore["mixPixelShader"] = mixPixelShader;
 }
 
 MixMaterial::~MixMaterial()

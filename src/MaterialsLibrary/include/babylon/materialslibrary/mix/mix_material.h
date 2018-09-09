@@ -9,10 +9,21 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class MixMaterial;
+using MixMaterialPtr = shared_ptr_t<MixMaterial>;
+
 class BABYLON_SHARED_EXPORT MixMaterial : public PushMaterial {
 
 public:
-  MixMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static MixMaterialPtr New(Ts&&... args)
+  {
+    auto material
+      = shared_ptr_t<MixMaterial>(new MixMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~MixMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -36,6 +47,8 @@ public:
                             const std::string& rootUrl);
 
 protected:
+  MixMaterial(const std::string& name, Scene* scene);
+
   BaseTexturePtr& get_mixTexture1();
   void set_mixTexture1(const BaseTexturePtr& value);
   BaseTexturePtr& get_mixTexture2();
