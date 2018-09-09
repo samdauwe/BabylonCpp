@@ -1,9 +1,11 @@
 #ifndef BABYLON_ENGINE_NODE_H
 #define BABYLON_ENGINE_NODE_H
 
+#include <functional>
+
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/behaviors/ibehavior_aware.h>
 #include <babylon/core/json.h>
 #include <babylon/core/structs.h>
@@ -13,17 +15,30 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
+class Animatable;
+struct AnimationPropertiesOverride;
+class Engine;
+class Node;
+class Scene;
+class TransformNode;
+using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;
+using AnimatablePtr    = std::shared_ptr<Animatable>;
+using NodePtr          = std::shared_ptr<Node>;
+using TransformNodePtr = std::shared_ptr<TransformNode>;
+
 /**
  * Defines how a node can be built from a string name.
  */
-using NodeConstructor = ::std::function<NodePtr(
-  const string_t& name, Scene* scene, const nullable_t<Json::value>& options)>;
+using NodeConstructor
+  = std::function<NodePtr(const std::string& name, Scene* scene,
+                          const std::optional<Json::value>& options)>;
 
 /**
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera,
  * etc.).
  */
-class BABYLON_SHARED_EXPORT Node : public ::std::enable_shared_from_this<Node>,
+class BABYLON_SHARED_EXPORT Node : public std::enable_shared_from_this<Node>,
                                    public IAnimatable,
                                    public IBehaviorAware<Node>,
                                    public IDisposable {
@@ -31,7 +46,7 @@ class BABYLON_SHARED_EXPORT Node : public ::std::enable_shared_from_this<Node>,
   friend class UtilityLayerRenderer;
 
 private:
-  static unordered_map_t<string_t, NodeConstructor> _NodeConstructors;
+  static std::unordered_map<std::string, NodeConstructor> _NodeConstructors;
 
 public:
   /**
@@ -39,7 +54,7 @@ public:
    * @param type defines the type name of the node to construct
    * @param constructorFunc defines the constructor function
    */
-  static void AddNodeConstructor(const string_t& type,
+  static void AddNodeConstructor(const std::string& type,
                                  const NodeConstructor& constructorFunc);
 
   /**
@@ -50,9 +65,9 @@ public:
    * @param options defines optional options to transmit to constructors
    * @returns the new constructor or null
    */
-  static ::std::function<NodePtr()>
-  Construct(const string_t& type, const string_t& name, Scene* scene,
-            const nullable_t<Json::value>& options = nullopt_t);
+  static std::function<NodePtr()>
+  Construct(const std::string& type, const std::string& name, Scene* scene,
+            const std::optional<Json::value>& options = std::nullopt);
 
 public:
   /**
@@ -60,11 +75,11 @@ public:
    * @param {string} name - the name and id to be given to this node
    * @param {BABYLON.Scene} the scene this node will be added to
    */
-  Node(const string_t& name, Scene* scene = nullptr);
+  Node(const std::string& name, Scene* scene = nullptr);
   virtual ~Node() override;
 
   template <typename Derived>
-  shared_ptr_t<Derived> shared_from_base()
+  std::shared_ptr<Derived> shared_from_base()
   {
     return std::static_pointer_cast<Derived>(shared_from_this());
   }
@@ -81,7 +96,7 @@ public:
    * @brief Gets a string idenfifying the name of the class.
    * @returns "Node" string
    */
-  virtual const string_t getClassName() const;
+  virtual const std::string getClassName() const;
 
   /**
    * @brief Gets the scene of the node.
@@ -118,7 +133,7 @@ public:
    * @see http://doc.babylonjs.com/features/behaviour
    * @returns null if behavior was not found else the requested behavior
    */
-  Behavior<Node>* getBehaviorByName(const string_t& name) override;
+  Behavior<Node>* getBehaviorByName(const std::string& name) override;
 
   /**
    * @brief Returns the world matrix of the node.
@@ -221,9 +236,10 @@ public:
    * part of the result, otherwise it will be ignored.
    */
   template <typename T>
-  void _getDescendants(
-    vector_t<shared_ptr_t<T>>& results, bool directDescendantsOnly = false,
-    const ::std::function<bool(const NodePtr& node)>& predicate = nullptr);
+  void _getDescendants(std::vector<std::shared_ptr<T>>& results,
+                       bool directDescendantsOnly = false,
+                       const std::function<bool(const NodePtr& node)>& predicate
+                       = nullptr);
 
   /**
    * @brief Will return all nodes that have this node as ascendant.
@@ -236,9 +252,9 @@ public:
    * part of the result, otherwise it will be ignored
    * @return all children nodes of all types
    */
-  vector_t<NodePtr>
+  std::vector<NodePtr>
   getDescendants(bool directDescendantsOnly = false,
-                 const ::std::function<bool(const NodePtr& node)>& predicate
+                 const std::function<bool(const NodePtr& node)>& predicate
                  = nullptr);
 
   /**
@@ -252,9 +268,9 @@ public:
    * part of the result, otherwise it will be ignored
    * @returns an array of {BABYLON.AbstractMesh}
    */
-  virtual vector_t<AbstractMeshPtr>
+  virtual std::vector<AbstractMeshPtr>
   getChildMeshes(bool directDescendantsOnly = false,
-                 const ::std::function<bool(const NodePtr& node)>& predicate
+                 const std::function<bool(const NodePtr& node)>& predicate
                  = nullptr);
 
   /**
@@ -268,9 +284,9 @@ public:
    * part of the result, otherwise it will be ignored
    * @returns an array of {BABYLON.TransformNode}
    */
-  virtual vector_t<TransformNodePtr> getChildTransformNodes(
-    bool directDescendantsOnly                                  = false,
-    const ::std::function<bool(const NodePtr& node)>& predicate = nullptr);
+  virtual std::vector<TransformNodePtr> getChildTransformNodes(
+    bool directDescendantsOnly                                = false,
+    const std::function<bool(const NodePtr& node)>& predicate = nullptr);
 
   /**
    * @brief Get all direct children of this node.
@@ -279,8 +295,8 @@ public:
    * part of the result, otherwise it will be ignored
    * @returns an array of {BABYLON.Node}
    */
-  vector_t<NodePtr>
-  getChildren(const ::std::function<bool(const NodePtr& node)>& predicate
+  std::vector<NodePtr>
+  getChildren(const std::function<bool(const NodePtr& node)>& predicate
               = nullptr);
 
   /**
@@ -291,14 +307,14 @@ public:
   /**
    * @brief Hidden
    */
-  virtual vector_t<AnimationPtr> getAnimations() override;
+  virtual std::vector<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Get an animation by name.
    * @param name defines the name of the animation to look for
    * @returns null if not found else the requested animation
    */
-  AnimationPtr getAnimationByName(const string_t& name);
+  AnimationPtr getAnimationByName(const std::string& name);
 
   /**
    * @brief Creates an animation range for this node.
@@ -306,7 +322,7 @@ public:
    * @param from defines the starting key
    * @param to defines the end key
    */
-  void createAnimationRange(const string_t& name, float from, float to);
+  void createAnimationRange(const std::string& name, float from, float to);
 
   /**
    * @brief Delete a specific animation range.
@@ -314,14 +330,14 @@ public:
    * @param deleteFrames defines if animation frames from the range must be
    * deleted as well
    */
-  void deleteAnimationRange(const string_t& name, bool deleteFrames = true);
+  void deleteAnimationRange(const std::string& name, bool deleteFrames = true);
 
   /**
    * @brief Get an animation range by name.
    * @param name defines the name of the animation range to look for
    * @returns null if not found else the requested animation range
    */
-  AnimationRange* getAnimationRange(const string_t& name);
+  AnimationRange* getAnimationRange(const std::string& name);
 
   /**
    * @brief Will start the animation sequence.
@@ -334,16 +350,15 @@ public:
    * @returns the object created for this animation. If range does not exist, it
    * will return null
    */
-  AnimatablePtr beginAnimation(const string_t& name, bool loop = false,
-                               float speedRatio = 1.f,
-                               ::std::function<void()> onAnimationEnd
-                               = nullptr);
+  AnimatablePtr beginAnimation(const std::string& name, bool loop = false,
+                               float speedRatio                     = 1.f,
+                               std::function<void()> onAnimationEnd = nullptr);
 
   /**
    * @brief Serialize animation ranges into a JSON compatible object.
    * @returns serialization object
    */
-  vector_t<AnimationRange> serializeAnimationRanges();
+  std::vector<AnimationRange> serializeAnimationRanges();
 
   /**
    * @brief Computes the world matrix of the node.
@@ -399,24 +414,24 @@ protected:
    * @brief Sets a callback that will be raised when the node will be disposed.
    */
   void set_onDispose(
-    const ::std::function<void(Node* node, EventState& es)>& callback);
+    const std::function<void(Node* node, EventState& es)>& callback);
 
   /**
    * @brief Gets the list of attached behaviors.
    * @see http://doc.babylonjs.com/features/behaviour
    */
-  vector_t<Behavior<Node>*>& get_behaviors();
+  std::vector<Behavior<Node>*>& get_behaviors();
 
 public:
   /**
    * Gets or sets the name of the node
    */
-  string_t name;
+  std::string name;
 
   /**
    * Gets or sets the id of the node
    */
-  string_t id;
+  std::string id;
 
   /**
    * Gets or sets the unique id of the node
@@ -438,16 +453,16 @@ public:
   /**
    * Gets a list of Animations associated with the node.
    */
-  vector_t<AnimationPtr> animations;
+  std::vector<AnimationPtr> animations;
 
   /**
    * Callback raised when the node is ready to be used
    */
-  ::std::function<void(Node* node)> onReady;
+  std::function<void(Node* node)> onReady;
 
   int _currentRenderId;
-  string_t parentId;
-  string_t _waitingParentId;
+  std::string parentId;
+  std::string _waitingParentId;
 
   /** Hidden */
   Scene* _scene;
@@ -468,16 +483,16 @@ public:
   /**
    * Callback that will be raised when the node will be disposed.
    */
-  WriteOnlyProperty<Node, ::std::function<void(Node* node, EventState& es)>>
+  WriteOnlyProperty<Node, std::function<void(Node* node, EventState& es)>>
     onDispose;
 
   /**
    * List of attached behaviors
    */
-  ReadOnlyProperty<Node, vector_t<Behavior<Node>*>> behaviors;
+  ReadOnlyProperty<Node, std::vector<Behavior<Node>*>> behaviors;
 
 protected:
-  unordered_map_t<string_t, unique_ptr_t<AnimationRange>> _ranges;
+  std::unordered_map<std::string, std::unique_ptr<AnimationRange>> _ranges;
   int _childRenderId;
 
 private:
@@ -485,13 +500,13 @@ private:
   bool _isReady;
   int _parentRenderId;
   Node* _parentNode;
-  vector_t<NodePtr> _children;
+  std::vector<NodePtr> _children;
   AnimationPropertiesOverride* _animationPropertiesOverride;
-  unique_ptr_t<Matrix> _worldMatrix;
+  std::unique_ptr<Matrix> _worldMatrix;
   Observer<Node>::Ptr _onDisposeObserver;
 
   // Behaviors
-  vector_t<Behavior<Node>*> _behaviors;
+  std::vector<Behavior<Node>*> _behaviors;
 
 }; // end of class Node
 

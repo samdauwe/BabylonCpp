@@ -1,11 +1,34 @@
 #ifndef BABYLON_ACTIONS_ACTION_H
 #define BABYLON_ACTIONS_ACTION_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/tools/observable.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class Action;
+class ActionEvent;
+class ActionManager;
+class AnimationValue;
+class Condition;
+class IAnimatable;
+using ActionPtr      = std::shared_ptr<Action>;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief The action to be carried out following a trigger.
@@ -16,7 +39,7 @@ class BABYLON_SHARED_EXPORT Action
 
 public:
   template <typename... Ts>
-  static shared_ptr_t<Action> New(Ts&&... args)
+  static ActionPtr New(Ts&&... args)
   {
     return std::make_shared<Action>(std::forward<Ts>(args)...);
   }
@@ -42,7 +65,7 @@ public:
    * @brief Gets the trigger parameters.
    * @returns the trigger parameters
    */
-  string_t getTriggerParameter() const;
+  std::string getTriggerParameter() const;
 
   /**
    * @brief Internal only - executes current action event.
@@ -71,13 +94,13 @@ public:
   /**
    * @brief Internal only.
    */
-  string_t _getProperty(const string_t& propertyPath);
+  std::string _getProperty(const std::string& propertyPath);
 
   /**
    * @brief Internal only.
    */
   IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
-                                     const string_t& propertyPath);
+                                     const std::string& propertyPath);
 
   /**
    * @brief Serialize placeholder for child classes.
@@ -91,7 +114,7 @@ public:
   /**
    * @brief Internal only.
    */
-  static string_t _SerializeValueAsString(const AnimationValue& value);
+  static std::string _SerializeValueAsString(const AnimationValue& value);
 
   /**
    * @brief Internal only.
@@ -125,7 +148,7 @@ private:
   Action* _nextActiveAction;
   Action* _child;
   Condition* _condition;
-  string_t _triggerParameter;
+  std::string _triggerParameter;
 
 }; // end of class Action
 

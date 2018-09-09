@@ -7,7 +7,7 @@ namespace BABYLON {
 
 SetValueAction::SetValueAction(unsigned int triggerOptions,
                                const IAnimatablePtr& target,
-                               const string_t& propertyPath,
+                               const std::string& propertyPath,
                                AnimationValue* value, Condition* condition)
     : Action(triggerOptions, condition)
     , _target{target}

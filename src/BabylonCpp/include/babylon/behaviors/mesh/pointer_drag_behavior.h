@@ -1,7 +1,7 @@
 #ifndef BABYLON_BEHAVIORS_MESH_POINTER_DRAG_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_MESH_POINTER_DRAG_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/behaviors/mesh/pointer_drag_behavior_options.h>
 #include <babylon/core/structs.h>
@@ -9,6 +9,13 @@
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Mesh;
+class PointerInfo;
+class Ray;
+class Scene;
+using MeshPtr = std::shared_ptr<Mesh>;
+using NodePtr = std::shared_ptr<Node>;
 
 /**
  * @brief A behavior that when attached to a mesh will allow the mesh to be
@@ -30,7 +37,7 @@ public:
   /**
    * @brief The name of the behavior.
    */
-  const string_t name() const;
+  const std::string name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -51,7 +58,7 @@ public:
   void detach() override;
 
 private:
-  nullable_t<Vector3> _pickWithRayOnDragPlane(const nullable_t<Ray>& ray);
+  std::optional<Vector3> _pickWithRayOnDragPlane(const std::optional<Ray>& ray);
 
   /**
    * @brief Position the drag plane based on the attached mesh position, for
@@ -128,7 +135,7 @@ public:
    */
   bool useObjectOrienationForDragging;
 
-  static unique_ptr_t<Scene> _planeScene;
+  static std::unique_ptr<Scene> _planeScene;
 
 private:
   NodePtr _attachedNode;

@@ -2,7 +2,7 @@
 #define BABYLON_ACTIONS_DIRECTACTIONS_STOP_ANIMATION_ACTION_H
 
 #include <babylon/actions/action.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -10,7 +10,7 @@ class BABYLON_SHARED_EXPORT SetValueAction : public Action {
 
 public:
   SetValueAction(unsigned int triggerOptions, const IAnimatablePtr& target,
-                 const string_t& propertyPath, AnimationValue* value,
+                 const std::string& propertyPath, AnimationValue* value,
                  Condition* condition = nullptr);
   ~SetValueAction() override;
 
@@ -25,8 +25,8 @@ public:
 private:
   IAnimatablePtr _target;
   IAnimatablePtr _effectiveTarget;
-  string_t _property;
-  string_t _propertyPath;
+  std::string _property;
+  std::string _propertyPath;
   AnimationValue* _value;
 
 }; // end of class SetValueAction

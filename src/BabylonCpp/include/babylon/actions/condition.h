@@ -1,9 +1,27 @@
 #ifndef BABYLON_ACTIONS_CONDITION_H
 #define BABYLON_ACTIONS_CONDITION_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+#include <memory>
+#include <string>
+
+#include <babylon/babylon_api.h>
+
+namespace picojson {
+class value;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
 
 namespace BABYLON {
+
+class ActionManager;
+class IAnimatable;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief A Condition applied to an Action.
@@ -31,13 +49,13 @@ public:
   /**
    * @brief Internal only.
    */
-  string_t _getProperty(const string_t& propertyPath);
+  std::string _getProperty(const std::string& propertyPath);
 
   /**
    * @brief Internal only.
    */
   IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
-                                     const string_t& propertyPath);
+                                     const std::string& propertyPath);
 
   /**
    * @brief Serialize placeholder for child classes.

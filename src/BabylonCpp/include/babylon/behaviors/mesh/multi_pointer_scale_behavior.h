@@ -1,12 +1,17 @@
 #ifndef BABYLON_BEHAVIORS_MESH_MULTI_POINTER_SCALE_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_MESH_MULTI_POINTER_SCALE_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Mesh;
+class PointerDragBehavior;
+class Scene;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief A behavior that when attached to a mesh will allow the mesh to be
@@ -24,7 +29,7 @@ public:
   /**
    * @brief The name of the behavior.
    */
-  const string_t name() const;
+  const std::string name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -46,8 +51,8 @@ private:
   float _getCurrentDistance();
 
 private:
-  unique_ptr_t<PointerDragBehavior> _dragBehaviorA;
-  unique_ptr_t<PointerDragBehavior> _dragBehaviorB;
+  std::unique_ptr<PointerDragBehavior> _dragBehaviorA;
+  std::unique_ptr<PointerDragBehavior> _dragBehaviorB;
   float _startDistance;
   Vector3 _initialScale;
   Vector3 _targetScale;

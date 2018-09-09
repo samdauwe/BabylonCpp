@@ -1,10 +1,15 @@
 #ifndef BABYLON_ACTIONS_ACTIONEVENT_H
 #define BABYLON_ACTIONS_ACTIONEVENT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Scene;
+class Sprite;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief ActionEvent is the event being sent when an action is triggered.
@@ -24,8 +29,8 @@ public:
    */
   ActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
               const AbstractMeshPtr& meshUnderPointer,
-              const nullable_t<Event>& sourceEvent,
-              const string_t& additionalData = "");
+              const std::optional<Event>& sourceEvent,
+              const std::string& additionalData = "");
   ActionEvent(const ActionEvent& other);
   ActionEvent(ActionEvent&& other);
   ActionEvent& operator=(const ActionEvent& other);
@@ -40,7 +45,7 @@ public:
    * @returns the new ActionEvent
    */
   static ActionEvent CreateNew(const AbstractMeshPtr& source,
-                               const nullable_t<Event>& evt = nullopt_t);
+                               const std::optional<Event>& evt = std::nullopt);
 
   /**
    * @brief Helper function to auto-create an ActionEvent from a source sprite.
@@ -72,7 +77,8 @@ public:
    */
   static ActionEvent
   CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos,
-                         const Event& evt, const string_t& additionalData = "");
+                         const Event& evt,
+                         const std::string& additionalData = "");
 
 public:
   /** The mesh that triggered the action */
@@ -86,9 +92,9 @@ public:
   /** The mesh that is currently pointed at (can be null) */
   AbstractMeshPtr meshUnderPointer;
   /** The original (browser) event that triggered the ActionEvent */
-  nullable_t<Event> sourceEvent;
+  std::optional<Event> sourceEvent;
   /** Additional data for the event */
-  string_t additionalData;
+  std::string additionalData;
 
 }; // end of class ActionEvent
 

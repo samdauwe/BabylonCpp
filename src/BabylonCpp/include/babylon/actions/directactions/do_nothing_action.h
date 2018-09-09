@@ -3,7 +3,7 @@
 
 #include <babylon/actions/action.h>
 #include <babylon/actions/action_manager.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

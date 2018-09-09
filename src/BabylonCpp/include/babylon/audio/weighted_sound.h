@@ -1,9 +1,16 @@
 #ifndef BABYLON_AUDIO_WEIGHTED_SOUND_H
 #define BABYLON_AUDIO_WEIGHTED_SOUND_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <optional>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Sound;
+using SoundPtr = std::shared_ptr<Sound>;
 
 /**
  * @brief Wraps one or more Sound objects and selects one with random weight for
@@ -20,7 +27,7 @@ public:
    * @param weights Array of number values for selection weights; length must
    * equal sounds, values will be normalized to 1
    */
-  WeightedSound(bool loop, const vector_t<SoundPtr>& sounds,
+  WeightedSound(bool loop, const std::vector<SoundPtr>& sounds,
                 const Float32Array& weights);
   ~WeightedSound();
 
@@ -38,7 +45,7 @@ public:
    * @brief Start playback.
    * @param startOffset Position the clip head at a specific time in seconds.
    */
-  void play(const nullable_t<size_t>& startOffset = nullopt_t);
+  void play(const std::optional<size_t>& startOffset = std::nullopt);
 
 protected:
   /**
@@ -120,9 +127,9 @@ private:
   float _coneOuterAngle;
   unsigned int _volume;
 
-  vector_t<SoundPtr> _sounds;
+  std::vector<SoundPtr> _sounds;
   Float32Array _weights;
-  nullable_t<size_t> _currentIndex;
+  std::optional<size_t> _currentIndex;
 
 }; // end of class Sound
 

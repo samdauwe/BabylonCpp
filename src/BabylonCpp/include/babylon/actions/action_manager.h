@@ -1,9 +1,34 @@
 #ifndef BABYLON_ACTIONS_ACTION_MANAGER_H
 #define BABYLON_ACTIONS_ACTION_MANAGER_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+#include <functional>
+#include <map>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
+
+namespace picojson {
+class value;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Action;
+class ActionEvent;
+class ActionManager;
+class IAnimatable;
+class Scene;
+using ActionManagerPtr = std::shared_ptr<ActionManager>;
+using IAnimatablePtr   = std::shared_ptr<IAnimatable>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Action Manager manages all events to be triggered on a given mesh or
@@ -191,16 +216,16 @@ public:
     return ActionManager::_OnPickOutTrigger;
   }
 
-  static array_t<unsigned int, 17> Triggers;
+  static std::array<unsigned int, 17> Triggers;
   static size_t DragMovementThreshold; // in pixels
   static size_t LongPressDelay;        // in milliseconds
 
   template <typename... Ts>
-  static shared_ptr_t<ActionManager> New(Ts&&... args)
+  static ActionManagerPtr New(Ts&&... args)
   {
     auto actionManagerRawPtr = new ActionManager(std::forward<Ts>(args)...);
     auto actionManager
-      = static_cast<shared_ptr_t<ActionManager>>(actionManagerRawPtr);
+      = static_cast<std::shared_ptr<ActionManager>>(actionManagerRawPtr);
     actionManager->addToScene(actionManager);
     return actionManager;
   }
@@ -208,7 +233,7 @@ public:
 
   /** Methods **/
 
-  void addToScene(const shared_ptr_t<ActionManager>& newActionManager);
+  void addToScene(const std::shared_ptr<ActionManager>& newActionManager);
 
   /**
    * @brief Releases all associated resources.
@@ -249,7 +274,7 @@ public:
    */
   bool hasSpecificTrigger(
     unsigned int trigger,
-    const ::std::function<bool(const string_t& parameter)>& parameterPredicate
+    const std::function<bool(const std::string& parameter)>& parameterPredicate
     = nullptr) const;
 
   /**
@@ -293,17 +318,17 @@ public:
 
   /** hidden */
   IAnimatablePtr _getEffectiveTarget(const IAnimatablePtr& target,
-                                     const string_t& propertyPath) const;
+                                     const std::string& propertyPath) const;
 
   /** hidden */
-  string_t _getProperty(const string_t& propertyPath) const;
+  std::string _getProperty(const std::string& propertyPath) const;
 
   /**
    * @brief Serialize this manager to a JSON object.
    * @param name defines the property name to store this manager
    * @returns a JSON representation of this manager
    */
-  Json::object serialize(const string_t& name) const;
+  Json::object serialize(const std::string& name) const;
 
   // Statics
 
@@ -336,7 +361,7 @@ public:
    * @param object defines the hosting mesh
    * @param scene defines the hosting scene
    */
-  static void Parse(const vector_t<Json::value>& parsedActions,
+  static void Parse(const std::vector<Json::value>& parsedActions,
                     AbstractMesh* object, Scene* scene);
 
   /**
@@ -344,7 +369,7 @@ public:
    * @param trigger defines the trigger index
    * @returns a trigger name
    */
-  static string_t GetTriggerName(unsigned int trigger);
+  static std::string GetTriggerName(unsigned int trigger);
 
 protected:
   /**
@@ -355,11 +380,11 @@ protected:
 
 public:
   /** Gets the cursor to use when hovering items */
-  string_t hoverCursor;
+  std::string hoverCursor;
 
 private:
   /** Gets the list of actions */
-  vector_t<Action*> actions;
+  std::vector<Action*> actions;
 
   Scene* _scene;
 

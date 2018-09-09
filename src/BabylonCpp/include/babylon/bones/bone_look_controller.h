@@ -1,7 +1,8 @@
 #ifndef BABYLON_BONES_LOOK_CONTROLLER_H
 #define BABYLON_BONES_LOOK_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_enums.h>
 #include <babylon/math/axis.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
@@ -9,19 +10,22 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
+class Bone;
+
 struct BABYLON_SHARED_EXPORT BoneLookControllerOptions {
-  nullable_t<float> maxYaw;
-  nullable_t<float> minYaw;
-  nullable_t<float> maxPitch;
-  nullable_t<float> minPitch;
-  nullable_t<float> slerpAmount;
-  nullable_t<Vector3> upAxis;
-  nullable_t<Space> upAxisSpace;
-  nullable_t<Vector3> yawAxis;
-  nullable_t<Vector3> pitchAxis;
-  nullable_t<float> adjustYaw;
-  nullable_t<float> adjustPitch;
-  nullable_t<float> adjustRoll;
+  std::optional<float> maxYaw;
+  std::optional<float> minYaw;
+  std::optional<float> maxPitch;
+  std::optional<float> minPitch;
+  std::optional<float> slerpAmount;
+  std::optional<Vector3> upAxis;
+  std::optional<Space> upAxisSpace;
+  std::optional<Vector3> yawAxis;
+  std::optional<Vector3> pitchAxis;
+  std::optional<float> adjustYaw;
+  std::optional<float> adjustPitch;
+  std::optional<float> adjustRoll;
 }; // end of struct BoneLookControllerOptions
 
 /**
@@ -54,8 +58,8 @@ public:
    * * adjustRoll: used to make an adjustment to the roll of the bone
    **/
   BoneLookController(AbstractMesh* mesh, Bone* bone, const Vector3& target,
-                     const nullable_t<BoneLookControllerOptions>& options
-                     = nullopt_t);
+                     const std::optional<BoneLookControllerOptions>& options
+                     = std::nullopt);
   ~BoneLookController();
 
   /**
@@ -179,9 +183,9 @@ public:
   Property<BoneLookController, float> maxPitch;
 
 private:
-  static array_t<Vector3, 10> _tmpVecs;
+  static std::array<Vector3, 10> _tmpVecs;
   static Quaternion _tmpQuat;
-  static array_t<Matrix, 5> _tmpMats;
+  static std::array<Matrix, 5> _tmpMats;
 
 private:
   bool _minYawSet;
@@ -199,7 +203,7 @@ private:
   float _maxPitchTan;
   Quaternion _boneQuat;
   bool _slerping;
-  nullable_t<Matrix> _transformYawPitch;
+  std::optional<Matrix> _transformYawPitch;
   Matrix _transformYawPitchInv;
   bool _firstFrameSkipped;
   float _yawRange;

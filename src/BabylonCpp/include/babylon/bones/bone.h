@@ -1,12 +1,15 @@
 #ifndef BABYLON_BONES_BONE_H
 #define BABYLON_BONES_BONE_H
 
-#include <babylon/babylon_global.h>
-
 #include <babylon/animations/ianimatable.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/node.h>
 
 namespace BABYLON {
+
+class Bone;
+class Skeleton;
+using BonePtr = std::shared_ptr<Bone>;
 
 /**
  * @brief Class used to store bone information.
@@ -16,16 +19,16 @@ class BABYLON_SHARED_EXPORT Bone : public Node {
 
 public:
   template <typename... Ts>
-  static Bone* New(Ts&&... args)
+  static BonePtr New(Ts&&... args)
   {
-    auto bone = new Bone(std::forward<Ts>(args)...);
-    bone->addToSkeleton(static_cast<unique_ptr_t<Bone>>(bone));
+    auto bone = std::shared_ptr<Bone>(new Bone(std::forward<Ts>(args)...));
+    bone->addToSkeleton(bone);
     return bone;
   }
   ~Bone() override;
 
   virtual IReflect::Type type() const override;
-  void addToSkeleton(unique_ptr_t<Bone>&& newBone);
+  void addToSkeleton(const BonePtr& newBone);
 
   /** Members **/
 
@@ -109,7 +112,7 @@ public:
   /**
    * @brief Gets the animations.
    */
-  vector_t<AnimationPtr> getAnimations() override;
+  std::vector<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Update the base and local matrices.
@@ -124,13 +127,14 @@ public:
   /**
    * @brief Hidden
    */
-  void _updateDifferenceMatrix(const nullable_t<Matrix>& rootMatrix = nullopt_t,
-                               bool updateChildren                  = true);
+  void _updateDifferenceMatrix(const std::optional<Matrix>& rootMatrix
+                               = std::nullopt,
+                               bool updateChildren = true);
 
   /**
    * @brief Flag the bone as dirty (Forcing it to update everything).
    */
-  Bone& markAsDirty(const string_t& property = "") override;
+  Bone& markAsDirty(const std::string& property = "") override;
 
   /**
    * @brief Copy an animation range from another bone.
@@ -141,7 +145,7 @@ public:
    * @param skelDimensionsRatio defines the scaling ratio
    * @returns true if operation was successful
    */
-  bool copyAnimationRange(Bone* source, const string_t& rangeName,
+  bool copyAnimationRange(Bone* source, const std::string& rangeName,
                           int frameOffset, bool rescaleAsRequired = false,
                           const Vector3& skelDimensionsRatio = Vector3(),
                           bool hasSkelDimensionsRatio        = false);
@@ -194,7 +198,7 @@ public:
    * @brief Gets the current scaling in local space.
    * @returns the current scaling vector
    */
-  nullable_t<Vector3>& getScale();
+  std::optional<Vector3>& getScale();
 
   /**
    * @brief Gets the current scaling in local space and stores it in a target
@@ -448,11 +452,11 @@ protected:
    * @param baseMatrix defines the base matrix
    * @param index defines index of the bone in the hiearchy
    */
-  Bone(const string_t& name, Skeleton* skeleton, Bone* parentBone = nullptr,
-       const nullable_t<Matrix>& localMatrix = nullopt_t,
-       const nullable_t<Matrix>& restPose    = nullopt_t,
-       const nullable_t<Matrix>& baseMatrix  = nullopt_t,
-       nullable_t<int> index                 = nullopt_t);
+  Bone(const std::string& name, Skeleton* skeleton, Bone* parentBone = nullptr,
+       const std::optional<Matrix>& localMatrix = std::nullopt,
+       const std::optional<Matrix>& restPose    = std::nullopt,
+       const std::optional<Matrix>& baseMatrix  = std::nullopt,
+       std::optional<int> index                 = std::nullopt);
 
   /**
    * @brief Hidden
@@ -499,12 +503,12 @@ protected:
   /**
    * @brief Gets current scaling (in local space).
    */
-  nullable_t<Vector3>& get_scaling();
+  std::optional<Vector3>& get_scaling();
 
   /**
    * @brief Sets current scaling (in local space).
    */
-  void set_scaling(const nullable_t<Vector3>& newScaling);
+  void set_scaling(const std::optional<Vector3>& newScaling);
 
   /**
    * @brief Gets the animation properties override.
@@ -525,7 +529,7 @@ public:
   /**
    * Gets the list of child bones
    */
-  vector_t<Bone*> children;
+  std::vector<Bone*> children;
 
   /**
    * Gets or sets bone length
@@ -538,7 +542,7 @@ public:
    * matrices Set this value to -1 to exclude the bone from the transform
    * matrices
    */
-  nullable_t<int> _index;
+  std::optional<int> _index;
 
   /**
    * Hidden
@@ -563,7 +567,7 @@ public:
   /**
    * Current scaling (in local space)
    */
-  Property<Bone, nullable_t<Vector3>> scaling;
+  Property<Bone, std::optional<Vector3>> scaling;
 
   /**
    * Animation properties override
@@ -572,9 +576,9 @@ public:
     animationPropertiesOverride;
 
 private:
-  static array_t<Vector3, 2> _tmpVecs;
+  static std::array<Vector3, 2> _tmpVecs;
   static Quaternion _tmpQuat;
-  static array_t<Matrix, 5> _tmpMats;
+  static std::array<Matrix, 5> _tmpMats;
 
 private:
   Skeleton* _skeleton;
@@ -582,15 +586,15 @@ private:
   Matrix _restPose;
   Matrix _baseMatrix;
   Matrix _absoluteTransform;
-  unique_ptr_t<Matrix> _invertedAbsoluteTransform;
+  std::unique_ptr<Matrix> _invertedAbsoluteTransform;
   Bone* _parent;
 
   Matrix _scaleMatrix;
   Vector3 _scaleVector;
   Vector3 _negateScaleChildren;
   float _scalingDeterminant;
-  unique_ptr_t<Matrix> _worldTransform;
-  nullable_t<Vector3> _localScaling;
+  std::unique_ptr<Matrix> _worldTransform;
+  std::optional<Vector3> _localScaling;
   Quaternion _localRotation;
   Vector3 _localPosition;
   bool _needToDecompose;

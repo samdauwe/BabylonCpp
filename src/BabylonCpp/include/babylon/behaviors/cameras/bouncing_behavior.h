@@ -1,13 +1,21 @@
 #ifndef BABYLON_BEHAVIORS_CAMERAS_BOUNCING_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_CAMERAS_BOUNCING_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
-
 #include <babylon/animations/easing/back_ease.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Animatable;
+class Animation;
+class ArcRotateCamera;
+class Camera;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+using AnimationPtr       = std::shared_ptr<Animation>;
 
 /**
  * @brief Add a bouncing effect to an ArcRotateCamera when reaching a specified
@@ -117,7 +125,7 @@ private:
   // Animations
   bool _radiusIsAnimating;
   AnimationPtr _radiusBounceTransition;
-  vector_t<Animatable*> _animatables;
+  std::vector<Animatable*> _animatables;
   float _cachedWheelPrecision;
 
 }; // end of class BouncingBehavior

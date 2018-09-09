@@ -1,7 +1,7 @@
 #ifndef BABYLON_AUDIO_ANALYSER_H
 #define BABYLON_AUDIO_ANALYSER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

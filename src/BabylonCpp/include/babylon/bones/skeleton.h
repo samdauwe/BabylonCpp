@@ -1,21 +1,43 @@
 #ifndef BABYLON_BONES_SKELETON_H
 #define BABYLON_BONES_SKELETON_H
 
+#include <map>
+
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/tools/observable.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class Animatable;
+struct AnimationPropertiesOverride;
+class Bone;
+class IAnimatable;
+class Scene;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+using BonePtr        = std::shared_ptr<Bone>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Class used to handle skinning animations.
  * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
  */
 class BABYLON_SHARED_EXPORT Skeleton
-    : public ::std::enable_shared_from_this<Skeleton>,
+    : public std::enable_shared_from_this<Skeleton>,
       public IAnimatable,
       public IDisposable {
 
@@ -26,7 +48,7 @@ public:
    * @param id defines the skeleton Id
    * @param scene defines the hosting scene
    */
-  Skeleton(const string_t& name, const string_t& id, Scene* scene);
+  Skeleton(const std::string& name, const std::string& id, Scene* scene);
   virtual ~Skeleton() override;
 
   virtual IReflect::Type type() const override;
@@ -56,14 +78,14 @@ public:
    * version
    * @returns a string representing the current skeleton data
    */
-  string_t toString(bool fullDetails = false);
+  std::string toString(bool fullDetails = false);
 
   /**
    * @brief Get bone's index searching by name.
    * @param name defines bone's name to search for
    * @return the indice of the bone. Returns -1 if not found
    */
-  int getBoneIndexByName(const string_t& name);
+  int getBoneIndexByName(const std::string& name);
 
   /**
    * @brief Creater a new animation range.
@@ -71,27 +93,27 @@ public:
    * @param from defines the start key
    * @param to defines the end key
    */
-  void createAnimationRange(const string_t& name, float from, float to);
+  void createAnimationRange(const std::string& name, float from, float to);
 
   /**
    * @brief Delete a specific animation range.
    * @param name defines the name of the range
    * @param deleteFrames defines if frames must be removed as well
    */
-  void deleteAnimationRange(const string_t& name, bool deleteFrames = true);
+  void deleteAnimationRange(const std::string& name, bool deleteFrames = true);
 
   /**
    * @brief Gets a specific animation range.
    * @param name defines the name of the range to look for
    * @returns the requested animation range or null if not found
    */
-  AnimationRange* getAnimationRange(const string_t& name);
+  AnimationRange* getAnimationRange(const std::string& name);
 
   /**
    * @brief Gets the list of all animation ranges defined on this skeleton.
    * @returns an array
    */
-  vector_t<AnimationRange> getAnimationRanges();
+  std::vector<AnimationRange> getAnimationRanges();
 
   /**
    * @brief Copy animation range from a source skeleton.
@@ -102,7 +124,7 @@ public:
    * @param rescaleAsRequired defines if rescaling must be applied if required
    * @returns true if operation was successful
    */
-  bool copyAnimationRange(Skeleton* source, const string_t& name,
+  bool copyAnimationRange(Skeleton* source, const std::string& name,
                           bool rescaleAsRequired = false);
 
   /**
@@ -119,9 +141,9 @@ public:
    * animation will end
    * @returns a new animatable
    */
-  Animatable* beginAnimation(const string_t& name, bool loop = false,
+  Animatable* beginAnimation(const std::string& name, bool loop = false,
                              float speedRatio = 1.f,
-                             const ::std::function<void()>& onAnimationEnd
+                             const std::function<void()>& onAnimationEnd
                              = nullptr);
 
   void _markAsDirty();
@@ -141,9 +163,9 @@ public:
    * @brief Gets the list of animatables currently running for this skeleton.
    * @returns an array of animatables
    */
-  vector_t<IAnimatablePtr> getAnimatables();
+  std::vector<IAnimatablePtr> getAnimatables();
 
-  vector_t<AnimationPtr> getAnimations() override;
+  std::vector<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Clone the current skeleton.
@@ -151,7 +173,8 @@ public:
    * @param id defines the id of the enw skeleton
    * @returns the new skeleton
    */
-  unique_ptr_t<Skeleton> clone(const string_t& name, const string_t& id) const;
+  std::unique_ptr<Skeleton> clone(const std::string& name,
+                                  const std::string& id) const;
 
   /**
    * @brief Enable animation blending for this skeleton.
@@ -214,19 +237,19 @@ protected:
 
 private:
   float _getHighestAnimationFrame();
-  void _sortBones(unsigned int index, vector_t<Bone*>& bones,
-                  vector_t<bool>& visited);
+  void _sortBones(unsigned int index, std::vector<Bone*>& bones,
+                  std::vector<bool>& visited);
 
 public:
   /**
    * Gets the list of child bones
    */
-  vector_t<BonePtr> bones;
+  std::vector<BonePtr> bones;
 
   /**
    * Gets an estimate of the dimension of the skeleton at rest
    */
-  unique_ptr_t<Vector3> dimensionsAtRest;
+  std::unique_ptr<Vector3> dimensionsAtRest;
 
   /**
    * Gets a boolean indicating if the root matrix is provided by meshes or by
@@ -234,9 +257,9 @@ public:
    */
   bool needInitialSkinMatrix;
 
-  vector_t<Animation*> animations;
-  string_t name;
-  string_t id;
+  std::vector<Animation*> animations;
+  std::string name;
+  std::string id;
 
   /**
    * Specifies if the skeleton should be serialized
@@ -258,11 +281,11 @@ private:
   Scene* _scene;
   bool _isDirty;
   Float32Array _transformMatrices;
-  vector_t<AbstractMesh*> _meshesWithPoseMatrix;
-  vector_t<IAnimatablePtr> _animatables;
+  std::vector<AbstractMesh*> _meshesWithPoseMatrix;
+  std::vector<IAnimatablePtr> _animatables;
   Matrix _identity;
   AbstractMesh* _synchronizedWithMesh;
-  unordered_map_t<string_t, AnimationRange> _ranges;
+  std::unordered_map<std::string, AnimationRange> _ranges;
   int _lastAbsoluteTransformsUpdateId;
   AnimationPropertiesOverride* _animationPropertiesOverride;
 

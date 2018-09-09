@@ -1,13 +1,18 @@
 #ifndef BABYLON_CORE_STRUCTS_H
 #define BABYLON_CORE_STRUCTS_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_enums.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class ICanvas;
+class Node;
 
 struct ArrayBufferView {
   enum class Type {
@@ -51,12 +56,12 @@ struct ArrayBufferView {
   {
   }
   ArrayBufferView(ArrayBufferView&& other)
-      : type{::std::move(other.type)}
-      , float32Array{::std::move(other.float32Array)}
-      , int16Array{::std::move(other.int16Array)}
-      , uint8Array{::std::move(other.uint8Array)}
-      , uint16Array{::std::move(other.uint16Array)}
-      , uint32Array{::std::move(other.uint32Array)}
+      : type{std::move(other.type)}
+      , float32Array{std::move(other.float32Array)}
+      , int16Array{std::move(other.int16Array)}
+      , uint8Array{std::move(other.uint8Array)}
+      , uint16Array{std::move(other.uint16Array)}
+      , uint32Array{std::move(other.uint32Array)}
   {
   }
   ArrayBufferView& operator=(const ArrayBufferView& other)
@@ -75,12 +80,12 @@ struct ArrayBufferView {
   ArrayBufferView& operator=(ArrayBufferView&& other)
   {
     if (&other != this) {
-      type         = ::std::move(other.type);
-      float32Array = ::std::move(other.float32Array);
-      int16Array   = ::std::move(other.int16Array);
-      uint8Array   = ::std::move(other.uint8Array);
-      uint16Array  = ::std::move(other.uint16Array);
-      uint32Array  = ::std::move(other.uint32Array);
+      type         = std::move(other.type);
+      float32Array = std::move(other.float32Array);
+      int16Array   = std::move(other.int16Array);
+      uint8Array   = std::move(other.uint8Array);
+      uint16Array  = std::move(other.uint16Array);
+      uint32Array  = std::move(other.uint32Array);
     }
 
     return *this;
@@ -116,7 +121,7 @@ struct CameraRigParams {
   bool vrPreViewMatrixSet = false;
   Matrix vrPreViewMatrix;
   VRMetrics vrMetrics;
-  unordered_map_t<string_t, float> params;
+  std::unordered_map<std::string, float> params;
 }; // end of struct CameraRigParams
 
 struct ClientRect {
@@ -153,8 +158,8 @@ struct Event {
 }; // end of struct Event
 
 struct Exception {
-  string_t message;
-  ::std::exception exception;
+  std::string message;
+  std::exception exception;
 }; // end of struct Exception
 
 struct Extents {
@@ -190,7 +195,7 @@ struct Image {
   }
   Image(ArrayBuffer iData, int iWidth, int iHeight, int iDepth,
         unsigned int iMode)
-      : data(::std::move(iData))
+      : data(std::move(iData))
       , width{iWidth}
       , height{iHeight}
       , depth{iDepth}
@@ -210,7 +215,7 @@ struct Image {
 struct KeyboardEvent : public Event {
   bool ctrlKey;
   bool altKey;
-  string_t code;
+  std::string code;
   void preventDefault() const
   {
   }
@@ -277,7 +282,7 @@ struct NodeCache {
   int renderWidth;
   int renderHeight;
   // TargetCamera
-  unique_ptr_t<Vector3> lockedTarget;
+  std::unique_ptr<Vector3> lockedTarget;
   // ArcRotateCamera
   Vector3 _target;
   float alpha;
@@ -296,7 +301,7 @@ struct PointerEvent : public Event {
   PointerEvent()
   {
   }
-  PointerEvent(const string_t& /*type*/)
+  PointerEvent(const std::string& /*type*/)
   {
   }
   PointerEvent(const PointerEvent& other)
@@ -316,19 +321,19 @@ struct PointerEvent : public Event {
   {
   }
   PointerEvent(PointerEvent&& other)
-      : clientX{::std::move(other.clientX)}
-      , clientY{::std::move(other.clientY)}
-      , movementX{::std::move(other.movementX)}
-      , movementY{::std::move(other.movementY)}
-      , offsetX{::std::move(other.offsetX)}
-      , offsetY{::std::move(other.offsetY)}
-      , pointerId{::std::move(other.pointerId)}
-      , pointerType{::std::move(other.pointerType)}
-      , ctrlKey{::std::move(other.ctrlKey)}
-      , shiftKey{::std::move(other.shiftKey)}
-      , button{::std::move(other.button)}
-      , buttons{::std::move(other.buttons)}
-      , srcElement{::std::move(other.srcElement)}
+      : clientX{std::move(other.clientX)}
+      , clientY{std::move(other.clientY)}
+      , movementX{std::move(other.movementX)}
+      , movementY{std::move(other.movementY)}
+      , offsetX{std::move(other.offsetX)}
+      , offsetY{std::move(other.offsetY)}
+      , pointerId{std::move(other.pointerId)}
+      , pointerType{std::move(other.pointerType)}
+      , ctrlKey{std::move(other.ctrlKey)}
+      , shiftKey{std::move(other.shiftKey)}
+      , button{std::move(other.button)}
+      , buttons{std::move(other.buttons)}
+      , srcElement{std::move(other.srcElement)}
   {
   }
   PointerEvent& operator=(const PointerEvent& other)
@@ -354,19 +359,19 @@ struct PointerEvent : public Event {
   PointerEvent& operator=(PointerEvent&& other)
   {
     if (&other != this) {
-      clientX     = ::std::move(other.clientX);
-      clientY     = ::std::move(other.clientY);
-      movementX   = ::std::move(other.movementX);
-      movementY   = ::std::move(other.movementY);
-      offsetX     = ::std::move(other.offsetX);
-      offsetY     = ::std::move(other.offsetY);
-      pointerId   = ::std::move(other.pointerId);
-      pointerType = ::std::move(other.pointerType);
-      ctrlKey     = ::std::move(other.ctrlKey);
-      shiftKey    = ::std::move(other.shiftKey);
-      button      = ::std::move(other.button);
-      buttons     = ::std::move(other.buttons);
-      srcElement  = ::std::move(other.srcElement);
+      clientX     = std::move(other.clientX);
+      clientY     = std::move(other.clientY);
+      movementX   = std::move(other.movementX);
+      movementY   = std::move(other.movementY);
+      offsetX     = std::move(other.offsetX);
+      offsetY     = std::move(other.offsetY);
+      pointerId   = std::move(other.pointerId);
+      pointerType = std::move(other.pointerType);
+      ctrlKey     = std::move(other.ctrlKey);
+      shiftKey    = std::move(other.shiftKey);
+      button      = std::move(other.button);
+      buttons     = std::move(other.buttons);
+      srcElement  = std::move(other.srcElement);
     }
 
     return *this;
@@ -398,9 +403,9 @@ struct MouseWheelEvent : public PointerEvent {
   {
   }
   MouseWheelEvent(MouseWheelEvent&& other)
-      : PointerEvent{::std::move(other)}
-      , wheelDelta{::std::move(other.wheelDelta)}
-      , detail{::std::move(other.detail)}
+      : PointerEvent{std::move(other)}
+      , wheelDelta{std::move(other.wheelDelta)}
+      , detail{std::move(other.detail)}
   {
   }
   MouseWheelEvent& operator=(const MouseWheelEvent& other)
@@ -416,9 +421,9 @@ struct MouseWheelEvent : public PointerEvent {
   MouseWheelEvent& operator=(MouseWheelEvent&& other)
   {
     if (&other != this) {
-      PointerEvent::operator=(::std::move(other));
-      wheelDelta            = ::std::move(other.wheelDelta);
-      detail                = ::std::move(other.detail);
+      PointerEvent::operator=(std::move(other));
+      wheelDelta            = std::move(other.wheelDelta);
+      detail                = std::move(other.detail);
     }
 
     return *this;
@@ -431,10 +436,10 @@ struct MouseWheelEvent : public PointerEvent {
 }; // end of struct MouseWheelEvent
 
 struct Polyhedron {
-  string_t name;
-  string_t category;
-  vector_t<Float32Array> vertices;
-  vector_t<Uint32Array> faces;
+  std::string name;
+  std::string category;
+  std::vector<Float32Array> vertices;
+  std::vector<Uint32Array> faces;
 }; // end of struct Polyhedron
 
 struct PositionCoord {
@@ -468,7 +473,7 @@ struct SolidParticleOptions {
 }; // end of struct SolidParticleOptions
 
 struct Style {
-  string_t cursor;
+  std::string cursor;
 }; // end of struct cursor
 
 struct SubdivisionsPerAxis {
@@ -483,7 +488,7 @@ struct SnapEvent {
 }; // end of struct SnapEvent
 
 struct TriggerOptions {
-  string_t parameter;
+  std::string parameter;
   unsigned int trigger;
 }; // end of struct TriggerOptions
 

@@ -1,10 +1,15 @@
 #ifndef BABYLON_BEHAVIORS_MESH_FADE_IN_OUT_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_MESH_FADE_IN_OUT_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/behaviors/behavior.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Mesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using MeshPtr         = std::shared_ptr<Mesh>;
 
 /**
  * @brief A behavior that when attached to a mesh will allow the mesh to fade in

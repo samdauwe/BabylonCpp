@@ -2,7 +2,7 @@
 #define BABYLON_ACTIONS_DIRECTACTIONS_STOP_ANIMATION_ACTION_H
 
 #include <babylon/actions/action.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

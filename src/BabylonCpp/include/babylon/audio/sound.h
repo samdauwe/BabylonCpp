@@ -1,7 +1,7 @@
 #ifndef BABYLON_AUDIO_SOUND_H
 #define BABYLON_AUDIO_SOUND_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
@@ -13,8 +13,8 @@ public:
   {
     return false;
   }
-  void play(nullable_t<size_t> /*time*/   = nullopt_t,
-            nullable_t<size_t> /*offset*/ = nullopt_t)
+  void play(std::optional<size_t> /*time*/   = std::nullopt,
+            std::optional<size_t> /*offset*/ = std::nullopt)
   {
   }
   void pause()
@@ -28,7 +28,7 @@ public:
   }
 
 public:
-  string_t name;
+  std::string name;
   bool autoplay;
   float directionalConeInnerAngle;
   float directionalConeOuterAngle;

@@ -1,22 +1,25 @@
 #ifndef BABYLON_BONES_IK_CONTROLLER_H
 #define BABYLON_BONES_IK_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
+class AbstractMesh;
+class Bone;
+
 struct BoneIKControllerOptions {
-  AbstractMesh* targetMesh                  = nullptr;
-  AbstractMesh* poleTargetMesh              = nullptr;
-  Bone* poleTargetBone                      = nullptr;
-  nullable_t<Vector3> poleTargetLocalOffset = nullopt_t;
-  nullable_t<float> poleAngle               = nullopt_t;
-  nullable_t<Vector3> bendAxis              = nullopt_t;
-  nullable_t<float> maxAngle                = nullopt_t;
-  nullable_t<float> slerpAmount             = nullopt_t;
+  AbstractMesh* targetMesh                     = nullptr;
+  AbstractMesh* poleTargetMesh                 = nullptr;
+  Bone* poleTargetBone                         = nullptr;
+  std::optional<Vector3> poleTargetLocalOffset = std::nullopt;
+  std::optional<float> poleAngle               = std::nullopt;
+  std::optional<Vector3> bendAxis              = std::nullopt;
+  std::optional<float> maxAngle                = std::nullopt;
+  std::optional<float> slerpAmount             = std::nullopt;
 }; // end of struct BoneIKControllerOptions
 
 /**
@@ -34,7 +37,7 @@ public:
    * @param options defines options to set up the controller
    */
   BoneIKController(AbstractMesh* mesh, Bone* bone,
-                   const nullable_t<BoneIKControllerOptions>& options);
+                   const std::optional<BoneIKControllerOptions>& options);
   ~BoneIKController();
 
   /**
@@ -111,9 +114,9 @@ public:
   Property<BoneIKController, float> maxAngle;
 
 private:
-  static array_t<Vector3, 6> _tmpVecs;
+  static std::array<Vector3, 6> _tmpVecs;
   static Quaternion _tmpQuat;
-  static array_t<Matrix, 2> _tmpMats;
+  static std::array<Matrix, 2> _tmpMats;
 
 private:
   Quaternion _bone1Quat;

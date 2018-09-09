@@ -1,8 +1,10 @@
 #ifndef BABYLON_ACTIONS_CONDITIONS_PREDICATE_CONDITION_H
 #define BABYLON_ACTIONS_CONDITIONS_PREDICATE_CONDITION_H
 
+#include <functional>
+
 #include <babylon/actions/condition.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -19,7 +21,7 @@ public:
    * condition
    */
   PredicateCondition(ActionManager* actionManager,
-                     const ::std::function<bool()>& predicate);
+                     const std::function<bool()>& predicate);
   ~PredicateCondition() override;
 
   /** Methods **/
@@ -31,7 +33,7 @@ public:
 
 private:
   /** Members **/
-  ::std::function<bool()> _predicate;
+  std::function<bool()> _predicate;
 
 }; // end of class PredicateCondition
 

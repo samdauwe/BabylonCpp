@@ -2,9 +2,11 @@
 #define BABYLON_ACTIONS_CONDITIONS_STATE_CONDITION_H
 
 #include <babylon/actions/condition.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AnimationValue;
 
 /**
  * @brief Defines a state condition as an extension of Condition.
@@ -18,7 +20,7 @@ public:
    * @param target of the condition
    * @param value to compare with target state
    */
-  StateCondition(ActionManager* actionManager, const IAnimatablePtr &target,
+  StateCondition(ActionManager* actionManager, const IAnimatablePtr& target,
                  AnimationValue* value);
   virtual ~StateCondition() override;
 

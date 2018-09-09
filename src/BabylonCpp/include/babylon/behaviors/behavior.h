@@ -1,7 +1,10 @@
 #ifndef BABYLON_BEHAVIORS_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -13,7 +16,7 @@ struct BABYLON_SHARED_EXPORT Behavior {
   /**
    * gets or sets behavior's name
    */
-  string_t name;
+  std::string name;
 
   /**
    * @brief Function called when the behavior needs to be initialized (after
@@ -24,7 +27,7 @@ struct BABYLON_SHARED_EXPORT Behavior {
    * @brief Called when the behavior is attached to a target.
    * @param target defines the target where the behavior is attached to
    */
-  virtual void attach(const shared_ptr_t<T>& target) = 0;
+  virtual void attach(const std::shared_ptr<T>& target) = 0;
   /**
    * @brief Called when the behavior is detached from its target.
    */

@@ -1,13 +1,20 @@
 #ifndef BABYLON_BEHAVIORS_MESH_SIX_DOF_DRAG_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_MESH_SIX_DOF_DRAG_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Mesh;
+class PointerInfo;
+class Scene;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using MeshPtr         = std::shared_ptr<Mesh>;
 
 /**
  * @brief A behavior that when attached to a mesh will allow the mesh to be
@@ -25,7 +32,7 @@ public:
   /**
    * @brief The name of the behavior.
    */
-  const string_t name() const;
+  const std::string name() const;
 
   /**
    * @brief Initializes the behavior.
@@ -67,7 +74,7 @@ public:
   bool detachCameraControls;
 
 private:
-  static unique_ptr_t<Scene> _virtualScene;
+  static std::unique_ptr<Scene> _virtualScene;
   MeshPtr _ownerNode;
   Observer<Scene>::Ptr _sceneRenderObserver;
   Scene* _scene;

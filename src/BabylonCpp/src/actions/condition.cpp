@@ -55,13 +55,13 @@ bool Condition::isValid()
   return true;
 }
 
-string_t Condition::_getProperty(const string_t& propertyPath)
+std::string Condition::_getProperty(const std::string& propertyPath)
 {
   return _actionManager->_getProperty(propertyPath);
 }
 
 IAnimatablePtr Condition::_getEffectiveTarget(const IAnimatablePtr& target,
-                                              const string_t& propertyPath)
+                                              const std::string& propertyPath)
 {
   return _actionManager->_getEffectiveTarget(target, propertyPath);
 }

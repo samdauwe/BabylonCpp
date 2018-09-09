@@ -1,7 +1,7 @@
 #ifndef BABYLON_BEHAVIORS_MESH_FACE_DIRECTION_INFO_H
 #define BABYLON_BEHAVIORS_MESH_FACE_DIRECTION_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -20,7 +20,7 @@ struct BABYLON_SHARED_EXPORT FaceDirectionInfo {
   FaceDirectionInfo& operator=(FaceDirectionInfo&& other);
   ~FaceDirectionInfo();
   FaceDirectionInfo copy() const;
-  unique_ptr_t<FaceDirectionInfo> clone() const;
+  std::unique_ptr<FaceDirectionInfo> clone() const;
   friend std::ostream& operator<<(std::ostream& os,
                                   const FaceDirectionInfo& arc);
   friend bool operator==(const FaceDirectionInfo& lhs,

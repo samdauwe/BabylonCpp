@@ -2,9 +2,11 @@
 #define BABYLON_ACTIONS_DIRECTACTIONS_PLAY_SOUND_ACTION_H
 
 #include <babylon/actions/action.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Sound;
 
 class BABYLON_SHARED_EXPORT PlaySoundAction : public Action {
 

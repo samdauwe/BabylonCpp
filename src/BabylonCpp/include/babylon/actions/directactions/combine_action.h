@@ -2,14 +2,15 @@
 #define BABYLON_ACTIONS_DIRECTACTIONS_COMBINE_ACTION_H
 
 #include <babylon/actions/action.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT CombineAction : public Action {
 
 public:
-  CombineAction(unsigned int triggerOptions, const vector_t<Action*>& children,
+  CombineAction(unsigned int triggerOptions,
+                const std::vector<Action*>& children,
                 Condition* condition = nullptr);
   ~CombineAction() override;
 
@@ -22,7 +23,7 @@ public:
   Json::object serialize(Json::object& parent) const override;
 
 public:
-  vector_t<Action*> children;
+  std::vector<Action*> children;
 
 }; // end of class CombineAction
 

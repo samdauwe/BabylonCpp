@@ -1,9 +1,14 @@
 #ifndef BABYLON_BEHAVIORS_IBEHAVIOR_AWARE_H
 #define BABYLON_BEHAVIORS_IBEHAVIOR_AWARE_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+template <class T>
+struct Behavior;
 
 /**
  * @brief Interface implemented by classes supporting behaviors.
@@ -28,7 +33,7 @@ struct BABYLON_SHARED_EXPORT IBehaviorAware {
    * @param name defines the name to search
    * @returns the behavior or null if not found
    */
-  virtual Behavior<T>* getBehaviorByName(const string_t& name) = 0;
+  virtual Behavior<T>* getBehaviorByName(const std::string& name) = 0;
 
 }; // end of struct IBehaviorAware<T>
 

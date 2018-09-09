@@ -444,7 +444,7 @@ Skeleton* Skeleton::Parse(const Json::value& parsedSkeleton, Scene* scene)
       }
     }
 
-    Bone* bone = nullptr;
+    BonePtr bone = nullptr;
     if (parsedBone.contains("rest")) {
       Matrix rest = Matrix::FromArray(Json::ToArray<float>(parsedBone, "rest"));
       bone        = Bone::New(

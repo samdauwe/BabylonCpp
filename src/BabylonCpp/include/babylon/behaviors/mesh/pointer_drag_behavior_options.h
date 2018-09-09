@@ -1,14 +1,16 @@
 #ifndef BABYLON_BEHAVIORS_MESH_POINTER_DRAG_BEHAVIOR_OPTIONS_H
 #define BABYLON_BEHAVIORS_MESH_POINTER_DRAG_BEHAVIOR_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <optional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT PointerDragBehaviorOptions {
-  nullable_t<Vector3> dragAxis        = nullopt_t;
-  nullable_t<Vector3> dragPlaneNormal = nullopt_t;
+  std::optional<Vector3> dragAxis        = std::nullopt;
+  std::optional<Vector3> dragPlaneNormal = std::nullopt;
 }; // end of struct PointerDragBehaviorOptions
 
 } // end of namespace BABYLON

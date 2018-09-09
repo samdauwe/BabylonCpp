@@ -2,9 +2,11 @@
 #define BABYLON_ACTIONS_CONDITIONS_VALUE_CONDITION_H
 
 #include <babylon/actions/condition.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AnimationValue;
 
 /**
  * @brief Defines specific conditional operators as extensions of Condition.
@@ -81,7 +83,7 @@ public:
    * @param operator the conditional operator, default ValueCondition.IsEqual
    */
   ValueCondition(ActionManager* actionManager, const IAnimatablePtr& target,
-                 const string_t& propertyPath, AnimationValue* value,
+                 const std::string& propertyPath, AnimationValue* value,
                  unsigned int operatorType = ValueCondition::IsEqual());
   virtual ~ValueCondition() override;
 
@@ -107,10 +109,10 @@ public:
    * @param operator the conditional operator
    * @returns the name
    */
-  static string_t GetOperatorName(unsigned int operatorType);
+  static std::string GetOperatorName(unsigned int operatorType);
 
 private:
-  string_t _propertyPath;
+  std::string _propertyPath;
   unsigned int _operatorType;
 
   /**
@@ -126,7 +128,7 @@ private:
   /**
    * Internal only
    */
-  string_t _property;
+  std::string _property;
 
   AnimationValue* _value;
 

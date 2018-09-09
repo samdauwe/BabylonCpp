@@ -1,12 +1,17 @@
 #ifndef BABYLON_BEHAVIORS_CAMERAS_AUTO_ROTATION_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_CAMERAS_AUTO_ROTATION_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
-
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class ArcRotateCamera;
+class Camera;
+class PointerInfoPre;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
 class BABYLON_SHARED_EXPORT AutoRotationBehavior
     : public Behavior<ArcRotateCamera> {
@@ -130,7 +135,7 @@ private:
   Observer<Camera>::Ptr _onAfterCheckInputsObserver;
   ArcRotateCameraPtr _attachedCamera;
   bool _isPointerDown;
-  nullable_t<high_res_time_point_t> _lastFrameTime;
+  std::optional<high_res_time_point_t> _lastFrameTime;
   high_res_time_point_t _lastInteractionTime;
   float _cameraRotationSpeed;
   float _lastFrameRadius;

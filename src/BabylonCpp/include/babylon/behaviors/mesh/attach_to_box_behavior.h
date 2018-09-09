@@ -1,7 +1,7 @@
 #ifndef BABYLON_BEHAVIORS_MESH_ATTACH_TO_BOX_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_MESH_ATTACH_TO_BOX_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/behaviors/mesh/face_direction_info.h>
 #include <babylon/math/matrix.h>
@@ -9,6 +9,11 @@
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Mesh;
+class Scene;
+class TransformNode;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief A behavior that when attached to a mesh will will place a specified
@@ -68,7 +73,7 @@ public:
 
 private:
   TransformNode* ui;
-  array_t<FaceDirectionInfo, 6> _faceVectors;
+  std::array<FaceDirectionInfo, 6> _faceVectors;
   MeshPtr _target;
   Scene* _scene;
   Observer<Scene>::Ptr _onRenderObserver;

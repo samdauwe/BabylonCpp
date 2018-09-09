@@ -1,13 +1,24 @@
 #ifndef BABYLON_BEHAVIORS_CAMERAS_FRAMING_BEHAVIOR_H
 #define BABYLON_BEHAVIORS_CAMERAS_FRAMING_BEHAVIOR_H
 
-#include <babylon/babylon_global.h>
-
 #include <babylon/animations/easing/exponential_ease.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/behaviors/behavior.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Animatable;
+class Animation;
+class ArcRotateCamera;
+class Camera;
+class PointerInfoPre;
+class Vector2;
+class Vector3;
+using AnimationPtr       = std::shared_ptr<Animation>;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
 class BABYLON_SHARED_EXPORT FramingBehavior : public Behavior<ArcRotateCamera> {
 
@@ -91,7 +102,7 @@ public:
    * @param onAnimationEnd Callback triggered at the end of the framing
    * animation
    */
-  void zoomOnMeshesHierarchy(const vector_t<AbstractMesh*>& meshes,
+  void zoomOnMeshesHierarchy(const std::vector<AbstractMesh*>& meshes,
                              bool focusOnOriginXZ = false,
                              const ::std::function<void()>& onAnimationEnd
                              = nullptr);
@@ -316,11 +327,11 @@ private:
   Observer<AbstractMesh>::Ptr _onMeshTargetChangedObserver;
   ArcRotateCameraPtr _attachedCamera;
   bool _isPointerDown;
-  nullable_t<high_res_time_point_t> _lastFrameTime;
+  std::optional<high_res_time_point_t> _lastFrameTime;
   high_res_time_point_t _lastInteractionTime;
 
   // Framing control
-  vector_t<Animatable*> _animatables;
+  std::vector<Animatable*> _animatables;
   bool _betaIsAnimating;
   AnimationPtr _betaTransition;
   AnimationPtr _radiusTransition;
