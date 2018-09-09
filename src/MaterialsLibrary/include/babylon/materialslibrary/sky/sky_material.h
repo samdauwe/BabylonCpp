@@ -9,10 +9,21 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class SkyMaterial;
+using SkyMaterialPtr = shared_ptr_t<SkyMaterial>;
+
 class BABYLON_SHARED_EXPORT SkyMaterial : public PushMaterial {
 
 public:
-  SkyMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static SkyMaterialPtr New(Ts&&... args)
+  {
+    auto material
+      = shared_ptr_t<SkyMaterial>(new SkyMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~SkyMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -32,6 +43,9 @@ public:
   /** Statics **/
   static SkyMaterial* Parse(const Json::value& source, Scene* scene,
                             const std::string& rootUrl);
+
+protected:
+  SkyMaterial(const std::string& name, Scene* scene);
 
 public:
   // Public members

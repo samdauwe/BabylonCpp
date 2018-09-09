@@ -7,6 +7,7 @@
 #include <babylon/samples/materialslibrary/lava_material_scene.h>
 #include <babylon/samples/materialslibrary/normal_material_scene.h>
 #include <babylon/samples/materialslibrary/simple_material_scene.h>
+#include <babylon/samples/materialslibrary/sky_material_scene.h>
 #include <babylon/samples/materialslibrary/terrain_material_scene.h>
 #include <babylon/samples/materialslibrary/tri_planar_material_scene.h>
 
@@ -59,7 +60,13 @@ _MaterialsLibrarySamplesIndex::_MaterialsLibrarySamplesIndex()
     [](ICanvas* iCanvas) {                                     //
       return ::std::make_unique<SimpleMaterialScene>(iCanvas); //
     });                                                        //
-  // Simple Material Scene
+  // Sky Material Scene
+  _samples["SkyMaterialScene"] = ::std::make_tuple(
+    true,                                                   //
+    [](ICanvas* iCanvas) {                                  //
+      return ::std::make_unique<SkyMaterialScene>(iCanvas); //
+    });                                                     //
+  // Terrain Material Scene
   _samples["TerrainMaterialScene"] = ::std::make_tuple(
     true,                                                       //
     [](ICanvas* iCanvas) {                                      //

@@ -8,6 +8,8 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materialslibrary/sky/sky_fragment_fx.h>
+#include <babylon/materialslibrary/sky/sky_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -31,6 +33,11 @@ SkyMaterial::SkyMaterial(const std::string& iName, Scene* scene)
     , _cameraPosition{Vector3::Zero()}
     , _renderId{-1}
 {
+  // Vertex shader
+  Effect::ShadersStore["skyVertexShader"] = skyVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore["skyPixelShader"] = skyPixelShader;
 }
 
 SkyMaterial::~SkyMaterial()
