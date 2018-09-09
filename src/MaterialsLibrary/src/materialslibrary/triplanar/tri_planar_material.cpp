@@ -10,6 +10,8 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/materialslibrary/triplanar/tri_planar_fragment_fx.h>
+#include <babylon/materialslibrary/triplanar/tri_planar_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -54,6 +56,11 @@ TriPlanarMaterial::TriPlanarMaterial(const std::string& iName, Scene* scene)
     , _worldViewProjectionMatrix{Matrix::Zero()}
     , _renderId{-1}
 {
+  // Vertex shader
+  Effect::ShadersStore["triPlanarVertexShader"] = triPlanarVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore["triPlanarPixelShader"] = triPlanarPixelShader;
 }
 
 TriPlanarMaterial::~TriPlanarMaterial()
@@ -308,7 +315,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
     // Legacy browser patch
-    const std::string shaderName{"triplanar"};
+    const std::string shaderName{"triPlanar"};
     auto join = defines.toString();
 
     const std::vector<std::string> uniforms{

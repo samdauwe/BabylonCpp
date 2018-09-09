@@ -9,10 +9,21 @@
 namespace BABYLON {
 namespace MaterialsLibrary {
 
+class TriPlanarMaterial;
+using TriPlanarMaterialPtr = shared_ptr_t<TriPlanarMaterial>;
+
 class BABYLON_SHARED_EXPORT TriPlanarMaterial : public PushMaterial {
 
 public:
-  TriPlanarMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static TriPlanarMaterialPtr New(Ts&&... args)
+  {
+    auto material = shared_ptr_t<TriPlanarMaterial>(
+      new TriPlanarMaterial(::std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~TriPlanarMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -36,6 +47,8 @@ public:
                                   const std::string& rootUrl);
 
 protected:
+  TriPlanarMaterial(const std::string& name, Scene* scene);
+
   BaseTexturePtr& get_mixTexture();
   void set_mixTexture(const BaseTexturePtr& value);
   TexturePtr& get_diffuseTextureX();

@@ -8,6 +8,7 @@
 #include <babylon/samples/materialslibrary/normal_material_scene.h>
 #include <babylon/samples/materialslibrary/simple_material_scene.h>
 #include <babylon/samples/materialslibrary/terrain_material_scene.h>
+#include <babylon/samples/materialslibrary/tri_planar_material_scene.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -64,6 +65,12 @@ _MaterialsLibrarySamplesIndex::_MaterialsLibrarySamplesIndex()
     [](ICanvas* iCanvas) {                                      //
       return ::std::make_unique<TerrainMaterialScene>(iCanvas); //
     });                                                         //
+  // Tri-Planar Material Scene
+  _samples["TriPlanarMaterialScene"] = ::std::make_tuple(
+    true,                                                         //
+    [](ICanvas* iCanvas) {                                        //
+      return ::std::make_unique<TriPlanarMaterialScene>(iCanvas); //
+    });                                                           //
 }
 
 _MaterialsLibrarySamplesIndex::~_MaterialsLibrarySamplesIndex()

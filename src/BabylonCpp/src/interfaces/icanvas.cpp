@@ -58,6 +58,7 @@ void ICanvas::addKeyEventListener(
     listeners.emplace_back(listener);
   }
   else {
+#if 0
     // Add when listener is not yet in the listeners list
     auto it = ::std::find_if(
       listeners.begin(), listeners.end(),
@@ -69,6 +70,9 @@ void ICanvas::addKeyEventListener(
     if (it == listeners.end()) {
       listeners.emplace_back(listener);
     }
+#else
+    listeners.emplace_back(listener);
+#endif
   }
 }
 
