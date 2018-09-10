@@ -81,7 +81,7 @@ void MeshTab::_buildTree()
   vector_t<NodePtr> meshWithoutAnyParent;
   for (auto& mesh : scene->meshes) {
     // Not already in the array, not system name and no parent
-    auto _mesh = static_cast<Node*>(mesh.get());
+    auto _mesh = std::dynamic_pointer_cast<Node>(mesh);
     if (!stl_util::contains(meshWithoutAnyParent, _mesh)
         && !Helpers::IsSystemName(_mesh->name) && !_mesh->parent) {
       meshWithoutAnyParent.emplace_back(_mesh);
@@ -90,7 +90,7 @@ void MeshTab::_buildTree()
   // ... and for transforms
   for (auto& tn : scene->transformNodes) {
     // Not already in the array, not system name and no parent
-    auto _tn = ::std::static_pointer_cast<Node>(tn);
+    auto _tn = std::dynamic_pointer_cast<Node>(tn);
     if (!stl_util::contains(meshWithoutAnyParent, _tn)
         && !Helpers::IsSystemName(_tn->name) && !_tn->parent) {
       meshWithoutAnyParent.emplace_back(_tn);
