@@ -22,10 +22,15 @@ public:
   template <typename... Ts>
   static BoundingBoxRendererPtr New(Ts&&... args)
   {
-    return shared_ptr_t<BoundingBoxRenderer>(
+    auto renderer = shared_ptr_t<BoundingBoxRenderer>(
       new BoundingBoxRenderer(::std::forward<Ts>(args)...));
+    renderer->addToScene(renderer);
+
+    return renderer;
   }
   virtual ~BoundingBoxRenderer();
+
+  void addToScene(const BoundingBoxRendererPtr& newBoundingBoxRenderer);
 
   /**
    * @brief Registers the component in a given scene.

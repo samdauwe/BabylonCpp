@@ -22,11 +22,16 @@ BoundingBoxRenderer::BoundingBoxRenderer(Scene* iScene)
 {
   scene = iScene;
   renderList.reserve(32);
-  scene->_addComponent(shared_from_this());
 }
 
 BoundingBoxRenderer::~BoundingBoxRenderer()
 {
+}
+
+void BoundingBoxRenderer::addToScene(
+  const BoundingBoxRendererPtr& newBoundingBoxRenderer)
+{
+  scene->_addComponent(newBoundingBoxRenderer);
 }
 
 void BoundingBoxRenderer::_register()
