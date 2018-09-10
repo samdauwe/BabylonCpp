@@ -1,7 +1,7 @@
 #include <babylon/behaviors/mesh/pointer_drag_behavior.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/mesh.h>
@@ -33,6 +33,9 @@ PointerDragBehavior::PointerDragBehavior(
     , _tmpVector{Vector3{0.f, 0.f, 0.f}}
     , _alternatePickedPoint{Vector3{0.f, 0.f, 0.f}}
     , _worldDragAxis{Vector3{0.f, 0.f, 0.f}}
+    , _targetPosition{Vector3{0.f, 0.f, 0.f}}
+    , _attachedElement{nullptr}
+    , _startDragRay{Ray(Vector3(), Vector3())}
     , _pointA{Vector3{0.f, 0.f, 0.f}}
     , _pointB{Vector3{0.f, 0.f, 0.f}}
     , _pointC{Vector3{0.f, 0.f, 0.f}}
@@ -95,16 +98,12 @@ void PointerDragBehavior::attach(const NodePtr& ownerNode)
 
   // State of the drag
   Vector3 lastPosition{0.f, 0.f, 0.f};
-  Vector3 delta{0.f, 0.f, 0.f};
-  float dragLength = 0.f;
-  Vector3 targetPosition{0.f, 0.f, 0.f};
 
   const auto& pickPredicate = [this](const AbstractMeshPtr& m) -> bool {
     return _attachedNode == m || m->isDescendantOf(_attachedNode.get());
   };
 
-  ICanvas* attachedElement = nullptr;
-  _pointerObserver         = _scene->onPointerObservable.add(
+  _pointerObserver = _scene->onPointerObservable.add(
     [&](PointerInfo* pointerInfo, EventState& /*es*/) {
       if (!enabled) {
         return;
@@ -115,83 +114,30 @@ void PointerDragBehavior::attach(const NodePtr& ownerNode)
         if (!dragging && _pickInfo.hit && _pickInfo.pickedMesh
             && _pickInfo.pickedPoint && _pickInfo.ray
             && pickPredicate(_pickInfo.pickedMesh)) {
-          _updateDragPlanePosition(*_pickInfo.ray, *_pickInfo.pickedPoint);
-          auto pickedPoint = _pickWithRayOnDragPlane(_pickInfo.ray);
-          if (pickedPoint) {
-            dragging                 = true;
-            currentDraggingPointerID = pointerInfo->pointerEvent.pointerId;
-            lastPosition.copyFrom(*pickedPoint);
-            DragStartOrEndEvent event;
-            event.dragPlanePoint = *pickedPoint;
-            event.pointerId      = currentDraggingPointerID;
-            onDragStartObservable.notifyObservers(&event);
-            targetPosition.copyFrom(
-              ::std::static_pointer_cast<Mesh>(_attachedNode)
-                ->absolutePosition());
-
-            // Dettach camera controls
-            if (detachCameraControls && _scene->activeCamera
-                && !_scene->activeCamera->leftCamera()) {
-              if (_scene->activeCamera->inputs.attachedElement) {
-                attachedElement = _scene->activeCamera->inputs.attachedElement;
-                _scene->activeCamera->detachControl(
-                  _scene->activeCamera->inputs.attachedElement);
-              }
-              else {
-                attachedElement = nullptr;
-              }
-            }
-          }
+          _startDrag(pointerInfo->pointerEvent.pointerId,
+                     pointerInfo->pickInfo.ray,
+                     pointerInfo->pickInfo.pickedPoint);
         }
       }
       else if (pointerInfo->type == PointerEventTypes::POINTERUP) {
         if (currentDraggingPointerID == pointerInfo->pointerEvent.pointerId) {
           releaseDrag();
-
-          // Reattach camera controls
-          if (detachCameraControls && attachedElement && _scene->activeCamera
-              && !_scene->activeCamera->leftCamera()) {
-            _scene->activeCamera->attachControl(attachedElement, true);
-          }
         }
       }
       else if (pointerInfo->type == PointerEventTypes::POINTERMOVE) {
-        if (currentDraggingPointerID == pointerInfo->pointerEvent.pointerId
-            && dragging && _pickInfo.ray) {
-          _moving          = true;
-          auto pickedPoint = _pickWithRayOnDragPlane(_pickInfo.ray);
-
-          if (pickedPoint) {
-            if (updateDragPlane) {
-              _updateDragPlanePosition(*_pickInfo.ray, *pickedPoint);
-            }
-
-            // depending on the drag mode option drag accordingly
-            if (_options.dragAxis) {
-              // Convert local drag axis to world
-              Vector3::TransformCoordinatesToRef(
-                *_options.dragAxis,
-                _attachedNode->getWorldMatrix()->getRotationMatrix(),
-                _worldDragAxis);
-
-              // Project delta drag from the drag plane onto the drag axis
-              (*pickedPoint).subtractToRef(lastDragPosition, _tmpVector);
-              dragLength = Vector3::Dot(_tmpVector, _worldDragAxis);
-              _worldDragAxis.scaleToRef(dragLength, delta);
-            }
-            else {
-              dragLength = delta.length();
-              (*pickedPoint).subtractToRef(lastDragPosition, delta);
-            }
-            targetPosition.addInPlace(delta);
-            DragMoveEvent event;
-            event.dragDistance    = dragLength;
-            event.delta           = delta;
-            event.dragPlanePoint  = *pickedPoint;
-            event.dragPlaneNormal = _dragPlane->forward();
-            event.pointerId       = currentDraggingPointerID;
-            onDragObservable.notifyObservers(&event);
-            lastPosition.copyFrom(*pickedPoint);
+        auto pointerId = pointerInfo->pointerEvent.pointerId;
+        // Keep track of last pointer ray, this is used simulating the start of
+        // a drag in startDrag()
+        if (!stl_util::contains(_lastPointerRay, pointerId)) {
+          _lastPointerRay[pointerId] = Ray(Vector3(), Vector3());
+        }
+        if (pointerInfo->pickInfo.ray) {
+          _lastPointerRay[pointerId].origin.copyFrom(
+            pointerInfo->pickInfo.ray->origin);
+          _lastPointerRay[pointerId].direction.copyFrom(
+            pointerInfo->pickInfo.ray->direction);
+          if (currentDraggingPointerID == pointerId && dragging) {
+            _moveDrag(*pointerInfo->pickInfo.ray);
           }
         }
       }
@@ -201,10 +147,10 @@ void PointerDragBehavior::attach(const NodePtr& ownerNode)
     [&](Scene* /*scene*/, EventState& /*es*/) {
       if (_moving && moveAttached) {
         // Slowly move mesh to avoid jitter
-        targetPosition.subtractToRef(
+        _targetPosition.subtractToRef(
           ::std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition(),
           _tmpVector);
-        _tmpVector.scaleInPlace(0.2f);
+        _tmpVector.scaleInPlace(dragDeltaRatio);
         ::std::static_pointer_cast<Mesh>(_attachedNode)
           ->getAbsolutePosition()
           .addToRef(_tmpVector, _tmpVector);
@@ -223,6 +169,116 @@ void PointerDragBehavior::releaseDrag()
   onDragEndObservable.notifyObservers(&event);
   currentDraggingPointerID = -1;
   _moving                  = false;
+
+  // Reattach camera controls
+  if (detachCameraControls && _attachedElement && _scene->activeCamera
+      && !_scene->activeCamera->leftCamera()) {
+    _scene->activeCamera->attachControl(_attachedElement, true);
+  }
+}
+
+void PointerDragBehavior::startDrag(
+  int pointerId, const std::optional<Ray>& fromRay,
+  const std::optional<Vector3>& startPickedPoint)
+{
+  _startDrag(pointerId, fromRay, startPickedPoint);
+  if (stl_util::contains(_lastPointerRay, pointerId)) {
+    // if there was a last pointer ray drag the object there
+    _moveDrag(_lastPointerRay[pointerId]);
+  }
+}
+
+void PointerDragBehavior::_startDrag(
+  int /*pointerId*/, const std::optional<Ray>& fromRay,
+  const std::optional<Vector3>& startPickedPoint)
+{
+  if (!_scene->activeCamera || dragging || !_attachedNode) {
+    return;
+  }
+
+  // Create start ray from the camera to the object
+  if (fromRay) {
+    _startDragRay.direction.copyFrom(fromRay->direction);
+    _startDragRay.origin.copyFrom(fromRay->origin);
+  }
+  else {
+    _startDragRay.origin.copyFrom(_scene->activeCamera->position);
+    _attachedNode->getWorldMatrix()->getTranslationToRef(_tmpVector);
+    _tmpVector.subtractToRef(_scene->activeCamera->position,
+                             _startDragRay.direction);
+  }
+
+  _updateDragPlanePosition(_startDragRay,
+                           startPickedPoint ? *startPickedPoint : _tmpVector);
+
+  auto pickedPoint = _pickWithRayOnDragPlane(_startDragRay);
+  if (pickedPoint) {
+    dragging                 = true;
+    currentDraggingPointerID = 1;
+    lastDragPosition.copyFrom(*pickedPoint);
+
+    DragStartOrEndEvent dragStartOrEndEvent;
+    dragStartOrEndEvent.dragPlanePoint = *pickedPoint;
+    dragStartOrEndEvent.pointerId      = currentDraggingPointerID;
+
+    onDragStartObservable.notifyObservers(&dragStartOrEndEvent);
+    _targetPosition.copyFrom(
+      std::dynamic_pointer_cast<Mesh>(_attachedNode)->absolutePosition);
+
+    // Detatch camera controls
+    if (detachCameraControls && _scene->activeCamera
+        && !_scene->activeCamera->leftCamera()) {
+      if (_scene->activeCamera->inputs.attachedElement) {
+        _attachedElement = _scene->activeCamera->inputs.attachedElement;
+        _scene->activeCamera->detachControl(
+          _scene->activeCamera->inputs.attachedElement);
+      }
+      else {
+        _attachedElement = nullptr;
+      }
+    }
+  }
+}
+
+void PointerDragBehavior::_moveDrag(const Ray& ray)
+{
+  _moving          = true;
+  auto pickedPoint = _pickWithRayOnDragPlane(ray);
+
+  if (pickedPoint) {
+    if (updateDragPlane) {
+      _updateDragPlanePosition(ray, *pickedPoint);
+    }
+
+    auto dragLength = 0.f;
+    // depending on the drag mode option drag accordingly
+    if (_options.dragAxis) {
+      // Convert local drag axis to world
+      Vector3::TransformCoordinatesToRef(
+        *_options.dragAxis,
+        _attachedNode->getWorldMatrix()->getRotationMatrix(), _worldDragAxis);
+
+      // Project delta drag from the drag plane onto the drag axis
+      pickedPoint->subtractToRef(lastDragPosition, _tmpVector);
+      dragLength = Vector3::Dot(_tmpVector, _worldDragAxis);
+      _worldDragAxis.scaleToRef(dragLength, _dragDelta);
+    }
+    else {
+      dragLength = _dragDelta.length();
+      pickedPoint->subtractToRef(lastDragPosition, _dragDelta);
+    }
+    _targetPosition.addInPlace(_dragDelta);
+
+    DragMoveEvent dragMoveEvent;
+    dragMoveEvent.dragDistance    = dragLength;
+    dragMoveEvent.delta           = _dragDelta;
+    dragMoveEvent.dragPlanePoint  = *pickedPoint;
+    dragMoveEvent.dragPlaneNormal = _dragPlane->forward;
+    dragMoveEvent.pointerId       = currentDraggingPointerID;
+
+    onDragObservable.notifyObservers(&dragMoveEvent);
+    lastDragPosition.copyFrom(*pickedPoint);
+  }
 }
 
 nullable_t<Vector3>

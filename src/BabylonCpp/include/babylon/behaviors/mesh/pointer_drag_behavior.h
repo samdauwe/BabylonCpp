@@ -5,6 +5,7 @@
 #include <babylon/behaviors/behavior.h>
 #include <babylon/behaviors/mesh/pointer_drag_behavior_options.h>
 #include <babylon/core/structs.h>
+#include <babylon/culling/ray.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
@@ -53,11 +54,29 @@ public:
   void releaseDrag();
 
   /**
+   * @brief Simulates the start of a pointer drag event on the behavior.
+   * @param pointerId pointerID of the pointer that should be simulated
+   * (Default: 1 for mouse pointer)
+   * @param fromRay initial ray of the pointer to be simulated (Default: Ray
+   * from camera to attached mesh)
+   * @param startPickedPoint picked point of the pointer to be simulated
+   * (Default: attached mesh position)
+   */
+  void startDrag(int pointerId                                  = 1,
+                 const std::optional<Ray>& fromRay              = std::nullopt,
+                 const std::optional<Vector3>& startPickedPoint = std::nullopt);
+
+  /**
    * @brief Detaches the behavior from the mesh.
    */
   void detach() override;
 
 private:
+  void _startDrag(int pointerId                     = 1,
+                  const std::optional<Ray>& fromRay = std::nullopt,
+                  const std::optional<Vector3>& startPickedPoint
+                  = std::nullopt);
+  void _moveDrag(const Ray& ray);
   std::optional<Vector3> _pickWithRayOnDragPlane(const std::optional<Ray>& ray);
 
   /**
@@ -158,6 +177,11 @@ private:
   Vector3 _tmpVector;
   Vector3 _alternatePickedPoint;
   Vector3 _worldDragAxis;
+  Vector3 _targetPosition;
+  ICanvas* _attachedElement;
+  Ray _startDragRay;
+  std::unordered_map<int, Ray> _lastPointerRay;
+  Vector3 _dragDelta;
 
   // Variables to avoid instantiation in the method _updateDragPlanePosition
   Vector3 _pointA;
