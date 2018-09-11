@@ -1,7 +1,7 @@
 #ifndef BABYLON_CULLING_BOUNDING_SPHERE_H
 #define BABYLON_CULLING_BOUNDING_SPHERE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
@@ -43,7 +43,7 @@ public:
    */
   void _update(const Matrix& world);
 
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes) const;
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
   bool intersectsPoint(const Vector3& point);
 
   /** Statics **/

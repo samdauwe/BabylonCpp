@@ -1,11 +1,17 @@
 #ifndef BABYLON_CULLING_RAY_H
 #define BABYLON_CULLING_RAY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class BoundingBox;
+class BoundingSphere;
+class IntersectionInfo;
+class PickingInfo;
 
 /**
  * @brief Represents a Ray.
@@ -19,13 +25,13 @@ public:
 public:
   Ray();
   Ray(const Vector3& origin, const Vector3& direction,
-      float length = numeric_limits_t<float>::max());
+      float length = std::numeric_limits<float>::max());
   Ray(const Ray& otherRay);
   Ray(Ray&& otherRay);
   Ray& operator=(const Ray& otherRay);
   Ray& operator=(Ray&& otherRay);
   ~Ray();
-  unique_ptr_t<Ray> clone() const;
+  std::unique_ptr<Ray> clone() const;
   friend std::ostream& operator<<(std::ostream& os, const Ray& ray);
 
   /** Methods **/
@@ -33,14 +39,14 @@ public:
                            const Vector3& maximum) const;
   bool intersectsBox(const BoundingBox& box) const;
   bool intersectsSphere(const BoundingSphere& sphere) const;
-  unique_ptr_t<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
+  std::unique_ptr<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
                                                     const Vector3& vertex1,
                                                     const Vector3& vertex2);
-  nullable_t<float> intersectsPlane(const Plane& plane);
+  std::optional<float> intersectsPlane(const Plane& plane);
   PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck = false);
-  vector_t<PickingInfo> intersectsMeshes(vector_t<AbstractMesh*>& meshes,
+  std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
                                          bool fastCheck,
-                                         vector_t<PickingInfo>& results);
+                                         std::vector<PickingInfo>& results);
 
   /**
    * Intersection test between the ray and a given segment whithin a given
@@ -100,7 +106,7 @@ private:
   Vector3 _tvec;
   Vector3 _qvec;
 
-  unique_ptr_t<Ray> _tmpRay;
+  std::unique_ptr<Ray> _tmpRay;
 
 }; // end of class Ray
 

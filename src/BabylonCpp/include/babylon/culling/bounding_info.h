@@ -1,13 +1,15 @@
 #ifndef BABYLON_CULLING_BOUNDING_INFO_H
 #define BABYLON_CULLING_BOUNDING_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/culling/icullable.h>
 
 namespace BABYLON {
+
+class Collider;
 
 class BABYLON_SHARED_EXPORT BoundingInfo : public ICullable {
 
@@ -45,7 +47,7 @@ public:
    * BABYLON.Scene.CULLINGSTRATEGY_STANDARD)
    * @returns true if the bounding info is in the frustum planes
    */
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                    unsigned int strategy
                    = 0 /*AbstractMesh::CULLINGSTRATEGY_STANDARD*/) override;
 
@@ -55,8 +57,8 @@ public:
    */
   float diagonalLength() const;
 
-  bool
-  isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
+  bool isCompletelyInFrustum(
+    const std::array<Plane, 6>& frustumPlanes) const override;
 
   /**
    * @brief Hidden
