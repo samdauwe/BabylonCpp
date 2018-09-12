@@ -1,10 +1,13 @@
 #ifndef BABYLON_CAMERAS_UNIVERSAL_CAMERA_H
 #define BABYLON_CAMERAS_UNIVERSAL_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/touch_camera.h>
 
 namespace BABYLON {
+
+class UniversalCamera;
+using UniversalCameraPtr = std::shared_ptr<UniversalCamera>;
 
 /**
  * @brief We're mainly based on the logic defined into the FreeCamera code.
@@ -15,7 +18,7 @@ public:
   template <typename... Ts>
   static UniversalCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<UniversalCamera>(
+    auto camera = std::shared_ptr<UniversalCamera>(
       new UniversalCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -23,10 +26,11 @@ public:
   }
   ~UniversalCamera() override;
 
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
-  UniversalCamera(const string_t& name, const Vector3& position, Scene* scene);
+  UniversalCamera(const std::string& name, const Vector3& position,
+                  Scene* scene);
 
   float get_gamepadAngularSensibility() const;
   void set_gamepadAngularSensibility(float value);

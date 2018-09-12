@@ -1,7 +1,7 @@
 #ifndef BABYLON_EVENTS_KEYBOARD_EVENT_TYPES_H
 #define BABYLON_EVENTS_KEYBOARD_EVENT_TYPES_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

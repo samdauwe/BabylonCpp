@@ -8,6 +8,7 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>

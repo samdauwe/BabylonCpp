@@ -8,6 +8,7 @@
 #include <babylon/core/time.h>
 #include <babylon/engine/depth_texture_creation_options.h>
 #include <babylon/engine/instancing_attribute_info.h>
+#include <babylon/engine/scene.h>
 #include <babylon/instrumentation/_time_token.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>

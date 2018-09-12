@@ -5,10 +5,6 @@
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/lava/lava_material.h>
 #include <babylon/mesh/mesh.h>
-//#include <babylon/materials/textures/texture.h>
-//#include <babylon/materialslibrary/cell/cell_material.h>
-//#include <babylon/mesh/mesh_builder.h>
-//#include <babylon/mesh/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {

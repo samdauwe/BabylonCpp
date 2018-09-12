@@ -2,6 +2,7 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/free_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>

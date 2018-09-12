@@ -1,7 +1,8 @@
 #ifndef BABYLON_COLLISIONS_WORKER_REPLY_H
 #define BABYLON_COLLISIONS_WORKER_REPLY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_enums.h>
 #include <babylon/collisions/collide_payload.h>
 #include <babylon/collisions/collision_reply_payload.h>
 #include <babylon/collisions/init_payload.h>

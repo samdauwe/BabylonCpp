@@ -1,10 +1,13 @@
 #ifndef BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_ARC_ROTATE_CAMERA_H
 #define BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_ARC_ROTATE_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 
 namespace BABYLON {
+
+class AnaglyphArcRotateCamera;
+using AnaglyphArcRotateCameraPtr = std::shared_ptr<AnaglyphArcRotateCamera>;
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on
@@ -19,7 +22,7 @@ public:
   template <typename... Ts>
   static AnaglyphArcRotateCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<AnaglyphArcRotateCamera>(
+    auto camera = std::shared_ptr<AnaglyphArcRotateCamera>(
       new AnaglyphArcRotateCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -31,7 +34,7 @@ public:
    * @brief Gets camera class name
    * @returns AnaglyphArcRotateCamera
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
   /**
@@ -44,7 +47,7 @@ protected:
    * @param interaxialDistance defines distance between each color axis
    * @param scene defines the hosting scene
    */
-  AnaglyphArcRotateCamera(const string_t& name, float alpha, float beta,
+  AnaglyphArcRotateCamera(const std::string& name, float alpha, float beta,
                           float radius, const Vector3& target,
                           float interaxialDistance, Scene* scene);
 

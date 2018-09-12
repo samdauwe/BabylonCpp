@@ -1,6 +1,7 @@
 #include <babylon/samples/materialslibrary/gradient_material_sphere_scene.h>
 
 #include <babylon/cameras/free_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materialslibrary/gradient/gradient_material.h>
 #include <babylon/mesh/mesh.h>

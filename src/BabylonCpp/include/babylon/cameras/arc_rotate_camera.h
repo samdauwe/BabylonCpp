@@ -1,7 +1,7 @@
 #ifndef BABYLON_CAMERAS_ARC_ROTATE_CAMERA_H
 #define BABYLON_CAMERAS_ARC_ROTATE_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/arc_rotate_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/structs.h>
@@ -10,6 +10,13 @@
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class ArcRotateCamera;
+class AutoRotationBehavior;
+class BouncingBehavior;
+class Collider;
+class FramingBehavior;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
 class BABYLON_SHARED_EXPORT ArcRotateCamera : public TargetCamera {
 
@@ -20,7 +27,7 @@ public:
   template <typename... Ts>
   static ArcRotateCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<ArcRotateCamera>(
+    auto camera = std::shared_ptr<ArcRotateCamera>(
       new ArcRotateCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -65,21 +72,21 @@ public:
                  bool allowSamePosition = false);
   /** Hidden */
   Matrix _getViewMatrix() override;
-  void zoomOn(const vector_t<AbstractMeshPtr> meshes,
+  void zoomOn(const std::vector<AbstractMeshPtr> meshes,
               bool doNotUpdateMaxZ = false);
   void focusOn(const MinMaxDistance& meshesOrMinMaxVectorAndDistance,
                bool doNotUpdateMaxZ = false);
   /** Hidden */
-  CameraPtr createRigCamera(const string_t& name, int cameraIndex) override;
+  CameraPtr createRigCamera(const std::string& name, int cameraIndex) override;
   void _updateRigCameras() override;
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   Json::object serialize() const override;
 
 protected:
-  ArcRotateCamera(const string_t& name, float alpha, float beta, float radius,
-                  const nullable_t<Vector3>& target, Scene* scene,
+  ArcRotateCamera(const std::string& name, float alpha, float beta, float radius,
+                  const std::optional<Vector3>& target, Scene* scene,
                   bool setActiveOnSceneIfNoneActive = true);
 
   Vector3 _getTargetPosition();
@@ -90,13 +97,13 @@ protected:
 private:
   Vector3& get_target();
   void set_target(const Vector3& value);
-  unique_ptr_t<BouncingBehavior>& get_bouncingBehavior();
+  std::unique_ptr<BouncingBehavior>& get_bouncingBehavior();
   bool get_useBouncingBehavior() const;
   void set_useBouncingBehavior(bool value);
-  unique_ptr_t<FramingBehavior>& get_framingBehavior();
+  std::unique_ptr<FramingBehavior>& get_framingBehavior();
   bool get_useFramingBehavior() const;
   void set_useFramingBehavior(bool value);
-  unique_ptr_t<AutoRotationBehavior>& get_autoRotationBehavior();
+  std::unique_ptr<AutoRotationBehavior>& get_autoRotationBehavior();
   bool get_useAutoRotationBehavior() const;
   void set_useAutoRotationBehavior(bool value);
 
@@ -108,16 +115,16 @@ public:
   float inertialAlphaOffset;
   float inertialBetaOffset;
   float inertialRadiusOffset;
-  nullable_t<float> lowerAlphaLimit;
-  nullable_t<float> upperAlphaLimit;
+  std::optional<float> lowerAlphaLimit;
+  std::optional<float> upperAlphaLimit;
   float lowerBetaLimit;
   float upperBetaLimit;
-  nullable_t<float> lowerRadiusLimit;
-  nullable_t<float> upperRadiusLimit;
+  std::optional<float> lowerRadiusLimit;
+  std::optional<float> upperRadiusLimit;
   float inertialPanningX;
   float inertialPanningY;
   float pinchToPanMaxDistance;
-  nullable_t<float> panningDistanceLimit;
+  std::optional<float> panningDistanceLimit;
   Vector3 panningOriginTarget;
   float panningInertia;
   float zoomOnFactor;
@@ -128,17 +135,17 @@ public:
   bool _useCtrlForPanning;
   /** Hidden */
   MouseButtonType _panningMouseButton;
-  unique_ptr_t<ArcRotateCameraInputsManager> inputs;
+  std::unique_ptr<ArcRotateCameraInputsManager> inputs;
   // Panning
-  unique_ptr_t<Vector3> panningAxis;
+  std::unique_ptr<Vector3> panningAxis;
   // Behaviors
-  ReadOnlyProperty<ArcRotateCamera, unique_ptr_t<BouncingBehavior>>
+  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<BouncingBehavior>>
     bouncingBehavior;
   Property<ArcRotateCamera, bool> useBouncingBehavior;
-  ReadOnlyProperty<ArcRotateCamera, unique_ptr_t<FramingBehavior>>
+  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<FramingBehavior>>
     framingBehavior;
   Property<ArcRotateCamera, bool> useFramingBehavior;
-  ReadOnlyProperty<ArcRotateCamera, unique_ptr_t<AutoRotationBehavior>>
+  ReadOnlyProperty<ArcRotateCamera, std::unique_ptr<AutoRotationBehavior>>
     autoRotationBehavior;
   Property<ArcRotateCamera, bool> useAutoRotationBehavior;
   // Behaviors
@@ -146,16 +153,16 @@ public:
   // Collisions
   ::std::function<void(AbstractMesh* collidedMesh)> onCollide;
   bool checkCollisions;
-  unique_ptr_t<Vector3> collisionRadius;
+  std::unique_ptr<Vector3> collisionRadius;
 
 protected:
   Vector3 _target;
   AbstractMesh* _targetHost;
   // Panning
-  unique_ptr_t<Vector3> _localDirection;
+  std::unique_ptr<Vector3> _localDirection;
   Vector3 _transformedDirection;
   // Collisions
-  unique_ptr_t<Collider> _collider;
+  std::unique_ptr<Collider> _collider;
   Vector3 _previousPosition;
   Vector3 _collisionVelocity;
   Vector3 _newPosition;
@@ -164,11 +171,11 @@ protected:
   float _previousRadius;
   // due to async collision inspection
   bool _collisionTriggered;
-  unique_ptr_t<Vector3> _targetBoundingCenter;
+  std::unique_ptr<Vector3> _targetBoundingCenter;
   // Behaviors
-  unique_ptr_t<BouncingBehavior> _bouncingBehavior;
-  unique_ptr_t<FramingBehavior> _framingBehavior;
-  unique_ptr_t<AutoRotationBehavior> _autoRotationBehavior;
+  std::unique_ptr<BouncingBehavior> _bouncingBehavior;
+  std::unique_ptr<FramingBehavior> _framingBehavior;
+  std::unique_ptr<AutoRotationBehavior> _autoRotationBehavior;
 
 private:
   Vector3 _computationVector;

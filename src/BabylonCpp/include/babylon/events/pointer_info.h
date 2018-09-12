@@ -1,7 +1,7 @@
 #ifndef BABYLON_EVENTS_POINTER_INFO_H
 #define BABYLON_EVENTS_POINTER_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info_base.h>

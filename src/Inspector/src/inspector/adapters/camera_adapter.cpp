@@ -2,6 +2,7 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/free_camera.h>
+#include <babylon/engine/scene.h>
 
 #include <babylon/inspector/properties/properties_view.h>
 #include <babylon/inspector/treetools/camera_pov.h>

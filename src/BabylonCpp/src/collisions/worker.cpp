@@ -2,6 +2,7 @@
 
 #include <babylon/collisions/babylon_message.h>
 #include <babylon/collisions/worker_reply.h>
+#include <babylon/engine/scene.h>
 
 namespace BABYLON {
 
@@ -29,7 +30,7 @@ void Worker::postMessage(const BabylonMessage& message)
 }
 
 void Worker::postMessage(const BabylonMessage& /*message*/,
-                         const vector_t<ArrayBufferView>& /*serializable*/)
+                         const std::vector<ArrayBufferView>& /*serializable*/)
 {
 }
 

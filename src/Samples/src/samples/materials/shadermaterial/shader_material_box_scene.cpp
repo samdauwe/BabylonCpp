@@ -1,6 +1,7 @@
 #include <babylon/samples/materials/shadermaterial/shader_material_box_scene.h>
 
 #include <babylon/cameras/free_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>

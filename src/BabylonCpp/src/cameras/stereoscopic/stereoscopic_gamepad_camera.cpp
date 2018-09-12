@@ -9,8 +9,8 @@ bool StereoscopicGamepadCamera::NodeConstructorAdded = false;
 void StereoscopicGamepadCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "StereoscopicGamepadCamera", [](const string_t& name, Scene* scene,
-                                    const nullable_t<Json::value>& options) {
+    "StereoscopicGamepadCamera", [](const std::string& name, Scene* scene,
+                                    const std::optional<Json::value>& options) {
       float interaxialDistance      = 0.f;
       bool isStereoscopicSideBySide = false;
       if (options) {
@@ -27,7 +27,7 @@ void StereoscopicGamepadCamera::AddNodeConstructor()
 }
 
 StereoscopicGamepadCamera::StereoscopicGamepadCamera(
-  const string_t& name, const Vector3& position, float iInteraxialDistance,
+  const std::string& name, const Vector3& position, float iInteraxialDistance,
   bool iIsStereoscopicSideBySide, Scene* scene)
     : GamepadCamera{name, position, scene}
 {
@@ -46,7 +46,7 @@ StereoscopicGamepadCamera::~StereoscopicGamepadCamera()
 {
 }
 
-const string_t StereoscopicGamepadCamera::getClassName() const
+const std::string StereoscopicGamepadCamera::getClassName() const
 {
   return "StereoscopicGamepadCamera";
 }

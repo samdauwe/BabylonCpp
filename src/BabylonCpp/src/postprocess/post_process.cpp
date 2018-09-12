@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>

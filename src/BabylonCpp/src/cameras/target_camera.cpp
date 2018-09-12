@@ -5,6 +5,7 @@
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/math/tmp.h>
 
 namespace BABYLON {

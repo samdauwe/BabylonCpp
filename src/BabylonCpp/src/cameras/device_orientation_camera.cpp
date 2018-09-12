@@ -6,15 +6,16 @@ bool DeviceOrientationCamera::NodeConstructorAdded = false;
 
 void DeviceOrientationCamera::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "DeviceOrientationCamera", [](const string_t& name, Scene* scene,
-                                  const nullable_t<Json::value>& /*options*/) {
-      return DeviceOrientationCamera::New(name, Vector3::Zero(), scene);
-    });
+  Node::AddNodeConstructor("DeviceOrientationCamera",
+                           [](const std::string& name, Scene* scene,
+                              const std::optional<Json::value>& /*options*/) {
+                             return DeviceOrientationCamera::New(
+                               name, Vector3::Zero(), scene);
+                           });
   DeviceOrientationCamera::NodeConstructorAdded = true;
 }
 
-DeviceOrientationCamera::DeviceOrientationCamera(const string_t& iName,
+DeviceOrientationCamera::DeviceOrientationCamera(const std::string& iName,
                                                  const Vector3& position,
                                                  Scene* scene)
     : FreeCamera{iName, position, scene}
@@ -33,7 +34,7 @@ IReflect::Type DeviceOrientationCamera::type() const
   return IReflect::Type::DEVICEORIENTATIONCAMERA;
 }
 
-const string_t DeviceOrientationCamera::getClassName() const
+const std::string DeviceOrientationCamera::getClassName() const
 {
   return "DeviceOrientationCamera";
 }
@@ -62,10 +63,10 @@ void DeviceOrientationCamera::resetToCurrentRotation(const Vector3& axis)
                                                   *rotationQuaternion);
 
   using Vec3Float = float Vector3::*;
-  const vector_t<Vec3Float> vecAttrs{&Vector3::x, &Vector3::y, &Vector3::z};
+  const std::vector<Vec3Float> vecAttrs{&Vector3::x, &Vector3::y, &Vector3::z};
   using QuatFloat = float Quaternion::*;
-  const vector_t<QuatFloat> quatAttrs{&Quaternion::x, &Quaternion::y,
-                                      &Quaternion::z};
+  const std::vector<QuatFloat> quatAttrs{&Quaternion::x, &Quaternion::y,
+                                         &Quaternion::z};
 
   for (unsigned int i = 0; i < vecAttrs.size(); ++i) {
     if (axis.*vecAttrs[i] == 0.f) {

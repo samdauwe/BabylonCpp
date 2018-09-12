@@ -5,6 +5,7 @@
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/engine/scene_component_constants.h>
 #include <babylon/lensflare/lens_flare.h>
 #include <babylon/lensflare/lens_flare_system_scene_component.h>

@@ -1,6 +1,7 @@
 #include <babylon/samples/meshes/polygonmesh/polygon_mesh_puzzle_piece_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/math/path2.h>

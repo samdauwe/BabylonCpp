@@ -1,6 +1,7 @@
 #include <babylon/samples/specialfx/fog_scene.h>
 
 #include <babylon/cameras/free_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/mesh/mesh.h>

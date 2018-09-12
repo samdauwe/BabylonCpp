@@ -1,7 +1,7 @@
 #ifndef BABYLON_COLLISIONS_INIT_PAYLOAD_H
 #define BABYLON_COLLISIONS_INIT_PAYLOAD_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

@@ -1,7 +1,7 @@
 #ifndef BABYLON_CAMERAS_VR_POSE_CONTROLLED_H
 #define BABYLON_CAMERAS_VR_POSE_CONTROLLED_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/vr/device_pose.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>

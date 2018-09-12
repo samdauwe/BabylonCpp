@@ -1,7 +1,8 @@
 #ifndef BABYLON_CAMERAS_VR_DEVICE_POSE_H
 #define BABYLON_CAMERAS_VR_DEVICE_POSE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 

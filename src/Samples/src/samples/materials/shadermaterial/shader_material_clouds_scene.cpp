@@ -4,6 +4,7 @@
 #include <babylon/core/random.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>

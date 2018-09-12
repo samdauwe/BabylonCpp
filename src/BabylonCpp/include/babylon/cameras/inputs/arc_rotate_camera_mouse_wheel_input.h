@@ -1,7 +1,7 @@
 #ifndef BABYLON_CAMERAS_INPUTS_ARC_ROTATE_CAMERA_MOUSE_WHEEL_INPUT_H
 #define BABYLON_CAMERAS_INPUTS_ARC_ROTATE_CAMERA_MOUSE_WHEEL_INPUT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/icamera_input.h>
 #include <babylon/core/structs.h>
@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT ArcRotateCameraMouseWheelInput
-  : public ICameraInput<ArcRotateCamera> {
+    : public ICameraInput<ArcRotateCamera> {
 
 public:
   ArcRotateCameraMouseWheelInput();

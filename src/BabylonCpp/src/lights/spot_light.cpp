@@ -1,6 +1,7 @@
 #include <babylon/lights/spot_light.h>
 
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/base_texture.h>

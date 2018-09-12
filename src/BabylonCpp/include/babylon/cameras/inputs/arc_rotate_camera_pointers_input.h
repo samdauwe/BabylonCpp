@@ -1,7 +1,7 @@
 #ifndef BABYLON_CAMERAS_INPUTS_ARC_ROTATE_CAMERA_POINTERS_INPUT_H
 #define BABYLON_CAMERAS_INPUTS_ARC_ROTATE_CAMERA_POINTERS_INPUT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/icamera_input.h>
 #include <babylon/core/structs.h>
@@ -25,7 +25,7 @@ struct MultiTouchPanPosition {
 }; // end of struct MultiTouchPanPosition
 
 class BABYLON_SHARED_EXPORT ArcRotateCameraPointersInput
-  : public ICameraInput<ArcRotateCamera> {
+    : public ICameraInput<ArcRotateCamera> {
 
 public:
   ArcRotateCameraPointersInput();
@@ -38,7 +38,7 @@ public:
   const char* getSimpleName() const override;
 
 public:
-  array_t<MouseButtonType, 3> buttons;
+  std::array<MouseButtonType, 3> buttons;
   float angularSensibilityX;
   float angularSensibilityY;
   float pinchPrecision;

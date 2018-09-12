@@ -1,11 +1,14 @@
 #ifndef BABYLON_CAMERAS_DEVICE_ORIENTATION_CAMERA_H
 #define BABYLON_CAMERAS_DEVICE_ORIENTATION_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/math/axis.h>
 
 namespace BABYLON {
+
+class DeviceOrientationCamera;
+using DeviceOrientationCameraPtr = std::shared_ptr<DeviceOrientationCamera>;
 
 /**
  * @brief This is a camera specifically designed to react to device orientation
@@ -21,7 +24,7 @@ public:
   template <typename... Ts>
   static DeviceOrientationCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<DeviceOrientationCamera>(
+    auto camera = std::shared_ptr<DeviceOrientationCamera>(
       new DeviceOrientationCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -36,7 +39,7 @@ public:
    * This helps avoiding instanceof at run time.
    * @returns the class name
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Checks and applies the current values of the inputs to the camera.
@@ -58,12 +61,12 @@ protected:
    * @param position The start position camera
    * @param scene The scene the camera belongs to
    */
-  DeviceOrientationCamera(const string_t& name, const Vector3& position,
+  DeviceOrientationCamera(const std::string& name, const Vector3& position,
                           Scene* scene);
 
 private:
-  unique_ptr_t<Quaternion> _initialQuaternion;
-  unique_ptr_t<Quaternion> _quaternionCache;
+  std::unique_ptr<Quaternion> _initialQuaternion;
+  std::unique_ptr<Quaternion> _quaternionCache;
 
   static bool NodeConstructorAdded;
 

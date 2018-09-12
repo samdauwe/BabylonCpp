@@ -1,7 +1,8 @@
 #ifndef BABYLON_COLLISIONS_SERIALIZED_COLLIDER_TO_WORKER_H
 #define BABYLON_COLLISIONS_SERIALIZED_COLLIDER_TO_WORKER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 

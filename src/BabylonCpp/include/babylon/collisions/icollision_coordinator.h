@@ -1,17 +1,25 @@
 #ifndef BABYLON_COLLISIONS_ICOLLISION_COORDINATOR_H
 #define BABYLON_COLLISIONS_ICOLLISION_COORDINATOR_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Collider;
+class Geometry;
+class Scene;
+class TransformNode;
+class Vector3;
 
 struct BABYLON_SHARED_EXPORT ICollisionCoordinator {
   virtual void getNewPosition(
     Vector3& position, Vector3& displacement, Collider* collider,
     unsigned int maximumRetry, AbstractMesh* excludedMesh,
-    const ::std::function<void(unsigned int collisionIndex,
-                               Vector3& newPosition,
-                               AbstractMesh* AbstractMesh)>& onNewPosition,
+    const std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+                             AbstractMesh* AbstractMesh)>& onNewPosition,
     unsigned int collisionIndex)
     = 0;
   virtual void init(Scene* scene) = 0;

@@ -1,6 +1,7 @@
 #include <babylon/samples/materialslibrary/cell_material_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/cell/cell_material.h>

@@ -11,6 +11,7 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/layer/highlight_layer.h>
 #include <babylon/lights/light.h>

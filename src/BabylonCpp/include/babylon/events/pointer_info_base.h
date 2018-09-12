@@ -1,7 +1,7 @@
 #ifndef BABYLON_EVENTS_POINTER_INFO_BASE_H
 #define BABYLON_EVENTS_POINTER_INFO_BASE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/events/pointer_event_types.h>
 

@@ -1,7 +1,7 @@
 #ifndef BABYLON_CAMERAS_INPUTS_FREE_CAMERA_MOUSE_INPUT_H
 #define BABYLON_CAMERAS_INPUTS_FREE_CAMERA_MOUSE_INPUT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/cameras/icamera_input.h>
 #include <babylon/core/structs.h>
@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT FreeCameraMouseInput
-  : public ICameraInput<FreeCamera> {
+    : public ICameraInput<FreeCamera> {
 
 public:
   FreeCameraMouseInput(bool touchEnabled = true);
@@ -24,7 +24,7 @@ public:
   const char* getSimpleName() const override;
 
 public:
-  array_t<MouseButtonType, 3> buttons;
+  std::array<MouseButtonType, 3> buttons;
   float angularSensibility;
   bool touchEnabled;
 

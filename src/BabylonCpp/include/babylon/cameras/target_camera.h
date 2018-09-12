@@ -1,11 +1,14 @@
 #ifndef BABYLON_CAMERAS_TARGET_CAMERA_H
 #define BABYLON_CAMERAS_TARGET_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/math/vector2.h>
 
 namespace BABYLON {
+
+class TargetCamera;
+using TargetCameraPtr = std::shared_ptr<TargetCamera>;
 
 class BABYLON_SHARED_EXPORT TargetCamera : public Camera {
 
@@ -13,7 +16,7 @@ public:
   template <typename... Ts>
   static TargetCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<TargetCamera>(
+    auto camera = std::shared_ptr<TargetCamera>(
       new TargetCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -73,14 +76,14 @@ public:
   Matrix _getViewMatrix() override;
 
   /** Camera rigs section **/
-  CameraPtr createRigCamera(const string_t& name, int cameraIndex) override;
+  CameraPtr createRigCamera(const std::string& name, int cameraIndex) override;
   /** Hidden */
   void _updateRigCameras() override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual Json::object serialize() const override;
 
 protected:
-  TargetCamera(const string_t& name, const Vector3& position, Scene* scene,
+  TargetCamera(const std::string& name, const Vector3& position, Scene* scene,
                bool setActiveOnSceneIfNoneActive = true);
 
   void _computeViewMatrix(const Vector3& position, const Vector3& target,
@@ -99,11 +102,11 @@ private:
   void _updateCameraRotationMatrix() override;
 
 public:
-  unique_ptr_t<Vector3> cameraDirection;
-  unique_ptr_t<Vector2> cameraRotation;
-  unique_ptr_t<Vector3> rotation;
+  std::unique_ptr<Vector3> cameraDirection;
+  std::unique_ptr<Vector2> cameraRotation;
+  std::unique_ptr<Vector3> rotation;
 
-  unique_ptr_t<Quaternion> rotationQuaternion;
+  std::unique_ptr<Quaternion> rotationQuaternion;
 
   float speed;
   bool noRotationConstraint;
@@ -120,12 +123,12 @@ public:
   /** Hidden */
   Matrix _cameraRotationMatrix;
   /** Hidden */
-  unique_ptr_t<Vector3> _referencePoint;
+  std::unique_ptr<Vector3> _referencePoint;
   /** Hidden */
   Vector3 _transformedReferencePoint;
   /** Hidden */
   ::std::function<void()> _reset;
-  string_t _waitingLockedTargetId;
+  std::string _waitingLockedTargetId;
 
 protected:
   Vector3 _globalCurrentTarget;

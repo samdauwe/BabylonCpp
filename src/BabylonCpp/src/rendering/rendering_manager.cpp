@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/rendering_group_info.h>
+#include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/particles/particle_system.h>

@@ -7,6 +7,7 @@
 #include <babylon/core/json.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
 
 namespace BABYLON {

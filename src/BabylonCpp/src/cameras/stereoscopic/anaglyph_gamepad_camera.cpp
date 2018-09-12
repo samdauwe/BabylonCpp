@@ -9,8 +9,8 @@ bool AnaglyphGamepadCamera::NodeConstructorAdded = false;
 void AnaglyphGamepadCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "AnaglyphGamepadCamera", [](const string_t& name, Scene* scene,
-                                const nullable_t<Json::value>& options) {
+    "AnaglyphGamepadCamera", [](const std::string& name, Scene* scene,
+                                const std::optional<Json::value>& options) {
       float interaxialDistance = 0.f;
       if (options) {
         interaxialDistance
@@ -22,7 +22,7 @@ void AnaglyphGamepadCamera::AddNodeConstructor()
   AnaglyphGamepadCamera::NodeConstructorAdded = true;
 }
 
-AnaglyphGamepadCamera::AnaglyphGamepadCamera(const string_t& name,
+AnaglyphGamepadCamera::AnaglyphGamepadCamera(const std::string& name,
                                              const Vector3& position,
                                              float iInteraxialDistance,
                                              Scene* scene)
@@ -40,7 +40,7 @@ AnaglyphGamepadCamera::~AnaglyphGamepadCamera()
 {
 }
 
-const string_t AnaglyphGamepadCamera::getClassName() const
+const std::string AnaglyphGamepadCamera::getClassName() const
 {
   return "AnaglyphGamepadCamera";
 }

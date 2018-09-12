@@ -9,8 +9,9 @@ bool StereoscopicArcRotateCamera::NodeConstructorAdded = false;
 void StereoscopicArcRotateCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "StereoscopicArcRotateCamera", [](const string_t& name, Scene* scene,
-                                      const nullable_t<Json::value>& options) {
+    "StereoscopicArcRotateCamera",
+    [](const std::string& name, Scene* scene,
+       const std::optional<Json::value>& options) {
       float interaxialDistance      = 0.f;
       bool isStereoscopicSideBySide = false;
       if (options) {
@@ -27,7 +28,7 @@ void StereoscopicArcRotateCamera::AddNodeConstructor()
 }
 
 StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
-  const string_t& name, float alpha, float beta, float radius,
+  const std::string& name, float alpha, float beta, float radius,
   const Vector3& target, float iInteraxialDistance,
   bool iIsStereoscopicSideBySide, Scene* scene)
     : ArcRotateCamera{name, alpha, beta, radius, target, scene}
@@ -47,7 +48,7 @@ StereoscopicArcRotateCamera::~StereoscopicArcRotateCamera()
 {
 }
 
-const string_t StereoscopicArcRotateCamera::getClassName() const
+const std::string StereoscopicArcRotateCamera::getClassName() const
 {
   return "StereoscopicArcRotateCamera";
 }

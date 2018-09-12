@@ -1,12 +1,16 @@
 #ifndef BABYLON_CAMERAS_FREE_CAMERA_H
 #define BABYLON_CAMERAS_FREE_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/free_camera_inputs_manager.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/structs.h>
 
 namespace BABYLON {
+
+class Collider;
+class FreeCamera;
+using FreeCameraPtr = std::shared_ptr<FreeCamera>;
 
 class BABYLON_SHARED_EXPORT FreeCamera : public TargetCamera {
 
@@ -17,8 +21,8 @@ public:
   template <typename... Ts>
   static FreeCameraPtr New(Ts&&... args)
   {
-    auto camera
-      = shared_ptr_t<FreeCamera>(new FreeCamera(::std::forward<Ts>(args)...));
+    auto camera = std::shared_ptr<FreeCamera>(
+      new FreeCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
@@ -43,7 +47,7 @@ public:
   void _updatePosition() override;
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   Json::object serialize() const override;
 
 private:
@@ -53,7 +57,7 @@ private:
                                   AbstractMesh* collidedMesh = nullptr);
 
 protected:
-  FreeCamera(const string_t& name, const Vector3& position, Scene* scene,
+  FreeCamera(const std::string& name, const Vector3& position, Scene* scene,
              bool setActiveOnSceneIfNoneActive = true);
 
 public:
@@ -61,12 +65,12 @@ public:
   Vector3 ellipsoidOffset;
   bool checkCollisions;
   bool applyGravity;
-  unique_ptr_t<FreeCameraInputsManager> inputs;
+  std::unique_ptr<FreeCameraInputsManager> inputs;
   // Collisions
   ::std::function<void(AbstractMesh* collidedMesh)> onCollide;
   // Direction
   /** Hidden */
-  unique_ptr_t<Vector3> _localDirection;
+  std::unique_ptr<Vector3> _localDirection;
   /** Hidden */
   Vector3 _transformedDirection;
 
@@ -74,7 +78,7 @@ public:
 
 private:
   // Collisions
-  unique_ptr_t<Collider> _collider;
+  std::unique_ptr<Collider> _collider;
   int _collisionMask;
   bool _needMoveForGravity;
   Vector3 _oldPosition;

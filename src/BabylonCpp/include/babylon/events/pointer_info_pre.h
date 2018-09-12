@@ -1,7 +1,7 @@
 #ifndef BABYLON_EVENTS_POINTER_INFO_PRE_H
 #define BABYLON_EVENTS_POINTER_INFO_PRE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/culling/ray.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info_base.h>
@@ -31,7 +31,7 @@ public:
   /**
    * Ray from a pointer if available (eg. 6dof controller)
    */
-  nullable_t<Ray> ray;
+  std::optional<Ray> ray;
 
 }; // end of class PointerInfoPre
 

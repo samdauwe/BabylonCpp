@@ -1,6 +1,7 @@
 #include <babylon/samples/meshes/colored_triangle_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_data.h>

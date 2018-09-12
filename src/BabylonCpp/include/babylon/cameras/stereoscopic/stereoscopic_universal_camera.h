@@ -1,10 +1,14 @@
 #ifndef BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_UNIVERSAL_CAMERA_H
 #define BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_UNIVERSAL_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/universal_camera.h>
 
 namespace BABYLON {
+
+class StereoscopicUniversalCamera;
+using StereoscopicUniversalCameraPtr
+  = std::shared_ptr<StereoscopicUniversalCamera>;
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on
@@ -20,7 +24,7 @@ public:
   template <typename... Ts>
   static StereoscopicUniversalCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<StereoscopicUniversalCamera>(
+    auto camera = std::shared_ptr<StereoscopicUniversalCamera>(
       new StereoscopicUniversalCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -32,7 +36,7 @@ public:
    * @brief Gets camera class name.
    * @returns StereoscopicUniversalCamera
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
   /**
@@ -44,7 +48,7 @@ protected:
    * side or over under
    * @param scene defines the hosting scene
    */
-  StereoscopicUniversalCamera(const string_t& name, const Vector3& position,
+  StereoscopicUniversalCamera(const std::string& name, const Vector3& position,
                               float interaxialDistance,
                               bool isStereoscopicSideBySide, Scene* scene);
 

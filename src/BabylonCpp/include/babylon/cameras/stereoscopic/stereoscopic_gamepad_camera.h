@@ -1,10 +1,13 @@
 #ifndef BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_GAMEPAD_CAMERA_H
 #define BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_GAMEPAD_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/gamepad_camera.h>
 
 namespace BABYLON {
+
+class StereoscopicGamepadCamera;
+using StereoscopicGamepadCameraPtr = std::shared_ptr<StereoscopicGamepadCamera>;
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on
@@ -19,7 +22,7 @@ public:
   template <typename... Ts>
   static StereoscopicGamepadCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<StereoscopicGamepadCamera>(
+    auto camera = std::shared_ptr<StereoscopicGamepadCamera>(
       new StereoscopicGamepadCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -31,7 +34,7 @@ public:
    * @brief Gets camera class name.
    * @returns StereoscopicGamepadCamera
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
   /**
@@ -43,7 +46,7 @@ protected:
    * side or over under
    * @param scene defines the hosting scene
    */
-  StereoscopicGamepadCamera(const string_t& name, const Vector3& position,
+  StereoscopicGamepadCamera(const std::string& name, const Vector3& position,
                             float interaxialDistance,
                             bool isStereoscopicSideBySide, Scene* scene);
 

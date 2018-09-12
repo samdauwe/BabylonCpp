@@ -1,7 +1,7 @@
 #ifndef BABYLON_COLLISIONS_COLLISION_DETECTOR_TRANSFERABLE_H
 #define BABYLON_COLLISIONS_COLLISION_DETECTOR_TRANSFERABLE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/collisions/collide_payload.h>
 #include <babylon/collisions/icollision_detector.h>
 #include <babylon/collisions/init_payload.h>
@@ -9,8 +9,10 @@
 
 namespace BABYLON {
 
+class CollisionCache;
+
 class BABYLON_SHARED_EXPORT CollisionDetectorTransferable
-  : public ICollisionDetector {
+    : public ICollisionDetector {
 
 public:
   CollisionDetectorTransferable();
@@ -21,7 +23,7 @@ public:
   WorkerReply onCollision(const CollidePayload& payload) override;
 
 private:
-  unique_ptr_t<CollisionCache> _collisionCache;
+  std::unique_ptr<CollisionCache> _collisionCache;
 
 }; // end of class ICollisionDetector
 

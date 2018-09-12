@@ -4,6 +4,7 @@
 #include <babylon/animations/easing/bezier_curve_ease.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/free_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/mesh/mesh.h>
 

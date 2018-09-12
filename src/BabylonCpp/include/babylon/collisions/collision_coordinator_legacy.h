@@ -1,26 +1,25 @@
 #ifndef BABYLON_COLLISIONS_COLLISION_COORDINATOR_LEGACY_H
 #define BABYLON_COLLISIONS_COLLISION_COORDINATOR_LEGACY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT CollisionCoordinatorLegacy
-  : public ICollisionCoordinator {
+    : public ICollisionCoordinator {
 
 public:
   CollisionCoordinatorLegacy();
   virtual ~CollisionCoordinatorLegacy();
 
-  void getNewPosition(Vector3& position, Vector3& displacement,
-                      Collider* collider, unsigned int maximumRetry,
-                      AbstractMesh* excludedMesh,
-                      const ::std::function<void(
-                        unsigned int collisionIndex, Vector3& newPosition,
-                        AbstractMesh* AbstractMesh)>& onNewPosition,
-                      unsigned int collisionIndex) override;
+  void getNewPosition(
+    Vector3& position, Vector3& displacement, Collider* collider,
+    unsigned int maximumRetry, AbstractMesh* excludedMesh,
+    const std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+                             AbstractMesh* AbstractMesh)>& onNewPosition,
+    unsigned int collisionIndex) override;
   void init(Scene* scene) override;
   void destroy() override;
   void onMeshAdded(AbstractMesh* mesh) override;

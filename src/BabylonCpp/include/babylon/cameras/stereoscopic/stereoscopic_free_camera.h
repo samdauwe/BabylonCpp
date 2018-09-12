@@ -1,10 +1,13 @@
 #ifndef BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_FREE_CAMERA_H
 #define BABYLON_CAMERAS_STEREOSCOPIC_STEREOSCOPIC_FREE_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/free_camera.h>
 
 namespace BABYLON {
+
+class StereoscopicFreeCamera;
+using StereoscopicFreeCameraPtr = std::shared_ptr<StereoscopicFreeCamera>;
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on FreeCamera).
@@ -18,7 +21,7 @@ public:
   template <typename... Ts>
   static StereoscopicFreeCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<StereoscopicFreeCamera>(
+    auto camera = std::shared_ptr<StereoscopicFreeCamera>(
       new StereoscopicFreeCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -30,7 +33,7 @@ public:
    * @brief Gets camera class name.
    * @returns StereoscopicFreeCamera
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
   /**
@@ -42,7 +45,7 @@ protected:
    * side or over under
    * @param scene defines the hosting scene
    */
-  StereoscopicFreeCamera(const string_t& name, const Vector3& position,
+  StereoscopicFreeCamera(const std::string& name, const Vector3& position,
                          float interaxialDistance,
                          bool isStereoscopicSideBySide, Scene* scene);
 

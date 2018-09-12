@@ -1,10 +1,13 @@
 #ifndef BABYLON_CAMERAS_VIRTUAL_JOYSTICKS_CAMERA_H
 #define BABYLON_CAMERAS_VIRTUAL_JOYSTICKS_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/free_camera.h>
 
 namespace BABYLON {
+
+class VirtualJoysticksCamera;
+using VirtualJoysticksCameraPtr = std::shared_ptr<VirtualJoysticksCamera>;
 
 /**
  * @brief We're mainly based on the logic defined into the FreeCamera code.
@@ -18,7 +21,7 @@ public:
   template <typename... Ts>
   static VirtualJoysticksCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<VirtualJoysticksCamera>(
+    auto camera = std::shared_ptr<VirtualJoysticksCamera>(
       new VirtualJoysticksCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -26,10 +29,10 @@ public:
   }
   ~VirtualJoysticksCamera() override;
 
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
-  VirtualJoysticksCamera(const string_t& name, const Vector3& position,
+  VirtualJoysticksCamera(const std::string& name, const Vector3& position,
                          Scene* scene);
 
 private:

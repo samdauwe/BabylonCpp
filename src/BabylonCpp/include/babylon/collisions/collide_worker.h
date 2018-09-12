@@ -1,12 +1,14 @@
 #ifndef BABYLON_COLLISIONS_COLLIDE_WORKER_H
 #define BABYLON_COLLISIONS_COLLIDE_WORKER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/collisions/collision_cache.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Collider;
 
 class BABYLON_SHARED_EXPORT CollideWorker {
 

@@ -1,11 +1,14 @@
 #ifndef BABYLON_CAMERAS_ARC_FOLLOW_CAMERA_H
 #define BABYLON_CAMERAS_ARC_FOLLOW_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/target_camera.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class ArcFollowCamera;
+using ArcFollowCameraPtr = std::shared_ptr<ArcFollowCamera>;
 
 class BABYLON_SHARED_EXPORT ArcFollowCamera : public TargetCamera {
 
@@ -16,7 +19,7 @@ public:
   template <typename... Ts>
   static ArcFollowCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<ArcFollowCamera>(
+    auto camera = std::shared_ptr<ArcFollowCamera>(
       new ArcFollowCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -28,11 +31,11 @@ public:
 
   /** Hidden */
   void _checkInputs() override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
-  ArcFollowCamera(const string_t& name, float alpha, float beta, float radius,
-                  AbstractMesh* target, Scene* scene);
+  ArcFollowCamera(const std::string& name, float alpha, float beta,
+                  float radius, AbstractMesh* target, Scene* scene);
 
 private:
   void follow();

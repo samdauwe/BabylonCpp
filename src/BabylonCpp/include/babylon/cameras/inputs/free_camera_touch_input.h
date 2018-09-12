@@ -1,7 +1,7 @@
 #ifndef BABYLON_CAMERAS_INPUTS_FREE_CAMERA_TOUCH_INPUT_H
 #define BABYLON_CAMERAS_INPUTS_FREE_CAMERA_TOUCH_INPUT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/cameras/icamera_input.h>
 #include <babylon/core/structs.h>
@@ -28,13 +28,13 @@ public:
   float touchMoveSensibility;
 
 private:
-  nullable_t<float> _offsetX;
-  nullable_t<float> _offsetY;
+  std::optional<float> _offsetX;
+  std::optional<float> _offsetY;
 
   Int32Array _pointerPressed;
-  ::std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
+  std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
   Observer<PointerInfo>::Ptr _observer;
-  ::std::function<string_t(FocusEvent& e)> _onLostFocus;
+  std::function<std::string(FocusEvent& e)> _onLostFocus;
 
 }; // end of class FreeCameraTouchInput
 

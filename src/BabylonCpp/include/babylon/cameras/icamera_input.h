@@ -1,9 +1,11 @@
 #ifndef BABYLON_CAMERAS_ICAMERA_INPUT_H
 #define BABYLON_CAMERAS_ICAMERA_INPUT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class ICanvas;
 
 template <class TCamera>
 struct BABYLON_SHARED_EXPORT ICameraInput {

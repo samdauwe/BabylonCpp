@@ -1,7 +1,9 @@
 #ifndef BABYLON_COLLISIONS_COLLISION_CACHE_H
 #define BABYLON_COLLISIONS_COLLISION_CACHE_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/collisions/serialized_geometry.h>
 #include <babylon/collisions/serialized_mesh.h>
 
@@ -13,20 +15,20 @@ public:
   CollisionCache();
   ~CollisionCache();
 
-  unordered_map_t<unsigned int, SerializedMesh>& getMeshes();
-  unordered_map_t<string_t, SerializedGeometry>& getGeometries();
+  std::unordered_map<unsigned int, SerializedMesh>& getMeshes();
+  std::unordered_map<std::string, SerializedGeometry>& getGeometries();
   bool containsMesh(unsigned int id) const;
   SerializedMesh& getMesh(unsigned int id);
   void addMesh(const SerializedMesh& mesh);
   void removeMesh(unsigned int uniqueId);
-  bool containsGeometry(const string_t& id) const;
-  SerializedGeometry& getGeometry(const string_t& id);
+  bool containsGeometry(const std::string& id) const;
+  SerializedGeometry& getGeometry(const std::string& id);
   void addGeometry(const SerializedGeometry& geometry);
-  void removeGeometry(const string_t& id);
+  void removeGeometry(const std::string& id);
 
 private:
-  unordered_map_t<unsigned int, SerializedMesh> _meshes;
-  unordered_map_t<string_t, SerializedGeometry> _geometries;
+  std::unordered_map<unsigned int, SerializedMesh> _meshes;
+  std::unordered_map<std::string, SerializedGeometry> _geometries;
 
 }; // end of class CollisionCache
 

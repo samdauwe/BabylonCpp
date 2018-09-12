@@ -3,6 +3,7 @@
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/target_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/spot_light.h>

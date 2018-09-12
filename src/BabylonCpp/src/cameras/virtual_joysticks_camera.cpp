@@ -6,15 +6,16 @@ bool VirtualJoysticksCamera::NodeConstructorAdded = false;
 
 void VirtualJoysticksCamera::AddNodeConstructor()
 {
-  Node::AddNodeConstructor(
-    "VirtualJoysticksCamera", [](const string_t& name, Scene* scene,
-                                 const nullable_t<Json::value>& /*options*/) {
-      return VirtualJoysticksCamera::New(name, Vector3::Zero(), scene);
-    });
+  Node::AddNodeConstructor("VirtualJoysticksCamera",
+                           [](const std::string& name, Scene* scene,
+                              const std::optional<Json::value>& /*options*/) {
+                             return VirtualJoysticksCamera::New(
+                               name, Vector3::Zero(), scene);
+                           });
   VirtualJoysticksCamera::NodeConstructorAdded = true;
 }
 
-VirtualJoysticksCamera::VirtualJoysticksCamera(const string_t& name,
+VirtualJoysticksCamera::VirtualJoysticksCamera(const std::string& name,
                                                const Vector3& position,
                                                Scene* scene)
     : FreeCamera{name, position, scene}
@@ -26,7 +27,7 @@ VirtualJoysticksCamera::~VirtualJoysticksCamera()
 {
 }
 
-const string_t VirtualJoysticksCamera::getClassName() const
+const std::string VirtualJoysticksCamera::getClassName() const
 {
   return "VirtualJoysticksCamera";
 }

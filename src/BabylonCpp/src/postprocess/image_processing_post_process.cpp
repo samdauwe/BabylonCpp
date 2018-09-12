@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/materials/image_processing_configuration.h>

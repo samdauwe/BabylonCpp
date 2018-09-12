@@ -1,7 +1,7 @@
 #ifndef BABYLON_CAMERAS_VR_VR_FOV_H
 #define BABYLON_CAMERAS_VR_VR_FOV_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

@@ -1,7 +1,7 @@
 #ifndef BABYLON_COLLISIONS_COLLISION_COORDINATOR_WORKER_H
 #define BABYLON_COLLISIONS_COLLISION_COORDINATOR_WORKER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/collisions/serialized_geometry.h>
 #include <babylon/collisions/serialized_mesh.h>
@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT CollisionCoordinatorWorker
-  : public ICollisionCoordinator {
+    : public ICollisionCoordinator {
 
 public:
   CollisionCoordinatorWorker();
@@ -22,13 +22,12 @@ public:
   static SerializedGeometry SerializeGeometry(Geometry* geometry);
 
   /** Methods **/
-  void getNewPosition(Vector3& position, Vector3& displacement,
-                      Collider* collider, unsigned int maximumRetry,
-                      AbstractMesh* excludedMesh,
-                      const ::std::function<void(
-                        unsigned int collisionIndex, Vector3& newPosition,
-                        AbstractMesh* AbstractMesh)>& onNewPosition,
-                      unsigned int collisionIndex) override;
+  void getNewPosition(
+    Vector3& position, Vector3& displacement, Collider* collider,
+    unsigned int maximumRetry, AbstractMesh* excludedMesh,
+    const std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+                             AbstractMesh* AbstractMesh)>& onNewPosition,
+    unsigned int collisionIndex) override;
   void init(Scene* scene) override;
   void destroy() override;
   void onMeshAdded(AbstractMesh* mesh) override;
@@ -46,17 +45,17 @@ private:
   Scene* _scene;
   Vector3 _scaledPosition;
   Vector3 _scaledVelocity;
-  vector_t<::std::function<void(unsigned int collisionIndex,
-                                Vector3& newPosition,
-                                AbstractMesh* collidedMesh)>>
+  std::vector<
+    std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+                       AbstractMesh* collidedMesh)>>
     _collisionsCallbackArray;
   bool _init;
   int _runningUpdated;
   Worker _worker;
-  unordered_map_t<unsigned int, SerializedMesh> _addUpdateMeshesList;
-  unordered_map_t<string_t, SerializedGeometry> _addUpdateGeometriesList;
+  std::unordered_map<unsigned int, SerializedMesh> _addUpdateMeshesList;
+  std::unordered_map<std::string, SerializedGeometry> _addUpdateGeometriesList;
   Uint32Array _toRemoveMeshesArray;
-  vector_t<string_t> _toRemoveGeometryArray;
+  std::vector<std::string> _toRemoveGeometryArray;
 
 }; // end of class CollisionCoordinatorWorker
 

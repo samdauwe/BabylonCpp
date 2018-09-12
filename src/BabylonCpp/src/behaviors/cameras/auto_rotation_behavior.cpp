@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/time.h>
+#include <babylon/engine/scene.h>
 #include <babylon/events/pointer_event_types.h>
 
 namespace BABYLON {

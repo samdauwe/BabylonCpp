@@ -1,17 +1,19 @@
 #ifndef BABYLON_COLLISIONS_UPDATE_PAYLOAD_H
 #define BABYLON_COLLISIONS_UPDATE_PAYLOAD_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/collisions/serialized_geometry.h>
 #include <babylon/collisions/serialized_mesh.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT UpdatePayload {
-  unordered_map_t<unsigned int, SerializedMesh> updatedMeshes;
-  unordered_map_t<string_t, SerializedGeometry> updatedGeometries;
+  std::unordered_map<unsigned int, SerializedMesh> updatedMeshes;
+  std::unordered_map<std::string, SerializedGeometry> updatedGeometries;
   Uint32Array removedMeshes;
-  vector_t<string_t> removedGeometries;
+  std::vector<std::string> removedGeometries;
 }; // end of struct UpdatePayload
 
 } // end of namespace BABYLON

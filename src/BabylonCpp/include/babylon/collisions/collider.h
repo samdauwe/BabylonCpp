@@ -1,11 +1,13 @@
 #ifndef BABYLON_COLLISIONS_COLLIDER_H
 #define BABYLON_COLLISIONS_COLLIDER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
 
 class BABYLON_SHARED_EXPORT Collider {
 
@@ -39,12 +41,12 @@ public:
   bool _canDoCollision(const Vector3& sphereCenter, float sphereRadius,
                        const Vector3& vecMin, const Vector3& vecMax) const;
   /** Hidden */
-  void _testTriangle(size_t faceIndex, vector_t<Plane>& trianglePlaneArray,
+  void _testTriangle(size_t faceIndex, std::vector<Plane>& trianglePlaneArray,
                      const Vector3& p1, const Vector3& p2, const Vector3& p3,
                      bool hasMaterial);
   /** Hidden */
-  void _collide(vector_t<Plane>& trianglePlaneArray,
-                const vector_t<Vector3> pts, const IndicesArray& indices,
+  void _collide(std::vector<Plane>& trianglePlaneArray,
+                const std::vector<Vector3> pts, const IndicesArray& indices,
                 size_t indexStart, size_t indexEnd, unsigned int decal,
                 bool hasMaterial);
   /** Hidden */

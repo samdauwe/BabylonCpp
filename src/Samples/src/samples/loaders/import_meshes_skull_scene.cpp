@@ -1,6 +1,7 @@
 #include <babylon/samples/loaders/import_meshes_skull_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/mesh/mesh.h>

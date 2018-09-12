@@ -1,11 +1,16 @@
 #ifndef BABYLON_COLLISIONS_PICKING_INFO_H
 #define BABYLON_COLLISIONS_PICKING_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/culling/ray.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Sprite;
+class Vector2;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief Information about the result of picking within a scene.
@@ -25,14 +30,14 @@ public:
    * calculate the normal instead of the normal map
    * @returns The normal corresponding to the face the pick collided with
    */
-  nullable_t<Vector3> getNormal(bool useWorldCoordinates = false,
-                                bool useVerticesNormals  = true);
+  std::optional<Vector3> getNormal(bool useWorldCoordinates = false,
+                                   bool useVerticesNormals  = true);
 
   /**
    * @brief Gets the texture coordinates of where the pick occured.
    * @returns the vector containing the coordnates of the texture
    */
-  nullable_t<Vector2> getTextureCoordinates();
+  std::optional<Vector2> getTextureCoordinates();
 
 public:
   /**
@@ -48,7 +53,7 @@ public:
   /**
    * The location of pick collision
    */
-  nullable_t<Vector3> pickedPoint;
+  std::optional<Vector3> pickedPoint;
 
   /**
    * The mesh corresponding the the pick collision
@@ -91,7 +96,7 @@ public:
   /**
    * The ray that was used to perform the picking.
    */
-  nullable_t<Ray> ray;
+  std::optional<Ray> ray;
 
 }; // end of class PickingInfo
 

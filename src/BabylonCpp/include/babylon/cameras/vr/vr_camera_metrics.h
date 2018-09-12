@@ -1,9 +1,12 @@
 #ifndef BABYLON_CAMERAS_VR_VR_CAMERA_METRICS_H
 #define BABYLON_CAMERAS_VR_VR_CAMERA_METRICS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Matrix;
 
 class BABYLON_SHARED_EXPORT VRCameraMetrics {
 

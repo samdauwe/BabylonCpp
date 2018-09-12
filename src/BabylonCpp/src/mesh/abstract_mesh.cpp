@@ -11,6 +11,7 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
+#include <babylon/engine/scene.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/materials/material.h>

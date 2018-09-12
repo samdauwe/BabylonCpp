@@ -1,10 +1,13 @@
 #ifndef BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_UNIVERSAL_CAMERA_H
 #define BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_UNIVERSAL_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/universal_camera.h>
 
 namespace BABYLON {
+
+class AnaglyphUniversalCamera;
+using AnaglyphUniversalCameraPtr = std::shared_ptr<AnaglyphUniversalCamera>;
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on
@@ -19,7 +22,7 @@ public:
   template <typename... Ts>
   static AnaglyphUniversalCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<AnaglyphUniversalCamera>(
+    auto camera = std::shared_ptr<AnaglyphUniversalCamera>(
       new AnaglyphUniversalCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -31,7 +34,7 @@ public:
    * @brief Gets camera class name.
    * @returns AnaglyphUniversalCamera
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
   /**
@@ -41,7 +44,7 @@ protected:
    * @param interaxialDistance defines distance between each color axis
    * @param scene defines the hosting scene
    */
-  AnaglyphUniversalCamera(const string_t& name, const Vector3& position,
+  AnaglyphUniversalCamera(const std::string& name, const Vector3& position,
                           float interaxialDistance, Scene* scene);
 
 private:

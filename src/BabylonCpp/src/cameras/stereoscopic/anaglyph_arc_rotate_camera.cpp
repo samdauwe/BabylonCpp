@@ -9,8 +9,8 @@ bool AnaglyphArcRotateCamera::NodeConstructorAdded = false;
 void AnaglyphArcRotateCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "AnaglyphArcRotateCamera", [](const string_t& name, Scene* scene,
-                                  const nullable_t<Json::value>& options) {
+    "AnaglyphArcRotateCamera", [](const std::string& name, Scene* scene,
+                                  const std::optional<Json::value>& options) {
       float interaxialDistance = 0.f;
       if (options) {
         interaxialDistance
@@ -23,7 +23,7 @@ void AnaglyphArcRotateCamera::AddNodeConstructor()
 }
 
 AnaglyphArcRotateCamera::AnaglyphArcRotateCamera(
-  const string_t& name, float alpha, float beta, float radius,
+  const std::string& name, float alpha, float beta, float radius,
   const Vector3& target, float iInteraxialDistance, Scene* scene)
     : ArcRotateCamera{name, alpha, beta, radius, target, scene}
 {
@@ -39,7 +39,7 @@ AnaglyphArcRotateCamera::~AnaglyphArcRotateCamera()
 {
 }
 
-const string_t AnaglyphArcRotateCamera::getClassName() const
+const std::string AnaglyphArcRotateCamera::getClassName() const
 {
   return "AnaglyphArcRotateCamera";
 }

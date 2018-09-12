@@ -1,5 +1,7 @@
 #include <babylon/cameras/vr/vr_camera_metrics.h>
 
+#include <cmath>
+
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
@@ -39,19 +41,19 @@ VRCameraMetrics::VRCameraMetrics(VRCameraMetrics& other)
 }
 
 VRCameraMetrics::VRCameraMetrics(VRCameraMetrics&& other)
-    : hResolution{::std::move(other.hResolution)}
-    , vResolution{::std::move(other.vResolution)}
-    , hScreenSize{::std::move(other.hScreenSize)}
-    , vScreenSize{::std::move(other.vScreenSize)}
-    , vScreenCenter{::std::move(other.vScreenCenter)}
-    , eyeToScreenDistance{::std::move(other.eyeToScreenDistance)}
-    , lensSeparationDistance{::std::move(other.lensSeparationDistance)}
-    , interpupillaryDistance{::std::move(other.interpupillaryDistance)}
-    , distortionK{::std::move(other.distortionK)}
-    , chromaAbCorrection{::std::move(other.chromaAbCorrection)}
-    , postProcessScaleFactor{::std::move(other.postProcessScaleFactor)}
-    , lensCenterOffset{::std::move(other.lensCenterOffset)}
-    , compensateDistortion{::std::move(other.compensateDistortion)}
+    : hResolution{std::move(other.hResolution)}
+    , vResolution{std::move(other.vResolution)}
+    , hScreenSize{std::move(other.hScreenSize)}
+    , vScreenSize{std::move(other.vScreenSize)}
+    , vScreenCenter{std::move(other.vScreenCenter)}
+    , eyeToScreenDistance{std::move(other.eyeToScreenDistance)}
+    , lensSeparationDistance{std::move(other.lensSeparationDistance)}
+    , interpupillaryDistance{std::move(other.interpupillaryDistance)}
+    , distortionK{std::move(other.distortionK)}
+    , chromaAbCorrection{std::move(other.chromaAbCorrection)}
+    , postProcessScaleFactor{std::move(other.postProcessScaleFactor)}
+    , lensCenterOffset{std::move(other.lensCenterOffset)}
+    , compensateDistortion{std::move(other.compensateDistortion)}
 {
 }
 
@@ -79,19 +81,19 @@ VRCameraMetrics& VRCameraMetrics::operator=(const VRCameraMetrics& other)
 VRCameraMetrics& VRCameraMetrics::operator=(VRCameraMetrics&& other)
 {
   if (&other != this) {
-    hResolution            = ::std::move(other.hResolution);
-    vResolution            = ::std::move(other.vResolution);
-    hScreenSize            = ::std::move(other.hScreenSize);
-    vScreenSize            = ::std::move(other.vScreenSize);
-    vScreenCenter          = ::std::move(other.vScreenCenter);
-    eyeToScreenDistance    = ::std::move(other.eyeToScreenDistance);
-    lensSeparationDistance = ::std::move(other.lensSeparationDistance);
-    interpupillaryDistance = ::std::move(other.interpupillaryDistance);
-    distortionK            = ::std::move(other.distortionK);
-    chromaAbCorrection     = ::std::move(other.chromaAbCorrection);
-    postProcessScaleFactor = ::std::move(other.postProcessScaleFactor);
-    lensCenterOffset       = ::std::move(other.lensCenterOffset);
-    compensateDistortion   = ::std::move(other.compensateDistortion);
+    hResolution            = std::move(other.hResolution);
+    vResolution            = std::move(other.vResolution);
+    hScreenSize            = std::move(other.hScreenSize);
+    vScreenSize            = std::move(other.vScreenSize);
+    vScreenCenter          = std::move(other.vScreenCenter);
+    eyeToScreenDistance    = std::move(other.eyeToScreenDistance);
+    lensSeparationDistance = std::move(other.lensSeparationDistance);
+    interpupillaryDistance = std::move(other.interpupillaryDistance);
+    distortionK            = std::move(other.distortionK);
+    chromaAbCorrection     = std::move(other.chromaAbCorrection);
+    postProcessScaleFactor = std::move(other.postProcessScaleFactor);
+    lensCenterOffset       = std::move(other.lensCenterOffset);
+    compensateDistortion   = std::move(other.compensateDistortion);
   }
 
   return *this;
@@ -110,8 +112,8 @@ float VRCameraMetrics::aspectRatio() const
 float VRCameraMetrics::aspectRatioFov() const
 {
   return (2.f
-          * ::std::atan((postProcessScaleFactor * vScreenSize)
-                        / (2.f * eyeToScreenDistance)));
+          * std::atan((postProcessScaleFactor * vScreenSize)
+                      / (2.f * eyeToScreenDistance)));
 }
 
 Matrix VRCameraMetrics::leftHMatrix() const

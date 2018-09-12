@@ -1,10 +1,13 @@
 #ifndef BABYLON_CAMERAS_FOLLOW_CAMERA_H
 #define BABYLON_CAMERAS_FOLLOW_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/target_camera.h>
 
 namespace BABYLON {
+
+class FollowCamera;
+using FollowCameraPtr = std::shared_ptr<FollowCamera>;
 
 class BABYLON_SHARED_EXPORT FollowCamera : public TargetCamera {
 
@@ -15,7 +18,7 @@ public:
   template <typename... Ts>
   static FollowCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<FollowCamera>(
+    auto camera = std::shared_ptr<FollowCamera>(
       new FollowCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -27,11 +30,11 @@ public:
 
   /** Hidden */
   void _checkInputs() override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   Json::object serialize() const override;
 
 protected:
-  FollowCamera(const string_t& name, const Vector3& position, Scene* scene,
+  FollowCamera(const std::string& name, const Vector3& position, Scene* scene,
                AbstractMesh* iLockedTarget = nullptr);
 
 private:

@@ -1,10 +1,13 @@
 #ifndef BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_GAMEPAD_CAMERA_H
 #define BABYLON_CAMERAS_STEREOSCOPIC_ANAGLYPH_GAMEPAD_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/gamepad_camera.h>
 
 namespace BABYLON {
+
+class AnaglyphGamepadCamera;
+using AnaglyphGamepadCameraPtr = std::shared_ptr<AnaglyphGamepadCamera>;
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on GamepadCamera).
@@ -18,7 +21,7 @@ public:
   template <typename... Ts>
   static AnaglyphGamepadCameraPtr New(Ts&&... args)
   {
-    auto camera = shared_ptr_t<AnaglyphGamepadCamera>(
+    auto camera = std::shared_ptr<AnaglyphGamepadCamera>(
       new AnaglyphGamepadCamera(::std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
@@ -30,7 +33,7 @@ public:
    * @brief Gets camera class name.
    * @returns AnaglyphGamepadCamera
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
 protected:
   /**
@@ -40,7 +43,7 @@ protected:
    * @param interaxialDistance defines distance between each color axis
    * @param scene defines the hosting scene
    */
-  AnaglyphGamepadCamera(const string_t& name, const Vector3& position,
+  AnaglyphGamepadCamera(const std::string& name, const Vector3& position,
                         float interaxialDistance, Scene* scene);
 
 private:

@@ -1,17 +1,27 @@
 #ifndef BABYLON_CAMERAS_CAMERA_H
 #define BABYLON_CAMERAS_CAMERA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/camera_inputs_manager.h>
 #include <babylon/engine/node.h>
-#include <babylon/engine/scene.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
+#include <babylon/math/plane.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/viewport.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class Camera;
+class ICullable;
+class FreeCamera;
+class PostProcess;
+class Ray;
+class RenderTargetTexture;
+using CameraPtr              = std::shared_ptr<Camera>;
+using FreeCameraPtr          = std::shared_ptr<FreeCamera>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 class BABYLON_SHARED_EXPORT Camera : public Node {
 
@@ -122,9 +132,9 @@ public:
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
    */
-  string_t toString(bool fullDetails = false) const;
+  std::string toString(bool fullDetails = false) const;
 
-  vector_t<AbstractMeshPtr>& getActiveMeshes();
+  std::vector<AbstractMeshPtr>& getActiveMeshes();
   bool isActiveMesh(const AbstractMeshPtr& mesh);
 
   /**
@@ -158,8 +168,8 @@ public:
   void update();
   /** Hidden */
   virtual void _checkInputs();
-  vector_t<CameraPtr>& rigCameras();
-  const vector_t<CameraPtr>& rigCameras() const;
+  std::vector<CameraPtr>& rigCameras();
+  const std::vector<CameraPtr>& rigCameras() const;
   PostProcess* rigPostProcess();
 
   /**
@@ -209,28 +219,28 @@ public:
   Vector3* getLeftTarget();
   Vector3* getRightTarget();
   void setCameraRigMode(int mode, const Json::value& rigParams);
-  void setCameraRigParameter(const string_t& name, float value);
-  virtual CameraPtr createRigCamera(const string_t& name, int cameraIndex);
+  void setCameraRigParameter(const std::string& name, float value);
+  virtual CameraPtr createRigCamera(const std::string& name, int cameraIndex);
   /** Hidden */
   virtual void _updateRigCameras();
   /** Hidden */
   virtual void _setupInputs();
   virtual Json::object serialize() const;
-  virtual const string_t getClassName() const override;
-  Camera* clone(const string_t& name);
+  virtual const std::string getClassName() const override;
+  Camera* clone(const std::string& name);
   Vector3 getDirection(const Vector3& localAxis);
   void getDirectionToRef(const Vector3& localAxis, Vector3& result);
   Matrix& computeWorldMatrix(bool force = false) override;
 
   // Statics
-  static CameraPtr GetConstructorFromName(const string_t& type,
-                                          const string_t& name, Scene* scene,
+  static CameraPtr GetConstructorFromName(const std::string& type,
+                                          const std::string& name, Scene* scene,
                                           float interaxial_distance     = 0.f,
                                           bool isStereoscopicSideBySide = true);
   static CameraPtr Parse(const Json::value& parsedCamera, Scene* scene);
 
 protected:
-  Camera(const string_t& name, const Vector3& position, Scene* scene,
+  Camera(const std::string& name, const Vector3& position, Scene* scene,
          bool setActiveOnSceneIfNoneActive = true);
 
   virtual bool _restoreStateValues();
@@ -294,14 +304,14 @@ public:
   /** Hidden */
   CameraRigParams _cameraRigParams;
   /** Hidden */
-  vector_t<CameraPtr> _rigCameras;
+  std::vector<CameraPtr> _rigCameras;
   /** Hidden */
   PostProcess* _rigPostProcess;
   /** Hidden */
   bool _skipRendering;
   /** Hidden */
   Camera* _alternateCamera;
-  vector_t<RenderTargetTexturePtr> customRenderTargets;
+  std::vector<RenderTargetTexturePtr> customRenderTargets;
 
   /** Observables **/
   Observable<Camera> onViewMatrixChangedObservable;
@@ -311,9 +321,9 @@ public:
 
   /** Cache **/
   Matrix _projectionMatrix;
-  vector_t<PostProcess*> _postProcesses;
+  std::vector<PostProcess*> _postProcesses;
   Uint32Array _postProcessesTakenIndices;
-  vector_t<AbstractMeshPtr> _activeMeshes;
+  std::vector<AbstractMeshPtr> _activeMeshes;
 
   ReadOnlyProperty<Camera, Vector3> globalPosition;
 
@@ -324,10 +334,10 @@ protected:
 private:
   Matrix _computedViewMatrix;
   bool _doNotComputeProjectionMatrix;
-  unique_ptr_t<Matrix> _worldMatrix;
+  std::unique_ptr<Matrix> _worldMatrix;
   Matrix _transformMatrix;
   Matrix _webvrProjectionMatrix;
-  array_t<Plane, 6> _frustumPlanes;
+  std::array<Plane, 6> _frustumPlanes;
   bool _refreshFrustumPlanes;
   float _storedFov;
   bool _stateStored;

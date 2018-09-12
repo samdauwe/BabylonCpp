@@ -9,8 +9,8 @@ bool AnaglyphFreeCamera::NodeConstructorAdded = false;
 void AnaglyphFreeCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "AnaglyphFreeCamera", [](const string_t& name, Scene* scene,
-                             const nullable_t<Json::value>& options) {
+    "AnaglyphFreeCamera", [](const std::string& name, Scene* scene,
+                             const std::optional<Json::value>& options) {
       float interaxialDistance = 0.f;
       if (options) {
         interaxialDistance
@@ -22,7 +22,7 @@ void AnaglyphFreeCamera::AddNodeConstructor()
   AnaglyphFreeCamera::NodeConstructorAdded = true;
 }
 
-AnaglyphFreeCamera::AnaglyphFreeCamera(const string_t& name,
+AnaglyphFreeCamera::AnaglyphFreeCamera(const std::string& name,
                                        const Vector3& position,
                                        float iInteraxialDistance, Scene* scene)
     : FreeCamera{name, position, scene}
@@ -39,7 +39,7 @@ AnaglyphFreeCamera::~AnaglyphFreeCamera()
 {
 }
 
-const string_t AnaglyphFreeCamera::getClassName() const
+const std::string AnaglyphFreeCamera::getClassName() const
 {
   return "AnaglyphFreeCamera";
 }

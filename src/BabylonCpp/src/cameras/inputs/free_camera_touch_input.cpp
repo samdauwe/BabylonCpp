@@ -5,8 +5,8 @@ namespace BABYLON {
 FreeCameraTouchInput::FreeCameraTouchInput()
     : touchAngularSensibility{200000.f}
     , touchMoveSensibility{250.f}
-    , _offsetX{nullopt_t}
-    , _offsetY{nullopt_t}
+    , _offsetX{std::nullopt}
+    , _offsetY{std::nullopt}
     , _pointerInput{nullptr}
     , _observer{nullptr}
     , _onLostFocus{nullptr}

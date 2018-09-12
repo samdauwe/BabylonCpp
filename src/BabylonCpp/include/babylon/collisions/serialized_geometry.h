@@ -1,9 +1,12 @@
 #ifndef BABYLON_COLLISIONS_SERIALIZED_GEOMETRY_H
 #define BABYLON_COLLISIONS_SERIALIZED_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Vector3;
 
 /**
  * @brief Interface describing the value associated with a geometry
@@ -12,7 +15,7 @@ struct BABYLON_SHARED_EXPORT SerializedGeometry {
   /**
    * Defines the unique ID of the geometry
    */
-  string_t id;
+  std::string id;
   /**
    * Defines the array containing the positions
    */
@@ -25,7 +28,7 @@ struct BABYLON_SHARED_EXPORT SerializedGeometry {
    * Defines the array containing the normals
    */
   Float32Array normals;
-  vector_t<Vector3> positionsArray;
+  std::vector<Vector3> positionsArray;
 }; // end of struct SerializedGeometry
 
 } // end of namespace BABYLON

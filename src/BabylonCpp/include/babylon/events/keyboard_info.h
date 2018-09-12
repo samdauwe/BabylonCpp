@@ -1,7 +1,7 @@
 #ifndef BABYLON_EVENTS_KEYBOARD_INFO_H
 #define BABYLON_EVENTS_KEYBOARD_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 
 namespace BABYLON {
