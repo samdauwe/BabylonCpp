@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <algorithm>
+
 namespace BABYLON {
 
 PowerEase::PowerEase(float IPower) : EasingFunction{}, power{IPower}

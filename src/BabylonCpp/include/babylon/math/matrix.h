@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <optional>
+#include <array>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>

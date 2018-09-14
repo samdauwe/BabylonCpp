@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <algorithm>
+
 namespace BABYLON {
 
 CircleEase::CircleEase() : EasingFunction{}

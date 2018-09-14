@@ -18,57 +18,57 @@ AnimationValue::AnimationValue(float value)
 }
 
 AnimationValue::AnimationValue(const Vector3& value)
-    : dataType{Animation::ANIMATIONTYPE_VECTOR3()}, vector3Data{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_VECTOR3()}, vector3Data{value}
 {
 }
 
 AnimationValue::AnimationValue(const Quaternion& value)
-    : dataType{Animation::ANIMATIONTYPE_QUATERNION()}, quaternionData{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_QUATERNION()}, quaternionData{value}
 {
 }
 
 AnimationValue::AnimationValue(const Matrix& value)
-    : dataType{Animation::ANIMATIONTYPE_MATRIX()}, matrixData{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_MATRIX()}, matrixData{value}
 {
 }
 
 AnimationValue::AnimationValue(const Color3& value)
-    : dataType{Animation::ANIMATIONTYPE_COLOR3()}, color3Data{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_COLOR3()}, color3Data{value}
 {
 }
 
 AnimationValue::AnimationValue(const Vector2& value)
-    : dataType{Animation::ANIMATIONTYPE_VECTOR2()}, vector2Data{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_VECTOR2()}, vector2Data{value}
 {
 }
 
 AnimationValue::AnimationValue(const Size& value)
-    : dataType{Animation::ANIMATIONTYPE_SIZE()}, sizeData{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_SIZE()}, sizeData{value}
 {
 }
 
 AnimationValue::AnimationValue(bool value)
-    : dataType{Animation::ANIMATIONTYPE_BOOL()}, boolData{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_BOOL()}, boolData{value}
 {
 }
 
 AnimationValue::AnimationValue(int value)
-    : dataType{Animation::ANIMATIONTYPE_INT()}, intData{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_INT()}, intData{value}
 {
 }
 
 AnimationValue::AnimationValue(const string_t& value)
-    : dataType{Animation::ANIMATIONTYPE_STRING()}, stringData{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_STRING()}, stringData{value}
 {
 }
 
 AnimationValue::AnimationValue(const Color4& value)
-    : dataType{Animation::ANIMATIONTYPE_COLOR4()}, color4Data{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_COLOR4()}, color4Data{value}
 {
 }
 
 AnimationValue::AnimationValue(const Float32Array& value)
-    : dataType{Animation::ANIMATIONTYPE_FLOAT32ARRAY()}, float32ArrayData{value}
+    : dataType{(int)Animation::ANIMATIONTYPE_FLOAT32ARRAY()}, float32ArrayData{value}
 {
 }
 
