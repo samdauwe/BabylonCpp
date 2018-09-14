@@ -1,7 +1,10 @@
 #ifndef BABYLON_CORE_ACTIVE_H
 #define BABYLON_CORE_ACTIVE_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <thread>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/shared_queue.h>
 
 namespace BABYLON {
@@ -18,7 +21,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Active {
 
 public:
-  using Callback = ::std::function<void()>;
+  using Callback = std::function<void()>;
 
 public:
   virtual ~Active()
@@ -33,10 +36,10 @@ public:
   }
 
   /// Factory: safe construction of object before thread start
-  static unique_ptr_t<Active> createActive()
+  static std::unique_ptr<Active> createActive()
   {
-    unique_ptr_t<Active> aPtr(new Active());
-    aPtr->_thread = ::std::thread(&Active::run, aPtr.get());
+    std::unique_ptr<Active> aPtr(new Active());
+    aPtr->_thread = std::thread(&Active::run, aPtr.get());
     return aPtr;
   }
 
@@ -58,7 +61,7 @@ private:
   }
 
   SharedQueue<Callback> _messageQueue;
-  ::std::thread _thread;
+  std::thread _thread;
   bool _done;
 
 }; // end of class Active

@@ -1,9 +1,18 @@
 #ifndef BABYLON_DEBUG_AXES_VIEWER_H
 #define BABYLON_DEBUG_AXES_VIEWER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class LinesMesh;
+class Scene;
+class Vector3;
+using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+
 namespace Debug {
 
 /**
@@ -47,9 +56,9 @@ public:
   float scaleLines;
 
 private:
-  vector_t<Vector3> _xline;
-  vector_t<Vector3> _yline;
-  vector_t<Vector3> _zline;
+  std::vector<Vector3> _xline;
+  std::vector<Vector3> _yline;
+  std::vector<Vector3> _zline;
 
   LinesMeshPtr _xmesh;
   LinesMeshPtr _ymesh;

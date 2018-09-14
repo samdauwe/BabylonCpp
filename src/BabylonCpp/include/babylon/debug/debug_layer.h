@@ -1,9 +1,11 @@
 #ifndef BABYLON_DEBUG_DEBUG_LAYER_H
 #define BABYLON_DEBUG_DEBUG_LAYER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Scene;
 
 class BABYLON_SHARED_EXPORT DebugLayer {
 

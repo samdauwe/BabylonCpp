@@ -1,6 +1,7 @@
 #include <babylon/cameras/camera_inputs_manager.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>

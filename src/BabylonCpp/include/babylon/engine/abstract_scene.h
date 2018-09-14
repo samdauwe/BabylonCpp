@@ -1,10 +1,69 @@
 #ifndef BABYLON_ENGINE_ABSTRACT_SCENE_H
 #define BABYLON_ENGINE_ABSTRACT_SCENE_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <map>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/any.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class AbstractMesh;
+class ActionManager;
+class Animation;
+class AnimationGroup;
+class AssetContainer;
+class BaseTexture;
+class Camera;
+class EffectLayer;
+class Geometry;
+class GlowLayer;
+class HighlightLayer;
+class IParticleSystem;
+class Layer;
+class LensFlareSystem;
+class Light;
+class Material;
+class MorphTargetManager;
+class MultiMaterial;
+class Scene;
+class Skeleton;
+class Sound;
+class TransformNode;
+using AbstractMeshPtr       = std::shared_ptr<AbstractMesh>;
+using ActionManagerPtr      = std::shared_ptr<ActionManager>;
+using AnimationPtr          = std::shared_ptr<Animation>;
+using AnimationGroupPtr     = std::shared_ptr<AnimationGroup>;
+using BaseTexturePtr        = std::shared_ptr<BaseTexture>;
+using CameraPtr             = std::shared_ptr<Camera>;
+using EffectLayerPtr        = std::shared_ptr<EffectLayer>;
+using GeometryPtr           = std::shared_ptr<Geometry>;
+using GlowLayerPtr          = std::shared_ptr<GlowLayer>;
+using HighlightLayerPtr     = std::shared_ptr<HighlightLayer>;
+using IParticleSystemPtr    = std::shared_ptr<IParticleSystem>;
+using LayerPtr              = std::shared_ptr<Layer>;
+using LensFlareSystemPtr    = std::shared_ptr<LensFlareSystem>;
+using LightPtr              = std::shared_ptr<Light>;
+using MaterialPtr           = std::shared_ptr<Material>;
+using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
+using MultiMaterialPtr      = std::shared_ptr<MultiMaterial>;
+using SkeletonPtr           = std::shared_ptr<Skeleton>;
+using SoundPtr              = std::shared_ptr<Sound>;
+using TransformNodePtr      = std::shared_ptr<TransformNode>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * Defines how the parser contract is defined.
@@ -13,14 +72,14 @@ namespace BABYLON {
  */
 using BabylonFileParser
   = std::function<void(const Json::value& parsedData, Scene* scene,
-                       AssetContainer& container, const string_t& rootUrl)>;
+                       AssetContainer& container, const std::string& rootUrl)>;
 
 /**
  * Defines how the individual parser contract is defined.
  * These parser can parse an individual asset
  */
 using IndividualBabylonFileParser = std::function<any(
-  const Json::value& parsedData, Scene* scene, const string_t& rootUrl)>;
+  const Json::value& parsedData, Scene* scene, const std::string& rootUrl)>;
 
 /**
  * @brief Base class of the scene acting as a container for the different
@@ -43,21 +102,22 @@ public:
    * @param name Defines the name of the parser
    * @param parser Defines the parser to add
    */
-  static void AddParser(const string_t& name, const BabylonFileParser& parser);
+  static void AddParser(const std::string& name,
+                        const BabylonFileParser& parser);
 
   /**
    * @brief Gets a general parser from the list of avaialble ones.
    * @param name Defines the name of the parser
    * @returns the requested parser or null
    */
-  static nullable_t<BabylonFileParser> GetParser(const string_t& name);
+  static std::optional<BabylonFileParser> GetParser(const std::string& name);
 
   /**
    * @brief Adds n individual parser in the list of available ones.
    * @param name Defines the name of the parser
    * @param parser Defines the parser to add
    */
-  static void AddIndividualParser(const string_t& name,
+  static void AddIndividualParser(const std::string& name,
                                   const IndividualBabylonFileParser& parser);
 
   /**
@@ -65,8 +125,8 @@ public:
    * @param name Defines the name of the parser
    * @returns the requested parser or null
    */
-  static nullable_t<IndividualBabylonFileParser>
-  GetIndividualParser(const string_t& name);
+  static std::optional<IndividualBabylonFileParser>
+  GetIndividualParser(const std::string& name);
 
   /**
    * @brief Parser json data and populate both a scene and its associated
@@ -77,7 +137,7 @@ public:
    * @param rootUrl Defines the root url of the data
    */
   static void Parse(Json::value& jsonData, Scene* scene,
-                    AssetContainer& container, const string_t& rootUrl);
+                    AssetContainer& container, const std::string& rootUrl);
 
   /**
    * @brief Removes the given effect layer from this scene.
@@ -97,14 +157,14 @@ public:
    * @param name The name of the highlight layer to look for.
    * @return The highlight layer if found otherwise null.
    */
-  GlowLayerPtr getGlowLayerByName(const string_t& name);
+  GlowLayerPtr getGlowLayerByName(const std::string& name);
 
   /**
    * @brief Return a the first highlight layer of the scene with a given name.
    * @param name The name of the highlight layer to look for.
    * @return The highlight layer if found otherwise null.
    */
-  HighlightLayerPtr getHighlightLayerByName(const string_t& name);
+  HighlightLayerPtr getHighlightLayerByName(const std::string& name);
 
   /**
    * @brief Removes the given lens flare system from this scene.
@@ -124,14 +184,14 @@ public:
    * @param name defines the name to look for
    * @returns the lens flare system or null if not found
    */
-  LensFlareSystemPtr getLensFlareSystemByName(const string_t& name);
+  LensFlareSystemPtr getLensFlareSystemByName(const std::string& name);
 
   /**
    * @brief Gets a lens flare system using its id.
    * @param id defines the id to look for
    * @returns the lens flare system or null if not found
    */
-  LensFlareSystemPtr getLensFlareSystemByID(const string_t& id);
+  LensFlareSystemPtr getLensFlareSystemByID(const std::string& id);
 
 private:
   /**
@@ -149,114 +209,114 @@ public:
    * All of the cameras added to this scene
    * @see http://doc.babylonjs.com/babylon101/cameras
    */
-  vector_t<CameraPtr> cameras;
+  std::vector<CameraPtr> cameras;
 
   /**
    * All of the lights added to this scene
    * @see http://doc.babylonjs.com/babylon101/lights
    */
-  vector_t<LightPtr> lights;
+  std::vector<LightPtr> lights;
 
   /**
    * All of the (abstract) meshes added to this scene
    */
-  vector_t<AbstractMeshPtr> meshes;
+  std::vector<AbstractMeshPtr> meshes;
 
   /**
    * The list of skeletons added to the scene
    * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
-  vector_t<SkeletonPtr> skeletons;
+  std::vector<SkeletonPtr> skeletons;
 
   /**
    * All of the particle systems added to this scene
    * @see http://doc.babylonjs.com/babylon101/particles
    */
-  vector_t<IParticleSystemPtr> particleSystems;
+  std::vector<IParticleSystemPtr> particleSystems;
 
   /**
    * Gets a list of Animations associated with the scene
    */
-  vector_t<AnimationPtr> animations;
+  std::vector<AnimationPtr> animations;
 
   /**
    * All of the animation groups added to this scene
    * @see http://doc.babylonjs.com/how_to/group
    */
-  vector_t<AnimationGroupPtr> animationGroups;
+  std::vector<AnimationGroupPtr> animationGroups;
 
   /**
    * All of the multi-materials added to this scene
    * @see http://doc.babylonjs.com/how_to/multi_materials
    */
-  vector_t<MultiMaterialPtr> multiMaterials;
+  std::vector<MultiMaterialPtr> multiMaterials;
 
   /**
    * All of the materials added to this scene
    * @see http://doc.babylonjs.com/babylon101/materials
    */
-  vector_t<MaterialPtr> materials;
+  std::vector<MaterialPtr> materials;
 
   /**
    * The list of morph target managers added to the scene
    * @see http://doc.babylonjs.com/how_to/how_to_dynamically_morph_a_mesh
    */
-  vector_t<MorphTargetManagerPtr> morphTargetManagers;
+  std::vector<MorphTargetManagerPtr> morphTargetManagers;
 
   /**
    * The list of geometries used in the scene.
    */
-  vector_t<GeometryPtr> geometries;
+  std::vector<GeometryPtr> geometries;
 
   /**
    * All of the tranform nodes added to this scene
    * @see http://doc.babylonjs.com/how_to/transformnode
    */
-  vector_t<TransformNodePtr> transformNodes;
+  std::vector<TransformNodePtr> transformNodes;
 
   /**
    * ActionManagers available on the scene.
    */
-  vector_t<ActionManagerPtr> actionManagers;
+  std::vector<ActionManagerPtr> actionManagers;
 
   /**
    * Sounds to keep.
    */
-  vector_t<SoundPtr> sounds;
+  std::vector<SoundPtr> sounds;
 
   /**
    * Textures to keep.
    */
-  vector_t<BaseTexturePtr> textures;
+  std::vector<BaseTexturePtr> textures;
 
   /**
    * The list of effect layers (highlights/glow) added to the scene
    * @see http://doc.babylonjs.com/how_to/highlight_layer
    * @see http://doc.babylonjs.com/how_to/glow_layer
    */
-  vector_t<EffectLayerPtr> effectLayers;
+  std::vector<EffectLayerPtr> effectLayers;
 
   /**
    * The list of layers (background and foreground) of the scene
    */
-  vector_t<LayerPtr> layers;
+  std::vector<LayerPtr> layers;
 
   /**
    * The list of lens flare system added to the scene
    * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
    */
-  vector_t<LensFlareSystemPtr> lensFlareSystems;
+  std::vector<LensFlareSystemPtr> lensFlareSystems;
 
 private:
   /**
    * Stores the list of available parsers in the application.
    */
-  static unordered_map_t<string_t, BabylonFileParser> _BabylonFileParsers;
+  static std::unordered_map<std::string, BabylonFileParser> _BabylonFileParsers;
 
   /**
    * Stores the list of available individual parsers in the application.
    */
-  static unordered_map_t<string_t, IndividualBabylonFileParser>
+  static std::unordered_map<std::string, IndividualBabylonFileParser>
     _IndividualBabylonFileParsers;
 
 }; // end of class AbstractScene

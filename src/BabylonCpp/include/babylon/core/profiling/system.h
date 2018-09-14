@@ -1,7 +1,7 @@
 #ifndef BABYLON_CORE_PROFILING_SYSTEM_H
 #define BABYLON_CORE_PROFILING_SYSTEM_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

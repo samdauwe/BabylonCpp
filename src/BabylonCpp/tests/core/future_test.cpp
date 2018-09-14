@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <numeric>
+
+#include <babylon/babylon_common.h>
 #include <babylon/core/future.h>
 
 struct MsgType {

@@ -73,9 +73,9 @@ uint16_t DataView::getUint16(size_t /*byteOffset*/, bool /*littleEndian*/) const
   return uint16_t{0};
 }
 
-float_t DataView::getFloat32(size_t /*byteOffset*/, bool /*littleEndian*/) const
+float DataView::getFloat32(size_t /*byteOffset*/, bool /*littleEndian*/) const
 {
-  return float_t{0};
+  return float{0};
 }
 
 } // end of namespace BABYLON

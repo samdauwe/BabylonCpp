@@ -1,25 +1,32 @@
 #ifndef BABYLON_DEBUG_RAY_HELPER_H
 #define BABYLON_DEBUG_RAY_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/culling/ray.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/event_state.h>
 
 namespace BABYLON {
 
+class Color3;
+class LinesMesh;
+class Scene;
+using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+
 class BABYLON_SHARED_EXPORT RayHelper {
 
 public:
   /** Statics **/
-  static unique_ptr_t<RayHelper> CreateAndShow(const Ray& ray, Scene* scene,
-                                               const Color3& color);
+  static std::unique_ptr<RayHelper> CreateAndShow(const Ray& ray, Scene* scene,
+                                                  const Color3& color);
 
 public:
   RayHelper(const Ray& ray);
   ~RayHelper();
 
-  void show(Scene* scene, const nullable_t<Color3>& color);
+  void show(Scene* scene, const std::optional<Color3>& color);
   void hide();
   void attachToMesh(AbstractMesh* mesh,
                     const Vector3& meshSpaceDirection = Vector3::Zero(),
@@ -33,15 +40,15 @@ private:
   void dispose();
 
 public:
-  unique_ptr_t<Ray> ray;
+  std::unique_ptr<Ray> ray;
 
 private:
-  vector_t<Vector3> _renderPoints;
+  std::vector<Vector3> _renderPoints;
   LinesMeshPtr _renderLine;
-  ::std::function<void(Scene*, EventState&)> _renderFunction;
+  std::function<void(Scene*, EventState&)> _renderFunction;
   Scene* _scene;
 
-  ::std::function<void(Scene*, EventState&)> _updateToMeshFunction;
+  std::function<void(Scene*, EventState&)> _updateToMeshFunction;
   AbstractMesh* _attachedToMesh;
   Vector3 _meshSpaceDirection;
   Vector3 _meshSpaceOrigin;

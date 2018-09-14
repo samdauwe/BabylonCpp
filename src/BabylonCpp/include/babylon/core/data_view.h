@@ -1,7 +1,8 @@
 #ifndef BABYLON_CORE_DATA_VIEW_H
 #define BABYLON_CORE_DATA_VIEW_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 
@@ -91,7 +92,7 @@ public:
    * or big-endian format. If false or undefined, a big-endian value is read.
    * @return A signed 32-bit float number.
    */
-  float_t getFloat32(size_t byteOffset, bool littleEndian = true) const;
+  float getFloat32(size_t byteOffset, bool littleEndian = true) const;
 
 private:
   /**

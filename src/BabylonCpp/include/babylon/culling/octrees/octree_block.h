@@ -1,11 +1,16 @@
 #ifndef BABYLON_CULLING_OCTREES_OCTREE_BLOCK_H
 #define BABYLON_CULLING_OCTREES_OCTREE_BLOCK_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/culling/octrees/ioctree_container.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Plane;
+class Ray;
 
 template <class T>
 class BABYLON_SHARED_EXPORT OctreeBlock : public IOctreeContainer<T> {
@@ -13,7 +18,7 @@ class BABYLON_SHARED_EXPORT OctreeBlock : public IOctreeContainer<T> {
 public:
   OctreeBlock(const Vector3& minPoint, const Vector3& maxPoint, size_t capacity,
               size_t depth, size_t maxDepth,
-              const ::std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
+              const std::function<void(T&, OctreeBlock<T>&)>& creationFunc);
   ~OctreeBlock();
 
   /** Properties **/
@@ -23,16 +28,16 @@ public:
 
   /** Methods **/
   void addEntry(T& entry);
-  void addEntries(vector_t<T>& entries);
-  void select(const array_t<Plane, 6>& frustumPlanes, vector_t<T>& selection,
-              bool allowDuplicate = true);
+  void addEntries(std::vector<T>& entries);
+  void select(const std::array<Plane, 6>& frustumPlanes,
+              std::vector<T>& selection, bool allowDuplicate = true);
   void intersects(const Vector3& sphereCenter, float sphereRadius,
-                  vector_t<T>& selection, bool allowDuplicate = true);
-  void intersectsRay(const Ray& ray, vector_t<T>& selection);
+                  std::vector<T>& selection, bool allowDuplicate = true);
+  void intersectsRay(const Ray& ray, std::vector<T>& selection);
   void createInnerBlocks();
 
 public:
-  vector_t<T> entries;
+  std::vector<T> entries;
 
 private:
   size_t _depth;
@@ -40,8 +45,8 @@ private:
   size_t _capacity;
   Vector3 _minPoint;
   Vector3 _maxPoint;
-  vector_t<Vector3> _boundingVectors;
-  ::std::function<void(T&, OctreeBlock<T>&)> _creationFunc;
+  std::vector<Vector3> _boundingVectors;
+  std::function<void(T&, OctreeBlock<T>&)> _creationFunc;
 
 }; // end of class OctreeBlock
 

@@ -4,6 +4,9 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
+class SubMesh;
+
 template struct IOctreeContainer<AbstractMesh*>;
 template struct IOctreeContainer<SubMesh*>;
 

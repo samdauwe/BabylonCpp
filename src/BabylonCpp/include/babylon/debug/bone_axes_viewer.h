@@ -1,11 +1,15 @@
 #ifndef BABYLON_DEBUG_BONE_AXES_VIEWER_H
 #define BABYLON_DEBUG_BONE_AXES_VIEWER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/debug/axes_viewer.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Bone;
+class Mesh;
+
 namespace Debug {
 
 /**

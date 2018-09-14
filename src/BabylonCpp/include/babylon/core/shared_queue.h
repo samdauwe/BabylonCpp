@@ -1,7 +1,11 @@
 #ifndef BABYLON_CORE_SHARED_QUEUE_H
 #define BABYLON_CORE_SHARED_QUEUE_H
 
-#include <babylon/babylon_global.h>
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -25,8 +29,8 @@ public:
   void push(T item)
   {
     {
-      ::std::lock_guard<::std::mutex> lock(_mutex);
-      _queue.push(::std::move(item));
+      std::lock_guard<std::mutex> lock(_mutex);
+      _queue.push(std::move(item));
     }
     _data_cond.notify_one();
   }
@@ -34,11 +38,11 @@ public:
   // return immediately, with true if successful retrieval
   bool tryAndPop(T& poppedItem)
   {
-    ::std::lock_guard<::std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     if (_queue.empty()) {
       return false;
     }
-    poppedItem = ::std::move(_queue.front());
+    poppedItem = std::move(_queue.front());
     _queue.pop();
     return true;
   }
@@ -46,25 +50,25 @@ public:
   // Try to retrieve, if no items, wait till an item is available and try again
   void waitAndPop(T& poppedItem)
   {
-    ::std::unique_lock<::std::mutex> lock(_mutex);
+    std::unique_lock<std::mutex> lock(_mutex);
     while (_queue.empty()) {
       _data_cond.wait(lock);
       //  This 'while' loop is equal to
       //  _data_cond.wait(lock, [](bool result){return !_queue.empty();});
     }
-    poppedItem = ::std::move(_queue.front());
+    poppedItem = std::move(_queue.front());
     _queue.pop();
   }
 
   bool empty() const
   {
-    ::std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return _queue.empty();
   }
 
   std::size_t size() const
   {
-    ::std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return _queue.size();
   }
 

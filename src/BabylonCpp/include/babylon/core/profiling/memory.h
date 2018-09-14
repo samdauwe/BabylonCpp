@@ -1,7 +1,8 @@
 #ifndef BABYLON_CORE_PROFILING_MEMORY_H
 #define BABYLON_CORE_PROFILING_MEMORY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 

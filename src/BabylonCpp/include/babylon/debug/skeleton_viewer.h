@@ -1,11 +1,24 @@
 #ifndef BABYLON_DEBUG_SKELETON_VIEWER_H
 #define BABYLON_DEBUG_SKELETON_VIEWER_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 #include <babylon/tools/event_state.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Bone;
+class LinesMesh;
+class Matrix;
+class Scene;
+class Skeleton;
+class Vector3;
+using BonePtr      = std::shared_ptr<Bone>;
+using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+
 namespace Debug {
 
 /**
@@ -54,10 +67,10 @@ private:
   void _getBonePosition(Vector3& position, const Bone& bone,
                         const Matrix& meshMat, float x = 0.f, float y = 0.f,
                         float z = 0.f) const;
-  void _getLinesForBonesWithLength(const vector_t<BonePtr>& bones,
+  void _getLinesForBonesWithLength(const std::vector<BonePtr>& bones,
                                    const Matrix& meshMat);
   void _resizeDebugLines(size_t bonesSize);
-  void _getLinesForBonesNoLength(const vector_t<BonePtr>& bones,
+  void _getLinesForBonesNoLength(const std::vector<BonePtr>& bones,
                                  const Matrix& meshMat);
 
 public:
@@ -91,10 +104,10 @@ public:
 
 private:
   Scene* _scene;
-  vector_t<vector_t<Vector3>> _debugLines;
+  std::vector<std::vector<Vector3>> _debugLines;
   LinesMeshPtr _debugMesh;
   bool _isEnabled;
-  ::std::function<void(Scene*, EventState&)> _renderFunction;
+  std::function<void(Scene*, EventState&)> _renderFunction;
 
 }; // end of class SkeletonViewer
 

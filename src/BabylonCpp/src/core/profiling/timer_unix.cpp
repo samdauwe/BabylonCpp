@@ -15,20 +15,20 @@ Timer::~Timer()
 void Timer::start()
 {
   stopped = false; // reset stop flag
-  gettimeofday(&startCount, NULL);
+  gettimeofday(&startCount, nullptr);
 }
 
 void Timer::stop()
 {
   stopped = true; // set timer stopped flag
-  gettimeofday(&endCount, NULL);
+  gettimeofday(&endCount, nullptr);
 }
 
 double Timer::getElapsedTimeInMicroSec()
 {
 
   if (!stopped) {
-    gettimeofday(&endCount, NULL);
+    gettimeofday(&endCount, nullptr);
   }
 
   startTimeInMicroSec = (startCount.tv_sec * 1000000.0) + startCount.tv_usec;

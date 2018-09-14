@@ -1,9 +1,27 @@
 #ifndef BABYLON_DEBUG_PHYSICS_VIEWER_H
 #define BABYLON_DEBUG_PHYSICS_VIEWER_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <memory>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class EventState;
+class IPhysicsEnginePlugin;
+class Material;
+class Mesh;
+class PhysicsImpostor;
+class Scene;
+class StandardMaterial;
+using AbstractMeshPtr     = std::shared_ptr<AbstractMesh>;
+using MaterialPtr         = std::shared_ptr<Material>;
+using MeshPtr             = std::shared_ptr<Mesh>;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+
 namespace Debug {
 
 /**
@@ -52,12 +70,12 @@ protected:
   /**
    * @brief Hidden
    */
-  vector_t<PhysicsImpostor*> _impostors;
+  std::vector<PhysicsImpostor*> _impostors;
 
   /**
    * @brief Hidden
    */
-  vector_t<AbstractMeshPtr> _meshes;
+  std::vector<AbstractMeshPtr> _meshes;
 
   /**
    * @brief Hidden
@@ -75,7 +93,7 @@ protected:
   IPhysicsEnginePlugin* _physicsEnginePlugin;
 
 private:
-  ::std::function<void(Scene* scene, EventState& es)> _renderFunction;
+  std::function<void(Scene* scene, EventState& es)> _renderFunction;
   MeshPtr _debugBoxMesh;
   MeshPtr _debugSphereMesh;
   StandardMaterialPtr _debugMaterial;

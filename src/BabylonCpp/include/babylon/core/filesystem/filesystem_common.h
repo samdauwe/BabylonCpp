@@ -1,7 +1,11 @@
 #ifndef BABYLON_CORE_FILESYSTEM_FILESYSTEM_COMMON_H
 #define BABYLON_CORE_FILESYSTEM_FILESYSTEM_COMMON_H
 
-#include <babylon/babylon_global.h>
+#include <algorithm>
+#include <fstream>
+#include <ios>
+#include <string>
+#include <vector>
 
 namespace BABYLON {
 namespace Filesystem {
@@ -12,10 +16,10 @@ namespace Filesystem {
  * @return The extension of the file or an empty string when the filename has no
  * extension.
  */
-inline string_t extension(const string_t& filename)
+inline std::string extension(const std::string& filename)
 {
   auto pos = filename.find_last_of(".");
-  if (pos == string_t::npos) {
+  if (pos == std::string::npos) {
     return "";
   }
   return filename.substr(pos + 1);
@@ -26,10 +30,10 @@ inline string_t extension(const string_t& filename)
  * @param filepath The file path.
  * @return The base directory of a file of subdirectory.
  */
-inline string_t baseDir(const string_t& filepath)
+inline std::string baseDir(const std::string& filepath)
 {
   auto pos = filepath.find_last_of("/\\");
-  if (pos != string_t::npos) {
+  if (pos != std::string::npos) {
     return filepath.substr(0, pos);
   }
   return "";
@@ -40,10 +44,10 @@ inline string_t baseDir(const string_t& filepath)
  * @param filepath The file path.
  * @return The filename of a path.
  */
-inline string_t baseName(const string_t& filepath)
+inline std::string baseName(const std::string& filepath)
 {
   auto pos = filepath.find_last_of("/\\");
-  if (pos != string_t::npos) {
+  if (pos != std::string::npos) {
     return filepath.substr(pos + 1);
   }
   return "";
@@ -67,7 +71,7 @@ inline T joinPath(const T& path0, const T& path1)
     char lastChar0  = *path0.rbegin();
     char firstChar1 = path1.empty() ? '\0' : *path1.cbegin();
     if ((lastChar0 != '/') && (firstChar1 != '/')) {
-      return path0 + string_t("/") + path1;
+      return path0 + std::string("/") + path1;
     }
     else {
       return path0 + path1;
@@ -87,14 +91,14 @@ inline T joinPath(const T& path0, const T& path1, Args... args)
  * @return The contents of the file or an empty string in case the content could
  * not be read.
  */
-inline string_t readFileContents(const char* filename)
+inline std::string readFileContents(const char* filename)
 {
-  string_t contents;
-  ::std::ifstream in(filename, ::std::ios::in | ::std::ios::binary);
+  std::string contents;
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
   if (in) {
-    in.seekg(0, ::std::ios::end);
+    in.seekg(0, std::ios::end);
     contents.resize(static_cast<size_t>(in.tellg()));
-    in.seekg(0, ::std::ios::beg);
+    in.seekg(0, std::ios::beg);
     in.read(&contents[0], static_cast<long>(contents.size()));
     in.close();
   }
@@ -107,12 +111,12 @@ inline string_t readFileContents(const char* filename)
  * @return The contents of the file or an empty vector in case the content could
  * not be read.
  */
-inline vector_t<string_t> readFileLines(const char* filename)
+inline std::vector<std::string> readFileLines(const char* filename)
 {
-  vector_t<string_t> lines;
-  ::std::ifstream in(filename, ::std::ios::in | ::std::ios::binary);
+  std::vector<std::string> lines;
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
   if (in) {
-    for (string_t line; ::std::getline(in, line);) {
+    for (std::string line; std::getline(in, line);) {
       lines.emplace_back(line);
     }
   }
@@ -124,10 +128,10 @@ inline vector_t<string_t> readFileLines(const char* filename)
  * @param filename. The filename.
  * @return The filename with the extension removes.
  */
-inline string_t removeExtension(const string_t& filename)
+inline std::string removeExtension(const std::string& filename)
 {
   auto p = filename.find_last_of('.');
-  return p > 0 && p != string_t::npos ? filename.substr(0, p) : filename;
+  return p > 0 && p != std::string::npos ? filename.substr(0, p) : filename;
 }
 
 /**
@@ -135,10 +139,10 @@ inline string_t removeExtension(const string_t& filename)
  * @param path The path to standardize.
  * @return The standardized path.
  */
-inline string_t standardizePath(const string_t& path)
+inline std::string standardizePath(const std::string& path)
 {
-  string_t _path = path;
-  ::std::replace(_path.begin(), _path.end(), '\\', '/');
+  std::string _path = path;
+  std::replace(_path.begin(), _path.end(), '\\', '/');
   if (_path.back() != '/') {
     _path += '/';
   }
@@ -152,10 +156,10 @@ inline string_t standardizePath(const string_t& path)
  * @param contents The contents to write to the file.
  * @return Whether or not the content was written to the file.
  */
-inline bool writeFileContents(const char* filename, const string_t& contents)
+inline bool writeFileContents(const char* filename, const std::string& contents)
 {
   bool writtentoFile = false;
-  ::std::ofstream out(filename, ::std::ios::out);
+  std::ofstream out(filename, std::ios::out);
   if (out) {
     out.write(contents.c_str(), static_cast<long>(contents.size()));
     out.close();
@@ -171,10 +175,10 @@ inline bool writeFileContents(const char* filename, const string_t& contents)
  * @return Whether or not the content was written to the file.
  */
 inline bool writeFileLines(const char* filename,
-                           const vector_t<string_t>& lines)
+                           const std::vector<std::string>& lines)
 {
   bool writtentoFile = false;
-  ::std::ofstream out(filename, ::std::ios::out);
+  std::ofstream out(filename, std::ios::out);
   if (out) {
     for (auto& line : lines) {
       out.write(line.c_str(), static_cast<long>(line.size()));

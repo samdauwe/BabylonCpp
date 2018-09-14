@@ -1,7 +1,10 @@
 #ifndef BABYLON_CORE_LOGGING_LOG_LEVELS_H
 #define BABYLON_CORE_LOGGING_LOG_LEVELS_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -21,10 +24,10 @@ public:
   /** Begin method X, end method X etc. **/
   static constexpr unsigned int LEVEL_TRACE = 5;
   /** Levels list **/
-  static const vector_t<pair_t<unsigned int, string_t>> Levels;
+  static const std::vector<std::pair<unsigned int, std::string>> Levels;
 
   // Functions
-  static string_t ToReadableLevel(unsigned int level);
+  static std::string ToReadableLevel(unsigned int level);
 
 }; // end of class LogChannel
 

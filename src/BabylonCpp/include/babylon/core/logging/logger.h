@@ -1,8 +1,8 @@
 #ifndef BABYLON_CORE_LOGGING_LOGGER_H
 #define BABYLON_CORE_LOGGING_LOGGER_H
 
-#include <babylon/babylon_global.h>
 #include <babylon/core/active.h>
+#include <babylon/core/delegates/delegate.h>
 #include <babylon/core/logging/log_levels.h>
 #include <babylon/core/logging/log_message.h>
 
@@ -21,7 +21,7 @@
 namespace BABYLON {
 
 struct LogMessageHandler {
-  using LogMessageListener = delegate_t<void(const LogMessage&)>;
+  using LogMessageListener = SA::delegate<void(const LogMessage&)>;
 
   LogMessageHandler();
   ~LogMessageHandler()                        = default;
@@ -31,16 +31,16 @@ struct LogMessageHandler {
   bool takes(unsigned int level);
   void handle(const LogMessage& msg);
 
-  unordered_map_t<unsigned int, vector_t<LogMessageListener*>>
+  std::unordered_map<unsigned int, std::vector<LogMessageListener*>>
     _logMessageListeners;
-  unique_ptr_t<Active> _bg;
+  std::unique_ptr<Active> _bg;
   unsigned int _minLevel, _maxLevel;
 };
 
 class BABYLON_SHARED_EXPORT Logger {
 
 public:
-  using LogMessageListener = delegate_t<void(const LogMessage&)>;
+  using LogMessageListener = SA::delegate<void(const LogMessage&)>;
 
 public:
   static Logger& Instance()
@@ -60,7 +60,7 @@ public:
   Logger& operator=(Logger const&) = delete; // Copy assignment
   Logger& operator=(Logger&&) = delete;      // Move assignment
 
-  static LogMessage CreateMessage(unsigned int level, string_t context,
+  static LogMessage CreateMessage(unsigned int level, std::string context,
                                   char const* file, int lineNumber,
                                   char const* func, char const* prettyFunc);
   void log(const LogMessage& logMessage);

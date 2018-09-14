@@ -11,7 +11,7 @@ LogMessageHandler::LogMessageHandler()
     , _maxLevel{LogLevels::LEVEL_TRACE}
 {
   for (unsigned int lvl = _minLevel; lvl <= _maxLevel; ++lvl) {
-    _logMessageListeners[lvl] = vector_t<LogMessageListener*>();
+    _logMessageListeners[lvl] = std::vector<LogMessageListener*>();
   }
 }
 
@@ -24,7 +24,7 @@ void LogMessageHandler::handle(const LogMessage& logMessage)
 {
   if (_logMessageListeners.find(logMessage.level())
       != _logMessageListeners.end()) {
-    vector_t<LogMessageListener*> _logMsgListenersLvl
+    std::vector<LogMessageListener*> _logMsgListenersLvl
       = _logMessageListeners[logMessage.level()];
     for (auto& logMsgListener : _logMsgListenersLvl) {
       (*logMsgListener)(LogMessage(logMessage));
@@ -45,7 +45,7 @@ Logger::~Logger()
   _impl._bg.reset(nullptr);
 }
 
-LogMessage Logger::CreateMessage(unsigned int level, string_t context,
+LogMessage Logger::CreateMessage(unsigned int level, std::string context,
                                  char const* file, int lineNumber,
                                  char const* func, char const* prettyFunc)
 {
@@ -73,7 +73,7 @@ bool Logger::isSubscribed(unsigned int level,
   bool subscribed = false;
   if (_impl._logMessageListeners.find(level)
       != _impl._logMessageListeners.end()) {
-    vector_t<LogMessageListener*>& _logMsgListenersLvl
+    std::vector<LogMessageListener*>& _logMsgListenersLvl
       = _impl._logMessageListeners[level];
     auto it    = ::std::find(_logMsgListenersLvl.begin(),
                           _logMsgListenersLvl.end(), &logMsgListener);
@@ -86,7 +86,7 @@ void Logger::registerLogMessageListener(LogMessageListener& logMsgListener)
 {
   auto bgAddMsgListenercall = [this, &logMsgListener] {
     for (auto& keyVal : _impl._logMessageListeners) {
-      vector_t<LogMessageListener*>& _logMsgListenersLvl
+      std::vector<LogMessageListener*>& _logMsgListenersLvl
         = _impl._logMessageListeners[keyVal.first];
       auto it = ::std::find(_logMsgListenersLvl.begin(),
                             _logMsgListenersLvl.end(), &logMsgListener);
@@ -105,7 +105,7 @@ void Logger::unregisterLogMessageListener(
 {
   auto bgRemoveMsgListenercall = [this, logMsgListener] {
     for (const auto& keyVal : _impl._logMessageListeners) {
-      vector_t<LogMessageListener*>& _logMsgListenersLvl
+      std::vector<LogMessageListener*>& _logMsgListenersLvl
         = _impl._logMessageListeners[keyVal.first];
       auto it = ::std::find(_logMsgListenersLvl.begin(),
                             _logMsgListenersLvl.end(), &logMsgListener);
@@ -125,7 +125,7 @@ void Logger::registerLogMessageListener(unsigned int level,
     auto bgAddMsgListenercall = [this, &level, &logMsgListener] {
       if (_impl._logMessageListeners.find(level)
           != _impl._logMessageListeners.end()) {
-        vector_t<LogMessageListener*>& _logMsgListenersLvl
+        std::vector<LogMessageListener*>& _logMsgListenersLvl
           = _impl._logMessageListeners[level];
         LogMessageListener* l = &logMsgListener;
         auto it               = ::std::find(_logMsgListenersLvl.begin(),
@@ -147,7 +147,7 @@ void Logger::unregisterLogMessageListener(
     auto bgRemoveMsgListenercall = [this, &level, &logMsgListener] {
       if (_impl._logMessageListeners.find(level)
           != _impl._logMessageListeners.end()) {
-        vector_t<LogMessageListener*>& _logMsgListenersLvl
+        std::vector<LogMessageListener*>& _logMsgListenersLvl
           = _impl._logMessageListeners[level];
         auto it = ::std::find(_logMsgListenersLvl.begin(),
                               _logMsgListenersLvl.end(), &logMsgListener);
