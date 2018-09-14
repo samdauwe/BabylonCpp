@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <algorithm>
+
 namespace BABYLON {
 
 BounceEase::BounceEase(int iBounces, float iBounciness)

@@ -4,6 +4,8 @@
 
 #include <babylon/babylon_constants.h>
 
+#include <algorithm>
+
 namespace BABYLON {
 
 BackEase::BackEase(float iAmplitude) : EasingFunction{}, amplitude{iAmplitude}

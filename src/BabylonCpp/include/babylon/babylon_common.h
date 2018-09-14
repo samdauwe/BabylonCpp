@@ -13,6 +13,8 @@
 // Strings library
 #include <string>
 
+#include <optional>
+
 namespace BABYLON {
 
 // -- Type support -- //
