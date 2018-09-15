@@ -1,5 +1,7 @@
 #include <babylon/impl/gl_rendering_context.h>
 
+#include <array>
+
 // GLXW
 #include <GLXW/glxw.h>
 
@@ -18,10 +20,9 @@
 namespace BABYLON {
 namespace GL {
 
-void GLAPIENTRY MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/,
-                                GLenum severity, GLsizei /*length*/,
-                                const GLchar* message,
-                                const void* /*userParam*/)
+void MessageCallback(GLenum /*source*/, GLenum type, GLuint /*id*/,
+                     GLenum severity, GLsizei /*length*/, const GLchar* message,
+                     const void* /*userParam*/)
 {
   fprintf(stderr,
           "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",

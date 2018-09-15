@@ -2,6 +2,7 @@
 #define BABYLON_SAMPLES_MATERIALS_SHADER_MATERIAL_TILES_SCENE_H
 
 #include <babylon/interfaces/irenderable_scene.h>
+#include <babylon/materials/shader_material.h>
 #include <babylon/math/vector2.h>
 
 namespace BABYLON {

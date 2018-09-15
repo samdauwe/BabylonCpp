@@ -715,7 +715,7 @@ void DynamicTerrain::CreateMapFromHeightMapToRef(
   const auto onError
     = [](const std::string& msg) { BABYLON_LOG_ERROR("Tools", msg); };
 
-  Tools::LoadImage(heightmapURL, onload, onError);
+  Tools::LoadImageFromUrl(heightmapURL, onload, onError);
 }
 
 void DynamicTerrain::CreateUVMapToRef(float subX, float subZ,

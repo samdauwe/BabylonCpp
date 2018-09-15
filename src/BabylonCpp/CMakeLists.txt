@@ -151,7 +151,8 @@ if (UNIX)
 endif (UNIX)
 
 if (WIN32)
-    set(CORE_HDR_FILES ${CORE_HDR_FILES} ${INCLUDE_PATH}/core/profiling/timer_win32.h)
+    set(CORE_HDR_FILES ${CORE_HDR_FILES} ${INCLUDE_PATH}/core/filesystem/filesystem_win32.h
+                                         ${INCLUDE_PATH}/core/profiling/timer_win32.h)
 endif (WIN32)
 
 if (OPTION_ENABLE_SIMD)

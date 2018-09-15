@@ -7,7 +7,6 @@
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
-#include <babylon/materials/shader_material.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/mesh_builder.h>
 #include <babylon/mesh/vertex_data_options.h>

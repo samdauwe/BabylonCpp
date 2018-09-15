@@ -1,5 +1,7 @@
 #include <babylon/postprocess/tonemap_post_process.h>
 
+#include <sstream>
+
 #include <babylon/materials/effect.h>
 
 #include <babylon/core/variant.h>

@@ -28,7 +28,15 @@ if(COMPILER_SUPPORTS_CXX17)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 else(COMPILER_SUPPORTS_CXX17)
-    message(STATUS "The compiler '${CMAKE_CXX_COMPILER}' has no C++17 support. Please use a more recent C++ compiler!")
+    if (MSVC_VERSION GREATER_EQUAL 1900)
+        include(CheckCXXCompilerFlag)
+        CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
+        if (_cpp_latest_flag_supported)
+            add_compile_options("/std:c++latest")
+        endif()
+    else()
+        message(STATUS "The compiler '${CMAKE_CXX_COMPILER}' has no C++17 support. Please use a more recent C++ compiler!")
+    endif()
 endif()
 
 # Check compiler version
@@ -70,10 +78,6 @@ endif()
 # MSVC compiler options
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
     set(WFLAGS ${WFLAGS}
-        _SCL_SECURE_NO_WARNINGS  # Calling any one of the potentially unsafe methods in the Standard C++ Library
-        _CRT_SECURE_NO_WARNINGS  # Calling any one of the potentially unsafe methods in the CRT Library
-    )
-    set(WFLAGS ${WFLAGS}
         /MP           # -> build with multiple processes
         /W4           # -> warning level 4
         # /WX         # -> treat warnings as errors
@@ -84,20 +88,10 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
 
         # /Zm114      # -> Memory size for precompiled headers (insufficient for msvc 2013)
         /Zm200        # -> Memory size for precompiled headers
-        
-        #$<$<CONFIG:Debug>:
-        #/RTCc         # -> value is assigned to a smaller data type and results in a data loss
-        #>
 
-        $<$<CONFIG:Release>: 
-        /Gw           # -> whole program global optimization
-        /GS-          # -> buffer security check: no 
-        /GL           # -> whole program optimization: enable link-time code generation (disables Zi)
-        /GF           # -> enable string pooling
-        >
-        
-        # No manual c++11 enable for MSVC as all supported MSVC versions for cmake-init have C++11 implicitly enabled (MSVC >=2013)
+        /bigobj       # (Increase Number of Sections in .Obj file)
     )
+    string(REPLACE ";" " " WFLAGS "${WFLAGS}")
 endif ()
 
 # Add "-Werror" flag if requested
@@ -142,7 +136,7 @@ if(OPTION_MORE_WARNINGS)
   endif()
   # Convert CMake list to a single string, erasing the ";" separators
   string(REPLACE ";" "" WFLAGS_STR ${WFLAGS})
-  set(EXTRA_FLAGS "${EXTRA_FLAGS} ${WFLAGS_STR}")
+  build_string("EXTRA_FLAGS" "${WFLAGS_STR}")
 endif()
 
 # Add -stdlib=libc++ when using Clang if possible
@@ -171,7 +165,7 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 endif()
 
 # Enable Position Independent Code (PIC) in shared libraries
-if(NOT MINGW)
+if(NOT MINGW AND NOT WIN32)
   set(EXTRA_FLAGS "${EXTRA_FLAGS} -fPIC")
 endif()
 
@@ -181,7 +175,9 @@ if(NOT APPLE AND NOT WIN32)
 endif()
 
 # Performance
-set(EXTRA_FLAGS "${EXTRA_FLAGS} -march=native -mpopcnt")
+if(NOT WIN32)
+  set(EXTRA_FLAGS "${EXTRA_FLAGS} -march=native -mpopcnt")
+endif()
 
 # Performance
 if (OPTION_ENABLE_ADDRESS_SANITIZER)
@@ -200,6 +196,10 @@ if (OPTION_ENABLE_ADDRESS_SANITIZER)
     set(ASAN_FOUND true)
   endif()
 endif(OPTION_ENABLE_ADDRESS_SANITIZER)
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+  set(CMAKE_CXX_FLAGS                   "${CMAKE_CXX_FLAGS} ${WFLAGS}")
+endif()
 
 # Check if the user provided CXXFLAGS, set defaults otherwise
 if(NOT CMAKE_CXX_FLAGS)

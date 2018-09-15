@@ -1,5 +1,7 @@
 #include <babylon/mesh/csg/vertex.h>
 
+#include <sstream>
+
 namespace BABYLON {
 
 CSG::Vertex::Vertex(const Vector3& _pos, const Vector3& _normal,

@@ -14,7 +14,7 @@
 namespace BABYLON {
 
 class Camera;
-class ICullable;
+struct ICullable;
 class FreeCamera;
 class PostProcess;
 class Ray;

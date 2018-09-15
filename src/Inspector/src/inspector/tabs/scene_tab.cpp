@@ -279,13 +279,13 @@ void SceneTab::_buildPropertiesView()
 void SceneTab::_renderActions()
 {
   // General
-  if (ImGui::CollapsingHeader("General", "General", true, true)) {
+  if (ImGui::CollapsingHeader("General", true)) {
     bool forceShowBoundingBoxes;
     ImGui::Checkbox("Bounding boxes", &forceShowBoundingBoxes);
     _scene->forceShowBoundingBoxes = forceShowBoundingBoxes;
   }
   // Rendering Mode
-  if (ImGui::CollapsingHeader("Rendering Mode", "Rendering Mode", true, true)) {
+  if (ImGui::CollapsingHeader("Rendering Mode", true)) {
     // Determine current render mode
     int currenRenderMode = -1;
     if (_scene->forcePointsCloud()) {
@@ -324,8 +324,7 @@ void SceneTab::_renderActions()
 
   // Textures
   bool origValue = false, value = false;
-  if (ImGui::CollapsingHeader("Texture Channels", "Texture Channels", true,
-                              true)) {
+  if (ImGui::CollapsingHeader("Texture Channels", true)) {
     // Diffuse Texture
     {
       origValue = value = StandardMaterial::DiffuseTextureEnabled();
@@ -416,7 +415,7 @@ void SceneTab::_renderActions()
     }
   }
   // Options
-  if (ImGui::CollapsingHeader("Options", "Options", true, true)) {
+  if (ImGui::CollapsingHeader("Options", true)) {
     // Animations
     {
       ImGui::Checkbox("Animations", &_scene->animationsEnabled);

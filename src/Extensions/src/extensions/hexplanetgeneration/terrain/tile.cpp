@@ -1,5 +1,7 @@
 #include <babylon/extensions/hexplanetgeneration/terrain/tile.h>
 
+#include <sstream>
+
 #include <babylon/culling/ray.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/corner.h>
 #include <babylon/extensions/hexplanetgeneration/utils/tools.h>

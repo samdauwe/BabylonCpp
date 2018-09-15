@@ -69,13 +69,13 @@ void StatsTab::render()
     ImGui::TextWrapped("%.f fps", static_cast<double>(_engine->getFps()));
     ImGui::PopStyleColor();
     // OpengGL Info
-    if (ImGui::CollapsingHeader("OpenGL Info", "OpenGL Info", true, true)) {
+    if (ImGui::CollapsingHeader("OpenGL Info", true)) {
       ImGui::TextWrapped("Version: %s", _glInfo.version.c_str());
       ImGui::TextWrapped("Renderer: %s", _glInfo.renderer.c_str());
       ImGui::TextWrapped("Vendor: %s", _glInfo.vendor.c_str());
     }
     // Count
-    if (ImGui::CollapsingHeader("Count", "Count", true, true)) {
+    if (ImGui::CollapsingHeader("Count", true)) {
       // Total meshes
       ImGui::TextWrapped("Total meshes");
       ImGui::SameLine(offsetX);
@@ -124,7 +124,7 @@ void StatsTab::render()
       ImGui::TextWrapped("%ld", _scene->getActiveParticles());
     }
     // Duration
-    if (ImGui::CollapsingHeader("Duration", "Duration", true, true)) {
+    if (ImGui::CollapsingHeader("Duration", true)) {
       // Meshes selection
       ImGui::TextWrapped("Meshes selection");
       ImGui::SameLine(offsetX);
@@ -198,7 +198,7 @@ void StatsTab::render()
                          _engine->getRenderHeight());
     }
     // Extensions
-    if (ImGui::CollapsingHeader("Extension", "Extensions", true, true)) {
+    if (ImGui::CollapsingHeader("Extension", true)) {
       // Std derivates
       ImGui::TextWrapped("Std derivates");
       ImGui::SameLine(offsetX);
@@ -247,7 +247,7 @@ void StatsTab::render()
       ImGui::TextWrapped("%s", engineCapabilities.timerQuery ? "Yes" : "No");
     }
     // Caps.
-    if (ImGui::CollapsingHeader("Caps.", "Caps.", true, true)) {
+    if (ImGui::CollapsingHeader("Caps.", true)) {
       // Stencil
       ImGui::TextWrapped("Stencil");
       ImGui::SameLine(offsetX);

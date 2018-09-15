@@ -311,7 +311,7 @@ constexpr float PercentToRange(float percent, float min, float max)
  * @param angle The angle to normalize in radian.
  * @return The converted angle.
  */
-constexpr float NormalizeRadians(float angle)
+inline float NormalizeRadians(float angle)
 {
   // More precise but slower version kept for reference.
   // angle = angle % Tools.TwoPi;

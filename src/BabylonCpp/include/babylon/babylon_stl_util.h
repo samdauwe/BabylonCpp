@@ -1,6 +1,8 @@
 #ifndef BABYLON_STL_UTIL_H
 #define BABYLON_STL_UTIL_H
 
+#include <sstream>
+
 #include <babylon/babylon_stl.h>
 
 namespace BABYLON {

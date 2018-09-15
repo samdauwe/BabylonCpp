@@ -371,7 +371,7 @@ int SampleLauncher::run(long runTime)
 
   // Check if there is a renderable scene
   if (!_sceneWindow.renderableScene) {
-    _sampleLauncherState = SampleLauncher::State::ERROR;
+    _sampleLauncherState = SampleLauncher::State::ERRORCONDITION;
     return 1;
   }
 
@@ -488,14 +488,14 @@ int SampleLauncher::initGLFW()
   }
 
   // Create the scene window
-  CreateWindow(_sceneWindow, _defaultWinResX, _defaultWinResY,
-               _sceneWindow.title.c_str(), nullptr, nullptr);
+  CreateGLFWWindow(_sceneWindow, _defaultWinResX, _defaultWinResY,
+                   _sceneWindow.title.c_str(), nullptr, nullptr);
   _sceneWindow.lastTime = glfwGetTime();
 
   // Create the inspector window
   if (_showInspectorWindow) {
-    CreateWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
-                 _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
+    CreateGLFWWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
+                     _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
     _inspectorWindow.lastTime = glfwGetTime();
     _inspector = ::std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
     _inspector->intialize();
@@ -504,9 +504,10 @@ int SampleLauncher::initGLFW()
   return 0;
 }
 
-void SampleLauncher::CreateWindow(Window& window, int width, int height,
-                                  const string_t& title, GLFWmonitor* monitor,
-                                  Window* parentWindow)
+void SampleLauncher::CreateGLFWWindow(Window& window, int width, int height,
+                                      const string_t& title,
+                                      GLFWmonitor* monitor,
+                                      Window* parentWindow)
 {
   // Create new window
   window.glfwWindow  = nullptr;

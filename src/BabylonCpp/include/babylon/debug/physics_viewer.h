@@ -11,7 +11,7 @@ namespace BABYLON {
 
 class AbstractMesh;
 class EventState;
-class IPhysicsEnginePlugin;
+struct IPhysicsEnginePlugin;
 class Material;
 class Mesh;
 class PhysicsImpostor;

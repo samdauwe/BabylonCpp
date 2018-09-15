@@ -4,6 +4,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/any.h>
@@ -27,7 +28,7 @@ class EffectLayer;
 class Geometry;
 class GlowLayer;
 class HighlightLayer;
-class IParticleSystem;
+struct IParticleSystem;
 class Layer;
 class LensFlareSystem;
 class Light;

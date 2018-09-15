@@ -595,7 +595,7 @@ GroundMeshPtr MeshBuilder::CreateGroundFromHeightMap(
   const auto onError
     = [](const string_t& msg) { BABYLON_LOG_ERROR("Tools", msg); };
 
-  Tools::LoadImage(url, onload, onError, false);
+  Tools::LoadImageFromUrl(url, onload, onError, false);
 
   return ground;
 }

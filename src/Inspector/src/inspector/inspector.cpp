@@ -1,6 +1,7 @@
 #include <babylon/inspector/inspector.h>
 
 #include <iomanip>
+#include <sstream>
 
 // GLFW
 #include <GLFW/glfw3.h>

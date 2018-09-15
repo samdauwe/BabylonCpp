@@ -6,6 +6,9 @@
 #ifdef __unix__
 // Unix filesystem functions
 #include <babylon/core/filesystem/filesystem_unix.h>
+#elif _WIN32
+// Windows filesystem functions
+#include <babylon/core/filesystem/filesystem_win32.h>
 #endif
 
 #endif // BABYLON_CORE_FILESYSTEM_H

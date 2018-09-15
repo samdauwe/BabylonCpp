@@ -170,9 +170,9 @@ inline std::string toIso8601Ms(const system_time_point_t& system_time_point)
 inline long unixtimeInMs()
 {
   using namespace std::chrono;
-  return duration_cast<milliseconds>(
-           high_resolution_clock::now().time_since_epoch())
-    .count();
+  return static_cast<long>(
+    duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch())
+      .count());
 }
 
 /**

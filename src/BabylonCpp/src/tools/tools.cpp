@@ -334,10 +334,10 @@ string_t Tools::DecodeURIComponent(const string_t& s)
   return s;
 }
 
-void Tools::LoadImage(string_t url,
-                      const ::std::function<void(const Image& img)>& onLoad,
-                      const ::std::function<void(const string_t& msg)>& onError,
-                      bool flipVertically)
+void Tools::LoadImageFromUrl(
+  string_t url, const ::std::function<void(const Image& img)>& onLoad,
+  const ::std::function<void(const string_t& msg)>& onError,
+  bool flipVertically)
 {
   url = Tools::CleanUrl(url);
 

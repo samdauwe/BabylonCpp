@@ -1,5 +1,7 @@
 #include <babylon/mesh/csg/polygon.h>
 
+#include <sstream>
+
 #include <babylon/mesh/csg/vertex.h>
 
 namespace BABYLON {

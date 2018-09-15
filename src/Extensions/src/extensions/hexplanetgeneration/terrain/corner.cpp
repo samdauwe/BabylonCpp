@@ -1,5 +1,7 @@
 #include <babylon/extensions/hexplanetgeneration/terrain/corner.h>
 
+#include <sstream>
+
 #include <babylon/extensions/hexplanetgeneration/terrain/border.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/tile.h>
 

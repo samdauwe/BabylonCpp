@@ -1342,8 +1342,10 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices,
 
   if (_caps.uintIndices) {
     // check 32 bit support
-    auto it = ::std::find_if(indices.begin(), indices.end(),
-                             ::std::bind2nd(::std::greater<uint32_t>(), 65535));
+    using namespace std::placeholders;
+    auto it
+      = ::std::find_if(indices.begin(), indices.end(),
+                       ::std::bind(::std::greater<uint32_t>(), _1, 65535));
     if (it != indices.end()) {
       need32Bits = true;
     }
@@ -2703,7 +2705,7 @@ InternalTexture* Engine::createTexture(
     };
 
     if (!fromData || isBase64) {
-      Tools::LoadImage(url, onload, _onerror);
+      Tools::LoadImageFromUrl(url, onload, _onerror);
     }
     else {
       // Not implemented yet

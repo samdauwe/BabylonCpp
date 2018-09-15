@@ -87,9 +87,10 @@ struct BABYLON_SHARED_EXPORT Tools {
   static string_t DecodeURIComponent(const string_t& s);
   static ::std::function<string_t(string_t url)> PreprocessUrl;
   static void
-  LoadImage(string_t url, const ::std::function<void(const Image& img)>& onLoad,
-            const ::std::function<void(const string_t& msg)>& onError,
-            bool flipVertically = true);
+  LoadImageFromUrl(string_t url,
+                   const ::std::function<void(const Image& img)>& onLoad,
+                   const ::std::function<void(const string_t& msg)>& onError,
+                   bool flipVertically = true);
   static void LoadFile(
     string_t url,
     const ::std::function<void(const string_t& data,

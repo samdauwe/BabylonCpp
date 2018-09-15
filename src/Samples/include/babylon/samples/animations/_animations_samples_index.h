@@ -7,10 +7,7 @@
 namespace BABYLON {
 namespace Samples {
 
-class BABYLON_SHARED_EXPORT _AnimationsSamplesIndex : public _ISamplesIndex {
-
-private:
-  static constexpr const char* _CategoryName = "Animations";
+class _AnimationsSamplesIndex : public _ISamplesIndex {
 
 public:
   /**
@@ -19,7 +16,7 @@ public:
    */
   static const string_t CategoryName()
   {
-    return _AnimationsSamplesIndex::_CategoryName;
+    return "Animations";
   }
 
 public:

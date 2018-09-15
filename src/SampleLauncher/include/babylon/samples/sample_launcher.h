@@ -39,12 +39,12 @@ class SampleLauncher {
 
 public:
   enum class State {
-    UNINITIALIZED = 0,
-    INITIALIZED   = 1,
-    RUNNING       = 2,
-    FINISHED      = 3,
-    DESTROYED     = 4,
-    ERROR         = 5,
+    UNINITIALIZED  = 0,
+    INITIALIZED    = 1,
+    RUNNING        = 2,
+    FINISHED       = 3,
+    DESTROYED      = 4,
+    ERRORCONDITION = 5,
   }; // end of enum class State
 
 public:
@@ -75,9 +75,9 @@ public:
   void setRenderableScene(std::unique_ptr<IRenderableScene>& renderableScene);
 
 public:
-  static void CreateWindow(Window& window, int width, int height,
-                           const string_t& title, GLFWmonitor* monitor,
-                           Window* parentWindow);
+  static void CreateGLFWWindow(Window& window, int width, int height,
+                               const string_t& title, GLFWmonitor* monitor,
+                               Window* parentWindow);
 
 private:
   int initGLFW();

@@ -2,6 +2,7 @@
 #define BABYLON_SAMPLES_MATERIALS_SHADER_MATERIAL_BOXES_SCENE_H
 
 #include <babylon/interfaces/irenderable_scene.h>
+#include <babylon/materials/shader_material.h>
 
 namespace BABYLON {
 
