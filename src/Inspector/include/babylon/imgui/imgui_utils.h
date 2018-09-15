@@ -137,8 +137,13 @@ inline bool Splitter(bool split_vertically, float thickness, float* size1,
                             0.0f, 0.0f);
   bb.Max.x   = bb.Min.x + bbMax.x;
   bb.Max.y   = bb.Min.y + bbMax.y;
+#ifdef __unix__
+  return SplitterBehavior(id, bb, split_vertically ? ImGuiAxis_X : ImGuiAxis_Y,
+                          size1, size2, min_size1, min_size2, 0.0f);
+#elif _WIN32
   return SplitterBehavior(bb, id, split_vertically ? ImGuiAxis_X : ImGuiAxis_Y,
                           size1, size2, min_size1, min_size2, 0.0f);
+#endif
 }
 
 inline bool CheckBoxFont(const char* name_, bool* pB_, const char* pOn_ = "[X]",

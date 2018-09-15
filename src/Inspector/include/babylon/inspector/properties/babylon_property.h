@@ -36,14 +36,44 @@ public:
   {
   }
 
-  BabylonProperty(const BabylonProperty& other) = delete;
+  BabylonProperty(const BabylonProperty& other)
+      : _id{other._id}
+      , _getter{other._getter}
+      , _getterNonConst{other._getterNonConst}
+      , _setter{other._setter}
+  {
+  }
 
   BabylonProperty(BabylonProperty&& other)
-      : _id{::std::move(other._id)}
-      , _getter{::std::move(other._getter)}
-      , _getterNonConst{::std::move(other._getterNonConst)}
-      , _setter{::std::move(other._setter)}
+      : _id{std::move(other._id)}
+      , _getter{std::move(other._getter)}
+      , _getterNonConst{std::move(other._getterNonConst)}
+      , _setter{std::move(other._setter)}
   {
+  }
+
+  BabylonProperty& operator=(const BabylonProperty& other)
+  {
+    if (&other != this) {
+      _id             = other._id;
+      _getter         = other._getter;
+      _getterNonConst = other._getterNonConst;
+      _setter         = other._setter;
+    }
+
+    return *this;
+  }
+
+  BabylonProperty& operator=(BabylonProperty&& other)
+  {
+    if (&other != this) {
+      _id             = std::move(other._id);
+      _getter         = std::move(other._getter);
+      _getterNonConst = std::move(other._getterNonConst);
+      _setter         = std::move(other._setter);
+    }
+
+    return *this;
   }
 
   virtual ~BabylonProperty()

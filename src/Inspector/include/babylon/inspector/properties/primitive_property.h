@@ -20,13 +20,40 @@ public:
   {
   }
 
-  PrimitiveProperty(const PrimitiveProperty& other) = delete;
+  PrimitiveProperty(const PrimitiveProperty& other)
+      : _id{other._id}
+      , _getter{other._getter}
+      , _setter{other._setter}
+  {
+  }
 
   PrimitiveProperty(PrimitiveProperty&& other)
       : _id{::std::move(other._id)}
       , _getter{::std::move(other._getter)}
       , _setter{::std::move(other._setter)}
   {
+  }
+
+  PrimitiveProperty& operator=(const PrimitiveProperty& other)
+  {
+    if (&other != this) {
+      _id             = other._id;
+      _getter         = other._getter;
+      _setter         = other._setter;
+    }
+
+    return *this;
+  }
+
+  PrimitiveProperty& operator=(PrimitiveProperty&& other)
+  {
+    if (&other != this) {
+      _id             = std::move(other._id);
+      _getter         = std::move(other._getter);
+      _setter         = std::move(other._setter);
+    }
+
+    return *this;
   }
 
   virtual ~PrimitiveProperty()
