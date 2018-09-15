@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_GEAR_VR_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_GEAR_VR_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
 namespace BABYLON {
@@ -33,7 +33,7 @@ public:
    * @brief Creates a new GearVRController from a gamepad.
    * @param vrGamepad the gamepad that the controller should be created from
    */
-  GearVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  GearVRController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
   ~GearVRController() override;
 
   /**
@@ -69,7 +69,7 @@ private:
   float _maxRotationDistFromHeadset;
   float _draggedRoomRotation;
   Vector3 _tmpVector;
-  const array_t<string_t, 2> _buttonIndexToObservableNameMap;
+  const std::array<std::string, 2> _buttonIndexToObservableNameMap;
 
 }; // end of class GearVRController
 

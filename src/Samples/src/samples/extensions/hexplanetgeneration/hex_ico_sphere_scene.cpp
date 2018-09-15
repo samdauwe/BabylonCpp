@@ -10,7 +10,6 @@
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
 

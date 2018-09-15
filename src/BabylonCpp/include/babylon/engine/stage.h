@@ -1,49 +1,58 @@
 #ifndef BABYLON_ENGINE_STAGE_H
 #define BABYLON_ENGINE_STAGE_H
 
-#include <babylon/babylon_global.h>
-#include <babylon/babylon_stl_util.h>
+#include <functional>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Camera;
+struct ISceneComponent;
+class RenderTargetTexture;
+class SubMesh;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * Strong typing of a Mesh related stage step action
  */
 using MeshStageAction
-  = ::std::function<bool(AbstractMesh* mesh, bool hardwareInstancedRendering)>;
+  = std::function<bool(AbstractMesh* mesh, bool hardwareInstancedRendering)>;
 
 /**
  * Strong typing of a Evaluate Sub Mesh related stage step action
  */
 using EvaluateSubMeshStageAction
-  = ::std::function<void(AbstractMesh* mesh, SubMesh* subMesh)>;
+  = std::function<void(AbstractMesh* mesh, SubMesh* subMesh)>;
 
 /**
  * Strong typing of a Active Mesh related stage step action
  */
 using ActiveMeshStageAction
-  = ::std::function<void(AbstractMesh* sourceMesh, AbstractMesh* mesh)>;
+  = std::function<void(AbstractMesh* sourceMesh, AbstractMesh* mesh)>;
 
 /**
  * Strong typing of a Camera related stage step action
  */
-using CameraStageAction = ::std::function<void(Camera* camera)>;
+using CameraStageAction = std::function<void(Camera* camera)>;
 
 /**
  * Strong typing of a RenderingGroup related stage step action
  */
-using RenderingGroupStageAction = ::std::function<void(int renderingGroupId)>;
+using RenderingGroupStageAction = std::function<void(int renderingGroupId)>;
 
 /**
  * Strong typing of a simple stage step action
  */
-using SimpleStageAction = ::std::function<void()>;
+using SimpleStageAction = std::function<void()>;
 
 /**
  * Strong typing of a render target action.
  */
 using RenderTargetsStageAction
-  = ::std::function<void(vector_t<RenderTargetTexturePtr>& renderTargets)>;
+  = std::function<void(std::vector<RenderTargetTexturePtr>& renderTargets)>;
 
 /**
  * @brief Representation of a step.
@@ -63,7 +72,7 @@ template <class T>
 class BABYLON_SHARED_EXPORT Stage {
 
 public:
-  using iterator = typename vector_t<Step<T>>::iterator;
+  using iterator = typename std::vector<Step<T>>::iterator;
 
   iterator begin()
   {
@@ -94,13 +103,22 @@ public:
                     const T& action)
   {
     size_t i        = 0;
-    size_t maxIndex = numeric_limits_t<size_t>::max();
+    size_t maxIndex = std::numeric_limits<size_t>::max();
     for (; i < _steps.size() && i < maxIndex; ++i) {
       const auto& step = _steps[i];
       maxIndex         = step.index;
     }
-    stl_util::splice<Step<T>>(_steps, static_cast<int>(i), 0,
-                              {Step<T>{index, component, action}});
+    const auto splice = [](std::vector<Step<T>>& v, int index, int howmany,
+                           const std::vector<Step<T>>& itemsToAdd) {
+      const auto start = std::min(v.end(), v.begin() + index);
+      const auto end   = std::min(v.end(), start + howmany);
+      std::vector<Step<T>> removedItems(start, end);
+      v.erase(start, end);
+      v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
+               itemsToAdd.end());
+      return removedItems;
+    };
+    splice(_steps, static_cast<int>(i), 0, {Step<T>{index, component, action}});
   }
 
   /**
@@ -112,7 +130,7 @@ public:
   }
 
 private:
-  vector_t<Step<T>> _steps;
+  std::vector<Step<T>> _steps;
 
 }; // end of class Stage
 

@@ -1,12 +1,14 @@
 #ifndef BABYLON_INTERFACES_ICANVAS_H
 #define BABYLON_INTERFACES_ICANVAS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_options.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {
+
+class ICanvasRenderingContext2D;
 
 class BABYLON_SHARED_EXPORT ICanvas {
 
@@ -20,16 +22,18 @@ public:
   virtual GL::IGLRenderingContext* getContext3d(const EngineOptions& options)
     = 0;
   // Event listeners
-  void addMouseEventListener(
-    EventType type, const ::std::function<void(PointerEvent&& evt)>& listener,
-    bool useCapture = false);
-  void addKeyEventListener(
-    EventType type, const ::std::function<void(KeyboardEvent&& evt)>& listener,
-    bool useCapture = false);
+  void
+  addMouseEventListener(EventType type,
+                        const std::function<void(PointerEvent&& evt)>& listener,
+                        bool useCapture = false);
+  void
+  addKeyEventListener(EventType type,
+                      const std::function<void(KeyboardEvent&& evt)>& listener,
+                      bool useCapture = false);
   void removeMouseEventListener(
-    EventType type, const ::std::function<void(PointerEvent&& evt)>& listener);
+    EventType type, const std::function<void(PointerEvent&& evt)>& listener);
   void removeKeyEventListener(
-    EventType type, const ::std::function<void(KeyboardEvent&& evt)>& listener);
+    EventType type, const std::function<void(KeyboardEvent&& evt)>& listener);
 
   void setFrameSize(int width, int height);
   void onError(int errorId, const char* errorDesc);
@@ -41,8 +45,8 @@ public:
   void onMouseMove(bool ctrlKey, bool shiftKey, int mouseX, int mouseY);
   void onMouseWheel(bool ctrlKey, bool shiftKey, int mouseX, int mouseY,
                     float wheelDelta);
-  void onKeyDown(bool ctrlKey, bool altKey, int keyCode, string_t code);
-  void onKeyUp(bool ctrlKey, bool altKey, int keyCode, string_t code);
+  void onKeyDown(bool ctrlKey, bool altKey, int keyCode, std::string code);
+  void onKeyUp(bool ctrlKey, bool altKey, int keyCode, std::string code);
 
   void focus();
   void applicationDidEnterBackground();
@@ -62,10 +66,10 @@ public:
   ClientRect _boundingClientRect;
 
 protected:
-  unique_ptr_t<GL::IGLRenderingContext> _renderingContext;
-  vector_t<vector_t<::std::function<void(PointerEvent&& evt)>>>
+  std::unique_ptr<GL::IGLRenderingContext> _renderingContext;
+  std::vector<std::vector<std::function<void(PointerEvent&& evt)>>>
     mouseEventListeners;
-  vector_t<vector_t<::std::function<void(KeyboardEvent&& evt)>>>
+  std::vector<std::vector<std::function<void(KeyboardEvent&& evt)>>>
     keyEventListeners;
 
 protected:

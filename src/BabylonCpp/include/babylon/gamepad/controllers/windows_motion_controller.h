@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
 namespace BABYLON {
@@ -66,11 +66,11 @@ struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
   /**
    * Map of the button meshes contained in the controller
    */
-  unordered_map_t<string_t, nullable_t<IButtonMeshInfo>> buttonMeshes;
+  std::unordered_map<std::string, std::optional<IButtonMeshInfo>> buttonMeshes;
   /**
    * Map of the axis meshes contained in the controller
    */
-  unordered_map_t<unsigned int, nullable_t<IAxisMeshInfo>> axisMeshes;
+  std::unordered_map<unsigned int, std::optional<IAxisMeshInfo>> axisMeshes;
 }; // end of struct LoadedMeshInfo
 
 /**
@@ -83,31 +83,31 @@ public:
   /**
    * The base url used to load the left and right controller models
    */
-  static const string_t MODEL_BASE_URL;
+  static const std::string MODEL_BASE_URL;
   /**
    * The name of the left controller model file
    */
-  static const string_t MODEL_LEFT_FILENAME;
+  static const std::string MODEL_LEFT_FILENAME;
   /**
    * The name of the right controller model file
    */
-  static const string_t MODEL_RIGHT_FILENAME;
+  static const std::string MODEL_RIGHT_FILENAME;
 
   /**
    * The controller name prefix for this controller type
    */
-  static const string_t GAMEPAD_ID_PREFIX;
+  static const std::string GAMEPAD_ID_PREFIX;
   /**
    * The controller id pattern for this controller type
    */
-  static const string_t GAMEPAD_ID_PATTERN;
+  static const std::string GAMEPAD_ID_PATTERN;
 
 public:
   /**
    * Creates a new WindowsMotionController from a gamepad.
    * @param vrGamepad the gamepad that the controller should be created from
    */
-  WindowsMotionController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  WindowsMotionController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
   ~WindowsMotionController() override;
 
   /**
@@ -180,7 +180,7 @@ protected:
    * @param buttonValue the value of the button which determines the buttons new
    * position
    */
-  void _lerpButtonTransform(const string_t& buttonName, float buttonValue);
+  void _lerpButtonTransform(const std::string& buttonName, float buttonValue);
 
   /**
    * @brief Moves the axis on the controller mesh based on its current state
@@ -251,7 +251,7 @@ private:
    * axes to meshes that can be transformed.
    */
   LoadedMeshInfo processModel(Scene* scene,
-                              const vector_t<AbstractMesh*>& meshes);
+                              const std::vector<AbstractMesh*>& meshes);
 
   LoadedMeshInfo createMeshInfo(AbstractMesh* rootNode);
 
@@ -267,26 +267,26 @@ public:
   StickValues trackpad;
 
 private:
-  nullable_t<LoadedMeshInfo> _loadedMeshInfo;
+  std::optional<LoadedMeshInfo> _loadedMeshInfo;
   // Mappings
 
   // Semantic button names
-  vector_t<string_t> _mappingButtons;
+  std::vector<std::string> _mappingButtons;
 
   // A mapping of the button name to glTF model node name
   // that should be transformed by button value.
-  unordered_map_t<string_t, string_t> _mappingButtonMeshNames;
+  std::unordered_map<std::string, std::string> _mappingButtonMeshNames;
 
   // This mapping is used to translate from the Motion Controller to Babylon
   // semantics
-  unordered_map_t<string_t, string_t> _mappingButtonObservableNames;
+  std::unordered_map<std::string, std::string> _mappingButtonObservableNames;
 
   // A mapping of the axis name to glTF model node name
   // that should be transformed by axis value.
   // This array mirrors the browserGamepad.axes array, such that
   // the mesh corresponding to axis 0 is in this array index 0.
-  vector_t<string_t> _mappingAxisMeshNames;
-  string_t _mappingPointingPoseMeshName;
+  std::vector<std::string> _mappingAxisMeshNames;
+  std::string _mappingPointingPoseMeshName;
 
 }; // end of class WindowsMotionController
 

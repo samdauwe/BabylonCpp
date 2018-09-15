@@ -1,8 +1,10 @@
 #ifndef BABYLON_ENGINE_SCENE_H
 #define BABYLON_ENGINE_SCENE_H
 
+#include <regex>
+
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/core/variant.h>
 #include <babylon/culling/octrees/octree.h>
@@ -22,8 +24,59 @@
 
 namespace BABYLON {
 
+class Animatable;
+struct AnimationPropertiesOverride;
+class Bone;
+class BoundingBoxRenderer;
+class ClickInfo;
+class DebugLayer;
+class DepthRenderer;
+class Effect;
+class Engine;
+class EnvironmentHelper;
+class GamepadManager;
+class GeometryBufferRenderer;
+struct IActiveMeshCandidateProvider;
+class IAnimatable;
+struct ICollisionCoordinator;
+struct IEnvironmentHelperOptions;
+class ImageProcessingConfiguration;
+class InternalTexture;
+struct IPhysicsEnginePlugin;
+struct IRenderingManagerAutoClearSetup;
+struct ISceneComponent;
+struct ISceneSerializableComponent;
+class KeyboardInfo;
+class KeyboardInfoPre;
+class Mesh;
+class Node;
+class OutlineRenderer;
+class PhysicsEngine;
+class PostProcess;
+class PostProcessManager;
+class PostProcessRenderPipelineManager;
 class ProceduralTexture;
-using ProceduralTexturePtr = shared_ptr_t<ProceduralTexture>;
+struct RenderingGroupInfo;
+class ReflectionProbe;
+class RenderingManager;
+class RuntimeAnimation;
+class SimplificationQueue;
+class SoundTrack;
+class SpriteManager;
+class UniformBuffer;
+using AnimatablePtr             = std::shared_ptr<Animatable>;
+using BoundingBoxRendererPtr    = std::shared_ptr<BoundingBoxRenderer>;
+using BonePtr                   = std::shared_ptr<Bone>;
+using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
+using IAnimatablePtr            = std::shared_ptr<IAnimatable>;
+using ISceneComponentPtr        = std::shared_ptr<ISceneComponent>;
+using ISceneSerializableComponentPtr
+  = std::shared_ptr<ISceneSerializableComponent>;
+using NodePtr                = std::shared_ptr<Node>;
+using MeshPtr                = std::shared_ptr<Mesh>;
+using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
+using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
+using SubMeshPtr             = std::shared_ptr<SubMesh>;
 
 /**
  * @brief Represents a scene to be rendered by the engine.
@@ -99,9 +152,9 @@ public:
   static bool ExclusiveDoubleClickMode;
 
   template <typename... Ts>
-  static unique_ptr_t<Scene> New(Ts&&... args)
+  static std::unique_ptr<Scene> New(Ts&&... args)
   {
-    unique_ptr_t<Scene> scene(new Scene(::std::forward<Ts>(args)...));
+    std::unique_ptr<Scene> scene(new Scene(std::forward<Ts>(args)...));
     return scene;
   }
   virtual ~Scene() override;
@@ -121,7 +174,7 @@ public:
    * @param name defines the name of the component to retrieve
    * @returns the component or null if not present
    */
-  ISceneComponentPtr _getComponent(const string_t& name);
+  ISceneComponentPtr _getComponent(const std::string& name);
 
   /** Properties **/
 
@@ -164,7 +217,7 @@ public:
    * @brief Gets the cached visibility state (ie. the latest rendered one).
    * @returns the cached visibility state
    */
-  nullable_t<float> getCachedVisibility();
+  std::optional<float> getCachedVisibility();
 
   /**
    * @brief Gets a boolean indicating if the current material / effect /
@@ -226,13 +279,13 @@ public:
    * @brief Gets the array of active meshes.
    * @returns an array of AbstractMesh
    */
-  vector_t<AbstractMeshPtr>& getActiveMeshes();
+  std::vector<AbstractMeshPtr>& getActiveMeshes();
 
   /**
    * @brief Gets the array of active meshes.
    * @returns an array of AbstractMesh
    */
-  const vector_t<AbstractMeshPtr>& getActiveMeshes() const;
+  const std::vector<AbstractMeshPtr>& getActiveMeshes() const;
 
   /**
    * @brief Gets the animation ratio (which is 1.0 is the scene renders at 60fps
@@ -264,7 +317,7 @@ public:
    * pointer event (eg. pointer id for multitouch)
    * @returns the current scene
    */
-  Scene& simulatePointerMove(nullable_t<PickingInfo>& pickResult);
+  Scene& simulatePointerMove(std::optional<PickingInfo>& pickResult);
 
   /**
    * @brief Use this method to simulate a pointer down on a mesh.
@@ -276,7 +329,7 @@ public:
    * pointer event (eg. pointer id for multitouch)
    * @returns the current scene
    */
-  Scene& simulatePointerDown(const nullable_t<PickingInfo>& pickResult);
+  Scene& simulatePointerDown(const std::optional<PickingInfo>& pickResult);
 
   /**
    * @brief Use this method to simulate a pointer up on a mesh.
@@ -288,7 +341,7 @@ public:
    * pointer event (eg. pointer id for multitouch)
    * @returns the current scene
    */
-  Scene& simulatePointerUp(const nullable_t<PickingInfo>& pickResult);
+  Scene& simulatePointerUp(const std::optional<PickingInfo>& pickResult);
 
   /**
    * @brief Gets a boolean indicating if the current pointer event is captured
@@ -333,28 +386,28 @@ public:
    * @param func defines the function to register
    */
   void registerBeforeRender(
-    const ::std::function<void(Scene* scene, EventState& es)>& func);
+    const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * Unregisters a function called before every frame render
    * @param func defines the function to unregister
    */
   void unregisterBeforeRender(
-    const ::std::function<void(Scene* scene, EventState& es)>& func);
+    const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * @brief Registers a function to be called after every frame render.
    * @param func defines the function to register
    */
   void registerAfterRender(
-    const ::std::function<void(Scene* scene, EventState& es)>& func);
+    const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * @brief Unregisters a function called after every frame render.
    * @param func defines the function to unregister
    */
   void unregisterAfterRender(
-    const ::std::function<void(Scene* scene, EventState& es)>& func);
+    const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * @brief Hidden
@@ -382,7 +435,7 @@ public:
    * @param {Function} func - the function to be executed
    */
   void executeWhenReady(
-    const ::std::function<void(Scene* scene, EventState& es)>& func);
+    const std::function<void(Scene* scene, EventState& es)>& func);
 
   /**
    * @brief Hidden
@@ -394,7 +447,7 @@ public:
   /**
    * @brief Gets all animations attached to the scene.
    */
-  vector_t<AnimationPtr> getAnimations() override;
+  std::vector<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Will start the animation sequence of a given target.
@@ -417,9 +470,9 @@ public:
   AnimatablePtr beginWeightedAnimation(
     const IAnimatablePtr& target, int from, int to, float weight = 1.f,
     bool loop = false, float speedRatio = 1.f,
-    const ::std::function<void()>& onAnimationEnd                = nullptr,
-    AnimatablePtr animatable                                     = nullptr,
-    const ::std::function<bool(IAnimatable* target)>& targetMask = nullptr);
+    const std::function<void()>& onAnimationEnd                = nullptr,
+    AnimatablePtr animatable                                   = nullptr,
+    const std::function<bool(IAnimatable* target)>& targetMask = nullptr);
 
   /**
    * @brief Will start the animation sequence of a given target.
@@ -443,9 +496,9 @@ public:
   AnimatablePtr
   beginAnimation(const IAnimatablePtr& target, int from, int to,
                  bool loop = false, float speedRatio = 1.f,
-                 const ::std::function<void()>& onAnimationEnd = nullptr,
+                 const std::function<void()>& onAnimationEnd = nullptr,
                  AnimatablePtr animatable = nullptr, bool stopCurrent = true,
-                 const ::std::function<bool(IAnimatable* target)>& targetMask
+                 const std::function<bool(IAnimatable* target)>& targetMask
                  = nullptr);
 
   /**
@@ -462,9 +515,9 @@ public:
    */
   AnimatablePtr
   beginDirectAnimation(const IAnimatablePtr& target,
-                       const vector_t<AnimationPtr>& animations, float from,
+                       const std::vector<AnimationPtr>& animations, float from,
                        float to, bool loop = false, float speedRatio = 1.f,
-                       const ::std::function<void()>& onAnimationEnd = nullptr);
+                       const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Begin a new animation on a given node and its hierarchy.
@@ -481,11 +534,11 @@ public:
    * (will be called once per node)
    * @returns the list of animatables created for all nodes
    */
-  vector_t<AnimatablePtr> beginDirectHierarchyAnimation(
+  std::vector<AnimatablePtr> beginDirectHierarchyAnimation(
     const NodePtr& target, bool directDescendantsOnly,
-    const vector_t<AnimationPtr>& animations, int from, int to,
+    const std::vector<AnimationPtr>& animations, int from, int to,
     bool loop = false, float speedRatio = 1.f,
-    const ::std::function<void()>& onAnimationEnd = nullptr);
+    const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Gets the animatable associated with a specific target.
@@ -499,9 +552,9 @@ public:
    * @param target defines the target to look animatables for
    * @returns an array of Animatables
    */
-  vector_t<AnimatablePtr>
+  std::vector<AnimatablePtr>
   getAllAnimatablesByTarget(const IAnimatablePtr& target);
-  vector_t<AnimatablePtr> getAllAnimatablesByTarget(IAnimatable* target);
+  std::vector<AnimatablePtr> getAllAnimatablesByTarget(IAnimatable* target);
 
   /**
    * @brief Will stop the animation of the given target.
@@ -512,13 +565,13 @@ public:
    * stopped based on its target (all animations will be stopped if both this
    * and animationName are empty)
    */
-  void stopAnimation(
-    const IAnimatablePtr& target, const string_t& animationName = "",
-    const ::std::function<bool(IAnimatable* target)>& targetMask = nullptr);
-  void
-  stopAnimation(IAnimatable* target, const string_t& animationName = "",
-                const ::std::function<bool(IAnimatable* target)>& targetMask
-                = nullptr);
+  void stopAnimation(const IAnimatablePtr& target,
+                     const std::string& animationName = "",
+                     const std::function<bool(IAnimatable* target)>& targetMask
+                     = nullptr);
+  void stopAnimation(IAnimatable* target, const std::string& animationName = "",
+                     const std::function<bool(IAnimatable* target)>& targetMask
+                     = nullptr);
 
   /**
    * @brief Stops and removes all animations that have been applied to the scene
@@ -776,7 +829,7 @@ public:
    * @brief Adds the given action manager to this scene.
    * @param newActionManager The action manager to add
    */
-  void addActionManager(const shared_ptr_t<ActionManager>& newActionManager);
+  void addActionManager(const std::shared_ptr<ActionManager>& newActionManager);
 
   /**
    * @brief Adds the given texture to this scene.
@@ -798,42 +851,42 @@ public:
    * @param id defines the camera's ID
    * @return the new active camera or null if none found.
    */
-  CameraPtr setActiveCameraByID(const string_t& id);
+  CameraPtr setActiveCameraByID(const std::string& id);
 
   /**
    * @brief Sets the active camera of the scene using its name.
    * @param name defines the camera's name
    * @returns the new active camera or null if none found.
    */
-  CameraPtr setActiveCameraByName(const string_t& name);
+  CameraPtr setActiveCameraByName(const std::string& name);
 
   /**
    * Gets an animation group using its name.
    * @param name defines the material's name
    * @return the animation group or null if none found.
    */
-  AnimationGroupPtr getAnimationGroupByName(const string_t& name);
+  AnimationGroupPtr getAnimationGroupByName(const std::string& name);
 
   /**
    * @brief Gets a material using its id.
    * @param id defines the material's ID
    * @return the material or null if none found.
    */
-  MaterialPtr getMaterialByID(const string_t& id);
+  MaterialPtr getMaterialByID(const std::string& id);
 
   /**
    * @brief Gets a material using its name.
    * @param name defines the material's name
    * @return the material or null if none found.
    */
-  MaterialPtr getMaterialByName(const string_t& name);
+  MaterialPtr getMaterialByName(const std::string& name);
 
   /**
    * @brief Gets a camera using its id.
    * @param id defines the id to look for
    * @returns the camera or null if not found
    */
-  CameraPtr getCameraByID(const string_t& id);
+  CameraPtr getCameraByID(const std::string& id);
 
   /**
    * Gets a camera using its unique id.
@@ -847,35 +900,35 @@ public:
    * @param name defines the camera's name
    * @return the camera or null if none found.
    */
-  CameraPtr getCameraByName(const string_t& name);
+  CameraPtr getCameraByName(const std::string& name);
 
   /**
    * @brief Gets a bone using its id.
    * @param id defines the bone's id
    * @return the bone or null if not found
    */
-  BonePtr getBoneByID(const string_t& id);
+  BonePtr getBoneByID(const std::string& id);
 
   /**
    * @brief Gets a bone using its id.
    * @param name defines the bone's name
    * @return the bone or null if not found
    */
-  BonePtr getBoneByName(const string_t& name);
+  BonePtr getBoneByName(const std::string& name);
 
   /**
    * @brief Gets a light node using its name.
    * @param name defines the the light's name
    * @return the light or null if none found.
    */
-  LightPtr getLightByName(const string_t& name);
+  LightPtr getLightByName(const std::string& name);
 
   /**
    * @brief Gets a light node using its id.
    * @param id defines the light's id
    * @return the light or null if none found.
    */
-  LightPtr getLightByID(const string_t& id);
+  LightPtr getLightByID(const std::string& id);
 
   /**
    * @brief Gets a light node using its scene-generated unique ID.
@@ -889,14 +942,14 @@ public:
    * @param id defines the particle system id
    * @return the corresponding system or null if none found
    */
-  IParticleSystemPtr getParticleSystemByID(const string_t& id);
+  IParticleSystemPtr getParticleSystemByID(const std::string& id);
 
   /**
    * @brief Gets a geometry using its ID
    * @param id defines the geometry's id.
    * @return the geometry or null if none found.
    */
-  GeometryPtr getGeometryByID(const string_t& id);
+  GeometryPtr getGeometryByID(const std::string& id);
 
   /**
    * @brief Add a new geometry to this scene.
@@ -919,35 +972,35 @@ public:
    * @brief Gets the list of geometries attached to the scene.
    * @returns an array of Geometry
    */
-  vector_t<GeometryPtr>& getGeometries();
+  std::vector<GeometryPtr>& getGeometries();
 
   /**
    * @brief Gets the first added mesh found of a given ID.
    * @param id defines the id to search for
    * @return the mesh found or null if not found at all
    */
-  AbstractMeshPtr getMeshByID(const string_t& id);
+  AbstractMeshPtr getMeshByID(const std::string& id);
 
   /**
    * @brief Gets a list of meshes using their id.
    * @param id defines the id to search for
    * @returns a list of meshes
    */
-  vector_t<AbstractMeshPtr> getMeshesByID(const string_t& id);
+  std::vector<AbstractMeshPtr> getMeshesByID(const std::string& id);
 
   /**
    * @brief Gets the first added transform node found of a given ID.
    * @param id defines the id to search for
    * @return the found transform node or null if not found at all.
    */
-  TransformNodePtr getTransformNodeByID(const string_t& id);
+  TransformNodePtr getTransformNodeByID(const std::string& id);
 
   /**
    * @brief Gets a list of transform nodes using their id.
    * @param id defines the id to search for
    * @returns a list of transform nodes
    */
-  vector_t<TransformNodePtr> getTransformNodesByID(const string_t& id);
+  std::vector<TransformNodePtr> getTransformNodesByID(const std::string& id);
 
   /**
    * @brief Gets a mesh with its auto-generated unique id.
@@ -961,54 +1014,54 @@ public:
    * @param id defines the id to search for
    * @return the found mesh or null if not found at all.
    */
-  AbstractMeshPtr getLastMeshByID(const string_t& id);
+  AbstractMeshPtr getLastMeshByID(const std::string& id);
 
   /**
    * @brief Hidden
    */
-  vector_t<AbstractMeshPtr> getMeshes() const;
+  std::vector<AbstractMeshPtr> getMeshes() const;
 
   /**
    * @brief Gets a the last added node (Mesh, Camera, Light) using a given id.
    * @param id defines the id to search for
    * @return the found node or null if not found at all
    */
-  NodePtr getLastEntryByID(const string_t& id);
+  NodePtr getLastEntryByID(const std::string& id);
 
   /**
    * @brief Gets a node (Mesh, Camera, Light) using a given id.
    * @param id defines the id to search for
    * @return the found node or null if not found at all
    */
-  NodePtr getNodeByID(const string_t& id);
+  NodePtr getNodeByID(const std::string& id);
 
   /**
    * @brief Gets a node (Mesh, Camera, Light) using a given name.
    * @param name defines the name to search for
    * @return the found node or null if not found at all.
    */
-  NodePtr getNodeByName(const string_t& name);
+  NodePtr getNodeByName(const std::string& name);
 
   /**
    * @brief Gets a mesh using a given name.
    * @param name defines the name to search for
    * @return the found mesh or null if not found at all.
    */
-  AbstractMeshPtr getMeshByName(const string_t& name);
+  AbstractMeshPtr getMeshByName(const std::string& name);
 
   /**
    * @brief Gets a transform node using a given name.
    * @param name defines the name to search for
    * @return the found transform node or null if not found at all.
    */
-  TransformNodePtr getTransformNodeByName(const string_t& name);
+  TransformNodePtr getTransformNodeByName(const std::string& name);
 
   /**
    * @brief Gets a sound using a given name.
    * @param name defines the name to search for
    * @return the found sound or null if not found at all.
    */
-  SoundPtr getSoundByName(const string_t& name);
+  SoundPtr getSoundByName(const std::string& name);
 
   /**
    * @brief Gets a skeleton using a given id (if many are found, this function
@@ -1016,7 +1069,7 @@ public:
    * @param id defines the id to search for
    * @return the found skeleton or null if not found at all.
    */
-  SkeletonPtr getLastSkeletonByID(const string_t& id);
+  SkeletonPtr getLastSkeletonByID(const std::string& id);
 
   /**
    * @brief Gets a skeleton using a given id (if many are found, this function
@@ -1024,14 +1077,14 @@ public:
    * @param id defines the id to search for
    * @return the found skeleton or null if not found at all.
    */
-  SkeletonPtr getSkeletonById(const string_t& id);
+  SkeletonPtr getSkeletonById(const std::string& id);
 
   /**
    * @brief Gets a skeleton using a given name.
    * @param name defines the name to search for
    * @return the found skeleton or null if not found at all.
    */
-  SkeletonPtr getSkeletonByName(const string_t& name);
+  SkeletonPtr getSkeletonByName(const std::string& name);
 
   /**
    * @brief Gets a morph target manager  using a given id (if many are found,
@@ -1195,7 +1248,7 @@ public:
    * @returns {{ min: Vector3; max: Vector3 }} min and max vectors
    */
   MinMax getWorldExtends(
-    const ::std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate
+    const std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate
     = nullptr);
 
   /**
@@ -1274,9 +1327,9 @@ public:
    * this case, the scene.activeCamera will be used
    * @returns a PickingInfo
    */
-  nullable_t<PickingInfo>
+  std::optional<PickingInfo>
   pick(int x, int y,
-       const ::std::function<bool(const AbstractMeshPtr& mesh)>& predicate
+       const std::function<bool(const AbstractMeshPtr& mesh)>& predicate
        = nullptr,
        bool fastCheck = false, const CameraPtr& camera = nullptr);
 
@@ -1292,9 +1345,9 @@ public:
    * null. In this case, the scene.activeCamera will be used
    * @returns a PickingInfo
    */
-  nullable_t<PickingInfo>
+  std::optional<PickingInfo>
   pickSprite(int x, int y,
-             const ::std::function<bool(Sprite* sprite)>& predicate = nullptr,
+             const std::function<bool(Sprite* sprite)>& predicate = nullptr,
              bool fastCheck = false, const CameraPtr& camera = nullptr);
 
   /** @brief Use the given ray to pick a mesh in the scene.
@@ -1305,11 +1358,11 @@ public:
    * set to null
    * @returns a PickingInfo
    */
-  nullable_t<PickingInfo> pickWithRay(
-    const Ray& ray,
-    const ::std::function<bool(const AbstractMeshPtr& mesh)>& predicate
-    = nullptr,
-    bool fastCheck = false);
+  std::optional<PickingInfo>
+  pickWithRay(const Ray& ray,
+              const std::function<bool(const AbstractMeshPtr& mesh)>& predicate
+              = nullptr,
+              bool fastCheck = false);
 
   /**
    * @brief Launch a ray to try to pick a mesh in the scene.
@@ -1322,9 +1375,9 @@ public:
    * null. In this case, the scene.activeCamera will be used
    * @returns an array of PickingInfo
    */
-  vector_t<nullable_t<PickingInfo>>
+  std::vector<std::optional<PickingInfo>>
   multiPick(int x, int y,
-            const ::std::function<bool(AbstractMesh* mesh)>& predicate,
+            const std::function<bool(AbstractMesh* mesh)>& predicate,
             const CameraPtr& camera = nullptr);
 
   /**
@@ -1335,9 +1388,9 @@ public:
    * isPickable set to true
    * @returns an array of PickingInfo
    */
-  vector_t<nullable_t<PickingInfo>>
+  std::vector<std::optional<PickingInfo>>
   multiPickWithRay(const Ray& ray,
-                   const ::std::function<bool(AbstractMesh* mesh)>& predicate);
+                   const std::function<bool(AbstractMesh* mesh)>& predicate);
 
   /**
    * @brief Force the value of meshUnderPointer.
@@ -1463,7 +1516,7 @@ public:
    * @param options defines the options you can use to configure the environment
    * @returns the new EnvironmentHelper
    */
-  unique_ptr_t<EnvironmentHelper>
+  std::unique_ptr<EnvironmentHelper>
   createDefaultEnvironment(const IEnvironmentHelperOptions& options);
 
   /** Tags **/
@@ -1474,7 +1527,7 @@ public:
    * @param forEach defines a predicate used to filter results
    * @returns an array of Mesh
    */
-  vector_t<Mesh*> getMeshesByTags();
+  std::vector<Mesh*> getMeshesByTags();
 
   /**
    * @brief Get a list of cameras by tags.
@@ -1482,7 +1535,7 @@ public:
    * @param forEach defines a predicate used to filter results
    * @returns an array of Camera
    */
-  vector_t<Camera*> getCamerasByTags();
+  std::vector<Camera*> getCamerasByTags();
 
   /**
    * @brief Get a list of lights by tags.
@@ -1490,7 +1543,7 @@ public:
    * @param forEach defines a predicate used to filter results
    * @returns an array of Light
    */
-  vector_t<Light*> getLightsByTags();
+  std::vector<Light*> getLightsByTags();
 
   /**
    * @brief Get a list of materials by tags.
@@ -1498,7 +1551,7 @@ public:
    * @param forEach defines a predicate used to filter results
    * @returns an array of Material
    */
-  vector_t<Material*> getMaterialByTags();
+  std::vector<Material*> getMaterialByTags();
 
   /**
    * @brief Overrides the default sort function applied in the renderging group
@@ -1515,13 +1568,13 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       opaqueSortCompareFn
     = nullptr,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       alphaTestSortCompareFn
     = nullptr,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       transparentSortCompareFn
     = nullptr);
 
@@ -1547,7 +1600,7 @@ public:
    * @param index the rendering group index to get the information for
    * @returns The auto clear setup for the requested rendering group
    */
-  nullable_t<IRenderingManagerAutoClearSetup>
+  std::optional<IRenderingManagerAutoClearSetup>
   getAutoClearDepthStencilSetup(size_t index);
 
   /**
@@ -1559,16 +1612,16 @@ public:
    */
   void
   markAllMaterialsAsDirty(unsigned int flag,
-                          const ::std::function<bool(Material* mat)>& predicate
+                          const std::function<bool(Material* mat)>& predicate
                           = nullptr);
 
   /**
    * @brief Hidden
    */
   IFileRequest _loadFile(
-    const string_t& url,
-    const ::std::function<void(Variant<string_t, ArrayBuffer>& data,
-                               const string_t& responseURL)>& onSuccess);
+    const std::string& url,
+    const std::function<void(Variant<std::string, ArrayBuffer>& data,
+                             const std::string& responseURL)>& onSuccess);
 
 protected:
   /**
@@ -1587,26 +1640,26 @@ private:
   void _createUbo();
   void _createAlternateUbo();
   // Pointers handling
-  nullable_t<PickingInfo> _pickSpriteButKeepRay(
-    const nullable_t<PickingInfo>& originalPointerInfo, int x, int y,
-    const ::std::function<bool(Sprite* sprite)>& predicate = nullptr,
+  std::optional<PickingInfo> _pickSpriteButKeepRay(
+    const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
+    const std::function<bool(Sprite* sprite)>& predicate = nullptr,
     bool fastCheck = false, const CameraPtr& camera = nullptr);
   void _setRayOnPointerInfo(PointerInfo& pointerInfo);
-  Scene& _processPointerMove(nullable_t<PickingInfo>& pickResult,
+  Scene& _processPointerMove(std::optional<PickingInfo>& pickResult,
                              const PointerEvent& evt);
-  bool _checkPrePointerObservable(const nullable_t<PickingInfo>& pickResult,
+  bool _checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
                                   const PointerEvent& evt,
                                   PointerEventTypes type);
-  Scene& _processPointerDown(const nullable_t<PickingInfo>& pickResult,
+  Scene& _processPointerDown(const std::optional<PickingInfo>& pickResult,
                              const PointerEvent& evt);
-  Scene& _processPointerUp(const nullable_t<PickingInfo>& pickResult,
+  Scene& _processPointerUp(const std::optional<PickingInfo>& pickResult,
                            const PointerEvent& evt, const ClickInfo& clickInfo);
   void _animate();
   AnimationValue _processLateAnimationBindingsForMatrices(
-    float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
+    float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
     Matrix& holderOriginalValue);
   Quaternion _processLateAnimationBindingsForQuaternions(
-    float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
+    float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
     Quaternion& holderOriginalValue);
   void _processLateAnimationBindings();
   void _evaluateSubMesh(const SubMeshPtr& subMesh, AbstractMesh* mesh);
@@ -1629,19 +1682,19 @@ private:
   void _switchAudioModeForHeadphones();
   void _switchAudioModeForNormalSpeakers();
   /** Picking **/
-  nullable_t<PickingInfo> _internalPick(
-    const ::std::function<Ray(Matrix& world)>& rayFunction,
-    const ::std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
+  std::optional<PickingInfo> _internalPick(
+    const std::function<Ray(Matrix& world)>& rayFunction,
+    const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
     bool fastCheck);
-  vector_t<nullable_t<PickingInfo>> _internalMultiPick(
-    const ::std::function<Ray(Matrix& world)>& rayFunction,
-    const ::std::function<bool(AbstractMesh* mesh)>& predicate);
-  nullable_t<PickingInfo>
+  std::vector<std::optional<PickingInfo>>
+  _internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
+                     const std::function<bool(AbstractMesh* mesh)>& predicate);
+  std::optional<PickingInfo>
   _internalPickSprites(const Ray& ray,
-                       const ::std::function<bool(Sprite* sprite)>& predicate,
+                       const std::function<bool(Sprite* sprite)>& predicate,
                        bool fastCheck, CameraPtr camera);
   /** Tags **/
-  vector_t<string_t> _getByTags();
+  std::vector<std::string> _getByTags();
 
 protected:
   /**
@@ -1670,7 +1723,7 @@ protected:
    * No setter as we it is a shared configuration, you can set the values
    * instead.
    */
-  unique_ptr_t<ImageProcessingConfiguration>&
+  std::unique_ptr<ImageProcessingConfiguration>&
   get_imageProcessingConfiguration();
 
   /**
@@ -1723,31 +1776,31 @@ protected:
    * @brief Sets a function to be executed when this scene is disposed.
    */
   void set_onDispose(
-    const ::std::function<void(Scene* scene, EventState& es)>& callback);
+    const std::function<void(Scene* scene, EventState& es)>& callback);
 
   /**
    * @brief Sets a function to be executed before rendering this scene.
    */
   void set_beforeRender(
-    const ::std::function<void(Scene* scene, EventState& es)>& callback);
+    const std::function<void(Scene* scene, EventState& es)>& callback);
 
   /**
    * @brief Sets a function to be executed after rendering this scene.
    */
   void set_afterRender(
-    const ::std::function<void(Scene* scene, EventState& es)>& callback);
+    const std::function<void(Scene* scene, EventState& es)>& callback);
 
   /**
    * @brief Sets a function to be executed before rendering a camera.
    */
   void set_beforeCameraRender(
-    const ::std::function<void(Camera* camera, EventState& es)>& callback);
+    const std::function<void(Camera* camera, EventState& es)>& callback);
 
   /**
    * @brief Sets a function to be executed after rendering a camera.
    */
   void set_afterCameraRender(
-    const ::std::function<void(Camera* camera, EventState& es)>& callback);
+    const std::function<void(Camera* camera, EventState& es)>& callback);
 
   // Gamepads
 
@@ -1755,7 +1808,7 @@ protected:
    * @brief Gets the gamepad manager associated with the scene.
    * @see http://doc.babylonjs.com/how_to/how_to_use_gamepads
    */
-  unique_ptr_t<GamepadManager>& get_gamepadManager();
+  std::unique_ptr<GamepadManager>& get_gamepadManager();
 
   // Pointers
 
@@ -1858,13 +1911,13 @@ protected:
    * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
    * @see http://doc.babylonjs.com/how_to/using_default_rendering_pipeline
    */
-  unique_ptr_t<PostProcessRenderPipelineManager>&
+  std::unique_ptr<PostProcessRenderPipelineManager>&
   get_postProcessRenderPipelineManager();
 
   /**
    * @brief Gets the main soundtrack associated with the scene.
    */
-  unique_ptr_t<SoundTrack>& get_mainSoundTrack();
+  std::unique_ptr<SoundTrack>& get_mainSoundTrack();
 
   /**
    * Gets the simplification queue attached to the scene.
@@ -1886,12 +1939,13 @@ protected:
   /**
    * @brief Gets the list of frustum planes (built from the active camera).
    */
-  array_t<Plane, 6>& get_frustumPlanes();
+  std::array<Plane, 6>& get_frustumPlanes();
 
   /**
    * @brief Hidden (Backing field)
    */
-  unordered_map_t<string_t, unique_ptr_t<DepthRenderer>>& get_depthRenderer();
+  std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>&
+  get_depthRenderer();
 
   /**
    * @brief Gets the current geometry buffer associated to the scene.
@@ -1907,7 +1961,7 @@ protected:
    * @brief Gets the debug layer (aka Inspector) associated with the scene.
    * @see http://doc.babylonjs.com/features/playground_debuglayer
    */
-  unique_ptr_t<DebugLayer>& get_debugLayer();
+  std::unique_ptr<DebugLayer>& get_debugLayer();
 
   /**
    * @brief Sets a boolean indicating if collisions are processed on a web
@@ -1979,7 +2033,7 @@ protected:
    * @brief Return a unique id as a string which can serve as an identifier for
    * the scene.
    */
-  string_t get_uid() const;
+  std::string get_uid() const;
 
   /** Audio **/
 
@@ -2060,7 +2114,7 @@ public:
    * No setter as we it is a shared configuration, you can set the values
    * instead.
    */
-  ReadOnlyProperty<Scene, unique_ptr_t<ImageProcessingConfiguration>>
+  ReadOnlyProperty<Scene, std::unique_ptr<ImageProcessingConfiguration>>
     imageProcessingConfiguration;
 
   // Events
@@ -2073,7 +2127,7 @@ public:
   /**
    * Sets a function to be executed when this scene is disposed
    */
-  WriteOnlyProperty<Scene, ::std::function<void(Scene* scene, EventState& es)>>
+  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>>
     onDispose;
 
   /**
@@ -2085,7 +2139,7 @@ public:
   /**
    * Sets a function to be executed before rendering this scene
    */
-  WriteOnlyProperty<Scene, ::std::function<void(Scene* scene, EventState& es)>>
+  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>>
     beforeRender;
 
   /**
@@ -2096,7 +2150,7 @@ public:
   /**
    * Sets a function to be executed after rendering this scene
    */
-  WriteOnlyProperty<Scene, ::std::function<void(Scene* scene, EventState& es)>>
+  WriteOnlyProperty<Scene, std::function<void(Scene* scene, EventState& es)>>
     afterRender;
 
   /**
@@ -2141,7 +2195,7 @@ public:
   /**
    * Sets a function to be executed before rendering a camera
    */
-  WriteOnlyProperty<Scene, ::std::function<void(Camera* scene, EventState& es)>>
+  WriteOnlyProperty<Scene, std::function<void(Camera* scene, EventState& es)>>
     beforeCameraRender;
   /**
    * An event triggered after rendering a camera
@@ -2151,7 +2205,7 @@ public:
   /**
    * Sets a function to be executed after rendering a camera
    */
-  WriteOnlyProperty<Scene, ::std::function<void(Camera* scene, EventState& es)>>
+  WriteOnlyProperty<Scene, std::function<void(Camera* scene, EventState& es)>>
     afterCameraRender;
 
   /**
@@ -2296,36 +2350,36 @@ public:
    * Gets or sets a predicate used to select candidate meshes for a pointer down
    * event
    */
-  ::std::function<bool(const AbstractMeshPtr& mesh)> pointerDownPredicate;
+  std::function<bool(const AbstractMeshPtr& mesh)> pointerDownPredicate;
   /**
    * Gets or sets a predicate used to select candidate meshes for a pointer up
    * event
    */
-  ::std::function<bool(const AbstractMeshPtr& mesh)> pointerUpPredicate;
+  std::function<bool(const AbstractMeshPtr& mesh)> pointerUpPredicate;
   /**
    * Gets or sets a predicate used to select candidate meshes for a pointer move
    * event
    */
-  ::std::function<bool(const AbstractMeshPtr& mesh)> pointerMovePredicate;
+  std::function<bool(const AbstractMeshPtr& mesh)> pointerMovePredicate;
 
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt,
-                       const nullable_t<PickingInfo>& pickInfo,
-                       PointerEventTypes type)>
+  std::function<void(const PointerEvent& evt,
+                     const std::optional<PickingInfo>& pickInfo,
+                     PointerEventTypes type)>
     onPointerMove;
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt,
-                       const nullable_t<PickingInfo>& pickInfo,
-                       PointerEventTypes type)>
+  std::function<void(const PointerEvent& evt,
+                     const std::optional<PickingInfo>& pickInfo,
+                     PointerEventTypes type)>
     onPointerDown;
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt,
-                       const nullable_t<PickingInfo>& pickInfo,
-                       PointerEventTypes type)>
+  std::function<void(const PointerEvent& evt,
+                     const std::optional<PickingInfo>& pickInfo,
+                     PointerEventTypes type)>
     onPointerUp;
   /** Deprecated. Use onPointerObservable instead */
-  ::std::function<void(const PointerEvent& evt,
-                       const nullable_t<PickingInfo>& pickInfo)>
+  std::function<void(const PointerEvent& evt,
+                     const std::optional<PickingInfo>& pickInfo)>
     onPointerPick;
 
   /**
@@ -2343,22 +2397,22 @@ public:
   /**
    * Gets or sets the active clipplane 1
    */
-  nullable_t<Plane> clipPlane;
+  std::optional<Plane> clipPlane;
 
   /**
    * Gets or sets the active clipplane 2
    */
-  nullable_t<Plane> clipPlane2;
+  std::optional<Plane> clipPlane2;
 
   /**
    * Gets or sets the active clipplane 3
    */
-  nullable_t<Plane> clipPlane3;
+  std::optional<Plane> clipPlane3;
 
   /**
    * Gets or sets the active clipplane 4
    */
-  nullable_t<Plane> clipPlane4;
+  std::optional<Plane> clipPlane4;
 
   /**
    * Gets or sets a boolean indicating if all bounding boxes must be rendered
@@ -2392,12 +2446,12 @@ public:
   /**
    * Defines the HTML cursor to use when hovering over interactive elements
    */
-  string_t hoverCursor;
+  std::string hoverCursor;
 
   /**
    * Defines the HTML default cursor to use (empty by default)
    */
-  string_t defaultCursor;
+  std::string defaultCursor;
 
   /**
    * This is used to call preventDefault() on pointer down
@@ -2415,13 +2469,13 @@ public:
   /**
    * Gets the name of the plugin used to load this scene (null by default)
    */
-  string_t loadingPluginName;
+  std::string loadingPluginName;
 
   /**
    * Use this array to add regular expressions used to disable offline support
    * for specific urls
    */
-  vector_t<::std::regex> disableOfflineSupportExceptionRules;
+  std::vector<std::regex> disableOfflineSupportExceptionRules;
 
   // Gamepads
 
@@ -2429,7 +2483,7 @@ public:
    * Gets the gamepad manager associated with the scene
    * @see http://doc.babylonjs.com/how_to/how_to_use_gamepads
    */
-  ReadOnlyProperty<Scene, unique_ptr_t<GamepadManager>> gamepadManager;
+  ReadOnlyProperty<Scene, std::unique_ptr<GamepadManager>> gamepadManager;
 
   // Pointers
 
@@ -2464,7 +2518,7 @@ public:
   // Mirror
 
   /** Hidden */
-  unique_ptr_t<Vector3> _mirroredCameraPosition;
+  std::unique_ptr<Vector3> _mirroredCameraPosition;
 
   // Keyboard
 
@@ -2544,7 +2598,7 @@ public:
   /**
    * All of the active cameras added to this scene
    */
-  vector_t<CameraPtr> activeCameras;
+  std::vector<CameraPtr> activeCameras;
 
   /**
    * The current active camera
@@ -2584,10 +2638,10 @@ public:
    * All of the sprite managers added to this scene
    * @see http://doc.babylonjs.com/babylon101/sprites
    */
-  vector_t<unique_ptr_t<SpriteManager>> spriteManagers;
-  ::std::function<bool(Sprite* sprite)> spritePredicate;
+  std::vector<std::unique_ptr<SpriteManager>> spriteManagers;
+  std::function<bool(Sprite* sprite)> spritePredicate;
 
-  vector_t<unique_ptr_t<HighlightLayer>> highlightLayers;
+  std::vector<std::unique_ptr<HighlightLayer>> highlightLayers;
 
   // Skeletons
 
@@ -2613,7 +2667,7 @@ public:
   bool collisionsEnabled;
 
   /** Hidden */
-  unique_ptr_t<ICollisionCoordinator> collisionCoordinator;
+  std::unique_ptr<ICollisionCoordinator> collisionCoordinator;
 
   /**
    * Defines the gravity applied to this scene (used only for collisions)
@@ -2626,7 +2680,7 @@ public:
   /**
    * The list of postprocesses added to the scene
    */
-  vector_t<PostProcess*> postProcesses;
+  std::vector<PostProcess*> postProcesses;
 
   /**
    * Gets or sets a boolean indicating if postprocesses are enabled on this
@@ -2637,14 +2691,14 @@ public:
   /**
    * Gets the current postprocess manager
    */
-  unique_ptr_t<PostProcessManager> postProcessManager;
+  std::unique_ptr<PostProcessManager> postProcessManager;
 
   /**
    * Gets the postprocess render pipeline manager
    * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
    * @see http://doc.babylonjs.com/how_to/using_default_rendering_pipeline
    */
-  ReadOnlyProperty<Scene, unique_ptr_t<PostProcessRenderPipelineManager>>
+  ReadOnlyProperty<Scene, std::unique_ptr<PostProcessRenderPipelineManager>>
     postProcessRenderPipelineManager;
 
   // Customs render targets
@@ -2665,7 +2719,7 @@ public:
   /**
    * The list of user defined render targets added to the scene
    */
-  vector_t<RenderTargetTexturePtr> customRenderTargets;
+  std::vector<RenderTargetTexturePtr> customRenderTargets;
 
   // Delay loading
 
@@ -2680,7 +2734,7 @@ public:
   /**
    * Gets the list of meshes imported to the scene through SceneLoader
    */
-  vector_t<string_t> importedMeshesFiles;
+  std::vector<std::string> importedMeshesFiles;
 
   // Probes
 
@@ -2693,7 +2747,7 @@ public:
    * The list of reflection probes added to the scene
    * @see http://doc.babylonjs.com/how_to/how_to_use_reflection_probes
    */
-  vector_t<unique_ptr_t<ReflectionProbe>> reflectionProbes;
+  std::vector<std::unique_ptr<ReflectionProbe>> reflectionProbes;
 
   // Database
 
@@ -2722,7 +2776,7 @@ public:
    * The list of procedural textures added to the scene
    * @see http://doc.babylonjs.com/how_to/how_to_use_procedural_textures
    */
-  vector_t<ProceduralTexturePtr> proceduralTextures;
+  std::vector<ProceduralTexturePtr> proceduralTextures;
 
   // Sound Tracks
 
@@ -2730,12 +2784,12 @@ public:
    * The list of sound tracks added to the scene
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
-  vector_t<SoundTrack*> soundTracks;
+  std::vector<SoundTrack*> soundTracks;
 
   /**
    * Gets the main soundtrack associated with the scene
    */
-  ReadOnlyProperty<Scene, unique_ptr_t<SoundTrack>> mainSoundTrack;
+  ReadOnlyProperty<Scene, std::unique_ptr<SoundTrack>> mainSoundTrack;
 
   // Simplification Queue
 
@@ -2765,9 +2819,9 @@ public:
   /** Hidden */
   Effect* _cachedEffect;
   /** Hidden */
-  nullable_t<float> _cachedVisibility;
+  std::optional<float> _cachedVisibility;
   /** Hidden */
-  vector_t<IDisposable*> _toBeDisposed;
+  std::vector<IDisposable*> _toBeDisposed;
 
   /**
    * Gets or sets a boolean indicating that all submeshes of active meshes must
@@ -2777,13 +2831,13 @@ public:
   bool dispatchAllSubMeshesOfActiveMeshes;
 
   /** Hidden */
-  vector_t<IParticleSystem*> _activeParticleSystems;
+  std::vector<IParticleSystem*> _activeParticleSystems;
 
   /** Hidden */
-  vector_t<AnimatablePtr> _activeAnimatables;
+  std::vector<AnimatablePtr> _activeAnimatables;
 
   /** Hidden */
-  unique_ptr_t<Vector3> _forcedViewPosition;
+  std::unique_ptr<Vector3> _forcedViewPosition;
 
   /**
    * Hidden
@@ -2793,7 +2847,7 @@ public:
   /**
    * Gets the list of frustum planes (built from the active camera)
    */
-  ReadOnlyProperty<Scene, array_t<Plane, 6>> frustumPlanes;
+  ReadOnlyProperty<Scene, std::array<Plane, 6>> frustumPlanes;
 
   /**
    * Gets or sets a boolean indicating if lights must be sorted by priority (off
@@ -2805,18 +2859,18 @@ public:
   /**
    * Backing store of defined scene components
    */
-  vector_t<ISceneComponentPtr> _components;
+  std::vector<ISceneComponentPtr> _components;
 
   /**
    * Backing store of defined scene components
    */
-  vector_t<ISceneSerializableComponentPtr> _serializableComponents;
+  std::vector<ISceneSerializableComponentPtr> _serializableComponents;
 
   /**
    * Gets the depth renderer object.
    */
-  ReadOnlyProperty<Scene,
-                   unordered_map_t<string_t, unique_ptr_t<DepthRenderer>>>
+  ReadOnlyProperty<
+    Scene, std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>>
     depthRenderer;
 
   /**
@@ -2828,7 +2882,7 @@ public:
    * Gets the debug layer (aka Inspector) associated with the scene
    * @see http://doc.babylonjs.com/features/playground_debuglayer
    */
-  ReadOnlyProperty<Scene, unique_ptr_t<DebugLayer>> debugLayer;
+  ReadOnlyProperty<Scene, std::unique_ptr<DebugLayer>> debugLayer;
 
   /**
    * Gets a boolean indicating if collisions are processed on a web
@@ -2892,7 +2946,7 @@ public:
    * Return a unique id as a string which can serve as an identifier for
    * the scene
    */
-  ReadOnlyProperty<Scene, string_t> uid;
+  ReadOnlyProperty<Scene, std::string> uid;
 
   /** Audio **/
 
@@ -2977,48 +3031,47 @@ protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
   /** Hidden */
-  unique_ptr_t<ImageProcessingConfiguration> _imageProcessingConfiguration;
+  std::unique_ptr<ImageProcessingConfiguration> _imageProcessingConfiguration;
 
 private:
   // Animations
   AnimationPropertiesOverride* _animationPropertiesOverride;
   // Events
-  ::std::function<bool(Sprite* sprite)> _spritePredicate;
+  std::function<bool(Sprite* sprite)> _spritePredicate;
   Observer<Scene>::Ptr _onDisposeObserver;
   Observer<Scene>::Ptr _onBeforeRenderObserver;
   Observer<Scene>::Ptr _onAfterRenderObserver;
   Observer<Camera>::Ptr _onBeforeCameraRenderObserver;
   Observer<Camera>::Ptr _onAfterCameraRenderObserver;
   // Animations
-  vector_t<string_t> _registeredForLateAnimationBindings;
+  std::vector<std::string> _registeredForLateAnimationBindings;
   // Pointers
-  ::std::function<void(PointerEvent&& evt)> _onPointerMove;
-  ::std::function<void(PointerEvent&& evt)> _onPointerDown;
-  ::std::function<void(PointerEvent&& evt)> _onPointerUp;
+  std::function<void(PointerEvent&& evt)> _onPointerMove;
+  std::function<void(PointerEvent&& evt)> _onPointerDown;
+  std::function<void(PointerEvent&& evt)> _onPointerUp;
   // Gamepads
-  unique_ptr_t<GamepadManager> _gamepadManager;
+  std::unique_ptr<GamepadManager> _gamepadManager;
   // Click events
-  ::std::function<void(
+  std::function<void(
     Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
     const PointerEvent& evt,
-    const ::std::function<void(const ClickInfo& clickInfo,
-                               nullable_t<PickingInfo>& pickResult)>& cb)>
+    const std::function<void(const ClickInfo& clickInfo,
+                             std::optional<PickingInfo>& pickResult)>& cb)>
     _initClickEvent;
-  ::std::function<ActionManager*(ActionManager* act,
-                                 const ClickInfo& clickInfo)>
+  std::function<ActionManager*(ActionManager* act, const ClickInfo& clickInfo)>
     _initActionManager;
-  ::std::function<void(
+  std::function<void(
     unsigned int btn, const ClickInfo& clickInfo,
-    const ::std::function<void(const ClickInfo& clickInfo,
-                               const PointerInfo& pickResult)>& cb)>
+    const std::function<void(const ClickInfo& clickInfo,
+                             const PointerInfo& pickResult)>& cb)>
     _delayedSimpleClick;
   milliseconds_t _delayedSimpleClickTimeout;
   milliseconds_t _previousDelayedSimpleClickTimeout;
   bool _meshPickProceed;
   MouseButtonType _previousButtonPressed;
   bool _previousHasSwiped;
-  nullable_t<PickingInfo> _currentPickResult;
-  nullable_t<PickingInfo> _previousPickResult;
+  std::optional<PickingInfo> _currentPickResult;
+  std::optional<PickingInfo> _previousPickResult;
   int _totalPointersPressed;
   bool _doubleClickOccured;
   int _pointerX;
@@ -3029,15 +3082,15 @@ private:
   Vector2 _previousStartingPointerPosition;
   high_res_time_point_t _startingPointerTime;
   high_res_time_point_t _previousStartingPointerTime;
-  unordered_map_t<int, bool> _pointerCaptures;
+  std::unordered_map<int, bool> _pointerCaptures;
   // AbstractMesh* _meshUnderPointer;
   // Deterministic lockstep
   float _timeAccumulator;
   unsigned int _currentStepId;
   unsigned int _currentInternalStep;
   // Keyboard
-  ::std::function<void(KeyboardEvent&& evt)> _onKeyDown;
-  ::std::function<void(KeyboardEvent&& evt)> _onKeyUp;
+  std::function<void(KeyboardEvent&& evt)> _onKeyDown;
+  std::function<void(KeyboardEvent&& evt)> _onKeyUp;
   Observer<Engine>::Ptr _onCanvasFocusObserver;
   Observer<Engine>::Ptr _onCanvasBlurObserver;
   // Coordinates system
@@ -3068,15 +3121,15 @@ private:
   // Skeletons
   bool _skeletonsEnabled;
   // Postprocesses
-  unique_ptr_t<PostProcessRenderPipelineManager>
+  std::unique_ptr<PostProcessRenderPipelineManager>
     _postProcessRenderPipelineManager;
   // Collisions
   bool _workerCollisions;
   // Actions
-  vector_t<AbstractMeshPtr> _meshesForIntersections;
+  std::vector<AbstractMeshPtr> _meshesForIntersections;
   // Sound Tracks
   bool _hasAudioEngine;
-  unique_ptr_t<SoundTrack> _mainSoundTrack;
+  std::unique_ptr<SoundTrack> _mainSoundTrack;
   bool _audioEnabled;
   bool _headphone;
   // Render engine
@@ -3094,22 +3147,22 @@ private:
   int _projectionUpdateFlag;
   int _alternateViewUpdateFlag;
   int _alternateProjectionUpdateFlag;
-  vector_t<IFileRequest> _activeRequests;
-  vector_t<string_t> _pendingData;
+  std::vector<IFileRequest> _activeRequests;
+  std::vector<std::string> _pendingData;
   bool _isDisposed;
-  vector_t<AbstractMeshPtr> _activeMeshes;
+  std::vector<AbstractMeshPtr> _activeMeshes;
   IActiveMeshCandidateProvider* _activeMeshCandidateProvider;
   bool _activeMeshesFrozen;
-  vector_t<MaterialPtr> _processedMaterials;
-  vector_t<RenderTargetTexturePtr> _renderTargets;
-  vector_t<SkeletonPtr> _activeSkeletons;
-  vector_t<Mesh*> _softwareSkinnedMeshes;
-  unique_ptr_t<RenderingManager> _renderingManager;
-  unique_ptr_t<PhysicsEngine> _physicsEngine;
+  std::vector<MaterialPtr> _processedMaterials;
+  std::vector<RenderTargetTexturePtr> _renderTargets;
+  std::vector<SkeletonPtr> _activeSkeletons;
+  std::vector<Mesh*> _softwareSkinnedMeshes;
+  std::unique_ptr<RenderingManager> _renderingManager;
+  std::unique_ptr<PhysicsEngine> _physicsEngine;
   Matrix _transformMatrix;
-  unique_ptr_t<UniformBuffer> _sceneUbo;
-  unique_ptr_t<UniformBuffer> _alternateSceneUbo;
-  unique_ptr_t<Matrix> _pickWithRayInverseMatrix;
+  std::unique_ptr<UniformBuffer> _sceneUbo;
+  std::unique_ptr<UniformBuffer> _alternateSceneUbo;
+  std::unique_ptr<Matrix> _pickWithRayInverseMatrix;
 
   /** Hidden (Backing field) */
   SimplificationQueuePtr _simplificationQueue;
@@ -3120,35 +3173,36 @@ private:
   /** Hidden (Backing field) */
   bool _forceShowBoundingBoxes;
 
-  unique_ptr_t<OutlineRenderer> _outlineRenderer;
+  std::unique_ptr<OutlineRenderer> _outlineRenderer;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
   Matrix _alternateViewMatrix;
   Matrix _alternateProjectionMatrix;
-  unique_ptr_t<Matrix> _alternateTransformMatrix;
+  std::unique_ptr<Matrix> _alternateTransformMatrix;
   bool _useAlternateCameraConfiguration;
   bool _alternateRendering;
   bool _frustumPlanesSet;
-  array_t<Plane, 6> _frustumPlanes;
+  std::array<Plane, 6> _frustumPlanes;
   Octree<AbstractMesh*>* _selectionOctree;
   Vector2 _unTranslatedPointer;
   AbstractMeshPtr _pointerOverMesh;
   Sprite* _pointerOverSprite;
-  unique_ptr_t<DebugLayer> _debugLayer;
-  unordered_map_t<string_t, unique_ptr_t<DepthRenderer>> _depthRenderer;
+  std::unique_ptr<DebugLayer> _debugLayer;
+  std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>
+    _depthRenderer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
   AbstractMeshPtr _pickedDownMesh;
   AbstractMeshPtr _pickedUpMesh;
   Sprite* _pickedDownSprite;
-  string_t _uid;
+  std::string _uid;
 
   /**
    * List of components to register on the next registration step
    */
-  vector_t<ISceneComponentPtr> _transientComponents;
+  std::vector<ISceneComponentPtr> _transientComponents;
 
-  unique_ptr_t<Ray> _tempPickingRay;
-  unique_ptr_t<Ray> _cachedRayForTransform;
+  std::unique_ptr<Ray> _tempPickingRay;
+  std::unique_ptr<Ray> _cachedRayForTransform;
 
 }; // end of class Scene
 

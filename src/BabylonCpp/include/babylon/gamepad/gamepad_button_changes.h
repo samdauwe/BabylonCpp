@@ -1,7 +1,10 @@
 #ifndef BABYLON_GAMEPAD_GAMEPAD_BUTTON_CHANGES_H
 #define BABYLON_GAMEPAD_GAMEPAD_BUTTON_CHANGES_H
 
-#include <babylon/babylon_global.h>
+#include <sstream>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -11,7 +14,7 @@ struct BABYLON_SHARED_EXPORT GamepadButtonChanges {
   bool touchChanged;
   bool valueChanged;
 
-  string_t toString() const
+  std::string toString() const
   {
     std::ostringstream oss;
     oss << "{\"Changed\":" << changed << ",\"PressChanged\":" << pressChanged

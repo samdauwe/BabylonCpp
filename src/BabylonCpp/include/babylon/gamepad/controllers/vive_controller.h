@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_VIVE_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_VIVE_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
 namespace BABYLON {
@@ -27,7 +27,7 @@ public:
    * @brief Creates a new ViveController from a gamepad.
    * @param vrGamepad the gamepad that the controller should be created from
    */
-  ViveController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  ViveController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
   ~ViveController() override;
 
   /**

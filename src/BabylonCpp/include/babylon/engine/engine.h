@@ -1,7 +1,9 @@
 #ifndef BABYLON_ENGINE_ENGINE_H
 #define BABYLON_ENGINE_ENGINE_H
 
-#include <babylon/babylon_global.h>
+#include <future>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine_capabilities.h>
@@ -2108,7 +2110,7 @@ public:
   /**
    * @brief Hidden
    */
-  promise_t<string_t> _loadFileAsync(const string_t& url);
+  std::promise<string_t> _loadFileAsync(const string_t& url);
 
   /** Statics **/
 

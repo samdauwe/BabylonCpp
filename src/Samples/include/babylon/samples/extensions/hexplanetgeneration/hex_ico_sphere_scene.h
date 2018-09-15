@@ -4,6 +4,10 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
+
 namespace Samples {
 
 class HexIcosphereScene : public IRenderableScene {

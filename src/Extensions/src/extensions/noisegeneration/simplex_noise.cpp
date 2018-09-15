@@ -1,5 +1,7 @@
 #include <babylon/extensions/noisegeneration/simplex_noise.h>
 
+#include <random>
+
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>

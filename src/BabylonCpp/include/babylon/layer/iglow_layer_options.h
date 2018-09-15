@@ -1,9 +1,15 @@
 #ifndef BABYLON_LAYER_IGLOW_LAYER_OPTIONS_H
 #define BABYLON_LAYER_IGLOW_LAYER_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <optional>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Camera;
+using CameraPtr = std::shared_ptr<Camera>;
 
 /**
  * @brief Glow layer options. This helps customizing the behaviour of the glow
@@ -20,7 +26,7 @@ struct BABYLON_SHARED_EXPORT IGlowLayerOptions {
   /**
    * Enforces a fixed size texture to ensure resize independant blur.
    */
-  nullable_t<int> mainTextureFixedSize = nullopt_t;
+  std::optional<int> mainTextureFixedSize = std::nullopt;
 
   /**
    * How big is the kernel of the blur texture.
@@ -35,7 +41,7 @@ struct BABYLON_SHARED_EXPORT IGlowLayerOptions {
   /**
    * Enable MSAA by chosing the number of samples.
    */
-  nullable_t<int> mainTextureSamples = 1;
+  std::optional<int> mainTextureSamples = 1;
 
   /**
    * The rendering group to draw the layer in.

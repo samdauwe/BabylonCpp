@@ -1,9 +1,14 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_POSE_ENABLED_CONTROLLER_HELPER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_POSE_ENABLED_CONTROLLER_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class IBrowserGamepad;
+class WebVRController;
 
 /**
  * @brief Defines the PoseEnabledControllerHelper object that is used initialize
@@ -19,7 +24,7 @@ struct BABYLON_SHARED_EXPORT PoseEnabledControllerHelper {
    * @returns a vr controller of the type the gamepad identified as
    */
   static WebVRController*
-  InitiateController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  InitiateController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
 
 }; // end of struct PoseEnabledControllerHelper
 

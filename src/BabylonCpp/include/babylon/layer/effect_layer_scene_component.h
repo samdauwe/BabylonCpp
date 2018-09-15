@@ -1,11 +1,33 @@
 #ifndef BABYLON_LAYER_EFFECT_LAYER_SCENE_COMPONENT_H
 #define BABYLON_LAYER_EFFECT_LAYER_SCENE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class AbstractMesh;
+class AbstractScene;
+class Camera;
+class EffectLayerSceneComponent;
+class Engine;
+using EffectLayerSceneComponentPtr = std::shared_ptr<EffectLayerSceneComponent>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Defines the layer scene component responsible to manage any effect
@@ -24,7 +46,7 @@ public:
   template <typename... Ts>
   static EffectLayerSceneComponentPtr New(Ts&&... args)
   {
-    return shared_ptr_t<EffectLayerSceneComponent>(
+    return std::shared_ptr<EffectLayerSceneComponent>(
       new EffectLayerSceneComponent(::std::forward<Ts>(args)...));
   }
   virtual ~EffectLayerSceneComponent();

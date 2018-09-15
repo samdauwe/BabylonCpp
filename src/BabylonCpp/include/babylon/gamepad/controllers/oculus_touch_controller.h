@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_OCULUS_TOUCH_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_OCULUS_TOUCH_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
 namespace BABYLON {
@@ -31,7 +31,7 @@ public:
    * @brief Creates a new OculusTouchController from a gamepad.
    * @param vrGamepad the gamepad that the controller should be created from
    */
-  OculusTouchController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  OculusTouchController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
   ~OculusTouchController() override;
 
   /**

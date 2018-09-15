@@ -21,7 +21,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  unique_ptr_t<Extensions::SimplePlanet> _hexPlanet;
+  std::unique_ptr<Extensions::SimplePlanet> _hexPlanet;
 
 }; // end of class ProceduralHexPlanetGenerationScene
 

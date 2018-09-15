@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_DAYDREAM_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_DAYDREAM_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
 namespace BABYLON {
@@ -34,7 +34,7 @@ public:
    * @brief Creates a new DaydreamController from a gamepad.
    * @param vrGamepad the gamepad that the controller should be created from
    */
-  DaydreamController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  DaydreamController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
   ~DaydreamController() override;
 
   /**

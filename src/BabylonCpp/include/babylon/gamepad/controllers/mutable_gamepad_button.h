@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_MUTABLE_GAMEPAD_BUTTON_H
 #define BABYLON_GAMEPAD_CONTROLLERS_MUTABLE_GAMEPAD_BUTTON_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
 
 namespace BABYLON {
@@ -20,7 +20,7 @@ public:
   MutableGamepadButton& operator=(const MutableGamepadButton& other);
   MutableGamepadButton& operator=(MutableGamepadButton&& other);
   ~MutableGamepadButton();
-  string_t toString() const;
+  std::string toString() const;
   friend std::ostream&
   operator<<(std::ostream& os,
              const MutableGamepadButton& mutableGamepadButton);

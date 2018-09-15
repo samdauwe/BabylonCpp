@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_TEXTURE_CONSTANTS_H
 #define BABYLON_MATERIALS_TEXTURES_TEXTURE_CONSTANTS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {

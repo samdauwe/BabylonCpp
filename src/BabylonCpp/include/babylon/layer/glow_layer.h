@@ -1,11 +1,23 @@
 #ifndef BABYLON_LAYER_GLOW_LAYER_H
 #define BABYLON_LAYER_GLOW_LAYER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/layer/effect_layer.h>
 #include <babylon/layer/iglow_layer_options.h>
 
 namespace BABYLON {
+
+class BlurPostProcess;
+class GlowLayer;
+class Material;
+class Mesh;
+class SubMesh;
+class Texture;
+using GlowLayerPtr = std::shared_ptr<GlowLayer>;
+using MaterialPtr  = std::shared_ptr<Material>;
+using MeshPtr      = std::shared_ptr<Mesh>;
+using SubMeshPtr   = std::shared_ptr<SubMesh>;
+using TexturePtr   = std::shared_ptr<Texture>;
 
 /**
  * @brief The glow layer Helps adding a glow effect around the emissive parts of
@@ -38,7 +50,7 @@ public:
   template <typename... Ts>
   static GlowLayerPtr New(Ts&&... args)
   {
-    return shared_ptr_t<GlowLayer>(new GlowLayer(::std::forward<Ts>(args)...));
+    return std::shared_ptr<GlowLayer>(new GlowLayer(std::forward<Ts>(args)...));
   }
   ~GlowLayer() override;
 
@@ -46,7 +58,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  string_t getEffectName() const override;
+  std::string getEffectName() const override;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -112,7 +124,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  string_t getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes this glow layer.
@@ -128,7 +140,7 @@ public:
    * @returns a parsed Glow Layer
    */
   static GlowLayer* Parse(const Json::value& parsedGlowLayer, Scene* scene,
-                          const string_t& rootUrl);
+                          const std::string& rootUrl);
 
 protected:
   /**
@@ -138,8 +150,8 @@ protected:
    * @param options Sets of none mandatory options to use with the layer (see
    * IGlowLayerOptions for more information)
    */
-  GlowLayer(const string_t& name, Scene* scene);
-  GlowLayer(const string_t& name, Scene* scene,
+  GlowLayer(const std::string& name, Scene* scene);
+  GlowLayer(const std::string& name, Scene* scene,
             const IGlowLayerOptions& options);
 
   /**
@@ -201,15 +213,15 @@ public:
    * Callback used to let the user override the color selection on a per mesh
    * basis
    */
-  ::std::function<void(const MeshPtr& mesh, SubMesh* subMesh,
-                       Material* material, Color4& result)>
+  std::function<void(const MeshPtr& mesh, SubMesh* subMesh, Material* material,
+                     Color4& result)>
     customEmissiveColorSelector;
   /**
    * Callback used to let the user override the texture selection on a per mesh
    * basis
    */
-  ::std::function<TexturePtr(const MeshPtr& mesh, SubMesh* subMesh,
-                             const MaterialPtr& material)>
+  std::function<TexturePtr(const MeshPtr& mesh, SubMesh* subMesh,
+                           const MaterialPtr& material)>
     customEmissiveTextureSelector;
 
 private:
@@ -217,14 +229,14 @@ private:
   Property<GlowLayer, float> intensity;
   IGlowLayerOptions _options;
   float _intensity;
-  unique_ptr_t<BlurPostProcess> _horizontalBlurPostprocess1;
-  unique_ptr_t<BlurPostProcess> _verticalBlurPostprocess1;
-  unique_ptr_t<BlurPostProcess> _horizontalBlurPostprocess2;
-  unique_ptr_t<BlurPostProcess> _verticalBlurPostprocess2;
+  std::unique_ptr<BlurPostProcess> _horizontalBlurPostprocess1;
+  std::unique_ptr<BlurPostProcess> _verticalBlurPostprocess1;
+  std::unique_ptr<BlurPostProcess> _horizontalBlurPostprocess2;
+  std::unique_ptr<BlurPostProcess> _verticalBlurPostprocess2;
   RenderTargetTexturePtr _blurTexture1;
   RenderTargetTexturePtr _blurTexture2;
-  vector_t<PostProcess*> _postProcesses1;
-  vector_t<PostProcess*> _postProcesses2;
+  std::vector<PostProcess*> _postProcesses1;
+  std::vector<PostProcess*> _postProcesses2;
 
   Uint64Array _includedOnlyMeshes;
   Uint64Array _excludedMeshes;

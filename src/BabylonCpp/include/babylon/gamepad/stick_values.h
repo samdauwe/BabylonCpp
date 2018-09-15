@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_STICK_VALUES_H
 #define BABYLON_GAMEPAD_STICK_VALUES_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

@@ -1,5 +1,7 @@
 #include <babylon/engine/engine.h>
 
+#include <future>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/babylon_version.h>
 #include <babylon/cameras/camera.h>
@@ -5298,9 +5300,9 @@ unsigned int Engine::getGlAlgorithmType(unsigned int algorithmType) const
            GL::ANY_SAMPLES_PASSED;
 }
 
-promise_t<string_t> Engine::_loadFileAsync(const string_t& /*url*/)
+std::promise<string_t> Engine::_loadFileAsync(const string_t& /*url*/)
 {
-  promise_t<string_t> result;
+  std::promise<string_t> result;
   return result;
 }
 

@@ -1,7 +1,9 @@
 #ifndef BABYLON_INTERFACES_ILOADING_SCREEN_H
 #define BABYLON_INTERFACES_ILOADING_SCREEN_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -12,8 +14,8 @@ public:
   virtual void hideLoadingUI()    = 0;
 
 public:
-  string_t loadingUIBackgroundColor;
-  string_t loadingUIText;
+  std::string loadingUIBackgroundColor;
+  std::string loadingUIText;
 }; // end of class ILoadingScreen
 
 } // end of namespace BABYLON

@@ -36,7 +36,7 @@ EffectLayer::EffectLayer(const string_t& iName, Scene* scene)
     , _mergeEffect{nullptr}
 {
   _scene         = scene ? scene : Engine::LastCreatedScene();
-  auto component = ::std::static_pointer_cast<EffectLayerSceneComponent>(
+  auto component = std::static_pointer_cast<EffectLayerSceneComponent>(
     _scene->_getComponent(SceneComponentConstants::NAME_EFFECTLAYER));
   if (!component) {
     component = EffectLayerSceneComponent::New(_scene);
@@ -101,10 +101,10 @@ void EffectLayer::_generateVertexBuffer()
     1,  -1  //
   };
 
-  auto vertexBuffer = ::std::make_unique<VertexBuffer>(
+  auto vertexBuffer = std::make_unique<VertexBuffer>(
     _engine, ToVariant<Float32Array, Buffer*>(vertices),
     VertexBuffer::PositionKind, false, false, 2);
-  _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(vertexBuffer);
+  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(vertexBuffer);
 }
 
 void EffectLayer::_setMainTextureSize()
@@ -130,9 +130,9 @@ void EffectLayer::_setMainTextureSize()
   }
 
   _mainTextureDesiredSize.width
-    = static_cast<int>(::std::floor(_mainTextureDesiredSize.width));
+    = static_cast<int>(std::floor(_mainTextureDesiredSize.width));
   _mainTextureDesiredSize.height
-    = static_cast<int>(::std::floor(_mainTextureDesiredSize.height));
+    = static_cast<int>(std::floor(_mainTextureDesiredSize.height));
 }
 
 void EffectLayer::_createMainTexture()
@@ -156,7 +156,7 @@ void EffectLayer::_createMainTexture()
              const vector_t<SubMeshPtr>& alphaTestSubMeshes,
              const vector_t<SubMeshPtr>& transparentSubMeshes,
              const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-             const ::std::function<void()>& /*beforeTransparents*/) {
+             const std::function<void()>& /*beforeTransparents*/) {
         onBeforeRenderMainTextureObservable.notifyObservers(this);
 
         auto engine = _scene->getEngine();
@@ -258,11 +258,11 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + ::std::to_string(mesh->numBoneInfluencers()));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string(
-          mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) : 0));
+      + std::to_string(mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) :
+                                          0));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -270,14 +270,14 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
 
   // Morph targets
   unsigned int morphInfluencers = 0;
-  if (auto _mesh = ::std::static_pointer_cast<Mesh>(mesh)) {
+  if (auto _mesh = std::static_pointer_cast<Mesh>(mesh)) {
     auto manager = _mesh->morphTargetManager();
     if (manager) {
       if (manager->numInfluencers > 0) {
         defines.emplace_back("#define MORPHTARGETS");
         morphInfluencers = static_cast<unsigned>(manager->numInfluencers);
         defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
-                             + ::std::to_string(morphInfluencers));
+                             + std::to_string(morphInfluencers));
         MaterialDefines defines;
         defines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
         MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
@@ -301,8 +301,8 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     _cachedDefines = join;
 
     EffectCreationOptions effectCreationOptions;
-    effectCreationOptions.attributes = ::std::move(attribs);
-    effectCreationOptions.defines    = ::std::move(join);
+    effectCreationOptions.attributes = std::move(attribs);
+    effectCreationOptions.defines    = std::move(join);
     effectCreationOptions.indexParameters
       = {{"maxSimultaneousMorphTargets", morphInfluencers}};
     effectCreationOptions.uniformsNames
@@ -554,10 +554,10 @@ void EffectLayer::dispose()
 
   // Remove from scene
   _scene->effectLayers.erase(
-    ::std::remove_if(_scene->effectLayers.begin(), _scene->effectLayers.end(),
-                     [this](const EffectLayerPtr& effectLayer) {
-                       return effectLayer.get() == this;
-                     }),
+    std::remove_if(_scene->effectLayers.begin(), _scene->effectLayers.end(),
+                   [this](const EffectLayerPtr& effectLayer) {
+                     return effectLayer.get() == this;
+                   }),
     _scene->effectLayers.end());
 
   // Callback

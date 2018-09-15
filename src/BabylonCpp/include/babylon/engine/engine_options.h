@@ -1,7 +1,7 @@
 #ifndef BABYLON_ENGINE_ENGINE_OPTIONS_H
 #define BABYLON_ENGINE_ENGINE_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

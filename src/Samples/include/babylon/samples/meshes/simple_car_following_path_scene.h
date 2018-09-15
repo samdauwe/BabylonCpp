@@ -5,6 +5,10 @@
 #include <babylon/math/quaternion.h>
 
 namespace BABYLON {
+
+class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
+
 namespace Samples {
 
 /**
@@ -34,7 +38,7 @@ private:
   Quaternion _startRotation;
   MeshPtr _carBody;
   MeshPtr _wheelFI, _wheelFO, _wheelRI, _wheelRO;
-  vector_t<Vector3> _points, _normals;
+  std::vector<Vector3> _points, _normals;
 
 }; // end of class SimpleCarFollowingPathScene
 

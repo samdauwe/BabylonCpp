@@ -1,5 +1,6 @@
 #include <babylon/particles/particle_system.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/random.h>

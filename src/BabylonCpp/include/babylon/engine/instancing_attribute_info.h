@@ -1,7 +1,7 @@
 #ifndef BABYLON_ENGINE_INSTANCING_ATTRIBUTE_INFO_H
 #define BABYLON_ENGINE_INSTANCING_ATTRIBUTE_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {

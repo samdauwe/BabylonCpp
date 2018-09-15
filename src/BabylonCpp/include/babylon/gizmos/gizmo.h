@@ -1,13 +1,20 @@
 #ifndef BABYLON_GIZMOS_GIZMO_H
 #define BABYLON_GIZMOS_GIZMO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Mesh;
+class Scene;
+class UtilityLayerRenderer;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using MeshPtr         = std::shared_ptr<Mesh>;
 
 /**
  * @brief Renders gizmos on top of an existing scene which provide controls for
@@ -20,7 +27,7 @@ public:
    * @brief Creates a gizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
-  Gizmo(const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer);
+  Gizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer);
   virtual ~Gizmo();
 
   /**
@@ -76,7 +83,7 @@ public:
   /**
    * The utility layer the gizmo will be added to
    */
-  shared_ptr_t<UtilityLayerRenderer> gizmoLayer;
+  std::shared_ptr<UtilityLayerRenderer> gizmoLayer;
 
   /**
    * If set the gizmo's rotation will be updated to match the attached mesh each

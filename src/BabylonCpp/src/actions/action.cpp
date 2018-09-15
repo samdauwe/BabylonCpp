@@ -35,7 +35,7 @@ void Action::_prepare()
 {
 }
 
-string_t Action::getTriggerParameter() const
+std::string Action::getTriggerParameter() const
 {
   return _triggerParameter;
 }
@@ -99,13 +99,13 @@ Action* Action::then(Action* action)
   return action;
 }
 
-string_t Action::_getProperty(const string_t& propertyPath)
+std::string Action::_getProperty(const std::string& propertyPath)
 {
   return _actionManager->_getProperty(propertyPath);
 }
 
 IAnimatablePtr Action::_getEffectiveTarget(const IAnimatablePtr& target,
-                                           const string_t& propertyPath)
+                                           const std::string& propertyPath)
 {
   return _actionManager->_getEffectiveTarget(target, propertyPath);
 }
@@ -145,7 +145,7 @@ Json::object Action::_serialize(const Json::object& serializedAction,
   return serializationObject;
 }
 
-string_t Action::_SerializeValueAsString(const AnimationValue& value)
+std::string Action::_SerializeValueAsString(const AnimationValue& value)
 {
   switch (value.dataType) {
     case Animation::ANIMATIONTYPE_INT():
@@ -180,7 +180,7 @@ string_t Action::_SerializeValueAsString(const AnimationValue& value)
 
 Json::object Action::_GetTargetProperty(const IAnimatablePtr& target)
 {
-  const string_t targetType
+  const std::string targetType
     = (target->animatableType() == IAnimatable::Type::MESH) ?
         "MeshProperties" :
         (target->animatableType() == IAnimatable::Type::LIGHT) ?
@@ -188,7 +188,7 @@ Json::object Action::_GetTargetProperty(const IAnimatablePtr& target)
         (target->animatableType() == IAnimatable::Type::CAMERA) ?
         "CameraProperties" :
         "SceneProperties";
-  const string_t value
+  const std::string value
     = (target->animatableType() == IAnimatable::Type::SCENE) ?
         "Scene" :
         ::std::static_pointer_cast<Node>(target)->name;

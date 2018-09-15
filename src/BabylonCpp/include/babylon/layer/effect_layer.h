@@ -1,13 +1,49 @@
 #ifndef BABYLON_LAYER_EFFECT_LAYER_H
 #define BABYLON_LAYER_EFFECT_LAYER_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+
+#include <babylon/babylon_api.h>
+#include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/layer/ieffect_layer_options.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/size.h>
 #include <babylon/tools/observable.h>
 
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
+
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class AbstractMesh;
+class BaseTexture;
+class Effect;
+class Engine;
+class Material;
+class Mesh;
+class PostProcess;
+class RenderTargetTexture;
+class Scene;
+class SubMesh;
+class VertexBuffer;
+using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using MaterialPtr            = std::shared_ptr<Material>;
+using MeshPtr                = std::shared_ptr<Mesh>;
+using SubMeshPtr             = std::shared_ptr<SubMesh>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 struct EmissiveTextureAndColor {
   BaseTexturePtr texture = nullptr;
@@ -34,7 +70,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  virtual string_t getEffectName() const = 0;
+  virtual std::string getEffectName() const = 0;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -101,7 +137,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  virtual string_t getClassName() const;
+  virtual std::string getClassName() const;
 
   /**
    * @brief Creates an effect layer from parsed effect layer data.
@@ -111,7 +147,7 @@ public:
    * @returns a parsed effect Layer
    */
   static EffectLayer* Parse(const Json::value& parsedEffectLayer, Scene* scene,
-                            const string_t& rootUrl);
+                            const std::string& rootUrl);
 
 protected:
   /**
@@ -119,7 +155,7 @@ protected:
    * @param name The name of the layer
    * @param scene The scene to use the layer in
    */
-  EffectLayer(const string_t& name, Scene* scene);
+  EffectLayer(const std::string& name, Scene* scene);
 
   /**
    * @brief Gets the camera attached to the layer.
@@ -232,7 +268,7 @@ public:
   /**
    * The Friendly of the effect in the scene.
    */
-  string_t name;
+  std::string name;
 
   /**
    * The clear color of the texture used to generate the glow map.
@@ -288,14 +324,14 @@ protected:
   int _maxSize;
   ISize _mainTextureDesiredSize;
   bool _shouldRender;
-  vector_t<PostProcess*> _postProcesses;
-  vector_t<BaseTexturePtr> _textures;
+  std::vector<PostProcess*> _postProcesses;
+  std::vector<BaseTexturePtr> _textures;
   EmissiveTextureAndColor _emissiveTextureAndColor;
 
 private:
-  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
-  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
-  string_t _cachedDefines;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
+  std::string _cachedDefines;
   Effect* _effectLayerMapGenerationEffect;
   IEffectLayerOptions _effectLayerOptions;
   Effect* _mergeEffect;

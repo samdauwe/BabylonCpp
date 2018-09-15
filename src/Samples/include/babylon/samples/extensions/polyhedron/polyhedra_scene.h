@@ -1,9 +1,18 @@
 #ifndef BABYLON_SAMPLES_EXTENSIONS_POLYHEDRON_POLYHEDRA_SCENE_H
 #define BABYLON_SAMPLES_EXTENSIONS_POLYHEDRON_POLYHEDRA_SCENE_H
 
+#include <babylon/babylon_common.h>
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class ArcRotateCamera;
+class Mesh;
+class PointLight;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+using MeshPtr            = std::shared_ptr<Mesh>;
+using PointLightPtr      = std::shared_ptr<PointLight>;
+
 namespace Samples {
 
 class PolyhedraScene : public IRenderableScene {

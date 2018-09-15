@@ -4,6 +4,10 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class ArcRotateCamera;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+
 namespace Samples {
 
 /**

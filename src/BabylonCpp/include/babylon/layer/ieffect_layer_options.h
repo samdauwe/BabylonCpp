@@ -1,10 +1,16 @@
 #ifndef BABYLON_LAYER_IEFFECT_LAYER_OPTIONS_H
 #define BABYLON_LAYER_IEFFECT_LAYER_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <optional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {
+
+class Camera;
+using CameraPtr = std::shared_ptr<Camera>;
 
 /**
  * @brief Effect layer options. This helps customizing the behaviour of the
@@ -21,7 +27,7 @@ struct BABYLON_SHARED_EXPORT IEffectLayerOptions {
   /**
    * Enforces a fixed size texture to ensure effect stability across devices.
    */
-  nullable_t<int> mainTextureFixedSize = nullopt_t;
+  std::optional<int> mainTextureFixedSize = std::nullopt;
 
   /**
    * Alpha blending mode used to apply the blur. Default depends of the

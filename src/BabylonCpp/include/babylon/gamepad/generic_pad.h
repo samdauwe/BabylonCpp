@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_GENERIC_PAD_H
 #define BABYLON_GAMEPAD_GENERIC_PAD_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/gamepad.h>
 #include <babylon/tools/observable.h>
 
@@ -10,8 +10,8 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT GenericPad : public Gamepad {
 
 public:
-  GenericPad(const string_t& id, int index,
-             const shared_ptr_t<IBrowserGamepad>& browserGamepad);
+  GenericPad(const std::string& id, int index,
+             const std::shared_ptr<IBrowserGamepad>& browserGamepad);
   virtual ~GenericPad() override;
 
   void setOnbuttondown(

@@ -4,6 +4,10 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class SpotLight;
+using SpotLightPtr = std::shared_ptr<SpotLight>;
+
 namespace Samples {
 
 /**

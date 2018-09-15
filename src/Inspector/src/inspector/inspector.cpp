@@ -1,5 +1,7 @@
 #include <babylon/inspector/inspector.h>
 
+#include <iomanip>
+
 // GLFW
 #include <GLFW/glfw3.h>
 #ifdef _WIN32

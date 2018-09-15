@@ -1,7 +1,7 @@
 #ifndef BABYLON_TOOLS_PERF_COUNTER_H
 #define BABYLON_TOOLS_PERF_COUNTER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/time.h>
 
 namespace BABYLON {

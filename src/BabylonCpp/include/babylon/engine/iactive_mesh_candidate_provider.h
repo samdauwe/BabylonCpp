@@ -1,9 +1,16 @@
 #ifndef BABYLON_ENGINE_IACTIVE_MESH_CANDIDATE_PROVIDER
 #define BABYLON_ENGINE_IACTIVE_MESH_CANDIDATE_PROVIDER
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Scene;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief Interface used to let developers provide their own mesh selection
@@ -16,7 +23,7 @@ struct BABYLON_SHARED_EXPORT IActiveMeshCandidateProvider {
    * @param scene defines the current scene
    * @returns the list of active meshes
    */
-  virtual vector_t<AbstractMeshPtr> getMeshes(Scene* scene) = 0;
+  virtual std::vector<AbstractMeshPtr> getMeshes(Scene* scene) = 0;
 
   /**
    * @brief Indicates if the meshes have been checked to make sure they are

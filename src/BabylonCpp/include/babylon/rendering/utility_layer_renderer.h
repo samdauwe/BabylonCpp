@@ -1,13 +1,20 @@
 #ifndef BABYLON_RENDERING_UTILITY_LAYER_RENDER_H
 #define BABYLON_RENDERING_UTILITY_LAYER_RENDER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class PickingInfo;
+class PointerInfo;
+class PointerInfoPre;
+class Scene;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief Renders a layer on top of an existing scene.
@@ -20,21 +27,21 @@ public:
    * scene (Depth map of the previous scene is cleared before drawing on top of
    * it).
    */
-  static shared_ptr_t<UtilityLayerRenderer>& DefaultUtilityLayer();
+  static std::shared_ptr<UtilityLayerRenderer>& DefaultUtilityLayer();
 
   /**
    * @brief A shared utility layer that can be used to embed objects into a
    * scene (Depth map of the previous scene is not cleared before drawing on top
    * of it).
    */
-  static shared_ptr_t<UtilityLayerRenderer>& DefaultKeepDepthUtilityLayer();
+  static std::shared_ptr<UtilityLayerRenderer>& DefaultKeepDepthUtilityLayer();
 
 public:
   template <typename... Ts>
-  static shared_ptr_t<UtilityLayerRenderer> New(Ts&&... args)
+  static std::shared_ptr<UtilityLayerRenderer> New(Ts&&... args)
   {
     auto renderer = new UtilityLayerRenderer(::std::forward<Ts>(args)...);
-    return static_cast<shared_ptr_t<UtilityLayerRenderer>>(renderer);
+    return static_cast<std::shared_ptr<UtilityLayerRenderer>>(renderer);
   }
   virtual ~UtilityLayerRenderer();
 
@@ -66,7 +73,7 @@ public:
   /**
    * The scene that is rendered on top of the original scene
    */
-  unique_ptr_t<Scene> utilityLayerScene;
+  std::unique_ptr<Scene> utilityLayerScene;
 
   /**
    *  If the utility layer should automatically be rendered on top of existing
@@ -104,12 +111,12 @@ public:
   ::std::function<bool(const AbstractMeshPtr& mesh)> mainSceneTrackerPredicate;
 
 private:
-  static shared_ptr_t<UtilityLayerRenderer> _DefaultUtilityLayer;
-  static shared_ptr_t<UtilityLayerRenderer> _DefaultKeepDepthUtilityLayer;
+  static std::shared_ptr<UtilityLayerRenderer> _DefaultUtilityLayer;
+  static std::shared_ptr<UtilityLayerRenderer> _DefaultKeepDepthUtilityLayer;
 
 private:
-  unordered_map_t<int, bool> _pointerCaptures;
-  unordered_map_t<int, PointerType> _lastPointerEvents;
+  std::unordered_map<int, bool> _pointerCaptures;
+  std::unordered_map<int, PointerType> _lastPointerEvents;
   Observer<Scene>::Ptr _afterRenderObserver;
   Observer<Scene>::Ptr _sceneDisposeObserver;
   Observer<PointerInfoPre>::Ptr _originalPointerObserver;

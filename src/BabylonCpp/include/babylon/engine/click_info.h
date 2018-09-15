@@ -1,7 +1,8 @@
 #ifndef BABYLON_ENGINE_CLICK_INFO_H
 #define BABYLON_ENGINE_CLICK_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 

@@ -1,7 +1,7 @@
 #ifndef BABYLON_GIZMOS_PLANE_ROTATION_GIZMO_H
 #define BABYLON_GIZMOS_PLANE_ROTATION_GIZMO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/math/color3.h>
@@ -9,6 +9,8 @@
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class PointerDragBehavior;
 
 /**
  * @brief Single axis scale gizmo.
@@ -25,7 +27,7 @@ public:
    */
   PlaneRotationGizmo(const Vector3& planeNormal,
                      const Color3& color = Color3::Gray(),
-                     const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer
+                     const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
                      = UtilityLayerRenderer::DefaultUtilityLayer());
   ~PlaneRotationGizmo() override;
 
@@ -42,7 +44,7 @@ public:
   /**
    * Drag behavior responsible for the gizmos dragging interactions
    */
-  unique_ptr_t<PointerDragBehavior> dragBehavior;
+  std::unique_ptr<PointerDragBehavior> dragBehavior;
 
   /**
    * Rotation distance in radians that the gizmo will snap to (Default: 0)

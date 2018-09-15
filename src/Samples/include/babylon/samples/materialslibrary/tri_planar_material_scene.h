@@ -5,6 +5,11 @@
 
 namespace BABYLON {
 
+class GroundMesh;
+class StandardMaterial;
+using GroundMeshPtr       = std::shared_ptr<GroundMesh>;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+
 namespace MaterialsLibrary {
 class TriPlanarMaterial;
 using TriPlanarMaterialPtr = std::shared_ptr<TriPlanarMaterial>;

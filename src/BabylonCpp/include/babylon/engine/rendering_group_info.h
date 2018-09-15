@@ -1,9 +1,15 @@
 #ifndef BABYLON_ENGINE_RENDERING_GROUP_INFO_H
 #define BABYLON_ENGINE_RENDERING_GROUP_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Camera;
+class Scene;
+using CameraPtr = std::shared_ptr<Camera>;
 
 /**
  * @brief This class is used by the onRenderingGroupObservable

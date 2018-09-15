@@ -58,13 +58,13 @@ public:
   GLenum checkFramebufferStatus(GLenum target) override;
   void clear(GLbitfield mask) override;
   void clearBufferfv(GLenum buffer, GLint drawbuffer,
-                     const vector_t<GLfloat>& values,
+                     const std::vector<GLfloat>& values,
                      GLint srcOffset = 0) override;
   void clearBufferiv(GLenum buffer, GLint drawbuffer,
-                     const vector_t<GLint>& values,
+                     const std::vector<GLint>& values,
                      GLint srcOffset = 0) override;
   void clearBufferuiv(GLenum buffer, GLint drawbuffer,
-                      const vector_t<GLuint>& values,
+                      const std::vector<GLuint>& values,
                       GLint srcOffset = 0) override;
   virtual void clearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth,
                              GLint stencil) override;

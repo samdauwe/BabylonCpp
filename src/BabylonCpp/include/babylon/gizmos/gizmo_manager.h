@@ -1,18 +1,28 @@
 #ifndef BABYLON_GIZMOS_GIZMO_MANAGER_H
 #define BABYLON_GIZMOS_GIZMO_MANAGER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color3.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
 
+class AbstractMesh;
+class BoundingBoxGizmo;
+class PointerInfo;
+class PositionGizmo;
+class RotationGizmo;
+class ScaleGizmo;
+class Scene;
+class SixDofDragBehavior;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+
 struct Gizmos {
-  unique_ptr_t<PositionGizmo> positionGizmo       = nullptr;
-  unique_ptr_t<RotationGizmo> rotationGizmo       = nullptr;
-  unique_ptr_t<ScaleGizmo> scaleGizmo             = nullptr;
-  unique_ptr_t<BoundingBoxGizmo> boundingBoxGizmo = nullptr;
+  std::unique_ptr<PositionGizmo> positionGizmo       = nullptr;
+  std::unique_ptr<RotationGizmo> rotationGizmo       = nullptr;
+  std::unique_ptr<ScaleGizmo> scaleGizmo             = nullptr;
+  std::unique_ptr<BoundingBoxGizmo> boundingBoxGizmo = nullptr;
 }; // end of struct Gizmos
 
 struct GizmosEnabledSettings {
@@ -83,7 +93,7 @@ public:
    * Array of meshes which will have the gizmo attached when a pointer selected
    * them. If null, all meshes are attachable. (Default: null)
    */
-  nullable_t<vector_t<AbstractMeshPtr>> attachableMeshes;
+  std::optional<std::vector<AbstractMeshPtr>> attachableMeshes;
 
   /**
    * If pointer events should perform attaching/detaching a gizmo, if false this
@@ -117,7 +127,7 @@ private:
   Observer<PointerInfo>::Ptr _pointerObserver;
   AbstractMeshPtr _attachedMesh;
   Color3 _boundingBoxColor;
-  unique_ptr_t<SixDofDragBehavior> _dragBehavior;
+  std::unique_ptr<SixDofDragBehavior> _dragBehavior;
 
 }; // end of class GizmoManager
 

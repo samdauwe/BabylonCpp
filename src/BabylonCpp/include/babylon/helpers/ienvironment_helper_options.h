@@ -1,12 +1,15 @@
 #ifndef BABYLON_HELPERS_IENVIRONMENT_HELPER_OPTIONS_H
 #define BABYLON_HELPERS_IENVIRONMENT_HELPER_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/variant.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 /**
  * @brief Represents the different options available during the creation of a
@@ -35,7 +38,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
    *
    * Remarks: Can be either a texture or a url.
    */
-  Variant<string_t, BaseTexture*> groundTexture;
+  Variant<std::string, BaseTexture*> groundTexture;
 
   /**
    * The color mixed in the ground texture by default.
@@ -131,7 +134,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
    *
    * Remarks: Can be either a texture or a url.
    */
-  Variant<string_t, BaseTexturePtr> skyboxTexture;
+  Variant<std::string, BaseTexturePtr> skyboxTexture;
 
   /**
    * The color mixed in the skybox texture by default.
@@ -169,7 +172,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
    *
    * Remarks: Can be either a texture or a url.
    */
-  Variant<string_t, BaseTexturePtr> environmentTexture;
+  Variant<std::string, BaseTexturePtr> environmentTexture;
 
   /**
    * The value of the exposure to apply to the scene.

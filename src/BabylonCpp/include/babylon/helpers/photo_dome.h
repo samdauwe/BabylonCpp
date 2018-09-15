@@ -1,10 +1,18 @@
 #ifndef BABYLON_HELPERS_PHOTO_DOME_H
 #define BABYLON_HELPERS_PHOTO_DOME_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/transform_node.h>
 
 namespace BABYLON {
+
+class BackgroundMaterial;
+class Mesh;
+struct PhotoDomeOptions;
+class Texture;
+using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
+using MeshPtr               = std::shared_ptr<Mesh>;
+using TexturePtr            = std::shared_ptr<Texture>;
 
 /**
  * @brief Display a 360 degree photo on an approximately spherical surface,
@@ -28,9 +36,9 @@ public:
    * @param onError defines a callback called when an error occured while
    * loading the texture
    */
-  PhotoDome(string_t name, const string_t& urlOfPhoto, PhotoDomeOptions options,
-            Scene* scene,
-            const ::std::function<void(const string_t& message)>& onError
+  PhotoDome(std::string name, const std::string& urlOfPhoto,
+            PhotoDomeOptions options, Scene* scene,
+            const ::std::function<void(const std::string& message)>& onError
             = nullptr);
   ~PhotoDome() override;
 
@@ -78,7 +86,7 @@ public:
   /**
    * Observable raised when an error occured while loading the 360 image
    */
-  Observable<string_t> onLoadErrorObservable;
+  Observable<std::string> onLoadErrorObservable;
 
   /**
    * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults

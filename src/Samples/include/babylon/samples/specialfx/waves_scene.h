@@ -1,11 +1,13 @@
 #ifndef BABYLON_SAMPLES_SPECIAL_FX_WAVES_SCENE_H
 #define BABYLON_SAMPLES_SPECIAL_FX_WAVES_SCENE_H
 
+#include <babylon/babylon_common.h>
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
 
 class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 namespace Samples {
 

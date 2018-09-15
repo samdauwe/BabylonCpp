@@ -4,6 +4,12 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class FreeCamera;
+class ShaderMaterial;
+using FreeCameraPtr     = std::shared_ptr<FreeCamera>;
+using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
+
 namespace Samples {
 
 /**

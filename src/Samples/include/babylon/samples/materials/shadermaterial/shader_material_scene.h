@@ -4,6 +4,14 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class ArcRotateCamera;
+class Mesh;
+class ShaderMaterial;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+using MeshPtr            = std::shared_ptr<Mesh>;
+using ShaderMaterialPtr  = std::shared_ptr<ShaderMaterial>;
+
 namespace Samples {
 
 class ShaderMaterialScene : public IRenderableScene {

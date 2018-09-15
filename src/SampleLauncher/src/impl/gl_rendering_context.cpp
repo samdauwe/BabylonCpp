@@ -375,21 +375,21 @@ void GLRenderingContext::clear(GLbitfield mask)
 }
 
 void GLRenderingContext::clearBufferfv(GLenum buffer, GLint drawbuffer,
-                                       const vector_t<GLfloat>& values,
+                                       const std::vector<GLfloat>& values,
                                        GLint /*srcOffset*/)
 {
   glClearBufferfv(buffer, drawbuffer, values.data());
 }
 
 void GLRenderingContext::clearBufferiv(GLenum buffer, GLint drawbuffer,
-                                       const vector_t<GLint>& values,
+                                       const std::vector<GLint>& values,
                                        GLint /*srcOffset*/)
 {
   glClearBufferiv(buffer, drawbuffer, values.data());
 }
 
 void GLRenderingContext::clearBufferuiv(GLenum buffer, GLint drawbuffer,
-                                        const vector_t<GLuint>& values,
+                                        const std::vector<GLuint>& values,
                                         GLint /*srcOffset*/)
 {
   glClearBufferuiv(buffer, drawbuffer, values.data());

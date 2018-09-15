@@ -1,7 +1,8 @@
 #ifndef BABYLON_TOOLS_ROLLING_AVERAGE_H
 #define BABYLON_TOOLS_ROLLING_AVERAGE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 
@@ -18,7 +19,7 @@ public:
    * @brief Constructor
    * @param length The number of samples required to saturate the sliding window
    */
-  RollingAverage(std::size_t length);
+  RollingAverage(size_t length);
   ~RollingAverage();
 
   /**
@@ -34,7 +35,7 @@ public:
    * and 1 for the value before that
    * @return Value previously recorded with add() or null if outside of range
    */
-  float history(std::size_t i) const;
+  float history(size_t i) const;
 
   /**
    * @brief Returns true if enough samples have been taken to completely fill

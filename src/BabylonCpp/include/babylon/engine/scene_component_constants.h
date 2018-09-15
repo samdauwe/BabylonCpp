@@ -1,7 +1,7 @@
 #ifndef BABYLON_ENGINE_SCENE_COMPONENT_CONSTANTS_H
 #define BABYLON_ENGINE_SCENE_COMPONENT_CONSTANTS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_WEB_VR_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_WEB_VR_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/extended_gamepad_button.h>
 #include <babylon/gamepad/controllers/pose_enabled_controller.h>
 #include <babylon/gamepad/gamepad_button_changes.h>
@@ -9,6 +9,8 @@
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class Scene;
 
 /**
  * @brief Defines the WebVRController object that represents controllers tracked
@@ -22,7 +24,7 @@ public:
    * @param vrGamepad the gamepad that the WebVRController should be created
    * from
    */
-  WebVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  WebVRController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
   ~WebVRController() override;
 
   /**
@@ -68,8 +70,8 @@ protected:
     = 0;
 
 private:
-  void _setButtonValue(nullable_t<ExtendedGamepadButton> newState,
-                       const nullable_t<ExtendedGamepadButton>& currentState,
+  void _setButtonValue(std::optional<ExtendedGamepadButton> newState,
+                       const std::optional<ExtendedGamepadButton>& currentState,
                        unsigned int buttonIndex);
   GamepadButtonChanges&
   _checkChanges(const ExtendedGamepadButton& newState,
@@ -111,7 +113,7 @@ public:
    * 'left' or 'right', see
    * https://w3c.github.io/gamepad/extensions.html#gamepadhand-enum
    */
-  string_t hand;
+  std::string hand;
 
   /**
    * The default controller model for the controller
@@ -127,7 +129,7 @@ protected:
   /**
    * Array of button availible on the controller
    */
-  vector_t<ExtendedGamepadButton> _buttons;
+  std::vector<ExtendedGamepadButton> _buttons;
 
 private:
   ::std::function<void(int controlledIndex, unsigned int buttonIndex,

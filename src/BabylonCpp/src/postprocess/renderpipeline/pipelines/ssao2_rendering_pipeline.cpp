@@ -1,5 +1,6 @@
 #include <babylon/postprocess/renderpipeline/pipelines/ssao2_rendering_pipeline.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>

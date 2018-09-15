@@ -1,5 +1,7 @@
 #include <babylon/gamepad/controllers/mutable_gamepad_button.h>
 
+#include <sstream>
+
 namespace BABYLON {
 
 MutableGamepadButton::MutableGamepadButton()
@@ -53,7 +55,7 @@ MutableGamepadButton::~MutableGamepadButton()
 {
 }
 
-string_t MutableGamepadButton::toString() const
+std::string MutableGamepadButton::toString() const
 {
   std::ostringstream oss;
   oss << *this;

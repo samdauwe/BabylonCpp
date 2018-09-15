@@ -1,11 +1,13 @@
 #ifndef BABYLON_GIZMOS_POSITION_GIZMO_H
 #define BABYLON_GIZMOS_POSITION_GIZMO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
+
+class AxisDragGizmo;
 
 /**
  * @brief Gizmo that enables dragging a mesh along 3 axis.
@@ -17,7 +19,7 @@ public:
    * @brief Creates a PositionGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
-  PositionGizmo(const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer
+  PositionGizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer());
   ~PositionGizmo() override;
 
@@ -50,17 +52,17 @@ public:
   /**
    * Internal gizmo used for interactions on the x axis
    */
-  unique_ptr_t<AxisDragGizmo> xGizmo;
+  std::unique_ptr<AxisDragGizmo> xGizmo;
 
   /**
    * Internal gizmo used for interactions on the y axis
    */
-  unique_ptr_t<AxisDragGizmo> yGizmo;
+  std::unique_ptr<AxisDragGizmo> yGizmo;
 
   /**
    * Internal gizmo used for interactions on the z axis
    */
-  unique_ptr_t<AxisDragGizmo> zGizmo;
+  std::unique_ptr<AxisDragGizmo> zGizmo;
 
   /**
    * Drag distance in babylon units that the gizmo will snap to when dragged

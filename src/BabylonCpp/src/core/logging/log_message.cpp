@@ -2,17 +2,18 @@
 #include <babylon/core/time.h>
 
 #include <cstdarg>
+#include <thread>
 
 namespace BABYLON {
 
-LogMessage::LogMessage(unsigned int lvl, const string_t& ctx)
+LogMessage::LogMessage(unsigned int lvl, const std::string& ctx)
     : _level{lvl}, _context{ctx}
 {
   // Set timestamp
   _timestamp = Time::systemTimepointNow();
   // Set thread id
   std::ostringstream ss;
-  ss << ::std::hex << ::std::this_thread::get_id();
+  ss << std::hex << std::this_thread::get_id();
   _threadId = ss.str();
 }
 
@@ -31,7 +32,7 @@ LogMessage::LogMessage(const LogMessage& otherLogMessage)
 
 LogMessage::LogMessage(LogMessage&& otherLogMessage)
 {
-  *this = ::std::move(otherLogMessage);
+  *this = std::move(otherLogMessage);
 }
 
 LogMessage& LogMessage::operator=(const LogMessage& otherLogMessage)
@@ -55,14 +56,14 @@ LogMessage& LogMessage::operator=(const LogMessage& otherLogMessage)
 LogMessage& LogMessage::operator=(LogMessage&& otherLogMessage)
 {
   if (&otherLogMessage != this) {
-    _level          = ::std::move(otherLogMessage._level);
-    _timestamp      = ::std::move(otherLogMessage._timestamp);
-    _file           = ::std::move(otherLogMessage._file);
-    _lineNumber     = ::std::move(otherLogMessage._lineNumber);
-    _threadId       = ::std::move(otherLogMessage._threadId);
-    _context        = ::std::move(otherLogMessage._context);
-    _function       = ::std::move(otherLogMessage._function);
-    _prettyFunction = ::std::move(otherLogMessage._prettyFunction);
+    _level          = std::move(otherLogMessage._level);
+    _timestamp      = std::move(otherLogMessage._timestamp);
+    _file           = std::move(otherLogMessage._file);
+    _lineNumber     = std::move(otherLogMessage._lineNumber);
+    _threadId       = std::move(otherLogMessage._threadId);
+    _context        = std::move(otherLogMessage._context);
+    _function       = std::move(otherLogMessage._function);
+    _prettyFunction = std::move(otherLogMessage._prettyFunction);
     _oss.clear();
     _oss << otherLogMessage._oss.str();
     otherLogMessage._oss.clear();
@@ -78,7 +79,7 @@ LogMessage::~LogMessage()
 std::ostream& operator<<(std::ostream& os, const LogMessage& logMessage)
 {
   os << '[' << Time::toIso8601Ms(logMessage.timestamp()) << "] "
-     << "[" << ::std::setw(5) << LogLevels::ToReadableLevel(logMessage.level())
+     << "[" << std::setw(5) << LogLevels::ToReadableLevel(logMessage.level())
      << "] "
      << "[" << logMessage.context() << "::" << logMessage.function() << "] "
      << "| " << logMessage.message();
@@ -89,7 +90,7 @@ std::ostream& operator<<(std::ostream& os, const LogMessage& logMessage)
   return os;
 }
 
-string_t LogMessage::toString() const
+std::string LogMessage::toString() const
 {
   std::ostringstream oss;
   oss << *this;
@@ -117,19 +118,19 @@ system_time_point_t LogMessage::timestamp() const
   return _timestamp;
 }
 
-string_t LogMessage::getReadableTimestamp() const
+std::string LogMessage::getReadableTimestamp() const
 {
   return Time::toIso8601Ms(_timestamp);
 }
 
-string_t const& LogMessage::file() const
+std::string const& LogMessage::file() const
 {
   return _file;
 }
 
 void LogMessage::setFile(char const* file)
 {
-  _file = string_t(file);
+  _file = std::string(file);
 }
 
 int const& LogMessage::lineNumber() const
@@ -142,27 +143,27 @@ void LogMessage::setLineNumber(int lineNumber)
   _lineNumber = lineNumber;
 }
 
-string_t const& LogMessage::threadId() const
+std::string const& LogMessage::threadId() const
 {
   return _threadId;
 }
 
-string_t const& LogMessage::context() const
+std::string const& LogMessage::context() const
 {
   return _context;
 }
 
-string_t const& LogMessage::function() const
+std::string const& LogMessage::function() const
 {
   return _function;
 }
 
 void LogMessage::setFunction(char const* func)
 {
-  _function = string_t(func);
+  _function = std::string(func);
 }
 
-string_t const& LogMessage::prettyFunction() const
+std::string const& LogMessage::prettyFunction() const
 {
   return _prettyFunction;
 }
@@ -172,7 +173,7 @@ void LogMessage::setPrettyFunction(char const* prettyFunc)
   _prettyFunction = prettify(prettyFunc);
 }
 
-string_t LogMessage::message() const
+std::string LogMessage::message() const
 {
   return _oss.str();
 }
@@ -184,8 +185,8 @@ string_t LogMessage::message() const
  */
 void LogMessage::writef(const char* printf_like_message, ...)
 {
-  static const int kMaxMessageSize            = 2048;
-  static const string_t kTruncatedWarningText = "[...truncated...]";
+  static const int kMaxMessageSize               = 2048;
+  static const std::string kTruncatedWarningText = "[...truncated...]";
   char finished_message[kMaxMessageSize];
   va_list arglist;
   va_start(arglist, printf_like_message);
@@ -204,7 +205,7 @@ void LogMessage::writef(const char* printf_like_message, ...)
   if (nbrcharacters <= 0) {
     _oss << "\n\tERROR LOG MSG NOTIFICATION: Failure to parse successfully "
             "the message";
-    _oss << '"' << printf_like_message << '"' << ::std::endl;
+    _oss << '"' << printf_like_message << '"' << std::endl;
   }
   else if (nbrcharacters > kMaxMessageSize) {
     _oss << finished_message << kTruncatedWarningText;
@@ -214,7 +215,7 @@ void LogMessage::writef(const char* printf_like_message, ...)
   }
 }
 
-string_t LogMessage::prettify(char const* pretty_func)
+std::string LogMessage::prettify(char const* pretty_func)
 {
   auto paren     = pretty_func;
   auto c         = pretty_func;

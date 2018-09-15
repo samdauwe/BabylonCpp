@@ -1,9 +1,14 @@
 #ifndef BABYLON_ENGINE_ISCENE_COMPONENT_H
 #define BABYLON_ENGINE_ISCENE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Scene;
 
 /**
  * @brief This represents a scene component.
@@ -17,7 +22,7 @@ struct BABYLON_SHARED_EXPORT ISceneComponent
   /**
    * @brief The name of the component. Each component must have a unique name.
    */
-  string_t name;
+  std::string name;
 
   /**
    * @brief The scene the component belongs to.

@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_GENERIC_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_GENERIC_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
 namespace BABYLON {
@@ -27,7 +27,7 @@ public:
    * @brief Creates a new GenericController from a gamepad.
    * @param vrGamepad the gamepad that the controller should be created from
    */
-  GenericController(const shared_ptr_t<IBrowserGamepad>& vrGamepad);
+  GenericController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
   ~GenericController() override;
 
   /**

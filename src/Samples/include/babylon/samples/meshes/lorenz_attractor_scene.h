@@ -4,6 +4,10 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class LinesMesh;
+using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+
 namespace Samples {
 
 class LorenzAttractorScene : public IRenderableScene {

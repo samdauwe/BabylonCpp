@@ -16,15 +16,11 @@
 // C Standard General Utilities Library
 #include <stdlib.h>
 
-// Condition variable
-#include <condition_variable>
-
 // Containers library
 #include <array>
 #include <map>
 #include <queue>
 #include <set>
-#include <stack>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -32,17 +28,6 @@
 
 // Dynamic memory management
 #include <memory>
-#include <new>
-
-// Error handling
-#include <exception>
-
-// Input/output library
-#include <fstream>
-#include <iomanip>
-#include <ios>
-#include <iosfwd>
-#include <sstream>
 
 // Numerics library
 #include <cmath>
@@ -54,16 +39,8 @@
 // Function objects
 #include <functional>
 
-// Pseudo-random number generation
-#include <random>
-
 // Regular expressions library
 #include <regex>
-
-// Thread support
-#include <future>
-#include <mutex>
-#include <thread>
 
 // Time functions
 #include <chrono>
@@ -158,13 +135,6 @@ template <class charT,
 using basic_string_t = ::std::basic_string<charT, traits, Alloc>;
 
 using string_t = ::std::basic_string<char>;
-
-// -- Thread support library -- //
-using condition_variable_t = ::std::condition_variable;
-using mutex_t              = ::std::mutex;
-template <class T>
-using promise_t = ::std::promise<T>;
-using thread_t  = ::std::thread;
 
 // -- Utilities library -- //
 template <size_t N>

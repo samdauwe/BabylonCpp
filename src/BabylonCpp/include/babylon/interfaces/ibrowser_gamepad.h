@@ -1,7 +1,7 @@
 #ifndef BABYLON_INTERFACES_IBROWSER_GAMEPAD_H
 #define BABYLON_INTERFACES_IBROWSER_GAMEPAD_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/gamepad_pose.h>
 
 namespace BABYLON {
@@ -17,12 +17,12 @@ struct IGamepadButton {
 class BABYLON_SHARED_EXPORT IBrowserGamepad {
 
 public:
-  string_t id;
-  string_t hand;
+  std::string id;
+  std::string hand;
   int index;
   Float32Array axes;
-  vector_t<IGamepadButton> buttons;
-  nullable_t<GamepadPose> pose;
+  std::vector<IGamepadButton> buttons;
+  std::optional<GamepadPose> pose;
 
 }; // end of class IBrowserGamepad
 

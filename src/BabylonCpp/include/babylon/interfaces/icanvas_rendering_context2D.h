@@ -3,7 +3,8 @@
 
 #include <iostream>
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/core/structs.h>
 #include <babylon/math/isize.h>
 
 namespace BABYLON {
@@ -11,19 +12,19 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ICanvasRenderingContext2D {
 
 public:
-  string_t fillStyle;
-  string_t font;
+  std::string fillStyle;
+  std::string font;
   void fillRect(int x, int y, int width, int height)
   {
     ::std::cout << x << ", " << y << ", ";
     ::std::cout << width << ", " << height << ", " << '\n';
   }
-  void fillText(const string_t& text, int x, int y)
+  void fillText(const std::string& text, int x, int y)
   {
     ::std::cout << x << ", " << y << ", ";
     ::std::cout << text << ", " << '\n';
   }
-  ISize measureText(const string_t& text)
+  ISize measureText(const std::string& text)
   {
     ::std::cout << text << ", " << '\n';
     return ISize(0, 0);

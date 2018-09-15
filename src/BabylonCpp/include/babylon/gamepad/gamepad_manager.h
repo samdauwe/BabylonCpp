@@ -1,12 +1,14 @@
 #ifndef BABYLON_GAMEPAD_GAMEPAD_MANAGER_H
 #define BABYLON_GAMEPAD_GAMEPAD_MANAGER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/gamepad/gamepad.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class Scene;
 
 class BABYLON_SHARED_EXPORT GamepadManager {
 
@@ -36,7 +38,7 @@ public:
 private:
   Scene* _scene;
 
-  vector_t<shared_ptr_t<Gamepad>> _babylonGamepads;
+  std::vector<std::shared_ptr<Gamepad>> _babylonGamepads;
   bool _oneGamepadConnected;
 
   bool _gamepadEventSupported;

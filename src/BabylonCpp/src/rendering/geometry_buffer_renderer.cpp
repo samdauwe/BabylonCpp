@@ -1,5 +1,6 @@
 #include <babylon/rendering/geometry_buffer_renderer.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>

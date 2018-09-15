@@ -1,13 +1,15 @@
 #ifndef BABYLON_INSTRUMENTATION_ENGINE_INSTRUMENTATION_H
 #define BABYLON_INSTRUMENTATION_ENGINE_INSTRUMENTATION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/instrumentation/_time_token.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observer.h>
 #include <babylon/tools/perf_counter.h>
 
 namespace BABYLON {
+
+class Engine;
 
 /**
  * @brief This class can be used to get instrumentation data from a Babylon
@@ -81,7 +83,7 @@ private:
   Engine* _engine;
 
   bool _captureGPUFrameTime = false;
-  nullable_t<_TimeToken> _gpuFrameTimeToken;
+  std::optional<_TimeToken> _gpuFrameTimeToken;
   PerfCounter _gpuFrameTime;
 
   bool _captureShaderCompilationTime;

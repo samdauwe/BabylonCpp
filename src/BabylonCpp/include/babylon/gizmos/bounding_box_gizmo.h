@@ -1,7 +1,7 @@
 #ifndef BABYLON_GIZMOS_BOUNDING_BOX_GIZMO_H
 #define BABYLON_GIZMOS_BOUNDING_BOX_GIZMO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/math/color3.h>
@@ -11,6 +11,11 @@
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class Node;
+class UtilityLayerRenderer;
+using NodePtr                 = std::shared_ptr<Node>;
+using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 /**
  * @brief Bounding box gizmo.
@@ -24,7 +29,7 @@ public:
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
   BoundingBoxGizmo(const Color3& color = Color3::Gray(),
-                   const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer
+                   const UtilityLayerRendererPtr& gizmoLayer
                    = UtilityLayerRenderer::DefaultUtilityLayer());
   ~BoundingBoxGizmo() override;
 
@@ -38,7 +43,7 @@ public:
    * others.
    * @param axis The list of axis that should be enabled (eg. "xy" or "xyz")
    */
-  void setEnabledRotationAxis(const string_t axis);
+  void setEnabledRotationAxis(const std::string axis);
 
   /**
    * @brief Disposes of the gizmo.
@@ -124,7 +129,7 @@ public:
    * object with scale from the opposite corner. 0.5,0.5,0.5 for center and
    * 0.5,0,0.5 for bottom (Default: null)
    */
-  nullable_t<Vector3> scalePivot;
+  std::optional<Vector3> scalePivot;
 
 private:
   AbstractMeshPtr _lineBoundingBox;

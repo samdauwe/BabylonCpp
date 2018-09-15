@@ -4,6 +4,11 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class Mesh;
+class Vector3;
+using MeshPtr = std::shared_ptr<Mesh>;
+
 namespace Samples {
 
 class SuperEllipsoidScene : public IRenderableScene {

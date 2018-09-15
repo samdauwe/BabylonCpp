@@ -1,10 +1,27 @@
 #ifndef BABYLON_ENGINE_ISCENE_SERIALIZABLE_COMPONENT_H
 #define BABYLON_ENGINE_ISCENE_SERIALIZABLE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class AbstractScene;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief This represents a SERIALIZABLE scene component.

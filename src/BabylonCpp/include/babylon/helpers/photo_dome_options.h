@@ -1,14 +1,16 @@
 #ifndef BABYLON_HELPERS_PHOTO_DOME_OPTIONS_H
 #define BABYLON_HELPERS_PHOTO_DOME_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <optional>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT PhotoDomeOptions {
-  nullable_t<unsigned int> resolution = nullopt_t;
-  nullable_t<unsigned int> size       = nullopt_t;
-  nullable_t<bool> useDirectMapping   = nullopt_t;
+  std::optional<unsigned int> resolution = std::nullopt;
+  std::optional<unsigned int> size       = std::nullopt;
+  std::optional<bool> useDirectMapping   = std::nullopt;
 }; // end of struct PhotoDomeOptions
 
 } // end of namespace BABYLON

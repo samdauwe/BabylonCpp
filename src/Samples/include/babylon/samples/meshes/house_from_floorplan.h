@@ -7,6 +7,10 @@
 #include <babylon/math/vector4.h>
 
 namespace BABYLON {
+
+class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
+
 namespace Samples {
 
 struct Door {
@@ -36,8 +40,8 @@ struct WindowSpace {
 
 struct Wall {
   Vector3 corner;
-  vector_t<DoorSpace> doorSpaces;
-  vector_t<WindowSpace> windowSpaces;
+  std::vector<DoorSpace> doorSpaces;
+  std::vector<WindowSpace> windowSpaces;
 }; // end of struct Wall
 
 struct WallData {
@@ -70,7 +74,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  MeshPtr buildFromPlan(vector_t<Wall>& walls, float ply, float height,
+  MeshPtr buildFromPlan(std::vector<Wall>& walls, float ply, float height,
                         BuildFromPlanOptions& options, Scene* scene);
 
 private:

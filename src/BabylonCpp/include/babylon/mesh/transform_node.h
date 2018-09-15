@@ -1,10 +1,12 @@
 #ifndef BABYLON_MESH_TRANSFORM_NODE_H
 #define BABYLON_MESH_TRANSFORM_NODE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/node.h>
 
 namespace BABYLON {
+
+class Bone;
 
 /**
  * @brief TransformNode class.
@@ -40,7 +42,7 @@ public:
   static constexpr unsigned int BILLBOARDMODE_ALL = 7;
 
 public:
-  TransformNode(const string_t& name, Scene* scene = nullptr,
+  TransformNode(const std::string& name, Scene* scene = nullptr,
                 bool isPure = true);
   ~TransformNode() override;
 
@@ -50,7 +52,7 @@ public:
    * @brief Gets a string identifying the name of the class.
    * @returns "TransformNode" string
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Returns the latest update of the World matrix.
@@ -86,7 +88,7 @@ public:
    */
   void _initCache() override;
 
-  TransformNode& markAsDirty(const string_t& property) override;
+  TransformNode& markAsDirty(const std::string& property) override;
 
   /**
    * @brief Sets a new matrix to apply before all other transformation
@@ -139,7 +141,7 @@ public:
    * @returns the TransformNode.
    */
   TransformNode&
-  setAbsolutePosition(const nullable_t<Vector3>& absolutePosition);
+  setAbsolutePosition(const std::optional<Vector3>& absolutePosition);
 
   /**
    * @brief Sets the mesh position in its local space.
@@ -341,7 +343,7 @@ public:
    * @param doNotCloneChildren Do not clone children hierarchy
    * @returns the new transform node
    */
-  TransformNodePtr clone(const string_t& name, Node* newParent,
+  TransformNodePtr clone(const std::string& name, Node* newParent,
                          bool doNotCloneChildren = false);
 
   Json::object serialize(Json::object& currentSerializationObject);
@@ -354,7 +356,7 @@ public:
    * `delayLoadingFile` property with
    */
   static TransformNodePtr Parse(const Json::value& parsedTransformNode,
-                                Scene* scene, const string_t& rootUrl);
+                                Scene* scene, const std::string& rootUrl);
 
   /**
    * @brief Releases resources associated with this transform node.
@@ -411,8 +413,8 @@ protected:
    * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
    * 0.0)
    */
-  nullable_t<Quaternion>& get_rotationQuaternion();
-  void set_rotationQuaternion(const nullable_t<Quaternion>& quaternion);
+  std::optional<Quaternion>& get_rotationQuaternion();
+  void set_rotationQuaternion(const std::optional<Quaternion>& quaternion);
 
   /**
    * @brief The forward direction of that transform in world space.
@@ -475,9 +477,9 @@ public:
 
   // Cache
   /** Hidden */
-  unique_ptr_t<Matrix> _poseMatrix;
+  std::unique_ptr<Matrix> _poseMatrix;
   /** Hidden */
-  unique_ptr_t<Matrix> _worldMatrix;
+  std::unique_ptr<Matrix> _worldMatrix;
   /** Hidden */
   float _worldMatrixDeterminant;
 
@@ -507,7 +509,7 @@ public:
    * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
    * 0.0)
    */
-  Property<TransformNode, nullable_t<Quaternion>> rotationQuaternion;
+  Property<TransformNode, std::optional<Quaternion>> rotationQuaternion;
 
   /**
    * @brief The forward direction of that transform in world space.
@@ -557,8 +559,8 @@ protected:
   Observable<TransformNode> onAfterWorldMatrixUpdateObservable;
 
 private:
-  static unique_ptr_t<Vector3> _lookAtVectorCache;
-  static unique_ptr_t<Quaternion> _rotationAxisCache;
+  static std::unique_ptr<Vector3> _lookAtVectorCache;
+  static std::unique_ptr<Quaternion> _rotationAxisCache;
 
 private:
   Vector3 _forward;
@@ -573,12 +575,12 @@ private:
   // Properties
   Vector3 _position;
   Vector3 _rotation;
-  nullable_t<Quaternion> _rotationQuaternion;
+  std::optional<Quaternion> _rotationQuaternion;
   TransformNode* _transformToBoneReferal;
   Matrix _localWorld;
   Vector3 _absolutePosition;
   Matrix _pivotMatrix;
-  unique_ptr_t<Matrix> _pivotMatrixInverse;
+  std::unique_ptr<Matrix> _pivotMatrixInverse;
   bool _postMultiplyPivotMatrix;
   bool _nonUniformScaling;
 

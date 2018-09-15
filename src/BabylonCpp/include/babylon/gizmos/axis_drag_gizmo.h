@@ -1,7 +1,7 @@
 #ifndef BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
 #define BABYLON_GIZMOS_AXIS_DRAG_GIZMO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/math/color3.h>
@@ -9,6 +9,8 @@
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class PointerDragBehavior;
 
 /**
  * @brief Single axis drag gizmo.
@@ -23,7 +25,7 @@ public:
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
   AxisDragGizmo(const Vector3& dragAxis, const Color3& color = Color3::Gray(),
-                const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer
+                const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer());
   ~AxisDragGizmo() override;
 
@@ -40,7 +42,7 @@ public:
   /**
    * Drag behavior responsible for the gizmos dragging interactions
    */
-  unique_ptr_t<PointerDragBehavior> _dragBehavior;
+  std::unique_ptr<PointerDragBehavior> _dragBehavior;
 
   /**
    * Drag distance in babylon units that the gizmo will snap to when dragged

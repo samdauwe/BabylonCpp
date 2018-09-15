@@ -2,6 +2,7 @@
 
 #include <babylon/actions/action.h>
 #include <babylon/actions/action_event.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>

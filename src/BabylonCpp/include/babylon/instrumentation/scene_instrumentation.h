@@ -1,12 +1,15 @@
 #ifndef BABYLON_INSTRUMENTATION_SCENE_INSTRUMENTATION_H
 #define BABYLON_INSTRUMENTATION_SCENE_INSTRUMENTATION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observer.h>
 #include <babylon/tools/perf_counter.h>
 
 namespace BABYLON {
+
+class Camera;
+class Scene;
 
 /**
  * @brief This class can be used to get instrumentation data from a Babylon

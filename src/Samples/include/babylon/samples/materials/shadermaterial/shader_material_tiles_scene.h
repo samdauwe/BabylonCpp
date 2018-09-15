@@ -5,6 +5,10 @@
 #include <babylon/math/vector2.h>
 
 namespace BABYLON {
+
+class ShaderMaterial;
+using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
+
 namespace Samples {
 
 class ShaderMaterialTilesScene : public IRenderableScene {

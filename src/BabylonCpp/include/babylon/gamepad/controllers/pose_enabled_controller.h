@@ -1,12 +1,17 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_POSE_ENABLED_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_POSE_ENABLED_CONTROLLER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/vr/pose_controlled.h>
 #include <babylon/gamepad/generic_pad.h>
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Ray;
+class TargetCamera;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief Defines the types of pose enabled controllers that are supported.
@@ -48,7 +53,7 @@ public:
    * @param browserGamepad the gamepad that the PoseEnabledController should be
    * created from
    */
-  PoseEnabledController(const shared_ptr_t<IBrowserGamepad>& browserGamepad);
+  PoseEnabledController(const std::shared_ptr<IBrowserGamepad>& browserGamepad);
   ~PoseEnabledController() override;
 
   /**

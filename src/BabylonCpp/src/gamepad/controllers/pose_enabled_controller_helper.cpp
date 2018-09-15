@@ -12,7 +12,7 @@
 namespace BABYLON {
 
 WebVRController* PoseEnabledControllerHelper::InitiateController(
-  const shared_ptr_t<IBrowserGamepad>& vrGamepad)
+  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
 {
   // Oculus Touch
   if (String::contains(vrGamepad->id, "Oculus Touch")) {

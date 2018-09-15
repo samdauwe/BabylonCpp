@@ -5,6 +5,9 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+
 namespace Extensions {
 class CrowdSimulation;
 }

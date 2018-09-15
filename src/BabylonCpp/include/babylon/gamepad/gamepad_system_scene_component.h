@@ -1,11 +1,15 @@
 #ifndef BABYLON_GAMEPAD_GAMEPAD_SYSTEM_SCENE_COMPONENT_POSE_H
 #define BABYLON_GAMEPAD_GAMEPAD_SYSTEM_SCENE_COMPONENT_POSE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
 namespace BABYLON {
+
+class GamepadSystemSceneComponent;
+using GamepadSystemSceneComponentPtr
+  = std::shared_ptr<GamepadSystemSceneComponent>;
 
 /**
  * @brief Defines the gamepad scene component responsible to manage gamepads in
@@ -25,7 +29,7 @@ public:
   template <typename... Ts>
   static GamepadSystemSceneComponentPtr New(Ts&&... args)
   {
-    return shared_ptr_t<GamepadSystemSceneComponent>(
+    return std::shared_ptr<GamepadSystemSceneComponent>(
       new GamepadSystemSceneComponent(::std::forward<Ts>(args)...));
   }
   virtual ~GamepadSystemSceneComponent();

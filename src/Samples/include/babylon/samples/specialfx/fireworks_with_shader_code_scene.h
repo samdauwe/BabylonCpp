@@ -4,6 +4,10 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class ShaderMaterial;
+using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
+
 namespace Samples {
 
 /**

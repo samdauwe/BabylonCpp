@@ -1,7 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_EXTENDED_GAMEPAD_BUTTON_H
 #define BABYLON_GAMEPAD_CONTROLLERS_EXTENDED_GAMEPAD_BUTTON_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/mutable_gamepad_button.h>
 
 namespace BABYLON {

@@ -6,7 +6,11 @@
 namespace BABYLON {
 
 class ArcRotateCamera;
+class Mesh;
 class PointLight;
+using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+using MeshPtr            = std::shared_ptr<Mesh>;
+using PointLightPtr      = std::shared_ptr<PointLight>;
 
 namespace Samples {
 

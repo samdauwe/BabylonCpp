@@ -1,11 +1,13 @@
 #ifndef BABYLON_GIZMOS_SCALE_GIZMO_H
 #define BABYLON_GIZMOS_SCALE_GIZMO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
+
+class AxisScaleGizmo;
 
 /**
  * @brief Gizmo that enables scaling a mesh along 3 axis.
@@ -17,7 +19,7 @@ public:
    * @brief Creates a ScaleGizmo
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
-  ScaleGizmo(const shared_ptr_t<UtilityLayerRenderer>& gizmoLayer
+  ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
              = UtilityLayerRenderer::DefaultUtilityLayer());
   ~ScaleGizmo() override;
 
@@ -40,22 +42,22 @@ public:
   /**
    * Internal gizmo used for interactions on the x axis
    */
-  unique_ptr_t<AxisScaleGizmo> xGizmo;
+  std::unique_ptr<AxisScaleGizmo> xGizmo;
 
   /**
    * Internal gizmo used for interactions on the y axis
    */
-  unique_ptr_t<AxisScaleGizmo> yGizmo;
+  std::unique_ptr<AxisScaleGizmo> yGizmo;
 
   /**
    * Internal gizmo used for interactions on the z axis
    */
-  unique_ptr_t<AxisScaleGizmo> zGizmo;
+  std::unique_ptr<AxisScaleGizmo> zGizmo;
 
   /**
    * Internal gizmo used to scale all axis equally
    */
-  unique_ptr_t<AxisScaleGizmo> _uniformGizmo;
+  std::unique_ptr<AxisScaleGizmo> _uniformGizmo;
 
   /**
    * Drag distance in babylon units that the gizmo will snap to when dragged

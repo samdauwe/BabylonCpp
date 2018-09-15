@@ -4,6 +4,12 @@
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
+
+class Mesh;
+class PointLight;
+using MeshPtr       = std::shared_ptr<Mesh>;
+using PointLightPtr = std::shared_ptr<PointLight>;
+
 namespace Samples {
 
 /**

@@ -1,11 +1,14 @@
 #ifndef BABYLON_GAMEPAD_XBOX_360_PAD_H
 #define BABYLON_GAMEPAD_XBOX_360_PAD_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/gamepad/gamepad.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class IBrowserGamepad;
 
 /**
  * @brief Defines a XBox360 gamepad.
@@ -61,8 +64,8 @@ public:
    * @param gamepad defines the internal HTML gamepad object
    * @param xboxOne defines if it is a XBox One gamepad
    */
-  Xbox360Pad(const string_t& id, int index,
-             const shared_ptr_t<IBrowserGamepad>& gamepad,
+  Xbox360Pad(const std::string& id, int index,
+             const std::shared_ptr<IBrowserGamepad>& gamepad,
              bool xboxOne = false);
   ~Xbox360Pad() override;
 

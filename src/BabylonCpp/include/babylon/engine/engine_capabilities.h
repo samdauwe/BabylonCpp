@@ -1,7 +1,7 @@
 #ifndef BABYLON_ENGINE_ENGINE_CAPABILITIES_H
 #define BABYLON_ENGINE_ENGINE_CAPABILITIES_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {
@@ -49,7 +49,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   /** Defines if standard derivates (dx/dy) are supported */
   bool standardDerivatives;
   /** Defines if s3tc texture compression is supported */
-  nullable_t<GL::WEBGL_compressed_texture_s3tc> s3tc;
+  std::optional<GL::WEBGL_compressed_texture_s3tc> s3tc;
   /** Defines if pvrtc texture compression is supported */
   GL::any pvrtc; // WEBGL_compressed_texture_pvrtc;
   /** Defines if etc1 texture compression is supported */
@@ -65,7 +65,7 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   /**
    * Gets the webgl extension for anisotropic filtering (null if not supported)
    */
-  nullable_t<GL::EXT_texture_filter_anisotropic>
+  std::optional<GL::EXT_texture_filter_anisotropic>
     textureAnisotropicFilterExtension;
   /** Gets the maximum level of anisotropy supported */
   unsigned int maxAnisotropy;

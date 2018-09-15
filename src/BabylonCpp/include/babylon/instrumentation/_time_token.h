@@ -1,7 +1,11 @@
 #ifndef BABYLON_INSTRUMENTATION_TIME_TOKEN_H
 #define BABYLON_INSTRUMENTATION_TIME_TOKEN_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+
+namespace GL {
+class IGLQuery;
+} // end of namespace GL
 
 namespace BABYLON {
 
