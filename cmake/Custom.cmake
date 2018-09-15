@@ -48,6 +48,19 @@ macro(display test desc summary)
   endif()
 endmacro()
 
+# Appends `str` to the variable named `var` with a whitespace as separator.
+# Suppresses a leading whitespace if the variable is empty and does nothing if
+# `str` is empty.
+function(build_string var str)
+  if(NOT str STREQUAL "")
+    if("${${var}}" STREQUAL "")
+      set("${var}" "${str}" PARENT_SCOPE)
+    else()
+      set("${var}" "${${var}} ${str}" PARENT_SCOPE)
+    endif()
+  endif()
+endfunction(build_string)
+
 # Copy single files
 macro(copy_resource_files files)
     foreach(file ${files})
