@@ -33,10 +33,10 @@ void CameraTab::_buildTree()
 
   // Get all cameras from the first scene.
   _cameras.clear();
-  for (const auto& camera : scene->cameras) {
+  /*for (const auto& camera : scene->cameras) {
     _cameras.emplace_back(TreeItem<CameraAdapter>{
       *this, ::std::make_unique<CameraAdapter>(camera)});
-  }
+  }*/
 
   // Set initialized flag
   _isInitialized = true;

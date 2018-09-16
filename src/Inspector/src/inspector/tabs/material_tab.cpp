@@ -33,10 +33,10 @@ void MaterialTab::_buildTree()
 
   // Get all materials from the first scene.
   _materials.clear();
-  for (const auto& mat : scene->materials) {
+  /*for (const auto& mat : scene->materials) {
     _materials.emplace_back(TreeItem<MaterialAdapter>{
       *this, ::std::make_unique<MaterialAdapter>(mat)});
-  }
+  }*/
 
   // Set initialized flag
   _isInitialized = true;
