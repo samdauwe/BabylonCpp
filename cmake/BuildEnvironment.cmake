@@ -78,6 +78,20 @@ if("${CMAKE_OUTPUT_PATH}" STREQUAL "")
   set(CMAKE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/cmake")
 endif()
 
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+  # First for the generic no-config case (e.g. with mingw)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/bin)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/lib)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/lib)
+  # Second, for multi-config builds (e.g. msvc)
+  foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
+      string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG )
+      set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/build/bin)
+      set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/build/lib)
+      set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/build/lib)
+  endforeach( OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES )
+endif()
+
 # Set runtime path
 set(CMAKE_SKIP_BUILD_RPATH            FALSE) # Add absolute path to all dependencies for BUILD
 set(CMAKE_BUILD_WITH_INSTALL_RPATH    FALSE) # Use CMAKE_INSTALL_RPATH for INSTALL

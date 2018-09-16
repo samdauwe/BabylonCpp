@@ -6,24 +6,24 @@
 namespace BABYLON {
 namespace Samples {
 
-using IRenderableScenePtr = ::std::unique_ptr<IRenderableScene>;
-using FactoryMethod = ::std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
-using Sample        = ::std::tuple<bool, FactoryMethod>;
+using IRenderableScenePtr = std::unique_ptr<IRenderableScene>;
+using FactoryMethod = std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
+using Sample        = std::tuple<bool, FactoryMethod>;
 
-class BABYLON_SHARED_EXPORT _ISamplesIndex {
+class _ISamplesIndex {
 
 public:
+  _ISamplesIndex();
+  ~_ISamplesIndex();
+
   /**
    * @brief Returns the list with example.
    * @return the list with example
    */
-  const ::std::unordered_map<string_t, Sample>& samples() const
-  {
-    return _samples;
-  }
+  const std::unordered_map<string_t, Sample>& samples() const;
 
 protected:
-  ::std::unordered_map<string_t, Sample> _samples;
+  std::unordered_map<string_t, Sample> _samples;
 
 }; // end of struct _SamplesIndex
 

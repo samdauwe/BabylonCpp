@@ -7,7 +7,7 @@
 namespace BABYLON {
 namespace Samples {
 
-class BABYLON_SHARED_EXPORT _MeshesSamplesIndex : public _ISamplesIndex {
+class _MeshesSamplesIndex : public _ISamplesIndex {
 
 public:
   /**

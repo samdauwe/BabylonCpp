@@ -7,8 +7,7 @@
 namespace BABYLON {
 namespace Samples {
 
-class BABYLON_SHARED_EXPORT _ProceduralTexturesLibrarySamplesIndex
-    : public _ISamplesIndex {
+class _ProceduralTexturesLibrarySamplesIndex : public _ISamplesIndex {
 
 public:
   /**
