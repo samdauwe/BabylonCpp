@@ -34,10 +34,10 @@ SkyMaterial::SkyMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["skyVertexShader"] = skyVertexShader;
+  Effect::ShadersStore()["skyVertexShader"] = skyVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["skyPixelShader"] = skyPixelShader;
+  Effect::ShadersStore()["skyPixelShader"] = skyPixelShader;
 }
 
 SkyMaterial::~SkyMaterial()

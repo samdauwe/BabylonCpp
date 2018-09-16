@@ -23,10 +23,10 @@ ShaderMaterialCloudsScene::ShaderMaterialCloudsScene(ICanvas* iCanvas)
     , _startTime{Time::unixtimeInMs()}
 {
   // Vertex shader
-  Effect::ShadersStore["cloudVertexShader"] = cloudVertexShader;
+  Effect::ShadersStore()["cloudVertexShader"] = cloudVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["cloudFragmentShader"] = cloudFragmentShader;
+  Effect::ShadersStore()["cloudFragmentShader"] = cloudFragmentShader;
 }
 
 ShaderMaterialCloudsScene::~ShaderMaterialCloudsScene()

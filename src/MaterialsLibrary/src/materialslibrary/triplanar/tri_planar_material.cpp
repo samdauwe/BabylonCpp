@@ -57,10 +57,10 @@ TriPlanarMaterial::TriPlanarMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["triPlanarVertexShader"] = triPlanarVertexShader;
+  Effect::ShadersStore()["triPlanarVertexShader"] = triPlanarVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["triPlanarPixelShader"] = triPlanarPixelShader;
+  Effect::ShadersStore()["triPlanarPixelShader"] = triPlanarPixelShader;
 }
 
 TriPlanarMaterial::~TriPlanarMaterial()

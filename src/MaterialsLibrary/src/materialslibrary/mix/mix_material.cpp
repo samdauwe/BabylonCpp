@@ -57,10 +57,10 @@ MixMaterial::MixMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["mixVertexShader"] = mixVertexShader;
+  Effect::ShadersStore()["mixVertexShader"] = mixVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["mixPixelShader"] = mixPixelShader;
+  Effect::ShadersStore()["mixPixelShader"] = mixPixelShader;
 }
 
 MixMaterial::~MixMaterial()

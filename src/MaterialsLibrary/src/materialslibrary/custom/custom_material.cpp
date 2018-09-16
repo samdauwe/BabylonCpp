@@ -107,7 +107,7 @@ string_t CustomMaterial::Builder(const string_t& /*shaderName*/,
                          (!CustomParts.Vertex_Before_NormalUpdated.empty() ?
                             CustomParts.Vertex_Before_NormalUpdated :
                             ""));
-  Effect::ShadersStore[name + "VertexShader"] = _VertexShader;
+  Effect::ShadersStore()[name + "VertexShader"] = _VertexShader;
 
   // #define CUSTOM_VERTEX_MAIN_END
 
@@ -139,7 +139,7 @@ string_t CustomMaterial::Builder(const string_t& /*shaderName*/,
                          (!CustomParts.Fragment_Before_FragColor.empty() ?
                             CustomParts.Fragment_Before_FragColor :
                             ""));
-  Effect::ShadersStore[name + "PixelShader"] = _FragmentShader;
+  Effect::ShadersStore()[name + "PixelShader"] = _FragmentShader;
 
   // #define CUSTOM_FRAGMENT_BEFORE_LIGHTS
 

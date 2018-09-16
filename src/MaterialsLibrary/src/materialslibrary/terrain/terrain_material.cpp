@@ -55,10 +55,10 @@ TerrainMaterial::TerrainMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["terrainVertexShader"] = terrainVertexShader;
+  Effect::ShadersStore()["terrainVertexShader"] = terrainVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["terrainPixelShader"] = terrainPixelShader;
+  Effect::ShadersStore()["terrainPixelShader"] = terrainPixelShader;
 }
 
 TerrainMaterial::~TerrainMaterial()

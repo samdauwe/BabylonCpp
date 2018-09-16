@@ -35,10 +35,10 @@ SimpleMaterial::SimpleMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["simpleVertexShader"] = simpleVertexShader;
+  Effect::ShadersStore()["simpleVertexShader"] = simpleVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["simplePixelShader"] = simplePixelShader;
+  Effect::ShadersStore()["simplePixelShader"] = simplePixelShader;
 }
 
 SimpleMaterial::~SimpleMaterial()

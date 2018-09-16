@@ -10,9 +10,6 @@ namespace Samples {
 class BABYLON_SHARED_EXPORT _ProceduralTexturesLibrarySamplesIndex
     : public _ISamplesIndex {
 
-private:
-  static constexpr const char* _CategoryName = "Procedural Textures Library";
-
 public:
   /**
    * @brief Returns the category name.
@@ -20,7 +17,7 @@ public:
    */
   static const string_t CategoryName()
   {
-    return _ProceduralTexturesLibrarySamplesIndex::_CategoryName;
+    return "Procedural Textures Library";
   }
 
 public:

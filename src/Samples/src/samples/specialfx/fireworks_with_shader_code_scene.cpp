@@ -19,10 +19,10 @@ FireworksWithShaderCodeScene::FireworksWithShaderCodeScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _time{0.f}, _shaderMaterial{nullptr}
 {
   // Vertex shader
-  Effect::ShadersStore["customVertexShader"] = customVertexShader;
+  Effect::ShadersStore()["customVertexShader"] = customVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["customFragmentShader"] = customFragmentShader;
+  Effect::ShadersStore()["customFragmentShader"] = customFragmentShader;
 }
 
 FireworksWithShaderCodeScene::~FireworksWithShaderCodeScene()

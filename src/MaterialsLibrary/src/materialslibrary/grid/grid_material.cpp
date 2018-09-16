@@ -32,10 +32,10 @@ GridMaterial::GridMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["gridVertexShader"] = gridVertexShader;
+  Effect::ShadersStore()["gridVertexShader"] = gridVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["gridPixelShader"] = gridPixelShader;
+  Effect::ShadersStore()["gridPixelShader"] = gridPixelShader;
 }
 
 GridMaterial::~GridMaterial()

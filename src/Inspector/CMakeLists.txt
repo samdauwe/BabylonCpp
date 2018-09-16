@@ -68,6 +68,9 @@ file(GLOB_RECURSE INSPECTOR_HDR_FILES   ${INCLUDE_PATH}/*.h)
 
 set(BABYLON_INSPECTOR_HEADERS
     ${INSPECTOR_HDR_FILES}
+    ${IMGUI_INCLUDE_DIRS}/imgui.h
+    ${IMGUI_INCLUDE_DIRS}/imconfig.h
+    ${IMGUI_INCLUDE_DIRS}/imgui_internal.h
 )
 
 # Source files
@@ -78,6 +81,7 @@ set(BABYLON_INSPECTOR_SOURCES
     ${IMGUI_SOURCE_DIRS}/imgui.cpp
     ${IMGUI_SOURCE_DIRS}/imgui_draw.cpp
     ${IMGUI_SOURCE_DIRS}/imgui_demo.cpp
+    ${IMGUI_SOURCE_DIRS}/imgui_widgets.cpp
 )
 
 # Group source files

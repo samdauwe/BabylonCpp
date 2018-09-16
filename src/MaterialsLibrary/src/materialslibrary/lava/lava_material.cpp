@@ -45,10 +45,10 @@ LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["lavaVertexShader"] = lavaVertexShader;
+  Effect::ShadersStore()["lavaVertexShader"] = lavaVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["lavaPixelShader"] = lavaPixelShader;
+  Effect::ShadersStore()["lavaPixelShader"] = lavaPixelShader;
 }
 
 LavaMaterial::~LavaMaterial()

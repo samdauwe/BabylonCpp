@@ -3,11 +3,11 @@
 
 #include <babylon/babylon_api.h>
 
+namespace BABYLON {
+
 namespace GL {
 class IGLQuery;
 } // end of namespace GL
-
-namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT _TimeToken {
   GL::IGLQuery* _startTimeQuery   = nullptr;

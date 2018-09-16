@@ -9,9 +9,6 @@ namespace Samples {
 
 class BABYLON_SHARED_EXPORT _MeshesSamplesIndex : public _ISamplesIndex {
 
-private:
-  static constexpr const char* _CategoryName = "Meshes";
-
 public:
   /**
    * @brief Returns the category name.
@@ -19,7 +16,7 @@ public:
    */
   static const string_t CategoryName()
   {
-    return _MeshesSamplesIndex::_CategoryName;
+    return "Meshes";
   }
 
 public:

@@ -39,10 +39,10 @@ CellMaterial::CellMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["cellVertexShader"] = cellVertexShader;
+  Effect::ShadersStore()["cellVertexShader"] = cellVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["cellPixelShader"] = cellPixelShader;
+  Effect::ShadersStore()["cellPixelShader"] = cellPixelShader;
 }
 
 CellMaterial::~CellMaterial()

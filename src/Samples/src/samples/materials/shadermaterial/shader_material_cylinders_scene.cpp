@@ -16,26 +16,26 @@ ShaderMaterialCylindersScene::ShaderMaterialCylindersScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _time{0.f}
 {
   // Vertex shaders
-  Effect::ShadersStore["custom1VertexShader"] = customVertexShader;
-  Effect::ShadersStore["custom2VertexShader"] = customVertexShader;
-  Effect::ShadersStore["custom3VertexShader"] = customVertexShader;
-  Effect::ShadersStore["custom4VertexShader"] = customVertexShader;
-  Effect::ShadersStore["custom5VertexShader"] = customVertexShader;
-  Effect::ShadersStore["custom6VertexShader"] = customVertexShader;
-  Effect::ShadersStore["custom7VertexShader"] = customVertexShader;
-  Effect::ShadersStore["custom8VertexShader"] = customVertexShader;
-  Effect::ShadersStore["custom9VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom1VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom2VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom3VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom4VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom5VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom6VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom7VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom8VertexShader"] = customVertexShader;
+  Effect::ShadersStore()["custom9VertexShader"] = customVertexShader;
 
   // Fragment shaders
-  Effect::ShadersStore["custom1FragmentShader"] = custom1FragmentShader;
-  Effect::ShadersStore["custom2FragmentShader"] = custom2FragmentShader;
-  Effect::ShadersStore["custom3FragmentShader"] = custom3FragmentShader;
-  Effect::ShadersStore["custom4FragmentShader"] = custom4FragmentShader;
-  Effect::ShadersStore["custom5FragmentShader"] = custom5FragmentShader;
-  Effect::ShadersStore["custom6FragmentShader"] = custom6FragmentShader;
-  Effect::ShadersStore["custom7FragmentShader"] = custom7FragmentShader;
-  Effect::ShadersStore["custom8FragmentShader"] = custom8FragmentShader;
-  Effect::ShadersStore["custom9FragmentShader"] = custom9FragmentShader;
+  Effect::ShadersStore()["custom1FragmentShader"] = custom1FragmentShader;
+  Effect::ShadersStore()["custom2FragmentShader"] = custom2FragmentShader;
+  Effect::ShadersStore()["custom3FragmentShader"] = custom3FragmentShader;
+  Effect::ShadersStore()["custom4FragmentShader"] = custom4FragmentShader;
+  Effect::ShadersStore()["custom5FragmentShader"] = custom5FragmentShader;
+  Effect::ShadersStore()["custom6FragmentShader"] = custom6FragmentShader;
+  Effect::ShadersStore()["custom7FragmentShader"] = custom7FragmentShader;
+  Effect::ShadersStore()["custom8FragmentShader"] = custom8FragmentShader;
+  Effect::ShadersStore()["custom9FragmentShader"] = custom9FragmentShader;
 }
 
 ShaderMaterialCylindersScene::~ShaderMaterialCylindersScene()

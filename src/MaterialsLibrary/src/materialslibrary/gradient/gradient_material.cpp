@@ -34,10 +34,10 @@ GradientMaterial::GradientMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["gradientVertexShader"] = gradientVertexShader;
+  Effect::ShadersStore()["gradientVertexShader"] = gradientVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["gradientPixelShader"] = gradientPixelShader;
+  Effect::ShadersStore()["gradientPixelShader"] = gradientPixelShader;
 }
 
 GradientMaterial::~GradientMaterial()

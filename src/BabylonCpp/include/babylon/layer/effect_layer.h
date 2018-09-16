@@ -10,10 +10,6 @@
 #include <babylon/math/size.h>
 #include <babylon/tools/observable.h>
 
-namespace GL {
-class IGLBuffer;
-} // end of namespace GL
-
 namespace picojson {
 class value;
 typedef std::vector<value> array;
@@ -38,6 +34,10 @@ using MaterialPtr            = std::shared_ptr<Material>;
 using MeshPtr                = std::shared_ptr<Mesh>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 namespace Json {
 typedef picojson::value value;

@@ -14,10 +14,10 @@ ShaderMaterialSkyboxScene::ShaderMaterialSkyboxScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas), _shaderMaterial{nullptr}
 {
   // Vertex shader
-  Effect::ShadersStore["gradientVertexShader"] = gradientVertexShader;
+  Effect::ShadersStore()["gradientVertexShader"] = gradientVertexShader;
 
   // Pixel (Fragment) Shader
-  Effect::ShadersStore["gradientFragmentShader"] = gradientPixelShader;
+  Effect::ShadersStore()["gradientFragmentShader"] = gradientPixelShader;
 }
 
 ShaderMaterialSkyboxScene::~ShaderMaterialSkyboxScene()

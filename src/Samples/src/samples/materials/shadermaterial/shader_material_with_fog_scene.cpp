@@ -15,10 +15,10 @@ ShaderMaterialWithFogScene::ShaderMaterialWithFogScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
 {
   // Vertex shader
-  Effect::ShadersStore["customVertexShader"] = customVertexShader;
+  Effect::ShadersStore()["customVertexShader"] = customVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["customFragmentShader"] = customFragmentShader;
+  Effect::ShadersStore()["customFragmentShader"] = customFragmentShader;
 }
 
 ShaderMaterialWithFogScene::~ShaderMaterialWithFogScene()

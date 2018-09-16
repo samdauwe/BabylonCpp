@@ -1,11 +1,34 @@
 #ifndef BABYLON_MATERIALS_EFFECT_H
 #define BABYLON_MATERIALS_EFFECT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+class Color3;
+class Color4;
+struct EffectCreationOptions;
+class EffectFallbacks;
+class Engine;
+class InternalTexture;
+class Matrix;
+class PostProcess;
+class RenderTargetTexture;
+class Vector2;
+class Vector3;
+class Vector4;
+using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+
+namespace GL {
+class IGLBuffer;
+class IGLProgram;
+class IGLUniformLocation;
+} // end of namespace GL
 
 /**
  * @brief Effect containing vertex and fragment shader that can be executed on
@@ -19,13 +42,13 @@ public:
   /**
    * Store of each shader (The can be looked up using effect.key)
    */
-  static unordered_map_t<string_t, string_t>& ShadersStore;
+  static std::unordered_map<std::string, std::string>& ShadersStore();
 
   /**
    * Store of each included file for a shader (The can be looked up using
    * effect.key)
    */
-  static unordered_map_t<string_t, string_t>& IncludesShadersStore;
+  static std::unordered_map<std::string, std::string>& IncludesShadersStore();
 
 public:
   /**
@@ -48,9 +71,9 @@ public:
    * @param indexParameters Parameters to be used with Babylons include syntax
    * to iterate over an array (eg. {lights: 10})
    */
-  Effect(const string_t& baseName, EffectCreationOptions& options,
+  Effect(const std::string& baseName, EffectCreationOptions& options,
          Engine* engine);
-  Effect(const unordered_map_t<string_t, string_t>& baseName,
+  Effect(const std::unordered_map<std::string, std::string>& baseName,
          EffectCreationOptions& options, Engine* engine);
   ~Effect();
 
@@ -59,7 +82,7 @@ public:
   /**
    * Unique key for this effect
    */
-  string_t key() const;
+  std::string key() const;
 
   /**
    * @brief If the effect has been compiled and prepared.
@@ -83,7 +106,7 @@ public:
    * @brief The set of names of attribute variables for the shader.
    * @returns An array of attribute names.
    */
-  vector_t<string_t>& getAttributesNames();
+  std::vector<std::string>& getAttributesNames();
 
   /**
    * @brief Returns the attribute at the given index.
@@ -97,7 +120,7 @@ public:
    * @param name of the attribute to look up.
    * @returns the attribute location.
    */
-  int getAttributeLocationByName(const string_t& name);
+  int getAttributeLocationByName(const std::string& name);
 
   /**
    * @brief The number of attributes.
@@ -110,26 +133,26 @@ public:
    * @param uniformName of the uniform to look up.
    * @returns the index.
    */
-  int getUniformIndex(const string_t& uniformName);
+  int getUniformIndex(const std::string& uniformName);
 
   /**
    * @brief Returns the attribute based on the name of the variable.
    * @param uniformName of the uniform to look up.
    * @returns the location of the uniform.
    */
-  GL::IGLUniformLocation* getUniform(const string_t& uniformName);
+  GL::IGLUniformLocation* getUniform(const std::string& uniformName);
 
   /**
    * @brief Returns an array of sampler variable names
    * @returns The array of sampler variable neames.
    */
-  vector_t<string_t>& getSamplers();
+  std::vector<std::string>& getSamplers();
 
   /**
    * @brief The error from the last compilation.
    * @returns the error string.
    */
-  string_t getCompilationError();
+  std::string getCompilationError();
 
   /** Methods **/
 
@@ -144,21 +167,21 @@ public:
    * @brief Hidden
    */
   void
-  _loadVertexShader(const string_t& vertex,
-                    const ::std::function<void(const string_t&)>& callback);
+  _loadVertexShader(const std::string& vertex,
+                    const ::std::function<void(const std::string&)>& callback);
 
   /**
    * @brief Hidden
    */
-  void
-  _loadFragmentShader(const string_t& fragment,
-                      const ::std::function<void(const string_t&)>& callback);
+  void _loadFragmentShader(
+    const std::string& fragment,
+    const ::std::function<void(const std::string&)>& callback);
 
   /**
    * @brief Hidden
    */
-  void _dumpShadersSource(string_t vertexCode, string_t fragmentCode,
-                          string_t defines);
+  void _dumpShadersSource(std::string vertexCode, std::string fragmentCode,
+                          std::string defines);
 
   /**
    * @brief Recompiles the webGL program
@@ -169,17 +192,17 @@ public:
    * Hidden
    */
   void _rebuildProgram(
-    const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
+    const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
     const ::std::function<void(GL::IGLProgram* program)>& onCompiled,
-    const ::std::function<void(const string_t& message)>& onError);
+    const ::std::function<void(const std::string& message)>& onError);
 
   /**
    * @brief Gets the uniform locations of the the specified variable names
    * @param names THe names of the variables to lookup.
    * @returns Array of locations in the same order as variable names.
    */
-  unordered_map_t<string_t, unique_ptr_t<GL::IGLUniformLocation>>
-  getSpecificUniformLocations(const vector_t<string_t>& names);
+  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
+  getSpecificUniformLocations(const std::vector<std::string>& names);
 
   /**
    * @brief Prepares the effect
@@ -199,14 +222,14 @@ public:
    * @param texture Texture to bind.
    * Hidden
    */
-  void _bindTexture(const string_t& channel, InternalTexture* texture);
+  void _bindTexture(const std::string& channel, InternalTexture* texture);
 
   /**
    * @brief Sets a texture on the engine to be used in the shader.
    * @param channel Name of the sampler variable.
    * @param texture Texture to set.
    */
-  void setTexture(const string_t& channel, const BaseTexturePtr& texture);
+  void setTexture(const std::string& channel, const BaseTexturePtr& texture);
 
   /**
    * @brief Sets a depth stencil texture from a render target on the engine to
@@ -214,7 +237,7 @@ public:
    * @param channel Name of the sampler variable.
    * @param texture Texture to set.
    */
-  void setDepthStencilTexture(const string_t& channel,
+  void setDepthStencilTexture(const std::string& channel,
                               const RenderTargetTexturePtr& texture);
 
   /**
@@ -222,8 +245,8 @@ public:
    * @param channel Name of the variable.
    * @param textures Textures to set.
    */
-  void setTextureArray(const string_t& channel,
-                       const vector_t<BaseTexturePtr>& textures);
+  void setTextureArray(const std::string& channel,
+                       const std::vector<BaseTexturePtr>& textures);
 
   /**
    * @brief Sets a texture to be the input of the specified post process. (To
@@ -231,7 +254,7 @@ public:
    * @param channel Name of the sampler variable.
    * @param postProcess Post process to get the input texture from.
    */
-  void setTextureFromPostProcess(const string_t& channel,
+  void setTextureFromPostProcess(const std::string& channel,
                                  PostProcess* postProcess);
 
   /**
@@ -242,13 +265,13 @@ public:
    * @param channel Name of the sampler variable.
    * @param postProcess Post process to get the output texture from.
    */
-  void setTextureFromPostProcessOutput(const string_t& channel,
+  void setTextureFromPostProcessOutput(const std::string& channel,
                                        PostProcess* postProcess);
 
-  bool _cacheMatrix(const string_t& uniformName, const Matrix& matrix);
-  bool _cacheFloat2(const string_t& uniformName, float x, float y);
-  bool _cacheFloat3(const string_t& uniformName, float x, float y, float z);
-  bool _cacheFloat4(const string_t& uniformName, float x, float y, float z,
+  bool _cacheMatrix(const std::string& uniformName, const Matrix& matrix);
+  bool _cacheFloat2(const std::string& uniformName, float x, float y);
+  bool _cacheFloat3(const std::string& uniformName, float x, float y, float z);
+  bool _cacheFloat4(const std::string& uniformName, float x, float y, float z,
                     float w);
 
   /**
@@ -256,14 +279,14 @@ public:
    * @param buffer Buffer to bind.
    * @param name Name of the uniform variable to bind to.
    */
-  void bindUniformBuffer(GL::IGLBuffer* _buffer, const string_t& name);
+  void bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& name);
 
   /**
    * @brief Binds block to a uniform.
    * @param blockName Name of the block to bind.
    * @param index Index to bind.
    */
-  void bindUniformBlock(const string_t& blockName, unsigned index);
+  void bindUniformBlock(const std::string& blockName, unsigned index);
 
   /**
    * @brief Sets an interger value on a uniform variable.
@@ -271,7 +294,7 @@ public:
    * @param value Value to be set.
    * @returns this effect.
    */
-  Effect& setInt(const string_t& uniformName, int value);
+  Effect& setInt(const std::string& uniformName, int value);
 
   /**
    * @brief Sets an int array on a uniform variable.
@@ -279,7 +302,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setIntArray(const string_t& uniformName, const Int32Array& array);
+  Effect& setIntArray(const std::string& uniformName, const Int32Array& array);
 
   /**
    * @brief Sets an int array 2 on a uniform variable. (Array is specified as
@@ -288,7 +311,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setIntArray2(const string_t& uniformName, const Int32Array& array);
+  Effect& setIntArray2(const std::string& uniformName, const Int32Array& array);
 
   /**
    * @brief Sets an int array 3 on a uniform variable. (Array is specified as
@@ -298,7 +321,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setIntArray3(const string_t& uniformName, const Int32Array& array);
+  Effect& setIntArray3(const std::string& uniformName, const Int32Array& array);
 
   /**
    * @brief Sets an int array 4 on a uniform variable. (Array is specified as
@@ -308,7 +331,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setIntArray4(const string_t& uniformName, const Int32Array& array);
+  Effect& setIntArray4(const std::string& uniformName, const Int32Array& array);
 
   /**
    * @brief Sets an float array on a uniform variable.
@@ -316,7 +339,8 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setFloatArray(const string_t& uniformName, const Float32Array& array);
+  Effect& setFloatArray(const std::string& uniformName,
+                        const Float32Array& array);
 
   /**
    * @brief Sets an float array 2 on a uniform variable. (Array is specified as
@@ -325,7 +349,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setFloatArray2(const string_t& uniformName,
+  Effect& setFloatArray2(const std::string& uniformName,
                          const Float32Array& array);
 
   /**
@@ -336,7 +360,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setFloatArray3(const string_t& uniformName,
+  Effect& setFloatArray3(const std::string& uniformName,
                          const Float32Array& array);
 
   /**
@@ -347,7 +371,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setFloatArray4(const string_t& uniformName,
+  Effect& setFloatArray4(const std::string& uniformName,
                          const Float32Array& array);
 
   /**
@@ -356,7 +380,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setArray(const string_t& uniformName, Float32Array array);
+  Effect& setArray(const std::string& uniformName, Float32Array array);
 
   /**
    * @brief Sets an array 2 on a uniform variable. (Array is specified as single
@@ -365,7 +389,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setArray2(const string_t& uniformName, Float32Array array);
+  Effect& setArray2(const std::string& uniformName, Float32Array array);
 
   /**
    * @brief Sets an array 3 on a uniform variable. (Array is specified as single
@@ -374,7 +398,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setArray3(const string_t& uniformName, Float32Array array);
+  Effect& setArray3(const std::string& uniformName, Float32Array array);
 
   /**
    * @brief Sets an array 4 on a uniform variable. (Array is specified as single
@@ -384,7 +408,7 @@ public:
    * @param array array to be set.
    * @returns this effect.
    */
-  Effect& setArray4(const string_t& uniformName, Float32Array array);
+  Effect& setArray4(const std::string& uniformName, Float32Array array);
 
   /**
    * @brief Sets matrices on a uniform variable.
@@ -392,7 +416,7 @@ public:
    * @param matrices matrices to be set.
    * @returns this effect.
    */
-  Effect& setMatrices(const string_t& uniformName, Float32Array matrices);
+  Effect& setMatrices(const std::string& uniformName, Float32Array matrices);
 
   /**
    * @brief Sets matrix on a uniform variable.
@@ -400,7 +424,7 @@ public:
    * @param matrix matrix to be set.
    * @returns this effect.
    */
-  Effect& setMatrix(const string_t& uniformName, const Matrix& matrix);
+  Effect& setMatrix(const std::string& uniformName, const Matrix& matrix);
 
   /**
    * @brief Sets a 3x3 matrix on a uniform variable. (Speicified as
@@ -409,7 +433,8 @@ public:
    * @param matrix matrix to be set.
    * @returns this effect.
    */
-  Effect& setMatrix3x3(const string_t& uniformName, const Float32Array& matrix);
+  Effect& setMatrix3x3(const std::string& uniformName,
+                       const Float32Array& matrix);
 
   /**
    * @brief Sets a 2x2 matrix on a uniform variable. (Speicified as [1,2,3,4]
@@ -418,7 +443,8 @@ public:
    * @param matrix matrix to be set.
    * @returns this effect.
    */
-  Effect& setMatrix2x2(const string_t& uniformName, const Float32Array& matrix);
+  Effect& setMatrix2x2(const std::string& uniformName,
+                       const Float32Array& matrix);
 
   /**
    * @brief Sets a float on a uniform variable.
@@ -426,7 +452,7 @@ public:
    * @param value value to be set.
    * @returns this effect.
    */
-  Effect& setFloat(const string_t& uniformName, float value);
+  Effect& setFloat(const std::string& uniformName, float value);
 
   /**
    * @brief Sets a boolean on a uniform variable.
@@ -434,7 +460,7 @@ public:
    * @param bool value to be set.
    * @returns this effect.
    */
-  Effect& setBool(const string_t& uniformName, bool _bool);
+  Effect& setBool(const std::string& uniformName, bool _bool);
 
   /**
    * @brief Sets a Vector2 on a uniform variable.
@@ -442,7 +468,7 @@ public:
    * @param vector2 vector2 to be set.
    * @returns this effect.
    */
-  Effect& setVector2(const string_t& uniformName, const Vector2& vector2);
+  Effect& setVector2(const std::string& uniformName, const Vector2& vector2);
 
   /**
    * @brief Sets a float2 on a uniform variable.
@@ -451,7 +477,7 @@ public:
    * @param y Second float in float2.
    * @returns this effect.
    */
-  Effect& setFloat2(const string_t& uniformName, float x, float y);
+  Effect& setFloat2(const std::string& uniformName, float x, float y);
 
   /**
    * @brief Sets a Vector3 on a uniform variable.
@@ -459,7 +485,7 @@ public:
    * @param vector3 Value to be set.
    * @returns this effect.
    */
-  Effect& setVector3(const string_t& uniformName, const Vector3& vector3);
+  Effect& setVector3(const std::string& uniformName, const Vector3& vector3);
 
   /**
    * @brief Sets a float3 on a uniform variable.
@@ -469,7 +495,7 @@ public:
    * @param z Third float in float3.
    * @returns this effect.
    */
-  Effect& setFloat3(const string_t& uniformName, float x, float y, float z);
+  Effect& setFloat3(const std::string& uniformName, float x, float y, float z);
 
   /**
    * @brief Sets a Vector4 on a uniform variable.
@@ -477,7 +503,7 @@ public:
    * @param vector4 Value to be set.
    * @returns this effect.
    */
-  Effect& setVector4(const string_t& uniformName, const Vector4& vector4);
+  Effect& setVector4(const std::string& uniformName, const Vector4& vector4);
 
   /**
    * @brief Sets a float4 on a uniform variable.
@@ -488,7 +514,7 @@ public:
    * @param w Fourth float in float4.
    * @returns this effect.
    */
-  Effect& setFloat4(const string_t& uniformName, float x, float y, float z,
+  Effect& setFloat4(const std::string& uniformName, float x, float y, float z,
                     float w);
 
   /**
@@ -497,7 +523,7 @@ public:
    * @param color3 Value to be set.
    * @returns this effect.
    */
-  Effect& setColor3(const string_t& uniformName, const Color3& color3);
+  Effect& setColor3(const std::string& uniformName, const Color3& color3);
 
   /**
    * @brief Sets a Color4 on a uniform variable.
@@ -506,7 +532,7 @@ public:
    * @param alpha Alpha value to be set.
    * @returns this effect.
    */
-  Effect& setColor4(const string_t& uniformName, const Color3& color3,
+  Effect& setColor4(const std::string& uniformName, const Color3& color3,
                     float alpha);
 
   /**
@@ -515,7 +541,7 @@ public:
    * @param color4 defines the value to be set
    * @returns this effect.
    */
-  Effect& setDirectColor4(const string_t& uniformName, const Color4& color4);
+  Effect& setDirectColor4(const std::string& uniformName, const Color4& color4);
 
   // Statics
 
@@ -526,9 +552,9 @@ public:
    * @param vertexShader optional vertex shader content
    */
   static void
-  RegisterShader(const string_t& name,
-                 const nullable_t<string_t>& pixelShader  = nullopt_t,
-                 const nullable_t<string_t>& vertexShader = nullopt_t);
+  RegisterShader(const std::string& name,
+                 const std::optional<std::string>& pixelShader  = std::nullopt,
+                 const std::optional<std::string>& vertexShader = std::nullopt);
 
   /**
    * @brief Resets the cache of effects.
@@ -543,22 +569,23 @@ protected:
 
 private:
   void _processShaderConversion(
-    const string_t& sourceCode, bool isFragment,
-    const ::std::function<void(const string_t&)>& callback);
-  void _processIncludes(const string_t& sourceCode,
-                        const ::std::function<void(const string_t&)>& callback);
-  string_t _processPrecision(string_t source);
+    const std::string& sourceCode, bool isFragment,
+    const ::std::function<void(const std::string&)>& callback);
+  void
+  _processIncludes(const std::string& sourceCode,
+                   const ::std::function<void(const std::string&)>& callback);
+  std::string _processPrecision(std::string source);
 
 public:
   /**
    * Name of the effect.
    */
-  string_t name;
+  std::string name;
   /**
    * String container all the define statements that should be set on the
    * shader.
    */
-  string_t defines;
+  std::string defines;
   /**
    * Callback that will be called when the shader is compiled.
    */
@@ -566,7 +593,7 @@ public:
   /**
    * Callback that will be called if an error occurs during shader compilation.
    */
-  ::std::function<void(Effect* effect, const string_t& errors)> onError;
+  ::std::function<void(Effect* effect, const std::string& errors)> onError;
   /**
    * Callback that will be called when effect is bound.
    */
@@ -598,34 +625,35 @@ public:
    * Key for the effect.
    * Hidden
    */
-  string_t _key;
+  std::string _key;
   /**
    * Compiled shader to webGL program.
    * Hidden
    */
-  unique_ptr_t<GL::IGLProgram> _program;
+  std::unique_ptr<GL::IGLProgram> _program;
 
 private:
   Observer<Effect>::Ptr _onCompileObserver;
   static std::size_t _uniqueIdSeed;
   Engine* _engine;
-  unordered_map_t<string_t, unsigned int> _uniformBuffersNames;
-  vector_t<string_t> _uniformsNames;
-  vector_t<string_t> _samplers;
+  std::unordered_map<std::string, unsigned int> _uniformBuffersNames;
+  std::vector<std::string> _uniformsNames;
+  std::vector<std::string> _samplers;
   bool _isReady;
-  string_t _compilationError;
-  vector_t<string_t> _attributesNames;
+  std::string _compilationError;
+  std::vector<std::string> _attributesNames;
   Int32Array _attributes;
-  unordered_map_t<string_t, unique_ptr_t<GL::IGLUniformLocation>> _uniforms;
-  unordered_map_t<string_t, unsigned int> _indexParameters;
-  unique_ptr_t<EffectFallbacks> _fallbacks;
-  string_t _vertexSourceCode;
-  string_t _fragmentSourceCode;
-  string_t _vertexSourceCodeOverride;
-  string_t _fragmentSourceCodeOverride;
-  vector_t<string_t> _transformFeedbackVaryings;
-  unordered_map_t<string_t, Float32Array> _valueCache;
-  static unordered_map_t<unsigned int, GL::IGLBuffer*> _baseCache;
+  std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
+    _uniforms;
+  std::unordered_map<std::string, unsigned int> _indexParameters;
+  std::unique_ptr<EffectFallbacks> _fallbacks;
+  std::string _vertexSourceCode;
+  std::string _fragmentSourceCode;
+  std::string _vertexSourceCodeOverride;
+  std::string _fragmentSourceCodeOverride;
+  std::vector<std::string> _transformFeedbackVaryings;
+  std::unordered_map<std::string, Float32Array> _valueCache;
+  static std::unordered_map<unsigned int, GL::IGLBuffer*> _baseCache;
 
 }; // end of class Effect
 

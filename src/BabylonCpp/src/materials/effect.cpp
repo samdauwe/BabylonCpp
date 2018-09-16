@@ -18,10 +18,15 @@
 
 namespace BABYLON {
 
-unordered_map_t<string_t, string_t>& Effect::ShadersStore
-  = EffectShadersStore().shaders();
-unordered_map_t<string_t, string_t>& Effect::IncludesShadersStore
-  = EffectIncludesShadersStore().shaders();
+unordered_map_t<string_t, string_t>& Effect::ShadersStore()
+{
+  return EffectShadersStore().shaders();
+}
+
+unordered_map_t<string_t, string_t>& Effect::IncludesShadersStore()
+{
+  return EffectIncludesShadersStore().shaders();
+}
 
 std::size_t Effect::_uniqueIdSeed = 0;
 unordered_map_t<unsigned int, GL::IGLBuffer*> Effect::_baseCache{};
@@ -294,9 +299,9 @@ void Effect::_loadVertexShader(
 
   // Is in local store ?
   const string_t vertexShaderName = vertex + "VertexShader";
-  if (stl_util::contains(Effect::ShadersStore, vertexShaderName)) {
+  if (stl_util::contains(Effect::ShadersStore(), vertexShaderName)) {
     const string_t vertexShaderName = vertex + "VertexShader";
-    callback(Effect::ShadersStore[vertexShaderName]);
+    callback(Effect::ShadersStore()[vertexShaderName]);
     return;
   }
 
@@ -327,14 +332,14 @@ void Effect::_loadFragmentShader(
 
   // Is in local store ?
   string_t fragmentShaderName = fragment + "PixelShader";
-  if (stl_util::contains(Effect::ShadersStore, fragmentShaderName)) {
-    callback(Effect::ShadersStore[fragmentShaderName]);
+  if (stl_util::contains(Effect::ShadersStore(), fragmentShaderName)) {
+    callback(Effect::ShadersStore()[fragmentShaderName]);
     return;
   }
 
   fragmentShaderName = fragment + "FragmentShader";
-  if (stl_util::contains(Effect::ShadersStore, fragmentShaderName)) {
-    callback(Effect::ShadersStore[fragmentShaderName]);
+  if (stl_util::contains(Effect::ShadersStore(), fragmentShaderName)) {
+    callback(Effect::ShadersStore()[fragmentShaderName]);
     return;
   }
 
@@ -478,9 +483,9 @@ void Effect::_processIncludes(
       includeFile += "Declaration";
     }
 
-    if (stl_util::contains(Effect::IncludesShadersStore, includeFile)) {
+    if (stl_util::contains(Effect::IncludesShadersStore(), includeFile)) {
       // Substitution
-      string_t includeContent = Effect::IncludesShadersStore[includeFile];
+      string_t includeContent = Effect::IncludesShadersStore()[includeFile];
       if (!match[2].empty()) {
         auto splits = String::split(match[3], ',');
 
@@ -1198,12 +1203,12 @@ void Effect::RegisterShader(const string_t& name,
                             const nullable_t<string_t>& vertexShader)
 {
   if (pixelShader.has_value()) {
-    Effect::ShadersStore[String::concat(name, "PixelShader")]
+    Effect::ShadersStore()[String::concat(name, "PixelShader")]
       = (*pixelShader).c_str();
   }
 
   if (vertexShader) {
-    Effect::ShadersStore[String::concat(name, "VertexShader")]
+    Effect::ShadersStore()[String::concat(name, "VertexShader")]
       = (*vertexShader).c_str();
   }
 }

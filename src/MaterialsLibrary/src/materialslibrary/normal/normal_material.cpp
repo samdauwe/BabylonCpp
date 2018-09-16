@@ -35,10 +35,10 @@ NormalMaterial::NormalMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
 {
   // Vertex shader
-  Effect::ShadersStore["normalVertexShader"] = normalVertexShader;
+  Effect::ShadersStore()["normalVertexShader"] = normalVertexShader;
 
   // Fragment shader
-  Effect::ShadersStore["normalPixelShader"] = normalPixelShader;
+  Effect::ShadersStore()["normalPixelShader"] = normalPixelShader;
 }
 
 NormalMaterial::~NormalMaterial()

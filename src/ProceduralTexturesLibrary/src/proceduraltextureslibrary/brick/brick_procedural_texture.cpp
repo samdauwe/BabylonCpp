@@ -33,7 +33,7 @@ BrickProceduralTexture::BrickProceduralTexture(const std::string& iName,
     , _brickColor{Color3(0.77f, 0.47f, 0.40f)}
 {
   // Fragment shader
-  Effect::ShadersStore["brickProceduralTexturePixelShader"]
+  Effect::ShadersStore()["brickProceduralTexturePixelShader"]
     = brickProceduralTexturePixelShader;
 
   updateShaderUniforms();
