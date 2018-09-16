@@ -8,7 +8,7 @@ namespace Extensions {
 bool ColorStop::operator==(const ColorStop& rhs) const
 {
   return stl_util::almost_equal(u, rhs.u) && stl_util::almost_equal(v, rhs.v)
-         && (color == rhs.color);
+         && (color.equals(rhs.color));
 }
 
 ColorGradient2D::ColorGradient2D(float resolution) : _resolution{resolution}
@@ -137,16 +137,18 @@ NearestNeighbors ColorGradient2D::getNearestNeighbors(float u, float v) const
     }
 
     if (cs.u <= u && cs.v >= v) {
-      if (!hasBottomLeft || (neighbors.bottomLeft.u <= cs.u
-                             && neighbors.bottomLeft.v >= cs.v)) {
+      if (!hasBottomLeft
+          || (neighbors.bottomLeft.u <= cs.u
+              && neighbors.bottomLeft.v >= cs.v)) {
         neighbors.bottomLeft = cs;
         hasBottomLeft        = true;
       }
     }
 
     if (cs.u >= u && cs.v >= v) {
-      if (!hasBottomRight || (neighbors.bottomRight.u >= cs.u
-                              && neighbors.bottomRight.v >= cs.v)) {
+      if (!hasBottomRight
+          || (neighbors.bottomRight.u >= cs.u
+              && neighbors.bottomRight.v >= cs.v)) {
         neighbors.bottomRight = cs;
         hasBottomRight        = true;
       }

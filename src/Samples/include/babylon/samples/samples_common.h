@@ -10,7 +10,7 @@ using IRenderableScenePtr = ::std::unique_ptr<IRenderableScene>;
 using FactoryMethod = ::std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
 using Sample        = ::std::tuple<bool, FactoryMethod>;
 
-class _ISamplesIndex {
+class BABYLON_SHARED_EXPORT _ISamplesIndex {
 
 public:
   /**
