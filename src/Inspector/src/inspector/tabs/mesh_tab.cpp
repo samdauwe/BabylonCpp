@@ -41,7 +41,7 @@ void MeshTab::_buildTree()
     auto node
       = TreeItem<MeshAdapter>{*this, ::std::make_unique<MeshAdapter>(obj)};
 
-    /*if (!descendants.empty()) {
+    if (!descendants.empty()) {
       for (auto& child : descendants) {
         if (child->type() == IReflect::Type::TRANSFORMNODE) {
           if (!Helpers::IsSystemName(child->name)) {
@@ -50,7 +50,7 @@ void MeshTab::_buildTree()
         }
       }
       node.update();
-    }*/
+    }
 
     // Retrieve the root node if the mesh is actually child of another mesh
     // This can hapen if the child mesh has been created before the parent mesh

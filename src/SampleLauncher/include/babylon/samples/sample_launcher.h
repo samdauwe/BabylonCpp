@@ -89,9 +89,11 @@ private:
 private:
   State _sampleLauncherState;
   int _defaultWinResX, _defaultWinResY;
+#ifdef WITH_INSPECTOR
   bool _showInspectorWindow;
   // Inspector
   unique_ptr_t<Inspector> _inspector;
+#endif
   // Other settings
   bool _useOpenGLES;
 

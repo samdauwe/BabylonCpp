@@ -19,6 +19,11 @@ project(${TARGET} C CXX)
 # Print status message
 message(STATUS "App ${TARGET}")
 
+# Inspector
+if (OPTION_BUILD_INSPECTOR)
+    # Set define for usage in source code
+    add_definitions(-DWITH_INSPECTOR)
+endif()
 
 # ============================================================================ #
 #                       Sources                                                #
@@ -58,11 +63,17 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include
     ${CMAKE_CURRENT_BINARY_DIR}/../Extensions/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../Inspector/include
-    ${CMAKE_CURRENT_BINARY_DIR}/../Inspector/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Samples/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+if (OPTION_BUILD_INSPECTOR)
+    target_include_directories(${TARGET}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Inspector/include
+        ${CMAKE_CURRENT_BINARY_DIR}/../Inspector/include
+    )
+endif()
 
 # Libraries
 target_link_libraries(${TARGET}
@@ -70,9 +81,15 @@ target_link_libraries(${TARGET}
     glfw
     ${OPENGL_LIBRARIES}
     BabylonCpp
-    Inspector
     Samples
 )
+
+if (OPTION_BUILD_INSPECTOR)
+    target_link_libraries(${TARGET}
+        PUBLIC
+        Inspector
+    )
+endif()
 
 # On Linux and other Unix platforms that use dlopen(), link with -ldl
 if(NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")

@@ -16,6 +16,7 @@
 
 // Babylon
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/logging.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -23,7 +24,9 @@
 #include <babylon/mesh/abstract_mesh.h>
 
 // Inspector
+#ifdef WITH_INSPECTOR
 #include <babylon/inspector/inspector.h>
+#endif
 
 namespace BABYLON {
 namespace Samples {
@@ -41,7 +44,9 @@ const SampleLauncher::ResolutionSize SampleLauncher::FULL_RESOLUTION_SIZE
   = std::make_pair(0, 0);
 
 static Window _sceneWindow;
+#ifdef WITH_INSPECTOR
 static Window _inspectorWindow;
+#endif
 
 static unordered_map_t<int, string_t>& GetGLFWKeyMap()
 {
@@ -328,9 +333,11 @@ SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
     : _sampleLauncherState{State::UNINITIALIZED}
     , _defaultWinResX{options.size.first}
     , _defaultWinResY{options.size.second}
+#ifdef WITH_INSPECTOR
     , _showInspectorWindow{options.showInspectorWindow}
     , _inspector{nullptr}
-    , _useOpenGLES{false}
+#endif
+, _useOpenGLES{false}
 {
   _sceneWindow                 = Window();
   _sceneWindow.title           = options.title;
@@ -338,8 +345,14 @@ SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
   _sceneWindow.renderCanvas    = std::make_unique<BABYLON::impl::Canvas>();
   _sceneWindow.renderableScene = nullptr;
   if (options.showInspectorWindow) {
+#ifdef WITH_INSPECTOR
     _inspectorWindow       = Window();
     _inspectorWindow.title = "Inspector";
+#else
+    BABYLON_LOG_ERROR("SampleLauncher",
+                      "Could not show inspector because it is currenlty "
+                      "disabled in the build!");
+#endif
   }
 }
 
@@ -390,14 +403,17 @@ int SampleLauncher::run(long runTime)
       glfwSwapBuffers(_sceneWindow.glfwWindow);
     }
     //*** Inspector Window ***//
+#ifdef WITH_INSPECTOR
     if (_showInspectorWindow && _inspector) {
       // Make the window's context current
       glfwMakeContextCurrent(_inspectorWindow.glfwWindow);
       // Render inspector window
+
       _inspector->render();
       // Swap front and back buffers
       glfwSwapBuffers(_inspectorWindow.glfwWindow);
     }
+#endif
     // Timeout
     // std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     // Process events
@@ -405,10 +421,13 @@ int SampleLauncher::run(long runTime)
     // Check if should close
     maxRunTimeReached
       = (runTime > 0 && (Time::unixtimeInMs() - startTime > runTime));
-    windowClosed = glfwWindowShouldClose(_sceneWindow.glfwWindow)
+    windowClosed = glfwWindowShouldClose(_sceneWindow.glfwWindow);
+#ifdef WITH_INSPECTOR
+    windowClosed = windowClosed
                    || (_showInspectorWindow ?
                          glfwWindowShouldClose(_inspectorWindow.glfwWindow) :
                          false);
+#endif
     _sampleLauncherState = (maxRunTimeReached || windowClosed
                             || (_sampleLauncherState == State::FINISHED)) ?
                              State::FINISHED :
@@ -422,9 +441,11 @@ void SampleLauncher::destroy()
 {
   // Cleanup window(s)
   glfwDestroyWindow(_sceneWindow.glfwWindow);
+#ifdef WITH_INSPECTOR
   if (_showInspectorWindow && _inspector) {
     _inspector->dispose();
   }
+#endif
   // Terminate GLFW
   glfwTerminate();
   _sampleLauncherState = State::DESTROYED;
@@ -450,10 +471,12 @@ void SampleLauncher::setRenderableScene(
     glfwSetWindowTitle(_sceneWindow.glfwWindow, title);
   }
   // Inspector window
+#ifdef WITH_INSPECTOR
   if (_showInspectorWindow && _inspector && _sceneWindow.renderableScene) {
     auto scene = _sceneWindow.renderableScene->getScene();
     _inspector->setScene(scene);
   }
+#endif
 }
 
 int SampleLauncher::initGLFW()
@@ -493,6 +516,7 @@ int SampleLauncher::initGLFW()
   _sceneWindow.lastTime = glfwGetTime();
 
   // Create the inspector window
+#ifdef WITH_INSPECTOR
   if (_showInspectorWindow) {
     CreateGLFWWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
                      _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
@@ -500,6 +524,7 @@ int SampleLauncher::initGLFW()
     _inspector = ::std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
     _inspector->intialize();
   }
+#endif
 
   return 0;
 }
