@@ -35,6 +35,9 @@ ParticleHelper::CreateDefault(const Variant<AbstractMeshPtr, Vector3>& emitter,
   system->minEmitPower = 2.f;
   system->maxEmitPower = 2.f;
 
+  // Update speed
+  system->updateSpeed = 1.f / 60.f;
+
   system->emitRate = 30;
 
   return system;
