@@ -32,6 +32,10 @@ EnvironmentHelper::EnvironmentHelper(const IEnvironmentHelperOptions& options,
   _setupImageProcessing();
 }
 
+EnvironmentHelper::~EnvironmentHelper()
+{
+}
+
 void EnvironmentHelper::updateOptions(const IEnvironmentHelperOptions& options)
 {
   auto& newOptions = options;
