@@ -134,6 +134,20 @@ public:
   /** Hidden */
   float _currentVelocity2;
 
+  /** Hidden */
+  nullable_t<FactorGradient> _currentLimitVelocityGradient;
+  /** Hidden */
+  float _currentLimitVelocity1;
+  /** Hidden */
+  float _currentLimitVelocity2;
+
+  /** Hidden */
+  nullable_t<FactorGradient> _currentDragGradient;
+  /** Hidden */
+  float _currentDrag1;
+  /** Hidden */
+  float _currentDrag2;
+
   /**
    * The particle system the particle belongs to.
    */

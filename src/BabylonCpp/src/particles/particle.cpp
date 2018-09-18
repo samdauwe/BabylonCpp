@@ -32,6 +32,12 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , _currentVelocityGradient{nullopt_t}
     , _currentVelocity1{0.f}
     , _currentVelocity2{0.f}
+    , _currentLimitVelocityGradient{nullopt_t}
+    , _currentLimitVelocity1{0.f}
+    , _currentLimitVelocity2{0.f}
+    , _currentDragGradient{nullopt_t}
+    , _currentDrag1{0.f}
+    , _currentDrag2{0.f}
     , particleSystem{iParticleSystem}
     , _currentFrameCounter{0}
 
@@ -70,6 +76,12 @@ Particle::Particle(const Particle& other)
     , _currentVelocityGradient{other._currentVelocityGradient}
     , _currentVelocity1{other._currentVelocity1}
     , _currentVelocity2{other._currentVelocity2}
+    , _currentLimitVelocityGradient{other._currentLimitVelocityGradient}
+    , _currentLimitVelocity1{other._currentLimitVelocity1}
+    , _currentLimitVelocity2{other._currentLimitVelocity2}
+    , _currentDragGradient{other._currentDragGradient}
+    , _currentDrag1{other._currentDrag1}
+    , _currentDrag2{other._currentDrag2}
     , particleSystem{other.particleSystem}
     , _currentFrameCounter{other._currentFrameCounter}
 {
@@ -77,40 +89,46 @@ Particle::Particle(const Particle& other)
 
 Particle::Particle(Particle&& other)
 {
-  *this = ::std::move(other);
+  *this = std::move(other);
 }
 
 Particle& Particle::operator=(const Particle& other)
 {
   if (&other != this) {
-    position                     = other.position;
-    direction                    = other.direction;
-    color                        = other.color;
-    colorStep                    = other.colorStep;
-    lifeTime                     = other.lifeTime;
-    age                          = other.age;
-    size                         = other.size;
-    scale                        = other.scale;
-    angle                        = other.angle;
-    angularSpeed                 = other.angularSpeed;
-    cellIndex                    = other.cellIndex;
-    _initialDirection            = other._initialDirection;
-    _initialStartSpriteCellID    = other._initialStartSpriteCellID;
-    _initialEndSpriteCellID      = other._initialEndSpriteCellID;
-    _currentColorGradient        = other._currentColorGradient;
-    _currentColor1               = other._currentColor1;
-    _currentColor2               = other._currentColor2;
-    _currentSizeGradient         = other._currentSizeGradient;
-    _currentSize1                = other._currentSize1;
-    _currentSize2                = other._currentSize2;
-    _currentAngularSpeedGradient = other._currentAngularSpeedGradient;
-    _currentAngularSpeed1        = other._currentAngularSpeed1;
-    _currentAngularSpeed2        = other._currentAngularSpeed2;
-    _currentVelocityGradient     = other._currentVelocityGradient;
-    _currentVelocity1            = other._currentVelocity1;
-    _currentVelocity2            = other._currentVelocity2;
-    particleSystem               = other.particleSystem;
-    _currentFrameCounter         = other._currentFrameCounter;
+    position                      = other.position;
+    direction                     = other.direction;
+    color                         = other.color;
+    colorStep                     = other.colorStep;
+    lifeTime                      = other.lifeTime;
+    age                           = other.age;
+    size                          = other.size;
+    scale                         = other.scale;
+    angle                         = other.angle;
+    angularSpeed                  = other.angularSpeed;
+    cellIndex                     = other.cellIndex;
+    _initialDirection             = other._initialDirection;
+    _initialStartSpriteCellID     = other._initialStartSpriteCellID;
+    _initialEndSpriteCellID       = other._initialEndSpriteCellID;
+    _currentColorGradient         = other._currentColorGradient;
+    _currentColor1                = other._currentColor1;
+    _currentColor2                = other._currentColor2;
+    _currentSizeGradient          = other._currentSizeGradient;
+    _currentSize1                 = other._currentSize1;
+    _currentSize2                 = other._currentSize2;
+    _currentAngularSpeedGradient  = other._currentAngularSpeedGradient;
+    _currentAngularSpeed1         = other._currentAngularSpeed1;
+    _currentAngularSpeed2         = other._currentAngularSpeed2;
+    _currentVelocityGradient      = other._currentVelocityGradient;
+    _currentVelocity1             = other._currentVelocity1;
+    _currentVelocity2             = other._currentVelocity2;
+    _currentLimitVelocityGradient = other._currentLimitVelocityGradient;
+    _currentLimitVelocity1        = other._currentLimitVelocity1;
+    _currentLimitVelocity2        = other._currentLimitVelocity2;
+    _currentDragGradient          = other._currentDragGradient;
+    _currentDrag1                 = other._currentDrag1;
+    _currentDrag2                 = other._currentDrag2;
+    particleSystem                = other.particleSystem;
+    _currentFrameCounter          = other._currentFrameCounter;
   }
 
   return *this;
@@ -119,35 +137,42 @@ Particle& Particle::operator=(const Particle& other)
 Particle& Particle::operator=(Particle&& other)
 {
   if (&other != this) {
-    position                  = ::std::move(other.position);
-    direction                 = ::std::move(other.direction);
-    color                     = ::std::move(other.color);
-    colorStep                 = ::std::move(other.colorStep);
-    lifeTime                  = ::std::move(other.lifeTime);
-    age                       = ::std::move(other.age);
-    size                      = ::std::move(other.size);
-    scale                     = ::std::move(other.scale);
-    angle                     = ::std::move(other.angle);
-    angularSpeed              = ::std::move(other.angularSpeed);
-    cellIndex                 = ::std::move(other.cellIndex);
-    _initialDirection         = ::std::move(other._initialDirection);
-    _initialStartSpriteCellID = ::std::move(other._initialStartSpriteCellID);
-    _initialEndSpriteCellID   = ::std::move(other._initialEndSpriteCellID);
-    _currentColorGradient     = ::std::move(other._currentColorGradient);
-    _currentColor1            = ::std::move(other._currentColor1);
-    _currentColor2            = ::std::move(other._currentColor2);
-    _currentSizeGradient      = ::std::move(other._currentSizeGradient);
-    _currentSize1             = ::std::move(other._currentSize1);
-    _currentSize2             = ::std::move(other._currentSize2);
+    position                  = std::move(other.position);
+    direction                 = std::move(other.direction);
+    color                     = std::move(other.color);
+    colorStep                 = std::move(other.colorStep);
+    lifeTime                  = std::move(other.lifeTime);
+    age                       = std::move(other.age);
+    size                      = std::move(other.size);
+    scale                     = std::move(other.scale);
+    angle                     = std::move(other.angle);
+    angularSpeed              = std::move(other.angularSpeed);
+    cellIndex                 = std::move(other.cellIndex);
+    _initialDirection         = std::move(other._initialDirection);
+    _initialStartSpriteCellID = std::move(other._initialStartSpriteCellID);
+    _initialEndSpriteCellID   = std::move(other._initialEndSpriteCellID);
+    _currentColorGradient     = std::move(other._currentColorGradient);
+    _currentColor1            = std::move(other._currentColor1);
+    _currentColor2            = std::move(other._currentColor2);
+    _currentSizeGradient      = std::move(other._currentSizeGradient);
+    _currentSize1             = std::move(other._currentSize1);
+    _currentSize2             = std::move(other._currentSize2);
     _currentAngularSpeedGradient
-      = ::std::move(other._currentAngularSpeedGradient);
-    _currentAngularSpeed1    = ::std::move(other._currentAngularSpeed1);
-    _currentAngularSpeed2    = ::std::move(other._currentAngularSpeed2);
-    _currentVelocityGradient = ::std::move(other._currentVelocityGradient);
-    _currentVelocity1        = ::std::move(other._currentVelocity1);
-    _currentVelocity2        = ::std::move(other._currentVelocity2);
-    particleSystem           = ::std::move(other.particleSystem);
-    _currentFrameCounter     = ::std::move(other._currentFrameCounter);
+      = std::move(other._currentAngularSpeedGradient);
+    _currentAngularSpeed1    = std::move(other._currentAngularSpeed1);
+    _currentAngularSpeed2    = std::move(other._currentAngularSpeed2);
+    _currentVelocityGradient = std::move(other._currentVelocityGradient);
+    _currentVelocity1        = std::move(other._currentVelocity1);
+    _currentVelocity2        = std::move(other._currentVelocity2);
+    _currentLimitVelocityGradient
+      = std::move(other._currentLimitVelocityGradient);
+    _currentLimitVelocity1 = std::move(other._currentLimitVelocity1);
+    _currentLimitVelocity2 = std::move(other._currentLimitVelocity2);
+    _currentDragGradient   = std::move(other._currentDragGradient);
+    _currentDrag1          = std::move(other._currentDrag1);
+    _currentDrag2          = std::move(other._currentDrag2);
+    particleSystem         = std::move(other.particleSystem);
+    _currentFrameCounter   = std::move(other._currentFrameCounter);
   }
 
   return *this;
@@ -171,7 +196,7 @@ void Particle::updateCellIndex()
 {
   auto dist  = (_initialEndSpriteCellID - _initialStartSpriteCellID);
   auto ratio = Scalar::Clamp(
-    ::std::fmod((age * particleSystem->spriteCellChangeSpeed), lifeTime)
+    std::fmod((age * particleSystem->spriteCellChangeSpeed), lifeTime)
     / lifeTime);
 
   cellIndex
@@ -222,6 +247,16 @@ void Particle::copyTo(Particle& other)
     other._currentVelocityGradient = _currentVelocityGradient;
     other._currentVelocity1        = _currentVelocity1;
     other._currentVelocity2        = _currentVelocity2;
+  }
+  if (_currentLimitVelocityGradient) {
+    other._currentLimitVelocityGradient = _currentLimitVelocityGradient;
+    other._currentLimitVelocity1        = _currentLimitVelocity1;
+    other._currentLimitVelocity2        = _currentLimitVelocity2;
+  }
+  if (_currentDragGradient) {
+    other._currentDragGradient = _currentDragGradient;
+    other._currentDrag1        = _currentDrag1;
+    other._currentDrag2        = _currentDrag2;
   }
   if (particleSystem->isAnimationSheetEnabled) {
     other._initialStartSpriteCellID = _initialStartSpriteCellID;

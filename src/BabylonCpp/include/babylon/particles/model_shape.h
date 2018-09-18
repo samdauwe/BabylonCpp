@@ -29,27 +29,33 @@ public:
 public:
   /**
    * The shape id.
+   * Hidden
    */
   int shapeID;
   /**
    * flat array of model positions (internal use)
+   * Hidden
    */
   vector_t<Vector3> _shape;
   /**
    * flat array of model UVs (internal use)
+   * Hidden
    */
   Float32Array _shapeUV;
   /**
    * length of the shape in the model indices array (internal use)
+   * Hidden
    */
   size_t _indicesLength;
   /**
    * Custom position function (internal use)
+   * Hidden
    */
   ::std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
     _positionFunction;
   /**
    * Custom vertex function (internal use)
+   * Hidden
    */
   ::std::function<void(SolidParticle* particle, const Vector3& vertex,
                        unsigned int i)>

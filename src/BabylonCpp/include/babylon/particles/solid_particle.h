@@ -105,6 +105,7 @@ public:
   bool isVisible;
   /**
    * Index of this particle in the global "positions" array (Internal use)
+   * Hidden
    */
   unsigned int _pos;
   /**
@@ -113,6 +114,7 @@ public:
   unsigned int _ind;
   /**
    * ModelShape of this particle (Internal use)
+   * Hidden
    */
   ModelShape* _model;
   /**
@@ -125,22 +127,27 @@ public:
   unsigned int idxInShape;
   /**
    * Reference to the shape model BoundingInfo object (Internal use)
+   * Hidden
    */
   unique_ptr_t<BoundingInfo> _modelBoundingInfo;
   /**
    * Particle BoundingInfo object (Internal use)
+   * Hidden
    */
   unique_ptr_t<BoundingInfo> _boundingInfo;
   /**
    * Reference to the SPS what the particle belongs to (Internal use)
+   * Hidden
    */
   SolidParticleSystem* _sps;
   /**
    * Still set as invisible in order to skip useless computations (Internal use)
+   * Hidden
    */
   bool _stillInvisible;
   /**
    * Last computed particle rotation matrix
+   * Hidden
    */
   Float32Array _rotationMatrix;
   /**
@@ -150,6 +157,7 @@ public:
   nullable_t<unsigned int> parentId;
   /**
    * Internal global position in the SPS.
+   * Hidden
    */
   Vector3 _globalPosition;
 
