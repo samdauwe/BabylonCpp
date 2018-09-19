@@ -200,7 +200,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * The particle emitter type defines the emitter used by the particle system.
    * It can be for example box, sphere, or cone...
    */
-  unique_ptr_t<IParticleEmitterType> particleEmitterType;
+  std::shared_ptr<IParticleEmitterType> particleEmitterType;
 
   /**
    * Gets or sets a value indicating how many cycles (or frames) must be
@@ -269,6 +269,12 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * AbstractMesh.BILLBOARDMODE_Y are supported so far
    */
   unsigned int billboardMode;
+
+  /**
+   * Gets or sets a value indicating the damping to apply if the limit velocity
+   * factor is reached
+   */
+  float limitVelocityDamping;
 
   /**
    * @brief Returns whether or not the particle system has an emitter.
@@ -417,7 +423,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   /**
    * @brief Adds a new angular speed gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the size factor to affect to the specified gradient
+   * @param factor defines the angular speed to affect to the specified gradient
    * @param factor2 defines an additional factor used to define a range
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
@@ -443,9 +449,9 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   virtual vector_t<FactorGradient>& getVelocityGradients() = 0;
 
   /**
-   * @brief Adds a new velocity gradient.
+   * @brief Adds a new velocity gradient
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the size factor to affect to the specified gradient
+   * @param factor defines the velocity to affect to the specified gradient
    * @param factor2 defines an additional factor used to define a range
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
@@ -461,6 +467,57 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @returns the current particle system
    */
   virtual IParticleSystem& removeVelocityGradient(float gradient) = 0;
+
+#if 0
+  /**
+   * @brief Gets the current list of limit velocity gradients.
+   * You must use addLimitVelocityGradient and removeLimitVelocityGradient to
+   * udpate this list
+   * @returns the list of limit velocity gradients
+   */
+  virtual std::vector<FactorGradient>& getLimitVelocityGradients() = 0;
+
+  /**
+   * @brief Adds a new limit velocity gradient
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the limit velocity to affect to the specified
+   * gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  virtual IParticleSystem&
+  addLimitVelocityGradient(float gradient, float factor,
+                           const std::optional<float>& factor2 = std::nullopt)
+    = 0;
+
+  /**
+   * Remove a specific limit velocity gradient
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  virtual IParticleSystem& removeLimitVelocityGradient(float gradient) = 0;
+
+  /**
+   * @brief Adds a new drag gradient
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the drag to affect to the specified gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  virtual IParticleSystem& addDragGradient(float gradient, float factor,
+                                           const std::optional<float>& factor2
+                                           = std::nullopt)
+    = 0;
+
+  /**
+   * @brief Remove a specific drag gradient
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  virtual IParticleSystem& removeDragGradient(float gradient) = 0;
+#endif
 
 }; // end of struct IParticleSystem
 

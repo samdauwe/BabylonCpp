@@ -473,12 +473,14 @@ public:
   /**
    * If the particle intersection must be computed only with the bounding sphere
    * (no bounding box computation, so faster). (Internal use only)
+   * Hidden
    */
   bool _bSphereOnly;
 
   /**
    * A number to multiply the boundind sphere radius by in order to reduce it
    * for instance. (Internal use only)
+   * Hidden
    */
   float _bSphereRadiusFactor;
 
