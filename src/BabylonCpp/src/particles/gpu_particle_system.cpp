@@ -8,7 +8,10 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
+#include <babylon/materials/image_processing_configuration.h>
+#include <babylon/materials/image_processing_configuration_defines.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/tmp.h>
@@ -33,15 +36,7 @@ bool GPUParticleSystem::IsSupported()
 GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
                                      nullable_t<int> randomTextureSize,
                                      Scene* scene, bool isAnimationSheetEnabled)
-    : direction1{this, &GPUParticleSystem::get_direction1,
-                 &GPUParticleSystem::set_direction1}
-    , direction2{this, &GPUParticleSystem::get_direction2,
-                 &GPUParticleSystem::set_direction2}
-    , minEmitBox{this, &GPUParticleSystem::get_minEmitBox,
-                 &GPUParticleSystem::set_minEmitBox}
-    , maxEmitBox{this, &GPUParticleSystem::get_maxEmitBox,
-                 &GPUParticleSystem::set_maxEmitBox}
-    , forceDepthWrite{false}
+    : BaseParticleSystem{iName}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
                           &GPUParticleSystem::set_activeParticleCount}
     , isAnimationSheetEnabled{this,
@@ -66,11 +61,12 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
     , _zeroVector3{Vector3::Zero()}
     , _rawTextureWidth{256}
     , _preWarmDone{false}
-    , _isBillboardBased{true}
     , _colorGradientsTexture{nullptr}
     , _angularSpeedGradientsTexture{nullptr}
     , _sizeGradientsTexture{nullptr}
     , _velocityGradientsTexture{nullptr}
+    , _limitVelocityGradientsTexture{nullptr}
+    , _dragGradientsTexture{nullptr}
 {
   // IParticleSystem
   {
@@ -115,7 +111,9 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
     billboardMode         = AbstractMesh::BILLBOARDMODE_ALL;
   }
 
-  _scene  = scene ? scene : Engine::LastCreatedScene();
+  _scene = scene ? scene : Engine::LastCreatedScene();
+  // Setup the default processing configuration to the scene.
+  _attachImageProcessingConfiguration(nullptr);
   _engine = _scene->getEngine();
 
   if (!randomTextureSize.has_value()) {
@@ -533,6 +531,11 @@ GPUParticleSystem& GPUParticleSystem::removeVelocityGradient(float gradient)
   return *this;
 }
 
+void GPUParticleSystem::_reset()
+{
+  _releaseBuffers();
+}
+
 unique_ptr_t<GL::IGLVertexArrayObject>
 GPUParticleSystem::_createUpdateVAO(Buffer* source)
 {
@@ -834,6 +837,15 @@ void GPUParticleSystem::_recreateRenderEffect()
   if (_scene->clipPlane.has_value()) {
     definesStream << "\n#define CLIPPLANE";
   }
+  if (_scene->clipPlane2.has_value()) {
+    definesStream << "\n#define CLIPPLANE2";
+  }
+  if (_scene->clipPlane3.has_value()) {
+    definesStream << "\n#define CLIPPLANE3";
+  }
+  if (_scene->clipPlane4.has_value()) {
+    definesStream << "\n#define CLIPPLANE4";
+  }
 
   if (_isBillboardBased) {
     definesStream << "\n#define BILLBOARD";
@@ -856,21 +868,39 @@ void GPUParticleSystem::_recreateRenderEffect()
     definesStream << "\n#define ANIMATESHEET";
   }
 
+  if (_imageProcessingConfiguration) {
+    _imageProcessingConfiguration->prepareDefines(
+      *_imageProcessingConfigurationDefines);
+    definesStream << "\n" << _imageProcessingConfigurationDefines->toString();
+  }
+
   auto defines = definesStream.str();
 
   if (_renderEffect && _renderEffect->defines == defines) {
     return;
   }
 
+  vector_t<string_t> uniforms{
+    "view",       "projection",       "colorDead",   "invView",
+    "vClipPlane", "vClipPlane2",      "vClipPlane3", "vClipPlane4",
+    "sheetInfos", "translationPivot", "eyePosition"};
+  vector_t<string_t> samplers{"textureSampler", "colorGradientSampler"};
+
+  // if (ImageProcessingConfiguration)
+  {
+    ImageProcessingConfiguration::PrepareUniforms(
+      uniforms, *_imageProcessingConfigurationDefines);
+    ImageProcessingConfiguration::PrepareSamplers(
+      samplers, *_imageProcessingConfigurationDefines);
+  }
+
   EffectCreationOptions renderEffectOptions;
   renderEffectOptions.attributes
     = {"position",         "age",   "life",     "size", "color", "offset", "uv",
        "initialDirection", "angle", "cellIndex"};
-  renderEffectOptions.uniformsNames
-    = {"view",       "projection", "colorDead",        "invView",
-       "vClipPlane", "sheetInfos", "translationPivot", "eyePosition"};
-  renderEffectOptions.samplers = {"textureSampler", "colorGradientSampler"};
-  renderEffectOptions.defines  = ::std::move(defines);
+  renderEffectOptions.uniformsNames = uniforms;
+  renderEffectOptions.samplers      = samplers;
+  renderEffectOptions.defines       = ::std::move(defines);
 
   _renderEffect = ::std::make_unique<Effect>(
     "gpuRenderParticles", renderEffectOptions, _scene->getEngine());
@@ -1157,14 +1187,19 @@ size_t GPUParticleSystem::render(bool preWarm)
       _renderEffect->setVector3("eyePosition", camera->globalPosition);
     }
 
-    if (_scene->clipPlane.has_value()) {
-      auto clipPlane = *_scene->clipPlane;
-      auto invView   = viewMatrix;
+    if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
+        || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()) {
+      auto invView = viewMatrix;
       invView.invert();
       _renderEffect->setMatrix("invView", invView);
-      _renderEffect->setFloat4("vClipPlane", clipPlane.normal.x,
-                               clipPlane.normal.y, clipPlane.normal.z,
-                               clipPlane.d);
+
+      MaterialHelper::BindClipPlane(_renderEffect.get(), _scene);
+    }
+
+    // image processing
+    if (_imageProcessingConfiguration
+        && !_imageProcessingConfiguration->applyByPostProcess) {
+      _imageProcessingConfiguration->bind(_renderEffect.get());
     }
 
     // Draw order
@@ -1276,6 +1311,11 @@ void GPUParticleSystem::dispose(bool disposeTexture,
   if (_velocityGradientsTexture) {
     _velocityGradientsTexture->dispose();
     _velocityGradientsTexture = nullptr;
+  }
+
+  if (_limitVelocityGradientsTexture) {
+    _limitVelocityGradientsTexture->dispose();
+    _limitVelocityGradientsTexture = nullptr;
   }
 
   if (_randomTexture) {

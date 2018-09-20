@@ -3,7 +3,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
-#include <babylon/particles/iparticle_system.h>
+#include <babylon/particles/base_particle_system.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
@@ -14,7 +14,7 @@ namespace BABYLON {
  * the individual particle data
  * @see https://www.babylonjs-playground.com/#PU4WYI#4
  */
-class BABYLON_SHARED_EXPORT GPUParticleSystem : public IParticleSystem,
+class BABYLON_SHARED_EXPORT GPUParticleSystem : public BaseParticleSystem,
                                                 public IAnimatable {
 
 public:
@@ -276,6 +276,8 @@ protected:
    */
   void set_isBillboardBased(bool value) override;
 
+  void _reset() override;
+
 private:
   template <typename T>
   GPUParticleSystem& _removeGradient(float gradient, vector_t<T>& gradients,
@@ -306,42 +308,6 @@ public:
   Observable<GPUParticleSystem> onDisposeObservable;
 
   /**
-   * Random direction of each particle after it has been emitted, between
-   * direction1 and direction2 vectors. This only works when particleEmitterTyps
-   * is a BoxParticleEmitter
-   */
-  Property<GPUParticleSystem, Vector3> direction1;
-
-  /**
-   * Random direction of each particle after it has been emitted, between
-   * direction1 and direction2 vectors. This only works when particleEmitterTyps
-   * is a BoxParticleEmitter
-   */
-  Property<GPUParticleSystem, Vector3> direction2;
-
-  /**
-   * Minimum box point around our emitter. Our emitter is the center of
-   * particles source, but if you want your particles to emit from more than one
-   * point, then you can tell it to do so. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter
-   */
-  Property<GPUParticleSystem, Vector3> minEmitBox;
-
-  /**
-   * Maximum box point around our emitter. Our emitter is the center of
-   * particles source, but if you want your particles to emit from more than one
-   * point, then you can tell it to do so. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter
-   */
-  Property<GPUParticleSystem, Vector3> maxEmitBox;
-
-  /**
-   * Forces the particle to write their depth information to the depth buffer.
-   * This can help preventing other draw calls to override the particles.
-   */
-  bool forceDepthWrite;
-
-  /**
    * Gets or set the number of active particles
    */
   Property<GPUParticleSystem, size_t> activeParticleCount;
@@ -370,7 +336,6 @@ private:
   Buffer* _sourceBuffer;
   Buffer* _targetBuffer;
 
-  Scene* _scene;
   Engine* _engine;
 
   int _currentRenderId;
@@ -391,20 +356,13 @@ private:
   Vector3 _zeroVector3;
   unsigned int _rawTextureWidth;
   bool _preWarmDone;
-  bool _isAnimationSheetEnabled;
-  bool _isBillboardBased;
 
-  vector_t<ColorGradient> _colorGradients;
   RawTexturePtr _colorGradientsTexture;
-
-  vector_t<FactorGradient> _angularSpeedGradients;
   RawTexturePtr _angularSpeedGradientsTexture;
-
-  vector_t<FactorGradient> _sizeGradients;
   RawTexturePtr _sizeGradientsTexture;
-
-  vector_t<FactorGradient> _velocityGradients;
   RawTexturePtr _velocityGradientsTexture;
+  RawTexturePtr _limitVelocityGradientsTexture;
+  RawTexturePtr _dragGradientsTexture;
 
 }; // end of class GPUParticleSystem
 
