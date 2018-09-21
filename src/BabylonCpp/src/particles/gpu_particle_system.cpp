@@ -151,7 +151,7 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
   _updateEffectOptions->maxSimultaneousLights     = 0;
   _updateEffectOptions->transformFeedbackVaryings = {};
 
-  particleEmitterType = ::std::make_unique<BoxParticleEmitter>();
+  particleEmitterType = std::make_unique<BoxParticleEmitter>();
 
   // Random data
   auto maxTextureSize
@@ -163,7 +163,7 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
     d.emplace_back(Math::random());
     d.emplace_back(Math::random());
   }
-  _randomTexture = ::std::make_unique<RawTexture>(
+  _randomTexture = std::make_unique<RawTexture>(
     ArrayBufferView(d), maxTextureSize, 1, EngineConstants::TEXTUREFORMAT_RGBA,
     _scene, false, false, TextureConstants::NEAREST_SAMPLINGMODE,
     EngineConstants::TEXTURETYPE_FLOAT);
@@ -177,7 +177,7 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
     d.emplace_back(Math::random());
     d.emplace_back(Math::random());
   }
-  _randomTexture2 = ::std::make_unique<RawTexture>(
+  _randomTexture2 = std::make_unique<RawTexture>(
     ArrayBufferView(d), maxTextureSize, 1, EngineConstants::TEXTUREFORMAT_RGBA,
     _scene, false, false, TextureConstants::NEAREST_SAMPLINGMODE,
     EngineConstants::TEXTURETYPE_FLOAT);
@@ -189,78 +189,6 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
 
 GPUParticleSystem::~GPUParticleSystem()
 {
-}
-
-Vector3& GPUParticleSystem::get_direction1()
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    return boxParticleEmitter->direction1;
-  }
-
-  return _zeroVector3;
-}
-
-void GPUParticleSystem::set_direction1(const Vector3& value)
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    boxParticleEmitter->direction1 = value;
-  }
-}
-
-Vector3& GPUParticleSystem::get_direction2()
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    return boxParticleEmitter->direction2;
-  }
-
-  return _zeroVector3;
-}
-
-void GPUParticleSystem::set_direction2(const Vector3& value)
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    boxParticleEmitter->direction2 = value;
-  }
-}
-
-Vector3& GPUParticleSystem::get_minEmitBox()
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    return boxParticleEmitter->minEmitBox;
-  }
-
-  return _zeroVector3;
-}
-
-void GPUParticleSystem::set_minEmitBox(const Vector3& value)
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    boxParticleEmitter->minEmitBox = value;
-  }
-}
-
-Vector3& GPUParticleSystem::get_maxEmitBox()
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    return boxParticleEmitter->maxEmitBox;
-  }
-
-  return _zeroVector3;
-}
-
-void GPUParticleSystem::set_maxEmitBox(const Vector3& value)
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    boxParticleEmitter->maxEmitBox = value;
-  }
 }
 
 size_t GPUParticleSystem::getCapacity() const
@@ -278,27 +206,6 @@ void GPUParticleSystem::set_activeParticleCount(size_t value)
   _activeCount = std::min(value, _capacity);
 }
 
-bool GPUParticleSystem::get_isAnimationSheetEnabled() const
-{
-  return _isAnimationSheetEnabled;
-}
-
-bool GPUParticleSystem::get_isBillboardBased() const
-{
-  return _isBillboardBased;
-}
-
-void GPUParticleSystem::set_isBillboardBased(bool value)
-{
-  if (_isBillboardBased == value) {
-    return;
-  }
-
-  _isBillboardBased = value;
-
-  _releaseBuffers();
-}
-
 bool GPUParticleSystem::isReady()
 {
   if (!_updateEffect) {
@@ -307,7 +214,8 @@ bool GPUParticleSystem::isReady()
     return false;
   }
 
-  if (/*!emitter ||*/ !_updateEffect->isReady() || !_renderEffect->isReady()
+  if (/*!emitter ||*/ !_updateEffect->isReady()
+      || !_imageProcessingConfiguration->isReady() || !_renderEffect->isReady()
       || !particleTexture || !particleTexture->isReady()) {
     return false;
   }
@@ -348,26 +256,6 @@ const char* GPUParticleSystem::getClassName() const
   return "GPUParticleSystem";
 }
 
-vector_t<ColorGradient>& GPUParticleSystem::getColorGradients()
-{
-  return _colorGradients;
-}
-
-vector_t<FactorGradient>& GPUParticleSystem::getSizeGradients()
-{
-  return _sizeGradients;
-}
-
-vector_t<FactorGradient>& GPUParticleSystem::getAngularSpeedGradients()
-{
-  return _angularSpeedGradients;
-}
-
-vector_t<FactorGradient>& GPUParticleSystem::getVelocityGradients()
-{
-  return _velocityGradients;
-}
-
 template <typename T>
 GPUParticleSystem& GPUParticleSystem::_removeGradient(float gradient,
                                                       vector_t<T>& gradients,
@@ -378,11 +266,11 @@ GPUParticleSystem& GPUParticleSystem::_removeGradient(float gradient,
   }
 
   gradients.erase(
-    ::std::remove_if(gradients.begin(), gradients.end(),
-                     [&gradient](const IValueGradient& valueGradient) {
-                       return stl_util::almost_equal(valueGradient.gradient,
-                                                     gradient);
-                     }),
+    std::remove_if(gradients.begin(), gradients.end(),
+                   [&gradient](const IValueGradient& valueGradient) {
+                     return stl_util::almost_equal(valueGradient.gradient,
+                                                   gradient);
+                   }),
     gradients.end());
 
   if (texture) {
@@ -403,17 +291,17 @@ GPUParticleSystem::addColorGradient(float gradient, const Color4& color1,
   colorGradient.color1   = color1;
   _colorGradients.emplace_back(colorGradient);
 
-  ::std::sort(_colorGradients.begin(), _colorGradients.end(),
-              [](const ColorGradient& a, const ColorGradient& b) {
-                if (a.gradient < b.gradient) {
-                  return -1;
-                }
-                else if (a.gradient > b.gradient) {
-                  return 1;
-                }
+  std::sort(_colorGradients.begin(), _colorGradients.end(),
+            [](const ColorGradient& a, const ColorGradient& b) {
+              if (a.gradient < b.gradient) {
+                return -1;
+              }
+              else if (a.gradient > b.gradient) {
+                return 1;
+              }
 
-                return 0;
-              });
+              return 0;
+            });
 
   if (_colorGradientsTexture) {
     _colorGradientsTexture->dispose();
@@ -442,17 +330,17 @@ void GPUParticleSystem::_addFactorGradient(
   valueGradient.factor1  = factor;
   factorGradients.emplace_back(valueGradient);
 
-  ::std::sort(factorGradients.begin(), factorGradients.end(),
-              [](const FactorGradient& a, const FactorGradient& b) {
-                if (a.gradient < b.gradient) {
-                  return -1;
-                }
-                else if (a.gradient > b.gradient) {
-                  return 1;
-                }
+  std::sort(factorGradients.begin(), factorGradients.end(),
+            [](const FactorGradient& a, const FactorGradient& b) {
+              if (a.gradient < b.gradient) {
+                return -1;
+              }
+              else if (a.gradient > b.gradient) {
+                return 1;
+              }
 
-                return 0;
-              });
+              return 0;
+            });
 
   _releaseBuffers();
 }
@@ -527,6 +415,54 @@ GPUParticleSystem& GPUParticleSystem::removeVelocityGradient(float gradient)
   _removeGradient(gradient, _velocityGradients,
                   _velocityGradientsTexture.get());
   _velocityGradientsTexture = nullptr;
+
+  return *this;
+}
+
+GPUParticleSystem& GPUParticleSystem::addLimitVelocityGradient(float gradient,
+                                                               float factor)
+{
+  _addFactorGradient(_limitVelocityGradients, gradient, factor);
+
+  if (_limitVelocityGradientsTexture) {
+    _limitVelocityGradientsTexture->dispose();
+    _limitVelocityGradientsTexture = nullptr;
+  }
+
+  _releaseBuffers();
+
+  return *this;
+}
+
+GPUParticleSystem&
+GPUParticleSystem::removeLimitVelocityGradient(float gradient)
+{
+  _removeGradient(gradient, _limitVelocityGradients,
+                  _limitVelocityGradientsTexture.get());
+  _limitVelocityGradientsTexture = nullptr;
+
+  return *this;
+}
+
+GPUParticleSystem& GPUParticleSystem::addDragGradient(float gradient,
+                                                      float factor)
+{
+  _addFactorGradient(_dragGradients, gradient, factor);
+
+  if (_dragGradientsTexture) {
+    _dragGradientsTexture->dispose();
+    _dragGradientsTexture = nullptr;
+  }
+
+  _releaseBuffers();
+
+  return *this;
+}
+
+GPUParticleSystem& GPUParticleSystem::removeDragGradient(float gradient)
+{
+  _removeGradient(gradient, _dragGradients, _dragGradientsTexture.get());
+  _dragGradientsTexture = nullptr;
 
   return *this;
 }
@@ -742,10 +678,10 @@ void GPUParticleSystem::_initialize(bool force)
 
   // Buffers
   _buffer0
-    = ::std::make_unique<Buffer>(engine, data, false, _attributesStrideSize);
+    = std::make_unique<Buffer>(engine, data, false, _attributesStrideSize);
   _buffer1
-    = ::std::make_unique<Buffer>(engine, data, false, _attributesStrideSize);
-  _spriteBuffer = ::std::make_unique<Buffer>(engine, spriteData, false, 4);
+    = std::make_unique<Buffer>(engine, data, false, _attributesStrideSize);
+  _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 4);
 
   // Update VAO
   _updateVAO.clear();
@@ -826,8 +762,8 @@ void GPUParticleSystem::_recreateUpdateEffect()
       "outCellIndex");
   }
 
-  _updateEffectOptions->defines = ::std::move(defines);
-  _updateEffect                 = ::std::make_unique<Effect>(
+  _updateEffectOptions->defines = std::move(defines);
+  _updateEffect                 = std::make_unique<Effect>(
     "gpuUpdateParticles", *_updateEffectOptions, _scene->getEngine());
 }
 
@@ -900,9 +836,9 @@ void GPUParticleSystem::_recreateRenderEffect()
        "initialDirection", "angle", "cellIndex"};
   renderEffectOptions.uniformsNames = uniforms;
   renderEffectOptions.samplers      = samplers;
-  renderEffectOptions.defines       = ::std::move(defines);
+  renderEffectOptions.defines       = std::move(defines);
 
-  _renderEffect = ::std::make_unique<Effect>(
+  _renderEffect = std::make_unique<Effect>(
     "gpuRenderParticles", renderEffectOptions, _scene->getEngine());
 }
 
@@ -943,16 +879,16 @@ void GPUParticleSystem::_setRawTextureByName(
   const string_t& textureName, unique_ptr_t<RawTexture>&& rawTexture)
 {
   if (textureName == "_colorGradientsTexture") {
-    _colorGradientsTexture = ::std::move(rawTexture);
+    _colorGradientsTexture = std::move(rawTexture);
   }
   else if (textureName == "_angularSpeedGradientsTexture") {
-    _angularSpeedGradientsTexture = ::std::move(rawTexture);
+    _angularSpeedGradientsTexture = std::move(rawTexture);
   }
   else if (textureName == "_sizeGradientsTexture") {
-    _sizeGradientsTexture = ::std::move(rawTexture);
+    _sizeGradientsTexture = std::move(rawTexture);
   }
   else if (textureName == "_velocityGradientsTexture") {
-    _velocityGradientsTexture = ::std::move(rawTexture);
+    _velocityGradientsTexture = std::move(rawTexture);
   }
 }
 
@@ -1074,8 +1010,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   if (_accumulatedCount > 1) {
     auto intPart = _accumulatedCount;
     _accumulatedCount -= intPart;
-    _currentActiveCount
-      = ::std::min(_activeCount, _currentActiveCount + intPart);
+    _currentActiveCount = std::min(_activeCount, _currentActiveCount + intPart);
   }
 
   if (!_currentActiveCount) {
@@ -1235,7 +1170,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   }
 
   // Switch buffers
-  ::std::swap(_sourceBuffer, _targetBuffer);
+  std::swap(_sourceBuffer, _targetBuffer);
 
   return _currentActiveCount;
 }
@@ -1283,11 +1218,11 @@ void GPUParticleSystem::dispose(bool disposeTexture,
 {
   // Remove from scene
   _scene->particleSystems.erase(
-    ::std::remove_if(_scene->particleSystems.begin(),
-                     _scene->particleSystems.end(),
-                     [this](const IParticleSystemPtr& particleSystem) {
-                       return particleSystem.get() == this;
-                     }),
+    std::remove_if(_scene->particleSystems.begin(),
+                   _scene->particleSystems.end(),
+                   [this](const IParticleSystemPtr& particleSystem) {
+                     return particleSystem.get() == this;
+                   }),
     _scene->particleSystems.end());
 
   _releaseBuffers();

@@ -84,36 +84,6 @@ public:
   const char* getClassName() const;
 
   /**
-   * @brief Gets the current list of color gradients.
-   * You must use addColorGradient and removeColorGradient to udpate this list
-   * @returns the list of color gradients
-   */
-  vector_t<ColorGradient>& getColorGradients() override;
-
-  /**
-   * @brief Gets the current list of size gradients.
-   * You must use addSizeGradient and removeSizeGradient to udpate this list
-   * @returns the list of size gradients
-   */
-  vector_t<FactorGradient>& getSizeGradients() override;
-
-  /**
-   * @brief Gets the current list of angular speed gradients.
-   * You must use addAngularSpeedGradient and removeAngularSpeedGradient to
-   * udpate this list
-   * @returns the list of angular speed gradients
-   */
-  vector_t<FactorGradient>& getAngularSpeedGradients() override;
-
-  /**
-   * @brief Gets the current list of velocity gradients.
-   * You must use addVelocityGradient and removeVelocityGradient to udpate this
-   * list
-   * @returns the list of angular speed gradients
-   */
-  vector_t<FactorGradient>& getVelocityGradients() override;
-
-  /**
    * @brief Adds a new color gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param color defines the color to affect to the specified gradient
@@ -133,7 +103,7 @@ public:
   GPUParticleSystem& removeColorGradient(float gradient) override;
 
   /**
-   * @brief Adds a new size gradient
+   * @brief Adds a new size gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the size factor to affect to the specified gradient
    * @returns the current particle system
@@ -143,16 +113,16 @@ public:
                                      = nullopt_t) override;
 
   /**
-   * @brief Remove a specific size gradient
+   * @brief Remove a specific size gradient.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
   GPUParticleSystem& removeSizeGradient(float gradient) override;
 
   /**
-   * @brief Adds a new angular speed gradient
+   * @brief Adds a new angular speed gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the size factor to affect to the specified gradient
+   * @param factor defines the angular speed to affect to the specified gradient
    * @returns the current particle system
    */
   GPUParticleSystem& addAngularSpeedGradient(float gradient, float factor,
@@ -160,7 +130,7 @@ public:
                                              = nullopt_t) override;
 
   /**
-   * @brief Remove a specific angular speed gradient
+   * @brief Remove a specific angular speed gradient.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
@@ -182,6 +152,37 @@ public:
    * @returns the current particle system
    */
   GPUParticleSystem& removeVelocityGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new limit velocity gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the limit velocity value to affect to the specified
+   * gradient
+   * @returns the current particle system
+   */
+  GPUParticleSystem& addLimitVelocityGradient(float gradient, float factor);
+
+  /**
+   * Remove a specific limit velocity gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  GPUParticleSystem& removeLimitVelocityGradient(float gradient);
+
+  /**
+   * @brief Adds a new drag gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the drag value to affect to the specified gradient
+   * @returns the current particle system
+   */
+  GPUParticleSystem& addDragGradient(float gradient, float factor);
+
+  /**
+   * Remove a specific drag gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  GPUParticleSystem& removeDragGradient(float gradient);
 
   /**
    * @brief Hidden
@@ -247,34 +248,8 @@ public:
                                 Scene* scene, const string_t& rootUrl);
 
 protected:
-  Vector3& get_direction1();
-  void set_direction1(const Vector3& value);
-  Vector3& get_direction2();
-  void set_direction2(const Vector3& value);
-  Vector3& get_minEmitBox();
-  void set_minEmitBox(const Vector3& value);
-  Vector3& get_maxEmitBox();
-  void set_maxEmitBox(const Vector3& value);
   size_t get_activeParticleCount() const;
   void set_activeParticleCount(size_t value);
-
-  /**
-   * @brief Gets whether an animation sprite sheet is enabled or not on the
-   * particle system.
-   */
-  bool get_isAnimationSheetEnabled() const;
-
-  /**
-   * @brief Gets a boolean indicating if the particles must be rendered as
-   * billboard or aligned with the direction
-   */
-  bool get_isBillboardBased() const override;
-
-  /**
-   * @brief Sets a boolean indicating if the particles must be rendered as
-   * billboard or aligned with the direction
-   */
-  void set_isBillboardBased(bool value) override;
 
   void _reset() override;
 
