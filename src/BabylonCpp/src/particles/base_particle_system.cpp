@@ -19,6 +19,9 @@ BaseParticleSystem::BaseParticleSystem(const string_t& iName)
     , onAnimationEnd{nullptr}
     , forceDepthWrite{false}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
+    , isAnimationSheetEnabled{this,
+                              &BaseParticleSystem::get_isAnimationSheetEnabled,
+                              &BaseParticleSystem::set_isAnimationSheetEnabled}
     , direction1{this, &BaseParticleSystem::get_direction1,
                  &BaseParticleSystem::set_direction1}
     , direction2{this, &BaseParticleSystem::get_direction2,

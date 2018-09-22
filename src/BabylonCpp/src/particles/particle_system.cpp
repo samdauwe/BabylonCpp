@@ -10,7 +10,10 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/image_processing_configuration.h>
+#include <babylon/materials/image_processing_configuration_defines.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/tmp.h>
@@ -31,31 +34,10 @@ namespace BABYLON {
 ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
                                Scene* scene, Effect* customEffect,
                                bool isAnimationSheetEnabled, float epsilon)
-    : manualEmitCount{-1}
-    , disposeOnStop{false}
-    , preventAutoStart{false}
-    , updateFunction{nullptr}
-    , onAnimationEnd{nullptr}
-    , forceDepthWrite{false}
-    , direction1{this, &ParticleSystem::get_direction1,
-                 &ParticleSystem::set_direction1}
-    , direction2{this, &ParticleSystem::get_direction2,
-                 &ParticleSystem::set_direction2}
-    , minEmitBox{this, &ParticleSystem::get_minEmitBox,
-                 &ParticleSystem::set_minEmitBox}
-    , maxEmitBox{this, &ParticleSystem::get_maxEmitBox,
-                 &ParticleSystem::set_maxEmitBox}
-    , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
+    : BaseParticleSystem{iName}
     , onDispose{this, &ParticleSystem::set_onDispose}
-    , isAnimationSheetEnabled{this,
-                              &ParticleSystem::get_isAnimationSheetEnabled,
-                              &ParticleSystem::set_isAnimationSheetEnabled}
     , _vertexBufferSize{11}
-    , _epsilon{epsilon}
-    , _capacity{capacity}
-    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _newPartsExcess{0}
-    , _customEffect{customEffect}
     , _scaledColorStep{Color4(0.f, 0.f, 0.f, 0.f)}
     , _colorDiff{Color4(0.f, 0.f, 0.f, 0.f)}
     , _scaledDirection{Vector3::Zero()}
@@ -65,47 +47,20 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
     , _started{false}
     , _stopped{false}
     , _actualFrame{0}
-    , _isAnimationSheetEnabled{isAnimationSheetEnabled}
-    , _isBillboardBased{true}
     , _appendParticleVertexes{nullptr}
     , _zeroVector3{Vector3::Zero()}
 {
-  // IParticleSystem
-  {
-    id                    = iName;
-    name                  = iName;
-    renderingGroupId      = 0;
-    emitRate              = 10.f;
-    updateSpeed           = 0.01f;
-    targetStopDuration    = 0;
-    particleTexture       = nullptr;
-    blendMode             = ParticleSystem::BLENDMODE_ONEONE;
-    minLifeTime           = 1.f;
-    maxLifeTime           = 1.f;
-    minSize               = 1.f;
-    maxSize               = 1.f;
-    layerMask             = 0x0FFFFFFF;
-    color1                = Color4{1.f, 1.f, 1.f, 1.f};
-    color2                = Color4{1.f, 1.f, 1.f, 1.f};
-    colorDead             = Color4{0.f, 0.f, 0.f, 1.f};
-    textureMask           = Color4{1.f, 1.f, 1.f, 1.f};
-    emitRate              = 100;
-    gravity               = Vector3::Zero();
-    minEmitPower          = 1.f;
-    maxEmitPower          = 1.f;
-    minAngularSpeed       = 0.f;
-    maxAngularSpeed       = 0.f;
-    particleEmitterType   = nullptr;
-    spriteCellChangeSpeed = 1.f;
-    startSpriteCellID     = 0;
-    endSpriteCellID       = 0;
-    spriteCellWidth       = 0;
-    spriteCellHeight      = 0;
-    preWarmCycles         = 0;
-    preWarmStepOffset     = 1;
-    translationPivot      = Vector2(0.f, 0.f);
-    billboardMode         = AbstractMesh::BILLBOARDMODE_ALL;
-  }
+  _capacity = capacity;
+
+  _epsilon                 = epsilon;
+  _isAnimationSheetEnabled = isAnimationSheetEnabled;
+
+  _scene = scene ? scene : Engine::LastCreatedScene();
+
+  // Setup the default processing configuration to the scene.
+  _attachImageProcessingConfiguration(nullptr);
+
+  _customEffect = customEffect;
 
   _scene->particleSystems.emplace_back(this);
 
@@ -115,7 +70,7 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
   _createVertexBuffers();
 
   // Default emitter type
-  particleEmitterType = ::std::make_unique<BoxParticleEmitter>();
+  particleEmitterType = std::make_unique<BoxParticleEmitter>();
 
   updateFunction = [this](vector_t<Particle*>& _particles) {
     nullable_t<Uint8Array> noiseTextureData;
@@ -188,6 +143,8 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
 
         // Direction
         auto directionScale = _scaledUpdateSpeed;
+
+        // Velocity
         if (_velocityGradients.size() > 0) {
           Tools::GetCurrentGradient<FactorGradient>(
             ratio, _velocityGradients,
@@ -204,6 +161,50 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
             });
         }
         particle->direction.scaleToRef(directionScale, _scaledDirection);
+
+        // Limit velocity
+        if (!_limitVelocityGradients.empty()) {
+          Tools::GetCurrentGradient<FactorGradient>(
+            ratio, _limitVelocityGradients,
+            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+                float scale) {
+              if (currentGradient != particle->_currentLimitVelocityGradient) {
+                particle->_currentLimitVelocity1
+                  = particle->_currentLimitVelocity2;
+                particle->_currentLimitVelocity2 = nextGradient.getFactor();
+                particle->_currentLimitVelocityGradient = currentGradient;
+              }
+
+              auto limitVelocity
+                = Scalar::Lerp(particle->_currentLimitVelocity1,
+                               particle->_currentLimitVelocity2, scale);
+              auto currentVelocity = particle->direction.length();
+
+              if (currentVelocity > limitVelocity) {
+                particle->direction.scaleInPlace(limitVelocityDamping);
+              }
+            });
+        }
+
+        /// Drag
+        if (!_dragGradients.empty()) {
+          Tools::GetCurrentGradient<FactorGradient>(
+            ratio, _dragGradients,
+            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+                float scale) {
+              if (currentGradient != particle->_currentDragGradient) {
+                particle->_currentDrag1        = particle->_currentDrag2;
+                particle->_currentDrag2        = nextGradient.getFactor();
+                particle->_currentDragGradient = currentGradient;
+              }
+
+              auto drag = Scalar::Lerp(particle->_currentDrag1,
+                                       particle->_currentDrag2, scale);
+
+              _scaledDirection.scaleInPlace(drag);
+            });
+        }
+
         particle->position.addInPlace(_scaledDirection);
 
         // Noise
@@ -289,153 +290,13 @@ vector_t<Particle*>& ParticleSystem::particles()
   return _particles;
 }
 
-vector_t<ColorGradient>& ParticleSystem::getColorGradients()
-{
-  return _colorGradients;
-}
-
-vector_t<FactorGradient>& ParticleSystem::getSizeGradients()
-{
-  return _sizeGradients;
-}
-
-vector_t<FactorGradient>& ParticleSystem::getLifeTimeGradients()
-{
-  return _lifeTimeGradients;
-}
-
-vector_t<FactorGradient>& ParticleSystem::getAngularSpeedGradients()
-{
-  return _angularSpeedGradients;
-}
-
-vector_t<FactorGradient>& ParticleSystem::getVelocityGradients()
-{
-  return _velocityGradients;
-}
-
-Vector3& ParticleSystem::get_direction1()
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    return boxParticleEmitter->direction1;
-  }
-
-  return _zeroVector3;
-}
-
-void ParticleSystem::set_direction1(const Vector3& value)
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    boxParticleEmitter->direction1 = value;
-  }
-}
-
-Vector3& ParticleSystem::get_direction2()
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    return boxParticleEmitter->direction2;
-  }
-
-  return _zeroVector3;
-}
-
-void ParticleSystem::set_direction2(const Vector3& value)
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    boxParticleEmitter->direction2 = value;
-  }
-}
-
-Vector3& ParticleSystem::get_minEmitBox()
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    return boxParticleEmitter->minEmitBox;
-  }
-
-  return _zeroVector3;
-}
-
-void ParticleSystem::set_minEmitBox(const Vector3& value)
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    boxParticleEmitter->minEmitBox = value;
-  }
-}
-
-Vector3& ParticleSystem::get_maxEmitBox()
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    return boxParticleEmitter->maxEmitBox;
-  }
-
-  return _zeroVector3;
-}
-
-void ParticleSystem::set_maxEmitBox(const Vector3& value)
-{
-  if (auto boxParticleEmitter
-      = static_cast<BoxParticleEmitter*>(particleEmitterType.get())) {
-    boxParticleEmitter->maxEmitBox = value;
-  }
-}
-
 void ParticleSystem::set_onDispose(
-  const ::std::function<void(ParticleSystem*, EventState&)>& callback)
+  const std::function<void(ParticleSystem*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
   }
   _onDisposeObserver = onDisposeObservable.add(callback);
-}
-
-bool ParticleSystem::get_isAnimationSheetEnabled() const
-{
-  return _isAnimationSheetEnabled;
-}
-
-void ParticleSystem::set_isAnimationSheetEnabled(bool value)
-{
-  if (_isAnimationSheetEnabled == value) {
-    return;
-  }
-
-  _isAnimationSheetEnabled = value;
-  _resetEffect();
-}
-
-bool ParticleSystem::get_isBillboardBased() const
-{
-  return _isBillboardBased;
-}
-
-void ParticleSystem::set_isBillboardBased(bool value)
-{
-  if (_isBillboardBased == value) {
-    return;
-  }
-
-  _isBillboardBased = value;
-  _resetEffect();
-}
-
-float ParticleSystem::_fetchR(float u, float v, float width, float height,
-                              const Uint8Array& pixels)
-{
-  u = ::std::abs(u) * 0.5f + 0.5f;
-  v = ::std::abs(v) * 0.5f + 0.5f;
-
-  auto wrappedU = ::std::fmod((u * width), width);
-  auto wrappedV = ::std::fmod((v * height), height);
-
-  auto position = static_cast<size_t>((wrappedU + wrappedV * width) * 4);
-  return static_cast<float>(pixels[position]) / 255.f;
 }
 
 void ParticleSystem::_addFactorGradient(
@@ -448,17 +309,17 @@ void ParticleSystem::_addFactorGradient(
   newGradient.factor2  = factor2;
   factorGradients.emplace_back(newGradient);
 
-  ::std::sort(factorGradients.begin(), factorGradients.end(),
-              [](const FactorGradient& a, const FactorGradient& b) {
-                if (a.gradient < b.gradient) {
-                  return -1;
-                }
-                else if (a.gradient > b.gradient) {
-                  return 1;
-                }
+  std::sort(factorGradients.begin(), factorGradients.end(),
+            [](const FactorGradient& a, const FactorGradient& b) {
+              if (a.gradient < b.gradient) {
+                return -1;
+              }
+              else if (a.gradient > b.gradient) {
+                return 1;
+              }
 
-                return 0;
-              });
+              return 0;
+            });
 }
 
 void ParticleSystem::_removeFactorGradient(
@@ -469,15 +330,15 @@ void ParticleSystem::_removeFactorGradient(
   }
 
   factorGradients.erase(
-    ::std::remove_if(factorGradients.begin(), factorGradients.end(),
-                     [&gradient](const FactorGradient& factorGradient) {
-                       return stl_util::almost_equal(factorGradient.gradient,
-                                                     gradient);
-                     }),
+    std::remove_if(factorGradients.begin(), factorGradients.end(),
+                   [&gradient](const FactorGradient& factorGradient) {
+                     return stl_util::almost_equal(factorGradient.gradient,
+                                                   gradient);
+                   }),
     factorGradients.end());
 }
 
-ParticleSystem&
+IParticleSystem&
 ParticleSystem::addLifeTimeGradient(float gradient, float factor,
                                     const nullable_t<float>& factor2)
 {
@@ -486,14 +347,14 @@ ParticleSystem::addLifeTimeGradient(float gradient, float factor,
   return *this;
 }
 
-ParticleSystem& ParticleSystem::removeLifeTimeGradient(float gradient)
+IParticleSystem& ParticleSystem::removeLifeTimeGradient(float gradient)
 {
   _removeFactorGradient(_lifeTimeGradients, gradient);
 
   return *this;
 }
 
-ParticleSystem&
+IParticleSystem&
 ParticleSystem::addSizeGradient(float gradient, float factor,
                                 const nullable_t<float>& factor2)
 {
@@ -542,6 +403,38 @@ IParticleSystem& ParticleSystem::removeVelocityGradient(float gradient)
 }
 
 IParticleSystem&
+ParticleSystem::addLimitVelocityGradient(float gradient, float factor,
+                                         const nullable_t<float>& factor2)
+{
+  _addFactorGradient(_limitVelocityGradients, gradient, factor, *factor2);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeLimitVelocityGradient(float gradient)
+{
+  _removeFactorGradient(_limitVelocityGradients, gradient);
+
+  return *this;
+}
+
+IParticleSystem&
+ParticleSystem::addDragGradient(float gradient, float factor,
+                                const nullable_t<float>& factor2)
+{
+  _addFactorGradient(_dragGradients, gradient, factor, factor2);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeDragGradient(float gradient)
+{
+  _removeFactorGradient(_dragGradients, gradient);
+
+  return *this;
+}
+
+IParticleSystem&
 ParticleSystem::addColorGradient(float gradient, const Color4& color,
                                  const nullable_t<Color4>& color2)
 {
@@ -551,17 +444,17 @@ ParticleSystem::addColorGradient(float gradient, const Color4& color,
   colorGradient.color2   = color2;
   _colorGradients.emplace_back(colorGradient);
 
-  ::std::sort(_colorGradients.begin(), _colorGradients.end(),
-              [](const ColorGradient& a, const ColorGradient& b) {
-                if (a.gradient < b.gradient) {
-                  return -1;
-                }
-                else if (a.gradient > b.gradient) {
-                  return 1;
-                }
+  std::sort(_colorGradients.begin(), _colorGradients.end(),
+            [](const ColorGradient& a, const ColorGradient& b) {
+              if (a.gradient < b.gradient) {
+                return -1;
+              }
+              else if (a.gradient > b.gradient) {
+                return 1;
+              }
 
-                return 0;
-              });
+              return 0;
+            });
 
   return *this;
 }
@@ -573,14 +466,31 @@ IParticleSystem& ParticleSystem::removeColorGradient(float gradient)
   }
 
   _colorGradients.erase(
-    ::std::remove_if(_colorGradients.begin(), _colorGradients.end(),
-                     [&gradient](const ColorGradient& colorGradient) {
-                       return stl_util::almost_equal(colorGradient.gradient,
-                                                     gradient);
-                     }),
+    std::remove_if(_colorGradients.begin(), _colorGradients.end(),
+                   [&gradient](const ColorGradient& colorGradient) {
+                     return stl_util::almost_equal(colorGradient.gradient,
+                                                   gradient);
+                   }),
     _colorGradients.end());
 
   return *this;
+}
+
+float ParticleSystem::_fetchR(float u, float v, float width, float height,
+                              const Uint8Array& pixels)
+{
+  u = std::abs(u) * 0.5f + 0.5f;
+  v = std::abs(v) * 0.5f + 0.5f;
+
+  auto wrappedU = std::fmod((u * width), width);
+  auto wrappedV = std::fmod((v * height), height);
+
+  auto position = static_cast<size_t>((wrappedU + wrappedV * width) * 4);
+  return static_cast<float>(pixels[position]) / 255.f;
+}
+
+void ParticleSystem::_reset()
+{
 }
 
 void ParticleSystem::_resetEffect()
@@ -613,28 +523,28 @@ void ParticleSystem::_createVertexBuffers()
   _vertexData
     = Float32Array(_capacity * _vertexBufferSize * (_useInstancing ? 1 : 4));
   _vertexBuffer
-    = ::std::make_unique<Buffer>(engine, _vertexData, true, _vertexBufferSize);
+    = std::make_unique<Buffer>(engine, _vertexData, true, _vertexBufferSize);
 
   size_t dataOffset = 0;
   auto positions
     = _vertexBuffer->createVertexBuffer(VertexBuffer::PositionKind, dataOffset,
                                         3, _vertexBufferSize, _useInstancing);
-  _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(positions);
+  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(positions);
   dataOffset += 3;
 
   auto colors = _vertexBuffer->createVertexBuffer(
     VertexBuffer::ColorKind, dataOffset, 4, _vertexBufferSize, _useInstancing);
-  _vertexBuffers[VertexBuffer::ColorKindChars] = ::std::move(colors);
+  _vertexBuffers[VertexBuffer::ColorKindChars] = std::move(colors);
   dataOffset += 4;
 
   auto options = _vertexBuffer->createVertexBuffer(
     VertexBuffer::AngleKind, dataOffset, 1, _vertexBufferSize, _useInstancing);
-  _vertexBuffers[VertexBuffer::AngleKindChars] = ::std::move(options);
+  _vertexBuffers[VertexBuffer::AngleKindChars] = std::move(options);
   dataOffset += 1;
 
   auto size = _vertexBuffer->createVertexBuffer(
     VertexBuffer::SizeKind, dataOffset, 2, _vertexBufferSize, _useInstancing);
-  _vertexBuffers[VertexBuffer::SizeKindChars] = ::std::move(size);
+  _vertexBuffers[VertexBuffer::SizeKindChars] = std::move(size);
   dataOffset += 2;
 
   if (_isAnimationSheetEnabled) {
@@ -642,7 +552,7 @@ void ParticleSystem::_createVertexBuffers()
       VertexBuffer::CellIndexKind, dataOffset, 1, _vertexBufferSize,
       _useInstancing);
     _vertexBuffers[VertexBuffer::CellIndexKindChars]
-      = ::std::move(cellIndexBuffer);
+      = std::move(cellIndexBuffer);
     dataOffset += 1;
   }
 
@@ -651,14 +561,14 @@ void ParticleSystem::_createVertexBuffers()
       VertexBuffer::DirectionKind, dataOffset, 3, _vertexBufferSize,
       _useInstancing);
     _vertexBuffers[VertexBuffer::DirectionKindChars]
-      = ::std::move(directionBuffer);
+      = std::move(directionBuffer);
     dataOffset += 3;
   }
 
   unique_ptr_t<VertexBuffer> offsets = nullptr;
   if (_useInstancing) {
     Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
-    _spriteBuffer = ::std::make_unique<Buffer>(engine, spriteData, false, 2);
+    _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 2);
     offsets = _spriteBuffer->createVertexBuffer(VertexBuffer::OffsetKind, 0, 2);
   }
   else {
@@ -667,7 +577,7 @@ void ParticleSystem::_createVertexBuffers()
                                           2, _vertexBufferSize, _useInstancing);
     dataOffset += 2;
   }
-  _vertexBuffers[VertexBuffer::OffsetKindChars] = ::std::move(offsets);
+  _vertexBuffers[VertexBuffer::OffsetKindChars] = std::move(offsets);
 }
 
 void ParticleSystem::_createIndexBuffer()
@@ -852,8 +762,8 @@ void ParticleSystem::_removeFromRoot()
   }
 
   _rootParticleSystem->activeSubSystems.erase(
-    ::std::remove(_rootParticleSystem->activeSubSystems.begin(),
-                  _rootParticleSystem->activeSubSystems.end(), this),
+    std::remove(_rootParticleSystem->activeSubSystems.begin(),
+                _rootParticleSystem->activeSubSystems.end(), this),
     _rootParticleSystem->activeSubSystems.end());
 }
 
@@ -864,7 +774,7 @@ void ParticleSystem::_emitFromParticle(Particle* /*particle*/)
   }
 #if 0
   auto templateIndex
-    = static_cast<size_t>(::std::floor(Math::random() * subEmitters.size()));
+    = static_cast<size_t>(std::floor(Math::random() * subEmitters.size()));
 
   auto subSystem
     = subEmitters[templateIndex]->clone(name + "_sub", particle->position);
@@ -1012,6 +922,34 @@ void ParticleSystem::_update(int newParticles)
       }
     }
 
+    // Limit velocity
+    if (!_limitVelocityGradients.empty()) {
+      particle->_currentLimitVelocityGradient = _limitVelocityGradients[0];
+      particle->_currentLimitVelocity1
+        = particle->_currentLimitVelocityGradient->getFactor();
+
+      if (_limitVelocityGradients.size() > 1) {
+        particle->_currentLimitVelocity2
+          = _limitVelocityGradients[1].getFactor();
+      }
+      else {
+        particle->_currentLimitVelocity2 = particle->_currentLimitVelocity1;
+      }
+    }
+
+    // Drag
+    if (_dragGradients.empty()) {
+      particle->_currentDragGradient = _dragGradients[0];
+      particle->_currentDrag1 = particle->_currentDragGradient->getFactor();
+
+      if (_dragGradients.size() > 1) {
+        particle->_currentDrag2 = _dragGradients[1].getFactor();
+      }
+      else {
+        particle->_currentDrag2 = particle->_currentDrag1;
+      }
+    }
+
     // Color
     if (_colorGradients.empty()) {
       auto step = Scalar::RandomRange(0.f, 1.f);
@@ -1066,7 +1004,8 @@ vector_t<string_t>
 ParticleSystem::_GetEffectCreationOptions(bool isAnimationSheetEnabled)
 {
   vector_t<string_t> effectCreationOption{
-    "invView",          "view",       "projection", "vClipPlane", "textureMask",
+    "invView",          "view",        "projection",  "vClipPlane",
+    "vClipPlane2",      "vClipPlane3", "vClipPlane4", "textureMask",
     "translationPivot", "eyePosition"};
 
   if (isAnimationSheetEnabled) {
@@ -1088,6 +1027,18 @@ Effect* ParticleSystem::_getEffect()
     defines.emplace_back("#define CLIPPLANE");
   }
 
+  if (_scene->clipPlane2.has_value()) {
+    defines.emplace_back("#define CLIPPLANE2");
+  }
+
+  if (_scene->clipPlane3.has_value()) {
+    defines.emplace_back("#define CLIPPLANE3");
+  }
+
+  if (_scene->clipPlane4.has_value()) {
+    defines.emplace_back("#define CLIPPLANE4");
+  }
+
   if (_isAnimationSheetEnabled) {
     defines.emplace_back("#define ANIMATESHEET");
   }
@@ -1105,6 +1056,12 @@ Effect* ParticleSystem::_getEffect()
     }
   }
 
+  if (_imageProcessingConfiguration) {
+    _imageProcessingConfiguration->prepareDefines(
+      *_imageProcessingConfigurationDefines);
+    defines.emplace_back(_imageProcessingConfigurationDefines->toString());
+  }
+
   // Effect
   string_t join = String::join(defines, '\n');
   if (_cachedDefines != join) {
@@ -1115,11 +1072,21 @@ Effect* ParticleSystem::_getEffect()
     auto effectCreationOption
       = ParticleSystem::_GetEffectCreationOptions(_isAnimationSheetEnabled);
 
+    vector_t<string_t> samplers{"diffuseSampler"};
+
+    // if (ImageProcessingConfiguration)
+    {
+      ImageProcessingConfiguration::PrepareUniforms(
+        effectCreationOption, *_imageProcessingConfigurationDefines);
+      ImageProcessingConfiguration::PrepareSamplers(
+        samplers, *_imageProcessingConfigurationDefines);
+    }
+
     EffectCreationOptions options;
-    options.attributes    = ::std::move(attributesNamesOrOptions);
-    options.uniformsNames = ::std::move(effectCreationOption);
-    options.samplers      = {"diffuseSampler"};
-    options.defines       = ::std::move(join);
+    options.attributes    = std::move(attributesNamesOrOptions);
+    options.uniformsNames = std::move(effectCreationOption);
+    options.samplers      = std::move(samplers);
+    options.defines       = std::move(join);
 
     _effect = _scene->getEngine()->createEffect("particles", options,
                                                 _scene->getEngine());
@@ -1138,7 +1105,8 @@ void ParticleSystem::animate(bool preWarmOnly)
     auto effect = _getEffect();
 
     // Check
-    if (!hasEmitter() || !effect->isReady() || !particleTexture
+    if (!hasEmitter() || !_imageProcessingConfiguration->isReady()
+        || !effect->isReady() || !particleTexture
         || !particleTexture->isReady())
       return;
 
@@ -1237,7 +1205,8 @@ void ParticleSystem::rebuild()
 bool ParticleSystem::isReady()
 {
   auto effect = _getEffect();
-  if (!hasEmitter() || !effect->isReady() || !particleTexture
+  if (!hasEmitter() || !_imageProcessingConfiguration->isReady()
+      || !effect->isReady() || !particleTexture
       || !particleTexture->isReady()) {
     return false;
   }
@@ -1282,13 +1251,13 @@ size_t ParticleSystem::render(bool /*preWarm*/)
     effect->setVector3("eyePosition", camera->globalPosition);
   }
 
-  if (_scene->clipPlane.has_value()) {
-    auto clipPlane = *_scene->clipPlane;
-    auto invView   = viewMatrix;
+  if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
+      || _scene->clipPlane3.has_value() || _scene->clipPlane4.has_value()) {
+    auto invView = viewMatrix;
     invView.invert();
     effect->setMatrix("invView", invView);
-    effect->setFloat4("vClipPlane", clipPlane.normal.x, clipPlane.normal.y,
-                      clipPlane.normal.z, clipPlane.d);
+
+    MaterialHelper::BindClipPlane(effect, _scene);
   }
 
   // VBOs
@@ -1297,6 +1266,12 @@ size_t ParticleSystem::render(bool /*preWarm*/)
     vertexBuffersTmp[item.first] = item.second.get();
   }
   engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), effect);
+
+  // image processing
+  if (_imageProcessingConfiguration
+      && !_imageProcessingConfiguration->applyByPostProcess) {
+    _imageProcessingConfiguration->bind(effect);
+  }
 
   // Draw order
   if (blendMode == ParticleSystem::BLENDMODE_ADD) {
@@ -1359,11 +1334,11 @@ void ParticleSystem::dispose(bool disposeTexture,
 
   // Remove from scene
   _scene->particleSystems.erase(
-    ::std::remove_if(_scene->particleSystems.begin(),
-                     _scene->particleSystems.end(),
-                     [this](const IParticleSystemPtr& particleSystem) {
-                       return particleSystem.get() == this;
-                     }),
+    std::remove_if(_scene->particleSystems.begin(),
+                   _scene->particleSystems.end(),
+                   [this](const IParticleSystemPtr& particleSystem) {
+                     return particleSystem.get() == this;
+                   }),
     _scene->particleSystems.end());
 
   // Callback
@@ -1374,67 +1349,6 @@ void ParticleSystem::dispose(bool disposeTexture,
 vector_t<AnimationPtr> ParticleSystem::getAnimations()
 {
   return animations;
-}
-
-PointParticleEmitter*
-ParticleSystem::createPointEmitter(const Vector3& direction1,
-                                   const Vector3& direction2)
-{
-  auto particleEmitter        = ::std::make_unique<PointParticleEmitter>();
-  particleEmitter->direction1 = direction1;
-  particleEmitter->direction2 = direction2;
-
-  particleEmitterType = ::std::move(particleEmitter);
-  return particleEmitter.get();
-}
-
-HemisphericParticleEmitter*
-ParticleSystem::createHemisphericEmitter(float radius, float radiusRange)
-{
-  auto particleEmitter
-    = ::std::make_unique<HemisphericParticleEmitter>(radius, radiusRange);
-  particleEmitterType = ::std::move(particleEmitter);
-  return particleEmitter.get();
-}
-
-SphereParticleEmitter* ParticleSystem::createSphereEmitter(float radius,
-                                                           float radiusRange)
-{
-  auto particleEmitter
-    = ::std::make_unique<SphereParticleEmitter>(radius, radiusRange);
-  particleEmitterType = ::std::move(particleEmitter);
-  return particleEmitter.get();
-}
-
-SphereDirectedParticleEmitter* ParticleSystem::createDirectedSphereEmitter(
-  float radius, const Vector3& direction1, const Vector3& direction2)
-{
-  auto particleEmitter = ::std::make_unique<SphereDirectedParticleEmitter>(
-    radius, direction1, direction2);
-  particleEmitterType = ::std::move(particleEmitter);
-  return particleEmitter.get();
-}
-
-ConeParticleEmitter* ParticleSystem::createConeEmitter(float radius,
-                                                       float angle)
-{
-  auto particleEmitter = ::std::make_unique<ConeParticleEmitter>(radius, angle);
-  particleEmitterType  = ::std::move(particleEmitter);
-  return particleEmitter.get();
-}
-
-BoxParticleEmitter* ParticleSystem::createBoxEmitter(const Vector3& iDirection1,
-                                                     const Vector3& iDirection2,
-                                                     const Vector3& iMinEmitBox,
-                                                     const Vector3& iMaxEmitBox)
-{
-  auto particleEmitter = ::std::make_unique<BoxParticleEmitter>();
-  particleEmitterType  = ::std::move(particleEmitter);
-  direction1           = iDirection1;
-  direction2           = iDirection2;
-  minEmitBox           = iMinEmitBox;
-  maxEmitBox           = iMaxEmitBox;
-  return particleEmitter.get();
 }
 
 IParticleSystem* ParticleSystem::clone(const string_t& /*iName*/,

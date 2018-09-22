@@ -68,49 +68,6 @@ GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
     , _limitVelocityGradientsTexture{nullptr}
     , _dragGradientsTexture{nullptr}
 {
-  // IParticleSystem
-  {
-    id                    = iName;
-    name                  = iName;
-    renderingGroupId      = 0;
-    layerMask             = 0x0FFFFFFF;
-    updateSpeed           = 0.01f;
-    targetStopDuration    = 0;
-    particleTexture       = nullptr;
-    blendMode             = ParticleSystem::BLENDMODE_ONEONE;
-    minLifeTime           = 1.f;
-    maxLifeTime           = 1.f;
-    minSize               = 1.f;
-    maxSize               = 1.f;
-    minScaleX             = 1.f;
-    maxScaleX             = 1.f;
-    minScaleY             = 1.f;
-    maxScaleY             = 1.f;
-    color1                = Color4{1.f, 1.f, 1.f, 1.f};
-    color2                = Color4{1.f, 1.f, 1.f, 1.f};
-    colorDead             = Color4{0.f, 0.f, 0.f, 0.f};
-    emitRate              = 100;
-    gravity               = Vector3::Zero();
-    minEmitPower          = 1.f;
-    maxEmitPower          = 1.f;
-    minAngularSpeed       = 0.f;
-    maxAngularSpeed       = 0.f;
-    particleEmitterType   = nullptr;
-    preWarmCycles         = 0;
-    preWarmStepOffset     = 1;
-    minInitialRotation    = 0.f;
-    maxInitialRotation    = 0.f;
-    spriteCellChangeSpeed = 1.f;
-    startSpriteCellID     = 0;
-    endSpriteCellID       = 0;
-    spriteCellWidth       = 0;
-    spriteCellHeight      = 0;
-    translationPivot      = Vector2(0.f, 0.f);
-    noiseTexture          = nullptr;
-    noiseStrength         = Vector3(10.f, 10.f, 10.f);
-    billboardMode         = AbstractMesh::BILLBOARDMODE_ALL;
-  }
-
   _scene = scene ? scene : Engine::LastCreatedScene();
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
@@ -214,7 +171,7 @@ bool GPUParticleSystem::isReady()
     return false;
   }
 
-  if (/*!emitter ||*/ !_updateEffect->isReady()
+  if (!hasEmitter() || !_updateEffect->isReady()
       || !_imageProcessingConfiguration->isReady() || !_renderEffect->isReady()
       || !particleTexture || !particleTexture->isReady()) {
     return false;
@@ -419,8 +376,8 @@ GPUParticleSystem& GPUParticleSystem::removeVelocityGradient(float gradient)
   return *this;
 }
 
-GPUParticleSystem& GPUParticleSystem::addLimitVelocityGradient(float gradient,
-                                                               float factor)
+IParticleSystem& GPUParticleSystem::addLimitVelocityGradient(
+  float gradient, float factor, const nullable_t<float>& /*factor2*/)
 {
   _addFactorGradient(_limitVelocityGradients, gradient, factor);
 
@@ -434,8 +391,7 @@ GPUParticleSystem& GPUParticleSystem::addLimitVelocityGradient(float gradient,
   return *this;
 }
 
-GPUParticleSystem&
-GPUParticleSystem::removeLimitVelocityGradient(float gradient)
+IParticleSystem& GPUParticleSystem::removeLimitVelocityGradient(float gradient)
 {
   _removeGradient(gradient, _limitVelocityGradients,
                   _limitVelocityGradientsTexture.get());
@@ -444,8 +400,9 @@ GPUParticleSystem::removeLimitVelocityGradient(float gradient)
   return *this;
 }
 
-GPUParticleSystem& GPUParticleSystem::addDragGradient(float gradient,
-                                                      float factor)
+IParticleSystem& GPUParticleSystem::addDragGradient(
+  float gradient, float factor, const nullable_t<float>& /*factor2*/
+)
 {
   _addFactorGradient(_dragGradients, gradient, factor);
 
@@ -459,7 +416,7 @@ GPUParticleSystem& GPUParticleSystem::addDragGradient(float gradient,
   return *this;
 }
 
-GPUParticleSystem& GPUParticleSystem::removeDragGradient(float gradient)
+IParticleSystem& GPUParticleSystem::removeDragGradient(float gradient)
 {
   _removeGradient(gradient, _dragGradients, _dragGradientsTexture.get());
   _dragGradientsTexture = nullptr;

@@ -160,14 +160,16 @@ public:
    * gradient
    * @returns the current particle system
    */
-  GPUParticleSystem& addLimitVelocityGradient(float gradient, float factor);
+  IParticleSystem& addLimitVelocityGradient(float gradient, float factor,
+                                            const nullable_t<float>& factor2
+                                            = nullopt_t) override;
 
   /**
    * Remove a specific limit velocity gradient.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
-  GPUParticleSystem& removeLimitVelocityGradient(float gradient);
+  IParticleSystem& removeLimitVelocityGradient(float gradient) override;
 
   /**
    * @brief Adds a new drag gradient.
@@ -175,14 +177,16 @@ public:
    * @param factor defines the drag value to affect to the specified gradient
    * @returns the current particle system
    */
-  GPUParticleSystem& addDragGradient(float gradient, float factor);
+  IParticleSystem& addDragGradient(float gradient, float factor,
+                                   const nullable_t<float>& factor2
+                                   = nullopt_t) override;
 
   /**
    * Remove a specific drag gradient.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
-  GPUParticleSystem& removeDragGradient(float gradient);
+  IParticleSystem& removeDragGradient(float gradient) override;
 
   /**
    * @brief Hidden

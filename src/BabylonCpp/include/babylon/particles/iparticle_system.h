@@ -468,7 +468,6 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    */
   virtual IParticleSystem& removeVelocityGradient(float gradient) = 0;
 
-#if 0
   /**
    * @brief Gets the current list of limit velocity gradients.
    * You must use addLimitVelocityGradient and removeLimitVelocityGradient to
@@ -517,7 +516,6 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @returns the current particle system
    */
   virtual IParticleSystem& removeDragGradient(float gradient) = 0;
-#endif
 
 }; // end of struct IParticleSystem
 

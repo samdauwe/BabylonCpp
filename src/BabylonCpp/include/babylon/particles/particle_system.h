@@ -3,7 +3,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_global.h>
-#include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
+#include <babylon/particles/base_particle_system.h>
 #include <babylon/particles/iparticle_system.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -18,25 +18,8 @@ namespace BABYLON {
  * like box, sphere, cone or you can write your custom function.
  * Example: https://doc.babylonjs.com/babylon101/particles
  */
-class BABYLON_SHARED_EXPORT ParticleSystem : public IAnimatable,
-                                             public IParticleSystem {
-
-public:
-  /** Statics **/
-  /**
-   * Source color is added to the destination color without alpha affecting the
-   * result.
-   */
-  static constexpr int BLENDMODE_ONEONE = 0;
-  /**
-   * Blend current color and particle color using particle’s alpha.
-   */
-  static constexpr int BLENDMODE_STANDARD = 1;
-
-  /**
-   * Add current color and particle color multiplied by particle’s alpha.
-   */
-  static constexpr int BLENDMODE_ADD = 2;
+class BABYLON_SHARED_EXPORT ParticleSystem : public BaseParticleSystem,
+                                             public IAnimatable {
 
 public:
   /**
@@ -67,44 +50,6 @@ public:
   Scene* getScene() const;
 
   /**
-   * @brief Gets the current list of color gradients.
-   * You must use addColorGradient and removeColorGradient to udpate this list
-   * @returns the list of color gradients
-   */
-  vector_t<ColorGradient>& getColorGradients() override;
-
-  /**
-   * @brief Gets the current list of size gradients.
-   * You must use addSizeGradient and removeSizeGradient to udpate this list
-   * @returns the list of size gradients
-   */
-  vector_t<FactorGradient>& getSizeGradients() override;
-
-  /**
-   * @brief Gets the current list of life time gradients.
-   * You must use addLifeTimeGradient and removeLifeTimeGradient to udpate this
-   * list
-   * @returns the list of life time gradients
-   */
-  vector_t<FactorGradient>& getLifeTimeGradients();
-
-  /**
-   * @brief Gets the current list of angular speed gradients.
-   * You must use addAngularSpeedGradient and removeAngularSpeedGradient to
-   * udpate this list
-   * @returns the list of angular speed gradients
-   */
-  vector_t<FactorGradient>& getAngularSpeedGradients() override;
-
-  /**
-   * @brief Gets the current list of velocity gradients.
-   * You must use addVelocityGradient and removeVelocityGradient to udpate this
-   * list
-   * @returns the list of velocity gradients
-   */
-  vector_t<FactorGradient>& getVelocityGradients() override;
-
-  /**
    * @brief Adds a new life time gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param factor defines the life time factor to affect to the specified
@@ -113,16 +58,16 @@ public:
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  ParticleSystem& addLifeTimeGradient(float gradient, float factor,
-                                      const nullable_t<float>& factor2
-                                      = nullopt_t);
+  IParticleSystem& addLifeTimeGradient(float gradient, float factor,
+                                       const nullable_t<float>& factor2
+                                       = nullopt_t);
 
   /**
    * @brief Remove a specific life time gradient.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
-  ParticleSystem& removeLifeTimeGradient(float gradient);
+  IParticleSystem& removeLifeTimeGradient(float gradient);
 
   /**
    * @brief Adds a new size gradient.
@@ -132,9 +77,9 @@ public:
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  ParticleSystem& addSizeGradient(float gradient, float factor,
-                                  const nullable_t<float>& factor2
-                                  = nullopt_t) override;
+  IParticleSystem& addSizeGradient(float gradient, float factor,
+                                   const nullable_t<float>& factor2
+                                   = nullopt_t) override;
 
   /**
    * @brief Remove a specific size gradient.
@@ -146,7 +91,8 @@ public:
   /**
    * @brief Adds a new angular speed gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the size factor to affect to the specified gradient
+   * @param factor defines the angular speed  to affect to the specified
+   * gradient
    * @param factor2 defines an additional factor used to define a range
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
@@ -165,7 +111,7 @@ public:
   /**
    * @brief Adds a new velocity gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param factor defines the size factor to affect to the specified gradient
+   * @param factor defines the velocity to affect to the specified gradient
    * @param factor2 defines an additional factor used to define a range
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
@@ -180,6 +126,45 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& removeVelocityGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new limit velocity gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the limit velocity value to affect to the specified
+   * gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  IParticleSystem& addLimitVelocityGradient(float gradient, float factor,
+                                            const nullable_t<float>& factor2
+                                            = nullopt_t) override;
+
+  /**
+   * @brief Remove a specific limit velocity gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeLimitVelocityGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new drag gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the drag value to affect to the specified gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  IParticleSystem& addDragGradient(float gradient, float factor,
+                                   const nullable_t<float>& factor2
+                                   = nullopt_t) override;
+
+  /**
+   * @brief Remove a specific drag gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeDragGradient(float gradient) override;
 
   /**
    * @brief Adds a new color gradient.
@@ -216,13 +201,13 @@ public:
   size_t getCapacity() const override;
 
   /**
-   * @brief Gets Wether there are still active particles in the system.
+   * @brief Gets whether there are still active particles in the system.
    * @returns True if it is alive, otherwise false.
    */
   bool isAlive() const;
 
   /**
-   * @brief Gets Wether the system has been started.
+   * @brief Gets whether the system has been started.
    * @returns True if it has been started, otherwise false.
    */
   bool isStarted() const override;
@@ -322,86 +307,6 @@ public:
   vector_t<AnimationPtr> getAnimations() override;
 
   /**
-   * @brief Creates a Point Emitter for the particle system (emits directly from
-   * the emitter position).
-   * @param direction1 Particles are emitted between the direction1 and
-   * direction2 from within the box
-   * @param direction2 Particles are emitted between the direction1 and
-   * direction2 from within the box
-   * @returns the emitter
-   */
-  PointParticleEmitter* createPointEmitter(const Vector3& direction1,
-                                           const Vector3& direction2);
-
-  /**
-   * @brief Creates a Hemisphere Emitter for the particle system (emits along
-   * the hemisphere radius).
-   * @param radius The radius of the hemisphere to emit from
-   * @param radiusRange The range of the hemisphere to emit from [0-1] 0 Surface
-   * Only, 1 Entire Radius
-   * @returns the emitter
-   */
-  HemisphericParticleEmitter* createHemisphericEmitter(float radius      = 1.f,
-                                                       float radiusRange = 1.f);
-
-  /**
-   * @brief Creates a Sphere Emitter for the particle system (emits along the
-   * sphere radius).
-   * @param radius The radius of the sphere to emit from
-   * @param radiusRange The range of the sphere to emit from [0-1] 0 Surface
-   * Only, 1 Entire Radius
-   * @returns the emitter
-   */
-  SphereParticleEmitter* createSphereEmitter(float radius      = 1.f,
-                                             float radiusRange = 1.f);
-
-  /**
-   * @brief Creates a Directed Sphere Emitter for the particle system (emits
-   * between direction1 and direction2).
-   * @param radius The radius of the sphere to emit from
-   * @param direction1 Particles are emitted between the direction1 and
-   * direction2 from within the sphere
-   * @param direction2 Particles are emitted between the direction1 and
-   * direction2 from within the sphere
-   * @returns the emitter
-   */
-  SphereDirectedParticleEmitter* createDirectedSphereEmitter(
-    float radius = 1.f, const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
-    const Vector3& direction2 = Vector3(0.f, 1.f, 0.f));
-
-  /**
-   * @brief Creates a Cone Emitter for the particle system (emits from the cone
-   * to the particle position).
-   * @param radius The radius of the cone to emit from
-   * @param angle The base angle of the cone
-   * @returns the emitter
-   */
-  ConeParticleEmitter* createConeEmitter(float radius = 1.f,
-                                         float angle  = Math::PI_4);
-
-  // this method needs to be changed when breaking changes will be allowed
-  // to match the sphere and cone methods and properties direction1,2 and
-  // minEmitBox,maxEmitBox to be removed from the system.
-  /**
-   * @brief Creates a Box Emitter for the particle system. (emits between
-   * direction1 and direction2 from withing the box defined by minEmitBox
-   * and maxEmitBox)
-   * @param direction1 Particles are emitted between the direction1 and
-   * direction2 from within the box
-   * @param direction2 Particles are emitted between the direction1 and
-   * direction2 from within the box
-   * @param minEmitBox Particles are emitted from the box between minEmitBox
-   * and maxEmitBox
-   * @param maxEmitBox  Particles are emitted from the box between
-   * minEmitBox and maxEmitBox
-   * @returns the emitter
-   */
-  BoxParticleEmitter* createBoxEmitter(const Vector3& direction1,
-                                       const Vector3& direction2,
-                                       const Vector3& minEmitBox,
-                                       const Vector3& maxEmitBox);
-
-  /**
    * @brief Clones the particle system.
    * @param name The name of the cloned object
    * @param newEmitter The new emitter to use
@@ -440,44 +345,13 @@ public:
                                Scene* scene, const string_t& url);
 
 protected:
-  Vector3& get_direction1();
-  void set_direction1(const Vector3& value);
-  Vector3& get_direction2();
-  void set_direction2(const Vector3& value);
-  Vector3& get_minEmitBox();
-  void set_minEmitBox(const Vector3& value);
-  Vector3& get_maxEmitBox();
-  void set_maxEmitBox(const Vector3& value);
-
   /**
    * @brief Sets a callback that will be triggered when the system is disposed.
    */
   void set_onDispose(
     const ::std::function<void(ParticleSystem*, EventState&)>& callback);
 
-  /**
-   * @brief Gets whether an animation sprite sheet is enabled or not on the
-   * particle system
-   */
-  bool get_isAnimationSheetEnabled() const;
-
-  /**
-   * @brief Sets whether an animation sprite sheet is enabled or not on the
-   * particle system
-   */
-  void set_isAnimationSheetEnabled(bool value);
-
-  /**
-   * @brief Gets or sets a boolean indicating if the particles must be rendered
-   * as billboard or aligned with the direction.
-   */
-  bool get_isBillboardBased() const override;
-
-  /**
-   * @brief Sets a boolean indicating if the particles must be rendered as
-   * billboard or aligned with the direction.
-   */
-  void set_isBillboardBased(bool value) override;
+  void _reset() override;
 
 private:
   float _fetchR(float u, float v, float width, float height,
@@ -502,29 +376,10 @@ private:
 
 public:
   /**
-   * If you want to launch only a few particles at once, that can be done, as
-   * well.
-   */
-  int manualEmitCount;
-
-  /**
-   * Specifies whether the particle system will be disposed once it reaches
-   * the end of the animation.
-   */
-  bool disposeOnStop;
-
-  /**
    * This can help using your own shader to render the particle system.
    * The according effect will be created
    */
   string_t customShader;
-
-  /**
-   * By default particle system starts as soon as they are created. This
-   * prevents the automatic start to happen and let you decide when to start
-   * emitting particles.
-   */
-  bool preventAutoStart;
 
   /**
    * This function can be defined to provide custom update for active
@@ -533,53 +388,6 @@ public:
    * on every frame so try to keep it simple and fast :)
    */
   ::std::function<void(vector_t<Particle*>& particles)> updateFunction;
-
-  /**
-   * Callback triggered when the particle animation is ending.
-   */
-  ::std::function<void()> onAnimationEnd;
-
-  /**
-   * Forces the particle to write their depth information to the depth buffer.
-   * This can help preventing other draw calls to override the particles.
-   */
-  bool forceDepthWrite;
-
-  /**
-   * Random direction of each particle after it has been emitted, between
-   * direction1 and direction2 vectors. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter
-   */
-  Property<ParticleSystem, Vector3> direction1;
-
-  /**
-   * Random direction of each particle after it has been emitted, between
-   * direction1 and direction2 vectors. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter
-   */
-  Property<ParticleSystem, Vector3> direction2;
-
-  /**
-   * Minimum box point around our emitter. Our emitter is the center of
-   * particles source, but if you want your particles to emit from more than
-   * one point, then you can tell it to do so. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter
-   */
-  Property<ParticleSystem, Vector3> minEmitBox;
-
-  /**
-   * Maximum box point around our emitter. Our emitter is the center of
-   * particles source, but if you want your particles to emit from more than
-   * one point, then you can tell it to do so. This only works when
-   * particleEmitterTyps is a BoxParticleEmitter
-   */
-  Property<ParticleSystem, Vector3> maxEmitBox;
-
-  /**
-   * An optional mask to filter some colors out of the texture, or filter a
-   * part of the alpha channel.
-   */
-  Color4 textureMask;
 
   /**
    * This function can be defined to specify initial direction for every new
@@ -609,12 +417,6 @@ public:
                     ::std::function<void(ParticleSystem*, EventState&)>>
     onDispose;
 
-  /**
-   * Gets or sets whether an animation sprite sheet is enabled or not on the
-   * particle system
-   */
-  Property<ParticleSystem, bool> isAnimationSheetEnabled;
-
   unsigned int _vertexBufferSize;
 
   // Sub-emitters
@@ -635,7 +437,6 @@ private:
   vector_t<Particle*> _particles;
   float _epsilon;
   size_t _capacity;
-  Scene* _scene;
   vector_t<Particle*> _stockParticles;
   int _newPartsExcess;
   Float32Array _vertexData;
@@ -659,8 +460,6 @@ private:
   bool _stopped;
   int _actualFrame;
   int _scaledUpdateSpeed;
-  bool _isAnimationSheetEnabled;
-  bool _isBillboardBased;
 
   ::std::function<void(unsigned int offset, Particle* particle)>
     _appendParticleVertexes;
@@ -669,12 +468,6 @@ private:
   Vector3 _zeroVector3;
 
   Matrix _emitterWorldMatrix;
-
-  vector_t<ColorGradient> _colorGradients;
-  vector_t<FactorGradient> _sizeGradients;
-  vector_t<FactorGradient> _lifeTimeGradients;
-  vector_t<FactorGradient> _angularSpeedGradients;
-  vector_t<FactorGradient> _velocityGradients;
 
 }; // end of class ParticleSystem
 

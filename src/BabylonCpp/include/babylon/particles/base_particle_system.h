@@ -338,6 +338,12 @@ public:
   Color4 textureMask;
 
   /**
+   * Gets or sets whether an animation sprite sheet is enabled or not on the
+   * particle system
+   */
+  Property<BaseParticleSystem, bool> isAnimationSheetEnabled;
+
+  /**
    * Random direction of each particle after it has been emitted, between
    * direction1 and direction2 vectors. This only works when
    * particleEmitterTyps is a BoxParticleEmitter.
