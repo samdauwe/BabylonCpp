@@ -1,18 +1,35 @@
 # Working examples #
 
-## Creating a Basic Scene ##
+## Basic Scene ##
 ![basic_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_scene.png?raw=true "Basic Scene")
 
+## Animations ##
+![animations_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/animations_scene.png?raw=true "Animations Scene")
+![easing_functions_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/easing_functions_scene.png?raw=true "Easing Functions Scene")
+![shape_easings_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shape_easings_scene.png?raw=true "Shape Easings Scene")
+![pump_jack_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/pump_jack_scene.png?raw=true "Pump Jack Scene")
+
+## Cameras ##
+![cameras_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cameras_scene.png?raw=true "Cameras Scene")
+
 ## Lights ##
+![directional_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/directional_light_scene.png?raw=true "Directional Light Scene")
+![hemispheric_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/hemispheric_light_scene.png?raw=true "Hemispheric Light Scene")
+![light_projected_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/light_projected_texture_scene.png?raw=true "Light Projected Texture Scene")
 ![lights_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lights_scene.png?raw=true "Lights Scene")
+![point_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/point_light_scene.png?raw=true "Point Light Scene")
+![spot_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/spot_light_scene.png?raw=true "Spot Light Scene")
 
 ## Loaders ##
 ![import_meshes_skull_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_meshes_skull_scene.png?raw=true "Import Meshes Skull Scene")
 
-## Use FresnelParameters ##
+## Materials ##
+![materials_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/materials_scene.png?raw=true "Materials Scene")
+![multi_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/multi_material_scene.png?raw=true "Multi Material Scene")
 ![fresnel_parameters_torus_knot_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_parameters_torus_knot_scene.png?raw=true "Fresnel Parameters TorusKnot Scene")
+![x_ray_material_with_fresnel_skull_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/x_ray_material_with_fresnel_skull_scene.png?raw=true "X-ray Material with Fresnel Skull Scene")
 
-## Understanding Shaders and ShaderMaterial ##
+### ShaderMaterial (Shadertoy shaders) ###
 ![shader_material_tiles_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_tiles_scene.png?raw=true "Shader Material Tiles Scene")
 ![shader_material_boxes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_boxes_scene.png?raw=true "Shader Material Boxes Scene")
 ![shader_material_cylinders_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_cylinders_scene.png?raw=true "Shader Material Cylinders Scene")
@@ -23,6 +40,7 @@
 ![shader_material_seascape_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_seascape_scene.png?raw=true "Shader Material Seascape Scene")
 ![shader_material_server_room_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_server_room_scene.png?raw=true "Shader Material Server Room Scene")
 ![shader_material_skybox_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_scene.png?raw=true "Shader Material Skybox Scene")
+![shader_material_clouds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_clouds_scene.png?raw=true "Shader Material Clouds Scene")
 ![shader_material_skybox_clouds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_skybox_clouds_scene.png?raw=true "Shader Material Skybox Clouds Scene")
 ![shader_material_kifs_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_kifs_scene.png?raw=true "Shader Material KIFS Scene")
 ![shader_material_luminescence_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_luminescence_scene.png?raw=true "Shader Material Luminescence Scene")
@@ -45,48 +63,55 @@
 ![shader_material_wolfenstein_3d_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_wolfenstein_3d_scene.png?raw=true "Shader Material Wolfenstein 3D Scene")
 ![shader_material_xyptonjtroz_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shader_material_xyptonjtroz_scene.png?raw=true "Shader Material Xyptonjtroz Scene")
 
-## Mesh Basics ##
+## Materials Library ##
+![cell_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cell_material_scene.png?raw=true "Cell Material Scene")
+![gradient_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/gradient_material_scene.png?raw=true "Gradient Material Scene")
+![gradient_material_sphere_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/gradient_material_sphere_scene.png?raw=true "Gradient Material Sphere Scene")
+![grid_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/grid_material_scene.png?raw=true "Grid Material Scene")
+![lava_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lava_material_scene.png?raw=true "Lava Material Scene")
+![mix_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/mix_material_scene.png?raw=true "Mix Material Scene")
+![normal_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/normal_material_scene.png?raw=true "Normal Material Scene")
+![simple_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simple_material_scene.png?raw=true "Simple Material Scene")
+![sky_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/sky_material_scene.png?raw=true "Sky Material Scene")
+![terrain_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/terrain_material_scene.png?raw=true "Terrain Material Scene")
+![tri_planar_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tri_planar_material_scene.png?raw=true "Tri-Planar Material Scene")
 
-### Animations ###
-![animations_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/animations_scene.png?raw=true "Animations Scene")
-![easing_functions_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/easing_functions_scene.png?raw=true "Easing Functions Scene")
-![shape_easings_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shape_easings_scene.png?raw=true "Shape Easings Scene")
-
-### Discover Basic Elements ###
+### Meshes ###
 ![basic_elements_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_elements_scene.png?raw=true "Basic Elements Scene")
-
-### How Rotations and Translations Work ###
-![rotation_and_scaling_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rotation_and_scaling_scene.png?raw=true "Rotation And Scaling Scene")
-
-### Mesh CreateXXX Methods With Options Parameter ###
+![basic_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_scene.png?raw=true "Basic Scene")
 ![polyhedron_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polyhedron_scene.png?raw=true "Polyhedron Scene")
 ![ico_sphere_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ico_sphere_scene.png?raw=true "Icosphere Scene")
 ![lathe_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lathe_scene.png?raw=true "Lathe Scene")
 ![cuboid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cuboid_scene.png?raw=true "Cuboid Scene")
 ![lorenz_attractor_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lorenz_attractor_scene.png?raw=true "Lorenz Attractor Scene")
+![circle_curves_from_beziers](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/circle_curves_from_beziers.png?raw=true "Circle Curves From Beziers Scene")
 ![extruded_polygon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extruded_polygon_scene.png?raw=true "Extruded Polygon Scene")
-
-### Parametric Shapes ###
-![tube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png?raw=true "Tube Scene")
-![curved_helix_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/curved_helix_meshes_scene.png?raw=true "Curved Helix Meshes Scene")
 ![extrusion_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extrusion_scene.png?raw=true "Extrusion Scene")
-
-## Mesh Intermediate ##
-
-### Ribbon Tutorial ###
+![merged_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/merged_meshes_scene.png?raw=true "Merged Meshes Scene")
+![tiled_ground_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tiled_ground_scene.png?raw=true "Tiled Ground Scene")
+![height_map_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/height_map_scene.png?raw=true "Height Map Scene")
+![colored_triangle_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/colored_triangle_scene.png?raw=true "Colored Triangle Scene")
+![tube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png?raw=true "Tube Scene")
 ![ribbon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ribbon_scene.png?raw=true "Ribbon Scene")
-
-### Using PolygonMeshBuilder ###
+![curved_helix_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/curved_helix_meshes_scene.png?raw=true "Curved Helix Meshes Scene")
 ![polygon_mesh_bird_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_bird_scene.png?raw=true "Polygon Mesh Bird Scene")
 ![polygon_mesh_monkey_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_monkey_scene.png?raw=true "Polygon Mesh Monkey Scene")
 ![polygon_mesh_puzzle_piece_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_puzzle_piece_scene.png?raw=true "Polygon Mesh Puzzle Piece Scene")
 ![polygon_mesh_stars_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_stars_scene.png?raw=true "Polygon Mesh Stars Scene")
 ![polygon_mesh_stars_with_holes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_stars_with_holes_scene.png?raw=true "Polygon Mesh Stars With Holes Scene")
+![rotation_and_scaling_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rotation_and_scaling_scene.png?raw=true "Rotation And Scaling Scene")
+![airplane_model_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/airplane_model_scene.png?raw=true "Airplane Model Scene")
+![house_from_floorplan](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/house_from_floorplan.png?raw=true "House from a Floorplan Scene")
+![mandelbrot_fractal_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/mandelbrot_fractal_scene.png?raw=true "Mandelbrot Fractal Scene")
+![super_ellipsoid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/super_ellipsoid_scene.png?raw=true "Super Ellipsoid Scene")
+![waves_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/waves_scene.png?raw=true "Waves Scene")
 
-## Mesh Advanced ##
+## Special FX ##
+![fog_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fog_scene.png?raw=true "Fog Scene")
+![infinite_loader_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png?raw=true "Infinite Loader Scene")
 
-### How to Merge Meshes ###
-![merged_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/merged_meshes_scene.png?raw=true "Merged Meshes Scene")
+## Textures ##
+![bump_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bump_texture_scene.png?raw=true "Bump Texture Scene")
 
 ## Extensions ##
 
@@ -106,11 +131,3 @@
 
 #### Simple Pine Generator ####
 ![simple_pine_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simple_pine_scene.png?raw=true "Simple Pine Scene")
-
-## Interesting Playgrounds ##
-![fireworks_with_shader_code_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fireworks_with_shader_code_scene.png?raw=true "Fireworks with Shader Code Scene")
-![infinite_loader_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png?raw=true "Infinite Loader Scene")
-![house_from_floorplan](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/house_from_floorplan.png?raw=true "House from a Floorplan Scene")
-![mandelbrot_fractal_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/mandelbrot_fractal_scene.png?raw=true "Mandelbrot Fractal Scene")
-![super_ellipsoid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/super_ellipsoid_scene.png?raw=true "Super Ellipsoid Scene")
-![waves_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/waves_scene.png?raw=true "Waves Scene")

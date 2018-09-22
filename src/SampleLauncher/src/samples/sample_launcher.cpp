@@ -34,8 +34,8 @@ namespace Samples {
 const SampleLauncher::ResolutionSize SampleLauncher::DESIGN_RESOLUTION_SIZE
   = std::make_pair(1280, 720);
 const SampleLauncher::ResolutionSize SampleLauncher::SMALL_RESOLUTION_SIZE
-  //  = std::make_pair(240, 160);
-  = std::make_pair(800, 600);
+  = std::make_pair(240, 160);
+//= std::make_pair(800, 600);
 const SampleLauncher::ResolutionSize SampleLauncher::MEDIUM_RESOLUTION_SIZE
   = std::make_pair(1024, 768);
 const SampleLauncher::ResolutionSize SampleLauncher::LARGE_RESOLUTION_SIZE
@@ -332,10 +332,15 @@ static void GLFWWindowSizeCallback(GLFWwindow* window, int width, int height)
 SampleLauncher::SampleLauncher(const SampleLauncherOptions& options)
     : _sampleLauncherState{State::UNINITIALIZED}
     , _defaultWinResX{options.size.first}
-    , _defaultWinResY{options.size.second}
+    , _defaultWinResY
+{
+  options.size.second
+}
 #ifdef WITH_INSPECTOR
-    , _showInspectorWindow{options.showInspectorWindow}
-    , _inspector{nullptr}
+, _showInspectorWindow{options.showInspectorWindow}, _inspector
+{
+  nullptr
+}
 #endif
 , _useOpenGLES{false}
 {
