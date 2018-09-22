@@ -1,13 +1,21 @@
 #ifndef BABYLON_LIGHTS_LIGHT_H
 #define BABYLON_LIGHTS_LIGHT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/engine/node.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Effect;
+class Light;
+struct MaterialDefines;
+class ShadowGenerator;
+class UniformBuffer;
+using LightPtr = std::shared_ptr<Light>;
 
 /**
  * @brief Base class of all the lights in Babylon. It groups all the generic
@@ -126,7 +134,7 @@ public:
    * @brief Returns the string "Light".
    * @returns the class name
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Converts the light information to a readable string for debug
@@ -135,7 +143,7 @@ public:
    * loading
    * @returns the human readable light info
    */
-  string_t toString(bool fullDetails = false) const;
+  std::string toString(bool fullDetails = false) const;
 
   /**
    * @brief Set the enabled state of this node.
@@ -161,10 +169,11 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The light
    */
-  virtual void transferToEffect(Effect* effect, const string_t& lightIndex) = 0;
+  virtual void transferToEffect(Effect* effect, const std::string& lightIndex)
+    = 0;
 
-  virtual void transferToEffect(Effect* effect, const string_t& uniformName0,
-                                const string_t& uniformName1);
+  virtual void transferToEffect(Effect* effect, const std::string& uniformName0,
+                                const std::string& uniformName1);
 
   /**
    * @brief Internal use only.
@@ -212,7 +221,7 @@ public:
    * @param name The name of the cloned light
    * @returns the new created light
    */
-  unique_ptr_t<Light> clone(const string_t& name);
+  std::unique_ptr<Light> clone(const std::string& name);
 
   /**
    * @brief Serializes the current light into a Serialization object.
@@ -261,7 +270,8 @@ public:
    * @returns the constructor function
    */
   static ::std::function<LightPtr()>
-  GetConstructorFromName(unsigned int type, const string_t& name, Scene* scene);
+  GetConstructorFromName(unsigned int type, const std::string& name,
+                         Scene* scene);
 
   /**
    * @brief Parses the passed "parsedLight" and returns a new instanced Light
@@ -279,7 +289,7 @@ protected:
    * @param name The firendly name of the light
    * @param scene The scene the light belongs too
    */
-  Light(const string_t& name, Scene* scene);
+  Light(const std::string& name, Scene* scene);
 
   /**
    * @brief Defines how far from the source the light is impacting in scene
@@ -348,22 +358,22 @@ protected:
   /**
    * @brief Gets the only meshes impacted by this light.
    */
-  vector_t<AbstractMesh*>& get_includedOnlyMeshes();
+  std::vector<AbstractMesh*>& get_includedOnlyMeshes();
 
   /**
    * @brief Sets the only meshes impacted by this light.
    */
-  void set_includedOnlyMeshes(const vector_t<AbstractMesh*>& value);
+  void set_includedOnlyMeshes(const std::vector<AbstractMesh*>& value);
 
   /**
    * @brief Gets the meshes not impacted by this light.
    */
-  vector_t<AbstractMesh*>& get_excludedMeshes();
+  std::vector<AbstractMesh*>& get_excludedMeshes();
 
   /**
    * @brief Sets the meshes not impacted by this light.
    */
-  void set_excludedMeshes(const vector_t<AbstractMesh*>& value);
+  void set_excludedMeshes(const std::vector<AbstractMesh*>& value);
 
   /**
    * @brief Gets the layer id use to find what meshes are not impacted by the
@@ -405,8 +415,8 @@ protected:
   void _resyncMeshes();
 
 private:
-  void _hookArrayForExcluded(const vector_t<AbstractMesh*>& array);
-  void _hookArrayForIncludedOnly(const vector_t<AbstractMesh*>& array);
+  void _hookArrayForExcluded(const std::vector<AbstractMesh*>& array);
+  void _hookArrayForIncludedOnly(const std::vector<AbstractMesh*>& array);
 
   /**
    * @brief Recomputes the cached photometric scale if needed.
@@ -465,18 +475,18 @@ public:
   /**
    * Internal use only.
    */
-  vector_t<string_t> _excludedMeshesIds;
+  std::vector<std::string> _excludedMeshesIds;
 
   /**
    * Internal use only.
    */
-  vector_t<string_t> _includedOnlyMeshesIds;
+  std::vector<std::string> _includedOnlyMeshesIds;
 
   /**
    * The current light unifom buffer.
    * Internal use only.
    */
-  unique_ptr_t<UniformBuffer> _uniformBuffer;
+  std::unique_ptr<UniformBuffer> _uniformBuffer;
 
   /**
    * Photometric scale used to interpret the intensity
@@ -503,12 +513,12 @@ public:
   /**
    * Meshes impacted by this light
    */
-  Property<Light, vector_t<AbstractMesh*>> includedOnlyMeshes;
+  Property<Light, std::vector<AbstractMesh*>> includedOnlyMeshes;
 
   /**
    * Meshes not impacted by this light
    */
-  Property<Light, vector_t<AbstractMesh*>> excludedMeshes;
+  Property<Light, std::vector<AbstractMesh*>> excludedMeshes;
 
   /**
    * Layer id use to find what meshes are not impacted by the light
@@ -541,13 +551,13 @@ private:
   float _radius;
   int _renderPriority;
   bool _shadowEnabled;
-  vector_t<AbstractMesh*> _includedOnlyMeshes;
-  vector_t<AbstractMesh*> _excludedMeshes;
+  std::vector<AbstractMesh*> _includedOnlyMeshes;
+  std::vector<AbstractMesh*> _excludedMeshes;
   unsigned int _includeOnlyWithLayerMask;
   unsigned int _excludeWithLayerMask;
   unsigned int _lightmapMode;
-  unique_ptr_t<Matrix> _parentedWorldMatrix;
-  unique_ptr_t<Matrix> _worldMatrix;
+  std::unique_ptr<Matrix> _parentedWorldMatrix;
+  std::unique_ptr<Matrix> _worldMatrix;
 
 }; // end of class Light
 

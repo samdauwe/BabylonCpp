@@ -1,11 +1,13 @@
 #ifndef BABYLON_LAYER_IHIGHLIGHT_LAYER_MESH_H
 #define BABYLON_LAYER_IHIGHLIGHT_LAYER_MESH_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Mesh;
 
 /**
  * @brief Storage interface grouping all the information required for glowing a

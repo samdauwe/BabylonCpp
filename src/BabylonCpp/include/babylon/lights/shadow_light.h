@@ -1,7 +1,7 @@
 #ifndef BABYLON_LIGHTS_SHADOW_LIGHT_H
 #define BABYLON_LIGHTS_SHADOW_LIGHT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
 
@@ -15,7 +15,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ShadowLight : public IShadowLight {
 
 public:
-  ShadowLight(const string_t& name, Scene* scene);
+  ShadowLight(const std::string& name, Scene* scene);
   ~ShadowLight() override;
 
   /**
@@ -131,12 +131,12 @@ public:
    */
   IShadowLight* setShadowProjectionMatrix(
     Matrix& matrix, Matrix& viewMatrix,
-    const vector_t<AbstractMeshPtr>& renderList) override;
+    const std::vector<AbstractMeshPtr>& renderList) override;
 
 protected:
-  virtual void
-  _setDefaultShadowProjectionMatrix(Matrix& matrix, const Matrix& viewMatrix,
-                                    const vector_t<AbstractMeshPtr>& renderList)
+  virtual void _setDefaultShadowProjectionMatrix(
+    Matrix& matrix, const Matrix& viewMatrix,
+    const std::vector<AbstractMeshPtr>& renderList)
     = 0;
 
   /**
@@ -174,22 +174,22 @@ protected:
   /**
    * @brief Gets the shadow projection clipping minimum z value.
    */
-  nullable_t<float>& get_shadowMinZ();
+  std::optional<float>& get_shadowMinZ();
 
   /**
    * @brief Sets the shadow projection clipping minimum z value.
    */
-  void set_shadowMinZ(const nullable_t<float>& value);
+  void set_shadowMinZ(const std::optional<float>& value);
 
   /**
    * @brief Sets the shadow projection clipping maximum z value.
    */
-  nullable_t<float>& get_shadowMaxZ();
+  std::optional<float>& get_shadowMaxZ();
 
   /**
    * @brief Gets the shadow projection clipping maximum z value.
    */
-  void set_shadowMaxZ(const nullable_t<float>& value);
+  void set_shadowMaxZ(const std::optional<float>& value);
 
 public:
   /**
@@ -197,40 +197,40 @@ public:
    * This can be used to override the default projection matrix computation.
    */
   ::std::function<void(const Matrix& viewMatrix,
-                       const vector_t<AbstractMeshPtr>& renderList,
+                       const std::vector<AbstractMeshPtr>& renderList,
                        Matrix& result)>
     customProjectionMatrixBuilder;
 
   /**
    * The shadow projection clipping minimum z value.
    */
-  Property<ShadowLight, nullable_t<float>> shadowMinZ;
+  Property<ShadowLight, std::optional<float>> shadowMinZ;
 
   /**
    * The shadow projection clipping maximum z value.
    */
-  Property<ShadowLight, nullable_t<float>> shadowMaxZ;
+  Property<ShadowLight, std::optional<float>> shadowMaxZ;
 
 protected:
   Vector3 _position;
-  unique_ptr_t<Vector3> _direction;
+  std::unique_ptr<Vector3> _direction;
 
   /**
    * The transformed position. Position of the light in world space taking
    * parenting in account.
    */
-  unique_ptr_t<Vector3> _transformedPosition;
+  std::unique_ptr<Vector3> _transformedPosition;
 
   /**
    * The transformed direction. Direction of the light in world space taking
    * parenting in account.
    */
-  unique_ptr_t<Vector3> _transformedDirection;
+  std::unique_ptr<Vector3> _transformedDirection;
 
 private:
-  nullable_t<float> _shadowMinZ;
-  nullable_t<float> _shadowMaxZ;
-  unique_ptr_t<Matrix> _worldMatrix;
+  std::optional<float> _shadowMinZ;
+  std::optional<float> _shadowMaxZ;
+  std::unique_ptr<Matrix> _worldMatrix;
   bool _needProjectionMatrixCompute;
 
 }; // end of class ShadowLight

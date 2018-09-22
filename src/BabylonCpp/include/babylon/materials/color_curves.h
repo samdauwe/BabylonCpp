@@ -1,10 +1,26 @@
 #ifndef BABYLON_MATERIALS_COLOR_CURVES_H
 #define BABYLON_MATERIALS_COLOR_CURVES_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/color4.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class Effect;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief The color grading curves provide additional color adjustmnent that is
@@ -30,13 +46,13 @@ public:
   /**
    * @brief Returns the string "ColorCurves".
    */
-  const string_t getClassName() const;
+  const std::string getClassName() const;
 
   /**
    * @brief Clones the current color curve instance.
    * @return The cloned curves
    */
-  unique_ptr_t<ColorCurves> clone() const;
+  std::unique_ptr<ColorCurves> clone() const;
 
   /**
    * @brief Serializes the current color curve instance to a json
@@ -52,16 +68,16 @@ public:
    */
   static void
   Bind(ColorCurves& colorCurves, Effect* effect,
-       const string_t& positiveUniform = "vCameraColorCurvePositive",
-       const string_t& neutralUniform  = "vCameraColorCurveNeutral",
-       const string_t& negativeUniform = "vCameraColorCurveNegative");
+       const std::string& positiveUniform = "vCameraColorCurvePositive",
+       const std::string& neutralUniform  = "vCameraColorCurveNeutral",
+       const std::string& negativeUniform = "vCameraColorCurveNegative");
 
   /**
    * @brief Prepare the list of uniforms associated with the ColorCurves
    * effects.
    * @param uniformsList The list of uniforms used in the effect
    */
-  static void PrepareUniforms(vector_t<string_t>& uniformsList);
+  static void PrepareUniforms(std::vector<std::string>& uniformsList);
 
   /**
    * @brief Returns color grading data based on a hue, density, saturation and
@@ -107,7 +123,7 @@ public:
    * @param source the JSON source to parse
    * @return The parsed curves
    */
-  static unique_ptr_t<ColorCurves> Parse(const Json::value& source);
+  static std::unique_ptr<ColorCurves> Parse(const Json::value& source);
 
 protected:
   /**

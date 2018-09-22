@@ -1,10 +1,13 @@
 #ifndef BABYLON_MATERIALS_PUSH_MATERIAL_H
 #define BABYLON_MATERIALS_PUSH_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/material.h>
 
 namespace BABYLON {
+
+class PushMaterial;
+using PushMaterialPtr = std::shared_ptr<PushMaterial>;
 
 class BABYLON_SHARED_EXPORT PushMaterial : public Material {
 
@@ -12,7 +15,7 @@ public:
   template <typename... Ts>
   static PushMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<PushMaterial>(
+    auto material = std::shared_ptr<PushMaterial>(
       new PushMaterial(::std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
@@ -23,7 +26,7 @@ public:
   /**
    * @brief Returns the string "PushMaterial".
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
@@ -45,7 +48,7 @@ public:
   void bind(Matrix* world, Mesh* mesh) override;
 
 protected:
-  PushMaterial(const string_t& name, Scene* scene);
+  PushMaterial(const std::string& name, Scene* scene);
 
   void _afterBind(Mesh* mesh, Effect* effect = nullptr);
   bool _mustRebind(Scene* scene, Effect* effect, float visibility = 1.f);

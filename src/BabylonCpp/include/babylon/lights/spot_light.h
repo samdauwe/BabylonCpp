@@ -1,10 +1,15 @@
 #ifndef BABYLON_LIGHTS_SPOT_LIGHT_H
 #define BABYLON_LIGHTS_SPOT_LIGHT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+class SpotLight;
+using SpotLightPtr   = std::shared_ptr<SpotLight>;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 /**
  * @brief A spot light is defined by a position, a direction, an angle, and an
@@ -24,7 +29,7 @@ public:
   static SpotLightPtr New(Ts&&... args)
   {
     auto light
-      = shared_ptr_t<SpotLight>(new SpotLight(::std::forward<Ts>(args)...));
+      = std::shared_ptr<SpotLight>(new SpotLight(::std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;
@@ -37,7 +42,7 @@ public:
    * @brief Returns the string "SpotLight".
    * @returns the class name
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Returns the integer 2.
@@ -52,7 +57,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The spot light
    */
-  void transferToEffect(Effect* effect, const string_t& lightIndex) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Disposes the light and the associated resources.
@@ -81,7 +86,7 @@ protected:
    * spot
    * @param scene The scene the lights belongs to
    */
-  SpotLight(const string_t& name, const Vector3& position,
+  SpotLight(const std::string& name, const Vector3& position,
             const Vector3& direction, float angle, float exponent,
             Scene* scene);
 
@@ -184,7 +189,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const vector_t<AbstractMeshPtr>& renderList) override;
+    const std::vector<AbstractMeshPtr>& renderList) override;
 
   void _computeProjectionTextureViewLightMatrix();
   void _computeProjectionTextureProjectionLightMatrix();
@@ -273,7 +278,7 @@ private:
   float _lightAngleScale;
   float _lightAngleOffset;
 
-  nullable_t<float> _shadowAngleScale;
+  std::optional<float> _shadowAngleScale;
   Matrix _projectionTextureMatrix;
   BaseTexturePtr _projectionTexture;
   bool _projectionTextureViewLightDirty;

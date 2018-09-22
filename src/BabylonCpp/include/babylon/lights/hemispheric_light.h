@@ -1,10 +1,13 @@
 #ifndef BABYLON_HEMISPHERIC_LIGHT_H
 #define BABYLON_HEMISPHERIC_LIGHT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/lights/light.h>
 
 namespace BABYLON {
+
+class HemisphericLight;
+using HemisphericLightPtr = std::shared_ptr<HemisphericLight>;
 
 /**
  * @brief The HemisphericLight simulates the ambient environment light,
@@ -20,7 +23,7 @@ public:
   template <typename... Ts>
   static HemisphericLightPtr New(Ts&&... args)
   {
-    auto light = shared_ptr_t<HemisphericLight>(
+    auto light = std::shared_ptr<HemisphericLight>(
       new HemisphericLight(::std::forward<Ts>(args)...));
     light->addToScene(light);
 
@@ -32,7 +35,7 @@ public:
    * @brief Returns the string "HemisphericLight".
    * @return The class name
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
@@ -58,7 +61,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The hemispheric light
    */
-  void transferToEffect(Effect* effect, const string_t& lightIndex) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Internal use only.
@@ -90,8 +93,8 @@ protected:
    * @param direction The direction of the light reflection
    * @param scene The scene the light belongs to
    */
-  HemisphericLight(const string_t& name, Scene* scene);
-  HemisphericLight(const string_t& name, const Vector3& direction,
+  HemisphericLight(const std::string& name, Scene* scene);
+  HemisphericLight(const std::string& name, const Vector3& direction,
                    Scene* scene);
 
   void _buildUniformLayout() override;
@@ -111,7 +114,7 @@ public:
   Vector3 direction;
 
 private:
-  unique_ptr_t<Matrix> _worldMatrix;
+  std::unique_ptr<Matrix> _worldMatrix;
 
   static bool NodeConstructorAdded;
 

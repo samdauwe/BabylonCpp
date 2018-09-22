@@ -1,9 +1,12 @@
 #ifndef BABYLON_LOADING_SCENE_LOADER_PROGRESS_EVENT_H
 #define BABYLON_LOADING_SCENE_LOADER_PROGRESS_EVENT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class ProgressEvent;
 
 /**
  * @brief The SceneLoaderProgressEvent class represents events measuring

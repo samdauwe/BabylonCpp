@@ -1,11 +1,24 @@
 #ifndef BABYLON_LOADING_ISCENE_LOADER_PLUGIN_H
 #define BABYLON_LOADING_ISCENE_LOADER_PLUGIN_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/variant.h>
 #include <babylon/loading/iscene_loader_plugin_extensions.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+struct IParticleSystem;
+class Scene;
+class Skeleton;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
+using SkeletonPtr        = std::shared_ptr<Skeleton>;
 
 struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
 
@@ -23,13 +36,13 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
    * @returns True if successful or false otherwise
    */
   virtual bool
-  importMesh(const vector_t<string_t>& meshesNames, Scene* scene,
-             const string_t& data, const string_t& rootUrl,
-             vector_t<AbstractMeshPtr>& meshes,
-             vector_t<IParticleSystemPtr>& particleSystems,
-             vector_t<SkeletonPtr>& skeletons,
-             const ::std::function<void(const string_t& message,
-                                        const string_t& exception)>& onError
+  importMesh(const std::vector<std::string>& meshesNames, Scene* scene,
+             const std::string& data, const std::string& rootUrl,
+             std::vector<AbstractMeshPtr>& meshes,
+             std::vector<IParticleSystemPtr>& particleSystems,
+             std::vector<SkeletonPtr>& skeletons,
+             const std::function<void(const std::string& message,
+                                      const std::string& exception)>& onError
              = nullptr) const = 0;
 
   /**
@@ -41,28 +54,28 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
    * @returns true if successful or false otherwise
    */
   virtual bool
-  load(Scene* scene, const string_t& data, const string_t& rootUrl,
-       const ::std::function<void(const string_t& message,
-                                  const string_t& exception)>& onError
+  load(Scene* scene, const std::string& data, const std::string& rootUrl,
+       const std::function<void(const std::string& message,
+                                const std::string& exception)>& onError
        = nullptr) const = 0;
 
   /**
    * The callback that returns true if the data can be directly loaded.
    */
-  ::std::function<bool(const string_t& data)> canDirectLoad = nullptr;
+  std::function<bool(const std::string& data)> canDirectLoad = nullptr;
 
   /**
    * The callback that allows custom handling of the root url based on the
    * response url.
    */
-  ::std::function<string_t(const string_t& rootUrl,
-                           const string_t& responseURL)>
+  std::function<std::string(const std::string& rootUrl,
+                            const std::string& responseURL)>
     rewriteRootURL = nullptr;
 
   /**
    * The friendly name of this plugin.
    */
-  string_t name;
+  std::string name;
 
   /**
    * The file extensions supported by this plugin.

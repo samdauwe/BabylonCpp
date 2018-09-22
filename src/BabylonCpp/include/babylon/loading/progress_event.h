@@ -1,7 +1,8 @@
 #ifndef BABYLON_LOADING_PROGRESS_EVENT_H
 #define BABYLON_LOADING_PROGRESS_EVENT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 
@@ -29,7 +30,7 @@ public:
    * HTTP, this only represent the content itself, not headers and other
    * overhead. It defaults to 0.
    */
-  ProgressEvent(const string_t& type, bool lengthComputable = false,
+  ProgressEvent(const std::string& type, bool lengthComputable = false,
                 size_t loaded = 0, size_t total = 0);
   ProgressEvent(const ProgressEvent& other);
   ProgressEvent(ProgressEvent&& other);
@@ -41,7 +42,7 @@ protected:
   /**
    * @brief Gets the name of the type of the ProgressEvent.
    */
-  string_t get_type() const;
+  std::string get_type() const;
 
   /**
    * @brief Gets the boolean flag indicating if the total work to be done, and
@@ -67,7 +68,7 @@ public:
   /**
    * The name of the type of the ProgressEvent.
    */
-  ReadOnlyProperty<ProgressEvent, string_t> type;
+  ReadOnlyProperty<ProgressEvent, std::string> type;
 
   /**
    * The Boolean flag indicating if the total work to be done, and the amount of
@@ -89,7 +90,7 @@ public:
   ReadOnlyProperty<ProgressEvent, size_t> total;
 
 private:
-  string_t _type;
+  std::string _type;
   bool _lengthComputable;
   size_t _loaded;
   size_t _total;

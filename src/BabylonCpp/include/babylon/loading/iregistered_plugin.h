@@ -1,12 +1,16 @@
 #ifndef BABYLON_LOADING_IREGISTERED_PLUGIN_H
 #define BABYLON_LOADING_IREGISTERED_PLUGIN_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
+struct ISceneLoaderPlugin;
+
 struct BABYLON_SHARED_EXPORT IRegisteredPlugin {
-  shared_ptr_t<ISceneLoaderPlugin> plugin;
+  std::shared_ptr<ISceneLoaderPlugin> plugin;
   bool isBinary;
 }; // end of struct IRegisteredPlugin
 

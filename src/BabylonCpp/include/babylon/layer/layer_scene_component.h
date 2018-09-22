@@ -1,11 +1,16 @@
 #ifndef BABYLON_LAYER_LAYER_SCENE_COMPONENT_H
 #define BABYLON_LAYER_LAYER_SCENE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
 namespace BABYLON {
+
+class Camera;
+class Engine;
+class LayerSceneComponent;
+using LayerSceneComponentPtr = std::shared_ptr<LayerSceneComponent>;
 
 /**
  * @brief Defines the layer scene component responsible to manage any layers
@@ -24,7 +29,7 @@ public:
   template <typename... Ts>
   static LayerSceneComponentPtr New(Ts&&... args)
   {
-    return shared_ptr_t<LayerSceneComponent>(
+    return std::shared_ptr<LayerSceneComponent>(
       new LayerSceneComponent(::std::forward<Ts>(args)...));
   }
   virtual ~LayerSceneComponent();

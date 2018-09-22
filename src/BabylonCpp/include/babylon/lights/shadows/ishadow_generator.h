@@ -1,9 +1,34 @@
 #ifndef BABYLON_LIGHTS_SHADOWS_ISHADOW_GENERATOR_H
 #define BABYLON_LIGHTS_SHADOWS_ISHADOW_GENERATOR_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <map>
+#include <memory>
+#include <vector>
+
+#include <babylon/babylon_api.h>
+
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
 
 namespace BABYLON {
+
+class Effect;
+struct MaterialDefines;
+class Matrix;
+class RenderTargetTexture;
+class ShadowGenerator;
+class SubMesh;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 struct ShadowGeneratorCompileOptions {
   bool useInstances = false;
@@ -58,7 +83,8 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * material owning the effect
    * @param effect The effect we are binfing the information for
    */
-  virtual void bindShadowLight(const string_t& lightIndex, Effect* effect) = 0;
+  virtual void bindShadowLight(const std::string& lightIndex, Effect* effect)
+    = 0;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the
@@ -83,7 +109,7 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * different modes
    */
   virtual void forceCompilation(
-    const ::std::function<void(ShadowGenerator* generator)>& onCompiled,
+    const std::function<void(ShadowGenerator* generator)>& onCompiled,
     const ShadowGeneratorCompileOptions& options)
     = 0;
 

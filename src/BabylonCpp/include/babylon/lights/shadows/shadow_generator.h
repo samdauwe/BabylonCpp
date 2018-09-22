@@ -1,13 +1,22 @@
 #ifndef BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_H
 #define BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/lights/shadows/ishadow_generator.h>
 #include <babylon/math/isize.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class IShadowLight;
+class PostProcess;
+class Scene;
+class SubMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using IShadowLightPtr = std::shared_ptr<IShadowLight>;
+using SubMeshPtr      = std::shared_ptr<SubMesh>;
 
 /**
  * @brief Default implementation IShadowGenerator.
@@ -269,7 +278,7 @@ public:
    * material owning the effect
    * @param effect The effect we are binfing the information for
    */
-  void bindShadowLight(const string_t& lightIndex, Effect* effect) override;
+  void bindShadowLight(const std::string& lightIndex, Effect* effect) override;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the
@@ -550,10 +559,10 @@ private:
   void _initializeGenerator();
   void _initializeShadowMap();
   void _initializeBlurRTTAndPostProcesses();
-  void _renderForShadowMap(const vector_t<SubMeshPtr>& opaqueSubMeshes,
-                           const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-                           const vector_t<SubMeshPtr>& transparentSubMeshes,
-                           const vector_t<SubMeshPtr>& depthOnlySubMeshes);
+  void _renderForShadowMap(const std::vector<SubMeshPtr>& opaqueSubMeshes,
+                           const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+                           const std::vector<SubMeshPtr>& transparentSubMeshes,
+                           const std::vector<SubMeshPtr>& depthOnlySubMeshes);
   void _renderSubMeshForShadowMap(const SubMeshPtr& subMesh);
   void _applyFilterValues();
   void _disposeBlurPostProcesses();
@@ -692,7 +701,7 @@ private:
   float _blurScale;
   float _blurKernel;
   bool _useKernelBlur;
-  nullable_t<float> _depthScale;
+  std::optional<float> _depthScale;
   unsigned int _filter;
   unsigned int _filteringQuality;
   float _contactHardeningLightSizeUVRatio;
@@ -710,12 +719,12 @@ private:
   bool _cacheInitialized;
   Vector3 _cachedPosition;
   Vector3 _cachedDirection;
-  string_t _cachedDefines;
+  std::string _cachedDefines;
   int _currentRenderID;
-  unique_ptr_t<PostProcess> _boxBlurPostprocess;
-  unique_ptr_t<PostProcess> _kernelBlurXPostprocess;
-  unique_ptr_t<PostProcess> _kernelBlurYPostprocess;
-  vector_t<PostProcess*> _blurPostProcesses;
+  std::unique_ptr<PostProcess> _boxBlurPostprocess;
+  std::unique_ptr<PostProcess> _kernelBlurXPostprocess;
+  std::unique_ptr<PostProcess> _kernelBlurYPostprocess;
+  std::vector<PostProcess*> _blurPostProcesses;
   ISize _mapSize;
   unsigned int _currentFaceIndex;
   unsigned int _currentFaceIndexCache;

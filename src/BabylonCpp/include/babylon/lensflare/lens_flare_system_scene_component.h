@@ -1,11 +1,32 @@
 #ifndef BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
 #define BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class AbstractScene;
+class Camera;
+class LensFlareSystemSceneComponent;
+using LensFlareSystemSceneComponentPtr
+  = std::shared_ptr<LensFlareSystemSceneComponent>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Defines the lens flare scene component responsible to manage any lens
@@ -26,7 +47,7 @@ public:
   template <typename... Ts>
   static LensFlareSystemSceneComponentPtr New(Ts&&... args)
   {
-    return shared_ptr_t<LensFlareSystemSceneComponent>(
+    return std::shared_ptr<LensFlareSystemSceneComponent>(
       new LensFlareSystemSceneComponent(::std::forward<Ts>(args)...));
   }
   virtual ~LensFlareSystemSceneComponent();

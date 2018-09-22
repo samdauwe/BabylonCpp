@@ -1,11 +1,15 @@
 #ifndef BABYLON_LENSFLARE_LENS_FLARE_H
 #define BABYLON_LENSFLARE_LENS_FLARE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class LensFlareSystem;
+class Texture;
+using TexturePtr = std::shared_ptr<Texture>;
 
 class BABYLON_SHARED_EXPORT LensFlare {
 
@@ -18,8 +22,8 @@ public:
 
 protected:
   LensFlare(float size, const Vector3& position,
-            const Color3& color    = Color3(1.f, 1.f, 1.f),
-            const string_t& imgUrl = "", LensFlareSystem* system = nullptr);
+            const Color3& color       = Color3(1.f, 1.f, 1.f),
+            const std::string& imgUrl = "", LensFlareSystem* system = nullptr);
 
 public:
   float size;

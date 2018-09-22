@@ -5,8 +5,7 @@
 
 namespace BABYLON {
 
-DaydreamController::DaydreamController(
-  const shared_ptr_t<IBrowserGamepad>& vrGamepad)
+DaydreamController::DaydreamController(const IBrowserGamepadPtr& vrGamepad)
     : WebVRController{vrGamepad}
 {
   controllerType = PoseEnabledControllerType::DAYDREAM;
@@ -23,10 +22,10 @@ void DaydreamController::initControllerMesh(
     {}, DaydreamController::MODEL_BASE_URL, DaydreamController::MODEL_FILENAME,
     scene,
     [this,
-     &meshLoaded](const vector_t<AbstractMeshPtr>& newMeshes,
-                  const vector_t<IParticleSystemPtr>& /*particleSystems*/,
-                  const vector_t<SkeletonPtr>& /*skeletons*/,
-                  const vector_t<AnimationGroupPtr>& /*animationGroups*/) {
+     &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
+                  const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+                  const std::vector<SkeletonPtr>& /*skeletons*/,
+                  const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
       _defaultModel = newMeshes[1];
       attachToMesh(_defaultModel);
       if (meshLoaded) {

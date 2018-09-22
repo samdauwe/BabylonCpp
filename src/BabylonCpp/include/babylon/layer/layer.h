@@ -1,7 +1,7 @@
 #ifndef BABYLON_LAYER_LAYER_H
 #define BABYLON_LAYER_LAYER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
@@ -9,6 +9,15 @@
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Layer;
+class Texture;
+class VertexBuffer;
+using TexturePtr = std::shared_ptr<Texture>;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 class BABYLON_SHARED_EXPORT Layer
     : public ::std::enable_shared_from_this<Layer> {
@@ -19,7 +28,7 @@ public:
   template <typename... Ts>
   static LayerPtr New(Ts&&... args)
   {
-    return shared_ptr_t<Layer>(new Layer(::std::forward<Ts>(args)...));
+    return std::shared_ptr<Layer>(new Layer(::std::forward<Ts>(args)...));
   }
   virtual ~Layer();
 
@@ -29,7 +38,7 @@ public:
   void dispose();
 
 protected:
-  Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
+  Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
         bool isBackground   = true,
         const Color4& color = Color4(1.f, 1.f, 1.f, 1.f));
 
@@ -79,10 +88,10 @@ private:
   Observer<Layer>::Ptr _onBeforeRenderObserver;
   Observer<Layer>::Ptr _onAfterRenderObserver;
   // Properties
-  string_t _name;
+  std::string _name;
   Scene* _scene;
-  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
-  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _alphaTestEffect;
 

@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-ShadowLight::ShadowLight(const string_t& name, Scene* scene)
+ShadowLight::ShadowLight(const std::string& name, Scene* scene)
     : IShadowLight{name, scene}
     , shadowMinZ{this, &ShadowLight::get_shadowMinZ,
                  &ShadowLight::set_shadowMinZ}
@@ -60,23 +60,23 @@ void ShadowLight::_setPosition(const Vector3& value)
   _position = value;
 }
 
-nullable_t<float>& ShadowLight::get_shadowMinZ()
+std::optional<float>& ShadowLight::get_shadowMinZ()
 {
   return _shadowMinZ;
 }
 
-void ShadowLight::set_shadowMinZ(const nullable_t<float>& value)
+void ShadowLight::set_shadowMinZ(const std::optional<float>& value)
 {
   _shadowMinZ = value;
   forceProjectionMatrixCompute();
 }
 
-nullable_t<float>& ShadowLight::get_shadowMaxZ()
+std::optional<float>& ShadowLight::get_shadowMaxZ()
 {
   return _shadowMaxZ;
 }
 
-void ShadowLight::set_shadowMaxZ(const nullable_t<float>& value)
+void ShadowLight::set_shadowMaxZ(const std::optional<float>& value)
 {
   _shadowMaxZ = value;
   forceProjectionMatrixCompute();
@@ -177,7 +177,7 @@ float ShadowLight::getDepthMaxZ(const Camera& activeCamera) const
 
 IShadowLight* ShadowLight::setShadowProjectionMatrix(
   Matrix& matrix, Matrix& viewMatrix,
-  const vector_t<AbstractMeshPtr>& renderList)
+  const std::vector<AbstractMeshPtr>& renderList)
 {
   if (customProjectionMatrixBuilder) {
     customProjectionMatrixBuilder(viewMatrix, renderList, matrix);

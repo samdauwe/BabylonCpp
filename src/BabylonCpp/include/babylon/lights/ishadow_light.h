@@ -1,11 +1,13 @@
 #ifndef BABYLON_ISHADOW_LIGHT_H
 #define BABYLON_ISHADOW_LIGHT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/lights/light.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Camera;
 
 /**
  * @brief Interface describing all the common properties and methods a shadow
@@ -16,7 +18,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT IShadowLight : public Light {
 
 public:
-  IShadowLight(const string_t& name, Scene* scene);
+  IShadowLight(const std::string& name, Scene* scene);
   virtual ~IShadowLight() override;
 
   /**
@@ -65,7 +67,7 @@ public:
    */
   virtual IShadowLight*
   setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
-                            const vector_t<AbstractMeshPtr>& renderList)
+                            const std::vector<AbstractMeshPtr>& renderList)
     = 0;
 
   /**

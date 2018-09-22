@@ -1,11 +1,32 @@
 #ifndef BABYLON_MATERIALS_IMAGE_PROCESSING_CONFIGURATION_H
 #define BABYLON_MATERIALS_IMAGE_PROCESSING_CONFIGURATION_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/color4.h>
 #include <babylon/tools/observable.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class BaseTexture;
+class ColorCurves;
+class Effect;
+struct IImageProcessingConfigurationDefines;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using ColorCurvesPtr = std::shared_ptr<ColorCurves>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief This groups together the common properties used for image processing
@@ -54,7 +75,7 @@ public:
   /**
    * @brief Returns the string "ImageProcessingConfiguration".
    */
-  const string_t getClassName() const;
+  const std::string getClassName() const;
 
   /**
    * @brief Prepare the list of uniforms associated with the Image Processing
@@ -63,7 +84,7 @@ public:
    * @param defines the list of defines currently in use
    */
   static void
-  PrepareUniforms(vector_t<string_t>& uniforms,
+  PrepareUniforms(std::vector<std::string>& uniforms,
                   const IImageProcessingConfigurationDefines& defines);
 
   /**
@@ -73,7 +94,7 @@ public:
    * @param defines the list of defines currently in use
    */
   static void
-  PrepareSamplers(vector_t<string_t>& samplersList,
+  PrepareSamplers(std::vector<std::string>& samplersList,
                   const IImageProcessingConfigurationDefines& defines);
 
   /**
@@ -98,7 +119,7 @@ public:
    * @brief Clones the current image processing instance.
    * @return The cloned image processing
    */
-  unique_ptr_t<ImageProcessingConfiguration> clone();
+  std::unique_ptr<ImageProcessingConfiguration> clone();
 
   /**
    * @brief Serializes the current image processing instance to a json

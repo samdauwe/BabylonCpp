@@ -1,10 +1,13 @@
 #ifndef BABYLON_LIGHTS_POINT_LIGHT_H
 #define BABYLON_LIGHTS_POINT_LIGHT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
+
+class PointLight;
+using PointLightPtr = std::shared_ptr<PointLight>;
 
 /**
  * @brief A point light is a light defined by an unique point in world space.
@@ -21,8 +24,8 @@ public:
   template <typename... Ts>
   static PointLightPtr New(Ts&&... args)
   {
-    auto light
-      = shared_ptr_t<PointLight>(new PointLight(::std::forward<Ts>(args)...));
+    auto light = std::shared_ptr<PointLight>(
+      new PointLight(::std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;
@@ -48,7 +51,7 @@ public:
    * @brief Returns the string "PointLight"
    * @returns the class name
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Returns the integer 0.
@@ -79,7 +82,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The point light
    */
-  void transferToEffect(Effect* effect, const string_t& lightIndex) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Prepares the list of defines specific to the light type.
@@ -103,7 +106,7 @@ protected:
    * @param position The position of the point light in the scene
    * @param scene The scene the lights belongs to
    */
-  PointLight(const string_t& name, const Vector3& position, Scene* scene);
+  PointLight(const std::string& name, const Vector3& position, Scene* scene);
 
   /**
    * @brief Sets the passed matrix "matrix" as a left-handed perspective
@@ -115,7 +118,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const vector_t<AbstractMeshPtr>& renderList) override;
+    const std::vector<AbstractMeshPtr>& renderList) override;
 
   void _buildUniformLayout() override;
 

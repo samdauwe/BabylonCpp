@@ -1,7 +1,7 @@
 #ifndef BABYLON_LAYER_HIGHLIGHT_LAYER_H
 #define BABYLON_LAYER_HIGHLIGHT_LAYER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/layer/effect_layer.h>
 #include <babylon/layer/ihighlight_layer_excluded_mesh.h>
 #include <babylon/layer/ihighlight_layer_mesh.h>
@@ -11,6 +11,11 @@
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class GlowBlurPostProcess;
+class HighlightLayer;
+class PassPostProcess;
+using HighlightLayerPtr = std::shared_ptr<HighlightLayer>;
 
 /**
  * @brief The highlight layer Helps adding a glow effect around a mesh.
@@ -49,8 +54,8 @@ public:
   template <typename... Ts>
   static HighlightLayerPtr New(Ts&&... args)
   {
-    return shared_ptr_t<HighlightLayer>(
-      new HighlightLayer(::std::forward<Ts>(args)...));
+    return std::shared_ptr<HighlightLayer>(
+      new HighlightLayer(std::forward<Ts>(args)...));
   }
   ~HighlightLayer() override;
 
@@ -58,7 +63,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  string_t getEffectName() const override;
+  std::string getEffectName() const override;
 
   /**
    * @brief Returns wether or nood the layer needs stencil enabled during the
@@ -138,7 +143,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  string_t getClassName() const override;
+  std::string getClassName() const override;
 
   /**
    * @brief Serializes this Highlight layer.
@@ -155,7 +160,7 @@ public:
    * @returns a parsed Highlight layer
    */
   static HighlightLayer* Parse(const Json::value& parsedHightlightLayer,
-                               Scene* scene, const string_t& rootUrl);
+                               Scene* scene, const std::string& rootUrl);
 
 protected:
   /**
@@ -165,8 +170,8 @@ protected:
    * @param options Sets of none mandatory options to use with the layer (see
    * IHighlightLayerOptions for more information)
    */
-  HighlightLayer(const string_t& name, Scene* scene);
-  HighlightLayer(const string_t& name, Scene* scene,
+  HighlightLayer(const std::string& name, Scene* scene);
+  HighlightLayer(const std::string& name, Scene* scene,
                  const IHighlightLayerOptions& options);
 
   /**
@@ -263,12 +268,12 @@ public:
 private:
   IHighlightLayerOptions _options;
   unsigned int _instanceGlowingMeshStencilReference;
-  unique_ptr_t<PassPostProcess> _downSamplePostprocess;
-  unique_ptr_t<GlowBlurPostProcess> _horizontalBlurPostprocess;
-  unique_ptr_t<GlowBlurPostProcess> _verticalBlurPostprocess;
+  std::unique_ptr<PassPostProcess> _downSamplePostprocess;
+  std::unique_ptr<GlowBlurPostProcess> _horizontalBlurPostprocess;
+  std::unique_ptr<GlowBlurPostProcess> _verticalBlurPostprocess;
   RenderTargetTexturePtr _blurTexture;
-  unordered_map_t<size_t, IHighlightLayerMesh> _meshes;
-  unordered_map_t<size_t, IHighlightLayerExcludedMesh> _excludedMeshes;
+  std::unordered_map<size_t, IHighlightLayerMesh> _meshes;
+  std::unordered_map<size_t, IHighlightLayerExcludedMesh> _excludedMeshes;
 
 }; // end of struct HighlightLayer
 

@@ -1,13 +1,43 @@
 #ifndef BABYLON_MATERIALS_MATERIAL_H
 #define BABYLON_MATERIALS_MATERIAL_H
 
+#include <map>
+
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class BaseSubMesh;
+class BaseTexture;
+class Effect;
+class Material;
+struct MaterialDefines;
+class Mesh;
+class MultiMaterial;
+class RenderTargetTexture;
+class Scene;
+class SubMesh;
+class UniformBuffer;
+using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using MaterialPtr            = std::shared_ptr<Material>;
+using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Base class for the main features of a material in Babylon.js.
@@ -201,13 +231,13 @@ public:
    * desired
    * @returns a string with material information
    */
-  string_t toString(bool fullDetails = false) const;
+  std::string toString(bool fullDetails = false) const;
 
   /**
    * @param Gets the class name of the material.
    * @returns a string with the class name of the material
    */
-  virtual const string_t getClassName() const;
+  virtual const std::string getClassName() const;
 
   /**
    * @brief Specifies if updates for the material been locked.
@@ -287,8 +317,8 @@ public:
   /**
    * @brief Hidden
    */
-  bool _preBind(Effect* effect                               = nullptr,
-                nullable_t<unsigned int> overrideOrientation = nullopt_t);
+  bool _preBind(Effect* effect                                  = nullptr,
+                std::optional<unsigned int> overrideOrientation = std::nullopt);
 
   /**
    * @brief Binds the material to the mesh.
@@ -339,7 +369,7 @@ public:
    * @brief Gets the active textures from the material.
    * @returns an array of textures
    */
-  virtual vector_t<BaseTexturePtr> getActiveTextures() const;
+  virtual std::vector<BaseTexturePtr> getActiveTextures() const;
 
   /**
    * @brief Specifies if the material uses a texture.
@@ -353,14 +383,14 @@ public:
    * @param name defines the new name for the duplicated material
    * @returns the cloned material
    */
-  virtual MaterialPtr clone(const string_t& name,
+  virtual MaterialPtr clone(const std::string& name,
                             bool cloneChildren = false) const;
 
   /**
    * @brief Gets the meshes bound to the material.
    * @returns an array of meshes bound to the material
    */
-  vector_t<AbstractMesh*> getBindedMeshes();
+  std::vector<AbstractMesh*> getBindedMeshes();
 
   /**
    * @brief Force shader compilation
@@ -372,7 +402,7 @@ public:
   void
   forceCompilation(AbstractMesh* mesh,
                    const ::std::function<void(Material* material)>& onCompiled,
-                   nullable_t<bool> clipPlane = false);
+                   std::optional<bool> clipPlane = false);
 
   /**
    * @brief Marks a define in the material to indicate that it needs to be
@@ -400,12 +430,12 @@ public:
 
   virtual void trackCreation(
     const ::std::function<void(const Effect* effect)>& onCompiled,
-    const ::std::function<void(const Effect* effect, const string_t& errors)>&
-      onError);
+    const ::std::function<void(const Effect* effect,
+                               const std::string& errors)>& onError);
 
   void addMaterialToScene(const MaterialPtr& newMaterial);
   void addMultiMaterialToScene(const MultiMaterialPtr& newMultiMaterial);
-  vector_t<AnimationPtr> getAnimations() override;
+  std::vector<AnimationPtr> getAnimations() override;
   void copyTo(Material* other) const;
 
   /**
@@ -425,7 +455,7 @@ public:
    * @returns a new material
    */
   static MaterialPtr Parse(const Json::value& parsedMaterial, Scene* scene,
-                           const string_t& rootUrl);
+                           const std::string& rootUrl);
 
 protected:
   /**
@@ -434,7 +464,7 @@ protected:
    * @param scene defines the scene to reference
    * @param doNotAdd specifies if the material should be added to the scene
    */
-  Material(const string_t& name, Scene* scene, bool doNotAdd = false);
+  Material(const std::string& name, Scene* scene, bool doNotAdd = false);
 
 protected:
   /**
@@ -641,7 +671,7 @@ public:
   /**
    * The ID of the material
    */
-  string_t id;
+  std::string id;
 
   /**
    * Gets or sets the unique id of the material
@@ -651,7 +681,7 @@ public:
   /**
    * The name of the material
    */
-  string_t name;
+  std::string name;
 
   /**
    * Specifies if the ready state should be checked on each call
@@ -686,12 +716,14 @@ public:
   /**
    * Callback triggered when an error occurs
    */
-  ::std::function<void(const Effect* effect, const string_t& errors)> onError;
+  ::std::function<void(const Effect* effect, const std::string& errors)>
+    onError;
 
   /**
    * Callback triggered to get the render target textures
    */
-  ::std::function<vector_t<RenderTargetTexturePtr>()> getRenderTargetTextures;
+  ::std::function<std::vector<RenderTargetTexturePtr>()>
+    getRenderTargetTextures;
 
   /**
    * Specifies if the material should be serialized
@@ -706,7 +738,7 @@ public:
   /**
    * Stores the animations for the material
    */
-  vector_t<Animation*> animations;
+  std::vector<Animation*> animations;
 
   /**
    * Called during a dispose event
@@ -816,7 +848,7 @@ protected:
   /**
    * Stores the uniform buffer
    */
-  unique_ptr_t<UniformBuffer> _uniformBuffer;
+  std::unique_ptr<UniformBuffer> _uniformBuffer;
 
 private:
   /**

@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-ProgressEvent::ProgressEvent(const string_t& type, bool lengthComputable,
+ProgressEvent::ProgressEvent(const std::string& type, bool lengthComputable,
                              size_t loaded, size_t total)
     : type{this, &ProgressEvent::get_type}
     , lengthComputable{this, &ProgressEvent::get_lengthComputable}
@@ -67,7 +67,7 @@ ProgressEvent::~ProgressEvent()
 {
 }
 
-string_t ProgressEvent::get_type() const
+std::string ProgressEvent::get_type() const
 {
   return _type;
 }

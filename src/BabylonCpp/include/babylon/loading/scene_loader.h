@@ -1,11 +1,17 @@
 #ifndef BABYLON_LOADING_SCENE_LOADER_H
 #define BABYLON_LOADING_SCENE_LOADER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/loading/iscene_loader_plugin.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class AnimationGroup;
+class Engine;
+struct IRegisteredPlugin;
+class SceneLoaderProgressEvent;
+using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
 
 class BABYLON_SHARED_EXPORT SceneLoader {
 
@@ -50,25 +56,27 @@ public:
 private:
   // Functions
   static IRegisteredPlugin _getDefaultPlugin();
-  static IRegisteredPlugin _getPluginForExtension(const string_t& extension);
-  static IRegisteredPlugin _getPluginForDirectLoad(const string_t& data);
-  static IRegisteredPlugin _getPluginForFilename(string_t sceneFilename);
-  static string_t _getDirectLoad(const string_t& sceneFilename);
-  static shared_ptr_t<ISceneLoaderPlugin> _loadData(
-    const string_t& rootUrl, const string_t& sceneFilename, Scene* scene,
-    const ::std::function<void(const shared_ptr_t<ISceneLoaderPlugin>& plugin,
-                               const string_t& data,
-                               const string_t& responseURL)>& onSuccess,
+  static IRegisteredPlugin _getPluginForExtension(const std::string& extension);
+  static IRegisteredPlugin _getPluginForDirectLoad(const std::string& data);
+  static IRegisteredPlugin _getPluginForFilename(std::string sceneFilename);
+  static std::string _getDirectLoad(const std::string& sceneFilename);
+  static std::shared_ptr<ISceneLoaderPlugin> _loadData(
+    const std::string& rootUrl, const std::string& sceneFilename, Scene* scene,
+    const ::std::function<
+      void(const std::shared_ptr<ISceneLoaderPlugin>& plugin,
+           const std::string& data, const std::string& responseURL)>& onSuccess,
     const ::std::function<void(const SceneLoaderProgressEvent& event)>&
       onProgress,
-    const ::std::function<void(const string_t& message,
-                               const string_t& exception)>& onError,
-    const ::std::function<void()>& onDispose, const string_t& pluginExtension);
+    const ::std::function<void(const std::string& message,
+                               const std::string& exception)>& onError,
+    const ::std::function<void()>& onDispose,
+    const std::string& pluginExtension);
 
 public:
-  static ISceneLoaderPlugin* GetPluginForExtension(const string_t& extension);
-  static bool IsPluginForExtensionAvailable(const string_t& extension);
-  static void RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin);
+  static ISceneLoaderPlugin*
+  GetPluginForExtension(const std::string& extension);
+  static bool IsPluginForExtensionAvailable(const std::string& extension);
+  static void RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin);
 
   /**
    * @brief Import meshes into a scene.
@@ -90,22 +98,22 @@ public:
    * @param pluginExtension the extension used to determine the plugin
    * @returns The loaded plugin
    */
-  static shared_ptr_t<ISceneLoaderPlugin>
-  ImportMesh(const vector_t<string_t>& meshNames, string_t rootUrl,
-             string_t sceneFilename, Scene* scene = nullptr,
-             const ::std::function<void(
-               const vector_t<AbstractMeshPtr>& meshes,
-               const vector_t<IParticleSystemPtr>& particleSystems,
-               const vector_t<SkeletonPtr>& skeletons,
-               const vector_t<AnimationGroupPtr>& animationGroups)>& onSuccess
-             = nullptr,
-             const ::std::function<void(const SceneLoaderProgressEvent& event)>&
-               onProgress
-             = nullptr,
-             const ::std::function<void(Scene* scene, const string_t& message,
-                                        const string_t& exception)>& onError
-             = nullptr,
-             const string_t& pluginExtension = "");
+  static std::shared_ptr<ISceneLoaderPlugin> ImportMesh(
+    const std::vector<std::string>& meshNames, std::string rootUrl,
+    std::string sceneFilename, Scene* scene = nullptr,
+    const ::std::function<
+      void(const std::vector<AbstractMeshPtr>& meshes,
+           const std::vector<IParticleSystemPtr>& particleSystems,
+           const std::vector<SkeletonPtr>& skeletons,
+           const std::vector<AnimationGroupPtr>& animationGroups)>& onSuccess
+    = nullptr,
+    const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+      onProgress
+    = nullptr,
+    const ::std::function<void(Scene* scene, const std::string& message,
+                               const std::string& exception)>& onError
+    = nullptr,
+    const std::string& pluginExtension = "");
 
   /**
    * @brief Load a scene
@@ -124,16 +132,17 @@ public:
    * @param pluginExtension the extension used to determine the plugin
    * @returns The loaded plugin
    */
-  unique_ptr_t<Scene>
-  Load(const string_t& rootUrl, const string_t& sceneFilename, Engine* engine,
+  std::unique_ptr<Scene>
+  Load(const std::string& rootUrl, const std::string& sceneFilename,
+       Engine* engine,
        const ::std::function<void(Scene* scene)>& onsuccess = nullptr,
        const ::std::function<void(const SceneLoaderProgressEvent& event)>&
          onProgress
        = nullptr,
-       const ::std::function<void(Scene* scene, const string_t& message,
-                                  const string_t& exception)>& onError
+       const ::std::function<void(Scene* scene, const std::string& message,
+                                  const std::string& exception)>& onError
        = nullptr,
-       const string_t& pluginExtension = "");
+       const std::string& pluginExtension = "");
 
   /**
    * @brief Append a scene.
@@ -152,23 +161,24 @@ public:
    * @param pluginExtension the extension used to determine the plugin
    * @returns The loaded plugin
    */
-  static shared_ptr_t<ISceneLoaderPlugin>
-  Append(string_t rootUrl, string_t sceneFilename = "", Scene* scene = nullptr,
+  static std::shared_ptr<ISceneLoaderPlugin>
+  Append(std::string rootUrl, std::string sceneFilename = "",
+         Scene* scene                                         = nullptr,
          const ::std::function<void(Scene* scene)>& onSuccess = nullptr,
          const ::std::function<void(const SceneLoaderProgressEvent& event)>&
            onProgress
          = nullptr,
-         const ::std::function<void(Scene* scene, const string_t& message,
-                                    const string_t& exception)>& onError
+         const ::std::function<void(Scene* scene, const std::string& message,
+                                    const std::string& exception)>& onError
          = nullptr,
-         const string_t& pluginExtension = "");
+         const std::string& pluginExtension = "");
 
 public:
   // Members
   static Observable<ISceneLoaderPlugin> OnPluginActivatedObservable;
 
 private:
-  static unordered_map_t<string_t, IRegisteredPlugin> _registeredPlugins;
+  static std::unordered_map<std::string, IRegisteredPlugin> _registeredPlugins;
 
 }; // end of struct SceneLoader
 

@@ -6,6 +6,9 @@
 
 namespace BABYLON {
 
+class IBrowserGamepad;
+using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
+
 /**
  * @brief Google Daydream controller.
  */

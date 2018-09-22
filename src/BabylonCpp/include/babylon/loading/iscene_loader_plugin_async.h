@@ -1,10 +1,20 @@
 #ifndef BABYLON_LOADING_ISCENE_LOADER_PLUGIN_ASYNC_H
 #define BABYLON_LOADING_ISCENE_LOADER_PLUGIN_ASYNC_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/loading/iscene_loader_plugin_extensions.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class AnimationGroup;
+struct IParticleSystem;
+class Scene;
+class SceneLoaderProgressEvent;
+class Skeleton;
 
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
 
@@ -20,16 +30,16 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
    * groups
    */
   virtual bool importMeshAsync(
-    const vector_t<string_t>& meshesNames, Scene* scene, const string_t& data,
-    const string_t& rootUrl,
-    const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+    const std::vector<std::string>& meshesNames, Scene* scene,
+    const std::string& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>&
       onProgress,
-    const ::std::function<void(vector_t<AbstractMesh*>& meshes,
-                               vector_t<IParticleSystem*>& particleSystems,
-                               vector_t<Skeleton*>& skeletons,
-                               vector_t<AnimationGroup*>& animationGroups)>&
+    const std::function<void(std::vector<AbstractMesh*>& meshes,
+                             std::vector<IParticleSystem*>& particleSystems,
+                             std::vector<Skeleton*>& skeletons,
+                             std::vector<AnimationGroup*>& animationGroups)>&
       onSuccess,
-    const ::std::function<void()>& onError)
+    const std::function<void()>& onError)
     = 0;
 
   /**
@@ -41,17 +51,17 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
    * @returns Nothing
    */
   virtual bool
-  loadAsync(Scene* scene, const string_t& data, const string_t& rootUrl,
-            const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+  loadAsync(Scene* scene, const std::string& data, const std::string& rootUrl,
+            const std::function<void(const SceneLoaderProgressEvent& event)>&
               onProgress,
-            const ::std::function<void()>& onsuccess,
-            const ::std::function<void()>& onerror)
+            const std::function<void()>& onsuccess,
+            const std::function<void()>& onerror)
     = 0;
 
   /**
    * The friendly name of this plugin.
    */
-  string_t name;
+  std::string name;
 
   /**
    * The file extensions supported by this plugin.

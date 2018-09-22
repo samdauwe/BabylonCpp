@@ -1,11 +1,14 @@
 #ifndef BABYLON_LIGHTS_DIRECTIONAL_LIGHT_H
 #define BABYLON_LIGHTS_DIRECTIONAL_LIGHT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadow_light.h>
 
 namespace BABYLON {
+
+class DirectionalLight;
+using DirectionalLightPtr = std::shared_ptr<DirectionalLight>;
 
 /**
  * @brief A directional light is defined by a direction (what a surprise!).
@@ -24,7 +27,7 @@ public:
   template <typename... Ts>
   static DirectionalLightPtr New(Ts&&... args)
   {
-    auto light = shared_ptr_t<DirectionalLight>(
+    auto light = std::shared_ptr<DirectionalLight>(
       new DirectionalLight(::std::forward<Ts>(args)...));
     light->addToScene(light);
 
@@ -38,7 +41,7 @@ public:
    * @brief Returns the string "DirectionalLight".
    * @return The class name
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Returns the integer 1.
@@ -53,7 +56,7 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The directional light
    */
-  void transferToEffect(Effect* effect, const string_t& lightIndex) override;
+  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
    * @brief Gets the minZ used for shadow according to both the scene and the
@@ -93,7 +96,7 @@ protected:
    * @param direction The direction of the light
    * @param scene The scene the light belongs to
    */
-  DirectionalLight(const string_t& name, const Vector3& direction,
+  DirectionalLight(const std::string& name, const Vector3& direction,
                    Scene* scene);
 
   /**
@@ -103,7 +106,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const vector_t<AbstractMeshPtr>& renderList) override;
+    const std::vector<AbstractMeshPtr>& renderList) override;
 
   /**
    * @brief Sets the passed matrix "matrix" as fixed frustum projection matrix
@@ -120,7 +123,7 @@ protected:
    */
   void _setDefaultAutoExtendShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const vector_t<AbstractMeshPtr>& renderList);
+    const std::vector<AbstractMeshPtr>& renderList);
 
   void _buildUniformLayout() override;
 
