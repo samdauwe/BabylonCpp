@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-PushMaterial::PushMaterial(const string_t& iName, Scene* scene)
+PushMaterial::PushMaterial(const std::string& iName, Scene* scene)
     : Material{iName, scene}, _activeEffect{nullptr}
 {
   storeEffectOnSubMeshes = true;
@@ -17,7 +17,7 @@ PushMaterial::~PushMaterial()
 {
 }
 
-const string_t PushMaterial::getClassName() const
+const std::string PushMaterial::getClassName() const
 {
   return "PushMaterial";
 }

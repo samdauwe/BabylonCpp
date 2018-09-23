@@ -7,8 +7,8 @@
 
 namespace BABYLON {
 
-unique_ptr_t<RayHelper> RayHelper::CreateAndShow(const Ray& ray, Scene* scene,
-                                                 const Color3& color)
+std::unique_ptr<RayHelper>
+RayHelper::CreateAndShow(const Ray& ray, Scene* scene, const Color3& color)
 {
   auto helper = ::std::make_unique<RayHelper>(ray);
 
@@ -31,7 +31,7 @@ RayHelper::~RayHelper()
 {
 }
 
-void RayHelper::show(Scene* scene, const nullable_t<Color3>& color)
+void RayHelper::show(Scene* scene, const std::optional<Color3>& color)
 {
   if (!_renderFunction && ray) {
     _renderFunction = [this](Scene*, EventState&) { _render(); };

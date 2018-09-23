@@ -1,10 +1,23 @@
 #ifndef BABYLON_MESH_VERTEX_BUFFER_H
 #define BABYLON_MESH_VERTEX_BUFFER_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/core/variant.h>
 
 namespace BABYLON {
+
+class Buffer;
+class DataView;
+class Engine;
+class Scene;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 /**
  * @brief
@@ -132,17 +145,18 @@ public:
    */
   VertexBuffer(Engine* engine, const Variant<Float32Array, Buffer*> data,
                unsigned int kind, bool updatable,
-               const nullable_t<bool>& postponeInternalCreation = nullopt_t,
-               nullable_t<size_t> stride                        = nullopt_t,
-               const nullable_t<bool>& instanced                = nullopt_t,
-               const nullable_t<unsigned int>& offset           = nullopt_t,
-               const nullable_t<size_t>& size                   = nullopt_t,
-               nullable_t<unsigned int> type                    = nullopt_t,
+               const std::optional<bool>& postponeInternalCreation
+               = std::nullopt,
+               std::optional<size_t> stride              = std::nullopt,
+               const std::optional<bool>& instanced      = std::nullopt,
+               const std::optional<unsigned int>& offset = std::nullopt,
+               const std::optional<size_t>& size         = std::nullopt,
+               std::optional<unsigned int> type          = std::nullopt,
                bool normalized = false, bool useBytes = false);
   virtual ~VertexBuffer();
 
   /** Statics **/
-  static string_t KindAsString(unsigned int kind);
+  static std::string KindAsString(unsigned int kind);
 
   /**
    * @brief Deduces the stride given a kind.
@@ -247,9 +261,8 @@ public:
    * @param count the number of values to enumerate
    * @param callback the callback function called for each value
    */
-  void
-  forEach(size_t count,
-          const ::std::function<void(float value, size_t index)>& callback);
+  void forEach(size_t count,
+               const std::function<void(float value, size_t index)>& callback);
 
   /**
    * @brief Gets the byte length of the given type.
@@ -273,7 +286,7 @@ public:
   ForEach(const Float32Array& data, size_t byteOffset, size_t byteStride,
           size_t componentCount, unsigned int componentType, size_t count,
           bool normalized,
-          const ::std::function<void(float value, size_t index)>& callback);
+          const std::function<void(float value, size_t index)>& callback);
 
   /**
    * @brief Enumerates each value of the given parameters as numbers.
@@ -290,7 +303,7 @@ public:
   ForEach(const Variant<ArrayBuffer, DataView>& data, size_t byteOffset,
           size_t byteStride, size_t componentCount, unsigned int componentType,
           size_t count, bool normalized,
-          const ::std::function<void(float value, size_t index)>& callback);
+          const std::function<void(float value, size_t index)>& callback);
 
 private:
   /**
@@ -312,7 +325,7 @@ public:
   /**
    * Hidden
    */
-  unique_ptr_t<Buffer> _ownedBuffer;
+  std::unique_ptr<Buffer> _ownedBuffer;
 
   /**
    * Hidden

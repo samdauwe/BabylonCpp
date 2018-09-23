@@ -1,13 +1,17 @@
 #ifndef BABYLON_MESH_BUFFER_POINTER_H
 #define BABYLON_MESH_BUFFER_POINTER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
+
 /**
-* @brief
-*/
+ * @brief
+ */
 struct BABYLON_SHARED_EXPORT BufferPointer {
   BufferPointer();
   BufferPointer(bool active, unsigned int indx, int size, unsigned int type,

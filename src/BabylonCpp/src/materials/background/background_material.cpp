@@ -33,11 +33,11 @@ float BackgroundMaterial::StandardReflectance90()
   return _standardReflectance90;
 }
 
-BackgroundMaterial::BackgroundMaterial(const string_t& iName, Scene* scene)
+BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , useEquirectangularFOV{false}
     , _primaryColor{Color3::White()}
-    , __perceptualColor{nullopt_t}
+    , __perceptualColor{std::nullopt}
     , _primaryColorShadowLevel{0.f}
     , _primaryColorHighlightLevel{0.f}
     , _reflectionTexture{nullptr}
@@ -67,7 +67,7 @@ BackgroundMaterial::BackgroundMaterial(const string_t& iName, Scene* scene)
   _attachImageProcessingConfiguration(nullptr);
 
 #if 0
-  getRenderTargetTextures = [this](vector_t<RenderTargetTexture*>()) {
+  getRenderTargetTextures = [this](std::vector<RenderTargetTexture*>()) {
     _renderTargets.clear();
 
     if (_diffuseTexture && _diffuseTexture->isRenderTarget) {
@@ -478,7 +478,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
 
     // Attributes
-    vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
+    std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
     if (defines["NORMAL"]) {
       attribs.emplace_back(VertexBuffer::NormalKindChars);
@@ -496,40 +496,40 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                               *fallbacks);
     MaterialHelper::PrepareAttributesForInstances(attribs, defines);
 
-    vector_t<string_t> uniforms{"world",
-                                "view",
-                                "viewProjection",
-                                "vEyePosition",
-                                "vLightsType",
-                                "vFogInfos",
-                                "vFogColor",
-                                "pointSize",
-                                "vClipPlane",
-                                "vClipPlane2",
-                                "vClipPlane3",
-                                "vClipPlane4",
-                                "mBones",
-                                "vPrimaryColor",
-                                "vPrimaryColorShadow",
-                                "vReflectionInfos",
-                                "reflectionMatrix",
-                                "vReflectionMicrosurfaceInfos",
-                                "fFovMultiplier",
-                                "shadowLevel",
-                                "alpha",
-                                "vBackgroundCenter",
-                                "vReflectionControl",
-                                "vDiffuseInfos",
-                                "diffuseMatrix"};
-    vector_t<string_t> samplers{"diffuseSampler", "reflectionSampler",
-                                "reflectionSamplerLow",
-                                "reflectionSamplerHigh"};
-    vector_t<string_t> uniformBuffers{"Material", "Scene"};
+    std::vector<std::string> uniforms{"world",
+                                      "view",
+                                      "viewProjection",
+                                      "vEyePosition",
+                                      "vLightsType",
+                                      "vFogInfos",
+                                      "vFogColor",
+                                      "pointSize",
+                                      "vClipPlane",
+                                      "vClipPlane2",
+                                      "vClipPlane3",
+                                      "vClipPlane4",
+                                      "mBones",
+                                      "vPrimaryColor",
+                                      "vPrimaryColorShadow",
+                                      "vReflectionInfos",
+                                      "reflectionMatrix",
+                                      "vReflectionMicrosurfaceInfos",
+                                      "fFovMultiplier",
+                                      "shadowLevel",
+                                      "alpha",
+                                      "vBackgroundCenter",
+                                      "vReflectionControl",
+                                      "vDiffuseInfos",
+                                      "diffuseMatrix"};
+    std::vector<std::string> samplers{"diffuseSampler", "reflectionSampler",
+                                      "reflectionSamplerLow",
+                                      "reflectionSamplerHigh"};
+    std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
     ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
     ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
 
-    unordered_map_t<string_t, unsigned int> indexParameters{
+    std::unordered_map<std::string, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights}};
 
     ::std::function<void(Effect * effect)> onCompiled = [&](Effect* effect) {
@@ -818,7 +818,7 @@ void BackgroundMaterial::dispose(bool forceDisposeEffect,
   PushMaterial::dispose(forceDisposeEffect);
 }
 
-MaterialPtr BackgroundMaterial::clone(const string_t& /*name*/,
+MaterialPtr BackgroundMaterial::clone(const std::string& /*name*/,
                                       bool /*cloneChildren*/) const
 {
   return nullptr;
@@ -829,14 +829,14 @@ Json::object BackgroundMaterial::serialize() const
   return Json::object();
 }
 
-const string_t BackgroundMaterial::getClassName() const
+const std::string BackgroundMaterial::getClassName() const
 {
   return "BackgroundMaterial";
 }
 
-unique_ptr_t<BackgroundMaterial>
+std::unique_ptr<BackgroundMaterial>
 BackgroundMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
-                          const string_t& /*url*/)
+                          const std::string& /*url*/)
 {
   return nullptr;
 }
@@ -851,12 +851,12 @@ void BackgroundMaterial::setPrimaryColor(const Color3& value)
   _primaryColor = value;
 }
 
-nullable_t<Color3>& BackgroundMaterial::_perceptualColor()
+std::optional<Color3>& BackgroundMaterial::_perceptualColor()
 {
   return __perceptualColor;
 }
 
-void BackgroundMaterial::setPerceptualColor(const nullable_t<Color3>& value)
+void BackgroundMaterial::setPerceptualColor(const std::optional<Color3>& value)
 {
   __perceptualColor = value;
   _computePrimaryColorFromPerceptualColor();

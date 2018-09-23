@@ -9,14 +9,14 @@ bool FollowCamera::NodeConstructorAdded = false;
 void FollowCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "FollowCamera", [](const string_t& name, Scene* scene,
-                       const nullable_t<Json::value>& /*options*/) {
+    "FollowCamera", [](const std::string& name, Scene* scene,
+                       const std::optional<Json::value>& /*options*/) {
       return FollowCamera::New(name, Vector3::Zero(), scene);
     });
   FollowCamera::NodeConstructorAdded = true;
 }
 
-FollowCamera::FollowCamera(const string_t& iName, const Vector3& iPosition,
+FollowCamera::FollowCamera(const std::string& iName, const Vector3& iPosition,
                            Scene* scene, AbstractMesh* iLockedTarget)
     : TargetCamera{iName, iPosition, scene}
     , radius{12.f}
@@ -93,7 +93,7 @@ void FollowCamera::_checkInputs()
   }
 }
 
-const string_t FollowCamera::getClassName() const
+const std::string FollowCamera::getClassName() const
 {
   return "FollowCamera";
 }

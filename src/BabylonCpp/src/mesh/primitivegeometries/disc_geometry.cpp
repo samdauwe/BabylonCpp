@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-DiscGeometry::DiscGeometry(const string_t& _id, Scene* scene, float _radius,
+DiscGeometry::DiscGeometry(const std::string& _id, Scene* scene, float _radius,
                            unsigned int _tessellation, bool canBeRegenerated,
                            Mesh* mesh, unsigned int _side)
     : _PrimitiveGeometry{_id, scene, canBeRegenerated, mesh}
@@ -19,7 +19,7 @@ DiscGeometry::~DiscGeometry()
 {
 }
 
-unique_ptr_t<VertexData> DiscGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> DiscGeometry::_regenerateVertexData()
 {
   DiscOptions options;
   options.radius          = radius;
@@ -29,7 +29,7 @@ unique_ptr_t<VertexData> DiscGeometry::_regenerateVertexData()
   return VertexData::CreateDisc(options);
 }
 
-GeometryPtr DiscGeometry::copy(const string_t& _id)
+GeometryPtr DiscGeometry::copy(const std::string& _id)
 {
   return DiscGeometry::New(_id, getScene(), radius, tessellation,
                            canBeRegenerated(), nullptr, side);

@@ -1,11 +1,14 @@
 #ifndef BABYLON_MESH_PRIMITIVE_GEOMETRIES_BOX_GEOMETRY_H
 #define BABYLON_MESH_PRIMITIVE_GEOMETRIES_BOX_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/primitivegeometries/_primitive_geometry.h>
 
 namespace BABYLON {
+
+class BoxGeometry;
+using BoxGeometryPtr = std::shared_ptr<BoxGeometry>;
 
 /**
  * @brief Creates a box geometry.
@@ -17,8 +20,8 @@ public:
   template <typename... Ts>
   static BoxGeometryPtr New(Ts&&... args)
   {
-    auto mesh
-      = shared_ptr_t<BoxGeometry>(new BoxGeometry(::std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<BoxGeometry>(
+      new BoxGeometry(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
@@ -29,9 +32,9 @@ public:
    * @brief Hidden
    * @return
    */
-  unique_ptr_t<VertexData> _regenerateVertexData() override;
+  std::unique_ptr<VertexData> _regenerateVertexData() override;
 
-  GeometryPtr copy(const string_t& id) override;
+  GeometryPtr copy(const std::string& id) override;
   Json::object serialize() const override;
 
   // Statics
@@ -50,7 +53,7 @@ protected:
    * @param side defines if the created geometry is double sided or not (default
    * is BABYLON.Mesh.DEFAULTSIDE)
    */
-  BoxGeometry(const string_t& id, Scene* scene, float size,
+  BoxGeometry(const std::string& id, Scene* scene, float size,
               bool canBeRegenerated, Mesh* mesh = nullptr,
               unsigned int side = Mesh::DEFAULTSIDE());
 

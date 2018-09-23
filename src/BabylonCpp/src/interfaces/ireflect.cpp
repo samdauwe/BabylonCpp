@@ -14,7 +14,7 @@ IReflect::~IReflect()
 {
 }
 
-string_t IReflect::TypeToString(Type type)
+std::string IReflect::TypeToString(Type type)
 {
   switch (type) {
     case Type::NODE:
@@ -82,14 +82,15 @@ string_t IReflect::TypeToString(Type type)
   }
 }
 
-any IReflect::getProperty(const string_t& targetProperty)
+any IReflect::getProperty(const std::string& targetProperty)
 {
   any property = dynamic_cast<IReflect*>(this);
 
   return getProperty(property, targetProperty);
 }
 
-any IReflect::getProperty(const any& property, const string_t& targetProperty)
+any IReflect::getProperty(const any& property,
+                          const std::string& targetProperty)
 {
   any _property = nullptr;
   if (property.is<std::nullptr_t>()) {
@@ -217,7 +218,7 @@ any IReflect::getProperty(const any& property, const string_t& targetProperty)
 }
 
 void IReflect::setProperty(const any& oldProperty,
-                           const string_t& targetProperty,
+                           const std::string& targetProperty,
                            const any& newProperty)
 {
   if (oldProperty.is<std::nullptr_t>() || newProperty.is<std::nullptr_t>()) {
@@ -259,7 +260,7 @@ void IReflect::setProperty(const any& oldProperty,
 }
 
 Vector3* IReflect::_getVector3Property(AbstractMesh* target,
-                                       const string_t& targetProperty)
+                                       const std::string& targetProperty)
 {
   Vector3* vector3Property = nullptr;
   if (targetProperty == "rotation") {
@@ -275,11 +276,11 @@ Vector3* IReflect::_getVector3Property(AbstractMesh* target,
   return vector3Property;
 }
 
-nullable_t<Quaternion>
+std::optional<Quaternion>
 IReflect::_getQuaternionProperty(AbstractMesh* target,
-                                 const string_t& targetProperty)
+                                 const std::string& targetProperty)
 {
-  nullable_t<Quaternion> quaternionProperty = nullopt_t;
+  std::optional<Quaternion> quaternionProperty = std::nullopt;
   if (targetProperty == "rotationQuaternion" && target->rotationQuaternion()) {
     quaternionProperty = target->rotationQuaternion();
   }

@@ -11,7 +11,7 @@
 
 namespace BABYLON {
 
-vector_t<string_t> HDRCubeTexture::_facesMapping{
+std::vector<std::string> HDRCubeTexture::_facesMapping{
   "right", //
   "left",  //
   "up",    //
@@ -21,11 +21,11 @@ vector_t<string_t> HDRCubeTexture::_facesMapping{
 };
 
 HDRCubeTexture::HDRCubeTexture(
-  const string_t& iUrl, Scene* scene, size_t size, bool noMipmap,
+  const std::string& iUrl, Scene* scene, size_t size, bool noMipmap,
   bool generateHarmonics, bool iGammaSpace, bool /*reserved*/,
   const ::std::function<void()>& onLoad,
-  const ::std::function<void(const string_t& message,
-                             const string_t& exception)>& onError)
+  const ::std::function<void(const std::string& message,
+                             const std::string& exception)>& onError)
     : BaseTexture(scene)
     , url{iUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
@@ -41,7 +41,7 @@ HDRCubeTexture::HDRCubeTexture(
     , _size{size}
     , _onLoad{onLoad}
     , _onError{onError}
-    , _boundingBoxSize{nullopt_t}
+    , _boundingBoxSize{std::nullopt}
 {
   if (iUrl.empty()) {
     return;
@@ -96,7 +96,7 @@ float HDRCubeTexture::get_rotationY() const
   return _rotationY;
 }
 
-void HDRCubeTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
+void HDRCubeTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
 {
   if (!value) {
     return;
@@ -112,7 +112,7 @@ void HDRCubeTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
   }
 }
 
-nullable_t<Vector3>& HDRCubeTexture::get_boundingBoxSize()
+std::optional<Vector3>& HDRCubeTexture::get_boundingBoxSize()
 {
   return _boundingBoxSize;
 }
@@ -143,7 +143,7 @@ void HDRCubeTexture::setReflectionTextureMatrix(const Matrix& value)
 
 HDRCubeTexture* HDRCubeTexture::Parse(const Json::value& /*parsedTexture*/,
                                       Scene* /*scene*/,
-                                      const string_t& /*rootUrl*/)
+                                      const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

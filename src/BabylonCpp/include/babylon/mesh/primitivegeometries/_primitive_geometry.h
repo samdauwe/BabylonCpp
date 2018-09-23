@@ -1,7 +1,7 @@
 #ifndef BABYLON_MESH_PRIMITIVE_GEOMETRIES_PRIMITIVE_GEOMETRY_H
 #define BABYLON_MESH_PRIMITIVE_GEOMETRIES_PRIMITIVE_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/geometry.h>
 
 namespace BABYLON {
@@ -22,7 +22,7 @@ public:
    * with new parameters (false by default)
    * @param mesh defines the hosting mesh (can be null)
    */
-  _PrimitiveGeometry(const string_t& id, Scene* scene, bool canBeRegenerated,
+  _PrimitiveGeometry(const std::string& id, Scene* scene, bool canBeRegenerated,
                      Mesh* mesh);
   ~_PrimitiveGeometry() override;
 
@@ -44,7 +44,7 @@ public:
    * @param id defines the unique ID of the new geometry
    * @returns the new geometry
    */
-  GeometryPtr asNewGeometry(const string_t& id);
+  GeometryPtr asNewGeometry(const std::string& id);
 
   // overrides
 
@@ -55,12 +55,12 @@ public:
 
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
-                                const nullable_t<size_t>& stride
-                                = nullopt_t) override;
+                                const std::optional<size_t>& stride
+                                = std::nullopt) override;
 
   // to override
-  virtual unique_ptr_t<VertexData> _regenerateVertexData() = 0;
-  virtual GeometryPtr copy(const string_t& id)             = 0;
+  virtual std::unique_ptr<VertexData> _regenerateVertexData() = 0;
+  virtual GeometryPtr copy(const std::string& id)             = 0;
   virtual Json::object serialize() const;
 
 private:

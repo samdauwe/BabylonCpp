@@ -1,11 +1,42 @@
 #ifndef BABYLON_MESH_GEOMETRY_H
 #define BABYLON_MESH_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class BoundingInfo;
+class Effect;
+class Engine;
+class Geometry;
+class Mesh;
+class Scene;
+class VertexBuffer;
+class VertexData;
+using GeometryPtr = std::shared_ptr<Geometry>;
+using MeshPtr     = std::shared_ptr<Mesh>;
+
+namespace GL {
+class IGLBuffer;
+class IGLVertexArrayObject;
+} // end of namespace GL
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Class used to store geometry data (vertex buffers + index buffer).
@@ -20,7 +51,7 @@ public:
   static GeometryPtr New(Ts&&... args)
   {
     auto geometry
-      = shared_ptr_t<Geometry>(new Geometry(::std::forward<Ts>(args)...));
+      = std::shared_ptr<Geometry>(new Geometry(std::forward<Ts>(args)...));
     geometry->addToScene(geometry);
 
     return geometry;
@@ -82,8 +113,8 @@ public:
    */
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
-                                const nullable_t<size_t>& stride
-                                = nullopt_t) override;
+                                const std::optional<size_t>& stride
+                                = std::nullopt) override;
 
   /**
    * @brief Removes a specific vertex data.
@@ -98,8 +129,9 @@ public:
    * @param totalVertices defines the total number of vertices for position kind
    * (could be null)
    */
-  void setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
-                         const nullable_t<size_t>& totalVertices = nullopt_t);
+  void setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer,
+                         const std::optional<size_t>& totalVertices
+                         = std::nullopt);
 
   /**
    * @brief Update a specific vertex buffer.
@@ -170,7 +202,7 @@ public:
    * @brief Returns all vertex buffers.
    * @return an object holding all vertex buffers indexed by kind
    */
-  unordered_map_t<string_t, VertexBuffer*> getVertexBuffers();
+  std::unordered_map<std::string, VertexBuffer*> getVertexBuffers();
 
   /**
    * @brief Gets a boolean indicating if specific vertex buffer is present.
@@ -251,7 +283,7 @@ public:
    * @param scene defines the hosting scene
    * @param onLoaded defines a callback called when the geometry is loaded
    */
-  void load(Scene* scene, const ::std::function<void()>& onLoaded = nullptr);
+  void load(Scene* scene, const std::function<void()>& onLoaded = nullptr);
 
   /**
    * @brief Invert the geometry to move from a right handed system to a left
@@ -287,7 +319,7 @@ public:
    * @param id defines the unique ID of the new geometry
    * @returns a new geometry object
    */
-  GeometryPtr copy(const string_t& id);
+  GeometryPtr copy(const std::string& id);
 
   /**
    * @brief Serialize the current geometry info (and not the vertices data) into
@@ -311,7 +343,7 @@ public:
    * @param id defines the unique ID of the new geometry object
    * @returns the new geometry object
    */
-  static GeometryPtr ExtractFromMesh(Mesh* mesh, const string_t& id);
+  static GeometryPtr ExtractFromMesh(Mesh* mesh, const std::string& id);
 
   /**
    * @brief You should now use Tools.RandomId(), this method is still here for
@@ -323,7 +355,7 @@ public:
    * collide"
    * @returns a string containing a new GUID
    */
-  static string_t RandomId();
+  static std::string RandomId();
 
   /**
    * @brief Hidden
@@ -347,7 +379,7 @@ public:
    * @returns the new geometry object
    */
   static GeometryPtr Parse(const Json::value& parsedVertexData, Scene* scene,
-                           const string_t& rootUrl);
+                           const std::string& rootUrl);
 
 protected:
   /**
@@ -359,8 +391,9 @@ protected:
    * @param updatable defines if geometry must be updatable (false by default)
    * @param mesh defines the mesh that will be associated with the geometry
    */
-  Geometry(const string_t& id, Scene* scene, VertexData* vertexData = nullptr,
-           bool updatable = false, Mesh* mesh = nullptr);
+  Geometry(const std::string& id, Scene* scene,
+           VertexData* vertexData = nullptr, bool updatable = false,
+           Mesh* mesh = nullptr);
 
   /**
    * @brief Gets the Bias Vector to apply on the bounding elements (box/sphere),
@@ -368,14 +401,14 @@ protected:
    * as v -= v * bias.x + bias.y
    * @returns The Bias Vector
    */
-  nullable_t<Vector2>& get_boundingBias();
+  std::optional<Vector2>& get_boundingBias();
 
   /**
    *  @brief Sets the Bias Vector to apply on the bounding elements.
    * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the
    * min is computed as v -= v * bias.x + bias.y
    */
-  void set_boundingBias(const nullable_t<Vector2>& value);
+  void set_boundingBias(const std::optional<Vector2>& value);
 
   /**
    * @brief Gets the current extend of the geometry.
@@ -392,7 +425,7 @@ private:
   void _updateExtend(Float32Array data);
   void _applyToMesh(Mesh* mesh);
   void notifyUpdate(unsigned int kind = 1);
-  void _queueLoad(Scene* scene, const ::std::function<void()>& onLoaded);
+  void _queueLoad(Scene* scene, const std::function<void()>& onLoaded);
   void _disposeVertexArrayObjects();
 
 public:
@@ -400,7 +433,7 @@ public:
   /**
    * Gets or sets the unique ID of the geometry
    */
-  string_t id;
+  std::string id;
 
   /**
    * Gets the delay loading state of the geometry (none by default which means
@@ -411,44 +444,44 @@ public:
   /**
    * Gets the file containing the data to load when running in delay load state
    */
-  string_t delayLoadingFile;
+  std::string delayLoadingFile;
 
   /**
    * Callback called when the geometry is updated
    */
-  ::std::function<void(Geometry* geometry, unsigned int kind)>
-    onGeometryUpdated;
+  std::function<void(Geometry* geometry, unsigned int kind)> onGeometryUpdated;
 
   /** Hidden */
   IndicesArray _indices;
   /** Hidden */
-  unordered_map_t<unsigned int, unique_ptr_t<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>>
+    _vertexBuffers;
   /** Hidden */
   Uint32Array _delayInfo;
   /** Hidden */
   Uint32Array _delayInfoKinds;
   /** Hidden */
-  unique_ptr_t<BoundingInfo> _boundingInfo;
+  std::unique_ptr<BoundingInfo> _boundingInfo;
   /** Hidden */
-  ::std::function<void(const Json::value& parsedVertexData, Geometry& geometry)>
+  std::function<void(const Json::value& parsedVertexData, Geometry& geometry)>
     _delayLoadingFunction;
   /** Hidden */
   int _softwareSkinningRenderId;
   // Cache
   /** Hidden */
-  vector_t<Vector3> _positions;
+  std::vector<Vector3> _positions;
 
   /**
    *  Gets or sets the Bias Vector to apply on the bounding elements
    * (box/sphere), the max extend is computed as v += v * bias.x + bias.y, the
    * min is computed as v -= v * bias.x + bias.y
    */
-  Property<Geometry, nullable_t<Vector2>> boundingBias;
+  Property<Geometry, std::optional<Vector2>> boundingBias;
 
-  unordered_map_t<string_t, unique_ptr_t<GL::IGLVertexArrayObject>>
+  std::unordered_map<std::string, std::unique_ptr<GL::IGLVertexArrayObject>>
     _vertexArrayObjects;
   bool _updatable;
-  vector_t<Vector3> centroids;
+  std::vector<Vector3> centroids;
 
   /**
    * Gets the current extend of the geometry
@@ -463,12 +496,12 @@ public:
 private:
   Scene* _scene;
   Engine* _engine;
-  vector_t<Mesh*> _meshes;
+  std::vector<Mesh*> _meshes;
   size_t _totalVertices;
   bool _isDisposed;
-  nullable_t<MinMax> _extend;
-  nullable_t<Vector2> _boundingBias;
-  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  std::optional<MinMax> _extend;
+  std::optional<Vector2> _boundingBias;
+  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   bool _indexBufferIsUpdatable;
 
 }; // end of class Geometry

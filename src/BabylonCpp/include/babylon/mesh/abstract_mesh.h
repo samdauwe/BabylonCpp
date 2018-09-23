@@ -1,7 +1,7 @@
 #ifndef BABYLON_MESH_ABSTRACT_MESH_H
 #define BABYLON_MESH_ABSTRACT_MESH_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/core/json.h>
 #include <babylon/culling/icullable.h>
@@ -19,6 +19,21 @@
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class ActionManager;
+class Camera;
+class EdgesRenderer;
+class Light;
+class Material;
+struct MaterialDefines;
+class PickingInfo;
+struct PhysicsParams;
+class Skeleton;
+class SolidParticle;
+using CameraPtr   = std::shared_ptr<Camera>;
+using LightPtr    = std::shared_ptr<Light>;
+using MaterialPtr = std::shared_ptr<Material>;
+using SkeletonPtr = std::shared_ptr<Skeleton>;
 
 namespace GL {
 class IGLQuery;
@@ -56,7 +71,7 @@ public:
   template <typename... Ts>
   static AbstractMeshPtr New(Ts&&... args)
   {
-    auto mesh = shared_ptr_t<AbstractMesh>(
+    auto mesh = std::shared_ptr<AbstractMesh>(
       new AbstractMesh(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
@@ -76,7 +91,7 @@ public:
    * @brief Returns the string "AbstractMesh".
    * @returns "AbstractMesh"
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Gets a string representation of the current mesh.
@@ -84,7 +99,7 @@ public:
    * included
    * @returns a string representation of the current mesh
    */
-  string_t toString(bool fullDetails = false) const;
+  std::string toString(bool fullDetails = false) const;
 
   /**
    * @brief Hidden
@@ -218,8 +233,8 @@ public:
    */
   virtual AbstractMesh*
   setVerticesData(unsigned int kind, const Float32Array& data,
-                  bool updatable                   = false,
-                  const nullable_t<size_t>& stride = nullopt_t) override;
+                  bool updatable                      = false,
+                  const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -403,7 +418,7 @@ public:
    * @param frustumPlanes defines the frustum to test
    * @returns true if the mesh is in the frustum planes
    */
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                    unsigned int strategy = 0) override;
 
   /**
@@ -413,8 +428,8 @@ public:
    * @param frustumPlanes defines the frustum to test
    * @returns true if the mesh is completely in the frustum planes
    */
-  bool
-  isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
+  bool isCompletelyInFrustum(
+    const std::array<Plane, 6>& frustumPlanes) const override;
 
   /**
    * @brief True if the mesh intersects another mesh or a SolidParticle object.
@@ -568,7 +583,7 @@ public:
    * not be cloned (false by default)
    * @returns the new mesh
    */
-  AbstractMesh* clone(const string_t& name, Node* newParent,
+  AbstractMesh* clone(const std::string& name, Node* newParent,
                       bool doNotCloneChildren = true);
 
   /**
@@ -620,7 +635,7 @@ public:
    * @returns an array of Vector3
    * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
-  vector_t<Vector3>& getFacetLocalNormals();
+  std::vector<Vector3>& getFacetLocalNormals();
 
   /**
    * @brief Returns the facetLocalPositions array.
@@ -628,14 +643,14 @@ public:
    * @returns an array of Vector3
    * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
-  vector_t<Vector3>& getFacetLocalPositions();
+  std::vector<Vector3>& getFacetLocalPositions();
 
   /**
    * @brief Returns the facetLocalPartioning array.
    * @returns an array of array of numbers
    * @see http://doc.babylonjs.com/how_to/how_to_use_facetdata
    */
-  vector_t<Uint32Array>& getFacetLocalPartitioning();
+  std::vector<Uint32Array>& getFacetLocalPartitioning();
 
   /**
    * @brief Returns the i-th facet position in the world system.
@@ -784,7 +799,7 @@ protected:
    * @param name defines the name of the mesh
    * @param scene defines the hosting scene
    */
-  AbstractMesh(const string_t& name, Scene* scene);
+  AbstractMesh(const std::string& name, Scene* scene);
 
   /**
    * @brief Hidden
@@ -1075,7 +1090,7 @@ protected:
   /**
    * @brief Gets the edgesRenderer associated with the mesh.
    */
-  unique_ptr_t<EdgesRenderer>& get_edgesRenderer();
+  std::unique_ptr<EdgesRenderer>& get_edgesRenderer();
 
   /**
    * @brief Returns true if the mesh is blocked. Implemented by child classes.
@@ -1111,7 +1126,7 @@ protected:
    * @see
    * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
-  unique_ptr_t<Collider>& get_collider();
+  std::unique_ptr<Collider>& get_collider();
 
 private:
   /**
@@ -1265,7 +1280,7 @@ public:
   /**
    * Hidden
    */
-  unique_ptr_t<GL::IGLQuery> _occlusionQuery;
+  std::unique_ptr<GL::IGLQuery> _occlusionQuery;
 
   /**
    * Whether the mesh is occluded or not, it is used also to set the intial
@@ -1444,7 +1459,7 @@ public:
    * Gets or sets impostor used for physic simulation
    * @see http://doc.babylonjs.com/features/physics_engine
    */
-  unique_ptr_t<PhysicsImpostor> physicsImpostor;
+  std::unique_ptr<PhysicsImpostor> physicsImpostor;
 
   // Collisions
 
@@ -1491,7 +1506,7 @@ public:
   Color4 edgesColor;
 
   /** Hidden */
-  unique_ptr_t<EdgesRenderer> _edgesRenderer;
+  std::unique_ptr<EdgesRenderer> _edgesRenderer;
 
   // Cache
 
@@ -1499,10 +1514,10 @@ public:
   AbstractMesh* _masterMesh;
 
   /** Hidden */
-  unique_ptr_t<MaterialDefines> _materialDefines;
+  std::unique_ptr<MaterialDefines> _materialDefines;
 
   /** Hidden */
-  unique_ptr_t<BoundingInfo> _boundingInfo;
+  std::unique_ptr<BoundingInfo> _boundingInfo;
 
   /** Hidden */
   int _renderId;
@@ -1511,27 +1526,27 @@ public:
    * Gets or sets the list of subMeshes
    * @see http://doc.babylonjs.com/how_to/multi_materials
    */
-  vector_t<shared_ptr_t<SubMesh>> subMeshes;
+  std::vector<std::shared_ptr<SubMesh>> subMeshes;
 
   /** Hidden */
   Octree<SubMesh*>* _submeshesOctree;
 
   /** Hidden */
-  vector_t<AbstractMesh*> _intersectionsInProgress;
+  std::vector<AbstractMesh*> _intersectionsInProgress;
 
   /** Hidden */
   bool _unIndexed;
 
   /** Hidden */
-  vector_t<LightPtr> _lightSources;
+  std::vector<LightPtr> _lightSources;
 
   // Loading properties
 
   /** Hidden */
-  vector_t<Json::value> _waitingActions;
+  std::vector<Json::value> _waitingActions;
 
   /** Hidden */
-  nullable_t<bool> _waitingFreezeWorldMatrix;
+  std::optional<bool> _waitingFreezeWorldMatrix;
 
   // Skeleton
 
@@ -1546,7 +1561,7 @@ public:
   /**
    * Gets the edgesRenderer associated with the mesh
    */
-  ReadOnlyProperty<AbstractMesh, unique_ptr_t<EdgesRenderer>> edgesRenderer;
+  ReadOnlyProperty<AbstractMesh, std::unique_ptr<EdgesRenderer>> edgesRenderer;
 
   /**
    * Returns true if the mesh is blocked. Implemented by child classes
@@ -1573,16 +1588,16 @@ public:
    * @see
    * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
-  ReadOnlyProperty<AbstractMesh, unique_ptr_t<Collider>> collider;
+  ReadOnlyProperty<AbstractMesh, std::unique_ptr<Collider>> collider;
 
 private:
   // FacetData private properties
   // Facet local positions
-  vector_t<Vector3> _facetPositions;
+  std::vector<Vector3> _facetPositions;
   // Facet local normals
-  vector_t<Vector3> _facetNormals;
+  std::vector<Vector3> _facetNormals;
   // Partitioning array of facet index arrays
-  vector_t<Uint32Array> _facetPartitioning;
+  std::vector<Uint32Array> _facetPartitioning;
   // facet number
   size_t _facetNb;
   // Number of subdivisions per axis in the partioning space
@@ -1604,12 +1619,12 @@ private:
   // copy of the indices array to store them once sorted
   IndicesArray _depthSortedIndices;
   // array of depth sorted facets
-  vector_t<DepthSortedFacet> _depthSortedFacets;
+  std::vector<DepthSortedFacet> _depthSortedFacets;
   // facet depth sort function
   ::std::function<int(const DepthSortedFacet& f1, const DepthSortedFacet& f2)>
     _facetDepthSortFunction;
   // location where to depth sort from
-  unique_ptr_t<Vector3> _facetDepthSortFrom;
+  std::unique_ptr<Vector3> _facetDepthSortFrom;
   // same as facetDepthSortFrom but expressed in the mesh local space
   Vector3 _facetDepthSortOrigin;
   Matrix _invertedMatrix;
@@ -1630,7 +1645,7 @@ private:
   bool _checkCollisions;
   int _collisionMask;
   int _collisionGroup;
-  unique_ptr_t<Collider> _collider;
+  std::unique_ptr<Collider> _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;
   // Cache

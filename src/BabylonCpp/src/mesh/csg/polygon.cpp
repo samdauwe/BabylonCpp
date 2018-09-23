@@ -1,12 +1,13 @@
 #include <babylon/mesh/csg/polygon.h>
 
+#include <algorithm>
 #include <sstream>
 
 #include <babylon/mesh/csg/vertex.h>
 
 namespace BABYLON {
 
-CSG::Polygon::Polygon(const vector_t<Vertex>& _vertices,
+CSG::Polygon::Polygon(const std::vector<Vertex>& _vertices,
                       const PolygonOptions& _shared)
     : vertices{_vertices}, shared{_shared}
 {
@@ -22,7 +23,7 @@ CSG::Polygon::Polygon(const BABYLON::CSG::Polygon& otherPolygon)
 
 CSG::Polygon::Polygon(BABYLON::CSG::Polygon&& otherPolygon)
 {
-  *this = ::std::move(otherPolygon);
+  *this = std::move(otherPolygon);
 }
 
 CSG::Polygon& CSG::Polygon::operator=(const BABYLON::CSG::Polygon& otherPolygon)
@@ -39,9 +40,9 @@ CSG::Polygon& CSG::Polygon::operator=(const BABYLON::CSG::Polygon& otherPolygon)
 CSG::Polygon& CSG::Polygon::operator=(BABYLON::CSG::Polygon&& otherPolygon)
 {
   if (&otherPolygon != this) {
-    vertices = ::std::move(otherPolygon.vertices);
-    shared   = ::std::move(otherPolygon.shared);
-    plane    = ::std::move(otherPolygon.plane);
+    vertices = std::move(otherPolygon.vertices);
+    shared   = std::move(otherPolygon.shared);
+    plane    = std::move(otherPolygon.plane);
   }
 
   return *this;
@@ -56,9 +57,9 @@ CSG::Polygon CSG::Polygon::clone() const
   return Polygon(*this);
 }
 
-unique_ptr_t<CSG::Polygon> CSG::Polygon::cloneToNewObject() const
+std::unique_ptr<CSG::Polygon> CSG::Polygon::cloneToNewObject() const
 {
-  return ::std::make_unique<Polygon>(*this);
+  return std::make_unique<Polygon>(*this);
 }
 
 namespace CSG {
@@ -77,7 +78,7 @@ std::ostream& operator<<(std::ostream& os, const Polygon& polygon)
 }
 } // namespace CSG
 
-string_t CSG::Polygon::toString() const
+std::string CSG::Polygon::toString() const
 {
   std::ostringstream oss;
   oss << (*this);

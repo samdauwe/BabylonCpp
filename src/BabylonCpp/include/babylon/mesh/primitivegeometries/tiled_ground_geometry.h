@@ -1,11 +1,14 @@
 #ifndef BABYLON_MESH_PRIMITIVE_GEOMETRIES_TILED_GROUND_GEOMETRY_H
 #define BABYLON_MESH_PRIMITIVE_GEOMETRIES_TILED_GROUND_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/primitivegeometries/_primitive_geometry.h>
 
 namespace BABYLON {
+
+class TiledGroundGeometry;
+using TiledGroundGeometryPtr = std::shared_ptr<TiledGroundGeometry>;
 
 /**
  * @brief Creates a tiled ground geometry.
@@ -17,7 +20,7 @@ public:
   template <typename... Ts>
   static TiledGroundGeometryPtr New(Ts&&... args)
   {
-    auto mesh = shared_ptr_t<TiledGroundGeometry>(
+    auto mesh = std::shared_ptr<TiledGroundGeometry>(
       new TiledGroundGeometry(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
@@ -29,9 +32,9 @@ public:
    * @brief Hidden
    * @return
    */
-  unique_ptr_t<VertexData> _regenerateVertexData() override;
+  std::unique_ptr<VertexData> _regenerateVertexData() override;
 
-  GeometryPtr copy(const string_t& id) override;
+  GeometryPtr copy(const std::string& id) override;
 
 protected:
   /**
@@ -49,10 +52,10 @@ protected:
    * with new parameters (false by default)
    * @param mesh defines the hosting mesh (can be null)
    */
-  TiledGroundGeometry(const string_t& id, Scene* scene, float xmin, float zmin,
-                      float xmax, float zmax, const ISize& subdivisions,
-                      const ISize& precision, bool canBeRegenerated,
-                      Mesh* mesh = nullptr);
+  TiledGroundGeometry(const std::string& id, Scene* scene, float xmin,
+                      float zmin, float xmax, float zmax,
+                      const ISize& subdivisions, const ISize& precision,
+                      bool canBeRegenerated, Mesh* mesh = nullptr);
 
 private:
   /**

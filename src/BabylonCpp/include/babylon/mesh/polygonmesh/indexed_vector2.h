@@ -1,8 +1,7 @@
 #ifndef BABYLON_MESH_POLYGONMESH_INDEXED_VECTOR2_H
 #define BABYLON_MESH_POLYGONMESH_INDEXED_VECTOR2_H
 
-#include <babylon/babylon_global.h>
-
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector2.h>
 
 namespace BABYLON {

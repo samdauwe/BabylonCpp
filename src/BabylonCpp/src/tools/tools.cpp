@@ -30,8 +30,8 @@
 
 namespace BABYLON {
 
-::std::function<string_t(string_t url)> Tools::PreprocessUrl
-  = [](string_t url) {
+::std::function<std::string(std::string url)> Tools::PreprocessUrl
+  = [](std::string url) {
       if (String::startsWith(url, "file:")) {
         url = url.substr(5);
       }
@@ -126,7 +126,7 @@ int Tools::GetExponentOfTwo(int value, int max, unsigned int mode)
   return ::std::min(pot, max);
 }
 
-string_t Tools::GetFilename(const string_t& path)
+std::string Tools::GetFilename(const std::string& path)
 {
   const auto index = String::lastIndexOf(path, "/");
   if (index < 0) {
@@ -136,8 +136,8 @@ string_t Tools::GetFilename(const string_t& path)
   return path.substr(static_cast<size_t>(index) + 1);
 }
 
-string_t Tools::GetFolderPath(const string_t& uri,
-                              bool returnUnchangedIfNoSlash)
+std::string Tools::GetFolderPath(const std::string& uri,
+                                 bool returnUnchangedIfNoSlash)
 {
   const auto index = String::lastIndexOf(uri, "/");
   if (index < 0) {
@@ -163,14 +163,14 @@ float Tools::ToRadians(float angle)
 MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
                                       const Uint32Array& indices,
                                       size_t indexStart, size_t indexCount,
-                                      const nullable_t<Vector2>& bias)
+                                      const std::optional<Vector2>& bias)
 {
-  Vector3 minimum(numeric_limits_t<float>::max(),
-                  numeric_limits_t<float>::max(),
-                  numeric_limits_t<float>::max());
-  Vector3 maximum(numeric_limits_t<float>::lowest(),
-                  numeric_limits_t<float>::lowest(),
-                  numeric_limits_t<float>::lowest());
+  Vector3 minimum(std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max());
+  Vector3 maximum(std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest());
 
   for (size_t index = indexStart; index < indexStart + indexCount; ++index) {
     Vector3 current(positions[indices[index] * 3],
@@ -195,15 +195,15 @@ MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
 }
 
 MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
-                               size_t count, const nullable_t<Vector2>& bias,
-                               nullable_t<unsigned int> stride)
+                               size_t count, const std::optional<Vector2>& bias,
+                               std::optional<unsigned int> stride)
 {
-  Vector3 minimum(numeric_limits_t<float>::max(),
-                  numeric_limits_t<float>::max(),
-                  numeric_limits_t<float>::max());
-  Vector3 maximum(numeric_limits_t<float>::lowest(),
-                  numeric_limits_t<float>::lowest(),
-                  numeric_limits_t<float>::lowest());
+  Vector3 minimum(std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max());
+  Vector3 maximum(std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest());
 
   if (!stride) {
     stride = 3;
@@ -232,13 +232,13 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
 }
 
 MinMaxVector2 Tools::ExtractMinAndMaxVector2(
-  const ::std::function<nullable_t<Vector2>(std::size_t index)>& feeder,
-  const nullable_t<Vector2>& bias)
+  const ::std::function<std::optional<Vector2>(std::size_t index)>& feeder,
+  const std::optional<Vector2>& bias)
 {
-  Vector2 minimum(numeric_limits_t<float>::max(),
-                  numeric_limits_t<float>::max());
-  Vector2 maximum(numeric_limits_t<float>::lowest(),
-                  numeric_limits_t<float>::lowest());
+  Vector2 minimum(std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max());
+  Vector2 maximum(std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest());
 
   std::size_t i = 0;
   auto cur      = feeder(i++);
@@ -323,20 +323,20 @@ Image Tools::CreateNoiseImage(unsigned int size)
   return Image(imageData, width, height, depth, mode);
 }
 
-string_t Tools::CleanUrl(string_t url)
+std::string Tools::CleanUrl(std::string url)
 {
   String::replaceInPlace(url, "#", "%23");
   return url;
 }
 
-string_t Tools::DecodeURIComponent(const string_t& s)
+std::string Tools::DecodeURIComponent(const std::string& s)
 {
   return s;
 }
 
 void Tools::LoadImageFromUrl(
-  string_t url, const ::std::function<void(const Image& img)>& onLoad,
-  const ::std::function<void(const string_t& msg)>& onError,
+  std::string url, const ::std::function<void(const Image& img)>& onLoad,
+  const ::std::function<void(const std::string& msg)>& onError,
   bool flipVertically)
 {
   url = Tools::CleanUrl(url);
@@ -345,7 +345,7 @@ void Tools::LoadImageFromUrl(
 
   if (String::startsWith(url, "file:")) {
     using stbi_ptr
-      = unique_ptr_t<unsigned char, ::std::function<void(unsigned char*)>>;
+      = std::unique_ptr<unsigned char, ::std::function<void(unsigned char*)>>;
 
     int w, h, n;
     stbi_set_flip_vertically_on_load(flipVertically);
@@ -368,12 +368,12 @@ void Tools::LoadImageFromUrl(
 }
 
 void Tools::LoadFile(
-  string_t url,
-  const ::std::function<void(const string_t& data,
-                             const string_t& responseURL)>& onSuccess,
+  std::string url,
+  const ::std::function<void(const std::string& data,
+                             const std::string& responseURL)>& onSuccess,
   const ::std::function<void(const ProgressEvent& event)>& onProgress,
   bool useArrayBuffer,
-  const ::std::function<void(const string_t& exception)>& onError)
+  const ::std::function<void(const std::string& exception)>& onError)
 {
   url = Tools::CleanUrl(url);
 
@@ -395,9 +395,9 @@ void Tools::LoadFile(
 }
 
 void Tools::ReadFile(
-  string_t fileToLoad,
-  const ::std::function<void(const string_t& data,
-                             const string_t& responseURL)>& callback,
+  std::string fileToLoad,
+  const ::std::function<void(const std::string& data,
+                             const std::string& responseURL)>& callback,
   const ::std::function<void(const ProgressEvent& event)>& onProgress,
   bool useArrayBuffer)
 {
@@ -451,15 +451,15 @@ void Tools::CheckExtends(Vector3& v, Vector3& min, Vector3& max)
   }
 }
 
-string_t Tools::RandomId()
+std::string Tools::RandomId()
 {
   // from
   // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/2117523#answer-2117523
-  string_t randomId = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
-  const array_t<unsigned int, 16> yconv{
+  std::string randomId = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+  const std::array<unsigned int, 16> yconv{
     {8, 9, 10, 11, 8, 9, 10, 11, 8, 9, 10, 11, 8, 9, 10, 11}};
-  const array_t<char, 16> hex{{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                               'a', 'b', 'c', 'd', 'e', 'f'}};
+  const std::array<char, 16> hex{{'0', '1', '2', '3', '4', '5', '6', '7', '8',
+                                  '9', 'a', 'b', 'c', 'd', 'e', 'f'}};
   const auto randomFloats = Math::randomList(0.f, 1.f, randomId.size());
   for (unsigned int i = 0; i < randomId.size(); ++i) {
     const char c = randomId[i];

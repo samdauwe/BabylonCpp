@@ -1,11 +1,14 @@
 #ifndef BABYLON_MESH_PRIMITIVE_GEOMETRIES_GROUND_GEOMETRY_H
 #define BABYLON_MESH_PRIMITIVE_GEOMETRIES_GROUND_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/primitivegeometries/_primitive_geometry.h>
 
 namespace BABYLON {
+
+class GroundGeometry;
+using GroundGeometryPtr = std::shared_ptr<GroundGeometry>;
 
 /**
  * @brief Creates a new ground geometry.
@@ -17,7 +20,7 @@ public:
   template <typename... Ts>
   static GroundGeometryPtr New(Ts&&... args)
   {
-    auto mesh = shared_ptr_t<GroundGeometry>(
+    auto mesh = std::shared_ptr<GroundGeometry>(
       new GroundGeometry(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
@@ -29,9 +32,9 @@ public:
    * @brief Hidden
    * @return
    */
-  unique_ptr_t<VertexData> _regenerateVertexData() override;
+  std::unique_ptr<VertexData> _regenerateVertexData() override;
 
-  GeometryPtr copy(const string_t& id) override;
+  GeometryPtr copy(const std::string& id) override;
   Json::object serialize() const override;
 
   // Statics
@@ -49,7 +52,7 @@ protected:
    * with new parameters (false by default)
    * @param mesh defines the hosting mesh (can be null)
    */
-  GroundGeometry(const string_t& id, Scene* scene, unsigned int width,
+  GroundGeometry(const std::string& id, Scene* scene, unsigned int width,
                  unsigned int height, unsigned int subdivisions,
                  bool canBeRegenerated, Mesh* mesh = nullptr);
 

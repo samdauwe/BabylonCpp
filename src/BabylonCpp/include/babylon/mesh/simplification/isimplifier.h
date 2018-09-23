@@ -1,7 +1,7 @@
 #ifndef BABYLON_MESH_SIMPLIFICATION_ISIMPLIFIER_H
 #define BABYLON_MESH_SIMPLIFICATION_ISIMPLIFIER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

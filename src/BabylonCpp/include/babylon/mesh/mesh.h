@@ -1,13 +1,37 @@
 #ifndef BABYLON_MESH_MESH_H
 #define BABYLON_MESH_MESH_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/isize.h>
 #include <babylon/math/path3d.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 
 namespace BABYLON {
+
+class _InstancesBatch;
+class _VisibleInstances;
+class Buffer;
+class Effect;
+class Geometry;
+class GroundMesh;
+class IAnimatable;
+class IcoSphereOptions;
+class InstancedMesh;
+struct IParticleSystem;
+class LinesMesh;
+class Mesh;
+class MeshLODLevel;
+class MorphTargetManager;
+class PolyhedronOptions;
+class VertexBuffer;
+using GroundMeshPtr         = std::shared_ptr<GroundMesh>;
+using IAnimatablePtr        = std::shared_ptr<IAnimatable>;
+using InstancedMeshPtr      = std::shared_ptr<InstancedMesh>;
+using IParticleSystemPtr    = std::shared_ptr<IParticleSystem>;
+using LinesMeshPtr          = std::shared_ptr<LinesMesh>;
+using MeshPtr               = std::shared_ptr<Mesh>;
+using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
 
 /**
  * @brief
@@ -93,7 +117,7 @@ public:
   template <typename... Ts>
   static MeshPtr New(Ts&&... args)
   {
-    auto mesh = shared_ptr_t<Mesh>(new Mesh(::std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<Mesh>(new Mesh(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
@@ -103,7 +127,7 @@ public:
   /**
    * @brief Returns the string "Mesh".
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   virtual IReflect::Type type() const override;
 
@@ -114,7 +138,7 @@ public:
    * @param {boolean} fullDetails - support for multiple levels of logging
    * within scene loading
    */
-  string_t toString(bool fullDetails = false);
+  std::string toString(bool fullDetails = false);
 
   void addSubMesh(SubMesh* subMesh);
 
@@ -128,7 +152,7 @@ public:
    * mesh
    * @returns an array of {BABYLON.MeshLODLevel}
    */
-  vector_t<MeshLODLevel*> getLODLevels();
+  std::vector<MeshLODLevel*> getLODLevels();
 
   /**
    * @brief Add a mesh as LOD level triggered at the given distance.
@@ -348,12 +372,13 @@ public:
   /**
    * @brief Hidden
    */
-  shared_ptr_t<SubMesh> _createGlobalSubMesh(bool force);
+  std::shared_ptr<SubMesh> _createGlobalSubMesh(bool force);
 
   void subdivide(size_t count);
   Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                        bool updatable                   = false,
-                        const nullable_t<size_t>& stride = nullopt_t) override;
+                        bool updatable = false,
+                        const std::optional<size_t>& stride
+                        = std::nullopt) override;
 
   void markVerticesDataAsUpdatable(unsigned int kind, bool updatable = true);
 
@@ -361,7 +386,7 @@ public:
    * @brief Sets the mesh VertexBuffer.
    * @returns The Mesh.
    */
-  Mesh& setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer);
+  Mesh& setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer);
 
   Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
                            bool updateExtends = false,
@@ -492,13 +517,13 @@ public:
    * @brief Returns an array populated with IParticleSystem objects whose the
    * mesh is the emitter.
    */
-  vector_t<IParticleSystemPtr> getEmittedParticleSystems();
+  std::vector<IParticleSystemPtr> getEmittedParticleSystems();
 
   /**
    * @brief Returns an array populated with IParticleSystem objects whose the
    * mesh or its children are the emitter.
    */
-  vector_t<IParticleSystemPtr> getHierarchyEmittedParticleSystems();
+  std::vector<IParticleSystemPtr> getHierarchyEmittedParticleSystems();
 
   /**
    * @brief Normalize matrix weights so that all vertices have a total weight
@@ -506,7 +531,7 @@ public:
    */
   void cleanMatrixWeights();
 
-  vector_t<NodePtr> getChildren();
+  std::vector<NodePtr> getChildren();
 
   /**
    * @brief Hidden
@@ -520,7 +545,7 @@ public:
    * @param frustumPlanes defines the frustum to test
    * @returns true if the mesh is in the frustum planes
    */
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                    unsigned int strategy = 0) override;
 
   /**
@@ -530,13 +555,13 @@ public:
    * multiMaterial.
    * @returns the Mesh.
    */
-  Mesh& setMaterialByID(const string_t& id);
+  Mesh& setMaterialByID(const std::string& id);
 
   /**
    * @brief Returns as a new array populated with the mesh material and/or
    * skeleton, if any.
    */
-  vector_t<IAnimatablePtr> getAnimatables();
+  std::vector<IAnimatablePtr> getAnimatables();
 
   /**
    * @brief Modifies the mesh geometry according to the passed transformation
@@ -587,7 +612,7 @@ public:
    * cloning in the same time of the original mesh `body` used by the physics
    * engine, if any.
    */
-  MeshPtr clone(const string_t& name, Node* newParent = nullptr,
+  MeshPtr clone(const std::string& name, Node* newParent = nullptr,
                 bool doNotCloneChildren   = false,
                 bool clonePhysicsImpostor = true);
 
@@ -625,12 +650,13 @@ public:
    * instance.
    * @returns the Mesh.
    */
-  void applyDisplacementMap(const string_t& url, int minHeight, int maxHeight,
-                            const ::std::function<void(Mesh* mesh)> onSuccess
-                            = nullptr,
-                            const nullable_t<Vector2>& uvOffset = nullopt_t,
-                            const nullable_t<Vector2>& uvScale  = nullopt_t,
-                            bool boolforceUpdate                = false);
+  void
+  applyDisplacementMap(const std::string& url, int minHeight, int maxHeight,
+                       const ::std::function<void(Mesh* mesh)> onSuccess
+                       = nullptr,
+                       const std::optional<Vector2>& uvOffset = std::nullopt,
+                       const std::optional<Vector2>& uvScale  = std::nullopt,
+                       bool boolforceUpdate                   = false);
 
   /**
    * @brief Modifies the mesh geometry according to a displacementMap buffer.
@@ -657,8 +683,9 @@ public:
   void applyDisplacementMapFromBuffer(
     const Uint8Array& buffer, unsigned int heightMapWidth,
     unsigned int heightMapHeight, int minHeight, int maxHeight,
-    const nullable_t<Vector2>& uvOffset = nullopt_t,
-    const nullable_t<Vector2>& uvScale = nullopt_t, bool forceUpdate = false);
+    const std::optional<Vector2>& uvOffset = std::nullopt,
+    const std::optional<Vector2>& uvScale  = std::nullopt,
+    bool forceUpdate                       = false);
 
   /**
    * @brief Modify the mesh to get a flat shading rendering.
@@ -708,7 +735,7 @@ public:
    * @see http://doc.babylonjs.com/how_to/how_to_use_instances
    * Warning : this method is not supported for Line mesh and LineSystem
    */
-  InstancedMeshPtr createInstance(const string_t& name);
+  InstancedMeshPtr createInstance(const std::string& name);
 
   /**
    * @brief Synchronises all the mesh instance submeshes to the current mesh
@@ -745,7 +772,7 @@ public:
    * `delayLoadingFile` property with
    */
   static MeshPtr Parse(const Json::value& parsedMesh, Scene* scene,
-                       const string_t& rootUrl);
+                       const std::string& rootUrl);
 
   /**
    * @brief Creates a ribbon mesh.
@@ -778,8 +805,8 @@ public:
    * created.
    */
   static MeshPtr
-  CreateRibbon(const string_t& name,
-               const vector_t<vector_t<Vector3>>& pathArray,
+  CreateRibbon(const std::string& name,
+               const std::vector<std::vector<Vector3>>& pathArray,
                bool closeArray = false, bool closePath = false, int offset = -1,
                Scene* = nullptr, bool updatable = false,
                unsigned int sideOrientation  = Mesh::DEFAULTSIDE(),
@@ -799,7 +826,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static MeshPtr CreateDisc(const string_t& name, float radius = 0.5f,
+  static MeshPtr CreateDisc(const std::string& name, float radius = 0.5f,
                             unsigned int tessellation = 64, Scene* = nullptr,
                             bool updatable               = false,
                             unsigned int sideOrientation = Mesh::DEFAULTSIDE());
@@ -816,7 +843,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static MeshPtr CreateBox(const string_t& name, float size = 1.f,
+  static MeshPtr CreateBox(const std::string& name, float size = 1.f,
                            Scene* = nullptr, bool updatable = false,
                            unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
@@ -834,7 +861,7 @@ public:
    * created.
    */
   static MeshPtr
-  CreateSphere(const string_t& name, unsigned int segments = 32,
+  CreateSphere(const std::string& name, unsigned int segments = 32,
                float diameter = 1.f, Scene* = nullptr, bool updatable = false,
                unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
@@ -858,7 +885,7 @@ public:
    * created.
    */
   static MeshPtr
-  CreateCylinder(const string_t& name, float height = 2.f,
+  CreateCylinder(const std::string& name, float height = 2.f,
                  float diameterTop = 1.f, float diameterBottom = 1.f,
                  unsigned int tessellation = 24, unsigned int subdivisions = 1,
                  Scene* = nullptr, bool updatable = false,
@@ -880,7 +907,7 @@ public:
    * created.
    */
   static MeshPtr
-  CreateTorus(const string_t& name, float diameter = 1.f,
+  CreateTorus(const std::string& name, float diameter = 1.f,
               float thickness = 0.5f, unsigned int tessellation = 16,
               Scene* = nullptr, bool updatable = false,
               unsigned int sideOrientation = Mesh::DEFAULTSIDE());
@@ -902,8 +929,8 @@ public:
    * created.
    */
   static MeshPtr
-  CreateTorusKnot(const string_t& name, float radius = 2.f, float tube = 0.5f,
-                  unsigned int radialSegments  = 32,
+  CreateTorusKnot(const std::string& name, float radius = 2.f,
+                  float tube = 0.5f, unsigned int radialSegments = 32,
                   unsigned int tubularSegments = 32, float p = 2.f,
                   float q = 3.f, Scene* = nullptr, bool updatable = false,
                   unsigned int sideOrientation = Mesh::DEFAULTSIDE());
@@ -926,8 +953,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static LinesMeshPtr CreateLines(const string_t& name,
-                                  const vector_t<Vector3>& points, Scene*,
+  static LinesMeshPtr CreateLines(const std::string& name,
+                                  const std::vector<Vector3>& points, Scene*,
                                   bool updatable                    = false,
                                   const LinesMeshPtr& linesInstance = nullptr);
 
@@ -956,7 +983,7 @@ public:
    * created.
    */
   static LinesMeshPtr CreateDashedLines(
-    const string_t& name, vector_t<Vector3>& points, float dashSize = 3.f,
+    const std::string& name, std::vector<Vector3>& points, float dashSize = 3.f,
     float gapSize = 1.f, unsigned int dashNb = 200, Scene* = nullptr,
     bool updatable = false, const LinesMeshPtr& instance = nullptr);
   /**
@@ -977,8 +1004,8 @@ public:
    * updating a polygon.
    */
   static MeshPtr
-  CreatePolygon(const string_t& name, const vector_t<Vector3>& shape,
-                Scene* scene, const vector_t<vector_t<Vector3>>& holes,
+  CreatePolygon(const std::string& name, const std::vector<Vector3>& shape,
+                Scene* scene, const std::vector<std::vector<Vector3>>& holes,
                 bool updatable               = false,
                 unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
@@ -987,8 +1014,8 @@ public:
    * Please consider using the same method from the MeshBuilder class instead.
    */
   static MeshPtr ExtrudePolygon(
-    const string_t& name, const vector_t<Vector3>& shape, float depth,
-    Scene* scene, const vector_t<vector_t<Vector3>>& holes,
+    const std::string& name, const std::vector<Vector3>& shape, float depth,
+    Scene* scene, const std::vector<std::vector<Vector3>>& holes,
     bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE());
 
   /**
@@ -1024,8 +1051,8 @@ public:
    * created.
    */
   static MeshPtr
-  ExtrudeShape(const string_t& name, const vector_t<Vector3>& shape,
-               const vector_t<Vector3>& path, float scale, float rotation,
+  ExtrudeShape(const std::string& name, const std::vector<Vector3>& shape,
+               const std::vector<Vector3>& path, float scale, float rotation,
                unsigned int cap, Scene*, bool updatable = false,
                unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
                const MeshPtr& instance      = nullptr);
@@ -1084,8 +1111,8 @@ public:
    * created.
    */
   static MeshPtr ExtrudeShapeCustom(
-    const string_t& name, const vector_t<Vector3>& shape,
-    const vector_t<Vector3>& path,
+    const std::string& name, const std::vector<Vector3>& shape,
+    const std::vector<Vector3>& path,
     const ::std::function<float(float i, float distance)>& scaleFunction,
     const ::std::function<float(float i, float distance)>& rotationFunction,
     bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
@@ -1111,7 +1138,7 @@ public:
    * created.
    */
   static MeshPtr
-  CreateLathe(const string_t& name, const vector_t<Vector3>& shape,
+  CreateLathe(const std::string& name, const std::vector<Vector3>& shape,
               float radius, unsigned int tessellation, Scene* = nullptr,
               bool updatable               = false,
               unsigned int sideOrientation = Mesh::DEFAULTSIDE());
@@ -1128,8 +1155,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static MeshPtr CreatePlane(const string_t& name, float size, Scene* = nullptr,
-                             bool updatable = false,
+  static MeshPtr CreatePlane(const std::string& name, float size,
+                             Scene* = nullptr, bool updatable = false,
                              unsigned int sideOrientation
                              = Mesh::DEFAULTSIDE());
 
@@ -1144,7 +1171,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static MeshPtr CreateGround(const string_t& name, unsigned int width = 1,
+  static MeshPtr CreateGround(const std::string& name, unsigned int width = 1,
                               unsigned int height       = 1,
                               unsigned int subdivisions = 1, Scene* = nullptr,
                               bool updatable = false);
@@ -1170,8 +1197,8 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static MeshPtr CreateTiledGround(const string_t& name, float xmin, float zmin,
-                                   float xmax, float zmax,
+  static MeshPtr CreateTiledGround(const std::string& name, float xmin,
+                                   float zmin, float xmax, float zmax,
                                    const ISize& subdivisions = ISize(1, 1),
                                    const ISize& precision    = ISize(1, 1),
                                    Scene* = nullptr, bool updatable = false);
@@ -1202,7 +1229,7 @@ public:
    * created.
    */
   static GroundMeshPtr CreateGroundFromHeightMap(
-    const string_t& name, const string_t& url, unsigned int width,
+    const std::string& name, const std::string& url, unsigned int width,
     unsigned int height, unsigned int subdivisions, unsigned int minHeight,
     unsigned int maxHeight, Scene*, bool updatable = false,
     const ::std::function<void(GroundMesh* mesh)>& onReady = nullptr);
@@ -1243,8 +1270,8 @@ public:
    * created.
    */
   static MeshPtr CreateTube(
-    const string_t& name, const vector_t<Vector3>& path, float radius = 1.f,
-    unsigned int tessellation = 64,
+    const std::string& name, const std::vector<Vector3>& path,
+    float radius = 1.f, unsigned int tessellation = 64,
     const ::std::function<float(unsigned int i, float distance)>& radiusFunction
     = nullptr,
     unsigned int cap = Mesh::NO_CAP(), Scene* = nullptr, bool updatable = false,
@@ -1281,7 +1308,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static MeshPtr CreatePolyhedron(const string_t& name,
+  static MeshPtr CreatePolyhedron(const std::string& name,
                                   PolyhedronOptions& options, Scene*);
 
   /**
@@ -1303,7 +1330,7 @@ public:
    * (default false) if its internal geometry is supposed to change once
    * created.
    */
-  static MeshPtr CreateIcoSphere(const string_t& name,
+  static MeshPtr CreateIcoSphere(const std::string& name,
                                  IcoSphereOptions& options, Scene*);
 
   /**
@@ -1319,7 +1346,7 @@ public:
    * The parameter `angle` (float in radian, default 0) sets the angle to rotate
    * the decal.
    */
-  static MeshPtr CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
+  static MeshPtr CreateDecal(const std::string& name, AbstractMesh* sourceMesh,
                              const Vector3& position, const Vector3& normal,
                              const Vector3& size, float angle = 0.f);
 
@@ -1350,7 +1377,7 @@ public:
    * This min and max Vector3 are the minimum and maximum vectors of each mesh
    * bounding box from the passed array, in the World system
    */
-  static MinMax GetMinMax(const vector_t<AbstractMeshPtr>& meshes);
+  static MinMax GetMinMax(const std::vector<AbstractMeshPtr>& meshes);
 
   /**
    * @brief Returns a Vector3, the center of the `{min:` Vector3`, max:`
@@ -1358,7 +1385,7 @@ public:
    */
   static Vector3 Center(const MinMaxDistance& MinMaxVectorAndDistance);
   static Vector3 Center(const MinMax& minMaxVector);
-  static Vector3 Center(const vector_t<AbstractMeshPtr>& meshes);
+  static Vector3 Center(const std::vector<AbstractMeshPtr>& meshes);
 
   /**
    * @brief Merge the array of meshes into a single mesh for performance
@@ -1374,7 +1401,7 @@ public:
    * @param subdivideWithSubMeshes - When true (false default), subdivide mesh
    * to his subMesh array with meshes source.
    */
-  static MeshPtr MergeMeshes(const vector_t<MeshPtr>& meshes,
+  static MeshPtr MergeMeshes(const std::vector<MeshPtr>& meshes,
                              bool disposeSource          = true,
                              bool allow32BitsIndices     = true,
                              MeshPtr meshSubclass        = nullptr,
@@ -1395,7 +1422,7 @@ protected:
    *               clone(), also passing False. This will make creation of
    *               children, recursive.
    */
-  Mesh(const string_t& name, Scene* scene, Node* parent = nullptr,
+  Mesh(const std::string& name, Scene* scene, Node* parent = nullptr,
        Mesh* source = nullptr, bool doNotCloneChildren = true,
        bool clonePhysicsImpostor = true);
 
@@ -1444,7 +1471,7 @@ protected:
    */
   bool get_areNormalsFrozen() const;
 
-  vector_t<Vector3>& get__positions();
+  std::vector<Vector3>& get__positions();
 
 private:
   void _sortLODLevels();
@@ -1476,10 +1503,10 @@ public:
 
   // Members
   int delayLoadState;
-  vector_t<InstancedMesh*> instances;
-  string_t delayLoadingFile;
+  std::vector<InstancedMesh*> instances;
+  std::string delayLoadingFile;
   /** Hidden */
-  string_t _binaryInfo;
+  std::string _binaryInfo;
   ::std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
     onLODLevelSelection;
 
@@ -1494,13 +1521,13 @@ public:
   ::std::function<void(const Json::value& parsedGeometry, const MeshPtr& mesh)>
     _delayLoadingFunction;
   /** Hidden */
-  unique_ptr_t<_VisibleInstances> _visibleInstances;
+  std::unique_ptr<_VisibleInstances> _visibleInstances;
   /** Hidden */
   bool _shouldGenerateFlatShading;
   // Use by builder only to know what orientation were the mesh build in.
   /** Hidden */
   unsigned int _originalBuilderSideOrientation;
-  nullable_t<unsigned int> overrideMaterialSideOrientation;
+  std::optional<unsigned int> overrideMaterialSideOrientation;
 
   /**
    * Will be used to save a source mesh reference, If any
@@ -1530,7 +1557,7 @@ public:
   /**
    * Cache
    */
-  ReadOnlyProperty<Mesh, vector_t<Vector3>> _positions;
+  ReadOnlyProperty<Mesh, std::vector<Vector3>> _positions;
 
 private:
   // Events
@@ -1539,15 +1566,15 @@ private:
   Observable<Mesh> _onBeforeDrawObservable;
   // Members
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
-  vector_t<unique_ptr_t<MeshLODLevel>> _LODLevels;
-  vector_t<Vector3> _emptyPositions;
+  std::vector<std::unique_ptr<MeshLODLevel>> _LODLevels;
+  std::vector<Vector3> _emptyPositions;
   // Morph
   MorphTargetManagerPtr _morphTargetManager;
-  vector_t<VertexBuffer*> _delayInfo;
+  std::vector<VertexBuffer*> _delayInfo;
   Int32Array _renderIdForInstances;
-  unique_ptr_t<_InstancesBatch> _batchCache;
+  std::unique_ptr<_InstancesBatch> _batchCache;
   unsigned int _instancesBufferSize;
-  unique_ptr_t<Buffer> _instancesBuffer;
+  std::unique_ptr<Buffer> _instancesBuffer;
   Float32Array _instancesData;
   size_t _overridenInstanceCount;
   MaterialPtr _effectiveMaterial;
@@ -1562,7 +1589,7 @@ private:
   Mesh* _source;
   // For extrusion and tube
   Path3D _path3D;
-  vector_t<vector_t<Vector3>> _pathArray;
+  std::vector<std::vector<Vector3>> _pathArray;
   unsigned int _tessellation;
   unsigned int _cap;
   float _arc;

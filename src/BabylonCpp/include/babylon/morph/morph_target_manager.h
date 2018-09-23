@@ -1,7 +1,7 @@
 #ifndef BABYLON_MORPH_MORPH_TARGET_MANAGER_H
 #define BABYLON_MORPH_MORPH_TARGET_MANAGER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/tools/observer.h>
 
@@ -19,13 +19,13 @@ public:
   static MorphTargetManager* New(Ts&&... args)
   {
     auto mtm = new MorphTargetManager(std::forward<Ts>(args)...);
-    mtm->addToScene(static_cast<unique_ptr_t<MorphTargetManager>>(mtm));
+    mtm->addToScene(static_cast<std::unique_ptr<MorphTargetManager>>(mtm));
 
     return mtm;
   }
   ~MorphTargetManager();
 
-  void addToScene(unique_ptr_t<MorphTargetManager>&& newMorphTargetManager);
+  void addToScene(std::unique_ptr<MorphTargetManager>&& newMorphTargetManager);
 
   /**
    * @brief Gets the active target at specified index. An active target is a
@@ -46,7 +46,7 @@ public:
    * @brief Add a new target to this manager.
    * @param target defines the target to add
    */
-  void addTarget(unique_ptr_t<MorphTarget>&& target);
+  void addTarget(std::unique_ptr<MorphTarget>&& target);
 
   /**
    * @brief Removes a target from the manager.
@@ -154,9 +154,9 @@ public:
   ReadOnlyProperty<MorphTargetManager, Float32Array> influences;
 
 private:
-  vector_t<shared_ptr_t<MorphTarget>> _targets;
-  vector_t<Observer<bool>::Ptr> _targetObservable;
-  vector_t<MorphTarget*> _activeTargets;
+  std::vector<MorphTargetPtr> _targets;
+  std::vector<Observer<bool>::Ptr> _targetObservable;
+  std::vector<MorphTarget*> _activeTargets;
   Scene* _scene;
   Float32Array _influences;
   bool _supportsNormals;

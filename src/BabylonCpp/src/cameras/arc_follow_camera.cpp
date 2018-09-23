@@ -9,14 +9,14 @@ bool ArcFollowCamera::NodeConstructorAdded = false;
 void ArcFollowCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "ArcFollowCamera", [](const string_t& name, Scene* scene,
-                          const nullable_t<Json::value>& /*options*/) {
+    "ArcFollowCamera", [](const std::string& name, Scene* scene,
+                          const std::optional<Json::value>& /*options*/) {
       return ArcFollowCamera::New(name, 0.f, 0.f, 1.f, nullptr, scene);
     });
   ArcFollowCamera::NodeConstructorAdded = true;
 }
 
-ArcFollowCamera::ArcFollowCamera(const string_t& iName, float iAlpha,
+ArcFollowCamera::ArcFollowCamera(const std::string& iName, float iAlpha,
                                  float iBeta, float iRadius,
                                  AbstractMesh* iTarget, Scene* scene)
     : TargetCamera{iName, Vector3::Zero(), scene}
@@ -59,7 +59,7 @@ void ArcFollowCamera::_checkInputs()
   follow();
 }
 
-const string_t ArcFollowCamera::getClassName() const
+const std::string ArcFollowCamera::getClassName() const
 {
   return "ArcFollowCamera";
 }

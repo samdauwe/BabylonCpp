@@ -31,11 +31,11 @@ FresnelParameters::FresnelParameters(const FresnelParameters& other)
 FresnelParameters::FresnelParameters(FresnelParameters&& other)
     : isEnabled{this, &FresnelParameters::get_isEnabled,
                 &FresnelParameters::set_isEnabled}
-    , leftColor{::std::move(other.leftColor)}
-    , rightColor{::std::move(other.rightColor)}
-    , bias{::std::move(other.bias)}
-    , power{::std::move(other.power)}
-    , _isEnabled{::std::move(other._isEnabled)}
+    , leftColor{std::move(other.leftColor)}
+    , rightColor{std::move(other.rightColor)}
+    , bias{std::move(other.bias)}
+    , power{std::move(other.power)}
+    , _isEnabled{std::move(other._isEnabled)}
 {
 }
 
@@ -55,11 +55,11 @@ FresnelParameters& FresnelParameters::operator=(const FresnelParameters& other)
 FresnelParameters& FresnelParameters::operator=(FresnelParameters&& other)
 {
   if (&other != this) {
-    leftColor  = ::std::move(other.leftColor);
-    rightColor = ::std::move(other.rightColor);
-    bias       = ::std::move(other.bias);
-    power      = ::std::move(other.power);
-    _isEnabled = ::std::move(other._isEnabled);
+    leftColor  = std::move(other.leftColor);
+    rightColor = std::move(other.rightColor);
+    bias       = std::move(other.bias);
+    power      = std::move(other.power);
+    _isEnabled = std::move(other._isEnabled);
   }
 
   return *this;
@@ -85,9 +85,9 @@ void FresnelParameters::set_isEnabled(bool value)
                                   | Material::MiscDirtyFlag());
 }
 
-unique_ptr_t<FresnelParameters> FresnelParameters::clone() const
+std::unique_ptr<FresnelParameters> FresnelParameters::clone() const
 {
-  return ::std::make_unique<FresnelParameters>(*this);
+  return std::make_unique<FresnelParameters>(*this);
 }
 
 Json::object FresnelParameters::serialize() const
@@ -95,10 +95,10 @@ Json::object FresnelParameters::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<FresnelParameters>
+std::unique_ptr<FresnelParameters>
 FresnelParameters::Parse(const Json::value& parsedFresnelParameters)
 {
-  auto fresnelParameters = ::std::make_unique<FresnelParameters>();
+  auto fresnelParameters = std::make_unique<FresnelParameters>();
 
   fresnelParameters->isEnabled
     = Json::GetBool(parsedFresnelParameters, "isEnabled", true);

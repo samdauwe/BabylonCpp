@@ -1,11 +1,30 @@
 #ifndef BABYLON_MORPH_MORPH_TARGET_H
 #define BABYLON_MORPH_MORPH_TARGET_H
 
+#include <map>
+
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/tools/observable.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class MorphTarget;
+struct AnimationPropertiesOverride;
+class Scene;
+using MorphTargetPtr = std::shared_ptr<MorphTarget>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Defines a target to use with MorphTargetManager.
@@ -19,7 +38,7 @@ public:
    * @param name defines the name of the target
    * @param influence defines the influence to use
    */
-  MorphTarget(const string_t& name, float influence = 0.f,
+  MorphTarget(const std::string& name, float influence = 0.f,
               Scene* scene = nullptr);
   ~MorphTarget() override;
 
@@ -92,7 +111,7 @@ public:
    * @param serializationObject defines the serialized data to use
    * @returns a new MorphTarget
    */
-  static unique_ptr_t<MorphTarget>
+  static std::unique_ptr<MorphTarget>
   Parse(const Json::value& serializationObject);
 
   /**
@@ -102,8 +121,8 @@ public:
    * @param influence defines the influence to attach to the target
    * @returns a new MorphTarget
    */
-  static unique_ptr_t<MorphTarget> FromMesh(AbstractMesh* mesh, string_t name,
-                                            float influence = 0.f);
+  static std::unique_ptr<MorphTarget>
+  FromMesh(AbstractMesh* mesh, std::string name, float influence = 0.f);
 
 protected:
   /**
@@ -148,7 +167,7 @@ public:
   /**
    * Gets or sets the list of animations
    */
-  vector_t<Animation*> animations;
+  std::vector<Animation*> animations;
 
   /**
    * Observable raised when the influence changes
@@ -185,7 +204,7 @@ private:
   /**
    * Defines the name of the target
    */
-  string_t _name;
+  std::string _name;
 
   Scene* _scene;
   Float32Array _positions;

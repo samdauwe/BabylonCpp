@@ -1,7 +1,9 @@
 #ifndef BABYLON_MESH_SIMPLIFICATION_QUADRATIC_MATRIX_H
 #define BABYLON_MESH_SIMPLIFICATION_QUADRATIC_MATRIX_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -12,7 +14,7 @@ class BABYLON_SHARED_EXPORT QuadraticMatrix {
 
 public:
   QuadraticMatrix();
-  QuadraticMatrix(const array_t<float, 10>& data);
+  QuadraticMatrix(const std::array<float, 10>& data);
   QuadraticMatrix(const QuadraticMatrix& other);
   QuadraticMatrix(QuadraticMatrix&& other);
   QuadraticMatrix& operator=(const QuadraticMatrix& other);
@@ -24,14 +26,15 @@ public:
             int unsigned a31, int unsigned a32, int unsigned a33  //
   );
   void addInPlace(const QuadraticMatrix& matrix);
-  void addArrayInPlace(const array_t<float, 10>& data);
+  void addArrayInPlace(const std::array<float, 10>& data);
   QuadraticMatrix add(const QuadraticMatrix& matrix);
 
   static QuadraticMatrix FromData(float a, float b, float c, float d);
-  static array_t<float, 10> DataFromNumbers(float a, float b, float c, float d);
+  static std::array<float, 10> DataFromNumbers(float a, float b, float c,
+                                               float d);
 
 private:
-  array_t<float, 10> data;
+  std::array<float, 10> data;
 
 }; // end of class QuadraticMatrix
 

@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-ScaleGizmo::ScaleGizmo(const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , xGizmo{::std::make_unique<AxisScaleGizmo>(
         Vector3(1.f, 0.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}

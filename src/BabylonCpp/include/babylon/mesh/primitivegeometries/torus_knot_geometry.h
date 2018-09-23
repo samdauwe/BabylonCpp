@@ -1,11 +1,14 @@
 #ifndef BABYLON_MESH_PRIMITIVE_GEOMETRIES_TORUS_KNOT_GEOMETRY_H
 #define BABYLON_MESH_PRIMITIVE_GEOMETRIES_TORUS_KNOT_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/primitivegeometries/_primitive_geometry.h>
 
 namespace BABYLON {
+
+class TorusKnotGeometry;
+using TorusKnotGeometryPtr = std::shared_ptr<TorusKnotGeometry>;
 
 /**
  * @brief Creates a torus knot geometry.
@@ -17,7 +20,7 @@ public:
   template <typename... Ts>
   static TorusKnotGeometryPtr New(Ts&&... args)
   {
-    auto mesh = shared_ptr_t<TorusKnotGeometry>(
+    auto mesh = std::shared_ptr<TorusKnotGeometry>(
       new TorusKnotGeometry(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
@@ -29,9 +32,9 @@ public:
    * @brief Hidden
    * @return
    */
-  unique_ptr_t<VertexData> _regenerateVertexData() override;
+  std::unique_ptr<VertexData> _regenerateVertexData() override;
 
-  GeometryPtr copy(const string_t& id) override;
+  GeometryPtr copy(const std::string& id) override;
   Json::object serialize() const override;
 
   // Statics
@@ -55,10 +58,10 @@ protected:
    * @param side defines if the created geometry is double sided or not (default
    * is BABYLON.Mesh.DEFAULTSIDE)
    */
-  TorusKnotGeometry(const string_t& id, Scene* scene, float radius, float tube,
-                    unsigned int radialSegments, unsigned int tubularSegments,
-                    float p, float q, bool canBeRegenerated,
-                    Mesh* mesh        = nullptr,
+  TorusKnotGeometry(const std::string& id, Scene* scene, float radius,
+                    float tube, unsigned int radialSegments,
+                    unsigned int tubularSegments, float p, float q,
+                    bool canBeRegenerated, Mesh* mesh = nullptr,
                     unsigned int side = Mesh::DEFAULTSIDE());
 
 public:

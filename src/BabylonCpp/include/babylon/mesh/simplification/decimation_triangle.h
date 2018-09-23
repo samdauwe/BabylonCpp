@@ -1,8 +1,7 @@
 #ifndef BABYLON_MESH_SIMPLIFICATION_DECIMATION_TRIANGLE_H
 #define BABYLON_MESH_SIMPLIFICATION_DECIMATION_TRIANGLE_H
 
-#include <babylon/babylon_global.h>
-
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 #include <babylon/mesh/simplification/decimation_vertex.h>
 
@@ -14,18 +13,18 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT DecimationTriangle {
 
 public:
-  DecimationTriangle(const vector_t<DecimationVertex>& vertices);
+  DecimationTriangle(const std::vector<DecimationVertex>& vertices);
   ~DecimationTriangle();
 
 public:
   Vector3 normal;
-  array_t<int, 4> error;
+  std::array<int, 4> error;
   bool deleted;
   bool isDirty;
   float borderFactor;
   bool deletePending;
   float originalOffset;
-  vector_t<DecimationVertex> vertices;
+  std::vector<DecimationVertex> vertices;
 
 }; // end of class DecimationTriangle
 

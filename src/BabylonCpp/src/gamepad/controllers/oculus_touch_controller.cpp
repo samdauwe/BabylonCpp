@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 OculusTouchController::OculusTouchController(
-  const shared_ptr_t<IBrowserGamepad>& vrGamepad)
+  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
     , onAButtonStateChangedObservable{this,
                                       &OculusTouchController::
@@ -46,10 +46,10 @@ void OculusTouchController::initControllerMesh(
   SceneLoader::ImportMesh(
     {}, OculusTouchController::MODEL_BASE_URL, meshName, scene,
     [this,
-     &meshLoaded](const vector_t<AbstractMeshPtr>& newMeshes,
-                  const vector_t<IParticleSystemPtr>& /*particleSystems*/,
-                  const vector_t<SkeletonPtr>& /*skeletons*/,
-                  const vector_t<AnimationGroupPtr>& /*animationGroups*/) {
+     &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
+                  const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+                  const std::vector<SkeletonPtr>& /*skeletons*/,
+                  const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
       /*
       Parent Mesh name: oculus_touch_left
       - body

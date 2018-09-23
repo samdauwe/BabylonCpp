@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-_PrimitiveGeometry::_PrimitiveGeometry(const string_t& _id, Scene* scene,
+_PrimitiveGeometry::_PrimitiveGeometry(const std::string& _id, Scene* scene,
                                        bool canBeRegenerated, Mesh* mesh)
     : Geometry(_id, scene, nullptr, false, mesh)
     , _canBeRegenerated{canBeRegenerated}
@@ -33,7 +33,7 @@ void _PrimitiveGeometry::regenerate()
   _beingRegenerated = false;
 }
 
-GeometryPtr _PrimitiveGeometry::asNewGeometry(const string_t& iId)
+GeometryPtr _PrimitiveGeometry::asNewGeometry(const std::string& iId)
 {
   return Geometry::copy(iId);
 }
@@ -50,7 +50,7 @@ void _PrimitiveGeometry::setAllVerticesData(VertexData* vertexData,
 AbstractMesh*
 _PrimitiveGeometry::setVerticesData(unsigned int kind, const Float32Array& data,
                                     bool /*updatable*/,
-                                    const nullable_t<size_t>& /*stride*/)
+                                    const std::optional<size_t>& /*stride*/)
 {
   if (!_beingRegenerated) {
     return nullptr;

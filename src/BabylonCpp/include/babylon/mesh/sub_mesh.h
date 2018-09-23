@@ -1,7 +1,7 @@
 #ifndef BABYLON_MESH_SUB_MESH_H
 #define BABYLON_MESH_SUB_MESH_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/culling/icullable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
@@ -10,6 +10,14 @@
 
 namespace BABYLON {
 
+class IntersectionInfo;
+class SubMesh;
+using SubMeshPtr = std::shared_ptr<SubMesh>;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
+
 /**
  * @brief
  */
@@ -17,17 +25,17 @@ class BABYLON_SHARED_EXPORT SubMesh : public BaseSubMesh, public ICullable {
 
 public:
   template <typename... Ts>
-  static shared_ptr_t<SubMesh> New(Ts&&... args)
+  static std::shared_ptr<SubMesh> New(Ts&&... args)
   {
     auto subMeshRawPtr = new SubMesh(::std::forward<Ts>(args)...);
-    auto subMesh       = static_cast<shared_ptr_t<SubMesh>>(subMeshRawPtr);
+    auto subMesh       = static_cast<std::shared_ptr<SubMesh>>(subMeshRawPtr);
     subMesh->addToMesh(subMesh);
 
     return subMesh;
   }
   virtual ~SubMesh();
 
-  void addToMesh(const shared_ptr_t<SubMesh>& newSubMesh);
+  void addToMesh(const std::shared_ptr<SubMesh>& newSubMesh);
   bool isGlobal() const;
 
   /**
@@ -79,15 +87,15 @@ public:
    * @brief Returns if the submesh bounding box intersects the frustum defined
    * by the passed array of planes.
    */
-  bool isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                    unsigned int strategy = 0) override;
 
   /**
    * @brief Returns if the submesh bounding box is completely inside the frustum
    * defined by the passed array of planes.
    */
-  bool
-  isCompletelyInFrustum(const array_t<Plane, 6>& frustumPlanes) const override;
+  bool isCompletelyInFrustum(
+    const std::array<Plane, 6>& frustumPlanes) const override;
 
   /**
    * @brief Renders the submesh.
@@ -110,10 +118,9 @@ public:
   /**
    * @brief Returns an object IntersectionInfo.
    */
-  unique_ptr_t<IntersectionInfo> intersects(Ray& ray,
-                                            const vector_t<Vector3>& positions,
-                                            const Uint32Array& indices,
-                                            bool fastCheck);
+  std::unique_ptr<IntersectionInfo>
+  intersects(Ray& ray, const std::vector<Vector3>& positions,
+             const Uint32Array& indices, bool fastCheck);
 
   /**
    * @brief Hidden
@@ -176,9 +183,9 @@ public:
   bool createBoundingBox;
   size_t linesIndexCount;
   /** Hidden */
-  vector_t<Vector3> _lastColliderWorldVertices;
+  std::vector<Vector3> _lastColliderWorldVertices;
   /** Hidden */
-  vector_t<Plane> _trianglePlanes;
+  std::vector<Plane> _trianglePlanes;
   /** Hidden */
   Matrix _lastColliderTransformMatrix;
   /** Hidden */
@@ -193,8 +200,8 @@ public:
 private:
   AbstractMeshPtr _mesh;
   MeshPtr _renderingMesh;
-  unique_ptr_t<BoundingInfo> _boundingInfo;
-  unique_ptr_t<GL::IGLBuffer> _linesIndexBuffer;
+  std::unique_ptr<BoundingInfo> _boundingInfo;
+  std::unique_ptr<GL::IGLBuffer> _linesIndexBuffer;
   MaterialPtr _currentMaterial;
 
 }; // end of class SubMesh

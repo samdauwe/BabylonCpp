@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 CylinderGeometry::CylinderGeometry(
-  const string_t& _id, Scene* scene, float _height, float _diameterTop,
+  const std::string& _id, Scene* scene, float _height, float _diameterTop,
   float _diameterBottom, unsigned int _tessellation, unsigned int _subdivisions,
   bool canBeRegenerated, Mesh* mesh, unsigned int _side)
     : _PrimitiveGeometry{_id, scene, canBeRegenerated, mesh}
@@ -25,7 +25,7 @@ CylinderGeometry::~CylinderGeometry()
 {
 }
 
-unique_ptr_t<VertexData> CylinderGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> CylinderGeometry::_regenerateVertexData()
 {
   CylinderOptions options;
   options.height          = height;
@@ -38,7 +38,7 @@ unique_ptr_t<VertexData> CylinderGeometry::_regenerateVertexData()
   return VertexData::CreateCylinder(options);
 }
 
-GeometryPtr CylinderGeometry::copy(const string_t& _id)
+GeometryPtr CylinderGeometry::copy(const std::string& _id)
 {
   return CylinderGeometry::New(_id, getScene(), height, diameterTop,
                                diameterBottom, tessellation, subdivisions,

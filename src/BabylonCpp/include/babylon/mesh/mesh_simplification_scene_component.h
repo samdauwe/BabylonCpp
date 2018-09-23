@@ -1,11 +1,15 @@
 #ifndef BABYLON_MESH_MESH_SIMPLIFICATION_SCENE_COMPONENT_H
 #define BABYLON_MESH_MESH_SIMPLIFICATION_SCENE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
 namespace BABYLON {
+
+class SimplicationQueueSceneComponent;
+using SimplicationQueueSceneComponentPtr
+  = std::shared_ptr<SimplicationQueueSceneComponent>;
 
 /**
  * @brief Defines the simplification queue scene component responsible to help
@@ -25,7 +29,7 @@ public:
   template <typename... Ts>
   static SimplicationQueueSceneComponentPtr New(Ts&&... args)
   {
-    return shared_ptr_t<SimplicationQueueSceneComponent>(
+    return std::shared_ptr<SimplicationQueueSceneComponent>(
       new SimplicationQueueSceneComponent(::std::forward<Ts>(args)...));
   }
   virtual ~SimplicationQueueSceneComponent();

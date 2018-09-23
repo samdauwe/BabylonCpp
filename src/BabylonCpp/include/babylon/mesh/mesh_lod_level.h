@@ -1,9 +1,11 @@
 #ifndef BABYLON_MESH_MESH_LOD_LEVEL_H
 #define BABYLON_MESH_MESH_LOD_LEVEL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Mesh;
 
 /**
  * @brief

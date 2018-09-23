@@ -68,7 +68,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   sphereLight->position().y     = 3.f;
   sphereLight->position().z     = 0.1f;
 
-  vector_t<MeshPtr> sphereLights{sphereLight};
+  std::vector<MeshPtr> sphereLights{sphereLight};
   Float32Array lightPositions{-2.f, 3.f, 6.9f};
 
   for (unsigned int i = 0; i < 1; ++i) {
@@ -78,7 +78,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
                 lightPositions[3 * i + 2]);
   }
 
-  vector_t<SpotLightPtr> spotLights(sphereLights.size());
+  std::vector<SpotLightPtr> spotLights(sphereLights.size());
   Float32Array lightDirections{-0.5f, -0.25f, 1.f, 0.f, 0.f, -1.f};
   for (unsigned int i = 0; i < sphereLights.size(); ++i) {
     auto iStr     = ::std::to_string(i);

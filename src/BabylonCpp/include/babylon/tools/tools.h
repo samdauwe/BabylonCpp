@@ -1,12 +1,18 @@
 #ifndef BABYLON_TOOLS_TOOLS_H
 #define BABYLON_TOOLS_TOOLS_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/tools/ivalue_gradient.h>
 
 namespace BABYLON {
+
+class Color4;
+class Engine;
+class ProgressEvent;
 
 /**
  * @brief Represents the tools class.
@@ -63,62 +69,62 @@ struct BABYLON_SHARED_EXPORT Tools {
   static int GetExponentOfTwo(int value, int max,
                               unsigned int mode
                               = EngineConstants::SCALEMODE_NEAREST);
-  static string_t GetFilename(const string_t& path);
-  static string_t GetFolderPath(const string_t& uri,
-                                bool returnUnchangedIfNoSlash = false);
+  static std::string GetFilename(const std::string& path);
+  static std::string GetFolderPath(const std::string& uri,
+                                   bool returnUnchangedIfNoSlash = false);
   static float ToDegrees(float angle);
   static float ToRadians(float angle);
   static MinMax ExtractMinAndMaxIndexed(const Float32Array& positions,
                                         const Uint32Array& indices,
                                         size_t indexStart, size_t indexCount,
-                                        const nullable_t<Vector2>& bias
-                                        = nullopt_t);
-  static MinMax ExtractMinAndMax(const Float32Array& positions, size_t start,
-                                 size_t count,
-                                 const nullable_t<Vector2>& bias = nullopt_t,
-                                 nullable_t<unsigned int> stride = nullopt_t);
+                                        const std::optional<Vector2>& bias
+                                        = std::nullopt);
+  static MinMax
+  ExtractMinAndMax(const Float32Array& positions, size_t start, size_t count,
+                   const std::optional<Vector2>& bias = std::nullopt,
+                   std::optional<unsigned int> stride = std::nullopt);
   static MinMaxVector2 ExtractMinAndMaxVector2(
-    const ::std::function<nullable_t<Vector2>(std::size_t index)>& feeder,
-    const nullable_t<Vector2>& bias = nullopt_t);
+    const std::function<std::optional<Vector2>(std::size_t index)>& feeder,
+    const std::optional<Vector2>& bias = std::nullopt);
   static Image CreateCheckerboardImage(unsigned int size = 256);
   static Image CreateNoiseImage(unsigned int size = 8);
   // External files
-  static string_t CleanUrl(string_t url);
-  static string_t DecodeURIComponent(const string_t& s);
-  static ::std::function<string_t(string_t url)> PreprocessUrl;
+  static std::string CleanUrl(std::string url);
+  static std::string DecodeURIComponent(const std::string& s);
+  static std::function<std::string(std::string url)> PreprocessUrl;
   static void
-  LoadImageFromUrl(string_t url,
-                   const ::std::function<void(const Image& img)>& onLoad,
-                   const ::std::function<void(const string_t& msg)>& onError,
+  LoadImageFromUrl(std::string url,
+                   const std::function<void(const Image& img)>& onLoad,
+                   const std::function<void(const std::string& msg)>& onError,
                    bool flipVertically = true);
   static void LoadFile(
-    string_t url,
-    const ::std::function<void(const string_t& data,
-                               const string_t& responseURL)>& callback,
-    const ::std::function<void(const ProgressEvent& event)>& progressCallBack
+    std::string url,
+    const std::function<void(const std::string& data,
+                             const std::string& responseURL)>& callback,
+    const std::function<void(const ProgressEvent& event)>& progressCallBack
     = nullptr,
-    bool useArrayBuffer                                             = false,
-    const ::std::function<void(const string_t& exception)>& onError = nullptr);
+    bool useArrayBuffer                                              = false,
+    const std::function<void(const std::string& exception)>& onError = nullptr);
   static void
-  ReadFile(string_t fileToLoad,
-           const ::std::function<void(const string_t& data,
-                                      const string_t& responseURL)>& callback,
-           const ::std::function<void(const ProgressEvent& event)>& onProgress,
+  ReadFile(std::string fileToLoad,
+           const std::function<void(const std::string& data,
+                                    const std::string& responseURL)>& callback,
+           const std::function<void(const ProgressEvent& event)>& onProgress,
            bool useArrayBuffer);
   static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);
-  static string_t RandomId();
-  static void SetImmediate(const ::std::function<void()>& immediate);
+  static std::string RandomId();
+  static void SetImmediate(const std::function<void()>& immediate);
   static void DumpFramebuffer(int width, int height, Engine* engine);
-  static void StartPerformanceCounter(const string_t&)
+  static void StartPerformanceCounter(const std::string&)
   {
   }
-  static void StartPerformanceCounter(const string_t&, bool)
+  static void StartPerformanceCounter(const std::string&, bool)
   {
   }
-  static void EndPerformanceCounter(const string_t&)
+  static void EndPerformanceCounter(const std::string&)
   {
   }
-  static void EndPerformanceCounter(const string_t&, bool)
+  static void EndPerformanceCounter(const std::string&, bool)
   {
   }
   static void ExitFullscreen()
@@ -137,8 +143,8 @@ struct BABYLON_SHARED_EXPORT Tools {
    */
   template <typename T>
   static void GetCurrentGradient(
-    float ratio, const vector_t<T>& gradients,
-    const ::std::function<void(T& current, T& next, float scale)>& updateFunc)
+    float ratio, const std::vector<T>& gradients,
+    const std::function<void(T& current, T& next, float scale)>& updateFunc)
   {
     for (size_t gradientIndex = 0; gradientIndex < gradients.size() - 1;
          ++gradientIndex) {

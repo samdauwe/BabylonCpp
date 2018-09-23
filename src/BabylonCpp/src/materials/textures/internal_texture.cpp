@@ -245,12 +245,13 @@ void InternalTexture::_swapAndDie(InternalTexture* target)
   }
 
   auto& cache = _engine->getLoadedTexturesCache();
-  cache.erase(::std::remove_if(
-                cache.begin(), cache.end(),
-                [this](const unique_ptr_t<InternalTexture>& internalTexture) {
-                  return internalTexture.get() == this;
-                }),
-              cache.end());
+  cache.erase(
+    ::std::remove_if(
+      cache.begin(), cache.end(),
+      [this](const std::unique_ptr<InternalTexture>& internalTexture) {
+        return internalTexture.get() == this;
+      }),
+    cache.end());
 }
 
 void InternalTexture::dispose()

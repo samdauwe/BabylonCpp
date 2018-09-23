@@ -1,9 +1,14 @@
 #ifndef BABYLON_MESH_VISIBLE_INSTANCES_H
 #define BABYLON_MESH_VISIBLE_INSTANCES_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class InstancedMesh;
 
 /**
  * @brief
@@ -14,7 +19,7 @@ public:
   int defaultRenderId;
   int selfDefaultRenderId;
   int intermediateDefaultRenderId;
-  unordered_map_t<int, vector_t<InstancedMesh*>> meshes;
+  std::unordered_map<int, std::vector<InstancedMesh*>> meshes;
 
 }; // end of class _VisibleInstances
 

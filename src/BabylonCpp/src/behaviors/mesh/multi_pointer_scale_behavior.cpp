@@ -23,7 +23,7 @@ MultiPointerScaleBehavior::~MultiPointerScaleBehavior()
 {
 }
 
-const string_t MultiPointerScaleBehavior::name() const
+const std::string MultiPointerScaleBehavior::name() const
 {
   return "MultiPointerScale";
 }

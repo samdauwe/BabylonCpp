@@ -1,7 +1,7 @@
 #ifndef BABYLON_MESH_SIMPLIFICATION_QUADRATIC_ERROR_SIMPLIFICATION_H
 #define BABYLON_MESH_SIMPLIFICATION_QUADRATIC_ERROR_SIMPLIFICATION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/simplification/isimplifier.h>
 
 namespace BABYLON {

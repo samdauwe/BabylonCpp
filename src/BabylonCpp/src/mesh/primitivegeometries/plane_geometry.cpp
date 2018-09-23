@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-PlaneGeometry::PlaneGeometry(const string_t& _id, Scene* scene, float _size,
+PlaneGeometry::PlaneGeometry(const std::string& _id, Scene* scene, float _size,
                              bool canBeRegenerated, Mesh* mesh,
                              unsigned int _side)
     : _PrimitiveGeometry{_id, scene, canBeRegenerated, mesh}
@@ -20,7 +20,7 @@ PlaneGeometry::~PlaneGeometry()
 {
 }
 
-unique_ptr_t<VertexData> PlaneGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> PlaneGeometry::_regenerateVertexData()
 {
   PlaneOptions options(size);
   options.sideOrientation = side;
@@ -28,7 +28,7 @@ unique_ptr_t<VertexData> PlaneGeometry::_regenerateVertexData()
   return VertexData::CreatePlane(options);
 }
 
-GeometryPtr PlaneGeometry::copy(const string_t& _id)
+GeometryPtr PlaneGeometry::copy(const std::string& _id)
 {
   return PlaneGeometry::New(_id, getScene(), size, canBeRegenerated(), nullptr,
                             side);

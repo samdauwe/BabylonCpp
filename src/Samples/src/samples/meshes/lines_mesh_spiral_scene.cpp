@@ -46,7 +46,7 @@ void LinesMeshSpiralScene::initializeScene(ICanvas* canvas, Scene* scene)
   unsigned int rdNb = 50;   // spiral round number
   float zShift      = 20.f; // z shift factor
   float pi2         = Math::PI * 2.f;
-  vector_t<Vector3> p;
+  std::vector<Vector3> p;
   for (unsigned int i = 0; i <= tess; ++i) {
     float ang = i * pi2 / tess * rdNb;
     p.emplace_back(Vector3(radius * ::std::cos(ang) * i / tess,

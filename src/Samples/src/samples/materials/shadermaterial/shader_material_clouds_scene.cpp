@@ -66,9 +66,9 @@ void ShaderMaterialCloudsScene::initializeScene(ICanvas* /*canvas*/,
   _cloudMaterial->setColor3("fogColor", Color3::FromInts(69, 132, 180));
 
   // Create merged planes
-  auto size                                 = 128.f;
-  size_t count                              = 8000;
-  unique_ptr_t<VertexData> globalVertexData = nullptr;
+  auto size                                    = 128.f;
+  size_t count                                 = 8000;
+  std::unique_ptr<VertexData> globalVertexData = nullptr;
 
   for (size_t i = 0; i < count; ++i) {
     PlaneOptions planeOptions(size);

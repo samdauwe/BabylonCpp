@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-GroundGeometry::GroundGeometry(const string_t& _id, Scene* scene,
+GroundGeometry::GroundGeometry(const std::string& _id, Scene* scene,
                                unsigned int _width, unsigned int _height,
                                unsigned int _subdivisions,
                                bool canBeRegenerated, Mesh* mesh)
@@ -22,7 +22,7 @@ GroundGeometry::~GroundGeometry()
 {
 }
 
-unique_ptr_t<VertexData> GroundGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> GroundGeometry::_regenerateVertexData()
 {
   GroundOptions options(subdivisions);
   options.width  = width;
@@ -31,7 +31,7 @@ unique_ptr_t<VertexData> GroundGeometry::_regenerateVertexData()
   return VertexData::CreateGround(options);
 }
 
-GeometryPtr GroundGeometry::copy(const string_t& _id)
+GeometryPtr GroundGeometry::copy(const std::string& _id)
 {
   return GroundGeometry::New(_id, getScene(), width, height, subdivisions,
                              canBeRegenerated(), nullptr);

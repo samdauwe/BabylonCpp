@@ -52,7 +52,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   bodyMaterial->backFaceCulling = false;
 
   // Array of points for trapezium side of car.
-  vector_t<Vector3> side{
+  std::vector<Vector3> side{
     Vector3(-4, 2, -2), //
     Vector3(4, 2, -2),  //
     Vector3(5, -2, -2), //
@@ -63,7 +63,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   side.emplace_back(side[0]);
 
   // Array of points for the extrusion path
-  const vector_t<Vector3> extrudePath = {Vector3(0, 0, 0), Vector3(0, 0, 4)};
+  const std::vector<Vector3> extrudePath = {Vector3(0, 0, 0), Vector3(0, 0, 4)};
 
   // Create body and apply material
   ExtrudeShapeOptions extrudeShapeOptions;
@@ -80,7 +80,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Lambda that creates a wheel
   const auto createWheel = [this, &scene,
-                            &wheelMaterial](const string_t& wheelName,
+                            &wheelMaterial](const std::string& wheelName,
                                             const Vector3& position) {
     // Create wheel front inside and apply material
     CylinderOptions cylinderOptions(3.f);

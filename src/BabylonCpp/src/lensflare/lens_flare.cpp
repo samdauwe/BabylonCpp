@@ -9,13 +9,13 @@ namespace BABYLON {
 template <typename... Ts>
 LensFlare* LensFlare::AddFlare(Ts&&... args)
 {
-  auto lensFlare = ::std::make_unique<LensFlare>(std::forward<Ts>(args)...);
+  auto lensFlare = std::make_unique<LensFlare>(std::forward<Ts>(args)...);
   lensFlare->_system->lensFlares.emplace_back(lensFlare);
   return lensFlare.get();
 }
 
 LensFlare::LensFlare(float iSize, const Vector3& iPosition,
-                     const Color3& iColor, const string_t& imgUrl,
+                     const Color3& iColor, const std::string& imgUrl,
                      LensFlareSystem* system)
     : size{iSize}
     , position{iPosition}
@@ -40,10 +40,10 @@ void LensFlare::dispose()
 
   // Remove from scene
   _system->lensFlares.erase(
-    ::std::remove_if(_system->lensFlares.begin(), _system->lensFlares.end(),
-                     [this](const unique_ptr_t<LensFlare>& lensFlare) {
-                       return lensFlare.get() == this;
-                     }),
+    std::remove_if(_system->lensFlares.begin(), _system->lensFlares.end(),
+                   [this](const std::unique_ptr<LensFlare>& lensFlare) {
+                     return lensFlare.get() == this;
+                   }),
     _system->lensFlares.end());
 }
 

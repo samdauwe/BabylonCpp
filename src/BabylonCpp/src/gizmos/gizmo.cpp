@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-Gizmo::Gizmo(const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : scaleRatio{1.f}
     , attachedMesh{this, &Gizmo::get_attachedMesh, &Gizmo::set_attachedMesh}
     , gizmoLayer{iGizmoLayer}

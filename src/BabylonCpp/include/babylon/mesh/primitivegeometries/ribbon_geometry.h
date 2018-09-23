@@ -1,12 +1,15 @@
 #ifndef BABYLON_MESH_PRIMITIVE_GEOMETRIES_RIBBON_GEOMETRY_H
 #define BABYLON_MESH_PRIMITIVE_GEOMETRIES_RIBBON_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/primitivegeometries/_primitive_geometry.h>
 
 namespace BABYLON {
+
+class RibbonGeometry;
+using RibbonGeometryPtr = std::shared_ptr<RibbonGeometry>;
 
 /**
  * @brief Creates a ribbon geometry.
@@ -19,7 +22,7 @@ public:
   template <typename... Ts>
   static RibbonGeometryPtr New(Ts&&... args)
   {
-    auto mesh = shared_ptr_t<RibbonGeometry>(
+    auto mesh = std::shared_ptr<RibbonGeometry>(
       new RibbonGeometry(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
@@ -30,9 +33,9 @@ public:
   /**
    * @brief Hidden
    */
-  unique_ptr_t<VertexData> _regenerateVertexData();
+  std::unique_ptr<VertexData> _regenerateVertexData();
 
-  GeometryPtr copy(const string_t& id);
+  GeometryPtr copy(const std::string& id);
 
 protected:
   /**
@@ -51,16 +54,17 @@ protected:
    * @param side defines if the created geometry is double sided or not (default
    * is BABYLON.Mesh.DEFAULTSIDE)
    */
-  RibbonGeometry(const string_t& id, Scene* scene,
-                 const vector_t<vector_t<Vector3>>& pathArray, bool closeArray,
-                 bool closePath, int offset, bool canBeRegenerated, Mesh* mesh,
+  RibbonGeometry(const std::string& id, Scene* scene,
+                 const std::vector<std::vector<Vector3>>& pathArray,
+                 bool closeArray, bool closePath, int offset,
+                 bool canBeRegenerated, Mesh* mesh,
                  unsigned int side = Mesh::DEFAULTSIDE());
 
 public:
   /**
    * Defines the array of paths to use
    */
-  vector_t<vector_t<Vector3>> pathArray;
+  std::vector<std::vector<Vector3>> pathArray;
 
   /**
    * Defines if the last and first points of each path in your pathArray must be

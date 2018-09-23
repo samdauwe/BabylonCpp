@@ -1,11 +1,13 @@
 #ifndef BABYLON_MESH_CSG_POLYGON_H
 #define BABYLON_MESH_CSG_POLYGON_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/csg/plane.h>
 
 namespace BABYLON {
 namespace CSG {
+
+class Vertex;
 
 struct BABYLON_SHARED_EXPORT PolygonOptions {
   unsigned int subMeshId;
@@ -23,23 +25,23 @@ struct BABYLON_SHARED_EXPORT PolygonOptions {
 class BABYLON_SHARED_EXPORT Polygon {
 
 public:
-  Polygon(const vector_t<Vertex>& vertices, const PolygonOptions& shared);
+  Polygon(const std::vector<Vertex>& vertices, const PolygonOptions& shared);
   Polygon(const Polygon& otherPolygon);
   Polygon(Polygon&& otherPolygon);
   Polygon& operator=(const Polygon& otherPolygon);
   Polygon& operator=(Polygon&& otherPolygon);
   ~Polygon();
   Polygon clone() const;
-  unique_ptr_t<Polygon> cloneToNewObject() const;
+  std::unique_ptr<Polygon> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Polygon& polygon);
-  string_t toString() const;
+  std::string toString() const;
 
   void flip();
 
 public:
-  vector_t<Vertex> vertices;
+  std::vector<Vertex> vertices;
   PolygonOptions shared;
-  nullable_t<Plane> plane;
+  std::optional<Plane> plane;
 
 }; // end of class Polygon
 

@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-unique_ptr_t<Scene> SixDofDragBehavior::_virtualScene = nullptr;
+std::unique_ptr<Scene> SixDofDragBehavior::_virtualScene = nullptr;
 
 SixDofDragBehavior::SixDofDragBehavior()
     : dragging{false}
@@ -30,7 +30,7 @@ SixDofDragBehavior::~SixDofDragBehavior()
 {
 }
 
-const string_t SixDofDragBehavior::name() const
+const std::string SixDofDragBehavior::name() const
 {
   return "SixDofDrag";
 }

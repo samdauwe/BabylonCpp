@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 PoseEnabledController::PoseEnabledController(
-  const shared_ptr_t<IBrowserGamepad>& browserGamepad)
+  const std::shared_ptr<IBrowserGamepad>& browserGamepad)
     : Gamepad(browserGamepad->id, browserGamepad->index, browserGamepad)
     , _mesh{nullptr}
     , _deviceToWorld{Matrix::Identity()}
@@ -110,13 +110,13 @@ void PoseEnabledController::attachToMesh(const AbstractMeshPtr& mesh)
   // is done to avoid a frame where position is 0,0,0 when attaching mesh
   _updatePoseAndMesh();
   if (_pointingPoseNode) {
-    vector_t<Node*> parents;
+    std::vector<Node*> parents;
     auto obj = static_cast<Node*>(_pointingPoseNode);
     while (obj && obj->parent()) {
       parents.emplace_back(obj->parent());
       obj = obj->parent();
     }
-    ::std::reverse(parents.begin(), parents.end());
+    std::reverse(parents.begin(), parents.end());
     for (auto& p : parents) {
       p->computeWorldMatrix(true);
     }

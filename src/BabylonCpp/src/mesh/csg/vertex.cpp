@@ -17,7 +17,7 @@ CSG::Vertex::Vertex(const BABYLON::CSG::Vertex& otherVertex)
 
 CSG::Vertex::Vertex(BABYLON::CSG::Vertex&& otherVertex)
 {
-  *this = ::std::move(otherVertex);
+  *this = std::move(otherVertex);
 }
 
 CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex)
@@ -34,9 +34,9 @@ CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex)
 CSG::Vertex& CSG::Vertex::operator=(BABYLON::CSG::Vertex&& otherVertex)
 {
   if (&otherVertex != this) {
-    pos    = ::std::move(otherVertex.pos);
-    normal = ::std::move(otherVertex.normal);
-    uv     = ::std::move(otherVertex.uv);
+    pos    = std::move(otherVertex.pos);
+    normal = std::move(otherVertex.normal);
+    uv     = std::move(otherVertex.uv);
   }
 
   return *this;
@@ -51,9 +51,9 @@ CSG::Vertex CSG::Vertex::clone() const
   return Vertex(*this);
 }
 
-unique_ptr_t<CSG::Vertex> CSG::Vertex::cloneToNewObject() const
+std::unique_ptr<CSG::Vertex> CSG::Vertex::cloneToNewObject() const
 {
-  return ::std::make_unique<Vertex>(*this);
+  return std::make_unique<Vertex>(*this);
 }
 
 namespace CSG {
@@ -65,7 +65,7 @@ std::ostream& operator<<(std::ostream& os, const BABYLON::CSG::Vertex& vertex)
 }
 } // namespace CSG
 
-string_t CSG::Vertex::toString() const
+std::string CSG::Vertex::toString() const
 {
   std::ostringstream oss;
   oss << (*this);

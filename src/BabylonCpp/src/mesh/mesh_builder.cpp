@@ -18,7 +18,7 @@
 
 namespace BABYLON {
 
-MeshPtr MeshBuilder::CreateBox(const string_t& name, BoxOptions& options,
+MeshPtr MeshBuilder::CreateBox(const std::string& name, BoxOptions& options,
                                Scene* scene)
 {
   auto box = Mesh::New(name, scene);
@@ -34,8 +34,8 @@ MeshPtr MeshBuilder::CreateBox(const string_t& name, BoxOptions& options,
   return box;
 }
 
-MeshPtr MeshBuilder::CreateSphere(const string_t& name, SphereOptions& options,
-                                  Scene* scene)
+MeshPtr MeshBuilder::CreateSphere(const std::string& name,
+                                  SphereOptions& options, Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
 
@@ -50,7 +50,7 @@ MeshPtr MeshBuilder::CreateSphere(const string_t& name, SphereOptions& options,
   return sphere;
 }
 
-MeshPtr MeshBuilder::CreateDisc(const string_t& name, DiscOptions& options,
+MeshPtr MeshBuilder::CreateDisc(const std::string& name, DiscOptions& options,
                                 Scene* scene)
 {
   auto disc = Mesh::New(name, scene);
@@ -66,7 +66,7 @@ MeshPtr MeshBuilder::CreateDisc(const string_t& name, DiscOptions& options,
   return disc;
 }
 
-MeshPtr MeshBuilder::CreateIcoSphere(const string_t& name,
+MeshPtr MeshBuilder::CreateIcoSphere(const std::string& name,
                                      IcoSphereOptions& options, Scene* scene)
 {
   auto sphere = Mesh::New(name, scene);
@@ -82,8 +82,8 @@ MeshPtr MeshBuilder::CreateIcoSphere(const string_t& name,
   return sphere;
 }
 
-MeshPtr MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
-                                  Scene* scene)
+MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
+                                  RibbonOptions& options, Scene* scene)
 
 {
   const auto& pathArray  = options.pathArray();
@@ -99,13 +99,14 @@ MeshPtr MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
                   // positionFunction : ribbon case
     // only pathArray and sideOrientation parameters are taken into account for
     // positions update
-    Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
-                             numeric_limits_t<float>::max(),
-                             numeric_limits_t<float>::max(),
+    Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
+                             std::numeric_limits<float>::max(),
+                             std::numeric_limits<float>::max(),
                              Tmp::Vector3Array[0]); // minimum
-    Vector3::FromFloatsToRef(
-      numeric_limits_t<float>::lowest(), numeric_limits_t<float>::lowest(),
-      numeric_limits_t<float>::lowest(), Tmp::Vector3Array[1]);
+    Vector3::FromFloatsToRef(std::numeric_limits<float>::lowest(),
+                             std::numeric_limits<float>::lowest(),
+                             std::numeric_limits<float>::lowest(),
+                             Tmp::Vector3Array[1]);
     const auto positionFunction = [&](Float32Array& positions) {
       auto minlg     = pathArray[0].size();
       unsigned int i = 0;
@@ -238,7 +239,7 @@ MeshPtr MeshBuilder::CreateRibbon(const string_t& name, RibbonOptions& options,
   }
 }
 
-MeshPtr MeshBuilder::CreateCylinder(const string_t& name,
+MeshPtr MeshBuilder::CreateCylinder(const std::string& name,
                                     CylinderOptions& options, Scene* scene)
 {
   auto cylinder = Mesh::New(name, scene);
@@ -254,7 +255,7 @@ MeshPtr MeshBuilder::CreateCylinder(const string_t& name,
   return cylinder;
 }
 
-MeshPtr MeshBuilder::CreateTorus(const string_t& name, TorusOptions& options,
+MeshPtr MeshBuilder::CreateTorus(const std::string& name, TorusOptions& options,
                                  Scene* scene)
 {
   auto torus = Mesh::New(name, scene);
@@ -270,7 +271,7 @@ MeshPtr MeshBuilder::CreateTorus(const string_t& name, TorusOptions& options,
   return torus;
 }
 
-MeshPtr MeshBuilder::CreateTorusKnot(const string_t& name,
+MeshPtr MeshBuilder::CreateTorusKnot(const std::string& name,
                                      TorusKnotOptions& options, Scene* scene)
 {
   auto torusKnot = Mesh::New(name, scene);
@@ -286,7 +287,7 @@ MeshPtr MeshBuilder::CreateTorusKnot(const string_t& name,
   return torusKnot;
 }
 
-LinesMeshPtr MeshBuilder::CreateLineSystem(const string_t& name,
+LinesMeshPtr MeshBuilder::CreateLineSystem(const std::string& name,
                                            LineSystemOptions& options,
                                            Scene* scene)
 {
@@ -297,7 +298,7 @@ LinesMeshPtr MeshBuilder::CreateLineSystem(const string_t& name,
   if (instance) { // lines update
     auto positions = instance->getVerticesData(VertexBuffer::PositionKind);
     Float32Array vertexColor;
-    vector_t<Color4> lineColors;
+    std::vector<Color4> lineColors;
     if (!colors.empty()) {
       vertexColor = instance->getVerticesData(VertexBuffer::ColorKind);
     }
@@ -338,14 +339,14 @@ LinesMeshPtr MeshBuilder::CreateLineSystem(const string_t& name,
   return lineSystem;
 }
 
-LinesMeshPtr MeshBuilder::CreateLines(const string_t& name,
+LinesMeshPtr MeshBuilder::CreateLines(const std::string& name,
                                       LinesOptions& options, Scene* scene)
 {
   LineSystemOptions lineSystemOptions(options);
   return MeshBuilder::CreateLineSystem(name, lineSystemOptions, scene);
 }
 
-LinesMeshPtr MeshBuilder::CreateDashedLines(const string_t& name,
+LinesMeshPtr MeshBuilder::CreateDashedLines(const std::string& name,
                                             DashedLinesOptions& options,
                                             Scene* scene)
 {
@@ -409,7 +410,7 @@ LinesMeshPtr MeshBuilder::CreateDashedLines(const string_t& name,
   return dashedLines;
 }
 
-MeshPtr MeshBuilder::ExtrudeShape(const string_t& name,
+MeshPtr MeshBuilder::ExtrudeShape(const std::string& name,
                                   ExtrudeShapeOptions& options, Scene* scene)
 {
   options.sideOrientation
@@ -422,7 +423,7 @@ MeshPtr MeshBuilder::ExtrudeShape(const string_t& name,
     options.frontUVs, options.backUVs);
 }
 
-MeshPtr MeshBuilder::ExtrudeShapeCustom(const string_t& name,
+MeshPtr MeshBuilder::ExtrudeShapeCustom(const std::string& name,
                                         ExtrudeShapeCustomOptions& options,
                                         Scene* scene)
 {
@@ -436,7 +437,7 @@ MeshPtr MeshBuilder::ExtrudeShapeCustom(const string_t& name,
     options.instance, options.invertUV, options.frontUVs, options.backUVs);
 }
 
-MeshPtr MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
+MeshPtr MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
                                  Scene* scene)
 {
   const auto arc          = options.arc();
@@ -451,13 +452,13 @@ MeshPtr MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
     = MeshBuilder::updateSideOrientation(options.sideOrientation);
   const auto& cap = options.cap;
   const auto& pi2 = Math::PI2;
-  vector_t<vector_t<Vector3>> paths;
+  std::vector<std::vector<Vector3>> paths;
   const auto& invertUV = options.invertUV;
 
   const float step = pi2 / tessellation * arc;
   Vector3 rotated;
   for (float i = 0.f; i <= tessellation - clip; ++i) {
-    vector_t<Vector3> path;
+    std::vector<Vector3> path;
     if (cap == Mesh::CAP_START() || cap == Mesh::CAP_ALL()) {
       path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
       path.emplace_back(Vector3(::std::cos(i * step) * shape[0].x * radius,
@@ -489,7 +490,7 @@ MeshPtr MeshBuilder::CreateLathe(const string_t& name, LatheOptions& options,
   return lathe;
 }
 
-MeshPtr MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
+MeshPtr MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,
                                  Scene* scene)
 {
   auto plane = Mesh::New(name, scene);
@@ -515,8 +516,8 @@ MeshPtr MeshBuilder::CreatePlane(const string_t& name, PlaneOptions& options,
   return plane;
 }
 
-MeshPtr MeshBuilder::CreateGround(const string_t& name, GroundOptions& options,
-                                  Scene* scene)
+MeshPtr MeshBuilder::CreateGround(const std::string& name,
+                                  GroundOptions& options, Scene* scene)
 {
   auto ground = GroundMesh::New(name, scene);
   ground->_setReady(false);
@@ -538,7 +539,7 @@ MeshPtr MeshBuilder::CreateGround(const string_t& name, GroundOptions& options,
   return ground;
 }
 
-MeshPtr MeshBuilder::CreateTiledGround(const string_t& name,
+MeshPtr MeshBuilder::CreateTiledGround(const std::string& name,
                                        TiledGroundOptions& options,
                                        Scene* scene)
 {
@@ -552,7 +553,7 @@ MeshPtr MeshBuilder::CreateTiledGround(const string_t& name,
 }
 
 GroundMeshPtr MeshBuilder::CreateGroundFromHeightMap(
-  const string_t& name, const string_t& url,
+  const std::string& name, const std::string& url,
   GroundFromHeightMapOptions& options, Scene* scene)
 {
   const auto& filter = options.colorFilter;
@@ -593,14 +594,14 @@ GroundMeshPtr MeshBuilder::CreateGroundFromHeightMap(
   };
 
   const auto onError
-    = [](const string_t& msg) { BABYLON_LOG_ERROR("Tools", msg); };
+    = [](const std::string& msg) { BABYLON_LOG_ERROR("Tools", msg); };
 
   Tools::LoadImageFromUrl(url, onload, onError, false);
 
   return ground;
 }
 
-MeshPtr MeshBuilder::CreatePolygon(const string_t& name,
+MeshPtr MeshBuilder::CreatePolygon(const std::string& name,
                                    PolygonOptions& options, Scene* scene)
 {
   options.sideOrientation
@@ -608,8 +609,8 @@ MeshPtr MeshBuilder::CreatePolygon(const string_t& name,
   const auto& shape = options.shape;
   const auto& holes = options.holes;
   const auto& depth = options.depth;
-  vector_t<Vector2> contours(shape.size());
-  vector_t<Vector2> hole;
+  std::vector<Vector2> contours(shape.size());
+  std::vector<Vector2> hole;
   for (std::size_t i = 0; i < shape.size(); ++i) {
     contours[i] = Vector2(shape[i].x, shape[i].z);
   }
@@ -636,13 +637,13 @@ MeshPtr MeshBuilder::CreatePolygon(const string_t& name,
   return polygon;
 }
 
-MeshPtr MeshBuilder::ExtrudePolygon(const string_t& name,
+MeshPtr MeshBuilder::ExtrudePolygon(const std::string& name,
                                     PolygonOptions& options, Scene* scene)
 {
   return MeshBuilder::CreatePolygon(name, options, scene);
 }
 
-MeshPtr MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
+MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
                                 Scene* scene)
 {
   const auto& path           = options.path;
@@ -659,8 +660,8 @@ MeshPtr MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
 
   // tube geometry
   const auto tubePathArray
-    = [](const vector_t<Vector3>& _path, Path3D& path3D,
-         vector_t<vector_t<Vector3>>& circlePaths, float _radius,
+    = [](const std::vector<Vector3>& _path, Path3D& path3D,
+         std::vector<std::vector<Vector3>>& circlePaths, float _radius,
          unsigned int _tessellation,
          const ::std::function<float(unsigned int i, float distance)>&
            _radiusFunction,
@@ -682,7 +683,7 @@ MeshPtr MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
           rad = (_radiusFunction == nullptr) ?
                   _radius :
                   _radiusFunction(i, distances[i]); // current radius
-          vector_t<Vector3> circlePath;             // current circle array
+          std::vector<Vector3> circlePath;          // current circle array
           normal = normals[i];                      // current normal
           for (std::size_t t = 0; t < _tessellation; ++t) {
             Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
@@ -699,7 +700,7 @@ MeshPtr MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
         // cap
         const auto capPath
           = [_path](unsigned int nbPoints, unsigned int pathIndex) {
-              vector_t<Vector3> pointCap;
+              std::vector<Vector3> pointCap;
               for (std::size_t i = 0; i < nbPoints; ++i) {
                 pointCap.emplace_back(_path[pathIndex]);
               }
@@ -730,7 +731,7 @@ MeshPtr MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
         return circlePaths;
       };
   Path3D path3D;
-  vector_t<vector_t<Vector3>> pathArray;
+  std::vector<std::vector<Vector3>> pathArray;
   if (instance) {
     // tube update
     path3D    = path3D.update(path);
@@ -747,7 +748,7 @@ MeshPtr MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
   }
   // tube creation
   path3D = Path3D(path);
-  vector_t<vector_t<Vector3>> newPathArray;
+  std::vector<std::vector<Vector3>> newPathArray;
   cap       = (cap > 3) ? 0 : cap;
   pathArray = tubePathArray(path, path3D, newPathArray, radius, tessellation,
                             radiusFunction, cap, arc);
@@ -767,7 +768,7 @@ MeshPtr MeshBuilder::CreateTube(const string_t& name, TubeOptions& options,
   return tube;
 }
 
-MeshPtr MeshBuilder::CreatePolyhedron(const string_t& name,
+MeshPtr MeshBuilder::CreatePolyhedron(const std::string& name,
                                       PolyhedronOptions& options, Scene* scene)
 {
   auto polyhedron = Mesh::New(name, scene);
@@ -783,7 +784,8 @@ MeshPtr MeshBuilder::CreatePolyhedron(const string_t& name,
   return polyhedron;
 }
 
-MeshPtr MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
+MeshPtr MeshBuilder::CreateDecal(const std::string& name,
+                                 AbstractMesh* sourceMesh,
                                  DecalOptions& options)
 {
   const auto indices = sourceMesh->getIndices();
@@ -847,7 +849,7 @@ MeshPtr MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
 
   // Inspired by
   // https://github.com/mrdoob/three.js/blob/eee231960882f6f3b6113405f524956145148146/examples/js/geometries/DecalGeometry.js
-  const auto clip = [&size](const vector_t<PositionNormalVertex>& vertices,
+  const auto clip = [&size](const std::vector<PositionNormalVertex>& vertices,
                             const Vector3& axis) {
     if (vertices.empty()) {
       return vertices;
@@ -865,19 +867,19 @@ MeshPtr MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
             Vector3::Lerp(v0.normal, v1.normal, clipFactor));
         };
 
-    vector_t<PositionNormalVertex> result;
+    std::vector<PositionNormalVertex> result;
 
     bool v1Out, v2Out, v3Out;
     unsigned int total;
-    nullable_t<PositionNormalVertex> nV1, nV2, nV3, nV4;
+    std::optional<PositionNormalVertex> nV1, nV2, nV3, nV4;
     float d1, d2, d3;
     for (std::size_t index = 0; index < vertices.size(); index += 3) {
       total = 0;
 
-      nV1 = nullopt_t;
-      nV2 = nullopt_t;
-      nV3 = nullopt_t;
-      nV4 = nullopt_t;
+      nV1 = std::nullopt;
+      nV2 = std::nullopt;
+      nV3 = std::nullopt;
+      nV4 = std::nullopt;
 
       d1 = Vector3::Dot(vertices[index].position, axis) - clipSize;
       d2 = Vector3::Dot(vertices[index + 1].position, axis) - clipSize;
@@ -973,7 +975,7 @@ MeshPtr MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
   };
 
   for (std::size_t index = 0; index < indices.size(); index += 3) {
-    vector_t<PositionNormalVertex> faceVertices;
+    std::vector<PositionNormalVertex> faceVertices;
 
     faceVertices.emplace_back(extractDecalVector3(index));
     faceVertices.emplace_back(extractDecalVector3(index + 1));
@@ -1017,8 +1019,8 @@ MeshPtr MeshBuilder::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
 }
 
 MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
-  const string_t& name, const vector_t<Vector3>& shape,
-  const vector_t<Vector3>& curve, float scale, float rotation,
+  const std::string& name, const std::vector<Vector3>& shape,
+  const std::vector<Vector3>& curve, float scale, float rotation,
   const ::std::function<float(float i, float distance)>& scaleFunction,
   const ::std::function<float(float i, float distance)>& rotateFunction,
   bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
@@ -1027,9 +1029,9 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
 {
   // extrusion geometry
   const auto extrusionPathArray
-    = [](const vector_t<Vector3>& _shape, const vector_t<Vector3>& _curve,
-         Path3D& path3D, vector_t<vector_t<Vector3>> shapePaths, float _scale,
-         float _rotation,
+    = [](const std::vector<Vector3>& _shape, const std::vector<Vector3>& _curve,
+         Path3D& path3D, std::vector<std::vector<Vector3>> shapePaths,
+         float _scale, float _rotation,
          const ::std::function<float(float i, float distance)>& _scaleFunction,
          const ::std::function<float(float i, float distance)>& _rotateFunction,
          unsigned int _cap, bool _custom) {
@@ -1051,7 +1053,7 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
         shapePaths.resize(_curve.size());
 
         for (std::size_t i = 0; i < _curve.size(); ++i) {
-          vector_t<Vector3> shapePath;
+          std::vector<Vector3> shapePath;
           auto angleStep  = rotate(static_cast<float>(i), distances[i]);
           auto scaleRatio = scl(static_cast<float>(i), distances[i]);
           for (std::size_t p = 0; p < _shape.size(); ++p) {
@@ -1069,8 +1071,8 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
           ++index;
         }
         // cap
-        const auto capPath = [&](const vector_t<Vector3>& shapePath) {
-          vector_t<Vector3> pointCap;
+        const auto capPath = [&](const std::vector<Vector3>& shapePath) {
+          std::vector<Vector3> pointCap;
           auto barycenter = Vector3::Zero();
           for (std::size_t i = 0; i < shapePath.size(); ++i) {
             barycenter.addInPlace(shapePath[i]);
@@ -1105,7 +1107,7 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
       };
 
   Path3D path3D;
-  vector_t<vector_t<Vector3>> pathArray;
+  std::vector<std::vector<Vector3>> pathArray;
   if (instance) { // instance update
     path3D    = path3D.update(curve);
     pathArray = extrusionPathArray(
@@ -1118,7 +1120,7 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
   }
   // extruded shape creation
   path3D = Path3D(curve);
-  vector_t<vector_t<Vector3>> newShapePaths;
+  std::vector<std::vector<Vector3>> newShapePaths;
   unsigned int _cap = (cap > 3) ? 0 : cap;
   pathArray
     = extrusionPathArray(shape, curve, path3D, newShapePaths, scale, rotation,

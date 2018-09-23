@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-InstancedMesh::InstancedMesh(const string_t& _name, Mesh* source)
+InstancedMesh::InstancedMesh(const std::string& _name, Mesh* source)
     : AbstractMesh(_name, source->getScene())
     , renderingGroupId{this, &InstancedMesh::get_renderingGroupId,
                        &InstancedMesh::set_renderingGroupId}
@@ -37,7 +37,7 @@ InstancedMesh::~InstancedMesh()
 {
 }
 
-const string_t InstancedMesh::getClassName() const
+const std::string InstancedMesh::getClassName() const
 {
   return "InstancedMesh";
 }
@@ -105,10 +105,10 @@ Float32Array InstancedMesh::getVerticesData(unsigned int kind,
   return _sourceMesh->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
-AbstractMesh* InstancedMesh::setVerticesData(unsigned int kind,
-                                             const Float32Array& data,
-                                             bool updatable,
-                                             const nullable_t<size_t>& stride)
+AbstractMesh*
+InstancedMesh::setVerticesData(unsigned int kind, const Float32Array& data,
+                               bool updatable,
+                               const std::optional<size_t>& stride)
 {
   if (sourceMesh()) {
     sourceMesh()->setVerticesData(kind, data, updatable, stride);
@@ -148,7 +148,7 @@ IndicesArray InstancedMesh::getIndices(bool /*copyWhenShared*/,
   return _sourceMesh->getIndices();
 }
 
-vector_t<Vector3>& InstancedMesh::_positions()
+std::vector<Vector3>& InstancedMesh::_positions()
 {
   return _sourceMesh->_positions();
 }
@@ -216,7 +216,7 @@ bool InstancedMesh::_generatePointsArray()
   return _sourceMesh->_generatePointsArray();
 }
 
-InstancedMeshPtr InstancedMesh::clone(const string_t& /*iNname*/,
+InstancedMeshPtr InstancedMesh::clone(const std::string& /*iNname*/,
                                       Node* newParent, bool doNotCloneChildren)
 {
   auto result = _sourceMesh->createInstance(name);

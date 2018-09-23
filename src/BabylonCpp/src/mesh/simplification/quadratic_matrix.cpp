@@ -9,7 +9,7 @@ QuadraticMatrix::QuadraticMatrix()
   }
 }
 
-QuadraticMatrix::QuadraticMatrix(const array_t<float, 10>& _data)
+QuadraticMatrix::QuadraticMatrix(const std::array<float, 10>& _data)
 {
   for (unsigned int i = 0; i < 10; ++i) {
     data[i] = _data[i];
@@ -65,7 +65,7 @@ void QuadraticMatrix::addInPlace(const QuadraticMatrix& matrix)
   }
 }
 
-void QuadraticMatrix::addArrayInPlace(const array_t<float, 10>& _data)
+void QuadraticMatrix::addArrayInPlace(const std::array<float, 10>& _data)
 {
   for (unsigned int i = 0; i < 10; ++i) {
     data[i] += _data[i];
@@ -86,8 +86,8 @@ QuadraticMatrix QuadraticMatrix::FromData(float a, float b, float c, float d)
   return QuadraticMatrix(QuadraticMatrix::DataFromNumbers(a, b, c, d));
 }
 
-array_t<float, 10> QuadraticMatrix::DataFromNumbers(float a, float b, float c,
-                                                    float d)
+std::array<float, 10> QuadraticMatrix::DataFromNumbers(float a, float b,
+                                                       float c, float d)
 {
   return {{a * a, a * b, a * c, a * d, //
            b * b, b * c, b * d,        //

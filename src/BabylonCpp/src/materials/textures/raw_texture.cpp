@@ -39,61 +39,61 @@ void RawTexture::update(const ArrayBufferView& data)
   }
 }
 
-unique_ptr_t<RawTexture> RawTexture::CreateLuminanceTexture(
+std::unique_ptr<RawTexture> RawTexture::CreateLuminanceTexture(
   const ArrayBufferView& data, int width, int height, Scene* scene,
   bool generateMipMaps, bool invertY, unsigned int samplingMode)
 {
-  return ::std::make_unique<RawTexture>(
+  return std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_LUMINANCE, scene,
     generateMipMaps, invertY, samplingMode);
 }
 
-unique_ptr_t<RawTexture> RawTexture::CreateLuminanceAlphaTexture(
+std::unique_ptr<RawTexture> RawTexture::CreateLuminanceAlphaTexture(
   const ArrayBufferView& data, int width, int height, Scene* scene,
   bool generateMipMaps, bool invertY, unsigned int samplingMode)
 {
-  return ::std::make_unique<RawTexture>(
+  return std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA, scene,
     generateMipMaps, invertY, samplingMode);
 }
 
-unique_ptr_t<RawTexture>
+std::unique_ptr<RawTexture>
 RawTexture::CreateAlphaTexture(const ArrayBufferView& data, int width,
                                int height, Scene* scene, bool generateMipMaps,
                                bool invertY, unsigned int samplingMode)
 {
-  return ::std::make_unique<RawTexture>(
+  return std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_ALPHA, scene,
     generateMipMaps, invertY, samplingMode);
 }
 
-unique_ptr_t<RawTexture>
+std::unique_ptr<RawTexture>
 RawTexture::CreateRGBTexture(const ArrayBufferView& data, int width, int height,
                              Scene* scene, bool generateMipMaps, bool invertY,
                              unsigned int samplingMode, unsigned int type)
 {
-  return ::std::make_unique<RawTexture>(
+  return std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_RGB, scene,
     generateMipMaps, invertY, samplingMode, type);
 }
 
-unique_ptr_t<RawTexture>
+std::unique_ptr<RawTexture>
 RawTexture::CreateRGBATexture(const ArrayBufferView& data, int width,
                               int height, Scene* scene, bool generateMipMaps,
                               bool invertY, unsigned int samplingMode,
                               unsigned int type)
 {
-  return ::std::make_unique<RawTexture>(
+  return std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_RGBA, scene,
     generateMipMaps, invertY, samplingMode, type);
 }
 
-unique_ptr_t<RawTexture>
+std::unique_ptr<RawTexture>
 RawTexture::CreateRTexture(const ArrayBufferView& data, int width, int height,
                            Scene* scene, bool generateMipMaps, bool invertY,
                            unsigned int samplingMode, unsigned int type)
 {
-  return ::std::make_unique<RawTexture>(
+  return std::make_unique<RawTexture>(
     data, width, height, EngineConstants::TEXTUREFORMAT_R, scene,
     generateMipMaps, invertY, samplingMode, type);
 }

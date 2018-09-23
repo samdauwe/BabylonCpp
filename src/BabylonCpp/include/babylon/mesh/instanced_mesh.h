@@ -1,10 +1,13 @@
 #ifndef BABYLON_MESH_INSTANCED_MESH_H
 #define BABYLON_MESH_INSTANCED_MESH_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
+
+class InstancedMesh;
+using InstancedMeshPtr = std::shared_ptr<InstancedMesh>;
 
 /**
  * @brief Represents an instance based on a source mesh.
@@ -15,7 +18,7 @@ public:
   template <typename... Ts>
   static InstancedMeshPtr New(Ts&&... args)
   {
-    auto mesh = shared_ptr_t<InstancedMesh>(
+    auto mesh = std::shared_ptr<InstancedMesh>(
       new InstancedMesh(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
@@ -26,7 +29,7 @@ public:
   /**
    * @brief Returns the string "InstancedMesh"
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
@@ -91,8 +94,8 @@ public:
    */
   AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
                                 bool updatable = false,
-                                const nullable_t<size_t>& stride
-                                = nullopt_t) override;
+                                const std::optional<size_t>& stride
+                                = std::nullopt) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -154,7 +157,7 @@ public:
   /**
    * @brief Hidden
    */
-  vector_t<Vector3>& _positions();
+  std::vector<Vector3>& _positions();
 
   /**
    * @brief Sets a new updated BoundingInfo to the mesh.
@@ -197,7 +200,7 @@ public:
    * the model children aren't cloned.
    * @returns The clone.
    */
-  InstancedMeshPtr clone(const string_t& name, Node* newParent,
+  InstancedMeshPtr clone(const std::string& name, Node* newParent,
                          bool doNotCloneChildren = false);
 
   /**
@@ -207,7 +210,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  InstancedMesh(const string_t& name, Mesh* source);
+  InstancedMesh(const std::string& name, Mesh* source);
 
 private:
   int get_renderingGroupId() const;

@@ -41,7 +41,7 @@ void CircleCurvesFromBeziersScene::initializeScene(ICanvas* canvas,
 
   // Draw an arbitrary orbit curve
   const auto createCircleCurve = [scene]() {
-    const vector_t<Vector3> p{
+    const std::vector<Vector3> p{
       Vector3(10.f, 0.f, 0.f),      //
       Vector3(10.f, 5.519f, 0.f),   //
       Vector3(5.519f, 10.f, 0.f),   //

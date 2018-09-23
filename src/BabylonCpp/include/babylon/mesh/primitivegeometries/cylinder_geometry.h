@@ -1,11 +1,14 @@
 #ifndef BABYLON_MESH_PRIMITIVE_GEOMETRIES_CYLINDER_GEOMETRY_H
 #define BABYLON_MESH_PRIMITIVE_GEOMETRIES_CYLINDER_GEOMETRY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/primitivegeometries/_primitive_geometry.h>
 
 namespace BABYLON {
+
+class CylinderGeometry;
+using CylinderGeometryPtr = std::shared_ptr<CylinderGeometry>;
 
 /**
  * @brief Creates a new cylinder geometry.
@@ -17,7 +20,7 @@ public:
   template <typename... Ts>
   static CylinderGeometryPtr New(Ts&&... args)
   {
-    auto mesh = shared_ptr_t<CylinderGeometry>(
+    auto mesh = std::shared_ptr<CylinderGeometry>(
       new CylinderGeometry(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
@@ -29,8 +32,8 @@ public:
    * @brief Hidden
    * @return
    */
-  unique_ptr_t<VertexData> _regenerateVertexData() override;
-  GeometryPtr copy(const string_t& id) override;
+  std::unique_ptr<VertexData> _regenerateVertexData() override;
+  GeometryPtr copy(const std::string& id) override;
   Json::object serialize() const override;
 
   // Statics
@@ -55,7 +58,7 @@ protected:
    * @param side defines if the created geometry is double sided or not (default
    * is BABYLON.Mesh.DEFAULTSIDE)
    */
-  CylinderGeometry(const string_t& id, Scene* scene, float height,
+  CylinderGeometry(const std::string& id, Scene* scene, float height,
                    float diameterTop, float diameterBottom,
                    unsigned int tessellation, unsigned int subdivisions,
                    bool canBeRegenerated, Mesh* mesh = nullptr,

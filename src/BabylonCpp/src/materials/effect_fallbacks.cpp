@@ -81,7 +81,7 @@ void EffectFallbacks::unBindMesh()
   _mesh = nullptr;
 }
 
-void EffectFallbacks::addFallback(unsigned int rank, const string_t& define)
+void EffectFallbacks::addFallback(unsigned int rank, const std::string& define)
 {
   if (_defines.find(rank) == _defines.end()) {
     if (rank < _currentRank) {
@@ -116,14 +116,15 @@ bool EffectFallbacks::isMoreFallbacks() const
   return _currentRank <= _maxRank;
 }
 
-string_t EffectFallbacks::reduce(string_t currentDefines, Effect* effect)
+std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
 {
   // First we try to switch to CPU skinning
   if (_mesh && _mesh->computeBonesUsingShaders()
       && _mesh->numBoneInfluencers() > 0 && _mesh->material()) {
     _mesh->computeBonesUsingShaders = false;
-    const string_t toReplace        = string_t("#define NUM_BONE_INFLUENCERS ")
-                               + ::std::to_string(_mesh->numBoneInfluencers());
+    const std::string toReplace
+      = std::string("#define NUM_BONE_INFLUENCERS ")
+        + ::std::to_string(_mesh->numBoneInfluencers());
     String::replaceInPlace(currentDefines, toReplace,
                            "#define NUM_BONE_INFLUENCERS 0");
     effect->_bonesComputationForcedToCPU = true;

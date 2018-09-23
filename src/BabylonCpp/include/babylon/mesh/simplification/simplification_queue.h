@@ -1,10 +1,14 @@
 #ifndef BABYLON_MESH_SIMPLIFICATION_SIMPLIFICATION_QUEUE_H
 #define BABYLON_MESH_SIMPLIFICATION_SIMPLIFICATION_QUEUE_H
 
-#include <babylon/babylon_global.h>
+#include <queue>
+
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/simplification/isimplification_task.h>
 
 namespace BABYLON {
+
+class ISimplifier;
 
 /**
  * @brief

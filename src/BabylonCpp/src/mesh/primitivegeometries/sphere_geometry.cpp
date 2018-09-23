@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-SphereGeometry::SphereGeometry(const string_t& _id, Scene* scene,
+SphereGeometry::SphereGeometry(const std::string& _id, Scene* scene,
                                unsigned int _segments, float _diameter,
                                bool canBeRegenerated, Mesh* mesh,
                                unsigned int _side)
@@ -22,7 +22,7 @@ SphereGeometry::~SphereGeometry()
 {
 }
 
-unique_ptr_t<VertexData> SphereGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> SphereGeometry::_regenerateVertexData()
 {
   SphereOptions options(diameter);
   options.segments        = segments;
@@ -31,7 +31,7 @@ unique_ptr_t<VertexData> SphereGeometry::_regenerateVertexData()
   return VertexData::CreateSphere(options);
 }
 
-GeometryPtr SphereGeometry::copy(const string_t& _id)
+GeometryPtr SphereGeometry::copy(const std::string& _id)
 {
   return SphereGeometry::New(_id, getScene(), segments, diameter,
                              canBeRegenerated(), nullptr, side);

@@ -7,10 +7,10 @@
 
 namespace BABYLON {
 
-TorusGeometry::TorusGeometry(const string_t& _id, Scene* scene, float _diameter,
-                             float _thickness, unsigned int _tessellation,
-                             bool canBeRegenerated, Mesh* mesh,
-                             unsigned int _side)
+TorusGeometry::TorusGeometry(const std::string& _id, Scene* scene,
+                             float _diameter, float _thickness,
+                             unsigned int _tessellation, bool canBeRegenerated,
+                             Mesh* mesh, unsigned int _side)
     : _PrimitiveGeometry{_id, scene, canBeRegenerated, mesh}
     , diameter{_diameter}
     , thickness{_thickness}
@@ -23,7 +23,7 @@ TorusGeometry::~TorusGeometry()
 {
 }
 
-unique_ptr_t<VertexData> TorusGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> TorusGeometry::_regenerateVertexData()
 {
   TorusOptions options;
   options.diameter        = diameter;
@@ -34,7 +34,7 @@ unique_ptr_t<VertexData> TorusGeometry::_regenerateVertexData()
   return VertexData::CreateTorus(options);
 }
 
-GeometryPtr TorusGeometry::copy(const string_t& _id)
+GeometryPtr TorusGeometry::copy(const std::string& _id)
 {
   return TorusGeometry::New(_id, getScene(), diameter, thickness, tessellation,
                             canBeRegenerated(), nullptr, side);

@@ -1,7 +1,9 @@
 #ifndef BABYLON_MESH_VERTEX_DATA_OPTIONS_H
 #define BABYLON_MESH_VERTEX_DATA_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/math/color3.h>
@@ -10,6 +12,12 @@
 #include <babylon/math/vector4.h>
 
 namespace BABYLON {
+
+class GroundMesh;
+class LinesMesh;
+class Mesh;
+using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+using MeshPtr      = std::shared_ptr<Mesh>;
 
 //------------------------------------------------------------------------------
 // Box mesh options
@@ -22,8 +30,8 @@ class BABYLON_SHARED_EXPORT BoxOptions {
 
 public:
   /** Statics **/
-  static array_t<Vector4, 6> DefaultBoxFaceUV;
-  static array_t<Color4, 6> DefaultBoxFaceColors;
+  static std::array<Vector4, 6> DefaultBoxFaceUV;
+  static std::array<Color4, 6> DefaultBoxFaceColors;
   static Vector4 DefaultFrontUVs;
   static Vector4 DefaultBackUVs;
 
@@ -36,8 +44,8 @@ public:
   float width;
   float height;
   float depth;
-  array_t<Vector4, 6> faceUV;
-  array_t<Color4, 6> faceColors;
+  std::array<Vector4, 6> faceUV;
+  std::array<Color4, 6> faceColors;
   unsigned int sideOrientation;
   Vector4 frontUVs;
   Vector4 backUVs;
@@ -56,8 +64,8 @@ class BABYLON_SHARED_EXPORT CylinderOptions {
 
 public:
   /** Statics **/
-  static vector_t<Vector4> DefaultCylinderFaceUV;
-  static vector_t<Color4> DefaultCylinderFaceColors;
+  static std::vector<Vector4> DefaultCylinderFaceUV;
+  static std::vector<Color4> DefaultCylinderFaceColors;
   static Vector4 DefaultFrontUVs;
   static Vector4 DefaultBackUVs;
 
@@ -77,8 +85,8 @@ public:
   unsigned int subdivisions;
   bool hasRings;
   bool enclose;
-  vector_t<Vector4> faceUV;
-  vector_t<Color4> faceColors;
+  std::vector<Vector4> faceUV;
+  std::vector<Color4> faceColors;
   unsigned int sideOrientation;
   Vector4 frontUVs;
   Vector4 backUVs;
@@ -106,7 +114,7 @@ public:
   float dashSize;
   float gapSize;
   unsigned int dashNb;
-  vector_t<Vector3> points;
+  std::vector<Vector3> points;
   bool updatable;
   LinesMeshPtr instance;
 
@@ -187,8 +195,8 @@ public:
   ~ExtrudeShapeOptions();
 
 public:
-  vector_t<Vector3> shape;
-  vector_t<Vector3> path;
+  std::vector<Vector3> shape;
+  std::vector<Vector3> path;
   float rotation;
   float scale;
   unsigned int cap;
@@ -220,10 +228,10 @@ public:
   ~ExtrudeShapeCustomOptions();
 
 public:
-  vector_t<Vector3> shape;
-  vector_t<Vector3> path;
-  ::std::function<float(float i, float distance)> scaleFunction;
-  ::std::function<float(float i, float distance)> rotationFunction;
+  std::vector<Vector3> shape;
+  std::vector<Vector3> path;
+  std::function<float(float i, float distance)> scaleFunction;
+  std::function<float(float i, float distance)> rotationFunction;
   bool ribbonCloseArray;
   bool ribbonClosePath;
   unsigned int cap;
@@ -260,7 +268,7 @@ public:
   unsigned int bufferHeight;
   Color3 colorFilter;
   bool updatable;
-  ::std::function<void(GroundMesh* mesh)> onReady;
+  std::function<void(GroundMesh* mesh)> onReady;
 
 }; // end of class GroundFromHeightMapOptions
 
@@ -341,7 +349,7 @@ public:
   void setArc(float value);
 
 public:
-  vector_t<Vector3> shape;
+  std::vector<Vector3> shape;
   float radius;
   unsigned int tessellation;
   unsigned int clip;
@@ -372,8 +380,8 @@ public:
   ~LinesOptions();
 
 public:
-  vector_t<Vector3> points;
-  vector_t<Color4> colors;
+  std::vector<Vector3> points;
+  std::vector<Color4> colors;
   bool updatable;
   bool useVertexAlpha;
   LinesMeshPtr instance;
@@ -395,8 +403,8 @@ public:
   ~LineSystemOptions();
 
 public:
-  vector_t<vector_t<Vector3>> lines;
-  vector_t<vector_t<Color4>> colors;
+  std::vector<std::vector<Vector3>> lines;
+  std::vector<std::vector<Color4>> colors;
   bool updatable;
   bool useVertexAlpha;
   LinesMeshPtr instance;
@@ -452,11 +460,11 @@ public:
   ~PolygonOptions();
 
 public:
-  vector_t<Vector3> shape;
-  vector_t<vector_t<Vector3>> holes;
+  std::vector<Vector3> shape;
+  std::vector<std::vector<Vector3>> holes;
   float depth;
-  vector_t<Vector4> faceUV;
-  vector_t<Color4> faceColors;
+  std::vector<Vector4> faceUV;
+  std::vector<Color4> faceColors;
   bool updatable;
   unsigned int sideOrientation;
   Vector4 frontUVs;
@@ -489,8 +497,8 @@ public:
   float sizeX;
   float sizeY;
   float sizeZ;
-  vector_t<Color4> faceColors;
-  vector_t<Vector4> faceUV;
+  std::vector<Color4> faceColors;
+  std::vector<Vector4> faceUV;
   Polyhedron custom;
   bool flat;
   unsigned int sideOrientation;
@@ -515,11 +523,12 @@ public:
   static Vector4 DefaultBackUVs;
 
 public:
-  RibbonOptions(const vector_t<vector_t<Vector3>>& pathArray, int offset = -1);
+  RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
+                int offset = -1);
   ~RibbonOptions();
 
-  vector_t<vector_t<Vector3>>& pathArray();
-  const vector_t<vector_t<Vector3>>& pathArray() const;
+  std::vector<std::vector<Vector3>>& pathArray();
+  const std::vector<std::vector<Vector3>>& pathArray() const;
   size_t offset() const;
 
 public:
@@ -531,11 +540,11 @@ public:
   Vector4 backUVs;
   bool updatable;
   MeshPtr instance;
-  vector_t<Vector2> uvs;
-  vector_t<Color4> colors;
+  std::vector<Vector2> uvs;
+  std::vector<Color4> colors;
 
 private:
-  vector_t<vector_t<Vector3>> _pathArray;
+  std::vector<std::vector<Vector3>> _pathArray;
   size_t _offset;
 
 }; // end of class RibbonOptions
@@ -685,10 +694,10 @@ public:
   void setArc(float value);
 
 public:
-  vector_t<Vector3> path;
+  std::vector<Vector3> path;
   float radius;
   unsigned int tessellation;
-  ::std::function<float(unsigned int i, float distance)> radiusFunction;
+  std::function<float(unsigned int i, float distance)> radiusFunction;
   unsigned int cap;
   unsigned int sideOrientation;
   Vector4 frontUVs;

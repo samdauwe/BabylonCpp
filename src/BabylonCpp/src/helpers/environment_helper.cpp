@@ -150,7 +150,7 @@ MirrorTexturePtr& EnvironmentHelper::groundMirror()
   return _groundMirror;
 }
 
-vector_t<AbstractMeshPtr>& EnvironmentHelper::groundMirrorRenderList()
+std::vector<AbstractMeshPtr>& EnvironmentHelper::groundMirrorRenderList()
 {
   if (_groundMirror) {
     return _groundMirror->renderList;
@@ -168,7 +168,7 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
   IEnvironmentHelperOptions options;
   options.createGround = true;
   options.groundSize   = 15;
-  options.groundTexture.set<string_t>(_groundTextureCDNUrl);
+  options.groundTexture.set<std::string>(_groundTextureCDNUrl);
   options.groundColor   = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
   options.groundOpacity = 0.9f;
   options.enableGroundShadow = true;
@@ -186,7 +186,7 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
 
   options.createSkybox = true;
   options.skyboxSize   = 20;
-  options.skyboxTexture.set<string_t>(_skyboxTextureCDNUrl);
+  options.skyboxTexture.set<std::string>(_skyboxTextureCDNUrl);
   options.skyboxColor = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
 
   options.backgroundYRotation = 0;
@@ -194,7 +194,7 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
   options.rootPosition        = Vector3::Zero();
 
   options.setupImageProcessing = true;
-  options.environmentTexture.set<string_t>(_environmentTextureCDNUrl);
+  options.environmentTexture.set<std::string>(_environmentTextureCDNUrl);
   options.cameraExposure     = 0.8f;
   options.cameraContrast     = 1.2f;
   options.toneMappingEnabled = true;
@@ -226,7 +226,7 @@ void EnvironmentHelper::_setupEnvironmentTexture()
   }
 
   const auto environmentTexture = CubeTexture::CreateFromPrefilteredData(
-    _options.environmentTexture.get<string_t>(), _scene);
+    _options.environmentTexture.get<std::string>(), _scene);
   _scene->environmentTexture = environmentTexture;
 }
 
@@ -348,7 +348,7 @@ void EnvironmentHelper::_setupGroundDiffuseTexture()
   }
 
   const auto diffuseTexture
-    = Texture::New(_options.groundTexture.get<string_t>(), _scene);
+    = Texture::New(_options.groundTexture.get<std::string>(), _scene);
   diffuseTexture->gammaSpace = false;
   diffuseTexture->hasAlpha   = true;
   // _groundMaterial->setDiffuseTexture(diffuseTexture);
@@ -446,13 +446,13 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
   }
 
   // _skyboxTexture
-  //  = new CubeTexture(_options.skyboxTexture.get<string_t>(), _scene);
+  //  = new CubeTexture(_options.skyboxTexture.get<std::string>(), _scene);
   _skyboxTexture->coordinatesMode = TextureConstants::SKYBOX_MODE;
   _skyboxTexture->gammaSpace      = false;
   _skyboxMaterial->setReflectionTexture(_skyboxTexture);
 }
 
-void EnvironmentHelper::_errorHandler(const string_t& message,
+void EnvironmentHelper::_errorHandler(const std::string& message,
                                       const ::std::exception& exception)
 {
   Exception _exception{message, exception};

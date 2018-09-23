@@ -8,11 +8,11 @@ namespace BABYLON {
 // Box mesh options
 //------------------------------------------------------------------------------
 
-array_t<Vector4, 6> BoxOptions::DefaultBoxFaceUV{
+std::array<Vector4, 6> BoxOptions::DefaultBoxFaceUV{
   {Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
    Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
    Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f)}};
-array_t<Color4, 6> BoxOptions::DefaultBoxFaceColors{
+std::array<Color4, 6> BoxOptions::DefaultBoxFaceColors{
   {Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
    Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
    Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f)}};
@@ -53,10 +53,10 @@ BoxOptions::~BoxOptions()
 // Cylinder or cone mesh options
 //------------------------------------------------------------------------------
 
-vector_t<Vector4> CylinderOptions::DefaultCylinderFaceUV{
+std::vector<Vector4> CylinderOptions::DefaultCylinderFaceUV{
   {Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
    Vector4(0.f, 0.f, 1.f, 1.f)}};
-vector_t<Color4> CylinderOptions::DefaultCylinderFaceColors{
+std::vector<Color4> CylinderOptions::DefaultCylinderFaceColors{
   {Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
    Color4(1.f, 1.f, 1.f, 1.f)}};
 Vector4 CylinderOptions::DefaultFrontUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
@@ -475,7 +475,7 @@ PolyhedronOptions::~PolyhedronOptions()
 Vector4 RibbonOptions::DefaultFrontUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
 Vector4 RibbonOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
 
-RibbonOptions::RibbonOptions(const vector_t<vector_t<Vector3>>& pathArray,
+RibbonOptions::RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
                              int offset)
     : closeArray{false}
     , closePath{false}
@@ -499,12 +499,12 @@ RibbonOptions::~RibbonOptions()
 {
 }
 
-vector_t<vector_t<Vector3>>& RibbonOptions::pathArray()
+std::vector<std::vector<Vector3>>& RibbonOptions::pathArray()
 {
   return _pathArray;
 }
 
-const vector_t<vector_t<Vector3>>& RibbonOptions::pathArray() const
+const std::vector<std::vector<Vector3>>& RibbonOptions::pathArray() const
 {
   return _pathArray;
 }

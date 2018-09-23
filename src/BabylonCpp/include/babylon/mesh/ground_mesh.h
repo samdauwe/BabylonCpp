@@ -1,7 +1,7 @@
 #ifndef BABYLON_MESH_GROUND_MESH_H
 #define BABYLON_MESH_GROUND_MESH_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector4.h>
@@ -24,8 +24,8 @@ public:
   template <typename... Ts>
   static GroundMeshPtr New(Ts&&... args)
   {
-    auto mesh
-      = shared_ptr_t<GroundMesh>(new GroundMesh(::std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<GroundMesh>(
+      new GroundMesh(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
@@ -35,7 +35,7 @@ public:
   /**
    * @brief Returns the string "GroundMesh"
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
@@ -123,7 +123,7 @@ private:
   GroundMesh& _computeHeightQuads();
 
 protected:
-  GroundMesh(const string_t& name, Scene* scene);
+  GroundMesh(const std::string& name, Scene* scene);
 
 public:
   bool generateOctree;
@@ -149,7 +149,7 @@ public:
   ReadOnlyProperty<GroundMesh, size_t> subdivisionsY;
 
 private:
-  vector_t<Quad> _heightQuads;
+  std::vector<Quad> _heightQuads;
 
 }; // end of class GroundMesh
 

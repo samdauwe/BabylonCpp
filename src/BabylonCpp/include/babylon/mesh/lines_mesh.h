@@ -1,11 +1,14 @@
 #ifndef BABYLON_MESH_LINE_MESH_H
 #define BABYLON_MESH_LINE_MESH_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
+
+class ShaderMaterial;
+using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
 
 /**
  * @brief
@@ -17,7 +20,7 @@ public:
   static LinesMeshPtr New(Ts&&... args)
   {
     auto mesh
-      = shared_ptr_t<LinesMesh>(new LinesMesh(::std::forward<Ts>(args)...));
+      = std::shared_ptr<LinesMesh>(new LinesMesh(::std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
@@ -27,11 +30,11 @@ public:
   /**
    * @brief Returns the string "LineMesh".
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
-  InstancedMesh* createInstance(const string_t& name);
+  InstancedMesh* createInstance(const std::string& name);
 
   /**
    * @brief Hidden
@@ -51,7 +54,7 @@ public:
   /**
    * @brief Returns a new LineMesh object cloned from the current one.
    */
-  LinesMeshPtr clone(const string_t& name, Node* newParent = nullptr,
+  LinesMeshPtr clone(const std::string& name, Node* newParent = nullptr,
                      bool doNotCloneChildren = false);
 
   /**
@@ -69,7 +72,7 @@ public:
                                      = false);
 
 protected:
-  LinesMesh(const string_t& name, Scene* scene, Node* parent = nullptr,
+  LinesMesh(const std::string& name, Scene* scene, Node* parent = nullptr,
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
             bool useVertexColor = false, bool useVertexAlpha = false);
 

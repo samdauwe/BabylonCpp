@@ -11,7 +11,7 @@ _ISamplesIndex::~_ISamplesIndex()
 {
 }
 
-const std::unordered_map<string_t, Sample>& _ISamplesIndex::samples() const
+const std::unordered_map<std::string, Sample>& _ISamplesIndex::samples() const
 {
   return _samples;
 }

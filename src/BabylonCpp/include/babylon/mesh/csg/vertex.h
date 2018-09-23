@@ -1,8 +1,7 @@
 #ifndef BABYLON_MESH_CSG_VERTEX_H
 #define BABYLON_MESH_CSG_VERTEX_H
 
-#include <babylon/babylon_global.h>
-
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 
@@ -30,9 +29,9 @@ public:
   Vertex& operator=(Vertex&& otherVertex);
   ~Vertex();
   Vertex clone() const;
-  unique_ptr_t<Vertex> cloneToNewObject() const;
+  std::unique_ptr<Vertex> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Vertex& vertex);
-  string_t toString() const;
+  std::string toString() const;
 
   // Invert all orientation-specific data (e.g. vertex normal). Called when the
   // orientation of a polygon is flipped.

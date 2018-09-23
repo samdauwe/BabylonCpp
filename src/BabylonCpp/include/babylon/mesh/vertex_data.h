@@ -1,11 +1,25 @@
 #ifndef BABYLON_MESH_VERTEX_DATA_H
 #define BABYLON_MESH_VERTEX_DATA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector4.h>
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
+
+class BoxOptions;
+class CylinderOptions;
+class DashedLinesOptions;
+class DiscOptions;
+class GroundFromHeightMapOptions;
+class GroundOptions;
+class LineSystemOptions;
+class PlaneOptions;
+class RibbonOptions;
+class SphereOptions;
+class TiledGroundOptions;
+class TorusKnotOptions;
+class TorusOptions;
 
 /**
  * @brief This class contains the various kinds of data on every vertex of a
@@ -105,9 +119,9 @@ public:
    * default false
    * @returns the object VertexData associated to the passed mesh
    */
-  static unique_ptr_t<VertexData> ExtractFromMesh(Mesh* mesh,
-                                                  bool copyWhenShared = false,
-                                                  bool forceCopy      = false);
+  static std::unique_ptr<VertexData>
+  ExtractFromMesh(Mesh* mesh, bool copyWhenShared = false,
+                  bool forceCopy = false);
 
   /**
    * @brief Extracts the vertexData from the geometry.
@@ -118,9 +132,9 @@ public:
    * default false
    * @returns the object VertexData associated to the passed mesh
    */
-  static unique_ptr_t<VertexData> ExtractFromGeometry(Geometry* geometry,
-                                                      bool copyWhenShared,
-                                                      bool forceCopy = false);
+  static std::unique_ptr<VertexData>
+  ExtractFromGeometry(Geometry* geometry, bool copyWhenShared,
+                      bool forceCopy = false);
 
   /**
    * @brief Creates the VertexData for a Ribbon.
@@ -150,7 +164,7 @@ public:
    * values, optional
    * @returns the VertexData of the ribbon
    */
-  static unique_ptr_t<VertexData> CreateRibbon(RibbonOptions& options);
+  static std::unique_ptr<VertexData> CreateRibbon(RibbonOptions& options);
 
   /**
    * @brief Creates the VertexData for a box.
@@ -178,7 +192,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the box
    */
-  static unique_ptr_t<VertexData> CreateBox(BoxOptions& options);
+  static std::unique_ptr<VertexData> CreateBox(BoxOptions& options);
 
   /**
    * @brief Creates the VertexData for an ellipsoid, defaults to a sphere.
@@ -209,7 +223,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the ellipsoid
    */
-  static unique_ptr_t<VertexData> CreateSphere(SphereOptions& options);
+  static std::unique_ptr<VertexData> CreateSphere(SphereOptions& options);
 
   /**
    * @brief Creates the VertexData for a cylinder, cone or prism.
@@ -246,7 +260,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the cylinder, cone or prism
    */
-  static unique_ptr_t<VertexData> CreateCylinder(CylinderOptions& options);
+  static std::unique_ptr<VertexData> CreateCylinder(CylinderOptions& options);
 
   /**
    * @brief Creates the VertexData for a torus.
@@ -267,7 +281,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the torus
    */
-  static unique_ptr_t<VertexData> CreateTorus(TorusOptions& options);
+  static std::unique_ptr<VertexData> CreateTorus(TorusOptions& options);
 
   /**
    * @brief Creates the VertexData of the LineSystem.
@@ -278,7 +292,8 @@ public:
    * of successive Color4, one per line point
    * @returns the VertexData of the LineSystem
    */
-  static unique_ptr_t<VertexData> CreateLineSystem(LineSystemOptions& options);
+  static std::unique_ptr<VertexData>
+  CreateLineSystem(LineSystemOptions& options);
 
   /**
    * @brief Create the VertexData for a DashedLines.
@@ -292,7 +307,7 @@ public:
    *  - dashNb the intended total number of dashes, optional, default 200
    * @returns the VertexData for the DashedLines
    */
-  static unique_ptr_t<VertexData>
+  static std::unique_ptr<VertexData>
   CreateDashedLines(DashedLinesOptions& options);
 
   /**
@@ -304,7 +319,7 @@ public:
    *  - subdivisions the number of subdivisions per side, optional, default 1
    * @returns the VertexData of the Ground
    */
-  static unique_ptr_t<VertexData> CreateGround(GroundOptions& options);
+  static std::unique_ptr<VertexData> CreateGround(GroundOptions& options);
 
   /**
    * @brief Creates the VertexData for a TiledGround by subdividing the ground
@@ -323,7 +338,7 @@ public:
    * default {w: 2, h: 2}
    * @returns the VertexData of the TiledGround
    */
-  static unique_ptr_t<VertexData>
+  static std::unique_ptr<VertexData>
   CreateTiledGround(TiledGroundOptions& options);
 
   /**
@@ -342,7 +357,7 @@ public:
    * * bufferHeight the height of image
    * @returns the VertexData of the Ground designed from a heightmap
    */
-  static unique_ptr_t<VertexData>
+  static std::unique_ptr<VertexData>
   CreateGroundFromHeightMap(GroundFromHeightMapOptions& options);
 
   /**
@@ -365,7 +380,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the box
    */
-  static unique_ptr_t<VertexData> CreatePlane(PlaneOptions& options);
+  static std::unique_ptr<VertexData> CreatePlane(PlaneOptions& options);
 
   /**
    * @brief Creates the VertexData of the Disc or regular Polygon.
@@ -385,7 +400,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the box
    */
-  static unique_ptr_t<VertexData> CreateDisc(DiscOptions& options);
+  static std::unique_ptr<VertexData> CreateDisc(DiscOptions& options);
 
   /**
    * @brief Creates the VertexData for an irregular Polygon in the XoZ plane
@@ -406,10 +421,11 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the Polygon
    */
-  static unique_ptr_t<VertexData>
+  static std::unique_ptr<VertexData>
   CreatePolygon(Mesh* polygon, unsigned int sideOrientation,
-                const vector_t<Vector4>& fUV, const vector_t<Color4>& fColors,
-                Vector4& frontUVs, Vector4& backUVs);
+                const std::vector<Vector4>& fUV,
+                const std::vector<Color4>& fColors, Vector4& frontUVs,
+                Vector4& backUVs);
 
   /**
    * @brief Creates the VertexData of the IcoSphere.
@@ -432,7 +448,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the IcoSphere
    */
-  static unique_ptr_t<VertexData> CreateIcoSphere(IcoSphereOptions& options);
+  static std::unique_ptr<VertexData> CreateIcoSphere(IcoSphereOptions& options);
 
   // inspired from // http://stemkoski.github.io/Three.js/Polyhedra.html
   /**
@@ -471,7 +487,8 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the Polyhedron
    */
-  static unique_ptr_t<VertexData> CreatePolyhedron(PolyhedronOptions& options);
+  static std::unique_ptr<VertexData>
+  CreatePolyhedron(PolyhedronOptions& options);
 
   // based on
   // http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473
@@ -497,7 +514,7 @@ public:
    * optional, default vector4 (0, 0, 1, 1)
    * @returns the VertexData of the Torus Knot
    */
-  static unique_ptr_t<VertexData> CreateTorusKnot(TorusKnotOptions& options);
+  static std::unique_ptr<VertexData> CreateTorusKnot(TorusKnotOptions& options);
 
   /** Tools **/
 
@@ -531,7 +548,8 @@ public:
    */
   static void ComputeNormals(const Float32Array& positions,
                              const Uint32Array& indices, Float32Array& normals,
-                             nullable_t<FacetParameters> options = nullopt_t);
+                             std::optional<FacetParameters> options
+                             = std::nullopt);
 
   /**
    * @brief Applies VertexData created from the imported parameters to the
@@ -556,7 +574,7 @@ private:
   Float32Array _mergeElement(const Float32Array& source,
                              const Float32Array& other) const;
   void _validate();
-  static unique_ptr_t<VertexData>
+  static std::unique_ptr<VertexData>
   _ExtractFrom(IGetSetVerticesData* meshOrGeometry, bool copyWhenShared = false,
                bool forceCopy = false);
 

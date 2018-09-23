@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-TorusKnotGeometry::TorusKnotGeometry(const string_t& _id, Scene* scene,
+TorusKnotGeometry::TorusKnotGeometry(const std::string& _id, Scene* scene,
                                      float _radius, float _tube,
                                      unsigned int _radialSegments,
                                      unsigned int _tubularSegments, float _p,
@@ -28,7 +28,7 @@ TorusKnotGeometry::~TorusKnotGeometry()
 {
 }
 
-unique_ptr_t<VertexData> TorusKnotGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> TorusKnotGeometry::_regenerateVertexData()
 {
   TorusKnotOptions options;
   options.radius          = radius;
@@ -42,7 +42,7 @@ unique_ptr_t<VertexData> TorusKnotGeometry::_regenerateVertexData()
   return VertexData::CreateTorusKnot(options);
 }
 
-GeometryPtr TorusKnotGeometry::copy(const string_t& _id)
+GeometryPtr TorusKnotGeometry::copy(const std::string& _id)
 {
   return TorusKnotGeometry::New(_id, getScene(), radius, tube, radialSegments,
                                 tubularSegments, p, q, canBeRegenerated(),

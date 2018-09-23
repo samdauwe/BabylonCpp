@@ -6,8 +6,8 @@
 
 namespace BABYLON {
 
-vector_t<Vector2> Polygon::Rectangle(float xmin, float ymin, float xmax,
-                                     float ymax)
+std::vector<Vector2> Polygon::Rectangle(float xmin, float ymin, float xmax,
+                                        float ymax)
 {
   return {
     Vector2(xmin, ymin), //
@@ -17,10 +17,10 @@ vector_t<Vector2> Polygon::Rectangle(float xmin, float ymin, float xmax,
   };
 }
 
-vector_t<Vector2> Polygon::Circle(float radius, float cx, float cy,
-                                  size_t numberOfSides)
+std::vector<Vector2> Polygon::Circle(float radius, float cx, float cy,
+                                     size_t numberOfSides)
 {
-  vector_t<Vector2> result;
+  std::vector<Vector2> result;
 
   float angle     = 0.f;
   float increment = Math::PI2 / static_cast<float>(numberOfSides);
@@ -34,14 +34,14 @@ vector_t<Vector2> Polygon::Circle(float radius, float cx, float cy,
   return result;
 }
 
-vector_t<Vector2> Polygon::Parse(const string_t& input)
+std::vector<Vector2> Polygon::Parse(const std::string& input)
 {
-  vector_t<Vector2> result;
-  string_t inputCpy = input;
+  std::vector<Vector2> result;
+  std::string inputCpy = input;
   String::replaceInPlace(inputCpy, "\\", "");
   String::replaceInPlace(inputCpy, "  ", " ");
-  vector_t<string_t> floats = String::split(inputCpy, ' ');
-  size_t floatsSize         = floats.size() - (floats.size() % 2);
+  std::vector<std::string> floats = String::split(inputCpy, ' ');
+  size_t floatsSize               = floats.size() - (floats.size() % 2);
   result.reserve(floatsSize / 2);
   for (size_t i = 0; i < floatsSize; i += 2) {
     result.emplace_back(

@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-GroundMesh::GroundMesh(const string_t& iName, Scene* scene)
+GroundMesh::GroundMesh(const std::string& iName, Scene* scene)
     : Mesh{iName, scene}
     , generateOctree{false}
     , subdivisions{this, &GroundMesh::get_subdivisions}
@@ -23,7 +23,7 @@ GroundMesh::~GroundMesh()
 {
 }
 
-const string_t GroundMesh::getClassName() const
+const std::string GroundMesh::getClassName() const
 {
   return "GroundMesh";
 }

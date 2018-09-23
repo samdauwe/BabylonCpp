@@ -1,15 +1,28 @@
 #ifndef BABYLON_PHYSICS_PHYSICS_IMPOSTER_H
 #define BABYLON_PHYSICS_PHYSICS_IMPOSTER_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 #include <babylon/physics/physics_impostor_parameters.h>
 
 namespace BABYLON {
 
+class AbstractMesh;
+class Bone;
+struct IPhysicsBody;
+struct IPhysicsEnabledObject;
+class Mesh;
+class PhysicsEngine;
+class PhysicsImpostor;
+class PhysicsJoint;
+struct PhysicsJointData;
+class Scene;
+
 struct Joint {
-  shared_ptr_t<PhysicsJoint> joint;
+  std::shared_ptr<PhysicsJoint> joint;
   PhysicsImpostor* otherImpostor;
 }; // end of class JointElement
 
@@ -79,12 +92,12 @@ public:
   /**
    * @brief Get a specific parametes from the options parameter.
    */
-  float getParam(const string_t& paramName) const;
+  float getParam(const std::string& paramName) const;
 
   /**
    * @brief Sets a specific parameter in the options given to the physics plugin
    */
-  void setParam(const string_t& paramName, float value);
+  void setParam(const std::string& paramName, float value);
 
   /**
    * @brief Specifically change the body's mass option. Won't recreate the
@@ -112,26 +125,26 @@ public:
    * physics body object.
    */
   void executeNativeFunction(
-    const ::std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
+    const std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func);
 
   /**
    * @brief Register a function that will be executed before the physics world
    * is stepping forward.
    */
   void registerBeforePhysicsStep(
-    const ::std::function<void(PhysicsImpostor* impostor)>& func);
+    const std::function<void(PhysicsImpostor* impostor)>& func);
 
   void unregisterBeforePhysicsStep(
-    const ::std::function<void(PhysicsImpostor* impostor)>& func);
+    const std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
    * @brief Register a function that will be executed after the physics step
    */
   void registerAfterPhysicsStep(
-    const ::std::function<void(PhysicsImpostor* impostor)>& func);
+    const std::function<void(PhysicsImpostor* impostor)>& func);
 
   void unregisterAfterPhysicsStep(
-    const ::std::function<void(PhysicsImpostor* impostor)>& func);
+    const std::function<void(PhysicsImpostor* impostor)>& func);
 
   /**
    * @brief Register a function that will be executed when this impostor
@@ -181,7 +194,7 @@ public:
    * @brief Add a joint to this impostor with a different impostor.
    */
   PhysicsImpostor& addJoint(PhysicsImpostor* otherImpostor,
-                            const shared_ptr_t<PhysicsJoint>& joint);
+                            const std::shared_ptr<PhysicsJoint>& joint);
 
   /**
    * @brief Will keep this body still, in a sleep mode.
@@ -193,7 +206,7 @@ public:
    */
   PhysicsImpostor& wakeUp();
 
-  unique_ptr_t<PhysicsImpostor> clone(IPhysicsEnabledObject* newObject);
+  std::unique_ptr<PhysicsImpostor> clone(IPhysicsEnabledObject* newObject);
   void dispose();
   void setDeltaPosition(const Vector3& position);
   void setDeltaRotation(const Quaternion& rotation);
@@ -210,9 +223,9 @@ public:
    * of the bone.
    */
   void syncBoneWithImpostor(Bone* bone, AbstractMesh* boneMesh,
-                            const nullable_t<Vector3>& jointPivot,
-                            nullable_t<float> distToJoint,
-                            const nullable_t<Quaternion>& adjustRotation);
+                            const std::optional<Vector3>& jointPivot,
+                            std::optional<float> distToJoint,
+                            const std::optional<Quaternion>& adjustRotation);
 
   /**
    * @brief Sync impostor to a bone.
@@ -225,13 +238,13 @@ public:
    * @param boneAxis Optional vector3 axis the bone is aligned with
    */
   void syncImpostorWithBone(Bone* bone, AbstractMesh* boneMesh,
-                            const nullable_t<Vector3>& jointPivot,
-                            nullable_t<float> distToJoint,
-                            const nullable_t<Quaternion>& adjustRotation,
-                            nullable_t<Vector3>& boneAxis);
+                            const std::optional<Vector3>& jointPivot,
+                            std::optional<float> distToJoint,
+                            const std::optional<Quaternion>& adjustRotation,
+                            std::optional<Vector3>& boneAxis);
 
 private:
-  static array_t<Vector3, 3> _tmpVecs;
+  static std::array<Vector3, 3> _tmpVecs;
   static Quaternion _tmpQuat;
 
 private:
@@ -262,17 +275,17 @@ private:
   // The native cannon/oimo/energy physics body object.
   IPhysicsBody* _physicsBody;
   bool _bodyUpdateRequired;
-  vector_t<::std::function<void(PhysicsImpostor* impostor)>>
+  std::vector<std::function<void(PhysicsImpostor* impostor)>>
     _onBeforePhysicsStepCallbacks;
-  vector_t<::std::function<void(PhysicsImpostor* imposter)>>
+  std::vector<std::function<void(PhysicsImpostor* imposter)>>
     _onAfterPhysicsStepCallbacks;
   Vector3 _deltaPosition;
-  unique_ptr_t<Quaternion> _deltaRotation;
-  unique_ptr_t<Quaternion> _deltaRotationConjugated;
+  std::unique_ptr<Quaternion> _deltaRotation;
+  std::unique_ptr<Quaternion> _deltaRotationConjugated;
   // If set, this is this impostor's parent
   PhysicsImpostor* _parent;
   bool _isDisposed;
-  vector_t<Joint> _joints;
+  std::vector<Joint> _joints;
   Vector3 _tmpPositionWithDelta;
   Quaternion _tmpRotationWithDelta;
 

@@ -6,7 +6,8 @@
 
 namespace BABYLON {
 
-ViveController::ViveController(const shared_ptr_t<IBrowserGamepad>& vrGamepad)
+ViveController::ViveController(
+  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
     , onLeftButtonStateChangedObservable{this,
                                          &ViveController::
@@ -27,15 +28,15 @@ ViveController::~ViveController()
 }
 
 void ViveController::initControllerMesh(
-  Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
+  Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   SceneLoader::ImportMesh(
     {}, ViveController::MODEL_BASE_URL, ViveController::MODEL_FILENAME, scene,
     [this,
-     &meshLoaded](const vector_t<AbstractMeshPtr>& newMeshes,
-                  const vector_t<IParticleSystemPtr>& /*particleSystems*/,
-                  const vector_t<SkeletonPtr>& /*skeletons*/,
-                  const vector_t<AnimationGroupPtr>& /*animationGroups*/) {
+     &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
+                  const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+                  const std::vector<SkeletonPtr>& /*skeletons*/,
+                  const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
       /*
       Parent Mesh name: ViveWand
       - body
@@ -79,14 +80,14 @@ void ViveController::_handleButtonChange(
 {
   auto notifyObject = state; //{ state: state, changes: changes };
   auto defaultModelChildren
-    = ::std::static_pointer_cast<Node>(_defaultModel)->getChildren();
+    = std::static_pointer_cast<Node>(_defaultModel)->getChildren();
   switch (buttonIdx) {
     case 0:
       onPadStateChangedObservable.notifyObservers(&notifyObject);
       return;
     case 1: // index trigger
       if (_defaultModel) {
-        (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[6]))
+        (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[6]))
           ->rotation()
           .x
           = -notifyObject.value() * 0.15f;
@@ -99,13 +100,13 @@ void ViveController::_handleButtonChange(
     case 3:
       if (_defaultModel) {
         if (notifyObject.pressed()) {
-          (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
+          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
             ->position()
             .y
             = -0.001f;
         }
         else {
-          (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
+          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
             ->position()
             .y
             = 0.f;

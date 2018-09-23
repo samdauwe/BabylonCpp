@@ -5,11 +5,11 @@
 
 namespace BABYLON {
 
-RibbonGeometry::RibbonGeometry(const string_t& _id, Scene* scene,
-                               const vector_t<vector_t<Vector3>>& _pathArray,
-                               bool _closeArray, bool _closePath, int _offset,
-                               bool canBeRegenerated, Mesh* mesh,
-                               unsigned int _side)
+RibbonGeometry::RibbonGeometry(
+  const std::string& _id, Scene* scene,
+  const std::vector<std::vector<Vector3>>& _pathArray, bool _closeArray,
+  bool _closePath, int _offset, bool canBeRegenerated, Mesh* mesh,
+  unsigned int _side)
     : _PrimitiveGeometry{_id, scene, canBeRegenerated, mesh}
     , pathArray{_pathArray}
     , closeArray{_closeArray}
@@ -23,7 +23,7 @@ RibbonGeometry::~RibbonGeometry()
 {
 }
 
-unique_ptr_t<VertexData> RibbonGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> RibbonGeometry::_regenerateVertexData()
 {
   RibbonOptions options(pathArray, offset);
   options.closeArray      = closeArray;
@@ -33,7 +33,7 @@ unique_ptr_t<VertexData> RibbonGeometry::_regenerateVertexData()
   return VertexData::CreateRibbon(options);
 }
 
-GeometryPtr RibbonGeometry::copy(const string_t& _id)
+GeometryPtr RibbonGeometry::copy(const std::string& _id)
 {
   return RibbonGeometry::New(_id, getScene(), pathArray, closeArray, closePath,
                              offset, canBeRegenerated(), nullptr, side);

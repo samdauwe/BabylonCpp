@@ -177,9 +177,9 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // params: (scene, target, fromFrame, toFrame, loopAnimation, speedRatio,
   // onAnimationEnd, animations)
   auto aa1 = Animatable::New(scene, box1, 1000, 1120, 1, 1.f, nullptr,
-                             vector_t<AnimationPtr>{a1});
+                             std::vector<AnimationPtr>{a1});
   auto aa2 = Animatable::New(scene, box2, 1000, 1120, 1, 1.f, nullptr,
-                             vector_t<AnimationPtr>{a2});
+                             std::vector<AnimationPtr>{a2});
   // Start the animatables
   aa1->_animate(millisecond_t(1));
   aa2->_animate(millisecond_t(1));

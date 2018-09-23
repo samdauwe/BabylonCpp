@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-BoxGeometry::BoxGeometry(const string_t& _id, Scene* scene, float _size,
+BoxGeometry::BoxGeometry(const std::string& _id, Scene* scene, float _size,
                          bool canBeRegenerated, Mesh* mesh, unsigned int _side)
     : _PrimitiveGeometry{_id, scene, canBeRegenerated, mesh}
     , size{_size}
@@ -19,7 +19,7 @@ BoxGeometry::~BoxGeometry()
 {
 }
 
-unique_ptr_t<VertexData> BoxGeometry::_regenerateVertexData()
+std::unique_ptr<VertexData> BoxGeometry::_regenerateVertexData()
 {
   BoxOptions options(size);
   options.sideOrientation = side;
@@ -27,7 +27,7 @@ unique_ptr_t<VertexData> BoxGeometry::_regenerateVertexData()
   return VertexData::CreateBox(options);
 }
 
-GeometryPtr BoxGeometry::copy(const string_t& _id)
+GeometryPtr BoxGeometry::copy(const std::string& _id)
 {
   return BoxGeometry::New(_id, getScene(), size, canBeRegenerated(), nullptr,
                           side);

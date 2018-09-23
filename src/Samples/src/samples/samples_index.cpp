@@ -56,7 +56,7 @@ SamplesIndex::~SamplesIndex()
 {
 }
 
-bool SamplesIndex::isSampleEnabled(const string_t& sampleName)
+bool SamplesIndex::isSampleEnabled(const std::string& sampleName)
 {
   for (const auto& item : _samplesIndex) {
     if (stl_util::contains(item.second.samples(), sampleName)) {
@@ -67,7 +67,7 @@ bool SamplesIndex::isSampleEnabled(const string_t& sampleName)
   return false;
 }
 
-bool SamplesIndex::sampleExists(const string_t& sampleName)
+bool SamplesIndex::sampleExists(const std::string& sampleName)
 {
   for (const auto& item : _samplesIndex) {
     if (stl_util::contains(item.second.samples(), sampleName)) {
@@ -78,10 +78,10 @@ bool SamplesIndex::sampleExists(const string_t& sampleName)
   return false;
 }
 
-std::vector<string_t> SamplesIndex::getSampleNames() const
+std::vector<std::string> SamplesIndex::getSampleNames() const
 {
   // Extract the enabled sample names from the map
-  std::vector<string_t> sampleNames;
+  std::vector<std::string> sampleNames;
   for (const auto& samplesCategory : _samplesIndex) {
     for (const auto& element : samplesCategory.second.samples()) {
       // Check if enabled
@@ -97,7 +97,7 @@ std::vector<string_t> SamplesIndex::getSampleNames() const
   return sampleNames;
 }
 
-::std::vector<string_t> SamplesIndex::getCategoryNames() const
+::std::vector<std::string> SamplesIndex::getCategoryNames() const
 {
   // Extract the category names
   auto categoryNames = stl_util::extract_keys(_samplesIndex);
@@ -108,7 +108,7 @@ std::vector<string_t> SamplesIndex::getSampleNames() const
   return categoryNames;
 }
 
-bool SamplesIndex::categoryExists(const string_t& categoryNameToSearch)
+bool SamplesIndex::categoryExists(const std::string& categoryNameToSearch)
 {
   bool _categoryExists = false;
 
@@ -126,11 +126,11 @@ bool SamplesIndex::categoryExists(const string_t& categoryNameToSearch)
   return _categoryExists;
 }
 
-::std::vector<string_t>
-SamplesIndex::getSampleNamesInCategory(const string_t& categoryName) const
+::std::vector<std::string>
+SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
 {
   // Extract the enabled sample names for the given category from the map
-  std::vector<string_t> sampleNames;
+  std::vector<std::string> sampleNames;
   if (stl_util::contains(_samplesIndex, categoryName)) {
     const auto& samplesCategory = _samplesIndex.at(categoryName);
     for (const auto& element : samplesCategory.samples()) {
@@ -148,7 +148,7 @@ SamplesIndex::getSampleNamesInCategory(const string_t& categoryName) const
 }
 
 std::unique_ptr<IRenderableScene>
-SamplesIndex::createRenderableScene(const string_t& sampleName,
+SamplesIndex::createRenderableScene(const std::string& sampleName,
                                     ICanvas* iCanvas) const
 {
   for (const auto& item : _samplesIndex) {

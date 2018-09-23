@@ -4,6 +4,7 @@
 #include <future>
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/delegates/delegate.h>
 #include <babylon/core/structs.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine_capabilities.h>
@@ -21,6 +22,39 @@
 
 namespace BABYLON {
 
+class _AlphaState;
+class _DepthCullingState;
+class _StencilState;
+struct _TimeToken;
+class AudioEngine;
+class BaseTexture;
+class Camera;
+class Color3;
+class Color4;
+struct DepthTextureCreationOptions;
+struct DummyInternalTextureTracker;
+class Effect;
+struct EffectCreationOptions;
+class EffectFallbacks;
+class ICanvasRenderingContext2D;
+struct IInternalTextureTracker;
+class ILoadingScreen;
+struct InstancingAttributeInfo;
+struct IMultiRenderTargetOptions;
+class InternalTexture;
+struct IRenderTargetOptions;
+class Material;
+class PassPostProcess;
+class PostProcess;
+using RenderTargetCreationOptions = IRenderTargetOptions;
+class RenderTargetTexture;
+class Scene;
+class Texture;
+class UniformBuffer;
+class VertexBuffer;
+using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+
 /**
  * @brief The engine class is responsible for interfacing with all lower-level
  * APIs such as WebGL and Audio.
@@ -28,22 +62,22 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT Engine {
 
 public:
-  using ArrayBufferViewArray   = vector_t<ArrayBufferView>;
-  using GLBufferPtr            = unique_ptr_t<GL::IGLBuffer>;
-  using GLFrameBufferPtr       = unique_ptr_t<GL::IGLFramebuffer>;
-  using GLProgramPtr           = unique_ptr_t<GL::IGLProgram>;
-  using GLQueryPtr             = unique_ptr_t<GL::IGLQuery>;
-  using GLRenderBufferPtr      = unique_ptr_t<GL::IGLRenderbuffer>;
-  using GLShaderPtr            = unique_ptr_t<GL::IGLShader>;
-  using GLTexturePtr           = unique_ptr_t<GL::IGLTexture>;
-  using GLTransformFeedbackPtr = unique_ptr_t<GL::IGLTransformFeedback>;
-  using GLUniformLocationPtr   = unique_ptr_t<GL::IGLUniformLocation>;
-  using GLVertexArrayObjectPtr = unique_ptr_t<GL::IGLVertexArrayObject>;
+  using ArrayBufferViewArray   = std::vector<ArrayBufferView>;
+  using GLBufferPtr            = std::unique_ptr<GL::IGLBuffer>;
+  using GLFrameBufferPtr       = std::unique_ptr<GL::IGLFramebuffer>;
+  using GLProgramPtr           = std::unique_ptr<GL::IGLProgram>;
+  using GLQueryPtr             = std::unique_ptr<GL::IGLQuery>;
+  using GLRenderBufferPtr      = std::unique_ptr<GL::IGLRenderbuffer>;
+  using GLShaderPtr            = std::unique_ptr<GL::IGLShader>;
+  using GLTexturePtr           = std::unique_ptr<GL::IGLTexture>;
+  using GLTransformFeedbackPtr = std::unique_ptr<GL::IGLTransformFeedback>;
+  using GLUniformLocationPtr   = std::unique_ptr<GL::IGLUniformLocation>;
+  using GLVertexArrayObjectPtr = std::unique_ptr<GL::IGLVertexArrayObject>;
 
   friend class BaseTexture;
 
 public:
-  static string_t Version();
+  static std::string Version();
 
   // Updatable statics so stick with vars here
 
@@ -56,26 +90,26 @@ public:
    * Gets or sets the relative url used to load code if using the engine in
    * non-minified mode
    */
-  static string_t CodeRepository;
+  static std::string CodeRepository;
 
   /**
    * Gets or sets the relative url used to load shaders if using the engine in
    * non-minified mode
    */
-  static string_t ShadersRepository;
+  static std::string ShadersRepository;
 
   // Engine instances
 
   /**
    * Gets the list of created engines
    */
-  static vector_t<Engine*> Instances;
+  static std::vector<Engine*> Instances;
 
 public:
   template <typename... Ts>
-  static unique_ptr_t<Engine> New(Ts&&... args)
+  static std::unique_ptr<Engine> New(Ts&&... args)
   {
-    unique_ptr_t<Engine> engine(new Engine(::std::forward<Ts>(args)...));
+    std::unique_ptr<Engine> engine(new Engine(std::forward<Ts>(args)...));
     return engine;
   }
   virtual ~Engine();
@@ -83,12 +117,12 @@ public:
   /**
    * @brief Gets the list of texture formats supported.
    */
-  vector_t<string_t>& texturesSupported();
+  std::vector<std::string>& texturesSupported();
 
   /**
    * @brief Gets the list of texture formats in use.
    */
-  string_t textureFormatInUse() const;
+  std::string textureFormatInUse() const;
 
   /**
    * @brief Gets the current viewport.
@@ -236,7 +270,7 @@ public:
    * webGL context.
    * @returns a client rectanglee
    */
-  nullable_t<ClientRect> getRenderingCanvasClientRect();
+  std::optional<ClientRect> getRenderingCanvasClientRect();
 
   /**
    * @brief Defines the hardware scaling level.
@@ -262,7 +296,7 @@ public:
    * @brief Gets the list of loaded textures.
    * @returns an array containing all loaded textures
    */
-  vector_t<unique_ptr_t<InternalTexture>>& getLoadedTexturesCache();
+  std::vector<std::unique_ptr<InternalTexture>>& getLoadedTexturesCache();
 
   /**
    * @brief Gets the object containing all engine capabilities.
@@ -278,7 +312,7 @@ public:
   /**
    * @brief Hidden
    */
-  nullable_t<PerfCounter> drawCallsPerfCounter();
+  std::optional<PerfCounter> drawCallsPerfCounter();
 
   /** Methods **/
 
@@ -446,7 +480,7 @@ public:
    * @param renderFunction defines the function to be removed. If not provided
    * all functions will be removed.
    */
-  void stopRenderLoop(const delegate_t<void()>& renderFunction);
+  void stopRenderLoop(const SA::delegate<void()>& renderFunction);
 
   /**
    * @brief Hidden
@@ -458,8 +492,8 @@ public:
    * one render function.
    * @param renderFunction defines the function to continuously execute
    */
-  void runRenderLoop(const ::std::function<void()>& renderFunction);
-  void renderFunction(const ::std::function<void()>& renderFunction);
+  void runRenderLoop(const std::function<void()>& renderFunction);
+  void renderFunction(const std::function<void()>& renderFunction);
 
   /**
    * @brief Toggle full screen mode.
@@ -565,12 +599,13 @@ public:
    * @param lodLevel defines le lod level to bind to the frame buffer
    */
   void bindFramebuffer(InternalTexture* texture,
-                       nullable_t<unsigned int> faceIndex       = nullopt_t,
-                       nullable_t<int> requiredWidth            = nullopt_t,
-                       nullable_t<int> requiredHeight           = nullopt_t,
-                       nullable_t<bool> forceFullscreenViewport = nullopt_t,
-                       InternalTexture* depthStencilTexture     = nullptr,
-                       int lodLevel                             = 0);
+                       std::optional<unsigned int> faceIndex = std::nullopt,
+                       std::optional<int> requiredWidth      = std::nullopt,
+                       std::optional<int> requiredHeight     = std::nullopt,
+                       std::optional<bool> forceFullscreenViewport
+                       = std::nullopt,
+                       InternalTexture* depthStencilTexture = nullptr,
+                       int lodLevel                         = 0);
 
   /**
    * @brief Unbind the current render target texture from the webGL context.
@@ -581,9 +616,8 @@ public:
    * effective unbind
    */
   void unBindFramebuffer(InternalTexture* texture,
-                         bool disableGenerateMipMaps = false,
-                         const ::std::function<void()>& onBeforeUnbind
-                         = nullptr);
+                         bool disableGenerateMipMaps                 = false,
+                         const std::function<void()>& onBeforeUnbind = nullptr);
 
   /**
    * @brief Unbind a list of render target textures from the webGL context.
@@ -595,9 +629,9 @@ public:
    * effective unbind
    */
   void unBindMultiColorAttachmentFramebuffer(
-    const vector_t<InternalTexture*>& textures,
-    bool disableGenerateMipMaps                   = false,
-    const ::std::function<void()>& onBeforeUnbind = nullptr);
+    const std::vector<InternalTexture*>& textures,
+    bool disableGenerateMipMaps                 = false,
+    const std::function<void()>& onBeforeUnbind = nullptr);
 
   /**
    * @brief Force the mipmap generation for the given render target texture.
@@ -717,8 +751,8 @@ public:
    * @param blockName defines the block name
    * @param index defines the index where to bind the block
    */
-  void bindUniformBlock(GL::IGLProgram* shaderProgram, const string_t blockName,
-                        unsigned int index);
+  void bindUniformBlock(GL::IGLProgram* shaderProgram,
+                        const std::string blockName, unsigned int index);
 
   /**
    * @brief Update the bound buffer with the given data.
@@ -735,7 +769,7 @@ public:
    * @returns the new vertex array object
    */
   GLVertexArrayObjectPtr recordVertexArrayObject(
-    const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers,
+    const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
     GL::IGLBuffer* indexBuffer, Effect* effect);
 
   /**
@@ -767,9 +801,9 @@ public:
    * @param indexBuffer defines the index buffer to bind
    * @param effect defines the effect associated with the vertex buffers
    */
-  void
-  bindBuffers(const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers,
-              GL::IGLBuffer* indexBuffer, Effect* effect);
+  void bindBuffers(
+    const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+    GL::IGLBuffer* indexBuffer, Effect* effect);
 
   /**
    * @brief Unbind all instance attributes.
@@ -822,7 +856,7 @@ public:
    */
   void updateAndBindInstancesBuffer(
     GL::IGLBuffer* instancesBuffer, const Float32Array& data,
-    const vector_t<InstancingAttributeInfo>& offsetLocations);
+    const std::vector<InstancingAttributeInfo>& offsetLocations);
 
   /**
    * @brief Apply all cached states (depth, culling, stencil and alpha).
@@ -918,9 +952,9 @@ public:
    * to compile shaders (like the maximum number of simultaneous lights)
    * @returns the new Effect
    */
-  Effect* createEffect(const string_t& baseName, EffectCreationOptions& options,
-                       Engine* engine,
-                       const ::std::function<void(Effect* effect)>& onCompiled
+  Effect* createEffect(const std::string& baseName,
+                       EffectCreationOptions& options, Engine* engine,
+                       const std::function<void(Effect* effect)>& onCompiled
                        = nullptr);
 
   /**
@@ -944,7 +978,7 @@ public:
    * to compile shaders (like the maximum number of simultaneous lights)
    * @returns the new Effect
    */
-  Effect* createEffect(unordered_map_t<string_t, string_t>& baseName,
+  Effect* createEffect(std::unordered_map<std::string, std::string>& baseName,
                        EffectCreationOptions& options, Engine* engine);
 
   /**
@@ -966,11 +1000,11 @@ public:
    * @returns the new Effect
    */
   Effect* createEffectForParticles(
-    const string_t& fragmentName, vector_t<string_t> uniformsNames,
-    vector_t<string_t> samplers, string_t defines = "",
-    EffectFallbacks* fallbacks                                    = nullptr,
-    const ::std::function<void(const Effect* effect)>& onCompiled = nullptr,
-    const ::std::function<void(const Effect* effect, const string_t& errors)>&
+    const std::string& fragmentName, std::vector<std::string> uniformsNames,
+    std::vector<std::string> samplers, std::string defines = "",
+    EffectFallbacks* fallbacks                                  = nullptr,
+    const std::function<void(const Effect* effect)>& onCompiled = nullptr,
+    const std::function<void(const Effect* effect, const std::string& errors)>&
       onError
     = nullptr);
 
@@ -985,9 +1019,9 @@ public:
    * @returns the new webGL program
    */
   GLProgramPtr createRawShaderProgram(
-    const string_t& vertexCode, const string_t& fragmentCode,
-    GL::IGLRenderingContext* context                    = nullptr,
-    const vector_t<string_t>& transformFeedbackVaryings = {});
+    const std::string& vertexCode, const std::string& fragmentCode,
+    GL::IGLRenderingContext* context                          = nullptr,
+    const std::vector<std::string>& transformFeedbackVaryings = {});
 
   /**
    * @brief Creates a webGL program.
@@ -1001,11 +1035,10 @@ public:
    * varyings to use
    * @returns the new webGL program
    */
-  GLProgramPtr
-  createShaderProgram(const string_t& vertexCode, const string_t& fragmentCode,
-                      const string_t& defines,
-                      GL::IGLRenderingContext* context = nullptr,
-                      const vector_t<string_t>& transformFeedbackVaryings = {});
+  GLProgramPtr createShaderProgram(
+    const std::string& vertexCode, const std::string& fragmentCode,
+    const std::string& defines, GL::IGLRenderingContext* context = nullptr,
+    const std::vector<std::string>& transformFeedbackVaryings = {});
 
   /**
    * @brief Gets the list of webGL uniform locations associated with a specific
@@ -1014,9 +1047,9 @@ public:
    * @param uniformsNames defines the list of uniform names
    * @returns an array of webGL uniform locations
    */
-  unordered_map_t<string_t, GLUniformLocationPtr>
+  std::unordered_map<std::string, GLUniformLocationPtr>
   getUniforms(GL::IGLProgram* shaderProgram,
-              const vector_t<string_t>& uniformsNames);
+              const std::vector<std::string>& uniformsNames);
 
   /**
    * @brief Gets the lsit of active attributes for a given webGL program.
@@ -1025,7 +1058,7 @@ public:
    * @returns an array of indices indicating the offset of each attribute
    */
   Int32Array getAttributes(GL::IGLProgram* shaderProgram,
-                           const vector_t<string_t>& attributesNames);
+                           const std::vector<std::string>& attributesNames);
 
   /**
    * @brief Activates an effect, mkaing it the current one (ie. the one used for
@@ -1357,18 +1390,19 @@ public:
    * Current families are astc, dxt, pvrtc, etc2, & etc1.
    * @returns The extension selected.
    */
-  string_t& setTextureFormatToUse(const vector_t<string_t>& formatsAvailable);
-  unique_ptr_t<GL::IGLTexture> _createTexture();
+  std::string&
+  setTextureFormatToUse(const std::vector<std::string>& formatsAvailable);
+  std::unique_ptr<GL::IGLTexture> _createTexture();
 
   /**
    * @brief Hidden
    */
   InternalTexture* createTexture(
-    const vector_t<string_t>& list, bool noMipmap, bool invertY, Scene* scene,
+    const std::vector<std::string>& list, bool noMipmap, bool invertY,
+    Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
-    = nullptr,
-    const ::std::function<void()>& onError    = nullptr,
+    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
+    const std::function<void()>& onError                             = nullptr,
     const Variant<ArrayBuffer, Image>& buffer = Variant<ArrayBuffer, Image>());
 
   /**
@@ -1399,14 +1433,13 @@ public:
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
   InternalTexture* createTexture(
-    const string_t& urlArg, bool noMipmap, bool invertY, Scene* scene,
+    const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
-    = nullptr,
-    const ::std::function<void()>& onError                = nullptr,
-    const nullable_t<Variant<ArrayBuffer, Image>>& buffer = nullopt_t,
-    InternalTexture* fallBack                             = nullptr,
-    const nullable_t<unsigned int>& format                = nullopt_t);
+    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
+    const std::function<void()>& onError                             = nullptr,
+    const std::optional<Variant<ArrayBuffer, Image>>& buffer = std::nullopt,
+    InternalTexture* fallBack                                = nullptr,
+    const std::optional<unsigned int>& format                = std::nullopt);
 
   /**
    * @brief Update a raw texture.
@@ -1420,7 +1453,7 @@ public:
    */
   void updateRawTexture(InternalTexture* texture, const Uint8Array& data,
                         unsigned int format, bool invertY = true,
-                        const string_t& compression = "",
+                        const std::string& compression = "",
                         unsigned int type
                         = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
@@ -1439,12 +1472,11 @@ public:
    * (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
    * @returns the raw texture inside an InternalTexture
    */
-  InternalTexture*
-  createRawTexture(const Uint8Array& data, int width, int height,
-                   unsigned int format, bool generateMipMaps, bool invertY,
-                   unsigned int samplingMode, const string_t& compression = "",
-                   unsigned int type
-                   = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+  InternalTexture* createRawTexture(
+    const Uint8Array& data, int width, int height, unsigned int format,
+    bool generateMipMaps, bool invertY, unsigned int samplingMode,
+    const std::string& compression = "",
+    unsigned int type              = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
    * @brief hidden
@@ -1510,7 +1542,7 @@ public:
    * @param options The options defining the texture.
    * @returns The texture
    */
-  unique_ptr_t<InternalTexture>
+  std::unique_ptr<InternalTexture>
   createDepthStencilTexture(const Variant<int, ISize>& size,
                             const DepthTextureCreationOptions& options);
 
@@ -1537,7 +1569,7 @@ public:
    * @param options defines the creation options
    * @returns the cube texture as an InternalTexture
    */
-  vector_t<InternalTexture*>
+  std::vector<InternalTexture*>
   createMultipleRenderTarget(ISize size,
                              const IMultiRenderTargetOptions& options);
 
@@ -1561,7 +1593,7 @@ public:
    * targets are not supported)
    */
   unsigned int updateMultipleRenderTargetTextureSampleCount(
-    const vector_t<InternalTexture*>& textures, unsigned int samples);
+    const std::vector<InternalTexture*>& textures, unsigned int samples);
 
   /**
    * @brief Hidden
@@ -1629,11 +1661,10 @@ public:
    * @returns the cube texture as an InternalTexture
    */
   InternalTexture* createPrefilteredCubeTexture(
-    const string_t& rootUrl, Scene* scene, float lodScale, float lodOffset,
-    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
-    = nullptr,
-    const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
-    const string_t& forcedExtension = "", bool createPolynomials = true);
+    const std::string& rootUrl, Scene* scene, float lodScale, float lodOffset,
+    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
+    const std::function<void()>& onError = nullptr, unsigned int format = 0,
+    const std::string& forcedExtension = "", bool createPolynomials = true);
 
   /**
    * @brief Creates a cube texture.
@@ -1660,12 +1691,11 @@ public:
    * @returns the cube texture as an InternalTexture
    */
   InternalTexture* createCubeTexture(
-    const string_t& rootUrl, Scene* scene, const vector_t<string_t>& files,
-    bool noMipmap,
-    const ::std::function<void(InternalTexture*, EventState&)>& onLoad
-    = nullptr,
-    const ::std::function<void()>& onError = nullptr, unsigned int format = 0,
-    const string_t& forcedExtension = "", bool createPolynomials = false,
+    const std::string& rootUrl, Scene* scene,
+    const std::vector<std::string>& files, bool noMipmap,
+    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
+    const std::function<void()>& onError = nullptr, unsigned int format = 0,
+    const std::string& forcedExtension = "", bool createPolynomials = false,
     float lodScale = 0.f, float lodOffset = 0.f,
     InternalTexture* fallback = nullptr);
 
@@ -1681,11 +1711,11 @@ public:
    * @param level defines which level of the texture to update
    */
   void updateRawCubeTexture(InternalTexture* texture,
-                            const vector_t<Uint8Array>& data,
+                            const std::vector<Uint8Array>& data,
                             unsigned int format, unsigned int type,
-                            bool invertY                = true,
-                            const string_t& compression = "",
-                            unsigned int level          = 0);
+                            bool invertY                   = true,
+                            const std::string& compression = "",
+                            unsigned int level             = 0);
 
   /**
    * @brief Creates a new raw cube texture.
@@ -1702,11 +1732,11 @@ public:
    * @param compression defines the compression used (null by default)
    * @returns the cube texture as an InternalTexture
    */
-  InternalTexture* createRawCubeTexture(const vector_t<Uint8Array> data,
+  InternalTexture* createRawCubeTexture(const std::vector<Uint8Array> data,
                                         int size, unsigned int format,
                                         unsigned int type, bool generateMipMaps,
                                         bool invertY, unsigned int samplingMode,
-                                        const string_t& compression = "");
+                                        const std::string& compression = "");
 
   /**
    * @brief Creates a new raw cube texture from a specified url.
@@ -1730,14 +1760,14 @@ public:
    * @returns the cube texture as an InternalTexture
    */
   InternalTexture* createRawCubeTextureFromUrl(
-    const string_t& url, Scene* scene, int size, unsigned int format,
+    const std::string& url, Scene* scene, int size, unsigned int format,
     unsigned int type, bool noMipmap,
-    const ::std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
+    const std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
       callback,
-    const ::std::function<vector_t<ArrayBufferViewArray>(
+    const std::function<std::vector<ArrayBufferViewArray>(
       const ArrayBufferViewArray& faces)>& mipmmapGenerator,
-    const ::std::function<void()>& onLoad  = nullptr,
-    const ::std::function<void()>& onError = nullptr,
+    const std::function<void()>& onLoad  = nullptr,
+    const std::function<void()>& onError = nullptr,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool invertY              = false);
 
@@ -1753,7 +1783,7 @@ public:
    */
   void updateRawTexture3D(InternalTexture* texture, const ArrayBufferView& data,
                           unsigned int format, bool invertY = true,
-                          const string_t& compression = "",
+                          const std::string& compression = "",
                           unsigned int textureType
                           = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
@@ -1775,7 +1805,7 @@ public:
   InternalTexture* createRawTexture3D(
     const ArrayBufferView& data, int width, int height, int depth,
     unsigned int format, bool generateMipMaps, bool invertY,
-    unsigned int samplingMode, const string_t& compression = "",
+    unsigned int samplingMode, const std::string& compression = "",
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   /**
@@ -1846,7 +1876,7 @@ public:
    * @param textures defines the array of textures to bind
    */
   void setTextureArray(int channel, GL::IGLUniformLocation* uniform,
-                       const vector_t<BaseTexturePtr>& textures);
+                       const std::vector<BaseTexturePtr>& textures);
 
   /**
    * @brief Hidden
@@ -1913,13 +1943,13 @@ public:
    * @brief Sets the current loading screen text.
    * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
-  void setLoadingUIText(const string_t& text);
+  void setLoadingUIText(const std::string& text);
 
   /**
    * @brief Sets the current loading screen background color.
    * @see http://doc.babylonjs.com/how_to/creating_a_custom_loading_screen
    */
-  void loadingUIBackgroundColor(const string_t& color);
+  void loadingUIBackgroundColor(const std::string& color);
 
   /**
    * @brief Gets the source code of the vertex shader associated with a specific
@@ -1928,7 +1958,7 @@ public:
    * @returns a string containing the source code of the vertex shader
    * associated with the program
    */
-  string_t getVertexShaderSource(GL::IGLProgram* program);
+  std::string getVertexShaderSource(GL::IGLProgram* program);
 
   /**
    * @brief Gets the source code of the fragment shader associated with a
@@ -1937,7 +1967,7 @@ public:
    * @returns a string containing the source code of the fragment shader
    * associated with the program
    */
-  string_t getFragmentShaderSource(GL::IGLProgram* program);
+  std::string getFragmentShaderSource(GL::IGLProgram* program);
 
   /**
    * @brief Get the current error code of the webGL context.
@@ -1980,8 +2010,8 @@ public:
    */
   GL::GLenum
   _getRGBABufferInternalSizedFormat(unsigned int type,
-                                    const nullable_t<unsigned int>& format
-                                    = nullopt_t) const;
+                                    const std::optional<unsigned int>& format
+                                    = std::nullopt) const;
 
   /**
    * @brief Hidden
@@ -2043,14 +2073,14 @@ public:
    * specific frame). Please note that only one query can be issued at a time
    * @returns a time token used to track the time span
    */
-  nullable_t<_TimeToken> startTimeQuery();
+  std::optional<_TimeToken> startTimeQuery();
 
   /**
    * @brief Ends a time query.
    * @param token defines the token used to measure the time span
    * @returns the time spent (in ns)
    */
-  int endTimeQuery(nullable_t<_TimeToken>& token);
+  int endTimeQuery(std::optional<_TimeToken>& token);
 
   /** Transform feedback **/
 
@@ -2091,7 +2121,7 @@ public:
    * @param value defines the list of strings representing the varying names
    */
   void setTranformFeedbackVaryings(GL::IGLProgram* program,
-                                   const vector_t<string_t>& value);
+                                   const std::vector<std::string>& value);
 
   /**
    * @brief Bind a webGL buffer for a transform feedback operation.
@@ -2103,14 +2133,14 @@ public:
    * @brief Hidden
    */
   IFileRequest _loadFile(
-    const string_t& url,
-    const ::std::function<void(Variant<string_t, ArrayBuffer>& data,
-                               const string_t& responseURL)>& onSuccess);
+    const std::string& url,
+    const std::function<void(Variant<std::string, ArrayBuffer>& data,
+                             const std::string& responseURL)>& onSuccess);
 
   /**
    * @brief Hidden
    */
-  std::promise<string_t> _loadFileAsync(const string_t& url);
+  std::promise<std::string> _loadFileAsync(const std::string& url);
 
   /** Statics **/
 
@@ -2133,7 +2163,7 @@ public:
    */
   static void
   MarkAllMaterialsAsDirty(unsigned int flag,
-                          const ::std::function<bool(Material* mat)>& predicate
+                          const std::function<bool(Material* mat)>& predicate
                           = nullptr);
 
   /**
@@ -2144,12 +2174,13 @@ public:
   static bool isSupported();
 
   static GLShaderPtr CompileShader(GL::IGLRenderingContext* gl,
-                                   const string_t& source, const string_t& type,
-                                   const string_t& defines,
-                                   const string_t& shaderVersion);
+                                   const std::string& source,
+                                   const std::string& type,
+                                   const std::string& defines,
+                                   const std::string& shaderVersion);
   static GLShaderPtr CompileRawShader(GL::IGLRenderingContext* gl,
-                                      const string_t& source,
-                                      const string_t& type);
+                                      const std::string& source,
+                                      const std::string& type);
   static SamplingParameters GetSamplingParameters(unsigned int samplingMode,
                                                   bool generateMipMaps);
 
@@ -2199,7 +2230,7 @@ private:
                             int offset);
   void _bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer);
   void _bindVertexBuffersAttributes(
-    const unordered_map_t<string_t, VertexBuffer*>& vertexBuffers,
+    const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
     Effect* effect);
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
@@ -2212,7 +2243,7 @@ private:
   void _activateCurrentTexture();
   void _rescaleTexture(InternalTexture* source, InternalTexture* destination,
                        Scene* scene, unsigned int internalFormat,
-                       const ::std::function<void()>& onComplete);
+                       const std::function<void()>& onComplete);
   void _setupDepthStencilTexture(InternalTexture* internalTexture,
                                  const Variant<int, ISize>& size,
                                  bool generateStencil, bool bilinearFiltering,
@@ -2226,7 +2257,7 @@ private:
    * @param options The options defining the texture.
    * @returns The texture
    */
-  unique_ptr_t<InternalTexture>
+  std::unique_ptr<InternalTexture>
   _createDepthStencilTexture(const Variant<int, ISize>& size,
                              const DepthTextureCreationOptions& options);
 
@@ -2237,16 +2268,16 @@ private:
    * @param options The options defining the cube texture.
    * @returns The cube texture
    */
-  unique_ptr_t<InternalTexture>
+  std::unique_ptr<InternalTexture>
   _createDepthStencilCubeTexture(int size,
                                  const DepthTextureCreationOptions& options);
 
   unsigned int _drawMode(unsigned int fillMode);
   GLProgramPtr
-  _createShaderProgram(const unique_ptr_t<GL::IGLShader>& vertexShader,
-                       const unique_ptr_t<GL::IGLShader>& fragmentShader,
+  _createShaderProgram(const std::unique_ptr<GL::IGLShader>& vertexShader,
+                       const std::unique_ptr<GL::IGLShader>& fragmentShader,
                        GL::IGLRenderingContext* context,
-                       const vector_t<string_t>& transformFeedbackVaryings
+                       const std::vector<std::string>& transformFeedbackVaryings
                        = {});
   void setCubeMapTextureParams(GL::IGLRenderingContext* gl, bool loadMipmap);
   GLRenderBufferPtr
@@ -2258,10 +2289,10 @@ private:
                                         unsigned int samplingMode);
   void _prepareWebGLTexture(
     InternalTexture* texture, Scene* scene, int width, int height,
-    nullable_t<bool> invertY, bool noMipmap, bool isCompressed,
-    const ::std::function<bool(
-      int width, int height,
-      const ::std::function<void()>& continuationCallback)>& processFunction,
+    std::optional<bool> invertY, bool noMipmap, bool isCompressed,
+    const std::function<
+      bool(int width, int height,
+           const std::function<void()>& continuationCallback)>& processFunction,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
   ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData,
                                                int width, int height,
@@ -2333,12 +2364,12 @@ public:
   /**
    * Gets the list of created scenes
    */
-  vector_t<Scene*> scenes;
+  std::vector<Scene*> scenes;
 
   /**
    * Gets the list of created postprocesses
    */
-  vector_t<PostProcess*> postProcesses;
+  std::vector<PostProcess*> postProcesses;
 
   // Observables
 
@@ -2428,7 +2459,7 @@ public:
   /**
    * Hidden
    */
-  vector_t<UniformBuffer*> _uniformBuffers;
+  std::vector<UniformBuffer*> _uniformBuffers;
 
   /**
    * Gets the audio engine
@@ -2480,17 +2511,17 @@ protected:
   /**
    * Hidden
    */
-  unique_ptr_t<_DepthCullingState> _depthCullingState;
+  std::unique_ptr<_DepthCullingState> _depthCullingState;
 
   /**
    * Hidden
    */
-  unique_ptr_t<_StencilState> _stencilState;
+  std::unique_ptr<_StencilState> _stencilState;
 
   /**
    * Hidden
    */
-  unique_ptr_t<_AlphaState> _alphaState;
+  std::unique_ptr<_AlphaState> _alphaState;
 
   /**
    * Hidden
@@ -2498,7 +2529,7 @@ protected:
   unsigned int _alphaMode;
 
   // Cache
-  vector_t<unique_ptr_t<InternalTexture>> _internalTexturesCache;
+  std::vector<std::unique_ptr<InternalTexture>> _internalTexturesCache;
 
   /**
    * Hidden
@@ -2508,7 +2539,7 @@ protected:
   /**
    * Hidden
    */
-  unordered_map_t<int, InternalTexture*> _boundTexturesCache;
+  std::unordered_map<int, InternalTexture*> _boundTexturesCache;
 
   /**
    * Hidden
@@ -2528,7 +2559,7 @@ protected:
   /**
    * Hidden
    */
-  unordered_map_t<string_t, VertexBuffer*> _cachedVertexBuffersMap;
+  std::unordered_map<std::string, VertexBuffer*> _cachedVertexBuffersMap;
 
   /**
    * Hidden
@@ -2565,15 +2596,15 @@ private:
   float _webGLVersion;
 
   // Focus
-  ::std::function<void()> _onFocus;
-  ::std::function<void()> _onBlur;
-  ::std::function<void()> _onCanvasPointerOut;
-  ::std::function<void()> _onCanvasBlur;
+  std::function<void()> _onFocus;
+  std::function<void()> _onBlur;
+  std::function<void()> _onCanvasPointerOut;
+  std::function<void()> _onCanvasBlur;
 
-  ::std::function<void()> _onCanvasFocus;
+  std::function<void()> _onCanvasFocus;
 
-  ::std::function<void()> _onFullscreenChange;
-  ::std::function<void()> _onPointerLockChange;
+  std::function<void()> _onFullscreenChange;
+  std::function<void()> _onPointerLockChange;
 
   int _hardwareScalingLevel;
   bool _pointerLockRequested;
@@ -2582,27 +2613,27 @@ private:
 
   ILoadingScreen* _loadingScreen;
 
-  string_t _glVersion;
-  string_t _glRenderer;
-  string_t _glVendor;
+  std::string _glVersion;
+  std::string _glRenderer;
+  std::string _glVendor;
 
   bool _videoTextureSupported;
 
   bool _renderingQueueLaunched;
-  vector_t<delegate_t<void()>> _activeRenderLoops;
+  std::vector<SA::delegate<void()>> _activeRenderLoops;
 
   // Deterministic lockstepMaxSteps
   bool _deterministicLockstep;
   unsigned int _lockstepMaxSteps;
 
   // Lost context
-  ::std::function<void(Event&& evt)> _onContextLost;
-  ::std::function<void(Event&& evt)> _onContextRestored;
+  std::function<void(Event&& evt)> _onContextLost;
+  std::function<void(Event&& evt)> _onContextRestored;
   bool _contextWasLost;
   bool _doNotHandleContextLost;
 
   // FPS
-  unique_ptr_t<PerformanceMonitor> _performanceMonitor;
+  std::unique_ptr<PerformanceMonitor> _performanceMonitor;
   float _fps;
   float _deltaTime;
 
@@ -2611,36 +2642,37 @@ private:
    */
   int _currentTextureChannel;
 
-  unordered_map_t<string_t, unique_ptr_t<Effect>> _compiledEffects;
-  vector_t<bool> _vertexAttribArraysEnabled;
+  std::unordered_map<std::string, std::unique_ptr<Effect>> _compiledEffects;
+  std::vector<bool> _vertexAttribArraysEnabled;
   GL::IGLVertexArrayObject* _cachedVertexArrayObject;
   bool _uintIndicesCurrentlySet;
-  unordered_map_t<int, GL::IGLBuffer*> _currentBoundBuffer;
-  unordered_map_t<unsigned int, BufferPointer> _currentBufferPointers;
+  std::unordered_map<int, GL::IGLBuffer*> _currentBoundBuffer;
+  std::unordered_map<unsigned int, BufferPointer> _currentBufferPointers;
   Int32Array _currentInstanceLocations;
-  vector_t<GL::IGLBuffer*> _currentInstanceBuffers;
+  std::vector<GL::IGLBuffer*> _currentInstanceBuffers;
   Int32Array _textureUnits;
-  unique_ptr_t<DummyInternalTextureTracker> _firstBoundInternalTextureTracker;
-  unique_ptr_t<DummyInternalTextureTracker> _lastBoundInternalTextureTracker;
+  std::unique_ptr<DummyInternalTextureTracker>
+    _firstBoundInternalTextureTracker;
+  std::unique_ptr<DummyInternalTextureTracker> _lastBoundInternalTextureTracker;
   ICanvas* _workingCanvas;
   ICanvasRenderingContext2D* _workingContext;
-  unique_ptr_t<PassPostProcess> _rescalePostProcess;
-  unique_ptr_t<GL::IGLFramebuffer> _dummyFramebuffer;
-  ::std::function<void()> _bindedRenderFunction;
+  std::unique_ptr<PassPostProcess> _rescalePostProcess;
+  std::unique_ptr<GL::IGLFramebuffer> _dummyFramebuffer;
+  std::function<void()> _bindedRenderFunction;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
   InternalTexture* _emptyTexture;
-  unique_ptr_t<InternalTexture> _emptyCubeTexture;
+  std::unique_ptr<InternalTexture> _emptyCubeTexture;
   InternalTexture* _emptyTexture3D;
   int _frameHandler;
   // Hardware supported Compressed Textures
-  vector_t<string_t> _texturesSupported;
+  std::vector<std::string> _texturesSupported;
   Int32Array _nextFreeTextureSlots;
   unsigned int _maxSimultaneousTextures;
-  string_t _textureFormatInUse;
-  unordered_map_t<int, GL::IGLUniformLocation*> _boundUniforms;
+  std::string _textureFormatInUse;
+  std::unordered_map<int, GL::IGLUniformLocation*> _boundUniforms;
   Vector4 _viewportCached;
-  nullable_t<bool> _unpackFlipYCached;
+  std::optional<bool> _unpackFlipYCached;
 
 }; // end of class Engine
 

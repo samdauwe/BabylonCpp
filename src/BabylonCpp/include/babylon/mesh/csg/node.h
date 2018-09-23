@@ -1,7 +1,7 @@
 #ifndef BABYLON_MESH_CSG_NODE_H
 #define BABYLON_MESH_CSG_NODE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/csg/csg.h>
 #include <babylon/mesh/csg/polygon.h>
 
@@ -21,36 +21,36 @@ class BABYLON_SHARED_EXPORT Node {
 
 public:
   Node();
-  Node(const vector_t<Polygon>& polygons);
+  Node(const std::vector<Polygon>& polygons);
   ~Node();
 
-  unique_ptr_t<Node> clone();
+  std::unique_ptr<Node> clone();
 
   // Convert solid space to empty space and empty space to solid space.
   void invert();
 
   // Recursively remove all polygons in `polygons` that are inside this BSP
   // tree.
-  vector_t<Polygon> clipPolygons(const vector_t<Polygon>& polygons);
+  std::vector<Polygon> clipPolygons(const std::vector<Polygon>& polygons);
 
   // Remove all polygons in this BSP tree that are inside the other BSP tree
   // `bsp`.
   void clipTo(Node& bsp);
 
   // Return a list of all polygons in this BSP tree.
-  vector_t<Polygon> allPolygons();
+  std::vector<Polygon> allPolygons();
 
   // Build a BSP tree out of `polygons`. When called on an existing tree, the
   // new polygons are filtered down to the bottom of the tree and become new
   // nodes there. Each set of polygons is partitioned using the first polygon
   // (no heuristic is used to pick a good split).
-  void build(const vector_t<Polygon>& polygons);
+  void build(const std::vector<Polygon>& polygons);
 
 private:
-  unique_ptr_t<Plane> _plane;
-  unique_ptr_t<Node> _front;
-  unique_ptr_t<Node> _back;
-  vector_t<Polygon> _polygons;
+  std::unique_ptr<Plane> _plane;
+  std::unique_ptr<Node> _front;
+  std::unique_ptr<Node> _back;
+  std::vector<Polygon> _polygons;
 
 }; // end of class Node
 

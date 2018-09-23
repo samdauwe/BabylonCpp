@@ -22,10 +22,10 @@ Viewport::Viewport(const Viewport& otherViewport)
 }
 
 Viewport::Viewport(Viewport&& otherViewport)
-    : x{::std::move(otherViewport.x)}
-    , y{::std::move(otherViewport.y)}
-    , width{::std::move(otherViewport.width)}
-    , height{::std::move(otherViewport.height)}
+    : x{std::move(otherViewport.x)}
+    , y{std::move(otherViewport.y)}
+    , width{std::move(otherViewport.width)}
+    , height{std::move(otherViewport.height)}
 {
 }
 
@@ -44,10 +44,10 @@ Viewport& Viewport::operator=(const Viewport& otherViewport)
 Viewport& Viewport::operator=(Viewport&& otherViewport)
 {
   if (&otherViewport != this) {
-    x      = ::std::move(otherViewport.x);
-    y      = ::std::move(otherViewport.y);
-    width  = ::std::move(otherViewport.width);
-    height = ::std::move(otherViewport.height);
+    x      = std::move(otherViewport.x);
+    y      = std::move(otherViewport.y);
+    width  = std::move(otherViewport.width);
+    height = std::move(otherViewport.height);
   }
 
   return *this;
@@ -62,9 +62,9 @@ Viewport Viewport::copy() const
   return Viewport(*this);
 }
 
-unique_ptr_t<Viewport> Viewport::clone() const
+std::unique_ptr<Viewport> Viewport::clone() const
 {
-  return ::std::make_unique<Viewport>(*this);
+  return std::make_unique<Viewport>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Viewport& viewport)

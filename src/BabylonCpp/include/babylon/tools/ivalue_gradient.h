@@ -1,7 +1,7 @@
 #ifndef BABYLON_TOOLS_IVALUE_GRADIENT_H
 #define BABYLON_TOOLS_IVALUE_GRADIENT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

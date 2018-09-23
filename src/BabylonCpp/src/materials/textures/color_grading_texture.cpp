@@ -11,7 +11,7 @@
 
 namespace BABYLON {
 
-ColorGradingTexture::ColorGradingTexture(const string_t& iUrl, Scene* scene)
+ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
     : BaseTexture{scene}
 {
   if (iUrl.empty()) {
@@ -69,12 +69,12 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
   _texture = texture;
 
 #if 0
-  const auto callback = [&](Variant<string_t, ArrayBuffer>& iText) {
-    if (!iText.is<string_t>()) {
+  const auto callback = [&](Variant<std::string, ArrayBuffer>& iText) {
+    if (!iText.is<std::string>()) {
       return;
     }
 
-    auto text = iText.get<string_t>();
+    auto text = iText.get<std::string>();
 
     Uint8Array data;
     Float32Array tempData;
@@ -181,7 +181,7 @@ void ColorGradingTexture::loadTexture()
   }
 }
 
-unique_ptr_t<ColorGradingTexture> ColorGradingTexture::clone() const
+std::unique_ptr<ColorGradingTexture> ColorGradingTexture::clone() const
 {
   auto newTexture = ::std::make_unique<ColorGradingTexture>(url, getScene());
 
@@ -205,11 +205,11 @@ void ColorGradingTexture::delayLoad()
   }
 }
 
-unique_ptr_t<ColorGradingTexture>
+std::unique_ptr<ColorGradingTexture>
 ColorGradingTexture::Parse(const Json::value& parsedTexture, Scene* scene,
-                           const string_t& /*rootUrl*/)
+                           const std::string& /*rootUrl*/)
 {
-  unique_ptr_t<ColorGradingTexture> texture = nullptr;
+  std::unique_ptr<ColorGradingTexture> texture = nullptr;
   if (parsedTexture.contains("name")
       && !Json::GetBool(parsedTexture, "isRenderTarget")) {
     auto parsedTextureName = Json::GetString(parsedTexture, "name");

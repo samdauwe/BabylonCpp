@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 GearVRController::GearVRController(
-  const shared_ptr_t<IBrowserGamepad>& vrGamepad)
+  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
     , _maxRotationDistFromHeadset{Math::PI / 5.f}
     , _draggedRoomRotation{0.f}
@@ -42,10 +42,10 @@ void GearVRController::initControllerMesh(
     {}, GearVRController::MODEL_BASE_URL, GearVRController::MODEL_FILENAME,
     scene,
     [this, &scene,
-     &meshLoaded](const vector_t<AbstractMeshPtr>& newMeshes,
-                  const vector_t<IParticleSystemPtr>& /*particleSystems*/,
-                  const vector_t<SkeletonPtr>& /*skeletons*/,
-                  const vector_t<AnimationGroupPtr>& /*animationGroups*/) {
+     &meshLoaded](const std::vector<AbstractMeshPtr>& newMeshes,
+                  const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+                  const std::vector<SkeletonPtr>& /*skeletons*/,
+                  const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
       // Offset the controller so it will rotate around the users wrist
       auto mesh                  = Mesh::New("", scene);
       newMeshes[1]->parent       = mesh.get();

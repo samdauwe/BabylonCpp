@@ -35,7 +35,7 @@ MorphTargetManager::~MorphTargetManager()
 }
 
 void MorphTargetManager::addToScene(
-  unique_ptr_t<MorphTargetManager>&& newMorphTargetManager)
+  std::unique_ptr<MorphTargetManager>&& newMorphTargetManager)
 {
   _scene->morphTargetManagers.emplace_back(::std::move(newMorphTargetManager));
 }
@@ -93,7 +93,7 @@ MorphTarget* MorphTargetManager::getTarget(std::size_t index)
   return nullptr;
 }
 
-void MorphTargetManager::addTarget(unique_ptr_t<MorphTarget>&& target)
+void MorphTargetManager::addTarget(std::unique_ptr<MorphTarget>&& target)
 {
   _targets.emplace_back(::std::move(target));
   _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add(
@@ -103,11 +103,10 @@ void MorphTargetManager::addTarget(unique_ptr_t<MorphTarget>&& target)
 
 void MorphTargetManager::removeTarget(MorphTarget* target)
 {
-  auto it
-    = ::std::find_if(_targets.begin(), _targets.end(),
-                     [target](const shared_ptr_t<MorphTarget>& morphTarget) {
-                       return target == morphTarget.get();
-                     });
+  auto it = ::std::find_if(_targets.begin(), _targets.end(),
+                           [target](const MorphTargetPtr& morphTarget) {
+                             return target == morphTarget.get();
+                           });
   if (it != _targets.end()) {
     _targets.erase(it);
 

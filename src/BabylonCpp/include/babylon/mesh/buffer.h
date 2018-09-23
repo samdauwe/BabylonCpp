@@ -1,9 +1,20 @@
 #ifndef BABYLON_MESH_BUFFER_H
 #define BABYLON_MESH_BUFFER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Engine;
+class Mesh;
+class VertexBuffer;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 /**
  * @brief Buffer representation.
@@ -23,7 +34,7 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    */
   Buffer(Engine* engine, const Float32Array& data, bool updatable,
-         nullable_t<size_t> stride     = nullopt_t,
+         std::optional<size_t> stride  = std::nullopt,
          bool postponeInternalCreation = false, bool instanced = false,
          bool useBytes = false);
 
@@ -39,7 +50,7 @@ public:
    * @param useBytes set to true if the stride in in bytes (optional)
    */
   Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
-         nullable_t<size_t> stride     = nullopt_t,
+         std::optional<size_t> stride  = std::nullopt,
          bool postponeInternalCreation = false, bool instanced = false,
          bool useBytes = false);
 
@@ -57,11 +68,11 @@ public:
    * @param useBytes defines if the offset and stride are in bytes
    * @returns the new vertex buffer
    */
-  unique_ptr_t<VertexBuffer>
+  std::unique_ptr<VertexBuffer>
   createVertexBuffer(unsigned int kind, size_t offset, int size,
-                     nullable_t<size_t> stride  = nullopt_t,
-                     nullable_t<bool> instanced = nullopt_t,
-                     bool useBytes              = false);
+                     std::optional<size_t> stride  = std::nullopt,
+                     std::optional<bool> instanced = std::nullopt,
+                     bool useBytes                 = false);
 
   // Properties
   bool isUpdatable() const;
@@ -93,8 +104,8 @@ public:
    * @param useBytes set to true if the offset is in bytes
    */
   GL::IGLBuffer* updateDirectly(const Float32Array& data, size_t offset,
-                                const nullable_t<size_t>& vertexCount
-                                = nullopt_t,
+                                const std::optional<size_t>& vertexCount
+                                = std::nullopt,
                                 bool useBytes = false);
 
   void dispose();
@@ -112,7 +123,7 @@ public:
 
 private:
   Engine* _engine;
-  unique_ptr_t<GL::IGLBuffer> _buffer;
+  std::unique_ptr<GL::IGLBuffer> _buffer;
   bool _updatable;
   bool _instanced;
 
