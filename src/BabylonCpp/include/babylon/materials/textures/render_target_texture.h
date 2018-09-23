@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_RENDER_TARGET_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_RENDER_TARGET_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
@@ -9,6 +9,20 @@
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Camera;
+class Engine;
+class PostProcess;
+class PostProcessManager;
+class RenderingManager;
+class RenderTargetTexture;
+class SubMesh;
+using AbstractMeshPtr             = std::shared_ptr<AbstractMesh>;
+using CameraPtr                   = std::shared_ptr<Camera>;
+using RenderTargetCreationOptions = IRenderTargetOptions;
+using RenderTargetTexturePtr      = std::shared_ptr<RenderTargetTexture>;
+using SubMeshPtr                  = std::shared_ptr<SubMesh>;
 
 class BABYLON_SHARED_EXPORT RenderTargetTexture : public Texture {
 
@@ -37,8 +51,8 @@ public:
   template <typename... Ts>
   static RenderTargetTexturePtr New(Ts&&... args)
   {
-    auto texture = shared_ptr_t<RenderTargetTexture>(
-      new RenderTargetTexture(::std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<RenderTargetTexture>(
+      new RenderTargetTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
@@ -95,13 +109,13 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       opaqueSortCompareFn
     = nullptr,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       alphaTestSortCompareFn
     = nullptr,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       transparentSortCompareFn
     = nullptr);
 
@@ -157,7 +171,7 @@ protected:
    * RGBA, ALPHA...)
    */
   RenderTargetTexture(
-    const string_t& name, const ISize& size, Scene* scene,
+    const std::string& name, const ISize& size, Scene* scene,
     bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
     unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     bool isCube               = false,
@@ -169,8 +183,8 @@ protected:
   /**
    * @brief Use this list to define the list of mesh you want to render.
    */
-  vector_t<AbstractMeshPtr>& get_renderList();
-  void set_renderList(const vector_t<AbstractMeshPtr>& value);
+  std::vector<AbstractMeshPtr>& get_renderList();
+  void set_renderList(const std::vector<AbstractMeshPtr>& value);
 
   /**
    * @brief Gets or sets the size of the bounding box associated with the
@@ -180,18 +194,19 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example: https://www.babylonjs-playground.com/#RNASML
    */
-  virtual void set_boundingBoxSize(const nullable_t<Vector3>& value) override;
-  virtual nullable_t<Vector3>& get_boundingBoxSize() override;
+  virtual void
+  set_boundingBoxSize(const std::optional<Vector3>& value) override;
+  virtual std::optional<Vector3>& get_boundingBoxSize() override;
 
   /** Events **/
   void set_onAfterUnbind(
-    const ::std::function<void(RenderTargetTexture*, EventState&)>& callback);
+    const std::function<void(RenderTargetTexture*, EventState&)>& callback);
   void set_onBeforeRender(
-    const ::std::function<void(int* faceIndex, EventState&)>& callback);
+    const std::function<void(int* faceIndex, EventState&)>& callback);
   void set_onAfterRender(
-    const ::std::function<void(int* faceIndex, EventState&)>& callback);
-  void set_onClear(
-    const ::std::function<void(Engine* engine, EventState&)>& callback);
+    const std::function<void(int* faceIndex, EventState&)>& callback);
+  void
+  set_onClear(const std::function<void(Engine* engine, EventState&)>& callback);
 
   virtual unsigned int get_samples() const;
   virtual void set_samples(unsigned int value);
@@ -205,7 +220,7 @@ private:
   int _bestReflectionRenderTargetDimension(int renderDimension,
                                            float scale) const;
   void renderToTarget(unsigned int faceIndex,
-                      const vector_t<AbstractMeshPtr>& currentRenderList,
+                      const std::vector<AbstractMeshPtr>& currentRenderList,
                       size_t currentRenderListLength, bool useCameraPostProcess,
                       bool dumpForDebug);
 
@@ -215,31 +230,31 @@ public:
    * render.
    * If set, the renderList property will be overwritten.
    */
-  ::std::function<bool(AbstractMesh*)> renderListPredicate;
+  std::function<bool(AbstractMesh*)> renderListPredicate;
 
   /**
    * Use this list to define the list of mesh you want to render
    */
-  Property<RenderTargetTexture, vector_t<AbstractMeshPtr>> renderList;
+  Property<RenderTargetTexture, std::vector<AbstractMeshPtr>> renderList;
 
   bool renderParticles;
   bool renderSprites;
   CameraPtr activeCamera;
-  ::std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
-                       const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-                       const vector_t<SubMeshPtr>& transparentSubMeshes,
-                       const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-                       const ::std::function<void()>& beforeTransparents)>
+  std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
+                     const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+                     const std::vector<SubMeshPtr>& transparentSubMeshes,
+                     const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+                     const std::function<void()>& beforeTransparents)>
     customRenderFunction;
   bool useCameraPostProcesses;
   bool ignoreCameraViewport;
-  nullable_t<Color4> clearColor;
+  std::optional<Color4> clearColor;
   /** Hidden */
   bool _generateMipMaps;
   /** Hidden */
-  vector_t<string_t> _waitingRenderList;
-  // ::std::function<void()> onAfterRender;
-  // ::std::function<void()> onBeforeRender;
+  std::vector<std::string> _waitingRenderList;
+  // std::function<void()> onAfterRender;
+  // std::function<void()> onBeforeRender;
 
   /**
    * Gets or sets the center of the bounding box associated with the texture
@@ -253,7 +268,7 @@ public:
    * depth texture.
    * Otherwise, return null.
    */
-  unique_ptr_t<InternalTexture> depthStencilTexture;
+  std::unique_ptr<InternalTexture> depthStencilTexture;
 
   // Events
 
@@ -268,7 +283,7 @@ public:
   Observable<RenderTargetTexture> onAfterUnbindObservable;
 
   WriteOnlyProperty<RenderTargetTexture,
-                    ::std::function<void(RenderTargetTexture*, EventState&)>>
+                    std::function<void(RenderTargetTexture*, EventState&)>>
     onAfterUnbind;
 
   /**
@@ -277,7 +292,7 @@ public:
   Observable<int> onBeforeRenderObservable;
 
   WriteOnlyProperty<RenderTargetTexture,
-                    ::std::function<void(int* faceIndex, EventState&)>>
+                    std::function<void(int* faceIndex, EventState&)>>
     onBeforeRender;
 
   /**
@@ -286,7 +301,7 @@ public:
   Observable<int> onAfterRenderObservable;
 
   WriteOnlyProperty<RenderTargetTexture,
-                    ::std::function<void(int* faceIndex, EventState&)>>
+                    std::function<void(int* faceIndex, EventState&)>>
     onAfterRender;
 
   /**
@@ -295,7 +310,7 @@ public:
   Observable<Engine> onClearObservable;
 
   WriteOnlyProperty<RenderTargetTexture,
-                    ::std::function<void(Engine* engine, EventState&)>>
+                    std::function<void(Engine* engine, EventState&)>>
     onClear;
 
   Property<RenderTargetTexture, unsigned int> samples;
@@ -307,18 +322,18 @@ protected:
   ISize _size;
   ISize _initialSizeParameter;
   float _sizeRatio;
-  unique_ptr_t<RenderingManager> _renderingManager;
+  std::unique_ptr<RenderingManager> _renderingManager;
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
   int _refreshRate;
-  unique_ptr_t<Matrix> _textureMatrix;
+  std::unique_ptr<Matrix> _textureMatrix;
   unsigned int _samples;
   Engine* _engine;
 
 private:
-  vector_t<AbstractMeshPtr> _renderList;
-  unique_ptr_t<PostProcessManager> _postProcessManager;
-  vector_t<PostProcess*> _postProcesses;
+  std::vector<AbstractMeshPtr> _renderList;
+  std::unique_ptr<PostProcessManager> _postProcessManager;
+  std::vector<PostProcess*> _postProcesses;
   Observer<Engine>::Ptr _resizeObserver;
   // Events
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;
@@ -327,7 +342,7 @@ private:
   Observer<Engine>::Ptr _onClearObserver;
   // Properties
   int _faceIndex;
-  nullable_t<Vector3> _boundingBoxSize;
+  std::optional<Vector3> _boundingBoxSize;
 
 }; // end of class RenderTargetTexture
 

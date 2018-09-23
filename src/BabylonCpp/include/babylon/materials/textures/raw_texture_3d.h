@@ -1,10 +1,12 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_RAW_TEXTURE_3D_H
 #define BABYLON_MATERIALS_TEXTURES_RAW_TEXTURE_3D_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
+
+class Engine;
 
 /**
  * @brief Class used to store 3D textures containing user data.

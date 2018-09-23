@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_PROCEDURALS_CUSTOM_PROCEDURAL_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_PROCEDURALS_CUSTOM_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/json.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
@@ -15,7 +15,7 @@ public:
   {
     auto texture = new CustomProceduralTexture(::std::forward<Ts>(args)...);
     texture->addToScene(
-      static_cast<unique_ptr_t<CustomProceduralTexture>>(texture));
+      static_cast<std::unique_ptr<CustomProceduralTexture>>(texture));
 
     return texture;
   }
@@ -29,20 +29,20 @@ public:
   void setAnimate(bool value);
 
 protected:
-  CustomProceduralTexture(const string_t& name, const string_t& texturePath,
-                          int size, Scene* scene,
-                          Texture* fallbackTexture = nullptr,
-                          bool generateMipMaps     = false);
+  CustomProceduralTexture(const std::string& name,
+                          const std::string& texturePath, int size,
+                          Scene* scene, Texture* fallbackTexture = nullptr,
+                          bool generateMipMaps = false);
 
 private:
-  void loadJson(const string_t& jsonUrl);
+  void loadJson(const std::string& jsonUrl);
 
 private:
   bool _animate;
   float _time;
   bool _configSet;
   Json::value _config;
-  string_t _texturePath;
+  std::string _texturePath;
 
 }; // end of class CustomProceduralTexture
 

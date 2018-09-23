@@ -3,13 +3,18 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/math/isize.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+class InternalTexture;
+class SphericalPolynomial;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 class BABYLON_SHARED_EXPORT BaseTexture
     : public ::std::enable_shared_from_this<BaseTexture>,
@@ -21,7 +26,7 @@ public:
   virtual ~BaseTexture() override;
 
   template <typename Derived>
-  shared_ptr_t<Derived> shared_from_base()
+  std::shared_ptr<Derived> shared_from_base()
   {
     return std::static_pointer_cast<Derived>(shared_from_this());
   }
@@ -29,13 +34,13 @@ public:
   virtual IReflect::Type type() const override;
   void addToScene(const BaseTexturePtr& newTexture);
 
-  string_t uid();
-  virtual string_t toString() const;
+  std::string uid();
+  virtual std::string toString() const;
 
   /**
    * @brief Returns the string "BaseTexture".
    */
-  const string_t getClassName() const;
+  const std::string getClassName() const;
 
   void setOnDispose(
     const ::std::function<void(BaseTexture*, EventState&)>& callback);
@@ -50,13 +55,13 @@ public:
   virtual void scale(float ratio);
   bool canRescale();
   /** Hidden */
-  InternalTexture* _getFromCache(const string_t& url, bool noMipmap,
+  InternalTexture* _getFromCache(const std::string& url, bool noMipmap,
                                  unsigned int sampling = 0);
   /** Hidden */
   virtual void _rebuild();
   virtual void delayLoad();
-  vector_t<AnimationPtr> getAnimations() override;
-  unique_ptr_t<BaseTexture> clone() const;
+  std::vector<AnimationPtr> getAnimations() override;
+  std::unique_ptr<BaseTexture> clone() const;
   unsigned int textureType() const;
   unsigned int textureFormat() const;
 
@@ -80,7 +85,7 @@ public:
   virtual void dispose();
   Json::object serialize() const;
 
-  static void WhenAllReady(const vector_t<BaseTexture*>& textures,
+  static void WhenAllReady(const std::vector<BaseTexture*>& textures,
                            const ::std::function<void()>& callback);
 
 protected:
@@ -98,15 +103,15 @@ protected:
 
   virtual bool get_isBlocking() const;
   virtual void set_isBlocking(bool value);
-  virtual void set_boundingBoxSize(const nullable_t<Vector3>& value);
-  virtual nullable_t<Vector3>& get_boundingBoxSize();
+  virtual void set_boundingBoxSize(const std::optional<Vector3>& value);
+  virtual std::optional<Vector3>& get_boundingBoxSize();
   float get_lodGenerationOffset() const;
   void set_lodGenerationOffset(float value);
   float get_lodGenerationScale() const;
   void set_lodGenerationScale(float value);
 
 public:
-  string_t name;
+  std::string name;
   Property<BaseTexture, bool> hasAlpha;
   bool getAlphaFromRGB;
   float level;
@@ -177,7 +182,7 @@ public:
   Property<BaseTexture, float> lodGenerationScale;
 
   bool isRenderTarget;
-  vector_t<AnimationPtr> animations;
+  std::vector<AnimationPtr> animations;
   /**
    * An event triggered when the texture is disposed.
    */
@@ -189,17 +194,17 @@ public:
   /**
    * Size of the bounding box associated with the texture (when in cube mode)
    */
-  Property<BaseTexture, nullable_t<Vector3>> boundingBoxSize;
+  Property<BaseTexture, std::optional<Vector3>> boundingBoxSize;
 
 private:
   bool _hasAlpha;
   unsigned int _coordinatesMode;
   Scene* _scene;
-  string_t _uid;
+  std::string _uid;
   Observer<BaseTexture>::Ptr _onDisposeObserver;
   Matrix _textureMatrix;
   Matrix _reflectionTextureMatrix;
-  nullable_t<Vector3> emptyVector3;
+  std::optional<Vector3> emptyVector3;
   ISize _cachedSize;
 
 }; // end of class BaseTexture

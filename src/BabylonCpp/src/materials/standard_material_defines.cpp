@@ -117,9 +117,9 @@ StandardMaterialDefines::~StandardMaterialDefines()
 {
 }
 
-void StandardMaterialDefines::setReflectionMode(const string_t& modeToEnable)
+void StandardMaterialDefines::setReflectionMode(const std::string& modeToEnable)
 {
-  static const array_t<string_t, 10> modes{
+  static const std::array<std::string, 10> modes{
     {"REFLECTIONMAP_CUBIC", "REFLECTIONMAP_EXPLICIT", "REFLECTIONMAP_PLANAR",
      "REFLECTIONMAP_PROJECTION", "REFLECTIONMAP_PROJECTION",
      "REFLECTIONMAP_SKYBOX", "REFLECTIONMAP_SPHERICAL",

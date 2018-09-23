@@ -1,10 +1,15 @@
 #ifndef BABYLON_MATERIALS_EFFECT_CREATE_OPTIONS_H
 #define BABYLON_MATERIALS_EFFECT_CREATE_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/materials/effect_fallbacks.h>
 
 namespace BABYLON {
+
+struct MaterialDefines;
 
 /**
  * @brief Options to be used when creating an effect.
@@ -13,24 +18,24 @@ struct BABYLON_SHARED_EXPORT EffectCreationOptions {
   /**
    * Atrributes that will be used in the shader.
    */
-  vector_t<string_t> attributes{};
+  std::vector<std::string> attributes{};
   /**
    * Uniform varible names that will be set in the shader.
    */
-  vector_t<string_t> uniformsNames{};
+  std::vector<std::string> uniformsNames{};
   /**
    * Uniform buffer varible names that will be set in the shader.
    */
-  vector_t<string_t> uniformBuffersNames{};
+  std::vector<std::string> uniformBuffersNames{};
   /**
    * Sampler texture variable names that will be set in the shader.
    */
-  vector_t<string_t> samplers{};
+  std::vector<std::string> samplers{};
   /**
    * See
    * https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/transformFeedbackVaryings
    */
-  vector_t<string_t> transformFeedbackVaryings{};
+  std::vector<std::string> transformFeedbackVaryings{};
   /**
    * MaterialDefines pointer.
    */
@@ -38,25 +43,25 @@ struct BABYLON_SHARED_EXPORT EffectCreationOptions {
   /**
    * Define statements that will be set in the shader.
    */
-  string_t defines{""};
+  std::string defines{""};
   /**
    * Possible fallbacks for this effect to improve performance when needed.
    */
-  unique_ptr_t<EffectFallbacks> fallbacks{nullptr};
+  std::unique_ptr<EffectFallbacks> fallbacks{nullptr};
   /**
    * Callback that will be called when the shader is compiled.
    */
-  ::std::function<void(Effect* effect)> onCompiled{nullptr};
+  std::function<void(Effect* effect)> onCompiled{nullptr};
   /**
    * Callback that will be called if an error occurs during shader compilation.
    */
-  ::std::function<void(Effect* effect, const string_t& errors)> onError{
+  std::function<void(Effect* effect, const std::string& errors)> onError{
     nullptr};
   /**
    * Parameters to be used with Babylons include syntax to iterate over an array
    * (eg. {lights: 10})
    */
-  unordered_map_t<string_t, unsigned int> indexParameters{};
+  std::unordered_map<std::string, unsigned int> indexParameters{};
   /**
    * Number.
    */

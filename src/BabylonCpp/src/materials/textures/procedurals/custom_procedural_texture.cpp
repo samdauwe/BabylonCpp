@@ -4,8 +4,8 @@
 
 namespace BABYLON {
 
-CustomProceduralTexture::CustomProceduralTexture(const string_t& name,
-                                                 const string_t& texturePath,
+CustomProceduralTexture::CustomProceduralTexture(const std::string& name,
+                                                 const std::string& texturePath,
                                                  int size, Scene* scene,
                                                  Texture* fallbackTexture,
                                                  bool generateMipMaps)
@@ -26,7 +26,7 @@ CustomProceduralTexture::~CustomProceduralTexture()
 {
 }
 
-void CustomProceduralTexture::loadJson(const string_t& /*jsonUrl*/)
+void CustomProceduralTexture::loadJson(const std::string& /*jsonUrl*/)
 {
 }
 

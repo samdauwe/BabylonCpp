@@ -13,19 +13,19 @@ bool HemisphericLight::NodeConstructorAdded = false;
 void HemisphericLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "Light_Type_3", [](const string_t& name, Scene* scene,
-                       const nullable_t<Json::value>& /*options*/) {
+    "Light_Type_3", [](const std::string& name, Scene* scene,
+                       const std::optional<Json::value>& /*options*/) {
       return HemisphericLight::New(name, Vector3::Zero(), scene);
     });
   HemisphericLight::NodeConstructorAdded = true;
 }
 
-HemisphericLight::HemisphericLight(const string_t& iName, Scene* scene)
+HemisphericLight::HemisphericLight(const std::string& iName, Scene* scene)
     : HemisphericLight(iName, Vector3::Up(), scene)
 {
 }
 
-HemisphericLight::HemisphericLight(const string_t& iName,
+HemisphericLight::HemisphericLight(const std::string& iName,
                                    const Vector3& iDirection, Scene* scene)
     : Light{iName, scene}
     , groundColor{Color3(0.f, 0.f, 0.f)}
@@ -49,7 +49,7 @@ void HemisphericLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-const string_t HemisphericLight::getClassName() const
+const std::string HemisphericLight::getClassName() const
 {
   return "HemisphericLight";
 }
@@ -71,7 +71,7 @@ ShadowGenerator* HemisphericLight::getShadowGenerator()
 }
 
 void HemisphericLight::transferToEffect(Effect* /*effect*/,
-                                        const string_t& lightIndex)
+                                        const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Normalize(direction);
 
@@ -89,7 +89,7 @@ void HemisphericLight::transferToEffect(Effect* /*effect*/,
 Matrix* HemisphericLight::_getWorldMatrix()
 {
   if (!_worldMatrix) {
-    _worldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
+    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
   }
 
   return _worldMatrix.get();
@@ -103,7 +103,7 @@ unsigned int HemisphericLight::getTypeID() const
 void HemisphericLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                                    unsigned int lightIndex)
 {
-  defines.boolDef["HEMILIGHT" + ::std::to_string(lightIndex)] = true;
+  defines.boolDef["HEMILIGHT" + std::to_string(lightIndex)] = true;
 }
 
 } // end of namespace BABYLON

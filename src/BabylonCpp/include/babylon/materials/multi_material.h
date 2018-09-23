@@ -1,10 +1,13 @@
 #ifndef BABYLON_MATERIALS_MULTI_MATERIAL_H
 #define BABYLON_MATERIALS_MULTI_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/material.h>
 
 namespace BABYLON {
+
+class MultiMaterial;
+using MultiMaterialPtr = std::shared_ptr<MultiMaterial>;
 
 class BABYLON_SHARED_EXPORT MultiMaterial : public Material {
 
@@ -12,7 +15,7 @@ public:
   template <typename... Ts>
   static MultiMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<MultiMaterial>(
+    auto material = std::shared_ptr<MultiMaterial>(
       new MultiMaterial(::std::forward<Ts>(args)...));
     material->addMultiMaterialToScene(material);
 
@@ -23,33 +26,33 @@ public:
   /**
    * @brief Returns the string "MultiMaterial".
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
   /** Properties **/
-  vector_t<MaterialPtr>& subMaterials();
-  void setSubMaterials(const vector_t<MaterialPtr>& value);
+  std::vector<MaterialPtr>& subMaterials();
+  void setSubMaterials(const std::vector<MaterialPtr>& value);
   MaterialPtr& getSubMaterial(unsigned int index);
-  vector_t<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /** Methods **/
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
-  MaterialPtr clone(const string_t& _name,
+  MaterialPtr clone(const std::string& _name,
                     bool cloneChildren = false) const override;
   Json::object serialize() const;
   void dispose(bool forceDisposeEffect   = false,
                bool forceDisposeTextures = false) override;
 
 protected:
-  MultiMaterial(const string_t name, Scene* scene);
+  MultiMaterial(const std::string name, Scene* scene);
 
 private:
-  void _hookArray(const vector_t<MaterialPtr>& array);
+  void _hookArray(const std::vector<MaterialPtr>& array);
 
 private:
-  vector_t<MaterialPtr> _subMaterials;
+  std::vector<MaterialPtr> _subMaterials;
 
 }; // end of class MultiMaterial
 

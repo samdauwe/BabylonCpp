@@ -1,9 +1,26 @@
 #ifndef BABYLON_MATERIALS_MATERIAL_HELPER_H
 #define BABYLON_MATERIALS_MATERIAL_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class BaseTexture;
+class Effect;
+struct EffectCreationOptions;
+class EffectFallbacks;
+class Engine;
+class Light;
+struct MaterialDefines;
+class Scene;
+class UniformBuffer;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 /**
  * @brief "Static Class" containing the most commonly used helper while dealing
@@ -33,7 +50,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    */
   static void PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
                                         MaterialDefines& defines,
-                                        const string_t& key);
+                                        const std::string& key);
 
   /**
    * @brief Binds a texture matrix value to its corrsponding uniform
@@ -43,7 +60,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    */
   static void BindTextureMatrix(BaseTexture& texture,
                                 UniformBuffer& uniformBuffer,
-                                const string_t& key);
+                                const std::string& key);
 
   /**
    * @brief Helper used to prepare the list of defines associated with misc.
@@ -70,10 +87,11 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param useInstances defines if instances have to be turned on
    * @param useClipPlane defines if clip plane have to be turned on
    */
-  static void
-  PrepareDefinesForFrameBoundValues(Scene* scene, Engine* engine,
-                                    MaterialDefines& defines, bool useInstances,
-                                    nullable_t<bool> useClipPlane = nullopt_t);
+  static void PrepareDefinesForFrameBoundValues(Scene* scene, Engine* engine,
+                                                MaterialDefines& defines,
+                                                bool useInstances,
+                                                std::optional<bool> useClipPlane
+                                                = std::nullopt);
 
   /**
    * @brief Prepares the defines used in the shader depending on the attributes
@@ -128,11 +146,11 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param maxSimultaneousLights The maximum number of simultanous light
    * allowed in the effect
    */
-  static void PrepareUniformsAndSamplersList(vector_t<string_t>& uniformsList,
-                                             vector_t<string_t>& samplersList,
-                                             MaterialDefines& defines,
-                                             unsigned int maxSimultaneousLights
-                                             = 4);
+  static void
+  PrepareUniformsAndSamplersList(std::vector<std::string>& uniformsList,
+                                 std::vector<std::string>& samplersList,
+                                 MaterialDefines& defines,
+                                 unsigned int maxSimultaneousLights = 4);
 
   /**
    * @brief Prepares the uniforms and samplers list to be used in the effect.
@@ -167,9 +185,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param mesh The mesh to prepare the morph targets attributes for
    * @param defines The current Defines of the effect
    */
-  static void PrepareAttributesForMorphTargets(vector_t<string_t>& attribs,
-                                               AbstractMesh* mesh,
-                                               MaterialDefines& defines);
+  static void
+  PrepareAttributesForMorphTargets(std::vector<std::string>& attribs,
+                                   AbstractMesh* mesh,
+                                   MaterialDefines& defines);
 
   /**
    * @brief Prepares the list of attributes required for bones according to the
@@ -179,7 +198,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param defines The current Defines of the effect
    * @param fallbacks The current efffect fallback strategy
    */
-  static void PrepareAttributesForBones(vector_t<string_t>& attribs,
+  static void PrepareAttributesForBones(std::vector<std::string>& attribs,
                                         AbstractMesh* mesh,
                                         MaterialDefines& defines,
                                         EffectFallbacks& fallbacks);
@@ -190,7 +209,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param attribs The current list of supported attribs
    * @param defines The current Defines of the effect
    */
-  static void PrepareAttributesForInstances(vector_t<string_t>& attribs,
+  static void PrepareAttributesForInstances(std::vector<std::string>& attribs,
                                             MaterialDefines& defines);
 
   /**

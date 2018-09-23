@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_PBR_PBR_BASE_SIMPLE_MATERIAL_H
 #define BABYLON_MATERIALS_PBR_PBR_BASE_SIMPLE_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/pbr/pbr_base_material.h>
 
 namespace BABYLON {
@@ -23,13 +23,13 @@ public:
    * @param name The material name
    * @param scene The scene the material will be use in.
    */
-  PBRBaseSimpleMaterial(const string_t& name, Scene* scene);
+  PBRBaseSimpleMaterial(const std::string& name, Scene* scene);
   ~PBRBaseSimpleMaterial() override;
 
   /**
    * @brief Returns the string "PBRBaseSimpleMaterial".
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Gets the current double sided mode.
@@ -45,7 +45,7 @@ public:
   /**
    * @brief Return the active textures of the material.
    */
-  vector_t<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   bool hasTexture(const BaseTexturePtr& texture) const override;
 

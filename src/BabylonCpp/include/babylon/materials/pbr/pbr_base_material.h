@@ -1,11 +1,16 @@
 #ifndef BABYLON_MATERIALS_PBR_PBR_BASE_MATERIAL_H
 #define BABYLON_MATERIALS_PBR_PBR_BASE_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/math/vector4.h>
 
 namespace BABYLON {
+
+class IAnimatable;
+class ImageProcessingConfiguration;
+struct PBRMaterialDefines;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 /**
  * @brief The Physically based material base class of BJS.
@@ -42,18 +47,18 @@ public:
    * @param name The material name
    * @param scene The scene the material will be use in.
    */
-  PBRBaseMaterial(const string_t& name, Scene* scene);
+  PBRBaseMaterial(const std::string& name, Scene* scene);
   ~PBRBaseMaterial() override;
 
   /**
    * @brief Gets the name of the material class.
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Gets the current transparency mode.
    */
-  nullable_t<unsigned int> transparencyMode() const;
+  std::optional<unsigned int> transparencyMode() const;
 
   /**
    * @brief Sets the transparency mode of the material.
@@ -66,7 +71,7 @@ public:
    * | 3     | ALPHATESTANDBLEND                   |             |
    *
    */
-  void setTransparencyMode(const nullable_t<unsigned int>& value);
+  void setTransparencyMode(const std::optional<unsigned int>& value);
 
   /**
    * @brief Returns true if alpha blending should be disabled.
@@ -142,7 +147,7 @@ public:
    * @brief Returns the animatable textures.
    * @returns - Array of animatable textures.
    */
-  vector_t<IAnimatablePtr> getAnimatables() const;
+  std::vector<IAnimatablePtr> getAnimatables() const;
 
   /**
    * @brief Disposes the resources of the material.
@@ -178,13 +183,13 @@ private:
   Effect* _prepareEffect(
     AbstractMesh* mesh, PBRMaterialDefines& defines,
     const ::std::function<void(Effect* effect)> onCompiled = nullptr,
-    ::std::function<void(Effect* effect, const string_t& errors)> onError
+    ::std::function<void(Effect* effect, const std::string& errors)> onError
     = nullptr,
-    const nullable_t<bool>& useInstances = nullopt_t,
-    const nullable_t<bool>& useClipPlane = nullopt_t);
+    const std::optional<bool>& useInstances = std::nullopt,
+    const std::optional<bool>& useClipPlane = std::nullopt);
   void _prepareDefines(AbstractMesh* mesh, PBRMaterialDefines& defines,
-                       const nullable_t<bool>& useInstances = nullopt_t,
-                       const nullable_t<bool>& useClipPlane = nullopt_t);
+                       const std::optional<bool>& useInstances = std::nullopt,
+                       const std::optional<bool>& useClipPlane = std::nullopt);
 
   /**
    * @brief Returns the texture used for reflections.
@@ -292,13 +297,13 @@ protected:
    * Specifies the metallic scalar of the metallic/roughness workflow.
    * Can also be used to scale the metalness values of the metallic texture.
    */
-  nullable_t<float> _metallic;
+  std::optional<float> _metallic;
 
   /**
    * Specifies the roughness scalar of the metallic/roughness workflow.
    * Can also be used to scale the roughness values of the metallic texture.
    */
-  nullable_t<float> _roughness;
+  std::optional<float> _roughness;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate chanel depending
@@ -534,7 +539,7 @@ protected:
   /**
    * The transparency mode of the material.
    */
-  nullable_t<unsigned int> _transparencyMode;
+  std::optional<unsigned int> _transparencyMode;
 
   /**
    * Specifies the environment BRDF texture used to comput the scale and offset
@@ -587,7 +592,7 @@ private:
   /**
    * Stores the available render targets.
    */
-  vector_t<RenderTargetTexturePtr> _renderTargets;
+  std::vector<RenderTargetTexturePtr> _renderTargets;
 
   /**
    * Sets the global ambient color for the material used in lighting

@@ -1,10 +1,15 @@
 #ifndef BABYLON_MATERIALS_PBR_PBR_MATERIAL_H
 #define BABYLON_MATERIALS_PBR_PBR_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/pbr/pbr_base_material.h>
 
 namespace BABYLON {
+
+class ColorCurves;
+class PBRMaterial;
+using ColorCurvesPtr = std::shared_ptr<ColorCurves>;
+using PBRMaterialPtr = std::shared_ptr<PBRMaterial>;
 
 /**
  * @brief The Physically based material of BJS.
@@ -51,8 +56,8 @@ public:
   template <typename... Ts>
   static PBRMaterialPtr New(Ts&&... args)
   {
-    auto material
-      = shared_ptr_t<PBRMaterial>(new PBRMaterial(::std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<PBRMaterial>(
+      new PBRMaterial(::std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -62,13 +67,13 @@ public:
   /**
    * @brief Returns the name of this material class.
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Returns an array of the actively used textures.
    * @returns - Array of BaseTextures
    */
-  vector_t<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Checks to see if a texture is used in the material.
@@ -81,7 +86,7 @@ public:
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const string_t& name,
+  MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
 
   /**
@@ -99,7 +104,7 @@ public:
    * @returns - PBRMaterial
    */
   static PBRMaterial* Parse(const Json::value& source, Scene* scene,
-                            const string_t& rootUrl);
+                            const std::string& rootUrl);
 
   // Getters / Setters
 
@@ -249,7 +254,7 @@ protected:
    * @param name The material name
    * @param scene The scene the material will be use in.
    */
-  PBRMaterial(const string_t& name, Scene* scene);
+  PBRMaterial(const std::string& name, Scene* scene);
 
 public:
   /**
@@ -337,13 +342,13 @@ public:
    * Specifies the metallic scalar of the metallic/roughness workflow.
    * Can also be used to scale the metalness values of the metallic texture.
    */
-  nullable_t<float> metallic;
+  std::optional<float> metallic;
 
   /**
    * Specifies the roughness scalar of the metallic/roughness workflow.
    * Can also be used to scale the roughness values of the metallic texture.
    */
-  nullable_t<float> roughness;
+  std::optional<float> roughness;
 
   /**
    * Used to enable roughness/glossiness fetch from a separate chanel depending

@@ -1,12 +1,21 @@
 #ifndef BABYLON_MATERIALS_STANDARD_MATERIAL_H
 #define BABYLON_MATERIALS_STANDARD_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/math/color3.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class ColorCurves;
+class FresnelParameters;
+class IAnimatable;
+class ImageProcessingConfiguration;
+class StandardMaterial;
+struct StandardMaterialDefines;
+using IAnimatablePtr      = std::shared_ptr<IAnimatable>;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
 
 class BABYLON_SHARED_EXPORT StandardMaterial : public PushMaterial {
 
@@ -29,7 +38,7 @@ public:
   template <typename... Ts>
   static StandardMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<StandardMaterial>(
+    auto material = std::shared_ptr<StandardMaterial>(
       new StandardMaterial(::std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
@@ -40,7 +49,7 @@ public:
   /**
    * @brief Returns the string "StandardMaterial".
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
@@ -56,12 +65,12 @@ public:
   void buildUniformLayout();
   void unbind() override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  vector_t<IAnimatablePtr> getAnimatables();
-  vector_t<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<IAnimatablePtr> getAnimatables();
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  MaterialPtr clone(const string_t& name,
+  MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
   Json::object serialize() const;
 
@@ -128,7 +137,7 @@ public:
 
   // Statics
   static StandardMaterialPtr Parse(const Json::value& source, Scene* scene,
-                                   const string_t& rootUrl);
+                                   const std::string& rootUrl);
   static bool DiffuseTextureEnabled();
   static void SetDiffuseTextureEnabled(bool value);
   static bool AmbientTextureEnabled();
@@ -153,7 +162,7 @@ public:
   static void SetFresnelEnabled(bool value);
 
 protected:
-  StandardMaterial(const string_t& name, Scene* scene);
+  StandardMaterial(const std::string& name, Scene* scene);
   StandardMaterial(const StandardMaterial& other);
 
   /**
@@ -250,7 +259,7 @@ protected:
    * corresponding to low luminance, medium luminance, and high luminance areas
    * respectively.
    */
-  shared_ptr_t<ColorCurves>& get_cameraColorCurves();
+  std::shared_ptr<ColorCurves>& get_cameraColorCurves();
 
   /**
    * @brief The color grading curves provide additional color adjustmnent that
@@ -265,7 +274,7 @@ protected:
    * corresponding to low luminance, medium luminance, and high luminance areas
    * respectively.
    */
-  void set_cameraColorCurves(const shared_ptr_t<ColorCurves>& value);
+  void set_cameraColorCurves(const std::shared_ptr<ColorCurves>& value);
 
   /**
    * @brief Gets the logarithmic depth setting.
@@ -303,10 +312,10 @@ public:
    */
   float alphaCutOff;
 
-  ::std::function<string_t(
-    const string_t& shaderName, vector_t<string_t>& uniforms,
-    vector_t<string_t>& uniformBuffers, vector_t<string_t>& samplers,
-    StandardMaterialDefines& defines)>
+  ::std::function<std::string(
+    const std::string& shaderName, std::vector<std::string>& uniforms,
+    std::vector<std::string>& uniformBuffers,
+    std::vector<std::string>& samplers, StandardMaterialDefines& defines)>
     customShaderNameResolve;
 
   /**
@@ -361,10 +370,10 @@ public:
    * corresponding to low luminance, medium luminance, and high luminance areas
    * respectively.
    */
-  Property<StandardMaterial, shared_ptr_t<ColorCurves>> cameraColorCurves;
+  Property<StandardMaterial, std::shared_ptr<ColorCurves>> cameraColorCurves;
 
 protected:
-  vector_t<RenderTargetTexturePtr> _renderTargets;
+  std::vector<RenderTargetTexturePtr> _renderTargets;
   Matrix _worldViewProjectionMatrix;
   Color3 _globalAmbientColor;
   bool _useLogarithmicDepth;
@@ -396,11 +405,11 @@ private:
   bool _useParallaxOcclusion;
   float _roughness;
   bool _useLightmapAsShadowmap;
-  unique_ptr_t<FresnelParameters> _diffuseFresnelParameters;
-  unique_ptr_t<FresnelParameters> _opacityFresnelParameters;
-  unique_ptr_t<FresnelParameters> _reflectionFresnelParameters;
-  unique_ptr_t<FresnelParameters> _refractionFresnelParameters;
-  unique_ptr_t<FresnelParameters> _emissiveFresnelParameters;
+  std::unique_ptr<FresnelParameters> _diffuseFresnelParameters;
+  std::unique_ptr<FresnelParameters> _opacityFresnelParameters;
+  std::unique_ptr<FresnelParameters> _reflectionFresnelParameters;
+  std::unique_ptr<FresnelParameters> _refractionFresnelParameters;
+  std::unique_ptr<FresnelParameters> _emissiveFresnelParameters;
   bool _useGlossinessFromSpecularMapAlpha;
   unsigned int _maxSimultaneousLights;
 

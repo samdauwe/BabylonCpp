@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_SHADER_MATERIAL_H
 #define BABYLON_MATERIALS_SHADER_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/shader_material_options.h>
 #include <babylon/math/color3.h>
@@ -13,13 +13,18 @@
 
 namespace BABYLON {
 
+class ShaderMaterial;
+class Texture;
+using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
+using TexturePtr        = std::shared_ptr<Texture>;
+
 class BABYLON_SHARED_EXPORT ShaderMaterial : public Material {
 
 public:
   template <typename... Ts>
   static ShaderMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<ShaderMaterial>(
+    auto material = std::shared_ptr<ShaderMaterial>(
       new ShaderMaterial(::std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
@@ -30,73 +35,79 @@ public:
   /**
    * @brief Returns the string "ShaderMaterial".
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
-  ShaderMaterial& setTexture(const string_t& name, const TexturePtr& texture);
-  ShaderMaterial& setTextureArray(const string_t& iName,
-                                  const vector_t<BaseTexturePtr>& textures);
-  ShaderMaterial& setInt(const string_t& name, int value);
-  ShaderMaterial& setFloat(const string_t& name, float value);
-  ShaderMaterial& setFloats(const string_t& name, const Float32Array& value);
-  ShaderMaterial& setColor3(const string_t& name, const Color3& value);
-  ShaderMaterial& setColor3Array(const string_t& iName,
-                                 const vector_t<Color3>& value);
-  ShaderMaterial& setColor4(const string_t& name, const Color4& value);
-  ShaderMaterial& setVector2(const string_t& name, const Vector2& value);
-  ShaderMaterial& setVector3(const string_t& name, const Vector3& value);
-  ShaderMaterial& setVector4(const string_t& name, const Vector4& value);
-  ShaderMaterial& setMatrix(const string_t& name, const Matrix& value);
-  ShaderMaterial& setMatrix3x3(const string_t& name, const Float32Array& value);
-  ShaderMaterial& setMatrix2x2(const string_t& name, const Float32Array& value);
-  ShaderMaterial& setArray2(const string_t& iName, const Float32Array& value);
-  ShaderMaterial& setArray3(const string_t& iName, const Float32Array& value);
+  ShaderMaterial& setTexture(const std::string& name,
+                             const TexturePtr& texture);
+  ShaderMaterial& setTextureArray(const std::string& iName,
+                                  const std::vector<BaseTexturePtr>& textures);
+  ShaderMaterial& setInt(const std::string& name, int value);
+  ShaderMaterial& setFloat(const std::string& name, float value);
+  ShaderMaterial& setFloats(const std::string& name, const Float32Array& value);
+  ShaderMaterial& setColor3(const std::string& name, const Color3& value);
+  ShaderMaterial& setColor3Array(const std::string& iName,
+                                 const std::vector<Color3>& value);
+  ShaderMaterial& setColor4(const std::string& name, const Color4& value);
+  ShaderMaterial& setVector2(const std::string& name, const Vector2& value);
+  ShaderMaterial& setVector3(const std::string& name, const Vector3& value);
+  ShaderMaterial& setVector4(const std::string& name, const Vector4& value);
+  ShaderMaterial& setMatrix(const std::string& name, const Matrix& value);
+  ShaderMaterial& setMatrix3x3(const std::string& name,
+                               const Float32Array& value);
+  ShaderMaterial& setMatrix2x2(const std::string& name,
+                               const Float32Array& value);
+  ShaderMaterial& setArray2(const std::string& iName,
+                            const Float32Array& value);
+  ShaderMaterial& setArray3(const std::string& iName,
+                            const Float32Array& value);
   bool isReady(AbstractMesh* mesh = nullptr,
                bool useInstances  = false) override;
   void bindOnlyWorldMatrix(Matrix& world) override;
   void bind(Matrix* world, Mesh* mesh = nullptr) override;
-  vector_t<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
-  MaterialPtr clone(const string_t& name,
+  MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   Json::object serialize() const;
 
   // Statics
-  static unique_ptr_t<ShaderMaterial> Parse(const Json::value& source,
-                                            Scene* scene, const string_t& url);
+  static std::unique_ptr<ShaderMaterial>
+  Parse(const Json::value& source, Scene* scene, const std::string& url);
 
 protected:
-  ShaderMaterial(const string_t& name, Scene* scene, const string_t& shaderPath,
+  ShaderMaterial(const std::string& name, Scene* scene,
+                 const std::string& shaderPath,
                  const ShaderMaterialOptions& options);
 
 private:
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
-  void _checkUniform(const string_t& uniformName);
+  void _checkUniform(const std::string& uniformName);
 
 private:
-  string_t _shaderPath;
+  std::string _shaderPath;
   ShaderMaterialOptions _options;
-  unordered_map_t<string_t, TexturePtr> _textures;
-  unordered_map_t<string_t, vector_t<BaseTexturePtr>> _textureArrays;
-  unordered_map_t<string_t, float> _floats;
-  unordered_map_t<string_t, int> _ints;
-  unordered_map_t<string_t, Float32Array> _floatsArrays;
-  unordered_map_t<string_t, Color3> _colors3;
-  unordered_map_t<string_t, Float32Array> _colors3Arrays;
-  unordered_map_t<string_t, Color4> _colors4;
-  unordered_map_t<string_t, Vector2> _vectors2;
-  unordered_map_t<string_t, Vector3> _vectors3;
-  unordered_map_t<string_t, Vector4> _vectors4;
-  unordered_map_t<string_t, Matrix> _matrices;
-  unordered_map_t<string_t, Float32Array> _matrices3x3;
-  unordered_map_t<string_t, Float32Array> _matrices2x2;
-  unordered_map_t<string_t, Float32Array> _vectors2Arrays;
-  unordered_map_t<string_t, Float32Array> _vectors3Arrays;
+  std::unordered_map<std::string, TexturePtr> _textures;
+  std::unordered_map<std::string, std::vector<BaseTexturePtr>> _textureArrays;
+  std::unordered_map<std::string, float> _floats;
+  std::unordered_map<std::string, int> _ints;
+  std::unordered_map<std::string, Float32Array> _floatsArrays;
+  std::unordered_map<std::string, Color3> _colors3;
+  std::unordered_map<std::string, Float32Array> _colors3Arrays;
+  std::unordered_map<std::string, Color4> _colors4;
+  std::unordered_map<std::string, Vector2> _vectors2;
+  std::unordered_map<std::string, Vector3> _vectors3;
+  std::unordered_map<std::string, Vector4> _vectors4;
+  std::unordered_map<std::string, Matrix> _matrices;
+  std::unordered_map<std::string, Float32Array> _matrices3x3;
+  std::unordered_map<std::string, Float32Array> _matrices2x2;
+  std::unordered_map<std::string, Float32Array> _vectors2Arrays;
+  std::unordered_map<std::string, Float32Array> _vectors3Arrays;
   Matrix _cachedWorldViewMatrix;
   int _renderId;
 

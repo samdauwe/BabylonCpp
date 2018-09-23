@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_IIMAGE_PROCESSING_CONFIGURATION_DEFINES_H
 #define BABYLON_MATERIALS_IIMAGE_PROCESSING_CONFIGURATION_DEFINES_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

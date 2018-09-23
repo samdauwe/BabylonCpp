@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_RAW_CUBE_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_RAW_CUBE_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
@@ -28,13 +28,13 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
    * BABYLON.Texture.NEAREST_SAMPLINGMODE)
    * @param compression defines the compression used (null by default)
    */
-  RawCubeTexture(Scene* scene, const vector_t<Uint8Array>& data, int size,
+  RawCubeTexture(Scene* scene, const std::vector<Uint8Array>& data, int size,
                  unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
                  unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                  bool generateMipMaps = false, bool invertY = false,
                  unsigned int samplingMode
                  = TextureConstants::TRILINEAR_SAMPLINGMODE,
-                 const string_t& compression = "");
+                 const std::string& compression = "");
   ~RawCubeTexture();
 
   /**
@@ -47,9 +47,9 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
    * @param compression defines the compression used (null by default)
    * @param level defines which level of the texture to update
    */
-  void update(const vector_t<Uint8Array>& data, unsigned int format,
-              unsigned int type, bool invertY, const string_t& compression = "",
-              unsigned int level = 0);
+  void update(const std::vector<Uint8Array>& data, unsigned int format,
+              unsigned int type, bool invertY,
+              const std::string& compression = "", unsigned int level = 0);
 
   /**
    * @brief Clones the raw cube texture.

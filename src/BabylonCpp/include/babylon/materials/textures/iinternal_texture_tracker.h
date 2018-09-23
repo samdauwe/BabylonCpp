@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_IINTERNAL_TEXTURE_TRACKER_H
 #define BABYLON_MATERIALS_TEXTURES_IINTERNAL_TEXTURE_TRACKER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

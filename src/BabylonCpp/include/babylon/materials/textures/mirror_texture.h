@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_MIRROR_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_MIRROR_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/matrix.h>
@@ -9,10 +9,13 @@
 
 namespace BABYLON {
 
+class BlurPostProcess;
+class ImageProcessingConfiguration;
+
 class BABYLON_SHARED_EXPORT MirrorTexture : public RenderTargetTexture {
 
 public:
-  MirrorTexture(const string_t& name, const ISize& size, Scene* scene,
+  MirrorTexture(const std::string& name, const ISize& size, Scene* scene,
                 bool generateMipMaps = false,
                 unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                 unsigned int samplingMode
@@ -20,7 +23,7 @@ public:
                 bool generateDepthBuffer = true);
   ~MirrorTexture() override;
 
-  unique_ptr_t<MirrorTexture> clone();
+  std::unique_ptr<MirrorTexture> clone();
   Json::object serialize() const;
   void dispose() override;
 
@@ -56,8 +59,8 @@ private:
   Matrix _mirrorMatrix;
   Matrix _savedViewMatrix;
 
-  unique_ptr_t<BlurPostProcess> _blurX;
-  unique_ptr_t<BlurPostProcess> _blurY;
+  std::unique_ptr<BlurPostProcess> _blurX;
+  std::unique_ptr<BlurPostProcess> _blurY;
   float _adaptiveBlurKernel;
   float _blurKernelX;
   float _blurKernelY;

@@ -1,9 +1,13 @@
 #ifndef BABYLON_MATERIALS_IMATERIAL_DEFINES_H
 #define BABYLON_MATERIALS_IMATERIAL_DEFINES_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+struct MaterialDefines;
 
 struct BABYLON_SHARED_EXPORT IMaterialDefines {
   virtual bool isDirty() const                             = 0;
@@ -20,7 +24,7 @@ struct BABYLON_SHARED_EXPORT IMaterialDefines {
   virtual bool isEqual(const MaterialDefines& other) const = 0;
   virtual void cloneTo(MaterialDefines& other)             = 0;
   virtual void reset()                                     = 0;
-  virtual string_t toString() const                        = 0;
+  virtual std::string toString() const                     = 0;
 }; // end of struct IMaterialDefines
 
 } // end of namespace BABYLON

@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_STANDARD_MATERIAL_DEFINES_H
 #define BABYLON_MATERIALS_STANDARD_MATERIAL_DEFINES_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/materials/material_defines.h>
 
@@ -14,7 +14,7 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines
   StandardMaterialDefines();
   ~StandardMaterialDefines();
 
-  void setReflectionMode(const string_t& modeToEnable);
+  void setReflectionMode(const std::string& modeToEnable);
 
 }; // end of struct StandardMaterialDefines
 

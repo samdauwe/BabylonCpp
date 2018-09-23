@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 PBRSpecularGlossinessMaterial::PBRSpecularGlossinessMaterial(
-  const string_t& iName, Scene* scene)
+  const std::string& iName, Scene* scene)
     : PBRBaseSimpleMaterial{iName, scene}
     , diffuseTexture{nullptr}
     , glossiness{0.f}
@@ -18,12 +18,12 @@ PBRSpecularGlossinessMaterial::~PBRSpecularGlossinessMaterial()
 {
 }
 
-const string_t PBRSpecularGlossinessMaterial::getClassName() const
+const std::string PBRSpecularGlossinessMaterial::getClassName() const
 {
   return "PBRSpecularGlossinessMaterial";
 }
 
-vector_t<BaseTexturePtr>
+std::vector<BaseTexturePtr>
 PBRSpecularGlossinessMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseSimpleMaterial::getActiveTextures();
@@ -57,7 +57,7 @@ bool PBRSpecularGlossinessMaterial::hasTexture(
   return false;
 }
 
-MaterialPtr PBRSpecularGlossinessMaterial::clone(const string_t& /*name*/,
+MaterialPtr PBRSpecularGlossinessMaterial::clone(const std::string& /*name*/,
                                                  bool /*cloneChildren*/) const
 {
   return nullptr;
@@ -68,8 +68,10 @@ Json::object PBRSpecularGlossinessMaterial::serialize() const
   return Json::object();
 }
 
-PBRSpecularGlossinessMaterial* PBRSpecularGlossinessMaterial::Parse(
-  const Json::value& /*source*/, Scene* /*scene*/, const string_t& /*rootUrl*/)
+PBRSpecularGlossinessMaterial*
+PBRSpecularGlossinessMaterial::Parse(const Json::value& /*source*/,
+                                     Scene* /*scene*/,
+                                     const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

@@ -1,20 +1,21 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_IMULTI_RENDER_TARGET_OPTIONS_H
 #define BABYLON_MATERIALS_TEXTURES_IMULTI_RENDER_TARGET_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT IMultiRenderTargetOptions {
-  nullable_t<bool> generateMipMaps        = nullopt_t;
-  vector_t<unsigned int> types            = {};
-  vector_t<unsigned int> samplingModes    = {};
-  nullable_t<bool> generateDepthBuffer    = nullopt_t;
-  nullable_t<bool> generateStencilBuffer  = nullopt_t;
-  nullable_t<bool> generateDepthTexture   = nullopt_t;
-  nullable_t<bool> doNotChangeAspectRatio = nullopt_t;
-  nullable_t<size_t> textureCount         = nullopt_t;
-  nullable_t<unsigned int> defaultType    = nullopt_t;
+  std::optional<bool> generateMipMaps        = std::nullopt;
+  std::vector<unsigned int> types            = {};
+  std::vector<unsigned int> samplingModes    = {};
+  std::optional<bool> generateDepthBuffer    = std::nullopt;
+  std::optional<bool> generateStencilBuffer  = std::nullopt;
+  std::optional<bool> generateDepthTexture   = std::nullopt;
+  std::optional<bool> doNotChangeAspectRatio = std::nullopt;
+  std::optional<size_t> textureCount         = std::nullopt;
+  std::optional<unsigned int> defaultType    = std::nullopt;
 }; // end of struct IMultiRenderTargetOptions
 
 } // end of namespace BABYLON

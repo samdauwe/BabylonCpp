@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_PBR_PBR_SPECULAR_GLOSSINESS_MATERIAL_H
 #define BABYLON_MATERIALS_PBR_PBR_SPECULAR_GLOSSINESS_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/pbr/pbr_base_simple_material.h>
 
 namespace BABYLON {
@@ -22,18 +22,18 @@ public:
    * @param name The material name
    * @param scene The scene the material will be use in.
    */
-  PBRSpecularGlossinessMaterial(const string_t& name, Scene* scene);
+  PBRSpecularGlossinessMaterial(const std::string& name, Scene* scene);
   ~PBRSpecularGlossinessMaterial() override;
 
   /**
    * @brief Return the currrent class name of the material.
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Return the active textures of the material.
    */
-  vector_t<BaseTexturePtr> getActiveTextures() const override;
+  std::vector<BaseTexturePtr> getActiveTextures() const override;
 
   /**
    * @brief Checks to see if a texture is used in the material.
@@ -46,7 +46,7 @@ public:
    * @brief Makes a duplicate of the current material.
    * @param name - name to use for the new material.
    */
-  MaterialPtr clone(const string_t& name,
+  MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
 
   /**
@@ -58,7 +58,7 @@ public:
    * @brief Parses a JSON object correponding to the serialize function.
    */
   static PBRSpecularGlossinessMaterial*
-  Parse(const Json::value& source, Scene* scene, const string_t& rootUrl);
+  Parse(const Json::value& source, Scene* scene, const std::string& rootUrl);
 
 public:
   /**

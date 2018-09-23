@@ -1,7 +1,9 @@
 #ifndef BABYLON_MATERIALS_MATERIAL_DEFINES_H
 #define BABYLON_MATERIALS_MATERIAL_DEFINES_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/materials/imaterial_defines.h>
 
 namespace BABYLON {
@@ -14,7 +16,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
   MaterialDefines();
   virtual ~MaterialDefines();
 
-  bool operator[](const string_t& define) const;
+  bool operator[](const std::string& define) const;
   bool operator==(const MaterialDefines& rhs) const;
   bool operator!=(const MaterialDefines& rhs) const;
   friend std::ostream& operator<<(std::ostream& os,
@@ -100,13 +102,13 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
    * @brief Converts the material define values to a string.
    * @returns - String of material define information.
    */
-  virtual string_t toString() const override;
+  virtual std::string toString() const override;
 
   // Properties
-  unordered_map_t<string_t, bool> boolDef;
-  unordered_map_t<string_t, unsigned int> intDef;
-  unordered_map_t<string_t, float> floatDef;
-  unordered_map_t<string_t, string_t> stringDef;
+  std::unordered_map<std::string, bool> boolDef;
+  std::unordered_map<std::string, unsigned int> intDef;
+  std::unordered_map<std::string, float> floatDef;
+  std::unordered_map<std::string, std::string> stringDef;
 
   bool _isDirty;
   /** Hidden */

@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_IRENDER_TARGET_OPTIONS_H
 #define BABYLON_MATERIALS_TEXTURES_IRENDER_TARGET_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 

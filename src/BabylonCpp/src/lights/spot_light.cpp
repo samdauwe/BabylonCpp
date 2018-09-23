@@ -15,15 +15,15 @@ bool SpotLight::NodeConstructorAdded = false;
 void SpotLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "Light_Type_2", [](const string_t& name, Scene* scene,
-                       const nullable_t<Json::value>& /*options*/) {
+    "Light_Type_2", [](const std::string& name, Scene* scene,
+                       const std::optional<Json::value>& /*options*/) {
       return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
                             scene);
     });
   SpotLight::NodeConstructorAdded = true;
 }
 
-SpotLight::SpotLight(const string_t& iName, const Vector3& iPosition,
+SpotLight::SpotLight(const std::string& iName, const Vector3& iPosition,
                      const Vector3& iDirection, float iAngle, float iExponent,
                      Scene* scene)
     : ShadowLight{iName, scene}
@@ -76,7 +76,7 @@ IReflect::Type SpotLight::type() const
   return IReflect::Type::SPOTLIGHT;
 }
 
-const string_t SpotLight::getClassName() const
+const std::string SpotLight::getClassName() const
 {
   return "SpotLight";
 }
@@ -185,7 +185,7 @@ void SpotLight::_setPosition(const Vector3& value)
 
 void SpotLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const vector_t<AbstractMeshPtr>& /*renderList*/)
+  const std::vector<AbstractMeshPtr>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
 
@@ -262,7 +262,7 @@ void SpotLight::_computeAngleValues()
   _lightAngleOffset = -_cosHalfAngle * _lightAngleScale;
 }
 
-void SpotLight::transferToEffect(Effect* effect, const string_t& lightIndex)
+void SpotLight::transferToEffect(Effect* effect, const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Zero();
 

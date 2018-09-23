@@ -1,13 +1,19 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_INTERNAL_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_INTERNAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/core/variant.h>
 #include <babylon/materials/textures/iinternal_texture_tracker.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+class Engine;
+class ICanvasRenderingContext2D;
+class SphericalPolynomial;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 namespace GL {
 class IGLFramebuffer;
@@ -143,7 +149,7 @@ public:
   /**
    * Gets the URL used to load this texture
    */
-  string_t url;
+  std::string url;
   /**
    * Gets the sampling mode of the texture
    */
@@ -206,29 +212,29 @@ public:
   unsigned int _dataSource;
   Variant<ArrayBuffer, Image> _buffer;
   ArrayBuffer _bufferView;
-  vector_t<ArrayBuffer> _bufferViewArray;
-  vector_t<vector_t<ArrayBuffer>> _bufferViewArrayArray;
+  std::vector<ArrayBuffer> _bufferViewArray;
+  std::vector<std::vector<ArrayBuffer>> _bufferViewArrayArray;
   int _size;
-  string_t _extension;
-  vector_t<string_t> _files;
+  std::string _extension;
+  std::vector<std::string> _files;
   ICanvas* _workingCanvas;
   ICanvasRenderingContext2D* _workingContext;
-  shared_ptr_t<GL::IGLFramebuffer> _framebuffer;
-  shared_ptr_t<GL::IGLRenderbuffer> _depthStencilBuffer;
-  unique_ptr_t<GL::IGLFramebuffer> _MSAAFramebuffer;
+  std::shared_ptr<GL::IGLFramebuffer> _framebuffer;
+  std::shared_ptr<GL::IGLRenderbuffer> _depthStencilBuffer;
+  std::unique_ptr<GL::IGLFramebuffer> _MSAAFramebuffer;
   Uint32Array _attachments;
-  unique_ptr_t<GL::IGLRenderbuffer> _MSAARenderBuffer;
+  std::unique_ptr<GL::IGLRenderbuffer> _MSAARenderBuffer;
   unsigned int _cachedCoordinatesMode;
   unsigned int _cachedWrapU;
   unsigned int _cachedWrapV;
   unsigned int _cachedWrapR;
   unsigned int _cachedAnisotropicFilteringLevel;
   bool _isDisabled;
-  string_t _compression;
+  std::string _compression;
   bool _generateStencilBuffer;
   bool _generateDepthBuffer;
   int _comparisonFunction;
-  unique_ptr_t<SphericalPolynomial> _sphericalPolynomial;
+  std::unique_ptr<SphericalPolynomial> _sphericalPolynomial;
   float _lodGenerationScale;
   float _lodGenerationOffset;
   // The following three fields helps sharing generated fixed LODs for texture
@@ -241,7 +247,7 @@ public:
   BaseTexturePtr _lodTextureLow;
   bool _isRGBD;
 
-  shared_ptr_t<GL::IGLTexture> _webGLTexture;
+  std::shared_ptr<GL::IGLTexture> _webGLTexture;
   int _references;
 
 private:

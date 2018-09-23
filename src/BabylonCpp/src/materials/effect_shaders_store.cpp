@@ -8,17 +8,17 @@
 #include <babylon/shaders/blur_fragment_fx.h>
 #include <babylon/shaders/chromatic_aberration_fragment_fx.h>
 #include <babylon/shaders/circle_of_confusion_fragment_fx.h>
+#include <babylon/shaders/color_correction_fragment_fx.h>
 #include <babylon/shaders/color_fragment_fx.h>
 #include <babylon/shaders/color_vertex_fx.h>
-#include <babylon/shaders/color_correction_fragment_fx.h>
 #include <babylon/shaders/convolution_fragment_fx.h>
 #include <babylon/shaders/default_fragment_fx.h>
 #include <babylon/shaders/default_vertex_fx.h>
-#include <babylon/shaders/depth_fragment_fx.h>
-#include <babylon/shaders/depth_vertex_fx.h>
 #include <babylon/shaders/depth_box_blur_fragment_fx.h>
+#include <babylon/shaders/depth_fragment_fx.h>
 #include <babylon/shaders/depth_of_field_fragment_fx.h>
 #include <babylon/shaders/depth_of_field_merge_fragment_fx.h>
+#include <babylon/shaders/depth_vertex_fx.h>
 #include <babylon/shaders/display_pass_fragment_fx.h>
 #include <babylon/shaders/extract_highlights_fragment_fx.h>
 #include <babylon/shaders/filter_fragment_fx.h>
@@ -65,9 +65,9 @@
 #include <babylon/shaders/sharpen_fragment_fx.h>
 #include <babylon/shaders/sprites_fragment_fx.h>
 #include <babylon/shaders/sprites_vertex_fx.h>
-#include <babylon/shaders/ssao_fragment_fx.h>
 #include <babylon/shaders/ssao2_fragment_fx.h>
 #include <babylon/shaders/ssao_combine_fragment_fx.h>
+#include <babylon/shaders/ssao_fragment_fx.h>
 #include <babylon/shaders/standard_fragment_fx.h>
 #include <babylon/shaders/stereoscopic_interlace_fragment_fx.h>
 #include <babylon/shaders/tonemap_fragment_fx.h>
@@ -85,18 +85,18 @@ EffectShadersStore::~EffectShadersStore()
 {
 }
 
-unordered_map_t<string_t, string_t>& EffectShadersStore::shaders()
+std::unordered_map<std::string, std::string>& EffectShadersStore::shaders()
 {
   return _shaders;
 }
 
-const unordered_map_t<string_t, string_t>&
+const std::unordered_map<std::string, std::string>&
 EffectShadersStore::shaders() const
 {
   return _shaders;
 }
 
-unordered_map_t<string_t, string_t> EffectShadersStore::_shaders
+std::unordered_map<std::string, std::string> EffectShadersStore::_shaders
   = {{"anaglyphPixelShader", anaglyphPixelShader},
      {"backgroundPixelShader", backgroundPixelShader},
      {"backgroundVertexShader", backgroundVertexShader},

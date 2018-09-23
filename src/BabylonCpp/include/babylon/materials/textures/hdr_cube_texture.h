@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_HDR_CUBE_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_HDR_CUBE_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
@@ -30,13 +30,13 @@ public:
    * standard material would require them in Gamma space)
    * @param reserved Reserved flag for internal use.
    */
-  HDRCubeTexture(const string_t& url, Scene* scene, size_t size,
-                 bool noMipmap = false, bool generateHarmonics = true,
-                 bool gammaSpace = false, bool reserved = false,
-                 const ::std::function<void()>& onLoad = nullptr,
-                 const ::std::function<void(const string_t& message,
-                                            const string_t& exception)>& onError
-                 = nullptr);
+  HDRCubeTexture(
+    const std::string& url, Scene* scene, size_t size, bool noMipmap = false,
+    bool generateHarmonics = true, bool gammaSpace = false,
+    bool reserved = false, const std::function<void()>& onLoad = nullptr,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr);
   ~HDRCubeTexture() override;
 
   HDRCubeTexture* clone();
@@ -46,7 +46,7 @@ public:
   Matrix* getReflectionTextureMatrix() override;
   void setReflectionTextureMatrix(const Matrix& value);
   static HDRCubeTexture* Parse(const Json::value& parsedTexture, Scene* scene,
-                               const string_t& rootUrl);
+                               const std::string& rootUrl);
   Json::object serialize() const;
 
 protected:
@@ -77,7 +77,7 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example https://www.babylonjs-playground.com/#RNASML
    */
-  void set_boundingBoxSize(const nullable_t<Vector3>& value) override;
+  void set_boundingBoxSize(const std::optional<Vector3>& value) override;
 
   /**
    * @brief Gets the size of the bounding box associated with the cube texture.
@@ -86,7 +86,7 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example https://www.babylonjs-playground.com/#RNASML
    */
-  nullable_t<Vector3>& get_boundingBoxSize() override;
+  std::optional<Vector3>& get_boundingBoxSize() override;
 
 private:
   /**
@@ -98,7 +98,7 @@ public:
   /**
    * The texture URL.
    */
-  string_t url;
+  std::string url;
 
   /**
    * The texture coordinates mode. As this texture is stored in a cube format,
@@ -132,16 +132,16 @@ protected:
   float _rotationY;
 
 private:
-  static vector_t<string_t> _facesMapping;
+  static std::vector<std::string> _facesMapping;
   bool _generateHarmonics;
   bool _noMipmap;
-  vector_t<string_t> _extensions;
+  std::vector<std::string> _extensions;
   Matrix _textureMatrix;
   size_t _size;
-  ::std::function<void()> _onLoad;
-  ::std::function<void(const string_t& message, const string_t& exception)>
+  std::function<void()> _onLoad;
+  std::function<void(const std::string& message, const std::string& exception)>
     _onError;
-  nullable_t<Vector3> _boundingBoxSize;
+  std::optional<Vector3> _boundingBoxSize;
 
 }; // end of class HDRCubeTexture
 

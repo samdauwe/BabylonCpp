@@ -1,11 +1,14 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_CUBE_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_CUBE_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
+
+class CubeTexture;
+using CubeTexturePtr = std::shared_ptr<CubeTexture>;
 
 class BABYLON_SHARED_EXPORT CubeTexture : public BaseTexture {
 
@@ -13,8 +16,8 @@ public:
   template <typename... Ts>
   static CubeTexturePtr New(Ts&&... args)
   {
-    auto texture
-      = shared_ptr_t<CubeTexture>(new CubeTexture(::std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<CubeTexture>(
+      new CubeTexture(::std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
@@ -27,7 +30,7 @@ public:
   CubeTexturePtr clone() const;
 
   /** Static methods **/
-  static CubeTexturePtr CreateFromImages(const vector_t<string_t>& files,
+  static CubeTexturePtr CreateFromImages(const std::vector<std::string>& files,
                                          Scene* scene, bool noMipmap = false);
 
   /**
@@ -42,12 +45,12 @@ public:
    * @return the prefiltered texture
    */
   static CubeTexturePtr
-  CreateFromPrefilteredData(const string_t& url, Scene* scene,
-                            const string_t& forcedExtension = "",
-                            bool createPolynomials          = true);
+  CreateFromPrefilteredData(const std::string& url, Scene* scene,
+                            const std::string& forcedExtension = "",
+                            bool createPolynomials             = true);
 
   static CubeTexturePtr Parse(const Json::value& parsedTexture, Scene* scene,
-                              const string_t& rootUrl);
+                              const std::string& rootUrl);
 
 protected:
   /**
@@ -77,14 +80,14 @@ protected:
    * manages first LOD level used for IBL according to the roughness
    * @return the cube texture
    */
-  CubeTexture(const string_t& rootUrl, Scene* scene,
-              const vector_t<string_t>& extensions = {}, bool noMipmap = false,
-              const vector_t<string_t>& files = {},
+  CubeTexture(const std::string& rootUrl, Scene* scene,
+              const std::vector<std::string>& extensions = {},
+              bool noMipmap = false, const std::vector<std::string>& files = {},
               const ::std::function<void(InternalTexture*, EventState&)>& onLoad
               = nullptr,
               const ::std::function<void()>& onError = nullptr,
               unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
-              bool prefiltered = false, const string_t& forcedExtension = "",
+              bool prefiltered = false, const std::string& forcedExtension = "",
               bool createPolynomials = false, float lodScale = 0.8f,
               float lodOffset = 0.f);
 
@@ -95,8 +98,8 @@ protected:
    * https://community.arm.com/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
    * Example: https://www.babylonjs-playground.com/#RNASML
    */
-  void set_boundingBoxSize(const nullable_t<Vector3>& value) override;
-  nullable_t<Vector3>& get_boundingBoxSize() override;
+  void set_boundingBoxSize(const std::optional<Vector3>& value) override;
+  std::optional<Vector3>& get_boundingBoxSize() override;
 
   /**
    * @brief Sets texture matrix rotation angle around Y axis in radians.
@@ -111,7 +114,7 @@ protected:
   float get_rotationY() const;
 
 public:
-  string_t url;
+  std::string url;
 
   /**
    * Gets or sets the center of the bounding box associated with the cube
@@ -128,12 +131,12 @@ public:
   bool _prefiltered;
 
 private:
-  nullable_t<Vector3> _boundingBoxSize;
+  std::optional<Vector3> _boundingBoxSize;
   float _rotationY;
   bool _noMipmap;
-  vector_t<string_t> _files;
-  vector_t<string_t> _extensions;
-  unique_ptr_t<Matrix> _textureMatrix;
+  std::vector<std::string> _files;
+  std::vector<std::string> _extensions;
+  std::unique_ptr<Matrix> _textureMatrix;
   unsigned int _format;
   bool _createPolynomials;
 

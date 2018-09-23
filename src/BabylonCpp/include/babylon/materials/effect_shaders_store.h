@@ -1,7 +1,10 @@
 ﻿#ifndef BABYLON_MATERIALS_EFFECT_SHADERS_STORE_H
 #define BABYLON_MATERIALS_EFFECT_SHADERS_STORE_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
@@ -11,11 +14,11 @@ public:
   EffectShadersStore();
   ~EffectShadersStore();
 
-  unordered_map_t<string_t, string_t>& shaders();
-  const unordered_map_t<string_t, string_t>& shaders() const;
+  std::unordered_map<std::string, std::string>& shaders();
+  const std::unordered_map<std::string, std::string>& shaders() const;
 
 private:
-  static unordered_map_t<string_t, string_t> _shaders;
+  static std::unordered_map<std::string, std::string> _shaders;
 
 }; // end of class EffectShadersStore
 

@@ -1,10 +1,12 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_COLOR_GRADING_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_COLOR_GRADING_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
+
+class Engine;
 
 /**
  * @brief This represents a color grading texture. This acts as a lookup table
@@ -25,7 +27,7 @@ public:
    * supporting 3dl)
    * @param scene The scene the texture will be used in
    */
-  ColorGradingTexture(const string_t& url, Scene* scene);
+  ColorGradingTexture(const std::string& url, Scene* scene);
   ~ColorGradingTexture() override;
 
   /**
@@ -38,7 +40,7 @@ public:
   /**
    * @brief Clones the color gradind texture.
    */
-  unique_ptr_t<ColorGradingTexture> clone() const;
+  std::unique_ptr<ColorGradingTexture> clone() const;
 
   /**
    * @brief Called during delayed load for textures.
@@ -52,9 +54,9 @@ public:
    * @param rootUrl The root url of the data assets to load
    * @return A color gradind texture
    */
-  static unique_ptr_t<ColorGradingTexture>
+  static std::unique_ptr<ColorGradingTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const string_t& rootUrl);
+        const std::string& rootUrl);
 
   /**
    * @brief Serializes the LUT texture to json format.
@@ -76,14 +78,14 @@ public:
   /**
    * The texture URL.
    */
-  string_t url;
+  std::string url;
 
 private:
   /**
    * The current texture matrix. (will always be identity in color grading
    * texture)
    */
-  unique_ptr_t<Matrix> _textureMatrix;
+  std::unique_ptr<Matrix> _textureMatrix;
 
   Engine* _engine;
 

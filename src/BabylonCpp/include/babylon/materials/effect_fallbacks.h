@@ -1,9 +1,16 @@
 #ifndef BABYLON_MATERIALS_EFFECT_FALLBACKS_H
 #define BABYLON_MATERIALS_EFFECT_FALLBACKS_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Effect;
 
 /**
  * @brief EffectFallbacks can be used to add fallbacks (properties to disable)
@@ -35,7 +42,7 @@ public:
    * first)
    * @param define The name of the define in the shader
    */
-  void addFallback(unsigned int rank, const string_t& define);
+  void addFallback(unsigned int rank, const std::string& define);
 
   /**
    * @brief Sets the mesh to use CPU skinning when needing to fallback.
@@ -56,10 +63,10 @@ public:
    * @param effect defines the current effect we try to compile
    * @returns The resulting defines with defines of the current rank removed.
    */
-  string_t reduce(string_t currentDefines, Effect* effect);
+  std::string reduce(std::string currentDefines, Effect* effect);
 
 private:
-  unordered_map_t<unsigned int, vector_t<string_t>> _defines;
+  std::unordered_map<unsigned int, std::vector<std::string>> _defines;
   unsigned int _currentRank;
   unsigned int _maxRank;
 

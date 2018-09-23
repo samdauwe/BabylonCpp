@@ -1,11 +1,16 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_DYNAMIC_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_DYNAMIC_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
+
+class DynamicTexture;
+class Engine;
+class ICanvasRenderingContext2D;
+using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
 
 struct DynamicTextureOptions {
   ICanvas* canvas = nullptr;
@@ -23,7 +28,7 @@ public:
   template <typename... Ts>
   static DynamicTexturePtr New(Ts&&... args)
   {
-    auto texture = shared_ptr_t<DynamicTexture>(
+    auto texture = std::shared_ptr<DynamicTexture>(
       new DynamicTexture(::std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
@@ -80,8 +85,8 @@ public:
    * @param update defines whether texture is immediately update (default is
    * true)
    */
-  void drawText(const string_t& text, int x, int y, const string_t& font,
-                const string_t& color, const string_t& clearColor,
+  void drawText(const std::string& text, int x, int y, const std::string& font,
+                const std::string& color, const std::string& clearColor,
                 bool invertY = true, bool update = true);
 
   /**
@@ -116,7 +121,7 @@ protected:
    * @param format defines the texture format to use (default is
    * BABYLON.Engine.TEXTUREFORMAT_RGBA)
    */
-  DynamicTexture(const string_t& name, const DynamicTextureOptions& options,
+  DynamicTexture(const std::string& name, const DynamicTextureOptions& options,
                  Scene* scene, bool generateMipMaps,
                  unsigned int samplingMode
                  = TextureConstants::TRILINEAR_SAMPLINGMODE,

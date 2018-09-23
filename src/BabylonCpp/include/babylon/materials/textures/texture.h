@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -10,6 +10,9 @@
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class Texture;
+using TexturePtr = std::shared_ptr<Texture>;
 
 class BABYLON_SHARED_EXPORT Texture : public BaseTexture {
 
@@ -28,7 +31,7 @@ public:
   static TexturePtr New(Ts&&... args)
   {
     auto texture
-      = shared_ptr_t<Texture>(new Texture(::std::forward<Ts>(args)...));
+      = std::shared_ptr<Texture>(new Texture(::std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
@@ -48,8 +51,8 @@ public:
    * @param url the url of the texture
    * @param buffer the buffer of the texture (defaults to null)
    */
-  void updateURL(const string_t& iUrl,
-                 const nullable_t<Variant<ArrayBuffer, Image>>& buffer);
+  void updateURL(const std::string& iUrl,
+                 const std::optional<Variant<ArrayBuffer, Image>>& buffer);
 
   void delayLoad() override;
 
@@ -90,32 +93,34 @@ public:
 
   /** Statics **/
   static TexturePtr CreateFromBase64String(
-    const string_t& data, const string_t& name, Scene* scene,
+    const std::string& data, const std::string& name, Scene* scene,
     bool noMipmap = false, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void()>& onLoad  = nullptr,
     const ::std::function<void()>& onError = nullptr,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
-  static unique_ptr_t<BaseTexture> Parse(const Json::value& parsedTexture,
-                                         Scene* scene, const string_t& rootUrl);
+  static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
+                                            Scene* scene,
+                                            const std::string& rootUrl);
   static TexturePtr LoadFromDataString(
-    const string_t& name, const nullable_t<Variant<ArrayBuffer, Image>>& buffer,
-    Scene* scene, bool deleteBuffer = false, bool noMipmap = false,
-    bool invertY              = true,
+    const std::string& name,
+    const std::optional<Variant<ArrayBuffer, Image>>& buffer, Scene* scene,
+    bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const ::std::function<void()>& onLoad  = nullptr,
     const ::std::function<void()>& onError = nullptr,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
 
 protected:
-  Texture(const string_t& url, Scene* scene, bool noMipmap = false,
+  Texture(const std::string& url, Scene* scene, bool noMipmap = false,
           bool invertY              = true,
           unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-          const ::std::function<void()>& onLoad                 = nullptr,
-          const ::std::function<void()>& onError                = nullptr,
-          const nullable_t<Variant<ArrayBuffer, Image>>& buffer = nullopt_t,
-          bool deleteBuffer                                     = false,
-          const nullable_t<unsigned int>& format                = nullopt_t);
+          const ::std::function<void()>& onLoad  = nullptr,
+          const ::std::function<void()>& onError = nullptr,
+          const std::optional<Variant<ArrayBuffer, Image>>& buffer
+          = std::nullopt,
+          bool deleteBuffer                         = false,
+          const std::optional<unsigned int>& format = std::nullopt);
 
   bool get_noMipmap() const;
   void set_isBlocking(bool value) override;
@@ -127,7 +132,7 @@ private:
   void _prepareRowForTextureGeneration(float x, float y, float z, Vector3& t);
 
 public:
-  string_t url;
+  std::string url;
   float uOffset;
   float vOffset;
   float uScale;
@@ -162,15 +167,15 @@ public:
   ReadOnlyProperty<Texture, Observable<Texture>> onLoadObservable;
 
 protected:
-  const nullable_t<unsigned int> _format;
+  const std::optional<unsigned int> _format;
   Observable<Texture> _onLoadObservable;
   bool _isBlocking;
 
 private:
   bool _noMipmap;
-  unique_ptr_t<Matrix> _rowGenerationMatrix;
-  unique_ptr_t<Matrix> _cachedTextureMatrix;
-  unique_ptr_t<Matrix> _projectionModeMatrix;
+  std::unique_ptr<Matrix> _rowGenerationMatrix;
+  std::unique_ptr<Matrix> _cachedTextureMatrix;
+  std::unique_ptr<Matrix> _projectionModeMatrix;
   Vector3 _t0;
   Vector3 _t1;
   Vector3 _t2;
@@ -184,7 +189,7 @@ private:
   float _cachedWAng;
   int _cachedProjectionMatrixId;
   unsigned int _cachedCoordinatesMode;
-  nullable_t<Variant<ArrayBuffer, Image>> _buffer;
+  std::optional<Variant<ArrayBuffer, Image>> _buffer;
   bool _deleteBuffer;
   ::std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
   ::std::function<void()> _delayedOnError;

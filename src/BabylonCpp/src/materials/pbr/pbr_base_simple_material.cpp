@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const string_t& iName,
+PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const std::string& iName,
                                              Scene* scene)
     : PBRBaseMaterial{iName, scene}
     , maxSimultaneousLights{4}
@@ -30,7 +30,7 @@ PBRBaseSimpleMaterial::~PBRBaseSimpleMaterial()
 {
 }
 
-const string_t PBRBaseSimpleMaterial::getClassName() const
+const std::string PBRBaseSimpleMaterial::getClassName() const
 {
   return "PBRBaseSimpleMaterial";
 }
@@ -56,7 +56,7 @@ bool PBRBaseSimpleMaterial::_shouldUseAlphaFromAlbedoTexture() const
          && _transparencyMode != PBRMaterial::PBRMATERIAL_OPAQUE;
 }
 
-vector_t<BaseTexturePtr> PBRBaseSimpleMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> PBRBaseSimpleMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseMaterial::getActiveTextures();
 

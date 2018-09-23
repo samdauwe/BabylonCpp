@@ -14,14 +14,14 @@ bool PointLight::NodeConstructorAdded = false;
 void PointLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "Light_Type_0", [](const string_t& name, Scene* scene,
-                       const nullable_t<Json::value>& /*options*/) {
+    "Light_Type_0", [](const std::string& name, Scene* scene,
+                       const std::optional<Json::value>& /*options*/) {
       return PointLight::New(name, Vector3::Zero(), scene);
     });
   PointLight::NodeConstructorAdded = true;
 }
 
-PointLight::PointLight(const string_t& iName, const Vector3& iPosition,
+PointLight::PointLight(const std::string& iName, const Vector3& iPosition,
                        Scene* scene)
     : ShadowLight{iName, scene}
     , shadowAngle{this, &PointLight::get_shadowAngle,
@@ -59,13 +59,13 @@ Vector3& PointLight::get_direction()
 void PointLight::set_direction(const Vector3& value)
 {
   auto previousNeedCube = needCube();
-  _direction            = ::std::make_unique<Vector3>(value);
+  _direction            = std::make_unique<Vector3>(value);
   if (needCube() != previousNeedCube && _shadowGenerator) {
     _shadowGenerator->recreateShadowMap();
   }
 }
 
-const string_t PointLight::getClassName() const
+const std::string PointLight::getClassName() const
 {
   return "PointLight";
 }
@@ -109,7 +109,7 @@ Vector3 PointLight::getShadowDirection(unsigned int faceIndex)
 
 void PointLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const vector_t<AbstractMeshPtr>& /*renderList*/)
+  const std::vector<AbstractMeshPtr>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
 
@@ -133,7 +133,7 @@ void PointLight::_buildUniformLayout()
 }
 
 void PointLight::transferToEffect(Effect* /*effect*/,
-                                  const string_t& lightIndex)
+                                  const std::string& lightIndex)
 {
   if (computeTransformedInformation()) {
     _uniformBuffer->updateFloat4("vLightData",            //
@@ -160,7 +160,7 @@ void PointLight::transferToEffect(Effect* /*effect*/,
 void PointLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                              unsigned int lightIndex)
 {
-  defines.boolDef["POINTLIGHT" + ::std::to_string(lightIndex)] = true;
+  defines.boolDef["POINTLIGHT" + std::to_string(lightIndex)] = true;
 }
 
 } // end of namespace BABYLON

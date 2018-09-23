@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_BACKGROUND_BACKGROUND_MATERIAL_H
 #define BABYLON_MATERIALS_BACKGROUND_BACKGROUND_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/math/color3.h>
@@ -10,6 +10,10 @@
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class BackgroundMaterial;
+class IShadowLight;
+using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
 
 /**
  * @brief Background material used to create an efficient environement around
@@ -32,7 +36,7 @@ public:
   template <typename... Ts>
   static BackgroundMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<BackgroundMaterial>(
+    auto material = std::shared_ptr<BackgroundMaterial>(
       new BackgroundMaterial(::std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
@@ -232,7 +236,7 @@ public:
    * @param name The cloned name.
    * @returns The cloned material.
    */
-  MaterialPtr clone(const string_t& name,
+  MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
 
   /**
@@ -245,7 +249,7 @@ public:
    * @brief Gets the class name of the material
    * @returns "BackgroundMaterial"
    */
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Parse a JSON input to create back a background material.
@@ -254,14 +258,14 @@ public:
    * @param rootUrl The root url of the assets the material depends upon
    * @returns the instantiated BackgroundMaterial.
    */
-  static unique_ptr_t<BackgroundMaterial>
-  Parse(const Json::value& source, Scene* scene, const string_t& url);
+  static std::unique_ptr<BackgroundMaterial>
+  Parse(const Json::value& source, Scene* scene, const std::string& url);
 
   /** Getters / Setters **/
   const Color3& primaryColor() const;
   void setPrimaryColor(const Color3& value);
-  nullable_t<Color3>& _perceptualColor();
-  void setPerceptualColor(const nullable_t<Color3>& value);
+  std::optional<Color3>& _perceptualColor();
+  void setPerceptualColor(const std::optional<Color3>& value);
   float primaryColorShadowLevel() const;
   void setPrimaryColorShadowLevel(float value);
   float primaryColorHighlightLevel() const;
@@ -297,7 +301,7 @@ protected:
    * @param name The friendly name of the material
    * @param scene The scene to add the material to
    */
-  BackgroundMaterial(const string_t& name, Scene* scene);
+  BackgroundMaterial(const std::string& name, Scene* scene);
 
   /**
    * @brief Attaches a new image processing configuration to the PBR Material.
@@ -341,7 +345,7 @@ protected:
    * color grading and color curves as they are considered post effect and not
    * directly part of lighting setup.)
    */
-  nullable_t<Color3> __perceptualColor;
+  std::optional<Color3> __perceptualColor;
 
   /**
    * Defines the level of the shadows (dark area of the reflection map) in order
@@ -384,7 +388,7 @@ protected:
    * Specify the list of lights casting shadow on the material.
    * All scene shadow lights will be included if null.
    */
-  vector_t<IShadowLight*> _shadowLights;
+  std::vector<IShadowLight*> _shadowLights;
 
   /**
    * Helps adjusting the shadow to a softer level if required.
@@ -495,7 +499,7 @@ private:
   Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
 
   // Temp values kept as cache in the material.
-  vector_t<RenderTargetTexture*> _renderTargets;
+  std::vector<RenderTargetTexture*> _renderTargets;
   Vector4 _reflectionControls;
   Color3 _white;
   Color3 _primaryShadowColor;

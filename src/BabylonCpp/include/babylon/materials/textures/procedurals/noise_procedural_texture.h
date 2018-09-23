@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_PROCEDURALS_NOISE_PROCEDURAL_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_PROCEDURALS_NOISE_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/json.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
@@ -18,7 +18,7 @@ public:
   {
     auto texture = new NoiseProceduralTexture(::std::forward<Ts>(args)...);
     texture->addToScene(
-      static_cast<unique_ptr_t<NoiseProceduralTexture>>(texture));
+      static_cast<std::unique_ptr<NoiseProceduralTexture>>(texture));
 
     return texture;
   }
@@ -45,7 +45,7 @@ public:
    * @returns a parsed NoiseProceduralTexture
    */
   static void Parse(const Json::value& serializationObject, Scene* scene,
-                    const string_t& rootUrl);
+                    const std::string& rootUrl);
 
 protected:
   /**
@@ -58,7 +58,7 @@ protected:
    * @param generateMipMaps defines if mipmaps must be generated (true by
    * default)
    */
-  NoiseProceduralTexture(const string_t& name, int size = 256,
+  NoiseProceduralTexture(const std::string& name, int size = 256,
                          Scene* scene             = nullptr,
                          Texture* fallbackTexture = nullptr,
                          bool generateMipMaps     = false);
