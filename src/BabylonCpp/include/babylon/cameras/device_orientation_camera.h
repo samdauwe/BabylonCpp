@@ -25,7 +25,7 @@ public:
   static DeviceOrientationCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<DeviceOrientationCamera>(
-      new DeviceOrientationCamera(::std::forward<Ts>(args)...));
+      new DeviceOrientationCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

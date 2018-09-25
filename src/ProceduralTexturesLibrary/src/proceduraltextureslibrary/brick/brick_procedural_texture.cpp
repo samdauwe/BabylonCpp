@@ -101,9 +101,9 @@ Json::object BrickProceduralTexture::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<BrickProceduralTexture>
+std::unique_ptr<BrickProceduralTexture>
 BrickProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                              Scene* /*scene*/, const string_t& /*rootUrl*/)
+                              Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

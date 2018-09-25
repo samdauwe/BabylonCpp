@@ -234,7 +234,7 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
     for (auto& light : mesh->_lightSources) {
       needNormals = true;
 
-      auto lightIndexStr = ::std::to_string(lightIndex);
+      auto lightIndexStr = std::to_string(lightIndex);
 
       if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
         needRebuild = true;
@@ -317,10 +317,10 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
   defines.boolDef["SHADOWS"]      = shadowEnabled;
 
   // Resetting all other lights if any
-  auto lightIndexStr = ::std::to_string(lightIndex);
+  auto lightIndexStr = std::to_string(lightIndex);
   for (unsigned int index = lightIndex; index < maxSimultaneousLights;
        ++index) {
-    auto indexStr = ::std::to_string(index);
+    auto indexStr = std::to_string(index);
     if (stl_util::contains(defines.boolDef, "LIGHT" + indexStr)) {
       defines.boolDef["LIGHT" + indexStr]           = false;
       defines.boolDef["HEMILIGHT" + lightIndexStr]  = false;
@@ -359,7 +359,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
 
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    const string_t lightIndexStr = ::std::to_string(lightIndex);
+    const string_t lightIndexStr = std::to_string(lightIndex);
 
     if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
       break;
@@ -410,7 +410,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
 
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    const string_t lightIndexStr = ::std::to_string(lightIndex);
+    const string_t lightIndexStr = std::to_string(lightIndex);
 
     if (!defines["LIGHT" + lightIndexStr]) {
       break;
@@ -455,7 +455,7 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
   unsigned int lightFallbackRank = 0;
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    const string_t lightIndexStr = ::std::to_string(lightIndex);
+    const string_t lightIndexStr = std::to_string(lightIndex);
 
     if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
       break;
@@ -505,7 +505,7 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
     auto normal  = manager && manager->supportsNormals() && defines["NORMAL"];
     auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
     for (unsigned int index = 0; index < influencers; ++index) {
-      const auto indexStr = ::std::to_string(index);
+      const auto indexStr = std::to_string(index);
       attribs.emplace_back(string_t(VertexBuffer::PositionKindChars)
                            + indexStr);
 
@@ -563,7 +563,7 @@ void MaterialHelper::BindLightShadow(Light& light, Scene* /*scene*/,
   if (light.shadowEnabled && mesh.receiveShadows()) {
     auto shadowGenerator = light.getShadowGenerator();
     if (shadowGenerator) {
-      shadowGenerator->bindShadowLight(::std::to_string(lightIndex), effect);
+      shadowGenerator->bindShadowLight(std::to_string(lightIndex), effect);
     }
   }
 }
@@ -571,7 +571,7 @@ void MaterialHelper::BindLightShadow(Light& light, Scene* /*scene*/,
 void MaterialHelper::BindLightProperties(Light& light, Effect* effect,
                                          unsigned int lightIndex)
 {
-  light.transferToEffect(effect, ::std::to_string(lightIndex));
+  light.transferToEffect(effect, std::to_string(lightIndex));
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
@@ -579,13 +579,13 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
                                 unsigned int maxSimultaneousLights,
                                 bool usePhysicalLightFalloff)
 {
-  auto len = ::std::min(mesh->_lightSources.size(),
+  auto len = std::min(mesh->_lightSources.size(),
                         static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned int i = 0; i < len; ++i) {
 
     auto& light    = mesh->_lightSources[i];
-    auto iAsString = ::std::to_string(i);
+    auto iAsString = std::to_string(i);
 
     auto scaledIntensity = light->getScaledIntensity();
     light->_uniformBuffer->bindToEffect(effect, "Light" + iAsString);
@@ -661,7 +661,7 @@ void MaterialHelper::BindLogDepth(MaterialDefines& defines, Effect* effect,
   if (defines["LOGARITHMICDEPTH"]) {
     effect->setFloat(
       "logarithmicDepthConstant",
-      2.f / (::std::log(scene->activeCamera->maxZ + 1.f) / Math::LN2));
+      2.f / (std::log(scene->activeCamera->maxZ + 1.f) / Math::LN2));
   }
 }
 

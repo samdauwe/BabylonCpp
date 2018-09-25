@@ -19,7 +19,7 @@ public:
   static InstancedMeshPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<InstancedMesh>(
-      new InstancedMesh(::std::forward<Ts>(args)...));
+      new InstancedMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

@@ -1,5 +1,7 @@
 #include <babylon/extensions/hexplanetgeneration/utils/matrix3.h>
 
+#include <cmath>
+
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -69,4 +71,4 @@ void Matrix3::FromAngleAxis(const Vector3& rkAxis, const float& fRadians)
 }
 
 } // end of namespace Extensions
-} // end of namespace BABY
+} // namespace BABYLON

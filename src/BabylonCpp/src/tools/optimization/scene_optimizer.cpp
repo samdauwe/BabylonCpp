@@ -8,8 +8,8 @@ namespace BABYLON {
 
 void SceneOptimizer::_CheckCurrentState(
   Scene* scene, SceneOptimizerOptions& options, int currentPriorityLevel,
-  const ::std::function<void()>& onSuccess,
-  const ::std::function<void()>& onFailure)
+  const std::function<void()>& onSuccess,
+  const std::function<void()>& onFailure)
 {
   if (scene->getEngine()->getFps() >= options.targetFrameRate) {
     if (onSuccess) {
@@ -54,8 +54,8 @@ void SceneOptimizer::_CheckCurrentState(
 
 void SceneOptimizer::OptimizeAsync(Scene* /*scene*/,
                                    const SceneOptimizerOptions& /*options*/,
-                                   const ::std::function<void()>& /*Success*/,
-                                   const ::std::function<void()>& /*onFailure*/)
+                                   const std::function<void()>& /*Success*/,
+                                   const std::function<void()>& /*onFailure*/)
 {
 }
 

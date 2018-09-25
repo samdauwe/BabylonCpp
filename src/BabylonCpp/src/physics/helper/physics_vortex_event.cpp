@@ -69,7 +69,7 @@ void PhysicsVortexEvent::dispose(bool force)
   }
 }
 
-unique_ptr_t<PhysicsForceAndContactPoint>
+std::unique_ptr<PhysicsForceAndContactPoint>
 PhysicsVortexEvent::getImpostorForceAndContactPoint(PhysicsImpostor* impostor)
 {
   if (impostor->mass == 0.f) {
@@ -124,7 +124,7 @@ PhysicsVortexEvent::getImpostorForceAndContactPoint(PhysicsImpostor* impostor)
   Vector3 force{forceX, forceY, forceZ};
   force = force.multiplyByFloats(_strength, _strength, _strength);
 
-  return ::std::make_unique<PhysicsForceAndContactPoint>(
+  return std::make_unique<PhysicsForceAndContactPoint>(
     PhysicsForceAndContactPoint{
       force,               // force,
       impostorObjectCenter // contactPoint

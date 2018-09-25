@@ -376,7 +376,7 @@ LinesMeshPtr MeshBuilder::CreateDashedLines(const std::string& name,
       std::size_t i = 0;
       for (i = 0; i < points.size() - 1; ++i) {
         points[i + 1].subtractToRef(points[i], curvect);
-        nb = static_cast<unsigned int>(::std::floor(curvect.length() / shft));
+        nb = static_cast<unsigned int>(std::floor(curvect.length() / shft));
         curvect.normalize();
         j = 0;
         while (j < nb && p < positions.size()) {
@@ -461,20 +461,20 @@ MeshPtr MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
     std::vector<Vector3> path;
     if (cap == Mesh::CAP_START() || cap == Mesh::CAP_ALL()) {
       path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
-      path.emplace_back(Vector3(::std::cos(i * step) * shape[0].x * radius,
+      path.emplace_back(Vector3(std::cos(i * step) * shape[0].x * radius,
                                 shape[0].y,
-                                ::std::sin(i * step) * shape[0].x * radius));
+                                std::sin(i * step) * shape[0].x * radius));
     }
     for (std::size_t p = 0; p < shape.size(); ++p) {
-      rotated = Vector3(::std::cos(i * step) * shape[p].x * radius, shape[p].y,
-                        ::std::sin(i * step) * shape[p].x * radius);
+      rotated = Vector3(std::cos(i * step) * shape[p].x * radius, shape[p].y,
+                        std::sin(i * step) * shape[p].x * radius);
       path.emplace_back(rotated);
     }
     if (cap == Mesh::CAP_END() || cap == Mesh::CAP_ALL()) {
       path.emplace_back(
-        Vector3(::std::cos(i * step) * shape[shape.size() - 1].x * radius,
+        Vector3(std::cos(i * step) * shape[shape.size() - 1].x * radius,
                 shape[shape.size() - 1].y,
-                ::std::sin(i * step) * shape[shape.size() - 1].x * radius));
+                std::sin(i * step) * shape[shape.size() - 1].x * radius));
       path.emplace_back(Vector3(0.f, shape[shape.size() - 1].y, 0.f));
     }
     paths.emplace_back(path);
@@ -507,7 +507,7 @@ MeshPtr MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,
     plane->translate(options.sourcePlane->normal, options.sourcePlane->d);
 
     auto product
-      = ::std::acos(Vector3::Dot(options.sourcePlane->normal, Axis::Z()));
+      = std::acos(Vector3::Dot(options.sourcePlane->normal, Axis::Z()));
     auto vectorProduct = Vector3::Cross(Axis::Z(), options.sourcePlane->normal);
 
     plane->rotate(vectorProduct, product);
@@ -663,7 +663,7 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
     = [](const std::vector<Vector3>& _path, Path3D& path3D,
          std::vector<std::vector<Vector3>>& circlePaths, float _radius,
          unsigned int _tessellation,
-         const ::std::function<float(unsigned int i, float distance)>&
+         const std::function<float(unsigned int i, float distance)>&
            _radiusFunction,
          unsigned int _cap, float _arc) {
         auto& tangents        = path3D.getTangents();
@@ -759,8 +759,8 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
   ribbonOptions.sideOrientation = sideOrientation;
   ribbonOptions.invertUV        = invertUV;
   auto tube           = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
-  tube->_pathArray    = ::std::move(pathArray);
-  tube->_path3D       = ::std::move(path3D);
+  tube->_pathArray    = std::move(pathArray);
+  tube->_path3D       = std::move(path3D);
   tube->_tessellation = tessellation;
   tube->_cap          = cap;
   tube->_arc          = arc;
@@ -807,9 +807,9 @@ MeshPtr MeshBuilder::CreateDecal(const std::string& name,
     normal = camera->globalPosition().subtract(cameraWorldTarget);
   }
 
-  auto yaw   = -::std::atan2(normal.z, normal.x) - Math::PI_2;
-  auto len   = ::std::sqrt(normal.x * normal.x + normal.z * normal.z);
-  auto pitch = ::std::atan2(normal.y, len);
+  auto yaw   = -std::atan2(normal.z, normal.x) - Math::PI_2;
+  auto len   = std::sqrt(normal.x * normal.x + normal.z * normal.z);
+  auto pitch = std::atan2(normal.y, len);
 
   // Matrix
   auto decalWorldMatrix
@@ -819,7 +819,7 @@ MeshPtr MeshBuilder::CreateDecal(const std::string& name,
   auto meshWorldMatrix         = sourceMesh->getWorldMatrix();
   auto transformMatrix = meshWorldMatrix->multiply(inverseDecalWorldMatrix);
 
-  auto vertexData = ::std::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
   vertexData->indices.clear();
   vertexData->positions.clear();
   vertexData->normals.clear();
@@ -855,7 +855,7 @@ MeshPtr MeshBuilder::CreateDecal(const std::string& name,
       return vertices;
     }
 
-    auto clipSize = 0.5f * ::std::abs(Vector3::Dot(size, axis));
+    auto clipSize = 0.5f * std::abs(Vector3::Dot(size, axis));
 
     const auto clipVertices
       = [&](const PositionNormalVertex& v0, const PositionNormalVertex& v1) {
@@ -1021,8 +1021,8 @@ MeshPtr MeshBuilder::CreateDecal(const std::string& name,
 MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
   const std::string& name, const std::vector<Vector3>& shape,
   const std::vector<Vector3>& curve, float scale, float rotation,
-  const ::std::function<float(float i, float distance)>& scaleFunction,
-  const ::std::function<float(float i, float distance)>& rotateFunction,
+  const std::function<float(float i, float distance)>& scaleFunction,
+  const std::function<float(float i, float distance)>& rotateFunction,
   bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
   bool updtbl, unsigned int side, MeshPtr instance, bool invertUV,
   Vector4& frontUVs, Vector4& backUVs)
@@ -1032,8 +1032,8 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
     = [](const std::vector<Vector3>& _shape, const std::vector<Vector3>& _curve,
          Path3D& path3D, std::vector<std::vector<Vector3>> shapePaths,
          float _scale, float _rotation,
-         const ::std::function<float(float i, float distance)>& _scaleFunction,
-         const ::std::function<float(float i, float distance)>& _rotateFunction,
+         const std::function<float(float i, float distance)>& _scaleFunction,
+         const std::function<float(float i, float distance)>& _rotateFunction,
          unsigned int _cap, bool _custom) {
         auto& tangents        = path3D.getTangents();
         const auto& normals   = path3D.getNormals();
@@ -1134,8 +1134,8 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
   ribbonOptions.frontUVs        = frontUVs;
   ribbonOptions.backUVs         = backUVs;
   auto extrudedGeneric = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
-  extrudedGeneric->_pathArray = ::std::move(pathArray);
-  extrudedGeneric->_path3D    = ::std::move(path3D);
+  extrudedGeneric->_pathArray = std::move(pathArray);
+  extrudedGeneric->_path3D    = std::move(path3D);
   extrudedGeneric->_cap       = _cap;
 
   return extrudedGeneric;

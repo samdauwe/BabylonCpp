@@ -20,7 +20,7 @@ protected:
   bool _loadMaterial(
     const GLTFLoader& loader, const string_t& context,
     const IGLTFMaterial& material,
-    const ::std::function<void(Material* babylonMaterial, bool isNew)>& assign);
+    const std::function<void(Material* babylonMaterial, bool isNew)>& assign);
 
 private:
   void _loadSpecularGlossinessProperties(

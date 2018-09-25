@@ -23,7 +23,7 @@ CollisionCoordinatorLegacy::~CollisionCoordinatorLegacy()
 void CollisionCoordinatorLegacy::getNewPosition(
   Vector3& position, Vector3& displacement, Collider* collider,
   unsigned int maximumRetry, AbstractMesh* excludedMesh,
-  const ::std::function<void(unsigned int collisionIndex, Vector3& newPosition,
+  const std::function<void(unsigned int collisionIndex, Vector3& newPosition,
                              AbstractMesh* AbstractMesh)>& onNewPosition,
   unsigned int collisionIndex)
 {

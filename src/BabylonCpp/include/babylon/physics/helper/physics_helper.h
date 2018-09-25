@@ -1,10 +1,20 @@
 #ifndef BABYLON_PHYSICS_HELPER_PHYSICS_HELPER_H
 #define BABYLON_PHYSICS_HELPER_PHYSICS_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/physics/helper/physics_helper_enums.h>
 
 namespace BABYLON {
+
+class PhysicsEngine;
+class PhysicsGravitationalFieldEvent;
+class PhysicsRadialExplosionEvent;
+class PhysicsUpdraftEvent;
+class PhysicsVortexEvent;
+class Scene;
+class Vector3;
 
 class BABYLON_SHARED_EXPORT PhysicsHelper {
 
@@ -19,7 +29,7 @@ public:
    * @param {PhysicsRadialImpulseFalloff} falloff possible options: Constant &
    * Linear. Defaults to Constant
    */
-  unique_ptr_t<PhysicsRadialExplosionEvent>
+  std::unique_ptr<PhysicsRadialExplosionEvent>
   applyRadialExplosionImpulse(const Vector3& origin, float radius,
                               float strength,
                               PhysicsRadialImpulseFalloff falloff
@@ -32,7 +42,7 @@ public:
    * @param {PhysicsRadialImpulseFalloff} falloff possible options: Constant &
    * Linear. Defaults to Constant
    */
-  unique_ptr_t<PhysicsRadialExplosionEvent>
+  std::unique_ptr<PhysicsRadialExplosionEvent>
   applyRadialExplosionForce(const Vector3& origin, float radius, float strength,
                             PhysicsRadialImpulseFalloff falloff
                             = PhysicsRadialImpulseFalloff::Constant);
@@ -44,7 +54,7 @@ public:
    * @param {PhysicsRadialImpulseFalloff} falloff possible options: Constant &
    * Linear. Defaults to Constant
    */
-  unique_ptr_t<PhysicsGravitationalFieldEvent>
+  std::unique_ptr<PhysicsGravitationalFieldEvent>
   gravitationalField(const Vector3& origin, float radius, float strength,
                      PhysicsRadialImpulseFalloff falloff
                      = PhysicsRadialImpulseFalloff::Constant);
@@ -57,7 +67,7 @@ public:
    * @param {PhysicsUpdraftMode} updraftMode possible options: Center &
    * Perpendicular. Defaults to Center
    */
-  unique_ptr_t<PhysicsUpdraftEvent>
+  std::unique_ptr<PhysicsUpdraftEvent>
   updraft(const Vector3& origin, float radius, float strength, float height,
           PhysicsUpdraftMode updraftMode = PhysicsUpdraftMode::Center);
 
@@ -67,8 +77,8 @@ public:
    * @param {number} strength the strength of the vortex
    * @param {number} height   the height of the vortex
    */
-  unique_ptr_t<PhysicsVortexEvent> vortex(const Vector3& origin, float radius,
-                                          float strength, float height);
+  std::unique_ptr<PhysicsVortexEvent>
+  vortex(const Vector3& origin, float radius, float strength, float height);
 
 private:
   Scene* _scene;

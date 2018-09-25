@@ -44,11 +44,11 @@ struct BABYLON_SHARED_EXPORT BabylonFileLoader : public ISceneLoaderPlugin {
              std::vector<AbstractMeshPtr>& meshes,
              std::vector<IParticleSystemPtr>& particleSystems,
              std::vector<SkeletonPtr>& skeletons,
-             const ::std::function<void(const std::string& message,
+             const std::function<void(const std::string& message,
                                         const std::string& exception)>& onError
              = nullptr) const override;
   bool load(Scene* scene, const std::string& data, const std::string& rootUrl,
-            const ::std::function<void(const std::string& message,
+            const std::function<void(const std::string& message,
                                        const std::string& exception)>& onError
             = nullptr) const override;
 

@@ -1,7 +1,9 @@
 #ifndef BABYLON_PHYSICS_PLUGINS_OIMO_PHYSICS_ENGINE_PLUGIN_H
 #define BABYLON_PHYSICS_PLUGINS_OIMO_PHYSICS_ENGINE_PLUGIN_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace OIMO {
@@ -12,6 +14,11 @@ class World;
 
 namespace BABYLON {
 
+struct IMotorEnabledJoint;
+struct IWorld;
+class PhysicsImpostor;
+struct PhysicsImpostorJoint;
+
 class BABYLON_SHARED_EXPORT OimoPhysicsEnginePlugin {
 
 public:
@@ -21,7 +28,7 @@ public:
   void setGravity(const Vector3& gravity);
   void setTimeStep(float timeStep);
   float getTimeStep() const;
-  void executeStep(float delta, const vector_t<PhysicsImpostor*>& impostors);
+  void executeStep(float delta, const std::vector<PhysicsImpostor*>& impostors);
   void applyImpulse(PhysicsImpostor* impostor, const Vector3& force,
                     const Vector3& contactPoint);
   void applyForce(PhysicsImpostor* impostor, const Vector3& force,
@@ -54,9 +61,9 @@ private:
   OIMO::Shape* getLastShape(OIMO::RigidBody* body);
 
 private:
-  unique_ptr_t<IWorld> world;
-  string_t name;
-  unordered_map_t<string_t, PhysicsImpostor*> _tmpImpostorsArray;
+  std::unique_ptr<IWorld> world;
+  std::string name;
+  std::unordered_map<std::string, PhysicsImpostor*> _tmpImpostorsArray;
   Vector3 _tmpPositionVector;
 
 }; // end of class OimoPhysicsEnginePlugin

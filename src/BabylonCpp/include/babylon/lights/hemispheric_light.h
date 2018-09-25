@@ -24,7 +24,7 @@ public:
   static HemisphericLightPtr New(Ts&&... args)
   {
     auto light = std::shared_ptr<HemisphericLight>(
-      new HemisphericLight(::std::forward<Ts>(args)...));
+      new HemisphericLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;

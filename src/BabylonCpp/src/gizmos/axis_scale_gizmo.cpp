@@ -62,7 +62,7 @@ AxisScaleGizmo::AxisScaleGizmo(
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
   options.dragAxis = dragAxis;
-  _dragBehavior    = ::std::make_unique<PointerDragBehavior>(options);
+  _dragBehavior    = std::make_unique<PointerDragBehavior>(options);
   _dragBehavior->moveAttached = false;
   _rootMesh->addBehavior(_dragBehavior.get());
 
@@ -86,11 +86,11 @@ AxisScaleGizmo::AxisScaleGizmo(
         }
         else {
           _currentSnapDragDistance += event->dragDistance;
-          if (::std::abs(_currentSnapDragDistance) > snapDistance) {
+          if (std::abs(_currentSnapDragDistance) > snapDistance) {
             dragSteps = static_cast<int>(
-              ::std::floor(_currentSnapDragDistance / snapDistance));
+              std::floor(_currentSnapDragDistance / snapDistance));
             _currentSnapDragDistance
-              = ::std::fmod(_currentSnapDragDistance, snapDistance);
+              = std::fmod(_currentSnapDragDistance, snapDistance);
             _tmpVector.scaleToRef(snapDistance * dragSteps, _tmpVector);
             snapped = true;
           }
@@ -115,11 +115,11 @@ AxisScaleGizmo::AxisScaleGizmo(
       }
       auto isHovered = stl_util::contains(
         _rootMesh->getChildMeshes(),
-        ::std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh));
+        std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh));
       auto material = isHovered ? hoverMaterial : _coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material    = material;
-        auto linesMesh = ::std::static_pointer_cast<LinesMesh>(m);
+        auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
         if (linesMesh) {
           linesMesh->color = material->emissiveColor;
         }
@@ -152,7 +152,7 @@ void AxisScaleGizmo::setCustomMesh(const MeshPtr& mesh, bool useGizmoMaterial)
   if (useGizmoMaterial) {
     for (const auto& m : _rootMesh->getChildMeshes()) {
       m->material = _coloredMaterial;
-      if (auto lm = ::std::static_pointer_cast<LinesMesh>(m)) {
+      if (auto lm = std::static_pointer_cast<LinesMesh>(m)) {
         lm->color = _coloredMaterial->emissiveColor;
       }
     }

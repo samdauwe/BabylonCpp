@@ -20,15 +20,15 @@ class IGLBuffer;
 } // end of namespace GL
 
 class BABYLON_SHARED_EXPORT Layer
-    : public ::std::enable_shared_from_this<Layer> {
+    : public std::enable_shared_from_this<Layer> {
 
-  using LayerCallbackType = ::std::function<void(Layer*, EventState&)>;
+  using LayerCallbackType = std::function<void(Layer*, EventState&)>;
 
 public:
   template <typename... Ts>
   static LayerPtr New(Ts&&... args)
   {
-    return std::shared_ptr<Layer>(new Layer(::std::forward<Ts>(args)...));
+    return std::shared_ptr<Layer>(new Layer(std::forward<Ts>(args)...));
   }
   virtual ~Layer();
 

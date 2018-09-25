@@ -62,9 +62,9 @@ Json::object CloudProceduralTexture::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<CloudProceduralTexture>
+std::unique_ptr<CloudProceduralTexture>
 CloudProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                              Scene* /*scene*/, const string_t& /*rootUrl*/)
+                              Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

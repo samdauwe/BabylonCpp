@@ -401,7 +401,7 @@ public:
    */
   void
   forceCompilation(AbstractMesh* mesh,
-                   const ::std::function<void(Material* material)>& onCompiled,
+                   const std::function<void(Material* material)>& onCompiled,
                    std::optional<bool> clipPlane = false);
 
   /**
@@ -429,8 +429,8 @@ public:
   Json::object serialize() const;
 
   virtual void trackCreation(
-    const ::std::function<void(const Effect* effect)>& onCompiled,
-    const ::std::function<void(const Effect* effect,
+    const std::function<void(const Effect* effect)>& onCompiled,
+    const std::function<void(const Effect* effect,
                                const std::string& errors)>& onError);
 
   void addMaterialToScene(const MaterialPtr& newMaterial);
@@ -491,7 +491,7 @@ protected:
    * @brief Called during a dispose event.
    */
   void
-  set_onDispose(const ::std::function<void(Material*, EventState&)>& callback);
+  set_onDispose(const std::function<void(Material*, EventState&)>& callback);
 
   /**
    * @brief An event triggered when the material is bound.
@@ -502,7 +502,7 @@ protected:
    * @brief Called during a bind event.
    */
   void
-  set_onBind(const ::std::function<void(AbstractMesh*, EventState&)>& callback);
+  set_onBind(const std::function<void(AbstractMesh*, EventState&)>& callback);
 
   /**
    * @brief An event triggered when the material is unbound.
@@ -615,7 +615,7 @@ protected:
    * submeshes
    */
   void _markAllSubMeshesAsDirty(
-    const ::std::function<void(MaterialDefines& defines)>& func);
+    const std::function<void(MaterialDefines& defines)>& func);
 
   /**
    * @brief Indicates that image processing needs to be re-calculated for all
@@ -711,18 +711,18 @@ public:
   /**
    * Callback triggered when the material is compiled
    */
-  ::std::function<void(const Effect* effect)> onCompiled;
+  std::function<void(const Effect* effect)> onCompiled;
 
   /**
    * Callback triggered when an error occurs
    */
-  ::std::function<void(const Effect* effect, const std::string& errors)>
+  std::function<void(const Effect* effect, const std::string& errors)>
     onError;
 
   /**
    * Callback triggered to get the render target textures
    */
-  ::std::function<std::vector<RenderTargetTexturePtr>()>
+  std::function<std::vector<RenderTargetTexturePtr>()>
     getRenderTargetTextures;
 
   /**
@@ -743,7 +743,7 @@ public:
   /**
    * Called during a dispose event
    */
-  WriteOnlyProperty<Material, ::std::function<void(Material*, EventState&)>>
+  WriteOnlyProperty<Material, std::function<void(Material*, EventState&)>>
     onDispose;
 
   /**
@@ -754,7 +754,7 @@ public:
   /**
    * Called during a bind event
    */
-  WriteOnlyProperty<Material, ::std::function<void(AbstractMesh*, EventState&)>>
+  WriteOnlyProperty<Material, std::function<void(AbstractMesh*, EventState&)>>
     onBind;
 
   /**
@@ -864,7 +864,7 @@ private:
    */
   Observer<AbstractMesh>::Ptr _onBindObserver;
   // Callbacks
-  ::std::function<void()> _beforeRenderCallback;
+  std::function<void()> _beforeRenderCallback;
 
   /**
    * Stores the value of the alpha mode

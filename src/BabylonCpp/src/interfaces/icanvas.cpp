@@ -23,7 +23,7 @@ ICanvas::~ICanvas()
 }
 
 void ICanvas::addMouseEventListener(
-  EventType type, const ::std::function<void(PointerEvent&& evt)>& listener,
+  EventType type, const std::function<void(PointerEvent&& evt)>& listener,
   bool /*useCapture*/)
 {
   auto& listeners = mouseEventListeners[static_cast<unsigned>(type)];
@@ -34,10 +34,10 @@ void ICanvas::addMouseEventListener(
   }
   else {
     // Add when listener is not yet in the listeners list
-    auto it = ::std::find_if(
+    auto it = std::find_if(
       listeners.begin(), listeners.end(),
       [&listener](
-        const ::std::function<void(PointerEvent && evt)>& mouseEventListener) {
+        const std::function<void(PointerEvent && evt)>& mouseEventListener) {
         return stl_util::get_address(listener)
                == stl_util::get_address(mouseEventListener);
       });
@@ -48,7 +48,7 @@ void ICanvas::addMouseEventListener(
 }
 
 void ICanvas::addKeyEventListener(
-  EventType type, const ::std::function<void(KeyboardEvent&& evt)>& listener,
+  EventType type, const std::function<void(KeyboardEvent&& evt)>& listener,
   bool /*useCapture*/)
 {
   auto& listeners = keyEventListeners[static_cast<unsigned>(type)];
@@ -60,10 +60,10 @@ void ICanvas::addKeyEventListener(
   else {
 #if 0
     // Add when listener is not yet in the listeners list
-    auto it = ::std::find_if(
+    auto it = std::find_if(
       listeners.begin(), listeners.end(),
       [&listener](
-        const ::std::function<void(KeyboardEvent && evt)>& keyEventListener) {
+        const std::function<void(KeyboardEvent && evt)>& keyEventListener) {
         return stl_util::get_address(listener)
                == stl_util::get_address(keyEventListener);
       });
@@ -77,15 +77,15 @@ void ICanvas::addKeyEventListener(
 }
 
 void ICanvas::removeMouseEventListener(
-  EventType type, const ::std::function<void(PointerEvent&& evt)>& listener)
+  EventType type, const std::function<void(PointerEvent&& evt)>& listener)
 {
   auto& listeners = mouseEventListeners[static_cast<unsigned>(type)];
   // Remove from listeners
   listeners.erase(
-    ::std::remove_if(
+    std::remove_if(
       listeners.begin(), listeners.end(),
       [&listener](
-        const ::std::function<void(PointerEvent && evt)>& mouseEventListener) {
+        const std::function<void(PointerEvent && evt)>& mouseEventListener) {
         return stl_util::get_address(listener)
                == stl_util::get_address(mouseEventListener);
       }),
@@ -93,15 +93,15 @@ void ICanvas::removeMouseEventListener(
 }
 
 void ICanvas::removeKeyEventListener(
-  EventType type, const ::std::function<void(KeyboardEvent&& evt)>& listener)
+  EventType type, const std::function<void(KeyboardEvent&& evt)>& listener)
 {
   auto& listeners = keyEventListeners[static_cast<unsigned>(type)];
   // Remove from listeners
   listeners.erase(
-    ::std::remove_if(
+    std::remove_if(
       listeners.begin(), listeners.end(),
       [&listener](
-        const ::std::function<void(KeyboardEvent && evt)>& keyEventListener) {
+        const std::function<void(KeyboardEvent && evt)>& keyEventListener) {
         return stl_util::get_address(listener)
                == stl_util::get_address(keyEventListener);
       }),
@@ -146,7 +146,7 @@ void ICanvas::onMouseButtonDown(bool ctrlKey, bool shiftKey, int iMouseX,
     evt.ctrlKey    = ctrlKey;
     evt.shiftKey   = shiftKey;
     evt.srcElement = this;
-    listener(::std::move(evt));
+    listener(std::move(evt));
   }
 }
 
@@ -166,7 +166,7 @@ void ICanvas::onMouseButtonUp(bool ctrlKey, bool shiftKey, int iMouseX,
     evt.ctrlKey    = ctrlKey;
     evt.shiftKey   = shiftKey;
     evt.srcElement = this;
-    listener(::std::move(evt));
+    listener(std::move(evt));
   }
 }
 
@@ -184,7 +184,7 @@ void ICanvas::onMouseMove(bool ctrlKey, bool shiftKey, int iMouseX, int iMouseY)
     evt.ctrlKey    = ctrlKey;
     evt.shiftKey   = shiftKey;
     evt.srcElement = this;
-    listener(::std::move(evt));
+    listener(std::move(evt));
   }
 }
 
@@ -205,7 +205,7 @@ void ICanvas::onMouseWheel(bool ctrlKey, bool shiftKey, int iMouseX,
     evt.wheelDelta = wheelDelta;
     evt.detail     = 0.f;
     evt.srcElement = this;
-    listener(::std::move(evt));
+    listener(std::move(evt));
   }
 }
 
@@ -218,8 +218,8 @@ void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode, string_t code)
     evt.ctrlKey = ctrlKey;
     evt.altKey  = altKey;
     evt.keyCode = keyCode;
-    evt.code    = ::std::move(code);
-    listener(::std::move(evt));
+    evt.code    = std::move(code);
+    listener(std::move(evt));
   }
 }
 
@@ -232,8 +232,8 @@ void ICanvas::onKeyUp(bool ctrlKey, bool altKey, int keyCode, string_t code)
     evt.ctrlKey = ctrlKey;
     evt.altKey  = altKey;
     evt.keyCode = keyCode;
-    evt.code    = ::std::move(code);
-    listener(::std::move(evt));
+    evt.code    = std::move(code);
+    listener(std::move(evt));
   }
 }
 

@@ -1,9 +1,14 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_PLANET_RENDER_DATA_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_PLANET_RENDER_DATA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Color4;
+class Vector3;
+
 namespace Extensions {
 
 struct RenderObject {

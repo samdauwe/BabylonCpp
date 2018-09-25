@@ -1,12 +1,16 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_FIRE_FIRE_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_FIRE_FIRE_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/fire/fire_material_defines.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class IAnimatable;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+
 namespace MaterialsLibrary {
 
 class BABYLON_SHARED_EXPORT FireMaterial : public PushMaterial {
@@ -27,7 +31,7 @@ public:
   std::vector<IAnimatablePtr> getAnimatables();
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,

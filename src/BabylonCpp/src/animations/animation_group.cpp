@@ -34,7 +34,7 @@ AnimationGroup::~AnimationGroup()
 void AnimationGroup::addToScene(
   unique_ptr_t<AnimationGroup>&& newAnimationGroup)
 {
-  _scene->animationGroups.emplace_back(::std::move(newAnimationGroup));
+  _scene->animationGroups.emplace_back(std::move(newAnimationGroup));
 }
 
 float AnimationGroup::get_from() const
@@ -100,7 +100,7 @@ AnimationGroup::addTargetedAnimation(const AnimationPtr& animation,
   }
 
   _targetedAnimations.emplace_back(
-    ::std::make_unique<TargetedAnimation>(targetedAnimation));
+    std::make_unique<TargetedAnimation>(targetedAnimation));
 
   return targetedAnimation;
 }
@@ -281,7 +281,7 @@ void AnimationGroup::dispose(bool /*doNotRecurse*/,
   _animatables.clear();
 
   _scene->animationGroups.erase(
-    ::std::remove_if(_scene->animationGroups.begin(),
+    std::remove_if(_scene->animationGroups.begin(),
                      _scene->animationGroups.end(),
                      [this](const AnimationGroupPtr& animationGroup) {
                        return animationGroup.get() == this;
@@ -293,7 +293,7 @@ void AnimationGroup::_checkAnimationGroupEnded(const AnimatablePtr& animatable)
 {
   // animatable should be taken out of the array
   _animatables.erase(
-    ::std::remove(_animatables.begin(), _animatables.end(), animatable),
+    std::remove(_animatables.begin(), _animatables.end(), animatable),
     _animatables.end());
 
   // all animatables were removed? animation group ended!

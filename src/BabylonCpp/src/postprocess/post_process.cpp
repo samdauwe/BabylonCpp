@@ -102,7 +102,7 @@ void PostProcess::set_samples(unsigned int n)
 }
 
 void PostProcess::setOnActivate(
-  const ::std::function<void(Camera* camera, EventState&)>& callback)
+  const std::function<void(Camera* camera, EventState&)>& callback)
 {
   if (_onActivateObserver) {
     onActivateObservable.remove(_onActivateObserver);
@@ -113,7 +113,7 @@ void PostProcess::setOnActivate(
 }
 
 void PostProcess::setOnSizeChanged(
-  const ::std::function<void(PostProcess* postProcess, EventState&)>& callback)
+  const std::function<void(PostProcess* postProcess, EventState&)>& callback)
 {
   if (_onSizeChangedObserver) {
     onSizeChangedObservable.remove(_onSizeChangedObserver);
@@ -122,7 +122,7 @@ void PostProcess::setOnSizeChanged(
 }
 
 void PostProcess::setOnApply(
-  const ::std::function<void(Effect* effect, EventState&)>& callback)
+  const std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onApplyObserver) {
     onApplyObservable.remove(_onApplyObserver);
@@ -131,7 +131,7 @@ void PostProcess::setOnApply(
 }
 
 void PostProcess::setOnBeforeRender(
-  const ::std::function<void(Effect* effect, EventState&)>& callback)
+  const std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -140,7 +140,7 @@ void PostProcess::setOnBeforeRender(
 }
 
 void PostProcess::setOnAfterRender(
-  const ::std::function<void(Effect* effect, EventState&)>& callback)
+  const std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);
@@ -208,8 +208,8 @@ void PostProcess::updateEffect(
   const string_t& defines, const vector_t<string_t>& uniforms,
   const vector_t<string_t>& samplers,
   const unordered_map_t<string_t, unsigned int>& indexParameters,
-  const ::std::function<void(Effect* effect)>& onCompiled,
-  const ::std::function<void(Effect* effect, const string_t& errors)>& onError)
+  const std::function<void(Effect* effect)>& onCompiled,
+  const std::function<void(Effect* effect, const string_t& errors)>& onError)
 {
   unordered_map_t<string_t, string_t> baseName{{"vertex", _vertexUrl},
                                                {"fragment", _fragmentUrl}};
@@ -466,13 +466,13 @@ void PostProcess::dispose(Camera* camera)
   _disposeTextures();
 
   if (_scene) {
-    _scene->postProcesses.erase(::std::remove(_scene->postProcesses.begin(),
+    _scene->postProcesses.erase(std::remove(_scene->postProcesses.begin(),
                                               _scene->postProcesses.end(),
                                               this),
                                 _scene->postProcesses.end());
   }
   else {
-    _engine->postProcesses.erase(::std::remove(_engine->postProcesses.begin(),
+    _engine->postProcesses.erase(std::remove(_engine->postProcesses.begin(),
                                                _engine->postProcesses.end(),
                                                this),
                                  _engine->postProcesses.end());

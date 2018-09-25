@@ -72,12 +72,12 @@ LowestRoot Collider::GetLowestRoot(float a, float b, float c, float maxR)
     return result;
   }
 
-  const float sqrtD = ::std::sqrt(determinant);
+  const float sqrtD = std::sqrt(determinant);
   float r1          = (-b - sqrtD) / (2.f * a);
   float r2          = (-b + sqrtD) / (2.f * a);
 
   if (r1 > r2) {
-    ::std::swap(r1, r2);
+    std::swap(r1, r2);
   }
 
   if (r1 > 0 && r1 < maxR) {
@@ -196,7 +196,7 @@ void Collider::_testTriangle(size_t faceIndex,
   float normalDotVelocity = Vector3::Dot(trianglePlane.normal, _velocity);
 
   if (stl_util::almost_equal(normalDotVelocity, 0.f)) {
-    if (::std::abs(signedDistToTrianglePlane) >= 1.f) {
+    if (std::abs(signedDistToTrianglePlane) >= 1.f) {
       return;
     }
     embeddedInPlane = true;
@@ -207,7 +207,7 @@ void Collider::_testTriangle(size_t faceIndex,
     float t1 = (1.f - signedDistToTrianglePlane) / normalDotVelocity;
 
     if (t0 > t1) {
-      ::std::swap(t0, t1);
+      std::swap(t0, t1);
     }
 
     if (t0 > 1.f || t1 < 0.f) {

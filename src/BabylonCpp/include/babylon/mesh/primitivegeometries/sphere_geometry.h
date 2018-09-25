@@ -21,7 +21,7 @@ public:
   static SphereGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<SphereGeometry>(
-      new SphereGeometry(::std::forward<Ts>(args)...));
+      new SphereGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

@@ -22,7 +22,7 @@ public:
   static FreeCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<FreeCamera>(
-      new FreeCamera(::std::forward<Ts>(args)...));
+      new FreeCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
@@ -67,7 +67,7 @@ public:
   bool applyGravity;
   std::unique_ptr<FreeCameraInputsManager> inputs;
   // Collisions
-  ::std::function<void(AbstractMesh* collidedMesh)> onCollide;
+  std::function<void(AbstractMesh* collidedMesh)> onCollide;
   // Direction
   /** Hidden */
   std::unique_ptr<Vector3> _localDirection;

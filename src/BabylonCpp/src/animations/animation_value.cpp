@@ -11,7 +11,7 @@ AnimationValue::AnimationValue() : dataType{-1}
 
 AnimationValue::AnimationValue(float value)
 {
-  if (!isNan(value) && ::std::isfinite(value)) {
+  if (!isNan(value) && std::isfinite(value)) {
     dataType  = Animation::ANIMATIONTYPE_FLOAT();
     floatData = value;
   }
@@ -90,19 +90,19 @@ AnimationValue::AnimationValue(const AnimationValue& other)
 }
 
 AnimationValue::AnimationValue(AnimationValue&& other)
-    : dataType{::std::move(other.dataType)}
-    , floatData{::std::move(other.floatData)}
-    , vector3Data{::std::move(other.vector3Data)}
-    , quaternionData{::std::move(other.quaternionData)}
-    , matrixData{::std::move(other.matrixData)}
-    , color3Data{::std::move(other.color3Data)}
-    , vector2Data{::std::move(other.vector2Data)}
-    , sizeData{::std::move(other.sizeData)}
-    , boolData{::std::move(other.boolData)}
-    , intData{::std::move(other.intData)}
-    , stringData{::std::move(other.stringData)}
-    , color4Data{::std::move(other.color4Data)}
-    , float32ArrayData{::std::move(other.float32ArrayData)}
+    : dataType{std::move(other.dataType)}
+    , floatData{std::move(other.floatData)}
+    , vector3Data{std::move(other.vector3Data)}
+    , quaternionData{std::move(other.quaternionData)}
+    , matrixData{std::move(other.matrixData)}
+    , color3Data{std::move(other.color3Data)}
+    , vector2Data{std::move(other.vector2Data)}
+    , sizeData{std::move(other.sizeData)}
+    , boolData{std::move(other.boolData)}
+    , intData{std::move(other.intData)}
+    , stringData{std::move(other.stringData)}
+    , color4Data{std::move(other.color4Data)}
+    , float32ArrayData{std::move(other.float32ArrayData)}
 {
 }
 
@@ -130,19 +130,19 @@ AnimationValue& AnimationValue::operator=(const AnimationValue& other)
 AnimationValue& AnimationValue::operator=(AnimationValue&& other)
 {
   if (&other != this) {
-    dataType         = ::std::move(other.dataType);
-    floatData        = ::std::move(other.floatData);
-    vector3Data      = ::std::move(other.vector3Data);
-    quaternionData   = ::std::move(other.quaternionData);
-    matrixData       = ::std::move(other.matrixData);
-    color3Data       = ::std::move(other.color3Data);
-    vector2Data      = ::std::move(other.vector2Data);
-    sizeData         = ::std::move(other.sizeData);
-    boolData         = ::std::move(other.boolData);
-    intData          = ::std::move(other.intData);
-    stringData       = ::std::move(other.stringData);
-    color4Data       = ::std::move(other.color4Data);
-    float32ArrayData = ::std::move(other.float32ArrayData);
+    dataType         = std::move(other.dataType);
+    floatData        = std::move(other.floatData);
+    vector3Data      = std::move(other.vector3Data);
+    quaternionData   = std::move(other.quaternionData);
+    matrixData       = std::move(other.matrixData);
+    color3Data       = std::move(other.color3Data);
+    vector2Data      = std::move(other.vector2Data);
+    sizeData         = std::move(other.sizeData);
+    boolData         = std::move(other.boolData);
+    intData          = std::move(other.intData);
+    stringData       = std::move(other.stringData);
+    color4Data       = std::move(other.color4Data);
+    float32ArrayData = std::move(other.float32ArrayData);
   }
 
   return *this;
@@ -174,7 +174,7 @@ AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
     case Animation::ANIMATIONTYPE_COLOR4():
       return AnimationValue(color4Data.subtract(fromValue.color4Data));
     case Animation::ANIMATIONTYPE_FLOAT32ARRAY(): {
-      auto count = ::std::min(float32ArrayData.size(),
+      auto count = std::min(float32ArrayData.size(),
                               fromValue.float32ArrayData.size());
       Float32Array result(count);
       for (size_t i = 0; i < count; ++i) {

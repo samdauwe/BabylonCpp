@@ -1,12 +1,16 @@
 #ifndef ABYLON_MATERIALS_LIBRARY_SHADOW_ONLY_SHADOW_ONLY_MATERIAL_H
 #define ABYLON_MATERIALS_LIBRARY_SHADOW_ONLY_SHADOW_ONLY_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/shadowonly/shadow_only_material_defines.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class IShadowLight;
+using IShadowLightPtr = std::shared_ptr<IShadowLight>;
+
 namespace MaterialsLibrary {
 
 class BABYLON_SHARED_EXPORT ShadowOnlyMaterial : public PushMaterial {
@@ -21,7 +25,7 @@ public:
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
   Json::object serialize() const;

@@ -9,7 +9,7 @@ namespace BABYLON {
 Sprite::Sprite(const string_t& iName, SpriteManager* manager)
     : name{iName}
     , position{Vector3::Zero()}
-    , color{::std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
+    , color{std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
     , width{1}
     , height{1}
     , angle{0}
@@ -38,7 +38,7 @@ Sprite::~Sprite()
 
 void Sprite::addToSpriteManager(unique_ptr_t<Sprite>&& newSprite)
 {
-  _manager->sprites.emplace_back(::std::move(newSprite));
+  _manager->sprites.emplace_back(std::move(newSprite));
 }
 
 int Sprite::get_size() const
@@ -53,7 +53,7 @@ void Sprite::set_size(int value)
 }
 
 void Sprite::playAnimation(int from, int to, bool loop, float delay,
-                           const ::std::function<void()>& onAnimationEnd)
+                           const std::function<void()>& onAnimationEnd)
 {
   _fromIndex        = from;
   _toIndex          = to;
@@ -81,7 +81,7 @@ void Sprite::_animate(float deltaTime)
 
   _time += deltaTime;
   if (_time > _delay) {
-    _time = ::std::fmod(_time, _delay);
+    _time = std::fmod(_time, _delay);
     cellIndex += _direction;
     if (cellIndex > _toIndex) {
       if (_loopAnimation) {
@@ -105,7 +105,7 @@ void Sprite::dispose()
 {
   // Remove from scene
   _manager->sprites.erase(
-    ::std::remove_if(_manager->sprites.begin(), _manager->sprites.end(),
+    std::remove_if(_manager->sprites.begin(), _manager->sprites.end(),
                      [this](const unique_ptr_t<Sprite>& sprite) {
                        return sprite.get() == this;
                      }),

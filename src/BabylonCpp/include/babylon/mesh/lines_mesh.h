@@ -20,7 +20,7 @@ public:
   static LinesMeshPtr New(Ts&&... args)
   {
     auto mesh
-      = std::shared_ptr<LinesMesh>(new LinesMesh(::std::forward<Ts>(args)...));
+      = std::shared_ptr<LinesMesh>(new LinesMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

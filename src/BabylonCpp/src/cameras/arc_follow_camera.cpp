@@ -44,9 +44,9 @@ void ArcFollowCamera::follow()
     return;
   }
 
-  _cartesianCoordinates.x = radius * ::std::cos(alpha) * ::std::cos(beta);
-  _cartesianCoordinates.y = radius * ::std::sin(beta);
-  _cartesianCoordinates.z = radius * ::std::sin(alpha) * ::std::cos(beta);
+  _cartesianCoordinates.x = radius * std::cos(alpha) * std::cos(beta);
+  _cartesianCoordinates.y = radius * std::sin(beta);
+  _cartesianCoordinates.z = radius * std::sin(alpha) * std::cos(beta);
 
   auto targetPosition = target->getAbsolutePosition();
   position            = targetPosition.add(_cartesianCoordinates);

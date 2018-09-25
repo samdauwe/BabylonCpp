@@ -1,13 +1,21 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_FUR_FUR_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_FUR_FUR_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/fur/fur_material_defines.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class DynamicTexture;
+class IAnimatable;
+using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
+using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
+using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
+
 namespace MaterialsLibrary {
 
 class BABYLON_SHARED_EXPORT FurMaterial : public PushMaterial {
@@ -26,7 +34,7 @@ public:
   std::vector<IAnimatablePtr> getAnimatables();
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,

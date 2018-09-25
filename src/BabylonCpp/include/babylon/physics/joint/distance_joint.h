@@ -1,10 +1,12 @@
 #ifndef BABYLON_PHYSICS_JOINT_DISTANCE_JOINT_H
 #define BABYLON_PHYSICS_JOINT_DISTANCE_JOINT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/physics/joint/physics_joint.h>
 
 namespace BABYLON {
+
+struct DistanceJointData;
 
 /**
  * @brief A class representing a physics distance joint.

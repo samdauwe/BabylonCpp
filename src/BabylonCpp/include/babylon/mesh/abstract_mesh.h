@@ -72,7 +72,7 @@ public:
   static AbstractMeshPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<AbstractMesh>(
-      new AbstractMesh(::std::forward<Ts>(args)...));
+      new AbstractMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
@@ -398,7 +398,7 @@ public:
    */
   MinMax getHierarchyBoundingVectors(
     bool includeDescendants = true,
-    const ::std::function<bool(AbstractMesh* abstractMesh)>& predicate
+    const std::function<bool(AbstractMesh* abstractMesh)>& predicate
     = nullptr);
 
   /**
@@ -891,13 +891,13 @@ protected:
    * @brief Set a function to call when this mesh collides with another one.
    */
   void set_onCollide(
-    const ::std::function<void(AbstractMesh*, EventState&)>& callback);
+    const std::function<void(AbstractMesh*, EventState&)>& callback);
 
   /**
    * @brief An event triggered when the collision's position changes.
    */
   void set_onCollisionPositionChange(
-    const ::std::function<void(Vector3*, EventState&)>& callback);
+    const std::function<void(Vector3*, EventState&)>& callback);
 
   /**
    * @brief Gets whether the mesh is occluded or not, it is used also to set the
@@ -1133,7 +1133,7 @@ private:
    * @brief Hidden
    */
   void _markSubMeshesAsDirty(
-    const ::std::function<void(const MaterialDefines& defines)>& func);
+    const std::function<void(const MaterialDefines& defines)>& func);
 
   /**
    * @brief Hidden
@@ -1197,7 +1197,7 @@ public:
    * The function to call when this mesh collides with another one
    */
   WriteOnlyProperty<AbstractMesh,
-                    ::std::function<void(AbstractMesh*, EventState&)>>
+                    std::function<void(AbstractMesh*, EventState&)>>
     onCollide;
 
   /**
@@ -1208,7 +1208,7 @@ public:
   /**
    * @brief An event triggered when the collision's position changes
    */
-  WriteOnlyProperty<AbstractMesh, ::std::function<void(Vector3*, EventState&)>>
+  WriteOnlyProperty<AbstractMesh, std::function<void(Vector3*, EventState&)>>
     onCollisionPositionChange;
 
   /**
@@ -1621,7 +1621,7 @@ private:
   // array of depth sorted facets
   std::vector<DepthSortedFacet> _depthSortedFacets;
   // facet depth sort function
-  ::std::function<int(const DepthSortedFacet& f1, const DepthSortedFacet& f2)>
+  std::function<int(const DepthSortedFacet& f1, const DepthSortedFacet& f2)>
     _facetDepthSortFunction;
   // location where to depth sort from
   std::unique_ptr<Vector3> _facetDepthSortFrom;

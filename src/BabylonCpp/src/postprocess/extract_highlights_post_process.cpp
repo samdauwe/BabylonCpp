@@ -30,7 +30,7 @@ ExtractHighlightsPostProcess::ExtractHighlightsPostProcess(
     if (_inputPostProcess) {
       effect->setTextureFromPostProcess("textureSampler", _inputPostProcess);
     }
-    effect->setFloat("threshold", ::std::pow(threshold, Math::ToGammaSpace));
+    effect->setFloat("threshold", std::pow(threshold, Math::ToGammaSpace));
     effect->setFloat("exposure", _exposure);
   });
 }

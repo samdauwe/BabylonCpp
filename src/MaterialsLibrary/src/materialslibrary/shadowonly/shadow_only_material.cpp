@@ -85,13 +85,13 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   if (_activeLight) {
     for (const auto& light : mesh->_lightSources) {
       if (light->shadowEnabled) {
-        auto activeLight = ::std::dynamic_pointer_cast<Light>(_activeLight);
+        auto activeLight = std::dynamic_pointer_cast<Light>(_activeLight);
         if (activeLight == light) {
           break; // We are good
         }
 
-        auto it = ::std::find(mesh->_lightSources.begin(),
-                              mesh->_lightSources.end(), activeLight);
+        auto it = std::find(mesh->_lightSources.begin(),
+                            mesh->_lightSources.end(), activeLight);
 
         if (it != mesh->_lightSources.end()) {
           mesh->_lightSources.erase(it);
@@ -243,7 +243,7 @@ Json::object ShadowOnlyMaterial::serialize() const
   return Json::object();
 }
 
-const string_t ShadowOnlyMaterial::getClassName() const
+const std::string ShadowOnlyMaterial::getClassName() const
 {
   return "ShadowOnlyMaterial";
 }

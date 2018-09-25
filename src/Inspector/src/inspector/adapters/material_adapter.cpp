@@ -12,10 +12,10 @@ MaterialAdapter::MaterialAdapter(const MaterialPtr& material)
 {
   // Cast material
   if (_material->type() == IReflect::Type::STANDARDMATERIAL) {
-    _standardMaterial = ::std::static_pointer_cast<StandardMaterial>(_material);
+    _standardMaterial = std::static_pointer_cast<StandardMaterial>(_material);
   }
   // Build properties view
-  _properties = ::std::make_unique<PropertiesView>();
+  _properties = std::make_unique<PropertiesView>();
   _buildPropertiesView();
 }
 

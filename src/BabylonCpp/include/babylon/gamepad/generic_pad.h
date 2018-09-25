@@ -15,9 +15,9 @@ public:
   virtual ~GenericPad() override;
 
   void setOnbuttondown(
-    const ::std::function<void(unsigned int buttonPressed)>& callback);
+    const std::function<void(unsigned int buttonPressed)>& callback);
   void
-  onbuttonup(const ::std::function<void(unsigned int buttonPressed)>& callback);
+  onbuttonup(const std::function<void(unsigned int buttonPressed)>& callback);
   void update() override;
   void dispose() override;
 
@@ -27,8 +27,8 @@ private:
 
 private:
   Uint32Array _buttons;
-  ::std::function<void(unsigned int buttonPressed)> _onbuttondown;
-  ::std::function<void(unsigned int buttonPressed)> _onbuttonup;
+  std::function<void(unsigned int buttonPressed)> _onbuttondown;
+  std::function<void(unsigned int buttonPressed)> _onbuttonup;
 
   Observable<unsigned int> onButtonDownObservable;
   Observable<unsigned int> onButtonUpObservable;

@@ -106,10 +106,10 @@ void LineEdgesRenderer::_generateEdgesLines()
   // Merge into a single mesh
   auto engine = _source->getScene()->getEngine();
 
-  _buffers[VertexBuffer::PositionKind] = ::std::make_unique<VertexBuffer>(
+  _buffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
     engine, ToVariant<Float32Array, Buffer*>(_linesPositions),
     VertexBuffer::PositionKind, false);
-  _buffers[VertexBuffer::NormalKind] = ::std::make_unique<VertexBuffer>(
+  _buffers[VertexBuffer::NormalKind] = std::make_unique<VertexBuffer>(
     engine, ToVariant<Float32Array, Buffer*>(_linesNormals),
     VertexBuffer::NormalKind, false, false, 4);
   _bufferPtrs[VertexBuffer::PositionKindChars]

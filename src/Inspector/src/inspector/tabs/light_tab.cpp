@@ -35,7 +35,7 @@ void LightTab::_buildTree()
   _lights.clear();
   for (const auto& light : scene->lights) {
     _lights.emplace_back(
-      TreeItem<LightAdapter>{*this, ::std::make_unique<LightAdapter>(light)});
+      TreeItem<LightAdapter>{*this, std::make_unique<LightAdapter>(light)});
   }
 
   // Set initialized flag

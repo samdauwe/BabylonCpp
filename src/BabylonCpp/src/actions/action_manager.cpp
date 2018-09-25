@@ -42,7 +42,7 @@ void ActionManager::dispose()
   }
 
   _scene->actionManagers.erase(
-    ::std::remove_if(_scene->actionManagers.begin(),
+    std::remove_if(_scene->actionManagers.begin(),
                      _scene->actionManagers.end(),
                      [this](const shared_ptr_t<ActionManager>& actionManager) {
                        return actionManager.get() == this;
@@ -57,9 +57,9 @@ Scene* ActionManager::getScene() const
 
 bool ActionManager::hasSpecificTriggers(const Uint32Array& triggers) const
 {
-  return ::std::find_if(actions.begin(), actions.end(),
+  return std::find_if(actions.begin(), actions.end(),
                         [&triggers](Action* action) {
-                          return ::std::find(triggers.begin(), triggers.end(),
+                          return std::find(triggers.begin(), triggers.end(),
                                              action->trigger)
                                  != triggers.end();
                         })
@@ -80,10 +80,10 @@ bool ActionManager::hasSpecificTriggers2(unsigned int triggerA,
 
 bool ActionManager::hasSpecificTrigger(
   unsigned int trigger,
-  const ::std::function<bool(const string_t& parameter)>& parameterPredicate)
+  const std::function<bool(const string_t& parameter)>& parameterPredicate)
   const
 {
-  return ::std::find_if(
+  return std::find_if(
            actions.begin(), actions.end(),
            [&trigger, &parameterPredicate](Action* action) {
              if (action->trigger == trigger) {
@@ -104,7 +104,7 @@ bool ActionManager::hasSpecificTrigger(
 bool ActionManager::hasPointerTriggers() const
 {
 
-  return ::std::find_if(
+  return std::find_if(
            actions.begin(), actions.end(),
            [](Action* action) {
              return action->trigger >= ActionManager::OnPickTrigger()
@@ -115,7 +115,7 @@ bool ActionManager::hasPointerTriggers() const
 
 bool ActionManager::hasPickTriggers() const
 {
-  return ::std::find_if(
+  return std::find_if(
            actions.begin(), actions.end(),
            [](Action* action) {
              return action->trigger >= ActionManager::OnPickTrigger()
@@ -126,7 +126,7 @@ bool ActionManager::hasPickTriggers() const
 
 bool ActionManager::HasTriggers()
 {
-  return ::std::accumulate(ActionManager::Triggers.begin(),
+  return std::accumulate(ActionManager::Triggers.begin(),
                            ActionManager::Triggers.end(), 0)
          != 0;
 }
@@ -136,7 +136,7 @@ bool ActionManager::HasPickTriggers()
   const auto start = ActionManager::OnPickTrigger();
   const auto end   = ActionManager::OnPickUpTrigger() + 1;
 
-  return ::std::accumulate(ActionManager::Triggers.begin() + start,
+  return std::accumulate(ActionManager::Triggers.begin() + start,
                            ActionManager::Triggers.begin() + end, 0)
          != 0;
 }
@@ -196,18 +196,18 @@ void ActionManager::processTrigger(unsigned int trigger,
         const auto sourceEvent = *evt.sourceEvent;
         if (!parameter.empty()
             && parameter
-                 != ::std::to_string(static_cast<char>(sourceEvent.keyCode))) {
+                 != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
           auto lowerCase = String::toLowerCase(parameter);
           if (lowerCase.empty()) {
             continue;
           }
 
           if (lowerCase
-              != ::std::to_string(static_cast<char>(sourceEvent.keyCode))) {
+              != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
             auto unicode = sourceEvent.charCode ? sourceEvent.charCode :
                                                   sourceEvent.keyCode;
             auto actualkey = String::toLowerCase(
-              ::std::to_string(static_cast<char>(unicode)));
+              std::to_string(static_cast<char>(unicode)));
             if (actualkey != lowerCase) {
               continue;
             }

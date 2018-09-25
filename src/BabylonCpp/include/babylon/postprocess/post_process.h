@@ -67,31 +67,31 @@ public:
    * @brief A function that is added to the onActivateObservable.
    */
   void setOnActivate(
-    const ::std::function<void(Camera* camera, EventState&)>& callback);
+    const std::function<void(Camera* camera, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onSizeChangedObservable.
    */
-  void setOnSizeChanged(const ::std::function<void(PostProcess* postProcess,
+  void setOnSizeChanged(const std::function<void(PostProcess* postProcess,
                                                    EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onApplyObservable.
    */
   void setOnApply(
-    const ::std::function<void(Effect* effect, EventState&)>& callback);
+    const std::function<void(Effect* effect, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onBeforeRenderObservable.
    */
   void setOnBeforeRender(
-    const ::std::function<void(Effect* effect, EventState&)>& callback);
+    const std::function<void(Effect* effect, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onAfterRenderObservable.
    */
   void setOnAfterRender(
-    const ::std::function<void(Effect* effect, EventState&)>& callback);
+    const std::function<void(Effect* effect, EventState&)>& callback);
 
   /**
    * @brief The input texture for this post process and the output texture of
@@ -160,8 +160,8 @@ public:
     const string_t& defines = "", const vector_t<string_t>& uniforms = {},
     const vector_t<string_t>& samplers                             = {},
     const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    const ::std::function<void(Effect* effect)>& onCompiled        = nullptr,
-    const ::std::function<void(Effect* effect, const string_t& errors)>& onError
+    const std::function<void(Effect* effect)>& onCompiled        = nullptr,
+    const std::function<void(Effect* effect, const string_t& errors)>& onError
     = nullptr);
 
   /**

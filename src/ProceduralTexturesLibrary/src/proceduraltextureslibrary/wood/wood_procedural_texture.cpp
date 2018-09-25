@@ -62,9 +62,9 @@ Json::object WoodProceduralTexture::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<WoodProceduralTexture>
+std::unique_ptr<WoodProceduralTexture>
 WoodProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                             Scene* /*scene*/, const string_t& /*rootUrl*/)
+                             Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

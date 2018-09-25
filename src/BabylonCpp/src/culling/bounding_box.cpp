@@ -45,7 +45,7 @@ void BoundingBox::reConstruct(const Vector3& min, const Vector3& max)
   vectorsWorld.clear();
   vectorsWorld.reserve(vectors.size());
   vectorsWorld.resize(vectors.size());
-  ::std::fill(vectorsWorld.begin(), vectorsWorld.end(), Vector3::Zero());
+  std::fill(vectorsWorld.begin(), vectorsWorld.end(), Vector3::Zero());
   minimumWorld    = Vector3::Zero();
   maximumWorld    = Vector3::Zero();
   centerWorld     = Vector3::Zero();
@@ -69,16 +69,16 @@ BoundingBox::BoundingBox(const BoundingBox& other)
 }
 
 BoundingBox::BoundingBox(BoundingBox&& other)
-    : vectors{::std::move(other.vectors)}
-    , center{::std::move(other.center)}
-    , extendSize{::std::move(other.extendSize)}
-    , directions{::std::move(other.directions)}
-    , vectorsWorld{::std::move(other.vectorsWorld)}
-    , minimumWorld{::std::move(other.minimumWorld)}
-    , maximumWorld{::std::move(other.maximumWorld)}
-    , minimum{::std::move(other.minimum)}
-    , maximum{::std::move(other.maximum)}
-    , _worldMatrix{::std::move(other._worldMatrix)}
+    : vectors{std::move(other.vectors)}
+    , center{std::move(other.center)}
+    , extendSize{std::move(other.extendSize)}
+    , directions{std::move(other.directions)}
+    , vectorsWorld{std::move(other.vectorsWorld)}
+    , minimumWorld{std::move(other.minimumWorld)}
+    , maximumWorld{std::move(other.maximumWorld)}
+    , minimum{std::move(other.minimum)}
+    , maximum{std::move(other.maximum)}
+    , _worldMatrix{std::move(other._worldMatrix)}
 {
 }
 
@@ -103,16 +103,16 @@ BoundingBox& BoundingBox::operator=(const BoundingBox& other)
 BoundingBox& BoundingBox::operator=(BoundingBox&& other)
 {
   if (&other != this) {
-    vectors      = ::std::move(other.vectors);
-    center       = ::std::move(other.center);
-    extendSize   = ::std::move(other.extendSize);
-    directions   = ::std::move(other.directions);
-    vectorsWorld = ::std::move(other.vectorsWorld);
-    minimumWorld = ::std::move(other.minimumWorld);
-    maximumWorld = ::std::move(other.maximumWorld);
-    minimum      = ::std::move(other.minimum);
-    maximum      = ::std::move(other.maximum);
-    _worldMatrix = ::std::move(other._worldMatrix);
+    vectors      = std::move(other.vectors);
+    center       = std::move(other.center);
+    extendSize   = std::move(other.extendSize);
+    directions   = std::move(other.directions);
+    vectorsWorld = std::move(other.vectorsWorld);
+    minimumWorld = std::move(other.minimumWorld);
+    maximumWorld = std::move(other.maximumWorld);
+    minimum      = std::move(other.minimum);
+    maximum      = std::move(other.maximum);
+    _worldMatrix = std::move(other._worldMatrix);
   }
 
   return *this;

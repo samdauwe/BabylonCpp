@@ -348,7 +348,7 @@ bool FireMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-const string_t FireMaterial::getClassName() const
+const std::string FireMaterial::getClassName() const
 {
   return "FireMaterial";
 }

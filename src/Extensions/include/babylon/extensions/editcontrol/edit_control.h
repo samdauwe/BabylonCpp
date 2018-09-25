@@ -1,7 +1,9 @@
 #ifndef BABYLON_EXTENSIONS_EDIT_CONTROL_EDIT_CONTROL_H
 #define BABYLON_EXTENSIONS_EDIT_CONTROL_EDIT_CONTROL_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/extensions/editcontrol/act_history.h>
 #include <babylon/math/color3.h>
@@ -9,6 +11,19 @@
 #include <babylon/tools/event_state.h>
 
 namespace BABYLON {
+
+class Camera;
+class LinesMesh;
+class Material;
+class Mesh;
+class Scene;
+class StandardMaterial;
+using CameraPtr           = std::shared_ptr<Camera>;
+using LinesMeshPtr        = std::shared_ptr<LinesMesh>;
+using MaterialPtr         = std::shared_ptr<Material>;
+using MeshPtr             = std::shared_ptr<Mesh>;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+
 namespace Extensions {
 
 class EditControl {
@@ -112,7 +127,7 @@ private:
   StandardMaterialPtr whiteMat;
   StandardMaterialPtr yellowMat;
   ActHist actHist;
-  ::std::function<void(Scene* scene, EventState& es)> renderer;
+  std::function<void(Scene* scene, EventState& es)> renderer;
   // EventListener* pointerdown;
   // EventListener* pointerup;
   // EventListener* pointermove;

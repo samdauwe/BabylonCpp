@@ -133,21 +133,21 @@ MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
   return result;
 }
 
-::std::pair<Float32Array, Uint32Array>
+std::pair<Float32Array, Uint32Array>
 PolygonMeshBuilder::buildWall(const Vector3& wall0Corner,
                               const Vector3& wall1Corner)
 {
   Float32Array positions;
   Uint32Array indices;
   auto direction = wall1Corner.subtract(wall0Corner).normalize();
-  auto angle     = ::std::acos(direction.x);
+  auto angle     = std::acos(direction.x);
   if (direction.z != 0.f) {
-    angle *= direction.z / ::std::abs(direction.z);
+    angle *= direction.z / std::abs(direction.z);
   }
   const auto& pointElements = _points.elements;
   for (const auto& p : pointElements) {
-    stl_util::concat(positions, {p.x * ::std::cos(angle) + wall0Corner.x, p.y,
-                                 p.x * ::std::sin(angle) + wall0Corner.z});
+    stl_util::concat(positions, {p.x * std::cos(angle) + wall0Corner.x, p.y,
+                                 p.x * std::sin(angle) + wall0Corner.z});
   };
   vector_t<vector_t<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array
@@ -157,7 +157,7 @@ PolygonMeshBuilder::buildWall(const Vector3& wall0Corner,
     indices.emplace_back(res[i]);
   }
 
-  return ::std::make_pair(positions, indices);
+  return std::make_pair(positions, indices);
 }
 
 PolygonPoints& PolygonMeshBuilder::points()

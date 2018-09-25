@@ -32,7 +32,7 @@ public:
    * @param callback the callback containing the button that was modified
    */
   void setOnButtonStateChange(
-    const ::std::function<void(int controlledIndex, unsigned int buttonIndex,
+    const std::function<void(int controlledIndex, unsigned int buttonIndex,
                                const ExtendedGamepadButton& state)>& callback);
 
   /**
@@ -52,7 +52,7 @@ public:
    * @param meshLoaded callback for when the mesh has been loaded
    */
   virtual void initControllerMesh(
-    Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
+    Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
     = 0;
 
 protected:
@@ -132,7 +132,7 @@ protected:
   std::vector<ExtendedGamepadButton> _buttons;
 
 private:
-  ::std::function<void(int controlledIndex, unsigned int buttonIndex,
+  std::function<void(int controlledIndex, unsigned int buttonIndex,
                        const ExtendedGamepadButton& state)>
     _onButtonStateChange;
   GamepadButtonChanges _changes;

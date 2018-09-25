@@ -1,16 +1,26 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_TERRAIN_TERRAIN_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_TERRAIN_TERRAIN_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/terrain/terrain_material_defines.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class IAnimatable;
+class Mesh;
+class Texture;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using IAnimatablePtr  = std::shared_ptr<IAnimatable>;
+using MeshPtr         = std::shared_ptr<Mesh>;
+using TexturePtr      = std::shared_ptr<Texture>;
+
 namespace MaterialsLibrary {
 
 class TerrainMaterial;
-using TerrainMaterialPtr = shared_ptr_t<TerrainMaterial>;
+using TerrainMaterialPtr = std::shared_ptr<TerrainMaterial>;
 
 class BABYLON_SHARED_EXPORT TerrainMaterial : public PushMaterial {
 
@@ -18,8 +28,8 @@ public:
   template <typename... Ts>
   static TerrainMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<TerrainMaterial>(
-      new TerrainMaterial(::std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<TerrainMaterial>(
+      new TerrainMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -35,7 +45,7 @@ public:
   std::vector<IAnimatablePtr> getAnimatables();
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,

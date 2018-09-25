@@ -12,7 +12,7 @@ namespace BABYLON {
 namespace Extensions {
 
 SimplePlanet::SimplePlanet(float scale, float degree, Scene* scene,
-                           const string_t& seed)
+                           const std::string& seed)
     : _degree{degree}
     , _scale{scale}
     , _scene{scene}

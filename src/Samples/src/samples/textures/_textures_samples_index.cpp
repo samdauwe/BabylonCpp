@@ -11,16 +11,16 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
   // -- Textures examples --
 
   // Bump Texture Scene
-  _samples["BumpTextureScene"] = ::std::make_tuple(
+  _samples["BumpTextureScene"] = std::make_tuple(
     true,                                                   //
     [](ICanvas* iCanvas) {                                  //
-      return ::std::make_unique<BumpTextureScene>(iCanvas); //
+      return std::make_unique<BumpTextureScene>(iCanvas); //
     });                                                     //
   // Procedural Textures Scene
-  _samples["ProceduralTexturesScene"] = ::std::make_tuple(
+  _samples["ProceduralTexturesScene"] = std::make_tuple(
     false,                                                         //
     [](ICanvas* iCanvas) {                                         //
-      return ::std::make_unique<ProceduralTexturesScene>(iCanvas); //
+      return std::make_unique<ProceduralTexturesScene>(iCanvas); //
     });                                                            //
 }
 

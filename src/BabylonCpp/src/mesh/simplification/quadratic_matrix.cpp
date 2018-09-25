@@ -22,7 +22,7 @@ QuadraticMatrix::QuadraticMatrix(const QuadraticMatrix& other)
 }
 
 QuadraticMatrix::QuadraticMatrix(QuadraticMatrix&& other)
-    : data{::std::move(other.data)}
+    : data{std::move(other.data)}
 {
 }
 
@@ -38,7 +38,7 @@ QuadraticMatrix& QuadraticMatrix::operator=(const QuadraticMatrix& other)
 QuadraticMatrix& QuadraticMatrix::operator=(QuadraticMatrix&& other)
 {
   if (&other != this) {
-    data = ::std::move(other.data);
+    data = std::move(other.data);
   }
 
   return *this;

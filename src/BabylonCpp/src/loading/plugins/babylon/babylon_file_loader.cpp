@@ -25,7 +25,7 @@ namespace BABYLON {
 
 BabylonFileLoader::BabylonFileLoader()
 {
-  extensions.mapping.emplace(::std::make_pair(".babylon", false));
+  extensions.mapping.emplace(std::make_pair(".babylon", false));
 }
 
 BabylonFileLoader::~BabylonFileLoader()
@@ -82,7 +82,7 @@ bool BabylonFileLoader::importMesh(
   const string_t& rootUrl, vector_t<AbstractMeshPtr>& meshes,
   vector_t<IParticleSystemPtr>& particleSystems,
   vector_t<SkeletonPtr>& skeletons,
-  const ::std::function<void(const string_t& message,
+  const std::function<void(const string_t& message,
                              const string_t& exception)>& onError) const
 {
   // Entire method running in try block, so ALWAYS logs as far as it got, only
@@ -286,7 +286,7 @@ bool BabylonFileLoader::importMesh(
     // Connecting parents
     for (auto& currentMesh : scene->meshes) {
       if (!currentMesh->_waitingParentId.empty()) {
-        ::std::static_pointer_cast<Node>(currentMesh)->parent
+        std::static_pointer_cast<Node>(currentMesh)->parent
           = scene->getLastEntryByID(currentMesh->_waitingParentId).get();
         currentMesh->_waitingParentId = "";
       }
@@ -323,7 +323,7 @@ bool BabylonFileLoader::importMesh(
 
     return true;
   }
-  catch (const ::std::exception& ex) {
+  catch (const std::exception& ex) {
     string_t msg = parsedData.contains("producer") ?
                      logOperation("importMesh", parsedData.get("producer")) :
                      logOperation("importMesh");
@@ -345,7 +345,7 @@ bool BabylonFileLoader::importMesh(
 
 bool BabylonFileLoader::load(
   Scene* scene, const string_t& data, const string_t& rootUrl,
-  const ::std::function<void(const string_t& message,
+  const std::function<void(const string_t& message,
                              const string_t& exception)>& /*onError*/) const
 {
   Json::value parsedData;

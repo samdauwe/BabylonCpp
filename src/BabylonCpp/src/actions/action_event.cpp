@@ -31,13 +31,13 @@ ActionEvent::ActionEvent(const ActionEvent& other)
 }
 
 ActionEvent::ActionEvent(ActionEvent&& other)
-    : source{::std::move(other.source)}
-    , sprite{::std::move(other.sprite)}
-    , pointerX{::std::move(other.pointerX)}
-    , pointerY{::std::move(other.pointerY)}
-    , meshUnderPointer{::std::move(other.meshUnderPointer)}
-    , sourceEvent{::std::move(other.sourceEvent)}
-    , additionalData{::std::move(other.additionalData)}
+    : source{std::move(other.source)}
+    , sprite{std::move(other.sprite)}
+    , pointerX{std::move(other.pointerX)}
+    , pointerY{std::move(other.pointerY)}
+    , meshUnderPointer{std::move(other.meshUnderPointer)}
+    , sourceEvent{std::move(other.sourceEvent)}
+    , additionalData{std::move(other.additionalData)}
 {
 }
 
@@ -59,13 +59,13 @@ ActionEvent& ActionEvent::operator=(const ActionEvent& other)
 ActionEvent& ActionEvent::operator=(ActionEvent&& other)
 {
   if (&other != this) {
-    source           = ::std::move(other.source);
-    sprite           = ::std::move(other.sprite);
-    pointerX         = ::std::move(other.pointerX);
-    pointerY         = ::std::move(other.pointerY);
-    meshUnderPointer = ::std::move(other.meshUnderPointer);
-    sourceEvent      = ::std::move(other.sourceEvent);
-    additionalData   = ::std::move(other.additionalData);
+    source           = std::move(other.source);
+    sprite           = std::move(other.sprite);
+    pointerX         = std::move(other.pointerX);
+    pointerY         = std::move(other.pointerY);
+    meshUnderPointer = std::move(other.meshUnderPointer);
+    sourceEvent      = std::move(other.sourceEvent);
+    additionalData   = std::move(other.additionalData);
   }
 
   return *this;

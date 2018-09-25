@@ -47,7 +47,7 @@ BaseTexture::BaseTexture(Scene* scene)
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
     , _reflectionTextureMatrix{Matrix::IdentityReadOnly()}
-    , emptyVector3{nullopt_t}
+    , emptyVector3{std::nullopt}
     , _cachedSize{Size::Zero()}
 {
 }
@@ -138,7 +138,7 @@ void BaseTexture::set_lodGenerationScale(float value)
   }
 }
 
-string_t BaseTexture::uid()
+std::string BaseTexture::uid()
 {
   if (_uid.empty()) {
     _uid = Tools::RandomId();
@@ -146,18 +146,18 @@ string_t BaseTexture::uid()
   return _uid;
 }
 
-string_t BaseTexture::toString() const
+std::string BaseTexture::toString() const
 {
   return name;
 }
 
-const string_t BaseTexture::getClassName() const
+const std::string BaseTexture::getClassName() const
 {
   return "BaseTexture";
 }
 
 void BaseTexture::setOnDispose(
-  const ::std::function<void(BaseTexture*, EventState&)>& callback)
+  const std::function<void(BaseTexture*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -254,7 +254,8 @@ bool BaseTexture::canRescale()
   return false;
 }
 
-InternalTexture* BaseTexture::_getFromCache(const string_t& url, bool noMipmap,
+InternalTexture* BaseTexture::_getFromCache(const std::string& url,
+                                            bool noMipmap,
                                             unsigned int sampling)
 {
   if (!_scene) {
@@ -283,21 +284,21 @@ void BaseTexture::delayLoad()
 {
 }
 
-void BaseTexture::set_boundingBoxSize(const nullable_t<Vector3>& /*value*/)
+void BaseTexture::set_boundingBoxSize(const std::optional<Vector3>& /*value*/)
 {
 }
 
-nullable_t<Vector3>& BaseTexture::get_boundingBoxSize()
+std::optional<Vector3>& BaseTexture::get_boundingBoxSize()
 {
   return emptyVector3;
 }
 
-vector_t<AnimationPtr> BaseTexture::getAnimations()
+std::vector<AnimationPtr> BaseTexture::getAnimations()
 {
   return animations;
 }
 
-unique_ptr_t<BaseTexture> BaseTexture::clone() const
+std::unique_ptr<BaseTexture> BaseTexture::clone() const
 {
   return nullptr;
 }
@@ -340,11 +341,11 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int level)
   auto engine = scene->getEngine();
 
   if (level != 0) {
-    width  = width / static_cast<int>(::std::pow(2, level));
-    height = height / static_cast<int>(::std::pow(2, level));
+    width  = width / static_cast<int>(std::pow(2, level));
+    height = height / static_cast<int>(std::pow(2, level));
 
-    width  = static_cast<int>(::std::round(width));
-    height = static_cast<int>(::std::round(height));
+    width  = static_cast<int>(std::round(width));
+    height = static_cast<int>(std::round(height));
   }
 
   if (_texture->isCube) {
@@ -382,7 +383,7 @@ void BaseTexture::setSphericalPolynomial(const SphericalPolynomial& value)
 {
   if (_texture) {
     _texture->_sphericalPolynomial
-      = ::std::make_unique<SphericalPolynomial>(value);
+      = std::make_unique<SphericalPolynomial>(value);
   }
 }
 
@@ -421,10 +422,10 @@ void BaseTexture::dispose()
 
   // Remove from scene
   _scene->textures.erase(
-    ::std::remove_if(_scene->textures.begin(), _scene->textures.end(),
-                     [this](const BaseTexturePtr& baseTexture) {
-                       return baseTexture.get() == this;
-                     }),
+    std::remove_if(_scene->textures.begin(), _scene->textures.end(),
+                   [this](const BaseTexturePtr& baseTexture) {
+                     return baseTexture.get() == this;
+                   }),
     _scene->textures.end());
 
   if (_texture == nullptr) {
@@ -444,8 +445,8 @@ Json::object BaseTexture::serialize() const
   return Json::object();
 }
 
-void BaseTexture::WhenAllReady(const vector_t<BaseTexture*>& textures,
-                               const ::std::function<void()>& callback)
+void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,
+                               const std::function<void()>& callback)
 {
   auto numRemaining = textures.size();
   if (numRemaining == 0) {
@@ -463,7 +464,7 @@ void BaseTexture::WhenAllReady(const vector_t<BaseTexture*>& textures,
       auto onLoadObservable
         = static_cast<Texture*>(texture)->onLoadObservable();
 
-      const ::std::function<void(Texture*, EventState&)> onLoadCallback
+      const std::function<void(Texture*, EventState&)> onLoadCallback
         = [&](Texture*, EventState&) {
             onLoadObservable.removeCallback(onLoadCallback);
             if (--numRemaining == 0) {

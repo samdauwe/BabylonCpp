@@ -18,25 +18,25 @@ ArcRotateCameraInputsManager::~ArcRotateCameraInputsManager()
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addMouseWheel()
 {
-  add(::std::make_shared<ArcRotateCameraMouseWheelInput>());
+  add(std::make_shared<ArcRotateCameraMouseWheelInput>());
   return *this;
 }
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addPointers()
 {
-  add(::std::make_shared<ArcRotateCameraPointersInput>());
+  add(std::make_shared<ArcRotateCameraPointersInput>());
   return *this;
 }
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addKeyboard()
 {
-  add(::std::make_shared<ArcRotateCameraKeyboardMoveInput>());
+  add(std::make_shared<ArcRotateCameraKeyboardMoveInput>());
   return *this;
 }
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addGamepad()
 {
-  // add(::std::make_shared<ArcRotateCameraGamepadInput>());
+  // add(std::make_shared<ArcRotateCameraGamepadInput>());
   return *this;
 }
 

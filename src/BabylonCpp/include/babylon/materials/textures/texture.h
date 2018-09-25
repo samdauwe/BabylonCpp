@@ -31,7 +31,7 @@ public:
   static TexturePtr New(Ts&&... args)
   {
     auto texture
-      = std::shared_ptr<Texture>(new Texture(::std::forward<Ts>(args)...));
+      = std::shared_ptr<Texture>(new Texture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
@@ -96,8 +96,8 @@ public:
     const std::string& data, const std::string& name, Scene* scene,
     bool noMipmap = false, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const ::std::function<void()>& onLoad  = nullptr,
-    const ::std::function<void()>& onError = nullptr,
+    const std::function<void()>& onLoad  = nullptr,
+    const std::function<void()>& onError = nullptr,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
                                             Scene* scene,
@@ -107,16 +107,16 @@ public:
     const std::optional<Variant<ArrayBuffer, Image>>& buffer, Scene* scene,
     bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const ::std::function<void()>& onLoad  = nullptr,
-    const ::std::function<void()>& onError = nullptr,
+    const std::function<void()>& onLoad  = nullptr,
+    const std::function<void()>& onError = nullptr,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
 
 protected:
   Texture(const std::string& url, Scene* scene, bool noMipmap = false,
           bool invertY              = true,
           unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-          const ::std::function<void()>& onLoad  = nullptr,
-          const ::std::function<void()>& onError = nullptr,
+          const std::function<void()>& onLoad  = nullptr,
+          const std::function<void()>& onError = nullptr,
           const std::optional<Variant<ArrayBuffer, Image>>& buffer
           = std::nullopt,
           bool deleteBuffer                         = false,
@@ -191,11 +191,11 @@ private:
   unsigned int _cachedCoordinatesMode;
   std::optional<Variant<ArrayBuffer, Image>> _buffer;
   bool _deleteBuffer;
-  ::std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
-  ::std::function<void()> _delayedOnError;
+  std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
+  std::function<void()> _delayedOnError;
 
-  ::std::function<void()> _onLoad;
-  ::std::function<void(InternalTexture*, EventState&)> _load;
+  std::function<void()> _onLoad;
+  std::function<void(InternalTexture*, EventState&)> _load;
 
 }; // end of class Texture
 

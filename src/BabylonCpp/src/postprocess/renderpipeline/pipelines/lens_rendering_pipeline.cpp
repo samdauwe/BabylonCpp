@@ -306,7 +306,7 @@ void LensRenderingPipeline::_createGrainTexture()
   _grainTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
   ICanvasRenderingContext2D* context
-    = ::std::static_pointer_cast<DynamicTexture>(_grainTexture)->getContext();
+    = std::static_pointer_cast<DynamicTexture>(_grainTexture)->getContext();
 
   auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
@@ -314,13 +314,13 @@ void LensRenderingPipeline::_createGrainTexture()
   string_t value;
   for (size_t x = 0; x < size; ++x) {
     for (size_t y = 0; y < size; ++y) {
-      value = ::std::to_string(
-        static_cast<int>(::std::floor(rand(0.42f, 0.58f) * 255.f)));
+      value = std::to_string(
+        static_cast<int>(std::floor(rand(0.42f, 0.58f) * 255.f)));
       context->fillStyle = "rgb(" + value + ", " + value + ", " + value + ")";
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     }
   }
-  ::std::static_pointer_cast<DynamicTexture>(_grainTexture)->update(false);
+  std::static_pointer_cast<DynamicTexture>(_grainTexture)->update(false);
 }
 
 } // end of namespace BABYLON

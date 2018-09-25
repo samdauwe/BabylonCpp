@@ -8,7 +8,7 @@ TEST(TestTime, measureFunctionCall)
   using namespace BABYLON;
 
   const auto sum = [](int a, int b) { return a + b; };
-  ::std::chrono::duration<float, ::std::nano> duration;
+  std::chrono::duration<float, std::nano> duration;
   float totalDurationNanos = 0.f;
   int result               = 0;
   for (int i = 0; i < 5; ++i) {

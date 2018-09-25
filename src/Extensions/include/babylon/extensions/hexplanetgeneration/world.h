@@ -1,9 +1,16 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_WORLD_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_WORLD_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Color4;
+class Vector3;
+
 namespace Extensions {
 
 struct Border;

@@ -16,7 +16,7 @@ namespace Samples {
  */
 class AirplaneModelScene : public IRenderableScene {
 
-  using MakeWingFunction = ::std::function<MeshPtr(
+  using MakeWingFunction = std::function<MeshPtr(
     const MeshPtr& mesh, float radius, float fuselageXer, bool invertY)>;
 
 public:

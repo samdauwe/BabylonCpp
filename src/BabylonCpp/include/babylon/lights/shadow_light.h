@@ -196,7 +196,7 @@ public:
    * Callback defining a custom Projection Matrix Builder.
    * This can be used to override the default projection matrix computation.
    */
-  ::std::function<void(const Matrix& viewMatrix,
+  std::function<void(const Matrix& viewMatrix,
                        const std::vector<AbstractMeshPtr>& renderList,
                        Matrix& result)>
     customProjectionMatrixBuilder;

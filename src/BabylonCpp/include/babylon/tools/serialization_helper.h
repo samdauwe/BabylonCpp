@@ -1,9 +1,34 @@
 #ifndef BABYLON_TOOLS_SERIALIZATION_HELPER_H
 #define BABYLON_TOOLS_SERIALIZATION_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+#include <memory>
+#include <vector>
+
+#include <babylon/babylon_api.h>
+
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
 
 namespace BABYLON {
+
+class BaseTexture;
+class Camera;
+class Light;
+class Scene;
+class StandardMaterial;
+using CameraPtr           = std::shared_ptr<Camera>;
+using LightPtr            = std::shared_ptr<Light>;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 struct BABYLON_SHARED_EXPORT SerializationHelper {
 
@@ -15,7 +40,7 @@ struct BABYLON_SHARED_EXPORT SerializationHelper {
                         Scene* scene);
   static StandardMaterialPtr Parse(const StandardMaterialPtr& standardMaterial,
                                    const Json::value& parsedMaterial,
-                                   Scene* scene, const string_t& rootUrl);
+                                   Scene* scene, const std::string& rootUrl);
 
 }; // end of struct SerializationHelper
 

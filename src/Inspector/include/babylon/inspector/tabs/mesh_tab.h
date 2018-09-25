@@ -1,7 +1,7 @@
 #ifndef BABYLON_INSPECTOR_TABS_MESH_TAB_H
 #define BABYLON_INSPECTOR_TABS_MESH_TAB_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/inspector/tabs/property_tab.h>
 #include <babylon/inspector/tree/tree_item.h>
 

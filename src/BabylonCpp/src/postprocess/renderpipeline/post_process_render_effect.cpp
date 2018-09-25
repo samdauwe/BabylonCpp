@@ -10,7 +10,7 @@ namespace BABYLON {
 
 PostProcessRenderEffect::PostProcessRenderEffect(
   Engine* engine, const string_t& name,
-  const ::std::function<vector_t<PostProcess*>()>& getPostProcesses,
+  const std::function<vector_t<PostProcess*>()>& getPostProcesses,
   bool singleInstance)
     : _name{name}
     , _engine{engine}

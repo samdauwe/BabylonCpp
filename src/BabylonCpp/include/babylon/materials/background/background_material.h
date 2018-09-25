@@ -37,7 +37,7 @@ public:
   static BackgroundMaterialPtr New(Ts&&... args)
   {
     auto material = std::shared_ptr<BackgroundMaterial>(
-      new BackgroundMaterial(::std::forward<Ts>(args)...));
+      new BackgroundMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;

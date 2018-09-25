@@ -90,7 +90,7 @@ void LinesMesh::set_intersectionThreshold(float value)
 
 MaterialPtr& LinesMesh::get_material()
 {
-  _colorShaderMaterial = ::std::static_pointer_cast<Material>(_colorShader);
+  _colorShaderMaterial = std::static_pointer_cast<Material>(_colorShader);
   return _colorShaderMaterial;
 }
 
@@ -165,7 +165,7 @@ LinesMesh::enableEdgesRendering(float epsilon,
                                 bool checkVerticesInsteadOfIndices)
 {
   disableEdgesRendering();
-  _edgesRenderer = ::std::make_unique<LineEdgesRenderer>(
+  _edgesRenderer = std::make_unique<LineEdgesRenderer>(
     shared_from_base<LinesMesh>(), epsilon, checkVerticesInsteadOfIndices);
   return *this;
 }

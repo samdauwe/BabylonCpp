@@ -1,10 +1,17 @@
 #ifndef BABYLON_PHYSICS_PHYSICS_ENGINE_H
 #define BABYLON_PHYSICS_PHYSICS_ENGINE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+struct IPhysicsBody;
+struct IPhysicsEnabledObject;
+struct IPhysicsEnginePlugin;
+class PhysicsImpostor;
+struct PhysicsImpostorJoint;
+class PhysicsJoint;
 
 class BABYLON_SHARED_EXPORT PhysicsEngine {
 
@@ -30,7 +37,7 @@ public:
   float getTimeStep() const;
 
   void dispose();
-  string_t getPhysicsPluginName() const;
+  std::string getPhysicsPluginName() const;
 
   /**
    * @brief Adding a new impostor for the impostor tracking.
@@ -57,7 +64,7 @@ public:
    */
   void addJoint(PhysicsImpostor* mainImpostor,
                 PhysicsImpostor* connectedImpostor,
-                const shared_ptr_t<PhysicsJoint>& joint);
+                const std::shared_ptr<PhysicsJoint>& joint);
 
   void removeJoint(PhysicsImpostor* mainImpostor,
                    PhysicsImpostor* connectedImpostor, PhysicsJoint* joint);
@@ -70,7 +77,7 @@ public:
 
   IPhysicsEnginePlugin* getPhysicsPlugin();
 
-  vector_t<shared_ptr_t<PhysicsImpostor>>& getImpostors();
+  std::vector<std::shared_ptr<PhysicsImpostor>>& getImpostors();
 
   PhysicsImpostor* getImpostorForPhysicsObject(IPhysicsEnabledObject* object);
 
@@ -84,8 +91,8 @@ public:
 private:
   bool _initialized;
   IPhysicsEnginePlugin* _physicsPlugin;
-  vector_t<shared_ptr_t<PhysicsImpostor>> _impostors;
-  vector_t<shared_ptr_t<PhysicsImpostorJoint>> _joints;
+  std::vector<std::shared_ptr<PhysicsImpostor>> _impostors;
+  std::vector<std::shared_ptr<PhysicsImpostorJoint>> _joints;
 
 }; // end of class PhysicsEngine
 

@@ -66,8 +66,8 @@ public:
     const string_t& defines = "", const vector_t<string_t>& uniforms = {},
     const vector_t<string_t>& samplers                             = {},
     const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    const ::std::function<void(Effect* effect)>& onCompiled        = nullptr,
-    const ::std::function<void(Effect* effect, const string_t& errors)>& onError
+    const std::function<void(Effect* effect)>& onCompiled        = nullptr,
+    const std::function<void(Effect* effect, const string_t& errors)>& onError
     = nullptr) override;
 
 private:

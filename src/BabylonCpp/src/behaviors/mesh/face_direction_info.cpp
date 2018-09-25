@@ -23,10 +23,10 @@ FaceDirectionInfo::FaceDirectionInfo(const FaceDirectionInfo& other)
 }
 
 FaceDirectionInfo::FaceDirectionInfo(FaceDirectionInfo&& other)
-    : direction{::std::move(other.direction)}
-    , rotatedDirection{::std::move(other.rotatedDirection)}
-    , diff{::std::move(other.diff)}
-    , ignore{::std::move(other.ignore)}
+    : direction{std::move(other.direction)}
+    , rotatedDirection{std::move(other.rotatedDirection)}
+    , diff{std::move(other.diff)}
+    , ignore{std::move(other.ignore)}
 {
 }
 
@@ -45,10 +45,10 @@ FaceDirectionInfo& FaceDirectionInfo::operator=(const FaceDirectionInfo& other)
 FaceDirectionInfo& FaceDirectionInfo::operator=(FaceDirectionInfo&& other)
 {
   if (&other != this) {
-    direction        = ::std::move(other.direction);
-    rotatedDirection = ::std::move(other.rotatedDirection);
-    diff             = ::std::move(other.diff);
-    ignore           = ::std::move(other.ignore);
+    direction        = std::move(other.direction);
+    rotatedDirection = std::move(other.rotatedDirection);
+    diff             = std::move(other.diff);
+    ignore           = std::move(other.ignore);
   }
 
   return *this;
@@ -65,7 +65,7 @@ FaceDirectionInfo FaceDirectionInfo::copy() const
 
 unique_ptr_t<FaceDirectionInfo> FaceDirectionInfo::clone() const
 {
-  return ::std::make_unique<FaceDirectionInfo>(*this);
+  return std::make_unique<FaceDirectionInfo>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os,

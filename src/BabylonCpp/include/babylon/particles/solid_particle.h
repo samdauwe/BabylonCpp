@@ -1,7 +1,7 @@
 #ifndef BABYLON_PARTICLES_SOLID_PARTICLE_H
 #define BABYLON_PARTICLES_SOLID_PARTICLE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/quaternion.h>
@@ -9,6 +9,10 @@
 #include <babylon/math/vector4.h>
 
 namespace BABYLON {
+
+class Mesh;
+class ModelShape;
+class SolidParticleSystem;
 
 /**
  * @brief Represents one particle of a solid particle system.
@@ -37,7 +41,8 @@ public:
   SolidParticle(unsigned int particleIndex, unsigned int positionIndex,
                 unsigned int indiceIndex, ModelShape* model, int shapeId,
                 unsigned int idxInShape, SolidParticleSystem* sps,
-                const nullable_t<BoundingInfo>& modelBoundingInfo = nullopt_t);
+                const std::optional<BoundingInfo>& modelBoundingInfo
+                = std::nullopt);
   ~SolidParticle();
 
   /**
@@ -59,7 +64,7 @@ public:
   /**
    * The color of the particle
    */
-  nullable_t<Color4> color;
+  std::optional<Color4> color;
   /**
    * The world space position of the particle.
    */
@@ -72,7 +77,7 @@ public:
   /**
    * The world space rotation quaternion of the particle.
    */
-  unique_ptr_t<Quaternion> rotationQuaternion;
+  std::unique_ptr<Quaternion> rotationQuaternion;
   /**
    * The scaling of the particle.
    */
@@ -129,12 +134,12 @@ public:
    * Reference to the shape model BoundingInfo object (Internal use)
    * Hidden
    */
-  unique_ptr_t<BoundingInfo> _modelBoundingInfo;
+  std::unique_ptr<BoundingInfo> _modelBoundingInfo;
   /**
    * Particle BoundingInfo object (Internal use)
    * Hidden
    */
-  unique_ptr_t<BoundingInfo> _boundingInfo;
+  std::unique_ptr<BoundingInfo> _boundingInfo;
   /**
    * Reference to the SPS what the particle belongs to (Internal use)
    * Hidden
@@ -154,14 +159,14 @@ public:
    * Parent particle Id, if any.
    * Default null.
    */
-  nullable_t<unsigned int> parentId;
+  std::optional<unsigned int> parentId;
   /**
    * Internal global position in the SPS.
    * Hidden
    */
   Vector3 _globalPosition;
 
-  unordered_map_t<string_t, float> extraFields;
+  std::unordered_map<std::string, float> extraFields;
 
 }; // end of class SolidParticle
 

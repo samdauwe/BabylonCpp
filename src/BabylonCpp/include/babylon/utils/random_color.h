@@ -1,7 +1,13 @@
 #ifndef BABYLON_UTILS_RANDOM_COLOR_H
 #define BABYLON_UTILS_RANDOM_COLOR_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace randomcolor {
@@ -58,7 +64,8 @@ class BABYLON_SHARED_EXPORT ColorInfo {
 public:
   ColorInfo();
   ColorInfo(const Range& hueRange, const Range& saturationRange,
-            const Range& brightnessRange, const vector_t<Range>& lowerBounds);
+            const Range& brightnessRange,
+            const std::vector<Range>& lowerBounds);
   ColorInfo(const ColorInfo& other);            // Copy constructor
   ColorInfo(ColorInfo&& other);                 // Move constructor
   ColorInfo& operator=(const ColorInfo& other); // Copy assignment operator
@@ -75,9 +82,9 @@ public:
   Range& getBrightnessRange();
   const Range& getBrightnessRange() const;
   void setBrightnessRange(const Range& brightnessRange);
-  vector_t<Range>& getLowerBounds();
-  const vector_t<Range>& getLowerBounds() const;
-  void setLowerBounds(const vector_t<Range>& lowerBounds);
+  std::vector<Range>& getLowerBounds();
+  const std::vector<Range>& getLowerBounds() const;
+  void setLowerBounds(const std::vector<Range>& lowerBounds);
   bool isValid() const;
 
 private:
@@ -85,7 +92,7 @@ private:
   bool _hasHueRange;
   Range _saturationRange;
   Range _brightnessRange;
-  vector_t<Range> _lowerBounds;
+  std::vector<Range> _lowerBounds;
   bool _isValid;
 
 }; // end of class ColorInfo
@@ -149,30 +156,32 @@ public:
    * @return the resulting rgb color as array,
    *         each component in range: [0 .. 255)
    */
-  static array_t<unsigned int, 3> HSVToRGB(float hue, float saturation,
-                                           float value);
-  static string_t GetColorName(const Color& color);
+  static std::array<unsigned int, 3> HSVToRGB(float hue, float saturation,
+                                              float value);
+  static std::string GetColorName(const Color& color);
 
   /** Member functions */
-  array_t<unsigned int, 3> randomColor();
-  array_t<unsigned int, 3> randomColor(float value,
-                                       const SaturationType& saturationType,
-                                       const Luminosity& luminosity);
-  vector_t<array_t<unsigned int, 3>> randomColor(int count);
-  array_t<unsigned int, 3> randomColor(const Color& color);
-  vector_t<array_t<unsigned int, 3>> random(const Color& color, int count);
-  void defineColor(const string_t& name, const vector_t<Range>& lowerBounds);
-  void defineColor(const string_t& name, const Range& hueRange,
-                   const vector_t<Range>& lowerBounds);
+  std::array<unsigned int, 3> randomColor();
+  std::array<unsigned int, 3> randomColor(float value,
+                                          const SaturationType& saturationType,
+                                          const Luminosity& luminosity);
+  std::vector<std::array<unsigned int, 3>> randomColor(int count);
+  std::array<unsigned int, 3> randomColor(const Color& color);
+  std::vector<std::array<unsigned int, 3>> random(const Color& color,
+                                                  int count);
+  void defineColor(const std::string& name,
+                   const std::vector<Range>& lowerBounds);
+  void defineColor(const std::string& name, const Range& hueRange,
+                   const std::vector<Range>& lowerBounds);
 
 private:
-  array_t<unsigned int, 3> getColor(float hue, float saturation,
-                                    float brightness);
+  std::array<unsigned int, 3> getColor(float hue, float saturation,
+                                       float brightness);
   float pickHue(float hue);
   float doPickHue(const Range& hueRange);
-  float pickHue(const string_t& name);
+  float pickHue(const std::string& name);
   Range getHueRange(float number);
-  Range getHueRange(const string_t& name);
+  Range getHueRange(const std::string& name);
   float pickSaturation(float hue, const SaturationType& saturationType,
                        const Luminosity& luminosity);
   float pickSaturation(const Color& color, const SaturationType& saturationType,
@@ -192,7 +201,7 @@ private:
   void loadColorBounds();
 
 private:
-  unordered_map_t<string_t, ColorInfo> _colors;
+  std::unordered_map<std::string, ColorInfo> _colors;
 
 }; // end of class RandomColor
 

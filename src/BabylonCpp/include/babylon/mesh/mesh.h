@@ -117,7 +117,7 @@ public:
   template <typename... Ts>
   static MeshPtr New(Ts&&... args)
   {
-    auto mesh = std::shared_ptr<Mesh>(new Mesh(::std::forward<Ts>(args)...));
+    auto mesh = std::shared_ptr<Mesh>(new Mesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
@@ -406,7 +406,7 @@ public:
    * @returns The Mesh.
    */
   Mesh& updateMeshPositions(
-    ::std::function<void(Float32Array& positions)> positionFunction,
+    std::function<void(Float32Array& positions)> positionFunction,
     bool computeNormals = true);
 
   /**
@@ -451,7 +451,7 @@ public:
    * @returns The Mesh.
    */
   Mesh& registerBeforeRender(
-    const ::std::function<void(Mesh* mesh, EventState& es)>& func);
+    const std::function<void(Mesh* mesh, EventState& es)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called before
@@ -460,7 +460,7 @@ public:
    * @returns The Mesh.
    */
   Mesh& unregisterBeforeRender(
-    const ::std::function<void(Mesh* mesh, EventState&)>& func);
+    const std::function<void(Mesh* mesh, EventState&)>& func);
 
   /**
    * @brief Registers for this mesh a javascript function called just after the
@@ -469,7 +469,7 @@ public:
    * @returns The Mesh.
    */
   Mesh& registerAfterRender(
-    const ::std::function<void(Mesh* mesh, EventState&)>& func);
+    const std::function<void(Mesh* mesh, EventState&)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called after
@@ -478,7 +478,7 @@ public:
    * @returns The Mesh.
    */
   Mesh& unregisterAfterRender(
-    const ::std::function<void(Mesh* mesh, EventState&)>& func);
+    const std::function<void(Mesh* mesh, EventState&)>& func);
 
   /**
    * @brief Hidden
@@ -498,7 +498,7 @@ public:
   Mesh&
   _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
                     _InstancesBatch* batch, bool hardwareInstancedRendering,
-                    ::std::function<void(bool isInstance, const Matrix& world,
+                    std::function<void(bool isInstance, const Matrix& world,
                                          Material* effectiveMaterial)>
                       onBeforeDraw,
                     Material* effectiveMaterial = nullptr);
@@ -652,7 +652,7 @@ public:
    */
   void
   applyDisplacementMap(const std::string& url, int minHeight, int maxHeight,
-                       const ::std::function<void(Mesh* mesh)> onSuccess
+                       const std::function<void(Mesh* mesh)> onSuccess
                        = nullptr,
                        const std::optional<Vector2>& uvOffset = std::nullopt,
                        const std::optional<Vector2>& uvScale  = std::nullopt,
@@ -756,7 +756,7 @@ public:
    * optimization finished.
    */
   void
-  optimizeIndices(const ::std::function<void(Mesh* mesh)>& successCallback);
+  optimizeIndices(const std::function<void(Mesh* mesh)>& successCallback);
 
   /**
    * @brief Hidden
@@ -1113,8 +1113,8 @@ public:
   static MeshPtr ExtrudeShapeCustom(
     const std::string& name, const std::vector<Vector3>& shape,
     const std::vector<Vector3>& path,
-    const ::std::function<float(float i, float distance)>& scaleFunction,
-    const ::std::function<float(float i, float distance)>& rotationFunction,
+    const std::function<float(float i, float distance)>& scaleFunction,
+    const std::function<float(float i, float distance)>& rotationFunction,
     bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene*,
     bool updatable = false, unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
     const MeshPtr& instance = nullptr);
@@ -1232,7 +1232,7 @@ public:
     const std::string& name, const std::string& url, unsigned int width,
     unsigned int height, unsigned int subdivisions, unsigned int minHeight,
     unsigned int maxHeight, Scene*, bool updatable = false,
-    const ::std::function<void(GroundMesh* mesh)>& onReady = nullptr);
+    const std::function<void(GroundMesh* mesh)>& onReady = nullptr);
 
   /**
    * @brief Creates a tube mesh.
@@ -1272,7 +1272,7 @@ public:
   static MeshPtr CreateTube(
     const std::string& name, const std::vector<Vector3>& path,
     float radius = 1.f, unsigned int tessellation = 64,
-    const ::std::function<float(unsigned int i, float distance)>& radiusFunction
+    const std::function<float(unsigned int i, float distance)>& radiusFunction
     = nullptr,
     unsigned int cap = Mesh::NO_CAP(), Scene* = nullptr, bool updatable = false,
     unsigned int sideOrientation = Mesh::DEFAULTSIDE(),
@@ -1442,7 +1442,7 @@ protected:
   Observable<Mesh>& get_onBeforeDrawObservable();
 
   void
-  set_onBeforeDraw(const ::std::function<void(Mesh*, EventState&)>& callback);
+  set_onBeforeDraw(const std::function<void(Mesh*, EventState&)>& callback);
 
   MorphTargetManagerPtr& get_morphTargetManager();
   void set_morphTargetManager(const MorphTargetManagerPtr& value);
@@ -1498,7 +1498,7 @@ public:
    */
   ReadOnlyProperty<Mesh, Observable<Mesh>> onBeforeDrawObservable;
 
-  WriteOnlyProperty<Mesh, ::std::function<void(Mesh*, EventState&)>>
+  WriteOnlyProperty<Mesh, std::function<void(Mesh*, EventState&)>>
     onBeforeDraw;
 
   // Members
@@ -1507,7 +1507,7 @@ public:
   std::string delayLoadingFile;
   /** Hidden */
   std::string _binaryInfo;
-  ::std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
+  std::function<void(float distance, Mesh* mesh, Mesh* selectedLevel)>
     onLODLevelSelection;
 
   // Morph
@@ -1518,7 +1518,7 @@ public:
   /** Hidden */
   Uint32Array _delayInfoKinds;
   /** Hidden */
-  ::std::function<void(const Json::value& parsedGeometry, const MeshPtr& mesh)>
+  std::function<void(const Json::value& parsedGeometry, const MeshPtr& mesh)>
     _delayLoadingFunction;
   /** Hidden */
   std::unique_ptr<_VisibleInstances> _visibleInstances;

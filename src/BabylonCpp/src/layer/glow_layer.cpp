@@ -141,9 +141,9 @@ void GlowLayer::_createTextureAndPostProcesses()
   _blurTexture1->renderParticles      = false;
   _blurTexture1->ignoreCameraViewport = true;
 
-  int blurTextureWidth2 = static_cast<int>(::std::floor(blurTextureWidth / 2));
+  int blurTextureWidth2 = static_cast<int>(std::floor(blurTextureWidth / 2));
   int blurTextureHeight2
-    = static_cast<int>(::std::floor(blurTextureHeight / 2));
+    = static_cast<int>(std::floor(blurTextureHeight / 2));
 
   _blurTexture2 = RenderTargetTexture::New(
     "GlowLayerBlurRTT2", ISize{blurTextureWidth2, blurTextureHeight2}, _scene,
@@ -156,7 +156,7 @@ void GlowLayer::_createTextureAndPostProcesses()
 
   _textures = {_blurTexture1, _blurTexture2};
 
-  _horizontalBlurPostprocess1 = ::std::make_unique<BlurPostProcess>(
+  _horizontalBlurPostprocess1 = std::make_unique<BlurPostProcess>(
     "GlowLayerHBP1", Vector2(1.f, 0.f), _options.blurKernelSize / 2,
     ToVariant<float, PostProcessOptions>(
       PostProcessOptions{blurTextureWidth, blurTextureHeight}),
@@ -169,14 +169,14 @@ void GlowLayer::_createTextureAndPostProcesses()
       effect->setTexture("textureSampler", _mainTexture);
     });
 
-  _verticalBlurPostprocess1 = ::std::make_unique<BlurPostProcess>(
+  _verticalBlurPostprocess1 = std::make_unique<BlurPostProcess>(
     "GlowLayerVBP1", Vector2(0.f, 1.f), _options.blurKernelSize / 2,
     ToVariant<float, PostProcessOptions>(
       PostProcessOptions{blurTextureWidth, blurTextureHeight}),
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false, textureType);
 
-  _horizontalBlurPostprocess2 = ::std::make_unique<BlurPostProcess>(
+  _horizontalBlurPostprocess2 = std::make_unique<BlurPostProcess>(
     "GlowLayerHBP2", Vector2(1.f, 0.f), _options.blurKernelSize / 2,
     ToVariant<float, PostProcessOptions>(
       PostProcessOptions{blurTextureWidth2, blurTextureHeight2}),
@@ -189,7 +189,7 @@ void GlowLayer::_createTextureAndPostProcesses()
       effect->setTexture("textureSampler", _blurTexture1);
     });
 
-  _verticalBlurPostprocess2 = ::std::make_unique<BlurPostProcess>(
+  _verticalBlurPostprocess2 = std::make_unique<BlurPostProcess>(
     "GlowLayerVBP2", Vector2(0.f, 1.f), _options.blurKernelSize / 2,
     ToVariant<float, PostProcessOptions>(
       PostProcessOptions{blurTextureWidth2, blurTextureHeight2}),
@@ -242,7 +242,7 @@ bool GlowLayer::isReady(SubMesh* subMesh, bool useInstances)
 
   BaseTexturePtr emissiveTexture = nullptr;
   if (material->type() == IReflect::Type::STANDARDMATERIAL) {
-    emissiveTexture = ::std::static_pointer_cast<StandardMaterial>(material)
+    emissiveTexture = std::static_pointer_cast<StandardMaterial>(material)
                         ->emissiveTexture();
   }
 
@@ -280,7 +280,7 @@ void GlowLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh,
 {
   StandardMaterialPtr material = nullptr;
   if (iMaterial->type() == IReflect::Type::STANDARDMATERIAL) {
-    material = ::std::static_pointer_cast<StandardMaterial>(iMaterial);
+    material = std::static_pointer_cast<StandardMaterial>(iMaterial);
   }
 
   auto textureLevel = 1.f;
@@ -336,7 +336,7 @@ void GlowLayer::addExcludedMesh(Mesh* mesh)
 
 void GlowLayer::removeExcludedMesh(Mesh* mesh)
 {
-  _excludedMeshes.erase(::std::remove(_excludedMeshes.begin(),
+  _excludedMeshes.erase(std::remove(_excludedMeshes.begin(),
                                       _excludedMeshes.end(), mesh->uniqueId),
                         _excludedMeshes.end());
 }
@@ -350,7 +350,7 @@ void GlowLayer::addIncludedOnlyMesh(Mesh* mesh)
 
 void GlowLayer::removeIncludedOnlyMesh(Mesh* mesh)
 {
-  _includedOnlyMeshes.erase(::std::remove(_includedOnlyMeshes.begin(),
+  _includedOnlyMeshes.erase(std::remove(_includedOnlyMeshes.begin(),
                                           _includedOnlyMeshes.end(),
                                           mesh->uniqueId),
                             _includedOnlyMeshes.end());

@@ -13,28 +13,28 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
   // -- Special FX examples --
 
   // Fireworks with Shader Code Scene
-  _samples["FireworksWithShaderCodeScene"] = ::std::make_tuple(
+  _samples["FireworksWithShaderCodeScene"] = std::make_tuple(
     true,                                                               //
     [](ICanvas* iCanvas) {                                              //
-      return ::std::make_unique<FireworksWithShaderCodeScene>(iCanvas); //
+      return std::make_unique<FireworksWithShaderCodeScene>(iCanvas); //
     });                                                                 //
   // Fog Scene
   _samples["FogScene"]
-    = ::std::make_tuple(true,                                           //
+    = std::make_tuple(true,                                           //
                         [](ICanvas* iCanvas) {                          //
-                          return ::std::make_unique<FogScene>(iCanvas); //
+                          return std::make_unique<FogScene>(iCanvas); //
                         });                                             //
   // Infinite Loader Scene
-  _samples["InfiniteLoaderScene"] = ::std::make_tuple(
+  _samples["InfiniteLoaderScene"] = std::make_tuple(
     false,                                                     //
     [](ICanvas* iCanvas) {                                     //
-      return ::std::make_unique<InfiniteLoaderScene>(iCanvas); //
+      return std::make_unique<InfiniteLoaderScene>(iCanvas); //
     });                                                        //
   // Waves Scene
   _samples["WavesScene"]
-    = ::std::make_tuple(true,                                             //
+    = std::make_tuple(true,                                             //
                         [](ICanvas* iCanvas) {                            //
-                          return ::std::make_unique<WavesScene>(iCanvas); //
+                          return std::make_unique<WavesScene>(iCanvas); //
                         });                                               //
 }
 

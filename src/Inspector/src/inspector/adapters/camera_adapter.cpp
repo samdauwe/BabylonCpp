@@ -13,13 +13,13 @@ namespace BABYLON {
 CameraAdapter::CameraAdapter(const CameraPtr& camera)
     : _camera{camera}, _freeCamera{nullptr}, _properties{nullptr}
 {
-  _tools.emplace_back(::std::make_unique<CameraPOV>(this));
+  _tools.emplace_back(std::make_unique<CameraPOV>(this));
   // Cast camera
   if (_camera->type() == IReflect::Type::FREECAMERA) {
-    _freeCamera = ::std::static_pointer_cast<FreeCamera>(_camera);
+    _freeCamera = std::static_pointer_cast<FreeCamera>(_camera);
   }
   // Build properties view
-  _properties = ::std::make_unique<PropertiesView>();
+  _properties = std::make_unique<PropertiesView>();
   _buildPropertiesView();
 }
 

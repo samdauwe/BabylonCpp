@@ -20,7 +20,7 @@ public:
    * @param onlyOnce Specifies if the event should be triggered only once
    */
   AnimationEvent(int frame,
-                 const ::std::function<void(float currentFrame)>& action,
+                 const std::function<void(float currentFrame)>& action,
                  bool onlyOnce = false);
   AnimationEvent(const AnimationEvent& other);
   AnimationEvent(AnimationEvent&& other);
@@ -42,7 +42,7 @@ public:
   /**
    * The event to perform when triggered
    */
-  ::std::function<void(float currentFrame)> action;
+  std::function<void(float currentFrame)> action;
 
   /**
    * Specifies if the event should be triggered only once

@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_LAVA_LAVA_MATERIAL_DEFINES_H
 #define BABYLON_MATERIALS_LIBRARY_LAVA_LAVA_MATERIAL_DEFINES_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/material_defines.h>
 
 namespace BABYLON {

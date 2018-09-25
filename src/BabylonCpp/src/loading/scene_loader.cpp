@@ -64,7 +64,7 @@ IRegisteredPlugin SceneLoader::_getDefaultPlugin()
 {
   // Add default plugin
   if (SceneLoader::_registeredPlugins.empty()) {
-    SceneLoader::RegisterPlugin(::std::make_shared<BabylonFileLoader>());
+    SceneLoader::RegisterPlugin(std::make_shared<BabylonFileLoader>());
   }
 
   return SceneLoader::_registeredPlugins[".babylon"];
@@ -125,14 +125,14 @@ string_t SceneLoader::_getDirectLoad(const string_t& sceneFilename)
 
 shared_ptr_t<ISceneLoaderPlugin> SceneLoader::_loadData(
   const string_t& rootUrl, const string_t& sceneFilename, Scene* scene,
-  const ::std::function<void(const shared_ptr_t<ISceneLoaderPlugin>& plugin,
+  const std::function<void(const shared_ptr_t<ISceneLoaderPlugin>& plugin,
                              const string_t& data,
                              const string_t& responseURL)>& onSuccess,
-  const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+  const std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
-  const ::std::function<void(const string_t& message,
+  const std::function<void(const string_t& message,
                              const string_t& exception)>& onError,
-  const ::std::function<void()>& /*onDispose*/, const string_t& pluginExtension)
+  const std::function<void()>& /*onDispose*/, const string_t& pluginExtension)
 {
   auto directLoad = SceneLoader::_getDirectLoad(sceneFilename);
   auto registeredPlugin
@@ -158,7 +158,7 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::_loadData(
 
   const auto manifestChecked = [&]() {
     auto url = rootUrl + sceneFilename;
-    ::std::function<void(const ProgressEvent& event)> progressCallback
+    std::function<void(const ProgressEvent& event)> progressCallback
       = nullptr;
     if (onProgress) {
       progressCallback = [&](const ProgressEvent& event) {
@@ -207,7 +207,7 @@ void SceneLoader::RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin)
   auto& extensions = plugin->extensions.mapping;
   for (auto& item : extensions) {
     SceneLoader::_registeredPlugins[String::toLowerCase(item.first)] = {
-      ::std::move(plugin), // plugin
+      std::move(plugin), // plugin
       item.second          // isBinary
     };
   }
@@ -216,14 +216,14 @@ void SceneLoader::RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin)
 shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
   const vector_t<string_t>& meshNames, string_t rootUrl, string_t sceneFilename,
   Scene* scene,
-  const ::std::function<
+  const std::function<
     void(const vector_t<AbstractMeshPtr>& meshes,
          const vector_t<IParticleSystemPtr>& particleSystems,
          const vector_t<SkeletonPtr>& skeletons,
          const vector_t<AnimationGroupPtr>& animationGroups)>& onSuccess,
-  const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+  const std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
-  const ::std::function<void(Scene* scene, const string_t& message,
+  const std::function<void(Scene* scene, const string_t& message,
                              const string_t& exception)>& onError,
   const string_t& pluginExtension)
 {
@@ -263,7 +263,7 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
     disposeHandler();
   };
 
-  ::std::function<void(const SceneLoaderProgressEvent& event)> progressHandler
+  std::function<void(const SceneLoaderProgressEvent& event)> progressHandler
     = nullptr;
   if (onProgress) {
     progressHandler = [&](const SceneLoaderProgressEvent& event) {
@@ -324,10 +324,10 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
 
 unique_ptr_t<Scene> SceneLoader::Load(
   const string_t& rootUrl, const string_t& sceneFilename, Engine* engine,
-  const ::std::function<void(Scene* scene)>& onsuccess,
-  const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+  const std::function<void(Scene* scene)>& onsuccess,
+  const std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
-  const ::std::function<void(Scene* scene, const string_t& message,
+  const std::function<void(Scene* scene, const string_t& message,
                              const string_t& exception)>& onError,
   const string_t& pluginExtension)
 {
@@ -339,10 +339,10 @@ unique_ptr_t<Scene> SceneLoader::Load(
 
 shared_ptr_t<ISceneLoaderPlugin> SceneLoader::Append(
   string_t rootUrl, string_t sceneFilename, Scene* scene,
-  const ::std::function<void(Scene* scene)>& onSuccess,
-  const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+  const std::function<void(Scene* scene)>& onSuccess,
+  const std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
-  const ::std::function<void(Scene* scene, const string_t& message,
+  const std::function<void(Scene* scene, const string_t& message,
                              const string_t& exception)>& onError,
   const string_t& pluginExtension)
 {
@@ -386,7 +386,7 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::Append(
         disposeHandler();
       };
 
-  ::std::function<void(const SceneLoaderProgressEvent& event)> progressHandler
+  std::function<void(const SceneLoaderProgressEvent& event)> progressHandler
     = nullptr;
   if (onProgress) {
     progressHandler = [&](const SceneLoaderProgressEvent& event) {

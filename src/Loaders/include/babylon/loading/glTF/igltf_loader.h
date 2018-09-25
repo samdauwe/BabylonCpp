@@ -11,19 +11,19 @@ struct BABYLON_SHARED_EXPORT IGLTFLoader : public IDisposable {
   virtual void importMeshAsync(
     const vector_t<string_t>& meshesNames, Scene* scene,
     const IGLTFLoaderData& data, const string_t& rootUrl,
-    const ::std::function<void(const vector_t<AbstractMesh*>& meshes,
+    const std::function<void(const vector_t<AbstractMesh*>& meshes,
                                const vector_t<ParticleSystem*>& particleSystems,
                                const vector_t<Skeleton*>& skeletons)>&
       onSuccess,
-    const ::std::function<void(const ProgressEvent& event)>& onProgress,
-    const ::std::function<void(const string_t& message)>& onError)
+    const std::function<void(const ProgressEvent& event)>& onProgress,
+    const std::function<void(const string_t& message)>& onError)
     = 0;
 
   virtual void
   loadAsync(Scene* scene, const IGLTFLoaderData& data, const string_t& rootUrl,
-            const ::std::function<void()>& onSuccess,
-            const ::std::function<void(const ProgressEvent& event)>& onProgress,
-            const ::std::function<void(const string_t& message)>& onError)
+            const std::function<void()>& onSuccess,
+            const std::function<void(const ProgressEvent& event)>& onProgress,
+            const std::function<void(const string_t& message)>& onError)
     = 0;
 
 }; // end of struct IGLTFLoader

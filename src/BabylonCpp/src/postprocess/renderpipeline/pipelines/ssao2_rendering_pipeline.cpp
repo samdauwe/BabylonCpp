@@ -124,7 +124,7 @@ SSAO2RenderingPipeline::~SSAO2RenderingPipeline()
 
 void SSAO2RenderingPipeline::set_samples(unsigned int n)
 {
-  _ssaoPostProcess->updateEffect("#define SAMPLES " + ::std::to_string(n)
+  _ssaoPostProcess->updateEffect("#define SAMPLES " + std::to_string(n)
                                  + "\n#define SSAO");
   _samples      = n;
   _sampleSphere = _generateHemisphere();
@@ -298,8 +298,8 @@ Vector3 SSAO2RenderingPipeline::_hemisphereSample_uniform(float u, float v)
   // rejecting samples that are close to tangent plane to avoid z-fighting
   // artifacts
   auto cosTheta = 1.f - (u * 0.85f + 0.15f);
-  auto sinTheta = ::std::sqrt(1.f - cosTheta * cosTheta);
-  return Vector3(::std::cos(phi) * sinTheta, ::std::sin(phi) * sinTheta,
+  auto sinTheta = std::sqrt(1.f - cosTheta * cosTheta);
+  return Vector3(std::cos(phi) * sinTheta, std::sin(phi) * sinTheta,
                  cosTheta);
 }
 
@@ -340,7 +340,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     {"randomSampler", "normalSampler"},
     ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    "#define SAMPLES " + ::std::to_string(numSamples) + "\n#define SSAO");
+    "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
 
   _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
     if (_firstUpdate) {
@@ -363,10 +363,10 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setFloat("base", base);
     effect->setFloat("near", _scene->activeCamera->minZ);
     effect->setFloat("far", _scene->activeCamera->maxZ);
-    effect->setFloat("xViewport", ::std::tan(_scene->activeCamera->fov / 2.f)
+    effect->setFloat("xViewport", std::tan(_scene->activeCamera->fov / 2.f)
                                     * _scene->getEngine()->getAspectRatio(
                                         *_scene->activeCamera, true));
-    effect->setFloat("yViewport", ::std::tan(_scene->activeCamera->fov / 2.f));
+    effect->setFloat("yViewport", std::tan(_scene->activeCamera->fov / 2.f));
     effect->setMatrix("projection", _scene->getProjectionMatrix());
 
     effect->setTexture("textureSampler", _depthTexture);
@@ -411,7 +411,7 @@ void SSAO2RenderingPipeline::_createRandomTexture()
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
   auto context
-    = ::std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
+    = std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
 
   const auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
@@ -427,12 +427,12 @@ void SSAO2RenderingPipeline::_createRandomTexture()
       randVector.normalize();
 
       randVector.scaleInPlace(255);
-      randVector.x = ::std::floor(randVector.x);
-      randVector.y = ::std::floor(randVector.y);
+      randVector.x = std::floor(randVector.x);
+      randVector.y = std::floor(randVector.y);
 
-      context->fillStyle = "rgb(" + ::std::to_string(randVector.x) + ", "
-                           + ::std::to_string(randVector.y) + ", "
-                           + ::std::to_string(randVector.z) + ")";
+      context->fillStyle = "rgb(" + std::to_string(randVector.x) + ", "
+                           + std::to_string(randVector.y) + ", "
+                           + std::to_string(randVector.z) + ")";
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     }
   }

@@ -1,13 +1,18 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_ICOSPHERE_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_ICOSPHERE_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 namespace Extensions {
 
+struct IcoNode;
+using RotationPredicateType = std::function<bool(
+  const IcoNode&, const IcoNode&, const IcoNode&, const IcoNode&)>;
 struct Tile;
 
 struct BABYLON_SHARED_EXPORT IcoNode {

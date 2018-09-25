@@ -37,10 +37,10 @@ ClickInfo::ClickInfo(ClickInfo&& otherClickInfo)
                   &ClickInfo::set_doubleClick}
     , hasSwiped{this, &ClickInfo::get_hasSwiped, &ClickInfo::set_hasSwiped}
     , ignore{this, &ClickInfo::get_ignore, &ClickInfo::set_ignore}
-    , _singleClick{::std::move(otherClickInfo._singleClick)}
-    , _doubleClick{::std::move(otherClickInfo._doubleClick)}
-    , _hasSwiped{::std::move(otherClickInfo._hasSwiped)}
-    , _ignore{::std::move(otherClickInfo._ignore)}
+    , _singleClick{std::move(otherClickInfo._singleClick)}
+    , _doubleClick{std::move(otherClickInfo._doubleClick)}
+    , _hasSwiped{std::move(otherClickInfo._hasSwiped)}
+    , _ignore{std::move(otherClickInfo._ignore)}
 {
 }
 
@@ -59,10 +59,10 @@ ClickInfo& ClickInfo::operator=(const ClickInfo& otherClickInfo)
 ClickInfo& ClickInfo::operator=(ClickInfo&& otherClickInfo)
 {
   if (&otherClickInfo != this) {
-    _singleClick = ::std::move(otherClickInfo._singleClick);
-    _doubleClick = ::std::move(otherClickInfo._doubleClick);
-    _hasSwiped   = ::std::move(otherClickInfo._hasSwiped);
-    _ignore      = ::std::move(otherClickInfo._ignore);
+    _singleClick = std::move(otherClickInfo._singleClick);
+    _doubleClick = std::move(otherClickInfo._doubleClick);
+    _hasSwiped   = std::move(otherClickInfo._hasSwiped);
+    _ignore      = std::move(otherClickInfo._ignore);
   }
 
   return *this;

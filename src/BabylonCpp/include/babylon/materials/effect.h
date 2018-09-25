@@ -161,21 +161,21 @@ public:
    * immediatly if already ready.
    * @param func The callback to be used.
    */
-  void executeWhenCompiled(const ::std::function<void(Effect* effect)>& func);
+  void executeWhenCompiled(const std::function<void(Effect* effect)>& func);
 
   /**
    * @brief Hidden
    */
   void
   _loadVertexShader(const std::string& vertex,
-                    const ::std::function<void(const std::string&)>& callback);
+                    const std::function<void(const std::string&)>& callback);
 
   /**
    * @brief Hidden
    */
   void _loadFragmentShader(
     const std::string& fragment,
-    const ::std::function<void(const std::string&)>& callback);
+    const std::function<void(const std::string&)>& callback);
 
   /**
    * @brief Hidden
@@ -193,8 +193,8 @@ public:
    */
   void _rebuildProgram(
     const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
-    const ::std::function<void(GL::IGLProgram* program)>& onCompiled,
-    const ::std::function<void(const std::string& message)>& onError);
+    const std::function<void(GL::IGLProgram* program)>& onCompiled,
+    const std::function<void(const std::string& message)>& onError);
 
   /**
    * @brief Gets the uniform locations of the the specified variable names
@@ -570,10 +570,10 @@ protected:
 private:
   void _processShaderConversion(
     const std::string& sourceCode, bool isFragment,
-    const ::std::function<void(const std::string&)>& callback);
+    const std::function<void(const std::string&)>& callback);
   void
   _processIncludes(const std::string& sourceCode,
-                   const ::std::function<void(const std::string&)>& callback);
+                   const std::function<void(const std::string&)>& callback);
   std::string _processPrecision(std::string source);
 
 public:
@@ -589,15 +589,15 @@ public:
   /**
    * Callback that will be called when the shader is compiled.
    */
-  ::std::function<void(Effect* effect)> onCompiled;
+  std::function<void(Effect* effect)> onCompiled;
   /**
    * Callback that will be called if an error occurs during shader compilation.
    */
-  ::std::function<void(Effect* effect, const std::string& errors)> onError;
+  std::function<void(Effect* effect, const std::string& errors)> onError;
   /**
    * Callback that will be called when effect is bound.
    */
-  ::std::function<void(Effect* effect)> onBind;
+  std::function<void(Effect* effect)> onBind;
   /**
    * Unique ID of the effect.
    */

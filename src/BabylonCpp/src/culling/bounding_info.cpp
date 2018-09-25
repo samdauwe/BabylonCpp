@@ -28,12 +28,12 @@ BoundingInfo::BoundingInfo(const BoundingInfo& boundingInfo)
 }
 
 BoundingInfo::BoundingInfo(BoundingInfo&& other)
-    : minimum{::std::move(other.minimum)}
-    , maximum{::std::move(other.maximum)}
-    , boundingBox{BoundingBox(::std::move(other.boundingBox))}
-    , boundingSphere{BoundingSphere(::std::move(other.boundingSphere))}
+    : minimum{std::move(other.minimum)}
+    , maximum{std::move(other.maximum)}
+    , boundingBox{BoundingBox(std::move(other.boundingBox))}
+    , boundingSphere{BoundingSphere(std::move(other.boundingSphere))}
     , isLocked{this, &BoundingInfo::get_isLocked, &BoundingInfo::set_isLocked}
-    , _isLocked{::std::move(other._isLocked)}
+    , _isLocked{std::move(other._isLocked)}
 {
 }
 
@@ -53,11 +53,11 @@ BoundingInfo& BoundingInfo::operator=(const BoundingInfo& other)
 BoundingInfo& BoundingInfo::operator=(BoundingInfo&& other)
 {
   if (&other != this) {
-    minimum        = ::std::move(other.minimum);
-    maximum        = ::std::move(other.maximum);
-    boundingBox    = ::std::move(other.boundingBox);
-    boundingSphere = ::std::move(other.boundingSphere);
-    _isLocked      = ::std::move(other._isLocked);
+    minimum        = std::move(other.minimum);
+    maximum        = std::move(other.maximum);
+    boundingBox    = std::move(other.boundingBox);
+    boundingSphere = std::move(other.boundingSphere);
+    _isLocked      = std::move(other._isLocked);
   }
 
   return *this;
@@ -235,11 +235,11 @@ Extents BoundingInfo::computeBoxExtents(const Vector3& axis,
   const float p = Vector3::Dot(box.centerWorld, axis);
 
   const float r0
-    = ::std::abs(Vector3::Dot(box.directions[0], axis)) * box.extendSize.x;
+    = std::abs(Vector3::Dot(box.directions[0], axis)) * box.extendSize.x;
   const float r1
-    = ::std::abs(Vector3::Dot(box.directions[1], axis)) * box.extendSize.y;
+    = std::abs(Vector3::Dot(box.directions[1], axis)) * box.extendSize.y;
   const float r2
-    = ::std::abs(Vector3::Dot(box.directions[2], axis)) * box.extendSize.z;
+    = std::abs(Vector3::Dot(box.directions[2], axis)) * box.extendSize.z;
 
   float r = r0 + r1 + r2;
   return {p - r, p + r};

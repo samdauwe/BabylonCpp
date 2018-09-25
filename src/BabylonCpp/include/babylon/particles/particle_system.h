@@ -2,13 +2,24 @@
 #define BABYLON_PARTICLES_PARTICLE_SYSTEM_H
 
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/particles/base_particle_system.h>
 #include <babylon/particles/iparticle_system.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Buffer;
+class Effect;
+class Mesh;
+class Particle;
+class Scene;
+class VertexBuffer;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 /**
  * @brief This represents a particle system in Babylon.
@@ -36,7 +47,7 @@ public:
    * animate the particles texture
    * @param epsilon Offset used to render the particles
    */
-  ParticleSystem(const string_t& name, size_t capacity, Scene* scene,
+  ParticleSystem(const std::string& name, size_t capacity, Scene* scene,
                  Effect* customEffect         = nullptr,
                  bool isAnimationSheetEnabled = false, float epsilon = 0.01f);
   virtual ~ParticleSystem() override;
@@ -59,8 +70,8 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addLifeTimeGradient(float gradient, float factor,
-                                       const nullable_t<float>& factor2
-                                       = nullopt_t);
+                                       const std::optional<float>& factor2
+                                       = std::nullopt);
 
   /**
    * @brief Remove a specific life time gradient.
@@ -78,8 +89,8 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addSizeGradient(float gradient, float factor,
-                                   const nullable_t<float>& factor2
-                                   = nullopt_t) override;
+                                   const std::optional<float>& factor2
+                                   = std::nullopt) override;
 
   /**
    * @brief Remove a specific size gradient.
@@ -98,8 +109,8 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addAngularSpeedGradient(float gradient, float factor,
-                                           const nullable_t<float>& factor2
-                                           = nullopt_t) override;
+                                           const std::optional<float>& factor2
+                                           = std::nullopt) override;
 
   /**
    * @brief Remove a specific angular speed gradient.
@@ -117,8 +128,8 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addVelocityGradient(float gradient, float factor,
-                                       const nullable_t<float>& factor2
-                                       = nullopt_t) override;
+                                       const std::optional<float>& factor2
+                                       = std::nullopt) override;
 
   /**
    * @brief Remove a specific velocity gradient.
@@ -137,8 +148,8 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addLimitVelocityGradient(float gradient, float factor,
-                                            const nullable_t<float>& factor2
-                                            = nullopt_t) override;
+                                            const std::optional<float>& factor2
+                                            = std::nullopt) override;
 
   /**
    * @brief Remove a specific limit velocity gradient.
@@ -156,8 +167,8 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addDragGradient(float gradient, float factor,
-                                   const nullable_t<float>& factor2
-                                   = nullopt_t) override;
+                                   const std::optional<float>& factor2
+                                   = std::nullopt) override;
 
   /**
    * @brief Remove a specific drag gradient.
@@ -174,8 +185,8 @@ public:
    * color2]) with main color to pick the final color from
    */
   IParticleSystem& addColorGradient(float gradient, const Color4& color,
-                                    const nullable_t<Color4>& color2
-                                    = nullopt_t) override;
+                                    const std::optional<Color4>& color2
+                                    = std::nullopt) override;
 
   /**
    * @brief Remove a specific color gradient.
@@ -186,7 +197,7 @@ public:
   /**
    * @brief Gets the current list of active particles.
    */
-  vector_t<Particle*>& particles();
+  std::vector<Particle*>& particles();
 
   /**
    * @brief Returns the string "ParticleSystem".
@@ -254,14 +265,14 @@ public:
   /**
    * @brief Hidden
    */
-  static vector_t<string_t>
+  static std::vector<std::string>
   _GetAttributeNamesOrOptions(bool isAnimationSheetEnabled = false,
                               bool isBillboardBased        = false);
 
   /**
    * @brief Hidden
    */
-  static vector_t<string_t>
+  static std::vector<std::string>
   _GetEffectCreationOptions(bool isAnimationSheetEnabled = false);
 
   /**
@@ -304,7 +315,7 @@ public:
   void dispose(bool disposeTexture             = true,
                bool disposeMaterialAndTextures = false) override;
 
-  vector_t<AnimationPtr> getAnimations() override;
+  std::vector<AnimationPtr> getAnimations() override;
 
   /**
    * @brief Clones the particle system.
@@ -312,7 +323,7 @@ public:
    * @param newEmitter The new emitter to use
    * @returns the cloned particle system
    */
-  IParticleSystem* clone(const string_t& name, Mesh* newEmitter) override;
+  IParticleSystem* clone(const std::string& name, Mesh* newEmitter) override;
 
   /**
    * @brief Serializes the particle system to a JSON object.
@@ -331,7 +342,7 @@ public:
    */
   static ParticleSystem* _Parse(const Json::value& parsedParticleSystem,
                                 IParticleSystem* particleSystem, Scene* scene,
-                                const string_t& url);
+                                const std::string& url);
 
   /**
    * @brief Parses a JSON object to create a particle system.
@@ -342,24 +353,24 @@ public:
    * @returns the Parsed particle system
    */
   static ParticleSystem* Parse(const Json::value& parsedParticleSystem,
-                               Scene* scene, const string_t& url);
+                               Scene* scene, const std::string& url);
 
 protected:
   /**
    * @brief Sets a callback that will be triggered when the system is disposed.
    */
   void set_onDispose(
-    const ::std::function<void(ParticleSystem*, EventState&)>& callback);
+    const std::function<void(ParticleSystem*, EventState&)>& callback);
 
   void _reset() override;
 
 private:
   float _fetchR(float u, float v, float width, float height,
                 const Uint8Array& pixels);
-  void _addFactorGradient(vector_t<FactorGradient>& factorGradients,
+  void _addFactorGradient(std::vector<FactorGradient>& factorGradients,
                           float gradient, float factor,
-                          const nullable_t<float>& factor2 = nullopt_t);
-  void _removeFactorGradient(vector_t<FactorGradient>& factorGradients,
+                          const std::optional<float>& factor2 = std::nullopt);
+  void _removeFactorGradient(std::vector<FactorGradient>& factorGradients,
                              float gradient);
   void _resetEffect();
   void _createVertexBuffers();
@@ -379,7 +390,7 @@ public:
    * This can help using your own shader to render the particle system.
    * The according effect will be created
    */
-  string_t customShader;
+  std::string customShader;
 
   /**
    * This function can be defined to provide custom update for active
@@ -387,13 +398,13 @@ public:
    * position, color, etc.). Do not forget that this function will be called
    * on every frame so try to keep it simple and fast :)
    */
-  ::std::function<void(vector_t<Particle*>& particles)> updateFunction;
+  std::function<void(std::vector<Particle*>& particles)> updateFunction;
 
   /**
    * This function can be defined to specify initial direction for every new
    * particle. It by default use the emitterType defined function
    */
-  ::std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate,
+  std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate,
                        Particle* particle)>
     startDirectionFunction;
 
@@ -401,7 +412,7 @@ public:
    * This function can be defined to specify initial position for every new
    * particle. It by default use the emitterType defined function
    */
-  ::std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate,
+  std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate,
                        Particle* particle)>
     startPositionFunction;
 
@@ -414,7 +425,7 @@ public:
    * Sets a callback that will be triggered when the system is disposed
    */
   WriteOnlyProperty<ParticleSystem,
-                    ::std::function<void(ParticleSystem*, EventState&)>>
+                    std::function<void(ParticleSystem*, EventState&)>>
     onDispose;
 
   unsigned int _vertexBufferSize;
@@ -425,28 +436,28 @@ public:
    * system when the particle dies, this property is used by the root particle
    * system only.
    */
-  vector_t<ParticleSystem*> subEmitters;
+  std::vector<ParticleSystem*> subEmitters;
   /**
    * The current active Sub-systems, this property is used by the root
    * particle system only.
    */
-  vector_t<ParticleSystem*> activeSubSystems;
+  std::vector<ParticleSystem*> activeSubSystems;
 
 private:
   Observer<ParticleSystem>::Ptr _onDisposeObserver;
-  vector_t<Particle*> _particles;
+  std::vector<Particle*> _particles;
   float _epsilon;
   size_t _capacity;
-  vector_t<Particle*> _stockParticles;
+  std::vector<Particle*> _stockParticles;
   int _newPartsExcess;
   Float32Array _vertexData;
-  unique_ptr_t<Buffer> _vertexBuffer;
-  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
-  unique_ptr_t<Buffer> _spriteBuffer;
-  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  std::unique_ptr<Buffer> _vertexBuffer;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unique_ptr<Buffer> _spriteBuffer;
+  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effect;
   Effect* _customEffect;
-  string_t _cachedDefines;
+  std::string _cachedDefines;
 
   Color4 _scaledColorStep;
   Color4 _colorDiff;
@@ -461,7 +472,7 @@ private:
   int _actualFrame;
   int _scaledUpdateSpeed;
 
-  ::std::function<void(unsigned int offset, Particle* particle)>
+  std::function<void(unsigned int offset, Particle* particle)>
     _appendParticleVertexes;
 
   ParticleSystem* _rootParticleSystem;

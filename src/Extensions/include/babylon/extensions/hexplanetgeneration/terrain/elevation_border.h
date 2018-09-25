@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_ELEVATION_BORDER_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_ELEVATION_BORDER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/elevation_border_origin.h>
 
 namespace BABYLON {

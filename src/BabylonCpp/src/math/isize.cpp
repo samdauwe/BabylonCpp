@@ -15,7 +15,7 @@ ISize::ISize(const ISize& other) : width{other.width}, height{other.height}
 }
 
 ISize::ISize(ISize&& other)
-    : width{::std::move(other.width)}, height{::std::move(other.height)}
+    : width{std::move(other.width)}, height{std::move(other.height)}
 {
 }
 
@@ -32,8 +32,8 @@ ISize& ISize::operator=(const ISize& other)
 ISize& ISize::operator=(ISize&& other)
 {
   if (&other != this) {
-    width  = ::std::move(other.width);
-    height = ::std::move(other.height);
+    width  = std::move(other.width);
+    height = std::move(other.height);
   }
 
   return *this;

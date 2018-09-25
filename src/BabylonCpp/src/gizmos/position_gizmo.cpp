@@ -10,11 +10,11 @@ namespace BABYLON {
 PositionGizmo::PositionGizmo(
   const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
-    , xGizmo{::std::make_unique<AxisDragGizmo>(
+    , xGizmo{std::make_unique<AxisDragGizmo>(
         Vector3(1.f, 0.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}
-    , yGizmo{::std::make_unique<AxisDragGizmo>(
+    , yGizmo{std::make_unique<AxisDragGizmo>(
         Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
-    , zGizmo{::std::make_unique<AxisDragGizmo>(
+    , zGizmo{std::make_unique<AxisDragGizmo>(
         Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
     , snapDistance{this, &PositionGizmo::get_snapDistance,
                    &PositionGizmo::set_snapDistance}

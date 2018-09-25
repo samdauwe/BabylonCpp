@@ -1,7 +1,7 @@
 #ifndef BABYLON_PROCEDURAL_TEXTURES_LIBRARY_BRICK_BRICK_PROCEDURAL_TEXTURE_H
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_BRICK_BRICK_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/math/color3.h>
 
@@ -9,7 +9,7 @@ namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
 class BrickProceduralTexture;
-using BrickProceduralTexturePtr = shared_ptr_t<BrickProceduralTexture>;
+using BrickProceduralTexturePtr = std::shared_ptr<BrickProceduralTexture>;
 
 class BABYLON_SHARED_EXPORT BrickProceduralTexture : public ProceduralTexture {
 
@@ -17,8 +17,8 @@ public:
   template <typename... Ts>
   static BrickProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = shared_ptr_t<BrickProceduralTexture>(
-      new BrickProceduralTexture(::std::forward<Ts>(args)...));
+    auto texture = std::shared_ptr<BrickProceduralTexture>(
+      new BrickProceduralTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
@@ -42,9 +42,9 @@ public:
    * information
    * @returns a parsed Brick Procedural Texture
    */
-  static unique_ptr_t<BrickProceduralTexture>
+  static std::unique_ptr<BrickProceduralTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const string_t& rootUrl);
+        const std::string& rootUrl);
 
 protected:
   BrickProceduralTexture(const std::string& name, const Size& size,

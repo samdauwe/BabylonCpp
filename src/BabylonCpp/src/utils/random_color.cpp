@@ -21,7 +21,7 @@ Range::Range(const Range& otherRange)
 
 Range::Range(Range&& otherRange)
 {
-  *this = ::std::move(otherRange);
+  *this = std::move(otherRange);
 }
 
 Range& Range::operator=(const Range& otherRange)
@@ -37,8 +37,8 @@ Range& Range::operator=(const Range& otherRange)
 Range& Range::operator=(Range&& otherRange)
 {
   if (&otherRange != this) {
-    _start = ::std::move(otherRange._start);
-    _end   = ::std::move(otherRange._end);
+    _start = std::move(otherRange._start);
+    _end   = std::move(otherRange._end);
   }
 
   return *this;
@@ -99,7 +99,7 @@ ColorInfo::ColorInfo(const ColorInfo& other)
 
 ColorInfo::ColorInfo(ColorInfo&& other)
 {
-  *this = ::std::move(other);
+  *this = std::move(other);
 }
 
 ColorInfo& ColorInfo::operator=(const ColorInfo& other)
@@ -119,12 +119,12 @@ ColorInfo& ColorInfo::operator=(const ColorInfo& other)
 ColorInfo& ColorInfo::operator=(ColorInfo&& other)
 {
   if (&other != this) {
-    _hueRange        = ::std::move(other._hueRange);
-    _hasHueRange     = ::std::move(other._hasHueRange);
-    _saturationRange = ::std::move(other._saturationRange);
-    _brightnessRange = ::std::move(other._brightnessRange);
-    _lowerBounds     = ::std::move(other._lowerBounds);
-    _isValid         = ::std::move(other._isValid);
+    _hueRange        = std::move(other._hueRange);
+    _hasHueRange     = std::move(other._hasHueRange);
+    _saturationRange = std::move(other._saturationRange);
+    _brightnessRange = std::move(other._brightnessRange);
+    _lowerBounds     = std::move(other._lowerBounds);
+    _isValid         = std::move(other._isValid);
   }
 
   return *this;
@@ -265,8 +265,8 @@ array_t<unsigned int, 3> RandomColor::HSVToRGB(float hue, float saturation,
   unsigned int iR = 0, iG = 0, iB = 0;
 
   float fC      = value * saturation; // Chroma
-  float fHPrime = ::std::fmod(hue / 60.f, 6.f);
-  float fX      = fC * (1.f - ::std::abs(::std::fmod(fHPrime, 2.f) - 1.f));
+  float fHPrime = std::fmod(hue / 60.f, 6.f);
+  float fX      = fC * (1.f - std::abs(std::fmod(fHPrime, 2.f) - 1.f));
   float fM      = value - fC;
 
   if (0 <= fHPrime && fHPrime < 1) {
@@ -309,9 +309,9 @@ array_t<unsigned int, 3> RandomColor::HSVToRGB(float hue, float saturation,
   fG += fM;
   fB += fM;
 
-  iR = static_cast<unsigned char>(::std::ceil(fR * 255.f));
-  iG = static_cast<unsigned char>(::std::ceil(fG * 255.f));
-  iB = static_cast<unsigned char>(::std::ceil(fB * 255.f));
+  iR = static_cast<unsigned char>(std::ceil(fR * 255.f));
+  iG = static_cast<unsigned char>(std::ceil(fG * 255.f));
+  iB = static_cast<unsigned char>(std::ceil(fB * 255.f));
 
   return {{iR, iG, iB}};
 }
@@ -595,7 +595,7 @@ ColorInfo RandomColor::getColorInfo(float hue)
 
 float RandomColor::randomWithin(const Range& range)
 {
-  return ::std::floor(range.start()
+  return std::floor(range.start()
                       + Math::randomNumber(0.f, 1.f)
                           * (range.end() + 1.f - (range.start())));
 }

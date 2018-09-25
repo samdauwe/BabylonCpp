@@ -57,7 +57,7 @@ ProceduralTexture::ProceduralTexture(
                         1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = ::std::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       _engine, ToVariant<Float32Array, Buffer*>(vertices),
       VertexBuffer::PositionKind, false, false, 2);
 
@@ -110,7 +110,7 @@ ProceduralTexture::ProceduralTexture(const string_t& iName, const Size& size,
                         1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = ::std::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       _engine, ToVariant<Float32Array, Buffer*>(vertices),
       VertexBuffer::PositionKind, false, false, 2);
 
@@ -289,7 +289,7 @@ void ProceduralTexture::resize(const Size& size, bool generateMipMaps)
 
 void ProceduralTexture::_checkUniform(const string_t& uniformName)
 {
-  auto it = ::std::find(_uniforms.begin(), _uniforms.end(), uniformName);
+  auto it = std::find(_uniforms.begin(), _uniforms.end(), uniformName);
   if (it == _uniforms.end()) {
     _uniforms.emplace_back(uniformName);
   }
@@ -298,7 +298,7 @@ void ProceduralTexture::_checkUniform(const string_t& uniformName)
 ProceduralTexture& ProceduralTexture::setTexture(const string_t& iName,
                                                  const TexturePtr& texture)
 {
-  auto it = ::std::find(_samplers.begin(), _samplers.end(), iName);
+  auto it = std::find(_samplers.begin(), _samplers.end(), iName);
   if (it == _samplers.end()) {
     _samplers.emplace_back(iName);
   }
@@ -512,7 +512,7 @@ void ProceduralTexture::dispose()
   }
 
   scene->proceduralTextures.erase(
-    ::std::remove_if(scene->proceduralTextures.begin(),
+    std::remove_if(scene->proceduralTextures.begin(),
                      scene->proceduralTextures.end(),
                      [this](const ProceduralTexturePtr& proceduralTexture) {
                        return proceduralTexture.get() == this;

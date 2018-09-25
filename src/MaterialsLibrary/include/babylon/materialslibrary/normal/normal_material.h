@@ -1,16 +1,20 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_NORMAL_NORMAL_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_NORMAL_NORMAL_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/normal/normal_material_defines.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class IAnimatable;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+
 namespace MaterialsLibrary {
 
 class NormalMaterial;
-using NormalMaterialPtr = shared_ptr_t<NormalMaterial>;
+using NormalMaterialPtr = std::shared_ptr<NormalMaterial>;
 
 class BABYLON_SHARED_EXPORT NormalMaterial : public PushMaterial {
 
@@ -18,8 +22,8 @@ public:
   template <typename... Ts>
   static NormalMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<NormalMaterial>(
-      new NormalMaterial(::std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<NormalMaterial>(
+      new NormalMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -37,7 +41,7 @@ public:
   std::vector<IAnimatablePtr> getAnimatables();
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,

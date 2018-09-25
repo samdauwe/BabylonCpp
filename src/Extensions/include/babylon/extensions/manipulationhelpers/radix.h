@@ -1,10 +1,29 @@
 #ifndef BABYLON_EXTENSIONS_MANIPULATION_HELPERS_RADIX_H
 #define BABYLON_EXTENSIONS_MANIPULATION_HELPERS_RADIX_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Material;
+class Matrix;
+class Mesh;
+class PointLight;
+class Quaternion;
+class Scene;
+class StandardMaterial;
+class Vector2;
+class Vector3;
+using AbstractMeshPtr     = std::shared_ptr<AbstractMesh>;
+using MaterialPtr         = std::shared_ptr<Material>;
+using MeshPtr             = std::shared_ptr<Mesh>;
+using PointLightPtr       = std::shared_ptr<PointLight>;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+
 namespace Extensions {
 
 enum class RadixFeatures : int {

@@ -93,7 +93,7 @@ void BoundingBoxRenderer::_prepareResources()
   BoxOptions options(1.f);
   auto boxdata = VertexData::CreateBox(options);
   _vertexBuffers.resize(VertexBuffer::PositionKind + 1);
-  _vertexBuffers[VertexBuffer::PositionKind] = ::std::make_unique<VertexBuffer>(
+  _vertexBuffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
     engine, ToVariant<Float32Array, Buffer*>(boxdata->positions),
     VertexBuffer::PositionKind, false);
   _vertexBuffersMap[VertexBuffer::PositionKindChars]

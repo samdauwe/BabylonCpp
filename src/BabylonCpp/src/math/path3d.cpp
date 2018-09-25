@@ -33,12 +33,12 @@ Path3D::Path3D(const Path3D& otherPath)
 
 Path3D::Path3D(Path3D&& otherPath)
     : path{otherPath.path}
-    , _curve{::std::move(otherPath._curve)}
-    , _distances{::std::move(otherPath._distances)}
-    , _tangents{::std::move(otherPath._tangents)}
-    , _normals{::std::move(otherPath._normals)}
-    , _binormals{::std::move(otherPath._binormals)}
-    , _raw{::std::move(otherPath._raw)}
+    , _curve{std::move(otherPath._curve)}
+    , _distances{std::move(otherPath._distances)}
+    , _tangents{std::move(otherPath._tangents)}
+    , _normals{std::move(otherPath._normals)}
+    , _binormals{std::move(otherPath._binormals)}
+    , _raw{std::move(otherPath._raw)}
 {
 }
 
@@ -60,13 +60,13 @@ Path3D& Path3D::operator=(const Path3D& otherPath)
 Path3D& Path3D::operator=(Path3D&& otherPath)
 {
   if (&otherPath != this) {
-    path       = ::std::move(otherPath.path);
-    _curve     = ::std::move(otherPath._curve);
-    _distances = ::std::move(otherPath._distances);
-    _tangents  = ::std::move(otherPath._tangents);
-    _normals   = ::std::move(otherPath._normals);
-    _binormals = ::std::move(otherPath._binormals);
-    _raw       = ::std::move(otherPath._raw);
+    path       = std::move(otherPath.path);
+    _curve     = std::move(otherPath._curve);
+    _distances = std::move(otherPath._distances);
+    _tangents  = std::move(otherPath._tangents);
+    _normals   = std::move(otherPath._normals);
+    _binormals = std::move(otherPath._binormals);
+    _raw       = std::move(otherPath._raw);
   }
 
   return *this;
@@ -83,7 +83,7 @@ Path3D Path3D::copy() const
 
 unique_ptr_t<Path3D> Path3D::clone() const
 {
-  return ::std::make_unique<Path3D>(*this);
+  return std::make_unique<Path3D>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Path3D& path)
@@ -265,15 +265,15 @@ Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
   if (va == nullopt_t) {
     Vector3 point;
     if (!Scalar::WithinEpsilon(
-          ::std::abs(vt.y) / tgl, 1.f,
+          std::abs(vt.y) / tgl, 1.f,
           Math::Epsilon)) { // search for a point in the plane
       point = Vector3(0.f, -1.f, 0.f);
     }
-    else if (!Scalar::WithinEpsilon(::std::abs(vt.x) / tgl, 1.f,
+    else if (!Scalar::WithinEpsilon(std::abs(vt.x) / tgl, 1.f,
                                     Math::Epsilon)) {
       point = Vector3(1.f, 0.f, 0.f);
     }
-    else if (!Scalar::WithinEpsilon(::std::abs(vt.z) / tgl, 1.f,
+    else if (!Scalar::WithinEpsilon(std::abs(vt.z) / tgl, 1.f,
                                     Math::Epsilon)) {
       point = Vector3(0.f, 0.f, 1.f);
     }

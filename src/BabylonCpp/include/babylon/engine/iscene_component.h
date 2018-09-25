@@ -17,7 +17,7 @@ class Scene;
  * workloads like layers, post processes...
  */
 struct BABYLON_SHARED_EXPORT ISceneComponent
-    : public ::std::enable_shared_from_this<ISceneComponent> {
+    : public std::enable_shared_from_this<ISceneComponent> {
 
   /**
    * @brief The name of the component. Each component must have a unique name.

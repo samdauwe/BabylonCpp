@@ -24,7 +24,7 @@ Plane::Plane(const Plane& otherPlane)
 }
 
 Plane::Plane(Plane&& otherPlane)
-    : normal{::std::move(otherPlane.normal)}, d{::std::move(otherPlane.d)}
+    : normal{std::move(otherPlane.normal)}, d{std::move(otherPlane.d)}
 {
 }
 
@@ -41,8 +41,8 @@ Plane& Plane::operator=(const Plane& otherPlane)
 Plane& Plane::operator=(Plane&& otherPlane)
 {
   if (&otherPlane != this) {
-    normal = ::std::move(otherPlane.normal);
-    d      = ::std::move(otherPlane.d);
+    normal = std::move(otherPlane.normal);
+    d      = std::move(otherPlane.d);
   }
 
   return *this;
@@ -59,7 +59,7 @@ Plane Plane::copy() const
 
 unique_ptr_t<Plane> Plane::clone() const
 {
-  return ::std::make_unique<Plane>(*this);
+  return std::make_unique<Plane>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Plane& plane)

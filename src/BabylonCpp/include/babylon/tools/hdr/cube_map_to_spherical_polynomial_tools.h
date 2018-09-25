@@ -1,11 +1,14 @@
 #ifndef BABYLON_TOOLS_HDR_CUBE_MAP_TO_SPHERICAL_POLYNOMIAL_TOOLS_H
 #define BABYLON_TOOLS_HDR_CUBE_MAP_TO_SPHERICAL_POLYNOMIAL_TOOLS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/tools/hdr/cube_map_info.h>
 #include <babylon/tools/hdr/file_face_orientation.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+class SphericalPolynomial;
 
 /**
  * @brief Helper class dealing with the extraction of spherical polynomial
@@ -14,7 +17,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT CubeMapToSphericalPolynomialTools {
 
 private:
-  static array_t<FileFaceOrientation, 6> FileFaces;
+  static std::array<FileFaceOrientation, 6> FileFaces;
 
 public:
   /**
@@ -25,7 +28,7 @@ public:
    * @param texture The texture to extract the information from.
    * @return The Spherical Polynomial data.
    */
-  static unique_ptr_t<SphericalPolynomial>
+  static std::unique_ptr<SphericalPolynomial>
   ConvertCubeMapTextureToSphericalPolynomial(BaseTexture* texture);
 
   /**
@@ -36,7 +39,7 @@ public:
    * @param cubeInfo The Cube map to extract the information from.
    * @return The Spherical Polynomial data.
    */
-  static unique_ptr_t<SphericalPolynomial>
+  static std::unique_ptr<SphericalPolynomial>
   ConvertCubeMapToSphericalPolynomial(const CubeMapInfo& cubeInfo);
 
 }; // end of class CubeMapToSphericalPolynomialTools

@@ -25,7 +25,7 @@ WeightedSound::WeightedSound(bool iLoop, const vector_t<SoundPtr>& sounds,
     , _currentIndex{nullopt_t}
 {
   if (sounds.size() != weights.size()) {
-    throw ::std::runtime_error("sounds length does not equal weights length");
+    throw std::runtime_error("sounds length does not equal weights length");
   }
 
   loop     = iLoop;

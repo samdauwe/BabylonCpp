@@ -307,7 +307,7 @@ void PhysicsImpostor::setAngularVelocity(const Vector3& velocity)
 }
 
 void PhysicsImpostor::executeNativeFunction(
-  const ::std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func)
+  const std::function<void(Mesh* world, IPhysicsBody* physicsBody)>& func)
 {
   if (_physicsEngine) {
     func(_physicsEngine->getPhysicsPlugin()->world, physicsBody());
@@ -315,18 +315,18 @@ void PhysicsImpostor::executeNativeFunction(
 }
 
 void PhysicsImpostor::registerBeforePhysicsStep(
-  const ::std::function<void(PhysicsImpostor* impostor)>& func)
+  const std::function<void(PhysicsImpostor* impostor)>& func)
 {
   _onBeforePhysicsStepCallbacks.emplace_back(func);
 }
 
 void PhysicsImpostor::unregisterBeforePhysicsStep(
-  const ::std::function<void(PhysicsImpostor* impostor)>& func)
+  const std::function<void(PhysicsImpostor* impostor)>& func)
 {
-  using Function = ::std::function<void(PhysicsImpostor * impostor)>;
+  using Function = std::function<void(PhysicsImpostor * impostor)>;
 
   _onBeforePhysicsStepCallbacks.erase(
-    ::std::remove_if(_onBeforePhysicsStepCallbacks.begin(),
+    std::remove_if(_onBeforePhysicsStepCallbacks.begin(),
                      _onBeforePhysicsStepCallbacks.end(),
                      [&func](const Function& f) {
                        auto ptr1 = func.template target<Function>();
@@ -337,18 +337,18 @@ void PhysicsImpostor::unregisterBeforePhysicsStep(
 }
 
 void PhysicsImpostor::registerAfterPhysicsStep(
-  const ::std::function<void(PhysicsImpostor* impostor)>& func)
+  const std::function<void(PhysicsImpostor* impostor)>& func)
 {
   _onAfterPhysicsStepCallbacks.emplace_back(func);
 }
 
 void PhysicsImpostor::unregisterAfterPhysicsStep(
-  const ::std::function<void(PhysicsImpostor* impostor)>& func)
+  const std::function<void(PhysicsImpostor* impostor)>& func)
 {
-  using Function = ::std::function<void(PhysicsImpostor * impostor)>;
+  using Function = std::function<void(PhysicsImpostor * impostor)>;
 
   _onAfterPhysicsStepCallbacks.erase(
-    ::std::remove_if(_onAfterPhysicsStepCallbacks.begin(),
+    std::remove_if(_onAfterPhysicsStepCallbacks.begin(),
                      _onAfterPhysicsStepCallbacks.end(),
                      [&func](const Function& f) {
                        auto ptr1 = func.template target<Function>();
@@ -460,7 +460,7 @@ PhysicsImpostor& PhysicsImpostor::createJoint(PhysicsImpostor* otherImpostor,
                                               const PhysicsJointData& jointData)
 {
   addJoint(otherImpostor,
-           ::std::make_shared<PhysicsJoint>(jointType, jointData));
+           std::make_shared<PhysicsJoint>(jointType, jointData));
 
   return *this;
 }
@@ -505,7 +505,7 @@ PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
   if (!newObject) {
     return nullptr;
   }
-  return ::std::make_unique<PhysicsImpostor>(newObject, _type, _options,
+  return std::make_unique<PhysicsImpostor>(newObject, _type, _options,
                                              _scene);
 }
 
@@ -539,7 +539,7 @@ void PhysicsImpostor::setDeltaPosition(const Vector3& position)
 void PhysicsImpostor::setDeltaRotation(const Quaternion& rotation)
 {
   if (!_deltaRotation) {
-    _deltaRotation = ::std::make_unique<Quaternion>();
+    _deltaRotation = std::make_unique<Quaternion>();
   }
   _deltaRotation->copyFrom(rotation);
   _deltaRotationConjugated->copyFrom(_deltaRotation->conjugate());

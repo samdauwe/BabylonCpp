@@ -13,7 +13,7 @@ template <class T>
 OctreeBlock<T>::OctreeBlock(
   const Vector3& iMinPoint, const Vector3& iMaxPoint, size_t iCapacity,
   size_t depth, size_t maxDepth,
-  const ::std::function<void(T&, OctreeBlock<T>&)>& creationFunc)
+  const std::function<void(T&, OctreeBlock<T>&)>& creationFunc)
     : _depth{depth}
     , _maxDepth{maxDepth}
     , _capacity{iCapacity}

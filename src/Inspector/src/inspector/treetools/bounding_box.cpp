@@ -19,7 +19,7 @@ BoundingBoxInsp::~BoundingBoxInsp()
 }
 
 BoundingBoxInsp::BoundingBoxInsp(BoundingBoxInsp&& other)
-    : AbstractTreeTool{std::move(other)}, _obj{::std::move(other._obj)}
+    : AbstractTreeTool{std::move(other)}, _obj{std::move(other._obj)}
 {
 }
 

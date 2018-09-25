@@ -141,8 +141,8 @@ void BoneLookController::set_minYaw(float value)
 {
   _minYaw    = value;
   _minYawSet = true;
-  _minYawSin = ::std::sin(value);
-  _minYawCos = ::std::cos(value);
+  _minYawSin = std::sin(value);
+  _minYawCos = std::cos(value);
   if (_maxYawSet) {
     _midYawConstraint = _getAngleDiff(_minYaw, _maxYaw) * 0.5f + _minYaw;
     _yawRange         = _maxYaw - _minYaw;
@@ -158,8 +158,8 @@ void BoneLookController::set_maxYaw(float value)
 {
   _maxYaw    = value;
   _minYawSet = true;
-  _maxYawSin = ::std::sin(value);
-  _maxYawCos = ::std::cos(value);
+  _maxYawSin = std::sin(value);
+  _maxYawCos = std::cos(value);
   if (_minYawSet) {
     _midYawConstraint = _getAngleDiff(_minYaw, _maxYaw) * 0.5f + _minYaw;
     _yawRange         = _maxYaw - _minYaw;
@@ -174,7 +174,7 @@ float BoneLookController::get_minPitch() const
 void BoneLookController::set_minPitch(float value)
 {
   _minPitch    = value;
-  _minPitchTan = ::std::tan(value);
+  _minPitchTan = std::tan(value);
 }
 
 float BoneLookController::get_maxPitch() const
@@ -185,7 +185,7 @@ float BoneLookController::get_maxPitch() const
 void BoneLookController::set_maxPitch(float value)
 {
   _maxPitch    = value;
-  _maxPitchTan = ::std::tan(value);
+  _maxPitchTan = std::tan(value);
 }
 
 void BoneLookController::update()
@@ -278,9 +278,9 @@ void BoneLookController::update()
       target.subtractToRef(bonePos, localTarget);
       Vector3::TransformCoordinatesToRef(localTarget, spaceMatInv, localTarget);
 
-      xzlen          = ::std::sqrt(localTarget.x * localTarget.x
+      xzlen          = std::sqrt(localTarget.x * localTarget.x
                           + localTarget.z * localTarget.z);
-      float pitch    = ::std::atan2(localTarget.y, xzlen);
+      float pitch    = std::atan2(localTarget.y, xzlen);
       float newPitch = pitch;
 
       if (pitch > _maxPitch) {
@@ -304,13 +304,13 @@ void BoneLookController::update()
       target.subtractToRef(bonePos, localTarget);
       Vector3::TransformCoordinatesToRef(localTarget, spaceMatInv, localTarget);
 
-      float yaw    = ::std::atan2(localTarget.x, localTarget.z);
+      float yaw    = std::atan2(localTarget.x, localTarget.z);
       float newYaw = yaw;
 
       if (yaw > _maxYaw || yaw < _minYaw) {
 
         if (!xzlenSet) {
-          xzlen    = ::std::sqrt(localTarget.x * localTarget.x
+          xzlen    = std::sqrt(localTarget.x * localTarget.x
                               + localTarget.z * localTarget.z);
           xzlenSet = true;
         }
@@ -356,14 +356,14 @@ void BoneLookController::update()
         Vector3::TransformCoordinatesToRef(boneFwd, boneRotMat, boneFwd);
         Vector3::TransformCoordinatesToRef(boneFwd, spaceMatInv, boneFwd);
 
-        float boneYaw      = ::std::atan2(boneFwd.x, boneFwd.z);
+        float boneYaw      = std::atan2(boneFwd.x, boneFwd.z);
         float angBtwTar    = _getAngleBetween(boneYaw, yaw);
         float angBtwMidYaw = _getAngleBetween(boneYaw, _midYawConstraint);
 
         if (angBtwTar > angBtwMidYaw) {
 
           if (!xzlenSet) {
-            xzlen    = ::std::sqrt(localTarget.x * localTarget.x
+            xzlen    = std::sqrt(localTarget.x * localTarget.x
                                 + localTarget.z * localTarget.z);
             xzlenSet = true;
           }
@@ -373,13 +373,13 @@ void BoneLookController::update()
 
           if (angBtwMin < angBtwMax) {
             newYaw        = boneYaw + Math::PI * 0.75f;
-            localTarget.z = ::std::cos(newYaw) * xzlen;
-            localTarget.x = ::std::sin(newYaw) * xzlen;
+            localTarget.z = std::cos(newYaw) * xzlen;
+            localTarget.x = std::sin(newYaw) * xzlen;
           }
           else {
             newYaw        = boneYaw - Math::PI * 0.75f;
-            localTarget.z = ::std::cos(newYaw) * xzlen;
-            localTarget.x = ::std::sin(newYaw) * xzlen;
+            localTarget.z = std::cos(newYaw) * xzlen;
+            localTarget.x = std::sin(newYaw) * xzlen;
           }
         }
       }
@@ -430,7 +430,7 @@ void BoneLookController::update()
     if (_transformYawPitch) {
       Matrix transformYawPitch = _transformYawPitch.value();
       transformYawPitch.multiplyToRef(_tmpMat1, _tmpMat1);
-      _transformYawPitch = ::std::move(transformYawPitch);
+      _transformYawPitch = std::move(transformYawPitch);
     }
     Quaternion::FromRotationMatrixToRef(_tmpMat1, _tmpQuat);
     Quaternion::SlerpToRef(_boneQuat, _tmpQuat, slerpAmount, _boneQuat);
@@ -442,7 +442,7 @@ void BoneLookController::update()
     if (_transformYawPitch) {
       Matrix transformYawPitch = _transformYawPitch.value();
       transformYawPitch.multiplyToRef(_tmpMat1, _tmpMat1);
-      _transformYawPitch = ::std::move(transformYawPitch);
+      _transformYawPitch = std::move(transformYawPitch);
     }
     bone->setRotationMatrix(_tmpMat1, Space::WORLD, mesh);
     _slerping = false;

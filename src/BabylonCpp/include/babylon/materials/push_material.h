@@ -16,7 +16,7 @@ public:
   static PushMaterialPtr New(Ts&&... args)
   {
     auto material = std::shared_ptr<PushMaterial>(
-      new PushMaterial(::std::forward<Ts>(args)...));
+      new PushMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;

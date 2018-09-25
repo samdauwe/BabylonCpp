@@ -13,46 +13,48 @@
 
 namespace BABYLON {
 
-CubeTexturePtr CubeTexture::CreateFromImages(const vector_t<string_t>& iFiles,
-                                             Scene* scene, bool noMipmap)
+CubeTexturePtr
+CubeTexture::CreateFromImages(const std::vector<std::string>& iFiles,
+                              Scene* scene, bool noMipmap)
 {
-  string_t rootUrlKey = "";
+  std::string rootUrlKey = "";
 
   for (const auto& url : iFiles) {
     rootUrlKey += url;
   }
 
-  const vector_t<string_t> emptyStringList;
+  const std::vector<std::string> emptyStringList;
   return CubeTexture::New(rootUrlKey, scene, emptyStringList, noMipmap, iFiles);
 }
 
 CubeTexturePtr
-CubeTexture::CreateFromPrefilteredData(const string_t& url, Scene* scene,
-                                       const string_t& forcedExtension,
+CubeTexture::CreateFromPrefilteredData(const std::string& url, Scene* scene,
+                                       const std::string& forcedExtension,
                                        bool createPolynomials)
 {
-  const vector_t<string_t> emptyStringList;
+  const std::vector<std::string> emptyStringList;
   return CubeTexture::New(url, scene, emptyStringList, false, emptyStringList,
                           nullptr, nullptr, EngineConstants::TEXTUREFORMAT_RGBA,
                           true, forcedExtension, createPolynomials);
 }
 
 CubeTexture::CubeTexture(
-  const string_t& rootUrl, Scene* scene, const vector_t<string_t>& extensions,
-  bool noMipmap, const vector_t<string_t>& iFiles,
-  const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
-  const ::std::function<void()>& onError, unsigned int format, bool prefiltered,
-  const string_t& forcedExtension, bool createPolynomials, float lodScale,
+  const std::string& rootUrl, Scene* scene,
+  const std::vector<std::string>& extensions, bool noMipmap,
+  const std::vector<std::string>& iFiles,
+  const std::function<void(InternalTexture*, EventState&)>& onLoad,
+  const std::function<void()>& onError, unsigned int format, bool prefiltered,
+  const std::string& forcedExtension, bool createPolynomials, float lodScale,
   float lodOffset)
     : BaseTexture{scene}
     , url{rootUrl}
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
     , _prefiltered{false}
-    , _boundingBoxSize{nullopt_t}
+    , _boundingBoxSize{std::nullopt}
     , _rotationY{0.f}
     , _noMipmap{noMipmap}
-    , _textureMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
+    , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
     , _createPolynomials{createPolynomials}
 {
@@ -143,7 +145,7 @@ CubeTexture::~CubeTexture()
 {
 }
 
-void CubeTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
+void CubeTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
 {
   if (_boundingBoxSize && (*_boundingBoxSize).equals(*value)) {
     return;
@@ -155,7 +157,7 @@ void CubeTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
   }
 }
 
-nullable_t<Vector3>& CubeTexture::get_boundingBoxSize()
+std::optional<Vector3>& CubeTexture::get_boundingBoxSize()
 {
   return _boundingBoxSize;
 }
@@ -207,11 +209,11 @@ Matrix* CubeTexture::getReflectionTextureMatrix()
 
 void CubeTexture::setReflectionTextureMatrix(const Matrix& value)
 {
-  _textureMatrix = ::std::make_unique<Matrix>(value);
+  _textureMatrix = std::make_unique<Matrix>(value);
 }
 
 CubeTexturePtr CubeTexture::Parse(const Json::value& parsedTexture,
-                                  Scene* scene, const string_t& rootUrl)
+                                  Scene* scene, const std::string& rootUrl)
 {
 
   auto cubeTexture

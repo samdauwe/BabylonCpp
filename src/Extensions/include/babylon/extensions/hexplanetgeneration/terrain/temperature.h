@@ -1,7 +1,9 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TEMPERATURE_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TEMPERATURE_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/hexplanetgeneration/utils/gradient.h>
 
 namespace BABYLON {

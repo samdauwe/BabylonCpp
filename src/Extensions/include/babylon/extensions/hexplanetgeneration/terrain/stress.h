@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_STRESS_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_STRESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace Extensions {

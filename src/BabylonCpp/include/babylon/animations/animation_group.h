@@ -26,7 +26,7 @@ public:
   template <typename... Ts>
   static AnimationGroup* New(Ts&&... args)
   {
-    auto animationGroup = new AnimationGroup(::std::forward<Ts>(args)...);
+    auto animationGroup = new AnimationGroup(std::forward<Ts>(args)...);
     animationGroup->addToScene(
       static_cast<std::unique_ptr<AnimationGroup>>(animationGroup));
 

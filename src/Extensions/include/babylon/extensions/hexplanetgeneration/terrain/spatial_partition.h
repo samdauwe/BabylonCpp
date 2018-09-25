@@ -1,10 +1,13 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_SPATIAL_PARTITION_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_SPATIAL_PARTITION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/culling/bounding_sphere.h>
 
 namespace BABYLON {
+
+class Ray;
+
 namespace Extensions {
 
 struct SpatialPartition;

@@ -1,12 +1,15 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TILE_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TILE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/uuid_obj.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Ray;
+
 namespace Extensions {
 
 struct Border;

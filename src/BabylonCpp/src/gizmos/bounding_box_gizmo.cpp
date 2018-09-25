@@ -155,7 +155,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
 
         // Do not allow the object to turn more than a full circle
         totalTurnAmountOfDrag += projectDist;
-        if (::std::abs(totalTurnAmountOfDrag) <= Math::PI2) {
+        if (std::abs(totalTurnAmountOfDrag) <= Math::PI2) {
           if (i >= 8) {
             Quaternion::RotationYawPitchRollToRef(0.f, 0.f, projectDist,
                                                   _tmpQuaternion);
@@ -576,7 +576,7 @@ void BoundingBoxGizmo::dispose(bool doNotRecurse,
 
 MeshPtr BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
 {
-  ::std::function<void(AbstractMesh * root)> makeNotPickable;
+  std::function<void(AbstractMesh * root)> makeNotPickable;
   makeNotPickable = [&makeNotPickable](AbstractMesh* root) {
     root->isPickable = false;
     for (auto& c : root->getChildMeshes()) {

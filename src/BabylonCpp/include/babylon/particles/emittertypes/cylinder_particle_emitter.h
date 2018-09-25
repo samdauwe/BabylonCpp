@@ -1,7 +1,7 @@
 #ifndef BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_PARTICLE_EMITTER_H
 #define BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_PARTICLE_EMITTER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 
 namespace BABYLON {
@@ -55,7 +55,7 @@ public:
    * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
-  unique_ptr_t<IParticleEmitterType> clone() const override;
+  std::unique_ptr<IParticleEmitterType> clone() const override;
 
   /**
    * @brief Called by the GPUParticleSystem to setup the update shader

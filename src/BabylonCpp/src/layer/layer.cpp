@@ -33,7 +33,7 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
   texture = !imgUrl.empty() ? Texture::New(imgUrl, scene, true) : nullptr;
 
   _scene              = scene ? scene : Engine::LastCreatedScene();
-  auto layerComponent = ::std::static_pointer_cast<LayerSceneComponent>(
+  auto layerComponent = std::static_pointer_cast<LayerSceneComponent>(
     _scene->_getComponent(SceneComponentConstants::NAME_LAYER));
   if (!layerComponent) {
     layerComponent = LayerSceneComponent::New(_scene);
@@ -52,7 +52,7 @@ Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
   };
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = ::std::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       engine, ToVariant<Float32Array, Buffer*>(vertices),
       VertexBuffer::PositionKind, false, false, 2);
 

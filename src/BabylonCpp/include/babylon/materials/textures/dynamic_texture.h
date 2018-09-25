@@ -29,7 +29,7 @@ public:
   static DynamicTexturePtr New(Ts&&... args)
   {
     auto texture = std::shared_ptr<DynamicTexture>(
-      new DynamicTexture(::std::forward<Ts>(args)...));
+      new DynamicTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;

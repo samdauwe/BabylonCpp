@@ -23,7 +23,7 @@ public:
   static AnaglyphUniversalCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<AnaglyphUniversalCamera>(
-      new AnaglyphUniversalCamera(::std::forward<Ts>(args)...));
+      new AnaglyphUniversalCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

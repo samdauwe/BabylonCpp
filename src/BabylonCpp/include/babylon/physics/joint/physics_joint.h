@@ -1,10 +1,15 @@
 #ifndef BABYLON_PHYSICS_JOINT_PHYSICS_JOINT_H
 #define BABYLON_PHYSICS_JOINT_PHYSICS_JOINT_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/physics/joint/physics_joint_data.h>
 
 namespace BABYLON {
+
+struct IPhysicsEnginePlugin;
+class Mesh;
 
 /**
  * @brief This is a holder class for the physics joint created by the physics
@@ -47,7 +52,7 @@ public:
    * physics joint.
    */
   void executeNativeFunction(
-    const ::std::function<void(Mesh* world, PhysicsJoint* physicsJoint)>& func);
+    const std::function<void(Mesh* world, PhysicsJoint* physicsJoint)>& func);
 
 public:
   unsigned int _jointType;

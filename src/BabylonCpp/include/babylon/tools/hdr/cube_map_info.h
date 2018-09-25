@@ -1,7 +1,7 @@
 #ifndef BABYLON_TOOLS_HDR_CUBE_MAP_INFO_H
 #define BABYLON_TOOLS_HDR_CUBE_MAP_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 
 namespace BABYLON {

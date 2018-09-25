@@ -1,10 +1,15 @@
 #ifndef BABYLON_TOOLS_OPTIMIZATION_MERGE_MESHES_OPTIMIZATION_H
 #define BABYLON_TOOLS_OPTIMIZATION_MERGE_MESHES_OPTIMIZATION_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/tools/optimization/scene_optimization.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 class BABYLON_SHARED_EXPORT MergeMeshesOptimization : public SceneOptimization {
 
@@ -14,7 +19,7 @@ public:
 
 public:
   MergeMeshesOptimization(int priority = 0);
-  ~MergeMeshesOptimization();
+  ~MergeMeshesOptimization() override;
 
   bool apply(Scene* scene) override;
   bool _apply(Scene* scene, bool updateSelectionTree = false);

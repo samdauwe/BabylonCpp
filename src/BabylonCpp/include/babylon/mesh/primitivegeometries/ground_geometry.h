@@ -21,7 +21,7 @@ public:
   static GroundGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<GroundGeometry>(
-      new GroundGeometry(::std::forward<Ts>(args)...));
+      new GroundGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

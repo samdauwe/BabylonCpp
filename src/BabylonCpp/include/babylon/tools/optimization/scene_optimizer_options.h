@@ -1,7 +1,9 @@
 #ifndef BABYLON_TOOLS_OPTIMIZATION_SCENE_OPTIMIZER_OPTIONS_H
 #define BABYLON_TOOLS_OPTIMIZATION_SCENE_OPTIMIZER_OPTIONS_H
 
-#include <babylon/babylon_global.h>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/tools/optimization/scene_optimization.h>
 
 namespace BABYLON {
@@ -26,7 +28,7 @@ public:
                                                       = 60);
 
 public:
-  vector_t<SceneOptimization> optimizations;
+  std::vector<SceneOptimization> optimizations;
   float targetFrameRate;
   int trackerDuration;
 

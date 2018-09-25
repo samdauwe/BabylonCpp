@@ -43,7 +43,7 @@ ParticleHelper::CreateDefault(const Variant<AbstractMeshPtr, Vector3>& emitter,
   return system;
 }
 
-ParticleSystemSet* ParticleHelper::CreateAsync(const string_t& /*type*/,
+ParticleSystemSet* ParticleHelper::CreateAsync(const std::string& /*type*/,
                                                Scene* scene, bool gpu)
 {
   if (!scene) {
@@ -58,15 +58,15 @@ ParticleSystemSet* ParticleHelper::CreateAsync(const string_t& /*type*/,
 
   // const auto url = String::concat(ParticleHelper::BaseAssetsUrl, "/systems/",
   // type, ".json");
-  // Tools::LoadFile(url, [](const string_t&, const string_t&) {}, nullptr,
-  // false);
+  // Tools::LoadFile(url, [](const std::string&, const std::string&) {},
+  // nullptr, false);
   return nullptr;
 }
 
-unique_ptr_t<ParticleSystemSet>
-ParticleHelper::ExportSet(const vector_t<IParticleSystem*>& systems)
+std::unique_ptr<ParticleSystemSet>
+ParticleHelper::ExportSet(const std::vector<IParticleSystem*>& systems)
 {
-  auto set = ::std::make_unique<ParticleSystemSet>();
+  auto set = std::make_unique<ParticleSystemSet>();
 
   for (auto& system : systems) {
     set->systems.emplace_back(system);

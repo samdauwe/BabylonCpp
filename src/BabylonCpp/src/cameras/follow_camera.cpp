@@ -52,15 +52,15 @@ void FollowCamera::follow(AbstractMesh* cameraTarget)
   if (cameraTarget->rotationQuaternion()) {
     Matrix rotMatrix;
     cameraTarget->rotationQuaternion()->toRotationMatrix(rotMatrix);
-    yRotation = ::std::atan2(rotMatrix.m[8], rotMatrix.m[10]);
+    yRotation = std::atan2(rotMatrix.m[8], rotMatrix.m[10]);
   }
   else {
     yRotation = cameraTarget->rotation().y;
   }
   float radians       = getRadians(rotationOffset) + yRotation;
   auto targetPosition = cameraTarget->getAbsolutePosition();
-  float targetX       = targetPosition.x + ::std::sin(radians) * radius;
-  float targetZ       = targetPosition.z + ::std::cos(radians) * radius;
+  float targetX       = targetPosition.x + std::sin(radians) * radius;
+  float targetZ       = targetPosition.z + std::cos(radians) * radius;
 
   float dx = targetX - position.x;
   float dy = (targetPosition.y + heightOffset) - position.y;

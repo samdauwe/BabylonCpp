@@ -54,7 +54,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   unsigned int moveDirection = 1;
 
   // Create custom easing function
-  auto myEase = ::std::make_shared<FunnyEase>(distanceOfStick, lengthOfStick);
+  auto myEase = std::make_shared<FunnyEase>(distanceOfStick, lengthOfStick);
 
   // Initialization
   auto camera = FreeCamera::New("camera1", Vector3(0.f, 10.f, -25.f), scene);

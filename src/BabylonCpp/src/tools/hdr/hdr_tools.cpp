@@ -9,16 +9,14 @@ namespace BABYLON {
 float HDRTools::Ldexp(float mantissa, float exponent)
 {
   if (exponent > 1023.f) {
-    return mantissa * ::std::pow(2.f, 1023.f)
-           * ::std::pow(2.f, exponent - 1023.f);
+    return mantissa * std::pow(2.f, 1023.f) * std::pow(2.f, exponent - 1023.f);
   }
 
   if (exponent < -1074.f) {
-    return mantissa * ::std::pow(2.f, -1074.f)
-           * ::std::pow(2.f, exponent + 1074.f);
+    return mantissa * std::pow(2.f, -1074.f) * std::pow(2.f, exponent + 1074.f);
   }
 
-  return mantissa * ::std::pow(2.f, exponent);
+  return mantissa * std::pow(2.f, exponent);
 }
 
 void HDRTools::Rgbe2float(Float32Array& float32array, float red, float green,
@@ -38,11 +36,11 @@ void HDRTools::Rgbe2float(Float32Array& float32array, float red, float green,
   }
 }
 
-string_t HDRTools::readStringLine(const Uint8Array& uint8array,
-                                  size_t startIndex)
+std::string HDRTools::readStringLine(const Uint8Array& uint8array,
+                                     size_t startIndex)
 {
   std::ostringstream line;
-  string_t character;
+  std::string character;
 
   for (size_t i = startIndex; i < uint8array.size() - startIndex; ++i) {
     character = String::fromCharCode(uint8array[i]);
@@ -64,7 +62,7 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
   size_t height = 0;
   size_t width  = 0;
 
-  string_t line = readStringLine(uint8array, 0);
+  std::string line = readStringLine(uint8array, 0);
   if (line.at(0) != '#' || line.at(1) != '?') {
     headerInfo.errorMessage = "Bad HDR Format.";
     return headerInfo;
@@ -94,13 +92,13 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
   lineIndex += (line.size() + 1);
   line = readStringLine(uint8array, lineIndex);
 
-  const ::std::regex sizeRegexp("-Y (.*) +X (.*)$/g", ::std::regex::optimize);
-  ::std::smatch match;
+  const std::regex sizeRegexp("-Y (.*) +X (.*)$/g", std::regex::optimize);
+  std::smatch match;
 
-  if (::std::regex_search(line, match, sizeRegexp) && (match.size() == 3)) {
+  if (std::regex_search(line, match, sizeRegexp) && (match.size() == 3)) {
     // Shader include found
-    width  = ::std::stoul(match.str(2));
-    height = ::std::stoul(match.str(1));
+    width  = std::stoul(match.str(2));
+    height = std::stoul(match.str(1));
   }
   else {
     headerInfo.errorMessage = "HDR Bad header format, no size";

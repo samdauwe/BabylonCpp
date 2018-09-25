@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_MANIPULATION_HELPERS_MANIPULATOR_INTERACTION_HELPER_H
 #define BABYLON_EXTENSIONS_MANIPULATION_HELPERS_MANIPULATOR_INTERACTION_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/extensions/manipulationhelpers/radix.h>
 #include <babylon/math/color3.h>
@@ -11,6 +11,10 @@
 #include <babylon/tools/event_state.h>
 
 namespace BABYLON {
+
+class PointerInfo;
+class Ray;
+
 namespace Extensions {
 
 enum class ManFlags : int {

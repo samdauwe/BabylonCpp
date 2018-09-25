@@ -74,42 +74,42 @@ public:
    * @param callback defines the callback to use
    */
   void
-  setOnlefttriggerchanged(const ::std::function<void(float value)>& callback);
+  setOnlefttriggerchanged(const std::function<void(float value)>& callback);
 
   /**
    * @brief Defines the callback to call when right trigger is pressed.
    * @param callback defines the callback to use
    */
   void
-  onrighttriggerchanged(const ::std::function<void(float value)>& callback);
+  onrighttriggerchanged(const std::function<void(float value)>& callback);
 
   /**
    * @brief Defines the callback to call when a button is pressed.
    * @param callback defines the callback to use
    */
   void onbuttondown(
-    const ::std::function<void(Xbox360Button buttonPressed)>& callback);
+    const std::function<void(Xbox360Button buttonPressed)>& callback);
 
   /**
    * @brief Defines the callback to call when a button is released.
    * @param callback defines the callback to use
    */
   void onbuttonup(
-    const ::std::function<void(Xbox360Button buttonReleased)>& callback);
+    const std::function<void(Xbox360Button buttonReleased)>& callback);
 
   /**
    * @brief Defines the callback to call when a pad is pressed.
    * @param callback defines the callback to use
    */
   void
-  ondpaddown(const ::std::function<void(Xbox360Dpad dPadPressed)>& callback);
+  ondpaddown(const std::function<void(Xbox360Dpad dPadPressed)>& callback);
 
   /**
    * @brief Defines the callback to call when a pad is released.
    * @param callback defines the callback to use
    */
   void
-  ondpadup(const ::std::function<void(Xbox360Dpad dPadReleased)>& callback);
+  ondpadup(const std::function<void(Xbox360Dpad dPadReleased)>& callback);
 
   /**
    * @brief Force the gamepad to synchronize with device values.
@@ -332,13 +332,13 @@ private:
   float _leftTrigger;
   float _rightTrigger;
 
-  ::std::function<void(float value)> _onlefttriggerchanged;
-  ::std::function<void(float value)> _onrighttriggerchanged;
+  std::function<void(float value)> _onlefttriggerchanged;
+  std::function<void(float value)> _onrighttriggerchanged;
 
-  ::std::function<void(Xbox360Button buttonPressed)> _onbuttondown;
-  ::std::function<void(Xbox360Button buttonReleased)> _onbuttonup;
-  ::std::function<void(Xbox360Dpad dPadPressed)> _ondpaddown;
-  ::std::function<void(Xbox360Dpad dPadReleased)> _ondpadup;
+  std::function<void(Xbox360Button buttonPressed)> _onbuttondown;
+  std::function<void(Xbox360Button buttonReleased)> _onbuttonup;
+  std::function<void(Xbox360Dpad dPadPressed)> _ondpaddown;
+  std::function<void(Xbox360Dpad dPadReleased)> _ondpadup;
 
   unsigned int _buttonA;
   unsigned int _buttonB;

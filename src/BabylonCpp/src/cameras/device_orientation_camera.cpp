@@ -20,7 +20,7 @@ DeviceOrientationCamera::DeviceOrientationCamera(const std::string& iName,
                                                  Scene* scene)
     : FreeCamera{iName, position, scene}
     , _initialQuaternion{nullptr}
-    , _quaternionCache{::std::make_unique<Quaternion>()}
+    , _quaternionCache{std::make_unique<Quaternion>()}
 {
   inputs->addDeviceOrientation();
 }
@@ -56,7 +56,7 @@ void DeviceOrientationCamera::resetToCurrentRotation(const Vector3& axis)
   }
 
   if (!_initialQuaternion) {
-    _initialQuaternion = ::std::make_unique<Quaternion>();
+    _initialQuaternion = std::make_unique<Quaternion>();
   }
 
   _initialQuaternion->copyFrom(_quaternionCache ? *_quaternionCache :

@@ -641,7 +641,7 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
   texture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   texture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
-  auto passPostProcess = ::std::make_unique<PassPostProcess>(
+  auto passPostProcess = std::make_unique<PassPostProcess>(
     "pass", 1.f, nullptr,
     useBilinearMode ? TextureConstants::BILINEAR_SAMPLINGMODE :
                       TextureConstants::NEAREST_SAMPLINGMODE,

@@ -17,7 +17,7 @@ public:
   static CubeTexturePtr New(Ts&&... args)
   {
     auto texture = std::shared_ptr<CubeTexture>(
-      new CubeTexture(::std::forward<Ts>(args)...));
+      new CubeTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
@@ -83,9 +83,9 @@ protected:
   CubeTexture(const std::string& rootUrl, Scene* scene,
               const std::vector<std::string>& extensions = {},
               bool noMipmap = false, const std::vector<std::string>& files = {},
-              const ::std::function<void(InternalTexture*, EventState&)>& onLoad
+              const std::function<void(InternalTexture*, EventState&)>& onLoad
               = nullptr,
-              const ::std::function<void()>& onError = nullptr,
+              const std::function<void()>& onError = nullptr,
               unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
               bool prefiltered = false, const std::string& forcedExtension = "",
               bool createPolynomials = false, float lodScale = 0.8f,

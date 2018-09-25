@@ -1,7 +1,8 @@
 #ifndef BABYLON_PARTICLES_DEPTH_SORTED_PARTICLE_H
 #define BABYLON_PARTICLES_DEPTH_SORTED_PARTICLE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 

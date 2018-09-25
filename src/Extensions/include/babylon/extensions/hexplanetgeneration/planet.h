@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_PLANET_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_PLANET_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 #include <babylon/extensions/hexplanetgeneration/planet_statistics.h>
 #include <babylon/extensions/hexplanetgeneration/render_data.h>

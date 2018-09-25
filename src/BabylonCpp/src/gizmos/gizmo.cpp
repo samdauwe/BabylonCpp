@@ -43,7 +43,7 @@ void Gizmo::set_attachedMesh(const AbstractMeshPtr& value)
 void Gizmo::setCustomMesh(const MeshPtr& mesh, bool /*useGizmoMaterial*/)
 {
   if (mesh->getScene() != gizmoLayer->utilityLayerScene.get()) {
-    throw ::std::runtime_error(
+    throw std::runtime_error(
       "When setting a custom mesh on a gizmo, the custom meshes scene must be "
       "the same as the gizmos (eg. gizmo.gizmoLayer.utilityLayerScene)");
   }

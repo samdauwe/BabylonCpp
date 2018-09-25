@@ -23,7 +23,7 @@ bool TextureOptimization::apply(Scene* scene)
     }
 
     auto currentSize  = texture->getSize();
-    auto maxDimension = ::std::max(currentSize.width, currentSize.height);
+    auto maxDimension = std::max(currentSize.width, currentSize.height);
 
     if (maxDimension > maximumSize) {
       texture->scale(0.5f);

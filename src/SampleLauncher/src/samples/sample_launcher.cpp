@@ -526,7 +526,7 @@ int SampleLauncher::initGLFW()
     CreateGLFWWindow(_inspectorWindow, _defaultWinResX / 2, _defaultWinResY,
                      _inspectorWindow.title.c_str(), nullptr, &_sceneWindow);
     _inspectorWindow.lastTime = glfwGetTime();
-    _inspector = ::std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
+    _inspector = std::make_unique<Inspector>(_inspectorWindow.glfwWindow);
     _inspector->intialize();
   }
 #endif

@@ -162,11 +162,11 @@ AbstractMesh* Geometry::setVerticesData(unsigned int kind,
                                         bool updatable,
                                         const nullable_t<size_t>& stride)
 {
-  auto buffer = ::std::make_unique<VertexBuffer>(
+  auto buffer = std::make_unique<VertexBuffer>(
     _engine, ToVariant<Float32Array, Buffer*>(data), kind, updatable,
     _meshes.empty(), stride);
 
-  setVerticesBuffer(::std::move(buffer));
+  setVerticesBuffer(std::move(buffer));
 
   return nullptr;
 }
@@ -187,7 +187,7 @@ void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
     _vertexBuffers[kind]->dispose();
   }
 
-  _vertexBuffers[kind] = ::std::move(buffer);
+  _vertexBuffers[kind] = std::move(buffer);
   auto _buffer         = _vertexBuffers[kind].get();
 
   if (kind == VertexBuffer::PositionKind) {
@@ -207,7 +207,7 @@ void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
 
     for (auto& mesh : _meshes) {
       mesh->_boundingInfo
-        = ::std::make_unique<BoundingInfo>(extend().min, extend().max);
+        = std::make_unique<BoundingInfo>(extend().min, extend().max);
       mesh->_createGlobalSubMesh(false);
       mesh->computeWorldMatrix(true);
     }
@@ -268,7 +268,7 @@ void Geometry::_updateBoundingInfo(bool updateExtends, const Float32Array& data)
   for (auto& mesh : _meshes) {
     if (updateExtends) {
       mesh->_boundingInfo
-        = ::std::make_unique<BoundingInfo>(extend().min, extend().max);
+        = std::make_unique<BoundingInfo>(extend().min, extend().max);
 
       for (auto& subMesh : mesh->subMeshes) {
         subMesh->refreshBoundingInfo();
@@ -396,7 +396,7 @@ bool Geometry::isVerticesDataPresent(unsigned int kind) const
 {
   if (_vertexBuffers.empty()) {
     if (!_delayInfo.empty()) {
-      return (::std::find(_delayInfo.begin(), _delayInfo.end(), kind)
+      return (std::find(_delayInfo.begin(), _delayInfo.end(), kind)
               != _delayInfo.end());
     }
     return false;
@@ -482,7 +482,7 @@ IndicesArray Geometry::getIndices(bool copyWhenShared, bool forceCopy)
   }
   else {
     IndicesArray _copy(_indices.size());
-    ::std::copy(_indices.begin(), _indices.end(), _copy.begin());
+    std::copy(_indices.begin(), _indices.end(), _copy.begin());
     return _copy;
   }
 }
@@ -509,7 +509,7 @@ void Geometry::_releaseVertexArrayObject(Effect* effect)
 
 void Geometry::releaseForMesh(Mesh* mesh, bool shouldDispose)
 {
-  auto it = ::std::find(_meshes.begin(), _meshes.end(), mesh);
+  auto it = std::find(_meshes.begin(), _meshes.end(), mesh);
   if (it == _meshes.end()) {
     return;
   }
@@ -584,7 +584,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
         _updateExtend(Float32Array());
       }
       mesh->_boundingInfo
-        = ::std::make_unique<BoundingInfo>(extend().min, extend().max);
+        = std::make_unique<BoundingInfo>(extend().min, extend().max);
 
       mesh->_createGlobalSubMesh(false);
 
@@ -615,7 +615,7 @@ void Geometry::notifyUpdate(unsigned int kind)
   }
 }
 
-void Geometry::load(Scene* scene, const ::std::function<void()>& onLoaded)
+void Geometry::load(Scene* scene, const std::function<void()>& onLoaded)
 {
   if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
     return;
@@ -634,7 +634,7 @@ void Geometry::load(Scene* scene, const ::std::function<void()>& onLoaded)
 }
 
 void Geometry::_queueLoad(Scene* /*scene*/,
-                          const ::std::function<void()>& /*onLoaded*/)
+                          const std::function<void()>& /*onLoaded*/)
 {
 }
 
@@ -644,7 +644,7 @@ void Geometry::toLeftHanded()
   auto tIndices = getIndices(false);
   if (!tIndices.empty()) {
     for (unsigned int i = 0; i < tIndices.size(); i += 3) {
-      ::std::swap(tIndices[i + 0], tIndices[i + 2]);
+      std::swap(tIndices[i + 0], tIndices[i + 2]);
     }
     setIndices(tIndices);
   }
@@ -744,7 +744,7 @@ void Geometry::dispose()
 
 GeometryPtr Geometry::copy(const string_t& iId)
 {
-  auto vertexData = ::std::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->indices.clear();
 
@@ -781,7 +781,7 @@ GeometryPtr Geometry::copy(const string_t& iId)
 
   // Bounding info
   geometry->_boundingInfo
-    = ::std::make_unique<BoundingInfo>(extend().min, extend().max);
+    = std::make_unique<BoundingInfo>(extend().min, extend().max);
 
   return geometry;
 }
@@ -949,7 +949,7 @@ void Geometry::_CleanMatricesWeights(const Json::value& parsedGeometry,
     = Json::GetNumber<int>(parsedGeometry, "skeletonId", -1);
   if (parsedGeometrySkeletonId > -1) {
     auto skeleton = mesh->getScene()->getLastSkeletonByID(
-      ::std::to_string(parsedGeometrySkeletonId));
+      std::to_string(parsedGeometrySkeletonId));
 
     if (!skeleton) {
       return;
@@ -1043,7 +1043,7 @@ GeometryPtr Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
     geometry->delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     geometry->delayLoadingFile
       = rootUrl + Json::GetString(parsedVertexData, "delayLoadingFile", "");
-    geometry->_boundingInfo = ::std::make_unique<BoundingInfo>(
+    geometry->_boundingInfo = std::make_unique<BoundingInfo>(
       Vector3::FromArray(
         Json::ToArray<float>(parsedVertexData, "boundingBoxMinimum")),
       Vector3::FromArray(

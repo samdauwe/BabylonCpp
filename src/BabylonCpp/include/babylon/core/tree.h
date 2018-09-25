@@ -17,18 +17,18 @@ class TreeNode {
 
 public:
   using node_iterator =
-    typename ::std::vector<std::unique_ptr<TreeNode<T>>>::iterator;
+    typename std::vector<std::unique_ptr<TreeNode<T>>>::iterator;
   using const_node_iterator =
-    typename ::std::vector<std::unique_ptr<TreeNode<T>>>::const_iterator;
+    typename std::vector<std::unique_ptr<TreeNode<T>>>::const_iterator;
   using size_type =
-    typename ::std::vector<std::unique_ptr<TreeNode<T>>>::size_type;
+    typename std::vector<std::unique_ptr<TreeNode<T>>>::size_type;
 
 public:
   /**
    * @brief Convenience constructor to create a Node<T> with an instance of T.
    * @param data an instance of T.
    */
-  TreeNode(T data) : _id{uid++}, _data{::std::move(data)}, _parent{nullptr}
+  TreeNode(T data) : _id{uid++}, _data{std::move(data)}, _parent{nullptr}
   {
   }
 
@@ -151,7 +151,7 @@ public:
     return _children.back().get();
   }
 
-  void addChildren(const ::std::vector<T>& dataItems)
+  void addChildren(const std::vector<T>& dataItems)
   {
     for (auto& dataItem : dataItems) {
       addChild(dataItem);
@@ -165,9 +165,9 @@ public:
    */
   TreeNode<T>& addChild(T data)
   {
-    auto node     = ::std::make_unique<TreeNode<T>>(data);
+    auto node     = std::make_unique<TreeNode<T>>(data);
     node->_parent = this;
-    _children.emplace_back(::std::move(node));
+    _children.emplace_back(std::move(node));
     return *_children.back();
   }
 
@@ -190,7 +190,7 @@ public:
    * @brief Returns the list containing the children nodes.
    * @return The list containing the children nodes.
    */
-  ::std::vector<std::unique_ptr<TreeNode<T>>>& children()
+  std::vector<std::unique_ptr<TreeNode<T>>>& children()
   {
     return _children;
   }
@@ -200,14 +200,14 @@ private:
   std::size_t _id;
   T _data;
   TreeNode* _parent;
-  ::std::vector<std::unique_ptr<TreeNode<T>>> _children;
+  std::vector<std::unique_ptr<TreeNode<T>>> _children;
 
 }; // end of class TreeNode
 
 /**
  * @brief Represents a Tree of Objects of generic type T. The Tree is
  * represented as a single root node which points to a
- * ::std::vector<TreeNode<T>>
+ * std::vector<TreeNode<T>>
  * of children. There is no restriction on the number of children that a
  * particular node may have. This Tree provides a method to serialize the Tree
  * into a List by doing a pre-order traversal. It has several methods to allow
@@ -227,14 +227,14 @@ public:
   /**
    * @brief Default constructor.
    */
-  Tree() : _root{::std::make_unique<TreeNode<T>>()}
+  Tree() : _root{std::make_unique<TreeNode<T>>()}
   {
   }
 
   /**
    * @brief constructor.
    */
-  Tree(T data) : _root{::std::make_unique<TreeNode<T>>(::std::move(data))}
+  Tree(T data) : _root{std::make_unique<TreeNode<T>>(std::move(data))}
   {
   }
 
@@ -487,7 +487,7 @@ std::basic_iostream<char>::basic_ostream&
 operator<<(std::basic_iostream<char>::basic_ostream& out, const Tree<T>& tree)
 {
   using node_t = std::unique_ptr<TreeNode<T>>;
-  ::std::vector<char> depth;
+  std::vector<char> depth;
   std::size_t di = 0;
 
   const auto push = [&](char c) {
@@ -502,12 +502,12 @@ operator<<(std::basic_iostream<char>::basic_ostream& out, const Tree<T>& tree)
 
   const auto pop = [&]() { depth[di -= 4] = 0; };
 
-  const ::std::function<void(const node_t& tree)> print
+  const std::function<void(const node_t& tree)> print
     = [&](const node_t& tree) {
         out << "(" << tree->data() << ")\n";
         const auto& children = tree->children();
         for (const auto& child : children) {
-          const ::std::string depthString(depth.begin(), depth.end());
+          const std::string depthString(depth.begin(), depth.end());
           out << depthString.c_str() << " └─-";
           push(' ');
           print(child);

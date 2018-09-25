@@ -5,12 +5,11 @@
 
 namespace BABYLON {
 
-SolidParticle::SolidParticle(unsigned int particleIndex,
-                             unsigned int positionIndex,
-                             unsigned int iIndiceIndex, ModelShape* model,
-                             int iShapeId, unsigned int iIdxInShape,
-                             SolidParticleSystem* sps,
-                             const nullable_t<BoundingInfo>& modelBoundingInfo)
+SolidParticle::SolidParticle(
+  unsigned int particleIndex, unsigned int positionIndex,
+  unsigned int iIndiceIndex, ModelShape* model, int iShapeId,
+  unsigned int iIdxInShape, SolidParticleSystem* sps,
+  const std::optional<BoundingInfo>& modelBoundingInfo)
     : idx{particleIndex}
     , color{Color4(1.f, 1.f, 1.f, 1.f)}
     , position{Vector3::Zero()}
@@ -31,14 +30,14 @@ SolidParticle::SolidParticle(unsigned int particleIndex,
     , _sps{sps}
     , _stillInvisible{false}
     , _rotationMatrix{{1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}}
-    , parentId{nullopt_t}
+    , parentId{std::nullopt}
     , _globalPosition{Vector3::Zero()}
 {
   if (modelBoundingInfo) {
     const auto& mdlInfo = *modelBoundingInfo;
-    _modelBoundingInfo  = ::std::make_unique<BoundingInfo>(mdlInfo);
+    _modelBoundingInfo  = std::make_unique<BoundingInfo>(mdlInfo);
     _boundingInfo
-      = ::std::make_unique<BoundingInfo>(mdlInfo.minimum, mdlInfo.maximum);
+      = std::make_unique<BoundingInfo>(mdlInfo.minimum, mdlInfo.maximum);
   }
 }
 

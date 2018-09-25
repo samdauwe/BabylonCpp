@@ -39,7 +39,7 @@ public:
   static StandardMaterialPtr New(Ts&&... args)
   {
     auto material = std::shared_ptr<StandardMaterial>(
-      new StandardMaterial(::std::forward<Ts>(args)...));
+      new StandardMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -312,7 +312,7 @@ public:
    */
   float alphaCutOff;
 
-  ::std::function<std::string(
+  std::function<std::string(
     const std::string& shaderName, std::vector<std::string>& uniforms,
     std::vector<std::string>& uniformBuffers,
     std::vector<std::string>& samplers, StandardMaterialDefines& defines)>

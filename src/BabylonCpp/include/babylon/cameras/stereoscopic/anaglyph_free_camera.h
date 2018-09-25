@@ -22,7 +22,7 @@ public:
   static AnaglyphFreeCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<AnaglyphFreeCamera>(
-      new AnaglyphFreeCamera(::std::forward<Ts>(args)...));
+      new AnaglyphFreeCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

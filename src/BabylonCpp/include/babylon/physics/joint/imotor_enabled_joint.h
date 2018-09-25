@@ -1,9 +1,11 @@
 #ifndef BABYLON_PHYSICS_JOINT_IMOTOR_ENABLED_JOINT_H
 #define BABYLON_PHYSICS_JOINT_IMOTOR_ENABLED_JOINT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class PhysicsJoint;
 
 struct BABYLON_SHARED_EXPORT IMotorEnabledJoint {
   PhysicsJoint* physicsJoint;

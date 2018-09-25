@@ -1,7 +1,7 @@
 #ifndef BABYLON_PROCEDURAL_TEXTURES_LIBRARY_CLOUD_CLOUD_PROCEDURAL_TEXTURE_H
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_CLOUD_CLOUD_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/math/color4.h>
 
@@ -14,9 +14,9 @@ public:
   template <typename... Ts>
   static CloudProceduralTexture* New(Ts&&... args)
   {
-    auto texture = new CloudProceduralTexture(::std::forward<Ts>(args)...);
+    auto texture = new CloudProceduralTexture(std::forward<Ts>(args)...);
     texture->addToScene(
-      static_cast<unique_ptr_t<CloudProceduralTexture>>(texture));
+      static_cast<std::unique_ptr<CloudProceduralTexture>>(texture));
 
     return texture;
   }
@@ -39,9 +39,9 @@ public:
    * information
    * @returns a parsed Cloud Procedural Texture
    */
-  static unique_ptr_t<CloudProceduralTexture>
+  static std::unique_ptr<CloudProceduralTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const string_t& rootUrl);
+        const std::string& rootUrl);
 
 protected:
   CloudProceduralTexture(const std::string& name, const Size& size,

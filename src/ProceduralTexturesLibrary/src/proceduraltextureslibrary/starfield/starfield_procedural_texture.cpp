@@ -198,9 +198,10 @@ Json::object StarfieldProceduralTexture::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<StarfieldProceduralTexture>
+std::unique_ptr<StarfieldProceduralTexture>
 StarfieldProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                                  Scene* /*scene*/, const string_t& /*rootUrl*/)
+                                  Scene* /*scene*/,
+                                  const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

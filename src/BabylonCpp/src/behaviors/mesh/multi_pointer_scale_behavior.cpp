@@ -7,8 +7,8 @@
 namespace BABYLON {
 
 MultiPointerScaleBehavior::MultiPointerScaleBehavior()
-    : _dragBehaviorA{::std::make_unique<PointerDragBehavior>()}
-    , _dragBehaviorB{::std::make_unique<PointerDragBehavior>()}
+    : _dragBehaviorA{std::make_unique<PointerDragBehavior>()}
+    , _dragBehaviorB{std::make_unique<PointerDragBehavior>()}
     , _startDistance{0.f}
     , _initialScale{Vector3(0.f, 0.f, 0.f)}
     , _targetScale{Vector3(0.f, 0.f, 0.f)}

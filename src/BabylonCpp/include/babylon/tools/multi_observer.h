@@ -1,7 +1,7 @@
 #ifndef BABYLON_TOOLS_MULTI_OBSERVER_H
 #define BABYLON_TOOLS_MULTI_OBSERVER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
@@ -16,8 +16,8 @@ class BABYLON_SHARED_EXPORT MultiObserver {
 
 public:
   using CallbackFunc
-    = ::std::function<void(T* eventData, EventState& eventState)>;
-  using SPtr = shared_ptr_t<MultiObserver<T>>;
+    = std::function<void(T* eventData, EventState& eventState)>;
+  using SPtr = std::shared_ptr<MultiObserver<T>>;
 
 public:
   MultiObserver()
@@ -51,11 +51,11 @@ public:
    * @param scope defines the current scope used to restore the JS context
    * @returns the new MultiObserver
    */
-  static shared_ptr_t<MultiObserver<T>>
-  Watch(const vector_t<typename Observable<T>::Ptr>& observables,
+  static std::shared_ptr<MultiObserver<T>>
+  Watch(const std::vector<typename Observable<T>::Ptr>& observables,
         const CallbackFunc& callback, int mask = -1, any* scope = nullptr)
   {
-    auto result = ::std::make_shared<MultiObserver<T>>();
+    auto result = std::make_shared<MultiObserver<T>>();
 
     result._observers.clear();
     result._observables = observables;
@@ -71,8 +71,8 @@ public:
   }
 
 private:
-  vector_t<typename Observer<T>::Ptr> _observers;
-  vector_t<typename Observable<T>::Ptr> _observables;
+  std::vector<typename Observer<T>::Ptr> _observers;
+  std::vector<typename Observable<T>::Ptr> _observables;
 
 }; // end of class MultiObserver<T>
 

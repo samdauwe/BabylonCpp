@@ -86,7 +86,7 @@ Json::object ParticleSystemSet::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<ParticleSystemSet>
+std::unique_ptr<ParticleSystemSet>
 ParticleSystemSet::Parse(const Json::value& /*data*/, Scene* /*scene*/,
                          bool /*gpu*/)
 {

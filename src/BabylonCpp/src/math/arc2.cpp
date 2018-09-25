@@ -7,12 +7,12 @@ namespace BABYLON {
 Arc2::Arc2(const Vector2& startPoint, const Vector2& midPoint,
            const Vector2& endPoint)
 {
-  float temp = ::std::pow(midPoint.x, 2.f) + ::std::pow(midPoint.y, 2.f);
+  float temp = std::pow(midPoint.x, 2.f) + std::pow(midPoint.y, 2.f);
   float startToMid
-    = (::std::pow(startPoint.x, 2.f) + ::std::pow(startPoint.y, 2.f) - temp)
+    = (std::pow(startPoint.x, 2.f) + std::pow(startPoint.y, 2.f) - temp)
       / 2.f;
   float midToEnd
-    = (temp - ::std::pow(endPoint.x, 2.f) - ::std::pow(endPoint.y, 2.f)) / 2.f;
+    = (temp - std::pow(endPoint.x, 2.f) - std::pow(endPoint.y, 2.f)) / 2.f;
   float det = (startPoint.x - midPoint.x) * (midPoint.y - endPoint.y)
               - (midPoint.x - endPoint.x) * (startPoint.y - midPoint.y);
 
@@ -60,11 +60,11 @@ Arc2::Arc2(const Arc2& otherArc)
 }
 
 Arc2::Arc2(Arc2&& otherArc)
-    : centerPoint{::std::move(otherArc.centerPoint)}
-    , radius{::std::move(otherArc.radius)}
-    , angle{::std::move(otherArc.angle)}
-    , startAngle{::std::move(otherArc.startAngle)}
-    , orientation{::std::move(otherArc.orientation)}
+    : centerPoint{std::move(otherArc.centerPoint)}
+    , radius{std::move(otherArc.radius)}
+    , angle{std::move(otherArc.angle)}
+    , startAngle{std::move(otherArc.startAngle)}
+    , orientation{std::move(otherArc.orientation)}
 {
 }
 
@@ -84,11 +84,11 @@ Arc2& Arc2::operator=(const Arc2& otherArc)
 Arc2& Arc2::operator=(Arc2&& otherArc)
 {
   if (&otherArc != this) {
-    centerPoint = ::std::move(otherArc.centerPoint);
-    radius      = ::std::move(otherArc.radius);
-    angle       = ::std::move(otherArc.angle);
-    startAngle  = ::std::move(otherArc.startAngle);
-    orientation = ::std::move(otherArc.orientation);
+    centerPoint = std::move(otherArc.centerPoint);
+    radius      = std::move(otherArc.radius);
+    angle       = std::move(otherArc.angle);
+    startAngle  = std::move(otherArc.startAngle);
+    orientation = std::move(otherArc.orientation);
   }
 
   return *this;
@@ -105,7 +105,7 @@ Arc2 Arc2::copy() const
 
 unique_ptr_t<Arc2> Arc2::clone() const
 {
-  return ::std::make_unique<Arc2>(*this);
+  return std::make_unique<Arc2>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Arc2& arc)

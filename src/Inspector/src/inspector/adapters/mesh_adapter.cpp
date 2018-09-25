@@ -26,29 +26,29 @@ MeshAdapter::MeshAdapter(const NodePtr& obj)
     , _y{0.f, 1.f, 0.f}
     , _z{0.f, 0.f, 1.f}
 {
-  _tools.emplace_back(::std::make_unique<Checkbox>(this));
-  _tools.emplace_back(::std::make_unique<DebugArea>(this));
+  _tools.emplace_back(std::make_unique<Checkbox>(this));
+  _tools.emplace_back(std::make_unique<DebugArea>(this));
   // Cast mesh
-  _abstractMesh = ::std::static_pointer_cast<AbstractMesh>(obj);
+  _abstractMesh = std::static_pointer_cast<AbstractMesh>(obj);
   if (_abstractMesh) {
     // Mesh
     if (_abstractMesh->type() == IReflect::Type::MESH) {
-      _mesh = ::std::static_pointer_cast<Mesh>(obj);
+      _mesh = std::static_pointer_cast<Mesh>(obj);
     }
     // GroundMesh
     if (_abstractMesh->type() == IReflect::Type::GROUNDMESH) {
-      _mesh       = ::std::static_pointer_cast<Mesh>(obj);
-      _groundMesh = ::std::static_pointer_cast<GroundMesh>(obj);
+      _mesh       = std::static_pointer_cast<Mesh>(obj);
+      _groundMesh = std::static_pointer_cast<GroundMesh>(obj);
     }
     // Bounding box
     if (_abstractMesh->getTotalVertices() > 0) {
-      _tools.emplace_back(::std::make_unique<BoundingBoxInsp>(this));
+      _tools.emplace_back(std::make_unique<BoundingBoxInsp>(this));
     }
   }
-  _tools.emplace_back(::std::make_unique<Info>(this));
+  _tools.emplace_back(std::make_unique<Info>(this));
   // Build properties view
   if (_abstractMesh) {
-    _properties = ::std::make_unique<PropertiesView>();
+    _properties = std::make_unique<PropertiesView>();
     _buildPropertiesView();
   }
 }
@@ -128,7 +128,7 @@ void MeshAdapter::debug(bool enable)
 string_t MeshAdapter::getInfo() const
 {
   if (_abstractMesh) {
-    ::std::to_string(_abstractMesh->getTotalVertices()) + " vertices";
+    std::to_string(_abstractMesh->getTotalVertices()) + " vertices";
   }
 
   return "0 vertices";
@@ -138,11 +138,11 @@ void MeshAdapter::_drawAxis()
 {
   _obj->computeWorldMatrix();
 
-  _axesViewer = ::std::make_unique<Debug::AxesViewer>(_obj->getScene());
+  _axesViewer = std::make_unique<Debug::AxesViewer>(_obj->getScene());
 
   onBeforeRenderObserver = _obj->getScene()->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
-      if (auto mesh = ::std::static_pointer_cast<TransformNode>(_obj)) {
+      if (auto mesh = std::static_pointer_cast<TransformNode>(_obj)) {
         auto matrix = *mesh->getWorldMatrix();
         Vector3 extend(1.f, 1.f, 1.f);
         if (_abstractMesh) {
@@ -150,7 +150,7 @@ void MeshAdapter::_drawAxis()
         }
         if (_axesViewer) {
           _axesViewer->scaleLines
-            = ::std::max(::std::max(extend.x, extend.y), extend.z) * 2.f;
+            = std::max(std::max(extend.x, extend.y), extend.z) * 2.f;
           _axesViewer->update(mesh->position(),
                               Vector3::TransformNormal(_x, matrix),
                               Vector3::TransformNormal(_y, matrix),

@@ -27,7 +27,7 @@ public:
   static DepthRendererSceneComponentPtr New(Ts&&... args)
   {
     return shared_ptr_t<DepthRendererSceneComponent>(
-      new DepthRendererSceneComponent(::std::forward<Ts>(args)...));
+      new DepthRendererSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~DepthRendererSceneComponent();
 

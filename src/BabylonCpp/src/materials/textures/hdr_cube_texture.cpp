@@ -23,8 +23,8 @@ std::vector<std::string> HDRCubeTexture::_facesMapping{
 HDRCubeTexture::HDRCubeTexture(
   const std::string& iUrl, Scene* scene, size_t size, bool noMipmap,
   bool generateHarmonics, bool iGammaSpace, bool /*reserved*/,
-  const ::std::function<void()>& onLoad,
-  const ::std::function<void(const std::string& message,
+  const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message,
                              const std::string& exception)>& onError)
     : BaseTexture(scene)
     , url{iUrl}

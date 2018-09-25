@@ -22,7 +22,7 @@ public:
   static TouchCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<TouchCamera>(
-      new TouchCamera(::std::forward<Ts>(args)...));
+      new TouchCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

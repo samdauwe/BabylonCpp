@@ -1,10 +1,16 @@
 #ifndef BABYLON_EXTENSIONS_MANIPULATION_HELPERS_SIMPLE_INTERACTION_HELPER_H
 #define BABYLON_EXTENSIONS_MANIPULATION_HELPERS_SIMPLE_INTERACTION_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Node;
+class PointerInfo;
+class Scene;
+using NodePtr = std::shared_ptr<Node>;
+
 namespace Extensions {
 
 class ManipulatorInteractionHelper;

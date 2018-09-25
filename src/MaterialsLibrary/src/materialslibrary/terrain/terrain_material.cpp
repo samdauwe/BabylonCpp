@@ -548,7 +548,7 @@ Json::object TerrainMaterial::serialize() const
   return Json::object();
 }
 
-const string_t TerrainMaterial::getClassName() const
+const std::string TerrainMaterial::getClassName() const
 {
   return "TerrainMaterial";
 }

@@ -205,7 +205,7 @@ void InternalTexture::_rebuild()
         },
         nullptr, format, _extension);
       proxy->_sphericalPolynomial
-        = ::std::unique_ptr<SphericalPolynomial>(&*_sphericalPolynomial);
+        = std::unique_ptr<SphericalPolynomial>(&*_sphericalPolynomial);
     }
       return;
   }
@@ -246,7 +246,7 @@ void InternalTexture::_swapAndDie(InternalTexture* target)
 
   auto& cache = _engine->getLoadedTexturesCache();
   cache.erase(
-    ::std::remove_if(
+    std::remove_if(
       cache.begin(), cache.end(),
       [this](const std::unique_ptr<InternalTexture>& internalTexture) {
         return internalTexture.get() == this;

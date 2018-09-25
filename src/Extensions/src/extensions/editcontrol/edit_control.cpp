@@ -229,10 +229,10 @@ void EditControl::onPointerDown(PointerEvent& evt)
     false, mainCamera);
 
   if ((*pickResult).hit) {
-    axisPicked  = ::std::static_pointer_cast<Mesh>((*pickResult).pickedMesh);
+    axisPicked  = std::static_pointer_cast<Mesh>((*pickResult).pickedMesh);
     auto childs = axisPicked->getChildren();
     if (!childs.empty()) {
-      ::std::static_pointer_cast<Mesh>(childs[0])->visibility = visibility;
+      std::static_pointer_cast<Mesh>(childs[0])->visibility = visibility;
     }
     else {
       axisPicked->visibility = visibility;
@@ -323,27 +323,27 @@ void EditControl::onPointerOver()
     false, mainCamera);
 
   if ((*pickResult).hit) {
-    if (::std::static_pointer_cast<Mesh>((*pickResult).pickedMesh)
+    if (std::static_pointer_cast<Mesh>((*pickResult).pickedMesh)
         != prevOverMesh) {
       pointerIsOver = true;
       if (prevOverMesh != nullptr) {
         prevOverMesh->visibility = 0.f;
         restoreColor(prevOverMesh);
       }
-      prevOverMesh = ::std::static_pointer_cast<Mesh>((*pickResult).pickedMesh);
+      prevOverMesh = std::static_pointer_cast<Mesh>((*pickResult).pickedMesh);
       if (rotEnabled) {
-        savedCol = (::std::static_pointer_cast<LinesMesh>(
+        savedCol = (std::static_pointer_cast<LinesMesh>(
                       prevOverMesh->getChildren()[0])
                       ->color);
-        ::std::static_pointer_cast<LinesMesh>(prevOverMesh->getChildren()[0])
+        std::static_pointer_cast<LinesMesh>(prevOverMesh->getChildren()[0])
           ->color
           = Color3::White();
       }
       else {
         auto childs = prevOverMesh->getChildren();
         if (!childs.empty()) {
-          savedMat = ::std::static_pointer_cast<Mesh>(childs[0])->material();
-          ::std::static_pointer_cast<Mesh>(childs[0])->material = whiteMat;
+          savedMat = std::static_pointer_cast<Mesh>(childs[0])->material();
+          std::static_pointer_cast<Mesh>(childs[0])->material = whiteMat;
         }
         else {
           savedMat               = prevOverMesh->material();
@@ -384,13 +384,13 @@ void EditControl::restoreColor(const MeshPtr& mesh)
   }
 
   if (rotEnabled) {
-    ::std::static_pointer_cast<LinesMesh>(mesh->getChildren()[0])->color
+    std::static_pointer_cast<LinesMesh>(mesh->getChildren()[0])->color
       = savedCol;
   }
   else {
     auto childs = mesh->getChildren();
     if (!childs.empty()) {
-      ::std::static_pointer_cast<Mesh>(childs[0])->material = savedMat;
+      std::static_pointer_cast<Mesh>(childs[0])->material = savedMat;
     }
     else {
       mesh->material = savedMat;

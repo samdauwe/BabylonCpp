@@ -3,13 +3,20 @@
 
 // https://experilous.com/1/blog/post/procedural-planet-generation
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/hexplanetgeneration/icosphere.h>
 #include <babylon/extensions/hexplanetgeneration/utils/xor_shift_128.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class LinesMesh;
+class Mesh;
+class Scene;
+using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+using MeshPtr      = std::shared_ptr<Mesh>;
+
 namespace Extensions {
 
 struct Icosphere;
@@ -36,7 +43,8 @@ struct PlanetData {
 class BABYLON_SHARED_EXPORT SimplePlanet {
 
 public:
-  SimplePlanet(float scale, float degree, Scene* scene, const string_t& seed);
+  SimplePlanet(float scale, float degree, Scene* scene,
+               const std::string& seed);
   ~SimplePlanet();
 
   void initialize();
@@ -51,7 +59,7 @@ public:
 private:
   float _scale;
   Scene* _scene;
-  string_t _seed;
+  std::string _seed;
   XorShift128 _random;
   IcosahedronMesh _icosahedronMesh;
   PlanetData _planet;

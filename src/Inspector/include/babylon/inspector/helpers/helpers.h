@@ -1,13 +1,15 @@
 #ifndef BABYLON_INSPECTOR_HELPERS_HELPERS_H
 #define BABYLON_INSPECTOR_HELPERS_HELPERS_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
 struct Helpers {
 
-  static bool IsSystemName(const string_t& name);
+  static bool IsSystemName(const std::string& name);
 
 }; // end of struct Helpers
 

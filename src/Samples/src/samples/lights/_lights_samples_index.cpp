@@ -15,40 +15,40 @@ _LightsSamplesIndex::_LightsSamplesIndex()
   // -- Lights examples --
 
   // Directional Light Scene
-  _samples["DirectionalLightScene"] = ::std::make_tuple(
+  _samples["DirectionalLightScene"] = std::make_tuple(
     true,                                                        //
     [](ICanvas* iCanvas) {                                       //
-      return ::std::make_unique<DirectionalLightScene>(iCanvas); //
+      return std::make_unique<DirectionalLightScene>(iCanvas); //
     });                                                          //
   // Hemispheric Light Scene
-  _samples["HemisphericLightScene"] = ::std::make_tuple(
+  _samples["HemisphericLightScene"] = std::make_tuple(
     true,                                                        //
     [](ICanvas* iCanvas) {                                       //
-      return ::std::make_unique<HemisphericLightScene>(iCanvas); //
+      return std::make_unique<HemisphericLightScene>(iCanvas); //
     });                                                          //
   // Light Projected Texture Scene
-  _samples["LightProjectedTextureScene"] = ::std::make_tuple(
+  _samples["LightProjectedTextureScene"] = std::make_tuple(
     true,                                                             //
     [](ICanvas* iCanvas) {                                            //
-      return ::std::make_unique<LightProjectedTextureScene>(iCanvas); //
+      return std::make_unique<LightProjectedTextureScene>(iCanvas); //
     });                                                               //
   // Lights Scene
   _samples["LightsScene"]
-    = ::std::make_tuple(true,                                              //
+    = std::make_tuple(true,                                              //
                         [](ICanvas* iCanvas) {                             //
-                          return ::std::make_unique<LightsScene>(iCanvas); //
+                          return std::make_unique<LightsScene>(iCanvas); //
                         });                                                //
   // Point light Scene
-  _samples["PointLightScene"] = ::std::make_tuple(
+  _samples["PointLightScene"] = std::make_tuple(
     true,                                                  //
     [](ICanvas* iCanvas) {                                 //
-      return ::std::make_unique<PointLightScene>(iCanvas); //
+      return std::make_unique<PointLightScene>(iCanvas); //
     });                                                    //
   // Spot light Scene
   _samples["SpotLightScene"]
-    = ::std::make_tuple(true,                                                 //
+    = std::make_tuple(true,                                                 //
                         [](ICanvas* iCanvas) {                                //
-                          return ::std::make_unique<SpotLightScene>(iCanvas); //
+                          return std::make_unique<SpotLightScene>(iCanvas); //
                         });                                                   //
 }
 

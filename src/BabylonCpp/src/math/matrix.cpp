@@ -22,7 +22,7 @@ Matrix Matrix::_identityReadOnly   = Matrix::Identity();
 
 Matrix::Matrix() : updateFlag{0}, _isIdentity{false}, _isIdentityDirty{true}
 {
-  ::std::fill(m.begin(), m.end(), 0.f);
+  std::fill(m.begin(), m.end(), 0.f);
   _markAsUpdated();
 }
 
@@ -30,7 +30,7 @@ Matrix::Matrix(const Matrix& otherMatrix) : m{otherMatrix.m}
 {
 }
 
-Matrix::Matrix(Matrix&& otherMatrix) : m{::std::move(otherMatrix.m)}
+Matrix::Matrix(Matrix&& otherMatrix) : m{std::move(otherMatrix.m)}
 {
 }
 
@@ -46,7 +46,7 @@ Matrix& Matrix::operator=(const Matrix& otherMatrix)
 Matrix& Matrix::operator=(Matrix&& otherMatrix)
 {
   if (&otherMatrix != this) {
-    m = ::std::move(otherMatrix.m);
+    m = std::move(otherMatrix.m);
   }
 
   return *this;
@@ -63,7 +63,7 @@ Matrix Matrix::copy() const
 
 unique_ptr_t<Matrix> Matrix::clone() const
 {
-  return ::std::make_unique<Matrix>(*this);
+  return std::make_unique<Matrix>(*this);
 }
 
 const char* Matrix::getClassName() const
@@ -75,7 +75,7 @@ int Matrix::getHashCode() const
 {
   float hash = m[0];
   for (unsigned int i = 1; i < 16; ++i) {
-    hash = ::std::pow((hash * 397), m[i]);
+    hash = std::pow((hash * 397), m[i]);
   }
   return static_cast<int>(hash);
 }
@@ -132,7 +132,7 @@ float Matrix::determinant() const
 Float32Array Matrix::toArray() const
 {
   Float32Array v(m.size());
-  ::std::copy(m.begin(), m.end(), v.begin());
+  std::copy(m.begin(), m.end(), v.begin());
 
   return v;
 }
@@ -151,7 +151,7 @@ Matrix& Matrix::invert()
 
 Matrix& Matrix::reset()
 {
-  ::std::fill(m.begin(), m.end(), 0.f);
+  std::fill(m.begin(), m.end(), 0.f);
 
   _markAsUpdated();
 
@@ -492,9 +492,9 @@ bool Matrix::decompose(nullable_t<Vector3> scale,
   }
 
   auto _scale = scale ? *scale : MathTmp::Vector3Array[0];
-  _scale.x    = ::std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
-  _scale.y    = ::std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
-  _scale.z    = ::std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
+  _scale.x    = std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
+  _scale.y    = std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
+  _scale.z    = std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
 
   if (determinant() <= 0.f) {
     _scale.y *= -1.f;
@@ -639,9 +639,9 @@ Matrix Matrix::getRotationMatrix() const
 
 const Matrix& Matrix::getRotationMatrixToRef(Matrix& result) const
 {
-  const float sx = ::std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
-  float sy       = ::std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
-  const float sz = ::std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
+  const float sx = std::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
+  float sy       = std::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
+  const float sz = std::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
 
   if (determinant() <= 0.f) {
     sy *= -1.f;
@@ -870,8 +870,8 @@ Matrix Matrix::Invert(Matrix& source)
 
 void Matrix::RotationXToRef(float angle, Matrix& result)
 {
-  const float s = ::std::sin(angle);
-  const float c = ::std::cos(angle);
+  const float s = std::sin(angle);
+  const float c = std::cos(angle);
 
   result.m[0]  = 1.f;
   result.m[15] = 1.f;
@@ -906,8 +906,8 @@ Matrix Matrix::RotationY(float angle)
 
 void Matrix::RotationYToRef(float angle, Matrix& result)
 {
-  const float s = ::std::sin(angle);
-  const float c = ::std::cos(angle);
+  const float s = std::sin(angle);
+  const float c = std::cos(angle);
 
   result.m[5]  = 1.f;
   result.m[15] = 1.f;
@@ -942,8 +942,8 @@ Matrix Matrix::RotationZ(float angle)
 
 void Matrix::RotationZToRef(float angle, Matrix& result)
 {
-  const float s = ::std::sin(angle);
-  const float c = ::std::cos(angle);
+  const float s = std::sin(angle);
+  const float c = std::cos(angle);
 
   result.m[10] = 1.f;
   result.m[15] = 1.f;
@@ -976,8 +976,8 @@ Matrix Matrix::RotationAxis(Vector3& axis, float angle)
 
 void Matrix::RotationAxisToRef(Vector3& axis, float angle, Matrix& result)
 {
-  const float s  = ::std::sin(-angle);
-  const float c  = ::std::cos(-angle);
+  const float s  = std::sin(-angle);
+  const float c  = std::cos(-angle);
   const float c1 = 1.f - c;
 
   axis.normalize();
@@ -1328,7 +1328,7 @@ void Matrix::PerspectiveFovLHToRef(float fov, float aspect, float znear,
   const float n = znear;
   const float f = zfar;
 
-  const float t = 1.f / (::std::tan(fov * 0.5f));
+  const float t = 1.f / (std::tan(fov * 0.5f));
   const float a = isVerticalFovFixed ? (t / aspect) : t;
   const float b = isVerticalFovFixed ? t : (t * aspect);
   const float c = (f + n) / (f - n);
@@ -1363,7 +1363,7 @@ void Matrix::PerspectiveFovRHToRef(float fov, float aspect, float znear,
   const float n = znear;
   const float f = zfar;
 
-  const float t = 1.f / (::std::tan(fov * 0.5f));
+  const float t = 1.f / (std::tan(fov * 0.5f));
   const float a = isVerticalFovFixed ? (t / aspect) : t;
   const float b = isVerticalFovFixed ? t : (t * aspect);
   const float c = -(f + n) / (f - n);
@@ -1380,10 +1380,10 @@ void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar,
                                       Matrix& result, bool rightHanded)
 {
   const float rightHandedFactor = rightHanded ? -1.f : 1.f;
-  const float upTan             = ::std::tan(fov.upDegrees * Math::PI / 180.f);
-  const float downTan  = ::std::tan(fov.downDegrees * Math::PI / 180.f);
-  const float leftTan  = ::std::tan(fov.leftDegrees * Math::PI / 180.f);
-  const float rightTan = ::std::tan(fov.rightDegrees * Math::PI / 180.f);
+  const float upTan             = std::tan(fov.upDegrees * Math::PI / 180.f);
+  const float downTan  = std::tan(fov.downDegrees * Math::PI / 180.f);
+  const float leftTan  = std::tan(fov.leftDegrees * Math::PI / 180.f);
+  const float rightTan = std::tan(fov.rightDegrees * Math::PI / 180.f);
   const float xScale   = 2.f / (leftTan + rightTan);
   const float yScale   = 2.f / (upTan + downTan);
   result.m[0]          = xScale;

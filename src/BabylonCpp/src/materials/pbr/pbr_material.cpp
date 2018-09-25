@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-PBRMaterial::PBRMaterial(const string_t& iName, Scene* scene)
+PBRMaterial::PBRMaterial(const std::string& iName, Scene* scene)
     : PBRBaseMaterial{iName, scene}
     , directIntensity{1.f}
     , emissiveIntensity{1.f}
@@ -209,12 +209,12 @@ void PBRMaterial::setCameraColorCurves(ColorCurves* /*value*/)
   // _imageProcessingConfiguration.colorCurves = value;
 }
 
-const string_t PBRMaterial::getClassName() const
+const std::string PBRMaterial::getClassName() const
 {
   return "PBRMaterial";
 }
 
-vector_t<BaseTexturePtr> PBRMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> PBRMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseMaterial::getActiveTextures();
 
@@ -314,7 +314,7 @@ bool PBRMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-MaterialPtr PBRMaterial::clone(const string_t& /*name*/,
+MaterialPtr PBRMaterial::clone(const std::string& /*name*/,
                                bool /*cloneChildren*/) const
 {
   return nullptr;
@@ -327,7 +327,7 @@ Json::object PBRMaterial::serialize() const
 
 // Statics
 PBRMaterial* PBRMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
-                                const string_t& /*rootUrl*/)
+                                const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

@@ -530,14 +530,14 @@ ShadowGenerator::removeShadowCaster(const AbstractMeshPtr& mesh,
     return *this;
   }
 
-  _shadowMap->renderList().erase(::std::remove(_shadowMap->renderList().begin(),
+  _shadowMap->renderList().erase(std::remove(_shadowMap->renderList().begin(),
                                                _shadowMap->renderList().end(),
                                                mesh),
                                  _shadowMap->renderList().end());
 
   if (includeDescendants) {
     for (auto& child : mesh->getChildren()) {
-      if (auto childMesh = ::std::static_pointer_cast<AbstractMesh>(child)) {
+      if (auto childMesh = std::static_pointer_cast<AbstractMesh>(child)) {
         removeShadowCaster(childMesh);
       }
     }
@@ -594,7 +594,7 @@ void ShadowGenerator::_initializeShadowMap()
              const vector_t<SubMeshPtr>& alphaTestSubMeshes,
              const vector_t<SubMeshPtr>& transparentSubMeshes,
              const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-             const ::std::function<void()>& /*beforeTransparents*/) {
+             const std::function<void()>& /*beforeTransparents*/) {
         _renderForShadowMap(opaqueSubMeshes, transparentSubMeshes,
                             alphaTestSubMeshes, depthOnlySubMeshes);
       };
@@ -648,7 +648,7 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
   }
 
   if (useKernelBlur()) {
-    _kernelBlurXPostprocess = ::std::make_unique<BlurPostProcess>(
+    _kernelBlurXPostprocess = std::make_unique<BlurPostProcess>(
       _light->name + "KernelBlurX", Vector2(1.f, 0.f), blurKernel(),
       ToVariant<float, PostProcessOptions>(1.f), nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, _textureType);
@@ -659,7 +659,7 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
         effect->setTexture("textureSampler", _shadowMap);
       });
 
-    _kernelBlurYPostprocess = ::std::make_unique<BlurPostProcess>(
+    _kernelBlurYPostprocess = std::make_unique<BlurPostProcess>(
       _light->name + "KernelBlurY", Vector2(0.f, 1.f), blurKernel(),
       ToVariant<float, PostProcessOptions>(1.f), nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, _textureType);
@@ -679,11 +679,11 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
   }
   else {
 #if 0
-    _boxBlurPostprocess = ::std::make_unique<PostProcess>(
+    _boxBlurPostprocess = std::make_unique<PostProcess>(
       _light->name + "DepthBoxBlur", "depthBoxBlur",
       {"screenSize", "boxOffset"}, {}, 1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
-      "#define OFFSET " + ::std::to_string(_blurBoxOffset), _textureType);
+      "#define OFFSET " + std::to_string(_blurBoxOffset), _textureType);
     _boxBlurPostprocess->onApplyObservable.add([this](Effect* effect) {
       int targetSize = static_cast<int>(_mapSize.width / blurScale());
       effect->setFloat2("screenSize", targetSize, targetSize);
@@ -834,7 +834,7 @@ void ShadowGenerator::_applyFilterValues()
 }
 
 void ShadowGenerator::forceCompilation(
-  const ::std::function<void(ShadowGenerator* generator)>& onCompiled,
+  const std::function<void(ShadowGenerator* generator)>& onCompiled,
   const ShadowGeneratorCompileOptions& options)
 {
   auto shadowMap = getShadowMap();
@@ -945,24 +945,24 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + ::std::to_string(mesh->numBoneInfluencers()));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       String::concat("#define BonesPerMesh "
-                     + ::std::to_string(mesh->skeleton()->bones.size() + 1)));
+                     + std::to_string(mesh->skeleton()->bones.size() + 1)));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
   }
 
   // Morph targets
-  auto manager = (::std::static_pointer_cast<Mesh>(mesh))->morphTargetManager();
+  auto manager = (std::static_pointer_cast<Mesh>(mesh))->morphTargetManager();
   unsigned int morphInfluencers = 0;
   if (manager) {
     if (manager->numInfluencers() > 0) {
       defines.emplace_back("#define MORPHTARGETS");
       morphInfluencers = static_cast<unsigned int>(manager->numInfluencers());
       defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
-                           + ::std::to_string(morphInfluencers));
+                           + std::to_string(morphInfluencers));
       MaterialDefines defines;
       defines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
       MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
@@ -985,12 +985,12 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes = ::std::move(attribs);
+    options.attributes = std::move(attribs);
     options.uniformsNames
       = {"world",     "mBones",      "viewProjection", "diffuseMatrix",
          "lightData", "depthValues", "biasAndScale",   "morphTargetInfluences"};
     options.samplers = {"diffuseSampler"};
-    options.defines  = ::std::move(join);
+    options.defines  = std::move(join);
     options.indexParameters
       = {{"maxSimultaneousMorphTargets", morphInfluencers}};
 
@@ -1031,7 +1031,7 @@ void ShadowGenerator::prepareDefines(MaterialDefines& defines,
     return;
   }
 
-  const auto lightIndexStr = ::std::to_string(lightIndex);
+  const auto lightIndexStr = std::to_string(lightIndex);
 
   defines.boolDef["SHADOW" + lightIndexStr] = true;
 
@@ -1146,7 +1146,7 @@ Matrix ShadowGenerator::getTransformMatrix()
                           _lightDirection);
 
   if (stl_util::almost_equal(
-        ::std::abs(Vector3::Dot(_lightDirection, Vector3::Up())), 1.f)) {
+        std::abs(Vector3::Dot(_lightDirection, Vector3::Up())), 1.f)) {
     // Required to avoid perfectly perpendicular light
     _lightDirection.z = 0.0000000000001f;
   }
@@ -1260,7 +1260,7 @@ ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
     return nullptr;
   }
 
-  auto light = ::std::static_pointer_cast<PointLight>(
+  auto light = std::static_pointer_cast<PointLight>(
     scene->getLightByID(parsedShadowGeneratorLightId));
 
   if (!light) {

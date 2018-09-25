@@ -1,11 +1,17 @@
 #ifndef BABYLON_PHYSICS_HELPER_PHYSICS_RADIAL_EXPLOSION_EVENT_H
 #define BABYLON_PHYSICS_HELPER_PHYSICS_RADIAL_EXPLOSION_EVENT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/mesh/vertex_data_options.h>
 #include <babylon/physics/helper/physics_helper_enums.h>
 
 namespace BABYLON {
+
+struct PhysicsForceAndContactPoint;
+class PhysicsImpostor;
+struct PhysicsRadialExplosionEventData;
+class Ray;
+class Scene;
 
 /**
  * @brief Radial explosion.
@@ -34,7 +40,7 @@ public:
    * Linear
    * @returns {Nullable<PhysicsForceAndContactPoint>}
    */
-  unique_ptr_t<PhysicsForceAndContactPoint> getImpostorForceAndContactPoint(
+  std::unique_ptr<PhysicsForceAndContactPoint> getImpostorForceAndContactPoint(
     PhysicsImpostor* impostor, const Vector3& origin, float radius,
     float strength, PhysicsRadialImpulseFalloff falloff);
 
@@ -57,7 +63,7 @@ private:
   // create a sphere, so we can get the intersecting meshes inside
   MeshPtr _sphere;
   SphereOptions _sphereOptions;
-  vector_t<Ray> _rays;
+  std::vector<Ray> _rays;
   // check if the data has been fetched. If not, do cleanup
   bool _dataFetched;
 

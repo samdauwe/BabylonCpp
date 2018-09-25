@@ -21,9 +21,9 @@ DataView::DataView(const DataView& other)
 }
 
 DataView::DataView(DataView&& other)
-    : _buffer{::std::move(other._buffer)}
-    , _byteLength{::std::move(other._byteLength)}
-    , _byteOffset{::std::move(other._byteOffset)}
+    : _buffer{std::move(other._buffer)}
+    , _byteLength{std::move(other._byteLength)}
+    , _byteOffset{std::move(other._byteOffset)}
 {
 }
 
@@ -41,9 +41,9 @@ DataView& DataView::operator=(const DataView& other)
 DataView& DataView::operator=(DataView&& other)
 {
   if (&other != this) {
-    _buffer     = ::std::move(other._buffer);
-    _byteLength = ::std::move(other._byteLength);
-    _byteOffset = ::std::move(other._byteOffset);
+    _buffer     = std::move(other._buffer);
+    _byteLength = std::move(other._byteLength);
+    _byteOffset = std::move(other._byteOffset);
   }
 
   return *this;

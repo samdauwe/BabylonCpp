@@ -17,7 +17,7 @@ Vector2::Vector2(const Vector2& otherVector)
 }
 
 Vector2::Vector2(Vector2&& otherVector)
-    : x{::std::move(otherVector.x)}, y{::std::move(otherVector.y)}
+    : x{std::move(otherVector.x)}, y{std::move(otherVector.y)}
 {
 }
 
@@ -34,8 +34,8 @@ Vector2& Vector2::operator=(const Vector2& otherVector)
 Vector2& Vector2::operator=(Vector2&& otherVector)
 {
   if (&otherVector != this) {
-    x = ::std::move(otherVector.x);
-    y = ::std::move(otherVector.y);
+    x = std::move(otherVector.x);
+    y = std::move(otherVector.y);
   }
 
   return *this;
@@ -52,7 +52,7 @@ Vector2 Vector2::copy() const
 
 unique_ptr_t<Vector2> Vector2::clone() const
 {
-  return ::std::make_unique<Vector2>(*this);
+  return std::make_unique<Vector2>(*this);
 }
 
 string_t Vector2::toString() const
@@ -261,12 +261,12 @@ bool Vector2::equalsWithEpsilon(const Vector2& otherVector, float epsilon) const
 
 Vector2 Vector2::floor() const
 {
-  return Vector2(::std::floor(x), ::std::floor(y));
+  return Vector2(std::floor(x), std::floor(y));
 }
 
 Vector2 Vector2::fract() const
 {
-  return Vector2(x - ::std::floor(x), y - ::std::floor(y));
+  return Vector2(x - std::floor(x), y - std::floor(y));
 }
 
 /** Operator overloading **/
@@ -406,7 +406,7 @@ bool Vector2::operator>=(const Vector2& otherVector) const
 /** Properties **/
 float Vector2::length() const
 {
-  return ::std::sqrt(x * x + y * y);
+  return std::sqrt(x * x + y * y);
 }
 
 float Vector2::lengthSquared() const
@@ -592,7 +592,7 @@ bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0,
 
 float Vector2::Distance(const Vector2& value1, const Vector2& value2)
 {
-  return ::std::sqrt(Vector2::DistanceSquared(value1, value2));
+  return std::sqrt(Vector2::DistanceSquared(value1, value2));
 }
 
 float Vector2::DistanceSquared(const Vector2& value1, const Vector2& value2)
@@ -619,7 +619,7 @@ float Vector2::DistanceOfPointFromSegment(const Vector2& p, const Vector2& segA,
   }
   const Vector2 v = segB.subtract(segA);
   const float t
-    = ::std::max(0.f, ::std::min(1.f, Vector2::Dot(p.subtract(segA), v) / l2));
+    = std::max(0.f, std::min(1.f, Vector2::Dot(p.subtract(segA), v) / l2));
   const Vector2 proj = segA.add(v.multiplyByFloats(t, t));
   return Vector2::Distance(p, proj);
 }

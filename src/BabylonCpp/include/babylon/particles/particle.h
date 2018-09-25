@@ -1,7 +1,7 @@
 #ifndef BABYLON_PARTICLES_PARTICLE_H
 #define BABYLON_PARTICLES_PARTICLE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
@@ -9,6 +9,8 @@
 #include <babylon/tools/factor_gradient.h>
 
 namespace BABYLON {
+
+class ParticleSystem;
 
 /**
  * @brief A particle represents one of the element emitted by a particle system.
@@ -100,49 +102,49 @@ public:
   unsigned int cellIndex;
 
   /** Hidden */
-  nullable_t<Vector3> _initialDirection;
+  std::optional<Vector3> _initialDirection;
 
   /** Hidden */
   unsigned int _initialStartSpriteCellID;
   unsigned int _initialEndSpriteCellID;
 
   /** Hidden */
-  nullable_t<ColorGradient> _currentColorGradient;
+  std::optional<ColorGradient> _currentColorGradient;
   /** Hidden */
   Color4 _currentColor1;
   /** Hidden */
   Color4 _currentColor2;
 
   /** Hidden */
-  nullable_t<FactorGradient> _currentSizeGradient;
+  std::optional<FactorGradient> _currentSizeGradient;
   /** Hidden */
   float _currentSize1;
   /** Hidden */
   float _currentSize2;
 
   /** Hidden */
-  nullable_t<FactorGradient> _currentAngularSpeedGradient;
+  std::optional<FactorGradient> _currentAngularSpeedGradient;
   /** Hidden */
   float _currentAngularSpeed1;
   /** Hidden */
   float _currentAngularSpeed2;
 
   /** Hidden */
-  nullable_t<FactorGradient> _currentVelocityGradient;
+  std::optional<FactorGradient> _currentVelocityGradient;
   /** Hidden */
   float _currentVelocity1;
   /** Hidden */
   float _currentVelocity2;
 
   /** Hidden */
-  nullable_t<FactorGradient> _currentLimitVelocityGradient;
+  std::optional<FactorGradient> _currentLimitVelocityGradient;
   /** Hidden */
   float _currentLimitVelocity1;
   /** Hidden */
   float _currentLimitVelocity2;
 
   /** Hidden */
-  nullable_t<FactorGradient> _currentDragGradient;
+  std::optional<FactorGradient> _currentDragGradient;
   /** Hidden */
   float _currentDrag1;
   /** Hidden */

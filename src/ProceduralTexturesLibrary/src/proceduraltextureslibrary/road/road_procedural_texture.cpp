@@ -47,9 +47,9 @@ Json::object RoadProceduralTexture::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<RoadProceduralTexture>
+std::unique_ptr<RoadProceduralTexture>
 RoadProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                             Scene* /*scene*/, const string_t& /*rootUrl*/)
+                             Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

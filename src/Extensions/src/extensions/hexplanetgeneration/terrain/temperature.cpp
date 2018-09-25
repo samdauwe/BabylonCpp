@@ -1,5 +1,7 @@
 #include <babylon/extensions/hexplanetgeneration/terrain/temperature.h>
 
+#include <babylon/babylon_constants.h>
+
 #include <babylon/extensions/hexplanetgeneration/utils/fast_simplex_noise.h>
 #include <babylon/extensions/hexplanetgeneration/utils/gradient.h>
 

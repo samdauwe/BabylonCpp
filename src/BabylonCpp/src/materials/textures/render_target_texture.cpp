@@ -73,7 +73,7 @@ RenderTargetTexture::RenderTargetTexture(
     = scene->getEngine()->onResizeObservable.add([](Engine*, EventState&) {});
 
   // Rendering groups
-  _renderingManager = ::std::make_unique<RenderingManager>(scene);
+  _renderingManager = std::make_unique<RenderingManager>(scene);
   _renderingManager->_useSceneAutoClearSetup = true;
 
   if (isMulti) {
@@ -96,7 +96,7 @@ RenderTargetTexture::RenderTargetTexture(
     _texture = scene->getEngine()->createRenderTargetCubeTexture(
       getRenderSize(), _renderTargetOptions);
     coordinatesMode = TextureConstants::INVCUBIC_MODE;
-    _textureMatrix  = ::std::make_unique<Matrix>(Matrix::Identity());
+    _textureMatrix  = std::make_unique<Matrix>(Matrix::Identity());
   }
   else {
     _texture = scene->getEngine()->createRenderTargetTexture(
@@ -143,7 +143,7 @@ nullable_t<Vector3>& RenderTargetTexture::get_boundingBoxSize()
 }
 
 void RenderTargetTexture::set_onAfterUnbind(
-  const ::std::function<void(RenderTargetTexture*, EventState&)>& callback)
+  const std::function<void(RenderTargetTexture*, EventState&)>& callback)
 {
   if (_onAfterUnbindObserver) {
     onAfterUnbindObservable.remove(_onAfterUnbindObserver);
@@ -152,7 +152,7 @@ void RenderTargetTexture::set_onAfterUnbind(
 }
 
 void RenderTargetTexture::set_onBeforeRender(
-  const ::std::function<void(int* faceIndex, EventState&)>& callback)
+  const std::function<void(int* faceIndex, EventState&)>& callback)
 {
   if (_onBeforeRenderObserver) {
     onBeforeRenderObservable.remove(_onBeforeRenderObserver);
@@ -161,7 +161,7 @@ void RenderTargetTexture::set_onBeforeRender(
 }
 
 void RenderTargetTexture::set_onAfterRender(
-  const ::std::function<void(int* faceIndex, EventState&)>& callback)
+  const std::function<void(int* faceIndex, EventState&)>& callback)
 {
   if (_onAfterRenderObserver) {
     onAfterRenderObservable.remove(_onAfterRenderObserver);
@@ -170,7 +170,7 @@ void RenderTargetTexture::set_onAfterRender(
 }
 
 void RenderTargetTexture::set_onClear(
-  const ::std::function<void(Engine* engine, EventState&)>& callback)
+  const std::function<void(Engine* engine, EventState&)>& callback)
 {
   if (_onClearObserver) {
     onClearObservable.remove(_onClearObserver);
@@ -258,7 +258,7 @@ void RenderTargetTexture::addPostProcess(PostProcess* postProcess)
       return;
     }
 
-    _postProcessManager = ::std::make_unique<PostProcessManager>(scene);
+    _postProcessManager = std::make_unique<PostProcessManager>(scene);
     _postProcesses.clear();
   }
 
@@ -452,7 +452,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
     auto& activeMeshes = scene->getActiveMeshes();
     for (auto& mesh : activeMeshes) {
       currentRenderList().emplace_back(
-        ::std::static_pointer_cast<AbstractMesh>(mesh));
+        std::static_pointer_cast<AbstractMesh>(mesh));
     }
   }
   auto currentRenderListLength = currentRenderList().size();
@@ -533,7 +533,7 @@ int RenderTargetTexture::_bestReflectionRenderTargetDimension(
     static_cast<int>(x + (minimum * minimum / (minimum + x))));
 
   // Ensure we don't exceed the render dimension (while staying POT)
-  return ::std::min(Tools::FloorPOT(renderDimension), curved);
+  return std::min(Tools::FloorPOT(renderDimension), curved);
 }
 
 void RenderTargetTexture::unbindFrameBuffer(Engine* engine,
@@ -637,11 +637,11 @@ void RenderTargetTexture::renderToTarget(
 
 void RenderTargetTexture::setRenderingOrder(
   unsigned int renderingGroupId,
-  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
     opaqueSortCompareFn,
-  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
     alphaTestSortCompareFn,
-  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
     transparentSortCompareFn)
 {
   _renderingManager->setRenderingOrder(renderingGroupId, opaqueSortCompareFn,
@@ -723,7 +723,7 @@ void RenderTargetTexture::dispose()
   }
 
   scene->customRenderTargets.erase(
-    ::std::remove_if(
+    std::remove_if(
       scene->customRenderTargets.begin(), scene->customRenderTargets.end(),
       [this](const RenderTargetTexturePtr& renderTargetTexturePtr) {
         return renderTargetTexturePtr.get() == this;
@@ -732,7 +732,7 @@ void RenderTargetTexture::dispose()
 
   for (auto& camera : scene->cameras) {
     camera->customRenderTargets.erase(
-      ::std::remove_if(
+      std::remove_if(
         camera->customRenderTargets.begin(), camera->customRenderTargets.end(),
         [this](const RenderTargetTexturePtr& renderTargetTexturePtr) {
           return renderTargetTexturePtr.get() == this;

@@ -299,7 +299,7 @@ AirplaneModelScene::MakeWingFunction AirplaneModelScene::_makeFormAppendage(
         };
 
         // Make a mesh shaper device.
-        auto vertexData = ::std::make_unique<VertexData>();
+        auto vertexData = std::make_unique<VertexData>();
 
         // stuff its buffers with your stuff
         vertexData->positions = positions;

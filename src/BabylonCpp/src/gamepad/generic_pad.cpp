@@ -17,13 +17,13 @@ GenericPad::~GenericPad()
 }
 
 void GenericPad::setOnbuttondown(
-  const ::std::function<void(unsigned int buttonPressed)>& callback)
+  const std::function<void(unsigned int buttonPressed)>& callback)
 {
   _onbuttondown = callback;
 }
 
 void GenericPad::onbuttonup(
-  const ::std::function<void(unsigned int buttonPressed)>& callback)
+  const std::function<void(unsigned int buttonPressed)>& callback)
 {
   _onbuttonup = callback;
 }

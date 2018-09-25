@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-array_t<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
+std::array<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
   = {{
     FileFaceOrientation("right", Vector3(1, 0, 0), Vector3(0, 0, -1),
                         Vector3(0, -1, 0)), // +X east
@@ -26,7 +26,7 @@ array_t<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
                         Vector3(0, -1, 0)) // -Z bottom
   }};
 
-unique_ptr_t<SphericalPolynomial>
+std::unique_ptr<SphericalPolynomial>
 CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
   BaseTexture* texture)
 {
@@ -77,7 +77,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
   return ConvertCubeMapToSphericalPolynomial(cubeInfo);
 }
 
-unique_ptr_t<SphericalPolynomial>
+std::unique_ptr<SphericalPolynomial>
 CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   const CubeMapInfo& cubeInfo)
 {
@@ -131,7 +131,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
                                 .add(fileFace.worldAxisForNormal);
         worldDirection.normalize();
 
-        float deltaSolidAngle = ::std::pow(1.f + u * u + v * v, -3.f / 2.f);
+        float deltaSolidAngle = std::pow(1.f + u * u + v * v, -3.f / 2.f);
 
         float r = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 0];
         float g = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 1];
@@ -146,9 +146,9 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
 
         // Handle Gamma space textures.
         if (cubeInfo.gammaSpace) {
-          r = ::std::pow(Scalar::Clamp(r), Math::ToLinearSpace);
-          g = ::std::pow(Scalar::Clamp(g), Math::ToLinearSpace);
-          b = ::std::pow(Scalar::Clamp(b), Math::ToLinearSpace);
+          r = std::pow(Scalar::Clamp(r), Math::ToLinearSpace);
+          g = std::pow(Scalar::Clamp(g), Math::ToLinearSpace);
+          b = std::pow(Scalar::Clamp(b), Math::ToLinearSpace);
         }
 
         Color3 color(r, g, b);
@@ -182,7 +182,7 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   sphericalHarmonics.convertIncidentRadianceToIrradiance();
   sphericalHarmonics.convertIrradianceToLambertianRadiance();
 
-  return ::std::make_unique<SphericalPolynomial>(
+  return std::make_unique<SphericalPolynomial>(
     SphericalPolynomial::FromHarmonics(sphericalHarmonics));
 }
 

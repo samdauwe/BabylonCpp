@@ -48,7 +48,7 @@ public:
   static LensFlareSystemSceneComponentPtr New(Ts&&... args)
   {
     return std::shared_ptr<LensFlareSystemSceneComponent>(
-      new LensFlareSystemSceneComponent(::std::forward<Ts>(args)...));
+      new LensFlareSystemSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~LensFlareSystemSceneComponent();
 

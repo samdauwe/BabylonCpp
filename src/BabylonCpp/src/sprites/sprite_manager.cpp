@@ -73,7 +73,7 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
   // a)
   _vertexData.resize(capacity * 16 * 4);
   _buffer
-    = ::std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 16);
+    = std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 16);
 
   auto positions
     = _buffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 4);
@@ -86,10 +86,10 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
   _vertexBufferPtrs[VertexBuffer::CellInfoKindChars] = cellInfo.get();
   _vertexBufferPtrs[VertexBuffer::ColorKindChars]    = colors.get();
 
-  _vertexBuffers[VertexBuffer::PositionKindChars] = ::std::move(positions);
-  _vertexBuffers[VertexBuffer::OptionsKindChars]  = ::std::move(options);
-  _vertexBuffers[VertexBuffer::CellInfoKindChars] = ::std::move(cellInfo);
-  _vertexBuffers[VertexBuffer::ColorKindChars]    = ::std::move(colors);
+  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(positions);
+  _vertexBuffers[VertexBuffer::OptionsKindChars]  = std::move(options);
+  _vertexBuffers[VertexBuffer::CellInfoKindChars] = std::move(cellInfo);
+  _vertexBuffers[VertexBuffer::ColorKindChars]    = std::move(colors);
 
   // Effects
 
@@ -124,11 +124,11 @@ SpriteManager::~SpriteManager()
 
 void SpriteManager::addToScene(unique_ptr_t<SpriteManager>&& newSpriteManager)
 {
-  _scene->spriteManagers.emplace_back(::std::move(newSpriteManager));
+  _scene->spriteManagers.emplace_back(std::move(newSpriteManager));
 }
 
 void SpriteManager::setOnDispose(
-  const ::std::function<void(SpriteManager*, EventState&)>& callback)
+  const std::function<void(SpriteManager*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -192,10 +192,10 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite* sprite,
 
 nullable_t<PickingInfo>
 SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
-                          ::std::function<bool(Sprite* sprite)> predicate,
+                          std::function<bool(Sprite* sprite)> predicate,
                           bool fastCheck)
 {
-  auto count               = ::std::min(_capacity, sprites.size());
+  auto count               = std::min(_capacity, sprites.size());
   auto min                 = Vector3::Zero();
   auto max                 = Vector3::Zero();
   auto distance            = numeric_limits_t<float>::max();
@@ -269,7 +269,7 @@ void SpriteManager::render()
 
   // Sprites
   auto deltaTime = engine->getDeltaTime();
-  size_t max     = ::std::min(_capacity, sprites.size());
+  size_t max     = std::min(_capacity, sprites.size());
   int rowSize    = baseSize.width / cellWidth;
 
   unsigned int offset = 0;
@@ -354,7 +354,7 @@ void SpriteManager::dispose()
 
   // Remove from scene
   _scene->spriteManagers.erase(
-    ::std::remove_if(_scene->spriteManagers.begin(),
+    std::remove_if(_scene->spriteManagers.begin(),
                      _scene->spriteManagers.end(),
                      [this](const unique_ptr_t<SpriteManager>& spriteManager) {
                        return spriteManager.get() == this;

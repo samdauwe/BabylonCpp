@@ -23,7 +23,7 @@ public:
   static RibbonGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<RibbonGeometry>(
-      new RibbonGeometry(::std::forward<Ts>(args)...));
+      new RibbonGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

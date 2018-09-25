@@ -65,7 +65,7 @@ AxisDragGizmo::AxisDragGizmo(
   PointerDragBehaviorOptions options;
   options.dragAxis = dragAxis;
   // options.pointerObservableScene = gizmoLayer->originalScene;
-  _dragBehavior = ::std::make_unique<PointerDragBehavior>(options);
+  _dragBehavior = std::make_unique<PointerDragBehavior>(options);
   _dragBehavior->moveAttached = false;
   _rootMesh->addBehavior(_dragBehavior.get());
   _dragBehavior->onDragObservable.add([&](DragMoveEvent* event,
@@ -87,9 +87,9 @@ AxisDragGizmo::AxisDragGizmo(
       }
       else {
         _currentSnapDragDistance += event->dragDistance;
-        if (::std::abs(_currentSnapDragDistance) > snapDistance) {
+        if (std::abs(_currentSnapDragDistance) > snapDistance) {
           auto dragSteps
-            = ::std::floor(::std::abs(_currentSnapDragDistance) / snapDistance);
+            = std::floor(std::abs(_currentSnapDragDistance) / snapDistance);
           _currentSnapDragDistance
             = std::fmod(_currentSnapDragDistance, snapDistance);
           _localDelta.normalizeToRef(_tmpVector);
@@ -109,11 +109,11 @@ AxisDragGizmo::AxisDragGizmo(
       }
       auto isHovered = stl_util::contains(
         _rootMesh->getChildMeshes(),
-        ::std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh));
+        std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh));
       auto material = isHovered ? hoverMaterial : coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material    = material;
-        auto linesMesh = ::std::static_pointer_cast<LinesMesh>(m);
+        auto linesMesh = std::static_pointer_cast<LinesMesh>(m);
         if (linesMesh) {
           linesMesh->color = material->emissiveColor;
         }

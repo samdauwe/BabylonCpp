@@ -1,7 +1,9 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_CUSTOM_SHADER_SPECIAL_PARTS_H
 #define BABYLON_MATERIALS_LIBRARY_CUSTOM_SHADER_SPECIAL_PARTS_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -11,27 +13,27 @@ struct BABYLON_SHARED_EXPORT ShaderSpecialParts {
   ShaderSpecialParts();
   ~ShaderSpecialParts();
 
-  string_t Fragment_Begin;
-  string_t Fragment_Definitions;
-  string_t Fragment_MainBegin;
+  std::string Fragment_Begin;
+  std::string Fragment_Definitions;
+  std::string Fragment_MainBegin;
 
   // diffuseColor
-  string_t Fragment_Custom_Diffuse;
+  std::string Fragment_Custom_Diffuse;
 
   // alpha
-  string_t Fragment_Custom_Alpha;
+  std::string Fragment_Custom_Alpha;
 
-  string_t Fragment_Before_FragColor;
+  std::string Fragment_Before_FragColor;
 
-  string_t Vertex_Begin;
-  string_t Vertex_Definitions;
-  string_t Vertex_MainBegin;
+  std::string Vertex_Begin;
+  std::string Vertex_Definitions;
+  std::string Vertex_MainBegin;
 
   // positionUpdated
-  string_t Vertex_Before_PositionUpdated;
+  std::string Vertex_Before_PositionUpdated;
 
   // normalUpdated
-  string_t Vertex_Before_NormalUpdated;
+  std::string Vertex_Before_NormalUpdated;
 
 }; // end of class ShaderSpecialParts
 

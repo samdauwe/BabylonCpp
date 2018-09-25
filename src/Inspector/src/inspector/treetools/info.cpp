@@ -17,7 +17,7 @@ Info::~Info()
 }
 
 Info::Info(Info&& other)
-    : AbstractTreeTool{std::move(other)}, _obj{::std::move(other._obj)}
+    : AbstractTreeTool{std::move(other)}, _obj{std::move(other._obj)}
 {
 }
 

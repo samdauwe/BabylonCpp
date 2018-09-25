@@ -173,7 +173,7 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
      "radius", "area", "fallOff", "base", "range", "viewport"},
     {"randomSampler"}, ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    "#define SAMPLES " + ::std::to_string(numSamples) + "\n#define SSAO");
+    "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
 
   _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
     if (_firstUpdate) {
@@ -223,7 +223,7 @@ void SSAORenderingPipeline::_createRandomTexture()
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
   auto context
-    = ::std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
+    = std::static_pointer_cast<DynamicTexture>(_randomTexture)->getContext();
 
   const auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
@@ -232,13 +232,13 @@ void SSAORenderingPipeline::_createRandomTexture()
 
   for (size_t x = 0; x < size; ++x) {
     for (size_t y = 0; y < size; ++y) {
-      randVector.x = ::std::floor(rand(-1.f, 1.f) * 255.f);
-      randVector.y = ::std::floor(rand(-1.f, 1.f) * 255.f);
-      randVector.z = ::std::floor(rand(-1.f, 1.f) * 255.f);
+      randVector.x = std::floor(rand(-1.f, 1.f) * 255.f);
+      randVector.y = std::floor(rand(-1.f, 1.f) * 255.f);
+      randVector.z = std::floor(rand(-1.f, 1.f) * 255.f);
 
-      context->fillStyle = "rgb(" + ::std::to_string(randVector.x) + ", "
-                           + ::std::to_string(randVector.y) + ", "
-                           + ::std::to_string(randVector.z) + ")";
+      context->fillStyle = "rgb(" + std::to_string(randVector.x) + ", "
+                           + std::to_string(randVector.y) + ", "
+                           + std::to_string(randVector.z) + ")";
       context->fillRect(static_cast<int>(x), static_cast<int>(y), 1, 1);
     }
   }

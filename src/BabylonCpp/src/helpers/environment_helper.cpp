@@ -279,7 +279,7 @@ ISceneSize EnvironmentHelper::_getSceneSize()
   if (_options.sizeAuto) {
     if (_scene->activeCamera->type() == IReflect::Type::ARCROTATECAMERA) {
       auto activecamera
-        = ::std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera);
+        = std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera);
       groundSize = static_cast<int>(*activecamera->upperRadiusLimit * 2.f);
       skyboxSize = groundSize;
     }
@@ -440,7 +440,7 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
 
   if (_options.skyboxTexture.is<BaseTexturePtr>()) {
     _skyboxMaterial->setReflectionTexture(
-      ::std::static_pointer_cast<RenderTargetTexture>(
+      std::static_pointer_cast<RenderTargetTexture>(
         _options.skyboxTexture.get<BaseTexturePtr>()));
     return;
   }
@@ -453,7 +453,7 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
 }
 
 void EnvironmentHelper::_errorHandler(const std::string& message,
-                                      const ::std::exception& exception)
+                                      const std::exception& exception)
 {
   Exception _exception{message, exception};
   onErrorObservable.notifyObservers(&_exception);

@@ -13,7 +13,7 @@ PropertiesView::~PropertiesView()
 {
 }
 
-void PropertiesView::addBoolProperty(const string_t& name,
+void PropertiesView::addBoolProperty(const std::string& name,
                                      const TPrimitiveGetter<bool>& getter,
                                      const TPrimitiveSetter<bool>& setter)
 {
@@ -25,7 +25,7 @@ void PropertiesView::addBoolProperty(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addFloatProperty(const string_t& name,
+void PropertiesView::addFloatProperty(const std::string& name,
                                       const TPrimitiveGetter<float>& getter,
                                       const TPrimitiveSetter<float>& setter)
 {
@@ -37,7 +37,7 @@ void PropertiesView::addFloatProperty(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addIntProperty(const string_t& name,
+void PropertiesView::addIntProperty(const std::string& name,
                                     const TPrimitiveGetter<int>& getter,
                                     const TPrimitiveSetter<int>& setter)
 {
@@ -49,7 +49,7 @@ void PropertiesView::addIntProperty(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addSizeTProperty(const string_t& name,
+void PropertiesView::addSizeTProperty(const std::string& name,
                                       const TPrimitiveGetter<size_t>& getter,
                                       const TPrimitiveSetter<size_t>& setter)
 {
@@ -61,19 +61,20 @@ void PropertiesView::addSizeTProperty(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addStringProperty(const string_t& name,
-                                       const TPrimitiveGetter<string_t>& getter,
-                                       const TPrimitiveSetter<string_t>& setter)
+void PropertiesView::addStringProperty(
+  const std::string& name, const TPrimitiveGetter<std::string>& getter,
+  const TPrimitiveSetter<std::string>& setter)
 {
   // Create property
-  _stringProperties.emplace_back(PrimitiveProperty<string_t>{getter, setter});
+  _stringProperties.emplace_back(
+    PrimitiveProperty<std::string>{getter, setter});
   // Store mapping
   auto index = _stringProperties.size() - 1;
   auto type  = PropertyTypeInsp::STRING_PROPERTY;
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addColor3Property(const string_t& name,
+void PropertiesView::addColor3Property(const std::string& name,
                                        const TBabylonGetter<Color3>& getter,
                                        const TBabylonSetter<Color3>& setter)
 {
@@ -85,7 +86,7 @@ void PropertiesView::addColor3Property(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addColor4Property(const string_t& name,
+void PropertiesView::addColor4Property(const std::string& name,
                                        const TBabylonGetter<Color4>& getter,
                                        const TBabylonSetter<Color4>& setter)
 {
@@ -97,7 +98,7 @@ void PropertiesView::addColor4Property(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addVector2Property(const string_t& name,
+void PropertiesView::addVector2Property(const std::string& name,
                                         const TBabylonGetter<Vector2>& getter,
                                         const TBabylonSetter<Vector2>& setter)
 {
@@ -109,7 +110,7 @@ void PropertiesView::addVector2Property(const string_t& name,
   _propertyEntries.emplace_back(PropertyEntry{name, index, type});
 }
 
-void PropertiesView::addVector3Property(const string_t& name,
+void PropertiesView::addVector3Property(const std::string& name,
                                         const TBabylonGetter<Vector3>& getter,
                                         const TBabylonSetter<Vector3>& setter)
 {
@@ -122,7 +123,7 @@ void PropertiesView::addVector3Property(const string_t& name,
 }
 
 void PropertiesView::addColorCurvesProperty(
-  const string_t& name,
+  const std::string& name,
   const TBabylonNonConstGetter<ColorCurves>& getterNonConst)
 {
   // Create property
@@ -135,7 +136,7 @@ void PropertiesView::addColorCurvesProperty(
 }
 
 void PropertiesView::addImageProcessingConfigurationProperty(
-  const string_t& name,
+  const std::string& name,
   const TBabylonNonConstGetter<ImageProcessingConfiguration>& getterNonConst)
 {
   // Create property
@@ -149,10 +150,10 @@ void PropertiesView::addImageProcessingConfigurationProperty(
 
 void PropertiesView::sortPropertiesByName()
 {
-  ::std::sort(_propertyEntries.begin(), _propertyEntries.end(),
-              [](const PropertyEntry& a, const PropertyEntry& b) {
-                return a.name < b.name;
-              });
+  std::sort(_propertyEntries.begin(), _propertyEntries.end(),
+            [](const PropertyEntry& a, const PropertyEntry& b) {
+              return a.name < b.name;
+            });
 }
 
 void PropertiesView::render()

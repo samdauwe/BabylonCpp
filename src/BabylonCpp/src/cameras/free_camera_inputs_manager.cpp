@@ -16,37 +16,37 @@ FreeCameraInputsManager::~FreeCameraInputsManager()
 
 FreeCameraInputsManager& FreeCameraInputsManager::addKeyboard()
 {
-  add(::std::make_unique<FreeCameraKeyboardMoveInput>());
+  add(std::make_unique<FreeCameraKeyboardMoveInput>());
   return *this;
 }
 
 FreeCameraInputsManager& FreeCameraInputsManager::addMouse(bool touchEnabled)
 {
-  add(::std::make_unique<FreeCameraMouseInput>(touchEnabled));
+  add(std::make_unique<FreeCameraMouseInput>(touchEnabled));
   return *this;
 }
 
 FreeCameraInputsManager& FreeCameraInputsManager::addGamepad()
 {
-  // add(::std::make_unique<FreeCameraGamepadInput>());
+  // add(std::make_unique<FreeCameraGamepadInput>());
   return *this;
 }
 
 FreeCameraInputsManager& FreeCameraInputsManager::addDeviceOrientation()
 {
-  // add(::std::make_unique<FreeCameraDeviceOrientationInput>());
+  // add(std::make_unique<FreeCameraDeviceOrientationInput>());
   return *this;
 }
 
 FreeCameraInputsManager& FreeCameraInputsManager::addTouch()
 {
-  // add(::std::make_unique<FreeCameraTouchInput>());
+  // add(std::make_unique<FreeCameraTouchInput>());
   return *this;
 }
 
 FreeCameraInputsManager& FreeCameraInputsManager::addVirtualJoystick()
 {
-  // add(::std::make_unique<FreeCameraVirtualJoystickInput>());
+  // add(std::make_unique<FreeCameraVirtualJoystickInput>());
   return *this;
 }
 

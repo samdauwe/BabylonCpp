@@ -26,7 +26,7 @@ LavaMaterial::LavaMaterial(const std::string& iName, Scene* scene)
     , diffuseTexture{this, &LavaMaterial::get_diffuseTexture,
                      &LavaMaterial::set_diffuseTexture}
     , noiseTexture{nullptr}
-    , fogColor{nullopt_t}
+    , fogColor{std::nullopt}
     , speed{1.f}
     , movingSpeed{1.f}
     , lowFrequencySpeed{1.f}
@@ -416,7 +416,7 @@ Json::object LavaMaterial::serialize() const
   return Json::object();
 }
 
-const string_t LavaMaterial::getClassName() const
+const std::string LavaMaterial::getClassName() const
 {
   return "LavaMaterial";
 }

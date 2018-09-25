@@ -13,7 +13,7 @@
 
 namespace BABYLON {
 
-BaseParticleSystem::BaseParticleSystem(const string_t& iName)
+BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     : manualEmitCount{-1}
     , disposeOnStop{false}
     , onAnimationEnd{nullptr}
@@ -103,37 +103,37 @@ void BaseParticleSystem::set_isAnimationSheetEnabled(bool value)
   _reset();
 }
 
-vector_t<FactorGradient>& BaseParticleSystem::getDragGradients()
+std::vector<FactorGradient>& BaseParticleSystem::getDragGradients()
 {
   return _dragGradients;
 }
 
-vector_t<FactorGradient>& BaseParticleSystem::getLimitVelocityGradients()
+std::vector<FactorGradient>& BaseParticleSystem::getLimitVelocityGradients()
 {
   return _limitVelocityGradients;
 }
 
-vector_t<ColorGradient>& BaseParticleSystem::getColorGradients()
+std::vector<ColorGradient>& BaseParticleSystem::getColorGradients()
 {
   return _colorGradients;
 }
 
-vector_t<FactorGradient>& BaseParticleSystem::getSizeGradients()
+std::vector<FactorGradient>& BaseParticleSystem::getSizeGradients()
 {
   return _sizeGradients;
 }
 
-vector_t<FactorGradient>& BaseParticleSystem::getLifeTimeGradients()
+std::vector<FactorGradient>& BaseParticleSystem::getLifeTimeGradients()
 {
   return _lifeTimeGradients;
 }
 
-vector_t<FactorGradient>& BaseParticleSystem::getAngularSpeedGradients()
+std::vector<FactorGradient>& BaseParticleSystem::getAngularSpeedGradients()
 {
   return _angularSpeedGradients;
 }
 
-vector_t<FactorGradient>& BaseParticleSystem::getVelocityGradients()
+std::vector<FactorGradient>& BaseParticleSystem::getVelocityGradients()
 {
   return _velocityGradients;
 }

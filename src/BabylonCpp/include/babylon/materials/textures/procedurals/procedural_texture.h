@@ -25,7 +25,7 @@ public:
   static ProceduralTexturePtr New(Ts&&... args)
   {
     auto texture = std::shared_ptr<ProceduralTexture>(
-      new ProceduralTexture(::std::forward<Ts>(args)...));
+      new ProceduralTexture(std::forward<Ts>(args)...));
     texture->addToScene(texture);
 
     return texture;
@@ -97,7 +97,7 @@ public:
   /** Hidden */
   bool _generateMipMaps;
   bool isEnabled;
-  ::std::function<void()> onGenerated;
+  std::function<void()> onGenerated;
 
   Property<ProceduralTexture, int> refreshRate;
 

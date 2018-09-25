@@ -89,7 +89,7 @@ void ShaderMaterialCloudsScene::initializeScene(ICanvas* /*canvas*/,
 
     // Merge
     if (!globalVertexData) {
-      globalVertexData = ::std::move(planeVertexData);
+      globalVertexData = std::move(planeVertexData);
     }
     else {
       globalVertexData->merge(*planeVertexData);
@@ -108,7 +108,7 @@ void ShaderMaterialCloudsScene::initializeScene(ICanvas* /*canvas*/,
   // Animation
   scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
     float cameraDepth
-      = ::std::fmod((Time::unixtimeInMs() - _startTime) * 0.03f, 8000.f);
+      = std::fmod((Time::unixtimeInMs() - _startTime) * 0.03f, 8000.f);
     _camera->position.z = cameraDepth;
   });
 }

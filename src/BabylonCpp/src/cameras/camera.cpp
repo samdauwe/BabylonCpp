@@ -54,7 +54,7 @@ Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene,
     , _globalPosition{Vector3::Zero()}
     , _computedViewMatrix{Matrix::Identity()}
     , _doNotComputeProjectionMatrix{false}
-    , _worldMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
+    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _transformMatrix{Matrix::Zero()}
     , _webvrProjectionMatrix{Matrix::Identity()}
     , _refreshFrustumPlanes{true}
@@ -138,7 +138,7 @@ vector_t<AbstractMeshPtr>& Camera::getActiveMeshes()
 
 bool Camera::isActiveMesh(const AbstractMeshPtr& mesh)
 {
-  return ::std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
+  return std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
          != _activeMeshes.end();
 }
 
@@ -594,7 +594,7 @@ FreeCameraPtr Camera::leftCamera()
   if (_rigCameras.size() < 1) {
     return nullptr;
   }
-  return ::std::static_pointer_cast<FreeCamera>(_rigCameras[0]);
+  return std::static_pointer_cast<FreeCamera>(_rigCameras[0]);
 }
 
 FreeCameraPtr Camera::rightCamera()
@@ -602,7 +602,7 @@ FreeCameraPtr Camera::rightCamera()
   if (_rigCameras.size() < 2) {
     return nullptr;
   }
-  return ::std::static_pointer_cast<FreeCamera>(_rigCameras[1]);
+  return std::static_pointer_cast<FreeCamera>(_rigCameras[1]);
 }
 
 Vector3* Camera::getLeftTarget()
@@ -610,7 +610,7 @@ Vector3* Camera::getLeftTarget()
   if (_rigCameras.size() < 1) {
     return nullptr;
   }
-  return &::std::static_pointer_cast<TargetCamera>(_rigCameras[0])->getTarget();
+  return &std::static_pointer_cast<TargetCamera>(_rigCameras[0])->getTarget();
 }
 
 Vector3* Camera::getRightTarget()
@@ -618,7 +618,7 @@ Vector3* Camera::getRightTarget()
   if (_rigCameras.size() < 2) {
     return nullptr;
   }
-  return &::std::static_pointer_cast<TargetCamera>(_rigCameras[1])->getTarget();
+  return &std::static_pointer_cast<TargetCamera>(_rigCameras[1])->getTarget();
 }
 
 void Camera::setCameraRigMode(int /*iMode*/, const Json::value& /*rigParams*/)
@@ -753,7 +753,7 @@ CameraPtr Camera::GetConstructorFromName(const string_t& type,
     = Node::Construct(type, name, scene, Json::value(options));
 
   if (constructorFunc) {
-    return ::std::static_pointer_cast<Camera>(constructorFunc());
+    return std::static_pointer_cast<Camera>(constructorFunc());
   }
 
   // Default to universal camera

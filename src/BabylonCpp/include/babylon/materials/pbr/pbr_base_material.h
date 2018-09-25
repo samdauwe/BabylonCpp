@@ -122,7 +122,7 @@ public:
    * @brief Force shader compilation
    */
   void forceCompilation(AbstractMesh* mesh,
-                        ::std::function<void(Material* material)>& onCompiled,
+                        std::function<void(Material* material)>& onCompiled,
                         bool clipPlane = false);
 
   /**
@@ -182,8 +182,8 @@ protected:
 private:
   Effect* _prepareEffect(
     AbstractMesh* mesh, PBRMaterialDefines& defines,
-    const ::std::function<void(Effect* effect)> onCompiled = nullptr,
-    ::std::function<void(Effect* effect, const std::string& errors)> onError
+    const std::function<void(Effect* effect)> onCompiled = nullptr,
+    std::function<void(Effect* effect, const std::string& errors)> onError
     = nullptr,
     const std::optional<bool>& useInstances = std::nullopt,
     const std::optional<bool>& useClipPlane = std::nullopt);

@@ -116,10 +116,10 @@ float BackgroundMaterial::fovMultiplier() const
 
 void BackgroundMaterial::setFovMultiplier(float value)
 {
-  if (::std::isnan(value)) {
+  if (std::isnan(value)) {
     value = 1.f;
   }
-  _fovMultiplier = ::std::max(0.f, ::std::min(2.f, value));
+  _fovMultiplier = std::max(0.f, std::min(2.f, value));
 }
 
 void BackgroundMaterial::_attachImageProcessingConfiguration(
@@ -239,7 +239,7 @@ ColorCurves* BackgroundMaterial::cameraColorCurves()
 void BackgroundMaterial::setCameraColorCurves(ColorCurves* value)
 {
   _imageProcessingConfiguration->colorCurves
-    = ::std::make_unique<ColorCurves>(*value);
+    = std::make_unique<ColorCurves>(*value);
 }
 
 bool BackgroundMaterial::needAlphaTesting() const
@@ -264,7 +264,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = ::std::make_unique<BackgroundMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<BackgroundMaterialDefines>();
   }
 
   auto scene   = getScene();
@@ -461,7 +461,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = ::std::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (defines["FOG"]) {
       fallbacks->addFallback(0, "FOG");
     }
@@ -532,7 +532,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     std::unordered_map<std::string, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights}};
 
-    ::std::function<void(Effect * effect)> onCompiled = [&](Effect* effect) {
+    std::function<void(Effect * effect)> onCompiled = [&](Effect* effect) {
       if (onCompiled) {
         onCompiled(effect);
       }
@@ -543,16 +543,16 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     auto join = defines.toString();
 
     EffectCreationOptions options;
-    options.attributes            = ::std::move(attribs);
-    options.uniformsNames         = ::std::move(uniforms);
-    options.uniformBuffersNames   = ::std::move(uniformBuffers);
-    options.samplers              = ::std::move(samplers);
+    options.attributes            = std::move(attribs);
+    options.uniformsNames         = std::move(uniforms);
+    options.uniformBuffersNames   = std::move(uniformBuffers);
+    options.samplers              = std::move(samplers);
     options.materialDefines       = &defines;
-    options.defines               = ::std::move(join);
-    options.fallbacks             = ::std::move(fallbacks);
+    options.defines               = std::move(join);
+    options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters       = ::std::move(indexParameters);
+    options.indexParameters       = std::move(indexParameters);
     options.maxSimultaneousLights = _maxSimultaneousLights;
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
@@ -889,7 +889,7 @@ void BackgroundMaterial::setPrimaryColorHighlightLevel(float value)
 
 BaseTexturePtr BackgroundMaterial::reflectionTexture()
 {
-  return ::std::static_pointer_cast<BaseTexture>(_reflectionTexture);
+  return std::static_pointer_cast<BaseTexture>(_reflectionTexture);
 }
 
 void BackgroundMaterial::setReflectionTexture(
@@ -900,7 +900,7 @@ void BackgroundMaterial::setReflectionTexture(
 
 BaseTexturePtr BackgroundMaterial::diffuseTexture()
 {
-  return ::std::static_pointer_cast<BaseTexture>(_diffuseTexture);
+  return std::static_pointer_cast<BaseTexture>(_diffuseTexture);
 }
 
 void BackgroundMaterial::setDiffuseTexture(const RenderTargetTexturePtr& value)

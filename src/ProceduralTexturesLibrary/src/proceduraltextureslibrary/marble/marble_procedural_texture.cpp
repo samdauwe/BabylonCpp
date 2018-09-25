@@ -93,9 +93,9 @@ Json::object MarbleProceduralTexture::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<MarbleProceduralTexture>
+std::unique_ptr<MarbleProceduralTexture>
 MarbleProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                               Scene* /*scene*/, const string_t& /*rootUrl*/)
+                               Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

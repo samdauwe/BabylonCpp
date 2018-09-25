@@ -136,7 +136,7 @@ void FurMaterial::updateFur()
 {
   for (const auto& mesh : _meshes) {
     if (auto offsetFur
-        = ::std::dynamic_pointer_cast<FurMaterial>(mesh->material())) {
+        = std::dynamic_pointer_cast<FurMaterial>(mesh->material())) {
       offsetFur->furLength      = furLength;
       offsetFur->furAngle       = furAngle;
       offsetFur->furGravity     = furGravity;
@@ -470,7 +470,7 @@ Json::object FurMaterial::serialize() const
   return Json::object();
 }
 
-const string_t FurMaterial::getClassName() const
+const std::string FurMaterial::getClassName() const
 {
   return "FurMaterial";
 }

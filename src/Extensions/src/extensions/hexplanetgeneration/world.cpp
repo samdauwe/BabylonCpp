@@ -1,5 +1,7 @@
 #include <babylon/extensions/hexplanetgeneration/world.h>
 
+#include <cmath>
+
 #include <babylon/core/logging.h>
 #include <babylon/extensions/hexplanetgeneration/icosphere.h>
 #include <babylon/extensions/hexplanetgeneration/planet.h>
@@ -21,7 +23,7 @@
 namespace BABYLON {
 namespace Extensions {
 
-const size_t World::UdefIdx = numeric_limits_t<size_t>::max();
+const size_t World::UdefIdx = std::numeric_limits<size_t>::max();
 
 World::World()
 {

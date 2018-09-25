@@ -27,7 +27,7 @@ public:
   static GeometryBufferRendererSceneComponentPtr New(Ts&&... args)
   {
     return shared_ptr_t<GeometryBufferRendererSceneComponent>(
-      new GeometryBufferRendererSceneComponent(::std::forward<Ts>(args)...));
+      new GeometryBufferRendererSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~GeometryBufferRendererSceneComponent();
 

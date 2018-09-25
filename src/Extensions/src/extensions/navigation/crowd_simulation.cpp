@@ -10,7 +10,7 @@ namespace BABYLON {
 namespace Extensions {
 
 CrowdSimulation::CrowdSimulation()
-    : _simulator{::std::make_unique<RVO2::RVOSimulator>()}
+    : _simulator{std::make_unique<RVO2::RVOSimulator>()}
     , _crowdCollisionAvoidanceSystem{
         CrowdCollisionAvoidanceSystem(_simulator.get())}
 {

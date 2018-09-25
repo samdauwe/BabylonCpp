@@ -158,7 +158,7 @@ InstancedMesh& InstancedMesh::refreshBoundingInfo()
   auto meshBB = _sourceMesh->getBoundingInfo();
 
   _boundingInfo
-    = ::std::make_unique<BoundingInfo>(meshBB.minimum, meshBB.maximum);
+    = std::make_unique<BoundingInfo>(meshBB.minimum, meshBB.maximum);
 
   _updateBoundingInfo();
 
@@ -229,14 +229,14 @@ InstancedMeshPtr InstancedMesh::clone(const std::string& /*iNname*/,
 
   // Parent
   if (newParent) {
-    ::std::static_pointer_cast<Node>(result)->parent = newParent;
+    std::static_pointer_cast<Node>(result)->parent = newParent;
   }
 
   if (!doNotCloneChildren) {
     // Children
     for (auto& mesh : getScene()->meshes) {
       if (mesh->parent() == this) {
-        // mesh->clone(mesh->name, ::std::static_pointer_cast<Node>(result));
+        // mesh->clone(mesh->name, std::static_pointer_cast<Node>(result));
       }
     }
   }
@@ -249,7 +249,7 @@ InstancedMeshPtr InstancedMesh::clone(const std::string& /*iNname*/,
 void InstancedMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   // Remove from mesh
-  _sourceMesh->instances.erase(::std::remove(_sourceMesh->instances.begin(),
+  _sourceMesh->instances.erase(std::remove(_sourceMesh->instances.begin(),
                                              _sourceMesh->instances.end(),
                                              this),
                                _sourceMesh->instances.end());

@@ -34,7 +34,7 @@ void StatsTab::_connectToInstrumentation()
     return;
   }
 
-  _sceneInstrumentation = ::std::make_unique<SceneInstrumentation>(_scene);
+  _sceneInstrumentation = std::make_unique<SceneInstrumentation>(_scene);
   _sceneInstrumentation->captureActiveMeshesEvaluationTime = true;
   _sceneInstrumentation->captureRenderTargetsRenderTime    = true;
   _sceneInstrumentation->captureFrameTime                  = true;
@@ -45,7 +45,7 @@ void StatsTab::_connectToInstrumentation()
   _sceneInstrumentation->capturePhysicsTime                = true;
   _sceneInstrumentation->captureAnimationsTime             = true;
 
-  _engineInstrumentation = ::std::make_unique<EngineInstrumentation>(_engine);
+  _engineInstrumentation = std::make_unique<EngineInstrumentation>(_engine);
   _engineInstrumentation->captureGPUFrameTime = true;
 }
 

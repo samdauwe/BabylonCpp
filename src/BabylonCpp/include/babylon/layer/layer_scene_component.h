@@ -30,7 +30,7 @@ public:
   static LayerSceneComponentPtr New(Ts&&... args)
   {
     return std::shared_ptr<LayerSceneComponent>(
-      new LayerSceneComponent(::std::forward<Ts>(args)...));
+      new LayerSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~LayerSceneComponent();
 

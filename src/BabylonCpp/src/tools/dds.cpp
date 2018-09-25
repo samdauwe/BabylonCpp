@@ -25,7 +25,7 @@ DDSInfo DDSTools::GetDDSInfo(const Uint8Array& arrayBuffer)
 
   int mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT) {
-    mipmapCount = ::std::max(1, header[off_mipmapCount]);
+    mipmapCount = std::max(1, header[off_mipmapCount]);
   }
 
   auto fourCC = header[off_pfFourCC];
@@ -120,15 +120,15 @@ float DDSTools::_FromHalfFloat(uint8_t value)
   auto f = value & 0x03FF;
 
   if (e == 0) {
-    auto result = (s ? -1 : 1) * ::std::pow(2, -14) * (f / std::pow(2, 10));
+    auto result = (s ? -1 : 1) * std::pow(2, -14) * (f / std::pow(2, 10));
     return static_cast<float>(result);
   }
   else if (e == 0x1F) {
-    return f ? 0 : ((s ? -1 : 1) * numeric_limits_t<int>::infinity());
+    return f ? 0 : ((s ? -1 : 1) * std::numeric_limits<int>::infinity());
   }
 
   auto result
-    = (s ? -1 : 1) * ::std::pow(2, e - 15) * (1 + (f / ::std::pow(2, 10)));
+    = (s ? -1 : 1) * std::pow(2, e - 15) * (1 + (f / std::pow(2, 10)));
   return static_cast<float>(result);
 }
 
@@ -350,7 +350,7 @@ void DDSTools::UploadDDSLevels(Engine* engine, InternalTexture* texture,
                                int lodIndex, int currentFace)
 {
   bool hasSphericalPolynomialFaces = false;
-  vector_t<ArrayBufferView> sphericalPolynomialFaces;
+  std::vector<ArrayBufferView> sphericalPolynomialFaces;
   if (info.sphericalPolynomial) {
     hasSphericalPolynomialFaces = true;
   }
@@ -448,7 +448,7 @@ void DDSTools::UploadDDSLevels(Engine* engine, InternalTexture* texture,
 
   int mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT && loadMipmaps) {
-    mipmapCount = ::std::max(1, header[off_mipmapCount]);
+    mipmapCount = std::max(1, header[off_mipmapCount]);
   }
 
   for (unsigned int face = 0; face < faces; ++face) {
@@ -487,7 +487,7 @@ void DDSTools::UploadDDSLevels(Engine* engine, InternalTexture* texture,
           int unpackAlignment   = engine->_getUnpackAlignement();
           float unpaddedRowSize = width;
           float paddedRowSize
-            = ::std::floor((width + unpackAlignment - 1) / unpackAlignment)
+            = std::floor((width + unpackAlignment - 1) / unpackAlignment)
               * unpackAlignment;
           dataLength = static_cast<size_t>(paddedRowSize * (height - 1)
                                            + unpaddedRowSize);
@@ -501,9 +501,8 @@ void DDSTools::UploadDDSLevels(Engine* engine, InternalTexture* texture,
           engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
         }
         else {
-          dataLength
-            = static_cast<size_t>(::std::max(4.f, width) / 4
-                                  * ::std::max(4.f, height) / 4 * blockBytes);
+          dataLength = static_cast<size_t>(
+            std::max(4.f, width) / 4 * std::max(4.f, height) / 4 * blockBytes);
           byteArray = Uint8Array(
             reinterpret_cast<const int*>(arrayBuffer.data() + dataOffset),
             reinterpret_cast<const int*>(arrayBuffer.data() + dataLength));
@@ -518,8 +517,8 @@ void DDSTools::UploadDDSLevels(Engine* engine, InternalTexture* texture,
       width *= 0.5f;
       height *= 0.5f;
 
-      width  = ::std::max(1.f, width);
-      height = ::std::max(1.f, height);
+      width  = std::max(1.f, width);
+      height = std::max(1.f, height);
     }
 
     if (currentFace != -1) {

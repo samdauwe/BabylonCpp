@@ -21,7 +21,7 @@ public:
   static BoxGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<BoxGeometry>(
-      new BoxGeometry(::std::forward<Ts>(args)...));
+      new BoxGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

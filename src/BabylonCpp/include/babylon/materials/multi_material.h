@@ -16,7 +16,7 @@ public:
   static MultiMaterialPtr New(Ts&&... args)
   {
     auto material = std::shared_ptr<MultiMaterial>(
-      new MultiMaterial(::std::forward<Ts>(args)...));
+      new MultiMaterial(std::forward<Ts>(args)...));
     material->addMultiMaterialToScene(material);
 
     return material;

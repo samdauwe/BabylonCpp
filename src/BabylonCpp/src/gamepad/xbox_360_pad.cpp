@@ -56,13 +56,13 @@ Xbox360Pad::~Xbox360Pad()
 }
 
 void Xbox360Pad::setOnlefttriggerchanged(
-  const ::std::function<void(float value)>& callback)
+  const std::function<void(float value)>& callback)
 {
   _onlefttriggerchanged = callback;
 }
 
 void Xbox360Pad::onrighttriggerchanged(
-  const ::std::function<void(float value)>& callback)
+  const std::function<void(float value)>& callback)
 {
   _onrighttriggerchanged = callback;
 }
@@ -96,25 +96,25 @@ void Xbox360Pad::set_rightTrigger(float newValue)
 }
 
 void Xbox360Pad::onbuttondown(
-  const ::std::function<void(Xbox360Button buttonPressed)>& callback)
+  const std::function<void(Xbox360Button buttonPressed)>& callback)
 {
   _onbuttondown = callback;
 }
 
 void Xbox360Pad::onbuttonup(
-  const ::std::function<void(Xbox360Button buttonReleased)>& callback)
+  const std::function<void(Xbox360Button buttonReleased)>& callback)
 {
   _onbuttonup = callback;
 }
 
 void Xbox360Pad::ondpaddown(
-  const ::std::function<void(Xbox360Dpad dPadPressed)>& callback)
+  const std::function<void(Xbox360Dpad dPadPressed)>& callback)
 {
   _ondpaddown = callback;
 }
 
 void Xbox360Pad::ondpadup(
-  const ::std::function<void(Xbox360Dpad dPadReleased)>& callback)
+  const std::function<void(Xbox360Dpad dPadReleased)>& callback)
 {
   _ondpadup = callback;
 }

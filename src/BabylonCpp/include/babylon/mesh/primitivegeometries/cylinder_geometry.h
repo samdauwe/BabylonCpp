@@ -21,7 +21,7 @@ public:
   static CylinderGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<CylinderGeometry>(
-      new CylinderGeometry(::std::forward<Ts>(args)...));
+      new CylinderGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

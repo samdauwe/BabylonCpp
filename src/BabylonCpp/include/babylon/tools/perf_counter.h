@@ -57,17 +57,17 @@ public:
   }
 
   PerfCounter(PerfCounter&& other)
-      : _startMonitoringTime{::std::move(other._startMonitoringTime)}
-      , _min{::std::move(other._min)}
-      , _max{::std::move(other._max)}
-      , _average{::std::move(other._average)}
-      , _current{::std::move(other._current)}
-      , _totalValueCount{::std::move(other._totalValueCount)}
-      , _totalAccumulated{::std::move(other._totalAccumulated)}
-      , _lastSecAverage{::std::move(other._lastSecAverage)}
-      , _lastSecAccumulated{::std::move(other._lastSecAccumulated)}
-      , _lastSecTime{::std::move(other._lastSecTime)}
-      , _lastSecValueCount{::std::move(other._lastSecValueCount)}
+      : _startMonitoringTime{std::move(other._startMonitoringTime)}
+      , _min{std::move(other._min)}
+      , _max{std::move(other._max)}
+      , _average{std::move(other._average)}
+      , _current{std::move(other._current)}
+      , _totalValueCount{std::move(other._totalValueCount)}
+      , _totalAccumulated{std::move(other._totalAccumulated)}
+      , _lastSecAverage{std::move(other._lastSecAverage)}
+      , _lastSecAccumulated{std::move(other._lastSecAccumulated)}
+      , _lastSecTime{std::move(other._lastSecTime)}
+      , _lastSecValueCount{std::move(other._lastSecValueCount)}
   {
   }
 
@@ -93,17 +93,17 @@ public:
   PerfCounter& operator=(PerfCounter&& other)
   {
     if (&other != this) {
-      _startMonitoringTime = ::std::move(other._startMonitoringTime);
-      _min                 = ::std::move(other._min);
-      _max                 = ::std::move(other._max);
-      _average             = ::std::move(other._average);
-      _current             = ::std::move(other._current);
-      _totalValueCount     = ::std::move(other._totalValueCount);
-      _totalAccumulated    = ::std::move(other._totalAccumulated);
-      _lastSecAverage      = ::std::move(other._lastSecAverage);
-      _lastSecAccumulated  = ::std::move(other._lastSecAccumulated);
-      _lastSecTime         = ::std::move(other._lastSecTime);
-      _lastSecValueCount   = ::std::move(other._lastSecValueCount);
+      _startMonitoringTime = std::move(other._startMonitoringTime);
+      _min                 = std::move(other._min);
+      _max                 = std::move(other._max);
+      _average             = std::move(other._average);
+      _current             = std::move(other._current);
+      _totalValueCount     = std::move(other._totalValueCount);
+      _totalAccumulated    = std::move(other._totalAccumulated);
+      _lastSecAverage      = std::move(other._lastSecAverage);
+      _lastSecAccumulated  = std::move(other._lastSecAccumulated);
+      _lastSecTime         = std::move(other._lastSecTime);
+      _lastSecValueCount   = std::move(other._lastSecValueCount);
     }
 
     return *this;
@@ -216,7 +216,7 @@ public:
     }
 
     auto currentTime = Time::highresTimepointNow();
-    _current = Time::fpTimeDiff<size_t, ::std::milli>(_startMonitoringTime,
+    _current = Time::fpTimeDiff<size_t, std::milli>(_startMonitoringTime,
                                                       currentTime);
 
     if (newFrame) {
@@ -231,14 +231,14 @@ private:
     _lastSecAccumulated += _current;
 
     // Min/Max update
-    _min     = ::std::min(_min, _current);
-    _max     = ::std::max(_max, _current);
+    _min     = std::min(_min, _current);
+    _max     = std::max(_max, _current);
     _average = static_cast<double>(_totalAccumulated)
                / static_cast<double>(_totalValueCount);
 
     // Reset last sec?
     auto now = Time::highresTimepointNow();
-    if (Time::fpTimeDiff<double, ::std::milli>(_lastSecTime, now) > 1000.0) {
+    if (Time::fpTimeDiff<double, std::milli>(_lastSecTime, now) > 1000.0) {
       _lastSecAverage = static_cast<double>(_lastSecAccumulated)
                         / static_cast<double>(_lastSecValueCount);
       _lastSecTime        = now;

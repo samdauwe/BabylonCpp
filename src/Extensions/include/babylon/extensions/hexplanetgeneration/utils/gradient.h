@@ -1,7 +1,11 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTIL_GRADIENT_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTIL_GRADIENT_H
 
-#include <babylon/babylon_global.h>
+#include <cmath>
+#include <utility>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 namespace Extensions {

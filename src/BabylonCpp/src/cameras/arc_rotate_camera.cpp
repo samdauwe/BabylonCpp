@@ -53,7 +53,7 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , zoomOnFactor{1.f}
     , targetScreenOffset{Vector2::Zero()}
     , allowUpsideDown{true}
-    , panningAxis{::std::make_unique<Vector3>(1.f, 1.f, 0.f)}
+    , panningAxis{std::make_unique<Vector3>(1.f, 1.f, 0.f)}
     , bouncingBehavior{this, &ArcRotateCamera::get_bouncingBehavior}
     , useBouncingBehavior{this, &ArcRotateCamera::get_useBouncingBehavior,
                           &ArcRotateCamera::set_useBouncingBehavior}
@@ -65,7 +65,7 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
                               &ArcRotateCamera::get_useAutoRotationBehavior,
                               &ArcRotateCamera::set_useAutoRotationBehavior}
     , checkCollisions{false}
-    , collisionRadius{::std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
+    , collisionRadius{std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
     , _target{Vector3::Zero()}
     , _targetHost{nullptr}
     , _collider{nullptr}
@@ -82,7 +82,7 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     setTarget(*iTarget);
   }
   getViewMatrix();
-  inputs = ::std::make_unique<ArcRotateCameraInputsManager>(this);
+  inputs = std::make_unique<ArcRotateCameraInputsManager>(this);
   inputs->addKeyboard().addMouseWheel().addPointers();
 }
 
@@ -244,13 +244,13 @@ void ArcRotateCamera::_checkInputs()
     inertialAlphaOffset *= inertia;
     inertialBetaOffset *= inertia;
     inertialRadiusOffset *= inertia;
-    if (::std::abs(inertialAlphaOffset) < Math::Epsilon) {
+    if (std::abs(inertialAlphaOffset) < Math::Epsilon) {
       inertialAlphaOffset = 0.f;
     }
-    if (::std::abs(inertialBetaOffset) < Math::Epsilon) {
+    if (std::abs(inertialBetaOffset) < Math::Epsilon) {
       inertialBetaOffset = 0.f;
     }
-    if (::std::abs(inertialRadiusOffset) < speed * Math::Epsilon) {
+    if (std::abs(inertialRadiusOffset) < speed * Math::Epsilon) {
       inertialRadiusOffset = 0.f;
     }
   }
@@ -259,7 +259,7 @@ void ArcRotateCamera::_checkInputs()
   if (!stl_util::almost_equal(inertialPanningX, 0.f)
       || !stl_util::almost_equal(inertialPanningY, 0.f)) {
     if (!_localDirection) {
-      _localDirection       = ::std::make_unique<Vector3>(Vector3::Zero());
+      _localDirection       = std::make_unique<Vector3>(Vector3::Zero());
       _transformedDirection = Vector3::Zero();
     }
 
@@ -292,10 +292,10 @@ void ArcRotateCamera::_checkInputs()
     inertialPanningX *= panningInertia;
     inertialPanningY *= panningInertia;
 
-    if (::std::abs(inertialPanningX) < speed * Math::Epsilon) {
+    if (std::abs(inertialPanningX) < speed * Math::Epsilon) {
       inertialPanningX = 0.f;
     }
-    if (::std::abs(inertialPanningY) < speed * Math::Epsilon) {
+    if (std::abs(inertialPanningY) < speed * Math::Epsilon) {
       inertialPanningY = 0.f;
     }
   }
@@ -355,16 +355,16 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
   }
 
   // Alpha
-  alpha = ::std::acos(_computationVector.x
-                      / ::std::sqrt(::std::pow(_computationVector.x, 2.f)
-                                    + ::std::pow(_computationVector.z, 2.f)));
+  alpha = std::acos(_computationVector.x
+                      / std::sqrt(std::pow(_computationVector.x, 2.f)
+                                    + std::pow(_computationVector.z, 2.f)));
 
   if (_computationVector.z < 0.f) {
     alpha = Math::PI2 - alpha;
   }
 
   // Beta
-  beta = ::std::acos(_computationVector.y / radius);
+  beta = std::acos(_computationVector.y / radius);
 
   _checkLimits();
 }
@@ -439,7 +439,7 @@ void ArcRotateCamera::set_useBouncingBehavior(bool value)
   }
 
   if (value) {
-    _bouncingBehavior = ::std::make_unique<BouncingBehavior>();
+    _bouncingBehavior = std::make_unique<BouncingBehavior>();
     addBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
   }
   else if (_bouncingBehavior) {
@@ -465,7 +465,7 @@ void ArcRotateCamera::set_useFramingBehavior(bool value)
   }
 
   if (value) {
-    _framingBehavior = ::std::make_unique<FramingBehavior>();
+    _framingBehavior = std::make_unique<FramingBehavior>();
     addBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
   }
   else if (_framingBehavior) {
@@ -491,7 +491,7 @@ void ArcRotateCamera::set_useAutoRotationBehavior(bool value)
   }
 
   if (value) {
-    _autoRotationBehavior = ::std::make_unique<AutoRotationBehavior>();
+    _autoRotationBehavior = std::make_unique<AutoRotationBehavior>();
     addBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
   }
   else if (_autoRotationBehavior) {
@@ -503,10 +503,10 @@ void ArcRotateCamera::set_useAutoRotationBehavior(bool value)
 Matrix ArcRotateCamera::_getViewMatrix()
 {
   // Compute
-  const float cosa = ::std::cos(alpha);
-  const float sina = ::std::sin(alpha);
-  const float cosb = ::std::cos(beta);
-  float sinb       = ::std::sin(beta);
+  const float cosa = std::cos(alpha);
+  const float sina = std::sin(alpha);
+  const float cosb = std::cos(beta);
+  float sinb       = std::sin(beta);
 
   if (sinb == 0.f) {
     sinb = 0.0001f;
@@ -518,7 +518,7 @@ Matrix ArcRotateCamera::_getViewMatrix()
   _target.addToRef(_computationVector, _newPosition);
   if (getScene()->collisionsEnabled && checkCollisions) {
     if (!_collider) {
-      _collider = ::std::make_unique<Collider>();
+      _collider = std::make_unique<Collider>();
     }
     _collider->_radius = *collisionRadius;
     _newPosition.subtractToRef(position, _collisionVelocity);
@@ -568,10 +568,10 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   }
 
   // Recompute because of constraints
-  const float cosa = ::std::cos(alpha);
-  const float sina = ::std::sin(alpha);
-  const float cosb = ::std::cos(beta);
-  float sinb       = ::std::sin(beta);
+  const float cosa = std::cos(alpha);
+  const float sina = std::sin(alpha);
+  const float cosb = std::cos(beta);
+  float sinb       = std::sin(beta);
 
   if (sinb == 0.f) {
     sinb = 0.0001f;
@@ -646,8 +646,8 @@ CameraPtr ArcRotateCamera::createRigCamera(const string_t& iName,
 
 void ArcRotateCamera::_updateRigCameras()
 {
-  auto camLeft  = ::std::static_pointer_cast<ArcRotateCamera>(_rigCameras[0]);
-  auto camRight = ::std::static_pointer_cast<ArcRotateCamera>(_rigCameras[1]);
+  auto camLeft  = std::static_pointer_cast<ArcRotateCamera>(_rigCameras[0]);
+  auto camRight = std::static_pointer_cast<ArcRotateCamera>(_rigCameras[1]);
 
   camLeft->beta = camRight->beta = beta;
   camLeft->radius = camRight->radius = radius;

@@ -30,7 +30,7 @@
 
 namespace BABYLON {
 
-::std::function<std::string(std::string url)> Tools::PreprocessUrl
+std::function<std::string(std::string url)> Tools::PreprocessUrl
   = [](std::string url) {
       if (String::startsWith(url, "file:")) {
         url = url.substr(5);
@@ -52,8 +52,8 @@ namespace BABYLON {
 void Tools::FetchToRef(int u, int v, int width, int height,
                        const Uint8Array& pixels, Color4& color)
 {
-  auto wrappedU = ((::std::abs(u) * width) % width);
-  auto wrappedV = ((::std::abs(v) * height) % height);
+  auto wrappedU = ((std::abs(u) * width) % width);
+  auto wrappedV = ((std::abs(v) * height) % height);
 
   auto position = static_cast<size_t>((wrappedU + wrappedV * width) * 4);
   color.r       = pixels[position] / 255;
@@ -123,7 +123,7 @@ int Tools::GetExponentOfTwo(int value, int max, unsigned int mode)
       break;
   }
 
-  return ::std::min(pot, max);
+  return std::min(pot, max);
 }
 
 std::string Tools::GetFilename(const std::string& path)
@@ -232,7 +232,7 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
 }
 
 MinMaxVector2 Tools::ExtractMinAndMaxVector2(
-  const ::std::function<std::optional<Vector2>(std::size_t index)>& feeder,
+  const std::function<std::optional<Vector2>(std::size_t index)>& feeder,
   const std::optional<Vector2>& bias)
 {
   Vector2 minimum(std::numeric_limits<float>::max(),
@@ -278,8 +278,8 @@ Image Tools::CreateCheckerboardImage(unsigned int size)
     for (unsigned int y = 0; y < size; ++y) {
       float yf              = static_cast<float>(y);
       unsigned int position = (x + size * y) * 4;
-      auto floorX = static_cast<std::uint8_t>(::std::floor(xf / (size / 8.f)));
-      auto floorY = static_cast<std::uint8_t>(::std::floor(yf / (size / 8.f)));
+      auto floorX = static_cast<std::uint8_t>(std::floor(xf / (size / 8.f)));
+      auto floorY = static_cast<std::uint8_t>(std::floor(yf / (size / 8.f)));
 
       if ((floorX + floorY) % 2 == 0) {
         r = g = b = 255;
@@ -313,7 +313,7 @@ Image Tools::CreateNoiseImage(unsigned int size)
   std::uint8_t value = 0;
   for (std::size_t i = 0; i < totalPixelsCount; i += 4) {
     value = static_cast<std::uint8_t>(
-      ::std::floor((randomNumbers[i] * (0.02f - 0.95f) + 0.95f) * 255.f));
+      std::floor((randomNumbers[i] * (0.02f - 0.95f) + 0.95f) * 255.f));
     imageData[i]     = value;
     imageData[i + 1] = value;
     imageData[i + 2] = value;
@@ -335,8 +335,8 @@ std::string Tools::DecodeURIComponent(const std::string& s)
 }
 
 void Tools::LoadImageFromUrl(
-  std::string url, const ::std::function<void(const Image& img)>& onLoad,
-  const ::std::function<void(const std::string& msg)>& onError,
+  std::string url, const std::function<void(const Image& img)>& onLoad,
+  const std::function<void(const std::string& msg)>& onError,
   bool flipVertically)
 {
   url = Tools::CleanUrl(url);
@@ -345,7 +345,7 @@ void Tools::LoadImageFromUrl(
 
   if (String::startsWith(url, "file:")) {
     using stbi_ptr
-      = std::unique_ptr<unsigned char, ::std::function<void(unsigned char*)>>;
+      = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
 
     int w, h, n;
     stbi_set_flip_vertically_on_load(flipVertically);
@@ -369,11 +369,11 @@ void Tools::LoadImageFromUrl(
 
 void Tools::LoadFile(
   std::string url,
-  const ::std::function<void(const std::string& data,
+  const std::function<void(const std::string& data,
                              const std::string& responseURL)>& onSuccess,
-  const ::std::function<void(const ProgressEvent& event)>& onProgress,
+  const std::function<void(const ProgressEvent& event)>& onProgress,
   bool useArrayBuffer,
-  const ::std::function<void(const std::string& exception)>& onError)
+  const std::function<void(const std::string& exception)>& onError)
 {
   url = Tools::CleanUrl(url);
 
@@ -396,9 +396,9 @@ void Tools::LoadFile(
 
 void Tools::ReadFile(
   std::string fileToLoad,
-  const ::std::function<void(const std::string& data,
+  const std::function<void(const std::string& data,
                              const std::string& responseURL)>& callback,
-  const ::std::function<void(const ProgressEvent& event)>& onProgress,
+  const std::function<void(const ProgressEvent& event)>& onProgress,
   bool useArrayBuffer)
 {
   if (!Filesystem::exists(fileToLoad)) {
@@ -471,7 +471,7 @@ std::string Tools::RandomId()
   return randomId;
 }
 
-void Tools::SetImmediate(const ::std::function<void()>& immediate)
+void Tools::SetImmediate(const std::function<void()>& immediate)
 {
   if (immediate) {
     immediate();

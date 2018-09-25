@@ -37,7 +37,7 @@ MorphTargetManager::~MorphTargetManager()
 void MorphTargetManager::addToScene(
   std::unique_ptr<MorphTargetManager>&& newMorphTargetManager)
 {
-  _scene->morphTargetManagers.emplace_back(::std::move(newMorphTargetManager));
+  _scene->morphTargetManagers.emplace_back(std::move(newMorphTargetManager));
 }
 
 size_t MorphTargetManager::get_uniqueId() const
@@ -95,7 +95,7 @@ MorphTarget* MorphTargetManager::getTarget(std::size_t index)
 
 void MorphTargetManager::addTarget(std::unique_ptr<MorphTarget>&& target)
 {
-  _targets.emplace_back(::std::move(target));
+  _targets.emplace_back(std::move(target));
   _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add(
     [this](bool needUpdate, EventState&) { _syncActiveTargets(needUpdate); }));
   _syncActiveTargets(true);
@@ -103,7 +103,7 @@ void MorphTargetManager::addTarget(std::unique_ptr<MorphTarget>&& target)
 
 void MorphTargetManager::removeTarget(MorphTarget* target)
 {
-  auto it = ::std::find_if(_targets.begin(), _targets.end(),
+  auto it = std::find_if(_targets.begin(), _targets.end(),
                            [target](const MorphTargetPtr& morphTarget) {
                              return target == morphTarget.get();
                            });
@@ -171,7 +171,7 @@ void MorphTargetManager::synchronize()
   }
   // Flag meshes as dirty to resync with the active targets
   for (auto& abstractMesh : _scene->meshes) {
-    auto mesh = ::std::static_pointer_cast<Mesh>(abstractMesh);
+    auto mesh = std::static_pointer_cast<Mesh>(abstractMesh);
     if (mesh && (mesh->morphTargetManager().get() == this)) {
       mesh->_syncGeometryWithMorphTargetManager();
     }

@@ -1,16 +1,20 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_GRADIENT_GRADIENT_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_GRADIENT_GRADIENT_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/gradient/gradient_material_defines.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class IAnimatable;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+
 namespace MaterialsLibrary {
 
 class GradientMaterial;
-using GradientMaterialPtr = shared_ptr_t<GradientMaterial>;
+using GradientMaterialPtr = std::shared_ptr<GradientMaterial>;
 
 class BABYLON_SHARED_EXPORT GradientMaterial : public PushMaterial {
 
@@ -18,8 +22,8 @@ public:
   template <typename... Ts>
   static GradientMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<GradientMaterial>(
-      new GradientMaterial(::std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<GradientMaterial>(
+      new GradientMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -36,7 +40,7 @@ public:
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables();
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,

@@ -114,11 +114,11 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto n  = _curveNumberOfPoints; // Number of points
   for (unsigned int i = 0; i < _curveNumberOfPoints + 1; ++i) {
     _points.emplace_back(
-      Vector3((r + (r / 5.f) * ::std::sin(8.f * i * Math::PI / n))
-                * ::std::sin(2.f * i * Math::PI / n),
+      Vector3((r + (r / 5.f) * std::sin(8.f * i * Math::PI / n))
+                * std::sin(2.f * i * Math::PI / n),
               0.f,
-              (r + (r / 10.f) * ::std::sin(6.f * i * Math::PI / n))
-                * ::std::cos(2.f * i * Math::PI / n)));
+              (r + (r / 10.f) * std::sin(6.f * i * Math::PI / n))
+                * std::cos(2.f * i * Math::PI / n)));
   }
 
   // Draw the curve
@@ -143,7 +143,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   Path3D path3d(_points);
   _normals   = path3d.getNormals();
   auto zAxis = Axis::Z();
-  auto theta = ::std::acos(Vector3::Dot(zAxis, _normals[0]));
+  auto theta = std::acos(Vector3::Dot(zAxis, _normals[0]));
   auto yAxis = Axis::Y();
   _carBody->rotate(yAxis, theta, Space::WORLD);
   _startRotation = *_carBody->rotationQuaternion();
@@ -160,9 +160,9 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
     _wheelRI->rotate(_normals[i], Math::PI / 32.f, Space::WORLD);
     _wheelRO->rotate(_normals[i], Math::PI / 32.f, Space::WORLD);
 
-    auto theta = ::std::acos(Vector3::Dot(_normals[i], _normals[i + 1]));
+    auto theta = std::acos(Vector3::Dot(_normals[i], _normals[i + 1]));
     auto dir   = Vector3::Cross(_normals[i], _normals[i + 1]).y;
-    dir        = dir / ::std::abs(dir);
+    dir        = dir / std::abs(dir);
     auto yAxis = Axis::Y();
     _carBody->rotate(yAxis, dir * theta, Space::WORLD);
 

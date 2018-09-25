@@ -1,10 +1,21 @@
 #ifndef BABYLON_PARTICLES_PARTICLE_HELPER_H
 #define BABYLON_PARTICLES_PARTICLE_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/variant.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+struct IParticleSystem;
+class ParticleSystem;
+class ParticleSystemSet;
+class Scene;
+class Vector3;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief This class is made for on one-liner static method to help creating
@@ -38,8 +49,9 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    * @param gpu If the system will use gpu
    * @returns the ParticleSystemSet created
    */
-  static ParticleSystemSet*
-  CreateAsync(const string_t& type, Scene* scene = nullptr, bool gpu = false);
+  static ParticleSystemSet* CreateAsync(const std::string& type,
+                                        Scene* scene = nullptr,
+                                        bool gpu     = false);
 
   /**
    * @brief Static function used to export a particle system to a
@@ -47,8 +59,8 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    * exported
    * @param system defines the particle systems to export
    */
-  static unique_ptr_t<ParticleSystemSet>
-  ExportSet(const vector_t<IParticleSystem*>& systems);
+  static std::unique_ptr<ParticleSystemSet>
+  ExportSet(const std::vector<IParticleSystem*>& systems);
 
 }; // end of class ParticleHelper
 

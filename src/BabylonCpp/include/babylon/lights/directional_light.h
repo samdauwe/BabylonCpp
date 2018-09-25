@@ -28,7 +28,7 @@ public:
   static DirectionalLightPtr New(Ts&&... args)
   {
     auto light = std::shared_ptr<DirectionalLight>(
-      new DirectionalLight(::std::forward<Ts>(args)...));
+      new DirectionalLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;

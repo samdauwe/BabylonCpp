@@ -19,7 +19,7 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
   }
 
   _engine        = scene->getEngine();
-  _textureMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
+  _textureMatrix = std::make_unique<Matrix>(Matrix::Identity());
   name           = iUrl;
   url            = iUrl;
   hasAlpha       = false;
@@ -106,13 +106,13 @@ InternalTexture* ColorGradingTexture::load3dlTexture()
       }
 
       if (size != 0) {
-        int r = ::std::max(::std::stoi(words[0]), 0);
-        int g = ::std::max(::std::stoi(words[1]), 0);
-        int b = ::std::max(::std::stoi(words[2]), 0);
+        int r = std::max(std::stoi(words[0]), 0);
+        int g = std::max(std::stoi(words[1]), 0);
+        int b = std::max(std::stoi(words[2]), 0);
 
-        maxColor = ::std::max(r, maxColor);
-        maxColor = ::std::max(g, maxColor);
-        maxColor = ::std::max(b, maxColor);
+        maxColor = std::max(r, maxColor);
+        maxColor = std::max(g, maxColor);
+        maxColor = std::max(b, maxColor);
 
         size_t pixelStorageIndex
           = (pixelIndexW + pixelIndexSlice * size + pixelIndexH * size * size)
@@ -183,7 +183,7 @@ void ColorGradingTexture::loadTexture()
 
 std::unique_ptr<ColorGradingTexture> ColorGradingTexture::clone() const
 {
-  auto newTexture = ::std::make_unique<ColorGradingTexture>(url, getScene());
+  auto newTexture = std::make_unique<ColorGradingTexture>(url, getScene());
 
   // Base texture
   newTexture->level = level;
@@ -213,7 +213,7 @@ ColorGradingTexture::Parse(const Json::value& parsedTexture, Scene* scene,
   if (parsedTexture.contains("name")
       && !Json::GetBool(parsedTexture, "isRenderTarget")) {
     auto parsedTextureName = Json::GetString(parsedTexture, "name");
-    texture = ::std::make_unique<ColorGradingTexture>(parsedTextureName, scene);
+    texture = std::make_unique<ColorGradingTexture>(parsedTextureName, scene);
     texture->name  = parsedTextureName;
     texture->level = Json::GetNumber<float>(parsedTexture, "level", 0.f);
   }

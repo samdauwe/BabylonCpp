@@ -51,43 +51,43 @@ inline std::deque<T>& FromJson(std::deque<T>& items,
 }
 
 template <class T,
-          typename ::std::enable_if<::std::is_same<T, int>::value, int>::type
+          typename std::enable_if<std::is_same<T, int>::value, int>::type
           = 0>
 inline std::pair<std::string, picojson::value> Pair(const std::string& name,
                                                     int value)
 {
-  return ::std::make_pair(name, picojson::value(static_cast<double>(value)));
+  return std::make_pair(name, picojson::value(static_cast<double>(value)));
 }
 
-template <class T, typename ::std::enable_if<
-                     ::std::is_same<T, unsigned int>::value, unsigned int>::type
+template <class T, typename std::enable_if<
+                     std::is_same<T, unsigned int>::value, unsigned int>::type
                    = 0>
 inline std::pair<std::string, picojson::value> Pair(const std::string& name,
                                                     unsigned int value)
 {
-  return ::std::make_pair(name, picojson::value(static_cast<double>(value)));
+  return std::make_pair(name, picojson::value(static_cast<double>(value)));
 }
 
 template <
   class T,
-  typename ::std::enable_if<::std::is_same<T, size_t>::value, size_t>::type = 0>
+  typename std::enable_if<std::is_same<T, size_t>::value, size_t>::type = 0>
 inline std::pair<std::string, picojson::value> Pair(const std::string& name,
                                                     size_t value)
 {
-  return ::std::make_pair(name, picojson::value(static_cast<double>(value)));
+  return std::make_pair(name, picojson::value(static_cast<double>(value)));
 }
 
 template <class T,
-          typename ::std::enable_if<!::std::is_same<T, int>::value, int>::type
+          typename std::enable_if<!std::is_same<T, int>::value, int>::type
           = 0>
 inline std::pair<std::string, picojson::value> Pair(const std::string& name,
                                                     const T& value)
 {
-  return ::std::make_pair(name, picojson::value(value));
+  return std::make_pair(name, picojson::value(value));
 }
 
 template <class T,
-          typename ::std::enable_if<::std::is_same<T, int>::value, int>::type
+          typename std::enable_if<std::is_same<T, int>::value, int>::type
           = 0>
 inline Json::value NameValuePair(const std::string& name, int value)
 {
@@ -97,7 +97,7 @@ inline Json::value NameValuePair(const std::string& name, int value)
 }
 
 template <class T,
-          typename ::std::enable_if<!::std::is_same<T, int>::value, int>::type
+          typename std::enable_if<!std::is_same<T, int>::value, int>::type
           = 0>
 inline Json::value NameValuePair(const std::string& name, const T& value)
 {

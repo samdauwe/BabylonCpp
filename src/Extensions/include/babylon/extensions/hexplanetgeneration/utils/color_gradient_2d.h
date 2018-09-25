@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_COLOR_GRADIENT_2D_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_COLOR_GRADIENT_2D_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {

@@ -18,7 +18,7 @@ bool RenderingManager::AUTOCLEAR = true;
 RenderingManager::RenderingManager(Scene* scene)
     : _useSceneAutoClearSetup{false}
     , _scene{scene}
-    , _renderingGroupInfo{::std::make_unique<RenderingGroupInfo>()}
+    , _renderingGroupInfo{std::make_unique<RenderingGroupInfo>()}
 {
   _autoClearDepthStencil.resize(MAX_RENDERINGGROUPS);
   _customOpaqueSortCompareFn.resize(MAX_RENDERINGGROUPS);
@@ -49,11 +49,11 @@ void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
 }
 
 void RenderingManager::render(
-  ::std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
+  std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
                        const vector_t<SubMeshPtr>& alphaTestSubMeshes,
                        const vector_t<SubMeshPtr>& transparentSubMeshes,
                        const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-                       const ::std::function<void()>& beforeTransparents)>
+                       const std::function<void()>& beforeTransparents)>
     customRenderFunction,
   const vector_t<AbstractMeshPtr>& activeMeshes, bool renderParticles,
   bool renderSprites)
@@ -82,7 +82,7 @@ void RenderingManager::render(
       continue;
     }
 
-    auto renderingGroupMask = static_cast<int>(::std::pow(2, index));
+    auto renderingGroupMask = static_cast<int>(std::pow(2, index));
     info->renderingGroupId  = index;
 
     // Before Observable
@@ -170,7 +170,7 @@ void RenderingManager::_prepareRenderingGroup(unsigned int renderingGroupId)
   }
 
   if (!_renderingGroups[renderingGroupId]) {
-    _renderingGroups[renderingGroupId] = ::std::make_unique<RenderingGroup>(
+    _renderingGroups[renderingGroupId] = std::make_unique<RenderingGroup>(
       renderingGroupId, _scene, _customOpaqueSortCompareFn[renderingGroupId],
       _customAlphaTestSortCompareFn[renderingGroupId],
       _customTransparentSortCompareFn[renderingGroupId]);
@@ -210,11 +210,11 @@ void RenderingManager::dispatch(const SubMeshPtr& subMesh, AbstractMesh* mesh,
 
 void RenderingManager::setRenderingOrder(
   unsigned int renderingGroupId,
-  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
     opaqueSortCompareFn,
-  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
     alphaTestSortCompareFn,
-  const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
     transparentSortCompareFn)
 {
   _customOpaqueSortCompareFn[renderingGroupId]      = opaqueSortCompareFn;

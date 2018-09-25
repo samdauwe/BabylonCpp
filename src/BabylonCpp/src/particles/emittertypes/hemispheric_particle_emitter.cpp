@@ -44,17 +44,17 @@ void HemisphericParticleEmitter::startPositionFunction(
   auto randRadius = radius - Scalar::RandomRange(0.f, radius * radiusRange);
   auto v          = Scalar::RandomRange(0.f, 1.f);
   auto phi        = Scalar::RandomRange(0.f, Math::PI2);
-  auto theta      = ::std::acos(2.f * v - 1.f);
-  auto randX      = randRadius * ::std::cos(phi) * ::std::sin(theta);
-  auto randY      = randRadius * ::std::cos(theta);
-  auto randZ      = randRadius * ::std::sin(phi) * ::std::sin(theta);
-  Vector3::TransformCoordinatesFromFloatsToRef(randX, ::std::abs(randY), randZ,
+  auto theta      = std::acos(2.f * v - 1.f);
+  auto randX      = randRadius * std::cos(phi) * std::sin(theta);
+  auto randY      = randRadius * std::cos(theta);
+  auto randZ      = randRadius * std::sin(phi) * std::sin(theta);
+  Vector3::TransformCoordinatesFromFloatsToRef(randX, std::abs(randY), randZ,
                                                worldMatrix, positionToUpdate);
 }
 
-unique_ptr_t<IParticleEmitterType> HemisphericParticleEmitter::clone() const
+std::unique_ptr<IParticleEmitterType> HemisphericParticleEmitter::clone() const
 {
-  auto newOne = ::std::make_unique<HemisphericParticleEmitter>();
+  auto newOne = std::make_unique<HemisphericParticleEmitter>();
 
   return newOne;
 }

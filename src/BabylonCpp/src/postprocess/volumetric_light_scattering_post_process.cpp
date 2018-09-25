@@ -30,7 +30,7 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
         {"decay", "exposure", "weight", "meshPositionOnScreen", "density"},
         {"lightScatteringSampler"}, ToVariant<float, PostProcessOptions>(ratio),
         camera, samplingMode, engine, reusable,
-        "#define NUM_SAMPLES " + ::std::to_string(samples))
+        "#define NUM_SAMPLES " + std::to_string(samples))
     , attachedNode{nullptr}
     , customMeshPosition{Vector3::Zero()}
     , useCustomMeshPosition{false}
@@ -122,10 +122,10 @@ bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
     attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
     attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + ::std::to_string(mesh->numBoneInfluencers()));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string(
+      + std::to_string(
           mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) : 0));
   }
   else {
@@ -150,11 +150,11 @@ bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
       {"fragmentElement", "volumetricLightScatteringPass"}};
 
     EffectCreationOptions options;
-    options.attributes = ::std::move(attribs);
+    options.attributes = std::move(attribs);
     options.uniformsNames
       = {"world", "mBones", "viewProjection", "diffuseMatrix"};
     options.samplers = {"diffuseSampler"};
-    options.defines  = ::std::move(join);
+    options.defines  = std::move(join);
 
     _volumetricLightScatteringPass
       = mesh->getScene()->getEngine()->createEffect(
@@ -178,7 +178,7 @@ Vector3& VolumetricLightScatteringPostProcess::getCustomMeshPosition()
 void VolumetricLightScatteringPostProcess::dispose(Camera* camera)
 {
   camera->getScene()->customRenderTargets.erase(
-    ::std::remove(camera->getScene()->customRenderTargets.begin(),
+    std::remove(camera->getScene()->customRenderTargets.begin(),
                   camera->getScene()->customRenderTargets.end(),
                   _volumetricLightScatteringRTT),
     camera->getScene()->customRenderTargets.end());
@@ -327,7 +327,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
           const vector_t<SubMeshPtr>& alphaTestSubMeshes,
           const vector_t<SubMeshPtr>& transparentSubMeshes,
           const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-          const ::std::function<void()>& /*beforeTransparents*/) {
+          const std::function<void()>& /*beforeTransparents*/) {
         auto pEngine = scene->getEngine();
 
         if (!depthOnlySubMeshes.empty()) {
@@ -363,7 +363,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
           auto sortedArray
             = stl_util::slice(transparentSubMeshes, 0,
                               static_cast<int>(transparentSubMeshes.size()));
-          ::std::sort(sortedArray.begin(), sortedArray.end(),
+          std::sort(sortedArray.begin(), sortedArray.end(),
                       [](const SubMeshPtr& a, const SubMeshPtr& b) {
                         // Alpha index first
                         if (a->_alphaIndex > b->_alphaIndex) {

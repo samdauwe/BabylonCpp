@@ -1,45 +1,47 @@
 #include <babylon/tools/hdr/panorama_to_cube_map_tools.h>
 
+#include <cmath>
+
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {
 
-array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_FRONT{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_FRONT{{
   Vector3(-1.f, -1.f, -1.f), //
   Vector3(1.f, -1.f, -1.f),  //
   Vector3(-1.f, 1.f, -1.f),  //
   Vector3(1.f, 1.f, -1.f)    //
 }};
 
-array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_BACK{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_BACK{{
   Vector3(1.f, -1.f, 1.f),  //
   Vector3(-1.f, -1.f, 1.f), //
   Vector3(1.f, 1.f, 1.f),   //
   Vector3(-1.f, 1.f, 1.f)   //
 }};
 
-array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_RIGHT{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_RIGHT{{
   Vector3(1.f, -1.f, -1.f), //
   Vector3(1.f, -1.f, 1.f),  //
   Vector3(1.f, 1.f, -1.f),  //
   Vector3(1.f, 1.f, 1.f)    //
 }};
 
-array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_LEFT{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_LEFT{{
   Vector3(-1.f, -1.f, 1.f),  //
   Vector3(-1.f, -1.f, -1.f), //
   Vector3(-1.f, 1.f, 1.f),   //
   Vector3(-1.f, 1.f, -1.f)   //
 }};
 
-array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_DOWN{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_DOWN{
   {Vector3(-1.f, 1.f, -1.f), //
    Vector3(1.f, 1.f, -1.f),  //
    Vector3(-1.f, 1.f, 1.f),  //
    Vector3(1.f, 1.f, 1.f)}};
 
-array_t<Vector3, 4> PanoramaToCubeMapTools::FACE_UP{{
+std::array<Vector3, 4> PanoramaToCubeMapTools::FACE_UP{{
   Vector3(-1.f, -1.f, 1.f),  //
   Vector3(1.f, -1.f, 1.f),   //
   Vector3(-1.f, -1.f, -1.f), //
@@ -79,7 +81,7 @@ CubeMapInfo PanoramaToCubeMapTools::ConvertPanoramaToCubemap(
 }
 
 Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(
-  size_t texSize, const array_t<Vector3, 4>& faceData,
+  size_t texSize, const std::array<Vector3, 4>& faceData,
   const Float32Array& float32Array, size_t inputWidth, size_t inputHeight)
 {
   Float32Array textureArray(texSize * texSize * 4 * 3);
@@ -121,8 +123,8 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
   const Vector3& vDir, const Float32Array& float32Array, size_t inputWidth,
   size_t inputHeight)
 {
-  float theta = ::std::atan2(vDir.z, vDir.x);
-  float phi   = ::std::acos(vDir.y);
+  float theta = std::atan2(vDir.z, vDir.x);
+  float phi   = std::acos(vDir.y);
 
   while (theta < -Math::PI) {
     theta += 2.f * Math::PI;
@@ -137,7 +139,7 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
   // recenter.
   dx = dx * 0.5f + 0.5f;
 
-  int px = static_cast<int>(::std::round(dx * static_cast<float>(inputWidth)));
+  int px = static_cast<int>(std::round(dx * static_cast<float>(inputWidth)));
   if (px < 0) {
     px = 0;
   }
@@ -145,7 +147,7 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
     px = static_cast<int>(inputWidth) - 1;
   }
 
-  int py = static_cast<int>(::std::round(dy * static_cast<float>(inputHeight)));
+  int py = static_cast<int>(std::round(dy * static_cast<float>(inputHeight)));
   if (py < 0) {
     py = 0;
   }

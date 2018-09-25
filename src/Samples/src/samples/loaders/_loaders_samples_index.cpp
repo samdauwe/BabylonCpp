@@ -10,10 +10,10 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
   // -- Loaders examples --
 
   // Import Meshes Skull Scene
-  _samples["ImportMeshesSkullScene"] = ::std::make_tuple(
+  _samples["ImportMeshesSkullScene"] = std::make_tuple(
     true,                                                         //
     [](ICanvas* iCanvas) {                                        //
-      return ::std::make_unique<ImportMeshesSkullScene>(iCanvas); //
+      return std::make_unique<ImportMeshesSkullScene>(iCanvas); //
     });                                                           //
 }
 

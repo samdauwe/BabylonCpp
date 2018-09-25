@@ -20,70 +20,70 @@ _MaterialsLibrarySamplesIndex::_MaterialsLibrarySamplesIndex()
   // -- Materials Library examples --
 
   // Cell Material Scene
-  _samples["CellMaterialScene"] = ::std::make_tuple(
+  _samples["CellMaterialScene"] = std::make_tuple(
     true,                                                    //
     [](ICanvas* iCanvas) {                                   //
-      return ::std::make_unique<CellMaterialScene>(iCanvas); //
+      return std::make_unique<CellMaterialScene>(iCanvas); //
     });                                                      //
   // Gradient Material Scene
-  _samples["GradientMaterialScene"] = ::std::make_tuple(
+  _samples["GradientMaterialScene"] = std::make_tuple(
     true,                                                        //
     [](ICanvas* iCanvas) {                                       //
-      return ::std::make_unique<GradientMaterialScene>(iCanvas); //
+      return std::make_unique<GradientMaterialScene>(iCanvas); //
     });                                                          //
   // Gradient Material Sphere Scene
-  _samples["GradientMaterialSphereScene"] = ::std::make_tuple(
+  _samples["GradientMaterialSphereScene"] = std::make_tuple(
     true,                                                              //
     [](ICanvas* iCanvas) {                                             //
-      return ::std::make_unique<GradientMaterialSphereScene>(iCanvas); //
+      return std::make_unique<GradientMaterialSphereScene>(iCanvas); //
     });                                                                //
   // Grid Material Scene
-  _samples["GridMaterialScene"] = ::std::make_tuple(
+  _samples["GridMaterialScene"] = std::make_tuple(
     true,                                                    //
     [](ICanvas* iCanvas) {                                   //
-      return ::std::make_unique<GridMaterialScene>(iCanvas); //
+      return std::make_unique<GridMaterialScene>(iCanvas); //
     });                                                      //
   // Lava Material Scene
-  _samples["LavaMaterialScene"] = ::std::make_tuple(
+  _samples["LavaMaterialScene"] = std::make_tuple(
     true,                                                    //
     [](ICanvas* iCanvas) {                                   //
-      return ::std::make_unique<LavaMaterialScene>(iCanvas); //
+      return std::make_unique<LavaMaterialScene>(iCanvas); //
     });                                                      //
   // Mix Material Scene
-  _samples["MixMaterialScene"] = ::std::make_tuple(
+  _samples["MixMaterialScene"] = std::make_tuple(
     true,                                                   //
     [](ICanvas* iCanvas) {                                  //
-      return ::std::make_unique<MixMaterialScene>(iCanvas); //
+      return std::make_unique<MixMaterialScene>(iCanvas); //
     });                                                     //
   // Normal Material Scene
-  _samples["NormalMaterialScene"] = ::std::make_tuple(
+  _samples["NormalMaterialScene"] = std::make_tuple(
     true,                                                      //
     [](ICanvas* iCanvas) {                                     //
-      return ::std::make_unique<NormalMaterialScene>(iCanvas); //
+      return std::make_unique<NormalMaterialScene>(iCanvas); //
     });                                                        //
   // Simple Material Scene
-  _samples["SimpleMaterialScene"] = ::std::make_tuple(
+  _samples["SimpleMaterialScene"] = std::make_tuple(
     true,                                                      //
     [](ICanvas* iCanvas) {                                     //
-      return ::std::make_unique<SimpleMaterialScene>(iCanvas); //
+      return std::make_unique<SimpleMaterialScene>(iCanvas); //
     });                                                        //
   // Sky Material Scene
-  _samples["SkyMaterialScene"] = ::std::make_tuple(
+  _samples["SkyMaterialScene"] = std::make_tuple(
     true,                                                   //
     [](ICanvas* iCanvas) {                                  //
-      return ::std::make_unique<SkyMaterialScene>(iCanvas); //
+      return std::make_unique<SkyMaterialScene>(iCanvas); //
     });                                                     //
   // Terrain Material Scene
-  _samples["TerrainMaterialScene"] = ::std::make_tuple(
+  _samples["TerrainMaterialScene"] = std::make_tuple(
     true,                                                       //
     [](ICanvas* iCanvas) {                                      //
-      return ::std::make_unique<TerrainMaterialScene>(iCanvas); //
+      return std::make_unique<TerrainMaterialScene>(iCanvas); //
     });                                                         //
   // Tri-Planar Material Scene
-  _samples["TriPlanarMaterialScene"] = ::std::make_tuple(
+  _samples["TriPlanarMaterialScene"] = std::make_tuple(
     true,                                                         //
     [](ICanvas* iCanvas) {                                        //
-      return ::std::make_unique<TriPlanarMaterialScene>(iCanvas); //
+      return std::make_unique<TriPlanarMaterialScene>(iCanvas); //
     });                                                           //
 }
 

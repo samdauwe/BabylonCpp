@@ -38,7 +38,7 @@ public:
    */
   PhotoDome(std::string name, const std::string& urlOfPhoto,
             PhotoDomeOptions options, Scene* scene,
-            const ::std::function<void(const std::string& message)>& onError
+            const std::function<void(const std::string& message)>& onError
             = nullptr);
   ~PhotoDome() override;
 

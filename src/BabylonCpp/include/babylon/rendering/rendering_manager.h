@@ -29,11 +29,11 @@ public:
   ~RenderingManager();
 
   void render(
-    ::std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
+    std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
                          const vector_t<SubMeshPtr>& alphaTestSubMeshes,
                          const vector_t<SubMeshPtr>& transparentSubMeshes,
                          const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-                         const ::std::function<void()>& beforeTransparents)>
+                         const std::function<void()>& beforeTransparents)>
       customRenderFunction,
     const vector_t<AbstractMeshPtr>& activeMeshes, bool renderParticles,
     bool renderSprites);
@@ -75,13 +75,13 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       opaqueSortCompareFn
     = nullptr,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       alphaTestSortCompareFn
     = nullptr,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       transparentSortCompareFn
     = nullptr);
 
@@ -127,11 +127,11 @@ private:
   bool _depthStencilBufferAlreadyCleaned;
 
   vector_t<IRenderingManagerAutoClearSetup> _autoClearDepthStencil;
-  vector_t<::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
+  vector_t<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customOpaqueSortCompareFn;
-  vector_t<::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
+  vector_t<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customAlphaTestSortCompareFn;
-  vector_t<::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
+  vector_t<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customTransparentSortCompareFn;
   unique_ptr_t<RenderingGroupInfo> _renderingGroupInfo;
 

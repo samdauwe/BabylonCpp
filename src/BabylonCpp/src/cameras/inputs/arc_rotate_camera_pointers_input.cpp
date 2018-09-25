@@ -69,7 +69,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
     }
 
     if (p->type != PointerEventTypes::POINTERMOVE
-        && (::std::find(buttons.begin(), buttons.end(), evt.button)
+        && (std::find(buttons.begin(), buttons.end(), evt.button)
             == buttons.end())) {
       return;
     }
@@ -197,7 +197,7 @@ void ArcRotateCameraPointersInput::attachControl(ICanvas* canvas,
         auto distY    = _pointA.y - _pointB.y;
         auto pinchSquaredDistance
           = static_cast<float>((distX * distX) + (distY * distY));
-        auto pinchDistance = ::std::sqrt(pinchSquaredDistance);
+        auto pinchDistance = std::sqrt(pinchSquaredDistance);
 
         if (stl_util::almost_equal(_previousPinchSquaredDistance, 0.f)) {
           _initialDistance                 = pinchDistance;

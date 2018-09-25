@@ -8,19 +8,19 @@ TEST(JSON, NameValuePair)
 
   // String
   Json::value v = Json::NameValuePair("string", "Test JSON");
-  EXPECT_EQ(v.get("name").get<::std::string>(), "string");
-  EXPECT_EQ(v.get("value").get<::std::string>(), "Test JSON");
+  EXPECT_EQ(v.get("name").get<std::string>(), "string");
+  EXPECT_EQ(v.get("value").get<std::string>(), "Test JSON");
   // Floating point number
   v = Json::NameValuePair("number", 3.14);
-  EXPECT_EQ(v.get("name").get<::std::string>(), "number");
+  EXPECT_EQ(v.get("name").get<std::string>(), "number");
   EXPECT_EQ(v.get("value").get<double>(), 3.14);
   // Integer
   v = Json::NameValuePair<int>("integer", 5);
-  EXPECT_EQ(v.get("name").get<::std::string>(), "integer");
+  EXPECT_EQ(v.get("name").get<std::string>(), "integer");
   EXPECT_EQ(static_cast<int>(v.get("value").get<double>()), 5);
   // Boolean value
   v = Json::NameValuePair("bool", true);
-  EXPECT_EQ(v.get("name").get<::std::string>(), "bool");
+  EXPECT_EQ(v.get("name").get<std::string>(), "bool");
   EXPECT_EQ(v.get("value").get<bool>(), true);
 }
 
@@ -29,9 +29,9 @@ TEST(JSON, Pair)
   using namespace BABYLON;
 
   // String
-  ::std::pair<::std::string, Json::value> v = Json::Pair("string", "Test JSON");
+  std::pair<std::string, Json::value> v = Json::Pair("string", "Test JSON");
   EXPECT_EQ(v.first, "string");
-  EXPECT_EQ(v.second.get<::std::string>(), "Test JSON");
+  EXPECT_EQ(v.second.get<std::string>(), "Test JSON");
   // Floating point number
   v = Json::Pair("number", 3.14);
   EXPECT_EQ(v.first, "number");

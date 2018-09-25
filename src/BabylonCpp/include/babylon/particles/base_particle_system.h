@@ -1,7 +1,9 @@
 #ifndef BABYLON_PARTICLES_BASE_PARTICLE_SYSTEM_H
 #define BABYLON_PARTICLES_BASE_PARTICLE_SYSTEM_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 #include <babylon/particles/iparticle_system.h>
 
@@ -12,9 +14,11 @@ class ConeParticleEmitter;
 class CylinderParticleEmitter;
 class HemisphericParticleEmitter;
 struct ImageProcessingConfigurationDefines;
+class ImageProcessingConfiguration;
 class PointParticleEmitter;
 class SphereDirectedParticleEmitter;
 class SphereParticleEmitter;
+class Scene;
 using BoxParticleEmitterPtr      = std::shared_ptr<BoxParticleEmitter>;
 using ConeParticleEmitterPtr     = std::shared_ptr<ConeParticleEmitter>;
 using CylinderParticleEmitterPtr = std::shared_ptr<CylinderParticleEmitter>;
@@ -64,7 +68,7 @@ public:
    * glitter and faery dust.
    * @param name The name of the particle system
    */
-  BaseParticleSystem(const string_t& name);
+  BaseParticleSystem(const std::string& name);
   ~BaseParticleSystem();
 
   /**
@@ -72,7 +76,7 @@ public:
    * You must use addDragGradient and removeDragGradient to udpate this list
    * @returns the list of drag gradients
    */
-  vector_t<FactorGradient>& getDragGradients();
+  std::vector<FactorGradient>& getDragGradients();
 
   /**
    * @brief Gets the current list of limit velocity gradients.
@@ -80,21 +84,21 @@ public:
    * udpate this list
    * @returns the list of limit velocity gradients
    */
-  vector_t<FactorGradient>& getLimitVelocityGradients();
+  std::vector<FactorGradient>& getLimitVelocityGradients();
 
   /**
    * @brief Gets the current list of color gradients.
    * You must use addColorGradient and removeColorGradient to udpate this list
    * @returns the list of color gradients
    */
-  vector_t<ColorGradient>& getColorGradients();
+  std::vector<ColorGradient>& getColorGradients();
 
   /**
    * @brief Gets the current list of size gradients.
    * You must use addSizeGradient and removeSizeGradient to udpate this list
    * @returns the list of size gradients
    */
-  vector_t<FactorGradient>& getSizeGradients();
+  std::vector<FactorGradient>& getSizeGradients();
 
   /**
    * @brief Gets the current list of life time gradients.
@@ -102,7 +106,7 @@ public:
    * list
    * @returns the list of life time gradients
    */
-  vector_t<FactorGradient>& getLifeTimeGradients();
+  std::vector<FactorGradient>& getLifeTimeGradients();
 
   /**
    * @brief Gets the current list of angular speed gradients.
@@ -110,7 +114,7 @@ public:
    * udpate this list
    * @returns the list of angular speed gradients
    */
-  vector_t<FactorGradient>& getAngularSpeedGradients();
+  std::vector<FactorGradient>& getAngularSpeedGradients();
 
   /**
    * @brief Gets the current list of velocity gradients.
@@ -118,7 +122,7 @@ public:
    * list
    * @returns the list of velocity gradients
    */
-  vector_t<FactorGradient>& getVelocityGradients();
+  std::vector<FactorGradient>& getVelocityGradients();
 
   /**
    * @brief Creates a Point Emitter for the particle system (emits directly from
@@ -401,13 +405,13 @@ protected:
    */
   ImageProcessingConfigurationPtr _imageProcessingConfiguration;
 
-  vector_t<ColorGradient> _colorGradients;
-  vector_t<FactorGradient> _sizeGradients;
-  vector_t<FactorGradient> _lifeTimeGradients;
-  vector_t<FactorGradient> _angularSpeedGradients;
-  vector_t<FactorGradient> _velocityGradients;
-  vector_t<FactorGradient> _limitVelocityGradients;
-  vector_t<FactorGradient> _dragGradients;
+  std::vector<ColorGradient> _colorGradients;
+  std::vector<FactorGradient> _sizeGradients;
+  std::vector<FactorGradient> _lifeTimeGradients;
+  std::vector<FactorGradient> _angularSpeedGradients;
+  std::vector<FactorGradient> _velocityGradients;
+  std::vector<FactorGradient> _limitVelocityGradients;
+  std::vector<FactorGradient> _dragGradients;
 
 private:
   Vector3 _zeroVector3;

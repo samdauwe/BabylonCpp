@@ -10,10 +10,10 @@ _ProceduralTexturesLibrarySamplesIndex::_ProceduralTexturesLibrarySamplesIndex()
   // -- Procedural Textures Library examples --
 
   // Brick Procedural Texture Scene
-  _samples["BrickProceduralTextureScene"] = ::std::make_tuple(
+  _samples["BrickProceduralTextureScene"] = std::make_tuple(
     false,                                                             //
     [](ICanvas* iCanvas) {                                             //
-      return ::std::make_unique<BrickProceduralTextureScene>(iCanvas); //
+      return std::make_unique<BrickProceduralTextureScene>(iCanvas); //
     });                                                                //
 }
 

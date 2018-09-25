@@ -1,7 +1,7 @@
 #ifndef BABYLON_INSPECTOR_PROPERTIES_PROPERTIES_VIEW_H
 #define BABYLON_INSPECTOR_PROPERTIES_PROPERTIES_VIEW_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 #include <babylon/inspector/properties/babylon_property.h>
 #include <babylon/inspector/properties/callbacks.h>
@@ -24,7 +24,7 @@ enum class PropertyTypeInsp {
 }; // end of enum class PropertyType
 
 struct PropertyEntry {
-  string_t name;
+  std::string name;
   size_t index;
   PropertyTypeInsp type;
 }; // end of struct struct PropertyEntry
@@ -35,37 +35,38 @@ public:
   PropertiesView();
   virtual ~PropertiesView();
 
-  void addBoolProperty(const string_t& name,
+  void addBoolProperty(const std::string& name,
                        const TPrimitiveGetter<bool>& getter,
                        const TPrimitiveSetter<bool>& setter);
-  void addFloatProperty(const string_t& name,
+  void addFloatProperty(const std::string& name,
                         const TPrimitiveGetter<float>& getter,
                         const TPrimitiveSetter<float>& setter);
-  void addIntProperty(const string_t& name, const TPrimitiveGetter<int>& getter,
+  void addIntProperty(const std::string& name,
+                      const TPrimitiveGetter<int>& getter,
                       const TPrimitiveSetter<int>& setter);
-  void addSizeTProperty(const string_t& name,
+  void addSizeTProperty(const std::string& name,
                         const TPrimitiveGetter<size_t>& getter,
                         const TPrimitiveSetter<size_t>& setter);
-  void addStringProperty(const string_t& name,
-                         const TPrimitiveGetter<string_t>& getter,
-                         const TPrimitiveSetter<string_t>& setter);
-  void addColor3Property(const string_t& name,
+  void addStringProperty(const std::string& name,
+                         const TPrimitiveGetter<std::string>& getter,
+                         const TPrimitiveSetter<std::string>& setter);
+  void addColor3Property(const std::string& name,
                          const TBabylonGetter<Color3>& getter,
                          const TBabylonSetter<Color3>& setter);
-  void addColor4Property(const string_t& name,
+  void addColor4Property(const std::string& name,
                          const TBabylonGetter<Color4>& getter,
                          const TBabylonSetter<Color4>& setter);
-  void addVector2Property(const string_t& name,
+  void addVector2Property(const std::string& name,
                           const TBabylonGetter<Vector2>& getter,
                           const TBabylonSetter<Vector2>& setter);
-  void addVector3Property(const string_t& name,
+  void addVector3Property(const std::string& name,
                           const TBabylonGetter<Vector3>& getter,
                           const TBabylonSetter<Vector3>& setter);
   void addColorCurvesProperty(
-    const string_t& name,
+    const std::string& name,
     const TBabylonNonConstGetter<ColorCurves>& getterNonConst);
   void addImageProcessingConfigurationProperty(
-    const string_t& name,
+    const std::string& name,
     const TBabylonNonConstGetter<ImageProcessingConfiguration>& getterNonConst);
   void sortPropertiesByName();
 
@@ -73,19 +74,19 @@ public:
   void dispose();
 
 private:
-  vector_t<PrimitiveProperty<bool>> _boolProperties;
-  vector_t<PrimitiveProperty<float>> _floatProperties;
-  vector_t<PrimitiveProperty<int>> _intProperties;
-  vector_t<PrimitiveProperty<size_t>> _sizeTProperties;
-  vector_t<PrimitiveProperty<string_t>> _stringProperties;
-  vector_t<BabylonProperty<Color3>> _color3Properties;
-  vector_t<BabylonProperty<Color4>> _color4Properties;
-  vector_t<BabylonProperty<Vector2>> _vector2Properties;
-  vector_t<BabylonProperty<Vector3>> _vector3Properties;
-  vector_t<BabylonProperty<ColorCurves>> _colorCurvesProperties;
-  vector_t<BabylonProperty<ImageProcessingConfiguration>>
+  std::vector<PrimitiveProperty<bool>> _boolProperties;
+  std::vector<PrimitiveProperty<float>> _floatProperties;
+  std::vector<PrimitiveProperty<int>> _intProperties;
+  std::vector<PrimitiveProperty<size_t>> _sizeTProperties;
+  std::vector<PrimitiveProperty<std::string>> _stringProperties;
+  std::vector<BabylonProperty<Color3>> _color3Properties;
+  std::vector<BabylonProperty<Color4>> _color4Properties;
+  std::vector<BabylonProperty<Vector2>> _vector2Properties;
+  std::vector<BabylonProperty<Vector3>> _vector3Properties;
+  std::vector<BabylonProperty<ColorCurves>> _colorCurvesProperties;
+  std::vector<BabylonProperty<ImageProcessingConfiguration>>
     _imageProcessingConfigurationProperties;
-  vector_t<PropertyEntry> _propertyEntries;
+  std::vector<PropertyEntry> _propertyEntries;
 
 }; // end of class PropertiesView
 

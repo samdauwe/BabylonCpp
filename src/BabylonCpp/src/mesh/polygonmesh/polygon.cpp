@@ -26,8 +26,8 @@ std::vector<Vector2> Polygon::Circle(float radius, float cx, float cy,
   float increment = Math::PI2 / static_cast<float>(numberOfSides);
 
   for (size_t i = 0; i < numberOfSides; ++i) {
-    result.emplace_back(Vector2(cx + ::std::cos(angle) * radius,
-                                cy + ::std::sin(angle) * radius));
+    result.emplace_back(Vector2(cx + std::cos(angle) * radius,
+                                cy + std::sin(angle) * radius));
     angle -= increment;
   }
 
@@ -45,7 +45,7 @@ std::vector<Vector2> Polygon::Parse(const std::string& input)
   result.reserve(floatsSize / 2);
   for (size_t i = 0; i < floatsSize; i += 2) {
     result.emplace_back(
-      Vector2(::std::stof(floats[i]), ::std::stof(floats[i + 1])));
+      Vector2(std::stof(floats[i]), std::stof(floats[i + 1])));
   }
 
   return result;

@@ -267,7 +267,7 @@ void StandardRenderingPipeline::setVolumetricLightStepsCount(float count)
   if (volumetricLightPostProcess) {
     volumetricLightPostProcess->updateEffect(
       "#define VLS\n#define NB_STEPS "
-      + ::std::to_string(::std::round(count * 10.f) / 10.f));
+      + std::to_string(std::round(count * 10.f) / 10.f));
   }
 
   _volumetricLightStepsCount = count;
@@ -283,7 +283,7 @@ void StandardRenderingPipeline::setMotionBlurSamples(float samples)
   if (motionBlurPostProcess) {
     motionBlurPostProcess->updateEffect(
       "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
-      + ::std::to_string(::std::round(samples * 10.f) / 10.f));
+      + std::to_string(std::round(samples * 10.f) / 10.f));
   }
 
   _motionBlurSamples = samples;
@@ -492,7 +492,7 @@ void StandardRenderingPipeline::_createBlurPostProcesses(
   auto engine = scene->getEngine();
 
   const string_t underscore = "_";
-  const auto indiceStr      = ::std::to_string(indice);
+  const auto indiceStr      = std::to_string(indice);
   auto blurX                = new BlurPostProcess(
     "HDRBlurH" + underscore + indiceStr, Vector2(1.f, 0.f),
     (*this)[blurWidthKey], ToVariant<float, PostProcessOptions>(ratio), nullptr,
@@ -571,7 +571,7 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
     ToVariant<float, PostProcessOptions>(ratio / 8), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define VLS\n#define NB_STEPS "
-      + ::std::to_string(::std::round(_volumetricLightStepsCount * 10.f)
+      + std::to_string(std::round(_volumetricLightStepsCount * 10.f)
                          / 10.f));
 
   volumetricLightPostProcess->setOnApply(
@@ -642,7 +642,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 {
   // Create luminance
   float size = static_cast<float>(
-    ::std::pow(3, StandardRenderingPipeline::LuminanceSteps));
+    std::pow(3, StandardRenderingPipeline::LuminanceSteps));
   luminancePostProcess = new PostProcess(
     "HDRLuminance", "standard", {"lumOffsets"}, {},
     ToVariant<float, PostProcessOptions>(size), nullptr,
@@ -674,8 +674,8 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
   // Create down sample luminance
   for (unsigned int i = StandardRenderingPipeline::LuminanceSteps; i-- > 0;) {
-    const string_t iStr = ::std::to_string(i);
-    float size          = static_cast<float>(::std::pow(3, i));
+    const string_t iStr = std::to_string(i);
+    float size          = static_cast<float>(std::pow(3, i));
 
     string_t defines = "#define LUMINANCE_DOWN_SAMPLE\n";
     if (i == 0) {
@@ -696,7 +696,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
   std::size_t index = 0;
   for (auto& pp : luminanceDownSamplePostProcesses) {
-    const string_t indexStr = ::std::to_string(index);
+    const string_t indexStr = std::to_string(index);
     Float32Array downSampleOffsets(18);
 
     pp->setOnApply([&](Effect* effect, EventState&) {
@@ -870,8 +870,8 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     );
 
     auto starRotation = Matrix::FromValues(
-      ::std::cos(camRot) * 0.5f, -::std::sin(camRot), 0.f, 0.f, //
-      ::std::sin(camRot), ::std::cos(camRot) * 0.5f, 0.f, 0.f,  //
+      std::cos(camRot) * 0.5f, -std::sin(camRot), 0.f, 0.f, //
+      std::sin(camRot), std::cos(camRot) * 0.5f, 0.f, 0.f,  //
       0.f, 0.f, 1.f, 0.f,                                       //
       0.f, 0.f, 0.f, 1.f                                        //
     );
@@ -920,7 +920,7 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
     {"depthSampler"}, ToVariant<float, PostProcessOptions>(ratio), nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
-      + ::std::to_string(motionBlurSamples()),
+      + std::to_string(motionBlurSamples()),
     EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
   motionBlurPostProcess->setOnApply([&](Effect* effect, EventState&) {

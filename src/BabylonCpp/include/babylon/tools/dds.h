@@ -1,10 +1,13 @@
 #ifndef BABYLON_TOOLS_DDS_H
 #define BABYLON_TOOLS_DDS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/spherical_polynomial.h>
 
 namespace BABYLON {
+
+class Engine;
+class InternalTexture;
 
 // Based on demo done by Brandon Jones -
 // http://media.tojicode.com/webgl-samples/dds.html
@@ -55,9 +58,9 @@ struct FourCCToInt32 {
   static const unsigned int value = (((((d << 8) | c) << 8) | b) << 8) | a;
 };
 
-inline string_t Int32ToFourCC(int value)
+inline std::string Int32ToFourCC(int value)
 {
-  string_t s;
+  std::string s;
   s += (static_cast<char>(value & 0xff));
   s += (static_cast<char>((value >> 8) & 0xff));
   s += (static_cast<char>((value >> 16) & 0xff));
@@ -131,7 +134,7 @@ struct DDSInfo {
   int dxgiFormat;
   unsigned int textureType;
   /** Sphericle polynomial created for the dds texture */
-  unique_ptr_t<SphericalPolynomial> sphericalPolynomial = nullptr;
+  std::unique_ptr<SphericalPolynomial> sphericalPolynomial = nullptr;
 }; // end of struct DDSInfo
 
 class BABYLON_SHARED_EXPORT DDSTools {

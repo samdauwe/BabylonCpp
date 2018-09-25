@@ -1,9 +1,15 @@
 #ifndef BABYLON_PARTICLES_MODEL_SHAPE_H
 #define BABYLON_PARTICLES_MODEL_SHAPE_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class SolidParticle;
+class Vector3;
 
 /**
  * @brief Represents the shape of the model used by one particle of a solid
@@ -18,12 +24,12 @@ public:
    * SPS. SPS internal tool, don't use it manually.
    */
   ModelShape(
-    int id, const vector_t<Vector3>& shape, size_t indicesLength,
+    int id, const std::vector<Vector3>& shape, size_t indicesLength,
     const Float32Array& shapeUV,
-    const ::std::function<void(SolidParticle* particle, unsigned int i,
-                               unsigned int s)>& posFunction,
-    const ::std::function<void(SolidParticle* particle, const Vector3& vertex,
-                               unsigned int i)>& vtxFunction);
+    const std::function<void(SolidParticle* particle, unsigned int i,
+                             unsigned int s)>& posFunction,
+    const std::function<void(SolidParticle* particle, const Vector3& vertex,
+                             unsigned int i)>& vtxFunction);
   ~ModelShape();
 
 public:
@@ -36,7 +42,7 @@ public:
    * flat array of model positions (internal use)
    * Hidden
    */
-  vector_t<Vector3> _shape;
+  std::vector<Vector3> _shape;
   /**
    * flat array of model UVs (internal use)
    * Hidden
@@ -51,14 +57,14 @@ public:
    * Custom position function (internal use)
    * Hidden
    */
-  ::std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
+  std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
     _positionFunction;
   /**
    * Custom vertex function (internal use)
    * Hidden
    */
-  ::std::function<void(SolidParticle* particle, const Vector3& vertex,
-                       unsigned int i)>
+  std::function<void(SolidParticle* particle, const Vector3& vertex,
+                     unsigned int i)>
     _vertexFunction;
 
 }; // end of class ModelShape

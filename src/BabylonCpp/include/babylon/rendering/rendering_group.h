@@ -20,13 +20,13 @@ public:
    */
   RenderingGroup(
     unsigned int index, Scene* scene,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       opaqueSortCompareFn
     = nullptr,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       alphaTestSortCompareFn
     = nullptr,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       transparentSortCompareFn
     = nullptr);
   ~RenderingGroup();
@@ -37,11 +37,11 @@ public:
    * of the group.
    */
   void render(
-    ::std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
+    std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
                          const vector_t<SubMeshPtr>& alphaTestSubMeshes,
                          const vector_t<SubMeshPtr>& transparentSubMeshes,
                          const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-                         const ::std::function<void()>& beforeTransparents)>&
+                         const std::function<void()>& beforeTransparents)>&
       customRenderFunction,
     bool renderSprites, bool renderParticles,
     const vector_t<AbstractMeshPtr>& activeMeshes);
@@ -136,7 +136,7 @@ private:
    */
   static void renderSorted(
     const vector_t<SubMeshPtr>& subMeshes,
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       sortCompareFn,
     const CameraPtr& camera, bool transparent);
 
@@ -153,7 +153,7 @@ protected:
    * If null the sub meshes will be render in the order they were created
    */
   void set_opaqueSortCompareFn(
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       value);
 
   /**
@@ -161,7 +161,7 @@ protected:
    * If null the sub meshes will be render in the order they were created
    */
   void set_alphaTestSortCompareFn(
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       value);
 
   /**
@@ -169,18 +169,18 @@ protected:
    * If null the sub meshes will be render in the order they were created
    */
   void set_transparentSortCompareFn(
-    const ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
       value);
 
 public:
   unsigned int index;
-  ::std::function<void()> onBeforeTransparentRendering;
+  std::function<void()> onBeforeTransparentRendering;
 
   /**
    * Sets the opaque sort comparison function
    * If null the sub meshes will be render in the order they were created
    */
-  WriteOnlyProperty<RenderingGroup, ::std::function<int(const SubMeshPtr& a,
+  WriteOnlyProperty<RenderingGroup, std::function<int(const SubMeshPtr& a,
                                                         const SubMeshPtr& b)>>
     opaqueSortCompareFn;
 
@@ -188,7 +188,7 @@ public:
    * Sets the alpha test sort comparison function.
    * If null the sub meshes will be render in the order they were created
    */
-  WriteOnlyProperty<RenderingGroup, ::std::function<int(const SubMeshPtr& a,
+  WriteOnlyProperty<RenderingGroup, std::function<int(const SubMeshPtr& a,
                                                         const SubMeshPtr& b)>>
     alphaTestSortCompareFn;
 
@@ -196,7 +196,7 @@ public:
    * Sets the transparent sort comparison function
    * If null the sub meshes will be render in the order they were created
    */
-  WriteOnlyProperty<RenderingGroup, ::std::function<int(const SubMeshPtr& a,
+  WriteOnlyProperty<RenderingGroup, std::function<int(const SubMeshPtr& a,
                                                         const SubMeshPtr& b)>>
     transparentSortCompareFn;
 
@@ -209,16 +209,16 @@ private:
   vector_t<IParticleSystem*> _particleSystems;
   vector_t<SpriteManager*> _spriteManagers;
 
-  ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>
+  std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>
     _opaqueSortCompareFn;
-  ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>
+  std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>
     _alphaTestSortCompareFn;
-  ::std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>
+  std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>
     _transparentSortCompareFn;
 
-  ::std::function<void(const vector_t<SubMeshPtr>& subMeshes)> _renderOpaque;
-  ::std::function<void(const vector_t<SubMeshPtr>& subMeshes)> _renderAlphaTest;
-  ::std::function<void(const vector_t<SubMeshPtr>& subMeshes)>
+  std::function<void(const vector_t<SubMeshPtr>& subMeshes)> _renderOpaque;
+  std::function<void(const vector_t<SubMeshPtr>& subMeshes)> _renderAlphaTest;
+  std::function<void(const vector_t<SubMeshPtr>& subMeshes)>
     _renderTransparent;
 
   vector_t<EdgesRenderer*> _edgesRenderers;

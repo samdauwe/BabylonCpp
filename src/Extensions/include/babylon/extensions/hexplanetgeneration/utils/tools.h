@@ -1,11 +1,20 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_TOOLS_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_TOOLS_H
 
-#include <babylon/babylon_global.h>
+#include <algorithm>
 
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/hexplanetgeneration/utils/irandom_function.h>
 
 namespace BABYLON {
+
+class BoundingSphere;
+class Color4;
+class Plane;
+class Quaternion;
+class Ray;
+class Vector3;
+
 namespace Extensions {
 
 template <typename T>

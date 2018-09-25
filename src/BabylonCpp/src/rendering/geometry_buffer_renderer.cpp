@@ -37,7 +37,7 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
 
   // Register the G Buffer component to the scene.
   auto component
-    = ::std::static_pointer_cast<GeometryBufferRendererSceneComponent>(
+    = std::static_pointer_cast<GeometryBufferRendererSceneComponent>(
       scene->_getComponent(
         SceneComponentConstants::NAME_GEOMETRYBUFFERRENDERER));
   if (!component) {
@@ -131,10 +131,10 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + ::std::to_string(mesh->numBoneInfluencers()));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 :
+      + std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 :
                                             0));
   }
   else {
@@ -159,12 +159,12 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
       {"buffersCount", _enablePosition ? 3u : 2u}};
 
     EffectCreationOptions options;
-    options.attributes = ::std::move(attribs);
+    options.attributes = std::move(attribs);
     options.uniformsNames
       = {"world", "mBones", "viewProjection", "diffuseMatrix", "view"};
     options.samplers        = {"diffuseSampler"};
-    options.defines         = ::std::move(join);
-    options.indexParameters = ::std::move(indexParameters);
+    options.defines         = std::move(join);
+    options.indexParameters = std::move(indexParameters);
 
     _effect = _scene->getEngine()->createEffect("geometry", options,
                                                 _scene->getEngine());
@@ -203,7 +203,7 @@ void GeometryBufferRenderer::_createRenderTargets()
   options.generateMipMaps      = false;
   options.generateDepthTexture = true;
   options.defaultType          = EngineConstants::TEXTURETYPE_FLOAT;
-  _multiRenderTarget           = ::std::make_shared<MultiRenderTarget>(
+  _multiRenderTarget           = std::make_shared<MultiRenderTarget>(
     "gBuffer",
     Size{static_cast<int>(engine->getRenderWidth() * _ratio),
          static_cast<int>(engine->getRenderHeight() * _ratio)},
@@ -229,7 +229,7 @@ void GeometryBufferRenderer::_createRenderTargets()
                      const vector_t<SubMeshPtr>& alphaTestSubMeshes,
                      const vector_t<SubMeshPtr>& /*transparentSubMeshes*/,
                      const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-                     const ::std::function<void()>& /*beforeTransparents*/) {
+                     const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
           for (auto& depthOnlySubMesh : depthOnlySubMeshes) {

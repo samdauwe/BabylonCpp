@@ -64,10 +64,10 @@ Json::object PerlinNoiseProceduralTexture::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<PerlinNoiseProceduralTexture>
+std::unique_ptr<PerlinNoiseProceduralTexture>
 PerlinNoiseProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
                                     Scene* /*scene*/,
-                                    const string_t& /*rootUrl*/)
+                                    const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

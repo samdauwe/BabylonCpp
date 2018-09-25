@@ -26,7 +26,7 @@ PhysicsHelper::~PhysicsHelper()
 {
 }
 
-unique_ptr_t<PhysicsRadialExplosionEvent>
+std::unique_ptr<PhysicsRadialExplosionEvent>
 PhysicsHelper::applyRadialExplosionImpulse(const Vector3& origin, float radius,
                                            float strength,
                                            PhysicsRadialImpulseFalloff falloff)
@@ -43,7 +43,7 @@ PhysicsHelper::applyRadialExplosionImpulse(const Vector3& origin, float radius,
     return nullptr;
   }
 
-  auto event = ::std::make_unique<PhysicsRadialExplosionEvent>(_scene);
+  auto event = std::make_unique<PhysicsRadialExplosionEvent>(_scene);
 
   for (const auto& impostor : impostors) {
     auto impostorForceAndContactPoint = event->getImpostorForceAndContactPoint(
@@ -61,7 +61,7 @@ PhysicsHelper::applyRadialExplosionImpulse(const Vector3& origin, float radius,
   return event;
 }
 
-unique_ptr_t<PhysicsRadialExplosionEvent>
+std::unique_ptr<PhysicsRadialExplosionEvent>
 PhysicsHelper::applyRadialExplosionForce(const Vector3& origin, float radius,
                                          float strength,
                                          PhysicsRadialImpulseFalloff falloff)
@@ -78,7 +78,7 @@ PhysicsHelper::applyRadialExplosionForce(const Vector3& origin, float radius,
     return nullptr;
   }
 
-  auto event = ::std::make_unique<PhysicsRadialExplosionEvent>(_scene);
+  auto event = std::make_unique<PhysicsRadialExplosionEvent>(_scene);
 
   for (const auto& impostor : impostors) {
     auto impostorForceAndContactPoint = event->getImpostorForceAndContactPoint(
@@ -96,7 +96,7 @@ PhysicsHelper::applyRadialExplosionForce(const Vector3& origin, float radius,
   return event;
 }
 
-unique_ptr_t<PhysicsGravitationalFieldEvent>
+std::unique_ptr<PhysicsGravitationalFieldEvent>
 PhysicsHelper::gravitationalField(const Vector3& origin, float radius,
                                   float strength,
                                   PhysicsRadialImpulseFalloff falloff)
@@ -113,7 +113,7 @@ PhysicsHelper::gravitationalField(const Vector3& origin, float radius,
     return nullptr;
   }
 
-  auto event = ::std::make_unique<PhysicsGravitationalFieldEvent>(
+  auto event = std::make_unique<PhysicsGravitationalFieldEvent>(
     this, _scene, origin, radius, strength, falloff);
 
   event->dispose(false);
@@ -121,7 +121,7 @@ PhysicsHelper::gravitationalField(const Vector3& origin, float radius,
   return event;
 }
 
-unique_ptr_t<PhysicsUpdraftEvent>
+std::unique_ptr<PhysicsUpdraftEvent>
 PhysicsHelper::updraft(const Vector3& origin, float radius, float strength,
                        float height, PhysicsUpdraftMode updraftMode)
 {
@@ -136,7 +136,7 @@ PhysicsHelper::updraft(const Vector3& origin, float radius, float strength,
     return nullptr;
   }
 
-  auto event = ::std::make_unique<PhysicsUpdraftEvent>(
+  auto event = std::make_unique<PhysicsUpdraftEvent>(
     _scene, origin, radius, strength, height, updraftMode);
 
   event->dispose(false);
@@ -144,10 +144,10 @@ PhysicsHelper::updraft(const Vector3& origin, float radius, float strength,
   return event;
 }
 
-unique_ptr_t<PhysicsVortexEvent> PhysicsHelper::vortex(const Vector3& origin,
-                                                       float radius,
-                                                       float strength,
-                                                       float height)
+std::unique_ptr<PhysicsVortexEvent> PhysicsHelper::vortex(const Vector3& origin,
+                                                          float radius,
+                                                          float strength,
+                                                          float height)
 {
   if (!_physicsEngine) {
     BABYLON_LOG_WARN("PhysicsHelper",
@@ -160,8 +160,8 @@ unique_ptr_t<PhysicsVortexEvent> PhysicsHelper::vortex(const Vector3& origin,
     return nullptr;
   }
 
-  auto event = ::std::make_unique<PhysicsVortexEvent>(_scene, origin, radius,
-                                                      strength, height);
+  auto event = std::make_unique<PhysicsVortexEvent>(_scene, origin, radius,
+                                                    strength, height);
 
   event->dispose(false);
 

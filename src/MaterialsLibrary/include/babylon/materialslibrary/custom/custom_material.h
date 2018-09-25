@@ -1,12 +1,16 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materialslibrary/custom/shader_special_parts.h>
 #include <babylon/math/vector4.h>
 
 namespace BABYLON {
+
+class Texture;
+using TexturePtr = std::shared_ptr<Texture>;
+
 namespace MaterialsLibrary {
 
 struct UniformInstance {
@@ -21,30 +25,30 @@ struct UniformInstance {
 class BABYLON_SHARED_EXPORT CustomMaterial : public StandardMaterial {
 
 public:
-  CustomMaterial(const string_t& name, Scene* scene);
+  CustomMaterial(const std::string& name, Scene* scene);
   ~CustomMaterial();
 
   void AttachAfterBind(Mesh* mesh, Effect* effect);
-  vector_t<string_t> ReviewUniform(const string_t& name,
-                                   vector_t<string_t> arr);
-  string_t Builder(const string_t& shaderName,
-                   const vector_t<string_t>& uniforms,
-                   const vector_t<string_t>& uniformBuffers,
-                   const vector_t<string_t>& samplers,
-                   StandardMaterialDefines& defines);
-  CustomMaterial& AddUniform(const string_t& name, const string_t& kind,
-                             const nullable_t<UniformInstance>& param);
-  CustomMaterial& Fragment_Begin(const string_t& shaderPart);
-  CustomMaterial& Fragment_Definitions(const string_t& shaderPart);
-  CustomMaterial& Fragment_MainBegin(const string_t& shaderPart);
-  CustomMaterial& Fragment_Custom_Diffuse(const string_t& shaderPart);
-  CustomMaterial& Fragment_Custom_Alpha(const string_t& shaderPart);
-  CustomMaterial& Fragment_Before_FragColor(const string_t& shaderPart);
-  CustomMaterial& Vertex_Begin(const string_t& shaderPart);
-  CustomMaterial& Vertex_Definitions(const string_t& shaderPart);
-  CustomMaterial& Vertex_MainBegin(const string_t& shaderPart);
-  CustomMaterial& Vertex_Before_PositionUpdated(const string_t& shaderPart);
-  CustomMaterial& Vertex_Before_NormalUpdated(const string_t& shaderPart);
+  std::vector<std::string> ReviewUniform(const std::string& name,
+                                         std::vector<std::string> arr);
+  std::string Builder(const std::string& shaderName,
+                      const std::vector<std::string>& uniforms,
+                      const std::vector<std::string>& uniformBuffers,
+                      const std::vector<std::string>& samplers,
+                      StandardMaterialDefines& defines);
+  CustomMaterial& AddUniform(const std::string& name, const std::string& kind,
+                             const std::optional<UniformInstance>& param);
+  CustomMaterial& Fragment_Begin(const std::string& shaderPart);
+  CustomMaterial& Fragment_Definitions(const std::string& shaderPart);
+  CustomMaterial& Fragment_MainBegin(const std::string& shaderPart);
+  CustomMaterial& Fragment_Custom_Diffuse(const std::string& shaderPart);
+  CustomMaterial& Fragment_Custom_Alpha(const std::string& shaderPart);
+  CustomMaterial& Fragment_Before_FragColor(const std::string& shaderPart);
+  CustomMaterial& Vertex_Begin(const std::string& shaderPart);
+  CustomMaterial& Vertex_Definitions(const std::string& shaderPart);
+  CustomMaterial& Vertex_MainBegin(const std::string& shaderPart);
+  CustomMaterial& Vertex_Before_PositionUpdated(const std::string& shaderPart);
+  CustomMaterial& Vertex_Before_NormalUpdated(const std::string& shaderPart);
 
 private:
   void _afterBind(Mesh* mesh, Effect* effect);
@@ -53,14 +57,14 @@ public:
   static unsigned int ShaderIndexer;
   ShaderSpecialParts CustomParts;
   bool _isCreatedShader;
-  string_t _createdShaderName;
-  vector_t<string_t> _customUniform;
-  vector_t<string_t> _newUniforms;
-  unordered_map_t<string_t, UniformInstance> _newUniformInstances;
-  unordered_map_t<string_t, TexturePtr> _newSamplerInstances;
+  std::string _createdShaderName;
+  std::vector<std::string> _customUniform;
+  std::vector<std::string> _newUniforms;
+  std::unordered_map<std::string, UniformInstance> _newUniformInstances;
+  std::unordered_map<std::string, TexturePtr> _newSamplerInstances;
 
-  string_t FragmentShader;
-  string_t VertexShader;
+  std::string FragmentShader;
+  std::string VertexShader;
 
 }; // end of class CustomMaterial
 

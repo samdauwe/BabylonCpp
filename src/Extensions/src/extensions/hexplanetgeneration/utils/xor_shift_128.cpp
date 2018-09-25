@@ -1,5 +1,7 @@
 #include <babylon/extensions/hexplanetgeneration/utils/xor_shift_128.h>
 
+#include <cmath>
+
 namespace BABYLON {
 namespace Extensions {
 
@@ -63,4 +65,4 @@ void XorShift128::reseed(size_t x, size_t y, size_t z, size_t w)
 }
 
 } // end of namespace Extensions
-} // end of namespace babylon
+} // namespace BABYLON

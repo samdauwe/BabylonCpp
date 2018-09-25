@@ -45,7 +45,7 @@ void GradientMaterialSphereScene::initializeScene(ICanvas* canvas, Scene* scene)
   _sphere->material             = gradientMaterial;
 
   scene->registerBeforeRender([this](Scene*, EventState&) {
-    _sphere->position().y += ::std::cos(_alpha) / 100.f;
+    _sphere->position().y += std::cos(_alpha) / 100.f;
     _alpha += 0.01f;
   });
 }

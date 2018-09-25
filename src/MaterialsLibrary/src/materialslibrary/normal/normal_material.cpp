@@ -362,7 +362,7 @@ Json::object NormalMaterial::serialize() const
   return Json::object();
 }
 
-const string_t NormalMaterial::getClassName() const
+const std::string NormalMaterial::getClassName() const
 {
   return "NormalMaterial";
 }

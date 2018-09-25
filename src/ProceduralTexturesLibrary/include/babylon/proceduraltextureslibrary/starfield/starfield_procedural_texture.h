@@ -1,7 +1,7 @@
 #ifndef BABYLON_PROCEDURAL_TEXTURES_LIBRARY_STARFIELD_STARFIELD_PROCEDURAL_TEXTURE_H
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_STARFIELD_STARFIELD_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/math/color3.h>
 
@@ -15,9 +15,9 @@ public:
   template <typename... Ts>
   static StarfieldProceduralTexture* New(Ts&&... args)
   {
-    auto texture = new StarfieldProceduralTexture(::std::forward<Ts>(args)...);
+    auto texture = new StarfieldProceduralTexture(std::forward<Ts>(args)...);
     texture->addToScene(
-      static_cast<unique_ptr_t<StarfieldProceduralTexture>>(texture));
+      static_cast<std::unique_ptr<StarfieldProceduralTexture>>(texture));
 
     return texture;
   }
@@ -40,9 +40,9 @@ public:
    * texture information
    * @returns a parsed Starfield Procedural Texture
    */
-  static unique_ptr_t<StarfieldProceduralTexture>
+  static std::unique_ptr<StarfieldProceduralTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const string_t& rootUrl);
+        const std::string& rootUrl);
 
 protected:
   StarfieldProceduralTexture(const std::string& name, const Size& size,

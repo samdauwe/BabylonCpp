@@ -177,7 +177,7 @@ private:
   void _setupSkyboxReflectionTexture();
 
   void _errorHandler(const std::string& message        = "",
-                     const ::std::exception& exception = ::std::exception());
+                     const std::exception& exception = std::exception());
 
 public:
   /**

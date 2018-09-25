@@ -19,7 +19,7 @@ public:
 protected:
   bool _traverseNode(
     const GLTFLoader& loader, const string_t& context, IGLTFNode* node:,
-    const ::std::function<bool(IGLTFNode* node, IGLTFNode* node)> action,
+    const std::function<bool(IGLTFNode* node, IGLTFNode* node)> action,
     IGLTFNode* parentNode);
 
   bool _loadNode(const GLTFLoader& loader, const string_t& context,
@@ -28,18 +28,18 @@ protected:
   bool _loadMaterial(
     const GLTFLoader& loader, const string_t& context,
     const IGLTFMaterial& material,
-    const ::std::function<void(Material* babylonMaterial, bool isNew)>& assign);
+    const std::function<void(Material* babylonMaterial, bool isNew)>& assign);
 
 private:
   void _loadNodeLOD(const GLTFLoader& loader, const string_t& context,
                     const vector_t<IGLTFNode*> nodes, unsigned int index,
-                    ::std::function<void()>& onComplete);
+                    std::function<void()>& onComplete);
 
   void _loadMaterialLOD(
     const GLTFLoader& loader, const string_t& context,
     const vector_t<IGLTFMaterial*>& materials, unsigned int index,
-    const ::std::function<void(Material* babylonMaterial, bool isNew)>& assign,
-    const ::std::function<void()>& onComplete);
+    const std::function<void(Material* babylonMaterial, bool isNew)>& assign,
+    const std::function<void()>& onComplete);
 
 }; // end of class KHRMaterialsPbrSpecularGlossiness
 

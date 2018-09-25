@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_GRID_GRID_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_GRID_GRID_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/grid/grid_material_defines.h>
 #include <babylon/math/color3.h>
@@ -11,7 +11,7 @@ namespace BABYLON {
 namespace MaterialsLibrary {
 
 class GridMaterial;
-using GridMaterialPtr = shared_ptr_t<GridMaterial>;
+using GridMaterialPtr = std::shared_ptr<GridMaterial>;
 
 /**
  * @brief The grid materials allows you to wrap any shape with a grid.
@@ -23,8 +23,8 @@ public:
   template <typename... Ts>
   static GridMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<GridMaterial>(
-      new GridMaterial(::std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<GridMaterial>(
+      new GridMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -39,7 +39,7 @@ public:
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,

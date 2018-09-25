@@ -36,7 +36,7 @@ void GearVRController::updateFromDevice(const DevicePose& poseData)
 }
 
 void GearVRController::initControllerMesh(
-  Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
+  Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   SceneLoader::ImportMesh(
     {}, GearVRController::MODEL_BASE_URL, GearVRController::MODEL_FILENAME,

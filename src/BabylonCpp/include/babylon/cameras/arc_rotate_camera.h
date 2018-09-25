@@ -28,7 +28,7 @@ public:
   static ArcRotateCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<ArcRotateCamera>(
-      new ArcRotateCamera(::std::forward<Ts>(args)...));
+      new ArcRotateCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
@@ -151,7 +151,7 @@ public:
   // Behaviors
   Observable<AbstractMesh> onMeshTargetChangedObservable;
   // Collisions
-  ::std::function<void(AbstractMesh* collidedMesh)> onCollide;
+  std::function<void(AbstractMesh* collidedMesh)> onCollide;
   bool checkCollisions;
   std::unique_ptr<Vector3> collisionRadius;
 

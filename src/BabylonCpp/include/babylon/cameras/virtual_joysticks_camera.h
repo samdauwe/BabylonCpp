@@ -22,7 +22,7 @@ public:
   static VirtualJoysticksCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<VirtualJoysticksCamera>(
-      new VirtualJoysticksCamera(::std::forward<Ts>(args)...));
+      new VirtualJoysticksCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

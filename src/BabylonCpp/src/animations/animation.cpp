@@ -80,7 +80,7 @@ AnimatablePtr Animation::CreateAndStartAnimation(
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
-  const ::std::function<void()>& onAnimationEnd)
+  const std::function<void()>& onAnimationEnd)
 {
 
   auto animation = Animation::_PrepareAnimation(
@@ -101,7 +101,7 @@ vector_t<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
   const string_t& targetProperty, size_t framePerSecond, int totalFrame,
   const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
-  const ::std::function<void()>& onAnimationEnd)
+  const std::function<void()>& onAnimationEnd)
 {
   auto animation = Animation::_PrepareAnimation(
     name, targetProperty, framePerSecond, totalFrame, from, to, loopMode,
@@ -122,7 +122,7 @@ AnimatablePtr Animation::CreateMergeAndStartAnimation(
   size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
-  const ::std::function<void()>& onAnimationEnd)
+  const std::function<void()>& onAnimationEnd)
 {
   auto animation = Animation::_PrepareAnimation(
     name, targetProperty, framePerSecond, totalFrame, from, to, loopMode,
@@ -142,7 +142,7 @@ Animatable* Animation::TransitionTo(
   const string_t& /*property*/, const AnimationValue& /*targetValue*/,
   const AnimationValue& /*host*/, Scene* /*scene*/, float /*frameRate*/,
   const AnimationPtr& /*transition*/, float /*duration*/,
-  const ::std::function<void()>& /*onAnimationEnd*/)
+  const std::function<void()>& /*onAnimationEnd*/)
 {
   return nullptr;
 }
@@ -198,9 +198,9 @@ string_t Animation::toString(bool fullDetails) const
              "Color3", "Vector2", "Size",       "Boolean"}[_dataType];
   }
   oss << ", nKeys: "
-      << (!_keys.empty() ? ::std::to_string(_keys.size()) : "none");
+      << (!_keys.empty() ? std::to_string(_keys.size()) : "none");
   oss << ", nRanges: "
-      << (!_ranges.empty() ? ::std::to_string(_ranges.size()) : "none");
+      << (!_ranges.empty() ? std::to_string(_ranges.size()) : "none");
   if (fullDetails) {
     oss << ", Ranges: {";
     bool first = true;
@@ -223,7 +223,7 @@ void Animation::addEvent(const AnimationEvent& event)
 
 void Animation::removeEvents(int frame)
 {
-  _events.erase(::std::remove_if(_events.begin(), _events.end(),
+  _events.erase(std::remove_if(_events.begin(), _events.end(),
                                  [frame](const AnimationEvent& event) {
                                    return event.frame == frame;
                                  }),
@@ -250,7 +250,7 @@ void Animation::deleteRange(const string_t& iName, bool deleteFrames)
       const auto& from = _ranges[iName].from;
       const auto& to   = _ranges[iName].to;
 
-      _keys.erase(::std::remove_if(_keys.begin(), _keys.end(),
+      _keys.erase(std::remove_if(_keys.begin(), _keys.end(),
                                    [from, to](const IAnimationKey& key) {
                                      return key.frame >= from
                                             && key.frame <= to;
@@ -389,10 +389,10 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
 
   // Try to get a hash to find the right key
   int _keysLength   = static_cast<int>(keys.size());
-  int startKeyIndex = ::std::max(
-    0, ::std::min(_keysLength - 1,
+  int startKeyIndex = std::max(
+    0, std::min(_keysLength - 1,
                   static_cast<int>(
-                    ::std::floor(_keysLength * (currentFrame - keys[0].frame)
+                    std::floor(_keysLength * (currentFrame - keys[0].frame)
                                  / (keys.back().frame - keys[0].frame))
                     - 1)));
 

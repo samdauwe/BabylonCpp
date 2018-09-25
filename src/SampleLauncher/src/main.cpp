@@ -60,7 +60,7 @@ void initializeLogging()
  * @return exit code
  */
 int runSample(const BABYLON::Samples::SamplesIndex& samples,
-              const ::std::string& sampleName, bool showInspectorWindow,
+              const std::string& sampleName, bool showInspectorWindow,
               long runTimeMillis = 0)
 {
   using namespace BABYLON::Samples;
@@ -94,7 +94,7 @@ int sampleLauncherMain(int l, int v, int i, const char* sampleGroup,
   SamplesIndex samples;
   int exitcode = 0;
   if (l > 0) {
-    ::std::ostringstream oss;
+    std::ostringstream oss;
     // Get sample names and category names
     const auto sampleNames   = samples.getSampleNames();
     const auto categoryNames = samples.getCategoryNames();
@@ -126,7 +126,7 @@ int sampleLauncherMain(int l, int v, int i, const char* sampleGroup,
     const std::string categoryName{sampleGroup};
     if (!categoryName.empty()
         && (samples.categoryExists(categoryName) || categoryName == "All")) {
-      ::std::vector<::std::string> categoryNames;
+      std::vector<std::string> categoryNames;
       if (categoryName == "All") {
         categoryNames = samples.getCategoryNames();
       }

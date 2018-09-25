@@ -53,7 +53,7 @@ void PhysicsEngine::dispose()
   _physicsPlugin->dispose();
 }
 
-string_t PhysicsEngine::getPhysicsPluginName() const
+std::string PhysicsEngine::getPhysicsPluginName() const
 {
   return _physicsPlugin->name;
 }
@@ -70,9 +70,9 @@ void PhysicsEngine::addImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 {
-  auto it = ::std::find_if(
+  auto it = std::find_if(
     _impostors.begin(), _impostors.end(),
-    [&impostor](const shared_ptr_t<PhysicsImpostor>& _imposter) {
+    [&impostor](const std::shared_ptr<PhysicsImpostor>& _imposter) {
       return _imposter.get() == impostor;
     });
   if (it != _impostors.end()) {
@@ -84,9 +84,9 @@ void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
 
 void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor,
                              PhysicsImpostor* connectedImpostor,
-                             const shared_ptr_t<PhysicsJoint>& joint)
+                             const std::shared_ptr<PhysicsJoint>& joint)
 {
-  auto impostorJoint               = ::std::make_shared<PhysicsImpostorJoint>();
+  auto impostorJoint               = std::make_shared<PhysicsImpostorJoint>();
   impostorJoint->mainImpostor      = mainImpostor;
   impostorJoint->connectedImpostor = connectedImpostor;
   impostorJoint->joint             = joint;
@@ -100,12 +100,13 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
                                 PhysicsImpostor* connectedImpostor,
                                 PhysicsJoint* joint)
 {
-  vector_t<shared_ptr_t<PhysicsImpostorJoint>> matchingJoints(_joints.size());
+  std::vector<std::shared_ptr<PhysicsImpostorJoint>> matchingJoints(
+    _joints.size());
 
-  auto it = ::std::copy_if(
+  auto it = std::copy_if(
     _joints.begin(), _joints.end(), matchingJoints.begin(),
-    [&connectedImpostor, &joint,
-     &mainImpostor](const shared_ptr_t<PhysicsImpostorJoint>& impostorJoint) {
+    [&connectedImpostor, &joint, &mainImpostor](
+      const std::shared_ptr<PhysicsImpostorJoint>& impostorJoint) {
       return (impostorJoint->connectedImpostor == connectedImpostor
               && impostorJoint->joint.get() == joint
               && impostorJoint->mainImpostor == mainImpostor);
@@ -113,7 +114,7 @@ void PhysicsEngine::removeJoint(PhysicsImpostor* mainImpostor,
 
   // shrink container to new size
   matchingJoints.resize(
-    static_cast<size_t>(::std::distance(matchingJoints.begin(), it)));
+    static_cast<size_t>(std::distance(matchingJoints.begin(), it)));
 
   if (!matchingJoints.empty()) {
     _physicsPlugin->removeJoint(matchingJoints[0].get());
@@ -145,7 +146,7 @@ IPhysicsEnginePlugin* PhysicsEngine::getPhysicsPlugin()
   return _physicsPlugin;
 }
 
-vector_t<shared_ptr_t<PhysicsImpostor>>& PhysicsEngine::getImpostors()
+std::vector<std::shared_ptr<PhysicsImpostor>>& PhysicsEngine::getImpostors()
 {
   return _impostors;
 }
@@ -154,20 +155,20 @@ PhysicsImpostor*
 PhysicsEngine::getImpostorForPhysicsObject(IPhysicsEnabledObject* object)
 {
   auto it
-    = ::std::find_if(_impostors.begin(), _impostors.end(),
-                     [&object](const shared_ptr_t<PhysicsImpostor>& impostor) {
-                       return impostor->object == object;
-                     });
+    = std::find_if(_impostors.begin(), _impostors.end(),
+                   [&object](const std::shared_ptr<PhysicsImpostor>& impostor) {
+                     return impostor->object == object;
+                   });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 
 PhysicsImpostor* PhysicsEngine::getImpostorWithPhysicsBody(IPhysicsBody* body)
 {
   auto it
-    = ::std::find_if(_impostors.begin(), _impostors.end(),
-                     [&body](const shared_ptr_t<PhysicsImpostor>& impostor) {
-                       return impostor->physicsBody() == body;
-                     });
+    = std::find_if(_impostors.begin(), _impostors.end(),
+                   [&body](const std::shared_ptr<PhysicsImpostor>& impostor) {
+                     return impostor->physicsBody() == body;
+                   });
   return (it == _impostors.end()) ? nullptr : (*it).get();
 }
 

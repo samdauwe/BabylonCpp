@@ -44,7 +44,7 @@ PathCursor& PathCursor::moveBack(float step)
 
 PathCursor& PathCursor::move(float step)
 {
-  if (::std::abs(step) > 1) {
+  if (std::abs(step) > 1) {
     BABYLON_LOG_ERROR("PathCursor", "Step size should be less than 1.");
     return *this;
   }
@@ -79,7 +79,7 @@ PathCursor& PathCursor::raiseOnChange()
 }
 
 PathCursor&
-PathCursor::onchange(const ::std::function<void(const PathCursor& cursor)>& f)
+PathCursor::onchange(const std::function<void(const PathCursor& cursor)>& f)
 {
   _onchange.emplace_back(f);
 

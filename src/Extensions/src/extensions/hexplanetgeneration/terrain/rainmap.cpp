@@ -1,5 +1,8 @@
 #include <babylon/extensions/hexplanetgeneration/terrain/rainmap.h>
 
+#include <cmath>
+
+#include <babylon/babylon_constants.h>
 #include <babylon/extensions/hexplanetgeneration/utils/fast_simplex_noise.h>
 
 namespace BABYLON {

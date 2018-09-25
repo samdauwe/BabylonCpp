@@ -9,7 +9,7 @@
 #ifndef BABYLON_TOOLS_HDR_PMREM_GENERATOR_H
 #define BABYLON_TOOLS_HDR_PMREM_GENERATOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector4.h>
 #include <babylon/tools/hdr/cmg_bounding_box.h>
 
@@ -72,7 +72,7 @@ private:
   //  _ABSOLUTE VALUE_ of the max coord)
   // into NVC space
   // Note this currently assumes the D3D cube face ordering and orientation
-  static const vector_t<vector_t<Float32Array>> _sgFace2DMapping;
+  static const std::vector<std::vector<Float32Array>> _sgFace2DMapping;
 
   //----------------------------------------------------------------------------
   // D3D cube map face specification
@@ -101,16 +101,16 @@ private:
   //  in ORDER of left, right, top, bottom (e.g. edges corresponding to u=0,
   //  u=1, v=0, v=1 in the 2D coordinate system of the particular face.
   // Note this currently assumes the D3D cube face ordering and orientation
-  static const vector_t<vector_t<Uint32Array>> _sgCubeNgh;
+  static const std::vector<std::vector<Uint32Array>> _sgCubeNgh;
 
   // The 12 edges of the cubemap, (entries are used to index into the neighbor
   // table) this table is used to average over the edges.
-  static const vector_t<Uint32Array> _sgCubeEdgeList;
+  static const std::vector<Uint32Array> _sgCubeEdgeList;
 
   // Information about which of the 8 cube corners are correspond to the
   //  the 4 corners in each cube face
   //  the order is upper left, upper right, lower left, lower right
-  static const vector_t<Uint32Array> _sgCubeCornerList;
+  static const std::vector<Uint32Array> _sgCubeCornerList;
 
 public:
   /**
@@ -132,7 +132,7 @@ public:
    * or not
    * @param fixup Specifies wether to apply the edge fixup algorythm or not
    */
-  PMREMGenerator(const vector_t<ArrayBufferView>& input, int inputSize,
+  PMREMGenerator(const std::vector<ArrayBufferView>& input, int inputSize,
                  int outputSize, size_t maxNumMipLevels, size_t numChannels,
                  bool isFloat, float specularPower, float cosinePowerDropPerMip,
                  bool excludeBase, bool fixup);
@@ -143,7 +143,7 @@ public:
    *
    * @return the filter cubemap in the form mip0 [faces1..6] .. mipN [faces1..6]
    */
-  vector_t<vector_t<ArrayBufferView>>& filterCubeMap();
+  std::vector<std::vector<ArrayBufferView>>& filterCubeMap();
 
 private:
   void init();
@@ -281,15 +281,16 @@ private:
   float texelCoordSolidAngle(unsigned int faceIdx, float u, float v,
                              size_t size) const;
 
-  void filterCubeSurfaces(const vector_t<ArrayBufferView>& srcCubeMap,
-                          float srcSize, vector_t<ArrayBufferView>& dstCubeMap,
+  void filterCubeSurfaces(const std::vector<ArrayBufferView>& srcCubeMap,
+                          float srcSize,
+                          std::vector<ArrayBufferView>& dstCubeMap,
                           size_t dstSize, float filterConeAngle,
                           float specularPower);
 
   //----------------------------------------------------------------------------
   // Clear filter extents for the 6 cube map faces
   //----------------------------------------------------------------------------
-  void clearFilterExtents(array_t<CMGBoundinBox, 6>& filterExtents);
+  void clearFilterExtents(std::array<CMGBoundinBox, 6>& filterExtents);
 
   //----------------------------------------------------------------------------
   // Define per-face bounding box filter extents
@@ -301,19 +302,21 @@ private:
   // cone.
   //
   //----------------------------------------------------------------------------
-  void determineFilterExtents(const Vector4& centerTapDir, size_t srcSize,
-                              size_t bboxSize,
-                              array_t<CMGBoundinBox, 6>& filterExtents) const;
+  void
+  determineFilterExtents(const Vector4& centerTapDir, size_t srcSize,
+                         size_t bboxSize,
+                         std::array<CMGBoundinBox, 6>& filterExtents) const;
 
   //----------------------------------------------------------------------------
   // ProcessFilterExtents
   //  Process bounding box in each cube face
   //
   //----------------------------------------------------------------------------
-  Vector4 processFilterExtents(const Vector4& centerTapDir, float dotProdThresh,
-                               const array_t<CMGBoundinBox, 6>& filterExtents,
-                               const vector_t<ArrayBufferView>& srcCubeMap,
-                               size_t srcSize, size_t specularPower) const;
+  Vector4
+  processFilterExtents(const Vector4& centerTapDir, float dotProdThresh,
+                       const std::array<CMGBoundinBox, 6>& filterExtents,
+                       const std::vector<ArrayBufferView>& srcCubeMap,
+                       size_t srcSize, size_t specularPower) const;
 
   //----------------------------------------------------------------------------
   // Fixup cube edges
@@ -321,10 +324,11 @@ private:
   // average texels on cube map faces across the edges
   // WARP/BENT Method Only.
   //----------------------------------------------------------------------------
-  void fixupCubeEdges(vector_t<ArrayBufferView>& cubeMap, size_t cubeMapSize);
+  void fixupCubeEdges(std::vector<ArrayBufferView>& cubeMap,
+                      size_t cubeMapSize);
 
 public:
-  vector_t<ArrayBufferView> input;
+  std::vector<ArrayBufferView> input;
   int inputSize;
   int outputSize;
   size_t maxNumMipLevels;
@@ -336,9 +340,9 @@ public:
   bool fixup;
 
 private:
-  vector_t<vector_t<ArrayBufferView>> _outputSurface;
-  vector_t<ArrayBufferView> _normCubeMap;
-  vector_t<vector_t<ArrayBufferView>> _filterLUT;
+  std::vector<std::vector<ArrayBufferView>> _outputSurface;
+  std::vector<ArrayBufferView> _normCubeMap;
+  std::vector<std::vector<ArrayBufferView>> _filterLUT;
   int _numMipLevels;
 
 }; // end of class PMREMGenerator

@@ -327,14 +327,14 @@ public:
    * @returns the TransformNode.
    */
   TransformNode& registerAfterWorldMatrixUpdate(
-    const ::std::function<void(TransformNode* mesh, EventState& es)>& func);
+    const std::function<void(TransformNode* mesh, EventState& es)>& func);
 
   /**
    * @brief Removes a registered callback function.
    * @returns the TransformNode.
    */
   TransformNode& unregisterAfterWorldMatrixUpdate(
-    const ::std::function<void(TransformNode* mesh, EventState& es)>& func);
+    const std::function<void(TransformNode* mesh, EventState& es)>& func);
 
   /**
    * @brief Clone the current transform node.

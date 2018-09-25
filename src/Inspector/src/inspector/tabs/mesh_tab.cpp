@@ -34,12 +34,12 @@ void MeshTab::_buildTree()
   vector_t<NodePtr> alreadyIn;
 
   // Recursive method building the tree panel
-  ::std::function<TreeItem<MeshAdapter>(NodePtr)> createNode
+  std::function<TreeItem<MeshAdapter>(NodePtr)> createNode
     = [&](const NodePtr& obj) -> TreeItem<MeshAdapter> {
     auto descendants = obj->getDescendants(true);
 
     auto node
-      = TreeItem<MeshAdapter>{*this, ::std::make_unique<MeshAdapter>(obj)};
+      = TreeItem<MeshAdapter>{*this, std::make_unique<MeshAdapter>(obj)};
 
     if (!descendants.empty()) {
       for (auto& child : descendants) {

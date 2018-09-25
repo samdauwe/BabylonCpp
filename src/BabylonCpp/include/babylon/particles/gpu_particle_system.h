@@ -2,11 +2,24 @@
 #define BABYLON_PARTICLES_GPU_PARTICLE_SYSTEM_H
 
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/particles/base_particle_system.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
+
+class Buffer;
+class Effect;
+class Engine;
+struct EffectCreationOptions;
+class GPUParticleSystem;
+class Mesh;
+class RawTexture;
+using RawTexturePtr = std::shared_ptr<RawTexture>;
+
+namespace GL {
+class IGLVertexArrayObject;
+} // end of namespace GL
 
 /**
  * @brief This represents a GPU particle system in Babylon
@@ -36,10 +49,10 @@ public:
    * @param isAnimationSheetEnabled Must be true if using a spritesheet to
    * animate the particles texture
    */
-  GPUParticleSystem(const string_t& name, size_t capacity = 5000,
-                    nullable_t<int> randomTextureSize = nullopt_t,
-                    Scene* scene                      = nullptr,
-                    bool isAnimationSheetEnabled      = false);
+  GPUParticleSystem(const std::string& name, size_t capacity = 5000,
+                    std::optional<int> randomTextureSize = std::nullopt,
+                    Scene* scene                         = nullptr,
+                    bool isAnimationSheetEnabled         = false);
   virtual ~GPUParticleSystem() override;
 
   /**
@@ -92,8 +105,8 @@ public:
    * @returns the current particle system
    */
   GPUParticleSystem& addColorGradient(float gradient, const Color4& color1,
-                                      const nullable_t<Color4>& color2
-                                      = nullopt_t) override;
+                                      const std::optional<Color4>& color2
+                                      = std::nullopt) override;
 
   /**
    * @brief Remove a specific color gradient.
@@ -109,8 +122,8 @@ public:
    * @returns the current particle system
    */
   GPUParticleSystem& addSizeGradient(float gradient, float factor,
-                                     const nullable_t<float>& factor2
-                                     = nullopt_t) override;
+                                     const std::optional<float>& factor2
+                                     = std::nullopt) override;
 
   /**
    * @brief Remove a specific size gradient.
@@ -126,8 +139,8 @@ public:
    * @returns the current particle system
    */
   GPUParticleSystem& addAngularSpeedGradient(float gradient, float factor,
-                                             const nullable_t<float>& factor2
-                                             = nullopt_t) override;
+                                             const std::optional<float>& factor2
+                                             = std::nullopt) override;
 
   /**
    * @brief Remove a specific angular speed gradient.
@@ -143,8 +156,8 @@ public:
    * @returns the current particle system
    */
   GPUParticleSystem& addVelocityGradient(float gradient, float factor,
-                                         const nullable_t<float>& factor2
-                                         = nullopt_t) override;
+                                         const std::optional<float>& factor2
+                                         = std::nullopt) override;
 
   /**
    * @brief Remove a specific velocity gradient
@@ -161,8 +174,8 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addLimitVelocityGradient(float gradient, float factor,
-                                            const nullable_t<float>& factor2
-                                            = nullopt_t) override;
+                                            const std::optional<float>& factor2
+                                            = std::nullopt) override;
 
   /**
    * Remove a specific limit velocity gradient.
@@ -178,8 +191,8 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& addDragGradient(float gradient, float factor,
-                                   const nullable_t<float>& factor2
-                                   = nullopt_t) override;
+                                   const std::optional<float>& factor2
+                                   = std::nullopt) override;
 
   /**
    * Remove a specific drag gradient.
@@ -232,7 +245,7 @@ public:
    * @param newEmitter The new emitter to use
    * @returns the cloned particle system
    */
-  IParticleSystem* clone(const string_t& name, Mesh* newEmitter) override;
+  IParticleSystem* clone(const std::string& name, Mesh* newEmitter) override;
 
   /**
    * @brief Serializes the particle system to a JSON object.
@@ -249,7 +262,7 @@ public:
    * @returns the parsed GPU particle system
    */
   static IParticleSystem* Parse(const Json::value& parsedParticleSystem,
-                                Scene* scene, const string_t& rootUrl);
+                                Scene* scene, const std::string& rootUrl);
 
 protected:
   size_t get_activeParticleCount() const;
@@ -259,20 +272,20 @@ protected:
 
 private:
   template <typename T>
-  GPUParticleSystem& _removeGradient(float gradient, vector_t<T>& gradients,
+  GPUParticleSystem& _removeGradient(float gradient, std::vector<T>& gradients,
                                      RawTexture* texture);
-  void _addFactorGradient(vector_t<FactorGradient>& factorGradients,
+  void _addFactorGradient(std::vector<FactorGradient>& factorGradients,
                           float gradient, float factor);
-  unique_ptr_t<GL::IGLVertexArrayObject> _createUpdateVAO(Buffer* source);
-  unique_ptr_t<GL::IGLVertexArrayObject> _createRenderVAO(Buffer* source,
-                                                          Buffer* spriteSource);
+  std::unique_ptr<GL::IGLVertexArrayObject> _createUpdateVAO(Buffer* source);
+  std::unique_ptr<GL::IGLVertexArrayObject>
+  _createRenderVAO(Buffer* source, Buffer* spriteSource);
   void _initialize(bool force = false);
-  RawTexture* _getRawTextureByName(const string_t& textureName);
-  void _setRawTextureByName(const string_t& textureName,
-                            unique_ptr_t<RawTexture>&& rawTexture);
+  RawTexture* _getRawTextureByName(const std::string& textureName);
+  void _setRawTextureByName(const std::string& textureName,
+                            std::unique_ptr<RawTexture>&& rawTexture);
   template <typename T>
-  void _createFactorGradientTexture(const vector_t<T>& factorGradients,
-                                    const string_t& textureName);
+  void _createFactorGradientTexture(const std::vector<T>& factorGradients,
+                                    const std::string& textureName);
   void _createSizeGradientTexture();
   void _createAngularSpeedGradientTexture();
   void _createVelocityGradientTexture();
@@ -302,14 +315,14 @@ private:
   size_t _activeCount;
   size_t _currentActiveCount;
   size_t _accumulatedCount;
-  unique_ptr_t<Effect> _renderEffect;
-  unique_ptr_t<Effect> _updateEffect;
+  std::unique_ptr<Effect> _renderEffect;
+  std::unique_ptr<Effect> _updateEffect;
 
-  unique_ptr_t<Buffer> _buffer0;
-  unique_ptr_t<Buffer> _buffer1;
-  unique_ptr_t<Buffer> _spriteBuffer;
-  vector_t<unique_ptr_t<GL::IGLVertexArrayObject>> _updateVAO;
-  vector_t<unique_ptr_t<GL::IGLVertexArrayObject>> _renderVAO;
+  std::unique_ptr<Buffer> _buffer0;
+  std::unique_ptr<Buffer> _buffer1;
+  std::unique_ptr<Buffer> _spriteBuffer;
+  std::vector<std::unique_ptr<GL::IGLVertexArrayObject>> _updateVAO;
+  std::vector<std::unique_ptr<GL::IGLVertexArrayObject>> _renderVAO;
 
   size_t _targetIndex;
   Buffer* _sourceBuffer;

@@ -19,7 +19,7 @@ public:
   static FollowCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<FollowCamera>(
-      new FollowCamera(::std::forward<Ts>(args)...));
+      new FollowCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

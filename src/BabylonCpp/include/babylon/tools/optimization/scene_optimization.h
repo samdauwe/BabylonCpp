@@ -1,9 +1,11 @@
 #ifndef BABYLON_TOOLS_OPTIMIZATION_SCENE_OPTIMIZATION_H
 #define BABYLON_TOOLS_OPTIMIZATION_SCENE_OPTIMIZATION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Scene;
 
 class BABYLON_SHARED_EXPORT SceneOptimization {
 

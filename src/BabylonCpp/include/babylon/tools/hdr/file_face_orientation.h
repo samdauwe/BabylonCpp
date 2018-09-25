@@ -1,14 +1,15 @@
 #ifndef BABYLON_TOOLS_HDR_FILE_FACE_ORIENTATION_H
 #define BABYLON_TOOLS_HDR_FILE_FACE_ORIENTATION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT FileFaceOrientation {
 
-  FileFaceOrientation(const string_t& name, const Vector3& worldAxisForNormal,
+  FileFaceOrientation(const std::string& name,
+                      const Vector3& worldAxisForNormal,
                       const Vector3& worldAxisForFileX,
                       const Vector3& worldAxisForFileY);
   FileFaceOrientation(const FileFaceOrientation& other);
@@ -17,7 +18,7 @@ struct BABYLON_SHARED_EXPORT FileFaceOrientation {
   FileFaceOrientation& operator=(FileFaceOrientation&& other);
   ~FileFaceOrientation();
 
-  string_t name;
+  std::string name;
   // The world axis corresponding to the normal to the face
   Vector3 worldAxisForNormal;
   // The world axis corresponding to texture right x-axis in file

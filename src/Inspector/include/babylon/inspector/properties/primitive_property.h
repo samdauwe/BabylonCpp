@@ -1,7 +1,7 @@
 #ifndef BABYLON_INSPECTOR_PROPERTIES_PRIMITIVE_PROPERTY_H
 #define BABYLON_INSPECTOR_PROPERTIES_PRIMITIVE_PROPERTY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 #include <babylon/inspector/properties/callbacks.h>
 #include <babylon/mesh/geometry.h>
@@ -21,25 +21,23 @@ public:
   }
 
   PrimitiveProperty(const PrimitiveProperty& other)
-      : _id{other._id}
-      , _getter{other._getter}
-      , _setter{other._setter}
+      : _id{other._id}, _getter{other._getter}, _setter{other._setter}
   {
   }
 
   PrimitiveProperty(PrimitiveProperty&& other)
-      : _id{::std::move(other._id)}
-      , _getter{::std::move(other._getter)}
-      , _setter{::std::move(other._setter)}
+      : _id{std::move(other._id)}
+      , _getter{std::move(other._getter)}
+      , _setter{std::move(other._setter)}
   {
   }
 
   PrimitiveProperty& operator=(const PrimitiveProperty& other)
   {
     if (&other != this) {
-      _id             = other._id;
-      _getter         = other._getter;
-      _setter         = other._setter;
+      _id     = other._id;
+      _getter = other._getter;
+      _setter = other._setter;
     }
 
     return *this;
@@ -48,9 +46,9 @@ public:
   PrimitiveProperty& operator=(PrimitiveProperty&& other)
   {
     if (&other != this) {
-      _id             = std::move(other._id);
-      _getter         = std::move(other._getter);
-      _setter         = std::move(other._setter);
+      _id     = std::move(other._id);
+      _getter = std::move(other._getter);
+      _setter = std::move(other._setter);
     }
 
     return *this;
@@ -99,10 +97,10 @@ public:
   }
 
   template <typename U = T>
-  typename std::enable_if<std::is_same<U, string_t>::value>::type render()
+  typename std::enable_if<std::is_same<U, std::string>::value>::type render()
   {
-    string_t stringValue = _getter();
-    char* cstr           = &stringValue[0u];
+    std::string stringValue = _getter();
+    char* cstr              = &stringValue[0u];
     if (ImGui::InputText("", cstr, stringValue.size())) {
     }
   }
@@ -112,7 +110,7 @@ public:
   }
 
 public:
-  string_t _id;
+  std::string _id;
   TPrimitiveGetter<T> _getter;
   TPrimitiveSetter<T> _setter;
 

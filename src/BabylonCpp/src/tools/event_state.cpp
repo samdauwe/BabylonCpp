@@ -18,11 +18,11 @@ EventState::EventState(const EventState& other)
 }
 
 EventState::EventState(EventState&& other)
-    : skipNextObservers{::std::move(other.skipNextObservers)}
-    , mask{::std::move(other.mask)}
-    , target{::std::move(other.target)}
-    , currentTarget{::std::move(other.currentTarget)}
-    , lastReturnValue{::std::move(other.lastReturnValue)}
+    : skipNextObservers{std::move(other.skipNextObservers)}
+    , mask{std::move(other.mask)}
+    , target{std::move(other.target)}
+    , currentTarget{std::move(other.currentTarget)}
+    , lastReturnValue{std::move(other.lastReturnValue)}
 {
 }
 
@@ -42,11 +42,11 @@ EventState& EventState::operator=(const EventState& other)
 EventState& EventState::operator=(EventState&& other)
 {
   if (&other != this) {
-    skipNextObservers = ::std::move(other.skipNextObservers);
-    mask              = ::std::move(other.mask);
-    target            = ::std::move(other.target);
-    currentTarget     = ::std::move(other.currentTarget);
-    lastReturnValue   = ::std::move(other.lastReturnValue);
+    skipNextObservers = std::move(other.skipNextObservers);
+    mask              = std::move(other.mask);
+    target            = std::move(other.target);
+    currentTarget     = std::move(other.currentTarget);
+    lastReturnValue   = std::move(other.lastReturnValue);
   }
 
   return *this;

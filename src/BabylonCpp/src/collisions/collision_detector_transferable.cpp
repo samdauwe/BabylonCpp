@@ -19,7 +19,7 @@ CollisionDetectorTransferable::~CollisionDetectorTransferable()
 WorkerReply
 CollisionDetectorTransferable::onInit(const InitPayload& /*payload*/)
 {
-  _collisionCache = ::std::make_unique<CollisionCache>();
+  _collisionCache = std::make_unique<CollisionCache>();
 
   WorkerReply reply;
   reply.error    = WorkerReplyType::SUCCESS;

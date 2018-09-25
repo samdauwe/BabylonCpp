@@ -1,7 +1,7 @@
 #ifndef BABYLON_PROCEDURAL_TEXTURES_LIBRARY_WOOD_WOOD_PROCEDURAL_TEXTURE_H
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_WOOD_WOOD_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/math/color3.h>
 
@@ -14,9 +14,9 @@ public:
   template <typename... Ts>
   static WoodProceduralTexture* New(Ts&&... args)
   {
-    auto texture = new WoodProceduralTexture(::std::forward<Ts>(args)...);
+    auto texture = new WoodProceduralTexture(std::forward<Ts>(args)...);
     texture->addToScene(
-      static_cast<unique_ptr_t<WoodProceduralTexture>>(texture));
+      static_cast<std::unique_ptr<WoodProceduralTexture>>(texture));
 
     return texture;
   }
@@ -39,9 +39,9 @@ public:
    * information
    * @returns a parsed Wood Procedural Texture
    */
-  static unique_ptr_t<WoodProceduralTexture>
+  static std::unique_ptr<WoodProceduralTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const string_t& rootUrl);
+        const std::string& rootUrl);
 
 protected:
   WoodProceduralTexture(const std::string& name, const Size& size, Scene* scene,

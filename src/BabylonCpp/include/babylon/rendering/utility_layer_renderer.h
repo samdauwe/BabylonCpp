@@ -40,7 +40,7 @@ public:
   template <typename... Ts>
   static std::shared_ptr<UtilityLayerRenderer> New(Ts&&... args)
   {
-    auto renderer = new UtilityLayerRenderer(::std::forward<Ts>(args)...);
+    auto renderer = new UtilityLayerRenderer(std::forward<Ts>(args)...);
     return static_cast<std::shared_ptr<UtilityLayerRenderer>>(renderer);
   }
   virtual ~UtilityLayerRenderer();
@@ -108,7 +108,7 @@ public:
    * Gets or sets a predicate that will be used to indicate utility meshes
    * present in the main scene
    */
-  ::std::function<bool(const AbstractMeshPtr& mesh)> mainSceneTrackerPredicate;
+  std::function<bool(const AbstractMeshPtr& mesh)> mainSceneTrackerPredicate;
 
 private:
   static std::shared_ptr<UtilityLayerRenderer> _DefaultUtilityLayer;

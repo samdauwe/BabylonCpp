@@ -1,7 +1,6 @@
 #ifndef BABYLON_SAMPLES_SPECIAL_FX_SPECIAL_FX_SAMPLES_INDEX_H
 #define BABYLON_SAMPLES_SPECIAL_FX_SPECIAL_FX_SAMPLES_INDEX_H
 
-#include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/samples/samples_common.h>
 
 namespace BABYLON {
@@ -14,7 +13,7 @@ public:
    * @brief Returns the category name.
    * @return the category name
    */
-  static const string_t CategoryName()
+  static const std::string CategoryName()
   {
     return "Special FX";
   }

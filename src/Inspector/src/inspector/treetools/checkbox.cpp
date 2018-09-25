@@ -19,7 +19,7 @@ Checkbox::~Checkbox()
 }
 
 Checkbox::Checkbox(Checkbox&& other)
-    : AbstractTreeTool{std::move(other)}, _obj{::std::move(other._obj)}
+    : AbstractTreeTool{std::move(other)}, _obj{std::move(other._obj)}
 {
 }
 

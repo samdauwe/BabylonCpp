@@ -1,7 +1,7 @@
 #ifndef BABYLON_PHYSICS_PHYSICS_PARAMS_H
 #define BABYLON_PHYSICS_PHYSICS_PARAMS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

@@ -13,9 +13,9 @@ namespace BABYLON {
 TargetCamera::TargetCamera(const string_t& iName, const Vector3& iPosition,
                            Scene* scene, bool setActiveOnSceneIfNoneActive)
     : Camera(iName, iPosition, scene, setActiveOnSceneIfNoneActive)
-    , cameraDirection{::std::make_unique<Vector3>(0.f, 0.f, 0.f)}
-    , cameraRotation{::std::make_unique<Vector2>(0.f, 0.f)}
-    , rotation{::std::make_unique<Vector3>(0.f, 0.f, 0.f)}
+    , cameraDirection{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
+    , cameraRotation{std::make_unique<Vector2>(0.f, 0.f)}
+    , rotation{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
     , rotationQuaternion{nullptr}
     , speed{2.f}
     , noRotationConstraint{false}
@@ -25,7 +25,7 @@ TargetCamera::TargetCamera(const string_t& iName, const Vector3& iPosition,
     , _camMatrix{Matrix::Zero()}
     , _cameraTransformMatrix{Matrix::Zero()}
     , _cameraRotationMatrix{Matrix::Zero()}
-    , _referencePoint{::std::make_unique<Vector3>(0.f, 0.f, 1.f)}
+    , _referencePoint{std::make_unique<Vector3>(0.f, 0.f, 1.f)}
     , _transformedReferencePoint{Vector3::Zero()}
     , _globalCurrentTarget{Vector3::Zero()}
     , _globalCurrentUpVector{Vector3::Zero()}
@@ -98,7 +98,7 @@ bool TargetCamera::_restoreStateValues()
 void TargetCamera::_initCache()
 {
   Camera::_initCache();
-  _cache.lockedTarget = ::std::make_unique<Vector3>(
+  _cache.lockedTarget = std::make_unique<Vector3>(
     numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
     numeric_limits_t<float>::max());
   _cache.rotation
@@ -154,12 +154,12 @@ float TargetCamera::_computeLocalCameraSpeed()
   auto engine = getEngine();
 
   return speed
-         * ::std::sqrt((engine->getDeltaTime() / (engine->getFps() * 100.f)));
+         * std::sqrt((engine->getDeltaTime() / (engine->getFps() * 100.f)));
 }
 
 void TargetCamera::setRotation(const Vector3& newRotation)
 {
-  rotation = ::std::make_unique<Vector3>(newRotation);
+  rotation = std::make_unique<Vector3>(newRotation);
 }
 
 Vector3& TargetCamera::getRotation()
@@ -179,15 +179,15 @@ void TargetCamera::setTarget(const Vector3& target)
   Matrix::LookAtLHToRef(position, target, _defaultUp, _camMatrix);
   _camMatrix.invert();
 
-  rotation->x = ::std::atan(_camMatrix.m[6] / _camMatrix.m[10]);
+  rotation->x = std::atan(_camMatrix.m[6] / _camMatrix.m[10]);
 
   auto vDir = target.subtract(position);
 
   if (vDir.x >= 0.f) {
-    rotation->y = (-::std::atan(vDir.z / vDir.x) + Math::PI / 2.f);
+    rotation->y = (-std::atan(vDir.z / vDir.x) + Math::PI / 2.f);
   }
   else {
-    rotation->y = (-::std::atan(vDir.z / vDir.x) - Math::PI / 2.f);
+    rotation->y = (-std::atan(vDir.z / vDir.x) - Math::PI / 2.f);
   }
 
   rotation->z = 0.f;
@@ -217,9 +217,9 @@ Vector3& TargetCamera::getTarget()
 
 bool TargetCamera::_decideIfNeedsToMove()
 {
-  return ::std::abs(cameraDirection->x) > 0.f
-         || ::std::abs(cameraDirection->y) > 0.f
-         || ::std::abs(cameraDirection->z) > 0.f;
+  return std::abs(cameraDirection->x) > 0.f
+         || std::abs(cameraDirection->y) > 0.f
+         || std::abs(cameraDirection->z) > 0.f;
 }
 
 void TargetCamera::_updatePosition()
@@ -237,8 +237,8 @@ void TargetCamera::_updatePosition()
 void TargetCamera::_checkInputs()
 {
   bool needToMove   = _decideIfNeedsToMove();
-  bool needToRotate = ::std::abs(cameraRotation->x) > 0.f
-                      || ::std::abs(cameraRotation->y) > 0.f;
+  bool needToRotate = std::abs(cameraRotation->x) > 0.f
+                      || std::abs(cameraRotation->y) > 0.f;
 
   // Move
   if (needToMove) {
@@ -273,25 +273,25 @@ void TargetCamera::_checkInputs()
 
   // Inertia
   if (needToMove) {
-    if (::std::abs(cameraDirection->x) < speed * Math::Epsilon) {
+    if (std::abs(cameraDirection->x) < speed * Math::Epsilon) {
       cameraDirection->x = 0.f;
     }
 
-    if (::std::abs(cameraDirection->y) < speed * Math::Epsilon) {
+    if (std::abs(cameraDirection->y) < speed * Math::Epsilon) {
       cameraDirection->y = 0.f;
     }
 
-    if (::std::abs(cameraDirection->z) < speed * Math::Epsilon) {
+    if (std::abs(cameraDirection->z) < speed * Math::Epsilon) {
       cameraDirection->z = 0.f;
     }
     cameraDirection->scaleInPlace(inertia);
   }
   if (needToRotate) {
-    if (::std::abs(cameraRotation->x) < speed * Math::Epsilon) {
+    if (std::abs(cameraRotation->x) < speed * Math::Epsilon) {
       cameraRotation->x = 0.f;
     }
 
-    if (::std::abs(cameraRotation->y) < speed * Math::Epsilon) {
+    if (std::abs(cameraRotation->y) < speed * Math::Epsilon) {
       cameraRotation->y = 0.f;
     }
     cameraRotation->scaleInPlace(inertia);
@@ -383,9 +383,9 @@ CameraPtr TargetCamera::createRigCamera(const string_t& iName,
     if (cameraRigMode == Camera::RIG_MODE_VR()
         || cameraRigMode == Camera::RIG_MODE_WEBVR()) {
       if (!rotationQuaternion) {
-        rotationQuaternion = ::std::make_unique<Quaternion>();
+        rotationQuaternion = std::make_unique<Quaternion>();
       }
-      rigCamera->rotationQuaternion = ::std::make_unique<Quaternion>();
+      rigCamera->rotationQuaternion = std::make_unique<Quaternion>();
     }
     return rigCamera;
   }
@@ -395,8 +395,8 @@ CameraPtr TargetCamera::createRigCamera(const string_t& iName,
 
 void TargetCamera::_updateRigCameras()
 {
-  auto camLeft  = ::std::static_pointer_cast<TargetCamera>(_rigCameras[0]);
-  auto camRight = ::std::static_pointer_cast<TargetCamera>(_rigCameras[1]);
+  auto camLeft  = std::static_pointer_cast<TargetCamera>(_rigCameras[0]);
+  auto camRight = std::static_pointer_cast<TargetCamera>(_rigCameras[1]);
 
   switch (cameraRigMode) {
     case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH():

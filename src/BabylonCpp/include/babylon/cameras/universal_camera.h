@@ -19,7 +19,7 @@ public:
   static UniversalCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<UniversalCamera>(
-      new UniversalCamera(::std::forward<Ts>(args)...));
+      new UniversalCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

@@ -17,7 +17,7 @@ GenericController::~GenericController()
 }
 
 void GenericController::initControllerMesh(
-  Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
+  Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   SceneLoader::ImportMesh(
     {}, GenericController::MODEL_BASE_URL, GenericController::MODEL_FILENAME,

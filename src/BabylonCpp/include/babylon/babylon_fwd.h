@@ -764,8 +764,8 @@ class ShadowsOptimization;
 class TextureOptimization;
 namespace picojson {
 class value;
-typedef ::std::vector<value> array;
-typedef ::std::map<::std::string, value> object;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
 } // end of namespace picojson
 
 namespace BABYLON {

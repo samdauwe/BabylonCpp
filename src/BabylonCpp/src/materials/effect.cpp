@@ -50,7 +50,7 @@ Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
     , _compilationError{""}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
-    , _fallbacks{::std::move(options.fallbacks)}
+    , _fallbacks{std::move(options.fallbacks)}
     , _transformFeedbackVaryings{options.transformFeedbackVaryings}
 {
   stl_util::concat(_uniformsNames, options.samplers);
@@ -122,7 +122,7 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
     , _compilationError{""}
     , _attributesNames{options.attributes}
     , _indexParameters{options.indexParameters}
-    , _fallbacks{::std::move(options.fallbacks)}
+    , _fallbacks{std::move(options.fallbacks)}
     , _transformFeedbackVaryings{options.transformFeedbackVaryings}
 {
   stl_util::concat(_uniformsNames, options.samplers);
@@ -276,7 +276,7 @@ string_t Effect::getCompilationError()
 }
 
 void Effect::executeWhenCompiled(
-  const ::std::function<void(Effect* effect)>& func)
+  const std::function<void(Effect* effect)>& func)
 {
   if (isReady()) {
     func(this);
@@ -288,7 +288,7 @@ void Effect::executeWhenCompiled(
 
 void Effect::_loadVertexShader(
   const string_t& vertex,
-  const ::std::function<void(const string_t&)>& callback)
+  const std::function<void(const string_t&)>& callback)
 {
   // Base64 encoded ?
   if (vertex.substr(0, 7) == "base64:") {
@@ -321,7 +321,7 @@ void Effect::_loadVertexShader(
 
 void Effect::_loadFragmentShader(
   const string_t& fragment,
-  const ::std::function<void(const string_t&)>& callback)
+  const std::function<void(const string_t&)>& callback)
 {
   // Base64 encoded ?
   if (fragment.substr(0, 7) == "base64:") {
@@ -369,19 +369,19 @@ void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
 
   // Number lines of shaders source code
   unsigned int i = 2;
-  const ::std::regex regex("\n", ::std::regex::optimize);
+  const std::regex regex("\n", std::regex::optimize);
   auto formattedVertexCode
     = "\n1\t"
       + String::regexReplace(vertexCode, regex,
-                             [&i](const ::std::smatch& /*m*/) {
-                               return "\n" + ::std::to_string(i++) + "\t";
+                             [&i](const std::smatch& /*m*/) {
+                               return "\n" + std::to_string(i++) + "\t";
                              });
   i = 2;
   auto formattedFragmentCode
     = "\n1\t"
       + String::regexReplace(fragmentCode, regex,
-                             [&i](const ::std::smatch& /*m*/) {
-                               return "\n" + ::std::to_string(i++) + "\t";
+                             [&i](const std::smatch& /*m*/) {
+                               return "\n" + std::to_string(i++) + "\t";
                              });
 
   // Dump shaders name and formatted source code
@@ -393,7 +393,7 @@ void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
 
 void Effect::_processShaderConversion(
   const string_t& sourceCode, bool isFragment,
-  const ::std::function<void(const string_t&)>& callback)
+  const std::function<void(const string_t&)>& callback)
 {
 
   auto preparedSourceCode = _processPrecision(sourceCode);
@@ -431,14 +431,14 @@ void Effect::_processShaderConversion(
 
   if (isFragment) {
     const vector_t<pair_t<string_t, string_t>> fragmentMappings{
-      ::std::make_pair("texture2DLodEXT\\s*\\(", "textureLod("),   //
-      ::std::make_pair("textureCubeLodEXT\\s*\\(", "textureLod("), //
-      ::std::make_pair("texture2D\\s*\\(", "texture("),            //
-      ::std::make_pair("textureCube\\s*\\(", "texture("),          //
-      ::std::make_pair("gl_FragDepthEXT", "gl_FragDepth"),         //
-      ::std::make_pair("gl_FragColor", "glFragColor"),             //
-      ::std::make_pair("gl_FragData", "glFragData"),
-      ::std::make_pair(
+      std::make_pair("texture2DLodEXT\\s*\\(", "textureLod("),   //
+      std::make_pair("textureCubeLodEXT\\s*\\(", "textureLod("), //
+      std::make_pair("texture2D\\s*\\(", "texture("),            //
+      std::make_pair("textureCube\\s*\\(", "texture("),          //
+      std::make_pair("gl_FragDepthEXT", "gl_FragDepth"),         //
+      std::make_pair("gl_FragColor", "glFragColor"),             //
+      std::make_pair("gl_FragData", "glFragData"),
+      std::make_pair(
         "void\\s+?main\\s*\\(", //
         String::concat(
           (hasDrawBuffersExtension ? "" : "out vec4 glFragColor;\n"),
@@ -456,10 +456,10 @@ void Effect::_processShaderConversion(
 
 void Effect::_processIncludes(
   const string_t& sourceCode,
-  const ::std::function<void(const string_t&)>& callback)
+  const std::function<void(const string_t&)>& callback)
 {
-  const ::std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
-                           ::std::regex::optimize);
+  const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
+                           std::regex::optimize);
   auto lines = String::split(sourceCode, '\n');
 
   std::ostringstream returnValue;
@@ -467,7 +467,7 @@ void Effect::_processIncludes(
   for (auto& line : lines) {
     auto match = String::regexMatch(line, regex);
     if (match.size() != 6) {
-      returnValue << line << ::std::endl;
+      returnValue << line << std::endl;
       continue;
     }
 
@@ -511,24 +511,24 @@ void Effect::_processIncludes(
 
             if ((!String::isDigit(maxIndex))
                 && stl_util::contains(_indexParameters, maxIndex)) {
-              maxIndex = ::std::to_string(_indexParameters[maxIndex]);
+              maxIndex = std::to_string(_indexParameters[maxIndex]);
             }
 
             if (String::isDigit(minIndex) && String::isDigit(maxIndex)) {
-              const size_t _minIndex = ::std::stoul(minIndex, nullptr, 0);
-              const size_t _maxIndex = ::std::stoul(maxIndex, nullptr, 0);
+              const size_t _minIndex = std::stoul(minIndex, nullptr, 0);
+              const size_t _maxIndex = std::stoul(maxIndex, nullptr, 0);
               for (size_t i = _minIndex; i < _maxIndex; ++i) {
-                const auto istr = ::std::to_string(i);
+                const auto istr = std::to_string(i);
                 if (!_engine->supportsUniformBuffers()) {
                   // Ubo replacement
-                  const auto callback = [](const ::std::smatch& m) {
+                  const auto callback = [](const std::smatch& m) {
                     if (m.size() == 2) {
                       return m.str(1) + "{X}";
                     }
                     return m.str(0);
                   };
-                  const ::std::regex regex{"light\\{X\\}.(\\w*)",
-                                           ::std::regex::optimize};
+                  const std::regex regex{"light\\{X\\}.(\\w*)",
+                                           std::regex::optimize};
                   sourceIncludeContent = String::regexReplace(
                     sourceIncludeContent, regex, callback);
                 }
@@ -542,14 +542,14 @@ void Effect::_processIncludes(
         else {
           if (!_engine->supportsUniformBuffers()) {
             // Ubo replacement
-            const auto callback = [](const ::std::smatch& m) {
+            const auto callback = [](const std::smatch& m) {
               if (m.size() == 2) {
                 return m.str(1) + "{X}";
               }
               return m.str(0);
             };
-            const ::std::regex regex{"light\\{X\\}.(\\w*)",
-                                     ::std::regex::optimize};
+            const std::regex regex{"light\\{X\\}.(\\w*)",
+                                     std::regex::optimize};
             includeContent
               = String::regexReplace(includeContent, regex, callback);
           }
@@ -560,7 +560,7 @@ void Effect::_processIncludes(
 
       // Replace
       String::replaceInPlace(line, match[0], includeContent);
-      returnValue << line << ::std::endl;
+      returnValue << line << std::endl;
     }
     else {
       // Load from file
@@ -609,8 +609,8 @@ string_t Effect::_processPrecision(string_t source)
 
 void Effect::_rebuildProgram(
   const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
-  const ::std::function<void(GL::IGLProgram* program)>& onCompiled,
-  const ::std::function<void(const string_t& message)>& onError)
+  const std::function<void(GL::IGLProgram* program)>& onCompiled,
+  const std::function<void(const string_t& message)>& onError)
 {
   _isReady = false;
 
@@ -670,8 +670,8 @@ void Effect::_prepareEffect()
     _program->__SPECTOR_rebuildProgram
       = [this](
           const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
-          const ::std::function<void(GL::IGLProgram * program)>& onCompiled,
-          const ::std::function<void(const string_t& message)>& onError) {
+          const std::function<void(GL::IGLProgram * program)>& onCompiled,
+          const std::function<void(const string_t& message)>& onError) {
           _rebuildProgram(vertexSourceCode, fragmentSourceCode, onCompiled,
                           onError);
         };
@@ -712,7 +712,7 @@ void Effect::_prepareEffect()
       _fallbacks->unBindMesh();
     }
   }
-  catch (const ::std::exception& e) {
+  catch (const std::exception& e) {
     _compilationError = e.what();
 
     // Let's go through fallbacks then
@@ -725,7 +725,7 @@ void Effect::_prepareEffect()
                        String::join(attributesNames, ' ').c_str());
     BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str());
     if (previousProgram) {
-      _program = ::std::move(previousProgram);
+      _program = std::move(previousProgram);
       _isReady = true;
       if (onError) {
         onError(this, _compilationError);

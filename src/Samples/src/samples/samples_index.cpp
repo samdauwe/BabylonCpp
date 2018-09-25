@@ -97,7 +97,7 @@ std::vector<std::string> SamplesIndex::getSampleNames() const
   return sampleNames;
 }
 
-::std::vector<std::string> SamplesIndex::getCategoryNames() const
+std::vector<std::string> SamplesIndex::getCategoryNames() const
 {
   // Extract the category names
   auto categoryNames = stl_util::extract_keys(_samplesIndex);
@@ -126,7 +126,7 @@ bool SamplesIndex::categoryExists(const std::string& categoryNameToSearch)
   return _categoryExists;
 }
 
-::std::vector<std::string>
+std::vector<std::string>
 SamplesIndex::getSampleNamesInCategory(const std::string& categoryName) const
 {
   // Extract the enabled sample names for the given category from the map

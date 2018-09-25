@@ -29,7 +29,7 @@ public:
   static SpotLightPtr New(Ts&&... args)
   {
     auto light
-      = std::shared_ptr<SpotLight>(new SpotLight(::std::forward<Ts>(args)...));
+      = std::shared_ptr<SpotLight>(new SpotLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;

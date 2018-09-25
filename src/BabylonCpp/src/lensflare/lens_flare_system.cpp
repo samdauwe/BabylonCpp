@@ -34,7 +34,7 @@ LensFlareSystem::LensFlareSystem(const string_t iName, Mesh* emitter,
 {
   _scene = scene ? scene : Engine::LastCreatedScene();
 
-  auto component = ::std::static_pointer_cast<LensFlareSystemSceneComponent>(
+  auto component = std::static_pointer_cast<LensFlareSystemSceneComponent>(
     _scene->_getComponent(SceneComponentConstants::NAME_LENSFLARESYSTEM));
   if (!component) {
     component = LensFlareSystemSceneComponent::New(_scene);
@@ -60,7 +60,7 @@ LensFlareSystem::LensFlareSystem(const string_t iName, Mesh* emitter,
                            1.f,  -1.f};
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = ::std::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       engine, ToVariant<Float32Array, Buffer*>(vertices),
       VertexBuffer::PositionKind, false, false, 2);
 
@@ -339,7 +339,7 @@ void LensFlareSystem::dispose()
   lensFlares.clear();
 
   // Remove from scene
-  _scene->lensFlareSystems.erase(::std::remove(_scene->lensFlareSystems.begin(),
+  _scene->lensFlareSystems.erase(std::remove(_scene->lensFlareSystems.begin(),
                                                _scene->lensFlareSystems.end(),
                                                shared_from_this()),
                                  _scene->lensFlareSystems.end());

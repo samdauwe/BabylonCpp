@@ -55,17 +55,17 @@ void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
         _altPressed  = evt.altKey;
 
         const int keyCode = evt.keyCode;
-        if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-            || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+        if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+            || (std::find(keysDown.begin(), keysDown.end(), keyCode)
                 != keysDown.end())
-            || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+            || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
                 != keysLeft.end())
-            || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+            || (std::find(keysRight.begin(), keysRight.end(), keyCode)
                 != keysRight.end())
-            || (::std::find(keysReset.begin(), keysReset.end(), keyCode)
+            || (std::find(keysReset.begin(), keysReset.end(), keyCode)
                 != keysReset.end())) {
 
-          if (::std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
+          if (std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
             _keys.emplace_back(keyCode);
           }
 
@@ -76,17 +76,17 @@ void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
       }
       else {
         const int keyCode = evt.keyCode;
-        if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-            || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+        if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+            || (std::find(keysDown.begin(), keysDown.end(), keyCode)
                 != keysDown.end())
-            || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+            || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
                 != keysLeft.end())
-            || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+            || (std::find(keysRight.begin(), keysRight.end(), keyCode)
                 != keysRight.end())
-            || (::std::find(keysReset.begin(), keysReset.end(), keyCode)
+            || (std::find(keysReset.begin(), keysReset.end(), keyCode)
                 != keysReset.end())) {
 
-          _keys.erase(::std::remove(_keys.begin(), _keys.end(), keyCode),
+          _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode),
                       _keys.end());
 
           if (!_noPreventDefault) {
@@ -117,7 +117,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
 {
   if (_onKeyboardObserver) {
     for (const auto& keyCode : _keys) {
-      if (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+      if (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
           != keysLeft.end()) {
         if (_ctrlPressed && camera->_useCtrlForPanning) {
           camera->inertialPanningX -= 1.f / panningSensibility;
@@ -126,7 +126,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
           camera->inertialAlphaOffset -= 0.01f;
         }
       }
-      else if (::std::find(keysUp.begin(), keysUp.end(), keyCode)
+      else if (std::find(keysUp.begin(), keysUp.end(), keyCode)
                != keysUp.end()) {
         if (_ctrlPressed && camera->_useCtrlForPanning) {
           camera->inertialPanningY += 1.f / panningSensibility;
@@ -138,7 +138,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
           camera->inertialBetaOffset -= 0.01f;
         }
       }
-      else if (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+      else if (std::find(keysRight.begin(), keysRight.end(), keyCode)
                != keysRight.end()) {
         if (_ctrlPressed && camera->_useCtrlForPanning) {
           camera->inertialPanningX += 1.f / panningSensibility;
@@ -147,7 +147,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
           camera->inertialAlphaOffset += 0.01f;
         }
       }
-      else if (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+      else if (std::find(keysDown.begin(), keysDown.end(), keyCode)
                != keysDown.end()) {
         if (_ctrlPressed && camera->_useCtrlForPanning) {
           camera->inertialPanningY -= 1.f / panningSensibility;
@@ -159,7 +159,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
           camera->inertialBetaOffset += 0.01f;
         }
       }
-      else if (::std::find(keysReset.begin(), keysReset.end(), keyCode)
+      else if (std::find(keysReset.begin(), keysReset.end(), keyCode)
                != keysReset.end()) {
         camera->restoreState();
       }

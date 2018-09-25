@@ -52,7 +52,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   if (material->useLogarithmicDepth()) {
     _effect->setFloat(
       "logarithmicDepthConstant",
-      2.f / (::std::log(_scene->activeCamera->maxZ + 1.f) / Math::LN2));
+      2.f / (std::log(_scene->activeCamera->maxZ + 1.f) / Math::LN2));
   }
 
   _effect->setFloat("offset", useOverlay ? 0 : mesh->outlineWidth);
@@ -128,10 +128,10 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + ::std::to_string(mesh->numBoneInfluencers()));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string(
+      + std::to_string(
           (mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0)));
   }
   else {
@@ -153,12 +153,12 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes = ::std::move(attribs);
+    options.attributes = std::move(attribs);
     options.uniformsNames
       = {"world",  "mBones", "viewProjection",          "diffuseMatrix",
          "offset", "color",  "logarithmicDepthConstant"};
     options.samplers = {"diffuseSampler"};
-    options.defines  = ::std::move(join);
+    options.defines  = std::move(join);
 
     _effect = _scene->getEngine()->createEffect("outline", options,
                                                 _scene->getEngine());

@@ -13,7 +13,10 @@
  * attribution is appreciated.
  */
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 namespace Extensions {

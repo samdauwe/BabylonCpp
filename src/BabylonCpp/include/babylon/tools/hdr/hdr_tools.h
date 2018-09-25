@@ -1,7 +1,7 @@
 #ifndef BABYLON_TOOLS_HDR_HDR_TOOLS_H
 #define BABYLON_TOOLS_HDR_HDR_TOOLS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/tools/hdr/cube_map_info.h>
 #include <babylon/tools/hdr/hdr_info.h>
 
@@ -57,8 +57,8 @@ private:
   static float Ldexp(float mantissa, float exponent);
   static void Rgbe2float(Float32Array& float32array, float red, float green,
                          float blue, float exponent, size_t index);
-  static string_t readStringLine(const Uint8Array& uint8array,
-                                 size_t startIndex);
+  static std::string readStringLine(const Uint8Array& uint8array,
+                                    size_t startIndex);
   static Float32Array RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
                                           const HDRInfo& hdrInfo);
 

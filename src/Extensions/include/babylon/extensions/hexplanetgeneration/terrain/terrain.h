@@ -1,9 +1,15 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TERRAIN_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TERRAIN_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Color3;
+
 namespace Extensions {
 
 class Color;

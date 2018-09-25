@@ -28,7 +28,7 @@ GizmoManager::GizmoManager(Scene* iScene)
     , _pointerObserver{nullptr}
     , _attachedMesh{nullptr}
     , _boundingBoxColor{Color3::FromHexString("#0984e3")}
-    , _dragBehavior{::std::make_unique<SixDofDragBehavior>()}
+    , _dragBehavior{std::make_unique<SixDofDragBehavior>()}
 {
   // Instatiate/dispose gizmos based on pointer actions
   _pointerObserver = _scene->onPointerObservable.add(
@@ -61,7 +61,7 @@ GizmoManager::GizmoManager(Scene* iScene)
             }
           }
           if (node && node->type() == IReflect::Type::ABSTRACTMESH) {
-            attachToMesh(::std::static_pointer_cast<AbstractMesh>(node));
+            attachToMesh(std::static_pointer_cast<AbstractMesh>(node));
           }
           else {
             attachToMesh(nullptr);
@@ -107,7 +107,7 @@ void GizmoManager::set_positionGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.positionGizmo) {
-      gizmos.positionGizmo = ::std::make_unique<PositionGizmo>();
+      gizmos.positionGizmo = std::make_unique<PositionGizmo>();
       gizmos.positionGizmo->updateGizmoRotationToMatchAttachedMesh = false;
     }
     gizmos.positionGizmo->attachedMesh = _attachedMesh;
@@ -127,7 +127,7 @@ void GizmoManager::set_rotationGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.rotationGizmo) {
-      gizmos.rotationGizmo = ::std::make_unique<RotationGizmo>();
+      gizmos.rotationGizmo = std::make_unique<RotationGizmo>();
     }
     gizmos.rotationGizmo->updateGizmoRotationToMatchAttachedMesh = false;
     gizmos.rotationGizmo->attachedMesh = _attachedMesh;
@@ -147,7 +147,7 @@ void GizmoManager::set_scaleGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.scaleGizmo) {
-      gizmos.scaleGizmo = ::std::make_unique<ScaleGizmo>();
+      gizmos.scaleGizmo = std::make_unique<ScaleGizmo>();
     }
     gizmos.scaleGizmo->attachedMesh = _attachedMesh;
   }
@@ -167,7 +167,7 @@ void GizmoManager::set_boundingBoxGizmoEnabled(bool value)
   if (value) {
     if (!gizmos.boundingBoxGizmo) {
       gizmos.boundingBoxGizmo
-        = ::std::make_unique<BoundingBoxGizmo>(_boundingBoxColor);
+        = std::make_unique<BoundingBoxGizmo>(_boundingBoxColor);
     }
     gizmos.boundingBoxGizmo->attachedMesh = _attachedMesh;
     if (_attachedMesh) {

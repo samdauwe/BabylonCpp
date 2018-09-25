@@ -1,7 +1,7 @@
 #ifndef BABYLON_PHYSICS_JOINT_PHYSICS_JOINT_DATA_H
 #define BABYLON_PHYSICS_JOINT_PHYSICS_JOINT_DATA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -14,7 +14,7 @@ struct BABYLON_SHARED_EXPORT PhysicsJointData {
   Vector3 connectedAxis;
   bool collision;
   // Native Oimo/Cannon/Energy data
-  string_t nativeParams;
+  std::string nativeParams;
 }; // end of struct PhysicsJointData
 
 } // end of namespace BABYLON

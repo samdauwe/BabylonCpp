@@ -48,7 +48,7 @@ Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
                           &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
     , _backFaceCulling{true}
-    , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
+    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
     , _onDisposeObserver{nullptr}
     , _onUnBindObservable{nullptr}
     , _onBindObserver{nullptr}
@@ -183,7 +183,7 @@ vector_t<AnimationPtr> Material::getAnimations()
 
 // Events
 void Material::set_onDispose(
-  const ::std::function<void(Material*, EventState&)>& callback)
+  const std::function<void(Material*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
     onDisposeObservable.remove(_onDisposeObserver);
@@ -197,7 +197,7 @@ Observable<AbstractMesh>& Material::get_onBindObservable()
 }
 
 void Material::set_onBind(
-  const ::std::function<void(AbstractMesh*, EventState&)>& callback)
+  const std::function<void(AbstractMesh*, EventState&)>& callback)
 {
   if (_onBindObserver) {
     onBindObservable().remove(_onBindObserver);
@@ -333,8 +333,8 @@ BaseTexturePtr Material::getAlphaTestTexture()
 }
 
 void Material::trackCreation(
-  const ::std::function<void(const Effect* effect)>& /*onCompiled*/,
-  const ::std::function<void(const Effect* effect, const string_t& errors)>&
+  const std::function<void(const Effect* effect)>& /*onCompiled*/,
+  const std::function<void(const Effect* effect, const string_t& errors)>&
   /*onError*/)
 {
 }
@@ -465,10 +465,10 @@ vector_t<AbstractMesh*> Material::getBindedMeshes()
 
 void Material::forceCompilation(
   AbstractMesh* mesh,
-  const ::std::function<void(Material* material)>& onCompiled,
+  const std::function<void(Material* material)>& onCompiled,
   nullable_t<bool> clipPlane)
 {
-  auto subMesh = ::std::make_unique<BaseSubMesh>();
+  auto subMesh = std::make_unique<BaseSubMesh>();
   auto scene   = getScene();
 
   const auto checkReady = [&]() {
@@ -541,7 +541,7 @@ void Material::markAsDirty(unsigned int flag)
 }
 
 void Material::_markAllSubMeshesAsDirty(
-  const ::std::function<void(MaterialDefines& defines)>& func)
+  const std::function<void(MaterialDefines& defines)>& func)
 {
   for (auto& mesh : getScene()->meshes) {
     if (mesh->subMeshes.empty()) {
@@ -620,7 +620,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
   getScene()->freeProcessedMaterials();
 
   // Remove from scene
-  _scene->materials.erase(::std::remove_if(_scene->materials.begin(),
+  _scene->materials.erase(std::remove_if(_scene->materials.begin(),
                                            _scene->materials.end(),
                                            [this](const MaterialPtr& material) {
                                              return material.get() == this;

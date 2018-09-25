@@ -21,7 +21,7 @@ public:
   static DiscGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<DiscGeometry>(
-      new DiscGeometry(::std::forward<Ts>(args)...));
+      new DiscGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

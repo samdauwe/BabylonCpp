@@ -17,7 +17,7 @@ public:
   static TargetCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<TargetCamera>(
-      new TargetCamera(::std::forward<Ts>(args)...));
+      new TargetCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
@@ -127,7 +127,7 @@ public:
   /** Hidden */
   Vector3 _transformedReferencePoint;
   /** Hidden */
-  ::std::function<void()> _reset;
+  std::function<void()> _reset;
   std::string _waitingLockedTargetId;
 
 protected:

@@ -57,7 +57,7 @@ public:
   static PBRMaterialPtr New(Ts&&... args)
   {
     auto material = std::shared_ptr<PBRMaterial>(
-      new PBRMaterial(::std::forward<Ts>(args)...));
+      new PBRMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;

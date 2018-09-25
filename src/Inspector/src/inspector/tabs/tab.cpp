@@ -2,7 +2,7 @@
 
 namespace BABYLON {
 
-Tab::Tab(const string_t& iName) : name{iName}
+Tab::Tab(const std::string& iName) : name{iName}
 {
 }
 

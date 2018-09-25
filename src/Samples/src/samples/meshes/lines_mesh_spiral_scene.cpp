@@ -49,8 +49,8 @@ void LinesMeshSpiralScene::initializeScene(ICanvas* canvas, Scene* scene)
   std::vector<Vector3> p;
   for (unsigned int i = 0; i <= tess; ++i) {
     float ang = i * pi2 / tess * rdNb;
-    p.emplace_back(Vector3(radius * ::std::cos(ang) * i / tess,
-                           radius * ::std::sin(ang) * i / tess,
+    p.emplace_back(Vector3(radius * std::cos(ang) * i / tess,
+                           radius * std::sin(ang) * i / tess,
                            i / tess * zShift));
   }
 

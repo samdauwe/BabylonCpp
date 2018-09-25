@@ -37,7 +37,7 @@ bool MergeMeshesOptimization::_canBeMerged(const AbstractMeshPtr& abstractMesh)
     return false;
   }
 
-  auto mesh = ::std::static_pointer_cast<Mesh>(abstractMesh);
+  auto mesh = std::static_pointer_cast<Mesh>(abstractMesh);
 
   if (mesh->isDisposed()) {
     return false;
@@ -74,11 +74,11 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
     auto current = globalPool[index];
 
     // Checks
-    if (!_canBeMerged(::std::static_pointer_cast<Mesh>(current))) {
+    if (!_canBeMerged(std::static_pointer_cast<Mesh>(current))) {
       continue;
     }
 
-    currentPool.emplace_back(::std::static_pointer_cast<Mesh>(current));
+    currentPool.emplace_back(std::static_pointer_cast<Mesh>(current));
 
     // Find compatible meshes
     for (size_t subIndex = index + 1; subIndex < globalLength; ++subIndex) {
@@ -96,7 +96,7 @@ bool MergeMeshesOptimization::_apply(Scene* scene, bool updateSelectionTree)
         continue;
       }
 
-      currentPool.emplace_back(::std::static_pointer_cast<Mesh>(otherMesh));
+      currentPool.emplace_back(std::static_pointer_cast<Mesh>(otherMesh));
       --globalLength;
 
       stl_util::splice(globalPool, static_cast<int>(subIndex), 1);

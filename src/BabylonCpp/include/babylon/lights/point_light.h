@@ -25,7 +25,7 @@ public:
   static PointLightPtr New(Ts&&... args)
   {
     auto light = std::shared_ptr<PointLight>(
-      new PointLight(::std::forward<Ts>(args)...));
+      new PointLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;

@@ -31,9 +31,9 @@ SceneLoaderProgressEvent::SceneLoaderProgressEvent(
     : lengthComputable{this, &SceneLoaderProgressEvent::get_lengthComputable}
     , loaded{this, &SceneLoaderProgressEvent::get_loaded}
     , total{this, &SceneLoaderProgressEvent::get_total}
-    , _lengthComputable{::std::move(other.lengthComputable)}
-    , _loaded{::std::move(other.loaded)}
-    , _total{::std::move(other.total)}
+    , _lengthComputable{std::move(other.lengthComputable)}
+    , _loaded{std::move(other.loaded)}
+    , _total{std::move(other.total)}
 {
 }
 
@@ -53,9 +53,9 @@ SceneLoaderProgressEvent& SceneLoaderProgressEvent::
 operator=(SceneLoaderProgressEvent&& other)
 {
   if (&other != this) {
-    _lengthComputable = ::std::move(other.lengthComputable);
-    _loaded           = ::std::move(other.loaded);
-    _total            = ::std::move(other.total);
+    _lengthComputable = std::move(other.lengthComputable);
+    _loaded           = std::move(other.loaded);
+    _total            = std::move(other.total);
   }
 
   return *this;

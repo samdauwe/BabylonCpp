@@ -23,7 +23,7 @@ public:
   static BoundingBoxRendererPtr New(Ts&&... args)
   {
     auto renderer = shared_ptr_t<BoundingBoxRenderer>(
-      new BoundingBoxRenderer(::std::forward<Ts>(args)...));
+      new BoundingBoxRenderer(std::forward<Ts>(args)...));
     renderer->addToScene(renderer);
 
     return renderer;

@@ -70,7 +70,7 @@ public:
    * animation
    */
   void zoomOnMesh(AbstractMesh* mesh, bool focusOnOriginXZ = false,
-                  const ::std::function<void()>& onAnimationEnd = nullptr);
+                  const std::function<void()>& onAnimationEnd = nullptr);
 
   /**
    * @brief Targets the given mesh with its children and updates zoom level
@@ -86,7 +86,7 @@ public:
    * animation
    */
   void zoomOnMeshHierarchy(AbstractMesh* mesh, bool focusOnOriginXZ = false,
-                           const ::std::function<void()>& onAnimationEnd
+                           const std::function<void()>& onAnimationEnd
                            = nullptr);
 
   /**
@@ -104,7 +104,7 @@ public:
    */
   void zoomOnMeshesHierarchy(const std::vector<AbstractMesh*>& meshes,
                              bool focusOnOriginXZ = false,
-                             const ::std::function<void()>& onAnimationEnd
+                             const std::function<void()>& onAnimationEnd
                              = nullptr);
 
   /**
@@ -122,7 +122,7 @@ public:
   void
   zoomOnBoundingInfo(const Vector3& minimumWorld, const Vector3& maximumWorld,
                      bool focusOnOriginXZ                          = false,
-                     const ::std::function<void()>& onAnimationEnd = nullptr);
+                     const std::function<void()>& onAnimationEnd = nullptr);
 
 protected:
   /**

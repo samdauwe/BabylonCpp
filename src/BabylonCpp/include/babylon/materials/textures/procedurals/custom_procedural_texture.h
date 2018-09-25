@@ -13,7 +13,7 @@ public:
   template <typename... Ts>
   static CustomProceduralTexture* New(Ts&&... args)
   {
-    auto texture = new CustomProceduralTexture(::std::forward<Ts>(args)...);
+    auto texture = new CustomProceduralTexture(std::forward<Ts>(args)...);
     texture->addToScene(
       static_cast<std::unique_ptr<CustomProceduralTexture>>(texture));
 

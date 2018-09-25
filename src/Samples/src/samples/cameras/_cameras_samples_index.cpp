@@ -11,9 +11,9 @@ _CamerasSamplesIndex::_CamerasSamplesIndex()
 
   // Cameras Scene
   _samples["CamerasScene"]
-    = ::std::make_tuple(true,                                               //
+    = std::make_tuple(true,                                               //
                         [](ICanvas* iCanvas) {                              //
-                          return ::std::make_unique<CamerasScene>(iCanvas); //
+                          return std::make_unique<CamerasScene>(iCanvas); //
                         });                                                 //
 }
 

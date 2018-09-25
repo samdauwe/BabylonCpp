@@ -25,9 +25,9 @@ SceneOptimizerOptions::SceneOptimizerOptions(const SceneOptimizerOptions& other)
 }
 
 SceneOptimizerOptions::SceneOptimizerOptions(SceneOptimizerOptions&& other)
-    : optimizations{::std::move(other.optimizations)}
-    , targetFrameRate{::std::move(other.targetFrameRate)}
-    , trackerDuration{::std::move(other.trackerDuration)}
+    : optimizations{std::move(other.optimizations)}
+    , targetFrameRate{std::move(other.targetFrameRate)}
+    , trackerDuration{std::move(other.trackerDuration)}
 {
 }
 
@@ -47,9 +47,9 @@ SceneOptimizerOptions& SceneOptimizerOptions::
 operator=(SceneOptimizerOptions&& other)
 {
   if (&other != this) {
-    optimizations   = ::std::move(other.optimizations);
-    targetFrameRate = ::std::move(other.targetFrameRate);
-    trackerDuration = ::std::move(other.trackerDuration);
+    optimizations   = std::move(other.optimizations);
+    targetFrameRate = std::move(other.targetFrameRate);
+    trackerDuration = std::move(other.trackerDuration);
   }
 
   return *this;

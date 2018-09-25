@@ -1,7 +1,8 @@
 #ifndef BABYLON_TOOLS_HDR_HDR_INFO_H
 #define BABYLON_TOOLS_HDR_HDR_INFO_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 
@@ -33,7 +34,7 @@ struct BABYLON_SHARED_EXPORT HDRInfo {
   /**
    * Header parse error message.
    */
-  string_t errorMessage;
+  std::string errorMessage;
 
 }; // end of struct HDRInfo
 

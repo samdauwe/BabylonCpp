@@ -25,7 +25,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
     : _scene{scene}, _depthMap{nullptr}, _effect{nullptr}
 {
   // Register the G Buffer component to the scene.
-  auto component = ::std::static_pointer_cast<DepthRendererSceneComponent>(
+  auto component = std::static_pointer_cast<DepthRendererSceneComponent>(
     scene->_getComponent(SceneComponentConstants::NAME_DEPTHRENDERER));
   if (!component) {
     component = DepthRendererSceneComponent::New(scene);
@@ -126,7 +126,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
                       const vector_t<SubMeshPtr>& alphaTestSubMeshes,
                       const vector_t<SubMeshPtr>& /*transparentSubMeshes*/,
                       const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-                      const ::std::function<void()>& /*beforeTransparents*/) {
+                      const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
           for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
@@ -185,10 +185,10 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
-                         + ::std::to_string(mesh->numBoneInfluencers()));
+                         + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + ::std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 :
+      + std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 :
                                             0));
   }
   else {
@@ -210,11 +210,11 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     _cachedDefines = join;
 
     EffectCreationOptions options;
-    options.attributes = ::std::move(attribs);
+    options.attributes = std::move(attribs);
     options.uniformsNames
       = {"world", "mBones", "viewProjection", "diffuseMatrix", "depthValues"};
     options.samplers = {"diffuseSampler"};
-    options.defines  = ::std::move(join);
+    options.defines  = std::move(join);
 
     _effect = _scene->getEngine()->createEffect("depth", options,
                                                 _scene->getEngine());

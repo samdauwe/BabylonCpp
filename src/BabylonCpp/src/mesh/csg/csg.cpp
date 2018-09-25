@@ -99,14 +99,14 @@ unique_ptr_t<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
 unique_ptr_t<BABYLON::CSG::CSG>
 CSG::CSG::FromPolygons(const vector_t<BABYLON::CSG::Polygon>& _polygons)
 {
-  auto csg       = ::std::make_unique<BABYLON::CSG::CSG>();
+  auto csg       = std::make_unique<BABYLON::CSG::CSG>();
   csg->_polygons = _polygons;
   return csg;
 }
 
 unique_ptr_t<CSG::CSG> CSG::CSG::clone() const
 {
-  auto csg = ::std::make_unique<CSG>();
+  auto csg = std::make_unique<CSG>();
   for (auto& p : _polygons) {
     csg->_polygons.emplace_back(p.clone());
   }

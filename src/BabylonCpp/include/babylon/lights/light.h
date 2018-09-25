@@ -269,7 +269,7 @@ public:
    * @param scene The scene the new light will belong to
    * @returns the constructor function
    */
-  static ::std::function<LightPtr()>
+  static std::function<LightPtr()>
   GetConstructorFromName(unsigned int type, const std::string& name,
                          Scene* scene);
 

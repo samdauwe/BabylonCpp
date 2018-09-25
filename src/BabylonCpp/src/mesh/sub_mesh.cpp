@@ -38,7 +38,7 @@ SubMesh::SubMesh(unsigned int iMaterialIndex, unsigned int iVerticesStart,
     , _currentMaterial{nullptr}
 {
   if (!renderingMesh) {
-    _renderingMesh = ::std::static_pointer_cast<Mesh>(mesh);
+    _renderingMesh = std::static_pointer_cast<Mesh>(mesh);
   }
 
   _id = mesh->subMeshes.size() /*- 1*/; // Submesh is not yet to the list
@@ -84,7 +84,7 @@ BoundingInfo& SubMesh::getBoundingInfo() const
 
 SubMesh& SubMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
-  _boundingInfo = ::std::make_unique<BoundingInfo>(boundingInfo);
+  _boundingInfo = std::make_unique<BoundingInfo>(boundingInfo);
   return *this;
 }
 
@@ -108,7 +108,7 @@ MaterialPtr SubMesh::getMaterial()
   else if (rootMaterial
            && (rootMaterial->type() == IReflect::Type::MULTIMATERIAL)) {
     auto multiMaterial
-      = ::std::static_pointer_cast<MultiMaterial>(rootMaterial);
+      = std::static_pointer_cast<MultiMaterial>(rootMaterial);
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
     if (_currentMaterial != effectiveMaterial) {
       _currentMaterial = effectiveMaterial;
@@ -133,7 +133,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
   auto data = _renderingMesh->getVerticesData(VertexBuffer::PositionKind);
 
   if (data.empty()) {
-    _boundingInfo = ::std::make_unique<BoundingInfo>(*_mesh->_boundingInfo);
+    _boundingInfo = std::make_unique<BoundingInfo>(*_mesh->_boundingInfo);
     return *this;
   }
 
@@ -153,7 +153,7 @@ SubMesh& SubMesh::refreshBoundingInfo()
       data, indices, indexStart, indexCount,
       *_renderingMesh->geometry()->boundingBias());
   }
-  _boundingInfo = ::std::make_unique<BoundingInfo>(extend.min, extend.max);
+  _boundingInfo = std::make_unique<BoundingInfo>(extend.min, extend.max);
 
   return *this;
 }
@@ -262,7 +262,7 @@ SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
 
   // LineMesh first as it's also a Mesh...
   if (_mesh->type() == IReflect::Type::LINESMESH) {
-    auto lineMesh = ::std::static_pointer_cast<LinesMesh>(_mesh);
+    auto lineMesh = std::static_pointer_cast<LinesMesh>(_mesh);
 
     // Line test
     float length;
@@ -278,7 +278,7 @@ SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
       }
 
       if (fastCheck || !intersectInfo || length < intersectInfo->distance) {
-        intersectInfo = ::std::make_unique<IntersectionInfo>(length);
+        intersectInfo = std::make_unique<IntersectionInfo>(length);
 
         if (fastCheck) {
           break;
@@ -303,7 +303,7 @@ SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
 
         if (fastCheck || !intersectInfo
             || currentIntersectInfo->distance < intersectInfo->distance) {
-          intersectInfo         = ::std::move(currentIntersectInfo);
+          intersectInfo         = std::move(currentIntersectInfo);
           intersectInfo->faceId = index / 3;
 
           if (fastCheck) {
@@ -339,7 +339,7 @@ SubMeshPtr SubMesh::clone(const AbstractMeshPtr& newMesh,
     //   return result;
     // }
 
-    result->_boundingInfo = ::std::make_unique<BoundingInfo>(
+    result->_boundingInfo = std::make_unique<BoundingInfo>(
       boundingInfo.minimum, boundingInfo.maximum);
   }
 
@@ -356,7 +356,7 @@ void SubMesh::dispose()
 
   // Remove from mesh
   _mesh->subMeshes.erase(
-    ::std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
+    std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
                      [this](const shared_ptr_t<SubMesh>& subMesh) {
                        return subMesh.get() == this;
                      }),

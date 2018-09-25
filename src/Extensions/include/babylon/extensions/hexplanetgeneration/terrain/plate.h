@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_PLATE_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_PLATE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 

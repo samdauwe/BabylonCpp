@@ -26,11 +26,11 @@ EffectFallbacks::EffectFallbacks(const EffectFallbacks& other)
 }
 
 EffectFallbacks::EffectFallbacks(EffectFallbacks&& other)
-    : _defines{::std::move(other._defines)}
-    , _currentRank{::std::move(other._currentRank)}
-    , _maxRank{::std::move(other._maxRank)}
-    , _mesh{::std::move(other._mesh)}
-    , _meshRank{::std::move(other._meshRank)}
+    : _defines{std::move(other._defines)}
+    , _currentRank{std::move(other._currentRank)}
+    , _maxRank{std::move(other._maxRank)}
+    , _mesh{std::move(other._mesh)}
+    , _meshRank{std::move(other._meshRank)}
 {
 }
 
@@ -50,11 +50,11 @@ EffectFallbacks& EffectFallbacks::operator=(const EffectFallbacks& other)
 EffectFallbacks& EffectFallbacks::operator=(EffectFallbacks&& other)
 {
   if (&other != this) {
-    _defines     = ::std::move(other._defines);
-    _currentRank = ::std::move(other._currentRank);
-    _maxRank     = ::std::move(other._maxRank);
-    _mesh        = ::std::move(other._mesh);
-    _meshRank    = ::std::move(other._meshRank);
+    _defines     = std::move(other._defines);
+    _currentRank = std::move(other._currentRank);
+    _maxRank     = std::move(other._maxRank);
+    _mesh        = std::move(other._mesh);
+    _meshRank    = std::move(other._meshRank);
   }
 
   return *this;
@@ -124,7 +124,7 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
     _mesh->computeBonesUsingShaders = false;
     const std::string toReplace
       = std::string("#define NUM_BONE_INFLUENCERS ")
-        + ::std::to_string(_mesh->numBoneInfluencers());
+        + std::to_string(_mesh->numBoneInfluencers());
     String::replaceInPlace(currentDefines, toReplace,
                            "#define NUM_BONE_INFLUENCERS 0");
     effect->_bonesComputationForcedToCPU = true;

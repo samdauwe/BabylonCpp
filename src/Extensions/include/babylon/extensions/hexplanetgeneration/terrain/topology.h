@@ -1,10 +1,9 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TOPOLOGY_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_TOPOLOGY_H
 
-#include <babylon/babylon_global.h>
-
-#include <babylon/extensions/hexplanetgeneration/terrain/corner.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/border.h>
+#include <babylon/extensions/hexplanetgeneration/terrain/corner.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/tile.h>
 
 namespace BABYLON {

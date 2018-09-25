@@ -81,7 +81,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   std::vector<SpotLightPtr> spotLights(sphereLights.size());
   Float32Array lightDirections{-0.5f, -0.25f, 1.f, 0.f, 0.f, -1.f};
   for (unsigned int i = 0; i < sphereLights.size(); ++i) {
-    auto iStr     = ::std::to_string(i);
+    auto iStr     = std::to_string(i);
     spotLights[i] = SpotLight::New(
       "spotlight" + iStr, sphereLights[i]->position(),
       Vector3(lightDirections[3 * i], lightDirections[3 * i + 1],

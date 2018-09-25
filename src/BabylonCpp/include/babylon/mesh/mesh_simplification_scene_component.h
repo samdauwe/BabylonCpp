@@ -30,7 +30,7 @@ public:
   static SimplicationQueueSceneComponentPtr New(Ts&&... args)
   {
     return std::shared_ptr<SimplicationQueueSceneComponent>(
-      new SimplicationQueueSceneComponent(::std::forward<Ts>(args)...));
+      new SimplicationQueueSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~SimplicationQueueSceneComponent();
 

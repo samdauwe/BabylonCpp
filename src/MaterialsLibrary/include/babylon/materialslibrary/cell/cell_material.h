@@ -1,16 +1,22 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_CELL_CELL_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_CELL_CELL_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/cell/cell_material_defines.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class IAnimatable;
+class Texture;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+using TexturePtr     = std::shared_ptr<Texture>;
+
 namespace MaterialsLibrary {
 
 class CellMaterial;
-using CellMaterialPtr = shared_ptr_t<CellMaterial>;
+using CellMaterialPtr = std::shared_ptr<CellMaterial>;
 
 class BABYLON_SHARED_EXPORT CellMaterial : public PushMaterial {
 
@@ -18,8 +24,8 @@ public:
   template <typename... Ts>
   static CellMaterialPtr New(Ts&&... args)
   {
-    auto material = shared_ptr_t<CellMaterial>(
-      new CellMaterial(::std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<CellMaterial>(
+      new CellMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -37,7 +43,7 @@ public:
   bool hasTexture(const BaseTexturePtr& texture) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
   Json::object serialize() const;

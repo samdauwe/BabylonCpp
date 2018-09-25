@@ -32,7 +32,7 @@ PhysicsRadialExplosionEventData PhysicsRadialExplosionEvent::getData()
   };
 }
 
-unique_ptr_t<PhysicsForceAndContactPoint>
+std::unique_ptr<PhysicsForceAndContactPoint>
 PhysicsRadialExplosionEvent::getImpostorForceAndContactPoint(
   PhysicsImpostor* impostor, const Vector3& origin, float radius,
   float strength, PhysicsRadialImpulseFalloff falloff)
@@ -73,7 +73,7 @@ PhysicsRadialExplosionEvent::getImpostorForceAndContactPoint(
 
   auto force = direction.multiplyByFloats(multiplier, multiplier, multiplier);
 
-  return ::std::make_unique<PhysicsForceAndContactPoint>(
+  return std::make_unique<PhysicsForceAndContactPoint>(
     PhysicsForceAndContactPoint{
       force,        // force
       *contactPoint // contactPoint

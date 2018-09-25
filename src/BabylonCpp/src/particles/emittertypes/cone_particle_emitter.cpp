@@ -53,7 +53,7 @@ void ConeParticleEmitter::set_angle(float value)
 void ConeParticleEmitter::_buildHeight()
 {
   if (_angle != 0.f) {
-    _height = _radius / ::std::tan(_angle / 2.f);
+    _height = _radius / std::tan(_angle / 2.f);
   }
   else {
     _height = 1.f;
@@ -103,18 +103,18 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   auto radius = _radius - Scalar::RandomRange(0.f, _radius * radiusRange);
   radius      = radius * h;
 
-  const auto randX = radius * ::std::sin(s);
-  const auto randZ = radius * ::std::cos(s);
+  const auto randX = radius * std::sin(s);
+  const auto randZ = radius * std::cos(s);
   const auto randY = h * _height;
 
   Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix,
                                                positionToUpdate);
 }
 
-unique_ptr_t<IParticleEmitterType> ConeParticleEmitter::clone() const
+std::unique_ptr<IParticleEmitterType> ConeParticleEmitter::clone() const
 {
-  auto newOne = ::std::make_unique<ConeParticleEmitter>(_radius, _angle,
-                                                        directionRandomizer);
+  auto newOne = std::make_unique<ConeParticleEmitter>(_radius, _angle,
+                                                      directionRandomizer);
 
   return newOne;
 }
@@ -129,7 +129,7 @@ void ConeParticleEmitter::applyToShader(Effect* effect)
 
 const char* ConeParticleEmitter::getEffectDefines() const
 {
-  string_t defines = "#define CONEEMITTER";
+  std::string defines = "#define CONEEMITTER";
 
   if (emitFromSpawnPointOnly) {
     defines += "\n#define CONEEMITTERSPAWNPOINT";

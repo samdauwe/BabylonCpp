@@ -233,7 +233,7 @@ void WindowsMotionController::_lerpAxisTransform(unsigned int axis,
 
 void WindowsMotionController::initControllerMesh(
   Scene* /*scene*/,
-  const ::std::function<void(AbstractMesh* mesh)>& /*meshLoaded*/)
+  const std::function<void(AbstractMesh* mesh)>& /*meshLoaded*/)
 {
 }
 

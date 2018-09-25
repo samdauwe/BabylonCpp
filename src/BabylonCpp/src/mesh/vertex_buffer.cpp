@@ -89,7 +89,7 @@ VertexBuffer::VertexBuffer(
     _ownsBuffer  = false;
   }
   else {
-    _ownedBuffer = ::std::make_unique<Buffer>(
+    _ownedBuffer = std::make_unique<Buffer>(
       engine, data.get<Float32Array>(), updatable, stride,
       postponeInternalCreation.has_value() ? *postponeInternalCreation : false,
       instanced.has_value() ? *instanced : false);
@@ -318,7 +318,7 @@ void VertexBuffer::dispose()
 
 void VertexBuffer::forEach(
   size_t count,
-  const ::std::function<void(float value, size_t index)>& callback)
+  const std::function<void(float value, size_t index)>& callback)
 {
   VertexBuffer::ForEach(_buffer->getData(), byteOffset, byteStride, _size, type,
                         count, normalized, callback);
@@ -346,7 +346,7 @@ size_t VertexBuffer::DeduceStride(unsigned int kind)
     case VertexBuffer::TangentKind:
       return 4;
     default:
-      throw ::std::runtime_error("Invalid kind '" + ::std::to_string(kind)
+      throw std::runtime_error("Invalid kind '" + std::to_string(kind)
                                  + "'");
   }
 }
@@ -364,7 +364,7 @@ unsigned int VertexBuffer::GetTypeByteLength(unsigned int type)
     case VertexBuffer::FLOAT:
       return 4;
     default:
-      throw ::std::runtime_error("Invalid type " + ::std::to_string(type));
+      throw std::runtime_error("Invalid type " + std::to_string(type));
   }
 }
 
@@ -372,7 +372,7 @@ void VertexBuffer::ForEach(
   const Float32Array& data, size_t byteOffset, size_t byteStride,
   size_t componentCount, unsigned int /*componentType*/, size_t count,
   bool /*normalized*/,
-  const ::std::function<void(float value, size_t index)>& callback)
+  const std::function<void(float value, size_t index)>& callback)
 {
   auto offset = byteOffset / 4;
   auto stride = byteStride / 4;
@@ -389,7 +389,7 @@ void VertexBuffer::ForEach(
   const Variant<ArrayBuffer, DataView>& data, size_t byteOffset,
   size_t byteStride, size_t componentCount, unsigned int componentType,
   size_t count, bool normalized,
-  const ::std::function<void(float value, size_t index)>& callback)
+  const std::function<void(float value, size_t index)>& callback)
 {
   DataView dataView = data.is<ArrayBuffer>() ?
                         DataView(data.get<ArrayBuffer>()) :
@@ -415,7 +415,7 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
     case VertexBuffer::BYTE: {
       auto value = static_cast<float>(dataView.getInt8(byteOffset));
       if (normalized) {
-        value = ::std::max(value / 127.f, -1.f);
+        value = std::max(value / 127.f, -1.f);
       }
       return value;
     }
@@ -429,7 +429,7 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
     case VertexBuffer::SHORT: {
       auto value = static_cast<float>(dataView.getInt16(byteOffset, true));
       if (normalized) {
-        value = ::std::max(value / 16383.f, -1.f);
+        value = std::max(value / 16383.f, -1.f);
       }
       return value;
     }
@@ -444,8 +444,8 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
       return dataView.getFloat32(byteOffset, true);
     }
     default: {
-      throw ::std::runtime_error("Invalid component type "
-                                 + ::std::to_string(type));
+      throw std::runtime_error("Invalid component type "
+                                 + std::to_string(type));
     }
   }
 }

@@ -25,7 +25,7 @@ public:
   static StereoscopicUniversalCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<StereoscopicUniversalCamera>(
-      new StereoscopicUniversalCamera(::std::forward<Ts>(args)...));
+      new StereoscopicUniversalCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

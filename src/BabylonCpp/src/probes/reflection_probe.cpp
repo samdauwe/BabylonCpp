@@ -66,7 +66,7 @@ ReflectionProbe::ReflectionProbe(const string_t& iName, const ISize& size,
 
       _scene->setTransformMatrix(_viewMatrix, _projectionMatrix);
 
-      _scene->_forcedViewPosition = ::std::make_unique<Vector3>(position);
+      _scene->_forcedViewPosition = std::make_unique<Vector3>(position);
     });
 
   _renderTargetTexture->onAfterUnbindObservable.add(
@@ -88,7 +88,7 @@ ReflectionProbe::~ReflectionProbe()
 void ReflectionProbe::addToScene(
   unique_ptr_t<ReflectionProbe>&& newReflectionProbe)
 {
-  _scene->reflectionProbes.emplace_back(::std::move(newReflectionProbe));
+  _scene->reflectionProbes.emplace_back(std::move(newReflectionProbe));
 }
 
 unsigned int ReflectionProbe::get_samples() const
@@ -142,7 +142,7 @@ void ReflectionProbe::dispose()
 {
   // Remove from the scene if found
   _scene->reflectionProbes.erase(
-    ::std::remove_if(
+    std::remove_if(
       _scene->reflectionProbes.begin(), _scene->reflectionProbes.end(),
       [this](const unique_ptr_t<ReflectionProbe>& reflectionProbe) {
         return reflectionProbe.get() == this;

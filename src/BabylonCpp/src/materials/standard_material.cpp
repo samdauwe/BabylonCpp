@@ -131,13 +131,13 @@ StandardMaterial::StandardMaterial(const string_t& iName, Scene* scene)
     if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
         && _reflectionTexture->isRenderTarget) {
       _renderTargets.emplace_back(
-        ::std::static_pointer_cast<RenderTargetTexture>(_reflectionTexture));
+        std::static_pointer_cast<RenderTargetTexture>(_reflectionTexture));
     }
 
     if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
         && _refractionTexture->isRenderTarget) {
       _renderTargets.emplace_back(
-        ::std::static_pointer_cast<RenderTargetTexture>(_refractionTexture));
+        std::static_pointer_cast<RenderTargetTexture>(_refractionTexture));
     }
 
     return _renderTargets;
@@ -298,7 +298,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = ::std::make_unique<StandardMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<StandardMaterialDefines>();
   }
 
   auto scene = getScene();
@@ -594,7 +594,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     scene->resetCachedMaterial();
 
     // Fallbacks
-    auto fallbacks = ::std::make_unique<EffectFallbacks>();
+    auto fallbacks = std::make_unique<EffectFallbacks>();
     if (defines["REFLECTION"]) {
       fallbacks->addFallback(0, "REFLECTION");
     }
@@ -749,16 +749,16 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
     EffectCreationOptions options;
-    options.attributes            = ::std::move(attribs);
-    options.uniformsNames         = ::std::move(uniforms);
-    options.uniformBuffersNames   = ::std::move(uniformBuffers);
-    options.samplers              = ::std::move(samplers);
+    options.attributes            = std::move(attribs);
+    options.uniformsNames         = std::move(uniforms);
+    options.uniformBuffersNames   = std::move(uniformBuffers);
+    options.samplers              = std::move(samplers);
     options.materialDefines       = &defines;
-    options.defines               = ::std::move(join);
-    options.fallbacks             = ::std::move(fallbacks);
+    options.defines               = std::move(join);
+    options.fallbacks             = std::move(fallbacks);
     options.onCompiled            = onCompiled;
     options.onError               = onError;
-    options.indexParameters       = ::std::move(indexParameters);
+    options.indexParameters       = std::move(indexParameters);
     options.maxSimultaneousLights = _maxSimultaneousLights;
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
@@ -982,7 +982,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
           if (_reflectionTexture->boundingBoxSize()) {
             if (auto cubeTexture
-                = ::std::static_pointer_cast<CubeTexture>(_reflectionTexture)) {
+                = std::static_pointer_cast<CubeTexture>(_reflectionTexture)) {
               _uniformBuffer->updateVector3("vReflectionPosition",
                                             cubeTexture->boundingBoxPosition);
               _uniformBuffer->updateVector3("vReflectionSize",
@@ -1045,7 +1045,7 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
               "refractionMatrix",
               *_refractionTexture->getReflectionTextureMatrix());
             auto refractionTextureTmp
-              = ::std::static_pointer_cast<RefractionTexture>(
+              = std::static_pointer_cast<RefractionTexture>(
                 _refractionTexture);
             if (refractionTextureTmp) {
               depth = refractionTextureTmp->depth;
@@ -1598,7 +1598,7 @@ void StandardMaterial::setUseLightmapAsShadowmap(bool value)
 FresnelParameters* StandardMaterial::diffuseFresnelParameters()
 {
   if (!_diffuseFresnelParameters) {
-    _diffuseFresnelParameters = ::std::make_unique<FresnelParameters>();
+    _diffuseFresnelParameters = std::make_unique<FresnelParameters>();
   }
 
   return _diffuseFresnelParameters.get();
@@ -1607,7 +1607,7 @@ FresnelParameters* StandardMaterial::diffuseFresnelParameters()
 FresnelParameters* StandardMaterial::opacityFresnelParameters()
 {
   if (!_opacityFresnelParameters) {
-    _opacityFresnelParameters = ::std::make_unique<FresnelParameters>();
+    _opacityFresnelParameters = std::make_unique<FresnelParameters>();
   }
 
   return _opacityFresnelParameters.get();
@@ -1616,7 +1616,7 @@ FresnelParameters* StandardMaterial::opacityFresnelParameters()
 FresnelParameters* StandardMaterial::reflectionFresnelParameters()
 {
   if (!_reflectionFresnelParameters) {
-    _reflectionFresnelParameters = ::std::make_unique<FresnelParameters>();
+    _reflectionFresnelParameters = std::make_unique<FresnelParameters>();
   }
 
   return _reflectionFresnelParameters.get();
@@ -1625,7 +1625,7 @@ FresnelParameters* StandardMaterial::reflectionFresnelParameters()
 FresnelParameters* StandardMaterial::refractionFresnelParameters()
 {
   if (!_refractionFresnelParameters) {
-    _refractionFresnelParameters = ::std::make_unique<FresnelParameters>();
+    _refractionFresnelParameters = std::make_unique<FresnelParameters>();
   }
 
   return _refractionFresnelParameters.get();
@@ -1634,7 +1634,7 @@ FresnelParameters* StandardMaterial::refractionFresnelParameters()
 FresnelParameters* StandardMaterial::emissiveFresnelParameters()
 {
   if (!_emissiveFresnelParameters) {
-    _emissiveFresnelParameters = ::std::make_unique<FresnelParameters>();
+    _emissiveFresnelParameters = std::make_unique<FresnelParameters>();
   }
 
   return _emissiveFresnelParameters.get();

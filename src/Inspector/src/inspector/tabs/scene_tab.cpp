@@ -21,7 +21,7 @@ SceneTab::SceneTab(Inspector& inspector)
     , _sz2{0.f}
 {
   // Build properties view
-  _properties = ::std::make_unique<PropertiesView>();
+  _properties = std::make_unique<PropertiesView>();
   _buildPropertiesView();
 }
 
@@ -109,8 +109,8 @@ void SceneTab::_buildPropertiesView()
   // - defaultMaterial
   view.addStringProperty(
     "defaultMaterial",
-    [&]() -> string_t& { return _scene->defaultMaterial()->name; },
-    [&](const string_t& /*value*/) {});
+    [&]() -> std::string& { return _scene->defaultMaterial()->name; },
+    [&](const std::string& /*value*/) {});
   // - dispatchAllSubMeshesOfActiveMeshes
   view.addBoolProperty(
     "dispatchAllSubMeshesOfActiveMeshes",
@@ -170,8 +170,8 @@ void SceneTab::_buildPropertiesView()
                        [&](const bool& value) { _scene->headphone = value; });
   // - hoverCursor
   view.addStringProperty(
-    "hoverCursor", [&]() -> string_t& { return _scene->hoverCursor; },
-    [&](const string_t& value) { _scene->hoverCursor = value; });
+    "hoverCursor", [&]() -> std::string& { return _scene->hoverCursor; },
+    [&](const std::string& value) { _scene->hoverCursor = value; });
   // - imageProcessingConfiguration
   if (_scene->imageProcessingConfiguration()) {
     view.addImageProcessingConfigurationProperty(
@@ -251,8 +251,8 @@ void SceneTab::_buildPropertiesView()
     "texturesEnabled", [&]() -> bool { return _scene->texturesEnabled(); },
     [&](const bool& value) { _scene->texturesEnabled = value; });
   // - uid
-  view.addStringProperty("uid", [&]() -> string_t { return _scene->uid(); },
-                         [&](const string_t& /*value*/) {});
+  view.addStringProperty("uid", [&]() -> std::string { return _scene->uid(); },
+                         [&](const std::string& /*value*/) {});
   // - unTranslatedPointer
   view.addVector2Property(
     "unTranslatedPointer",

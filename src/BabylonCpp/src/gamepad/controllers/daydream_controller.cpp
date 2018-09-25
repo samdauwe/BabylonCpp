@@ -16,7 +16,7 @@ DaydreamController::~DaydreamController()
 }
 
 void DaydreamController::initControllerMesh(
-  Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
+  Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   SceneLoader::ImportMesh(
     {}, DaydreamController::MODEL_BASE_URL, DaydreamController::MODEL_FILENAME,

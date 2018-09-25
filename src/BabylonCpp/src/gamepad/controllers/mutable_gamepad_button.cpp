@@ -21,9 +21,9 @@ MutableGamepadButton::MutableGamepadButton(const MutableGamepadButton& other)
 }
 
 MutableGamepadButton::MutableGamepadButton(MutableGamepadButton&& other)
-    : _value{::std::move(other._value)}
-    , _touched{::std::move(other._touched)}
-    , _pressed{::std::move(other._pressed)}
+    : _value{std::move(other._value)}
+    , _touched{std::move(other._touched)}
+    , _pressed{std::move(other._pressed)}
 {
 }
 
@@ -43,9 +43,9 @@ MutableGamepadButton& MutableGamepadButton::
 operator=(MutableGamepadButton&& other)
 {
   if (&other != this) {
-    _value   = ::std::move(other._value);
-    _touched = ::std::move(other._touched);
-    _pressed = ::std::move(other._pressed);
+    _value   = std::move(other._value);
+    _touched = std::move(other._touched);
+    _pressed = std::move(other._pressed);
   }
 
   return *this;

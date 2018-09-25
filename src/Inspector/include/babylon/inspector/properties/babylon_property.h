@@ -1,7 +1,7 @@
 #ifndef BABYLON_INSPECTOR_PROPERTIES_BABYLON_PROPERTY_H
 #define BABYLON_INSPECTOR_PROPERTIES_BABYLON_PROPERTY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/math/color3.h>
@@ -86,7 +86,7 @@ public:
   void render()
   {
     const auto& color = _getter();
-    array_t<float, 3> _colorArray{{color.r, color.g, color.b}};
+    std::array<float, 3> _colorArray{{color.r, color.g, color.b}};
     if (_render(_colorArray)) {
       _setter(Color3{_colorArray[0], _colorArray[1], _colorArray[2]});
     }
@@ -98,7 +98,7 @@ public:
   void render()
   {
     const auto& color = _getter();
-    array_t<float, 4> _colorArray{{color.r, color.g, color.b, color.a}};
+    std::array<float, 4> _colorArray{{color.r, color.g, color.b, color.a}};
     if (_render(_colorArray)) {
       _setter(
         Color4{_colorArray[0], _colorArray[1], _colorArray[2], _colorArray[3]});
@@ -244,7 +244,7 @@ public:
   }
 
 private:
-  bool _render(array_t<float, 3>& colorArray)
+  bool _render(std::array<float, 3>& colorArray)
   {
     if (ImGui::ColorEdit3("", colorArray.data())) {
       return true;
@@ -252,7 +252,7 @@ private:
     return false;
   }
 
-  bool _render(array_t<float, 4>& colorArray)
+  bool _render(std::array<float, 4>& colorArray)
   {
     if (ImGui::ColorEdit4("", colorArray.data())) {
       return true;
@@ -266,7 +266,7 @@ private:
 
     if (ImGui::TreeNode(_id.c_str(), "ColorCurves")) {
       // Set attribute names
-      static array_t<string_t, 15> attributeNames{
+      static std::array<std::string, 15> attributeNames{
         "globalDensity",        //
         "globalHue",            //
         "globalSaturation",     //
@@ -284,7 +284,7 @@ private:
         "shadowsSaturation",    //
       };
       // Set attributes references
-      array_t<FloatProperty, 15> attributes{
+      std::array<FloatProperty, 15> attributes{
         &ColorCurves::globalDensity,        //
         &ColorCurves::globalHue,            //
         &ColorCurves::globalSaturation,     //
@@ -350,14 +350,14 @@ private:
       }
       {
         // Set attribute names
-        array_t<string_t, 4> attributeNames{
+        std::array<std::string, 4> attributeNames{
           "colorCurvesEnabled",         //
           "colorGradingBGR",            //
           "colorGradingEnabled",        //
           "colorGradingWithGreenDepth", //
         };
         // Set attributes references
-        array_t<BoolProperty, 4> attributes{
+        std::array<BoolProperty, 4> attributes{
           &ImageProcessingConfiguration::colorCurvesEnabled,         //
           &ImageProcessingConfiguration::colorGradingBGR,            //
           &ImageProcessingConfiguration::colorGradingEnabled,        //
@@ -380,12 +380,12 @@ private:
       }
       {
         // Set attribute names
-        array_t<string_t, 2> attributeNames{
+        std::array<std::string, 2> attributeNames{
           "contrast", //
           "exposure", //
         };
         // Set attributes references
-        array_t<FloatProperty, 2> attributes{
+        std::array<FloatProperty, 2> attributes{
           &ImageProcessingConfiguration::contrast, //
           &ImageProcessingConfiguration::exposure, //
         };
@@ -406,12 +406,12 @@ private:
       }
       {
         // Set attribute names
-        array_t<string_t, 2> attributeNames{
+        std::array<std::string, 2> attributeNames{
           "isEnabled",          //
           "toneMappingEnabled", //
         };
         // Set attributes references
-        array_t<BoolProperty, 2> attributes{
+        std::array<BoolProperty, 2> attributes{
           &ImageProcessingConfiguration::isEnabled,          //
           &ImageProcessingConfiguration::toneMappingEnabled, //
         };
@@ -448,13 +448,13 @@ private:
       }
       {
         // Set attribute names
-        array_t<string_t, 3> attributeNames{
+        std::array<std::string, 3> attributeNames{
           "vignetteCameraFov", //
           "vignetteCentreX",   //
           "vignetteCentreY",   //
         };
         // Set attributes references
-        array_t<FloatAttribute, 3> attributes{
+        std::array<FloatAttribute, 3> attributes{
           &ImageProcessingConfiguration::vignetteCameraFov, //
           &ImageProcessingConfiguration::vignetteCentreX,   //
           &ImageProcessingConfiguration::vignetteCentreY,   //
@@ -483,7 +483,7 @@ private:
         ImGui::PopStyleColor();
         ImGui::NextColumn();
         const auto& color = ipc.vignetteColor;
-        array_t<float, 4> _colorArray{{color.r, color.g, color.b, color.a}};
+        std::array<float, 4> _colorArray{{color.r, color.g, color.b, color.a}};
         if (_render(_colorArray)) {
           ipc.vignetteColor = Color4{_colorArray[0], _colorArray[1],
                                      _colorArray[2], _colorArray[3]};
@@ -505,12 +505,12 @@ private:
       }
       {
         // Set attribute names
-        array_t<string_t, 2> attributeNames{
+        std::array<std::string, 2> attributeNames{
           "vignetteStretch", //
           "vignetteWeight",  //
         };
         // Set attributes references
-        array_t<FloatAttribute, 2> attributes{
+        std::array<FloatAttribute, 2> attributes{
           &ImageProcessingConfiguration::vignetteStretch, //
           &ImageProcessingConfiguration::vignetteWeight,  //
         };
@@ -535,7 +535,7 @@ private:
   }
 
 public:
-  string_t _id;
+  std::string _id;
   TBabylonGetter<T> _getter;
   TBabylonNonConstGetter<T> _getterNonConst;
   TBabylonSetter<T> _setter;

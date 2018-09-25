@@ -17,8 +17,8 @@ Path2::Path2(const Path2& otherPath)
 }
 
 Path2::Path2(Path2&& otherPath)
-    : _points{::std::move(otherPath._points)}
-    , _length{::std::move(otherPath._length)}
+    : _points{std::move(otherPath._points)}
+    , _length{std::move(otherPath._length)}
 {
 }
 
@@ -36,9 +36,9 @@ Path2& Path2::operator=(const Path2& otherPath)
 Path2& Path2::operator=(Path2&& otherPath)
 {
   if (&otherPath != this) {
-    closed  = ::std::move(otherPath.closed);
-    _points = ::std::move(otherPath._points);
-    _length = ::std::move(otherPath._length);
+    closed  = std::move(otherPath.closed);
+    _points = std::move(otherPath._points);
+    _length = std::move(otherPath._length);
   }
 
   return *this;
@@ -55,7 +55,7 @@ Path2 Path2::copy() const
 
 unique_ptr_t<Path2> Path2::clone() const
 {
-  return ::std::make_unique<Path2>(*this);
+  return std::make_unique<Path2>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Path2& path)
@@ -103,8 +103,8 @@ Path2& Path2::addArcTo(float midX, float midY, float endX, float endY,
 
   float x = 0.f, y = 0.f;
   for (unsigned int i = 0; i < numberOfSegments; ++i) {
-    x = ::std::cos(currentAngle) * arc.radius + arc.centerPoint.x;
-    y = ::std::sin(currentAngle) * arc.radius + arc.centerPoint.y;
+    x = std::cos(currentAngle) * arc.radius + arc.centerPoint.x;
+    y = std::sin(currentAngle) * arc.radius + arc.centerPoint.y;
     addLineTo(x, y);
     currentAngle += increment;
   }

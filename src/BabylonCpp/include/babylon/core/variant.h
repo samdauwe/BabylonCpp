@@ -40,7 +40,7 @@ struct variant_helper<F, Ts...> {
   inline static void move(size_t old_t, void* old_v, void* new_v)
   {
     if (old_t == typeid(F).hash_code())
-      new (new_v) F(::std::move(*reinterpret_cast<F*>(old_v)));
+      new (new_v) F(std::move(*reinterpret_cast<F*>(old_v)));
     else
       variant_helper<Ts...>::move(old_t, old_v, new_v);
   }
@@ -74,7 +74,7 @@ private:
   static const size_t data_size  = static_max<sizeof(Ts)...>::value;
   static const size_t data_align = static_max<alignof(Ts)...>::value;
 
-  using data_t = typename ::std::aligned_storage<data_size, data_align>::type;
+  using data_t = typename std::aligned_storage<data_size, data_align>::type;
 
   using helper_t = variant_helper<Ts...>;
 
@@ -137,7 +137,7 @@ public:
     if (type_id == typeid(T).hash_code())
       return *reinterpret_cast<T*>(&data);
     else
-      throw ::std::bad_cast();
+      throw std::bad_cast();
   }
 
   template <typename T>
@@ -147,7 +147,7 @@ public:
     if (type_id == typeid(T).hash_code())
       return *reinterpret_cast<const T*>(&data);
     else
-      throw ::std::bad_cast();
+      throw std::bad_cast();
   }
 
   ~Variant()

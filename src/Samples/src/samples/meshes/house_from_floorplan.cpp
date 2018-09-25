@@ -128,7 +128,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
   outerData.resize(nbWalls);
   for (size_t w = 0; w < nbWalls; ++w) {
     angle = Math::PI
-            - ::std::acos(Vector3::Dot(line, nextLine)
+            - std::acos(Vector3::Dot(line, nextLine)
                           / (line.length() * nextLine.length()));
     direction       = Vector3::Cross(nextLine, line).normalize().y;
     auto lineNormal = Vector3(line.z, 0.f, -1.f * line.x).normalize();
@@ -136,7 +136,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
     outerData[(w + 1) % nbWalls]
       = walls[(w + 1) % nbWalls]
           .corner.add(lineNormal.scale(ply))
-          .add(line.scale(direction * ply / ::std::tan(angle / 2.f)));
+          .add(line.scale(direction * ply / std::tan(angle / 2.f)));
     line = nextLine;
     walls[(w + 3) % nbWalls].corner.subtractToRef(
       walls[(w + 2) % nbWalls].corner, nextLine);
@@ -160,7 +160,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
 
   auto maxL = 0.f;
   for (size_t w = 0; w < nbWalls; ++w) {
-    maxL = ::std::max(innerBaseCorners[(w + 1) % nbWalls]
+    maxL = std::max(innerBaseCorners[(w + 1) % nbWalls]
                         .subtract(innerBaseCorners[w])
                         .length(),
                       maxL);
@@ -258,7 +258,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
     // WallBuilder produces wall vertex positions array and indices using the
     // current and next wall to rotate and translate vertex positions to correct
     // place
-    ::std::tie(wallData.positions, wallData.indices)
+    std::tie(wallData.positions, wallData.indices)
       = polygonTriangulation.buildWall(walls[w].corner,
                                        walls[(w + 1) % nbWalls].corner);
 
@@ -383,7 +383,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
     positions = stl_util::concat(positions, wallData.positions);
 
     // Reverse indices for correct normals
-    ::std::reverse(wallData.indices.begin(), wallData.indices.end());
+    std::reverse(wallData.indices.begin(), wallData.indices.end());
     for (const auto& idx : wallData.indices) {
       indices.emplace_back(idx + nbIndices);
     }
@@ -962,14 +962,14 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
   auto customMesh = Mesh::New("custom", scene);
 
   // Result
-  auto vertexData = ::std::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   // Assign positions and indices to vertexData
-  vertexData->positions = ::std::move(positions);
-  vertexData->indices   = ::std::move(indices);
-  vertexData->normals   = ::std::move(normals);
-  vertexData->uvs       = ::std::move(uvs);
-  vertexData->colors    = ::std::move(colors);
+  vertexData->positions = std::move(positions);
+  vertexData->indices   = std::move(indices);
+  vertexData->normals   = std::move(normals);
+  vertexData->uvs       = std::move(uvs);
+  vertexData->colors    = std::move(colors);
 
   // Apply vertexData to custom mesh
   vertexData->applyToMesh(*customMesh);

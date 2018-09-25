@@ -68,9 +68,9 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , disableUniformBuffers{false}
     , disablePerformanceMonitorInBackground{false}
     , premultipliedAlpha{options.premultipliedAlpha}
-    , _depthCullingState{::std::make_unique<_DepthCullingState>()}
-    , _stencilState{::std::make_unique<_StencilState>()}
-    , _alphaState{::std::make_unique<_AlphaState>()}
+    , _depthCullingState{std::make_unique<_DepthCullingState>()}
+    , _stencilState{std::make_unique<_StencilState>()}
+    , _alphaState{std::make_unique<_AlphaState>()}
     , _alphaMode{EngineConstants::ALPHA_DISABLE}
     , _activeChannel{0}
     , _currentEffect{nullptr}
@@ -93,15 +93,15 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _lockstepMaxSteps{4}
     , _contextWasLost{false}
     , _doNotHandleContextLost{options.doNotHandleContextLost ? true : false}
-    , _performanceMonitor{::std::make_unique<PerformanceMonitor>()}
+    , _performanceMonitor{std::make_unique<PerformanceMonitor>()}
     , _fps{60.f}
     , _deltaTime{0.f}
     , _currentTextureChannel{-1}
     , _cachedVertexArrayObject{nullptr}
     , _uintIndicesCurrentlySet{false}
-    , _firstBoundInternalTextureTracker{::std::make_unique<
+    , _firstBoundInternalTextureTracker{std::make_unique<
         DummyInternalTextureTracker>()}
-    , _lastBoundInternalTextureTracker{::std::make_unique<
+    , _lastBoundInternalTextureTracker{std::make_unique<
         DummyInternalTextureTracker>()}
     , _workingCanvas{nullptr}
     , _workingContext{nullptr}
@@ -221,7 +221,7 @@ Scene* Engine::LastCreatedScene()
 }
 
 void Engine::MarkAllMaterialsAsDirty(
-  unsigned int flag, const ::std::function<bool(Material* mat)>& predicate)
+  unsigned int flag, const std::function<bool(Material* mat)>& predicate)
 {
   for (auto& engine : Engine::Instances) {
     for (auto& scene : engine->scenes) {
@@ -722,7 +722,7 @@ void Engine::stopRenderLoop()
 
 void Engine::stopRenderLoop(const delegate_t<void()>& renderFunction)
 {
-  _activeRenderLoops.erase(::std::remove(_activeRenderLoops.begin(),
+  _activeRenderLoops.erase(std::remove(_activeRenderLoops.begin(),
                                          _activeRenderLoops.end(),
                                          renderFunction),
                            _activeRenderLoops.end());
@@ -757,9 +757,9 @@ void Engine::_renderLoop()
   }
 }
 
-void Engine::runRenderLoop(const ::std::function<void()>& renderFunction)
+void Engine::runRenderLoop(const std::function<void()>& renderFunction)
 {
-  if (::std::find(_activeRenderLoops.begin(), _activeRenderLoops.end(),
+  if (std::find(_activeRenderLoops.begin(), _activeRenderLoops.end(),
                   renderFunction)
       != _activeRenderLoops.end()) {
     return;
@@ -772,7 +772,7 @@ void Engine::runRenderLoop(const ::std::function<void()>& renderFunction)
   }
 }
 
-void Engine::renderFunction(const ::std::function<void()>& renderFunction)
+void Engine::renderFunction(const std::function<void()>& renderFunction)
 {
   bool shouldRender = true;
   if (!renderEvenInBackground && _windowIsBackground) {
@@ -1053,7 +1053,7 @@ void Engine::bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer)
 
 void Engine::unBindFramebuffer(InternalTexture* texture,
                                bool disableGenerateMipMaps,
-                               const ::std::function<void()>& onBeforeUnbind)
+                               const std::function<void()>& onBeforeUnbind)
 {
   _currentRenderTarget = nullptr;
 
@@ -1085,7 +1085,7 @@ void Engine::unBindFramebuffer(InternalTexture* texture,
 
 void Engine::unBindMultiColorAttachmentFramebuffer(
   const vector_t<InternalTexture*>& textures, bool disableGenerateMipMaps,
-  const ::std::function<void()>& onBeforeUnbind)
+  const std::function<void()>& onBeforeUnbind)
 {
   _currentRenderTarget = nullptr;
 
@@ -1102,7 +1102,7 @@ void Engine::unBindMultiColorAttachmentFramebuffer(
     }
 
     for (size_t i = 0; i < textures.size(); ++i) {
-      const auto iStr = ::std::to_string(i);
+      const auto iStr = std::to_string(i);
       auto& texture   = textures[i];
 
       for (size_t j = 0; j < attachments.size(); ++j) {
@@ -1119,7 +1119,7 @@ void Engine::unBindMultiColorAttachmentFramebuffer(
                            GL::COLOR_BUFFER_BIT, GL::NEAREST);
     }
     for (size_t i = 0; i < attachments.size(); i++) {
-      const auto iStr = ::std::to_string(i);
+      const auto iStr = std::to_string(i);
       attachments[i]
         = (*_gl)[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
                                         "COLOR_ATTACHMENT" + iStr + "_WEBGL"];
@@ -1232,8 +1232,8 @@ void Engine::updateUniformBuffer(GL::IGLBuffer* uniformBuffer,
   }
   else {
     Float32Array subvector;
-    ::std::copy(elements.begin() + offset, elements.begin() + offset + count,
-                ::std::back_inserter(subvector));
+    std::copy(elements.begin() + offset, elements.begin() + offset + count,
+                std::back_inserter(subvector));
     _gl->bufferSubData(GL::UNIFORM_BUFFER, 0, subvector);
   }
 
@@ -1311,9 +1311,9 @@ void Engine::updateDynamicVertexBuffer(const Engine::GLBufferPtr& vertexBuffer,
   }
   else {
     Float32Array subvector;
-    ::std::copy(vertices.begin() + byteOffset,
+    std::copy(vertices.begin() + byteOffset,
                 vertices.begin() + byteOffset + byteLength,
-                ::std::back_inserter(subvector));
+                std::back_inserter(subvector));
     _gl->bufferSubData(GL::ARRAY_BUFFER, 0, subvector);
   }
 
@@ -1344,8 +1344,8 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices,
     // check 32 bit support
     using namespace std::placeholders;
     auto it
-      = ::std::find_if(indices.begin(), indices.end(),
-                       ::std::bind(::std::greater<uint32_t>(), _1, 65535));
+      = std::find_if(indices.begin(), indices.end(),
+                       std::bind(std::greater<uint32_t>(), _1, 65535));
     if (it != indices.end()) {
       need32Bits = true;
     }
@@ -1869,7 +1869,7 @@ void Engine::_deleteProgram(GL::IGLProgram* program)
 Effect*
 Engine::createEffect(const string_t& baseName, EffectCreationOptions& options,
                      Engine* engine,
-                     const ::std::function<void(Effect* effect)>& onCompiled)
+                     const std::function<void(Effect* effect)>& onCompiled)
 {
   string_t name = baseName + "+" + baseName + "@" + options.defines;
   if (stl_util::contains(_compiledEffects, name)) {
@@ -1880,9 +1880,9 @@ Engine::createEffect(const string_t& baseName, EffectCreationOptions& options,
     return compiledEffect;
   }
 
-  auto effect  = ::std::make_unique<Effect>(baseName, options, engine);
+  auto effect  = std::make_unique<Effect>(baseName, options, engine);
   effect->_key = name;
-  _compiledEffects[name] = ::std::move(effect);
+  _compiledEffects[name] = std::move(effect);
 
   return _compiledEffects[name].get();
 }
@@ -1905,9 +1905,9 @@ Effect* Engine::createEffect(unordered_map_t<string_t, string_t>& baseName,
     return _compiledEffects[name].get();
   }
 
-  auto effect  = ::std::make_unique<Effect>(baseName, options, engine);
+  auto effect  = std::make_unique<Effect>(baseName, options, engine);
   effect->_key = name;
-  _compiledEffects[name] = ::std::move(effect);
+  _compiledEffects[name] = std::move(effect);
 
   return _compiledEffects[name].get();
 }
@@ -1915,8 +1915,8 @@ Effect* Engine::createEffect(unordered_map_t<string_t, string_t>& baseName,
 Effect* Engine::createEffectForParticles(
   const string_t& fragmentName, vector_t<string_t> uniformsNames,
   vector_t<string_t> samplers, string_t defines, EffectFallbacks* fallbacks,
-  const ::std::function<void(const Effect* effect)>& onCompiled,
-  const ::std::function<void(const Effect* effect, const string_t& errors)>&
+  const std::function<void(const Effect* effect)>& onCompiled,
+  const std::function<void(const Effect* effect, const string_t& errors)>&
     onError)
 {
   auto attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions();
@@ -1935,11 +1935,11 @@ Effect* Engine::createEffectForParticles(
   stl_util::concat(effectCreationOption, uniformsNames);
 
   EffectCreationOptions options;
-  options.attributes    = ::std::move(attributesNamesOrOptions);
-  options.uniformsNames = ::std::move(effectCreationOption);
-  options.samplers      = ::std::move(samplers);
-  options.defines       = ::std::move(defines);
-  options.fallbacks     = ::std::make_unique<EffectFallbacks>(*fallbacks);
+  options.attributes    = std::move(attributesNamesOrOptions);
+  options.uniformsNames = std::move(effectCreationOption);
+  options.samplers      = std::move(samplers);
+  options.defines       = std::move(defines);
+  options.fallbacks     = std::make_unique<EffectFallbacks>(*fallbacks);
   options.onCompiled    = onCompiled;
   options.onError       = onError;
 
@@ -2037,7 +2037,7 @@ Engine::getUniforms(GL::IGLProgram* shaderProgram,
   for (auto& name : uniformsNames) {
     auto uniform = _gl->getUniformLocation(shaderProgram, name);
     if (uniform) {
-      results[name] = ::std::move(uniform);
+      results[name] = std::move(uniform);
     }
   }
 
@@ -2529,8 +2529,8 @@ unique_ptr_t<GL::IGLTexture> Engine::_createTexture()
 InternalTexture* Engine::createTexture(
   const vector_t<string_t>& list, bool noMipmap, bool invertY, Scene* scene,
   unsigned int samplingMode,
-  const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
-  const ::std::function<void()>& onError,
+  const std::function<void(InternalTexture*, EventState&)>& onLoad,
+  const std::function<void()>& onError,
   const Variant<ArrayBuffer, Image>& buffer)
 {
   if (list.empty()) {
@@ -2544,8 +2544,8 @@ InternalTexture* Engine::createTexture(
 InternalTexture* Engine::createTexture(
   const string_t& urlArg, bool noMipmap, bool invertY, Scene* scene,
   unsigned int samplingMode,
-  const ::std::function<void(InternalTexture*, EventState&)>& onLoad,
-  const ::std::function<void()>& onError,
+  const std::function<void(InternalTexture*, EventState&)>& onLoad,
+  const std::function<void()>& onError,
   const nullable_t<Variant<ArrayBuffer, Image>>& buffer,
   InternalTexture* fallback, const nullable_t<unsigned int>& format)
 {
@@ -2620,7 +2620,7 @@ InternalTexture* Engine::createTexture(
   };
 
 #if 0
-  ::std::function<void(ArrayBufferView & arrayBuffer)> callback;
+  std::function<void(ArrayBufferView & arrayBuffer)> callback;
 #endif
 
   // processing for non-image formats
@@ -2638,7 +2638,7 @@ InternalTexture* Engine::createTexture(
       _prepareWebGLTexture(
         texture, scene, img.width, img.height, invertY, noMipmap, false,
         [&](int potWidth, int potHeight,
-            const ::std::function<void()>& continuationCallback) {
+            const std::function<void()>& continuationCallback) {
           auto isPot = (img.width == potWidth && img.height == potHeight);
           auto internalFormat
             = (format ? _getInternalFormat(*format) :
@@ -2718,7 +2718,7 @@ InternalTexture* Engine::createTexture(
 void Engine::_rescaleTexture(InternalTexture* source,
                              InternalTexture* destination, Scene* scene,
                              unsigned int internalFormat,
-                             const ::std::function<void()>& onComplete)
+                             const std::function<void()>& onComplete)
 {
   IRenderTargetOptions options;
   options.generateMipMaps       = false;
@@ -2731,7 +2731,7 @@ void Engine::_rescaleTexture(InternalTexture* source,
     ISize(destination->width, destination->height), options);
 
   if (!_rescalePostProcess) {
-    _rescalePostProcess = ::std::make_unique<PassPostProcess>(
+    _rescalePostProcess = std::make_unique<PassPostProcess>(
       "rescale", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, this,
       false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   }
@@ -2817,7 +2817,7 @@ InternalTexture* Engine::createRawTexture(const Uint8Array& data, int width,
                                           const string_t& compression,
                                           unsigned int type)
 {
-  auto texture = ::std::make_unique<InternalTexture>(
+  auto texture = std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_RAW);
   auto _texture             = texture.get();
   _texture->baseWidth       = width;
@@ -2852,7 +2852,7 @@ InternalTexture* Engine::createRawTexture(const Uint8Array& data, int width,
 
   _texture->samplingMode = samplingMode;
 
-  _internalTexturesCache.emplace_back(::std::move(texture));
+  _internalTexturesCache.emplace_back(std::move(texture));
 
   return _texture;
 }
@@ -2874,7 +2874,7 @@ InternalTexture* Engine::createDynamicTexture(int width, int height,
                                               bool generateMipMaps,
                                               unsigned int samplingMode)
 {
-  auto texture = ::std::make_unique<InternalTexture>(
+  auto texture = std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_DYNAMIC);
   auto _texture       = texture.get();
   texture->baseWidth  = width;
@@ -2898,7 +2898,7 @@ InternalTexture* Engine::createDynamicTexture(int width, int height,
 
   updateTextureSamplingMode(samplingMode, _texture);
 
-  _internalTexturesCache.emplace_back(::std::move(texture));
+  _internalTexturesCache.emplace_back(std::move(texture));
 
   return _texture;
 }
@@ -3068,7 +3068,7 @@ unique_ptr_t<InternalTexture>
 Engine::_createDepthStencilTexture(const Variant<int, ISize>& size,
                                    const DepthTextureCreationOptions& options)
 {
-  auto internalTexture = ::std::make_unique<InternalTexture>(
+  auto internalTexture = std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_DEPTHTEXTURE);
 
   if (!_caps.depthTextureExtension) {
@@ -3124,7 +3124,7 @@ Engine::_createDepthStencilTexture(const Variant<int, ISize>& size,
 unique_ptr_t<InternalTexture> Engine::_createDepthStencilCubeTexture(
   int size, const DepthTextureCreationOptions& options)
 {
-  auto internalTexture = ::std::make_unique<InternalTexture>(
+  auto internalTexture = std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_UNKNOWN);
   internalTexture->isCube = true;
 
@@ -3235,7 +3235,7 @@ Engine::createRenderTargetTexture(ISize size,
     samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
   }
 
-  auto texture = ::std::make_unique<InternalTexture>(
+  auto texture = std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_RENDERTARGET);
   auto _texture = texture.get();
   _bindTextureDirectly(GL::TEXTURE_2D, _texture, true);
@@ -3282,7 +3282,7 @@ Engine::createRenderTargetTexture(ISize size,
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   bindUnboundFramebuffer(currentFrameBuffer);
 
-  _texture->_framebuffer           = ::std::move(framebuffer);
+  _texture->_framebuffer           = std::move(framebuffer);
   _texture->baseWidth              = width;
   _texture->baseHeight             = height;
   _texture->width                  = width;
@@ -3297,7 +3297,7 @@ Engine::createRenderTargetTexture(ISize size,
 
   // resetTextureCache();
 
-  _internalTexturesCache.emplace_back(::std::move(texture));
+  _internalTexturesCache.emplace_back(std::move(texture));
 
   return _texture;
 }
@@ -3332,7 +3332,7 @@ Engine::createMultipleRenderTarget(ISize size,
     *generateStencilBuffer, *generateDepthBuffer, width, height);
 
   for (unsigned int i = 0; i < textureCount; ++i) {
-    const auto iStr = ::std::to_string(i);
+    const auto iStr = std::to_string(i);
     auto samplingMode
       = (i < samplingModes.size()) ? samplingModes[i] : defaultSamplingMode;
     auto type = (i < types.size()) ? types[i] : defaultType;
@@ -3357,7 +3357,7 @@ Engine::createMultipleRenderTarget(ISize size,
                        "to TEXTURETYPE_UNSIGNED_BYTE type");
     }
 
-    auto texture = ::std::make_unique<InternalTexture>(
+    auto texture = std::make_unique<InternalTexture>(
       this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
     auto attachment
       = (*_gl)[webGLVersion() > 1 ? "COLOR_ATTACHMENT" + iStr :
@@ -3387,8 +3387,8 @@ Engine::createMultipleRenderTarget(ISize size,
     // Unbind
     _bindTextureDirectly(GL::TEXTURE_2D, nullptr);
 
-    texture->_framebuffer           = ::std::move(framebuffer);        // FIXME
-    texture->_depthStencilBuffer    = ::std::move(depthStencilBuffer); // FIXME
+    texture->_framebuffer           = std::move(framebuffer);        // FIXME
+    texture->_depthStencilBuffer    = std::move(depthStencilBuffer); // FIXME
     texture->baseWidth              = width;
     texture->baseHeight             = height;
     texture->width                  = width;
@@ -3407,7 +3407,7 @@ Engine::createMultipleRenderTarget(ISize size,
 
   if (generateDepthTexture && _caps.depthTextureExtension) {
     // Depth texture
-    auto depthTexture = ::std::make_unique<InternalTexture>(
+    auto depthTexture = std::make_unique<InternalTexture>(
       this, InternalTexture::DATASOURCE_MULTIRENDERTARGET);
 
     _gl->activeTexture(GL::TEXTURE0);
@@ -3434,7 +3434,7 @@ Engine::createMultipleRenderTarget(ISize size,
                               0                                  //
     );
 
-    depthTexture->_framebuffer           = ::std::move(framebuffer); // FIXME
+    depthTexture->_framebuffer           = std::move(framebuffer); // FIXME
     depthTexture->baseWidth              = width;
     depthTexture->baseHeight             = height;
     depthTexture->width                  = width;
@@ -3447,7 +3447,7 @@ Engine::createMultipleRenderTarget(ISize size,
     depthTexture->_generateStencilBuffer = *generateStencilBuffer;
 
     textures.emplace_back(depthTexture.get());
-    _internalTexturesCache.emplace_back(::std::move(depthTexture));
+    _internalTexturesCache.emplace_back(std::move(depthTexture));
   }
 
   _gl->drawBuffers(attachments);
@@ -3515,7 +3515,7 @@ Engine::updateRenderTargetTextureSampleCount(InternalTexture* texture,
     return samples;
   }
 
-  samples = ::std::min(
+  samples = std::min(
     samples, static_cast<unsigned int>(_gl->getParameteri(GL::MAX_SAMPLES)));
 
   // Dispose previous render buffers
@@ -3542,7 +3542,7 @@ Engine::updateRenderTargetTextureSampleCount(InternalTexture* texture,
       return 0;
     }
 
-    texture->_MSAAFramebuffer = ::std::move(framebuffer);
+    texture->_MSAAFramebuffer = std::move(framebuffer);
     bindUnboundFramebuffer(texture->_MSAAFramebuffer.get());
 
     auto colorRenderbuffer = _gl->createRenderbuffer();
@@ -3561,7 +3561,7 @@ Engine::updateRenderTargetTextureSampleCount(InternalTexture* texture,
     _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, GL::COLOR_ATTACHMENT0,
                                  GL::RENDERBUFFER, colorRenderbuffer);
 
-    texture->_MSAARenderBuffer = ::std::move(colorRenderbuffer);
+    texture->_MSAARenderBuffer = std::move(colorRenderbuffer);
   }
   else {
     bindUnboundFramebuffer(texture->_framebuffer.get());
@@ -3589,7 +3589,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
     return samples;
   }
 
-  samples = ::std::min(
+  samples = std::min(
     samples, static_cast<unsigned>(_gl->getParameteri(GL::MAX_SAMPLES)));
 
   // Dispose previous render buffers
@@ -3627,7 +3627,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
     Uint32Array attachments;
 
     for (size_t i = 0; i < textures.size(); ++i) {
-      auto iStr     = ::std::to_string(i);
+      auto iStr     = std::to_string(i);
       auto& texture = textures[i];
       auto attachment
         = (*_gl)[webGLVersion() > 1.f ? "COLOR_ATTACHMENT" + iStr :
@@ -3650,10 +3650,10 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
       _gl->framebufferRenderbuffer(GL::FRAMEBUFFER, attachment,
                                    GL::RENDERBUFFER, colorRenderbuffer);
 
-      texture->_MSAAFramebuffer    = ::std::move(framebuffer);
-      texture->_MSAARenderBuffer   = ::std::move(colorRenderbuffer);
+      texture->_MSAAFramebuffer    = std::move(framebuffer);
+      texture->_MSAARenderBuffer   = std::move(colorRenderbuffer);
       texture->samples             = samples;
-      texture->_depthStencilBuffer = ::std::move(depthStencilBuffer);
+      texture->_depthStencilBuffer = std::move(depthStencilBuffer);
       _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
       attachments.emplace_back(attachment);
     }
@@ -3727,7 +3727,7 @@ void Engine::_uploadImageToTexture(InternalTexture* texture,
 InternalTexture* Engine::createRenderTargetCubeTexture(
   const ISize& size, const RenderTargetCreationOptions& options)
 {
-  auto texture = ::std::make_unique<InternalTexture>(
+  auto texture = std::make_unique<InternalTexture>(
     this, InternalTexture::DATASOURCE_RENDERTARGET);
   auto _texture = texture.get();
 
@@ -3781,14 +3781,14 @@ InternalTexture* Engine::createRenderTargetCubeTexture(
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   bindUnboundFramebuffer(nullptr);
 
-  _texture->_framebuffer = ::std::move(framebuffer);
+  _texture->_framebuffer = std::move(framebuffer);
   _texture->width        = size.width;
   _texture->height       = size.height;
   _texture->isReady      = true;
 
   // resetTextureCache();
 
-  _internalTexturesCache.emplace_back(::std::move(texture));
+  _internalTexturesCache.emplace_back(std::move(texture));
 
   return _texture;
 }
@@ -3796,8 +3796,8 @@ InternalTexture* Engine::createRenderTargetCubeTexture(
 InternalTexture* Engine::createPrefilteredCubeTexture(
   const string_t& /*rootUrl*/, Scene* /*scene*/, float /*scale*/,
   float /*offset*/,
-  const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
-  const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
+  const std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
+  const std::function<void()>& /*onError*/, unsigned int /*format*/,
   const string_t& /*forcedExtension*/, bool /*createPolynomials*/)
 {
   return nullptr;
@@ -3806,8 +3806,8 @@ InternalTexture* Engine::createPrefilteredCubeTexture(
 InternalTexture* Engine::createCubeTexture(
   const string_t& /*rootUrl*/, Scene* /*scene*/,
   const vector_t<string_t>& /*files*/, bool /*noMipmap*/,
-  const ::std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
-  const ::std::function<void()>& /*onError*/, unsigned int /*format*/,
+  const std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
+  const std::function<void()>& /*onError*/, unsigned int /*format*/,
   const string_t& /*forcedExtension*/, bool /*createPolynomials*/,
   float /*lodScale*/, float /*lodOffset*/, InternalTexture* /*fallback*/)
 {
@@ -3980,12 +3980,12 @@ InternalTexture* Engine::createRawCubeTexture(
 InternalTexture* Engine::createRawCubeTextureFromUrl(
   const string_t& /*url*/, Scene* /*scene*/, int /*size*/,
   unsigned int /*format*/, unsigned int /*type*/, bool /*noMipmap*/,
-  const ::std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
+  const std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
   /*callback*/,
-  const ::std::function<vector_t<ArrayBufferViewArray>(
+  const std::function<vector_t<ArrayBufferViewArray>(
     const ArrayBufferViewArray& faces)>& /*mipmmapGenerator*/,
-  const ::std::function<void()>& /*onLoad*/,
-  const ::std::function<void()>& /*onError*/, unsigned int /*samplingMode*/,
+  const std::function<void()>& /*onLoad*/,
+  const std::function<void()>& /*onError*/, unsigned int /*samplingMode*/,
   bool /*invertY*/)
 {
   return nullptr;
@@ -4115,16 +4115,16 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
 void Engine::_prepareWebGLTexture(
   InternalTexture* texture, Scene* scene, int width, int height,
   nullable_t<bool> invertY, bool noMipmap, bool isCompressed,
-  const ::std::function<
+  const std::function<
     bool(int width, int height,
-         const ::std::function<void()>& continuationCallback)>& processFunction,
+         const std::function<void()>& continuationCallback)>& processFunction,
   unsigned int samplingMode)
 {
   auto maxTextureSize = getCaps().maxTextureSize;
-  auto potWidth       = ::std::min(
+  auto potWidth       = std::min(
     maxTextureSize,
     needPOTTextures() ? Tools::GetExponentOfTwo(width, maxTextureSize) : width);
-  auto potHeight = ::std::min(
+  auto potHeight = std::min(
     maxTextureSize, needPOTTextures() ?
                       Tools::GetExponentOfTwo(height, maxTextureSize) :
                       height);
@@ -4242,7 +4242,7 @@ void Engine::_releaseTexture(InternalTexture* texture)
   unbindAllTextures();
 
   _internalTexturesCache.erase(
-    ::std::remove_if(_internalTexturesCache.begin(),
+    std::remove_if(_internalTexturesCache.begin(),
                      _internalTexturesCache.end(),
                      [&texture](const unique_ptr_t<InternalTexture>& _texture) {
                        return _texture.get() == texture;
@@ -4396,7 +4396,7 @@ int Engine::_removeDesignatedSlot(InternalTexture* internalTexture)
 void Engine::_activateCurrentTexture()
 {
   if (_currentTextureChannel != _activeChannel) {
-    _gl->activeTexture((*_gl)["TEXTURE" + ::std::to_string(_activeChannel)]);
+    _gl->activeTexture((*_gl)["TEXTURE" + std::to_string(_activeChannel)]);
     _currentTextureChannel = _activeChannel;
   }
 }
@@ -4424,7 +4424,7 @@ bool Engine::_bindTextureDirectly(unsigned int target, InternalTexture* texture,
 
     if (texture) {
       if (!disableTextureBindingOptimization) {
-        _nextFreeTextureSlots.erase(::std::remove(_nextFreeTextureSlots.begin(),
+        _nextFreeTextureSlots.erase(std::remove(_nextFreeTextureSlots.begin(),
                                                   _nextFreeTextureSlots.end(),
                                                   _activeChannel),
                                     _nextFreeTextureSlots.end());
@@ -4570,7 +4570,7 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture,
 
   InternalTexture* internalTexture = nullptr;
   if (depthStencilTexture) {
-    internalTexture = ::std::static_pointer_cast<RenderTargetTexture>(texture)
+    internalTexture = std::static_pointer_cast<RenderTargetTexture>(texture)
                         ->depthStencilTexture.get();
   }
   else if (texture->isReady()) {
@@ -4730,7 +4730,7 @@ void Engine::_setAnisotropicLevel(unsigned int target,
       && internalTexture->_cachedAnisotropicFilteringLevel != value) {
     _setTextureParameterFloat(
       target, AnisotropicFilterExtension::TEXTURE_MAX_ANISOTROPY_EXT,
-      static_cast<float>(::std::min(value, _caps.maxAnisotropy)),
+      static_cast<float>(std::min(value, _caps.maxAnisotropy)),
       internalTexture);
     internalTexture->_cachedAnisotropicFilteringLevel = value;
   }
@@ -4854,7 +4854,7 @@ void Engine::dispose()
 
   // Remove from Instances
   Engine::Instances.erase(
-    ::std::remove(Engine::Instances.begin(), Engine::Instances.end(), this),
+    std::remove(Engine::Instances.begin(), Engine::Instances.end(), this),
     Engine::Instances.end());
 
   _workingCanvas  = nullptr;
@@ -4969,7 +4969,7 @@ ArrayBufferView Engine::_readTexturePixels(InternalTexture* texture, int width,
       return ArrayBufferView();
     }
 
-    _dummyFramebuffer = ::std::move(dummy);
+    _dummyFramebuffer = std::move(dummy);
   }
   _gl->bindFramebuffer(GL::FRAMEBUFFER, _dummyFramebuffer.get());
 
@@ -5289,7 +5289,7 @@ void Engine::bindTransformFeedbackBuffer(GL::IGLBuffer* value)
 
 IFileRequest Engine::_loadFile(
   const string_t& /*url*/,
-  const ::std::function<void(Variant<string_t, ArrayBuffer>& data,
+  const std::function<void(Variant<string_t, ArrayBuffer>& data,
                              const string_t& responseURL)>& /*onSuccess*/)
 {
   return IFileRequest();

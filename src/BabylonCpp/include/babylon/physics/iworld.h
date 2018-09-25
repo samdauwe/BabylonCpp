@@ -1,9 +1,13 @@
 #ifndef BABYLON_PHYSICS_IWORLD_H
 #define BABYLON_PHYSICS_IWORLD_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+struct IPhysicsBody;
+class PhysicsJoint;
+class Vector3;
 
 struct BABYLON_SHARED_EXPORT IWorld {
 

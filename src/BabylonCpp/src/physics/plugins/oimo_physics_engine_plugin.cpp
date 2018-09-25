@@ -60,7 +60,7 @@ void OimoPhysicsEnginePlugin::executeStep(
   for (auto& impostor : impostors) {
     impostor->afterStep();
     // update the ordered impostors array
-    _tmpImpostorsArray[::std::to_string(impostor->uniqueId)] = impostor;
+    _tmpImpostorsArray[std::to_string(impostor->uniqueId)] = impostor;
   }
 #if 0
   // check for collisions

@@ -1,7 +1,9 @@
 #ifndef BABYLON_PARTICLES_IPARTICLE_SYSTEM_H
 #define BABYLON_PARTICLES_IPARTICLE_SYSTEM_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/variant.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
@@ -10,7 +12,30 @@
 #include <babylon/tools/color_gradient.h>
 #include <babylon/tools/factor_gradient.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class AbstractMesh;
+class Animation;
+class BaseTexture;
+struct IParticleEmitterType;
+class Mesh;
+class Texture;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using AnimationPtr    = std::shared_ptr<Animation>;
+using BaseTexturePtr  = std::shared_ptr<BaseTexture>;
+using TexturePtr      = std::shared_ptr<Texture>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Interface representing a particle system in Babylon.js.
@@ -26,17 +51,17 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   /**
    * List of animations used by the particle system.
    */
-  vector_t<AnimationPtr> animations;
+  std::vector<AnimationPtr> animations;
 
   /**
    * The id of the Particle system.
    */
-  string_t id;
+  std::string id;
 
   /**
    * The name of the Particle system.
    */
-  string_t name;
+  std::string name;
 
   /**
    * The emitter represents the Mesh or position we are attaching the particle
@@ -322,7 +347,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @param newEmitter The new emitter to use
    * @returns the cloned particle system
    */
-  virtual IParticleSystem* clone(const string_t& name, Mesh* newEmitter) = 0;
+  virtual IParticleSystem* clone(const std::string& name, Mesh* newEmitter) = 0;
 
   /**
    * @brief Serializes the particle system to a JSON object.
@@ -368,7 +393,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    */
   virtual IParticleSystem&
   addColorGradient(float gradient, const Color4& color1,
-                   const nullable_t<Color4>& color2 = nullopt_t)
+                   const std::optional<Color4>& color2 = std::nullopt)
     = 0;
 
   /**
@@ -387,8 +412,8 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @returns the current particle system
    */
   virtual IParticleSystem& addSizeGradient(float gradient, float factor,
-                                           const nullable_t<float>& factor2
-                                           = nullopt_t)
+                                           const std::optional<float>& factor2
+                                           = std::nullopt)
     = 0;
 
   /**
@@ -403,14 +428,14 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * You must use addColorGradient and removeColorGradient to udpate this list
    * @returns the list of color gradients
    */
-  virtual vector_t<ColorGradient>& getColorGradients() = 0;
+  virtual std::vector<ColorGradient>& getColorGradients() = 0;
 
   /**
    * @brief Gets the current list of size gradients.
    * You must use addSizeGradient and removeSizeGradient to udpate this list
    * @returns the list of size gradients
    */
-  virtual vector_t<FactorGradient>& getSizeGradients() = 0;
+  virtual std::vector<FactorGradient>& getSizeGradients() = 0;
 
   /**
    * @brief Gets the current list of angular speed gradients.
@@ -418,7 +443,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * udpate this list
    * @returns the list of angular speed gradients
    */
-  virtual vector_t<FactorGradient>& getAngularSpeedGradients() = 0;
+  virtual std::vector<FactorGradient>& getAngularSpeedGradients() = 0;
 
   /**
    * @brief Adds a new angular speed gradient.
@@ -430,7 +455,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    */
   virtual IParticleSystem&
   addAngularSpeedGradient(float gradient, float factor,
-                          const nullable_t<float>& factor2 = nullopt_t)
+                          const std::optional<float>& factor2 = std::nullopt)
     = 0;
 
   /**
@@ -446,7 +471,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * list
    * @returns the list of velocity gradients
    */
-  virtual vector_t<FactorGradient>& getVelocityGradients() = 0;
+  virtual std::vector<FactorGradient>& getVelocityGradients() = 0;
 
   /**
    * @brief Adds a new velocity gradient
@@ -456,9 +481,9 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * ([factor, factor2]) with main value to pick the final value from
    * @returns the current particle system
    */
-  virtual IParticleSystem& addVelocityGradient(float gradient, float factor,
-                                               const nullable_t<float>& factor2
-                                               = nullopt_t)
+  virtual IParticleSystem&
+  addVelocityGradient(float gradient, float factor,
+                      const std::optional<float>& factor2 = std::nullopt)
     = 0;
 
   /**

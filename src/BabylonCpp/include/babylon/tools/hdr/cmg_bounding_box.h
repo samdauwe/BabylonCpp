@@ -1,7 +1,7 @@
 #ifndef BABYLON_TOOLS_HDR_CMG_BOUNDING_BOX_H
 #define BABYLON_TOOLS_HDR_CMG_BOUNDING_BOX_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {

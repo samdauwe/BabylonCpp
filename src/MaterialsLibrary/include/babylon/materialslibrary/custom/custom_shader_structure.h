@@ -1,7 +1,9 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_SHADER_STRUCTURE_H
 #define BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_SHADER_STRUCTURE_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace MaterialsLibrary {
@@ -11,8 +13,8 @@ struct BABYLON_SHARED_EXPORT CustomShaderStructure {
   CustomShaderStructure();
   ~CustomShaderStructure();
 
-  string_t FragmentStore;
-  string_t VertexStore;
+  std::string FragmentStore;
+  std::string VertexStore;
 
 }; // end of class CustomShaderStructure
 

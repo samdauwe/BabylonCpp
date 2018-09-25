@@ -10,7 +10,7 @@ namespace BABYLON {
 std::unique_ptr<RayHelper>
 RayHelper::CreateAndShow(const Ray& ray, Scene* scene, const Color3& color)
 {
-  auto helper = ::std::make_unique<RayHelper>(ray);
+  auto helper = std::make_unique<RayHelper>(ray);
 
   helper->show(scene, color);
 
@@ -18,7 +18,7 @@ RayHelper::CreateAndShow(const Ray& ray, Scene* scene, const Color3& color)
 }
 
 RayHelper::RayHelper(const Ray& iRay)
-    : ray{::std::make_unique<Ray>(iRay)}
+    : ray{std::make_unique<Ray>(iRay)}
     , _renderLine{nullptr}
     , _renderFunction{nullptr}
     , _scene{nullptr}
@@ -71,7 +71,7 @@ void RayHelper::_render()
   }
 
   auto& point    = _renderPoints[1];
-  const auto len = ::std::min(ray->length, 1000000.f);
+  const auto len = std::min(ray->length, 1000000.f);
 
   point.copyFrom(ray->direction);
   point.scaleInPlace(len);

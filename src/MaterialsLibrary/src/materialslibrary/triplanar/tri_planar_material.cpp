@@ -536,7 +536,7 @@ Json::object TriPlanarMaterial::serialize() const
   return Json::object();
 }
 
-const string_t TriPlanarMaterial::getClassName() const
+const std::string TriPlanarMaterial::getClassName() const
 {
   return "TriPlanarMaterial";
 }

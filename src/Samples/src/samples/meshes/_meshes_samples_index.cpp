@@ -39,189 +39,189 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
   // -- Mesh examples --
 
   // Airplane Model Scene
-  _samples["AirplaneModelScene"] = ::std::make_tuple(
+  _samples["AirplaneModelScene"] = std::make_tuple(
     true,                                                     //
     [](ICanvas* iCanvas) {                                    //
-      return ::std::make_unique<AirplaneModelScene>(iCanvas); //
+      return std::make_unique<AirplaneModelScene>(iCanvas); //
     });                                                       //
   // Basic Elements Scene
-  _samples["BasicElementsScene"] = ::std::make_tuple(
+  _samples["BasicElementsScene"] = std::make_tuple(
     true,                                                     //
     [](ICanvas* iCanvas) {                                    //
-      return ::std::make_unique<BasicElementsScene>(iCanvas); //
+      return std::make_unique<BasicElementsScene>(iCanvas); //
     });                                                       //
   // Basic Scene
   _samples["BasicScene"]
-    = ::std::make_tuple(true,                                             //
+    = std::make_tuple(true,                                             //
                         [](ICanvas* iCanvas) {                            //
-                          return ::std::make_unique<BasicScene>(iCanvas); //
+                          return std::make_unique<BasicScene>(iCanvas); //
                         });                                               //
 
   // Circle Curves From Beziers Scene
-  _samples["CircleCurvesFromBeziersScene"] = ::std::make_tuple(
+  _samples["CircleCurvesFromBeziersScene"] = std::make_tuple(
     true,                                                               //
     [](ICanvas* iCanvas) {                                              //
-      return ::std::make_unique<CircleCurvesFromBeziersScene>(iCanvas); //
+      return std::make_unique<CircleCurvesFromBeziersScene>(iCanvas); //
     });                                                                 //
   // Colored Triangle Scene
-  _samples["ColoredTriangleScene"] = ::std::make_tuple(
+  _samples["ColoredTriangleScene"] = std::make_tuple(
     true,                                                       //
     [](ICanvas* iCanvas) {                                      //
-      return ::std::make_unique<ColoredTriangleScene>(iCanvas); //
+      return std::make_unique<ColoredTriangleScene>(iCanvas); //
     });                                                         //
   // Cuboid Scene
   _samples["CuboidScene"]
-    = ::std::make_tuple(true,                                              //
+    = std::make_tuple(true,                                              //
                         [](ICanvas* iCanvas) {                             //
-                          return ::std::make_unique<CuboidScene>(iCanvas); //
+                          return std::make_unique<CuboidScene>(iCanvas); //
                         });                                                //
   // Curved Helix Meshes Scene
-  _samples["CurvedHelixMeshesScene"] = ::std::make_tuple(
+  _samples["CurvedHelixMeshesScene"] = std::make_tuple(
     true,                                                         //
     [](ICanvas* iCanvas) {                                        //
-      return ::std::make_unique<CurvedHelixMeshesScene>(iCanvas); //
+      return std::make_unique<CurvedHelixMeshesScene>(iCanvas); //
     });                                                           //
   // Extruded Polygon Scene
-  _samples["ExtrudedPolygonScene"] = ::std::make_tuple(
+  _samples["ExtrudedPolygonScene"] = std::make_tuple(
     true,                                                       //
     [](ICanvas* iCanvas) {                                      //
-      return ::std::make_unique<ExtrudedPolygonScene>(iCanvas); //
+      return std::make_unique<ExtrudedPolygonScene>(iCanvas); //
     });                                                         //
   // Extrusion Scene
   _samples["ExtrusionScene"]
-    = ::std::make_tuple(true,                                                 //
+    = std::make_tuple(true,                                                 //
                         [](ICanvas* iCanvas) {                                //
-                          return ::std::make_unique<ExtrusionScene>(iCanvas); //
+                          return std::make_unique<ExtrusionScene>(iCanvas); //
                         });                                                   //
   // Height Map Scene
   _samples["HeightMapScene"]
-    = ::std::make_tuple(true,                                                 //
+    = std::make_tuple(true,                                                 //
                         [](ICanvas* iCanvas) {                                //
-                          return ::std::make_unique<HeightMapScene>(iCanvas); //
+                          return std::make_unique<HeightMapScene>(iCanvas); //
                         });                                                   //
   // House from a Floorplan Scene
-  _samples["HouseFromFloorplanScene"] = ::std::make_tuple(
+  _samples["HouseFromFloorplanScene"] = std::make_tuple(
     true,                                                          //
     [](ICanvas* iCanvas) {                                         //
-      return ::std::make_unique<HouseFromFloorplanScene>(iCanvas); //
+      return std::make_unique<HouseFromFloorplanScene>(iCanvas); //
     });                                                            //
   // Icosphere Scene
   _samples["IcoSphereScene"]
-    = ::std::make_tuple(true,                                                 //
+    = std::make_tuple(true,                                                 //
                         [](ICanvas* iCanvas) {                                //
-                          return ::std::make_unique<IcoSphereScene>(iCanvas); //
+                          return std::make_unique<IcoSphereScene>(iCanvas); //
                         });                                                   //
   // Lathe Scene
   _samples["LatheScene"]
-    = ::std::make_tuple(true,                                             //
+    = std::make_tuple(true,                                             //
                         [](ICanvas* iCanvas) {                            //
-                          return ::std::make_unique<LatheScene>(iCanvas); //
+                          return std::make_unique<LatheScene>(iCanvas); //
                         });                                               //
 
   // Lines Mesh Spiral Scene
-  _samples["LinesMeshSpiralScene"] = ::std::make_tuple(
+  _samples["LinesMeshSpiralScene"] = std::make_tuple(
     true,                                                       //
     [](ICanvas* iCanvas) {                                      //
-      return ::std::make_unique<LinesMeshSpiralScene>(iCanvas); //
+      return std::make_unique<LinesMeshSpiralScene>(iCanvas); //
     });                                                         //
   // Lorenz Attractor Scene
-  _samples["LorenzAttractorScene"] = ::std::make_tuple(
+  _samples["LorenzAttractorScene"] = std::make_tuple(
     true,                                                       //
     [](ICanvas* iCanvas) {                                      //
-      return ::std::make_unique<LorenzAttractorScene>(iCanvas); //
+      return std::make_unique<LorenzAttractorScene>(iCanvas); //
     });                                                         //
   // Mandelbrot Fractal Scene
-  _samples["MandelbrotFractalScene"] = ::std::make_tuple(
+  _samples["MandelbrotFractalScene"] = std::make_tuple(
     true,                                                         //
     [](ICanvas* iCanvas) {                                        //
-      return ::std::make_unique<MandelbrotFractalScene>(iCanvas); //
+      return std::make_unique<MandelbrotFractalScene>(iCanvas); //
     });                                                           //
   // Merged Meshes Scene
-  _samples["MergedMeshesScene"] = ::std::make_tuple(
+  _samples["MergedMeshesScene"] = std::make_tuple(
     true,                                                    //
     [](ICanvas* iCanvas) {                                   //
-      return ::std::make_unique<MergedMeshesScene>(iCanvas); //
+      return std::make_unique<MergedMeshesScene>(iCanvas); //
     });                                                      //
   // Mesh Normals Scene
-  _samples["MeshNormalsScene"] = ::std::make_tuple(
+  _samples["MeshNormalsScene"] = std::make_tuple(
     false,                                                  //
     [](ICanvas* iCanvas) {                                  //
-      return ::std::make_unique<MeshNormalsScene>(iCanvas); //
+      return std::make_unique<MeshNormalsScene>(iCanvas); //
     });                                                     //
   // Polyhedron Scene
-  _samples["PolyhedronScene"] = ::std::make_tuple(
+  _samples["PolyhedronScene"] = std::make_tuple(
     true,
     [](ICanvas* iCanvas) {                                 //
-      return ::std::make_unique<PolyhedronScene>(iCanvas); //
+      return std::make_unique<PolyhedronScene>(iCanvas); //
     });                                                    //
   // Ribbon Scene
   _samples["RibbonScene"]
-    = ::std::make_tuple(false,                                             //
+    = std::make_tuple(false,                                             //
                         [](ICanvas* iCanvas) {                             //
-                          return ::std::make_unique<RibbonScene>(iCanvas); //
+                          return std::make_unique<RibbonScene>(iCanvas); //
                         });                                                //
   // Rotation and Scaling Scene
-  _samples["RotationAndScalingScene"] = ::std::make_tuple(
+  _samples["RotationAndScalingScene"] = std::make_tuple(
     true,                                                          //
     [](ICanvas* iCanvas) {                                         //
-      return ::std::make_unique<RotationAndScalingScene>(iCanvas); //
+      return std::make_unique<RotationAndScalingScene>(iCanvas); //
     });                                                            //
   // Simple Car Following Path Scene
-  _samples["SimpleCarFollowingPathScene"] = ::std::make_tuple(
+  _samples["SimpleCarFollowingPathScene"] = std::make_tuple(
     false,
     [](ICanvas* iCanvas) {                                             //
-      return ::std::make_unique<SimpleCarFollowingPathScene>(iCanvas); //
+      return std::make_unique<SimpleCarFollowingPathScene>(iCanvas); //
     });                                                                //
   // Super Ellipsoid Scene
-  _samples["SuperEllipsoidScene"] = ::std::make_tuple(
+  _samples["SuperEllipsoidScene"] = std::make_tuple(
     true,                                                      //
     [](ICanvas* iCanvas) {                                     //
-      return ::std::make_unique<SuperEllipsoidScene>(iCanvas); //
+      return std::make_unique<SuperEllipsoidScene>(iCanvas); //
     });                                                        //
   // Tiled Ground Scene
-  _samples["TiledGroundScene"] = ::std::make_tuple(
+  _samples["TiledGroundScene"] = std::make_tuple(
     true,                                                   //
     [](ICanvas* iCanvas) {                                  //
-      return ::std::make_unique<TiledGroundScene>(iCanvas); //
+      return std::make_unique<TiledGroundScene>(iCanvas); //
     });                                                     //
   // Tube Scene
   _samples["TubeScene"]
-    = ::std::make_tuple(true,                                            //
+    = std::make_tuple(true,                                            //
                         [](ICanvas* iCanvas) {                           //
-                          return ::std::make_unique<TubeScene>(iCanvas); //
+                          return std::make_unique<TubeScene>(iCanvas); //
                         });                                              //
 
   // -- Polygon Mesh examples --
 
   // Polygon Mesh Bird Scene
-  _samples["PolygonMeshBirdScene"] = ::std::make_tuple(
+  _samples["PolygonMeshBirdScene"] = std::make_tuple(
     true,                                                       //
     [](ICanvas* iCanvas) {                                      //
-      return ::std::make_unique<PolygonMeshBirdScene>(iCanvas); //
+      return std::make_unique<PolygonMeshBirdScene>(iCanvas); //
     });                                                         //
   // Polygon Mesh Monkey Scene
-  _samples["PolygonMeshMonkeyScene"] = ::std::make_tuple(
+  _samples["PolygonMeshMonkeyScene"] = std::make_tuple(
     true,                                                         //
     [](ICanvas* iCanvas) {                                        //
-      return ::std::make_unique<PolygonMeshMonkeyScene>(iCanvas); //
+      return std::make_unique<PolygonMeshMonkeyScene>(iCanvas); //
     });                                                           //
   // Polygon Mesh Puzzle Piece Scene
-  _samples["PolygonMeshPuzzlePieceScene"] = ::std::make_tuple(
+  _samples["PolygonMeshPuzzlePieceScene"] = std::make_tuple(
     true,                                                              //
     [](ICanvas* iCanvas) {                                             //
-      return ::std::make_unique<PolygonMeshPuzzlePieceScene>(iCanvas); //
+      return std::make_unique<PolygonMeshPuzzlePieceScene>(iCanvas); //
     });                                                                //
   // Polygon Mesh Stars Scene
-  _samples["PolygonMeshStarsScene"] = ::std::make_tuple(
+  _samples["PolygonMeshStarsScene"] = std::make_tuple(
     true,                                                        //
     [](ICanvas* iCanvas) {                                       //
-      return ::std::make_unique<PolygonMeshStarsScene>(iCanvas); //
+      return std::make_unique<PolygonMeshStarsScene>(iCanvas); //
     });                                                          //
   // Polygon Mesh Stars With Holes Scene
-  _samples["PolygonMeshStarsWithHolesScene"] = ::std::make_tuple(
+  _samples["PolygonMeshStarsWithHolesScene"] = std::make_tuple(
     true,                                                                 //
     [](ICanvas* iCanvas) {                                                //
-      return ::std::make_unique<PolygonMeshStarsWithHolesScene>(iCanvas); //
+      return std::make_unique<PolygonMeshStarsWithHolesScene>(iCanvas); //
     });                                                                   //
 }
 

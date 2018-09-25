@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace utf8 {
 // Base for the exceptions that may be thrown from the library
-class exception : public ::std::exception {
+class exception : public std::exception {
 };
 
 // Exceptions that may be thrown from the library functions.

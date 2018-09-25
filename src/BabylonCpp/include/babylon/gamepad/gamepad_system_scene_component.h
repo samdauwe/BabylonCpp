@@ -30,7 +30,7 @@ public:
   static GamepadSystemSceneComponentPtr New(Ts&&... args)
   {
     return std::shared_ptr<GamepadSystemSceneComponent>(
-      new GamepadSystemSceneComponent(::std::forward<Ts>(args)...));
+      new GamepadSystemSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~GamepadSystemSceneComponent();
 

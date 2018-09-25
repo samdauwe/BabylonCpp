@@ -29,7 +29,7 @@ namespace BABYLON {
 
 Color3 PBRBaseMaterial::_scaledReflectivity = Color3();
 
-PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
+PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
@@ -47,8 +47,8 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _emissiveTexture{nullptr}
     , _reflectivityTexture{nullptr}
     , _metallicTexture{nullptr}
-    , _metallic{nullopt_t}
-    , _roughness{nullopt_t}
+    , _metallic{std::nullopt}
+    , _roughness{std::nullopt}
     , _microSurfaceTexture{nullptr}
     , _bumpTexture{nullptr}
     , _lightmapTexture{nullptr}
@@ -88,7 +88,7 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     , _forceAlphaTest{false}
     , _useAlphaFresnel{false}
     , _useLinearAlphaFresnel{false}
-    , _transparencyMode{nullopt_t}
+    , _transparencyMode{std::nullopt}
     , _environmentBRDFTexture{nullptr}
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
@@ -108,13 +108,13 @@ PBRBaseMaterial::PBRBaseMaterial(const string_t& iName, Scene* scene)
     if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
         && _reflectionTexture->isRenderTarget) {
       _renderTargets.emplace_back(
-        ::std::static_pointer_cast<RenderTargetTexture>(_reflectionTexture));
+        std::static_pointer_cast<RenderTargetTexture>(_reflectionTexture));
     }
 
     if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
         && _refractionTexture->isRenderTarget) {
       _renderTargets.emplace_back(
-        ::std::static_pointer_cast<RenderTargetTexture>(_refractionTexture));
+        std::static_pointer_cast<RenderTargetTexture>(_refractionTexture));
     }
 
     return _renderTargets;
@@ -159,7 +159,7 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
   }
 }
 
-const string_t PBRBaseMaterial::getClassName() const
+const std::string PBRBaseMaterial::getClassName() const
 {
   return "PBRBaseMaterial";
 }
@@ -175,12 +175,13 @@ void PBRBaseMaterial::set_useLogarithmicDepth(bool value)
     = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
 }
 
-nullable_t<unsigned int> PBRBaseMaterial::transparencyMode() const
+std::optional<unsigned int> PBRBaseMaterial::transparencyMode() const
 {
   return _transparencyMode;
 }
 
-void PBRBaseMaterial::setTransparencyMode(const nullable_t<unsigned int>& value)
+void PBRBaseMaterial::setTransparencyMode(
+  const std::optional<unsigned int>& value)
 {
   if (_transparencyMode == value) {
     return;
@@ -229,7 +230,7 @@ bool PBRBaseMaterial::needAlphaTesting() const
   }
 
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
-         && (_transparencyMode == nullopt_t
+         && (_transparencyMode == std::nullopt
              || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
 }
 
@@ -255,7 +256,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = ::std::make_unique<PBRMaterialDefines>();
+    subMesh->_materialDefines = std::make_unique<PBRMaterialDefines>();
   }
 
   auto scene = getScene();
@@ -395,9 +396,10 @@ bool PBRBaseMaterial::isMetallicWorkflow() const
 
 Effect* PBRBaseMaterial::_prepareEffect(
   AbstractMesh* mesh, PBRMaterialDefines& defines,
-  const ::std::function<void(Effect* effect)> onCompiled,
-  ::std::function<void(Effect* effect, const string_t& errors)> onError,
-  const nullable_t<bool>& useInstances, const nullable_t<bool>& useClipPlane)
+  const std::function<void(Effect* effect)> onCompiled,
+  std::function<void(Effect* effect, const std::string& errors)> onError,
+  const std::optional<bool>& useInstances,
+  const std::optional<bool>& useClipPlane)
 {
   _prepareDefines(mesh, defines, useInstances, useClipPlane);
   if (!defines.isDirty()) {
@@ -410,7 +412,7 @@ Effect* PBRBaseMaterial::_prepareEffect(
   auto engine = scene->getEngine();
 
   // Fallbacks
-  auto fallbacks    = ::std::make_unique<EffectFallbacks>();
+  auto fallbacks    = std::make_unique<EffectFallbacks>();
   auto fallbackRank = 0u;
   if (defines["USESPHERICALINVERTEX"]) {
     fallbacks->addFallback(fallbackRank++, "USESPHERICALINVERTEX");
@@ -487,7 +489,7 @@ Effect* PBRBaseMaterial::_prepareEffect(
   }
 
   // Attributes
-  vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
+  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
   if (defines["NORMAL"]) {
     attribs.emplace_back(VertexBuffer::NormalKindChars);
@@ -513,69 +515,69 @@ Effect* PBRBaseMaterial::_prepareEffect(
   MaterialHelper::PrepareAttributesForInstances(attribs, defines);
   MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh, defines);
 
-  vector_t<string_t> uniforms{"world",
-                              "view",
-                              "viewProjection",
-                              "vEyePosition",
-                              "vLightsType",
-                              "vAmbientColor",
-                              "vAlbedoColor",
-                              "vReflectivityColor",
-                              "vEmissiveColor",
-                              "vReflectionColor",
-                              "vFogInfos",
-                              "vFogColor",
-                              "pointSize",
-                              "vAlbedoInfos",
-                              "vAmbientInfos",
-                              "vOpacityInfos",
-                              "vReflectionInfos",
-                              "vReflectionPosition",
-                              "vReflectionSize",
-                              "vEmissiveInfos",
-                              "vReflectivityInfos",
-                              "vMicroSurfaceSamplerInfos",
-                              "vBumpInfos",
-                              "vLightmapInfos",
-                              "vRefractionInfos",
-                              "mBones",
-                              "vClipPlane",
-                              "vClipPlane2",
-                              "vClipPlane3",
-                              "vClipPlane4",
-                              "albedoMatrix",
-                              "ambientMatrix",
-                              "opacityMatrix",
-                              "reflectionMatrix",
-                              "emissiveMatrix",
-                              "reflectivityMatrix",
-                              "normalMatrix",
-                              "microSurfaceSamplerMatrix",
-                              "bumpMatrix",
-                              "lightmapMatrix",
-                              "refractionMatrix",
-                              "vLightingIntensity",
-                              "logarithmicDepthConstant",
-                              "vSphericalX",
-                              "vSphericalY",
-                              "vSphericalZ",
-                              "vSphericalXX",
-                              "vSphericalYY",
-                              "vSphericalZZ",
-                              "vSphericalXY",
-                              "vSphericalYZ",
-                              "vSphericalZX",
-                              "vReflectionMicrosurfaceInfos",
-                              "vRefractionMicrosurfaceInfos",
-                              "vTangentSpaceParams"};
+  std::vector<std::string> uniforms{"world",
+                                    "view",
+                                    "viewProjection",
+                                    "vEyePosition",
+                                    "vLightsType",
+                                    "vAmbientColor",
+                                    "vAlbedoColor",
+                                    "vReflectivityColor",
+                                    "vEmissiveColor",
+                                    "vReflectionColor",
+                                    "vFogInfos",
+                                    "vFogColor",
+                                    "pointSize",
+                                    "vAlbedoInfos",
+                                    "vAmbientInfos",
+                                    "vOpacityInfos",
+                                    "vReflectionInfos",
+                                    "vReflectionPosition",
+                                    "vReflectionSize",
+                                    "vEmissiveInfos",
+                                    "vReflectivityInfos",
+                                    "vMicroSurfaceSamplerInfos",
+                                    "vBumpInfos",
+                                    "vLightmapInfos",
+                                    "vRefractionInfos",
+                                    "mBones",
+                                    "vClipPlane",
+                                    "vClipPlane2",
+                                    "vClipPlane3",
+                                    "vClipPlane4",
+                                    "albedoMatrix",
+                                    "ambientMatrix",
+                                    "opacityMatrix",
+                                    "reflectionMatrix",
+                                    "emissiveMatrix",
+                                    "reflectivityMatrix",
+                                    "normalMatrix",
+                                    "microSurfaceSamplerMatrix",
+                                    "bumpMatrix",
+                                    "lightmapMatrix",
+                                    "refractionMatrix",
+                                    "vLightingIntensity",
+                                    "logarithmicDepthConstant",
+                                    "vSphericalX",
+                                    "vSphericalY",
+                                    "vSphericalZ",
+                                    "vSphericalXX",
+                                    "vSphericalYY",
+                                    "vSphericalZZ",
+                                    "vSphericalXY",
+                                    "vSphericalYZ",
+                                    "vSphericalZX",
+                                    "vReflectionMicrosurfaceInfos",
+                                    "vRefractionMicrosurfaceInfos",
+                                    "vTangentSpaceParams"};
 
-  vector_t<string_t> samplers{
+  std::vector<std::string> samplers{
     "albedoSampler",         "reflectivitySampler", "ambientSampler",
     "emissiveSampler",       "bumpSampler",         "lightmapSampler",
     "opacitySampler",        "refractionSampler",   "refractionSamplerLow",
     "refractionSamplerHigh", "reflectionSampler",   "reflectionSamplerLow",
     "reflectionSamplerHigh", "microSurfaceSampler", "environmentBrdfSampler"};
-  vector_t<string_t> uniformBuffers{"Material", "Scene"};
+  std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
   // if (ImageProcessingConfiguration)
   {
@@ -583,23 +585,23 @@ Effect* PBRBaseMaterial::_prepareEffect(
     ImageProcessingConfiguration::PrepareSamplers(samplers, defines);
   }
 
-  unordered_map_t<string_t, unsigned int> indexParameters{
+  std::unordered_map<std::string, unsigned int> indexParameters{
     {"maxSimultaneousLights", _maxSimultaneousLights},
     {"maxSimultaneousMorphTargets", defines.intDef["NUM_MORPH_INFLUENCERS"]}};
 
   auto join = defines.toString();
 
   EffectCreationOptions options;
-  options.attributes            = ::std::move(attribs);
-  options.uniformsNames         = ::std::move(uniforms);
-  options.uniformBuffersNames   = ::std::move(uniformBuffers);
-  options.samplers              = ::std::move(samplers);
+  options.attributes            = std::move(attribs);
+  options.uniformsNames         = std::move(uniforms);
+  options.uniformBuffersNames   = std::move(uniformBuffers);
+  options.samplers              = std::move(samplers);
   options.materialDefines       = &defines;
-  options.defines               = ::std::move(join);
-  options.fallbacks             = ::std::move(fallbacks);
+  options.defines               = std::move(join);
+  options.fallbacks             = std::move(fallbacks);
   options.onCompiled            = onCompiled;
   options.onError               = onError;
-  options.indexParameters       = ::std::move(indexParameters);
+  options.indexParameters       = std::move(indexParameters);
   options.maxSimultaneousLights = _maxSimultaneousLights;
 
   MaterialHelper::PrepareUniformsAndSamplersList(options);
@@ -609,8 +611,8 @@ Effect* PBRBaseMaterial::_prepareEffect(
 
 void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
                                       PBRMaterialDefines& defines,
-                                      const nullable_t<bool>& useInstances,
-                                      const nullable_t<bool>& useClipPlane)
+                                      const std::optional<bool>& useInstances,
+                                      const std::optional<bool>& useClipPlane)
 {
   auto scene  = getScene();
   auto engine = scene->getEngine();
@@ -883,8 +885,8 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
     }
 
     defines.stringDef["ALPHATESTVALUE"]
-      = ::std::to_string(_alphaCutOff)
-        + (::std::fmod(_alphaCutOff, 1.f) == 0.f ? "." : "");
+      = std::to_string(_alphaCutOff)
+        + (std::fmod(_alphaCutOff, 1.f) == 0.f ? "." : "");
     defines.boolDef["PREMULTIPLYALPHA"]
       = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
          || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
@@ -930,12 +932,12 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 }
 
 void PBRBaseMaterial::forceCompilation(
-  AbstractMesh* mesh, ::std::function<void(Material* material)>& onCompiled,
+  AbstractMesh* mesh, std::function<void(Material* material)>& onCompiled,
   bool clipPlane)
 {
   PBRMaterialDefines defines;
   auto effect
-    = _prepareEffect(mesh, defines, nullptr, nullptr, nullopt_t, clipPlane);
+    = _prepareEffect(mesh, defines, nullptr, nullptr, std::nullopt, clipPlane);
   if (effect->isReady()) {
     if (onCompiled) {
       onCompiled(this);
@@ -1086,7 +1088,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
 
           if (reflectionTexture->boundingBoxSize()) {
             if (auto cubeTexture
-                = ::std::static_pointer_cast<CubeTexture>(reflectionTexture)) {
+                = std::static_pointer_cast<CubeTexture>(reflectionTexture)) {
               _uniformBuffer->updateVector3("vReflectionPosition",
                                             cubeTexture->boundingBoxPosition);
               _uniformBuffer->updateVector3("vReflectionSize",
@@ -1202,8 +1204,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
           float depth = 1.f;
           if (!_refractionTexture->isCube) {
             auto refractionTextureTmp
-              = ::std::static_pointer_cast<RefractionTexture>(
-                _refractionTexture);
+              = std::static_pointer_cast<RefractionTexture>(_refractionTexture);
             if (refractionTextureTmp) {
               depth = refractionTextureTmp->depth;
             }
@@ -1393,9 +1394,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _afterBind(mesh, _activeEffect);
 }
 
-vector_t<IAnimatablePtr> PBRBaseMaterial::getAnimatables() const
+std::vector<IAnimatablePtr> PBRBaseMaterial::getAnimatables() const
 {
-  vector_t<IAnimatablePtr> results;
+  std::vector<IAnimatablePtr> results;
 
   if (_albedoTexture && _albedoTexture->animations.size() > 0) {
     results.emplace_back(_albedoTexture);

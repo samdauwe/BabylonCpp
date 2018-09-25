@@ -1,19 +1,32 @@
 #ifndef BABYLON_PHYSICS_IPHYSICS_ENGINE_PLUGIN_H
 #define BABYLON_PHYSICS_IPHYSICS_ENGINE_PLUGIN_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
+class AbstractMesh;
+class DistanceJoint;
+struct IMotorEnabledJoint;
+class Mesh;
+class PhysicsImpostor;
+struct PhysicsImpostorJoint;
+class Quaternion;
+class Vector3;
+
 struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   Mesh* world;
-  string_t name;
+  std::string name;
   virtual void setGravity(const Vector3& gravity) = 0;
   virtual void setTimeStep(float timeStep)        = 0;
   virtual float getTimeStep() const               = 0;
   virtual void
   executeStep(float delta,
-              const vector_t<unique_ptr_t<PhysicsImpostor>>& impostors)
+              const std::vector<std::unique_ptr<PhysicsImpostor>>& impostors)
     = 0; // not forgetting pre and post events
   virtual void applyImpulse(PhysicsImpostor* impostor, const Vector3& force,
                             const Vector3& contactPoint)

@@ -213,13 +213,13 @@ public:
   }
   iterator& operator++()
   {
-    ::std::advance(it, utf8::internal::sequence_length(it));
+    std::advance(it, utf8::internal::sequence_length(it));
     return *this;
   }
   iterator operator++(int)
   {
     iterator temp = *this;
-    ::std::advance(it, utf8::internal::sequence_length(it));
+    std::advance(it, utf8::internal::sequence_length(it));
     return temp;
   }
   iterator& operator--()

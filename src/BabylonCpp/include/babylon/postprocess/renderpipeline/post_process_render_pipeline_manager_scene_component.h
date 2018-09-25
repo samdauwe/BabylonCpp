@@ -28,7 +28,7 @@ public:
   {
     return shared_ptr_t<PostProcessRenderPipelineManagerSceneComponent>(
       new PostProcessRenderPipelineManagerSceneComponent(
-        ::std::forward<Ts>(args)...));
+        std::forward<Ts>(args)...));
   }
   virtual ~PostProcessRenderPipelineManagerSceneComponent();
 

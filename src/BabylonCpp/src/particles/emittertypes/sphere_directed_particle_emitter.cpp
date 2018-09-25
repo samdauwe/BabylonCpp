@@ -28,9 +28,10 @@ void SphereDirectedParticleEmitter::startDirectionFunction(
                                           directionToUpdate);
 }
 
-unique_ptr_t<IParticleEmitterType> SphereDirectedParticleEmitter::clone() const
+std::unique_ptr<IParticleEmitterType>
+SphereDirectedParticleEmitter::clone() const
 {
-  auto newOne = ::std::make_unique<SphereDirectedParticleEmitter>(
+  auto newOne = std::make_unique<SphereDirectedParticleEmitter>(
     radius, direction1, direction2);
 
   return newOne;

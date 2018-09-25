@@ -134,7 +134,7 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _facetDepthSort{false}
     , _facetDepthSortEnabled{false}
     , _facetDepthSortFunction{nullptr}
-    , _facetDepthSortFrom{::std::make_unique<Vector3>(Vector3::Zero())}
+    , _facetDepthSortFrom{std::make_unique<Vector3>(Vector3::Zero())}
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
     , _visibility{1.f}
@@ -216,7 +216,7 @@ Vector3& AbstractMesh::get_facetDepthSortFrom()
 
 void AbstractMesh::set_facetDepthSortFrom(const Vector3& location)
 {
-  _facetDepthSortFrom = ::std::make_unique<Vector3>(location);
+  _facetDepthSortFrom = std::make_unique<Vector3>(location);
 }
 
 bool AbstractMesh::get_isFacetDataEnabled() const
@@ -234,7 +234,7 @@ bool AbstractMesh::_updateNonUniformScalingState(bool value)
 }
 
 void AbstractMesh::set_onCollide(
-  const ::std::function<void(AbstractMesh*, EventState&)>& callback)
+  const std::function<void(AbstractMesh*, EventState&)>& callback)
 {
   if (_onCollideObserver) {
     onCollideObservable.remove(_onCollideObserver);
@@ -243,7 +243,7 @@ void AbstractMesh::set_onCollide(
 }
 
 void AbstractMesh::set_onCollisionPositionChange(
-  const ::std::function<void(Vector3*, EventState&)>& callback)
+  const std::function<void(Vector3*, EventState&)>& callback)
 {
   if (_onCollisionPositionChangeObserver) {
     onCollisionPositionChangeObservable.remove(
@@ -521,7 +521,7 @@ void AbstractMesh::_resyncLighSource(Light* light)
 {
   bool isIn = light->isEnabled() && light->canAffectMesh(this);
 
-  auto index = ::std::find_if(_lightSources.begin(), _lightSources.end(),
+  auto index = std::find_if(_lightSources.begin(), _lightSources.end(),
                               [light](const LightPtr& lightSource) {
                                 return lightSource.get() == light;
                               });
@@ -556,7 +556,7 @@ void AbstractMesh::_removeLightSource(const LightPtr& light)
 
 void AbstractMesh::_removeLightSource(Light* light)
 {
-  auto index = ::std::find_if(
+  auto index = std::find_if(
     _lightSources.begin(), _lightSources.end(),
     [light](const LightPtr& _light) { return _light.get() == light; });
 
@@ -570,7 +570,7 @@ void AbstractMesh::_removeLightSource(Light* light)
 }
 
 void AbstractMesh::_markSubMeshesAsDirty(
-  const ::std::function<void(const MaterialDefines& defines)>& func)
+  const std::function<void(const MaterialDefines& defines)>& func)
 {
   if (subMeshes.empty()) {
     return;
@@ -676,7 +676,7 @@ AbstractMesh::enableEdgesRendering(float epsilon,
 {
   disableEdgesRendering();
 
-  _edgesRenderer = ::std::make_unique<EdgesRenderer>(
+  _edgesRenderer = std::make_unique<EdgesRenderer>(
     shared_from_base<AbstractMesh>(), epsilon, checkVerticesInsteadOfIndices);
 
   return *this;
@@ -777,7 +777,7 @@ AbstractMesh& AbstractMesh::normalizeToUnitCube(bool includeDescendants)
 
 AbstractMesh& AbstractMesh::setBoundingInfo(const BoundingInfo& boundingInfo)
 {
-  _boundingInfo = ::std::make_unique<BoundingInfo>(boundingInfo);
+  _boundingInfo = std::make_unique<BoundingInfo>(boundingInfo);
   return *this;
 }
 
@@ -861,7 +861,7 @@ Vector3 AbstractMesh::calcRotatePOV(float flipBack, float twirlClockwise,
 
 MinMax AbstractMesh::getHierarchyBoundingVectors(
   bool includeDescendants,
-  const ::std::function<bool(AbstractMesh* abstractMesh)>& predicate)
+  const std::function<bool(AbstractMesh* abstractMesh)>& predicate)
 {
   // Ensures that all world matrix will be recomputed.
   getScene()->incrementRenderId();
@@ -890,7 +890,7 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
 
     for (auto& descendant : descendants) {
       auto childMesh
-        = ::std::static_pointer_cast<class AbstractMesh>(descendant);
+        = std::static_pointer_cast<class AbstractMesh>(descendant);
 
       childMesh->computeWorldMatrix(true);
 
@@ -921,7 +921,7 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
 AbstractMesh& AbstractMesh::_updateBoundingInfo()
 {
   if (!_boundingInfo) {
-    _boundingInfo = ::std::make_unique<BoundingInfo>(absolutePosition(),
+    _boundingInfo = std::make_unique<BoundingInfo>(absolutePosition(),
                                                      absolutePosition());
   }
 
@@ -1092,7 +1092,7 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
   globalPosition.addToRef(ellipsoidOffset, _oldPositionForCollisions);
 
   if (!_collider) {
-    _collider = ::std::make_unique<Collider>();
+    _collider = std::make_unique<Collider>();
   }
 
   _collider->_radius = ellipsoid;
@@ -1366,7 +1366,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   // Intersections in progress
   for (auto& other : _intersectionsInProgress) {
-    ::std::remove(other->_intersectionsInProgress.begin(),
+    std::remove(other->_intersectionsInProgress.begin(),
                   other->_intersectionsInProgress.end(), this);
   }
 
@@ -1375,11 +1375,11 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Lights
   for (auto& light : getScene()->lights) {
     // Included meshes
-    ::std::remove(light->includedOnlyMeshes().begin(),
+    std::remove(light->includedOnlyMeshes().begin(),
                   light->includedOnlyMeshes().end(), this);
 
     // Excluded meshes
-    ::std::remove(light->excludedMeshes().begin(),
+    std::remove(light->excludedMeshes().begin(),
                   light->excludedMeshes().end(), this);
 
     // Shadow generators
@@ -1387,7 +1387,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     if (generator) {
       auto shadowMap = generator->getShadowMap();
       if (shadowMap && !shadowMap->renderList().empty()) {
-        ::std::remove_if(
+        std::remove_if(
           shadowMap->renderList().begin(), shadowMap->renderList().end(),
           [this](const AbstractMeshPtr& mesh) { return mesh.get() == this; });
       }
@@ -1410,7 +1410,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   if (sceneOctree) {
 #if 0
     sceneOctree->dynamicContent.erase(
-      ::std::remove_if(
+      std::remove_if(
         sceneOctree->dynamicContent.begin(), sceneOctree->dynamicContent.end(),
         [this](const AbstractMeshPtr& mesh) { return mesh.get() == this; }),
       sceneOctree->dynamicContent.end());
@@ -1488,10 +1488,10 @@ AbstractMesh& AbstractMesh::_initFacetData()
     = (_partitioningBBoxRatio != 0.f) ? _partitioningBBoxRatio : 1.01f;
 
   _facetNormals.resize(_facetNb);
-  ::std::fill(_facetNormals.begin(), _facetNormals.end(), Vector3::Zero());
+  std::fill(_facetNormals.begin(), _facetNormals.end(), Vector3::Zero());
 
   _facetPositions.resize(_facetNb);
-  ::std::fill(_facetPositions.begin(), _facetPositions.end(), Vector3::Zero());
+  std::fill(_facetPositions.begin(), _facetPositions.end(), Vector3::Zero());
 
   _facetDataEnabled = true;
 
@@ -1524,8 +1524,8 @@ AbstractMesh& AbstractMesh::updateFacetData()
     if (!_facetDepthSortFrom) {
       auto& camera        = getScene()->activeCamera;
       _facetDepthSortFrom = (camera) ?
-                              ::std::make_unique<Vector3>(camera->position) :
-                              ::std::make_unique<Vector3>(Vector3::Zero());
+                              std::make_unique<Vector3>(camera->position) :
+                              std::make_unique<Vector3>(Vector3::Zero());
     }
     _depthSortedFacets.clear();
     for (unsigned int f = 0; f < _facetNb; f++) {
@@ -1552,13 +1552,13 @@ AbstractMesh& AbstractMesh::updateFacetData()
   _subDiv.max    = _partitioningSubdivisions;
   // adjust the number of subdivisions per axis
   _subDiv.X
-    = static_cast<unsigned>(::std::floor(_subDiv.max * _bbSize.x / bbSizeMax));
+    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.x / bbSizeMax));
   // according to each bbox size per axis
   _subDiv.Y
-    = static_cast<unsigned>(::std::floor(_subDiv.max * _bbSize.y / bbSizeMax));
+    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.y / bbSizeMax));
   // at least one subdivision
   _subDiv.Z
-    = static_cast<unsigned>(::std::floor(_subDiv.max * _bbSize.z / bbSizeMax));
+    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.z / bbSizeMax));
   _subDiv.X = _subDiv.X < 1 ? 1 : _subDiv.X;
   _subDiv.Y = _subDiv.Y < 1 ? 1 : _subDiv.Y;
   _subDiv.Z = _subDiv.Z < 1 ? 1 : _subDiv.Z;
@@ -1582,7 +1582,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
   VertexData::ComputeNormals(positions, indices, normals, _facetParameters);
 
   if (_facetDepthSort && _facetDepthSortEnabled) {
-    ::std::sort(_depthSortedFacets.begin(), _depthSortedFacets.end(),
+    std::sort(_depthSortedFacets.begin(), _depthSortedFacets.end(),
                 _facetDepthSortFunction);
     auto l = (_depthSortedIndices.size() / 3);
     for (size_t f = 0; f < l; f++) {
@@ -1657,13 +1657,13 @@ Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
   auto bInfo = getBoundingInfo();
 
   int ox = static_cast<int>(
-    ::std::floor((x - bInfo.minimum.x * _partitioningBBoxRatio) * _subDiv.X
+    std::floor((x - bInfo.minimum.x * _partitioningBBoxRatio) * _subDiv.X
                  * _partitioningBBoxRatio / _bbSize.x));
   int oy = static_cast<int>(
-    ::std::floor((y - bInfo.minimum.y * _partitioningBBoxRatio) * _subDiv.Y
+    std::floor((y - bInfo.minimum.y * _partitioningBBoxRatio) * _subDiv.Y
                  * _partitioningBBoxRatio / _bbSize.y));
   int oz = static_cast<int>(
-    ::std::floor((z - bInfo.minimum.z * _partitioningBBoxRatio) * _subDiv.Z
+    std::floor((z - bInfo.minimum.z * _partitioningBBoxRatio) * _subDiv.Z
                  * _partitioningBBoxRatio / _bbSize.z));
 
   if (ox < 0 || oy < 0 || oz < 0) {

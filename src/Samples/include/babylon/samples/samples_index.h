@@ -31,13 +31,13 @@ public:
    * @brief Returns a sorted list containing the enabled examples.
    * @return a sorted list containing the enabled examples.
    */
-  ::std::vector<std::string> getSampleNames() const;
+  std::vector<std::string> getSampleNames() const;
 
   /**
    * @brief Returns a sorted list containing the category names.
    * @return a sorted list containing the category names.
    */
-  ::std::vector<std::string> getCategoryNames() const;
+  std::vector<std::string> getCategoryNames() const;
 
   /**
    * @brief Returns whether or not the category exists.
@@ -52,7 +52,7 @@ public:
    * @return a sorted list containing the enabled examples in the specified
    * category.
    */
-  ::std::vector<std::string>
+  std::vector<std::string>
   getSampleNamesInCategory(const std::string& categoryName) const;
 
   /**
@@ -66,7 +66,7 @@ public:
 
 private:
   // Contains the mapping from category to samples index
-  ::std::unordered_map<std::string, _ISamplesIndex> _samplesIndex;
+  std::unordered_map<std::string, _ISamplesIndex> _samplesIndex;
 
 }; // end of class SamplesIndex
 

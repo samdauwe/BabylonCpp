@@ -37,7 +37,7 @@ void BaseSubMesh::setEffect(Effect* effect, const MaterialDefines& defines)
     }
     return;
   }
-  _materialDefines = ::std::make_unique<MaterialDefines>(defines);
+  _materialDefines = std::make_unique<MaterialDefines>(defines);
   _materialEffect  = effect;
 }
 

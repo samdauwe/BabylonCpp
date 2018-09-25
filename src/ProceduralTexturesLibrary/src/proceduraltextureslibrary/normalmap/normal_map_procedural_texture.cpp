@@ -62,9 +62,10 @@ Json::object NormalMapProceduralTexture::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<NormalMapProceduralTexture>
+std::unique_ptr<NormalMapProceduralTexture>
 NormalMapProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                                  Scene* /*scene*/, const string_t& /*rootUrl*/)
+                                  Scene* /*scene*/,
+                                  const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

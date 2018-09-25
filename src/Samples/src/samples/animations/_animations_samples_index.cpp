@@ -15,43 +15,43 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
   // -- Animations examples --
 
   // Animations Scene
-  _samples["AnimationsScene"] = ::std::make_tuple(
+  _samples["AnimationsScene"] = std::make_tuple(
     true,                                                  //
     [](ICanvas* iCanvas) {                                 //
-      return ::std::make_unique<AnimationsScene>(iCanvas); //
+      return std::make_unique<AnimationsScene>(iCanvas); //
     });                                                    //
   // Cartoon Animations Scene
-  _samples["CartoonAnimationsScene"] = ::std::make_tuple(
+  _samples["CartoonAnimationsScene"] = std::make_tuple(
     false,                                                        //
     [](ICanvas* iCanvas) {                                        //
-      return ::std::make_unique<CartoonAnimationsScene>(iCanvas); //
+      return std::make_unique<CartoonAnimationsScene>(iCanvas); //
     });                                                           //
   // Pump Jack Scene
   _samples["PumpJackScene"]
-    = ::std::make_tuple(true,                                                //
+    = std::make_tuple(true,                                                //
                         [](ICanvas* iCanvas) {                               //
-                          return ::std::make_unique<PumpJackScene>(iCanvas); //
+                          return std::make_unique<PumpJackScene>(iCanvas); //
                         });                                                  //
   // Tube Animation Scene
-  _samples["TubeAnimationScene"] = ::std::make_tuple(
+  _samples["TubeAnimationScene"] = std::make_tuple(
     false,                                                    //
     [](ICanvas* iCanvas) {                                    //
-      return ::std::make_unique<TubeAnimationScene>(iCanvas); //
+      return std::make_unique<TubeAnimationScene>(iCanvas); //
     });                                                       //
 
   // -- Easing function examples --
 
   // Easing Functions Scene
-  _samples["EasingFunctionsScene"] = ::std::make_tuple(
+  _samples["EasingFunctionsScene"] = std::make_tuple(
     false,                                                      //
     [](ICanvas* iCanvas) {                                      //
-      return ::std::make_unique<EasingFunctionsScene>(iCanvas); //
+      return std::make_unique<EasingFunctionsScene>(iCanvas); //
     });                                                         //
   // Shape Easings Scene
-  _samples["ShapeEasingsScene"] = ::std::make_tuple(
+  _samples["ShapeEasingsScene"] = std::make_tuple(
     false,                                                   //
     [](ICanvas* iCanvas) {                                   //
-      return ::std::make_unique<ShapeEasingsScene>(iCanvas); //
+      return std::make_unique<ShapeEasingsScene>(iCanvas); //
     });                                                      //
 }
 

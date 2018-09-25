@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_EDIT_CONTROL_ACT_HISTORY_H
 #define BABYLON_EXTENSIONS_EDIT_CONTROL_ACT_HISTORY_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/editcontrol/act.h>
 
 namespace BABYLON {

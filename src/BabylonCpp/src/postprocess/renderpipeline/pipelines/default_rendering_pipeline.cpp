@@ -622,7 +622,7 @@ void DefaultRenderingPipeline::addCamera(Camera* camera)
 void DefaultRenderingPipeline::removeCamera(Camera* camera)
 {
   _camerasToBeAttached.erase(
-    ::std::remove_if(
+    std::remove_if(
       _camerasToBeAttached.begin(), _camerasToBeAttached.end(),
       [camera](const CameraPtr& _camera) { return _camera.get() == camera; }),
     _camerasToBeAttached.end());

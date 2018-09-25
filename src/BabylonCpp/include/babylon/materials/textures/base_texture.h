@@ -17,7 +17,7 @@ class SphericalPolynomial;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 class BABYLON_SHARED_EXPORT BaseTexture
-    : public ::std::enable_shared_from_this<BaseTexture>,
+    : public std::enable_shared_from_this<BaseTexture>,
       public IAnimatable {
 public:
   static constexpr unsigned int DEFAULT_ANISOTROPIC_FILTERING_LEVEL = 4;
@@ -43,7 +43,7 @@ public:
   const std::string getClassName() const;
 
   void setOnDispose(
-    const ::std::function<void(BaseTexture*, EventState&)>& callback);
+    const std::function<void(BaseTexture*, EventState&)>& callback);
   Scene* getScene() const;
   virtual Matrix* getTextureMatrix();
   virtual Matrix* getReflectionTextureMatrix();
@@ -86,7 +86,7 @@ public:
   Json::object serialize() const;
 
   static void WhenAllReady(const std::vector<BaseTexture*>& textures,
-                           const ::std::function<void()>& callback);
+                           const std::function<void()>& callback);
 
 protected:
   BaseTexture(Scene* scene);

@@ -47,7 +47,7 @@ public:
   static EffectLayerSceneComponentPtr New(Ts&&... args)
   {
     return std::shared_ptr<EffectLayerSceneComponent>(
-      new EffectLayerSceneComponent(::std::forward<Ts>(args)...));
+      new EffectLayerSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~EffectLayerSceneComponent();
 

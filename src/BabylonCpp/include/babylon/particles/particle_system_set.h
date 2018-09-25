@@ -1,11 +1,32 @@
 #ifndef BABYLON_PARTICLES_PARTICLE_SYSTEM_SET_H
 #define BABYLON_PARTICLES_PARTICLE_SYSTEM_SET_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/particles/particle_system_set_emitter_creation_options.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class AbstractMesh;
+struct IParticleSystem;
+class Scene;
+class TransformNode;
+using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;
+using TransformNodePtr = std::shared_ptr<TransformNode>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Represents a set of particle systems working together to create a
@@ -52,8 +73,8 @@ public:
    * @param gpu defines if we want GPU particles or CPU particles
    * @returns a new ParticleSystemSet
    */
-  static unique_ptr_t<ParticleSystemSet> Parse(const Json::value& data,
-                                               Scene* scene, bool gpu = false);
+  static std::unique_ptr<ParticleSystemSet>
+  Parse(const Json::value& data, Scene* scene, bool gpu = false);
 
 protected:
   /**
@@ -65,7 +86,7 @@ public:
   /**
    * Gets the particle system list
    */
-  vector_t<IParticleSystem*> systems;
+  std::vector<IParticleSystem*> systems;
 
   /**
    * Gets the emitter node used with this set.

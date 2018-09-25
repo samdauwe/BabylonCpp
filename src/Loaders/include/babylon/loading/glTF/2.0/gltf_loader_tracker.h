@@ -9,7 +9,7 @@ namespace GLTF2 {
 class BABYLON_SHARED_EXPORT GLTFLoaderTracker {
 
 public:
-  GLTFLoaderTracker(const ::std::function<void()>& onComplete);
+  GLTFLoaderTracker(const std::function<void()>& onComplete);
   ~GLTFLoaderTracker();
 
   void _addPendingData();
@@ -17,7 +17,7 @@ public:
 
 private:
   int _pendingCount;
-  ::std::function<void()> _callback;
+  std::function<void()> _callback;
 
 }; // end of struct GLTFUtils
 

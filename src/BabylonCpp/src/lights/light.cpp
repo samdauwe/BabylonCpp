@@ -22,7 +22,7 @@ Light::Light(const string_t& iName, Scene* scene)
     , falloffType{Light::FALLOFF_DEFAULT}
     , intensity{1.f}
     , _shadowGenerator{nullptr}
-    , _uniformBuffer{::std::make_unique<UniformBuffer>(scene->getEngine())}
+    , _uniformBuffer{std::make_unique<UniformBuffer>(scene->getEngine())}
     , intensityMode{this, &Light::get_intensityMode, &Light::set_intensityMode}
     , radius{this, &Light::get_radius, &Light::set_radius}
     , shadowEnabled{this, &Light::get_shadowEnabled, &Light::set_shadowEnabled}
@@ -50,7 +50,7 @@ Light::Light(const string_t& iName, Scene* scene)
     , _excludeWithLayerMask{0}
     , _lightmapMode{0}
     , _parentedWorldMatrix{nullptr}
-    , _worldMatrix{::std::make_unique<Matrix>(Matrix::Identity())}
+    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
 {
 }
 
@@ -248,12 +248,12 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
   }
 
   auto it1
-    = ::std::find(_includedOnlyMeshes.begin(), _includedOnlyMeshes.end(), mesh);
+    = std::find(_includedOnlyMeshes.begin(), _includedOnlyMeshes.end(), mesh);
   if (_includedOnlyMeshes.size() > 0 && it1 == _includedOnlyMeshes.end()) {
     return false;
   }
 
-  auto it2 = ::std::find(_excludedMeshes.begin(), _excludedMeshes.end(), mesh);
+  auto it2 = std::find(_excludedMeshes.begin(), _excludedMeshes.end(), mesh);
   if (_excludedMeshes.size() > 0 && it2 != _excludedMeshes.end()) {
     return false;
   }
@@ -279,7 +279,7 @@ Matrix* Light::getWorldMatrix()
 
   if (parent() && parent()->getWorldMatrix()) {
     if (!_parentedWorldMatrix) {
-      _parentedWorldMatrix = ::std::make_unique<Matrix>(Matrix::Identity());
+      _parentedWorldMatrix = std::make_unique<Matrix>(Matrix::Identity());
     }
 
     worldMatrix->multiplyToRef(*parent()->getWorldMatrix(),
@@ -346,16 +346,16 @@ Json::object Light::serialize() const
   return Json::object();
 }
 
-::std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
+std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
                                                           const string_t& name,
                                                           Scene* scene)
 {
   auto constructorFunc
-    = Node::Construct("Light_Type_" + ::std::to_string(type), name, scene);
+    = Node::Construct("Light_Type_" + std::to_string(type), name, scene);
 
   if (constructorFunc) {
     return [constructorFunc]() {
-      return ::std::static_pointer_cast<Light>(constructorFunc());
+      return std::static_pointer_cast<Light>(constructorFunc());
     };
   }
 
@@ -489,9 +489,9 @@ float Light::_getPhotometricScale()
           // Impose a minimum light angular size to avoid the light becoming an
           // infinitely small angular light source (i.e. a dirac delta
           // function).
-          apexAngleRadians = ::std::max(apexAngleRadians, 0.001f);
+          apexAngleRadians = std::max(apexAngleRadians, 0.001f);
           auto solidAngle
-            = 2.f * Math::PI * (1.f - ::std::cos(apexAngleRadians));
+            = 2.f * Math::PI * (1.f - std::cos(apexAngleRadians));
           photometricScale = solidAngle;
           break;
       }

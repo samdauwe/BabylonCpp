@@ -1,9 +1,18 @@
 #ifndef BABYLON_TOOLS_TEXTURE_TOOLS_H
 #define BABYLON_TOOLS_TEXTURE_TOOLS_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+class Scene;
+class Texture;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using TexturePtr     = std::shared_ptr<Texture>;
 
 /**
  * @brief Represents the texture tools class.
@@ -22,7 +31,7 @@ struct BABYLON_SHARED_EXPORT TextureTools {
 
   static BaseTexturePtr& GetEnvironmentBRDFTexture(Scene* scene);
 
-  static string_t _environmentBRDFBase64Texture;
+  static std::string _environmentBRDFBase64Texture;
 
 }; // end of struct TextureTools
 

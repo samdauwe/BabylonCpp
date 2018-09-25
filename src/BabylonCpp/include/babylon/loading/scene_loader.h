@@ -62,14 +62,14 @@ private:
   static std::string _getDirectLoad(const std::string& sceneFilename);
   static std::shared_ptr<ISceneLoaderPlugin> _loadData(
     const std::string& rootUrl, const std::string& sceneFilename, Scene* scene,
-    const ::std::function<
+    const std::function<
       void(const std::shared_ptr<ISceneLoaderPlugin>& plugin,
            const std::string& data, const std::string& responseURL)>& onSuccess,
-    const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+    const std::function<void(const SceneLoaderProgressEvent& event)>&
       onProgress,
-    const ::std::function<void(const std::string& message,
+    const std::function<void(const std::string& message,
                                const std::string& exception)>& onError,
-    const ::std::function<void()>& onDispose,
+    const std::function<void()>& onDispose,
     const std::string& pluginExtension);
 
 public:
@@ -101,16 +101,16 @@ public:
   static std::shared_ptr<ISceneLoaderPlugin> ImportMesh(
     const std::vector<std::string>& meshNames, std::string rootUrl,
     std::string sceneFilename, Scene* scene = nullptr,
-    const ::std::function<
+    const std::function<
       void(const std::vector<AbstractMeshPtr>& meshes,
            const std::vector<IParticleSystemPtr>& particleSystems,
            const std::vector<SkeletonPtr>& skeletons,
            const std::vector<AnimationGroupPtr>& animationGroups)>& onSuccess
     = nullptr,
-    const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+    const std::function<void(const SceneLoaderProgressEvent& event)>&
       onProgress
     = nullptr,
-    const ::std::function<void(Scene* scene, const std::string& message,
+    const std::function<void(Scene* scene, const std::string& message,
                                const std::string& exception)>& onError
     = nullptr,
     const std::string& pluginExtension = "");
@@ -135,11 +135,11 @@ public:
   std::unique_ptr<Scene>
   Load(const std::string& rootUrl, const std::string& sceneFilename,
        Engine* engine,
-       const ::std::function<void(Scene* scene)>& onsuccess = nullptr,
-       const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+       const std::function<void(Scene* scene)>& onsuccess = nullptr,
+       const std::function<void(const SceneLoaderProgressEvent& event)>&
          onProgress
        = nullptr,
-       const ::std::function<void(Scene* scene, const std::string& message,
+       const std::function<void(Scene* scene, const std::string& message,
                                   const std::string& exception)>& onError
        = nullptr,
        const std::string& pluginExtension = "");
@@ -164,11 +164,11 @@ public:
   static std::shared_ptr<ISceneLoaderPlugin>
   Append(std::string rootUrl, std::string sceneFilename = "",
          Scene* scene                                         = nullptr,
-         const ::std::function<void(Scene* scene)>& onSuccess = nullptr,
-         const ::std::function<void(const SceneLoaderProgressEvent& event)>&
+         const std::function<void(Scene* scene)>& onSuccess = nullptr,
+         const std::function<void(const SceneLoaderProgressEvent& event)>&
            onProgress
          = nullptr,
-         const ::std::function<void(Scene* scene, const std::string& message,
+         const std::function<void(Scene* scene, const std::string& message,
                                     const std::string& exception)>& onError
          = nullptr,
          const std::string& pluginExtension = "");

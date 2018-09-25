@@ -54,7 +54,7 @@ void LightProjectedTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto groundMaterial = StandardMaterial::New("ground", scene);
   groundMaterial->setDiffuseTexture(Texture::New("textures/ground.jpg", scene));
   auto diffuseTexture
-    = ::std::static_pointer_cast<Texture>(groundMaterial->diffuseTexture());
+    = std::static_pointer_cast<Texture>(groundMaterial->diffuseTexture());
   diffuseTexture->uScale        = 6.f;
   diffuseTexture->vScale        = 6.f;
   groundMaterial->specularColor = Color3(0.f, 0.f, 0.f);
@@ -64,7 +64,7 @@ void LightProjectedTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Animations
   scene->registerBeforeRender([&](Scene* /*scene*/, EventState& /*es*/) {
     _spotLight->position
-      = Vector3(::std::cos(_alpha) * 60.f, 40.f, ::std::sin(_alpha) * 60.f);
+      = Vector3(std::cos(_alpha) * 60.f, 40.f, std::sin(_alpha) * 60.f);
     _spotLight->setDirectionToTarget(Vector3::Zero());
     _alpha += 0.01f;
   });

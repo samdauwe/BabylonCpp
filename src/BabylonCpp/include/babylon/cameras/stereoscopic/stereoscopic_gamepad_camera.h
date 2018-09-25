@@ -23,7 +23,7 @@ public:
   static StereoscopicGamepadCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<StereoscopicGamepadCamera>(
-      new StereoscopicGamepadCamera(::std::forward<Ts>(args)...));
+      new StereoscopicGamepadCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

@@ -23,7 +23,7 @@ CSG::Node::~Node()
 
 unique_ptr_t<CSG::Node> CSG::Node::clone()
 {
-  auto node       = ::std::make_unique<Node>();
+  auto node       = std::make_unique<Node>();
   node->_plane    = _plane ? _plane->cloneToNewObject() : nullptr;
   node->_front    = _front ? _front->clone() : nullptr;
   node->_back     = _back ? _back->clone() : nullptr;
@@ -108,13 +108,13 @@ void BABYLON::CSG::Node::build(const vector_t<BABYLON::CSG::Polygon>& polygons)
   }
   if (!front.empty()) {
     if (!_front) {
-      _front = ::std::make_unique<Node>();
+      _front = std::make_unique<Node>();
     }
     _front->build(front);
   }
   if (!back.empty()) {
     if (!_back) {
-      _back = ::std::make_unique<Node>();
+      _back = std::make_unique<Node>();
     }
     _back->build(back);
   }

@@ -400,7 +400,7 @@ StandardMaterialPtr Radix::getMaterial(const std::string& name)
     return nullptr;
   }
 
-  return ::std::static_pointer_cast<StandardMaterial>(_materials[name]);
+  return std::static_pointer_cast<StandardMaterial>(_materials[name]);
 }
 
 /** Getters / Setters **/
@@ -418,7 +418,7 @@ void Radix::setWireSelectionThreshold(float value)
     return node->type() == IReflect::Type::LINESMESH;
   });
   for (auto mesh : meshes) {
-    auto lm = ::std::static_pointer_cast<LinesMesh>(mesh);
+    auto lm = std::static_pointer_cast<LinesMesh>(mesh);
     if (lm) {
       lm->intersectionThreshold = value;
     }

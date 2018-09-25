@@ -37,7 +37,7 @@ public:
 private:
   ICanvas* _canvas;
   bool _noPreventDefault;
-  ::std::function<void(PointerInfo* p, EventState& es)> _wheel;
+  std::function<void(PointerInfo* p, EventState& es)> _wheel;
   Observer<PointerInfo>::Ptr _observer;
 
 }; // end of class ArcRotateCameraMouseWheelInput

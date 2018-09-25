@@ -43,9 +43,9 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     , _showDockingWindow{true}
 {
   // Reset tabs
-  ::std::fill(_tabs.begin(), _tabs.end(), nullptr);
+  std::fill(_tabs.begin(), _tabs.end(), nullptr);
   // Create log tab
-  _tabs[LOGS_TAB] = ::std::make_unique<LogsTab>();
+  _tabs[LOGS_TAB] = std::make_unique<LogsTab>();
 }
 
 Inspector::~Inspector()
@@ -61,12 +61,12 @@ void Inspector::setScene(Scene* scene)
 {
   _scene = scene;
   // Reset tabs
-  _tabs[SCENE_TAB]    = ::std::make_unique<SceneTab>(*this);
-  _tabs[STATS_TAB]    = ::std::make_unique<StatsTab>(*this);
-  _tabs[MESH_TAB]     = ::std::make_unique<MeshTab>(*this);
-  _tabs[LIGHT_TAB]    = ::std::make_unique<LightTab>(*this);
-  _tabs[MATERIAL_TAB] = ::std::make_unique<MaterialTab>(*this);
-  _tabs[CAMERA_TAB]   = ::std::make_unique<CameraTab>(*this);
+  _tabs[SCENE_TAB]    = std::make_unique<SceneTab>(*this);
+  _tabs[STATS_TAB]    = std::make_unique<StatsTab>(*this);
+  _tabs[MESH_TAB]     = std::make_unique<MeshTab>(*this);
+  _tabs[LIGHT_TAB]    = std::make_unique<LightTab>(*this);
+  _tabs[MATERIAL_TAB] = std::make_unique<MaterialTab>(*this);
+  _tabs[CAMERA_TAB]   = std::make_unique<CameraTab>(*this);
 }
 
 void Inspector::intialize()

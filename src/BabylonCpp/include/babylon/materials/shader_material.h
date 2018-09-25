@@ -25,7 +25,7 @@ public:
   static ShaderMaterialPtr New(Ts&&... args)
   {
     auto material = std::shared_ptr<ShaderMaterial>(
-      new ShaderMaterial(::std::forward<Ts>(args)...));
+      new ShaderMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;

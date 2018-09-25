@@ -1,13 +1,22 @@
 #ifndef BABYLON_EXTENSIONS_DYNAMIC_TERRAIN_DYNAMIC_TERRAIN_H
 #define BABYLON_EXTENSIONS_DYNAMIC_TERRAIN_DYNAMIC_TERRAIN_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Camera;
+class Mesh;
+class Scene;
+using CameraPtr = std::shared_ptr<Camera>;
+using MeshPtr   = std::shared_ptr<Mesh>;
+
 namespace Extensions {
 
 struct DynamicTerrainOptions;

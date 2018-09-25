@@ -17,25 +17,25 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , angle{0.f}
     , angularSpeed{0.f}
     , cellIndex{0}
-    , _initialDirection{nullopt_t}
+    , _initialDirection{std::nullopt}
     , _initialStartSpriteCellID{0}
     , _initialEndSpriteCellID{0}
-    , _currentColorGradient{nullopt_t}
+    , _currentColorGradient{std::nullopt}
     , _currentColor1{Color4(0, 0, 0, 0)}
     , _currentColor2{Color4(0, 0, 0, 0)}
-    , _currentSizeGradient{nullopt_t}
+    , _currentSizeGradient{std::nullopt}
     , _currentSize1{0.f}
     , _currentSize2{0.f}
-    , _currentAngularSpeedGradient{nullopt_t}
+    , _currentAngularSpeedGradient{std::nullopt}
     , _currentAngularSpeed1{0.f}
     , _currentAngularSpeed2{0.f}
-    , _currentVelocityGradient{nullopt_t}
+    , _currentVelocityGradient{std::nullopt}
     , _currentVelocity1{0.f}
     , _currentVelocity2{0.f}
-    , _currentLimitVelocityGradient{nullopt_t}
+    , _currentLimitVelocityGradient{std::nullopt}
     , _currentLimitVelocity1{0.f}
     , _currentLimitVelocity2{0.f}
-    , _currentDragGradient{nullopt_t}
+    , _currentDragGradient{std::nullopt}
     , _currentDrag1{0.f}
     , _currentDrag2{0.f}
     , particleSystem{iParticleSystem}
@@ -215,7 +215,7 @@ void Particle::copyTo(Particle& other)
     }
   }
   else {
-    other._initialDirection = nullopt_t;
+    other._initialDirection = std::nullopt;
   }
   other.direction.copyFrom(direction);
   other.color.copyFrom(color);

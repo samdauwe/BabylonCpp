@@ -21,7 +21,7 @@ public:
   static TorusGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<TorusGeometry>(
-      new TorusGeometry(::std::forward<Ts>(args)...));
+      new TorusGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

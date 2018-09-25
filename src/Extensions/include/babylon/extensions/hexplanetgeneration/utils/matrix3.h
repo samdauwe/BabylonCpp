@@ -1,9 +1,14 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_MATRIX3_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_UTILS_MATRIX3_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Vector3;
+
 namespace Extensions {
 
 class Matrix3 {

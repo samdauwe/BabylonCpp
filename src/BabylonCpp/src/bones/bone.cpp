@@ -32,12 +32,12 @@ Bone::Bone(const string_t& iName, Skeleton* skeleton, Bone* parentBone,
     , _localMatrix{localMatrix ? *localMatrix : Matrix::Identity()}
     , _restPose{restPose ? *restPose : Matrix::Identity()}
     , _baseMatrix{baseMatrix ? *baseMatrix : _localMatrix}
-    , _invertedAbsoluteTransform{::std::make_unique<Matrix>()}
+    , _invertedAbsoluteTransform{std::make_unique<Matrix>()}
     , _scaleMatrix{Matrix::Identity()}
     , _scaleVector{Vector3::One()}
     , _negateScaleChildren{Vector3::One()}
     , _scalingDeterminant{1.f}
-    , _worldTransform{::std::make_unique<Matrix>()}
+    , _worldTransform{std::make_unique<Matrix>()}
     , _needToDecompose{true}
     , _needToCompose{false}
 {

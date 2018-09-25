@@ -1,11 +1,20 @@
 #ifndef BABYLON_PHYSICS_HELPER_PHYSICS_GRAVITATIONAL_FIELD_EVENT_H
 #define BABYLON_PHYSICS_HELPER_PHYSICS_GRAVITATIONAL_FIELD_EVENT_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 #include <babylon/physics/helper/physics_helper_enums.h>
 
 namespace BABYLON {
+
+class EventState;
+class Mesh;
+struct PhysicsGravitationalFieldEventData;
+class PhysicsHelper;
+class Scene;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief Gravitational Field.
@@ -52,7 +61,7 @@ private:
   float _radius;
   float _strength;
   PhysicsRadialImpulseFalloff _falloff;
-  ::std::function<void(Scene* scene, EventState& es)> _tickCallback;
+  std::function<void(Scene* scene, EventState& es)> _tickCallback;
   MeshPtr _sphere;
   // check if the has been fetched the data. If not, do cleanup
   bool _dataFetched;

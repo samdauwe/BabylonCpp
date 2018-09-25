@@ -63,7 +63,7 @@ Buffer::createVertexBuffer(unsigned int kind, size_t offset, int size,
                              byteStride;
 
   // a lot of these parameters are ignored as they are overriden by the buffer
-  return ::std::make_unique<VertexBuffer>(
+  return std::make_unique<VertexBuffer>(
     _engine, ToVariant<Float32Array, Buffer*>(this), kind, _updatable, true,
     _byteStride, !instanced.has_value() ? _instanced : _byteOffset, offset,
     size, std::nullopt, false, true);
@@ -108,7 +108,7 @@ GL::IGLBuffer* Buffer::create(Float32Array data)
   if (!_buffer) { // create buffer
     if (_updatable) {
       _buffer = _engine->createDynamicVertexBuffer(data);
-      _data   = ::std::move(data);
+      _data   = std::move(data);
     }
     else {
       _buffer = _engine->createVertexBuffer(data);
@@ -116,7 +116,7 @@ GL::IGLBuffer* Buffer::create(Float32Array data)
   }
   else if (_updatable) { // update buffer
     _engine->updateDynamicVertexBuffer(_buffer, data);
-    _data = ::std::move(data);
+    _data = std::move(data);
   }
 
   return _buffer ? _buffer.get() : nullptr;

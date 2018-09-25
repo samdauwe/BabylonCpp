@@ -110,7 +110,7 @@ void RuntimeAnimation::dispose()
 {
   auto& runtimeAnimations = _animation->runtimeAnimations();
   runtimeAnimations.erase(
-    ::std::remove_if(runtimeAnimations.begin(), runtimeAnimations.end(),
+    std::remove_if(runtimeAnimations.begin(), runtimeAnimations.end(),
                      [this](const RuntimeAnimationPtr& runtimeAnimation) {
                        return runtimeAnimation.get() == this;
                      }),
@@ -279,7 +279,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
   else {
     // Get max value if required
     if (_animation->loopMode != Animation::ANIMATIONLOOPMODE_CYCLE()) {
-      string_t keyOffset = ::std::to_string(to) + ::std::to_string(from);
+      string_t keyOffset = std::to_string(to) + std::to_string(from);
       if (!_offsetsCache.count(keyOffset)) {
         AnimationValue fromValue = _interpolate(
           static_cast<int>(from), 0, Animation::ANIMATIONLOOPMODE_CYCLE());
@@ -355,7 +355,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
 
   // Compute value
   auto repeatCount   = static_cast<int>(ratio / range);
-  auto _currentFrame = returnValue ? from + ::std::fmod(ratio, range) : to;
+  auto _currentFrame = returnValue ? from + std::fmod(ratio, range) : to;
 
   // Need to normalize?
   if (_host && _host->syncRoot) {

@@ -26,10 +26,10 @@ public:
   void addToScene(unique_ptr_t<SpriteManager>&& newSpriteManager);
 
   void setOnDispose(
-    const ::std::function<void(SpriteManager*, EventState&)>& callback);
+    const std::function<void(SpriteManager*, EventState&)>& callback);
   nullable_t<PickingInfo>
   intersects(const Ray ray, const CameraPtr& camera,
-             ::std::function<bool(Sprite* sprite)> predicate, bool fastCheck);
+             std::function<bool(Sprite* sprite)> predicate, bool fastCheck);
   void render();
   void dispose();
 

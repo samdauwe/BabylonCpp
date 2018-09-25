@@ -16,7 +16,7 @@ public:
   template <typename... Ts>
   static NoiseProceduralTexture* New(Ts&&... args)
   {
-    auto texture = new NoiseProceduralTexture(::std::forward<Ts>(args)...);
+    auto texture = new NoiseProceduralTexture(std::forward<Ts>(args)...);
     texture->addToScene(
       static_cast<std::unique_ptr<NoiseProceduralTexture>>(texture));
 

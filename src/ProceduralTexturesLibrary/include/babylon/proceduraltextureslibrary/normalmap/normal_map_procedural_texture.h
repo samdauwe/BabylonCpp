@@ -1,7 +1,7 @@
 #ifndef BABYLON_PROCEDURAL_TEXTURES_LIBRARY_NORMAL_MAP_NORMAL_MAP_PROCEDURAL_TEXTURE_H
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_NORMAL_MAP_NORMAL_MAP_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
 namespace BABYLON {
@@ -14,9 +14,9 @@ public:
   template <typename... Ts>
   static NormalMapProceduralTexture* New(Ts&&... args)
   {
-    auto texture = new NormalMapProceduralTexture(::std::forward<Ts>(args)...);
+    auto texture = new NormalMapProceduralTexture(std::forward<Ts>(args)...);
     texture->addToScene(
-      static_cast<unique_ptr_t<NormalMapProceduralTexture>>(texture));
+      static_cast<std::unique_ptr<NormalMapProceduralTexture>>(texture));
 
     return texture;
   }
@@ -41,9 +41,9 @@ public:
    * texture information
    * @returns a parsed Normal Map Procedural Texture
    */
-  static unique_ptr_t<NormalMapProceduralTexture>
+  static std::unique_ptr<NormalMapProceduralTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const string_t& rootUrl);
+        const std::string& rootUrl);
 
 protected:
   NormalMapProceduralTexture(const std::string& name, const Size& size,

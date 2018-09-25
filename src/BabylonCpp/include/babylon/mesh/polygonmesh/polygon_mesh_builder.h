@@ -29,7 +29,7 @@ public:
 
   PolygonMeshBuilder& addHole(const std::vector<Vector2>& hole);
   MeshPtr build(bool updatable = false, float depth = 0.f);
-  ::std::pair<Float32Array, Uint32Array> buildWall(const Vector3& wall0Corner,
+  std::pair<Float32Array, Uint32Array> buildWall(const Vector3& wall0Corner,
                                                    const Vector3& wall1Corner);
 
   PolygonPoints& points();

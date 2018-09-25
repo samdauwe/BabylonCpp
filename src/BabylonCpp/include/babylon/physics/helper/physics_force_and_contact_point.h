@@ -1,7 +1,7 @@
 #ifndef BABYLON_PHYSICS_HELPER_PHYSICS_FORCE_AND_CONTACT_POINT_H
 #define BABYLON_PHYSICS_HELPER_PHYSICS_FORCE_AND_CONTACT_POINT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {

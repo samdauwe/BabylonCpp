@@ -72,7 +72,7 @@ void PhysicsUpdraftEvent::dispose(bool force)
   }
 }
 
-unique_ptr_t<PhysicsForceAndContactPoint>
+std::unique_ptr<PhysicsForceAndContactPoint>
 PhysicsUpdraftEvent::getImpostorForceAndContactPoint(PhysicsImpostor* impostor)
 {
   if (impostor->mass == 0.f) {
@@ -97,7 +97,7 @@ PhysicsUpdraftEvent::getImpostorForceAndContactPoint(PhysicsImpostor* impostor)
 
   auto force = direction.multiplyByFloats(multiplier, multiplier, multiplier);
 
-  return ::std::make_unique<PhysicsForceAndContactPoint>(
+  return std::make_unique<PhysicsForceAndContactPoint>(
     PhysicsForceAndContactPoint{
       force,               // force,
       impostorObjectCenter // contactPoint

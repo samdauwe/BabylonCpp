@@ -1,7 +1,7 @@
 #ifndef BABYLON_PHYSICS_JOINT_HINGE_2_JOINT_H
 #define BABYLON_PHYSICS_JOINT_HINGE_2_JOINT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/physics/joint/motor_enabled_joint.h>
 
 namespace BABYLON {

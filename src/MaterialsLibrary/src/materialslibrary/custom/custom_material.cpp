@@ -49,8 +49,9 @@ void CustomMaterial::AttachAfterBind(Mesh* /*mesh*/, Effect* effect)
   }
 }
 
-vector_t<string_t> CustomMaterial::ReviewUniform(const string_t& name,
-                                                 vector_t<string_t> arr)
+std::vector<std::string>
+CustomMaterial::ReviewUniform(const std::string& name,
+                              std::vector<std::string> arr)
 {
   if (name == "uniform") {
     for (const auto& ind : _newUniforms) {
@@ -69,11 +70,12 @@ vector_t<string_t> CustomMaterial::ReviewUniform(const string_t& name,
   return arr;
 }
 
-string_t CustomMaterial::Builder(const string_t& /*shaderName*/,
-                                 const vector_t<string_t>& uniforms,
-                                 const vector_t<string_t>& /*uniformBuffers*/,
-                                 const vector_t<string_t>& samplers,
-                                 StandardMaterialDefines& /*defines*/)
+std::string
+CustomMaterial::Builder(const std::string& /*shaderName*/,
+                        const std::vector<std::string>& uniforms,
+                        const std::vector<std::string>& /*uniformBuffers*/,
+                        const std::vector<std::string>& samplers,
+                        StandardMaterialDefines& /*defines*/)
 {
   if (_isCreatedShader) {
     return _createdShaderName;
@@ -81,7 +83,7 @@ string_t CustomMaterial::Builder(const string_t& /*shaderName*/,
   _isCreatedShader = false;
 
   ++CustomMaterial::ShaderIndexer;
-  string_t name = "custom_" + ::std::to_string(CustomMaterial::ShaderIndexer);
+  std::string name = "custom_" + std::to_string(CustomMaterial::ShaderIndexer);
 
   ReviewUniform("uniform", uniforms);
   ReviewUniform("sampler", samplers);
@@ -152,8 +154,8 @@ string_t CustomMaterial::Builder(const string_t& /*shaderName*/,
 }
 
 CustomMaterial&
-CustomMaterial::AddUniform(const string_t& name, const string_t& kind,
-                           const nullable_t<UniformInstance>& param)
+CustomMaterial::AddUniform(const std::string& name, const std::string& kind,
+                           const std::optional<UniformInstance>& param)
 {
   if (param) {
     if (!String::contains(kind, "sampler")) {
@@ -169,26 +171,28 @@ CustomMaterial::AddUniform(const string_t& name, const string_t& kind,
   return *this;
 }
 
-CustomMaterial& CustomMaterial::Fragment_Begin(const string_t& shaderPart)
+CustomMaterial& CustomMaterial::Fragment_Begin(const std::string& shaderPart)
 {
   CustomParts.Fragment_Begin = shaderPart;
   return *this;
 }
 
-CustomMaterial& CustomMaterial::Fragment_Definitions(const string_t& shaderPart)
+CustomMaterial&
+CustomMaterial::Fragment_Definitions(const std::string& shaderPart)
 {
   CustomParts.Fragment_Definitions = shaderPart;
   return *this;
 }
 
-CustomMaterial& CustomMaterial::Fragment_MainBegin(const string_t& shaderPart)
+CustomMaterial&
+CustomMaterial::Fragment_MainBegin(const std::string& shaderPart)
 {
   CustomParts.Fragment_MainBegin = shaderPart;
   return *this;
 }
 
 CustomMaterial&
-CustomMaterial::Fragment_Custom_Diffuse(const string_t& shaderPart)
+CustomMaterial::Fragment_Custom_Diffuse(const std::string& shaderPart)
 {
   CustomParts.Fragment_Custom_Diffuse
     = String::replace(shaderPart, "result", "diffuseColor");
@@ -196,7 +200,7 @@ CustomMaterial::Fragment_Custom_Diffuse(const string_t& shaderPart)
 }
 
 CustomMaterial&
-CustomMaterial::Fragment_Custom_Alpha(const string_t& shaderPart)
+CustomMaterial::Fragment_Custom_Alpha(const std::string& shaderPart)
 {
   CustomParts.Fragment_Custom_Alpha
     = String::replace(shaderPart, "result", "alpha");
@@ -204,33 +208,34 @@ CustomMaterial::Fragment_Custom_Alpha(const string_t& shaderPart)
 }
 
 CustomMaterial&
-CustomMaterial::Fragment_Before_FragColor(const string_t& shaderPart)
+CustomMaterial::Fragment_Before_FragColor(const std::string& shaderPart)
 {
   CustomParts.Fragment_Before_FragColor
     = String::replace(shaderPart, "result", "color");
   return *this;
 }
 
-CustomMaterial& CustomMaterial::Vertex_Begin(const string_t& shaderPart)
+CustomMaterial& CustomMaterial::Vertex_Begin(const std::string& shaderPart)
 {
   CustomParts.Vertex_Begin = shaderPart;
   return *this;
 }
 
-CustomMaterial& CustomMaterial::Vertex_Definitions(const string_t& shaderPart)
+CustomMaterial&
+CustomMaterial::Vertex_Definitions(const std::string& shaderPart)
 {
   CustomParts.Vertex_Definitions = shaderPart;
   return *this;
 }
 
-CustomMaterial& CustomMaterial::Vertex_MainBegin(const string_t& shaderPart)
+CustomMaterial& CustomMaterial::Vertex_MainBegin(const std::string& shaderPart)
 {
   CustomParts.Vertex_MainBegin = shaderPart;
   return *this;
 }
 
 CustomMaterial&
-CustomMaterial::Vertex_Before_PositionUpdated(const string_t& shaderPart)
+CustomMaterial::Vertex_Before_PositionUpdated(const std::string& shaderPart)
 {
   CustomParts.Vertex_Before_PositionUpdated
     = String::replace(shaderPart, "result", "positionUpdated");
@@ -238,7 +243,7 @@ CustomMaterial::Vertex_Before_PositionUpdated(const string_t& shaderPart)
 }
 
 CustomMaterial&
-CustomMaterial::Vertex_Before_NormalUpdated(const string_t& shaderPart)
+CustomMaterial::Vertex_Before_NormalUpdated(const std::string& shaderPart)
 {
   CustomParts.Vertex_Before_NormalUpdated
     = String::replace(shaderPart, "result", "normalUpdated");

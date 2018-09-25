@@ -1,10 +1,21 @@
 #ifndef BABYLON_PHYSICS_HELPER_PHYSICS_VORTEX_EVENT_H
 #define BABYLON_PHYSICS_HELPER_PHYSICS_VORTEX_EVENT_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class EventState;
+class Mesh;
+class PhysicsEngine;
+struct PhysicsForceAndContactPoint;
+class PhysicsImpostor;
+struct PhysicsVortexEventData;
+class Scene;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief Vortex.
@@ -39,7 +50,7 @@ public:
   void dispose(bool force = true);
 
 private:
-  unique_ptr_t<PhysicsForceAndContactPoint>
+  std::unique_ptr<PhysicsForceAndContactPoint>
   getImpostorForceAndContactPoint(PhysicsImpostor* impostor);
 
   void _tick();
@@ -63,7 +74,7 @@ private:
   // kick in
   float _centripetalForceThreshold;
   float _updraftMultiplier;
-  ::std::function<void(Scene* scene, EventState& es)> _tickCallback;
+  std::function<void(Scene* scene, EventState& es)> _tickCallback;
   MeshPtr _cylinder;
   // to keep the cylinders position, because normally the origin is in the
   // center and not on the bottom

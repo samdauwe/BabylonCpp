@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_COLOR_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_COLOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/hexplanetgeneration/utils/gradient.h>
 #include <babylon/extensions/hexplanetgeneration/utils/color_gradient_2d.h>
 

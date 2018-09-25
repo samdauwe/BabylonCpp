@@ -10,14 +10,14 @@ class BABYLON_SHARED_EXPORT ExecuteCodeAction : public Action {
 
 public:
   ExecuteCodeAction(unsigned int triggerOptions,
-                    const ::std::function<void(const ActionEvent&)>& func,
+                    const std::function<void(const ActionEvent&)>& func,
                     Condition* condition = nullptr);
   ~ExecuteCodeAction() override;
 
   void execute(const ActionEvent& evt) override;
 
 public:
-  ::std::function<void(const ActionEvent&)> func;
+  std::function<void(const ActionEvent&)> func;
 
 }; // end of class ExecuteCodeAction
 

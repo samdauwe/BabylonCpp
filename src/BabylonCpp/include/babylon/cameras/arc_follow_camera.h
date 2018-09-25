@@ -20,7 +20,7 @@ public:
   static ArcFollowCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<ArcFollowCamera>(
-      new ArcFollowCamera(::std::forward<Ts>(args)...));
+      new ArcFollowCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

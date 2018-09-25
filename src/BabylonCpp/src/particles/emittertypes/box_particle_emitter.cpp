@@ -44,9 +44,9 @@ void BoxParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
                                                positionToUpdate);
 }
 
-unique_ptr_t<IParticleEmitterType> BoxParticleEmitter::clone() const
+std::unique_ptr<IParticleEmitterType> BoxParticleEmitter::clone() const
 {
-  auto newOne = ::std::make_unique<BoxParticleEmitter>();
+  auto newOne = std::make_unique<BoxParticleEmitter>();
 
   return newOne;
 }

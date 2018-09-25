@@ -276,7 +276,7 @@ Json::object GradientMaterial::serialize() const
   return Json::object();
 }
 
-const string_t GradientMaterial::getClassName() const
+const std::string GradientMaterial::getClassName() const
 {
   return "GradientMaterial";
 }

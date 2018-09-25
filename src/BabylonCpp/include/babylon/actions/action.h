@@ -35,7 +35,7 @@ typedef picojson::object object;
  * @see http://doc.babylonjs.com/how_to/how_to_use_actions#available-actions
  */
 class BABYLON_SHARED_EXPORT Action
-    : public ::std::enable_shared_from_this<Action> {
+    : public std::enable_shared_from_this<Action> {
 
 public:
   template <typename... Ts>

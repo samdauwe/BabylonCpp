@@ -1,17 +1,17 @@
 #ifndef BABYLON_TOOLS_OPTIMIZATION_POST_PROCESS_OPTIMIZATION_H
 #define BABYLON_TOOLS_OPTIMIZATION_POST_PROCESS_OPTIMIZATION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/tools/optimization/scene_optimization.h>
 
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT PostProcessesOptimization
-  : public SceneOptimization {
+    : public SceneOptimization {
 
 public:
   PostProcessesOptimization(int priority = 0);
-  ~PostProcessesOptimization();
+  ~PostProcessesOptimization() override;
 
   bool apply(Scene* scene) override;
 

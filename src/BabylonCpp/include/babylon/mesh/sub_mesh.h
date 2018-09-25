@@ -27,7 +27,7 @@ public:
   template <typename... Ts>
   static std::shared_ptr<SubMesh> New(Ts&&... args)
   {
-    auto subMeshRawPtr = new SubMesh(::std::forward<Ts>(args)...);
+    auto subMeshRawPtr = new SubMesh(std::forward<Ts>(args)...);
     auto subMesh       = static_cast<std::shared_ptr<SubMesh>>(subMeshRawPtr);
     subMesh->addToMesh(subMesh);
 

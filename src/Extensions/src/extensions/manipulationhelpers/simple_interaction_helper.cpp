@@ -82,7 +82,7 @@ void SimpleInteractionHelper::doSelectorInteraction(const PointerInfo& p,
   }
 
   // We selected the same mesh? nothing to do
-  auto pickedMesh = ::std::static_pointer_cast<AbstractMesh>(_pickedNode);
+  auto pickedMesh = std::static_pointer_cast<AbstractMesh>(_pickedNode);
   if (pickedMesh == selectedMesh) {
 #if 0
     selectedMesh->showBoundingBox = !selectedMesh->showBoundingBox;
@@ -97,7 +97,7 @@ void SimpleInteractionHelper::doSelectorInteraction(const PointerInfo& p,
 
   // Detach the manipulator to the current selected mesh
   if (_pickedNode) {
-    auto mesh = ::std::static_pointer_cast<AbstractMesh>(_pickedNode);
+    auto mesh = std::static_pointer_cast<AbstractMesh>(_pickedNode);
     if (mesh) {
 #if 0
       mesh->showBoundingBox = false;

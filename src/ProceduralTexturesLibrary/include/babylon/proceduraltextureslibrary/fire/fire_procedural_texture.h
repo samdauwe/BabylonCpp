@@ -1,7 +1,7 @@
 #ifndef BABYLON_PROCEDURAL_TEXTURES_LIBRARY_FIRE_FIRE_PROCEDURAL_TEXTURE_H
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_FIRE_FIRE_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector2.h>
@@ -15,9 +15,9 @@ public:
   template <typename... Ts>
   static FireProceduralTexture* New(Ts&&... args)
   {
-    auto texture = new FireProceduralTexture(::std::forward<Ts>(args)...);
+    auto texture = new FireProceduralTexture(std::forward<Ts>(args)...);
     texture->addToScene(
-      static_cast<unique_ptr_t<FireProceduralTexture>>(texture));
+      static_cast<std::unique_ptr<FireProceduralTexture>>(texture));
 
     return texture;
   }
@@ -46,9 +46,9 @@ public:
    * information
    * @returns a parsed Fire Procedural Texture
    */
-  static unique_ptr_t<FireProceduralTexture>
+  static std::unique_ptr<FireProceduralTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const string_t& rootUrl);
+        const std::string& rootUrl);
 
 protected:
   FireProceduralTexture(const std::string& name, const Size& size, Scene* scene,

@@ -1,7 +1,8 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_UUID_OBJ_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_UUID_OBJ_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 namespace Extensions {

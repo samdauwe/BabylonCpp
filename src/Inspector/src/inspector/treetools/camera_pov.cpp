@@ -20,7 +20,7 @@ CameraPOV::~CameraPOV()
 
 CameraPOV::CameraPOV(CameraPOV&& other)
     : AbstractTreeTool{std::move(other)}
-    , _cameraPOV{::std::move(other._cameraPOV)}
+    , _cameraPOV{std::move(other._cameraPOV)}
 {
 }
 

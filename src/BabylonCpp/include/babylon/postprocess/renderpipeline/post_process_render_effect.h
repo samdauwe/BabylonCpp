@@ -27,7 +27,7 @@ public:
    */
   PostProcessRenderEffect(
     Engine* engine, const string_t& name,
-    const ::std::function<vector_t<PostProcess*>()>& getPostProcesses,
+    const std::function<vector_t<PostProcess*>()>& getPostProcesses,
     bool singleInstance = true);
   ~PostProcessRenderEffect();
 
@@ -94,7 +94,7 @@ public:
 
 private:
   unordered_map_t<string_t, vector_t<PostProcess*>> _postProcesses;
-  ::std::function<vector_t<PostProcess*>()> _getPostProcesses;
+  std::function<vector_t<PostProcess*>()> _getPostProcesses;
   bool _singleInstance;
   unordered_map_t<string_t, CameraPtr> _cameras;
   unordered_map_t<string_t, IndicesArray> _indicesForCamera;

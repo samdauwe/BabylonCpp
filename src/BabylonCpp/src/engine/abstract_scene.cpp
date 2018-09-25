@@ -142,7 +142,7 @@ void AbstractScene::Parse(Json::value& jsonData, Scene* scene,
 
 int AbstractScene::removeEffectLayer(const EffectLayerPtr& toRemove)
 {
-  auto it   = ::std::find(effectLayers.begin(), effectLayers.end(), toRemove);
+  auto it   = std::find(effectLayers.begin(), effectLayers.end(), toRemove);
   int index = static_cast<int>(it - effectLayers.begin());
   if (it != effectLayers.end()) {
     effectLayers.erase(it);
@@ -157,7 +157,7 @@ void AbstractScene::addEffectLayer(const EffectLayerPtr& newEffectLayer)
 
 GlowLayerPtr AbstractScene::getGlowLayerByName(const string_t& name)
 {
-  auto it = ::std::find_if(effectLayers.begin(), effectLayers.end(),
+  auto it = std::find_if(effectLayers.begin(), effectLayers.end(),
                            [&name](const EffectLayerPtr& effectLayer) {
                              return effectLayer->name == name
                                     && effectLayer->getEffectName()
@@ -166,12 +166,12 @@ GlowLayerPtr AbstractScene::getGlowLayerByName(const string_t& name)
 
   return (it == effectLayers.end()) ?
            nullptr :
-           ::std::static_pointer_cast<GlowLayer>(*it);
+           std::static_pointer_cast<GlowLayer>(*it);
 }
 
 HighlightLayerPtr AbstractScene::getHighlightLayerByName(const string_t& name)
 {
-  auto it = ::std::find_if(effectLayers.begin(), effectLayers.end(),
+  auto it = std::find_if(effectLayers.begin(), effectLayers.end(),
                            [&name](const EffectLayerPtr& effectLayer) {
                              return effectLayer->name == name
                                     && effectLayer->getEffectName()
@@ -180,13 +180,13 @@ HighlightLayerPtr AbstractScene::getHighlightLayerByName(const string_t& name)
 
   return (it == effectLayers.end()) ?
            nullptr :
-           ::std::static_pointer_cast<HighlightLayer>(*it);
+           std::static_pointer_cast<HighlightLayer>(*it);
 }
 
 int AbstractScene::removeLensFlareSystem(const LensFlareSystemPtr& toRemove)
 {
   auto it
-    = ::std::find(lensFlareSystems.begin(), lensFlareSystems.end(), toRemove);
+    = std::find(lensFlareSystems.begin(), lensFlareSystems.end(), toRemove);
   int index = static_cast<int>(it - lensFlareSystems.begin());
   if (it != lensFlareSystems.end()) {
     lensFlareSystems.erase(it);
@@ -202,7 +202,7 @@ void AbstractScene::addLensFlareSystem(
 
 LensFlareSystemPtr AbstractScene::getLensFlareSystemByName(const string_t& name)
 {
-  auto it = ::std::find_if(lensFlareSystems.begin(), lensFlareSystems.end(),
+  auto it = std::find_if(lensFlareSystems.begin(), lensFlareSystems.end(),
                            [&name](const LensFlareSystemPtr& lensFlareSystem) {
                              return lensFlareSystem->name == name;
                            });
@@ -212,7 +212,7 @@ LensFlareSystemPtr AbstractScene::getLensFlareSystemByName(const string_t& name)
 
 LensFlareSystemPtr AbstractScene::getLensFlareSystemByID(const string_t& id)
 {
-  auto it = ::std::find_if(lensFlareSystems.begin(), lensFlareSystems.end(),
+  auto it = std::find_if(lensFlareSystems.begin(), lensFlareSystems.end(),
                            [&id](const LensFlareSystemPtr& lensFlareSystem) {
                              return lensFlareSystem->id == id;
                            });

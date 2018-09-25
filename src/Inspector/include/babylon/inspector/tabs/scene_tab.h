@@ -1,13 +1,16 @@
 #ifndef BABYLON_INSPECTOR_TABS_SCENE_TAB_H
 #define BABYLON_INSPECTOR_TABS_SCENE_TAB_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/inspector/tabs/tab.h>
 
 namespace BABYLON {
 
 class Inspector;
 class PropertiesView;
+class Scene;
 
 class BABYLON_SHARED_EXPORT SceneTab : public Tab {
 
@@ -26,7 +29,7 @@ private:
 private:
   Inspector& _inspector;
   Scene* _scene;
-  unique_ptr_t<PropertiesView> _properties;
+  std::unique_ptr<PropertiesView> _properties;
   bool _splitterIntialized;
   float _width;
   float _sz1;

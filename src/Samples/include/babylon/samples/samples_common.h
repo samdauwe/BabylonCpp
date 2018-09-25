@@ -1,12 +1,17 @@
 #ifndef BABYLON_SAMPLES_SAMPLES_COMMON_H
 #define BABYLON_SAMPLES_SAMPLES_COMMON_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <memory>
 
 namespace BABYLON {
+
+class ICanvas;
+class IRenderableScene;
+using IRenderableScenePtr = std::unique_ptr<IRenderableScene>;
+
 namespace Samples {
 
-using IRenderableScenePtr = std::unique_ptr<IRenderableScene>;
 using FactoryMethod = std::function<IRenderableScenePtr(ICanvas* iCanvas)>;
 using Sample        = std::tuple<bool, FactoryMethod>;
 
@@ -20,10 +25,10 @@ public:
    * @brief Returns the list with example.
    * @return the list with example
    */
-  const std::unordered_map<string_t, Sample>& samples() const;
+  const std::unordered_map<std::string, Sample>& samples() const;
 
 protected:
-  std::unordered_map<string_t, Sample> _samples;
+  std::unordered_map<std::string, Sample> _samples;
 
 }; // end of struct _SamplesIndex
 

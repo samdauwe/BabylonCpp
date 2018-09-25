@@ -32,10 +32,10 @@ ProgressEvent::ProgressEvent(ProgressEvent&& other)
     , lengthComputable{this, &ProgressEvent::get_lengthComputable}
     , loaded{this, &ProgressEvent::get_loaded}
     , total{this, &ProgressEvent::get_total}
-    , _type{::std::move(other.type)}
-    , _lengthComputable{::std::move(other.lengthComputable)}
-    , _loaded{::std::move(other.loaded)}
-    , _total{::std::move(other.total)}
+    , _type{std::move(other.type)}
+    , _lengthComputable{std::move(other.lengthComputable)}
+    , _loaded{std::move(other.loaded)}
+    , _total{std::move(other.total)}
 {
 }
 
@@ -54,10 +54,10 @@ ProgressEvent& ProgressEvent::operator=(const ProgressEvent& other)
 ProgressEvent& ProgressEvent::operator=(ProgressEvent&& other)
 {
   if (&other != this) {
-    _type             = ::std::move(other.type);
-    _lengthComputable = ::std::move(other.lengthComputable);
-    _loaded           = ::std::move(other.loaded);
-    _total            = ::std::move(other.total);
+    _type             = std::move(other.type);
+    _lengthComputable = std::move(other.lengthComputable);
+    _loaded           = std::move(other.loaded);
+    _total            = std::move(other.total);
   }
 
   return *this;

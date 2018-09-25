@@ -1,13 +1,22 @@
 #ifndef BABYLON_PARTICLES_SOLID_PARTICLE_SYSTEM_H
 #define BABYLON_PARTICLES_SOLID_PARTICLE_SYSTEM_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/particles/solid_particle.h>
 
 namespace BABYLON {
+
+struct DepthSortedParticle;
+class Mesh;
+class Scene;
+class TargetCamera;
+using MeshPtr         = std::shared_ptr<Mesh>;
+using TargetCameraPtr = std::shared_ptr<TargetCamera>;
 
 struct SolidParticleSystemOptions {
   bool updatable            = true;
@@ -25,10 +34,10 @@ struct SolidParticleSystemDigestOptions {
 }; // end of struct SolidParticleSystemOptions
 
 struct SolidParticleSystemMeshBuilderOptions {
-  ::std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
+  std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
     positionFunction = nullptr;
-  ::std::function<void(SolidParticle* particle, const Vector3& vertex,
-                       unsigned int i)>
+  std::function<void(SolidParticle* particle, const Vector3& vertex,
+                     unsigned int i)>
     vertexFunction = nullptr;
 }; // end of struct SolidParticleSystemMeshBuilderOptions
 
@@ -71,9 +80,9 @@ public:
    * Example: bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere
    * exactly matches a spherical mesh.
    */
-  SolidParticleSystem(const string_t& name, Scene* scene,
-                      const nullable_t<SolidParticleSystemOptions>& options
-                      = nullopt_t);
+  SolidParticleSystem(const std::string& name, Scene* scene,
+                      const std::optional<SolidParticleSystemOptions>& options
+                      = std::nullopt);
   virtual ~SolidParticleSystem();
 
   /**
@@ -376,7 +385,7 @@ private:
    * @brief Inserts the shape model in the global SPS mesh.
    */
   SolidParticle*
-  _meshBuilder(unsigned int p, const vector_t<Vector3>& shape,
+  _meshBuilder(unsigned int p, const std::vector<Vector3>& shape,
                Float32Array& positions, Uint32Array& meshInd,
                Uint32Array& indices, const Float32Array& meshUV,
                Float32Array& uvs, const Float32Array& meshCol,
@@ -387,7 +396,7 @@ private:
   /**
    * @brief Returns a shape array from positions array.
    */
-  vector_t<Vector3> _posToShape(const Float32Array& positions);
+  std::vector<Vector3> _posToShape(const Float32Array& positions);
 
   /**
    * @brief Returns a shapeUV array from a Vector4 uvs.
@@ -399,7 +408,7 @@ private:
    */
   SolidParticle* _addParticle(unsigned int idx, unsigned int idxpos,
                               unsigned int idxind,
-                              unique_ptr_t<ModelShape>&& model, int shapeId,
+                              std::unique_ptr<ModelShape>&& model, int shapeId,
                               unsigned int idxInShape,
                               const BoundingInfo& bInfo);
 
@@ -417,7 +426,7 @@ public:
    * any classic array.
    * Example : var p = SPS.particles[i];
    */
-  vector_t<unique_ptr_t<SolidParticle>> particles;
+  std::vector<std::unique_ptr<SolidParticle>> particles;
 
   /**
    * The SPS total number of particles. Read only. Use SPS.counter instead if
@@ -444,7 +453,7 @@ public:
   /**
    * The SPS name. This name is also given to the underlying mesh.
    */
-  string_t name;
+  std::string name;
 
   /**
    * The SPS mesh. It's a standard BJS Mesh, so all the methods from the Mesh
@@ -462,13 +471,13 @@ public:
    * Please read :
    * http://doc.babylonjs.com/overviews/Solid_Particle_System#pickable-particles
    */
-  vector_t<PickedParticle> pickedParticles;
+  std::vector<PickedParticle> pickedParticles;
 
   /**
    * This array is populated when `enableDepthSort` is set to true.
    * Each element of this array is an instance of the class DepthSortedParticle.
    */
-  vector_t<DepthSortedParticle> depthSortedParticles;
+  std::vector<DepthSortedParticle> depthSortedParticles;
 
   /**
    * If the particle intersection must be computed only with the bounding sphere
@@ -507,10 +516,10 @@ private:
   bool _alwaysVisible;
   bool _depthSort;
   int _shapeCounter;
-  unique_ptr_t<SolidParticle> _copy;
-  vector_t<Vector3> _shape;
+  std::unique_ptr<SolidParticle> _copy;
+  std::vector<Vector3> _shape;
   Float32Array _shapeUV;
-  unique_ptr_t<Color4> _color;
+  std::unique_ptr<Color4> _color;
   bool _computeParticleColor;
   bool _computeParticleTexture;
   bool _computeParticleRotation;
@@ -553,8 +562,8 @@ private:
   Vector3 _minBbox;
   Vector3 _maxBbox;
   bool _particlesIntersect;
-  ::std::function<int(const DepthSortedParticle& p1,
-                      const DepthSortedParticle& p2)>
+  std::function<int(const DepthSortedParticle& p1,
+                    const DepthSortedParticle& p2)>
     _depthSortFunction;
   bool _needs32Bits;
   Vector3 _pivotBackTranslation;

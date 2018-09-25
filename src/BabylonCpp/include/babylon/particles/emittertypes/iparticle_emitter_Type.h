@@ -1,9 +1,30 @@
 #ifndef BABYLON_PARTICLES_EMITTER_TYPES_IPARTICLE_EMITTER_TYPE_H
 #define BABYLON_PARTICLES_EMITTER_TYPES_IPARTICLE_EMITTER_TYPE_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+#include <memory>
+#include <vector>
+
+#include <babylon/babylon_api.h>
+
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
 
 namespace BABYLON {
+
+class Effect;
+class Matrix;
+class Particle;
+class Vector3;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Particle emitter represents a volume emitting particles.
@@ -40,7 +61,7 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @brief Clones the current emitter and returns a copy of it.
    * @returns the new emitter
    */
-  virtual unique_ptr_t<IParticleEmitterType> clone() const = 0;
+  virtual std::unique_ptr<IParticleEmitterType> clone() const = 0;
 
   /**
    * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update shader

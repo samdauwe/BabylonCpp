@@ -35,10 +35,10 @@ void PointParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
                                                positionToUpdate);
 }
 
-unique_ptr_t<IParticleEmitterType> PointParticleEmitter::clone() const
+std::unique_ptr<IParticleEmitterType> PointParticleEmitter::clone() const
 {
 
-  auto newOne = ::std::make_unique<PointParticleEmitter>();
+  auto newOne = std::make_unique<PointParticleEmitter>();
 
   return newOne;
 }

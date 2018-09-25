@@ -1,16 +1,22 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_MIX_MIX_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_MIX_MIX_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/lava/lava_material_defines.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class IAnimatable;
+class Texture;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+using TexturePtr     = std::shared_ptr<Texture>;
+
 namespace MaterialsLibrary {
 
 class MixMaterial;
-using MixMaterialPtr = shared_ptr_t<MixMaterial>;
+using MixMaterialPtr = std::shared_ptr<MixMaterial>;
 
 class BABYLON_SHARED_EXPORT MixMaterial : public PushMaterial {
 
@@ -18,8 +24,8 @@ public:
   template <typename... Ts>
   static MixMaterialPtr New(Ts&&... args)
   {
-    auto material
-      = shared_ptr_t<MixMaterial>(new MixMaterial(::std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<MixMaterial>(
+      new MixMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -35,7 +41,7 @@ public:
   std::vector<IAnimatablePtr> getAnimatables();
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,

@@ -40,7 +40,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   for (size_t i = 0; i < tessellation; ++i) {
     auto radian = (Math::PI2) * (i / (tessellation - 1));
     points.emplace_back(
-      Vector3(radius * ::std::sin(radian), 0.f, radius * ::std::cos(radian)));
+      Vector3(radius * std::sin(radian), 0.f, radius * std::cos(radian)));
   }
   auto rotationMesh
     = Mesh::CreateLines("", points, gizmoLayer->utilityLayerScene.get());
@@ -58,7 +58,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
   options.dragPlaneNormal    = planeNormal;
-  dragBehavior               = ::std::make_unique<PointerDragBehavior>(options);
+  dragBehavior               = std::make_unique<PointerDragBehavior>(options);
   dragBehavior->moveAttached = false;
   dragBehavior->maxDragAngle = Math::PI * 9.f / 20.f;
   dragBehavior->_useAlternatePickedPointAboveMaxDragAngle = true;
@@ -90,7 +90,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
             .normalize();
       auto cross = Vector3::Cross(newVector, originalVector);
       auto dot   = Vector3::Dot(newVector, originalVector);
-      auto angle = ::std::atan2(cross.length(), dot);
+      auto angle = std::atan2(cross.length(), dot);
       _planeNormalTowardsCamera.copyFrom(planeNormal);
       _localPlaneNormalTowardsCamera.copyFrom(planeNormal);
       if (updateGizmoRotationToMatchAttachedMesh) {
@@ -118,11 +118,11 @@ PlaneRotationGizmo::PlaneRotationGizmo(
       auto snapped = false;
       if (snapDistance != 0.f) {
         _currentSnapDragDistance += angle;
-        if (::std::abs(_currentSnapDragDistance) > snapDistance) {
+        if (std::abs(_currentSnapDragDistance) > snapDistance) {
           auto dragSteps
-            = ::std::floor(_currentSnapDragDistance / snapDistance);
+            = std::floor(_currentSnapDragDistance / snapDistance);
           _currentSnapDragDistance
-            = ::std::fmod(_currentSnapDragDistance, snapDistance);
+            = std::fmod(_currentSnapDragDistance, snapDistance);
           angle   = snapDistance * dragSteps;
           snapped = true;
         }
@@ -143,11 +143,11 @@ PlaneRotationGizmo::PlaneRotationGizmo(
 
       // Convert angle and axis to quaternion
       // (http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm)
-      auto quaternionCoefficient = ::std::sin(angle / 2.f);
+      auto quaternionCoefficient = std::sin(angle / 2.f);
       _amountToRotate.set(_planeNormalTowardsCamera.x * quaternionCoefficient,
                           _planeNormalTowardsCamera.y * quaternionCoefficient,
                           _planeNormalTowardsCamera.z * quaternionCoefficient,
-                          ::std::cos(angle / 2.f));
+                          std::cos(angle / 2.f));
 
       // If the meshes local scale is inverted (eg. loaded gltf file parent with
       // z scale of -1) the rotation needs to be inverted on the y axis
@@ -188,7 +188,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
         m->material = material;
         // if ((static_cast<LinesMesh*>(m))->color)
         {
-          ::std::static_pointer_cast<LinesMesh>(m)->color
+          std::static_pointer_cast<LinesMesh>(m)->color
             = material->emissiveColor;
         }
       };

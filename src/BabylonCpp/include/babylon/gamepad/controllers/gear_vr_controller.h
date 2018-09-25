@@ -52,7 +52,7 @@ public:
    */
   void initControllerMesh(
     Scene* scene,
-    const ::std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
+    const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
   /**

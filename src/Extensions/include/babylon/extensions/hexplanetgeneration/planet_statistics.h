@@ -1,7 +1,11 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_PLANET_STATISTICS_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_PLANET_STATISTICS_H
 
-#include <babylon/babylon_global.h>
+#include <limits>
+#include <map>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 namespace Extensions {
@@ -15,8 +19,8 @@ struct ValueStats {
   T min, avg, max;
   void reset()
   {
-    min = numeric_limits_t<T>::max();
-    max = numeric_limits_t<T>::lowest();
+    min = std::numeric_limits<T>::max();
+    max = std::numeric_limits<T>::lowest();
     avg = 0;
   }
 };

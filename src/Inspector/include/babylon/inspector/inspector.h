@@ -1,7 +1,9 @@
 #ifndef BABYLON_INSPECTOR_INSPECTOR_H
 #define BABYLON_INSPECTOR_INSPECTOR_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 struct GLFWwindow;
 
@@ -9,6 +11,7 @@ namespace BABYLON {
 
 class ActionStore;
 struct InspectorAction;
+class Scene;
 class Tab;
 
 class BABYLON_SHARED_EXPORT Inspector {
@@ -56,7 +59,7 @@ private:
   bool _showDockingWindow;
   int _menuHeight;
   // Tabs
-  array_t<unique_ptr_t<Tab>, 7> _tabs;
+  std::array<std::unique_ptr<Tab>, 7> _tabs;
 
 }; // end of class Inspector
 

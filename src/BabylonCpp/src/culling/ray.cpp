@@ -47,7 +47,7 @@ Ray::Ray(const Ray& otherRay)
 
 Ray::Ray(Ray&& otherRay)
 {
-  *this = ::std::move(otherRay);
+  *this = std::move(otherRay);
 }
 
 Ray& Ray::operator=(const Ray& otherRay)
@@ -70,15 +70,15 @@ Ray& Ray::operator=(const Ray& otherRay)
 Ray& Ray::operator=(Ray&& otherRay)
 {
   if (&otherRay != this) {
-    origin      = ::std::move(otherRay.origin);
-    direction   = ::std::move(otherRay.direction);
-    length      = ::std::move(otherRay.length);
-    _vectorsSet = ::std::move(otherRay._vectorsSet);
-    _edge1      = ::std::move(otherRay._edge1);
-    _edge2      = ::std::move(otherRay._edge2);
-    _pvec       = ::std::move(otherRay._pvec);
-    _tvec       = ::std::move(otherRay._tvec);
-    _qvec       = ::std::move(otherRay._qvec);
+    origin      = std::move(otherRay.origin);
+    direction   = std::move(otherRay.direction);
+    length      = std::move(otherRay.length);
+    _vectorsSet = std::move(otherRay._vectorsSet);
+    _edge1      = std::move(otherRay._edge1);
+    _edge2      = std::move(otherRay._edge2);
+    _pvec       = std::move(otherRay._pvec);
+    _tvec       = std::move(otherRay._tvec);
+    _qvec       = std::move(otherRay._qvec);
   }
 
   return *this;
@@ -90,7 +90,7 @@ Ray::~Ray()
 
 unique_ptr_t<Ray> Ray::clone() const
 {
-  return ::std::make_unique<Ray>(*this);
+  return std::make_unique<Ray>(*this);
 }
 
 std::ostream& operator<<(std::ostream& os, const Ray& ray)
@@ -109,7 +109,7 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
   float inv      = 0.f;
   float min      = 0.f;
   float max      = 0.f;
-  if (::std::abs(direction.x) < 0.0000001f) {
+  if (std::abs(direction.x) < 0.0000001f) {
     if (origin.x < minimum.x || origin.x > maximum.x) {
       return false;
     }
@@ -123,18 +123,18 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     }
 
     if (min > max) {
-      ::std::swap(min, max);
+      std::swap(min, max);
     }
 
-    d        = ::std::max(min, d);
-    maxValue = ::std::min(max, maxValue);
+    d        = std::max(min, d);
+    maxValue = std::min(max, maxValue);
 
     if (d > maxValue) {
       return false;
     }
   }
 
-  if (::std::abs(direction.y) < 0.0000001f) {
+  if (std::abs(direction.y) < 0.0000001f) {
     if (origin.y < minimum.y || origin.y > maximum.y) {
       return false;
     }
@@ -149,18 +149,18 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     }
 
     if (min > max) {
-      ::std::swap(min, max);
+      std::swap(min, max);
     }
 
-    d        = ::std::max(min, d);
-    maxValue = ::std::min(max, maxValue);
+    d        = std::max(min, d);
+    maxValue = std::min(max, maxValue);
 
     if (d > maxValue) {
       return false;
     }
   }
 
-  if (::std::abs(direction.z) < 0.0000001f) {
+  if (std::abs(direction.z) < 0.0000001f) {
     if (origin.z < minimum.z || origin.z > maximum.z) {
       return false;
     }
@@ -175,11 +175,11 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     }
 
     if (min > max) {
-      ::std::swap(min, max);
+      std::swap(min, max);
     }
 
-    d        = ::std::max(min, d);
-    maxValue = ::std::min(max, maxValue);
+    d        = std::max(min, d);
+    maxValue = std::min(max, maxValue);
 
     if (d > maxValue) {
       return false;
@@ -261,14 +261,14 @@ unique_ptr_t<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
     return nullptr;
   }
 
-  return ::std::make_unique<IntersectionInfo>(bu, bv, distance);
+  return std::make_unique<IntersectionInfo>(bu, bv, distance);
 }
 
 nullable_t<float> Ray::intersectsPlane(const Plane& plane)
 {
   float distance;
   float result1 = Vector3::Dot(plane.normal, direction);
-  if (::std::abs(result1) < 9.99999997475243E-07f) {
+  if (std::abs(result1) < 9.99999997475243E-07f) {
     return nullopt_t;
   }
   else {
@@ -297,7 +297,7 @@ PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
     Ray::TransformToRef(*this, tm, *_tmpRay);
   }
   else {
-    _tmpRay = ::std::make_unique<Ray>(Ray::Transform(*this, tm));
+    _tmpRay = std::make_unique<Ray>(Ray::Transform(*this, tm));
   }
 
   return mesh->intersects(*_tmpRay, fastCheck);
@@ -315,7 +315,7 @@ vector_t<PickingInfo> Ray::intersectsMeshes(vector_t<AbstractMesh*>& meshes,
     }
   }
 
-  ::std::sort(results.begin(), results.end(), _comparePickingInfo);
+  std::sort(results.begin(), results.end(), _comparePickingInfo);
 
   return results;
 }
@@ -403,8 +403,8 @@ float Ray::intersectionSegment(const Vector3& sega, const Vector3& segb,
     }
   }
   // finally do the division to get sc and tc
-  sc = (::std::abs(sN) < Ray::smallnum ? 0.f : sN / sD);
-  tc = (::std::abs(tN) < Ray::smallnum ? 0.f : tN / tD);
+  sc = (std::abs(sN) < Ray::smallnum ? 0.f : sN / sD);
+  tc = (std::abs(tN) < Ray::smallnum ? 0.f : tN / tD);
 
   // get the difference of the two closest points
   auto qtc = v.multiplyByFloats(tc, tc, tc);
@@ -453,7 +453,7 @@ Ray Ray::CreateNewFromTo(const Vector3& origin, const Vector3& end,
 {
   auto direction = end.subtract(origin);
   float length
-    = ::std::sqrt((direction.x * direction.x) + (direction.y * direction.y)
+    = std::sqrt((direction.x * direction.x) + (direction.y * direction.y)
                   + (direction.z * direction.z));
   direction.normalize();
 

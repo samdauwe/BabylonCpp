@@ -12,17 +12,17 @@ class TreeItem {
 
 public:
   TreeItem(Tab& tab, unique_ptr_t<AdapterType>&& adapter)
-      : _tab{tab}, _adapter{::std::move(adapter)}, _active{false}
+      : _tab{tab}, _adapter{std::move(adapter)}, _active{false}
   {
   }
 
   TreeItem(const TreeItem& treeitem) = delete;
 
   TreeItem(TreeItem&& treeitem)
-      : children(::std::move(treeitem.children))
+      : children(std::move(treeitem.children))
       , _tab(treeitem._tab)
-      , _adapter(::std::move(treeitem._adapter))
-      , _active{::std::move(treeitem._active)}
+      , _adapter(std::move(treeitem._adapter))
+      , _active{std::move(treeitem._active)}
   {
   }
 
@@ -31,10 +31,10 @@ public:
   TreeItem& operator=(TreeItem&& treeitem)
   {
     if (&treeitem != this) {
-      children = ::std::move(treeitem.children);
+      children = std::move(treeitem.children);
       _tab     = treeitem._tab;
-      _adapter = ::std::move(treeitem._adapter);
-      _active  = ::std::move(treeitem._active);
+      _adapter = std::move(treeitem._adapter);
+      _active  = std::move(treeitem._active);
     }
 
     return *this;

@@ -26,9 +26,9 @@ Vector3::Vector3(const Vector3& otherVector)
 }
 
 Vector3::Vector3(Vector3&& otherVector)
-    : x{::std::move(otherVector.x)}
-    , y{::std::move(otherVector.y)}
-    , z{::std::move(otherVector.z)}
+    : x{std::move(otherVector.x)}
+    , y{std::move(otherVector.y)}
+    , z{std::move(otherVector.z)}
 {
 }
 
@@ -50,9 +50,9 @@ Vector3& Vector3::operator=(const Vector3& otherVector)
 Vector3& Vector3::operator=(Vector3&& otherVector)
 {
   if (&otherVector != this) {
-    x = ::std::move(otherVector.x);
-    y = ::std::move(otherVector.y);
-    z = ::std::move(otherVector.z);
+    x = std::move(otherVector.x);
+    y = std::move(otherVector.y);
+    z = std::move(otherVector.z);
   }
 
   return *this;
@@ -65,7 +65,7 @@ Vector3 Vector3::copy() const
 
 unique_ptr_t<Vector3> Vector3::clone() const
 {
-  return ::std::make_unique<Vector3>(*this);
+  return std::make_unique<Vector3>(*this);
 }
 
 string_t Vector3::toString() const
@@ -337,13 +337,13 @@ Vector3& Vector3::maximizeInPlace(const Vector3& other)
 
 bool Vector3::isNonUniform() const
 {
-  const auto absX = ::std::abs(x);
-  const auto absY = ::std::abs(y);
+  const auto absX = std::abs(x);
+  const auto absY = std::abs(y);
   if (!stl_util::almost_equal(absX, absY)) {
     return true;
   }
 
-  const auto absZ = ::std::abs(z);
+  const auto absZ = std::abs(z);
   if (!stl_util::almost_equal(absX, absZ)) {
     return true;
   }
@@ -357,12 +357,12 @@ bool Vector3::isNonUniform() const
 
 Vector3 Vector3::floor() const
 {
-  return Vector3(::std::floor(x), ::std::floor(y), ::std::floor(z));
+  return Vector3(std::floor(x), std::floor(y), std::floor(z));
 }
 
 Vector3 Vector3::fract() const
 {
-  return Vector3(x - ::std::floor(x), y - ::std::floor(y), z - ::std::floor(z));
+  return Vector3(x - std::floor(x), y - std::floor(y), z - std::floor(z));
 }
 
 /** Operator overloading **/
@@ -460,7 +460,7 @@ const float& Vector3::operator[](const unsigned int index) const
 /** Properties **/
 float Vector3::length() const
 {
-  return ::std::sqrt(x * x + y * y + z * z);
+  return std::sqrt(x * x + y * y + z * z);
 }
 
 float Vector3::lengthSquared() const
@@ -549,9 +549,9 @@ float Vector3::GetAngleBetweenVectors(const Vector3& vector0,
   const auto dot = Vector3::Dot(v0, v1);
   const auto n   = Vector3::Cross(v0, v1);
   if (Vector3::Dot(n, normal) > 0.f) {
-    return ::std::acos(dot);
+    return std::acos(dot);
   }
-  return -::std::acos(dot);
+  return -std::acos(dot);
 }
 
 Vector3 Vector3::FromArray(const Float32Array& array, unsigned int offset)
@@ -947,7 +947,7 @@ Vector3 Vector3::Maximize(const Vector3& left, const Vector3& right)
 
 float Vector3::Distance(const Vector3& value1, const Vector3& value2)
 {
-  return ::std::sqrt(Vector3::DistanceSquared(value1, value2));
+  return std::sqrt(Vector3::DistanceSquared(value1, value2));
 }
 
 float Vector3::DistanceSquared(const Vector3& value1, const Vector3& value2)

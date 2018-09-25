@@ -34,17 +34,17 @@ public:
   void importMeshAsync(
     const vector_t<string_t>& meshesNames, Scene* scene,
     const Variant<string_t, ArrayBuffer>& data, const string_t& rootUrl,
-    const ::std::function<void(const vector_t<AbstractMesh*>& meshes,
+    const std::function<void(const vector_t<AbstractMesh*>& meshes,
                                const vector_t<ParticleSystem*>& particleSystems,
                                const vector_t<Skeleton*>& skeletons)>&
       onSuccess,
-    const ::std::function<void(const ProgressEvent& event)>& onProgress,
-    const ::std::function<void(const string_t& message)>& onError);
+    const std::function<void(const ProgressEvent& event)>& onProgress,
+    const std::function<void(const string_t& message)>& onError);
   void
   loadAsync(Scene* scene, const Variant<string_t, ArrayBuffer>& data,
-            const string_t& rootUrl, const ::std::function<void()>& onSuccess,
-            const ::std::function<void(const ProgressEvent& event)>& onProgress,
-            const ::std::function<void(const string_t& message)>& onError);
+            const string_t& rootUrl, const std::function<void()>& onSuccess,
+            const std::function<void(const ProgressEvent& event)>& onProgress,
+            const std::function<void(const string_t& message)>& onError);
 
 private:
   bool canDirectLoad(const string_t& data);
@@ -60,13 +60,13 @@ private:
   static string_t _decodeBufferToText(const Uint8Array& buffer);
 
 public:
-  static ::std::function<IGLTFLoader(const GLTFFileLoader& parent)>
+  static std::function<IGLTFLoader(const GLTFFileLoader& parent)>
     CreateGLTFLoaderV1;
-  static ::std::function<IGLTFLoader(const GLTFFileLoader& parent)>
+  static std::function<IGLTFLoader(const GLTFFileLoader& parent)>
     CreateGLTFLoaderV2;
 
   // Common options
-  ::std::function<void(const IGLTFLoaderData& data)> onParsed;
+  std::function<void(const IGLTFLoaderData& data)> onParsed;
 
   // V1 options
   static bool HomogeneousCoordinates;
@@ -74,15 +74,15 @@ public:
 
   // V2 options
   GLTFLoaderCoordinateSystemMode coordinateSystemMode;
-  ::std::function<void(BaseTexture* texture)> onTextureLoaded;
-  ::std::function<void(Material* material)> onMaterialLoaded;
+  std::function<void(BaseTexture* texture)> onTextureLoaded;
+  std::function<void(Material* material)> onMaterialLoaded;
 
   /**
    * Let the user decides if he needs to process the material (like
    * precompilation) before affecting it to meshes
    */
-  ::std::function<void(Material* material, AbstractMesh* targetMesh, bool isLOD,
-                       const ::std::function<void()>& callback)>
+  std::function<void(Material* material, AbstractMesh* targetMesh, bool isLOD,
+                       const std::function<void()>& callback)>
     onBeforeMaterialReadyAsync;
 
   /**
@@ -92,7 +92,7 @@ public:
    * For assets without LODs, raised when the model is complete just after
    * onSuccess.
    */
-  ::std::function<void()> onComplete;
+  std::function<void()> onComplete;
 
   string_t name;
 

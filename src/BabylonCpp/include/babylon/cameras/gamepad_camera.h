@@ -22,7 +22,7 @@ public:
   static GamepadCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<GamepadCamera>(
-      new GamepadCamera(::std::forward<Ts>(args)...));
+      new GamepadCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

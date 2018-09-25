@@ -1,5 +1,7 @@
 #include <babylon/extensions/hexplanetgeneration/icosphere.h>
 
+#include <cmath>
+
 #include <babylon/extensions/hexplanetgeneration/utils/irandom_function.h>
 #include <babylon/extensions/hexplanetgeneration/utils/tools.h>
 

@@ -1,16 +1,20 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_SKY_SKY_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_SKY_SKY_MATERIAL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materialslibrary/sky/sky_material_defines.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class IAnimatable;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+
 namespace MaterialsLibrary {
 
 class SkyMaterial;
-using SkyMaterialPtr = shared_ptr_t<SkyMaterial>;
+using SkyMaterialPtr = std::shared_ptr<SkyMaterial>;
 
 class BABYLON_SHARED_EXPORT SkyMaterial : public PushMaterial {
 
@@ -18,8 +22,8 @@ public:
   template <typename... Ts>
   static SkyMaterialPtr New(Ts&&... args)
   {
-    auto material
-      = shared_ptr_t<SkyMaterial>(new SkyMaterial(::std::forward<Ts>(args)...));
+    auto material = std::shared_ptr<SkyMaterial>(
+      new SkyMaterial(std::forward<Ts>(args)...));
     material->addMaterialToScene(material);
 
     return material;
@@ -33,7 +37,7 @@ public:
                          bool useInstances = false) override;
   void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables();
-  const string_t getClassName() const override;
+  const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,

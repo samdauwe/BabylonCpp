@@ -1,7 +1,7 @@
 #ifndef BABYLON_PHYSICS_JOINT_HINGE_JOINT_H
 #define BABYLON_PHYSICS_JOINT_HINGE_JOINT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/physics/joint/motor_enabled_joint.h>
 
 namespace BABYLON {
@@ -13,7 +13,7 @@ class BABYLON_SHARED_EXPORT HingeJoint : public MotorEnabledJoint {
 
 public:
   HingeJoint(const PhysicsJointData& jointData);
-  ~HingeJoint();
+  ~HingeJoint() override;
 
   /**
    * Set the motor values.

@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-bool Helpers::IsSystemName(const string_t& name)
+bool Helpers::IsSystemName(const std::string& name)
 {
   if (name.empty()) {
     return false;

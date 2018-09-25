@@ -1,7 +1,7 @@
 #ifndef BABYLON_PARTICLES_EMITTER_TYPES_SPHERE_DIRECTED_PARTICLE_EMITTER_H
 #define BABYLON_PARTICLES_EMITTER_TYPES_SPHERE_DIRECTED_PARTICLE_EMITTER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 #include <babylon/particles/emittertypes/sphere_particle_emitter.h>
 
@@ -45,7 +45,7 @@ public:
    * @brief Clones the current emitter and returns a copy of it
    * @returns the new emitter
    */
-  unique_ptr_t<IParticleEmitterType> clone() const override;
+  std::unique_ptr<IParticleEmitterType> clone() const override;
 
   /**
    * @brief Called by the GPUParticleSystem to setup the update shader

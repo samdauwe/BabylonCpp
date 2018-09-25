@@ -31,7 +31,7 @@ OculusTouchController::~OculusTouchController()
 }
 
 void OculusTouchController::initControllerMesh(
-  Scene* scene, const ::std::function<void(AbstractMesh* mesh)>& meshLoaded)
+  Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
 {
   std::string meshName;
 
@@ -75,7 +75,7 @@ OculusTouchController::get_onAButtonStateChangedObservable()
     return onMainButtonStateChangedObservable;
   }
   else {
-    throw ::std::runtime_error("No A button on left hand");
+    throw std::runtime_error("No A button on left hand");
   }
 }
 
@@ -86,7 +86,7 @@ OculusTouchController::get_onBButtonStateChangedObservable()
     return onSecondaryButtonStateChangedObservable;
   }
   else {
-    throw ::std::runtime_error("No B button on left hand");
+    throw std::runtime_error("No B button on left hand");
   }
 }
 
@@ -97,7 +97,7 @@ OculusTouchController::get_onXButtonStateChangedObservable()
     return onMainButtonStateChangedObservable;
   }
   else {
-    throw ::std::runtime_error("No A button on right hand");
+    throw std::runtime_error("No A button on right hand");
   }
 }
 
@@ -108,7 +108,7 @@ OculusTouchController::get_onYButtonStateChangedObservable()
     return onSecondaryButtonStateChangedObservable;
   }
   else {
-    throw ::std::runtime_error("No B button on right hand");
+    throw std::runtime_error("No B button on right hand");
   }
 }
 
@@ -119,22 +119,22 @@ void OculusTouchController::_handleButtonChange(
   auto notifyObject     = state; //{ state: state, changes: changes };
   auto triggerDirection = hand == "right" ? -1 : 1;
   auto defaultModelChildren
-    = ::std::static_pointer_cast<Node>(_defaultModel)->getChildren();
+    = std::static_pointer_cast<Node>(_defaultModel)->getChildren();
   switch (buttonIdx) {
     case 0:
       onPadStateChangedObservable.notifyObservers(&notifyObject);
       return;
     case 1: // index trigger
       if (_defaultModel) {
-        (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[3]))
+        (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[3]))
           ->rotation()
           .x
           = -notifyObject.value() * 0.20f;
-        (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[3]))
+        (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[3]))
           ->position()
           .y
           = -notifyObject.value() * 0.005f;
-        (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[3]))
+        (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[3]))
           ->position()
           .z
           = -notifyObject.value() * 0.005f;
@@ -143,7 +143,7 @@ void OculusTouchController::_handleButtonChange(
       return;
     case 2: // secondary trigger
       if (_defaultModel) {
-        (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[4]))
+        (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[4]))
           ->position()
           .x
           = triggerDirection * notifyObject.value() * 0.0035f;
@@ -153,13 +153,13 @@ void OculusTouchController::_handleButtonChange(
     case 3:
       if (_defaultModel) {
         if (notifyObject.pressed()) {
-          (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[1]))
+          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[1]))
             ->position()
             .y
             = -0.001f;
         }
         else {
-          (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[1]))
+          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[1]))
             ->position()
             .y
             = 0.f;
@@ -170,13 +170,13 @@ void OculusTouchController::_handleButtonChange(
     case 4:
       if (_defaultModel) {
         if (notifyObject.pressed()) {
-          (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
+          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
             ->position()
             .y
             = -0.001f;
         }
         else {
-          (::std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
+          (std::static_pointer_cast<AbstractMesh>(defaultModelChildren[2]))
             ->position()
             .y
             = 0.f;

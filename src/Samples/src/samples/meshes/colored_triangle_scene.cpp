@@ -42,7 +42,7 @@ void ColoredTriangleScene::initializeScene(ICanvas* canvas, Scene* scene)
   // https://doc.babylonjs.com/how_to/custom
   auto customMesh = Mesh::New("test", scene);
 
-  auto vertexData = ::std::make_unique<VertexData>();
+  auto vertexData = std::make_unique<VertexData>();
 
   vertexData->positions = {
     -1, -1, 0, // left bottom

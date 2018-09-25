@@ -1,5 +1,6 @@
 #include <babylon/extensions/hexplanetgeneration/utils/fast_simplex_noise.h>
 
+#include <babylon/babylon_constants.h>
 #include <babylon/core/random.h>
 
 namespace BABYLON {
@@ -89,10 +90,10 @@ FastSimplexNoise::FastSimplexNoise(const FastSimplexNoiseOptions& options)
   uint8_t q;
   for (int i = 255; i > 0; i--) {
     uint8_t _i = static_cast<uint8_t>(i);
-    n          = static_cast<unsigned int>(std::floor((i + 1) * Math::random()));
-    q          = p[_i];
-    p[_i]      = p[n];
-    p[n]       = q;
+    n     = static_cast<unsigned int>(std::floor((i + 1) * Math::random()));
+    q     = p[_i];
+    p[_i] = p[n];
+    p[n]  = q;
   }
 
   _perm.resize(512);

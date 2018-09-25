@@ -221,7 +221,7 @@ void SpotLight::_computeProjectionTextureProjectionLightMatrix()
 
   const auto P = light_far / (light_far - light_near);
   const auto Q = -P * light_near;
-  const auto S = 1.f / ::std::tan(_angle / 2.f);
+  const auto S = 1.f / std::tan(_angle / 2.f);
   const auto A = 1.f;
 
   Matrix::FromValuesToRef(                                    //
@@ -258,7 +258,7 @@ void SpotLight::_computeAngleValues()
 {
   _lightAngleScale
     = 1.f
-      / ::std::max(0.001f, (::std::cos(_innerAngle * 0.5f) - _cosHalfAngle));
+      / std::max(0.001f, (std::cos(_innerAngle * 0.5f) - _cosHalfAngle));
   _lightAngleOffset = -_cosHalfAngle * _lightAngleScale;
 }
 
@@ -333,7 +333,7 @@ void SpotLight::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines,
                                             unsigned int lightIndex)
 {
-  const auto lightIndexStr = ::std::to_string(lightIndex);
+  const auto lightIndexStr = std::to_string(lightIndex);
 
   defines.boolDef["SPOTLIGHT" + lightIndexStr] = true;
   defines.boolDef["PROJECTEDLIGHTTEXTURE" + lightIndexStr]

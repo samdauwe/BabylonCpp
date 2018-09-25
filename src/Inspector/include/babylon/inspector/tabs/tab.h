@@ -1,14 +1,16 @@
 #ifndef BABYLON_INSPECTOR_TABS_TAB_H
 #define BABYLON_INSPECTOR_TABS_TAB_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT Tab {
 
 public:
-  Tab(const string_t& name);
+  Tab(const std::string& name);
   virtual ~Tab();
 
   virtual void render()  = 0;
@@ -16,7 +18,7 @@ public:
 
 public:
   // The tab name displayed in the tabbar
-  string_t name;
+  std::string name;
 
 }; // end of class Tab
 

@@ -1,11 +1,22 @@
 #ifndef BABYLON_PHYSICS_HELPER_PHYSICS_UPDRAFT_EVENT_H
 #define BABYLON_PHYSICS_HELPER_PHYSICS_UPDRAFT_EVENT_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 #include <babylon/physics/helper/physics_helper_enums.h>
 
 namespace BABYLON {
+
+class EventState;
+class Mesh;
+class PhysicsEngine;
+struct PhysicsForceAndContactPoint;
+class PhysicsImpostor;
+struct PhysicsUpdraftEventData;
+class Scene;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief Updraft.
@@ -41,7 +52,7 @@ public:
   void dispose(bool force = true);
 
 private:
-  unique_ptr_t<PhysicsForceAndContactPoint>
+  std::unique_ptr<PhysicsForceAndContactPoint>
   getImpostorForceAndContactPoint(PhysicsImpostor* impostor);
 
   void _tick();
@@ -65,7 +76,7 @@ private:
   // used if the updraftMode is perpendicular
   Vector3 _originDirection;
   float _updraftMultiplier;
-  ::std::function<void(Scene* scene, EventState& es)> _tickCallback;
+  std::function<void(Scene* scene, EventState& es)> _tickCallback;
   MeshPtr _cylinder;
   // to keep the cylinders position, because normally the origin is in the
   // center and not on the bottom

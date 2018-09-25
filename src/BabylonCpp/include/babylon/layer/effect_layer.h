@@ -61,7 +61,7 @@ struct EmissiveTextureAndColor {
  * from to be customized per effects.
  */
 class BABYLON_SHARED_EXPORT EffectLayer
-    : public ::std::enable_shared_from_this<EffectLayer> {
+    : public std::enable_shared_from_this<EffectLayer> {
 
 public:
   virtual ~EffectLayer();

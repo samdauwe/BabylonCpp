@@ -13,7 +13,7 @@ AbstractTreeTool::~AbstractTreeTool()
 }
 
 AbstractTreeTool::AbstractTreeTool(AbstractTreeTool&& other)
-    : _on{::std::move(other._on)}
+    : _on{std::move(other._on)}
 {
 }
 

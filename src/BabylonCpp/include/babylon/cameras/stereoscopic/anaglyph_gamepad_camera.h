@@ -22,7 +22,7 @@ public:
   static AnaglyphGamepadCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<AnaglyphGamepadCamera>(
-      new AnaglyphGamepadCamera(::std::forward<Ts>(args)...));
+      new AnaglyphGamepadCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

@@ -33,7 +33,7 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
     effect->setTextureFromPostProcess("textureSampler", originalFromInput);
     for (size_t index = 0; index < blurSteps.size(); ++index)
       effect->setTextureFromPostProcessOutput(
-        "blurStep" + ::std::to_string(blurSteps.size() - 1), blurSteps[index]);
+        "blurStep" + std::to_string(blurSteps.size() - 1), blurSteps[index]);
   });
 
   if (!blockCompilation) {
@@ -49,14 +49,14 @@ void DepthOfFieldMergePostProcess::updateEffect(
   const string_t& defines, const vector_t<string_t>& uniforms,
   const vector_t<string_t>& samplers,
   const unordered_map_t<string_t, unsigned int>& indexParameters,
-  const ::std::function<void(Effect* effect)>& onCompiled,
-  const ::std::function<void(Effect* effect, const string_t& errors)>& onError)
+  const std::function<void(Effect* effect)>& onCompiled,
+  const std::function<void(Effect* effect, const string_t& errors)>& onError)
 {
   auto _defines = defines;
   if (!defines.empty()) {
     _defines = "";
     _defines
-      += "#define BLUR_LEVEL " + ::std::to_string(blurSteps.size() - 1) + "\n";
+      += "#define BLUR_LEVEL " + std::to_string(blurSteps.size() - 1) + "\n";
   }
   PostProcess::updateEffect(_defines, uniforms, samplers, indexParameters,
                             onCompiled, onError);

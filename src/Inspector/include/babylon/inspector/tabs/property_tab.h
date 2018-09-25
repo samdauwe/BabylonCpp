@@ -1,7 +1,9 @@
 #ifndef BABYLON_INSPECTOR_TABS_PROPERTY_TAB_H
 #define BABYLON_INSPECTOR_TABS_PROPERTY_TAB_H
 
-#include <babylon/babylon_global.h>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/inspector/tabs/tab.h>
 
 namespace BABYLON {
@@ -19,7 +21,7 @@ class TreeItem;
 class BABYLON_SHARED_EXPORT PropertyTab : public Tab {
 
 public:
-  PropertyTab(const string_t& name, Inspector& inspector);
+  PropertyTab(const std::string& name, Inspector& inspector);
   ~PropertyTab() override;
 
   void render() override;

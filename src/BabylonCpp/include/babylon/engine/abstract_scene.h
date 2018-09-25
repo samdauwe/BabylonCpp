@@ -89,7 +89,7 @@ using IndividualBabylonFileParser = std::function<any(
  * coupling
  */
 class BABYLON_SHARED_EXPORT AbstractScene
-    : public ::std::enable_shared_from_this<AbstractScene> {
+    : public std::enable_shared_from_this<AbstractScene> {
 
 public:
   /**

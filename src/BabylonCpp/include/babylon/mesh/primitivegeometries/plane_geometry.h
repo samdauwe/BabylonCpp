@@ -21,7 +21,7 @@ public:
   static PlaneGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<PlaneGeometry>(
-      new PlaneGeometry(::std::forward<Ts>(args)...));
+      new PlaneGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

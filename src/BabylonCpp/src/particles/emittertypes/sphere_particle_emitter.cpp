@@ -46,19 +46,19 @@ void SphereParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   const auto randRadius = radius - Scalar::RandomRange(0, radius * radiusRange);
   const auto v          = Scalar::RandomRange(0.f, 1.f);
   const auto phi        = Scalar::RandomRange(0.f, Math::PI2);
-  const auto theta      = ::std::acos(2.f * v - 1.f);
+  const auto theta      = std::acos(2.f * v - 1.f);
 
-  const auto randX = randRadius * ::std::cos(phi) * ::std::sin(theta);
-  const auto randY = randRadius * ::std::cos(theta);
-  const auto randZ = randRadius * ::std::sin(phi) * ::std::sin(theta);
+  const auto randX = randRadius * std::cos(phi) * std::sin(theta);
+  const auto randY = randRadius * std::cos(theta);
+  const auto randZ = randRadius * std::sin(phi) * std::sin(theta);
   Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix,
                                                positionToUpdate);
 }
 
-unique_ptr_t<IParticleEmitterType> SphereParticleEmitter::clone() const
+std::unique_ptr<IParticleEmitterType> SphereParticleEmitter::clone() const
 {
   auto newOne
-    = ::std::make_unique<SphereParticleEmitter>(radius, directionRandomizer);
+    = std::make_unique<SphereParticleEmitter>(radius, directionRandomizer);
 
   return newOne;
 }

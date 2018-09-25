@@ -1,7 +1,10 @@
 #ifndef BABYLON_INSPECTOR_TABS_LOGS_TAB_H
 #define BABYLON_INSPECTOR_TABS_LOGS_TAB_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/inspector/tabs/tab.h>
 
 namespace BABYLON {

@@ -53,7 +53,7 @@ TEST(TestColor4, FromHexString)
   using namespace BABYLON;
 
   // Red
-  ::std::string hex{"#FF000000"};
+  std::string hex{"#FF000000"};
   Color4 color4 = Color4::FromHexString(hex);
   EXPECT_FLOAT_EQ(1.f, color4.r);
   EXPECT_FLOAT_EQ(0.f, color4.g);
@@ -61,7 +61,7 @@ TEST(TestColor4, FromHexString)
   EXPECT_FLOAT_EQ(0.f, color4.a);
 
   // Green
-  hex    = ::std::string{"#00FF0000"};
+  hex    = std::string{"#00FF0000"};
   color4 = Color4::FromHexString(hex);
   EXPECT_FLOAT_EQ(0.f, color4.r);
   EXPECT_FLOAT_EQ(1.f, color4.g);
@@ -69,14 +69,14 @@ TEST(TestColor4, FromHexString)
   EXPECT_FLOAT_EQ(0.f, color4.a);
 
   // Blue
-  hex    = ::std::string{"#0000FF00"};
+  hex    = std::string{"#0000FF00"};
   color4 = Color4::FromHexString(hex);
   EXPECT_FLOAT_EQ(0.f, color4.r);
   EXPECT_FLOAT_EQ(0.f, color4.g);
   EXPECT_FLOAT_EQ(1.f, color4.b);
   EXPECT_FLOAT_EQ(0.f, color4.a);
 
-  hex    = ::std::string{"#000000FF"};
+  hex    = std::string{"#000000FF"};
   color4 = Color4::FromHexString(hex);
   EXPECT_FLOAT_EQ(0.f, color4.r);
   EXPECT_FLOAT_EQ(0.f, color4.g);

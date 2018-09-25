@@ -35,7 +35,7 @@ void CameraTab::_buildTree()
   _cameras.clear();
   for (const auto& camera : scene->cameras) {
     _cameras.emplace_back(TreeItem<CameraAdapter>{
-      *this, ::std::make_unique<CameraAdapter>(camera)});
+      *this, std::make_unique<CameraAdapter>(camera)});
   }
 
   // Set initialized flag

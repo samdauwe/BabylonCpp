@@ -1,9 +1,14 @@
 #ifndef BABYLON_STENCIL_STATE_H
 #define BABYLON_STENCIL_STATE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+namespace GL {
+class IGLRenderingContext;
+} // end of namespace GL
 
 class BABYLON_SHARED_EXPORT _StencilState {
 

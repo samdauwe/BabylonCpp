@@ -23,7 +23,7 @@ BABYLON::CSG::Plane::Plane(const BABYLON::CSG::Plane& otherPlane)
 
 BABYLON::CSG::Plane::Plane(BABYLON::CSG::Plane&& otherPlane)
 {
-  *this = ::std::move(otherPlane);
+  *this = std::move(otherPlane);
 }
 
 BABYLON::CSG::Plane& BABYLON::CSG::Plane::
@@ -41,8 +41,8 @@ BABYLON::CSG::Plane& BABYLON::CSG::Plane::
 operator=(BABYLON::CSG::Plane&& otherPlane)
 {
   if (&otherPlane != this) {
-    normal = ::std::move(otherPlane.normal);
-    w      = ::std::move(otherPlane.w);
+    normal = std::move(otherPlane.normal);
+    w      = std::move(otherPlane.w);
   }
 
   return *this;
@@ -59,7 +59,7 @@ CSG::Plane CSG::Plane::clone() const
 
 unique_ptr_t<CSG::Plane> CSG::Plane::cloneToNewObject() const
 {
-  return ::std::make_unique<BABYLON::CSG::Plane>(*this);
+  return std::make_unique<BABYLON::CSG::Plane>(*this);
 }
 
 namespace CSG {

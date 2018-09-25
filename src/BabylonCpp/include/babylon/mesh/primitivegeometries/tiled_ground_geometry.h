@@ -21,7 +21,7 @@ public:
   static TiledGroundGeometryPtr New(Ts&&... args)
   {
     auto mesh = std::shared_ptr<TiledGroundGeometry>(
-      new TiledGroundGeometry(::std::forward<Ts>(args)...));
+      new TiledGroundGeometry(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;

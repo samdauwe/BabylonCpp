@@ -1,11 +1,15 @@
 #ifndef BABYLON_EXTENSIONS_EDIT_CONTROL_ACT_H
 #define BABYLON_EXTENSIONS_EDIT_CONTROL_ACT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+
 namespace Extensions {
 
 class Act {

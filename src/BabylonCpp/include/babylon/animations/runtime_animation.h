@@ -28,7 +28,7 @@ public:
   static RuntimeAnimationPtr New(Ts&&... args)
   {
     auto animation = std::shared_ptr<RuntimeAnimation>(
-      new RuntimeAnimation(::std::forward<Ts>(args)...));
+      new RuntimeAnimation(std::forward<Ts>(args)...));
     animation->addToRuntimeAnimations(animation);
 
     return animation;

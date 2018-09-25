@@ -1,7 +1,9 @@
 #ifndef BABYLON_TOOLS_FACTOR_GRADIENT_H
 #define BABYLON_TOOLS_FACTOR_GRADIENT_H
 
-#include <babylon/babylon_global.h>
+#include <optional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/tools/ivalue_gradient.h>
 
 namespace BABYLON {
@@ -22,7 +24,7 @@ struct BABYLON_SHARED_EXPORT FactorGradient : public IValueGradient {
   /**
    * Gets or sets second associated factor
    */
-  nullable_t<float> factor2;
+  std::optional<float> factor2;
 
   /**
    * Will get a number picked randomly between factor1 and factor2.

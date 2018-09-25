@@ -14,7 +14,7 @@ namespace BABYLON {
 PhotoDome::PhotoDome(
   std::string iName, const std::string& urlOfPhoto, PhotoDomeOptions options,
   Scene* scene,
-  const ::std::function<void(const std::string& message)>& /*onError*/)
+  const std::function<void(const std::string& message)>& /*onError*/)
     : TransformNode{iName, scene}
     , photoTexture{this, &PhotoDome::get_photoTexture,
                    &PhotoDome::set_photoTexture}

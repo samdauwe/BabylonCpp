@@ -1,7 +1,10 @@
 #ifndef BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_HEIGHTMAP_H
 #define BABYLON_EXTENSIONS_HEX_PLANET_GENERATION_TERRAIN_HEIGHTMAP_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 namespace Extensions {

@@ -23,7 +23,7 @@ public:
   static AnaglyphArcRotateCameraPtr New(Ts&&... args)
   {
     auto camera = std::shared_ptr<AnaglyphArcRotateCamera>(
-      new AnaglyphArcRotateCamera(::std::forward<Ts>(args)...));
+      new AnaglyphArcRotateCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;

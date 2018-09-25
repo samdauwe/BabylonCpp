@@ -11,9 +11,9 @@
 namespace BABYLON {
 
 unique_ptr_t<Vector3> TransformNode::_lookAtVectorCache
-  = ::std::make_unique<Vector3>(0.f, 0.f, 0.f);
+  = std::make_unique<Vector3>(0.f, 0.f, 0.f);
 unique_ptr_t<Quaternion> TransformNode::_rotationAxisCache
-  = ::std::make_unique<Quaternion>();
+  = std::make_unique<Quaternion>();
 
 TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     : Node{name, scene}
@@ -21,8 +21,8 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , scalingDeterminant{1.f}
     , infiniteDistance{false}
     , ignoreNonUniformScaling{false}
-    , _poseMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
-    , _worldMatrix{::std::make_unique<Matrix>(Matrix::Zero())}
+    , _poseMatrix{std::make_unique<Matrix>(Matrix::Zero())}
+    , _worldMatrix{std::make_unique<Matrix>(Matrix::Zero())}
     , _worldMatrixDeterminant{0.f}
 
     , position{this, &TransformNode::get_position, &TransformNode::set_position}
@@ -265,7 +265,7 @@ TransformNode& TransformNode::setPivotMatrix(Matrix& matrix,
   if (_postMultiplyPivotMatrix) {
     if (!_pivotMatrixInverse) {
       _pivotMatrixInverse
-        = ::std::make_unique<Matrix>(Matrix::Invert(_pivotMatrix));
+        = std::make_unique<Matrix>(Matrix::Invert(_pivotMatrix));
     }
     else {
       _pivotMatrix.invertToRef(*_pivotMatrixInverse);
@@ -366,9 +366,9 @@ TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor,
   auto& dv = *TransformNode::_lookAtVectorCache;
   auto pos = (space == Space::LOCAL) ? position : getAbsolutePosition();
   targetPoint.subtractToRef(pos, dv);
-  auto yaw   = -::std::atan2(dv.z, dv.x) - Math::PI_2;
-  auto len   = ::std::sqrt(dv.x * dv.x + dv.z * dv.z);
-  auto pitch = ::std::atan2(dv.y, len);
+  auto yaw   = -std::atan2(dv.z, dv.x) - Math::PI_2;
+  auto len   = std::sqrt(dv.x * dv.x + dv.z * dv.z);
+  auto pitch = std::atan2(dv.y, len);
   if (rotationQuaternion()) {
     Quaternion::RotationYawPitchRollToRef(yaw + yawCor, pitch + pitchCor,
                                           rollCor, *rotationQuaternion());
@@ -743,17 +743,17 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
       auto finalEuler = Tmp::Vector3Array[4].copyFromFloats(0.f, 0.f, 0.f);
       if ((billboardMode & TransformNode::BILLBOARDMODE_X)
           == TransformNode::BILLBOARDMODE_X) {
-        finalEuler.x = ::std::atan2(-currentPosition.y, currentPosition.z);
+        finalEuler.x = std::atan2(-currentPosition.y, currentPosition.z);
       }
 
       if ((billboardMode & TransformNode::BILLBOARDMODE_Y)
           == TransformNode::BILLBOARDMODE_Y) {
-        finalEuler.y = ::std::atan2(currentPosition.x, currentPosition.z);
+        finalEuler.y = std::atan2(currentPosition.x, currentPosition.z);
       }
 
       if ((billboardMode & TransformNode::BILLBOARDMODE_Z)
           == TransformNode::BILLBOARDMODE_Z) {
-        finalEuler.z = ::std::atan2(currentPosition.y, currentPosition.x);
+        finalEuler.z = std::atan2(currentPosition.y, currentPosition.x);
       }
 
       Matrix::RotationYawPitchRollToRef(finalEuler.y, finalEuler.x,
@@ -842,7 +842,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force)
   onAfterWorldMatrixUpdateObservable.notifyObservers(this);
 
   if (!_poseMatrix) {
-    _poseMatrix = ::std::make_unique<Matrix>(Matrix::Invert(*_worldMatrix));
+    _poseMatrix = std::make_unique<Matrix>(Matrix::Invert(*_worldMatrix));
   }
 
   // Cache the determinant
@@ -856,14 +856,14 @@ void TransformNode::_afterComputeWorldMatrix()
 }
 
 TransformNode& TransformNode::registerAfterWorldMatrixUpdate(
-  const ::std::function<void(TransformNode* mesh, EventState& es)>& func)
+  const std::function<void(TransformNode* mesh, EventState& es)>& func)
 {
   onAfterWorldMatrixUpdateObservable.add(func);
   return *this;
 }
 
 TransformNode& TransformNode::unregisterAfterWorldMatrixUpdate(
-  const ::std::function<void(TransformNode* mesh, EventState& es)>& func)
+  const std::function<void(TransformNode* mesh, EventState& es)>& func)
 {
   onAfterWorldMatrixUpdateObservable.removeCallback(func);
   return *this;

@@ -84,7 +84,7 @@ float AutoRotationBehavior::get_idleRotationSpinupTime() const
 
 bool AutoRotationBehavior::get_rotationInProgress() const
 {
-  return ::std::abs(_cameraRotationSpeed) > 0.f;
+  return std::abs(_cameraRotationSpeed) > 0.f;
 }
 
 void AutoRotationBehavior::init()
@@ -114,7 +114,7 @@ void AutoRotationBehavior::attach(const ArcRotateCameraPtr& camera)
         auto now = Time::highresTimepointNow();
         auto dt  = 0.f;
         if (_lastFrameTime.has_value()) {
-          dt = Time::fpTimeDiff<float, ::std::milli>(now, *_lastFrameTime);
+          dt = Time::fpTimeDiff<float, std::milli>(now, *_lastFrameTime);
         }
         _lastFrameTime = now;
 
@@ -123,10 +123,10 @@ void AutoRotationBehavior::attach(const ArcRotateCameraPtr& camera)
         _applyUserInteraction();
 
         float timeToRotation
-          = Time::fpTimeDiff<float, ::std::milli>(now, _lastInteractionTime)
+          = Time::fpTimeDiff<float, std::milli>(now, _lastInteractionTime)
             - _idleRotationWaitTime;
-        float scale = ::std::max(
-          ::std::min(timeToRotation / (_idleRotationSpinupTime), 1.f), 0.f);
+        float scale = std::max(
+          std::min(timeToRotation / (_idleRotationSpinupTime), 1.f), 0.f);
         _cameraRotationSpeed = _idleRotationSpeed * scale;
 
         // Step camera rotation by rotation speed

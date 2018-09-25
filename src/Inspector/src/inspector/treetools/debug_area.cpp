@@ -17,7 +17,7 @@ DebugArea::~DebugArea()
 }
 
 DebugArea::DebugArea(DebugArea&& other)
-    : AbstractTreeTool{std::move(other)}, _obj{::std::move(other._obj)}
+    : AbstractTreeTool{std::move(other)}, _obj{std::move(other._obj)}
 {
 }
 

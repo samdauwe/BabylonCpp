@@ -18,9 +18,9 @@ Condition::Condition(const Condition& other)
 }
 
 Condition::Condition(Condition&& other)
-    : _actionManager{::std::move(other._actionManager)}
-    , _evaluationId{::std::move(other._evaluationId)}
-    , _currentResult{::std::move(other._currentResult)}
+    : _actionManager{std::move(other._actionManager)}
+    , _evaluationId{std::move(other._evaluationId)}
+    , _currentResult{std::move(other._currentResult)}
 {
 }
 
@@ -38,9 +38,9 @@ Condition& Condition::operator=(const Condition& other)
 Condition& Condition::operator=(Condition&& other)
 {
   if (&other != this) {
-    _actionManager = ::std::move(other._actionManager);
-    _evaluationId  = ::std::move(other._evaluationId);
-    _currentResult = ::std::move(other._currentResult);
+    _actionManager = std::move(other._actionManager);
+    _evaluationId  = std::move(other._evaluationId);
+    _currentResult = std::move(other._currentResult);
   }
 
   return *this;

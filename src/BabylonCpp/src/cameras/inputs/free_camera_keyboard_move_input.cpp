@@ -48,15 +48,15 @@ void FreeCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
 
       if (info->type == KeyboardEventTypes::KEYDOWN) {
         const int keyCode = evt.keyCode;
-        if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-            || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+        if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+            || (std::find(keysDown.begin(), keysDown.end(), keyCode)
                 != keysDown.end())
-            || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+            || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
                 != keysLeft.end())
-            || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+            || (std::find(keysRight.begin(), keysRight.end(), keyCode)
                 != keysRight.end())) {
 
-          if (::std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
+          if (std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
             _keys.emplace_back(keyCode);
           }
 
@@ -67,15 +67,15 @@ void FreeCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
       }
       else {
         const int keyCode = evt.keyCode;
-        if ((::std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-            || (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+        if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+            || (std::find(keysDown.begin(), keysDown.end(), keyCode)
                 != keysDown.end())
-            || (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+            || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
                 != keysLeft.end())
-            || (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+            || (std::find(keysRight.begin(), keysRight.end(), keyCode)
                 != keysRight.end())) {
 
-          _keys.erase(::std::remove(_keys.begin(), _keys.end(), keyCode),
+          _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode),
                       _keys.end());
 
           if (!_noPreventDefault) {
@@ -108,19 +108,19 @@ void FreeCameraKeyboardMoveInput::checkInputs()
     for (const auto& keyCode : _keys) {
       const auto speed = camera->_computeLocalCameraSpeed();
 
-      if (::std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+      if (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
           != keysLeft.end()) {
         camera->_localDirection->copyFromFloats(-speed, 0.f, 0.f);
       }
-      else if (::std::find(keysUp.begin(), keysUp.end(), keyCode)
+      else if (std::find(keysUp.begin(), keysUp.end(), keyCode)
                != keysUp.end()) {
         camera->_localDirection->copyFromFloats(0.f, 0.f, speed);
       }
-      else if (::std::find(keysRight.begin(), keysRight.end(), keyCode)
+      else if (std::find(keysRight.begin(), keysRight.end(), keyCode)
                != keysRight.end()) {
         camera->_localDirection->copyFromFloats(speed, 0.f, 0.f);
       }
-      else if (::std::find(keysDown.begin(), keysDown.end(), keyCode)
+      else if (std::find(keysDown.begin(), keysDown.end(), keyCode)
                != keysDown.end()) {
         camera->_localDirection->copyFromFloats(0.f, 0.f, -speed);
       }

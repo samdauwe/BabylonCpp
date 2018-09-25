@@ -31,13 +31,13 @@ void CylinderParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
   auto randY = Scalar::RandomRange(-directionRandomizer / 2.f,
                                    directionRandomizer / 2.f);
 
-  auto angle = ::std::atan2(direction.x, direction.z);
+  auto angle = std::atan2(direction.x, direction.z);
   angle += Scalar::RandomRange(-Math::PI_2, Math::PI_2) * directionRandomizer;
 
   direction.y
     = randY; // set direction y to rand y to mirror normal of cylinder surface
-  direction.x = ::std::sin(angle);
-  direction.z = ::std::cos(angle);
+  direction.x = std::sin(angle);
+  direction.z = std::cos(angle);
   direction.normalize();
 
   Vector3::TransformNormalFromFloatsToRef(direction.x, direction.y, direction.z,
@@ -55,18 +55,18 @@ void CylinderParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   // https://programming.guide/random-point-within-circle.html
   auto radiusDistribution
     = Scalar::RandomRange((1.f - radiusRange) * (1.f - radiusRange), 1.f);
-  auto positionRadius = ::std::sqrt(radiusDistribution) * radius;
-  auto xPos           = positionRadius * ::std::cos(angle);
-  auto zPos           = positionRadius * ::std::sin(angle);
+  auto positionRadius = std::sqrt(radiusDistribution) * radius;
+  auto xPos           = positionRadius * std::cos(angle);
+  auto zPos           = positionRadius * std::sin(angle);
 
   Vector3::TransformCoordinatesFromFloatsToRef(xPos, yPos, zPos, worldMatrix,
                                                positionToUpdate);
 }
 
-unique_ptr_t<IParticleEmitterType> CylinderParticleEmitter::clone() const
+std::unique_ptr<IParticleEmitterType> CylinderParticleEmitter::clone() const
 {
   auto newOne
-    = ::std::make_unique<CylinderParticleEmitter>(radius, directionRandomizer);
+    = std::make_unique<CylinderParticleEmitter>(radius, directionRandomizer);
 
   return newOne;
 }

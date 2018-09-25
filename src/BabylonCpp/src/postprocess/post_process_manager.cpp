@@ -34,7 +34,7 @@ void PostProcessManager::_prepareBuffers()
     1.f,  -1.f  //
   };
   _vertexBuffers[VertexBuffer::PositionKindChars]
-    = ::std::make_unique<VertexBuffer>(
+    = std::make_unique<VertexBuffer>(
       _scene->getEngine(), ToVariant<Float32Array, Buffer*>(vertices),
       VertexBuffer::PositionKind, false, false, 2);
   _vertexBufferPtrs[VertexBuffer::PositionKindChars]

@@ -52,7 +52,7 @@ PointerDragBehavior::PointerDragBehavior(
     ++optionCount;
   }
   if (optionCount > 1) {
-    throw ::std::runtime_error(
+    throw std::runtime_error(
       "Multiple drag modes specified in dragBehavior options. Only one "
       "expected");
   }
@@ -148,13 +148,13 @@ void PointerDragBehavior::attach(const NodePtr& ownerNode)
       if (_moving && moveAttached) {
         // Slowly move mesh to avoid jitter
         _targetPosition.subtractToRef(
-          ::std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition(),
+          std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition(),
           _tmpVector);
         _tmpVector.scaleInPlace(dragDeltaRatio);
-        ::std::static_pointer_cast<Mesh>(_attachedNode)
+        std::static_pointer_cast<Mesh>(_attachedNode)
           ->getAbsolutePosition()
           .addToRef(_tmpVector, _tmpVector);
-        ::std::static_pointer_cast<Mesh>(_attachedNode)
+        std::static_pointer_cast<Mesh>(_attachedNode)
           ->setAbsolutePosition(_tmpVector);
       }
     });
@@ -290,7 +290,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const nullable_t<Ray>& ray)
 
   // Calculate angle between plane normal and ray
   auto angle
-    = ::std::acos(Vector3::Dot(_dragPlane->forward(), (*ray).direction));
+    = std::acos(Vector3::Dot(_dragPlane->forward(), (*ray).direction));
   // Correct if ray is casted from oposite side
   if (angle > Math::PI_2) {
     angle = Math::PI - angle;
@@ -302,7 +302,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const nullable_t<Ray>& ray)
     if (_useAlternatePickedPointAboveMaxDragAngle) {
       // Invert ray direction along the towards object axis
       _tmpVector.copyFrom((*ray).direction);
-      ::std::static_pointer_cast<Mesh>(_attachedNode)
+      std::static_pointer_cast<Mesh>(_attachedNode)
         ->absolutePosition()
         .subtractToRef((*ray).origin, _alternatePickedPoint);
       _alternatePickedPoint.normalize();
@@ -316,7 +316,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const nullable_t<Ray>& ray)
       _dragPlane->forward().scaleToRef(-dot, _alternatePickedPoint);
       _alternatePickedPoint.addInPlace(_tmpVector);
       _alternatePickedPoint.addInPlace(
-        ::std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition());
+        std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition());
       return _alternatePickedPoint;
     }
     else {

@@ -1,7 +1,7 @@
 #ifndef BABYLON_PROCEDURAL_TEXTURES_LIBRARY_PERLIN_NOISE_PERLIN_NOISE_PROCEDURAL_TEXTURE_H
 #define BABYLON_PROCEDURAL_TEXTURES_LIBRARY_PERLIN_NOISE_PERLIN_NOISE_PROCEDURAL_TEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
 namespace BABYLON {
@@ -15,9 +15,9 @@ public:
   static PerlinNoiseProceduralTexture* New(Ts&&... args)
   {
     auto texture
-      = new PerlinNoiseProceduralTexture(::std::forward<Ts>(args)...);
+      = new PerlinNoiseProceduralTexture(std::forward<Ts>(args)...);
     texture->addToScene(
-      static_cast<unique_ptr_t<PerlinNoiseProceduralTexture>>(texture));
+      static_cast<std::unique_ptr<PerlinNoiseProceduralTexture>>(texture));
 
     return texture;
   }
@@ -42,9 +42,9 @@ public:
    * texture information
    * @returns a parsed Perlin Noise Procedural Texture
    */
-  static unique_ptr_t<PerlinNoiseProceduralTexture>
+  static std::unique_ptr<PerlinNoiseProceduralTexture>
   Parse(const Json::value& parsedTexture, Scene* scene,
-        const string_t& rootUrl);
+        const std::string& rootUrl);
 
   PerlinNoiseProceduralTexture(const std::string& name, const Size& size,
                                Scene* scene, Texture* fallbackTexture = nullptr,
