@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_SHADER_BUILDER_SHADER_MATERIAL_HELPER_STATICS_H
 #define BABYLON_EXTENSIONS_SHADER_BUILDER_SHADER_MATERIAL_HELPER_STATICS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace Extensions {

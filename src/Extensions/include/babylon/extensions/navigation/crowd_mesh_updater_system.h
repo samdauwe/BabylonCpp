@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_NAVIGATION_CROWD_MESH_UPDATER_SYSTEM_H
 #define BABYLON_EXTENSIONS_NAVIGATION_CROWD_MESH_UPDATER_SYSTEM_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/entitycomponentsystem/system.h>
 #include <babylon/extensions/navigation/crowd_agent.h>
 #include <babylon/extensions/navigation/crowd_mesh.h>

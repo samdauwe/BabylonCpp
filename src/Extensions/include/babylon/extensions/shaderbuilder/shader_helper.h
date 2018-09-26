@@ -1,7 +1,10 @@
 #ifndef BABYLON_EXTENSIONS_SHADER_BUILDER_SHADER_HELPER_H
 #define BABYLON_EXTENSIONS_SHADER_BUILDER_SHADER_HELPER_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace Extensions {

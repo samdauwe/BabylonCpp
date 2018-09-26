@@ -97,7 +97,7 @@ void CrowdSimulation::addObstacleByBoundingBox(const AbstractMeshPtr& mesh,
 
   // Add (polygonal) obstacle, specifying the vertices in counterclockwise
   // order.
-  const vector_t<RVO2::Vector2> obstacle{
+  const std::vector<RVO2::Vector2> obstacle{
     RVO2::Vector2(max.x, max.z), //
     RVO2::Vector2(min.x, max.z), //
     RVO2::Vector2(min.x, min.z), //

@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_SHADER_BUILDER_IREFLECT_MAP_H
 #define BABYLON_EXTENSIONS_SHADER_BUILDER_IREFLECT_MAP_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/shaderbuilder/ivector3.h>
 
 namespace BABYLON {

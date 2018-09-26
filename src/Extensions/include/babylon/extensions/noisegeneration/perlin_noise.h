@@ -1,7 +1,10 @@
 #ifndef BABYLON_EXTENSIONS_NOISE_GENERATION_PERLIN_NOISE_H
 #define BABYLON_EXTENSIONS_NOISE_GENERATION_PERLIN_NOISE_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
 namespace Extensions {

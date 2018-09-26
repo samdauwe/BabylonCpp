@@ -1,10 +1,16 @@
 #ifndef BABYLON_EXTENSIONS_NAVIGATION_MESH_NAVIGATION_H
 #define BABYLON_EXTENSIONS_NAVIGATION_MESH_NAVIGATION_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/navigationmesh/navigation_structs.h>
 
 namespace BABYLON {
+
+class Geometry;
+class Mesh;
+
 namespace Extensions {
 
 /**

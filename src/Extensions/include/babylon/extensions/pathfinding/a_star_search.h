@@ -1,7 +1,12 @@
 #ifndef BABYLON_EXTENSIONS_PATH_FINDING_A_STAR_SEARCH_H
 #define BABYLON_EXTENSIONS_PATH_FINDING_A_STAR_SEARCH_H
 
-#include <babylon/babylon_global.h>
+#include <algorithm>
+#include <queue>
+#include <unordered_map>
+#include <utility>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace Extensions {

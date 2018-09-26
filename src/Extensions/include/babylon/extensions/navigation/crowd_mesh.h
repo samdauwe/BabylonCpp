@@ -1,10 +1,16 @@
 #ifndef BABYLON_EXTENSIONS_NAVIGATION_CROWD_MESH_H
 #define BABYLON_EXTENSIONS_NAVIGATION_CROWD_MESH_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/entitycomponentsystem/component.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+
 namespace Extensions {
 
 /**

@@ -1,7 +1,8 @@
 #ifndef BABYLON_EXTENSIONS_NAVIGATION_CROWD_ROADMAP_VERTEX_H
 #define BABYLON_EXTENSIONS_NAVIGATION_CROWD_ROADMAP_VERTEX_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/extensions/navigation/rvo2/vector2.h>
 
 namespace BABYLON {

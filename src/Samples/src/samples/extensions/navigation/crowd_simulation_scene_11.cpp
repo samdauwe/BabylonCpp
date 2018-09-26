@@ -91,7 +91,7 @@ void CrowdSimulationScene11::setupScenario(Scene* scene)
   }
 
   // Create obstacles
-  const vector_t<Vector3> boxPositions{
+  const std::vector<Vector3> boxPositions{
     // Left boxes
     Vector3(150.f, 0.f, 29.f),   //
     Vector3(150.f, 0.f, -29.f),  //
@@ -111,7 +111,7 @@ void CrowdSimulationScene11::setupScenario(Scene* scene)
     Vector3(-213.5f + 50.f, 0.f, -55.f)  //
   };
 
-  const vector_t<Vector3> scalings{
+  const std::vector<Vector3> scalings{
     // Left boxes
     Vector3(5.f, 10.f, 52.f),  //
     Vector3(5.f, 10.f, 52.f),  //
@@ -138,7 +138,7 @@ void CrowdSimulationScene11::setupScenario(Scene* scene)
   }
 
   // Add waypoints
-  const vector_t<Vector2> wayPoints{
+  const std::vector<Vector2> wayPoints{
     Vector2(140.f, 0.f),           //
     Vector2(160.f, 0.f),           //
     Vector2(205.f, -65.f),         //

@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_NAVIGATION_MESH_CHANNEL_H
 #define BABYLON_EXTENSIONS_NAVIGATION_MESH_CHANNEL_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/navigationmesh/navigation_structs.h>
 #include <babylon/math/vector3.h>
 

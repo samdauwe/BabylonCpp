@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_POLYHEDRON_POLYHEDRA_H
 #define BABYLON_EXTENSIONS_POLYHEDRON_POLYHEDRA_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 
 namespace BABYLON {

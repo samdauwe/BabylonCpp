@@ -1,10 +1,17 @@
 #ifndef BABYLON_EXTENSIONS_TREE_GENERATORS_SPS_TREE_GENERATOR_H
 #define BABYLON_EXTENSIONS_TREE_GENERATORS_SPS_TREE_GENERATOR_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class Material;
+class Mesh;
+class Scene;
+using MaterialPtr = std::shared_ptr<Material>;
+using MeshPtr     = std::shared_ptr<Mesh>;
+
 namespace Extensions {
 
 struct CoordSystem {

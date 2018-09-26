@@ -1,9 +1,17 @@
 #ifndef BABYLON_EXTENSIONS_NOISE_GENERATION_SIMPLEX_NOISE_H
 #define BABYLON_EXTENSIONS_NOISE_GENERATION_SIMPLEX_NOISE_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Vector2;
+class Vector3;
+class Vector4;
+
 namespace Extensions {
 
 /**

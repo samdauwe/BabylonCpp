@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_SHADER_BUILDER_IRANGE_H
 #define BABYLON_EXTENSIONS_SHADER_BUILDER_IRANGE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace Extensions {

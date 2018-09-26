@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_SHADER_BUILDER_IVECTOR3_H
 #define BABYLON_EXTENSIONS_SHADER_BUILDER_IVECTOR3_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace Extensions {

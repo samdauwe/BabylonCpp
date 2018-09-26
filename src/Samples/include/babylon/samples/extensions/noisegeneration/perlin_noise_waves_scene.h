@@ -7,6 +7,7 @@
 namespace BABYLON {
 
 class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 namespace Samples {
 

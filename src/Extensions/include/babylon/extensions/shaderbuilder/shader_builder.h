@@ -1,10 +1,19 @@
 #ifndef BABYLON_EXTENSIONS_SHADER_BUILDER_SHADER_BUILDER_H
 #define BABYLON_EXTENSIONS_SHADER_BUILDER_SHADER_BUILDER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/shaderbuilder/shader_setting.h>
 
 namespace BABYLON {
+
+class Camera;
+class Material;
+class PostProcess;
+class Scene;
+class ShaderMaterial;
+
 namespace Extensions {
 
 struct IColor;

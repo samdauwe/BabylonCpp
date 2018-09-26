@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_NAVIGATION_CROWD_AGENT_H
 #define BABYLON_EXTENSIONS_NAVIGATION_CROWD_AGENT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/entitycomponentsystem/component.h>
 #include <babylon/extensions/navigation/crowd_roadmap_vertex.h>
 #include <babylon/extensions/navigation/rvo2/vector2.h>

@@ -1,9 +1,18 @@
 #ifndef BABYLON_EXTENSIONS_TREE_GENERATORS_SIMPLE_PINE_TREE_GENERATOR_H
 #define BABYLON_EXTENSIONS_TREE_GENERATORS_SIMPLE_PINE_TREE_GENERATOR_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Material;
+class Mesh;
+class Scene;
+using MaterialPtr = std::shared_ptr<Material>;
+using MeshPtr     = std::shared_ptr<Mesh>;
+
 namespace Extensions {
 
 /**

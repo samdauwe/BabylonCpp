@@ -1,7 +1,9 @@
 #ifndef BABYLON_EXTENSIONS_SHADER_BUILDER_SHADER_SETTINGS_H
 #define BABYLON_EXTENSIONS_SHADER_BUILDER_SHADER_SETTINGS_H
 
-#include <babylon/babylon_global.h>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/shaderbuilder/itexture.h>
 
 namespace BABYLON {

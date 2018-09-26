@@ -93,7 +93,7 @@ void CrowdSimulationScene04::setupScenario(Scene* scene)
   _crowdSimulation->addObstacleByBoundingBox(box, Vector3(0.f, -3.f, 0.f));
 
   // Add waypoints
-  const vector_t<Vector2> wayPoints{
+  const std::vector<Vector2> wayPoints{
     Vector2(33.f, 33.f),   //
     Vector2(-33.f, 33.f),  //
     Vector2(-33.f, -33.f), //

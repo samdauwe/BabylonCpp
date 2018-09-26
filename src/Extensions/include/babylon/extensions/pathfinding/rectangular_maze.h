@@ -1,7 +1,10 @@
 #ifndef BABYLON_EXTENSIONS_PATH_FINDING_RECTANGULAR_MAZE_H
 #define BABYLON_EXTENSIONS_PATH_FINDING_RECTANGULAR_MAZE_H
 
-#include <babylon/babylon_global.h>
+#include <sstream>
+#include <stack>
+
+#include <babylon/babylon_api.h>
 #include <babylon/core/random.h>
 #include <babylon/extensions/pathfinding/a_star_search.h>
 
@@ -376,8 +379,8 @@ operator<<(std::basic_iostream<char>::basic_ostream& out,
   // Print path
   for (std::size_t i = 0; i < maze._path.size() - 1; ++i) {
     std::size_t r1, c1, r2, c2;
-    std::tie(r1, c1) = maze.location(maze._path[i]);
-    std::tie(r2, c2) = maze.location(maze._path[i + 1]);
+    std::tie(r1, c1)            = maze.location(maze._path[i]);
+    std::tie(r2, c2)            = maze.location(maze._path[i + 1]);
     const auto renderRow        = r1 * 2 + 1;
     const auto renderCol        = c1 * 2 + 1;
     cells[renderRow][renderCol] = WallType::Used;
@@ -407,7 +410,7 @@ operator<<(std::basic_iostream<char>::basic_ostream& out,
   {
     auto& loc = maze._path.back();
     std::size_t r, c;
-    std::tie(r, c) = maze.location(loc);
+    std::tie(r, c)              = maze.location(loc);
     cells[r * 2 + 1][c * 2 + 1] = WallType::Used;
   }
 

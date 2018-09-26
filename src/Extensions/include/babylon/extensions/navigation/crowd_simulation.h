@@ -1,7 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_NAVIGATION_CROWD_SIMULATION_H
 #define BABYLON_EXTENSIONS_NAVIGATION_CROWD_SIMULATION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/extensions/entitycomponentsystem/world.h>
 #include <babylon/extensions/navigation/crowd_collision_avoidance_system.h>
 #include <babylon/extensions/navigation/crowd_mesh_updater_system.h>

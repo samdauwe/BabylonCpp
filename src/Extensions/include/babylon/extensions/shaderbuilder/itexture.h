@@ -1,7 +1,9 @@
 #ifndef BABYLON_EXTENSIONS_SHADER_BUILDER_ITEXTURE_H
 #define BABYLON_EXTENSIONS_SHADER_BUILDER_ITEXTURE_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace Extensions {

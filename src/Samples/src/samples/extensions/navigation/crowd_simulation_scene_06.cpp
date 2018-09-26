@@ -107,7 +107,7 @@ void CrowdSimulationScene06::setupScenario(Scene* scene)
   }
 
   // Create obstacles
-  const vector_t<Vector3> boxPositions{
+  const std::vector<Vector3> boxPositions{
     Vector3(25.f, -3.f, 25.f),   //
     Vector3(-25.f, -3.f, 25.f),  //
     Vector3(-25.f, -3.f, -25.f), //
@@ -120,7 +120,7 @@ void CrowdSimulationScene06::setupScenario(Scene* scene)
   }
 
   // Add waypoints
-  const vector_t<Vector2> wayPoints{
+  const std::vector<Vector2> wayPoints{
     Vector2(-42.1f, -42.2f),  //
     Vector2(-42.3f, -8.4f),   //
     Vector2(-42.1f, 8.21f),   //
