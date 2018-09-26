@@ -1,10 +1,22 @@
 #ifndef BABYLON_RENDERING_EDGES_RENDERER_H
 #define BABYLON_RENDERING_EDGES_RENDERER_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class ShaderMaterial;
+class VertexBuffer;
+using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
+using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 /**
  * @brief This class is used to generate edges of the mesh that could then
@@ -60,7 +72,7 @@ protected:
    * @param  p1
    */
   virtual void _checkEdge(size_t faceIndex, int edge,
-                          const vector_t<Vector3>& faceNormals,
+                          const std::vector<Vector3>& faceNormals,
                           const Vector3& p0, const Vector3& p1);
 
   /**
@@ -85,9 +97,9 @@ protected:
   float _epsilon;
   size_t _indicesCount;
   ShaderMaterialPtr _lineShader;
-  unique_ptr_t<GL::IGLBuffer> _ib;
-  unordered_map_t<unsigned int, unique_ptr_t<VertexBuffer>> _buffers;
-  unordered_map_t<string_t, VertexBuffer*> _bufferPtrs;
+  std::unique_ptr<GL::IGLBuffer> _ib;
+  std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>> _buffers;
+  std::unordered_map<std::string, VertexBuffer*> _bufferPtrs;
   bool _checkVerticesInsteadOfIndices;
 
 }; // end of class EdgesRenderer

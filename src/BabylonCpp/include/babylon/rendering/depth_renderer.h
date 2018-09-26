@@ -1,11 +1,19 @@
 #ifndef BABYLON_RENDERING_DEPTH_RENDERER_H
 #define BABYLON_RENDERING_DEPTH_RENDERER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
+
+class Camera;
+class Effect;
+class RenderTargetTexture;
+class Scene;
+class SubMesh;
+using CameraPtr              = std::shared_ptr<Camera>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief This represents a depth renderer in Babylon.
@@ -52,7 +60,7 @@ private:
   Scene* _scene;
   RenderTargetTexturePtr _depthMap;
   Effect* _effect;
-  string_t _cachedDefines;
+  std::string _cachedDefines;
   CameraPtr _camera;
 
 }; // end of class DepthRenderer

@@ -1,9 +1,16 @@
 #ifndef BABYLON_RENDERING_OUTLINE_RENDERER_H
 #define BABYLON_RENDERING_OUTLINE_RENDERER_H
 
-#include <babylon/babylon_global.h>
+#include <string>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class _InstancesBatch;
+class Effect;
+class Scene;
+class SubMesh;
 
 class BABYLON_SHARED_EXPORT OutlineRenderer {
 
@@ -21,7 +28,7 @@ public:
 private:
   Scene* _scene;
   Effect* _effect;
-  string_t _cachedDefines;
+  std::string _cachedDefines;
 
 }; // end of class OutlineRenderer
 

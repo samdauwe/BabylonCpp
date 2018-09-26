@@ -1,13 +1,27 @@
 #ifndef BABYLON_SPRITES_SPRITE_MANAGER_H
 #define BABYLON_SPRITES_SPRITE_MANAGER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/sprites/sprite.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Buffer;
+class Camera;
+class Effect;
+class PickingInfo;
+class Ray;
+class Texture;
+class VertexBuffer;
+using CameraPtr  = std::shared_ptr<Camera>;
+using TexturePtr = std::shared_ptr<Texture>;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 class BABYLON_SHARED_EXPORT SpriteManager {
 
@@ -17,24 +31,24 @@ public:
   {
     auto spriteManager = new SpriteManager(std::forward<Ts>(args)...);
     spriteManager->addToScene(
-      static_cast<unique_ptr_t<SpriteManager>>(spriteManager));
+      static_cast<std::unique_ptr<SpriteManager>>(spriteManager));
 
     return spriteManager;
   }
   virtual ~SpriteManager();
 
-  void addToScene(unique_ptr_t<SpriteManager>&& newSpriteManager);
+  void addToScene(std::unique_ptr<SpriteManager>&& newSpriteManager);
 
   void setOnDispose(
     const std::function<void(SpriteManager*, EventState&)>& callback);
-  nullable_t<PickingInfo>
+  std::optional<PickingInfo>
   intersects(const Ray ray, const CameraPtr& camera,
              std::function<bool(Sprite* sprite)> predicate, bool fastCheck);
   void render();
   void dispose();
 
 protected:
-  SpriteManager(const string_t& name, const string_t& imgUrl,
+  SpriteManager(const std::string& name, const std::string& imgUrl,
                 unsigned int capacity, const ISize& cellSize, Scene* scene,
                 float epsilon = 0.01f,
                 unsigned int samplingMode
@@ -48,8 +62,8 @@ private:
                            int offsetY, int rowSize);
 
 public:
-  string_t name;
-  vector_t<unique_ptr_t<Sprite>> sprites;
+  std::string name;
+  std::vector<std::unique_ptr<Sprite>> sprites;
   unsigned int renderingGroupId;
   unsigned int layerMask;
   bool fogEnabled;
@@ -71,10 +85,10 @@ private:
   TexturePtr _spriteTexture;
   Scene* _scene;
   Float32Array _vertexData;
-  unique_ptr_t<Buffer> _buffer;
-  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
-  unordered_map_t<string_t, VertexBuffer*> _vertexBufferPtrs;
-  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  std::unique_ptr<Buffer> _buffer;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<std::string, VertexBuffer*> _vertexBufferPtrs;
+  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Effect* _effectBase;
   Effect* _effectFog;
 

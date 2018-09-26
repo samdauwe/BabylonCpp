@@ -1,9 +1,16 @@
 #ifndef BABYLON_ALPHA_STATE_H
 #define BABYLON_ALPHA_STATE_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+namespace GL {
+class IGLRenderingContext;
+} // end of namespace GL
 
 class BABYLON_SHARED_EXPORT _AlphaState {
 
@@ -37,9 +44,9 @@ private:
   bool _isBlendEquationParametersDirty;
   bool _isBlendConstantsDirty;
   bool _alphaBlend;
-  array_t<nullable_t<unsigned int>, 4> _blendFunctionParameters;
-  array_t<nullable_t<unsigned int>, 2> _blendEquationParameters;
-  array_t<nullable_t<float>, 4> _blendConstants;
+  std::array<std::optional<unsigned int>, 4> _blendFunctionParameters;
+  std::array<std::optional<unsigned int>, 2> _blendEquationParameters;
+  std::array<std::optional<float>, 4> _blendConstants;
 
 }; // end of class _AlphaState
 

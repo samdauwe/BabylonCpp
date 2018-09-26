@@ -1,11 +1,19 @@
 #ifndef BABYLON_RENDERING_DEPTH_RENDERING_SCENE_COMPONENT_H
 #define BABYLON_RENDERING_DEPTH_RENDERING_SCENE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
 namespace BABYLON {
+
+class DepthRendererSceneComponent;
+class RenderTargetTexture;
+using DepthRendererSceneComponentPtr
+  = std::shared_ptr<DepthRendererSceneComponent>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Defines the Depth Renderer scene component responsible to manage a
@@ -26,7 +34,7 @@ public:
   template <typename... Ts>
   static DepthRendererSceneComponentPtr New(Ts&&... args)
   {
-    return shared_ptr_t<DepthRendererSceneComponent>(
+    return std::shared_ptr<DepthRendererSceneComponent>(
       new DepthRendererSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~DepthRendererSceneComponent();
@@ -55,7 +63,7 @@ protected:
   DepthRendererSceneComponent(Scene* scene);
 
 private:
-  void _gatherRenderTargets(vector_t<RenderTargetTexturePtr>& renderTargets);
+  void _gatherRenderTargets(std::vector<RenderTargetTexturePtr>& renderTargets);
 
 }; // end of class DepthRendererSceneComponent
 

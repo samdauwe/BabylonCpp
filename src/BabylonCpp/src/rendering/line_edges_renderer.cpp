@@ -20,7 +20,7 @@ LineEdgesRenderer::~LineEdgesRenderer()
 {
 }
 void LineEdgesRenderer::_checkEdge(size_t /*faceIndex*/, int /*edge*/,
-                                   const vector_t<Vector3>& /*faceNormals*/,
+                                   const std::vector<Vector3>& /*faceNormals*/,
                                    const Vector3& p0, const Vector3& p1)
 {
   auto offset = _linesPositions.size() / 3;
@@ -84,8 +84,8 @@ void LineEdgesRenderer::_generateEdgesLines()
   }
 
   // First let's find adjacencies
-  vector_t<FaceAdjacencies> adjacencies;
-  vector_t<Vector3> faceNormals;
+  std::vector<FaceAdjacencies> adjacencies;
+  std::vector<Vector3> faceNormals;
   for (size_t i = 0; i < (positions.size() / 3) - 1; ++i) {
     FaceAdjacencies currentAdjecancy;
     currentAdjecancy.p0

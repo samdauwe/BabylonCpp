@@ -1,10 +1,23 @@
 #ifndef BABYLON_RENDERING_GEOMETRY_BUFFER_RENDERER_H
 #define BABYLON_RENDERING_GEOMETRY_BUFFER_RENDERER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/engine/engine_constants.h>
 
 namespace BABYLON {
+
+class Effect;
+class Mesh;
+class SubMesh;
+class MultiRenderTarget;
+class Scene;
+class SubMesh;
+using MeshPtr              = std::shared_ptr<Mesh>;
+using SubMeshPtr           = std::shared_ptr<SubMesh>;
+using MultiRenderTargetPtr = std::shared_ptr<MultiRenderTarget>;
 
 /**
  * @brief This renderer is helpfull to fill one of the render target with a
@@ -45,7 +58,7 @@ protected:
   /**
    * @brief Set the render list (meshes to be rendered) used in the G buffer.
    */
-  void set_renderList(const vector_t<MeshPtr>& meshes);
+  void set_renderList(const std::vector<MeshPtr>& meshes);
 
   /**
    * @brief Gets wether or not G buffer are supported by the running hardware.
@@ -99,7 +112,7 @@ public:
   /**
    * The render list (meshes to be rendered) used in the G buffer.
    */
-  WriteOnlyProperty<GeometryBufferRenderer, vector_t<MeshPtr>> renderList;
+  WriteOnlyProperty<GeometryBufferRenderer, std::vector<MeshPtr>> renderList;
 
   /**
    * Wether or not G buffer are supported by the running hardware.
@@ -130,7 +143,7 @@ public:
 
 protected:
   Effect* _effect;
-  string_t _cachedDefines;
+  std::string _cachedDefines;
 
 private:
   Scene* _scene;

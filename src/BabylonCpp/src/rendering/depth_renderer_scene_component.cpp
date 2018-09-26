@@ -18,7 +18,7 @@ void DepthRendererSceneComponent::_register()
 {
   scene->_gatherRenderTargetsStage.registerStep(
     SceneComponentConstants::STEP_GATHERRENDERTARGETS_DEPTHRENDERER, this,
-    [this](vector_t<RenderTargetTexturePtr>& renderTargets) {
+    [this](std::vector<RenderTargetTexturePtr>& renderTargets) {
       _gatherRenderTargets(renderTargets);
     });
 }
@@ -36,7 +36,7 @@ void DepthRendererSceneComponent::dispose()
 }
 
 void DepthRendererSceneComponent::_gatherRenderTargets(
-  vector_t<RenderTargetTexturePtr>& renderTargets)
+  std::vector<RenderTargetTexturePtr>& renderTargets)
 {
   if (!scene->depthRenderer().empty()) {
     for (auto& item : scene->depthRenderer()) {

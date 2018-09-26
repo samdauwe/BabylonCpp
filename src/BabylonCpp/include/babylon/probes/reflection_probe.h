@@ -1,12 +1,19 @@
 #ifndef BABYLON_PROBES_REFLECTION_PROBE_H
 #define BABYLON_PROBES_REFLECTION_PROBE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+struct ISize;
+class RenderTargetTexture;
+class Scene;
+using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Class used to generate realtime reflection / refraction cube textures
@@ -20,13 +27,13 @@ public:
   {
     auto reflectionProbe = new ReflectionProbe(std::forward<Ts>(args)...);
     reflectionProbe->addToScene(
-      static_cast<unique_ptr_t<ReflectionProbe>>(reflectionProbe));
+      static_cast<std::unique_ptr<ReflectionProbe>>(reflectionProbe));
 
     return reflectionProbe;
   }
   virtual ~ReflectionProbe();
 
-  void addToScene(unique_ptr_t<ReflectionProbe>&& newReflectionProbe);
+  void addToScene(std::unique_ptr<ReflectionProbe>&& newReflectionProbe);
 
   /**
    * @brief Gets the hosting scene.
@@ -72,7 +79,7 @@ protected:
    * @param useFloat defines if HDR data (flaot data) should be used to store
    * colors (false by default)
    */
-  ReflectionProbe(const string_t& name, const ISize& size, Scene* scene,
+  ReflectionProbe(const std::string& name, const ISize& size, Scene* scene,
                   bool generateMipMaps = true, bool useFloat = false);
 
 private:
@@ -80,13 +87,13 @@ private:
   void set_samples(unsigned int value);
   int get_refreshRate() const;
   void set_refreshRate(int value);
-  vector_t<AbstractMeshPtr>& get_renderList();
+  std::vector<AbstractMeshPtr>& get_renderList();
 
 public:
   /**
    * Defines the name of the probe
    */
-  string_t name;
+  std::string name;
 
   /**
    * Gets or sets probe position (center of the cube map)
@@ -107,7 +114,7 @@ public:
   /**
    * Gets the list of meshes to render
    */
-  ReadOnlyProperty<ReflectionProbe, vector_t<AbstractMeshPtr>> renderList;
+  ReadOnlyProperty<ReflectionProbe, std::vector<AbstractMeshPtr>> renderList;
 
 private:
   Scene* _scene;

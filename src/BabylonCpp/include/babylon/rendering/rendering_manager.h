@@ -1,10 +1,25 @@
 #ifndef BABYLON_RENDERING_RENDERING_MANAGER_H
 #define BABYLON_RENDERING_RENDERING_MANAGER_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+
+#include <babylon/babylon_api.h>
 #include <babylon/math/color4.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+struct IParticleSystem;
+struct IRenderingManagerAutoClearSetup;
+class Material;
+class RenderingGroup;
+struct RenderingGroupInfo;
+class Scene;
+class SpriteManager;
+class SubMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using MaterialPtr     = std::shared_ptr<Material>;
+using SubMeshPtr      = std::shared_ptr<SubMesh>;
 
 class BABYLON_SHARED_EXPORT RenderingManager {
 
@@ -28,15 +43,15 @@ public:
   RenderingManager(Scene* scene);
   ~RenderingManager();
 
-  void render(
-    std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
-                         const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-                         const vector_t<SubMeshPtr>& transparentSubMeshes,
-                         const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-                         const std::function<void()>& beforeTransparents)>
-      customRenderFunction,
-    const vector_t<AbstractMeshPtr>& activeMeshes, bool renderParticles,
-    bool renderSprites);
+  void
+  render(std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
+                            const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+                            const std::vector<SubMeshPtr>& transparentSubMeshes,
+                            const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+                            const std::function<void()>& beforeTransparents)>
+           customRenderFunction,
+         const std::vector<AbstractMeshPtr>& activeMeshes, bool renderParticles,
+         bool renderSprites);
   void reset();
   void dispose();
 
@@ -108,7 +123,7 @@ public:
    * @param index the rendering group index to get the information for
    * @returns The auto clear setup for the requested rendering group
    */
-  nullable_t<IRenderingManagerAutoClearSetup>
+  std::optional<IRenderingManagerAutoClearSetup>
   getAutoClearDepthStencilSetup(size_t index);
 
 private:
@@ -123,17 +138,17 @@ public:
 
 private:
   Scene* _scene;
-  vector_t<unique_ptr_t<RenderingGroup>> _renderingGroups;
+  std::vector<std::unique_ptr<RenderingGroup>> _renderingGroups;
   bool _depthStencilBufferAlreadyCleaned;
 
-  vector_t<IRenderingManagerAutoClearSetup> _autoClearDepthStencil;
-  vector_t<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
+  std::vector<IRenderingManagerAutoClearSetup> _autoClearDepthStencil;
+  std::vector<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customOpaqueSortCompareFn;
-  vector_t<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
+  std::vector<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customAlphaTestSortCompareFn;
-  vector_t<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
+  std::vector<std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>>
     _customTransparentSortCompareFn;
-  unique_ptr_t<RenderingGroupInfo> _renderingGroupInfo;
+  std::unique_ptr<RenderingGroupInfo> _renderingGroupInfo;
 
 }; // end of class RenderingManager
 

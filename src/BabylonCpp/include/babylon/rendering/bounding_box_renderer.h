@@ -1,12 +1,27 @@
 #ifndef BABYLON_RENDERING_BOUNDING_BOX_RENDERER_H
 #define BABYLON_RENDERING_BOUNDING_BOX_RENDERER_H
 
-#include <babylon/babylon_global.h>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 #include <babylon/math/color3.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class BoundingBox;
+class BoundingBoxRenderer;
+class ShaderMaterial;
+class SubMesh;
+class VertexBuffer;
+using BoundingBoxRendererPtr = std::shared_ptr<BoundingBoxRenderer>;
+using ShaderMaterialPtr      = std::shared_ptr<ShaderMaterial>;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 class BABYLON_SHARED_EXPORT BoundingBoxRenderer : public ISceneComponent {
 
@@ -22,7 +37,7 @@ public:
   template <typename... Ts>
   static BoundingBoxRendererPtr New(Ts&&... args)
   {
-    auto renderer = shared_ptr_t<BoundingBoxRenderer>(
+    auto renderer = std::shared_ptr<BoundingBoxRenderer>(
       new BoundingBoxRenderer(std::forward<Ts>(args)...));
     renderer->addToScene(renderer);
 
@@ -68,13 +83,13 @@ public:
   Color3 frontColor;
   Color3 backColor;
   bool showBackLines;
-  vector_t<BoundingBox> renderList;
+  std::vector<BoundingBox> renderList;
 
 private:
   ShaderMaterialPtr _colorShader;
-  vector_t<unique_ptr_t<VertexBuffer>> _vertexBuffers;
-  unordered_map_t<string_t, VertexBuffer*> _vertexBuffersMap;
-  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  std::vector<std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<std::string, VertexBuffer*> _vertexBuffersMap;
+  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
 
 }; // end of class BoundingBoxRenderer
 

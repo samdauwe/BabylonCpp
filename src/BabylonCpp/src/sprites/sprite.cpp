@@ -1,12 +1,14 @@
 #include <babylon/sprites/sprite.h>
 
+#include <cmath>
+
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color4.h>
 #include <babylon/sprites/sprite_manager.h>
 
 namespace BABYLON {
 
-Sprite::Sprite(const string_t& iName, SpriteManager* manager)
+Sprite::Sprite(const std::string& iName, SpriteManager* manager)
     : name{iName}
     , position{Vector3::Zero()}
     , color{std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
@@ -36,7 +38,7 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::addToSpriteManager(unique_ptr_t<Sprite>&& newSprite)
+void Sprite::addToSpriteManager(std::unique_ptr<Sprite>&& newSprite)
 {
   _manager->sprites.emplace_back(std::move(newSprite));
 }
@@ -106,9 +108,9 @@ void Sprite::dispose()
   // Remove from scene
   _manager->sprites.erase(
     std::remove_if(_manager->sprites.begin(), _manager->sprites.end(),
-                     [this](const unique_ptr_t<Sprite>& sprite) {
-                       return sprite.get() == this;
-                     }),
+                   [this](const std::unique_ptr<Sprite>& sprite) {
+                     return sprite.get() == this;
+                   }),
     _manager->sprites.end());
 }
 

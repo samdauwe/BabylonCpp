@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-ReflectionProbe::ReflectionProbe(const string_t& iName, const ISize& size,
+ReflectionProbe::ReflectionProbe(const std::string& iName, const ISize& size,
                                  Scene* scene, bool generateMipMaps,
                                  bool useFloat)
     : name{iName}
@@ -86,7 +86,7 @@ ReflectionProbe::~ReflectionProbe()
 }
 
 void ReflectionProbe::addToScene(
-  unique_ptr_t<ReflectionProbe>&& newReflectionProbe)
+  std::unique_ptr<ReflectionProbe>&& newReflectionProbe)
 {
   _scene->reflectionProbes.emplace_back(std::move(newReflectionProbe));
 }
@@ -121,7 +121,7 @@ RenderTargetTexture* ReflectionProbe::cubeTexture()
   return _renderTargetTexture.get();
 }
 
-vector_t<AbstractMeshPtr>& ReflectionProbe::get_renderList()
+std::vector<AbstractMeshPtr>& ReflectionProbe::get_renderList()
 {
   return _renderTargetTexture->renderList;
 }
@@ -144,7 +144,7 @@ void ReflectionProbe::dispose()
   _scene->reflectionProbes.erase(
     std::remove_if(
       _scene->reflectionProbes.begin(), _scene->reflectionProbes.end(),
-      [this](const unique_ptr_t<ReflectionProbe>& reflectionProbe) {
+      [this](const std::unique_ptr<ReflectionProbe>& reflectionProbe) {
         return reflectionProbe.get() == this;
       }),
     _scene->reflectionProbes.end());

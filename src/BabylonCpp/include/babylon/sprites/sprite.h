@@ -1,13 +1,16 @@
 #ifndef BABYLON_SPRITES_SPRITE_H
 #define BABYLON_SPRITES_SPRITE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 #include <babylon/animations/animation.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
+
+class ActionManager;
+class SpriteManager;
 
 class BABYLON_SHARED_EXPORT Sprite {
 
@@ -16,13 +19,13 @@ public:
   static Sprite* New(Ts&&... args)
   {
     auto sprite = new Sprite(std::forward<Ts>(args)...);
-    sprite->addToSpriteManager(static_cast<unique_ptr_t<Sprite>>(sprite));
+    sprite->addToSpriteManager(static_cast<std::unique_ptr<Sprite>>(sprite));
 
     return sprite;
   }
   virtual ~Sprite();
 
-  void addToSpriteManager(unique_ptr_t<Sprite>&& newSprite);
+  void addToSpriteManager(std::unique_ptr<Sprite>&& newSprite);
 
   void playAnimation(int from, int to, bool loop, float delay,
                      const std::function<void()>& onAnimationEnd);
@@ -35,16 +38,16 @@ public:
   void dispose();
 
 protected:
-  Sprite(const string_t& name, SpriteManager* manager);
+  Sprite(const std::string& name, SpriteManager* manager);
 
 private:
   int get_size() const;
   void set_size(int value);
 
 public:
-  string_t name;
+  std::string name;
   Vector3 position;
-  unique_ptr_t<Color4> color;
+  std::unique_ptr<Color4> color;
   int width;
   int height;
   float angle;
@@ -52,7 +55,7 @@ public:
   int invertU;
   int invertV;
   bool disposeWhenFinishedAnimating;
-  vector_t<Animation*> animations;
+  std::vector<Animation*> animations;
   bool isPickable;
   ActionManager* actionManager;
 

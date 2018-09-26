@@ -20,7 +20,7 @@ void GeometryBufferRendererSceneComponent::_register()
 {
   scene->_gatherRenderTargetsStage.registerStep(
     SceneComponentConstants::STEP_GATHERRENDERTARGETS_GEOMETRYBUFFERRENDERER,
-    this, [this](vector_t<RenderTargetTexturePtr>& renderTargets) {
+    this, [this](std::vector<RenderTargetTexturePtr>& renderTargets) {
       _gatherRenderTargets(renderTargets);
     });
 }
@@ -36,7 +36,7 @@ void GeometryBufferRendererSceneComponent::dispose()
 }
 
 void GeometryBufferRendererSceneComponent::_gatherRenderTargets(
-  vector_t<RenderTargetTexturePtr>& renderTargets)
+  std::vector<RenderTargetTexturePtr>& renderTargets)
 {
   if (scene->geometryBufferRenderer()) {
     renderTargets.emplace_back(scene->geometryBufferRenderer()->getGBuffer());

@@ -1,11 +1,19 @@
 #ifndef BABYLON_RENDERING_GEOMETRY_BUFFER_RENDERER_SCENE_COMPONENT_H
 #define BABYLON_RENDERING_GEOMETRY_BUFFER_RENDERER_SCENE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
 namespace BABYLON {
+
+class GeometryBufferRendererSceneComponent;
+class RenderTargetTexture;
+using GeometryBufferRendererSceneComponentPtr
+  = std::shared_ptr<GeometryBufferRendererSceneComponent>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Defines the Geometry Buffer scene component responsible to manage a
@@ -26,7 +34,7 @@ public:
   template <typename... Ts>
   static GeometryBufferRendererSceneComponentPtr New(Ts&&... args)
   {
-    return shared_ptr_t<GeometryBufferRendererSceneComponent>(
+    return std::shared_ptr<GeometryBufferRendererSceneComponent>(
       new GeometryBufferRendererSceneComponent(std::forward<Ts>(args)...));
   }
   virtual ~GeometryBufferRendererSceneComponent();
@@ -55,7 +63,7 @@ protected:
   GeometryBufferRendererSceneComponent(Scene* scene);
 
 private:
-  void _gatherRenderTargets(vector_t<RenderTargetTexturePtr>& renderTargets);
+  void _gatherRenderTargets(std::vector<RenderTargetTexturePtr>& renderTargets);
 
 }; // end of class GeometryBufferRendererSceneComponent
 

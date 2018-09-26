@@ -1,7 +1,7 @@
 #ifndef BABYLON_RENDERING_IRENDERING_MANAGER_AUTO_CLEAR_SETUP_H
 #define BABYLON_RENDERING_IRENDERING_MANAGER_AUTO_CLEAR_SETUP_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 

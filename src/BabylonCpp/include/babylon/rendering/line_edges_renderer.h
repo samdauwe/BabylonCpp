@@ -1,7 +1,7 @@
 #ifndef BABYLON_RENDERING_LINE_EDGES_RENDERER_H
 #define BABYLON_RENDERING_LINE_EDGES_RENDERER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/rendering/edges_renderer.h>
 
 namespace BABYLON {
@@ -34,7 +34,7 @@ protected:
    * @param  p1 end of line
    */
   void _checkEdge(size_t faceIndex, int edge,
-                  const vector_t<Vector3>& faceNormals, const Vector3& p0,
+                  const std::vector<Vector3>& faceNormals, const Vector3& p0,
                   const Vector3& p1) override;
 
 private:

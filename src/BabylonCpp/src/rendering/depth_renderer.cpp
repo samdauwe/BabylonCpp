@@ -122,10 +122,10 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
 
   _depthMap->customRenderFunction
     = [engine,
-       renderSubMesh](const vector_t<SubMeshPtr>& opaqueSubMeshes,
-                      const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-                      const vector_t<SubMeshPtr>& /*transparentSubMeshes*/,
-                      const vector_t<SubMeshPtr>& depthOnlySubMeshes,
+       renderSubMesh](const std::vector<SubMeshPtr>& opaqueSubMeshes,
+                      const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+                      const std::vector<SubMeshPtr>& /*transparentSubMeshes*/,
+                      const std::vector<SubMeshPtr>& depthOnlySubMeshes,
                       const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
@@ -156,9 +156,9 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     return false;
   }
 
-  vector_t<string_t> defines;
+  std::vector<std::string> defines;
 
-  vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
+  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
 
   auto mesh = subMesh->getMesh();
 
@@ -186,9 +186,9 @@ bool DepthRenderer::isReady(SubMesh* subMesh, bool useInstances)
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back(
-      "#define BonesPerMesh "
-      + std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 :
+    defines.emplace_back("#define BonesPerMesh "
+                         + std::to_string(mesh->skeleton() ?
+                                            mesh->skeleton()->bones.size() + 1 :
                                             0));
   }
   else {

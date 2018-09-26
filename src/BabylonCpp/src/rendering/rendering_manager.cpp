@@ -49,13 +49,13 @@ void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
 }
 
 void RenderingManager::render(
-  std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
-                       const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-                       const vector_t<SubMeshPtr>& transparentSubMeshes,
-                       const vector_t<SubMeshPtr>& depthOnlySubMeshes,
-                       const std::function<void()>& beforeTransparents)>
+  std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
+                     const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+                     const std::vector<SubMeshPtr>& transparentSubMeshes,
+                     const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+                     const std::function<void()>& beforeTransparents)>
     customRenderFunction,
-  const vector_t<AbstractMeshPtr>& activeMeshes, bool renderParticles,
+  const std::vector<AbstractMeshPtr>& activeMeshes, bool renderParticles,
   bool renderSprites)
 {
   // Update the observable context (not null as it only goes away on dispose)
@@ -242,11 +242,11 @@ void RenderingManager::setRenderingAutoClearDepthStencil(
   };
 }
 
-nullable_t<IRenderingManagerAutoClearSetup>
+std::optional<IRenderingManagerAutoClearSetup>
 RenderingManager::getAutoClearDepthStencilSetup(size_t index)
 {
   if (index >= _autoClearDepthStencil.size()) {
-    return nullopt_t;
+    return std::nullopt;
   }
 
   return _autoClearDepthStencil[index];

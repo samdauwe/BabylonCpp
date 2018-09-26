@@ -18,9 +18,9 @@
 
 namespace BABYLON {
 
-SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
-                             unsigned int capacity, const ISize& cellSize,
-                             Scene* scene, float epsilon,
+SpriteManager::SpriteManager(const std::string& iName,
+                             const std::string& imgUrl, unsigned int capacity,
+                             const ISize& cellSize, Scene* scene, float epsilon,
                              unsigned int samplingMode)
     : name{iName}
     , renderingGroupId{0}
@@ -72,8 +72,7 @@ SpriteManager::SpriteManager(const string_t& iName, const string_t& imgUrl,
   // invertU, invertV, cellIndexX, cellIndexY, color r, color g, color b, color
   // a)
   _vertexData.resize(capacity * 16 * 4);
-  _buffer
-    = std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 16);
+  _buffer = std::make_unique<Buffer>(scene->getEngine(), _vertexData, true, 16);
 
   auto positions
     = _buffer->createVertexBuffer(VertexBuffer::PositionKind, 0, 4);
@@ -122,7 +121,8 @@ SpriteManager::~SpriteManager()
 {
 }
 
-void SpriteManager::addToScene(unique_ptr_t<SpriteManager>&& newSpriteManager)
+void SpriteManager::addToScene(
+  std::unique_ptr<SpriteManager>&& newSpriteManager)
 {
   _scene->spriteManagers.emplace_back(std::move(newSpriteManager));
 }
@@ -190,7 +190,7 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite* sprite,
   _vertexData[arrayOffset + 15] = sprite->color->a;
 }
 
-nullable_t<PickingInfo>
+std::optional<PickingInfo>
 SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
                           std::function<bool(Sprite* sprite)> predicate,
                           bool fastCheck)
@@ -198,7 +198,7 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
   auto count               = std::min(_capacity, sprites.size());
   auto min                 = Vector3::Zero();
   auto max                 = Vector3::Zero();
-  auto distance            = numeric_limits_t<float>::max();
+  auto distance            = std::numeric_limits<float>::max();
   Sprite* currentSprite    = nullptr;
   auto cameraSpacePosition = Vector3::Zero();
   auto cameraView          = camera->getViewMatrix();
@@ -254,7 +254,7 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
     return result;
   }
 
-  return nullopt_t;
+  return std::nullopt;
 }
 
 void SpriteManager::render()
@@ -354,11 +354,10 @@ void SpriteManager::dispose()
 
   // Remove from scene
   _scene->spriteManagers.erase(
-    std::remove_if(_scene->spriteManagers.begin(),
-                     _scene->spriteManagers.end(),
-                     [this](const unique_ptr_t<SpriteManager>& spriteManager) {
-                       return spriteManager.get() == this;
-                     }),
+    std::remove_if(_scene->spriteManagers.begin(), _scene->spriteManagers.end(),
+                   [this](const std::unique_ptr<SpriteManager>& spriteManager) {
+                     return spriteManager.get() == this;
+                   }),
     _scene->spriteManagers.end());
 
   // Callback
