@@ -1,9 +1,22 @@
 #ifndef BABYLON_POSTPROCESS_POST_PROCESS_MANANGER_H
 #define BABYLON_POSTPROCESS_POST_PROCESS_MANANGER_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <unordered_map>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class InternalTexture;
+class PostProcess;
+class Scene;
+class VertexBuffer;
+
+namespace GL {
+class IGLBuffer;
+} // end of namespace GL
 
 /**
  * @brief PostProcessManager is used to manage one or more post processes or
@@ -35,8 +48,8 @@ public:
    * @returns True if the post processes were able to be run.
    * Hidden
    */
-  bool _prepareFrame(InternalTexture* sourceTexture              = nullptr,
-                     const vector_t<PostProcess*>& postProcesses = {});
+  bool _prepareFrame(InternalTexture* sourceTexture                 = nullptr,
+                     const std::vector<PostProcess*>& postProcesses = {});
 
   /**
    * @brief Manually render a set of post processes to a texture.
@@ -48,7 +61,7 @@ public:
    * the target
    * @param lodLevel defines which lod of the texture to render to
    */
-  void directRender(const vector_t<PostProcess*>& postProcesses,
+  void directRender(const std::vector<PostProcess*>& postProcesses,
                     InternalTexture* targetTexture = nullptr,
                     bool forceFullscreenViewport   = false,
                     unsigned int faceIndex = 0, int lodLevel = 0);
@@ -66,8 +79,8 @@ public:
   void _finalizeFrame(bool doNotPresent,
                       InternalTexture* targetTexture = nullptr,
                       unsigned int faceIndex         = 0,
-                      const vector_t<PostProcess*>& postProcesses
-                      = vector_t<PostProcess*>(),
+                      const std::vector<PostProcess*>& postProcesses
+                      = std::vector<PostProcess*>(),
                       bool forceFullscreenViewport = false);
 
   /**
@@ -81,10 +94,10 @@ private:
 
 private:
   Scene* _scene;
-  unique_ptr_t<GL::IGLBuffer> _indexBuffer;
+  std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Float32Array _vertexDeclaration;
-  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> _vertexBuffers;
-  unordered_map_t<string_t, VertexBuffer*> _vertexBufferPtrs;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<std::string, VertexBuffer*> _vertexBufferPtrs;
 
 }; // end of class PostProcessManager
 

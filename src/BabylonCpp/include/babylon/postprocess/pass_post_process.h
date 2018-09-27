@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_PASS_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_PASS_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/postprocess/post_process.h>
 
@@ -13,7 +13,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PassPostProcess : public PostProcess {
 
 public:
-  PassPostProcess(const string_t& name, float ratio, const CameraPtr& camera,
+  PassPostProcess(const std::string& name, float ratio, const CameraPtr& camera,
                   unsigned int samplingMode, Engine* engine,
                   bool reusable = false,
                   unsigned int textureType

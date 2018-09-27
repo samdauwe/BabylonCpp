@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 BlackAndWhitePostProcess::BlackAndWhitePostProcess(
-  const string_t& iName, float ratio, const CameraPtr& camera,
+  const std::string& iName, float ratio, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable)
     : PostProcess{iName,
                   "blackAndWhite",

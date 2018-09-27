@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_CONVOLUTION_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_CONVOLUTION_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -64,7 +64,7 @@ public:
    * @param textureType Type of textures used when performing the post process.
    * (default: 0)
    */
-  ConvolutionPostProcess(const string_t& name, const Float32Array& kernel,
+  ConvolutionPostProcess(const std::string& name, const Float32Array& kernel,
                          float ratio, const CameraPtr& camera,
                          unsigned int samplingMode, Engine* engine,
                          bool reusable = false,

@@ -9,10 +9,10 @@
 namespace BABYLON {
 
 BlurPostProcess::BlurPostProcess(
-  const string_t& iName, const Vector2& iDrection, float kernel,
+  const std::string& iName, const Vector2& iDrection, float kernel,
   const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
-  unsigned int textureType, const string_t& defines, bool iBlockCompilation)
+  unsigned int textureType, const std::string& defines, bool iBlockCompilation)
     : PostProcess{iName,
                   "kernelBlur",
                   {"delta", "direction", "cameraMinMaxZ"},
@@ -92,18 +92,18 @@ bool BlurPostProcess::get_packedFloat() const
 }
 
 void BlurPostProcess::updateEffect(
-  const string_t& /*defines*/, const vector_t<string_t>& /*uniforms*/,
-  const vector_t<string_t>& /*samplers*/,
-  const unordered_map_t<string_t, unsigned int>& /*indexParameters*/,
+  const std::string& /*defines*/, const vector_t<std::string>& /*uniforms*/,
+  const vector_t<std::string>& /*samplers*/,
+  const unordered_map_t<std::string, unsigned int>& /*indexParameters*/,
   const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const string_t& errors)>& onError)
+  const std::function<void(Effect* effect, const std::string& errors)>& onError)
 {
   _updateParameters(onCompiled, onError);
 }
 
 void BlurPostProcess::_updateParameters(
   const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const string_t& errors)>& onError)
+  const std::function<void(Effect* effect, const std::string& errors)>& onError)
 {
   // Generate sampling offsets and weights
   const auto N           = _kernel;
@@ -135,8 +135,7 @@ void BlurPostProcess::_updateParameters(
   vector_t<pair_t<std::int32_t, float>> linearSamplingMap;
 
   for (unsigned int i = 0; i <= centerIndex; i += 2) {
-    auto j
-      = std::min(i + 1, static_cast<unsigned>(std::floor(centerIndex)));
+    auto j = std::min(i + 1, static_cast<unsigned>(std::floor(centerIndex)));
 
     auto singleCenterSample = (i == j);
 
@@ -151,8 +150,7 @@ void BlurPostProcess::_updateParameters(
         offsets[i] + 1 / (1 + weights[i] / weights[j]));
 
       if (offsetLinear == 0) {
-        linearSamplingMap.emplace_back(
-          std::make_pair(offsets[i], weights[i]));
+        linearSamplingMap.emplace_back(std::make_pair(offsets[i], weights[i]));
         linearSamplingMap.emplace_back(
           std::make_pair(offsets[i + 1], weights[i + 1]));
       }
@@ -229,8 +227,7 @@ float BlurPostProcess::_nearestBestKernel(float idealKernel) const
   Float32Array vec{v, v - 1, v + 1, v - 2, v + 2};
   for (auto k : vec) {
     if (!stl_util::almost_equal(std::fmod(k, 2.f), 0.f)
-        && (stl_util::almost_equal(std::fmod(std::floor(k / 2.f), 2.f),
-                                   0.f))
+        && (stl_util::almost_equal(std::fmod(std::floor(k / 2.f), 2.f), 0.f))
         && k > 0.f) {
       return std::max(k, 3.f);
     }
@@ -256,7 +253,8 @@ float BlurPostProcess::_gaussianWeight(float x) const
   return weight;
 }
 
-string_t BlurPostProcess::_glslFloat(float x, unsigned int decimalFigures) const
+std::string BlurPostProcess::_glslFloat(float x,
+                                        unsigned int decimalFigures) const
 {
   std::ostringstream oss;
   oss.precision(decimalFigures);

@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_BLOOM_MERGE_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_BLOOM_MERGE_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -35,7 +35,7 @@ public:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BloomMergePostProcess(const string_t& name, PostProcess* originalFromInput,
+  BloomMergePostProcess(const std::string& name, PostProcess* originalFromInput,
                         PostProcess* blurred, float weight,
                         const Variant<float, PostProcessOptions>& options,
                         const CameraPtr& camera, unsigned int samplingMode,

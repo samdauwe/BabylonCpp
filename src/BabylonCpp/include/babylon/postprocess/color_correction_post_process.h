@@ -1,10 +1,13 @@
 #ifndef BABYLON_POSTPROCESS_COLOR_CORRECTION_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_COLOR_CORRECTION_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
+
+class Texture;
+using TexturePtr = std::shared_ptr<Texture>;
 
 /**
  * @brief This post-process allows the modification of rendered colors by using
@@ -22,8 +25,8 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ColorCorrectionPostProcess : public PostProcess {
 
 public:
-  ColorCorrectionPostProcess(const string_t& name,
-                             const string_t& colorTableUrl, float ratio,
+  ColorCorrectionPostProcess(const std::string& name,
+                             const std::string& colorTableUrl, float ratio,
                              const CameraPtr& camera, unsigned int samplingMode,
                              Engine* engine, bool reusable = false);
   ~ColorCorrectionPostProcess();

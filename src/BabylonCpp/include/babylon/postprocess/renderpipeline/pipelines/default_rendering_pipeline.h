@@ -1,13 +1,41 @@
 #ifndef BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_DEFAULT_RENDERING_PIPLINE_H
 #define BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_DEFAULT_RENDERING_PIPLINE_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocess/depth_of_field_effect_blur_level.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
 #include <babylon/tools/observer.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class Animation;
+class BloomEffect;
+class ChromaticAberrationPostProcess;
+class DepthOfFieldEffect;
+class FxaaPostProcess;
+class GlowLayer;
+class GrainPostProcess;
+class ImageProcessingConfiguration;
+class PostProcess;
+class Scene;
+class SharpenPostProcess;
+using GlowLayerPtr = std::shared_ptr<GlowLayer>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief The default rendering pipeline can be added to a scene to apply common
@@ -59,11 +87,10 @@ public:
    * @param {boolean} automaticBuild - if false, you will have to manually call
    * prepare() to update the pipeline (default: true)
    */
-  DefaultRenderingPipeline(const string_t& name = "", bool hdr = true,
-                           Scene* scene = nullptr,
-                           const unordered_map_t<string_t, CameraPtr>& cameras
-                           = {},
-                           bool automaticBuild = true);
+  DefaultRenderingPipeline(
+    const std::string& name = "", bool hdr = true, Scene* scene = nullptr,
+    const std::unordered_map<std::string, CameraPtr>& cameras = {},
+    bool automaticBuild                                       = true);
   virtual ~DefaultRenderingPipeline() override;
 
   /**
@@ -102,8 +129,8 @@ public:
    * @param rootUrl The URL of the serialized pipeline.
    * @returns An instantiated pipeline from the serialized object.
    */
-  static unique_ptr_t<DefaultRenderingPipeline>
-  Parse(const Json::value& source, Scene* scene, const string_t& rootUrl);
+  static std::unique_ptr<DefaultRenderingPipeline>
+  Parse(const Json::value& source, Scene* scene, const std::string& rootUrl);
 
 private:
   /**
@@ -236,7 +263,7 @@ public:
   /**
    * Animations which can be used to tweak settings over a period of time
    */
-  vector_t<Animation*> animations;
+  std::vector<Animation*> animations;
 
   /**
    * Specifies the size of the bloom blur kernel, relative to the final output
@@ -353,7 +380,7 @@ private:
   bool _hdr;
   unsigned int _samples;
   Scene* _scene;
-  vector_t<CameraPtr> _camerasToBeAttached;
+  std::vector<CameraPtr> _camerasToBeAttached;
 
   bool _hasCleared;
   PostProcess* _prevPostProcess;

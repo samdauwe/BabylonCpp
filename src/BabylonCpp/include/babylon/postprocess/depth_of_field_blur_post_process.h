@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_DEPTH_OF_FIELD_BLUR_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_DEPTH_OF_FIELD_BLUR_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/blur_post_process.h>
 
 namespace BABYLON {
@@ -42,9 +42,10 @@ struct BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess
    * at a later time. (default: false)
    */
   DepthOfFieldBlurPostProcess(
-    const string_t& name, Scene* scene, const Vector2& direction, float kernel,
-    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-    PostProcess* circleOfConfusion, PostProcess* imageToBlur = nullptr,
+    const std::string& name, Scene* scene, const Vector2& direction,
+    float kernel, const Variant<float, PostProcessOptions>& options,
+    const CameraPtr& camera, PostProcess* circleOfConfusion,
+    PostProcess* imageToBlur  = nullptr,
     unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,

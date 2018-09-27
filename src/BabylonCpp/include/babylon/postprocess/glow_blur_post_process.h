@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_GLOW_BLUR_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_GLOW_BLUR_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/postprocess/post_process.h>
 
@@ -14,7 +14,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT GlowBlurPostProcess : public PostProcess {
 
 public:
-  GlowBlurPostProcess(const string_t& name, const Vector2& direction,
+  GlowBlurPostProcess(const std::string& name, const Vector2& direction,
                       float kernel,
                       const Variant<float, PostProcessOptions>& options,
                       const CameraPtr& camera,

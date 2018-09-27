@@ -1,12 +1,17 @@
 #ifndef BABYLON_POSTPROCESS_IMAGE_PROCESSING_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_IMAGE_PROCESSING_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+class ColorCurves;
+class ImageProcessingConfiguration;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 /**
  * @brief
@@ -15,7 +20,7 @@ class BABYLON_SHARED_EXPORT ImageProcessingPostProcess : public PostProcess {
 
 public:
   ImageProcessingPostProcess(
-    const string_t& name, float renderRatio, const CameraPtr& camera,
+    const std::string& name, float renderRatio, const CameraPtr& camera,
     unsigned int samplingMode, Engine* engine, bool reusable = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
@@ -48,13 +53,13 @@ protected:
    * @brief Gets Color curves setup used in the effect if colorCurvesEnabled is
    * set to true .
    */
-  shared_ptr_t<ColorCurves>& get_colorCurves();
+  std::shared_ptr<ColorCurves>& get_colorCurves();
 
   /**
    * Sets Color curves setup used in the effect if colorCurvesEnabled is set to
    * true .
    */
-  void set_colorCurves(const shared_ptr_t<ColorCurves>& value);
+  void set_colorCurves(const std::shared_ptr<ColorCurves>& value);
 
   /**
    * @brief Gets wether the color curves effect is enabled.
@@ -230,7 +235,8 @@ public:
    * Color curves setup used in the effect if colorCurvesEnabled is set to true
    * .
    */
-  Property<ImageProcessingPostProcess, shared_ptr_t<ColorCurves>> colorCurves;
+  Property<ImageProcessingPostProcess, std::shared_ptr<ColorCurves>>
+    colorCurves;
 
   /**
    * Wether the color curves effect is enabled.

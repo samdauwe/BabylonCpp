@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_VR_DISTORTION_CORRECTION_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_VR_DISTORTION_CORRECTION_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/cameras/vr/vr_camera_metrics.h>
 #include <babylon/postprocess/post_process.h>
 
@@ -14,7 +14,7 @@ class BABYLON_SHARED_EXPORT VRDistortionCorrectionPostProcess
     : public PostProcess {
 
 public:
-  VRDistortionCorrectionPostProcess(const string_t& name,
+  VRDistortionCorrectionPostProcess(const std::string& name,
                                     const CameraPtr& camera, bool isRightEye,
                                     const VRCameraMetrics& vrMetrics);
   ~VRDistortionCorrectionPostProcess();

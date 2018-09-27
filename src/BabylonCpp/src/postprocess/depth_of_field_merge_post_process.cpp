@@ -5,8 +5,8 @@
 namespace BABYLON {
 
 DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
-  const string_t& name, PostProcess* originalFromInput,
-  PostProcess* circleOfConfusion, const vector_t<PostProcess*>& iBlurSteps,
+  const std::string& name, PostProcess* originalFromInput,
+  PostProcess* circleOfConfusion, const std::vector<PostProcess*>& iBlurSteps,
   const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType, bool blockCompilation)
@@ -46,11 +46,11 @@ DepthOfFieldMergePostProcess::~DepthOfFieldMergePostProcess()
 }
 
 void DepthOfFieldMergePostProcess::updateEffect(
-  const string_t& defines, const vector_t<string_t>& uniforms,
-  const vector_t<string_t>& samplers,
-  const unordered_map_t<string_t, unsigned int>& indexParameters,
+  const std::string& defines, const std::vector<std::string>& uniforms,
+  const std::vector<std::string>& samplers,
+  const std::unordered_map<std::string, unsigned int>& indexParameters,
   const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const string_t& errors)>& onError)
+  const std::function<void(Effect* effect, const std::string& errors)>& onError)
 {
   auto _defines = defines;
   if (!defines.empty()) {

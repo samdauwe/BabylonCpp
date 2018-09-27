@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_BLUR_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_BLUR_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/variant.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/vector2.h>
@@ -38,15 +38,13 @@ public:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BlurPostProcess(const string_t& name, const Vector2& direction, float kernel,
-                  const Variant<float, PostProcessOptions>& options,
-                  const CameraPtr& camera,
-                  unsigned int samplingMode
-                  = TextureConstants::BILINEAR_SAMPLINGMODE,
-                  Engine* engine = nullptr, bool reusable = false,
-                  unsigned int textureType
-                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-                  const string_t& defines = "", bool blockCompilation = false);
+  BlurPostProcess(
+    const std::string& name, const Vector2& direction, float kernel,
+    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+    unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
+    Engine* engine = nullptr, bool reusable = false,
+    unsigned int textureType   = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    const std::string& defines = "", bool blockCompilation = false);
   ~BlurPostProcess() override;
 
   /**
@@ -65,17 +63,20 @@ public:
    * @param onError Called if there is an error when compiling a shader.
    */
   void updateEffect(
-    const string_t& defines = "", const vector_t<string_t>& uniforms = {},
-    const vector_t<string_t>& samplers                             = {},
-    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    const std::function<void(Effect* effect)>& onCompiled        = nullptr,
-    const std::function<void(Effect* effect, const string_t& errors)>& onError
+    const std::string& defines                                           = "",
+    const std::vector<std::string>& uniforms                             = {},
+    const std::vector<std::string>& samplers                             = {},
+    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+    const std::function<void(Effect* effect)>& onCompiled = nullptr,
+    const std::function<void(Effect* effect, const std::string& errors)>&
+      onError
     = nullptr) override;
 
 protected:
   void _updateParameters(
     const std::function<void(Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(Effect* effect, const string_t& errors)>& onError
+    const std::function<void(Effect* effect, const std::string& errors)>&
+      onError
     = nullptr);
 
   /**
@@ -110,7 +111,7 @@ protected:
    * (excluding trailing 0s).
    * @return GLSL float string.
    */
-  string_t _glslFloat(float x, unsigned int decimalFigures = 8) const;
+  std::string _glslFloat(float x, unsigned int decimalFigures = 8) const;
 
 private:
   /**
@@ -155,7 +156,7 @@ protected:
   bool _packedFloat;
 
 private:
-  string_t _staticDefines;
+  std::string _staticDefines;
   bool blockCompilation;
 
 }; // end of class BlurPostProcess

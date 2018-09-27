@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_ANAGLYPH_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_ANAGLYPH_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -23,8 +23,8 @@ public:
    * @param reusable defines if the postprocess will be reused multiple times
    * per frame
    */
-  AnaglyphPostProcess(const string_t& name, float ratio,
-                      const vector_t<CameraPtr>& rigCameras,
+  AnaglyphPostProcess(const std::string& name, float ratio,
+                      const std::vector<CameraPtr>& rigCameras,
                       unsigned int samplingMode, Engine* engine,
                       bool reusable = false);
   ~AnaglyphPostProcess();

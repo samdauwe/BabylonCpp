@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_EXTRACT_HIGHLIGHTS_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_EXTRACT_HIGHLIGHTS_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT ExtractHighlightsPostProcess : public PostProcess {
 
 public:
   ExtractHighlightsPostProcess(
-    const string_t& name, const Variant<float, PostProcessOptions>& options,
+    const std::string& name, const Variant<float, PostProcessOptions>& options,
     const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
     bool reusable            = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,

@@ -1,11 +1,35 @@
 #ifndef BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_SSAO_RENDERING_PIPLINE_H
 #define BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_SSAO_RENDERING_PIPLINE_H
 
-#include <babylon/babylon_global.h>
+#include <map>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class DynamicTexture;
+class PassPostProcess;
+class PostProcess;
+class Scene;
+class Texture;
+class Vector3;
+using TexturePtr        = std::shared_ptr<Texture>;
+using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 struct SSAO2Ratio {
   float ssaoRatio;
@@ -52,11 +76,11 @@ public:
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
    * pipeline will be attached to
    */
-  SSAO2RenderingPipeline(const string_t& name, Scene* scene, float ratio,
-                         const vector_t<CameraPtr>& cameras);
-  SSAO2RenderingPipeline(const string_t& name, Scene* scene,
+  SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
+                         const std::vector<CameraPtr>& cameras);
+  SSAO2RenderingPipeline(const std::string& name, Scene* scene,
                          const SSAO2Ratio& ratio,
-                         const vector_t<CameraPtr>& cameras);
+                         const std::vector<CameraPtr>& cameras);
   virtual ~SSAO2RenderingPipeline() override;
 
   /** Methods */
@@ -84,8 +108,8 @@ public:
    * @param rootUrl The URL of the serialized pipeline.
    * @returns An instantiated pipeline from the serialized object.
    */
-  static unique_ptr_t<SSAO2RenderingPipeline>
-  Parse(const Json::value& source, Scene* scene, const string_t& url);
+  static std::unique_ptr<SSAO2RenderingPipeline>
+  Parse(const Json::value& source, Scene* scene, const std::string& url);
 
 private:
   void set_samples(unsigned int n);
@@ -97,7 +121,7 @@ private:
   void _createBlurPostProcess(float ssaoRatio, float blurRatio);
   // Van der Corput radical inverse
   float _radicalInverse_VdC(uint32_t i);
-  array_t<float, 2> _hammersley(uint32_t i, uint32_t n);
+  std::array<float, 2> _hammersley(uint32_t i, uint32_t n);
   Vector3 _hemisphereSample_uniform(float u, float v);
   Float32Array _generateHemisphere();
   void _createSSAOPostProcess(float ratio);

@@ -1,12 +1,34 @@
 #ifndef BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_STANDARD_RENDERING_PIPLINE_H
 #define BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_STANDARD_RENDERING_PIPLINE_H
 
+#include <map>
+
+#include <babylon/babylon_api.h>
+
 #include <babylon/animations/ianimatable.h>
-#include <babylon/babylon_global.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
+
+class BlurPostProcess;
+class Light;
+class PostProcess;
+class Scene;
+class Texture;
+using TexturePtr = std::shared_ptr<Texture>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 class BABYLON_SHARED_EXPORT StandardRenderingPipeline
     : public PostProcessRenderPipeline,
@@ -29,12 +51,12 @@ public:
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
    * pipeline will be attached to
    */
-  StandardRenderingPipeline(const string_t& name, Scene* scene, float ratio,
-                            PostProcess* originalPostProcess   = nullptr,
-                            const vector_t<CameraPtr>& cameras = {});
+  StandardRenderingPipeline(const std::string& name, Scene* scene, float ratio,
+                            PostProcess* originalPostProcess      = nullptr,
+                            const std::vector<CameraPtr>& cameras = {});
   virtual ~StandardRenderingPipeline() override;
 
-  float operator[](const string_t& key) const;
+  float operator[](const std::string& key) const;
 
   bool bloomEnabled() const;
   void setBloomEnabled(bool enabled);
@@ -72,8 +94,8 @@ public:
    * @param rootUrl The URL of the serialized pipeline.
    * @returns An instantiated pipeline from the serialized object.
    */
-  static unique_ptr_t<StandardRenderingPipeline>
-  Parse(const Json::value& source, Scene* scene, const string_t& url);
+  static std::unique_ptr<StandardRenderingPipeline>
+  Parse(const Json::value& source, Scene* scene, const std::string& url);
 
 private:
   void _buildPipeline();
@@ -83,7 +105,7 @@ private:
   void _createBrightPassPostProcess(Scene* scene, float ratio);
   // Create blur H&V post-processes
   void _createBlurPostProcesses(Scene* scene, float ratio, unsigned int indice,
-                                const string_t& blurWidthKey = "blurWidth");
+                                const std::string& blurWidthKey = "blurWidth");
   // Create texture adder post-process
   void _createTextureAdderPostProcess(Scene* scene, float ratio);
   void _createVolumetricLightPostProcess(Scene* scene, float ratio);
@@ -105,8 +127,8 @@ public:
   PostProcess* originalPostProcess;
   PostProcess* downSampleX4PostProcess;
   PostProcess* brightPassPostProcess;
-  vector_t<PostProcess*> blurHPostProcesses;
-  vector_t<PostProcess*> blurVPostProcesses;
+  std::vector<PostProcess*> blurHPostProcesses;
+  std::vector<PostProcess*> blurVPostProcesses;
   PostProcess* textureAdderPostProcess;
   PostProcess* volumetricLightPostProcess;
   BlurPostProcess* volumetricLightSmoothXPostProcess;
@@ -114,7 +136,7 @@ public:
   PostProcess* volumetricLightMergePostProces;
   PostProcess* volumetricLightFinalPostProcess;
   PostProcess* luminancePostProcess;
-  vector_t<PostProcess*> luminanceDownSamplePostProcesses;
+  std::vector<PostProcess*> luminanceDownSamplePostProcesses;
   PostProcess* hdrPostProcess;
   PostProcess* textureAdderFinalPostProcess;
   PostProcess* lensFlareFinalPostProcess;
@@ -147,7 +169,7 @@ public:
   float depthOfFieldBlurWidth;
   float motionStrength;
   // IAnimatable
-  vector_t<Animation> animations;
+  std::vector<Animation> animations;
 
 private:
   Scene* _scene;

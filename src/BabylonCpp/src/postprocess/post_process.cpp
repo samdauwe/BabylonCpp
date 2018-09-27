@@ -16,7 +16,8 @@ namespace BABYLON {
 
 PostProcess::PostProcess(
   const string_t& iName, const string_t& fragmentUrl,
-  const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
+  const std::vector<string_t>& parameters,
+  const std::vector<string_t>& samplers,
   const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   const string_t& defines, unsigned int textureType, const string_t& vertexUrl,
@@ -205,8 +206,8 @@ void PostProcess::useOwnOutput()
 }
 
 void PostProcess::updateEffect(
-  const string_t& defines, const vector_t<string_t>& uniforms,
-  const vector_t<string_t>& samplers,
+  const string_t& defines, const std::vector<string_t>& uniforms,
+  const std::vector<string_t>& samplers,
   const unordered_map_t<string_t, unsigned int>& indexParameters,
   const std::function<void(Effect* effect)>& onCompiled,
   const std::function<void(Effect* effect, const string_t& errors)>& onError)
@@ -467,14 +468,13 @@ void PostProcess::dispose(Camera* camera)
 
   if (_scene) {
     _scene->postProcesses.erase(std::remove(_scene->postProcesses.begin(),
-                                              _scene->postProcesses.end(),
-                                              this),
+                                            _scene->postProcesses.end(), this),
                                 _scene->postProcesses.end());
   }
   else {
     _engine->postProcesses.erase(std::remove(_engine->postProcesses.begin(),
-                                               _engine->postProcesses.end(),
-                                               this),
+                                             _engine->postProcesses.end(),
+                                             this),
                                  _engine->postProcesses.end());
   }
 

@@ -1,7 +1,7 @@
 #ifndef BABYLON_MATH_SIMD_FLOAT32X4_H
 #define BABYLON_MATH_SIMD_FLOAT32X4_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 #include <xmmintrin.h>
 

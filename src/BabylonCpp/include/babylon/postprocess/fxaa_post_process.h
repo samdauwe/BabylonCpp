@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_FXAA_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_FXAA_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/postprocess/post_process.h>
 
@@ -13,7 +13,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT FxaaPostProcess : public PostProcess {
 
 public:
-  FxaaPostProcess(const string_t& _name, float ratio,
+  FxaaPostProcess(const std::string& _name, float ratio,
                   const CameraPtr& camera = nullptr,
                   unsigned int samplingMode
                   = TextureConstants::BILINEAR_SAMPLINGMODE,
@@ -23,7 +23,7 @@ public:
   ~FxaaPostProcess();
 
 private:
-  string_t _getDefines();
+  std::string _getDefines();
 
 public:
   float texelWidth;

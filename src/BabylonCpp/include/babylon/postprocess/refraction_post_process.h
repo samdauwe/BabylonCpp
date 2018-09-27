@@ -1,11 +1,14 @@
 #ifndef BABYLON_POSTPROCESS_REFRACTION_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_REFRACTION_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
+
+class Texture;
+using TexturePtr = std::shared_ptr<Texture>;
 
 /**
  * @brief
@@ -13,8 +16,8 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT RefractionPostProcess : public PostProcess {
 
 public:
-  RefractionPostProcess(const string_t& name,
-                        const string_t& refractionTextureUrl,
+  RefractionPostProcess(const std::string& name,
+                        const std::string& refractionTextureUrl,
                         const Color3& color, float depth, int colorLevel,
                         float ratio, const CameraPtr& camera,
                         unsigned int samplingMode, Engine* engine,

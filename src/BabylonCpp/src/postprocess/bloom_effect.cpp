@@ -8,8 +8,8 @@
 
 namespace BABYLON {
 
-BloomEffect::BloomEffect(const string_t& name, Scene* scene, float bloomScale,
-                         float bloomWeight, float bloomKernel,
+BloomEffect::BloomEffect(const std::string& name, Scene* scene,
+                         float bloomScale, float bloomWeight, float bloomKernel,
                          unsigned int pipelineTextureType,
                          bool blockCompilation)
     : PostProcessRenderEffect{scene->getEngine(), "bloom",

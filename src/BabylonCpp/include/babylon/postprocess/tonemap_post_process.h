@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_TONEMAP_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_TONEMAP_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -24,7 +24,8 @@ public:
    * @param textureFormat defines the texture format to use
    * (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
    */
-  TonemapPostProcess(const string_t& name, const TonemappingOperator& operator_,
+  TonemapPostProcess(const std::string& name,
+                     const TonemappingOperator& operator_,
                      float exposureAdjustment, const CameraPtr& camera,
                      unsigned int samplingMode
                      = TextureConstants::BILINEAR_SAMPLINGMODE,

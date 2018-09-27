@@ -1,10 +1,15 @@
 #ifndef BABYLON_POSTPROCESS_BLOOM_EFFECT_H
 #define BABYLON_POSTPROCESS_BLOOM_EFFECT_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 
 namespace BABYLON {
+
+class BloomMergePostProcess;
+class BlurPostProcess;
+class ExtractHighlightsPostProcess;
+class Scene;
 
 /**
  * @brief The bloom effect spreads bright areas of an image to simulate
@@ -27,7 +32,7 @@ public:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BloomEffect(const string_t& name, Scene* scene, float bloomScale,
+  BloomEffect(const std::string& name, Scene* scene, float bloomScale,
               float bloomWeight, float bloomKernel,
               unsigned int pipelineTextureType = 0,
               bool blockCompilation            = false);
@@ -94,7 +99,7 @@ public:
   /**
    * Hidden Internal
    */
-  vector_t<PostProcess*> _effects;
+  std::vector<PostProcess*> _effects;
 
   /**
    * Hidden Internal

@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_DEPTH_OF_FIELD_MERGE_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_DEPTH_OF_FIELD_MERGE_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -38,8 +38,8 @@ public:
    * at a later time. (default: false)
    */
   DepthOfFieldMergePostProcess(
-    const string_t& name, PostProcess* originalFromInput,
-    PostProcess* circleOfConfusion, const vector_t<PostProcess*>& blurSteps,
+    const std::string& name, PostProcess* originalFromInput,
+    PostProcess* circleOfConfusion, const std::vector<PostProcess*>& blurSteps,
     const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
     unsigned int samplingMode = 0, Engine* engine = nullptr,
     bool reusable            = false,
@@ -63,15 +63,17 @@ public:
    * @param onError Called if there is an error when compiling a shader.
    */
   void updateEffect(
-    const string_t& defines = "", const vector_t<string_t>& uniforms = {},
-    const vector_t<string_t>& samplers                             = {},
-    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    const std::function<void(Effect* effect)>& onCompiled        = nullptr,
-    const std::function<void(Effect* effect, const string_t& errors)>& onError
+    const std::string& defines                                           = "",
+    const std::vector<std::string>& uniforms                             = {},
+    const std::vector<std::string>& samplers                             = {},
+    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+    const std::function<void(Effect* effect)>& onCompiled = nullptr,
+    const std::function<void(Effect* effect, const std::string& errors)>&
+      onError
     = nullptr) override;
 
 private:
-  vector_t<PostProcess*> blurSteps;
+  std::vector<PostProcess*> blurSteps;
 
 }; // end of class DepthOfFieldMergePostProcess
 

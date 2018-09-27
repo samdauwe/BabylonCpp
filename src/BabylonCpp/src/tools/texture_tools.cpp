@@ -11,7 +11,7 @@
 
 namespace BABYLON {
 
-string_t TextureTools::_environmentBRDFBase64Texture
+std::string TextureTools::_environmentBRDFBase64Texture
   = "data:image/"
     "png;base64,"
     "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAgAElEQVR4Xu19Z7PtTHbW1g3jMM"

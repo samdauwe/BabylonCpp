@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-FilterPostProcess::FilterPostProcess(const string_t& iName,
+FilterPostProcess::FilterPostProcess(const std::string& iName,
                                      const Matrix& _kernelMatrix, float ratio,
                                      const CameraPtr& camera,
                                      unsigned int samplingMode, Engine* engine,

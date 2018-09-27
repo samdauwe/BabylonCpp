@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 StereoscopicInterlacePostProcess::StereoscopicInterlacePostProcess(
-  const string_t& iName, const vector_t<CameraPtr>& rigCameras,
+  const std::string& iName, const std::vector<CameraPtr>& rigCameras,
   bool isStereoscopicHoriz, unsigned int samplingMode, Engine* engine,
   bool reusable)
     : PostProcess(iName, "stereoscopicInterlace", {"stepSize"}, {"camASampler"},

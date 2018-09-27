@@ -1,11 +1,20 @@
 #ifndef BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_SSAO_RENDERING_PIPLINE_H
 #define BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_SSAO_RENDERING_PIPLINE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
 
 namespace BABYLON {
+
+class BlurPostProcess;
+class DynamicTexture;
+class PassPostProcess;
+class PostProcess;
+class RenderTargetTexture;
+class Scene;
+using DynamicTexturePtr      = std::shared_ptr<DynamicTexture>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 struct SSARatio {
   float ssaoRatio;
@@ -52,11 +61,11 @@ public:
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
    * pipeline will be attached to
    */
-  SSAORenderingPipeline(const string_t& name, Scene* scene, float ratio,
-                        const vector_t<CameraPtr>& cameras);
-  SSAORenderingPipeline(const string_t& name, Scene* scene,
+  SSAORenderingPipeline(const std::string& name, Scene* scene, float ratio,
+                        const std::vector<CameraPtr>& cameras);
+  SSAORenderingPipeline(const std::string& name, Scene* scene,
                         const SSARatio& ratio,
-                        const vector_t<CameraPtr>& cameras);
+                        const std::vector<CameraPtr>& cameras);
   virtual ~SSAORenderingPipeline() override;
 
   /** Methods */

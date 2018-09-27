@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 TonemapPostProcess::TonemapPostProcess(
-  const string_t& iName, const TonemappingOperator& operator_,
+  const std::string& iName, const TonemappingOperator& operator_,
   float exposureAdjustment, const CameraPtr& camera, unsigned int samplingMode,
   Engine* engine, unsigned int textureFormat)
     : PostProcess{iName,

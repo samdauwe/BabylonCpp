@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 GlowBlurPostProcess::GlowBlurPostProcess(
-  const string_t& name, const Vector2& iDirection, float iKernel,
+  const std::string& name, const Vector2& iDirection, float iKernel,
   const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable)
     : PostProcess(name, "glowBlurPostProcess",

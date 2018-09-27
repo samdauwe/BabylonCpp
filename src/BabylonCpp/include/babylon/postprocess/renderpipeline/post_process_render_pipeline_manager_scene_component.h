@@ -1,11 +1,19 @@
 #ifndef BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_MANAGER_SCENE_COMPONENT_H
 #define BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_MANAGER_SCENE_COMPONENT_H
 
-#include <babylon/babylon_global.h>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
 namespace BABYLON {
+
+class PostProcessRenderPipelineManagerSceneComponent;
+class RenderTargetTexture;
+using PostProcessRenderPipelineManagerSceneComponentPtr
+  = std::shared_ptr<PostProcessRenderPipelineManagerSceneComponent>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Defines the Render Pipeline scene component responsible to rendering
@@ -26,7 +34,7 @@ public:
   template <typename... Ts>
   static PostProcessRenderPipelineManagerSceneComponentPtr New(Ts&&... args)
   {
-    return shared_ptr_t<PostProcessRenderPipelineManagerSceneComponent>(
+    return std::shared_ptr<PostProcessRenderPipelineManagerSceneComponent>(
       new PostProcessRenderPipelineManagerSceneComponent(
         std::forward<Ts>(args)...));
   }
@@ -56,8 +64,8 @@ protected:
   PostProcessRenderPipelineManagerSceneComponent(Scene* scene);
 
 private:
-  void
-  _gatherRenderTargets(const vector_t<RenderTargetTexturePtr>& renderTargets);
+  void _gatherRenderTargets(
+    const std::vector<RenderTargetTexturePtr>& renderTargets);
   void _rebuildGeometry();
 
 }; // end of class PostProcessRenderPipelineManagerSceneComponent

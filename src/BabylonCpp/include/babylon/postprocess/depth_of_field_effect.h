@@ -1,11 +1,21 @@
 #ifndef BABYLON_POSTPROCESS_DEPTH_OF_FIELD_EFFECT_H
 #define BABYLON_POSTPROCESS_DEPTH_OF_FIELD_EFFECT_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/depth_of_field_effect_blur_level.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 
 namespace BABYLON {
+
+class CircleOfConfusionPostProcess;
+class DepthOfFieldBlurPostProcess;
+class DepthOfFieldMergePostProcess;
+class PassPostProcess;
+class RenderTargetTexture;
+class Scene;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief The depth of field effect applies a blur to objects that are closer or
@@ -93,12 +103,12 @@ public:
   /**
    * Hidden Internal, blurs from high to low
    */
-  std::vector<unique_ptr_t<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurX;
+  std::vector<std::unique_ptr<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurX;
 
   /**
    * Hidden Internal post processes in depth of field effect
    */
-  vector_t<PostProcess*> _effects;
+  std::vector<PostProcess*> _effects;
 
   /**
    * The focal the length of the camera used in the effect
@@ -131,10 +141,10 @@ public:
   WriteOnlyProperty<DepthOfFieldEffect, RenderTargetTexturePtr> depthTexture;
 
 private:
-  unique_ptr_t<DepthOfFieldMergePostProcess> _dofMerge;
-  unique_ptr_t<PassPostProcess> _depthOfFieldPass;
-  unique_ptr_t<CircleOfConfusionPostProcess> _circleOfConfusion;
-  std::vector<unique_ptr_t<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurY;
+  std::unique_ptr<DepthOfFieldMergePostProcess> _dofMerge;
+  std::unique_ptr<PassPostProcess> _depthOfFieldPass;
+  std::unique_ptr<CircleOfConfusionPostProcess> _circleOfConfusion;
+  std::vector<std::unique_ptr<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurY;
 
 }; // end of class ConvolutionPostProcess
 

@@ -4,7 +4,8 @@
 
 namespace BABYLON {
 
-HighlightsPostProcess::HighlightsPostProcess(const string_t& iName, float ratio,
+HighlightsPostProcess::HighlightsPostProcess(const std::string& iName,
+                                             float ratio,
                                              const CameraPtr& camera,
                                              unsigned int samplingMode,
                                              Engine* engine, bool reusable,

@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_GRAIN_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_GRAIN_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -30,7 +30,7 @@ public:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  GrainPostProcess(const string_t& name,
+  GrainPostProcess(const std::string& name,
                    const Variant<float, PostProcessOptions>& options,
                    const CameraPtr& camera, unsigned int samplingMode,
                    Engine* engine, bool reusable = false,

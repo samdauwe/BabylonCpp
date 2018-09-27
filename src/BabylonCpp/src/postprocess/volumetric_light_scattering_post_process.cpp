@@ -22,7 +22,7 @@
 namespace BABYLON {
 
 VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
-  const string_t& iName, float ratio, const CameraPtr& camera,
+  const std::string& iName, float ratio, const CameraPtr& camera,
   const MeshPtr& iMesh, unsigned int samples, unsigned int samplingMode,
   Engine* engine, bool reusable, Scene* scene)
     : PostProcess(
@@ -97,8 +97,8 @@ bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
     return _mesh->material()->isReady(mesh.get());
   }
 
-  vector_t<string_t> defines;
-  vector_t<string_t> attribs{VertexBuffer::PositionKindChars};
+  vector_t<std::string> defines;
+  vector_t<std::string> attribs{VertexBuffer::PositionKindChars};
   auto material = subMesh->getMaterial();
 
   // Alpha test
@@ -125,8 +125,8 @@ bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
                          + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
       "#define BonesPerMesh "
-      + std::to_string(
-          mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) : 0));
+      + std::to_string(mesh->skeleton() ? (mesh->skeleton()->bones.size() + 1) :
+                                          0));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -142,10 +142,10 @@ bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
   }
 
   // Get correct effect
-  string_t join = String::join(defines, '\n');
+  std::string join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
-    unordered_map_t<string_t, string_t> baseName{
+    unordered_map_t<std::string, std::string> baseName{
       {"vertexElement", "depth"},
       {"fragmentElement", "volumetricLightScatteringPass"}};
 
@@ -179,8 +179,8 @@ void VolumetricLightScatteringPostProcess::dispose(Camera* camera)
 {
   camera->getScene()->customRenderTargets.erase(
     std::remove(camera->getScene()->customRenderTargets.begin(),
-                  camera->getScene()->customRenderTargets.end(),
-                  _volumetricLightScatteringRTT),
+                camera->getScene()->customRenderTargets.end(),
+                _volumetricLightScatteringRTT),
     camera->getScene()->customRenderTargets.end());
 
   _volumetricLightScatteringRTT->dispose();
@@ -364,25 +364,25 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
             = stl_util::slice(transparentSubMeshes, 0,
                               static_cast<int>(transparentSubMeshes.size()));
           std::sort(sortedArray.begin(), sortedArray.end(),
-                      [](const SubMeshPtr& a, const SubMeshPtr& b) {
-                        // Alpha index first
-                        if (a->_alphaIndex > b->_alphaIndex) {
-                          return 1;
-                        }
-                        if (a->_alphaIndex < b->_alphaIndex) {
-                          return -1;
-                        }
+                    [](const SubMeshPtr& a, const SubMeshPtr& b) {
+                      // Alpha index first
+                      if (a->_alphaIndex > b->_alphaIndex) {
+                        return 1;
+                      }
+                      if (a->_alphaIndex < b->_alphaIndex) {
+                        return -1;
+                      }
 
-                        // Then distance to camera
-                        if (a->_distanceToCamera < b->_distanceToCamera) {
-                          return 1;
-                        }
-                        if (a->_distanceToCamera > b->_distanceToCamera) {
-                          return -1;
-                        }
+                      // Then distance to camera
+                      if (a->_distanceToCamera < b->_distanceToCamera) {
+                        return 1;
+                      }
+                      if (a->_distanceToCamera > b->_distanceToCamera) {
+                        return -1;
+                      }
 
-                        return 0;
-                      });
+                      return 0;
+                    });
 
           // Render sub meshes
           pEngine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
@@ -424,7 +424,7 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
 }
 
 MeshPtr
-VolumetricLightScatteringPostProcess::CreateDefaultMesh(const string_t& name,
+VolumetricLightScatteringPostProcess::CreateDefaultMesh(const std::string& name,
                                                         Scene* scene)
 {
   auto mesh           = Mesh::CreatePlane(name, 1.f, scene);

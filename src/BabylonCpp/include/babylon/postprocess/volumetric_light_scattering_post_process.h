@@ -1,11 +1,20 @@
 #ifndef BABYLON_POSTPROCESS_VOLUMETRIC_LIGHT_SCATTERING_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_VOLUMETRIC_LIGHT_SCATTERING_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/math/viewport.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class Mesh;
+class RenderTargetTexture;
+class SubMesh;
+using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
+using MeshPtr                = std::shared_ptr<Mesh>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using SubMeshPtr             = std::shared_ptr<SubMesh>;
 
 /**
  * @brief VolumetricLightScatteringPostProcess class.
@@ -34,7 +43,7 @@ public:
    * provided
    */
   VolumetricLightScatteringPostProcess(
-    const string_t& name, float ratio, const CameraPtr& camera,
+    const std::string& name, float ratio, const CameraPtr& camera,
     const MeshPtr& mesh, unsigned int samples = 100,
     unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false, Scene* scene = nullptr);
@@ -76,7 +85,7 @@ public:
    * @param {BABYLON.Scene} The scene where to create the mesh
    * @return {BABYLON.Mesh} the default mesh
    */
-  static MeshPtr CreateDefaultMesh(const string_t& name, Scene* scene);
+  static MeshPtr CreateDefaultMesh(const std::string& name, Scene* scene);
 
 private:
   bool _isReady(const SubMeshPtr& subMesh, bool useInstances);
@@ -115,7 +124,7 @@ public:
   /**
    * Array containing the excluded meshes not rendered in the internal pass
    */
-  vector_t<AbstractMeshPtr> excludedMeshes;
+  std::vector<AbstractMeshPtr> excludedMeshes;
   /**
    * Controls the overall intensity of the post-process
    */
@@ -138,7 +147,7 @@ private:
   RenderTargetTexturePtr _volumetricLightScatteringRTT;
   Viewport _viewPort;
   Vector2 _screenCoordinates;
-  string_t _cachedDefines;
+  std::string _cachedDefines;
   Vector3 _customMeshPosition;
 
 }; // end of class VolumetricLightScatteringPostProcess

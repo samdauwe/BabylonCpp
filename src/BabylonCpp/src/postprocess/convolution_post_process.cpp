@@ -19,7 +19,7 @@ const Float32Array ConvolutionPostProcess::GaussianKernel
   = {0, 1, 0, 1, 1, 1, 0, 1, 0};
 
 ConvolutionPostProcess::ConvolutionPostProcess(
-  const string_t& iName, const Float32Array& iKernel, float ratio,
+  const std::string& iName, const Float32Array& iKernel, float ratio,
   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
   bool reusable, unsigned int textureType)
     : PostProcess{iName,

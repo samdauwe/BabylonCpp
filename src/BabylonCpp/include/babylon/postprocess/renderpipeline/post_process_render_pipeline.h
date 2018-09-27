@@ -1,10 +1,19 @@
 #ifndef BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_H
 #define BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_H
 
-#include <babylon/babylon_global.h>
+#include <memory>
+#include <unordered_map>
+#include <vector>
+
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 
 namespace BABYLON {
+
+class Camera;
+class Engine;
+class PostProcessRenderEffect;
+using CameraPtr = std::shared_ptr<Camera>;
 
 /**
  * @brief
@@ -12,7 +21,7 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PostProcessRenderPipeline : public IDisposable {
 
 public:
-  PostProcessRenderPipeline(Engine* engine, const string_t& name);
+  PostProcessRenderPipeline(Engine* engine, const std::string& name);
   virtual ~PostProcessRenderPipeline();
 
   /**
@@ -20,20 +29,20 @@ public:
    */
   const char* getClassName() const;
 
-  vector_t<CameraPtr> getCameras() const;
+  std::vector<CameraPtr> getCameras() const;
   bool isSupported() const;
   void addEffect(PostProcessRenderEffect* renderEffect);
   /** Hidden */
   virtual void _rebuild();
   /** Hidden */
-  void _enableEffect(const string_t& renderEffectName,
-                     const vector_t<CameraPtr>& cameras);
-  void _disableEffect(const string_t& renderEffectName,
-                      const vector_t<CameraPtr>& cameras);
+  void _enableEffect(const std::string& renderEffectName,
+                     const std::vector<CameraPtr>& cameras);
+  void _disableEffect(const std::string& renderEffectName,
+                      const std::vector<CameraPtr>& cameras);
   /** Hidden */
-  void _attachCameras(const vector_t<CameraPtr>& cameras, bool unique);
+  void _attachCameras(const std::vector<CameraPtr>& cameras, bool unique);
   /** Hidden */
-  void _detachCameras(const vector_t<CameraPtr>& cameras);
+  void _detachCameras(const std::vector<CameraPtr>& cameras);
   /** Hidden */
   void _update();
   /** Hidden */
@@ -46,15 +55,15 @@ protected:
 
 public:
   /** Hidden */
-  string_t _name;
+  std::string _name;
 
 protected:
-  unordered_map_t<string_t, CameraPtr> _cameras;
+  std::unordered_map<std::string, CameraPtr> _cameras;
 
 private:
   Engine* engine;
-  unordered_map_t<string_t, PostProcessRenderEffect*> _renderEffects;
-  unordered_map_t<string_t, PostProcessRenderEffect*>
+  std::unordered_map<std::string, PostProcessRenderEffect*> _renderEffects;
+  std::unordered_map<std::string, PostProcessRenderEffect*>
     _renderEffectsForIsolatedPass;
 
 }; // end of class PostProcessRenderPipeline

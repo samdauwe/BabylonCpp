@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 ColorCorrectionPostProcess::ColorCorrectionPostProcess(
-  const string_t& iName, const string_t& colorTableUrl, float ratio,
+  const std::string& iName, const std::string& colorTableUrl, float ratio,
   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
   bool reusable)
     : PostProcess{iName,

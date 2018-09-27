@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 ImageProcessingPostProcess::ImageProcessingPostProcess(
-  const string_t& iName, float renderRatio, const CameraPtr& camera,
+  const std::string& iName, float renderRatio, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType,
   ImageProcessingConfiguration* imageProcessingConfiguration)
@@ -168,13 +168,13 @@ void ImageProcessingPostProcess::_attachImageProcessingConfiguration(
   }
 }
 
-shared_ptr_t<ColorCurves>& ImageProcessingPostProcess::get_colorCurves()
+std::shared_ptr<ColorCurves>& ImageProcessingPostProcess::get_colorCurves()
 {
   return _imageProcessingConfiguration->colorCurves;
 }
 
 void ImageProcessingPostProcess::set_colorCurves(
-  const shared_ptr_t<ColorCurves>& value)
+  const std::shared_ptr<ColorCurves>& value)
 {
   _imageProcessingConfiguration->colorCurves = value;
 }
@@ -340,7 +340,7 @@ void ImageProcessingPostProcess::_updateParameters()
   _defines.FROMLINEARSPACE = _fromLinearSpace;
   _imageProcessingConfiguration->prepareDefines(_defines, true);
 
-  string_t defines = "";
+  std::string defines = "";
   if (_defines.IMAGEPROCESSING) {
     defines += "#define IMAGEPROCESSING;\r\n";
   }
@@ -384,10 +384,10 @@ void ImageProcessingPostProcess::_updateParameters()
     defines += "#define EXPOSURE;\r\n";
   }
 
-  vector_t<string_t> samplers{"textureSampler"};
+  std::vector<std::string> samplers{"textureSampler"};
   ImageProcessingConfiguration::PrepareSamplers(samplers, _defines);
 
-  vector_t<string_t> uniforms{"scale"};
+  std::vector<std::string> uniforms{"scale"};
 
   ImageProcessingConfiguration::PrepareSamplers(samplers, _defines);
   ImageProcessingConfiguration::PrepareUniforms(uniforms, _defines);

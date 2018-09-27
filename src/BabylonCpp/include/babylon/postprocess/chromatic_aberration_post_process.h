@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_CHROMATIC_ABERRATION_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_CHROMATIC_ABERRATION_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
@@ -35,7 +35,7 @@ public:
    * at a later time. (default: false)
    */
   ChromaticAberrationPostProcess(
-    const string_t& name, int screenWidth, int screenHeight,
+    const std::string& name, int screenWidth, int screenHeight,
     const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
     unsigned int samplingMode, Engine* engine, bool reusable = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,

@@ -1,7 +1,7 @@
 #ifndef BABYLON_CORE_PROFILING_TIMER_H
 #define BABYLON_CORE_PROFILING_TIMER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <windows.h>
 
 namespace BABYLON {

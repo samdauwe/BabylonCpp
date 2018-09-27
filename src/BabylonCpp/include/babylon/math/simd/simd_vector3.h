@@ -1,9 +1,13 @@
 #ifndef BABYLON_MATH_SIMD_VECTOR3_H
 #define BABYLON_MATH_SIMD_VECTOR3_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Matrix;
+class Vector3;
+
 namespace SIMD {
 
 struct BABYLON_SHARED_EXPORT SIMDVector3 {

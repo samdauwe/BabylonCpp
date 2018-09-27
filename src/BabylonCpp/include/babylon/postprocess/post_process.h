@@ -1,7 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/engine_constants.h>
@@ -11,6 +11,14 @@
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
+
+class Animation;
+class Camera;
+class Effect;
+class Engine;
+class Scene;
+class InternalTexture;
+using CameraPtr = std::shared_ptr<Camera>;
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has
@@ -49,16 +57,17 @@ public:
    * (default: false)
    */
   PostProcess(
-    const string_t& name, const string_t& fragmentUrl,
-    const vector_t<string_t>& parameters, const vector_t<string_t>& samplers,
+    const std::string& name, const std::string& fragmentUrl,
+    const std::vector<std::string>& parameters,
+    const std::vector<std::string>& samplers,
     const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
     unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
-    const string_t& defines   = "",
-    unsigned int textureType  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    const string_t& vertexUrl = "postprocess",
-    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    bool blockCompilation                                          = false);
+    const std::string& defines   = "",
+    unsigned int textureType     = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    const std::string& vertexUrl = "postprocess",
+    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+    bool blockCompilation = false);
   virtual ~PostProcess();
 
   // Events
@@ -72,14 +81,14 @@ public:
   /**
    * @brief A function that is added to the onSizeChangedObservable.
    */
-  void setOnSizeChanged(const std::function<void(PostProcess* postProcess,
-                                                   EventState&)>& callback);
+  void setOnSizeChanged(
+    const std::function<void(PostProcess* postProcess, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onApplyObservable.
    */
-  void setOnApply(
-    const std::function<void(Effect* effect, EventState&)>& callback);
+  void
+  setOnApply(const std::function<void(Effect* effect, EventState&)>& callback);
 
   /**
    * @brief A function that is added to the onBeforeRenderObservable.
@@ -157,11 +166,13 @@ public:
    * @param onError Called if there is an error when compiling a shader.
    */
   virtual void updateEffect(
-    const string_t& defines = "", const vector_t<string_t>& uniforms = {},
-    const vector_t<string_t>& samplers                             = {},
-    const unordered_map_t<string_t, unsigned int>& indexParameters = {},
-    const std::function<void(Effect* effect)>& onCompiled        = nullptr,
-    const std::function<void(Effect* effect, const string_t& errors)>& onError
+    const std::string& defines                                           = "",
+    const std::vector<std::string>& uniforms                             = {},
+    const std::vector<std::string>& samplers                             = {},
+    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+    const std::function<void(Effect* effect)>& onCompiled = nullptr,
+    const std::function<void(Effect* effect, const std::string& errors)>&
+      onError
     = nullptr);
 
   /**
@@ -242,7 +253,7 @@ public:
   /**
    * Name of the PostProcess
    */
-  string_t name;
+  std::string name;
 
   /**
    * Width of the texture to apply the post process on
@@ -270,7 +281,7 @@ public:
   /**
    * Clear color to use when screen clearing
    */
-  unique_ptr_t<Color4> clearColor;
+  std::unique_ptr<Color4> clearColor;
 
   /**
    * If the buffer needs to be cleared before applying the post process.
@@ -288,12 +299,12 @@ public:
   /**
    * Sets the setAlphaBlendConstants of the babylon engine
    */
-  nullable_t<Color4> alphaConstants;
+  std::optional<Color4> alphaConstants;
 
   /**
    * Animations to be used for the post processing
    */
-  vector_t<Animation*> animations;
+  std::vector<Animation*> animations;
 
   /**
    * Enable Pixel Perfect mode where texture is not scaled to be power of 2.
@@ -341,7 +352,7 @@ public:
    * Smart array of input and output textures for the post process.
    * Hidden
    */
-  vector_t<InternalTexture*> _textures;
+  std::vector<InternalTexture*> _textures;
 
   /**
    * The index in _textures that corresponds to the output texture.
@@ -377,7 +388,7 @@ public:
   Observable<Effect> onAfterRenderObservable;
 
 protected:
-  unordered_map_t<string_t, unsigned int> _indexParameters;
+  std::unordered_map<std::string, unsigned int> _indexParameters;
 
 private:
   unsigned int _samples;
@@ -389,10 +400,10 @@ private:
   bool _reusable;
   unsigned int _textureType;
   Effect* _effect;
-  vector_t<string_t> _samplers;
-  string_t _fragmentUrl;
-  string_t _vertexUrl;
-  vector_t<string_t> _parameters;
+  std::vector<std::string> _samplers;
+  std::string _fragmentUrl;
+  std::string _vertexUrl;
+  std::vector<std::string> _parameters;
   Vector2 _scaleRatio;
   PostProcess* _shareOutputWithPostProcess;
   Vector2 _texelSize;

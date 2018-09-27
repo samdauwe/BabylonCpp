@@ -1,9 +1,15 @@
 #ifndef BABYLON_MATH_SIMD_MATRIX_H
 #define BABYLON_MATH_SIMD_MATRIX_H
 
-#include <babylon/babylon_global.h>
+#include <array>
+
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
+
+class Matrix;
+class Vector3;
+
 namespace SIMD {
 
 struct BABYLON_SHARED_EXPORT SIMDMatrix {
@@ -20,13 +26,13 @@ struct BABYLON_SHARED_EXPORT SIMDMatrix {
   ~SIMDMatrix();
 
   SIMDMatrix& multiplyToArraySIMD(const Matrix& other,
-                                  array_t<float, 16>& result,
+                                  std::array<float, 16>& result,
                                   unsigned int offset);
   SIMDMatrix& invertToRefSIMD(Matrix& other);
   static void LookAtLHToRefSIMD(const Vector3& eyeRef, const Vector3& targetRef,
                                 const Vector3& upRef, Matrix& result);
 
-  array_t<float, 16> m;
+  std::array<float, 16> m;
 
 }; // end of struct SIMDMatrix
 

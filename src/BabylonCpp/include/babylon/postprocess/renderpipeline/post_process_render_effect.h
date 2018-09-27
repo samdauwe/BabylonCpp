@@ -1,9 +1,18 @@
 #ifndef BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_EFFECT_H
 #define BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_EFFECT_H
 
-#include <babylon/babylon_global.h>
+#include <functional>
+#include <memory>
+
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 
 namespace BABYLON {
+
+class Camera;
+class Engine;
+class PostProcess;
+using CameraPtr = std::shared_ptr<Camera>;
 
 /**
  * @brief This represents a set of one or more post processes in Babylon.
@@ -26,8 +35,8 @@ public:
    * cameras. (default: true)
    */
   PostProcessRenderEffect(
-    Engine* engine, const string_t& name,
-    const std::function<vector_t<PostProcess*>()>& getPostProcesses,
+    Engine* engine, const std::string& name,
+    const std::function<std::vector<PostProcess*>()>& getPostProcesses,
     bool singleInstance = true);
   ~PostProcessRenderEffect();
 
@@ -42,35 +51,35 @@ public:
    * @param cameras The camera to attach to.
    * Hidden
    */
-  void _attachCameras(const vector_t<CameraPtr>& cameras);
+  void _attachCameras(const std::vector<CameraPtr>& cameras);
 
   /**
    * @brief Detatches the effect on cameras.
    * @param cameras The camera to detatch from.
    * Hidden
    */
-  void _detachCameras(const vector_t<CameraPtr>& cameras);
+  void _detachCameras(const std::vector<CameraPtr>& cameras);
 
   /**
    * @brief Enables the effect on given cameras.
    * @param cameras The camera to enable.
    * Hidden
    */
-  void _enable(const vector_t<CameraPtr>& cameras);
+  void _enable(const std::vector<CameraPtr>& cameras);
 
   /**
    * @brief Disables the effect on the given cameras.
    * @param cameras The camera to disable.
    * Hidden
    */
-  void _disable(const vector_t<CameraPtr>& cameras);
+  void _disable(const std::vector<CameraPtr>& cameras);
 
   /**
    * @brief Gets a list of the post processes contained in the effect.
    * @param camera The camera to get the post processes on.
    * @returns The list of the post processes in the effect.
    */
-  vector_t<PostProcess*> getPostProcesses(Camera* camera = nullptr);
+  std::vector<PostProcess*> getPostProcesses(Camera* camera = nullptr);
 
 protected:
   /**
@@ -83,7 +92,7 @@ public:
    * Name of the effect
    * Hidden
    */
-  string_t _name;
+  std::string _name;
 
   Engine* _engine;
 
@@ -93,11 +102,11 @@ public:
   ReadOnlyProperty<PostProcessRenderEffect, bool> isSupported;
 
 private:
-  unordered_map_t<string_t, vector_t<PostProcess*>> _postProcesses;
-  std::function<vector_t<PostProcess*>()> _getPostProcesses;
+  std::unordered_map<std::string, std::vector<PostProcess*>> _postProcesses;
+  std::function<std::vector<PostProcess*>()> _getPostProcesses;
   bool _singleInstance;
-  unordered_map_t<string_t, CameraPtr> _cameras;
-  unordered_map_t<string_t, IndicesArray> _indicesForCamera;
+  std::unordered_map<std::string, CameraPtr> _cameras;
+  std::unordered_map<std::string, IndicesArray> _indicesForCamera;
 
 }; // end of class PostProcessRenderEffect
 

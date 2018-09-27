@@ -1,11 +1,18 @@
 #ifndef BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_LENS_RENDERING_PIPLINE_H
 #define BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_LENS_RENDERING_PIPLINE_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
 
 namespace BABYLON {
+
+class PostProcess;
+class Scene;
+class RenderTargetTexture;
+class Texture;
+using TexturePtr             = std::shared_ptr<Texture>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 struct LensRenderingPipelineParameters {
   TexturePtr grain_texture   = nullptr;
@@ -102,11 +109,11 @@ public:
    * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
    * pipeline will be attached to
    */
-  LensRenderingPipeline(const string_t& name,
+  LensRenderingPipeline(const std::string& name,
                         const LensRenderingPipelineParameters& parameters,
                         Scene* scene, float ratio = 1.f,
-                        const vector_t<CameraPtr>& cameras = {});
-  virtual ~LensRenderingPipeline();
+                        const std::vector<CameraPtr>& cameras = {});
+  virtual ~LensRenderingPipeline() override;
 
   /** Methods **/
   void setEdgeBlur(float amount);

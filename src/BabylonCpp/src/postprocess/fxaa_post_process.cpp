@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-FxaaPostProcess::FxaaPostProcess(const string_t& iName, float ratio,
+FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio,
                                  const CameraPtr& camera,
                                  unsigned int samplingMode, Engine* engine,
                                  bool reusable, unsigned int textureType)
@@ -39,7 +39,7 @@ FxaaPostProcess::~FxaaPostProcess()
 {
 }
 
-string_t FxaaPostProcess::_getDefines()
+std::string FxaaPostProcess::_getDefines()
 {
   auto engine = getEngine();
   if (!engine) {

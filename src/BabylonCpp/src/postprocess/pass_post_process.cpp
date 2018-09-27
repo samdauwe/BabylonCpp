@@ -4,7 +4,7 @@
 
 namespace BABYLON {
 
-PassPostProcess::PassPostProcess(const string_t& iName, float ratio,
+PassPostProcess::PassPostProcess(const std::string& iName, float ratio,
                                  const CameraPtr& camera,
                                  unsigned int samplingMode, Engine* engine,
                                  bool reusable, unsigned int textureType,

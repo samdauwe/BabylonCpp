@@ -21,13 +21,13 @@ void PostProcessRenderPipelineManagerSceneComponent::_register()
   scene->_gatherRenderTargetsStage.registerStep(
     SceneComponentConstants::
       STEP_GATHERRENDERTARGETS_POSTPROCESSRENDERPIPELINEMANAGER,
-    this, [this](const vector_t<RenderTargetTexturePtr>& renderTargets) {
+    this, [this](const std::vector<RenderTargetTexturePtr>& renderTargets) {
       _gatherRenderTargets(renderTargets);
     });
   scene->_gatherRenderTargetsStage.registerStep(
     SceneComponentConstants::
       STEP_REBUILDGEOMETRY_POSTPROCESSRENDERPIPELINEMANAGER,
-    this, [this](const vector_t<RenderTargetTexturePtr>& /*renderTargets*/) {
+    this, [this](const std::vector<RenderTargetTexturePtr>& /*renderTargets*/) {
       _rebuildGeometry();
     });
 }
@@ -45,7 +45,7 @@ void PostProcessRenderPipelineManagerSceneComponent::dispose()
 }
 
 void PostProcessRenderPipelineManagerSceneComponent::_gatherRenderTargets(
-  const vector_t<RenderTargetTexturePtr>& /*renderTargets*/)
+  const std::vector<RenderTargetTexturePtr>& /*renderTargets*/)
 {
   if (scene->postProcessRenderPipelineManager()) {
     scene->postProcessRenderPipelineManager()->update();

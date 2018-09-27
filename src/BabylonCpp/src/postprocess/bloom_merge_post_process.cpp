@@ -5,10 +5,11 @@
 namespace BABYLON {
 
 BloomMergePostProcess::BloomMergePostProcess(
-  const string_t& iName, PostProcess* iOriginalFromInput, PostProcess* iBlurred,
-  float iWeight, const Variant<float, PostProcessOptions>& options,
-  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
-  bool reusable, unsigned int textureType, bool blockCompilation)
+  const std::string& iName, PostProcess* iOriginalFromInput,
+  PostProcess* iBlurred, float iWeight,
+  const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
+  unsigned int samplingMode, Engine* engine, bool reusable,
+  unsigned int textureType, bool blockCompilation)
     : PostProcess(iName, "bloomMerge", {"bloomWeight"},
                   {"circleOfConfusionSampler", "blurStep0", "blurStep1",
                    "blurStep2", "bloomBlur"},

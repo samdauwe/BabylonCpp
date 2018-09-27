@@ -1,10 +1,13 @@
 #ifndef BABYLON_POSTPROCESS_CIRCLE_OF_CONFUSION_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_CIRCLE_OF_CONFUSION_POST_PROCESS_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
 #include <babylon/postprocess/post_process.h>
 
 namespace BABYLON {
+
+class RenderTargetTexture;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief The CircleOfConfusionPostProcess computes the circle of confusion
@@ -36,7 +39,7 @@ public:
    * at a later time. (default: false)
    */
   CircleOfConfusionPostProcess(
-    const string_t& name, RenderTargetTexture* depthTexture,
+    const std::string& name, RenderTargetTexture* depthTexture,
     const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
     unsigned int samplingMode = 0, Engine* engine = nullptr,
     bool reusable            = false,

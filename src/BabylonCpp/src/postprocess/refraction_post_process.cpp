@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 RefractionPostProcess::RefractionPostProcess(
-  const string_t& iName, const string_t& refractionTextureUrl,
+  const std::string& iName, const std::string& refractionTextureUrl,
   const Color3& iColor, float iDepth, int iColorLevel, float ratio,
   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
   bool reusable)
