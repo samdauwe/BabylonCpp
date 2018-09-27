@@ -1,6 +1,6 @@
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
 
-#include <babylon/babylon_stl.h>
+#include <utility>
 
 namespace BABYLON {
 

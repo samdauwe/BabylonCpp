@@ -1,6 +1,7 @@
 #include <babylon/math/path2.h>
 
-#include <babylon/babylon_stl.h>
+#include <cmath>
+
 #include <babylon/math/arc2.h>
 #include <babylon/math/vector2.h>
 
@@ -53,7 +54,7 @@ Path2 Path2::copy() const
   return Path2(*this);
 }
 
-unique_ptr_t<Path2> Path2::clone() const
+std::unique_ptr<Path2> Path2::clone() const
 {
   return std::make_unique<Path2>(*this);
 }
@@ -130,12 +131,12 @@ float Path2::length() const
   return result;
 }
 
-vector_t<Vector2>& Path2::getPoints()
+std::vector<Vector2>& Path2::getPoints()
 {
   return _points;
 }
 
-const vector_t<Vector2>& Path2::getPoints() const
+const std::vector<Vector2>& Path2::getPoints() const
 {
   return _points;
 }

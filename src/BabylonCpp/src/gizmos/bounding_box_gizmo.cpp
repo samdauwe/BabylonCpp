@@ -17,14 +17,14 @@
 namespace BABYLON {
 
 BoundingBoxGizmo::BoundingBoxGizmo(
-  const Color3& color, const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+  const Color3& color, const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , ignoreChildren{false}
     , rotationSphereSize{0.1f}
     , scaleBoxSize{0.1f}
     , fixedDragMeshScreenSize{false}
     , fixedDragMeshScreenSizeDistanceFactor{10.f}
-    , scalePivot{nullopt_t}
+    , scalePivot{std::nullopt}
     , _lineBoundingBox{nullptr}
     , _rotateSpheresParent{nullptr}
     , _scaleBoxesParent{nullptr}
@@ -54,8 +54,8 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   // Build bounding box out of lines
   _lineBoundingBox = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _lineBoundingBox->rotationQuaternion = Quaternion();
-  vector_t<LinesMeshPtr> lines;
-  vector_t<vector_t<Vector3>> linesPoints{
+  std::vector<LinesMeshPtr> lines;
+  std::vector<std::vector<Vector3>> linesPoints{
     {Vector3(0.f, 0.f, 0.f), Vector3(_boundingDimensions.x, 0.f, 0.f)},
     {Vector3(0.f, 0.f, 0.f), Vector3(0.f, _boundingDimensions.y, 0.f)},
     {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, _boundingDimensions.z)},
@@ -283,14 +283,14 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   _rootMesh->addChild(*_scaleBoxesParent);
 
   // Hover color change
-  unordered_map_t<int, AbstractMeshPtr> pointerIds;
+  std::unordered_map<int, AbstractMeshPtr> pointerIds;
   _pointerObserver
     = gizmoLayer->utilityLayerScene.get()->onPointerObservable.add(
       [&](PointerInfo* pointerInfo, EventState& /*es*/) {
         if (!stl_util::contains(pointerIds,
                                 (pointerInfo->pointerEvent).pointerId)) {
           const auto changeHoverColor
-            = [&](const vector_t<AbstractMeshPtr>& meshes) {
+            = [&](const std::vector<AbstractMeshPtr>& meshes) {
                 for (auto& mesh : meshes) {
                   if (pointerInfo->pickInfo.pickedMesh == mesh) {
                     pointerIds[(pointerInfo->pointerEvent).pointerId] = mesh;
@@ -546,7 +546,7 @@ void BoundingBoxGizmo::updateBoundingBox()
   }
 }
 
-void BoundingBoxGizmo::setEnabledRotationAxis(const string_t axis)
+void BoundingBoxGizmo::setEnabledRotationAxis(const std::string axis)
 {
   size_t i = 0;
   for (auto& m : _rotateSpheresParent->getChildMeshes()) {

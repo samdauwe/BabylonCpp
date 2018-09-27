@@ -12,7 +12,7 @@
 
 namespace BABYLON {
 
-array_t<unsigned int, 17> ActionManager::Triggers{
+std::array<unsigned int, 17> ActionManager::Triggers{
   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 size_t ActionManager::DragMovementThreshold = 10;  // in pixels
 size_t ActionManager::LongPressDelay        = 500; // in milliseconds
@@ -27,7 +27,7 @@ ActionManager::~ActionManager()
 }
 
 void ActionManager::addToScene(
-  const shared_ptr_t<ActionManager>& newActionManager)
+  const std::shared_ptr<ActionManager>& newActionManager)
 {
   _scene->actionManagers.emplace_back(newActionManager);
 }
@@ -42,11 +42,10 @@ void ActionManager::dispose()
   }
 
   _scene->actionManagers.erase(
-    std::remove_if(_scene->actionManagers.begin(),
-                     _scene->actionManagers.end(),
-                     [this](const shared_ptr_t<ActionManager>& actionManager) {
-                       return actionManager.get() == this;
-                     }),
+    std::remove_if(_scene->actionManagers.begin(), _scene->actionManagers.end(),
+                   [this](const std::shared_ptr<ActionManager>& actionManager) {
+                     return actionManager.get() == this;
+                   }),
     _scene->actionManagers.end());
 }
 
@@ -58,11 +57,11 @@ Scene* ActionManager::getScene() const
 bool ActionManager::hasSpecificTriggers(const Uint32Array& triggers) const
 {
   return std::find_if(actions.begin(), actions.end(),
-                        [&triggers](Action* action) {
-                          return std::find(triggers.begin(), triggers.end(),
-                                             action->trigger)
-                                 != triggers.end();
-                        })
+                      [&triggers](Action* action) {
+                        return std::find(triggers.begin(), triggers.end(),
+                                         action->trigger)
+                               != triggers.end();
+                      })
          != actions.end();
 }
 
@@ -80,7 +79,7 @@ bool ActionManager::hasSpecificTriggers2(unsigned int triggerA,
 
 bool ActionManager::hasSpecificTrigger(
   unsigned int trigger,
-  const std::function<bool(const string_t& parameter)>& parameterPredicate)
+  const std::function<bool(const std::string& parameter)>& parameterPredicate)
   const
 {
   return std::find_if(
@@ -104,30 +103,30 @@ bool ActionManager::hasSpecificTrigger(
 bool ActionManager::hasPointerTriggers() const
 {
 
-  return std::find_if(
-           actions.begin(), actions.end(),
-           [](Action* action) {
-             return action->trigger >= ActionManager::OnPickTrigger()
-                    && action->trigger <= ActionManager::OnPointerOutTrigger();
-           })
+  return std::find_if(actions.begin(), actions.end(),
+                      [](Action* action) {
+                        return action->trigger >= ActionManager::OnPickTrigger()
+                               && action->trigger
+                                    <= ActionManager::OnPointerOutTrigger();
+                      })
          != actions.end();
 }
 
 bool ActionManager::hasPickTriggers() const
 {
-  return std::find_if(
-           actions.begin(), actions.end(),
-           [](Action* action) {
-             return action->trigger >= ActionManager::OnPickTrigger()
-                    && action->trigger <= ActionManager::OnPickUpTrigger();
-           })
+  return std::find_if(actions.begin(), actions.end(),
+                      [](Action* action) {
+                        return action->trigger >= ActionManager::OnPickTrigger()
+                               && action->trigger
+                                    <= ActionManager::OnPickUpTrigger();
+                      })
          != actions.end();
 }
 
 bool ActionManager::HasTriggers()
 {
   return std::accumulate(ActionManager::Triggers.begin(),
-                           ActionManager::Triggers.end(), 0)
+                         ActionManager::Triggers.end(), 0)
          != 0;
 }
 
@@ -137,7 +136,7 @@ bool ActionManager::HasPickTriggers()
   const auto end   = ActionManager::OnPickUpTrigger() + 1;
 
   return std::accumulate(ActionManager::Triggers.begin() + start,
-                           ActionManager::Triggers.begin() + end, 0)
+                         ActionManager::Triggers.begin() + end, 0)
          != 0;
 }
 
@@ -206,8 +205,8 @@ void ActionManager::processTrigger(unsigned int trigger,
               != std::to_string(static_cast<char>(sourceEvent.keyCode))) {
             auto unicode = sourceEvent.charCode ? sourceEvent.charCode :
                                                   sourceEvent.keyCode;
-            auto actualkey = String::toLowerCase(
-              std::to_string(static_cast<char>(unicode)));
+            auto actualkey
+              = String::toLowerCase(std::to_string(static_cast<char>(unicode)));
             if (actualkey != lowerCase) {
               continue;
             }
@@ -225,9 +224,9 @@ void ActionManager::processTrigger(unsigned int /*trigger*/) const
 
 IAnimatablePtr
 ActionManager::_getEffectiveTarget(const IAnimatablePtr& target,
-                                   const string_t& propertyPath) const
+                                   const std::string& propertyPath) const
 {
-  vector_t<string_t> properties = String::split(propertyPath, '.');
+  std::vector<std::string> properties = String::split(propertyPath, '.');
 
   for (unsigned int index = 0; index < properties.size() - 1; ++index) {
     // target = (*target)[properties[index]];
@@ -236,25 +235,25 @@ ActionManager::_getEffectiveTarget(const IAnimatablePtr& target,
   return target;
 }
 
-string_t ActionManager::_getProperty(const string_t& propertyPath) const
+std::string ActionManager::_getProperty(const std::string& propertyPath) const
 {
-  vector_t<string_t> properties = String::split(propertyPath, '.');
+  std::vector<std::string> properties = String::split(propertyPath, '.');
 
   return properties.back();
 }
 
-Json::object ActionManager::serialize(const string_t& /*name*/) const
+Json::object ActionManager::serialize(const std::string& /*name*/) const
 {
   return Json::object();
 }
 
-void ActionManager::Parse(const vector_t<Json::value>& /*parsedActions*/,
+void ActionManager::Parse(const std::vector<Json::value>& /*parsedActions*/,
                           AbstractMesh* /*object*/, Scene* /*scene*/)
 {
   // TODO FIXME
 }
 
-string_t ActionManager::GetTriggerName(unsigned int trigger)
+std::string ActionManager::GetTriggerName(unsigned int trigger)
 {
   switch (trigger) {
     case ActionManager::NothingTrigger():

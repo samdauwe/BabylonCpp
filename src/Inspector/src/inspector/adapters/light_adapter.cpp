@@ -25,22 +25,22 @@ LightAdapter::~LightAdapter()
 {
 }
 
-string_t LightAdapter::id()
+std::string LightAdapter::id()
 {
   return _light->name;
 }
 
-string_t LightAdapter::type()
+std::string LightAdapter::type()
 {
   return _light->getClassName();
 }
 
-unique_ptr_t<PropertiesView>& LightAdapter::getProperties()
+std::unique_ptr<PropertiesView>& LightAdapter::getProperties()
 {
   return _properties;
 }
 
-vector_t<unique_ptr_t<AbstractTreeTool>>& LightAdapter::getTools()
+std::vector<std::unique_ptr<AbstractTreeTool>>& LightAdapter::getTools()
 {
   return _tools;
 }
@@ -61,11 +61,11 @@ void LightAdapter::_buildPropertiesView()
   auto& view = *_properties;
   /** Node properties **/
   // - id
-  view.addStringProperty("id", [&]() -> string_t& { return _light->id; },
-                         [&](const string_t& value) { _light->id = value; });
+  view.addStringProperty("id", [&]() -> std::string& { return _light->id; },
+                         [&](const std::string& value) { _light->id = value; });
   // - name
-  view.addStringProperty("name", [&]() -> string_t& { return _light->name; },
-                         [&](const string_t& value) { _light->name = value; });
+  view.addStringProperty("name", [&]() -> std::string& { return _light->name; },
+                         [&](const std::string& value) { _light->name = value; });
   // - doNotSerialize
   view.addBoolProperty(
     "doNotSerialize", [&]() -> bool { return _light->doNotSerialize; },

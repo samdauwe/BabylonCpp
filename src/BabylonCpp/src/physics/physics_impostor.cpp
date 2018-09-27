@@ -20,7 +20,7 @@ const Vector3 PhysicsImpostor::DEFAULT_OBJECT_SIZE = Vector3::One();
 
 Quaternion PhysicsImpostor::IDENTITY_QUATERNION = Quaternion::Identity();
 
-array_t<Vector3, 3> PhysicsImpostor::_tmpVecs
+std::array<Vector3, 3> PhysicsImpostor::_tmpVecs
   = {{Vector3::Zero(), Vector3::Zero(), Vector3::Zero()}};
 Quaternion PhysicsImpostor::_tmpQuat = Quaternion::Identity();
 
@@ -76,11 +76,11 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* _object,
       }
     }
     // Default options params
-    _options.mass = (_options.mass == nullopt_t) ? 0.f : *_options.mass;
+    _options.mass = (_options.mass == std::nullopt) ? 0.f : *_options.mass;
     _options.friction
-      = (_options.friction == nullopt_t) ? 0.2f : *_options.friction;
+      = (_options.friction == std::nullopt) ? 0.2f : *_options.friction;
     _options.restitution
-      = (_options.restitution == nullopt_t) ? 0.2f : *_options.restitution;
+      = (_options.restitution == std::nullopt) ? 0.2f : *_options.restitution;
 
     // If the mesh has a parent, don't initialize the physicsBody. Instead wait
     // for the parent to do that.
@@ -206,7 +206,7 @@ Vector3 PhysicsImpostor::getObjectCenter()
   }
 }
 
-float PhysicsImpostor::getParam(const string_t& paramName) const
+float PhysicsImpostor::getParam(const std::string& paramName) const
 {
   if (_options.contains(paramName)) {
     return _options[paramName];
@@ -215,7 +215,7 @@ float PhysicsImpostor::getParam(const string_t& paramName) const
   return 0.f;
 }
 
-void PhysicsImpostor::setParam(const string_t& paramName, float value)
+void PhysicsImpostor::setParam(const std::string& paramName, float value)
 {
   _options.setValue(paramName, value);
   _bodyUpdateRequired = true;
@@ -467,7 +467,7 @@ PhysicsImpostor& PhysicsImpostor::createJoint(PhysicsImpostor* otherImpostor,
 
 PhysicsImpostor&
 PhysicsImpostor::addJoint(PhysicsImpostor* otherImpostor,
-                          const shared_ptr_t<PhysicsJoint>& joint)
+                          const std::shared_ptr<PhysicsJoint>& joint)
 {
   Joint _joint;
   _joint.otherImpostor = otherImpostor;
@@ -499,7 +499,7 @@ PhysicsImpostor& PhysicsImpostor::wakeUp()
   return *this;
 }
 
-unique_ptr_t<PhysicsImpostor>
+std::unique_ptr<PhysicsImpostor>
 PhysicsImpostor::clone(IPhysicsEnabledObject* newObject)
 {
   if (!newObject) {
@@ -561,8 +561,8 @@ float PhysicsImpostor::getRadius() const
 }
 
 void PhysicsImpostor::syncBoneWithImpostor(
-  Bone* bone, AbstractMesh* boneMesh, const nullable_t<Vector3>& jointPivot,
-  nullable_t<float> distToJoint, const nullable_t<Quaternion>& adjustRotation)
+  Bone* bone, AbstractMesh* boneMesh, const std::optional<Vector3>& jointPivot,
+  std::optional<float> distToJoint, const std::optional<Quaternion>& adjustRotation)
 {
   auto& tempVec = PhysicsImpostor::_tmpVecs[0];
   auto mesh     = static_cast<AbstractMesh*>(object);
@@ -613,9 +613,9 @@ void PhysicsImpostor::syncBoneWithImpostor(
 }
 
 void PhysicsImpostor::syncImpostorWithBone(
-  Bone* bone, AbstractMesh* boneMesh, const nullable_t<Vector3>& jointPivot,
-  nullable_t<float> distToJoint, const nullable_t<Quaternion>& adjustRotation,
-  nullable_t<Vector3>& boneAxis)
+  Bone* bone, AbstractMesh* boneMesh, const std::optional<Vector3>& jointPivot,
+  std::optional<float> distToJoint, const std::optional<Quaternion>& adjustRotation,
+  std::optional<Vector3>& boneAxis)
 {
   auto mesh = static_cast<AbstractMesh*>(object);
 

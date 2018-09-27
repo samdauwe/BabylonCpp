@@ -1,6 +1,7 @@
 #include <babylon/inspector/treetools/info.h>
 
-#include <babylon/babylon_stl.h>
+#include <utility>
+
 #include <babylon/inspector/treetools/itool_info.h>
 
 #include <imgui.h>

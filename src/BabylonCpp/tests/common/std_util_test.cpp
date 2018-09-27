@@ -3,7 +3,6 @@
 
 #include <babylon/babylon_common.h>
 #include <babylon/babylon_constants.h>
-#include <babylon/babylon_stl.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 
@@ -12,7 +11,7 @@ TEST(TestStdUtil, to_bitset)
   using namespace BABYLON;
 
   // 0
-  float number           = 0.f;
+  float number         = 0.f;
   std::string expected = "00000000000000000000000000000000";
   EXPECT_EQ(stl_util::to_bitset(number).to_string(), expected);
 
@@ -113,7 +112,7 @@ TEST(TestStdUtil, hex_to_float)
 
   // 0
   std::string hexString = "0x00000000";
-  float expected          = 0.f;
+  float expected        = 0.f;
   EXPECT_EQ(stl_util::hex_to_float(hexString), expected);
 
   // PI
@@ -174,12 +173,11 @@ TEST(TestStdUtil, contains)
 
     // Filter vector
     auto numbersFiltered = std::vector<std::reference_wrapper<const int>>{};
-    std::for_each(numbers.begin(), numbers.end(),
-                    [&numbersFiltered](auto& v) {
-                      if (*v > 5) {
-                        numbersFiltered.emplace_back(std::ref(*v.get()));
-                      }
-                    });
+    std::for_each(numbers.begin(), numbers.end(), [&numbersFiltered](auto& v) {
+      if (*v > 5) {
+        numbersFiltered.emplace_back(std::ref(*v.get()));
+      }
+    });
 
     // Perform check
     {
@@ -199,8 +197,8 @@ TEST(TestStdUtil, insert_at)
   using namespace BABYLON;
 
   std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
-  const std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE",
-                                              "ALPHATEST", "POINTSIZE", "FOG"};
+  const std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "ALPHATEST",
+                                          "POINTSIZE", "FOG"};
   EXPECT_THAT(stl_util::insert_at(v, 2, "ALPHATEST"),
               ::testing::ContainerEq(expected));
 }
@@ -291,8 +289,7 @@ TEST(TestStdUtil, min)
 
   EXPECT_EQ(stl_util::min(10, 5.5), 5.5);
   EXPECT_EQ(stl_util::min(0.5, -10.1, -200), -200);
-  EXPECT_EQ(stl_util::min(std::string{"var1"}, std::string{"var2"}),
-            "var1");
+  EXPECT_EQ(stl_util::min(std::string{"var1"}, std::string{"var2"}), "var1");
   EXPECT_EQ(stl_util::min(std::string{"var1"}, "var2"), "var1");
   EXPECT_EQ(stl_util::min("var1", std::string{"var2"}), "var1");
 }
@@ -314,11 +311,10 @@ TEST(TestStdUtil, max)
 
   EXPECT_EQ(stl_util::max(10, 5.5), 10);
   EXPECT_EQ(stl_util::max(0.5, -10.1, -200), 0.5);
-  EXPECT_EQ(stl_util::max(std::string{"var1"}, std::string{"var2"}),
-            "var2");
-  EXPECT_EQ(stl_util::max(std::string{"var1"},
-                          static_cast<char const* const>("var2")),
-            "var2");
+  EXPECT_EQ(stl_util::max(std::string{"var1"}, std::string{"var2"}), "var2");
+  EXPECT_EQ(
+    stl_util::max(std::string{"var1"}, static_cast<char const* const>("var2")),
+    "var2");
   EXPECT_EQ(stl_util::max("var1", std::string{"var2"}), "var2");
 }
 
@@ -404,7 +400,7 @@ TEST(TestStdUtil, splice)
   {
     std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
     std::vector<std::string> expected{"DIFFUSE",     "CLIPPLANE", "SHADOW",
-                                          "VERTEXALPHA", "POINTSIZE", "FOG"};
+                                      "VERTEXALPHA", "POINTSIZE", "FOG"};
     std::vector<std::string> r
       = stl_util::splice(v, 2, 0, {"SHADOW", "VERTEXALPHA"});
     EXPECT_THAT(v, ::testing::ContainerEq(expected));
@@ -415,7 +411,7 @@ TEST(TestStdUtil, splice)
   {
     std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "POINTSIZE", "FOG"};
     std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "SHADOW",
-                                          "VERTEXALPHA", "FOG"};
+                                      "VERTEXALPHA", "FOG"};
     std::vector<std::string> expectedRemovedItem{"POINTSIZE"};
     std::vector<std::string> r
       = stl_util::splice(v, 2, 1, {"SHADOW", "VERTEXALPHA"});
@@ -425,8 +421,8 @@ TEST(TestStdUtil, splice)
 
   // At position 2, remove 2 items
   {
-    std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "SHADOW",
-                                   "VERTEXALPHA", "FOG"};
+    std::vector<std::string> v{"DIFFUSE", "CLIPPLANE", "SHADOW", "VERTEXALPHA",
+                               "FOG"};
     std::vector<std::string> expected{"DIFFUSE", "CLIPPLANE", "FOG"};
     std::vector<std::string> expectedRemovedItems{"SHADOW", "VERTEXALPHA"};
     std::vector<std::string> r = stl_util::splice(v, 2, 2);

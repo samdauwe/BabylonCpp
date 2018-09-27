@@ -11,8 +11,8 @@ bool TouchCamera::NodeConstructorAdded = false;
 void TouchCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "TouchCamera", [](const string_t& name, Scene* scene,
-                      const nullable_t<Json::value>& /*options*/) {
+    "TouchCamera", [](const std::string& name, Scene* scene,
+                      const std::optional<Json::value>& /*options*/) {
       return TouchCamera::New(name, Vector3::Zero(), scene);
     });
   TouchCamera::NodeConstructorAdded = true;
@@ -74,7 +74,7 @@ void TouchCamera::set_touchMoveSensibility(float value)
 
 //-- end properties for backward compatibility for inputs
 
-TouchCamera::TouchCamera::TouchCamera(const string_t& name,
+TouchCamera::TouchCamera::TouchCamera(const std::string& name,
                                       const Vector3& position, Scene* scene)
     : FreeCamera{name, position, scene}
     , touchAngularSensibility{this, &TouchCamera::get_touchAngularSensibility,
@@ -91,7 +91,7 @@ TouchCamera::~TouchCamera()
 {
 }
 
-const string_t TouchCamera::getClassName() const
+const std::string TouchCamera::getClassName() const
 {
   return "TouchCamera";
 }

@@ -27,9 +27,9 @@ CameraInputsManager<TCamera>::~CameraInputsManager()
 
 template <class TCamera>
 void CameraInputsManager<TCamera>::add(
-  shared_ptr_t<ICameraInput<TCamera>>&& input)
+  std::shared_ptr<ICameraInput<TCamera>>&& input)
 {
-  const string_t type = input->getSimpleName();
+  const std::string type = input->getSimpleName();
   if (stl_util::contains(_attached, type)) {
     BABYLON_LOGF_WARN("CameraInputsManager",
                       "camera input of type %s already exists on camera",
@@ -61,7 +61,7 @@ void CameraInputsManager<TCamera>::remove(ICameraInput<TCamera>* inputToRemove)
 }
 
 template <class TCamera>
-void CameraInputsManager<TCamera>::removeByType(const string_t& inputType)
+void CameraInputsManager<TCamera>::removeByType(const std::string& inputType)
 {
   for (auto& item : _attached) {
     auto& input = item.second;
@@ -144,7 +144,7 @@ void CameraInputsManager<TCamera>::checkInputs()
 }
 
 template <class TCamera>
-unordered_map_t<string_t, shared_ptr_t<ICameraInput<TCamera>>>&
+std::unordered_map<std::string, std::shared_ptr<ICameraInput<TCamera>>>&
 CameraInputsManager<TCamera>::attached()
 {
   return _attached;

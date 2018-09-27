@@ -57,7 +57,7 @@ CSG::Plane CSG::Plane::clone() const
   return Plane(*this);
 }
 
-unique_ptr_t<CSG::Plane> CSG::Plane::cloneToNewObject() const
+std::unique_ptr<CSG::Plane> CSG::Plane::cloneToNewObject() const
 {
   return std::make_unique<BABYLON::CSG::Plane>(*this);
 }
@@ -70,7 +70,7 @@ std::ostream& operator<<(std::ostream& os, const BABYLON::CSG::Plane& plane)
 }
 } // namespace CSG
 
-string_t CSG::Plane::toString() const
+std::string CSG::Plane::toString() const
 {
   std::ostringstream oss;
   oss << (*this);
@@ -85,9 +85,9 @@ void CSG::Plane::flip()
 
 void BABYLON::CSG::Plane::splitPolygon(
   const BABYLON::CSG::Polygon& polygon,
-  vector_t<BABYLON::CSG::Polygon>& coplanarFront,
-  vector_t<BABYLON::CSG::Polygon>& coplanarBack,
-  vector_t<BABYLON::CSG::Polygon>& front, vector_t<BABYLON::CSG::Polygon>& back)
+  std::vector<BABYLON::CSG::Polygon>& coplanarFront,
+  std::vector<BABYLON::CSG::Polygon>& coplanarBack,
+  std::vector<BABYLON::CSG::Polygon>& front, std::vector<BABYLON::CSG::Polygon>& back)
 {
   // Classify each point as well as the entire polygon into one of the above
   // four classes.
@@ -116,7 +116,7 @@ void BABYLON::CSG::Plane::splitPolygon(
       back.emplace_back(polygon);
       break;
     case SPANNING:
-      vector_t<BABYLON::CSG::Vertex> f, b;
+      std::vector<BABYLON::CSG::Vertex> f, b;
       for (size_t i = 0; i < polygon.vertices.size(); ++i) {
         size_t j = (i + 1) % polygon.vertices.size();
         int ti = types[i], tj = types[j];
@@ -155,7 +155,7 @@ void BABYLON::CSG::Plane::splitPolygon(
   }
 }
 
-nullable_t<CSG::Plane>
+std::optional<CSG::Plane>
 CSG::Plane::FromPoints(const Vector3& a, const Vector3& b, const Vector3& c)
 {
   const auto v0 = c.subtract(a);
@@ -163,7 +163,7 @@ CSG::Plane::FromPoints(const Vector3& a, const Vector3& b, const Vector3& c)
 
   if (stl_util::almost_equal(v0.lengthSquared(), 0.f)
       || stl_util::almost_equal(v1.lengthSquared(), 0.f)) {
-    return nullopt_t;
+    return std::nullopt;
   }
 
   const Vector3 n = Vector3::Normalize(Vector3::Cross(v0, v1));

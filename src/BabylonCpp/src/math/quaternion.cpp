@@ -1,5 +1,7 @@
 #include <babylon/math/quaternion.h>
 
+#include <cmath>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/math/math_tmp.h>
 #include <babylon/math/matrix.h>
@@ -61,12 +63,12 @@ Quaternion Quaternion::copy() const
   return Quaternion(*this);
 }
 
-unique_ptr_t<Quaternion> Quaternion::clone() const
+std::unique_ptr<Quaternion> Quaternion::clone() const
 {
   return std::make_unique<Quaternion>(*this);
 }
 
-string_t Quaternion::toString() const
+std::string Quaternion::toString() const
 {
   std::ostringstream oss;
   oss << *this;
@@ -245,7 +247,7 @@ Quaternion& Quaternion::normalize()
   return *this;
 }
 
-Vector3 Quaternion::toEulerAngles(const string_t& order) const
+Vector3 Quaternion::toEulerAngles(const std::string& order) const
 {
   Vector3 result = Vector3::Zero();
 
@@ -255,7 +257,8 @@ Vector3 Quaternion::toEulerAngles(const string_t& order) const
 }
 
 const Quaternion&
-Quaternion::toEulerAnglesToRef(Vector3& result, const string_t& /*order*/) const
+Quaternion::toEulerAnglesToRef(Vector3& result,
+                               const std::string& /*order*/) const
 {
   const float qz = z;
   const float qx = x;
@@ -281,8 +284,7 @@ Quaternion::toEulerAnglesToRef(Vector3& result, const string_t& /*order*/) const
     result.z = 0.f;
   }
   else {
-    result.z
-      = std::atan2(2.f * (qx * qy + qz * qw), (-sqz - sqx + sqy + sqw));
+    result.z = std::atan2(2.f * (qx * qy + qz * qw), (-sqz - sqx + sqy + sqw));
     result.x = std::asin(-2.f * (qz * qy - qx * qw));
     result.y = std::atan2(2.f * (qz * qx + qy * qw), (sqz - sqx - sqy + sqw));
   }
@@ -384,7 +386,7 @@ Quaternion Quaternion::FromRotationMatrix(const Matrix& matrix)
 void Quaternion::FromRotationMatrixToRef(const Matrix& matrix,
                                          Quaternion& result)
 {
-  const array_t<float, 16>& data = matrix.m;
+  const std::array<float, 16>& data = matrix.m;
   const float m11 = data[0], m12 = data[4], m13 = data[8];
   const float m21 = data[1], m22 = data[5], m23 = data[9];
   const float m31 = data[2], m32 = data[6], m33 = data[10];

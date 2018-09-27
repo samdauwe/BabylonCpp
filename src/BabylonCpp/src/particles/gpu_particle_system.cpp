@@ -33,8 +33,8 @@ bool GPUParticleSystem::IsSupported()
   return Engine::LastCreatedEngine()->webGLVersion() > 1.f;
 }
 
-GPUParticleSystem::GPUParticleSystem(const string_t& iName, size_t capacity,
-                                     nullable_t<int> randomTextureSize,
+GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
+                                     std::optional<int> randomTextureSize,
                                      Scene* scene, bool isAnimationSheetEnabled)
     : BaseParticleSystem{iName}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
@@ -215,7 +215,7 @@ const char* GPUParticleSystem::getClassName() const
 
 template <typename T>
 GPUParticleSystem& GPUParticleSystem::_removeGradient(float gradient,
-                                                      vector_t<T>& gradients,
+                                                      std::vector<T>& gradients,
                                                       RawTexture* texture)
 {
   if (gradients.empty()) {
@@ -241,7 +241,7 @@ GPUParticleSystem& GPUParticleSystem::_removeGradient(float gradient,
 
 GPUParticleSystem&
 GPUParticleSystem::addColorGradient(float gradient, const Color4& color1,
-                                    const nullable_t<Color4>& /*color2*/)
+                                    const std::optional<Color4>& /*color2*/)
 {
   ColorGradient colorGradient;
   colorGradient.gradient = gradient;
@@ -280,7 +280,7 @@ GPUParticleSystem& GPUParticleSystem::removeColorGradient(float gradient)
 }
 
 void GPUParticleSystem::_addFactorGradient(
-  vector_t<FactorGradient>& factorGradients, float gradient, float factor)
+  std::vector<FactorGradient>& factorGradients, float gradient, float factor)
 {
   FactorGradient valueGradient;
   valueGradient.gradient = gradient;
@@ -304,7 +304,7 @@ void GPUParticleSystem::_addFactorGradient(
 
 GPUParticleSystem&
 GPUParticleSystem::addSizeGradient(float gradient, float factor,
-                                   const nullable_t<float>& /*factor2*/)
+                                   const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_sizeGradients, gradient, factor);
 
@@ -326,9 +326,8 @@ GPUParticleSystem& GPUParticleSystem::removeSizeGradient(float gradient)
   return *this;
 }
 
-GPUParticleSystem&
-GPUParticleSystem::addAngularSpeedGradient(float gradient, float factor,
-                                           const nullable_t<float>& /*factor2*/)
+GPUParticleSystem& GPUParticleSystem::addAngularSpeedGradient(
+  float gradient, float factor, const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_angularSpeedGradients, gradient, factor);
 
@@ -353,7 +352,7 @@ GPUParticleSystem& GPUParticleSystem::removeAngularSpeedGradient(float gradient)
 
 GPUParticleSystem&
 GPUParticleSystem::addVelocityGradient(float gradient, float factor,
-                                       const nullable_t<float>& /*factor2*/)
+                                       const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_velocityGradients, gradient, factor);
 
@@ -377,7 +376,7 @@ GPUParticleSystem& GPUParticleSystem::removeVelocityGradient(float gradient)
 }
 
 IParticleSystem& GPUParticleSystem::addLimitVelocityGradient(
-  float gradient, float factor, const nullable_t<float>& /*factor2*/)
+  float gradient, float factor, const std::optional<float>& /*factor2*/)
 {
   _addFactorGradient(_limitVelocityGradients, gradient, factor);
 
@@ -401,7 +400,7 @@ IParticleSystem& GPUParticleSystem::removeLimitVelocityGradient(float gradient)
 }
 
 IParticleSystem& GPUParticleSystem::addDragGradient(
-  float gradient, float factor, const nullable_t<float>& /*factor2*/
+  float gradient, float factor, const std::optional<float>& /*factor2*/
 )
 {
   _addFactorGradient(_dragGradients, gradient, factor);
@@ -429,10 +428,11 @@ void GPUParticleSystem::_reset()
   _releaseBuffers();
 }
 
-unique_ptr_t<GL::IGLVertexArrayObject>
+std::unique_ptr<GL::IGLVertexArrayObject>
 GPUParticleSystem::_createUpdateVAO(Buffer* source)
 {
-  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> updateVertexBuffers;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>>
+    updateVertexBuffers;
   updateVertexBuffers["position"]
     = source->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
   updateVertexBuffers["age"]
@@ -486,10 +486,11 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
   return vao;
 }
 
-unique_ptr_t<GL::IGLVertexArrayObject>
+std::unique_ptr<GL::IGLVertexArrayObject>
 GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
 {
-  unordered_map_t<string_t, unique_ptr_t<VertexBuffer>> renderVertexBuffers;
+  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>>
+    renderVertexBuffers;
   auto attributesStrideSizeT      = static_cast<size_t>(_attributesStrideSize);
   renderVertexBuffers["position"] = source->createVertexBuffer(
     VertexBuffer::PositionKind, 0, 3, attributesStrideSizeT, true);
@@ -659,7 +660,7 @@ void GPUParticleSystem::_initialize(bool force)
 
 void GPUParticleSystem::_recreateUpdateEffect()
 {
-  ostringstream_t definesStream;
+  std::ostringstream definesStream;
   definesStream << (particleEmitterType ?
                       particleEmitterType->getEffectDefines() :
                       "");
@@ -726,7 +727,7 @@ void GPUParticleSystem::_recreateUpdateEffect()
 
 void GPUParticleSystem::_recreateRenderEffect()
 {
-  ostringstream_t definesStream;
+  std::ostringstream definesStream;
   if (_scene->clipPlane.has_value()) {
     definesStream << "\n#define CLIPPLANE";
   }
@@ -773,11 +774,11 @@ void GPUParticleSystem::_recreateRenderEffect()
     return;
   }
 
-  vector_t<string_t> uniforms{
+  std::vector<std::string> uniforms{
     "view",       "projection",       "colorDead",   "invView",
     "vClipPlane", "vClipPlane2",      "vClipPlane3", "vClipPlane4",
     "sheetInfos", "translationPivot", "eyePosition"};
-  vector_t<string_t> samplers{"textureSampler", "colorGradientSampler"};
+  std::vector<std::string> samplers{"textureSampler", "colorGradientSampler"};
 
   // if (ImageProcessingConfiguration)
   {
@@ -812,7 +813,8 @@ void GPUParticleSystem::animate(bool preWarm)
   }
 }
 
-RawTexture* GPUParticleSystem::_getRawTextureByName(const string_t& textureName)
+RawTexture*
+GPUParticleSystem::_getRawTextureByName(const std::string& textureName)
 {
   RawTexture* rawTexture = nullptr;
 
@@ -833,7 +835,7 @@ RawTexture* GPUParticleSystem::_getRawTextureByName(const string_t& textureName)
 }
 
 void GPUParticleSystem::_setRawTextureByName(
-  const string_t& textureName, unique_ptr_t<RawTexture>&& rawTexture)
+  const std::string& textureName, std::unique_ptr<RawTexture>&& rawTexture)
 {
   if (textureName == "_colorGradientsTexture") {
     _colorGradientsTexture = std::move(rawTexture);
@@ -851,7 +853,7 @@ void GPUParticleSystem::_setRawTextureByName(
 
 template <typename T>
 void GPUParticleSystem::_createFactorGradientTexture(
-  const vector_t<T>& factorGradients, const string_t& textureName)
+  const std::vector<T>& factorGradients, const std::string& textureName)
 {
   auto texture = _getRawTextureByName(textureName);
 
@@ -1235,7 +1237,7 @@ void GPUParticleSystem::dispose(bool disposeTexture,
   onDisposeObservable.clear();
 }
 
-IParticleSystem* GPUParticleSystem::clone(const string_t& /*name*/,
+IParticleSystem* GPUParticleSystem::clone(const std::string& /*name*/,
                                           Mesh* /*newEmitter*/)
 {
   return nullptr;
@@ -1248,7 +1250,7 @@ Json::object GPUParticleSystem::serialize() const
 
 IParticleSystem*
 GPUParticleSystem::Parse(const Json::value& /*parsedParticleSystem*/,
-                         Scene* /*scene*/, const string_t& /*rootUrl*/)
+                         Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

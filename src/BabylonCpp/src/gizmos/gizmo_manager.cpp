@@ -13,7 +13,7 @@
 namespace BABYLON {
 
 GizmoManager::GizmoManager(Scene* iScene)
-    : attachableMeshes{nullopt_t}
+    : attachableMeshes{std::nullopt}
     , usePointerToAttachGizmos{true}
     , positionGizmoEnabled{this, &GizmoManager::get_positionGizmoEnabled,
                            &GizmoManager::set_positionGizmoEnabled}
@@ -41,7 +41,7 @@ GizmoManager::GizmoManager(Scene* iScene)
           NodePtr node = pointerInfo->pickInfo.pickedMesh ?
                            pointerInfo->pickInfo.pickedMesh :
                            nullptr;
-          if (attachableMeshes == nullopt_t) {
+          if (attachableMeshes == std::nullopt) {
             // Attach to the most parent node
             while (node && node->parent() != nullptr) {
               // node = node->parent();

@@ -38,7 +38,7 @@ void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene)
 
 void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
                                                MaterialDefines& defines,
-                                               const string_t& key)
+                                               const std::string& key)
 {
   defines._needUVs     = true;
   defines.boolDef[key] = true;
@@ -58,7 +58,7 @@ void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
 
 void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
                                        UniformBuffer& uniformBuffer,
-                                       const string_t& key)
+                                       const std::string& key)
 {
   auto matrix = *texture.getTextureMatrix();
 
@@ -86,7 +86,7 @@ void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
 
 void MaterialHelper::PrepareDefinesForFrameBoundValues(
   Scene* scene, Engine* engine, MaterialDefines& defines, bool useInstances,
-  nullable_t<bool> useClipPlane)
+  std::optional<bool> useClipPlane)
 {
   auto changed       = false;
   auto useClipPlane1 = false;
@@ -94,13 +94,13 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
   auto useClipPlane3 = false;
   auto useClipPlane4 = false;
 
-  useClipPlane1 = useClipPlane == nullopt_t ? (scene->clipPlane != nullopt_t) :
+  useClipPlane1 = useClipPlane == std::nullopt ? (scene->clipPlane != std::nullopt) :
                                               *useClipPlane;
-  useClipPlane2 = useClipPlane == nullopt_t ? (scene->clipPlane2 != nullopt_t) :
+  useClipPlane2 = useClipPlane == std::nullopt ? (scene->clipPlane2 != std::nullopt) :
                                               *useClipPlane;
-  useClipPlane3 = useClipPlane == nullopt_t ? (scene->clipPlane3 != nullopt_t) :
+  useClipPlane3 = useClipPlane == std::nullopt ? (scene->clipPlane3 != std::nullopt) :
                                               *useClipPlane;
-  useClipPlane4 = useClipPlane == nullopt_t ? (scene->clipPlane4 != nullopt_t) :
+  useClipPlane4 = useClipPlane == std::nullopt ? (scene->clipPlane4 != std::nullopt) :
                                               *useClipPlane;
 
   if (defines["CLIPPLANE"] != useClipPlane1) {
@@ -352,14 +352,14 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
 }
 
 void MaterialHelper::PrepareUniformsAndSamplersList(
-  vector_t<string_t>& uniformsList, vector_t<string_t>& samplersList,
+  std::vector<std::string>& uniformsList, std::vector<std::string>& samplersList,
   MaterialDefines& defines, unsigned int maxSimultaneousLights)
 {
-  vector_t<string_t> uniformBuffersList;
+  std::vector<std::string> uniformBuffersList;
 
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    const string_t lightIndexStr = std::to_string(lightIndex);
+    const std::string lightIndexStr = std::to_string(lightIndex);
 
     if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
       break;
@@ -410,7 +410,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
 
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    const string_t lightIndexStr = std::to_string(lightIndex);
+    const std::string lightIndexStr = std::to_string(lightIndex);
 
     if (!defines["LIGHT" + lightIndexStr]) {
       break;
@@ -455,7 +455,7 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
   unsigned int lightFallbackRank = 0;
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    const string_t lightIndexStr = std::to_string(lightIndex);
+    const std::string lightIndexStr = std::to_string(lightIndex);
 
     if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
       break;
@@ -492,7 +492,7 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
 }
 
 void MaterialHelper::PrepareAttributesForMorphTargets(
-  vector_t<string_t>& attribs, AbstractMesh* mesh, MaterialDefines& defines)
+  std::vector<std::string>& attribs, AbstractMesh* mesh, MaterialDefines& defines)
 {
   auto influencers = defines.intDef["NUM_MORPH_INFLUENCERS"];
 
@@ -506,16 +506,16 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
     auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
     for (unsigned int index = 0; index < influencers; ++index) {
       const auto indexStr = std::to_string(index);
-      attribs.emplace_back(string_t(VertexBuffer::PositionKindChars)
+      attribs.emplace_back(std::string(VertexBuffer::PositionKindChars)
                            + indexStr);
 
       if (normal) {
-        attribs.emplace_back(string_t(VertexBuffer::NormalKindChars)
+        attribs.emplace_back(std::string(VertexBuffer::NormalKindChars)
                              + indexStr);
       }
 
       if (tangent) {
-        attribs.emplace_back(string_t(VertexBuffer::TangentKindChars)
+        attribs.emplace_back(std::string(VertexBuffer::TangentKindChars)
                              + indexStr);
       }
 
@@ -528,7 +528,7 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
   }
 }
 
-void MaterialHelper::PrepareAttributesForBones(vector_t<string_t>& attribs,
+void MaterialHelper::PrepareAttributesForBones(std::vector<std::string>& attribs,
                                                AbstractMesh* mesh,
                                                MaterialDefines& defines,
                                                EffectFallbacks& fallbacks)
@@ -545,7 +545,7 @@ void MaterialHelper::PrepareAttributesForBones(vector_t<string_t>& attribs,
   }
 }
 
-void MaterialHelper::PrepareAttributesForInstances(vector_t<string_t>& attribs,
+void MaterialHelper::PrepareAttributesForInstances(std::vector<std::string>& attribs,
                                                    MaterialDefines& defines)
 {
   if (defines["INSTANCES"]) {

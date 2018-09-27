@@ -1,15 +1,17 @@
 #include <argtable3/argtable3.h>
+
+#include <sstream>
+
 #include <babylon/babylon_version.h>
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/samples/sample_launcher.h>
 #include <babylon/samples/samples_index.h>
-#include <sstream>
 
 struct ConsoleLogger {
 
-  using log_message_t = BABYLON::delegate_t<void(const BABYLON::LogMessage&)>;
+  using log_message_t = SA::delegate<void(const BABYLON::LogMessage&)>;
 
   static void onLogMessage(const BABYLON::LogMessage& logMessage)
   {
@@ -21,7 +23,7 @@ struct ConsoleLogger {
 }; // end of struct ConsoleLogger
 
 ConsoleLogger::log_message_t ConsoleLogger::logListenerDelegate
-  = BABYLON::delegate_t<void(
+  = SA::delegate<void(
     const BABYLON::LogMessage&)>::create<&ConsoleLogger::onLogMessage>();
 
 /**
@@ -30,7 +32,7 @@ ConsoleLogger::log_message_t ConsoleLogger::logListenerDelegate
 void initializeLogging()
 {
   static_assert(
-    std::is_same<BABYLON::delegate_t<void(const BABYLON::LogMessage&)>,
+    std::is_same<SA::delegate<void(const BABYLON::LogMessage&)>,
                  decltype(ConsoleLogger::logListenerDelegate)>::value,
     "!");
   // Intialize log levels

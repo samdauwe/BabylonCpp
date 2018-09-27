@@ -10,12 +10,12 @@
 
 namespace BABYLON {
 
-unique_ptr_t<Vector3> TransformNode::_lookAtVectorCache
+std::unique_ptr<Vector3> TransformNode::_lookAtVectorCache
   = std::make_unique<Vector3>(0.f, 0.f, 0.f);
-unique_ptr_t<Quaternion> TransformNode::_rotationAxisCache
+std::unique_ptr<Quaternion> TransformNode::_rotationAxisCache
   = std::make_unique<Quaternion>();
 
-TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
+TransformNode::TransformNode(const std::string& name, Scene* scene, bool isPure)
     : Node{name, scene}
     , billboardMode{TransformNode::BILLBOARDMODE_NONE}
     , scalingDeterminant{1.f}
@@ -50,7 +50,7 @@ TransformNode::TransformNode(const string_t& name, Scene* scene, bool isPure)
     , _rightInverted{Vector3{-1.f, 0.f, 0.f}}
     , _position{Vector3::Zero()}
     , _rotation{Vector3::Zero()}
-    , _rotationQuaternion{nullopt_t}
+    , _rotationQuaternion{std::nullopt}
     , _transformToBoneReferal{nullptr}
     , _localWorld{Matrix::Zero()}
     , _absolutePosition{Vector3::Zero()}
@@ -73,7 +73,7 @@ IReflect::Type TransformNode::type() const
   return IReflect::Type::TRANSFORMNODE;
 }
 
-const string_t TransformNode::getClassName() const
+const std::string TransformNode::getClassName() const
 {
   return "TransformNode";
 }
@@ -108,13 +108,13 @@ void TransformNode::set_scaling(const Vector3& newScaling)
   _scaling = newScaling;
 }
 
-nullable_t<Quaternion>& TransformNode::get_rotationQuaternion()
+std::optional<Quaternion>& TransformNode::get_rotationQuaternion()
 {
   return _rotationQuaternion;
 }
 
 void TransformNode::set_rotationQuaternion(
-  const nullable_t<Quaternion>& quaternion)
+  const std::optional<Quaternion>& quaternion)
 {
   _rotationQuaternion = quaternion;
   // reset the rotation vector.
@@ -235,12 +235,12 @@ void TransformNode::_initCache()
   _cache.billboardMode      = AbstractMesh::BILLBOARDMODE_NONE;
 }
 
-TransformNode& TransformNode::markAsDirty(const string_t& property)
+TransformNode& TransformNode::markAsDirty(const std::string& property)
 {
   if (property == "rotation") {
-    rotationQuaternion = nullopt_t;
+    rotationQuaternion = std::nullopt;
   }
-  _currentRenderId = numeric_limits_t<int>::max();
+  _currentRenderId = std::numeric_limits<int>::max();
   _isDirty         = true;
   return *this;
 }
@@ -312,7 +312,7 @@ Vector3& TransformNode::getAbsolutePosition()
 }
 
 TransformNode&
-TransformNode::setAbsolutePosition(const nullable_t<Vector3>& absolutePosition)
+TransformNode::setAbsolutePosition(const std::optional<Vector3>& absolutePosition)
 {
   if (!absolutePosition) {
     return *this;
@@ -869,7 +869,7 @@ TransformNode& TransformNode::unregisterAfterWorldMatrixUpdate(
   return *this;
 }
 
-TransformNodePtr TransformNode::clone(const string_t& /*name*/,
+TransformNodePtr TransformNode::clone(const std::string& /*name*/,
                                       Node* /*newParent*/,
                                       bool /*doNotCloneChildren*/)
 {
@@ -884,7 +884,7 @@ TransformNode::serialize(Json::object& /*currentSerializationObject*/)
 
 TransformNodePtr
 TransformNode::Parse(const Json::value& /*parsedTransformNode*/,
-                     Scene* /*scene*/, const string_t& /*rootUrl*/)
+                     Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

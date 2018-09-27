@@ -13,7 +13,7 @@ namespace BABYLON {
 
 PlaneRotationGizmo::PlaneRotationGizmo(
   const Vector3& planeNormal, const Color3& color,
-  const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , _pointerObserver{nullptr}
@@ -36,7 +36,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   // Create circle out of lines
   auto tessellation = 20ul;
   auto radius       = 0.8f;
-  vector_t<Vector3> points;
+  std::vector<Vector3> points;
   for (size_t i = 0; i < tessellation; ++i) {
     auto radian = (Math::PI2) * (i / (tessellation - 1));
     points.emplace_back(

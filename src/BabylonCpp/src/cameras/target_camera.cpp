@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-TargetCamera::TargetCamera(const string_t& iName, const Vector3& iPosition,
+TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition,
                            Scene* scene, bool setActiveOnSceneIfNoneActive)
     : Camera(iName, iPosition, scene, setActiveOnSceneIfNoneActive)
     , cameraDirection{std::make_unique<Vector3>(0.f, 0.f, 0.f)}
@@ -99,11 +99,11 @@ void TargetCamera::_initCache()
 {
   Camera::_initCache();
   _cache.lockedTarget = std::make_unique<Vector3>(
-    numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
-    numeric_limits_t<float>::max());
+    std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+    std::numeric_limits<float>::max());
   _cache.rotation
-    = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
-              numeric_limits_t<float>::max());
+    = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+              std::numeric_limits<float>::max());
 }
 
 void TargetCamera::_updateCache(bool ignoreParentClass)
@@ -375,7 +375,7 @@ void TargetCamera::_computeViewMatrix(const Vector3& position,
 }
 
 /** Camera rigs section **/
-CameraPtr TargetCamera::createRigCamera(const string_t& iName,
+CameraPtr TargetCamera::createRigCamera(const std::string& iName,
                                         int /*cameraIndex*/)
 {
   if (cameraRigMode != Camera::RIG_MODE_NONE()) {
@@ -453,7 +453,7 @@ void TargetCamera::_getRigCamPosition(float halfSpace, Vector3& result)
   Vector3::TransformCoordinatesToRef(position, _rigCamTransformMatrix, result);
 }
 
-const string_t TargetCamera::getClassName() const
+const std::string TargetCamera::getClassName() const
 {
   return "TargetCamera";
 }

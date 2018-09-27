@@ -209,7 +209,7 @@ void ICanvas::onMouseWheel(bool ctrlKey, bool shiftKey, int iMouseX,
   }
 }
 
-void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode, string_t code)
+void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode, std::string code)
 {
   const unsigned int type = static_cast<unsigned>(EventType::KEY_DOWN);
   for (auto& listener : keyEventListeners[type]) {
@@ -223,7 +223,7 @@ void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode, string_t code)
   }
 }
 
-void ICanvas::onKeyUp(bool ctrlKey, bool altKey, int keyCode, string_t code)
+void ICanvas::onKeyUp(bool ctrlKey, bool altKey, int keyCode, std::string code)
 {
   const unsigned int type = static_cast<unsigned>(EventType::KEY_UP);
   for (auto& listener : keyEventListeners[type]) {

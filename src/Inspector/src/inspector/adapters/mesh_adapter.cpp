@@ -57,22 +57,22 @@ MeshAdapter::~MeshAdapter()
 {
 }
 
-string_t MeshAdapter::id()
+std::string MeshAdapter::id()
 {
   return _obj->name;
 }
 
-string_t MeshAdapter::type()
+std::string MeshAdapter::type()
 {
   return _obj->getClassName();
 }
 
-unique_ptr_t<PropertiesView>& MeshAdapter::getProperties()
+std::unique_ptr<PropertiesView>& MeshAdapter::getProperties()
 {
   return _properties;
 }
 
-vector_t<unique_ptr_t<AbstractTreeTool>>& MeshAdapter::getTools()
+std::vector<std::unique_ptr<AbstractTreeTool>>& MeshAdapter::getTools()
 {
   return _tools;
 }
@@ -125,7 +125,7 @@ void MeshAdapter::debug(bool enable)
   }
 }
 
-string_t MeshAdapter::getInfo() const
+std::string MeshAdapter::getInfo() const
 {
   if (_abstractMesh) {
     std::to_string(_abstractMesh->getTotalVertices()) + " vertices";
@@ -167,16 +167,16 @@ void MeshAdapter::_buildPropertiesView()
   /** Node properties **/
   // - id
   view.addStringProperty(
-    "id", [&]() -> string_t& { return _abstractMesh->id; },
-    [&](const string_t& value) { _abstractMesh->id = value; });
+    "id", [&]() -> std::string& { return _abstractMesh->id; },
+    [&](const std::string& value) { _abstractMesh->id = value; });
   // - uniqueId
   view.addSizeTProperty(
     "uniqueId", [&]() -> size_t { return _abstractMesh->uniqueId; },
     [&](const size_t& value) { _abstractMesh->uniqueId = value; });
   // - name
   view.addStringProperty(
-    "name", [&]() -> string_t& { return _abstractMesh->name; },
-    [&](const string_t& value) { _abstractMesh->name = value; });
+    "name", [&]() -> std::string& { return _abstractMesh->name; },
+    [&](const std::string& value) { _abstractMesh->name = value; });
   // - doNotSerialize
   view.addBoolProperty(
     "doNotSerialize", [&]() -> bool { return _abstractMesh->doNotSerialize; },

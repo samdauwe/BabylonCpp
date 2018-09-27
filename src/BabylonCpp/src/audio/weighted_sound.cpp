@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-WeightedSound::WeightedSound(bool iLoop, const vector_t<SoundPtr>& sounds,
+WeightedSound::WeightedSound(bool iLoop, const std::vector<SoundPtr>& sounds,
                              const Float32Array& weights)
     : loop{false}
     , isPlaying{false}
@@ -22,7 +22,7 @@ WeightedSound::WeightedSound(bool iLoop, const vector_t<SoundPtr>& sounds,
     , _coneInnerAngle{360.f}
     , _coneOuterAngle{360.f}
     , _volume{1}
-    , _currentIndex{nullopt_t}
+    , _currentIndex{std::nullopt}
 {
   if (sounds.size() != weights.size()) {
     throw std::runtime_error("sounds length does not equal weights length");
@@ -137,7 +137,7 @@ void WeightedSound::stop()
   }
 }
 
-void WeightedSound::play(const nullable_t<size_t>& startOffset)
+void WeightedSound::play(const std::optional<size_t>& startOffset)
 {
   if (!isPaused) {
     stop();
@@ -154,7 +154,7 @@ void WeightedSound::play(const nullable_t<size_t>& startOffset)
   if (_currentIndex.has_value()) {
     const auto& sound = _sounds[*_currentIndex];
     if (sound->isReady()) {
-      sound->play(0, isPaused ? nullopt_t : startOffset);
+      sound->play(0, isPaused ? std::nullopt : startOffset);
     }
     else {
       sound->autoplay = true;

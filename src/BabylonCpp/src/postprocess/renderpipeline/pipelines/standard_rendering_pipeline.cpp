@@ -30,8 +30,8 @@ namespace BABYLON {
 unsigned int StandardRenderingPipeline::LuminanceSteps = 6;
 
 StandardRenderingPipeline::StandardRenderingPipeline(
-  const string_t& iName, Scene* scene, float ratio,
-  PostProcess* iOriginalPostProcess, const vector_t<CameraPtr>& cameras)
+  const std::string& iName, Scene* scene, float ratio,
+  PostProcess* iOriginalPostProcess, const std::vector<CameraPtr>& cameras)
     : PostProcessRenderPipeline{scene->getEngine(), iName}
     , originalPostProcess{iOriginalPostProcess}
     , downSampleX4PostProcess{nullptr}
@@ -103,7 +103,7 @@ StandardRenderingPipeline::~StandardRenderingPipeline()
 {
 }
 
-float StandardRenderingPipeline::operator[](const string_t& key) const
+float StandardRenderingPipeline::operator[](const std::string& key) const
 {
   if (key == "brightThreshold") {
     return brightThreshold;
@@ -315,7 +315,7 @@ void StandardRenderingPipeline::_buildPipeline()
 
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRPassPostProcess",
-    [&]() -> vector_t<PostProcess*> { return {originalPostProcess}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {originalPostProcess}; }, true));
 
   _currentDepthOfFieldSource = originalPostProcess;
 
@@ -340,7 +340,7 @@ void StandardRenderingPipeline::_buildPipeline()
       "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(new PostProcessRenderEffect(
       scene->getEngine(), "HDRBaseDepthOfFieldSource",
-      [this]() -> vector_t<PostProcess*> {
+      [this]() -> std::vector<PostProcess*> {
         return {textureAdderFinalPostProcess};
       },
       true));
@@ -357,7 +357,7 @@ void StandardRenderingPipeline::_buildPipeline()
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
       "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(new PostProcessRenderEffect(scene->getEngine(), "HDRVLSFinal",
-                                          [this]() -> vector_t<PostProcess*> {
+                                          [this]() -> std::vector<PostProcess*> {
                                             return {
                                               volumetricLightFinalPostProcess};
                                           },
@@ -377,7 +377,7 @@ void StandardRenderingPipeline::_buildPipeline()
       "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(new PostProcessRenderEffect(scene->getEngine(),
                                           "HDRPostLensFlareDepthOfFieldSource",
-                                          [this]() -> vector_t<PostProcess*> {
+                                          [this]() -> std::vector<PostProcess*> {
                                             return {lensFlareFinalPostProcess};
                                           },
                                           true));
@@ -398,7 +398,7 @@ void StandardRenderingPipeline::_buildPipeline()
       "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(new PostProcessRenderEffect(
       scene->getEngine(), "HDRPostHDReDepthOfFieldSource",
-      [this]() -> vector_t<PostProcess*> { return {hdrFinalPostProcess}; },
+      [this]() -> std::vector<PostProcess*> { return {hdrFinalPostProcess}; },
       true));
   }
 
@@ -449,7 +449,7 @@ void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
   // Add to pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRDownSampleX4",
-    [&]() -> vector_t<PostProcess*> { return {downSampleX4PostProcess}; },
+    [&]() -> std::vector<PostProcess*> { return {downSampleX4PostProcess}; },
     true));
 }
 
@@ -483,15 +483,15 @@ void StandardRenderingPipeline::_createBrightPassPostProcess(Scene* scene,
   // Add to pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRBrightPass",
-    [&]() -> vector_t<PostProcess*> { return {brightPassPostProcess}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {brightPassPostProcess}; }, true));
 }
 
 void StandardRenderingPipeline::_createBlurPostProcesses(
-  Scene* scene, float ratio, unsigned int indice, const string_t& blurWidthKey)
+  Scene* scene, float ratio, unsigned int indice, const std::string& blurWidthKey)
 {
   auto engine = scene->getEngine();
 
-  const string_t underscore = "_";
+  const std::string underscore = "_";
   const auto indiceStr      = std::to_string(indice);
   auto blurX                = new BlurPostProcess(
     "HDRBlurH" + underscore + indiceStr, Vector2(1.f, 0.f),
@@ -518,10 +518,10 @@ void StandardRenderingPipeline::_createBlurPostProcesses(
 
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRBlurH" + indiceStr,
-    [&]() -> vector_t<PostProcess*> { return {blurX}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {blurX}; }, true));
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRBlurV" + indiceStr,
-    [&]() -> vector_t<PostProcess*> { return {blurY}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {blurY}; }, true));
 
   blurHPostProcesses.emplace_back(blurX);
   blurVPostProcesses.emplace_back(blurY);
@@ -550,7 +550,7 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
   // Add to pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRTextureAdder",
-    [&]() -> vector_t<PostProcess*> { return {textureAdderPostProcess}; },
+    [&]() -> std::vector<PostProcess*> { return {textureAdderPostProcess}; },
     true));
 }
 
@@ -607,7 +607,7 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
 
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRVLS",
-    [this]() -> vector_t<PostProcess*> { return {volumetricLightPostProcess}; },
+    [this]() -> std::vector<PostProcess*> { return {volumetricLightPostProcess}; },
     true));
 
   // Smooth
@@ -630,7 +630,7 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
     });
 
   addEffect(new PostProcessRenderEffect(scene->getEngine(), "HDRVLSMerge",
-                                        [this]() -> vector_t<PostProcess*> {
+                                        [this]() -> std::vector<PostProcess*> {
                                           return {
                                             volumetricLightMergePostProces};
                                         },
@@ -669,15 +669,15 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
   // Add to pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRLuminance",
-    [this]() -> vector_t<PostProcess*> { return {luminancePostProcess}; },
+    [this]() -> std::vector<PostProcess*> { return {luminancePostProcess}; },
     true));
 
   // Create down sample luminance
   for (unsigned int i = StandardRenderingPipeline::LuminanceSteps; i-- > 0;) {
-    const string_t iStr = std::to_string(i);
+    const std::string iStr = std::to_string(i);
     float size          = static_cast<float>(std::pow(3, i));
 
-    string_t defines = "#define LUMINANCE_DOWN_SAMPLE\n";
+    std::string defines = "#define LUMINANCE_DOWN_SAMPLE\n";
     if (i == 0) {
       defines += "#define FINAL_DOWN_SAMPLER";
     }
@@ -696,7 +696,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
   std::size_t index = 0;
   for (auto& pp : luminanceDownSamplePostProcesses) {
-    const string_t indexStr = std::to_string(index);
+    const std::string indexStr = std::to_string(index);
     Float32Array downSampleOffsets(18);
 
     pp->setOnApply([&](Effect* effect, EventState&) {
@@ -738,7 +738,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
     addEffect(new PostProcessRenderEffect(
       scene->getEngine(), "HDRLuminanceDownSample" + indexStr,
-      [&]() -> vector_t<PostProcess*> { return {pp}; }, true));
+      [&]() -> std::vector<PostProcess*> { return {pp}; }, true));
     ++index;
   };
 }
@@ -790,7 +790,7 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
 
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDR",
-    [&]() -> vector_t<PostProcess*> { return {hdrPostProcess}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {hdrPostProcess}; }, true));
 }
 
 void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
@@ -805,7 +805,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     "#define LENS_FLARE", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRLensFlare",
-    [&]() -> vector_t<PostProcess*> { return {lensFlarePostProcess}; }, false));
+    [&]() -> std::vector<PostProcess*> { return {lensFlarePostProcess}; }, false));
 
   _createBlurPostProcesses(scene, ratio / 4.f, 2);
 
@@ -817,7 +817,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     "#define LENS_FLARE_COMPOSE", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRLensFlareCompose",
-    [&]() -> vector_t<PostProcess*> { return {lensFlareComposePostProcess}; },
+    [&]() -> std::vector<PostProcess*> { return {lensFlareComposePostProcess}; },
     false));
 
   // Lens flare
@@ -905,7 +905,7 @@ void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
   // Add to pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRDepthOfField",
-    [&]() -> vector_t<PostProcess*> { return {depthOfFieldPostProcess}; },
+    [&]() -> std::vector<PostProcess*> { return {depthOfFieldPostProcess}; },
     true));
 }
 
@@ -952,7 +952,7 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
 
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), "HDRMotionBlur",
-    [&]() -> vector_t<PostProcess*> { return {motionBlurPostProcess}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {motionBlurPostProcess}; }, true));
 }
 
 TexturePtr StandardRenderingPipeline::_getDepthTexture()
@@ -1082,9 +1082,9 @@ Json::object StandardRenderingPipeline::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<StandardRenderingPipeline>
+std::unique_ptr<StandardRenderingPipeline>
 StandardRenderingPipeline::Parse(const Json::value& /*source*/,
-                                 Scene* /*scene*/, const string_t& /*url*/)
+                                 Scene* /*scene*/, const std::string& /*url*/)
 {
   return nullptr;
 }

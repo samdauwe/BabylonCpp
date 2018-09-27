@@ -57,12 +57,12 @@ Vector4 Vector4::copy() const
   return Vector4(*this);
 }
 
-unique_ptr_t<Vector4> Vector4::clone() const
+std::unique_ptr<Vector4> Vector4::clone() const
 {
   return std::make_unique<Vector4>(*this);
 }
 
-string_t Vector4::toString() const
+std::string Vector4::toString() const
 {
   std::ostringstream oss;
   oss << *this;

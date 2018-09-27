@@ -22,7 +22,7 @@
 
 namespace BABYLON {
 
-EffectLayer::EffectLayer(const string_t& iName, Scene* scene)
+EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
     : name{iName}
     , isEnabled{true}
     , camera{this, &EffectLayer::get_camera}
@@ -152,10 +152,10 @@ void EffectLayer::_createMainTexture()
 
   // Custom render function
   _mainTexture->customRenderFunction
-    = [this](const vector_t<SubMeshPtr>& opaqueSubMeshes,
-             const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-             const vector_t<SubMeshPtr>& transparentSubMeshes,
-             const vector_t<SubMeshPtr>& depthOnlySubMeshes,
+    = [this](const std::vector<SubMeshPtr>& opaqueSubMeshes,
+             const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+             const std::vector<SubMeshPtr>& transparentSubMeshes,
+             const std::vector<SubMeshPtr>& depthOnlySubMeshes,
              const std::function<void()>& /*beforeTransparents*/) {
         onBeforeRenderMainTextureObservable.notifyObservers(this);
 
@@ -201,9 +201,9 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
     return false;
   }
 
-  vector_t<string_t> defines = {};
+  std::vector<std::string> defines = {};
 
-  vector_t<string_t> attribs = {VertexBuffer::PositionKindChars};
+  std::vector<std::string> attribs = {VertexBuffer::PositionKindChars};
 
   auto mesh = subMesh->getMesh();
   auto uv1  = false;
@@ -570,13 +570,13 @@ void EffectLayer::dispose()
   onSizeChangedObservable.clear();
 }
 
-string_t EffectLayer::getClassName() const
+std::string EffectLayer::getClassName() const
 {
   return "EffectLayer";
 }
 
 EffectLayer* EffectLayer::Parse(const Json::value& /*parsedEffectLayer*/,
-                                Scene* /*scene*/, const string_t& /*rootUrl*/)
+                                Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

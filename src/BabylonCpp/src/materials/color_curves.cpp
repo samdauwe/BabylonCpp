@@ -404,15 +404,15 @@ void ColorCurves::set_shadowsExposure(float value)
   _dirty           = true;
 }
 
-const string_t ColorCurves::getClassName() const
+const std::string ColorCurves::getClassName() const
 {
   return "ColorCurves";
 }
 
 void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect,
-                       const string_t& positiveUniform,
-                       const string_t& neutralUniform,
-                       const string_t& negativeUniform)
+                       const std::string& positiveUniform,
+                       const std::string& neutralUniform,
+                       const std::string& negativeUniform)
 {
   if (colorCurves._dirty) {
     colorCurves._dirty = false;
@@ -470,7 +470,7 @@ void ColorCurves::Bind(ColorCurves& colorCurves, Effect* effect,
   }
 }
 
-void ColorCurves::PrepareUniforms(vector_t<string_t>& uniformsList)
+void ColorCurves::PrepareUniforms(std::vector<std::string>& uniformsList)
 {
   stl_util::concat(uniformsList,
                    {
@@ -588,7 +588,7 @@ float ColorCurves::clamp(float value, float min, float max)
   return std::min(std::max(value, min), max);
 }
 
-unique_ptr_t<ColorCurves> ColorCurves::clone() const
+std::unique_ptr<ColorCurves> ColorCurves::clone() const
 {
   return nullptr;
 }
@@ -598,7 +598,7 @@ Json::object ColorCurves::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<ColorCurves> Parse(const Json::value& /*source*/)
+std::unique_ptr<ColorCurves> Parse(const Json::value& /*source*/)
 {
   return nullptr;
 }

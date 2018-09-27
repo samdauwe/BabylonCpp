@@ -5,8 +5,8 @@
 
 namespace BABYLON {
 
-Gamepad::Gamepad(const string_t& iId, int iIndex,
-                 const shared_ptr_t<IBrowserGamepad>& browserGamepad,
+Gamepad::Gamepad(const std::string& iId, int iIndex,
+                 const std::shared_ptr<IBrowserGamepad>& browserGamepad,
                  unsigned int leftStickX, unsigned int leftStickY,
                  unsigned int rightStickX, unsigned int rightStickY)
     : id{iId}
@@ -56,12 +56,12 @@ void Gamepad::setOnrightstickchanged(
   _onrightstickchanged = callback;
 }
 
-nullable_t<StickValues>& Gamepad::get_leftStick()
+std::optional<StickValues>& Gamepad::get_leftStick()
 {
   return _leftStick;
 }
 
-void Gamepad::set_leftStick(const nullable_t<StickValues>& newValues)
+void Gamepad::set_leftStick(const std::optional<StickValues>& newValues)
 {
   if (_onleftstickchanged
       && (!stl_util::almost_equal((*_leftStick).x, (*newValues).x)
@@ -71,12 +71,12 @@ void Gamepad::set_leftStick(const nullable_t<StickValues>& newValues)
   _leftStick = newValues;
 }
 
-nullable_t<StickValues>& Gamepad::get_rightStick()
+std::optional<StickValues>& Gamepad::get_rightStick()
 {
   return _rightStick;
 }
 
-void Gamepad::set_rightStick(const nullable_t<StickValues>& newValues)
+void Gamepad::set_rightStick(const std::optional<StickValues>& newValues)
 {
   if (_onrightstickchanged
       && (!stl_util::almost_equal((*_rightStick).x, (*newValues).x)

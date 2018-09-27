@@ -1,7 +1,6 @@
 #ifndef BABYLON_INSPECTOR_ADAPTERS_MESH_ADAPTER_H
 #define BABYLON_INSPECTOR_ADAPTERS_MESH_ADAPTER_H
 
-#include <babylon/babylon_stl.h>
 #include <babylon/math/vector3.h>
 #include <babylon/tools/observer.h>
 
@@ -40,22 +39,22 @@ public:
   /**
    * @brief Returns the name displayed in the tree.
    */
-  string_t id() override;
+  std::string id() override;
 
   /**
    * @brief Returns the type of this object - displayed in the tree.
    */
-  string_t type() override;
+  std::string type() override;
 
   /**
    * @brief Returns the list of properties to be displayed for this adapter.
    */
-  unique_ptr_t<PropertiesView>& getProperties() override;
+  std::unique_ptr<PropertiesView>& getProperties() override;
 
   /**
    * @brief Returns the list of tools available for this adapter.
    */
-  vector_t<AbstractTreeToolUPtr>& getTools() override;
+  std::vector<AbstractTreeToolUPtr>& getTools() override;
 
   void setVisible(bool b) override;
 
@@ -70,7 +69,7 @@ public:
   /**
    * @brief Returns some information about this mesh.
    */
-  string_t getInfo() const override;
+  std::string getInfo() const override;
 
 private:
   /**
@@ -89,10 +88,10 @@ private:
   AbstractMeshPtr _abstractMesh;
   MeshPtr _mesh;
   GroundMeshPtr _groundMesh;
-  unique_ptr_t<PropertiesView> _properties;
-  vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
+  std::unique_ptr<PropertiesView> _properties;
+  std::vector<std::unique_ptr<AbstractTreeTool>> _tools;
   /** Keep track of the axis of the actual object */
-  unique_ptr_t<Debug::AxesViewer> _axesViewer;
+  std::unique_ptr<Debug::AxesViewer> _axesViewer;
   Observer<Scene>::Ptr onBeforeRenderObserver;
   // Axis
   Vector3 _x, _y, _z;

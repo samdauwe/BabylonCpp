@@ -12,7 +12,8 @@
 
 namespace BABYLON {
 
-Skeleton::Skeleton(const string_t& iName, const string_t& iId, Scene* scene)
+Skeleton::Skeleton(const std::string& iName, const std::string& iId,
+                   Scene* scene)
     : needInitialSkinMatrix{false}
     , name{iName}
     , id{iId}
@@ -74,7 +75,7 @@ Scene* Skeleton::getScene()
   return _scene;
 }
 
-string_t Skeleton::toString(bool fullDetails)
+std::string Skeleton::toString(bool fullDetails)
 {
   std::ostringstream oss;
   oss << "Name: " << name << ", nBones: " << bones.size();
@@ -100,7 +101,7 @@ string_t Skeleton::toString(bool fullDetails)
   return oss.str();
 }
 
-int Skeleton::getBoneIndexByName(const string_t& _name)
+int Skeleton::getBoneIndexByName(const std::string& _name)
 {
   for (size_t boneIndex = 0, cache = bones.size(); boneIndex < cache;
        ++boneIndex) {
@@ -111,7 +112,8 @@ int Skeleton::getBoneIndexByName(const string_t& _name)
   return -1;
 }
 
-void Skeleton::createAnimationRange(const string_t& _name, float from, float to)
+void Skeleton::createAnimationRange(const std::string& _name, float from,
+                                    float to)
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, _name)) {
@@ -124,7 +126,7 @@ void Skeleton::createAnimationRange(const string_t& _name, float from, float to)
   }
 }
 
-void Skeleton::deleteAnimationRange(const string_t& _name, bool deleteFrames)
+void Skeleton::deleteAnimationRange(const std::string& _name, bool deleteFrames)
 {
   for (auto& bone : bones) {
     if (!bone->animations.empty() && (bone->animations[0] != nullptr)) {
@@ -134,7 +136,7 @@ void Skeleton::deleteAnimationRange(const string_t& _name, bool deleteFrames)
   _ranges.erase(_name);
 }
 
-AnimationRange* Skeleton::getAnimationRange(const string_t& _name)
+AnimationRange* Skeleton::getAnimationRange(const std::string& _name)
 {
   if (!stl_util::contains(_ranges, _name)) {
     return &_ranges[_name];
@@ -143,16 +145,16 @@ AnimationRange* Skeleton::getAnimationRange(const string_t& _name)
   return nullptr;
 }
 
-vector_t<AnimationRange> Skeleton::getAnimationRanges()
+std::vector<AnimationRange> Skeleton::getAnimationRanges()
 {
-  vector_t<AnimationRange> animationRanges;
+  std::vector<AnimationRange> animationRanges;
   for (const auto& range : _ranges) {
     animationRanges.emplace_back(range.second);
   }
   return animationRanges;
 }
 
-bool Skeleton::copyAnimationRange(Skeleton* source, const string_t& _name,
+bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
                                   bool rescaleAsRequired)
 {
   if (stl_util::contains(_ranges, _name) || !source->getAnimationRange(_name)) {
@@ -163,7 +165,7 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const string_t& _name,
 
   // make a dictionary of source skeleton's bones, so exact same order or
   // doublely nested loop is not required
-  unordered_map_t<string_t, Bone*> boneDict;
+  std::unordered_map<std::string, Bone*> boneDict;
   auto& sourceBones = source->bones;
   for (auto& bone : sourceBones) {
     boneDict[bone->name] = bone.get();
@@ -230,7 +232,7 @@ float Skeleton::_getHighestAnimationFrame()
 }
 
 Animatable*
-Skeleton::beginAnimation(const string_t& _name, bool /*loop*/,
+Skeleton::beginAnimation(const std::string& _name, bool /*loop*/,
                          float /*speedRatio*/,
                          const std::function<void()>& /*onAnimationEnd*/)
 {
@@ -349,7 +351,7 @@ void Skeleton::prepare()
   _scene->_activeBones.addCount(bones.size(), false);
 }
 
-vector_t<IAnimatablePtr> Skeleton::getAnimatables()
+std::vector<IAnimatablePtr> Skeleton::getAnimatables()
 {
   if (_animatables.size() != bones.size()) {
     _animatables.clear();
@@ -362,13 +364,13 @@ vector_t<IAnimatablePtr> Skeleton::getAnimatables()
   return _animatables;
 }
 
-vector_t<AnimationPtr> Skeleton::getAnimations()
+std::vector<AnimationPtr> Skeleton::getAnimations()
 {
-  return vector_t<AnimationPtr>();
+  return std::vector<AnimationPtr>();
 }
 
-unique_ptr_t<Skeleton> Skeleton::clone(const string_t& /*iName*/,
-                                       const string_t& /*iId*/) const
+std::unique_ptr<Skeleton> Skeleton::clone(const std::string& /*iName*/,
+                                          const std::string& /*iId*/) const
 {
   /*auto result = Skeleton::New(name, id, this->_scene);
 
@@ -504,8 +506,8 @@ Matrix* Skeleton::getPoseMatrix() const
 
 void Skeleton::sortBones()
 {
-  vector_t<Bone*> bones;
-  vector_t<bool> visited(bones.size());
+  std::vector<Bone*> bones;
+  std::vector<bool> visited(bones.size());
   for (unsigned int index = 0; index < bones.size(); ++index) {
     _sortBones(index, bones, visited);
   }
@@ -513,8 +515,8 @@ void Skeleton::sortBones()
   bones = bones;
 }
 
-void Skeleton::_sortBones(unsigned int index, vector_t<Bone*>& iBones,
-                          vector_t<bool>& visited)
+void Skeleton::_sortBones(unsigned int index, std::vector<Bone*>& iBones,
+                          std::vector<bool>& visited)
 {
   if (visited[index]) {
     return;
@@ -528,9 +530,10 @@ void Skeleton::_sortBones(unsigned int index, vector_t<Bone*>& iBones,
   }
 
   const auto boneIndexOf = [this](Bone* iBone) {
-    auto it = std::find_if(
-      bones.begin(), bones.end(),
-      [&iBone](const BonePtr& bone) { return bone.get() == iBone; });
+    auto it
+      = std::find_if(bones.begin(), bones.end(), [&iBone](const BonePtr& bone) {
+          return bone.get() == iBone;
+        });
     if (it != bones.end()) {
       return static_cast<int>(it - bones.begin());
     }

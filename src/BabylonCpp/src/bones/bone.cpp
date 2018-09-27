@@ -8,16 +8,16 @@
 
 namespace BABYLON {
 
-array_t<Vector3, 2> Bone::_tmpVecs{{Vector3::Zero(), Vector3::Zero()}};
+std::array<Vector3, 2> Bone::_tmpVecs{{Vector3::Zero(), Vector3::Zero()}};
 Quaternion Bone::_tmpQuat{Quaternion::Identity()};
-array_t<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
+std::array<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
                                    Matrix::Identity(), Matrix::Identity(),
                                    Matrix::Identity()}};
 
-Bone::Bone(const string_t& iName, Skeleton* skeleton, Bone* parentBone,
-           const nullable_t<Matrix>& localMatrix,
-           const nullable_t<Matrix>& restPose,
-           const nullable_t<Matrix>& baseMatrix, nullable_t<int> index)
+Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
+           const std::optional<Matrix>& localMatrix,
+           const std::optional<Matrix>& restPose,
+           const std::optional<Matrix>& baseMatrix, std::optional<int> index)
     : Node{iName, skeleton->getScene()}
     , length{-1}
     , _index{index}
@@ -189,17 +189,17 @@ void Bone::set_rotationQuaternion(const Quaternion& newRotation)
   setRotationQuaternion(newRotation);
 }
 
-nullable_t<Vector3>& Bone::get_scaling()
+std::optional<Vector3>& Bone::get_scaling()
 {
   return getScale();
 }
 
-void Bone::set_scaling(const nullable_t<Vector3>& newScaling)
+void Bone::set_scaling(const std::optional<Vector3>& newScaling)
 {
   setScale(*newScaling);
 }
 
-vector_t<AnimationPtr> Bone::getAnimations()
+std::vector<AnimationPtr> Bone::getAnimations()
 {
   return animations;
 }
@@ -254,7 +254,7 @@ void Bone::updateMatrix(const Matrix& matrix, bool updateDifferenceMatrix,
   }
 }
 
-void Bone::_updateDifferenceMatrix(const nullable_t<Matrix>& rootMatrix,
+void Bone::_updateDifferenceMatrix(const std::optional<Matrix>& rootMatrix,
                                    bool updateChildren)
 {
   auto _rootMatrix = rootMatrix ? *rootMatrix : _baseMatrix;
@@ -278,7 +278,7 @@ void Bone::_updateDifferenceMatrix(const nullable_t<Matrix>& rootMatrix,
   _scalingDeterminant = (_absoluteTransform.determinant() < 0.f ? -1.f : 1.f);
 }
 
-Bone& Bone::markAsDirty(const string_t& /*property*/)
+Bone& Bone::markAsDirty(const std::string& /*property*/)
 {
   ++_currentRenderId;
   ++_childRenderId;
@@ -299,7 +299,7 @@ void Bone::_markAsDirtyAndDecompose()
   _needToDecompose = true;
 }
 
-bool Bone::copyAnimationRange(Bone* source, const string_t& rangeName,
+bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
                               int frameOffset, bool rescaleAsRequired,
                               const Vector3& skelDimensionsRatio,
                               bool hasSkelDimensionsRatio)
@@ -516,7 +516,7 @@ void Bone::setScale(const Vector3& scale)
   _markAsDirtyAndCompose();
 }
 
-nullable_t<Vector3>& Bone::getScale()
+std::optional<Vector3>& Bone::getScale()
 {
   _decompose();
   return _localScaling;

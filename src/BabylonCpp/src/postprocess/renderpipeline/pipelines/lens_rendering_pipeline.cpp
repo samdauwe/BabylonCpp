@@ -19,8 +19,8 @@
 namespace BABYLON {
 
 LensRenderingPipeline::LensRenderingPipeline(
-  const string_t& name, const LensRenderingPipelineParameters& parameters,
-  Scene* scene, float ratio, const vector_t<CameraPtr>& cameras)
+  const std::string& name, const LensRenderingPipelineParameters& parameters,
+  Scene* scene, float ratio, const std::vector<CameraPtr>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name), _scene{scene}
 {
   // Fetch texture samplers
@@ -54,21 +54,21 @@ LensRenderingPipeline::LensRenderingPipeline(
   // Set up pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), LensChromaticAberrationEffect,
-    [&]() -> vector_t<PostProcess*> {
+    [&]() -> std::vector<PostProcess*> {
       return {_chromaticAberrationPostProcess};
     },
     true));
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), HighlightsEnhancingEffect,
-    [&]() -> vector_t<PostProcess*> { return {_highlightsPostProcess}; },
+    [&]() -> std::vector<PostProcess*> { return {_highlightsPostProcess}; },
     true));
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), LensDepthOfFieldEffect,
-    [&]() -> vector_t<PostProcess*> { return {_depthOfFieldPostProcess}; },
+    [&]() -> std::vector<PostProcess*> { return {_depthOfFieldPostProcess}; },
     true));
 
   if (stl_util::almost_equal(_highlightsGain, -1.f)) {
-    _disableEffect(HighlightsEnhancingEffect, vector_t<CameraPtr>());
+    _disableEffect(HighlightsEnhancingEffect, std::vector<CameraPtr>());
   }
 
   // Finish
@@ -311,7 +311,7 @@ void LensRenderingPipeline::_createGrainTexture()
   auto rand
     = [](float min, float max) { return Math::random() * (max - min) + min; };
 
-  string_t value;
+  std::string value;
   for (size_t x = 0; x < size; ++x) {
     for (size_t y = 0; y < size; ++y) {
       value = std::to_string(

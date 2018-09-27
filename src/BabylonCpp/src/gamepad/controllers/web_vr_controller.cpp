@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-WebVRController::WebVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad)
+WebVRController::WebVRController(const std::shared_ptr<IBrowserGamepad>& vrGamepad)
     : PoseEnabledController(vrGamepad)
     , pad{StickValues(0.f, 0.f)}
     , hand{vrGamepad->hand}
@@ -22,7 +22,7 @@ WebVRController::WebVRController(const shared_ptr_t<IBrowserGamepad>& vrGamepad)
         false,
       }}
 {
-  _buttons = vector_t<ExtendedGamepadButton>(vrGamepad->buttons.size());
+  _buttons = std::vector<ExtendedGamepadButton>(vrGamepad->buttons.size());
 }
 
 WebVRController::~WebVRController()
@@ -57,8 +57,8 @@ void WebVRController::update()
 }
 
 void WebVRController::_setButtonValue(
-  nullable_t<ExtendedGamepadButton> newState,
-  const nullable_t<ExtendedGamepadButton>& currentState,
+  std::optional<ExtendedGamepadButton> newState,
+  const std::optional<ExtendedGamepadButton>& currentState,
   unsigned int buttonIndex)
 {
   if (!newState) {

@@ -27,10 +27,10 @@ _DepthCullingState::_DepthCullingState()
     , _isCullDirty{false}
     , _isZOffsetDirty{false}
     , _isFrontFaceDirty{false}
-    , _depthFunc{nullopt_t}
+    , _depthFunc{std::nullopt}
     , _cull{nullptr}
-    , _cullFace{nullopt_t}
-    , _frontFace{nullopt_t}
+    , _cullFace{std::nullopt}
+    , _frontFace{std::nullopt}
 {
   reset();
 }
@@ -61,12 +61,12 @@ void _DepthCullingState::set_zOffset(float value)
   _isZOffsetDirty = true;
 }
 
-nullable_t<int>& _DepthCullingState::get_cullFace()
+std::optional<int>& _DepthCullingState::get_cullFace()
 {
   return _cullFace;
 }
 
-void _DepthCullingState::set_cullFace(const nullable_t<int>& value)
+void _DepthCullingState::set_cullFace(const std::optional<int>& value)
 {
   if (_cullFace == value) {
     return;
@@ -76,12 +76,12 @@ void _DepthCullingState::set_cullFace(const nullable_t<int>& value)
   _isCullFaceDirty = true;
 }
 
-nullable_t<bool>& _DepthCullingState::get_cull()
+std::optional<bool>& _DepthCullingState::get_cull()
 {
   return _cull;
 }
 
-void _DepthCullingState::set_cull(const nullable_t<bool>& value)
+void _DepthCullingState::set_cull(const std::optional<bool>& value)
 {
   if (_cull == value) {
     return;
@@ -91,12 +91,12 @@ void _DepthCullingState::set_cull(const nullable_t<bool>& value)
   _isCullDirty = true;
 }
 
-nullable_t<int>& _DepthCullingState::get_depthFunc()
+std::optional<int>& _DepthCullingState::get_depthFunc()
 {
   return _depthFunc;
 }
 
-void _DepthCullingState::set_depthFunc(const nullable_t<int>& value)
+void _DepthCullingState::set_depthFunc(const std::optional<int>& value)
 {
   if (_depthFunc == value) {
     return;
@@ -136,12 +136,12 @@ void _DepthCullingState::set_depthTest(bool value)
   _isDepthTestDirty = true;
 }
 
-nullable_t<unsigned int>& _DepthCullingState::get_frontFace()
+std::optional<unsigned int>& _DepthCullingState::get_frontFace()
 {
   return _frontFace;
 }
 
-void _DepthCullingState::set_frontFace(const nullable_t<unsigned int>& value)
+void _DepthCullingState::set_frontFace(const std::optional<unsigned int>& value)
 {
   if (_frontFace == value) {
     return;
@@ -155,11 +155,11 @@ void _DepthCullingState::reset()
 {
   _depthMask = true;
   _depthTest = true;
-  _depthFunc = nullopt_t;
-  _cullFace  = nullopt_t;
-  _cull      = nullopt_t;
+  _depthFunc = std::nullopt;
+  _cullFace  = std::nullopt;
+  _cull      = std::nullopt;
   _zOffset   = 0.f;
-  _frontFace = nullopt_t;
+  _frontFace = std::nullopt;
 
   _isDepthTestDirty = true;
   _isDepthMaskDirty = true;

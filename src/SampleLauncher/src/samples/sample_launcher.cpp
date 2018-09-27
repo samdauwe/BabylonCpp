@@ -48,9 +48,9 @@ static Window _sceneWindow;
 static Window _inspectorWindow;
 #endif
 
-static unordered_map_t<int, string_t>& GetGLFWKeyMap()
+static std::unordered_map<int, std::string>& GetGLFWKeyMap()
 {
-  static unordered_map_t<int, string_t> glfwKeyMap{
+  static std::unordered_map<int, std::string> glfwKeyMap{
     // Inknown key
     {GLFW_KEY_UNKNOWN, "Unknown"}, // -1
     // Non-alphanumeric characters
@@ -184,7 +184,7 @@ static unordered_map_t<int, string_t>& GetGLFWKeyMap()
   return glfwKeyMap;
 }
 
-static string_t GLFWKeyToString(int glfwKey)
+static std::string GLFWKeyToString(int glfwKey)
 {
   static auto& glfwKeyMap = GetGLFWKeyMap();
   return stl_util::contains(glfwKeyMap, glfwKey) ? glfwKeyMap[glfwKey] :
@@ -535,7 +535,7 @@ int SampleLauncher::initGLFW()
 }
 
 void SampleLauncher::CreateGLFWWindow(Window& window, int width, int height,
-                                      const string_t& title,
+                                      const std::string& title,
                                       GLFWmonitor* monitor,
                                       Window* parentWindow)
 {

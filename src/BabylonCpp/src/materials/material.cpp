@@ -16,7 +16,7 @@
 
 namespace BABYLON {
 
-Material::Material(const string_t& iName, Scene* scene, bool doNotAdd)
+Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     : id{!iName.empty() ? iName : Tools::RandomId()}
     , name{iName}
     , checkReadyOnEveryCall{false}
@@ -176,9 +176,9 @@ void Material::set_useLogarithmicDepth(bool /*value*/)
 }
 
 // Methods
-vector_t<AnimationPtr> Material::getAnimations()
+std::vector<AnimationPtr> Material::getAnimations()
 {
-  return vector_t<AnimationPtr>();
+  return std::vector<AnimationPtr>();
 }
 
 // Events
@@ -260,7 +260,7 @@ unsigned int Material::get_fillMode() const
   return _fillMode;
 }
 
-string_t Material::toString(bool fullDetails) const
+std::string Material::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name;
@@ -269,7 +269,7 @@ string_t Material::toString(bool fullDetails) const
   return oss.str();
 }
 
-const string_t Material::getClassName() const
+const std::string Material::getClassName() const
 {
   return "Material";
 }
@@ -334,7 +334,7 @@ BaseTexturePtr Material::getAlphaTestTexture()
 
 void Material::trackCreation(
   const std::function<void(const Effect* effect)>& /*onCompiled*/,
-  const std::function<void(const Effect* effect, const string_t& errors)>&
+  const std::function<void(const Effect* effect, const std::string& errors)>&
   /*onError*/)
 {
 }
@@ -345,7 +345,7 @@ void Material::markDirty()
 }
 
 bool Material::_preBind(Effect* effect,
-                        nullable_t<unsigned int> overrideOrientation)
+                        std::optional<unsigned int> overrideOrientation)
 {
   auto engine = _scene->getEngine();
 
@@ -434,7 +434,7 @@ void Material::unbind()
   }
 }
 
-vector_t<BaseTexturePtr> Material::getActiveTextures() const
+std::vector<BaseTexturePtr> Material::getActiveTextures() const
 {
   return {};
 }
@@ -444,15 +444,15 @@ bool Material::hasTexture(const BaseTexturePtr& /*texture*/) const
   return false;
 }
 
-MaterialPtr Material::clone(const string_t& /*name*/,
+MaterialPtr Material::clone(const std::string& /*name*/,
                             bool /*cloneChildren*/) const
 {
   return nullptr;
 }
 
-vector_t<AbstractMesh*> Material::getBindedMeshes()
+std::vector<AbstractMesh*> Material::getBindedMeshes()
 {
-  vector_t<AbstractMesh*> result;
+  std::vector<AbstractMesh*> result;
 
   for (auto& mesh : _scene->meshes) {
     if (mesh->material().get() == this) {
@@ -466,7 +466,7 @@ vector_t<AbstractMesh*> Material::getBindedMeshes()
 void Material::forceCompilation(
   AbstractMesh* mesh,
   const std::function<void(Material* material)>& onCompiled,
-  nullable_t<bool> clipPlane)
+  std::optional<bool> clipPlane)
 {
   auto subMesh = std::make_unique<BaseSubMesh>();
   auto scene   = getScene();
@@ -705,7 +705,7 @@ Material::ParseMultiMaterial(const Json::value& parsedMultiMaterial,
   // Tags.AddTagsTo(multiMaterial, parsedMultiMaterial.tags);
 
   for (auto& subMatId : Json::GetArray(parsedMultiMaterial, "materials")) {
-    auto _subMatId = subMatId.get<string_t>();
+    auto _subMatId = subMatId.get<std::string>();
     if (!_subMatId.empty()) {
       multiMaterial->subMaterials().emplace_back(
         scene->getMaterialByID(_subMatId));
@@ -719,7 +719,7 @@ Material::ParseMultiMaterial(const Json::value& parsedMultiMaterial,
 }
 
 MaterialPtr Material::Parse(const Json::value& parsedMaterial, Scene* scene,
-                            const string_t& rootUrl)
+                            const std::string& rootUrl)
 {
   if (!parsedMaterial.contains("customType")
       || Json::GetString(parsedMaterial, "customType")

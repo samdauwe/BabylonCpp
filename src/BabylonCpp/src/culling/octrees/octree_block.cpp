@@ -84,7 +84,7 @@ void OctreeBlock<T>::addEntry(T& entry)
 }
 
 template <class T>
-void OctreeBlock<T>::addEntries(vector_t<T>& _entries)
+void OctreeBlock<T>::addEntries(std::vector<T>& _entries)
 {
   for (auto& mesh : _entries) {
     addEntry(mesh);
@@ -92,8 +92,8 @@ void OctreeBlock<T>::addEntries(vector_t<T>& _entries)
 }
 
 template <class T>
-void OctreeBlock<T>::select(const array_t<Plane, 6>& frustumPlanes,
-                            vector_t<T>& selection, bool allowDuplicate)
+void OctreeBlock<T>::select(const std::array<Plane, 6>& frustumPlanes,
+                            std::vector<T>& selection, bool allowDuplicate)
 {
   if (BoundingBox::IsInFrustum(_boundingVectors, frustumPlanes)) {
     if (!IOctreeContainer<T>::blocks.empty()) {
@@ -114,7 +114,7 @@ void OctreeBlock<T>::select(const array_t<Plane, 6>& frustumPlanes,
 
 template <class T>
 void OctreeBlock<T>::intersects(const Vector3& sphereCenter, float sphereRadius,
-                                vector_t<T>& selection, bool allowDuplicate)
+                                std::vector<T>& selection, bool allowDuplicate)
 {
   if (BoundingBox::IntersectsSphere(_minPoint, _maxPoint, sphereCenter,
                                     sphereRadius)) {
@@ -135,7 +135,7 @@ void OctreeBlock<T>::intersects(const Vector3& sphereCenter, float sphereRadius,
 }
 
 template <class T>
-void OctreeBlock<T>::intersectsRay(const Ray& ray, vector_t<T>& selection)
+void OctreeBlock<T>::intersectsRay(const Ray& ray, std::vector<T>& selection)
 {
   if (ray.intersectsBoxMinMax(_minPoint, _maxPoint)) {
     if (!IOctreeContainer<T>::blocks.empty()) {

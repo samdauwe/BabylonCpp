@@ -18,20 +18,20 @@
 
 namespace BABYLON {
 
-unordered_map_t<string_t, string_t>& Effect::ShadersStore()
+std::unordered_map<std::string, std::string>& Effect::ShadersStore()
 {
   return EffectShadersStore().shaders();
 }
 
-unordered_map_t<string_t, string_t>& Effect::IncludesShadersStore()
+std::unordered_map<std::string, std::string>& Effect::IncludesShadersStore()
 {
   return EffectIncludesShadersStore().shaders();
 }
 
 std::size_t Effect::_uniqueIdSeed = 0;
-unordered_map_t<unsigned int, GL::IGLBuffer*> Effect::_baseCache{};
+std::unordered_map<unsigned int, GL::IGLBuffer*> Effect::_baseCache{};
 
-Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
+Effect::Effect(const std::string& baseName, EffectCreationOptions& options,
                Engine* engine)
     : name{baseName}
     , defines{options.defines}
@@ -65,46 +65,48 @@ Effect::Effect(const string_t& baseName, EffectCreationOptions& options,
   const auto& fragmentSource = baseName;
 
   _loadVertexShader(vertexSource, [this, &fragmentSource,
-                                   &baseName](const string_t& vertexCode) {
+                                   &baseName](const std::string& vertexCode) {
     _processIncludes(vertexCode, [this, &fragmentSource, &baseName](
-                                   const string_t& vertexCodeWithIncludes) {
+                                   const std::string& vertexCodeWithIncludes) {
       _processShaderConversion(
         vertexCodeWithIncludes, false,
-        [this, &fragmentSource, &baseName](const string_t& migratedVertexCode) {
-          _loadFragmentShader(fragmentSource, [this, &migratedVertexCode,
-                                               &baseName](
-                                                const string_t& fragmentCode) {
-            _processIncludes(
-              fragmentCode, [this, &migratedVertexCode, &baseName](
-                              const string_t& fragmentCodeWithIncludes) {
-                _processShaderConversion(
-                  fragmentCodeWithIncludes, true,
-                  [this, &migratedVertexCode,
-                   &baseName](const string_t& migratedFragmentCode) {
-                    if (!baseName.empty()) {
-                      const auto& vertex   = baseName;
-                      const auto& fragment = baseName;
+        [this, &fragmentSource,
+         &baseName](const std::string& migratedVertexCode) {
+          _loadFragmentShader(
+            fragmentSource, [this, &migratedVertexCode,
+                             &baseName](const std::string& fragmentCode) {
+              _processIncludes(
+                fragmentCode, [this, &migratedVertexCode, &baseName](
+                                const std::string& fragmentCodeWithIncludes) {
+                  _processShaderConversion(
+                    fragmentCodeWithIncludes, true,
+                    [this, &migratedVertexCode,
+                     &baseName](const std::string& migratedFragmentCode) {
+                      if (!baseName.empty()) {
+                        const auto& vertex   = baseName;
+                        const auto& fragment = baseName;
 
-                      _vertexSourceCode = "#define SHADER_NAME vertex:" + vertex
-                                          + "\n" + migratedVertexCode;
-                      _fragmentSourceCode
-                        = "#define SHADER_NAME fragment:" + fragment + "\n"
-                          + migratedFragmentCode;
-                    }
-                    else {
-                      _vertexSourceCode   = migratedVertexCode;
-                      _fragmentSourceCode = migratedFragmentCode;
-                    }
-                    _prepareEffect();
-                  });
-              });
-          });
+                        _vertexSourceCode
+                          = "#define SHADER_NAME vertex:" + vertex + "\n"
+                            + migratedVertexCode;
+                        _fragmentSourceCode
+                          = "#define SHADER_NAME fragment:" + fragment + "\n"
+                            + migratedFragmentCode;
+                      }
+                      else {
+                        _vertexSourceCode   = migratedVertexCode;
+                        _fragmentSourceCode = migratedFragmentCode;
+                      }
+                      _prepareEffect();
+                    });
+                });
+            });
         });
     });
   });
 }
 
-Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
+Effect::Effect(const std::unordered_map<std::string, std::string>& baseName,
                EffectCreationOptions& options, Engine* engine)
     : defines{options.defines}
     , onCompiled{options.onCompiled}
@@ -133,8 +135,8 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
     }
   }
 
-  string_t vertexSource   = "";
-  string_t fragmentSource = "";
+  std::string vertexSource   = "";
+  std::string fragmentSource = "";
 
   if (stl_util::contains(baseName, "vertexElement")) {
     vertexSource = baseName.at("vertexElement");
@@ -154,43 +156,44 @@ Effect::Effect(const unordered_map_t<string_t, string_t>& baseName,
     return;
   }
 
-  _loadVertexShader(vertexSource, [this, &fragmentSource,
-                                   &vertexSource](const string_t& vertexCode) {
+  _loadVertexShader(vertexSource, [this, &fragmentSource, &vertexSource](
+                                    const std::string& vertexCode) {
     _processIncludes(vertexCode, [this, &fragmentSource, &vertexSource](
-                                   const string_t& vertexCodeWithIncludes) {
+                                   const std::string& vertexCodeWithIncludes) {
       _processShaderConversion(
         vertexCodeWithIncludes, false,
         [this, &fragmentSource,
-         &vertexSource](const string_t& migratedVertexCode) {
-          _loadFragmentShader(fragmentSource, [this, &migratedVertexCode,
-                                               &fragmentSource, &vertexSource](
-                                                const string_t& fragmentCode) {
-            _processIncludes(
-              fragmentCode,
-              [this, &migratedVertexCode, &fragmentSource,
-               &vertexSource](const string_t& fragmentCodeWithIncludes) {
-                _processShaderConversion(
-                  fragmentCodeWithIncludes, true,
-                  [this, &migratedVertexCode, &fragmentSource,
-                   &vertexSource](const string_t& migratedFragmentCode) {
-                    if (!vertexSource.empty()) {
-                      const auto& vertex   = vertexSource;
-                      const auto& fragment = fragmentSource;
+         &vertexSource](const std::string& migratedVertexCode) {
+          _loadFragmentShader(
+            fragmentSource, [this, &migratedVertexCode, &fragmentSource,
+                             &vertexSource](const std::string& fragmentCode) {
+              _processIncludes(
+                fragmentCode,
+                [this, &migratedVertexCode, &fragmentSource,
+                 &vertexSource](const std::string& fragmentCodeWithIncludes) {
+                  _processShaderConversion(
+                    fragmentCodeWithIncludes, true,
+                    [this, &migratedVertexCode, &fragmentSource,
+                     &vertexSource](const std::string& migratedFragmentCode) {
+                      if (!vertexSource.empty()) {
+                        const auto& vertex   = vertexSource;
+                        const auto& fragment = fragmentSource;
 
-                      _vertexSourceCode = "#define SHADER_NAME vertex:" + vertex
-                                          + "\n" + migratedVertexCode;
-                      _fragmentSourceCode
-                        = "#define SHADER_NAME fragment:" + fragment + "\n"
-                          + migratedFragmentCode;
-                    }
-                    else {
-                      _vertexSourceCode   = migratedVertexCode;
-                      _fragmentSourceCode = migratedFragmentCode;
-                    }
-                    _prepareEffect();
-                  });
-              });
-          });
+                        _vertexSourceCode
+                          = "#define SHADER_NAME vertex:" + vertex + "\n"
+                            + migratedVertexCode;
+                        _fragmentSourceCode
+                          = "#define SHADER_NAME fragment:" + fragment + "\n"
+                            + migratedFragmentCode;
+                      }
+                      else {
+                        _vertexSourceCode   = migratedVertexCode;
+                        _fragmentSourceCode = migratedFragmentCode;
+                      }
+                      _prepareEffect();
+                    });
+                });
+            });
         });
     });
   });
@@ -205,7 +208,7 @@ Observable<Effect>& Effect::get_onBindObservable()
   return _onBindObservable;
 }
 
-string_t Effect::key() const
+std::string Effect::key() const
 {
   return _key;
 }
@@ -225,7 +228,7 @@ GL::IGLProgram* Effect::getProgram()
   return _program.get();
 }
 
-vector_t<string_t>& Effect::getAttributesNames()
+std::vector<std::string>& Effect::getAttributesNames()
 {
   return _attributesNames;
 }
@@ -239,7 +242,7 @@ int Effect::getAttributeLocation(unsigned int index)
   return -1;
 }
 
-int Effect::getAttributeLocationByName(const string_t& _name)
+int Effect::getAttributeLocationByName(const std::string& _name)
 {
   int index = stl_util::index_of(_attributesNames, _name);
 
@@ -251,12 +254,12 @@ size_t Effect::getAttributesCount()
   return _attributes.size();
 }
 
-int Effect::getUniformIndex(const string_t& uniformName)
+int Effect::getUniformIndex(const std::string& uniformName)
 {
   return stl_util::index_of(_uniformsNames, uniformName);
 }
 
-GL::IGLUniformLocation* Effect::getUniform(const string_t& uniformName)
+GL::IGLUniformLocation* Effect::getUniform(const std::string& uniformName)
 {
   if (stl_util::contains(_uniforms, uniformName)) {
     return _uniforms[uniformName].get();
@@ -265,12 +268,12 @@ GL::IGLUniformLocation* Effect::getUniform(const string_t& uniformName)
   return nullptr;
 }
 
-vector_t<string_t>& Effect::getSamplers()
+std::vector<std::string>& Effect::getSamplers()
 {
   return _samplers;
 }
 
-string_t Effect::getCompilationError()
+std::string Effect::getCompilationError()
 {
   return _compilationError;
 }
@@ -287,8 +290,8 @@ void Effect::executeWhenCompiled(
 }
 
 void Effect::_loadVertexShader(
-  const string_t& vertex,
-  const std::function<void(const string_t&)>& callback)
+  const std::string& vertex,
+  const std::function<void(const std::string&)>& callback)
 {
   // Base64 encoded ?
   if (vertex.substr(0, 7) == "base64:") {
@@ -298,17 +301,17 @@ void Effect::_loadVertexShader(
   }
 
   // Is in local store ?
-  const string_t vertexShaderName = vertex + "VertexShader";
+  const std::string vertexShaderName = vertex + "VertexShader";
   if (stl_util::contains(Effect::ShadersStore(), vertexShaderName)) {
-    const string_t vertexShaderName = vertex + "VertexShader";
+    const std::string vertexShaderName = vertex + "VertexShader";
     callback(Effect::ShadersStore()[vertexShaderName]);
     return;
   }
 
-  string_t vertexShaderUrl;
+  std::string vertexShaderUrl;
 
   if ((vertex.at(0) == '.') || (vertex.at(0) == '/')
-      || ((vertex.find("http") != string_t::npos))) {
+      || ((vertex.find("http") != std::string::npos))) {
     vertexShaderUrl = vertex;
   }
   else {
@@ -320,8 +323,8 @@ void Effect::_loadVertexShader(
 }
 
 void Effect::_loadFragmentShader(
-  const string_t& fragment,
-  const std::function<void(const string_t&)>& callback)
+  const std::string& fragment,
+  const std::function<void(const std::string&)>& callback)
 {
   // Base64 encoded ?
   if (fragment.substr(0, 7) == "base64:") {
@@ -331,7 +334,7 @@ void Effect::_loadFragmentShader(
   }
 
   // Is in local store ?
-  string_t fragmentShaderName = fragment + "PixelShader";
+  std::string fragmentShaderName = fragment + "PixelShader";
   if (stl_util::contains(Effect::ShadersStore(), fragmentShaderName)) {
     callback(Effect::ShadersStore()[fragmentShaderName]);
     return;
@@ -343,10 +346,10 @@ void Effect::_loadFragmentShader(
     return;
   }
 
-  string_t fragmentShaderUrl;
+  std::string fragmentShaderUrl;
 
   if ((fragment.at(0) == '.') || (fragment.at(0) == '/')
-      || ((fragment.find("http") != string_t::npos))) {
+      || ((fragment.find("http") != std::string::npos))) {
     fragmentShaderUrl = fragment;
   }
   else {
@@ -357,8 +360,8 @@ void Effect::_loadFragmentShader(
   // Tools::LoadFile(fragmentShaderUrl + ".fragment.fx", callback);
 }
 
-void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
-                                string_t defines)
+void Effect::_dumpShadersSource(std::string vertexCode,
+                                std::string fragmentCode, std::string defines)
 {
   // Rebuild shaders source code
   auto shaderVersion
@@ -372,10 +375,9 @@ void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
   const std::regex regex("\n", std::regex::optimize);
   auto formattedVertexCode
     = "\n1\t"
-      + String::regexReplace(vertexCode, regex,
-                             [&i](const std::smatch& /*m*/) {
-                               return "\n" + std::to_string(i++) + "\t";
-                             });
+      + String::regexReplace(vertexCode, regex, [&i](const std::smatch& /*m*/) {
+          return "\n" + std::to_string(i++) + "\t";
+        });
   i = 2;
   auto formattedFragmentCode
     = "\n1\t"
@@ -392,8 +394,8 @@ void Effect::_dumpShadersSource(string_t vertexCode, string_t fragmentCode,
 }
 
 void Effect::_processShaderConversion(
-  const string_t& sourceCode, bool isFragment,
-  const std::function<void(const string_t&)>& callback)
+  const std::string& sourceCode, bool isFragment,
+  const std::function<void(const std::string&)>& callback)
 {
 
   auto preparedSourceCode = _processPrecision(sourceCode);
@@ -418,7 +420,7 @@ void Effect::_processShaderConversion(
   // #extension GL_EXT_shader_texture_lod : enable
   // #extension GL_EXT_frag_depth : enable
   // #extension GL_EXT_draw_buffers : require
-  const string_t regex(
+  const std::string regex(
     "#extension.+(GL_OES_standard_derivatives|GL_EXT_shader_texture_lod|GL_EXT_"
     "frag_depth|GL_EXT_draw_buffers).+(enable|require)");
   auto result = String::regexReplace(preparedSourceCode, regex, "");
@@ -430,7 +432,7 @@ void Effect::_processShaderConversion(
   result = String::regexReplace(result, "[ \t]attribute", " in");
 
   if (isFragment) {
-    const vector_t<pair_t<string_t, string_t>> fragmentMappings{
+    const std::vector<std::pair<std::string, std::string>> fragmentMappings{
       std::make_pair("texture2DLodEXT\\s*\\(", "textureLod("),   //
       std::make_pair("textureCubeLodEXT\\s*\\(", "textureLod("), //
       std::make_pair("texture2D\\s*\\(", "texture("),            //
@@ -455,11 +457,11 @@ void Effect::_processShaderConversion(
 }
 
 void Effect::_processIncludes(
-  const string_t& sourceCode,
-  const std::function<void(const string_t&)>& callback)
+  const std::string& sourceCode,
+  const std::function<void(const std::string&)>& callback)
 {
   const std::regex regex("#include<(.+)>(\\((.*)\\))*(\\[(.*)\\])*",
-                           std::regex::optimize);
+                         std::regex::optimize);
   auto lines = String::split(sourceCode, '\n');
 
   std::ostringstream returnValue;
@@ -485,13 +487,13 @@ void Effect::_processIncludes(
 
     if (stl_util::contains(Effect::IncludesShadersStore(), includeFile)) {
       // Substitution
-      string_t includeContent = Effect::IncludesShadersStore()[includeFile];
+      std::string includeContent = Effect::IncludesShadersStore()[includeFile];
       if (!match[2].empty()) {
         auto splits = String::split(match[3], ',');
 
         for (std::size_t index = 0; index < splits.size(); index += 2) {
-          const string_t source{splits[index]};
-          const string_t dest{splits[index + 1]};
+          const std::string source{splits[index]};
+          const std::string dest{splits[index + 1]};
 
           includeContent = String::regexReplace(includeContent, source, dest);
         }
@@ -528,7 +530,7 @@ void Effect::_processIncludes(
                     return m.str(0);
                   };
                   const std::regex regex{"light\\{X\\}.(\\w*)",
-                                           std::regex::optimize};
+                                         std::regex::optimize};
                   sourceIncludeContent = String::regexReplace(
                     sourceIncludeContent, regex, callback);
                 }
@@ -548,8 +550,7 @@ void Effect::_processIncludes(
               }
               return m.str(0);
             };
-            const std::regex regex{"light\\{X\\}.(\\w*)",
-                                     std::regex::optimize};
+            const std::regex regex{"light\\{X\\}.(\\w*)", std::regex::optimize};
             includeContent
               = String::regexReplace(includeContent, regex, callback);
           }
@@ -570,7 +571,7 @@ void Effect::_processIncludes(
   callback(returnValue.str());
 }
 
-string_t Effect::_processPrecision(string_t source)
+std::string Effect::_processPrecision(std::string source)
 {
   if (!String::contains(source, "precision highp float")
       && !String::contains(source, "precision mediump float")) {
@@ -591,14 +592,14 @@ string_t Effect::_processPrecision(string_t source)
 
   // Add GL_ES define
   // -- precision mediump float
-  const string_t mediump{"#ifdef GL_ES\nprecision mediump float;\n#endif\n"};
+  const std::string mediump{"#ifdef GL_ES\nprecision mediump float;\n#endif\n"};
   if (String::contains(source, "precision mediump float;")
       && !String::contains(source, mediump)) {
     String::replaceInPlace(source, "precision mediump float;", mediump);
   }
 
   // -- precision highp float
-  const string_t highp{"#ifdef GL_ES\nprecision highp float;\n#endif\n"};
+  const std::string highp{"#ifdef GL_ES\nprecision highp float;\n#endif\n"};
   if (String::contains(source, "precision highp float;")
       && !String::contains(source, highp)) {
     String::replaceInPlace(source, "precision highp float;", highp);
@@ -608,15 +609,15 @@ string_t Effect::_processPrecision(string_t source)
 }
 
 void Effect::_rebuildProgram(
-  const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
+  const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
   const std::function<void(GL::IGLProgram* program)>& onCompiled,
-  const std::function<void(const string_t& message)>& onError)
+  const std::function<void(const std::string& message)>& onError)
 {
   _isReady = false;
 
   _vertexSourceCodeOverride   = vertexSourceCode;
   _fragmentSourceCodeOverride = fragmentSourceCode;
-  this->onError               = [&](Effect* /*effect*/, const string_t& error) {
+  this->onError = [&](Effect* /*effect*/, const std::string& error) {
     if (onError) {
       onError(error);
     }
@@ -634,8 +635,8 @@ void Effect::_rebuildProgram(
   _prepareEffect();
 }
 
-unordered_map_t<string_t, unique_ptr_t<GL::IGLUniformLocation>>
-Effect::getSpecificUniformLocations(const vector_t<string_t>& names)
+std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
+Effect::getSpecificUniformLocations(const std::vector<std::string>& names)
 {
   return _engine->getUniforms(_program.get(), names);
 }
@@ -668,10 +669,10 @@ void Effect::_prepareEffect()
         _transformFeedbackVaryings);
     }
     _program->__SPECTOR_rebuildProgram
-      = [this](
-          const string_t& vertexSourceCode, const string_t& fragmentSourceCode,
-          const std::function<void(GL::IGLProgram * program)>& onCompiled,
-          const std::function<void(const string_t& message)>& onError) {
+      = [this](const std::string& vertexSourceCode,
+               const std::string& fragmentSourceCode,
+               const std::function<void(GL::IGLProgram * program)>& onCompiled,
+               const std::function<void(const std::string& message)>& onError) {
           _rebuildProgram(vertexSourceCode, fragmentSourceCode, onCompiled,
                           onError);
         };
@@ -758,26 +759,27 @@ bool Effect::isSupported() const
   return _compilationError.empty();
 }
 
-void Effect::_bindTexture(const string_t& channel, InternalTexture* texture)
+void Effect::_bindTexture(const std::string& channel, InternalTexture* texture)
 {
   _engine->_bindTexture(stl_util::index_of(_samplers, channel), texture);
 }
 
-void Effect::setTexture(const string_t& channel, const BaseTexturePtr& texture)
+void Effect::setTexture(const std::string& channel,
+                        const BaseTexturePtr& texture)
 {
   _engine->setTexture(stl_util::index_of(_samplers, channel),
                       getUniform(channel), texture);
 }
 
-void Effect::setDepthStencilTexture(const string_t& channel,
+void Effect::setDepthStencilTexture(const std::string& channel,
                                     const RenderTargetTexturePtr& texture)
 {
   _engine->setDepthStencilTexture(stl_util::index_of(_samplers, channel),
                                   getUniform(channel), texture);
 }
 
-void Effect::setTextureArray(const string_t& channel,
-                             const vector_t<BaseTexturePtr>& textures)
+void Effect::setTextureArray(const std::string& channel,
+                             const std::vector<BaseTexturePtr>& textures)
 {
   if (stl_util::index_of(_samplers, channel + "Ex") == -1) {
     auto initialPos = stl_util::index_of(_samplers, channel);
@@ -791,21 +793,21 @@ void Effect::setTextureArray(const string_t& channel,
                            getUniform(channel), textures);
 }
 
-void Effect::setTextureFromPostProcess(const string_t& channel,
+void Effect::setTextureFromPostProcess(const std::string& channel,
                                        PostProcess* postProcess)
 {
   _engine->setTextureFromPostProcess(stl_util::index_of(_samplers, channel),
                                      postProcess);
 }
 
-void Effect::setTextureFromPostProcessOutput(const string_t& channel,
+void Effect::setTextureFromPostProcessOutput(const std::string& channel,
                                              PostProcess* postProcess)
 {
   _engine->setTextureFromPostProcessOutput(
     stl_util::index_of(_samplers, channel), postProcess);
 }
 
-bool Effect::_cacheMatrix(const string_t& uniformName, const Matrix& matrix)
+bool Effect::_cacheMatrix(const std::string& uniformName, const Matrix& matrix)
 {
   auto flag = matrix.updateFlag;
   if (stl_util::contains(_valueCache, uniformName)
@@ -824,7 +826,7 @@ bool Effect::_cacheMatrix(const string_t& uniformName, const Matrix& matrix)
   return true;
 }
 
-bool Effect::_cacheFloat2(const string_t& uniformName, float x, float y)
+bool Effect::_cacheFloat2(const std::string& uniformName, float x, float y)
 {
   if (!stl_util::contains(_valueCache, uniformName)) {
     _valueCache[uniformName] = {x, y};
@@ -845,7 +847,7 @@ bool Effect::_cacheFloat2(const string_t& uniformName, float x, float y)
   return changed;
 }
 
-bool Effect::_cacheFloat3(const string_t& uniformName, float x, float y,
+bool Effect::_cacheFloat3(const std::string& uniformName, float x, float y,
                           float z)
 {
   if (!stl_util::contains(_valueCache, uniformName)) {
@@ -871,7 +873,7 @@ bool Effect::_cacheFloat3(const string_t& uniformName, float x, float y,
   return changed;
 }
 
-bool Effect::_cacheFloat4(const string_t& uniformName, float x, float y,
+bool Effect::_cacheFloat4(const std::string& uniformName, float x, float y,
                           float z, float w)
 {
   if (!stl_util::contains(_valueCache, uniformName)) {
@@ -901,7 +903,7 @@ bool Effect::_cacheFloat4(const string_t& uniformName, float x, float y,
   return changed;
 }
 
-void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const string_t& name)
+void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& name)
 {
   if (stl_util::contains(_uniformBuffersNames, name)) {
     const auto& bufferName = _uniformBuffersNames[name];
@@ -919,12 +921,12 @@ void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const string_t& name)
   _engine->bindUniformBufferBase(_buffer, bufferName);
 }
 
-void Effect::bindUniformBlock(const string_t& blockName, unsigned index)
+void Effect::bindUniformBlock(const std::string& blockName, unsigned index)
 {
   _engine->bindUniformBlock(_program.get(), blockName, index);
 }
 
-Effect& Effect::setInt(const string_t& uniformName, int value)
+Effect& Effect::setInt(const std::string& uniformName, int value)
 {
   Float32Array _value{static_cast<float>(value)};
   if (stl_util::contains(_valueCache, uniformName)
@@ -939,7 +941,7 @@ Effect& Effect::setInt(const string_t& uniformName, int value)
   return *this;
 }
 
-Effect& Effect::setIntArray(const string_t& uniformName,
+Effect& Effect::setIntArray(const std::string& uniformName,
                             const Int32Array& array)
 {
   _valueCache.erase(uniformName);
@@ -948,7 +950,7 @@ Effect& Effect::setIntArray(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setIntArray2(const string_t& uniformName,
+Effect& Effect::setIntArray2(const std::string& uniformName,
                              const Int32Array& array)
 {
   _valueCache.erase(uniformName);
@@ -957,7 +959,7 @@ Effect& Effect::setIntArray2(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setIntArray3(const string_t& uniformName,
+Effect& Effect::setIntArray3(const std::string& uniformName,
                              const Int32Array& array)
 {
   _valueCache.erase(uniformName);
@@ -966,7 +968,7 @@ Effect& Effect::setIntArray3(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setIntArray4(const string_t& uniformName,
+Effect& Effect::setIntArray4(const std::string& uniformName,
                              const Int32Array& array)
 {
   _valueCache.erase(uniformName);
@@ -975,7 +977,7 @@ Effect& Effect::setIntArray4(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setFloatArray(const string_t& uniformName,
+Effect& Effect::setFloatArray(const std::string& uniformName,
                               const Float32Array& array)
 {
   _valueCache.erase(uniformName);
@@ -984,7 +986,7 @@ Effect& Effect::setFloatArray(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setFloatArray2(const string_t& uniformName,
+Effect& Effect::setFloatArray2(const std::string& uniformName,
                                const Float32Array& array)
 {
   _valueCache.erase(uniformName);
@@ -993,7 +995,7 @@ Effect& Effect::setFloatArray2(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setFloatArray3(const string_t& uniformName,
+Effect& Effect::setFloatArray3(const std::string& uniformName,
                                const Float32Array& array)
 {
   _valueCache.erase(uniformName);
@@ -1002,7 +1004,7 @@ Effect& Effect::setFloatArray3(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setFloatArray4(const string_t& uniformName,
+Effect& Effect::setFloatArray4(const std::string& uniformName,
                                const Float32Array& array)
 {
   _valueCache.erase(uniformName);
@@ -1011,7 +1013,7 @@ Effect& Effect::setFloatArray4(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setArray(const string_t& uniformName, Float32Array array)
+Effect& Effect::setArray(const std::string& uniformName, Float32Array array)
 {
   _valueCache.erase(uniformName);
   _engine->setArray(getUniform(uniformName), array);
@@ -1019,7 +1021,7 @@ Effect& Effect::setArray(const string_t& uniformName, Float32Array array)
   return *this;
 }
 
-Effect& Effect::setArray2(const string_t& uniformName, Float32Array array)
+Effect& Effect::setArray2(const std::string& uniformName, Float32Array array)
 {
   _valueCache.erase(uniformName);
   _engine->setArray2(getUniform(uniformName), array);
@@ -1027,7 +1029,7 @@ Effect& Effect::setArray2(const string_t& uniformName, Float32Array array)
   return *this;
 }
 
-Effect& Effect::setArray3(const string_t& uniformName, Float32Array array)
+Effect& Effect::setArray3(const std::string& uniformName, Float32Array array)
 {
   _valueCache.erase(uniformName);
   _engine->setArray3(getUniform(uniformName), array);
@@ -1035,7 +1037,7 @@ Effect& Effect::setArray3(const string_t& uniformName, Float32Array array)
   return *this;
 }
 
-Effect& Effect::setArray4(const string_t& uniformName, Float32Array array)
+Effect& Effect::setArray4(const std::string& uniformName, Float32Array array)
 {
   _valueCache.erase(uniformName);
   _engine->setArray4(getUniform(uniformName), array);
@@ -1043,7 +1045,8 @@ Effect& Effect::setArray4(const string_t& uniformName, Float32Array array)
   return *this;
 }
 
-Effect& Effect::setMatrices(const string_t& uniformName, Float32Array matrices)
+Effect& Effect::setMatrices(const std::string& uniformName,
+                            Float32Array matrices)
 {
   if (matrices.empty()) {
     return *this;
@@ -1055,7 +1058,7 @@ Effect& Effect::setMatrices(const string_t& uniformName, Float32Array matrices)
   return *this;
 }
 
-Effect& Effect::setMatrix(const string_t& uniformName, const Matrix& matrix)
+Effect& Effect::setMatrix(const std::string& uniformName, const Matrix& matrix)
 {
   if (_cacheMatrix(uniformName, matrix)) {
     _engine->setMatrix(getUniform(uniformName), matrix);
@@ -1064,7 +1067,7 @@ Effect& Effect::setMatrix(const string_t& uniformName, const Matrix& matrix)
   return *this;
 }
 
-Effect& Effect::setMatrix3x3(const string_t& uniformName,
+Effect& Effect::setMatrix3x3(const std::string& uniformName,
                              const Float32Array& matrix)
 {
   _valueCache.erase(uniformName);
@@ -1073,7 +1076,7 @@ Effect& Effect::setMatrix3x3(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setMatrix2x2(const string_t& uniformName,
+Effect& Effect::setMatrix2x2(const std::string& uniformName,
                              const Float32Array& matrix)
 {
   _valueCache.erase(uniformName);
@@ -1082,7 +1085,7 @@ Effect& Effect::setMatrix2x2(const string_t& uniformName,
   return *this;
 }
 
-Effect& Effect::setFloat(const string_t& uniformName, float value)
+Effect& Effect::setFloat(const std::string& uniformName, float value)
 {
   if (stl_util::contains(_valueCache, uniformName)
       && stl_util::almost_equal(_valueCache[uniformName][0], value)) {
@@ -1096,7 +1099,7 @@ Effect& Effect::setFloat(const string_t& uniformName, float value)
   return *this;
 }
 
-Effect& Effect::setBool(const string_t& uniformName, bool _bool)
+Effect& Effect::setBool(const std::string& uniformName, bool _bool)
 {
   if (stl_util::contains(_valueCache, uniformName)
       && stl_util::almost_equal(_valueCache[uniformName][0],
@@ -1111,7 +1114,8 @@ Effect& Effect::setBool(const string_t& uniformName, bool _bool)
   return *this;
 }
 
-Effect& Effect::setVector2(const string_t& uniformName, const Vector2& vector2)
+Effect& Effect::setVector2(const std::string& uniformName,
+                           const Vector2& vector2)
 {
   if (_cacheFloat2(uniformName, vector2.x, vector2.y)) {
     _engine->setFloat2(getUniform(uniformName), vector2.x, vector2.y);
@@ -1120,7 +1124,7 @@ Effect& Effect::setVector2(const string_t& uniformName, const Vector2& vector2)
   return *this;
 }
 
-Effect& Effect::setFloat2(const string_t& uniformName, float x, float y)
+Effect& Effect::setFloat2(const std::string& uniformName, float x, float y)
 {
   if (_cacheFloat2(uniformName, x, y)) {
     _engine->setFloat2(getUniform(uniformName), x, y);
@@ -1129,7 +1133,8 @@ Effect& Effect::setFloat2(const string_t& uniformName, float x, float y)
   return *this;
 }
 
-Effect& Effect::setVector3(const string_t& uniformName, const Vector3& vector3)
+Effect& Effect::setVector3(const std::string& uniformName,
+                           const Vector3& vector3)
 {
   if (_cacheFloat3(uniformName, vector3.x, vector3.y, vector3.z)) {
     _engine->setFloat3(getUniform(uniformName), vector3.x, vector3.y,
@@ -1139,7 +1144,7 @@ Effect& Effect::setVector3(const string_t& uniformName, const Vector3& vector3)
   return *this;
 }
 
-Effect& Effect::setFloat3(const string_t& uniformName, float x, float y,
+Effect& Effect::setFloat3(const std::string& uniformName, float x, float y,
                           float z)
 {
   if (_cacheFloat3(uniformName, x, y, z)) {
@@ -1149,7 +1154,8 @@ Effect& Effect::setFloat3(const string_t& uniformName, float x, float y,
   return *this;
 }
 
-Effect& Effect::setVector4(const string_t& uniformName, const Vector4& vector4)
+Effect& Effect::setVector4(const std::string& uniformName,
+                           const Vector4& vector4)
 {
   if (_cacheFloat4(uniformName, vector4.x, vector4.y, vector4.z, vector4.w)) {
     _engine->setFloat4(getUniform(uniformName), vector4.x, vector4.y, vector4.z,
@@ -1159,7 +1165,7 @@ Effect& Effect::setVector4(const string_t& uniformName, const Vector4& vector4)
   return *this;
 }
 
-Effect& Effect::setFloat4(const string_t& uniformName, float x, float y,
+Effect& Effect::setFloat4(const std::string& uniformName, float x, float y,
                           float z, float w)
 {
   if (_cacheFloat4(uniformName, x, y, z, w)) {
@@ -1169,7 +1175,7 @@ Effect& Effect::setFloat4(const string_t& uniformName, float x, float y,
   return *this;
 }
 
-Effect& Effect::setColor3(const string_t& uniformName, const Color3& color3)
+Effect& Effect::setColor3(const std::string& uniformName, const Color3& color3)
 {
   if (_cacheFloat3(uniformName, color3.r, color3.g, color3.b)) {
     _engine->setColor3(getUniform(uniformName), color3);
@@ -1178,7 +1184,7 @@ Effect& Effect::setColor3(const string_t& uniformName, const Color3& color3)
   return *this;
 }
 
-Effect& Effect::setColor4(const string_t& uniformName, const Color3& color3,
+Effect& Effect::setColor4(const std::string& uniformName, const Color3& color3,
                           float alpha)
 {
   if (_cacheFloat4(uniformName, color3.r, color3.g, color3.b, alpha)) {
@@ -1188,7 +1194,7 @@ Effect& Effect::setColor4(const string_t& uniformName, const Color3& color3,
   return *this;
 }
 
-Effect& Effect::setDirectColor4(const string_t& uniformName,
+Effect& Effect::setDirectColor4(const std::string& uniformName,
                                 const Color4& color4)
 {
   if (_cacheFloat4(uniformName, color4.r, color4.g, color4.b, color4.a)) {
@@ -1198,9 +1204,9 @@ Effect& Effect::setDirectColor4(const string_t& uniformName,
   return *this;
 }
 
-void Effect::RegisterShader(const string_t& name,
-                            const nullable_t<string_t>& pixelShader,
-                            const nullable_t<string_t>& vertexShader)
+void Effect::RegisterShader(const std::string& name,
+                            const std::optional<std::string>& pixelShader,
+                            const std::optional<std::string>& vertexShader)
 {
   if (pixelShader.has_value()) {
     Effect::ShadersStore()[String::concat(name, "PixelShader")]

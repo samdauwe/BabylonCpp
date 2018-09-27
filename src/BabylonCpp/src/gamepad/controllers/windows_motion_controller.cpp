@@ -8,18 +8,18 @@
 
 namespace BABYLON {
 
-const string_t WindowsMotionController::MODEL_BASE_URL
+const std::string WindowsMotionController::MODEL_BASE_URL
   = "https://controllers.babylonjs.com/microsoft/";
-const string_t WindowsMotionController::MODEL_LEFT_FILENAME  = "left.glb";
-const string_t WindowsMotionController::MODEL_RIGHT_FILENAME = "right.glb";
+const std::string WindowsMotionController::MODEL_LEFT_FILENAME  = "left.glb";
+const std::string WindowsMotionController::MODEL_RIGHT_FILENAME = "right.glb";
 
-const string_t WindowsMotionController::GAMEPAD_ID_PREFIX
+const std::string WindowsMotionController::GAMEPAD_ID_PREFIX
   = "Spatial Controller (Spatial Interaction Source) ";
-const string_t WindowsMotionController::GAMEPAD_ID_PATTERN
+const std::string WindowsMotionController::GAMEPAD_ID_PATTERN
   = "([0-9a-zA-Z]+-[0-9a-zA-Z]+)";
 
 WindowsMotionController::WindowsMotionController(
-  const shared_ptr_t<IBrowserGamepad>& vrGamepad)
+  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
     , onTriggerButtonStateChangedObservable{this,
          &WindowsMotionController::get_onTriggerButtonStateChangedObservable}
@@ -34,7 +34,7 @@ WindowsMotionController::WindowsMotionController(
     , onTouchpadValuesChangedObservable{this,
         &WindowsMotionController::get_onTouchpadValuesChangedObservable}
     , trackpad{0.f,0.f}
-    , _loadedMeshInfo{nullopt_t}
+    , _loadedMeshInfo{std::nullopt}
     ,_mappingButtons{"thumbstick", "trigger", "grip", "menu", "trackpad"}
     , _mappingButtonMeshNames{              //
         {"trigger", "SELECT"},              //
@@ -172,7 +172,7 @@ void WindowsMotionController::_handleButtonChange(
   _lerpButtonTransform(buttonName, static_cast<float>(state.value()));
 }
 
-void WindowsMotionController::_lerpButtonTransform(const string_t& buttonName,
+void WindowsMotionController::_lerpButtonTransform(const std::string& buttonName,
                                                    float buttonValue)
 {
   // If there is no loaded mesh, there is nothing to transform.
@@ -239,7 +239,7 @@ void WindowsMotionController::initControllerMesh(
 
 LoadedMeshInfo
 WindowsMotionController::processModel(Scene* scene,
-                                      const vector_t<AbstractMesh*>& meshes)
+                                      const std::vector<AbstractMesh*>& meshes)
 {
   LoadedMeshInfo loadedMeshInfo;
 

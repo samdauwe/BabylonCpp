@@ -1,7 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <babylon/babylon_stl.h>
+#include <chrono>
+
+#include <babylon/core/delegates/delegate.h>
 
 typedef uint64_t ns;
 typedef uint32_t rep;

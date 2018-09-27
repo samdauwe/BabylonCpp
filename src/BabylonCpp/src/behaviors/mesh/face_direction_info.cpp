@@ -63,7 +63,7 @@ FaceDirectionInfo FaceDirectionInfo::copy() const
   return FaceDirectionInfo(*this);
 }
 
-unique_ptr_t<FaceDirectionInfo> FaceDirectionInfo::clone() const
+std::unique_ptr<FaceDirectionInfo> FaceDirectionInfo::clone() const
 {
   return std::make_unique<FaceDirectionInfo>(*this);
 }

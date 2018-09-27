@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-PropertyTab::PropertyTab(const string_t& name, Inspector& inspector)
+PropertyTab::PropertyTab(const std::string& name, Inspector& inspector)
     : Tab{name}, _inspector{inspector}
 {
 }

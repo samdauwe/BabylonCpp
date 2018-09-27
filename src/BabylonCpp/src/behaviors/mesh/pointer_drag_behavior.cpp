@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-unique_ptr_t<Scene> PointerDragBehavior::_planeScene = nullptr;
+std::unique_ptr<Scene> PointerDragBehavior::_planeScene = nullptr;
 
 PointerDragBehavior::PointerDragBehavior(
   const PointerDragBehaviorOptions& iOptions)
@@ -62,7 +62,7 @@ PointerDragBehavior::~PointerDragBehavior()
 {
 }
 
-const string_t PointerDragBehavior::name() const
+const std::string PointerDragBehavior::name() const
 {
   return "PointerDrag";
 }
@@ -281,11 +281,11 @@ void PointerDragBehavior::_moveDrag(const Ray& ray)
   }
 }
 
-nullable_t<Vector3>
-PointerDragBehavior::_pickWithRayOnDragPlane(const nullable_t<Ray>& ray)
+std::optional<Vector3>
+PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
 {
   if (!ray) {
-    return nullopt_t;
+    return std::nullopt;
   }
 
   // Calculate angle between plane normal and ray
@@ -320,7 +320,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const nullable_t<Ray>& ray)
       return _alternatePickedPoint;
     }
     else {
-      return nullopt_t;
+      return std::nullopt;
     }
   }
 
@@ -331,7 +331,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const nullable_t<Ray>& ray)
     return (*pickResult).pickedPoint;
   }
   else {
-    return nullopt_t;
+    return std::nullopt;
   }
 }
 

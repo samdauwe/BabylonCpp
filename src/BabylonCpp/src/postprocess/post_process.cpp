@@ -15,13 +15,13 @@
 namespace BABYLON {
 
 PostProcess::PostProcess(
-  const string_t& iName, const string_t& fragmentUrl,
-  const std::vector<string_t>& parameters,
-  const std::vector<string_t>& samplers,
+  const std::string& iName, const std::string& fragmentUrl,
+  const std::vector<std::string>& parameters,
+  const std::vector<std::string>& samplers,
   const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
-  const string_t& defines, unsigned int textureType, const string_t& vertexUrl,
-  const unordered_map_t<string_t, unsigned int>& indexParameters,
+  const std::string& defines, unsigned int textureType, const std::string& vertexUrl,
+  const std::unordered_map<std::string, unsigned int>& indexParameters,
   bool blockCompilation)
     : name{iName}
     , width{-1}
@@ -206,13 +206,13 @@ void PostProcess::useOwnOutput()
 }
 
 void PostProcess::updateEffect(
-  const string_t& defines, const std::vector<string_t>& uniforms,
-  const std::vector<string_t>& samplers,
-  const unordered_map_t<string_t, unsigned int>& indexParameters,
+  const std::string& defines, const std::vector<std::string>& uniforms,
+  const std::vector<std::string>& samplers,
+  const std::unordered_map<std::string, unsigned int>& indexParameters,
   const std::function<void(Effect* effect)>& onCompiled,
-  const std::function<void(Effect* effect, const string_t& errors)>& onError)
+  const std::function<void(Effect* effect, const std::string& errors)>& onError)
 {
-  unordered_map_t<string_t, string_t> baseName{{"vertex", _vertexUrl},
+  std::unordered_map<std::string, std::string> baseName{{"vertex", _vertexUrl},
                                                {"fragment", _fragmentUrl}};
 
   EffectCreationOptions options;
@@ -359,7 +359,7 @@ InternalTexture* PostProcess::activate(const CameraPtr& camera,
   }
   else {
     _scaleRatio.copyFromFloats(1.f, 1.f);
-    _engine->bindFramebuffer(target, 0u, nullopt_t, nullopt_t,
+    _engine->bindFramebuffer(target, 0u, std::nullopt, std::nullopt,
                              forceFullscreenViewport);
   }
 

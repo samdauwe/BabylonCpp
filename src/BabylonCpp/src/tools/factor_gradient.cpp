@@ -6,7 +6,7 @@
 
 namespace BABYLON {
 
-FactorGradient::FactorGradient() : factor2{nullopt_t}
+FactorGradient::FactorGradient() : factor2{std::nullopt}
 {
 }
 

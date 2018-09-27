@@ -1,6 +1,7 @@
 #include <babylon/inspector/treetools/debug_area.h>
 
-#include <babylon/babylon_stl.h>
+#include <utility>
+
 #include <babylon/inspector/treetools/itool_debug.h>
 
 #include <imgui.h>

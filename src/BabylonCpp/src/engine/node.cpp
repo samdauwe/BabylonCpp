@@ -14,17 +14,17 @@
 
 namespace BABYLON {
 
-unordered_map_t<string_t, NodeConstructor> Node::_NodeConstructors;
+std::unordered_map<std::string, NodeConstructor> Node::_NodeConstructors;
 
-void Node::AddNodeConstructor(const string_t& type,
+void Node::AddNodeConstructor(const std::string& type,
                               const NodeConstructor& constructorFunc)
 {
   _NodeConstructors[type] = constructorFunc;
 }
 
 std::function<NodePtr()>
-Node::Construct(const string_t& type, const string_t& name, Scene* scene,
-                const nullable_t<Json::value>& options)
+Node::Construct(const std::string& type, const std::string& name, Scene* scene,
+                const std::optional<Json::value>& options)
 {
   if (!stl_util::contains(_NodeConstructors, type)) {
     return nullptr;
@@ -37,7 +37,7 @@ Node::Construct(const string_t& type, const string_t& name, Scene* scene,
   };
 }
 
-Node::Node(const string_t& iName, Scene* scene)
+Node::Node(const std::string& iName, Scene* scene)
     : name{iName}
     , id{iName}
     , doNotSerialize{false}
@@ -119,7 +119,7 @@ void Node::set_animationPropertiesOverride(
   _animationPropertiesOverride = value;
 }
 
-const string_t Node::getClassName() const
+const std::string Node::getClassName() const
 {
   return "Node";
 }
@@ -181,12 +181,12 @@ Node& Node::removeBehavior(Behavior<Node>* behavior)
   return *this;
 }
 
-vector_t<Behavior<Node>*>& Node::get_behaviors()
+std::vector<Behavior<Node>*>& Node::get_behaviors()
 {
   return _behaviors;
 }
 
-Behavior<Node>* Node::getBehaviorByName(const string_t& iName)
+Behavior<Node>* Node::getBehaviorByName(const std::string& iName)
 {
   auto it = std::find_if(_behaviors.begin(), _behaviors.end(),
                            [&iName](const Behavior<Node>* behavior) {
@@ -320,7 +320,7 @@ bool Node::isDescendantOf(const Node* ancestor)
 
 template <typename T>
 void Node::_getDescendants(
-  vector_t<shared_ptr_t<T>>& results, bool directDescendantsOnly,
+  std::vector<std::shared_ptr<T>>& results, bool directDescendantsOnly,
   const std::function<bool(const NodePtr& node)>& predicate)
 {
   if (_children.empty()) {
@@ -340,21 +340,21 @@ void Node::_getDescendants(
   }
 }
 
-vector_t<NodePtr> Node::getDescendants(
+std::vector<NodePtr> Node::getDescendants(
   bool directDescendantsOnly,
   const std::function<bool(const NodePtr& node)>& predicate)
 {
-  vector_t<NodePtr> results;
+  std::vector<NodePtr> results;
   _getDescendants(results, directDescendantsOnly, predicate);
 
   return results;
 }
 
-vector_t<AbstractMeshPtr> Node::getChildMeshes(
+std::vector<AbstractMeshPtr> Node::getChildMeshes(
   bool directDescendantsOnly,
   const std::function<bool(const NodePtr& node)>& predicate)
 {
-  vector_t<AbstractMeshPtr> results;
+  std::vector<AbstractMeshPtr> results;
   _getDescendants(
     results, directDescendantsOnly, [&predicate](const NodePtr& node) {
       return ((!predicate || predicate(node))
@@ -363,11 +363,11 @@ vector_t<AbstractMeshPtr> Node::getChildMeshes(
   return results;
 }
 
-vector_t<TransformNodePtr> Node::getChildTransformNodes(
+std::vector<TransformNodePtr> Node::getChildTransformNodes(
   bool directDescendantsOnly,
   const std::function<bool(const NodePtr& node)>& predicate)
 {
-  vector_t<TransformNodePtr> results;
+  std::vector<TransformNodePtr> results;
   _getDescendants(
     results, directDescendantsOnly, [&predicate](const NodePtr& node) {
       return ((!predicate || predicate(node))
@@ -376,7 +376,7 @@ vector_t<TransformNodePtr> Node::getChildTransformNodes(
   return results;
 }
 
-vector_t<NodePtr>
+std::vector<NodePtr>
 Node::getChildren(const std::function<bool(const NodePtr& node)>& predicate)
 {
   return getDescendants(true, predicate);
@@ -400,12 +400,12 @@ void Node::_setReady(bool iState)
   _isReady = true;
 }
 
-vector_t<AnimationPtr> Node::getAnimations()
+std::vector<AnimationPtr> Node::getAnimations()
 {
   return animations;
 }
 
-AnimationPtr Node::getAnimationByName(const string_t& iName)
+AnimationPtr Node::getAnimationByName(const std::string& iName)
 {
   auto it = std::find_if(animations.begin(), animations.end(),
                            [&iName](const AnimationPtr& animation) {
@@ -415,7 +415,7 @@ AnimationPtr Node::getAnimationByName(const string_t& iName)
   return (it == animations.end() ? nullptr : *it);
 }
 
-void Node::createAnimationRange(const string_t& iName, float from, float to)
+void Node::createAnimationRange(const std::string& iName, float from, float to)
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, iName)) {
@@ -428,7 +428,7 @@ void Node::createAnimationRange(const string_t& iName, float from, float to)
   }
 }
 
-void Node::deleteAnimationRange(const string_t& iName, bool deleteFrames)
+void Node::deleteAnimationRange(const std::string& iName, bool deleteFrames)
 {
   for (auto& animation : animations) {
     if (animation) {
@@ -439,7 +439,7 @@ void Node::deleteAnimationRange(const string_t& iName, bool deleteFrames)
   _ranges.erase(iName);
 }
 
-AnimationRange* Node::getAnimationRange(const string_t& iName)
+AnimationRange* Node::getAnimationRange(const std::string& iName)
 {
   if (stl_util::contains(_ranges, iName)) {
     return _ranges[iName].get();
@@ -448,7 +448,7 @@ AnimationRange* Node::getAnimationRange(const string_t& iName)
   return nullptr;
 }
 
-AnimatablePtr Node::beginAnimation(const string_t& iName, bool loop,
+AnimatablePtr Node::beginAnimation(const std::string& iName, bool loop,
                                    float speedRatio,
                                    std::function<void()> onAnimationEnd)
 {
@@ -465,9 +465,9 @@ AnimatablePtr Node::beginAnimation(const string_t& iName, bool loop,
                                 onAnimationEnd);
 }
 
-vector_t<AnimationRange> Node::serializeAnimationRanges()
+std::vector<AnimationRange> Node::serializeAnimationRanges()
 {
-  vector_t<AnimationRange> serializationRanges;
+  std::vector<AnimationRange> serializationRanges;
   for (auto& item : _ranges) {
     serializationRanges.emplace_back(
       AnimationRange(item.first, item.second->from, item.second->to));
@@ -525,13 +525,13 @@ void Node::ParseAnimationRanges(Node& node, const Json::value& parsedNode,
 }
 
 template void Node::_getDescendants<Node>(
-  vector_t<NodePtr>& results, bool directDescendantsOnly = false,
+  std::vector<NodePtr>& results, bool directDescendantsOnly = false,
   const std::function<bool(const NodePtr& node)>& predicate = nullptr);
 template void Node::_getDescendants<AbstractMesh>(
-  vector_t<AbstractMeshPtr>& results, bool directDescendantsOnly = false,
+  std::vector<AbstractMeshPtr>& results, bool directDescendantsOnly = false,
   const std::function<bool(const NodePtr& node)>& predicate = nullptr);
 template void Node::_getDescendants<TransformNode>(
-  vector_t<TransformNodePtr>& results, bool directDescendantsOnly = false,
+  std::vector<TransformNodePtr>& results, bool directDescendantsOnly = false,
   const std::function<bool(const NodePtr& node)>& predicate = nullptr);
 
 } // end of namespace BABYLON

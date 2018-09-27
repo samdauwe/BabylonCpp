@@ -1,8 +1,6 @@
 #ifndef BABYLON_INSPECTOR_ADAPTERS_MATERIAL_ADAPTER_H
 #define BABYLON_INSPECTOR_ADAPTERS_MATERIAL_ADAPTER_H
 
-#include <babylon/babylon_fwd.h>
-#include <babylon/babylon_stl.h>
 #include <babylon/inspector/adapters/adapter.h>
 #include <babylon/inspector/treetools/abstract_tree_tool.h>
 
@@ -10,6 +8,8 @@ namespace BABYLON {
 
 class Material;
 class StandardMaterial;
+using MaterialPtr         = std::shared_ptr<Material>;
+using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
 
 class MaterialAdapter : public Adapter {
 
@@ -20,22 +20,22 @@ public:
   /**
    * @brief Returns the name displayed in the tree.
    */
-  string_t id() override;
+  std::string id() override;
 
   /**
    * @brief Returns the type of this object - displayed in the tree.
    */
-  string_t type() override;
+  std::string type() override;
 
   /**
    * @brief Returns the list of properties to be displayed for this adapter.
    */
-  unique_ptr_t<PropertiesView>& getProperties() override;
+  std::unique_ptr<PropertiesView>& getProperties() override;
 
   /**
    * @brief No tools for a material adapter.
    */
-  vector_t<AbstractTreeToolUPtr>& getTools() override;
+  std::vector<AbstractTreeToolUPtr>& getTools() override;
 
 private:
   void _buildPropertiesView();
@@ -43,8 +43,8 @@ private:
 private:
   MaterialPtr _material;
   StandardMaterialPtr _standardMaterial;
-  unique_ptr_t<PropertiesView> _properties;
-  vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
+  std::unique_ptr<PropertiesView> _properties;
+  std::vector<std::unique_ptr<AbstractTreeTool>> _tools;
 
 }; // end of class MaterialAdapter
 

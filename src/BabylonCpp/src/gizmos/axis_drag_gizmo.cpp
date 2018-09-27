@@ -13,7 +13,7 @@ namespace BABYLON {
 
 AxisDragGizmo::AxisDragGizmo(
   const Vector3& dragAxis, const Color3& color,
-  const shared_ptr_t<UtilityLayerRenderer>& iGizmoLayer)
+  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , _pointerObserver{nullptr}

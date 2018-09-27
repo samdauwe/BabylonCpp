@@ -17,15 +17,15 @@ bool FreeCamera::NodeConstructorAdded = false;
 void FreeCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "FreeCamera", [](const string_t& name, Scene* scene,
-                     const nullable_t<Json::value>& /*options*/) {
+    "FreeCamera", [](const std::string& name, Scene* scene,
+                     const std::optional<Json::value>& /*options*/) {
       // Forcing to use the Universal camera
       return UniversalCamera::New(name, Vector3::Zero(), scene);
     });
   FreeCamera::NodeConstructorAdded = true;
 }
 
-FreeCamera::FreeCamera(const string_t& iName, const Vector3& iPosition,
+FreeCamera::FreeCamera(const std::string& iName, const Vector3& iPosition,
                        Scene* scene, bool setActiveOnSceneIfNoneActive)
     : TargetCamera{iName, iPosition, scene, setActiveOnSceneIfNoneActive}
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
@@ -179,7 +179,7 @@ void FreeCamera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   TargetCamera::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-const string_t FreeCamera::getClassName() const
+const std::string FreeCamera::getClassName() const
 {
   return "FreeCamera";
 }

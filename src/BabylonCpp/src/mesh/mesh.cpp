@@ -44,7 +44,7 @@
 
 namespace BABYLON {
 
-Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
+Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
            bool doNotCloneChildren, bool clonePhysicsImpostor)
     : AbstractMesh{iName, scene}
     , onBeforeRenderObservable{this, &Mesh::get_onBeforeDrawObservable}
@@ -59,7 +59,7 @@ Mesh::Mesh(const string_t& iName, Scene* scene, Node* iParent, Mesh* source,
     , _visibleInstances{nullptr}
     , _shouldGenerateFlatShading{false}
     , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE()}
-    , overrideMaterialSideOrientation{nullopt_t}
+    , overrideMaterialSideOrientation{std::nullopt}
     , source{this, &Mesh::get_source}
     , isUnIndexed{this, &Mesh::get_isUnIndexed, &Mesh::set_isUnIndexed}
     , hasLODLevels{this, &Mesh::get_hasLODLevels}
@@ -190,7 +190,7 @@ void Mesh::set_isUnIndexed(bool value)
   }
 }
 
-const string_t Mesh::getClassName() const
+const std::string Mesh::getClassName() const
 {
   return "Mesh";
 }
@@ -224,7 +224,7 @@ void Mesh::set_onBeforeDraw(
   _onBeforeDrawObserver = onBeforeDrawObservable().add(callback);
 }
 
-string_t Mesh::toString(bool fullDetails)
+std::string Mesh::toString(bool fullDetails)
 {
   std::ostringstream oss;
   oss << AbstractMesh::toString(fullDetails);
@@ -275,7 +275,7 @@ bool Mesh::get_hasLODLevels() const
   return _LODLevels.size() > 0;
 }
 
-vector_t<MeshLODLevel*> Mesh::getLODLevels()
+std::vector<MeshLODLevel*> Mesh::getLODLevels()
 {
   return stl_util::to_raw_ptr_vector(_LODLevels);
 }
@@ -283,8 +283,8 @@ vector_t<MeshLODLevel*> Mesh::getLODLevels()
 void Mesh::_sortLODLevels()
 {
   std::sort(_LODLevels.begin(), _LODLevels.end(),
-              [](const unique_ptr_t<MeshLODLevel>& a,
-                 const unique_ptr_t<MeshLODLevel>& b) {
+              [](const std::unique_ptr<MeshLODLevel>& a,
+                 const std::unique_ptr<MeshLODLevel>& b) {
                 if (a->distance < b->distance) {
                   return 1;
                 }
@@ -614,7 +614,7 @@ Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 
   if (_visibleInstances->meshes.find(renderId)
       == _visibleInstances->meshes.end()) {
-    _visibleInstances->meshes[renderId] = vector_t<InstancedMesh*>();
+    _visibleInstances->meshes[renderId] = std::vector<InstancedMesh*>();
   }
 
   _visibleInstances->meshes[renderId].emplace_back(instance);
@@ -717,7 +717,7 @@ Float32Array Mesh::_getPositionData(bool applySkeleton)
   return data;
 }
 
-shared_ptr_t<SubMesh> Mesh::_createGlobalSubMesh(bool force)
+std::shared_ptr<SubMesh> Mesh::_createGlobalSubMesh(bool force)
 {
   auto totalVertices = getTotalVertices();
   if (!totalVertices || (!_geometry->isReady() && getIndices().empty())) {
@@ -795,7 +795,7 @@ void Mesh::subdivide(size_t count)
 }
 
 Mesh* Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
-                            bool updatable, const nullable_t<size_t>& stride)
+                            bool updatable, const std::optional<size_t>& stride)
 {
   if (!_geometry) {
     auto vertexData = std::make_unique<VertexData>();
@@ -824,7 +824,7 @@ void Mesh::markVerticesDataAsUpdatable(unsigned int kind, bool updatable)
   setVerticesData(kind, getVerticesData(kind), updatable);
 }
 
-Mesh& Mesh::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer)
+Mesh& Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
 {
   if (!_geometry) {
     _geometry = Geometry::CreateGeometryForMesh(this).get();
@@ -1048,7 +1048,7 @@ _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
   auto scene                               = getScene();
   _batchCache->mustReturn                  = false;
   _batchCache->renderSelf[subMeshId]       = isEnabled() && isVisible;
-  _batchCache->visibleInstances[subMeshId] = vector_t<InstancedMesh*>();
+  _batchCache->visibleInstances[subMeshId] = std::vector<InstancedMesh*>();
 
   if (_visibleInstances) {
     auto currentRenderId_ = scene->getRenderId();
@@ -1380,9 +1380,9 @@ Mesh& Mesh::_onBeforeDraw(bool isInstance, Matrix& world,
   return *this;
 }
 
-vector_t<IParticleSystemPtr> Mesh::getEmittedParticleSystems()
+std::vector<IParticleSystemPtr> Mesh::getEmittedParticleSystems()
 {
-  vector_t<IParticleSystemPtr> results;
+  std::vector<IParticleSystemPtr> results;
   for (auto& particleSystem : getScene()->particleSystems) {
     auto& emitter = particleSystem->emitter;
     if (emitter.is<AbstractMeshPtr>()
@@ -1394,9 +1394,9 @@ vector_t<IParticleSystemPtr> Mesh::getEmittedParticleSystems()
   return results;
 }
 
-vector_t<IParticleSystemPtr> Mesh::getHierarchyEmittedParticleSystems()
+std::vector<IParticleSystemPtr> Mesh::getHierarchyEmittedParticleSystems()
 {
-  vector_t<IParticleSystemPtr> results;
+  std::vector<IParticleSystemPtr> results;
   auto descendants = getDescendants();
   descendants.emplace_back(this);
 
@@ -1493,9 +1493,9 @@ void Mesh::cleanMatrixWeights()
   }
 }
 
-vector_t<NodePtr> Mesh::getChildren()
+std::vector<NodePtr> Mesh::getChildren()
 {
-  vector_t<NodePtr> results;
+  std::vector<NodePtr> results;
   for (auto& mesh : getScene()->meshes) {
     if (mesh->parent() == this) {
       results.emplace_back(mesh);
@@ -1527,7 +1527,7 @@ Mesh& Mesh::_queueLoad(Scene* scene)
   return *this;
 }
 
-bool Mesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+bool Mesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                        unsigned int /*strategy*/)
 {
   if (delayLoadState == EngineConstants::DELAYLOADSTATE_LOADING) {
@@ -1543,7 +1543,7 @@ bool Mesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
   return true;
 }
 
-Mesh& Mesh::setMaterialByID(const string_t& iId)
+Mesh& Mesh::setMaterialByID(const std::string& iId)
 {
   const auto& materials = getScene()->materials;
   for (std::size_t index = materials.size(); index-- > 0;) {
@@ -1565,9 +1565,9 @@ Mesh& Mesh::setMaterialByID(const string_t& iId)
   return *this;
 }
 
-vector_t<IAnimatablePtr> Mesh::getAnimatables()
+std::vector<IAnimatablePtr> Mesh::getAnimatables()
 {
-  vector_t<IAnimatablePtr> results;
+  std::vector<IAnimatablePtr> results;
 
   if (material()) {
     results.emplace_back(material());
@@ -1644,7 +1644,7 @@ Mesh& Mesh::bakeCurrentTransformIntoVertices()
 }
 
 // Cache
-vector_t<Vector3>& Mesh::get__positions()
+std::vector<Vector3>& Mesh::get__positions()
 {
   if (_geometry) {
     return _geometry->_positions;
@@ -1669,7 +1669,7 @@ bool Mesh::_generatePointsArray()
   return false;
 }
 
-MeshPtr Mesh::clone(const string_t& iName, Node* newParent,
+MeshPtr Mesh::clone(const std::string& iName, Node* newParent,
                     bool doNotCloneChildren, bool clonePhysicsImpostor)
 {
   return Mesh::New(iName, getScene(), newParent, this, doNotCloneChildren,
@@ -1713,10 +1713,10 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 }
 
 void Mesh::applyDisplacementMap(
-  const string_t& url, int minHeight, int maxHeight,
+  const std::string& url, int minHeight, int maxHeight,
   const std::function<void(Mesh* mesh)> onSuccess,
-  const nullable_t<Vector2>& /*uvOffset*/,
-  const nullable_t<Vector2>& /*uvScale*/, bool /*boolforceUpdate*/)
+  const std::optional<Vector2>& /*uvOffset*/,
+  const std::optional<Vector2>& /*uvScale*/, bool /*boolforceUpdate*/)
 {
   std::cout << url << minHeight << maxHeight;
   onSuccess(nullptr);
@@ -1726,8 +1726,8 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
                                           unsigned int heightMapWidth,
                                           unsigned int heightMapHeight,
                                           int minHeight, int maxHeight,
-                                          const nullable_t<Vector2>& iUvOffset,
-                                          const nullable_t<Vector2>& iUvScale,
+                                          const std::optional<Vector2>& iUvOffset,
+                                          const std::optional<Vector2>& iUvScale,
                                           bool forceUpdate)
 {
   if (!isVerticesDataPresent(VertexBuffer::PositionKind)
@@ -1981,7 +1981,7 @@ Mesh& Mesh::flipFaces(bool flipNormals)
   return *this;
 }
 
-InstancedMeshPtr Mesh::createInstance(const string_t& iName)
+InstancedMeshPtr Mesh::createInstance(const std::string& iName)
 {
   return InstancedMesh::New(iName, this);
 }
@@ -2066,7 +2066,7 @@ void Mesh::_syncGeometryWithMorphTargetManager()
 }
 
 MeshPtr Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
-                    const string_t& rootUrl)
+                    const std::string& rootUrl)
 {
   MeshPtr mesh = nullptr;
   if (Json::GetString(parsedMesh, "type") == "GroundMesh") {
@@ -2130,7 +2130,7 @@ MeshPtr Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
   if (parsedMesh.contains("alphaIndex")) {
     mesh->alphaIndex
-      = Json::GetNumber(parsedMesh, "alphaIndex", numeric_limits_t<int>::max());
+      = Json::GetNumber(parsedMesh, "alphaIndex", std::numeric_limits<int>::max());
   }
 
   mesh->receiveShadows = Json::GetBool(parsedMesh, "receiveShadows", false);
@@ -2263,7 +2263,7 @@ MeshPtr Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
   // Skeleton
   if (parsedMesh.contains("skeletonId")) {
-    string_t parsedSkeletonId = Json::GetString(parsedMesh, "skeletonId");
+    std::string parsedSkeletonId = Json::GetString(parsedMesh, "skeletonId");
     if (!parsedSkeletonId.empty()) {
       mesh->skeleton = scene->getLastSkeletonByID(parsedSkeletonId);
       if (parsedMesh.contains("numBoneInfluencers")) {
@@ -2360,8 +2360,8 @@ MeshPtr Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 }
 
 // Statics
-MeshPtr Mesh::CreateRibbon(const string_t& name,
-                           const vector_t<vector_t<Vector3>>& pathArray,
+MeshPtr Mesh::CreateRibbon(const std::string& name,
+                           const std::vector<std::vector<Vector3>>& pathArray,
                            bool closeArray, bool closePath, int offset,
                            Scene* scene, bool updatable,
                            unsigned int sideOrientation,
@@ -2377,7 +2377,7 @@ MeshPtr Mesh::CreateRibbon(const string_t& name,
   return MeshBuilder::CreateRibbon(name, options, scene);
 }
 
-MeshPtr Mesh::CreateDisc(const string_t& name, float radius,
+MeshPtr Mesh::CreateDisc(const std::string& name, float radius,
                          unsigned int tessellation, Scene* scene,
                          bool updatable, unsigned int sideOrientation)
 {
@@ -2390,7 +2390,7 @@ MeshPtr Mesh::CreateDisc(const string_t& name, float radius,
   return MeshBuilder::CreateDisc(name, options, scene);
 }
 
-MeshPtr Mesh::CreateBox(const string_t& name, float size, Scene* scene,
+MeshPtr Mesh::CreateBox(const std::string& name, float size, Scene* scene,
                         bool updatable, unsigned int sideOrientation)
 {
   BoxOptions options(size);
@@ -2400,7 +2400,7 @@ MeshPtr Mesh::CreateBox(const string_t& name, float size, Scene* scene,
   return MeshBuilder::CreateBox(name, options, scene);
 }
 
-MeshPtr Mesh::CreateSphere(const string_t& name, unsigned int segments,
+MeshPtr Mesh::CreateSphere(const std::string& name, unsigned int segments,
                            float diameter, Scene* scene, bool updatable,
                            unsigned int sideOrientation)
 {
@@ -2416,7 +2416,7 @@ MeshPtr Mesh::CreateSphere(const string_t& name, unsigned int segments,
 }
 
 // Cylinder and cone
-MeshPtr Mesh::CreateCylinder(const string_t& name, float height,
+MeshPtr Mesh::CreateCylinder(const std::string& name, float height,
                              float diameterTop, float diameterBottom,
                              unsigned int tessellation,
                              unsigned int subdivisions, Scene* scene,
@@ -2435,7 +2435,7 @@ MeshPtr Mesh::CreateCylinder(const string_t& name, float height,
 }
 
 // Torus
-MeshPtr Mesh::CreateTorus(const string_t& name, float diameter, float thickness,
+MeshPtr Mesh::CreateTorus(const std::string& name, float diameter, float thickness,
                           unsigned int tessellation, Scene* scene,
                           bool updatable, unsigned int sideOrientation)
 {
@@ -2449,7 +2449,7 @@ MeshPtr Mesh::CreateTorus(const string_t& name, float diameter, float thickness,
   return MeshBuilder::CreateTorus(name, options, scene);
 }
 
-MeshPtr Mesh::CreateTorusKnot(const string_t& name, float radius, float tube,
+MeshPtr Mesh::CreateTorusKnot(const std::string& name, float radius, float tube,
                               unsigned int radialSegments,
                               unsigned int tubularSegments, float p, float q,
                               Scene* scene, bool updatable,
@@ -2468,8 +2468,8 @@ MeshPtr Mesh::CreateTorusKnot(const string_t& name, float radius, float tube,
   return MeshBuilder::CreateTorusKnot(name, options, scene);
 }
 
-LinesMeshPtr Mesh::CreateLines(const string_t& name,
-                               const vector_t<Vector3>& points, Scene* scene,
+LinesMeshPtr Mesh::CreateLines(const std::string& name,
+                               const std::vector<Vector3>& points, Scene* scene,
                                bool updatable, const LinesMeshPtr& instance)
 {
   LinesOptions options;
@@ -2480,8 +2480,8 @@ LinesMeshPtr Mesh::CreateLines(const string_t& name,
   return MeshBuilder::CreateLines(name, options, scene);
 }
 
-LinesMeshPtr Mesh::CreateDashedLines(const string_t& name,
-                                     vector_t<Vector3>& points, float dashSize,
+LinesMeshPtr Mesh::CreateDashedLines(const std::string& name,
+                                     std::vector<Vector3>& points, float dashSize,
                                      float gapSize, unsigned int dashNb,
                                      Scene* scene, bool updatable,
                                      const LinesMeshPtr& instance)
@@ -2497,9 +2497,9 @@ LinesMeshPtr Mesh::CreateDashedLines(const string_t& name,
   return MeshBuilder::CreateDashedLines(name, options, scene);
 }
 
-MeshPtr Mesh::CreatePolygon(const string_t& name,
-                            const vector_t<Vector3>& shape, Scene* scene,
-                            const vector_t<vector_t<Vector3>>& holes,
+MeshPtr Mesh::CreatePolygon(const std::string& name,
+                            const std::vector<Vector3>& shape, Scene* scene,
+                            const std::vector<std::vector<Vector3>>& holes,
                             bool updatable, unsigned int sideOrientation)
 {
   PolygonOptions options;
@@ -2511,10 +2511,10 @@ MeshPtr Mesh::CreatePolygon(const string_t& name,
   return MeshBuilder::CreatePolygon(name, options, scene);
 }
 
-MeshPtr Mesh::ExtrudePolygon(const string_t& name,
-                             const vector_t<Vector3>& shape, float depth,
+MeshPtr Mesh::ExtrudePolygon(const std::string& name,
+                             const std::vector<Vector3>& shape, float depth,
                              Scene* scene,
-                             const vector_t<vector_t<Vector3>>& holes,
+                             const std::vector<std::vector<Vector3>>& holes,
                              bool updatable, unsigned int sideOrientation)
 {
   PolygonOptions options;
@@ -2527,8 +2527,8 @@ MeshPtr Mesh::ExtrudePolygon(const string_t& name,
   return MeshBuilder::ExtrudePolygon(name, options, scene);
 }
 
-MeshPtr Mesh::ExtrudeShape(const string_t& name, const vector_t<Vector3>& shape,
-                           const vector_t<Vector3>& path, float scale,
+MeshPtr Mesh::ExtrudeShape(const std::string& name, const std::vector<Vector3>& shape,
+                           const std::vector<Vector3>& path, float scale,
                            float rotation, unsigned int cap, Scene* scene,
                            bool updatable, unsigned int sideOrientation,
                            const MeshPtr& instance)
@@ -2547,8 +2547,8 @@ MeshPtr Mesh::ExtrudeShape(const string_t& name, const vector_t<Vector3>& shape,
 }
 
 MeshPtr Mesh::ExtrudeShapeCustom(
-  const string_t& name, const vector_t<Vector3>& shape,
-  const vector_t<Vector3>& path,
+  const std::string& name, const std::vector<Vector3>& shape,
+  const std::vector<Vector3>& path,
   const std::function<float(float i, float distance)>& scaleFunction,
   const std::function<float(float i, float distance)>& rotationFunction,
   bool ribbonCloseArray, bool ribbonClosePath, unsigned int cap, Scene* scene,
@@ -2569,7 +2569,7 @@ MeshPtr Mesh::ExtrudeShapeCustom(
   return MeshBuilder::ExtrudeShapeCustom(name, options, scene);
 }
 
-MeshPtr Mesh::CreateLathe(const string_t& name, const vector_t<Vector3>& shape,
+MeshPtr Mesh::CreateLathe(const std::string& name, const std::vector<Vector3>& shape,
                           float radius, unsigned int tessellation, Scene* scene,
                           bool updatable, unsigned int sideOrientation)
 {
@@ -2583,7 +2583,7 @@ MeshPtr Mesh::CreateLathe(const string_t& name, const vector_t<Vector3>& shape,
   return MeshBuilder::CreateLathe(name, options, scene);
 }
 
-MeshPtr Mesh::CreatePlane(const string_t& name, float size, Scene* scene,
+MeshPtr Mesh::CreatePlane(const std::string& name, float size, Scene* scene,
                           bool updatable, unsigned int sideOrientation)
 {
   PlaneOptions options(size);
@@ -2593,7 +2593,7 @@ MeshPtr Mesh::CreatePlane(const string_t& name, float size, Scene* scene,
   return MeshBuilder::CreatePlane(name, options, scene);
 }
 
-MeshPtr Mesh::CreateGround(const string_t& name, unsigned int width,
+MeshPtr Mesh::CreateGround(const std::string& name, unsigned int width,
                            unsigned int height, unsigned int subdivisions,
                            Scene* scene, bool updatable)
 {
@@ -2605,7 +2605,7 @@ MeshPtr Mesh::CreateGround(const string_t& name, unsigned int width,
   return MeshBuilder::CreateGround(name, options, scene);
 }
 
-MeshPtr Mesh::CreateTiledGround(const string_t& name, float xmin, float zmin,
+MeshPtr Mesh::CreateTiledGround(const std::string& name, float xmin, float zmin,
                                 float xmax, float zmax,
                                 const ISize& subdivisions,
                                 const ISize& precision, Scene* scene,
@@ -2624,7 +2624,7 @@ MeshPtr Mesh::CreateTiledGround(const string_t& name, float xmin, float zmin,
 }
 
 GroundMeshPtr Mesh::CreateGroundFromHeightMap(
-  const string_t& name, const string_t& url, unsigned int width,
+  const std::string& name, const std::string& url, unsigned int width,
   unsigned int height, unsigned int subdivisions, unsigned int minHeight,
   unsigned int maxHeight, Scene* scene, bool updatable,
   const std::function<void(GroundMesh* mesh)>& onReady)
@@ -2642,7 +2642,7 @@ GroundMeshPtr Mesh::CreateGroundFromHeightMap(
 }
 
 MeshPtr Mesh::CreateTube(
-  const string_t& name, const vector_t<Vector3>& path, float radius,
+  const std::string& name, const std::vector<Vector3>& path, float radius,
   unsigned int tessellation,
   const std::function<float(unsigned int i, float distance)>& radiusFunction,
   unsigned int cap, Scene* scene, bool updatable, unsigned int sideOrientation,
@@ -2662,19 +2662,19 @@ MeshPtr Mesh::CreateTube(
   return MeshBuilder::CreateTube(name, options, scene);
 }
 
-MeshPtr Mesh::CreatePolyhedron(const string_t& name, PolyhedronOptions& options,
+MeshPtr Mesh::CreatePolyhedron(const std::string& name, PolyhedronOptions& options,
                                Scene* scene)
 {
   return MeshBuilder::CreatePolyhedron(name, options, scene);
 }
 
-MeshPtr Mesh::CreateIcoSphere(const string_t& name, IcoSphereOptions& options,
+MeshPtr Mesh::CreateIcoSphere(const std::string& name, IcoSphereOptions& options,
                               Scene* scene)
 {
   return MeshBuilder::CreateIcoSphere(name, options, scene);
 }
 
-MeshPtr Mesh::CreateDecal(const string_t& name, AbstractMesh* sourceMesh,
+MeshPtr Mesh::CreateDecal(const std::string& name, AbstractMesh* sourceMesh,
                           const Vector3& position, const Vector3& normal,
                           const Vector3& size, float angle)
 {
@@ -2842,7 +2842,7 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& skeleton)
   return this;
 }
 
-MinMax Mesh::GetMinMax(const vector_t<AbstractMeshPtr>& meshes)
+MinMax Mesh::GetMinMax(const std::vector<AbstractMeshPtr>& meshes)
 {
   bool minVectorSet = false;
   Vector3 minVector;
@@ -2884,13 +2884,13 @@ Vector3 Mesh::Center(const MinMax& minMaxVector)
   return Vector3::Center(minMaxVector.min, minMaxVector.max);
 }
 
-Vector3 Mesh::Center(const vector_t<AbstractMeshPtr>& meshes)
+Vector3 Mesh::Center(const std::vector<AbstractMeshPtr>& meshes)
 {
   MinMax minMaxVector = Mesh::GetMinMax(meshes);
   return Vector3::Center(minMaxVector.min, minMaxVector.max);
 }
 
-MeshPtr Mesh::MergeMeshes(const vector_t<MeshPtr>& meshes, bool disposeSource,
+MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes, bool disposeSource,
                           bool allow32BitsIndices, MeshPtr meshSubclass,
                           bool subdivideWithSubMeshes)
 {
@@ -2915,8 +2915,8 @@ MeshPtr Mesh::MergeMeshes(const vector_t<MeshPtr>& meshes, bool disposeSource,
   }
 
   // Merge
-  unique_ptr_t<VertexData> vertexData      = nullptr;
-  unique_ptr_t<VertexData> otherVertexData = nullptr;
+  std::unique_ptr<VertexData> vertexData      = nullptr;
+  std::unique_ptr<VertexData> otherVertexData = nullptr;
   IndicesArray indiceArray;
   MeshPtr source = nullptr;
   for (auto& mesh : meshes) {

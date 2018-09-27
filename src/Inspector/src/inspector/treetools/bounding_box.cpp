@@ -1,6 +1,7 @@
 #include <babylon/inspector/treetools/bounding_box.h>
 
-#include <babylon/babylon_stl.h>
+#include <utility>
+
 #include <babylon/inspector/treetools/itool_bounding_box.h>
 
 #include <imgui.h>

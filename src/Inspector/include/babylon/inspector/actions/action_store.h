@@ -1,7 +1,9 @@
 #ifndef BABYLON_INSPECTOR_ACTIONS_ACTION_STORE_H
 #define BABYLON_INSPECTOR_ACTIONS_ACTION_STORE_H
 
-#include <babylon/babylon_stl.h>
+#include <string>
+#include <unordered_map>
+
 #include <babylon/inspector/actions/inspector_action.h>
 
 namespace BABYLON {

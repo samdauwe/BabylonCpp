@@ -79,8 +79,8 @@ void PerformanceMonitor::disable()
   _enabled = false;
   // clear last sample to avoid interpolating over the disabled period when next
   // enabled
-  _lastFrameTimeMs  = nullopt_t;
-  _lastChangeTimeMs = nullopt_t;
+  _lastFrameTimeMs  = std::nullopt;
+  _lastChangeTimeMs = std::nullopt;
 }
 
 bool PerformanceMonitor::isEnabled() const
@@ -92,8 +92,8 @@ void PerformanceMonitor::reset()
 {
   // clear last sample to avoid interpolating over the disabled period when next
   // enabled
-  _lastFrameTimeMs  = nullopt_t;
-  _lastChangeTimeMs = nullopt_t;
+  _lastFrameTimeMs  = std::nullopt;
+  _lastChangeTimeMs = std::nullopt;
   // wipe record
   _rollingFrameTime.reset();
 }

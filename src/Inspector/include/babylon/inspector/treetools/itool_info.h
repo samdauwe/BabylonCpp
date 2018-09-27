@@ -1,6 +1,8 @@
 #ifndef BABYLON_INSPECTOR_TREE_TOOLS_ITOOL_INFO_H
 #define BABYLON_INSPECTOR_TREE_TOOLS_ITOOL_INFO_H
 
+#include <string>
+
 namespace BABYLON {
 
 /**
@@ -9,7 +11,7 @@ namespace BABYLON {
  */
 struct IToolInfo {
 
-  virtual string_t getInfo() const = 0;
+  virtual std::string getInfo() const = 0;
 
 }; // end of struct IToolInfo
 

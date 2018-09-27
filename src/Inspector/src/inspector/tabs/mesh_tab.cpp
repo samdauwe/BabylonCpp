@@ -31,7 +31,7 @@ void MeshTab::_buildTree()
   // Create meshes alias
   auto& arr = _meshes;
   // Tab containing mesh already in results
-  vector_t<NodePtr> alreadyIn;
+  std::vector<NodePtr> alreadyIn;
 
   // Recursive method building the tree panel
   std::function<TreeItem<MeshAdapter>(NodePtr)> createNode
@@ -78,7 +78,7 @@ void MeshTab::_buildTree()
   }
 
   // Find top of hierarchy for meshes...
-  vector_t<NodePtr> meshWithoutAnyParent;
+  std::vector<NodePtr> meshWithoutAnyParent;
   for (auto& mesh : scene->meshes) {
     // Not already in the array, not system name and no parent
     auto _mesh = std::dynamic_pointer_cast<Node>(mesh);

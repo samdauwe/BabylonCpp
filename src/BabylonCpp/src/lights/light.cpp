@@ -14,7 +14,7 @@
 
 namespace BABYLON {
 
-Light::Light(const string_t& iName, Scene* scene)
+Light::Light(const std::string& iName, Scene* scene)
     : Node{iName, scene}
     , diffuse{Color3(1.f, 1.f, 1.f)}
     , specular{Color3(1.f, 1.f, 1.f)}
@@ -38,7 +38,7 @@ Light::Light(const string_t& iName, Scene* scene)
                                &Light::set_includeOnlyWithLayerMask}
     , lightmapMode{this, &Light::get_lightmapMode, &Light::set_lightmapMode}
     , _inverseSquaredRange{0.f}
-    , _range{numeric_limits_t<float>::max()}
+    , _range{std::numeric_limits<float>::max()}
     , _photometricScale{1.f}
     , _intensityMode{Light::INTENSITYMODE_AUTOMATIC}
     , _radius{0.00001f}
@@ -70,17 +70,17 @@ void Light::addToScene(const LightPtr& newLight)
   getScene()->addLight(newLight);
 }
 
-const string_t Light::getClassName() const
+const std::string Light::getClassName() const
 {
   return "Light";
 }
 
-string_t Light::toString(bool fullDetails) const
+std::string Light::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name;
   oss << ", type: ";
-  const array_t<string_t, 4> types{
+  const std::array<std::string, 4> types{
     {"Point", "Directional", "Spot", "Hemispheric"}};
   oss << (getTypeID() < types.size() ? types[getTypeID()] : "Unknown");
   if (!animations.empty()) {
@@ -162,23 +162,23 @@ void Light::set_renderPriority(int value)
   _reorderLightsInScene();
 }
 
-vector_t<AbstractMesh*>& Light::get_includedOnlyMeshes()
+std::vector<AbstractMesh*>& Light::get_includedOnlyMeshes()
 {
   return _includedOnlyMeshes;
 }
 
-void Light::set_includedOnlyMeshes(const vector_t<AbstractMesh*>& value)
+void Light::set_includedOnlyMeshes(const std::vector<AbstractMesh*>& value)
 {
   _includedOnlyMeshes = value;
   _hookArrayForIncludedOnly(value);
 }
 
-vector_t<AbstractMesh*>& Light::get_excludedMeshes()
+std::vector<AbstractMesh*>& Light::get_excludedMeshes()
 {
   return _excludedMeshes;
 }
 
-void Light::set_excludedMeshes(const vector_t<AbstractMesh*>& value)
+void Light::set_excludedMeshes(const std::vector<AbstractMesh*>& value)
 {
   _excludedMeshes = value;
   _hookArrayForExcluded(value);
@@ -231,13 +231,13 @@ Vector3 Light::getAbsolutePosition()
   return Vector3::Zero();
 }
 
-void Light::transferToEffect(Effect* /*effect*/, const string_t& /*lightIndex*/)
+void Light::transferToEffect(Effect* /*effect*/, const std::string& /*lightIndex*/)
 {
 }
 
 void Light::transferToEffect(Effect* /*effect*/,
-                             const string_t& /*uniformName0*/,
-                             const string_t& /*uniformName1*/)
+                             const std::string& /*uniformName0*/,
+                             const std::string& /*uniformName1*/)
 {
 }
 
@@ -336,7 +336,7 @@ float Light::getScaledIntensity() const
   return _photometricScale * intensity;
 }
 
-unique_ptr_t<Light> Light::clone(const string_t& /*name*/)
+std::unique_ptr<Light> Light::clone(const std::string& /*name*/)
 {
   return nullptr;
 }
@@ -347,7 +347,7 @@ Json::object Light::serialize() const
 }
 
 std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
-                                                          const string_t& name,
+                                                          const std::string& name,
                                                           Scene* scene)
 {
   auto constructorFunc
@@ -412,11 +412,11 @@ LightPtr Light::Parse(const Json::value& parsedLight, Scene* scene)
   return light;
 }
 
-void Light::_hookArrayForExcluded(const vector_t<AbstractMesh*>& /*array*/)
+void Light::_hookArrayForExcluded(const std::vector<AbstractMesh*>& /*array*/)
 {
 }
 
-void Light::_hookArrayForIncludedOnly(const vector_t<AbstractMesh*>& /*array*/)
+void Light::_hookArrayForIncludedOnly(const std::vector<AbstractMesh*>& /*array*/)
 {
 }
 

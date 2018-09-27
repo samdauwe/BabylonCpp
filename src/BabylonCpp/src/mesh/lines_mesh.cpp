@@ -13,7 +13,7 @@
 
 namespace BABYLON {
 
-LinesMesh::LinesMesh(const string_t& iName, Scene* scene, Node* iParent,
+LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
                      LinesMesh* source, bool doNotCloneChildren,
                      bool iUseVertexColor, bool iUseVertexAlpha)
     : Mesh(iName, scene, iParent, source, doNotCloneChildren)
@@ -34,7 +34,7 @@ LinesMesh::LinesMesh(const string_t& iName, Scene* scene, Node* iParent,
 
   _intersectionThreshold = 0.1f;
 
-  vector_t<string_t> defines;
+  std::vector<std::string> defines;
   ShaderMaterialOptions options;
   options.attributes        = {VertexBuffer::PositionKindChars};
   options.uniforms          = {"world", "viewProjection"};
@@ -61,7 +61,7 @@ LinesMesh::~LinesMesh()
 {
 }
 
-const string_t LinesMesh::getClassName() const
+const std::string LinesMesh::getClassName() const
 {
   return "LinesMesh";
 }
@@ -104,7 +104,7 @@ bool LinesMesh::get_checkCollisions() const
   return false;
 }
 
-InstancedMesh* LinesMesh::createInstance(const string_t& /*name*/)
+InstancedMesh* LinesMesh::createInstance(const std::string& /*name*/)
 {
   BABYLON_LOG_ERROR("InstancedMesh",
                     "LinesMeshes do not support createInstance.");
@@ -154,7 +154,7 @@ void LinesMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   Mesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-LinesMeshPtr LinesMesh::clone(const string_t& iName, Node* newParent,
+LinesMeshPtr LinesMesh::clone(const std::string& iName, Node* newParent,
                               bool doNotCloneChildren)
 {
   return LinesMesh::New(iName, getScene(), newParent, this, doNotCloneChildren);

@@ -20,7 +20,7 @@ void PostProcessRenderPipelineManager::addPipeline(
 }
 
 void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
-  const string_t& renderPipelineName, const vector_t<CameraPtr>& cameras,
+  const std::string& renderPipelineName, const std::vector<CameraPtr>& cameras,
   bool unique)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
@@ -31,7 +31,7 @@ void PostProcessRenderPipelineManager::attachCamerasToRenderPipeline(
 }
 
 void PostProcessRenderPipelineManager::detachCamerasFromRenderPipeline(
-  const string_t& renderPipelineName, const vector_t<CameraPtr>& cameras)
+  const std::string& renderPipelineName, const std::vector<CameraPtr>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -41,8 +41,8 @@ void PostProcessRenderPipelineManager::detachCamerasFromRenderPipeline(
 }
 
 void PostProcessRenderPipelineManager::enableEffectInPipeline(
-  const string_t& renderPipelineName, const string_t& renderEffectName,
-  const vector_t<CameraPtr>& cameras)
+  const std::string& renderPipelineName, const std::string& renderEffectName,
+  const std::vector<CameraPtr>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -53,8 +53,8 @@ void PostProcessRenderPipelineManager::enableEffectInPipeline(
 }
 
 void PostProcessRenderPipelineManager::disableEffectInPipeline(
-  const string_t& renderPipelineName, const string_t& renderEffectName,
-  const vector_t<CameraPtr>& cameras)
+  const std::string& renderPipelineName, const std::string& renderEffectName,
+  const std::vector<CameraPtr>& cameras)
 {
   if (!stl_util::contains(_renderPipelines, renderPipelineName)) {
     return;
@@ -66,7 +66,7 @@ void PostProcessRenderPipelineManager::disableEffectInPipeline(
 
 void PostProcessRenderPipelineManager::update()
 {
-  vector_t<string_t> pipelinesToRemove;
+  std::vector<std::string> pipelinesToRemove;
   for (auto& item : _renderPipelines) {
     auto& pipeline = item.second;
     if (!pipeline->isSupported()) {

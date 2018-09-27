@@ -31,7 +31,7 @@
 
 namespace BABYLON {
 
-ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
+ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
                                Scene* scene, Effect* customEffect,
                                bool isAnimationSheetEnabled, float epsilon)
     : BaseParticleSystem{iName}
@@ -72,9 +72,9 @@ ParticleSystem::ParticleSystem(const string_t& iName, size_t capacity,
   // Default emitter type
   particleEmitterType = std::make_unique<BoxParticleEmitter>();
 
-  updateFunction = [this](vector_t<Particle*>& _particles) {
-    nullable_t<Uint8Array> noiseTextureData;
-    nullable_t<ISize> noiseTextureSize = nullopt_t;
+  updateFunction = [this](std::vector<Particle*>& _particles) {
+    std::optional<Uint8Array> noiseTextureData;
+    std::optional<ISize> noiseTextureSize = std::nullopt;
 
     if (noiseTexture) { // We need to get texture data back to CPU
       noiseTextureData = noiseTexture->readPixels().uint8Array;
@@ -285,7 +285,7 @@ Scene* ParticleSystem::getScene() const
   return _scene;
 }
 
-vector_t<Particle*>& ParticleSystem::particles()
+std::vector<Particle*>& ParticleSystem::particles()
 {
   return _particles;
 }
@@ -300,8 +300,8 @@ void ParticleSystem::set_onDispose(
 }
 
 void ParticleSystem::_addFactorGradient(
-  vector_t<FactorGradient>& factorGradients, float gradient, float factor,
-  const nullable_t<float>& factor2)
+  std::vector<FactorGradient>& factorGradients, float gradient, float factor,
+  const std::optional<float>& factor2)
 {
   FactorGradient newGradient;
   newGradient.gradient = gradient;
@@ -323,7 +323,7 @@ void ParticleSystem::_addFactorGradient(
 }
 
 void ParticleSystem::_removeFactorGradient(
-  vector_t<FactorGradient>& factorGradients, float gradient)
+  std::vector<FactorGradient>& factorGradients, float gradient)
 {
   if (factorGradients.empty()) {
     return;
@@ -340,7 +340,7 @@ void ParticleSystem::_removeFactorGradient(
 
 IParticleSystem&
 ParticleSystem::addLifeTimeGradient(float gradient, float factor,
-                                    const nullable_t<float>& factor2)
+                                    const std::optional<float>& factor2)
 {
   _addFactorGradient(_lifeTimeGradients, gradient, factor, factor2);
 
@@ -356,7 +356,7 @@ IParticleSystem& ParticleSystem::removeLifeTimeGradient(float gradient)
 
 IParticleSystem&
 ParticleSystem::addSizeGradient(float gradient, float factor,
-                                const nullable_t<float>& factor2)
+                                const std::optional<float>& factor2)
 {
   _addFactorGradient(_sizeGradients, gradient, factor, factor2);
 
@@ -372,7 +372,7 @@ IParticleSystem& ParticleSystem::removeSizeGradient(float gradient)
 
 IParticleSystem&
 ParticleSystem::addAngularSpeedGradient(float gradient, float factor,
-                                        const nullable_t<float>& factor2)
+                                        const std::optional<float>& factor2)
 {
   _addFactorGradient(_angularSpeedGradients, gradient, factor, factor2);
 
@@ -388,7 +388,7 @@ IParticleSystem& ParticleSystem::removeAngularSpeedGradient(float gradient)
 
 IParticleSystem&
 ParticleSystem::addVelocityGradient(float gradient, float factor,
-                                    const nullable_t<float>& factor2)
+                                    const std::optional<float>& factor2)
 {
   _addFactorGradient(_velocityGradients, gradient, factor, factor2);
 
@@ -404,7 +404,7 @@ IParticleSystem& ParticleSystem::removeVelocityGradient(float gradient)
 
 IParticleSystem&
 ParticleSystem::addLimitVelocityGradient(float gradient, float factor,
-                                         const nullable_t<float>& factor2)
+                                         const std::optional<float>& factor2)
 {
   _addFactorGradient(_limitVelocityGradients, gradient, factor, *factor2);
 
@@ -420,7 +420,7 @@ IParticleSystem& ParticleSystem::removeLimitVelocityGradient(float gradient)
 
 IParticleSystem&
 ParticleSystem::addDragGradient(float gradient, float factor,
-                                const nullable_t<float>& factor2)
+                                const std::optional<float>& factor2)
 {
   _addFactorGradient(_dragGradients, gradient, factor, factor2);
 
@@ -436,7 +436,7 @@ IParticleSystem& ParticleSystem::removeDragGradient(float gradient)
 
 IParticleSystem&
 ParticleSystem::addColorGradient(float gradient, const Color4& color,
-                                 const nullable_t<Color4>& color2)
+                                 const std::optional<Color4>& color2)
 {
   ColorGradient colorGradient;
   colorGradient.gradient = gradient;
@@ -565,7 +565,7 @@ void ParticleSystem::_createVertexBuffers()
     dataOffset += 3;
   }
 
-  unique_ptr_t<VertexBuffer> offsets = nullptr;
+  std::unique_ptr<VertexBuffer> offsets = nullptr;
   if (_useInstancing) {
     Float32Array spriteData{0.f, 0.f, 1.f, 0.f, 1.f, 1.f, 0.f, 1.f};
     _spriteBuffer = std::make_unique<Buffer>(engine, spriteData, false, 2);
@@ -746,7 +746,7 @@ Particle* ParticleSystem::_createParticle()
     particle = _stockParticles.back();
     _stockParticles.pop_back();
     particle->age                   = 0;
-    particle->_currentColorGradient = nullopt_t;
+    particle->_currentColorGradient = std::nullopt;
     particle->cellIndex             = startSpriteCellID;
   }
   else {
@@ -841,7 +841,7 @@ void ParticleSystem::_update(int newParticles)
       }
     }
     else {
-      particle->_initialDirection = nullopt_t;
+      particle->_initialDirection = std::nullopt;
     }
 
     particle->direction.scaleInPlace(emitPower);
@@ -981,11 +981,11 @@ void ParticleSystem::_update(int newParticles)
   }
 }
 
-vector_t<string_t>
+std::vector<std::string>
 ParticleSystem::_GetAttributeNamesOrOptions(bool isAnimationSheetEnabled,
                                             bool isBillboardBased)
 {
-  vector_t<string_t> attributeNamesOrOptions{VertexBuffer::PositionKindChars,
+  std::vector<std::string> attributeNamesOrOptions{VertexBuffer::PositionKindChars,
                                              VertexBuffer::ColorKindChars,
                                              "angle", "offset", "size"};
 
@@ -1000,10 +1000,10 @@ ParticleSystem::_GetAttributeNamesOrOptions(bool isAnimationSheetEnabled,
   return attributeNamesOrOptions;
 }
 
-vector_t<string_t>
+std::vector<std::string>
 ParticleSystem::_GetEffectCreationOptions(bool isAnimationSheetEnabled)
 {
-  vector_t<string_t> effectCreationOption{
+  std::vector<std::string> effectCreationOption{
     "invView",          "view",        "projection",  "vClipPlane",
     "vClipPlane2",      "vClipPlane3", "vClipPlane4", "textureMask",
     "translationPivot", "eyePosition"};
@@ -1021,7 +1021,7 @@ Effect* ParticleSystem::_getEffect()
     return _customEffect;
   };
 
-  vector_t<string_t> defines;
+  std::vector<std::string> defines;
 
   if (_scene->clipPlane.has_value()) {
     defines.emplace_back("#define CLIPPLANE");
@@ -1063,7 +1063,7 @@ Effect* ParticleSystem::_getEffect()
   }
 
   // Effect
-  string_t join = String::join(defines, '\n');
+  std::string join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
@@ -1072,7 +1072,7 @@ Effect* ParticleSystem::_getEffect()
     auto effectCreationOption
       = ParticleSystem::_GetEffectCreationOptions(_isAnimationSheetEnabled);
 
-    vector_t<string_t> samplers{"diffuseSampler"};
+    std::vector<std::string> samplers{"diffuseSampler"};
 
     // if (ImageProcessingConfiguration)
     {
@@ -1261,7 +1261,7 @@ size_t ParticleSystem::render(bool /*preWarm*/)
   }
 
   // VBOs
-  unordered_map_t<string_t, VertexBuffer*> vertexBuffersTmp;
+  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
   for (auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
   }
@@ -1346,12 +1346,12 @@ void ParticleSystem::dispose(bool disposeTexture,
   onDisposeObservable.clear();
 }
 
-vector_t<AnimationPtr> ParticleSystem::getAnimations()
+std::vector<AnimationPtr> ParticleSystem::getAnimations()
 {
   return animations;
 }
 
-IParticleSystem* ParticleSystem::clone(const string_t& /*iName*/,
+IParticleSystem* ParticleSystem::clone(const std::string& /*iName*/,
                                        Mesh* /*newEmitter*/)
 {
   // ParticleSystem* result = new ParticleSystem(_name, _capacity, _scene);
@@ -1388,13 +1388,13 @@ void ParticleSystem::_Serialize(Json::object& /*serializationObject*/,
 ParticleSystem*
 ParticleSystem::_Parse(const Json::value& /*parsedParticleSystem*/,
                        IParticleSystem* /*particleSystem*/, Scene* /*scene*/,
-                       const string_t& /*url*/)
+                       const std::string& /*url*/)
 {
   return nullptr;
 }
 
 ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
-                                      Scene* scene, const string_t& rootUrl)
+                                      Scene* scene, const std::string& rootUrl)
 {
   auto name           = Json::GetString(parsedParticleSystem, "name");
   auto particleSystem = new ParticleSystem(

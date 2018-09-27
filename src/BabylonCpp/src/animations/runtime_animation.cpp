@@ -1,5 +1,7 @@
 #include <babylon/animations/runtime_animation.h>
 
+#include <cmath>
+
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/easing/ieasing_function.h>
@@ -15,7 +17,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& target,
     : currentFrame{this, &RuntimeAnimation::get_currentFrame}
     , weight{this, &RuntimeAnimation::get_weight}
     , currentValue{this, &RuntimeAnimation::get_currentValue}
-    , _workValue{nullopt_t}
+    , _workValue{std::nullopt}
     , targetPath{this, &RuntimeAnimation::get_targetPath}
     , target{this, &RuntimeAnimation::get_target}
     , _currentFrame{0}
@@ -25,7 +27,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& target,
     , _stopped{false}
     , _blendingFactor{0.f}
     , _scene{scene}
-    , _currentValue{nullopt_t}
+    , _currentValue{std::nullopt}
     , _targetPath{""}
     , _weight{1.f}
     , _ratioOffset{0.f}
@@ -61,12 +63,12 @@ float RuntimeAnimation::get_weight() const
   return _weight;
 }
 
-nullable_t<AnimationValue>& RuntimeAnimation::get_currentValue()
+std::optional<AnimationValue>& RuntimeAnimation::get_currentValue()
 {
   return _currentValue;
 }
 
-string_t RuntimeAnimation::get_targetPath() const
+std::string RuntimeAnimation::get_targetPath() const
 {
   return _targetPath;
 }
@@ -84,7 +86,7 @@ AnimationPtr& RuntimeAnimation::animation()
 void RuntimeAnimation::reset(bool restoreOriginal)
 {
   if (restoreOriginal) {
-    if (!_originalValue.empty() && _originalValue[0] != nullopt_t) {
+    if (!_originalValue.empty() && _originalValue[0] != std::nullopt) {
       // _setValue(_target, _originalValue[0], -1);
     }
   }
@@ -111,9 +113,9 @@ void RuntimeAnimation::dispose()
   auto& runtimeAnimations = _animation->runtimeAnimations();
   runtimeAnimations.erase(
     std::remove_if(runtimeAnimations.begin(), runtimeAnimations.end(),
-                     [this](const RuntimeAnimationPtr& runtimeAnimation) {
-                       return runtimeAnimation.get() == this;
-                     }),
+                   [this](const RuntimeAnimationPtr& runtimeAnimation) {
+                     return runtimeAnimation.get() == this;
+                   }),
     runtimeAnimations.end());
 }
 
@@ -143,8 +145,8 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& target,
                                  float weight, unsigned int targetIndex)
 {
   // Set value
-  string_t path   = "";
-  any destination = nullptr;
+  std::string path = "";
+  any destination  = nullptr;
 
   const auto& targetPropertyPath = _animation->targetPropertyPath;
 
@@ -169,7 +171,7 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& target,
 
   if (targetIndex >= _originalValue.size()) {
     _originalValue.resize(targetIndex + 1);
-    _originalValue[targetIndex] = nullopt_t;
+    _originalValue[targetIndex] = std::nullopt;
   }
 
   // Blending
@@ -188,7 +190,7 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& target,
   }
 }
 
-nullable_t<unsigned int> RuntimeAnimation::_getCorrectLoopMode() const
+std::optional<unsigned int> RuntimeAnimation::_getCorrectLoopMode() const
 {
   return 0u;
 }
@@ -279,7 +281,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
   else {
     // Get max value if required
     if (_animation->loopMode != Animation::ANIMATIONLOOPMODE_CYCLE()) {
-      string_t keyOffset = std::to_string(to) + std::to_string(from);
+      std::string keyOffset = std::to_string(to) + std::to_string(from);
       if (!_offsetsCache.count(keyOffset)) {
         AnimationValue fromValue = _interpolate(
           static_cast<int>(from), 0, Animation::ANIMATIONLOOPMODE_CYCLE());

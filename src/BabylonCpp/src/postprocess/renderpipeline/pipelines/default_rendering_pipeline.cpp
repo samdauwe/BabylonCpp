@@ -29,8 +29,8 @@
 namespace BABYLON {
 
 DefaultRenderingPipeline::DefaultRenderingPipeline(
-  const string_t& iName, bool hdr, Scene* scene,
-  const unordered_map_t<string_t, CameraPtr>& cameras, bool automaticBuild)
+  const std::string& iName, bool hdr, Scene* scene,
+  const std::unordered_map<std::string, CameraPtr>& cameras, bool automaticBuild)
     : PostProcessRenderPipeline(scene ? scene->getEngine() :
                                         Engine::LastCreatedScene()->getEngine(),
                                 iName)
@@ -130,7 +130,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     _defaultPipelineTextureType, true);
   _sharpenEffect = new PostProcessRenderEffect(
     engine, SharpenPostProcessId,
-    [this]() -> vector_t<PostProcess*> { return {sharpen}; }, true);
+    [this]() -> std::vector<PostProcess*> { return {sharpen}; }, true);
 
   depthOfField = new DepthOfFieldEffect(_scene, nullptr, _depthOfFieldBlurLevel,
                                         _defaultPipelineTextureType, true);
@@ -145,7 +145,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     _defaultPipelineTextureType, true);
   _chromaticAberrationEffect = new PostProcessRenderEffect(
     engine, ChromaticAberrationPostProcessId,
-    [this]() -> vector_t<PostProcess*> { return {chromaticAberration}; }, true);
+    [this]() -> std::vector<PostProcess*> { return {chromaticAberration}; }, true);
 
   grain
     = new GrainPostProcess("Grain", ToVariant<float, PostProcessOptions>(1.f),
@@ -153,7 +153,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
                            engine, false, _defaultPipelineTextureType, true);
   _grainEffect = new PostProcessRenderEffect(
     engine, GrainPostProcessId,
-    [this]() -> vector_t<PostProcess*> { return {grain}; }, true);
+    [this]() -> std::vector<PostProcess*> { return {grain}; }, true);
 
   _resizeObserver = engine->onResizeObservable.add(
     [this](Engine* engine, EventState& /*es*/) {
@@ -500,7 +500,7 @@ void DefaultRenderingPipeline::_buildPipeline()
     if (_hdr) {
       addEffect(new PostProcessRenderEffect(
         engine, ImageProcessingPostProcessId,
-        [this]() -> vector_t<PostProcess*> { return {imageProcessing}; },
+        [this]() -> std::vector<PostProcess*> { return {imageProcessing}; },
         true));
       _setAutoClearAndTextureSharing(imageProcessing);
     }
@@ -539,7 +539,7 @@ void DefaultRenderingPipeline::_buildPipeline()
                                false, _defaultPipelineTextureType);
     addEffect(new PostProcessRenderEffect(
       engine, FxaaPostProcessId,
-      [this]() -> vector_t<PostProcess*> { return {fxaa}; }, true));
+      [this]() -> std::vector<PostProcess*> { return {fxaa}; }, true));
     _setAutoClearAndTextureSharing(fxaa, true);
   }
 
@@ -650,9 +650,9 @@ Json::object DefaultRenderingPipeline::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<DefaultRenderingPipeline>
+std::unique_ptr<DefaultRenderingPipeline>
 DefaultRenderingPipeline::Parse(const Json::value& /*source*/, Scene* /*scene*/,
-                                const string_t& /*rootUrl*/)
+                                const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

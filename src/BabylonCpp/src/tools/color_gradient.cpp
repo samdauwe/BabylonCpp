@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-ColorGradient::ColorGradient() : color2{nullopt_t}
+ColorGradient::ColorGradient() : color2{std::nullopt}
 {
 }
 

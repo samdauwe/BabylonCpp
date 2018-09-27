@@ -1,7 +1,9 @@
 #ifndef BABYLON_INSPECTOR_ACTIONS_INSPECTOR_ACTION_H
 #define BABYLON_INSPECTOR_ACTIONS_INSPECTOR_ACTION_H
 
-#include <babylon/babylon_stl.h>
+#include <string>
+
+#include <babylon/core/delegates/delegate.h>
 
 namespace BABYLON {
 
@@ -22,7 +24,7 @@ struct InspectorAction {
   const char* id;
   const char* icon;
   const char* label;
-  string_t iconWithLabel;
+  std::string iconWithLabel;
   const char* shortcut;
   SA::delegate<void()> callback;
   SA::delegate<bool()> isSelected;

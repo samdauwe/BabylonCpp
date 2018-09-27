@@ -42,7 +42,7 @@ struct BABYLON_SHARED_EXPORT InstancingAttributeInfo {
   /**
    * Name of the GLSL attribute, for debugging purpose only
    */
-  string_t attributeName;
+  std::string attributeName;
 }; // end of struct InstancingAttributeInfo
 
 } // end of namespace BABYLON

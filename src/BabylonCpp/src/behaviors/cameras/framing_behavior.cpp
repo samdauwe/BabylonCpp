@@ -233,14 +233,14 @@ void FramingBehavior::zoomOnMeshHierarchy(
 }
 
 void FramingBehavior::zoomOnMeshesHierarchy(
-  const vector_t<AbstractMesh*>& meshes, bool focusOnOriginXZ,
+  const std::vector<AbstractMesh*>& meshes, bool focusOnOriginXZ,
   const std::function<void()>& onAnimationEnd)
 {
-  Vector3 min(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
-              numeric_limits_t<float>::max());
-  Vector3 max(numeric_limits_t<float>::lowest(),
-              numeric_limits_t<float>::lowest(),
-              numeric_limits_t<float>::lowest());
+  Vector3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+              std::numeric_limits<float>::max());
+  Vector3 max(std::numeric_limits<float>::lowest(),
+              std::numeric_limits<float>::lowest(),
+              std::numeric_limits<float>::lowest());
 
   for (auto& mesh : meshes) {
     auto boundingInfo = mesh->getHierarchyBoundingVectors(true);

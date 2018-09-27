@@ -27,15 +27,15 @@
 namespace BABYLON {
 
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(
-  const string_t& name, Scene* scene, float ratio,
-  const vector_t<CameraPtr>& cameras)
+  const std::string& name, Scene* scene, float ratio,
+  const std::vector<CameraPtr>& cameras)
     : SSAO2RenderingPipeline(name, scene, {ratio, ratio}, cameras)
 {
 }
 
 SSAO2RenderingPipeline::SSAO2RenderingPipeline(
-  const string_t& name, Scene* scene, const SSAO2Ratio& iRatio,
-  const vector_t<CameraPtr>& cameras)
+  const std::string& name, Scene* scene, const SSAO2Ratio& iRatio,
+  const std::vector<CameraPtr>& cameras)
     : PostProcessRenderPipeline(scene->getEngine(), name)
     , totalStrength{1.f}
     , maxZ{100.f}
@@ -93,21 +93,21 @@ SSAO2RenderingPipeline::SSAO2RenderingPipeline(
   // Set up pipeline
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), SSAOOriginalSceneColorEffect,
-    [&]() -> vector_t<PostProcess*> { return {_originalColorPostProcess}; },
+    [&]() -> std::vector<PostProcess*> { return {_originalColorPostProcess}; },
     true));
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), SSAORenderEffect,
-    [&]() -> vector_t<PostProcess*> { return {_ssaoPostProcess}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {_ssaoPostProcess}; }, true));
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), SSAOBlurHRenderEffect,
-    [&]() -> vector_t<PostProcess*> { return {_blurHPostProcess}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {_blurHPostProcess}; }, true));
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), SSAOBlurVRenderEffect,
-    [&]() -> vector_t<PostProcess*> { return {_blurVPostProcess}; }, true));
+    [&]() -> std::vector<PostProcess*> { return {_blurVPostProcess}; }, true));
 
   addEffect(new PostProcessRenderEffect(
     scene->getEngine(), SSAOCombineRenderEffect,
-    [&]() -> vector_t<PostProcess*> { return {_ssaoCombinePostProcess}; },
+    [&]() -> std::vector<PostProcess*> { return {_ssaoCombinePostProcess}; },
     true));
 
   // Finish
@@ -158,11 +158,11 @@ void SSAO2RenderingPipeline::set_expensiveBlur(bool b)
   _blurHPostProcess->updateEffect(
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES "
     "16\n#define EXPENSIVE "
-      + string_t(b ? "1" : "0") + "\n",
+      + std::string(b ? "1" : "0") + "\n",
     {}, {"textureSampler", "depthSampler"});
   _blurVPostProcess->updateEffect(
     "#define BILATERAL_BLUR\n#define SAMPLES 16\n#define EXPENSIVE "
-      + string_t(b ? "1" : "0") + "\n",
+      + std::string(b ? "1" : "0") + "\n",
     {}, {"textureSampler", "depthSampler"});
   _expensiveBlur = b;
   _firstUpdate   = true;
@@ -286,7 +286,7 @@ float SSAO2RenderingPipeline::_radicalInverse_VdC(uint32_t i)
   return _bits[0] * 2.3283064365386963e-10f; // / 0x100000000 or / 4294967296
 }
 
-array_t<float, 2> SSAO2RenderingPipeline::_hammersley(uint32_t i, uint32_t n)
+std::array<float, 2> SSAO2RenderingPipeline::_hammersley(uint32_t i, uint32_t n)
 {
   return {
     {static_cast<float>(i) / static_cast<float>(n), _radicalInverse_VdC(i)}};
@@ -445,9 +445,9 @@ Json::object SSAO2RenderingPipeline::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<SSAO2RenderingPipeline>
+std::unique_ptr<SSAO2RenderingPipeline>
 SSAO2RenderingPipeline::Parse(const Json::value& /*source*/, Scene* /*scene*/,
-                              const string_t& /*url*/)
+                              const std::string& /*url*/)
 {
   return nullptr;
 }

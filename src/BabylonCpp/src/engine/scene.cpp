@@ -113,10 +113,10 @@ Scene::Scene(Engine* engine)
                      &Scene::set_forceWireframe}
     , forcePointsCloud{this, &Scene::get_forcePointsCloud,
                        &Scene::set_forcePointsCloud}
-    , clipPlane{nullopt_t}
-    , clipPlane2{nullopt_t}
-    , clipPlane3{nullopt_t}
-    , clipPlane4{nullopt_t}
+    , clipPlane{std::nullopt}
+    , clipPlane2{std::nullopt}
+    , clipPlane3{std::nullopt}
+    , clipPlane4{std::nullopt}
     , forceShowBoundingBoxes{this, &Scene::get_forceShowBoundingBoxes,
                              &Scene::set_forceShowBoundingBoxes}
     , animationsEnabled{true}
@@ -215,8 +215,8 @@ Scene::Scene(Engine* engine)
     , _delayedSimpleClick{nullptr}
     , _meshPickProceed{false}
     , _previousHasSwiped{false}
-    , _currentPickResult{nullopt_t}
-    , _previousPickResult{nullopt_t}
+    , _currentPickResult{std::nullopt}
+    , _previousPickResult{std::nullopt}
     , _totalPointersPressed{0}
     , _doubleClickOccured{false}
     , _pointerX{0}
@@ -348,7 +348,7 @@ void Scene::_addComponent(const ISceneComponentPtr& component)
   }
 }
 
-ISceneComponentPtr Scene::_getComponent(const string_t& name)
+ISceneComponentPtr Scene::_getComponent(const std::string& name)
 {
   auto it = std::find_if(_components.begin(), _components.end(),
                            [&name](const ISceneComponentPtr& component) {
@@ -409,7 +409,7 @@ void Scene::set_afterCameraRender(
 }
 
 // Gamepads
-unique_ptr_t<GamepadManager>& Scene::get_gamepadManager()
+std::unique_ptr<GamepadManager>& Scene::get_gamepadManager()
 {
   if (!_gamepadManager) {
     _gamepadManager = std::make_unique<GamepadManager>(this);
@@ -479,7 +479,7 @@ unsigned int Scene::getInternalStep() const
   return _currentInternalStep;
 }
 
-unique_ptr_t<ImageProcessingConfiguration>&
+std::unique_ptr<ImageProcessingConfiguration>&
 Scene::get_imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
@@ -622,7 +622,7 @@ bool Scene::get_skeletonsEnabled() const
   return _skeletonsEnabled;
 }
 
-unique_ptr_t<PostProcessRenderPipelineManager>&
+std::unique_ptr<PostProcessRenderPipelineManager>&
 Scene::get_postProcessRenderPipelineManager()
 {
   if (!_postProcessRenderPipelineManager) {
@@ -641,7 +641,7 @@ Scene::get_postProcessRenderPipelineManager()
   return _postProcessRenderPipelineManager;
 }
 
-unique_ptr_t<SoundTrack>& Scene::get_mainSoundTrack()
+std::unique_ptr<SoundTrack>& Scene::get_mainSoundTrack()
 {
   if (!_mainSoundTrack) {
     _mainSoundTrack = std::make_unique<SoundTrack>(this, true);
@@ -670,7 +670,7 @@ void Scene::set_simplificationQueue(const SimplificationQueuePtr& value)
   _simplificationQueue = value;
 }
 
-unordered_map_t<string_t, unique_ptr_t<DepthRenderer>>&
+std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>&
 Scene::get_depthRenderer()
 {
   return _depthRenderer;
@@ -712,12 +712,12 @@ bool Scene::get_isAlternateRenderingEnabled() const
   return _alternateRendering;
 }
 
-array_t<Plane, 6>& Scene::get_frustumPlanes()
+std::array<Plane, 6>& Scene::get_frustumPlanes()
 {
   return _frustumPlanes;
 }
 
-unique_ptr_t<DebugLayer>& Scene::get_debugLayer()
+std::unique_ptr<DebugLayer>& Scene::get_debugLayer()
 {
   if (!_debugLayer) {
     _debugLayer = std::make_unique<DebugLayer>(this);
@@ -748,9 +748,9 @@ bool Scene::get_workerCollisions() const
   return _workerCollisions;
 }
 
-vector_t<AbstractMeshPtr> Scene::getMeshes() const
+std::vector<AbstractMeshPtr> Scene::getMeshes() const
 {
-  vector_t<AbstractMeshPtr> _meshes;
+  std::vector<AbstractMeshPtr> _meshes;
   _meshes.reserve(meshes.size());
 
   std::for_each(
@@ -790,7 +790,7 @@ Effect* Scene::getCachedEffect()
   return _cachedEffect;
 }
 
-nullable_t<float> Scene::getCachedVisibility()
+std::optional<float> Scene::getCachedVisibility()
 {
   return _cachedVisibility;
 }
@@ -861,12 +861,12 @@ PerfCounter& Scene::get_activeBonesPerfCounter()
   return _activeBones;
 }
 
-vector_t<AbstractMeshPtr>& Scene::getActiveMeshes()
+std::vector<AbstractMeshPtr>& Scene::getActiveMeshes()
 {
   return _activeMeshes;
 }
 
-const vector_t<AbstractMeshPtr>& Scene::getActiveMeshes() const
+const std::vector<AbstractMeshPtr>& Scene::getActiveMeshes() const
 {
   return _activeMeshes;
 }
@@ -916,15 +916,15 @@ void Scene::_createAlternateUbo()
   _alternateSceneUbo->addUniform("view", 16);
 }
 
-nullable_t<PickingInfo> Scene::_pickSpriteButKeepRay(
-  const nullable_t<PickingInfo>& originalPointerInfo, int x, int y,
+std::optional<PickingInfo> Scene::_pickSpriteButKeepRay(
+  const std::optional<PickingInfo>& originalPointerInfo, int x, int y,
   const std::function<bool(Sprite* sprite)>& predicate, bool fastCheck,
   const CameraPtr& camera)
 {
   auto result = pickSprite(x, y, predicate, fastCheck, camera);
   if (result) {
     auto _result = *result;
-    _result.ray  = originalPointerInfo ? _result.ray : nullopt_t;
+    _result.ray  = originalPointerInfo ? _result.ray : std::nullopt;
     result       = _result;
   }
   return result;
@@ -949,7 +949,7 @@ void Scene::_setRayOnPointerInfo(PointerInfo& pointerInfo)
   }
 }
 
-Scene& Scene::simulatePointerMove(nullable_t<PickingInfo>& pickResult)
+Scene& Scene::simulatePointerMove(std::optional<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointermove");
 
@@ -960,7 +960,7 @@ Scene& Scene::simulatePointerMove(nullable_t<PickingInfo>& pickResult)
   return _processPointerMove(pickResult, evt);
 }
 
-Scene& Scene::_processPointerMove(nullable_t<PickingInfo>& pickResult,
+Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
                                   const PointerEvent& evt)
 {
   auto canvas = _engine->getRenderingCanvas();
@@ -1045,7 +1045,7 @@ Scene& Scene::_processPointerMove(nullable_t<PickingInfo>& pickResult,
 }
 
 bool Scene::_checkPrePointerObservable(
-  const nullable_t<PickingInfo>& pickResult, const PointerEvent& evt,
+  const std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
   PointerEventTypes type)
 {
   PointerInfoPre pi(type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
@@ -1061,7 +1061,7 @@ bool Scene::_checkPrePointerObservable(
   }
 }
 
-Scene& Scene::simulatePointerDown(const nullable_t<PickingInfo>& pickResult)
+Scene& Scene::simulatePointerDown(const std::optional<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointerdown");
 
@@ -1073,7 +1073,7 @@ Scene& Scene::simulatePointerDown(const nullable_t<PickingInfo>& pickResult)
   return _processPointerDown(pickResult, evt);
 }
 
-Scene& Scene::_processPointerDown(const nullable_t<PickingInfo>& pickResult,
+Scene& Scene::_processPointerDown(const std::optional<PickingInfo>& pickResult,
                                   const PointerEvent& evt)
 {
   if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh) {
@@ -1158,7 +1158,7 @@ Scene& Scene::_processPointerDown(const nullable_t<PickingInfo>& pickResult,
   return *this;
 }
 
-Scene& Scene::simulatePointerUp(const nullable_t<PickingInfo>& pickResult)
+Scene& Scene::simulatePointerUp(const std::optional<PickingInfo>& pickResult)
 {
   PointerEvent evt("pointerup");
   ClickInfo clickInfo;
@@ -1173,7 +1173,7 @@ Scene& Scene::simulatePointerUp(const nullable_t<PickingInfo>& pickResult)
   return _processPointerUp(pickResult, evt, clickInfo);
 }
 
-Scene& Scene::_processPointerUp(const nullable_t<PickingInfo>& pickResult,
+Scene& Scene::_processPointerUp(const std::optional<PickingInfo>& pickResult,
                                 const PointerEvent& evt,
                                 const ClickInfo& clickInfo)
 {
@@ -1278,7 +1278,7 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
         _currentPickResult = *pickResult;
       }
       else {
-        _currentPickResult = nullopt_t;
+        _currentPickResult = std::nullopt;
       }
       if (pickResult) {
         const auto _pickResult = *pickResult;
@@ -1296,9 +1296,9 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
       Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
       const PointerEvent& evt,
       const std::function<void(const ClickInfo& clickInfo,
-                                 nullable_t<PickingInfo>& pickResult)>& cb) {
+                                 std::optional<PickingInfo>& pickResult)>& cb) {
       ClickInfo clickInfo;
-      _currentPickResult = nullopt_t;
+      _currentPickResult = std::nullopt;
       ActionManager* act = nullptr;
 
       auto checkPicking
@@ -1537,7 +1537,7 @@ void Scene::_onPointerMoveEvent(PointerEvent&& evt)
   _updatePointerPosition(evt);
 
   // PreObservable support
-  if (_checkPrePointerObservable(nullopt_t, evt,
+  if (_checkPrePointerObservable(std::nullopt, evt,
                                  (evt.type == EventType::MOUSE_WHEEL
                                   || evt.type == EventType::DOM_MOUSE_SCROLL) ?
                                    PointerEventTypes::POINTERWHEEL :
@@ -1580,7 +1580,7 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
   }
 
   // PreObservable support
-  if (_checkPrePointerObservable(nullopt_t, evt,
+  if (_checkPrePointerObservable(std::nullopt, evt,
                                  PointerEventTypes::POINTERDOWN)) {
     return;
   }
@@ -1662,7 +1662,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
   _initClickEvent(
     onPrePointerObservable, onPointerObservable, evt,
     [this, evt](const ClickInfo& clickInfo,
-                nullable_t<PickingInfo>& pickResult) {
+                std::optional<PickingInfo>& pickResult) {
       // PreObservable support
       if (onPrePointerObservable.hasObservers()) {
         if (!clickInfo.ignore) {
@@ -1670,7 +1670,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
                      static_cast<int>(PointerEventTypes::POINTERTAP))) {
-              if (_checkPrePointerObservable(nullopt_t, evt,
+              if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERTAP)) {
                 return;
               }
@@ -1679,14 +1679,14 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
                 && onPrePointerObservable.hasSpecificMask(
                      static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(
-                    nullopt_t, evt, PointerEventTypes::POINTERDOUBLETAP)) {
+                    std::nullopt, evt, PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
               }
             }
           }
         }
         else {
-          if (_checkPrePointerObservable(nullopt_t, evt,
+          if (_checkPrePointerObservable(std::nullopt, evt,
                                          PointerEventTypes::POINTERUP)) {
             return;
           }
@@ -1841,7 +1841,7 @@ bool Scene::isReady()
     // Effect layers
     auto _mesh = static_cast<Mesh*>(mesh.get());
     auto hardwareInstancedRendering
-      = mesh->getClassName() == string_t("InstancedMesh")
+      = mesh->getClassName() == std::string("InstancedMesh")
         || (engine->getCaps().instancedArrays && _mesh->instances.size() > 0);
 
     // Is Ready For Mesh
@@ -1956,9 +1956,9 @@ void Scene::_checkIsReady()
   }
 }
 
-vector_t<AnimationPtr> Scene::getAnimations()
+std::vector<AnimationPtr> Scene::getAnimations()
 {
-  return vector_t<AnimationPtr>();
+  return std::vector<AnimationPtr>();
 }
 
 AnimatablePtr Scene::beginWeightedAnimation(
@@ -2003,7 +2003,7 @@ AnimatablePtr Scene::beginAnimation(
   }
 
   // Children animations
-  vector_t<IAnimatablePtr> animatables;
+  std::vector<IAnimatablePtr> animatables;
   if (auto s = std::dynamic_pointer_cast<Skeleton>(target)) {
     animatables = s->getAnimatables();
   }
@@ -2028,7 +2028,7 @@ AnimatablePtr Scene::beginAnimation(
 
 AnimatablePtr
 Scene::beginDirectAnimation(const IAnimatablePtr& target,
-                            const vector_t<AnimationPtr>& _animations,
+                            const std::vector<AnimationPtr>& _animations,
                             float from, float to, bool loop, float speedRatio,
                             const std::function<void()>& onAnimationEnd)
 {
@@ -2036,14 +2036,14 @@ Scene::beginDirectAnimation(const IAnimatablePtr& target,
                          onAnimationEnd, _animations);
 }
 
-vector_t<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
+std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
   const NodePtr& target, bool directDescendantsOnly,
-  const vector_t<AnimationPtr>& animations, int from, int to, bool loop,
+  const std::vector<AnimationPtr>& animations, int from, int to, bool loop,
   float speedRatio, const std::function<void()>& onAnimationEnd)
 {
   auto children = target->getDescendants(directDescendantsOnly);
 
-  vector_t<AnimatablePtr> result;
+  std::vector<AnimatablePtr> result;
   result.emplace_back(beginDirectAnimation(target, animations, from, to, loop,
                                            speedRatio, onAnimationEnd));
   for (auto& child : children) {
@@ -2063,15 +2063,15 @@ AnimatablePtr Scene::getAnimatableByTarget(const IAnimatablePtr& target)
   return (it == _activeAnimatables.end()) ? nullptr : *it;
 }
 
-vector_t<AnimatablePtr>
+std::vector<AnimatablePtr>
 Scene::getAllAnimatablesByTarget(const IAnimatablePtr& target)
 {
   return getAllAnimatablesByTarget(target.get());
 }
 
-vector_t<AnimatablePtr> Scene::getAllAnimatablesByTarget(IAnimatable* target)
+std::vector<AnimatablePtr> Scene::getAllAnimatablesByTarget(IAnimatable* target)
 {
-  vector_t<AnimatablePtr> result;
+  std::vector<AnimatablePtr> result;
   for (const auto& activeAnimatable : _activeAnimatables) {
     if (activeAnimatable->target.get() == target) {
       result.emplace_back(activeAnimatable);
@@ -2082,14 +2082,14 @@ vector_t<AnimatablePtr> Scene::getAllAnimatablesByTarget(IAnimatable* target)
 }
 
 void Scene::stopAnimation(
-  const IAnimatablePtr& target, const string_t& animationName,
+  const IAnimatablePtr& target, const std::string& animationName,
   const std::function<bool(IAnimatable* target)>& targetMask)
 {
   return stopAnimation(target.get(), animationName, targetMask);
 }
 
 void Scene::stopAnimation(
-  IAnimatable* target, const string_t& animationName,
+  IAnimatable* target, const std::string& animationName,
   const std::function<bool(IAnimatable* target)>& targetMask)
 {
   auto animatables = getAllAnimatablesByTarget(target);
@@ -2150,7 +2150,7 @@ void Scene::_registerTargetForLateAnimationBinding(
 }
 
 AnimationValue Scene::_processLateAnimationBindingsForMatrices(
-  float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
+  float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
   Matrix& holderOriginalValue)
 {
   auto normalizer         = 1.f;
@@ -2206,7 +2206,7 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
 }
 
 Quaternion Scene::_processLateAnimationBindingsForQuaternions(
-  float holderTotalWeight, vector_t<RuntimeAnimation*>& holderAnimations,
+  float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
   Quaternion& holderOriginalValue)
 {
   auto& originalAnimation = holderAnimations[0];
@@ -2219,7 +2219,7 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   }
 
   auto normalizer = 1.f;
-  vector_t<Quaternion> quaternions;
+  std::vector<Quaternion> quaternions;
   Float32Array weights;
 
   if (holderTotalWeight < 1.f) {
@@ -2252,7 +2252,7 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   // https://gamedev.stackexchange.com/questions/62354/method-for-interpolation-between-3-quaternions
 
   auto cumulativeAmount                       = 0.f;
-  nullable_t<Quaternion> cumulativeQuaternion = nullopt_t;
+  std::optional<Quaternion> cumulativeQuaternion = std::nullopt;
   for (size_t index = 0; index < quaternions.size();) {
     if (!cumulativeQuaternion) {
       cumulativeQuaternion = Quaternion::Slerp(
@@ -2727,7 +2727,7 @@ void Scene::addGeometry(const GeometryPtr& newGeometry)
 }
 
 void Scene::addActionManager(
-  const shared_ptr_t<ActionManager>& newActionManager)
+  const std::shared_ptr<ActionManager>& newActionManager)
 {
   actionManagers.emplace_back(newActionManager);
 }
@@ -2755,7 +2755,7 @@ void Scene::switchActiveCamera(const CameraPtr& newCamera, bool attachControl)
   }
 }
 
-CameraPtr Scene::setActiveCameraByID(const string_t& id)
+CameraPtr Scene::setActiveCameraByID(const std::string& id)
 {
   auto camera = getCameraByID(id);
 
@@ -2767,7 +2767,7 @@ CameraPtr Scene::setActiveCameraByID(const string_t& id)
   return nullptr;
 }
 
-CameraPtr Scene::setActiveCameraByName(const string_t& name)
+CameraPtr Scene::setActiveCameraByName(const std::string& name)
 {
   auto camera = getCameraByName(name);
 
@@ -2779,7 +2779,7 @@ CameraPtr Scene::setActiveCameraByName(const string_t& name)
   return nullptr;
 }
 
-AnimationGroupPtr Scene::getAnimationGroupByName(const string_t& name)
+AnimationGroupPtr Scene::getAnimationGroupByName(const std::string& name)
 {
   auto it = std::find_if(animationGroups.begin(), animationGroups.end(),
                            [&name](const AnimationGroupPtr& animationGroup) {
@@ -2789,7 +2789,7 @@ AnimationGroupPtr Scene::getAnimationGroupByName(const string_t& name)
   return (it == animationGroups.end()) ? nullptr : *it;
 }
 
-MaterialPtr Scene::getMaterialByID(const string_t& id)
+MaterialPtr Scene::getMaterialByID(const std::string& id)
 {
   auto it = std::find_if(
     materials.begin(), materials.end(),
@@ -2798,7 +2798,7 @@ MaterialPtr Scene::getMaterialByID(const string_t& id)
   return (it == materials.end()) ? nullptr : *it;
 }
 
-MaterialPtr Scene::getMaterialByName(const string_t& name)
+MaterialPtr Scene::getMaterialByName(const std::string& name)
 {
   auto it = std::find_if(
     materials.begin(), materials.end(),
@@ -2807,7 +2807,7 @@ MaterialPtr Scene::getMaterialByName(const string_t& name)
   return (it == materials.end()) ? nullptr : *it;
 }
 
-CameraPtr Scene::getCameraByID(const string_t& id)
+CameraPtr Scene::getCameraByID(const std::string& id)
 {
   auto it = std::find_if(
     cameras.begin(), cameras.end(),
@@ -2826,7 +2826,7 @@ CameraPtr Scene::getCameraByUniqueID(unsigned int uniqueId)
   return (it == cameras.end()) ? nullptr : *it;
 }
 
-CameraPtr Scene::getCameraByName(const string_t& name)
+CameraPtr Scene::getCameraByName(const std::string& name)
 {
   auto it = std::find_if(
     cameras.begin(), cameras.end(),
@@ -2835,7 +2835,7 @@ CameraPtr Scene::getCameraByName(const string_t& name)
   return (it == cameras.end()) ? nullptr : *it;
 }
 
-BonePtr Scene::getBoneByID(const string_t& id)
+BonePtr Scene::getBoneByID(const std::string& id)
 {
   for (auto& skeleton : skeletons) {
     for (auto& bone : skeleton->bones) {
@@ -2848,7 +2848,7 @@ BonePtr Scene::getBoneByID(const string_t& id)
   return nullptr;
 }
 
-BonePtr Scene::getBoneByName(const string_t& name)
+BonePtr Scene::getBoneByName(const std::string& name)
 {
   for (auto& skeleton : skeletons) {
     for (auto& bone : skeleton->bones) {
@@ -2861,7 +2861,7 @@ BonePtr Scene::getBoneByName(const string_t& name)
   return nullptr;
 }
 
-LightPtr Scene::getLightByName(const string_t& name)
+LightPtr Scene::getLightByName(const std::string& name)
 {
   auto it = std::find_if(
     lights.begin(), lights.end(),
@@ -2870,7 +2870,7 @@ LightPtr Scene::getLightByName(const string_t& name)
   return (it == lights.end()) ? nullptr : *it;
 }
 
-LightPtr Scene::getLightByID(const string_t& id)
+LightPtr Scene::getLightByID(const std::string& id)
 {
   auto it
     = std::find_if(lights.begin(), lights.end(),
@@ -2888,7 +2888,7 @@ LightPtr Scene::getLightByUniqueID(unsigned int uniqueId)
   return (it == lights.end()) ? nullptr : *it;
 }
 
-IParticleSystemPtr Scene::getParticleSystemByID(const string_t& id)
+IParticleSystemPtr Scene::getParticleSystemByID(const std::string& id)
 {
   auto it = std::find_if(particleSystems.begin(), particleSystems.end(),
                            [&id](const IParticleSystemPtr& particleSystem) {
@@ -2898,7 +2898,7 @@ IParticleSystemPtr Scene::getParticleSystemByID(const string_t& id)
   return (it == particleSystems.end()) ? nullptr : *it;
 }
 
-GeometryPtr Scene::getGeometryByID(const string_t& id)
+GeometryPtr Scene::getGeometryByID(const std::string& id)
 {
   auto it = std::find_if(
     geometries.begin(), geometries.end(),
@@ -2951,12 +2951,12 @@ bool Scene::removeGeometry(Geometry* geometry)
   return false;
 }
 
-vector_t<GeometryPtr>& Scene::getGeometries()
+std::vector<GeometryPtr>& Scene::getGeometries()
 {
   return geometries;
 }
 
-AbstractMeshPtr Scene::getMeshByID(const string_t& id)
+AbstractMeshPtr Scene::getMeshByID(const std::string& id)
 {
   auto it = std::find_if(
     meshes.begin(), meshes.end(),
@@ -2965,9 +2965,9 @@ AbstractMeshPtr Scene::getMeshByID(const string_t& id)
   return (it == meshes.end()) ? nullptr : *it;
 }
 
-vector_t<AbstractMeshPtr> Scene::getMeshesByID(const string_t& id)
+std::vector<AbstractMeshPtr> Scene::getMeshesByID(const std::string& id)
 {
-  vector_t<AbstractMeshPtr> filteredMeshes;
+  std::vector<AbstractMeshPtr> filteredMeshes;
   std::for_each(meshes.begin(), meshes.end(),
                   [&filteredMeshes, &id](const AbstractMeshPtr& mesh) {
                     if (mesh->id == id) {
@@ -2977,7 +2977,7 @@ vector_t<AbstractMeshPtr> Scene::getMeshesByID(const string_t& id)
   return filteredMeshes;
 }
 
-TransformNodePtr Scene::getTransformNodeByID(const string_t& id)
+TransformNodePtr Scene::getTransformNodeByID(const std::string& id)
 {
   auto it = std::find_if(transformNodes.begin(), transformNodes.end(),
                            [&id](const TransformNodePtr& transformNode) {
@@ -2987,9 +2987,9 @@ TransformNodePtr Scene::getTransformNodeByID(const string_t& id)
   return (it == transformNodes.end()) ? nullptr : *it;
 }
 
-vector_t<TransformNodePtr> Scene::getTransformNodesByID(const string_t& id)
+std::vector<TransformNodePtr> Scene::getTransformNodesByID(const std::string& id)
 {
-  vector_t<TransformNodePtr> filteredTransformNodes;
+  std::vector<TransformNodePtr> filteredTransformNodes;
   std::for_each(
     transformNodes.begin(), transformNodes.end(),
     [&filteredTransformNodes, &id](const TransformNodePtr& transformNode) {
@@ -3010,7 +3010,7 @@ AbstractMeshPtr Scene::getMeshByUniqueID(unsigned int uniqueId)
   return (it == meshes.end()) ? nullptr : *it;
 }
 
-AbstractMeshPtr Scene::getLastMeshByID(const string_t& id)
+AbstractMeshPtr Scene::getLastMeshByID(const std::string& id)
 {
   if (meshes.empty()) {
     return nullptr;
@@ -3025,7 +3025,7 @@ AbstractMeshPtr Scene::getLastMeshByID(const string_t& id)
   return nullptr;
 }
 
-NodePtr Scene::getLastEntryByID(const string_t& id)
+NodePtr Scene::getLastEntryByID(const std::string& id)
 {
   size_t index;
   for (index = meshes.size(); index > 0; --index) {
@@ -3055,7 +3055,7 @@ NodePtr Scene::getLastEntryByID(const string_t& id)
   return nullptr;
 }
 
-NodePtr Scene::getNodeByID(const string_t& id)
+NodePtr Scene::getNodeByID(const std::string& id)
 {
   auto mesh = getMeshByID(id);
 
@@ -3080,7 +3080,7 @@ NodePtr Scene::getNodeByID(const string_t& id)
   return bone;
 }
 
-NodePtr Scene::getNodeByName(const string_t& name)
+NodePtr Scene::getNodeByName(const std::string& name)
 {
   auto mesh = getMeshByName(name);
 
@@ -3105,7 +3105,7 @@ NodePtr Scene::getNodeByName(const string_t& name)
   return bone;
 }
 
-AbstractMeshPtr Scene::getMeshByName(const string_t& name)
+AbstractMeshPtr Scene::getMeshByName(const std::string& name)
 {
   auto it = std::find_if(
     meshes.begin(), meshes.end(),
@@ -3114,7 +3114,7 @@ AbstractMeshPtr Scene::getMeshByName(const string_t& name)
   return (it == meshes.end()) ? nullptr : *it;
 }
 
-TransformNodePtr Scene::getTransformNodeByName(const string_t& name)
+TransformNodePtr Scene::getTransformNodeByName(const std::string& name)
 {
   auto it = std::find_if(transformNodes.begin(), transformNodes.end(),
                            [&name](const TransformNodePtr& transformNode) {
@@ -3124,12 +3124,12 @@ TransformNodePtr Scene::getTransformNodeByName(const string_t& name)
   return (it == transformNodes.end()) ? nullptr : *it;
 }
 
-SoundPtr Scene::getSoundByName(const string_t& /*name*/)
+SoundPtr Scene::getSoundByName(const std::string& /*name*/)
 {
   return nullptr;
 }
 
-SkeletonPtr Scene::getLastSkeletonByID(const string_t& id)
+SkeletonPtr Scene::getLastSkeletonByID(const std::string& id)
 {
   for (size_t index = skeletons.size() - 1;; --index) {
     if (skeletons[index]->id == id) {
@@ -3144,7 +3144,7 @@ SkeletonPtr Scene::getLastSkeletonByID(const string_t& id)
   return nullptr;
 }
 
-SkeletonPtr Scene::getSkeletonById(const string_t& id)
+SkeletonPtr Scene::getSkeletonById(const std::string& id)
 {
   auto it = std::find_if(
     skeletons.begin(), skeletons.end(),
@@ -3153,7 +3153,7 @@ SkeletonPtr Scene::getSkeletonById(const string_t& id)
   return (it == skeletons.end()) ? nullptr : *it;
 }
 
-SkeletonPtr Scene::getSkeletonByName(const string_t& name)
+SkeletonPtr Scene::getSkeletonByName(const std::string& name)
 {
   auto it = std::find_if(
     skeletons.begin(), skeletons.end(),
@@ -3179,7 +3179,7 @@ bool Scene::isActiveMesh(const AbstractMeshPtr& mesh)
          != _activeMeshes.end();
 }
 
-string_t Scene::get_uid() const
+std::string Scene::get_uid() const
 {
   return _uid;
 }
@@ -3318,7 +3318,7 @@ void Scene::_evaluateActiveMeshes()
   }
 
   // Meshes
-  vector_t<AbstractMeshPtr> _meshes;
+  std::vector<AbstractMeshPtr> _meshes;
   bool checkIsEnabled = true;
 
   // Determine mesh candidates
@@ -3434,7 +3434,7 @@ void Scene::_activeMesh(const AbstractMeshPtr& sourceMesh, AbstractMesh* mesh)
 
   if (mesh && !mesh->subMeshes.empty()) {
     // Submeshes Octrees
-    vector_t<SubMeshPtr> subMeshes;
+    std::vector<SubMeshPtr> subMeshes;
 
     if (mesh->_submeshesOctree && mesh->useOctreeForRenderingSelection) {
       // subMeshes = mesh->_submeshesOctree->select(_frustumPlanes);
@@ -4252,7 +4252,7 @@ void Scene::cleanCachedTextureBuffer()
       auto buffer = texture->_buffer;
 
       if (buffer) {
-        texture->_buffer = nullopt_t;
+        texture->_buffer = std::nullopt;
       }
     }
   }
@@ -4262,13 +4262,13 @@ void Scene::cleanCachedTextureBuffer()
 MinMax Scene::getWorldExtends(
   const std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate)
 {
-  Vector3 min(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
-              numeric_limits_t<float>::max());
-  Vector3 max(numeric_limits_t<float>::lowest(),
-              numeric_limits_t<float>::lowest(),
-              numeric_limits_t<float>::lowest());
+  Vector3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+              std::numeric_limits<float>::max());
+  Vector3 max(std::numeric_limits<float>::lowest(),
+              std::numeric_limits<float>::lowest(),
+              std::numeric_limits<float>::lowest());
 
-  vector_t<AbstractMeshPtr> filteredMeshes;
+  std::vector<AbstractMeshPtr> filteredMeshes;
   if (filterPredicate) {
     for (auto& mesh : meshes) {
       if (filterPredicate(mesh)) {
@@ -4409,12 +4409,12 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
   return *this;
 }
 
-nullable_t<PickingInfo> Scene::_internalPick(
+std::optional<PickingInfo> Scene::_internalPick(
   const std::function<Ray(Matrix& world)>& rayFunction,
   const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
   bool fastCheck)
 {
-  nullable_t<PickingInfo> pickingInfo = nullopt_t;
+  std::optional<PickingInfo> pickingInfo = std::nullopt;
 
   for (auto& mesh : meshes) {
     if (predicate) {
@@ -4434,7 +4434,7 @@ nullable_t<PickingInfo> Scene::_internalPick(
       continue;
     }
 
-    if (!fastCheck && pickingInfo != nullopt_t
+    if (!fastCheck && pickingInfo != std::nullopt
         && result.distance >= (*pickingInfo).distance) {
       continue;
     }
@@ -4449,11 +4449,11 @@ nullable_t<PickingInfo> Scene::_internalPick(
   return pickingInfo ? pickingInfo : PickingInfo();
 }
 
-vector_t<nullable_t<PickingInfo>> Scene::_internalMultiPick(
+std::vector<std::optional<PickingInfo>> Scene::_internalMultiPick(
   const std::function<Ray(Matrix& world)>& rayFunction,
   const std::function<bool(AbstractMesh* mesh)>& predicate)
 {
-  vector_t<nullable_t<PickingInfo>> pickingInfos;
+  std::vector<std::optional<PickingInfo>> pickingInfos;
 
   for (auto& mesh : meshes) {
     if (predicate) {
@@ -4479,15 +4479,15 @@ vector_t<nullable_t<PickingInfo>> Scene::_internalMultiPick(
   return pickingInfos;
 }
 
-nullable_t<PickingInfo> Scene::_internalPickSprites(
+std::optional<PickingInfo> Scene::_internalPickSprites(
   const Ray& ray, const std::function<bool(Sprite* sprite)>& predicate,
   bool fastCheck, CameraPtr camera)
 {
-  nullable_t<PickingInfo> pickingInfo = nullopt_t;
+  std::optional<PickingInfo> pickingInfo = std::nullopt;
 
   if (!camera) {
     if (!activeCamera) {
-      return nullopt_t;
+      return std::nullopt;
     }
     camera = activeCamera;
   }
@@ -4520,7 +4520,7 @@ nullable_t<PickingInfo> Scene::_internalPickSprites(
   return pickingInfo ? pickingInfo : PickingInfo();
 }
 
-nullable_t<PickingInfo>
+std::optional<PickingInfo>
 Scene::pick(int x, int y,
             const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
             bool fastCheck, const CameraPtr& camera)
@@ -4541,7 +4541,7 @@ Scene::pick(int x, int y,
   return result;
 }
 
-nullable_t<PickingInfo>
+std::optional<PickingInfo>
 Scene::pickSprite(int x, int y,
                   const std::function<bool(Sprite* sprite)>& predicate,
                   bool fastCheck, const CameraPtr& camera)
@@ -4551,7 +4551,7 @@ Scene::pickSprite(int x, int y,
   return _internalPickSprites(*_tempPickingRay, predicate, fastCheck, camera);
 }
 
-nullable_t<PickingInfo> Scene::pickWithRay(
+std::optional<PickingInfo> Scene::pickWithRay(
   const Ray& ray,
   const std::function<bool(const AbstractMeshPtr& mesh)>& predicate,
   bool fastCheck)
@@ -4581,7 +4581,7 @@ nullable_t<PickingInfo> Scene::pickWithRay(
   return result;
 }
 
-vector_t<nullable_t<PickingInfo>>
+std::vector<std::optional<PickingInfo>>
 Scene::multiPick(int x, int y,
                  const std::function<bool(AbstractMesh* mesh)>& predicate,
                  const CameraPtr& camera)
@@ -4593,7 +4593,7 @@ Scene::multiPick(int x, int y,
     predicate);
 }
 
-vector_t<nullable_t<PickingInfo>> Scene::multiPickWithRay(
+std::vector<std::optional<PickingInfo>> Scene::multiPickWithRay(
   const Ray& ray, const std::function<bool(AbstractMesh* mesh)>& predicate)
 {
   return _internalMultiPick(
@@ -4859,7 +4859,7 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
   return hdrSkybox;
 }
 
-unique_ptr_t<EnvironmentHelper>
+std::unique_ptr<EnvironmentHelper>
 Scene::createDefaultEnvironment(const IEnvironmentHelperOptions& options)
 {
   return std::make_unique<EnvironmentHelper>(options, this);
@@ -4867,29 +4867,29 @@ Scene::createDefaultEnvironment(const IEnvironmentHelperOptions& options)
 
 // Tags
 
-vector_t<string_t> Scene::_getByTags()
+std::vector<std::string> Scene::_getByTags()
 {
-  return vector_t<string_t>();
+  return std::vector<std::string>();
 }
 
-vector_t<Mesh*> Scene::getMeshesByTags()
+std::vector<Mesh*> Scene::getMeshesByTags()
 {
-  return vector_t<Mesh*>();
+  return std::vector<Mesh*>();
 }
 
-vector_t<Camera*> Scene::getCamerasByTags()
+std::vector<Camera*> Scene::getCamerasByTags()
 {
-  return vector_t<Camera*>();
+  return std::vector<Camera*>();
 }
 
-vector_t<Light*> Scene::getLightsByTags()
+std::vector<Light*> Scene::getLightsByTags()
 {
-  return vector_t<Light*>();
+  return std::vector<Light*>();
 }
 
-vector_t<Material*> Scene::getMaterialByTags()
+std::vector<Material*> Scene::getMaterialByTags()
 {
-  return vector_t<Material*>();
+  return std::vector<Material*>();
 }
 
 void Scene::setRenderingOrder(
@@ -4914,7 +4914,7 @@ void Scene::setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
     renderingGroupId, autoClearDepthStencil, depth, stencil);
 }
 
-nullable_t<IRenderingManagerAutoClearSetup>
+std::optional<IRenderingManagerAutoClearSetup>
 Scene::getAutoClearDepthStencilSetup(size_t index)
 {
   return _renderingManager->getAutoClearDepthStencilSetup(index);
@@ -4932,9 +4932,9 @@ void Scene::markAllMaterialsAsDirty(
 }
 
 IFileRequest
-Scene::_loadFile(const string_t& /*url*/,
-                 const std::function<void(Variant<string_t, ArrayBuffer>&,
-                                            const string_t&)>& /*onSuccess*/)
+Scene::_loadFile(const std::string& /*url*/,
+                 const std::function<void(Variant<std::string, ArrayBuffer>&,
+                                            const std::string&)>& /*onSuccess*/)
 {
   return IFileRequest();
 }

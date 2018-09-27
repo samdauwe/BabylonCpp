@@ -1,6 +1,7 @@
 #include <babylon/inspector/treetools/checkbox.h>
 
-#include <babylon/babylon_stl.h>
+#include <utility>
+
 #include <babylon/inspector/treetools/itool_visible.h>
 
 #include <imgui.h>

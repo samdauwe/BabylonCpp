@@ -1,8 +1,6 @@
 #ifndef BABYLON_INSPECTOR_ADAPTERS_LIGHT_ADAPTER_H
 #define BABYLON_INSPECTOR_ADAPTERS_LIGHT_ADAPTER_H
 
-#include <babylon/babylon_fwd.h>
-#include <babylon/babylon_stl.h>
 #include <babylon/inspector/adapters/adapter.h>
 #include <babylon/inspector/treetools/itool_visible.h>
 
@@ -10,6 +8,8 @@ namespace BABYLON {
 
 class HemisphericLight;
 class Light;
+using HemisphericLightPtr = std::shared_ptr<HemisphericLight>;
+using LightPtr            = std::shared_ptr<Light>;
 
 class LightAdapter : public Adapter, public IToolVisible {
 
@@ -20,22 +20,22 @@ public:
   /**
    * @brief Returns the name displayed in the tree.
    */
-  string_t id() override;
+  std::string id() override;
 
   /**
    * @brief Returns the type of this object - displayed in the tree.
    */
-  string_t type() override;
+  std::string type() override;
 
   /**
    * @brief Returns the list of properties to be displayed for this adapter.
    */
-  unique_ptr_t<PropertiesView>& getProperties() override;
+  std::unique_ptr<PropertiesView>& getProperties() override;
 
   /**
    * @brief Returns the list of tools available for this adapter.
    */
-  vector_t<AbstractTreeToolUPtr>& getTools() override;
+  std::vector<AbstractTreeToolUPtr>& getTools() override;
 
   void setVisible(bool b) override;
 
@@ -47,8 +47,8 @@ private:
 private:
   LightPtr _light;
   HemisphericLightPtr _hemispericLight;
-  unique_ptr_t<PropertiesView> _properties;
-  vector_t<unique_ptr_t<AbstractTreeTool>> _tools;
+  std::unique_ptr<PropertiesView> _properties;
+  std::vector<std::unique_ptr<AbstractTreeTool>> _tools;
 
 }; // end of class LightAdapter
 

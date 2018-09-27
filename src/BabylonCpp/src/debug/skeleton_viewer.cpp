@@ -84,7 +84,7 @@ void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone,
   position.z = tmat.m[14];
 }
 
-void SkeletonViewer::_getLinesForBonesWithLength(const vector_t<BonePtr>& bones,
+void SkeletonViewer::_getLinesForBonesWithLength(const std::vector<BonePtr>& bones,
                                                  const Matrix& meshMat)
 {
   _resizeDebugLines(bones.size());
@@ -102,7 +102,7 @@ void SkeletonViewer::_getLinesForBonesWithLength(const vector_t<BonePtr>& bones,
   }
 }
 
-void SkeletonViewer::_getLinesForBonesNoLength(const vector_t<BonePtr>& bones,
+void SkeletonViewer::_getLinesForBonesNoLength(const std::vector<BonePtr>& bones,
                                                const Matrix& /*meshMat*/)
 {
   _resizeDebugLines(bones.size());
@@ -129,7 +129,7 @@ void SkeletonViewer::_resizeDebugLines(size_t bonesSize)
   if (bonesSize > _debugLines.size()) {
     size_t sizeDiff = bonesSize - _debugLines.size();
     _debugLines.resize(bonesSize);
-    vector_t<Vector3> point{Vector3::Zero(), Vector3::Zero()};
+    std::vector<Vector3> point{Vector3::Zero(), Vector3::Zero()};
     for (size_t i = 0; i < sizeDiff; ++i) {
       _debugLines.emplace_back(point);
     }

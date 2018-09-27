@@ -1,5 +1,7 @@
 #include <babylon/math/angle.h>
 
+#include <cmath>
+
 #include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/math/vector2.h>
@@ -52,7 +54,7 @@ Angle Angle::copy() const
   return Angle(*this);
 }
 
-unique_ptr_t<Angle> Angle::clone() const
+std::unique_ptr<Angle> Angle::clone() const
 {
   return std::make_unique<Angle>(*this);
 }

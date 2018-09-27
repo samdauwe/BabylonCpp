@@ -32,10 +32,10 @@ BabylonFileLoader::~BabylonFileLoader()
 {
 }
 
-MaterialPtr BabylonFileLoader::parseMaterialById(const string_t& id,
+MaterialPtr BabylonFileLoader::parseMaterialById(const std::string& id,
                                                  const Json::value& parsedData,
                                                  Scene* scene,
-                                                 const string_t& rootUrl) const
+                                                 const std::string& rootUrl) const
 {
   for (const auto& parsedMaterial : Json::GetArray(parsedData, "materials")) {
     if (Json::GetString(parsedData, "id") == id) {
@@ -46,8 +46,8 @@ MaterialPtr BabylonFileLoader::parseMaterialById(const string_t& id,
 }
 
 bool BabylonFileLoader::isDescendantOf(const Json::value& mesh,
-                                       const vector_t<string_t>& names,
-                                       vector_t<string_t>& hierarchyIds) const
+                                       const std::vector<std::string>& names,
+                                       std::vector<std::string>& hierarchyIds) const
 {
   for (auto& name : names) {
     if (Json::GetString(mesh, "name") == name) {
@@ -63,12 +63,12 @@ bool BabylonFileLoader::isDescendantOf(const Json::value& mesh,
   return false;
 }
 
-string_t BabylonFileLoader::logOperation(const string_t& operation) const
+std::string BabylonFileLoader::logOperation(const std::string& operation) const
 {
   return operation + " of unknown";
 }
 
-string_t BabylonFileLoader::logOperation(const string_t& operation,
+std::string BabylonFileLoader::logOperation(const std::string& operation,
                                          const Json::value& producer) const
 {
   return operation + " of " + Json::GetString(producer, "file") + " from "
@@ -78,12 +78,12 @@ string_t BabylonFileLoader::logOperation(const string_t& operation,
 }
 
 bool BabylonFileLoader::importMesh(
-  const vector_t<string_t>& meshesNames, Scene* scene, const string_t& data,
-  const string_t& rootUrl, vector_t<AbstractMeshPtr>& meshes,
-  vector_t<IParticleSystemPtr>& particleSystems,
-  vector_t<SkeletonPtr>& skeletons,
-  const std::function<void(const string_t& message,
-                             const string_t& exception)>& onError) const
+  const std::vector<std::string>& meshesNames, Scene* scene, const std::string& data,
+  const std::string& rootUrl, std::vector<AbstractMeshPtr>& meshes,
+  std::vector<IParticleSystemPtr>& particleSystems,
+  std::vector<SkeletonPtr>& skeletons,
+  const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError) const
 {
   // Entire method running in try block, so ALWAYS logs as far as it got, only
   // actually writes details when SceneLoader.debugLogging = true (default), or
@@ -95,10 +95,10 @@ bool BabylonFileLoader::importMesh(
     const auto _log = log.str();
     if (!_log.empty()
         && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING()) {
-      string_t msg = parsedData.contains("producer") ?
+      std::string msg = parsedData.contains("producer") ?
                        logOperation("importMesh", parsedData.get("producer")) :
                        logOperation("importMesh");
-      string_t logStr
+      std::string logStr
         = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING() ? _log :
                                                                           "";
       BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(),
@@ -110,7 +110,7 @@ bool BabylonFileLoader::importMesh(
   log << "importMesh has failed JSON parse";
   Json::value parsedData;
   try {
-    string_t err = Json::Parse(parsedData, data);
+    std::string err = Json::Parse(parsedData, data);
     if (!err.empty()) {
       BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", log.str().c_str());
       return false;
@@ -122,16 +122,16 @@ bool BabylonFileLoader::importMesh(
     bool fullDetails
       = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING();
 
-    vector_t<string_t> loadedSkeletonsIds;
-    vector_t<string_t> loadedMaterialsIds;
-    vector_t<string_t> hierarchyIds;
+    std::vector<std::string> loadedSkeletonsIds;
+    std::vector<std::string> loadedMaterialsIds;
+    std::vector<std::string> hierarchyIds;
 
     for (auto& parsedMesh : Json::GetArray(parsedData, "meshes")) {
       if (meshesNames.empty()
           || isDescendantOf(parsedMesh, meshesNames, hierarchyIds)) {
 
         // Id
-        const string_t parsedMeshId = Json::GetString(parsedMesh, "id", "");
+        const std::string parsedMeshId = Json::GetString(parsedMesh, "id", "");
 
         // Geometry ?
         if (parsedMesh.contains("geometryId")) {
@@ -142,7 +142,7 @@ bool BabylonFileLoader::importMesh(
             auto& geometries = parsedData.get("geometries");
             // find the correct geometry and add it to the scene
             bool found = false;
-            const array_t<string_t, 8> geometryTypes{
+            const std::array<std::string, 8> geometryTypes{
               {"boxes", "spheres", "cylinders", "toruses", "grounds", "planes",
                "torusKnots", "vertexData"}};
             for (const auto& geometryType : geometryTypes) {
@@ -153,7 +153,7 @@ bool BabylonFileLoader::importMesh(
               else {
                 for (const auto& parsedGeometryData :
                      Json::GetArray(geometries, geometryType)) {
-                  const string_t parsedGeometryDataId
+                  const std::string parsedGeometryDataId
                     = Json::GetString(parsedGeometryData, "id");
                   if (!parsedGeometryDataId.empty()
                       && (parsedGeometryDataId == parsedMeshGeometryId)) {
@@ -196,7 +196,7 @@ bool BabylonFileLoader::importMesh(
 
         // Material ?
         if (parsedMesh.contains("materialId")) {
-          const string_t parsedMeshMaterialId
+          const std::string parsedMeshMaterialId
             = Json::GetString(parsedMesh, "materialId");
           bool materialFound
             = stl_util::contains(loadedMaterialsIds, parsedMeshMaterialId);
@@ -205,7 +205,7 @@ bool BabylonFileLoader::importMesh(
               && parsedData.get("multiMaterials").is<Json::array>()) {
             for (const auto& parsedMultiMaterial :
                  Json::GetArray(parsedData, "multiMaterials")) {
-              const string_t parsedMultiMaterialId
+              const std::string parsedMultiMaterialId
                 = Json::GetString(parsedMultiMaterial, "id", "");
               if ((!parsedMultiMaterialId.empty())
                   && (parsedMultiMaterialId == parsedMeshMaterialId)) {
@@ -213,8 +213,8 @@ bool BabylonFileLoader::importMesh(
                     && parsedMultiMaterial.get("materials").is<Json::array>()) {
                   for (const auto& subMatId :
                        Json::GetArray(parsedMultiMaterial, "materials")) {
-                    loadedMaterialsIds.emplace_back(subMatId.get<string_t>());
-                    auto mat = parseMaterialById(subMatId.get<string_t>(),
+                    loadedMaterialsIds.emplace_back(subMatId.get<std::string>());
+                    auto mat = parseMaterialById(subMatId.get<std::string>(),
                                                  parsedData, scene, rootUrl);
                     log << "\n\tMaterial " << mat->toString(fullDetails);
                   }
@@ -246,7 +246,7 @@ bool BabylonFileLoader::importMesh(
 
         // Skeleton ?
         if (parsedMesh.contains("skeletonId")) {
-          const string_t parsedMeshSkeletonId
+          const std::string parsedMeshSkeletonId
             = Json::GetString(parsedMesh, "skeletonId");
           bool skeletonAlreadyLoaded
             = stl_util::contains(loadedSkeletonsIds, parsedMeshSkeletonId);
@@ -255,7 +255,7 @@ bool BabylonFileLoader::importMesh(
               && parsedData.get("skeletons").is<Json::array>()) {
             for (const auto& parsedSkeleton :
                  Json::GetArray(parsedData, "skeletons")) {
-              const string_t parsedSkeletonId
+              const std::string parsedSkeletonId
                 = Json::GetString(parsedSkeleton, "id", "");
               if ((!parsedSkeletonId.empty())
                   && (parsedSkeletonId == parsedMeshSkeletonId)) {
@@ -308,7 +308,7 @@ bool BabylonFileLoader::importMesh(
         && parsedData.get("particleSystems").is<Json::array>()) {
       for (const auto& parsedParticleSystem :
            Json::GetArray(parsedData, "particleSystems")) {
-        const string_t parsedParticleSystemEmitterId
+        const std::string parsedParticleSystemEmitterId
           = Json::GetString(parsedParticleSystem, "emitterId");
         if (!parsedParticleSystemEmitterId.empty()
             && stl_util::contains(hierarchyIds,
@@ -324,7 +324,7 @@ bool BabylonFileLoader::importMesh(
     return true;
   }
   catch (const std::exception& ex) {
-    string_t msg = parsedData.contains("producer") ?
+    std::string msg = parsedData.contains("producer") ?
                      logOperation("importMesh", parsedData.get("producer")) :
                      logOperation("importMesh");
     msg += log.str();
@@ -344,14 +344,14 @@ bool BabylonFileLoader::importMesh(
 }
 
 bool BabylonFileLoader::load(
-  Scene* scene, const string_t& data, const string_t& rootUrl,
-  const std::function<void(const string_t& message,
-                             const string_t& exception)>& /*onError*/) const
+  Scene* scene, const std::string& data, const std::string& rootUrl,
+  const std::function<void(const std::string& message,
+                             const std::string& exception)>& /*onError*/) const
 {
   Json::value parsedData;
-  string_t err = Json::Parse(parsedData, data.c_str());
+  std::string err = Json::Parse(parsedData, data.c_str());
   if (!err.empty()) {
-    string_t log = "importScene has failed JSON parse";
+    std::string log = "importScene has failed JSON parse";
     BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", log.c_str());
     return false;
   }
@@ -604,10 +604,10 @@ bool BabylonFileLoader::load(
   const auto _log = log.str();
   if (!_log.empty()
       && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING()) {
-    string_t msg = parsedData.contains("producer") ?
+    std::string msg = parsedData.contains("producer") ?
                      logOperation("importScene", parsedData.get("producer")) :
                      logOperation("importScene");
-    string_t logStr
+    std::string logStr
       = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING() ? _log :
                                                                         "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());

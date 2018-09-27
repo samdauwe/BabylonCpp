@@ -17,14 +17,14 @@ bool DirectionalLight::NodeConstructorAdded = false;
 void DirectionalLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "Light_Type_1", [](const string_t& name, Scene* scene,
-                       const nullable_t<Json::value>& /*options*/) {
+    "Light_Type_1", [](const std::string& name, Scene* scene,
+                       const std::optional<Json::value>& /*options*/) {
       return DirectionalLight::New(name, Vector3::Zero(), scene);
     });
   DirectionalLight::NodeConstructorAdded = true;
 }
 
-DirectionalLight::DirectionalLight(const string_t& iName,
+DirectionalLight::DirectionalLight(const std::string& iName,
                                    const Vector3& iDirection, Scene* scene)
     : ShadowLight{iName, scene}
     , shadowFrustumSize{this, &DirectionalLight::get_shadowFrustumSize,
@@ -34,10 +34,10 @@ DirectionalLight::DirectionalLight(const string_t& iName,
     , autoUpdateExtends{true}
     , _shadowFrustumSize{0.f}
     , _shadowOrthoScale{0.1f}
-    , _orthoLeft{numeric_limits_t<float>::max()}
-    , _orthoRight{numeric_limits_t<float>::min()}
-    , _orthoTop{numeric_limits_t<float>::min()}
-    , _orthoBottom{numeric_limits_t<float>::max()}
+    , _orthoLeft{std::numeric_limits<float>::max()}
+    , _orthoRight{std::numeric_limits<float>::min()}
+    , _orthoTop{std::numeric_limits<float>::min()}
+    , _orthoBottom{std::numeric_limits<float>::max()}
 {
   position  = iDirection.scale(-1.f);
   direction = iDirection;
@@ -52,7 +52,7 @@ IReflect::Type DirectionalLight::type() const
   return IReflect::Type::DIRECTIONALLIGHT;
 }
 
-const string_t DirectionalLight::getClassName() const
+const std::string DirectionalLight::getClassName() const
 {
   return "DirectionalLight";
 }
@@ -86,7 +86,7 @@ void DirectionalLight::set_shadowOrthoScale(float value)
 
 void DirectionalLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
-  const vector_t<AbstractMeshPtr>& renderList)
+  const std::vector<AbstractMeshPtr>& renderList)
 {
   if (shadowFrustumSize() > 0.f) {
     _setDefaultFixedFrustumShadowProjectionMatrix(matrix, viewMatrix);
@@ -113,7 +113,7 @@ void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
 
 void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
-  const vector_t<AbstractMeshPtr>& renderList)
+  const std::vector<AbstractMeshPtr>& renderList)
 {
   auto& activeCamera = getScene()->activeCamera;
 
@@ -123,13 +123,13 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
 
   // Check extends
   if (autoUpdateExtends
-      || stl_util::almost_equal(_orthoLeft, numeric_limits_t<float>::max())) {
+      || stl_util::almost_equal(_orthoLeft, std::numeric_limits<float>::max())) {
     auto tempVector3 = Vector3::Zero();
 
-    _orthoLeft   = numeric_limits_t<float>::max();
-    _orthoRight  = numeric_limits_t<float>::min();
-    _orthoTop    = numeric_limits_t<float>::min();
-    _orthoBottom = numeric_limits_t<float>::max();
+    _orthoLeft   = std::numeric_limits<float>::max();
+    _orthoRight  = std::numeric_limits<float>::min();
+    _orthoTop    = std::numeric_limits<float>::min();
+    _orthoBottom = std::numeric_limits<float>::max();
 
     // Check extends
     for (const auto& mesh : renderList) {
@@ -183,7 +183,7 @@ void DirectionalLight::_buildUniformLayout()
 }
 
 void DirectionalLight::transferToEffect(Effect* /*effect*/,
-                                        const string_t& lightIndex)
+                                        const std::string& lightIndex)
 {
   if (computeTransformedInformation()) {
     _uniformBuffer->updateFloat4("vLightData", transformedDirection().x,

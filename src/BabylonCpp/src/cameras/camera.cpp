@@ -27,7 +27,7 @@ namespace BABYLON {
 bool Camera::ForceAttachControlToAlwaysPreventDefault = false;
 bool Camera::UseAlternateWebVRRendering               = false;
 
-Camera::Camera(const string_t& iName, const Vector3& iPosition, Scene* scene,
+Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
                bool setActiveOnSceneIfNoneActive)
     : Node(iName, scene)
     , position{iPosition}
@@ -110,7 +110,7 @@ bool Camera::restoreState()
   return false;
 }
 
-string_t Camera::toString(bool fullDetails) const
+std::string Camera::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name;
@@ -131,7 +131,7 @@ Vector3& Camera::get_globalPosition()
   return _globalPosition;
 }
 
-vector_t<AbstractMeshPtr>& Camera::getActiveMeshes()
+std::vector<AbstractMeshPtr>& Camera::getActiveMeshes()
 {
   return _activeMeshes;
 }
@@ -160,11 +160,11 @@ void Camera::_initCache()
   Node::_initCache();
 
   _cache.position
-    = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
-              numeric_limits_t<float>::max());
+    = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+              std::numeric_limits<float>::max());
   _cache.upVector
-    = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
-              numeric_limits_t<float>::max());
+    = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+              std::numeric_limits<float>::max());
 
   _cache.mode = 0;
   _cache.minZ = 0.f;
@@ -259,12 +259,12 @@ void Camera::_checkInputs()
   onAfterCheckInputsObservable.notifyObservers(this);
 }
 
-vector_t<CameraPtr>& Camera::rigCameras()
+std::vector<CameraPtr>& Camera::rigCameras()
 {
   return _rigCameras;
 }
 
-const vector_t<CameraPtr>& Camera::rigCameras() const
+const std::vector<CameraPtr>& Camera::rigCameras() const
 {
   return _rigCameras;
 }
@@ -665,7 +665,7 @@ Matrix& Camera::_getWebVRViewMatrix()
   return _webvrViewMatrix;
 }
 
-void Camera::setCameraRigParameter(const string_t& _name, float value)
+void Camera::setCameraRigParameter(const std::string& _name, float value)
 {
   _cameraRigParams.params[_name] = value;
   // provisionnally:
@@ -678,7 +678,7 @@ void Camera::setCameraRigParameter(const string_t& _name, float value)
  * May needs to be overridden by children so sub has required properties
  * to be copied
  */
-CameraPtr Camera::createRigCamera(const string_t& /*name*/, int /*cameraIndex*/)
+CameraPtr Camera::createRigCamera(const std::string& /*name*/, int /*cameraIndex*/)
 {
   return nullptr;
 }
@@ -709,12 +709,12 @@ Json::object Camera::serialize() const
   return Json::object();
 }
 
-const string_t Camera::getClassName() const
+const std::string Camera::getClassName() const
 {
   return "Camera";
 }
 
-Camera* Camera::clone(const string_t& /*name*/)
+Camera* Camera::clone(const std::string& /*name*/)
 {
   return nullptr;
 }
@@ -738,8 +738,8 @@ Matrix& Camera::computeWorldMatrix(bool /*force*/)
   return *getWorldMatrix();
 }
 
-CameraPtr Camera::GetConstructorFromName(const string_t& type,
-                                         const string_t& name, Scene* scene,
+CameraPtr Camera::GetConstructorFromName(const std::string& type,
+                                         const std::string& name, Scene* scene,
                                          float interaxial_distance,
                                          bool isStereoscopicSideBySide)
 {

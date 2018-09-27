@@ -201,7 +201,7 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
    * @param f An instance of an array.
    * @return A new SIMD data type.
    */
-  static inline float32x4_t load(const array_t<float, 4>& f)
+  static inline float32x4_t load(const std::array<float, 4>& f)
   {
     const float ALIGN_16 data[4] = {f[0], f[1], f[2], f[3]};
     return _mm_load_ps(data);
@@ -214,7 +214,7 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
    * @param i A number for the index from where to start loading in the array.
    * @return A new SIMD data type.
    */
-  static inline float32x4_t load(const array_t<float, 16>& m, unsigned int i)
+  static inline float32x4_t load(const std::array<float, 16>& m, unsigned int i)
   {
     const float ALIGN_16 f[4] = {m[i], m[i + 1], m[i + 2], m[i + 3]};
     return _mm_load_ps(f);
@@ -225,7 +225,7 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
    * @param dest An instance of an array.
    * @param src An instance of a SIMD data type to store into the array.
    */
-  static inline void store(array_t<float, 4>& dest, float32x4_t src)
+  static inline void store(std::array<float, 4>& dest, float32x4_t src)
   {
     _mm_store_ps(dest.data(), src);
   }
@@ -236,7 +236,7 @@ struct BABYLON_SHARED_EXPORT Float32x4 {
    * @param i A number for the index from where to start storing in the array.
    * @param src An instance of a SIMD data type to store into the array.
    */
-  static inline void store(array_t<float, 16>& dest, unsigned int i,
+  static inline void store(std::array<float, 16>& dest, unsigned int i,
                            float32x4_t src)
   {
     float p[4] = {0.f, 0.f, 0.f, 0.f};

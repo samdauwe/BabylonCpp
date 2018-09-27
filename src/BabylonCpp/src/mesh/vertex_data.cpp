@@ -444,20 +444,20 @@ Json::object VertexData::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<VertexData>
+std::unique_ptr<VertexData>
 VertexData::ExtractFromMesh(Mesh* mesh, bool copyWhenShared, bool forceCopy)
 {
   return VertexData::_ExtractFrom(mesh, copyWhenShared, forceCopy);
 }
 
-unique_ptr_t<VertexData> VertexData::ExtractFromGeometry(Geometry* geometry,
+std::unique_ptr<VertexData> VertexData::ExtractFromGeometry(Geometry* geometry,
                                                          bool copyWhenShared,
                                                          bool forceCopy)
 {
   return VertexData::_ExtractFrom(geometry, copyWhenShared, forceCopy);
 }
 
-unique_ptr_t<VertexData>
+std::unique_ptr<VertexData>
 VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
                          bool copyWhenShared, bool forceCopy)
 {
@@ -542,7 +542,7 @@ VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
   return result;
 }
 
-unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 {
   auto& pathArray             = options.pathArray();
   const auto offset           = options.offset();
@@ -560,10 +560,10 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 
   // us[path_id] = [uDist1, uDist2, uDist3 ... ] distances between points on
   // path path_id
-  vector_t<Float32Array> us;
+  std::vector<Float32Array> us;
   // vs[i] = [vDist1, vDist2, vDist3, ... ] distances between points i of
   // consecutives paths from pathArray
-  vector_t<Float32Array> vs;
+  std::vector<Float32Array> vs;
   // uTotalDistance[p] : total distance of path p
   Float32Array uTotalDistance;
   //  vTotalDistance[i] : total distance between points i of first and last path
@@ -585,8 +585,8 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 
   // if single path in pathArray
   if (pathArray.size() < 2) {
-    vector_t<Vector3> ar1;
-    vector_t<Vector3> ar2;
+    std::vector<Vector3> ar1;
+    std::vector<Vector3> ar2;
     for (i = 0; i < pathArray[0].size() - offset; ++i) {
       ar1.emplace_back(pathArray[0][i]);
       ar2.emplace_back(pathArray[0][i + offset]);
@@ -598,7 +598,7 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   size_t idc = 0;
   // the final index will be +1 if closePath
   size_t closePathCorr = (closePath) ? 1 : 0;
-  vector_t<Vector3> path;
+  std::vector<Vector3> path;
   size_t l;
   minlg = pathArray[0].size();
   float vectlg;
@@ -637,10 +637,10 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   }
 
   // vertical distances (v)
-  vector_t<Vector3> path1;
-  vector_t<Vector3> path2;
-  nullable_t<Vector3> vertex1 = nullopt_t;
-  nullable_t<Vector3> vertex2 = nullopt_t;
+  std::vector<Vector3> path1;
+  std::vector<Vector3> path2;
+  std::optional<Vector3> vertex1 = std::nullopt;
+  std::optional<Vector3> vertex2 = std::nullopt;
   for (i = 0, ul = minlg + closePathCorr; i < ul; ++i) {
     vTotalDistance.emplace_back(0.f);
     vs.emplace_back(0);
@@ -793,9 +793,9 @@ unique_ptr_t<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreateBox(BoxOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 {
-  vector_t<Vector3> normalsSource = {
+  std::vector<Vector3> normalsSource = {
     Vector3(0.f, 0.f, 1.f),  //
     Vector3(0.f, 0.f, -1.f), //
     Vector3(1.f, 0.f, 0.f),  //
@@ -898,7 +898,7 @@ unique_ptr_t<VertexData> VertexData::CreateBox(BoxOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreateSphere(SphereOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 {
   const auto& segments        = options.segments;
   const auto& diameterX       = options.diameterX;
@@ -977,7 +977,7 @@ unique_ptr_t<VertexData> VertexData::CreateSphere(SphereOptions& options)
 }
 
 // Cylinder and cone
-unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 {
   const auto& height          = options.height;
   const auto& diameterTop     = options.diameterTop;
@@ -1179,7 +1179,7 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     Vector3 circleVector;
     Vector2 textureCoordinate;
     Vector4 u            = (isTop) ? faceUV[surfaceNb - 1] : faceUV[0];
-    nullable_t<Color4> c = nullopt_t;
+    std::optional<Color4> c = std::nullopt;
     if (!faceColors.empty()) {
       c = (isTop) ? faceColors[surfaceNb - 1] : faceColors[0];
     }
@@ -1250,7 +1250,7 @@ unique_ptr_t<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreateTorus(TorusOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -1325,7 +1325,7 @@ unique_ptr_t<VertexData> VertexData::CreateTorus(TorusOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData>
+std::unique_ptr<VertexData>
 VertexData::CreateLineSystem(LineSystemOptions& options)
 {
   Uint32Array indices;
@@ -1367,7 +1367,7 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData>
+std::unique_ptr<VertexData>
 VertexData::CreateDashedLines(DashedLinesOptions& options)
 {
   const auto& dashSize = options.dashSize;
@@ -1418,7 +1418,7 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreateGround(GroundOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateGround(GroundOptions& options)
 {
   IndicesArray indices;
   Float32Array positions;
@@ -1479,7 +1479,7 @@ unique_ptr_t<VertexData> VertexData::CreateGround(GroundOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData>
+std::unique_ptr<VertexData>
 VertexData::CreateTiledGround(TiledGroundOptions& options)
 {
   const auto& xmin = options.xmin;
@@ -1516,7 +1516,7 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
         unsigned int rowLength = precision_w + 1;
         for (row = 0; row < precision_h; ++row) {
           for (col = 0; col < precision_w; ++col) {
-            array_t<unsigned int, 4> square
+            std::array<unsigned int, 4> square
               = {{base + col + row * rowLength,             //
                   base + (col + 1) + row * rowLength,       //
                   base + (col + 1) + (row + 1) * rowLength, //
@@ -1576,7 +1576,7 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData>
+std::unique_ptr<VertexData>
 VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
 {
   Uint32Array indices;
@@ -1658,7 +1658,7 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreatePlane(PlaneOptions& options)
+std::unique_ptr<VertexData> VertexData::CreatePlane(PlaneOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -1709,7 +1709,7 @@ unique_ptr_t<VertexData> VertexData::CreatePlane(PlaneOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreateDisc(DiscOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
 {
   Float32Array positions;
   Uint32Array indices;
@@ -1763,9 +1763,9 @@ unique_ptr_t<VertexData> VertexData::CreateDisc(DiscOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreatePolygon(
-  Mesh* polygon, unsigned int sideOrientation, const vector_t<Vector4>& fUV,
-  const vector_t<Color4>& fColors, Vector4& frontUVs, Vector4& backUVs)
+std::unique_ptr<VertexData> VertexData::CreatePolygon(
+  Mesh* polygon, unsigned int sideOrientation, const std::vector<Vector4>& fUV,
+  const std::vector<Color4>& fColors, Vector4& frontUVs, Vector4& backUVs)
 {
   auto faceUV     = fUV;
   auto faceColors = fColors;
@@ -1837,7 +1837,7 @@ unique_ptr_t<VertexData> VertexData::CreatePolygon(
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
 {
   const auto& sideOrientation = options.sideOrientation;
   const auto& radius          = options.radius;
@@ -1851,14 +1851,14 @@ unique_ptr_t<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
   const float t = (1.f + std::sqrt(5.f)) / 2.f;
 
   // 12 vertex x,y,z
-  const array_t<float, 36> ico_vertices = {{
+  const std::array<float, 36> ico_vertices = {{
     -1.f, t,    -0.f, 1.f, t,   0.f,  -1.f, -t,   0.f, 1.f, -t,  0.f, // v0-3
     0.f,  -1.f, -t,   0.f, 1.f, -t,   0.f,  -1.f, t,   0.f, 1.f, t,   // v4-7
     t,    0.f,  1.f,  t,   0.f, -1.f, -t,   0.f,  1.f, -t,  0.f, -1.f // v8-11
   }};
 
   // index of 3 vertex makes a face of icopshere
-  const array_t<unsigned int, 60> ico_indices = {{
+  const std::array<unsigned int, 60> ico_indices = {{
     0,  11, 5,  0,  5,  1,  0,  1,  7,  0,  7,  10, 12, 22, 23, //
     1,  5,  20, 5,  11, 4,  23, 22, 13, 22, 18, 6,  7,  1,  8,  //
     14, 21, 4,  14, 4,  2,  16, 13, 6,  15, 6,  19, 3,  8,  9,  //
@@ -1866,7 +1866,7 @@ unique_ptr_t<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
   }};
 
   // vertex for uv have aliased position, not for UV
-  const array_t<unsigned int, 24> vertices_unalias_id = {{
+  const std::array<unsigned int, 24> vertices_unalias_id = {{
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
     // vertex alias
     0,  // 12: 0 + 12
@@ -1884,7 +1884,7 @@ unique_ptr_t<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
   }};
 
   // uv as integer step (not pixels !)
-  const array_t<float, 48> ico_vertexuv = {{
+  const std::array<float, 48> ico_vertexuv = {{
     5, 1, 3, 1, 6, 4, 0, 0, // v0-3
     5, 3, 4, 2, 2, 2, 4, 0, // v4-7
     2, 0, 1, 1, 6, 0, 6, 2, // v8-11
@@ -1954,7 +1954,7 @@ unique_ptr_t<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
   const float island_v_offset = +20.f / 1024.f;
   // face is either island 0 or 1 :
   // second island is for faces : [4, 7, 8, 12, 13, 16, 17, 18]
-  array_t<float, 20> island = {{
+  std::array<float, 20> island = {{
     0, 0, 0, 0, 1, //  0 - 4
     0, 0, 1, 1, 0, //  5 - 9
     0, 0, 1, 1, 0, //  10 - 14
@@ -1969,8 +1969,8 @@ unique_ptr_t<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
   unsigned int current_indice = 0;
   // prepare array of 3 vector (empty) (to be worked in place, shared for each
   // face)
-  array_t<Vector3, 3> face_vertex_pos;
-  array_t<Vector2, 3> face_vertex_uv;
+  std::array<Vector3, 3> face_vertex_pos;
+  std::array<Vector2, 3> face_vertex_uv;
   unsigned int v012;
   for (v012 = 0; v012 < 3; ++v012) {
     face_vertex_pos[v012] = Vector3::Zero();
@@ -2132,7 +2132,7 @@ unique_ptr_t<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData>
+std::unique_ptr<VertexData>
 VertexData::CreatePolyhedron(PolyhedronOptions& options)
 {
   // inspired from // http://stemkoski.github.io/Three.js/Polyhedra.html
@@ -2153,7 +2153,7 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   // 12 : Elongated Square Dipyramid (J15),
   // 13 : Elongated Pentagonal Dipyramid (J16),
   // 14 : Elongated Pentagonal Cupola (J20)
-  vector_t<vector_t<Float32Array>> polyhedraVertices = {
+  std::vector<std::vector<Float32Array>> polyhedraVertices = {
     // polyhedra[0].vertex
     {{0.f, 0.f, 1.732051f},
      {1.632993f, 0.f, -0.5773503f},
@@ -2321,7 +2321,7 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
      {0.641224f, 0.109523f, 0.783723f},   {0.737185f, -0.451155f, 0.538891f},
      {0.848705f, -0.612742f, -0.314616f}, {0.976075f, 0.365067f, 0.32976f},
      {1.072036f, -0.19561f, 0.084927f}}};
-  vector_t<vector_t<Uint32Array>> polyhedraFaces
+  std::vector<std::vector<Uint32Array>> polyhedraFaces
     = {// polyhedra[0].face
        {{0, 1, 2}, {0, 2, 3}, {0, 3, 1}, {1, 3, 2}},
        // polyhedra[1].face
@@ -2464,8 +2464,8 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   float u, v, ang, x, y, tmp;
 
   // default face colors and UV if undefined
-  vector_t<Color4> faceColors;
-  vector_t<Vector4> faceUV;
+  std::vector<Color4> faceColors;
+  std::vector<Vector4> faceUV;
   if (flat) {
     for (f = 1; f <= nbfaces; ++f) {
       if (f > faceColors.size()) {
@@ -2543,7 +2543,7 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   return vertexData;
 }
 
-unique_ptr_t<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
+std::unique_ptr<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -2652,7 +2652,7 @@ unique_ptr_t<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
 void VertexData::ComputeNormals(const Float32Array& positions,
                                 const Uint32Array& indices,
                                 Float32Array& normals,
-                                nullable_t<FacetParameters> options)
+                                std::optional<FacetParameters> options)
 {
   if (normals.size() < positions.size()) {
     normals.resize(positions.size());
@@ -2685,8 +2685,8 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   bool computeDepthSort          = false;
   float faceNormalSign           = 1.f;
   float ratio                    = 0.f;
-  nullable_t<Vector3> distanceTo = nullopt_t;
-  vector_t<DepthSortedFacet> depthSortedFacets;
+  std::optional<Vector3> distanceTo = std::nullopt;
+  std::vector<DepthSortedFacet> depthSortedFacets;
   if (options) {
     computeFacetNormals   = (!options->facetNormals.empty()) ? true : false;
     computeFacetPositions = (!options->facetPositions.empty()) ? true : false;
@@ -2833,7 +2833,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
       block_idx_v3 = b3x + options->subDiv.max * b3y + subSq * b3z;
       block_idx_o  = ox + options->subDiv.max * oy + subSq * oz;
 
-      const array_t<unsigned int, 4> block_idxs{
+      const std::array<unsigned int, 4> block_idxs{
         {block_idx_o, block_idx_v1, block_idx_v2, block_idx_v3}};
       for (auto& block_idx : block_idxs) {
         // Check if facetPartitioning needs to be resized

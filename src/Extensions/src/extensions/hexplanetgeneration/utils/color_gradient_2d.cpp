@@ -1,5 +1,7 @@
 #include <babylon/extensions/hexplanetgeneration/utils/color_gradient_2d.h>
 
+#include <cmath>
+
 #include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {

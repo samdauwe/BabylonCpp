@@ -60,12 +60,12 @@ void RenderingGroup::set_opaqueSortCompareFn(
 {
   _opaqueSortCompareFn = value;
   if (value) {
-    _renderOpaque = [this](const vector_t<SubMeshPtr>& subMeshes) {
+    _renderOpaque = [this](const std::vector<SubMeshPtr>& subMeshes) {
       renderOpaqueSorted(subMeshes);
     };
   }
   else {
-    _renderOpaque = [](const vector_t<SubMeshPtr>& subMeshes) {
+    _renderOpaque = [](const std::vector<SubMeshPtr>& subMeshes) {
       RenderingGroup::renderUnsorted(subMeshes);
     };
   }
@@ -76,12 +76,12 @@ void RenderingGroup::set_alphaTestSortCompareFn(
 {
   _alphaTestSortCompareFn = value;
   if (value) {
-    _renderAlphaTest = [this](const vector_t<SubMeshPtr>& subMeshes) {
+    _renderAlphaTest = [this](const std::vector<SubMeshPtr>& subMeshes) {
       renderAlphaTestSorted(subMeshes);
     };
   }
   else {
-    _renderAlphaTest = [](const vector_t<SubMeshPtr>& subMeshes) {
+    _renderAlphaTest = [](const std::vector<SubMeshPtr>& subMeshes) {
       RenderingGroup::renderUnsorted(subMeshes);
     };
   }
@@ -98,20 +98,20 @@ void RenderingGroup::set_transparentSortCompareFn(
       return RenderingGroup::defaultTransparentSortCompare(a, b);
     };
   }
-  _renderTransparent = [this](const vector_t<SubMeshPtr>& subMeshes) {
+  _renderTransparent = [this](const std::vector<SubMeshPtr>& subMeshes) {
     renderTransparentSorted(subMeshes);
   };
 }
 
 void RenderingGroup::render(
-  std::function<void(const vector_t<SubMeshPtr>& opaqueSubMeshes,
-                       const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-                       const vector_t<SubMeshPtr>& transparentSubMeshes,
-                       const vector_t<SubMeshPtr>& depthOnlySubMeshes,
+  std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
+                       const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+                       const std::vector<SubMeshPtr>& transparentSubMeshes,
+                       const std::vector<SubMeshPtr>& depthOnlySubMeshes,
                        const std::function<void()>& beforeTransparents)>&
     customRenderFunction,
   bool renderSprites, bool renderParticles,
-  const vector_t<AbstractMeshPtr>& activeMeshes)
+  const std::vector<AbstractMeshPtr>& activeMeshes)
 {
   if (customRenderFunction) {
     customRenderFunction(_opaqueSubMeshes, _alphaTestSubMeshes,
@@ -177,28 +177,28 @@ void RenderingGroup::render(
   engine->setStencilBuffer(stencilState);
 }
 
-void RenderingGroup::renderOpaqueSorted(const vector_t<SubMeshPtr>& subMeshes)
+void RenderingGroup::renderOpaqueSorted(const std::vector<SubMeshPtr>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _opaqueSortCompareFn,
                                       _scene->activeCamera, false);
 }
 
 void RenderingGroup::renderAlphaTestSorted(
-  const vector_t<SubMeshPtr>& subMeshes)
+  const std::vector<SubMeshPtr>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _alphaTestSortCompareFn,
                                       _scene->activeCamera, false);
 }
 
 void RenderingGroup::renderTransparentSorted(
-  const vector_t<SubMeshPtr>& subMeshes)
+  const std::vector<SubMeshPtr>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _transparentSortCompareFn,
                                       _scene->activeCamera, true);
 }
 
 void RenderingGroup::renderSorted(
-  const vector_t<SubMeshPtr>& subMeshes,
+  const std::vector<SubMeshPtr>& subMeshes,
   const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
     sortCompareFn,
   const CameraPtr& camera, bool transparent)
@@ -239,7 +239,7 @@ void RenderingGroup::renderSorted(
   }
 }
 
-void RenderingGroup::renderUnsorted(const vector_t<SubMeshPtr>& subMeshes)
+void RenderingGroup::renderUnsorted(const std::vector<SubMeshPtr>& subMeshes)
 {
   for (auto& subMesh : subMeshes) {
     subMesh->render(false);
@@ -358,7 +358,7 @@ void RenderingGroup::dispatchParticles(IParticleSystem* particleSystem)
 }
 
 void RenderingGroup::_renderParticles(
-  const vector_t<AbstractMeshPtr>& activeMeshes)
+  const std::vector<AbstractMeshPtr>& activeMeshes)
 {
   if (_particleSystems.empty()) {
     return;

@@ -14,7 +14,7 @@
 
 namespace BABYLON {
 
-Layer::Layer(const string_t& name, const string_t& imgUrl, Scene* scene,
+Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
              bool iIsBackground, const Color4& iColor)
     : isBackground{iIsBackground}
     , color{iColor}

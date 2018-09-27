@@ -1,6 +1,7 @@
 #include <babylon/inspector/treetools/camera_pov.h>
 
-#include <babylon/babylon_stl.h>
+#include <utility>
+
 #include <babylon/inspector/treetools/icamera_pov.h>
 
 #include <imgui.h>

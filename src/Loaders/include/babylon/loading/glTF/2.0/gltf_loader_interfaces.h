@@ -54,12 +54,12 @@ enum class ETextureWrapMode {
  * Interfaces
  */
 struct IGLTFProperty {
-  unordered_map_t<string_t, string_t> extensions;
-  string_t extras;
+  std::unordered_map<std::string, std::string> extensions;
+  std::string extras;
 }; // end of struct IGLTFProperty
 
 struct IGLTFChildRootProperty : public IGLTFProperty {
-  string_t name;
+  std::string name;
 }; // end of struct IGLTFChildRootProperty
 
 struct IGLTFAccessorSparseIndices : public IGLTFProperty {
@@ -85,7 +85,7 @@ struct IGLTFAccessor : public IGLTFChildRootProperty {
   EComponentType componentType;
   bool normalized;
   unsigned int count;
-  string_t type;
+  std::string type;
   Float32Array max;
   Float32Array min;
   Nullable<IGLTFAccessorSparse> sparse;
@@ -95,7 +95,7 @@ struct IGLTFAccessor : public IGLTFChildRootProperty {
 
 struct IGLTFAnimationChannelTarget : public IGLTFProperty {
   unsigned int node;
-  string_t path;
+  std::string path;
 }; // end of struct IGLTFAnimationChannelTarget
 
 struct IGLTFAnimationChannel : public IGLTFProperty {
@@ -105,28 +105,28 @@ struct IGLTFAnimationChannel : public IGLTFProperty {
 
 struct IGLTFAnimationSampler : public IGLTFProperty {
   unsigned int input;
-  string_t interpolation;
+  std::string interpolation;
   unsigned int output;
 }; // end of struct IGLTFAnimationSampler
 
 struct IGLTFAnimation : public IGLTFChildRootProperty {
-  vector_t<IGLTFAnimationChannel> channels;
-  vector_t<IGLTFAnimationSampler> samplers;
+  std::vector<IGLTFAnimationChannel> channels;
+  std::vector<IGLTFAnimationSampler> samplers;
 
   // Runtime values
   int index;
-  vector_t<Node*> targets;
+  std::vector<Node*> targets;
 }; // end of struct IGLTFAnimation
 
 struct IGLTFAsset : public IGLTFChildRootProperty {
-  string_t copyright;
-  string_t generator;
-  string_t version;
-  string_t minVersion;
+  std::string copyright;
+  std::string generator;
+  std::string version;
+  std::string minVersion;
 }; // end of struct IGLTFAsset
 
 struct IGLTFBuffer : public IGLTFChildRootProperty {
-  string_t uri;
+  std::string uri;
   int byteLength;
   // Runtime values
   int index;
@@ -160,12 +160,12 @@ struct IGLTFCameraPerspective : public IGLTFProperty {
 struct IGLTFCamera : public IGLTFChildRootProperty {
   IGLTFCameraOrthographic orthographic;
   IGLTFCameraPerspective perspective;
-  string_t type;
+  std::string type;
 }; // end of struct IGLTFCamera
 
 struct IGLTFImage : public IGLTFChildRootProperty {
-  string_t uri;
-  string_t mimeType;
+  std::string uri;
+  std::string mimeType;
   int bufferView;
   // Runtime values
   int index;
@@ -198,7 +198,7 @@ struct IGLTFMaterial : public IGLTFChildRootProperty {
   Nullable<IGLTFMaterialOcclusionTextureInfo> occlusionTexture;
   Nullable<IGLTFTextureInfo> emissiveTexture;
   Float32Array emissiveFactor;
-  string_t alphaMode;
+  std::string alphaMode;
   Nullable<float> alphaCutoff;
   bool doubleSided;
   // Runtime values
@@ -207,18 +207,18 @@ struct IGLTFMaterial : public IGLTFChildRootProperty {
 }; // end of struct IGLTFMaterial
 
 struct IGLTFMeshPrimitive : public IGLTFProperty {
-  unordered_map_t<string_t, int> attributes;
+  std::unordered_map<std::string, int> attributes;
   int indices;
   int material;
   EMeshPrimitiveMode mode;
-  vector_t<unordered_map_t<string_t, int>> targets;
+  std::vector<std::unordered_map<std::string, int>> targets;
   // Runtime values
   VertexData* vertexData;
-  vector_t<VertexData> targetsVertexData;
+  std::vector<VertexData> targetsVertexData;
 }; // end of struct IGLTFMeshPrimitive
 
 struct IGLTFMesh : public IGLTFChildRootProperty {
-  vector_t<IGLTFMeshPrimitive*> primitives;
+  std::vector<IGLTFMeshPrimitive*> primitives;
   Float32Array weights;
   // Runtime values
   int index;
@@ -238,8 +238,8 @@ struct IGLTFNode : public IGLTFChildRootProperty {
   int index;
   IGLTFNode* parent;
   Mesh* babylonMesh;
-  unordered_map_t<int, Bone*> babylonBones;
-  vector_t<Node*> babylonAnimationTargets;
+  std::unordered_map<int, Bone*> babylonBones;
+  std::vector<Node*> babylonAnimationTargets;
 }; // end of struct IGLTFNode
 
 struct IGLTFSampler : public IGLTFChildRootProperty {
@@ -269,28 +269,28 @@ struct IGLTFTexture : public IGLTFChildRootProperty {
   int source;
   // Runtime values
   int index;
-  string_t url;
+  std::string url;
   Observable<IGLTFTexture> dataReadyObservable;
 }; // end of struct IGLTFTexture
 
 struct IGLTF : public IGLTFProperty {
-  vector_t<IGLTFAccessor> accessors;
-  vector_t<IGLTFAnimation> animations;
-  vector_t<IGLTFAsset> asset;
-  vector_t<IGLTFBuffer> buffers;
-  vector_t<IGLTFBufferView> bufferViews;
-  vector_t<IGLTFCamera> cameras;
-  vector_t<string_t> extensionsUsed;
-  vector_t<string_t> extensionsRequired;
-  vector_t<IGLTFImage> images;
-  vector_t<IGLTFMaterial> materials;
-  vector_t<IGLTFMesh> meshes;
-  vector_t<IGLTFNode> nodes;
-  vector_t<IGLTFSampler> sampler;
+  std::vector<IGLTFAccessor> accessors;
+  std::vector<IGLTFAnimation> animations;
+  std::vector<IGLTFAsset> asset;
+  std::vector<IGLTFBuffer> buffers;
+  std::vector<IGLTFBufferView> bufferViews;
+  std::vector<IGLTFCamera> cameras;
+  std::vector<std::string> extensionsUsed;
+  std::vector<std::string> extensionsRequired;
+  std::vector<IGLTFImage> images;
+  std::vector<IGLTFMaterial> materials;
+  std::vector<IGLTFMesh> meshes;
+  std::vector<IGLTFNode> nodes;
+  std::vector<IGLTFSampler> sampler;
   Nullable<unsigned int> scene;
-  vector_t<IGLTFScene> scenes;
-  vector_t<IGLTFSkin> skins;
-  vector_t<IGLTFTexture> textures;
+  std::vector<IGLTFScene> scenes;
+  std::vector<IGLTFSkin> skins;
+  std::vector<IGLTFTexture> textures;
 }; // end of struct IGLTF
 
 } // end of namespace GLTF2

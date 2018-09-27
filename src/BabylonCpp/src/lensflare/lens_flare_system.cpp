@@ -21,7 +21,7 @@
 
 namespace BABYLON {
 
-LensFlareSystem::LensFlareSystem(const string_t iName, Mesh* emitter,
+LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
                                  Scene* scene)
     : name{iName}
     , borderLimit{300}
@@ -271,7 +271,7 @@ bool LensFlareSystem::render()
   engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
 
   // VBOs
-  unordered_map_t<string_t, VertexBuffer*> vertexBuffersTmp;
+  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
   vertexBuffersTmp.reserve(_vertexBuffers.size());
   for (const auto& item : _vertexBuffers) {
     vertexBuffersTmp[item.first] = item.second.get();
@@ -347,13 +347,13 @@ void LensFlareSystem::dispose()
 
 LensFlareSystemPtr
 LensFlareSystem::Parse(const Json::value& /*parsedLensFlareSystem*/,
-                       Scene* /*scene*/, const string_t& /*rootUrl*/)
+                       Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
 #if 0
   auto emitterId = Json::GetString(parsedLensFlareSystem, "emitterId");
   auto emitter   = scene->getLastEntryByID(emitterId);
 
-  string_t name = parsedLensFlareSystem.contains("name") ?
+  std::string name = parsedLensFlareSystem.contains("name") ?
                        Json::GetString(parsedLensFlareSystem, "name") :
                        "lensFlareSystem#" + emitterId;
 

@@ -150,12 +150,12 @@ BoundingBox& BoundingBox::setWorldMatrix(const Matrix& matrix)
 
 void BoundingBox::_update(const Matrix& world)
 {
-  Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
-                           numeric_limits_t<float>::max(),
-                           numeric_limits_t<float>::max(), minimumWorld);
-  Vector3::FromFloatsToRef(numeric_limits_t<float>::lowest(),
-                           numeric_limits_t<float>::lowest(),
-                           numeric_limits_t<float>::lowest(), maximumWorld);
+  Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
+                           std::numeric_limits<float>::max(),
+                           std::numeric_limits<float>::max(), minimumWorld);
+  Vector3::FromFloatsToRef(std::numeric_limits<float>::lowest(),
+                           std::numeric_limits<float>::lowest(),
+                           std::numeric_limits<float>::lowest(), maximumWorld);
 
   unsigned int index = 0;
   for (auto& vector : vectors) {
@@ -200,14 +200,14 @@ void BoundingBox::_update(const Matrix& world)
   _worldMatrix = world;
 }
 
-bool BoundingBox::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+bool BoundingBox::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                               unsigned int /*strategy*/)
 {
   return BoundingBox::IsInFrustum(vectorsWorld, frustumPlanes);
 }
 
 bool BoundingBox::isCompletelyInFrustum(
-  const array_t<Plane, 6>& frustumPlanes) const
+  const std::array<Plane, 6>& frustumPlanes) const
 {
   return BoundingBox::IsCompletelyInFrustum(vectorsWorld, frustumPlanes);
 }
@@ -286,8 +286,8 @@ bool BoundingBox::IntersectsSphere(const Vector3& minPoint,
 }
 
 bool BoundingBox::IsCompletelyInFrustum(
-  const vector_t<Vector3>& boundingVectors,
-  const array_t<Plane, 6>& frustumPlanes)
+  const std::vector<Vector3>& boundingVectors,
+  const std::array<Plane, 6>& frustumPlanes)
 {
   for (unsigned int p = 0; p < 6; ++p) {
     for (unsigned int i = 0; i < 8; ++i) {
@@ -299,8 +299,8 @@ bool BoundingBox::IsCompletelyInFrustum(
   return true;
 }
 
-bool BoundingBox::IsInFrustum(const vector_t<Vector3>& boundingVectors,
-                              const array_t<Plane, 6>& frustumPlanes)
+bool BoundingBox::IsInFrustum(const std::vector<Vector3>& boundingVectors,
+                              const std::array<Plane, 6>& frustumPlanes)
 {
   for (size_t p = 0; p < 6; ++p) {
     auto inCount = 8;

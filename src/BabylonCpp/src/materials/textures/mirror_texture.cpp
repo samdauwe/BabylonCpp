@@ -12,7 +12,7 @@
 
 namespace BABYLON {
 
-MirrorTexture::MirrorTexture(const string_t& iName, const ISize& size,
+MirrorTexture::MirrorTexture(const std::string& iName, const ISize& size,
                              Scene* iScene, bool generateMipMaps,
                              unsigned int type, unsigned int samplingMode,
                              bool generateDepthBuffer)
@@ -208,7 +208,7 @@ void MirrorTexture::_preparePostProcesses()
   }
 }
 
-unique_ptr_t<MirrorTexture> MirrorTexture::clone()
+std::unique_ptr<MirrorTexture> MirrorTexture::clone()
 {
   auto scene = getScene();
 

@@ -61,7 +61,7 @@ Matrix Matrix::copy() const
   return Matrix(*this);
 }
 
-unique_ptr_t<Matrix> Matrix::clone() const
+std::unique_ptr<Matrix> Matrix::clone() const
 {
   return std::make_unique<Matrix>(*this);
 }
@@ -82,7 +82,7 @@ int Matrix::getHashCode() const
 
 void Matrix::_markAsUpdated()
 {
-  updateFlag = (Matrix::_updateFlagSeed < numeric_limits_t<int>::max()) ?
+  updateFlag = (Matrix::_updateFlagSeed < std::numeric_limits<int>::max()) ?
                  Matrix::_updateFlagSeed++ :
                  0;
   _isIdentityDirty = true;
@@ -342,7 +342,7 @@ Matrix& Matrix::copyFrom(const Matrix& other)
   return *this;
 }
 
-const Matrix& Matrix::copyToArray(array_t<float, 16>& array,
+const Matrix& Matrix::copyToArray(std::array<float, 16>& array,
                                   unsigned int offset) const
 {
   if (offset != 0) {
@@ -379,7 +379,7 @@ Matrix& Matrix::multiplyToRef(const Matrix& other, Matrix& result)
 }
 
 const Matrix& Matrix::multiplyToArray(const Matrix& other,
-                                      array_t<float, 16>& result,
+                                      std::array<float, 16>& result,
                                       unsigned int offset) const
 {
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
@@ -450,7 +450,7 @@ const Matrix& Matrix::multiplyToArray(const Matrix& other, Float32Array& result,
     return *this;
   }
 
-  array_t<float, 16> array;
+  std::array<float, 16> array;
   multiplyToArray(other, array, offset);
   for (unsigned int i = 0; i != 16; ++i) {
     result[i] = array[i];
@@ -479,9 +479,9 @@ bool Matrix::equals(const Matrix& other) const
           && stl_util::almost_equal(m[15], other.m[15]));
 }
 
-bool Matrix::decompose(nullable_t<Vector3> scale,
-                       nullable_t<Quaternion> rotation,
-                       nullable_t<Vector3> translation) const
+bool Matrix::decompose(std::optional<Vector3> scale,
+                       std::optional<Quaternion> rotation,
+                       std::optional<Vector3> translation) const
 {
   if (translation) {
     translation = Vector3{
@@ -531,10 +531,10 @@ bool Matrix::decompose(nullable_t<Vector3> scale,
   return true;
 }
 
-nullable_t<Vector4> Matrix::getRow(unsigned int index) const
+std::optional<Vector4> Matrix::getRow(unsigned int index) const
 {
   if (index > 3) {
-    return nullopt_t;
+    return std::nullopt;
   }
 
   const unsigned int i = index * 4;

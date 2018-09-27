@@ -27,22 +27,22 @@ CameraAdapter::~CameraAdapter()
 {
 }
 
-string_t CameraAdapter::id()
+std::string CameraAdapter::id()
 {
   return _camera->name;
 }
 
-string_t CameraAdapter::type()
+std::string CameraAdapter::type()
 {
   return _camera->getClassName();
 }
 
-unique_ptr_t<PropertiesView>& CameraAdapter::getProperties()
+std::unique_ptr<PropertiesView>& CameraAdapter::getProperties()
 {
   return _properties;
 }
 
-vector_t<unique_ptr_t<AbstractTreeTool>>& CameraAdapter::getTools()
+std::vector<std::unique_ptr<AbstractTreeTool>>& CameraAdapter::getTools()
 {
   return _tools;
 }
@@ -52,7 +52,7 @@ void CameraAdapter::setPOV()
   _camera->getScene()->switchActiveCamera(_camera);
 }
 
-string_t CameraAdapter::getCurrentActiveCamera() const
+std::string CameraAdapter::getCurrentActiveCamera() const
 {
   const auto& activeCamera = _camera->getScene()->activeCamera;
   if (activeCamera != nullptr) {
@@ -63,7 +63,7 @@ string_t CameraAdapter::getCurrentActiveCamera() const
   }
 }
 
-string_t CameraAdapter::cameraId() const
+std::string CameraAdapter::cameraId() const
 {
   return _camera->name;
 }
@@ -74,11 +74,11 @@ void CameraAdapter::_buildPropertiesView()
   auto& view = *_properties;
   /** Node properties **/
   // - id
-  view.addStringProperty("id", [&]() -> string_t& { return _camera->id; },
-                         [&](const string_t& value) { _camera->id = value; });
+  view.addStringProperty("id", [&]() -> std::string& { return _camera->id; },
+                         [&](const std::string& value) { _camera->id = value; });
   // - name
-  view.addStringProperty("name", [&]() -> string_t& { return _camera->name; },
-                         [&](const string_t& value) { _camera->name = value; });
+  view.addStringProperty("name", [&]() -> std::string& { return _camera->name; },
+                         [&](const std::string& value) { _camera->name = value; });
   // - doNotSerialize
   view.addBoolProperty(
     "doNotSerialize", [&]() -> bool { return _camera->doNotSerialize; },

@@ -36,9 +36,10 @@ bool Animation::AllowMatrixDecomposeForInterpolation()
 }
 
 AnimationPtr Animation::_PrepareAnimation(
-  const string_t& name, const string_t& targetProperty, size_t framePerSecond,
-  int totalFrame, const AnimationValue& from, const AnimationValue& to,
-  unsigned int loopMode, const IEasingFunctionPtr& easingFunction)
+  const std::string& name, const std::string& targetProperty,
+  size_t framePerSecond, int totalFrame, const AnimationValue& from,
+  const AnimationValue& to, unsigned int loopMode,
+  const IEasingFunctionPtr& easingFunction)
 {
   auto dataType = from.dataType;
 
@@ -62,7 +63,7 @@ AnimationPtr Animation::_PrepareAnimation(
 }
 
 AnimationPtr
-Animation::CreateAnimation(const string_t& property, int animationType,
+Animation::CreateAnimation(const std::string& property, int animationType,
                            std::size_t framePerSecond,
                            const IEasingFunctionPtr& easingFunction)
 {
@@ -76,9 +77,9 @@ Animation::CreateAnimation(const string_t& property, int animationType,
 }
 
 AnimatablePtr Animation::CreateAndStartAnimation(
-  const string_t& name, const NodePtr& node, const string_t& targetProperty,
-  size_t framePerSecond, int totalFrame, const AnimationValue& from,
-  const AnimationValue& to, unsigned int loopMode,
+  const std::string& name, const NodePtr& node,
+  const std::string& targetProperty, size_t framePerSecond, int totalFrame,
+  const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
   const std::function<void()>& onAnimationEnd)
 {
@@ -96,9 +97,9 @@ AnimatablePtr Animation::CreateAndStartAnimation(
     onAnimationEnd);
 }
 
-vector_t<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
-  const string_t& name, const NodePtr& node, bool directDescendantsOnly,
-  const string_t& targetProperty, size_t framePerSecond, int totalFrame,
+std::vector<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
+  const std::string& name, const NodePtr& node, bool directDescendantsOnly,
+  const std::string& targetProperty, size_t framePerSecond, int totalFrame,
   const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
   const std::function<void()>& onAnimationEnd)
@@ -118,9 +119,9 @@ vector_t<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
 }
 
 AnimatablePtr Animation::CreateMergeAndStartAnimation(
-  const string_t& name, const NodePtr& node, const string_t& targetProperty,
-  size_t framePerSecond, int totalFrame, const AnimationValue& from,
-  const AnimationValue& to, unsigned int loopMode,
+  const std::string& name, const NodePtr& node,
+  const std::string& targetProperty, size_t framePerSecond, int totalFrame,
+  const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
   const std::function<void()>& onAnimationEnd)
 {
@@ -139,7 +140,7 @@ AnimatablePtr Animation::CreateMergeAndStartAnimation(
 }
 
 Animatable* Animation::TransitionTo(
-  const string_t& /*property*/, const AnimationValue& /*targetValue*/,
+  const std::string& /*property*/, const AnimationValue& /*targetValue*/,
   const AnimationValue& /*host*/, Scene* /*scene*/, float /*frameRate*/,
   const AnimationPtr& /*transition*/, float /*duration*/,
   const std::function<void()>& /*onAnimationEnd*/)
@@ -147,7 +148,7 @@ Animatable* Animation::TransitionTo(
   return nullptr;
 }
 
-vector_t<RuntimeAnimationPtr>& Animation::runtimeAnimations()
+std::vector<RuntimeAnimationPtr>& Animation::runtimeAnimations()
 {
   return _runtimeAnimations;
 }
@@ -163,9 +164,9 @@ bool Animation::get_hasRunningRuntimeAnimations() const
   return false;
 }
 
-Animation::Animation(const string_t& iName, const string_t& iTargetProperty,
-                     size_t iFramePerSecond, int iDataType,
-                     unsigned int iLoopMode)
+Animation::Animation(const std::string& iName,
+                     const std::string& iTargetProperty, size_t iFramePerSecond,
+                     int iDataType, unsigned int iLoopMode)
 
     : name{iName}
     , targetProperty{iTargetProperty}
@@ -185,7 +186,7 @@ Animation::~Animation()
 {
 }
 
-string_t Animation::toString(bool fullDetails) const
+std::string Animation::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name << ", property: " << targetProperty;
@@ -193,9 +194,9 @@ string_t Animation::toString(bool fullDetails) const
       && static_cast<unsigned int>(dataType) <= ANIMATIONTYPE_BOOL()) {
     size_t _dataType = static_cast<size_t>(dataType);
     oss << ", datatype: "
-        << vector_t<string_t>{
-             "Float",  "Vector3", "Quaternion", "Matrix",
-             "Color3", "Vector2", "Size",       "Boolean"}[_dataType];
+        << std::vector<std::string>{"Float",  "Vector3", "Quaternion",
+                                    "Matrix", "Color3",  "Vector2",
+                                    "Size",   "Boolean"}[_dataType];
   }
   oss << ", nKeys: "
       << (!_keys.empty() ? std::to_string(_keys.size()) : "none");
@@ -224,18 +225,18 @@ void Animation::addEvent(const AnimationEvent& event)
 void Animation::removeEvents(int frame)
 {
   _events.erase(std::remove_if(_events.begin(), _events.end(),
-                                 [frame](const AnimationEvent& event) {
-                                   return event.frame == frame;
-                                 }),
+                               [frame](const AnimationEvent& event) {
+                                 return event.frame == frame;
+                               }),
                 _events.end());
 }
 
-vector_t<AnimationEvent>& Animation::getEvents()
+std::vector<AnimationEvent>& Animation::getEvents()
 {
   return _events;
 }
 
-void Animation::createRange(const string_t& _name, float from, float to)
+void Animation::createRange(const std::string& _name, float from, float to)
 {
   // check name not already in use; could happen for bones after serialized
   if (!stl_util::contains(_ranges, _name)) {
@@ -243,7 +244,7 @@ void Animation::createRange(const string_t& _name, float from, float to)
   }
 }
 
-void Animation::deleteRange(const string_t& iName, bool deleteFrames)
+void Animation::deleteRange(const std::string& iName, bool deleteFrames)
 {
   if (stl_util::contains(_ranges, iName)) {
     if (deleteFrames) {
@@ -251,22 +252,21 @@ void Animation::deleteRange(const string_t& iName, bool deleteFrames)
       const auto& to   = _ranges[iName].to;
 
       _keys.erase(std::remove_if(_keys.begin(), _keys.end(),
-                                   [from, to](const IAnimationKey& key) {
-                                     return key.frame >= from
-                                            && key.frame <= to;
-                                   }),
+                                 [from, to](const IAnimationKey& key) {
+                                   return key.frame >= from && key.frame <= to;
+                                 }),
                   _keys.end());
     }
     _ranges.erase(iName);
   }
 }
 
-AnimationRange& Animation::getRange(const string_t& iName)
+AnimationRange& Animation::getRange(const std::string& iName)
 {
   return _ranges[iName];
 }
 
-vector_t<IAnimationKey>& Animation::getKeys()
+std::vector<IAnimationKey>& Animation::getKeys()
 {
   return _keys;
 }
@@ -374,7 +374,7 @@ AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
 }
 
 AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
-                                       nullable_t<AnimationValue>& workValue,
+                                       std::optional<AnimationValue>& workValue,
                                        unsigned int loopMode,
                                        const AnimationValue& offsetValue,
                                        const AnimationValue& highLimitValue)
@@ -391,10 +391,10 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
   int _keysLength   = static_cast<int>(keys.size());
   int startKeyIndex = std::max(
     0, std::min(_keysLength - 1,
-                  static_cast<int>(
-                    std::floor(_keysLength * (currentFrame - keys[0].frame)
-                                 / (keys.back().frame - keys[0].frame))
-                    - 1)));
+                static_cast<int>(
+                  std::floor(_keysLength * (currentFrame - keys[0].frame)
+                             / (keys.back().frame - keys[0].frame))
+                  - 1)));
 
   if (keys[static_cast<unsigned int>(startKeyIndex)].frame >= currentFrame) {
     while (startKeyIndex - 1 >= 0
@@ -645,7 +645,7 @@ AnimationPtr Animation::clone() const
   return clonedAnimation;
 }
 
-void Animation::setKeys(const vector_t<IAnimationKey>& values)
+void Animation::setKeys(const std::vector<IAnimationKey>& values)
 {
   _keys = values;
 }
@@ -660,7 +660,7 @@ Json::object Animation::serialize() const
                     Json::Pair<unsigned>("loopBehavior", loopMode)});
 
   // Animation keys
-  vector_t<Json::value> keys;
+  std::vector<Json::value> keys;
   for (auto& animationKey : _keys) {
     const AnimationValue& value = animationKey.value;
     Float32Array keyValues;
@@ -689,7 +689,7 @@ Json::object Animation::serialize() const
   serializationObject["keys"] = Json::value(keys);
 
   // Animation ranges
-  vector_t<Json::value> ranges;
+  std::vector<Json::value> ranges;
   for (auto& range : _ranges) {
     ranges.emplace_back(Json::value(Json::object(
       {Json::Pair("name", range.first),                              //
@@ -712,7 +712,7 @@ Animation* Animation::Parse(const Json::value& parsedAnimation)
                                     Animation::ANIMATIONLOOPMODE_CYCLE()));
 
   auto dataType = Json::GetNumber(parsedAnimation, "dataType", 0);
-  vector_t<IAnimationKey> keys;
+  std::vector<IAnimationKey> keys;
 
   if (parsedAnimation.contains("enableBlending")) {
     animation->enableBlending

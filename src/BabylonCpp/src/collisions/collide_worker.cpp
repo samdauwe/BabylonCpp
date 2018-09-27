@@ -36,7 +36,7 @@ void CollideWorker::collideWithWorld(Vector3& position, Vector3& velocity,
   collider->_initialize(position, velocity, closeDistance);
 
   // Check all meshes
-  unordered_map_t<unsigned int, SerializedMesh>& meshes
+  std::unordered_map<unsigned int, SerializedMesh>& meshes
     = _collisionCache.getMeshes();
 
   if (excludedMeshUniqueId >= 0) {
@@ -94,7 +94,7 @@ void CollideWorker::checkCollision(SerializedMesh& mesh)
 void CollideWorker::processCollisionsForSubMeshes(const Matrix& transformMatrix,
                                                   SerializedMesh& mesh)
 {
-  vector_t<SerializedSubMesh>& subMeshes = mesh.subMeshes;
+  std::vector<SerializedSubMesh>& subMeshes = mesh.subMeshes;
   size_t len                             = subMeshes.size();
 
   if (mesh.geometryId.empty()) {

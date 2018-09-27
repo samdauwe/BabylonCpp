@@ -23,22 +23,22 @@ MaterialAdapter::~MaterialAdapter()
 {
 }
 
-string_t MaterialAdapter::id()
+std::string MaterialAdapter::id()
 {
   return _material->name;
 }
 
-string_t MaterialAdapter::type()
+std::string MaterialAdapter::type()
 {
   return _material->getClassName();
 }
 
-unique_ptr_t<PropertiesView>& MaterialAdapter::getProperties()
+std::unique_ptr<PropertiesView>& MaterialAdapter::getProperties()
 {
   return _properties;
 }
 
-vector_t<unique_ptr_t<AbstractTreeTool>>& MaterialAdapter::getTools()
+std::vector<std::unique_ptr<AbstractTreeTool>>& MaterialAdapter::getTools()
 {
   return _tools;
 }
@@ -62,12 +62,12 @@ void MaterialAdapter::_buildPropertiesView()
     "backFaceCulling", [&]() -> bool { return _material->backFaceCulling(); },
     [&](const bool& value) { _material->backFaceCulling = value; });
   // - id
-  view.addStringProperty("id", [&]() -> string_t& { return _material->id; },
-                         [&](const string_t& value) { _material->id = value; });
+  view.addStringProperty("id", [&]() -> std::string& { return _material->id; },
+                         [&](const std::string& value) { _material->id = value; });
   // - name
   view.addStringProperty(
-    "name", [&]() -> string_t& { return _material->name; },
-    [&](const string_t& value) { _material->name = value; });
+    "name", [&]() -> std::string& { return _material->name; },
+    [&](const std::string& value) { _material->name = value; });
   // - checkReadyOnEveryCall
   view.addBoolProperty(
     "checkReadyOnEveryCall",

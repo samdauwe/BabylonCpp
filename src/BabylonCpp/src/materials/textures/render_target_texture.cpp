@@ -20,7 +20,7 @@
 namespace BABYLON {
 
 RenderTargetTexture::RenderTargetTexture(
-  const string_t& iName, const ISize& size, Scene* scene, bool generateMipMaps,
+  const std::string& iName, const ISize& size, Scene* scene, bool generateMipMaps,
   bool doNotChangeAspectRatio, unsigned int type, bool iIsCube,
   unsigned int samplingMode, bool generateDepthBuffer,
   bool generateStencilBuffer, bool isMulti, unsigned int format)
@@ -54,7 +54,7 @@ RenderTargetTexture::RenderTargetTexture(
     , _onBeforeRenderObserver{nullptr}
     , _onAfterRenderObserver{nullptr}
     , _onClearObserver{nullptr}
-    , _boundingBoxSize{nullopt_t}
+    , _boundingBoxSize{std::nullopt}
 {
   if (!scene) {
     return;
@@ -115,17 +115,17 @@ void RenderTargetTexture::_onRatioRescale()
   }
 }
 
-vector_t<AbstractMeshPtr>& RenderTargetTexture::get_renderList()
+std::vector<AbstractMeshPtr>& RenderTargetTexture::get_renderList()
 {
   return _renderList;
 }
 
-void RenderTargetTexture::set_renderList(const vector_t<AbstractMeshPtr>& value)
+void RenderTargetTexture::set_renderList(const std::vector<AbstractMeshPtr>& value)
 {
   _renderList = value;
 }
 
-void RenderTargetTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
+void RenderTargetTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
 {
   if (_boundingBoxSize && (*_boundingBoxSize).equals(*value)) {
     return;
@@ -137,7 +137,7 @@ void RenderTargetTexture::set_boundingBoxSize(const nullable_t<Vector3>& value)
   }
 }
 
-nullable_t<Vector3>& RenderTargetTexture::get_boundingBoxSize()
+std::optional<Vector3>& RenderTargetTexture::get_boundingBoxSize()
 {
   return _boundingBoxSize;
 }
@@ -549,7 +549,7 @@ void RenderTargetTexture::unbindFrameBuffer(Engine* engine,
 }
 
 void RenderTargetTexture::renderToTarget(
-  unsigned int faceIndex, const vector_t<AbstractMeshPtr>& currentRenderList,
+  unsigned int faceIndex, const std::vector<AbstractMeshPtr>& currentRenderList,
   size_t /*currentRenderListLength*/, bool useCameraPostProcess,
   bool dumpForDebug)
 
@@ -572,12 +572,12 @@ void RenderTargetTexture::renderToTarget(
   else if (!useCameraPostProcess
            || !scene->postProcessManager->_prepareFrame(_texture)) {
     if (_texture) {
-      nullable_t<unsigned int> faceIndexVal = nullopt_t;
+      std::optional<unsigned int> faceIndexVal = std::nullopt;
       if (isCube) {
         faceIndexVal = faceIndex;
       }
       engine->bindFramebuffer(
-        _texture, faceIndexVal, nullopt_t, nullopt_t, ignoreCameraViewport,
+        _texture, faceIndexVal, std::nullopt, std::nullopt, ignoreCameraViewport,
         depthStencilTexture ? depthStencilTexture.get() : nullptr);
     }
   }

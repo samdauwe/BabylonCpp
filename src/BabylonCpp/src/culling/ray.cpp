@@ -88,7 +88,7 @@ Ray::~Ray()
 {
 }
 
-unique_ptr_t<Ray> Ray::clone() const
+std::unique_ptr<Ray> Ray::clone() const
 {
   return std::make_unique<Ray>(*this);
 }
@@ -105,7 +105,7 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
                               const Vector3& maximum) const
 {
   float d        = 0.f;
-  float maxValue = numeric_limits_t<float>::max();
+  float maxValue = std::numeric_limits<float>::max();
   float inv      = 0.f;
   float min      = 0.f;
   float max      = 0.f;
@@ -118,8 +118,8 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     inv = 1.f / direction.x;
     min = (minimum.x - origin.x) * inv;
     max = (maximum.x - origin.x) * inv;
-    if (stl_util::almost_equal(max, -numeric_limits_t<float>::infinity())) {
-      max = numeric_limits_t<float>::infinity();
+    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
+      max = std::numeric_limits<float>::infinity();
     }
 
     if (min > max) {
@@ -144,8 +144,8 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     min = (minimum.y - origin.y) * inv;
     max = (maximum.y - origin.y) * inv;
 
-    if (stl_util::almost_equal(max, -numeric_limits_t<float>::infinity())) {
-      max = numeric_limits_t<float>::infinity();
+    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
+      max = std::numeric_limits<float>::infinity();
     }
 
     if (min > max) {
@@ -170,8 +170,8 @@ bool Ray::intersectsBoxMinMax(const Vector3& minimum,
     min = (minimum.z - origin.z) * inv;
     max = (maximum.z - origin.z) * inv;
 
-    if (stl_util::almost_equal(max, -numeric_limits_t<float>::infinity())) {
-      max = numeric_limits_t<float>::infinity();
+    if (stl_util::almost_equal(max, -std::numeric_limits<float>::infinity())) {
+      max = std::numeric_limits<float>::infinity();
     }
 
     if (min > max) {
@@ -215,7 +215,7 @@ bool Ray::intersectsSphere(const BoundingSphere& sphere) const
   return temp <= rr;
 }
 
-unique_ptr_t<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
+std::unique_ptr<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
                                                        const Vector3& vertex1,
                                                        const Vector3& vertex2)
 {
@@ -264,19 +264,19 @@ unique_ptr_t<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
   return std::make_unique<IntersectionInfo>(bu, bv, distance);
 }
 
-nullable_t<float> Ray::intersectsPlane(const Plane& plane)
+std::optional<float> Ray::intersectsPlane(const Plane& plane)
 {
   float distance;
   float result1 = Vector3::Dot(plane.normal, direction);
   if (std::abs(result1) < 9.99999997475243E-07f) {
-    return nullopt_t;
+    return std::nullopt;
   }
   else {
     const float result2 = Vector3::Dot(plane.normal, origin);
     distance            = (-plane.d - result2) / result1;
     if (distance < 0.f) {
       if (distance < -9.99999997475243E-07f) {
-        return nullopt_t;
+        return std::nullopt;
       }
       else {
         return 0.f;
@@ -303,9 +303,9 @@ PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
   return mesh->intersects(*_tmpRay, fastCheck);
 }
 
-vector_t<PickingInfo> Ray::intersectsMeshes(vector_t<AbstractMesh*>& meshes,
+std::vector<PickingInfo> Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes,
                                             bool fastCheck,
-                                            vector_t<PickingInfo>& results)
+                                            std::vector<PickingInfo>& results)
 {
   for (auto& mesh : meshes) {
     auto pickInfo = intersectsMesh(mesh, fastCheck);

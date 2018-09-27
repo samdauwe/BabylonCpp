@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* iEngine,
-                                                     const string_t& name)
+                                                     const std::string& name)
 
     : _name{name}, engine{iEngine}
 {
@@ -34,9 +34,9 @@ bool PostProcessRenderPipeline::isSupported() const
   return true;
 }
 
-vector_t<CameraPtr> PostProcessRenderPipeline::getCameras() const
+std::vector<CameraPtr> PostProcessRenderPipeline::getCameras() const
 {
-  vector_t<CameraPtr> cameras;
+  std::vector<CameraPtr> cameras;
   cameras.reserve(_cameras.size());
   for (auto& item : _cameras) {
     cameras.emplace_back(item.second);
@@ -54,7 +54,7 @@ void PostProcessRenderPipeline::_rebuild()
 }
 
 void PostProcessRenderPipeline::_enableEffect(
-  const string_t& renderEffectName, const vector_t<CameraPtr>& cameras)
+  const std::string& renderEffectName, const std::vector<CameraPtr>& cameras)
 {
   auto& renderEffects = _renderEffects[renderEffectName];
 
@@ -67,7 +67,7 @@ void PostProcessRenderPipeline::_enableEffect(
 }
 
 void PostProcessRenderPipeline::_disableEffect(
-  const string_t& renderEffectName, const vector_t<CameraPtr>& cameras)
+  const std::string& renderEffectName, const std::vector<CameraPtr>& cameras)
 {
   if (!stl_util::contains(_renderEffects, renderEffectName)) {
     return;
@@ -78,7 +78,7 @@ void PostProcessRenderPipeline::_disableEffect(
 }
 
 void PostProcessRenderPipeline::_attachCameras(
-  const vector_t<CameraPtr>& cameras, bool unique)
+  const std::vector<CameraPtr>& cameras, bool unique)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -86,7 +86,7 @@ void PostProcessRenderPipeline::_attachCameras(
     return;
   }
 
-  vector_t<CameraPtr> camerasToDelete;
+  std::vector<CameraPtr> camerasToDelete;
   for (auto& camera : cams) {
     const auto& cameraName = camera->name;
 
@@ -110,7 +110,7 @@ void PostProcessRenderPipeline::_attachCameras(
 }
 
 void PostProcessRenderPipeline::_detachCameras(
-  const vector_t<CameraPtr>& cameras)
+  const std::vector<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 

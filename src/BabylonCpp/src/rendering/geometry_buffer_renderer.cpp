@@ -53,7 +53,7 @@ GeometryBufferRenderer::~GeometryBufferRenderer()
 {
 }
 
-void GeometryBufferRenderer::set_renderList(const vector_t<MeshPtr>& meshes)
+void GeometryBufferRenderer::set_renderList(const std::vector<MeshPtr>& meshes)
 {
   _multiRenderTarget->renderList().clear();
   _multiRenderTarget->renderList().reserve(meshes.size());
@@ -97,9 +97,9 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     return false;
   }
 
-  vector_t<string_t> defines;
+  std::vector<std::string> defines;
 
-  vector_t<string_t> attribs{VertexBuffer::PositionKindChars,
+  std::vector<std::string> attribs{VertexBuffer::PositionKindChars,
                              VertexBuffer::NormalKindChars};
 
   auto mesh = subMesh->getMesh();
@@ -155,7 +155,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
-    const unordered_map_t<string_t, unsigned int> indexParameters{
+    const std::unordered_map<std::string, unsigned int> indexParameters{
       {"buffersCount", _enablePosition ? 3u : 2u}};
 
     EffectCreationOptions options;
@@ -225,10 +225,10 @@ void GeometryBufferRenderer::_createRenderTargets()
 
   // Custom render function
   _multiRenderTarget->customRenderFunction
-    = [this, engine](const vector_t<SubMeshPtr>& opaqueSubMeshes,
-                     const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-                     const vector_t<SubMeshPtr>& /*transparentSubMeshes*/,
-                     const vector_t<SubMeshPtr>& depthOnlySubMeshes,
+    = [this, engine](const std::vector<SubMeshPtr>& opaqueSubMeshes,
+                     const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+                     const std::vector<SubMeshPtr>& /*transparentSubMeshes*/,
+                     const std::vector<SubMeshPtr>& depthOnlySubMeshes,
                      const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);

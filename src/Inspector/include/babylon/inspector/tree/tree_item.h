@@ -1,7 +1,8 @@
 #ifndef BABYLON_INSPECTOR_TREE_TREE_ITEM_H
 #define BABYLON_INSPECTOR_TREE_TREE_ITEM_H
 
-#include <babylon/babylon_stl.h>
+#include <memory>
+#include <vector>
 
 namespace BABYLON {
 
@@ -11,7 +12,7 @@ template <typename AdapterType>
 class TreeItem {
 
 public:
-  TreeItem(Tab& tab, unique_ptr_t<AdapterType>&& adapter)
+  TreeItem(Tab& tab, std::unique_ptr<AdapterType>&& adapter)
       : _tab{tab}, _adapter{std::move(adapter)}, _active{false}
   {
   }
@@ -47,7 +48,7 @@ public:
   /**
    *@brief Returns the item ID == its adapter ID.
    */
-  string_t id() const
+  std::string id() const
   {
     return _adapter->id();
   }
@@ -89,14 +90,14 @@ public:
   }
 
 public:
-  vector_t<TreeItem<AdapterType>> children;
+  std::vector<TreeItem<AdapterType>> children;
 
 private:
   // Reference to the tab
   Tab& _tab;
   // The object this item is linked to (should be a primitive or a canvas) TODO
   // should be superclass of all primitives
-  unique_ptr_t<AdapterType> _adapter;
+  std::unique_ptr<AdapterType> _adapter;
   // Whether this item is active
   bool _active;
 

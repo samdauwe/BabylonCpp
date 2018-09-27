@@ -24,7 +24,7 @@ MaterialDefines::~MaterialDefines()
 {
 }
 
-bool MaterialDefines::operator[](const string_t& define) const
+bool MaterialDefines::operator[](const std::string& define) const
 {
   return stl_util::contains(boolDef, define) && boolDef.at(define);
 }
@@ -200,7 +200,7 @@ void MaterialDefines::reset()
   _needUVs            = false;
 }
 
-string_t MaterialDefines::toString() const
+std::string MaterialDefines::toString() const
 {
   std::ostringstream oss;
   oss << *this;

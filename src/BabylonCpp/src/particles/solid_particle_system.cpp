@@ -21,8 +21,8 @@
 namespace BABYLON {
 
 SolidParticleSystem::SolidParticleSystem(
-  const string_t& iName, Scene* scene,
-  const nullable_t<SolidParticleSystemOptions>& options)
+  const std::string& iName, Scene* scene,
+  const std::optional<SolidParticleSystemOptions>& options)
     : nbParticles{0}
     , billboard{false}
     , recomputeNormals{true}
@@ -308,12 +308,12 @@ void SolidParticleSystem::_resetCopy()
   _copy->uvs.y              = 0.f;
   _copy->uvs.z              = 1.f;
   _copy->uvs.w              = 1.f;
-  _copy->color              = nullopt_t;
+  _copy->color              = std::nullopt;
   _copy->translateFromPivot = false;
 }
 
 SolidParticle* SolidParticleSystem::_meshBuilder(
-  unsigned int p, const vector_t<Vector3>& shape, Float32Array& positions,
+  unsigned int p, const std::vector<Vector3>& shape, Float32Array& positions,
   Uint32Array& meshInd, Uint32Array& indices, const Float32Array& meshUV,
   Float32Array& uvs, const Float32Array& meshCol, Float32Array& colors,
   const Float32Array& meshNor, Float32Array& normals, unsigned int idx,
@@ -433,10 +433,10 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   return _copy.get();
 }
 
-vector_t<Vector3>
+std::vector<Vector3>
 SolidParticleSystem::_posToShape(const Float32Array& positions)
 {
-  vector_t<Vector3> shape;
+  std::vector<Vector3> shape;
   for (size_t i = 0; i < positions.size(); i += 3) {
     shape.emplace_back(
       Vector3(positions[i], positions[i + 1], positions[i + 2]));
@@ -457,7 +457,7 @@ Float32Array SolidParticleSystem::_uvsToShapeUV(const Float32Array& uvs)
 
 SolidParticle* SolidParticleSystem::_addParticle(
   unsigned int idx, unsigned int idxpos, unsigned int idxind,
-  unique_ptr_t<ModelShape>&& model, int shapeId, unsigned int idxInShape,
+  std::unique_ptr<ModelShape>&& model, int shapeId, unsigned int idxInShape,
   const BoundingInfo& bInfo)
 {
   particles.emplace_back(std::make_unique<SolidParticle>(
@@ -596,7 +596,7 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
   particle->pivot.y            = 0.f;
   particle->pivot.z            = 0.f;
   particle->translateFromPivot = false;
-  particle->parentId           = nullopt_t;
+  particle->parentId           = std::nullopt;
 }
 
 SolidParticleSystem& SolidParticleSystem::rebuildMesh()
@@ -687,12 +687,12 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   if (_computeBoundingBox) {
     // all the particles are updated, then recompute the BBox from scratch
     if (start == 0 && end == nbParticles - 1) {
-      Vector3::FromFloatsToRef(numeric_limits_t<float>::max(),
-                               numeric_limits_t<float>::max(),
-                               numeric_limits_t<float>::max(), _minimum);
-      Vector3::FromFloatsToRef(numeric_limits_t<float>::lowest(),
-                               numeric_limits_t<float>::lowest(),
-                               numeric_limits_t<float>::lowest(), _maximum);
+      Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
+                               std::numeric_limits<float>::max(),
+                               std::numeric_limits<float>::max(), _minimum);
+      Vector3::FromFloatsToRef(std::numeric_limits<float>::lowest(),
+                               std::numeric_limits<float>::lowest(),
+                               std::numeric_limits<float>::lowest(), _maximum);
     }
     // only some particles are updated, then use the current existing BBox
     // basis. Note : it can only increase.
@@ -738,7 +738,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     if (_particle->isVisible) {
       _particle->_stillInvisible = false; // un-mark permanent invisibility
 
-      _particleHasParent = (_particle->parentId != nullopt_t);
+      _particleHasParent = (_particle->parentId != std::nullopt);
 
       _scaledPivot.x = _particle->pivot.x * _particle->scaling.x;
       _scaledPivot.y = _particle->pivot.y * _particle->scaling.y;

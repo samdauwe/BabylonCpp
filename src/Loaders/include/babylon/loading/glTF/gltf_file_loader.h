@@ -32,32 +32,32 @@ class BABYLON_SHARED_EXPORT GLTFFileLoader : public IDisposable,
 public:
   void dispose();
   void importMeshAsync(
-    const vector_t<string_t>& meshesNames, Scene* scene,
-    const Variant<string_t, ArrayBuffer>& data, const string_t& rootUrl,
-    const std::function<void(const vector_t<AbstractMesh*>& meshes,
-                               const vector_t<ParticleSystem*>& particleSystems,
-                               const vector_t<Skeleton*>& skeletons)>&
+    const std::vector<std::string>& meshesNames, Scene* scene,
+    const Variant<std::string, ArrayBuffer>& data, const std::string& rootUrl,
+    const std::function<void(const std::vector<AbstractMesh*>& meshes,
+                               const std::vector<ParticleSystem*>& particleSystems,
+                               const std::vector<Skeleton*>& skeletons)>&
       onSuccess,
     const std::function<void(const ProgressEvent& event)>& onProgress,
-    const std::function<void(const string_t& message)>& onError);
+    const std::function<void(const std::string& message)>& onError);
   void
-  loadAsync(Scene* scene, const Variant<string_t, ArrayBuffer>& data,
-            const string_t& rootUrl, const std::function<void()>& onSuccess,
+  loadAsync(Scene* scene, const Variant<std::string, ArrayBuffer>& data,
+            const std::string& rootUrl, const std::function<void()>& onSuccess,
             const std::function<void(const ProgressEvent& event)>& onProgress,
-            const std::function<void(const string_t& message)>& onError);
+            const std::function<void(const std::string& message)>& onError);
 
 private:
-  bool canDirectLoad(const string_t& data);
+  bool canDirectLoad(const std::string& data);
   IGLTFLoader _getLoader(const IGLTFLoaderData& loaderData);
 
 private:
-  static IGLTFLoaderData _parse(const Variant<string_t, ArrayBuffer>& data);
+  static IGLTFLoaderData _parse(const Variant<std::string, ArrayBuffer>& data);
   static IGLTFLoaderData _parseBinary(const ArrayBuffer& data);
   static IGLTFLoaderData _parseV1(const BinaryReader& binaryReader);
   static IGLTFLoaderData _parseV2(const BinaryReader& binaryReader);
-  static Nullable<Version> _parseVersion(const string_t& version);
+  static Nullable<Version> _parseVersion(const std::string& version);
   static int _compareVersion(const Version& a, const Version& b);
-  static string_t _decodeBufferToText(const Uint8Array& buffer);
+  static std::string _decodeBufferToText(const Uint8Array& buffer);
 
 public:
   static std::function<IGLTFLoader(const GLTFFileLoader& parent)>
@@ -94,7 +94,7 @@ public:
    */
   std::function<void()> onComplete;
 
-  string_t name;
+  std::string name;
 
 private:
   IGLTFLoader _loader;

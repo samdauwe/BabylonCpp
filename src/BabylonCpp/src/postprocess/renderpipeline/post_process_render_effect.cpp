@@ -9,8 +9,8 @@
 namespace BABYLON {
 
 PostProcessRenderEffect::PostProcessRenderEffect(
-  Engine* engine, const string_t& name,
-  const std::function<vector_t<PostProcess*>()>& getPostProcesses,
+  Engine* engine, const std::string& name,
+  const std::function<std::vector<PostProcess*>()>& getPostProcesses,
   bool singleInstance)
     : _name{name}
     , _engine{engine}
@@ -40,9 +40,9 @@ void PostProcessRenderEffect::_update()
 {
 }
 
-void PostProcessRenderEffect::_attachCameras(const vector_t<CameraPtr>& cameras)
+void PostProcessRenderEffect::_attachCameras(const std::vector<CameraPtr>& cameras)
 {
-  string_t cameraKey;
+  std::string cameraKey;
 
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -83,7 +83,7 @@ void PostProcessRenderEffect::_attachCameras(const vector_t<CameraPtr>& cameras)
   }
 }
 
-void PostProcessRenderEffect::_detachCameras(const vector_t<CameraPtr>& cameras)
+void PostProcessRenderEffect::_detachCameras(const std::vector<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -106,7 +106,7 @@ void PostProcessRenderEffect::_detachCameras(const vector_t<CameraPtr>& cameras)
   }
 }
 
-void PostProcessRenderEffect::_enable(const vector_t<CameraPtr>& cameras)
+void PostProcessRenderEffect::_enable(const std::vector<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -131,7 +131,7 @@ void PostProcessRenderEffect::_enable(const vector_t<CameraPtr>& cameras)
   }
 }
 
-void PostProcessRenderEffect::_disable(const vector_t<CameraPtr>& cameras)
+void PostProcessRenderEffect::_disable(const std::vector<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -148,7 +148,7 @@ void PostProcessRenderEffect::_disable(const vector_t<CameraPtr>& cameras)
   }
 }
 
-vector_t<PostProcess*> PostProcessRenderEffect::getPostProcesses(Camera* camera)
+std::vector<PostProcess*> PostProcessRenderEffect::getPostProcesses(Camera* camera)
 {
   if (_singleInstance) {
     return _postProcesses["0"];

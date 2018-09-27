@@ -21,7 +21,7 @@
 
 namespace BABYLON {
 
-PolygonMeshBuilder::PolygonMeshBuilder(const string_t& name,
+PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
                                        const Path2& contours, Scene* scene)
     : _name{name}, _scene{scene}
 {
@@ -32,8 +32,8 @@ PolygonMeshBuilder::PolygonMeshBuilder(const string_t& name,
   _outlinepoints.add(points);
 }
 
-PolygonMeshBuilder::PolygonMeshBuilder(const string_t& name,
-                                       const vector_t<Vector2>& contours,
+PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
+                                       const std::vector<Vector2>& contours,
                                        Scene* scene)
     : _name{name}, _scene{scene}
 {
@@ -47,7 +47,7 @@ PolygonMeshBuilder::~PolygonMeshBuilder()
 {
 }
 
-void PolygonMeshBuilder::_addToepoint(const vector_t<Vector2>& points)
+void PolygonMeshBuilder::_addToepoint(const std::vector<Vector2>& points)
 {
   for (auto& p : points) {
     Point2D point{{p.x, p.y}};
@@ -55,7 +55,7 @@ void PolygonMeshBuilder::_addToepoint(const vector_t<Vector2>& points)
   }
 }
 
-PolygonMeshBuilder& PolygonMeshBuilder::addHole(const vector_t<Vector2>& hole)
+PolygonMeshBuilder& PolygonMeshBuilder::addHole(const std::vector<Vector2>& hole)
 {
   _points.add(hole);
   PolygonPoints holepoints;
@@ -84,7 +84,7 @@ MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
                            (p.y - bounds.min.y) / bounds.height});
   }
 
-  vector_t<vector_t<Point2D>> polygon;
+  std::vector<std::vector<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array
   addHoles(_epoints, _eholes, polygon);
   auto res = mapbox::earcut<int32_t>(polygon);
@@ -149,7 +149,7 @@ PolygonMeshBuilder::buildWall(const Vector3& wall0Corner,
     stl_util::concat(positions, {p.x * std::cos(angle) + wall0Corner.x, p.y,
                                  p.x * std::sin(angle) + wall0Corner.z});
   };
-  vector_t<vector_t<Point2D>> polygon;
+  std::vector<std::vector<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array
   addHoles(_epoints, _eholes, polygon);
   auto res = mapbox::earcut<int32_t>(polygon);
@@ -238,9 +238,9 @@ void PolygonMeshBuilder::addSide(Float32Array& positions, Float32Array& normals,
   }
 }
 
-void PolygonMeshBuilder::addHoles(const vector_t<Point2D>& epoints,
+void PolygonMeshBuilder::addHoles(const std::vector<Point2D>& epoints,
                                   const Uint32Array& holeIndices,
-                                  vector_t<vector_t<Point2D>>& polygon)
+                                  std::vector<std::vector<Point2D>>& polygon)
 {
   // Check if polygon has holes
   if (holeIndices.empty()) {
@@ -248,8 +248,8 @@ void PolygonMeshBuilder::addHoles(const vector_t<Point2D>& epoints,
   }
   else {
     // Determine hole indices
-    using IndexRange = array_t<size_t, 2>;
-    vector_t<IndexRange> holes;
+    using IndexRange = std::array<size_t, 2>;
+    std::vector<IndexRange> holes;
     for (size_t i = 0, len = holeIndices.size(); i < len; i++) {
       size_t startIndex = holeIndices[i];
       size_t endIndex   = i < len - 1 ? holeIndices[i + 1] : epoints.size();
@@ -257,12 +257,12 @@ void PolygonMeshBuilder::addHoles(const vector_t<Point2D>& epoints,
       holes.emplace_back(range);
     }
     // Add outer ring
-    vector_t<Point2D> ring(epoints.begin(),
+    std::vector<Point2D> ring(epoints.begin(),
                            epoints.begin() + static_cast<long>(holes[0][0]));
     polygon.emplace_back(ring);
     // Add holes
     for (auto& holeRange : holes) {
-      vector_t<Point2D> hole(epoints.begin() + static_cast<long>(holeRange[0]),
+      std::vector<Point2D> hole(epoints.begin() + static_cast<long>(holeRange[0]),
                              epoints.begin() + static_cast<long>(holeRange[1]));
       polygon.emplace_back(hole);
     }

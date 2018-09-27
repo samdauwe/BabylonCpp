@@ -1,5 +1,7 @@
 #include <babylon/math/arc2.h>
 
+#include <cmath>
+
 #include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {
@@ -9,8 +11,7 @@ Arc2::Arc2(const Vector2& startPoint, const Vector2& midPoint,
 {
   float temp = std::pow(midPoint.x, 2.f) + std::pow(midPoint.y, 2.f);
   float startToMid
-    = (std::pow(startPoint.x, 2.f) + std::pow(startPoint.y, 2.f) - temp)
-      / 2.f;
+    = (std::pow(startPoint.x, 2.f) + std::pow(startPoint.y, 2.f) - temp) / 2.f;
   float midToEnd
     = (temp - std::pow(endPoint.x, 2.f) - std::pow(endPoint.y, 2.f)) / 2.f;
   float det = (startPoint.x - midPoint.x) * (midPoint.y - endPoint.y)
@@ -103,7 +104,7 @@ Arc2 Arc2::copy() const
   return Arc2(*this);
 }
 
-unique_ptr_t<Arc2> Arc2::clone() const
+std::unique_ptr<Arc2> Arc2::clone() const
 {
   return std::make_unique<Arc2>(*this);
 }

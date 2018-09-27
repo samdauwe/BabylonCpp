@@ -15,19 +15,19 @@ struct BABYLON_SHARED_EXPORT GLTFUtils {
    * @brief Tests if the uri is a base64 string.
    * @param uri: the uri to test.
    */
-  static bool IsBase64(const string_t& uri);
+  static bool IsBase64(const std::string& uri);
 
   /**
    * @brief Decodes the base64 uri.
    * @param uri: the uri to decode.
    */
-  static Uint8Array DecodeBase64(const string_t& uri);
+  static Uint8Array DecodeBase64(const std::string& uri);
 
   /**
    * @brief Validates the uri.
    * @param uri: the uri to validate.
    */
-  static bool ValidateUri(const string_t& uri);
+  static bool ValidateUri(const std::string& uri);
 
 }; // end of struct GLTFUtils
 

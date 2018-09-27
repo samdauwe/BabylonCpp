@@ -10,8 +10,8 @@ bool GamepadCamera::NodeConstructorAdded = false;
 void GamepadCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "GamepadCamera", [](const string_t& name, Scene* scene,
-                        const nullable_t<Json::value>& /*options*/) {
+    "GamepadCamera", [](const std::string& name, Scene* scene,
+                        const std::optional<Json::value>& /*options*/) {
       return GamepadCamera::New(name, Vector3::Zero(), scene);
     });
   GamepadCamera::NodeConstructorAdded = true;
@@ -77,7 +77,7 @@ void GamepadCamera::set_gamepadMoveSensibility(float value)
 
 //-- end properties for backward compatibility for inputs
 
-GamepadCamera::GamepadCamera::GamepadCamera(const string_t& name,
+GamepadCamera::GamepadCamera::GamepadCamera(const std::string& name,
                                             const Vector3& position,
                                             Scene* scene)
     : UniversalCamera{name, position, scene}
@@ -93,7 +93,7 @@ GamepadCamera::~GamepadCamera()
 {
 }
 
-const string_t GamepadCamera::getClassName() const
+const std::string GamepadCamera::getClassName() const
 {
   return "GamepadCamera";
 }

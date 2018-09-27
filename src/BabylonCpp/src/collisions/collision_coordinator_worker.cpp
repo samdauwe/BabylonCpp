@@ -35,7 +35,7 @@ CollisionCoordinatorWorker::~CollisionCoordinatorWorker()
 
 SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
 {
-  vector_t<SerializedSubMesh> submeshes;
+  std::vector<SerializedSubMesh> submeshes;
   if (!mesh->subMeshes.empty()) {
     unsigned int idx = 0;
     for (auto& sm : mesh->subMeshes) {
@@ -56,7 +56,7 @@ SerializedMesh CollisionCoordinatorWorker::SerializeMesh(AbstractMesh* mesh)
     }
   }
 
-  string_t geometryId;
+  std::string geometryId;
   if (mesh->type() == IReflect::Type::MESH) {
     auto _mesh = dynamic_cast<Mesh*>(mesh);
     geometryId = _mesh->geometry() ? _mesh->geometry()->id : "";
@@ -228,9 +228,9 @@ void CollisionCoordinatorWorker::_afterRender()
   message.updatePayload = payload;
   message.taskType      = WorkerTaskType::UPDATE;
 
-  vector_t<ArrayBufferView> serializable;
+  std::vector<ArrayBufferView> serializable;
   for (auto item : payload.updatedGeometries) {
-    const string_t& id = item.first;
+    const std::string& id = item.first;
     if (stl_util::contains(payload.updatedGeometries, id)) {
       // prepare transferables
       serializable.emplace_back(

@@ -22,8 +22,8 @@
 
 namespace BABYLON {
 
-ShaderMaterial::ShaderMaterial(const string_t& iName, Scene* scene,
-                               const string_t& shaderPath,
+ShaderMaterial::ShaderMaterial(const std::string& iName, Scene* scene,
+                               const std::string& shaderPath,
                                const ShaderMaterialOptions& options)
     : Material{iName, scene}, _shaderPath{shaderPath}, _renderId{-1}
 {
@@ -40,7 +40,7 @@ ShaderMaterial::~ShaderMaterial()
 {
 }
 
-const string_t ShaderMaterial::getClassName() const
+const std::string ShaderMaterial::getClassName() const
 {
   return "ShaderMaterial";
 }
@@ -60,14 +60,14 @@ bool ShaderMaterial::needAlphaTesting() const
   return _options.needAlphaTesting;
 }
 
-void ShaderMaterial::_checkUniform(const string_t& uniformName)
+void ShaderMaterial::_checkUniform(const std::string& uniformName)
 {
   if (!stl_util::contains(_options.uniforms, uniformName)) {
     _options.uniforms.emplace_back(uniformName);
   }
 }
 
-ShaderMaterial& ShaderMaterial::setTexture(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setTexture(const std::string& iName,
                                            const TexturePtr& texture)
 {
   if (!stl_util::contains(_options.samplers, iName)) {
@@ -79,8 +79,8 @@ ShaderMaterial& ShaderMaterial::setTexture(const string_t& iName,
 }
 
 ShaderMaterial&
-ShaderMaterial::setTextureArray(const string_t& iName,
-                                const vector_t<BaseTexturePtr>& textures)
+ShaderMaterial::setTextureArray(const std::string& iName,
+                                const std::vector<BaseTexturePtr>& textures)
 {
   if (!stl_util::contains(_options.samplers, iName)) {
     _options.samplers.emplace_back(iName);
@@ -93,7 +93,7 @@ ShaderMaterial::setTextureArray(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setInt(const string_t& name, int value)
+ShaderMaterial& ShaderMaterial::setInt(const std::string& name, int value)
 {
   _checkUniform(name);
   _ints[name] = value;
@@ -101,7 +101,7 @@ ShaderMaterial& ShaderMaterial::setInt(const string_t& name, int value)
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setFloat(const string_t& iName, float value)
+ShaderMaterial& ShaderMaterial::setFloat(const std::string& iName, float value)
 {
   _checkUniform(iName);
   _floats[iName] = value;
@@ -109,7 +109,7 @@ ShaderMaterial& ShaderMaterial::setFloat(const string_t& iName, float value)
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setFloats(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setFloats(const std::string& iName,
                                           const Float32Array& value)
 {
   _checkUniform(iName);
@@ -118,7 +118,7 @@ ShaderMaterial& ShaderMaterial::setFloats(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setColor3(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setColor3(const std::string& iName,
                                           const Color3& value)
 {
   _checkUniform(iName);
@@ -127,8 +127,8 @@ ShaderMaterial& ShaderMaterial::setColor3(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setColor3Array(const string_t& iName,
-                                               const vector_t<Color3>& value)
+ShaderMaterial& ShaderMaterial::setColor3Array(const std::string& iName,
+                                               const std::vector<Color3>& value)
 {
   _checkUniform(iName);
   _colors3Arrays[name].clear();
@@ -141,7 +141,7 @@ ShaderMaterial& ShaderMaterial::setColor3Array(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setColor4(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setColor4(const std::string& iName,
                                           const Color4& value)
 {
   _checkUniform(iName);
@@ -150,7 +150,7 @@ ShaderMaterial& ShaderMaterial::setColor4(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setVector2(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setVector2(const std::string& iName,
                                            const Vector2& value)
 {
   _checkUniform(iName);
@@ -159,7 +159,7 @@ ShaderMaterial& ShaderMaterial::setVector2(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setVector3(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setVector3(const std::string& iName,
                                            const Vector3& value)
 {
   _checkUniform(iName);
@@ -168,7 +168,7 @@ ShaderMaterial& ShaderMaterial::setVector3(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setVector4(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setVector4(const std::string& iName,
                                            const Vector4& value)
 {
   _checkUniform(iName);
@@ -177,7 +177,7 @@ ShaderMaterial& ShaderMaterial::setVector4(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setMatrix(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setMatrix(const std::string& iName,
                                           const Matrix& value)
 {
   _checkUniform(iName);
@@ -186,7 +186,7 @@ ShaderMaterial& ShaderMaterial::setMatrix(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setMatrix3x3(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setMatrix3x3(const std::string& iName,
                                              const Float32Array& value)
 {
   _checkUniform(iName);
@@ -195,7 +195,7 @@ ShaderMaterial& ShaderMaterial::setMatrix3x3(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setMatrix2x2(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setMatrix2x2(const std::string& iName,
                                              const Float32Array& value)
 {
   _checkUniform(iName);
@@ -204,7 +204,7 @@ ShaderMaterial& ShaderMaterial::setMatrix2x2(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setArray2(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setArray2(const std::string& iName,
                                           const Float32Array& value)
 {
   _checkUniform(iName);
@@ -213,7 +213,7 @@ ShaderMaterial& ShaderMaterial::setArray2(const string_t& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setArray3(const string_t& iName,
+ShaderMaterial& ShaderMaterial::setArray3(const std::string& iName,
                                           const Float32Array& value)
 {
   _checkUniform(iName);
@@ -230,7 +230,7 @@ bool ShaderMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
   }
 
   if (_effect
-      && (_effect->defines.find("#define INSTANCES") != string_t::npos)
+      && (_effect->defines.find("#define INSTANCES") != std::string::npos)
            != useInstances) {
     return false;
   }
@@ -252,8 +252,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   // Instances
-  vector_t<string_t> defines;
-  vector_t<string_t> attribs;
+  std::vector<std::string> defines;
+  std::vector<std::string> attribs;
   auto fallbacks = std::make_unique<EffectFallbacks>();
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
@@ -465,7 +465,7 @@ void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
   _afterBind(mesh);
 }
 
-vector_t<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
+std::vector<BaseTexturePtr> ShaderMaterial::getActiveTextures() const
 {
   auto activeTextures = Material::getActiveTextures();
 
@@ -491,7 +491,7 @@ bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
 
   auto it1
     = std::find_if(_textures.begin(), _textures.end(),
-                     [&texture](const pair_t<string_t, TexturePtr>& tex) {
+                     [&texture](const std::pair<std::string, TexturePtr>& tex) {
                        return tex.second == texture;
                      });
   if (it1 != _textures.end()) {
@@ -500,7 +500,7 @@ bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
 
   auto it2 = std::find_if(
     _textureArrays.begin(), _textureArrays.end(),
-    [&texture](const pair_t<string_t, vector_t<BaseTexturePtr>>& textures) {
+    [&texture](const std::pair<std::string, std::vector<BaseTexturePtr>>& textures) {
       return stl_util::contains(textures.second, texture);
     });
   if (it2 != _textureArrays.end()) {
@@ -510,7 +510,7 @@ bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-MaterialPtr ShaderMaterial::clone(const string_t& iName,
+MaterialPtr ShaderMaterial::clone(const std::string& iName,
                                   bool /*cloneChildren*/) const
 {
   return ShaderMaterial::New(iName, getScene(), _shaderPath, _options);
@@ -540,9 +540,9 @@ Json::object ShaderMaterial::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<ShaderMaterial>
+std::unique_ptr<ShaderMaterial>
 ShaderMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
-                      const string_t& /*url*/)
+                      const std::string& /*url*/)
 {
   return nullptr;
 }

@@ -18,13 +18,13 @@ public:
 
 protected:
   bool _loadMaterial(
-    const GLTFLoader& loader, const string_t& context,
+    const GLTFLoader& loader, const std::string& context,
     const IGLTFMaterial& material,
     const std::function<void(Material* babylonMaterial, bool isNew)>& assign);
 
 private:
   void _loadSpecularGlossinessProperties(
-    GLTFLoader& loader, const string_t& context, IGLTFMaterial& material,
+    GLTFLoader& loader, const std::string& context, IGLTFMaterial& material,
     const IKHRMaterialsPbrSpecularGlossiness& properties);
 
 }; // end of class KHRMaterialsPbrSpecularGlossiness

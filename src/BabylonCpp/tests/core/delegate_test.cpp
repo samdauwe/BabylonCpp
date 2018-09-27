@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <babylon/babylon_stl.h>
+#include <babylon/core/delegates/delegate.h>
 
 struct A {
 

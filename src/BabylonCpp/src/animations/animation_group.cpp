@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-AnimationGroup::AnimationGroup(const string_t& iName, Scene* scene)
+AnimationGroup::AnimationGroup(const std::string& iName, Scene* scene)
     : name{iName}
     , from{this, &AnimationGroup::get_from}
     , to{this, &AnimationGroup::get_to}
@@ -20,8 +20,8 @@ AnimationGroup::AnimationGroup(const string_t& iName, Scene* scene)
     , targetedAnimations{this, &AnimationGroup::get_targetedAnimations}
     , animatables{this, &AnimationGroup::get_animatables}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
-    , _from{numeric_limits_t<float>::max()}
-    , _to{numeric_limits_t<float>::lowest()}
+    , _from{std::numeric_limits<float>::max()}
+    , _to{std::numeric_limits<float>::lowest()}
     , _isStarted{false}
     , _speedRatio{1.f}
 {
@@ -32,7 +32,7 @@ AnimationGroup::~AnimationGroup()
 }
 
 void AnimationGroup::addToScene(
-  unique_ptr_t<AnimationGroup>&& newAnimationGroup)
+  std::unique_ptr<AnimationGroup>&& newAnimationGroup)
 {
   _scene->animationGroups.emplace_back(std::move(newAnimationGroup));
 }
@@ -70,13 +70,13 @@ void AnimationGroup::set_speedRatio(float value)
   }
 }
 
-vector_t<unique_ptr_t<TargetedAnimation>>&
+std::vector<std::unique_ptr<TargetedAnimation>>&
 AnimationGroup::get_targetedAnimations()
 {
   return _targetedAnimations;
 }
 
-vector_t<AnimatablePtr>& AnimationGroup::get_animatables()
+std::vector<AnimatablePtr>& AnimationGroup::get_animatables()
 {
   return _animatables;
 }
@@ -105,8 +105,8 @@ AnimationGroup::addTargetedAnimation(const AnimationPtr& animation,
   return targetedAnimation;
 }
 
-AnimationGroup& AnimationGroup::normalize(const nullable_t<int>& iBeginFrame,
-                                          const nullable_t<int>& iEndFrame)
+AnimationGroup& AnimationGroup::normalize(const std::optional<int>& iBeginFrame,
+                                          const std::optional<int>& iEndFrame)
 {
   auto beginFrame = iBeginFrame ? *iBeginFrame : _from;
   auto endFrame   = iEndFrame ? *iEndFrame : _to;
@@ -140,8 +140,8 @@ AnimationGroup& AnimationGroup::normalize(const nullable_t<int>& iBeginFrame,
 }
 
 AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
-                                      nullable_t<float> from,
-                                      nullable_t<float> to)
+                                      std::optional<float> from,
+                                      std::optional<float> to)
 {
   if (_isStarted || _targetedAnimations.empty()) {
     return *this;
@@ -282,10 +282,10 @@ void AnimationGroup::dispose(bool /*doNotRecurse*/,
 
   _scene->animationGroups.erase(
     std::remove_if(_scene->animationGroups.begin(),
-                     _scene->animationGroups.end(),
-                     [this](const AnimationGroupPtr& animationGroup) {
-                       return animationGroup.get() == this;
-                     }),
+                   _scene->animationGroups.end(),
+                   [this](const AnimationGroupPtr& animationGroup) {
+                     return animationGroup.get() == this;
+                   }),
     _scene->animationGroups.end());
 }
 

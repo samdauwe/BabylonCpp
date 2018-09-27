@@ -797,7 +797,7 @@ void EditControl::doRotation(const MeshPtr& mesh, const MeshPtr& axis,
     setLocalAxes(mesh);
     if ((eulerian)) {
       mesh->rotation           = mesh->rotationQuaternion()->toEulerAngles();
-      mesh->rotationQuaternion = nullopt_t;
+      mesh->rotationQuaternion = std::nullopt;
     }
   }
 }

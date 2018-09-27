@@ -1,8 +1,6 @@
 #ifndef BABYLON_SAMPLES_SAMPLE_LAUNCHER_H
 #define BABYLON_SAMPLES_SAMPLE_LAUNCHER_H
 
-#include <babylon/babylon_stl.h>
-
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/irenderable_scene.h>
 
@@ -23,14 +21,14 @@ struct Window {
   bool fullscreen          = false;
   int width                = 0;
   int height               = 0;
-  string_t title           = "";
+  std::string title        = "";
   bool intialized          = false;
   // Babylon scene related variables
-  bool sceneIntialized                           = false;
-  unique_ptr_t<ICanvas> renderCanvas             = nullptr;
-  unique_ptr_t<IRenderableScene> renderableScene = nullptr;
-  double lastTime                                = 0.0;
-  int frameCount                                 = 0;
+  bool sceneIntialized                              = false;
+  std::unique_ptr<ICanvas> renderCanvas             = nullptr;
+  std::unique_ptr<IRenderableScene> renderableScene = nullptr;
+  double lastTime                                   = 0.0;
+  int frameCount                                    = 0;
 }; // end of struct Window
 
 struct SampleLauncherOptions;
@@ -76,7 +74,7 @@ public:
 
 public:
   static void CreateGLFWWindow(Window& window, int width, int height,
-                               const string_t& title, GLFWmonitor* monitor,
+                               const std::string& title, GLFWmonitor* monitor,
                                Window* parentWindow);
 
 private:
@@ -92,7 +90,7 @@ private:
 #ifdef WITH_INSPECTOR
   bool _showInspectorWindow;
   // Inspector
-  unique_ptr_t<Inspector> _inspector;
+  std::unique_ptr<Inspector> _inspector;
 #endif
   // Other settings
   bool _useOpenGLES;

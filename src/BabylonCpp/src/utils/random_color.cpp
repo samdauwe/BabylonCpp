@@ -77,7 +77,7 @@ ColorInfo::ColorInfo() : _hasHueRange{false}, _isValid{false}
 
 ColorInfo::ColorInfo(const Range& hueRange, const Range& saturationRange,
                      const Range& brightnessRange,
-                     const vector_t<Range>& lowerBounds)
+                     const std::vector<Range>& lowerBounds)
     : _hueRange{hueRange}
     , _hasHueRange{true}
     , _saturationRange{saturationRange}
@@ -184,17 +184,17 @@ void ColorInfo::setBrightnessRange(const Range& brightnessRange)
   _brightnessRange = brightnessRange;
 }
 
-vector_t<Range>& ColorInfo::getLowerBounds()
+std::vector<Range>& ColorInfo::getLowerBounds()
 {
   return _lowerBounds;
 }
 
-const vector_t<Range>& ColorInfo::getLowerBounds() const
+const std::vector<Range>& ColorInfo::getLowerBounds() const
 {
   return _lowerBounds;
 }
 
-void ColorInfo::setLowerBounds(const vector_t<Range>& lowerBounds)
+void ColorInfo::setLowerBounds(const std::vector<Range>& lowerBounds)
 {
   _lowerBounds = lowerBounds;
 }
@@ -258,7 +258,7 @@ RandomColor::~RandomColor()
 {
 }
 
-array_t<unsigned int, 3> RandomColor::HSVToRGB(float hue, float saturation,
+std::array<unsigned int, 3> RandomColor::HSVToRGB(float hue, float saturation,
                                                float value)
 {
   float fR = 0.f, fG = 0.f, fB = 0.f;
@@ -316,7 +316,7 @@ array_t<unsigned int, 3> RandomColor::HSVToRGB(float hue, float saturation,
   return {{iR, iG, iB}};
 }
 
-string_t RandomColor::GetColorName(const Color& color)
+std::string RandomColor::GetColorName(const Color& color)
 {
   switch (color) {
     case Color::MONOCHROME:
@@ -340,18 +340,18 @@ string_t RandomColor::GetColorName(const Color& color)
   }
 }
 
-array_t<unsigned int, 3> RandomColor::getColor(float hue, float saturation,
+std::array<unsigned int, 3> RandomColor::getColor(float hue, float saturation,
                                                float brightness)
 {
   return RandomColor::HSVToRGB(hue, saturation / 100.f, brightness / 100.f);
 }
 
-array_t<unsigned int, 3> RandomColor::randomColor()
+std::array<unsigned int, 3> RandomColor::randomColor()
 {
   return randomColor(0, SaturationType::UNDEFINED, Luminosity::UNDEFINED);
 }
 
-array_t<unsigned int, 3>
+std::array<unsigned int, 3>
 RandomColor::randomColor(float value, const SaturationType& saturationType,
                          const Luminosity& luminosity)
 {
@@ -363,13 +363,13 @@ RandomColor::randomColor(float value, const SaturationType& saturationType,
   return getColor(hue, saturation, brightness);
 }
 
-vector_t<array_t<unsigned int, 3>> RandomColor::randomColor(int count)
+std::vector<std::array<unsigned int, 3>> RandomColor::randomColor(int count)
 {
   if (count <= 0) {
-    return vector_t<array_t<unsigned int, 3>>();
+    return std::vector<std::array<unsigned int, 3>>();
   }
 
-  vector_t<array_t<unsigned int, 3>> colors;
+  std::vector<std::array<unsigned int, 3>> colors;
   for (int i = 0; i < count; ++i) {
     colors.emplace_back(randomColor());
   }
@@ -377,7 +377,7 @@ vector_t<array_t<unsigned int, 3>> RandomColor::randomColor(int count)
   return colors;
 }
 
-array_t<unsigned int, 3> RandomColor::randomColor(const Color& color)
+std::array<unsigned int, 3> RandomColor::randomColor(const Color& color)
 {
   float hue = pickHue(RandomColor::GetColorName(color));
   float saturation
@@ -387,14 +387,14 @@ array_t<unsigned int, 3> RandomColor::randomColor(const Color& color)
   return getColor(hue, saturation, brightness);
 }
 
-vector_t<array_t<unsigned int, 3>> RandomColor::random(const Color& color,
+std::vector<std::array<unsigned int, 3>> RandomColor::random(const Color& color,
                                                        int count)
 {
   if (count <= 0) {
-    return vector_t<array_t<unsigned int, 3>>();
+    return std::vector<std::array<unsigned int, 3>>();
   }
 
-  vector_t<array_t<unsigned int, 3>> colors;
+  std::vector<std::array<unsigned int, 3>> colors;
   for (int i = 0; i < count; ++i) {
     colors.emplace_back(randomColor(color));
   }
@@ -421,7 +421,7 @@ float RandomColor::doPickHue(const Range& hueRange)
   return hue;
 }
 
-float RandomColor::pickHue(const string_t& name)
+float RandomColor::pickHue(const std::string& name)
 {
   Range hueRange = getHueRange(name);
   return doPickHue(hueRange);
@@ -436,7 +436,7 @@ Range RandomColor::getHueRange(float number)
   return Range(0, 360);
 }
 
-Range RandomColor::getHueRange(const string_t& name)
+Range RandomColor::getHueRange(const std::string& name)
 {
   if (stl_util::contains(_colors, name)) {
     return _colors[name].getHueRange();
@@ -552,7 +552,7 @@ float RandomColor::getMinimumBrightness(const ColorInfo& colorInfo,
     return 0;
   }
 
-  const vector_t<Range>& lowerBounds = colorInfo.getLowerBounds();
+  const std::vector<Range>& lowerBounds = colorInfo.getLowerBounds();
   for (unsigned int i = 0; i < lowerBounds.size() - 1; ++i) {
 
     float s1 = lowerBounds.at(i).start();
@@ -600,8 +600,8 @@ float RandomColor::randomWithin(const Range& range)
                           * (range.end() + 1.f - (range.start())));
 }
 
-void RandomColor::defineColor(const string_t& name,
-                              const vector_t<Range>& lowerBounds)
+void RandomColor::defineColor(const std::string& name,
+                              const std::vector<Range>& lowerBounds)
 {
   float sMin = lowerBounds.front().start();
   float sMax = lowerBounds.at(lowerBounds.size() - 1).start();
@@ -612,8 +612,8 @@ void RandomColor::defineColor(const string_t& name,
     = ColorInfo(Range(), Range(sMin, sMax), Range(bMin, bMax), lowerBounds);
 }
 
-void RandomColor::defineColor(const string_t& name, const Range& hueRange,
-                              const vector_t<Range>& lowerBounds)
+void RandomColor::defineColor(const std::string& name, const Range& hueRange,
+                              const std::vector<Range>& lowerBounds)
 {
   float sMin = lowerBounds.front().start();
   float sMax = lowerBounds.at(lowerBounds.size() - 1).start();

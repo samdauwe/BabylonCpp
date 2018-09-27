@@ -1,5 +1,7 @@
 #include <babylon/animations/animation_value.h>
 
+#include <cmath>
+
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 
@@ -18,57 +20,67 @@ AnimationValue::AnimationValue(float value)
 }
 
 AnimationValue::AnimationValue(const Vector3& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_VECTOR3()}, vector3Data{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_VECTOR3())}
+    , vector3Data{value}
 {
 }
 
 AnimationValue::AnimationValue(const Quaternion& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_QUATERNION()}, quaternionData{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_QUATERNION())}
+    , quaternionData{value}
 {
 }
 
 AnimationValue::AnimationValue(const Matrix& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_MATRIX()}, matrixData{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_MATRIX())}
+    , matrixData{value}
 {
 }
 
 AnimationValue::AnimationValue(const Color3& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_COLOR3()}, color3Data{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_COLOR3())}
+    , color3Data{value}
 {
 }
 
 AnimationValue::AnimationValue(const Vector2& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_VECTOR2()}, vector2Data{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_VECTOR2())}
+    , vector2Data{value}
 {
 }
 
 AnimationValue::AnimationValue(const Size& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_SIZE()}, sizeData{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_SIZE())}
+    , sizeData{value}
 {
 }
 
 AnimationValue::AnimationValue(bool value)
-    : dataType{(int)Animation::ANIMATIONTYPE_BOOL()}, boolData{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_BOOL())}
+    , boolData{value}
 {
 }
 
 AnimationValue::AnimationValue(int value)
-    : dataType{(int)Animation::ANIMATIONTYPE_INT()}, intData{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_INT())}, intData{value}
 {
 }
 
-AnimationValue::AnimationValue(const string_t& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_STRING()}, stringData{value}
+AnimationValue::AnimationValue(const std::string& value)
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_STRING())}
+    , stringData{value}
 {
 }
 
 AnimationValue::AnimationValue(const Color4& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_COLOR4()}, color4Data{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_COLOR4())}
+    , color4Data{value}
 {
 }
 
 AnimationValue::AnimationValue(const Float32Array& value)
-    : dataType{(int)Animation::ANIMATIONTYPE_FLOAT32ARRAY()}, float32ArrayData{value}
+    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_FLOAT32ARRAY())}
+    , float32ArrayData{value}
 {
 }
 
@@ -174,8 +186,8 @@ AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
     case Animation::ANIMATIONTYPE_COLOR4():
       return AnimationValue(color4Data.subtract(fromValue.color4Data));
     case Animation::ANIMATIONTYPE_FLOAT32ARRAY(): {
-      auto count = std::min(float32ArrayData.size(),
-                              fromValue.float32ArrayData.size());
+      auto count
+        = std::min(float32ArrayData.size(), fromValue.float32ArrayData.size());
       Float32Array result(count);
       for (size_t i = 0; i < count; ++i) {
         result[i] = float32ArrayData[i] - fromValue.float32ArrayData[i];
@@ -200,7 +212,7 @@ AnimationValue AnimationValue::operator!()
   return *this;
 }
 
-AnimationValue AnimationValue::operator[](const string_t& /*property*/)
+AnimationValue AnimationValue::operator[](const std::string& /*property*/)
 {
   return AnimationValue(false);
 }

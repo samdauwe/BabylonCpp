@@ -13,8 +13,8 @@
 
 namespace BABYLON {
 
-unordered_map_t<string_t, BabylonFileParser> AbstractScene::_BabylonFileParsers;
-unordered_map_t<string_t, IndividualBabylonFileParser>
+std::unordered_map<std::string, BabylonFileParser> AbstractScene::_BabylonFileParsers;
+std::unordered_map<std::string, IndividualBabylonFileParser>
   AbstractScene::_IndividualBabylonFileParsers;
 
 AbstractScene::AbstractScene()
@@ -33,7 +33,7 @@ void AbstractScene::_addIndividualParsers()
   AbstractScene::AddIndividualParser(
     SceneComponentConstants::NAME_PARTICLESYSTEM,
     [](const Json::value& parsedParticleSystem, Scene* scene,
-       const string_t& rootUrl) -> any {
+       const std::string& rootUrl) -> any {
       if (parsedParticleSystem.contains("activeParticleCount")) {
         auto ps
           = GPUParticleSystem::Parse(parsedParticleSystem, scene, rootUrl);
@@ -52,7 +52,7 @@ void AbstractScene::_addParsers()
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_EFFECTLAYER,
     [](const Json::value& parsedData, Scene* scene, AssetContainer& container,
-       const string_t& rootUrl) {
+       const std::string& rootUrl) {
       if (parsedData.contains("effectLayers")) {
         for (const auto& effectLayer :
              Json::GetArray(parsedData, "effectLayers")) {
@@ -66,7 +66,7 @@ void AbstractScene::_addParsers()
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_LENSFLARESYSTEM,
     [](const Json::value& parsedData, Scene* scene, AssetContainer& container,
-       const string_t& rootUrl) {
+       const std::string& rootUrl) {
       // Lens flares
       if (parsedData.contains("lensFlareSystems")) {
         for (const auto& parsedLensFlareSystem :
@@ -81,7 +81,7 @@ void AbstractScene::_addParsers()
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_PARTICLESYSTEM,
     [](const Json::value& parsedData, Scene* scene, AssetContainer& container,
-       const string_t& rootUrl) {
+       const std::string& rootUrl) {
       auto individualParser = AbstractScene::GetIndividualParser(
         SceneComponentConstants::NAME_PARTICLESYSTEM);
       if (!individualParser) {
@@ -101,39 +101,39 @@ void AbstractScene::_addParsers()
     });
 }
 
-void AbstractScene::AddParser(const string_t& name,
+void AbstractScene::AddParser(const std::string& name,
                               const BabylonFileParser& parser)
 {
   _BabylonFileParsers[name] = parser;
 }
 
-nullable_t<BabylonFileParser> AbstractScene::GetParser(const string_t& name)
+std::optional<BabylonFileParser> AbstractScene::GetParser(const std::string& name)
 {
   if (stl_util::contains(_BabylonFileParsers, name)) {
     return _BabylonFileParsers[name];
   }
 
-  return nullopt_t;
+  return std::nullopt;
 }
 
 void AbstractScene::AddIndividualParser(
-  const string_t& name, const IndividualBabylonFileParser& parser)
+  const std::string& name, const IndividualBabylonFileParser& parser)
 {
   _IndividualBabylonFileParsers[name] = parser;
 }
 
-nullable_t<IndividualBabylonFileParser>
-AbstractScene::GetIndividualParser(const string_t& name)
+std::optional<IndividualBabylonFileParser>
+AbstractScene::GetIndividualParser(const std::string& name)
 {
   if (stl_util::contains(_IndividualBabylonFileParsers, name)) {
     return _IndividualBabylonFileParsers[name];
   }
 
-  return nullopt_t;
+  return std::nullopt;
 }
 
 void AbstractScene::Parse(Json::value& jsonData, Scene* scene,
-                          AssetContainer& container, const string_t& rootUrl)
+                          AssetContainer& container, const std::string& rootUrl)
 {
   for (const auto& _BabylonFileParserItem : _BabylonFileParsers) {
     _BabylonFileParserItem.second(jsonData, scene, container, rootUrl);
@@ -155,7 +155,7 @@ void AbstractScene::addEffectLayer(const EffectLayerPtr& newEffectLayer)
   effectLayers.emplace_back(newEffectLayer);
 }
 
-GlowLayerPtr AbstractScene::getGlowLayerByName(const string_t& name)
+GlowLayerPtr AbstractScene::getGlowLayerByName(const std::string& name)
 {
   auto it = std::find_if(effectLayers.begin(), effectLayers.end(),
                            [&name](const EffectLayerPtr& effectLayer) {
@@ -169,7 +169,7 @@ GlowLayerPtr AbstractScene::getGlowLayerByName(const string_t& name)
            std::static_pointer_cast<GlowLayer>(*it);
 }
 
-HighlightLayerPtr AbstractScene::getHighlightLayerByName(const string_t& name)
+HighlightLayerPtr AbstractScene::getHighlightLayerByName(const std::string& name)
 {
   auto it = std::find_if(effectLayers.begin(), effectLayers.end(),
                            [&name](const EffectLayerPtr& effectLayer) {
@@ -200,7 +200,7 @@ void AbstractScene::addLensFlareSystem(
   lensFlareSystems.emplace_back(newLensFlareSystem);
 }
 
-LensFlareSystemPtr AbstractScene::getLensFlareSystemByName(const string_t& name)
+LensFlareSystemPtr AbstractScene::getLensFlareSystemByName(const std::string& name)
 {
   auto it = std::find_if(lensFlareSystems.begin(), lensFlareSystems.end(),
                            [&name](const LensFlareSystemPtr& lensFlareSystem) {
@@ -210,7 +210,7 @@ LensFlareSystemPtr AbstractScene::getLensFlareSystemByName(const string_t& name)
   return (it == lensFlareSystems.end()) ? nullptr : (*it);
 }
 
-LensFlareSystemPtr AbstractScene::getLensFlareSystemByID(const string_t& id)
+LensFlareSystemPtr AbstractScene::getLensFlareSystemByID(const std::string& id)
 {
   auto it = std::find_if(lensFlareSystems.begin(), lensFlareSystems.end(),
                            [&id](const LensFlareSystemPtr& lensFlareSystem) {

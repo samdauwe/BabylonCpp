@@ -44,7 +44,7 @@ void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   const auto createCorner = [](float x, float y) { return Vector3(x, 0, y); };
 
-  vector_t<Vector3> corners;
+  std::vector<Vector3> corners;
   for (size_t b = 0; b < baseData.size() / 2; ++b) {
     corners.emplace_back(createCorner(baseData[2 * b], baseData[2 * b + 1]));
   }
@@ -59,7 +59,7 @@ void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene)
   WindowSpace windowSpace1{window0, 0.4f, 0.4f, 0.45f};
   WindowSpace windowSpace78{window1, 1.5, 0.6f, 0.45f};
 
-  vector_t<Wall> walls;
+  std::vector<Wall> walls;
   for (size_t c = 0; c < corners.size(); ++c) {
     walls.emplace_back(Wall{corners[c], {}, {}});
   }
@@ -87,7 +87,7 @@ void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene)
   });
 }
 
-MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
+MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls, float ply,
                                                float height,
                                                BuildFromPlanOptions& options,
                                                Scene* scene)
@@ -107,16 +107,16 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
   size_t interiorIndex = 0;
 
   // Arrays to hold wall corner data
-  vector_t<Vector3> innerBaseCorners;
-  vector_t<Vector3> outerBaseCorners;
-  vector_t<Vector3> innerTopCorners;
-  vector_t<Vector3> outerTopCorners;
-  vector_t<vector_t<vector_t<Vector3>>> innerDoorCorners;
-  vector_t<vector_t<vector_t<Vector3>>> outerDoorCorners;
-  vector_t<vector_t<vector_t<Vector3>>> innerWindowCorners;
-  vector_t<vector_t<vector_t<Vector3>>> outerWindowCorners;
+  std::vector<Vector3> innerBaseCorners;
+  std::vector<Vector3> outerBaseCorners;
+  std::vector<Vector3> innerTopCorners;
+  std::vector<Vector3> outerTopCorners;
+  std::vector<std::vector<std::vector<Vector3>>> innerDoorCorners;
+  std::vector<std::vector<std::vector<Vector3>>> outerDoorCorners;
+  std::vector<std::vector<std::vector<Vector3>>> innerWindowCorners;
+  std::vector<std::vector<std::vector<Vector3>>> outerWindowCorners;
 
-  vector_t<Vector3> outerData;
+  std::vector<Vector3> outerData;
   auto angle     = 0.f;
   auto direction = 0.f;
   auto line      = Vector3::Zero();
@@ -171,7 +171,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
   /**************** House Mesh Construction ***********************************/
 
   // Wall Construction
-  vector_t<Vector2> polygonCorners;
+  std::vector<Vector2> polygonCorners;
   WallData wallData;
   auto wallDirection      = Vector3::Zero();
   auto wallNormal         = Vector3::Zero();
@@ -231,9 +231,9 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
     // Windows
     // Construct holes and add to polygon from window data
     auto windows = walls[w].windowSpaces.size();
-    vector_t<vector_t<Vector2>> holes;
+    std::vector<std::vector<Vector2>> holes;
     for (size_t ws = 0; ws < windows; ++ws) {
-      vector_t<Vector2> holeData;
+      std::vector<Vector2> holeData;
       holeData.emplace_back<Vector2>(
         Vector2(walls[w].windowSpaces[ws].left,
                 height - walls[w].windowSpaces[ws].top
@@ -293,11 +293,11 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
     // For each inner door save corner as an array of four Vector3s, base left,
     // top left, top right, base right
     // Extend door data outwards by ply and save outer door corners
-    vector_t<vector_t<Vector3>> doorCornersIn;
-    vector_t<vector_t<Vector3>> doorCornersOut;
+    std::vector<std::vector<Vector3>> doorCornersIn;
+    std::vector<std::vector<Vector3>> doorCornersOut;
     for (size_t p = 0; p < doorData.size() / 12; ++p) {
-      vector_t<Vector3> doorsIn;
-      vector_t<Vector3> doorsOut;
+      std::vector<Vector3> doorsIn;
+      std::vector<Vector3> doorsOut;
       for (size_t d = 0; d < 4; ++d) {
         doorsIn.emplace_back(Vector3(doorData[3 * d + 12 * p],
                                      doorData[3 * d + 12 * p + 1],
@@ -317,11 +317,11 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(vector_t<Wall>& walls, float ply,
     // For each inner window save corner as an array of four Vector3s, base
     // left, top left, top right, base right
     // Extend window data outwards by ply and save outer window corners
-    vector_t<vector_t<Vector3>> windowCornersIn;
-    vector_t<vector_t<Vector3>> windowCornersOut;
+    std::vector<std::vector<Vector3>> windowCornersIn;
+    std::vector<std::vector<Vector3>> windowCornersOut;
     for (size_t p = 0; p < windowData.size() / 12; ++p) {
-      vector_t<Vector3> windowsIn;
-      vector_t<Vector3> windowsOut;
+      std::vector<Vector3> windowsIn;
+      std::vector<Vector3> windowsOut;
       for (size_t d = 0; d < 4; ++d) {
         windowsIn.emplace_back(Vector3(windowData[3 * d + 12 * p],
                                        windowData[3 * d + 12 * p + 1],

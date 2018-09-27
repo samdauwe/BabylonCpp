@@ -18,16 +18,16 @@ bool ArcRotateCamera::NodeConstructorAdded = false;
 void ArcRotateCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "ArcRotateCamera", [](const string_t& name, Scene* scene,
-                          const nullable_t<Json::value>& /*options*/) {
+    "ArcRotateCamera", [](const std::string& name, Scene* scene,
+                          const std::optional<Json::value>& /*options*/) {
       return ArcRotateCamera::New(name, 0.f, 0.f, 1.f, Vector3::Zero(), scene);
     });
   ArcRotateCamera::NodeConstructorAdded = true;
 }
 
-ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
+ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
                                  float iBeta, float iRadius,
-                                 const nullable_t<Vector3>& iTarget,
+                                 const std::optional<Vector3>& iTarget,
                                  Scene* scene,
                                  bool setActiveOnSceneIfNoneActive)
     : TargetCamera{iName, Vector3::Zero(), scene, setActiveOnSceneIfNoneActive}
@@ -38,16 +38,16 @@ ArcRotateCamera::ArcRotateCamera(const string_t& iName, float iAlpha,
     , inertialAlphaOffset{0.f}
     , inertialBetaOffset{0.f}
     , inertialRadiusOffset{0.f}
-    , lowerAlphaLimit{nullopt_t}
-    , upperAlphaLimit{nullopt_t}
+    , lowerAlphaLimit{std::nullopt}
+    , upperAlphaLimit{std::nullopt}
     , lowerBetaLimit{0.01f}
     , upperBetaLimit{Math::PI}
-    , lowerRadiusLimit{nullopt_t}
-    , upperRadiusLimit{nullopt_t}
+    , lowerRadiusLimit{std::nullopt}
+    , upperRadiusLimit{std::nullopt}
     , inertialPanningX{0.f}
     , inertialPanningY{0.f}
     , pinchToPanMaxDistance{20.f}
-    , panningDistanceLimit{nullopt_t}
+    , panningDistanceLimit{std::nullopt}
     , panningOriginTarget{Vector3::Zero()}
     , panningInertia{0.9f}
     , zoomOnFactor{1.f}
@@ -100,8 +100,8 @@ void ArcRotateCamera::_initCache()
   TargetCamera::_initCache();
 
   _cache._target
-    = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
-              numeric_limits_t<float>::max());
+    = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+              std::numeric_limits<float>::max());
   _cache.alpha              = 0.f;
   _cache.beta               = 0.f;
   _cache.radius             = 0.f;
@@ -422,7 +422,7 @@ void ArcRotateCamera::setTarget(const Vector3& iTarget,
   rebuildAnglesAndRadius();
 }
 
-unique_ptr_t<BouncingBehavior>& ArcRotateCamera::get_bouncingBehavior()
+std::unique_ptr<BouncingBehavior>& ArcRotateCamera::get_bouncingBehavior()
 {
   return _bouncingBehavior;
 }
@@ -448,7 +448,7 @@ void ArcRotateCamera::set_useBouncingBehavior(bool value)
   }
 }
 
-unique_ptr_t<FramingBehavior>& ArcRotateCamera::get_framingBehavior()
+std::unique_ptr<FramingBehavior>& ArcRotateCamera::get_framingBehavior()
 {
   return _framingBehavior;
 }
@@ -474,7 +474,7 @@ void ArcRotateCamera::set_useFramingBehavior(bool value)
   }
 }
 
-unique_ptr_t<AutoRotationBehavior>& ArcRotateCamera::get_autoRotationBehavior()
+std::unique_ptr<AutoRotationBehavior>& ArcRotateCamera::get_autoRotationBehavior()
 {
   return _autoRotationBehavior;
 }
@@ -595,7 +595,7 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   _collisionTriggered = false;
 }
 
-void ArcRotateCamera::zoomOn(const vector_t<AbstractMeshPtr> meshes,
+void ArcRotateCamera::zoomOn(const std::vector<AbstractMeshPtr> meshes,
                              bool doNotUpdateMaxZ)
 {
   auto _meshes = meshes.empty() ? getScene()->getMeshes() : meshes;
@@ -618,7 +618,7 @@ void ArcRotateCamera::focusOn(
   }
 }
 
-CameraPtr ArcRotateCamera::createRigCamera(const string_t& iName,
+CameraPtr ArcRotateCamera::createRigCamera(const std::string& iName,
                                            int cameraIndex)
 {
   float alphaShift = 0.f;
@@ -677,7 +677,7 @@ void ArcRotateCamera::dispose(bool doNotRecurse,
   TargetCamera::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-const string_t ArcRotateCamera::getClassName() const
+const std::string ArcRotateCamera::getClassName() const
 {
   return "ArcRotateCamera";
 }

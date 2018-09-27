@@ -1,7 +1,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <babylon/babylon_stl.h>
 #include <babylon/math/vector2.h>
 
 template <typename T>

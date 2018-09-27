@@ -18,7 +18,7 @@
 
 namespace BABYLON {
 
-Geometry::Geometry(const string_t& iId, Scene* scene, VertexData* vertexData,
+Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
                    bool updatable, Mesh* mesh)
     : id{iId}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
@@ -74,12 +74,12 @@ void Geometry::addToScene(const GeometryPtr& newGeometry)
   _scene->pushGeometry(newGeometry, true);
 }
 
-nullable_t<Vector2>& Geometry::get_boundingBias()
+std::optional<Vector2>& Geometry::get_boundingBias()
 {
   return _boundingBias;
 }
 
-void Geometry::set_boundingBias(const nullable_t<Vector2>& value)
+void Geometry::set_boundingBias(const std::optional<Vector2>& value)
 {
   if (_boundingBias && (*_boundingBias).equals(*value)) {
     return;
@@ -160,7 +160,7 @@ void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
 AbstractMesh* Geometry::setVerticesData(unsigned int kind,
                                         const Float32Array& data,
                                         bool updatable,
-                                        const nullable_t<size_t>& stride)
+                                        const std::optional<size_t>& stride)
 {
   auto buffer = std::make_unique<VertexBuffer>(
     _engine, ToVariant<Float32Array, Buffer*>(data), kind, updatable,
@@ -179,8 +179,8 @@ void Geometry::removeVerticesData(unsigned int kind)
   }
 }
 
-void Geometry::setVerticesBuffer(unique_ptr_t<VertexBuffer>&& buffer,
-                                 const nullable_t<size_t>& totalVertices)
+void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer,
+                                 const std::optional<size_t>& totalVertices)
 {
   auto kind = buffer->getKind();
   if (stl_util::contains(_vertexBuffers, kind)) {
@@ -376,16 +376,16 @@ VertexBuffer* Geometry::getVertexBuffer(unsigned int kind) const
   }
 }
 
-unordered_map_t<string_t, VertexBuffer*> Geometry::getVertexBuffers()
+std::unordered_map<std::string, VertexBuffer*> Geometry::getVertexBuffers()
 {
-  unordered_map_t<string_t, VertexBuffer*> vertexBuffers;
+  std::unordered_map<std::string, VertexBuffer*> vertexBuffers;
 
   if (!isReady()) {
     return vertexBuffers;
   }
 
   for (const auto& item : _vertexBuffers) {
-    const string_t kind = VertexBuffer::KindAsString(item.first);
+    const std::string kind = VertexBuffer::KindAsString(item.first);
     vertexBuffers[kind] = item.second.get();
   }
 
@@ -447,7 +447,7 @@ AbstractMesh* Geometry::setIndices(const IndicesArray& indices,
   _indices                = indices;
   _indexBufferIsUpdatable = updatable;
   if (!_meshes.empty() && !_indices.empty()) {
-    _indexBuffer = unique_ptr_t<GL::IGLBuffer>(
+    _indexBuffer = std::unique_ptr<GL::IGLBuffer>(
       _engine->createIndexBuffer(_indices, updatable));
   }
 
@@ -547,7 +547,7 @@ void Geometry::applyToMesh(Mesh* mesh)
     _applyToMesh(mesh);
   }
   else {
-    mesh->_boundingInfo = unique_ptr_t<BoundingInfo>(_boundingInfo.get());
+    mesh->_boundingInfo = std::unique_ptr<BoundingInfo>(_boundingInfo.get());
   }
 }
 
@@ -597,7 +597,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
   // indexBuffer
   if (numOfMeshes == 1 && _indices.size() > 0) {
     _indexBuffer
-      = unique_ptr_t<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
+      = std::unique_ptr<GL::IGLBuffer>(_engine->createIndexBuffer(_indices));
   }
   if (_indexBuffer) {
     _indexBuffer->references = numOfMeshes;
@@ -742,7 +742,7 @@ void Geometry::dispose()
   _isDisposed = true;
 }
 
-GeometryPtr Geometry::copy(const string_t& iId)
+GeometryPtr Geometry::copy(const std::string& iId)
 {
   auto vertexData = std::make_unique<VertexData>();
 
@@ -796,7 +796,7 @@ Json::object Geometry::serializeVerticeData() const
   return Json::object();
 }
 
-GeometryPtr Geometry::ExtractFromMesh(Mesh* mesh, const string_t& id)
+GeometryPtr Geometry::ExtractFromMesh(Mesh* mesh, const std::string& id)
 {
   auto geometry = mesh->geometry();
 
@@ -807,7 +807,7 @@ GeometryPtr Geometry::ExtractFromMesh(Mesh* mesh, const string_t& id)
   return geometry->copy(id);
 }
 
-string_t Geometry::RandomId()
+std::string Geometry::RandomId()
 {
   return Tools::RandomId();
 }
@@ -818,7 +818,7 @@ void Geometry::_ImportGeometry(const Json::value& parsedGeometry,
   auto scene = mesh->getScene();
 
   if (parsedGeometry.contains("geometryId")) {
-    string_t geometryId = Json::GetString(parsedGeometry, "geometryId", "");
+    std::string geometryId = Json::GetString(parsedGeometry, "geometryId", "");
     auto geometry       = scene->getGeometryByID(geometryId);
     if (geometry) {
       geometry->applyToMesh(mesh.get());
@@ -1025,7 +1025,7 @@ void Geometry::_CleanMatricesWeights(const Json::value& parsedGeometry,
 }
 
 GeometryPtr Geometry::Parse(const Json::value& parsedVertexData, Scene* scene,
-                            const string_t& rootUrl)
+                            const std::string& rootUrl)
 {
   const auto parsedVertexDataId = Json::GetString(parsedVertexData, "id");
   if (parsedVertexDataId.empty()

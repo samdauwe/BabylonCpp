@@ -12,7 +12,7 @@ Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget,
                        int iFromFrame, int iToFrame, bool iLoopAnimation,
                        float iSpeedRatio,
                        const std::function<void()>& iOnAnimationEnd,
-                       const vector_t<AnimationPtr>& animations)
+                       const std::vector<AnimationPtr>& animations)
     : target{iTarget}
     , disposeOnEnd{true}
     , animationStarted{false}
@@ -24,8 +24,8 @@ Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget,
     , masterFrame{this, &Animatable::get_masterFrame}
     , weight{this, &Animatable::get_weight, &Animatable::set_weight}
     , speedRatio{this, &Animatable::get_speedRatio, &Animatable::set_speedRatio}
-    , _localDelayOffset{nullopt_t}
-    , _pausedDelay{nullopt_t}
+    , _localDelayOffset{std::nullopt}
+    , _pausedDelay{std::nullopt}
     , _paused{false}
     , _scene{scene}
     , _weight{-1.f}
@@ -110,13 +110,13 @@ Animatable& Animatable::syncWith(Animatable* root)
   return *this;
 }
 
-vector_t<RuntimeAnimationPtr>& Animatable::getAnimations()
+std::vector<RuntimeAnimationPtr>& Animatable::getAnimations()
 {
   return _runtimeAnimations;
 }
 
 void Animatable::appendAnimations(const IAnimatablePtr& iTarget,
-                                  const vector_t<AnimationPtr>& animations)
+                                  const std::vector<AnimationPtr>& animations)
 {
   for (auto& animation : animations) {
     _runtimeAnimations.emplace_back(
@@ -125,7 +125,7 @@ void Animatable::appendAnimations(const IAnimatablePtr& iTarget,
 }
 
 AnimationPtr
-Animatable::getAnimationByTargetProperty(const string_t& property) const
+Animatable::getAnimationByTargetProperty(const std::string& property) const
 {
   auto it = std::find_if(
     _runtimeAnimations.begin(), _runtimeAnimations.end(),
@@ -136,8 +136,8 @@ Animatable::getAnimationByTargetProperty(const string_t& property) const
   return (it == _runtimeAnimations.end()) ? nullptr : (*it)->animation();
 }
 
-RuntimeAnimationPtr
-Animatable::getRuntimeAnimationByTargetProperty(const string_t& property) const
+RuntimeAnimationPtr Animatable::getRuntimeAnimationByTargetProperty(
+  const std::string& property) const
 {
   auto it = std::find_if(
     _runtimeAnimations.begin(), _runtimeAnimations.end(),
@@ -154,8 +154,8 @@ void Animatable::reset()
     runtimeAnimation->reset(true);
   }
 
-  _localDelayOffset = nullopt_t;
-  _pausedDelay      = nullopt_t;
+  _localDelayOffset = std::nullopt;
+  _pausedDelay      = std::nullopt;
 }
 
 void Animatable::enableBlending(float blendingSpeed)
@@ -181,7 +181,7 @@ void Animatable::goToFrame(int frame)
     auto adjustTime   = frame - currentFrame;
     auto delay        = static_cast<float>(adjustTime) * 1000.f
                  / (static_cast<float>(fps) * speedRatio);
-    if (_localDelayOffset == nullopt_t) {
+    if (_localDelayOffset == std::nullopt) {
       _localDelayOffset = millisecond_t(0);
     }
     _localDelayOffset = (*_localDelayOffset)
@@ -216,7 +216,7 @@ void Animatable::_raiseOnAnimationEnd()
 }
 
 void Animatable::stop(
-  const string_t& animationName,
+  const std::string& animationName,
   const std::function<bool(IAnimatable* target)>& targetMask)
 {
   if (!animationName.empty() || targetMask) {
@@ -256,19 +256,19 @@ bool Animatable::_animate(const millisecond_t& delay)
 {
   if (_paused) {
     animationStarted = false;
-    if (_pausedDelay == nullopt_t) {
+    if (_pausedDelay == std::nullopt) {
       _pausedDelay = delay;
     }
     return true;
   }
 
-  if (_localDelayOffset == nullopt_t) {
+  if (_localDelayOffset == std::nullopt) {
     _localDelayOffset = delay;
-    _pausedDelay      = nullopt_t;
+    _pausedDelay      = std::nullopt;
   }
-  else if (_pausedDelay != nullopt_t) {
+  else if (_pausedDelay != std::nullopt) {
     _localDelayOffset = (*_localDelayOffset) + delay - (*_pausedDelay);
-    _pausedDelay      = nullopt_t;
+    _pausedDelay      = std::nullopt;
   }
 
   if (_weight == 0.f) { // We consider that an animation with a weight === 0 is

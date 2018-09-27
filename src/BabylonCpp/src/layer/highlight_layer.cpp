@@ -32,23 +32,23 @@ Color4 HighlightLayer::NeutralColor             = Color4(0.f, 0.f, 0.f, 0.f);
 int HighlightLayer::GlowingMeshStencilReference = 0x02;
 int HighlightLayer::NormalMeshStencilReference  = 0x01;
 
-HighlightLayer::HighlightLayer(const string_t& name, Scene* scene)
+HighlightLayer::HighlightLayer(const std::string& name, Scene* scene)
     : HighlightLayer(name, scene,
                      IHighlightLayerOptions{
                        0.5f,                           // mainTextureRatio
-                       nullopt_t,                      // mainTextureFixedSize
+                       std::nullopt,                      // mainTextureFixedSize
                        0.5f,                           // blurTextureSizeRatio
                        1.f,                            // blurVerticalSize
                        1.f,                            // blurHorizontalSize
                        EngineConstants::ALPHA_COMBINE, // alphaBlendingMode
                        nullptr,                        // camera
-                       nullopt_t,                      // isStroke
+                       std::nullopt,                      // isStroke
                        -1                              // renderingGroupId
                      })
 {
 }
 
-HighlightLayer::HighlightLayer(const string_t& iName, Scene* scene,
+HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene,
                                const IHighlightLayerOptions& options)
     : EffectLayer{iName, scene}
     , innerGlow{true}
@@ -118,7 +118,7 @@ float HighlightLayer::get_blurVerticalSize() const
   return _verticalBlurPostprocess->kernel;
 }
 
-string_t HighlightLayer::getEffectName() const
+std::string HighlightLayer::getEffectName() const
 {
   return HighlightLayer::EffectName;
 }
@@ -553,7 +553,7 @@ void HighlightLayer::dispose()
   EffectLayer::dispose();
 }
 
-string_t HighlightLayer::getClassName() const
+std::string HighlightLayer::getClassName() const
 {
   return "HighlightLayer";
 }
@@ -565,7 +565,7 @@ Json::object HighlightLayer::serialize() const
 
 HighlightLayer*
 HighlightLayer::Parse(const Json::value& /*parsedHightlightLayer*/,
-                      Scene* /*scene*/, const string_t& /*rootUrl*/)
+                      Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

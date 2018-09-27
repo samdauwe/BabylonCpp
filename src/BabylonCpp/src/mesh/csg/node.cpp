@@ -9,7 +9,7 @@ CSG::Node::Node() : _plane{nullptr}, _front{nullptr}, _back{nullptr}
 {
 }
 
-CSG::Node::Node(const vector_t<BABYLON::CSG::Polygon>& polygons)
+CSG::Node::Node(const std::vector<BABYLON::CSG::Polygon>& polygons)
     : _plane{nullptr}, _front{nullptr}, _back{nullptr}
 {
   if (!polygons.empty()) {
@@ -21,7 +21,7 @@ CSG::Node::~Node()
 {
 }
 
-unique_ptr_t<CSG::Node> CSG::Node::clone()
+std::unique_ptr<CSG::Node> CSG::Node::clone()
 {
   auto node       = std::make_unique<Node>();
   node->_plane    = _plane ? _plane->cloneToNewObject() : nullptr;
@@ -48,13 +48,13 @@ void CSG::Node::invert()
   std::swap(_front, _back);
 }
 
-vector_t<CSG::Polygon>
-CSG::Node::clipPolygons(const vector_t<BABYLON::CSG::Polygon>& polygons)
+std::vector<CSG::Polygon>
+CSG::Node::clipPolygons(const std::vector<BABYLON::CSG::Polygon>& polygons)
 {
   if (!_plane) {
     return polygons;
   }
-  vector_t<Polygon> front, back;
+  std::vector<Polygon> front, back;
   for (auto& polygon : polygons) {
     _plane->splitPolygon(polygon, front, back, front, back);
   }
@@ -82,9 +82,9 @@ void BABYLON::CSG::Node::clipTo(BABYLON::CSG::Node& bsp)
   }
 }
 
-vector_t<BABYLON::CSG::Polygon> BABYLON::CSG::Node::allPolygons()
+std::vector<BABYLON::CSG::Polygon> BABYLON::CSG::Node::allPolygons()
 {
-  vector_t<Polygon> polygons = _polygons;
+  std::vector<Polygon> polygons = _polygons;
   if (_front) {
     polygons = stl_util::concat(polygons, _front->allPolygons());
   }
@@ -94,7 +94,7 @@ vector_t<BABYLON::CSG::Polygon> BABYLON::CSG::Node::allPolygons()
   return polygons;
 }
 
-void BABYLON::CSG::Node::build(const vector_t<BABYLON::CSG::Polygon>& polygons)
+void BABYLON::CSG::Node::build(const std::vector<BABYLON::CSG::Polygon>& polygons)
 {
   if (polygons.empty()) {
     return;
@@ -102,7 +102,7 @@ void BABYLON::CSG::Node::build(const vector_t<BABYLON::CSG::Polygon>& polygons)
   if (!_plane) {
     _plane = (*polygons[0].plane).cloneToNewObject();
   }
-  vector_t<Polygon> front, back;
+  std::vector<Polygon> front, back;
   for (auto& polygon : polygons) {
     _plane->splitPolygon(polygon, _polygons, _polygons, front, back);
   }

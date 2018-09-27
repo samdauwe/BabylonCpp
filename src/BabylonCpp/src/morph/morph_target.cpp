@@ -10,7 +10,7 @@
 
 namespace BABYLON {
 
-MorphTarget::MorphTarget(const string_t& name, float iInfluence, Scene* scene)
+MorphTarget::MorphTarget(const std::string& name, float iInfluence, Scene* scene)
     : influence{this, &MorphTarget::get_influence, &MorphTarget::set_influence}
     , animationPropertiesOverride{this,
                                   &MorphTarget::get_animationPropertiesOverride,
@@ -133,7 +133,7 @@ Json::object MorphTarget::serialize() const
   return Json::object();
 }
 
-unique_ptr_t<MorphTarget>
+std::unique_ptr<MorphTarget>
 MorphTarget::Parse(const Json::value& serializationObject)
 {
   auto result = std::make_unique<MorphTarget>(
@@ -161,8 +161,8 @@ MorphTarget::Parse(const Json::value& serializationObject)
   return result;
 }
 
-unique_ptr_t<MorphTarget> MorphTarget::FromMesh(AbstractMesh* mesh,
-                                                string_t name, float influence)
+std::unique_ptr<MorphTarget> MorphTarget::FromMesh(AbstractMesh* mesh,
+                                                std::string name, float influence)
 {
   if (name.empty()) {
     name = mesh->name;

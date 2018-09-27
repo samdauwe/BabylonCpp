@@ -65,7 +65,7 @@ void UniversalCamera::set_gamepadMoveSensibility(float value)
 
 //-- end properties for backward compatibility for inputs
 
-UniversalCamera::UniversalCamera::UniversalCamera(const string_t& name,
+UniversalCamera::UniversalCamera::UniversalCamera(const std::string& name,
                                                   const Vector3& position,
                                                   Scene* scene)
     : TouchCamera{name, position, scene}
@@ -82,7 +82,7 @@ UniversalCamera::~UniversalCamera()
 {
 }
 
-const string_t UniversalCamera::getClassName() const
+const std::string UniversalCamera::getClassName() const
 {
   return "UniversalCamera";
 }

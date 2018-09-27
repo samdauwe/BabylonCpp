@@ -34,7 +34,7 @@ namespace BABYLON {
 
 Vector3 AbstractMesh::_lookAtVectorCache = Vector3(0.f, 0.f, 0.f);
 
-AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
+AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     : TransformNode(iName, scene, false)
     , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_STANDARD}
     , facetNb{this, &AbstractMesh::get_facetNb}
@@ -66,7 +66,7 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
                                  &AbstractMesh::get_isOcclusionQueryInProgress}
     , visibility{this, &AbstractMesh::get_visibility,
                  &AbstractMesh::set_visibility}
-    , alphaIndex{numeric_limits_t<int>::max()}
+    , alphaIndex{std::numeric_limits<int>::max()}
     , isVisible{true}
     , isPickable{true}
     , showBoundingBox{this, &AbstractMesh::get_showBoundingBox,
@@ -117,7 +117,7 @@ AbstractMesh::AbstractMesh(const string_t& iName, Scene* scene)
     , _renderId{0}
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
-    , _waitingFreezeWorldMatrix{nullopt_t}
+    , _waitingFreezeWorldMatrix{std::nullopt}
     , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
     , edgesRenderer{this, &AbstractMesh::get_edgesRenderer}
     , isBlocked{this, &AbstractMesh::get_isBlocked}
@@ -447,12 +447,12 @@ void AbstractMesh::set_collisionGroup(int mask)
   _collisionGroup = !isNan(mask) ? mask : -1;
 }
 
-const string_t AbstractMesh::getClassName() const
+const std::string AbstractMesh::getClassName() const
 {
   return "AbstractMesh";
 }
 
-string_t AbstractMesh::toString(bool fullDetails) const
+std::string AbstractMesh::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name << ", isInstance: ";
@@ -463,7 +463,7 @@ string_t AbstractMesh::toString(bool fullDetails) const
   }
   if (fullDetails) {
     oss << ", billboard mode: ";
-    const vector_t<string_t> billboardModes{"NONE", "X",    "Y",    "null",
+    const std::vector<std::string> billboardModes{"NONE", "X",    "Y",    "null",
                                             "Z",    "null", "null", "ALL"};
     if (billboardMode < billboardModes.size()) {
       oss << billboardModes[billboardMode];
@@ -682,7 +682,7 @@ AbstractMesh::enableEdgesRendering(float epsilon,
   return *this;
 }
 
-unique_ptr_t<EdgesRenderer>& AbstractMesh::get_edgesRenderer()
+std::unique_ptr<EdgesRenderer>& AbstractMesh::get_edgesRenderer()
 {
   return _edgesRenderer;
 }
@@ -719,7 +719,7 @@ Float32Array AbstractMesh::getVerticesData(unsigned int /*kind*/,
 AbstractMesh*
 AbstractMesh::setVerticesData(unsigned int /*kind*/,
                               const Float32Array& /*data*/, bool /*updatable*/,
-                              const nullable_t<size_t>& /*stride*/)
+                              const std::optional<size_t>& /*stride*/)
 {
   return this;
 }
@@ -874,11 +874,11 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
 
   if (subMeshes.empty()) {
     min
-      = Vector3(numeric_limits_t<float>::max(), numeric_limits_t<float>::max(),
-                numeric_limits_t<float>::max());
-    max = Vector3(numeric_limits_t<float>::lowest(),
-                  numeric_limits_t<float>::lowest(),
-                  numeric_limits_t<float>::lowest());
+      = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+                std::numeric_limits<float>::max());
+    max = Vector3(std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest());
   }
   else {
     min = boundingInfo.boundingBox.minimumWorld;
@@ -952,7 +952,7 @@ void AbstractMesh::_afterComputeWorldMatrix()
   _updateBoundingInfo();
 }
 
-bool AbstractMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+bool AbstractMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                                unsigned int /*strategy*/)
 {
   return _boundingInfo != nullptr
@@ -960,7 +960,7 @@ bool AbstractMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
 }
 
 bool AbstractMesh::isCompletelyInFrustum(
-  const array_t<Plane, 6>& frustumPlanes) const
+  const std::array<Plane, 6>& frustumPlanes) const
 {
   return _boundingInfo != nullptr
          && _boundingInfo->isCompletelyInFrustum(frustumPlanes);
@@ -1080,7 +1080,7 @@ void AbstractMesh::set_checkCollisions(bool collisionEnabled)
   }
 }
 
-unique_ptr_t<Collider>& AbstractMesh::get_collider()
+std::unique_ptr<Collider>& AbstractMesh::get_collider()
 {
   return _collider;
 }
@@ -1145,7 +1145,7 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
   auto boundingInfo = getBoundingInfo();
 
   // Update octree
-  vector_t<SubMesh*> subMeshPtrs;
+  std::vector<SubMesh*> subMeshPtrs;
   subMeshPtrs.reserve(subMeshes.size());
   for (auto& subMesh : subMeshes) {
     subMeshPtrs.emplace_back(subMesh.get());
@@ -1325,7 +1325,7 @@ PickingInfo AbstractMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
   return PickingInfo();
 }
 
-AbstractMesh* AbstractMesh::clone(const string_t& /*name*/, Node* /*newParent*/,
+AbstractMesh* AbstractMesh::clone(const std::string& /*name*/, Node* /*newParent*/,
                                   bool /*doNotCloneChildren*/)
 {
   return nullptr;
@@ -1597,7 +1597,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
   return *this;
 }
 
-vector_t<Vector3>& AbstractMesh::getFacetLocalNormals()
+std::vector<Vector3>& AbstractMesh::getFacetLocalNormals()
 {
   if (_facetNormals.empty()) {
     updateFacetData();
@@ -1605,7 +1605,7 @@ vector_t<Vector3>& AbstractMesh::getFacetLocalNormals()
   return _facetNormals;
 }
 
-vector_t<Vector3>& AbstractMesh::getFacetLocalPositions()
+std::vector<Vector3>& AbstractMesh::getFacetLocalPositions()
 {
   if (_facetPositions.empty()) {
     updateFacetData();
@@ -1613,7 +1613,7 @@ vector_t<Vector3>& AbstractMesh::getFacetLocalPositions()
   return _facetPositions;
 }
 
-vector_t<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
+std::vector<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
 {
 #if 0
   if (_facetPartitioning.empty()) {
@@ -1725,7 +1725,7 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z,
     return closest;
   }
   // Get the closest facet to (x, y, z)
-  float shortest    = numeric_limits_t<float>::max(); // init distance vars
+  float shortest    = std::numeric_limits<float>::max(); // init distance vars
   float tmpDistance = shortest;
   size_t fib        = 0; // current facet in the block
   Vector3 norm;          // current facet normal

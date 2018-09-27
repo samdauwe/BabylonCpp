@@ -16,29 +16,29 @@ public:
   // Utilities
   //
   static bool TraverseNode(
-    GLTFLoader& loader, const string_t& context, IGLTFNode* node,
+    GLTFLoader& loader, const std::string& context, IGLTFNode* node,
     const std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
     IGLTFNode* parentNode);
-  static bool LoadNode(GLTFLoader& loader, const string_t& context,
+  static bool LoadNode(GLTFLoader& loader, const std::string& context,
                        IGLTFNode* node);
   static bool LoadMaterial(
-    GLTFLoader& loader, const string_t& context, IGLTFMaterial& material,
+    GLTFLoader& loader, const std::string& context, IGLTFMaterial& material,
     const std::function<void(Material* babylonMaterial, bool isNew)>& assign);
 
 protected:
   virtual bool _traverseNode(
-    GLTFLoader& loader, const string_t& context, IGLTFNode* node,
+    GLTFLoader& loader, const std::string& context, IGLTFNode* node,
     const std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
     IGLTFNode* parentNode);
-  virtual bool _loadNode(GLTFLoader& loader, const string_t& context,
+  virtual bool _loadNode(GLTFLoader& loader, const std::string& context,
                          IGLTFNode* node);
   virtual bool _loadMaterial(
-    GLTFLoader& loader, const string_t& context, IGLTFMaterial& material,
+    GLTFLoader& loader, const std::string& context, IGLTFMaterial& material,
     const std::function<void(Material* babylonMaterial, bool isNew)>& assign);
   template <typename T>
   bool _loadExtension(
-    const string_t& context, IGLTFProperty& property,
-    const std::function<void(const string_t& context, const T& extension,
+    const std::string& context, IGLTFProperty& property,
+    const std::function<void(const std::string& context, const T& extension,
                                const std::function<void()>& onComplete)>&
       action);
 
@@ -50,7 +50,7 @@ private:
     const std::function<bool(const GLTFLoaderExtension& extension)>& action);
 
 public:
-  vector_t<GLTFLoaderExtension> _Extensions;
+  std::vector<GLTFLoaderExtension> _Extensions;
 
 private:
   bool _enabled;

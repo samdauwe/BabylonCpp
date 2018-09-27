@@ -14,7 +14,7 @@ public:
 
 protected:
   std::string _body;
-  vector_t<std::string> _headers;
+  std::vector<std::string> _headers;
   std::string _httpVersion;
   int _statusCode;
   std::string _statusDescription;

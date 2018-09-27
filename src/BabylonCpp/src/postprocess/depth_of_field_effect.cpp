@@ -1,5 +1,7 @@
 #include <babylon/postprocess/depth_of_field_effect.h>
 
+#include <cmath>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/variant.h>
 #include <babylon/engine/scene.h>
@@ -18,7 +20,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
                                        unsigned int pipelineTextureType,
                                        bool blockCompilation)
     : PostProcessRenderEffect{scene->getEngine(), "depth of field",
-                              [&]() -> vector_t<PostProcess*> {
+                              [&]() -> std::vector<PostProcess*> {
                                 return _effects;
                               },
                               true}
@@ -87,7 +89,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
     _depthOfFieldBlurX.emplace_back(std::move(blurX));
   }
 
-  vector_t<PostProcess*> blurSteps;
+  std::vector<PostProcess*> blurSteps;
   for (auto& depthOfFieldBlurX : _depthOfFieldBlurX) {
     blurSteps.emplace_back(static_cast<PostProcess*>(depthOfFieldBlurX.get()));
   }

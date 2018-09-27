@@ -65,7 +65,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , _lastDeltaTime{0.f}
     , _renderId{-1}
     , _isVisible{false}
-    , _clipPlane{nullopt_t}
+    , _clipPlane{std::nullopt}
     , _savedViewMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
     , _useLogarithmicDepth{false}

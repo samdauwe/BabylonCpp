@@ -20,11 +20,11 @@
 
 namespace BABYLON {
 
-GlowLayer::GlowLayer(const string_t& name, Scene* scene)
+GlowLayer::GlowLayer(const std::string& name, Scene* scene)
     : GlowLayer(name, scene,
                 IGlowLayerOptions{
                   GlowLayer::DefaultTextureRatio, // mainTextureRatio;
-                  nullopt_t,                      // mainTextureFixedSize
+                  std::nullopt,                      // mainTextureFixedSize
                   32,                             // blurKernelSize
                   nullptr,                        // camera
                   1,                              // mainTextureSamples
@@ -33,7 +33,7 @@ GlowLayer::GlowLayer(const string_t& name, Scene* scene)
 {
 }
 
-GlowLayer::GlowLayer(const string_t& iName, Scene* scene,
+GlowLayer::GlowLayer(const std::string& iName, Scene* scene,
                      const IGlowLayerOptions& options)
     : EffectLayer{iName, scene}
     , customEmissiveColorSelector{nullptr}
@@ -95,7 +95,7 @@ float GlowLayer::get_intensity() const
   return _intensity;
 }
 
-string_t GlowLayer::getEffectName() const
+std::string GlowLayer::getEffectName() const
 {
   return GlowLayer::EffectName;
 }
@@ -381,7 +381,7 @@ void GlowLayer::_disposeMesh(Mesh* mesh)
   removeExcludedMesh(mesh);
 }
 
-string_t GlowLayer::getClassName() const
+std::string GlowLayer::getClassName() const
 {
   return "GlowLayer";
 }
@@ -392,7 +392,7 @@ Json::object GlowLayer::serialize() const
 }
 
 GlowLayer* GlowLayer::Parse(const Json::value& /*parsedGlowLayer*/,
-                            Scene* /*scene*/, const string_t& /*rootUrl*/)
+                            Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

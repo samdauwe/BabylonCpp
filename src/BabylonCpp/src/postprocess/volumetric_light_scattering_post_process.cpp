@@ -97,8 +97,8 @@ bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
     return _mesh->material()->isReady(mesh.get());
   }
 
-  vector_t<std::string> defines;
-  vector_t<std::string> attribs{VertexBuffer::PositionKindChars};
+  std::vector<std::string> defines;
+  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
   auto material = subMesh->getMaterial();
 
   // Alpha test
@@ -145,7 +145,7 @@ bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
   std::string join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
-    unordered_map_t<std::string, std::string> baseName{
+    std::unordered_map<std::string, std::string> baseName{
       {"vertexElement", "depth"},
       {"fragmentElement", "volumetricLightScatteringPass"}};
 
@@ -323,10 +323,10 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     [&](int*, EventState&) { scene->clearColor = savedSceneClearColor; });
 
   _volumetricLightScatteringRTT->customRenderFunction
-    = [&](const vector_t<SubMeshPtr>& opaqueSubMeshes,
-          const vector_t<SubMeshPtr>& alphaTestSubMeshes,
-          const vector_t<SubMeshPtr>& transparentSubMeshes,
-          const vector_t<SubMeshPtr>& depthOnlySubMeshes,
+    = [&](const std::vector<SubMeshPtr>& opaqueSubMeshes,
+          const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+          const std::vector<SubMeshPtr>& transparentSubMeshes,
+          const std::vector<SubMeshPtr>& depthOnlySubMeshes,
           const std::function<void()>& /*beforeTransparents*/) {
         auto pEngine = scene->getEngine();
 

@@ -21,17 +21,17 @@ CSG::CSG::~CSG()
 {
 }
 
-unique_ptr_t<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
+std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
 {
   Vector3 normal;
   Vector2 uv;
   Vector3 position;
-  vector_t<Polygon> polygons;
+  std::vector<Polygon> polygons;
 
   Matrix matrix;
   Vector3 meshPosition;
   Vector3 meshRotation;
-  nullable_t<Quaternion> meshRotationQuaternion = nullopt_t;
+  std::optional<Quaternion> meshRotationQuaternion = std::nullopt;
   Vector3 meshScaling;
 
   mesh->computeWorldMatrix(true);
@@ -53,7 +53,7 @@ unique_ptr_t<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
     for (size_t i  = subMesh->indexStart,
                 il = subMesh->indexCount + subMesh->indexStart;
          i < il; i += 3) {
-      vector_t<Vertex> vertices;
+      std::vector<Vertex> vertices;
       for (unsigned int j = 0; j < 3; ++j) {
         Vector3 sourceNormal(normals[indices[i + j] * 3],
                              normals[indices[i + j] * 3 + 1],
@@ -96,15 +96,15 @@ unique_ptr_t<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
   return csg;
 }
 
-unique_ptr_t<BABYLON::CSG::CSG>
-CSG::CSG::FromPolygons(const vector_t<BABYLON::CSG::Polygon>& _polygons)
+std::unique_ptr<BABYLON::CSG::CSG>
+CSG::CSG::FromPolygons(const std::vector<BABYLON::CSG::Polygon>& _polygons)
 {
   auto csg       = std::make_unique<BABYLON::CSG::CSG>();
   csg->_polygons = _polygons;
   return csg;
 }
 
-unique_ptr_t<CSG::CSG> CSG::CSG::clone() const
+std::unique_ptr<CSG::CSG> CSG::CSG::clone() const
 {
   auto csg = std::make_unique<CSG>();
   for (auto& p : _polygons) {
@@ -210,7 +210,7 @@ void CSG::CSG::intersectInPlace(BABYLON::CSG::CSG* csg)
   _polygons = a.allPolygons();
 }
 
-unique_ptr_t<CSG::CSG> CSG::CSG::inverse()
+std::unique_ptr<CSG::CSG> CSG::CSG::inverse()
 {
   auto csg = clone();
   csg->inverseInPlace();
@@ -235,13 +235,13 @@ CSG::CSG& CSG::CSG::copyTransformAttributes(const BABYLON::CSG::CSG& csg)
   return *this;
 }
 
-MeshPtr CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
+MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
                                     bool keepSubMeshes)
 {
   Matrix _matrix = matrix;
   _matrix.invert();
 
-  using SubMeshObj = array_t<unsigned int, 3>;
+  using SubMeshObj = std::array<unsigned int, 3>;
 
   auto mesh = Mesh::New(name, scene);
   Float32Array vertices;
@@ -252,12 +252,12 @@ MeshPtr CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
   auto normal   = Vector3::Zero();
   auto uv       = Vector2::Zero();
   auto polygons = _polygons;
-  array_t<unsigned int, 3> polygonIndices{{0, 0, 0}};
-  unordered_map_t<string_t, size_t> vertice_dict;
+  std::array<unsigned int, 3> polygonIndices{{0, 0, 0}};
+  std::unordered_map<std::string, size_t> vertice_dict;
   bool vertexIdxDefined     = false;
   size_t vertex_idx         = 0;
   unsigned int currentIndex = 0;
-  unordered_map_t<unsigned int, unordered_map_t<unsigned int, SubMeshObj>>
+  std::unordered_map<unsigned int, std::unordered_map<unsigned int, SubMeshObj>>
     subMesh_dict;
   SubMeshObj subMesh_obj;
 
@@ -278,16 +278,16 @@ MeshPtr CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
     // Building SubMeshes
     if (subMesh_dict.find(polygon.shared.meshId) == subMesh_dict.end()) {
       subMesh_dict[polygon.shared.meshId]
-        = unordered_map_t<unsigned int, SubMeshObj>();
+        = std::unordered_map<unsigned int, SubMeshObj>();
     }
     if (subMesh_dict[polygon.shared.meshId].find(polygon.shared.subMeshId)
         == subMesh_dict[polygon.shared.meshId].end()) {
       // IndexStart
       subMesh_dict[polygon.shared.meshId][polygon.shared.subMeshId][0]
-        = numeric_limits_t<unsigned int>::max();
+        = std::numeric_limits<unsigned int>::max();
       // IndexEnd
       subMesh_dict[polygon.shared.meshId][polygon.shared.subMeshId][1]
-        = numeric_limits_t<unsigned int>::min();
+        = std::numeric_limits<unsigned int>::min();
       // materialIndex
       subMesh_dict[polygon.shared.meshId][polygon.shared.subMeshId][2]
         = polygon.shared.materialIndex;
@@ -307,7 +307,7 @@ MeshPtr CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
         Vector3 localVertex = Vector3::TransformCoordinates(vertex, matrix);
         Vector3 localNormal = Vector3::TransformNormal(normal, matrix);
 
-        string_t vertexId = String::concat(localVertex.x, ",", localVertex.y,
+        std::string vertexId = String::concat(localVertex.x, ",", localVertex.y,
                                            ",", localVertex.z);
 
         if (stl_util::contains(vertice_dict, vertexId)) {
@@ -375,7 +375,7 @@ MeshPtr CSG::CSG::buildMeshGeometry(const string_t& name, Scene* scene,
   return mesh;
 }
 
-MeshPtr CSG::CSG::toMesh(const string_t& name, const MaterialPtr& material,
+MeshPtr CSG::CSG::toMesh(const std::string& name, const MaterialPtr& material,
                          Scene* scene, bool keepSubMeshes)
 {
   auto mesh = buildMeshGeometry(name, scene, keepSubMeshes);

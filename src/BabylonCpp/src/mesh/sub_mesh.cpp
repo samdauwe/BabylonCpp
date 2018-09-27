@@ -53,7 +53,7 @@ SubMesh::~SubMesh()
 {
 }
 
-void SubMesh::addToMesh(const shared_ptr_t<SubMesh>& newSubMesh)
+void SubMesh::addToMesh(const std::shared_ptr<SubMesh>& newSubMesh)
 {
   _mesh->subMeshes.emplace_back(newSubMesh);
 }
@@ -178,7 +178,7 @@ SubMesh& SubMesh::updateBoundingInfo(const Matrix& world)
   return *this;
 }
 
-bool SubMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
+bool SubMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                           unsigned int /*strategy*/)
 {
   auto boundingInfo = getBoundingInfo();
@@ -191,7 +191,7 @@ bool SubMesh::isInFrustum(const array_t<Plane, 6>& frustumPlanes,
 }
 
 bool SubMesh::isCompletelyInFrustum(
-  const array_t<Plane, 6>& frustumPlanes) const
+  const std::array<Plane, 6>& frustumPlanes) const
 {
   auto boundingInfo = getBoundingInfo();
 
@@ -238,12 +238,12 @@ bool SubMesh::canIntersects(const Ray& ray) const
   return ray.intersectsBox(boundingInfo.boundingBox);
 }
 
-unique_ptr_t<IntersectionInfo>
-SubMesh::intersects(Ray& ray, const vector_t<Vector3>& positions,
+std::unique_ptr<IntersectionInfo>
+SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
                     const Uint32Array& indices, bool fastCheck)
 {
 
-  unique_ptr_t<IntersectionInfo> intersectInfo = nullptr;
+  std::unique_ptr<IntersectionInfo> intersectInfo = nullptr;
 
   const auto material = getMaterial();
   if (!material) {
@@ -357,7 +357,7 @@ void SubMesh::dispose()
   // Remove from mesh
   _mesh->subMeshes.erase(
     std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
-                     [this](const shared_ptr_t<SubMesh>& subMesh) {
+                     [this](const std::shared_ptr<SubMesh>& subMesh) {
                        return subMesh.get() == this;
                      }),
     _mesh->subMeshes.end());
@@ -370,8 +370,8 @@ SubMeshPtr SubMesh::CreateFromIndices(unsigned int materialIndex,
                                       const AbstractMeshPtr& mesh,
                                       Mesh* renderingMesh)
 {
-  unsigned int minVertexIndex = numeric_limits_t<unsigned>::max();
-  unsigned int maxVertexIndex = numeric_limits_t<unsigned>::min();
+  unsigned int minVertexIndex = std::numeric_limits<unsigned>::max();
+  unsigned int maxVertexIndex = std::numeric_limits<unsigned>::min();
 
   auto _renderingMesh
     = renderingMesh ? renderingMesh : static_cast<Mesh*>(mesh.get());

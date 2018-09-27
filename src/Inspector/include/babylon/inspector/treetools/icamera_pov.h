@@ -1,7 +1,7 @@
 #ifndef BABYLON_INSPECTOR_TREE_TOOLS_ICAMERA_POV_H
 #define BABYLON_INSPECTOR_TREE_TOOLS_ICAMERA_POV_H
 
-#include <babylon/babylon_stl.h>
+#include <string>
 
 namespace BABYLON {
 
@@ -9,9 +9,9 @@ struct ICameraPOV {
 
   virtual void setPOV() = 0;
 
-  virtual string_t getCurrentActiveCamera() const = 0;
+  virtual std::string getCurrentActiveCamera() const = 0;
 
-  virtual string_t cameraId() const = 0;
+  virtual std::string cameraId() const = 0;
 
 }; // end of struct ICameraPOV
 

@@ -18,26 +18,26 @@ public:
 
 protected:
   bool _traverseNode(
-    const GLTFLoader& loader, const string_t& context, IGLTFNode* node:,
+    const GLTFLoader& loader, const std::string& context, IGLTFNode* node:,
     const std::function<bool(IGLTFNode* node, IGLTFNode* node)> action,
     IGLTFNode* parentNode);
 
-  bool _loadNode(const GLTFLoader& loader, const string_t& context,
+  bool _loadNode(const GLTFLoader& loader, const std::string& context,
                  IGLTFNode* node);
 
   bool _loadMaterial(
-    const GLTFLoader& loader, const string_t& context,
+    const GLTFLoader& loader, const std::string& context,
     const IGLTFMaterial& material,
     const std::function<void(Material* babylonMaterial, bool isNew)>& assign);
 
 private:
-  void _loadNodeLOD(const GLTFLoader& loader, const string_t& context,
-                    const vector_t<IGLTFNode*> nodes, unsigned int index,
+  void _loadNodeLOD(const GLTFLoader& loader, const std::string& context,
+                    const std::vector<IGLTFNode*> nodes, unsigned int index,
                     std::function<void()>& onComplete);
 
   void _loadMaterialLOD(
-    const GLTFLoader& loader, const string_t& context,
-    const vector_t<IGLTFMaterial*>& materials, unsigned int index,
+    const GLTFLoader& loader, const std::string& context,
+    const std::vector<IGLTFMaterial*>& materials, unsigned int index,
     const std::function<void(Material* babylonMaterial, bool isNew)>& assign,
     const std::function<void()>& onComplete);
 

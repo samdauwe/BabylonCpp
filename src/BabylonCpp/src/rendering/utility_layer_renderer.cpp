@@ -8,12 +8,12 @@
 
 namespace BABYLON {
 
-shared_ptr_t<UtilityLayerRenderer> UtilityLayerRenderer::_DefaultUtilityLayer
+std::shared_ptr<UtilityLayerRenderer> UtilityLayerRenderer::_DefaultUtilityLayer
   = nullptr;
-shared_ptr_t<UtilityLayerRenderer>
+std::shared_ptr<UtilityLayerRenderer>
   UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer = nullptr;
 
-shared_ptr_t<UtilityLayerRenderer>& UtilityLayerRenderer::DefaultUtilityLayer()
+std::shared_ptr<UtilityLayerRenderer>& UtilityLayerRenderer::DefaultUtilityLayer()
 {
   if (UtilityLayerRenderer::_DefaultUtilityLayer == nullptr) {
     UtilityLayerRenderer::_DefaultUtilityLayer
@@ -26,7 +26,7 @@ shared_ptr_t<UtilityLayerRenderer>& UtilityLayerRenderer::DefaultUtilityLayer()
   return UtilityLayerRenderer::_DefaultUtilityLayer;
 }
 
-shared_ptr_t<UtilityLayerRenderer>&
+std::shared_ptr<UtilityLayerRenderer>&
 UtilityLayerRenderer::DefaultKeepDepthUtilityLayer()
 {
   if (UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer == nullptr) {

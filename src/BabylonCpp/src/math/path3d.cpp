@@ -10,8 +10,8 @@ Path3D::Path3D()
 {
 }
 
-Path3D::Path3D(const vector_t<Vector3>& iPath,
-               const nullable_t<Vector3>& firstNormal, bool raw)
+Path3D::Path3D(const std::vector<Vector3>& iPath,
+               const std::optional<Vector3>& firstNormal, bool raw)
     : path{iPath}, _raw{raw}
 {
   for (auto& vector : iPath) {
@@ -81,7 +81,7 @@ Path3D Path3D::copy() const
   return Path3D(*this);
 }
 
-unique_ptr_t<Path3D> Path3D::clone() const
+std::unique_ptr<Path3D> Path3D::clone() const
 {
   return std::make_unique<Path3D>(*this);
 }
@@ -128,22 +128,22 @@ std::ostream& operator<<(std::ostream& os, const Path3D& path)
   return os;
 }
 
-vector_t<Vector3>& Path3D::getCurve()
+std::vector<Vector3>& Path3D::getCurve()
 {
   return _curve;
 }
 
-vector_t<Vector3>& Path3D::getTangents()
+std::vector<Vector3>& Path3D::getTangents()
 {
   return _tangents;
 }
 
-vector_t<Vector3>& Path3D::getNormals()
+std::vector<Vector3>& Path3D::getNormals()
 {
   return _normals;
 }
 
-vector_t<Vector3>& Path3D::getBinormals()
+std::vector<Vector3>& Path3D::getBinormals()
 {
   return _binormals;
 }
@@ -153,8 +153,8 @@ Float32Array& Path3D::getDistances()
   return _distances;
 }
 
-Path3D& Path3D::update(const vector_t<Vector3>& path,
-                       const nullable_t<Vector3>& firstNormal)
+Path3D& Path3D::update(const std::vector<Vector3>& path,
+                       const std::optional<Vector3>& firstNormal)
 {
   for (unsigned int p = 0; p < path.size(); ++p) {
     _curve[p].x = path[p].x;
@@ -165,7 +165,7 @@ Path3D& Path3D::update(const vector_t<Vector3>& path,
   return *this;
 }
 
-void Path3D::_compute(const nullable_t<Vector3>& firstNormal)
+void Path3D::_compute(const std::optional<Vector3>& firstNormal)
 {
   const auto l = _curve.size();
 
@@ -254,7 +254,7 @@ Vector3 Path3D::_getLastNonNullVector(unsigned int index)
 }
 
 Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
-                              const nullable_t<Vector3>& va)
+                              const std::optional<Vector3>& va)
 {
   Vector3 normal0;
   float tgl = vt.length();
@@ -262,7 +262,7 @@ Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
     tgl = 1.f;
   }
 
-  if (va == nullopt_t) {
+  if (va == std::nullopt) {
     Vector3 point;
     if (!Scalar::WithinEpsilon(
           std::abs(vt.y) / tgl, 1.f,

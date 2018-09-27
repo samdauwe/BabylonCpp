@@ -63,12 +63,12 @@ Vector3 Vector3::copy() const
   return Vector3(*this);
 }
 
-unique_ptr_t<Vector3> Vector3::clone() const
+std::unique_ptr<Vector3> Vector3::clone() const
 {
   return std::make_unique<Vector3>(*this);
 }
 
-string_t Vector3::toString() const
+std::string Vector3::toString() const
 {
   std::ostringstream oss;
   oss << *this;
@@ -567,7 +567,7 @@ void Vector3::FromArrayToRef(const Float32Array& array, unsigned int offset,
   result.z = array[offset + 2];
 }
 
-void Vector3::FromArrayToRef(const array_t<float, 16>& array,
+void Vector3::FromArrayToRef(const std::array<float, 16>& array,
                              unsigned int offset, Vector3& result)
 {
   result.x = array[offset];

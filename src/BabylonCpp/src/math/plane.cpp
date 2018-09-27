@@ -1,5 +1,7 @@
 #include <babylon/math/plane.h>
 
+#include <cmath>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/math/matrix.h>
 
@@ -57,7 +59,7 @@ Plane Plane::copy() const
   return Plane(*this);
 }
 
-unique_ptr_t<Plane> Plane::clone() const
+std::unique_ptr<Plane> Plane::clone() const
 {
   return std::make_unique<Plane>(*this);
 }
@@ -80,7 +82,7 @@ size_t Plane::getHashCode() const
   return hash;
 }
 
-array_t<float, 4> Plane::asArray() const
+std::array<float, 4> Plane::asArray() const
 {
   return {{normal.x, normal.y, normal.z, d}};
 }
@@ -90,7 +92,7 @@ Plane& Plane::normalize()
 {
   const float norm = sqrtf((normal.x * normal.x) + (normal.y * normal.y)
                            + (normal.z * normal.z));
-  float magnitude = 0.f;
+  float magnitude  = 0.f;
 
   if (!stl_util::almost_equal(norm, 0.f)) {
     magnitude = 1.f / norm;

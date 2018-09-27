@@ -91,7 +91,7 @@ Color4 Color4::copy() const
   return Color4(*this);
 }
 
-unique_ptr_t<Color4> Color4::clone() const
+std::unique_ptr<Color4> Color4::clone() const
 {
   return std::make_unique<Color4>(*this);
 }
@@ -230,7 +230,7 @@ bool Color4::equals(const Color4& otherColor) const
          && stl_util::almost_equal(a, otherColor.a);
 }
 
-string_t Color4::toString() const
+std::string Color4::toString() const
 {
   std::ostringstream oss;
   oss << *this;
@@ -263,7 +263,7 @@ Color4& Color4::set(float red, float green, float blue, float alpha)
   return copyFromFloats(red, green, blue, alpha);
 }
 
-string_t Color4::toHexString() const
+std::string Color4::toHexString() const
 {
   const int intR = static_cast<int>(r * 255) | 0;
   const int intG = static_cast<int>(g * 255) | 0;
@@ -347,7 +347,7 @@ Color4 Color4::operator*(float iscale) const
 }
 
 /** Statics **/
-Color4 Color4::FromHexString(const string_t& hex)
+Color4 Color4::FromHexString(const std::string& hex)
 {
   if (hex.substr(0, 1) != "#" || hex.size() != 9) {
     return Color4(0, 0, 0, 0);

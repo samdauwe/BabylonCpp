@@ -92,9 +92,9 @@ bool BlurPostProcess::get_packedFloat() const
 }
 
 void BlurPostProcess::updateEffect(
-  const std::string& /*defines*/, const vector_t<std::string>& /*uniforms*/,
-  const vector_t<std::string>& /*samplers*/,
-  const unordered_map_t<std::string, unsigned int>& /*indexParameters*/,
+  const std::string& /*defines*/, const std::vector<std::string>& /*uniforms*/,
+  const std::vector<std::string>& /*samplers*/,
+  const std::unordered_map<std::string, unsigned int>& /*indexParameters*/,
   const std::function<void(Effect* effect)>& onCompiled,
   const std::function<void(Effect* effect, const std::string& errors)>& onError)
 {
@@ -132,7 +132,7 @@ void BlurPostProcess::_updateParameters(
   Float32Array linearSamplingWeights;
   Int32Array linearSamplingOffsets;
 
-  vector_t<pair_t<std::int32_t, float>> linearSamplingMap;
+  std::vector<std::pair<std::int32_t, float>> linearSamplingMap;
 
   for (unsigned int i = 0; i <= centerIndex; i += 2) {
     auto j = std::min(i + 1, static_cast<unsigned>(std::floor(centerIndex)));

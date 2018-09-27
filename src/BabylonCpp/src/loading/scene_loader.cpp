@@ -58,7 +58,7 @@ void SceneLoader::setCleanBoneMatrixWeights(bool value)
   SceneLoader::_CleanBoneMatrixWeights = value;
 }
 
-unordered_map_t<string_t, IRegisteredPlugin> SceneLoader::_registeredPlugins{};
+std::unordered_map<std::string, IRegisteredPlugin> SceneLoader::_registeredPlugins{};
 
 IRegisteredPlugin SceneLoader::_getDefaultPlugin()
 {
@@ -70,7 +70,7 @@ IRegisteredPlugin SceneLoader::_getDefaultPlugin()
   return SceneLoader::_registeredPlugins[".babylon"];
 }
 
-IRegisteredPlugin SceneLoader::_getPluginForExtension(const string_t& extension)
+IRegisteredPlugin SceneLoader::_getPluginForExtension(const std::string& extension)
 {
   if (stl_util::contains(SceneLoader::_registeredPlugins, extension)) {
     return SceneLoader::_registeredPlugins[extension];
@@ -85,7 +85,7 @@ IRegisteredPlugin SceneLoader::_getPluginForExtension(const string_t& extension)
   return SceneLoader::_getDefaultPlugin();
 }
 
-IRegisteredPlugin SceneLoader::_getPluginForDirectLoad(const string_t& data)
+IRegisteredPlugin SceneLoader::_getPluginForDirectLoad(const std::string& data)
 {
   for (const auto& pluginItem : SceneLoader::_registeredPlugins) {
     const auto& registeredPlugin = pluginItem.second;
@@ -99,11 +99,11 @@ IRegisteredPlugin SceneLoader::_getPluginForDirectLoad(const string_t& data)
   return SceneLoader::_getDefaultPlugin();
 }
 
-IRegisteredPlugin SceneLoader::_getPluginForFilename(string_t sceneFilename)
+IRegisteredPlugin SceneLoader::_getPluginForFilename(std::string sceneFilename)
 {
   auto queryStringPosition = sceneFilename.find("?", 0);
 
-  if (queryStringPosition == string_t::npos) {
+  if (queryStringPosition == std::string::npos) {
     sceneFilename = sceneFilename.substr(0, queryStringPosition);
   }
 
@@ -114,7 +114,7 @@ IRegisteredPlugin SceneLoader::_getPluginForFilename(string_t sceneFilename)
   return SceneLoader::_getPluginForExtension(extension);
 }
 
-string_t SceneLoader::_getDirectLoad(const string_t& sceneFilename)
+std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
 {
   if (String::startsWith(sceneFilename, "data:")) {
     return sceneFilename.substr(5);
@@ -123,16 +123,16 @@ string_t SceneLoader::_getDirectLoad(const string_t& sceneFilename)
   return "";
 }
 
-shared_ptr_t<ISceneLoaderPlugin> SceneLoader::_loadData(
-  const string_t& rootUrl, const string_t& sceneFilename, Scene* scene,
-  const std::function<void(const shared_ptr_t<ISceneLoaderPlugin>& plugin,
-                             const string_t& data,
-                             const string_t& responseURL)>& onSuccess,
+std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
+  const std::string& rootUrl, const std::string& sceneFilename, Scene* scene,
+  const std::function<void(const std::shared_ptr<ISceneLoaderPlugin>& plugin,
+                             const std::string& data,
+                             const std::string& responseURL)>& onSuccess,
   const std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
-  const std::function<void(const string_t& message,
-                             const string_t& exception)>& onError,
-  const std::function<void()>& /*onDispose*/, const string_t& pluginExtension)
+  const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError,
+  const std::function<void()>& /*onDispose*/, const std::string& pluginExtension)
 {
   auto directLoad = SceneLoader::_getDirectLoad(sceneFilename);
   auto registeredPlugin
@@ -147,7 +147,7 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::_loadData(
   SceneLoader::OnPluginActivatedObservable.notifyObservers(plugin.get());
 
   const auto dataCallback
-    = [&](const string_t& data, const string_t& responseURL) {
+    = [&](const std::string& data, const std::string& responseURL) {
         if (scene->isDisposed()) {
           onError("Scene has been disposed", "");
           return;
@@ -167,7 +167,7 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::_loadData(
     }
 
     Tools::LoadFile(url, dataCallback, progressCallback, useArrayBuffer,
-                    [&](const string_t& exception) {
+                    [&](const std::string& exception) {
                       onError("Failed to load scene."
                                 + (exception.empty() ? "" : " " + exception),
                               exception);
@@ -192,17 +192,17 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::_loadData(
 }
 
 ISceneLoaderPlugin*
-SceneLoader::GetPluginForExtension(const string_t& extension)
+SceneLoader::GetPluginForExtension(const std::string& extension)
 {
   return SceneLoader::_getPluginForExtension(extension).plugin.get();
 }
 
-bool SceneLoader::IsPluginForExtensionAvailable(const string_t& extension)
+bool SceneLoader::IsPluginForExtensionAvailable(const std::string& extension)
 {
   return stl_util::contains(SceneLoader::_registeredPlugins, extension);
 }
 
-void SceneLoader::RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin)
+void SceneLoader::RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin)
 {
   auto& extensions = plugin->extensions.mapping;
   for (auto& item : extensions) {
@@ -213,19 +213,19 @@ void SceneLoader::RegisterPlugin(shared_ptr_t<ISceneLoaderPlugin>&& plugin)
   }
 }
 
-shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
-  const vector_t<string_t>& meshNames, string_t rootUrl, string_t sceneFilename,
+std::shared_ptr<ISceneLoaderPlugin> SceneLoader::ImportMesh(
+  const std::vector<std::string>& meshNames, std::string rootUrl, std::string sceneFilename,
   Scene* scene,
   const std::function<
-    void(const vector_t<AbstractMeshPtr>& meshes,
-         const vector_t<IParticleSystemPtr>& particleSystems,
-         const vector_t<SkeletonPtr>& skeletons,
-         const vector_t<AnimationGroupPtr>& animationGroups)>& onSuccess,
+    void(const std::vector<AbstractMeshPtr>& meshes,
+         const std::vector<IParticleSystemPtr>& particleSystems,
+         const std::vector<SkeletonPtr>& skeletons,
+         const std::vector<AnimationGroupPtr>& animationGroups)>& onSuccess,
   const std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
-  const std::function<void(Scene* scene, const string_t& message,
-                             const string_t& exception)>& onError,
-  const string_t& pluginExtension)
+  const std::function<void(Scene* scene, const std::string& message,
+                             const std::string& exception)>& onError,
+  const std::string& pluginExtension)
 {
   scene = scene ? scene : Engine::LastCreatedScene();
 
@@ -246,8 +246,8 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
 
   const auto disposeHandler = []() {};
 
-  const auto errorHandler = [&](const string_t& message,
-                                const string_t& exception) {
+  const auto errorHandler = [&](const std::string& message,
+                                const std::string& exception) {
     const auto errorMessage
       = String::concat("Unable to import meshes from ", rootUrl, sceneFilename,
                        (!message.empty() ? ": " + message : ""));
@@ -277,10 +277,10 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
   }
 
   const auto successHandler
-    = [&](const vector_t<AbstractMeshPtr>& meshes,
-          const vector_t<IParticleSystemPtr>& particleSystems,
-          const vector_t<SkeletonPtr>& skeletons,
-          const vector_t<AnimationGroupPtr>& animationGroups) {
+    = [&](const std::vector<AbstractMeshPtr>& meshes,
+          const std::vector<IParticleSystemPtr>& particleSystems,
+          const std::vector<SkeletonPtr>& skeletons,
+          const std::vector<AnimationGroupPtr>& animationGroups) {
         if (onSuccess) {
           try {
             onSuccess(meshes, particleSystems, skeletons, animationGroups);
@@ -293,8 +293,8 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
 
   return SceneLoader::_loadData(
     rootUrl, sceneFilename, scene,
-    [&](const shared_ptr_t<ISceneLoaderPlugin>& plugin, const string_t& data,
-        const string_t& responseURL) {
+    [&](const std::shared_ptr<ISceneLoaderPlugin>& plugin, const std::string& data,
+        const std::string& responseURL) {
       if (plugin->rewriteRootURL) {
         rootUrl = plugin->rewriteRootURL(rootUrl, responseURL);
       }
@@ -306,10 +306,10 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
       }
 
       auto& syncedPlugin = plugin;
-      vector_t<AbstractMeshPtr> meshes;
-      vector_t<IParticleSystemPtr> particleSystems;
-      vector_t<SkeletonPtr> skeletons;
-      vector_t<AnimationGroupPtr> animationGroups;
+      std::vector<AbstractMeshPtr> meshes;
+      std::vector<IParticleSystemPtr> particleSystems;
+      std::vector<SkeletonPtr> skeletons;
+      std::vector<AnimationGroupPtr> animationGroups;
 
       if (!syncedPlugin->importMesh(meshNames, scene, data, rootUrl, meshes,
                                     particleSystems, skeletons, errorHandler)) {
@@ -322,14 +322,14 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::ImportMesh(
     progressHandler, errorHandler, disposeHandler, pluginExtension);
 }
 
-unique_ptr_t<Scene> SceneLoader::Load(
-  const string_t& rootUrl, const string_t& sceneFilename, Engine* engine,
+std::unique_ptr<Scene> SceneLoader::Load(
+  const std::string& rootUrl, const std::string& sceneFilename, Engine* engine,
   const std::function<void(Scene* scene)>& onsuccess,
   const std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
-  const std::function<void(Scene* scene, const string_t& message,
-                             const string_t& exception)>& onError,
-  const string_t& pluginExtension)
+  const std::function<void(Scene* scene, const std::string& message,
+                             const std::string& exception)>& onError,
+  const std::string& pluginExtension)
 {
   auto scene = Scene::New(engine);
   SceneLoader::Append(rootUrl, sceneFilename, scene.get(), onsuccess,
@@ -337,14 +337,14 @@ unique_ptr_t<Scene> SceneLoader::Load(
   return scene;
 }
 
-shared_ptr_t<ISceneLoaderPlugin> SceneLoader::Append(
-  string_t rootUrl, string_t sceneFilename, Scene* scene,
+std::shared_ptr<ISceneLoaderPlugin> SceneLoader::Append(
+  std::string rootUrl, std::string sceneFilename, Scene* scene,
   const std::function<void(Scene* scene)>& onSuccess,
   const std::function<void(const SceneLoaderProgressEvent& event)>&
     onProgress,
-  const std::function<void(Scene* scene, const string_t& message,
-                             const string_t& exception)>& onError,
-  const string_t& pluginExtension)
+  const std::function<void(Scene* scene, const std::string& message,
+                             const std::string& exception)>& onError,
+  const std::string& pluginExtension)
 {
   scene = scene ? scene : Engine::LastCreatedScene();
 
@@ -371,7 +371,7 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::Append(
     = [&scene]() { scene->getEngine()->hideLoadingUI(); };
 
   const auto errorHandler
-    = [&](const string_t& message, const string_t& exception) {
+    = [&](const std::string& message, const std::string& exception) {
         const auto errorMessage
           = String::concat("Unable to load from ", rootUrl, sceneFilename,
                            (!message.empty() ? ": " + message : ""));
@@ -412,8 +412,8 @@ shared_ptr_t<ISceneLoaderPlugin> SceneLoader::Append(
 
   return SceneLoader::_loadData(
     rootUrl, sceneFilename, scene,
-    [&](const shared_ptr_t<ISceneLoaderPlugin>& plugin, const string_t& data,
-        const string_t& /*responseURL*/) {
+    [&](const std::shared_ptr<ISceneLoaderPlugin>& plugin, const std::string& data,
+        const std::string& /*responseURL*/) {
       if (sceneFilename == "") {
         rootUrl = Tools::GetFolderPath(rootUrl, true);
       }

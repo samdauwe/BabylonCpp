@@ -259,13 +259,13 @@ void ImageProcessingConfiguration::_updateParameters()
   onUpdateParameters.notifyObservers(this);
 }
 
-const string_t ImageProcessingConfiguration::getClassName() const
+const std::string ImageProcessingConfiguration::getClassName() const
 {
   return "ImageProcessingConfiguration";
 }
 
 void ImageProcessingConfiguration::PrepareUniforms(
-  vector_t<string_t>& uniforms,
+  std::vector<std::string>& uniforms,
   const IImageProcessingConfigurationDefines& defines)
 {
   if (defines.EXPOSURE) {
@@ -288,7 +288,7 @@ void ImageProcessingConfiguration::PrepareUniforms(
 }
 
 void ImageProcessingConfiguration::PrepareSamplers(
-  vector_t<string_t>& samplersList,
+  std::vector<std::string>& samplersList,
   const IImageProcessingConfigurationDefines& defines)
 {
   if (defines.COLORGRADING) {
@@ -407,7 +407,7 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
   }
 }
 
-unique_ptr_t<ImageProcessingConfiguration> ImageProcessingConfiguration::clone()
+std::unique_ptr<ImageProcessingConfiguration> ImageProcessingConfiguration::clone()
 {
   return nullptr;
 }
