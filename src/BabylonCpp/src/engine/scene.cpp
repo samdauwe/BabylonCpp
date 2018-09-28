@@ -199,6 +199,7 @@ Scene::Scene(Engine* engine)
     , headphone{this, &Scene::get_headphone, &Scene::set_headphone}
     , isDisposed{this, &Scene::get_isDisposed}
     , _allowPostProcessClear{true}
+    , blockMaterialDirtyMechanism{false}
     , _environmentTexture{nullptr}
     , _animationPropertiesOverride{nullptr}
     , _spritePredicate{nullptr}
@@ -236,7 +237,7 @@ Scene::Scene(Engine* engine)
     , _forceWireframe{false}
     , _forcePointsCloud{false}
     , _fogEnabled{true}
-    , _fogMode{Scene::FOGMODE_NONE()}
+    , _fogMode{Scene::FOGMODE_NONE}
     , _shadowsEnabled{true}
     , _lightsEnabled{true}
     , _defaultMaterial{nullptr}
@@ -351,9 +352,9 @@ void Scene::_addComponent(const ISceneComponentPtr& component)
 ISceneComponentPtr Scene::_getComponent(const std::string& name)
 {
   auto it = std::find_if(_components.begin(), _components.end(),
-                           [&name](const ISceneComponentPtr& component) {
-                             return component->name == name;
-                           });
+                         [&name](const ISceneComponentPtr& component) {
+                           return component->name == name;
+                         });
   return (it == _components.end()) ? nullptr : *it;
 }
 
@@ -654,9 +655,8 @@ SimplificationQueuePtr& Scene::get_simplificationQueue()
 {
   if (!_simplificationQueue) {
     _simplificationQueue = std::make_shared<SimplificationQueue>();
-    auto component
-      = std::static_pointer_cast<SimplicationQueueSceneComponent>(
-        _getComponent(SceneComponentConstants::NAME_SIMPLIFICATIONQUEUE));
+    auto component = std::static_pointer_cast<SimplicationQueueSceneComponent>(
+      _getComponent(SceneComponentConstants::NAME_SIMPLIFICATIONQUEUE));
     if (!component) {
       component = SimplicationQueueSceneComponent::New(this);
       _addComponent(component);
@@ -1291,161 +1291,156 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
     return act;
   };
 
-  _initClickEvent =
-    [this](
-      Observable<PointerInfoPre>& obs1, Observable<PointerInfo>& obs2,
-      const PointerEvent& evt,
-      const std::function<void(const ClickInfo& clickInfo,
-                                 std::optional<PickingInfo>& pickResult)>& cb) {
-      ClickInfo clickInfo;
-      _currentPickResult = std::nullopt;
-      ActionManager* act = nullptr;
+  _initClickEvent = [this](Observable<PointerInfoPre>& obs1,
+                           Observable<PointerInfo>& obs2,
+                           const PointerEvent& evt,
+                           const std::function<void(
+                             const ClickInfo& clickInfo,
+                             std::optional<PickingInfo>& pickResult)>& cb) {
+    ClickInfo clickInfo;
+    _currentPickResult = std::nullopt;
+    ActionManager* act = nullptr;
 
-      auto checkPicking
-        = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
-          || obs2.hasSpecificMask(
-               static_cast<int>(PointerEventTypes::POINTERPICK))
-          || obs1.hasSpecificMask(
-               static_cast<int>(PointerEventTypes::POINTERTAP))
-          || obs2.hasSpecificMask(
-               static_cast<int>(PointerEventTypes::POINTERTAP))
-          || obs1.hasSpecificMask(
-               static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-          || obs2.hasSpecificMask(
-               static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
-      if (!checkPicking && ActionManager::HasPickTriggers()) {
-        act = _initActionManager(act, clickInfo);
-        if (act) {
-          checkPicking = act->hasPickTriggers();
-        }
+    auto checkPicking
+      = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
+        || obs2.hasSpecificMask(
+             static_cast<int>(PointerEventTypes::POINTERPICK))
+        || obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERTAP))
+        || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERTAP))
+        || obs1.hasSpecificMask(
+             static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+        || obs2.hasSpecificMask(
+             static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+    if (!checkPicking && ActionManager::HasPickTriggers()) {
+      act = _initActionManager(act, clickInfo);
+      if (act) {
+        checkPicking = act->hasPickTriggers();
       }
-      if (checkPicking) {
-        auto btn = evt.button;
-        clickInfo.hasSwiped
-          = std::abs(_startingPointerPosition.x - _pointerX)
-              > Scene::DragMovementThreshold
-            || std::abs(_startingPointerPosition.y - _pointerY)
-                 > Scene::DragMovementThreshold;
+    }
+    if (checkPicking) {
+      auto btn            = evt.button;
+      clickInfo.hasSwiped = std::abs(_startingPointerPosition.x - _pointerX)
+                              > Scene::DragMovementThreshold
+                            || std::abs(_startingPointerPosition.y - _pointerY)
+                                 > Scene::DragMovementThreshold;
 
-        if (!clickInfo.hasSwiped) {
-          auto checkSingleClickImmediately = !Scene::ExclusiveDoubleClickMode;
+      if (!clickInfo.hasSwiped) {
+        auto checkSingleClickImmediately = !Scene::ExclusiveDoubleClickMode;
 
-          if (!checkSingleClickImmediately) {
-            checkSingleClickImmediately
-              = !obs1.hasSpecificMask(
-                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-                && !obs2.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
-
-            if (checkSingleClickImmediately
-                && !ActionManager::HasSpecificTrigger(
-                     ActionManager::OnDoublePickTrigger())) {
-              act = _initActionManager(act, clickInfo);
-              if (act) {
-                checkSingleClickImmediately = !act->hasSpecificTrigger(
-                  ActionManager::OnDoublePickTrigger());
-              }
-            }
-          }
-
-          if (checkSingleClickImmediately) {
-            // single click detected if double click delay is over or two
-            // different successive keys pressed without exclusive double click
-            // or no double click required
-            if (Time::fpTimeSince<long, std::milli>(
-                  _previousStartingPointerTime)
-                  > Scene::DoubleClickDelay.count()
-                || btn != _previousButtonPressed) {
-              clickInfo.singleClick = true;
-
-              cb(clickInfo, _currentPickResult);
-            }
-          }
-          // at least one double click is required to be check and exclusive
-          // double click is enabled
-          else {
-            // wait that no double click has been raised during the double click
-            // delay
-            _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
-          }
-
-          auto checkDoubleClick
-            = obs1.hasSpecificMask(
+        if (!checkSingleClickImmediately) {
+          checkSingleClickImmediately
+            = !obs1.hasSpecificMask(
                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
-              || obs2.hasSpecificMask(
+              && !obs2.hasSpecificMask(
                    static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
-          if (!checkDoubleClick
-              && ActionManager::HasSpecificTrigger(
+
+          if (checkSingleClickImmediately
+              && !ActionManager::HasSpecificTrigger(
                    ActionManager::OnDoublePickTrigger())) {
             act = _initActionManager(act, clickInfo);
             if (act) {
-              checkDoubleClick
-                = act->hasSpecificTrigger(ActionManager::OnDoublePickTrigger());
+              checkSingleClickImmediately = !act->hasSpecificTrigger(
+                ActionManager::OnDoublePickTrigger());
             }
           }
-          if (checkDoubleClick) {
-            // two successive keys pressed are equal, double click delay is not
-            // over and double click has not just occurred
-            if (btn == _previousButtonPressed
-                && Time::fpTimeSince<long, std::milli>(
-                     _previousStartingPointerTime)
-                     < Scene::DoubleClickDelay.count()
-                && !_doubleClickOccured) {
-              // pointer has not moved for 2 clicks, it's a double click
-              if (!clickInfo.hasSwiped
-                  && std::abs(_previousStartingPointerPosition.x
-                                - _startingPointerPosition.x)
-                       < Scene::DragMovementThreshold
-                  && std::abs(_previousStartingPointerPosition.y
-                                - _startingPointerPosition.y)
-                       < Scene::DragMovementThreshold) {
-                _previousStartingPointerTime = high_res_time_point_t();
-                _doubleClickOccured          = true;
-                clickInfo.doubleClick        = true;
-                clickInfo.ignore             = false;
-                if (Scene::ExclusiveDoubleClickMode
-                    && _previousDelayedSimpleClickTimeout.count() > 0) {
-                  // clearTimeout(_previousDelayedSimpleClickTimeout);
-                }
-                _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
-                cb(clickInfo, _currentPickResult);
-              }
-              // if the two successive clicks are too far, it's just two simple
-              // clicks
-              else {
-                _doubleClickOccured                = false;
-                _previousStartingPointerTime       = _startingPointerTime;
-                _previousStartingPointerPosition.x = _startingPointerPosition.x;
-                _previousStartingPointerPosition.y = _startingPointerPosition.y;
-                _previousButtonPressed             = btn;
-                if (Scene::ExclusiveDoubleClickMode) {
-                  if (_previousDelayedSimpleClickTimeout.count() > 0) {
-                    // clearTimeout(_previousDelayedSimpleClickTimeout);
-                  }
-                  _previousDelayedSimpleClickTimeout
-                    = _delayedSimpleClickTimeout;
+        }
 
-                  cb(clickInfo, _previousPickResult);
-                }
-                else {
-                  cb(clickInfo, _currentPickResult);
-                }
+        if (checkSingleClickImmediately) {
+          // single click detected if double click delay is over or two
+          // different successive keys pressed without exclusive double click
+          // or no double click required
+          if (Time::fpTimeSince<long, std::milli>(_previousStartingPointerTime)
+                > Scene::DoubleClickDelay.count()
+              || btn != _previousButtonPressed) {
+            clickInfo.singleClick = true;
+
+            cb(clickInfo, _currentPickResult);
+          }
+        }
+        // at least one double click is required to be check and exclusive
+        // double click is enabled
+        else {
+          // wait that no double click has been raised during the double click
+          // delay
+          _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
+        }
+
+        auto checkDoubleClick
+          = obs1.hasSpecificMask(
+              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+            || obs2.hasSpecificMask(
+                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+        if (!checkDoubleClick
+            && ActionManager::HasSpecificTrigger(
+                 ActionManager::OnDoublePickTrigger())) {
+          act = _initActionManager(act, clickInfo);
+          if (act) {
+            checkDoubleClick
+              = act->hasSpecificTrigger(ActionManager::OnDoublePickTrigger());
+          }
+        }
+        if (checkDoubleClick) {
+          // two successive keys pressed are equal, double click delay is not
+          // over and double click has not just occurred
+          if (btn == _previousButtonPressed
+              && Time::fpTimeSince<long, std::milli>(
+                   _previousStartingPointerTime)
+                   < Scene::DoubleClickDelay.count()
+              && !_doubleClickOccured) {
+            // pointer has not moved for 2 clicks, it's a double click
+            if (!clickInfo.hasSwiped
+                && std::abs(_previousStartingPointerPosition.x
+                            - _startingPointerPosition.x)
+                     < Scene::DragMovementThreshold
+                && std::abs(_previousStartingPointerPosition.y
+                            - _startingPointerPosition.y)
+                     < Scene::DragMovementThreshold) {
+              _previousStartingPointerTime = high_res_time_point_t();
+              _doubleClickOccured          = true;
+              clickInfo.doubleClick        = true;
+              clickInfo.ignore             = false;
+              if (Scene::ExclusiveDoubleClickMode
+                  && _previousDelayedSimpleClickTimeout.count() > 0) {
+                // clearTimeout(_previousDelayedSimpleClickTimeout);
               }
+              _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
+              cb(clickInfo, _currentPickResult);
             }
-            // just the first click of the double has been raised
+            // if the two successive clicks are too far, it's just two simple
+            // clicks
             else {
               _doubleClickOccured                = false;
               _previousStartingPointerTime       = _startingPointerTime;
               _previousStartingPointerPosition.x = _startingPointerPosition.x;
               _previousStartingPointerPosition.y = _startingPointerPosition.y;
               _previousButtonPressed             = btn;
+              if (Scene::ExclusiveDoubleClickMode) {
+                if (_previousDelayedSimpleClickTimeout.count() > 0) {
+                  // clearTimeout(_previousDelayedSimpleClickTimeout);
+                }
+                _previousDelayedSimpleClickTimeout = _delayedSimpleClickTimeout;
+
+                cb(clickInfo, _previousPickResult);
+              }
+              else {
+                cb(clickInfo, _currentPickResult);
+              }
             }
+          }
+          // just the first click of the double has been raised
+          else {
+            _doubleClickOccured                = false;
+            _previousStartingPointerTime       = _startingPointerTime;
+            _previousStartingPointerPosition.x = _startingPointerPosition.x;
+            _previousStartingPointerPosition.y = _startingPointerPosition.y;
+            _previousButtonPressed             = btn;
           }
         }
       }
-      clickInfo.ignore = true;
-      cb(clickInfo, _currentPickResult);
-    };
+    }
+    clickInfo.ignore = true;
+    cb(clickInfo, _currentPickResult);
+  };
 
   spritePredicate = [](Sprite* sprite) {
     return sprite->isPickable && sprite->actionManager
@@ -1461,8 +1456,7 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
   _onPointerUp
     = [this](PointerEvent&& evt) { _onPointerUpEvent(std::move(evt)); };
 
-  _onKeyDown
-    = [this](KeyboardEvent&& evt) { _onKeyDownEvent(std::move(evt)); };
+  _onKeyDown = [this](KeyboardEvent&& evt) { _onKeyDownEvent(std::move(evt)); };
 
   _onKeyUp = [this](KeyboardEvent&& evt) { _onKeyUpEvent(std::move(evt)); };
 
@@ -1978,8 +1972,7 @@ AnimatablePtr Scene::beginWeightedAnimation(
 AnimatablePtr Scene::beginAnimation(
   const IAnimatablePtr& target, int from, int to, bool loop, float speedRatio,
   const std::function<void()>& onAnimationEnd, AnimatablePtr animatable,
-  bool stopCurrent,
-  const std::function<bool(IAnimatable* target)>& targetMask)
+  bool stopCurrent, const std::function<bool(IAnimatable* target)>& targetMask)
 {
   if (from > to && speedRatio > 0.f) {
     speedRatio *= -1.f;
@@ -2057,9 +2050,9 @@ std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
 AnimatablePtr Scene::getAnimatableByTarget(const IAnimatablePtr& target)
 {
   auto it = std::find_if(_activeAnimatables.begin(), _activeAnimatables.end(),
-                           [&target](const AnimatablePtr& animatable) {
-                             return animatable->target == target;
-                           });
+                         [&target](const AnimatablePtr& animatable) {
+                           return animatable->target == target;
+                         });
   return (it == _activeAnimatables.end()) ? nullptr : *it;
 }
 
@@ -2207,15 +2200,16 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
 
 Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
-  Quaternion& holderOriginalValue)
+  Quaternion& holderOriginalValue, Quaternion& refQuaternion)
 {
   auto& originalAnimation = holderAnimations[0];
   auto& originalValue     = holderOriginalValue;
 
   if (holderAnimations.size() == 1) {
-    return Quaternion::Slerp(
-      originalValue, (*originalAnimation->currentValue()).quaternionData,
-      std::min(1.f, holderTotalWeight));
+    Quaternion::SlerpToRef(originalValue,
+                           (*originalAnimation->currentValue()).quaternionData,
+                           std::min(1.f, holderTotalWeight), refQuaternion);
+    return refQuaternion;
   }
 
   auto normalizer = 1.f;
@@ -2233,10 +2227,11 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   }
   else {
     if (holderAnimations.size() == 2) { // Slerp as soon as we can
-      return Quaternion::Slerp(
+      Quaternion::SlerpToRef(
         (*holderAnimations[0]->currentValue()).quaternionData,
         (*holderAnimations[1]->currentValue()).quaternionData,
-        holderAnimations[1]->weight / holderTotalWeight);
+        holderAnimations[1]->weight / holderTotalWeight, refQuaternion);
+      return refQuaternion;
     }
     quaternions.clear();
     weights.clear();
@@ -2251,14 +2246,16 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
 
   // https://gamedev.stackexchange.com/questions/62354/method-for-interpolation-between-3-quaternions
 
-  auto cumulativeAmount                       = 0.f;
+  auto cumulativeAmount                          = 0.f;
   std::optional<Quaternion> cumulativeQuaternion = std::nullopt;
   for (size_t index = 0; index < quaternions.size();) {
     if (!cumulativeQuaternion) {
-      cumulativeQuaternion = Quaternion::Slerp(
-        quaternions[index], quaternions[index + 1],
-        weights[index + 1] / (weights[index] + weights[index + 1]));
-      cumulativeAmount = weights[index] + weights[index + 1];
+      Quaternion::SlerpToRef(quaternions[index], quaternions[index + 1],
+                             weights[index + 1]
+                               / (weights[index] + weights[index + 1]),
+                             refQuaternion);
+      cumulativeQuaternion = refQuaternion;
+      cumulativeAmount     = weights[index] + weights[index + 1];
       index += 2;
       continue;
     }
@@ -2450,9 +2447,9 @@ int Scene::removeTransformNode(const TransformNodePtr& toRemove)
 int Scene::removeTransformNode(TransformNode* toRemove)
 {
   auto it   = std::find_if(transformNodes.begin(), transformNodes.end(),
-                           [toRemove](const TransformNodePtr& transformNode) {
-                             return transformNode.get() == toRemove;
-                           });
+                         [toRemove](const TransformNodePtr& transformNode) {
+                           return transformNode.get() == toRemove;
+                         });
   int index = static_cast<int>(it - transformNodes.begin());
   if (it != transformNodes.end()) {
     // Remove from the scene if found
@@ -2472,9 +2469,9 @@ int Scene::removeSkeleton(const SkeletonPtr& toRemove)
 int Scene::removeSkeleton(Skeleton* toRemove)
 {
   auto it   = std::find_if(skeletons.begin(), skeletons.end(),
-                           [toRemove](const SkeletonPtr& skeleton) {
-                             return skeleton.get() == toRemove;
-                           });
+                         [toRemove](const SkeletonPtr& skeleton) {
+                           return skeleton.get() == toRemove;
+                         });
   int index = static_cast<int>(it - skeletons.begin());
   if (it != skeletons.end()) {
     // Remove from the scene if found
@@ -2486,8 +2483,8 @@ int Scene::removeSkeleton(Skeleton* toRemove)
 
 int Scene::removeMorphTargetManager(const MorphTargetManagerPtr& toRemove)
 {
-  auto it = std::find(morphTargetManagers.begin(), morphTargetManagers.end(),
-                        toRemove);
+  auto it   = std::find(morphTargetManagers.begin(), morphTargetManagers.end(),
+                      toRemove);
   int index = static_cast<int>(it - morphTargetManagers.begin());
   if (it != morphTargetManagers.end()) {
     // Remove from the scene if found
@@ -2563,11 +2560,10 @@ int Scene::removeCamera(Camera* toRemove)
 
 int Scene::removeParticleSystem(IParticleSystem* toRemove)
 {
-  auto it
-    = std::find_if(particleSystems.begin(), particleSystems.end(),
-                     [&toRemove](const IParticleSystemPtr& particleSystem) {
-                       return particleSystem.get() == toRemove;
-                     });
+  auto it   = std::find_if(particleSystems.begin(), particleSystems.end(),
+                         [&toRemove](const IParticleSystemPtr& particleSystem) {
+                           return particleSystem.get() == toRemove;
+                         });
   int index = static_cast<int>(it - particleSystems.begin());
   if (it != particleSystems.end()) {
     particleSystems.erase(it);
@@ -2587,8 +2583,7 @@ int Scene::removeAnimation(const AnimationPtr& toRemove)
 
 int Scene::removeAnimationGroup(const AnimationGroupPtr& toRemove)
 {
-  auto it
-    = std::find(animationGroups.begin(), animationGroups.end(), toRemove);
+  auto it = std::find(animationGroups.begin(), animationGroups.end(), toRemove);
   int index = static_cast<int>(it - animationGroups.begin());
   if (it != animationGroups.end()) {
     animationGroups.erase(it);
@@ -2598,7 +2593,7 @@ int Scene::removeAnimationGroup(const AnimationGroupPtr& toRemove)
 
 int Scene::removeMultiMaterial(const MultiMaterialPtr& toRemove)
 {
-  auto it = std::find(multiMaterials.begin(), multiMaterials.end(), toRemove);
+  auto it   = std::find(multiMaterials.begin(), multiMaterials.end(), toRemove);
   int index = static_cast<int>(it - multiMaterials.begin());
   if (it != multiMaterials.end()) {
     multiMaterials.erase(it);
@@ -2624,9 +2619,9 @@ int Scene::removeActionManager(const ActionManagerPtr& toRemove)
 int Scene::removeActionManager(ActionManager* toRemove)
 {
   auto it   = std::find_if(actionManagers.begin(), actionManagers.end(),
-                           [toRemove](const ActionManagerPtr& actionManager) {
-                             return actionManager.get() == toRemove;
-                           });
+                         [toRemove](const ActionManagerPtr& actionManager) {
+                           return actionManager.get() == toRemove;
+                         });
   int index = static_cast<int>(it - actionManagers.begin());
   if (it != actionManagers.end()) {
     actionManagers.erase(it);
@@ -2642,9 +2637,9 @@ int Scene::removeTexture(const BaseTexturePtr& toRemove)
 int Scene::removeTexture(BaseTexture* toRemove)
 {
   auto it   = std::find_if(textures.begin(), textures.end(),
-                           [toRemove](const BaseTexturePtr& texture) {
-                             return texture.get() == toRemove;
-                           });
+                         [toRemove](const BaseTexturePtr& texture) {
+                           return texture.get() == toRemove;
+                         });
   int index = static_cast<int>(it - textures.begin());
   if (it != textures.end()) {
     textures.erase(it);
@@ -2673,9 +2668,9 @@ void Scene::sortLightsByPriority()
 {
   if (requireLightSorting) {
     std::sort(lights.begin(), lights.end(),
-                [](const LightPtr& a, const LightPtr& b) {
-                  return Light::CompareLightsPriority(a.get(), b.get());
-                });
+              [](const LightPtr& a, const LightPtr& b) {
+                return Light::CompareLightsPriority(a.get(), b.get());
+              });
   }
 }
 
@@ -2782,9 +2777,9 @@ CameraPtr Scene::setActiveCameraByName(const std::string& name)
 AnimationGroupPtr Scene::getAnimationGroupByName(const std::string& name)
 {
   auto it = std::find_if(animationGroups.begin(), animationGroups.end(),
-                           [&name](const AnimationGroupPtr& animationGroup) {
-                             return animationGroup->name == name;
-                           });
+                         [&name](const AnimationGroupPtr& animationGroup) {
+                           return animationGroup->name == name;
+                         });
 
   return (it == animationGroups.end()) ? nullptr : *it;
 }
@@ -2809,9 +2804,9 @@ MaterialPtr Scene::getMaterialByName(const std::string& name)
 
 CameraPtr Scene::getCameraByID(const std::string& id)
 {
-  auto it = std::find_if(
-    cameras.begin(), cameras.end(),
-    [&id](const CameraPtr& camera) { return camera->id == id; });
+  auto it
+    = std::find_if(cameras.begin(), cameras.end(),
+                   [&id](const CameraPtr& camera) { return camera->id == id; });
 
   return (it == cameras.end()) ? nullptr : *it;
 }
@@ -2819,9 +2814,9 @@ CameraPtr Scene::getCameraByID(const std::string& id)
 CameraPtr Scene::getCameraByUniqueID(unsigned int uniqueId)
 {
   auto it = std::find_if(cameras.begin(), cameras.end(),
-                           [uniqueId](const CameraPtr& camera) {
-                             return camera->uniqueId == uniqueId;
-                           });
+                         [uniqueId](const CameraPtr& camera) {
+                           return camera->uniqueId == uniqueId;
+                         });
 
   return (it == cameras.end()) ? nullptr : *it;
 }
@@ -2874,7 +2869,7 @@ LightPtr Scene::getLightByID(const std::string& id)
 {
   auto it
     = std::find_if(lights.begin(), lights.end(),
-                     [&id](const LightPtr& light) { return light->id == id; });
+                   [&id](const LightPtr& light) { return light->id == id; });
 
   return (it == lights.end()) ? nullptr : *it;
 }
@@ -2891,9 +2886,9 @@ LightPtr Scene::getLightByUniqueID(unsigned int uniqueId)
 IParticleSystemPtr Scene::getParticleSystemByID(const std::string& id)
 {
   auto it = std::find_if(particleSystems.begin(), particleSystems.end(),
-                           [&id](const IParticleSystemPtr& particleSystem) {
-                             return particleSystem->id == id;
-                           });
+                         [&id](const IParticleSystemPtr& particleSystem) {
+                           return particleSystem->id == id;
+                         });
 
   return (it == particleSystems.end()) ? nullptr : *it;
 }
@@ -2933,9 +2928,9 @@ bool Scene::removeGeometry(const GeometryPtr& geometry)
 bool Scene::removeGeometry(Geometry* geometry)
 {
   auto it = std::find_if(geometries.begin(), geometries.end(),
-                           [geometry](const GeometryPtr& _geometry) {
-                             return _geometry.get() == geometry;
-                           });
+                         [geometry](const GeometryPtr& _geometry) {
+                           return _geometry.get() == geometry;
+                         });
   if (it != geometries.end()) {
     geometries.erase(it);
 
@@ -2969,25 +2964,26 @@ std::vector<AbstractMeshPtr> Scene::getMeshesByID(const std::string& id)
 {
   std::vector<AbstractMeshPtr> filteredMeshes;
   std::for_each(meshes.begin(), meshes.end(),
-                  [&filteredMeshes, &id](const AbstractMeshPtr& mesh) {
-                    if (mesh->id == id) {
-                      filteredMeshes.emplace_back(mesh);
-                    }
-                  });
+                [&filteredMeshes, &id](const AbstractMeshPtr& mesh) {
+                  if (mesh->id == id) {
+                    filteredMeshes.emplace_back(mesh);
+                  }
+                });
   return filteredMeshes;
 }
 
 TransformNodePtr Scene::getTransformNodeByID(const std::string& id)
 {
   auto it = std::find_if(transformNodes.begin(), transformNodes.end(),
-                           [&id](const TransformNodePtr& transformNode) {
-                             return transformNode->id == id;
-                           });
+                         [&id](const TransformNodePtr& transformNode) {
+                           return transformNode->id == id;
+                         });
 
   return (it == transformNodes.end()) ? nullptr : *it;
 }
 
-std::vector<TransformNodePtr> Scene::getTransformNodesByID(const std::string& id)
+std::vector<TransformNodePtr>
+Scene::getTransformNodesByID(const std::string& id)
 {
   std::vector<TransformNodePtr> filteredTransformNodes;
   std::for_each(
@@ -3003,9 +2999,9 @@ std::vector<TransformNodePtr> Scene::getTransformNodesByID(const std::string& id
 AbstractMeshPtr Scene::getMeshByUniqueID(unsigned int uniqueId)
 {
   auto it = std::find_if(meshes.begin(), meshes.end(),
-                           [&uniqueId](const AbstractMeshPtr& mesh) {
-                             return mesh->uniqueId == uniqueId;
-                           });
+                         [&uniqueId](const AbstractMeshPtr& mesh) {
+                           return mesh->uniqueId == uniqueId;
+                         });
 
   return (it == meshes.end()) ? nullptr : *it;
 }
@@ -3117,9 +3113,9 @@ AbstractMeshPtr Scene::getMeshByName(const std::string& name)
 TransformNodePtr Scene::getTransformNodeByName(const std::string& name)
 {
   auto it = std::find_if(transformNodes.begin(), transformNodes.end(),
-                           [&name](const TransformNodePtr& transformNode) {
-                             return transformNode->name == name;
-                           });
+                         [&name](const TransformNodePtr& transformNode) {
+                           return transformNode->name == name;
+                         });
 
   return (it == transformNodes.end()) ? nullptr : *it;
 }
@@ -3166,9 +3162,9 @@ MorphTargetManagerPtr Scene::getMorphTargetManagerById(unsigned int id)
 {
   auto it
     = std::find_if(morphTargetManagers.begin(), morphTargetManagers.end(),
-                     [&id](const MorphTargetManagerPtr& morphTargetManager) {
-                       return morphTargetManager->uniqueId() == id;
-                     });
+                   [&id](const MorphTargetManagerPtr& morphTargetManager) {
+                     return morphTargetManager->uniqueId() == id;
+                   });
 
   return (it == morphTargetManagers.end()) ? nullptr : *it;
 }
@@ -3235,12 +3231,12 @@ void Scene::_evaluateSubMesh(const SubMeshPtr& subMesh, AbstractMesh* mesh)
       // Render targets
       if (material->getRenderTargetTextures) {
         if (std::find(_processedMaterials.begin(), _processedMaterials.end(),
-                        material)
+                      material)
             == _processedMaterials.end()) {
           _processedMaterials.emplace_back(material);
           for (auto& renderTarget : material->getRenderTargetTextures()) {
             if (std::find(_renderTargets.begin(), _renderTargets.end(),
-                            renderTarget)
+                          renderTarget)
                 == _renderTargets.end()) {
               _renderTargets.emplace_back(renderTarget);
             }
@@ -3352,11 +3348,11 @@ void Scene::_evaluateActiveMeshes()
 
     // Intersections
     if (mesh->actionManager
-        && mesh->actionManager->hasSpecificTriggers(
-             {ActionManager::OnIntersectionEnterTrigger(),
-              ActionManager::OnIntersectionExitTrigger()})) {
+        && mesh->actionManager->hasSpecificTriggers2(
+             ActionManager::OnIntersectionEnterTrigger(),
+             ActionManager::OnIntersectionExitTrigger())) {
       if (std::find(_meshesForIntersections.begin(),
-                      _meshesForIntersections.end(), mesh)
+                    _meshesForIntersections.end(), mesh)
           == _meshesForIntersections.end()) {
         _meshesForIntersections.emplace_back(mesh);
       }
@@ -3410,7 +3406,7 @@ void Scene::_activeMesh(const AbstractMeshPtr& sourceMesh, AbstractMesh* mesh)
 {
   if (skeletonsEnabled() && mesh->skeleton()) {
     if (std::find(_activeSkeletons.begin(), _activeSkeletons.end(),
-                    mesh->skeleton())
+                  mesh->skeleton())
         == _activeSkeletons.end()) {
       _activeSkeletons.emplace_back(mesh->skeleton());
       mesh->skeleton()->prepare();
@@ -3420,7 +3416,7 @@ void Scene::_activeMesh(const AbstractMeshPtr& sourceMesh, AbstractMesh* mesh)
       auto _mesh = static_cast<Mesh*>(mesh);
       if (_mesh) {
         if (std::find(_softwareSkinnedMeshes.begin(),
-                        _softwareSkinnedMeshes.end(), _mesh)
+                      _softwareSkinnedMeshes.end(), _mesh)
             == _softwareSkinnedMeshes.end()) {
           _softwareSkinnedMeshes.emplace_back(_mesh);
         }
@@ -3625,16 +3621,11 @@ void Scene::render(bool updateCameras)
     actionManager->processTrigger(ActionManager::OnEveryFrameTrigger());
   }
 
-  // Simplification Queue
-  if (simplificationQueue() && !simplificationQueue()->running) {
-    simplificationQueue()->executeNext();
-  }
-
   if (_engine->isDeterministicLockStep()) {
     auto deltaTime
       = (std::max(static_cast<float>(Scene::MinDeltaTime.count()),
-                    std::min(_engine->getDeltaTime() * 1000.f,
-                               static_cast<float>(Scene::MaxDeltaTime.count())))
+                  std::min(_engine->getDeltaTime() * 1000.f,
+                           static_cast<float>(Scene::MaxDeltaTime.count())))
          / 1000.f)
         + _timeAccumulator;
 
@@ -3686,10 +3677,10 @@ void Scene::render(bool updateCameras)
     const float deltaTime
       = useConstantAnimationDeltaTime ?
           16.f :
-          std::max(Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
-                     std::min(_engine->getDeltaTime(),
-                                Time::fpMillisecondsDuration<float>(
-                                  Scene::MaxDeltaTime)));
+          std::max(
+            Time::fpMillisecondsDuration<float>(Scene::MinDeltaTime),
+            std::min(_engine->getDeltaTime(),
+                     Time::fpMillisecondsDuration<float>(Scene::MaxDeltaTime)));
     _animationRatio = deltaTime * (60.f / 1000.f);
     _animate();
     onAfterAnimationsObservable.notifyObservers(this);
@@ -3819,9 +3810,9 @@ void Scene::render(bool updateCameras)
         auto shadowMap  = shadowGenerator->getShadowMap();
         auto& _textures = shadowGenerator->getShadowMap()->getScene()->textures;
         auto it         = std::find_if(_textures.begin(), _textures.end(),
-                                 [&shadowMap](const BaseTexturePtr& texture) {
-                                   return texture == shadowMap;
-                                 });
+                               [&shadowMap](const BaseTexturePtr& texture) {
+                                 return texture == shadowMap;
+                               });
         if (it != _textures.end()) {
           _renderTargets.emplace_back(shadowMap);
         }
@@ -3829,19 +3820,9 @@ void Scene::render(bool updateCameras)
     }
   }
 
-  // Depth renderer
-  for (auto& depthRendererItem : _depthRenderer) {
-    _renderTargets.emplace_back(depthRendererItem.second->getDepthMap());
-  }
-
-  // Geometry renderer
-  if (_geometryBufferRenderer) {
-    _renderTargets.emplace_back(_geometryBufferRenderer->getGBuffer());
-  }
-
-  // RenderPipeline
-  if (_postProcessRenderPipelineManager) {
-    _postProcessRenderPipelineManager->update();
+  // Collects render targets from external components.
+  for (auto& step : _gatherRenderTargetsStage) {
+    step.action(_renderTargets);
   }
 
   // Multi-cameras?
@@ -4045,6 +4026,7 @@ void Scene::dispose()
   _afterCameraDrawStage.clear();
   _beforeCameraUpdateStage.clear();
   _gatherRenderTargetsStage.clear();
+  _rebuildGeometryStage.clear();
   for (const auto& component : _components) {
     component->dispose();
   }
@@ -4054,11 +4036,6 @@ void Scene::dispose()
   stopAllAnimations();
 
   resetCachedMaterial();
-
-  for (auto& depthRendererItem : _depthRenderer) {
-    depthRendererItem.second->dispose();
-  }
-  _depthRenderer.clear();
 
   // Smart arrays
   if (activeCamera) {
@@ -4196,10 +4173,6 @@ void Scene::dispose()
   // Post-processes
   postProcessManager->dispose();
 
-  if (_postProcessRenderPipelineManager) {
-    _postProcessRenderPipelineManager->dispose();
-  }
-
   // Physics
   if (_physicsEngine) {
     disablePhysicsEngine();
@@ -4262,7 +4235,8 @@ void Scene::cleanCachedTextureBuffer()
 MinMax Scene::getWorldExtends(
   const std::function<bool(const AbstractMeshPtr& mesh)>& filterPredicate)
 {
-  Vector3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+  Vector3 min(std::numeric_limits<float>::max(),
+              std::numeric_limits<float>::max(),
               std::numeric_limits<float>::max());
   Vector3 max(std::numeric_limits<float>::lowest(),
               std::numeric_limits<float>::lowest(),
@@ -4725,8 +4699,8 @@ void Scene::_rebuildGeometries()
     system->rebuild();
   }
 
-  if (_postProcessRenderPipelineManager) {
-    _postProcessRenderPipelineManager->_rebuild();
+  for (auto& step : _rebuildGeometryStage) {
+    step.action();
   }
 }
 void Scene::_rebuildTextures()
@@ -4923,6 +4897,10 @@ Scene::getAutoClearDepthStencilSetup(size_t index)
 void Scene::markAllMaterialsAsDirty(
   unsigned int flag, const std::function<bool(Material* mat)>& predicate)
 {
+  if (blockMaterialDirtyMechanism) {
+    return;
+  }
+
   for (auto& material : materials) {
     if (predicate && !predicate(material.get())) {
       continue;
@@ -4934,7 +4912,7 @@ void Scene::markAllMaterialsAsDirty(
 IFileRequest
 Scene::_loadFile(const std::string& /*url*/,
                  const std::function<void(Variant<std::string, ArrayBuffer>&,
-                                            const std::string&)>& /*onSuccess*/)
+                                          const std::string&)>& /*onSuccess*/)
 {
   return IFileRequest();
 }

@@ -143,7 +143,7 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
       = (pointsCloud() || scene->forcePointsCloud());
     _defines.boolDef["FOG"]
       = (scene->fogEnabled() && mesh->applyFog()
-         && scene->fogMode() != Scene::FOGMODE_NONE() && fogEnabled());
+         && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled());
   }
 
   // Values that need to be evaluated on every frame
@@ -272,7 +272,7 @@ void FireMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
 
   // View
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE()) {
+      && scene->fogMode() != Scene::FOGMODE_NONE) {
     _activeEffect->setMatrix("view", scene->getViewMatrix());
   }
 

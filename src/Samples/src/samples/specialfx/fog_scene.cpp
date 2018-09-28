@@ -64,7 +64,7 @@ void FogScene::initializeScene(ICanvas* canvas, Scene* scene)
   _sphere1->convertToFlatShadedMesh();
 
   // Fog settings
-  scene->fogMode    = Scene::FOGMODE_EXP();
+  scene->fogMode    = Scene::FOGMODE_EXP;
   scene->fogDensity = 0.1f;
 
   // Animations

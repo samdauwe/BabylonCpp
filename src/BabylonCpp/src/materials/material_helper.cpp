@@ -78,7 +78,7 @@ void MaterialHelper::PrepareDefinesForMisc(AbstractMesh* mesh, Scene* scene,
     defines.boolDef["POINTSIZE"]        = pointsCloud;
     defines.boolDef["FOG"]
       = (scene->fogEnabled() && mesh->applyFog()
-         && scene->fogMode() != Scene::FOGMODE_NONE() && fogEnabled);
+         && scene->fogMode() != Scene::FOGMODE_NONE && fogEnabled);
     defines.boolDef["NONUNIFORMSCALING"] = mesh->nonUniformScaling();
     defines.boolDef["ALPHATEST"]         = alphaTest;
   }
@@ -94,14 +94,18 @@ void MaterialHelper::PrepareDefinesForFrameBoundValues(
   auto useClipPlane3 = false;
   auto useClipPlane4 = false;
 
-  useClipPlane1 = useClipPlane == std::nullopt ? (scene->clipPlane != std::nullopt) :
-                                              *useClipPlane;
-  useClipPlane2 = useClipPlane == std::nullopt ? (scene->clipPlane2 != std::nullopt) :
-                                              *useClipPlane;
-  useClipPlane3 = useClipPlane == std::nullopt ? (scene->clipPlane3 != std::nullopt) :
-                                              *useClipPlane;
-  useClipPlane4 = useClipPlane == std::nullopt ? (scene->clipPlane4 != std::nullopt) :
-                                              *useClipPlane;
+  useClipPlane1 = useClipPlane == std::nullopt ?
+                    (scene->clipPlane != std::nullopt) :
+                    *useClipPlane;
+  useClipPlane2 = useClipPlane == std::nullopt ?
+                    (scene->clipPlane2 != std::nullopt) :
+                    *useClipPlane;
+  useClipPlane3 = useClipPlane == std::nullopt ?
+                    (scene->clipPlane3 != std::nullopt) :
+                    *useClipPlane;
+  useClipPlane4 = useClipPlane == std::nullopt ?
+                    (scene->clipPlane4 != std::nullopt) :
+                    *useClipPlane;
 
   if (defines["CLIPPLANE"] != useClipPlane1) {
     defines.boolDef["CLIPPLANE"] = useClipPlane1;
@@ -352,8 +356,9 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
 }
 
 void MaterialHelper::PrepareUniformsAndSamplersList(
-  std::vector<std::string>& uniformsList, std::vector<std::string>& samplersList,
-  MaterialDefines& defines, unsigned int maxSimultaneousLights)
+  std::vector<std::string>& uniformsList,
+  std::vector<std::string>& samplersList, MaterialDefines& defines,
+  unsigned int maxSimultaneousLights)
 {
   std::vector<std::string> uniformBuffersList;
 
@@ -492,7 +497,8 @@ unsigned int MaterialHelper::HandleFallbacksForShadows(
 }
 
 void MaterialHelper::PrepareAttributesForMorphTargets(
-  std::vector<std::string>& attribs, AbstractMesh* mesh, MaterialDefines& defines)
+  std::vector<std::string>& attribs, AbstractMesh* mesh,
+  MaterialDefines& defines)
 {
   auto influencers = defines.intDef["NUM_MORPH_INFLUENCERS"];
 
@@ -528,10 +534,9 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
   }
 }
 
-void MaterialHelper::PrepareAttributesForBones(std::vector<std::string>& attribs,
-                                               AbstractMesh* mesh,
-                                               MaterialDefines& defines,
-                                               EffectFallbacks& fallbacks)
+void MaterialHelper::PrepareAttributesForBones(
+  std::vector<std::string>& attribs, AbstractMesh* mesh,
+  MaterialDefines& defines, EffectFallbacks& fallbacks)
 {
   if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
     fallbacks.addCPUSkinningFallback(0, mesh);
@@ -545,8 +550,8 @@ void MaterialHelper::PrepareAttributesForBones(std::vector<std::string>& attribs
   }
 }
 
-void MaterialHelper::PrepareAttributesForInstances(std::vector<std::string>& attribs,
-                                                   MaterialDefines& defines)
+void MaterialHelper::PrepareAttributesForInstances(
+  std::vector<std::string>& attribs, MaterialDefines& defines)
 {
   if (defines["INSTANCES"]) {
     attribs.emplace_back(VertexBuffer::World0KindChars);
@@ -580,7 +585,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
                                 bool usePhysicalLightFalloff)
 {
   auto len = std::min(mesh->_lightSources.size(),
-                        static_cast<size_t>(maxSimultaneousLights));
+                      static_cast<size_t>(maxSimultaneousLights));
 
   for (unsigned int i = 0; i < len; ++i) {
 
@@ -614,7 +619,7 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
                                        Effect* effect)
 {
   if (scene->fogEnabled() && mesh->applyFog()
-      && scene->fogMode() != Scene::FOGMODE_NONE()) {
+      && scene->fogMode() != Scene::FOGMODE_NONE) {
     effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()),
                       scene->fogStart, scene->fogEnd, scene->fogDensity);
     effect->setColor3("vFogColor", scene->fogColor);

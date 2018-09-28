@@ -84,15 +84,18 @@ using SubMeshPtr             = std::shared_ptr<SubMesh>;
  */
 class BABYLON_SHARED_EXPORT Scene : public AbstractScene, public IAnimatable {
 
-private:
-  // Statics
-  static constexpr unsigned int _FOGMODE_NONE   = 0;
-  static constexpr unsigned int _FOGMODE_EXP    = 1;
-  static constexpr unsigned int _FOGMODE_EXP2   = 2;
-  static constexpr unsigned int _FOGMODE_LINEAR = 3;
-
 public:
   static size_t _uniqueIdCounter;
+
+  /** The fog is deactivated */
+  static constexpr unsigned int FOGMODE_NONE = 0;
+  /** The fog density is following an exponential function */
+  static constexpr unsigned int FOGMODE_EXP = 1;
+  /** The fog density is following an exponential function faster than
+   * FOGMODE_EXP */
+  static constexpr unsigned int FOGMODE_EXP2 = 2;
+  /** The fog density is following a linear function. */
+  static constexpr unsigned int FOGMODE_LINEAR = 3;
 
   /**
    * Gets or sets the minimum deltatime when deterministic lock step is enabled
@@ -105,31 +108,6 @@ public:
    * @see http://doc.babylonjs.com/babylon101/animations#deterministic-lockstep
    */
   static microseconds_t MaxDeltaTime;
-
-  /** The fog is deactivated */
-  static constexpr unsigned int FOGMODE_NONE()
-  {
-    return Scene::_FOGMODE_NONE;
-  }
-
-  /** The fog density is following an exponential function */
-  static constexpr unsigned int FOGMODE_EXP()
-  {
-    return Scene::_FOGMODE_EXP;
-  }
-
-  /** The fog density is following an exponential function faster than
-   * FOGMODE_EXP */
-  static constexpr unsigned int FOGMODE_EXP2()
-  {
-    return Scene::_FOGMODE_EXP2;
-  }
-
-  /** The fog density is following a linear function. */
-  static constexpr unsigned int FOGMODE_LINEAR()
-  {
-    return Scene::_FOGMODE_LINEAR;
-  }
 
   /**
    * The distance in pixel that you have to move to prevent some events.
@@ -166,6 +144,7 @@ public:
    * Note that the component could be registered on th next frame if this is
    * called after the register component stage.
    * @param component Defines the component to add to the scene
+   * Hidden
    */
   void _addComponent(const ISceneComponentPtr& component);
 
@@ -173,6 +152,7 @@ public:
    * @brief Gets a component from the scene.
    * @param name defines the name of the component to retrieve
    * @returns the component or null if not present
+   * Hidden
    */
   ISceneComponentPtr _getComponent(const std::string& name);
 
@@ -1660,7 +1640,7 @@ private:
     Matrix& holderOriginalValue);
   Quaternion _processLateAnimationBindingsForQuaternions(
     float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
-    Quaternion& holderOriginalValue);
+    Quaternion& holderOriginalValue, Quaternion& refQuaternion);
   void _processLateAnimationBindings();
   void _evaluateSubMesh(const SubMeshPtr& subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
@@ -2858,11 +2838,13 @@ public:
 
   /**
    * Backing store of defined scene components
+   * Hidden
    */
   std::vector<ISceneComponentPtr> _components;
 
   /**
    * Backing store of defined scene components
+   * Hidden
    */
   std::vector<ISceneSerializableComponentPtr> _serializableComponents;
 
@@ -2974,58 +2956,79 @@ public:
 
   /**
    * Defines the actions happening before camera updates
+   * Hidden
    */
   Stage<SimpleStageAction> _beforeCameraUpdateStage;
 
   /**
    * Defines the actions happening before camera updates.
+   * Hidden
    */
   Stage<RenderTargetsStageAction> _gatherRenderTargetsStage;
 
   /**
    * Defines the actions happening during the per mesh ready checks
+   * Hidden
    */
   Stage<MeshStageAction> _isReadyForMeshStage;
 
   /**
    * Defines the actions happening before evaluate active mesh checks
+   * Hidden
    */
   Stage<SimpleStageAction> _beforeEvaluateActiveMeshStage;
 
   /**
    * Defines the actions happening during the evaluate sub mesh checks
+   * Hidden
    */
   Stage<EvaluateSubMeshStageAction> _evaluateSubMeshStage;
 
   /**
    * Defines the actions happening during the active mesh stage
+   * Hidden
    */
   Stage<ActiveMeshStageAction> _activeMeshStage;
 
   /**
    * Defines the actions happening during the per camera render target step
+   * Hidden
    */
   Stage<CameraStageAction> _cameraDrawRenderTargetStage;
 
   /**
    * Defines the actions happening just before the active camera is drawing
+   * Hidden
    */
   Stage<CameraStageAction> _beforeCameraDrawStage;
 
   /**
    * Defines the actions happening just before a rendering group is drawing
+   * Hidden
    */
   Stage<RenderingGroupStageAction> _beforeRenderingGroupDrawStage;
 
   /**
    * Defines the actions happening just after a rendering group has been drawn
+   * Hidden
    */
   Stage<RenderingGroupStageAction> _afterRenderingGroupDrawStage;
 
   /**
    * Defines the actions happening just after the active camera has been drawn
+   * Hidden
    */
   Stage<CameraStageAction> _afterCameraDrawStage;
+
+  /**
+   * Defines the actions happening when Geometries are rebuilding.
+   * Hidden
+   */
+  Stage<SimpleStageAction> _rebuildGeometryStage;
+
+  /** Gets or sets a boolean blocking all the calls to markAllMaterialsAsDirty
+   * (ie. the materials won't be updated if they are out of sync) */
+  bool blockMaterialDirtyMechanism;
 
 protected:
   /** Hidden */

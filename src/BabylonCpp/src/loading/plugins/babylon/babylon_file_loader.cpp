@@ -32,10 +32,9 @@ BabylonFileLoader::~BabylonFileLoader()
 {
 }
 
-MaterialPtr BabylonFileLoader::parseMaterialById(const std::string& id,
-                                                 const Json::value& parsedData,
-                                                 Scene* scene,
-                                                 const std::string& rootUrl) const
+MaterialPtr BabylonFileLoader::parseMaterialById(
+  const std::string& id, const Json::value& parsedData, Scene* scene,
+  const std::string& rootUrl) const
 {
   for (const auto& parsedMaterial : Json::GetArray(parsedData, "materials")) {
     if (Json::GetString(parsedData, "id") == id) {
@@ -45,9 +44,9 @@ MaterialPtr BabylonFileLoader::parseMaterialById(const std::string& id,
   return nullptr;
 }
 
-bool BabylonFileLoader::isDescendantOf(const Json::value& mesh,
-                                       const std::vector<std::string>& names,
-                                       std::vector<std::string>& hierarchyIds) const
+bool BabylonFileLoader::isDescendantOf(
+  const Json::value& mesh, const std::vector<std::string>& names,
+  std::vector<std::string>& hierarchyIds) const
 {
   for (auto& name : names) {
     if (Json::GetString(mesh, "name") == name) {
@@ -69,7 +68,7 @@ std::string BabylonFileLoader::logOperation(const std::string& operation) const
 }
 
 std::string BabylonFileLoader::logOperation(const std::string& operation,
-                                         const Json::value& producer) const
+                                            const Json::value& producer) const
 {
   return operation + " of " + Json::GetString(producer, "file") + " from "
          + Json::GetString(producer, "name") + " version: "
@@ -78,12 +77,13 @@ std::string BabylonFileLoader::logOperation(const std::string& operation,
 }
 
 bool BabylonFileLoader::importMesh(
-  const std::vector<std::string>& meshesNames, Scene* scene, const std::string& data,
-  const std::string& rootUrl, std::vector<AbstractMeshPtr>& meshes,
+  const std::vector<std::string>& meshesNames, Scene* scene,
+  const std::string& data, const std::string& rootUrl,
+  std::vector<AbstractMeshPtr>& meshes,
   std::vector<IParticleSystemPtr>& particleSystems,
   std::vector<SkeletonPtr>& skeletons,
   const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError) const
+                           const std::string& exception)>& onError) const
 {
   // Entire method running in try block, so ALWAYS logs as far as it got, only
   // actually writes details when SceneLoader.debugLogging = true (default), or
@@ -95,9 +95,10 @@ bool BabylonFileLoader::importMesh(
     const auto _log = log.str();
     if (!_log.empty()
         && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING()) {
-      std::string msg = parsedData.contains("producer") ?
-                       logOperation("importMesh", parsedData.get("producer")) :
-                       logOperation("importMesh");
+      std::string msg
+        = parsedData.contains("producer") ?
+            logOperation("importMesh", parsedData.get("producer")) :
+            logOperation("importMesh");
       std::string logStr
         = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING() ? _log :
                                                                           "";
@@ -213,7 +214,8 @@ bool BabylonFileLoader::importMesh(
                     && parsedMultiMaterial.get("materials").is<Json::array>()) {
                   for (const auto& subMatId :
                        Json::GetArray(parsedMultiMaterial, "materials")) {
-                    loadedMaterialsIds.emplace_back(subMatId.get<std::string>());
+                    loadedMaterialsIds.emplace_back(
+                      subMatId.get<std::string>());
                     auto mat = parseMaterialById(subMatId.get<std::string>(),
                                                  parsedData, scene, rootUrl);
                     log << "\n\tMaterial " << mat->toString(fullDetails);
@@ -325,8 +327,8 @@ bool BabylonFileLoader::importMesh(
   }
   catch (const std::exception& ex) {
     std::string msg = parsedData.contains("producer") ?
-                     logOperation("importMesh", parsedData.get("producer")) :
-                     logOperation("importMesh");
+                        logOperation("importMesh", parsedData.get("producer")) :
+                        logOperation("importMesh");
     msg += log.str();
     if (onError) {
       onError(msg, ex.what());
@@ -346,7 +348,7 @@ bool BabylonFileLoader::importMesh(
 bool BabylonFileLoader::load(
   Scene* scene, const std::string& data, const std::string& rootUrl,
   const std::function<void(const std::string& message,
-                             const std::string& exception)>& /*onError*/) const
+                           const std::string& exception)>& /*onError*/) const
 {
   Json::value parsedData;
   std::string err = Json::Parse(parsedData, data.c_str());
@@ -374,8 +376,8 @@ bool BabylonFileLoader::load(
   }
 
   // Fog
-  auto fogMode = Json::GetNumber(parsedData, "fogMode", Scene::FOGMODE_NONE());
-  if (fogMode != Scene::FOGMODE_NONE()) {
+  auto fogMode = Json::GetNumber(parsedData, "fogMode", Scene::FOGMODE_NONE);
+  if (fogMode != Scene::FOGMODE_NONE) {
     scene->fogMode = fogMode;
     scene->fogColor
       = Color3::FromArray(Json::ToArray<float>(parsedData, "fogColor"));
@@ -384,13 +386,13 @@ bool BabylonFileLoader::load(
     scene->fogDensity = Json::GetNumber(parsedData, "fogDensity", 0.1f);
     log << "\tFog mode for scene:  ";
     switch (fogMode) {
-      case Scene::FOGMODE_EXP():
+      case Scene::FOGMODE_EXP:
         log << "exp\n";
         break;
-      case Scene::FOGMODE_EXP2():
+      case Scene::FOGMODE_EXP2:
         log << "exp2\n";
         break;
-      case Scene::FOGMODE_LINEAR():
+      case Scene::FOGMODE_LINEAR:
         log << "linear\n";
         break;
       default:
@@ -604,9 +606,10 @@ bool BabylonFileLoader::load(
   const auto _log = log.str();
   if (!_log.empty()
       && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING()) {
-    std::string msg = parsedData.contains("producer") ?
-                     logOperation("importScene", parsedData.get("producer")) :
-                     logOperation("importScene");
+    std::string msg
+      = parsedData.contains("producer") ?
+          logOperation("importScene", parsedData.get("producer")) :
+          logOperation("importScene");
     std::string logStr
       = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING() ? _log :
                                                                         "";
