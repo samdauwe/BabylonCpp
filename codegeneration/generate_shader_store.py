@@ -130,17 +130,20 @@ def generateShadersStore(shaderFiles, outputDir,
     headerFilename = outputFileName.replace(".cpp", ".h")
     output = "#ifndef BABYLON_MATERIALS_EFFECT_SHADERS_STORE_H%s" % eol
     output += "#define BABYLON_MATERIALS_EFFECT_SHADERS_STORE_H%s%s" % (eol,eol)
-    output += "#include <babylon/babylon_global.h>%s%s" % (eol, eol)
+    output += "#include <string>%s" % eol
+    output += "#include <unordered_map>%s%s" % (eol, eol)
+    output += "#include <babylon/babylon_api.h>%s%s" % (eol, eol)
     output += "namespace BABYLON {%s%s" % (eol, eol)
     output += "class BABYLON_SHARED_EXPORT EffectShadersStore {%s%s" % (eol,eol)
     output += "public:%s" % eol
     output += "  EffectShadersStore();%s" % eol
     output += "  ~EffectShadersStore();%s%s" % (eol,eol)
-    output += "  unordered_map_t<string_t, string_t>& shaders();%s" % eol
-    output += "  const unordered_map_t<string_t, string_t>& shaders() const;"
-    output += "%s%s" % (eol, eol)
+    output += "  std::unordered_map<std::string, std::string>& "
+    output += "shaders();%s" % eol
+    output += "  const std::unordered_map<std::string, std::string>& shaders() "
+    output += "const;%s%s" % (eol, eol)
     output += "private:%s" % eol
-    output += "  static unordered_map_t<string_t, string_t> _shaders;"
+    output += "  static std::unordered_map<std::string, std::string> _shaders;"
     output += "%s%s" % (eol,eol)
     output += "}; // end of class EffectShadersStore%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s#endif " % (eol, eol)
@@ -165,14 +168,14 @@ def generateShadersStore(shaderFiles, outputDir,
     output += "{%s}%s%s" % (eol, eol, eol)
     output += "EffectShadersStore::~EffectShadersStore()%s" % eol
     output += "{%s}%s%s" % (eol, eol, eol)
-    output += "unordered_map_t<string_t, string_t>& "
+    output += "std::unordered_map<std::string, std::string>& "
     output += "EffectShadersStore::shaders()%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
-    output += "const unordered_map_t<string_t, string_t>&%s" % eol
+    output += "const std::unordered_map<std::string, std::string>&%s" % eol
     output += "EffectShadersStore::shaders() const%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
     # create shader name to shared source mapping
-    output += "unordered_map_t<string_t, string_t> "
+    output += "std::unordered_map<std::string, std::string> "
     output += "EffectShadersStore::_shaders%s" % eol
     shaderMapping = ""
     for shaderName in shaderNames:
@@ -203,18 +206,21 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     output = "#ifndef BABYLON_MATERIALS_EFFECT_INCLUDES_SHADERS_STORE_H%s" % eol
     output += "#define BABYLON_MATERIALS_EFFECT_INCLUDES_SHADERS_STORE_H%s%s"  \
                                                                     % (eol,eol)
-    output += "#include <babylon/babylon_global.h>%s%s" % (eol, eol)
+    output += "#include <string>%s" % eol
+    output += "#include <unordered_map>%s%s" % (eol, eol)
+    output += "#include <babylon/babylon_api.h>%s%s" % (eol, eol)
     output += "namespace BABYLON {%s%s" % (eol, eol)
     output += "class BABYLON_SHARED_EXPORT EffectIncludesShadersStore {"
     output += "%s%s" % (eol,eol)
     output += "public:%s" % eol
     output += "  EffectIncludesShadersStore();%s" % eol
     output += "  ~EffectIncludesShadersStore();%s%s" % (eol,eol)
-    output += "  unordered_map_t<string_t, string_t>& shaders();%s" % eol
-    output += "  const unordered_map_t<string_t, string_t>& shaders() const;"
-    output += "%s%s" % (eol, eol)
+    output += "  std::unordered_map<std::string, std::string>& "
+    output += "shaders();%s" % eol
+    output += "  const std::unordered_map<std::string, std::string>& shaders() "
+    output += "const;%s%s" % (eol, eol)
     output += "private:%s" % eol
-    output += "  static unordered_map_t<string_t, string_t> _shaders;"
+    output += "  static std::unordered_map<std::string, std::string> _shaders;"
     output += "%s%s" % (eol,eol)
     output += "}; // end of class EffectIncludesShadersStore%s%s" % (eol, eol)
     output += "} // end of namespace BABYLON%s%s#endif " % (eol, eol)
@@ -239,14 +245,14 @@ def generateIncludesShadersStore(shaderFiles, outputDir,
     output += "{%s}%s%s" % (eol, eol, eol)
     output += "EffectIncludesShadersStore::~EffectIncludesShadersStore()%s" % eol
     output += "{%s}%s%s" % (eol, eol, eol)
-    output += "unordered_map_t<string_t, string_t>& "
+    output += "std::unordered_map<std::string, std::string>&%s" % eol
     output += "EffectIncludesShadersStore::shaders()%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
-    output += "const unordered_map_t<string_t, string_t>&%s" % eol
+    output += "const std::unordered_map<std::string, std::string>&%s" % eol
     output += "EffectIncludesShadersStore::shaders() const%s" % eol
     output += "{%s  return _shaders;%s}%s%s" % (eol, eol, eol, eol)
     # create shader include name to shared source mapping
-    output += "unordered_map_t<string_t, string_t> "
+    output += "std::unordered_map<std::string, std::string>%s" % eol
     output += "EffectIncludesShadersStore::_shaders = {%s" % eol
     for shaderName in shaderNames:
         output += "{\"%s\", %s},%s   " % (shaderName, shaderName, eol)
