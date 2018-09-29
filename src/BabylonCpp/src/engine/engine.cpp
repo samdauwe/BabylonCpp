@@ -3370,7 +3370,7 @@ Engine::createMultipleRenderTarget(ISize size,
     textures.emplace_back(texture.get());
     attachments.emplace_back(attachment);
 
-    _gl->activeTexture((*_gl)["TEXTURE" + iStr]);
+    _gl->activeTexture((*_gl)["TEXTURE0"] + i);
     _gl->bindTexture(GL::TEXTURE_2D, texture->_webGLTexture.get());
 
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
@@ -4401,7 +4401,8 @@ int Engine::_removeDesignatedSlot(InternalTexture* internalTexture)
 void Engine::_activateCurrentTexture()
 {
   if (_currentTextureChannel != _activeChannel) {
-    _gl->activeTexture((*_gl)["TEXTURE" + std::to_string(_activeChannel)]);
+    _gl->activeTexture((*_gl)["TEXTURE0"]
+                       + static_cast<unsigned int>(_activeChannel));
     _currentTextureChannel = _activeChannel;
   }
 }

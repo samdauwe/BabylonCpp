@@ -11,10 +11,10 @@ _ProceduralTexturesLibrarySamplesIndex::_ProceduralTexturesLibrarySamplesIndex()
 
   // Brick Procedural Texture Scene
   _samples["BrickProceduralTextureScene"] = std::make_tuple(
-    false,                                                             //
-    [](ICanvas* iCanvas) {                                             //
+    true,                                                            //
+    [](ICanvas* iCanvas) {                                           //
       return std::make_unique<BrickProceduralTextureScene>(iCanvas); //
-    });                                                                //
+    });                                                              //
 }
 
 _ProceduralTexturesLibrarySamplesIndex::

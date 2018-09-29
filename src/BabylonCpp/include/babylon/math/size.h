@@ -14,7 +14,9 @@ public:
   /**
    * @brief Creates a Size object from the given width and height (floats).
    */
-  Size(int width = 0, int height = 0);
+  Size();
+  Size(int size);
+  Size(int width, int height);
   Size(const Size& otherSize);
   Size(Size&& otherSize);
   ~Size();

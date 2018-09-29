@@ -316,7 +316,8 @@ ProceduralTexture& ProceduralTexture::setFloat(const std::string& _name,
   return *this;
 }
 
-ProceduralTexture& ProceduralTexture::setInt(const std::string& _name, int value)
+ProceduralTexture& ProceduralTexture::setInt(const std::string& _name,
+                                             int value)
 {
   _checkUniform(_name);
   _ints[_name] = value;
@@ -513,10 +514,10 @@ void ProceduralTexture::dispose()
 
   scene->proceduralTextures.erase(
     std::remove_if(scene->proceduralTextures.begin(),
-                     scene->proceduralTextures.end(),
-                     [this](const ProceduralTexturePtr& proceduralTexture) {
-                       return proceduralTexture.get() == this;
-                     }),
+                   scene->proceduralTextures.end(),
+                   [this](const ProceduralTexturePtr& proceduralTexture) {
+                     return proceduralTexture.get() == this;
+                   }),
     scene->proceduralTextures.end());
 
   auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];

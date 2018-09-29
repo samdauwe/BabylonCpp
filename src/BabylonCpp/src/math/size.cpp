@@ -4,6 +4,14 @@
 
 namespace BABYLON {
 
+Size::Size() : ISize(0, 0)
+{
+}
+
+Size::Size(int size) : ISize(size, size)
+{
+}
+
 Size::Size(int _width, int _height) : ISize(_width, _height)
 {
 }
