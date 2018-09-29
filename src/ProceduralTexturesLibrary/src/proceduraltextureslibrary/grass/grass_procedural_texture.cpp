@@ -1,6 +1,8 @@
 #include <babylon/proceduraltextureslibrary/grass/grass_procedural_texture.h>
 
 #include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/grass/grass_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -22,6 +24,10 @@ GrassProceduralTexture::GrassProceduralTexture(const std::string& iName,
                   &GrassProceduralTexture::set_groundColor}
     , _groundColor{Color3(1.f, 1.f, 1.f)}
 {
+  // Fragment shader
+  Effect::ShadersStore()["grassProceduralTexturePixelShader"]
+    = grassProceduralTexturePixelShader;
+
   _grassColors = {
     Color3(0.29f, 0.38f, 0.02f), //
     Color3(0.36f, 0.49f, 0.09f), //

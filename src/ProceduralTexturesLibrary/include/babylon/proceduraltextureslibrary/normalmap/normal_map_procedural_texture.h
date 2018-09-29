@@ -7,16 +7,20 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class NormalMapProceduralTexture;
+using NormalMapProceduralTexturePtr
+  = std::shared_ptr<NormalMapProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT NormalMapProceduralTexture
     : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static NormalMapProceduralTexture* New(Ts&&... args)
+  static NormalMapProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new NormalMapProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<NormalMapProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<NormalMapProceduralTexture>(
+      new NormalMapProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }

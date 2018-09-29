@@ -8,15 +8,18 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class GrassProceduralTexture;
+using GrassProceduralTexturePtr = std::shared_ptr<GrassProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT GrassProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static GrassProceduralTexture* New(Ts&&... args)
+  static GrassProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new GrassProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<GrassProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<GrassProceduralTexture>(
+      new GrassProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }

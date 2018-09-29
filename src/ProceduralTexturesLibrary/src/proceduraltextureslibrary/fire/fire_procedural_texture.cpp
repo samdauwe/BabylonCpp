@@ -2,6 +2,8 @@
 
 #include <babylon/core/json.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/fire/fire_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -31,6 +33,10 @@ FireProceduralTexture::FireProceduralTexture(const std::string& iName,
     , _autoGenerateTime{true}
     , _alphaThreshold{0.5f}
 {
+  // Fragment shader
+  Effect::ShadersStore()["fireProceduralTexturePixelShader"]
+    = fireProceduralTexturePixelShader;
+
   _fireColors = FireProceduralTexture::RedFireColors();
   updateShaderUniforms();
 }

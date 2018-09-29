@@ -8,16 +8,20 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class StarfieldProceduralTexture;
+using StarfieldProceduralTexturePtr
+  = std::shared_ptr<StarfieldProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT StarfieldProceduralTexture
     : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static StarfieldProceduralTexture* New(Ts&&... args)
+  static StarfieldProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new StarfieldProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<StarfieldProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<StarfieldProceduralTexture>(
+      new StarfieldProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }

@@ -8,15 +8,18 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class CloudProceduralTexture;
+using CloudProceduralTexturePtr = std::shared_ptr<CloudProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT CloudProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static CloudProceduralTexture* New(Ts&&... args)
+  static CloudProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new CloudProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<CloudProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<CloudProceduralTexture>(
+      new CloudProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }

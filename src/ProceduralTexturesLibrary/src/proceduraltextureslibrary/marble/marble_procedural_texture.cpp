@@ -1,6 +1,8 @@
 #include <babylon/proceduraltextureslibrary/marble/marble_procedural_texture.h>
 
 #include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/marble/marble_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -29,6 +31,10 @@ MarbleProceduralTexture::MarbleProceduralTexture(const std::string& iName,
     , _amplitude{9.f}
     , _jointColor{Color3(0.72f, 0.72f, 0.72f)}
 {
+  // Fragment shader
+  Effect::ShadersStore()["marbleProceduralTexturePixelShader"]
+    = marbleProceduralTexturePixelShader;
+
   updateShaderUniforms();
 }
 

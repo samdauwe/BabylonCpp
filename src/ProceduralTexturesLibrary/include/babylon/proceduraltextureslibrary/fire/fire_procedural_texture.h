@@ -9,15 +9,18 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class FireProceduralTexture;
+using FireProceduralTexturePtr = std::shared_ptr<FireProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT FireProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static FireProceduralTexture* New(Ts&&... args)
+  static FireProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new FireProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<FireProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<FireProceduralTexture>(
+      new FireProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }

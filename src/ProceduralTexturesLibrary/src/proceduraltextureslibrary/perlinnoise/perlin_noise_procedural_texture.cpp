@@ -3,6 +3,8 @@
 #include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/perlinnoise/perlin_noise_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -21,6 +23,10 @@ PerlinNoiseProceduralTexture::PerlinNoiseProceduralTexture(
     , translationSpeed{1.f}
     , _currentTranslation{0.f}
 {
+  // Fragment shader
+  Effect::ShadersStore()["perlinNoiseProceduralTexturePixelShader"]
+    = perlinNoiseProceduralTexturePixelShader;
+
   updateShaderUniforms();
 }
 

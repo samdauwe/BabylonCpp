@@ -8,15 +8,18 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class RoadProceduralTexture;
+using RoadProceduralTexturePtr = std::shared_ptr<RoadProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT RoadProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static RoadProceduralTexture* New(Ts&&... args)
+  static RoadProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new RoadProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<RoadProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<RoadProceduralTexture>(
+      new RoadProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }

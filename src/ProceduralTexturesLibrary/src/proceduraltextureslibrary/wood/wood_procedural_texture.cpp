@@ -1,6 +1,8 @@
 #include <babylon/proceduraltextureslibrary/wood/wood_procedural_texture.h>
 
 #include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/wood/wood_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -22,6 +24,10 @@ WoodProceduralTexture::WoodProceduralTexture(const std::string& iName,
     , _ampScale{100.f}
     , _woodColor{Color3(0.32f, 0.17f, 0.09f)}
 {
+  // Fragment shader
+  Effect::ShadersStore()["woodProceduralTexturePixelShader"]
+    = woodProceduralTexturePixelShader;
+
   updateShaderUniforms();
 }
 

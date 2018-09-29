@@ -8,15 +8,18 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class WoodProceduralTexture;
+using WoodProceduralTexturePtr = std::shared_ptr<WoodProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT WoodProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static WoodProceduralTexture* New(Ts&&... args)
+  static WoodProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new WoodProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<WoodProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<WoodProceduralTexture>(
+      new WoodProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }

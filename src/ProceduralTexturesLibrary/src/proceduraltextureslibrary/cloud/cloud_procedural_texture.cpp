@@ -1,6 +1,8 @@
 #include <babylon/proceduraltextureslibrary/cloud/cloud_procedural_texture.h>
 
 #include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/cloud/cloud_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -22,6 +24,10 @@ CloudProceduralTexture::CloudProceduralTexture(const std::string& iName,
     , _skyColor{Color4(0.15f, 0.68f, 1.f, 1.f)}
     , _cloudColor{Color4(1.f, 1.f, 1.f, 1.f)}
 {
+  // Fragment shader
+  Effect::ShadersStore()["cloudProceduralTexturePixelShader"]
+    = cloudProceduralTexturePixelShader;
+
   updateShaderUniforms();
 }
 

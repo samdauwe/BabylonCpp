@@ -1,6 +1,8 @@
 #include <babylon/proceduraltextureslibrary/normalmap/normal_map_procedural_texture.h>
 
 #include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/normalmap/normal_map_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -20,6 +22,10 @@ NormalMapProceduralTexture::NormalMapProceduralTexture(const std::string& iName,
                   &NormalMapProceduralTexture::set_baseTexture}
     , _baseTexture{nullptr}
 {
+  // Fragment shader
+  Effect::ShadersStore()["normalMapProceduralTexturePixelShader"]
+    = normalMapProceduralTexturePixelShader;
+
   updateShaderUniforms();
 }
 

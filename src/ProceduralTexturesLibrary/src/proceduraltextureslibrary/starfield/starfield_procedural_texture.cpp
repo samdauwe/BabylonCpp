@@ -1,6 +1,8 @@
 #include <babylon/proceduraltextureslibrary/starfield/starfield_procedural_texture.h>
 
 #include <babylon/core/json.h>
+#include <babylon/materials/effect.h>
+#include <babylon/proceduraltextureslibrary/starfield/starfield_procedural_texture_fragment_fx.h>
 
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
@@ -50,6 +52,10 @@ StarfieldProceduralTexture::StarfieldProceduralTexture(const std::string& iName,
     , _distfading{0.730f}
     , _saturation{0.850f}
 {
+  // Fragment shader
+  Effect::ShadersStore()["starfieldProceduralTexturePixelShader"]
+    = starfieldProceduralTexturePixelShader;
+
   updateShaderUniforms();
 }
 

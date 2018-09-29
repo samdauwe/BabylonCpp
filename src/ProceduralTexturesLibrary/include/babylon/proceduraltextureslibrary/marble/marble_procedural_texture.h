@@ -8,15 +8,18 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class MarbleProceduralTexture;
+using MarbleProceduralTexturePtr = std::shared_ptr<MarbleProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT MarbleProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static MarbleProceduralTexture* New(Ts&&... args)
+  static MarbleProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new MarbleProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<MarbleProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<MarbleProceduralTexture>(
+      new MarbleProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }

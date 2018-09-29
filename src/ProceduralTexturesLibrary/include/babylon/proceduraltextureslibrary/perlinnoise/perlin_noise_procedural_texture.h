@@ -7,17 +7,20 @@
 namespace BABYLON {
 namespace ProceduralTexturesLibrary {
 
+class PerlinNoiseProceduralTexture;
+using PerlinNoiseProceduralTexturePtr
+  = std::shared_ptr<PerlinNoiseProceduralTexture>;
+
 class BABYLON_SHARED_EXPORT PerlinNoiseProceduralTexture
     : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static PerlinNoiseProceduralTexture* New(Ts&&... args)
+  static PerlinNoiseProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture
-      = new PerlinNoiseProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<PerlinNoiseProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<PerlinNoiseProceduralTexture>(
+      new PerlinNoiseProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }
