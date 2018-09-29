@@ -25,7 +25,7 @@ const char* BrickProceduralTextureScene::getName()
 
 void BrickProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  auto camera = ArcRotateCamera::New("Camera", 3.f * Math::PI_2, Math::PI / 2.f,
+  auto camera = ArcRotateCamera::New("Camera", 2.8f * Math::PI_2, Math::PI_2,
                                      15.f, Vector3::Zero(), scene);
   camera->attachControl(canvas, false);
 

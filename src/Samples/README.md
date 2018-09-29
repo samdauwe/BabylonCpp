@@ -76,6 +76,17 @@
 ![terrain_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/terrain_material_scene.png?raw=true "Terrain Material Scene")
 ![tri_planar_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tri_planar_material_scene.png?raw=true "Tri-Planar Material Scene")
 
+## Procedural Textures Library ##
+![brick_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/brick_procedural_texture_scene.png?raw=true "Brick Procedural Texture Scene")
+![cloud_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cloud_procedural_texture_scene.png?raw=true "Cloud Procedural Texture Scene")
+![fire_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fire_procedural_texture_scene.png?raw=true "Fire Procedural Texture Scene")
+![grass_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/grass_procedural_texture_scene.png?raw=true "Grass Procedural Texture Scene")
+![marble_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/marble_procedural_texture_scene.png?raw=true "Marble Procedural Texture Scene")
+![perlin_noise_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/perlin_noise_procedural_texture_scene.png?raw=true "Perlin Noise Procedural Texture Scene")
+![road_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/road_procedural_texture_scene.png?raw=true "Road Procedural Texture Scene")
+![starfield_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/starfield_procedural_texture_scene.png?raw=true "Starfield Procedural Texture Scene")
+![wood_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/wood_procedural_texture_scene.png?raw=true "Wood Procedural Texture Scene")
+
 ### Meshes ###
 ![basic_elements_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_elements_scene.png?raw=true "Basic Elements Scene")
 ![basic_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_scene.png?raw=true "Basic Scene")
