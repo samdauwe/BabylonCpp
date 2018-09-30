@@ -28,6 +28,7 @@ InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
     , _initialSlot{-1}
     , _designatedSlot{-1}
     , _dataSource{dataSource}
+    , _size{0}
     , _cachedWrapU{0}
     , _cachedWrapV{0}
     , _cachedWrapR{0}

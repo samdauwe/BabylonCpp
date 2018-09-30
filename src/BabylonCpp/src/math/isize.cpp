@@ -6,6 +6,10 @@ ISize::ISize() : width{0}, height{0}
 {
 }
 
+ISize::ISize(int size) : width{size}, height{size}
+{
+}
+
 ISize::ISize(int iWidth, int iHeight) : width{iWidth}, height{iHeight}
 {
 }

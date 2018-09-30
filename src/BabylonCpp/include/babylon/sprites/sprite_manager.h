@@ -14,10 +14,12 @@ class Camera;
 class Effect;
 class PickingInfo;
 class Ray;
+class SpriteManager;
 class Texture;
 class VertexBuffer;
-using CameraPtr  = std::shared_ptr<Camera>;
-using TexturePtr = std::shared_ptr<Texture>;
+using CameraPtr        = std::shared_ptr<Camera>;
+using SpriteManagerPtr = std::shared_ptr<SpriteManager>;
+using TexturePtr       = std::shared_ptr<Texture>;
 
 namespace GL {
 class IGLBuffer;
@@ -27,17 +29,17 @@ class BABYLON_SHARED_EXPORT SpriteManager {
 
 public:
   template <typename... Ts>
-  static SpriteManager* New(Ts&&... args)
+  static SpriteManagerPtr New(Ts&&... args)
   {
-    auto spriteManager = new SpriteManager(std::forward<Ts>(args)...);
-    spriteManager->addToScene(
-      static_cast<std::unique_ptr<SpriteManager>>(spriteManager));
+    auto spriteManager = std::shared_ptr<SpriteManager>(
+      new SpriteManager(std::forward<Ts>(args)...));
+    spriteManager->addToScene(spriteManager);
 
     return spriteManager;
   }
   virtual ~SpriteManager();
 
-  void addToScene(std::unique_ptr<SpriteManager>&& newSpriteManager);
+  void addToScene(const SpriteManagerPtr& newSpriteManager);
 
   void setOnDispose(
     const std::function<void(SpriteManager*, EventState&)>& callback);
@@ -58,12 +60,12 @@ protected:
   void set_texture(const TexturePtr& value);
 
 private:
-  void _appendSpriteVertex(size_t index, Sprite* sprite, int offsetX,
-                           int offsetY, int rowSize);
+  void _appendSpriteVertex(size_t index, const Sprite& sprite, int offsetX,
+                           int offsetY, float rowSize);
 
 public:
   std::string name;
-  std::vector<std::unique_ptr<Sprite>> sprites;
+  std::vector<SpritePtr> sprites;
   unsigned int renderingGroupId;
   unsigned int layerMask;
   bool fogEnabled;

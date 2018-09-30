@@ -10,6 +10,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT ISize {
 
   ISize();
+  ISize(int size);
   ISize(int width, int height);
   ISize(const ISize& other);            // Copy constructor
   ISize(ISize&& other);                 // Move constructor

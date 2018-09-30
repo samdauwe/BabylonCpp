@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-Sprite::Sprite(const std::string& iName, SpriteManager* manager)
+Sprite::Sprite(const std::string& iName, const SpriteManagerPtr& manager)
     : name{iName}
     , position{Vector3::Zero()}
     , color{std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
@@ -38,17 +38,17 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::addToSpriteManager(std::unique_ptr<Sprite>&& newSprite)
+void Sprite::addToSpriteManager(const SpritePtr& newSprite)
 {
-  _manager->sprites.emplace_back(std::move(newSprite));
+  _manager->sprites.emplace_back(newSprite);
 }
 
-int Sprite::get_size() const
+float Sprite::get_size() const
 {
   return width;
 }
 
-void Sprite::set_size(int value)
+void Sprite::set_size(float value)
 {
   width  = value;
   height = value;
@@ -106,12 +106,12 @@ void Sprite::_animate(float deltaTime)
 void Sprite::dispose()
 {
   // Remove from scene
-  _manager->sprites.erase(
-    std::remove_if(_manager->sprites.begin(), _manager->sprites.end(),
-                   [this](const std::unique_ptr<Sprite>& sprite) {
-                     return sprite.get() == this;
-                   }),
-    _manager->sprites.end());
+  _manager->sprites.erase(std::remove_if(_manager->sprites.begin(),
+                                         _manager->sprites.end(),
+                                         [this](const SpritePtr& sprite) {
+                                           return sprite.get() == this;
+                                         }),
+                          _manager->sprites.end());
 }
 
 } // end of namespace BABYLON

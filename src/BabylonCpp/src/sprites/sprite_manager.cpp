@@ -121,10 +121,9 @@ SpriteManager::~SpriteManager()
 {
 }
 
-void SpriteManager::addToScene(
-  std::unique_ptr<SpriteManager>&& newSpriteManager)
+void SpriteManager::addToScene(const SpriteManagerPtr& newSpriteManager)
 {
-  _scene->spriteManagers.emplace_back(std::move(newSpriteManager));
+  _scene->spriteManagers.emplace_back(newSpriteManager);
 }
 
 void SpriteManager::setOnDispose(
@@ -146,8 +145,8 @@ void SpriteManager::set_texture(const TexturePtr& value)
   _spriteTexture = value;
 }
 
-void SpriteManager::_appendSpriteVertex(size_t index, Sprite* sprite,
-                                        int offsetX, int offsetY, int rowSize)
+void SpriteManager::_appendSpriteVertex(size_t index, const Sprite& sprite,
+                                        int offsetX, int offsetY, float rowSize)
 {
   size_t arrayOffset = index * 16;
 
@@ -168,26 +167,26 @@ void SpriteManager::_appendSpriteVertex(size_t index, Sprite* sprite,
     offsetYVal = 1.f - _epsilon;
   }
 
-  _vertexData[arrayOffset + 0] = sprite->position.x;
-  _vertexData[arrayOffset + 1] = sprite->position.y;
-  _vertexData[arrayOffset + 2] = sprite->position.z;
-  _vertexData[arrayOffset + 3] = sprite->angle;
-  _vertexData[arrayOffset + 4] = static_cast<float>(sprite->width);
-  _vertexData[arrayOffset + 5] = static_cast<float>(sprite->height);
+  _vertexData[arrayOffset + 0] = sprite.position.x;
+  _vertexData[arrayOffset + 1] = sprite.position.y;
+  _vertexData[arrayOffset + 2] = sprite.position.z;
+  _vertexData[arrayOffset + 3] = sprite.angle;
+  _vertexData[arrayOffset + 4] = static_cast<float>(sprite.width);
+  _vertexData[arrayOffset + 5] = static_cast<float>(sprite.height);
   _vertexData[arrayOffset + 6] = offsetXVal;
   _vertexData[arrayOffset + 7] = offsetYVal;
-  _vertexData[arrayOffset + 8] = sprite->invertU ? 1.f : 0.f;
-  _vertexData[arrayOffset + 9] = sprite->invertV ? 1.f : 0.f;
-  float offset = static_cast<float>((sprite->cellIndex / rowSize) >> 0);
+  _vertexData[arrayOffset + 8] = sprite.invertU ? 1.f : 0.f;
+  _vertexData[arrayOffset + 9] = sprite.invertV ? 1.f : 0.f;
+  float offset                 = sprite.cellIndex / rowSize;
   _vertexData[arrayOffset + 10]
-    = static_cast<float>(static_cast<float>(sprite->cellIndex)
+    = static_cast<float>(static_cast<float>(sprite.cellIndex)
                          - offset * static_cast<float>(rowSize));
   _vertexData[arrayOffset + 11] = offset;
   // Color
-  _vertexData[arrayOffset + 12] = sprite->color->r;
-  _vertexData[arrayOffset + 13] = sprite->color->g;
-  _vertexData[arrayOffset + 14] = sprite->color->b;
-  _vertexData[arrayOffset + 15] = sprite->color->a;
+  _vertexData[arrayOffset + 12] = sprite.color->r;
+  _vertexData[arrayOffset + 13] = sprite.color->g;
+  _vertexData[arrayOffset + 14] = sprite.color->b;
+  _vertexData[arrayOffset + 15] = sprite.color->a;
 }
 
 std::optional<PickingInfo>
@@ -261,8 +260,9 @@ void SpriteManager::render()
 {
   // Check
   if (!_effectBase->isReady() || !_effectFog->isReady() || !_spriteTexture
-      || !_spriteTexture->isReady())
+      || !_spriteTexture->isReady()) {
     return;
+  }
 
   auto engine   = _scene->getEngine();
   auto baseSize = _spriteTexture->getBaseSize();
@@ -270,7 +270,8 @@ void SpriteManager::render()
   // Sprites
   auto deltaTime = engine->getDeltaTime();
   size_t max     = std::min(_capacity, sprites.size());
-  int rowSize    = baseSize.width / cellWidth;
+  float rowSize
+    = static_cast<float>(baseSize.width) / static_cast<float>(cellWidth);
 
   unsigned int offset = 0;
   for (size_t index = 0; index < max; index++) {
@@ -282,10 +283,10 @@ void SpriteManager::render()
 
     sprite->_animate(deltaTime);
 
-    _appendSpriteVertex(offset++, sprite.get(), 0, 0, rowSize);
-    _appendSpriteVertex(offset++, sprite.get(), 1, 0, rowSize);
-    _appendSpriteVertex(offset++, sprite.get(), 1, 1, rowSize);
-    _appendSpriteVertex(offset++, sprite.get(), 0, 1, rowSize);
+    _appendSpriteVertex(offset++, *sprite, 0, 0, rowSize);
+    _appendSpriteVertex(offset++, *sprite, 1, 0, rowSize);
+    _appendSpriteVertex(offset++, *sprite, 1, 1, rowSize);
+    _appendSpriteVertex(offset++, *sprite, 0, 1, rowSize);
   }
   _buffer->update(_vertexData);
 
@@ -324,14 +325,14 @@ void SpriteManager::render()
   effect->setBool("alphaTest", true);
   engine->setColorWrite(false);
   engine->drawElementsType(Material::TriangleFillMode(), 0,
-                           static_cast<int>((offset / 4) * 6));
+                           static_cast<int>((offset / 4.f) * 6));
   engine->setColorWrite(true);
   effect->setBool("alphaTest", false);
 
   engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
 
   engine->drawElementsType(Material::TriangleFillMode(), 0,
-                           static_cast<int>((offset / 4) * 6));
+                           static_cast<int>((offset / 4.f) * 6));
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 }
 
@@ -355,7 +356,7 @@ void SpriteManager::dispose()
   // Remove from scene
   _scene->spriteManagers.erase(
     std::remove_if(_scene->spriteManagers.begin(), _scene->spriteManagers.end(),
-                   [this](const std::unique_ptr<SpriteManager>& spriteManager) {
+                   [this](const SpriteManagerPtr& spriteManager) {
                      return spriteManager.get() == this;
                    }),
     _scene->spriteManagers.end());

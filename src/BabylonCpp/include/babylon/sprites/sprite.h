@@ -10,25 +10,29 @@
 namespace BABYLON {
 
 class ActionManager;
+class Sprite;
 class SpriteManager;
+using SpritePtr        = std::shared_ptr<Sprite>;
+using SpriteManagerPtr = std::shared_ptr<SpriteManager>;
 
 class BABYLON_SHARED_EXPORT Sprite {
 
 public:
   template <typename... Ts>
-  static Sprite* New(Ts&&... args)
+  static SpritePtr New(Ts&&... args)
   {
-    auto sprite = new Sprite(std::forward<Ts>(args)...);
-    sprite->addToSpriteManager(static_cast<std::unique_ptr<Sprite>>(sprite));
+    auto sprite
+      = std::shared_ptr<Sprite>(new Sprite(std::forward<Ts>(args)...));
+    sprite->addToSpriteManager(sprite);
 
     return sprite;
   }
   virtual ~Sprite();
 
-  void addToSpriteManager(std::unique_ptr<Sprite>&& newSprite);
+  void addToSpriteManager(const SpritePtr& newSprite);
 
   void playAnimation(int from, int to, bool loop, float delay,
-                     const std::function<void()>& onAnimationEnd);
+                     const std::function<void()>& onAnimationEnd = nullptr);
   void stopAnimation();
 
   /**
@@ -38,18 +42,18 @@ public:
   void dispose();
 
 protected:
-  Sprite(const std::string& name, SpriteManager* manager);
+  Sprite(const std::string& name, const SpriteManagerPtr& manager);
 
 private:
-  int get_size() const;
-  void set_size(int value);
+  float get_size() const;
+  void set_size(float value);
 
 public:
   std::string name;
   Vector3 position;
   std::unique_ptr<Color4> color;
-  int width;
-  int height;
+  float width;
+  float height;
   float angle;
   int cellIndex;
   int invertU;
@@ -65,7 +69,7 @@ public:
    */
   bool isVisible;
 
-  Property<Sprite, int> size;
+  Property<Sprite, float> size;
 
 private:
   bool _animationStarted;
@@ -74,7 +78,7 @@ private:
   int _toIndex;
   float _delay;
   int _direction;
-  SpriteManager* _manager;
+  SpriteManagerPtr _manager;
   float _time;
   std::function<void()> _onAnimationEnd;
 

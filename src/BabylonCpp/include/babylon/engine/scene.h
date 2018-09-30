@@ -76,6 +76,7 @@ using NodePtr                = std::shared_ptr<Node>;
 using MeshPtr                = std::shared_ptr<Mesh>;
 using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
 using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
+using SpriteManagerPtr       = std::shared_ptr<SpriteManager>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
 
 /**
@@ -2618,7 +2619,7 @@ public:
    * All of the sprite managers added to this scene
    * @see http://doc.babylonjs.com/babylon101/sprites
    */
-  std::vector<std::unique_ptr<SpriteManager>> spriteManagers;
+  std::vector<SpriteManagerPtr> spriteManagers;
   std::function<bool(Sprite* sprite)> spritePredicate;
 
   std::vector<std::unique_ptr<HighlightLayer>> highlightLayers;
