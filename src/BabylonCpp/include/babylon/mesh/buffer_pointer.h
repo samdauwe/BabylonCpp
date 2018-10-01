@@ -10,7 +10,7 @@ class IGLBuffer;
 } // end of namespace GL
 
 /**
- * @brief
+ * @brief Keeps track of all the buffer info used in engine.
  */
 struct BABYLON_SHARED_EXPORT BufferPointer {
   BufferPointer();

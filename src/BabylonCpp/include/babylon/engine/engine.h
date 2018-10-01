@@ -982,33 +982,6 @@ public:
                        EffectCreationOptions& options, Engine* engine);
 
   /**
-   * @brief Create an effect to use with particle systems.
-   * Please note that some parameters like animation sheets or not being
-   * billboard are not supported in this configuration
-   * @param fragmentName defines the base name of the effect (The name of file
-   * without .fragment.fx)
-   * @param uniformsNames defines a list of attribute names
-   * @param samplers defines an array of string used to represent textures
-   * @param defines defines the string containing the defines to use to compile
-   * the shaders
-   * @param fallbacks defines the list of potential fallbacks to use if shader
-   * conmpilation fails
-   * @param onCompiled defines a function to call when the effect creation is
-   * successful
-   * @param onError defines a function to call when the effect creation has
-   * failed
-   * @returns the new Effect
-   */
-  Effect* createEffectForParticles(
-    const std::string& fragmentName, std::vector<std::string> uniformsNames,
-    std::vector<std::string> samplers, std::string defines = "",
-    EffectFallbacks* fallbacks                                  = nullptr,
-    const std::function<void(const Effect* effect)>& onCompiled = nullptr,
-    const std::function<void(const Effect* effect, const std::string& errors)>&
-      onError
-    = nullptr);
-
-  /**
    * @brief Directly creates a webGL program.
    * @param vertexCode defines the vertex shader code to use
    * @param fragmentCode defines the fragment shader code to use
@@ -1489,6 +1462,11 @@ public:
   void _unpackFlipY(bool value);
 
   /**
+   * @brief hidden
+   */
+  int _getUnpackAlignement();
+
+  /**
    * @brief Creates a dynamic texture.
    * @param width defines the width of the texture
    * @param height defines the height of the texture
@@ -1615,16 +1593,9 @@ public:
   /**
    * @brief Hidden
    */
-  void _uploadDataToTexture(unsigned int target, int lod, int internalFormat,
-                            int width, int height, unsigned int format,
-                            unsigned int type, const Uint8Array& data);
-
-  /**
-   * @brief Hidden
-   */
-  void _uploadCompressedDataToTexture(unsigned int target, int lod,
-                                      unsigned int internalFormat, int width,
-                                      int height, const Uint8Array& data);
+  void _uploadArrayBufferViewToTexture(InternalTexture* texture,
+                                       const Uint8Array& imageData,
+                                       unsigned int faceIndex = 0, int lod = 0);
 
   /**
    * @brief Hidden
@@ -1665,6 +1636,8 @@ public:
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void()>& onError = nullptr, unsigned int format = 0,
     const std::string& forcedExtension = "", bool createPolynomials = true);
+
+  void _setCubeMapTextureParams(bool loadMipmap);
 
   /**
    * @brief Creates a cube texture.
@@ -1722,7 +1695,7 @@ public:
    * @param data defines the array of data to use to create each face
    * @param size defines the size of the textures
    * @param format defines the format of the data
-   * @param type defines the type fo the data (like
+   * @param type defines the type of the data (like
    * BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT)
    * @param generateMipMaps  defines if the engine should generate the mip
    * levels
@@ -2167,22 +2140,16 @@ public:
                           = nullptr);
 
   /**
+   * Hidden
+   */
+  // static std::vector<IInternalTextureLoader*> _TextureLoaders;
+
+  /**
    * @brief Gets a boolean indicating if the engine can be instanciated (ie. if
    * a webGL context can be found).
    * @returns true if the engine can be created
    */
   static bool isSupported();
-
-  static GLShaderPtr CompileShader(GL::IGLRenderingContext* gl,
-                                   const std::string& source,
-                                   const std::string& type,
-                                   const std::string& defines,
-                                   const std::string& shaderVersion);
-  static GLShaderPtr CompileRawShader(GL::IGLRenderingContext* gl,
-                                      const std::string& source,
-                                      const std::string& type);
-  static SamplingParameters GetSamplingParameters(unsigned int samplingMode,
-                                                  bool generateMipMaps);
 
 protected:
   /**
@@ -2273,13 +2240,19 @@ private:
                                  const DepthTextureCreationOptions& options);
 
   unsigned int _drawMode(unsigned int fillMode);
+  GLShaderPtr _compileShader(const std::string& source, const std::string& type,
+                             const std::string& defines,
+                             const std::string& shaderVersion);
+  GLShaderPtr _compileRawShader(const std::string& source,
+                                const std::string& type);
   GLProgramPtr
   _createShaderProgram(const std::unique_ptr<GL::IGLShader>& vertexShader,
                        const std::unique_ptr<GL::IGLShader>& fragmentShader,
                        GL::IGLRenderingContext* context,
                        const std::vector<std::string>& transformFeedbackVaryings
                        = {});
-  void setCubeMapTextureParams(GL::IGLRenderingContext* gl, bool loadMipmap);
+  SamplingParameters _getSamplingParameters(unsigned int samplingMode,
+                                            bool generateMipMaps);
   GLRenderBufferPtr
   _setupFramebufferDepthAttachments(bool generateStencilBuffer,
                                     bool generateDepthBuffer, int width,
@@ -2293,7 +2266,8 @@ private:
     const std::function<
       bool(int width, int height,
            const std::function<void()>& continuationCallback)>& processFunction,
-    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE);
+    unsigned int samplingMode
+    = EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE);
   ArrayBufferView _convertRGBtoRGBATextureData(const ArrayBufferView& rgbData,
                                                int width, int height,
                                                unsigned int textureType);
@@ -2370,6 +2344,12 @@ public:
    * Gets the list of created postprocesses
    */
   std::vector<PostProcess*> postProcesses;
+
+  /**
+   * Gets or sets a boolean indicating if the engine should validate programs
+   * after compilation
+   */
+  bool validateShaderPrograms;
 
   // Observables
 
@@ -2460,6 +2440,11 @@ public:
    * Hidden
    */
   std::vector<UniformBuffer*> _uniformBuffers;
+
+  /**
+   * Hidden
+   */
+  GL::IGLRenderingContext* _gl;
 
   /**
    * Gets the audio engine
@@ -2590,7 +2575,6 @@ private:
   // WebVR
   bool _vrExclusivePointerMode;
   // Private Members
-  GL::IGLRenderingContext* _gl;
   ICanvas* _renderingCanvas;
   bool _windowIsBackground;
   float _webGLVersion;

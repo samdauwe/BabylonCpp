@@ -62,11 +62,13 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , preventCacheWipeBetweenFrames{false}
     , enableOfflineSupport{false}
     , disableManifestCheck{false}
+    , validateShaderPrograms{false}
     , _badOS{false}
     , _badDesktopOS{false}
     , disableTextureBindingOptimization{false}
     , _vrDisplayEnabled{false}
     , disableUniformBuffers{false}
+    , _gl{nullptr}
     , disablePerformanceMonitorInBackground{false}
     , premultipliedAlpha{options.premultipliedAlpha}
     , _depthCullingState{std::make_unique<_DepthCullingState>()}
@@ -83,7 +85,6 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _currentRenderTarget{nullptr}
     , _currentFramebuffer{nullptr}
     , _vrExclusivePointerMode{false}
-    , _gl{nullptr}
     , _renderingCanvas{canvas}
     , _windowIsBackground{false}
     , _webGLVersion{1.f}
@@ -251,7 +252,7 @@ InternalTexture* Engine::emptyTexture()
   if (!_emptyTexture) {
     _emptyTexture = createRawTexture(
       Uint8Array(4), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
-      TextureConstants::NEAREST_SAMPLINGMODE);
+      EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE);
   }
 
   return _emptyTexture;
@@ -262,7 +263,7 @@ InternalTexture* Engine::emptyTexture3D()
   if (!_emptyTexture3D) {
     _emptyTexture3D = createRawTexture3D(
       Uint8Array(4), 1, 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
-      TextureConstants::NEAREST_SAMPLINGMODE);
+      EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE);
   }
 
   return _emptyTexture3D;
@@ -274,11 +275,11 @@ InternalTexture* Engine::emptyCubeTexture()
 #if 0
     Uint8Array faceData(4);
     std::vector<Uint8Array> cubeData{faceData, faceData, faceData,
-                                  faceData, faceData, faceData};
-    _emptyCubeTexture
-      = createRawCubeTexture(cubeData, 1, EngineConstants::TEXTUREFORMAT_RGBA,
-                             EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
-                             false, TextureConstants::NEAREST_SAMPLINGMODE);
+                                     faceData, faceData, faceData};
+    _emptyCubeTexture = createRawCubeTexture(
+      cubeData, 1, EngineConstants::TEXTUREFORMAT_RGBA,
+      EngineConstants::TEXTURETYPE_UNSIGNED_INT, false, false,
+      EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE);
 #endif
   }
 
@@ -1914,39 +1915,39 @@ Engine::createEffect(std::unordered_map<std::string, std::string>& baseName,
   return _compiledEffects[name].get();
 }
 
-Effect* Engine::createEffectForParticles(
-  const std::string& fragmentName, std::vector<std::string> uniformsNames,
-  std::vector<std::string> samplers, std::string defines,
-  EffectFallbacks* fallbacks,
-  const std::function<void(const Effect* effect)>& onCompiled,
-  const std::function<void(const Effect* effect, const std::string& errors)>&
-    onError)
+std::unique_ptr<GL::IGLShader>
+Engine::_compileShader(const std::string& source, const std::string& type,
+                       const std::string& defines,
+                       const std::string& shaderVersion)
 {
-  auto attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions();
-  auto effectCreationOption     = ParticleSystem::_GetEffectCreationOptions();
+  return _compileRawShader(
+    shaderVersion + ((!defines.empty()) ? defines + "\n" : "") + source, type);
+}
 
-  if (!String::contains(defines, " BILLBOARD")) {
-    defines += "\n#define BILLBOARD\n";
+std::unique_ptr<GL::IGLShader>
+Engine::_compileRawShader(const std::string& source, const std::string& type)
+{
+  auto shader = _gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
+                                                     GL::FRAGMENT_SHADER);
+  _gl->shaderSource(shader, source);
+  _gl->compileShader(shader);
+
+  if (!_gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {
+    auto log = _gl->getShaderInfoLog(shader);
+    if (!log.empty()) {
+      BABYLON_LOG_ERROR("Engine", log);
+      BABYLON_LOG_ERROR("Engine", source);
+    }
+    return nullptr;
   }
 
-  if (!stl_util::contains(samplers, "diffuseSampler")) {
-    samplers.emplace_back("diffuseSampler");
+  if (!shader) {
+    BABYLON_LOG_ERROR("Engine",
+                      "Something went wrong while compile the shader.");
+    return nullptr;
   }
 
-  std::unordered_map<std::string, std::string> baseName{
-    {"vertex", "particles"}, {"fragmentElement", fragmentName}};
-  stl_util::concat(effectCreationOption, uniformsNames);
-
-  EffectCreationOptions options;
-  options.attributes    = std::move(attributesNamesOrOptions);
-  options.uniformsNames = std::move(effectCreationOption);
-  options.samplers      = std::move(samplers);
-  options.defines       = std::move(defines);
-  options.fallbacks     = std::make_unique<EffectFallbacks>(*fallbacks);
-  options.onCompiled    = onCompiled;
-  options.onError       = onError;
-
-  return createEffect(baseName, options, this);
+  return shader;
 }
 
 std::unique_ptr<GL::IGLProgram> Engine::createRawShaderProgram(
@@ -1956,8 +1957,8 @@ std::unique_ptr<GL::IGLProgram> Engine::createRawShaderProgram(
 {
   context = context ? context : _gl;
 
-  auto vertexShader   = CompileRawShader(context, vertexCode, "vertex");
-  auto fragmentShader = CompileRawShader(context, fragmentCode, "fragment");
+  auto vertexShader   = _compileRawShader(vertexCode, "vertex");
+  auto fragmentShader = _compileRawShader(fragmentCode, "fragment");
 
   return _createShaderProgram(vertexShader, fragmentShader, context,
                               transformFeedbackVaryings);
@@ -1974,10 +1975,10 @@ std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
 
   const std::string shaderVersion
     = (_webGLVersion > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
-  auto vertexShader   = Engine::CompileShader(context, vertexCode, "vertex",
-                                            defines, shaderVersion);
-  auto fragmentShader = Engine::CompileShader(context, fragmentCode, "fragment",
-                                              defines, shaderVersion);
+  auto vertexShader
+    = _compileShader(vertexCode, "vertex", defines, shaderVersion);
+  auto fragmentShader
+    = _compileShader(fragmentCode, "fragment", defines, shaderVersion);
 
   auto program = _createShaderProgram(vertexShader, fragmentShader, context,
                                       transformFeedbackVaryings);
@@ -2017,11 +2018,23 @@ std::unique_ptr<GL::IGLProgram> Engine::_createShaderProgram(
   }
 
   if (!linked) {
-    context->validateProgram(shaderProgram.get());
     const auto error = context->getProgramInfoLog(shaderProgram);
     if (!error.empty()) {
       BABYLON_LOG_ERROR("Engine", error);
       return nullptr;
+    }
+  }
+
+  if (validateShaderPrograms) {
+    context->validateProgram(shaderProgram.get());
+    auto validated
+      = context->getProgramParameter(shaderProgram.get(), GL::VALIDATE_STATUS);
+    if (!validated) {
+      const auto error = context->getProgramInfoLog(shaderProgram);
+      if (!error.empty()) {
+        BABYLON_LOG_ERROR("Engine", error);
+        return nullptr;
+      }
     }
   }
 
@@ -2063,7 +2076,7 @@ Engine::getAttributes(GL::IGLProgram* shaderProgram,
 
 void Engine::enableEffect(Effect* effect)
 {
-  if (!effect) {
+  if (!effect || effect == _currentEffect) {
     return;
   }
 
@@ -2520,6 +2533,106 @@ Engine::setTextureFormatToUse(const std::vector<std::string>& formatsAvailable)
   return _textureFormatInUse;
 }
 
+SamplingParameters Engine::_getSamplingParameters(unsigned int samplingMode,
+                                                  bool generateMipMaps)
+{
+  GL::GLenum magFilter = GL::NEAREST;
+  GL::GLenum minFilter = GL::NEAREST;
+
+  switch (samplingMode) {
+    case TextureConstants::BILINEAR_SAMPLINGMODE:
+      magFilter = GL::LINEAR;
+      if (generateMipMaps) {
+        minFilter = GL::LINEAR_MIPMAP_NEAREST;
+      }
+      else {
+        minFilter = GL::LINEAR;
+      }
+      break;
+    case TextureConstants::TRILINEAR_SAMPLINGMODE:
+      magFilter = GL::LINEAR;
+      if (generateMipMaps) {
+        minFilter = GL::LINEAR_MIPMAP_LINEAR;
+      }
+      else {
+        minFilter = GL::LINEAR;
+      }
+      break;
+    case TextureConstants::NEAREST_SAMPLINGMODE:
+      magFilter = GL::NEAREST;
+      if (generateMipMaps) {
+        minFilter = GL::NEAREST_MIPMAP_LINEAR;
+      }
+      else {
+        minFilter = GL::NEAREST;
+      }
+      break;
+    case TextureConstants::NEAREST_NEAREST_MIPNEAREST:
+      magFilter = GL::NEAREST;
+      if (generateMipMaps) {
+        minFilter = GL::NEAREST_MIPMAP_NEAREST;
+      }
+      else {
+        minFilter = GL::NEAREST;
+      }
+      break;
+    case TextureConstants::NEAREST_LINEAR_MIPNEAREST:
+      magFilter = GL::NEAREST;
+      if (generateMipMaps) {
+        minFilter = GL::LINEAR_MIPMAP_NEAREST;
+      }
+      else {
+        minFilter = GL::LINEAR;
+      }
+      break;
+    case TextureConstants::NEAREST_LINEAR_MIPLINEAR:
+      magFilter = GL::NEAREST;
+      if (generateMipMaps) {
+        minFilter = GL::LINEAR_MIPMAP_LINEAR;
+      }
+      else {
+        minFilter = GL::LINEAR;
+      }
+      break;
+    case TextureConstants::NEAREST_LINEAR:
+      magFilter = GL::NEAREST;
+      minFilter = GL::LINEAR;
+      break;
+    case TextureConstants::NEAREST_NEAREST:
+      magFilter = GL::NEAREST;
+      minFilter = GL::NEAREST;
+      break;
+    case TextureConstants::LINEAR_NEAREST_MIPNEAREST:
+      magFilter = GL::LINEAR;
+      if (generateMipMaps) {
+        minFilter = GL::NEAREST_MIPMAP_NEAREST;
+      }
+      else {
+        minFilter = GL::NEAREST;
+      }
+      break;
+    case TextureConstants::LINEAR_NEAREST_MIPLINEAR:
+      magFilter = GL::LINEAR;
+      if (generateMipMaps) {
+        minFilter = GL::NEAREST_MIPMAP_LINEAR;
+      }
+      else {
+        minFilter = GL::NEAREST;
+      }
+      break;
+    case TextureConstants::LINEAR_LINEAR:
+      magFilter = GL::LINEAR;
+      minFilter = GL::LINEAR;
+      break;
+    case TextureConstants::LINEAR_NEAREST:
+      magFilter = GL::LINEAR;
+      minFilter = GL::NEAREST;
+      break;
+  }
+
+  return {static_cast<int>(minFilter), static_cast<int>(magFilter)};
+}
+
 std::unique_ptr<GL::IGLTexture> Engine::_createTexture()
 {
   auto texture = _gl->createTexture();
@@ -2726,10 +2839,10 @@ void Engine::_rescaleTexture(InternalTexture* source,
                              const std::function<void()>& onComplete)
 {
   IRenderTargetOptions options;
-  options.generateMipMaps       = false;
-  options.type                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
-  options.samplingMode          = TextureConstants::BILINEAR_SAMPLINGMODE;
-  options.generateDepthBuffer   = false;
+  options.generateMipMaps     = false;
+  options.type                = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  options.samplingMode        = EngineConstants::TEXTURE_BILINEAR_SAMPLINGMODE;
+  options.generateDepthBuffer = false;
   options.generateStencilBuffer = false;
 
   auto rtt = createRenderTargetTexture(
@@ -2737,8 +2850,8 @@ void Engine::_rescaleTexture(InternalTexture* source,
 
   if (!_rescalePostProcess) {
     _rescalePostProcess = std::make_unique<PassPostProcess>(
-      "rescale", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, this,
-      false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+      "rescale", 1.f, nullptr, EngineConstants::TEXTURE_BILINEAR_SAMPLINGMODE,
+      this, false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   }
 
   _rescalePostProcess->getEffect()->executeWhenCompiled(
@@ -2844,7 +2957,7 @@ InternalTexture* Engine::createRawTexture(const Uint8Array& data, int width,
   _bindTextureDirectly(GL::TEXTURE_2D, _texture, true);
 
   // Filters
-  auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
+  auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
 
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
@@ -2873,6 +2986,11 @@ void Engine::_unpackFlipY(bool value)
     _unpackFlipYCached = value;
     _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, value ? 1 : 0);
   }
+}
+
+int Engine::_getUnpackAlignement()
+{
+  return _gl->getParameteri(GL::UNPACK_ALIGNMENT);
 }
 
 InternalTexture* Engine::createDynamicTexture(int width, int height,
@@ -2911,7 +3029,7 @@ InternalTexture* Engine::createDynamicTexture(int width, int height,
 void Engine::updateTextureSamplingMode(unsigned int samplingMode,
                                        InternalTexture* texture)
 {
-  auto filters = GetSamplingParameters(samplingMode, texture->generateMipMaps);
+  auto filters = _getSamplingParameters(samplingMode, texture->generateMipMaps);
 
   if (texture->isCube) {
     _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
@@ -3030,15 +3148,15 @@ void Engine::_setupDepthStencilTexture(InternalTexture* internalTexture,
   internalTexture->generateMipMaps        = false;
   internalTexture->_generateDepthBuffer   = true;
   internalTexture->_generateStencilBuffer = generateStencil;
-  internalTexture->samplingMode           = bilinearFiltering ?
-                                    TextureConstants::BILINEAR_SAMPLINGMODE :
-                                    TextureConstants::NEAREST_SAMPLINGMODE;
+  internalTexture->samplingMode
+    = bilinearFiltering ? EngineConstants::TEXTURE_BILINEAR_SAMPLINGMODE :
+                          EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
   internalTexture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
   internalTexture->_comparisonFunction = comparisonFunction;
 
   auto target = internalTexture->isCube ? GL::TEXTURE_CUBE_MAP : GL::TEXTURE_2D;
   auto samplingParameters
-    = GetSamplingParameters(internalTexture->samplingMode, false);
+    = _getSamplingParameters(internalTexture->samplingMode, false);
   _gl->texParameteri(target, GL::TEXTURE_MAG_FILTER, samplingParameters.mag);
   _gl->texParameteri(target, GL::TEXTURE_MIN_FILTER, samplingParameters.min);
   _gl->texParameteri(target, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
@@ -3232,12 +3350,12 @@ Engine::createRenderTargetTexture(ISize size,
   if (type == EngineConstants::TEXTURETYPE_FLOAT
       && !_caps.textureFloatLinearFiltering) {
     // if floating point linear (GL::FLOAT) then force to NEAREST_SAMPLINGMODE
-    samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
+    samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
   else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT
            && !_caps.textureHalfFloatLinearFiltering) {
     // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
-    samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
+    samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
 
   auto texture = std::make_unique<InternalTexture>(
@@ -3248,7 +3366,7 @@ Engine::createRenderTargetTexture(ISize size,
   int width  = size.width;
   int height = size.height;
 
-  auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
+  auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
 
   if (type == EngineConstants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
     type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
@@ -3318,7 +3436,7 @@ Engine::createMultipleRenderTarget(ISize size,
   auto textureCount          = options.textureCount;
 
   auto defaultType         = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
-  auto defaultSamplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE;
+  auto defaultSamplingMode = EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE;
 
   const auto& types         = options.types;
   const auto& samplingModes = options.samplingModes;
@@ -3345,16 +3463,16 @@ Engine::createMultipleRenderTarget(ISize size,
     if (type == EngineConstants::TEXTURETYPE_FLOAT
         && !_caps.textureFloatLinearFiltering) {
       // if floating point linear (gl.FLOAT) then force to NEAREST_SAMPLINGMODE
-      samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
+      samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
     }
     else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT
              && !_caps.textureHalfFloatLinearFiltering) {
       // if floating point linear (HALF_FLOAT) then force to
       // NEAREST_SAMPLINGMODE
-      samplingMode = TextureConstants::NEAREST_SAMPLINGMODE;
+      samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
     }
 
-    auto filters = GetSamplingParameters(samplingMode, *generateMipMaps);
+    auto filters = _getSamplingParameters(samplingMode, *generateMipMaps);
     if (type == EngineConstants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
       type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
       BABYLON_LOG_WARN("Engine",
@@ -3687,22 +3805,17 @@ void Engine::_uploadDataToTextureDirectly(InternalTexture* /*texture*/,
 {
 }
 
-void Engine::_uploadDataToTexture(unsigned int target, int lod,
-                                  int internalFormat, int width, int height,
-                                  unsigned int format, unsigned int type,
-                                  const Uint8Array& data)
+void Engine::_uploadArrayBufferViewToTexture(InternalTexture* texture,
+                                             const Uint8Array& imageData,
+                                             unsigned int faceIndex, int lod)
 {
-  _gl->texImage2D(target, lod, internalFormat, width, height, 0, format, type,
-                  data);
-}
+  auto bindTarget = texture->isCube ? GL::TEXTURE_CUBE_MAP : GL::TEXTURE_2D;
 
-void Engine::_uploadCompressedDataToTexture(unsigned int target, int lod,
-                                            unsigned int internalFormat,
-                                            int width, int height,
-                                            const Uint8Array& data)
-{
-  _gl->compressedTexImage2D(target, lod, internalFormat, width, height, 0,
-                            data);
+  _bindTextureDirectly(bindTarget, texture, true);
+
+  _uploadDataToTextureDirectly(texture, imageData, faceIndex, lod);
+
+  _bindTextureDirectly(bindTarget, nullptr, true);
 }
 
 void Engine::_uploadImageToTexture(InternalTexture* texture,
@@ -3748,7 +3861,7 @@ InternalTexture* Engine::createRenderTargetCubeTexture(
   _texture->samples         = 1;
   _texture->samplingMode    = samplingMode;
 
-  auto filters = Engine::GetSamplingParameters(samplingMode, generateMipMaps);
+  auto filters = Engine::_getSamplingParameters(samplingMode, generateMipMaps);
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, _texture, true);
 
@@ -3819,16 +3932,15 @@ InternalTexture* Engine::createCubeTexture(
   return nullptr;
 }
 
-void Engine::setCubeMapTextureParams(GL::IGLRenderingContext* gl,
-                                     bool loadMipmap)
+void Engine::_setCubeMapTextureParams(bool loadMipmap)
 {
-  gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
-  gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
-                    loadMipmap ? GL::LINEAR_MIPMAP_LINEAR : GL::LINEAR);
-  gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
-                    GL::CLAMP_TO_EDGE);
-  gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
-                    GL::CLAMP_TO_EDGE);
+  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, GL::LINEAR);
+  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
+                     loadMipmap ? GL::LINEAR_MIPMAP_LINEAR : GL::LINEAR);
+  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
+                     GL::CLAMP_TO_EDGE);
+  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
+                     GL::CLAMP_TO_EDGE);
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
 
@@ -3909,10 +4021,9 @@ InternalTexture* Engine::createRawCubeTexture(
   unsigned int samplingMode, const std::string& compression)
 {
   auto texture = new InternalTexture(this, InternalTexture::DATASOURCE_CUBERAW);
-  texture->isCube          = true;
-  texture->generateMipMaps = generateMipMaps;
-  texture->format          = format;
-  texture->type            = type;
+  texture->isCube = true;
+  texture->format = format;
+  texture->type   = type;
   if (!_doNotHandleContextLost) {
     texture->_bufferViewArray = data;
   }
@@ -3922,6 +4033,38 @@ InternalTexture* Engine::createRawCubeTexture(
 
   if (internalFormat == GL::RGB) {
     internalFormat = GL::RGBA;
+  }
+
+  // Mipmap generation needs a sized internal format that is both
+  // color-renderable and texture-filterable
+  if (textureType == GL::FLOAT && !_caps.textureFloatLinearFiltering) {
+    generateMipMaps = false;
+    samplingMode    = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    BABYLON_LOG_WARN("Engine",
+                     "Float texture filtering is not supported. Mipmap "
+                     "generation and sampling mode are forced to false and "
+                     "TEXTURE_NEAREST_SAMPLINGMODE, respectively.");
+  }
+  else if (textureType == GL::HALF_FLOAT_OES
+           && !_caps.textureHalfFloatLinearFiltering) {
+    generateMipMaps = false;
+    samplingMode    = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    BABYLON_LOG_WARN("Engine",
+                     "Half float texture filtering is not supported. Mipmap "
+                     "generation and sampling mode are forced to false and "
+                     "TEXTURE_NEAREST_SAMPLINGMODE, respectively.");
+  }
+  else if (textureType == GL::FLOAT && !_caps.textureFloatRender) {
+    generateMipMaps = false;
+    BABYLON_LOG_WARN("Engine",
+                     "Render to float textures is not supported. Mipmap "
+                     "generation forced to false.");
+  }
+  else if (textureType == GL::HALF_FLOAT && !_caps.colorBufferFloat) {
+    generateMipMaps = false;
+    BABYLON_LOG_WARN("Engine",
+                     "Render to half float textures is not supported. Mipmap "
+                     "generation forced to false.");
   }
 
   int width  = size;
@@ -3952,32 +4095,17 @@ InternalTexture* Engine::createRawCubeTexture(
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
 
-  if (textureType == GL::FLOAT && !_caps.textureFloatLinearFiltering) {
-    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
-                       GL::NEAREST);
-    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
-                       GL::NEAREST);
-  }
-  else if (textureType == _gl->HALF_FLOAT_OES
-           && !_caps.textureHalfFloatLinearFiltering) {
-    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
-                       GL::NEAREST);
-    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
-                       GL::NEAREST);
-  }
-  else {
-    auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
-    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
-                       filters.mag);
-    _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
-                       filters.min);
-  }
+  auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
+  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, filters.mag);
+  _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER, filters.min);
 
   _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
                      GL::CLAMP_TO_EDGE);
   _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
                      GL::CLAMP_TO_EDGE);
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
+
+  texture->generateMipMaps = generateMipMaps;
 
   return texture;
 }
@@ -4072,7 +4200,7 @@ InternalTexture* Engine::createRawTexture3D(const ArrayBufferView& data,
   _bindTextureDirectly(GL::TEXTURE_3D, texture, true);
 
   // Filters
-  auto filters = GetSamplingParameters(samplingMode, generateMipMaps);
+  auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
 
   _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_MAG_FILTER, filters.mag);
   _gl->texParameteri(GL::TEXTURE_3D, GL::TEXTURE_MIN_FILTER, filters.min);
@@ -4097,7 +4225,7 @@ void Engine::_prepareWebGLTextureContinuation(InternalTexture* texture,
     return;
   }
 
-  auto filters = GetSamplingParameters(samplingMode, !noMipmap);
+  auto filters = _getSamplingParameters(samplingMode, !noMipmap);
 
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MIN_FILTER, filters.min);
@@ -4540,11 +4668,11 @@ void Engine::_bindSamplerUniformToChannel(int sourceSlot, int destination)
 unsigned int Engine::_getTextureWrapMode(unsigned int mode) const
 {
   switch (mode) {
-    case TextureConstants::WRAP_ADDRESSMODE:
+    case EngineConstants::TEXTURE_WRAP_ADDRESSMODE:
       return GL::REPEAT;
-    case TextureConstants::CLAMP_ADDRESSMODE:
+    case EngineConstants::TEXTURE_CLAMP_ADDRESSMODE:
       return GL::CLAMP_TO_EDGE;
-    case TextureConstants::MIRROR_ADDRESSMODE:
+    case EngineConstants::TEXTURE_MIRROR_ADDRESSMODE:
       return GL::MIRRORED_REPEAT;
   }
   return GL::REPEAT;
@@ -4648,8 +4776,9 @@ bool Engine::_setTexture(int channel, const BaseTexturePtr& texture,
       // CUBIC_MODE and SKYBOX_MODE both require CLAMP_TO_EDGE.  All other modes
       // use REPEAT.
       auto textureWrapMode
-        = (texture->coordinatesMode() != TextureConstants::CUBIC_MODE
-           && texture->coordinatesMode() != TextureConstants::SKYBOX_MODE) ?
+        = (texture->coordinatesMode() != EngineConstants::TEXTURE_CUBIC_MODE
+           && texture->coordinatesMode()
+                != EngineConstants::TEXTURE_SKYBOX_MODE) ?
             GL::REPEAT :
             GL::CLAMP_TO_EDGE;
       _setTextureParameterInteger(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
@@ -4724,10 +4853,11 @@ void Engine::_setAnisotropicLevel(unsigned int target,
   auto value                      = texture->anisotropicFilteringLevel;
 
   if (internalTexture->samplingMode
-        != TextureConstants::LINEAR_LINEAR_MIPNEAREST
+        != EngineConstants::TEXTURE_LINEAR_LINEAR_MIPNEAREST
       && internalTexture->samplingMode
-           != TextureConstants::LINEAR_LINEAR_MIPLINEAR
-      && internalTexture->samplingMode != TextureConstants::LINEAR_LINEAR) {
+           != EngineConstants::TEXTURE_LINEAR_LINEAR_MIPLINEAR
+      && internalTexture->samplingMode
+           != EngineConstants::TEXTURE_LINEAR_LINEAR) {
     value = 1; // Forcing the anisotropic to 1 because else webgl will force
                // filters to linear
   }
@@ -5318,143 +5448,6 @@ std::promise<std::string> Engine::_loadFileAsync(const std::string& /*url*/)
 bool Engine::isSupported()
 {
   return true;
-}
-
-std::unique_ptr<GL::IGLShader>
-Engine::CompileShader(GL::IGLRenderingContext* gl, const std::string& source,
-                      const std::string& type, const std::string& defines,
-                      const std::string& shaderVersion)
-{
-  return CompileRawShader(
-    gl, shaderVersion + ((!defines.empty()) ? defines + "\n" : "") + source,
-    type);
-}
-
-std::unique_ptr<GL::IGLShader>
-Engine::CompileRawShader(GL::IGLRenderingContext* gl, const std::string& source,
-                         const std::string& type)
-{
-  auto shader = gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
-                                                    GL::FRAGMENT_SHADER);
-  gl->shaderSource(shader, source);
-  gl->compileShader(shader);
-
-  if (!gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {
-    auto log = gl->getShaderInfoLog(shader);
-    if (!log.empty()) {
-      BABYLON_LOG_ERROR("Engine", log);
-      BABYLON_LOG_ERROR("Engine", source);
-    }
-    return nullptr;
-  }
-
-  if (!shader) {
-    BABYLON_LOG_ERROR("Engine",
-                      "Something went wrong while compile the shader.");
-    return nullptr;
-  }
-
-  return shader;
-}
-
-SamplingParameters Engine::GetSamplingParameters(unsigned int samplingMode,
-                                                 bool generateMipMaps)
-{
-  GL::GLenum magFilter = GL::NEAREST;
-  GL::GLenum minFilter = GL::NEAREST;
-
-  switch (samplingMode) {
-    case TextureConstants::BILINEAR_SAMPLINGMODE:
-      magFilter = GL::LINEAR;
-      if (generateMipMaps) {
-        minFilter = GL::LINEAR_MIPMAP_NEAREST;
-      }
-      else {
-        minFilter = GL::LINEAR;
-      }
-      break;
-    case TextureConstants::TRILINEAR_SAMPLINGMODE:
-      magFilter = GL::LINEAR;
-      if (generateMipMaps) {
-        minFilter = GL::LINEAR_MIPMAP_LINEAR;
-      }
-      else {
-        minFilter = GL::LINEAR;
-      }
-      break;
-    case TextureConstants::NEAREST_SAMPLINGMODE:
-      magFilter = GL::NEAREST;
-      if (generateMipMaps) {
-        minFilter = GL::NEAREST_MIPMAP_LINEAR;
-      }
-      else {
-        minFilter = GL::NEAREST;
-      }
-      break;
-    case TextureConstants::NEAREST_NEAREST_MIPNEAREST:
-      magFilter = GL::NEAREST;
-      if (generateMipMaps) {
-        minFilter = GL::NEAREST_MIPMAP_NEAREST;
-      }
-      else {
-        minFilter = GL::NEAREST;
-      }
-      break;
-    case TextureConstants::NEAREST_LINEAR_MIPNEAREST:
-      magFilter = GL::NEAREST;
-      if (generateMipMaps) {
-        minFilter = GL::LINEAR_MIPMAP_NEAREST;
-      }
-      else {
-        minFilter = GL::LINEAR;
-      }
-      break;
-    case TextureConstants::NEAREST_LINEAR_MIPLINEAR:
-      magFilter = GL::NEAREST;
-      if (generateMipMaps) {
-        minFilter = GL::LINEAR_MIPMAP_LINEAR;
-      }
-      else {
-        minFilter = GL::LINEAR;
-      }
-      break;
-    case TextureConstants::NEAREST_LINEAR:
-      magFilter = GL::NEAREST;
-      minFilter = GL::LINEAR;
-      break;
-    case TextureConstants::NEAREST_NEAREST:
-      magFilter = GL::NEAREST;
-      minFilter = GL::NEAREST;
-      break;
-    case TextureConstants::LINEAR_NEAREST_MIPNEAREST:
-      magFilter = GL::LINEAR;
-      if (generateMipMaps) {
-        minFilter = GL::NEAREST_MIPMAP_NEAREST;
-      }
-      else {
-        minFilter = GL::NEAREST;
-      }
-      break;
-    case TextureConstants::LINEAR_NEAREST_MIPLINEAR:
-      magFilter = GL::LINEAR;
-      if (generateMipMaps) {
-        minFilter = GL::NEAREST_MIPMAP_LINEAR;
-      }
-      else {
-        minFilter = GL::NEAREST;
-      }
-      break;
-    case TextureConstants::LINEAR_LINEAR:
-      magFilter = GL::LINEAR;
-      minFilter = GL::LINEAR;
-      break;
-    case TextureConstants::LINEAR_NEAREST:
-      magFilter = GL::LINEAR;
-      minFilter = GL::NEAREST;
-      break;
-  }
-
-  return {static_cast<int>(minFilter), static_cast<int>(magFilter)};
 }
 
 } // end of namespace BABYLON
