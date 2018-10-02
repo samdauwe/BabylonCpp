@@ -61,12 +61,14 @@ def main():
     current, previous = "3.3.0-alpha.9", "3.3.0-alpha.2"
     current, previous = "3.3.0-alpha.13", "3.3.0-alpha.9"
     current, previous = "3.3.0-beta.3", "3.3.0-alpha.13"
+    current, previous = "3.3.0", "3.3.0-beta.3"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
         "3.3.0-alpha.2" : "3.3.0_2018_05_24",
         "3.3.0-alpha.9" : "3.3.0_2018_06_24",
         "3.3.0-alpha.13": "3.3.0_2018_07_24",
         "3.3.0-beta.3"  : "3.3.0_2018_08_24",
+        "3.3.0"         : "3.3.0_2018_10_02",
     }
     # List containing the files to ignore
     whiteList = ["babylon.nullEngine.ts", "babylon.khronosTextureContainer.ts",
