@@ -224,7 +224,12 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
   static constexpr unsigned int TEXTUREFORMAT_RGBA = 5;
 
   /**
-   * R
+   * RED
+   */
+  static constexpr unsigned int TEXTUREFORMAT_RED = 6;
+
+  /**
+   * RED (2nd reference)
    */
   static constexpr unsigned int TEXTUREFORMAT_R = 6;
 
@@ -234,7 +239,37 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
   static constexpr unsigned int TEXTUREFORMAT_RG = 7;
 
   /**
-   * UNSIGNED_INT
+   * RED_INTEGER
+   */
+  static constexpr unsigned int TEXTUREFORMAT_RED_INTEGER = 8;
+
+  /**
+   * RED_INTEGER (2nd reference)
+   */
+  static constexpr unsigned int TEXTUREFORMAT_R_INTEGER = 8;
+
+  /**
+   * RG_INTEGER
+   */
+  static constexpr unsigned int TEXTUREFORMAT_RG_INTEGER = 9;
+
+  /**
+   * RGB_INTEGER
+   */
+  static constexpr unsigned int TEXTUREFORMAT_RGB_INTEGER = 10;
+
+  /**
+   * RGBA_INTEGER
+   */
+  static constexpr unsigned int TEXTUREFORMAT_RGBA_INTEGER = 11;
+
+  /**
+   * UNSIGNED_BYTE
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_BYTE = 0;
+
+  /**
+   * UNSIGNED_BYTE (2nd reference)
    */
   static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT = 0;
 
@@ -247,6 +282,71 @@ struct BABYLON_SHARED_EXPORT EngineConstants {
    * HALF_FLOAT
    */
   static constexpr unsigned int TEXTURETYPE_HALF_FLOAT = 2;
+
+  /**
+   * BYTE
+   */
+  static constexpr unsigned int TEXTURETYPE_BYTE = 3;
+
+  /**
+   * SHORT
+   */
+  static constexpr unsigned int TEXTURETYPE_SHORT = 4;
+
+  /**
+   * UNSIGNED_SHORT
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_SHORT = 5;
+
+  /**
+   * INT
+   */
+  static constexpr unsigned int TEXTURETYPE_INT = 6;
+
+  /**
+   * UNSIGNED_INT
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_INTEGER = 7;
+
+  /**
+   * UNSIGNED_SHORT_4_4_4_4
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_SHORT_4_4_4_4 = 8;
+
+  /**
+   * UNSIGNED_SHORT_5_5_5_1
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_SHORT_5_5_5_1 = 9;
+
+  /**
+   * UNSIGNED_SHORT_5_6_5
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_SHORT_5_6_5 = 10;
+
+  /**
+   * UNSIGNED_INT_2_10_10_10_REV
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT_2_10_10_10_REV = 11;
+
+  /**
+   * UNSIGNED_INT_24_8
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT_24_8 = 12;
+
+  /**
+   * UNSIGNED_INT_10F_11F_11F_REV
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT_10F_11F_11F_REV = 13;
+
+  /**
+   * UNSIGNED_INT_5_9_9_9_REV
+   */
+  static constexpr unsigned int TEXTURETYPE_UNSIGNED_INT_5_9_9_9_REV = 14;
+
+  /**
+   * FLOAT_32_UNSIGNED_INT_24_8_REV
+   */
+  static constexpr unsigned int TEXTURETYPE_FLOAT_32_UNSIGNED_INT_24_8_REV = 15;
 
   /**
    * nearest is mag = nearest and min = nearest and mip = linear
