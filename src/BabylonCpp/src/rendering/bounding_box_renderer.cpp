@@ -52,9 +52,9 @@ void BoundingBoxRenderer::_register()
       _evaluateSubMesh(mesh, subMesh);
     });
 
-  scene->_afterCameraDrawStage.registerStep(
-    SceneComponentConstants::STEP_AFTERCAMERADRAW_BOUNDINGBOXRENDERER, this,
-    [this](Camera* /*camera*/) { render(); });
+  // scene->_afterRenderingGroupDrawStage.registerStep(
+  //  SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_BOUNDINGBOXRENDERER,
+  //  this, [this](Camera* /*camera*/) { render(); });
 }
 
 void BoundingBoxRenderer::_evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh)

@@ -24,12 +24,6 @@ void PostProcessRenderPipelineManagerSceneComponent::_register()
     this, [this](const std::vector<RenderTargetTexturePtr>& renderTargets) {
       _gatherRenderTargets(renderTargets);
     });
-  scene->_gatherRenderTargetsStage.registerStep(
-    SceneComponentConstants::
-      STEP_REBUILDGEOMETRY_POSTPROCESSRENDERPIPELINEMANAGER,
-    this, [this](const std::vector<RenderTargetTexturePtr>& /*renderTargets*/) {
-      _rebuildGeometry();
-    });
 }
 
 void PostProcessRenderPipelineManagerSceneComponent::rebuild()

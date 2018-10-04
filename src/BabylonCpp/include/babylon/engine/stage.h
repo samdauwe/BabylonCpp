@@ -8,9 +8,13 @@
 
 namespace BABYLON {
 
+class _InstancesBatch;
 class AbstractMesh;
 class Camera;
+class ICanvas;
 struct ISceneComponent;
+class PickingInfo;
+struct PointerEvent;
 class RenderTargetTexture;
 class SubMesh;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
@@ -44,6 +48,12 @@ using CameraStageAction = std::function<void(Camera* camera)>;
 using RenderingGroupStageAction = std::function<void(int renderingGroupId)>;
 
 /**
+ * Strong typing of a Mesh Render related stage step action
+ */
+using RenderingMeshStageAction = std::function<void(
+  AbstractMesh* mesh, SubMesh* subMesh, _InstancesBatch* batch)>;
+
+/**
  * Strong typing of a simple stage step action
  */
 using SimpleStageAction = std::function<void()>;
@@ -53,6 +63,20 @@ using SimpleStageAction = std::function<void()>;
  */
 using RenderTargetsStageAction
   = std::function<void(std::vector<RenderTargetTexturePtr>& renderTargets)>;
+
+/**
+ * Strong typing of a pointer move action.
+ */
+using PointerMoveStageAction = std::function<std::optional<PickingInfo>(
+  int unTranslatedPointerX, int unTranslatedPointerY,
+  std::optional<PickingInfo> pickResult, bool isMeshPicked, ICanvas* canvas)>;
+
+/**
+ * Strong typing of a pointer up/down action.
+ */
+using PointerUpDownStageAction = std::function<std::optional<PickingInfo>(
+  int unTranslatedPointerX, int unTranslatedPointerY,
+  std::optional<PickingInfo> pickResult, PointerEvent evt)>;
 
 /**
  * @brief Representation of a step.
@@ -93,6 +117,18 @@ public:
   {
   }
 
+  std::vector<Step<T>> splice(std::vector<Step<T>>& v, int index, int howmany,
+                              const std::vector<Step<T>>& itemsToAdd)
+  {
+    const auto start = std::min(v.end(), v.begin() + index);
+    const auto end   = std::min(v.end(), start + howmany);
+    std::vector<Step<T>> removedItems(start, end);
+    v.erase(start, end);
+    v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
+             itemsToAdd.end());
+    return removedItems;
+  }
+
   /**
    * @brief Registers a step in an ordered way in the targeted stage.
    * @param index Defines the position to register the step in
@@ -104,20 +140,13 @@ public:
   {
     size_t i        = 0;
     size_t maxIndex = std::numeric_limits<size_t>::max();
-    for (; i < _steps.size() && i < maxIndex; ++i) {
+    for (; i < _steps.size(); ++i) {
       const auto& step = _steps[i];
       maxIndex         = step.index;
+      if (index < maxIndex) {
+        break;
+      }
     }
-    const auto splice = [](std::vector<Step<T>>& v, int index, int howmany,
-                           const std::vector<Step<T>>& itemsToAdd) {
-      const auto start = std::min(v.end(), v.begin() + index);
-      const auto end   = std::min(v.end(), start + howmany);
-      std::vector<Step<T>> removedItems(start, end);
-      v.erase(start, end);
-      v.insert(end - static_cast<int>(removedItems.size()), itemsToAdd.begin(),
-               itemsToAdd.end());
-      return removedItems;
-    };
     splice(_steps, static_cast<int>(i), 0, {Step<T>{index, component, action}});
   }
 
