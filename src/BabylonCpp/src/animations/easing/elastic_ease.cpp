@@ -1,5 +1,6 @@
 #include <babylon/animations/easing/elastic_ease.h>
 
+#include <algorithm>
 #include <cmath>
 
 #include <babylon/babylon_constants.h>

@@ -1,5 +1,7 @@
 #include <babylon/extensions/shaderbuilder/shader_builder.h>
 
+#include <array>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/string.h>
 #include <babylon/extensions/shaderbuilder/helper.h>

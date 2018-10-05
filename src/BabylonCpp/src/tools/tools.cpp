@@ -18,6 +18,10 @@
 #if defined(__GNUC__) || defined(__MINGW32__)
 #pragma GCC diagnostic pop
 #endif
+#if _WIN32
+// Macro NOMINMAX already defined then WinDefs.h
+#define NOMINMAX
+#endif
 
 #include <babylon/core/filesystem.h>
 #include <babylon/core/logging.h>

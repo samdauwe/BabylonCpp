@@ -1,6 +1,7 @@
 #include <babylon/extensions/noisegeneration/perlin_noise.h>
 
 #include <algorithm>
+#include <numeric>
 #include <random>
 
 namespace BABYLON {

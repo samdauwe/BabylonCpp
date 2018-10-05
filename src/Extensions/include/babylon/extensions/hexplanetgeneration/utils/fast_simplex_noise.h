@@ -13,6 +13,7 @@
  * attribution is appreciated.
  */
 
+#include <array>
 #include <functional>
 
 #include <babylon/babylon_api.h>

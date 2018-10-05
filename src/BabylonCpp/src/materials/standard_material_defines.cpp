@@ -1,5 +1,7 @@
 #include <babylon/materials/standard_material_defines.h>
 
+#include <array>
+
 namespace BABYLON {
 
 StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
@@ -126,7 +128,7 @@ void StandardMaterialDefines::setReflectionMode(const std::string& modeToEnable)
      "REFLECTIONMAP_EQUIRECTANGULAR", "REFLECTIONMAP_EQUIRECTANGULAR_FIXED",
      "REFLECTIONMAP_MIRROREDEQUIRECTANGULAR_FIXED"}};
 
-  for (auto& mode : modes) {
+  for (const auto& mode : modes) {
     boolDef[mode] = (mode == modeToEnable);
   }
 }

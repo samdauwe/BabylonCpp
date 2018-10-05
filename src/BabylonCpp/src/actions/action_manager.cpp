@@ -1,5 +1,7 @@
 #include <babylon/actions/action_manager.h>
 
+#include <numeric>
+
 #include <babylon/actions/action.h>
 #include <babylon/actions/action_event.h>
 #include <babylon/babylon_stl_util.h>
