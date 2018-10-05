@@ -22,7 +22,10 @@ namespace BABYLON {
 
 DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
                              const CameraPtr& camera)
-    : _scene{scene}, _depthMap{nullptr}, _effect{nullptr}
+    : useOnlyInActiveCamera{false}
+    , _scene{scene}
+    , _depthMap{nullptr}
+    , _effect{nullptr}
 {
   // Register the G Buffer component to the scene.
   auto component = std::static_pointer_cast<DepthRendererSceneComponent>(

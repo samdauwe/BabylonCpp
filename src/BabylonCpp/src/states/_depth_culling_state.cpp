@@ -28,8 +28,9 @@ _DepthCullingState::_DepthCullingState()
     , _isZOffsetDirty{false}
     , _isFrontFaceDirty{false}
     , _depthFunc{std::nullopt}
-    , _cull{nullptr}
+    , _cull{std::nullopt}
     , _cullFace{std::nullopt}
+    , _zOffset{0.f}
     , _frontFace{std::nullopt}
 {
   reset();

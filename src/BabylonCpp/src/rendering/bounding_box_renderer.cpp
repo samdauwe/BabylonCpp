@@ -52,26 +52,26 @@ void BoundingBoxRenderer::_register()
       _evaluateSubMesh(mesh, subMesh);
     });
 
-  // scene->_afterRenderingGroupDrawStage.registerStep(
-  //  SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_BOUNDINGBOXRENDERER,
-  //  this, [this](Camera* /*camera*/) { render(); });
+  scene->_afterRenderingGroupDrawStage.registerStep(
+    SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_BOUNDINGBOXRENDERER,
+    this, [this](int renderingGroupId) { render(renderingGroupId); });
 }
 
 void BoundingBoxRenderer::_evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh)
 {
   if (mesh->showSubMeshesBoundingBox) {
-    const auto& boundingInfo = subMesh->getBoundingInfo();
-
+    auto& boundingInfo            = subMesh->getBoundingInfo();
+    boundingInfo.boundingBox._tag = mesh->renderingGroupId;
     renderList.emplace_back(boundingInfo.boundingBox);
   }
 }
 
 void BoundingBoxRenderer::_activeMesh(AbstractMesh* sourceMesh,
-                                      AbstractMesh* /*mesh*/)
+                                      AbstractMesh* mesh)
 {
   if (sourceMesh->showBoundingBox || scene->forceShowBoundingBoxes) {
-    const auto& boundingInfo = sourceMesh->getBoundingInfo();
-
+    auto& boundingInfo            = sourceMesh->getBoundingInfo();
+    boundingInfo.boundingBox._tag = mesh->renderingGroupId;
     renderList.emplace_back(boundingInfo.boundingBox);
   }
 }
@@ -125,7 +125,7 @@ void BoundingBoxRenderer::reset()
   renderList.clear();
 }
 
-void BoundingBoxRenderer::render()
+void BoundingBoxRenderer::render(int renderingGroupId)
 {
   if (renderList.empty()) {
     return;
@@ -141,6 +141,9 @@ void BoundingBoxRenderer::render()
   engine->setDepthWrite(false);
   _colorShader->_preBind();
   for (auto& boundingBox : renderList) {
+    if (boundingBox._tag != renderingGroupId) {
+      continue;
+    }
     const auto& min = boundingBox.minimum;
     const auto& max = boundingBox.maximum;
     auto diff       = max.subtract(min);

@@ -80,6 +80,11 @@ public:
   Vector3 minimum;
   Vector3 maximum;
 
+  /**
+   * Hidden
+   */
+  int _tag;
+
 private:
   Matrix _worldMatrix;
 

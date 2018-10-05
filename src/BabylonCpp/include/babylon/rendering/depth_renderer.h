@@ -56,6 +56,14 @@ public:
    */
   void dispose();
 
+public:
+  /**
+   * Specifies that the depth renderer will only be used within
+   * the camera it is created for.
+   * This can help forcing its rendering during the camera processing.
+   */
+  bool useOnlyInActiveCamera;
+
 private:
   Scene* _scene;
   RenderTargetTexturePtr _depthMap;

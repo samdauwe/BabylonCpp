@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 BoundingBox::BoundingBox(const Vector3& min, const Vector3& max)
-    : _worldMatrix{Matrix::Identity()}
+    : _tag{-1}, _worldMatrix{Matrix::Identity()}
 {
   reConstruct(min, max);
 }

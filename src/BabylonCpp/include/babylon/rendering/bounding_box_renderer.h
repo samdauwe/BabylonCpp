@@ -23,6 +23,11 @@ namespace GL {
 class IGLBuffer;
 } // end of namespace GL
 
+/**
+ * @brief Component responsible of rendering the bounding box of the meshes in a
+ * scene. This is usually used through the mesh.showBoundingBox or the
+ * scene.forceShowBoundingBoxes properties
+ */
 class BABYLON_SHARED_EXPORT BoundingBoxRenderer : public ISceneComponent {
 
 public:
@@ -57,19 +62,34 @@ public:
    * context lost for instance.
    */
   void rebuild() override;
+
+  /**
+   * @brief Hidden
+   */
   void reset();
-  void render();
+
+  /**
+   * @brief Render the bounding boxes of a specific rendering group.
+   * @param renderingGroupId defines the rendering group to render
+   */
+  void render(int renderingGroupId);
+
+  /**
+   * @brief In case of occlusion queries, we can render the occlusion bounding
+   * box through this method.
+   * @param mesh Define the mesh to render the occlusion bounding box for
+   */
   void renderOcclusionBoundingBox(AbstractMesh* mesh);
 
   /**
-   * @brief Disposes the component and the associated resources.
+   * @brief Dispose and release the resources attached to this renderer.
    */
   void dispose() override;
 
 protected:
   /**
-   * @brief Creates a new instance of the component for the given scene.
-   * @param scene Defines the scene to register the component in
+   * @brief Instantiates a new bounding box renderer in a scene.
+   * @param scene the scene the  renderer renders in
    */
   BoundingBoxRenderer(Scene* scene);
 
@@ -80,9 +100,24 @@ private:
   void _createIndexBuffer();
 
 public:
+  /**
+   * Color of the bounding box lines placed in front of an object
+   */
   Color3 frontColor;
+
+  /**
+   * Color of the bounding box lines placed behind an object
+   */
   Color3 backColor;
+
+  /**
+   * Defines if the renderer should show the back lines or not
+   */
   bool showBackLines;
+
+  /**
+   * Hidden
+   */
   std::vector<BoundingBox> renderList;
 
 private:
