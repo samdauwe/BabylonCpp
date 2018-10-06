@@ -59,12 +59,12 @@ void TriPlanarMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   _triPlanarMaterial->tileSize      = 1.5f;
 
   // Create default material
-  _defaultMaterial      = StandardMaterial::New("ground", scene);
-  auto groundTexture    = Texture::New("textures/ground.jpg", scene);
-  groundTexture->uScale = 10.f;
-  groundTexture->vScale = 10.f;
-  _defaultMaterial->setDiffuseTexture(groundTexture);
-  _defaultMaterial->specularColor = Color3(0.f, 0.f, 0.f);
+  _defaultMaterial                 = StandardMaterial::New("ground", scene);
+  auto groundTexture               = Texture::New("textures/ground.jpg", scene);
+  groundTexture->uScale            = 10.f;
+  groundTexture->vScale            = 10.f;
+  _defaultMaterial->diffuseTexture = groundTexture;
+  _defaultMaterial->specularColor  = Color3(0.f, 0.f, 0.f);
 
   // Ground
   _ground           = Mesh::CreateGroundFromHeightMap("ground",

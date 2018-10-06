@@ -38,7 +38,7 @@ void PerlinNoiseProceduralTextureScene::initializeScene(ICanvas* canvas,
   auto perlinnoiseTexture
     = ProceduralTexturesLibrary::PerlinNoiseProceduralTexture::New(
       "PerlinNoiseMaterialtext", 512, scene);
-  perlinnoiseMaterial->setDiffuseTexture(perlinnoiseTexture);
+  perlinnoiseMaterial->diffuseTexture = perlinnoiseTexture;
 
   auto plane      = Mesh::CreatePlane("PerlinNoisePlane", 20, scene);
   plane->material = perlinnoiseMaterial;

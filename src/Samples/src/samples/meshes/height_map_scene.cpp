@@ -44,8 +44,8 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Ground
-  auto groundMaterial = StandardMaterial::New("ground", scene);
-  groundMaterial->setDiffuseTexture(Texture::New("textures/earth.jpg", scene));
+  auto groundMaterial            = StandardMaterial::New("ground", scene);
+  groundMaterial->diffuseTexture = Texture::New("textures/earth.jpg", scene);
 
   auto ground
     = Mesh::CreateGroundFromHeightMap("ground", "textures/worldHeightMap.jpg",
@@ -62,14 +62,14 @@ void HeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto skybox                     = Mesh::CreateBox("skyBox", 800.f, scene);
   auto skyboxMaterial             = StandardMaterial::New("skyBox", scene);
   skyboxMaterial->backFaceCulling = false;
-  skyboxMaterial->setReflectionTexture(
-    CubeTexture::New("textures/skybox", scene));
+  skyboxMaterial->reflectionTexture
+    = CubeTexture::New("textures/skybox", scene);
   skyboxMaterial->reflectionTexture()->coordinatesMode
     = TextureConstants::SKYBOX_MODE;
-  skyboxMaterial->diffuseColor  = Color3(0.f, 0.f, 0.f);
-  skyboxMaterial->specularColor = Color3(0.f, 0.f, 0.f);
-  skyboxMaterial->setDisableLighting(true);
-  skybox->material = skyboxMaterial;
+  skyboxMaterial->diffuseColor    = Color3(0.f, 0.f, 0.f);
+  skyboxMaterial->specularColor   = Color3(0.f, 0.f, 0.f);
+  skyboxMaterial->disableLighting = true;
+  skybox->material                = skyboxMaterial;
 
   // Sun animation
   scene->registerBeforeRender([&](Scene* /*scene*/, EventState& /*es*/) {

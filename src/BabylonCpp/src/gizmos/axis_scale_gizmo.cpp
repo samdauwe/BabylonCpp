@@ -25,13 +25,13 @@ AxisScaleGizmo::AxisScaleGizmo(
   // Create Material
   _coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  _coloredMaterial->setDisableLighting(true);
-  _coloredMaterial->emissiveColor = color;
+  _coloredMaterial->disableLighting = true;
+  _coloredMaterial->emissiveColor   = color;
 
   auto hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  hoverMaterial->setDisableLighting(true);
-  hoverMaterial->emissiveColor = color.add(Color3(0.3f, 0.3f, 0.3f));
+  hoverMaterial->disableLighting = true;
+  hoverMaterial->emissiveColor   = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
@@ -61,8 +61,8 @@ AxisScaleGizmo::AxisScaleGizmo(
 
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
-  options.dragAxis = dragAxis;
-  _dragBehavior    = std::make_unique<PointerDragBehavior>(options);
+  options.dragAxis            = dragAxis;
+  _dragBehavior               = std::make_unique<PointerDragBehavior>(options);
   _dragBehavior->moveAttached = false;
   _rootMesh->addBehavior(_dragBehavior.get());
 

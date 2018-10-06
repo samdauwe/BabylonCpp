@@ -22,13 +22,13 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   // Create Material
   auto coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  coloredMaterial->setDisableLighting(true);
-  coloredMaterial->emissiveColor = color;
+  coloredMaterial->disableLighting = true;
+  coloredMaterial->emissiveColor   = color;
 
   auto hoverMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  hoverMaterial->setDisableLighting(true);
-  hoverMaterial->emissiveColor = color.add(Color3(0.3f, 0.3f, 0.3f));
+  hoverMaterial->disableLighting = true;
+  hoverMaterial->emissiveColor   = color.add(Color3(0.3f, 0.3f, 0.3f));
 
   // Build mesh on root node
   auto parentMesh = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
@@ -119,8 +119,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
       if (snapDistance != 0.f) {
         _currentSnapDragDistance += angle;
         if (std::abs(_currentSnapDragDistance) > snapDistance) {
-          auto dragSteps
-            = std::floor(_currentSnapDragDistance / snapDistance);
+          auto dragSteps = std::floor(_currentSnapDragDistance / snapDistance);
           _currentSnapDragDistance
             = std::fmod(_currentSnapDragDistance, snapDistance);
           angle   = snapDistance * dragSteps;

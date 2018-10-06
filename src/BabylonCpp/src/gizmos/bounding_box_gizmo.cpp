@@ -43,11 +43,11 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   // Create Materials
   auto coloredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  coloredMaterial->setDisableLighting(true);
-  coloredMaterial->emissiveColor = color;
+  coloredMaterial->disableLighting = true;
+  coloredMaterial->emissiveColor   = color;
   auto hoverColoredMaterial
     = StandardMaterial::New("", gizmoLayer->utilityLayerScene.get());
-  hoverColoredMaterial->setDisableLighting(true);
+  hoverColoredMaterial->disableLighting = true;
   hoverColoredMaterial->emissiveColor
     = color.copy().add(Color3(0.3f, 0.3f, 0.3f));
 

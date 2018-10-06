@@ -36,7 +36,7 @@ void BrickProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
     "BrickMaterialtext", 512, scene);
   brickTexture->numberOfBricksHeight = 6.f;
   brickTexture->numberOfBricksWidth  = 10.f;
-  brickMaterial->setDiffuseTexture(brickTexture);
+  brickMaterial->diffuseTexture      = brickTexture;
 
   auto plane      = Mesh::CreatePlane("BrickPlane", 10, scene);
   plane->material = brickMaterial;

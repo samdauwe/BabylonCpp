@@ -64,25 +64,25 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   materialSphere2->alpha        = 0.3f;
 
   // Creation of a material with an image texture
-  auto materialSphere3 = StandardMaterial::New("texture3", scene);
-  materialSphere3->setDiffuseTexture(Texture::New("textures/misc.jpg", scene));
+  auto materialSphere3            = StandardMaterial::New("texture3", scene);
+  materialSphere3->diffuseTexture = Texture::New("textures/misc.jpg", scene);
 
   // Creation of a material with translated texture
-  auto materialSphere4 = StandardMaterial::New("texture4", scene);
-  materialSphere4->setDiffuseTexture(Texture::New("textures/misc.jpg", scene));
+  auto materialSphere4            = StandardMaterial::New("texture4", scene);
+  materialSphere4->diffuseTexture = Texture::New("textures/misc.jpg", scene);
   auto texture
     = std::static_pointer_cast<Texture>(materialSphere4->diffuseTexture());
   texture->vOffset = 0.1f; // Vertical offset of 10%
   texture->uOffset = 0.4f; // Horizontal offset of 40%
 
   // Creation of a material with an alpha texture
-  auto materialSphere5 = StandardMaterial::New("texture5", scene);
-  materialSphere5->setDiffuseTexture(Texture::New("textures/tree.png", scene));
+  auto materialSphere5            = StandardMaterial::New("texture5", scene);
+  materialSphere5->diffuseTexture = Texture::New("textures/tree.png", scene);
   materialSphere5->diffuseTexture()->hasAlpha = true; // Has an alpha
 
   // Creation of a material and show all the faces
-  auto materialSphere6 = StandardMaterial::New("texture6", scene);
-  materialSphere6->setDiffuseTexture(Texture::New("textures/tree.png", scene));
+  auto materialSphere6            = StandardMaterial::New("texture6", scene);
+  materialSphere6->diffuseTexture = Texture::New("textures/tree.png", scene);
   materialSphere6->diffuseTexture()->hasAlpha = true; // Have an alpha
   materialSphere6->backFaceCulling = false; // Show all the faces of the element
 
@@ -90,9 +90,8 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto materialPlane = StandardMaterial::New("texturePlane", scene);
   materialPlane->backFaceCulling
     = false; // Always show the front and the back of an element
-  materialPlane->setDiffuseTexture(Texture::New("textures/grass.jpg", scene));
-  texture
-    = std::static_pointer_cast<Texture>(materialPlane->diffuseTexture());
+  materialPlane->diffuseTexture = Texture::New("textures/grass.jpg", scene);
+  texture = std::static_pointer_cast<Texture>(materialPlane->diffuseTexture());
   texture->uScale = 5.f; // Repeat 5 times on the Vertical Axes
   texture->vScale = 5.f; // Repeat 5 times on the Horizontal Axes
   materialPlane->backFaceCulling

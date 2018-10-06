@@ -34,7 +34,7 @@ void GrassProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto grassMaterial = StandardMaterial::New("GrassMaterial", scene);
   auto grassTexture  = ProceduralTexturesLibrary::GrassProceduralTexture::New(
     "GrassMaterialtext", 256, scene);
-  grassMaterial->setAmbientTexture(grassTexture);
+  grassMaterial->ambientTexture = grassTexture;
 
   auto plane      = Mesh::CreatePlane("GrassPlane", 10, scene);
   plane->material = grassMaterial;

@@ -34,9 +34,9 @@ void FireProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto fireMaterial = StandardMaterial::New("fontainSculptur2", scene);
   auto fireTexture  = ProceduralTexturesLibrary::FireProceduralTexture::New(
     "FireMaterialtext", 256, scene);
-  fireMaterial->setDiffuseTexture(fireTexture);
-  fireMaterial->setOpacityTexture(fireTexture);
-  fireMaterial->setDiffuseTexture(fireTexture);
+  fireMaterial->diffuseTexture = fireTexture;
+  fireMaterial->opacityTexture = fireTexture;
+  fireMaterial->diffuseTexture = fireTexture;
 
   auto fireball = Mesh::CreatePlane("firebawl", 20, scene);
 

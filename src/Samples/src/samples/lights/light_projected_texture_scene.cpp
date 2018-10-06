@@ -51,8 +51,8 @@ void LightProjectedTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Ground
   auto ground = Mesh::CreateGroundFromHeightMap(
     "ground", "textures/heightMap.png", 100, 100, 100, 0, 10, scene, false);
-  auto groundMaterial = StandardMaterial::New("ground", scene);
-  groundMaterial->setDiffuseTexture(Texture::New("textures/ground.jpg", scene));
+  auto groundMaterial            = StandardMaterial::New("ground", scene);
+  groundMaterial->diffuseTexture = Texture::New("textures/ground.jpg", scene);
   auto diffuseTexture
     = std::static_pointer_cast<Texture>(groundMaterial->diffuseTexture());
   diffuseTexture->uScale        = 6.f;

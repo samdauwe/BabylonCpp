@@ -34,8 +34,8 @@ void WoodProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto woodMaterial = StandardMaterial::New("WoodMaterial", scene);
   auto woodTexture  = ProceduralTexturesLibrary::WoodProceduralTexture::New(
     "WoodMaterialtext", 1024, scene);
-  woodTexture->ampScale = 80.f;
-  woodMaterial->setDiffuseTexture(woodTexture);
+  woodTexture->ampScale        = 80.f;
+  woodMaterial->diffuseTexture = woodTexture;
 
   auto plane      = Mesh::CreatePlane("WoodPlane", 10, scene);
   plane->material = woodMaterial;

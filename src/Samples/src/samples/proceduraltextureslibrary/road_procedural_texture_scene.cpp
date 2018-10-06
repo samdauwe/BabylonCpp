@@ -34,7 +34,7 @@ void RoadProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto roadMaterial = StandardMaterial::New("RoadMaterial", scene);
   auto roadTexture  = ProceduralTexturesLibrary::RoadProceduralTexture::New(
     "RoadMaterialtext", 512, scene);
-  roadMaterial->setDiffuseTexture(roadTexture);
+  roadMaterial->diffuseTexture = roadTexture;
 
   auto plane      = Mesh::CreatePlane("RoadPlane", 20, scene);
   plane->material = roadMaterial;

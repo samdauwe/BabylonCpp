@@ -48,15 +48,104 @@ bool StandardMaterial::_ColorGradingTextureEnabled = true;
 
 StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , diffuseTexture{this, &StandardMaterial::get_diffuseTexture,
+                     &StandardMaterial::set_diffuseTexture}
+    , ambientTexture{this, &StandardMaterial::get_ambientTexture,
+                     &StandardMaterial::set_ambientTexture}
+    , opacityTexture{this, &StandardMaterial::get_opacityTexture,
+                     &StandardMaterial::set_opacityTexture}
+    , reflectionTexture{this, &StandardMaterial::get_reflectionTexture,
+                        &StandardMaterial::set_reflectionTexture}
+    , emissiveTexture{this, &StandardMaterial::get_emissiveTexture,
+                      &StandardMaterial::set_emissiveTexture}
+    , specularTexture{this, &StandardMaterial::get_specularTexture,
+                      &StandardMaterial::set_specularTexture}
+    , bumpTexture{this, &StandardMaterial::get_bumpTexture,
+                  &StandardMaterial::set_bumpTexture}
+    , lightmapTexture{this, &StandardMaterial::get_lightmapTexture,
+                      &StandardMaterial::set_lightmapTexture}
+    , refractionTexture{this, &StandardMaterial::get_refractionTexture,
+                        &StandardMaterial::set_refractionTexture}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
     , diffuseColor{Color3(1.f, 1.f, 1.f)}
     , specularColor{Color3(1.f, 1.f, 1.f)}
     , emissiveColor{Color3(0.f, 0.f, 0.f)}
     , specularPower{64.f}
+    , useAlphaFromDiffuseTexture{this,
+                                 &StandardMaterial::
+                                   get_useAlphaFromDiffuseTexture,
+                                 &StandardMaterial::
+                                   set_useAlphaFromDiffuseTexture}
+    , useEmissiveAsIllumination{this,
+                                &StandardMaterial::
+                                  get_useEmissiveAsIllumination,
+                                &StandardMaterial::
+                                  set_useEmissiveAsIllumination}
+    , linkEmissiveWithDiffuse{this,
+                              &StandardMaterial::get_linkEmissiveWithDiffuse,
+                              &StandardMaterial::set_linkEmissiveWithDiffuse}
+    , useSpecularOverAlpha{this, &StandardMaterial::get_useSpecularOverAlpha,
+                           &StandardMaterial::set_useSpecularOverAlpha}
+    , useReflectionOverAlpha{this,
+                             &StandardMaterial::get_useReflectionOverAlpha,
+                             &StandardMaterial::set_useReflectionOverAlpha}
+    , disableLighting{this, &StandardMaterial::get_disableLighting,
+                      &StandardMaterial::set_disableLighting}
+    , useObjectSpaceNormalMap{this,
+                              &StandardMaterial::get_useObjectSpaceNormalMap,
+                              &StandardMaterial::set_useObjectSpaceNormalMap}
+    , useParallax{this, &StandardMaterial::get_useParallax,
+                  &StandardMaterial::set_useParallax}
+    , useParallaxOcclusion{this, &StandardMaterial::get_useParallaxOcclusion,
+                           &StandardMaterial::set_useParallaxOcclusion}
     , parallaxScaleBias{0.05f}
+    , roughness{this, &StandardMaterial::get_roughness,
+                &StandardMaterial::set_roughness}
     , indexOfRefraction{0.98f}
     , invertRefractionY{true}
     , alphaCutOff{0.4f}
+    , useLightmapAsShadowmap{this,
+                             &StandardMaterial::get_useLightmapAsShadowmap,
+                             &StandardMaterial::set_useLightmapAsShadowmap}
+    , diffuseFresnelParameters{this,
+                               &StandardMaterial::get_diffuseFresnelParameters,
+                               &StandardMaterial::set_diffuseFresnelParameters}
+    , opacityFresnelParameters{this,
+                               &StandardMaterial::get_opacityFresnelParameters,
+                               &StandardMaterial::set_opacityFresnelParameters}
+    , reflectionFresnelParameters{this,
+                                  &StandardMaterial::
+                                    get_reflectionFresnelParameters,
+                                  &StandardMaterial::
+                                    set_reflectionFresnelParameters}
+    , refractionFresnelParameters{this,
+                                  &StandardMaterial::
+                                    get_refractionFresnelParameters,
+                                  &StandardMaterial::
+                                    set_refractionFresnelParameters}
+    , emissiveFresnelParameters{this,
+                                &StandardMaterial::
+                                  get_emissiveFresnelParameters,
+                                &StandardMaterial::
+                                  set_emissiveFresnelParameters}
+    , useReflectionFresnelFromSpecular{this,
+                                       &StandardMaterial::
+                                         get_useReflectionFresnelFromSpecular,
+                                       &StandardMaterial::
+                                         set_useReflectionFresnelFromSpecular}
+    , useGlossinessFromSpecularMapAlpha{this,
+                                        &StandardMaterial::
+                                          get_useGlossinessFromSpecularMapAlpha,
+                                        &StandardMaterial::
+                                          set_useGlossinessFromSpecularMapAlpha}
+    , maxSimultaneousLights{this, &StandardMaterial::get_maxSimultaneousLights,
+                            &StandardMaterial::set_maxSimultaneousLights}
+    , invertNormalMapX{this, &StandardMaterial::get_invertNormalMapX,
+                       &StandardMaterial::set_invertNormalMapX}
+    , invertNormalMapY{this, &StandardMaterial::get_invertNormalMapY,
+                       &StandardMaterial::set_invertNormalMapY}
+    , twoSidedLighting{this, &StandardMaterial::get_twoSidedLighting,
+                       &StandardMaterial::set_twoSidedLighting}
     , customShaderNameResolve{nullptr}
     , imageProcessingConfiguration{this,
                                    &StandardMaterial::
@@ -146,6 +235,95 @@ StandardMaterial::StandardMaterial(const std::string& iName, Scene* scene)
 
 StandardMaterial::StandardMaterial(const StandardMaterial& other)
     : PushMaterial{other.name, other.getScene()}
+    , diffuseTexture{this, &StandardMaterial::get_diffuseTexture,
+                     &StandardMaterial::set_diffuseTexture}
+    , ambientTexture{this, &StandardMaterial::get_ambientTexture,
+                     &StandardMaterial::set_ambientTexture}
+    , opacityTexture{this, &StandardMaterial::get_opacityTexture,
+                     &StandardMaterial::set_opacityTexture}
+    , reflectionTexture{this, &StandardMaterial::get_reflectionTexture,
+                        &StandardMaterial::set_reflectionTexture}
+    , emissiveTexture{this, &StandardMaterial::get_emissiveTexture,
+                      &StandardMaterial::set_emissiveTexture}
+    , specularTexture{this, &StandardMaterial::get_specularTexture,
+                      &StandardMaterial::set_specularTexture}
+    , bumpTexture{this, &StandardMaterial::get_bumpTexture,
+                  &StandardMaterial::set_bumpTexture}
+    , lightmapTexture{this, &StandardMaterial::get_lightmapTexture,
+                      &StandardMaterial::set_lightmapTexture}
+    , refractionTexture{this, &StandardMaterial::get_refractionTexture,
+                        &StandardMaterial::set_refractionTexture}
+    , useAlphaFromDiffuseTexture{this,
+                                 &StandardMaterial::
+                                   get_useAlphaFromDiffuseTexture,
+                                 &StandardMaterial::
+                                   set_useAlphaFromDiffuseTexture}
+    , useEmissiveAsIllumination{this,
+                                &StandardMaterial::
+                                  get_useEmissiveAsIllumination,
+                                &StandardMaterial::
+                                  set_useEmissiveAsIllumination}
+    , linkEmissiveWithDiffuse{this,
+                              &StandardMaterial::get_linkEmissiveWithDiffuse,
+                              &StandardMaterial::set_linkEmissiveWithDiffuse}
+    , useSpecularOverAlpha{this, &StandardMaterial::get_useSpecularOverAlpha,
+                           &StandardMaterial::set_useSpecularOverAlpha}
+    , useReflectionOverAlpha{this,
+                             &StandardMaterial::get_useReflectionOverAlpha,
+                             &StandardMaterial::set_useReflectionOverAlpha}
+    , disableLighting{this, &StandardMaterial::get_disableLighting,
+                      &StandardMaterial::set_disableLighting}
+    , useObjectSpaceNormalMap{this,
+                              &StandardMaterial::get_useObjectSpaceNormalMap,
+                              &StandardMaterial::set_useObjectSpaceNormalMap}
+    , useParallax{this, &StandardMaterial::get_useParallax,
+                  &StandardMaterial::set_useParallax}
+    , useParallaxOcclusion{this, &StandardMaterial::get_useParallaxOcclusion,
+                           &StandardMaterial::set_useParallaxOcclusion}
+    , roughness{this, &StandardMaterial::get_roughness,
+                &StandardMaterial::set_roughness}
+    , useLightmapAsShadowmap{this,
+                             &StandardMaterial::get_useLightmapAsShadowmap,
+                             &StandardMaterial::set_useLightmapAsShadowmap}
+    , diffuseFresnelParameters{this,
+                               &StandardMaterial::get_diffuseFresnelParameters,
+                               &StandardMaterial::set_diffuseFresnelParameters}
+    , opacityFresnelParameters{this,
+                               &StandardMaterial::get_opacityFresnelParameters,
+                               &StandardMaterial::set_opacityFresnelParameters}
+    , reflectionFresnelParameters{this,
+                                  &StandardMaterial::
+                                    get_reflectionFresnelParameters,
+                                  &StandardMaterial::
+                                    set_reflectionFresnelParameters}
+    , refractionFresnelParameters{this,
+                                  &StandardMaterial::
+                                    get_refractionFresnelParameters,
+                                  &StandardMaterial::
+                                    set_refractionFresnelParameters}
+    , emissiveFresnelParameters{this,
+                                &StandardMaterial::
+                                  get_emissiveFresnelParameters,
+                                &StandardMaterial::
+                                  set_emissiveFresnelParameters}
+    , useReflectionFresnelFromSpecular{this,
+                                       &StandardMaterial::
+                                         get_useReflectionFresnelFromSpecular,
+                                       &StandardMaterial::
+                                         set_useReflectionFresnelFromSpecular}
+    , useGlossinessFromSpecularMapAlpha{this,
+                                        &StandardMaterial::
+                                          get_useGlossinessFromSpecularMapAlpha,
+                                        &StandardMaterial::
+                                          set_useGlossinessFromSpecularMapAlpha}
+    , maxSimultaneousLights{this, &StandardMaterial::get_maxSimultaneousLights,
+                            &StandardMaterial::set_maxSimultaneousLights}
+    , invertNormalMapX{this, &StandardMaterial::get_invertNormalMapX,
+                       &StandardMaterial::set_invertNormalMapX}
+    , invertNormalMapY{this, &StandardMaterial::get_invertNormalMapY,
+                       &StandardMaterial::set_invertNormalMapY}
+    , twoSidedLighting{this, &StandardMaterial::get_twoSidedLighting,
+                       &StandardMaterial::set_twoSidedLighting}
     , imageProcessingConfiguration{this,
                                    &StandardMaterial::
                                      get_imageProcessingConfiguration,
@@ -1361,360 +1539,494 @@ Json::object StandardMaterial::serialize() const
   return Json::object();
 }
 
-BaseTexturePtr& StandardMaterial::diffuseTexture()
+BaseTexturePtr& StandardMaterial::get_diffuseTexture()
 {
   return _diffuseTexture;
 }
 
-void StandardMaterial::setDiffuseTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_diffuseTexture(const BaseTexturePtr& value)
 {
+  if (_diffuseTexture == value) {
+    return;
+  }
+
   _diffuseTexture = value;
+  _markAllSubMeshesAsTexturesAndMiscDirty();
 }
 
-BaseTexturePtr& StandardMaterial::ambientTexture()
+BaseTexturePtr& StandardMaterial::get_ambientTexture()
 {
   return _ambientTexture;
 }
 
-void StandardMaterial::setAmbientTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_ambientTexture(const BaseTexturePtr& value)
 {
+  if (_ambientTexture == value) {
+    return;
+  }
+
   _ambientTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-BaseTexturePtr& StandardMaterial::opacityTexture()
+BaseTexturePtr& StandardMaterial::get_opacityTexture()
 {
   return _opacityTexture;
 }
 
-void StandardMaterial::setOpacityTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_opacityTexture(const BaseTexturePtr& value)
 {
+  if (_opacityTexture == value) {
+    return;
+  }
+
   _opacityTexture = value;
+  _markAllSubMeshesAsTexturesAndMiscDirty();
 }
 
-BaseTexturePtr& StandardMaterial::reflectionTexture()
+BaseTexturePtr& StandardMaterial::get_reflectionTexture()
 {
   return _reflectionTexture;
 }
 
-void StandardMaterial::setReflectionTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_reflectionTexture(const BaseTexturePtr& value)
 {
+  if (_reflectionTexture == value) {
+    return;
+  }
+
   _reflectionTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-BaseTexturePtr& StandardMaterial::emissiveTexture()
+BaseTexturePtr& StandardMaterial::get_emissiveTexture()
 {
   return _emissiveTexture;
 }
 
-void StandardMaterial::setEmissiveTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_emissiveTexture(const BaseTexturePtr& value)
 {
+  if (_emissiveTexture == value) {
+    return;
+  }
+
   _emissiveTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-BaseTexturePtr& StandardMaterial::specularTexture()
+BaseTexturePtr& StandardMaterial::get_specularTexture()
 {
   return _specularTexture;
 }
 
-void StandardMaterial::setSpecularTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_specularTexture(const BaseTexturePtr& value)
 {
+  if (_specularTexture == value) {
+    return;
+  }
+
   _specularTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-BaseTexturePtr& StandardMaterial::bumpTexture()
+BaseTexturePtr& StandardMaterial::get_bumpTexture()
 {
   return _bumpTexture;
 }
 
-void StandardMaterial::setBumpTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_bumpTexture(const BaseTexturePtr& value)
 {
+  if (_bumpTexture == value) {
+    return;
+  }
+
   _bumpTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-BaseTexturePtr& StandardMaterial::lightmapTexture()
+BaseTexturePtr& StandardMaterial::get_lightmapTexture()
 {
   return _lightmapTexture;
 }
 
-void StandardMaterial::setLightmapTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_lightmapTexture(const BaseTexturePtr& value)
 {
+  if (_lightmapTexture == value) {
+    return;
+  }
+
   _lightmapTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-BaseTexturePtr& StandardMaterial::refractionTexture()
+BaseTexturePtr& StandardMaterial::get_refractionTexture()
 {
   return _refractionTexture;
 }
 
-void StandardMaterial::setRefractionTexture(const BaseTexturePtr& value)
+void StandardMaterial::set_refractionTexture(const BaseTexturePtr& value)
 {
+  if (_refractionTexture == value) {
+    return;
+  }
+
   _refractionTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::useAlphaFromDiffuseTexture() const
+bool StandardMaterial::get_useAlphaFromDiffuseTexture() const
 {
   return _useAlphaFromDiffuseTexture;
 }
 
-void StandardMaterial::setUseAlphaFromDiffuseTexture(bool value)
+void StandardMaterial::set_useAlphaFromDiffuseTexture(bool value)
 {
   if (_useAlphaFromDiffuseTexture == value) {
     return;
   }
+
   _useAlphaFromDiffuseTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::useEmissiveAsIllumination() const
+bool StandardMaterial::get_useEmissiveAsIllumination() const
 {
   return _useEmissiveAsIllumination;
 }
 
-void StandardMaterial::setUseEmissiveAsIllumination(bool value)
+void StandardMaterial::set_useEmissiveAsIllumination(bool value)
 {
   if (_useEmissiveAsIllumination == value) {
     return;
   }
+
   _useEmissiveAsIllumination = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::linkEmissiveWithDiffuse() const
+bool StandardMaterial::get_linkEmissiveWithDiffuse() const
 {
   return _linkEmissiveWithDiffuse;
 }
 
-void StandardMaterial::setLinkEmissiveWithDiffuse(bool value)
+void StandardMaterial::set_linkEmissiveWithDiffuse(bool value)
 {
   if (_linkEmissiveWithDiffuse == value) {
     return;
   }
+
   _linkEmissiveWithDiffuse = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::useSpecularOverAlpha() const
+bool StandardMaterial::get_useSpecularOverAlpha() const
 {
   return _useSpecularOverAlpha;
 }
 
-void StandardMaterial::setUseSpecularOverAlpha(bool value)
+void StandardMaterial::set_useSpecularOverAlpha(bool value)
 {
   if (_useSpecularOverAlpha == value) {
     return;
   }
+
   _useSpecularOverAlpha = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::useReflectionOverAlpha() const
+bool StandardMaterial::get_useReflectionOverAlpha() const
 {
   return _useReflectionOverAlpha;
 }
 
-void StandardMaterial::setUseReflectionOverAlpha(bool value)
+void StandardMaterial::set_useReflectionOverAlpha(bool value)
 {
   if (_useReflectionOverAlpha == value) {
     return;
   }
+
   _useReflectionOverAlpha = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::disableLighting() const
+bool StandardMaterial::get_disableLighting() const
 {
   return _disableLighting;
 }
 
-void StandardMaterial::setDisableLighting(bool value)
+void StandardMaterial::set_disableLighting(bool value)
 {
   if (_disableLighting == value) {
     return;
   }
+
   _disableLighting = value;
+  _markAllSubMeshesAsLightsDirty();
 }
 
-bool StandardMaterial::useObjectSpaceNormalMap() const
+bool StandardMaterial::get_useObjectSpaceNormalMap() const
 {
   return _useObjectSpaceNormalMap;
 }
 
-void StandardMaterial::setUseObjectSpaceNormalMap(bool value)
+void StandardMaterial::set_useObjectSpaceNormalMap(bool value)
 {
   if (_useObjectSpaceNormalMap == value) {
     return;
   }
+
   _useObjectSpaceNormalMap = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::useParallax() const
+bool StandardMaterial::get_useParallax() const
 {
   return _useParallax;
 }
 
-void StandardMaterial::setUseParallax(bool value)
+void StandardMaterial::set_useParallax(bool value)
 {
   if (_useParallax == value) {
     return;
   }
+
   _useParallax = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::useParallaxOcclusion() const
+bool StandardMaterial::get_useParallaxOcclusion() const
 {
   return _useParallaxOcclusion;
 }
 
-void StandardMaterial::setUseParallaxOcclusion(bool value)
+void StandardMaterial::set_useParallaxOcclusion(bool value)
 {
   if (_useParallaxOcclusion == value) {
     return;
   }
+
   _useParallaxOcclusion = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-float StandardMaterial::roughness() const
+float StandardMaterial::get_roughness() const
 {
   return _roughness;
 }
 
-void StandardMaterial::setRoughness(float value)
+void StandardMaterial::set_roughness(float value)
 {
   if (stl_util::almost_equal(_roughness, value)) {
     return;
   }
+
   _roughness = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::useLightmapAsShadowmap() const
+bool StandardMaterial::get_useLightmapAsShadowmap() const
 {
   return _useLightmapAsShadowmap;
 }
 
-void StandardMaterial::setUseLightmapAsShadowmap(bool value)
+void StandardMaterial::set_useLightmapAsShadowmap(bool value)
 {
   if (_useLightmapAsShadowmap == value) {
     return;
   }
+
   _useLightmapAsShadowmap = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-FresnelParameters* StandardMaterial::diffuseFresnelParameters()
+FresnelParametersPtr& StandardMaterial::get_diffuseFresnelParameters()
 {
   if (!_diffuseFresnelParameters) {
-    _diffuseFresnelParameters = std::make_unique<FresnelParameters>();
+    _diffuseFresnelParameters = std::make_shared<FresnelParameters>();
   }
 
-  return _diffuseFresnelParameters.get();
+  return _diffuseFresnelParameters;
 }
 
-FresnelParameters* StandardMaterial::opacityFresnelParameters()
+void StandardMaterial::set_diffuseFresnelParameters(
+  const FresnelParametersPtr& value)
+{
+  if (_diffuseFresnelParameters == value) {
+    return;
+  }
+
+  _diffuseFresnelParameters = value;
+  _markAllSubMeshesAsFresnelDirty();
+}
+
+FresnelParametersPtr& StandardMaterial::get_opacityFresnelParameters()
 {
   if (!_opacityFresnelParameters) {
-    _opacityFresnelParameters = std::make_unique<FresnelParameters>();
+    _opacityFresnelParameters = std::make_shared<FresnelParameters>();
   }
 
-  return _opacityFresnelParameters.get();
+  return _opacityFresnelParameters;
 }
 
-FresnelParameters* StandardMaterial::reflectionFresnelParameters()
+void StandardMaterial::set_opacityFresnelParameters(
+  const FresnelParametersPtr& value)
+{
+  if (_opacityFresnelParameters == value) {
+    return;
+  }
+
+  _opacityFresnelParameters = value;
+  _markAllSubMeshesAsFresnelAndMiscDirty();
+}
+
+FresnelParametersPtr& StandardMaterial::get_reflectionFresnelParameters()
 {
   if (!_reflectionFresnelParameters) {
-    _reflectionFresnelParameters = std::make_unique<FresnelParameters>();
+    _reflectionFresnelParameters = std::make_shared<FresnelParameters>();
   }
 
-  return _reflectionFresnelParameters.get();
+  return _reflectionFresnelParameters;
 }
 
-FresnelParameters* StandardMaterial::refractionFresnelParameters()
+void StandardMaterial::set_reflectionFresnelParameters(
+  const FresnelParametersPtr& value)
+{
+  if (_reflectionFresnelParameters == value) {
+    return;
+  }
+
+  _reflectionFresnelParameters = value;
+  _markAllSubMeshesAsFresnelDirty();
+}
+
+FresnelParametersPtr& StandardMaterial::get_refractionFresnelParameters()
 {
   if (!_refractionFresnelParameters) {
-    _refractionFresnelParameters = std::make_unique<FresnelParameters>();
+    _refractionFresnelParameters = std::make_shared<FresnelParameters>();
   }
 
-  return _refractionFresnelParameters.get();
+  return _refractionFresnelParameters;
 }
 
-FresnelParameters* StandardMaterial::emissiveFresnelParameters()
+void StandardMaterial::set_refractionFresnelParameters(
+  const FresnelParametersPtr& value)
+{
+  if (_refractionFresnelParameters == value) {
+    return;
+  }
+
+  _refractionFresnelParameters = value;
+  _markAllSubMeshesAsFresnelDirty();
+}
+
+FresnelParametersPtr& StandardMaterial::get_emissiveFresnelParameters()
 {
   if (!_emissiveFresnelParameters) {
-    _emissiveFresnelParameters = std::make_unique<FresnelParameters>();
+    _emissiveFresnelParameters = std::make_shared<FresnelParameters>();
   }
 
-  return _emissiveFresnelParameters.get();
+  return _emissiveFresnelParameters;
 }
 
-bool StandardMaterial::useReflectionFresnelFromSpecular() const
+void StandardMaterial::set_emissiveFresnelParameters(
+  const FresnelParametersPtr& value)
+{
+  if (_emissiveFresnelParameters == value) {
+    return;
+  }
+
+  _emissiveFresnelParameters = value;
+  _markAllSubMeshesAsFresnelDirty();
+}
+
+bool StandardMaterial::get_useReflectionFresnelFromSpecular() const
 {
   return _useReflectionFresnelFromSpecular;
 }
 
-void StandardMaterial::setUseReflectionFresnelFromSpecular(bool value)
+void StandardMaterial::set_useReflectionFresnelFromSpecular(bool value)
 {
   if (_useReflectionFresnelFromSpecular == value) {
     return;
   }
+
   _useReflectionFresnelFromSpecular = value;
+  _markAllSubMeshesAsFresnelDirty();
 }
 
-bool StandardMaterial::useGlossinessFromSpecularMapAlpha() const
+bool StandardMaterial::get_useGlossinessFromSpecularMapAlpha() const
 {
   return _useGlossinessFromSpecularMapAlpha;
 }
 
-void StandardMaterial::setUseGlossinessFromSpecularMapAlpha(bool value)
+void StandardMaterial::set_useGlossinessFromSpecularMapAlpha(bool value)
 {
   if (_useGlossinessFromSpecularMapAlpha == value) {
     return;
   }
+
   _useGlossinessFromSpecularMapAlpha = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-unsigned int StandardMaterial::maxSimultaneousLights() const
+unsigned int StandardMaterial::get_maxSimultaneousLights() const
 {
   return _maxSimultaneousLights;
 }
 
-void StandardMaterial::setMaxSimultaneousLights(unsigned int value)
+void StandardMaterial::set_maxSimultaneousLights(unsigned int value)
 {
   if (_maxSimultaneousLights == value) {
     return;
   }
+
   _maxSimultaneousLights = value;
+  _markAllSubMeshesAsLightsDirty();
 }
 
-bool StandardMaterial::invertNormalMapX() const
+bool StandardMaterial::get_invertNormalMapX() const
 {
   return _invertNormalMapX;
 }
 
-void StandardMaterial::setInvertNormalMapX(bool value)
+void StandardMaterial::set_invertNormalMapX(bool value)
 {
   if (_invertNormalMapX == value) {
     return;
   }
+
   _invertNormalMapX = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::invertNormalMapY() const
+bool StandardMaterial::get_invertNormalMapY() const
 {
   return _invertNormalMapY;
 }
 
-void StandardMaterial::setInvertNormalMapY(bool value)
+void StandardMaterial::set_invertNormalMapY(bool value)
 {
   if (_invertNormalMapY == value) {
     return;
   }
+
   _invertNormalMapY = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
-bool StandardMaterial::twoSidedLighting() const
+bool StandardMaterial::get_twoSidedLighting() const
 {
   return _twoSidedLighting;
 }
 
-void StandardMaterial::setTwoSidedLighting(bool value)
+void StandardMaterial::set_twoSidedLighting(bool value)
 {
   if (_twoSidedLighting == value) {
     return;
   }
+
   _twoSidedLighting = value;
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 ImageProcessingConfiguration*&

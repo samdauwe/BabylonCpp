@@ -41,7 +41,7 @@ void CloudProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto cloudMaterial = StandardMaterial::New("cloudMat", scene);
   auto cloudProcText = ProceduralTexturesLibrary::CloudProceduralTexture::New(
     "cloud", 1024, scene);
-  cloudMaterial->setEmissiveTexture(cloudProcText);
+  cloudMaterial->emissiveTexture = cloudProcText;
   cloudMaterial->backFaceCulling = false;
   cloudMaterial->emissiveTexture()->coordinatesMode
     = TextureConstants::SKYBOX_MODE;

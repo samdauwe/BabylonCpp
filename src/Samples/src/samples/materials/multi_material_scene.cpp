@@ -37,7 +37,7 @@ void MultiMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto material0          = StandardMaterial::New("mat0", scene);
   material0->diffuseColor = Color3(1.f, 0.f, 0.f);
-  material0->setBumpTexture(Texture::New("textures/normalMap.jpg", scene));
+  material0->bumpTexture  = Texture::New("textures/normalMap.jpg", scene);
 
   auto material1          = StandardMaterial::New("mat1", scene);
   material1->diffuseColor = Color3(0.f, 0.f, 1.f);

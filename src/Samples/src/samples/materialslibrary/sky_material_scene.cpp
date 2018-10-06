@@ -40,14 +40,14 @@ void SkyMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Ground
   auto ground = Mesh::CreateGroundFromHeightMap(
     "ground", "textures/heightMap.png", 100, 100, 100, 0, 10, scene, false);
-  auto groundMaterial           = StandardMaterial::New("ground", scene);
-  auto groundtexture            = Texture::New("textures/ground.jpg", scene);
-  groundtexture->uScale         = 6.f;
-  groundtexture->vScale         = 6.f;
-  groundMaterial->specularColor = Color3(0.f, 0.f, 0.f);
-  groundMaterial->setDiffuseTexture(groundtexture);
-  ground->position().y = -2.05f;
-  ground->material     = groundMaterial;
+  auto groundMaterial            = StandardMaterial::New("ground", scene);
+  auto groundtexture             = Texture::New("textures/ground.jpg", scene);
+  groundtexture->uScale          = 6.f;
+  groundtexture->vScale          = 6.f;
+  groundMaterial->specularColor  = Color3(0.f, 0.f, 0.f);
+  groundMaterial->diffuseTexture = groundtexture;
+  ground->position().y           = -2.05f;
+  ground->material               = groundMaterial;
 
   // Sky material
   _skyboxMaterial = MaterialsLibrary::SkyMaterial::New("skyMaterial", scene);

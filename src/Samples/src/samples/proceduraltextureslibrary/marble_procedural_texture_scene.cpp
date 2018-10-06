@@ -37,7 +37,7 @@ void MarbleProceduralTextureScene::initializeScene(ICanvas* canvas,
     "MarbleMaterialtext", 512, scene);
   marbleTexture->numberOfTilesHeight = 3.f;
   marbleTexture->numberOfTilesWidth  = 3.f;
-  marbleMaterial->setDiffuseTexture(marbleTexture);
+  marbleMaterial->diffuseTexture     = marbleTexture;
 
   auto plane      = Mesh::CreatePlane("MarblePlane", 20, scene);
   plane->material = marbleMaterial;

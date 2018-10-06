@@ -91,8 +91,8 @@ void LightsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Create material
   auto material          = StandardMaterial::New("mat", scene);
   material->diffuseColor = Color3(1.f, 1.f, 1.f);
-  material->setMaxSimultaneousLights(
-    static_cast<unsigned>(lightPositions.size()));
+  material->maxSimultaneousLights
+    = static_cast<unsigned>(lightPositions.size());
 
   // Generate sphere using ribbon
   auto generateSphere = [](float radius) {

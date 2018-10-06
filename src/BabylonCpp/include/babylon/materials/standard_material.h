@@ -14,8 +14,9 @@ class IAnimatable;
 class ImageProcessingConfiguration;
 class StandardMaterial;
 struct StandardMaterialDefines;
-using IAnimatablePtr      = std::shared_ptr<IAnimatable>;
-using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
+using FresnelParametersPtr = std::shared_ptr<FresnelParameters>;
+using IAnimatablePtr       = std::shared_ptr<IAnimatable>;
+using StandardMaterialPtr  = std::shared_ptr<StandardMaterial>;
 
 class BABYLON_SHARED_EXPORT StandardMaterial : public PushMaterial {
 
@@ -74,67 +75,6 @@ public:
                     bool cloneChildren = false) const override;
   Json::object serialize() const;
 
-  // Getters / Setters
-  BaseTexturePtr& diffuseTexture();
-  void setDiffuseTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& ambientTexture();
-  void setAmbientTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& opacityTexture();
-  void setOpacityTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& reflectionTexture();
-  void setReflectionTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& emissiveTexture();
-  void setEmissiveTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& specularTexture();
-  void setSpecularTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& bumpTexture();
-  void setBumpTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& lightmapTexture();
-  void setLightmapTexture(const BaseTexturePtr& value);
-  BaseTexturePtr& refractionTexture();
-  void setRefractionTexture(const BaseTexturePtr& value);
-  bool useAlphaFromDiffuseTexture() const;
-  void setUseAlphaFromDiffuseTexture(bool value);
-  bool useEmissiveAsIllumination() const;
-  void setUseEmissiveAsIllumination(bool value);
-  bool linkEmissiveWithDiffuse() const;
-  void setLinkEmissiveWithDiffuse(bool value);
-  bool useSpecularOverAlpha() const;
-  void setUseSpecularOverAlpha(bool value);
-  bool useReflectionOverAlpha() const;
-  void setUseReflectionOverAlpha(bool value);
-  bool disableLighting() const;
-  void setDisableLighting(bool value);
-  bool useObjectSpaceNormalMap() const;
-  void setUseObjectSpaceNormalMap(bool value);
-  bool useParallax() const;
-  void setUseParallax(bool value);
-  bool useParallaxOcclusion() const;
-  void setUseParallaxOcclusion(bool value);
-  float roughness() const;
-  void setRoughness(float value);
-  bool useLightmapAsShadowmap() const;
-  void setUseLightmapAsShadowmap(bool value);
-
-  // Fresnel
-  FresnelParameters* diffuseFresnelParameters();
-  FresnelParameters* opacityFresnelParameters();
-  FresnelParameters* reflectionFresnelParameters();
-  FresnelParameters* refractionFresnelParameters();
-  FresnelParameters* emissiveFresnelParameters();
-  bool useReflectionFresnelFromSpecular() const;
-  void setUseReflectionFresnelFromSpecular(bool value);
-  bool useGlossinessFromSpecularMapAlpha() const;
-  void setUseGlossinessFromSpecularMapAlpha(bool value);
-  unsigned int maxSimultaneousLights() const;
-  void setMaxSimultaneousLights(unsigned int value);
-  bool invertNormalMapX() const;
-  void setInvertNormalMapX(bool value);
-  bool invertNormalMapY() const;
-  void setInvertNormalMapY(bool value);
-  bool twoSidedLighting() const;
-  void setTwoSidedLighting(bool value);
-
   // Statics
   static StandardMaterialPtr Parse(const Json::value& source, Scene* scene,
                                    const std::string& rootUrl);
@@ -164,6 +104,72 @@ public:
 protected:
   StandardMaterial(const std::string& name, Scene* scene);
   StandardMaterial(const StandardMaterial& other);
+
+  BaseTexturePtr& get_diffuseTexture();
+  void set_diffuseTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_ambientTexture();
+  void set_ambientTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_opacityTexture();
+  void set_opacityTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_reflectionTexture();
+  void set_reflectionTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_emissiveTexture();
+  void set_emissiveTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_specularTexture();
+  void set_specularTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_bumpTexture();
+  void set_bumpTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_lightmapTexture();
+  void set_lightmapTexture(const BaseTexturePtr& value);
+  BaseTexturePtr& get_refractionTexture();
+  void set_refractionTexture(const BaseTexturePtr& value);
+
+  bool get_useAlphaFromDiffuseTexture() const;
+  void set_useAlphaFromDiffuseTexture(bool value);
+  bool get_useEmissiveAsIllumination() const;
+  void set_useEmissiveAsIllumination(bool value);
+  bool get_linkEmissiveWithDiffuse() const;
+  void set_linkEmissiveWithDiffuse(bool value);
+  bool get_useSpecularOverAlpha() const;
+  void set_useSpecularOverAlpha(bool value);
+  bool get_useReflectionOverAlpha() const;
+  void set_useReflectionOverAlpha(bool value);
+  bool get_disableLighting() const;
+  void set_disableLighting(bool value);
+  bool get_useObjectSpaceNormalMap() const;
+  void set_useObjectSpaceNormalMap(bool value);
+  bool get_useParallax() const;
+  void set_useParallax(bool value);
+  bool get_useParallaxOcclusion() const;
+  void set_useParallaxOcclusion(bool value);
+  float get_roughness() const;
+  void set_roughness(float value);
+  bool get_useLightmapAsShadowmap() const;
+  void set_useLightmapAsShadowmap(bool value);
+
+  // Fresnel
+  FresnelParametersPtr& get_diffuseFresnelParameters();
+  void set_diffuseFresnelParameters(const FresnelParametersPtr& value);
+  FresnelParametersPtr& get_opacityFresnelParameters();
+  void set_opacityFresnelParameters(const FresnelParametersPtr& value);
+  FresnelParametersPtr& get_reflectionFresnelParameters();
+  void set_reflectionFresnelParameters(const FresnelParametersPtr& value);
+  FresnelParametersPtr& get_refractionFresnelParameters();
+  void set_refractionFresnelParameters(const FresnelParametersPtr& value);
+  FresnelParametersPtr& get_emissiveFresnelParameters();
+  void set_emissiveFresnelParameters(const FresnelParametersPtr& value);
+  bool get_useReflectionFresnelFromSpecular() const;
+  void set_useReflectionFresnelFromSpecular(bool value);
+  bool get_useGlossinessFromSpecularMapAlpha() const;
+  void set_useGlossinessFromSpecularMapAlpha(bool value);
+  unsigned int get_maxSimultaneousLights() const;
+  void set_maxSimultaneousLights(unsigned int value);
+  bool get_invertNormalMapX() const;
+  void set_invertNormalMapX(bool value);
+  bool get_invertNormalMapY() const;
+  void set_invertNormalMapY(bool value);
+  bool get_twoSidedLighting() const;
+  void set_twoSidedLighting(bool value);
 
   /**
    * @brief Gets the image processing configuration used either in this
@@ -298,12 +304,36 @@ protected:
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
 public:
+  Property<StandardMaterial, BaseTexturePtr> diffuseTexture;
+  Property<StandardMaterial, BaseTexturePtr> ambientTexture;
+  Property<StandardMaterial, BaseTexturePtr> opacityTexture;
+  Property<StandardMaterial, BaseTexturePtr> reflectionTexture;
+  Property<StandardMaterial, BaseTexturePtr> emissiveTexture;
+  Property<StandardMaterial, BaseTexturePtr> specularTexture;
+  Property<StandardMaterial, BaseTexturePtr> bumpTexture;
+  Property<StandardMaterial, BaseTexturePtr> lightmapTexture;
+  Property<StandardMaterial, BaseTexturePtr> refractionTexture;
+
   Color3 ambientColor;
   Color3 diffuseColor;
   Color3 specularColor;
   Color3 emissiveColor;
   float specularPower;
+
+  Property<StandardMaterial, bool> useAlphaFromDiffuseTexture;
+  Property<StandardMaterial, bool> useEmissiveAsIllumination;
+  Property<StandardMaterial, bool> linkEmissiveWithDiffuse;
+  Property<StandardMaterial, bool> useSpecularOverAlpha;
+  Property<StandardMaterial, bool> useReflectionOverAlpha;
+  Property<StandardMaterial, bool> disableLighting;
+  Property<StandardMaterial, bool> useObjectSpaceNormalMap;
+  Property<StandardMaterial, bool> useParallax;
+  Property<StandardMaterial, bool> useParallaxOcclusion;
+
   float parallaxScaleBias;
+
+  Property<StandardMaterial, float> roughness;
+
   float indexOfRefraction;
   bool invertRefractionY;
 
@@ -311,6 +341,21 @@ public:
    * Defines the alpha limits in alpha test mode
    */
   float alphaCutOff;
+
+  Property<StandardMaterial, bool> useLightmapAsShadowmap;
+
+  // Fresnel
+  Property<StandardMaterial, FresnelParametersPtr> diffuseFresnelParameters;
+  Property<StandardMaterial, FresnelParametersPtr> opacityFresnelParameters;
+  Property<StandardMaterial, FresnelParametersPtr> reflectionFresnelParameters;
+  Property<StandardMaterial, FresnelParametersPtr> refractionFresnelParameters;
+  Property<StandardMaterial, FresnelParametersPtr> emissiveFresnelParameters;
+  Property<StandardMaterial, bool> useReflectionFresnelFromSpecular;
+  Property<StandardMaterial, bool> useGlossinessFromSpecularMapAlpha;
+  Property<StandardMaterial, unsigned int> maxSimultaneousLights;
+  Property<StandardMaterial, bool> invertNormalMapX;
+  Property<StandardMaterial, bool> invertNormalMapY;
+  Property<StandardMaterial, bool> twoSidedLighting;
 
   std::function<std::string(
     const std::string& shaderName, std::vector<std::string>& uniforms,
@@ -405,11 +450,11 @@ private:
   bool _useParallaxOcclusion;
   float _roughness;
   bool _useLightmapAsShadowmap;
-  std::unique_ptr<FresnelParameters> _diffuseFresnelParameters;
-  std::unique_ptr<FresnelParameters> _opacityFresnelParameters;
-  std::unique_ptr<FresnelParameters> _reflectionFresnelParameters;
-  std::unique_ptr<FresnelParameters> _refractionFresnelParameters;
-  std::unique_ptr<FresnelParameters> _emissiveFresnelParameters;
+  FresnelParametersPtr _diffuseFresnelParameters;
+  FresnelParametersPtr _opacityFresnelParameters;
+  FresnelParametersPtr _reflectionFresnelParameters;
+  FresnelParametersPtr _refractionFresnelParameters;
+  FresnelParametersPtr _emissiveFresnelParameters;
   bool _useGlossinessFromSpecularMapAlpha;
   unsigned int _maxSimultaneousLights;
 

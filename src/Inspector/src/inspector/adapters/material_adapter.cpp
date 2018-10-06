@@ -62,8 +62,9 @@ void MaterialAdapter::_buildPropertiesView()
     "backFaceCulling", [&]() -> bool { return _material->backFaceCulling(); },
     [&](const bool& value) { _material->backFaceCulling = value; });
   // - id
-  view.addStringProperty("id", [&]() -> std::string& { return _material->id; },
-                         [&](const std::string& value) { _material->id = value; });
+  view.addStringProperty(
+    "id", [&]() -> std::string& { return _material->id; },
+    [&](const std::string& value) { _material->id = value; });
   // - name
   view.addStringProperty(
     "name", [&]() -> std::string& { return _material->name; },
@@ -195,7 +196,7 @@ void MaterialAdapter::_buildPropertiesView()
     view.addBoolProperty(
       "disableLighting",
       [&]() -> bool { return _standardMaterial->disableLighting(); },
-      [&](const bool& value) { _standardMaterial->setDisableLighting(value); });
+      [&](const bool& value) { _standardMaterial->disableLighting = value; });
     // - emissiveColor
     view.addColor3Property(
       "emissiveColor",
@@ -219,16 +220,12 @@ void MaterialAdapter::_buildPropertiesView()
     view.addBoolProperty(
       "invertNormalMapX",
       [&]() -> bool { return _standardMaterial->invertNormalMapX(); },
-      [&](const bool& value) {
-        _standardMaterial->setInvertNormalMapX(value);
-      });
+      [&](const bool& value) { _standardMaterial->invertNormalMapX = value; });
     // - invertNormalMapY
     view.addBoolProperty(
       "invertNormalMapY",
       [&]() -> bool { return _standardMaterial->invertNormalMapY(); },
-      [&](const bool& value) {
-        _standardMaterial->setInvertNormalMapY(value);
-      });
+      [&](const bool& value) { _standardMaterial->invertNormalMapY = value; });
     // - invertRefractionY
     view.addBoolProperty(
       "invertRefractionY",
@@ -239,15 +236,14 @@ void MaterialAdapter::_buildPropertiesView()
       "linkEmissiveWithDiffuse",
       [&]() -> bool { return _standardMaterial->linkEmissiveWithDiffuse(); },
       [&](const bool& value) {
-        _standardMaterial->setLinkEmissiveWithDiffuse(value);
+        _standardMaterial->linkEmissiveWithDiffuse = value;
       });
     // - maxSimultaneousLights
     view.addSizeTProperty(
       "maxSimultaneousLights",
       [&]() -> size_t { return _standardMaterial->maxSimultaneousLights(); },
       [&](const size_t& value) {
-        _standardMaterial->setMaxSimultaneousLights(
-          static_cast<unsigned>(value));
+        _standardMaterial->maxSimultaneousLights = static_cast<unsigned>(value);
       });
     // - parallaxScaleBias
     view.addFloatProperty(
@@ -259,7 +255,7 @@ void MaterialAdapter::_buildPropertiesView()
     // - roughness
     view.addFloatProperty(
       "roughness", [&]() -> float { return _standardMaterial->roughness(); },
-      [&](const float& value) { _standardMaterial->setRoughness(value); });
+      [&](const float& value) { _standardMaterial->roughness = value; });
     // - specularColor
     view.addColor3Property(
       "specularColor",
@@ -274,22 +270,20 @@ void MaterialAdapter::_buildPropertiesView()
     view.addBoolProperty(
       "twoSidedLighting",
       [&]() -> bool { return _standardMaterial->twoSidedLighting(); },
-      [&](const bool& value) {
-        _standardMaterial->setTwoSidedLighting(value);
-      });
+      [&](const bool& value) { _standardMaterial->twoSidedLighting = value; });
     // - useAlphaFromDiffuseTexture
     view.addBoolProperty(
       "useAlphaFromDiffuseTexture",
       [&]() -> bool { return _standardMaterial->useAlphaFromDiffuseTexture(); },
       [&](const bool& value) {
-        _standardMaterial->setUseAlphaFromDiffuseTexture(value);
+        _standardMaterial->useAlphaFromDiffuseTexture = value;
       });
     // - useEmissiveAsIllumination
     view.addBoolProperty(
       "useEmissiveAsIllumination",
       [&]() -> bool { return _standardMaterial->useEmissiveAsIllumination(); },
       [&](const bool& value) {
-        _standardMaterial->setUseEmissiveAsIllumination(value);
+        _standardMaterial->useEmissiveAsIllumination = value;
       });
     // - useGlossinessFromSpecularMapAlpha
     view.addBoolProperty(
@@ -298,14 +292,14 @@ void MaterialAdapter::_buildPropertiesView()
         return _standardMaterial->useGlossinessFromSpecularMapAlpha();
       },
       [&](const bool& value) {
-        _standardMaterial->setUseGlossinessFromSpecularMapAlpha(value);
+        _standardMaterial->useGlossinessFromSpecularMapAlpha = value;
       });
     // - useLightmapAsShadowmap
     view.addBoolProperty(
       "useLightmapAsShadowmap",
       [&]() -> bool { return _standardMaterial->useLightmapAsShadowmap(); },
       [&](const bool& value) {
-        _standardMaterial->setUseLightmapAsShadowmap(value);
+        _standardMaterial->useLightmapAsShadowmap = value;
       });
     // - useLogarithmicDepth
     view.addBoolProperty(
@@ -319,18 +313,18 @@ void MaterialAdapter::_buildPropertiesView()
       "useObjectSpaceNormalMap",
       [&]() -> bool { return _standardMaterial->useObjectSpaceNormalMap(); },
       [&](const bool& value) {
-        _standardMaterial->setUseObjectSpaceNormalMap(value);
+        _standardMaterial->useObjectSpaceNormalMap = value;
       });
     // - useParallax
     view.addBoolProperty(
       "useParallax", [&]() -> bool { return _standardMaterial->useParallax(); },
-      [&](const bool& value) { _standardMaterial->setUseParallax(value); });
+      [&](const bool& value) { _standardMaterial->useParallax = value; });
     // - useParallaxOcclusion
     view.addBoolProperty(
       "useParallaxOcclusion",
       [&]() -> bool { return _standardMaterial->useParallaxOcclusion(); },
       [&](const bool& value) {
-        _standardMaterial->setUseParallaxOcclusion(value);
+        _standardMaterial->useParallaxOcclusion = value;
       });
     // - useReflectionFresnelFromSpecular
     view.addBoolProperty(
@@ -339,21 +333,21 @@ void MaterialAdapter::_buildPropertiesView()
         return _standardMaterial->useReflectionFresnelFromSpecular();
       },
       [&](const bool& value) {
-        _standardMaterial->setUseReflectionFresnelFromSpecular(value);
+        _standardMaterial->useReflectionFresnelFromSpecular = value;
       });
     // - useReflectionOverAlpha
     view.addBoolProperty(
       "useReflectionOverAlpha",
       [&]() -> bool { return _standardMaterial->useReflectionOverAlpha(); },
       [&](const bool& value) {
-        _standardMaterial->setUseReflectionOverAlpha(value);
+        _standardMaterial->useReflectionOverAlpha = value;
       });
     // - useSpecularOverAlpha
     view.addBoolProperty(
       "useSpecularOverAlpha",
       [&]() -> bool { return _standardMaterial->useSpecularOverAlpha(); },
       [&](const bool& value) {
-        _standardMaterial->setUseSpecularOverAlpha(value);
+        _standardMaterial->useSpecularOverAlpha = value;
       });
   }
   // -- Sort properties by property name -- //

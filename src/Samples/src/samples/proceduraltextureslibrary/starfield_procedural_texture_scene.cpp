@@ -40,7 +40,7 @@ void StarfieldProceduralTextureScene::initializeScene(ICanvas* canvas,
       "StarFieldMaterialtext", 512, scene);
   _starfieldTexture->beta            = 0.1f;
   _starfieldTexture->coordinatesMode = TextureConstants::SKYBOX_MODE;
-  starfieldMaterial->setDiffuseTexture(_starfieldTexture);
+  starfieldMaterial->diffuseTexture  = _starfieldTexture;
   starfieldMaterial->backFaceCulling = false;
 
   auto spaceScale = 10.f;

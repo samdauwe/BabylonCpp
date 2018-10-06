@@ -4818,16 +4818,16 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
     hdrSkybox->material                 = hdrSkyboxMaterial;
   }
   else {
-    auto skyboxMaterial             = StandardMaterial::New("skyBox", this);
-    skyboxMaterial->backFaceCulling = false;
-    skyboxMaterial->setReflectionTexture(environmentTexture());
+    auto skyboxMaterial               = StandardMaterial::New("skyBox", this);
+    skyboxMaterial->backFaceCulling   = false;
+    skyboxMaterial->reflectionTexture = environmentTexture();
     if (skyboxMaterial->reflectionTexture()) {
       skyboxMaterial->reflectionTexture()->coordinatesMode
         = TextureConstants::SKYBOX_MODE;
     }
-    skyboxMaterial->setDisableLighting(true);
-    hdrSkybox->infiniteDistance = true;
-    hdrSkybox->material         = skyboxMaterial;
+    skyboxMaterial->disableLighting = true;
+    hdrSkybox->infiniteDistance     = true;
+    hdrSkybox->material             = skyboxMaterial;
   }
 
   return hdrSkybox;

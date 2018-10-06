@@ -34,8 +34,8 @@ void BumpTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto light       = PointLight::New("Omni", Vector3(20, 100, 2), scene);
   light->intensity = 0.97f;
 
-  auto material = StandardMaterial::New("normalMap", scene);
-  material->setBumpTexture(Texture::New("textures/normalMap.jpg", scene));
+  auto material         = StandardMaterial::New("normalMap", scene);
+  material->bumpTexture = Texture::New("textures/normalMap.jpg", scene);
   material->bumpTexture()->level = 1.f;
   material->diffuseColor         = Color3(1.f, 0.f, 0.f);
 
