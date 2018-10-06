@@ -1,5 +1,6 @@
 #include <babylon/samples/specialfx/_special_fx_samples_index.h>
 
+#include <babylon/samples/specialfx/environment_scene.h>
 #include <babylon/samples/specialfx/fireworks_with_shader_code_scene.h>
 #include <babylon/samples/specialfx/fog_scene.h>
 #include <babylon/samples/specialfx/infinite_loader_scene.h>
@@ -13,6 +14,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
 {
   // -- Special FX examples --
 
+  // Environment Scene
+  _samples["EnvironmentScene"]
+    = std::make_tuple(false,                                                //
+                      [](ICanvas* iCanvas) {                                //
+                        return std::make_unique<EnvironmentScene>(iCanvas); //
+                      });                                                   //
   // Fireworks with Shader Code Scene
   _samples["FireworksWithShaderCodeScene"] = std::make_tuple(
     true,                                                             //
