@@ -83,7 +83,7 @@ void InternalTexture::updateSize(int iWidth, int iHeight, int iDepth)
 
 void InternalTexture::_rebuild()
 {
-  InternalTexture* proxy;
+  InternalTexturePtr proxy;
   isReady                          = false;
   _cachedCoordinatesMode           = 0;
   _cachedWrapU                     = 0;
@@ -157,10 +157,8 @@ void InternalTexture::_rebuild()
 
       auto size = ISize{width, height};
       // TODO FIXME
-      proxy = _engine
-                ->createDepthStencilTexture(ToVariant<int, ISize>(size),
-                                            depthTextureOptions)
-                .get();
+      proxy = _engine->createDepthStencilTexture(ToVariant<int, ISize>(size),
+                                                 depthTextureOptions);
       proxy->_swapAndDie(this);
 
       isReady = true;
@@ -246,13 +244,11 @@ void InternalTexture::_swapAndDie(InternalTexture* target)
   }
 
   auto& cache = _engine->getLoadedTexturesCache();
-  cache.erase(
-    std::remove_if(
-      cache.begin(), cache.end(),
-      [this](const std::unique_ptr<InternalTexture>& internalTexture) {
-        return internalTexture.get() == this;
-      }),
-    cache.end());
+  cache.erase(std::remove_if(cache.begin(), cache.end(),
+                             [this](const InternalTexturePtr& internalTexture) {
+                               return internalTexture.get() == this;
+                             }),
+              cache.end());
 }
 
 void InternalTexture::dispose()

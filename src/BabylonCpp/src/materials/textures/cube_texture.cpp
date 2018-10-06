@@ -43,9 +43,10 @@ CubeTexture::CubeTexture(
   const std::vector<std::string>& extensions, bool noMipmap,
   const std::vector<std::string>& iFiles,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
-  const std::function<void()>& onError, unsigned int format, bool prefiltered,
-  const std::string& forcedExtension, bool createPolynomials, float lodScale,
-  float lodOffset)
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError,
+  unsigned int format, bool prefiltered, const std::string& forcedExtension,
+  bool createPolynomials, float lodScale, float lodOffset)
     : BaseTexture{scene}
     , url{rootUrl}
     , boundingBoxPosition{Vector3::Zero()}
@@ -120,7 +121,7 @@ CubeTexture::CubeTexture(
       }
       else {
         _texture = scene->getEngine()->createCubeTexture(
-          rootUrl, scene, extensions, noMipmap, onLoad, onError, _format,
+          rootUrl, scene, _files, noMipmap, onLoad, onError, _format,
           forcedExtension, false, lodScale, lodOffset);
       }
     }

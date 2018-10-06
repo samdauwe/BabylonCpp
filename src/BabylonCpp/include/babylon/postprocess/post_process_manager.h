@@ -13,6 +13,7 @@ class InternalTexture;
 class PostProcess;
 class Scene;
 class VertexBuffer;
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
 namespace GL {
 class IGLBuffer;
@@ -48,7 +49,7 @@ public:
    * @returns True if the post processes were able to be run.
    * Hidden
    */
-  bool _prepareFrame(InternalTexture* sourceTexture                 = nullptr,
+  bool _prepareFrame(const InternalTexturePtr& sourceTexture        = nullptr,
                      const std::vector<PostProcess*>& postProcesses = {});
 
   /**
@@ -62,8 +63,8 @@ public:
    * @param lodLevel defines which lod of the texture to render to
    */
   void directRender(const std::vector<PostProcess*>& postProcesses,
-                    InternalTexture* targetTexture = nullptr,
-                    bool forceFullscreenViewport   = false,
+                    const InternalTexturePtr& targetTexture = nullptr,
+                    bool forceFullscreenViewport            = false,
                     unsigned int faceIndex = 0, int lodLevel = 0);
 
   /**
@@ -77,8 +78,8 @@ public:
    * Hidden
    */
   void _finalizeFrame(bool doNotPresent,
-                      InternalTexture* targetTexture = nullptr,
-                      unsigned int faceIndex         = 0,
+                      const InternalTexturePtr& targetTexture = nullptr,
+                      unsigned int faceIndex                  = 0,
                       const std::vector<PostProcess*>& postProcesses
                       = std::vector<PostProcess*>(),
                       bool forceFullscreenViewport = false);

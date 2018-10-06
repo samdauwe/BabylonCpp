@@ -69,6 +69,7 @@ using BoundingBoxRendererPtr    = std::shared_ptr<BoundingBoxRenderer>;
 using BonePtr                   = std::shared_ptr<Bone>;
 using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
 using IAnimatablePtr            = std::shared_ptr<IAnimatable>;
+using InternalTexturePtr        = std::shared_ptr<InternalTexture>;
 using ISceneComponentPtr        = std::shared_ptr<ISceneComponent>;
 using ISceneSerializableComponentPtr
   = std::shared_ptr<ISceneSerializableComponent>;
@@ -398,12 +399,12 @@ public:
   /**
    * @brief Hidden
    */
-  void _addPendingData(InternalTexture* texure);
+  void _addPendingData(const InternalTexturePtr& texure);
 
   /**
    * @brief Hidden
    */
-  void _removePendingData(InternalTexture* texture);
+  void _removePendingData(const InternalTexturePtr& texture);
 
   /**
    * @brief Returns the number of items waiting to be loaded.

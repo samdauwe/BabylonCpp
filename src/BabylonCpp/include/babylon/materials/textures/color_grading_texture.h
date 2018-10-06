@@ -67,7 +67,7 @@ private:
   /**
    * @brief Occurs when the file being loaded is a .3dl LUT file.
    */
-  InternalTexture* load3dlTexture();
+  InternalTexturePtr load3dlTexture();
 
   /**
    * @brief Starts the loading process of the texture.

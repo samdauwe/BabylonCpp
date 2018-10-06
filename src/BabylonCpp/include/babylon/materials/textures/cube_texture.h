@@ -85,7 +85,9 @@ protected:
               bool noMipmap = false, const std::vector<std::string>& files = {},
               const std::function<void(InternalTexture*, EventState&)>& onLoad
               = nullptr,
-              const std::function<void()>& onError = nullptr,
+              const std::function<void(const std::string& message,
+                                       const std::string& exception)>& onError
+              = nullptr,
               unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
               bool prefiltered = false, const std::string& forcedExtension = "",
               bool createPolynomials = false, float lodScale = 0.8f,

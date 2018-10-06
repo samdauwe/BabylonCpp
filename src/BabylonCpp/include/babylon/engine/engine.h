@@ -37,6 +37,7 @@ class Effect;
 struct EffectCreationOptions;
 class EffectFallbacks;
 class ICanvasRenderingContext2D;
+struct IInternalTextureLoader;
 struct IInternalTextureTracker;
 class ILoadingScreen;
 struct InstancingAttributeInfo;
@@ -52,8 +53,13 @@ class Scene;
 class Texture;
 class UniformBuffer;
 class VertexBuffer;
-using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using DummyInternalTextureTrackerPtr
+  = std::shared_ptr<DummyInternalTextureTracker>;
+using IInternalTextureLoaderPtr  = std::shared_ptr<IInternalTextureLoader>;
+using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
+using InternalTexturePtr         = std::shared_ptr<InternalTexture>;
+using RenderTargetTexturePtr     = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief The engine class is responsible for interfacing with all lower-level
@@ -132,17 +138,17 @@ public:
   /**
    * @brief Gets the default empty texture.
    */
-  InternalTexture* emptyTexture();
+  InternalTexturePtr& emptyTexture();
 
   /**
    * @brief Gets the default empty 3D texture.
    */
-  InternalTexture* emptyTexture3D();
+  InternalTexturePtr& emptyTexture3D();
 
   /**
    * @brief Gets the default empty cube texture.
    */
-  InternalTexture* emptyCubeTexture();
+  InternalTexturePtr& emptyCubeTexture();
 
   /**
    * @brief Gets version of the current webGL context.
@@ -296,7 +302,7 @@ public:
    * @brief Gets the list of loaded textures.
    * @returns an array containing all loaded textures
    */
-  std::vector<std::unique_ptr<InternalTexture>>& getLoadedTexturesCache();
+  std::vector<InternalTexturePtr>& getLoadedTexturesCache();
 
   /**
    * @brief Gets the object containing all engine capabilities.
@@ -598,7 +604,7 @@ public:
    * @param depthStencilTexture The depth stencil texture to use to render
    * @param lodLevel defines le lod level to bind to the frame buffer
    */
-  void bindFramebuffer(InternalTexture* texture,
+  void bindFramebuffer(const InternalTexturePtr& texture,
                        std::optional<unsigned int> faceIndex = std::nullopt,
                        std::optional<int> requiredWidth      = std::nullopt,
                        std::optional<int> requiredHeight     = std::nullopt,
@@ -615,7 +621,7 @@ public:
    * @param onBeforeUnbind defines a function which will be called before the
    * effective unbind
    */
-  void unBindFramebuffer(InternalTexture* texture,
+  void unBindFramebuffer(const InternalTexturePtr& texture,
                          bool disableGenerateMipMaps                 = false,
                          const std::function<void()>& onBeforeUnbind = nullptr);
 
@@ -629,7 +635,7 @@ public:
    * effective unbind
    */
   void unBindMultiColorAttachmentFramebuffer(
-    const std::vector<InternalTexture*>& textures,
+    const std::vector<InternalTexturePtr>& textures,
     bool disableGenerateMipMaps                 = false,
     const std::function<void()>& onBeforeUnbind = nullptr);
 
@@ -637,7 +643,7 @@ public:
    * @brief Force the mipmap generation for the given render target texture.
    * @param texture defines the render target texture to use
    */
-  void generateMipMapsForCubemap(InternalTexture* texture);
+  void generateMipMapsForCubemap(const InternalTexturePtr& texture);
 
   /**
    * @brief Force a webGL flush (ie. a flush of all waiting webGL commands).
@@ -1370,7 +1376,7 @@ public:
   /**
    * @brief Hidden
    */
-  InternalTexture* createTexture(
+  InternalTexturePtr createTexture(
     const std::vector<std::string>& list, bool noMipmap, bool invertY,
     Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
@@ -1405,13 +1411,13 @@ public:
    * RGBA.  Ignored for compressed textures
    * @returns a InternalTexture for assignment back into BABYLON.Texture
    */
-  InternalTexture* createTexture(
+  InternalTexturePtr createTexture(
     const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void()>& onError                             = nullptr,
     const std::optional<Variant<ArrayBuffer, Image>>& buffer = std::nullopt,
-    InternalTexture* fallBack                                = nullptr,
+    const InternalTexturePtr& fallBack                       = nullptr,
     const std::optional<unsigned int>& format                = std::nullopt);
 
   /**
@@ -1424,8 +1430,9 @@ public:
    * @param type defines the type fo the data
    * (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
    */
-  void updateRawTexture(InternalTexture* texture, const Uint8Array& data,
-                        unsigned int format, bool invertY = true,
+  void updateRawTexture(const InternalTexturePtr& texture,
+                        const Uint8Array& data, unsigned int format,
+                        bool invertY                   = true,
                         const std::string& compression = "",
                         unsigned int type
                         = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
@@ -1445,7 +1452,7 @@ public:
    * (BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT by default)
    * @returns the raw texture inside an InternalTexture
    */
-  InternalTexture* createRawTexture(
+  InternalTexturePtr createRawTexture(
     const Uint8Array& data, int width, int height, unsigned int format,
     bool generateMipMaps, bool invertY, unsigned int samplingMode,
     const std::string& compression = "",
@@ -1475,9 +1482,9 @@ public:
    * (BABYLON.Texture.NEAREST_SAMPLINGMODE by default)
    * @returns the dynamic texture inside an InternalTexture
    */
-  InternalTexture* createDynamicTexture(int width, int height,
-                                        bool generateMipMaps,
-                                        unsigned int samplingMode);
+  InternalTexturePtr createDynamicTexture(int width, int height,
+                                          bool generateMipMaps,
+                                          unsigned int samplingMode);
 
   /**
    * @brief Update the sampling mode of a given texture.
@@ -1485,7 +1492,7 @@ public:
    * @param texture defines the texture to update
    */
   void updateTextureSamplingMode(unsigned int samplingMode,
-                                 InternalTexture* texture);
+                                 const InternalTexturePtr& texture);
 
   /**
    * @brief Update the content of a dynamic texture.
@@ -1495,7 +1502,7 @@ public:
    * @param premulAlpha defines if alpha is stored as premultiplied
    * @param format defines the format of the data
    */
-  void updateDynamicTexture(InternalTexture* texture, ICanvas* canvas,
+  void updateDynamicTexture(const InternalTexturePtr& texture, ICanvas* canvas,
                             bool invertY, bool premulAlpha = false,
                             unsigned int format
                             = EngineConstants::TEXTUREFORMAT_RGBA);
@@ -1509,7 +1516,7 @@ public:
    * @param comparisonFunction The comparison function to set, 0 if no
    *comparison required
    */
-  void updateTextureComparisonFunction(InternalTexture* texture,
+  void updateTextureComparisonFunction(const InternalTexturePtr& texture,
                                        int comparisonFunction);
 
   /**
@@ -1520,7 +1527,7 @@ public:
    * @param options The options defining the texture.
    * @returns The texture
    */
-  std::unique_ptr<InternalTexture>
+  InternalTexturePtr
   createDepthStencilTexture(const Variant<int, ISize>& size,
                             const DepthTextureCreationOptions& options);
 
@@ -1537,7 +1544,7 @@ public:
    * @param options defines the options used to create the texture
    * @returns a new render target texture stored in an InternalTexture
    */
-  InternalTexture*
+  InternalTexturePtr
   createRenderTargetTexture(ISize size, const IRenderTargetOptions& options);
 
   /**
@@ -1547,7 +1554,7 @@ public:
    * @param options defines the creation options
    * @returns the cube texture as an InternalTexture
    */
-  std::vector<InternalTexture*>
+  std::vector<InternalTexturePtr>
   createMultipleRenderTarget(ISize size,
                              const IMultiRenderTargetOptions& options);
 
@@ -1559,8 +1566,9 @@ public:
    * @returns the effective sample count (could be 0 if multisample render
    * targets are not supported)
    */
-  unsigned int updateRenderTargetTextureSampleCount(InternalTexture* texture,
-                                                    unsigned int samples);
+  unsigned int
+  updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
+                                       unsigned int samples);
 
   /**
    * @brief Update the sample count for a given multiple render target texture.
@@ -1571,12 +1579,12 @@ public:
    * targets are not supported)
    */
   unsigned int updateMultipleRenderTargetTextureSampleCount(
-    const std::vector<InternalTexture*>& textures, unsigned int samples);
+    const std::vector<InternalTexturePtr>& textures, unsigned int samples);
 
   /**
    * @brief Hidden
    */
-  void _uploadCompressedDataToTextureDirectly(InternalTexture* texture,
+  void _uploadCompressedDataToTextureDirectly(const InternalTexturePtr& texture,
                                               unsigned int internalFormat,
                                               float width, float height,
                                               const Uint8Array& data,
@@ -1586,22 +1594,22 @@ public:
   /**
    * @brief Hidden
    */
-  void _uploadDataToTextureDirectly(InternalTexture* texture,
+  void _uploadDataToTextureDirectly(const InternalTexturePtr& texture,
                                     const Uint8Array& imageData,
                                     unsigned int faceIndex = 0, int lod = 0);
 
   /**
    * @brief Hidden
    */
-  void _uploadArrayBufferViewToTexture(InternalTexture* texture,
+  void _uploadArrayBufferViewToTexture(const InternalTexturePtr& texture,
                                        const Uint8Array& imageData,
                                        unsigned int faceIndex = 0, int lod = 0);
 
   /**
    * @brief Hidden
    */
-  void _uploadImageToTexture(InternalTexture* texture, unsigned int faceIndex,
-                             int lod, ICanvas* image);
+  void _uploadImageToTexture(const InternalTexturePtr& texture,
+                             unsigned int faceIndex, int lod, ICanvas* image);
 
   /**
    * @brief Creates a new render target cube texture.
@@ -1609,7 +1617,7 @@ public:
    * @param options defines the options used to create the texture
    * @returns a new render target cube texture stored in an InternalTexture
    */
-  InternalTexture*
+  InternalTexturePtr
   createRenderTargetCubeTexture(const ISize& size,
                                 const RenderTargetCreationOptions& options);
 
@@ -1631,11 +1639,14 @@ public:
    * harmonics for the texture
    * @returns the cube texture as an InternalTexture
    */
-  InternalTexture* createPrefilteredCubeTexture(
+  InternalTexturePtr createPrefilteredCubeTexture(
     const std::string& rootUrl, Scene* scene, float lodScale, float lodOffset,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
-    const std::function<void()>& onError = nullptr, unsigned int format = 0,
-    const std::string& forcedExtension = "", bool createPolynomials = true);
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr,
+    unsigned int format = 0, const std::string& forcedExtension = "",
+    bool createPolynomials = true);
 
   void _setCubeMapTextureParams(bool loadMipmap);
 
@@ -1663,14 +1674,16 @@ public:
    * texture file not found.
    * @returns the cube texture as an InternalTexture
    */
-  InternalTexture* createCubeTexture(
-    const std::string& rootUrl, Scene* scene,
-    const std::vector<std::string>& files, bool noMipmap,
+  InternalTexturePtr createCubeTexture(
+    std::string rootUrl, Scene* scene, const std::vector<std::string>& files,
+    bool noMipmap,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
-    const std::function<void()>& onError = nullptr, unsigned int format = 0,
-    const std::string& forcedExtension = "", bool createPolynomials = false,
-    float lodScale = 0.f, float lodOffset = 0.f,
-    InternalTexture* fallback = nullptr);
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr,
+    unsigned int format = 0, const std::string& forcedExtension = "",
+    bool createPolynomials = false, float lodScale = 0.f, float lodOffset = 0.f,
+    const InternalTexturePtr& fallback = nullptr);
 
   /**
    * @brief Update a raw cube texture.
@@ -1683,7 +1696,7 @@ public:
    * @param compression defines the compression used (null by default)
    * @param level defines which level of the texture to update
    */
-  void updateRawCubeTexture(InternalTexture* texture,
+  void updateRawCubeTexture(const InternalTexturePtr& texture,
                             const std::vector<Uint8Array>& data,
                             unsigned int format, unsigned int type,
                             bool invertY                   = true,
@@ -1705,11 +1718,12 @@ public:
    * @param compression defines the compression used (null by default)
    * @returns the cube texture as an InternalTexture
    */
-  InternalTexture* createRawCubeTexture(const std::vector<Uint8Array> data,
-                                        int size, unsigned int format,
-                                        unsigned int type, bool generateMipMaps,
-                                        bool invertY, unsigned int samplingMode,
-                                        const std::string& compression = "");
+  InternalTexturePtr createRawCubeTexture(const std::vector<Uint8Array> data,
+                                          int size, unsigned int format,
+                                          unsigned int type,
+                                          bool generateMipMaps, bool invertY,
+                                          unsigned int samplingMode,
+                                          const std::string& compression = "");
 
   /**
    * @brief Creates a new raw cube texture from a specified url.
@@ -1754,8 +1768,9 @@ public:
    * @param textureType defines the texture Type
    * (Engine.TEXTURETYPE_UNSIGNED_INT, Engine.TEXTURETYPE_FLOAT...)
    */
-  void updateRawTexture3D(InternalTexture* texture, const ArrayBufferView& data,
-                          unsigned int format, bool invertY = true,
+  void updateRawTexture3D(const InternalTexturePtr& texture,
+                          const ArrayBufferView& data, unsigned int format,
+                          bool invertY                   = true,
                           const std::string& compression = "",
                           unsigned int textureType
                           = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
@@ -1775,7 +1790,7 @@ public:
    * @param textureType defines the compressed used (can be null)
    * @returns a new raw 3D texture (stored in an InternalTexture)
    */
-  InternalTexture* createRawTexture3D(
+  InternalTexturePtr createRawTexture3D(
     const ArrayBufferView& data, int width, int height, int depth,
     unsigned int format, bool generateMipMaps, bool invertY,
     unsigned int samplingMode, const std::string& compression = "",
@@ -1800,7 +1815,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _bindTexture(int channel, InternalTexture* texture);
+  void _bindTexture(int channel, const InternalTexturePtr& texture);
 
   /**
    * @brief Sets a texture to the webGL context from a postprocess.
@@ -1969,8 +1984,8 @@ public:
   /**
    * @brief Hidden
    */
-  ArrayBufferView _readTexturePixels(InternalTexture* texture, int width,
-                                     int height, int faceIndex = -1,
+  ArrayBufferView _readTexturePixels(const InternalTexturePtr& texture,
+                                     int width, int height, int faceIndex = -1,
                                      int level = 0);
 
   /**
@@ -2107,8 +2122,13 @@ public:
    */
   IFileRequest _loadFile(
     const std::string& url,
-    const std::function<void(Variant<std::string, ArrayBuffer>& data,
-                             const std::string& responseURL)>& onSuccess);
+    const std::function<void(const Variant<std::string, ArrayBuffer>& data,
+                             const std::string& responseURL)>& onSuccess,
+    const std::function<void(const std::string& data)>& onProgress = nullptr,
+    bool useArrayBuffer                                            = false,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr);
 
   /**
    * @brief Hidden
@@ -2142,7 +2162,7 @@ public:
   /**
    * Hidden
    */
-  // static std::vector<IInternalTextureLoader*> _TextureLoaders;
+  static std::vector<IInternalTextureLoaderPtr> _TextureLoaders;
 
   /**
    * @brief Gets a boolean indicating if the engine can be instanciated (ie. if
@@ -2170,7 +2190,8 @@ protected:
   /**
    * @brief Hidden
    */
-  bool _bindTextureDirectly(unsigned int target, InternalTexture* texture,
+  bool _bindTextureDirectly(unsigned int target,
+                            const InternalTexturePtr& texture,
                             bool forTextureDataUpdate = false,
                             bool force                = false);
 
@@ -2188,10 +2209,11 @@ private:
                    bool isPartOfTextureArray = false,
                    bool depthStencilTexture  = false);
   void _setTextureParameterFloat(unsigned int target, unsigned int parameter,
-                                 float value, InternalTexture* texture);
+                                 float value,
+                                 const InternalTexturePtr& texture);
   void _setTextureParameterInteger(unsigned int target, unsigned int parameter,
                                    int value,
-                                   InternalTexture* texture = nullptr);
+                                   const InternalTexturePtr& texture = nullptr);
   void bindUnboundFramebuffer(GL::IGLFramebuffer* framebuffer);
   void bindIndexBuffer(GL::IGLBuffer* buffer);
   void bindBuffer(GL::IGLBuffer* buffer, int target);
@@ -2204,15 +2226,24 @@ private:
     Effect* effect);
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
-  void _moveBoundTextureOnTop(InternalTexture* internalTexture);
+  void _moveBoundTextureOnTop(const InternalTexturePtr& internalTexture);
   int _getCorrectTextureChannel(int channel,
-                                InternalTexture* internalTexture = nullptr);
-  void _linkTrackers(IInternalTextureTracker* previous,
-                     IInternalTextureTracker* next);
-  int _removeDesignatedSlot(InternalTexture* internalTexture);
+                                const InternalTexturePtr& internalTexture
+                                = nullptr);
+  void _linkTrackers(const IInternalTextureTrackerPtr& previous,
+                     const IInternalTextureTrackerPtr& next);
+  int _removeDesignatedSlot(const InternalTexturePtr& internalTexture);
   void _activateCurrentTexture();
-  void _rescaleTexture(InternalTexture* source, InternalTexture* destination,
-                       Scene* scene, unsigned int internalFormat,
+  void _cascadeLoadImgs(
+    const std::string& rootUrl, Scene* scene,
+    const std::function<void(const std::vector<Image>& imgages)>& onfinish,
+    const std::vector<std::string>& files,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr);
+  void _rescaleTexture(const InternalTexturePtr& source,
+                       const InternalTexturePtr& destination, Scene* scene,
+                       unsigned int internalFormat,
                        const std::function<void()>& onComplete);
   void _setupDepthStencilTexture(InternalTexture* internalTexture,
                                  const Variant<int, ISize>& size,
@@ -2227,7 +2258,7 @@ private:
    * @param options The options defining the texture.
    * @returns The texture
    */
-  std::unique_ptr<InternalTexture>
+  InternalTexturePtr
   _createDepthStencilTexture(const Variant<int, ISize>& size,
                              const DepthTextureCreationOptions& options);
 
@@ -2238,7 +2269,7 @@ private:
    * @param options The options defining the cube texture.
    * @returns The cube texture
    */
-  std::unique_ptr<InternalTexture>
+  InternalTexturePtr
   _createDepthStencilCubeTexture(int size,
                                  const DepthTextureCreationOptions& options);
 
@@ -2260,11 +2291,12 @@ private:
   _setupFramebufferDepthAttachments(bool generateStencilBuffer,
                                     bool generateDepthBuffer, int width,
                                     int height, int samples = 1);
-  void _prepareWebGLTextureContinuation(InternalTexture* texture, Scene* scene,
-                                        bool noMipmap, bool isCompressed,
+  void _prepareWebGLTextureContinuation(const InternalTexturePtr& texture,
+                                        Scene* scene, bool noMipmap,
+                                        bool isCompressed,
                                         unsigned int samplingMode);
   void _prepareWebGLTexture(
-    InternalTexture* texture, Scene* scene, int width, int height,
+    const InternalTexturePtr& texture, Scene* scene, int width, int height,
     std::optional<bool> invertY, bool noMipmap, bool isCompressed,
     const std::function<
       bool(int width, int height,
@@ -2287,6 +2319,15 @@ private:
 
   /** Occlusion Queries **/
   unsigned int getGlAlgorithmType(unsigned int algorithmType) const;
+
+  /** File loading */
+  void _cascadeLoadFiles(
+    Scene* scene,
+    const std::function<void(const Variant<std::string, ArrayBuffer>& data,
+                             const std::string& responseURL)>& onloaddata,
+    const std::vector<std::string>& files,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError);
 
 public:
   // Public members
@@ -2517,7 +2558,7 @@ protected:
   unsigned int _alphaMode;
 
   // Cache
-  std::vector<std::unique_ptr<InternalTexture>> _internalTexturesCache;
+  std::vector<InternalTexturePtr> _internalTexturesCache;
 
   /**
    * Hidden
@@ -2527,7 +2568,7 @@ protected:
   /**
    * Hidden
    */
-  std::unordered_map<int, InternalTexture*> _boundTexturesCache;
+  std::unordered_map<int, InternalTexturePtr> _boundTexturesCache;
 
   /**
    * Hidden
@@ -2567,7 +2608,7 @@ protected:
   /**
    * Hidden
    */
-  InternalTexture* _currentRenderTarget;
+  InternalTexturePtr _currentRenderTarget;
 
   /**
    * Hidden
@@ -2638,9 +2679,8 @@ private:
   Int32Array _currentInstanceLocations;
   std::vector<GL::IGLBuffer*> _currentInstanceBuffers;
   Int32Array _textureUnits;
-  std::unique_ptr<DummyInternalTextureTracker>
-    _firstBoundInternalTextureTracker;
-  std::unique_ptr<DummyInternalTextureTracker> _lastBoundInternalTextureTracker;
+  DummyInternalTextureTrackerPtr _firstBoundInternalTextureTracker;
+  DummyInternalTextureTrackerPtr _lastBoundInternalTextureTracker;
   ICanvas* _workingCanvas;
   ICanvasRenderingContext2D* _workingContext;
   std::unique_ptr<PassPostProcess> _rescalePostProcess;
@@ -2648,9 +2688,9 @@ private:
   std::function<void()> _bindedRenderFunction;
   bool _vaoRecordInProgress;
   bool _mustWipeVertexAttributes;
-  InternalTexture* _emptyTexture;
-  std::unique_ptr<InternalTexture> _emptyCubeTexture;
-  InternalTexture* _emptyTexture3D;
+  InternalTexturePtr _emptyTexture;
+  InternalTexturePtr _emptyCubeTexture;
+  InternalTexturePtr _emptyTexture3D;
   int _frameHandler;
   // Hardware supported Compressed Textures
   std::vector<std::string> _texturesSupported;

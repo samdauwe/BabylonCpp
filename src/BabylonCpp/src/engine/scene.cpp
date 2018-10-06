@@ -1905,11 +1905,11 @@ void Scene::_addPendingData(Mesh* /*mesh*/)
 {
 }
 
-void Scene::_addPendingData(InternalTexture* /*texure*/)
+void Scene::_addPendingData(const InternalTexturePtr& /*texure*/)
 {
 }
 
-void Scene::_removePendingData(InternalTexture* /*texture*/)
+void Scene::_removePendingData(const InternalTexturePtr& /*texture*/)
 {
   auto wasLoading = isLoading();
 

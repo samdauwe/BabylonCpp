@@ -759,7 +759,8 @@ bool Effect::isSupported() const
   return _compilationError.empty();
 }
 
-void Effect::_bindTexture(const std::string& channel, InternalTexture* texture)
+void Effect::_bindTexture(const std::string& channel,
+                          const InternalTexturePtr& texture)
 {
   _engine->_bindTexture(stl_util::index_of(_samplers, channel), texture);
 }

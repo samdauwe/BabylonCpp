@@ -69,7 +69,7 @@ void PostProcessManager::_rebuild()
 }
 
 bool PostProcessManager::_prepareFrame(
-  InternalTexture* sourceTexture,
+  const InternalTexturePtr& sourceTexture,
   const std::vector<PostProcess*>& iPostProcesses)
 {
   auto camera = _scene->activeCamera;
@@ -96,7 +96,7 @@ bool PostProcessManager::_prepareFrame(
 
 void PostProcessManager::directRender(
   const std::vector<PostProcess*>& postProcesses,
-  InternalTexture* targetTexture, bool forceFullscreenViewport,
+  const InternalTexturePtr& targetTexture, bool forceFullscreenViewport,
   unsigned int faceIndex, int lodLevel)
 {
   auto engine = _scene->getEngine();
@@ -107,8 +107,9 @@ void PostProcessManager::directRender(
     }
     else {
       if (targetTexture) {
-        engine->bindFramebuffer(targetTexture, faceIndex, std::nullopt, std::nullopt,
-                                forceFullscreenViewport, nullptr, lodLevel);
+        engine->bindFramebuffer(targetTexture, faceIndex, std::nullopt,
+                                std::nullopt, forceFullscreenViewport, nullptr,
+                                lodLevel);
       }
       else {
         engine->restoreDefaultFramebuffer();
@@ -138,8 +139,9 @@ void PostProcessManager::directRender(
 }
 
 void PostProcessManager::_finalizeFrame(
-  bool doNotPresent, InternalTexture* targetTexture, unsigned int faceIndex,
-  const std::vector<PostProcess*>& _postProcesses, bool forceFullscreenViewport)
+  bool doNotPresent, const InternalTexturePtr& targetTexture,
+  unsigned int faceIndex, const std::vector<PostProcess*>& _postProcesses,
+  bool forceFullscreenViewport)
 {
   auto camera = _scene->activeCamera;
   if (!camera) {

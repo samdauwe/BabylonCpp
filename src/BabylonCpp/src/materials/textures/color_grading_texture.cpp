@@ -52,9 +52,9 @@ Matrix* ColorGradingTexture::getTextureMatrix()
   return _textureMatrix.get();
 }
 
-InternalTexture* ColorGradingTexture::load3dlTexture()
+InternalTexturePtr ColorGradingTexture::load3dlTexture()
 {
-  InternalTexture* texture = nullptr;
+  InternalTexturePtr texture = nullptr;
   if (_engine->webGLVersion() == 1.f) {
     texture = _engine->createRawTexture(
       Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,

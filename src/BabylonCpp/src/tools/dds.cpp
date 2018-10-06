@@ -344,7 +344,8 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
   return byteArray;
 }
 
-void DDSTools::UploadDDSLevels(Engine* engine, InternalTexture* texture,
+void DDSTools::UploadDDSLevels(Engine* engine,
+                               const InternalTexturePtr& texture,
                                const Uint8Array& arrayBuffer, DDSInfo& info,
                                bool loadMipmaps, unsigned int faces,
                                int lodIndex, int currentFace)

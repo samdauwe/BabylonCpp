@@ -18,7 +18,8 @@ class Effect;
 class Engine;
 class Scene;
 class InternalTexture;
-using CameraPtr = std::shared_ptr<Camera>;
+using CameraPtr          = std::shared_ptr<Camera>;
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has
@@ -108,8 +109,8 @@ public:
    * process will render it's output into this texture and this texture will be
    * used as textureSampler in the fragment shader of this post process.
    */
-  InternalTexture* inputTexture();
-  void setInputTexture(InternalTexture* value);
+  InternalTexturePtr& inputTexture();
+  void setInputTexture(const InternalTexturePtr& value);
 
   /**
    * @brief Gets the camera which post process is applied to.
@@ -202,9 +203,9 @@ public:
    * generated. (default: false)
    * @returns The target texture that was bound to be written to.
    */
-  InternalTexture* activate(const CameraPtr& camera,
-                            InternalTexture* sourceTexture = nullptr,
-                            bool forceDepthStencil         = false);
+  InternalTexturePtr activate(const CameraPtr& camera,
+                              const InternalTexturePtr& sourceTexture = nullptr,
+                              bool forceDepthStencil                  = false);
 
   /**
    * @brief If the post process is supported.
@@ -270,7 +271,7 @@ public:
    * (Typically the texture on the next postprocess in the chain)
    * Hidden
    */
-  InternalTexture* _outputTexture;
+  InternalTexturePtr _outputTexture;
 
   /**
    * Sampling mode used by the shader
@@ -352,7 +353,7 @@ public:
    * Smart array of input and output textures for the post process.
    * Hidden
    */
-  std::vector<InternalTexture*> _textures;
+  std::vector<InternalTexturePtr> _textures;
 
   /**
    * The index in _textures that corresponds to the output texture.
@@ -407,7 +408,7 @@ private:
   Vector2 _scaleRatio;
   PostProcess* _shareOutputWithPostProcess;
   Vector2 _texelSize;
-  InternalTexture* _forcedOutputTexture;
+  InternalTexturePtr _forcedOutputTexture;
   // Events
   Observer<Camera>::Ptr _onActivateObserver;
   Observer<PostProcess>::Ptr _onSizeChangedObserver;

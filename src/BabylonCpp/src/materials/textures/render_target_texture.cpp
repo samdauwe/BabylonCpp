@@ -20,9 +20,9 @@
 namespace BABYLON {
 
 RenderTargetTexture::RenderTargetTexture(
-  const std::string& iName, const ISize& size, Scene* scene, bool generateMipMaps,
-  bool doNotChangeAspectRatio, unsigned int type, bool iIsCube,
-  unsigned int samplingMode, bool generateDepthBuffer,
+  const std::string& iName, const ISize& size, Scene* scene,
+  bool generateMipMaps, bool doNotChangeAspectRatio, unsigned int type,
+  bool iIsCube, unsigned int samplingMode, bool generateDepthBuffer,
   bool generateStencilBuffer, bool isMulti, unsigned int format)
     : Texture{"", scene, !generateMipMaps}
     , renderListPredicate{nullptr}
@@ -120,12 +120,14 @@ std::vector<AbstractMeshPtr>& RenderTargetTexture::get_renderList()
   return _renderList;
 }
 
-void RenderTargetTexture::set_renderList(const std::vector<AbstractMeshPtr>& value)
+void RenderTargetTexture::set_renderList(
+  const std::vector<AbstractMeshPtr>& value)
 {
   _renderList = value;
 }
 
-void RenderTargetTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
+void RenderTargetTexture::set_boundingBoxSize(
+  const std::optional<Vector3>& value)
 {
   if (_boundingBoxSize && (*_boundingBoxSize).equals(*value)) {
     return;
@@ -576,9 +578,10 @@ void RenderTargetTexture::renderToTarget(
       if (isCube) {
         faceIndexVal = faceIndex;
       }
-      engine->bindFramebuffer(
-        _texture, faceIndexVal, std::nullopt, std::nullopt, ignoreCameraViewport,
-        depthStencilTexture ? depthStencilTexture.get() : nullptr);
+      engine->bindFramebuffer(_texture, faceIndexVal, std::nullopt,
+                              std::nullopt, ignoreCameraViewport,
+                              depthStencilTexture ? depthStencilTexture.get() :
+                                                    nullptr);
     }
   }
 
@@ -695,7 +698,7 @@ void RenderTargetTexture::disposeFramebufferObjects()
   auto objBuffer = getInternalTexture();
   auto scene     = getScene();
   if (objBuffer && scene) {
-    scene->getEngine()->_releaseFramebufferObjects(objBuffer);
+    scene->getEngine()->_releaseFramebufferObjects(objBuffer.get());
   }
 }
 

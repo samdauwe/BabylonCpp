@@ -22,6 +22,7 @@ class Vector2;
 class Vector3;
 class Vector4;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 namespace GL {
@@ -173,9 +174,9 @@ public:
   /**
    * @brief Hidden
    */
-  void _loadFragmentShader(
-    const std::string& fragment,
-    const std::function<void(const std::string&)>& callback);
+  void
+  _loadFragmentShader(const std::string& fragment,
+                      const std::function<void(const std::string&)>& callback);
 
   /**
    * @brief Hidden
@@ -222,7 +223,8 @@ public:
    * @param texture Texture to bind.
    * Hidden
    */
-  void _bindTexture(const std::string& channel, InternalTexture* texture);
+  void _bindTexture(const std::string& channel,
+                    const InternalTexturePtr& texture);
 
   /**
    * @brief Sets a texture on the engine to be used in the shader.

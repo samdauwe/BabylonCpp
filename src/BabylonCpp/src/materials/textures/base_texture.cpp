@@ -189,7 +189,7 @@ Matrix* BaseTexture::getReflectionTextureMatrix()
   return &_reflectionTextureMatrix;
 }
 
-InternalTexture* BaseTexture::getInternalTexture()
+InternalTexturePtr& BaseTexture::getInternalTexture()
 {
   return _texture;
 }
@@ -254,9 +254,9 @@ bool BaseTexture::canRescale()
   return false;
 }
 
-InternalTexture* BaseTexture::_getFromCache(const std::string& url,
-                                            bool noMipmap,
-                                            unsigned int sampling)
+InternalTexturePtr BaseTexture::_getFromCache(const std::string& url,
+                                              bool noMipmap,
+                                              unsigned int sampling)
 {
   if (!_scene) {
     return nullptr;
@@ -268,7 +268,7 @@ InternalTexture* BaseTexture::_getFromCache(const std::string& url,
         && texturesCacheEntry->generateMipMaps != noMipmap) {
       if (!sampling || sampling == texturesCacheEntry->samplingMode) {
         texturesCacheEntry->incrementReferences();
-        return texturesCacheEntry.get();
+        return texturesCacheEntry;
       }
     }
   }

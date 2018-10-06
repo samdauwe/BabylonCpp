@@ -20,7 +20,8 @@ PostProcess::PostProcess(
   const std::vector<std::string>& samplers,
   const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
   unsigned int samplingMode, Engine* engine, bool reusable,
-  const std::string& defines, unsigned int textureType, const std::string& vertexUrl,
+  const std::string& defines, unsigned int textureType,
+  const std::string& vertexUrl,
   const std::unordered_map<std::string, unsigned int>& indexParameters,
   bool blockCompilation)
     : name{iName}
@@ -149,12 +150,12 @@ void PostProcess::setOnAfterRender(
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
 }
 
-InternalTexture* PostProcess::inputTexture()
+InternalTexturePtr& PostProcess::inputTexture()
 {
   return _textures[_currentRenderTextureInd];
 }
 
-void PostProcess::setInputTexture(InternalTexture* value)
+void PostProcess::setInputTexture(const InternalTexturePtr& value)
 {
   _forcedOutputTexture = value;
 }
@@ -212,8 +213,8 @@ void PostProcess::updateEffect(
   const std::function<void(Effect* effect)>& onCompiled,
   const std::function<void(Effect* effect, const std::string& errors)>& onError)
 {
-  std::unordered_map<std::string, std::string> baseName{{"vertex", _vertexUrl},
-                                               {"fragment", _fragmentUrl}};
+  std::unordered_map<std::string, std::string> baseName{
+    {"vertex", _vertexUrl}, {"fragment", _fragmentUrl}};
 
   EffectCreationOptions options;
   options.attributes    = {"position"};
@@ -238,9 +239,10 @@ void PostProcess::markTextureDirty()
   width = -1;
 }
 
-InternalTexture* PostProcess::activate(const CameraPtr& camera,
-                                       InternalTexture* sourceTexture,
-                                       bool forceDepthStencil)
+InternalTexturePtr
+PostProcess::activate(const CameraPtr& camera,
+                      const InternalTexturePtr& sourceTexture,
+                      bool forceDepthStencil)
 {
   auto pCamera = camera ? camera : _camera;
 
@@ -294,8 +296,8 @@ InternalTexture* PostProcess::activate(const CameraPtr& camera,
 
     if (width != desiredWidth || height != desiredHeight) {
       if (!_textures.empty()) {
-        for (auto& texture : _textures) {
-          _engine->_releaseTexture(texture);
+        for (const auto& texture : _textures) {
+          _engine->_releaseTexture(texture.get());
         }
         _textures.clear();
       }
@@ -335,7 +337,7 @@ InternalTexture* PostProcess::activate(const CameraPtr& camera,
     }
   }
 
-  InternalTexture* target = nullptr;
+  InternalTexturePtr target = nullptr;
   if (_shareOutputWithPostProcess) {
     target = _shareOutputWithPostProcess->inputTexture();
   }
@@ -426,7 +428,7 @@ Effect* PostProcess::apply()
 
   // Bind the output texture of the preivous post process as the input to this
   // post process.
-  InternalTexture* source = nullptr;
+  InternalTexturePtr source = nullptr;
   if (_shareOutputWithPostProcess) {
     source = _shareOutputWithPostProcess->inputTexture();
   }
@@ -452,8 +454,8 @@ void PostProcess::_disposeTextures()
   }
 
   if (!_textures.empty()) {
-    for (auto& texture : _textures) {
-      _engine->_releaseTexture(texture);
+    for (const auto& texture : _textures) {
+      _engine->_releaseTexture(texture.get());
     }
   }
 

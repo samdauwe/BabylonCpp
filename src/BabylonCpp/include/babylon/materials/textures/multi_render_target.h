@@ -46,7 +46,7 @@ public:
   WriteOnlyProperty<MultiRenderTarget, unsigned int> wrapV;
 
 private:
-  std::vector<InternalTexture*> _internalTextures;
+  std::vector<InternalTexturePtr> _internalTextures;
   std::vector<TexturePtr> _textures;
   IMultiRenderTargetOptions _multiRenderTargetOptions;
   TexturePtr _nullTexture;

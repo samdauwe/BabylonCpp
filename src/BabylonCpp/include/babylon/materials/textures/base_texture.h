@@ -14,7 +14,8 @@ namespace BABYLON {
 class BaseTexture;
 class InternalTexture;
 class SphericalPolynomial;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using BaseTexturePtr     = std::shared_ptr<BaseTexture>;
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
 class BABYLON_SHARED_EXPORT BaseTexture
     : public std::enable_shared_from_this<BaseTexture>,
@@ -42,12 +43,12 @@ public:
    */
   const std::string getClassName() const;
 
-  void setOnDispose(
-    const std::function<void(BaseTexture*, EventState&)>& callback);
+  void
+  setOnDispose(const std::function<void(BaseTexture*, EventState&)>& callback);
   Scene* getScene() const;
   virtual Matrix* getTextureMatrix();
   virtual Matrix* getReflectionTextureMatrix();
-  InternalTexture* getInternalTexture();
+  InternalTexturePtr& getInternalTexture();
   virtual bool isReadyOrNotBlocking();
   virtual bool isReady();
   ISize getSize();
@@ -55,8 +56,8 @@ public:
   virtual void scale(float ratio);
   bool canRescale();
   /** Hidden */
-  InternalTexture* _getFromCache(const std::string& url, bool noMipmap,
-                                 unsigned int sampling = 0);
+  InternalTexturePtr _getFromCache(const std::string& url, bool noMipmap,
+                                   unsigned int sampling = 0);
   /** Hidden */
   virtual void _rebuild();
   virtual void delayLoad();
@@ -189,7 +190,7 @@ public:
   Observable<BaseTexture> onDisposeObservable;
   unsigned int delayLoadState;
   /** Hidden */
-  InternalTexture* _texture;
+  InternalTexturePtr _texture;
 
   /**
    * Size of the bounding box associated with the texture (when in cube mode)

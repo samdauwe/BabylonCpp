@@ -8,6 +8,7 @@ namespace BABYLON {
 
 class Engine;
 class InternalTexture;
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 
 // Based on demo done by Brandon Jones -
 // http://media.tojicode.com/webgl-samples/dds.html
@@ -185,7 +186,7 @@ public:
   /**
    * @brief Uploads DDS Levels to a Babylon Texture.
    */
-  static void UploadDDSLevels(Engine* engine, InternalTexture* texture,
+  static void UploadDDSLevels(Engine* engine, const InternalTexturePtr& texture,
                               const Uint8Array& arrayBuffer, DDSInfo& info,
                               bool loadMipmaps, unsigned int faces,
                               int lodIndex = -1, int currentFace = -1);
