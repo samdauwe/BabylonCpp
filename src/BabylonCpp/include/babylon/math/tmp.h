@@ -17,6 +17,7 @@ class Vector4;
 
 /**
  * @brief Temporary pre-allocated objects for engine internal use.
+ * Hidden
  */
 struct BABYLON_SHARED_EXPORT Tmp {
   static std::array<Color3, 3> Color3Array;

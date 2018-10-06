@@ -111,7 +111,7 @@ const Vector3& Vector3::toArray(Float32Array& array, unsigned int index) const
 
 Quaternion Vector3::toQuaternion() const
 {
-  return Quaternion::RotationYawPitchRoll(x, y, z);
+  return Quaternion::RotationYawPitchRoll(y, x, z);
 }
 
 Vector3& Vector3::addInPlace(const Vector3& otherVector)
@@ -307,31 +307,39 @@ Vector3& Vector3::divideInPlace(const Vector3& otherVector)
 
 Vector3& Vector3::minimizeInPlace(const Vector3& other)
 {
-  if (other.x < x) {
-    x = other.x;
-  }
-  if (other.y < y) {
-    y = other.y;
-  }
-  if (other.z < z) {
-    z = other.z;
-  }
-
-  return *this;
+  return minimizeInPlaceFromFloats(other.x, other.y, other.z);
 }
 
 Vector3& Vector3::maximizeInPlace(const Vector3& other)
 {
-  if (other.x > x) {
-    x = other.x;
-  }
-  if (other.y > y) {
-    y = other.y;
-  }
-  if (other.z > z) {
-    z = other.z;
-  }
+  return maximizeInPlaceFromFloats(other.x, other.y, other.z);
+}
 
+Vector3& Vector3::minimizeInPlaceFromFloats(float ix, float iy, float iz)
+{
+  if (ix < x) {
+    x = ix;
+  }
+  if (iy < y) {
+    y = iy;
+  }
+  if (iz < z) {
+    z = iz;
+  }
+  return *this;
+}
+
+Vector3& Vector3::maximizeInPlaceFromFloats(float ix, float iy, float iz)
+{
+  if (ix > x) {
+    x = ix;
+  }
+  if (iy > y) {
+    y = iy;
+  }
+  if (iz > z) {
+    z = iz;
+  }
   return *this;
 }
 
@@ -544,10 +552,11 @@ float Vector3::GetAngleBetweenVectors(const Vector3& vector0,
                                       const Vector3& vector1,
                                       const Vector3& normal)
 {
-  const auto v0  = vector0.copy().normalize();
-  const auto v1  = vector1.copy().normalize();
+  const auto v0  = MathTmp::Vector3Array[1].copyFrom(vector0).normalize();
+  const auto v1  = MathTmp::Vector3Array[2].copyFrom(vector1).normalize();
   const auto dot = Vector3::Dot(v0, v1);
-  const auto n   = Vector3::Cross(v0, v1);
+  auto& n        = MathTmp::Vector3Array[3];
+  Vector3::CrossToRef(v0, v1, n);
   if (Vector3::Dot(n, normal) > 0.f) {
     return std::acos(dot);
   }
@@ -605,6 +614,11 @@ Vector3 Vector3::Down()
 Vector3 Vector3::Forward()
 {
   return Vector3(0.f, 0.f, 1.f);
+}
+
+Vector3 Vector3::Backward()
+{
+  return Vector3(0.f, 0.f, -1.f);
 }
 
 Vector3 Vector3::Right()

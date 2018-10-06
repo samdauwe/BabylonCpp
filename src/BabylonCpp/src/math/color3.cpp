@@ -342,11 +342,17 @@ Color3 Color3::FromInts(int r, int g, int b)
 
 Color3 Color3::Lerp(const Color3& start, const Color3& end, float amount)
 {
-  const float r = start.r + ((end.r - start.r) * amount);
-  const float g = start.g + ((end.g - start.g) * amount);
-  const float b = start.b + ((end.b - start.b) * amount);
+  Color3 result(0.f, 0.f, 0.f);
+  Color3::LerpToRef(start, end, amount, result);
+  return result;
+}
 
-  return Color3(r, g, b);
+void Color3::LerpToRef(const Color3& left, const Color3& right, float amount,
+                       Color3& result)
+{
+  result.r = left.r + ((right.r - left.r) * amount);
+  result.g = left.g + ((right.g - left.g) * amount);
+  result.b = left.b + ((right.b - left.b) * amount);
 }
 
 Color3 Color3::Red()

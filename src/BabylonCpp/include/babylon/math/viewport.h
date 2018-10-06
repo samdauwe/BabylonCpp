@@ -9,14 +9,18 @@
 namespace BABYLON {
 
 /**
- * @brief Represents a Viewport.
+ * @brief Class used to represent a viewport on screen.
  */
 class BABYLON_SHARED_EXPORT Viewport {
 
 public:
   /**
    * @brief Creates a Viewport object located at (x, y) and sized (width,
-   * height).
+   * height)
+   * @param x defines viewport left coordinate
+   * @param y defines viewport top coordinate
+   * @param width defines the viewport width
+   * @param height defines the viewport height
    */
   Viewport();
   Viewport(int x, int y, int width, int height);
@@ -29,17 +33,43 @@ public:
 
   /**
    * @brief Returns a new Viewport copied from the current one.
+   * @returns a new Viewport
    */
   std::unique_ptr<Viewport> clone() const;
 
   friend std::ostream& operator<<(std::ostream& os, const Viewport& viewport);
 
   /** Methods **/
+
+  /**
+   * @brief Creates a new viewport using absolute sizing (from 0-> width, 0->
+   * height instead of 0->1).
+   * @param renderWidthOrEngine defines either an engine or the rendering width
+   * @param renderHeight defines the rendering height
+   * @returns a new Viewport
+   */
   Viewport toGlobal(int renderWidth, int renderHeight) const;
 
 public:
-  int x, y;
-  int width, height;
+  /**
+   * viewport left coordinate
+   */
+  int x;
+
+  /**
+   * viewport top coordinate
+   */
+  int y;
+
+  /**
+   * viewport width
+   */
+  int width;
+
+  /**
+   * viewport height
+   */
+  int height;
 
 }; // end of class Viewport
 

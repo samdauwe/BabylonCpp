@@ -6,31 +6,33 @@
 
 namespace BABYLON {
 
-Arc2::Arc2(const Vector2& startPoint, const Vector2& midPoint,
-           const Vector2& endPoint)
+Arc2::Arc2(const Vector2& iStartPoint, const Vector2& iMidPoint,
+           const Vector2& iEndPoint)
+    : startPoint{iStartPoint}, midPoint{iMidPoint}, endPoint{iEndPoint}
 {
-  float temp = std::pow(midPoint.x, 2.f) + std::pow(midPoint.y, 2.f);
+  float temp = std::pow(iMidPoint.x, 2.f) + std::pow(iMidPoint.y, 2.f);
   float startToMid
-    = (std::pow(startPoint.x, 2.f) + std::pow(startPoint.y, 2.f) - temp) / 2.f;
+    = (std::pow(iStartPoint.x, 2.f) + std::pow(iStartPoint.y, 2.f) - temp)
+      / 2.f;
   float midToEnd
-    = (temp - std::pow(endPoint.x, 2.f) - std::pow(endPoint.y, 2.f)) / 2.f;
-  float det = (startPoint.x - midPoint.x) * (midPoint.y - endPoint.y)
-              - (midPoint.x - endPoint.x) * (startPoint.y - midPoint.y);
+    = (temp - std::pow(iEndPoint.x, 2.f) - std::pow(iEndPoint.y, 2.f)) / 2.f;
+  float det = (iStartPoint.x - iMidPoint.x) * (iMidPoint.y - iEndPoint.y)
+              - (iMidPoint.x - iEndPoint.x) * (iStartPoint.y - iMidPoint.y);
 
-  centerPoint = Vector2((startToMid * (midPoint.y - endPoint.y)
-                         - midToEnd * (startPoint.y - midPoint.y))
+  centerPoint = Vector2((startToMid * (iMidPoint.y - iEndPoint.y)
+                         - midToEnd * (iStartPoint.y - iMidPoint.y))
                           / det,
-                        ((startPoint.x - midPoint.x) * midToEnd
-                         - (midPoint.x - endPoint.x) * startToMid)
+                        ((iStartPoint.x - iMidPoint.x) * midToEnd
+                         - (iMidPoint.x - iEndPoint.x) * startToMid)
                           / det);
 
-  radius = centerPoint.subtract(startPoint).length();
+  radius = centerPoint.subtract(iStartPoint).length();
 
-  startAngle = Angle::BetweenTwoPoints(centerPoint, startPoint);
+  startAngle = Angle::BetweenTwoPoints(centerPoint, iStartPoint);
 
   float a1 = startAngle.degrees();
-  float a2 = Angle::BetweenTwoPoints(centerPoint, midPoint).degrees();
-  float a3 = Angle::BetweenTwoPoints(centerPoint, endPoint).degrees();
+  float a2 = Angle::BetweenTwoPoints(centerPoint, iMidPoint).degrees();
+  float a3 = Angle::BetweenTwoPoints(centerPoint, iEndPoint).degrees();
 
   // angles correction
   if (a2 - a1 > +180.f) {

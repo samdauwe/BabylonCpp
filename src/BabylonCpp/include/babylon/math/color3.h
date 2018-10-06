@@ -67,11 +67,11 @@ public:
   const Color3& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
-   * @brief Returns a new {BABYLON.Color4} object from the current Color3 and
-   * the given alpha.
-   * @param alpha defines the alpha component on the new {BABYLON.Color4} object
-   * (default is 1)
-   * @returns a new {BABYLON.Color4} object
+   * @brief Returns a new Color4 object from the current Color3 and the given
+   * alpha
+   * @param alpha defines the alpha component on the new Color4 object (default
+   * is 1)
+   * @returns a new Color4 object
    */
   Color4 toColor4(float alpha = 1.f) const;
 
@@ -306,6 +306,17 @@ public:
    * @returns a new Color3 object
    */
   static Color3 Lerp(const Color3& start, const Color3& end, float amount);
+
+  /**
+   * @brief Creates a new Color3 with values linearly interpolated of "amount"
+   * between the start Color3 and the end Color3.
+   * @param left defines the start value
+   * @param right defines the end value
+   * @param amount defines the gradient factor
+   * @param result defines the Color3 object where to store the result
+   */
+  static void LerpToRef(const Color3& left, const Color3& right, float amount,
+                        Color3& result);
 
   /**
    * @brief Returns a Color3 value containing a red color.

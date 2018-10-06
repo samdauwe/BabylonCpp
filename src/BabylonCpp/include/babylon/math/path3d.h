@@ -11,20 +11,22 @@
 namespace BABYLON {
 
 /**
- * @brief Represents an Path3D.
+ * @brief Represents a 3D path made up of multiple 3D points.
  */
 class BABYLON_SHARED_EXPORT Path3D {
 
 public:
   Path3D();
   /**
-   * @brief Creates a Path3D. A Path3D is a logical math object, so not a mesh.
-   * path : an array of Vector3, the curve axis of the Path3D
-   * normal (optional) : Vector3, the first wanted normal to the curve. Ex (0,
-   *                     1, 0) for a vertical normal.
-   * raw (optional, default false) : boolean, if true the returned Path3D isn't
-   *                                 normalized. Useful to depict path
-   *                                 acceleration or speed.
+   * @brief new Path3D(path, normal, raw)
+   * Creates a Path3D. A Path3D is a logical math object, so not a mesh.
+   * please read the description in the tutorial :
+   * http://doc.babylonjs.com/tutorials/How_to_use_Path3D
+   * @param path an array of Vector3, the curve axis of the Path3D
+   * @param normal (options) Vector3, the first wanted normal to the curve. Ex
+   * (0, 1, 0) for a vertical normal.
+   * @param raw (optional, default false) : boolean, if true the returned Path3D
+   * isn't normalized. Useful to depict path acceleration or speed.
    */
   Path3D(const std::vector<Vector3>& path,
          const std::optional<Vector3>& firstNormal = std::nullopt,
@@ -40,36 +42,47 @@ public:
 
   /**
    * @brief Returns the Path3D array of successive Vector3 designing its curve.
+   * @returns the Path3D array of successive Vector3 designing its curve.
    */
   std::vector<Vector3>& getCurve();
 
   /**
-   * Returns an array populated with tangent vectors on each Path3D curve point.
+   *@brief Returns an array populated with tangent vectors on each Path3D curve
+   *point.
+   * @returns an array populated with tangent vectors on each Path3D curve
+   *point.
    */
   std::vector<Vector3>& getTangents();
 
   /**
    * @brief Returns an array populated with normal vectors on each Path3D curve
    * point.
+   * @returns an array populated with normal vectors on each Path3D curve point.
    */
   std::vector<Vector3>& getNormals();
 
   /**
    * @brief Returns an array populated with binormal vectors on each Path3D
    * curve point.
+   * @returns an array populated with binormal vectors on each Path3D curve
+   * point.
    */
   std::vector<Vector3>& getBinormals();
 
   /**
    * @brief Returns an array populated with distances (float) of the i-th point
    * from the first curve point.
+   * @returns an array populated with distances (float) of the i-th point from
+   * the first curve point.
    */
   Float32Array& getDistances();
 
   /**
    * @brief Forces the Path3D tangent, normal, binormal and distance
    * recomputation.
-   * @returns The same object updated.
+   * @param path path which all values are copied into the curves points
+   * @param firstNormal which should be projected onto the curve
+   * @returns the same object updated.
    */
   Path3D& update(const std::vector<Vector3>& path,
                  const std::optional<Vector3>& firstNormal = std::nullopt);
@@ -101,6 +114,9 @@ private:
                         const std::optional<Vector3>& va);
 
 public:
+  /**
+   * an array of Vector3, the curve axis of the Path3D
+   */
   std::vector<Vector3> path;
 
 private:

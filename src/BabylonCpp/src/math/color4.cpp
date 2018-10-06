@@ -377,6 +377,11 @@ void Color4::LerpToRef(const Color4& left, const Color4& right, float amount,
   result.a = left.a + (right.a - left.a) * amount;
 }
 
+Color4 Color4::FromColor3(const Color3& color3, float alpha)
+{
+  return Color4(color3.r, color3.g, color3.b, alpha);
+}
+
 Color4 Color4::FromArray(const Float32Array& array, unsigned int offset)
 {
   return Color4(array[offset], array[offset + 1], array[offset + 2],

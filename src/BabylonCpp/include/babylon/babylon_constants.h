@@ -20,9 +20,18 @@ constexpr float SQRT2   = 1.41421356237309504880f;  // sqrt(2)
 constexpr float SQRT2_2 = 0.707106781186547524401f; // sqrt(2)/2
 
 // Used by Babylon Math
-constexpr float ToGammaSpace  = 1.f / 2.2f;
+/**
+ * Constant used to convert a value to gamma space
+ */
+constexpr float ToGammaSpace = 1.f / 2.2f;
+/**
+ * Constant used to convert a value to linear space
+ */
 constexpr float ToLinearSpace = 2.2f;
-constexpr float Epsilon       = 0.001f;
+/**
+ * Constant used to define the minimal number value in Babylon.js
+ */
+constexpr float Epsilon = 0.001f;
 
 } // end of namespace Math
 

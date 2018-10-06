@@ -319,6 +319,26 @@ public:
   Vector3& maximizeInPlace(const Vector3& other);
 
   /**
+   * @brief Updates the current Vector3 with the minimal coordinate values
+   * between its and the given coordinates.
+   * @param x defines the x coordinate of the operand
+   * @param y defines the y coordinate of the operand
+   * @param z defines the z coordinate of the operand
+   * @returns the current updated Vector3
+   */
+  Vector3& minimizeInPlaceFromFloats(float x, float y, float z);
+
+  /**
+   * @brief Updates the current Vector3 with the maximal coordinate values
+   * between its and the given coordinates.
+   * @param x defines the x coordinate of the operand
+   * @param y defines the y coordinate of the operand
+   * @param z defines the z coordinate of the operand
+   * @returns the current updated Vector3
+   */
+  Vector3& maximizeInPlaceFromFloats(float x, float y, float z);
+
+  /**
    * @brief Gets a boolean indicating that the vector is non uniform meaning x,
    * y or z are not all the same.
    */
@@ -506,6 +526,12 @@ public:
    * @returns a new forward Vector3
    */
   static Vector3 Forward();
+
+  /**
+   * @brief Returns a new Vector3 set to (0.0, 0.0, -1.0).
+   * @returns a new forward Vector3
+   */
+  static Vector3 Backward();
 
   /**
    * @brief Returns a new Vector3 set to (1.0, 0.0, 0.0).

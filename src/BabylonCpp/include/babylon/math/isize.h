@@ -7,6 +7,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Interface for the size containing width and height.
+ */
 struct BABYLON_SHARED_EXPORT ISize {
 
   ISize();
@@ -31,7 +34,14 @@ struct BABYLON_SHARED_EXPORT ISize {
   ISize operator/(float scale) const;
   ISize& operator/=(float scale);
 
+  /**
+   * Width
+   */
   int width;
+
+  /**
+   * Heighht
+   */
   int height;
 
 }; // end of struct ISize

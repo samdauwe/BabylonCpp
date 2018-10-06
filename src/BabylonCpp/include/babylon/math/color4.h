@@ -287,6 +287,14 @@ public:
                         Color4& result);
 
   /**
+   * @brief Creates a new Color4 from a Color3 and an alpha value.
+   * @param color3 defines the source Color3 to read from
+   * @param alpha defines the alpha component (1.0 by default)
+   * @returns a new Color4 object
+   */
+  static Color4 FromColor3(const Color3& color3, float alpha = 1.f);
+
+  /**
    * @brief Creates a new Color4 from the starting index element of the given
    * array.
    * @param array defines the source array to read from
