@@ -1,6 +1,10 @@
 #ifndef BABYLON_SAMPLES_SAMPLE_LAUNCHER_H
 #define BABYLON_SAMPLES_SAMPLE_LAUNCHER_H
 
+#if _WIN32
+#define NOMINMAX
+#endif
+
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/irenderable_scene.h>
 

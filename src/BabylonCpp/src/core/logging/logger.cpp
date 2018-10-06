@@ -38,10 +38,11 @@ Logger::Logger()
 
 Logger::~Logger()
 {
+  using namespace std::literals;
   // Cleanly shutting down log message handler
   auto bg_clear_listeners_call = [this] { _impl._logMessageListeners.clear(); };
   auto token_cleared = spawn_task(bg_clear_listeners_call, _impl._bg.get());
-  token_cleared.wait();
+  token_cleared.wait_for(1s);
   _impl._bg.reset(nullptr);
 }
 

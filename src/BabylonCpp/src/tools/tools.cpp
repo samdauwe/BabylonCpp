@@ -19,7 +19,6 @@
 #pragma GCC diagnostic pop
 #endif
 #if _WIN32
-// Macro NOMINMAX already defined then WinDefs.h
 #define NOMINMAX
 #endif
 
