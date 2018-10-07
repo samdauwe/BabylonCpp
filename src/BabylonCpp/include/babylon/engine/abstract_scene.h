@@ -35,6 +35,7 @@ class Light;
 class Material;
 class MorphTargetManager;
 class MultiMaterial;
+class Node;
 class Scene;
 class Skeleton;
 class Sound;
@@ -56,6 +57,7 @@ using LightPtr              = std::shared_ptr<Light>;
 using MaterialPtr           = std::shared_ptr<Material>;
 using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
 using MultiMaterialPtr      = std::shared_ptr<MultiMaterial>;
+using NodePtr               = std::shared_ptr<Node>;
 using SkeletonPtr           = std::shared_ptr<Skeleton>;
 using SoundPtr              = std::shared_ptr<Sound>;
 using TransformNodePtr      = std::shared_ptr<TransformNode>;
@@ -207,6 +209,11 @@ private:
 
 public:
   /**
+   * Gets the list of root nodes (ie. nodes with no parent)
+   */
+  std::vector<NodePtr> rootNodes;
+
+  /**
    * All of the cameras added to this scene
    * @see http://doc.babylonjs.com/babylon101/cameras
    */
@@ -279,11 +286,6 @@ public:
    * ActionManagers available on the scene.
    */
   std::vector<ActionManagerPtr> actionManagers;
-
-  /**
-   * Sounds to keep.
-   */
-  std::vector<SoundPtr> sounds;
 
   /**
    * Textures to keep.

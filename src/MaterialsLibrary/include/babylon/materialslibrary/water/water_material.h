@@ -67,6 +67,13 @@ protected:
   void set_bumpAffectsReflection(bool value);
   bool get_useLogarithmicDepth() const override;
   void set_useLogarithmicDepth(bool value) override;
+
+  /**
+   * @brief Gets a boolean indicating that current material needs to register
+   * RTT.
+   */
+  bool get_hasRenderTargetTextures() const;
+
   RenderTargetTexturePtr& get_refractionTexture();
   RenderTargetTexturePtr& get_reflectionTexture();
   bool get_renderTargetsEnabled() const;
@@ -138,6 +145,11 @@ public:
    * Defines the waves speed
    */
   float waveSpeed;
+
+  /**
+   * Gets a boolean indicating that current material needs to register RTT
+   */
+  ReadOnlyProperty<WaterMaterial, bool> hasRenderTargetTextures;
 
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> refractionTexture;
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> reflectionTexture;

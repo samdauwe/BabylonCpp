@@ -54,11 +54,6 @@ void AssetContainer::addAllToScene()
   for (const auto& o : actionManagers) {
     scene->addActionManager(o);
   }
-  for (const auto& o : sounds) {
-    o->play();
-    o->autoplay = true;
-    scene->mainSoundTrack()->AddSound(o);
-  };
   for (const auto& o : textures) {
     scene->addTexture(o);
   }
@@ -105,11 +100,6 @@ void AssetContainer::removeAllFromScene()
   }
   for (const auto& o : actionManagers) {
     scene->removeActionManager(o);
-  }
-  for (const auto& o : sounds) {
-    o->stop();
-    o->autoplay = false;
-    scene->mainSoundTrack()->RemoveSound(o);
   }
   for (const auto& o : textures) {
     scene->removeTexture(o);

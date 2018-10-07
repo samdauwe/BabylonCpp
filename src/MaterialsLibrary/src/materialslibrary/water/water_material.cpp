@@ -48,6 +48,7 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , colorBlendFactor2{0.2f}
     , waveLength{0.1f}
     , waveSpeed{1.f}
+    , hasRenderTargetTextures{this, &WaterMaterial::get_hasRenderTargetTextures}
     , refractionTexture{this, &WaterMaterial::get_refractionTexture}
     , reflectionTexture{this, &WaterMaterial::get_reflectionTexture}
     , renderTargetsEnabled{this, &WaterMaterial::get_renderTargetsEnabled}
@@ -166,6 +167,11 @@ void WaterMaterial::set_useLogarithmicDepth(bool value)
   _useLogarithmicDepth
     = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
   _markAllSubMeshesAsMiscDirty();
+}
+
+bool WaterMaterial::get_hasRenderTargetTextures() const
+{
+  return true;
 }
 
 RenderTargetTexturePtr& WaterMaterial::get_refractionTexture()
@@ -515,28 +521,18 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
   scene->customRenderTargets.emplace_back(_reflectionRTT.get());
 
   _refractionRTT->onBeforeRender
-    = [this, &scene](int* /*faceIndex*/, EventState& /*es*/) {
+    = [this](int* /*faceIndex*/, EventState& /*es*/) {
         if (_mesh) {
           _isVisible       = _mesh->isVisible;
           _mesh->isVisible = false;
         }
-        // Clip plane
-        _clipPlane = scene->clipPlane;
-
-        float positiony = _mesh ? _mesh->position().y : 0.f;
-        Vector3 normal(0.f, 1.f, 0.f);
-        scene->clipPlane = Plane::FromPositionAndNormal(
-          Vector3(0.f, positiony + 0.05f, 0.f), normal);
       };
 
   _refractionRTT->onAfterRender
-    = [this, &scene](int* /*faceIndex*/, EventState& /*es*/) {
+    = [this](int* /*faceIndex*/, EventState& /*es*/) {
         if (_mesh) {
           _mesh->isVisible = _isVisible;
         }
-
-        // Clip plane
-        scene->clipPlane = _clipPlane;
       };
 
   _reflectionRTT->onBeforeRender
