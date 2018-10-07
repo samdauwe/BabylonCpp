@@ -2639,12 +2639,24 @@ SamplingParameters Engine::_getSamplingParameters(unsigned int samplingMode,
 
 void Engine::_cascadeLoadImgs(
   const std::string& /*rootUrl*/, Scene* /*scene*/,
-  const std::function<void(const std::vector<Image>& imgages)>& /*onfinish*/,
-  const std::vector<std::string>& /*files*/,
+  const std::function<void(const std::vector<Image>& images)>& onfinish,
+  const std::vector<std::string>& files,
   const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/
-)
+                           const std::string& exception)>& onError)
 {
+  std::vector<Image> images;
+  for (size_t index = 0; index < 6; ++index) {
+    Tools::LoadImageFromUrl(
+      files[index], [&images](const Image& img) { images.emplace_back(img); },
+      onError, false);
+  }
+
+  if (images.size() == 6) {
+    onfinish(images);
+  }
+  else {
+    onError("Unable to cascade load images!", "");
+  }
 }
 
 std::unique_ptr<GL::IGLTexture> Engine::_createTexture()
@@ -2729,27 +2741,29 @@ InternalTexturePtr Engine::createTexture(
     _internalTexturesCache.emplace_back(texture);
   }
 
-  const auto _onerror = [&](const std::string& /*msg*/) {
-    if (scene) {
-      scene->_removePendingData(texture);
-    }
+  const auto _onerror
+    = [&](const std::string& /*msg*/, const std::string& /*exception*/) {
+        if (scene) {
+          scene->_removePendingData(texture);
+        }
 
-    if (onLoadObserver && !isKTX) {
-      // dont remove the observer if its a ktx file, since the fallback
-      // createTexture call will require it.
-      texture->onLoadedObservable.remove(onLoadObserver);
-    }
+        if (onLoadObserver && !isKTX) {
+          // dont remove the observer if its a ktx file, since the fallback
+          // createTexture call will require it.
+          texture->onLoadedObservable.remove(onLoadObserver);
+        }
 
-    // fallback for when compressed file not found to try again.  For instance,
-    // etc1 does not have an alpha capable type
-    if (isKTX) {
-      // createTexture(urlArg, noMipmap, invertY, scene, samplingMode, nullptr,
-      //              onError, buffer, texture);
-    }
-    else if (onError) {
-      onError();
-    }
-  };
+        // fallback for when compressed file not found to try again.  For
+        // instance, etc1 does not have an alpha capable type
+        if (isKTX) {
+          // createTexture(urlArg, noMipmap, invertY, scene, samplingMode,
+          // nullptr,
+          //              onError, buffer, texture);
+        }
+        else if (onError) {
+          onError();
+        }
+      };
 
 #if 0
   std::function<void(ArrayBufferView & arrayBuffer)> callback;
@@ -4017,7 +4031,7 @@ InternalTexturePtr Engine::createCubeTexture(
 
         _prepareWorkingCanvas();
 
-        if (!_workingCanvas || !_workingContext) {
+        if (!_workingCanvas /*|| !_workingContext*/) {
           return;
         }
         _workingCanvas->width  = width;
@@ -4033,10 +4047,16 @@ InternalTexturePtr Engine::createCubeTexture(
 
         auto internalFormat = format ? _getInternalFormat(format) : GL::RGBA;
         for (size_t index = 0; index < faces.size(); index++) {
+#if 0
           _workingContext->drawImage(imgs[index], 0, 0, imgs[index].width,
                                      imgs[index].height, 0, 0, width, height);
           _gl->texImage2D(faces[index], 0, internalFormat, internalFormat,
                           GL::UNSIGNED_BYTE, _workingCanvas);
+#else
+          _gl->texImage2D(faces[index], 0, static_cast<int>(internalFormat),
+                          imgs[index].width, imgs[index].height, 0, GL::RGBA,
+                          GL::UNSIGNED_BYTE, imgs[index].data);
+#endif
         }
 
         if (!noMipmap) {

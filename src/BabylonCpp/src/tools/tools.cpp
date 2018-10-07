@@ -339,7 +339,8 @@ std::string Tools::DecodeURIComponent(const std::string& s)
 
 void Tools::LoadImageFromUrl(
   std::string url, const std::function<void(const Image& img)>& onLoad,
-  const std::function<void(const std::string& msg)>& onError,
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError,
   bool flipVertically)
 {
   url = Tools::CleanUrl(url);
@@ -360,7 +361,7 @@ void Tools::LoadImageFromUrl(
                   });
 
     if (!data) {
-      onError("Error loading image from file " + url);
+      onError("Error loading image from file " + url, "");
       return;
     }
 
@@ -373,7 +374,7 @@ void Tools::LoadImageFromUrl(
 void Tools::LoadFile(
   std::string url,
   const std::function<void(const std::string& data,
-                             const std::string& responseURL)>& onSuccess,
+                           const std::string& responseURL)>& onSuccess,
   const std::function<void(const ProgressEvent& event)>& onProgress,
   bool useArrayBuffer,
   const std::function<void(const std::string& exception)>& onError)
@@ -400,7 +401,7 @@ void Tools::LoadFile(
 void Tools::ReadFile(
   std::string fileToLoad,
   const std::function<void(const std::string& data,
-                             const std::string& responseURL)>& callback,
+                           const std::string& responseURL)>& callback,
   const std::function<void(const ProgressEvent& event)>& onProgress,
   bool useArrayBuffer)
 {

@@ -2236,7 +2236,7 @@ private:
   void _activateCurrentTexture();
   void _cascadeLoadImgs(
     const std::string& rootUrl, Scene* scene,
-    const std::function<void(const std::vector<Image>& imgages)>& onfinish,
+    const std::function<void(const std::vector<Image>& images)>& onfinish,
     const std::vector<std::string>& files,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError

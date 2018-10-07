@@ -92,11 +92,11 @@ struct BABYLON_SHARED_EXPORT Tools {
   static std::string CleanUrl(std::string url);
   static std::string DecodeURIComponent(const std::string& s);
   static std::function<std::string(std::string url)> PreprocessUrl;
-  static void
-  LoadImageFromUrl(std::string url,
-                   const std::function<void(const Image& img)>& onLoad,
-                   const std::function<void(const std::string& msg)>& onError,
-                   bool flipVertically = true);
+  static void LoadImageFromUrl(
+    std::string url, const std::function<void(const Image& img)>& onLoad,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError,
+    bool flipVertically = true);
   static void LoadFile(
     std::string url,
     const std::function<void(const std::string& data,
