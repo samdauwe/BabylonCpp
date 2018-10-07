@@ -63,7 +63,7 @@ void EnvironmentScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto skyboxMaterial             = StandardMaterial::New("skyBox", scene);
   skyboxMaterial->backFaceCulling = false;
   skyboxMaterial->reflectionTexture
-    = CubeTexture::New("textures/skybox", scene);
+    = CubeTexture::New("textures/skybox/skybox", scene);
   skyboxMaterial->reflectionTexture()->coordinatesMode
     = TextureConstants::SKYBOX_MODE;
   skyboxMaterial->diffuseColor    = Color3(0.f, 0.f, 0.f);

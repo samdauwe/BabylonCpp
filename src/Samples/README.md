@@ -118,6 +118,7 @@
 ![waves_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/waves_scene.png?raw=true "Waves Scene")
 
 ## Special FX ##
+![environment_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/environment_scene.png?raw=true "Environment Scene")
 ![fog_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fog_scene.png?raw=true "Fog Scene")
 ![infinite_loader_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png?raw=true "Infinite Loader Scene")
 
