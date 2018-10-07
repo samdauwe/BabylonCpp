@@ -97,6 +97,10 @@ def main():
           "MaterialsLibrary": os.path.join(os.path.expanduser('~'), "Projects",
                                   "Babylon.js-%s" % BabylonJsVersions[version],
                                   "materialsLibrary", "src"),
+          "ProceduralTexturesLibrary": os.path.join(os.path.expanduser('~'),
+                                  "Projects",
+                                  "Babylon.js-%s" % BabylonJsVersions[version],
+                                  "proceduralTexturesLibrary", "src"),
         }
         BabylonJsVersions[version] = modules
     # Perform comparison
