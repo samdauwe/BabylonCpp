@@ -18,6 +18,7 @@
 ![light_projected_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/light_projected_texture_scene.png?raw=true "Light Projected Texture Scene")
 ![lights_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lights_scene.png?raw=true "Lights Scene")
 ![point_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/point_light_scene.png?raw=true "Point Light Scene")
+![simultaneous_lights_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simultaneous_lights_scene.png?raw=true "Simultaneous Lights Scene")
 ![spot_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/spot_light_scene.png?raw=true "Spot Light Scene")
 
 ## Loaders ##
