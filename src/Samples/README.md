@@ -124,6 +124,7 @@
 
 ## Textures ##
 ![bump_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bump_texture_scene.png?raw=true "Bump Texture Scene")
+![bump_texture_spheres_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bump_texture_spheres_scene.png?raw=true "Bump Texture Spheres Scene")
 
 ## Extensions ##
 
