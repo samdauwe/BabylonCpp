@@ -102,6 +102,7 @@
 ![merged_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/merged_meshes_scene.png?raw=true "Merged Meshes Scene")
 ![tiled_ground_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tiled_ground_scene.png?raw=true "Tiled Ground Scene")
 ![height_map_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/height_map_scene.png?raw=true "Height Map Scene")
+![colored_cube_faces_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/colored_cube_faces_scene.png?raw=true "Colored Cube Faces Scene")
 ![colored_triangle_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/colored_triangle_scene.png?raw=true "Colored Triangle Scene")
 ![tube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png?raw=true "Tube Scene")
 ![ribbon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ribbon_scene.png?raw=true "Ribbon Scene")
