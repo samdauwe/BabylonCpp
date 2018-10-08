@@ -7,8 +7,9 @@
 
 namespace BABYLON {
 
-SceneInstrumentation::SceneInstrumentation(Scene* scene)
-    : activeMeshesEvaluationTimeCounter{this,
+SceneInstrumentation::SceneInstrumentation(Scene* iScene)
+    : scene{iScene}
+    , activeMeshesEvaluationTimeCounter{this,
                                         &SceneInstrumentation::
                                           get_activeMeshesEvaluationTimeCounter}
     , captureActiveMeshesEvaluationTime{this,
@@ -66,7 +67,6 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
     , drawCallsCounter{this, &SceneInstrumentation::get_drawCallsCounter}
     , textureCollisionsCounter{this, &SceneInstrumentation::
                                        get_textureCollisionsCounter}
-    , _scene{scene}
     , _captureActiveMeshesEvaluationTime{false}
     , _captureRenderTargetsRenderTime{false}
     , _captureFrameTime{false}
@@ -127,8 +127,8 @@ SceneInstrumentation::SceneInstrumentation(Scene* scene)
         _animationsTime.beginMonitoring();
       }
 
-      _scene->getEngine()->_drawCalls.fetchNewFrame();
-      _scene->getEngine()->_textureCollisions.fetchNewFrame();
+      scene->getEngine()->_drawCalls.fetchNewFrame();
+      scene->getEngine()->_textureCollisions.fetchNewFrame();
     });
 
   // After render
@@ -173,25 +173,25 @@ void SceneInstrumentation::set_captureActiveMeshesEvaluationTime(bool value)
 
   if (value) {
     _onBeforeActiveMeshesEvaluationObserver
-      = _scene->onBeforeActiveMeshesEvaluationObservable.add(
+      = scene->onBeforeActiveMeshesEvaluationObservable.add(
         [this](Scene* /*scene*/, EventState& /*es*/) {
           Tools::StartPerformanceCounter("Active meshes evaluation");
           _activeMeshesEvaluationTime.beginMonitoring();
         });
 
     _onAfterActiveMeshesEvaluationObserver
-      = _scene->onAfterActiveMeshesEvaluationObservable.add(
+      = scene->onAfterActiveMeshesEvaluationObservable.add(
         [this](Scene* /*scene*/, EventState& /*es*/) {
           Tools::EndPerformanceCounter("Active meshes evaluation");
           _activeMeshesEvaluationTime.endMonitoring();
         });
   }
   else {
-    _scene->onBeforeActiveMeshesEvaluationObservable.remove(
+    scene->onBeforeActiveMeshesEvaluationObservable.remove(
       _onBeforeActiveMeshesEvaluationObserver);
     _onBeforeActiveMeshesEvaluationObserver = nullptr;
 
-    _scene->onAfterActiveMeshesEvaluationObservable.remove(
+    scene->onAfterActiveMeshesEvaluationObservable.remove(
       _onAfterActiveMeshesEvaluationObserver);
     _onAfterActiveMeshesEvaluationObserver = nullptr;
   }
@@ -217,25 +217,25 @@ void SceneInstrumentation::set_captureRenderTargetsRenderTime(bool value)
 
   if (value) {
     _onBeforeRenderTargetsRenderObserver
-      = _scene->onBeforeRenderTargetsRenderObservable.add(
+      = scene->onBeforeRenderTargetsRenderObservable.add(
         [this](Scene* /*scene*/, EventState& /*es*/) {
           Tools::StartPerformanceCounter("Render targets rendering");
           _renderTargetsRenderTime.beginMonitoring();
         });
 
     _onAfterRenderTargetsRenderObserver
-      = _scene->onAfterRenderTargetsRenderObservable.add(
+      = scene->onAfterRenderTargetsRenderObservable.add(
         [this](Scene* /*scene*/, EventState& /*es*/) {
           Tools::EndPerformanceCounter("Render targets rendering");
           _renderTargetsRenderTime.endMonitoring(false);
         });
   }
   else {
-    _scene->onBeforeRenderTargetsRenderObservable.remove(
+    scene->onBeforeRenderTargetsRenderObservable.remove(
       _onBeforeRenderTargetsRenderObserver);
     _onBeforeRenderTargetsRenderObserver = nullptr;
 
-    _scene->onAfterRenderTargetsRenderObservable.remove(
+    scene->onAfterRenderTargetsRenderObservable.remove(
       _onAfterRenderTargetsRenderObserver);
     _onAfterRenderTargetsRenderObserver = nullptr;
   }
@@ -261,25 +261,25 @@ void SceneInstrumentation::set_captureParticlesRenderTime(bool value)
 
   if (value) {
     _onBeforeParticlesRenderingObserver
-      = _scene->onBeforeParticlesRenderingObservable.add(
+      = scene->onBeforeParticlesRenderingObservable.add(
         [this](Scene* /*scene*/, EventState& /*es*/) {
           Tools::StartPerformanceCounter("Particles");
           _particlesRenderTime.beginMonitoring();
         });
 
     _onAfterParticlesRenderingObserver
-      = _scene->onAfterParticlesRenderingObservable.add(
+      = scene->onAfterParticlesRenderingObservable.add(
         [this](Scene* /*scene*/, EventState& /*es*/) {
           Tools::EndPerformanceCounter("Particles");
           _particlesRenderTime.endMonitoring(false);
         });
   }
   else {
-    _scene->onBeforeParticlesRenderingObservable.remove(
+    scene->onBeforeParticlesRenderingObservable.remove(
       _onBeforeParticlesRenderingObserver);
     _onBeforeParticlesRenderingObserver = nullptr;
 
-    _scene->onAfterParticlesRenderingObservable.remove(
+    scene->onAfterParticlesRenderingObservable.remove(
       _onAfterParticlesRenderingObserver);
     _onAfterParticlesRenderingObserver = nullptr;
   }
@@ -303,27 +303,31 @@ void SceneInstrumentation::set_captureSpritesRenderTime(bool value)
 
   _captureSpritesRenderTime = value;
 
+  if (scene->spriteManagers.empty()) {
+    return;
+  }
+
   if (value) {
     _onBeforeSpritesRenderingObserver
-      = _scene->onBeforeSpritesRenderingObservable.add(
+      = scene->onBeforeSpritesRenderingObservable.add(
         [this](Scene* /*scene*/, EventState& /*es*/) {
           Tools::StartPerformanceCounter("Sprites");
           _spritesRenderTime.beginMonitoring();
         });
 
     _onAfterSpritesRenderingObserver
-      = _scene->onAfterSpritesRenderingObservable.add(
+      = scene->onAfterSpritesRenderingObservable.add(
         [this](Scene* /*scene*/, EventState& /*es*/) {
           Tools::EndPerformanceCounter("Sprites");
           _spritesRenderTime.endMonitoring(false);
         });
   }
   else {
-    _scene->onBeforeSpritesRenderingObservable.remove(
+    scene->onBeforeSpritesRenderingObservable.remove(
       _onBeforeSpritesRenderingObserver);
     _onBeforeSpritesRenderingObserver = nullptr;
 
-    _scene->onAfterSpritesRenderingObservable.remove(
+    scene->onAfterSpritesRenderingObservable.remove(
       _onAfterSpritesRenderingObserver);
     _onAfterSpritesRenderingObserver = nullptr;
   }
@@ -348,23 +352,23 @@ void SceneInstrumentation::set_capturePhysicsTime(bool value)
   _capturePhysicsTime = value;
 
   if (value) {
-    _onBeforePhysicsObserver = _scene->onBeforePhysicsObservable.add(
+    _onBeforePhysicsObserver = scene->onBeforePhysicsObservable.add(
       [this](Scene* /*scene*/, EventState& /*es*/) {
         Tools::StartPerformanceCounter("Physics");
         _physicsTime.beginMonitoring();
       });
 
-    _onAfterPhysicsObserver = _scene->onAfterPhysicsObservable.add(
+    _onAfterPhysicsObserver = scene->onAfterPhysicsObservable.add(
       [this](Scene* /*scene*/, EventState& /*es*/) {
         Tools::EndPerformanceCounter("Physics");
         _physicsTime.endMonitoring();
       });
   }
   else {
-    _scene->onBeforePhysicsObservable.remove(_onBeforePhysicsObserver);
+    scene->onBeforePhysicsObservable.remove(_onBeforePhysicsObserver);
     _onBeforePhysicsObserver = nullptr;
 
-    _scene->onAfterPhysicsObservable.remove(_onAfterPhysicsObserver);
+    scene->onAfterPhysicsObservable.remove(_onAfterPhysicsObserver);
     _onAfterPhysicsObserver = nullptr;
   }
 }
@@ -388,13 +392,13 @@ void SceneInstrumentation::set_captureAnimationsTime(bool value)
   _captureAnimationsTime = value;
 
   if (value) {
-    _onAfterAnimationsObserver = _scene->onAfterAnimationsObservable.add(
+    _onAfterAnimationsObserver = scene->onAfterAnimationsObservable.add(
       [this](Scene* /*scene*/, EventState& /*es*/) {
         _animationsTime.endMonitoring();
       });
   }
   else {
-    _scene->onAfterAnimationsObservable.remove(_onAfterAnimationsObserver);
+    scene->onAfterAnimationsObservable.remove(_onAfterAnimationsObserver);
     _onAfterAnimationsObserver = nullptr;
   }
 }
@@ -448,22 +452,22 @@ void SceneInstrumentation::set_captureRenderTime(bool value)
   _captureRenderTime = value;
 
   if (value) {
-    _onBeforeDrawPhaseObserver = _scene->onBeforeDrawPhaseObservable.add(
+    _onBeforeDrawPhaseObserver = scene->onBeforeDrawPhaseObservable.add(
       [this](Scene* /*scene*/, EventState& /*es*/) {
         _renderTime.beginMonitoring();
         Tools::StartPerformanceCounter("Main render");
       });
 
-    _onAfterDrawPhaseObserver = _scene->onAfterDrawPhaseObservable.add(
+    _onAfterDrawPhaseObserver = scene->onAfterDrawPhaseObservable.add(
       [this](Scene* /*scene*/, EventState& /*es*/) {
         _renderTime.endMonitoring(false);
         Tools::EndPerformanceCounter("Main render");
       });
   }
   else {
-    _scene->onBeforeDrawPhaseObservable.remove(_onBeforeDrawPhaseObserver);
+    scene->onBeforeDrawPhaseObservable.remove(_onBeforeDrawPhaseObserver);
     _onBeforeDrawPhaseObserver = nullptr;
-    _scene->onAfterDrawPhaseObservable.remove(_onAfterDrawPhaseObserver);
+    scene->onAfterDrawPhaseObservable.remove(_onAfterDrawPhaseObserver);
     _onAfterDrawPhaseObserver = nullptr;
   }
 }
@@ -487,100 +491,99 @@ void SceneInstrumentation::set_captureCameraRenderTime(bool value)
   _captureCameraRenderTime = value;
 
   if (value) {
-    _onBeforeCameraRenderObserver = _scene->onBeforeCameraRenderObservable.add(
+    _onBeforeCameraRenderObserver = scene->onBeforeCameraRenderObservable.add(
       [this](Camera* camera, EventState& /*es*/) {
         _cameraRenderTime.beginMonitoring();
         Tools::StartPerformanceCounter("Rendering camera " + camera->name);
       });
 
-    _onAfterCameraRenderObserver = _scene->onAfterCameraRenderObservable.add(
+    _onAfterCameraRenderObserver = scene->onAfterCameraRenderObservable.add(
       [this](Camera* camera, EventState& /*es*/) {
         _cameraRenderTime.endMonitoring(false);
         Tools::EndPerformanceCounter("Rendering camera " + camera->name);
       });
   }
   else {
-    _scene->onBeforeCameraRenderObservable.remove(
-      _onBeforeCameraRenderObserver);
+    scene->onBeforeCameraRenderObservable.remove(_onBeforeCameraRenderObserver);
     _onBeforeCameraRenderObserver = nullptr;
-    _scene->onAfterCameraRenderObservable.remove(_onAfterCameraRenderObserver);
+    scene->onAfterCameraRenderObservable.remove(_onAfterCameraRenderObserver);
     _onAfterCameraRenderObserver = nullptr;
   }
 }
 
 PerfCounter& SceneInstrumentation::get_drawCallsCounter()
 {
-  return _scene->getEngine()->_drawCalls;
+  return scene->getEngine()->_drawCalls;
 }
 
 PerfCounter& SceneInstrumentation::get_textureCollisionsCounter()
 {
-  return _scene->getEngine()->_textureCollisions;
+  return scene->getEngine()->_textureCollisions;
 }
 
 void SceneInstrumentation::dispose(bool /*doNotRecurse*/,
                                    bool /*disposeMaterialAndTextures*/)
 {
-  _scene->onAfterRenderObservable.remove(_onAfterRenderObserver);
+  scene->onAfterRenderObservable.remove(_onAfterRenderObserver);
   _onAfterRenderObserver = nullptr;
 
-  _scene->onBeforeActiveMeshesEvaluationObservable.remove(
+  scene->onBeforeActiveMeshesEvaluationObservable.remove(
     _onBeforeActiveMeshesEvaluationObserver);
   _onBeforeActiveMeshesEvaluationObserver = nullptr;
 
-  _scene->onAfterActiveMeshesEvaluationObservable.remove(
+  scene->onAfterActiveMeshesEvaluationObservable.remove(
     _onAfterActiveMeshesEvaluationObserver);
   _onAfterActiveMeshesEvaluationObserver = nullptr;
 
-  _scene->onBeforeRenderTargetsRenderObservable.remove(
+  scene->onBeforeRenderTargetsRenderObservable.remove(
     _onBeforeRenderTargetsRenderObserver);
   _onBeforeRenderTargetsRenderObserver = nullptr;
 
-  _scene->onAfterRenderTargetsRenderObservable.remove(
+  scene->onAfterRenderTargetsRenderObservable.remove(
     _onAfterRenderTargetsRenderObserver);
   _onAfterRenderTargetsRenderObserver = nullptr;
 
-  _scene->onBeforeAnimationsObservable.remove(_onBeforeAnimationsObserver);
+  scene->onBeforeAnimationsObservable.remove(_onBeforeAnimationsObserver);
   _onBeforeAnimationsObserver = nullptr;
 
-  _scene->onBeforeParticlesRenderingObservable.remove(
+  scene->onBeforeParticlesRenderingObservable.remove(
     _onBeforeParticlesRenderingObserver);
   _onBeforeParticlesRenderingObserver = nullptr;
 
-  _scene->onAfterParticlesRenderingObservable.remove(
+  scene->onAfterParticlesRenderingObservable.remove(
     _onAfterParticlesRenderingObserver);
   _onAfterParticlesRenderingObserver = nullptr;
 
-  _scene->onBeforeSpritesRenderingObservable.remove(
+  scene->onBeforeSpritesRenderingObservable.remove(
     _onBeforeSpritesRenderingObserver);
   _onBeforeSpritesRenderingObserver = nullptr;
 
-  _scene->onAfterSpritesRenderingObservable.remove(
+  scene->onAfterSpritesRenderingObservable.remove(
     _onAfterSpritesRenderingObserver);
   _onAfterSpritesRenderingObserver = nullptr;
 
-  _scene->onBeforeDrawPhaseObservable.remove(_onBeforeDrawPhaseObserver);
+  scene->onBeforeDrawPhaseObservable.remove(_onBeforeDrawPhaseObserver);
   _onBeforeDrawPhaseObserver = nullptr;
 
-  _scene->onAfterDrawPhaseObservable.remove(_onAfterDrawPhaseObserver);
+  scene->onAfterDrawPhaseObservable.remove(_onAfterDrawPhaseObserver);
   _onAfterDrawPhaseObserver = nullptr;
 
-  _scene->onBeforePhysicsObservable.remove(_onBeforePhysicsObserver);
+  scene->onBeforePhysicsObservable.remove(_onBeforePhysicsObserver);
   _onBeforePhysicsObserver = nullptr;
 
-  _scene->onAfterPhysicsObservable.remove(_onAfterPhysicsObserver);
+  scene->onAfterPhysicsObservable.remove(_onAfterPhysicsObserver);
   _onAfterPhysicsObserver = nullptr;
 
-  _scene->onAfterAnimationsObservable.remove(_onAfterAnimationsObserver);
+  scene->onAfterAnimationsObservable.remove(_onAfterAnimationsObserver);
   _onAfterAnimationsObserver = nullptr;
 
-  _scene->onBeforeCameraRenderObservable.remove(_onBeforeCameraRenderObserver);
+  scene->onBeforeCameraRenderObservable.remove(_onBeforeCameraRenderObserver);
   _onBeforeCameraRenderObserver = nullptr;
 
-  _scene->onAfterCameraRenderObservable.remove(_onAfterCameraRenderObserver);
+  scene->onAfterCameraRenderObservable.remove(_onAfterCameraRenderObserver);
   _onAfterCameraRenderObserver = nullptr;
 
-  _scene = nullptr;
+  scene = nullptr;
 }
 
 } // end of namespace BABYLON

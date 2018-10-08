@@ -14,13 +14,25 @@ class Engine;
 /**
  * @brief This class can be used to get instrumentation data from a Babylon
  * engine.
+ * @see
+ * http://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
  */
 class BABYLON_SHARED_EXPORT EngineInstrumentation : public IDisposable {
 
 public:
+  /**
+   * @brief Instantiates a new engine instrumentation.
+   * This class can be used to get instrumentation data from a Babylon engine
+   * @see
+   * http://doc.babylonjs.com/how_to/optimizing_your_scene#engineinstrumentation
+   * @param engine Defines the engine to instrument
+   */
   EngineInstrumentation(Engine* engine);
   virtual ~EngineInstrumentation();
 
+  /**
+   * @brief Dispose and release associated resources.
+   */
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 
@@ -80,6 +92,9 @@ public:
   Property<EngineInstrumentation, bool> captureShaderCompilationTime;
 
 private:
+  /**
+   * Define the instrumented engine.
+   */
   Engine* _engine;
 
   bool _captureGPUFrameTime = false;

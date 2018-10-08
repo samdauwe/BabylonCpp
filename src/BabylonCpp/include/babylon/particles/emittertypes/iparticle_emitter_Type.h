@@ -64,19 +64,19 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
   virtual std::unique_ptr<IParticleEmitterType> clone() const = 0;
 
   /**
-   * @brief Called by the {BABYLON.GPUParticleSystem} to setup the update shader
+   * @brief Called by the GPUParticleSystem to setup the update shader.
    * @param effect defines the update shader
    */
   virtual void applyToShader(Effect* effect) = 0;
 
   /**
-   * @brief Returns a string to use to update the GPU particles update shader
+   * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containng the defines string
    */
   virtual const char* getEffectDefines() const = 0;
 
   /**
-   * @brief Returns the string "SphereDirectedParticleEmitter"
+   * @brief Returns the string "SphereDirectedParticleEmitter".
    * @returns a string containing the class name
    */
   virtual const char* getClassName() const = 0;
@@ -88,7 +88,7 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
   virtual Json::object serialize() const = 0;
 
   /**
-   * @brief Parse properties from a JSON object
+   * @brief Parse properties from a JSON object.
    * @param serializationObject defines the JSON object
    */
   virtual void parse(const Json::value& serializationObject) = 0;

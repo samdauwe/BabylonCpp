@@ -14,13 +14,25 @@ class Scene;
 /**
  * @brief This class can be used to get instrumentation data from a Babylon
  * engine.
+ * @see
+ * http://doc.babylonjs.com/how_to/optimizing_your_scene#sceneinstrumentation
  */
 class BABYLON_SHARED_EXPORT SceneInstrumentation : public IDisposable {
 
 public:
+  /**
+   * @brief Instantiates a new scene instrumentation.
+   * This class can be used to get instrumentation data from a Babylon engine
+   * @see
+   * http://doc.babylonjs.com/how_to/optimizing_your_scene#sceneinstrumentation
+   * @param scene Defines the scene to instrument
+   */
   SceneInstrumentation(Scene* scene);
   virtual ~SceneInstrumentation();
 
+  /**
+   * @brief Dispose and release associated resources.
+   */
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 
@@ -188,6 +200,12 @@ protected:
 
 public:
   // Properties
+
+  /**
+   * Defines the scene to instrument
+   */
+  Scene* scene;
+
   /**
    * Perf counter used for active meshes evaluation time.
    */
@@ -302,8 +320,6 @@ public:
   ReadOnlyProperty<SceneInstrumentation, PerfCounter> textureCollisionsCounter;
 
 private:
-  Scene* _scene;
-
   bool _captureActiveMeshesEvaluationTime;
   PerfCounter _activeMeshesEvaluationTime;
 

@@ -76,6 +76,7 @@ using ISceneSerializableComponentPtr
 using NodePtr                = std::shared_ptr<Node>;
 using MeshPtr                = std::shared_ptr<Mesh>;
 using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
+using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
 using SpriteManagerPtr       = std::shared_ptr<SpriteManager>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
@@ -2729,7 +2730,7 @@ public:
    * The list of reflection probes added to the scene
    * @see http://doc.babylonjs.com/how_to/how_to_use_reflection_probes
    */
-  std::vector<std::unique_ptr<ReflectionProbe>> reflectionProbes;
+  std::vector<ReflectionProbePtr> reflectionProbes;
 
   // Database
 

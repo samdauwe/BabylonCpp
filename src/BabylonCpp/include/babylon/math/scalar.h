@@ -9,6 +9,10 @@
 #include <babylon/core/string.h>
 
 namespace BABYLON {
+
+/**
+ * @brief Scalar computation library.
+ */
 namespace Scalar {
 
 /**
@@ -21,7 +25,12 @@ constexpr float TwoPi()
 }
 
 /**
- * @brief Returns if the absolute difference between a and b is lower than
+ * @brief Boolean : true if the absolute difference between a and b is lower
+ * than epsilon (default = 1.401298E-45).
+ * @param a number
+ * @param b number
+ * @param epsilon (default = 1.401298E-45)
+ * @returns true if the absolute difference between a and b is lower than
  * epsilon (default = 1.401298E-45)
  */
 template <typename T>
@@ -31,7 +40,10 @@ constexpr bool WithinEpsilon(T a, T b, T epsilon = 1.401298E-45f)
 }
 
 /**
- * @brief Returns the upper case translation of the number i to hexadecimal.
+ * @brief Returns a string : the upper case translation of the number i to
+ * hexadecimal.
+ * @param i number
+ * @returns the upper case translation of the number i to hexadecimal.
  */
 inline std::string ToHex(int i)
 {
@@ -42,7 +54,8 @@ inline std::string ToHex(int i)
 
 /**
  * @brief Returns -1 if value is negative and +1 is value is positive.
- * Returns the 0 if it's equal to zero.
+ * @param value the value
+ * @returns the value itself if it's equal to zero.
  */
 template <typename T>
 constexpr int Sign(T x)
@@ -52,7 +65,8 @@ constexpr int Sign(T x)
 
 /**
  * @brief Returns -1 if value is negative and +1 is value is positive.
- * Returns the 0 if it's equal to zero.
+ * @param value the value
+ * @returns the value itself if it's equal to zero.
  */
 template <typename T>
 constexpr float Signf(T x)
@@ -72,7 +86,13 @@ constexpr T Clamp(T value, T min, T max)
 }
 
 /**
- * @brief Returns the value itself if it's between 0 and 1.
+ * @brief Returns the value itself if it's between min and max.
+ * Returns min if the value is lower than min.
+ * Returns max if the value is greater than max.
+ * @param value the value to clmap
+ * @param min the min value to clamp to (default: 0)
+ * @param max the max value to clamp to (default: 1)
+ * @returns the clamped value
  */
 template <typename T>
 constexpr T Clamp(T value)
@@ -82,6 +102,8 @@ constexpr T Clamp(T value)
 
 /**
  * @brief Returns the log2 of value.
+ * @param value the value to compute log2 of
+ * @returns the log2 of value.
  */
 template <typename T>
 constexpr T Log2(T value)
@@ -106,11 +128,13 @@ constexpr int IMul(int a, int b)
  * smaller than 0.
  *
  * This is similar to the modulo operator but it works with floating point
- * numbers.
- * For example, using 3.0 for t and 2.5 for length, the result would be 0.5.
- * With t = 5 and length = 2.5, the result would be 0.0.
- * Note, however, that the behaviour is not defined for negative numbers as it
- * is for the modulo operator
+ * numbers. For example, using 3.0 for t and 2.5 for length, the result would be
+ * 0.5. With t = 5 and length = 2.5, the result would be 0.0. Note, however,
+ * that the behaviour is not defined for negative numbers as it is for the
+ * modulo operator
+ * @param value the value
+ * @param length the length
+ * @returns the looped value
  */
 inline float Repeat(float value, float length)
 {
@@ -118,7 +142,11 @@ inline float Repeat(float value, float length)
 }
 
 /**
- * @brief Normalize the value between 0.0 and 1.0 using min and max values
+ * @brief Normalize the value between 0.0 and 1.0 using min and max values.
+ * @param value value to normalize
+ * @param min max to normalize between
+ * @param max min to normalize between
+ * @returns the normalized value
  */
 constexpr float Normalize(float value, float min, float max)
 {
@@ -126,7 +154,11 @@ constexpr float Normalize(float value, float min, float max)
 }
 
 /**
- * @brief Denormalize the value from 0.0 and 1.0 using min and max values
+ * @brief Denormalize the value from 0.0 and 1.0 using min and max values.
+ * @param normalized value to denormalize
+ * @param min max to denormalize between
+ * @param max min to denormalize between
+ * @returns the denormalized value
  */
 constexpr float Denormalize(float normalized, float min, float max)
 {
@@ -136,6 +168,9 @@ constexpr float Denormalize(float normalized, float min, float max)
 /**
  * @brief Calculates the shortest difference between two given angles given in
  * degrees.
+ * @param current current angle in degrees
+ * @param target target angle in degrees
+ * @returns the delta
  */
 inline float DeltaAngle(float current, float target)
 {
@@ -149,8 +184,9 @@ inline float DeltaAngle(float current, float target)
 /**
  * @brief PingPongs the value t, so that it is never larger than length and
  * never smaller than 0.
- *
- * The returned value will move back and forth between 0 and length
+ * @param tx value
+ * @param length length
+ * @returns The returned value will move back and forth between 0 and length
  */
 inline float PingPong(float tx, float length)
 {
@@ -162,9 +198,13 @@ inline float PingPong(float tx, float length)
  * @brief Interpolates between min and max with smoothing at the limits.
  *
  * This function interpolates between min and max in a similar way to Lerp.
- * However, the interpolation will gradually speed up
- * from the start and slow down toward the end. This is useful for creating
- * natural-looking animation, fading and other transitions.
+ * However, the interpolation will gradually speed up from the start and slow
+ * down toward the end. This is useful for creating natural-looking animation,
+ * fading and other transitions.
+ * @param from from
+ * @param to to
+ * @param tx value
+ * @returns the smooth stepped value
  */
 constexpr float SmoothStep(float from, float to, float tx)
 {
@@ -177,8 +217,12 @@ constexpr float SmoothStep(float from, float to, float tx)
  * @brief Moves a value current towards target.
  *
  * This is essentially the same as Mathf.Lerp but instead the function will
- * ensure that the speed never exceeds maxDelta.
- * Negative values of maxDelta pushes the value away from target.
+ * ensure that the speed never exceeds maxDelta. Negative values of maxDelta
+ * pushes the value away from target.
+ * @param current current value
+ * @param target target value
+ * @param maxDelta max distance to move
+ * @returns resulting value
  */
 inline float MoveTowards(float current, float target, float maxDelta)
 {
@@ -197,9 +241,13 @@ inline float MoveTowards(float current, float target, float maxDelta)
  * when they wrap around 360 degrees.
  *
  * Variables current and target are assumed to be in degrees. For optimization
- * reasons, negative values of maxDelta
- *  are not supported and may cause oscillation. To push current away from a
- * target angle, add 180 to that angle instead.
+ * reasons, negative values of maxDelta are not supported and may cause
+ * oscillation. To push current away from a target angle, add 180 to that angle
+ * instead.
+ * @param current current value
+ * @param target target value
+ * @param maxDelta max distance to move
+ * @returns resulting angle
  */
 inline float MoveTowardsAngle(float current, float target, float maxDelta)
 {
@@ -218,6 +266,10 @@ inline float MoveTowardsAngle(float current, float target, float maxDelta)
 /**
  * @brief Creates a new scalar with values linearly interpolated of "amount"
  * between the start scalar and the end scalar.
+ * @param start start value
+ * @param end target value
+ * @param amount amount to lerp between
+ * @returns the lerped value
  */
 template <typename T>
 constexpr T Lerp(T start, T end, T amount)
@@ -227,7 +279,12 @@ constexpr T Lerp(T start, T end, T amount)
 
 /**
  * @brief Same as Lerp but makes sure the values interpolate correctly when they
- * wrap around 360 degrees.
+ * wrap around 360 degrees. The parameter t is clamped to the range [0, 1].
+ * Variables a and b are assumed to be in degrees.
+ * @param start start value
+ * @param end target value
+ * @param amount amount to lerp between
+ * @returns the lerped value
  */
 inline float LerpAngle(float start, float end, float amount)
 {
@@ -241,6 +298,10 @@ inline float LerpAngle(float start, float end, float amount)
 /**
  * @brief Calculates the linear parameter t that produces the interpolant value
  * within the range [a, b].
+ * @param a start value
+ * @param b target value
+ * @param value value between a and b
+ * @returns the inverseLerp value
  */
 constexpr float InverseLerp(float a, float b, float value)
 {
@@ -257,6 +318,13 @@ constexpr float InverseLerp(float a, float b, float value)
 /**
  * @brief Returns a new scalar located for "amount" (float) on the Hermite
  * spline defined by the scalars "value1", "value3", "tangent1", "tangent2".
+ * @see http://mathworld.wolfram.com/HermitePolynomial.html
+ * @param value1 spline value
+ * @param tangent1 spline value
+ * @param value2 spline value
+ * @param tangent2 spline value
+ * @param amount input value
+ * @returns hermite result
  */
 constexpr float Hermite(float value1, float tangent1, float value2,
                         float tangent2, float amount)
@@ -273,7 +341,10 @@ constexpr float Hermite(float value1, float tangent1, float value2,
 }
 
 /**
- * @brief Returns a random float number between and min and max values
+ * @brief Returns a random float number between and min and max values.
+ * @param min min value of random
+ * @param max max value of random
+ * @returns random value
  */
 inline float RandomRange(float min, float max)
 {
@@ -288,6 +359,10 @@ inline float RandomRange(float min, float max)
  *
  * RangeToPercent(40,20,60) will return 0.5 (50%)
  * RangeToPercent(34,0,100) will return 0.34 (34%)
+ * @param number to convert to percentage
+ * @param min min range
+ * @param max max range
+ * @returns the percentage
  */
 constexpr float RangeToPercent(float number, float min, float max)
 {
@@ -299,6 +374,10 @@ constexpr float RangeToPercent(float number, float min, float max)
  * given range.
  *
  * PercentToRange(0.34,0,100) will return 34.
+ * @param percent to convert to number
+ * @param min min range
+ * @param max max range
+ * @returns the number
  */
 constexpr float PercentToRange(float percent, float min, float max)
 {

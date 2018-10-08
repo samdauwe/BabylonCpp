@@ -15,6 +15,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -240,7 +241,7 @@ bool LensFlareSystem::render()
     away = borderLimitf;
   }
 
-  auto intensity = 1.f - (away / borderLimitf);
+  auto intensity = 1.f - Scalar::Clamp(away / borderLimitf, 0.f, 1.f);
   if (intensity < 0.f) {
     return false;
   }
@@ -340,8 +341,8 @@ void LensFlareSystem::dispose()
 
   // Remove from scene
   _scene->lensFlareSystems.erase(std::remove(_scene->lensFlareSystems.begin(),
-                                               _scene->lensFlareSystems.end(),
-                                               shared_from_this()),
+                                             _scene->lensFlareSystems.end(),
+                                             shared_from_this()),
                                  _scene->lensFlareSystems.end());
 }
 

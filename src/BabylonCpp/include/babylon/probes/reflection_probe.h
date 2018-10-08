@@ -10,9 +10,11 @@ namespace BABYLON {
 
 class AbstractMesh;
 struct ISize;
+class ReflectionProbe;
 class RenderTargetTexture;
 class Scene;
 using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
+using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
@@ -23,17 +25,17 @@ class BABYLON_SHARED_EXPORT ReflectionProbe {
 
 public:
   template <typename... Ts>
-  static ReflectionProbe* New(Ts&&... args)
+  static ReflectionProbePtr New(Ts&&... args)
   {
-    auto reflectionProbe = new ReflectionProbe(std::forward<Ts>(args)...);
-    reflectionProbe->addToScene(
-      static_cast<std::unique_ptr<ReflectionProbe>>(reflectionProbe));
+    auto reflectionProbe = std::shared_ptr<ReflectionProbe>(
+      new ReflectionProbe(std::forward<Ts>(args)...));
+    reflectionProbe->addToScene(reflectionProbe);
 
     return reflectionProbe;
   }
   virtual ~ReflectionProbe();
 
-  void addToScene(std::unique_ptr<ReflectionProbe>&& newReflectionProbe);
+  void addToScene(const ReflectionProbePtr& newReflectionProbe);
 
   /**
    * @brief Gets the hosting scene.

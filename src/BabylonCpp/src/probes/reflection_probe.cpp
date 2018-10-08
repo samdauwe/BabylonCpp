@@ -85,10 +85,9 @@ ReflectionProbe::~ReflectionProbe()
 {
 }
 
-void ReflectionProbe::addToScene(
-  std::unique_ptr<ReflectionProbe>&& newReflectionProbe)
+void ReflectionProbe::addToScene(const ReflectionProbePtr& newReflectionProbe)
 {
-  _scene->reflectionProbes.emplace_back(std::move(newReflectionProbe));
+  _scene->reflectionProbes.emplace_back(newReflectionProbe);
 }
 
 unsigned int ReflectionProbe::get_samples() const
@@ -142,11 +141,11 @@ void ReflectionProbe::dispose()
 {
   // Remove from the scene if found
   _scene->reflectionProbes.erase(
-    std::remove_if(
-      _scene->reflectionProbes.begin(), _scene->reflectionProbes.end(),
-      [this](const std::unique_ptr<ReflectionProbe>& reflectionProbe) {
-        return reflectionProbe.get() == this;
-      }),
+    std::remove_if(_scene->reflectionProbes.begin(),
+                   _scene->reflectionProbes.end(),
+                   [this](const ReflectionProbePtr& reflectionProbe) {
+                     return reflectionProbe.get() == this;
+                   }),
     _scene->reflectionProbes.end());
 
   if (_renderTargetTexture) {
