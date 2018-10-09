@@ -7,16 +7,35 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Base class of pointer info types.
+ */
 class BABYLON_SHARED_EXPORT PointerInfoBase {
 
 public:
+  /**
+   * @brief Instantiates the base class of pointers info.
+   * @param type Defines the type of event (BABYLON.PointerEventTypes)
+   * @param event Defines the related dom event
+   */
   PointerInfoBase(PointerEventTypes type, const PointerEvent& event);
   PointerInfoBase(PointerEventTypes type, const MouseWheelEvent& event);
   ~PointerInfoBase();
 
 public:
+  /**
+   * Defines the type of event (BABYLON.PointerEventTypes)
+   */
   PointerEventTypes type;
+
+  /**
+   * Defines the related pointer event
+   */
   PointerEvent pointerEvent;
+
+  /**
+   * Defines the related mouse event
+   */
   MouseWheelEvent mouseWheelEvent;
 
 }; // end of class PointerInfoBase

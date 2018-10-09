@@ -16,11 +16,21 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT KeyboardInfoPre : public KeyboardInfo {
 
 public:
+  /**
+   * @brief Instantiates a new keyboard pre info.
+   * This class is used to store keyboard related info for the
+   * onPreKeyboardObservable event.
+   * @param type Defines the type of event (BABYLON.KeyboardEventTypes)
+   * @param event Defines the related dom event
+   */
   KeyboardInfoPre(unsigned int type, const KeyboardEvent& event);
   ~KeyboardInfoPre();
 
 public:
-  Vector2 localPosition;
+  /**
+   * Defines whether the engine should skip the next onKeyboardObservable
+   * associated to this pre.
+   */
   bool skipOnPointerObservable;
 
 }; // end of class KeyboardInfoPre

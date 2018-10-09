@@ -18,6 +18,16 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PointerInfoPre : public PointerInfoBase {
 
 public:
+  /**
+   * @brief Instantiates a PointerInfoPre to store pointer related info to the
+   * onPrePointerObservable event.
+   * @param type Defines the type of event (BABYLON.PointerEventTypes)
+   * @param event Defines the related dom event
+   * @param localX Defines the local x coordinates of the pointer when the event
+   * occured
+   * @param localY Defines the local y coordinates of the pointer when the event
+   * occured
+   */
   PointerInfoPre(PointerEventTypes type, const PointerEvent& event,
                  float localX, float localY);
   PointerInfoPre(PointerEventTypes type, const MouseWheelEvent& event,
@@ -25,13 +35,21 @@ public:
   ~PointerInfoPre();
 
 public:
-  Vector2 localPosition;
-  bool skipOnPointerObservable;
-
   /**
    * Ray from a pointer if available (eg. 6dof controller)
    */
   std::optional<Ray> ray;
+
+  /**
+   * Defines the local position of the pointer on the canvas.
+   */
+  Vector2 localPosition;
+
+  /**
+   * Defines whether the engine should skip the next OnPointerObservable
+   * associated to this pre.
+   */
+  bool skipOnPointerObservable;
 
 }; // end of class PointerInfoPre
 

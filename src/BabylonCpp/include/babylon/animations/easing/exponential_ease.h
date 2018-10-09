@@ -11,6 +11,11 @@ namespace BABYLON {
 class ExponentialEase;
 using ExponentialEasePtr = std::shared_ptr<ExponentialEase>;
 
+/**
+ * @brief Easing function with an exponential shape (see link below).
+ * @see https://easings.net/#easeInExpo
+ * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ */
 class BABYLON_SHARED_EXPORT ExponentialEase : public EasingFunction {
 
 public:
@@ -22,12 +27,23 @@ public:
   }
   ~ExponentialEase() override;
 
+  /**
+   * @brief Hidden
+   */
   float easeInCore(float gradient) const override;
 
 protected:
+  /**
+   * @brief Instantiates an exponential easing function.
+   * @see https://easings.net/#easeInExpo
+   * @param exponent Defines the exponent of the function
+   */
   ExponentialEase(int exponent = 2);
 
 public:
+  /**
+   * Defines the exponent of the function
+   */
   float exponent;
 
 }; // end of class ExponentialEase

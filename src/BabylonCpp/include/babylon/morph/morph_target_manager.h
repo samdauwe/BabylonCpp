@@ -155,7 +155,8 @@ public:
 
 private:
   std::vector<MorphTargetPtr> _targets;
-  std::vector<Observer<bool>::Ptr> _targetObservable;
+  std::vector<Observer<bool>::Ptr> _targetInfluenceChangedObservers;
+  std::vector<Observer<void>::Ptr> _targetDataLayoutChangedObservers;
   std::vector<MorphTarget*> _activeTargets;
   Scene* _scene;
   Float32Array _influences;

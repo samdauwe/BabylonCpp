@@ -11,6 +11,11 @@ namespace BABYLON {
 class CircleEase;
 using CircleEasePtr = std::shared_ptr<CircleEase>;
 
+/**
+ * @brief Easing function with a circle shape (see link below).
+ * @see https://easings.net/#easeInCirc
+ * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ */
 class BABYLON_SHARED_EXPORT CircleEase : public EasingFunction {
 
 public:
@@ -22,6 +27,9 @@ public:
   }
   ~CircleEase() override;
 
+  /**
+   * @brief Hidden
+   */
   float easeInCore(float gradient) const override;
 
 protected:

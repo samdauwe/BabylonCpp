@@ -18,6 +18,13 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PointerInfo : public PointerInfoBase {
 
 public:
+  /**
+   * @brief Instantiates a PointerInfo to store pointer related info to the
+   * onPointerObservable event.
+   * @param type Defines the type of event (BABYLON.PointerEventTypes)
+   * @param event Defines the related dom event
+   * @param pickInfo Defines the picking info associated to the info (if any)\
+   */
   PointerInfo(PointerEventTypes type, const PointerEvent& event,
               const PickingInfo& pickInfo);
   PointerInfo(PointerEventTypes type, const MouseWheelEvent& event,
@@ -25,6 +32,9 @@ public:
   ~PointerInfo();
 
 public:
+  /**
+   * Defines the picking info associated to the info (if any)
+   */
   PickingInfo pickInfo;
 
 }; // end of class PointerInfo

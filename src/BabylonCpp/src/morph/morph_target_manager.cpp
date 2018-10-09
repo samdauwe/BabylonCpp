@@ -96,22 +96,30 @@ MorphTarget* MorphTargetManager::getTarget(std::size_t index)
 void MorphTargetManager::addTarget(std::unique_ptr<MorphTarget>&& target)
 {
   _targets.emplace_back(std::move(target));
-  _targetObservable.emplace_back(_targets.back()->onInfluenceChanged.add(
-    [this](bool needUpdate, EventState&) { _syncActiveTargets(needUpdate); }));
+  _targetInfluenceChangedObservers.emplace_back(
+    _targets.back()->onInfluenceChanged.add(
+      [this](bool needUpdate, EventState&) {
+        _syncActiveTargets(needUpdate);
+      }));
+  _targetDataLayoutChangedObservers.emplace_back(
+    _targets.back()->_onDataLayoutChanged.add(
+      [this](void*, EventState&) { _syncActiveTargets(true); }));
   _syncActiveTargets(true);
 }
 
 void MorphTargetManager::removeTarget(MorphTarget* target)
 {
   auto it = std::find_if(_targets.begin(), _targets.end(),
-                           [target](const MorphTargetPtr& morphTarget) {
-                             return target == morphTarget.get();
-                           });
+                         [target](const MorphTargetPtr& morphTarget) {
+                           return target == morphTarget.get();
+                         });
   if (it != _targets.end()) {
     _targets.erase(it);
 
     size_t index = static_cast<size_t>(it - _targets.begin());
-    target->onInfluenceChanged.remove(_targetObservable[index]);
+    target->onInfluenceChanged.remove(_targetInfluenceChangedObservers[index]);
+    target->_onDataLayoutChanged.remove(
+      _targetDataLayoutChangedObservers[index]);
     _syncActiveTargets(true);
   }
 }
@@ -132,15 +140,19 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
   _vertexCount      = 0;
 
   for (auto& target : _targets) {
+    if (target->influence == 0.f) {
+      continue;
+    }
+
     _activeTargets.emplace_back(target.get());
     _tempInfluences.emplace_back(target->influence());
     ++influenceCount;
 
+    _supportsNormals  = _supportsNormals && target->hasNormals();
+    _supportsTangents = _supportsTangents && target->hasTangents();
+
     auto& positions = target->getPositions();
     if (!positions.empty()) {
-      _supportsNormals  = _supportsNormals && target->hasNormals();
-      _supportsTangents = _supportsTangents && target->hasTangents();
-
       const auto vertexCount = positions.size() / 3;
       if (_vertexCount == 0) {
         _vertexCount = vertexCount;

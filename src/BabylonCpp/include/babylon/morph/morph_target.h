@@ -175,6 +175,11 @@ public:
   Observable<bool> onInfluenceChanged;
 
   /**
+   * Hidden
+   */
+  Observable<void> _onDataLayoutChanged;
+
+  /**
    * Influence of this target (ie. its weight in the overall morphing).
    */
   Property<MorphTarget, float> influence;

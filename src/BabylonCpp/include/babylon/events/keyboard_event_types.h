@@ -5,9 +5,18 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Gather the list of keyboard event types as constants.
+ */
 struct BABYLON_SHARED_EXPORT KeyboardEventTypes {
+  /**
+   * The keydown event is fired when a key becomes active (pressed).
+   */
   static constexpr unsigned int KEYDOWN = 0x01;
-  static constexpr unsigned int KEYUP   = 0x02;
+  /**
+   * The keyup event is fired when a key has been released.
+   */
+  static constexpr unsigned int KEYUP = 0x02;
 }; // end of struct KeyboardEventTypes
 
 } // end of namespace BABYLON

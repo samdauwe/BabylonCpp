@@ -10,7 +10,8 @@
 
 namespace BABYLON {
 
-MorphTarget::MorphTarget(const std::string& name, float iInfluence, Scene* scene)
+MorphTarget::MorphTarget(const std::string& name, float iInfluence,
+                         Scene* scene)
     : influence{this, &MorphTarget::get_influence, &MorphTarget::set_influence}
     , animationPropertiesOverride{this,
                                   &MorphTarget::get_animationPropertiesOverride,
@@ -85,7 +86,13 @@ bool MorphTarget::get_hasTangents() const
 
 void MorphTarget::setPositions(const Float32Array& data)
 {
+  const auto hadPositions = hasPositions();
+
   _positions = data;
+
+  if (hadPositions != hasPositions) {
+    _onDataLayoutChanged.notifyObservers();
+  }
 }
 
 Float32Array& MorphTarget::getPositions()
@@ -95,7 +102,13 @@ Float32Array& MorphTarget::getPositions()
 
 void MorphTarget::setNormals(const Float32Array& data)
 {
+  const auto hadNormals = hasNormals();
+
   _normals = data;
+
+  if (hadNormals != hasNormals) {
+    _onDataLayoutChanged.notifyObservers();
+  }
 }
 
 const Float32Array& MorphTarget::getPositions() const
@@ -115,7 +128,13 @@ const Float32Array& MorphTarget::getNormals() const
 
 void MorphTarget::setTangents(const Float32Array& data)
 {
+  const auto hadTangents = hasTangents();
+
   _tangents = data;
+
+  if (hadTangents != hasTangents) {
+    _onDataLayoutChanged.notifyObservers();
+  }
 }
 
 Float32Array& MorphTarget::getTangents()
@@ -161,8 +180,8 @@ MorphTarget::Parse(const Json::value& serializationObject)
   return result;
 }
 
-std::unique_ptr<MorphTarget> MorphTarget::FromMesh(AbstractMesh* mesh,
-                                                std::string name, float influence)
+std::unique_ptr<MorphTarget>
+MorphTarget::FromMesh(AbstractMesh* mesh, std::string name, float influence)
 {
   if (name.empty()) {
     name = mesh->name;

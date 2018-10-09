@@ -6,9 +6,9 @@ PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
                                const PointerEvent& event, float localX,
                                float localY)
     : PointerInfoBase(_type, event)
+    , ray{std::nullopt}
     , localPosition{Vector2(localX, localY)}
     , skipOnPointerObservable{false}
-    , ray{std::nullopt}
 {
 }
 
@@ -16,9 +16,9 @@ PointerInfoPre::PointerInfoPre(PointerEventTypes _type,
                                const MouseWheelEvent& event, float localX,
                                float localY)
     : PointerInfoBase(_type, event)
+    , ray{std::nullopt}
     , localPosition{Vector2(localX, localY)}
     , skipOnPointerObservable{false}
-    , ray{std::nullopt}
 {
 }
 

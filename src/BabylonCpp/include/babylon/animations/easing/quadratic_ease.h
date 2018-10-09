@@ -11,6 +11,11 @@ namespace BABYLON {
 class QuadraticEase;
 using QuadraticEasePtr = std::shared_ptr<QuadraticEase>;
 
+/**
+ * @brief Easing function with a power of 2 shape (see link below).
+ * @see https://easings.net/#easeInQuad
+ * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ */
 class BABYLON_SHARED_EXPORT QuadraticEase : public EasingFunction {
 
 public:
@@ -22,6 +27,9 @@ public:
   }
   ~QuadraticEase() override;
 
+  /**
+   * @brief Hidden
+   */
   float easeInCore(float gradient) const override;
 
 protected:

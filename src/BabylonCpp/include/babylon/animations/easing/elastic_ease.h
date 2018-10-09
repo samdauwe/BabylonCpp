@@ -11,6 +11,11 @@ namespace BABYLON {
 class ElasticEase;
 using ElasticEasePtr = std::shared_ptr<ElasticEase>;
 
+/**
+ * @brief Easing function with an elastic shape (see link below).
+ * @see https://easings.net/#easeInElastic
+ * @see http://doc.babylonjs.com/babylon101/animations#easing-functions
+ */
 class BABYLON_SHARED_EXPORT ElasticEase : public EasingFunction {
 
 public:
@@ -22,13 +27,29 @@ public:
   }
   ~ElasticEase() override;
 
+  /**
+   * @brief Hidden
+   */
   float easeInCore(float gradient) const override;
 
 protected:
+  /**
+   * @brief Instantiates an elastic easing function.
+   * @see https://easings.net/#easeInElastic
+   * @param oscillations Defines the number of oscillations
+   * @param springiness Defines the amplitude of the oscillations
+   */
   ElasticEase(int oscillations = 3, int springiness = 3);
 
 public:
+  /**
+   * Defines the number of oscillations
+   */
   float oscillations;
+
+  /**
+   * Defines the amplitude of the oscillations
+   */
   float springiness;
 
 }; // end of class ElasticEase
