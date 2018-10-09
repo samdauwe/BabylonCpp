@@ -49,3 +49,9 @@ set(IMGUI_INCLUDE_DIRS
 set(IMGUI_SOURCE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui
     CACHE INTERNAL "Source directories of imgui")
+
+# json.hpp (JSON for Modern C++)
+include_directories("json.hpp")
+set(JSON_HPP_INCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}/json.hpp
+    CACHE INTERNAL "Include directories of json.hpp")

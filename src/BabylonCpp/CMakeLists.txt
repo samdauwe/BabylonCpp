@@ -379,6 +379,7 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${EARCUT_HPP_INCLUDE_DIRS}
+    ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../OimoCpp/include
     PUBLIC
     INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
