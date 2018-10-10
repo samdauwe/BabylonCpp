@@ -27,6 +27,7 @@
 ## Materials ##
 ![materials_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/materials_scene.png?raw=true "Materials Scene")
 ![multi_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/multi_material_scene.png?raw=true "Multi Material Scene")
+![glossiness_and_roughness_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/glossiness_and_roughness_scene.png?raw=true "Glossiness and roughness scene")
 ![fresnel_parameters_torus_knot_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_parameters_torus_knot_scene.png?raw=true "Fresnel Parameters TorusKnot Scene")
 ![x_ray_material_with_fresnel_skull_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/x_ray_material_with_fresnel_skull_scene.png?raw=true "X-ray Material with Fresnel Skull Scene")
 
