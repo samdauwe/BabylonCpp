@@ -9,6 +9,7 @@
 #include <babylon/engine/scene_component_constants.h>
 #include <babylon/lensflare/lens_flare.h>
 #include <babylon/lensflare/lens_flare_system_scene_component.h>
+#include <babylon/lights/ishadow_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -22,7 +23,8 @@
 
 namespace BABYLON {
 
-LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
+LensFlareSystem::LensFlareSystem(const std::string iName,
+                                 const LensFlareEmitterType& emitter,
                                  Scene* scene)
     : name{iName}
     , borderLimit{300}
@@ -44,7 +46,6 @@ LensFlareSystem::LensFlareSystem(const std::string iName, Mesh* emitter,
 
   _emitter = emitter;
   id       = iName;
-  scene->lensFlareSystems.emplace_back(shared_from_this());
 
   meshesSelectionPredicate = [this](const AbstractMeshPtr& m) {
     return _scene->activeCamera && m->material() && m->isVisible
@@ -90,6 +91,11 @@ LensFlareSystem::~LensFlareSystem()
 {
 }
 
+void LensFlareSystem::addToScene(const LensFlareSystemPtr& lensFlareSystem)
+{
+  _scene->lensFlareSystems.emplace_back(lensFlareSystem);
+}
+
 bool LensFlareSystem::get_isEnabled() const
 {
   return _isEnabled;
@@ -105,19 +111,27 @@ Scene* LensFlareSystem::getScene()
   return _scene;
 }
 
-Mesh* LensFlareSystem::getEmitter()
+LensFlareSystem::LensFlareEmitterType& LensFlareSystem::getEmitter()
 {
   return _emitter;
 }
 
-void LensFlareSystem::setEmitter(Mesh* newEmitter)
+void LensFlareSystem::setEmitter(const LensFlareEmitterType& newEmitter)
 {
   _emitter = newEmitter;
 }
 
 Vector3 LensFlareSystem::getEmitterPosition()
 {
-  return _emitter->position();
+  if (std::holds_alternative<CameraPtr>(_emitter)) {
+    return std::get<CameraPtr>(_emitter)->position;
+  }
+  else if (std::holds_alternative<IShadowLightPtr>(_emitter)) {
+    return std::get<IShadowLightPtr>(_emitter)->getAbsolutePosition();
+  }
+  else {
+    return std::get<MeshPtr>(_emitter)->getAbsolutePosition();
+  }
 }
 
 bool LensFlareSystem::computeEffectivePosition(Viewport& globalViewport)
@@ -283,8 +297,8 @@ bool LensFlareSystem::render()
   for (auto& flare : lensFlares) {
     engine->setAlphaMode(flare->alphaMode);
 
-    auto x = centerX - (distX * flare->position.x);
-    auto y = centerY - (distY * flare->position.y);
+    auto x = centerX - (distX * flare->position);
+    auto y = centerY - (distY * flare->position);
 
     auto cw = flare->size;
     auto ch = flare->size * engine->getAspectRatio(*_scene->activeCamera);
@@ -292,10 +306,10 @@ bool LensFlareSystem::render()
     auto cy
       = 1.f - 2.f * (y / (globalViewport_height + globalViewport_y * 2.f));
 
-    auto viewportMatrix = Matrix::FromValues(cw / 2, 0, 0, 0, //
-                                             0, ch / 2, 0, 0, //
-                                             0, 0, 1, 0,      //
-                                             cx, cy, 0, 1     //
+    auto viewportMatrix = Matrix::FromValues(cw / 2.f, 0.f, 0.f, 0.f, //
+                                             0.f, ch / 2.f, 0.f, 0.f, //
+                                             0.f, 0.f, 1.f, 0.f,      //
+                                             cx, cy, 0.f, 1.f         //
     );
 
     _effect->setMatrix("viewportMatrix", viewportMatrix);
@@ -340,10 +354,13 @@ void LensFlareSystem::dispose()
   lensFlares.clear();
 
   // Remove from scene
-  _scene->lensFlareSystems.erase(std::remove(_scene->lensFlareSystems.begin(),
-                                             _scene->lensFlareSystems.end(),
-                                             shared_from_this()),
-                                 _scene->lensFlareSystems.end());
+  _scene->lensFlareSystems.erase(
+    std::remove_if(_scene->lensFlareSystems.begin(),
+                   _scene->lensFlareSystems.end(),
+                   [this](const LensFlareSystemPtr& fensFlareSystem) {
+                     return fensFlareSystem.get() == this;
+                   }),
+    _scene->lensFlareSystems.end());
 }
 
 LensFlareSystemPtr

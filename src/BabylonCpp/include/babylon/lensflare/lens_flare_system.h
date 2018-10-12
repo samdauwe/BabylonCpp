@@ -4,6 +4,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -17,17 +18,26 @@ typedef std::map<std::string, value> object;
 namespace BABYLON {
 
 class AbstractMesh;
+class Camera;
 class Effect;
+class IShadowLight;
 class LensFlare;
 class LensFlareSystem;
+class Light;
 class Mesh;
 class Scene;
+class TransformNode;
 class Vector3;
 class VertexBuffer;
 class Viewport;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using CameraPtr          = std::shared_ptr<Camera>;
+using IShadowLightPtr    = std::shared_ptr<IShadowLight>;
 using LensFlarePtr       = std::shared_ptr<LensFlare>;
 using LensFlareSystemPtr = std::shared_ptr<LensFlareSystem>;
-using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using LightPtr           = std::shared_ptr<Light>;
+using MeshPtr            = std::shared_ptr<Mesh>;
+using TransformNodePtr   = std::shared_ptr<TransformNode>;
 
 namespace Json {
 typedef picojson::value value;
@@ -45,17 +55,24 @@ class IGLBuffer;
  * `BABYLON.lensFlare`.
  * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
  */
-class BABYLON_SHARED_EXPORT LensFlareSystem
-    : public std::enable_shared_from_this<LensFlareSystem> {
+class BABYLON_SHARED_EXPORT LensFlareSystem {
+
+  using LensFlareEmitterType
+    = std::variant<CameraPtr, IShadowLightPtr, MeshPtr>;
 
 public:
   template <typename... Ts>
   static LensFlareSystemPtr New(Ts&&... args)
   {
-    return std::shared_ptr<LensFlareSystem>(
+    auto lensFlareSystem = std::shared_ptr<LensFlareSystem>(
       new LensFlareSystem(std::forward<Ts>(args)...));
+    lensFlareSystem->addToScene(lensFlareSystem);
+
+    return lensFlareSystem;
   }
   virtual ~LensFlareSystem();
+
+  void addToScene(const LensFlareSystemPtr& lensFlareSystem);
 
   /**
    * @brief Get the scene the effects belongs to.
@@ -69,7 +86,7 @@ public:
    * mesh).
    * @returns the emitter of the lens flare system
    */
-  Mesh* getEmitter();
+  LensFlareEmitterType& getEmitter();
 
   /**
    * @brief Set the emitter of the lens flare system.
@@ -77,7 +94,7 @@ public:
    * mesh).
    * @param newEmitter Define the new emitter of the system
    */
-  void setEmitter(Mesh* newEmitter);
+  void setEmitter(const LensFlareEmitterType& newEmitter);
 
   /**
    * @brief Get the lens flare system emitter position.
@@ -138,7 +155,8 @@ protected:
    * be a camera, a light or a mesh).
    * @param scene Define the scene the lens flare system belongs to
    */
-  LensFlareSystem(const std::string name, Mesh* emitter, Scene* scene);
+  LensFlareSystem(const std::string name, const LensFlareEmitterType& emitter,
+                  Scene* scene);
 
 private:
   bool get_isEnabled() const;
@@ -190,7 +208,7 @@ public:
 
 private:
   Scene* _scene;
-  Mesh* _emitter;
+  LensFlareEmitterType _emitter;
   // Float32Array _vertexDeclaration;
   // int _vertexStrideSize;
   std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;

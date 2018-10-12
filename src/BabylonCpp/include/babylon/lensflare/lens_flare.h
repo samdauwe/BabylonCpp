@@ -10,8 +10,9 @@ namespace BABYLON {
 class LensFlare;
 class LensFlareSystem;
 class Texture;
-using LensFlarePtr = std::shared_ptr<LensFlare>;
-using TexturePtr   = std::shared_ptr<Texture>;
+using LensFlarePtr       = std::shared_ptr<LensFlare>;
+using LensFlareSystemPtr = std::shared_ptr<LensFlareSystem>;
+using TexturePtr         = std::shared_ptr<Texture>;
 
 /**
  * @brief This represents one of the lens effect in a `BABYLON.lensFlareSystem`.
@@ -53,9 +54,9 @@ public:
    * @param system Define the `lensFlareSystem` this flare is part of
    * @returns The newly created Lens Flare
    */
-  static LensFlarePtr AddFlare(float size, const Vector3& position,
-                               const Color3& color, const std::string& imgUrl,
-                               LensFlareSystem* system);
+  static LensFlarePtr AddFlare(float size, float position, const Color3& color,
+                               const std::string& imgUrl,
+                               const LensFlareSystemPtr& system);
 
   /**
    * @brief Dispose and release the lens flare with its associated resources.
@@ -78,24 +79,12 @@ protected:
    * @param imgUrl Define the lens texture url
    * @param system Define the `lensFlareSystem` this flare is part of
    */
-  LensFlare(float size, const Vector3& position,
-            const Color3& color       = Color3(1.f, 1.f, 1.f),
-            const std::string& imgUrl = "", LensFlareSystem* system = nullptr);
+  LensFlare(float size, float position,
+            const Color3& color              = Color3(1.f, 1.f, 1.f),
+            const std::string& imgUrl        = "",
+            const LensFlareSystemPtr& system = nullptr);
 
 public:
-  /**
-   * Define the size of the lens flare in the system (a floating value between 0
-   * and 1)
-   */
-  float size;
-
-  /**
-   * Define the position of the lens flare in the system. (a floating value
-   * between -1 and 1). A value of 0 is located on the emitter. A value greater
-   * than 0 is beyond the emitter and a value lesser than 0 is behind.
-   */
-  Vector3 position;
-
   /**
    * Define the lens color.
    */
@@ -111,8 +100,21 @@ public:
    */
   unsigned int alphaMode;
 
+  /**
+   * Define the size of the lens flare in the system (a floating value between 0
+   * and 1)
+   */
+  float size;
+
+  /**
+   * Define the position of the lens flare in the system. (a floating value
+   * between -1 and 1). A value of 0 is located on the emitter. A value greater
+   * than 0 is beyond the emitter and a value lesser than 0 is behind.
+   */
+  float position;
+
 private:
-  LensFlareSystem* _system;
+  LensFlareSystemPtr _system;
 
 }; // end of class LensFlare
 
