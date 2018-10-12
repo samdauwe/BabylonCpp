@@ -5,6 +5,7 @@
 #include <babylon/samples/specialfx/fog_scene.h>
 #include <babylon/samples/specialfx/fresnel_scene.h>
 #include <babylon/samples/specialfx/infinite_loader_scene.h>
+#include <babylon/samples/specialfx/lens_flares_scene.h>
 #include <babylon/samples/specialfx/sprites_scene.h>
 #include <babylon/samples/specialfx/waves_scene.h>
 
@@ -45,6 +46,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
     [](ICanvas* iCanvas) {                                   //
       return std::make_unique<InfiniteLoaderScene>(iCanvas); //
     });                                                      //
+  // Lens Flares Scene
+  _samples["LensFlaresScene"]
+    = std::make_tuple(true,                                                //
+                      [](ICanvas* iCanvas) {                               //
+                        return std::make_unique<LensFlaresScene>(iCanvas); //
+                      });                                                  //
   // Sprites Scene
   _samples["SpritesScene"]
     = std::make_tuple(false,                                            //

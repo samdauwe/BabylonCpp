@@ -125,6 +125,7 @@
 ![fog_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fog_scene.png?raw=true "Fog Scene")
 ![fresnel_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_scene.png?raw=true "Fresnel Scene")
 ![infinite_loader_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png?raw=true "Infinite Loader Scene")
+![lens_flares_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lens_flares_scene.png?raw=true "Lens Flares Scene")
 
 ## Textures ##
 ![bump_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bump_texture_scene.png?raw=true "Bump Texture Scene")
