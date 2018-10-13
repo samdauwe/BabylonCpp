@@ -215,9 +215,9 @@ bool Ray::intersectsSphere(const BoundingSphere& sphere) const
   return temp <= rr;
 }
 
-std::unique_ptr<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
-                                                       const Vector3& vertex1,
-                                                       const Vector3& vertex2)
+std::optional<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0,
+                                                        const Vector3& vertex1,
+                                                        const Vector3& vertex2)
 {
   if (!_vectorsSet) {
     _vectorsSet = true;
@@ -234,7 +234,7 @@ std::unique_ptr<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0
   float det = Vector3::Dot(_edge1, _pvec);
 
   if (stl_util::almost_equal(det, 0.f)) {
-    return nullptr;
+    return std::nullopt;
   }
 
   float invdet = 1.f / det;
@@ -244,7 +244,7 @@ std::unique_ptr<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0
   float bu = Vector3::Dot(_tvec, _pvec) * invdet;
 
   if (bu < 0.f || bu > 1.f) {
-    return nullptr;
+    return std::nullopt;
   }
 
   Vector3::CrossToRef(_tvec, _edge1, _qvec);
@@ -252,16 +252,16 @@ std::unique_ptr<IntersectionInfo> Ray::intersectsTriangle(const Vector3& vertex0
   float bv = Vector3::Dot(direction, _qvec) * invdet;
 
   if (bv < 0.f || bu + bv > 1.f) {
-    return nullptr;
+    return std::nullopt;
   }
 
   // check if the distance is longer than the predefined length.
   float distance = Vector3::Dot(_edge2, _qvec) * invdet;
   if (distance > length) {
-    return nullptr;
+    return std::nullopt;
   }
 
-  return std::make_unique<IntersectionInfo>(bu, bv, distance);
+  return IntersectionInfo(bu, bv, distance);
 }
 
 std::optional<float> Ray::intersectsPlane(const Plane& plane)
@@ -303,9 +303,9 @@ PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
   return mesh->intersects(*_tmpRay, fastCheck);
 }
 
-std::vector<PickingInfo> Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes,
-                                            bool fastCheck,
-                                            std::vector<PickingInfo>& results)
+std::vector<PickingInfo>
+Ray::intersectsMeshes(std::vector<AbstractMesh*>& meshes, bool fastCheck,
+                      std::vector<PickingInfo>& results)
 {
   for (auto& mesh : meshes) {
     auto pickInfo = intersectsMesh(mesh, fastCheck);
@@ -454,7 +454,7 @@ Ray Ray::CreateNewFromTo(const Vector3& origin, const Vector3& end,
   auto direction = end.subtract(origin);
   float length
     = std::sqrt((direction.x * direction.x) + (direction.y * direction.y)
-                  + (direction.z * direction.z));
+                + (direction.z * direction.z));
   direction.normalize();
 
   return Ray::Transform(Ray(origin, direction, length), world);

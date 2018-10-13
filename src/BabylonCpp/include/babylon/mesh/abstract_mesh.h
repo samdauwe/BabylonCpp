@@ -397,9 +397,8 @@ public:
    * @returns the new bounding vectors
    */
   MinMax getHierarchyBoundingVectors(
-    bool includeDescendants = true,
-    const std::function<bool(AbstractMesh* abstractMesh)>& predicate
-    = nullptr);
+    bool includeDescendants                                          = true,
+    const std::function<bool(AbstractMesh* abstractMesh)>& predicate = nullptr);
 
   /**
    * @brief Hidden
@@ -573,7 +572,7 @@ public:
    * @returns the picking info
    * @see http://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
    */
-  virtual PickingInfo intersects(const Ray& ray, bool fastCheck = true);
+  virtual PickingInfo intersects(Ray& ray, bool fastCheck = true);
 
   /**
    * @brief Clones the current mesh.
@@ -1064,6 +1063,12 @@ protected:
   void set_collisionGroup(int mask);
 
   /**
+   * @brief Hidden
+   * @return
+   */
+  virtual std::vector<Vector3>& get__positions();
+
+  /**
    * @brief Sets a skeleton to apply skining transformations.
    * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
    */
@@ -1547,6 +1552,14 @@ public:
 
   /** Hidden */
   std::optional<bool> _waitingFreezeWorldMatrix;
+
+  /** Hidden */
+  std::vector<Vector3> _emptyPositions;
+
+  /**
+   * Cache
+   */
+  ReadOnlyProperty<AbstractMesh, std::vector<Vector3>> _positions;
 
   // Skeleton
 

@@ -1379,13 +1379,13 @@ public:
    * @brief Force the value of meshUnderPointer.
    * @param mesh defines the mesh to use
    */
-  void setPointerOverMesh(const AbstractMeshPtr& mesh);
+  void setPointerOverMesh(AbstractMesh* mesh);
 
   /**
    * @brief Gets the mesh under the pointer.
    * @returns a Mesh or null if no mesh is under the pointer
    */
-  AbstractMeshPtr& getPointerOverMesh();
+  AbstractMesh* getPointerOverMesh();
 
   /**
    * @brief Force the sprite under the pointer.
@@ -1971,7 +1971,7 @@ protected:
   /**
    * @brief Gets the mesh that is currently under the pointer.
    */
-  AbstractMeshPtr& get_meshUnderPointer();
+  AbstractMesh*& get_meshUnderPointer();
 
   /**
    * @brief Gets the current on-screen X position of the pointer.
@@ -2886,7 +2886,7 @@ public:
   /**
    * Gets the mesh that is currently under the pointer
    */
-  ReadOnlyProperty<Scene, AbstractMeshPtr> meshUnderPointer;
+  ReadOnlyProperty<Scene, AbstractMesh*> meshUnderPointer;
 
   /**
    * Gets the current on-screen X position of the pointer
@@ -3197,14 +3197,14 @@ private:
   std::array<Plane, 6> _frustumPlanes;
   Octree<AbstractMesh*>* _selectionOctree;
   Vector2 _unTranslatedPointer;
-  AbstractMeshPtr _pointerOverMesh;
+  AbstractMesh* _pointerOverMesh;
   Sprite* _pointerOverSprite;
   std::unique_ptr<DebugLayer> _debugLayer;
   std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>
     _depthRenderer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
-  AbstractMeshPtr _pickedDownMesh;
-  AbstractMeshPtr _pickedUpMesh;
+  AbstractMesh* _pickedDownMesh;
+  AbstractMesh* _pickedUpMesh;
   Sprite* _pickedDownSprite;
   std::string _uid;
 

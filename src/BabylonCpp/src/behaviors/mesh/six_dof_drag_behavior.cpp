@@ -60,8 +60,8 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
     = AbstractMesh::New("", SixDofDragBehavior::_virtualScene.get());
   _virtualDragMesh->rotationQuaternion = Quaternion();
 
-  const auto pickPredicate = [this](const AbstractMeshPtr& m) {
-    return _ownerNode == m || m->isDescendantOf(_ownerNode.get());
+  const auto pickPredicate = [this](AbstractMesh* m) {
+    return _ownerNode.get() == m || m->isDescendantOf(_ownerNode.get());
   };
 
   ICanvas* attachedElement = nullptr;

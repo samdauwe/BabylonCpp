@@ -107,8 +107,7 @@ MaterialPtr SubMesh::getMaterial()
   }
   else if (rootMaterial
            && (rootMaterial->type() == IReflect::Type::MULTIMATERIAL)) {
-    auto multiMaterial
-      = std::static_pointer_cast<MultiMaterial>(rootMaterial);
+    auto multiMaterial = std::static_pointer_cast<MultiMaterial>(rootMaterial);
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
     if (_currentMaterial != effectiveMaterial) {
       _currentMaterial = effectiveMaterial;
@@ -238,16 +237,16 @@ bool SubMesh::canIntersects(const Ray& ray) const
   return ray.intersectsBox(boundingInfo.boundingBox);
 }
 
-std::unique_ptr<IntersectionInfo>
+std::optional<IntersectionInfo>
 SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
                     const Uint32Array& indices, bool fastCheck)
 {
 
-  std::unique_ptr<IntersectionInfo> intersectInfo = nullptr;
+  std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
   const auto material = getMaterial();
   if (!material) {
-    return nullptr;
+    return std::nullopt;
   }
 
   switch (material->fillMode()) {
@@ -257,7 +256,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
     case Material::LineStripDrawMode():
     case Material::TriangleFanDrawMode():
     case Material::TriangleStripDrawMode():
-      return nullptr;
+      return std::nullopt;
   }
 
   // LineMesh first as it's also a Mesh...
@@ -278,7 +277,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
       }
 
       if (fastCheck || !intersectInfo || length < intersectInfo->distance) {
-        intersectInfo = std::make_unique<IntersectionInfo>(length);
+        intersectInfo = IntersectionInfo(length);
 
         if (fastCheck) {
           break;
@@ -303,7 +302,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
 
         if (fastCheck || !intersectInfo
             || currentIntersectInfo->distance < intersectInfo->distance) {
-          intersectInfo         = std::move(currentIntersectInfo);
+          intersectInfo         = currentIntersectInfo;
           intersectInfo->faceId = index / 3;
 
           if (fastCheck) {
@@ -357,9 +356,9 @@ void SubMesh::dispose()
   // Remove from mesh
   _mesh->subMeshes.erase(
     std::remove_if(_mesh->subMeshes.begin(), _mesh->subMeshes.end(),
-                     [this](const std::shared_ptr<SubMesh>& subMesh) {
-                       return subMesh.get() == this;
-                     }),
+                   [this](const std::shared_ptr<SubMesh>& subMesh) {
+                     return subMesh.get() == this;
+                   }),
     _mesh->subMeshes.end());
 }
 

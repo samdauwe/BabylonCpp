@@ -99,8 +99,8 @@ void PointerDragBehavior::attach(const NodePtr& ownerNode)
   // State of the drag
   Vector3 lastPosition{0.f, 0.f, 0.f};
 
-  const auto& pickPredicate = [this](const AbstractMeshPtr& m) -> bool {
-    return _attachedNode == m || m->isDescendantOf(_attachedNode.get());
+  const auto& pickPredicate = [this](AbstractMesh* m) -> bool {
+    return _attachedNode.get() == m || m->isDescendantOf(_attachedNode.get());
   };
 
   _pointerObserver = _scene->onPointerObservable.add(
@@ -289,8 +289,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
   }
 
   // Calculate angle between plane normal and ray
-  auto angle
-    = std::acos(Vector3::Dot(_dragPlane->forward(), (*ray).direction));
+  auto angle = std::acos(Vector3::Dot(_dragPlane->forward(), (*ray).direction));
   // Correct if ray is casted from oposite side
   if (angle > Math::PI_2) {
     angle = Math::PI - angle;

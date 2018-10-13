@@ -36,7 +36,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
+  void _attachedMeshChanged(AbstractMesh* value) override;
 
 public:
   /**

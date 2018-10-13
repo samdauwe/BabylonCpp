@@ -1470,7 +1470,10 @@ protected:
    */
   bool get_areNormalsFrozen() const;
 
-  std::vector<Vector3>& get__positions();
+  /**
+   * @brief Hidden
+   */
+  std::vector<Vector3>& get__positions() override;
 
 private:
   void _sortLODLevels();
@@ -1552,11 +1555,6 @@ public:
    */
   ReadOnlyProperty<Mesh, bool> areNormalsFrozen;
 
-  /**
-   * Cache
-   */
-  ReadOnlyProperty<Mesh, std::vector<Vector3>> _positions;
-
 private:
   // Events
   Observable<Mesh> _onBeforeRenderObservable;
@@ -1565,7 +1563,6 @@ private:
   // Members
   Observer<Mesh>::Ptr _onBeforeDrawObserver;
   std::vector<std::unique_ptr<MeshLODLevel>> _LODLevels;
-  std::vector<Vector3> _emptyPositions;
   // Morph
   MorphTargetManagerPtr _morphTargetManager;
   std::vector<VertexBuffer*> _delayInfo;

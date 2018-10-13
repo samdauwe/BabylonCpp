@@ -65,7 +65,6 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , hasLODLevels{this, &Mesh::get_hasLODLevels}
     , geometry{this, &Mesh::get_geometry}
     , areNormalsFrozen{this, &Mesh::get_areNormalsFrozen}
-    , _positions{this, &Mesh::get__positions}
     , _onBeforeDrawObserver{nullptr}
     , _morphTargetManager{nullptr}
     , _batchCache{std::make_unique<_InstancesBatch>()}

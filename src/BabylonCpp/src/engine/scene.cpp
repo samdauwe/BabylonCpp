@@ -765,7 +765,7 @@ Octree<AbstractMesh*>*& Scene::get_selectionOctree()
   return _selectionOctree;
 }
 
-AbstractMeshPtr& Scene::get_meshUnderPointer()
+AbstractMesh*& Scene::get_meshUnderPointer()
 {
   return _pointerOverMesh;
 }
@@ -4589,12 +4589,12 @@ std::vector<std::optional<PickingInfo>> Scene::multiPickWithRay(
     predicate);
 }
 
-AbstractMeshPtr& Scene::getPointerOverMesh()
+AbstractMesh* Scene::getPointerOverMesh()
 {
   return _pointerOverMesh;
 }
 
-void Scene::setPointerOverMesh(const AbstractMeshPtr& mesh)
+void Scene::setPointerOverMesh(AbstractMesh* mesh)
 {
   if (_pointerOverMesh == mesh) {
     return;

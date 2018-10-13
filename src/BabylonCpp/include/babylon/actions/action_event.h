@@ -27,8 +27,8 @@ public:
    * ActionEvent
    * @param additionalData additional data for the event
    */
-  ActionEvent(const AbstractMeshPtr& source, int pointerX, int pointerY,
-              const AbstractMeshPtr& meshUnderPointer,
+  ActionEvent(AbstractMesh* source, int pointerX, int pointerY,
+              AbstractMesh* meshUnderPointer,
               const std::optional<Event>& sourceEvent,
               const std::string& additionalData = "");
   ActionEvent(const ActionEvent& other);
@@ -44,7 +44,7 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent CreateNew(const AbstractMeshPtr& source,
+  static ActionEvent CreateNew(AbstractMesh* source,
                                const std::optional<Event>& evt = std::nullopt);
 
   /**
@@ -76,7 +76,7 @@ public:
    * @returns the new ActionEvent
    */
   static ActionEvent
-  CreateNewFromPrimitive(const AbstractMeshPtr& prim, const Vector2& pointerPos,
+  CreateNewFromPrimitive(AbstractMesh* prim, const Vector2& pointerPos,
                          const Event& evt,
                          const std::string& additionalData = "");
 
@@ -90,7 +90,7 @@ public:
   /** The Y mouse cursor position at the time of the event */
   int pointerY;
   /** The mesh that is currently pointed at (can be null) */
-  AbstractMeshPtr meshUnderPointer;
+  AbstractMesh* meshUnderPointer;
   /** The original (browser) event that triggered the ActionEvent */
   std::optional<Event> sourceEvent;
   /** Additional data for the event */

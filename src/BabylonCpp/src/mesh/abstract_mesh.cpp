@@ -6,6 +6,7 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/icollision_coordinator.h>
+#include <babylon/collisions/intersection_info.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
@@ -118,6 +119,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
     , _waitingFreezeWorldMatrix{std::nullopt}
+    , _positions{this, &AbstractMesh::get__positions}
     , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
     , edgesRenderer{this, &AbstractMesh::get_edgesRenderer}
     , isBlocked{this, &AbstractMesh::get_isBlocked}
@@ -463,8 +465,8 @@ std::string AbstractMesh::toString(bool fullDetails) const
   }
   if (fullDetails) {
     oss << ", billboard mode: ";
-    const std::vector<std::string> billboardModes{"NONE", "X",    "Y",    "null",
-                                            "Z",    "null", "null", "ALL"};
+    const std::vector<std::string> billboardModes{
+      "NONE", "X", "Y", "null", "Z", "null", "null", "ALL"};
     if (billboardMode < billboardModes.size()) {
       oss << billboardModes[billboardMode];
     }
@@ -522,9 +524,9 @@ void AbstractMesh::_resyncLighSource(Light* light)
   bool isIn = light->isEnabled() && light->canAffectMesh(this);
 
   auto index = std::find_if(_lightSources.begin(), _lightSources.end(),
-                              [light](const LightPtr& lightSource) {
-                                return lightSource.get() == light;
-                              });
+                            [light](const LightPtr& lightSource) {
+                              return lightSource.get() == light;
+                            });
 
   if (index != _lightSources.end()) {
     if (!isIn) {
@@ -608,6 +610,11 @@ void AbstractMesh::_markSubMeshesAsMiscDirty()
 Scene* AbstractMesh::getScene() const
 {
   return Node::getScene();
+}
+
+std::vector<Vector3>& AbstractMesh::get__positions()
+{
+  return _emptyPositions;
 }
 
 void AbstractMesh::set_skeleton(const SkeletonPtr& value)
@@ -873,9 +880,9 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
   auto boundingInfo = getBoundingInfo();
 
   if (subMeshes.empty()) {
-    min
-      = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-                std::numeric_limits<float>::max());
+    min = Vector3(std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max());
     max = Vector3(std::numeric_limits<float>::lowest(),
                   std::numeric_limits<float>::lowest(),
                   std::numeric_limits<float>::lowest());
@@ -889,8 +896,7 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
     auto descendants = getDescendants(false);
 
     for (auto& descendant : descendants) {
-      auto childMesh
-        = std::static_pointer_cast<class AbstractMesh>(descendant);
+      auto childMesh = std::static_pointer_cast<class AbstractMesh>(descendant);
 
       childMesh->computeWorldMatrix(true);
 
@@ -921,8 +927,8 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
 AbstractMesh& AbstractMesh::_updateBoundingInfo()
 {
   if (!_boundingInfo) {
-    _boundingInfo = std::make_unique<BoundingInfo>(absolutePosition(),
-                                                     absolutePosition());
+    _boundingInfo
+      = std::make_unique<BoundingInfo>(absolutePosition(), absolutePosition());
   }
 
   _boundingInfo->update(worldMatrixFromCache());
@@ -1243,13 +1249,13 @@ bool AbstractMesh::_generatePointsArray()
   return false;
 }
 
-PickingInfo AbstractMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
+PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck)
 {
-  /*var pickingInfo = new PickingInfo();
+  PickingInfo pickingInfo;
 
-  if (!subMeshes || !_boundingInfo
-      || !ray.intersectsSphere(_boundingInfo.boundingSphere)
-      || !ray.intersectsBox(_boundingInfo.boundingBox)) {
+  if (subMeshes.empty() || !_boundingInfo
+      || !ray.intersectsSphere(_boundingInfo->boundingSphere)
+      || !ray.intersectsBox(_boundingInfo->boundingBox)) {
     return pickingInfo;
   }
 
@@ -1257,39 +1263,42 @@ PickingInfo AbstractMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
     return pickingInfo;
   }
 
-  var intersectInfo : IntersectionInfo = null;
+  std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
   // Octrees
-  var subMeshes : SubMesh[];
-  var len : number;
+  std::vector<SubMeshPtr> _subMeshes;
+  size_t len = 0;
 
   if (_submeshesOctree && useOctreeForPicking) {
-    var worldRay      = Ray.Transform(ray, getWorldMatrix());
-    var intersections = _submeshesOctree.intersectsRay(worldRay);
+#if 0
+    auto worldRay      = Ray::Transform(ray, *getWorldMatrix());
+    auto intersections = _submeshesOctree->intersectsRay(worldRay);
 
-    len       = intersections.length;
-    subMeshes = intersections.data;
+    len        = intersections.size();
+    _subMeshes = intersections;
+#endif
   }
   else {
-    subMeshes = subMeshes;
-    len       = subMeshes.length;
+    _subMeshes = subMeshes;
+    len        = _subMeshes.size();
   }
 
-  for (var index = 0; index < len; index++) {
-    var subMesh = subMeshes[index];
+  for (size_t index = 0; index < len; ++index) {
+    auto& subMesh = _subMeshes[index];
 
     // Bounding test
-    if (len > 1 && !subMesh.canIntersects(ray))
+    if (len > 1 && !subMesh->canIntersects(ray)) {
       continue;
+    }
 
-    var currentIntersectInfo
-      = subMesh.intersects(ray, _positions, getIndices(), fastCheck);
+    auto currentIntersectInfo
+      = subMesh->intersects(ray, _positions(), getIndices(), fastCheck);
 
     if (currentIntersectInfo) {
       if (fastCheck || !intersectInfo
-          || currentIntersectInfo.distance < intersectInfo.distance) {
-        intersectInfo           = currentIntersectInfo;
-        intersectInfo.subMeshId = index;
+          || currentIntersectInfo->distance < intersectInfo->distance) {
+        intersectInfo            = currentIntersectInfo;
+        intersectInfo->subMeshId = static_cast<int>(index);
 
         if (fastCheck) {
           break;
@@ -1300,32 +1309,31 @@ PickingInfo AbstractMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
 
   if (intersectInfo) {
     // Get picked point
-    var world          = getWorldMatrix();
-    var worldOrigin    = Vector3.TransformCoordinates(ray.origin, world);
-    var direction      = ray.direction.clone();
-    direction          = direction.scale(intersectInfo.distance);
-    var worldDirection = Vector3.TransformNormal(direction, world);
+    auto world          = getWorldMatrix();
+    auto worldOrigin    = Vector3::TransformCoordinates(ray.origin, *world);
+    auto direction      = ray.direction;
+    direction           = direction.scale(intersectInfo->distance);
+    auto worldDirection = Vector3::TransformNormal(direction, *world);
 
-    var pickedPoint = worldOrigin.add(worldDirection);
+    auto pickedPoint = worldOrigin.add(worldDirection);
 
     // Return result
     pickingInfo.hit         = true;
-    pickingInfo.distance    = Vector3.Distance(worldOrigin, pickedPoint);
+    pickingInfo.distance    = Vector3::Distance(worldOrigin, pickedPoint);
     pickingInfo.pickedPoint = pickedPoint;
     pickingInfo.pickedMesh  = this;
-    pickingInfo.bu          = intersectInfo.bu;
-    pickingInfo.bv          = intersectInfo.bv;
-    pickingInfo.faceId      = intersectInfo.faceId;
-    pickingInfo.subMeshId   = intersectInfo.subMeshId;
+    pickingInfo.bu          = intersectInfo->bu;
+    pickingInfo.bv          = intersectInfo->bv;
+    pickingInfo.faceId      = static_cast<unsigned>(intersectInfo->faceId);
+    pickingInfo.subMeshId   = static_cast<unsigned>(intersectInfo->subMeshId);
     return pickingInfo;
   }
 
-  return pickingInfo;*/
-
-  return PickingInfo();
+  return pickingInfo;
 }
 
-AbstractMesh* AbstractMesh::clone(const std::string& /*name*/, Node* /*newParent*/,
+AbstractMesh* AbstractMesh::clone(const std::string& /*name*/,
+                                  Node* /*newParent*/,
                                   bool /*doNotCloneChildren*/)
 {
   return nullptr;
@@ -1367,7 +1375,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Intersections in progress
   for (auto& other : _intersectionsInProgress) {
     std::remove(other->_intersectionsInProgress.begin(),
-                  other->_intersectionsInProgress.end(), this);
+                other->_intersectionsInProgress.end(), this);
   }
 
   _intersectionsInProgress.clear();
@@ -1376,11 +1384,11 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   for (auto& light : getScene()->lights) {
     // Included meshes
     std::remove(light->includedOnlyMeshes().begin(),
-                  light->includedOnlyMeshes().end(), this);
+                light->includedOnlyMeshes().end(), this);
 
     // Excluded meshes
-    std::remove(light->excludedMeshes().begin(),
-                  light->excludedMeshes().end(), this);
+    std::remove(light->excludedMeshes().begin(), light->excludedMeshes().end(),
+                this);
 
     // Shadow generators
     auto generator = light->getShadowGenerator();
@@ -1583,7 +1591,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
 
   if (_facetDepthSort && _facetDepthSortEnabled) {
     std::sort(_depthSortedFacets.begin(), _depthSortedFacets.end(),
-                _facetDepthSortFunction);
+              _facetDepthSortFunction);
     auto l = (_depthSortedIndices.size() / 3);
     for (size_t f = 0; f < l; f++) {
       const auto& sind               = _depthSortedFacets[f].ind;
@@ -1658,13 +1666,13 @@ Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
 
   int ox = static_cast<int>(
     std::floor((x - bInfo.minimum.x * _partitioningBBoxRatio) * _subDiv.X
-                 * _partitioningBBoxRatio / _bbSize.x));
+               * _partitioningBBoxRatio / _bbSize.x));
   int oy = static_cast<int>(
     std::floor((y - bInfo.minimum.y * _partitioningBBoxRatio) * _subDiv.Y
-                 * _partitioningBBoxRatio / _bbSize.y));
+               * _partitioningBBoxRatio / _bbSize.y));
   int oz = static_cast<int>(
     std::floor((z - bInfo.minimum.z * _partitioningBBoxRatio) * _subDiv.Z
-                 * _partitioningBBoxRatio / _bbSize.z));
+               * _partitioningBBoxRatio / _bbSize.z));
 
   if (ox < 0 || oy < 0 || oz < 0) {
     return Uint32Array();

@@ -118,7 +118,7 @@ public:
   /**
    * @brief Returns an object IntersectionInfo.
    */
-  std::unique_ptr<IntersectionInfo>
+  std::optional<IntersectionInfo>
   intersects(Ray& ray, const std::vector<Vector3>& positions,
              const Uint32Array& indices, bool fastCheck);
 

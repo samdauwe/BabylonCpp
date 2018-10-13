@@ -30,7 +30,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  void set_attachedMesh(const AbstractMeshPtr& mesh) override;
+  void set_attachedMesh(AbstractMesh* const& mesh) override;
   void set_updateGizmoRotationToMatchAttachedMesh(bool value);
   bool get_updateGizmoRotationToMatchAttachedMesh() const;
   void set_snapDistance(float value);

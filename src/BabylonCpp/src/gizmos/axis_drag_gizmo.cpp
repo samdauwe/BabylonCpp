@@ -107,9 +107,15 @@ AxisDragGizmo::AxisDragGizmo(
       if (_customMeshSet) {
         return;
       }
-      auto isHovered = stl_util::contains(
-        _rootMesh->getChildMeshes(),
-        std::static_pointer_cast<Mesh>(pointerInfo->pickInfo.pickedMesh));
+
+      auto pickedMesh = pointerInfo->pickInfo.pickedMesh;
+      auto it         = std::find_if(_rootMesh->getChildMeshes().begin(),
+                             _rootMesh->getChildMeshes().end(),
+                             [&pickedMesh](const AbstractMeshPtr& mesh) {
+                               return mesh.get() == pickedMesh;
+                             });
+      auto isHovered  = (it != _rootMesh->getChildMeshes().end());
+
       auto material = isHovered ? hoverMaterial : coloredMaterial;
       for (auto& m : _rootMesh->getChildMeshes()) {
         m->material    = material;
@@ -125,7 +131,7 @@ AxisDragGizmo::~AxisDragGizmo()
 {
 }
 
-void AxisDragGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
+void AxisDragGizmo::_attachedMeshChanged(AbstractMesh* value)
 {
   if (_dragBehavior) {
     _dragBehavior->enabled = value ? true : false;

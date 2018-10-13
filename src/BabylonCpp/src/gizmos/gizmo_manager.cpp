@@ -38,9 +38,9 @@ GizmoManager::GizmoManager(Scene* iScene)
       }
       if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
         if (pointerInfo->pickInfo.pickedMesh) {
-          NodePtr node = pointerInfo->pickInfo.pickedMesh ?
-                           pointerInfo->pickInfo.pickedMesh :
-                           nullptr;
+          Node* node = pointerInfo->pickInfo.pickedMesh ?
+                         pointerInfo->pickInfo.pickedMesh :
+                         nullptr;
           if (attachableMeshes == std::nullopt) {
             // Attach to the most parent node
             while (node && node->parent() != nullptr) {
@@ -51,8 +51,9 @@ GizmoManager::GizmoManager(Scene* iScene)
             // Attach to the parent node that is an attachableMesh
             auto found = false;
             for (auto& mesh : *attachableMeshes) {
-              if (node && (node == mesh || node->isDescendantOf(mesh.get()))) {
-                node  = mesh;
+              if (node
+                  && (node == mesh.get() || node->isDescendantOf(mesh.get()))) {
+                node  = mesh.get();
                 found = true;
               }
             }
@@ -61,7 +62,7 @@ GizmoManager::GizmoManager(Scene* iScene)
             }
           }
           if (node && node->type() == IReflect::Type::ABSTRACTMESH) {
-            attachToMesh(std::static_pointer_cast<AbstractMesh>(node));
+            attachToMesh(static_cast<AbstractMesh*>(node));
           }
           else {
             attachToMesh(nullptr);
@@ -78,7 +79,7 @@ GizmoManager::~GizmoManager()
 {
 }
 
-void GizmoManager::attachToMesh(const AbstractMeshPtr& mesh)
+void GizmoManager::attachToMesh(AbstractMesh* mesh)
 {
   if (_attachedMesh) {
     // _attachedMesh->removeBehavior(_dragBehavior);

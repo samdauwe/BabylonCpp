@@ -49,7 +49,7 @@ public:
    * @brief Attaches a set of gizmos to the specified mesh.
    * @param mesh The mesh the gizmo's should be attached to
    */
-  void attachToMesh(const AbstractMeshPtr& mesh);
+  void attachToMesh(AbstractMesh* mesh);
 
   /**
    * @brief Disposes of the gizmo manager.
@@ -125,7 +125,7 @@ private:
   Scene* _scene;
   GizmosEnabledSettings _gizmosEnabled;
   Observer<PointerInfo>::Ptr _pointerObserver;
-  AbstractMeshPtr _attachedMesh;
+  AbstractMesh* _attachedMesh;
   Color3 _boundingBoxColor;
   std::unique_ptr<SixDofDragBehavior> _dragBehavior;
 

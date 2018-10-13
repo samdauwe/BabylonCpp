@@ -51,15 +51,15 @@ protected:
    * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag
    * gizmo the mesh that will be dragged).
    */
-  AbstractMeshPtr& get_attachedMesh();
+  AbstractMesh*& get_attachedMesh();
 
   /**
    * @brief Sets the mesh that the gizmo will be attached to. (eg. on a drag
    * gizmo the mesh that will be dragged).
    */
-  virtual void set_attachedMesh(const AbstractMeshPtr& value);
+  virtual void set_attachedMesh(AbstractMesh* const& value);
 
-  virtual void _attachedMeshChanged(const AbstractMeshPtr& value);
+  virtual void _attachedMeshChanged(AbstractMesh* value);
 
   /**
    * Hidden
@@ -78,7 +78,7 @@ public:
    * will be dragged)
    * * When set, interactions will be enabled
    */
-  Property<Gizmo, AbstractMeshPtr> attachedMesh;
+  Property<Gizmo, AbstractMesh*> attachedMesh;
 
   /**
    * The utility layer the gizmo will be added to
@@ -116,7 +116,7 @@ protected:
   bool _interactionsEnabled;
 
 private:
-  AbstractMeshPtr _attachedMesh;
+  AbstractMesh* _attachedMesh;
   Matrix _tmpMatrix;
   Vector3 _tempVector;
   Observer<Scene>::Ptr _beforeRenderObserver;

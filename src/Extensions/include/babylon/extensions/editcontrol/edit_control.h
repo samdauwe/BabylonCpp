@@ -65,16 +65,15 @@ private:
   void onPointerDown(PointerEvent& event);
   void detachControl(Camera* cam, ICanvas* can);
   void onPointerOver();
-  void restoreColor(const MeshPtr& mesh);
+  void restoreColor(Mesh* mesh);
   void onPointerUp(const Event& event);
   void onPointerMove(const Event& event);
-  MeshPtr getPickPlane(const MeshPtr& axis);
+  MeshPtr getPickPlane(Mesh* axis);
   void doTranslation(const Vector3& diff);
   void transWithSnap(const MeshPtr& mesh, Vector3& trans, bool local);
   void doScaling(const Vector3& diff);
   void scaleWithSnap(const MeshPtr& mesh, Vector3& p);
-  void doRotation(const MeshPtr& mesh, const MeshPtr& axis,
-                  const Vector3& newPos);
+  void doRotation(const MeshPtr& mesh, Mesh* axis, const Vector3& newPos);
   std::tuple<Vector3, bool> getPosOnPickPlane();
   void hideBaxis();
   /**
@@ -135,8 +134,8 @@ private:
   float visibility;
   // Picking
   bool pDown;
-  MeshPtr axisPicked;
-  MeshPtr prevOverMesh;
+  Mesh* axisPicked;
+  Mesh* prevOverMesh;
   bool pointerIsOver;
   MaterialPtr savedMat;
   Color3 savedCol;

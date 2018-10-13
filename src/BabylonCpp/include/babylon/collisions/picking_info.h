@@ -58,7 +58,7 @@ public:
   /**
    * The mesh corresponding the the pick collision
    */
-  AbstractMeshPtr pickedMesh = nullptr;
+  AbstractMesh* pickedMesh = nullptr;
 
   /**
    * (See getTextureCoordinates) The barycentric U coordinate that is used when

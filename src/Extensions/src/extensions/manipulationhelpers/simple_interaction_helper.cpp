@@ -75,14 +75,14 @@ void SimpleInteractionHelper::doSelectorInteraction(const PointerInfo& p,
     return;
   }
 
-  AbstractMeshPtr selectedMesh = nullptr;
+  AbstractMesh* selectedMesh = nullptr;
 
   if (p.pickInfo.hit) {
     selectedMesh = p.pickInfo.pickedMesh;
   }
 
   // We selected the same mesh? nothing to do
-  auto pickedMesh = std::static_pointer_cast<AbstractMesh>(_pickedNode);
+  auto pickedMesh = static_cast<AbstractMesh*>(_pickedNode);
   if (pickedMesh == selectedMesh) {
 #if 0
     selectedMesh->showBoundingBox = !selectedMesh->showBoundingBox;
@@ -97,13 +97,13 @@ void SimpleInteractionHelper::doSelectorInteraction(const PointerInfo& p,
 
   // Detach the manipulator to the current selected mesh
   if (_pickedNode) {
-    auto mesh = std::static_pointer_cast<AbstractMesh>(_pickedNode);
+    auto mesh = static_cast<AbstractMesh*>(_pickedNode);
     if (mesh) {
 #if 0
       mesh->showBoundingBox = false;
 #endif
     }
-    manipulator()->detachManipulatedNode(_pickedNode.get());
+    manipulator()->detachManipulatedNode(_pickedNode);
     _pickedNode = nullptr;
   }
 
@@ -117,7 +117,7 @@ void SimpleInteractionHelper::doSelectorInteraction(const PointerInfo& p,
   selectedMesh->showBoundingBox = true;
 #endif
 
-  manipulator()->attachManipulatedNode(_pickedNode.get());
+  manipulator()->attachManipulatedNode(_pickedNode);
 }
 
 void SimpleInteractionHelper::detectActionChanged(const PointerInfo& p,

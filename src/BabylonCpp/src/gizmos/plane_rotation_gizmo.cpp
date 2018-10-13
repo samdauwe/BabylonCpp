@@ -198,7 +198,7 @@ PlaneRotationGizmo::~PlaneRotationGizmo()
 {
 }
 
-void PlaneRotationGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
+void PlaneRotationGizmo::_attachedMeshChanged(AbstractMesh* value)
 {
   if (dragBehavior) {
     dragBehavior->enabled = value ? true : false;

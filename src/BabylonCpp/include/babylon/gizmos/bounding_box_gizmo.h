@@ -68,13 +68,13 @@ public:
                      bool useGizmoMaterial = false) override;
 
 protected:
-  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
+  void _attachedMeshChanged(AbstractMesh* value) override;
 
 private:
   void removeAndStorePivotPoint();
   void restorePivotPoint();
   void _selectNode(const MeshPtr& selectedMesh);
-  void _recurseComputeWorld(const NodePtr& node);
+  void _recurseComputeWorld(Node* node);
 
 public:
   /**

@@ -229,7 +229,7 @@ void EditControl::onPointerDown(PointerEvent& evt)
     false, mainCamera);
 
   if ((*pickResult).hit) {
-    axisPicked  = std::static_pointer_cast<Mesh>((*pickResult).pickedMesh);
+    axisPicked  = static_cast<Mesh*>((*pickResult).pickedMesh);
     auto childs = axisPicked->getChildren();
     if (!childs.empty()) {
       std::static_pointer_cast<Mesh>(childs[0])->visibility = visibility;
@@ -323,18 +323,17 @@ void EditControl::onPointerOver()
     false, mainCamera);
 
   if ((*pickResult).hit) {
-    if (std::static_pointer_cast<Mesh>((*pickResult).pickedMesh)
-        != prevOverMesh) {
+    if (static_cast<Mesh*>((*pickResult).pickedMesh) != prevOverMesh) {
       pointerIsOver = true;
       if (prevOverMesh != nullptr) {
         prevOverMesh->visibility = 0.f;
         restoreColor(prevOverMesh);
       }
-      prevOverMesh = std::static_pointer_cast<Mesh>((*pickResult).pickedMesh);
+      prevOverMesh = static_cast<Mesh*>((*pickResult).pickedMesh);
       if (rotEnabled) {
-        savedCol = (std::static_pointer_cast<LinesMesh>(
-                      prevOverMesh->getChildren()[0])
-                      ->color);
+        savedCol
+          = (std::static_pointer_cast<LinesMesh>(prevOverMesh->getChildren()[0])
+               ->color);
         std::static_pointer_cast<LinesMesh>(prevOverMesh->getChildren()[0])
           ->color
           = Color3::White();
@@ -370,7 +369,7 @@ void EditControl::onPointerOver()
   }
 }
 
-void EditControl::restoreColor(const MeshPtr& mesh)
+void EditControl::restoreColor(Mesh* mesh)
 {
   const auto& meshName = mesh->name;
   if (meshName == "X") {
@@ -445,7 +444,7 @@ void EditControl::onPointerMove(const Event& /*evt*/)
   prevPos = newPos;
 }
 
-MeshPtr EditControl::getPickPlane(const MeshPtr& axis)
+MeshPtr EditControl::getPickPlane(Mesh* axis)
 {
   const auto& n = axis->name;
   if (transEnabled || scaleEnabled) {
@@ -687,14 +686,14 @@ void EditControl::scaleWithSnap(const MeshPtr& mesh, Vector3& p)
   mesh->scaling().addInPlace(p);
 }
 
-void EditControl::doRotation(const MeshPtr& mesh, const MeshPtr& axis,
+void EditControl::doRotation(const MeshPtr& mesh, Mesh* axis,
                              const Vector3& newPos)
 {
   auto cN = Vector3::TransformNormal(Axis::Z(), *mainCamera->getWorldMatrix());
   auto angle
     = EditControl::getAngle(prevPos, newPos, mesh->getAbsolutePivotPoint(), cN);
 
-  if (axis == rX) {
+  if (axis == rX.get()) {
     if (snapR) {
       snapRX += angle;
       angle = 0.f;
@@ -722,7 +721,7 @@ void EditControl::doRotation(const MeshPtr& mesh, const MeshPtr& axis,
       }
     }
   }
-  else if (axis == rY) {
+  else if (axis == rY.get()) {
     if (snapR) {
       snapRY += angle;
       angle = 0.f;
@@ -750,7 +749,7 @@ void EditControl::doRotation(const MeshPtr& mesh, const MeshPtr& axis,
       }
     }
   }
-  else if (axis == rZ) {
+  else if (axis == rZ.get()) {
     if (snapR) {
       snapRZ += angle;
       angle = 0.f;
@@ -776,7 +775,7 @@ void EditControl::doRotation(const MeshPtr& mesh, const MeshPtr& axis,
       }
     }
   }
-  else if (axis == rAll) {
+  else if (axis == rAll.get()) {
     if (snapR) {
       snapRA += angle;
       angle = 0.f;

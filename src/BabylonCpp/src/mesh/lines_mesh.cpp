@@ -142,7 +142,7 @@ void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/,
                            static_cast<int>(subMesh->indexCount));
 }
 
-PickingInfo LinesMesh::intersects(const Ray& /*ray*/, bool /*fastCheck*/)
+PickingInfo LinesMesh::intersects(Ray& /*ray*/, bool /*fastCheck*/)
 {
   return PickingInfo();
 }

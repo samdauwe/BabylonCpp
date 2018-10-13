@@ -31,7 +31,7 @@ RotationGizmo::~RotationGizmo()
 {
 }
 
-void RotationGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
+void RotationGizmo::set_attachedMesh(AbstractMesh* const& mesh)
 {
   if (xGizmo) {
     xGizmo->attachedMesh = mesh;

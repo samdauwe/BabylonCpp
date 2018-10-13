@@ -42,7 +42,7 @@ ScaleGizmo::~ScaleGizmo()
 {
 }
 
-void ScaleGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
+void ScaleGizmo::set_attachedMesh(AbstractMesh* const& mesh)
 {
   if (xGizmo) {
     xGizmo->attachedMesh        = mesh;

@@ -39,14 +39,14 @@ public:
                            const Vector3& maximum) const;
   bool intersectsBox(const BoundingBox& box) const;
   bool intersectsSphere(const BoundingSphere& sphere) const;
-  std::unique_ptr<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
-                                                    const Vector3& vertex1,
-                                                    const Vector3& vertex2);
+  std::optional<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
+                                                     const Vector3& vertex1,
+                                                     const Vector3& vertex2);
   std::optional<float> intersectsPlane(const Plane& plane);
   PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck = false);
   std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
-                                         bool fastCheck,
-                                         std::vector<PickingInfo>& results);
+                                            bool fastCheck,
+                                            std::vector<PickingInfo>& results);
 
   /**
    * Intersection test between the ray and a given segment whithin a given

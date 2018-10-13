@@ -47,7 +47,7 @@ public:
   void _draw(SubMesh* subMesh, int fillMode, size_t instancesCount = 0,
              bool alternate = false) override;
 
-  PickingInfo intersects(const Ray& ray, bool fastCheck = true) override;
+  PickingInfo intersects(Ray& ray, bool fastCheck = true) override;
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 

@@ -31,7 +31,7 @@ PositionGizmo::~PositionGizmo()
 {
 }
 
-void PositionGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
+void PositionGizmo::set_attachedMesh(AbstractMesh* const& mesh)
 {
   if (xGizmo) {
     xGizmo->attachedMesh = mesh;

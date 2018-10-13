@@ -292,7 +292,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
           const auto changeHoverColor
             = [&](const std::vector<AbstractMeshPtr>& meshes) {
                 for (auto& mesh : meshes) {
-                  if (pointerInfo->pickInfo.pickedMesh == mesh) {
+                  if (pointerInfo->pickInfo.pickedMesh == mesh.get()) {
                     pointerIds[(pointerInfo->pointerEvent).pointerId] = mesh;
                     mesh->material = hoverColoredMaterial;
                   }
@@ -305,7 +305,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
           if (stl_util::contains(pointerIds,
                                  (pointerInfo->pointerEvent).pointerId)
               && pointerInfo->pickInfo.pickedMesh
-                   != pointerIds[(pointerInfo->pointerEvent).pointerId]) {
+                   != pointerIds[(pointerInfo->pointerEvent).pointerId].get()) {
             pointerIds[(pointerInfo->pointerEvent).pointerId]->material
               = coloredMaterial;
             pointerIds.erase((pointerInfo->pointerEvent).pointerId);
@@ -361,7 +361,7 @@ void BoundingBoxGizmo::restorePivotPoint()
   }
 }
 
-void BoundingBoxGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
+void BoundingBoxGizmo::_attachedMeshChanged(AbstractMesh* value)
 {
   if (value) {
     // Reset anchor mesh to match attached mesh's scale
@@ -380,13 +380,13 @@ void BoundingBoxGizmo::_selectNode(const MeshPtr& selectedMesh)
   }
 }
 
-void BoundingBoxGizmo::_recurseComputeWorld(const NodePtr& node)
+void BoundingBoxGizmo::_recurseComputeWorld(Node* node)
 {
   node->computeWorldMatrix(true);
 
   if (!ignoreChildren) {
     for (const auto& n : node->getDescendants()) {
-      _recurseComputeWorld(n);
+      _recurseComputeWorld(n.get());
     }
   }
 }
