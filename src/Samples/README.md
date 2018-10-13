@@ -115,6 +115,7 @@
 ![polygon_mesh_stars_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_stars_scene.png?raw=true "Polygon Mesh Stars Scene")
 ![polygon_mesh_stars_with_holes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_stars_with_holes_scene.png?raw=true "Polygon Mesh Stars With Holes Scene")
 ![polyhedron_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polyhedron_scene.png?raw=true "Polyhedron Scene")
+![raycast_on_height_map_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/raycast_on_height_map_scene.png?raw=true "Raycast On Height Map Scene")
 ![ribbon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ribbon_scene.png?raw=true "Ribbon Scene")
 ![rotation_and_scaling_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rotation_and_scaling_scene.png?raw=true "Rotation And Scaling Scene")
 ![super_ellipsoid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/super_ellipsoid_scene.png?raw=true "Super Ellipsoid Scene")

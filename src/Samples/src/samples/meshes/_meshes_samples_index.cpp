@@ -26,6 +26,7 @@
 #include <babylon/samples/meshes/polygonmesh/polygon_mesh_stars_scene.h>
 #include <babylon/samples/meshes/polygonmesh/polygon_mesh_stars_with_holes_scene.h>
 #include <babylon/samples/meshes/polyhedron_scene.h>
+#include <babylon/samples/meshes/raycast_on_height_map_scene.h>
 #include <babylon/samples/meshes/ribbon_scene.h>
 #include <babylon/samples/meshes/rotation_and_scaling_scene.h>
 #include <babylon/samples/meshes/simple_car_following_path_scene.h>
@@ -168,6 +169,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<PolyhedronScene>(iCanvas); //
                       });                                                  //
+  // Raycast On Height Map Scene
+  _samples["RaycastOnHeightMapScene"] = std::make_tuple(
+    true,                                                        //
+    [](ICanvas* iCanvas) {                                       //
+      return std::make_unique<RaycastOnHeightMapScene>(iCanvas); //
+    });                                                          //
   // Ribbon Scene
   _samples["RibbonScene"]
     = std::make_tuple(false,                                           //
