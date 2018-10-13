@@ -20,11 +20,21 @@ using MeshPtr         = std::shared_ptr<Mesh>;
 
 namespace MaterialsLibrary {
 
+class WaterMaterial;
+using WaterMaterialPtr = std::shared_ptr<WaterMaterial>;
+
 class BABYLON_SHARED_EXPORT WaterMaterial : public PushMaterial {
 
 public:
-  WaterMaterial(const std::string& name, Scene* scene,
-                const Vector2& renderTargetSize = Vector2(512.f, 512.f));
+  template <typename... Ts>
+  static WaterMaterialPtr New(Ts&&... args)
+  {
+    auto material = std::shared_ptr<WaterMaterial>(
+      new WaterMaterial(std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~WaterMaterial() override;
 
   // Methods
@@ -53,6 +63,9 @@ public:
   static MeshPtr CreateDefaultMesh(const std::string& name, Scene* scene);
 
 protected:
+  WaterMaterial(const std::string& name, Scene* scene,
+                const Vector2& renderTargetSize = Vector2(512.f, 512.f));
+
   BaseTexturePtr& get_bumpTexture();
   void set_bumpTexture(const BaseTexturePtr& value);
   bool get_disableLighting() const;
@@ -154,6 +167,9 @@ public:
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> refractionTexture;
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> reflectionTexture;
   ReadOnlyProperty<WaterMaterial, bool> renderTargetsEnabled;
+
+protected:
+  std::vector<RenderTargetTexturePtr> _renderTargets;
 
 private:
   BaseTexturePtr _bumpTexture;

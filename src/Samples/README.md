@@ -77,6 +77,7 @@
 ![sky_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/sky_material_scene.png?raw=true "Sky Material Scene")
 ![terrain_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/terrain_material_scene.png?raw=true "Terrain Material Scene")
 ![tri_planar_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tri_planar_material_scene.png?raw=true "Tri-Planar Material Scene")
+![water_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/water_material_scene.png?raw=true "Water Material Scene")
 
 ## Procedural Textures Library ##
 ![brick_procedural_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/brick_procedural_texture_scene.png?raw=true "Brick Procedural Texture Scene")

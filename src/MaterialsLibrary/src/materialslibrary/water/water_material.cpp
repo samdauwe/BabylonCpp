@@ -12,6 +12,8 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
+#include <babylon/materialslibrary/water/water_fragment_fx.h>
+#include <babylon/materialslibrary/water/water_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -71,8 +73,22 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , _mirrorMatrix{Matrix::Zero()}
     , _useLogarithmicDepth{false}
 {
+  // Vertex shader
+  Effect::ShadersStore()["waterVertexShader"] = waterVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore()["waterPixelShader"] = waterPixelShader;
+
   // Create render targets
   _createRenderTargets(scene, renderTargetSize);
+
+  getRenderTargetTextures = [this]() -> std::vector<RenderTargetTexturePtr> {
+    _renderTargets.clear();
+    _renderTargets.emplace_back(_reflectionRTT);
+    _renderTargets.emplace_back(_refractionRTT);
+
+    return _renderTargets;
+  };
 }
 
 WaterMaterial::~WaterMaterial()
@@ -186,16 +202,26 @@ RenderTargetTexturePtr& WaterMaterial::get_reflectionTexture()
 
 void WaterMaterial::addToRenderList(const AbstractMeshPtr& node)
 {
-  _refractionRTT->renderList().emplace_back(node);
-  _reflectionRTT->renderList().emplace_back(node);
+  if (_refractionRTT) {
+    _refractionRTT->renderList().emplace_back(node);
+  }
+
+  if (_reflectionRTT) {
+    _reflectionRTT->renderList().emplace_back(node);
+  }
 }
 
 void WaterMaterial::enableRenderTargets(bool enable)
 {
   int refreshRate = enable ? 1 : 0;
 
-  _refractionRTT->refreshRate = refreshRate;
-  _reflectionRTT->refreshRate = refreshRate;
+  if (_refractionRTT) {
+    _refractionRTT->refreshRate = refreshRate;
+  }
+
+  if (_reflectionRTT) {
+    _reflectionRTT->refreshRate = refreshRate;
+  }
 }
 
 std::vector<AbstractMeshPtr>& WaterMaterial::getRenderList()
@@ -507,18 +533,17 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
     name + "_refraction", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
     false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
     TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
-  _refractionRTT->wrapU = TextureConstants::MIRROR_ADDRESSMODE;
-  _refractionRTT->wrapV = TextureConstants::MIRROR_ADDRESSMODE;
+  _refractionRTT->wrapU                = TextureConstants::MIRROR_ADDRESSMODE;
+  _refractionRTT->wrapV                = TextureConstants::MIRROR_ADDRESSMODE;
+  _refractionRTT->ignoreCameraViewport = true;
 
   _reflectionRTT = RenderTargetTexture::New(
     name + "_reflection", ISize{renderTargetSizeX, renderTargetSizeY}, scene,
     false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT, false,
     TextureConstants::TRILINEAR_SAMPLINGMODE, true, false);
-  _reflectionRTT->wrapU = TextureConstants::MIRROR_ADDRESSMODE;
-  _reflectionRTT->wrapV = TextureConstants::MIRROR_ADDRESSMODE;
-
-  scene->customRenderTargets.emplace_back(_refractionRTT.get());
-  scene->customRenderTargets.emplace_back(_reflectionRTT.get());
+  _reflectionRTT->wrapU                = TextureConstants::MIRROR_ADDRESSMODE;
+  _reflectionRTT->wrapV                = TextureConstants::MIRROR_ADDRESSMODE;
+  _reflectionRTT->ignoreCameraViewport = true;
 
   _refractionRTT->onBeforeRender
     = [this](int* /*faceIndex*/, EventState& /*es*/) {
@@ -526,6 +551,12 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
           _isVisible       = _mesh->isVisible;
           _mesh->isVisible = false;
         }
+        // Clip plane
+        _clipPlane = getScene()->clipPlane;
+
+        auto positiony        = _mesh ? _mesh->position().y : 0.f;
+        getScene()->clipPlane = Plane::FromPositionAndNormal(
+          Vector3(0.f, positiony + 0.05f, 0.f), Vector3(0.f, 1.f, 0.f));
       };
 
   _refractionRTT->onAfterRender
@@ -533,22 +564,26 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
         if (_mesh) {
           _mesh->isVisible = _isVisible;
         }
+
+        // Clip plane
+        getScene()->clipPlane = _clipPlane;
       };
 
   _reflectionRTT->onBeforeRender
-    = [this, &scene](int* /*faceIndex*/, EventState& /*es*/) {
+    = [this](int* /*faceIndex*/, EventState& /*es*/) {
         if (_mesh) {
           _isVisible       = _mesh->isVisible;
           _mesh->isVisible = false;
         }
 
+        auto scene = getScene();
+
         // Clip plane
         _clipPlane = scene->clipPlane;
 
-        float positiony = _mesh ? _mesh->position().y : 0.f;
-        Vector3 normal(0.f, -1.f, 0.f);
+        float positiony  = _mesh ? _mesh->position().y : 0.f;
         scene->clipPlane = Plane::FromPositionAndNormal(
-          Vector3(0.f, positiony - 0.05f, 0.f), normal);
+          Vector3(0.f, positiony - 0.05f, 0.f), Vector3(0.f, -1.f, 0.f));
 
         // Transform
         Matrix::ReflectionToRef(*scene->clipPlane, _mirrorMatrix);
@@ -563,10 +598,12 @@ void WaterMaterial::_createRenderTargets(Scene* scene,
       };
 
   _reflectionRTT->onAfterRender
-    = [this, &scene](int* /*faceIndex*/, EventState& /*es*/) {
+    = [this](int* /*faceIndex*/, EventState& /*es*/) {
         if (_mesh) {
           _mesh->isVisible = _isVisible;
         }
+
+        auto scene = getScene();
 
         // Clip plane
         scene->clipPlane = _clipPlane;
@@ -587,10 +624,10 @@ std::vector<IAnimatablePtr> WaterMaterial::getAnimatables()
     results.emplace_back(_bumpTexture);
   }
   if (_reflectionRTT && _reflectionRTT->animations.size() > 0) {
-    results.emplace_back(_reflectionRTT.get());
+    results.emplace_back(_reflectionRTT);
   }
   if (_refractionRTT && _refractionRTT->animations.size() > 0) {
-    results.emplace_back(_refractionRTT.get());
+    results.emplace_back(_refractionRTT);
   }
 
   return results;

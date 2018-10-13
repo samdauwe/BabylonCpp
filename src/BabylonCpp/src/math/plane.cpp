@@ -199,7 +199,7 @@ Plane Plane::FromPoints(const Vector3& point1, const Vector3& point2,
   return result;
 }
 
-Plane Plane::FromPositionAndNormal(const Vector3& origin, Vector3& normal)
+Plane Plane::FromPositionAndNormal(const Vector3& origin, Vector3 normal)
 {
   Plane result(0.f, 0.f, 0.f, 0.f);
   normal.normalize();

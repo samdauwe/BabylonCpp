@@ -136,7 +136,7 @@ public:
    * @returns a new Plane the normal vector to this plane at the given origin
    * point. Note : the vector "normal" is updated because normalized.
    */
-  static Plane FromPositionAndNormal(const Vector3& origin, Vector3& normal);
+  static Plane FromPositionAndNormal(const Vector3& origin, Vector3 normal);
 
   /**
    * @brief Calculates the distance from a plane and a point
