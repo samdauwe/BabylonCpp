@@ -2655,7 +2655,9 @@ void Engine::_cascadeLoadImgs(
     onfinish(images);
   }
   else {
-    onError("Unable to cascade load images!", "");
+    if (onError) {
+      onError("Unable to cascade load images!", "");
+    }
   }
 }
 
