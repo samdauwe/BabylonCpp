@@ -109,6 +109,7 @@
 ![tube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png?raw=true "Tube Scene")
 ![ribbon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ribbon_scene.png?raw=true "Ribbon Scene")
 ![curved_helix_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/curved_helix_meshes_scene.png?raw=true "Curved Helix Meshes Scene")
+![displacement_map_cpu_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/displacement_map_cpu_scene.png?raw=true "Displacement map (CPU) Scene")
 ![polygon_mesh_bird_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_bird_scene.png?raw=true "Polygon Mesh Bird Scene")
 ![polygon_mesh_monkey_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_monkey_scene.png?raw=true "Polygon Mesh Monkey Scene")
 ![polygon_mesh_puzzle_piece_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polygon_mesh_puzzle_piece_scene.png?raw=true "Polygon Mesh Puzzle Piece Scene")

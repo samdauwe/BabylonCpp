@@ -8,6 +8,7 @@
 #include <babylon/samples/meshes/colored_triangle_scene.h>
 #include <babylon/samples/meshes/cuboid_scene.h>
 #include <babylon/samples/meshes/curved_helix_meshes_scene.h>
+#include <babylon/samples/meshes/displacement_map_cpu_scene.h>
 #include <babylon/samples/meshes/extruded_polygon_scene.h>
 #include <babylon/samples/meshes/extrusion_scene.h>
 #include <babylon/samples/meshes/height_map_scene.h>
@@ -88,6 +89,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
     [](ICanvas* iCanvas) {                                      //
       return std::make_unique<CurvedHelixMeshesScene>(iCanvas); //
     });                                                         //
+  // Displacement map (CPU) Scene
+  _samples["DisplacementMapCPUScene"] = std::make_tuple(
+    true,                                                        //
+    [](ICanvas* iCanvas) {                                       //
+      return std::make_unique<DisplacementMapCPUScene>(iCanvas); //
+    });                                                          //
   // Extruded Polygon Scene
   _samples["ExtrudedPolygonScene"] = std::make_tuple(
     true,                                                     //
