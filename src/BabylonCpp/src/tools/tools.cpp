@@ -360,7 +360,7 @@ void Tools::LoadImageFromUrl(
                     }
                   });
 
-    if (!data) {
+    if (!data && onError) {
       onError("Error loading image from file " + url, "");
       return;
     }

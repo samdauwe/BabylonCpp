@@ -283,17 +283,17 @@ std::vector<MeshLODLevel*> Mesh::getLODLevels()
 void Mesh::_sortLODLevels()
 {
   std::sort(_LODLevels.begin(), _LODLevels.end(),
-              [](const std::unique_ptr<MeshLODLevel>& a,
-                 const std::unique_ptr<MeshLODLevel>& b) {
-                if (a->distance < b->distance) {
-                  return 1;
-                }
-                if (a->distance > b->distance) {
-                  return -1;
-                }
+            [](const std::unique_ptr<MeshLODLevel>& a,
+               const std::unique_ptr<MeshLODLevel>& b) {
+              if (a->distance < b->distance) {
+                return 1;
+              }
+              if (a->distance > b->distance) {
+                return -1;
+              }
 
-                return 0;
-              });
+              return 0;
+            });
 }
 
 Mesh& Mesh::addLODLevel(float distance, Mesh* mesh)
@@ -607,8 +607,8 @@ void Mesh::_preActivateForIntermediateRendering(int renderId)
 Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 {
   if (!_visibleInstances) {
-    _visibleInstances = std::make_unique<_VisibleInstances>();
-    _visibleInstances->defaultRenderId     = renderId;
+    _visibleInstances                  = std::make_unique<_VisibleInstances>();
+    _visibleInstances->defaultRenderId = renderId;
     _visibleInstances->selfDefaultRenderId = _renderId;
   }
 
@@ -783,10 +783,9 @@ void Mesh::subdivide(size_t count)
       break;
     }
 
-    SubMesh::CreateFromIndices(
-      0, static_cast<unsigned>(offset),
-      std::min(subdivisionSize, totalIndices - offset),
-      shared_from_base<Mesh>());
+    SubMesh::CreateFromIndices(0, static_cast<unsigned>(offset),
+                               std::min(subdivisionSize, totalIndices - offset),
+                               shared_from_base<Mesh>());
 
     offset += subdivisionSize;
   }
@@ -1144,8 +1143,8 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
       _instancesBuffer->dispose();
     }
 
-    _instancesBuffer = std::make_unique<Buffer>(engine, _instancesData, true,
-                                                  16, false, true);
+    _instancesBuffer
+      = std::make_unique<Buffer>(engine, _instancesData, true, 16, false, true);
 
     setVerticesBuffer(
       _instancesBuffer->createVertexBuffer(VertexBuffer::World0Kind, 0, 4));
@@ -1173,7 +1172,7 @@ Mesh& Mesh::_processRendering(
   SubMesh* subMesh, Effect* effect, int fillMode, _InstancesBatch* batch,
   bool hardwareInstancedRendering,
   std::function<void(bool isInstance, const Matrix& world,
-                       Material* effectiveMaterial)>
+                     Material* effectiveMaterial)>
     onBeforeDraw,
   Material* effectiveMaterial)
 {
@@ -1403,7 +1402,7 @@ std::vector<IParticleSystemPtr> Mesh::getHierarchyEmittedParticleSystems()
   for (auto& particleSystem : getScene()->particleSystems) {
     if (particleSystem->emitter.is<AbstractMeshPtr>()) {
       if (std::find(descendants.begin(), descendants.end(),
-                      particleSystem->emitter.get<AbstractMeshPtr>())
+                    particleSystem->emitter.get<AbstractMeshPtr>())
           != descendants.end()) {
         results.emplace_back(particleSystem.get());
       }
@@ -1712,23 +1711,36 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
-void Mesh::applyDisplacementMap(
-  const std::string& url, int minHeight, int maxHeight,
+Mesh& Mesh::applyDisplacementMap(
+  const std::string& url, float minHeight, float maxHeight,
   const std::function<void(Mesh* mesh)> onSuccess,
-  const std::optional<Vector2>& /*uvOffset*/,
-  const std::optional<Vector2>& /*uvScale*/, bool /*boolforceUpdate*/)
+  const std::optional<Vector2>& uvOffset, const std::optional<Vector2>& uvScale,
+  bool forceUpdate)
 {
-  std::cout << url << minHeight << maxHeight;
-  onSuccess(nullptr);
+  Tools::LoadImageFromUrl(
+    url,
+    [&](const Image& img) {
+      auto heightMapWidth  = static_cast<unsigned>(img.width);
+      auto heightMapHeight = static_cast<unsigned>(img.height);
+      // Create VertexData from map data
+      applyDisplacementMapFromBuffer(img.data, heightMapWidth, heightMapHeight,
+                                     minHeight, maxHeight, uvOffset, uvScale,
+                                     forceUpdate);
+      // execute success callback, if set
+      if (onSuccess) {
+        onSuccess(this);
+      }
+    },
+    nullptr, false);
+
+  return *this;
 }
 
-void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
-                                          unsigned int heightMapWidth,
-                                          unsigned int heightMapHeight,
-                                          int minHeight, int maxHeight,
-                                          const std::optional<Vector2>& iUvOffset,
-                                          const std::optional<Vector2>& iUvScale,
-                                          bool forceUpdate)
+void Mesh::applyDisplacementMapFromBuffer(
+  const Uint8Array& buffer, unsigned int heightMapWidth,
+  unsigned int heightMapHeight, float minHeight, float maxHeight,
+  const std::optional<Vector2>& iUvOffset,
+  const std::optional<Vector2>& iUvScale, bool forceUpdate)
 {
   if (!isVerticesDataPresent(VertexBuffer::PositionKind)
       || !isVerticesDataPresent(VertexBuffer::NormalKind)
@@ -1755,14 +1767,12 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
     Vector2::FromArrayToRef(uvs, (index / 3) * 2, uv);
 
     // Compute height
-    auto u
-      = (static_cast<unsigned int>(std::abs(uv.x * uvScale.x + uvOffset.x))
-         * heightMapWidth)
-        % heightMapWidth;
-    auto v
-      = (static_cast<unsigned int>(std::abs(uv.y * uvScale.y + uvOffset.y))
-         * heightMapHeight)
-        % heightMapHeight;
+    auto u = static_cast<unsigned int>(std::abs(uv.x * uvScale.x + uvOffset.x)
+                                       * heightMapWidth)
+             % heightMapWidth;
+    auto v = static_cast<unsigned int>(std::abs(uv.y * uvScale.y + uvOffset.y)
+                                       * heightMapHeight)
+             % heightMapHeight;
 
     auto pos = (u + v * heightMapWidth) * 4;
     auto r   = buffer[pos] / 255.f;
@@ -1772,9 +1782,7 @@ void Mesh::applyDisplacementMapFromBuffer(const Uint8Array& buffer,
     auto gradient = r * 0.3f + g * 0.59f + b * 0.11f;
 
     normal.normalize();
-    auto scale = static_cast<float>(minHeight)
-                 + static_cast<float>(maxHeight - minHeight) * gradient;
-    normal.scaleInPlace(scale);
+    normal.scaleInPlace(minHeight + (maxHeight - minHeight) * gradient);
     position = position.add(normal);
 
     position.toArray(positions, index);
@@ -2129,8 +2137,8 @@ MeshPtr Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   if (parsedMesh.contains("alphaIndex")) {
-    mesh->alphaIndex
-      = Json::GetNumber(parsedMesh, "alphaIndex", std::numeric_limits<int>::max());
+    mesh->alphaIndex = Json::GetNumber(parsedMesh, "alphaIndex",
+                                       std::numeric_limits<int>::max());
   }
 
   mesh->receiveShadows = Json::GetBool(parsedMesh, "receiveShadows", false);
@@ -2435,9 +2443,10 @@ MeshPtr Mesh::CreateCylinder(const std::string& name, float height,
 }
 
 // Torus
-MeshPtr Mesh::CreateTorus(const std::string& name, float diameter, float thickness,
-                          unsigned int tessellation, Scene* scene,
-                          bool updatable, unsigned int sideOrientation)
+MeshPtr Mesh::CreateTorus(const std::string& name, float diameter,
+                          float thickness, unsigned int tessellation,
+                          Scene* scene, bool updatable,
+                          unsigned int sideOrientation)
 {
   TorusOptions options;
   options.diameter        = diameter;
@@ -2481,9 +2490,10 @@ LinesMeshPtr Mesh::CreateLines(const std::string& name,
 }
 
 LinesMeshPtr Mesh::CreateDashedLines(const std::string& name,
-                                     std::vector<Vector3>& points, float dashSize,
-                                     float gapSize, unsigned int dashNb,
-                                     Scene* scene, bool updatable,
+                                     std::vector<Vector3>& points,
+                                     float dashSize, float gapSize,
+                                     unsigned int dashNb, Scene* scene,
+                                     bool updatable,
                                      const LinesMeshPtr& instance)
 {
   DashedLinesOptions options;
@@ -2527,7 +2537,8 @@ MeshPtr Mesh::ExtrudePolygon(const std::string& name,
   return MeshBuilder::ExtrudePolygon(name, options, scene);
 }
 
-MeshPtr Mesh::ExtrudeShape(const std::string& name, const std::vector<Vector3>& shape,
+MeshPtr Mesh::ExtrudeShape(const std::string& name,
+                           const std::vector<Vector3>& shape,
                            const std::vector<Vector3>& path, float scale,
                            float rotation, unsigned int cap, Scene* scene,
                            bool updatable, unsigned int sideOrientation,
@@ -2569,8 +2580,9 @@ MeshPtr Mesh::ExtrudeShapeCustom(
   return MeshBuilder::ExtrudeShapeCustom(name, options, scene);
 }
 
-MeshPtr Mesh::CreateLathe(const std::string& name, const std::vector<Vector3>& shape,
-                          float radius, unsigned int tessellation, Scene* scene,
+MeshPtr Mesh::CreateLathe(const std::string& name,
+                          const std::vector<Vector3>& shape, float radius,
+                          unsigned int tessellation, Scene* scene,
                           bool updatable, unsigned int sideOrientation)
 {
   LatheOptions options;
@@ -2662,14 +2674,14 @@ MeshPtr Mesh::CreateTube(
   return MeshBuilder::CreateTube(name, options, scene);
 }
 
-MeshPtr Mesh::CreatePolyhedron(const std::string& name, PolyhedronOptions& options,
-                               Scene* scene)
+MeshPtr Mesh::CreatePolyhedron(const std::string& name,
+                               PolyhedronOptions& options, Scene* scene)
 {
   return MeshBuilder::CreatePolyhedron(name, options, scene);
 }
 
-MeshPtr Mesh::CreateIcoSphere(const std::string& name, IcoSphereOptions& options,
-                              Scene* scene)
+MeshPtr Mesh::CreateIcoSphere(const std::string& name,
+                              IcoSphereOptions& options, Scene* scene)
 {
   return MeshBuilder::CreateIcoSphere(name, options, scene);
 }
@@ -2890,9 +2902,9 @@ Vector3 Mesh::Center(const std::vector<AbstractMeshPtr>& meshes)
   return Vector3::Center(minMaxVector.min, minMaxVector.max);
 }
 
-MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes, bool disposeSource,
-                          bool allow32BitsIndices, MeshPtr meshSubclass,
-                          bool subdivideWithSubMeshes)
+MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
+                          bool disposeSource, bool allow32BitsIndices,
+                          MeshPtr meshSubclass, bool subdivideWithSubMeshes)
 {
   unsigned int index = 0;
   if (!allow32BitsIndices) {

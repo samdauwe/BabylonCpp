@@ -468,8 +468,8 @@ public:
    * This function is passed the current mesh.
    * @returns The Mesh.
    */
-  Mesh& registerAfterRender(
-    const std::function<void(Mesh* mesh, EventState&)>& func);
+  Mesh&
+  registerAfterRender(const std::function<void(Mesh* mesh, EventState&)>& func);
 
   /**
    * @brief Disposes a previously registered javascript function called after
@@ -499,7 +499,7 @@ public:
   _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
                     _InstancesBatch* batch, bool hardwareInstancedRendering,
                     std::function<void(bool isInstance, const Matrix& world,
-                                         Material* effectiveMaterial)>
+                                       Material* effectiveMaterial)>
                       onBeforeDraw,
                     Material* effectiveMaterial = nullptr);
 
@@ -650,8 +650,8 @@ public:
    * instance.
    * @returns the Mesh.
    */
-  void
-  applyDisplacementMap(const std::string& url, int minHeight, int maxHeight,
+  Mesh&
+  applyDisplacementMap(const std::string& url, float minHeight, float maxHeight,
                        const std::function<void(Mesh* mesh)> onSuccess
                        = nullptr,
                        const std::optional<Vector2>& uvOffset = std::nullopt,
@@ -682,7 +682,7 @@ public:
    */
   void applyDisplacementMapFromBuffer(
     const Uint8Array& buffer, unsigned int heightMapWidth,
-    unsigned int heightMapHeight, int minHeight, int maxHeight,
+    unsigned int heightMapHeight, float minHeight, float maxHeight,
     const std::optional<Vector2>& uvOffset = std::nullopt,
     const std::optional<Vector2>& uvScale  = std::nullopt,
     bool forceUpdate                       = false);
@@ -755,8 +755,7 @@ public:
    * @param successCallback an optional success callback to be called after the
    * optimization finished.
    */
-  void
-  optimizeIndices(const std::function<void(Mesh* mesh)>& successCallback);
+  void optimizeIndices(const std::function<void(Mesh* mesh)>& successCallback);
 
   /**
    * @brief Hidden
@@ -1498,8 +1497,7 @@ public:
    */
   ReadOnlyProperty<Mesh, Observable<Mesh>> onBeforeDrawObservable;
 
-  WriteOnlyProperty<Mesh, std::function<void(Mesh*, EventState&)>>
-    onBeforeDraw;
+  WriteOnlyProperty<Mesh, std::function<void(Mesh*, EventState&)>> onBeforeDraw;
 
   // Members
   int delayLoadState;
