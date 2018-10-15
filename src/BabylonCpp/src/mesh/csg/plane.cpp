@@ -22,8 +22,8 @@ BABYLON::CSG::Plane::Plane(const BABYLON::CSG::Plane& otherPlane)
 }
 
 BABYLON::CSG::Plane::Plane(BABYLON::CSG::Plane&& otherPlane)
+    : normal{std::move(otherPlane.normal)}, w{std::move(otherPlane.w)}
 {
-  *this = std::move(otherPlane);
 }
 
 BABYLON::CSG::Plane& BABYLON::CSG::Plane::
@@ -87,7 +87,8 @@ void BABYLON::CSG::Plane::splitPolygon(
   const BABYLON::CSG::Polygon& polygon,
   std::vector<BABYLON::CSG::Polygon>& coplanarFront,
   std::vector<BABYLON::CSG::Polygon>& coplanarBack,
-  std::vector<BABYLON::CSG::Polygon>& front, std::vector<BABYLON::CSG::Polygon>& back)
+  std::vector<BABYLON::CSG::Polygon>& front,
+  std::vector<BABYLON::CSG::Polygon>& back)
 {
   // Classify each point as well as the entire polygon into one of the above
   // four classes.

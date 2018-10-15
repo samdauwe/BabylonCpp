@@ -22,8 +22,10 @@ CSG::Polygon::Polygon(const BABYLON::CSG::Polygon& otherPolygon)
 }
 
 CSG::Polygon::Polygon(BABYLON::CSG::Polygon&& otherPolygon)
+    : vertices{std::move(otherPolygon.vertices)}
+    , shared{std::move(otherPolygon.shared)}
+    , plane{std::move(otherPolygon.plane)}
 {
-  *this = std::move(otherPolygon);
 }
 
 CSG::Polygon& CSG::Polygon::operator=(const BABYLON::CSG::Polygon& otherPolygon)

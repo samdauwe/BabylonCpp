@@ -5,6 +5,7 @@
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
+#include <babylon/mesh/csg/polygon.h>
 
 namespace BABYLON {
 
@@ -15,8 +16,6 @@ using MaterialPtr = std::shared_ptr<Material>;
 using MeshPtr     = std::shared_ptr<Mesh>;
 
 namespace CSG {
-
-class Polygon;
 
 /**
  * @brief
@@ -31,11 +30,11 @@ public:
   static std::unique_ptr<CSG> FromMesh(Mesh* mesh);
 
   std::unique_ptr<CSG> clone() const;
-  CSG& _union(const CSG& csg);
+  CSG _union(const CSG& csg);
   void unionInPlace(CSG* csg);
-  CSG& subtract(const CSG& csg);
+  CSG subtract(const CSG& csg);
   void subtractInPlace(CSG* csg);
-  CSG& intersect(const CSG& csg);
+  CSG intersect(const CSG& csg);
   void intersectInPlace(CSG* csg);
 
   // Return a new BABYLON.CSG solid with solid and empty space switched. This

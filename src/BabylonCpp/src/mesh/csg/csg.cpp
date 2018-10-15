@@ -114,7 +114,7 @@ std::unique_ptr<CSG::CSG> CSG::CSG::clone() const
   return csg;
 }
 
-CSG::CSG& CSG::CSG::_union(const BABYLON::CSG::CSG& csg)
+CSG::CSG CSG::CSG::_union(const BABYLON::CSG::CSG& csg)
 {
   Node a{clone()->_polygons};
   Node b{csg.clone()->_polygons};
@@ -144,7 +144,7 @@ void CSG::CSG::unionInPlace(BABYLON::CSG::CSG* csg)
   _polygons = a.allPolygons();
 }
 
-CSG::CSG& CSG::CSG::subtract(const BABYLON::CSG::CSG& csg)
+CSG::CSG CSG::CSG::subtract(const BABYLON::CSG::CSG& csg)
 {
   Node a{clone()->_polygons};
   Node b{csg.clone()->_polygons};
@@ -178,7 +178,7 @@ void CSG::CSG::subtractInPlace(BABYLON::CSG::CSG* csg)
   _polygons = a.allPolygons();
 }
 
-CSG::CSG& CSG::CSG::intersect(const BABYLON::CSG::CSG& csg)
+CSG::CSG CSG::CSG::intersect(const BABYLON::CSG::CSG& csg)
 {
   Node a{clone()->_polygons};
   Node b{csg.clone()->_polygons};
@@ -308,7 +308,7 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
         Vector3 localNormal = Vector3::TransformNormal(normal, matrix);
 
         std::string vertexId = String::concat(localVertex.x, ",", localVertex.y,
-                                           ",", localVertex.z);
+                                              ",", localVertex.z);
 
         if (stl_util::contains(vertice_dict, vertexId)) {
           vertex_idx       = vertice_dict[vertexId];
