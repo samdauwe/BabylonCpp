@@ -66,14 +66,14 @@ void ConstructiveSolidGeometriesScene::initializeScene(ICanvas* canvas,
 
   mat0->diffuseColor.copyFromFloats(0.8f, 0.2f, 0.2f);
   mat0->backFaceCulling = false;
-
+#if 0
   mat1->diffuseColor.copyFromFloats(0.2f, 0.8f, 0.2f);
   mat1->backFaceCulling = false;
-
+#endif
   auto subCSG       = bCSG->subtract(*aCSG);
   auto newMesh      = subCSG.toMesh("csg", mat0, scene);
   newMesh->position = Vector3(-10, 0, 0);
-
+#if 0
   subCSG            = aCSG->subtract(*bCSG);
   newMesh           = subCSG.toMesh("csg2", mat0, scene);
   newMesh->position = Vector3(10, 0, 0);
@@ -93,6 +93,7 @@ void ConstructiveSolidGeometriesScene::initializeScene(ICanvas* canvas,
   subCSG            = bCSG->subtract(*cCSG);
   newMesh           = subCSG.toMesh("csg4", multiMat, scene, true);
   newMesh->position = Vector3(0, 0, -10);
+#endif
 }
 
 } // end of namespace Samples
