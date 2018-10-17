@@ -4,9 +4,9 @@
 
 namespace BABYLON {
 
-CSG::Vertex::Vertex(const Vector3& _pos, const Vector3& _normal,
-                    const Vector2& _uv)
-    : pos{_pos}, normal{_normal}, uv{_uv}
+CSG::Vertex::Vertex(const Vector3& iPos, const Vector3& iNormal,
+                    const Vector2& iUv)
+    : pos{iPos}, normal{iNormal}, uv{iUv}
 {
 }
 
@@ -16,8 +16,10 @@ CSG::Vertex::Vertex(const BABYLON::CSG::Vertex& otherVertex)
 }
 
 CSG::Vertex::Vertex(BABYLON::CSG::Vertex&& otherVertex)
+    : pos{std::move(otherVertex.pos)}
+    , normal{std::move(otherVertex.normal)}
+    , uv{std::move(otherVertex.uv)}
 {
-  *this = std::move(otherVertex);
 }
 
 CSG::Vertex& CSG::Vertex::operator=(const BABYLON::CSG::Vertex& otherVertex)

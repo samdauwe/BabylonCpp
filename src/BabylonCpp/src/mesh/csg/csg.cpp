@@ -17,11 +17,21 @@ CSG::CSG::CSG()
 {
 }
 
+CSG::CSG::CSG(const BABYLON::CSG::CSG& otherCSG)
+    : matrix{otherCSG.matrix}
+    , position{otherCSG.position}
+    , rotation{otherCSG.rotation}
+    , rotationQuaternion{otherCSG.rotationQuaternion}
+    , scaling{otherCSG.scaling}
+    , _polygons{otherCSG._polygons}
+{
+}
+
 CSG::CSG::~CSG()
 {
 }
 
-std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
+std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
 {
   Vector3 normal;
   Vector2 uv;
@@ -41,7 +51,7 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
   if (mesh->rotationQuaternion()) {
     meshRotationQuaternion = *mesh->rotationQuaternion();
   }
-  meshScaling = mesh->rotation();
+  meshScaling = mesh->scaling();
 
   IndicesArray indices   = mesh->getIndices();
   Float32Array positions = mesh->getVerticesData(VertexBuffer::PositionKind);
@@ -74,11 +84,13 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(Mesh* mesh)
       shared.materialIndex = subMesh->materialIndex;
 
       Polygon polygon(vertices, shared);
+      polygon.plane
+        = Plane::FromPoints(vertices[0].pos, vertices[1].pos, vertices[2].pos);
 
       // To handle the case of degenerated triangle
       // polygon.plane == null <=> the polygon does not represent 1 single plane
       // <=> the triangle is degenerated
-      if (polygon.plane) {
+      if (polygon.plane.first) {
         polygons.emplace_back(polygon);
       }
     }
@@ -114,10 +126,10 @@ std::unique_ptr<CSG::CSG> CSG::CSG::clone() const
   return csg;
 }
 
-CSG::CSG CSG::CSG::_union(const BABYLON::CSG::CSG& csg)
+CSG::CSG CSG::CSG::_union(const BABYLON::CSG::CSGPtr& csg)
 {
-  Node a{clone()->_polygons};
-  Node b{csg.clone()->_polygons};
+  Node a{_polygons};
+  Node b{csg->_polygons};
   a.clipTo(b);
   b.clipTo(a);
   b.invert();
@@ -128,7 +140,7 @@ CSG::CSG CSG::CSG::_union(const BABYLON::CSG::CSG& csg)
   return CSG::FromPolygons(a.allPolygons())->copyTransformAttributes(*this);
 }
 
-void CSG::CSG::unionInPlace(BABYLON::CSG::CSG* csg)
+void CSG::CSG::unionInPlace(const BABYLON::CSG::CSGPtr& csg)
 {
   Node a{_polygons};
   Node b{csg->_polygons};
@@ -144,10 +156,10 @@ void CSG::CSG::unionInPlace(BABYLON::CSG::CSG* csg)
   _polygons = a.allPolygons();
 }
 
-CSG::CSG CSG::CSG::subtract(const BABYLON::CSG::CSG& csg)
+CSG::CSG CSG::CSG::subtract(const BABYLON::CSG::CSGPtr& csg)
 {
-  Node a{clone()->_polygons};
-  Node b{csg.clone()->_polygons};
+  Node a{_polygons};
+  Node b{csg->_polygons};
   a.invert();
   a.clipTo(b);
   b.clipTo(a);
@@ -160,7 +172,7 @@ CSG::CSG CSG::CSG::subtract(const BABYLON::CSG::CSG& csg)
   return CSG::FromPolygons(a.allPolygons())->copyTransformAttributes(*this);
 }
 
-void CSG::CSG::subtractInPlace(BABYLON::CSG::CSG* csg)
+void CSG::CSG::subtractInPlace(const BABYLON::CSG::CSGPtr& csg)
 {
   Node a{_polygons};
   Node b{csg->_polygons};
@@ -178,10 +190,10 @@ void CSG::CSG::subtractInPlace(BABYLON::CSG::CSG* csg)
   _polygons = a.allPolygons();
 }
 
-CSG::CSG CSG::CSG::intersect(const BABYLON::CSG::CSG& csg)
+CSG::CSG CSG::CSG::intersect(const BABYLON::CSG::CSGPtr& csg)
 {
-  Node a{clone()->_polygons};
-  Node b{csg.clone()->_polygons};
+  Node a{_polygons};
+  Node b{csg->_polygons};
   a.invert();
   b.clipTo(a);
   b.invert();
@@ -193,7 +205,7 @@ CSG::CSG CSG::CSG::intersect(const BABYLON::CSG::CSG& csg)
   return CSG::FromPolygons(a.allPolygons())->copyTransformAttributes(*this);
 }
 
-void CSG::CSG::intersectInPlace(BABYLON::CSG::CSG* csg)
+void CSG::CSG::intersectInPlace(const BABYLON::CSG::CSGPtr& csg)
 {
   Node a{_polygons};
   Node b{csg->_polygons};

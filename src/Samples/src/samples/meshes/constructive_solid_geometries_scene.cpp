@@ -45,24 +45,24 @@ void ConstructiveSolidGeometriesScene::initializeScene(ICanvas* canvas,
 
   auto a = Mesh::CreateSphere("sphere", 16, 4, scene);
   auto b = Mesh::CreateBox("box", 4, scene);
-  auto c = Mesh::CreateBox("box", 4, scene);
+  // auto c = Mesh::CreateBox("box", 4, scene);
 
   a->material = sourceMat;
   b->material = sourceMat;
-  c->material = sourceMat;
+  // c->material = sourceMat;
 
   a->position().y += 5.f;
   b->position().y += 2.5f;
-  c->position().y += 3.5f;
-  c->rotation().y += Math::PI / 8.f;
+  // c->position().y += 3.5f;
+  // c->rotation().y += Math::PI / 8.f;
 
-  auto aCSG = CSG::CSG::FromMesh(a.get());
-  auto bCSG = CSG::CSG::FromMesh(b.get());
-  auto cCSG = CSG::CSG::FromMesh(c.get());
+  auto aCSG = CSG::CSG::FromMesh(a);
+  auto bCSG = CSG::CSG::FromMesh(b);
+  // auto cCSG = CSG::CSG::FromMesh(c);
 
   // Set up a MultiMaterial
   auto mat0 = StandardMaterial::New("mat0", scene);
-  auto mat1 = StandardMaterial::New("mat1", scene);
+  // auto mat1 = StandardMaterial::New("mat1", scene);
 
   mat0->diffuseColor.copyFromFloats(0.8f, 0.2f, 0.2f);
   mat0->backFaceCulling = false;
@@ -70,15 +70,15 @@ void ConstructiveSolidGeometriesScene::initializeScene(ICanvas* canvas,
   mat1->diffuseColor.copyFromFloats(0.2f, 0.8f, 0.2f);
   mat1->backFaceCulling = false;
 #endif
-  auto subCSG       = bCSG->subtract(*aCSG);
+  auto subCSG       = bCSG->subtract(aCSG);
   auto newMesh      = subCSG.toMesh("csg", mat0, scene);
   newMesh->position = Vector3(-10, 0, 0);
 #if 0
-  subCSG            = aCSG->subtract(*bCSG);
+  subCSG            = aCSG->subtract(bCSG);
   newMesh           = subCSG.toMesh("csg2", mat0, scene);
   newMesh->position = Vector3(10, 0, 0);
 
-  subCSG            = aCSG->intersect(*bCSG);
+  subCSG            = aCSG->intersect(bCSG);
   newMesh           = subCSG.toMesh("csg3", mat0, scene);
   newMesh->position = Vector3(0, 0, 10);
 
@@ -90,7 +90,7 @@ void ConstructiveSolidGeometriesScene::initializeScene(ICanvas* canvas,
 
   // Last parameter to true means you want to build 1 subMesh for each mesh
   // involved
-  subCSG            = bCSG->subtract(*cCSG);
+  subCSG            = bCSG->subtract(cCSG);
   newMesh           = subCSG.toMesh("csg4", multiMat, scene, true);
   newMesh->position = Vector3(0, 0, -10);
 #endif

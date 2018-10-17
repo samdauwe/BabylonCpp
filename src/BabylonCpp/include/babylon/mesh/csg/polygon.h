@@ -1,6 +1,8 @@
 #ifndef BABYLON_MESH_CSG_POLYGON_H
 #define BABYLON_MESH_CSG_POLYGON_H
 
+#include <utility>
+
 #include <babylon/babylon_api.h>
 #include <babylon/mesh/csg/plane.h>
 
@@ -41,7 +43,7 @@ public:
 public:
   std::vector<Vertex> vertices;
   PolygonOptions shared;
-  std::optional<Plane> plane;
+  std::pair<bool, Plane> plane;
 
 }; // end of class Polygon
 

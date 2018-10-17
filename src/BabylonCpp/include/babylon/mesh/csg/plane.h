@@ -54,8 +54,8 @@ public:
                     std::vector<Polygon>& coplanarBack,
                     std::vector<Polygon>& front, std::vector<Polygon>& back);
 
-  static std::optional<Plane> FromPoints(const Vector3& a, const Vector3& b,
-                                         const Vector3& c);
+  static std::pair<bool, Plane> FromPoints(const Vector3& a, const Vector3& b,
+                                           const Vector3& c);
 
 public:
   Vector3 normal;

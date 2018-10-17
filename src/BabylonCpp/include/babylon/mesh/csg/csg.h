@@ -17,6 +17,9 @@ using MeshPtr     = std::shared_ptr<Mesh>;
 
 namespace CSG {
 
+class CSG;
+using CSGPtr = std::unique_ptr<CSG>;
+
 /**
  * @brief
  */
@@ -24,23 +27,24 @@ class BABYLON_SHARED_EXPORT CSG {
 
 public:
   CSG();
+  CSG(const CSG& otherCSG);
   ~CSG();
 
   // Convert BABYLON.Mesh to BABYLON.CSG
-  static std::unique_ptr<CSG> FromMesh(Mesh* mesh);
+  static CSGPtr FromMesh(const MeshPtr& mesh);
 
-  std::unique_ptr<CSG> clone() const;
-  CSG _union(const CSG& csg);
-  void unionInPlace(CSG* csg);
-  CSG subtract(const CSG& csg);
-  void subtractInPlace(CSG* csg);
-  CSG intersect(const CSG& csg);
-  void intersectInPlace(CSG* csg);
+  CSGPtr clone() const;
+  CSG _union(const CSGPtr& csg);
+  void unionInPlace(const CSGPtr& csg);
+  CSG subtract(const CSGPtr& csg);
+  void subtractInPlace(const CSGPtr& csg);
+  CSG intersect(const CSGPtr& csg);
+  void intersectInPlace(const CSGPtr& csg);
 
   // Return a new BABYLON.CSG solid with solid and empty space switched. This
   // solid is
   // not modified.
-  std::unique_ptr<CSG> inverse();
+  CSGPtr inverse();
 
   void inverseInPlace();
 
@@ -61,8 +65,7 @@ public:
 private:
   // Construct a BABYLON.CSG solid from a list of `BABYLON.CSG.Polygon`
   // instances.
-  static std::unique_ptr<CSG>
-  FromPolygons(const std::vector<Polygon>& polygons);
+  static CSGPtr FromPolygons(const std::vector<Polygon>& polygons);
 
 public:
   Matrix matrix;

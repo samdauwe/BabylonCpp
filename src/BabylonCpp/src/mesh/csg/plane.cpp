@@ -79,7 +79,7 @@ std::string CSG::Plane::toString() const
 
 void CSG::Plane::flip()
 {
-  normal.scaleInPlace(-1);
+  normal.scaleInPlace(-1.f);
   w = -w;
 }
 
@@ -102,12 +102,13 @@ void BABYLON::CSG::Plane::splitPolygon(
     types.emplace_back(type);
   }
 
+  // std::cout << polygonType << std::endl;
+
   // Put the polygon in the correct list, splitting it when necessary.
   switch (polygonType) {
     case COPLANAR:
-    default:
-      (Vector3::Dot(normal, (*polygon.plane).normal) > 0 ? coplanarFront :
-                                                           coplanarBack)
+      (Vector3::Dot(normal, polygon.plane.second.normal) > 0 ? coplanarFront :
+                                                               coplanarBack)
         .emplace_back(polygon);
       break;
     case FRONT:
@@ -139,7 +140,7 @@ void BABYLON::CSG::Plane::splitPolygon(
       if (f.size() >= 3) {
         Polygon poly(f, polygon.shared);
 
-        if (poly.plane) {
+        if (poly.plane.first) {
           front.emplace_back(poly);
         }
       }
@@ -147,7 +148,7 @@ void BABYLON::CSG::Plane::splitPolygon(
       if (b.size() >= 3) {
         Polygon poly(b, polygon.shared);
 
-        if (poly.plane) {
+        if (poly.plane.first) {
           back.emplace_back(poly);
         }
       }
@@ -156,7 +157,7 @@ void BABYLON::CSG::Plane::splitPolygon(
   }
 }
 
-std::optional<CSG::Plane>
+std::pair<bool, CSG::Plane>
 CSG::Plane::FromPoints(const Vector3& a, const Vector3& b, const Vector3& c)
 {
   const auto v0 = c.subtract(a);
@@ -164,11 +165,11 @@ CSG::Plane::FromPoints(const Vector3& a, const Vector3& b, const Vector3& c)
 
   if (stl_util::almost_equal(v0.lengthSquared(), 0.f)
       || stl_util::almost_equal(v1.lengthSquared(), 0.f)) {
-    return std::nullopt;
+    return std::make_pair(false, Plane());
   }
 
-  const Vector3 n = Vector3::Normalize(Vector3::Cross(v0, v1));
-  return Plane(n, Vector3::Dot(n, a));
+  const auto n = Vector3::Normalize(Vector3::Cross(v0, v1));
+  return std::make_pair(true, Plane(n, Vector3::Dot(n, a)));
 }
 
 } // end of namespace BABYLON
