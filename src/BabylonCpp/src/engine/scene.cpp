@@ -3207,11 +3207,12 @@ void Scene::freeRenderingGroups()
   }
   if (!textures.empty()) {
     for (auto& texture : textures) {
-      if (texture
-          && !static_cast<RenderTargetTexture*>(texture.get())
-                ->renderList()
-                .empty()) {
-        static_cast<RenderTargetTexture*>(texture.get())->freeRenderingGroups();
+      if (texture) {
+        auto renderTargetTexture
+          = std::dynamic_pointer_cast<RenderTargetTexture>(texture);
+        if (renderTargetTexture && !renderTargetTexture->renderList().empty()) {
+          renderTargetTexture->freeRenderingGroups();
+        }
       }
     }
   }
