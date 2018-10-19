@@ -100,6 +100,7 @@
 ![cuboid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cuboid_scene.png?raw=true "Cuboid Scene")
 ![curved_helix_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/curved_helix_meshes_scene.png?raw=true "Curved Helix Meshes Scene")
 ![displacement_map_cpu_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/displacement_map_cpu_scene.png?raw=true "Displacement map (CPU) Scene")
+![extrude_polygon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extrude_polygon_scene.png?raw=true "Extrude Polygon Scene")
 ![extruded_polygon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extruded_polygon_scene.png?raw=true "Extruded Polygon Scene")
 ![extrusion_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/extrusion_scene.png?raw=true "Extrusion Scene")
 ![height_map_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/height_map_scene.png?raw=true "Height Map Scene")

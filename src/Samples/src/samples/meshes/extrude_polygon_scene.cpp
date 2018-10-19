@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_rotate_camera.h>
+#include <babylon/interfaces/icanvas.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
@@ -16,6 +17,29 @@ namespace Samples {
 
 ExtrudePolygonScene::ExtrudePolygonScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
+    // Roof
+    , _roof{nullptr}
+    , _ceiling{nullptr} // Front
+    , _frontWall{nullptr}
+    , _windowFBL{nullptr}
+    , _windowFBR{nullptr}
+    , _windowFTL{nullptr}
+    , _windowFTR{nullptr}
+    , _windowFTM{nullptr}
+    , _frontDoor{nullptr} // Back
+    , _rearWallnb1{nullptr}
+    , _rearWallnb2{nullptr}
+    , _windowRBL{nullptr}
+    , _windowRBR{nullptr}
+    , _windowRTL{nullptr}
+    , _windowRTR{nullptr}
+    , _windowR1BL{nullptr}
+    , _windowR1TL{nullptr}
+    , _windowR1TR{nullptr} // Left Side
+    , _sideWallnb1{nullptr}
+    , _sideWallnb3{nullptr}
+    , _backDoor{nullptr} // Right Side
+    , _sideWallnb2{nullptr}
 {
 }
 
@@ -31,16 +55,17 @@ const char* ExtrudePolygonScene::getName()
 void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
 
-  // camera
+  // Camera
   auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f, 25,
-                                     Vector3(0, 0, 4.5f), scene);
+                                     Vector3::Zero(), scene);
+  camera->target = Vector3(0, 0.f, 4.5f);
   camera->attachControl(canvas, true);
 
   auto light = HemisphericLight::New("hemiLight", Vector3(10, 10, 0), scene);
+  light->intensity = 0.98f;
 
-  auto wallmat = StandardMaterial::New("wallmaterial", scene);
-  wallmat->diffuseTexture
-    = Texture::New("http://i.imgur.com/2b1C7UH.jpg", scene);
+  auto wallmat            = StandardMaterial::New("wallmaterial", scene);
+  wallmat->diffuseTexture = Texture::New("textures/wallMaterial.jpg", scene);
 
   auto innerwallmat = StandardMaterial::New("innerwallmaterial", scene);
   innerwallmat->diffuseColor
@@ -109,9 +134,9 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
   frontWallOptions.depth  = 0.15f;
   frontWallOptions.holes  = frontWindowHoles;
   frontWallOptions.faceUV = frontWallFaceUV;
-  auto frontWall = MeshBuilder::ExtrudePolygon("wall", frontWallOptions, scene);
-  frontWall->rotation().x = -Math::PI_2;
-  frontWall->material     = wallmat;
+  _frontWall = MeshBuilder::ExtrudePolygon("wall", frontWallOptions, scene);
+  _frontWall->rotation().x = -Math::PI_2;
+  _frontWall->material     = wallmat;
 
   // Real wall polygon shape in XoZ plane
   std::vector<Vector3> rearWallnb1Data{
@@ -125,24 +150,24 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
   std::vector<std::vector<Vector3>> rear1WindowHoles{
     // rear1WindowHoles[0]
     {
-      Vector3(3.7f, 0, -1.8f), //
-      Vector3(4.5f, 0, -1.8f), //
-      Vector3(4.5f, 0, -0.3f), //
-      Vector3(3.7f, 0, -0.3f)  //
+      Vector3(3.7f, 0.f, -1.8f), //
+      Vector3(4.5f, 0.f, -1.8f), //
+      Vector3(4.5f, 0.f, -0.3f), //
+      Vector3(3.7f, 0.f, -0.3f)  //
     },
     // rear1WindowHoles[1]
     {
-      Vector3(1.9f, 0, 0.75f), //
-      Vector3(2.7f, 0, 0.75f), //
-      Vector3(2.7f, 0, 2.55f), //
-      Vector3(1.9f, 0, 2.55f)  //
+      Vector3(1.9f, 0.f, 0.75f), //
+      Vector3(2.7f, 0.f, 0.75f), //
+      Vector3(2.7f, 0.f, 2.55f), //
+      Vector3(1.9f, 0.f, 2.55f)  //
     },
     // rear1WindowHoles[2]
     {
-      Vector3(4.2f, 0, 0.75f), //
-      Vector3(5.f, 0, 0.75f),  //
-      Vector3(5.f, 0, 2.55f),  //
-      Vector3(4.2f, 0, 2.55f)  //
+      Vector3(4.2f, 0.f, 0.75f), //
+      Vector3(5.f, 0.f, 0.75f),  //
+      Vector3(5.f, 0.f, 2.55f),  //
+      Vector3(4.2f, 0.f, 2.55f)  //
     }};
 
   // Rear Wall faceUVs
@@ -152,98 +177,98 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
     Vector4(0.f, 0.f, 7.f / 15.f, 1.f)          //
   };
 
-  // Rear wall nb1 polygon shape in XoZ plane
+  // Rear wall 1
   PolygonOptions rearWallnb1Options;
   rearWallnb1Options.shape  = rearWallnb1Data;
   rearWallnb1Options.depth  = 0.1f;
   rearWallnb1Options.holes  = rear1WindowHoles;
   rearWallnb1Options.faceUV = rearFaceUV;
-  auto rearWallnb1
+  _rearWallnb1
     = MeshBuilder::ExtrudePolygon("rearWallnb1", rearWallnb1Options, scene);
-  rearWallnb1->rotation().x = -Math::PI_2;
-  rearWallnb1->position().z = 6.15f;
-  rearWallnb1->material     = wallmat;
+  _rearWallnb1->rotation().x = -Math::PI_2;
+  _rearWallnb1->position().z = 6.15f;
+  _rearWallnb1->material     = wallmat;
 
   // Real wall nb2 polygon shape in XoZ plane
   std::vector<Vector3> rearWallnb2Data{
-    Vector3(-5.6f, 0, -3.f),   //
-    Vector3(1.45f, 0, -3.f),   //
-    Vector3(1.45f, 0, 3.f),    //
-    Vector3(-2.075f, 0, 5.5f), //
-    Vector3(-5.6f, 0, 3.f)     //
+    Vector3(-5.6f, 0.f, -3.f),   //
+    Vector3(1.45f, 0.f, -3.f),   //
+    Vector3(1.45f, 0.f, 3.f),    //
+    Vector3(-2.075f, 0.f, 5.5f), //
+    Vector3(-5.6f, 0.f, 3.f)     //
   };
 
   // Holes in XoZ plane
   std::vector<std::vector<Vector3>> rear2WindowHoles{
     // rear2WindowHoles[0]
     {
-      Vector3(-5.f, 0, -1.8f),   //
-      Vector3(-1.85f, 0, -1.8f), //
-      Vector3(-1.85f, 0, -0.3f), //
-      Vector3(-5.f, 0, -0.3f)    //
+      Vector3(-5.f, 0.f, -1.8f),   //
+      Vector3(-1.85f, 0.f, -1.8f), //
+      Vector3(-1.85f, 0.f, -0.3f), //
+      Vector3(-5.f, 0.f, -0.3f)    //
     },
     // rear2WindowHoles[1]
     {
-      Vector3(-0.8f, 0, -1.8f), //
-      Vector3(0.9f, 0, -1.8f),  //
-      Vector3(0.9f, 0, -0.3f),  //
-      Vector3(-0.8f, 0, -0.3f)  //
+      Vector3(-0.8f, 0.f, -1.8f), //
+      Vector3(0.9f, 0.f, -1.8f),  //
+      Vector3(0.9f, 0.f, -0.3f),  //
+      Vector3(-0.8f, 0.f, -0.3f)  //
     },
     // rear2WindowHoles[2]
     {
-      Vector3(-5.f, 0, 0.75f),   //
-      Vector3(-1.85f, 0, 0.75f), //
-      Vector3(-1.85f, 0, 2.55f), //
-      Vector3(-5.f, 0, 2.55f)    //
+      Vector3(-5.f, 0.f, 0.75f),   //
+      Vector3(-1.85f, 0.f, 0.75f), //
+      Vector3(-1.85f, 0.f, 2.55f), //
+      Vector3(-5.f, 0.f, 2.55f)    //
     },
     // rear2WindowHoles[3]
     {
-      Vector3(-0.6f, 0, 1.75f), //
-      Vector3(0.7f, 0, 1.75f),  //
-      Vector3(0.7f, 0, 2.55f),  //
-      Vector3(-0.6f, 0, 2.55f)  //
+      Vector3(-0.6f, 0.f, 1.75f), //
+      Vector3(0.7f, 0.f, 1.75f),  //
+      Vector3(0.7f, 0.f, 2.55f),  //
+      Vector3(-0.6f, 0.f, 2.55f)  //
     }};
 
-  // Rear wall nb2 polygon shape in XoZ plane
+  // Rear wall 2
   PolygonOptions rearWallnb2Options;
   rearWallnb2Options.shape  = rearWallnb2Data;
   rearWallnb2Options.depth  = 0.1f;
   rearWallnb2Options.holes  = rear2WindowHoles;
   rearWallnb2Options.faceUV = rearFaceUV;
-  auto rearWallnb2
+  _rearWallnb2
     = MeshBuilder::ExtrudePolygon("rearWallnb2", rearWallnb2Options, scene);
-  rearWallnb2->rotation().x = -Math::PI_2;
-  rearWallnb2->position().z = 9.15f;
-  rearWallnb2->material     = wallmat;
+  _rearWallnb2->rotation().x = -Math::PI_2;
+  _rearWallnb2->position().z = 9.15f;
+  _rearWallnb2->material     = wallmat;
 
-  // Side wall nb1 polygon shape in XoZ plane
+  // Side wall 1 polygon shape in XoZ plane
   std::vector<Vector3> sideWallnb1Data{
-    Vector3(-3.15f, 0, -3.f), //
-    Vector3(3.1f, 0, -3.f),   //
-    Vector3(3.1f, 0, 3.f),    //
-    Vector3(0.f, 0, 5.5f),    //
-    Vector3(-3.15f, 0, 3.f)   //
+    Vector3(-3.15f, 0.f, -3.f), //
+    Vector3(3.1f, 0.f, -3.f),   //
+    Vector3(3.1f, 0.f, 3.f),    //
+    Vector3(0.f, 0.f, 5.5f),    //
+    Vector3(-3.15f, 0.f, 3.f)   //
   };
 
-  // faceUVs
+  // Side wall 1 faceUVs
   std::vector<Vector4> side1FaceUV{
     Vector4(0.f, 0.f, 7.f / 15.f, 1.f),        //
     Vector4(14.f / 15.f, 0.f, 1.f, 1.f),       //
     Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f) //
   };
 
-  // Side wall nb1
+  // Side wall 1
   PolygonOptions sideWallnb1Options;
   sideWallnb1Options.shape  = sideWallnb1Data;
   sideWallnb1Options.depth  = 0.1f;
   sideWallnb1Options.faceUV = side1FaceUV;
-  auto sideWallnb1
+  _sideWallnb1
     = MeshBuilder::ExtrudePolygon("sideWallnb1", sideWallnb1Options, scene);
-  sideWallnb1->rotation().z = -Math::PI_2;
-  sideWallnb1->rotation().x = -Math::PI_2;
-  sideWallnb1->position().x = 5.6f;
-  sideWallnb1->position().z = 3.15f;
-  sideWallnb1->material     = wallmat;
+  _sideWallnb1->rotation().z = -Math::PI_2;
+  _sideWallnb1->rotation().x = -Math::PI_2;
+  _sideWallnb1->position().x = 5.6f;
+  _sideWallnb1->position().z = 3.15f;
+  _sideWallnb1->material     = wallmat;
 
   // Side wall nb2 polygon shape in XoZ plane
   std::vector<Vector3> sideWallnb2Data{
@@ -252,74 +277,73 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
     Vector3(6.f, 0.f, 3.f),     //
     Vector3(3.1f, 0.f, 3.f),    //
     Vector3(0.f, 0.f, 5.5f),    //
-    Vector3(-3.15f, 0, 3.f)     //
+    Vector3(-3.15f, 0.f, 3.f)   //
   };
 
-  // Side 2 faceUVs
+  // Side wall 2 faceUVs
   std::vector<Vector4> side2FaceUV{
     Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f), //
     Vector4(14.f / 15.f, 0.f, 1.f, 1.f),        //
     Vector4(0.f, 0.f, 7.f / 15.f, 1.f)          //
   };
 
-  // Side wall nb2
+  // Side wall 2
   PolygonOptions sideWallnb2Options;
   sideWallnb2Options.shape  = sideWallnb2Data;
   sideWallnb2Options.depth  = 0.1f;
   sideWallnb2Options.faceUV = side2FaceUV;
-  auto sideWallnb2
+  _sideWallnb2
     = MeshBuilder::ExtrudePolygon("sideWallnb2", sideWallnb2Options, scene);
-  sideWallnb2->rotation().z = -Math::PI_2;
-  sideWallnb2->rotation().x = -Math::PI_2;
-  sideWallnb2->position().x = -5.5f;
-  sideWallnb2->position().z = 3.15f;
-  sideWallnb2->material     = wallmat;
+  _sideWallnb2->rotation().z = -Math::PI_2;
+  _sideWallnb2->rotation().x = -Math::PI_2;
+  _sideWallnb2->position().x = -5.5f;
+  _sideWallnb2->position().z = 3.15f;
+  _sideWallnb2->material     = wallmat;
 
-  // Side wall nb3 polygon shape in XoZ plane
+  // Side wall 3
   std::vector<Vector3> sideWallnb3Data{
-    Vector3(3.1f, 0, -3.f),   //
-    Vector3(4.5f, 0, -3.f),   //
-    Vector3(4.5f, 0, -0.75f), //
-    Vector3(5.5f, 0, -0.75f), //
-    Vector3(5.5f, 0, -3.f),   //
-    Vector3(6.f, 0, -3.f),    //
-    Vector3(6.f, 0, 3.f),     //
-    Vector3(3.1f, 0, 3.f)     //
+    Vector3(3.1f, 0.f, -3.f),   //
+    Vector3(4.5f, 0.f, -3.f),   //
+    Vector3(4.5f, 0.f, -0.75f), //
+    Vector3(5.5f, 0.f, -0.75f), //
+    Vector3(5.5f, 0.f, -3.f),   //
+    Vector3(6.f, 0.f, -3.f),    //
+    Vector3(6.f, 0.f, 3.f),     //
+    Vector3(3.1f, 0.f, 3.f)     //
   };
 
-  // Side 3 faceUVs
+  // Side wall 3 faceUVs
   std::vector<Vector4> side3FaceUV{
     Vector4(0.f, 0.f, 7.f / 15.f, 1.f),        //
     Vector4(14.f / 15.f, 0.f, 1.f, 1.f),       //
     Vector4(7.f / 15.f, 0.f, 14.f / 15.f, 1.f) //
   };
 
-  // Side wall nb3
+  // Side wall 3
   PolygonOptions sideWallnb3Options;
   sideWallnb3Options.shape  = sideWallnb3Data;
   sideWallnb3Options.depth  = 0.1f;
   sideWallnb3Options.faceUV = side3FaceUV;
-  auto sideWallnb3
+  _sideWallnb3
     = MeshBuilder::ExtrudePolygon("sideWallnb3", sideWallnb3Options, scene);
-  sideWallnb3->rotation().z = -Math::PI_2;
-  sideWallnb3->rotation().x = -Math::PI_2;
-  sideWallnb3->position().x = 1.45f;
-  sideWallnb3->position().z = 3.15f;
-  sideWallnb3->material     = wallmat;
+  _sideWallnb3->rotation().z = -Math::PI_2;
+  _sideWallnb3->rotation().x = -Math::PI_2;
+  _sideWallnb3->position().x = 1.45f;
+  _sideWallnb3->position().z = 3.15f;
+  _sideWallnb3->material     = wallmat;
 
   // Roof material
-  auto roofmat = StandardMaterial::New("roofmat", scene);
-  roofmat->diffuseTexture
-    = Texture::New("http://i.imgur.com/Vw4fzwq.jpg", scene);
+  auto roofmat            = StandardMaterial::New("roofmat", scene);
+  roofmat->diffuseTexture = Texture::New("textures/roofMaterial.jpg", scene);
 
   // Roof 1 polygon shape in XoZ plane
   std::vector<Vector3> roof1Data{
-    Vector3(-0.05f, 0, 0.f), //
-    Vector3(0.1f, 0, 0.f),   //
-    Vector3(3.3f, 0, 2.65f), //
-    Vector3(6.5f, 0, 0.f),   //
-    Vector3(6.6f, 0, 0.f),   //
-    Vector3(3.3f, 0, 2.8f)   //
+    Vector3(-0.05f, 0.f, 0.f), //
+    Vector3(0.1f, 0.f, 0.f),   //
+    Vector3(3.3f, 0.f, 2.65f), //
+    Vector3(6.5f, 0.f, 0.f),   //
+    Vector3(6.6f, 0.f, 0.f),   //
+    Vector3(3.3f, 0.f, 2.8f)   //
   };
 
   // Roof 1
@@ -336,12 +360,12 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Roof 2 polygon shape in XoZ plane
   std::vector<Vector3> roof2Data{
-    Vector3(0.f, 0, 0.f),     //
-    Vector3(0.142f, 0, 0.f),  //
-    Vector3(3.834f, 0, 2.6f), //
-    Vector3(7.476f, 0, 0.f),  //
-    Vector3(7.618f, 0, 0.f),  //
-    Vector3(3.834f, 0, 2.7f)  //
+    Vector3(0.f, 0.f, 0.f),     //
+    Vector3(0.142f, 0.f, 0.f),  //
+    Vector3(3.834f, 0.f, 2.6f), //
+    Vector3(7.476f, 0.f, 0.f),  //
+    Vector3(7.618f, 0.f, 0.f),  //
+    Vector3(3.834f, 0.f, 2.7f)  //
   };
 
   // Roof 2
@@ -357,12 +381,12 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Roof 3 polygon shape in XoZ plane
   std::vector<Vector3> roof3Data{
-    Vector3(0.3f, 0, 0.2f),   //
-    Vector3(0.442f, 0, 0.2f), //
-    Vector3(3.834f, 0, 2.6f), //
-    Vector3(7.476f, 0, 0.f),  //
-    Vector3(7.618f, 0, 0.f),  //
-    Vector3(3.834f, 0, 2.7f)  //
+    Vector3(0.3f, 0.f, 0.2f),   //
+    Vector3(0.442f, 0.f, 0.2f), //
+    Vector3(3.834f, 0.f, 2.6f), //
+    Vector3(7.476f, 0.f, 0.f),  //
+    Vector3(7.618f, 0.f, 0.f),  //
+    Vector3(3.834f, 0.f, 2.7f)  //
   };
 
   // Roof 3
@@ -376,8 +400,394 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
   roof3->position().z = 3.1f;
   roof3->material     = roofmat;
 
-  //////////////////////////////////////////////////////////////////////////////
+  // Roof
+  _roof = Mesh::MergeMeshes({roof1, roof2, roof3}, true);
 
+  // Staircase
+  auto stairsDepth     = 2.f;
+  auto stairsHeight    = 3.f;
+  auto stairsThickness = 0.05f;
+  auto nBStairs        = 12;
+  std::vector<Vector3> stairs;
+  auto x = 0.f;
+  auto z = 0.f;
+
+  // Up
+  stairs.emplace_back(Vector3(x, 0.f, z));
+  z += stairsHeight / nBStairs - stairsThickness;
+  stairs.emplace_back(Vector3(x, 0.f, z));
+  for (auto i = 0; i < nBStairs; ++i) {
+    x += stairsDepth / nBStairs;
+    stairs.emplace_back(Vector3(x, 0.f, z));
+    z += stairsHeight / nBStairs;
+    stairs.emplace_back(Vector3(x, 0.f, z));
+  }
+  x += stairsDepth / nBStairs - stairsThickness;
+  stairs.emplace_back(Vector3(x, 0.f, z));
+
+  // Down
+  for (auto i = 0; i <= nBStairs; i++) {
+    x -= stairsDepth / nBStairs;
+    stairs.emplace_back(Vector3(x, 0.f, z));
+    z -= stairsHeight / nBStairs;
+    stairs.emplace_back(Vector3(x, 0.f, z));
+  }
+
+  std::vector<Color4> faceColors{
+    Color4(0.f, 0.f, 0.f, 1.f),                              //
+    Color4(190.f / 255.f, 139.f / 255.f, 94.f / 255.f, 1.f), //
+    Color4(0.f, 0.f, 0.f, 1.f),                              //
+  };
+
+  // Stairs
+  auto stairsWidth = 1.f;
+  PolygonOptions stairsOptions;
+  stairsOptions.shape      = stairs;
+  stairsOptions.depth      = stairsWidth;
+  stairsOptions.faceColors = faceColors;
+  auto stairCase = MeshBuilder::ExtrudePolygon("stairs", stairsOptions, scene);
+  stairCase->position().x = 1.37f;
+  stairCase->position().y = -3.f;
+  stairCase->position().z = 2.51f;
+  stairCase->rotation().x = -Math::PI_2;
+  stairCase->rotation().y = -Math::PI_2;
+
+  // Floor material
+  auto floormat            = StandardMaterial::New("floormaterial", scene);
+  floormat->diffuseTexture = Texture::New("textures/floorMaterial.jpg", scene);
+
+  // Floor polygon shape in XoZ plane
+  std::vector<Vector3> floorData{
+    Vector3(-5.5f, 0.f, 0),  //
+    Vector3(5.5f, 0.f, 0),   //
+    Vector3(5.5f, 0.f, 6),   //
+    Vector3(1.345f, 0.f, 6), //
+    Vector3(1.345f, 0.f, 9), //
+    Vector3(-5.5f, 0.f, 9)   //
+  };
+
+  // Stair space
+  std::vector<std::vector<Vector3>> stairSpace{// stairSpace[0]
+                                               {
+                                                 Vector3(0.27f, 0.f, 2.5f), //
+                                                 Vector3(0.27f, 0.f, 4.5f), //
+                                                 Vector3(1.37f, 0.f, 4.5f), //
+                                                 Vector3(1.37f, 0.f, 2.5f), //
+                                               }};
+
+  // Rear Wall faceUVs
+  std::vector<Vector4> floorFaceUV{
+    Vector4(0.f, 0.f, 0.5f, 1.f), //
+    Vector4(0.f, 0.f, 0.f, 0.f),  //
+    Vector4(0.5f, 0.f, 1.f, 1.f)  //
+  };
+
+  // Floor
+  PolygonOptions floorOptions;
+  floorOptions.shape  = floorData;
+  floorOptions.holes  = stairSpace;
+  floorOptions.depth  = 0.1f;
+  floorOptions.faceUV = floorFaceUV;
+  auto floor = MeshBuilder::ExtrudePolygon("floor", floorOptions, scene);
+  floor->position().y = 0.21f;
+  floor->position().z = 0.15f;
+  floor->material     = floormat;
+
+  // Ground floor polygon shape in XoZ plane
+  std::vector<Vector3> groundFloorData{
+    Vector3(-5.6f, 0.f, -0.1f), //
+    Vector3(5.6f, 0.f, -0.1f),  //
+    Vector3(5.6f, 0.f, 6.1f),   //
+    Vector3(1.36f, 0.f, 6.1f),  //
+    Vector3(1.36f, 0.f, 9.1f),  //
+    Vector3(-5.6f, 0.f, 9.1f)   //
+  };
+
+  // Ground floor faceUVs
+  std::vector<Vector4> groundFloorFaceUV{
+    Vector4(0.f, 0.f, 0.5f, 1.f), //
+    Vector4(0.f, 0.f, 0.f, 0.f),  //
+    Vector4(0.5f, 0.f, 1.f, 1.f)  //
+  };
+
+  // Ground floor
+  PolygonOptions groundFloorOptions;
+  groundFloorOptions.shape  = groundFloorData;
+  groundFloorOptions.depth  = 0.04f;
+  groundFloorOptions.faceUV = groundFloorFaceUV;
+  auto groundFloor
+    = MeshBuilder::ExtrudePolygon("groundFloor", groundFloorOptions, scene);
+  groundFloor->position().y = -3.f;
+  groundFloor->position().z = 0.15f;
+  groundFloor->material     = floormat;
+
+  // Ceiling polygon shape in XoZ plane
+  std::vector<Vector3> ceilingData{
+    Vector3(-5.5f, 0.f, 0.f),  //
+    Vector3(5.5f, 0.f, 0.f),   //
+    Vector3(5.5f, 0.f, 6.f),   //
+    Vector3(1.345f, 0.f, 6.f), //
+    Vector3(1.345f, 0.f, 9.f), //
+    Vector3(-5.5f, 0.f, 9.f)   //
+  };
+
+  // Ceiling
+  PolygonOptions ceilingOptions;
+  ceilingOptions.shape = ceilingData;
+  ceilingOptions.depth = 0.1f;
+  _ceiling = MeshBuilder::ExtrudePolygon("ceiling", ceilingOptions, scene);
+  _ceiling->position().y = 2.8f;
+  _ceiling->position().z = 0.15f;
+  _ceiling->material     = innerwallmat;
+
+  // Inner wall 1 polygon shape in XoZ plane
+  std::vector<Vector3> innerWallnb1Data{
+    Vector3(-3.f, 0.f, 0.6f), //
+    Vector3(-3.f, 0.f, 0.f),  //
+    Vector3(3.f, 0.f, 0.f),   //
+    Vector3(3.f, 0.f, 6.1f),  //
+    Vector3(-3.f, 0.f, 6.1f), //
+    Vector3(-3.f, 0.f, 1.6f), //
+    Vector3(-1.f, 0.f, 1.6f), //
+    Vector3(-1.f, 0.f, 0.6f), //
+  };
+
+  // Door space 1
+  std::vector<std::vector<Vector3>> doorSpace1{// doorSpace1[0]
+                                               {
+                                                 Vector3(0.1f, 0.f, 1.6f), //
+                                                 Vector3(0.1f, 0.f, 0.6f), //
+                                                 Vector3(2.f, 0.f, 0.6f),  //
+                                                 Vector3(2.f, 0.f, 1.6f)   //
+                                               }};
+
+  // Inner wall 1
+  PolygonOptions innerWallnb1Options;
+  innerWallnb1Options.shape = innerWallnb1Data;
+  innerWallnb1Options.holes = doorSpace1;
+  innerWallnb1Options.depth = 0.1f;
+  auto innerWallnb1
+    = MeshBuilder::ExtrudePolygon("innerWallnb1", innerWallnb1Options, scene);
+  innerWallnb1->rotation().z = Math::PI_2;
+  innerWallnb1->position().x = 1.35f;
+  innerWallnb1->position().z = 0.15f;
+  innerWallnb1->material     = innerwallmat;
+
+  // Inner wall 1 polygon shape in XoZ plane
+  std::vector<Vector3> innerWallnb2Data{
+    Vector3(-3.f, 0.f, 0.f),  //
+    Vector3(3.f, 0.f, 0.f),   //
+    Vector3(3.f, 0.f, 9.f),   //
+    Vector3(-3.f, 0.f, 9.f),  //
+    Vector3(-3.f, 0.f, 7.6f), //
+    Vector3(-1.f, 0.f, 7.6f), //
+    Vector3(-1.f, 0.f, 6.6f), //
+    Vector3(-3.f, 0.f, 6.6f), //
+    Vector3(-3.f, 0.f, 1.6f), //
+    Vector3(-1.f, 0.f, 1.6f), //
+    Vector3(-1.f, 0.f, 0.6f), //
+    Vector3(-3.f, 0.f, 0.6f)  //
+  };
+
+  // Door space 2
+  std::vector<std::vector<Vector3>> doorSpace2{// doorSpace2[0]
+                                               {
+                                                 Vector3(0.1f, 0.f, 0.6f), //
+                                                 Vector3(2.f, 0.f, 0.6f),  //
+                                                 Vector3(2.f, 0.f, 1.6f),  //
+                                                 Vector3(0.1f, 0.f, 1.6f)  //
+                                               },
+                                               // doorSpace2[1]
+                                               {
+                                                 Vector3(0.1f, 0.f, 4.6f), //
+                                                 Vector3(2.f, 0.f, 4.6f),  //
+                                                 Vector3(2.f, 0.f, 5.6f),  //
+                                                 Vector3(0.1f, 0.f, 5.6f)  //
+                                               }};
+
+  // Inner wall 2
+  PolygonOptions innerWallnb2options;
+  innerWallnb2options.shape = innerWallnb2Data;
+  innerWallnb2options.holes = doorSpace2;
+  innerWallnb2options.depth = 0.1f;
+  auto innerWallnb2
+    = MeshBuilder::ExtrudePolygon("innerWallnb2", innerWallnb2options, scene);
+  innerWallnb2->rotation().z = Math::PI_2;
+  innerWallnb2->position().x = 1.35f;
+  innerWallnb2->position().z = 0.15f;
+  innerWallnb2->position().x = -1.4f;
+  innerWallnb2->material     = innerwallmat;
+
+  // Bathroom wall polygon shape in XoZ plane
+  std::vector<Vector3> bathroomWallData{
+    Vector3(-1.4f, 0.f, 0), //
+    Vector3(-0.5f, 0.f, 0), //
+    Vector3(-0.5f, 0.f, 2), //
+    Vector3(0.5f, 0.f, 2),  //
+    Vector3(0.5f, 0.f, 0),  //
+    Vector3(1.4f, 0.f, 0),  //
+    Vector3(1.4f, 0.f, 6),  //
+    Vector3(-1.4f, 0.f, 6)  //
+  };
+
+  // Door space 3
+  std::vector<std::vector<Vector3>> doorSpace3{// doorSpace3[0]
+                                               {
+                                                 Vector3(-0.5f, 0.f, 3.2f), //
+                                                 Vector3(-0.5f, 0.f, 5.2f), //
+                                                 Vector3(0.5f, 0.f, 5.2f),  //
+                                                 Vector3(0.5f, 0.f, 3.2f)   //
+                                               }};
+
+  // Bathroom wall
+  PolygonOptions bathroomOptions;
+  bathroomOptions.shape = bathroomWallData;
+  bathroomOptions.depth = 0.1f;
+  bathroomOptions.holes = doorSpace3;
+  auto bathroomWall
+    = MeshBuilder::ExtrudePolygon("bathroomWall", bathroomOptions, scene);
+  bathroomWall->rotation().x = -Math::PI_2;
+  bathroomWall->position().y = -3.f;
+  bathroomWall->position().z = 6.f;
+  bathroomWall->material     = innerwallmat;
+
+  // Bedroom 1 wall shape in XoZ plane
+  std::vector<Vector3> bedroom1WallData{
+    Vector3(-5.5f, 0.f, 0.f), //
+    Vector3(-2.9f, 0.f, 0.f), //
+    Vector3(-2.9f, 0.f, 2.f), //
+    Vector3(-1.9f, 0.f, 2.f), //
+    Vector3(-1.9f, 0.f, 0.f), //
+    Vector3(-1.4f, 0.f, 0.f), //
+    Vector3(-1.4f, 0.f, 6.f), //
+    Vector3(-5.5f, 0.f, 6.f)  //
+  };
+
+  // Bedroom 1 wall
+  PolygonOptions bedroom1WallOptions;
+  bedroom1WallOptions.shape = bedroom1WallData;
+  bedroom1WallOptions.depth = 0.1f;
+  auto bedroom1Wall
+    = MeshBuilder::ExtrudePolygon("bedroom1Wall", bedroom1WallOptions, scene);
+  bedroom1Wall->rotation().x = -Math::PI_2;
+  bedroom1Wall->position().y = -3;
+  bedroom1Wall->position().z = 4.5;
+  bedroom1Wall->material     = innerwallmat;
+
+  // Bannister wall shape in XoZ plane
+  std::vector<Vector3> bannisterWallData{
+    Vector3(0.f, 0.f, 0.f),    //
+    Vector3(1.f, 0.f, 0.f),    //
+    Vector3(1.f, 0.f, 1.4f),   //
+    Vector3(1.75f, 0.f, 1.4f), //
+    Vector3(1.75f, 0.f, 0.f),  //
+    Vector3(3.5f, 0.f, 0.f),   //
+    Vector3(3.5f, 0.f, 3.2f),  //
+    Vector3(1.5f, 0.f, 3.2f),  //
+    Vector3(0.f, 0.f, 0.75f)   //
+  };
+  auto spindleThickness = 0.05f;
+  auto spindles         = 12;
+  auto railGap = (1.5f - spindles * spindleThickness) / (spindles - 1.f);
+  std::vector<std::vector<Vector3>> rail;
+  auto ac = spindleThickness;
+  for (auto s = 0; s < spindles - 1; s++) {
+    std::vector<Vector3> rails;
+    rails.emplace_back(Vector3(ac, 0.f, 0.1f + 1.6f * ac));
+    rails.emplace_back(
+      Vector3(ac, 0.f, (0.75f - spindleThickness) + 1.6f * ac));
+    rails.emplace_back(Vector3(
+      ac + railGap, 0.f, (0.75f - spindleThickness) + 1.6f * (ac + railGap)));
+    rails.emplace_back(Vector3(ac + railGap, 0.f, 1.6f * (ac + railGap)));
+    rail.emplace_back(rails);
+    ac += spindleThickness + railGap;
+  }
+
+  // Bannister wall
+  PolygonOptions bannisterWallOptions;
+  bannisterWallOptions.shape = bannisterWallData;
+  bannisterWallOptions.holes = rail;
+  bannisterWallOptions.depth = 0.1f;
+  auto bannisterWall
+    = MeshBuilder::ExtrudePolygon("bannisterWall", bannisterWallOptions, scene);
+  bannisterWall->rotation().x = -Math::PI_2;
+  bannisterWall->rotation().z = -Math::PI_2;
+  bannisterWall->position().x = 0.4f;
+  bannisterWall->position().y = -3.f;
+  bannisterWall->position().z = 2.51f;
+
+  // Bannister 1 shape in XoZ plane
+  std::vector<Vector3> bannister1Data{
+    Vector3(0, 0.f, 0),
+    Vector3(2, 0.f, 0),
+    Vector3(2, 0.f, 0.75),
+    Vector3(0, 0.f, 0.75),
+  };
+  auto spindle1Thickness = 0.05f;
+  auto spindles1         = 12;
+  auto rail1Gap = (2.f - spindles1 * spindle1Thickness) / (spindles1 - 1.f);
+  std::vector<std::vector<Vector3>> rail1;
+  auto ac1 = spindle1Thickness;
+  for (auto s = 0; s < spindles1 - 1; s++) {
+    std::vector<Vector3> rail1s;
+    rail1s.emplace_back(Vector3(ac1, 0.f, spindle1Thickness));
+    rail1s.emplace_back(Vector3(ac1, 0.f, 0.75f - spindle1Thickness));
+    rail1s.emplace_back(
+      Vector3(ac1 + rail1Gap, 0.f, 0.75f - spindle1Thickness));
+    rail1s.emplace_back(Vector3(ac1 + rail1Gap, 0.f, spindle1Thickness));
+    rail1.emplace_back(rail1s);
+    ac1 += spindle1Thickness + rail1Gap;
+  }
+
+  // Bannister 1
+  PolygonOptions bannister1Options;
+  bannister1Options.shape = bannister1Data;
+  bannister1Options.holes = rail1;
+  bannister1Options.depth = 0.1f;
+  auto bannister1
+    = MeshBuilder::ExtrudePolygon("bannister1", bannister1Options, scene);
+  bannister1->rotation().x = -Math::PI_2;
+  bannister1->rotation().z = -Math::PI_2;
+  bannister1->position().x = 0.3f;
+  bannister1->position().y = 0.2f;
+  bannister1->position().z = 2.61f;
+
+  // Bannister 2 shape in XoZ plane
+  std::vector<Vector3> bannister2Data{
+    Vector3(0, 0.f, 0),
+    Vector3(1, 0.f, 0),
+    Vector3(1, 0.f, 0.75),
+    Vector3(0, 0.f, 0.75),
+  };
+  auto spindle2Thickness = 0.05f;
+  auto spindles2         = 6;
+  auto rail2Gap = (1.f - spindles2 * spindle2Thickness) / (spindles2 - 1.f);
+  std::vector<std::vector<Vector3>> rail2;
+  auto ac2 = spindle2Thickness;
+  for (auto s = 0; s < spindles2 - 1; s++) {
+    std::vector<Vector3> rail2s;
+    rail2s.emplace_back(Vector3(ac2, 0.f, spindle2Thickness));
+    rail2s.emplace_back(Vector3(ac2, 0.f, 0.75f - spindle2Thickness));
+    rail2s.emplace_back(
+      Vector3(ac2 + rail2Gap, 0.f, 0.75f - spindle2Thickness));
+    rail2s.emplace_back(Vector3(ac2 + rail2Gap, 0.f, spindle2Thickness));
+    rail2.emplace_back(rail2s);
+    ac2 += spindle2Thickness + rail2Gap;
+  }
+
+  // Bannister 2
+  PolygonOptions bannister2Options;
+  bannister2Options.shape = bannister2Data;
+  bannister2Options.holes = rail2;
+  bannister2Options.depth = 0.1f;
+  auto bannister2
+    = MeshBuilder::ExtrudePolygon("bannister2", bannister2Options, scene);
+  bannister2->rotation().x = -Math::PI_2;
+  bannister2->position().x = 0.3f;
+  bannister2->position().y = 0.2f;
+  bannister2->position().z = 2.61f;
+
+  // Windo maker function
   const auto windowMaker = [scene](float width, float height, float frames,
                                    float frameDepth, float frameThickness) {
     std::vector<Vector3> windowShape{
@@ -421,66 +831,67 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
     return window;
   };
 
-  auto windowFBL          = windowMaker(3.2f, 2.f, 4.f, 0.15f, 0.1f);
-  windowFBL->position().x = -4.78f;
-  windowFBL->position().y = -2.3f;
-  windowFBL->position().z = 0.1f;
+  _windowFBL               = windowMaker(3.2f, 2.f, 4.f, 0.15f, 0.1f);
+  _windowFBL->position().x = -4.78f;
+  _windowFBL->position().y = -2.3f;
+  _windowFBL->position().z = 0.1f;
 
-  auto windowFBR          = windowMaker(3.2f, 2.f, 4.f, 0.15f, 0.1f);
-  windowFBR->position().x = 1.58f;
-  windowFBR->position().y = -2.3f;
-  windowFBR->position().z = 0.1f;
+  _windowFBR               = windowMaker(3.2f, 2.f, 4.f, 0.15f, 0.1f);
+  _windowFBR->position().x = 1.58f;
+  _windowFBR->position().y = -2.3f;
+  _windowFBR->position().z = 0.1f;
 
-  auto windowFTL          = windowMaker(1.9f, 1.8f, 2.f, 0.15f, 0.1f);
-  windowFTL->position().x = -4.03f;
-  windowFTL->position().y = 0.75f;
-  windowFTL->position().z = 0.1f;
+  _windowFTL               = windowMaker(1.9f, 1.8f, 2.f, 0.15f, 0.1f);
+  _windowFTL->position().x = -4.03f;
+  _windowFTL->position().y = 0.75f;
+  _windowFTL->position().z = 0.1f;
 
-  auto windowFTR          = windowMaker(1.9f, 1.8f, 2.f, 0.15f, 0.1f);
-  windowFTR->position().x = 2.13f;
-  windowFTR->position().y = 0.75f;
-  windowFTR->position().z = 0.1f;
+  _windowFTR               = windowMaker(1.9f, 1.8f, 2.f, 0.15f, 0.1f);
+  _windowFTR->position().x = 2.13f;
+  _windowFTR->position().y = 0.75f;
+  _windowFTR->position().z = 0.1f;
 
-  auto windowFTM          = windowMaker(1.3f, 1.8f, 2.f, 0.15f, 0.1f);
-  windowFTM->position().x = -0.65f;
-  windowFTM->position().y = 0.75f;
-  windowFTM->position().z = 0.1f;
+  _windowFTM               = windowMaker(1.3f, 1.8f, 2.f, 0.15f, 0.1f);
+  _windowFTM->position().x = -0.65f;
+  _windowFTM->position().y = 0.75f;
+  _windowFTM->position().z = 0.1f;
 
-  auto windowRBL          = windowMaker(3.15f, 1.5f, 4.f, 0.15f, 0.1f);
-  windowRBL->position().x = -5.f;
-  windowRBL->position().y = -1.8f;
-  windowRBL->position().z = 9.f;
+  _windowRBL               = windowMaker(3.15f, 1.5f, 4.f, 0.15f, 0.1f);
+  _windowRBL->position().x = -5.f;
+  _windowRBL->position().y = -1.8f;
+  _windowRBL->position().z = 9.f;
 
-  auto windowRBR          = windowMaker(1.7f, 1.5f, 2.f, 0.15f, 0.1f);
-  windowRBR->position().x = -0.8f;
-  windowRBR->position().y = -1.8f;
-  windowRBR->position().z = 9.f;
+  _windowRBR               = windowMaker(1.7f, 1.5f, 2.f, 0.15f, 0.1f);
+  _windowRBR->position().x = -0.8f;
+  _windowRBR->position().y = -1.8f;
+  _windowRBR->position().z = 9.f;
 
-  auto windowRTL          = windowMaker(3.15f, 1.8f, 4.f, 0.15f, 0.1f);
-  windowRTL->position().x = -5.f;
-  windowRTL->position().y = 0.75f;
-  windowRTL->position().z = 9.f;
+  _windowRTL               = windowMaker(3.15f, 1.8f, 4.f, 0.15f, 0.1f);
+  _windowRTL->position().x = -5.f;
+  _windowRTL->position().y = 0.75f;
+  _windowRTL->position().z = 9.f;
 
-  auto windowRTR          = windowMaker(1.3f, 0.8f, 1.f, 0.15f, 0.1f);
-  windowRTR->position().x = -0.6f;
-  windowRTR->position().y = 1.75f;
-  windowRTR->position().z = 9.f;
+  _windowRTR               = windowMaker(1.3f, 0.8f, 1.f, 0.15f, 0.1f);
+  _windowRTR->position().x = -0.6f;
+  _windowRTR->position().y = 1.75f;
+  _windowRTR->position().z = 9.f;
 
-  auto windowR1BL          = windowMaker(0.8f, 1.5f, 1.f, 0.15f, 0.1f);
-  windowR1BL->position().x = 3.7f;
-  windowR1BL->position().y = -1.8f;
-  windowR1BL->position().z = 6.f;
+  _windowR1BL               = windowMaker(0.8f, 1.5f, 1.f, 0.15f, 0.1f);
+  _windowR1BL->position().x = 3.7f;
+  _windowR1BL->position().y = -1.8f;
+  _windowR1BL->position().z = 6.f;
 
-  auto windowR1TL          = windowMaker(0.8f, 1.8f, 1.f, 0.15f, 0.1f);
-  windowR1TL->position().x = 1.9f;
-  windowR1TL->position().y = 0.75f;
-  windowR1TL->position().z = 6.f;
+  _windowR1TL               = windowMaker(0.8f, 1.8f, 1.f, 0.15f, 0.1f);
+  _windowR1TL->position().x = 1.9f;
+  _windowR1TL->position().y = 0.75f;
+  _windowR1TL->position().z = 6.f;
 
-  auto windowR1TR          = windowMaker(0.8f, 1.8f, 1.f, 0.15f, 0.1f);
-  windowR1TR->position().x = 4.2f;
-  windowR1TR->position().y = 0.75f;
-  windowR1TR->position().z = 6.f;
+  _windowR1TR               = windowMaker(0.8f, 1.8f, 1.f, 0.15f, 0.1f);
+  _windowR1TR->position().x = 4.2f;
+  _windowR1TR->position().y = 0.75f;
+  _windowR1TR->position().z = 6.f;
 
+  // Door maker function
   const auto doorMaker = [scene](float width, float height, float depth) {
     std::vector<Vector3> doorShape{
       Vector3(0.f, 0.f, 0.f),      //
@@ -547,18 +958,60 @@ void ExtrudePolygonScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto doormat          = StandardMaterial::New("door", scene);
   doormat->diffuseColor = Color3(82.f / 255.f, 172.f / 255.f, 106.f / 255.f);
 
-  auto frontDoor          = doorMaker(1.f, 2.25f, 0.1f);
-  frontDoor->position().x = -0.5f;
-  frontDoor->position().y = -3.f;
-  frontDoor->position().z = 0.1f;
-  frontDoor->material     = doormat;
+  // Front door
+  _frontDoor               = doorMaker(1.f, 2.25f, 0.1f);
+  _frontDoor->position().x = -0.5f;
+  _frontDoor->position().y = -3.f;
+  _frontDoor->position().z = 0.1f;
+  _frontDoor->material     = doormat;
 
-  auto backDoor          = doorMaker(1, 2.25f, 0.1f);
-  backDoor->rotation().y = Math::PI_2;
-  backDoor->position().x = 1.3f;
-  backDoor->position().y = -3.f;
-  backDoor->position().z = 8.65f;
-  backDoor->material     = doormat;
+  // Back door
+  _backDoor               = doorMaker(1, 2.25f, 0.1f);
+  _backDoor->rotation().y = Math::PI_2;
+  _backDoor->position().x = 1.3f;
+  _backDoor->position().y = -3.f;
+  _backDoor->position().z = 8.65f;
+  _backDoor->material     = doormat;
+
+  // Events to toggle visibility
+  canvas->addKeyEventListener(EventType::KEY_DOWN, [this](KeyboardEvent&& evt) {
+    switch (evt.keyCode) {
+      case 49: // 1 - Toggle Roof Visibility
+        _roof->isVisible    = !_roof->isVisible;
+        _ceiling->isVisible = !_ceiling->isVisible;
+        break;
+      case 50: // 2 - Toggle Front Visibility
+        _frontWall->isVisible = !_frontWall->isVisible;
+        _windowFBL->isVisible = !_windowFBL->isVisible;
+        _windowFBR->isVisible = !_windowFBR->isVisible;
+        _windowFTL->isVisible = !_windowFTL->isVisible;
+        _windowFTR->isVisible = !_windowFTR->isVisible;
+        _windowFTM->isVisible = !_windowFTM->isVisible;
+        _frontDoor->isVisible = !_frontDoor->isVisible;
+        break;
+      case 51: // 3 - Toggle Back Visibility
+        _rearWallnb1->isVisible = !_rearWallnb1->isVisible;
+        _rearWallnb2->isVisible = !_rearWallnb2->isVisible;
+        _windowRBL->isVisible   = !_windowRBL->isVisible;
+        _windowRBR->isVisible   = !_windowRBR->isVisible;
+        _windowRTL->isVisible   = !_windowRTL->isVisible;
+        _windowRTR->isVisible   = !_windowRTR->isVisible;
+        _windowR1BL->isVisible  = !_windowR1BL->isVisible;
+        _windowR1TL->isVisible  = !_windowR1TL->isVisible;
+        _windowR1TR->isVisible  = !_windowR1TR->isVisible;
+        break;
+      case 52: // 4 - Toggle Left Side Visibility
+        _sideWallnb1->isVisible = !_sideWallnb1->isVisible;
+        _sideWallnb3->isVisible = !_sideWallnb3->isVisible;
+        _backDoor->isVisible    = !_backDoor->isVisible;
+        break;
+      case 53: // 5 - Toggle Right Side Visibility
+        _sideWallnb2->isVisible = !_sideWallnb2->isVisible;
+        break;
+      default:
+        break;
+    }
+  });
 }
 
 } // end of namespace Samples
