@@ -129,7 +129,7 @@ void BABYLON::CSG::Plane::splitPolygon(
         if (ti != FRONT) {
           b.emplace_back(ti != BACK ? Vertex(vi) : vi);
         }
-        if ((ti == SPANNING) || (tj == SPANNING)) {
+        if ((ti | tj) == SPANNING) {
           float t = (w - Vector3::Dot(normal, vi.pos))
                     / Vector3::Dot(normal, vj.pos.subtract(vi.pos));
           BABYLON::CSG::Vertex v = vi.interpolate(vj, t);

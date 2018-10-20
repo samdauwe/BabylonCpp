@@ -27,6 +27,7 @@ struct BABYLON_SHARED_EXPORT PolygonOptions {
 class BABYLON_SHARED_EXPORT Polygon {
 
 public:
+  Polygon();
   Polygon(const std::vector<Vertex>& vertices, const PolygonOptions& shared);
   Polygon(const Polygon& otherPolygon);
   Polygon(Polygon&& otherPolygon);

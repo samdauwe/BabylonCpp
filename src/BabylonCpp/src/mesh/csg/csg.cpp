@@ -278,10 +278,10 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
     std::sort(polygons.begin(), polygons.end(),
               [](const Polygon& a, const Polygon& b) {
                 if (a.shared.meshId == b.shared.meshId) {
-                  return a.shared.subMeshId - b.shared.subMeshId;
+                  return a.shared.subMeshId > b.shared.subMeshId;
                 }
                 else {
-                  return a.shared.meshId - b.shared.meshId;
+                  return a.shared.meshId > b.shared.meshId;
                 }
               });
   }
@@ -316,8 +316,8 @@ MeshPtr CSG::CSG::buildMeshGeometry(const std::string& name, Scene* scene,
         vertex.copyFrom(polygon.vertices[polygonIndices[k]].pos);
         normal.copyFrom(polygon.vertices[polygonIndices[k]].normal);
         uv.copyFrom(polygon.vertices[polygonIndices[k]].uv);
-        Vector3 localVertex = Vector3::TransformCoordinates(vertex, matrix);
-        Vector3 localNormal = Vector3::TransformNormal(normal, matrix);
+        Vector3 localVertex = Vector3::TransformCoordinates(vertex, _matrix);
+        Vector3 localNormal = Vector3::TransformNormal(normal, _matrix);
 
         std::string vertexId = String::concat(localVertex.x, ",", localVertex.y,
                                               ",", localVertex.z);
@@ -395,7 +395,7 @@ MeshPtr CSG::CSG::toMesh(const std::string& name, const MaterialPtr& material,
   mesh->material = material;
 
   mesh->position().copyFrom(position);
-  mesh->rotation().copyFrom(*rotation);
+  mesh->rotation().copyFrom(rotation);
   if (rotationQuaternion) {
     mesh->rotationQuaternion = *rotationQuaternion;
   }

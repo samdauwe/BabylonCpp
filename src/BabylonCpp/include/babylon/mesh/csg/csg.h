@@ -70,7 +70,7 @@ private:
 public:
   Matrix matrix;
   Vector3 position;
-  std::optional<Vector3> rotation;
+  Vector3 rotation;
   std::optional<Quaternion> rotationQuaternion;
   Vector3 scaling;
 

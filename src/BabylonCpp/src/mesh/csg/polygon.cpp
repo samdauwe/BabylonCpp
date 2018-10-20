@@ -7,6 +7,11 @@
 
 namespace BABYLON {
 
+CSG::Polygon::Polygon()
+    : shared{PolygonOptions{0, 0, 0}}, plane{std::make_pair(false, Plane())}
+{
+}
+
 CSG::Polygon::Polygon(const std::vector<Vertex>& iVertices,
                       const PolygonOptions& iShared)
     : vertices{iVertices}, shared{iShared}
