@@ -97,6 +97,7 @@
 ![circle_curves_from_beziers](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/circle_curves_from_beziers.png?raw=true "Circle Curves From Beziers Scene")
 ![colored_cube_faces_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/colored_cube_faces_scene.png?raw=true "Colored Cube Faces Scene")
 ![colored_triangle_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/colored_triangle_scene.png?raw=true "Colored Triangle Scene")
+![constructive_solid_geometries_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/constructive_solid_geometries_scene.png?raw=true "Constructive Solid Geometries Scene")
 ![cuboid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cuboid_scene.png?raw=true "Cuboid Scene")
 ![curved_helix_meshes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/curved_helix_meshes_scene.png?raw=true "Curved Helix Meshes Scene")
 ![displacement_map_cpu_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/displacement_map_cpu_scene.png?raw=true "Displacement map (CPU) Scene")
