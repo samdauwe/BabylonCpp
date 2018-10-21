@@ -344,6 +344,14 @@ void GLRenderingContext::bufferData(GLenum target, const Uint32Array& data,
 }
 
 void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
+                                       const Uint8Array& data)
+{
+  glBufferSubData(target, offset,
+                  static_cast<GLint>(data.size() * sizeof(GLbyte)),
+                  data.data());
+}
+
+void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
                                        const Float32Array& data)
 {
   glBufferSubData(target, offset,

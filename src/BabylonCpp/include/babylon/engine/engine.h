@@ -720,8 +720,8 @@ public:
    * @param byteLength the byte length of the data
    */
   void updateDynamicVertexBuffer(const GLBufferPtr& vertexBuffer,
-                                 const Float32Array& vertices,
-                                 int byteOffset = -1, int byteLength = -1);
+                                 const Float32Array& data, int byteOffset = -1,
+                                 int byteLength = -1);
 
   /**
    * @brief Creates a new index buffer.

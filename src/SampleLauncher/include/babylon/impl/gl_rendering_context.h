@@ -52,6 +52,8 @@ public:
   void bufferData(GLenum target, const Uint32Array& data,
                   GLenum usage) override;
   void bufferSubData(GLenum target, GLintptr offset,
+                     const Uint8Array& data) override;
+  void bufferSubData(GLenum target, GLintptr offset,
                      const Float32Array& data) override;
   void bufferSubData(GLenum target, GLintptr offset, Int32Array& data) override;
   void bindVertexArray(GL::IGLVertexArrayObject* vao) override;

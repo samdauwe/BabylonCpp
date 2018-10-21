@@ -21,10 +21,13 @@ public:
     auto mesh = std::shared_ptr<InstancedMesh>(
       new InstancedMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
+    mesh->syncSubMeshes(mesh);
 
     return mesh;
   }
   ~InstancedMesh() override;
+
+  void syncSubMeshes(const InstancedMeshPtr& instancedMesh);
 
   /**
    * @brief Returns the string "InstancedMesh"

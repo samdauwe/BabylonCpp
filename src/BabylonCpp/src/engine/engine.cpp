@@ -1303,8 +1303,8 @@ void Engine::updateDynamicIndexBuffer(const GLBufferPtr& indexBuffer,
 }
 
 void Engine::updateDynamicVertexBuffer(const Engine::GLBufferPtr& vertexBuffer,
-                                       const Float32Array& vertices,
-                                       int byteOffset, int byteLength)
+                                       const Float32Array& data, int byteOffset,
+                                       int byteLength)
 {
   bindArrayBuffer(vertexBuffer.get());
 
@@ -1313,14 +1313,12 @@ void Engine::updateDynamicVertexBuffer(const Engine::GLBufferPtr& vertexBuffer,
   }
 
   if (byteLength == -1) {
-    _gl->bufferSubData(GL::ARRAY_BUFFER, byteOffset, vertices);
+    _gl->bufferSubData(GL::ARRAY_BUFFER, byteOffset, data);
   }
   else {
-    Float32Array subvector;
-    std::copy(vertices.begin() + byteOffset,
-              vertices.begin() + byteOffset + byteLength,
-              std::back_inserter(subvector));
-    _gl->bufferSubData(GL::ARRAY_BUFFER, 0, subvector);
+    auto byteArray = stl_util::toUint8Array(
+      data, static_cast<size_t>(byteOffset), static_cast<size_t>(byteLength));
+    _gl->bufferSubData(GL::ARRAY_BUFFER, 0, byteArray);
   }
 
   _resetVertexBufferBinding();

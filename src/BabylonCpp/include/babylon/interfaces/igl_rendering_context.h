@@ -958,6 +958,18 @@ public:
    * @param target A GLenum specifying the binding point (target).
    * @param offset A GLintptr specifying an offset in bytes where the data
    * replacement will start.
+   * @param data A Uint8Array typed array that will be copied into the data
+   * store.
+   */
+  virtual void bufferSubData(GLenum target, GLintptr offset,
+                             const Uint8Array& data)
+    = 0;
+
+  /**
+   * @brief Updates a subset of a buffer object's data store.
+   * @param target A GLenum specifying the binding point (target).
+   * @param offset A GLintptr specifying an offset in bytes where the data
+   * replacement will start.
    * @param data A Float32Array typed array that will be copied into the data
    * store.
    */

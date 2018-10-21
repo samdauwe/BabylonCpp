@@ -30,11 +30,15 @@ InstancedMesh::InstancedMesh(const std::string& _name, Mesh* source)
   setPivotMatrix(source->getPivotMatrix());
 
   refreshBoundingInfo();
-  _syncSubMeshes();
 }
 
 InstancedMesh::~InstancedMesh()
 {
+}
+
+void InstancedMesh::syncSubMeshes(const InstancedMeshPtr& instancedMesh)
+{
+  instancedMesh->_syncSubMeshes();
 }
 
 const std::string InstancedMesh::getClassName() const
@@ -250,8 +254,7 @@ void InstancedMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   // Remove from mesh
   _sourceMesh->instances.erase(std::remove(_sourceMesh->instances.begin(),
-                                             _sourceMesh->instances.end(),
-                                             this),
+                                           _sourceMesh->instances.end(), this),
                                _sourceMesh->instances.end());
 
   AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);

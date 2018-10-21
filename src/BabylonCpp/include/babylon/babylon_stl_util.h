@@ -2,6 +2,7 @@
 #define BABYLON_STL_UTIL_H
 
 #include <bitset>
+#include <cstring>
 #include <functional>
 #include <memory>
 #include <set>
@@ -125,6 +126,21 @@ T& from_bytes(const std::array<byte, sizeof(T)>& bytes, T& object)
   std::copy(std::begin(bytes), std::end(bytes), begin_object);
 
   return object;
+}
+
+template <typename T>
+std::vector<uint8_t> toUint8Array(const std::vector<T> buffer,
+                                  size_t byteOffset, size_t byteLength)
+{
+  std::vector<uint8_t> bytes(byteLength);
+  std::memcpy(bytes.data(), buffer.data() + byteOffset, sizeof(bytes));
+  return bytes;
+}
+
+template <typename T>
+std::vector<uint8_t> toUint8Array(const std::vector<T> buffer)
+{
+  return toUint8Array(buffer, 0, buffer.size() * sizeof(T));
 }
 
 // -- String helper functions --

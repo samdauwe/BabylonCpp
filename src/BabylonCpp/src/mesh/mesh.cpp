@@ -1130,7 +1130,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
   if (!visibleInstances.empty()) {
     for (size_t instanceIndex = 0; instanceIndex < visibleInstances.size();
          ++instanceIndex) {
-      InstancedMesh* instance = visibleInstances[instanceIndex];
+      auto instance = visibleInstances[instanceIndex];
       instance->getWorldMatrix()->copyToArray(_instancesData, offset);
       offset += 16;
       ++instancesCount;
