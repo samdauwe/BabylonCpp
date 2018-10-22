@@ -119,7 +119,7 @@
 ![polyhedron_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/polyhedron_scene.png?raw=true "Polyhedron Scene")
 ![raycast_on_height_map_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/raycast_on_height_map_scene.png?raw=true "Raycast On Height Map Scene")
 ![ribbon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ribbon_scene.png?raw=true "Ribbon Scene")
-![rotation_and_scaling_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rotation_and_scaling_scene.png?raw=true "Rotation And Scaling Scene")
+![rotation_and_scaling_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rotation_and_scaling_scene.png?raw=true "Rotation and Scaling Scene")
 ![super_ellipsoid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/super_ellipsoid_scene.png?raw=true "Super Ellipsoid Scene")
 ![tiled_ground_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tiled_ground_scene.png?raw=true "Tiled Ground Scene")
 ![tube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png?raw=true "Tube Scene")
