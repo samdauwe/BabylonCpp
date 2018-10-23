@@ -7,6 +7,7 @@
 #include <babylon/samples/specialfx/infinite_loader_scene.h>
 #include <babylon/samples/specialfx/lens_flares_scene.h>
 #include <babylon/samples/specialfx/refraction_and_reflection_scene.h>
+#include <babylon/samples/specialfx/simple_post_process_render_pipeline_scene.h>
 #include <babylon/samples/specialfx/sprites_scene.h>
 #include <babylon/samples/specialfx/waves_scene.h>
 
@@ -59,6 +60,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
     [](ICanvas* iCanvas) {                                            //
       return std::make_unique<RefractionAndReflectionScene>(iCanvas); //
     });                                                               //
+  // Simple Post Process Render Pipeline Scene
+  _samples["SimplePostProcessRenderPipelineScene"] = std::make_tuple(
+    false,                                                                    //
+    [](ICanvas* iCanvas) {                                                    //
+      return std::make_unique<SimplePostProcessRenderPipelineScene>(iCanvas); //
+    });                                                                       //
   // Sprites Scene
   _samples["SpritesScene"]
     = std::make_tuple(false,                                            //
