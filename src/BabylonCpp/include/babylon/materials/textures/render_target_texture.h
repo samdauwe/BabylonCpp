@@ -20,6 +20,7 @@ class RenderTargetTexture;
 class SubMesh;
 using AbstractMeshPtr             = std::shared_ptr<AbstractMesh>;
 using CameraPtr                   = std::shared_ptr<Camera>;
+using PostProcessPtr              = std::shared_ptr<PostProcess>;
 using RenderTargetCreationOptions = IRenderTargetOptions;
 using RenderTargetTexturePtr      = std::shared_ptr<RenderTargetTexture>;
 using SubMeshPtr                  = std::shared_ptr<SubMesh>;
@@ -79,9 +80,9 @@ public:
   RenderTargetCreationOptions& renderTargetOptions();
   const RenderTargetCreationOptions& renderTargetOptions() const;
   void resetRefreshCounter();
-  void addPostProcess(PostProcess* postProcess);
+  void addPostProcess(const PostProcessPtr& postProcess);
   void clearPostProcesses(bool dispose = false);
-  void removePostProcess(PostProcess* postProcess);
+  void removePostProcess(const PostProcessPtr& postProcess);
   /** Hidden */
   bool _shouldRender();
   bool isReady() override;
@@ -333,7 +334,7 @@ protected:
 private:
   std::vector<AbstractMeshPtr> _renderList;
   std::unique_ptr<PostProcessManager> _postProcessManager;
-  std::vector<PostProcess*> _postProcesses;
+  std::vector<PostProcessPtr> _postProcesses;
   Observer<Engine>::Ptr _resizeObserver;
   // Events
   Observer<RenderTargetTexture>::Ptr _onAfterUnbindObserver;

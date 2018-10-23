@@ -21,6 +21,7 @@ class Ray;
 class RenderTargetTexture;
 using CameraPtr              = std::shared_ptr<Camera>;
 using FreeCameraPtr          = std::shared_ptr<FreeCamera>;
+using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 class BABYLON_SHARED_EXPORT Camera : public Node {
@@ -176,9 +177,10 @@ public:
    * @brief Internal, gets the first post proces.
    * @returns the first post process to be run on this camera.
    */
-  PostProcess* _getFirstPostProcess() const;
+  PostProcessPtr _getFirstPostProcess() const;
 
-  int attachPostProcess(PostProcess* postProcess, int insertAt = -1);
+  int attachPostProcess(const PostProcessPtr& postProcess, int insertAt = -1);
+  void detachPostProcess(const PostProcessPtr& postProcess);
   void detachPostProcess(PostProcess* postProcess);
   Matrix* getWorldMatrix() override;
   /** Hidden */
@@ -321,7 +323,7 @@ public:
 
   /** Cache **/
   Matrix _projectionMatrix;
-  std::vector<PostProcess*> _postProcesses;
+  std::vector<PostProcessPtr> _postProcesses;
   Uint32Array _postProcessesTakenIndices;
   std::vector<AbstractMeshPtr> _activeMeshes;
 

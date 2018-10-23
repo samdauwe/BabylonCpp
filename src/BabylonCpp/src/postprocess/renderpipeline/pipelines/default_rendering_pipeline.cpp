@@ -4,7 +4,6 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
@@ -30,7 +29,8 @@ namespace BABYLON {
 
 DefaultRenderingPipeline::DefaultRenderingPipeline(
   const std::string& iName, bool hdr, Scene* scene,
-  const std::unordered_map<std::string, CameraPtr>& cameras, bool automaticBuild)
+  const std::unordered_map<std::string, CameraPtr>& cameras,
+  bool automaticBuild)
     : PostProcessRenderPipeline(scene ? scene->getEngine() :
                                         Engine::LastCreatedScene()->getEngine(),
                                 iName)
@@ -117,43 +117,38 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     _defaultPipelineTextureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
   }
 
-  // Attach
-  _scene->postProcessRenderPipelineManager()->addPipeline(this);
-
   auto engine = _scene->getEngine();
   // Create post processes before hand so they can be modified before enabled.
   // Block compilation flag is set to true to avoid compilation prior to use,
   // these will be updated on first use in build pipeline.
-  sharpen = new SharpenPostProcess(
-    "sharpen", ToVariant<float, PostProcessOptions>(1.f), nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
-    _defaultPipelineTextureType, true);
-  _sharpenEffect = new PostProcessRenderEffect(
+  sharpen = SharpenPostProcess::New(
+    "sharpen", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+    false, _defaultPipelineTextureType, true);
+  _sharpenEffect = PostProcessRenderEffect::New(
     engine, SharpenPostProcessId,
-    [this]() -> std::vector<PostProcess*> { return {sharpen}; }, true);
+    [this]() -> std::vector<PostProcessPtr> { return {sharpen}; }, true);
 
-  depthOfField = new DepthOfFieldEffect(_scene, nullptr, _depthOfFieldBlurLevel,
-                                        _defaultPipelineTextureType, true);
+  depthOfField = DepthOfFieldEffect::New(
+    _scene, nullptr, _depthOfFieldBlurLevel, _defaultPipelineTextureType, true);
 
-  bloom = new BloomEffect("", _scene, _bloomScale, _bloomWeight, bloomKernel,
-                          _defaultPipelineTextureType, true);
+  bloom = BloomEffect::New("", _scene, _bloomScale, _bloomWeight, bloomKernel,
+                           _defaultPipelineTextureType, true);
 
-  chromaticAberration = new ChromaticAberrationPostProcess(
+  chromaticAberration = ChromaticAberrationPostProcess::New(
     "ChromaticAberration", engine->getRenderWidth(), engine->getRenderHeight(),
-    ToVariant<float, PostProcessOptions>(1.f), nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
+    1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
     _defaultPipelineTextureType, true);
-  _chromaticAberrationEffect = new PostProcessRenderEffect(
+  _chromaticAberrationEffect = PostProcessRenderEffect::New(
     engine, ChromaticAberrationPostProcessId,
-    [this]() -> std::vector<PostProcess*> { return {chromaticAberration}; }, true);
+    [this]() -> std::vector<PostProcessPtr> { return {chromaticAberration}; },
+    true);
 
-  grain
-    = new GrainPostProcess("Grain", ToVariant<float, PostProcessOptions>(1.f),
-                           nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-                           engine, false, _defaultPipelineTextureType, true);
-  _grainEffect = new PostProcessRenderEffect(
+  grain        = GrainPostProcess::New("Grain", 1.f, nullptr,
+                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+                                false, _defaultPipelineTextureType, true);
+  _grainEffect = PostProcessRenderEffect::New(
     engine, GrainPostProcessId,
-    [this]() -> std::vector<PostProcess*> { return {grain}; }, true);
+    [this]() -> std::vector<PostProcessPtr> { return {grain}; }, true);
 
   _resizeObserver = engine->onResizeObservable.add(
     [this](Engine* engine, EventState& /*es*/) {
@@ -167,12 +162,20 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
         bloom->_downscale->_exposure
           = _scene->imageProcessingConfiguration()->exposure();
       });
-
-  _buildPipeline();
 }
 
 DefaultRenderingPipeline::~DefaultRenderingPipeline()
 {
+}
+
+void DefaultRenderingPipeline::addToScene(
+  const DefaultRenderingPipelinePtr& renderingPipeline)
+{
+  // Attach
+  _scene->postProcessRenderPipelineManager()->addPipeline(renderingPipeline);
+
+  // Build the pipeline
+  renderingPipeline->_buildPipeline();
 }
 
 void DefaultRenderingPipeline::set_sharpenEnabled(bool enabled)
@@ -268,8 +271,8 @@ void DefaultRenderingPipeline::_rebuildBloom()
 {
   // recreate bloom and dispose old as this setting is not dynamic
   auto oldBloom = bloom;
-  bloom = new BloomEffect("", _scene, bloomScale, _bloomWeight, bloomKernel,
-                          _defaultPipelineTextureType, false);
+  bloom = BloomEffect::New("", _scene, bloomScale, _bloomWeight, bloomKernel,
+                           _defaultPipelineTextureType, false);
   bloom->threshold = oldBloom->threshold();
   for (auto& item : _cameras) {
     oldBloom->disposeEffects(item.second.get());
@@ -308,8 +311,9 @@ void DefaultRenderingPipeline::set_depthOfFieldBlurLevel(
   // recreate dof and dispose old as this setting is not dynamic
   auto oldDof = depthOfField;
 
-  depthOfField = new DepthOfFieldEffect(_scene, nullptr, _depthOfFieldBlurLevel,
-                                        _defaultPipelineTextureType, false);
+  depthOfField
+    = DepthOfFieldEffect::New(_scene, nullptr, _depthOfFieldBlurLevel,
+                              _defaultPipelineTextureType, false);
   depthOfField->focalLength   = oldDof->focalLength();
   depthOfField->focusDistance = oldDof->focusDistance();
   depthOfField->fStop         = oldDof->fStop();
@@ -422,7 +426,7 @@ void DefaultRenderingPipeline::prepare()
 }
 
 void DefaultRenderingPipeline::_setAutoClearAndTextureSharing(
-  PostProcess* postProcess, bool skipTextureSharing)
+  const PostProcessPtr& postProcess, bool skipTextureSharing)
 {
   if (_hasCleared) {
     postProcess->autoClear = false;
@@ -494,13 +498,13 @@ void DefaultRenderingPipeline::_buildPipeline()
   }
 
   if (_imageProcessingEnabled) {
-    imageProcessing = new ImageProcessingPostProcess(
-      "imageProcessing", 1.0, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+    imageProcessing = ImageProcessingPostProcess::New(
+      "imageProcessing", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
       engine, false, _defaultPipelineTextureType);
     if (_hdr) {
-      addEffect(new PostProcessRenderEffect(
+      addEffect(PostProcessRenderEffect::New(
         engine, ImageProcessingPostProcessId,
-        [this]() -> std::vector<PostProcess*> { return {imageProcessing}; },
+        [this]() -> std::vector<PostProcessPtr> { return {imageProcessing}; },
         true));
       _setAutoClearAndTextureSharing(imageProcessing);
     }
@@ -534,12 +538,12 @@ void DefaultRenderingPipeline::_buildPipeline()
   }
 
   if (fxaaEnabled) {
-    fxaa = new FxaaPostProcess("fxaa", 1.0, nullptr,
-                               TextureConstants::BILINEAR_SAMPLINGMODE, engine,
-                               false, _defaultPipelineTextureType);
-    addEffect(new PostProcessRenderEffect(
+    fxaa = FxaaPostProcess::New("fxaa", 1.0, nullptr,
+                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+                                false, _defaultPipelineTextureType);
+    addEffect(PostProcessRenderEffect::New(
       engine, FxaaPostProcessId,
-      [this]() -> std::vector<PostProcess*> { return {fxaa}; }, true));
+      [this]() -> std::vector<PostProcessPtr> { return {fxaa}; }, true));
     _setAutoClearAndTextureSharing(fxaa, true);
   }
 
@@ -621,11 +625,12 @@ void DefaultRenderingPipeline::addCamera(Camera* camera)
 
 void DefaultRenderingPipeline::removeCamera(Camera* camera)
 {
-  _camerasToBeAttached.erase(
-    std::remove_if(
-      _camerasToBeAttached.begin(), _camerasToBeAttached.end(),
-      [camera](const CameraPtr& _camera) { return _camera.get() == camera; }),
-    _camerasToBeAttached.end());
+  _camerasToBeAttached.erase(std::remove_if(_camerasToBeAttached.begin(),
+                                            _camerasToBeAttached.end(),
+                                            [camera](const CameraPtr& _camera) {
+                                              return _camera.get() == camera;
+                                            }),
+                             _camerasToBeAttached.end());
   _buildPipeline();
 }
 

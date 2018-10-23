@@ -21,6 +21,7 @@ namespace BABYLON {
 class Animation;
 class BloomEffect;
 class ChromaticAberrationPostProcess;
+class DefaultRenderingPipeline;
 class DepthOfFieldEffect;
 class FxaaPostProcess;
 class GlowLayer;
@@ -29,7 +30,16 @@ class ImageProcessingConfiguration;
 class PostProcess;
 class Scene;
 class SharpenPostProcess;
-using GlowLayerPtr = std::shared_ptr<GlowLayer>;
+using BloomEffectPtr = std::shared_ptr<BloomEffect>;
+using ChromaticAberrationPostProcessPtr
+  = std::shared_ptr<ChromaticAberrationPostProcess>;
+using DefaultRenderingPipelinePtr = std::shared_ptr<DefaultRenderingPipeline>;
+using DepthOfFieldEffectPtr       = std::shared_ptr<DepthOfFieldEffect>;
+using FxaaPostProcessPtr          = std::shared_ptr<FxaaPostProcess>;
+using GlowLayerPtr                = std::shared_ptr<GlowLayer>;
+using GrainPostProcessPtr         = std::shared_ptr<GrainPostProcess>;
+using PostProcessPtr              = std::shared_ptr<PostProcess>;
+using SharpenPostProcessPtr       = std::shared_ptr<SharpenPostProcess>;
 
 namespace Json {
 typedef picojson::value value;
@@ -75,23 +85,18 @@ private:
   static constexpr const char* GrainPostProcessId = "GrainPostProcessEffect";
 
 public:
-  /**
-   * @brief constructor
-   * @param {string} name - The rendering pipeline name (default: "")
-   * @param {boolean} hdr - If high dynamic range textures should be used
-   * (default: true)
-   * @param {BABYLON.Scene} scene - The scene linked to this pipeline (default:
-   * the last created scene)
-   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
-   * pipeline will be attached to (default: scene.cameras)
-   * @param {boolean} automaticBuild - if false, you will have to manually call
-   * prepare() to update the pipeline (default: true)
-   */
-  DefaultRenderingPipeline(
-    const std::string& name = "", bool hdr = true, Scene* scene = nullptr,
-    const std::unordered_map<std::string, CameraPtr>& cameras = {},
-    bool automaticBuild                                       = true);
+  template <typename... Ts>
+  static DefaultRenderingPipelinePtr New(Ts&&... args)
+  {
+    auto renderingPipeline = std::shared_ptr<DefaultRenderingPipeline>(
+      new DefaultRenderingPipeline(std::forward<Ts>(args)...));
+    renderingPipeline->addToScene(renderingPipeline);
+
+    return renderingPipeline;
+  }
   virtual ~DefaultRenderingPipeline() override;
+
+  void addToScene(const DefaultRenderingPipelinePtr& renderingPipeline);
 
   /**
    * @brief Force the compilation of the entire pipeline.
@@ -131,6 +136,24 @@ public:
    */
   static std::unique_ptr<DefaultRenderingPipeline>
   Parse(const Json::value& source, Scene* scene, const std::string& rootUrl);
+
+protected:
+  /**
+   * @brief constructor
+   * @param {string} name - The rendering pipeline name (default: "")
+   * @param {boolean} hdr - If high dynamic range textures should be used
+   * (default: true)
+   * @param {BABYLON.Scene} scene - The scene linked to this pipeline (default:
+   * the last created scene)
+   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
+   * pipeline will be attached to (default: scene.cameras)
+   * @param {boolean} automaticBuild - if false, you will have to manually call
+   * prepare() to update the pipeline (default: true)
+   */
+  DefaultRenderingPipeline(
+    const std::string& name = "", bool hdr = true, Scene* scene = nullptr,
+    const std::unordered_map<std::string, CameraPtr>& cameras = {},
+    bool automaticBuild                                       = true);
 
 private:
   /**
@@ -222,7 +245,7 @@ private:
   bool get_grainEnabled() const;
 
   void _rebuildBloom();
-  void _setAutoClearAndTextureSharing(PostProcess* postProcess,
+  void _setAutoClearAndTextureSharing(const PostProcessPtr& postProcess,
                                       bool skipTextureSharing = false);
   void _buildPipeline();
   void _disposePostProcesses(bool disposeNonRecreated = false);
@@ -233,32 +256,32 @@ public:
    * Sharpen post process which will apply a sharpen convolution to enhance
    * edges
    */
-  SharpenPostProcess* sharpen;
+  SharpenPostProcessPtr sharpen;
   /**
    * Depth of field effect, applies a blur based on how far away objects are
    * from the focus distance.
    */
-  DepthOfFieldEffect* depthOfField;
+  DepthOfFieldEffectPtr depthOfField;
   /**
    * The Fast Approximate Anti-Aliasing post process which attemps to remove
    * aliasing from an image.
    */
-  FxaaPostProcess* fxaa;
+  FxaaPostProcessPtr fxaa;
   /**
    * Image post processing pass used to perform operations such as tone mapping
    * or color grading.
    */
-  PostProcess* imageProcessing; // ImageProcessingPostProcess
+  PostProcessPtr imageProcessing; // ImageProcessingPostProcess
 
   /**
    * Chromatic aberration post process which will shift rgb colors in the image
    */
-  ChromaticAberrationPostProcess* chromaticAberration;
+  ChromaticAberrationPostProcessPtr chromaticAberration;
 
   /**
    * Grain post process which add noise to the image
    */
-  GrainPostProcess* grain;
+  GrainPostProcessPtr grain;
 
   /**
    * Animations which can be used to tweak settings over a period of time
@@ -340,10 +363,10 @@ public:
 
 private:
   // Post-processes
-  PostProcessRenderEffect* _sharpenEffect;
-  BloomEffect* bloom;
-  PostProcessRenderEffect* _chromaticAberrationEffect;
-  PostProcessRenderEffect* _grainEffect;
+  PostProcessRenderEffectPtr _sharpenEffect;
+  BloomEffectPtr bloom;
+  PostProcessRenderEffectPtr _chromaticAberrationEffect;
+  PostProcessRenderEffectPtr _grainEffect;
 
   /**
    * Glow post process which adds a glow to emmisive areas of the image
@@ -383,8 +406,8 @@ private:
   std::vector<CameraPtr> _camerasToBeAttached;
 
   bool _hasCleared;
-  PostProcess* _prevPostProcess;
-  PostProcess* _prevPrevPostProcess;
+  PostProcessPtr _prevPostProcess;
+  PostProcessPtr _prevPrevPostProcess;
 
 }; // end of class SSAORenderingPipeline
 

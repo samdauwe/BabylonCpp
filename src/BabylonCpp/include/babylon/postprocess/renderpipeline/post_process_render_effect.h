@@ -12,7 +12,10 @@ namespace BABYLON {
 class Camera;
 class Engine;
 class PostProcess;
-using CameraPtr = std::shared_ptr<Camera>;
+class PostProcessRenderEffect;
+using CameraPtr                  = std::shared_ptr<Camera>;
+using PostProcessPtr             = std::shared_ptr<PostProcess>;
+using PostProcessRenderEffectPtr = std::shared_ptr<PostProcessRenderEffect>;
 
 /**
  * @brief This represents a set of one or more post processes in Babylon.
@@ -23,21 +26,12 @@ using CameraPtr = std::shared_ptr<Camera>;
 class BABYLON_SHARED_EXPORT PostProcessRenderEffect {
 
 public:
-  /**
-   * @brief Instantiates a post process render effect.
-   * A post process can be used to apply a shader to a texture after it is
-   * rendered.
-   * @param engine The engine the effect is tied to
-   * @param name The name of the effect
-   * @param getPostProcesses A function that returns a set of post processes
-   * which the effect will run in order to be run.
-   * @param singleInstance False if this post process can be run on multiple
-   * cameras. (default: true)
-   */
-  PostProcessRenderEffect(
-    Engine* engine, const std::string& name,
-    const std::function<std::vector<PostProcess*>()>& getPostProcesses,
-    bool singleInstance = true);
+  template <typename... Ts>
+  static PostProcessRenderEffectPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<PostProcessRenderEffect>(
+      new PostProcessRenderEffect(std::forward<Ts>(args)...));
+  }
   ~PostProcessRenderEffect();
 
   /**
@@ -79,9 +73,25 @@ public:
    * @param camera The camera to get the post processes on.
    * @returns The list of the post processes in the effect.
    */
-  std::vector<PostProcess*> getPostProcesses(Camera* camera = nullptr);
+  std::vector<PostProcessPtr> getPostProcesses(Camera* camera = nullptr);
 
 protected:
+  /**
+   * @brief Instantiates a post process render effect.
+   * A post process can be used to apply a shader to a texture after it is
+   * rendered.
+   * @param engine The engine the effect is tied to
+   * @param name The name of the effect
+   * @param getPostProcesses A function that returns a set of post processes
+   * which the effect will run in order to be run.
+   * @param singleInstance False if this post process can be run on multiple
+   * cameras. (default: true)
+   */
+  PostProcessRenderEffect(
+    Engine* engine, const std::string& name,
+    const std::function<std::vector<PostProcessPtr>()>& getPostProcesses,
+    bool singleInstance = true);
+
   /**
    * @brief Checks if all the post processes in the effect are supported.
    */
@@ -102,8 +112,8 @@ public:
   ReadOnlyProperty<PostProcessRenderEffect, bool> isSupported;
 
 private:
-  std::unordered_map<std::string, std::vector<PostProcess*>> _postProcesses;
-  std::function<std::vector<PostProcess*>()> _getPostProcesses;
+  std::unordered_map<std::string, std::vector<PostProcessPtr>> _postProcesses;
+  std::function<std::vector<PostProcessPtr>()> _getPostProcesses;
   bool _singleInstance;
   std::unordered_map<std::string, CameraPtr> _cameras;
   std::unordered_map<std::string, IndicesArray> _indicesForCamera;

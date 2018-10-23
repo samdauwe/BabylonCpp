@@ -10,16 +10,19 @@ namespace BABYLON {
 
 BlurPostProcess::BlurPostProcess(
   const std::string& iName, const Vector2& iDrection, float kernel,
-  const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-  unsigned int samplingMode, Engine* engine, bool reusable,
-  unsigned int textureType, const std::string& defines, bool iBlockCompilation)
+  const std::variant<float, PostProcessOptions>& options,
+  const CameraPtr& camera, std::optional<unsigned int> samplingMode,
+  Engine* engine, bool reusable, unsigned int textureType,
+  const std::string& defines, bool iBlockCompilation)
     : PostProcess{iName,
                   "kernelBlur",
                   {"delta", "direction", "cameraMinMaxZ"},
                   {"circleOfConfusionSampler"},
                   options,
                   camera,
-                  samplingMode,
+                  samplingMode.has_value() ?
+                    *samplingMode :
+                    TextureConstants::BILINEAR_SAMPLINGMODE,
                   engine,
                   reusable,
                   "",

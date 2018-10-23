@@ -6,6 +6,9 @@
 
 namespace BABYLON {
 
+class SharpenPostProcess;
+using SharpenPostProcessPtr = std::shared_ptr<SharpenPostProcess>;
+
 /**
  * @brief The SharpenPostProcess applies a sharpen kernel to every pixel.
  * See http://en.wikipedia.org/wiki/Kernel_(image_processing)
@@ -13,6 +16,15 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT SharpenPostProcess : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static SharpenPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<SharpenPostProcess>(
+      new SharpenPostProcess(std::forward<Ts>(args)...));
+  }
+  virtual ~SharpenPostProcess() override;
+
+protected:
   /**
    * @brief Creates a new instance ConvolutionPostProcess.
    * @param name The name of the effect.
@@ -32,13 +44,12 @@ public:
    * at a later time. (default: false)
    */
   SharpenPostProcess(const std::string& name,
-                     const Variant<float, PostProcessOptions>& options,
+                     const std::variant<float, PostProcessOptions>& options,
                      const CameraPtr& camera, unsigned int samplingMode,
                      Engine* engine, bool reusable = false,
                      unsigned int textureType
                      = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                      bool blockCompilation = false);
-  virtual ~SharpenPostProcess() override;
 
 public:
   /**

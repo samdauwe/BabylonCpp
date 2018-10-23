@@ -20,7 +20,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
                                        unsigned int pipelineTextureType,
                                        bool blockCompilation)
     : PostProcessRenderEffect{scene->getEngine(), "depth of field",
-                              [&]() -> std::vector<PostProcess*> {
+                              [&]() -> std::vector<PostProcessPtr> {
                                 return _effects;
                               },
                               true}
@@ -37,8 +37,7 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
   // Circle of confusion value for each pixel is used to determine how
   // much to blur that pixel
   _circleOfConfusion = std::make_unique<CircleOfConfusionPostProcess>(
-    "circleOfConfusion", iDepthTexture,
-    ToVariant<float, PostProcessOptions>(1.f), nullptr,
+    "circleOfConfusion", iDepthTexture, 1.f, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     pipelineTextureType, blockCompilation);
 
@@ -71,34 +70,35 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
   auto adjustedKernelSize = kernelSize / std::pow(2, blurCount - 1);
   auto ratio              = 1.f;
   for (int i = 0; i < blurCount; ++i) {
-    auto blurY = std::make_unique<DepthOfFieldBlurPostProcess>(
-      "verticle blur", scene, Vector2(0.f, 1.f), adjustedKernelSize,
-      ToVariant<float, PostProcessOptions>(ratio), nullptr,
-      _depthOfFieldPass.get(), i == 0 ? _circleOfConfusion.get() : nullptr,
+    auto blurY = DepthOfFieldBlurPostProcess::New(
+      "verticle blur", scene, Vector2(0.f, 1.f), adjustedKernelSize, ratio,
+      nullptr, _depthOfFieldPass.get(),
+      i == 0 ? _circleOfConfusion.get() : nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
       pipelineTextureType, blockCompilation);
     blurY->autoClear = false;
     ratio            = 0.75f / std::pow(2.f, static_cast<float>(i));
-    auto blurX       = std::make_unique<DepthOfFieldBlurPostProcess>(
-      "horizontal blur", scene, Vector2(1.f, 0.f), adjustedKernelSize,
-      ToVariant<float, PostProcessOptions>(ratio), nullptr,
-      _depthOfFieldPass.get(), nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-      scene->getEngine(), false, pipelineTextureType, blockCompilation);
+    auto blurX       = DepthOfFieldBlurPostProcess::New(
+      "horizontal blur", scene, Vector2(1.f, 0.f), adjustedKernelSize, ratio,
+      nullptr, _depthOfFieldPass.get(), nullptr,
+      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+      pipelineTextureType, blockCompilation);
     blurX->autoClear = false;
-    _depthOfFieldBlurY.emplace_back(std::move(blurY));
-    _depthOfFieldBlurX.emplace_back(std::move(blurX));
+    _depthOfFieldBlurY.emplace_back(blurY);
+    _depthOfFieldBlurX.emplace_back(blurX);
   }
 
-  std::vector<PostProcess*> blurSteps;
+  std::vector<PostProcessPtr> blurSteps;
   for (auto& depthOfFieldBlurX : _depthOfFieldBlurX) {
-    blurSteps.emplace_back(static_cast<PostProcess*>(depthOfFieldBlurX.get()));
+    blurSteps.emplace_back(
+      std::dynamic_pointer_cast<PostProcess>(depthOfFieldBlurX));
   }
 
   // Set all post processes on the effect.
-  _effects = {_circleOfConfusion.get()};
+  _effects = {_circleOfConfusion};
   for (size_t i = 0; i < _depthOfFieldBlurX.size(); i++) {
-    _effects.emplace_back(_depthOfFieldBlurY[i].get());
-    _effects.emplace_back(_depthOfFieldBlurX[i].get());
+    _effects.emplace_back(_depthOfFieldBlurY[i]);
+    _effects.emplace_back(_depthOfFieldBlurX[i]);
   }
 
   // Merge blurred images with original image based on circleOfConfusion

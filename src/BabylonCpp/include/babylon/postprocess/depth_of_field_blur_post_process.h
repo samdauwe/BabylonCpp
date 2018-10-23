@@ -6,6 +6,10 @@
 
 namespace BABYLON {
 
+class DepthOfFieldBlurPostProcess;
+using DepthOfFieldBlurPostProcessPtr
+  = std::shared_ptr<DepthOfFieldBlurPostProcess>;
+
 /**
  * @brief The DepthOfFieldBlurPostProcess applied a blur in a give direction.
  * This blur differs from the standard BlurPostProcess as it attempts to avoid
@@ -13,9 +17,19 @@ namespace BABYLON {
  * than the center pixel. See section 2.6.2
  * http://fileadmin.cs.lth.se/cs/education/edan35/lectures/12dof.pdf
  */
-struct BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess
+class BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess
     : public BlurPostProcess {
 
+public:
+  template <typename... Ts>
+  static DepthOfFieldBlurPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<DepthOfFieldBlurPostProcess>(
+      new DepthOfFieldBlurPostProcess(std::forward<Ts>(args)...));
+  }
+  ~DepthOfFieldBlurPostProcess();
+
+protected:
   /**
    * @brief Creates a new instance CircleOfConfusionPostProcess.
    * @param name The name of the effect.
@@ -43,14 +57,13 @@ struct BABYLON_SHARED_EXPORT DepthOfFieldBlurPostProcess
    */
   DepthOfFieldBlurPostProcess(
     const std::string& name, Scene* scene, const Vector2& direction,
-    float kernel, const Variant<float, PostProcessOptions>& options,
+    float kernel, const std::variant<float, PostProcessOptions>& options,
     const CameraPtr& camera, PostProcess* circleOfConfusion,
     PostProcess* imageToBlur  = nullptr,
     unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     bool blockCompilation    = false);
-  ~DepthOfFieldBlurPostProcess();
 
 }; // end of class DepthOfFieldBlurPostProcess
 

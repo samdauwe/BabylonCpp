@@ -20,10 +20,14 @@ class DynamicTexture;
 class PassPostProcess;
 class PostProcess;
 class Scene;
+class SSAO2RenderingPipeline;
 class Texture;
 class Vector3;
-using TexturePtr        = std::shared_ptr<Texture>;
-using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
+using DynamicTexturePtr         = std::shared_ptr<DynamicTexture>;
+using PassPostProcessPtr        = std::shared_ptr<PassPostProcess>;
+using PostProcessPtr            = std::shared_ptr<PostProcess>;
+using SSAO2RenderingPipelinePtr = std::shared_ptr<SSAO2RenderingPipeline>;
+using TexturePtr                = std::shared_ptr<Texture>;
 
 namespace Json {
 typedef picojson::value value;
@@ -66,22 +70,18 @@ public:
     = "SSAOCombineRenderEffect";
 
 public:
-  /**
-   * @brief Constructor
-   * @param {string} name - The rendering pipeline name
-   * @param {BABYLON.Scene} scene - The scene linked to this pipeline
-   * @param {any} ratio - The size of the postprocesses. Can be a number shared
-   * between passes or an object for more precision: { ssaoRatio: 0.5,
-   * combineRatio: 1.0 }
-   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
-   * pipeline will be attached to
-   */
-  SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                         const std::vector<CameraPtr>& cameras);
-  SSAO2RenderingPipeline(const std::string& name, Scene* scene,
-                         const SSAO2Ratio& ratio,
-                         const std::vector<CameraPtr>& cameras);
+  template <typename... Ts>
+  static SSAO2RenderingPipelinePtr New(Ts&&... args)
+  {
+    auto renderingPipeline = std::shared_ptr<SSAO2RenderingPipeline>(
+      new SSAO2RenderingPipeline(std::forward<Ts>(args)...));
+    renderingPipeline->addToScene(renderingPipeline);
+
+    return renderingPipeline;
+  }
   virtual ~SSAO2RenderingPipeline() override;
+
+  void addToScene(const SSAO2RenderingPipelinePtr& ssao2RenderingPipeline);
 
   /** Methods */
   static bool IsSupported();
@@ -110,6 +110,23 @@ public:
    */
   static std::unique_ptr<SSAO2RenderingPipeline>
   Parse(const Json::value& source, Scene* scene, const std::string& url);
+
+protected:
+  /**
+   * @brief Constructor
+   * @param {string} name - The rendering pipeline name
+   * @param {BABYLON.Scene} scene - The scene linked to this pipeline
+   * @param {any} ratio - The size of the postprocesses. Can be a number shared
+   * between passes or an object for more precision: { ssaoRatio: 0.5,
+   * combineRatio: 1.0 }
+   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
+   * pipeline will be attached to
+   */
+  SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
+                         const std::vector<CameraPtr>& cameras);
+  SSAO2RenderingPipeline(const std::string& name, Scene* scene,
+                         const SSAO2Ratio& ratio,
+                         const std::vector<CameraPtr>& cameras);
 
 private:
   void set_samples(unsigned int n);
@@ -222,15 +239,16 @@ private:
   bool _expensiveBlur;
 
   Scene* _scene;
+  std::vector<CameraPtr> _cameraList;
   TexturePtr _depthTexture;
   TexturePtr _normalTexture;
   DynamicTexturePtr _randomTexture;
 
-  PassPostProcess* _originalColorPostProcess;
-  PostProcess* _ssaoPostProcess;
-  PostProcess* _blurHPostProcess;
-  PostProcess* _blurVPostProcess;
-  PostProcess* _ssaoCombinePostProcess;
+  PassPostProcessPtr _originalColorPostProcess;
+  PostProcessPtr _ssaoPostProcess;
+  PostProcessPtr _blurHPostProcess;
+  PostProcessPtr _blurVPostProcess;
+  PostProcessPtr _ssaoCombinePostProcess;
 
   bool _firstUpdate;
   Uint32Array _bits;

@@ -7,6 +7,9 @@
 
 namespace BABYLON {
 
+class GlowBlurPostProcess;
+using GlowBlurPostProcessPtr = std::shared_ptr<GlowBlurPostProcess>;
+
 /**
  * @brief Special Glow Blur post process only blurring the alpha channel
  * It enforces keeping the most luminous color in the color channel.
@@ -14,14 +17,22 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT GlowBlurPostProcess : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static GlowBlurPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<GlowBlurPostProcess>(
+      new GlowBlurPostProcess(std::forward<Ts>(args)...));
+  }
+  ~GlowBlurPostProcess();
+
+protected:
   GlowBlurPostProcess(const std::string& name, const Vector2& direction,
                       float kernel,
-                      const Variant<float, PostProcessOptions>& options,
+                      const std::variant<float, PostProcessOptions>& options,
                       const CameraPtr& camera,
                       unsigned int samplingMode
                       = TextureConstants::BILINEAR_SAMPLINGMODE,
                       Engine* engine = nullptr, bool reusable = false);
-  ~GlowBlurPostProcess();
 
 public:
   Vector2 direction;

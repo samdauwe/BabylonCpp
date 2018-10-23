@@ -7,19 +7,30 @@
 
 namespace BABYLON {
 
+class PassPostProcess;
+using PassPostProcessPtr = std::shared_ptr<PassPostProcess>;
+
 /**
  * @brief
  */
 class BABYLON_SHARED_EXPORT PassPostProcess : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static PassPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<PassPostProcess>(
+      new PassPostProcess(std::forward<Ts>(args)...));
+  }
+  ~PassPostProcess();
+
+protected:
   PassPostProcess(const std::string& name, float ratio, const CameraPtr& camera,
                   unsigned int samplingMode, Engine* engine,
                   bool reusable = false,
                   unsigned int textureType
                   = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                   bool blockCompilation = false);
-  ~PassPostProcess();
 
 }; // end of class PassPostProcess
 

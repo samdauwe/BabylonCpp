@@ -59,6 +59,7 @@ using DummyInternalTextureTrackerPtr
 using IInternalTextureLoaderPtr  = std::shared_ptr<IInternalTextureLoader>;
 using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
 using InternalTexturePtr         = std::shared_ptr<InternalTexture>;
+using PassPostProcessPtr         = std::shared_ptr<PassPostProcess>;
 using RenderTargetTexturePtr     = std::shared_ptr<RenderTargetTexture>;
 
 /**
@@ -2683,7 +2684,7 @@ private:
   DummyInternalTextureTrackerPtr _lastBoundInternalTextureTracker;
   ICanvas* _workingCanvas;
   ICanvasRenderingContext2D* _workingContext;
-  std::unique_ptr<PassPostProcess> _rescalePostProcess;
+  PassPostProcessPtr _rescalePostProcess;
   std::unique_ptr<GL::IGLFramebuffer> _dummyFramebuffer;
   std::function<void()> _bindedRenderFunction;
   bool _vaoRecordInProgress;

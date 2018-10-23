@@ -11,6 +11,7 @@ namespace BABYLON {
 
 class BlurPostProcess;
 class ImageProcessingConfiguration;
+using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
 
 class BABYLON_SHARED_EXPORT MirrorTexture : public RenderTargetTexture {
 
@@ -59,8 +60,8 @@ private:
   Matrix _mirrorMatrix;
   Matrix _savedViewMatrix;
 
-  std::unique_ptr<BlurPostProcess> _blurX;
-  std::unique_ptr<BlurPostProcess> _blurY;
+  BlurPostProcessPtr _blurX;
+  BlurPostProcessPtr _blurY;
   float _adaptiveBlurKernel;
   float _blurKernelX;
   float _blurKernelY;

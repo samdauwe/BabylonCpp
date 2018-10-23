@@ -32,6 +32,7 @@ class VertexBuffer;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using MaterialPtr            = std::shared_ptr<Material>;
 using MeshPtr                = std::shared_ptr<Mesh>;
+using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
@@ -324,7 +325,7 @@ protected:
   int _maxSize;
   ISize _mainTextureDesiredSize;
   bool _shouldRender;
-  std::vector<PostProcess*> _postProcesses;
+  std::vector<PostProcessPtr> _postProcesses;
   std::vector<BaseTexturePtr> _textures;
   EmissiveTextureAndColor _emissiveTextureAndColor;
 

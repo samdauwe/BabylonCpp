@@ -171,9 +171,8 @@ void MirrorTexture::_preparePostProcesses()
                          EngineConstants::TEXTURETYPE_FLOAT :
                          EngineConstants::TEXTURETYPE_HALF_FLOAT;
 
-    _blurX = std::make_unique<BlurPostProcess>(
-      "horizontal blur", Vector2(1.f, 0.f), _blurKernelX,
-      ToVariant<float, PostProcessOptions>(_blurRatio), nullptr,
+    _blurX = BlurPostProcess::New(
+      "horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
     _blurX->autoClear = false;
 
@@ -184,24 +183,23 @@ void MirrorTexture::_preparePostProcesses()
       _blurX->alwaysForcePOT = true;
     }
 
-    _blurY = std::make_unique<BlurPostProcess>(
-      "vertical blur", Vector2(0.f, 1.f), _blurKernelY,
-      ToVariant<float, PostProcessOptions>(_blurRatio), nullptr,
+    _blurY = BlurPostProcess::New(
+      "vertical blur", Vector2(0.f, 1.f), _blurKernelY, _blurRatio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
     _blurY->autoClear      = false;
     _blurY->alwaysForcePOT = _blurRatio != 1.f;
 
-    addPostProcess(_blurX.get());
-    addPostProcess(_blurY.get());
+    addPostProcess(_blurX);
+    addPostProcess(_blurY);
   }
   else {
     if (_blurY) {
-      removePostProcess(_blurY.get());
+      removePostProcess(_blurY);
       _blurY->dispose();
       _blurY = nullptr;
     }
     if (_blurX) {
-      removePostProcess(_blurX.get());
+      removePostProcess(_blurX);
       _blurX->dispose();
       _blurX = nullptr;
     }

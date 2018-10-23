@@ -40,9 +40,9 @@ public:
   DepthOfFieldMergePostProcess(
     const std::string& name, PostProcess* originalFromInput,
     PostProcess* circleOfConfusion, const std::vector<PostProcess*>& blurSteps,
-    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-    unsigned int samplingMode = 0, Engine* engine = nullptr,
-    bool reusable            = false,
+    const std::variant<float, PostProcessOptions>& options,
+    const CameraPtr& camera, unsigned int samplingMode = 0,
+    Engine* engine = nullptr, bool reusable = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     bool blockCompilation    = false);
   ~DepthOfFieldMergePostProcess() override;

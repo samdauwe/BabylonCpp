@@ -1,7 +1,6 @@
 #include <babylon/postprocess/renderpipeline/pipelines/ssao_rendering_pipeline.h>
 
 #include <babylon/core/random.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
@@ -36,6 +35,7 @@ SSAORenderingPipeline::SSAORenderingPipeline(
     , fallOff{0.000001f}
     , base{0.5f}
     , _scene{scene}
+    , _cameraList{cameras}
     , _firstUpdate{true}
 {
   // Set up assets
@@ -46,7 +46,7 @@ SSAORenderingPipeline::SSAORenderingPipeline(
   auto ssaoRatio    = ratio.ssaoRatio;
   auto combineRatio = ratio.combineRatio;
 
-  _originalColorPostProcess = new PassPostProcess(
+  _originalColorPostProcess = PassPostProcess::New(
     "SSAOOriginalSceneColor", combineRatio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false);
   _createSSAOPostProcess(ssaoRatio);
@@ -54,35 +54,44 @@ SSAORenderingPipeline::SSAORenderingPipeline(
   _createSSAOCombinePostProcess(combineRatio);
 
   // Set up pipeline
-  addEffect(new PostProcessRenderEffect(
-    scene->getEngine(), SSAOOriginalSceneColorEffect,
-    [&]() -> std::vector<PostProcess*> { return {_originalColorPostProcess}; },
-    true));
-  addEffect(new PostProcessRenderEffect(
+  addEffect(PostProcessRenderEffect::New(scene->getEngine(),
+                                         SSAOOriginalSceneColorEffect,
+                                         [&]() -> std::vector<PostProcessPtr> {
+                                           return {_originalColorPostProcess};
+                                         },
+                                         true));
+  addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), SSAORenderEffect,
-    [&]() -> std::vector<PostProcess*> { return {_ssaoPostProcess}; }, true));
-  addEffect(new PostProcessRenderEffect(
+    [&]() -> std::vector<PostProcessPtr> { return {_ssaoPostProcess}; }, true));
+  addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), SSAOBlurHRenderEffect,
-    [&]() -> std::vector<PostProcess*> { return {_blurHPostProcess}; }, true));
-  addEffect(new PostProcessRenderEffect(
+    [&]() -> std::vector<PostProcessPtr> { return {_blurHPostProcess}; },
+    true));
+  addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), SSAOBlurVRenderEffect,
-    [&]() -> std::vector<PostProcess*> { return {_blurVPostProcess}; }, true));
-
-  addEffect(new PostProcessRenderEffect(
-    scene->getEngine(), SSAOCombineRenderEffect,
-    [&]() -> std::vector<PostProcess*> { return {_ssaoCombinePostProcess}; },
+    [&]() -> std::vector<PostProcessPtr> { return {_blurVPostProcess}; },
     true));
 
-  // Finish
-  scene->postProcessRenderPipelineManager()->addPipeline(this);
-  if (!cameras.empty()) {
-    scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
-      name, cameras);
-  }
+  addEffect(PostProcessRenderEffect::New(
+    scene->getEngine(), SSAOCombineRenderEffect,
+    [&]() -> std::vector<PostProcessPtr> { return {_ssaoCombinePostProcess}; },
+    true));
 }
 
 SSAORenderingPipeline::~SSAORenderingPipeline()
 {
+}
+
+void SSAORenderingPipeline::addToScene(
+  const SSAORenderingPipelinePtr& ssao2RenderingPipeline)
+{
+  // Finish
+  _scene->postProcessRenderPipelineManager()->addPipeline(
+    ssao2RenderingPipeline);
+  if (!_cameraList.empty()) {
+    _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
+      _name, _cameraList);
+  }
 }
 
 void SSAORenderingPipeline::dispose(bool disableDepthRender,
@@ -114,14 +123,12 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
 {
   auto size = 16;
 
-  _blurHPostProcess = new BlurPostProcess(
-    "BlurH", Vector2(1.f, 0.f), size,
-    ToVariant<float, PostProcessOptions>(ratio), nullptr,
+  _blurHPostProcess = BlurPostProcess::New(
+    "BlurH", Vector2(1.f, 0.f), size, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-  _blurVPostProcess = new BlurPostProcess(
-    "BlurV", Vector2(0.f, 1.f), size,
-    ToVariant<float, PostProcessOptions>(ratio), nullptr,
+  _blurVPostProcess = BlurPostProcess::New(
+    "BlurV", Vector2(0.f, 1.f), size, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
@@ -167,12 +174,12 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
   }};
   float samplesFactor = 1.f / static_cast<float>(numSamples);
 
-  _ssaoPostProcess = new PostProcess(
+  _ssaoPostProcess = PostProcess::New(
     "ssao", "ssao",
     {"sampleSphere", "samplesFactor", "randTextureTiles", "totalStrength",
      "radius", "area", "fallOff", "base", "range", "viewport"},
-    {"randomSampler"}, ToVariant<float, PostProcessOptions>(ratio), nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    {"randomSampler"}, ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+    _scene->getEngine(), false,
     "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
 
   _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
@@ -195,16 +202,16 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
 
 void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
 {
-  _ssaoCombinePostProcess = new PostProcess(
-    "ssaoCombine", "ssaoCombine", {}, {"originalColor", "viewport"},
-    ToVariant<float, PostProcessOptions>(ratio), nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
+  _ssaoCombinePostProcess = PostProcess::New(
+    "ssaoCombine", "ssaoCombine", {}, {"originalColor", "viewport"}, ratio,
+    nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
+    false);
 
   _ssaoCombinePostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setVector4("viewport",
                        Tmp::Vector4Array[0].copyFromFloats(0.f, 0.f, 1.f, 1.f));
     effect->setTextureFromPostProcess("originalColor",
-                                      _originalColorPostProcess);
+                                      _originalColorPostProcess.get());
   });
 }
 

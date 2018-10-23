@@ -6,10 +6,16 @@
 
 namespace BABYLON {
 
+class BloomEffect;
 class BloomMergePostProcess;
 class BlurPostProcess;
 class ExtractHighlightsPostProcess;
 class Scene;
+using BloomEffectPtr           = std::shared_ptr<BloomEffect>;
+using BloomMergePostProcessPtr = std::shared_ptr<BloomMergePostProcess>;
+using BlurPostProcessPtr       = std::shared_ptr<BlurPostProcess>;
+using ExtractHighlightsPostProcessPtr
+  = std::shared_ptr<ExtractHighlightsPostProcess>;
 
 /**
  * @brief The bloom effect spreads bright areas of an image to simulate
@@ -18,24 +24,12 @@ class Scene;
 class BABYLON_SHARED_EXPORT BloomEffect : public PostProcessRenderEffect {
 
 public:
-  /**
-   * @brief Creates a new instance of @see BloomEffect.
-   * @param scene The scene the effect belongs to.
-   * @param bloomScale The ratio of the blur texture to the input texture that
-   * should be used to compute the bloom.
-   * @param bloomKernel The size of the kernel to be used when applying the
-   * blur.
-   * @param bloomWeight The the strength of bloom.
-   * @param pipelineTextureType The type of texture to be used when performing
-   * the post processing.
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
-   */
-  BloomEffect(const std::string& name, Scene* scene, float bloomScale,
-              float bloomWeight, float bloomKernel,
-              unsigned int pipelineTextureType = 0,
-              bool blockCompilation            = false);
+  template <typename... Ts>
+  static BloomEffectPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<BloomEffect>(
+      new BloomEffect(std::forward<Ts>(args)...));
+  }
   virtual ~BloomEffect();
 
   /**
@@ -57,6 +51,25 @@ public:
   bool _isReady() const;
 
 protected:
+  /**
+   * @brief Creates a new instance of @see BloomEffect.
+   * @param scene The scene the effect belongs to.
+   * @param bloomScale The ratio of the blur texture to the input texture that
+   * should be used to compute the bloom.
+   * @param bloomKernel The size of the kernel to be used when applying the
+   * blur.
+   * @param bloomWeight The the strength of bloom.
+   * @param pipelineTextureType The type of texture to be used when performing
+   * the post processing.
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
+   */
+  BloomEffect(const std::string& name, Scene* scene, float bloomScale,
+              float bloomWeight, float bloomKernel,
+              unsigned int pipelineTextureType = 0,
+              bool blockCompilation            = false);
+
   /**
    * @brief Gets the luminance threshold to find bright areas of the image to
    * bloom.
@@ -99,12 +112,12 @@ public:
   /**
    * Hidden Internal
    */
-  std::vector<PostProcess*> _effects;
+  std::vector<PostProcessPtr> _effects;
 
   /**
    * Hidden Internal
    */
-  ExtractHighlightsPostProcess* _downscale;
+  ExtractHighlightsPostProcessPtr _downscale;
 
   /**
    * The luminance threshold to find bright areas of the image to bloom.
@@ -123,9 +136,9 @@ public:
 
 private:
   float bloomScale;
-  BlurPostProcess* _blurX;
-  BlurPostProcess* _blurY;
-  BloomMergePostProcess* _merge;
+  BlurPostProcessPtr _blurX;
+  BlurPostProcessPtr _blurY;
+  BloomMergePostProcessPtr _merge;
 
 }; // end of class ChromaticAberrationPostProcess
 

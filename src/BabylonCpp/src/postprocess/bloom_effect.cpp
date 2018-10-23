@@ -13,30 +13,27 @@ BloomEffect::BloomEffect(const std::string& name, Scene* scene,
                          unsigned int pipelineTextureType,
                          bool blockCompilation)
     : PostProcessRenderEffect{scene->getEngine(), "bloom",
-                              [&]() { return _effects; }, true}
+                              [this]() { return _effects; }, true}
     , threshold{this, &BloomEffect::get_threshold, &BloomEffect::set_threshold}
     , weight{this, &BloomEffect::get_weight, &BloomEffect::set_weight}
     , kernel{this, &BloomEffect::get_kernel, &BloomEffect::set_kernel}
 {
   _name      = name;
-  _downscale = new ExtractHighlightsPostProcess(
-    "highlights", ToVariant<float, PostProcessOptions>(1.f), nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    pipelineTextureType, blockCompilation);
+  _downscale = ExtractHighlightsPostProcess::New(
+    "highlights", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+    scene->getEngine(), false, pipelineTextureType, blockCompilation);
 
-  _blurX = new BlurPostProcess("horizontal blur", Vector2(1.f, 0.f), 10.0,
-                               ToVariant<float, PostProcessOptions>(bloomScale),
-                               nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-                               scene->getEngine(), false, pipelineTextureType,
-                               "", blockCompilation);
+  _blurX = BlurPostProcess::New(
+    "horizontal blur", Vector2(1.f, 0.f), 10.0, bloomScale, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    pipelineTextureType, "", blockCompilation);
   _blurX->alwaysForcePOT = true;
   _blurX->autoClear      = false;
 
-  _blurY = new BlurPostProcess("vertical blur", Vector2(0.f, 1.f), 10.0,
-                               ToVariant<float, PostProcessOptions>(bloomScale),
-                               nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-                               scene->getEngine(), false, pipelineTextureType,
-                               "", blockCompilation);
+  _blurY = BlurPostProcess::New(
+    "vertical blur", Vector2(0.f, 1.f), 10.0, bloomScale, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+    pipelineTextureType, "", blockCompilation);
   _blurY->alwaysForcePOT = true;
   _blurY->autoClear      = false;
 
@@ -44,9 +41,8 @@ BloomEffect::BloomEffect(const std::string& name, Scene* scene,
 
   _effects = {_downscale, _blurX, _blurY};
 
-  _merge = new BloomMergePostProcess(
-    "bloomMerge", _downscale, _blurY, bloomWeight,
-    ToVariant<float, PostProcessOptions>(bloomScale), nullptr,
+  _merge = BloomMergePostProcess::New(
+    "bloomMerge", _downscale, _blurY, bloomWeight, bloomScale, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     pipelineTextureType, blockCompilation);
   _merge->autoClear = false;

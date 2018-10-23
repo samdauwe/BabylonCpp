@@ -8,7 +8,8 @@
 namespace BABYLON {
 
 SharpenPostProcess::SharpenPostProcess(
-  const std::string& iName, const Variant<float, PostProcessOptions>& options,
+  const std::string& iName,
+  const std::variant<float, PostProcessOptions>& options,
   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
   bool reusable, unsigned int textureType, bool blockCompilation)
     : PostProcess{iName,

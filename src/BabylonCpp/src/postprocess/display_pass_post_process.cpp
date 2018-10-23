@@ -1,7 +1,5 @@
 #include <babylon/postprocess/display_pass_post_process.h>
 
-#include <babylon/core/variant.h>
-
 namespace BABYLON {
 
 DisplayPassPostProcess::DisplayPassPostProcess(const std::string& iName,
@@ -9,15 +7,9 @@ DisplayPassPostProcess::DisplayPassPostProcess(const std::string& iName,
                                                const CameraPtr& camera,
                                                unsigned int samplingMode,
                                                Engine* engine, bool reusable)
-    : PostProcess{iName,
-                  "displayPass",
-                  {"passSampler"},
-                  {"passSampler"},
-                  ToVariant<float, PostProcessOptions>(ratio),
-                  camera,
-                  samplingMode,
-                  engine,
-                  reusable}
+    : PostProcess{iName,           "displayPass", {"passSampler"},
+                  {"passSampler"}, ratio,         camera,
+                  samplingMode,    engine,        reusable}
 {
 }
 

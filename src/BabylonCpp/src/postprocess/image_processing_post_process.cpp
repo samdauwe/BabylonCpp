@@ -1,7 +1,6 @@
 #include <babylon/postprocess/image_processing_post_process.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/color_curves.h>
@@ -15,20 +14,9 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
   unsigned int samplingMode, Engine* engine, bool reusable,
   unsigned int textureType,
   ImageProcessingConfiguration* imageProcessingConfiguration)
-    : PostProcess{iName,
-                  "imageProcessing",
-                  {},
-                  {},
-                  ToVariant<float, PostProcessOptions>(renderRatio),
-                  camera,
-                  samplingMode,
-                  engine,
-                  reusable,
-                  "",
-                  textureType,
-                  "postprocess",
-                  {},
-                  true}
+    : PostProcess{iName,       "imageProcessing", {},     {},       renderRatio,
+                  camera,      samplingMode,      engine, reusable, "",
+                  textureType, "postprocess",     {},     true}
     , imageProcessingConfiguration{this,
                                    &ImageProcessingPostProcess::
                                      get_imageProcessingConfiguration,

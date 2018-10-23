@@ -24,7 +24,7 @@ GlowLayer::GlowLayer(const std::string& name, Scene* scene)
     : GlowLayer(name, scene,
                 IGlowLayerOptions{
                   GlowLayer::DefaultTextureRatio, // mainTextureRatio;
-                  std::nullopt,                      // mainTextureFixedSize
+                  std::nullopt,                   // mainTextureFixedSize
                   32,                             // blurKernelSize
                   nullptr,                        // camera
                   1,                              // mainTextureSamples
@@ -141,9 +141,8 @@ void GlowLayer::_createTextureAndPostProcesses()
   _blurTexture1->renderParticles      = false;
   _blurTexture1->ignoreCameraViewport = true;
 
-  int blurTextureWidth2 = static_cast<int>(std::floor(blurTextureWidth / 2));
-  int blurTextureHeight2
-    = static_cast<int>(std::floor(blurTextureHeight / 2));
+  int blurTextureWidth2  = static_cast<int>(std::floor(blurTextureWidth / 2));
+  int blurTextureHeight2 = static_cast<int>(std::floor(blurTextureHeight / 2));
 
   _blurTexture2 = RenderTargetTexture::New(
     "GlowLayerBlurRTT2", ISize{blurTextureWidth2, blurTextureHeight2}, _scene,
@@ -156,12 +155,11 @@ void GlowLayer::_createTextureAndPostProcesses()
 
   _textures = {_blurTexture1, _blurTexture2};
 
-  _horizontalBlurPostprocess1 = std::make_unique<BlurPostProcess>(
+  _horizontalBlurPostprocess1 = BlurPostProcess::New(
     "GlowLayerHBP1", Vector2(1.f, 0.f), _options.blurKernelSize / 2,
-    ToVariant<float, PostProcessOptions>(
-      PostProcessOptions{blurTextureWidth, blurTextureHeight}),
-    nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, textureType);
+    PostProcessOptions{blurTextureWidth, blurTextureHeight}, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    textureType);
   _horizontalBlurPostprocess1->width  = blurTextureWidth;
   _horizontalBlurPostprocess1->height = blurTextureHeight;
   _horizontalBlurPostprocess1->onApplyObservable.add(
@@ -169,19 +167,17 @@ void GlowLayer::_createTextureAndPostProcesses()
       effect->setTexture("textureSampler", _mainTexture);
     });
 
-  _verticalBlurPostprocess1 = std::make_unique<BlurPostProcess>(
+  _verticalBlurPostprocess1 = BlurPostProcess::New(
     "GlowLayerVBP1", Vector2(0.f, 1.f), _options.blurKernelSize / 2,
-    ToVariant<float, PostProcessOptions>(
-      PostProcessOptions{blurTextureWidth, blurTextureHeight}),
-    nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, textureType);
+    PostProcessOptions{blurTextureWidth, blurTextureHeight}, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    textureType);
 
-  _horizontalBlurPostprocess2 = std::make_unique<BlurPostProcess>(
+  _horizontalBlurPostprocess2 = BlurPostProcess::New(
     "GlowLayerHBP2", Vector2(1.f, 0.f), _options.blurKernelSize / 2,
-    ToVariant<float, PostProcessOptions>(
-      PostProcessOptions{blurTextureWidth2, blurTextureHeight2}),
-    nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, textureType);
+    PostProcessOptions{blurTextureWidth2, blurTextureHeight2}, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    textureType);
   _horizontalBlurPostprocess2->width  = blurTextureWidth2;
   _horizontalBlurPostprocess2->height = blurTextureHeight2;
   _horizontalBlurPostprocess2->onApplyObservable.add(
@@ -189,20 +185,16 @@ void GlowLayer::_createTextureAndPostProcesses()
       effect->setTexture("textureSampler", _blurTexture1);
     });
 
-  _verticalBlurPostprocess2 = std::make_unique<BlurPostProcess>(
+  _verticalBlurPostprocess2 = BlurPostProcess::New(
     "GlowLayerVBP2", Vector2(0.f, 1.f), _options.blurKernelSize / 2,
-    ToVariant<float, PostProcessOptions>(
-      PostProcessOptions{blurTextureWidth2, blurTextureHeight2}),
-    nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
-    false, textureType);
+    PostProcessOptions{blurTextureWidth2, blurTextureHeight2}, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
+    textureType);
 
-  _postProcesses
-    = {_horizontalBlurPostprocess1.get(), _verticalBlurPostprocess1.get(),
-       _horizontalBlurPostprocess2.get(), _verticalBlurPostprocess2.get()};
-  _postProcesses1
-    = {_horizontalBlurPostprocess1.get(), _verticalBlurPostprocess1.get()};
-  _postProcesses2
-    = {_horizontalBlurPostprocess2.get(), _verticalBlurPostprocess2.get()};
+  _postProcesses  = {_horizontalBlurPostprocess1, _verticalBlurPostprocess1,
+                    _horizontalBlurPostprocess2, _verticalBlurPostprocess2};
+  _postProcesses1 = {_horizontalBlurPostprocess1, _verticalBlurPostprocess1};
+  _postProcesses2 = {_horizontalBlurPostprocess2, _verticalBlurPostprocess2};
 
   _mainTexture->samples
     = _options.mainTextureSamples.has_value() ?
@@ -242,8 +234,8 @@ bool GlowLayer::isReady(SubMesh* subMesh, bool useInstances)
 
   BaseTexturePtr emissiveTexture = nullptr;
   if (material->type() == IReflect::Type::STANDARDMATERIAL) {
-    emissiveTexture = std::static_pointer_cast<StandardMaterial>(material)
-                        ->emissiveTexture();
+    emissiveTexture
+      = std::static_pointer_cast<StandardMaterial>(material)->emissiveTexture();
   }
 
   return EffectLayer::_isReady(subMesh, useInstances, emissiveTexture);
@@ -336,9 +328,9 @@ void GlowLayer::addExcludedMesh(Mesh* mesh)
 
 void GlowLayer::removeExcludedMesh(Mesh* mesh)
 {
-  _excludedMeshes.erase(std::remove(_excludedMeshes.begin(),
-                                      _excludedMeshes.end(), mesh->uniqueId),
-                        _excludedMeshes.end());
+  _excludedMeshes.erase(
+    std::remove(_excludedMeshes.begin(), _excludedMeshes.end(), mesh->uniqueId),
+    _excludedMeshes.end());
 }
 
 void GlowLayer::addIncludedOnlyMesh(Mesh* mesh)
@@ -351,8 +343,8 @@ void GlowLayer::addIncludedOnlyMesh(Mesh* mesh)
 void GlowLayer::removeIncludedOnlyMesh(Mesh* mesh)
 {
   _includedOnlyMeshes.erase(std::remove(_includedOnlyMeshes.begin(),
-                                          _includedOnlyMeshes.end(),
-                                          mesh->uniqueId),
+                                        _includedOnlyMeshes.end(),
+                                        mesh->uniqueId),
                             _includedOnlyMeshes.end());
 }
 

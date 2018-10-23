@@ -21,8 +21,12 @@ class BlurPostProcess;
 class Light;
 class PostProcess;
 class Scene;
+class StandardRenderingPipeline;
 class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+using BlurPostProcessPtr           = std::shared_ptr<BlurPostProcess>;
+using PostProcessPtr               = std::shared_ptr<PostProcess>;
+using TexturePtr                   = std::shared_ptr<Texture>;
+using StandardRenderingPipelinePtr = std::shared_ptr<StandardRenderingPipeline>;
 
 namespace Json {
 typedef picojson::value value;
@@ -39,23 +43,19 @@ public:
   static unsigned int LuminanceSteps;
 
 public:
-  /**
-   * @brief Constructor
-   * @param {string} name - The rendering pipeline name
-   * @param {BABYLON.Scene} scene - The scene linked to this pipeline
-   * @param {any} ratio - The size of the postprocesses (0.5 means that your
-   * postprocess will have a width = canvas.width 0.5 and a height =
-   * canvas.height 0.5)
-   * @param {BABYLON.PostProcess} originalPostProcess - the custom original
-   * color post-process. Must be "reusable". Can be null.
-   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
-   * pipeline will be attached to
-   */
-  StandardRenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                            PostProcess* originalPostProcess      = nullptr,
-                            const std::vector<CameraPtr>& cameras = {});
+  template <typename... Ts>
+  static StandardRenderingPipelinePtr New(Ts&&... args)
+  {
+    auto renderingPipeline = std::shared_ptr<StandardRenderingPipeline>(
+      new StandardRenderingPipeline(std::forward<Ts>(args)...));
+    renderingPipeline->addToScene(renderingPipeline);
+
+    return renderingPipeline;
+  }
   virtual ~StandardRenderingPipeline() override;
 
+  void addToScene(const StandardRenderingPipelinePtr& renderingPipeline);
+  IReflect::Type type() const override;
   float operator[](const std::string& key) const;
 
   bool bloomEnabled() const;
@@ -97,6 +97,23 @@ public:
   static std::unique_ptr<StandardRenderingPipeline>
   Parse(const Json::value& source, Scene* scene, const std::string& url);
 
+protected:
+  /**
+   * @brief Constructor
+   * @param {string} name - The rendering pipeline name
+   * @param {BABYLON.Scene} scene - The scene linked to this pipeline
+   * @param {any} ratio - The size of the postprocesses (0.5 means that your
+   * postprocess will have a width = canvas.width 0.5 and a height =
+   * canvas.height 0.5)
+   * @param {BABYLON.PostProcess} originalPostProcess - the custom original
+   * color post-process. Must be "reusable". Can be null.
+   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
+   * pipeline will be attached to
+   */
+  StandardRenderingPipeline(const std::string& name, Scene* scene, float ratio,
+                            PostProcess* originalPostProcess      = nullptr,
+                            const std::vector<CameraPtr>& cameras = {});
+
 private:
   void _buildPipeline();
   // Down Sample X4 Post-Processs
@@ -124,27 +141,27 @@ private:
 
 public:
   // Post-processes
-  PostProcess* originalPostProcess;
-  PostProcess* downSampleX4PostProcess;
-  PostProcess* brightPassPostProcess;
-  std::vector<PostProcess*> blurHPostProcesses;
-  std::vector<PostProcess*> blurVPostProcesses;
-  PostProcess* textureAdderPostProcess;
-  PostProcess* volumetricLightPostProcess;
-  BlurPostProcess* volumetricLightSmoothXPostProcess;
-  BlurPostProcess* volumetricLightSmoothYPostProcess;
-  PostProcess* volumetricLightMergePostProces;
-  PostProcess* volumetricLightFinalPostProcess;
-  PostProcess* luminancePostProcess;
-  std::vector<PostProcess*> luminanceDownSamplePostProcesses;
-  PostProcess* hdrPostProcess;
-  PostProcess* textureAdderFinalPostProcess;
-  PostProcess* lensFlareFinalPostProcess;
-  PostProcess* hdrFinalPostProcess;
-  PostProcess* lensFlarePostProcess;
-  PostProcess* lensFlareComposePostProcess;
-  PostProcess* motionBlurPostProcess;
-  PostProcess* depthOfFieldPostProcess;
+  PostProcessPtr originalPostProcess;
+  PostProcessPtr downSampleX4PostProcess;
+  PostProcessPtr brightPassPostProcess;
+  std::vector<PostProcessPtr> blurHPostProcesses;
+  std::vector<PostProcessPtr> blurVPostProcesses;
+  PostProcessPtr textureAdderPostProcess;
+  PostProcessPtr volumetricLightPostProcess;
+  BlurPostProcessPtr volumetricLightSmoothXPostProcess;
+  BlurPostProcessPtr volumetricLightSmoothYPostProcess;
+  PostProcessPtr volumetricLightMergePostProces;
+  PostProcessPtr volumetricLightFinalPostProcess;
+  PostProcessPtr luminancePostProcess;
+  std::vector<PostProcessPtr> luminanceDownSamplePostProcesses;
+  PostProcessPtr hdrPostProcess;
+  PostProcessPtr textureAdderFinalPostProcess;
+  PostProcessPtr lensFlareFinalPostProcess;
+  PostProcessPtr hdrFinalPostProcess;
+  PostProcessPtr lensFlarePostProcess;
+  PostProcessPtr lensFlareComposePostProcess;
+  PostProcessPtr motionBlurPostProcess;
+  PostProcessPtr depthOfFieldPostProcess;
   // Values
   float brightThreshold;
   float blurWidth;
@@ -173,8 +190,8 @@ public:
 
 private:
   Scene* _scene;
-  PostProcess* _currentDepthOfFieldSource;
-  PostProcess* _basePostProcess;
+  PostProcessPtr _currentDepthOfFieldSource;
+  PostProcessPtr _basePostProcess;
   float _hdrCurrentLuminance;
   unsigned int _floatTextureType;
   float _ratio;

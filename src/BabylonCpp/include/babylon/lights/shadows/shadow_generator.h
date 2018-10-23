@@ -16,6 +16,7 @@ class Scene;
 class SubMesh;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 using IShadowLightPtr = std::shared_ptr<IShadowLight>;
+using PostProcessPtr  = std::shared_ptr<PostProcess>;
 using SubMeshPtr      = std::shared_ptr<SubMesh>;
 
 /**
@@ -721,10 +722,10 @@ private:
   Vector3 _cachedDirection;
   std::string _cachedDefines;
   int _currentRenderID;
-  std::unique_ptr<PostProcess> _boxBlurPostprocess;
-  std::unique_ptr<PostProcess> _kernelBlurXPostprocess;
-  std::unique_ptr<PostProcess> _kernelBlurYPostprocess;
-  std::vector<PostProcess*> _blurPostProcesses;
+  PostProcessPtr _boxBlurPostprocess;
+  PostProcessPtr _kernelBlurXPostprocess;
+  PostProcessPtr _kernelBlurYPostprocess;
+  std::vector<PostProcessPtr> _blurPostProcesses;
   ISize _mapSize;
   unsigned int _currentFaceIndex;
   unsigned int _currentFaceIndexCache;

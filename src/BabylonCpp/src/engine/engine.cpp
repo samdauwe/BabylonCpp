@@ -2877,7 +2877,7 @@ void Engine::_rescaleTexture(const InternalTexturePtr& source,
     ISize(destination->width, destination->height), options);
 
   if (!_rescalePostProcess) {
-    _rescalePostProcess = std::make_unique<PassPostProcess>(
+    _rescalePostProcess = PassPostProcess::New(
       "rescale", 1.f, nullptr, EngineConstants::TEXTURE_BILINEAR_SAMPLINGMODE,
       this, false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   }
@@ -2893,8 +2893,8 @@ void Engine::_rescaleTexture(const InternalTexturePtr& source,
       if (!hostingScene) {
         hostingScene = scenes.back();
       }
-      hostingScene->postProcessManager->directRender(
-        {_rescalePostProcess.get()}, rtt, true);
+      hostingScene->postProcessManager->directRender({_rescalePostProcess}, rtt,
+                                                     true);
 
       _bindTextureDirectly(GL::TEXTURE_2D, destination, true);
       _gl->copyTexImage2D(GL::TEXTURE_2D, 0, internalFormat, 0, 0,

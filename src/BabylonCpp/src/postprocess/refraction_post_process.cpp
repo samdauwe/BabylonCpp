@@ -1,7 +1,6 @@
 #include <babylon/postprocess/refraction_post_process.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/core/variant.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/texture.h>
 
@@ -16,7 +15,7 @@ RefractionPostProcess::RefractionPostProcess(
                   "refraction",
                   {"baseColor", "depth", "colorLevel"},
                   {"refractionSampler"},
-                  ToVariant<float, PostProcessOptions>(ratio),
+                  ratio,
                   camera,
                   samplingMode,
                   engine,

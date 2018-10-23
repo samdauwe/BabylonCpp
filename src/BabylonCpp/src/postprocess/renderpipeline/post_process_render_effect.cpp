@@ -10,7 +10,7 @@ namespace BABYLON {
 
 PostProcessRenderEffect::PostProcessRenderEffect(
   Engine* engine, const std::string& name,
-  const std::function<std::vector<PostProcess*>()>& getPostProcesses,
+  const std::function<std::vector<PostProcessPtr>()>& getPostProcesses,
   bool singleInstance)
     : _name{name}
     , _engine{engine}
@@ -40,7 +40,8 @@ void PostProcessRenderEffect::_update()
 {
 }
 
-void PostProcessRenderEffect::_attachCameras(const std::vector<CameraPtr>& cameras)
+void PostProcessRenderEffect::_attachCameras(
+  const std::vector<CameraPtr>& cameras)
 {
   std::string cameraKey;
 
@@ -83,7 +84,8 @@ void PostProcessRenderEffect::_attachCameras(const std::vector<CameraPtr>& camer
   }
 }
 
-void PostProcessRenderEffect::_detachCameras(const std::vector<CameraPtr>& cameras)
+void PostProcessRenderEffect::_detachCameras(
+  const std::vector<CameraPtr>& cameras)
 {
   auto cams = cameras.empty() ? stl_util::extract_values(_cameras) : cameras;
 
@@ -148,7 +150,8 @@ void PostProcessRenderEffect::_disable(const std::vector<CameraPtr>& cameras)
   }
 }
 
-std::vector<PostProcess*> PostProcessRenderEffect::getPostProcesses(Camera* camera)
+std::vector<PostProcessPtr>
+PostProcessRenderEffect::getPostProcesses(Camera* camera)
 {
   if (_singleInstance) {
     return _postProcesses["0"];

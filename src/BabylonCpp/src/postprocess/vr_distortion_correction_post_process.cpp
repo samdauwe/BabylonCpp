@@ -1,6 +1,5 @@
 #include <babylon/postprocess/vr_distortion_correction_post_process.h>
 
-#include <babylon/core/variant.h>
 #include <babylon/materials/effect.h>
 
 namespace BABYLON {
@@ -12,8 +11,7 @@ VRDistortionCorrectionPostProcess::VRDistortionCorrectionPostProcess(
                   "vrDistortionCorrection",
                   {"LensCenter", "Scale", "ScaleIn", "HmdWarpParam"},
                   {},
-                  ToVariant<float, PostProcessOptions>(
-                    vrMetrics.postProcessScaleFactor),
+                  vrMetrics.postProcessScaleFactor,
                   camera,
                   TextureConstants::BILINEAR_SAMPLINGMODE}
     , _isRightEye{isRightEye}

@@ -6,12 +6,24 @@
 
 namespace BABYLON {
 
+class GrainPostProcess;
+using GrainPostProcessPtr = std::shared_ptr<GrainPostProcess>;
+
 /**
  * @brief The GrainPostProcess adds noise to the image at mid luminance levels.
  */
 class BABYLON_SHARED_EXPORT GrainPostProcess : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static GrainPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<GrainPostProcess>(
+      new GrainPostProcess(std::forward<Ts>(args)...));
+  }
+  ~GrainPostProcess();
+
+protected:
   /**
    * @brief Creates a new instance of @see GrainPostProcess.
    * @param name The name of the effect.
@@ -31,13 +43,12 @@ public:
    * at a later time. (default: false)
    */
   GrainPostProcess(const std::string& name,
-                   const Variant<float, PostProcessOptions>& options,
+                   const std::variant<float, PostProcessOptions>& options,
                    const CameraPtr& camera, unsigned int samplingMode,
                    Engine* engine, bool reusable = false,
                    unsigned int textureType
                    = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                    bool blockCompilation = false);
-  ~GrainPostProcess();
 
 public:
   /**

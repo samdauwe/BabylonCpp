@@ -14,6 +14,7 @@ class PostProcess;
 class Scene;
 class VertexBuffer;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+using PostProcessPtr     = std::shared_ptr<PostProcess>;
 
 namespace GL {
 class IGLBuffer;
@@ -49,8 +50,8 @@ public:
    * @returns True if the post processes were able to be run.
    * Hidden
    */
-  bool _prepareFrame(const InternalTexturePtr& sourceTexture        = nullptr,
-                     const std::vector<PostProcess*>& postProcesses = {});
+  bool _prepareFrame(const InternalTexturePtr& sourceTexture          = nullptr,
+                     const std::vector<PostProcessPtr>& postProcesses = {});
 
   /**
    * @brief Manually render a set of post processes to a texture.
@@ -62,7 +63,7 @@ public:
    * the target
    * @param lodLevel defines which lod of the texture to render to
    */
-  void directRender(const std::vector<PostProcess*>& postProcesses,
+  void directRender(const std::vector<PostProcessPtr>& postProcesses,
                     const InternalTexturePtr& targetTexture = nullptr,
                     bool forceFullscreenViewport            = false,
                     unsigned int faceIndex = 0, int lodLevel = 0);
@@ -80,9 +81,8 @@ public:
   void _finalizeFrame(bool doNotPresent,
                       const InternalTexturePtr& targetTexture = nullptr,
                       unsigned int faceIndex                  = 0,
-                      const std::vector<PostProcess*>& postProcesses
-                      = std::vector<PostProcess*>(),
-                      bool forceFullscreenViewport = false);
+                      const std::vector<PostProcessPtr>& postProcesses = {},
+                      bool forceFullscreenViewport                     = false);
 
   /**
    * @brief Disposes of the post process manager.

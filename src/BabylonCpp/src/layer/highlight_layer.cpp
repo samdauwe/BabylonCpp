@@ -36,13 +36,13 @@ HighlightLayer::HighlightLayer(const std::string& name, Scene* scene)
     : HighlightLayer(name, scene,
                      IHighlightLayerOptions{
                        0.5f,                           // mainTextureRatio
-                       std::nullopt,                      // mainTextureFixedSize
+                       std::nullopt,                   // mainTextureFixedSize
                        0.5f,                           // blurTextureSizeRatio
                        1.f,                            // blurVerticalSize
                        1.f,                            // blurHorizontalSize
                        EngineConstants::ALPHA_COMBINE, // alphaBlendingMode
                        nullptr,                        // camera
-                       std::nullopt,                      // isStroke
+                       std::nullopt,                   // isStroke
                        -1                              // renderingGroupId
                      })
 {
@@ -172,7 +172,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
   _textures = {_blurTexture};
 
   if (_options.alphaBlendingMode == EngineConstants::ALPHA_COMBINE) {
-    _downSamplePostprocess = std::make_unique<PassPostProcess>(
+    _downSamplePostprocess = PassPostProcess::New(
       "HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _downSamplePostprocess->onApplyObservable.add(
@@ -180,34 +180,31 @@ void HighlightLayer::_createTextureAndPostProcesses()
         effect->setTexture("textureSampler", _mainTexture);
       });
 
-    _horizontalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
-      "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize,
-      ToVariant<float, PostProcessOptions>(1.f), nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+    _horizontalBlurPostprocess = GlowBlurPostProcess::New(
+      "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize, 1.f,
+      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _horizontalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
         effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
                           static_cast<float>(blurTextureHeight));
       });
 
-    _verticalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
-      "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize,
-      ToVariant<float, PostProcessOptions>(1.f), nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
+    _verticalBlurPostprocess = GlowBlurPostProcess::New(
+      "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize, 1.f,
+      nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
     _verticalBlurPostprocess->onApplyObservable.add(
       [&](Effect* effect, EventState&) {
         effect->setFloat2("screenSize", static_cast<float>(blurTextureWidth),
                           static_cast<float>(blurTextureHeight));
       });
 
-    _postProcesses
-      = {_downSamplePostprocess.get(), _horizontalBlurPostprocess.get(),
-         _verticalBlurPostprocess.get()};
+    _postProcesses = {_downSamplePostprocess, _horizontalBlurPostprocess,
+                      _verticalBlurPostprocess};
   }
   else {
-    _horizontalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
+    _horizontalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerHBP", Vector2(1.f, 0.f), _options.blurHorizontalSize,
-      ToVariant<float, PostProcessOptions>(1.f), nullptr,
+      1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine()/*, false,
       textureType*/);
     _horizontalBlurPostprocess->width  = blurTextureWidth;
@@ -217,9 +214,9 @@ void HighlightLayer::_createTextureAndPostProcesses()
         effect->setTexture("textureSampler", _mainTexture);
       });
 
-    _verticalBlurPostprocess = std::make_unique<GlowBlurPostProcess>(
+    _verticalBlurPostprocess = GlowBlurPostProcess::New(
       "HighlightLayerVBP", Vector2(0.f, 1.f), _options.blurVerticalSize,
-      ToVariant<float, PostProcessOptions>(1.f), nullptr,
+      1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine()/*, false,
       textureType*/);
     _verticalBlurPostprocess->onApplyObservable.add(
@@ -228,8 +225,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
                           static_cast<float>(blurTextureHeight));
       });
 
-    _postProcesses
-      = {_horizontalBlurPostprocess.get(), _verticalBlurPostprocess.get()};
+    _postProcesses = {_horizontalBlurPostprocess, _verticalBlurPostprocess};
   }
 
   _mainTexture->onAfterUnbindObservable.add(
@@ -270,8 +266,8 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances)
   if ((_meshes.find(mesh->uniqueId) != _meshes.end())
       && _meshes[mesh->uniqueId].glowEmissiveOnly && material
       && (material->type() == IReflect::Type::STANDARDMATERIAL)) {
-    emissiveTexture = std::static_pointer_cast<StandardMaterial>(material)
-                        ->emissiveTexture();
+    emissiveTexture
+      = std::static_pointer_cast<StandardMaterial>(material)->emissiveTexture();
   }
   return EffectLayer::_isReady(subMesh, useInstances, emissiveTexture);
 }
@@ -371,8 +367,7 @@ void HighlightLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh,
   if (hasHighlightLayerMesh && _meshes[mesh->uniqueId].glowEmissiveOnly
       && material && (material->type() == IReflect::Type::STANDARDMATERIAL)) {
     _emissiveTextureAndColor.texture
-      = std::static_pointer_cast<StandardMaterial>(material)
-          ->emissiveTexture();
+      = std::static_pointer_cast<StandardMaterial>(material)->emissiveTexture();
     _emissiveTextureAndColor.color.set(1.0, //
                                        1.0, //
                                        1.0, //

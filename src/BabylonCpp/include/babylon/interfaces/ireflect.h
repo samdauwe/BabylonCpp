@@ -60,7 +60,9 @@ public:
     BASETEXTURE = 250,
     TEXTURE     = 251,
     // Morph
-    MORPHTARGET = 300
+    MORPHTARGET = 300,
+    // Piplines
+    STANDARDRENDERINGPIPLINE = 350
   }; // end of enum class Type
 
 public:

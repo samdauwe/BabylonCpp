@@ -427,6 +427,28 @@ inline int index_of(C& c, const T& elem)
  * -1
  */
 template <typename C, typename T>
+inline int index_of_raw_ptr(C& c, T* elem)
+{
+  auto i = std::find_if(
+    c.begin(), c.end(),
+    [&elem](const std::shared_ptr<T>& _elem) { return _elem.get() == elem; });
+  if (i != c.end()) {
+    return static_cast<int>(i - c.begin());
+  }
+  return -1;
+}
+
+/**
+ * Searches the array for the specified item, and returns its position.
+ * Returns -1 if the item is not found.
+ * If the item is present more than once, the indexOf method returns the
+ * position of the first occurence.
+ * @param c Required. The container to search in.
+ * @param elem Required. The item to search for.
+ * @return A Number, representing the position of the specified item, otherwise
+ * -1
+ */
+template <typename C, typename T>
 inline int index_of_ptr(const std::vector<std::shared_ptr<C>>& c, T* elem)
 {
   auto i

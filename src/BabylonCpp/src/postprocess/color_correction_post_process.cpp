@@ -1,7 +1,6 @@
 #include <babylon/postprocess/color_correction_post_process.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/core/variant.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/texture.h>
 
@@ -11,15 +10,8 @@ ColorCorrectionPostProcess::ColorCorrectionPostProcess(
   const std::string& iName, const std::string& colorTableUrl, float ratio,
   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
   bool reusable)
-    : PostProcess{iName,
-                  "colorCorrection",
-                  {},
-                  {"colorTable"},
-                  ToVariant<float, PostProcessOptions>(ratio),
-                  camera,
-                  samplingMode,
-                  engine,
-                  reusable}
+    : PostProcess{iName,  "colorCorrection", {},     {"colorTable"}, ratio,
+                  camera, samplingMode,      engine, reusable}
 {
   _colorTableTexture
     = Texture::New(colorTableUrl, camera->getScene(), true, false,

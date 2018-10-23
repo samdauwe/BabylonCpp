@@ -6,6 +6,11 @@
 
 namespace BABYLON {
 
+class BloomMergePostProcess;
+class PostProcess;
+using BloomMergePostProcessPtr = std::shared_ptr<BloomMergePostProcess>;
+using PostProcessPtr           = std::shared_ptr<PostProcess>;
+
 /**
  * @brief The BloomMergePostProcess merges blurred images with the original
  * based on the values of the circle of confusion.
@@ -13,6 +18,15 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BloomMergePostProcess : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static BloomMergePostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<BloomMergePostProcess>(
+      new BloomMergePostProcess(std::forward<Ts>(args)...));
+  }
+  virtual ~BloomMergePostProcess() override;
+
+protected:
   /**
    * @brief Creates a new instance of @see BloomMergePostProcess.
    * @param name The name of the effect.
@@ -35,19 +49,19 @@ public:
    * the constructor. The updateEffect method can be used to compile the shader
    * at a later time. (default: false)
    */
-  BloomMergePostProcess(const std::string& name, PostProcess* originalFromInput,
-                        PostProcess* blurred, float weight,
-                        const Variant<float, PostProcessOptions>& options,
+  BloomMergePostProcess(const std::string& name,
+                        const PostProcessPtr& originalFromInput,
+                        const PostProcessPtr& blurred, float weight,
+                        const std::variant<float, PostProcessOptions>& options,
                         const CameraPtr& camera, unsigned int samplingMode,
                         Engine* engine, bool reusable = false,
                         unsigned int textureType
                         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                         bool blockCompilation = false);
-  virtual ~BloomMergePostProcess() override;
 
 public:
-  PostProcess* originalFromInput;
-  PostProcess* blurred;
+  PostProcessPtr originalFromInput;
+  PostProcessPtr blurred;
 
   /**
    * Weight of the bloom to be added to the original input

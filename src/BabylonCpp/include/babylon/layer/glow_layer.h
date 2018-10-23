@@ -13,11 +13,12 @@ class Material;
 class Mesh;
 class SubMesh;
 class Texture;
-using GlowLayerPtr = std::shared_ptr<GlowLayer>;
-using MaterialPtr  = std::shared_ptr<Material>;
-using MeshPtr      = std::shared_ptr<Mesh>;
-using SubMeshPtr   = std::shared_ptr<SubMesh>;
-using TexturePtr   = std::shared_ptr<Texture>;
+using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
+using GlowLayerPtr       = std::shared_ptr<GlowLayer>;
+using MaterialPtr        = std::shared_ptr<Material>;
+using MeshPtr            = std::shared_ptr<Mesh>;
+using SubMeshPtr         = std::shared_ptr<SubMesh>;
+using TexturePtr         = std::shared_ptr<Texture>;
 
 /**
  * @brief The glow layer Helps adding a glow effect around the emissive parts of
@@ -229,14 +230,14 @@ private:
   Property<GlowLayer, float> intensity;
   IGlowLayerOptions _options;
   float _intensity;
-  std::unique_ptr<BlurPostProcess> _horizontalBlurPostprocess1;
-  std::unique_ptr<BlurPostProcess> _verticalBlurPostprocess1;
-  std::unique_ptr<BlurPostProcess> _horizontalBlurPostprocess2;
-  std::unique_ptr<BlurPostProcess> _verticalBlurPostprocess2;
+  BlurPostProcessPtr _horizontalBlurPostprocess1;
+  BlurPostProcessPtr _verticalBlurPostprocess1;
+  BlurPostProcessPtr _horizontalBlurPostprocess2;
+  BlurPostProcessPtr _verticalBlurPostprocess2;
   RenderTargetTexturePtr _blurTexture1;
   RenderTargetTexturePtr _blurTexture2;
-  std::vector<PostProcess*> _postProcesses1;
-  std::vector<PostProcess*> _postProcesses2;
+  std::vector<PostProcessPtr> _postProcesses1;
+  std::vector<PostProcessPtr> _postProcesses2;
 
   Uint64Array _includedOnlyMeshes;
   Uint64Array _excludedMeshes;

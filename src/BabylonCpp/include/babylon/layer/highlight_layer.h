@@ -15,7 +15,9 @@ namespace BABYLON {
 class GlowBlurPostProcess;
 class HighlightLayer;
 class PassPostProcess;
-using HighlightLayerPtr = std::shared_ptr<HighlightLayer>;
+using GlowBlurPostProcessPtr = std::shared_ptr<GlowBlurPostProcess>;
+using HighlightLayerPtr      = std::shared_ptr<HighlightLayer>;
+using PassPostProcessPtr     = std::shared_ptr<PassPostProcess>;
 
 /**
  * @brief The highlight layer Helps adding a glow effect around a mesh.
@@ -268,9 +270,9 @@ public:
 private:
   IHighlightLayerOptions _options;
   unsigned int _instanceGlowingMeshStencilReference;
-  std::unique_ptr<PassPostProcess> _downSamplePostprocess;
-  std::unique_ptr<GlowBlurPostProcess> _horizontalBlurPostprocess;
-  std::unique_ptr<GlowBlurPostProcess> _verticalBlurPostprocess;
+  PassPostProcessPtr _downSamplePostprocess;
+  GlowBlurPostProcessPtr _horizontalBlurPostprocess;
+  GlowBlurPostProcessPtr _verticalBlurPostprocess;
   RenderTargetTexturePtr _blurTexture;
   std::unordered_map<size_t, IHighlightLayerMesh> _meshes;
   std::unordered_map<size_t, IHighlightLayerExcludedMesh> _excludedMeshes;

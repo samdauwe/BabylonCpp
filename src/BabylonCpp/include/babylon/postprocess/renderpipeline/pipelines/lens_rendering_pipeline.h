@@ -7,12 +7,15 @@
 
 namespace BABYLON {
 
+class LensRenderingPipeline;
 class PostProcess;
 class Scene;
 class RenderTargetTexture;
 class Texture;
-using TexturePtr             = std::shared_ptr<Texture>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using LensRenderingPipelinePtr = std::shared_ptr<LensRenderingPipeline>;
+using PostProcessPtr           = std::shared_ptr<PostProcess>;
+using TexturePtr               = std::shared_ptr<Texture>;
+using RenderTargetTexturePtr   = std::shared_ptr<RenderTargetTexture>;
 
 struct LensRenderingPipelineParameters {
   TexturePtr grain_texture   = nullptr;
@@ -67,6 +70,48 @@ public:
     = "LensDepthOfFieldEffect";
 
 public:
+  template <typename... Ts>
+  static LensRenderingPipelinePtr New(Ts&&... args)
+  {
+    auto renderingPipeline = std::shared_ptr<LensRenderingPipeline>(
+      new LensRenderingPipeline(std::forward<Ts>(args)...));
+    renderingPipeline->addToScene(renderingPipeline);
+
+    return renderingPipeline;
+  }
+  virtual ~LensRenderingPipeline() override;
+
+  void addToScene(const LensRenderingPipelinePtr& lensRenderingPipeline);
+
+  /** Methods **/
+  void setEdgeBlur(float amount);
+  void disableEdgeBlur();
+  void setGrainAmount(float amount);
+  void disableGrain();
+  void setChromaticAberration(float amount);
+  void disableChromaticAberration();
+  void setEdgeDistortion(float amount);
+  void disableEdgeDistortion();
+  void setFocusDistance(float amount);
+  void disableDepthOfField();
+  void setAperture(float amount);
+  void setDarkenOutOfFocus(float amount);
+  void enablePentagonBokeh();
+  void disablePentagonBokeh();
+  void enableNoiseBlur();
+  void disableNoiseBlur();
+  void setHighlightsGain(float amount);
+  void setHighlightsThreshold(float amount);
+  void disableHighlights();
+
+  /**
+   * Removes the internal pipeline assets and detaches the pipeline from the
+   * scene cameras
+   */
+  void dispose(bool disableDepthRender         = false,
+               bool disposeMaterialAndTextures = false) override;
+
+protected:
   /**
    * Constructor
    *
@@ -113,35 +158,6 @@ public:
                         const LensRenderingPipelineParameters& parameters,
                         Scene* scene, float ratio = 1.f,
                         const std::vector<CameraPtr>& cameras = {});
-  virtual ~LensRenderingPipeline() override;
-
-  /** Methods **/
-  void setEdgeBlur(float amount);
-  void disableEdgeBlur();
-  void setGrainAmount(float amount);
-  void disableGrain();
-  void setChromaticAberration(float amount);
-  void disableChromaticAberration();
-  void setEdgeDistortion(float amount);
-  void disableEdgeDistortion();
-  void setFocusDistance(float amount);
-  void disableDepthOfField();
-  void setAperture(float amount);
-  void setDarkenOutOfFocus(float amount);
-  void enablePentagonBokeh();
-  void disablePentagonBokeh();
-  void enableNoiseBlur();
-  void disableNoiseBlur();
-  void setHighlightsGain(float amount);
-  void setHighlightsThreshold(float amount);
-  void disableHighlights();
-
-  /**
-   * Removes the internal pipeline assets and detaches the pipeline from the
-   * scene cameras
-   */
-  void dispose(bool disableDepthRender         = false,
-               bool disposeMaterialAndTextures = false) override;
 
 private:
   /**
@@ -165,10 +181,11 @@ private:
   Scene* _scene;
   RenderTargetTexturePtr _depthTexture;
   TexturePtr _grainTexture;
+  std::vector<CameraPtr> _cameraList;
 
-  PostProcess* _chromaticAberrationPostProcess;
-  PostProcess* _highlightsPostProcess;
-  PostProcess* _depthOfFieldPostProcess;
+  PostProcessPtr _chromaticAberrationPostProcess;
+  PostProcessPtr _highlightsPostProcess;
+  PostProcessPtr _depthOfFieldPostProcess;
 
   float _edgeBlur;
   float _grainAmount;

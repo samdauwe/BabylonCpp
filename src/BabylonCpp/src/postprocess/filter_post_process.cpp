@@ -1,6 +1,5 @@
 #include <babylon/postprocess/filter_post_process.h>
 
-#include <babylon/core/variant.h>
 #include <babylon/materials/effect.h>
 
 namespace BABYLON {
@@ -10,15 +9,8 @@ FilterPostProcess::FilterPostProcess(const std::string& iName,
                                      const CameraPtr& camera,
                                      unsigned int samplingMode, Engine* engine,
                                      bool reusable)
-    : PostProcess{iName,
-                  "filter",
-                  {"kernelMatrix"},
-                  {},
-                  ToVariant<float, PostProcessOptions>(ratio),
-                  camera,
-                  samplingMode,
-                  engine,
-                  reusable}
+    : PostProcess{iName,  "filter",     {"kernelMatrix"}, {},      ratio,
+                  camera, samplingMode, engine,           reusable}
     , kernelMatrix{_kernelMatrix}
 {
   setOnApply([&](Effect* effect, EventState&) {

@@ -9,6 +9,9 @@
 
 namespace BABYLON {
 
+class BlurPostProcess;
+using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
+
 /**
  * @brief  The Blur Post Process which blurs an image based on a kernel and
  * direction. Can be used twice in x and y directions to perform a guassian blur
@@ -17,34 +20,12 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT BlurPostProcess : public PostProcess {
 
 public:
-  /**
-   * @brief Creates a new instance BlurPostProcess.
-   * @param name The name of the effect.
-   * @param direction The direction in which to blur the image.
-   * @param kernel The size of the kernel to be used when computing the blur.
-   * eg. Size of 3 will blur the center pixel by 2 pixels surrounding it.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass. (Use 1.0 for full size)
-   * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param textureType Type of textures used when performing the post process.
-   * (default: 0)
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
-   */
-  BlurPostProcess(
-    const std::string& name, const Vector2& direction, float kernel,
-    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-    unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
-    Engine* engine = nullptr, bool reusable = false,
-    unsigned int textureType   = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    const std::string& defines = "", bool blockCompilation = false);
+  template <typename... Ts>
+  static BlurPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<BlurPostProcess>(
+      new BlurPostProcess(std::forward<Ts>(args)...));
+  }
   ~BlurPostProcess() override;
 
   /**
@@ -73,6 +54,38 @@ public:
     = nullptr) override;
 
 protected:
+  /**
+   * @brief Creates a new instance BlurPostProcess.
+   * @param name The name of the effect.
+   * @param direction The direction in which to blur the image.
+   * @param kernel The size of the kernel to be used when computing the blur.
+   * eg. Size of 3 will blur the center pixel by 2 pixels surrounding it.
+   * @param options The required width/height ratio to downsize to before
+   * computing the render pass. (Use 1.0 for full size)
+   * @param camera The camera to apply the render pass to.
+   * @param samplingMode The sampling mode to be used when computing the pass.
+   * (default: 0)
+   * @param engine The engine which the post process will be applied. (default:
+   * current engine)
+   * @param reusable If the post process can be reused on the same frame.
+   * (default: false)
+   * @param textureType Type of textures used when performing the post process.
+   * (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
+   */
+  BlurPostProcess(const std::string& name, const Vector2& direction,
+                  float kernel,
+                  const std::variant<float, PostProcessOptions>& options,
+                  const CameraPtr& camera,
+                  std::optional<unsigned int> samplingMode = std::nullopt,
+                  Engine* engine = nullptr, bool reusable = false,
+                  unsigned int textureType
+                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+                  const std::string& defines = "",
+                  bool blockCompilation      = false);
+
   void _updateParameters(
     const std::function<void(Effect* effect)>& onCompiled = nullptr,
     const std::function<void(Effect* effect, const std::string& errors)>&

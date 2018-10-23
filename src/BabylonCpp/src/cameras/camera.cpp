@@ -159,12 +159,12 @@ void Camera::_initCache()
 {
   Node::_initCache();
 
-  _cache.position
-    = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max());
-  _cache.upVector
-    = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max());
+  _cache.position = Vector3(std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max());
+  _cache.upVector = Vector3(std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max());
 
   _cache.mode = 0;
   _cache.minZ = 0.f;
@@ -274,7 +274,7 @@ PostProcess* Camera::rigPostProcess()
   return _rigPostProcess;
 }
 
-PostProcess* Camera::_getFirstPostProcess() const
+PostProcessPtr Camera::_getFirstPostProcess() const
 {
   for (const auto& pp : _postProcesses) {
     if (pp != nullptr) {
@@ -316,7 +316,7 @@ void Camera::_cascadePostProcessesToRigCams()
   }
 }
 
-int Camera::attachPostProcess(PostProcess* postProcess, int insertAt)
+int Camera::attachPostProcess(const PostProcessPtr& postProcess, int insertAt)
 {
   if (!postProcess->isReusable()
       && stl_util::index_of(_postProcesses, postProcess) > -1) {
@@ -340,9 +340,18 @@ int Camera::attachPostProcess(PostProcess* postProcess, int insertAt)
   return stl_util::index_of(_postProcesses, postProcess);
 }
 
-void Camera::detachPostProcess(PostProcess* postProcess)
+void Camera::detachPostProcess(const PostProcessPtr& postProcess)
 {
   auto idx = stl_util::index_of(_postProcesses, postProcess);
+  if (idx != -1) {
+    _postProcesses[static_cast<size_t>(idx)] = nullptr;
+  }
+  _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
+}
+
+void Camera::detachPostProcess(PostProcess* postProcess)
+{
+  auto idx = stl_util::index_of_raw_ptr(_postProcesses, postProcess);
   if (idx != -1) {
     _postProcesses[static_cast<size_t>(idx)] = nullptr;
   }
@@ -678,7 +687,8 @@ void Camera::setCameraRigParameter(const std::string& _name, float value)
  * May needs to be overridden by children so sub has required properties
  * to be copied
  */
-CameraPtr Camera::createRigCamera(const std::string& /*name*/, int /*cameraIndex*/)
+CameraPtr Camera::createRigCamera(const std::string& /*name*/,
+                                  int /*cameraIndex*/)
 {
   return nullptr;
 }

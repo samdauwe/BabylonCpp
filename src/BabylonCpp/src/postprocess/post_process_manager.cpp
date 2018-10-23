@@ -70,7 +70,7 @@ void PostProcessManager::_rebuild()
 
 bool PostProcessManager::_prepareFrame(
   const InternalTexturePtr& sourceTexture,
-  const std::vector<PostProcess*>& iPostProcesses)
+  const std::vector<PostProcessPtr>& iPostProcesses)
 {
   auto camera = _scene->activeCamera;
   if (!camera) {
@@ -83,7 +83,7 @@ bool PostProcessManager::_prepareFrame(
   // Filter out all null elements
   postProcesses.erase(
     std::remove_if(postProcesses.begin(), postProcesses.end(),
-                   [](const PostProcess* pp) { return pp == nullptr; }),
+                   [](const PostProcessPtr& pp) { return pp == nullptr; }),
     postProcesses.end());
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {
@@ -95,7 +95,7 @@ bool PostProcessManager::_prepareFrame(
 }
 
 void PostProcessManager::directRender(
-  const std::vector<PostProcess*>& postProcesses,
+  const std::vector<PostProcessPtr>& postProcesses,
   const InternalTexturePtr& targetTexture, bool forceFullscreenViewport,
   unsigned int faceIndex, int lodLevel)
 {
@@ -140,7 +140,7 @@ void PostProcessManager::directRender(
 
 void PostProcessManager::_finalizeFrame(
   bool doNotPresent, const InternalTexturePtr& targetTexture,
-  unsigned int faceIndex, const std::vector<PostProcess*>& _postProcesses,
+  unsigned int faceIndex, const std::vector<PostProcessPtr>& _postProcesses,
   bool forceFullscreenViewport)
 {
   auto camera = _scene->activeCamera;
@@ -154,7 +154,7 @@ void PostProcessManager::_finalizeFrame(
   // Filter out all null elements
   postProcesses.erase(
     std::remove_if(postProcesses.begin(), postProcesses.end(),
-                   [](const PostProcess* pp) { return pp == nullptr; }),
+                   [](const PostProcessPtr& pp) { return pp == nullptr; }),
     postProcesses.end());
 
   if (postProcesses.empty() || !_scene->postProcessesEnabled) {

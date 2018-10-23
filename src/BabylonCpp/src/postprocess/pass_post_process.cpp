@@ -1,7 +1,5 @@
 #include <babylon/postprocess/pass_post_process.h>
 
-#include <babylon/core/variant.h>
-
 namespace BABYLON {
 
 PassPostProcess::PassPostProcess(const std::string& iName, float ratio,
@@ -9,20 +7,9 @@ PassPostProcess::PassPostProcess(const std::string& iName, float ratio,
                                  unsigned int samplingMode, Engine* engine,
                                  bool reusable, unsigned int textureType,
                                  bool blockCompilation)
-    : PostProcess{iName,
-                  "pass",
-                  {},
-                  {},
-                  ToVariant<float, PostProcessOptions>(ratio),
-                  camera,
-                  samplingMode,
-                  engine,
-                  reusable,
-                  "",
-                  textureType,
-                  "",
-                  {},
-                  blockCompilation}
+    : PostProcess{
+        iName,  "pass",   {}, {},          ratio, camera, samplingMode,
+        engine, reusable, "", textureType, "",    {},     blockCompilation}
 {
 }
 

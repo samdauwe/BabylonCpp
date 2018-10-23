@@ -1,9 +1,10 @@
 #ifndef BABYLON_POSTPROCESS_POST_PROCESS_H
 #define BABYLON_POSTPROCESS_POST_PROCESS_H
 
+#include <variant>
+
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/color4.h>
@@ -16,10 +17,12 @@ class Animation;
 class Camera;
 class Effect;
 class Engine;
+class PostProcess;
 class Scene;
 class InternalTexture;
 using CameraPtr          = std::shared_ptr<Camera>;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+using PostProcessPtr     = std::shared_ptr<PostProcess>;
 
 /**
  * @brief PostProcess can be used to apply a shader to a texture after it has
@@ -28,48 +31,28 @@ using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 class BABYLON_SHARED_EXPORT PostProcess {
 
 public:
-  /**
-   * @brief Creates a new instance PostProcess.
-   * @param name The name of the PostProcess.
-   * @param fragmentUrl The url of the fragment shader to be used.
-   * @param parameters Array of the names of uniform non-sampler2D variables
-   * that will be passed to the shader.
-   * @param samplers Array of the names of uniform sampler2D variables that will
-   * be passed to the shader.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass. (Use 1.0 for full size)
-   * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param defines String of defines that will be set when running the fragment
-   * shader. (default: null)
-   * @param textureType Type of textures used when performing the post process.
-   * (default: 0)
-   * @param vertexUrl The url of the vertex shader to be used. (default:
-   * "postprocess")
-   * @param indexParameters The index parameters to be used for babylons include
-   * syntax "#include<kernelBlurVaryingDeclaration>[0..varyingCount]". (default:
-   * undefined) See usage in babylon.blurPostProcess.ts and kernelBlur.vertex.fx
-   * @param blockCompilation If the shader should not be compiled imediatly.
-   * (default: false)
-   */
-  PostProcess(
-    const std::string& name, const std::string& fragmentUrl,
-    const std::vector<std::string>& parameters,
-    const std::vector<std::string>& samplers,
-    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-    unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
-    Engine* engine = nullptr, bool reusable = false,
-    const std::string& defines   = "",
-    unsigned int textureType     = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    const std::string& vertexUrl = "postprocess",
-    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
-    bool blockCompilation = false);
+  static PostProcessPtr
+  New(const std::string& name, const std::string& fragmentUrl,
+      const std::vector<std::string>& parameters,
+      const std::vector<std::string>& samplers,
+      const std::variant<float, PostProcessOptions>& options,
+      const CameraPtr& camera,
+      unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
+      Engine* engine = nullptr, bool reusable = false,
+      const std::string& defines   = "",
+      unsigned int textureType     = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+      const std::string& vertexUrl = "postprocess",
+      const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+      bool blockCompilation = false)
+  {
+    return std::shared_ptr<PostProcess>(
+      new PostProcess(name, fragmentUrl, parameters, samplers, options, camera,
+                      samplingMode, engine, reusable, defines, textureType,
+                      vertexUrl, indexParameters, blockCompilation));
+  }
   virtual ~PostProcess();
+
+  void add(const PostProcessPtr& newPostProcess);
 
   // Events
 
@@ -142,7 +125,7 @@ public:
    * @param postProcess The post process to share the output with.
    * @returns This post process.
    */
-  PostProcess& shareOutputWith(PostProcess* postProcess);
+  PostProcess& shareOutputWith(const PostProcessPtr& postProcess);
 
   /**
    * @brief Reverses the effect of calling shareOutputWith and returns the post
@@ -240,6 +223,50 @@ public:
   virtual void dispose(Camera* camera = nullptr);
 
 protected:
+  /**
+   * @brief Creates a new instance PostProcess.
+   * @param name The name of the PostProcess.
+   * @param fragmentUrl The url of the fragment shader to be used.
+   * @param parameters Array of the names of uniform non-sampler2D variables
+   * that will be passed to the shader.
+   * @param samplers Array of the names of uniform sampler2D variables that
+   * will be passed to the shader.
+   * @param options The required width/height ratio to downsize to before
+   * computing the render pass. (Use 1.0 for full size)
+   * @param camera The camera to apply the render pass to.
+   * @param samplingMode The sampling mode to be used when computing the pass.
+   * (default: 0)
+   * @param engine The engine which the post process will be applied.
+   * (default: current engine)
+   * @param reusable If the post process can be reused on the same frame.
+   * (default: false)
+   * @param defines String of defines that will be set when running the
+   * fragment shader. (default: null)
+   * @param textureType Type of textures used when performing the post
+   * process. (default: 0)
+   * @param vertexUrl The url of the vertex shader to be used. (default:
+   * "postprocess")
+   * @param indexParameters The index parameters to be used for babylons
+   * include syntax "#include<kernelBlurVaryingDeclaration>[0..varyingCount]".
+   * (default: undefined) See usage in babylon.blurPostProcess.ts and
+   * kernelBlur.vertex.fx
+   * @param blockCompilation If the shader should not be compiled imediatly.
+   * (default: false)
+   */
+  PostProcess(
+    const std::string& name, const std::string& fragmentUrl,
+    const std::vector<std::string>& parameters,
+    const std::vector<std::string>& samplers,
+    const std::variant<float, PostProcessOptions>& options,
+    const CameraPtr& camera,
+    unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
+    Engine* engine = nullptr, bool reusable = false,
+    const std::string& defines   = "",
+    unsigned int textureType     = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    const std::string& vertexUrl = "postprocess",
+    const std::unordered_map<std::string, unsigned int>& indexParameters = {},
+    bool blockCompilation = false);
+
   /**
    * @brief Gets the number of sample textures (default: 1)
    */
@@ -397,7 +424,7 @@ private:
   Scene* _scene;
   Engine* _engine;
   float _renderRatio;
-  Variant<float, PostProcessOptions> _options;
+  std::variant<float, PostProcessOptions> _options;
   bool _reusable;
   unsigned int _textureType;
   Effect* _effect;
@@ -406,7 +433,7 @@ private:
   std::string _vertexUrl;
   std::vector<std::string> _parameters;
   Vector2 _scaleRatio;
-  PostProcess* _shareOutputWithPostProcess;
+  PostProcessPtr _shareOutputWithPostProcess;
   Vector2 _texelSize;
   InternalTexturePtr _forcedOutputTexture;
   // Events

@@ -13,8 +13,13 @@ class PassPostProcess;
 class PostProcess;
 class RenderTargetTexture;
 class Scene;
-using DynamicTexturePtr      = std::shared_ptr<DynamicTexture>;
-using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+class SSAORenderingPipeline;
+using BlurPostProcessPtr       = std::shared_ptr<BlurPostProcess>;
+using DynamicTexturePtr        = std::shared_ptr<DynamicTexture>;
+using PassPostProcessPtr       = std::shared_ptr<PassPostProcess>;
+using PostProcessPtr           = std::shared_ptr<PostProcess>;
+using RenderTargetTexturePtr   = std::shared_ptr<RenderTargetTexture>;
+using SSAORenderingPipelinePtr = std::shared_ptr<SSAORenderingPipeline>;
 
 struct SSARatio {
   float ssaoRatio;
@@ -51,6 +56,31 @@ public:
     = "SSAOCombineRenderEffect";
 
 public:
+  template <typename... Ts>
+  static SSAORenderingPipelinePtr New(Ts&&... args)
+  {
+    auto renderingPipeline = std::shared_ptr<SSAORenderingPipeline>(
+      new SSAORenderingPipeline(std::forward<Ts>(args)...));
+    renderingPipeline->addToScene(renderingPipeline);
+
+    return renderingPipeline;
+  }
+  virtual ~SSAORenderingPipeline() override;
+
+  /** Methods */
+  void addToScene(const SSAORenderingPipelinePtr& ssao2RenderingPipeline);
+
+  /** Hidden */
+  void _rebuild() override;
+
+  /**
+   * Removes the internal pipeline assets and detatches the pipeline from the
+   * scene cameras
+   */
+  void dispose(bool disableDepthRender         = false,
+               bool disposeMaterialAndTextures = false) override;
+
+protected:
   /**
    * Constructor
    * @param {string} name - The rendering pipeline name
@@ -66,19 +96,6 @@ public:
   SSAORenderingPipeline(const std::string& name, Scene* scene,
                         const SSARatio& ratio,
                         const std::vector<CameraPtr>& cameras);
-  virtual ~SSAORenderingPipeline() override;
-
-  /** Methods */
-
-  /** Hidden */
-  void _rebuild() override;
-
-  /**
-   * Removes the internal pipeline assets and detatches the pipeline from the
-   * scene cameras
-   */
-  void dispose(bool disableDepthRender         = false,
-               bool disposeMaterialAndTextures = false) override;
 
 private:
   void _createBlurPostProcess(float ratio);
@@ -119,14 +136,15 @@ public:
 
 private:
   Scene* _scene;
+  std::vector<CameraPtr> _cameraList;
   RenderTargetTexturePtr _depthTexture;
   DynamicTexturePtr _randomTexture;
 
-  PassPostProcess* _originalColorPostProcess;
-  PostProcess* _ssaoPostProcess;
-  BlurPostProcess* _blurHPostProcess;
-  BlurPostProcess* _blurVPostProcess;
-  PostProcess* _ssaoCombinePostProcess;
+  PassPostProcessPtr _originalColorPostProcess;
+  PostProcessPtr _ssaoPostProcess;
+  BlurPostProcessPtr _blurHPostProcess;
+  BlurPostProcessPtr _blurVPostProcess;
+  PostProcessPtr _ssaoCombinePostProcess;
 
   bool _firstUpdate;
 

@@ -18,9 +18,9 @@ PostProcess::PostProcess(
   const std::string& iName, const std::string& fragmentUrl,
   const std::vector<std::string>& parameters,
   const std::vector<std::string>& samplers,
-  const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-  unsigned int samplingMode, Engine* engine, bool reusable,
-  const std::string& defines, unsigned int textureType,
+  const std::variant<float, PostProcessOptions>& options,
+  const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
+  bool reusable, const std::string& defines, unsigned int textureType,
   const std::string& vertexUrl,
   const std::unordered_map<std::string, unsigned int>& indexParameters,
   bool blockCompilation)
@@ -38,6 +38,9 @@ PostProcess::PostProcess(
     , adaptScaleToCurrentViewport{false}
     , _currentRenderTextureInd{0}
     , _samples{1}
+    , _camera{nullptr}
+    , _scene{nullptr}
+    , _engine{nullptr}
     , _renderRatio{1.f}
     , _options{options}
     , _reusable{false}
@@ -57,13 +60,10 @@ PostProcess::PostProcess(
   if (camera) {
     _camera = camera;
     _scene  = camera->getScene();
-    _camera->attachPostProcess(this);
     _engine = _scene->getEngine();
-    _scene->postProcesses.emplace_back(this);
   }
   else if (engine) {
     _engine = engine;
-    _scene->postProcesses.emplace_back(this);
   }
 
   renderTargetSamplingMode = samplingMode;
@@ -85,6 +85,16 @@ PostProcess::PostProcess(
 
 PostProcess::~PostProcess()
 {
+}
+
+void PostProcess::add(const PostProcessPtr& newPostProcess)
+{
+  if (_camera) {
+    _camera->attachPostProcess(newPostProcess);
+  }
+  else if (_engine) {
+    _engine->postProcesses.emplace_back(this);
+  }
 }
 
 unsigned int PostProcess::get_samples() const
@@ -189,7 +199,7 @@ Effect* PostProcess::getEffect()
   return _effect;
 }
 
-PostProcess& PostProcess::shareOutputWith(PostProcess* postProcess)
+PostProcess& PostProcess::shareOutputWith(const PostProcessPtr& postProcess)
 {
   _disposeTextures();
   _shareOutputWithPostProcess = postProcess;
@@ -259,11 +269,11 @@ PostProcess::activate(const CameraPtr& camera,
                                        _engine->getRenderingCanvas()->height)
     * _renderRatio);
 
-  int desiredWidth = _options.is<PostProcessOptions>() ?
-                       _options.get<PostProcessOptions>().width :
+  int desiredWidth = std::holds_alternative<PostProcessOptions>(_options) ?
+                       std::get<PostProcessOptions>(_options).width :
                        requiredWidth;
-  int desiredHeight = _options.is<PostProcessOptions>() ?
-                        _options.get<PostProcessOptions>().height :
+  int desiredHeight = std::holds_alternative<PostProcessOptions>(_options) ?
+                        std::get<PostProcessOptions>(_options).height :
                         requiredHeight;
 
   if (!_shareOutputWithPostProcess && !_forcedOutputTexture) {
@@ -279,14 +289,14 @@ PostProcess::activate(const CameraPtr& camera,
 
     if (renderTargetSamplingMode != TextureConstants::TRILINEAR_SAMPLINGMODE
         || alwaysForcePOT) {
-      if (!_options.is<PostProcessOptions>()) {
+      if (!std::holds_alternative<PostProcessOptions>(_options)) {
         desiredWidth
           = engine->needPOTTextures() ?
               Tools::GetExponentOfTwo(desiredWidth, maxSize, scaleMode) :
               desiredWidth;
       }
 
-      if (!_options.is<PostProcessOptions>()) {
+      if (!std::holds_alternative<PostProcessOptions>(_options)) {
         desiredHeight
           = engine->needPOTTextures() ?
               Tools::GetExponentOfTwo(desiredHeight, maxSize, scaleMode) :
@@ -309,10 +319,10 @@ PostProcess::activate(const CameraPtr& camera,
       textureOptions.generateMipMaps = false;
       textureOptions.generateDepthBuffer
         = forceDepthStencil
-          || (stl_util::index_of(pCamera->_postProcesses, this) == 0);
+          || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0);
       textureOptions.generateStencilBuffer
         = (forceDepthStencil
-           || (stl_util::index_of(pCamera->_postProcesses, this) == 0))
+           || (stl_util::index_of_raw_ptr(pCamera->_postProcesses, this) == 0))
           && _engine->isStencilEnable();
       textureOptions.samplingMode = renderTargetSamplingMode;
       textureOptions.type         = _textureType;
@@ -485,7 +495,7 @@ void PostProcess::dispose(Camera* camera)
   }
   pCamera->detachPostProcess(this);
 
-  const int index = stl_util::index_of(pCamera->_postProcesses, this);
+  const auto index = stl_util::index_of_raw_ptr(pCamera->_postProcesses, this);
   if (index == 0 && pCamera->_postProcesses.size() > 0) {
     auto firstPostProcess = _camera->_getFirstPostProcess();
     if (firstPostProcess) {

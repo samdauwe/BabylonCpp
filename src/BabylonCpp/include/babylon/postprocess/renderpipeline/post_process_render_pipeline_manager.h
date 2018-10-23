@@ -11,7 +11,8 @@ namespace BABYLON {
 
 class Camera;
 class PostProcessRenderPipeline;
-using CameraPtr = std::shared_ptr<Camera>;
+using CameraPtr                    = std::shared_ptr<Camera>;
+using PostProcessRenderPipelinePtr = std::shared_ptr<PostProcessRenderPipeline>;
 
 /**
  * @brief
@@ -22,15 +23,26 @@ public:
   PostProcessRenderPipelineManager();
   ~PostProcessRenderPipelineManager();
 
-  void addPipeline(PostProcessRenderPipeline* renderPipeline);
+  void addPipeline(const PostProcessRenderPipelinePtr& renderPipeline);
+  void attachCamerasToRenderPipeline(const std::string& renderPipelineName,
+                                     const CameraPtr& camera,
+                                     bool unique = false);
   void attachCamerasToRenderPipeline(const std::string& renderPipelineName,
                                      const std::vector<CameraPtr>& cameras,
                                      bool unique = false);
   void detachCamerasFromRenderPipeline(const std::string& renderPipelineName,
+                                       const CameraPtr& camera);
+  void detachCamerasFromRenderPipeline(const std::string& renderPipelineName,
                                        const std::vector<CameraPtr>& cameras);
   void enableEffectInPipeline(const std::string& renderPipelineName,
                               const std::string& renderEffectName,
+                              const CameraPtr& camera);
+  void enableEffectInPipeline(const std::string& renderPipelineName,
+                              const std::string& renderEffectName,
                               const std::vector<CameraPtr>& cameras);
+  void disableEffectInPipeline(const std::string& renderPipelineName,
+                               const std::string& renderEffectName,
+                               const CameraPtr& camera);
   void disableEffectInPipeline(const std::string& renderPipelineName,
                                const std::string& renderEffectName,
                                const std::vector<CameraPtr>& cameras);
@@ -40,7 +52,8 @@ public:
   void dispose();
 
 private:
-  std::unordered_map<std::string, PostProcessRenderPipeline*> _renderPipelines;
+  std::unordered_map<std::string, PostProcessRenderPipelinePtr>
+    _renderPipelines;
 
 }; // end of class PostProcessRenderPipelineManager
 

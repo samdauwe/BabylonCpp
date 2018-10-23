@@ -44,7 +44,8 @@ std::vector<CameraPtr> PostProcessRenderPipeline::getCameras() const
   return cameras;
 }
 
-void PostProcessRenderPipeline::addEffect(PostProcessRenderEffect* renderEffect)
+void PostProcessRenderPipeline::addEffect(
+  const PostProcessRenderEffectPtr& renderEffect)
 {
   _renderEffects[renderEffect->_name] = renderEffect;
 }

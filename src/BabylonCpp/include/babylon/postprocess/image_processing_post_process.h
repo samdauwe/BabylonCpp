@@ -11,7 +11,10 @@ namespace BABYLON {
 class BaseTexture;
 class ColorCurves;
 class ImageProcessingConfiguration;
+class ImageProcessingPostProcess;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using ImageProcessingPostProcessPtr
+  = std::shared_ptr<ImageProcessingPostProcess>;
 
 /**
  * @brief
@@ -19,11 +22,12 @@ using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 class BABYLON_SHARED_EXPORT ImageProcessingPostProcess : public PostProcess {
 
 public:
-  ImageProcessingPostProcess(
-    const std::string& name, float renderRatio, const CameraPtr& camera,
-    unsigned int samplingMode, Engine* engine, bool reusable = false,
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
+  template <typename... Ts>
+  static ImageProcessingPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<ImageProcessingPostProcess>(
+      new ImageProcessingPostProcess(std::forward<Ts>(args)...));
+  }
   ~ImageProcessingPostProcess();
 
   /**
@@ -34,6 +38,12 @@ public:
   void dispose(Camera* camera = nullptr);
 
 protected:
+  ImageProcessingPostProcess(
+    const std::string& name, float renderRatio, const CameraPtr& camera,
+    unsigned int samplingMode, Engine* engine, bool reusable = false,
+    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
+
   /**
    * @brief Gets the image processing configuration used either in this
    * material.

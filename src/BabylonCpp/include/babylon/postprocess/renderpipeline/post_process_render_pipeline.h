@@ -13,7 +13,10 @@ namespace BABYLON {
 class Camera;
 class Engine;
 class PostProcessRenderEffect;
-using CameraPtr = std::shared_ptr<Camera>;
+class PostProcessRenderPipeline;
+using CameraPtr                    = std::shared_ptr<Camera>;
+using PostProcessRenderEffectPtr   = std::shared_ptr<PostProcessRenderEffect>;
+using PostProcessRenderPipelinePtr = std::shared_ptr<PostProcessRenderPipeline>;
 
 /**
  * @brief
@@ -21,7 +24,12 @@ using CameraPtr = std::shared_ptr<Camera>;
 class BABYLON_SHARED_EXPORT PostProcessRenderPipeline : public IDisposable {
 
 public:
-  PostProcessRenderPipeline(Engine* engine, const std::string& name);
+  template <typename... Ts>
+  static PostProcessRenderPipelinePtr New(Ts&&... args)
+  {
+    return std::shared_ptr<PostProcessRenderPipeline>(
+      new PostProcessRenderPipeline(std::forward<Ts>(args)...));
+  }
   virtual ~PostProcessRenderPipeline();
 
   /**
@@ -31,7 +39,7 @@ public:
 
   std::vector<CameraPtr> getCameras() const;
   bool isSupported() const;
-  void addEffect(PostProcessRenderEffect* renderEffect);
+  void addEffect(const PostProcessRenderEffectPtr& renderEffect);
   /** Hidden */
   virtual void _rebuild();
   /** Hidden */
@@ -51,6 +59,8 @@ public:
                        bool disposeMaterialAndTextures = false) override;
 
 protected:
+  PostProcessRenderPipeline(Engine* engine, const std::string& name);
+
   bool _enableMSAAOnFirstPostProcess(unsigned int sampleCount);
 
 public:
@@ -62,8 +72,8 @@ protected:
 
 private:
   Engine* engine;
-  std::unordered_map<std::string, PostProcessRenderEffect*> _renderEffects;
-  std::unordered_map<std::string, PostProcessRenderEffect*>
+  std::unordered_map<std::string, PostProcessRenderEffectPtr> _renderEffects;
+  std::unordered_map<std::string, PostProcessRenderEffectPtr>
     _renderEffectsForIsolatedPass;
 
 }; // end of class PostProcessRenderPipeline

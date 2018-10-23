@@ -7,12 +7,24 @@
 
 namespace BABYLON {
 
+class FxaaPostProcess;
+using FxaaPostProcessPtr = std::shared_ptr<FxaaPostProcess>;
+
 /**
  * @brief
  */
 class BABYLON_SHARED_EXPORT FxaaPostProcess : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static FxaaPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<FxaaPostProcess>(
+      new FxaaPostProcess(std::forward<Ts>(args)...));
+  }
+  ~FxaaPostProcess();
+
+protected:
   FxaaPostProcess(const std::string& _name, float ratio,
                   const CameraPtr& camera = nullptr,
                   unsigned int samplingMode
@@ -20,7 +32,6 @@ public:
                   Engine* engine = nullptr, bool reusable = false,
                   unsigned int textureType
                   = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-  ~FxaaPostProcess();
 
 private:
   std::string _getDefines();

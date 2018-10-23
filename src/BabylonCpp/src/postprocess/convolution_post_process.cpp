@@ -1,6 +1,5 @@
 #include <babylon/postprocess/convolution_post_process.h>
 
-#include <babylon/core/variant.h>
 #include <babylon/materials/effect.h>
 
 namespace BABYLON {
@@ -22,17 +21,10 @@ ConvolutionPostProcess::ConvolutionPostProcess(
   const std::string& iName, const Float32Array& iKernel, float ratio,
   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
   bool reusable, unsigned int textureType)
-    : PostProcess{iName,
-                  "convolution",
-                  {"kernel", "screenSize"},
-                  {},
-                  ToVariant<float, PostProcessOptions>(ratio),
-                  camera,
-                  samplingMode,
-                  engine,
-                  reusable,
-                  "",
-                  textureType}
+    : PostProcess{iName,        "convolution", {"kernel", "screenSize"},
+                  {},           ratio,         camera,
+                  samplingMode, engine,        reusable,
+                  "",           textureType}
     , kernel{iKernel}
 {
   setOnApply([&](Effect* effect, EventState&) {

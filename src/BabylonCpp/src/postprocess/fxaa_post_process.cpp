@@ -1,7 +1,6 @@
 #include <babylon/postprocess/fxaa_post_process.h>
 
 #include <babylon/core/string.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/effect.h>
 
@@ -11,20 +10,9 @@ FxaaPostProcess::FxaaPostProcess(const std::string& iName, float ratio,
                                  const CameraPtr& camera,
                                  unsigned int samplingMode, Engine* engine,
                                  bool reusable, unsigned int textureType)
-    : PostProcess{iName,
-                  "fxaa",
-                  {"texelSize"},
-                  {},
-                  ToVariant<float, PostProcessOptions>(ratio),
-                  camera,
-                  samplingMode,
-                  engine,
-                  reusable,
-                  "",
-                  textureType,
-                  "fxaa",
-                  {},
-                  true}
+    : PostProcess{iName,        "fxaa", {"texelSize"}, {}, ratio,       camera,
+                  samplingMode, engine, reusable,      "", textureType, "fxaa",
+                  {},           true}
 {
   const auto defines = _getDefines();
   updateEffect(defines);

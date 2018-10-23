@@ -11,11 +11,20 @@ namespace BABYLON {
 
 class CircleOfConfusionPostProcess;
 class DepthOfFieldBlurPostProcess;
+class DepthOfFieldEffect;
 class DepthOfFieldMergePostProcess;
 class PassPostProcess;
 class RenderTargetTexture;
 class Scene;
+using CircleOfConfusionPostProcessPtr
+  = std::shared_ptr<CircleOfConfusionPostProcess>;
+using DepthOfFieldBlurPostProcessPtr
+  = std::shared_ptr<DepthOfFieldBlurPostProcess>;
+using DepthOfFieldEffectPtr = std::shared_ptr<DepthOfFieldEffect>;
+using DepthOfFieldMergePostProcessPtr
+  = std::shared_ptr<DepthOfFieldMergePostProcess>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using PassPostProcessPtr     = std::shared_ptr<PassPostProcess>;
 
 /**
  * @brief The depth of field effect applies a blur to objects that are closer or
@@ -25,23 +34,12 @@ class BABYLON_SHARED_EXPORT DepthOfFieldEffect
     : public PostProcessRenderEffect {
 
 public:
-  /**
-   * @brief  Creates a new instance DepthOfFieldEffect.
-   * @param scene The scene the effect belongs to.
-   * @param depthTexture The depth texture of the scene to compute the circle of
-   * confusion.This must be set in order for this to function but may be set
-   * after initialization if needed.
-   * @param pipelineTextureType The type of texture to be used when performing
-   * the post processing.
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
-   */
-  DepthOfFieldEffect(Scene* scene, RenderTargetTexture* depthTexture,
-                     DepthOfFieldEffectBlurLevel blurLevel
-                     = DepthOfFieldEffectBlurLevel::Low,
-                     unsigned int pipelineTextureType = 0,
-                     bool blockCompilation            = false);
+  template <typename... Ts>
+  static DepthOfFieldEffectPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<DepthOfFieldEffect>(
+      new DepthOfFieldEffect(std::forward<Ts>(args)...));
+  }
   ~DepthOfFieldEffect();
 
   /**
@@ -63,6 +61,24 @@ public:
   bool _isReady() const;
 
 protected:
+  /**
+   * @brief  Creates a new instance DepthOfFieldEffect.
+   * @param scene The scene the effect belongs to.
+   * @param depthTexture The depth texture of the scene to compute the circle of
+   * confusion.This must be set in order for this to function but may be set
+   * after initialization if needed.
+   * @param pipelineTextureType The type of texture to be used when performing
+   * the post processing.
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
+   */
+  DepthOfFieldEffect(Scene* scene, RenderTargetTexture* depthTexture,
+                     DepthOfFieldEffectBlurLevel blurLevel
+                     = DepthOfFieldEffectBlurLevel::Low,
+                     unsigned int pipelineTextureType = 0,
+                     bool blockCompilation            = false);
+
   /**
    * @brief The focal the length of the camera used in the effect in scene
    * units/1000 (eg. millimeter).
@@ -103,12 +119,12 @@ public:
   /**
    * Hidden Internal, blurs from high to low
    */
-  std::vector<std::unique_ptr<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurX;
+  std::vector<DepthOfFieldBlurPostProcessPtr> _depthOfFieldBlurX;
 
   /**
    * Hidden Internal post processes in depth of field effect
    */
-  std::vector<PostProcess*> _effects;
+  std::vector<PostProcessPtr> _effects;
 
   /**
    * The focal the length of the camera used in the effect
@@ -141,10 +157,10 @@ public:
   WriteOnlyProperty<DepthOfFieldEffect, RenderTargetTexturePtr> depthTexture;
 
 private:
-  std::unique_ptr<DepthOfFieldMergePostProcess> _dofMerge;
-  std::unique_ptr<PassPostProcess> _depthOfFieldPass;
-  std::unique_ptr<CircleOfConfusionPostProcess> _circleOfConfusion;
-  std::vector<std::unique_ptr<DepthOfFieldBlurPostProcess>> _depthOfFieldBlurY;
+  DepthOfFieldMergePostProcessPtr _dofMerge;
+  PassPostProcessPtr _depthOfFieldPass;
+  CircleOfConfusionPostProcessPtr _circleOfConfusion;
+  std::vector<DepthOfFieldBlurPostProcessPtr> _depthOfFieldBlurY;
 
 }; // end of class ConvolutionPostProcess
 

@@ -6,6 +6,10 @@
 
 namespace BABYLON {
 
+class ExtractHighlightsPostProcess;
+using ExtractHighlightsPostProcessPtr
+  = std::shared_ptr<ExtractHighlightsPostProcess>;
+
 /**
  * @brief The extract highlights post process sets all pixels to black except
  * pixels above the specified luminance threshold. Used as the first step for a
@@ -14,13 +18,22 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT ExtractHighlightsPostProcess : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static ExtractHighlightsPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<ExtractHighlightsPostProcess>(
+      new ExtractHighlightsPostProcess(std::forward<Ts>(args)...));
+  }
+  ~ExtractHighlightsPostProcess();
+
+protected:
   ExtractHighlightsPostProcess(
-    const std::string& name, const Variant<float, PostProcessOptions>& options,
+    const std::string& name,
+    const std::variant<float, PostProcessOptions>& options,
     const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
     bool reusable            = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     bool blockCompilation    = false);
-  ~ExtractHighlightsPostProcess();
 
 public:
   /**

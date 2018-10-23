@@ -6,12 +6,24 @@
 
 namespace BABYLON {
 
+class AnaglyphPostProcess;
+using AnaglyphPostProcessPtr = std::shared_ptr<AnaglyphPostProcess>;
+
 /**
  * @brief Postprocess used to generate anaglyphic rendering.
  */
 class BABYLON_SHARED_EXPORT AnaglyphPostProcess : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static AnaglyphPostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<AnaglyphPostProcess>(
+      new AnaglyphPostProcess(std::forward<Ts>(args)...));
+  }
+  ~AnaglyphPostProcess();
+
+protected:
   /**
    * @brief Creates a new AnaglyphPostProcess.
    * @param name defines postprocess name
@@ -27,7 +39,6 @@ public:
                       const std::vector<CameraPtr>& rigCameras,
                       unsigned int samplingMode, Engine* engine,
                       bool reusable = false);
-  ~AnaglyphPostProcess();
 
 private:
   PostProcess* _passedProcess;

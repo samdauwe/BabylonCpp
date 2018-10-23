@@ -40,9 +40,9 @@ public:
    */
   CircleOfConfusionPostProcess(
     const std::string& name, RenderTargetTexture* depthTexture,
-    const Variant<float, PostProcessOptions>& options, const CameraPtr& camera,
-    unsigned int samplingMode = 0, Engine* engine = nullptr,
-    bool reusable            = false,
+    const std::variant<float, PostProcessOptions>& options,
+    const CameraPtr& camera, unsigned int samplingMode = 0,
+    Engine* engine = nullptr, bool reusable = false,
     unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
     bool blockCompilation    = false);
   ~CircleOfConfusionPostProcess();

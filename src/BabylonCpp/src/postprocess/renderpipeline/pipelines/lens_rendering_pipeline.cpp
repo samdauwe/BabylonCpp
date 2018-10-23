@@ -21,7 +21,9 @@ namespace BABYLON {
 LensRenderingPipeline::LensRenderingPipeline(
   const std::string& name, const LensRenderingPipelineParameters& parameters,
   Scene* scene, float ratio, const std::vector<CameraPtr>& cameras)
-    : PostProcessRenderPipeline(scene->getEngine(), name), _scene{scene}
+    : PostProcessRenderPipeline(scene->getEngine(), name)
+    , _scene{scene}
+    , _cameraList{cameras}
 {
   // Fetch texture samplers
   _depthTexture
@@ -52,35 +54,40 @@ LensRenderingPipeline::LensRenderingPipeline(
   _createDepthOfFieldPostProcess(ratio / 4.f);
 
   // Set up pipeline
-  addEffect(new PostProcessRenderEffect(
+  addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), LensChromaticAberrationEffect,
-    [&]() -> std::vector<PostProcess*> {
+    [&]() -> std::vector<PostProcessPtr> {
       return {_chromaticAberrationPostProcess};
     },
     true));
-  addEffect(new PostProcessRenderEffect(
+  addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), HighlightsEnhancingEffect,
-    [&]() -> std::vector<PostProcess*> { return {_highlightsPostProcess}; },
+    [&]() -> std::vector<PostProcessPtr> { return {_highlightsPostProcess}; },
     true));
-  addEffect(new PostProcessRenderEffect(
+  addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), LensDepthOfFieldEffect,
-    [&]() -> std::vector<PostProcess*> { return {_depthOfFieldPostProcess}; },
+    [&]() -> std::vector<PostProcessPtr> { return {_depthOfFieldPostProcess}; },
     true));
 
   if (stl_util::almost_equal(_highlightsGain, -1.f)) {
     _disableEffect(HighlightsEnhancingEffect, std::vector<CameraPtr>());
   }
-
-  // Finish
-  scene->postProcessRenderPipelineManager()->addPipeline(this);
-  if (!cameras.empty()) {
-    scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
-      name, cameras);
-  }
 }
 
 LensRenderingPipeline::~LensRenderingPipeline()
 {
+}
+
+void LensRenderingPipeline::addToScene(
+  const LensRenderingPipelinePtr& lensRenderingPipeline)
+{
+  // Finish
+  _scene->postProcessRenderPipelineManager()->addPipeline(
+    lensRenderingPipeline);
+  if (!_cameraList.empty()) {
+    _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
+      _name, _cameraList);
+  }
 }
 
 void LensRenderingPipeline::setEdgeBlur(float amount)
@@ -201,13 +208,13 @@ void LensRenderingPipeline::dispose(bool disableDepthRender,
 
 void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
 {
-  _chromaticAberrationPostProcess = new PostProcess(
+  _chromaticAberrationPostProcess = PostProcess::New(
     "LensChromaticAberration", "chromaticAberration",
     {"chromatic_aberration", "screen_width", "screen_height", "direction",
      "radialIntensity", "centerPosition"}, // uniforms
     {},                                    // samplers
-    ToVariant<float, PostProcessOptions>(ratio), nullptr,
-    TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
+    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
+    _scene->getEngine(), false);
 
   _chromaticAberrationPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("chromatic_aberration", _chromaticAberration);
@@ -224,19 +231,18 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
 
 void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
 {
-  _highlightsPostProcess = new PostProcess(
+  _highlightsPostProcess = PostProcess::New(
     "LensHighlights", "lensHighlights",
     {"gain", "threshold", "screen_width", "screen_height"}, // uniforms
     {},                                                     // samplers
-    ToVariant<float, PostProcessOptions>(ratio), nullptr,
-    TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    _dofPentagon ? "#define PENTAGON\n" : "");
+    ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
+    _scene->getEngine(), false, _dofPentagon ? "#define PENTAGON\n" : "");
 
   _highlightsPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setFloat("gain", _highlightsGain);
     effect->setFloat("threshold", _highlightsThreshold);
     effect->setTextureFromPostProcess("textureSampler",
-                                      _chromaticAberrationPostProcess);
+                                      _chromaticAberrationPostProcess.get());
     effect->setFloat("screen_width",
                      static_cast<float>(_scene->getEngine()->getRenderWidth()));
     effect->setFloat(
@@ -247,21 +253,21 @@ void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
 
 void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
 {
-  _depthOfFieldPostProcess = new PostProcess(
+  _depthOfFieldPostProcess = PostProcess::New(
     "LensDepthOfField", "depthOfField",
     {"grain_amount", "blur_noise", "screen_width", "screen_height",
      "distortion", "dof_enabled", "screen_distance", "aperture", "darken",
      "edge_blur", "highlights", "near", "far"},
-    {"depthSampler", "grainSampler", "highlightsSampler"},
-    ToVariant<float, PostProcessOptions>(ratio), nullptr,
+    {"depthSampler", "grainSampler", "highlightsSampler"}, ratio, nullptr,
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
   _depthOfFieldPostProcess->setOnApply([&](Effect* effect, EventState&) {
     effect->setTexture("depthSampler", _depthTexture);
     effect->setTexture("grainSampler", _grainTexture);
-    effect->setTextureFromPostProcess("textureSampler", _highlightsPostProcess);
+    effect->setTextureFromPostProcess("textureSampler",
+                                      _highlightsPostProcess.get());
     effect->setTextureFromPostProcess("highlightsSampler",
-                                      _depthOfFieldPostProcess);
+                                      _depthOfFieldPostProcess.get());
 
     effect->setFloat("grain_amount", _grainAmount);
     effect->setBool("blur_noise", _blurNoise);

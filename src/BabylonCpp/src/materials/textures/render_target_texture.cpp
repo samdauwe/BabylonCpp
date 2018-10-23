@@ -252,7 +252,7 @@ void RenderTargetTexture::set_refreshRate(int value)
   resetRefreshCounter();
 }
 
-void RenderTargetTexture::addPostProcess(PostProcess* postProcess)
+void RenderTargetTexture::addPostProcess(const PostProcessPtr& postProcess)
 {
   if (!_postProcessManager) {
     auto scene = getScene();
@@ -284,7 +284,7 @@ void RenderTargetTexture::clearPostProcesses(bool dispose)
   _postProcesses.clear();
 }
 
-void RenderTargetTexture::removePostProcess(PostProcess* postProcess)
+void RenderTargetTexture::removePostProcess(const PostProcessPtr& postProcess)
 {
   if (_postProcesses.empty()) {
     return;

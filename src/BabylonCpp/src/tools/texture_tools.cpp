@@ -641,7 +641,7 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
   texture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   texture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
 
-  auto passPostProcess = std::make_unique<PassPostProcess>(
+  auto passPostProcess = PassPostProcess::New(
     "pass", 1.f, nullptr,
     useBilinearMode ? TextureConstants::BILINEAR_SAMPLINGMODE :
                       TextureConstants::NEAREST_SAMPLINGMODE,
@@ -654,7 +654,7 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
     auto internalTexture = rtt->getInternalTexture();
 
     if (internalTexture) {
-      scene->postProcessManager->directRender({passPostProcess.get()},
+      scene->postProcessManager->directRender({passPostProcess},
                                               internalTexture);
 
       engine->unBindFramebuffer(internalTexture);

@@ -4,25 +4,16 @@
 
 #include <babylon/materials/effect.h>
 
-#include <babylon/core/variant.h>
-
 namespace BABYLON {
 
 TonemapPostProcess::TonemapPostProcess(
   const std::string& iName, const TonemappingOperator& operator_,
   float exposureAdjustment, const CameraPtr& camera, unsigned int samplingMode,
   Engine* engine, unsigned int textureFormat)
-    : PostProcess{iName,
-                  "tonemap",
-                  {"_ExposureAdjustment"},
-                  {},
-                  ToVariant<float, PostProcessOptions>(1.f),
-                  camera,
-                  samplingMode,
-                  engine,
-                  true,
-                  "",
-                  textureFormat}
+    : PostProcess{iName,        "tonemap",    {"_ExposureAdjustment"},
+                  {},           1.f,          camera,
+                  samplingMode, engine,       true,
+                  "",           textureFormat}
     , _operator{operator_}
 {
   std::ostringstream defines;
