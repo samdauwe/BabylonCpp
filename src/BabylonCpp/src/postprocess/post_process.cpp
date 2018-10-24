@@ -93,7 +93,7 @@ void PostProcess::add(const PostProcessPtr& newPostProcess)
     _camera->attachPostProcess(newPostProcess);
   }
   else if (_engine) {
-    _engine->postProcesses.emplace_back(this);
+    _engine->postProcesses.emplace_back(newPostProcess);
   }
 }
 
@@ -479,15 +479,21 @@ void PostProcess::dispose(Camera* camera)
   _disposeTextures();
 
   if (_scene) {
-    _scene->postProcesses.erase(std::remove(_scene->postProcesses.begin(),
-                                            _scene->postProcesses.end(), this),
-                                _scene->postProcesses.end());
+    _scene->postProcesses.erase(
+      std::remove_if(_scene->postProcesses.begin(), _scene->postProcesses.end(),
+                     [this](const PostProcessPtr& postprocess) {
+                       return postprocess.get() == this;
+                     }),
+      _scene->postProcesses.end());
   }
   else {
-    _engine->postProcesses.erase(std::remove(_engine->postProcesses.begin(),
-                                             _engine->postProcesses.end(),
-                                             this),
-                                 _engine->postProcesses.end());
+    _engine->postProcesses.erase(
+      std::remove_if(_engine->postProcesses.begin(),
+                     _engine->postProcesses.end(),
+                     [this](const PostProcessPtr& postprocess) {
+                       return postprocess.get() == this;
+                     }),
+      _engine->postProcesses.end());
   }
 
   if (!pCamera) {

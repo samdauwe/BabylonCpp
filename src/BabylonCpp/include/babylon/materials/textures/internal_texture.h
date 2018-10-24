@@ -1,9 +1,10 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_INTERNAL_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_INTERNAL_TEXTURE_H
 
+#include <variant>
+
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/core/variant.h>
 #include <babylon/materials/textures/iinternal_texture_tracker.h>
 #include <babylon/tools/observable.h>
 
@@ -210,7 +211,7 @@ public:
   int _initialSlot;
   int _designatedSlot;
   unsigned int _dataSource;
-  Variant<ArrayBuffer, Image> _buffer;
+  std::variant<ArrayBuffer, Image> _buffer;
   ArrayBuffer _bufferView;
   std::vector<ArrayBuffer> _bufferViewArray;
   std::vector<std::vector<ArrayBuffer>> _bufferViewArrayArray;

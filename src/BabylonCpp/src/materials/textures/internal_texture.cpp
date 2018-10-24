@@ -157,8 +157,7 @@ void InternalTexture::_rebuild()
 
       auto size = ISize{width, height};
       // TODO FIXME
-      proxy = _engine->createDepthStencilTexture(ToVariant<int, ISize>(size),
-                                                 depthTextureOptions);
+      proxy = _engine->createDepthStencilTexture(size, depthTextureOptions);
       proxy->_swapAndDie(this);
 
       isReady = true;

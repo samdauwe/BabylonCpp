@@ -51,10 +51,10 @@ void EnvironmentHelper::updateOptions(const IEnvironmentHelperOptions& options)
   }
 
   if (_groundTexture) {
-    if (_options.groundTexture.is<BaseTexture*>()
-        && newOptions.groundTexture.is<BaseTexture*>()
-        && _options.groundTexture.get<BaseTexture*>()
-             != newOptions.groundTexture.get<BaseTexture*>()) {
+    if (std::holds_alternative<BaseTexturePtr>(_options.groundTexture)
+        && std::holds_alternative<BaseTexturePtr>(newOptions.groundTexture)
+        && std::get<BaseTexturePtr>(_options.groundTexture)
+             != std::get<BaseTexturePtr>(newOptions.groundTexture)) {
       _groundTexture->dispose();
       _groundTexture = nullptr;
     }
@@ -71,10 +71,10 @@ void EnvironmentHelper::updateOptions(const IEnvironmentHelperOptions& options)
   }
 
   if (_skyboxTexture) {
-    if (_options.skyboxTexture.is<BaseTexturePtr>()
-        && newOptions.skyboxTexture.is<BaseTexturePtr>()
-        && _options.skyboxTexture.get<BaseTexturePtr>()
-             != newOptions.skyboxTexture.get<BaseTexturePtr>()) {
+    if (std::holds_alternative<BaseTexturePtr>(_options.skyboxTexture)
+        && std::holds_alternative<BaseTexturePtr>(newOptions.skyboxTexture)
+        && std::get<BaseTexturePtr>(_options.skyboxTexture)
+             != std::get<BaseTexturePtr>(newOptions.skyboxTexture)) {
       _skyboxTexture->dispose();
       _skyboxTexture = nullptr;
     }
@@ -86,10 +86,10 @@ void EnvironmentHelper::updateOptions(const IEnvironmentHelperOptions& options)
   }
 
   if (_scene->environmentTexture()) {
-    if (_options.environmentTexture.is<BaseTexture*>()
-        && newOptions.environmentTexture.is<BaseTexture*>()
-        && _options.environmentTexture.get<BaseTexture*>()
-             != newOptions.environmentTexture.get<BaseTexture*>()) {
+    if (std::holds_alternative<BaseTexturePtr>(_options.environmentTexture)
+        && std::holds_alternative<BaseTexturePtr>(newOptions.environmentTexture)
+        && std::get<BaseTexturePtr>(_options.environmentTexture)
+             != std::get<BaseTexturePtr>(newOptions.environmentTexture)) {
       _scene->environmentTexture()->dispose();
     }
   }
@@ -166,9 +166,9 @@ BackgroundMaterialPtr& EnvironmentHelper::groundMaterial()
 IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
 {
   IEnvironmentHelperOptions options;
-  options.createGround = true;
-  options.groundSize   = 15;
-  options.groundTexture.set<std::string>(_groundTextureCDNUrl);
+  options.createGround  = true;
+  options.groundSize    = 15;
+  options.groundTexture = _groundTextureCDNUrl;
   options.groundColor   = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
   options.groundOpacity = 0.9f;
   options.enableGroundShadow = true;
@@ -184,20 +184,20 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
 
   options.groundYBias = 0.00001f;
 
-  options.createSkybox = true;
-  options.skyboxSize   = 20;
-  options.skyboxTexture.set<std::string>(_skyboxTextureCDNUrl);
-  options.skyboxColor = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
+  options.createSkybox  = true;
+  options.skyboxSize    = 20;
+  options.skyboxTexture = _skyboxTextureCDNUrl;
+  options.skyboxColor   = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
 
   options.backgroundYRotation = 0;
   options.sizeAuto            = true;
   options.rootPosition        = Vector3::Zero();
 
   options.setupImageProcessing = true;
-  options.environmentTexture.set<std::string>(_environmentTextureCDNUrl);
-  options.cameraExposure     = 0.8f;
-  options.cameraContrast     = 1.2f;
-  options.toneMappingEnabled = true;
+  options.environmentTexture   = _environmentTextureCDNUrl;
+  options.cameraExposure       = 0.8f;
+  options.cameraContrast       = 1.2f;
+  options.toneMappingEnabled   = true;
 
   return options;
 }
@@ -219,14 +219,14 @@ void EnvironmentHelper::_setupEnvironmentTexture()
     return;
   }
 
-  if (_options.environmentTexture.is<BaseTexturePtr>()) {
+  if (std::holds_alternative<BaseTexturePtr>(_options.environmentTexture)) {
     _scene->environmentTexture
-      = _options.environmentTexture.get<BaseTexturePtr>();
+      = std::get<BaseTexturePtr>(_options.environmentTexture);
     return;
   }
 
   const auto environmentTexture = CubeTexture::CreateFromPrefilteredData(
-    _options.environmentTexture.get<std::string>(), _scene);
+    std::get<std::string>(_options.environmentTexture), _scene);
   _scene->environmentTexture = environmentTexture;
 }
 
@@ -342,13 +342,13 @@ void EnvironmentHelper::_setupGroundDiffuseTexture()
     return;
   }
 
-  if (_options.skyboxTexture.is<BaseTexturePtr>()) {
+  if (std::holds_alternative<BaseTexturePtr>(_options.skyboxTexture)) {
     // _groundMaterial->setDiffuseTexture ( _options.groundTexture);
     return;
   }
 
   const auto diffuseTexture
-    = Texture::New(_options.groundTexture.get<std::string>(), _scene);
+    = Texture::New(std::get<std::string>(_options.groundTexture), _scene);
   diffuseTexture->gammaSpace = false;
   diffuseTexture->hasAlpha   = true;
   // _groundMaterial->setDiffuseTexture(diffuseTexture);
@@ -438,10 +438,10 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
     return;
   }
 
-  if (_options.skyboxTexture.is<BaseTexturePtr>()) {
+  if (std::holds_alternative<BaseTexturePtr>(_options.skyboxTexture)) {
     _skyboxMaterial->setReflectionTexture(
       std::static_pointer_cast<RenderTargetTexture>(
-        _options.skyboxTexture.get<BaseTexturePtr>()));
+        std::get<BaseTexturePtr>(_options.skyboxTexture)));
     return;
   }
 

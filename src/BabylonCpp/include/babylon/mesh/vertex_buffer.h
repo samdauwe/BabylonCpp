@@ -3,10 +3,10 @@
 
 #include <functional>
 #include <memory>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/core/variant.h>
 
 namespace BABYLON {
 
@@ -143,7 +143,7 @@ public:
    * @param normalized whether the data contains normalized data (optional)
    * @param useBytes set to true if stride and offset are in bytes (optional)
    */
-  VertexBuffer(Engine* engine, const Variant<Float32Array, Buffer*> data,
+  VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*> data,
                unsigned int kind, bool updatable,
                const std::optional<bool>& postponeInternalCreation
                = std::nullopt,
@@ -300,7 +300,7 @@ public:
    * @param callback the callback function called for each value
    */
   static void
-  ForEach(const Variant<ArrayBuffer, DataView>& data, size_t byteOffset,
+  ForEach(const std::variant<ArrayBuffer, DataView>& data, size_t byteOffset,
           size_t byteStride, size_t componentCount, unsigned int componentType,
           size_t count, bool normalized,
           const std::function<void(float value, size_t index)>& callback);

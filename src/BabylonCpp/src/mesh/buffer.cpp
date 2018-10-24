@@ -64,9 +64,9 @@ Buffer::createVertexBuffer(unsigned int kind, size_t offset, int size,
 
   // a lot of these parameters are ignored as they are overriden by the buffer
   return std::make_unique<VertexBuffer>(
-    _engine, ToVariant<Float32Array, Buffer*>(this), kind, _updatable, true,
-    _byteStride, !instanced.has_value() ? _instanced : _byteOffset, offset,
-    size, std::nullopt, false, true);
+    _engine, this, kind, _updatable, true, _byteStride,
+    !instanced.has_value() ? _instanced : _byteOffset, offset, size,
+    std::nullopt, false, true);
 }
 
 // Properties

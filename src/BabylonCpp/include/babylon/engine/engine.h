@@ -2,11 +2,11 @@
 #define BABYLON_ENGINE_ENGINE_H
 
 #include <future>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/structs.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine_capabilities.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/engine/engine_options.h>
@@ -60,6 +60,7 @@ using IInternalTextureLoaderPtr  = std::shared_ptr<IInternalTextureLoader>;
 using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
 using InternalTexturePtr         = std::shared_ptr<InternalTexture>;
 using PassPostProcessPtr         = std::shared_ptr<PassPostProcess>;
+using PostProcessPtr             = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr     = std::shared_ptr<RenderTargetTexture>;
 
 /**
@@ -1383,7 +1384,8 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void()>& onError                             = nullptr,
-    const Variant<ArrayBuffer, Image>& buffer = Variant<ArrayBuffer, Image>());
+    const std::variant<ArrayBuffer, Image>& buffer
+    = std::variant<ArrayBuffer, Image>());
 
   /**
    * @brief HUsually called from BABYLON.Texture.ts.
@@ -1417,9 +1419,10 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
     const std::function<void()>& onError                             = nullptr,
-    const std::optional<Variant<ArrayBuffer, Image>>& buffer = std::nullopt,
-    const InternalTexturePtr& fallBack                       = nullptr,
-    const std::optional<unsigned int>& format                = std::nullopt);
+    const std::optional<std::variant<ArrayBuffer, Image>>& buffer
+    = std::nullopt,
+    const InternalTexturePtr& fallBack        = nullptr,
+    const std::optional<unsigned int>& format = std::nullopt);
 
   /**
    * @brief Update a raw texture.
@@ -1529,7 +1532,7 @@ public:
    * @returns The texture
    */
   InternalTexturePtr
-  createDepthStencilTexture(const Variant<int, ISize>& size,
+  createDepthStencilTexture(const std::variant<int, ISize>& size,
                             const DepthTextureCreationOptions& options);
 
   /**
@@ -2123,7 +2126,7 @@ public:
    */
   IFileRequest _loadFile(
     const std::string& url,
-    const std::function<void(const Variant<std::string, ArrayBuffer>& data,
+    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                              const std::string& responseURL)>& onSuccess,
     const std::function<void(const std::string& data)>& onProgress = nullptr,
     bool useArrayBuffer                                            = false,
@@ -2247,7 +2250,7 @@ private:
                        unsigned int internalFormat,
                        const std::function<void()>& onComplete);
   void _setupDepthStencilTexture(InternalTexture* internalTexture,
-                                 const Variant<int, ISize>& size,
+                                 const std::variant<int, ISize>& size,
                                  bool generateStencil, bool bilinearFiltering,
                                  int comparisonFunction);
 
@@ -2260,7 +2263,7 @@ private:
    * @returns The texture
    */
   InternalTexturePtr
-  _createDepthStencilTexture(const Variant<int, ISize>& size,
+  _createDepthStencilTexture(const std::variant<int, ISize>& size,
                              const DepthTextureCreationOptions& options);
 
   /**
@@ -2324,7 +2327,7 @@ private:
   /** File loading */
   void _cascadeLoadFiles(
     Scene* scene,
-    const std::function<void(const Variant<std::string, ArrayBuffer>& data,
+    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                              const std::string& responseURL)>& onloaddata,
     const std::vector<std::string>& files,
     const std::function<void(const std::string& message,
@@ -2388,7 +2391,7 @@ public:
   /**
    * Gets the list of created postprocesses
    */
-  std::vector<PostProcess*> postProcesses;
+  std::vector<PostProcessPtr> postProcesses;
 
   /**
    * Gets or sets a boolean indicating if the engine should validate programs

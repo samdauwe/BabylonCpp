@@ -17,7 +17,7 @@ Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
                  bool invertY, unsigned int samplingMode,
                  const std::function<void()>& onLoad,
                  const std::function<void()>& onError,
-                 const std::optional<Variant<ArrayBuffer, Image>>& buffer,
+                 const std::optional<std::variant<ArrayBuffer, Image>>& buffer,
                  bool deleteBuffer, const std::optional<unsigned int>& format)
     : BaseTexture{scene}
     , url{_url}
@@ -138,8 +138,9 @@ bool Texture::get_noMipmap() const
   return _noMipmap;
 }
 
-void Texture::updateURL(const std::string& iUrl,
-                        const std::optional<Variant<ArrayBuffer, Image>>& buffer)
+void Texture::updateURL(
+  const std::string& iUrl,
+  const std::optional<std::variant<ArrayBuffer, Image>>& buffer)
 {
   if (iUrl.empty()) {
     throw std::runtime_error("URL is already set");
@@ -409,8 +410,8 @@ void Texture::dispose()
 }
 
 TexturePtr Texture::CreateFromBase64String(
-  const std::string& /*data*/, const std::string& name, Scene* scene, bool noMipmap,
-  bool invertY, unsigned int samplingMode,
+  const std::string& /*data*/, const std::string& name, Scene* scene,
+  bool noMipmap, bool invertY, unsigned int samplingMode,
   const std::function<void()>& onLoad, const std::function<void()>& onError,
   unsigned int format)
 {
@@ -418,18 +419,19 @@ TexturePtr Texture::CreateFromBase64String(
                       onLoad, onError, std::nullopt, false, format);
 }
 
-std::unique_ptr<BaseTexture> Texture::Parse(const Json::value& /*parsedTexture*/,
-                                         Scene* /*scene*/,
-                                         const std::string& /*rootUrl*/)
+std::unique_ptr<BaseTexture>
+Texture::Parse(const Json::value& /*parsedTexture*/, Scene* /*scene*/,
+               const std::string& /*rootUrl*/)
 {
   return nullptr;
 }
 
 TexturePtr Texture::LoadFromDataString(
-  const std::string& name, const std::optional<Variant<ArrayBuffer, Image>>& buffer,
-  Scene* scene, bool deleteBuffer, bool noMipmap, bool invertY,
-  unsigned int samplingMode, const std::function<void()>& onLoad,
-  const std::function<void()>& onError, unsigned int format)
+  const std::string& name,
+  const std::optional<std::variant<ArrayBuffer, Image>>& buffer, Scene* scene,
+  bool deleteBuffer, bool noMipmap, bool invertY, unsigned int samplingMode,
+  const std::function<void()>& onLoad, const std::function<void()>& onError,
+  unsigned int format)
 {
   std::string _name = name;
   if (_name.substr(0, 5) != "data:") {

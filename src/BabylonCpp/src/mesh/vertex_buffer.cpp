@@ -75,22 +75,23 @@ constexpr const unsigned int VertexBuffer::UNSIGNED_INT;
 constexpr const unsigned int VertexBuffer::FLOAT;
 
 VertexBuffer::VertexBuffer(
-  Engine* engine, const Variant<Float32Array, Buffer*> data, unsigned int kind,
-  bool updatable, const std::optional<bool>& postponeInternalCreation,
+  Engine* engine, const std::variant<Float32Array, Buffer*> data,
+  unsigned int kind, bool updatable,
+  const std::optional<bool>& postponeInternalCreation,
   std::optional<size_t> stride, const std::optional<bool>& instanced,
   const std::optional<unsigned int>& offset, const std::optional<size_t>& size,
   std::optional<unsigned int> iType, bool iNormalized, bool useBytes)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor,
                       &VertexBuffer::set_instanceDivisor}
 {
-  if (data.is<Buffer*>()) {
-    _buffer      = data.get<Buffer*>();
+  if (std::holds_alternative<Buffer*>(data)) {
+    _buffer      = std::get<Buffer*>(data);
     _ownedBuffer = nullptr;
     _ownsBuffer  = false;
   }
   else {
     _ownedBuffer = std::make_unique<Buffer>(
-      engine, data.get<Float32Array>(), updatable, stride,
+      engine, std::get<Float32Array>(data), updatable, stride,
       postponeInternalCreation.has_value() ? *postponeInternalCreation : false,
       instanced.has_value() ? *instanced : false);
     _buffer     = nullptr;
@@ -317,8 +318,7 @@ void VertexBuffer::dispose()
 }
 
 void VertexBuffer::forEach(
-  size_t count,
-  const std::function<void(float value, size_t index)>& callback)
+  size_t count, const std::function<void(float value, size_t index)>& callback)
 {
   VertexBuffer::ForEach(_buffer->getData(), byteOffset, byteStride, _size, type,
                         count, normalized, callback);
@@ -346,8 +346,7 @@ size_t VertexBuffer::DeduceStride(unsigned int kind)
     case VertexBuffer::TangentKind:
       return 4;
     default:
-      throw std::runtime_error("Invalid kind '" + std::to_string(kind)
-                                 + "'");
+      throw std::runtime_error("Invalid kind '" + std::to_string(kind) + "'");
   }
 }
 
@@ -386,14 +385,14 @@ void VertexBuffer::ForEach(
 }
 
 void VertexBuffer::ForEach(
-  const Variant<ArrayBuffer, DataView>& data, size_t byteOffset,
+  const std::variant<ArrayBuffer, DataView>& data, size_t byteOffset,
   size_t byteStride, size_t componentCount, unsigned int componentType,
   size_t count, bool normalized,
   const std::function<void(float value, size_t index)>& callback)
 {
-  DataView dataView = data.is<ArrayBuffer>() ?
-                        DataView(data.get<ArrayBuffer>()) :
-                        DataView(data.get<DataView>());
+  DataView dataView = std::holds_alternative<ArrayBuffer>(data) ?
+                        DataView(std::get<ArrayBuffer>(data)) :
+                        DataView(std::get<DataView>(data));
   auto componentByteLength = VertexBuffer::GetTypeByteLength(componentType);
   for (size_t index = 0; index < count; index += componentCount) {
     auto componentByteOffset = byteOffset;
@@ -445,7 +444,7 @@ float VertexBuffer::_GetFloatValue(const DataView& dataView, unsigned int type,
     }
     default: {
       throw std::runtime_error("Invalid component type "
-                                 + std::to_string(type));
+                               + std::to_string(type));
     }
   }
 }

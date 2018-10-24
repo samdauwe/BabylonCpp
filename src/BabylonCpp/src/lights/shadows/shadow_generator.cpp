@@ -6,7 +6,6 @@
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/ishadow_light.h>

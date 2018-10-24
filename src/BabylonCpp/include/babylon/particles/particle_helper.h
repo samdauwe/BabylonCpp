@@ -2,10 +2,10 @@
 #define BABYLON_PARTICLES_PARTICLE_HELPER_H
 
 #include <memory>
+#include <variant>
 #include <vector>
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/variant.h>
 
 namespace BABYLON {
 
@@ -37,7 +37,7 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    * @returns the new Particle system
    */
   static ParticleSystem*
-  CreateDefault(const Variant<AbstractMeshPtr, Vector3>& emitter,
+  CreateDefault(const std::variant<AbstractMeshPtr, Vector3>& emitter,
                 size_t capacity = 500, Scene* scene = nullptr);
 
   /**

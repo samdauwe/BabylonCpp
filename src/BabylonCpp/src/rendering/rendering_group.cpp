@@ -105,10 +105,10 @@ void RenderingGroup::set_transparentSortCompareFn(
 
 void RenderingGroup::render(
   std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
-                       const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-                       const std::vector<SubMeshPtr>& transparentSubMeshes,
-                       const std::vector<SubMeshPtr>& depthOnlySubMeshes,
-                       const std::function<void()>& beforeTransparents)>&
+                     const std::vector<SubMeshPtr>& alphaTestSubMeshes,
+                     const std::vector<SubMeshPtr>& transparentSubMeshes,
+                     const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+                     const std::function<void()>& beforeTransparents)>&
     customRenderFunction,
   bool renderSprites, bool renderParticles,
   const std::vector<AbstractMeshPtr>& activeMeshes)
@@ -177,7 +177,8 @@ void RenderingGroup::render(
   engine->setStencilBuffer(stencilState);
 }
 
-void RenderingGroup::renderOpaqueSorted(const std::vector<SubMeshPtr>& subMeshes)
+void RenderingGroup::renderOpaqueSorted(
+  const std::vector<SubMeshPtr>& subMeshes)
 {
   return RenderingGroup::renderSorted(subMeshes, _opaqueSortCompareFn,
                                       _scene->activeCamera, false);
@@ -217,9 +218,9 @@ void RenderingGroup::renderSorted(
   // sort using a custom function object
   if (sortCompareFn) {
     std::sort(sortedArray.begin(), sortedArray.end(),
-                [&sortCompareFn](const SubMeshPtr& a, const SubMeshPtr& b) {
-                  return sortCompareFn(a, b);
-                });
+              [&sortCompareFn](const SubMeshPtr& a, const SubMeshPtr& b) {
+                return sortCompareFn(a, b);
+              });
   }
 
   for (auto& subMesh : sortedArray) {
@@ -373,9 +374,9 @@ void RenderingGroup::_renderParticles(
       continue;
     }
     if (!activeMeshes.empty()
-        || (particleSystem->emitter.is<AbstractMeshPtr>()
-            && stl_util::index_of(
-                 activeMeshes, particleSystem->emitter.get<AbstractMeshPtr>())
+        || (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+            && stl_util::index_of(activeMeshes, std::get<AbstractMeshPtr>(
+                                                  particleSystem->emitter))
                  != -1)) {
       _scene->_activeParticles.addCount(particleSystem->render(), false);
     }

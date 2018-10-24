@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/scene.h>
 #include <babylon/postprocess/blur_post_process.h>
 #include <babylon/postprocess/circle_of_confusion_post_process.h>

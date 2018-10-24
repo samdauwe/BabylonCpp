@@ -4,7 +4,6 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json.h>
 #include <babylon/core/structs.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/image_processing_configuration.h>

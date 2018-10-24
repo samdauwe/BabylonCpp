@@ -53,8 +53,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = std::make_unique<VertexBuffer>(
-      engine, ToVariant<Float32Array, Buffer*>(vertices),
-      VertexBuffer::PositionKind, false, false, 2);
+      engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
 

@@ -1,8 +1,9 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_TEXTURE_H
 
+#include <variant>
+
 #include <babylon/babylon_api.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
@@ -52,7 +53,7 @@ public:
    * @param buffer the buffer of the texture (defaults to null)
    */
   void updateURL(const std::string& iUrl,
-                 const std::optional<Variant<ArrayBuffer, Image>>& buffer);
+                 const std::optional<std::variant<ArrayBuffer, Image>>& buffer);
 
   void delayLoad() override;
 
@@ -98,18 +99,18 @@ public:
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad  = nullptr,
     const std::function<void()>& onError = nullptr,
-    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+    unsigned int format                  = EngineConstants::TEXTUREFORMAT_RGBA);
   static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
                                             Scene* scene,
                                             const std::string& rootUrl);
   static TexturePtr LoadFromDataString(
     const std::string& name,
-    const std::optional<Variant<ArrayBuffer, Image>>& buffer, Scene* scene,
+    const std::optional<std::variant<ArrayBuffer, Image>>& buffer, Scene* scene,
     bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void()>& onLoad  = nullptr,
     const std::function<void()>& onError = nullptr,
-    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+    unsigned int format                  = EngineConstants::TEXTUREFORMAT_RGBA);
 
 protected:
   Texture(const std::string& url, Scene* scene, bool noMipmap = false,
@@ -117,7 +118,7 @@ protected:
           unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
           const std::function<void()>& onLoad  = nullptr,
           const std::function<void()>& onError = nullptr,
-          const std::optional<Variant<ArrayBuffer, Image>>& buffer
+          const std::optional<std::variant<ArrayBuffer, Image>>& buffer
           = std::nullopt,
           bool deleteBuffer                         = false,
           const std::optional<unsigned int>& format = std::nullopt);
@@ -189,7 +190,7 @@ private:
   float _cachedWAng;
   int _cachedProjectionMatrixId;
   unsigned int _cachedCoordinatesMode;
-  std::optional<Variant<ArrayBuffer, Image>> _buffer;
+  std::optional<std::variant<ArrayBuffer, Image>> _buffer;
   bool _deleteBuffer;
   std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
   std::function<void()> _delayedOnError;

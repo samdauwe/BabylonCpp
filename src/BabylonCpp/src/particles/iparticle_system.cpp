@@ -16,7 +16,8 @@ IParticleSystem::~IParticleSystem()
 
 bool IParticleSystem::hasEmitter() const
 {
-  return emitter.is<AbstractMeshPtr>() || emitter.is<Vector3>();
+  return std::holds_alternative<AbstractMeshPtr>(emitter)
+         || std::holds_alternative<Vector3>(emitter);
 }
 
 } // end of namespace BABYLON

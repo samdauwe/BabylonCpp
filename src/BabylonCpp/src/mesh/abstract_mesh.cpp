@@ -1447,8 +1447,8 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     for (size_t index = 0; index < getScene()->particleSystems.size();
          ++index) {
       auto& emitter = getScene()->particleSystems[index]->emitter;
-      if (emitter.is<AbstractMeshPtr>()
-          && (emitter.get<AbstractMeshPtr>().get() == this)) {
+      if (std::holds_alternative<AbstractMeshPtr>(emitter)
+          && (std::get<AbstractMeshPtr>(emitter).get() == this)) {
         getScene()->particleSystems[index]->dispose();
         --index;
       }

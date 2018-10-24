@@ -345,11 +345,9 @@ void EdgesRenderer::_generateEdgesLines()
   auto engine = _source->getScene()->getEngine();
 
   _buffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
-    engine, ToVariant<Float32Array, Buffer*>(_linesPositions),
-    VertexBuffer::PositionKind, false);
+    engine, _linesPositions, VertexBuffer::PositionKind, false);
   _buffers[VertexBuffer::NormalKind] = std::make_unique<VertexBuffer>(
-    engine, ToVariant<Float32Array, Buffer*>(_linesNormals),
-    VertexBuffer::NormalKind, false, false, 4);
+    engine, _linesNormals, VertexBuffer::NormalKind, false, false, 4);
   _bufferPtrs[VertexBuffer::PositionKindChars]
     = _buffers[VertexBuffer::PositionKind].get();
   _bufferPtrs[VertexBuffer::NormalKindChars]

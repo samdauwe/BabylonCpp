@@ -2675,7 +2675,7 @@ InternalTexturePtr Engine::createTexture(
   Scene* scene, unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void()>& onError,
-  const Variant<ArrayBuffer, Image>& buffer)
+  const std::variant<ArrayBuffer, Image>& buffer)
 {
   if (list.empty()) {
     return nullptr;
@@ -2690,7 +2690,7 @@ InternalTexturePtr Engine::createTexture(
   unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
   const std::function<void()>& onError,
-  const std::optional<Variant<ArrayBuffer, Image>>& buffer,
+  const std::optional<std::variant<ArrayBuffer, Image>>& buffer,
   const InternalTexturePtr& fallback, const std::optional<unsigned int>& format)
 {
   // assign a new string, so that the original is still available in case of
@@ -2778,7 +2778,7 @@ InternalTexturePtr Engine::createTexture(
       if (fromBlob && !_doNotHandleContextLost) {
         // We need to store the image if we need to rebuild the texture
         // in case of a webgl context lost
-        texture->_buffer.set<Image>(img);
+        texture->_buffer = img;
       }
 
       _prepareWebGLTexture(
@@ -3159,13 +3159,16 @@ void Engine::updateTextureComparisonFunction(const InternalTexturePtr& texture,
 }
 
 void Engine::_setupDepthStencilTexture(InternalTexture* internalTexture,
-                                       const Variant<int, ISize>& size,
+                                       const std::variant<int, ISize>& size,
                                        bool generateStencil,
                                        bool bilinearFiltering,
                                        int comparisonFunction)
 {
-  auto width  = size.is<int>() ? size.get<int>() : size.get<ISize>().width;
-  auto height = size.is<int>() ? size.get<int>() : size.get<ISize>().height;
+  auto width = std::holds_alternative<int>(size) ? std::get<int>(size) :
+                                                   std::get<ISize>(size).width;
+  auto height = std::holds_alternative<int>(size) ?
+                  std::get<int>(size) :
+                  std::get<ISize>(size).height;
   internalTexture->baseWidth              = width;
   internalTexture->baseHeight             = height;
   internalTexture->width                  = width;
@@ -3202,11 +3205,13 @@ void Engine::_setupDepthStencilTexture(InternalTexture* internalTexture,
 }
 
 InternalTexturePtr
-Engine::createDepthStencilTexture(const Variant<int, ISize>& size,
+Engine::createDepthStencilTexture(const std::variant<int, ISize>& size,
                                   const DepthTextureCreationOptions& options)
 {
   if (options.isCube) {
-    auto width = size.is<int>() ? size.get<int>() : size.get<ISize>().width;
+    auto width = std::holds_alternative<int>(size) ?
+                   std::get<int>(size) :
+                   std::get<ISize>(size).width;
     return _createDepthStencilCubeTexture(width, options);
   }
   else {
@@ -3215,7 +3220,7 @@ Engine::createDepthStencilTexture(const Variant<int, ISize>& size,
 }
 
 InternalTexturePtr
-Engine::_createDepthStencilTexture(const Variant<int, ISize>& size,
+Engine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
                                    const DepthTextureCreationOptions& options)
 {
   auto internalTexture = std::make_shared<InternalTexture>(
@@ -3294,10 +3299,9 @@ InternalTexturePtr Engine::_createDepthStencilCubeTexture(
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture, true);
 
-  _setupDepthStencilTexture(internalTexture.get(), ToVariant<int, ISize>(size),
-                            *internalOptions.generateStencil,
-                            *internalOptions.bilinearFiltering,
-                            *internalOptions.comparisonFunction);
+  _setupDepthStencilTexture(
+    internalTexture.get(), size, *internalOptions.generateStencil,
+    *internalOptions.bilinearFiltering, *internalOptions.comparisonFunction);
 
   // Create the depth/stencil buffer
   for (unsigned int face = 0; face < 6; ++face) {
@@ -3996,11 +4000,12 @@ InternalTexturePtr Engine::createCubeTexture(
   if (loader) {
     rootUrl = loader->transformUrl(rootUrl, _textureFormatInUse);
 
-    const auto onloaddata = [&](const Variant<std::string, ArrayBuffer>& data,
-                                const std::string & /*responseURL*/) -> void {
+    const auto onloaddata
+      = [&](const std::variant<std::string, ArrayBuffer>& data,
+            const std::string & /*responseURL*/) -> void {
       _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
-      loader->loadCubeData(data.get<std::string>(), texture, createPolynomials,
-                           onLoad, onError);
+      loader->loadCubeData(std::get<std::string>(data), texture,
+                           createPolynomials, onLoad, onError);
     };
     if (!files.empty() && files.size() == 6) {
       if (loader->supportCascades) {
@@ -5744,7 +5749,7 @@ void Engine::bindTransformFeedbackBuffer(GL::IGLBuffer* value)
 
 IFileRequest Engine::_loadFile(
   const std::string& /*url*/,
-  const std::function<void(const Variant<std::string, ArrayBuffer>& data,
+  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                            const std::string& responseURL)>& /*onSuccess*/,
   const std::function<void(const std::string& data)>& /*onProgress*/,
   bool /*useArrayBuffer*/,
@@ -5770,7 +5775,7 @@ std::promise<std::string> Engine::_loadFileAsync(const std::string& /*url*/)
 
 void Engine::_cascadeLoadFiles(
   Scene* /*scene*/,
-  const std::function<void(const Variant<std::string, ArrayBuffer>& data,
+  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                            const std::string& responseURL)>& /*onloaddata*/,
   const std::vector<std::string>& /*files*/,
   const std::function<void(const std::string& message,

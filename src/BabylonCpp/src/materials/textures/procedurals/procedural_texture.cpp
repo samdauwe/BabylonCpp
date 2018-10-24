@@ -58,8 +58,7 @@ ProceduralTexture::ProceduralTexture(
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = std::make_unique<VertexBuffer>(
-      _engine, ToVariant<Float32Array, Buffer*>(vertices),
-      VertexBuffer::PositionKind, false, false, 2);
+      _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
   Uint32Array indices{0, 1, 2, 0, 2, 3};
@@ -111,8 +110,7 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = std::make_unique<VertexBuffer>(
-      _engine, ToVariant<Float32Array, Buffer*>(vertices),
-      VertexBuffer::PositionKind, false, false, 2);
+      _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
 }

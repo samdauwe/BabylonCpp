@@ -3392,8 +3392,8 @@ void Scene::_evaluateActiveMeshes()
         continue;
       }
 
-      if (particleSystem->emitter.is<AbstractMeshPtr>()
-          && particleSystem->emitter.get<AbstractMeshPtr>()->isEnabled()) {
+      if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+          && std::get<AbstractMeshPtr>(particleSystem->emitter)->isEnabled()) {
         _activeParticleSystems.emplace_back(particleSystem.get());
         particleSystem->animate();
         _renderingManager->dispatchParticles(particleSystem.get());
@@ -4910,10 +4910,10 @@ void Scene::markAllMaterialsAsDirty(
   }
 }
 
-IFileRequest
-Scene::_loadFile(const std::string& /*url*/,
-                 const std::function<void(Variant<std::string, ArrayBuffer>&,
-                                          const std::string&)>& /*onSuccess*/)
+IFileRequest Scene::_loadFile(
+  const std::string& /*url*/,
+  const std::function<void(std::variant<std::string, ArrayBuffer>&,
+                           const std::string&)>& /*onSuccess*/)
 {
   return IFileRequest();
 }

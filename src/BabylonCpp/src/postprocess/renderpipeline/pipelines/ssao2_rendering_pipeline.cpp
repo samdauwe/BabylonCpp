@@ -5,7 +5,6 @@
 #include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/random.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>

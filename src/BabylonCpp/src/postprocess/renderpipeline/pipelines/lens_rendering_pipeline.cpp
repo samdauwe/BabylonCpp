@@ -3,7 +3,6 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/random.h>
-#include <babylon/core/variant.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>

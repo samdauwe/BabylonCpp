@@ -2,11 +2,11 @@
 #define BABYLON_ENGINE_SCENE_H
 
 #include <regex>
+#include <variant>
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/core/variant.h>
 #include <babylon/culling/octrees/octree.h>
 #include <babylon/engine/abstract_scene.h>
 #include <babylon/engine/stage.h>
@@ -75,6 +75,7 @@ using ISceneSerializableComponentPtr
   = std::shared_ptr<ISceneSerializableComponent>;
 using NodePtr                = std::shared_ptr<Node>;
 using MeshPtr                = std::shared_ptr<Mesh>;
+using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
 using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
@@ -1603,7 +1604,7 @@ public:
    */
   IFileRequest _loadFile(
     const std::string& url,
-    const std::function<void(Variant<std::string, ArrayBuffer>& data,
+    const std::function<void(std::variant<std::string, ArrayBuffer>& data,
                              const std::string& responseURL)>& onSuccess);
 
 protected:
@@ -2663,7 +2664,7 @@ public:
   /**
    * The list of postprocesses added to the scene
    */
-  std::vector<PostProcess*> postProcesses;
+  std::vector<PostProcessPtr> postProcesses;
 
   /**
    * Gets or sets a boolean indicating if postprocesses are enabled on this

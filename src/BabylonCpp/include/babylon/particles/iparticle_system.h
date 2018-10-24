@@ -2,9 +2,9 @@
 #define BABYLON_PARTICLES_IPARTICLE_SYSTEM_H
 
 #include <map>
+#include <variant>
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/variant.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
@@ -67,7 +67,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * The emitter represents the Mesh or position we are attaching the particle
    * system to.
    */
-  Variant<AbstractMeshPtr, Vector3> emitter;
+  std::variant<AbstractMeshPtr, Vector3> emitter;
 
   /**
    * @brief Gets or sets a boolean indicating if the particles must be rendered

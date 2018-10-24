@@ -162,9 +162,8 @@ AbstractMesh* Geometry::setVerticesData(unsigned int kind,
                                         bool updatable,
                                         const std::optional<size_t>& stride)
 {
-  auto buffer = std::make_unique<VertexBuffer>(
-    _engine, ToVariant<Float32Array, Buffer*>(data), kind, updatable,
-    _meshes.empty(), stride);
+  auto buffer = std::make_unique<VertexBuffer>(_engine, data, kind, updatable,
+                                               _meshes.empty(), stride);
 
   setVerticesBuffer(std::move(buffer));
 
@@ -386,7 +385,7 @@ std::unordered_map<std::string, VertexBuffer*> Geometry::getVertexBuffers()
 
   for (const auto& item : _vertexBuffers) {
     const std::string kind = VertexBuffer::KindAsString(item.first);
-    vertexBuffers[kind] = item.second.get();
+    vertexBuffers[kind]    = item.second.get();
   }
 
   return vertexBuffers;
@@ -819,7 +818,7 @@ void Geometry::_ImportGeometry(const Json::value& parsedGeometry,
 
   if (parsedGeometry.contains("geometryId")) {
     std::string geometryId = Json::GetString(parsedGeometry, "geometryId", "");
-    auto geometry       = scene->getGeometryByID(geometryId);
+    auto geometry          = scene->getGeometryByID(geometryId);
     if (geometry) {
       geometry->applyToMesh(mesh.get());
     }

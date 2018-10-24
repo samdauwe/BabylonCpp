@@ -43,14 +43,14 @@ void ParticleSystemSet::setEmitterAsSphere(
 
   auto emitterMesh
     = MeshBuilder::CreateSphere("emitterSphere", sphereOptions, scene);
-  emitterMesh->renderingGroupId = renderingGroupId;
+  emitterMesh->renderingGroupId = static_cast<int>(renderingGroupId);
 
   auto material = StandardMaterial::New("emitterSphereMaterial", scene);
   material->emissiveColor = options.color;
   emitterMesh->material   = material;
 
   for (auto& system : systems) {
-    system->emitter.set<AbstractMeshPtr>(emitterMesh);
+    system->emitter = emitterMesh;
   }
 
   _emitterNode = emitterMesh;
@@ -60,7 +60,7 @@ void ParticleSystemSet::start(const AbstractMeshPtr& emitter)
 {
   for (auto& system : systems) {
     if (emitter) {
-      system->emitter.set<AbstractMeshPtr>(emitter);
+      system->emitter = emitter;
     }
     system->start();
   }

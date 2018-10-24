@@ -102,8 +102,7 @@ void EffectLayer::_generateVertexBuffer()
   };
 
   auto vertexBuffer = std::make_unique<VertexBuffer>(
-    _engine, ToVariant<Float32Array, Buffer*>(vertices),
-    VertexBuffer::PositionKind, false, false, 2);
+    _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
   _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(vertexBuffer);
 }
 
@@ -576,7 +575,8 @@ std::string EffectLayer::getClassName() const
 }
 
 EffectLayer* EffectLayer::Parse(const Json::value& /*parsedEffectLayer*/,
-                                Scene* /*scene*/, const std::string& /*rootUrl*/)
+                                Scene* /*scene*/,
+                                const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

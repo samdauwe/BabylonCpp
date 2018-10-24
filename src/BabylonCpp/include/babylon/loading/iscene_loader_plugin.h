@@ -7,7 +7,6 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/variant.h>
 #include <babylon/loading/iscene_loader_plugin_extensions.h>
 
 namespace BABYLON {

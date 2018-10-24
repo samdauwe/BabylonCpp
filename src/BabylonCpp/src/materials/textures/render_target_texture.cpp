@@ -205,8 +205,7 @@ void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction,
   options.comparisonFunction = comparisonFunction;
   options.generateStencil    = generateStencil;
   options.isCube             = isCube;
-  depthStencilTexture
-    = engine->createDepthStencilTexture(ToVariant<int, ISize>(_size), options);
+  depthStencilTexture = engine->createDepthStencilTexture(_size, options);
 
   engine->setFrameBufferDepthStencilTexture(this);
 }
@@ -489,12 +488,13 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   for (auto& particleSystem : scene->particleSystems) {
     if (!particleSystem->isStarted() || !particleSystem->hasEmitter()
-        || !(particleSystem->emitter.is<AbstractMeshPtr>()
-             && particleSystem->emitter.get<AbstractMeshPtr>()->isEnabled())) {
+        || !(std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+             && std::get<AbstractMeshPtr>(particleSystem->emitter)
+                  ->isEnabled())) {
       continue;
     }
     if (stl_util::index_of(currentRenderList(),
-                           particleSystem->emitter.get<AbstractMeshPtr>())
+                           std::get<AbstractMeshPtr>(particleSystem->emitter))
         >= 0) {
       _renderingManager->dispatchParticles(particleSystem.get());
     }

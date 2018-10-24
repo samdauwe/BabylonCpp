@@ -63,8 +63,7 @@ LensFlareSystem::LensFlareSystem(const std::string iName,
 
   _vertexBuffers[VertexBuffer::PositionKindChars]
     = std::make_unique<VertexBuffer>(
-      engine, ToVariant<Float32Array, Buffer*>(vertices),
-      VertexBuffer::PositionKind, false, false, 2);
+      engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
   Uint32Array indices = {

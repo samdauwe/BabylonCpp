@@ -789,12 +789,12 @@ void ParticleSystem::_update(int newParticles)
   // Update current
   _alive = !_particles.empty();
 
-  if (emitter.is<AbstractMeshPtr>()) {
-    auto emitterMesh    = emitter.get<AbstractMeshPtr>();
+  if (std::holds_alternative<AbstractMeshPtr>(emitter)) {
+    auto emitterMesh    = std::get<AbstractMeshPtr>(emitter);
     _emitterWorldMatrix = *emitterMesh->getWorldMatrix();
   }
   else {
-    auto emitterPosition = emitter.get<Vector3>();
+    auto emitterPosition = std::get<Vector3>(emitter);
     _emitterWorldMatrix  = Matrix::Translation(
       emitterPosition.x, emitterPosition.y, emitterPosition.z);
   }
@@ -985,9 +985,9 @@ std::vector<std::string>
 ParticleSystem::_GetAttributeNamesOrOptions(bool isAnimationSheetEnabled,
                                             bool isBillboardBased)
 {
-  std::vector<std::string> attributeNamesOrOptions{VertexBuffer::PositionKindChars,
-                                             VertexBuffer::ColorKindChars,
-                                             "angle", "offset", "size"};
+  std::vector<std::string> attributeNamesOrOptions{
+    VertexBuffer::PositionKindChars, VertexBuffer::ColorKindChars, "angle",
+    "offset", "size"};
 
   if (isAnimationSheetEnabled) {
     attributeNamesOrOptions.emplace_back("cellIndex");
@@ -1420,12 +1420,12 @@ ParticleSystem* ParticleSystem::Parse(const Json::value& parsedParticleSystem,
 
   // Emitter
   if (parsedParticleSystem.contains("emitterId")) {
-    particleSystem->emitter.set<AbstractMeshPtr>(scene->getLastMeshByID(
-      Json::GetString(parsedParticleSystem, "emitterId")));
+    particleSystem->emitter = scene->getLastMeshByID(
+      Json::GetString(parsedParticleSystem, "emitterId"));
   }
   else {
-    particleSystem->emitter.set<Vector3>(Vector3::FromArray(
-      Json::ToArray<float>(parsedParticleSystem, "emitter")));
+    particleSystem->emitter = Vector3::FromArray(
+      Json::ToArray<float>(parsedParticleSystem, "emitter"));
   }
 
   // Animations
