@@ -45,10 +45,13 @@ public:
       const std::unordered_map<std::string, unsigned int>& indexParameters = {},
       bool blockCompilation = false)
   {
-    return std::shared_ptr<PostProcess>(
+    auto  postProcess = std::shared_ptr<PostProcess>(
       new PostProcess(name, fragmentUrl, parameters, samplers, options, camera,
                       samplingMode, engine, reusable, defines, textureType,
                       vertexUrl, indexParameters, blockCompilation));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   virtual ~PostProcess();
 

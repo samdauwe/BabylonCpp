@@ -25,8 +25,11 @@ public:
   template <typename... Ts>
   static ImageProcessingPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<ImageProcessingPostProcess>(
+    auto postProcess = std::shared_ptr<ImageProcessingPostProcess>(
       new ImageProcessingPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~ImageProcessingPostProcess();
 

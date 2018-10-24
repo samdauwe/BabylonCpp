@@ -21,8 +21,11 @@ public:
   template <typename... Ts>
   static BloomMergePostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<BloomMergePostProcess>(
+    auto postProcess = std::shared_ptr<BloomMergePostProcess>(
       new BloomMergePostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   virtual ~BloomMergePostProcess() override;
 

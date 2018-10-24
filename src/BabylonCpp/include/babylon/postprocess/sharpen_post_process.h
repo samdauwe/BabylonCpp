@@ -19,8 +19,11 @@ public:
   template <typename... Ts>
   static SharpenPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<SharpenPostProcess>(
+    auto postProcess = std::shared_ptr<SharpenPostProcess>(
       new SharpenPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   virtual ~SharpenPostProcess() override;
 

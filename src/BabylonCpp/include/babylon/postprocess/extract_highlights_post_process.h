@@ -21,8 +21,11 @@ public:
   template <typename... Ts>
   static ExtractHighlightsPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<ExtractHighlightsPostProcess>(
+    auto postProcess = std::shared_ptr<ExtractHighlightsPostProcess>(
       new ExtractHighlightsPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~ExtractHighlightsPostProcess();
 

@@ -19,8 +19,11 @@ public:
   template <typename... Ts>
   static PassPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<PassPostProcess>(
+    auto postProcess = std::shared_ptr<PassPostProcess>(
       new PassPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~PassPostProcess();
 

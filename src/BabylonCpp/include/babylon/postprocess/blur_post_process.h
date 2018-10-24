@@ -2,7 +2,6 @@
 #define BABYLON_POSTPROCESS_BLUR_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/variant.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/vector2.h>
 #include <babylon/postprocess/post_process.h>
@@ -23,8 +22,11 @@ public:
   template <typename... Ts>
   static BlurPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<BlurPostProcess>(
+    auto postProcess = std::shared_ptr<BlurPostProcess>(
       new BlurPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~BlurPostProcess() override;
 

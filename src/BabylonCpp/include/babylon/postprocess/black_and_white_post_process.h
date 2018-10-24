@@ -18,8 +18,11 @@ public:
   template <typename... Ts>
   static BlackAndWhitePostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<BlackAndWhitePostProcess>(
+    auto postProcess = std::shared_ptr<BlackAndWhitePostProcess>(
       new BlackAndWhitePostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~BlackAndWhitePostProcess();
 

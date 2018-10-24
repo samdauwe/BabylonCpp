@@ -18,8 +18,11 @@ public:
   template <typename... Ts>
   static GrainPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<GrainPostProcess>(
+    auto postProcess = std::shared_ptr<GrainPostProcess>(
       new GrainPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~GrainPostProcess();
 

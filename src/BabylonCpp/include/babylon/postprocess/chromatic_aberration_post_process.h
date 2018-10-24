@@ -21,8 +21,11 @@ public:
   template <typename... Ts>
   static ChromaticAberrationPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<ChromaticAberrationPostProcess>(
+    auto postProcess = std::shared_ptr<ChromaticAberrationPostProcess>(
       new ChromaticAberrationPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   virtual ~ChromaticAberrationPostProcess() override;
 

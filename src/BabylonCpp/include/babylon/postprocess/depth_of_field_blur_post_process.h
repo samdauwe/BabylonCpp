@@ -24,8 +24,11 @@ public:
   template <typename... Ts>
   static DepthOfFieldBlurPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<DepthOfFieldBlurPostProcess>(
+    auto postProcess = std::shared_ptr<DepthOfFieldBlurPostProcess>(
       new DepthOfFieldBlurPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~DepthOfFieldBlurPostProcess();
 

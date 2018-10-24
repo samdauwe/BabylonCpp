@@ -20,8 +20,11 @@ public:
   template <typename... Ts>
   static GlowBlurPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<GlowBlurPostProcess>(
+    auto postProcess = std::shared_ptr<GlowBlurPostProcess>(
       new GlowBlurPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~GlowBlurPostProcess();
 

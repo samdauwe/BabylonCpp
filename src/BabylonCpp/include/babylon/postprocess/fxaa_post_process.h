@@ -19,8 +19,11 @@ public:
   template <typename... Ts>
   static FxaaPostProcessPtr New(Ts&&... args)
   {
-    return std::shared_ptr<FxaaPostProcess>(
+    auto postProcess = std::shared_ptr<FxaaPostProcess>(
       new FxaaPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
   }
   ~FxaaPostProcess();
 
