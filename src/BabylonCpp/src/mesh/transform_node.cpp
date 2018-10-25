@@ -255,7 +255,7 @@ TransformNode& TransformNode::setPreTransformMatrix(Matrix& matrix)
   return setPivotMatrix(matrix, false);
 }
 
-TransformNode& TransformNode::setPivotMatrix(Matrix& matrix,
+TransformNode& TransformNode::setPivotMatrix(Matrix matrix,
                                              bool postMultiplyPivotMatrix)
 {
   _pivotMatrix              = matrix;
@@ -311,8 +311,8 @@ Vector3& TransformNode::getAbsolutePosition()
   return _absolutePosition;
 }
 
-TransformNode&
-TransformNode::setAbsolutePosition(const std::optional<Vector3>& absolutePosition)
+TransformNode& TransformNode::setAbsolutePosition(
+  const std::optional<Vector3>& absolutePosition)
 {
   if (!absolutePosition) {
     return *this;

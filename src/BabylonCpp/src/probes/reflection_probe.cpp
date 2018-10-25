@@ -115,9 +115,9 @@ Scene* ReflectionProbe::getScene() const
   return _scene;
 }
 
-RenderTargetTexture* ReflectionProbe::cubeTexture()
+RenderTargetTexturePtr& ReflectionProbe::cubeTexture()
 {
-  return _renderTargetTexture.get();
+  return _renderTargetTexture;
 }
 
 std::vector<AbstractMeshPtr>& ReflectionProbe::get_renderList()

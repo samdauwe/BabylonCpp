@@ -11,24 +11,36 @@ namespace BABYLON {
 
 class BlurPostProcess;
 class ImageProcessingConfiguration;
+class MirrorTexture;
 using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
+using MirrorTexturePtr   = std::shared_ptr<MirrorTexture>;
 
 class BABYLON_SHARED_EXPORT MirrorTexture : public RenderTargetTexture {
 
 public:
+  template <typename... Ts>
+  static MirrorTexturePtr New(Ts&&... args)
+  {
+    auto texture = std::shared_ptr<MirrorTexture>(
+      new MirrorTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
+
+    return texture;
+  }
+  ~MirrorTexture() override;
+
+  MirrorTexturePtr clone();
+  Json::object serialize() const;
+  void dispose() override;
+
+protected:
   MirrorTexture(const std::string& name, const ISize& size, Scene* scene,
                 bool generateMipMaps = false,
                 unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                 unsigned int samplingMode
                 = TextureConstants::BILINEAR_SAMPLINGMODE,
                 bool generateDepthBuffer = true);
-  ~MirrorTexture() override;
 
-  std::unique_ptr<MirrorTexture> clone();
-  Json::object serialize() const;
-  void dispose() override;
-
-protected:
   void set_blurRatio(float value);
   float get_blurRatio() const;
   void set_adaptiveBlurKernel(float value);

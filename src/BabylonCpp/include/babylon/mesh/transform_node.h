@@ -106,7 +106,7 @@ public:
    * cancel the transformation effect
    * @returns the current TransformNode
    */
-  TransformNode& setPivotMatrix(Matrix& matrix,
+  TransformNode& setPivotMatrix(Matrix matrix,
                                 bool postMultiplyPivotMatrix = true);
 
   /**

@@ -46,7 +46,7 @@ public:
   /**
    * @brief Gets the internal CubeTexture used to render to.
    */
-  RenderTargetTexture* cubeTexture();
+  RenderTargetTexturePtr& cubeTexture();
 
   /**
    * @brief Attach the probe to a specific mesh (Rendering will be done from

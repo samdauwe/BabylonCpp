@@ -205,7 +205,7 @@ void MirrorTexture::_preparePostProcesses()
   }
 }
 
-std::unique_ptr<MirrorTexture> MirrorTexture::clone()
+MirrorTexturePtr MirrorTexture::clone()
 {
   auto scene = getScene();
 
@@ -214,15 +214,15 @@ std::unique_ptr<MirrorTexture> MirrorTexture::clone()
   }
 
   auto textureSize = getSize();
-  auto newTexture  = std::make_unique<MirrorTexture>(
-    name,                                        //
-    Size(textureSize.width, textureSize.height), //
-    scene,                                       //
-    _renderTargetOptions.generateMipMaps,        //
-    _renderTargetOptions.type,                   //
-    _renderTargetOptions.samplingMode,           //
-    _renderTargetOptions.generateDepthBuffer     //
-  );
+  auto newTexture
+    = MirrorTexture::New(name,                                        //
+                         Size(textureSize.width, textureSize.height), //
+                         scene,                                       //
+                         _renderTargetOptions.generateMipMaps,        //
+                         _renderTargetOptions.type,                   //
+                         _renderTargetOptions.samplingMode,           //
+                         _renderTargetOptions.generateDepthBuffer     //
+    );
 
   // Base texture
   newTexture->hasAlpha = hasAlpha();
