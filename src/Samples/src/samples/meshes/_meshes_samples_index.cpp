@@ -146,7 +146,6 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
                       [](ICanvas* iCanvas) {                          //
                         return std::make_unique<LatheScene>(iCanvas); //
                       });                                             //
-
   // Lines Mesh Spiral Scene
   _samples["LinesMeshSpiralScene"] = std::make_tuple(
     true,                                                     //
