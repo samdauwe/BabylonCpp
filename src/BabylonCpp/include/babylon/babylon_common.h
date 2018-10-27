@@ -57,7 +57,8 @@ using Float64Array = std::vector<double>;
 // Indices array alias
 using IndicesArray = std::vector<uint32_t>;
 
-// ArrayBuffer
+// An ArrayBuffer object is used to represent a generic, fixed-length raw binary
+// data buffer.
 using ArrayBuffer = std::vector<uint8_t>;
 
 // -- Read-Only Properties -- //

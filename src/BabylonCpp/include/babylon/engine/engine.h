@@ -26,6 +26,7 @@ class _AlphaState;
 class _DepthCullingState;
 class _StencilState;
 struct _TimeToken;
+struct ArrayBufferView;
 class AudioEngine;
 class BaseTexture;
 class Camera;

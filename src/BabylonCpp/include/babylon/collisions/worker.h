@@ -5,10 +5,10 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/collisions/collision_detector_transferable.h>
-#include <babylon/core/structs.h>
 
 namespace BABYLON {
 
+struct ArrayBufferView;
 struct BabylonMessage;
 struct WorkerReply;
 

@@ -60,6 +60,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
       Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
       TextureConstants::BILINEAR_SAMPLINGMODE);
   }
+#if 0
   else {
     texture = _engine->createRawTexture3D(
       Uint8Array(), 1, 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
@@ -68,7 +69,6 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
 
   _texture = texture;
 
-#if 0
   const auto callback = [&](Variant<std::string, ArrayBuffer>& iText) {
     if (!iText.is<std::string>()) {
       return;

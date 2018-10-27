@@ -11,6 +11,7 @@
 
 namespace BABYLON {
 
+struct ArrayBufferView;
 class BaseTexture;
 class InternalTexture;
 class SphericalPolynomial;

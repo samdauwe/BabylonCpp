@@ -5,6 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/babylon_version.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
@@ -1316,7 +1317,7 @@ void Engine::updateDynamicVertexBuffer(const Engine::GLBufferPtr& vertexBuffer,
     _gl->bufferSubData(GL::ARRAY_BUFFER, byteOffset, data);
   }
   else {
-    auto byteArray = stl_util::toUint8Array(
+    auto byteArray = stl_util::to_array<uint8_t>(
       data, static_cast<size_t>(byteOffset), static_cast<size_t>(byteLength));
     _gl->bufferSubData(GL::ARRAY_BUFFER, 0, byteArray);
   }

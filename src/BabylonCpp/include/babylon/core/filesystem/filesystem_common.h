@@ -4,10 +4,16 @@
 #include <algorithm>
 #include <fstream>
 #include <ios>
+#include <iterator>
 #include <string>
 #include <vector>
 
 namespace BABYLON {
+
+// An ArrayBuffer object is used to represent a generic, fixed-length raw binary
+// data buffer.
+using ArrayBuffer = std::vector<uint8_t>;
+
 namespace Filesystem {
 
 /**
@@ -121,6 +127,33 @@ inline std::vector<std::string> readFileLines(const char* filename)
     }
   }
   return lines;
+}
+
+/**
+ * @brief Reads the file with the given filename into byte array.
+ * @param filename The path of the file to read from.
+ * @return The contents of the file or an empty vector in case the content could
+ * not be read.
+ */
+inline ArrayBuffer readBinaryFile(const char* filename)
+{
+  ArrayBuffer contents;
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  if (in) {
+    // Stop eating new lines in binary mode
+    in.unsetf(std::ios::skipws);
+    // Get the file size
+    std::streampos fileSize;
+    in.seekg(0, std::ios::end);
+    fileSize = in.tellg();
+    in.seekg(0, std::ios::beg);
+    // Reserve capacity
+    contents.reserve(static_cast<size_t>(fileSize));
+    // Read the data:
+    contents.insert(contents.begin(), std::istream_iterator<uint8_t>(in),
+                    std::istream_iterator<uint8_t>());
+  }
+  return contents;
 }
 
 /**

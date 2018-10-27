@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/core/json.h>
 #include <babylon/core/random.h>
 #include <babylon/engine/engine.h>

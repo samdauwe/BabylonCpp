@@ -7,6 +7,7 @@
 #include <babylon/collisions/serialized_mesh.h>
 #include <babylon/collisions/serialized_sub_mesh.h>
 #include <babylon/collisions/worker_reply.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
@@ -101,7 +102,7 @@ void CollisionCoordinatorWorker::getNewPosition(
   Vector3& position, Vector3& displacement, Collider* collider,
   unsigned int maximumRetry, AbstractMesh* excludedMesh,
   const std::function<void(unsigned int collisionIndex, Vector3& newPosition,
-                             AbstractMesh* AbstractMesh)>& onNewPosition,
+                           AbstractMesh* AbstractMesh)>& onNewPosition,
   unsigned int collisionIndex)
 {
   if (!_init) {

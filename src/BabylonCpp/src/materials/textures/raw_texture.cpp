@@ -1,5 +1,6 @@
 #include <babylon/materials/textures/raw_texture.h>
 
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/textures/internal_texture.h>

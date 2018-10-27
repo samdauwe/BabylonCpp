@@ -128,19 +128,19 @@ T& from_bytes(const std::array<byte, sizeof(T)>& bytes, T& object)
   return object;
 }
 
-template <typename T>
-std::vector<uint8_t> toUint8Array(const std::vector<T> buffer,
-                                  size_t byteOffset, size_t byteLength)
+template <typename C, typename T>
+std::vector<C> to_array(const std::vector<T> buffer, size_t byteOffset,
+                        size_t byteLength)
 {
-  std::vector<uint8_t> bytes(byteLength);
+  std::vector<C> bytes(byteLength);
   std::memcpy(bytes.data(), buffer.data() + byteOffset, sizeof(bytes));
   return bytes;
 }
 
-template <typename T>
-std::vector<uint8_t> toUint8Array(const std::vector<T> buffer)
+template <typename C, typename T>
+std::vector<C> to_array(const std::vector<T> buffer)
 {
-  return toUint8Array(buffer, 0, buffer.size() * sizeof(T));
+  return to_array<C>(buffer, 0, (buffer.size() * sizeof(T)) / sizeof(C));
 }
 
 // -- String helper functions --
