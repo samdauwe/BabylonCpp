@@ -64,7 +64,7 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
     });                                                          //
   // Realtime Refraction Scene
   _samples["RealtimeRefractionScene"] = std::make_tuple(
-    false,                                                       //
+    true,                                                        //
     [](ICanvas* iCanvas) {                                       //
       return std::make_unique<RealtimeRefractionScene>(iCanvas); //
     });                                                          //
