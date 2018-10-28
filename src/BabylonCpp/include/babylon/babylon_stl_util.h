@@ -133,7 +133,8 @@ std::vector<C> to_array(const std::vector<T> buffer, size_t byteOffset,
                         size_t byteLength)
 {
   std::vector<C> bytes(byteLength);
-  std::memcpy(bytes.data(), buffer.data() + byteOffset, sizeof(bytes));
+  std::memcpy(bytes.data(), buffer.data() + byteOffset,
+              bytes.size() * sizeof(C));
   return bytes;
 }
 

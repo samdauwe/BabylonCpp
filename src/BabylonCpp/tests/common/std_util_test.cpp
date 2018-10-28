@@ -313,7 +313,7 @@ TEST(TestStdUtil, max)
   EXPECT_EQ(stl_util::max(0.5, -10.1, -200), 0.5);
   EXPECT_EQ(stl_util::max(std::string{"var1"}, std::string{"var2"}), "var2");
   EXPECT_EQ(
-    stl_util::max(std::string{"var1"}, static_cast<char const* const>("var2")),
+    stl_util::max(std::string{"var1"}, static_cast<char const*>("var2")),
     "var2");
   EXPECT_EQ(stl_util::max("var1", std::string{"var2"}), "var2");
 }
