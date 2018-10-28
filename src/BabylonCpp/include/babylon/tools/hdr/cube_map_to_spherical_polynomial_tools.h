@@ -9,6 +9,7 @@ namespace BABYLON {
 
 class BaseTexture;
 class SphericalPolynomial;
+using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
 
 /**
  * @brief Helper class dealing with the extraction of spherical polynomial
@@ -28,7 +29,7 @@ public:
    * @param texture The texture to extract the information from.
    * @return The Spherical Polynomial data.
    */
-  static std::unique_ptr<SphericalPolynomial>
+  static SphericalPolynomialPtr
   ConvertCubeMapTextureToSphericalPolynomial(BaseTexture* texture);
 
   /**
@@ -39,7 +40,7 @@ public:
    * @param cubeInfo The Cube map to extract the information from.
    * @return The Spherical Polynomial data.
    */
-  static std::unique_ptr<SphericalPolynomial>
+  static SphericalPolynomialPtr
   ConvertCubeMapToSphericalPolynomial(const CubeMapInfo& cubeInfo);
 
 }; // end of class CubeMapToSphericalPolynomialTools

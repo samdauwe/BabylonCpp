@@ -1,11 +1,14 @@
 #ifndef BABYLON_TOOLS_DDS_H
 #define BABYLON_TOOLS_DDS_H
 
+#include <variant>
+
 #include <babylon/babylon_api.h>
 #include <babylon/math/spherical_polynomial.h>
 
 namespace BABYLON {
 
+class DDSInfo;
 class Engine;
 class InternalTexture;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
@@ -123,21 +126,6 @@ enum PixelFormat {
   RGBA_S3TC_DXT5_Format = 2004
 }; // end of enum PixelFormat
 
-struct DDSInfo {
-  int width;
-  int height;
-  int mipmapCount;
-  bool isFourCC;
-  bool isRGB;
-  bool isLuminance;
-  bool isCube;
-  bool isCompressed;
-  int dxgiFormat;
-  unsigned int textureType;
-  /** Sphericle polynomial created for the dds texture */
-  std::unique_ptr<SphericalPolynomial> sphericalPolynomial = nullptr;
-}; // end of struct DDSInfo
-
 class BABYLON_SHARED_EXPORT DDSTools {
 
 private:
@@ -181,15 +169,20 @@ private:
                                              const Uint8Array& arrayBuffer);
 
 public:
-  static DDSInfo GetDDSInfo(const Uint8Array& arrayBuffer);
+  static DDSInfo
+  GetDDSInfo(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
 
   /**
    * @brief Uploads DDS Levels to a Babylon Texture.
    */
-  static void UploadDDSLevels(Engine* engine, const InternalTexturePtr& texture,
-                              const Uint8Array& arrayBuffer, DDSInfo& info,
-                              bool loadMipmaps, unsigned int faces,
-                              int lodIndex = -1, int currentFace = -1);
+  static void
+  UploadDDSLevels(Engine* engine, const InternalTexturePtr& texture,
+                  const std::variant<std::string, ArrayBuffer>& arrayBuffer,
+                  DDSInfo& info, bool loadMipmaps, unsigned int faces,
+                  int lodIndex = -1, int currentFace = -1);
+
+  static ArrayBuffer
+  ToArrayBuffer(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
 
 public:
   static bool StoreLODInAlphaChannel;

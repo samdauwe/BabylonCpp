@@ -42,7 +42,7 @@ CubeTexture::CubeTexture(
   const std::string& rootUrl, Scene* scene,
   const std::vector<std::string>& extensions, bool noMipmap,
   const std::vector<std::string>& iFiles,
-  const std::function<void(InternalTexture*, EventState&)>& onLoad,
+  const std::function<void(const CubeTextureData& data)>& onLoad,
   const std::function<void(const std::string& message,
                            const std::string& exception)>& onError,
   unsigned int format, bool prefiltered, const std::string& forcedExtension,
@@ -131,13 +131,13 @@ CubeTexture::CubeTexture(
   }
   else if (onLoad) {
     if (_texture->isReady) {
-      Tools::SetImmediate([&onLoad]() {
-        EventState es{-1};
-        onLoad(nullptr, es);
+      Tools::SetImmediate([]() {
+        // EventState es{-1};
+        // onLoad(nullptr, es);
       });
     }
     else {
-      _texture->onLoadedObservable.add(onLoad);
+      // _texture->onLoadedObservable.add(onLoad);
     }
   }
 }

@@ -167,8 +167,8 @@ void InternalTexture::_rebuild()
     case InternalTexture::DATASOURCE_CUBE: {
       proxy = _engine->createCubeTexture(
         url, nullptr, _files, !generateMipMaps,
-        [this](InternalTexture*, EventState&) { isReady = true; }, nullptr,
-        format, _extension);
+        [this](const CubeTextureData&) { isReady = true; }, nullptr, format,
+        _extension);
       proxy->_swapAndDie(this);
     }
       return;
@@ -196,7 +196,7 @@ void InternalTexture::_rebuild()
     case InternalTexture::DATASOURCE_CUBEPREFILTERED: {
       proxy = _engine->createPrefilteredCubeTexture(
         url, nullptr, _lodGenerationScale, _lodGenerationOffset,
-        [this, &proxy](InternalTexture*, EventState&) {
+        [this, &proxy](const CubeTextureData&) {
           if (proxy) {
             proxy->_swapAndDie(this);
           }

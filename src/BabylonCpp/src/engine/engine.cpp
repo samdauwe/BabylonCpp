@@ -28,11 +28,13 @@
 #include <babylon/materials/textures/imulti_render_target_options.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/materials/textures/loaders/dds_texture_loader.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
+#include <babylon/math/scalar.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/particles/particle_system.h>
@@ -46,7 +48,10 @@
 
 namespace BABYLON {
 
-std::vector<IInternalTextureLoaderPtr> Engine::_TextureLoaders = {};
+// Register the loaders
+std::vector<IInternalTextureLoaderPtr> Engine::_TextureLoaders = {
+  // DDS Texture Loader
+  std::make_shared<DDSTextureLoader>()};
 
 std::string Engine::Version()
 {
@@ -378,6 +383,8 @@ void Engine::_initGLContext()
     = stl_util::contains(extensions, "OES_texture_half_float");
   _caps.textureHalfFloatLinearFiltering
     = stl_util::contains(extensions, "OES_texture_half_float_linear");
+
+  _caps.textureHalfFloat = (_webGLVersion > 1);
   if (_webGLVersion > 1) {
     _gl->HALF_FLOAT_OES = 0x140B;
   }
@@ -3829,11 +3836,33 @@ void Engine::_uploadCompressedDataToTextureDirectly(
 {
 }
 
-void Engine::_uploadDataToTextureDirectly(const InternalTexturePtr& /*texture*/,
-                                          const Uint8Array& /*imageData*/,
-                                          unsigned int /*faceIndex*/,
-                                          int /*lod*/)
+void Engine::_uploadDataToTextureDirectly(const InternalTexturePtr& texture,
+                                          const ArrayBufferView& imageData,
+                                          unsigned int faceIndex, int lod)
 {
+  auto textureType    = _getWebGLTextureType(texture->type);
+  auto format         = _getInternalFormat(texture->format);
+  auto internalFormat = static_cast<int>(
+    _getRGBABufferInternalSizedFormat(texture->type, format));
+
+  _unpackFlipY(texture->invertY);
+
+  GL::GLenum target = GL::TEXTURE_2D;
+  if (texture->isCube) {
+    target = GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex;
+  }
+
+  const auto lodMaxWidth
+    = static_cast<int>(std::round(Scalar::Log2(texture->width)));
+  const auto lodMaxHeight
+    = static_cast<int>(std::round(Scalar::Log2(texture->height)));
+  const auto width
+    = static_cast<int>(std::pow(2, std::max(lodMaxWidth - lod, 0)));
+  const auto height
+    = static_cast<int>(std::pow(2, std::max(lodMaxHeight - lod, 0)));
+
+  _gl->texImage2D(target, lod, internalFormat, width, height, 0, format,
+                  textureType, imageData.uint8Array);
 }
 
 void Engine::_uploadArrayBufferViewToTexture(const InternalTexturePtr& texture,
@@ -3944,7 +3973,7 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
 InternalTexturePtr Engine::createPrefilteredCubeTexture(
   const std::string& /*rootUrl*/, Scene* /*scene*/, float /*scale*/,
   float /*offset*/,
-  const std::function<void(InternalTexture*, EventState&)>& /*onLoad*/,
+  const std::function<void(const CubeTextureData& data)>& /*onLoad*/,
   const std::function<void(const std::string& message,
                            const std::string& exception)>& /*onError*/,
   unsigned int /*format*/, const std::string& /*forcedExtension*/,
@@ -3955,8 +3984,7 @@ InternalTexturePtr Engine::createPrefilteredCubeTexture(
 
 InternalTexturePtr Engine::createCubeTexture(
   std::string rootUrl, Scene* scene, const std::vector<std::string>& files,
-  bool noMipmap,
-  const std::function<void(InternalTexture*, EventState&)>& onLoad,
+  bool noMipmap, const std::function<void(const CubeTextureData& data)>& onLoad,
   const std::function<void(const std::string& message,
                            const std::string& exception)>& onError,
   unsigned int format, const std::string& forcedExtension,
@@ -4005,11 +4033,10 @@ InternalTexturePtr Engine::createCubeTexture(
       = [&](const std::variant<std::string, ArrayBuffer>& data,
             const std::string & /*responseURL*/) -> void {
       _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
-      loader->loadCubeData(std::get<std::string>(data), texture,
-                           createPolynomials, onLoad, onError);
+      loader->loadCubeData(data, texture, createPolynomials, onLoad, onError);
     };
     if (!files.empty() && files.size() == 6) {
-      if (loader->supportCascades) {
+      if (loader->supportCascades()) {
         _cascadeLoadFiles(scene, onloaddata, files, onError);
       }
       else if (onError) {
@@ -5749,15 +5776,15 @@ void Engine::bindTransformFeedbackBuffer(GL::IGLBuffer* value)
 }
 
 IFileRequest Engine::_loadFile(
-  const std::string& /*url*/,
+  const std::string& url,
   const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
-                           const std::string& responseURL)>& /*onSuccess*/,
-  const std::function<void(const std::string& data)>& /*onProgress*/,
-  bool /*useArrayBuffer*/,
+                           const std::string& responseURL)>& onSuccess,
+  const std::function<void(const ProgressEvent& event)>& onProgress,
+  bool useArrayBuffer,
   const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/
-)
+                           const std::string& exception)>& onError)
 {
+  Tools::LoadFile(url, onSuccess, onProgress, useArrayBuffer, onError);
   return IFileRequest();
 }
 

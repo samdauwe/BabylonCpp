@@ -32,6 +32,7 @@ class BaseTexture;
 class Camera;
 class Color3;
 class Color4;
+struct CubeTextureData;
 struct DepthTextureCreationOptions;
 struct DummyInternalTextureTracker;
 class Effect;
@@ -48,6 +49,7 @@ struct IRenderTargetOptions;
 class Material;
 class PassPostProcess;
 class PostProcess;
+class ProgressEvent;
 using RenderTargetCreationOptions = IRenderTargetOptions;
 class RenderTargetTexture;
 class Scene;
@@ -1600,7 +1602,7 @@ public:
    * @brief Hidden
    */
   void _uploadDataToTextureDirectly(const InternalTexturePtr& texture,
-                                    const Uint8Array& imageData,
+                                    const ArrayBufferView& imageData,
                                     unsigned int faceIndex = 0, int lod = 0);
 
   /**
@@ -1646,7 +1648,7 @@ public:
    */
   InternalTexturePtr createPrefilteredCubeTexture(
     const std::string& rootUrl, Scene* scene, float lodScale, float lodOffset,
-    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
+    const std::function<void(const CubeTextureData& data)>& onLoad = nullptr,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
     = nullptr,
@@ -1682,7 +1684,7 @@ public:
   InternalTexturePtr createCubeTexture(
     std::string rootUrl, Scene* scene, const std::vector<std::string>& files,
     bool noMipmap,
-    const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
+    const std::function<void(const CubeTextureData& data)>& onLoad = nullptr,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
     = nullptr,
@@ -2129,8 +2131,8 @@ public:
     const std::string& url,
     const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                              const std::string& responseURL)>& onSuccess,
-    const std::function<void(const std::string& data)>& onProgress = nullptr,
-    bool useArrayBuffer                                            = false,
+    const std::function<void(const ProgressEvent& event)>& onProgress = nullptr,
+    bool useArrayBuffer                                               = false,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
     = nullptr);

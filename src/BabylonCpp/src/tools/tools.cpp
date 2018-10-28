@@ -373,11 +373,12 @@ void Tools::LoadImageFromUrl(
 
 void Tools::LoadFile(
   std::string url,
-  const std::function<void(const std::string& data,
+  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                            const std::string& responseURL)>& onSuccess,
   const std::function<void(const ProgressEvent& event)>& onProgress,
   bool useArrayBuffer,
-  const std::function<void(const std::string& exception)>& onError)
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError)
 {
   url = Tools::CleanUrl(url);
 
@@ -394,13 +395,13 @@ void Tools::LoadFile(
 
   // Report error
   if (onError) {
-    onError("Unable to load file from location " + url);
+    onError("Unable to load file from location " + url, "");
   }
 }
 
 void Tools::ReadFile(
   std::string fileToLoad,
-  const std::function<void(const std::string& data,
+  const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                            const std::string& responseURL)>& callback,
   const std::function<void(const ProgressEvent& event)>& onProgress,
   bool useArrayBuffer)
@@ -428,7 +429,14 @@ void Tools::ReadFile(
     return;
   }
   else {
-    // Not implemented yet
+    // Read file contents
+    if (callback) {
+      callback(Filesystem::readBinaryFile(fileToLoad.c_str()), "");
+    }
+    if (onProgress) {
+      onProgress(ProgressEvent{"ReadFileEvent", true, 100, 100});
+    }
+    return;
   }
 }
 

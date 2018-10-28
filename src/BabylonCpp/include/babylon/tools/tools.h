@@ -2,6 +2,7 @@
 #define BABYLON_TOOLS_TOOLS_H
 
 #include <functional>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
@@ -99,18 +100,20 @@ struct BABYLON_SHARED_EXPORT Tools {
     bool flipVertically = true);
   static void LoadFile(
     std::string url,
-    const std::function<void(const std::string& data,
+    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                              const std::string& responseURL)>& callback,
     const std::function<void(const ProgressEvent& event)>& progressCallBack
     = nullptr,
-    bool useArrayBuffer                                              = false,
-    const std::function<void(const std::string& exception)>& onError = nullptr);
-  static void
-  ReadFile(std::string fileToLoad,
-           const std::function<void(const std::string& data,
-                                    const std::string& responseURL)>& callback,
-           const std::function<void(const ProgressEvent& event)>& onProgress,
-           bool useArrayBuffer);
+    bool useArrayBuffer = false,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr);
+  static void ReadFile(
+    std::string fileToLoad,
+    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
+                             const std::string& responseURL)>& callback,
+    const std::function<void(const ProgressEvent& event)>& onProgress,
+    bool useArrayBuffer);
   static void CheckExtends(Vector3& v, Vector3& min, Vector3& max);
   static std::string RandomId();
   static void SetImmediate(const std::function<void()>& immediate);

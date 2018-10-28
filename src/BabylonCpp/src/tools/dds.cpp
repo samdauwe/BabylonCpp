@@ -1,11 +1,13 @@
 #include <babylon/tools/dds.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/math/scalar.h>
+#include <babylon/tools/dds_info.h>
 #include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 
 namespace BABYLON {
@@ -14,14 +16,15 @@ bool DDSTools::StoreLODInAlphaChannel = false;
 Float32Array DDSTools::_FloatView;
 Int32Array DDSTools::_Int32View;
 
-DDSInfo DDSTools::GetDDSInfo(const Uint8Array& arrayBuffer)
+DDSInfo
+DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBuffer>& iArrayBuffer)
 {
-  Int32Array header(
-    reinterpret_cast<const int*>(arrayBuffer.data()),
-    reinterpret_cast<const int*>(arrayBuffer.data() + DDS::headerLengthInt));
-  Int32Array extendedHeader(reinterpret_cast<const int*>(arrayBuffer.data()),
-                            reinterpret_cast<const int*>(
-                              arrayBuffer.data() + DDS::headerLengthInt + 4));
+  const auto arrayBuffer = ToArrayBuffer(iArrayBuffer);
+
+  Int32Array header
+    = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
+  Int32Array extendedHeader
+    = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt + 4);
 
   int mipmapCount = 1;
   if (header[off_flags] & DDSD_MIPMAPCOUNT) {
@@ -47,27 +50,30 @@ DDSInfo DDSTools::GetDDSInfo(const Uint8Array& arrayBuffer)
       }
   }
 
-  return {// width
-          header[off_width],
-          // height
-          header[off_height],
-          // mipmapCount
-          mipmapCount,
-          // isFourCC
-          (header[off_pfFlags] & DDPF_FOURCC) == DDPF_FOURCC,
-          // isRGB
-          (header[off_pfFlags] & DDPF_RGB) == DDPF_RGB,
-          // isLuminance
-          (header[off_pfFlags] & DDPF_LUMINANCE) == DDPF_LUMINANCE,
-          // isCube
-          (header[off_caps2] & DDSCAPS2_CUBEMAP) == DDSCAPS2_CUBEMAP,
-          // isCompressed
-          (fourCC == DDS::FOURCC_DXT1 || fourCC == DDS::FOURCC_DXT3
-           || fourCC == DDS::FOURCC_DXT5),
-          // dxgiFormat
-          dxgiFormat,
-          // textureType
-          textureType};
+  return DDSInfo(
+    // width
+    header[off_width],
+    // height
+    header[off_height],
+    // mipmapCount
+    mipmapCount,
+    // isFourCC
+    (header[off_pfFlags] & DDPF_FOURCC) == DDPF_FOURCC,
+    // isRGB
+    (header[off_pfFlags] & DDPF_RGB) == DDPF_RGB,
+    // isLuminance
+    (header[off_pfFlags] & DDPF_LUMINANCE) == DDPF_LUMINANCE,
+    // isCube
+    (header[off_caps2] & DDSCAPS2_CUBEMAP) == DDSCAPS2_CUBEMAP,
+    // isCompressed
+    (fourCC == DDS::FOURCC_DXT1 || fourCC == DDS::FOURCC_DXT3
+     || fourCC == DDS::FOURCC_DXT5),
+    // dxgiFormat
+    dxgiFormat,
+    // textureType
+    textureType,
+    // sphericalPolynomial
+    nullptr);
 }
 
 float DDSTools::_ToHalfFloat(float value)
@@ -182,7 +188,7 @@ DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
     return destArray;
   }
 
-  return Uint16Array();
+  return stl_util::to_array<uint16_t>(arrayBuffer, dataOffset, dataLength);
 }
 
 Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
@@ -208,7 +214,7 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
 
     return destArray;
   }
-  return Float32Array();
+  return stl_util::to_array<float>(arrayBuffer, dataOffset, dataLength);
 }
 
 Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
@@ -344,12 +350,13 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
   return byteArray;
 }
 
-void DDSTools::UploadDDSLevels(Engine* engine,
-                               const InternalTexturePtr& texture,
-                               const Uint8Array& arrayBuffer, DDSInfo& info,
-                               bool loadMipmaps, unsigned int faces,
-                               int lodIndex, int currentFace)
+void DDSTools::UploadDDSLevels(
+  Engine* engine, const InternalTexturePtr& texture,
+  const std::variant<std::string, ArrayBuffer>& iArrayBuffer, DDSInfo& info,
+  bool loadMipmaps, unsigned int faces, int lodIndex, int currentFace)
 {
+  const auto arrayBuffer = ToArrayBuffer(iArrayBuffer);
+
   bool hasSphericalPolynomialFaces = false;
   std::vector<ArrayBufferView> sphericalPolynomialFaces;
   if (info.sphericalPolynomial) {
@@ -357,9 +364,8 @@ void DDSTools::UploadDDSLevels(Engine* engine,
   }
   auto ext = engine->getCaps().s3tc;
 
-  Int32Array header(
-    reinterpret_cast<const int*>(arrayBuffer.data()),
-    reinterpret_cast<const int*>(arrayBuffer.data() + DDS::headerLengthInt));
+  Int32Array header
+    = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
   int fourCC = 0;
   Uint8Array byteArray;
   int blockBytes                        = 1;
@@ -463,7 +469,69 @@ void DDSTools::UploadDDSLevels(Engine* engine,
         const int i = (lodIndex == -1) ? mip : 0;
 
         if (!info.isCompressed && info.isFourCC) {
-          // Not implemeted yet
+          texture->format = EngineConstants::TEXTUREFORMAT_RGBA;
+          dataLength      = static_cast<size_t>(width * height * 4);
+          ArrayBufferView floatArray;
+
+          if (engine->_badOS || engine->_badDesktopOS
+              || (!engine->getCaps().textureHalfFloat
+                  && !engine->getCaps()
+                        .textureFloat)) { // Required because iOS has many
+                                          // issues with float and half float
+                                          // generation
+            if (bpp == 128) {
+              floatArray = DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
+                width, height, dataOffset, dataLength, arrayBuffer, i);
+              if (i == 0) {
+                sphericalPolynomialFaces.emplace_back(
+                  DDSTools::_GetFloatRGBAArrayBuffer(
+                    width, height, dataOffset, dataLength, arrayBuffer, i));
+              }
+            }
+            else if (bpp == 64) {
+              floatArray = DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
+                width, height, dataOffset, dataLength, arrayBuffer, i);
+              if (i == 0) {
+                sphericalPolynomialFaces.emplace_back(
+                  DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
+                    width, height, dataOffset, dataLength, arrayBuffer, i));
+              }
+            }
+
+            texture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+          }
+          else {
+            if (bpp == 128) {
+              texture->type = EngineConstants::TEXTURETYPE_FLOAT;
+              floatArray    = DDSTools::_GetFloatRGBAArrayBuffer(
+                width, height, dataOffset, dataLength, arrayBuffer, i);
+              if (i == 0) {
+                sphericalPolynomialFaces.emplace_back(floatArray);
+              }
+            }
+            else if (bpp == 64 && !engine->getCaps().textureHalfFloat) {
+              texture->type = EngineConstants::TEXTURETYPE_FLOAT;
+              floatArray    = DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
+                width, height, dataOffset, dataLength, arrayBuffer, i);
+              if (i == 0) {
+                sphericalPolynomialFaces.emplace_back(floatArray);
+              }
+            }
+            else { // 64
+              texture->type = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+              floatArray    = DDSTools::_GetHalfFloatRGBAArrayBuffer(
+                width, height, dataOffset, dataLength, arrayBuffer, i);
+              if (i == 0) {
+                sphericalPolynomialFaces.emplace_back(
+                  DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
+                    width, height, dataOffset, dataLength, arrayBuffer, i));
+              }
+            }
+          }
+
+          if (floatArray) {
+            engine->_uploadDataToTextureDirectly(texture, floatArray, face, i);
+          }
         }
         else if (info.isRGB) {
           texture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
@@ -547,6 +615,20 @@ void DDSTools::UploadDDSLevels(Engine* engine,
   else {
     info.sphericalPolynomial = nullptr;
   }
+}
+
+ArrayBuffer DDSTools::ToArrayBuffer(
+  const std::variant<std::string, ArrayBuffer>& arrayBuffer)
+{
+  ArrayBuffer byteArray;
+  if (std::holds_alternative<std::string>(arrayBuffer)) {
+    auto charArray = String::toCharArray(std::get<std::string>(arrayBuffer));
+    byteArray      = stl_util::to_array<uint8_t>(charArray);
+  }
+  else {
+    byteArray = std::get<ArrayBuffer>(arrayBuffer);
+  }
+  return byteArray;
 }
 
 } // end of namespace BABYLON

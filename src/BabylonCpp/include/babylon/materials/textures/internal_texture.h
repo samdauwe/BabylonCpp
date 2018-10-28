@@ -15,7 +15,8 @@ class BaseTexture;
 class Engine;
 class ICanvasRenderingContext2D;
 class SphericalPolynomial;
-using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using SphericalPolynomialPtr = std::shared_ptr<SphericalPolynomial>;
 
 namespace GL {
 class IGLFramebuffer;
@@ -236,7 +237,7 @@ public:
   bool _generateStencilBuffer;
   bool _generateDepthBuffer;
   int _comparisonFunction;
-  std::unique_ptr<SphericalPolynomial> _sphericalPolynomial;
+  SphericalPolynomialPtr _sphericalPolynomial;
   float _lodGenerationScale;
   float _lodGenerationOffset;
   // The following three fields helps sharing generated fixed LODs for texture

@@ -116,6 +116,7 @@ file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
                                     ${INCLUDE_PATH}/materials/background/*.h
                                     ${INCLUDE_PATH}/materials/pbr/*.h
                                     ${INCLUDE_PATH}/materials/textures/*.h
+                                    ${INCLUDE_PATH}/materials/textures/loaders/*.h
                                     ${INCLUDE_PATH}/materials/textures/procedurals/*.h)
 file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h)
 file(GLOB MESH_HDR_FILES            ${INCLUDE_PATH}/mesh/*.h
@@ -239,6 +240,7 @@ file(GLOB MATERIALS_SRC_FILES       ${SOURCE_PATH}/materials/*.cpp
                                     ${SOURCE_PATH}/materials/background/*.cpp
                                     ${SOURCE_PATH}/materials/pbr/*.cpp
                                     ${SOURCE_PATH}/materials/textures/*.cpp
+                                    ${SOURCE_PATH}/materials/textures/loaders/*.cpp
                                     ${SOURCE_PATH}/materials/textures/procedurals/*.cpp)
 file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp)
 file(GLOB MESH_SRC_FILES            ${SOURCE_PATH}/mesh/*.cpp

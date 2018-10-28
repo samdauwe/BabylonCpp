@@ -1,39 +1,23 @@
-#ifndef BABYLON_MATERIALS_TEXTURES_IINTERNAL_TEXTURE_LOADER_H
-#define BABYLON_MATERIALS_TEXTURES_IINTERNAL_TEXTURE_LOADER_H
+#ifndef BABYLON_MATERIALS_TEXTURES_LOADERS_DDS_TEXTURE_LOADER_H
+#define BABYLON_MATERIALS_TEXTURES_LOADERS_DDS_TEXTURE_LOADER_H
 
-#include <functional>
-#include <memory>
-#include <variant>
-
-#include <babylon/babylon_api.h>
-#include <babylon/babylon_common.h>
-#include <babylon/tools/dds_info.h>
+#include <babylon/materials/textures/iinternal_texture_loader.h>
 
 namespace BABYLON {
 
-class EventState;
-class InternalTexture;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
-
-struct CubeTextureData {
-  bool isDDS;
-  int width;
-  DDSInfo info;
-  std::vector<std::variant<std::string, ArrayBuffer>> data;
-  InternalTexturePtr texture;
-}; // End of struct CubeTextureData
-
 /**
- * @brief This represents the required contract to create a new type of texture
- * loader.
+ * @brief Implementation of the DDS Texture Loader.
  */
-struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
+struct BABYLON_SHARED_EXPORT DDSTextureLoader : public IInternalTextureLoader {
+
+  DDSTextureLoader();
+  virtual ~DDSTextureLoader();
 
   /**
    * @brief Defines wether the loader supports cascade loading the different
    * faces.
    */
-  virtual bool supportCascades() const = 0;
+  bool supportCascades() const override;
 
   /**
    * @brief This returns if the loader support the current file information.
@@ -45,10 +29,10 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param isBuffer defines whether the texture data are stored as a buffer
    * @returns true if the loader can load the specified file
    */
-  virtual bool
-  canLoad(const std::string& extension, const std::string& textureFormatInUse,
-          const InternalTexturePtr& fallback, bool isBase64, bool isBuffer)
-    = 0;
+  bool canLoad(const std::string& extension,
+               const std::string& textureFormatInUse,
+               const InternalTexturePtr& fallback, bool isBase64,
+               bool isBuffer) override;
 
   /**
    * @brief Transform the url before loading if required.
@@ -57,9 +41,8 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * the engine
    * @returns the transformed texture
    */
-  virtual std::string transformUrl(const std::string& rootUrl,
-                                   const std::string& textureFormatInUse)
-    = 0;
+  std::string transformUrl(const std::string& rootUrl,
+                           const std::string& textureFormatInUse) override;
 
   /**
    * @brief Gets the fallback url in case the load fail. This can return null to
@@ -69,10 +52,25 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * the engine
    * @returns the fallback texture
    */
-  virtual std::string
+  std::string
   getFallbackTextureUrl(const std::string& rootUrl,
-                        const std::string& textureFormatInUse)
-    = 0;
+                        const std::string& textureFormatInUse) override;
+
+  /**
+   * @brief Uploads the cube texture data to the WebGl Texture. It has alreday
+   * been bound.
+   * @param data contains the texture data
+   * @param texture defines the BabylonJS internal texture
+   * @param createPolynomials will be true if polynomials have been requested
+   * @param onLoad defines the callback to trigger once the texture is ready
+   * @param onError defines the callback to trigger in case of error
+   */
+  void loadCubeData(
+    const std::variant<std::string, ArrayBuffer>& img,
+    const InternalTexturePtr& texture, bool createPolynomials,
+    const std::function<void(const CubeTextureData& data)>& onLoad,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError) override;
 
   /**
    * @brief Uploads the cube texture data to the WebGl Texture. It has alreday
@@ -83,30 +81,12 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param onLoad defines the callback to trigger once the texture is ready
    * @param onError defines the callback to trigger in case of error
    */
-  virtual void
-  loadCubeData(const std::variant<std::string, ArrayBuffer>& img,
-               const InternalTexturePtr& texture, bool createPolynomials,
-               const std::function<void(const CubeTextureData& data)>& onLoad,
-               const std::function<void(const std::string& message,
-                                        const std::string& exception)>& onError)
-    = 0;
-
-  /**
-   * @brief Uploads the cube texture data to the WebGl Texture. It has alreday
-   * been bound.
-   * @param img contains the texture data
-   * @param texture defines the BabylonJS internal texture
-   * @param createPolynomials will be true if polynomials have been requested
-   * @param onLoad defines the callback to trigger once the texture is ready
-   * @param onError defines the callback to trigger in case of error
-   */
-  virtual void
-  loadCubeData(const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
-               const InternalTexturePtr& texture, bool createPolynomials,
-               const std::function<void(const CubeTextureData& datas)>& onLoad,
-               const std::function<void(const std::string& message,
-                                        const std::string& exception)>& onError)
-    = 0;
+  virtual void loadCubeData(
+    const std::vector<std::variant<std::string, ArrayBuffer>>& imgs,
+    const InternalTexturePtr& texture, bool createPolynomials,
+    const std::function<void(const CubeTextureData& data)>& onLoad,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError) override;
 
   /**
    * @brief Uploads the 2D texture data to the WebGl Texture. It has alreday
@@ -115,15 +95,13 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param texture defines the BabylonJS internal texture
    * @param callback defines the method to call once ready to upload
    */
-  virtual void loadData(
-    const ArrayBuffer& data, const InternalTexturePtr& texture,
-    const std::function<void(int width, int height, bool loadMipmap,
-                             bool isCompressed,
-                             const std::function<void()>& done)>& callback)
-    = 0;
+  void loadData(const ArrayBuffer& data, const InternalTexturePtr& texture,
+                const std::function<void(
+                  int width, int height, bool loadMipmap, bool isCompressed,
+                  const std::function<void()>& done)>& callback) override;
 
-}; // end of struct IInternalTextureLoader
+}; // end of struct DDSTextureLoader
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_MATERIALS_TEXTURES_IINTERNAL_TEXTURE_LOADER_H
+#endif // end of BABYLON_MATERIALS_TEXTURES_LOADERS_DDS_TEXTURE_LOADER_H
