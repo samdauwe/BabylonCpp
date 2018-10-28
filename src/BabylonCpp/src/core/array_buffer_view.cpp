@@ -19,6 +19,17 @@ ArrayBufferView::ArrayBufferView(const ArrayBuffer& arrayBuffer)
 {
 }
 
+ArrayBufferView::ArrayBufferView(const Uint16Array& buffer)
+    : int8Array{stl_util::to_array<int8_t>(buffer)}
+    , uint8Array{stl_util::to_array<uint8_t>(buffer)}
+    , int16Array{stl_util::to_array<int16_t>(buffer)}
+    , uint16Array{buffer}
+    , int32Array{stl_util::to_array<int32_t>(buffer)}
+    , uint32Array{stl_util::to_array<uint32_t>(buffer)}
+    , float32Array{stl_util::to_array<float>(buffer)}
+{
+}
+
 ArrayBufferView::ArrayBufferView(const Uint32Array& buffer)
     : int8Array{stl_util::to_array<int8_t>(buffer)}
     , uint8Array{stl_util::to_array<uint8_t>(buffer)}
@@ -95,6 +106,13 @@ ArrayBufferView& ArrayBufferView::operator=(ArrayBufferView&& other)
 
 ArrayBufferView::~ArrayBufferView()
 {
+}
+
+ArrayBufferView::operator bool() const
+{
+  return !int8Array.empty() && !uint8Array.empty() && !int16Array.empty()
+         && !uint16Array.empty() && !int32Array.empty() && !uint32Array.empty()
+         && !float32Array.empty();
 }
 
 } // end of namespace BABYLON

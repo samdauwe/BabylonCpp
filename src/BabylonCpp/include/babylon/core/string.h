@@ -548,6 +548,17 @@ inline std::vector<std::string> split(const std::string& value, char separator)
 }
 
 /**
+ * @brief Converts a string to a char vector.
+ * @param str Required. The string to convert
+ * @return An Array, containing the chars of the original string.
+ */
+inline std::vector<char> toCharArray(const std::string& str)
+{
+  std::vector<char> charArray(str.begin(), str.end());
+  return charArray;
+}
+
+/**
  * @brief Converts a string to lowercase letters.
  * @param source Required. The string to convert.
  * @return A String, representing the value of a string converted to lowercase.

@@ -20,6 +20,7 @@ struct ArrayBufferView {
 
   ArrayBufferView();
   ArrayBufferView(const ArrayBuffer& arrayBuffer);
+  ArrayBufferView(const Uint16Array& buffer);
   ArrayBufferView(const Uint32Array& buffer);
   ArrayBufferView(const Float32Array& buffer);
   ArrayBufferView(const ArrayBufferView& other);
@@ -27,6 +28,8 @@ struct ArrayBufferView {
   ArrayBufferView& operator=(const ArrayBufferView& other);
   ArrayBufferView& operator=(ArrayBufferView&& other);
   ~ArrayBufferView();
+
+  operator bool() const;
 
   Int8Array int8Array;
   Uint8Array uint8Array;
