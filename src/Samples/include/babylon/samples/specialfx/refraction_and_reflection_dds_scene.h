@@ -7,8 +7,9 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Refraction and reflection dds scene. This example simulates how light
- * would reflect and refract with a sphere using a DDS texure as skybox.
+ * @brief Refraction and reflection dds texture scene. This example simulates
+ * how light would reflect and refract with a sphere using a DDS texure as
+ * skybox.
  * @see https://www.babylonjs-playground.com/#XH85A9#0
  */
 class RefractionAndReflectionDDSScene : public IRenderableScene {

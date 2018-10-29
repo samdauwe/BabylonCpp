@@ -24,7 +24,7 @@ RefractionAndReflectionDDSScene::~RefractionAndReflectionDDSScene()
 
 const char* RefractionAndReflectionDDSScene::getName()
 {
-  return "Refraction And Reflection DDS Scene";
+  return "Refraction And Reflection DDS Texture Scene";
 }
 
 void RefractionAndReflectionDDSScene::initializeScene(ICanvas* canvas,
