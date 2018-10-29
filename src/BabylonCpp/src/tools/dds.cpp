@@ -139,7 +139,7 @@ float DDSTools::_FromHalfFloat(uint8_t value)
 }
 
 Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
-  float width, float height, size_t dataOffset, size_t dataLength,
+  float width, float height, int dataOffset, size_t dataLength,
   const Uint8Array& arrayBuffer, float lod)
 {
   Float32Array destArray(dataLength);
@@ -147,7 +147,7 @@ Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width) * 4;
+      size_t srcPos    = static_cast<size_t>(dataOffset + (x + y * width) * 4);
       destArray[index] = DDSTools::_FromHalfFloat(srcData[srcPos]);
       destArray[index + 1] = DDSTools::_FromHalfFloat(srcData[srcPos + 1]);
       destArray[index + 2] = DDSTools::_FromHalfFloat(srcData[srcPos + 2]);
@@ -166,7 +166,7 @@ Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
 
 Uint16Array
 DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
-                                       size_t dataOffset, size_t dataLength,
+                                       int dataOffset, size_t dataLength,
                                        const Uint8Array& arrayBuffer, float lod)
 {
   if (DDSTools::StoreLODInAlphaChannel) {
@@ -175,8 +175,8 @@ DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
     size_t index = 0;
     for (float y = 0; y < height; ++y) {
       for (float x = 0; x < width; ++x) {
-        size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width) * 4;
-        destArray[index] = srcData[srcPos];
+        size_t srcPos = static_cast<size_t>(dataOffset + (x + y * width) * 4);
+        destArray[index]     = srcData[srcPos];
         destArray[index + 1] = srcData[srcPos + 1];
         destArray[index + 2] = srcData[srcPos + 2];
         destArray[index + 3]
@@ -188,11 +188,12 @@ DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
     return destArray;
   }
 
-  return stl_util::to_array<uint16_t>(arrayBuffer, dataOffset, dataLength);
+  return stl_util::to_array<uint16_t>(
+    arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
 }
 
 Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
-                                                size_t dataOffset,
+                                                int dataOffset,
                                                 size_t dataLength,
                                                 const Uint8Array& arrayBuffer,
                                                 float lod)
@@ -203,8 +204,8 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
     size_t index = 0;
     for (float y = 0; y < height; ++y) {
       for (float x = 0; x < width; ++x) {
-        size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width) * 4;
-        destArray[index] = srcData[srcPos];
+        size_t srcPos = static_cast<size_t>(dataOffset + (x + y * width) * 4);
+        destArray[index]     = srcData[srcPos];
         destArray[index + 1] = srcData[srcPos + 1];
         destArray[index + 2] = srcData[srcPos + 2];
         destArray[index + 3] = lod;
@@ -214,11 +215,12 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
 
     return destArray;
   }
-  return stl_util::to_array<float>(arrayBuffer, dataOffset, dataLength);
+  return stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset),
+                                   dataLength);
 }
 
 Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
-  float width, float height, size_t dataOffset, size_t dataLength,
+  float width, float height, int dataOffset, size_t dataLength,
   const Uint8Array& arrayBuffer, float lod)
 {
   Float32Array destArray(dataLength);
@@ -226,7 +228,7 @@ Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width) * 4;
+      size_t srcPos    = static_cast<size_t>(dataOffset + (x + y * width) * 4);
       destArray[index] = Scalar::Clamp(srcData[srcPos]) * 255;
       destArray[index + 1] = Scalar::Clamp(srcData[srcPos + 1]) * 255;
       destArray[index + 2] = Scalar::Clamp(srcData[srcPos + 2]) * 255;
@@ -244,7 +246,7 @@ Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
 }
 
 Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
-  float width, float height, size_t dataOffset, size_t dataLength,
+  float width, float height, int dataOffset, size_t dataLength,
   const Uint8Array& arrayBuffer, float lod)
 {
   Float32Array destArray(dataLength);
@@ -252,7 +254,7 @@ Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos = dataOffset + static_cast<size_t>(x + y * width) * 4;
+      size_t srcPos = static_cast<size_t>(dataOffset + (x + y * width) * 4);
 
       destArray[index]
         = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos])) * 255;
@@ -275,7 +277,7 @@ Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
 }
 
 Uint8Array DDSTools::_GetRGBAArrayBuffer(float width, float height,
-                                         size_t dataOffset, size_t dataLength,
+                                         int dataOffset, size_t dataLength,
                                          const Uint8Array& arrayBuffer,
                                          int rOffset, int gOffset, int bOffset,
                                          int aOffset)
@@ -309,7 +311,7 @@ int DDSTools::_ExtractLongWordOrder(int value)
 }
 
 Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height,
-                                        size_t dataOffset, size_t dataLength,
+                                        int dataOffset, size_t dataLength,
                                         const Uint8Array& arrayBuffer,
                                         int rOffset, int gOffset, int bOffset)
 {
@@ -332,8 +334,7 @@ Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height,
 }
 
 Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
-                                              size_t dataOffset,
-                                              size_t dataLength,
+                                              int dataOffset, size_t dataLength,
                                               const Uint8Array& arrayBuffer)
 {
   Uint8Array byteArray(dataLength);
@@ -341,7 +342,7 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos    = dataOffset + static_cast<size_t>(x + y * width);
+      size_t srcPos    = static_cast<size_t>(dataOffset + x + y * width);
       byteArray[index] = srcData[srcPos];
       ++index;
     }
@@ -371,7 +372,8 @@ void DDSTools::UploadDDSLevels(
   int blockBytes                        = 1;
   unsigned int internalCompressedFormat = 0;
   float width = 0.f, height = 0.f;
-  size_t dataOffset = 0, dataLength = 0;
+  int dataOffset    = 0;
+  size_t dataLength = 0;
 
   if (header[off_magic] != DDS_MAGIC) {
     BABYLON_LOG_ERROR("DDSTools", "Invalid magic number in DDS header");
@@ -391,7 +393,7 @@ void DDSTools::UploadDDSLevels(
   }
 
   auto bpp   = header[off_RGBbpp];
-  dataOffset = static_cast<size_t>(header[off_size]) + 4;
+  dataOffset = header[off_size] + 4;
 
   auto computeFormats = false;
 
@@ -459,9 +461,8 @@ void DDSTools::UploadDDSLevels(
   }
 
   for (unsigned int face = 0; face < faces; ++face) {
-    width      = static_cast<float>(header[off_width]);
-    height     = static_cast<float>(header[off_height]);
-    dataOffset = static_cast<size_t>(header[off_size] + 4);
+    width  = static_cast<float>(header[off_width]);
+    height = static_cast<float>(header[off_height]);
 
     for (int mip = 0; mip < mipmapCount; ++mip) {
       if (lodIndex == -1 || lodIndex == mip) {

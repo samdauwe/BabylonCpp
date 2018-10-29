@@ -132,40 +132,39 @@ private:
   static float _ToHalfFloat(float value);
   static float _FromHalfFloat(uint8_t value);
   static Float32Array
-  _GetHalfFloatAsFloatRGBAArrayBuffer(float width, float height,
-                                      size_t dataOffset, size_t dataLength,
+  _GetHalfFloatAsFloatRGBAArrayBuffer(float width, float height, int dataOffset,
+                                      size_t dataLength,
                                       const Uint8Array& arrayBuffer, float lod);
   static Uint16Array _GetHalfFloatRGBAArrayBuffer(float width, float height,
-                                                  size_t dataOffset,
+                                                  int dataOffset,
                                                   size_t dataLength,
                                                   const Uint8Array& arrayBuffer,
                                                   float lod);
   static Float32Array _GetFloatRGBAArrayBuffer(float width, float height,
-                                               size_t dataOffset,
+                                               int dataOffset,
                                                size_t dataLength,
                                                const Uint8Array& arrayBuffer,
                                                float lod);
   static Float32Array
-  _GetFloatAsUIntRGBAArrayBuffer(float width, float height, size_t dataOffset,
+  _GetFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
                                  size_t dataLength,
                                  const Uint8Array& arrayBuffer, float lod);
   static Float32Array
-  _GetHalfFloatAsUIntRGBAArrayBuffer(float width, float height,
-                                     size_t dataOffset, size_t dataLength,
+  _GetHalfFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
+                                     size_t dataLength,
                                      const Uint8Array& arrayBuffer, float lod);
   static Uint8Array _GetRGBAArrayBuffer(float width, float height,
-                                        size_t dataOffset, size_t dataLength,
+                                        int dataOffset, size_t dataLength,
                                         const Uint8Array& arrayBuffer,
                                         int rOffset, int gOffset, int bOffset,
                                         int aOffset);
   static int _ExtractLongWordOrder(int value);
   static Uint8Array _GetRGBArrayBuffer(float width, float height,
-                                       size_t dataOffset, size_t dataLength,
+                                       int dataOffset, size_t dataLength,
                                        const Uint8Array& arrayBuffer,
                                        int rOffset, int gOffset, int bOffset);
   static Uint8Array _GetLuminanceArrayBuffer(float width, float height,
-                                             size_t dataOffset,
-                                             size_t dataLength,
+                                             int dataOffset, size_t dataLength,
                                              const Uint8Array& arrayBuffer);
 
 public:
