@@ -25,6 +25,8 @@
 
 namespace BABYLON {
 
+Color3 MaterialHelper::_tempFogColor = Color3::Black();
+
 void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene)
 {
   if (scene->_forcedViewPosition) {
@@ -616,13 +618,21 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
 }
 
 void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
-                                       Effect* effect)
+                                       Effect* effect, bool linearSpace)
 {
   if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
     effect->setFloat4("vFogInfos", static_cast<float>(scene->fogMode()),
                       scene->fogStart, scene->fogEnd, scene->fogDensity);
-    effect->setColor3("vFogColor", scene->fogColor);
+    // Convert fog color to linear space if used in a linear space computed
+    // shader.
+    if (linearSpace) {
+      scene->fogColor.toLinearSpaceToRef(MaterialHelper::_tempFogColor);
+      effect->setColor3("vFogColor", MaterialHelper::_tempFogColor);
+    }
+    else {
+      effect->setColor3("vFogColor", scene->fogColor);
+    }
   }
 }
 

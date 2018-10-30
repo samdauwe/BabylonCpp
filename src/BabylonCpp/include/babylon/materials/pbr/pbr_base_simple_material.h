@@ -113,8 +113,15 @@ public:
    */
   float alphaCutOff;
 
+  /**
+   * Stores the pre-calculated light information of a mesh in a texture.
+   */
   BaseTexturePtr lightmapTexture;
 
+  /**
+   * If true, the light map contains occlusion information instead of lighting
+   * info.
+   */
   bool useLightmapAsShadowmap;
 
 }; // end of class PBRBaseSimpleMaterial

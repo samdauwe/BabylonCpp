@@ -351,10 +351,9 @@ public:
   std::optional<float> roughness;
 
   /**
-   * Used to enable roughness/glossiness fetch from a separate chanel depending
-   * on the current mode.
-   * Gray Scale represents roughness in metallic mode and glossiness in specular
-   * mode.
+   * Used to enable roughness/glossiness fetch from a separate channel depending
+   * on the current mode. Gray Scale represents roughness in metallic mode and
+   * glossiness in specular mode.
    */
   BaseTexture* microSurfaceTexture;
 
@@ -422,6 +421,10 @@ public:
    */
   bool linkRefractionWithTransparency;
 
+  /**
+   * If true, the light map contains occlusion information instead of lighting
+   * info.
+   */
   bool useLightmapAsShadowmap;
 
   /**
@@ -442,10 +445,9 @@ public:
   float alphaCutOff;
 
   /**
-   * Specifies that the material will keeps the specular highlights over a
-   * transparent surface (only the most limunous ones).
-   * A car glass is a good exemple of that. When sun reflects on it you can not
-   * see what is behind.
+   * Specifies that the material will keep the specular highlights over a
+   * transparent surface (only the most limunous ones). A car glass is a good
+   * exemple of that. When sun reflects on it you can not see what is behind.
    */
   bool useSpecularOverAlpha;
 

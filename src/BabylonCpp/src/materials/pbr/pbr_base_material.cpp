@@ -153,10 +153,25 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
   if (_imageProcessingConfiguration) {
     _imageProcessingObserver
       = _imageProcessingConfiguration->onUpdateParameters.add(
-        [this](ImageProcessingConfiguration*, EventState&) {
+        [this](ImageProcessingConfiguration* /*conf*/, EventState&) {
           _markAllSubMeshesAsImageProcessingDirty();
         });
   }
+}
+
+bool PBRBaseMaterial::hasRenderTargetTextures() const
+{
+  if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
+      && _reflectionTexture->isRenderTarget) {
+    return true;
+  }
+
+  if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
+      && _refractionTexture->isRenderTarget) {
+    return true;
+  }
+
+  return false;
 }
 
 const std::string PBRBaseMaterial::getClassName() const
@@ -1375,7 +1390,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     }
 
     // Fog
-    MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
+    MaterialHelper::BindFogParameters(scene, mesh, _activeEffect, true);
 
     // Morph targets
     if (defines.intDef["NUM_MORPH_INFLUENCERS"]) {

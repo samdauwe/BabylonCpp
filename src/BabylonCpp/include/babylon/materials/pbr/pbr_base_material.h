@@ -51,6 +51,12 @@ public:
   ~PBRBaseMaterial() override;
 
   /**
+   * @brief Gets a boolean indicating that current material needs to register
+   * RTT.
+   */
+  bool hasRenderTargetTextures() const;
+
+  /**
    * @brief Gets the name of the material class.
    */
   const std::string getClassName() const override;
@@ -306,10 +312,9 @@ protected:
   std::optional<float> _roughness;
 
   /**
-   * Used to enable roughness/glossiness fetch from a separate chanel depending
-   * on the current mode.
-   * Gray Scale represents roughness in metallic mode and glossiness in specular
-   * mode.
+   * Used to enable roughness/glossiness fetch from a separate channel depending
+   * on the current mode. Gray Scale represents roughness in metallic mode and
+   * glossiness in specular mode.
    */
   BaseTexturePtr _microSurfaceTexture;
 

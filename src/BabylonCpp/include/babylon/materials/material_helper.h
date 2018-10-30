@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/math/color3.h>
 
 namespace BABYLON {
 
@@ -43,10 +44,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
 
   /**
    * @brief Helps preparing the defines values about the UVs in used in the
-   * effect. UVs are shared as much as we can accross chanels in the shaders.
+   * effect. UVs are shared as much as we can accross channels in the shaders.
    * @param texture The texture we are preparing the UVs for
    * @param defines The defines to update
-   * @param key The chanel key "diffuse", "specular"... used in the shader
+   * @param key The channel key "diffuse", "specular"... used in the shader
    */
   static void PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
                                         MaterialDefines& defines,
@@ -56,7 +57,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @brief Binds a texture matrix value to its corrsponding uniform
    * @param texture The texture to bind the matrix for
    * @param uniformBuffer The uniform buffer receivin the data
-   * @param key The chanel key "diffuse", "specular"... used in the shader
+   * @param key The channel key "diffuse", "specular"... used in the shader
    */
   static void BindTextureMatrix(BaseTexture& texture,
                                 UniformBuffer& uniformBuffer,
@@ -255,9 +256,10 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param scene The scene the lights belongs to
    * @param mesh The mesh we are binding the information to render
    * @param effect The effect we are binding the data to
+   * @param linearSpace Defines if the fog effect is applied in linear space
    */
   static void BindFogParameters(Scene* scene, AbstractMesh* mesh,
-                                Effect* effect);
+                                Effect* effect, bool linearSpace = false);
 
   /**
    * @brief Binds the bones information from the mesh to the effect.
@@ -290,6 +292,8 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    */
   static void BindClipPlane(Effect* effect, Scene* scene);
+
+  static Color3 _tempFogColor;
 
 }; // end of struct MaterialHelper
 
