@@ -85,9 +85,8 @@ def main():
                  "babylon.vrDeviceOrientationFreeCamera.ts", "babylon.webvr.ts",
                  "babylon.vrDeviceOrientationArcRotateCamera.ts",
                  "babylon.internalTextureLoader.ts",
-                 "babylon.ddsTextureLoader.ts", "babylon.ktxTextureLoader.ts",
-                 "babylon.tgaTextureLoader.ts", "babylon.envTextureLoader.ts",
-                 "babylon.babylonFileLoader.ts", "babylon.videoRecorder.ts"]
+                 "babylon.envTextureLoader.ts", "babylon.ktxTextureLoader.ts",
+                 "babylon.tgaTextureLoader.ts", "babylon.videoRecorder.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         modules = {
