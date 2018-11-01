@@ -11,6 +11,8 @@ class IAnimatable;
 class ImageProcessingConfiguration;
 struct PBRMaterialDefines;
 using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+using ImageProcessingConfigurationPtr
+  = std::shared_ptr<ImageProcessingConfiguration>;
 
 /**
  * @brief The Physically based material base class of BJS.
@@ -169,7 +171,7 @@ protected:
    * @param configuration
    */
   void _attachImageProcessingConfiguration(
-    ImageProcessingConfiguration* configuration);
+    const ImageProcessingConfigurationPtr& configuration);
 
   bool _shouldUseAlphaFromAlbedoTexture() const;
 
@@ -576,7 +578,12 @@ protected:
    * Default configuration related to image processing available in the PBR
    * Material.
    */
-  ImageProcessingConfiguration* _imageProcessingConfiguration;
+  ImageProcessingConfigurationPtr _imageProcessingConfiguration;
+
+  /**
+   * If set to true, no lighting calculations will be applied.
+   */
+  bool _unlit;
 
 private:
   /**
@@ -610,11 +617,6 @@ private:
    * buffers.
    */
   bool _useLogarithmicDepth;
-
-  /**
-   * If set to true, no lighting calculations will be applied.
-   */
-  bool _unlit;
 
 }; // end of class PBRBaseMaterial
 

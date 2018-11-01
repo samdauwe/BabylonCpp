@@ -69,8 +69,10 @@ using BoundingBoxRendererPtr    = std::shared_ptr<BoundingBoxRenderer>;
 using BonePtr                   = std::shared_ptr<Bone>;
 using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
 using IAnimatablePtr            = std::shared_ptr<IAnimatable>;
-using InternalTexturePtr        = std::shared_ptr<InternalTexture>;
-using ISceneComponentPtr        = std::shared_ptr<ISceneComponent>;
+using ImageProcessingConfigurationPtr
+  = std::shared_ptr<ImageProcessingConfiguration>;
+using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+using ISceneComponentPtr = std::shared_ptr<ISceneComponent>;
 using ISceneSerializableComponentPtr
   = std::shared_ptr<ISceneSerializableComponent>;
 using NodePtr                = std::shared_ptr<Node>;
@@ -1707,8 +1709,7 @@ protected:
    * No setter as we it is a shared configuration, you can set the values
    * instead.
    */
-  std::unique_ptr<ImageProcessingConfiguration>&
-  get_imageProcessingConfiguration();
+  ImageProcessingConfigurationPtr& get_imageProcessingConfiguration();
 
   /**
    * @brief Sets a boolean indicating if all rendering must be done in
@@ -2098,7 +2099,7 @@ public:
    * No setter as we it is a shared configuration, you can set the values
    * instead.
    */
-  ReadOnlyProperty<Scene, std::unique_ptr<ImageProcessingConfiguration>>
+  ReadOnlyProperty<Scene, ImageProcessingConfigurationPtr>
     imageProcessingConfiguration;
 
   // Events
@@ -3044,7 +3045,7 @@ protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
   /** Hidden */
-  std::unique_ptr<ImageProcessingConfiguration> _imageProcessingConfiguration;
+  ImageProcessingConfigurationPtr _imageProcessingConfiguration;
 
 private:
   // Animations

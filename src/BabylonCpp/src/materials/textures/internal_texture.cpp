@@ -24,7 +24,8 @@ constexpr unsigned int InternalTexture::DATASOURCE_DEPTHTEXTURE;
 constexpr unsigned int InternalTexture::DATASOURCE_CUBERAW_RGBD;
 
 InternalTexture::InternalTexture(Engine* engine, unsigned int dataSource)
-    : isCube{false}
+    : isReady{false}
+    , isCube{false}
     , is3D{false}
     , _initialSlot{-1}
     , _designatedSlot{-1}

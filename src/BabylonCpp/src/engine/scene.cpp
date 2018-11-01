@@ -313,7 +313,7 @@ Scene::Scene(Engine* engine)
   // if (ImageProcessingConfiguration)
   {
     _imageProcessingConfiguration
-      = std::make_unique<ImageProcessingConfiguration>();
+      = std::make_shared<ImageProcessingConfiguration>();
   }
 }
 
@@ -480,8 +480,7 @@ unsigned int Scene::getInternalStep() const
   return _currentInternalStep;
 }
 
-std::unique_ptr<ImageProcessingConfiguration>&
-Scene::get_imageProcessingConfiguration()
+ImageProcessingConfigurationPtr& Scene::get_imageProcessingConfiguration()
 {
   return _imageProcessingConfiguration;
 }
@@ -4808,8 +4807,8 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
     auto hdrSkyboxMaterial               = PBRMaterial::New("skyBox", this);
     hdrSkyboxMaterial->backFaceCulling   = false;
     hdrSkyboxMaterial->reflectionTexture = environmentTexture();
-    if (hdrSkyboxMaterial->reflectionTexture) {
-      hdrSkyboxMaterial->reflectionTexture->coordinatesMode
+    if (hdrSkyboxMaterial->reflectionTexture()) {
+      hdrSkyboxMaterial->reflectionTexture()->coordinatesMode
         = TextureConstants::SKYBOX_MODE;
     }
     hdrSkyboxMaterial->microSurface     = 1.f - blur;

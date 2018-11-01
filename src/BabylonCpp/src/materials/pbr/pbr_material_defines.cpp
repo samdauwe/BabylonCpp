@@ -147,8 +147,8 @@ PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
     {"NUM_MORPH_INFLUENCERS", 0},   //
   };
 
-  floatDef = {
-    {"ALPHATESTVALUE", 0.5f}, //
+  stringDef = {
+    {"ALPHATESTVALUE", "0.5"}, //
   };
 
 } // namespace BABYLON
@@ -164,7 +164,7 @@ void PBRMaterialDefines::reset()
   boolDef["PBR"]           = true;
   boolDef["NORMALXYSCALE"] = true;
 
-  floatDef["ALPHATESTVALUE"] = 0.5f;
+  stringDef["ALPHATESTVALUE"] = "0.5";
 }
 
 } // end of namespace BABYLON

@@ -93,11 +93,13 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     , _forceIrradianceInFragment{false}
     , _forceNormalForward{false}
     , _enableSpecularAntiAliasing{false}
+    , _imageProcessingConfiguration{std::make_shared<
+        ImageProcessingConfiguration>()}
+    , _unlit{false}
     , _lightingInfos{Vector4(_directIntensity, _emissiveIntensity,
                              _environmentIntensity, _specularIntensity)}
     , _imageProcessingObserver{nullptr}
     , _globalAmbientColor{Color3(0, 0, 0)}
-    , _unlit{false}
 {
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
@@ -128,7 +130,7 @@ PBRBaseMaterial::~PBRBaseMaterial()
 }
 
 void PBRBaseMaterial::_attachImageProcessingConfiguration(
-  ImageProcessingConfiguration* configuration)
+  const ImageProcessingConfigurationPtr& configuration)
 {
   if (configuration == _imageProcessingConfiguration) {
     return;
@@ -142,8 +144,7 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
 
   // Pick the scene configuration if needed.
   if (!configuration) {
-    _imageProcessingConfiguration
-      = getScene()->imageProcessingConfiguration().get();
+    _imageProcessingConfiguration = getScene()->imageProcessingConfiguration();
   }
   else {
     _imageProcessingConfiguration = configuration;

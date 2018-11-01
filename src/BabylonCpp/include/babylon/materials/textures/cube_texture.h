@@ -11,6 +11,9 @@ class CubeTexture;
 struct CubeTextureData;
 using CubeTexturePtr = std::shared_ptr<CubeTexture>;
 
+/**
+ * @brief Class for creating a cube texture.
+ */
 class BABYLON_SHARED_EXPORT CubeTexture : public BaseTexture {
 
 public:
@@ -25,12 +28,36 @@ public:
   }
   ~CubeTexture() override;
 
+  /**
+   * @brief Delays loading of the cube texture.
+   */
   void delayLoad() override;
+
+  /**
+   * @brief Returns the reflection texture matrix.
+   * @returns the reflection texture matrix
+   */
   Matrix* getReflectionTextureMatrix() override;
+
+  /**
+   * @brief Sets the reflection texture matrix.
+   * @param value Reflection texture matrix
+   */
   void setReflectionTextureMatrix(const Matrix& value);
+
+  /**
+   * @brief Makes a clone, or deep copy, of the cube texture.
+   * @returns a new cube texture
+   */
   CubeTexturePtr clone() const;
 
-  /** Static methods **/
+  /**
+   * @brief Creates a cube texture from an array of image urls.
+   * @param files defines an array of image urls
+   * @param scene defines the hosting scene
+   * @param noMipmap specifies if mip maps are not used
+   * @returns a cube texture
+   */
   static CubeTexturePtr CreateFromImages(const std::vector<std::string>& files,
                                          Scene* scene, bool noMipmap = false);
 
@@ -50,13 +77,20 @@ public:
                             const std::string& forcedExtension = "",
                             bool createPolynomials             = true);
 
+  /**
+   * @brief Parses text to create a cube texture.
+   * @param parsedTexture define the serialized text to read from
+   * @param scene defines the hosting scene
+   * @param rootUrl defines the root url of the cube texture
+   * @returns a cube texture
+   */
   static CubeTexturePtr Parse(const Json::value& parsedTexture, Scene* scene,
                               const std::string& rootUrl);
 
 protected:
   /**
-   * Creates a cube texture to use with reflection for instance. It can be based
-   * upon dds or six images as well as prefiltered data.
+   * @brief Creates a cube texture to use with reflection for instance. It can
+   * be based upon dds or six images as well as prefiltered data.
    * @param rootUrl defines the url of the texture or the root name of the six
    * images
    * @param scene defines the scene the texture is attached to
@@ -102,6 +136,11 @@ protected:
    * Example: https://www.babylonjs-playground.com/#RNASML
    */
   void set_boundingBoxSize(const std::optional<Vector3>& value) override;
+
+  /**
+   * @brief Returns the bounding box size.
+   * @see http://doc.babylonjs.com/how_to/reflect#using-local-cubemap-mode
+   */
   std::optional<Vector3>& get_boundingBoxSize() override;
 
   /**
@@ -117,11 +156,15 @@ protected:
   float get_rotationY() const;
 
 public:
+  /**
+   * The url of the texture
+   */
   std::string url;
 
   /**
    * Gets or sets the center of the bounding box associated with the cube
-   * texture It must define where the camera used to render the texture was set
+   * texture. It must define where the camera used to render the texture was set
+   * @see http://doc.babylonjs.com/how_to/reflect#using-local-cubemap-mode
    */
   Vector3 boundingBoxPosition;
 
