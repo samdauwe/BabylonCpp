@@ -73,7 +73,7 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
                       });                                                     //
   // PBR Material Scenee
   _samples["PBRMaterialScene"]
-    = std::make_tuple(false,                                                //
+    = std::make_tuple(true,                                                 //
                       [](ICanvas* iCanvas) {                                //
                         return std::make_unique<PBRMaterialScene>(iCanvas); //
                       });                                                   //

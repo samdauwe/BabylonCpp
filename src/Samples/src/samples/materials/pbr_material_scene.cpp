@@ -46,7 +46,7 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto hdrSkyboxMaterial = PBRMaterial::New("skyBox", scene);
   hdrSkyboxMaterial->backFaceCulling   = false;
   hdrSkyboxMaterial->reflectionTexture = hdrTexture->clone();
-  hdrSkyboxMaterial->reflectionTexture->coordinatesMode
+  hdrSkyboxMaterial->reflectionTexture()->coordinatesMode
     = TextureConstants::SKYBOX_MODE;
   hdrSkyboxMaterial->microSurface    = 1.f;
   hdrSkyboxMaterial->disableLighting = true;
@@ -69,6 +69,7 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   woodPlankOptions.depth  = 65.f;
   auto woodPlank = MeshBuilder::CreateBox("plane", woodPlankOptions, scene);
 
+#if 0
   // Create materials
   auto glass                            = PBRMaterial::New("glass", scene);
   glass->reflectionTexture              = hdrTexture;
@@ -106,6 +107,7 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   wood->albedoColor   = Color3::White();
   wood->albedoTexture = Texture::New("textures/albedo.png", scene);
   woodPlank->material = wood;
+#endif
 }
 
 } // end of namespace Samples
