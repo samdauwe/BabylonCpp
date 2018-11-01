@@ -190,7 +190,7 @@ protected:
 private:
   Effect* _prepareEffect(
     AbstractMesh* mesh, PBRMaterialDefines& defines,
-    const std::function<void(Effect* effect)> onCompiled = nullptr,
+    const std::function<void(Effect* effect)>& onCompiled = nullptr,
     std::function<void(Effect* effect, const std::string& errors)> onError
     = nullptr,
     const std::optional<bool>& useInstances = std::nullopt,

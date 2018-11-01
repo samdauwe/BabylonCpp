@@ -412,7 +412,7 @@ bool PBRBaseMaterial::isMetallicWorkflow() const
 
 Effect* PBRBaseMaterial::_prepareEffect(
   AbstractMesh* mesh, PBRMaterialDefines& defines,
-  const std::function<void(Effect* effect)> onCompiled,
+  const std::function<void(Effect* effect)>& onCompiled,
   std::function<void(Effect* effect, const std::string& errors)> onError,
   const std::optional<bool>& useInstances,
   const std::optional<bool>& useClipPlane)
@@ -939,7 +939,8 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 
   // Values that need to be evaluated on every frame
   MaterialHelper::PrepareDefinesForFrameBoundValues(
-    scene, engine, defines, useInstances ? true : false, useClipPlane);
+    scene, engine, defines,
+    (useInstances.has_value() && (*useInstances)) ? true : false, useClipPlane);
 
   // Attribs
   MaterialHelper::PrepareDefinesForAttributes(

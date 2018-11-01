@@ -676,6 +676,7 @@ BaseTexturePtr& TextureTools::GetEnvironmentBRDFTexture(Scene* scene)
 
     texture->wrapU                 = TextureConstants::CLAMP_ADDRESSMODE;
     texture->wrapV                 = TextureConstants::CLAMP_ADDRESSMODE;
+    texture->_texture->isReady     = true;
     scene->_environmentBRDFTexture = texture;
   }
 
