@@ -11,6 +11,7 @@
 
 ## Cameras ##
 ![cameras_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cameras_scene.png?raw=true "Cameras Scene")
+![multi_views_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/multi_views_scene.png?raw=true "Multi-Views Scene")
 
 ## Lights ##
 ![directional_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/directional_light_scene.png?raw=true "Directional Light Scene")
