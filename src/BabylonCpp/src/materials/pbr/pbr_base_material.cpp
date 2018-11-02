@@ -100,6 +100,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
                              _environmentIntensity, _specularIntensity)}
     , _imageProcessingObserver{nullptr}
     , _globalAmbientColor{Color3(0, 0, 0)}
+    , _useLogarithmicDepth{false}
 {
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);

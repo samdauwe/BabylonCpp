@@ -25,6 +25,12 @@ struct BABYLON_SHARED_EXPORT PBRMaterialDefines
    */
   void reset() override;
 
+  /**
+   * @brief Converts the material define values to a string.
+   * @returns - String of material define information.
+   */
+  virtual std::string toString() const override;
+
 }; // end of struct PBRMaterialDefines
 
 } // end of namespace BABYLON

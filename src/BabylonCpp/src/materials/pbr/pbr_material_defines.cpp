@@ -1,5 +1,7 @@
 #include <babylon/materials/pbr/pbr_material_defines.h>
 
+#include <sstream>
+
 namespace BABYLON {
 
 PBRMaterialDefines::PBRMaterialDefines() : MaterialDefines{}
@@ -165,6 +167,15 @@ void PBRMaterialDefines::reset()
   boolDef["NORMALXYSCALE"] = true;
 
   stringDef["ALPHATESTVALUE"] = "0.5";
+}
+
+std::string PBRMaterialDefines::toString() const
+{
+  std::ostringstream oss;
+  oss << MaterialDefines::toString();
+  oss << IImageProcessingConfigurationDefines::convertToString();
+
+  return oss.str();
 }
 
 } // end of namespace BABYLON

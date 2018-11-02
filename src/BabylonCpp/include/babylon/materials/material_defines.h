@@ -100,7 +100,7 @@ struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
 
   /**
    * @brief Converts the material define values to a string.
-   * @returns - String of material define information.
+   * @returns String of material define information.
    */
   virtual std::string toString() const override;
 

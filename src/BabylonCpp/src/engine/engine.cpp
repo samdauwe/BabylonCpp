@@ -334,11 +334,18 @@ void Engine::_initGLContext()
   _caps.maxTexturesImageUnits = _gl->getParameteri(GL::MAX_TEXTURE_IMAGE_UNITS);
   _caps.maxCombinedTexturesImageUnits
     = _gl->getParameteri(GL::MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+  _caps.maxVertexTextureImageUnits
+    = _gl->getParameteri(GL::MAX_VERTEX_TEXTURE_IMAGE_UNITS);
   _caps.maxTextureSize = _gl->getParameteri(GL::MAX_TEXTURE_SIZE);
   _caps.maxCubemapTextureSize
     = _gl->getParameteri(GL::MAX_CUBE_MAP_TEXTURE_SIZE);
   _caps.maxRenderTextureSize = _gl->getParameteri(GL::MAX_RENDERBUFFER_SIZE);
   _caps.maxVertexAttribs     = _gl->getParameteri(GL::MAX_VERTEX_ATTRIBS);
+  _caps.maxVaryingVectors    = _gl->getParameteri(GL::MAX_VARYING_VECTORS);
+  _caps.maxFragmentUniformVectors
+    = _gl->getParameteri(GL::MAX_FRAGMENT_UNIFORM_VECTORS);
+  _caps.maxVertexUniformVectors
+    = _gl->getParameteri(GL::MAX_VERTEX_UNIFORM_VECTORS);
 
   // Infos
   _glVersion  = _gl->getString(GL::VERSION);
@@ -360,35 +367,48 @@ void Engine::_initGLContext()
     extensions.insert(extension);
   }
 
-  _caps.standardDerivatives = true;
-  _caps.textureFloat  = stl_util::contains(extensions, "GL_ARB_texture_float");
-  _caps.maxAnisotropy = _caps.textureAnisotropicFilterExtension ?
-                          static_cast<unsigned>(_gl->getParameteri(
-                            GL::MAX_TEXTURE_MAX_ANISOTROPY_EXT)) :
-                          0;
-  _caps.depthTextureExtension        = false;
-  _caps.vertexArrayObject            = false;
-  _caps.instancedArrays              = false;
-  _caps.uintIndices                  = true;
-  _caps.fragmentDepthSupported       = true;
+  _caps.standardDerivatives = (_webGLVersion > 1.f);
+  _caps.maxAnisotropy       = static_cast<unsigned>(
+    _gl->getParameteri(GL::MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+  _caps.uintIndices                  = (_webGLVersion > 1.f);
+  _caps.fragmentDepthSupported       = (_webGLVersion > 1.f);
   _caps.highPrecisionShaderSupported = true;
-  _caps.drawBuffersExtension
-    = stl_util::contains(extensions, "GL_ARB_draw_buffers");
-  _caps.textureFloatLinearFiltering = true;
-  _caps.textureLOD
-    = stl_util::contains(extensions, "GL_ARB_shader_texture_lod");
-  // _caps.textureFloatRender = renderToFullFloat;
 
-  _caps.textureHalfFloat
-    = stl_util::contains(extensions, "OES_texture_half_float");
-  _caps.textureHalfFloatLinearFiltering
-    = stl_util::contains(extensions, "OES_texture_half_float_linear");
+  // Checks if some of the format renders first to allow the use of webgl
+  // inspector.
+  _caps.colorBufferFloat = (_webGLVersion > 1.f);
 
-  _caps.textureHalfFloat = (_webGLVersion > 1);
+  _caps.textureFloat
+    = (_webGLVersion > 1.f)
+      || stl_util::contains(extensions, "GL_ARB_texture_float");
+  _caps.textureFloatLinearFiltering = _caps.textureFloat;
+  _caps.textureFloatRender
+    = _caps.textureFloat && _canRenderToFloatFramebuffer() ? true : false;
+
+  _caps.textureHalfFloat                = (_webGLVersion > 1.f);
+  _caps.textureHalfFloatLinearFiltering = (_webGLVersion > 1.f);
   if (_webGLVersion > 1) {
     _gl->HALF_FLOAT_OES = 0x140B;
   }
-  // _caps.textureHalfFloatRender = renderToHalfFloat;
+  _caps.textureHalfFloatRender
+    = _caps.textureHalfFloat && _canRenderToHalfFloatFramebuffer();
+
+  _caps.textureLOD = (_webGLVersion > 1.f);
+
+  // Draw buffers
+  if (_webGLVersion > 1.f) {
+    _caps.drawBuffersExtension = true;
+  }
+
+  // Depth Texture
+  if (_webGLVersion > 1.f) {
+    _caps.depthTextureExtension = true;
+  }
+
+  // Vertex array object
+  if (_webGLVersion > 1.f) {
+    _caps.vertexArrayObject = true;
+  }
 
   // Instances count
   if (_webGLVersion > 1.f) {

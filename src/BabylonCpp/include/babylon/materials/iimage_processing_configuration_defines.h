@@ -1,6 +1,8 @@
 #ifndef BABYLON_MATERIALS_IIMAGE_PROCESSING_CONFIGURATION_DEFINES_H
 #define BABYLON_MATERIALS_IIMAGE_PROCESSING_CONFIGURATION_DEFINES_H
 
+#include <ostream>
+
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
@@ -25,6 +27,17 @@ struct BABYLON_SHARED_EXPORT IImageProcessingConfigurationDefines {
   bool SAMPLER3DGREENDEPTH        = false;
   bool SAMPLER3DBGRMAP            = false;
   bool IMAGEPROCESSINGPOSTPROCESS = false;
+
+  friend std::ostream& operator<<(std::ostream& os,
+                                  const IImageProcessingConfigurationDefines&
+                                    imageProcessingConfigurationDefines);
+
+  /**
+   * @brief Converts the material define values to a string.
+   * @returns String of material define information.
+   */
+  std::string convertToString() const;
+
 }; // end of struct IImageProcessingConfigurationDefines
 
 } // end of namespace BABYLON
