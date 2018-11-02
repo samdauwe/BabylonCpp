@@ -8,7 +8,7 @@ Viewport::Viewport()
 {
 }
 
-Viewport::Viewport(int ix, int iy, int iwidth, int iheight)
+Viewport::Viewport(float ix, float iy, float iwidth, float iheight)
     : x{ix}, y{iy}, width{iwidth}, height{iheight}
 {
 }

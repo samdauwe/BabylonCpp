@@ -42,7 +42,7 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , inertia{0.9f}
     , mode{Camera::PERSPECTIVE_CAMERA()}
     , isIntermediate{false}
-    , viewport{Viewport(0, 0, 1, 1)}
+    , viewport{Viewport(0.f, 0.f, 1.f, 1.f)}
     , layerMask{0x0FFFFFFF}
     , fovMode{Camera::FOVMODE_VERTICAL_FIXED()}
     , cameraRigMode{Camera::RIG_MODE_NONE()}

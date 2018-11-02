@@ -23,7 +23,7 @@ public:
    * @param height defines the viewport height
    */
   Viewport();
-  Viewport(int x, int y, int width, int height);
+  Viewport(float x, float y, float width, float height);
   Viewport(const Viewport& otherViewport);
   Viewport(Viewport&& otherViewport);
   Viewport& operator=(const Viewport& otherViewport);
@@ -54,22 +54,22 @@ public:
   /**
    * viewport left coordinate
    */
-  int x;
+  float x;
 
   /**
    * viewport top coordinate
    */
-  int y;
+  float y;
 
   /**
    * viewport width
    */
-  int width;
+  float width;
 
   /**
    * viewport height
    */
-  int height;
+  float height;
 
 }; // end of class Viewport
 

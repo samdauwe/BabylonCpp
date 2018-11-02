@@ -550,7 +550,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _viewport(int x, int y, int width, int height);
+  void _viewport(float x, float y, float width, float height);
 
   /**
    * @brief Set the WebGL's viewport.

@@ -904,18 +904,19 @@ void Engine::scissorClear(int x, int y, int width, int height,
   }
 }
 
-void Engine::_viewport(int x, int y, int width, int height)
+void Engine::_viewport(float x, float y, float width, float height)
 {
-  if (x != static_cast<int>(_viewportCached.x)
-      || y != static_cast<int>(_viewportCached.y)
-      || width != static_cast<int>(_viewportCached.z)
-      || height != static_cast<int>(_viewportCached.w)) {
+  if (!stl_util::almost_equal(x, _viewportCached.x)
+      || !stl_util::almost_equal(y, _viewportCached.y)
+      || !stl_util::almost_equal(width, _viewportCached.z)
+      || !stl_util::almost_equal(height, _viewportCached.w)) {
     _viewportCached.x = x;
     _viewportCached.y = y;
     _viewportCached.z = width;
     _viewportCached.w = height;
 
-    _gl->viewport(x, y, width, height);
+    _gl->viewport(static_cast<int>(x), static_cast<int>(y),
+                  static_cast<int>(width), static_cast<int>(height));
   }
 }
 
@@ -930,10 +931,10 @@ void Engine::setViewport(Viewport& viewport, int requiredWidth,
     _cachedViewport = &viewport;
   }
   else {
-    int width  = requiredWidth != 0 ? requiredWidth : getRenderWidth();
-    int height = requiredHeight != 0 ? requiredHeight : getRenderHeight();
-    int x      = viewport.x;
-    int y      = viewport.y;
+    auto width  = requiredWidth != 0 ? requiredWidth : getRenderWidth();
+    auto height = requiredHeight != 0 ? requiredHeight : getRenderHeight();
+    auto x      = viewport.x;
+    auto y      = viewport.y;
 
     _cachedViewport = &viewport;
 
