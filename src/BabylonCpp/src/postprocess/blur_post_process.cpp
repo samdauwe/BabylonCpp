@@ -166,6 +166,9 @@ void BlurPostProcess::_updateParameters(
     }
   }
 
+  linearSamplingOffsets.resize(linearSamplingMap.size());
+  linearSamplingWeights.resize(linearSamplingMap.size());
+
   for (unsigned int i = 0; i < linearSamplingMap.size(); ++i) {
     linearSamplingOffsets[i] = linearSamplingMap[i].first;
     linearSamplingWeights[i] = linearSamplingMap[i].second;
@@ -262,7 +265,7 @@ std::string BlurPostProcess::_glslFloat(float x,
   std::ostringstream oss;
   oss.precision(decimalFigures);
   oss << std::fixed << x;
-  return String::regexReplace(oss.str(), "0+", "");
+  return oss.str();
 }
 
 } // end of namespace BABYLON

@@ -61,7 +61,8 @@ void PostProcessRenderEffect::_attachCameras(
       cameraKey = cameraName;
     }
 
-    if (!stl_util::contains(_postProcesses, cameraKey)) {
+    if (!stl_util::contains(_postProcesses, cameraKey)
+        || _postProcesses[cameraKey].empty()) {
       auto postProcess = _getPostProcesses();
       if (!postProcess.empty()) {
         _postProcesses[cameraKey] = postProcess;

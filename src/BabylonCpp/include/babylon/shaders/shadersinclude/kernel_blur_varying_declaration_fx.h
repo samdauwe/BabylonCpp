@@ -6,8 +6,7 @@ namespace BABYLON {
 extern const char* kernelBlurVaryingDeclaration;
 
 const char* kernelBlurVaryingDeclaration
-  = "varying vec2 sampleCoord{X};\n"
-    "varying vec2 sampleCoord{X};\n";
+  = "varying vec2 sampleCoord{X};\n";
 
 } // end of namespace BABYLON
 

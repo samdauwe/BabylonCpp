@@ -6,8 +6,7 @@ namespace BABYLON {
 extern const char* kernelBlurVertex;
 
 const char* kernelBlurVertex
-  = "sampleCoord{X} = sampleCenter + delta * KERNEL_OFFSET{X};\n"
-    "sampleCoord{X} = sampleCenter + delta * KERNEL_OFFSET{X};\n";
+  = "sampleCoord{X} = sampleCenter + delta * KERNEL_OFFSET{X};\n";
 
 } // end of namespace BABYLON
 

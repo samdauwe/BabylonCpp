@@ -236,7 +236,8 @@ void PostProcess::updateEffect(
   options.indexParameters
     = !indexParameters.empty() ? indexParameters : _indexParameters;
 
-  _effect = _engine->createEffect(baseName, options, _scene->getEngine());
+  _effect = _engine->createEffect(baseName, options,
+                                  _scene ? _scene->getEngine() : _engine);
 }
 
 bool PostProcess::isReusable() const
