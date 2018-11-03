@@ -134,6 +134,7 @@
 ![lens_flares_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lens_flares_scene.png?raw=true "Lens Flares Scene")
 ![refraction_and_reflection_dds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/refraction_and_reflection_dds_scene.png?raw=true "Refraction And Reflection DDS Texture Scene")
 ![refraction_and_reflection_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/refraction_and_reflection_scene.png?raw=true "Refraction And Reflection Scene")
+![simple_post_process_render_pipeline_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simple_post_process_render_pipeline_scene.png?raw=true "Simple Post Process Render Pipeline Scene")
 ![waves_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/waves_scene.png?raw=true "Waves Scene")
 
 ## Textures ##

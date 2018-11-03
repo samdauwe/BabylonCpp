@@ -83,7 +83,7 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
     });                                                               //
   // Simple Post Process Render Pipeline Scene
   _samples["SimplePostProcessRenderPipelineScene"] = std::make_tuple(
-    false,                                                                    //
+    true,                                                                     //
     [](ICanvas* iCanvas) {                                                    //
       return std::make_unique<SimplePostProcessRenderPipelineScene>(iCanvas); //
     });                                                                       //

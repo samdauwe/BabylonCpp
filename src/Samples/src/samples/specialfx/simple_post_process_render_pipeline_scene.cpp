@@ -16,6 +16,8 @@ namespace Samples {
 SimplePostProcessRenderPipelineScene::SimplePostProcessRenderPipelineScene(
   ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
+    , _blackAndWhite{nullptr}
+    , _horizontalBlur{nullptr}
 {
 }
 
@@ -49,10 +51,10 @@ void SimplePostProcessRenderPipelineScene::initializeScene(ICanvas* canvas,
     = PostProcessRenderPipeline::New(engine, "standardPipeline");
 
   // Create post processes
-  auto blackAndWhite
+  _blackAndWhite
     = BlackAndWhitePostProcess::New("bw", 1.f, nullptr, 0, engine, false);
-  auto horizontalBlur = BlurPostProcess::New(
-    "hb", Vector2(1.f, 0.f), 20, 1.f, nullptr, std::nullopt, engine, false);
+  _horizontalBlur = BlurPostProcess::New("hb", Vector2(1.f, 0.f), 20, 1.f,
+                                         nullptr, std::nullopt, engine, false);
 
   // Create effect with multiple post processes and add to pipeline
   auto blackAndWhiteThenBlur = PostProcessRenderEffect::New(
