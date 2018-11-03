@@ -4,6 +4,7 @@
 #include <babylon/engine/depth_texture_creation_options.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/iinternal_texture_loader.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/math/spherical_polynomial.h>
 
@@ -168,8 +169,10 @@ void InternalTexture::_rebuild()
     case InternalTexture::DATASOURCE_CUBE: {
       proxy = _engine->createCubeTexture(
         url, nullptr, _files, !generateMipMaps,
-        [this](const CubeTextureData&) { isReady = true; }, nullptr, format,
-        _extension);
+        [this](const std::optional<CubeTextureData>& /*data*/) {
+          isReady = true;
+        },
+        nullptr, format, _extension);
       proxy->_swapAndDie(this);
     }
       return;
@@ -197,7 +200,7 @@ void InternalTexture::_rebuild()
     case InternalTexture::DATASOURCE_CUBEPREFILTERED: {
       proxy = _engine->createPrefilteredCubeTexture(
         url, nullptr, _lodGenerationScale, _lodGenerationOffset,
-        [this, &proxy](const CubeTextureData&) {
+        [this, &proxy](const std::optional<CubeTextureData>& /*data*/) {
           if (proxy) {
             proxy->_swapAndDie(this);
           }

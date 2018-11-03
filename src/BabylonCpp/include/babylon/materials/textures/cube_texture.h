@@ -118,7 +118,8 @@ protected:
   CubeTexture(const std::string& rootUrl, Scene* scene,
               const std::vector<std::string>& extensions = {},
               bool noMipmap = false, const std::vector<std::string>& files = {},
-              const std::function<void(const CubeTextureData& data)>& onLoad
+              const std::function<
+                void(const std::optional<CubeTextureData>& data)>& onLoad
               = nullptr,
               const std::function<void(const std::string& message,
                                        const std::string& exception)>& onError

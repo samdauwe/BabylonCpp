@@ -25,6 +25,15 @@ public:
   static constexpr unsigned int DEFAULT_ANISOTROPIC_FILTERING_LEVEL = 4;
 
 public:
+  template <typename... Ts>
+  static BaseTexturePtr New(Ts&&... args)
+  {
+    auto texture = std::shared_ptr<BaseTexture>(
+      new BaseTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
+
+    return texture;
+  }
   virtual ~BaseTexture() override;
 
   template <typename Derived>

@@ -1630,7 +1630,7 @@ public:
 
   /**
    * @brief Create a cube texture from prefiltered data (ie. the mipmaps contain
-   * ready to use data for PBR reflection).
+   * ready to use data for PBR reflection)
    * @param rootUrl defines the url where the file to load is located
    * @param scene defines the current scene
    * @param lodScale defines scale to apply to the mip map selection
@@ -1648,7 +1648,9 @@ public:
    */
   InternalTexturePtr createPrefilteredCubeTexture(
     const std::string& rootUrl, Scene* scene, float lodScale, float lodOffset,
-    const std::function<void(const CubeTextureData& data)>& onLoad = nullptr,
+    const std::function<void(const std::optional<CubeTextureData>& data)>&
+      onLoad
+    = nullptr,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
     = nullptr,
@@ -1684,7 +1686,9 @@ public:
   InternalTexturePtr createCubeTexture(
     std::string rootUrl, Scene* scene, const std::vector<std::string>& files,
     bool noMipmap,
-    const std::function<void(const CubeTextureData& data)>& onLoad = nullptr,
+    const std::function<void(const std::optional<CubeTextureData>& data)>&
+      onLoad
+    = nullptr,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
     = nullptr,

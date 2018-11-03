@@ -42,7 +42,7 @@ CubeTexture::CubeTexture(
   const std::string& rootUrl, Scene* scene,
   const std::vector<std::string>& extensions, bool noMipmap,
   const std::vector<std::string>& iFiles,
-  const std::function<void(const CubeTextureData& data)>& onLoad,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message,
                            const std::string& exception)>& onError,
   unsigned int format, bool prefiltered, const std::string& forcedExtension,

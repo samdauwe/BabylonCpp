@@ -44,6 +44,7 @@
 #include <babylon/states/_alpha_state.h>
 #include <babylon/states/_depth_culling_state.h>
 #include <babylon/states/_stencil_state.h>
+#include <babylon/tools/dds.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -3992,20 +3993,125 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
 }
 
 InternalTexturePtr Engine::createPrefilteredCubeTexture(
-  const std::string& /*rootUrl*/, Scene* /*scene*/, float /*scale*/,
-  float /*offset*/,
-  const std::function<void(const CubeTextureData& data)>& /*onLoad*/,
+  const std::string& rootUrl, Scene* scene, float lodScale, float lodOffset,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/,
-  unsigned int /*format*/, const std::string& /*forcedExtension*/,
-  bool /*createPolynomials*/)
+                           const std::string& exception)>& onError,
+  unsigned int format, const std::string& forcedExtension,
+  bool createPolynomials)
 {
-  return nullptr;
+  const auto callback = [&](const std::optional<CubeTextureData>& loadData) {
+    if (!loadData.has_value()) {
+      if (onLoad) {
+        onLoad(std::nullopt);
+      }
+      return;
+    }
+
+    auto texture = loadData->texture;
+    if (!createPolynomials) {
+      texture->_sphericalPolynomial = std::make_shared<SphericalPolynomial>();
+    }
+    else if (loadData->info.sphericalPolynomial) {
+      texture->_sphericalPolynomial = loadData->info.sphericalPolynomial;
+    }
+    texture->_dataSource = InternalTexture::DATASOURCE_CUBEPREFILTERED;
+
+    if (_caps.textureLOD) {
+      // Do not add extra process if texture lod is supported.
+      if (onLoad) {
+        onLoad(loadData);
+      }
+      return;
+    }
+
+    unsigned int mipSlices = 3;
+
+    auto width = loadData->width;
+    if (!width) {
+      return;
+    }
+
+    std::vector<BaseTexturePtr> textures;
+    for (unsigned int i = 0; i < mipSlices; ++i) {
+      // compute LOD from even spacing in smoothness (matching shader
+      // calculation)
+      float smoothness
+        = static_cast<float>(i) / static_cast<float>(mipSlices - 1);
+      float roughness = 1.f - smoothness;
+
+      float minLODIndex = lodOffset; // roughness = 0
+      float maxLODIndex
+        = Scalar::Log2(width) * lodScale + lodOffset; // roughness = 1
+
+      float lodIndex  = minLODIndex + (maxLODIndex - minLODIndex) * roughness;
+      int mipmapIndex = static_cast<int>(
+        std::round(std::min(std::max(lodIndex, 0.f), maxLODIndex)));
+
+      auto glTextureFromLod = std::make_shared<InternalTexture>(
+        this, InternalTexture::DATASOURCE_TEMP);
+      glTextureFromLod->type   = texture->type;
+      glTextureFromLod->format = texture->format;
+      glTextureFromLod->width  = static_cast<int>(std::pow(
+        2.f,
+        std::max(static_cast<float>(Scalar::Log2(width) - mipmapIndex), 0.f)));
+      glTextureFromLod->height = glTextureFromLod->width;
+      glTextureFromLod->isCube = true;
+      _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, glTextureFromLod, true);
+
+      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER,
+                         GL::LINEAR);
+      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MIN_FILTER,
+                         GL::LINEAR);
+      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_S,
+                         GL::CLAMP_TO_EDGE);
+      _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
+                         GL::CLAMP_TO_EDGE);
+
+      if (loadData->isDDS) {
+#if 0
+        auto info  = loadData->info;
+        auto& data = loadData->data;
+        _unpackFlipY(info.isCompressed);
+
+        DDSTools::UploadDDSLevels(this, glTextureFromLod, data, info, true, 6u,
+                                  mipmapIndex);
+#endif
+      }
+      else {
+        BABYLON_LOG_WARN(
+          "Engine", "DDS is the only prefiltered cube map supported so far.");
+      }
+
+      _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
+
+      // Wrap in a base texture for easy binding.
+      auto lodTexture      = BaseTexture::New(scene);
+      lodTexture->isCube   = true;
+      lodTexture->_texture = glTextureFromLod;
+
+      glTextureFromLod->isReady = true;
+      textures.emplace_back(lodTexture);
+    }
+
+    texture->_lodTextureHigh = textures[2];
+    texture->_lodTextureMid  = textures[1];
+    texture->_lodTextureLow  = textures[0];
+
+    if (onLoad) {
+      onLoad(loadData);
+    }
+  };
+
+  return createCubeTexture(rootUrl, scene, {}, false, callback, onError, format,
+                           forcedExtension, createPolynomials, lodScale,
+                           lodOffset);
 }
 
 InternalTexturePtr Engine::createCubeTexture(
   std::string rootUrl, Scene* scene, const std::vector<std::string>& files,
-  bool noMipmap, const std::function<void(const CubeTextureData& data)>& onLoad,
+  bool noMipmap,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad,
   const std::function<void(const std::string& message,
                            const std::string& exception)>& onError,
   unsigned int format, const std::string& forcedExtension,

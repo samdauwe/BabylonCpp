@@ -35,10 +35,9 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->minZ = 0.1f;
 
   // Environment Texture
-  // auto hdrTexture
-  //  = CubeTexture::CreateFromPrefilteredData("textures/environment.dds",
-  //  scene);
-  auto hdrTexture = CubeTexture::New("textures/environment.dds", scene);
+  auto hdrTexture
+    = CubeTexture::CreateFromPrefilteredData("textures/environment.dds", scene);
+
 #if 0
   scene->imageProcessingConfiguration()->exposure = 0.6f;
   scene->imageProcessingConfiguration()->contrast = 1.6f;
