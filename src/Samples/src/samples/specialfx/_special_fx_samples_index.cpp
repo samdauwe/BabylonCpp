@@ -1,5 +1,6 @@
 #include <babylon/samples/specialfx/_special_fx_samples_index.h>
 
+#include <babylon/samples/specialfx/convolution_post_process_scene.h>
 #include <babylon/samples/specialfx/environment_scene.h>
 #include <babylon/samples/specialfx/fireworks_with_shader_code_scene.h>
 #include <babylon/samples/specialfx/fog_scene.h>
@@ -21,6 +22,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
 {
   // -- Special FX examples --
 
+  // Convolution Post-process Scene
+  _samples["ConvolutionPostProcessScene"] = std::make_tuple(
+    true,                                                            //
+    [](ICanvas* iCanvas) {                                           //
+      return std::make_unique<ConvolutionPostProcessScene>(iCanvas); //
+    });                                                              //
   // Environment Scene
   _samples["EnvironmentScene"]
     = std::make_tuple(true,                                                 //

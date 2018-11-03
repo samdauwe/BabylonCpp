@@ -6,6 +6,9 @@
 
 namespace BABYLON {
 
+class ConvolutionPostProcess;
+using ConvolutionPostProcessPtr = std::shared_ptr<ConvolutionPostProcess>;
+
 /**
  * @brief The ConvolutionPostProcess applies a 3x3 kernel to every pixel of the
  * input texture to perform effects such as edge detection or sharpening
@@ -47,6 +50,18 @@ public:
   static const Float32Array GaussianKernel;
 
 public:
+  template <typename... Ts>
+  static ConvolutionPostProcessPtr New(Ts&&... args)
+  {
+    auto postProcess = std::shared_ptr<ConvolutionPostProcess>(
+      new ConvolutionPostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
+  }
+  ~ConvolutionPostProcess();
+
+protected:
   /**
    * @brief Creates a new instance ConvolutionPostProcess.
    * @param name The name of the effect.
@@ -66,11 +81,11 @@ public:
    */
   ConvolutionPostProcess(const std::string& name, const Float32Array& kernel,
                          float ratio, const CameraPtr& camera,
-                         unsigned int samplingMode, Engine* engine,
-                         bool reusable = false,
+                         unsigned int samplingMode
+                         = TextureConstants::NEAREST_SAMPLINGMODE,
+                         Engine* engine = nullptr, bool reusable = false,
                          unsigned int textureType
                          = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-  ~ConvolutionPostProcess();
 
 public:
   /**
