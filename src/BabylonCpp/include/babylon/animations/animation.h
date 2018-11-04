@@ -6,6 +6,7 @@
 #include <babylon/animations/animation_event.h>
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/animation_value.h>
+#include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/babylon_api.h>
 
 namespace picojson {
@@ -20,7 +21,7 @@ class Animatable;
 class Animation;
 class IAnimatable;
 struct IAnimationKey;
-class IEasingFunction;
+struct IEasingFunction;
 class Node;
 class RuntimeAnimation;
 class Scene;
