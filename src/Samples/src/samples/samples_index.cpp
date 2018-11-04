@@ -13,6 +13,7 @@
 #include <babylon/samples/meshes/_meshes_samples_index.h>
 #include <babylon/samples/optimizations/_optimizations_samples_index.h>
 #include <babylon/samples/proceduraltextureslibrary/_procedural_textures_library_samples_index.h>
+#include <babylon/samples/shadows/_shadows_samples_index.h>
 #include <babylon/samples/specialfx/_special_fx_samples_index.h>
 #include <babylon/samples/textures/_textures_samples_index.h>
 
@@ -45,6 +46,8 @@ SamplesIndex::SamplesIndex()
     // Procedural Textures Library samples
     {_ProceduralTexturesLibrarySamplesIndex::CategoryName(),
      _ProceduralTexturesLibrarySamplesIndex()},
+    // Shadows samples
+    {_ShadowsSamplesIndex::CategoryName(), _ShadowsSamplesIndex()},
     // Special FX samples
     {_SpecialFXSamplesIndex::CategoryName(), _SpecialFXSamplesIndex()},
     // Textures samples
