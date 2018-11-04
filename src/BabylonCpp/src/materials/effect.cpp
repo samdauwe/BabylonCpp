@@ -1,5 +1,7 @@
 #include <babylon/materials/effect.h>
 
+#include <sstream>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
@@ -592,14 +594,24 @@ std::string Effect::_processPrecision(std::string source)
 
   // Add GL_ES define
   // -- precision mediump float
-  const std::string mediump{"#ifdef GL_ES\nprecision mediump float;\n#endif\n"};
+  std::ostringstream mediumpStream;
+  mediumpStream << "#ifdef GL_ES\n";
+  mediumpStream << "precision mediump float;\n";
+  mediumpStream << "precision mediump sampler2DShadow;\n";
+  mediumpStream << "#endif\n";
+  const std::string mediump{mediumpStream.str()};
   if (String::contains(source, "precision mediump float;")
       && !String::contains(source, mediump)) {
     String::replaceInPlace(source, "precision mediump float;", mediump);
   }
 
   // -- precision highp float
-  const std::string highp{"#ifdef GL_ES\nprecision highp float;\n#endif\n"};
+  std::ostringstream highpStream;
+  highpStream << "#ifdef GL_ES\n";
+  highpStream << "precision highp float;\n";
+  highpStream << "precision highp sampler2DShadow;\n";
+  highpStream << "#endif\n";
+  const std::string highp{highpStream.str()};
   if (String::contains(source, "precision highp float;")
       && !String::contains(source, highp)) {
     String::replaceInPlace(source, "precision highp float;", highp);
