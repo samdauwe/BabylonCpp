@@ -13,11 +13,13 @@ class AbstractMesh;
 class IShadowLight;
 class PostProcess;
 class Scene;
+class ShadowGenerator;
 class SubMesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using IShadowLightPtr = std::shared_ptr<IShadowLight>;
-using PostProcessPtr  = std::shared_ptr<PostProcess>;
-using SubMeshPtr      = std::shared_ptr<SubMesh>;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using IShadowLightPtr    = std::shared_ptr<IShadowLight>;
+using PostProcessPtr     = std::shared_ptr<PostProcess>;
+using ShadowGeneratorPtr = std::shared_ptr<ShadowGenerator>;
+using SubMeshPtr         = std::shared_ptr<SubMesh>;
 
 /**
  * @brief Default implementation IShadowGenerator.
@@ -157,23 +159,18 @@ public:
     return ShadowGenerator::_QUALITY_LOW;
   }
 
-  /**
-   * @brief Creates a ShadowGenerator object.
-   * A ShadowGenerator is the required tool to use the shadows.
-   * Each light casting shadows needs to use its own ShadowGenerator.
-   * Documentation : http://doc.babylonjs.com/tutorials/shadows
-   * @param mapSize The size of the texture what stores the shadows. Example :
-   * 1024.
-   * @param light The light object generating the shadows.
-   * @param useFullFloatFirst By default the generator will try to use half
-   * float textures but if you need precision (for self shadowing for instance),
-   * you can use this option to enforce full float texture.
-   */
-  ShadowGenerator(int mapSize, const IShadowLightPtr& light,
-                  bool useFullFloatFirst = false);
-  ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& light,
-                  bool useFullFloatFirst = false);
+  template <typename... Ts>
+  static ShadowGeneratorPtr New(Ts&&... args)
+  {
+    auto shadowGenerator = std::shared_ptr<ShadowGenerator>(
+      new ShadowGenerator(std::forward<Ts>(args)...));
+    shadowGenerator->addToLight(shadowGenerator);
+
+    return shadowGenerator;
+  }
   virtual ~ShadowGenerator();
+
+  void addToLight(const ShadowGeneratorPtr& shadowGenerator);
 
   /**
    * @brief Returns the darkness value (float). This can only decrease the
@@ -221,7 +218,7 @@ public:
    * added. Default to true
    * @returns the Shadow Generator itself
    */
-  ShadowGenerator& addShadowCaster(AbstractMesh* mesh,
+  ShadowGenerator& addShadowCaster(const AbstractMeshPtr& mesh,
                                    bool includeDescendants = true);
 
   /**
@@ -319,6 +316,23 @@ public:
                                 Scene* scene);
 
 protected:
+  /**
+   * @brief Creates a ShadowGenerator object.
+   * A ShadowGenerator is the required tool to use the shadows.
+   * Each light casting shadows needs to use its own ShadowGenerator.
+   * Documentation : http://doc.babylonjs.com/tutorials/shadows
+   * @param mapSize The size of the texture what stores the shadows. Example :
+   * 1024.
+   * @param light The light object generating the shadows.
+   * @param useFullFloatFirst By default the generator will try to use half
+   * float textures but if you need precision (for self shadowing for instance),
+   * you can use this option to enforce full float texture.
+   */
+  ShadowGenerator(int mapSize, const IShadowLightPtr& light,
+                  bool useFullFloatFirst = false);
+  ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& light,
+                  bool useFullFloatFirst = false);
+
   /**
    * @brief Gets the bias: offset applied on the depth preventing acnea (in
    * light direction).

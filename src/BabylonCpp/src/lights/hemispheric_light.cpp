@@ -65,7 +65,7 @@ Vector3 HemisphericLight::setDirectionToTarget(const Vector3& target)
   return direction;
 }
 
-ShadowGenerator* HemisphericLight::getShadowGenerator()
+ShadowGeneratorPtr HemisphericLight::getShadowGenerator()
 {
   return nullptr;
 }

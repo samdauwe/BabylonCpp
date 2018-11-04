@@ -52,7 +52,7 @@ public:
    * @returns Always null for hemispheric lights because it does not support
    * shadows.
    */
-  ShadowGenerator* getShadowGenerator() override;
+  ShadowGeneratorPtr getShadowGenerator() override;
 
   /**
    * @brief Sets the passed Effect object with the HemisphericLight normalized

@@ -15,7 +15,8 @@ class Light;
 struct MaterialDefines;
 class ShadowGenerator;
 class UniformBuffer;
-using LightPtr = std::shared_ptr<Light>;
+using LightPtr           = std::shared_ptr<Light>;
+using ShadowGeneratorPtr = std::shared_ptr<ShadowGenerator>;
 
 /**
  * @brief Base class of all the lights in Babylon. It groups all the generic
@@ -155,7 +156,7 @@ public:
    * @brief Returns the Light associated shadow generator if any.
    * @return the associated shadow generator.
    */
-  virtual ShadowGenerator* getShadowGenerator();
+  virtual ShadowGeneratorPtr getShadowGenerator();
 
   /**
    * @brief Returns a Vector3, the absolute light position in the World.
@@ -470,7 +471,7 @@ public:
    * Shadow generator associted to the light.
    * Hidden Internal use only.
    */
-  ShadowGenerator* _shadowGenerator;
+  ShadowGeneratorPtr _shadowGenerator;
 
   /**
    * Internal use only.

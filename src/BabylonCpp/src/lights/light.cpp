@@ -221,7 +221,7 @@ void Light::set_lightmapMode(unsigned int value)
   _markMeshesAsLightDirty();
 }
 
-ShadowGenerator* Light::getShadowGenerator()
+ShadowGeneratorPtr Light::getShadowGenerator()
 {
   return _shadowGenerator;
 }
@@ -231,7 +231,8 @@ Vector3 Light::getAbsolutePosition()
   return Vector3::Zero();
 }
 
-void Light::transferToEffect(Effect* /*effect*/, const std::string& /*lightIndex*/)
+void Light::transferToEffect(Effect* /*effect*/,
+                             const std::string& /*lightIndex*/)
 {
 }
 
@@ -347,8 +348,8 @@ Json::object Light::serialize() const
 }
 
 std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
-                                                          const std::string& name,
-                                                          Scene* scene)
+                                                        const std::string& name,
+                                                        Scene* scene)
 {
   auto constructorFunc
     = Node::Construct("Light_Type_" + std::to_string(type), name, scene);
@@ -416,7 +417,8 @@ void Light::_hookArrayForExcluded(const std::vector<AbstractMesh*>& /*array*/)
 {
 }
 
-void Light::_hookArrayForIncludedOnly(const std::vector<AbstractMesh*>& /*array*/)
+void Light::_hookArrayForIncludedOnly(
+  const std::vector<AbstractMesh*>& /*array*/)
 {
 }
 
@@ -430,7 +432,10 @@ void Light::_resyncMeshes()
 void Light::_markMeshesAsLightDirty()
 {
   for (auto& mesh : getScene()->meshes) {
-    if (stl_util::contains(mesh->_lightSources, this)) {
+    if (std::find_if(
+          mesh->_lightSources.begin(), mesh->_lightSources.end(),
+          [this](const LightPtr& light) { return light.get() == this; })
+        != mesh->_lightSources.end()) {
       mesh->_markSubMeshesAsLightDirty();
     }
   }
@@ -490,8 +495,7 @@ float Light::_getPhotometricScale()
           // infinitely small angular light source (i.e. a dirac delta
           // function).
           apexAngleRadians = std::max(apexAngleRadians, 0.001f);
-          auto solidAngle
-            = 2.f * Math::PI * (1.f - std::cos(apexAngleRadians));
+          auto solidAngle = 2.f * Math::PI * (1.f - std::cos(apexAngleRadians));
           photometricScale = solidAngle;
           break;
       }

@@ -135,8 +135,6 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize,
     , _textureType{0}
     , _defaultTextureMatrix{Matrix::Identity()}
 {
-  light->_shadowGenerator = this;
-
   // Texture type fallback from float to int if not supported.
   const auto& caps = _scene->getEngine()->getCaps();
 
@@ -170,6 +168,11 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize,
 
 ShadowGenerator::~ShadowGenerator()
 {
+}
+
+void ShadowGenerator::addToLight(const ShadowGeneratorPtr& shadowGenerator)
+{
+  _light->_shadowGenerator = shadowGenerator;
 }
 
 float ShadowGenerator::get_bias() const
@@ -505,7 +508,7 @@ RenderTargetTexturePtr ShadowGenerator::getShadowMapForRendering()
   return _shadowMap;
 }
 
-ShadowGenerator& ShadowGenerator::addShadowCaster(AbstractMesh* mesh,
+ShadowGenerator& ShadowGenerator::addShadowCaster(const AbstractMeshPtr& mesh,
                                                   bool includeDescendants)
 {
   if (!_shadowMap) {
