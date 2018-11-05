@@ -36,6 +36,7 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     [](ICanvas* iCanvas) {                                       //
       return std::make_unique<ProceduralTexturesScene>(iCanvas); //
     });                                                          //
+  // Render Target Texture Scene
 }
 
 _TexturesSamplesIndex::~_TexturesSamplesIndex()
