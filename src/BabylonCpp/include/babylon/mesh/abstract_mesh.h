@@ -1360,6 +1360,11 @@ public:
   Property<AbstractMesh, MaterialPtr> material;
 
   /**
+   * The saved material
+   */
+  MaterialPtr _savedMaterial;
+
+  /**
    * A boolean indicating that this mesh can receive realtime shadows.
    */
   Property<AbstractMesh, bool> receiveShadows;

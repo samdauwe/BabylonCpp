@@ -77,6 +77,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , enablePointerMoveEvents{false}
     , renderingGroupId{0}
     , material{this, &AbstractMesh::get_material, &AbstractMesh::set_material}
+    , _savedMaterial{nullptr}
     , receiveShadows{this, &AbstractMesh::get_receiveShadows,
                      &AbstractMesh::set_receiveShadows}
     , renderOutline{false}
