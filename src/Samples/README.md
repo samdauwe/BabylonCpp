@@ -141,7 +141,9 @@
 ## Textures ##
 ![bump_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bump_texture_scene.png?raw=true "Bump Texture Scene")
 ![bump_texture_spheres_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bump_texture_spheres_scene.png?raw=true "Bump Texture Spheres Scene")
+![custom_render_targets_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/custom_render_targets_scene.png?raw=true "Custom Render Targets Scene")
 ![image_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/image_texture_scene.png?raw=true "Image Texture Scene")
+![render_target_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/render_target_texture_scene.png?raw=true "Render Target Texture Scene")
 
 ## Extensions ##
 
