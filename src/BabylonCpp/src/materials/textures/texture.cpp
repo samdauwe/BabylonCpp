@@ -358,7 +358,12 @@ Matrix* Texture::getReflectionTextureMatrix()
 
   scene->markAllMaterialsAsDirty(
     Material::TextureDirtyFlag(), [this](Material* mat) {
-      return stl_util::contains(mat->getActiveTextures(), this);
+      return (std::find_if(mat->getActiveTextures().begin(),
+                           mat->getActiveTextures().end(),
+                           [this](const BaseTexturePtr& texture) {
+                             return texture.get() == this;
+                           })
+              != mat->getActiveTextures().end());
     });
 
   return _cachedTextureMatrix.get();

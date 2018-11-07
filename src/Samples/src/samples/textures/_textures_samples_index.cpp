@@ -4,6 +4,7 @@
 #include <babylon/samples/textures/bump_texture_spheres_scene.h>
 #include <babylon/samples/textures/custom_render_targets_scene.h>
 #include <babylon/samples/textures/image_texture_scene.h>
+#include <babylon/samples/textures/mirrors_scene.h>
 #include <babylon/samples/textures/procedural_textures_scene.h>
 #include <babylon/samples/textures/render_target_texture_scene.h>
 
@@ -38,6 +39,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<ImageTextureScene>(iCanvas); //
                       });                                                    //
+  // Mirrors Scene
+  _samples["MirrorsScene"]
+    = std::make_tuple(true,                                             //
+                      [](ICanvas* iCanvas) {                            //
+                        return std::make_unique<MirrorsScene>(iCanvas); //
+                      });                                               //
   // Procedural Textures Scene
   _samples["ProceduralTexturesScene"] = std::make_tuple(
     false,                                                       //

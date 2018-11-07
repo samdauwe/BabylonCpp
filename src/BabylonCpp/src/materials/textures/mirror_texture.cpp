@@ -133,8 +133,10 @@ void MirrorTexture::_autoComputeBlurKernel()
 {
   auto engine = getScene()->getEngine();
 
-  auto dw     = getRenderWidth() / engine->getRenderWidth();
-  auto dh     = getRenderHeight() / engine->getRenderHeight();
+  auto dw = static_cast<float>(getRenderWidth())
+            / static_cast<float>(engine->getRenderWidth());
+  auto dh = static_cast<float>(getRenderHeight())
+            / static_cast<float>(engine->getRenderHeight());
   blurKernelX = _adaptiveBlurKernel * dw;
   blurKernelY = _adaptiveBlurKernel * dh;
 }
