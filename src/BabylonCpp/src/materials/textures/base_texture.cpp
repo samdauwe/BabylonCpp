@@ -29,8 +29,6 @@ BaseTexture::BaseTexture(Scene* scene)
     , is3D{false}
     , gammaSpace{true}
     , isRGBD{this, &BaseTexture::get_isRGBD}
-    , isBlocking{this, &BaseTexture::get_isBlocking,
-                 &BaseTexture::set_isBlocking}
     , invertZ{false}
     , lodLevelInAlpha{false}
     , lodGenerationOffset{this, &BaseTexture::get_lodGenerationOffset,
@@ -38,18 +36,32 @@ BaseTexture::BaseTexture(Scene* scene)
     , lodGenerationScale{this, &BaseTexture::get_lodGenerationScale,
                          &BaseTexture::set_lodGenerationScale}
     , isRenderTarget{false}
+    , uid{this, &BaseTexture::get_uid}
+    , onDispose{this, &BaseTexture::set_onDispose}
     , delayLoadState{EngineConstants::DELAYLOADSTATE_NONE}
     , _texture{nullptr}
+    , isBlocking{this, &BaseTexture::get_isBlocking,
+                 &BaseTexture::set_isBlocking}
     , boundingBoxSize{this, &BaseTexture::get_boundingBoxSize,
                       &BaseTexture::set_boundingBoxSize}
+    , textureType{this, &BaseTexture::get_textureType}
+    , textureFormat{this, &BaseTexture::get_textureFormat}
+    , sphericalPolynomial{this, &BaseTexture::get_sphericalPolynomial,
+                          &BaseTexture::set_sphericalPolynomial}
+    , _lodTextureHigh{this, &BaseTexture::get__lodTextureHigh}
+    , _lodTextureMid{this, &BaseTexture::get__lodTextureMid}
+    , _lodTextureLow{this, &BaseTexture::get__lodTextureLow}
     , _hasAlpha{false}
     , _coordinatesMode{TextureConstants::EXPLICIT_MODE}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
+    , _uid{Tools::RandomId()}
     , _onDisposeObserver{nullptr}
     , _textureMatrix{Matrix::IdentityReadOnly()}
     , _reflectionTextureMatrix{Matrix::IdentityReadOnly()}
     , emptyVector3{std::nullopt}
     , _cachedSize{Size::Zero()}
+    , _nullSphericalPolynomial{nullptr}
+    , _nullBaseTexture{nullptr}
 {
 }
 
@@ -139,11 +151,8 @@ void BaseTexture::set_lodGenerationScale(float value)
   }
 }
 
-std::string BaseTexture::uid()
+std::string BaseTexture::get_uid() const
 {
-  if (_uid.empty()) {
-    _uid = Tools::RandomId();
-  }
   return _uid;
 }
 
@@ -157,7 +166,7 @@ const std::string BaseTexture::getClassName() const
   return "BaseTexture";
 }
 
-void BaseTexture::setOnDispose(
+void BaseTexture::set_onDispose(
   const std::function<void(BaseTexture*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
@@ -304,7 +313,7 @@ std::unique_ptr<BaseTexture> BaseTexture::clone() const
   return nullptr;
 }
 
-unsigned int BaseTexture::textureType() const
+unsigned int BaseTexture::get_textureType() const
 {
   if (!_texture) {
     return EngineConstants::TEXTURETYPE_UNSIGNED_INT;
@@ -314,7 +323,7 @@ unsigned int BaseTexture::textureType() const
                           EngineConstants::TEXTURETYPE_UNSIGNED_INT;
 }
 
-unsigned int BaseTexture::textureFormat() const
+unsigned int BaseTexture::get_textureFormat() const
 {
   if (!_texture) {
     return EngineConstants::TEXTUREFORMAT_RGBA;
@@ -324,7 +333,8 @@ unsigned int BaseTexture::textureFormat() const
                             EngineConstants::TEXTUREFORMAT_RGBA;
 }
 
-ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int level)
+ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int level,
+                                        std::optional<ArrayBufferView> buffer)
 {
   if (!_texture) {
     return ArrayBufferView();
@@ -351,11 +361,12 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int level)
 
   if (_texture->isCube) {
     return engine->_readTexturePixels(_texture, size.width, size.height,
-                                      static_cast<int>(faceIndex), level);
+                                      static_cast<int>(faceIndex), level,
+                                      buffer);
   }
 
   return engine->_readTexturePixels(_texture, size.width, size.height, -1,
-                                    level);
+                                    level, buffer);
 }
 
 void BaseTexture::releaseInternalTexture()
@@ -366,10 +377,10 @@ void BaseTexture::releaseInternalTexture()
   }
 }
 
-SphericalPolynomial* BaseTexture::sphericalPolynomial()
+SphericalPolynomialPtr& BaseTexture::get_sphericalPolynomial()
 {
   if (!_texture || !isReady()) {
-    return nullptr;
+    return _nullSphericalPolynomial;
   }
 
   if (!_texture->_sphericalPolynomial) {
@@ -377,39 +388,38 @@ SphericalPolynomial* BaseTexture::sphericalPolynomial()
       ConvertCubeMapTextureToSphericalPolynomial(this);
   }
 
-  return _texture->_sphericalPolynomial.get();
+  return _texture->_sphericalPolynomial;
 }
 
-void BaseTexture::setSphericalPolynomial(const SphericalPolynomial& value)
+void BaseTexture::set_sphericalPolynomial(const SphericalPolynomialPtr& value)
 {
   if (_texture) {
-    _texture->_sphericalPolynomial
-      = std::make_unique<SphericalPolynomial>(value);
+    _texture->_sphericalPolynomial = value;
   }
 }
 
-BaseTexturePtr BaseTexture::_lodTextureHigh() const
+BaseTexturePtr& BaseTexture::get__lodTextureHigh()
 {
   if (_texture) {
     return _texture->_lodTextureHigh;
   }
-  return nullptr;
+  return _nullBaseTexture;
 }
 
-BaseTexturePtr BaseTexture::_lodTextureMid() const
+BaseTexturePtr& BaseTexture::get__lodTextureMid()
 {
   if (_texture) {
     return _texture->_lodTextureMid;
   }
-  return nullptr;
+  return _nullBaseTexture;
 }
 
-BaseTexturePtr BaseTexture::_lodTextureLow() const
+BaseTexturePtr& BaseTexture::get__lodTextureLow()
 {
   if (_texture) {
     return _texture->_lodTextureLow;
   }
-  return nullptr;
+  return _nullBaseTexture;
 }
 
 void BaseTexture::dispose()
@@ -428,6 +438,8 @@ void BaseTexture::dispose()
                      return baseTexture.get() == this;
                    }),
     _scene->textures.end());
+
+  _scene->onTextureRemovedObservable.notifyObservers(this);
 
   if (_texture == nullptr) {
     return;

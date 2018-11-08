@@ -5410,9 +5410,10 @@ void Engine::_measureFps()
   _deltaTime = _performanceMonitor->instantaneousFrameTime();
 }
 
-ArrayBufferView Engine::_readTexturePixels(const InternalTexturePtr& texture,
-                                           int width, int height, int faceIndex,
-                                           int level)
+ArrayBufferView
+Engine::_readTexturePixels(const InternalTexturePtr& texture, int width,
+                           int height, int faceIndex, int level,
+                           std::optional<ArrayBufferView> /*buffer*/)
 {
   if (!_dummyFramebuffer) {
     auto dummy = _gl->createFramebuffer();

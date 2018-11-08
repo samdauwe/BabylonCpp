@@ -2288,6 +2288,26 @@ public:
   Observable<AbstractMesh> onMeshRemovedObservable;
 
   /**
+   * An event triggered when a material is created
+   */
+  Observable<Material> onNewMaterialAddedObservable;
+
+  /**
+   * An event triggered when a material is removed
+   */
+  Observable<Material> onMaterialRemovedObservable;
+
+  /**
+   * An event triggered when a texture is created
+   */
+  Observable<BaseTexture> onNewTextureAddedObservable;
+
+  /**
+   * An event triggered when a texture is removed
+   */
+  Observable<BaseTexture> onTextureRemovedObservable;
+
+  /**
    * An event triggered when render targets are about to be rendered
    * Can happen multiple times per frame.
    */

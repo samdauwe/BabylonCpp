@@ -5,6 +5,7 @@
 #include <variant>
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine_capabilities.h>
@@ -26,7 +27,6 @@ class _AlphaState;
 class _DepthCullingState;
 class _StencilState;
 struct _TimeToken;
-struct ArrayBufferView;
 class AudioEngine;
 class BaseTexture;
 class Camera;
@@ -1995,9 +1995,10 @@ public:
   /**
    * @brief Hidden
    */
-  ArrayBufferView _readTexturePixels(const InternalTexturePtr& texture,
-                                     int width, int height, int faceIndex = -1,
-                                     int level = 0);
+  ArrayBufferView
+  _readTexturePixels(const InternalTexturePtr& texture, int width, int height,
+                     int faceIndex = -1, int level = 0,
+                     std::optional<ArrayBufferView> buffer = std::nullopt);
 
   /**
    * @brief Hidden
