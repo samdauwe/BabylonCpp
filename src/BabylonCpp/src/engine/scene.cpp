@@ -4905,7 +4905,9 @@ void Scene::markAllMaterialsAsDirty(
     if (predicate && !predicate(material.get())) {
       continue;
     }
-    material->markAsDirty(flag);
+    if (material) {
+      material->markAsDirty(flag);
+    }
   }
 }
 
