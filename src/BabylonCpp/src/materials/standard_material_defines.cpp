@@ -1,6 +1,7 @@
 #include <babylon/materials/standard_material_defines.h>
 
 #include <array>
+#include <sstream>
 
 namespace BABYLON {
 
@@ -131,6 +132,15 @@ void StandardMaterialDefines::setReflectionMode(const std::string& modeToEnable)
   for (const auto& mode : modes) {
     boolDef[mode] = (mode == modeToEnable);
   }
+}
+
+std::string StandardMaterialDefines::toString() const
+{
+  std::ostringstream oss;
+  oss << MaterialDefines::toString();
+  oss << IImageProcessingConfigurationDefines::convertToString();
+
+  return oss.str();
 }
 
 } // end of namespace BABYLON

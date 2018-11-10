@@ -362,10 +362,9 @@ void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
 void GLRenderingContext::bufferSubData(GLenum target, GLintptr offset,
                                        Int32Array& data)
 {
-  glBufferSubData(
-    target, offset,
-    static_cast<GLint>(data.size() * data.size() * sizeof(int32_t)),
-    data.data());
+  glBufferSubData(target, offset,
+                  static_cast<GLint>(data.size() * sizeof(int32_t)),
+                  data.data());
 }
 
 void GLRenderingContext::bindVertexArray(GL::IGLVertexArrayObject* vao)

@@ -12,9 +12,15 @@ struct BABYLON_SHARED_EXPORT StandardMaterialDefines
       public IImageProcessingConfigurationDefines {
 
   StandardMaterialDefines();
-  ~StandardMaterialDefines();
+  ~StandardMaterialDefines() override;
 
   void setReflectionMode(const std::string& modeToEnable);
+
+  /**
+   * @brief Converts the material define values to a string.
+   * @returns - String of material define information.
+   */
+  virtual std::string toString() const override;
 
 }; // end of struct StandardMaterialDefines
 
