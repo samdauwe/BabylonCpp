@@ -216,11 +216,8 @@ protected:
   InstancedMesh(const std::string& name, Mesh* source);
 
 private:
-  int get_renderingGroupId() const;
-  void set_renderingGroupId(int value);
-
-public:
-  Property<InstancedMesh, int> renderingGroupId;
+  int get_renderingGroupId() const override;
+  void set_renderingGroupId(int value) override;
 
 private:
   Mesh* _sourceMesh;

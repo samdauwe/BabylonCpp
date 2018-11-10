@@ -451,8 +451,8 @@ VertexData::ExtractFromMesh(Mesh* mesh, bool copyWhenShared, bool forceCopy)
 }
 
 std::unique_ptr<VertexData> VertexData::ExtractFromGeometry(Geometry* geometry,
-                                                         bool copyWhenShared,
-                                                         bool forceCopy)
+                                                            bool copyWhenShared,
+                                                            bool forceCopy)
 {
   return VertexData::_ExtractFrom(geometry, copyWhenShared, forceCopy);
 }
@@ -1063,7 +1063,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
           ringNormal.x = ringVertex.x;
           ringNormal.z = ringVertex.z;
           ringNormal.y = std::sqrt(ringNormal.x * ringNormal.x
-                                     + ringNormal.z * ringNormal.z)
+                                   + ringNormal.z * ringNormal.z)
                          * _tan;
           ringNormal.normalize();
         }
@@ -1178,7 +1178,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     float _angle;
     Vector3 circleVector;
     Vector2 textureCoordinate;
-    Vector4 u            = (isTop) ? faceUV[surfaceNb - 1] : faceUV[0];
+    Vector4 u               = (isTop) ? faceUV[surfaceNb - 1] : faceUV[0];
     std::optional<Color4> c = std::nullopt;
     if (!faceColors.empty()) {
       c = (isTop) ? faceColors[surfaceNb - 1] : faceColors[0];
@@ -1837,7 +1837,8 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreateIcoSphere(IcoSphereOptions& options)
+std::unique_ptr<VertexData>
+VertexData::CreateIcoSphere(IcoSphereOptions& options)
 {
   const auto& sideOrientation = options.sideOrientation;
   const auto& radius          = options.radius;
@@ -2543,7 +2544,8 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   return vertexData;
 }
 
-std::unique_ptr<VertexData> VertexData::CreateTorusKnot(TorusKnotOptions& options)
+std::unique_ptr<VertexData>
+VertexData::CreateTorusKnot(TorusKnotOptions& options)
 {
   Uint32Array indices;
   Float32Array positions;
@@ -2681,10 +2683,10 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   unsigned int v3z           = 0;   // vector3 z index in the positions array
   bool computeFacetNormals   = false;
   bool computeFacetPositions = false;
-  bool computeFacetPartitioning  = false;
-  bool computeDepthSort          = false;
-  float faceNormalSign           = 1.f;
-  float ratio                    = 0.f;
+  bool computeFacetPartitioning     = false;
+  bool computeDepthSort             = false;
+  float faceNormalSign              = 1.f;
+  float ratio                       = 0.f;
   std::optional<Vector3> distanceTo = std::nullopt;
   std::vector<DepthSortedFacet> depthSortedFacets;
   if (options) {
@@ -2773,7 +2775,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
 
     // normalize this normal and store it in the array facetData
     length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
-                         + faceNormalz * faceNormalz);
+                       + faceNormalz * faceNormalz);
     length = stl_util::almost_equal(length, 0.f) ? 1.f : length;
     faceNormalx /= length;
     faceNormaly /= length;
@@ -2884,7 +2886,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
     faceNormalz = normals[index * 3 + 2];
 
     length = std::sqrt(faceNormalx * faceNormalx + faceNormaly * faceNormaly
-                         + faceNormalz * faceNormalz);
+                       + faceNormalz * faceNormalz);
     length = stl_util::almost_equal(length, 0.f) ? 1.f : length;
     faceNormalx /= length;
     faceNormaly /= length;

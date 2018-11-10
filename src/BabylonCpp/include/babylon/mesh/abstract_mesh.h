@@ -941,6 +941,16 @@ protected:
   void set_showBoundingBox(bool value);
 
   /**
+   * @brief Gets the rendering group id for this mesh.
+   */
+  virtual int get_renderingGroupId() const;
+
+  /**
+   * @brief Sets the rendering group id for this mesh.
+   */
+  virtual void set_renderingGroupId(int value);
+
+  /**
    * @brief Gets current material.
    */
   virtual MaterialPtr& get_material();
@@ -1352,7 +1362,7 @@ public:
    * @see
    * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#rendering-groups
    */
-  int renderingGroupId;
+  Property<AbstractMesh, int> renderingGroupId;
 
   /**
    * The current material
@@ -1651,6 +1661,7 @@ private:
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;
   // Properties
   float _visibility;
+  int _renderingGroupId;
   MaterialPtr _material;
   bool _receiveShadows;
   bool _hasVertexAlpha;

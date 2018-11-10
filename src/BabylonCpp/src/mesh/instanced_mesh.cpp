@@ -10,8 +10,6 @@ namespace BABYLON {
 
 InstancedMesh::InstancedMesh(const std::string& _name, Mesh* source)
     : AbstractMesh(_name, source->getScene())
-    , renderingGroupId{this, &InstancedMesh::get_renderingGroupId,
-                       &InstancedMesh::set_renderingGroupId}
     , _sourceMesh{source}
     , _currentLOD{nullptr}
 {

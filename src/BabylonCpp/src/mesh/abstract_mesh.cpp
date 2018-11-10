@@ -75,7 +75,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , showSubMeshesBoundingBox{false}
     , isBlocker{false}
     , enablePointerMoveEvents{false}
-    , renderingGroupId{0}
+    , renderingGroupId{this, &AbstractMesh::get_renderingGroupId,
+                       &AbstractMesh::set_renderingGroupId}
     , material{this, &AbstractMesh::get_material, &AbstractMesh::set_material}
     , _savedMaterial{nullptr}
     , receiveShadows{this, &AbstractMesh::get_receiveShadows,
@@ -141,6 +142,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
     , _visibility{1.f}
+    , _renderingGroupId{0}
     , _material{nullptr}
     , _receiveShadows{false}
     , _hasVertexAlpha{false}
@@ -428,6 +430,16 @@ void AbstractMesh::set_showBoundingBox(bool value)
   if (value) {
     getScene()->getBoundingBoxRenderer();
   }
+}
+
+int AbstractMesh::get_renderingGroupId() const
+{
+  return _renderingGroupId;
+}
+
+void AbstractMesh::set_renderingGroupId(int value)
+{
+  _renderingGroupId = value;
 }
 
 int AbstractMesh::get_collisionMask() const
