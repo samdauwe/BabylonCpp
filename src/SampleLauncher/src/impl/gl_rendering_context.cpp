@@ -332,7 +332,7 @@ void GLRenderingContext::bufferData(GLenum target, const Int32Array& data,
 void GLRenderingContext::bufferData(GLenum target, const Uint16Array& data,
                                     GLenum usage)
 {
-  glBufferData(target, static_cast<GLint>(data.size() * sizeof(char16_t)),
+  glBufferData(target, static_cast<GLint>(data.size() * sizeof(uint16_t)),
                data.data(), usage);
 }
 
