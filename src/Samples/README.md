@@ -125,6 +125,9 @@
 ![tiled_ground_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tiled_ground_scene.png?raw=true "Tiled Ground Scene")
 ![tube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/tube_scene.png?raw=true "Tube Scene")
 
+## Optimizations ##
+![building_instances_grid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/building_instances_grid_scene.png?raw=true "Building Instances Grid Scene")
+
 ## Special FX ##
 ![convolution_post_process_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/convolution_post_process_scene.png?raw=true "Convolution Post-process Scene")
 ![environment_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/environment_scene.png?raw=true "Environment Scene")

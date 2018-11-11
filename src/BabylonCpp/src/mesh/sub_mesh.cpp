@@ -244,9 +244,13 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
 
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
+  if (positions.empty()) {
+    return intersectInfo;
+  }
+
   const auto material = getMaterial();
   if (!material) {
-    return std::nullopt;
+    return intersectInfo;
   }
 
   switch (material->fillMode()) {
