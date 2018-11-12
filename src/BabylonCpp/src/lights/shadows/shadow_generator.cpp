@@ -257,7 +257,7 @@ void ShadowGenerator::set_useKernelBlur(bool value)
 
 float ShadowGenerator::get_depthScale() const
 {
-  return _depthScale ? *_depthScale : _light->getDepthScale();
+  return _depthScale.has_value() ? *_depthScale : _light->getDepthScale();
 }
 
 void ShadowGenerator::set_depthScale(float value)
@@ -681,22 +681,21 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
     _blurPostProcesses = {_kernelBlurXPostprocess, _kernelBlurYPostprocess};
   }
   else {
-#if 0
-    _boxBlurPostprocess = std::make_unique<PostProcess>(
+    _boxBlurPostprocess = PostProcess::New(
       _light->name + "DepthBoxBlur", "depthBoxBlur",
       {"screenSize", "boxOffset"}, {}, 1.f, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
       "#define OFFSET " + std::to_string(_blurBoxOffset), _textureType);
-    _boxBlurPostprocess->onApplyObservable.add([this](Effect* effect) {
-      int targetSize = static_cast<int>(_mapSize.width / blurScale());
-      effect->setFloat2("screenSize", targetSize, targetSize);
-      effect->setTexture("textureSampler", _shadowMap.get());
-  });
+    _boxBlurPostprocess->onApplyObservable.add(
+      [this](Effect* effect, EventState& /*es*/) {
+        auto targetSize = static_cast<float>(_mapSize.width) / blurScale();
+        effect->setFloat2("screenSize", targetSize, targetSize);
+        effect->setTexture("textureSampler", _shadowMap);
+      });
 
-  _boxBlurPostprocess->autoClear = false;
+    _boxBlurPostprocess->autoClear = false;
 
-  _blurPostProcesses = {_boxBlurPostprocess.get()};
-#endif
+    _blurPostProcesses = {_boxBlurPostprocess};
   }
 }
 
@@ -710,7 +709,7 @@ void ShadowGenerator::_renderForShadowMap(
 
   if (!depthOnlySubMeshes.empty()) {
     engine->setColorWrite(false);
-    for (auto& depthOnlySubMesh : depthOnlySubMeshes) {
+    for (const auto& depthOnlySubMesh : depthOnlySubMeshes) {
       _renderSubMeshForShadowMap(depthOnlySubMesh);
     }
     engine->setColorWrite(true);
@@ -802,12 +801,13 @@ void ShadowGenerator::_renderSubMeshForShadowMap(const SubMeshPtr& subMesh)
     }
 
     // Draw
-    mesh->_processRendering(
-      subMesh.get(), _effect, Material::TriangleFillMode(), batch,
-      hardwareInstancedRendering,
-      [&](bool /*isInstance*/, Matrix world, Material* /*effectiveMaterial*/) {
-        _effect->setMatrix("world", world);
-      });
+    mesh->_processRendering(subMesh.get(), _effect,
+                            Material::TriangleFillMode(), batch,
+                            hardwareInstancedRendering,
+                            [&](bool /*isInstance*/, const Matrix& world,
+                                Material* /*effectiveMaterial*/) {
+                              _effect->setMatrix("world", world);
+                            });
 
     if (forceBackFacesOnly) {
       engine->setState(true, 0, false, false);
