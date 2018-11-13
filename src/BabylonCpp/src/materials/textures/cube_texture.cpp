@@ -57,7 +57,10 @@ CubeTexture::CubeTexture(
     , _noMipmap{noMipmap}
     , _textureMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _format{format}
+    , _forcedExtension{forcedExtension}
     , _createPolynomials{createPolynomials}
+    , _lodScale{lodScale}
+    , _lodOffset{lodOffset}
 {
   isCube = true;
 
@@ -250,8 +253,9 @@ CubeTexturePtr CubeTexture::clone() const
     return nullptr;
   }
 
-  auto newTexture
-    = CubeTexture::New(url, scene, _extensions, _noMipmap, _files);
+  auto newTexture = CubeTexture::New(
+    url, scene, _extensions, _noMipmap, _files, nullptr, nullptr, _format,
+    _prefiltered, _forcedExtension, _createPolynomials, _lodScale, _lodOffset);
 
   return newTexture;
 }

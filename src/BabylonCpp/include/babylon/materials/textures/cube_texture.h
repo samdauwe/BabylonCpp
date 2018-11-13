@@ -185,7 +185,10 @@ private:
   std::vector<std::string> _extensions;
   std::unique_ptr<Matrix> _textureMatrix;
   unsigned int _format;
+  std::string _forcedExtension;
   bool _createPolynomials;
+  float _lodScale;
+  float _lodOffset;
 
 }; // end of class CubeTexture
 
