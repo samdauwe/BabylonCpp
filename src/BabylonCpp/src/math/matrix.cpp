@@ -26,18 +26,29 @@ Matrix::Matrix() : updateFlag{0}, _isIdentity{false}, _isIdentityDirty{true}
   _markAsUpdated();
 }
 
-Matrix::Matrix(const Matrix& otherMatrix) : m{otherMatrix.m}
+Matrix::Matrix(const Matrix& otherMatrix)
+    : updateFlag{otherMatrix.updateFlag}
+    , m{otherMatrix.m}
+    , _isIdentity{otherMatrix._isIdentity}
+    , _isIdentityDirty{otherMatrix._isIdentityDirty}
 {
 }
 
-Matrix::Matrix(Matrix&& otherMatrix) : m{std::move(otherMatrix.m)}
+Matrix::Matrix(Matrix&& otherMatrix)
+    : updateFlag{std::move(otherMatrix.updateFlag)}
+    , m{std::move(otherMatrix.m)}
+    , _isIdentity{std::move(otherMatrix._isIdentity)}
+    , _isIdentityDirty{std::move(otherMatrix._isIdentityDirty)}
 {
 }
 
 Matrix& Matrix::operator=(const Matrix& otherMatrix)
 {
   if (&otherMatrix != this) {
-    m = otherMatrix.m;
+    updateFlag       = otherMatrix.updateFlag;
+    m                = otherMatrix.m;
+    _isIdentity      = otherMatrix._isIdentity;
+    _isIdentityDirty = otherMatrix._isIdentityDirty;
   }
 
   return *this;
@@ -46,7 +57,10 @@ Matrix& Matrix::operator=(const Matrix& otherMatrix)
 Matrix& Matrix::operator=(Matrix&& otherMatrix)
 {
   if (&otherMatrix != this) {
-    m = std::move(otherMatrix.m);
+    updateFlag       = std::move(otherMatrix.updateFlag);
+    m                = std::move(otherMatrix.m);
+    _isIdentity      = std::move(otherMatrix._isIdentity);
+    _isIdentityDirty = std::move(otherMatrix._isIdentityDirty);
   }
 
   return *this;
@@ -1381,12 +1395,12 @@ void Matrix::PerspectiveFovWebVRToRef(const VRFov& fov, float znear, float zfar,
 {
   const float rightHandedFactor = rightHanded ? -1.f : 1.f;
   const float upTan             = std::tan(fov.upDegrees * Math::PI / 180.f);
-  const float downTan  = std::tan(fov.downDegrees * Math::PI / 180.f);
-  const float leftTan  = std::tan(fov.leftDegrees * Math::PI / 180.f);
-  const float rightTan = std::tan(fov.rightDegrees * Math::PI / 180.f);
-  const float xScale   = 2.f / (leftTan + rightTan);
-  const float yScale   = 2.f / (upTan + downTan);
-  result.m[0]          = xScale;
+  const float downTan           = std::tan(fov.downDegrees * Math::PI / 180.f);
+  const float leftTan           = std::tan(fov.leftDegrees * Math::PI / 180.f);
+  const float rightTan          = std::tan(fov.rightDegrees * Math::PI / 180.f);
+  const float xScale            = 2.f / (leftTan + rightTan);
+  const float yScale            = 2.f / (upTan + downTan);
+  result.m[0]                   = xScale;
   result.m[1] = result.m[2] = result.m[3] = result.m[4] = 0.f;
   result.m[5]                                           = yScale;
   result.m[6] = result.m[7] = 0.0;
