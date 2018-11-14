@@ -592,7 +592,7 @@ std::string Effect::_processPrecision(std::string source)
     }
   }
 
-  // Add GL_ES define
+  // Add GL_ES defines
   // -- precision mediump float
   std::ostringstream mediumpStream;
   mediumpStream << "#ifdef GL_ES\n";
@@ -602,6 +602,12 @@ std::string Effect::_processPrecision(std::string source)
   const std::string mediump{mediumpStream.str()};
   if (String::contains(source, "precision mediump float;")
       && !String::contains(source, mediump)) {
+    if (String::contains(source,
+                         "#ifdef GL_ES\nprecision mediump float;\n#endif")) {
+      String::replaceInPlace(source,
+                             "#ifdef GL_ES\nprecision mediump float;\n#endif",
+                             "precision mediump float;");
+    }
     String::replaceInPlace(source, "precision mediump float;", mediump);
   }
 
@@ -614,6 +620,12 @@ std::string Effect::_processPrecision(std::string source)
   const std::string highp{highpStream.str()};
   if (String::contains(source, "precision highp float;")
       && !String::contains(source, highp)) {
+    if (String::contains(source,
+                         "#ifdef GL_ES\nprecision highp float;\n#endif")) {
+      String::replaceInPlace(source,
+                             "#ifdef GL_ES\nprecision highp float;\n#endif",
+                             "precision highp float;");
+    }
     String::replaceInPlace(source, "precision highp float;", highp);
   }
 
