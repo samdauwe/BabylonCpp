@@ -119,7 +119,7 @@ float DDSTools::_ToHalfFloat(float value)
   return bits;
 }
 
-float DDSTools::_FromHalfFloat(uint8_t value)
+float DDSTools::_FromHalfFloat(uint16_t value)
 {
   auto s = (value & 0x8000) >> 15;
   auto e = (value & 0x7C00) >> 10;
@@ -143,12 +143,13 @@ Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
   const Uint8Array& arrayBuffer, float lod)
 {
   Float32Array destArray(dataLength);
-  Uint8Array srcData(arrayBuffer);
+  Uint16Array srcData(
+    stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos    = static_cast<size_t>(dataOffset + (x + y * width) * 4);
-      destArray[index] = DDSTools::_FromHalfFloat(srcData[srcPos]);
+      auto srcPos          = static_cast<size_t>((x + y * width) * 4);
+      destArray[index]     = DDSTools::_FromHalfFloat(srcData[srcPos]);
       destArray[index + 1] = DDSTools::_FromHalfFloat(srcData[srcPos + 1]);
       destArray[index + 2] = DDSTools::_FromHalfFloat(srcData[srcPos + 2]);
       if (DDSTools::StoreLODInAlphaChannel) {
@@ -171,11 +172,12 @@ DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
 {
   if (DDSTools::StoreLODInAlphaChannel) {
     Uint16Array destArray(dataLength);
-    Uint8Array srcData(arrayBuffer);
+    Uint16Array srcData(stl_util::to_array<uint16_t>(
+      arrayBuffer, static_cast<size_t>(dataOffset)));
     size_t index = 0;
     for (float y = 0; y < height; ++y) {
       for (float x = 0; x < width; ++x) {
-        size_t srcPos = static_cast<size_t>(dataOffset + (x + y * width) * 4);
+        auto srcPos          = static_cast<size_t>((x + y * width) * 4);
         destArray[index]     = srcData[srcPos];
         destArray[index + 1] = srcData[srcPos + 1];
         destArray[index + 2] = srcData[srcPos + 2];
@@ -200,11 +202,12 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
 {
   if (DDSTools::StoreLODInAlphaChannel) {
     Float32Array destArray(dataLength);
-    Uint8Array srcData(arrayBuffer);
+    Float32Array srcData(
+      stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
     size_t index = 0;
     for (float y = 0; y < height; ++y) {
       for (float x = 0; x < width; ++x) {
-        size_t srcPos = static_cast<size_t>(dataOffset + (x + y * width) * 4);
+        auto srcPos          = static_cast<size_t>((x + y * width) * 4);
         destArray[index]     = srcData[srcPos];
         destArray[index + 1] = srcData[srcPos + 1];
         destArray[index + 2] = srcData[srcPos + 2];
@@ -224,12 +227,13 @@ Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
   const Uint8Array& arrayBuffer, float lod)
 {
   Float32Array destArray(dataLength);
-  Uint8Array srcData(arrayBuffer);
+  Float32Array srcData(
+    stl_util::to_array<float>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos    = static_cast<size_t>(dataOffset + (x + y * width) * 4);
-      destArray[index] = Scalar::Clamp(srcData[srcPos]) * 255;
+      auto srcPos          = static_cast<size_t>((x + y * width) * 4);
+      destArray[index]     = Scalar::Clamp(srcData[srcPos]) * 255;
       destArray[index + 1] = Scalar::Clamp(srcData[srcPos + 1]) * 255;
       destArray[index + 2] = Scalar::Clamp(srcData[srcPos + 2]) * 255;
       if (DDSTools::StoreLODInAlphaChannel) {
@@ -250,11 +254,12 @@ Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
   const Uint8Array& arrayBuffer, float lod)
 {
   Float32Array destArray(dataLength);
-  Uint8Array srcData(arrayBuffer);
+  Uint16Array srcData(
+    stl_util::to_array<uint16_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos = static_cast<size_t>(dataOffset + (x + y * width) * 4);
+      auto srcPos = static_cast<size_t>((x + y * width) * 4);
 
       destArray[index]
         = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos])) * 255;
@@ -283,12 +288,12 @@ Uint8Array DDSTools::_GetRGBAArrayBuffer(float width, float height,
                                          int aOffset)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(arrayBuffer);
+  Uint8Array srcData(
+    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      int srcPos
-        = static_cast<int>(dataOffset) + static_cast<int>(x + y * width) * 4;
+      auto srcPos = static_cast<int>(x + y * width) * 4;
 
       byteArray[index]     = srcData[static_cast<size_t>(srcPos + rOffset)];
       byteArray[index + 1] = srcData[static_cast<size_t>(srcPos + gOffset)];
@@ -316,12 +321,12 @@ Uint8Array DDSTools::_GetRGBArrayBuffer(float width, float height,
                                         int rOffset, int gOffset, int bOffset)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(arrayBuffer);
+  Uint8Array srcData(
+    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      int srcPos
-        = static_cast<int>(dataOffset) + static_cast<int>(x + y * width) * 3;
+      auto srcPos = static_cast<int>(x + y * width) * 3;
 
       byteArray[index]     = srcData[static_cast<size_t>(srcPos + rOffset)];
       byteArray[index + 1] = srcData[static_cast<size_t>(srcPos + gOffset)];
@@ -338,11 +343,12 @@ Uint8Array DDSTools::_GetLuminanceArrayBuffer(float width, float height,
                                               const Uint8Array& arrayBuffer)
 {
   Uint8Array byteArray(dataLength);
-  Uint8Array srcData(arrayBuffer);
+  Uint8Array srcData(
+    stl_util::to_array<uint8_t>(arrayBuffer, static_cast<size_t>(dataOffset)));
   size_t index = 0;
   for (float y = 0; y < height; ++y) {
     for (float x = 0; x < width; ++x) {
-      size_t srcPos    = static_cast<size_t>(dataOffset + x + y * width);
+      auto srcPos      = static_cast<size_t>(x + y * width);
       byteArray[index] = srcData[srcPos];
       ++index;
     }

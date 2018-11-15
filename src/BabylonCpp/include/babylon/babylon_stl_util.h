@@ -139,6 +139,13 @@ std::vector<C> to_array(const std::vector<T> buffer, size_t byteOffset,
 }
 
 template <typename C, typename T>
+std::vector<C> to_array(const std::vector<T> buffer, size_t byteOffset)
+{
+  return to_array<C>(buffer, byteOffset,
+                     (buffer.size() * sizeof(T)) / sizeof(C));
+}
+
+template <typename C, typename T>
 std::vector<C> to_array(const std::vector<T> buffer)
 {
   return to_array<C>(buffer, 0, (buffer.size() * sizeof(T)) / sizeof(C));

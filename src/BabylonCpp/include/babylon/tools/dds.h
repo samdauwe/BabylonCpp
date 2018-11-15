@@ -130,7 +130,7 @@ class BABYLON_SHARED_EXPORT DDSTools {
 
 private:
   static float _ToHalfFloat(float value);
-  static float _FromHalfFloat(uint8_t value);
+  static float _FromHalfFloat(uint16_t value);
   static Float32Array
   _GetHalfFloatAsFloatRGBAArrayBuffer(float width, float height, int dataOffset,
                                       size_t dataLength,
