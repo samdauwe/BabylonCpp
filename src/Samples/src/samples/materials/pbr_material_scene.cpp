@@ -38,7 +38,6 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto hdrTexture
     = CubeTexture::CreateFromPrefilteredData("textures/environment.dds", scene);
 
-#if 0
   scene->imageProcessingConfiguration()->exposure = 0.6f;
   scene->imageProcessingConfiguration()->contrast = 1.6f;
 
@@ -60,17 +59,16 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto sphereMetal = Mesh::CreateSphere("sphereMetal", 48, 30.f, scene);
   sphereMetal->translate(Vector3(1.f, 0.f, 0.f), 60.f);
-#endif
+
   auto spherePlastic = Mesh::CreateSphere("spherePlastic", 48, 30.f, scene);
   spherePlastic->translate(Vector3(0.f, 0.f, 1.f), -60.f);
-#if 0
+
   BoxOptions woodPlankOptions;
   woodPlankOptions.width  = 65.f;
   woodPlankOptions.height = 1.f;
   woodPlankOptions.depth  = 65.f;
   auto woodPlank = MeshBuilder::CreateBox("plane", woodPlankOptions, scene);
-#endif
-#if 0
+
   // Create materials
   auto glass                            = PBRMaterial::New("glass", scene);
   glass->reflectionTexture              = hdrTexture;
@@ -89,14 +87,14 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   metal->reflectivityColor = Color3(0.85f, 0.85f, 0.85f);
   metal->albedoColor       = Color3(0.01f, 0.01f, 0.01f);
   sphereMetal->material    = metal;
-#endif
+
   auto plastic               = PBRMaterial::New("plastic", scene);
   plastic->reflectionTexture = hdrTexture;
   plastic->microSurface      = 0.96f;
   plastic->albedoColor       = Color3(0.206f, 0.94f, 1.f);
   plastic->reflectivityColor = Color3(0.003f, 0.003f, 0.003f);
   spherePlastic->material    = plastic;
-#if 0
+
   auto wood                  = PBRMaterial::New("wood", scene);
   wood->reflectionTexture    = hdrTexture;
   wood->environmentIntensity = 1.f;
@@ -108,7 +106,6 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   wood->albedoColor   = Color3::White();
   wood->albedoTexture = Texture::New("textures/albedo.png", scene);
   woodPlank->material = wood;
-#endif
 }
 
 } // end of namespace Samples

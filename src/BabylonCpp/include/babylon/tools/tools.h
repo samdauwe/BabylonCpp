@@ -21,6 +21,10 @@ class ProgressEvent;
 struct BABYLON_SHARED_EXPORT Tools {
 
   /** Statics **/
+  static bool UseFallbackTexture;
+
+  // Used in case of a texture loading problem
+  static std::string fallbackTexture;
 
   /**
    * @brief Read the content of a byte array at a specified coordinates (taking
@@ -98,6 +102,11 @@ struct BABYLON_SHARED_EXPORT Tools {
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError,
     bool flipVertically = true);
+  static void LoadImageFromBuffer(
+    const std::variant<std::string, ArrayBuffer, Image>& input,
+    const std::function<void(const Image& img)>& onLoad,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError);
   static void LoadFile(
     std::string url,
     const std::function<void(const std::variant<std::string, ArrayBuffer>& data,

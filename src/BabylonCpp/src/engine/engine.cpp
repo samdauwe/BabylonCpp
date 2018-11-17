@@ -2704,8 +2704,9 @@ InternalTexturePtr Engine::createTexture(
   const std::vector<std::string>& list, bool noMipmap, bool invertY,
   Scene* scene, unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
-  const std::function<void()>& onError,
-  const std::variant<ArrayBuffer, Image>& buffer)
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError,
+  const std::variant<std::string, ArrayBuffer, Image>& buffer)
 {
   if (list.empty()) {
     return nullptr;
@@ -2719,8 +2720,9 @@ InternalTexturePtr Engine::createTexture(
   const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
   unsigned int samplingMode,
   const std::function<void(InternalTexture*, EventState&)>& onLoad,
-  const std::function<void()>& onError,
-  const std::optional<std::variant<ArrayBuffer, Image>>& buffer,
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError,
+  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
   const InternalTexturePtr& fallback, const std::optional<unsigned int>& format)
 {
   // assign a new string, so that the original is still available in case of
@@ -2739,14 +2741,18 @@ InternalTexturePtr Engine::createTexture(
   size_t lastDot  = lastDotTmp >= 0 ? static_cast<size_t>(lastDotTmp) : 0;
   auto extension
     = (lastDot > 0) ? String::toLowerCase(url.substr(lastDot, url.size())) : "";
-  auto isDDS = getCaps().s3tc && (extension == ".dds");
-  auto isTGA = (extension == ".tga");
 
-  // determine if a ktx file should be substituted
-  auto isKTX = false;
-  if (!_textureFormatInUse.empty() && !isBase64 && !fallback && !buffer) {
-    url   = url.substr(0, lastDot) + _textureFormatInUse;
-    isKTX = true;
+  IInternalTextureLoaderPtr loader = nullptr;
+  for (const auto& availableLoader : Engine::_TextureLoaders) {
+    if (availableLoader->canLoad(extension, _textureFormatInUse, fallback,
+                                 false, false)) {
+      loader = availableLoader;
+      break;
+    }
+  }
+
+  if (loader) {
+    url = loader->transformUrl(url, _textureFormatInUse);
   }
 
   if (scene) {
@@ -2757,9 +2763,9 @@ InternalTexturePtr Engine::createTexture(
   texture->samplingMode    = samplingMode;
   texture->invertY         = invertY;
 
-  if (!_doNotHandleContextLost) {
+  if (!_doNotHandleContextLost && buffer.has_value()) {
     // Keep a link to the buffer only if we plan to handle context lost
-    // texture->_buffer = buffer;
+    texture->_buffer = *buffer;
   }
 
   Observer<InternalTexture>::Ptr onLoadObserver = nullptr;
@@ -2771,37 +2777,66 @@ InternalTexturePtr Engine::createTexture(
     _internalTexturesCache.emplace_back(texture);
   }
 
-  const auto _onerror
-    = [&](const std::string& /*msg*/, const std::string& /*exception*/) {
+  const auto onInternalError
+    = [&](const std::string& message, const std::string& exception) {
         if (scene) {
           scene->_removePendingData(texture);
         }
 
-        if (onLoadObserver && !isKTX) {
-          // dont remove the observer if its a ktx file, since the fallback
-          // createTexture call will require it.
-          texture->onLoadedObservable.remove(onLoadObserver);
+        bool customFallback = false;
+        if (loader) {
+          auto fallbackUrl
+            = loader->getFallbackTextureUrl(url, _textureFormatInUse);
+          if (!fallbackUrl.empty()) {
+            // Add Back
+            customFallback = true;
+            createTexture(urlArg, noMipmap, invertY, scene, samplingMode,
+                          nullptr, onError, buffer, texture);
+          }
         }
 
-        // fallback for when compressed file not found to try again.  For
-        // instance, etc1 does not have an alpha capable type
-        if (isKTX) {
-          // createTexture(urlArg, noMipmap, invertY, scene, samplingMode,
-          // nullptr,
-          //              onError, buffer, texture);
+        if (!customFallback) {
+          if (onLoadObserver) {
+            texture->onLoadedObservable.remove(onLoadObserver);
+          }
+          if (Tools::UseFallbackTexture) {
+            createTexture(Tools::fallbackTexture, noMipmap, invertY, scene,
+                          samplingMode, nullptr, onError, buffer, texture);
+          }
         }
-        else if (onError) {
-          onError();
+
+        if (onError) {
+          onError(message.empty() ? "Unknown error" : message, exception);
         }
       };
 
-#if 0
-  std::function<void(ArrayBufferView & arrayBuffer)> callback;
-#endif
-
   // processing for non-image formats
-  if (isKTX || isTGA || isDDS) {
-    // Not implemented yet
+  if (loader) {
+    const auto callback
+      = [&](const std::variant<std::string, ArrayBuffer>& data,
+            const std::string & /*responseURL*/) -> void {
+      loader->loadData(
+        std::get<ArrayBuffer>(data), texture,
+        [&](int width, int height, bool loadMipmap, bool isCompressed,
+            const std::function<void()>& done) -> void {
+          _prepareWebGLTexture(
+            texture, scene, width, height, invertY, !loadMipmap, isCompressed,
+            [&](
+              int /*width*/, int /*height*/,
+              const std::function<void()> & /*continuationCallback*/) -> bool {
+              done();
+              return false;
+            },
+            samplingMode);
+        });
+    };
+
+    if (!buffer.has_value()) {
+      _loadFile(url, callback, nullptr, true, onInternalError);
+    }
+    else {
+      callback(std::get<ArrayBuffer>(*buffer), "");
+    }
   }
   else {
     auto onload = [&](const Image& img) {
@@ -2881,10 +2916,13 @@ InternalTexturePtr Engine::createTexture(
     };
 
     if (!fromData || isBase64) {
-      Tools::LoadImageFromUrl(url, onload, _onerror);
+      Tools::LoadImageFromUrl(url, onload, onInternalError);
     }
-    else {
-      // Not implemented yet
+    else if (buffer.has_value()
+             && (std::holds_alternative<std::string>(*buffer)
+                 || std::holds_alternative<ArrayBuffer>(*buffer)
+                 || std::holds_alternative<Image>(*buffer))) {
+      Tools::LoadImageFromBuffer(url, onload, onInternalError);
     }
   }
 

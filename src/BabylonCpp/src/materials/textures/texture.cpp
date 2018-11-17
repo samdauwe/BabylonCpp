@@ -13,12 +13,13 @@ namespace BABYLON {
 
 bool Texture::UseSerializedUrlIfAny = false;
 
-Texture::Texture(const std::string& _url, Scene* scene, bool noMipmap,
-                 bool invertY, unsigned int samplingMode,
-                 const std::function<void()>& onLoad,
-                 const std::function<void()>& onError,
-                 const std::optional<std::variant<ArrayBuffer, Image>>& buffer,
-                 bool deleteBuffer, const std::optional<unsigned int>& format)
+Texture::Texture(
+  const std::string& _url, Scene* scene, bool noMipmap, bool invertY,
+  unsigned int samplingMode, const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError,
+  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
+  bool deleteBuffer, const std::optional<unsigned int>& format)
     : BaseTexture{scene}
     , url{_url}
     , uOffset{0.f}
@@ -140,7 +141,7 @@ bool Texture::get_noMipmap() const
 
 void Texture::updateURL(
   const std::string& iUrl,
-  const std::optional<std::variant<ArrayBuffer, Image>>& buffer)
+  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer)
 {
   if (iUrl.empty()) {
     throw std::runtime_error("URL is already set");
@@ -415,13 +416,14 @@ void Texture::dispose()
 }
 
 TexturePtr Texture::CreateFromBase64String(
-  const std::string& /*data*/, const std::string& name, Scene* scene,
-  bool noMipmap, bool invertY, unsigned int samplingMode,
-  const std::function<void()>& onLoad, const std::function<void()>& onError,
+  const std::string& data, const std::string& name, Scene* scene, bool noMipmap,
+  bool invertY, unsigned int samplingMode, const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError,
   unsigned int format)
 {
   return Texture::New("data:" + name, scene, noMipmap, invertY, samplingMode,
-                      onLoad, onError, std::nullopt, false, format);
+                      onLoad, onError, data, false, format);
 }
 
 std::unique_ptr<BaseTexture>
@@ -433,9 +435,11 @@ Texture::Parse(const Json::value& /*parsedTexture*/, Scene* /*scene*/,
 
 TexturePtr Texture::LoadFromDataString(
   const std::string& name,
-  const std::optional<std::variant<ArrayBuffer, Image>>& buffer, Scene* scene,
-  bool deleteBuffer, bool noMipmap, bool invertY, unsigned int samplingMode,
-  const std::function<void()>& onLoad, const std::function<void()>& onError,
+  const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
+  Scene* scene, bool deleteBuffer, bool noMipmap, bool invertY,
+  unsigned int samplingMode, const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError,
   unsigned int format)
 {
   std::string _name = name;

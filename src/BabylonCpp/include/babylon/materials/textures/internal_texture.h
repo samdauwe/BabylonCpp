@@ -213,7 +213,7 @@ public:
   int _initialSlot;
   int _designatedSlot;
   unsigned int _dataSource;
-  std::variant<ArrayBuffer, Image> _buffer;
+  std::variant<std::string, ArrayBuffer, Image> _buffer;
   ArrayBuffer _bufferView;
   std::vector<ArrayBuffer> _bufferViewArray;
   std::vector<std::vector<ArrayBuffer>> _bufferViewArrayArray;

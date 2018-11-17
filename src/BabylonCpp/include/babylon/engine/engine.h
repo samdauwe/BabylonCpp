@@ -1386,9 +1386,11 @@ public:
     Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
-    const std::function<void()>& onError                             = nullptr,
-    const std::variant<ArrayBuffer, Image>& buffer
-    = std::variant<ArrayBuffer, Image>());
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr,
+    const std::variant<std::string, ArrayBuffer, Image>& buffer
+    = std::variant<std::string, ArrayBuffer, Image>());
 
   /**
    * @brief HUsually called from BABYLON.Texture.ts.
@@ -1421,8 +1423,10 @@ public:
     const std::string& urlArg, bool noMipmap, bool invertY, Scene* scene,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     const std::function<void(InternalTexture*, EventState&)>& onLoad = nullptr,
-    const std::function<void()>& onError                             = nullptr,
-    const std::optional<std::variant<ArrayBuffer, Image>>& buffer
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr,
+    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer
     = std::nullopt,
     const InternalTexturePtr& fallBack        = nullptr,
     const std::optional<unsigned int>& format = std::nullopt);

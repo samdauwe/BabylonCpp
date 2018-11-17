@@ -52,8 +52,10 @@ public:
    * @param url the url of the texture
    * @param buffer the buffer of the texture (defaults to null)
    */
-  void updateURL(const std::string& iUrl,
-                 const std::optional<std::variant<ArrayBuffer, Image>>& buffer);
+  void updateURL(
+    const std::string& iUrl,
+    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer
+    = std::nullopt);
 
   void delayLoad() override;
 
@@ -97,31 +99,39 @@ public:
     const std::string& data, const std::string& name, Scene* scene,
     bool noMipmap = false, bool invertY = false,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr,
-    unsigned int format                  = EngineConstants::TEXTUREFORMAT_RGBA);
+    const std::function<void()>& onLoad = nullptr,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr,
+    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
   static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
                                             Scene* scene,
                                             const std::string& rootUrl);
   static TexturePtr LoadFromDataString(
     const std::string& name,
-    const std::optional<std::variant<ArrayBuffer, Image>>& buffer, Scene* scene,
-    bool deleteBuffer = false, bool noMipmap = false, bool invertY = true,
+    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,
+    Scene* scene, bool deleteBuffer = false, bool noMipmap = false,
+    bool invertY              = true,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-    const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr,
-    unsigned int format                  = EngineConstants::TEXTUREFORMAT_RGBA);
+    const std::function<void()>& onLoad = nullptr,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr,
+    unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
 
 protected:
-  Texture(const std::string& url, Scene* scene, bool noMipmap = false,
-          bool invertY              = true,
-          unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
-          const std::function<void()>& onLoad  = nullptr,
-          const std::function<void()>& onError = nullptr,
-          const std::optional<std::variant<ArrayBuffer, Image>>& buffer
-          = std::nullopt,
-          bool deleteBuffer                         = false,
-          const std::optional<unsigned int>& format = std::nullopt);
+  Texture(
+    const std::string& url, Scene* scene, bool noMipmap = false,
+    bool invertY              = true,
+    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    const std::function<void()>& onLoad = nullptr,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr,
+    const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer
+    = std::nullopt,
+    bool deleteBuffer                         = false,
+    const std::optional<unsigned int>& format = std::nullopt);
 
   bool get_noMipmap() const;
   void set_isBlocking(bool value) override;
@@ -190,10 +200,11 @@ private:
   float _cachedWAng;
   int _cachedProjectionMatrixId;
   unsigned int _cachedCoordinatesMode;
-  std::optional<std::variant<ArrayBuffer, Image>> _buffer;
+  std::optional<std::variant<std::string, ArrayBuffer, Image>> _buffer;
   bool _deleteBuffer;
   std::function<void(InternalTexture*, EventState&)> _delayedOnLoad;
-  std::function<void()> _delayedOnError;
+  std::function<void(const std::string& message, const std::string& exception)>
+    _delayedOnError;
 
   std::function<void()> _onLoad;
   std::function<void(InternalTexture*, EventState&)> _load;

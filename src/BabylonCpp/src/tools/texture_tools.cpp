@@ -671,9 +671,15 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
 BaseTexturePtr& TextureTools::GetEnvironmentBRDFTexture(Scene* scene)
 {
   if (!scene->_environmentBRDFTexture) {
+#if 0
     auto texture = Texture::CreateFromBase64String(
       _environmentBRDFBase64Texture, "EnvironmentBRDFTexture", scene, true,
       false, TextureConstants::BILINEAR_SAMPLINGMODE);
+#else
+    auto texture
+      = Texture::New("textures/_environmentBRDFBase64Texture.png", scene, true,
+                     false, TextureConstants::BILINEAR_SAMPLINGMODE);
+#endif
 
     texture->wrapU                 = TextureConstants::CLAMP_ADDRESSMODE;
     texture->wrapV                 = TextureConstants::CLAMP_ADDRESSMODE;
