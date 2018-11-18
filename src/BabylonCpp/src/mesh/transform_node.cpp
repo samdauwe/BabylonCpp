@@ -553,7 +553,7 @@ TransformNode& TransformNode::detachFromBone()
   return *this;
 }
 
-TransformNode& TransformNode::rotate(Vector3& axis, float amount, Space space)
+TransformNode& TransformNode::rotate(Vector3 axis, float amount, Space space)
 {
   axis.normalize();
   if (!rotationQuaternion()) {

@@ -68,6 +68,7 @@
 
 ## Materials Library ##
 ![cell_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cell_material_scene.png?raw=true "Cell Material Scene")
+![cell_shading_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cell_shading_material_scene.png?raw=true "Cell Shading Material Scene")
 ![gradient_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/gradient_material_scene.png?raw=true "Gradient Material Scene")
 ![gradient_material_sphere_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/gradient_material_sphere_scene.png?raw=true "Gradient Material Sphere Scene")
 ![grid_material_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/grid_material_scene.png?raw=true "Grid Material Scene")

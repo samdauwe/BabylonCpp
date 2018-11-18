@@ -261,8 +261,7 @@ public:
    * The passed axis is also normalized.
    * @returns the TransformNode.
    */
-  TransformNode& rotate(Vector3& axis, float amount,
-                        Space space = Space::LOCAL);
+  TransformNode& rotate(Vector3 axis, float amount, Space space = Space::LOCAL);
 
   /**
    * @brief Rotates the mesh around the axis vector for the passed angle
