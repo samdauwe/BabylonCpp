@@ -59,6 +59,7 @@ target_include_directories(${TARGET}
     PRIVATE
     ${GLFW_INCLUDE_DIRS}
     ${GLXW_INCLUDE_DIRS}
+    ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extensions/include

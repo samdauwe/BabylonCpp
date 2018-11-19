@@ -4,16 +4,11 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <optional>
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/any.h>
-
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
 
 namespace BABYLON {
 
@@ -62,19 +57,13 @@ using SkeletonPtr           = std::shared_ptr<Skeleton>;
 using SoundPtr              = std::shared_ptr<Sound>;
 using TransformNodePtr      = std::shared_ptr<TransformNode>;
 
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
-
 /**
  * Defines how the parser contract is defined.
  * These parsers are used to parse a list of specific assets (like particle
  * systems, etc..)
  */
 using BabylonFileParser
-  = std::function<void(const Json::value& parsedData, Scene* scene,
+  = std::function<void(const nlohmann::json& parsedData, Scene* scene,
                        AssetContainer& container, const std::string& rootUrl)>;
 
 /**
@@ -82,7 +71,7 @@ using BabylonFileParser
  * These parser can parse an individual asset
  */
 using IndividualBabylonFileParser = std::function<any(
-  const Json::value& parsedData, Scene* scene, const std::string& rootUrl)>;
+  const nlohmann::json& parsedData, Scene* scene, const std::string& rootUrl)>;
 
 /**
  * @brief Base class of the scene acting as a container for the different
@@ -139,7 +128,7 @@ public:
    * @param container Defines the container attached to the parsing sequence
    * @param rootUrl Defines the root url of the data
    */
-  static void Parse(Json::value& jsonData, Scene* scene,
+  static void Parse(const nlohmann::json& jsonData, Scene* scene,
                     AssetContainer& container, const std::string& rootUrl);
 
   /**

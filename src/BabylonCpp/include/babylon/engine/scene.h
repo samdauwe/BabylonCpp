@@ -22,6 +22,12 @@
 #include <babylon/tools/observer.h>
 #include <babylon/tools/perf_counter.h>
 
+namespace picojson {
+class value;
+typedef std::vector<value> array;
+typedef std::map<std::string, value> object;
+} // end of namespace picojson
+
 namespace BABYLON {
 
 class Animatable;
@@ -83,6 +89,12 @@ using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
 using SpriteManagerPtr       = std::shared_ptr<SpriteManager>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
+
+namespace Json {
+typedef picojson::value value;
+typedef picojson::array array;
+typedef picojson::object object;
+} // namespace Json
 
 /**
  * @brief Represents a scene to be rendered by the engine.

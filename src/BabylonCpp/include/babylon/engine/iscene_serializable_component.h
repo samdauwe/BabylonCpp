@@ -2,26 +2,15 @@
 #define BABYLON_ENGINE_ISCENE_SERIALIZABLE_COMPONENT_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
 #include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
-
 namespace BABYLON {
 
 class AbstractScene;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief This represents a SERIALIZABLE scene component.
@@ -47,7 +36,7 @@ struct BABYLON_SHARED_EXPORT ISceneSerializableComponent
    * @brief Serializes the component data to the specified json object.
    * @param serializationObject The object to serialize to
    */
-  virtual void serialize(const Json::object& serializationObject) = 0;
+  virtual void serialize(const nlohmann::json& serializationObject) = 0;
 
 }; // end of struct ISceneSerializableComponent
 
