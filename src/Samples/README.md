@@ -146,6 +146,7 @@
 ## Textures ##
 ![bump_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bump_texture_scene.png?raw=true "Bump Texture Scene")
 ![bump_texture_spheres_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bump_texture_spheres_scene.png?raw=true "Bump Texture Spheres Scene")
+![cube_texture_different_faces_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cube_texture_different_faces_scene.png?raw=true "Cube texture different faces scene")
 ![custom_render_targets_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/custom_render_targets_scene.png?raw=true "Custom Render Targets Scene")
 ![equirectangular_map_as_reflection_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/equirectangular_map_as_reflection_texture_scene.png?raw=true "Equirectangular Map as Reflection Texture Scene")
 ![image_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/image_texture_scene.png?raw=true "Image Texture Scene")
