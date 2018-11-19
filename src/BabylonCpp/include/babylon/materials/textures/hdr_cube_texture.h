@@ -43,10 +43,33 @@ public:
 
   /** Methods **/
   void delayLoad() override;
+
+  /**
+   * @brief Get the texture reflection matrix used to rotate/transform the
+   * reflection.
+   * @returns the reflection matrix
+   */
   Matrix* getReflectionTextureMatrix() override;
+
+  /**
+   * @brief Set the texture reflection matrix used to rotate/transform the
+   * reflection.
+   * @param value Define the reflection matrix to set
+   */
   void setReflectionTextureMatrix(const Matrix& value);
+
+  /**
+   * @brief Parses a JSON representation of an HDR Texture in order to create
+   * the texture
+   * @param parsedTexture Define the JSON representation
+   * @param scene Define the scene the texture should be created in
+   * @param rootUrl Define the root url in case we need to load relative
+   * dependencies
+   * @returns the newly created texture after parsing
+   */
   static HDRCubeTexture* Parse(const Json::value& parsedTexture, Scene* scene,
                                const std::string& rootUrl);
+
   Json::object serialize() const;
 
 protected:

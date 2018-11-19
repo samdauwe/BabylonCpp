@@ -25,7 +25,7 @@ HDRCubeTexture::HDRCubeTexture(
   bool generateHarmonics, bool iGammaSpace, bool /*reserved*/,
   const std::function<void()>& onLoad,
   const std::function<void(const std::string& message,
-                             const std::string& exception)>& onError)
+                           const std::string& exception)>& onError)
     : BaseTexture(scene)
     , url{iUrl}
     , coordinatesMode{TextureConstants::CUBIC_MODE}
@@ -47,8 +47,8 @@ HDRCubeTexture::HDRCubeTexture(
     return;
   }
 
-  name           = url;
-  url            = url;
+  name           = iUrl;
+  url            = iUrl;
   hasAlpha       = false;
   isCube         = true;
   _textureMatrix = Matrix::Identity();
@@ -98,7 +98,7 @@ float HDRCubeTexture::get_rotationY() const
 
 void HDRCubeTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
 {
-  if (!value) {
+  if (!value.has_value()) {
     return;
   }
 
