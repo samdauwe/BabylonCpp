@@ -81,10 +81,12 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _savedMaterial{nullptr}
     , receiveShadows{this, &AbstractMesh::get_receiveShadows,
                      &AbstractMesh::set_receiveShadows}
-    , renderOutline{false}
+    , renderOutline{this, &AbstractMesh::get_renderOutline,
+                    &AbstractMesh::set_renderOutline}
     , outlineColor{Color3::Red()}
     , outlineWidth{0.02f}
-    , renderOverlay{false}
+    , renderOverlay{this, &AbstractMesh::get_renderOverlay,
+                    &AbstractMesh::set_renderOverlay}
     , overlayColor{Color3::Red()}
     , overlayAlpha{0.5f}
     , hasVertexAlpha{this, &AbstractMesh::get_hasVertexAlpha,
@@ -145,6 +147,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _renderingGroupId{0}
     , _material{nullptr}
     , _receiveShadows{false}
+    , _renderOutline{false}
+    , _renderOverlay{false}
     , _hasVertexAlpha{false}
     , _useVertexColors{true}
     , _computeBonesUsingShaders{true}
@@ -1102,6 +1106,34 @@ void AbstractMesh::set_checkCollisions(bool collisionEnabled)
 std::unique_ptr<Collider>& AbstractMesh::get_collider()
 {
   return _collider;
+}
+
+bool AbstractMesh::get_renderOutline() const
+{
+  return _renderOutline;
+}
+
+void AbstractMesh::set_renderOutline(bool value)
+{
+  if (value) {
+    // Lazy Load the component.
+    getScene()->getOutlineRenderer();
+  }
+  _renderOutline = value;
+}
+
+bool AbstractMesh::get_renderOverlay() const
+{
+  return _renderOverlay;
+}
+
+void AbstractMesh::set_renderOverlay(bool value)
+{
+  if (value) {
+    // Lazy Load the component.
+    getScene()->getOutlineRenderer();
+  }
+  _renderOverlay = value;
 }
 
 AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)

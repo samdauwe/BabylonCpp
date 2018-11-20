@@ -83,6 +83,7 @@ using ISceneSerializableComponentPtr
   = std::shared_ptr<ISceneSerializableComponent>;
 using NodePtr                = std::shared_ptr<Node>;
 using MeshPtr                = std::shared_ptr<Mesh>;
+using OutlineRendererPtr     = std::shared_ptr<OutlineRenderer>;
 using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
 using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
@@ -238,7 +239,7 @@ public:
    * @brief Gets the outline renderer associated with the scene.
    * @returns a OutlineRenderer
    */
-  OutlineRenderer* getOutlineRenderer();
+  OutlineRendererPtr& getOutlineRenderer();
 
   /**
    * @brief Gets the engine associated with the scene.
@@ -3052,6 +3053,18 @@ public:
   Stage<RenderingGroupStageAction> _beforeRenderingGroupDrawStage;
 
   /**
+   * Defines the actions happening just before a mesh is drawing.
+   * Hidden
+   */
+  Stage<RenderingMeshStageAction> _beforeRenderingMeshStage;
+
+  /**
+   * Defines the actions happening just after a mesh has been drawn.
+   * Hidden
+   */
+  Stage<RenderingMeshStageAction> _afterRenderingMeshStage;
+
+  /**
    * Defines the actions happening just after a rendering group has been drawn
    * Hidden
    */
@@ -3219,7 +3232,8 @@ private:
   /** Hidden (Backing field) */
   bool _forceShowBoundingBoxes;
 
-  std::unique_ptr<OutlineRenderer> _outlineRenderer;
+  /** Hidden */
+  OutlineRendererPtr _outlineRenderer;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
   Matrix _alternateViewMatrix;

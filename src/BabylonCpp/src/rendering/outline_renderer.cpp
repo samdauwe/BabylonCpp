@@ -16,18 +16,49 @@
 
 namespace BABYLON {
 
-OutlineRenderer::OutlineRenderer(Scene* scene) : zOffset{1.f}, _scene{scene}
+OutlineRenderer::OutlineRenderer(Scene* iScene) : zOffset{1.f}
 {
+  scene   = iScene;
+  _engine = scene->getEngine();
 }
 
 OutlineRenderer::~OutlineRenderer()
 {
 }
 
+void OutlineRenderer::addToScene(const OutlineRendererPtr& outlineRenderer)
+{
+  scene->_addComponent(outlineRenderer);
+}
+
+void OutlineRenderer::_register()
+{
+  scene->_beforeRenderingMeshStage.registerStep(
+    SceneComponentConstants::STEP_BEFORERENDERINGMESH_OUTLINE, this,
+    [this](AbstractMesh* mesh, SubMesh* subMesh, _InstancesBatch* batch) {
+      _beforeRenderingMesh(mesh, subMesh, batch);
+    });
+  scene->_afterRenderingMeshStage.registerStep(
+    SceneComponentConstants::STEP_AFTERRENDERINGMESH_OUTLINE, this,
+    [this](AbstractMesh* mesh, SubMesh* subMesh, _InstancesBatch* batch) {
+      _afterRenderingMesh(mesh, subMesh, batch);
+    });
+}
+
+void OutlineRenderer::rebuild()
+{
+  // Nothing to do here.
+}
+
+void OutlineRenderer::dispose()
+{
+  // Nothing to do here.
+}
+
 void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
                              bool useOverlay)
 {
-  auto engine = _scene->getEngine();
+  auto engine = scene->getEngine();
 
   bool hardwareInstancedRendering
     = engine->getCaps().instancedArrays
@@ -42,7 +73,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   auto mesh     = subMesh->getRenderingMesh();
   auto material = subMesh->getMaterial();
 
-  if (!material || !_scene->activeCamera) {
+  if (!material || !scene->activeCamera) {
     return;
   }
 
@@ -52,14 +83,14 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
   if (material->useLogarithmicDepth()) {
     _effect->setFloat(
       "logarithmicDepthConstant",
-      2.f / (std::log(_scene->activeCamera->maxZ + 1.f) / Math::LN2));
+      2.f / (std::log(scene->activeCamera->maxZ + 1.f) / Math::LN2));
   }
 
   _effect->setFloat("offset", useOverlay ? 0 : mesh->outlineWidth);
   _effect->setColor4("color",
                      useOverlay ? mesh->overlayColor : mesh->outlineColor,
                      useOverlay ? mesh->overlayAlpha : material->alpha());
-  _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
+  _effect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
   if (mesh->useBones() && mesh->computeBonesUsingShaders()
@@ -83,7 +114,7 @@ void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
 
   mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(), batch,
                           hardwareInstancedRendering,
-                          [this](bool, Matrix world, Material*) {
+                          [this](bool, const Matrix& world, Material*) {
                             _effect->setMatrix("world", world);
                           });
 
@@ -148,7 +179,7 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   // Get correct effect
-  std::string join = String::join(defines, '\n');
+  auto join = String::join(defines, '\n');
   if (_cachedDefines != join) {
     _cachedDefines = join;
 
@@ -160,11 +191,43 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     options.samplers = {"diffuseSampler"};
     options.defines  = std::move(join);
 
-    _effect = _scene->getEngine()->createEffect("outline", options,
-                                                _scene->getEngine());
+    _effect = scene->getEngine()->createEffect("outline", options,
+                                               scene->getEngine());
   }
 
   return _effect->isReady();
+}
+
+void OutlineRenderer::_beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                           _InstancesBatch* batch)
+{
+  // Outline - step 1
+  _savedDepthWrite = _engine->getDepthWrite();
+  if (mesh->renderOutline) {
+    _engine->setDepthWrite(false);
+    render(subMesh, batch);
+    _engine->setDepthWrite(_savedDepthWrite);
+  }
+}
+
+void OutlineRenderer::_afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
+                                          _InstancesBatch* batch)
+{
+  // Outline - step 2
+  if (mesh->renderOutline && _savedDepthWrite) {
+    _engine->setDepthWrite(true);
+    _engine->setColorWrite(false);
+    render(subMesh, batch);
+    _engine->setColorWrite(true);
+  }
+
+  // Overlay
+  if (mesh->renderOverlay) {
+    auto currentMode = _engine->getAlphaMode();
+    _engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+    render(subMesh, batch, true);
+    _engine->setAlphaMode(currentMode);
+  }
 }
 
 } // end of namespace BABYLON

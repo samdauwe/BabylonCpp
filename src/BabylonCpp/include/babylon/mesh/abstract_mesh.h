@@ -1143,6 +1143,26 @@ protected:
    */
   std::unique_ptr<Collider>& get_collider();
 
+  /**
+   * Gets or sets a boolean indicating if the outline must be rendered as well
+   */
+  bool get_renderOutline() const;
+
+  /**
+   * Gets or sets a boolean indicating if the outline must be rendered as well
+   */
+  void set_renderOutline(bool value);
+
+  /**
+   * Gets or sets a boolean indicating if the overlay must be rendered as well
+   */
+  bool get_renderOverlay() const;
+
+  /**
+   * Gets or sets a boolean indicating if the overlay must be rendered as well
+   */
+  void set_renderOverlay(bool value);
+
 private:
   /**
    * @brief Hidden
@@ -1383,7 +1403,7 @@ public:
    * Gets or sets a boolean indicating if the outline must be rendered as well
    * @see https://www.babylonjs-playground.com/#10WJ5S#3
    */
-  bool renderOutline;
+  Property<AbstractMesh, bool> renderOutline;
 
   /**
    * Defines color to use when rendering outline
@@ -1399,7 +1419,7 @@ public:
    * Gets or sets a boolean indicating if the overlay must be rendered as well
    * @see https://www.babylonjs-playground.com/#10WJ5S#2
    */
-  bool renderOverlay;
+  Property<AbstractMesh, bool> renderOverlay;
 
   /**
    * Defines color to use when rendering overlay
@@ -1664,6 +1684,10 @@ private:
   int _renderingGroupId;
   MaterialPtr _material;
   bool _receiveShadows;
+  /** Hidden (Backing field) */
+  bool _renderOutline;
+  /** Hidden (Backing field) */
+  bool _renderOverlay;
   bool _hasVertexAlpha;
   bool _useVertexColors;
   bool _computeBonesUsingShaders;

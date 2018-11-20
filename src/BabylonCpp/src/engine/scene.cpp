@@ -296,11 +296,6 @@ Scene::Scene(Engine* engine)
     postProcessManager = std::make_unique<PostProcessManager>(this);
   }
 
-  // if (OutlineRenderer)
-  {
-    _outlineRenderer = std::make_unique<OutlineRenderer>(this);
-  }
-
   attachControl();
 
   // Collision coordinator initialization.
@@ -810,9 +805,12 @@ BoundingBoxRendererPtr& Scene::getBoundingBoxRenderer()
   return _boundingBoxRenderer;
 }
 
-OutlineRenderer* Scene::getOutlineRenderer()
+OutlineRendererPtr& Scene::getOutlineRenderer()
 {
-  return _outlineRenderer.get();
+  if (!_outlineRenderer) {
+    _outlineRenderer = OutlineRenderer::New(this);
+  }
+  return _outlineRenderer;
 }
 
 Engine* Scene::getEngine()
