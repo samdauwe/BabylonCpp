@@ -11,6 +11,7 @@ namespace BABYLON {
 class AbstractMesh;
 struct IParticleSystem;
 struct IRenderingManagerAutoClearSetup;
+struct ISpriteManager;
 class Material;
 class RenderingGroup;
 struct RenderingGroupInfo;
@@ -21,6 +22,12 @@ using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 using MaterialPtr     = std::shared_ptr<Material>;
 using SubMeshPtr      = std::shared_ptr<SubMesh>;
 
+/**
+ * @brief This is the manager responsible of all the rendering for meshes
+ * sprites and particles. It is enable to manage the different groups as well as
+ * the different necessary sort functions. This should not be used directly
+ * aside of the few static configurations
+ */
 class BABYLON_SHARED_EXPORT RenderingManager {
 
 public:
@@ -40,9 +47,18 @@ public:
   static bool AUTOCLEAR;
 
 public:
+  /**
+   * @brief Instantiates a new rendering group for a particular scene.
+   * @param scene Defines the scene the groups belongs to
+   */
   RenderingManager(Scene* scene);
   ~RenderingManager();
 
+  /**
+   * @brief Renders the entire managed groups. This is used by the scene or the
+   * different rennder targets.
+   * Hidden
+   */
   void
   render(std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
                             const std::vector<SubMeshPtr>& alphaTestSubMeshes,
@@ -52,7 +68,17 @@ public:
            customRenderFunction,
          const std::vector<AbstractMeshPtr>& activeMeshes, bool renderParticles,
          bool renderSprites);
+
+  /**
+   * @brief Resets the different information of the group to prepare a new frame
+   * Hidden
+   */
   void reset();
+
+  /**
+   * @brief Dispose and release the group and its associated resources.
+   * Hidden
+   */
   void dispose();
 
   /**
@@ -61,15 +87,27 @@ public:
    */
   void freeRenderingGroups();
 
-  void dispatchSprites(SpriteManager* spriteManager);
+  /**
+   * @brief Add a sprite manager to the rendering manager in order to render it
+   * this frame.
+   * @param spriteManager Define the sprite manager to render
+   */
+  void dispatchSprites(ISpriteManager* spriteManager);
+
+  /**
+   * @brief Add a particle system to the rendering manager in order to render it
+   * this frame.
+   * @param particleSystem Define the particle system to render
+   */
   void dispatchParticles(IParticleSystem* particleSystem);
 
   /**
+   * @brief Add a submesh to the manager in order to render it this frame.
    * @param subMesh The submesh to dispatch
-   * @param [mesh] Optional reference to the submeshes's mesh. Provide if you
-   * have an exiting reference to improve performance.
-   * @param [material] Optional reference to the submeshes's material. Provide
-   * if you have an exiting reference to improve performance.
+   * @param mesh Optional reference to the submeshes's mesh. Provide if you have
+   * an exiting reference to improve performance.
+   * @param material Optional reference to the submeshes's material. Provide if
+   * you have an exiting reference to improve performance.
    */
   void dispatch(const SubMeshPtr& subMesh, AbstractMesh* mesh = nullptr,
                 const MaterialPtr& material = nullptr);

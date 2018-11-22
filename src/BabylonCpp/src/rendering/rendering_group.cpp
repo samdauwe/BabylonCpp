@@ -348,7 +348,7 @@ void RenderingGroup::dispatch(const SubMeshPtr& subMesh, AbstractMesh* mesh,
   }
 }
 
-void RenderingGroup::dispatchSprites(SpriteManager* spriteManager)
+void RenderingGroup::dispatchSprites(ISpriteManager* spriteManager)
 {
   _spriteManagers.emplace_back(spriteManager);
 }

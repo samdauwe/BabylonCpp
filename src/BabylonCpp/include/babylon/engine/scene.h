@@ -52,6 +52,7 @@ struct IPhysicsEnginePlugin;
 struct IRenderingManagerAutoClearSetup;
 struct ISceneComponent;
 struct ISceneSerializableComponent;
+struct ISpriteManager;
 class KeyboardInfo;
 class KeyboardInfoPre;
 class Mesh;
@@ -68,7 +69,6 @@ class RenderingManager;
 class RuntimeAnimation;
 class SimplificationQueue;
 class SoundTrack;
-class SpriteManager;
 class UniformBuffer;
 using AnimatablePtr             = std::shared_ptr<Animatable>;
 using BoundingBoxRendererPtr    = std::shared_ptr<BoundingBoxRenderer>;
@@ -81,6 +81,7 @@ using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 using ISceneComponentPtr = std::shared_ptr<ISceneComponent>;
 using ISceneSerializableComponentPtr
   = std::shared_ptr<ISceneSerializableComponent>;
+using ISpriteManagerPtr      = std::shared_ptr<ISpriteManager>;
 using NodePtr                = std::shared_ptr<Node>;
 using MeshPtr                = std::shared_ptr<Mesh>;
 using OutlineRendererPtr     = std::shared_ptr<OutlineRenderer>;
@@ -88,7 +89,6 @@ using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
 using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
-using SpriteManagerPtr       = std::shared_ptr<SpriteManager>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
 
 namespace Json {
@@ -350,6 +350,11 @@ public:
    * @returns true if the pointer was captured
    */
   bool isPointerCaptured(int pointerId = 0);
+
+  /**
+   * @brief Hidden
+   */
+  bool _isPointerSwiping() const;
 
   /**
    * @brief Attach events to the canvas (To handle actionManagers triggers and
@@ -1349,7 +1354,24 @@ public:
              const std::function<bool(Sprite* sprite)>& predicate = nullptr,
              bool fastCheck = false, const CameraPtr& camera = nullptr);
 
-  /** @brief Use the given ray to pick a mesh in the scene.
+  /**
+   * Use the given ray to pick a sprite in the scene
+   * @param ray The ray (in world space) to use to pick meshes
+   * @param predicate Predicate function used to determine eligible sprites. Can
+   * be set to null. In this case, a sprite must have isPickable set to true
+   * @param fastCheck Launch a fast check only using the bounding boxes. Can be
+   * set to null.
+   * @param camera camera to use. Can be set to null. In this case, the
+   * scene.activeCamera will be used
+   * @returns a PickingInfo
+   */
+  std::optional<PickingInfo>
+  pickSpriteWithRay(const Ray& ray,
+                    const std::function<bool(Sprite* sprite)>& predicate,
+                    bool fastCheck, CameraPtr& camera);
+
+  /**
+   * @brief Use the given ray to pick a mesh in the scene.
    * @param ray The ray to use to pick meshes
    * @param predicate Predicate function used to determine eligible sprites. Can
    * be set to null. In this case, a sprite must have isPickable set to true
@@ -1688,10 +1710,15 @@ private:
   std::vector<std::optional<PickingInfo>>
   _internalMultiPick(const std::function<Ray(Matrix& world)>& rayFunction,
                      const std::function<bool(AbstractMesh* mesh)>& predicate);
+
+  /**
+   * @Brief hidden
+   */
   std::optional<PickingInfo>
   _internalPickSprites(const Ray& ray,
-                       const std::function<bool(Sprite* sprite)>& predicate,
-                       bool fastCheck, CameraPtr camera);
+                       const std::function<bool(Sprite* sprite)>& predicate
+                       = nullptr,
+                       bool fastCheck = false, CameraPtr camera = nullptr);
   /** Tags **/
   std::vector<std::string> _getByTags();
 
@@ -2652,12 +2679,28 @@ public:
    */
   bool spritesEnabled;
 
+  std::function<bool(Sprite* sprite)> spritePredicate;
+
+  /**
+   * Hidden
+   */
+  Sprite* _pointerOverSprite;
+
+  /**
+   * Hidden
+   */
+  Sprite* _pickedDownSprite;
+
+  /**
+   * Hidden
+   */
+  std::optional<Ray> _tempSpritePickingRay;
+
   /**
    * All of the sprite managers added to this scene
    * @see http://doc.babylonjs.com/babylon101/sprites
    */
-  std::vector<SpriteManagerPtr> spriteManagers;
-  std::function<bool(Sprite* sprite)> spritePredicate;
+  std::vector<ISpriteManagerPtr> spriteManagers;
 
   std::vector<std::unique_ptr<HighlightLayer>> highlightLayers;
 
@@ -2990,7 +3033,7 @@ public:
   /**
    * Hidden
    */
-  bool _allowPostProcessClear;
+  bool _allowPostProcessClearColor;
 
   /**
    * Defines the actions happening before camera updates
@@ -3009,6 +3052,12 @@ public:
    * Hidden
    */
   Stage<RenderTargetsStageAction> _gatherRenderTargetsStage;
+
+  /**
+   * Defines the actions happening for one camera in the frame.
+   * Hidden
+   */
+  Stage<RenderTargetsStageAction> _gatherActiveCameraRenderTargetsStage;
 
   /**
    * Defines the actions happening during the per mesh ready checks
@@ -3075,6 +3124,30 @@ public:
    * Hidden
    */
   Stage<CameraStageAction> _afterCameraDrawStage;
+
+  /**
+   * Defines the actions happening just after rendering all cameras and
+   * computing intersections. Hidden
+   */
+  Stage<SimpleStageAction> _afterRenderStage;
+
+  /**
+   * Defines the actions happening when a pointer move event happens.
+   * Hidden
+   */
+  Stage<PointerMoveStageAction> _pointerMoveStage;
+
+  /**
+   * Defines the actions happening when a pointer down event happens.
+   * Hidden
+   */
+  Stage<PointerUpDownStageAction> _pointerDownStage;
+
+  /**
+   * Defines the actions happening when a pointer up event happens.
+   * Hidden
+   */
+  Stage<PointerUpDownStageAction> _pointerUpStage;
 
   /**
    * Defines the actions happening when Geometries are rebuilding.
@@ -3246,14 +3319,12 @@ private:
   Octree<AbstractMesh*>* _selectionOctree;
   Vector2 _unTranslatedPointer;
   AbstractMesh* _pointerOverMesh;
-  Sprite* _pointerOverSprite;
   std::unique_ptr<DebugLayer> _debugLayer;
   std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>
     _depthRenderer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;
-  Sprite* _pickedDownSprite;
   std::string _uid;
 
   /**

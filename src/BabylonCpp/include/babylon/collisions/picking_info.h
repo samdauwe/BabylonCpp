@@ -20,6 +20,10 @@ class BABYLON_SHARED_EXPORT PickingInfo {
 
 public:
   PickingInfo();
+  PickingInfo(const PickingInfo& other);
+  PickingInfo(PickingInfo&& other);
+  PickingInfo& operator=(const PickingInfo& other);
+  PickingInfo& operator=(PickingInfo&& other);
   ~PickingInfo();
 
   /**

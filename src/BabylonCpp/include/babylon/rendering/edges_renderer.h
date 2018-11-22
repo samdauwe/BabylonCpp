@@ -5,10 +5,13 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
+#include <babylon/rendering/iedges_renderer.h>
+#include <babylon/tools/observer.h>
 
 namespace BABYLON {
 
 class AbstractMesh;
+class Node;
 class ShaderMaterial;
 class VertexBuffer;
 using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
@@ -22,7 +25,7 @@ class IGLBuffer;
  * @brief This class is used to generate edges of the mesh that could then
  * easily be rendered in a scene.
  */
-class BABYLON_SHARED_EXPORT EdgesRenderer {
+class BABYLON_SHARED_EXPORT EdgesRenderer : public IEdgesRenderer {
 
 public:
   /**
@@ -46,11 +49,21 @@ public:
   void _rebuild();
 
   /**
+   * @brief Checks wether or not the edges renderer is ready to render.
+   * @return true if ready, otherwise false.
+   */
+  bool isReady() override;
+
+  /**
    * @brief Releases the required resources for the edges renderer.
    */
-  void dispose();
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
-  void render();
+  /**
+   * @brief Renders the edges of the attached mesh.
+   */
+  void render() override;
 
 protected:
   void _prepareResources();
@@ -81,13 +94,15 @@ protected:
   virtual void _generateEdgesLines();
 
 public:
+  /**
+   * Define the size of the edges with an orthographic camera
+   */
   float edgesWidthScalerForOrthographic;
-  float edgesWidthScalerForPerspective;
 
   /**
-   * Gets or sets a boolean indicating if the edgesRenderer is active
+   * Define the size of the edges with a perspective camera
    */
-  bool isEnabled;
+  float edgesWidthScalerForPerspective;
 
 protected:
   AbstractMeshPtr _source;
@@ -101,6 +116,10 @@ protected:
   std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>> _buffers;
   std::unordered_map<std::string, VertexBuffer*> _bufferPtrs;
   bool _checkVerticesInsteadOfIndices;
+
+private:
+  Observer<AbstractMesh>::Ptr _meshRebuildObserver;
+  Observer<Node>::Ptr _meshDisposeObserver;
 
 }; // end of class EdgesRenderer
 

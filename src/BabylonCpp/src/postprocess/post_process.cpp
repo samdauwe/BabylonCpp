@@ -379,10 +379,9 @@ PostProcess::activate(const CameraPtr& camera,
   onActivateObservable.notifyObservers(camera.get());
 
   // Clear
-  if (scene->_allowPostProcessClear && autoClear
-      && alphaMode == EngineConstants::ALPHA_DISABLE) {
-    _engine->clear(clearColor ? *clearColor : scene->clearColor, true, true,
-                   true);
+  if (autoClear && alphaMode == EngineConstants::ALPHA_DISABLE) {
+    _engine->clear(clearColor ? *clearColor : scene->clearColor,
+                   scene->_allowPostProcessClearColor, true, true);
   }
 
   if (_reusable) {

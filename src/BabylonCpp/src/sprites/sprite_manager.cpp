@@ -5,6 +5,7 @@
 #include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/engine/scene_component_constants.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -14,6 +15,7 @@
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/vertex_buffer.h>
+#include <babylon/sprites/sprite_scene_component.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -23,16 +25,25 @@ SpriteManager::SpriteManager(const std::string& iName,
                              const ISize& cellSize, Scene* scene, float epsilon,
                              unsigned int samplingMode)
     : name{iName}
-    , renderingGroupId{0}
-    , layerMask{0x0FFFFFFF}
     , fogEnabled{true}
-    , isPickable{false}
-    , _epsilon{epsilon}
+    , onDispose{this, &SpriteManager::set_onDispose}
     , texture{this, &SpriteManager::get_texture, &SpriteManager::set_texture}
     , _onDisposeObserver{nullptr}
-    , _capacity{capacity}
+    , _epsilon{epsilon}
     , _scene{scene}
 {
+  if (!scene->_getComponent(SceneComponentConstants::NAME_SPRITE)) {
+    scene->_addComponent(SpriteSceneComponent::New(scene));
+  }
+
+  // ISpriteManager interface properties
+  {
+    layerMask        = 0x0FFFFFFF;
+    isPickable       = false;
+    renderingGroupId = 0;
+  }
+
+  _capacity      = capacity;
   _spriteTexture = Texture::New(imgUrl, scene, true, false, samplingMode);
   _spriteTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _spriteTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
@@ -126,7 +137,7 @@ void SpriteManager::addToScene(const SpriteManagerPtr& newSpriteManager)
   _scene->spriteManagers.emplace_back(newSpriteManager);
 }
 
-void SpriteManager::setOnDispose(
+void SpriteManager::set_onDispose(
   const std::function<void(SpriteManager*, EventState&)>& callback)
 {
   if (_onDisposeObserver) {
@@ -250,7 +261,7 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
     result.pickedSprite = currentSprite;
     result.distance     = distance;
 
-    return result;
+    return std::move(result);
   }
 
   return std::nullopt;
@@ -336,7 +347,8 @@ void SpriteManager::render()
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 }
 
-void SpriteManager::dispose()
+void SpriteManager::dispose(bool /*doNotRecurse*/,
+                            bool /*disposeMaterialAndTextures*/)
 {
   if (_buffer) {
     _buffer->dispose();
@@ -356,7 +368,7 @@ void SpriteManager::dispose()
   // Remove from scene
   _scene->spriteManagers.erase(
     std::remove_if(_scene->spriteManagers.begin(), _scene->spriteManagers.end(),
-                   [this](const SpriteManagerPtr& spriteManager) {
+                   [this](const ISpriteManagerPtr& spriteManager) {
                      return spriteManager.get() == this;
                    }),
     _scene->spriteManagers.end());

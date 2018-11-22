@@ -64,8 +64,8 @@ void RenderingManager::render(
   info->camera = _scene->activeCamera;
 
   // Dispatch sprites
-  if (renderSprites) {
-    for (auto& manager : _scene->spriteManagers) {
+  if (!_scene->spriteManagers.empty() && renderSprites) {
+    for (const auto& manager : _scene->spriteManagers) {
       dispatchSprites(manager.get());
     }
   }
@@ -92,7 +92,8 @@ void RenderingManager::render(
     // Clear depth/stencil if needed
     if (RenderingManager::AUTOCLEAR) {
       if (_useSceneAutoClearSetup) {
-        auto autoClear = _scene->getAutoClearDepthStencilSetup(index);
+        const auto autoClear = _scene->getAutoClearDepthStencilSetup(index);
+
         if (autoClear.has_value() && (*autoClear).autoClear) {
           _clearDepthStencilBuffer((*autoClear).depth, (*autoClear).stencil);
         }
@@ -108,18 +109,15 @@ void RenderingManager::render(
     }
 
     // Render
-#if 0
-    for (auto& step : _scene->_beforeRenderingGroupDrawStage) {
-      step.action(index);
+    const auto iIndex = static_cast<int>(index);
+    for (const auto& step : _scene->_beforeRenderingGroupDrawStage) {
+      step.action(iIndex);
     }
-#endif
     renderingGroup->render(customRenderFunction, renderSprites, renderParticles,
                            activeMeshes);
-#if 0
-    for (auto& step : _scene->_afterRenderingGroupDrawStage) {
-      step.action(index);
+    for (const auto& step : _scene->_afterRenderingGroupDrawStage) {
+      step.action(iIndex);
     }
-#endif
 
     // After Observable
     _scene->onAfterRenderingGroupObservable.notifyObservers(info.get(),
@@ -177,7 +175,7 @@ void RenderingManager::_prepareRenderingGroup(unsigned int renderingGroupId)
   }
 }
 
-void RenderingManager::dispatchSprites(SpriteManager* spriteManager)
+void RenderingManager::dispatchSprites(ISpriteManager* spriteManager)
 {
   const auto& renderingGroupId = spriteManager->renderingGroupId;
 
@@ -201,7 +199,7 @@ void RenderingManager::dispatch(const SubMeshPtr& subMesh, AbstractMesh* mesh,
   if (!mesh) {
     mesh = subMesh->getMesh().get();
   }
-  const auto& renderingGroupId = mesh->renderingGroupId;
+  const auto& renderingGroupId = static_cast<size_t>(mesh->renderingGroupId);
 
   _prepareRenderingGroup(static_cast<unsigned>(renderingGroupId));
 

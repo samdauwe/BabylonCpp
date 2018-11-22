@@ -17,17 +17,24 @@ EdgesRenderer::EdgesRenderer(const AbstractMeshPtr& source, float epsilon,
                              bool generateEdgesLines)
     : edgesWidthScalerForOrthographic{1000.f}
     , edgesWidthScalerForPerspective{50.f}
-    , isEnabled{true}
     , _source{source}
     , _epsilon{epsilon}
     , _lineShader{nullptr}
     , _ib{nullptr}
     , _checkVerticesInsteadOfIndices{checkVerticesInsteadOfIndices}
 {
+  isEnabled = true;
+
   _prepareResources();
   if (generateEdgesLines) {
     _generateEdgesLines();
   }
+
+  _meshRebuildObserver = _source->onRebuildObservable.add(
+    [this](AbstractMesh* /*mesh*/, EventState& /*es*/) { _rebuild(); });
+
+  _meshDisposeObserver = _source->onDisposeObservable.add(
+    [this](Node* /*node*/, EventState& /*es*/) { dispose(); });
 }
 
 EdgesRenderer::~EdgesRenderer()
@@ -69,8 +76,12 @@ void EdgesRenderer::_rebuild()
   _ib         = engine->createIndexBuffer(_linesIndices);
 }
 
-void EdgesRenderer::dispose()
+void EdgesRenderer::dispose(bool /*doNotRecurse*/,
+                            bool /*disposeMaterialAndTextures*/)
 {
+  _source->onRebuildObservable.remove(_meshRebuildObserver);
+  _source->onDisposeObservable.remove(_meshDisposeObserver);
+
   if (_buffers.find(VertexBuffer::PositionKind) != _buffers.end()) {
     auto& buffer = _buffers[VertexBuffer::PositionKind];
     if (buffer) {
@@ -358,11 +369,16 @@ void EdgesRenderer::_generateEdgesLines()
   _indicesCount = _linesIndices.size();
 }
 
+bool EdgesRenderer::isReady()
+{
+  return _lineShader->isReady();
+}
+
 void EdgesRenderer::render()
 {
   auto scene = _source->getScene();
 
-  if (!_lineShader->isReady() || !scene->activeCamera) {
+  if (!isReady() || !scene->activeCamera) {
     return;
   }
 

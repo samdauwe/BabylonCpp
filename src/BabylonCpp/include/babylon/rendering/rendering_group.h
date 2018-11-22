@@ -12,16 +12,24 @@ namespace BABYLON {
 class AbstractMesh;
 class Camera;
 class EdgesRenderer;
+struct IEdgesRenderer;
 struct IParticleSystem;
+struct ISpriteManager;
 class Material;
 class Scene;
-class SpriteManager;
 class SubMesh;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 using CameraPtr       = std::shared_ptr<Camera>;
 using MaterialPtr     = std::shared_ptr<Material>;
 using SubMeshPtr      = std::shared_ptr<SubMesh>;
 
+/**
+ * @brief This represents the object necessary to create a rendering group.
+ * This is exclusively used and created by the rendering manager.
+ * To modify the behavior, you use the available helpers in your scene or
+ * meshes.
+ * Hidden
+ */
 class BABYLON_SHARED_EXPORT RenderingGroup {
 
 public:
@@ -114,7 +122,7 @@ public:
   void dispatch(const SubMeshPtr& subMesh, AbstractMesh* mesh = nullptr,
                 MaterialPtr material = nullptr);
 
-  void dispatchSprites(SpriteManager* spriteManager);
+  void dispatchSprites(ISpriteManager* spriteManager);
 
   void dispatchParticles(IParticleSystem* particleSystem);
 
@@ -221,7 +229,7 @@ private:
   std::vector<SubMeshPtr> _alphaTestSubMeshes;
   std::vector<SubMeshPtr> _depthOnlySubMeshes;
   std::vector<IParticleSystem*> _particleSystems;
-  std::vector<SpriteManager*> _spriteManagers;
+  std::vector<ISpriteManager*> _spriteManagers;
 
   std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>
     _opaqueSortCompareFn;
@@ -236,7 +244,7 @@ private:
   std::function<void(const std::vector<SubMeshPtr>& subMeshes)>
     _renderTransparent;
 
-  std::vector<EdgesRenderer*> _edgesRenderers;
+  std::vector<IEdgesRenderer*> _edgesRenderers;
 
 }; // end of class RenderingGroup
 

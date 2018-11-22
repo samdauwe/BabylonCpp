@@ -13,7 +13,8 @@ std::shared_ptr<UtilityLayerRenderer> UtilityLayerRenderer::_DefaultUtilityLayer
 std::shared_ptr<UtilityLayerRenderer>
   UtilityLayerRenderer::_DefaultKeepDepthUtilityLayer = nullptr;
 
-std::shared_ptr<UtilityLayerRenderer>& UtilityLayerRenderer::DefaultUtilityLayer()
+std::shared_ptr<UtilityLayerRenderer>&
+UtilityLayerRenderer::DefaultUtilityLayer()
 {
   if (UtilityLayerRenderer::_DefaultUtilityLayer == nullptr) {
     UtilityLayerRenderer::_DefaultUtilityLayer
@@ -57,7 +58,9 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
   // Create scene which will be rendered in the foreground and remove it from
   // being referenced by engine to avoid interfering with existing app
   utilityLayerScene = Scene::New(iOriginalScene->getEngine());
-  utilityLayerScene->_allowPostProcessClear = false;
+  utilityLayerScene->useRightHandedSystem
+    = originalScene->useRightHandedSystem();
+  utilityLayerScene->_allowPostProcessClearColor = false;
   iOriginalScene->getEngine()->scenes.pop_back();
 
   // Detach controls on utility scene, events will be fired by logic below to
@@ -148,6 +151,14 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
             else if (prePointerInfo->type == PointerEventTypes::POINTERDOWN) {
               _pointerCaptures[pointerEvent.pointerId] = true;
             }
+            else if (stl_util::contains(_lastPointerEvents,
+                                        pointerEvent.pointerId)
+                     && _lastPointerEvents[pointerEvent.pointerId]) {
+              // We need to send a last pointerup to the utilityLayerScene to
+              // make sure animations can complete
+              onPointerOutObservable.notifyObservers(&pointerEvent.pointerId);
+              _lastPointerEvents.erase(pointerEvent.pointerId);
+            }
           }
           else if (stl_util::contains(_pointerCaptures, pointerEvent.pointerId)
                    && !_pointerCaptures[pointerEvent.pointerId]
@@ -222,7 +233,7 @@ void UtilityLayerRenderer::_notifyObservers(
     PointerInfo pointerInfo(prePointerInfo.type, prePointerInfo.pointerEvent,
                             pickInfo);
     utilityLayerScene->onPointerObservable.notifyObservers(&pointerInfo);
-    _lastPointerEvents[pointerEvent.pointerId] = pointerEvent.pointerType;
+    _lastPointerEvents[pointerEvent.pointerId] = true;
   }
 }
 

@@ -1607,6 +1607,11 @@ public:
   Property<AbstractMesh, SkeletonPtr> skeleton;
 
   /**
+   * An event triggered when the mesh is rebuilt.
+   */
+  Observable<AbstractMesh> onRebuildObservable;
+
+  /**
    * Gets the edgesRenderer associated with the mesh
    */
   ReadOnlyProperty<AbstractMesh, std::unique_ptr<EdgesRenderer>> edgesRenderer;

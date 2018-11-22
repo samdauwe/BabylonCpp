@@ -17,14 +17,14 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Defines the Geometry Buffer scene component responsible to manage a
- * G-Buffer usefull in several rendering techniques.
+ * G-Buffer useful in several rendering techniques.
  */
 class BABYLON_SHARED_EXPORT GeometryBufferRendererSceneComponent
     : public ISceneComponent {
 
 public:
   /**
-   * The component name helpfull to identify the component in the list of scene
+   * The component name helpful to identify the component in the list of scene
    * components.
    */
   static constexpr const char* name

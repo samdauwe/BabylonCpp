@@ -1,5 +1,6 @@
 #include <babylon/rendering/depth_renderer_scene_component.h>
 
+#include <babylon/cameras/camera.h>
 #include <babylon/engine/scene.h>
 #include <babylon/rendering/depth_renderer.h>
 
@@ -21,6 +22,11 @@ void DepthRendererSceneComponent::_register()
     [this](std::vector<RenderTargetTexturePtr>& renderTargets) {
       _gatherRenderTargets(renderTargets);
     });
+  scene->_gatherActiveCameraRenderTargetsStage.registerStep(
+    SceneComponentConstants::STEP_GATHERACTIVECAMERARENDERTARGETS_DEPTHRENDERER,
+    this, [this](std::vector<RenderTargetTexturePtr>& renderTargets) {
+      _gatherActiveCameraRenderTargets(renderTargets);
+    });
 }
 
 void DepthRendererSceneComponent::rebuild()
@@ -30,7 +36,7 @@ void DepthRendererSceneComponent::rebuild()
 
 void DepthRendererSceneComponent::dispose()
 {
-  for (auto& item : scene->depthRenderer()) {
+  for (const auto& item : scene->depthRenderer()) {
     item.second->dispose();
   }
 }
@@ -39,8 +45,25 @@ void DepthRendererSceneComponent::_gatherRenderTargets(
   std::vector<RenderTargetTexturePtr>& renderTargets)
 {
   if (!scene->depthRenderer().empty()) {
-    for (auto& item : scene->depthRenderer()) {
-      renderTargets.emplace_back(item.second->getDepthMap());
+    for (const auto& item : scene->depthRenderer()) {
+      const auto& depthRenderer = item.second;
+      if (!depthRenderer->useOnlyInActiveCamera) {
+        renderTargets.emplace_back(depthRenderer->getDepthMap());
+      }
+    }
+  }
+}
+
+void DepthRendererSceneComponent::_gatherActiveCameraRenderTargets(
+  std::vector<RenderTargetTexturePtr>& renderTargets)
+{
+  if (!scene->depthRenderer().empty()) {
+    for (const auto& item : scene->depthRenderer()) {
+      const auto& depthRenderer = item.second;
+      if (depthRenderer->useOnlyInActiveCamera
+          && scene->activeCamera->id == item.first) {
+        renderTargets.emplace_back(depthRenderer->getDepthMap());
+      }
     }
   }
 }

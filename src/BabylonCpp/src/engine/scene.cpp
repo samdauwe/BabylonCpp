@@ -149,6 +149,9 @@ Scene::Scene(Engine* engine)
                       &Scene::set_texturesEnabled}
     , particlesEnabled{true}
     , spritesEnabled{true}
+    , _pointerOverSprite{nullptr}
+    , _pickedDownSprite{nullptr}
+    , _tempSpritePickingRay{std::nullopt}
     , skeletonsEnabled{this, &Scene::get_skeletonsEnabled,
                        &Scene::set_skeletonsEnabled}
     , lensFlaresEnabled{true}
@@ -198,7 +201,7 @@ Scene::Scene(Engine* engine)
     , audioEnabled{this, &Scene::get_audioEnabled, &Scene::set_audioEnabled}
     , headphone{this, &Scene::get_headphone, &Scene::set_headphone}
     , isDisposed{this, &Scene::get_isDisposed}
-    , _allowPostProcessClear{true}
+    , _allowPostProcessClearColor{true}
     , blockMaterialDirtyMechanism{false}
     , _environmentTexture{nullptr}
     , _animationPropertiesOverride{nullptr}
@@ -277,12 +280,10 @@ Scene::Scene(Engine* engine)
     , _frustumPlanesSet{false}
     , _selectionOctree{nullptr}
     , _pointerOverMesh{nullptr}
-    , _pointerOverSprite{nullptr}
     , _debugLayer{nullptr}
     , _geometryBufferRenderer{nullptr}
     , _pickedDownMesh{nullptr}
     , _pickedUpMesh{nullptr}
-    , _pickedDownSprite{nullptr}
     , _uid{Tools::RandomId()}
     , _tempPickingRay{std::make_unique<Ray>(Ray::Zero())}
     , _cachedRayForTransform{nullptr}
@@ -1260,6 +1261,14 @@ bool Scene::isPointerCaptured(int pointerId)
 {
   return stl_util::contains(_pointerCaptures, pointerId)
          && _pointerCaptures[pointerId];
+}
+
+bool Scene::_isPointerSwiping() const
+{
+  return std::abs(_startingPointerPosition.x - _pointerX)
+           > Scene::DragMovementThreshold
+         || std::abs(_startingPointerPosition.y - _pointerY)
+              > Scene::DragMovementThreshold;
 }
 
 void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
@@ -4521,6 +4530,28 @@ Scene::pickSprite(int x, int y,
   createPickingRayInCameraSpaceToRef(x, y, *_tempPickingRay, camera);
 
   return _internalPickSprites(*_tempPickingRay, predicate, fastCheck, camera);
+}
+
+std::optional<PickingInfo>
+Scene::pickSpriteWithRay(const Ray& ray,
+                         const std::function<bool(Sprite* sprite)>& predicate,
+                         bool fastCheck, CameraPtr& camera)
+{
+  if (!_tempSpritePickingRay) {
+    return std::nullopt;
+  }
+
+  if (!camera) {
+    if (!activeCamera) {
+      return std::nullopt;
+    }
+    camera = activeCamera;
+  }
+
+  Ray::TransformToRef(ray, camera->getViewMatrix(), *_tempSpritePickingRay);
+
+  return _internalPickSprites(*_tempSpritePickingRay, predicate, fastCheck,
+                              camera);
 }
 
 std::optional<PickingInfo> Scene::pickWithRay(

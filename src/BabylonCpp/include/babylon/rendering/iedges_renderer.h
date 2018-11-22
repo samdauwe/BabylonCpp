@@ -18,7 +18,7 @@ struct BABYLON_SHARED_EXPORT IEdgesRenderer : public IDisposable {
   /**
    * @brief Renders the edges of the attached mesh,
    */
-  virtual void render();
+  virtual void render() = 0;
 
   /**
    * @brief Checks wether or not the edges renderer is ready to render.

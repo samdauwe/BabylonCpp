@@ -64,6 +64,8 @@ protected:
 
 private:
   void _gatherRenderTargets(std::vector<RenderTargetTexturePtr>& renderTargets);
+  void _gatherActiveCameraRenderTargets(
+    std::vector<RenderTargetTexturePtr>& renderTargets);
 
 }; // end of class DepthRendererSceneComponent
 

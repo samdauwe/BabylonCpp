@@ -116,7 +116,7 @@ private:
 
 private:
   std::unordered_map<int, bool> _pointerCaptures;
-  std::unordered_map<int, PointerType> _lastPointerEvents;
+  std::unordered_map<int, bool> _lastPointerEvents;
   Observer<Scene>::Ptr _afterRenderObserver;
   Observer<Scene>::Ptr _sceneDisposeObserver;
   Observer<PointerInfoPre>::Ptr _originalPointerObserver;

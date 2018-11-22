@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/sprites/isprite_manager.h>
 #include <babylon/sprites/sprite.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
@@ -25,7 +26,11 @@ namespace GL {
 class IGLBuffer;
 } // end of namespace GL
 
-class BABYLON_SHARED_EXPORT SpriteManager {
+/**
+ * @brief Class used to manage multiple sprites on the same spritesheet.
+ * @see http://doc.babylonjs.com/babylon101/sprites
+ */
+class BABYLON_SHARED_EXPORT SpriteManager : public ISpriteManager {
 
 public:
   template <typename... Ts>
@@ -41,22 +46,62 @@ public:
 
   void addToScene(const SpriteManagerPtr& newSpriteManager);
 
-  void setOnDispose(
-    const std::function<void(SpriteManager*, EventState&)>& callback);
+  /**
+   * @brief Intersects the sprites with a ray.
+   * @param ray defines the ray to intersect with
+   * @param camera defines the current active camera
+   * @param predicate defines a predicate used to select candidate sprites
+   * @param fastCheck defines if a fast check only must be done (the first
+   * potential sprite is will be used and not the closer)
+   * @returns null if no hit or a PickingInfo
+   */
   std::optional<PickingInfo>
   intersects(const Ray ray, const CameraPtr& camera,
-             std::function<bool(Sprite* sprite)> predicate, bool fastCheck);
-  void render();
-  void dispose();
+             std::function<bool(Sprite* sprite)> predicate,
+             bool fastCheck) override;
+
+  /**
+   * @brief Render all child sprites.
+   */
+  void render() override;
+
+  /**
+   * @brief Release associated resources.
+   */
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
 protected:
+  /**
+   * @brief Creates a new sprite manager.
+   * @param name defines the manager's name
+   * @param imgUrl defines the sprite sheet url
+   * @param capacity defines the maximum allowed number of sprites
+   * @param cellSize defines the size of a sprite cell
+   * @param scene defines the hosting scene
+   * @param epsilon defines the epsilon value to align texture (0.01 by default)
+   * @param samplingMode defines the smapling mode to use with spritesheet
+   */
   SpriteManager(const std::string& name, const std::string& imgUrl,
                 unsigned int capacity, const ISize& cellSize, Scene* scene,
                 float epsilon = 0.01f,
                 unsigned int samplingMode
                 = TextureConstants::TRILINEAR_SAMPLINGMODE);
 
+  /**
+   * @brief Sets the callback called when the manager is disposed.
+   */
+  void set_onDispose(
+    const std::function<void(SpriteManager*, EventState&)>& callback);
+
+  /**
+   * @brief Gets the spritesheet texture.
+   */
   TexturePtr& get_texture();
+
+  /**
+   * @brief Sets the spritesheet texture.
+   */
   void set_texture(const TexturePtr& value);
 
 private:
@@ -64,14 +109,25 @@ private:
                            int offsetY, float rowSize);
 
 public:
+  /**
+   * Defines the manager's name
+   */
   std::string name;
-  std::vector<SpritePtr> sprites;
-  unsigned int renderingGroupId;
-  unsigned int layerMask;
+
+  /**
+   * Gets or sets a boolean indicating if the manager must consider scene fog
+   * when rendering
+   */
   bool fogEnabled;
-  bool isPickable;
-  float _epsilon;
+
+  /**
+   * Defines the default width of a cell in the spritesheet
+   */
   int cellWidth;
+
+  /**
+   * Defines the default height of a cell in the spritesheet
+   */
   int cellHeight;
 
   /**
@@ -79,12 +135,23 @@ public:
    */
   Observable<SpriteManager> onDisposeObservable;
 
+  /**
+   * Callback called when the manager is disposed
+   */
+  WriteOnlyProperty<SpriteManager,
+                    std::function<void(SpriteManager*, EventState&)>>
+    onDispose;
+
+  /**
+   * Gets or sets the spritesheet texture
+   */
   Property<SpriteManager, TexturePtr> texture;
 
 private:
   Observer<SpriteManager>::Ptr _onDisposeObserver;
   size_t _capacity;
   TexturePtr _spriteTexture;
+  float _epsilon;
   Scene* _scene;
   Float32Array _vertexData;
   std::unique_ptr<Buffer> _buffer;

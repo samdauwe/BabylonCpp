@@ -76,7 +76,7 @@ using PointerMoveStageAction = std::function<std::optional<PickingInfo>(
  */
 using PointerUpDownStageAction = std::function<std::optional<PickingInfo>(
   int unTranslatedPointerX, int unTranslatedPointerY,
-  std::optional<PickingInfo> pickResult, PointerEvent evt)>;
+  std::optional<PickingInfo> pickResult, const PointerEvent& evt)>;
 
 /**
  * @brief Representation of a step.
