@@ -1,6 +1,7 @@
 #include <babylon/particles/sub_emitter.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/particles/particle_system.h>
 
 namespace BABYLON {
@@ -22,13 +23,12 @@ SubEmitterPtr SubEmitter::clone() const
   return nullptr;
 }
 
-Json::object SubEmitter::serialize() const
+json SubEmitter::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-SubEmitterPtr SubEmitter::Parse(const Json::value& /*parsedLight*/,
-                                Scene* /*scene*/,
+SubEmitterPtr SubEmitter::Parse(const json& /*parsedLight*/, Scene* /*scene*/,
                                 const std::string& /*rootUrl*/)
 {
   return nullptr;

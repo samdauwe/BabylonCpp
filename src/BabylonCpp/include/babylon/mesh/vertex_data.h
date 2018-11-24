@@ -106,7 +106,7 @@ public:
    * @brief Serializes the VertexData.
    * @returns a serialized object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /** Statics **/
 
@@ -557,7 +557,7 @@ public:
    * @param parsedVertexData the parsed data from an imported file
    * @param geometry the geometry to apply the VertexData to
    */
-  static void ImportVertexData(const Json::value& parsedVertexData,
+  static void ImportVertexData(const json& parsedVertexData,
                                Geometry& geometry);
 
   static void

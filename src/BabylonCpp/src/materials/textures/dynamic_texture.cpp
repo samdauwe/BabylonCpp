@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/dynamic_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -158,9 +159,9 @@ DynamicTexturePtr DynamicTexture::clone()
   return newTexture;
 }
 
-Json::object DynamicTexture::serialize() const
+json DynamicTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 void DynamicTexture::_rebuild()

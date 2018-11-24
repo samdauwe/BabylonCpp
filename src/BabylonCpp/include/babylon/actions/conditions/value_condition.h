@@ -100,7 +100,7 @@ public:
    * @brief Serialize the ValueCondition into a JSON compatible object.
    * @returns serialization object
    */
-  Json::object serialize() const override;
+  json serialize() const override;
 
   /** Statics **/
 

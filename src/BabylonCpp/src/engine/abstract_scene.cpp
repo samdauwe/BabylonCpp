@@ -1,7 +1,6 @@
 #include <babylon/engine/abstract_scene.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/asset_container.h>
 #include <babylon/engine/scene_component_constants.h>
 #include <babylon/layer/effect_layer.h>
@@ -149,7 +148,7 @@ AbstractScene::GetIndividualParser(const std::string& name)
   return std::nullopt;
 }
 
-void AbstractScene::Parse(const nlohmann::json& /*jsonData*/, Scene* /*scene*/,
+void AbstractScene::Parse(const json& /*jsonData*/, Scene* /*scene*/,
                           AssetContainer& /*container*/,
                           const std::string& /*rootUrl*/)
 {

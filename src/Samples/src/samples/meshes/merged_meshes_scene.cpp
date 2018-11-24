@@ -1,7 +1,7 @@
 #include <babylon/samples/meshes/merged_meshes_scene.h>
 
 #include <babylon/cameras/free_camera.h>
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -12,7 +12,7 @@
 namespace BABYLON {
 namespace Samples {
 
-const char* MergedMeshesScene::json
+const char* MergedMeshesScene::world_json
   = R"someToken({"defaultBlocks":[{"terrain":"mountain","r":1,"g":1,"b":1,"a":1},{"terrain":"hill","r":0.7,"g":0.5,"b":0.4,"a":0.1},{"terrain":"water","r":0,"g":0,"b":1,"a":1},{"terrain":"grass","r":0,"g":1,"b":0,"a":1}],"map":[{"terrain":"mountain","x":0,"z":0,"y":0},{"terrain":"mountain","x":0,"z":0,"y":1},{"terrain":"mountain","x":0,"z":0,"y":2},{"terrain":"mountain","x":0,"z":1,"y":0},{"terrain":"mountain","x":0,"z":1,"y":1},{"terrain":"mountain","x":0,"z":1,"y":2},{"terrain":"water","x":0,"z":2,"y":0},{"terrain":"water","x":0,"z":3,"y":0},{"terrain":"mountain","x":0,"z":4,"y":0},{"terrain":"mountain","x":0,"z":4,"y":1},{"terrain":"mountain","x":0,"z":4,"y":2},{"terrain":"mountain","x":0,"z":5,"y":0},{"terrain":"mountain","x":0,"z":5,"y":1},{"terrain":"mountain","x":0,"z":5,"y":2},{"terrain":"mountain","x":0,"z":6,"y":0},{"terrain":"mountain","x":0,"z":6,"y":1},{"terrain":"mountain","x":0,"z":6,"y":2},{"terrain":"hill","x":0,"z":7,"y":0},{"terrain":"hill","x":0,"z":7,"y":1},{"terrain":"hill","x":0,"z":8,"y":0},{"terrain":"hill","x":0,"z":8,"y":1},{"terrain":"grass","x":0,"z":9,"y":0},{"terrain":"grass","x":0,"z":10,"y":0},{"terrain":"grass","x":0,"z":11,"y":0},{"terrain":"grass","x":0,"z":12,"y":0},{"terrain":"grass","x":0,"z":13,"y":0},{"terrain":"mountain","x":1,"z":0,"y":0},{"terrain":"mountain","x":1,"z":0,"y":1},{"terrain":"mountain","x":1,"z":0,"y":2},{"terrain":"mountain","x":1,"z":1,"y":0},{"terrain":"mountain","x":1,"z":1,"y":1},{"terrain":"mountain","x":1,"z":1,"y":2},{"terrain":"hill","x":1,"z":2,"y":0},{"terrain":"hill","x":1,"z":2,"y":1},{"terrain":"water","x":1,"z":3,"y":0},{"terrain":"grass","x":1,"z":4,"y":0},{"terrain":"hill","x":1,"z":5,"y":0},{"terrain":"hill","x":1,"z":5,"y":1},{"terrain":"hill","x":1,"z":6,"y":0},{"terrain":"hill","x":1,"z":6,"y":1},{"terrain":"hill","x":1,"z":7,"y":0},{"terrain":"hill","x":1,"z":7,"y":1},{"terrain":"grass","x":1,"z":8,"y":0},{"terrain":"grass","x":1,"z":9,"y":0},{"terrain":"grass","x":1,"z":10,"y":0},{"terrain":"grass","x":1,"z":11,"y":0},{"terrain":"grass","x":1,"z":12,"y":0},{"terrain":"grass","x":1,"z":13,"y":0},{"terrain":"mountain","x":2,"z":0,"y":0},{"terrain":"mountain","x":2,"z":0,"y":1},{"terrain":"mountain","x":2,"z":0,"y":2},{"terrain":"hill","x":2,"z":1,"y":0},{"terrain":"hill","x":2,"z":1,"y":1},{"terrain":"grass","x":2,"z":2,"y":0},{"terrain":"water","x":2,"z":3,"y":0},{"terrain":"grass","x":2,"z":4,"y":0},{"terrain":"grass","x":2,"z":5,"y":0},{"terrain":"grass","x":2,"z":6,"y":0},{"terrain":"grass","x":2,"z":7,"y":0},{"terrain":"grass","x":2,"z":8,"y":0},{"terrain":"grass","x":2,"z":9,"y":0},{"terrain":"grass","x":2,"z":10,"y":0},{"terrain":"grass","x":2,"z":11,"y":0},{"terrain":"grass","x":2,"z":12,"y":0},{"terrain":"grass","x":2,"z":13,"y":0},{"terrain":"mountain","x":3,"z":0,"y":0},{"terrain":"mountain","x":3,"z":0,"y":1},{"terrain":"mountain","x":3,"z":0,"y":2},{"terrain":"grass","x":3,"z":1,"y":0},{"terrain":"grass","x":3,"z":2,"y":0},{"terrain":"water","x":3,"z":3,"y":0},{"terrain":"water","x":3,"z":4,"y":0},{"terrain":"water","x":3,"z":5,"y":0},{"terrain":"water","x":3,"z":6,"y":0},{"terrain":"water","x":3,"z":7,"y":0},{"terrain":"water","x":3,"z":8,"y":0},{"terrain":"grass","x":3,"z":9,"y":0},{"terrain":"grass","x":3,"z":10,"y":0},{"terrain":"grass","x":3,"z":11,"y":0},{"terrain":"grass","x":3,"z":12,"y":0},{"terrain":"grass","x":3,"z":13,"y":0},{"terrain":"hill","x":4,"z":0,"y":0},{"terrain":"hill","x":4,"z":0,"y":1},{"terrain":"grass","x":4,"z":1,"y":0},{"terrain":"grass","x":4,"z":2,"y":0},{"terrain":"grass","x":4,"z":3,"y":0},{"terrain":"grass","x":4,"z":4,"y":0},{"terrain":"grass","x":4,"z":5,"y":0},{"terrain":"grass","x":4,"z":6,"y":0},{"terrain":"grass","x":4,"z":7,"y":0},{"terrain":"water","x":4,"z":8,"y":0},{"terrain":"grass","x":4,"z":9,"y":0},{"terrain":"grass","x":4,"z":10,"y":0},{"terrain":"grass","x":4,"z":11,"y":0},{"terrain":"grass","x":4,"z":12,"y":0},{"terrain":"grass","x":4,"z":13,"y":0},{"terrain":"hill","x":5,"z":0,"y":0},{"terrain":"hill","x":5,"z":0,"y":1},{"terrain":"grass","x":5,"z":1,"y":0},{"terrain":"grass","x":5,"z":2,"y":0},{"terrain":"grass","x":5,"z":3,"y":0},{"terrain":"grass","x":5,"z":4,"y":0},{"terrain":"grass","x":5,"z":5,"y":0},{"terrain":"grass","x":5,"z":6,"y":0},{"terrain":"grass","x":5,"z":7,"y":0},{"terrain":"water","x":5,"z":8,"y":0},{"terrain":"grass","x":5,"z":9,"y":0},{"terrain":"grass","x":5,"z":10,"y":0},{"terrain":"grass","x":5,"z":11,"y":0},{"terrain":"grass","x":5,"z":12,"y":0},{"terrain":"grass","x":5,"z":13,"y":0},{"terrain":"hill","x":6,"z":0,"y":0},{"terrain":"hill","x":6,"z":0,"y":1},{"terrain":"grass","x":6,"z":1,"y":0},{"terrain":"grass","x":6,"z":2,"y":0},{"terrain":"grass","x":6,"z":3,"y":0},{"terrain":"grass","x":6,"z":4,"y":0},{"terrain":"grass","x":6,"z":5,"y":0},{"terrain":"grass","x":6,"z":6,"y":0},{"terrain":"grass","x":6,"z":7,"y":0},{"terrain":"water","x":6,"z":8,"y":0},{"terrain":"grass","x":6,"z":9,"y":0},{"terrain":"grass","x":6,"z":10,"y":0},{"terrain":"grass","x":6,"z":11,"y":0},{"terrain":"grass","x":6,"z":12,"y":0},{"terrain":"grass","x":6,"z":13,"y":0},{"terrain":"hill","x":7,"z":0,"y":0},{"terrain":"hill","x":7,"z":0,"y":1},{"terrain":"grass","x":7,"z":1,"y":0},{"terrain":"grass","x":7,"z":2,"y":0},{"terrain":"grass","x":7,"z":3,"y":0},{"terrain":"grass","x":7,"z":4,"y":0},{"terrain":"grass","x":7,"z":5,"y":0},{"terrain":"grass","x":7,"z":6,"y":0},{"terrain":"grass","x":7,"z":7,"y":0},{"terrain":"water","x":7,"z":8,"y":0},{"terrain":"grass","x":7,"z":9,"y":0},{"terrain":"grass","x":7,"z":10,"y":0},{"terrain":"grass","x":7,"z":11,"y":0},{"terrain":"grass","x":7,"z":12,"y":0},{"terrain":"water","x":7,"z":13,"y":0},{"terrain":"hill","x":8,"z":0,"y":0},{"terrain":"hill","x":8,"z":0,"y":1},{"terrain":"grass","x":8,"z":1,"y":0},{"terrain":"grass","x":8,"z":2,"y":0},{"terrain":"grass","x":8,"z":3,"y":0},{"terrain":"grass","x":8,"z":4,"y":0},{"terrain":"grass","x":8,"z":5,"y":0},{"terrain":"grass","x":8,"z":6,"y":0},{"terrain":"grass","x":8,"z":7,"y":0},{"terrain":"water","x":8,"z":8,"y":0},{"terrain":"water","x":8,"z":9,"y":0},{"terrain":"water","x":8,"z":10,"y":0},{"terrain":"water","x":8,"z":11,"y":0},{"terrain":"water","x":8,"z":12,"y":0},{"terrain":"water","x":8,"z":13,"y":0},{"terrain":"hill","x":9,"z":0,"y":0},{"terrain":"hill","x":9,"z":0,"y":1},{"terrain":"grass","x":9,"z":1,"y":0},{"terrain":"grass","x":9,"z":2,"y":0},{"terrain":"grass","x":9,"z":3,"y":0},{"terrain":"grass","x":9,"z":4,"y":0},{"terrain":"grass","x":9,"z":5,"y":0},{"terrain":"grass","x":9,"z":6,"y":0},{"terrain":"grass","x":9,"z":7,"y":0},{"terrain":"grass","x":9,"z":8,"y":0},{"terrain":"water","x":9,"z":9,"y":0},{"terrain":"water","x":9,"z":10,"y":0},{"terrain":"water","x":9,"z":11,"y":0},{"terrain":"water","x":9,"z":12,"y":0},{"terrain":"water","x":9,"z":13,"y":0},{"terrain":"hill","x":10,"z":0,"y":0},{"terrain":"hill","x":10,"z":0,"y":1},{"terrain":"grass","x":10,"z":1,"y":0},{"terrain":"grass","x":10,"z":2,"y":0},{"terrain":"grass","x":10,"z":3,"y":0},{"terrain":"grass","x":10,"z":4,"y":0},{"terrain":"grass","x":10,"z":5,"y":0},{"terrain":"grass","x":10,"z":6,"y":0},{"terrain":"grass","x":10,"z":7,"y":0},{"terrain":"grass","x":10,"z":8,"y":0},{"terrain":"water","x":10,"z":9,"y":0},{"terrain":"water","x":10,"z":10,"y":0},{"terrain":"water","x":10,"z":11,"y":0},{"terrain":"water","x":10,"z":12,"y":0},{"terrain":"water","x":10,"z":13,"y":0},{"terrain":"hill","x":11,"z":0,"y":0},{"terrain":"hill","x":11,"z":0,"y":1},{"terrain":"grass","x":11,"z":1,"y":0},{"terrain":"grass","x":11,"z":2,"y":0},{"terrain":"grass","x":11,"z":3,"y":0},{"terrain":"grass","x":11,"z":4,"y":0},{"terrain":"grass","x":11,"z":5,"y":0},{"terrain":"grass","x":11,"z":6,"y":0},{"terrain":"water","x":11,"z":7,"y":0},{"terrain":"water","x":11,"z":8,"y":0},{"terrain":"water","x":11,"z":9,"y":0},{"terrain":"water","x":11,"z":10,"y":0},{"terrain":"water","x":11,"z":11,"y":0},{"terrain":"water","x":11,"z":12,"y":0},{"terrain":"water","x":11,"z":13,"y":0},{"terrain":"hill","x":12,"z":0,"y":0},{"terrain":"hill","x":12,"z":0,"y":1},{"terrain":"grass","x":12,"z":1,"y":0},{"terrain":"grass","x":12,"z":2,"y":0},{"terrain":"grass","x":12,"z":3,"y":0},{"terrain":"grass","x":12,"z":4,"y":0},{"terrain":"grass","x":12,"z":5,"y":0},{"terrain":"grass","x":12,"z":6,"y":0},{"terrain":"grass","x":12,"z":7,"y":0},{"terrain":"water","x":12,"z":8,"y":0},{"terrain":"water","x":12,"z":9,"y":0},{"terrain":"water","x":12,"z":10,"y":0},{"terrain":"water","x":12,"z":11,"y":0},{"terrain":"water","x":12,"z":12,"y":0},{"terrain":"water","x":12,"z":13,"y":0},{"terrain":"hill","x":13,"z":0,"y":0},{"terrain":"hill","x":13,"z":0,"y":1},{"terrain":"grass","x":13,"z":1,"y":0},{"terrain":"grass","x":13,"z":2,"y":0},{"terrain":"grass","x":13,"z":3,"y":0},{"terrain":"grass","x":13,"z":4,"y":0},{"terrain":"grass","x":13,"z":5,"y":0},{"terrain":"water","x":13,"z":6,"y":0},{"terrain":"water","x":13,"z":7,"y":0},{"terrain":"water","x":13,"z":8,"y":0},{"terrain":"water","x":13,"z":9,"y":0},{"terrain":"water","x":13,"z":10,"y":0},{"terrain":"water","x":13,"z":11,"y":0},{"terrain":"water","x":13,"z":12,"y":0},{"terrain":"water","x":13,"z":13,"y":0}]})someToken";
 
 MergedMeshesScene::MergedMeshesScene(ICanvas* iCanvas)
@@ -47,22 +47,17 @@ void MergedMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.8f;
 
   // Parse the json representation of the world
-  picojson::value world;
-  std::string err = picojson::parse(world, json, json + strlen(json));
-  if (!err.empty()) {
-    BABYLON_LOGF_ERROR("MergedMeshesScene", "Error while parsing json: %s",
-                       err.c_str());
-    return;
-  }
+  auto world = json::parse(world_json);
 
   // Create map with default block name to color mapping
   std::unordered_map<std::string, Block> defaultBlocks;
-  for (auto& defaultBlock : Json::GetArray(world, "defaultBlocks")) {
-    defaultBlocks[Json::GetString(defaultBlock, "terrain")]
-      = {Json::GetNumber<float>(defaultBlock, "r", 0.f),
-         Json::GetNumber<float>(defaultBlock, "g", 0.f),
-         Json::GetNumber<float>(defaultBlock, "b", 0.f),
-         Json::GetNumber<float>(defaultBlock, "a", 0.f)};
+  for (auto& defaultBlock :
+       json_util::get_array<json>(world, "defaultBlocks")) {
+    defaultBlocks[json_util::get_string(defaultBlock, "terrain")]
+      = {json_util::get_number(defaultBlock, "r", 0.f),
+         json_util::get_number(defaultBlock, "g", 0.f),
+         json_util::get_number(defaultBlock, "b", 0.f),
+         json_util::get_number(defaultBlock, "a", 0.f)};
   }
 
   // Block factory method
@@ -86,12 +81,12 @@ void MergedMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Create map
   std::vector<MeshPtr> arrayOfMeshes;
   unsigned int blockNr = 0;
-  for (auto& blockOfMap : Json::GetArray(world, "map")) {
-    const auto blockType = Json::GetString(blockOfMap, "terrain");
+  for (auto& blockOfMap : json_util::get_array<json>(world, "map")) {
+    const auto blockType = json_util::get_string(blockOfMap, "terrain");
     const auto blockName = String::concat("Block_", blockNr++);
-    const float y        = Json::GetNumber<float>(blockOfMap, "y", 0.f);
-    const float x        = Json::GetNumber<float>(blockOfMap, "x", 0.f);
-    const float z        = Json::GetNumber<float>(blockOfMap, "z", 0.f);
+    const float y        = json_util::get_number(blockOfMap, "y", 0.f);
+    const float x        = json_util::get_number(blockOfMap, "x", 0.f);
+    const float z        = json_util::get_number(blockOfMap, "z", 0.f);
     auto block           = createBlock(blockName, defaultBlocks[blockType]);
     block->position().y  = y * 5.f;
     block->position().x  = x * 5.f;

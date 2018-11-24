@@ -12,7 +12,7 @@ void TouchCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "TouchCamera", [](const std::string& name, Scene* scene,
-                      const std::optional<Json::value>& /*options*/) {
+                      const std::optional<json>& /*options*/) {
       return TouchCamera::New(name, Vector3::Zero(), scene);
     });
   TouchCamera::NodeConstructorAdded = true;

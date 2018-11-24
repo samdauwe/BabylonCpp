@@ -34,7 +34,7 @@ public:
    * @brief Serializes this normal map procedural texture.
    * @returns a serialized normal map procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Normal Map Procedural Texture from parsed normal map
@@ -46,8 +46,7 @@ public:
    * @returns a parsed Normal Map Procedural Texture
    */
   static std::unique_ptr<NormalMapProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   NormalMapProceduralTexture(const std::string& name, const Size& size,

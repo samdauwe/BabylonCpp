@@ -345,7 +345,7 @@ public:
   TransformNodePtr clone(const std::string& name, Node* newParent,
                          bool doNotCloneChildren = false);
 
-  Json::object serialize(Json::object& currentSerializationObject);
+  json serialize(json& currentSerializationObject);
 
   // Statics
   /**
@@ -354,8 +354,8 @@ public:
    * @param `rootUrl` is a string, it's the root URL to prefix the
    * `delayLoadingFile` property with
    */
-  static TransformNodePtr Parse(const Json::value& parsedTransformNode,
-                                Scene* scene, const std::string& rootUrl);
+  static TransformNodePtr Parse(const json& parsedTransformNode, Scene* scene,
+                                const std::string& rootUrl);
 
   /**
    * @brief Releases resources associated with this transform node.

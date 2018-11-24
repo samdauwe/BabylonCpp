@@ -47,12 +47,12 @@ void NoiseProceduralTexture::render(bool useCameraPostProcess)
   ProceduralTexture::render(useCameraPostProcess);
 }
 
-Json::object NoiseProceduralTexture::serialize() const
+json NoiseProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-void NoiseProceduralTexture::Parse(const Json::value& /*serializationObject*/,
+void NoiseProceduralTexture::Parse(const json& /*serializationObject*/,
                                    Scene* /*scene*/,
                                    const std::string& /*rootUrl*/)
 {

@@ -21,8 +21,8 @@ public:
   template <typename... Ts>
   static FreeCameraPtr New(Ts&&... args)
   {
-    auto camera = std::shared_ptr<FreeCamera>(
-      new FreeCamera(std::forward<Ts>(args)...));
+    auto camera
+      = std::shared_ptr<FreeCamera>(new FreeCamera(std::forward<Ts>(args)...));
     camera->addToScene(camera);
 
     return camera;
@@ -48,7 +48,7 @@ public:
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
   const std::string getClassName() const override;
-  Json::object serialize() const override;
+  json serialize() const override;
 
 private:
   int get_collisionMask() const;

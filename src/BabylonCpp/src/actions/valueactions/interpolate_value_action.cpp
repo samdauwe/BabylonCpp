@@ -1,12 +1,13 @@
 #include <babylon/actions/valueactions/interpolate_value_action.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/audio/sound.h>
-#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/scene.h>
 
@@ -72,23 +73,9 @@ void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
                               wrapper);
 }
 
-Json::object InterpolateValueAction::serialize(Json::object& parent) const
+json InterpolateValueAction::serialize(json& /*parent*/) const
 {
-  return Action::_serialize(
-    Json::object(
-      {Json::Pair("name", "InterpolateValueAction"),
-       Json::Pair("properties", Json::array({{/*
-Action::_GetTargetProperty(_target),
-Json::NameValuePair("propertyPath", propertyPath),
-Json::NameValuePair("value", Action::_SerializeValueAsString(value)),
-Json::NameValuePair("duration", Action::_SerializeValueAsString(
-                                  AnimationValue(duration))),
-Json::NameValuePair("stopOtherAnimations",
-                    Action::_SerializeValueAsString(
-                      AnimationValue(stopOtherAnimations))),
-
-*/}}))}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

@@ -34,7 +34,7 @@ public:
    * @brief Serializes this perlin noise procedural texture.
    * @returns a serialized perlin noise procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Perlin Noise Procedural Texture from parsed perlin noise
@@ -46,8 +46,7 @@ public:
    * @returns a parsed Perlin Noise Procedural Texture
    */
   static std::unique_ptr<PerlinNoiseProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
   PerlinNoiseProceduralTexture(const std::string& name, const Size& size,
                                Scene* scene, Texture* fallbackTexture = nullptr,

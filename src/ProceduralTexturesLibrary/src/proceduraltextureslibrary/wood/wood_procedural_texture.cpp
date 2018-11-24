@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/wood/wood_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/wood/wood_procedural_texture_fragment_fx.h>
 
@@ -63,14 +64,14 @@ void WoodProceduralTexture::set_woodColor(const Color3& value)
   updateShaderUniforms();
 }
 
-Json::object WoodProceduralTexture::serialize() const
+json WoodProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<WoodProceduralTexture>
-WoodProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                             Scene* /*scene*/, const std::string& /*rootUrl*/)
+WoodProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
+                             const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

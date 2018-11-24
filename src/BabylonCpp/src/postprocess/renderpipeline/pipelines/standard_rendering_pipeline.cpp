@@ -1,8 +1,9 @@
 #include <babylon/postprocess/renderpipeline/pipelines/standard_rendering_pipeline.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -1078,14 +1079,14 @@ void StandardRenderingPipeline::dispose(bool doNotRecurse,
   PostProcessRenderPipeline::dispose(doNotRecurse);
 }
 
-Json::object StandardRenderingPipeline::serialize() const
+json StandardRenderingPipeline::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<StandardRenderingPipeline>
-StandardRenderingPipeline::Parse(const Json::value& /*source*/,
-                                 Scene* /*scene*/, const std::string& /*url*/)
+StandardRenderingPipeline::Parse(const json& /*source*/, Scene* /*scene*/,
+                                 const std::string& /*url*/)
 {
   return nullptr;
 }

@@ -1,5 +1,7 @@
 #include <babylon/cameras/camera.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_follow_camera.h>
@@ -8,7 +10,6 @@
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/cameras/universal_camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/culling/icullable.h>
@@ -630,7 +631,7 @@ Vector3* Camera::getRightTarget()
   return &std::static_pointer_cast<TargetCamera>(_rigCameras[1])->getTarget();
 }
 
-void Camera::setCameraRigMode(int /*iMode*/, const Json::value& /*rigParams*/)
+void Camera::setCameraRigMode(int /*iMode*/, const json& /*rigParams*/)
 {
 }
 
@@ -714,9 +715,9 @@ void Camera::_setupInputs()
 {
 }
 
-Json::object Camera::serialize() const
+json Camera::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string Camera::getClassName() const
@@ -748,63 +749,18 @@ Matrix& Camera::computeWorldMatrix(bool /*force*/)
   return *getWorldMatrix();
 }
 
-CameraPtr Camera::GetConstructorFromName(const std::string& type,
-                                         const std::string& name, Scene* scene,
-                                         float interaxial_distance,
-                                         bool isStereoscopicSideBySide)
+CameraPtr Camera::GetConstructorFromName(const std::string& /*type*/,
+                                         const std::string& /*name*/,
+                                         Scene* /*scene*/,
+                                         float /*interaxial_distance*/,
+                                         bool /*isStereoscopicSideBySide*/)
 {
-  Json::object options;
-  options["interaxial_distance"]
-    = picojson::value(static_cast<double>(interaxial_distance));
-  options["isStereoscopicSideBySide"]
-    = picojson::value(isStereoscopicSideBySide);
-
-  auto constructorFunc
-    = Node::Construct(type, name, scene, Json::value(options));
-
-  if (constructorFunc) {
-    return std::static_pointer_cast<Camera>(constructorFunc());
-  }
-
-  // Default to universal camera
-  return UniversalCamera::New(name, Vector3::Zero(), scene);
+  return nullptr;
 }
 
-CameraPtr Camera::Parse(const Json::value& parsedCamera, Scene* scene)
+CameraPtr Camera::Parse(const json& /*parsedCamera*/, Scene* /*scene*/)
 {
-  auto type      = Json::GetString(parsedCamera, "type");
-  auto construct = Camera::GetConstructorFromName(
-    type, Json::GetString(parsedCamera, "name"), scene,
-    Json::GetNumber<float>(parsedCamera, "interaxial_distance", 0.f),
-    Json::GetBool(parsedCamera, "isStereoscopicSideBySide", true));
-  if (!construct) {
-    return nullptr;
-  }
-
-  auto camera = SerializationHelper::Parse(construct, parsedCamera, scene);
-
-  // Parent
-  if (parsedCamera.contains("parentId")) {
-    camera->_waitingParentId = Json::GetString(parsedCamera, "parentId");
-  }
-
-  // Animations
-  if (parsedCamera.contains("animations")) {
-    for (auto parsedAnimation : Json::GetArray(parsedCamera, "animations")) {
-      camera->animations.emplace_back(Animation::Parse(parsedAnimation));
-    }
-    Node::ParseAnimationRanges(*camera, parsedCamera, scene);
-  }
-
-  if (parsedCamera.contains("autoAnimate")) {
-    scene->beginAnimation(
-      camera, Json::GetNumber(parsedCamera, "autoAnimateFrom", 0),
-      Json::GetNumber(parsedCamera, "autoAnimateTo", 0),
-      Json::GetBool(parsedCamera, "autoAnimateLoop"),
-      Json::GetNumber(parsedCamera, "autoAnimateSpeed", 1.f));
-  }
-
-  return camera;
+  return nullptr;
 }
 
 } // end of namespace BABYLON

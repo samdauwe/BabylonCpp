@@ -5,14 +5,12 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 
-namespace picojson {
-class value;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -24,11 +22,6 @@ class IAnimatable;
 class Scene;
 using ActionManagerPtr = std::shared_ptr<ActionManager>;
 using IAnimatablePtr   = std::shared_ptr<IAnimatable>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Action Manager manages all events to be triggered on a given mesh or
@@ -328,7 +321,7 @@ public:
    * @param name defines the property name to store this manager
    * @returns a JSON representation of this manager
    */
-  Json::object serialize(const std::string& name) const;
+  json serialize(const std::string& name) const;
 
   // Statics
 
@@ -361,7 +354,7 @@ public:
    * @param object defines the hosting mesh
    * @param scene defines the hosting scene
    */
-  static void Parse(const std::vector<Json::value>& parsedActions,
+  static void Parse(const std::vector<json>& parsedActions,
                     AbstractMesh* object, Scene* scene);
 
   /**

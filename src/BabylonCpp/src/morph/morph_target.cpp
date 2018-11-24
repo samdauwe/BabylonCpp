@@ -2,7 +2,7 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/abstract_mesh.h>
@@ -147,32 +147,34 @@ const Float32Array& MorphTarget::getTangents() const
   return _tangents;
 }
 
-Json::object MorphTarget::serialize() const
+json MorphTarget::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-std::unique_ptr<MorphTarget>
-MorphTarget::Parse(const Json::value& serializationObject)
+std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
 {
   auto result = std::make_unique<MorphTarget>(
-    Json::GetString(serializationObject, "name"),
-    Json::GetNumber<float>(serializationObject, "influence", 0.f));
+    json_util::get_string(serializationObject, "name"),
+    json_util::get_number<float>(serializationObject, "influence", 0.f));
 
-  result->setPositions(Json::ToArray<float>(serializationObject, "positions"));
+  result->setPositions(
+    json_util::get_array<float>(serializationObject, "positions"));
 
-  if (serializationObject.contains("normals")) {
-    result->setNormals(Json::ToArray<float>(serializationObject, "normals"));
+  if (json_util::has_key(serializationObject, "normals")) {
+    result->setNormals(
+      json_util::get_array<float>(serializationObject, "normals"));
   }
 
-  if (serializationObject.contains("tangents")) {
-    result->setNormals(Json::ToArray<float>(serializationObject, "tangents"));
+  if (json_util::has_key(serializationObject, "tangents")) {
+    result->setNormals(
+      json_util::get_array<float>(serializationObject, "tangents"));
   }
 
   // Animations
-  if (serializationObject.contains("animations")) {
+  if (json_util::has_key(serializationObject, "animations")) {
     for (auto parsedAnimation :
-         Json::GetArray(serializationObject, "animations")) {
+         json_util::get_array<json>(serializationObject, "animations")) {
       result->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
   }

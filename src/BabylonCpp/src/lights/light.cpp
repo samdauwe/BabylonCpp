@@ -342,9 +342,9 @@ std::unique_ptr<Light> Light::clone(const std::string& /*name*/)
   return nullptr;
 }
 
-Json::object Light::serialize() const
+json Light::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
@@ -364,53 +364,9 @@ std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
   return nullptr;
 }
 
-LightPtr Light::Parse(const Json::value& parsedLight, Scene* scene)
+LightPtr Light::Parse(const json& /*parsedLight*/, Scene* /*scene*/)
 {
-  auto constructor = Light::GetConstructorFromName(
-    Json::GetNumber(parsedLight, "type", 0u),
-    Json::GetString(parsedLight, "name"), scene);
-  if (!constructor) {
-    return nullptr;
-  }
-
-  auto light = SerializationHelper::Parse(constructor(), parsedLight, scene);
-  if (!light) {
-    return nullptr;
-  }
-
-  // Inclusion / exclusions
-  if (parsedLight.contains("excludedMeshesIds")) {
-    light->_excludedMeshesIds
-      = Json::ToStringVector(parsedLight, "excludedMeshesIds");
-  }
-
-  if (parsedLight.contains("includedOnlyMeshesIds")) {
-    light->_includedOnlyMeshesIds
-      = Json::ToStringVector(parsedLight, "includedOnlyMeshesIds");
-  }
-
-  // Parent
-  if (parsedLight.contains("parentId")) {
-    light->_waitingParentId = Json::GetString(parsedLight, "parentId");
-  }
-
-  // Animations
-  if (parsedLight.contains("animations")) {
-    for (auto parsedAnimation : Json::GetArray(parsedLight, "animations")) {
-      light->animations.emplace_back(Animation::Parse(parsedAnimation));
-    }
-    Node::ParseAnimationRanges(*light, parsedLight, scene);
-  }
-
-  if (parsedLight.contains("autoAnimate")) {
-    scene->beginAnimation(
-      light, Json::GetNumber(parsedLight, "autoAnimateFrom", 0),
-      Json::GetNumber(parsedLight, "autoAnimateTo", 0),
-      Json::GetBool(parsedLight, "autoAnimateLoop"),
-      Json::GetNumber(parsedLight, "autoAnimateSpeed", 1.f));
-  }
-
-  return light;
+  return nullptr;
 }
 
 void Light::_hookArrayForExcluded(const std::vector<AbstractMesh*>& /*array*/)

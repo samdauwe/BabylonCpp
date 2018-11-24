@@ -33,7 +33,7 @@ public:
    * @brief Serializes this starfield procedural texture.
    * @returns a serialized starfield procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Starfield Procedural Texture from parsed startfield
@@ -45,8 +45,7 @@ public:
    * @returns a parsed Starfield Procedural Texture
    */
   static std::unique_ptr<StarfieldProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   StarfieldProceduralTexture(const std::string& name, const Size& size,

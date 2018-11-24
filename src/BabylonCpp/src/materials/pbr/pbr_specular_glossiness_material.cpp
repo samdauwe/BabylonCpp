@@ -1,6 +1,6 @@
 #include <babylon/materials/pbr/pbr_specular_glossiness_material.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
 
 namespace BABYLON {
 
@@ -63,14 +63,13 @@ MaterialPtr PBRSpecularGlossinessMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object PBRSpecularGlossinessMaterial::serialize() const
+json PBRSpecularGlossinessMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 PBRSpecularGlossinessMaterial*
-PBRSpecularGlossinessMaterial::Parse(const Json::value& /*source*/,
-                                     Scene* /*scene*/,
+PBRSpecularGlossinessMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                      const std::string& /*rootUrl*/)
 {
   return nullptr;

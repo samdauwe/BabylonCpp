@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_MATERIAL_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
@@ -9,11 +10,7 @@
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -32,12 +29,6 @@ using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using MaterialPtr            = std::shared_ptr<Material>;
 using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Base class for the main features of a material in Babylon.js.
@@ -426,12 +417,12 @@ public:
    * Serializes this material.
    * @returns the serialized material object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   virtual void trackCreation(
     const std::function<void(const Effect* effect)>& onCompiled,
-    const std::function<void(const Effect* effect,
-                               const std::string& errors)>& onError);
+    const std::function<void(const Effect* effect, const std::string& errors)>&
+      onError);
 
   void addMaterialToScene(const MaterialPtr& newMaterial);
   void addMultiMaterialToScene(const MultiMaterialPtr& newMultiMaterial);
@@ -444,8 +435,8 @@ public:
    * @param scene defines the hosting scene
    * @returns a new MultiMaterial
    */
-  static MultiMaterialPtr
-  ParseMultiMaterial(const Json::value& parsedMultiMaterial, Scene* scene);
+  static MultiMaterialPtr ParseMultiMaterial(const json& parsedMultiMaterial,
+                                             Scene* scene);
 
   /**
    * @brief Creates a material from parsed material data.
@@ -454,7 +445,7 @@ public:
    * @param rootUrl defines the root URL to use to load textures
    * @returns a new material
    */
-  static MaterialPtr Parse(const Json::value& parsedMaterial, Scene* scene,
+  static MaterialPtr Parse(const json& parsedMaterial, Scene* scene,
                            const std::string& rootUrl);
 
 protected:
@@ -716,14 +707,12 @@ public:
   /**
    * Callback triggered when an error occurs
    */
-  std::function<void(const Effect* effect, const std::string& errors)>
-    onError;
+  std::function<void(const Effect* effect, const std::string& errors)> onError;
 
   /**
    * Callback triggered to get the render target textures
    */
-  std::function<std::vector<RenderTargetTexturePtr>()>
-    getRenderTargetTextures;
+  std::function<std::vector<RenderTargetTexturePtr>()> getRenderTargetTextures;
 
   /**
    * Specifies if the material should be serialized

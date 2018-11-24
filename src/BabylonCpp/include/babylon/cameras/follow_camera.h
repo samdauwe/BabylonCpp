@@ -31,7 +31,7 @@ public:
   /** Hidden */
   void _checkInputs() override;
   const std::string getClassName() const override;
-  Json::object serialize() const override;
+  json serialize() const override;
 
 protected:
   FollowCamera(const std::string& name, const Vector3& position, Scene* scene,

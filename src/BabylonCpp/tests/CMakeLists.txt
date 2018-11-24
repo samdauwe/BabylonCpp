@@ -42,6 +42,7 @@ set_target_properties(${TARGET}
 # Include directories
 target_include_directories(${TARGET}
     PRIVATE
+    ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
     ${CMAKE_CURRENT_BINARY_DIR}/../include
 )

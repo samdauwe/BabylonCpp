@@ -1,8 +1,9 @@
 #include <babylon/actions/directactions/stop_animation_action.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/ianimatable.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/scene.h>
 
 namespace BABYLON {
@@ -28,15 +29,9 @@ void StopAnimationAction::execute(const ActionEvent& /*evt*/)
   // scene->stopAnimation(_target);
 }
 
-Json::object StopAnimationAction::serialize(Json::object& parent) const
+json StopAnimationAction::serialize(json& /*parent*/) const
 {
-  return Action::_serialize(
-    Json::object({Json::Pair("name", "StopAnimationAction"),
-                  Json::Pair("properties",
-                             Json::array({{
-                               Json::value(Action::_GetTargetProperty(_target)),
-                             }}))}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

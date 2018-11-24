@@ -41,7 +41,7 @@ public:
                          bool useInstances = false) override;
   MaterialPtr clone(const std::string& _name,
                     bool cloneChildren = false) const override;
-  Json::object serialize() const;
+  json serialize() const;
   void dispose(bool forceDisposeEffect   = false,
                bool forceDisposeTextures = false) override;
 

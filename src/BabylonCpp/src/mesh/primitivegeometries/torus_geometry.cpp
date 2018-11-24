@@ -1,5 +1,6 @@
 #include <babylon/mesh/primitivegeometries/torus_geometry.h>
 
+#include <babylon/core/json_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -40,34 +41,30 @@ GeometryPtr TorusGeometry::copy(const std::string& _id)
                             canBeRegenerated(), nullptr, side);
 }
 
-Json::object TorusGeometry::serialize() const
+json TorusGeometry::serialize() const
 {
   auto serializationObject = _PrimitiveGeometry::serialize();
 
-  serializationObject["diameter"]
-    = picojson::value(static_cast<double>(diameter));
-  serializationObject["thickness"]
-    = picojson::value(static_cast<double>(thickness));
-  serializationObject["tessellation"]
-    = picojson::value(static_cast<double>(tessellation));
+  serializationObject["diameter"]     = diameter;
+  serializationObject["thickness"]    = thickness;
+  serializationObject["tessellation"] = tessellation;
 
   return serializationObject;
 }
 
-TorusGeometryPtr TorusGeometry::Parse(const Json::value& parsedTorus,
-                                      Scene* scene)
+TorusGeometryPtr TorusGeometry::Parse(const json& parsedTorus, Scene* scene)
 {
-  const auto parsedTorusId = Json::GetString(parsedTorus, "id");
+  const auto parsedTorusId = json_util::get_string(parsedTorus, "id");
   if (parsedTorusId.empty() || scene->getGeometryByID(parsedTorusId)) {
     return nullptr; // null since geometry could be something else than a
                     // torus...
   }
 
   return TorusGeometry::New(
-    parsedTorusId, scene, Json::GetNumber(parsedTorus, "diameter", 1.f),
-    Json::GetNumber(parsedTorus, "thickness", 0.5f),
-    Json::GetNumber(parsedTorus, "tessellation", 16u),
-    Json::GetBool(parsedTorus, "canBeRegenerated", true), nullptr);
+    parsedTorusId, scene, json_util::get_number(parsedTorus, "diameter", 1.f),
+    json_util::get_number(parsedTorus, "thickness", 0.5f),
+    json_util::get_number(parsedTorus, "tessellation", 16u),
+    json_util::get_bool(parsedTorus, "canBeRegenerated", true), nullptr);
 }
 
 } // end of namespace BABYLON

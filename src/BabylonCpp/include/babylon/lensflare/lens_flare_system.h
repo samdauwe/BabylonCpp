@@ -4,16 +4,13 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -38,12 +35,6 @@ using LensFlareSystemPtr = std::shared_ptr<LensFlareSystem>;
 using LightPtr           = std::shared_ptr<Light>;
 using MeshPtr            = std::shared_ptr<Mesh>;
 using TransformNodePtr   = std::shared_ptr<TransformNode>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 namespace GL {
 class IGLBuffer;
@@ -128,7 +119,7 @@ public:
    * @brief Serialize the current Lens Flare System into a JSON representation.
    * @returns the serialized JSON
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   // Statics
 
@@ -140,7 +131,7 @@ public:
    * load relative dependencies such as textures
    * @returns the parsed system
    */
-  static LensFlareSystemPtr Parse(const Json::value& parsedLensFlareSystem,
+  static LensFlareSystemPtr Parse(const json& parsedLensFlareSystem,
                                   Scene* scene, const std::string& rootUrl);
 
 protected:

@@ -1,7 +1,8 @@
 #include <babylon/actions/directactions/set_state_action.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/animations/ianimatable.h>
-#include <babylon/core/json.h>
 
 namespace BABYLON {
 
@@ -21,16 +22,9 @@ void SetStateAction::execute(const ActionEvent& /*evt*/)
   _target->state = _value;
 }
 
-Json::object SetStateAction::serialize(Json::object& parent) const
+json SetStateAction::serialize(json& /*parent*/) const
 {
-  return Action::_serialize(
-    Json::object(
-      {Json::Pair("name", "SetStateAction"),
-       Json::Pair(
-         "properties",
-         Json::array({{Json::value(Action::_GetTargetProperty(_target)),
-                       Json::NameValuePair("value", _value)}}))}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

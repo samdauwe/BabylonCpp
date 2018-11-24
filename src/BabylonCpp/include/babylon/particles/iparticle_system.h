@@ -2,6 +2,7 @@
 #define BABYLON_PARTICLES_IPARTICLE_SYSTEM_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 #include <variant>
 
 #include <babylon/babylon_api.h>
@@ -12,11 +13,7 @@
 #include <babylon/tools/color_gradient.h>
 #include <babylon/tools/factor_gradient.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -30,12 +27,6 @@ using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 using AnimationPtr    = std::shared_ptr<Animation>;
 using BaseTexturePtr  = std::shared_ptr<BaseTexture>;
 using TexturePtr      = std::shared_ptr<Texture>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Interface representing a particle system in Babylon.js.
@@ -353,7 +344,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  virtual Json::object serialize() const = 0;
+  virtual json serialize() const = 0;
 
   /**
    * @brief Rebuild the particle system.

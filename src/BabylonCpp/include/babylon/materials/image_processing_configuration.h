@@ -2,16 +2,13 @@
 #define BABYLON_MATERIALS_IMAGE_PROCESSING_CONFIGURATION_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/color4.h>
 #include <babylon/tools/observable.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -21,12 +18,6 @@ class Effect;
 struct IImageProcessingConfigurationDefines;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using ColorCurvesPtr = std::shared_ptr<ColorCurves>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief This groups together the common properties used for image processing
@@ -126,14 +117,14 @@ public:
    * representation.
    * @return a JSON representation
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parses the image processing from a json representation.
    * @param source the JSON source to parse
    * @return The parsed image processing
    */
-  static void Parse(const Json::value& source);
+  static void Parse(const json& source);
 
 protected:
   /**

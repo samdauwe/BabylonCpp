@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/normalmap/normal_map_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/normalmap/normal_map_procedural_texture_fragment_fx.h>
 
@@ -63,13 +64,13 @@ void NormalMapProceduralTexture::set_baseTexture(const TexturePtr& texture)
   updateShaderUniforms();
 }
 
-Json::object NormalMapProceduralTexture::serialize() const
+json NormalMapProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<NormalMapProceduralTexture>
-NormalMapProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+NormalMapProceduralTexture::Parse(const json& /*parsedTexture*/,
                                   Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {

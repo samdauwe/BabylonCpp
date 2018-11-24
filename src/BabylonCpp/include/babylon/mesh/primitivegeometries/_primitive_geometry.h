@@ -61,7 +61,7 @@ public:
   // to override
   virtual std::unique_ptr<VertexData> _regenerateVertexData() = 0;
   virtual GeometryPtr copy(const std::string& id)             = 0;
-  virtual Json::object serialize() const;
+  virtual json serialize() const;
 
 private:
   bool _beingRegenerated;

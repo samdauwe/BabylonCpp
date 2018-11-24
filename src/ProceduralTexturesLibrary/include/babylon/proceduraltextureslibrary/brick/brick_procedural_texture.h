@@ -31,7 +31,7 @@ public:
    * @brief Serializes this brick procedural texture.
    * @returns a serialized brick procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Brick Procedural Texture from parsed brick procedural
@@ -43,8 +43,7 @@ public:
    * @returns a parsed Brick Procedural Texture
    */
   static std::unique_ptr<BrickProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   BrickProceduralTexture(const std::string& name, const Size& size,

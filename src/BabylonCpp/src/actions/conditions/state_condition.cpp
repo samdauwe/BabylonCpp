@@ -1,7 +1,8 @@
 #include <babylon/actions/conditions/state_condition.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/actions/action.h>
-#include <babylon/core/json.h>
 
 namespace BABYLON {
 
@@ -21,16 +22,9 @@ bool StateCondition::isValid()
   return false; // _target->state == value;
 }
 
-Json::object StateCondition::serialize() const
+json StateCondition::serialize() const
 {
-  auto object = Json::object(
-    {Json::Pair("name", "StateCondition"),
-     Json::Pair(
-       "properties",
-       Json::array({{Json::value(Action::_GetTargetProperty(_target)),
-                     Json::NameValuePair(
-                       "value", Action::_SerializeValueAsString(*value))}}))});
-  return _serialize(object);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

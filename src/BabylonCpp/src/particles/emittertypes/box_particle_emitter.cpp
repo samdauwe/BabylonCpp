@@ -1,6 +1,6 @@
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
@@ -70,28 +70,32 @@ const char* BoxParticleEmitter::getClassName() const
   ;
 }
 
-Json::object BoxParticleEmitter::serialize() const
+json BoxParticleEmitter::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-void BoxParticleEmitter::parse(const Json::value& serializationObject)
+void BoxParticleEmitter::parse(const json& serializationObject)
 {
-  if (serializationObject.contains("direction1")) {
+  if (json_util::has_key(serializationObject, "direction1")) {
     Vector3::FromArrayToRef(
-      Json::ToArray<float>(serializationObject, "direction1"), 0, direction1);
+      json_util::get_array<float>(serializationObject, "direction1"), 0,
+      direction1);
   }
-  if (serializationObject.contains("direction2")) {
+  if (json_util::has_key(serializationObject, "direction2")) {
     Vector3::FromArrayToRef(
-      Json::ToArray<float>(serializationObject, "direction2"), 0, direction2);
+      json_util::get_array<float>(serializationObject, "direction2"), 0,
+      direction2);
   }
-  if (serializationObject.contains("minEmitBox")) {
+  if (json_util::has_key(serializationObject, "minEmitBox")) {
     Vector3::FromArrayToRef(
-      Json::ToArray<float>(serializationObject, "minEmitBox"), 0, minEmitBox);
+      json_util::get_array<float>(serializationObject, "minEmitBox"), 0,
+      minEmitBox);
   }
-  if (serializationObject.contains("maxEmitBox")) {
+  if (json_util::has_key(serializationObject, "maxEmitBox")) {
     Vector3::FromArrayToRef(
-      Json::ToArray<float>(serializationObject, "maxEmitBox"), 0, maxEmitBox);
+      json_util::get_array<float>(serializationObject, "maxEmitBox"), 0,
+      maxEmitBox);
   }
 }
 

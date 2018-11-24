@@ -31,7 +31,7 @@ public:
    * @brief Serializes this grass procedural texture.
    * @returns a serialized grass procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Grass Procedural Texture from parsed grass procedural
@@ -43,8 +43,7 @@ public:
    * @returns a parsed Grass Procedural Texture
    */
   static std::unique_ptr<GrassProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   GrassProceduralTexture(const std::string& name, const Size& size,

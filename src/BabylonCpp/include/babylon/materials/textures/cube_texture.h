@@ -84,7 +84,7 @@ public:
    * @param rootUrl defines the root url of the cube texture
    * @returns a cube texture
    */
-  static CubeTexturePtr Parse(const Json::value& parsedTexture, Scene* scene,
+  static CubeTexturePtr Parse(const json& parsedTexture, Scene* scene,
                               const std::string& rootUrl);
 
 protected:

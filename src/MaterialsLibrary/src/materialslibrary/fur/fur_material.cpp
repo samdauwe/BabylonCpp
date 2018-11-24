@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/fur/fur_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -465,9 +466,9 @@ MaterialPtr FurMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object FurMaterial::serialize() const
+json FurMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string FurMaterial::getClassName() const
@@ -475,7 +476,7 @@ const std::string FurMaterial::getClassName() const
   return "FurMaterial";
 }
 
-FurMaterial* FurMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
+FurMaterial* FurMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                 const std::string& /*rootUrl*/)
 {
   return nullptr;

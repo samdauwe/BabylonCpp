@@ -1,9 +1,10 @@
 #include <babylon/mesh/transform_node.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/tmp.h>
 #include <babylon/mesh/abstract_mesh.h>
@@ -876,15 +877,14 @@ TransformNodePtr TransformNode::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object
-TransformNode::serialize(Json::object& /*currentSerializationObject*/)
+json TransformNode::serialize(json& /*currentSerializationObject*/)
 {
-  return Json::object();
+  return nullptr;
 }
 
-TransformNodePtr
-TransformNode::Parse(const Json::value& /*parsedTransformNode*/,
-                     Scene* /*scene*/, const std::string& /*rootUrl*/)
+TransformNodePtr TransformNode::Parse(const json& /*parsedTransformNode*/,
+                                      Scene* /*scene*/,
+                                      const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

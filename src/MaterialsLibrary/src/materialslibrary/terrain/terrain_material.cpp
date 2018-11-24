@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/terrain/terrain_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -543,9 +544,9 @@ MaterialPtr TerrainMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object TerrainMaterial::serialize() const
+json TerrainMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string TerrainMaterial::getClassName() const
@@ -553,7 +554,7 @@ const std::string TerrainMaterial::getClassName() const
   return "TerrainMaterial";
 }
 
-TerrainMaterial* TerrainMaterial::Parse(const Json::value& /*source*/,
+TerrainMaterial* TerrainMaterial::Parse(const json& /*source*/,
                                         Scene* /*scene*/,
                                         const std::string& /*rootUrl*/)
 {

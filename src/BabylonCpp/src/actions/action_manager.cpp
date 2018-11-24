@@ -1,5 +1,6 @@
 #include <babylon/actions/action_manager.h>
 
+#include <nlohmann/json.hpp>
 #include <numeric>
 
 #include <babylon/actions/action.h>
@@ -244,12 +245,12 @@ std::string ActionManager::_getProperty(const std::string& propertyPath) const
   return properties.back();
 }
 
-Json::object ActionManager::serialize(const std::string& /*name*/) const
+json ActionManager::serialize(const std::string& /*name*/) const
 {
-  return Json::object();
+  return nullptr;
 }
 
-void ActionManager::Parse(const std::vector<Json::value>& /*parsedActions*/,
+void ActionManager::Parse(const std::vector<json>& /*parsedActions*/,
                           AbstractMesh* /*object*/, Scene* /*scene*/)
 {
   // TODO FIXME

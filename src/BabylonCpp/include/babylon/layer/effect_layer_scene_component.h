@@ -2,17 +2,14 @@
 #define BABYLON_LAYER_EFFECT_LAYER_SCENE_COMPONENT_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
 #include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -22,12 +19,6 @@ class Camera;
 class EffectLayerSceneComponent;
 class Engine;
 using EffectLayerSceneComponentPtr = std::shared_ptr<EffectLayerSceneComponent>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Defines the layer scene component responsible to manage any effect
@@ -66,7 +57,7 @@ public:
    * @brief Serializes the component data to the specified json object
    * @param serializationObject The object to serialize to
    */
-  void serialize(Json::value& serializationObject) const;
+  void serialize(json& serializationObject) const;
 
   /**
    * @brief Adds all the element from the container to the scene.

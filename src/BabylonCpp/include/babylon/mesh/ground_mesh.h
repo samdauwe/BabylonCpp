@@ -24,8 +24,8 @@ public:
   template <typename... Ts>
   static GroundMeshPtr New(Ts&&... args)
   {
-    auto mesh = std::shared_ptr<GroundMesh>(
-      new GroundMesh(std::forward<Ts>(args)...));
+    auto mesh
+      = std::shared_ptr<GroundMesh>(new GroundMesh(std::forward<Ts>(args)...));
     mesh->addToScene(mesh);
 
     return mesh;
@@ -77,9 +77,9 @@ public:
    */
   GroundMesh& updateCoordinateHeights();
 
-  Json::object serialize(Json::object& serializationObject) const;
+  json serialize(json& serializationObject) const;
 
-  static GroundMeshPtr Parse(const Json::value& parsedMesh, Scene* scene);
+  static GroundMeshPtr Parse(const json& parsedMesh, Scene* scene);
 
 private:
   size_t get_subdivisions() const;

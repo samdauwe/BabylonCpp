@@ -1,6 +1,7 @@
 #include <babylon/materialslibrary/grid/grid_material.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -188,9 +189,9 @@ MaterialPtr GridMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object GridMaterial::serialize() const
+json GridMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string GridMaterial::getClassName() const
@@ -198,8 +199,7 @@ const std::string GridMaterial::getClassName() const
   return "GridMaterial";
 }
 
-GridMaterial* GridMaterial::Parse(const Json::value& /*source*/,
-                                  Scene* /*scene*/,
+GridMaterial* GridMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
   return nullptr;

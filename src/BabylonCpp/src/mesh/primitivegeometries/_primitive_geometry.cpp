@@ -59,11 +59,11 @@ _PrimitiveGeometry::setVerticesData(unsigned int kind, const Float32Array& data,
   return Geometry::setVerticesData(kind, data, false);
 }
 
-Json::object _PrimitiveGeometry::serialize() const
+json _PrimitiveGeometry::serialize() const
 {
   auto serializationObject = Geometry::serialize();
 
-  serializationObject["canBeRegenerated"] = picojson::value(canBeRegenerated());
+  serializationObject["canBeRegenerated"] = canBeRegenerated();
 
   return serializationObject;
 }

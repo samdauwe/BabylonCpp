@@ -1,6 +1,6 @@
 #include <babylon/actions/directactions/combine_action.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
 
 namespace BABYLON {
 
@@ -30,19 +30,9 @@ void CombineAction::execute(const ActionEvent& evt)
   }
 }
 
-Json::object CombineAction::serialize(Json::object& parent) const
+json CombineAction::serialize(json& /*parent*/) const
 {
-  Json::array combine;
-  Json::object tmp;
-  for (auto& child : children) {
-    combine.emplace_back(child->serialize(tmp));
-  }
-
-  return Action::_serialize(
-    Json::object({Json::Pair("name", "CombineAction"),
-                  Json::Pair("properties", Json::array()),
-                  Json::Pair("combine", combine)}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

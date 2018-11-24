@@ -2,6 +2,7 @@
 #define BABYLON_LAYER_EFFECT_LAYER_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/igl_rendering_context.h>
@@ -10,11 +11,7 @@
 #include <babylon/math/size.h>
 #include <babylon/tools/observable.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -39,12 +36,6 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 namespace GL {
 class IGLBuffer;
 } // end of namespace GL
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 struct EmissiveTextureAndColor {
   BaseTexturePtr texture = nullptr;
@@ -101,7 +92,7 @@ public:
    * @brief Serializes this layer (Glow or Highlight for example).
    * @returns a serialized layer object
    */
-  virtual Json::object serialize() const = 0;
+  virtual json serialize() const = 0;
 
   /**
    * @brief Renders the glowing part of the scene by blending the blurred
@@ -147,7 +138,7 @@ public:
    * @param rootUrl defines the root URL containing the effect layer information
    * @returns a parsed effect Layer
    */
-  static EffectLayer* Parse(const Json::value& parsedEffectLayer, Scene* scene,
+  static EffectLayer* Parse(const json& parsedEffectLayer, Scene* scene,
                             const std::string& rootUrl);
 
 protected:

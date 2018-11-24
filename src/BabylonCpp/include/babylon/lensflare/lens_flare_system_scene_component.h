@@ -2,17 +2,14 @@
 #define BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
 #include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -21,12 +18,6 @@ class Camera;
 class LensFlareSystemSceneComponent;
 using LensFlareSystemSceneComponentPtr
   = std::shared_ptr<LensFlareSystemSceneComponent>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Defines the lens flare scene component responsible to manage any lens
@@ -79,7 +70,7 @@ public:
    * @brief Serializes the component data to the specified json object
    * @param serializationObject The object to serialize to
    */
-  void serialize(Json::value& serializationObject);
+  void serialize(json& serializationObject);
 
   /**
    * @brief Disposes the component and the associated resources.

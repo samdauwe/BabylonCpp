@@ -1,7 +1,8 @@
 #include <babylon/actions/directactions/stop_sound_action.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/audio/sound.h>
-#include <babylon/core/json.h>
 
 namespace BABYLON {
 
@@ -26,13 +27,9 @@ void StopSoundAction::execute(const ActionEvent& /*evt*/)
   }
 }
 
-Json::object StopSoundAction::serialize(Json::object& parent) const
+json StopSoundAction::serialize(json& /*parent*/) const
 {
-  return Action::_serialize(
-    Json::object({Json::Pair("name", "StopSoundAction"),
-                  Json::Pair("properties", Json::array({{Json::NameValuePair(
-                                             "sound", _sound->name)}}))}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

@@ -35,10 +35,10 @@ public:
   std::unique_ptr<VertexData> _regenerateVertexData() override;
 
   GeometryPtr copy(const std::string& id) override;
-  Json::object serialize() const override;
+  json serialize() const override;
 
   // Statics
-  static BoxGeometryPtr Parse(const Json::value& parsedBox, Scene* scene);
+  static BoxGeometryPtr Parse(const json& parsedBox, Scene* scene);
 
 protected:
   /**

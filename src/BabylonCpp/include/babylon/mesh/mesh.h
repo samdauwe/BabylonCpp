@@ -770,7 +770,7 @@ public:
    * The parameter `rootUrl` is a string, it's the root URL to prefix the
    * `delayLoadingFile` property with
    */
-  static MeshPtr Parse(const Json::value& parsedMesh, Scene* scene,
+  static MeshPtr Parse(const json& parsedMesh, Scene* scene,
                        const std::string& rootUrl);
 
   /**
@@ -1519,7 +1519,7 @@ public:
   /** Hidden */
   Uint32Array _delayInfoKinds;
   /** Hidden */
-  std::function<void(const Json::value& parsedGeometry, const MeshPtr& mesh)>
+  std::function<void(const json& parsedGeometry, const MeshPtr& mesh)>
     _delayLoadingFunction;
   /** Hidden */
   std::unique_ptr<_VisibleInstances> _visibleInstances;

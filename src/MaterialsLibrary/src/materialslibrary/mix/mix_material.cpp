@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/mix/mix_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -639,9 +640,9 @@ MaterialPtr MixMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object MixMaterial::serialize() const
+json MixMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string MixMaterial::getClassName() const
@@ -649,7 +650,7 @@ const std::string MixMaterial::getClassName() const
   return "MixMaterial";
 }
 
-MixMaterial* MixMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
+MixMaterial* MixMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                 const std::string& /*rootUrl*/)
 {
   return nullptr;

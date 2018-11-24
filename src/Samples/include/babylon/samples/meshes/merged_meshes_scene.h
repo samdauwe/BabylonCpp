@@ -16,7 +16,7 @@ struct Block {
 struct MergedMeshesScene : public IRenderableScene {
 
   // json representation of the world
-  static const char* json;
+  static const char* world_json;
 
   MergedMeshesScene(ICanvas* iCanvas);
   ~MergedMeshesScene() override;

@@ -70,13 +70,13 @@ public:
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  Json::object serialize() const override;
+  json serialize() const override;
 
   /**
    * @brief Parse properties from a JSON object
    * @param serializationObject defines the JSON object
    */
-  void parse(const Json::value& serializationObject) override;
+  void parse(const json& serializationObject) override;
 
 public:
   /**

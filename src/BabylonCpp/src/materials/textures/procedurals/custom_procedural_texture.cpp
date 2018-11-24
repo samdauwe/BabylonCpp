@@ -1,5 +1,7 @@
 #include <babylon/materials/textures/procedurals/custom_procedural_texture.h>
 
+#include <babylon/core/json_util.h>
+
 #include <babylon/engine/scene.h>
 
 namespace BABYLON {
@@ -61,10 +63,11 @@ void CustomProceduralTexture::render(bool useCameraPostProcess)
 void CustomProceduralTexture::updateTextures()
 {
   if (_configSet) {
-    for (auto& sampler2D : Json::GetArray(_config, "sampler2Ds")) {
-      const auto sample2Dname = Json::GetString(sampler2D, "sample2Dname");
+    for (auto& sampler2D : json_util::get_array<json>(_config, "sampler2Ds")) {
+      const auto sample2Dname
+        = json_util::get_string(sampler2D, "sample2Dname");
       const auto textureRelativeUrl
-        = Json::GetString(sampler2D, "textureRelativeUrl");
+        = json_util::get_string(sampler2D, "textureRelativeUrl");
       setTexture(
         sample2Dname,
         Texture::New(_texturePath + "/" + textureRelativeUrl, getScene()));
@@ -75,36 +78,36 @@ void CustomProceduralTexture::updateTextures()
 void CustomProceduralTexture::updateShaderUniforms()
 {
   if (_configSet) {
-    for (auto& uniform : Json::GetArray(_config, "uniforms")) {
-      const auto uniformType = Json::GetString(uniform, "type");
-      const auto uniformName = Json::GetString(uniform, "name");
+    for (auto& uniform : json_util::get_array<json>(_config, "uniforms")) {
+      const auto uniformType = json_util::get_string(uniform, "type");
+      const auto uniformName = json_util::get_string(uniform, "name");
 
       if (uniformType == "float") {
-        setFloat(uniformName, Json::GetNumber<float>(uniform, "value", 0.f));
+        setFloat(uniformName, json_util::get_number<float>(uniform, "value"));
       }
       else if (uniformType == "color3") {
         setColor3(uniformName,
-                  Color3(Json::GetNumber<float>(uniform, "r", 0.f),
-                         Json::GetNumber<float>(uniform, "g", 0.f),
-                         Json::GetNumber<float>(uniform, "b", 0.f)));
+                  Color3(json_util::get_number<float>(uniform, "r"),
+                         json_util::get_number<float>(uniform, "g"),
+                         json_util::get_number<float>(uniform, "b")));
       }
       else if (uniformType == "color4") {
         setColor4(uniformName,
-                  Color4(Json::GetNumber<float>(uniform, "r", 0.f),
-                         Json::GetNumber<float>(uniform, "g", 0.f),
-                         Json::GetNumber<float>(uniform, "b", 0.f),
-                         Json::GetNumber<float>(uniform, "a", 0.f)));
+                  Color4(json_util::get_number<float>(uniform, "r"),
+                         json_util::get_number<float>(uniform, "g"),
+                         json_util::get_number<float>(uniform, "b"),
+                         json_util::get_number<float>(uniform, "a")));
       }
       else if (uniformType == "vector2") {
         setVector2(uniformName,
-                   Vector2(Json::GetNumber<float>(uniform, "x", 0.f),
-                           Json::GetNumber<float>(uniform, "y", 0.f)));
+                   Vector2(json_util::get_number<float>(uniform, "x"),
+                           json_util::get_number<float>(uniform, "y")));
       }
       else if (uniformType == "vector3") {
         setVector3(uniformName,
-                   Vector3(Json::GetNumber<float>(uniform, "x", 0.f),
-                           Json::GetNumber<float>(uniform, "y", 0.f),
-                           Json::GetNumber<float>(uniform, "z", 0.f)));
+                   Vector3(json_util::get_number<float>(uniform, "x"),
+                           json_util::get_number<float>(uniform, "y"),
+                           json_util::get_number<float>(uniform, "z")));
       }
     }
   }

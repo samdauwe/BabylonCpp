@@ -4,7 +4,7 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/follow_camera.h>
 #include <babylon/cameras/free_camera.h>
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/point_light.h>
@@ -14,17 +14,15 @@
 
 namespace BABYLON {
 
-BaseTexture*
-SerializationHelper::Parse(BaseTexture* baseTexture,
-                           const Json::value& /*parsedBaseTexture*/,
-                           Scene* /*scene*/)
+BaseTexture* SerializationHelper::Parse(BaseTexture* baseTexture,
+                                        const json& /*parsedBaseTexture*/,
+                                        Scene* /*scene*/)
 {
   return baseTexture;
 }
 
 CameraPtr SerializationHelper::Parse(const CameraPtr& camera,
-                                     const Json::value& parsedCamera,
-                                     Scene* /*scene*/)
+                                     const json& parsedCamera, Scene* /*scene*/)
 {
   if (!camera) {
     return nullptr;
@@ -35,88 +33,89 @@ CameraPtr SerializationHelper::Parse(const CameraPtr& camera,
     /** ArcRotateCamera **/
     auto arcRotateCamera = std::static_pointer_cast<ArcRotateCamera>(camera);
     // alpha
-    if (parsedCamera.contains("alpha")) {
+    if (json_util::has_key(parsedCamera, "alpha")) {
       arcRotateCamera->alpha
-        = Json::GetNumber<float>(parsedCamera, "alpha", 0.f);
+        = json_util::get_number<float>(parsedCamera, "alpha", 0.f);
     }
     // beta
-    if (parsedCamera.contains("beta")) {
-      arcRotateCamera->beta = Json::GetNumber<float>(parsedCamera, "beta", 0.f);
+    if (json_util::has_key(parsedCamera, "beta")) {
+      arcRotateCamera->beta
+        = json_util::get_number<float>(parsedCamera, "beta", 0.f);
     }
     // radius
-    if (parsedCamera.contains("radius")) {
+    if (json_util::has_key(parsedCamera, "radius")) {
       arcRotateCamera->radius
-        = Json::GetNumber<float>(parsedCamera, "radius", 0.f);
+        = json_util::get_number<float>(parsedCamera, "radius", 0.f);
     }
     // target
-    if (parsedCamera.contains("target")) {
-      arcRotateCamera->setTarget(
-        Vector3::FromArray(Json::ToArray<float>(parsedCamera, "target")));
+    if (json_util::has_key(parsedCamera, "target")) {
+      arcRotateCamera->setTarget(Vector3::FromArray(
+        json_util::get_array<float>(parsedCamera, "target")));
     }
     // inertialAlphaOffset
-    if (parsedCamera.contains("inertialAlphaOffset")) {
-      arcRotateCamera->inertialAlphaOffset
-        = Json::GetNumber<float>(parsedCamera, "inertialAlphaOffset", 0.f);
+    if (json_util::has_key(parsedCamera, "inertialAlphaOffset")) {
+      arcRotateCamera->inertialAlphaOffset = json_util::get_number<float>(
+        parsedCamera, "inertialAlphaOffset", 0.f);
     }
     // inertialBetaOffset
-    if (parsedCamera.contains("inertialBetaOffset")) {
+    if (json_util::has_key(parsedCamera, "inertialBetaOffset")) {
       arcRotateCamera->inertialBetaOffset
-        = Json::GetNumber<float>(parsedCamera, "inertialBetaOffset", 0.f);
+        = json_util::get_number<float>(parsedCamera, "inertialBetaOffset", 0.f);
     }
     // inertialRadiusOffset
-    if (parsedCamera.contains("inertialRadiusOffset")) {
-      arcRotateCamera->inertialRadiusOffset
-        = Json::GetNumber<float>(parsedCamera, "inertialRadiusOffset", 0.f);
+    if (json_util::has_key(parsedCamera, "inertialRadiusOffset")) {
+      arcRotateCamera->inertialRadiusOffset = json_util::get_number<float>(
+        parsedCamera, "inertialRadiusOffset", 0.f);
     }
     // lowerAlphaLimit
-    if (parsedCamera.contains("lowerAlphaLimit")) {
+    if (json_util::has_key(parsedCamera, "lowerAlphaLimit")) {
       arcRotateCamera->lowerAlphaLimit
-        = Json::GetNumber<float>(parsedCamera, "lowerAlphaLimit", 0.f);
+        = json_util::get_number<float>(parsedCamera, "lowerAlphaLimit", 0.f);
     }
     // upperAlphaLimit
-    if (parsedCamera.contains("upperAlphaLimit")) {
+    if (json_util::has_key(parsedCamera, "upperAlphaLimit")) {
       arcRotateCamera->upperAlphaLimit
-        = Json::GetNumber<float>(parsedCamera, "upperAlphaLimit", 0.f);
+        = json_util::get_number<float>(parsedCamera, "upperAlphaLimit", 0.f);
     }
     // lowerBetaLimit
-    if (parsedCamera.contains("lowerBetaLimit")) {
+    if (json_util::has_key(parsedCamera, "lowerBetaLimit")) {
       arcRotateCamera->lowerBetaLimit
-        = Json::GetNumber<float>(parsedCamera, "lowerBetaLimit", 0.01f);
+        = json_util::get_number<float>(parsedCamera, "lowerBetaLimit", 0.01f);
     }
     // upperBetaLimit
-    if (parsedCamera.contains("upperBetaLimit")) {
-      arcRotateCamera->upperBetaLimit
-        = Json::GetNumber<float>(parsedCamera, "upperBetaLimit", Math::PI);
+    if (json_util::has_key(parsedCamera, "upperBetaLimit")) {
+      arcRotateCamera->upperBetaLimit = json_util::get_number<float>(
+        parsedCamera, "upperBetaLimit", Math::PI);
     }
     // lowerRadiusLimit
-    if (parsedCamera.contains("lowerRadiusLimit")) {
+    if (json_util::has_key(parsedCamera, "lowerRadiusLimit")) {
       arcRotateCamera->lowerRadiusLimit
-        = Json::GetNumber<float>(parsedCamera, "lowerRadiusLimit", 0.f);
+        = json_util::get_number<float>(parsedCamera, "lowerRadiusLimit", 0.f);
     }
     // upperRadiusLimit
-    if (parsedCamera.contains("upperRadiusLimit")) {
+    if (json_util::has_key(parsedCamera, "upperRadiusLimit")) {
       arcRotateCamera->upperRadiusLimit
-        = Json::GetNumber<float>(parsedCamera, "upperRadiusLimit", 0.f);
+        = json_util::get_number<float>(parsedCamera, "upperRadiusLimit", 0.f);
     }
     // inertialPanningX
-    if (parsedCamera.contains("inertialPanningX")) {
+    if (json_util::has_key(parsedCamera, "inertialPanningX")) {
       arcRotateCamera->inertialPanningX
-        = Json::GetNumber<float>(parsedCamera, "inertialPanningX", 0.f);
+        = json_util::get_number<float>(parsedCamera, "inertialPanningX", 0.f);
     }
     // inertialPanningY
-    if (parsedCamera.contains("inertialPanningY")) {
+    if (json_util::has_key(parsedCamera, "inertialPanningY")) {
       arcRotateCamera->inertialPanningY
-        = Json::GetNumber<float>(parsedCamera, "inertialPanningY", 0.f);
+        = json_util::get_number<float>(parsedCamera, "inertialPanningY", 0.f);
     }
     // zoomOnFactor
-    if (parsedCamera.contains("zoomOnFactor")) {
+    if (json_util::has_key(parsedCamera, "zoomOnFactor")) {
       arcRotateCamera->zoomOnFactor
-        = Json::GetNumber<float>(parsedCamera, "zoomOnFactor", 1.f);
+        = json_util::get_number<float>(parsedCamera, "zoomOnFactor", 1.f);
     }
     // allowUpsideDown
-    if (parsedCamera.contains("allowUpsideDown")) {
+    if (json_util::has_key(parsedCamera, "allowUpsideDown")) {
       arcRotateCamera->allowUpsideDown
-        = Json::GetBool(parsedCamera, "allowUpsideDown", true);
+        = json_util::get_bool(parsedCamera, "allowUpsideDown", true);
     }
   }
   else if ((cameraClassName == "FollowCamera")
@@ -124,47 +123,48 @@ CameraPtr SerializationHelper::Parse(const CameraPtr& camera,
     /** FollowCamera / ArcFollowCamera **/
     auto followCamera = std::static_pointer_cast<FollowCamera>(camera);
     // zoomOnFactor
-    if (parsedCamera.contains("radius")) {
+    if (json_util::has_key(parsedCamera, "radius")) {
       followCamera->radius
-        = Json::GetNumber<float>(parsedCamera, "radius", 12.f);
+        = json_util::get_number<float>(parsedCamera, "radius", 12.f);
     }
     // zoomOnFactor
-    if (parsedCamera.contains("rotationOffset")) {
+    if (json_util::has_key(parsedCamera, "rotationOffset")) {
       followCamera->rotationOffset
-        = Json::GetNumber<float>(parsedCamera, "rotationOffset", 0.f);
+        = json_util::get_number<float>(parsedCamera, "rotationOffset", 0.f);
     }
     // zoomOnFactor
-    if (parsedCamera.contains("heightOffset")) {
+    if (json_util::has_key(parsedCamera, "heightOffset")) {
       followCamera->heightOffset
-        = Json::GetNumber<float>(parsedCamera, "heightOffset", 4.f);
+        = json_util::get_number<float>(parsedCamera, "heightOffset", 4.f);
     }
     // zoomOnFactor
-    if (parsedCamera.contains("cameraAcceleration")) {
-      followCamera->cameraAcceleration
-        = Json::GetNumber<float>(parsedCamera, "cameraAcceleration", 0.05f);
+    if (json_util::has_key(parsedCamera, "cameraAcceleration")) {
+      followCamera->cameraAcceleration = json_util::get_number<float>(
+        parsedCamera, "cameraAcceleration", 0.05f);
     }
     // zoomOnFactor
-    if (parsedCamera.contains("maxCameraSpeed")) {
+    if (json_util::has_key(parsedCamera, "maxCameraSpeed")) {
       followCamera->maxCameraSpeed
-        = Json::GetNumber<float>(parsedCamera, "maxCameraSpeed", 20.f);
+        = json_util::get_number<float>(parsedCamera, "maxCameraSpeed", 20.f);
     }
   }
   else if (cameraClassName == "FreeCamera") {
     /** FreeCamera **/
     auto freeCamera = std::static_pointer_cast<FreeCamera>(camera);
     // ellipsoid
-    if (parsedCamera.contains("ellipsoid")) {
-      freeCamera->ellipsoid
-        = Vector3::FromArray(Json::ToArray<float>(parsedCamera, "ellipsoid"));
+    if (json_util::has_key(parsedCamera, "ellipsoid")) {
+      freeCamera->ellipsoid = Vector3::FromArray(
+        json_util::get_array<float>(parsedCamera, "ellipsoid"));
     }
     // checkCollisions
-    if (parsedCamera.contains("checkCollisions")) {
+    if (json_util::has_key(parsedCamera, "checkCollisions")) {
       freeCamera->checkCollisions
-        = Json::GetBool(parsedCamera, "checkCollisions");
+        = json_util::get_bool(parsedCamera, "checkCollisions");
     }
     // applyGravity
-    if (parsedCamera.contains("applyGravity")) {
-      freeCamera->applyGravity = Json::GetBool(parsedCamera, "applyGravity");
+    if (json_util::has_key(parsedCamera, "applyGravity")) {
+      freeCamera->applyGravity
+        = json_util::get_bool(parsedCamera, "applyGravity");
     }
   }
 
@@ -172,8 +172,7 @@ CameraPtr SerializationHelper::Parse(const CameraPtr& camera,
 }
 
 LightPtr SerializationHelper::Parse(const LightPtr& light,
-                                    const Json::value& parsedLight,
-                                    Scene* /*scene*/)
+                                    const json& parsedLight, Scene* /*scene*/)
 {
   if (!light) {
     return nullptr;
@@ -184,69 +183,70 @@ LightPtr SerializationHelper::Parse(const LightPtr& light,
       /** PointLight **/
       auto pointLight = std::static_pointer_cast<PointLight>(light);
       // position
-      if (parsedLight.contains("position")) {
-        pointLight->position
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
+      if (json_util::has_key(parsedLight, "position")) {
+        pointLight->position = Vector3::FromArray(
+          json_util::get_array<float>(parsedLight, "position"));
       }
     } break;
     case 1: {
       /** DirectionalLight **/
       auto directionalLight = std::static_pointer_cast<DirectionalLight>(light);
       // position
-      if (parsedLight.contains("position")) {
-        directionalLight->position
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
+      if (json_util::has_key(parsedLight, "position")) {
+        directionalLight->position = Vector3::FromArray(
+          json_util::get_array<float>(parsedLight, "position"));
       }
       // direction
-      if (parsedLight.contains("direction")) {
-        directionalLight->direction
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction"));
+      if (json_util::has_key(parsedLight, "direction")) {
+        directionalLight->direction = Vector3::FromArray(
+          json_util::get_array<float>(parsedLight, "direction"));
       }
       // shadowOrthoScale
-      if (parsedLight.contains("shadowOrthoScale")) {
+      if (json_util::has_key(parsedLight, "shadowOrthoScale")) {
         directionalLight->shadowOrthoScale
-          = Json::GetNumber(parsedLight, "shadowOrthoScale", 0.5f);
+          = json_util::get_number(parsedLight, "shadowOrthoScale", 0.5f);
       }
       // autoUpdateExtends
-      if (parsedLight.contains("autoUpdateExtends")) {
+      if (json_util::has_key(parsedLight, "autoUpdateExtends")) {
         directionalLight->autoUpdateExtends
-          = Json::GetBool(parsedLight, "autoUpdateExtends", true);
+          = json_util::get_bool(parsedLight, "autoUpdateExtends", true);
       }
     } break;
     case 2: {
       /** SpotLight **/
       auto spotLight = std::static_pointer_cast<SpotLight>(light);
       // position
-      if (parsedLight.contains("position")) {
-        spotLight->position
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "position"));
+      if (json_util::has_key(parsedLight, "position")) {
+        spotLight->position = Vector3::FromArray(
+          json_util::get_array<float>(parsedLight, "position"));
       }
       // direction
-      if (parsedLight.contains("direction")) {
-        spotLight->direction
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction"));
+      if (json_util::has_key(parsedLight, "direction")) {
+        spotLight->direction = Vector3::FromArray(
+          json_util::get_array<float>(parsedLight, "direction"));
       }
       // angle
-      if (parsedLight.contains("angle")) {
-        spotLight->angle = Json::GetNumber(parsedLight, "angle", 0.f);
+      if (json_util::has_key(parsedLight, "angle")) {
+        spotLight->angle = json_util::get_number(parsedLight, "angle", 0.f);
       }
       // exponent
-      if (parsedLight.contains("exponent")) {
-        spotLight->exponent = Json::GetNumber(parsedLight, "exponent", 0.f);
+      if (json_util::has_key(parsedLight, "exponent")) {
+        spotLight->exponent
+          = json_util::get_number(parsedLight, "exponent", 0.f);
       }
     } break;
     case 3: {
       /** HemisphericLight **/
       auto hemisphericLight = std::static_pointer_cast<HemisphericLight>(light);
       // groundColor
-      if (parsedLight.contains("groundColor")) {
-        hemisphericLight->groundColor
-          = Color3::FromArray(Json::ToArray<float>(parsedLight, "groundColor"));
+      if (json_util::has_key(parsedLight, "groundColor")) {
+        hemisphericLight->groundColor = Color3::FromArray(
+          json_util::get_array<float>(parsedLight, "groundColor"));
       }
       // direction
-      if (parsedLight.contains("direction")) {
-        hemisphericLight->direction
-          = Vector3::FromArray(Json::ToArray<float>(parsedLight, "direction"));
+      if (json_util::has_key(parsedLight, "direction")) {
+        hemisphericLight->direction = Vector3::FromArray(
+          json_util::get_array<float>(parsedLight, "direction"));
       }
     } break;
     default:
@@ -258,7 +258,7 @@ LightPtr SerializationHelper::Parse(const LightPtr& light,
 
 StandardMaterialPtr
 SerializationHelper::Parse(const StandardMaterialPtr& standardMaterial,
-                           const Json::value& parsedMaterial, Scene* /*scene*/,
+                           const json& parsedMaterial, Scene* /*scene*/,
                            const std::string& /*rootUrl*/)
 {
   if (!standardMaterial) {
@@ -266,119 +266,119 @@ SerializationHelper::Parse(const StandardMaterialPtr& standardMaterial,
   }
 
   // ambient
-  if (parsedMaterial.contains("ambient")) {
-    standardMaterial->ambientColor
-      = Color3::FromArray(Json::ToArray<float>(parsedMaterial, "ambient"));
+  if (json_util::has_key(parsedMaterial, "ambient")) {
+    standardMaterial->ambientColor = Color3::FromArray(
+      json_util::get_array<float>(parsedMaterial, "ambient"));
   }
   // diffuse
-  if (parsedMaterial.contains("diffuse")) {
-    standardMaterial->diffuseColor
-      = Color3::FromArray(Json::ToArray<float>(parsedMaterial, "diffuse"));
+  if (json_util::has_key(parsedMaterial, "diffuse")) {
+    standardMaterial->diffuseColor = Color3::FromArray(
+      json_util::get_array<float>(parsedMaterial, "diffuse"));
   }
   // specular
-  if (parsedMaterial.contains("specular")) {
-    standardMaterial->specularColor
-      = Color3::FromArray(Json::ToArray<float>(parsedMaterial, "specular"));
+  if (json_util::has_key(parsedMaterial, "specular")) {
+    standardMaterial->specularColor = Color3::FromArray(
+      json_util::get_array<float>(parsedMaterial, "specular"));
   }
   // emissive
-  if (parsedMaterial.contains("emissive")) {
-    standardMaterial->emissiveColor
-      = Color3::FromArray(Json::ToArray<float>(parsedMaterial, "emissive"));
+  if (json_util::has_key(parsedMaterial, "emissive")) {
+    standardMaterial->emissiveColor = Color3::FromArray(
+      json_util::get_array<float>(parsedMaterial, "emissive"));
   }
   // specularPower
-  if (parsedMaterial.contains("specularPower")) {
+  if (json_util::has_key(parsedMaterial, "specularPower")) {
     standardMaterial->specularPower
-      = Json::GetNumber<float>(parsedMaterial, "specularPower", 64.f);
+      = json_util::get_number<float>(parsedMaterial, "specularPower", 64.f);
   }
   // useAlphaFromDiffuseTexture
-  if (parsedMaterial.contains("useAlphaFromDiffuseTexture")) {
+  if (json_util::has_key(parsedMaterial, "useAlphaFromDiffuseTexture")) {
     standardMaterial->useAlphaFromDiffuseTexture
-      = Json::GetBool(parsedMaterial, "useAlphaFromDiffuseTexture");
+      = json_util::get_bool(parsedMaterial, "useAlphaFromDiffuseTexture");
   }
   // useEmissiveAsIllumination
-  if (parsedMaterial.contains("useEmissiveAsIllumination")) {
+  if (json_util::has_key(parsedMaterial, "useEmissiveAsIllumination")) {
     standardMaterial->useEmissiveAsIllumination
-      = Json::GetBool(parsedMaterial, "useEmissiveAsIllumination");
+      = json_util::get_bool(parsedMaterial, "useEmissiveAsIllumination");
   }
   // linkEmissiveWithDiffuse
-  if (parsedMaterial.contains("linkEmissiveWithDiffuse")) {
+  if (json_util::has_key(parsedMaterial, "linkEmissiveWithDiffuse")) {
     standardMaterial->linkEmissiveWithDiffuse
-      = Json::GetBool(parsedMaterial, "linkEmissiveWithDiffuse");
+      = json_util::get_bool(parsedMaterial, "linkEmissiveWithDiffuse");
   }
   // useReflectionFresnelFromSpecular
-  if (parsedMaterial.contains("useReflectionFresnelFromSpecular")) {
+  if (json_util::has_key(parsedMaterial, "useReflectionFresnelFromSpecular")) {
     standardMaterial->useReflectionFresnelFromSpecular
-      = Json::GetBool(parsedMaterial, "useReflectionFresnelFromSpecular");
+      = json_util::get_bool(parsedMaterial, "useReflectionFresnelFromSpecular");
   }
   // useSpecularOverAlpha
-  if (parsedMaterial.contains("useSpecularOverAlpha")) {
+  if (json_util::has_key(parsedMaterial, "useSpecularOverAlpha")) {
     standardMaterial->useSpecularOverAlpha
-      = Json::GetBool(parsedMaterial, "useSpecularOverAlpha");
+      = json_util::get_bool(parsedMaterial, "useSpecularOverAlpha");
   }
   // useReflectionOverAlpha
-  if (parsedMaterial.contains("useReflectionOverAlpha")) {
+  if (json_util::has_key(parsedMaterial, "useReflectionOverAlpha")) {
     standardMaterial->useReflectionOverAlpha
-      = Json::GetBool(parsedMaterial, "useReflectionOverAlpha");
+      = json_util::get_bool(parsedMaterial, "useReflectionOverAlpha");
   }
   // disableLighting
-  if (parsedMaterial.contains("disableLighting")) {
+  if (json_util::has_key(parsedMaterial, "disableLighting")) {
     standardMaterial->disableLighting
-      = Json::GetBool(parsedMaterial, "disableLighting");
+      = json_util::get_bool(parsedMaterial, "disableLighting");
   }
   // useParallax
-  if (parsedMaterial.contains("useParallax")) {
+  if (json_util::has_key(parsedMaterial, "useParallax")) {
     standardMaterial->useParallax
-      = Json::GetBool(parsedMaterial, "useParallax");
+      = json_util::get_bool(parsedMaterial, "useParallax");
   }
   // useParallaxOcclusion
-  if (parsedMaterial.contains("useParallaxOcclusion")) {
+  if (json_util::has_key(parsedMaterial, "useParallaxOcclusion")) {
     standardMaterial->useParallaxOcclusion
-      = Json::GetBool(parsedMaterial, "useParallaxOcclusion");
+      = json_util::get_bool(parsedMaterial, "useParallaxOcclusion");
   }
   // parallaxScaleBias
-  if (parsedMaterial.contains("parallaxScaleBias")) {
+  if (json_util::has_key(parsedMaterial, "parallaxScaleBias")) {
     standardMaterial->parallaxScaleBias
-      = Json::GetNumber<float>(parsedMaterial, "parallaxScaleBias", 0.5f);
+      = json_util::get_number<float>(parsedMaterial, "parallaxScaleBias", 0.5f);
   }
   // roughness
-  if (parsedMaterial.contains("roughness")) {
+  if (json_util::has_key(parsedMaterial, "roughness")) {
     standardMaterial->roughness
-      = Json::GetNumber<float>(parsedMaterial, "roughness", 0.f);
+      = json_util::get_number<float>(parsedMaterial, "roughness", 0.f);
   }
   // indexOfRefraction
-  if (parsedMaterial.contains("indexOfRefraction")) {
-    standardMaterial->indexOfRefraction
-      = Json::GetNumber<float>(parsedMaterial, "indexOfRefraction", 0.98f);
+  if (json_util::has_key(parsedMaterial, "indexOfRefraction")) {
+    standardMaterial->indexOfRefraction = json_util::get_number<float>(
+      parsedMaterial, "indexOfRefraction", 0.98f);
   }
   // invertRefractionY
-  if (parsedMaterial.contains("invertRefractionY")) {
+  if (json_util::has_key(parsedMaterial, "invertRefractionY")) {
     standardMaterial->invertRefractionY
-      = Json::GetBool(parsedMaterial, "invertRefractionY", true);
+      = json_util::get_bool(parsedMaterial, "invertRefractionY", true);
   }
   // useLightmapAsShadowmap
-  if (parsedMaterial.contains("useLightmapAsShadowmap")) {
+  if (json_util::has_key(parsedMaterial, "useLightmapAsShadowmap")) {
     standardMaterial->useLightmapAsShadowmap
-      = Json::GetBool(parsedMaterial, "useLightmapAsShadowmap", true);
+      = json_util::get_bool(parsedMaterial, "useLightmapAsShadowmap", true);
   }
   // useGlossinessFromSpecularMapAlpha
-  if (parsedMaterial.contains("useGlossinessFromSpecularMapAlpha")) {
-    standardMaterial->useGlossinessFromSpecularMapAlpha
-      = Json::GetBool(parsedMaterial, "useGlossinessFromSpecularMapAlpha");
+  if (json_util::has_key(parsedMaterial, "useGlossinessFromSpecularMapAlpha")) {
+    standardMaterial->useGlossinessFromSpecularMapAlpha = json_util::get_bool(
+      parsedMaterial, "useGlossinessFromSpecularMapAlpha");
   }
   // maxSimultaneousLights
-  if (parsedMaterial.contains("maxSimultaneousLights")) {
-    standardMaterial->maxSimultaneousLights
-      = Json::GetNumber<unsigned>(parsedMaterial, "maxSimultaneousLights", 4);
+  if (json_util::has_key(parsedMaterial, "maxSimultaneousLights")) {
+    standardMaterial->maxSimultaneousLights = json_util::get_number<unsigned>(
+      parsedMaterial, "maxSimultaneousLights", 4);
   }
   // invertNormalMapX
-  if (parsedMaterial.contains("invertNormalMapX")) {
+  if (json_util::has_key(parsedMaterial, "invertNormalMapX")) {
     standardMaterial->invertNormalMapX
-      = Json::GetBool(parsedMaterial, "invertNormalMapX");
+      = json_util::get_bool(parsedMaterial, "invertNormalMapX");
   }
   // invertNormalMapY
-  if (parsedMaterial.contains("invertNormalMapY")) {
+  if (json_util::has_key(parsedMaterial, "invertNormalMapY")) {
     standardMaterial->invertNormalMapY
-      = Json::GetBool(parsedMaterial, "invertNormalMapY");
+      = json_util::get_bool(parsedMaterial, "invertNormalMapY");
   }
 
   return standardMaterial;

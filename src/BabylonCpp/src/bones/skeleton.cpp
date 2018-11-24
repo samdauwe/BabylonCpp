@@ -1,9 +1,10 @@
 #include <babylon/bones/skeleton.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
-#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -415,71 +416,14 @@ void Skeleton::dispose(bool /*doNotRecurse*/,
   getScene()->removeSkeleton(this);
 }
 
-Json::object Skeleton::serialize() const
+json Skeleton::serialize() const
 {
-  return Json::object();
+  return json();
 }
 
-Skeleton* Skeleton::Parse(const Json::value& parsedSkeleton, Scene* scene)
+Skeleton* Skeleton::Parse(const json& /*parsedSkeleton*/, Scene* /*scene*/)
 {
-  auto skeleton = new Skeleton(Json::GetString(parsedSkeleton, "name"),
-                               Json::GetString(parsedSkeleton, "id"), scene);
-
-  if (parsedSkeleton.contains("dimensionsAtRest")) {
-    skeleton->dimensionsAtRest = std::make_unique<Vector3>(Vector3::FromArray(
-      Json::ToArray<float>(parsedSkeleton, "dimensionsAtRest")));
-  }
-
-  skeleton->needInitialSkinMatrix
-    = Json::GetBool(parsedSkeleton, "needInitialSkinMatrix");
-
-  for (auto& parsedBone : Json::GetArray(parsedSkeleton, "bones")) {
-    Bone* parentBone = nullptr;
-    if (parsedBone.contains("parentBoneIndex")) {
-      auto parentBoneIndex
-        = Json::GetNumber<int>(parsedBone, "parentBoneIndex", -1);
-      if (parentBoneIndex > -1) {
-        auto _parentBoneIndex = static_cast<unsigned>(parentBoneIndex);
-        if (_parentBoneIndex < skeleton->bones.size()) {
-          parentBone = skeleton->bones[_parentBoneIndex].get();
-        }
-      }
-    }
-
-    BonePtr bone = nullptr;
-    if (parsedBone.contains("rest")) {
-      Matrix rest = Matrix::FromArray(Json::ToArray<float>(parsedBone, "rest"));
-      bone        = Bone::New(
-        Json::GetString(parsedSkeleton, "name"), skeleton, parentBone,
-        Matrix::FromArray(Json::ToArray<float>(parsedBone, "matrix")), rest);
-    }
-    else {
-      bone = Bone::New(
-        Json::GetString(parsedSkeleton, "name"), skeleton, parentBone,
-        Matrix::FromArray(Json::ToArray<float>(parsedBone, "matrix")));
-    }
-
-    if (parsedBone.contains("length")) {
-      bone->length = Json::GetNumber(parsedBone, "length", 0);
-    }
-
-    if (parsedBone.contains("metadata")) {
-      // bone.metadata = parsedBone.metadata;
-    }
-
-    if (parsedBone.contains("animation")) {
-      bone->animations.emplace_back(
-        Animation::Parse(parsedBone.get("animation")));
-    }
-  }
-
-  // placed after bones, so createAnimationRange can cascade down
-  for (auto& range : Json::GetArray(parsedSkeleton, "ranges")) {
-    skeleton->createAnimationRange(Json::GetString(range, "name"),
-                                   Json::GetNumber<float>(range, "from", 0),
-                                   Json::GetNumber<float>(range, "to", 0));
-  }
-  return skeleton;
+  return nullptr;
 }
 
 void Skeleton::computeAbsoluteTransforms(bool forceUpdate)

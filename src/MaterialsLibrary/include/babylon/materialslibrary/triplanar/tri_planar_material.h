@@ -50,10 +50,10 @@ public:
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
-  Json::object serialize() const;
+  json serialize() const;
 
   /** Statics **/
-  static TriPlanarMaterial* Parse(const Json::value& source, Scene* scene,
+  static TriPlanarMaterial* Parse(const json& source, Scene* scene,
                                   const std::string& rootUrl);
 
 protected:

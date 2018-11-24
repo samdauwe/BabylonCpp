@@ -2,6 +2,7 @@
 #define BABYLON_ANIMATIONS_ANIMATION_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/animations/animation_event.h>
 #include <babylon/animations/animation_range.h>
@@ -9,11 +10,7 @@
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/babylon_api.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -30,12 +27,6 @@ using AnimationPtr        = std::shared_ptr<Animation>;
 using IEasingFunctionPtr  = std::shared_ptr<IEasingFunction>;
 using NodePtr             = std::shared_ptr<Node>;
 using RuntimeAnimationPtr = std::shared_ptr<RuntimeAnimation>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Class used to store any kind of animation.
@@ -641,14 +632,14 @@ public:
    * @brief Serializes the animation to an object.
    * @returns Serialized object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parses an animation object and creates an animation.
    * @param parsedAnimation Parsed animation object
    * @returns Animation object
    */
-  static Animation* Parse(const Json::value& parsedAnimation);
+  static Animation* Parse(const json& parsedAnimation);
 
   /**
    * @brief Appends the serialized animations from the source animations.
@@ -656,7 +647,7 @@ public:
    * @param destination Target to store the animations
    */
   static void AppendSerializedAnimations(IAnimatable* source,
-                                         picojson::object& destination);
+                                         json& destination);
 
 protected:
   /**

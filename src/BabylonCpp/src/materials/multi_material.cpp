@@ -1,7 +1,8 @@
 #include <babylon/materials/multi_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/standard_material.h>
 
@@ -102,9 +103,9 @@ MaterialPtr MultiMaterial::clone(const std::string& iName,
   return newMultiMaterial;
 }
 
-Json::object MultiMaterial::serialize() const
+json MultiMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
@@ -117,9 +118,9 @@ void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
   // Remove from scene
   scene->multiMaterials.erase(
     std::remove_if(scene->multiMaterials.begin(), scene->multiMaterials.end(),
-                     [this](const MultiMaterialPtr& multiMaterial) {
-                       return multiMaterial.get() == this;
-                     }),
+                   [this](const MultiMaterialPtr& multiMaterial) {
+                     return multiMaterial.get() == this;
+                   }),
     scene->multiMaterials.end());
 
   Material::dispose(forceDisposeEffect, forceDisposeTextures);

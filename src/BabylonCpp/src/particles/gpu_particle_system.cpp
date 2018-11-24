@@ -1,9 +1,10 @@
 #include <babylon/particles/gpu_particle_system.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/array_buffer_view.h>
-#include <babylon/core/json.h>
 #include <babylon/core/random.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -1244,14 +1245,14 @@ IParticleSystem* GPUParticleSystem::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object GPUParticleSystem::serialize() const
+json GPUParticleSystem::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-IParticleSystem*
-GPUParticleSystem::Parse(const Json::value& /*parsedParticleSystem*/,
-                         Scene* /*scene*/, const std::string& /*rootUrl*/)
+IParticleSystem* GPUParticleSystem::Parse(const json& /*parsedParticleSystem*/,
+                                          Scene* /*scene*/,
+                                          const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

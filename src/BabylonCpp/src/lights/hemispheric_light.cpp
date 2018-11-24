@@ -1,6 +1,7 @@
 #include <babylon/lights/hemispheric_light.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
@@ -14,7 +15,7 @@ void HemisphericLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "Light_Type_3", [](const std::string& name, Scene* scene,
-                       const std::optional<Json::value>& /*options*/) {
+                       const std::optional<json>& /*options*/) {
       return HemisphericLight::New(name, Vector3::Zero(), scene);
     });
   HemisphericLight::NodeConstructorAdded = true;

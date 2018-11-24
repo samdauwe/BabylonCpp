@@ -1,6 +1,6 @@
 #include <babylon/particles/emittertypes/sphere_particle_emitter.h>
 
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/scalar.h>
@@ -80,23 +80,23 @@ const char* SphereParticleEmitter::getClassName() const
   return "SphereParticleEmitter";
 }
 
-Json::object SphereParticleEmitter::serialize() const
+json SphereParticleEmitter::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-void SphereParticleEmitter::parse(const Json::value& serializationObject)
+void SphereParticleEmitter::parse(const json& serializationObject)
 {
-  if (serializationObject.contains("radius")) {
-    radius = Json::GetNumber<float>(serializationObject, "radius", 1.f);
+  if (json_util::has_key(serializationObject, "radius")) {
+    radius = json_util::get_number<float>(serializationObject, "radius", 1.f);
   }
-  if (serializationObject.contains("radiusRange")) {
+  if (json_util::has_key(serializationObject, "radiusRange")) {
     radiusRange
-      = Json::GetNumber<float>(serializationObject, "radiusRange", 1.f);
+      = json_util::get_number<float>(serializationObject, "radiusRange", 1.f);
   }
-  if (serializationObject.contains("directionRandomizer")) {
-    directionRandomizer
-      = Json::GetNumber<float>(serializationObject, "directionRandomizer", 0.f);
+  if (json_util::has_key(serializationObject, "directionRandomizer")) {
+    directionRandomizer = json_util::get_number<float>(
+      serializationObject, "directionRandomizer", 0.f);
   }
 }
 

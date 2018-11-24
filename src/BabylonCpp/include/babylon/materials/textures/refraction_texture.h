@@ -22,7 +22,7 @@ public:
   ~RefractionTexture();
 
   std::unique_ptr<RefractionTexture> clone();
-  Json::object serialize() const;
+  json serialize() const;
 
 public:
   Plane refractionPlane;

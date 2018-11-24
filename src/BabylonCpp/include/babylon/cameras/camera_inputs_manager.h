@@ -4,23 +4,14 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/cameras/icamera_input.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 template <class TCamera>
 class BABYLON_SHARED_EXPORT CameraInputsManager {
@@ -59,8 +50,8 @@ public:
    */
   void clear();
 
-  Json::object serialize(Json::object& serializedCamera) const;
-  void parse(const Json::value& parsedCamera);
+  json serialize(json& serializedCamera) const;
+  void parse(const json& parsedCamera);
 
 public:
   ICanvas* attachedElement;

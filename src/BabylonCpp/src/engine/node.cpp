@@ -22,9 +22,9 @@ void Node::AddNodeConstructor(const std::string& type,
   _NodeConstructors[type] = constructorFunc;
 }
 
-std::function<NodePtr()>
-Node::Construct(const std::string& type, const std::string& name, Scene* scene,
-                const std::optional<Json::value>& options)
+std::function<NodePtr()> Node::Construct(const std::string& type,
+                                         const std::string& name, Scene* scene,
+                                         const std::optional<json>& options)
 {
   if (!stl_util::contains(_NodeConstructors, type)) {
     return nullptr;
@@ -84,11 +84,12 @@ void Node::set_parent(Node* const& parent)
 
   // Remove self from list of children of parent
   if (_parentNode && !_parentNode->_children.empty()) {
-    _parentNode->_children.erase(
-      std::remove_if(
-        _parentNode->_children.begin(), _parentNode->_children.end(),
-        [this](const NodePtr& node) { return node.get() == this; }),
-      _parentNode->_children.end());
+    _parentNode->_children.erase(std::remove_if(_parentNode->_children.begin(),
+                                                _parentNode->_children.end(),
+                                                [this](const NodePtr& node) {
+                                                  return node.get() == this;
+                                                }),
+                                 _parentNode->_children.end());
   }
 
   // Store new parent
@@ -189,9 +190,9 @@ std::vector<Behavior<Node>*>& Node::get_behaviors()
 Behavior<Node>* Node::getBehaviorByName(const std::string& iName)
 {
   auto it = std::find_if(_behaviors.begin(), _behaviors.end(),
-                           [&iName](const Behavior<Node>* behavior) {
-                             return behavior->name == iName;
-                           });
+                         [&iName](const Behavior<Node>* behavior) {
+                           return behavior->name == iName;
+                         });
 
   return (it != _behaviors.end() ? *it : nullptr);
 }
@@ -340,9 +341,9 @@ void Node::_getDescendants(
   }
 }
 
-std::vector<NodePtr> Node::getDescendants(
-  bool directDescendantsOnly,
-  const std::function<bool(const NodePtr& node)>& predicate)
+std::vector<NodePtr>
+Node::getDescendants(bool directDescendantsOnly,
+                     const std::function<bool(const NodePtr& node)>& predicate)
 {
   std::vector<NodePtr> results;
   _getDescendants(results, directDescendantsOnly, predicate);
@@ -350,16 +351,16 @@ std::vector<NodePtr> Node::getDescendants(
   return results;
 }
 
-std::vector<AbstractMeshPtr> Node::getChildMeshes(
-  bool directDescendantsOnly,
-  const std::function<bool(const NodePtr& node)>& predicate)
+std::vector<AbstractMeshPtr>
+Node::getChildMeshes(bool directDescendantsOnly,
+                     const std::function<bool(const NodePtr& node)>& predicate)
 {
   std::vector<AbstractMeshPtr> results;
-  _getDescendants(
-    results, directDescendantsOnly, [&predicate](const NodePtr& node) {
-      return ((!predicate || predicate(node))
-              && (std::static_pointer_cast<AbstractMesh>(node)));
-    });
+  _getDescendants(results, directDescendantsOnly,
+                  [&predicate](const NodePtr& node) {
+                    return ((!predicate || predicate(node))
+                            && (std::static_pointer_cast<AbstractMesh>(node)));
+                  });
   return results;
 }
 
@@ -368,11 +369,11 @@ std::vector<TransformNodePtr> Node::getChildTransformNodes(
   const std::function<bool(const NodePtr& node)>& predicate)
 {
   std::vector<TransformNodePtr> results;
-  _getDescendants(
-    results, directDescendantsOnly, [&predicate](const NodePtr& node) {
-      return ((!predicate || predicate(node))
-              && (std::static_pointer_cast<TransformNode>(node)));
-    });
+  _getDescendants(results, directDescendantsOnly,
+                  [&predicate](const NodePtr& node) {
+                    return ((!predicate || predicate(node))
+                            && (std::static_pointer_cast<TransformNode>(node)));
+                  });
   return results;
 }
 
@@ -408,9 +409,9 @@ std::vector<AnimationPtr> Node::getAnimations()
 AnimationPtr Node::getAnimationByName(const std::string& iName)
 {
   auto it = std::find_if(animations.begin(), animations.end(),
-                           [&iName](const AnimationPtr& animation) {
-                             return animation->name == iName;
-                           });
+                         [&iName](const AnimationPtr& animation) {
+                           return animation->name == iName;
+                         });
 
   return (it == animations.end() ? nullptr : *it);
 }
@@ -512,16 +513,9 @@ void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _isDisposed = true;
 }
 
-void Node::ParseAnimationRanges(Node& node, const Json::value& parsedNode,
+void Node::ParseAnimationRanges(Node& /*node*/, const json& /*parsedNode*/,
                                 Scene* /*scene*/)
 {
-  if (parsedNode.contains("ranges")) {
-    for (auto& range : Json::GetArray(parsedNode, "ranges")) {
-      node.createAnimationRange(Json::GetString(range, "name"),
-                                Json::GetNumber<float>(range, "from", 0.f),
-                                Json::GetNumber<float>(range, "to", 0.f));
-    }
-  }
 }
 
 template void Node::_getDescendants<Node>(

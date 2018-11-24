@@ -10,7 +10,7 @@ void FollowCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "FollowCamera", [](const std::string& name, Scene* scene,
-                       const std::optional<Json::value>& /*options*/) {
+                       const std::optional<json>& /*options*/) {
       return FollowCamera::New(name, Vector3::Zero(), scene);
     });
   FollowCamera::NodeConstructorAdded = true;
@@ -98,9 +98,9 @@ const std::string FollowCamera::getClassName() const
   return "FollowCamera";
 }
 
-Json::object FollowCamera::serialize() const
+json FollowCamera::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 } // end of namespace BABYLON

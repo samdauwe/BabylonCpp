@@ -1,6 +1,7 @@
 #include <babylon/materials/fresnel_parameters.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/engine/engine.h>
 #include <babylon/materials/material.h>
 
@@ -90,28 +91,15 @@ std::unique_ptr<FresnelParameters> FresnelParameters::clone() const
   return std::make_unique<FresnelParameters>(*this);
 }
 
-Json::object FresnelParameters::serialize() const
+json FresnelParameters::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<FresnelParameters>
-FresnelParameters::Parse(const Json::value& parsedFresnelParameters)
+FresnelParameters::Parse(const json& /*parsedFresnelParameters*/)
 {
-  auto fresnelParameters = std::make_unique<FresnelParameters>();
-
-  fresnelParameters->isEnabled
-    = Json::GetBool(parsedFresnelParameters, "isEnabled", true);
-  fresnelParameters->leftColor = Color3::FromArray(
-    Json::ToArray<float>(parsedFresnelParameters, "leftColor"));
-  fresnelParameters->rightColor = Color3::FromArray(
-    Json::ToArray<float>(parsedFresnelParameters, "rightColor"));
-  fresnelParameters->bias
-    = Json::GetNumber<float>(parsedFresnelParameters, "bias", 0.f);
-  fresnelParameters->power
-    = Json::GetNumber<float>(parsedFresnelParameters, "power ", 1.f);
-
-  return fresnelParameters;
+  return nullptr;
 }
 
 } // end of namespace BABYLON

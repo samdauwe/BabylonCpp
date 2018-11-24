@@ -93,7 +93,7 @@ public:
    * @brief Serializes this PBR Material.
    * @returns - An object with the serialized material.
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   // Statics
   /**
@@ -103,7 +103,7 @@ public:
    * @param rootUrl - url for the scene object
    * @returns - PBRMaterial
    */
-  static PBRMaterial* Parse(const Json::value& source, Scene* scene,
+  static PBRMaterial* Parse(const json& source, Scene* scene,
                             const std::string& rootUrl);
 
 protected:

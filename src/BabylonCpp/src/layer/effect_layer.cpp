@@ -574,7 +574,7 @@ std::string EffectLayer::getClassName() const
   return "EffectLayer";
 }
 
-EffectLayer* EffectLayer::Parse(const Json::value& /*parsedEffectLayer*/,
+EffectLayer* EffectLayer::Parse(const json& /*parsedEffectLayer*/,
                                 Scene* /*scene*/,
                                 const std::string& /*rootUrl*/)
 {

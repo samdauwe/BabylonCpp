@@ -1,7 +1,7 @@
 #include <babylon/actions/directactions/increment_value_action.h>
 
 #include <babylon/animations/ianimatable.h>
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
 
 namespace BABYLON {
 
@@ -37,19 +37,9 @@ void IncrementValueAction::execute(const ActionEvent& /*evt*/)
   }*/
 }
 
-Json::object IncrementValueAction::serialize(Json::object& parent) const
+json IncrementValueAction::serialize(json& /*parent*/) const
 {
-  return Action::_serialize(
-    Json::object(
-      {Json::Pair("name", "IncrementValueAction"),
-       Json::Pair("properties",
-                  Json::array({{
-                    Json::value(Action::_GetTargetProperty(_target)),
-                    Json::NameValuePair("propertyPath", _propertyPath),
-                    Json::NameValuePair(
-                      "value", Action::_SerializeValueAsString(_value)),
-                  }}))}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

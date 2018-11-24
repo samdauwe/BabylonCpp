@@ -1,7 +1,8 @@
 #include <babylon/materials/pbr/pbr_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/tools/texture_tools.h>
@@ -1385,13 +1386,13 @@ MaterialPtr PBRMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object PBRMaterial::serialize() const
+json PBRMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 // Statics
-PBRMaterial* PBRMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
+PBRMaterial* PBRMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                 const std::string& /*rootUrl*/)
 {
   return nullptr;

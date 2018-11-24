@@ -39,10 +39,10 @@ public:
                        bool forceDisposeTextures = false) override;
   MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
-  Json::object serialize() const;
+  json serialize() const;
 
   /** Statics **/
-  static FurMaterial* Parse(const Json::value& source, Scene* scene,
+  static FurMaterial* Parse(const json& source, Scene* scene,
                             const std::string& rootUrl);
   static DynamicTexture* GenerateTexture(const std::string& name, Scene* scene);
 

@@ -4,15 +4,12 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
 #include <babylon/babylon_api.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -23,12 +20,6 @@ class RenderTargetTexture;
 class ShadowGenerator;
 class SubMesh;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 struct ShadowGeneratorCompileOptions {
   bool useInstances = false;
@@ -117,7 +108,7 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * @brief Serializes the shadow generator setup to a json object.
    * @returns The serialized JSON object
    */
-  virtual Json::object serialize() const = 0;
+  virtual json serialize() const = 0;
 
   /**
    * @brief Disposes the Shadow map and related Textures and effects.

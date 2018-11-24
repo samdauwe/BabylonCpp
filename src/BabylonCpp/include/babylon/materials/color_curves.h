@@ -2,25 +2,16 @@
 #define BABYLON_MATERIALS_COLOR_CURVES_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/color4.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
 class Effect;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief The color grading curves provide additional color adjustmnent that is
@@ -59,7 +50,7 @@ public:
    * representation.
    * @return a JSON representation
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Binds the color curves to the shader.
@@ -123,7 +114,7 @@ public:
    * @param source the JSON source to parse
    * @return The parsed curves
    */
-  static std::unique_ptr<ColorCurves> Parse(const Json::value& source);
+  static std::unique_ptr<ColorCurves> Parse(const json& source);
 
 protected:
   /**

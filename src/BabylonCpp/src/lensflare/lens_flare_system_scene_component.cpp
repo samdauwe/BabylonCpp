@@ -50,8 +50,7 @@ void LensFlareSystemSceneComponent::removeFromContainer(
   };
 }
 
-void LensFlareSystemSceneComponent::serialize(
-  Json::value& /*serializationObject*/)
+void LensFlareSystemSceneComponent::serialize(json& /*serializationObject*/)
 {
 }
 

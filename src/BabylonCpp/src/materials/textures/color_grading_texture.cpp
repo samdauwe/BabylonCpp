@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/color_grading_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -206,23 +207,15 @@ void ColorGradingTexture::delayLoad()
 }
 
 std::unique_ptr<ColorGradingTexture>
-ColorGradingTexture::Parse(const Json::value& parsedTexture, Scene* scene,
+ColorGradingTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
                            const std::string& /*rootUrl*/)
 {
-  std::unique_ptr<ColorGradingTexture> texture = nullptr;
-  if (parsedTexture.contains("name")
-      && !Json::GetBool(parsedTexture, "isRenderTarget")) {
-    auto parsedTextureName = Json::GetString(parsedTexture, "name");
-    texture = std::make_unique<ColorGradingTexture>(parsedTextureName, scene);
-    texture->name  = parsedTextureName;
-    texture->level = Json::GetNumber<float>(parsedTexture, "level", 0.f);
-  }
-  return texture;
+  return nullptr;
 }
 
-Json::object ColorGradingTexture::serialize() const
+json ColorGradingTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 } // end of namespace BABYLON

@@ -1,12 +1,13 @@
 #include <babylon/actions/action.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/actions/action_event.h>
 #include <babylon/actions/action_manager.h>
 #include <babylon/actions/condition.h>
 #include <babylon/animations/animation.h>
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/ianimatable.h>
-#include <babylon/core/json.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/node.h>
 #include <babylon/engine/scene.h>
@@ -110,39 +111,15 @@ IAnimatablePtr Action::_getEffectiveTarget(const IAnimatablePtr& target,
   return _actionManager->_getEffectiveTarget(target, propertyPath);
 }
 
-Json::object Action::serialize(Json::object& /*parent*/) const
+json Action::serialize(json& /*parent*/) const
 {
-  return Json::object();
+  return json();
 }
 
-Json::object Action::_serialize(const Json::object& serializedAction,
-                                Json::object& /*parent*/) const
+json Action::_serialize(const json& /*serializedAction*/,
+                        json& /*parent*/) const
 {
-  auto serializationObject = Json::object(
-    {Json::Pair<int>("type", 1), // Json::Pair("children", Json::array()),
-     Json::Pair("name", serializedAction.at("name")),
-     Json::Pair("name", serializedAction.at("properties"))});
-
-  // Serialize child
-  if (_child) {
-    _child->serialize(serializationObject);
-  }
-
-  // Check if "this" has a condition
-  /*if (_condition) {
-    auto serializedCondition = _condition->serialize();
-    serializedCondition.children.push(serializationObject);
-
-    if (parent) {
-      parent.children.push(serializedCondition);
-    }
-    return serializedCondition;
-  }
-
-  if (parent) {
-    parent.children.push(serializationObject);
-  }*/
-  return serializationObject;
+  return nullptr;
 }
 
 std::string Action::_SerializeValueAsString(const AnimationValue& value)
@@ -178,23 +155,9 @@ std::string Action::_SerializeValueAsString(const AnimationValue& value)
   }
 }
 
-Json::object Action::_GetTargetProperty(const IAnimatablePtr& target)
+json Action::_GetTargetProperty(const IAnimatablePtr& /*target*/)
 {
-  const std::string targetType
-    = (target->animatableType() == IAnimatable::Type::MESH) ?
-        "MeshProperties" :
-        (target->animatableType() == IAnimatable::Type::LIGHT) ?
-        "LightProperties" :
-        (target->animatableType() == IAnimatable::Type::CAMERA) ?
-        "CameraProperties" :
-        "SceneProperties";
-  const std::string value
-    = (target->animatableType() == IAnimatable::Type::SCENE) ?
-        "Scene" :
-        std::static_pointer_cast<Node>(target)->name;
-  return Json::object({Json::Pair("name", "target"),
-                       Json::Pair("targetType", targetType),
-                       Json::Pair("value", value)});
+  return nullptr;
 }
 
 } // end of namespace BABYLON

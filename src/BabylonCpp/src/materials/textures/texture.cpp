@@ -1,7 +1,8 @@
 #include <babylon/materials/textures/texture.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
@@ -400,9 +401,9 @@ Observable<Texture>& Texture::get_onLoadObservable()
   return _onLoadObservable;
 }
 
-Json::object Texture::serialize() const
+json Texture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 void Texture::dispose()
@@ -426,9 +427,9 @@ TexturePtr Texture::CreateFromBase64String(
                       onLoad, onError, data, false, format);
 }
 
-std::unique_ptr<BaseTexture>
-Texture::Parse(const Json::value& /*parsedTexture*/, Scene* /*scene*/,
-               const std::string& /*rootUrl*/)
+std::unique_ptr<BaseTexture> Texture::Parse(const json& /*parsedTexture*/,
+                                            Scene* /*scene*/,
+                                            const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

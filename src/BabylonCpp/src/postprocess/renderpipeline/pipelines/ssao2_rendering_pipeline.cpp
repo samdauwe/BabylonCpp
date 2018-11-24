@@ -1,8 +1,9 @@
 #include <babylon/postprocess/renderpipeline/pipelines/ssao2_rendering_pipeline.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/random.h>
 #include <babylon/engine/engine.h>
@@ -446,13 +447,13 @@ void SSAO2RenderingPipeline::_createRandomTexture()
   _randomTexture->update(false);
 }
 
-Json::object SSAO2RenderingPipeline::serialize() const
+json SSAO2RenderingPipeline::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<SSAO2RenderingPipeline>
-SSAO2RenderingPipeline::Parse(const Json::value& /*source*/, Scene* /*scene*/,
+SSAO2RenderingPipeline::Parse(const json& /*source*/, Scene* /*scene*/,
                               const std::string& /*url*/)
 {
   return nullptr;

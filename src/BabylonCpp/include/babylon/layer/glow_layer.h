@@ -131,7 +131,7 @@ public:
    * @brief Serializes this glow layer.
    * @returns a serialized glow layer object
    */
-  Json::object serialize() const override;
+  json serialize() const override;
 
   /**
    * @brief Creates a Glow Layer from parsed glow layer data.
@@ -140,7 +140,7 @@ public:
    * @param rootUrl defines the root URL containing the glow layer information
    * @returns a parsed Glow Layer
    */
-  static GlowLayer* Parse(const Json::value& parsedGlowLayer, Scene* scene,
+  static GlowLayer* Parse(const json& parsedGlowLayer, Scene* scene,
                           const std::string& rootUrl);
 
 protected:

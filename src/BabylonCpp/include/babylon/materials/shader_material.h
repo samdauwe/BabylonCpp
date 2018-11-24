@@ -74,11 +74,11 @@ public:
                     bool cloneChildren = false) const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
-  Json::object serialize() const;
+  json serialize() const;
 
   // Statics
-  static std::unique_ptr<ShaderMaterial>
-  Parse(const Json::value& source, Scene* scene, const std::string& url);
+  static std::unique_ptr<ShaderMaterial> Parse(const json& source, Scene* scene,
+                                               const std::string& url);
 
 protected:
   ShaderMaterial(const std::string& name, Scene* scene,

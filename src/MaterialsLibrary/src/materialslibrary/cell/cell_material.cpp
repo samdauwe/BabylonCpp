@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/cell/cell_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -374,13 +375,12 @@ MaterialPtr CellMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object CellMaterial::serialize() const
+json CellMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-CellMaterial* CellMaterial::Parse(const Json::value& /*source*/,
-                                  Scene* /*scene*/,
+CellMaterial* CellMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
   return nullptr;

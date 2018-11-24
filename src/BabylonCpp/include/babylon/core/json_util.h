@@ -36,11 +36,11 @@ inline T get_number(const json& j, const std::string& key, T defaultValue = T())
 }
 
 template <typename T = std::string>
-inline T get_string(const json& j, const std::string& key, T defaultValue = T())
+inline T get_string(const json& j, const std::string& key,
+                    const std::string& defaultValue = "")
 {
   if (!j.is_null() && has_key(j, key) && j[key].is_string()) {
-    // return j[key].get<T>();
-    return defaultValue;
+    return j[key].get<T>();
   }
   else {
     return defaultValue;

@@ -35,7 +35,7 @@ public:
    * @brief Serialize the StateCondition into a JSON compatible object.
    * @returns serialization object
    */
-  Json::object serialize() const override;
+  json serialize() const override;
 
 public:
   AnimationValue* value;

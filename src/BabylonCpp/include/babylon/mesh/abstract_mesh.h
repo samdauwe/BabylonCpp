@@ -1,9 +1,10 @@
 #ifndef BABYLON_MESH_ABSTRACT_MESH_H
 #define BABYLON_MESH_ABSTRACT_MESH_H
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/collisions/collider.h>
-#include <babylon/core/json.h>
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/octrees/octree.h>
 #include <babylon/interfaces/idisposable.h>
@@ -17,6 +18,8 @@
 #include <babylon/physics/physics_impostor.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -1583,7 +1586,7 @@ public:
   // Loading properties
 
   /** Hidden */
-  std::vector<Json::value> _waitingActions;
+  std::vector<json> _waitingActions;
 
   /** Hidden */
   std::optional<bool> _waitingFreezeWorldMatrix;

@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/cloud/cloud_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/cloud/cloud_procedural_texture_fragment_fx.h>
 
@@ -63,14 +64,14 @@ void CloudProceduralTexture::set_cloudColor(const Color4& value)
   updateShaderUniforms();
 }
 
-Json::object CloudProceduralTexture::serialize() const
+json CloudProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<CloudProceduralTexture>
-CloudProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                              Scene* /*scene*/, const std::string& /*rootUrl*/)
+CloudProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
+                              const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

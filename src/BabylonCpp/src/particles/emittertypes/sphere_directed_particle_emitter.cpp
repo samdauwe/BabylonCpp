@@ -1,6 +1,6 @@
 #include <babylon/particles/emittertypes/sphere_directed_particle_emitter.h>
 
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
 #include <babylon/math/scalar.h>
 
@@ -55,22 +55,21 @@ const char* SphereDirectedParticleEmitter::getClassName() const
   return "SphereDirectedParticleEmitter";
 }
 
-Json::object SphereDirectedParticleEmitter::serialize() const
+json SphereDirectedParticleEmitter::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-void SphereDirectedParticleEmitter::parse(
-  const Json::value& serializationObject)
+void SphereDirectedParticleEmitter::parse(const json& serializationObject)
 {
   SphereParticleEmitter::parse(serializationObject);
-  if (serializationObject.contains("direction1")) {
+  if (json_util::has_key(serializationObject, "direction1")) {
     direction1.copyFrom(Vector3::FromArray(
-      Json::ToArray<float>(serializationObject, "direction1")));
+      json_util::get_array<float>(serializationObject, "direction1")));
   }
-  if (serializationObject.contains("direction2")) {
+  if (json_util::has_key(serializationObject, "direction2")) {
     direction2.copyFrom(Vector3::FromArray(
-      Json::ToArray<float>(serializationObject, "direction2")));
+      json_util::get_array<float>(serializationObject, "direction2")));
   }
 }
 

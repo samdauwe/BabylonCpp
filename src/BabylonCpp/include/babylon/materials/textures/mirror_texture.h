@@ -30,7 +30,7 @@ public:
   ~MirrorTexture() override;
 
   MirrorTexturePtr clone();
-  Json::object serialize() const;
+  json serialize() const;
   void dispose() override;
 
 protected:

@@ -1,5 +1,7 @@
 #include <babylon/cameras/arc_follow_camera.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
@@ -10,7 +12,7 @@ void ArcFollowCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "ArcFollowCamera", [](const std::string& name, Scene* scene,
-                          const std::optional<Json::value>& /*options*/) {
+                          const std::optional<json>& /*options*/) {
       return ArcFollowCamera::New(name, 0.f, 0.f, 1.f, nullptr, scene);
     });
   ArcFollowCamera::NodeConstructorAdded = true;

@@ -824,9 +824,9 @@ MaterialPtr BackgroundMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object BackgroundMaterial::serialize() const
+json BackgroundMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string BackgroundMaterial::getClassName() const
@@ -835,7 +835,7 @@ const std::string BackgroundMaterial::getClassName() const
 }
 
 std::unique_ptr<BackgroundMaterial>
-BackgroundMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
+BackgroundMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                           const std::string& /*url*/)
 {
   return nullptr;

@@ -187,7 +187,7 @@ public:
    * later on.
    * @returns the JSON representation of the texture
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Helper function to be called back once a list of texture contains

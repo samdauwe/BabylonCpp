@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/refraction_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/engine/scene.h>
 
 namespace BABYLON {
@@ -47,9 +48,9 @@ std::unique_ptr<RefractionTexture> RefractionTexture::clone()
   return newTexture;
 }
 
-Json::object RefractionTexture::serialize() const
+json RefractionTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 } // end of namespace BABYLON

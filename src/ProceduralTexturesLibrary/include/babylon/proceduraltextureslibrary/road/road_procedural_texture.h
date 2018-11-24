@@ -31,7 +31,7 @@ public:
    * @brief Serializes this road procedural texture.
    * @returns a serialized road procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Road Procedural Texture from parsed road procedural
@@ -43,8 +43,7 @@ public:
    * @returns a parsed Road Procedural Texture
    */
   static std::unique_ptr<RoadProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   RoadProceduralTexture(const std::string& name, const Size& size, Scene* scene,

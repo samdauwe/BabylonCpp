@@ -1,7 +1,8 @@
 #include <babylon/actions/conditions/value_condition.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/actions/action.h>
-#include <babylon/core/json.h>
 
 namespace BABYLON {
 
@@ -29,20 +30,9 @@ bool ValueCondition::isValid()
   return true;
 }
 
-Json::object ValueCondition::serialize() const
+json ValueCondition::serialize() const
 {
-  auto object = Json::object(
-    {Json::Pair("name", "ValueCondition"),
-     Json::Pair(
-       "properties",
-       Json::array(
-         {{Json::value(Action::_GetTargetProperty(_target)),
-           Json::NameValuePair("propertyPath", _propertyPath),
-           Json::NameValuePair("value",
-                               Action::_SerializeValueAsString(*_value)),
-           Json::NameValuePair<std::string>(
-             "operator", ValueCondition::GetOperatorName(_operatorType))}}))});
-  return _serialize(object);
+  return nullptr;
 }
 
 std::string ValueCondition::GetOperatorName(unsigned int operatorType)

@@ -35,11 +35,10 @@ public:
   std::unique_ptr<VertexData> _regenerateVertexData() override;
 
   GeometryPtr copy(const std::string& id) override;
-  Json::object serialize() const override;
+  json serialize() const override;
 
   // Statics
-  static TorusKnotGeometryPtr Parse(const Json::value& parsedTorusKnot,
-                                    Scene* scene);
+  static TorusKnotGeometryPtr Parse(const json& parsedTorusKnot, Scene* scene);
 
 protected:
   /**

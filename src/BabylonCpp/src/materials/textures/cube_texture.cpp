@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/cube_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -216,33 +217,12 @@ void CubeTexture::setReflectionTextureMatrix(const Matrix& value)
   _textureMatrix = std::make_unique<Matrix>(value);
 }
 
-CubeTexturePtr CubeTexture::Parse(const Json::value& parsedTexture,
-                                  Scene* scene, const std::string& rootUrl)
+CubeTexturePtr CubeTexture::Parse(const json& /*parsedTexture*/,
+                                  Scene* /*scene*/,
+                                  const std::string& /*rootUrl*/)
 {
 
-  auto cubeTexture
-    = CubeTexture::New(rootUrl + Json::GetString(parsedTexture, "name"), scene,
-                       Json::ToStringVector(parsedTexture, "extensions"));
-  SerializationHelper::Parse(cubeTexture.get(), parsedTexture, scene);
-
-  // Local Cubemaps
-  if (parsedTexture.contains("boundingBoxPosition")) {
-    cubeTexture->boundingBoxPosition = Vector3::FromArray(
-      Json::ToArray<float>(parsedTexture, "boundingBoxPosition"));
-  }
-  if (parsedTexture.contains("boundingBoxSize")) {
-    cubeTexture->boundingBoxSize = Vector3::FromArray(
-      Json::ToArray<float>(parsedTexture, "boundingBoxSize"));
-  }
-
-  // Animations
-  if (parsedTexture.contains("animations")) {
-    for (auto& parsedAnimation : Json::GetArray(parsedTexture, "animations")) {
-      cubeTexture->animations.emplace_back(Animation::Parse(parsedAnimation));
-    }
-  }
-
-  return cubeTexture;
+  return nullptr;
 }
 
 CubeTexturePtr CubeTexture::clone() const

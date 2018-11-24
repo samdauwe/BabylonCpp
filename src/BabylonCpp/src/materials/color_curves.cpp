@@ -1,7 +1,8 @@
 #include <babylon/materials/color_curves.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/materials/effect.h>
 
 namespace BABYLON {
@@ -593,12 +594,12 @@ std::unique_ptr<ColorCurves> ColorCurves::clone() const
   return nullptr;
 }
 
-Json::object ColorCurves::serialize() const
+json ColorCurves::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-std::unique_ptr<ColorCurves> Parse(const Json::value& /*source*/)
+std::unique_ptr<ColorCurves> Parse(const json& /*source*/)
 {
   return nullptr;
 }

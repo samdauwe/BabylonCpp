@@ -18,7 +18,7 @@ void DirectionalLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "Light_Type_1", [](const std::string& name, Scene* scene,
-                       const std::optional<Json::value>& /*options*/) {
+                       const std::optional<json>& /*options*/) {
       return DirectionalLight::New(name, Vector3::Zero(), scene);
     });
   DirectionalLight::NodeConstructorAdded = true;
@@ -123,7 +123,8 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
 
   // Check extends
   if (autoUpdateExtends
-      || stl_util::almost_equal(_orthoLeft, std::numeric_limits<float>::max())) {
+      || stl_util::almost_equal(_orthoLeft,
+                                std::numeric_limits<float>::max())) {
     auto tempVector3 = Vector3::Zero();
 
     _orthoLeft   = std::numeric_limits<float>::max();

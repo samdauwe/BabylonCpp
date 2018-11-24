@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/normal/normal_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -357,9 +358,9 @@ MaterialPtr NormalMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object NormalMaterial::serialize() const
+json NormalMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string NormalMaterial::getClassName() const
@@ -367,8 +368,7 @@ const std::string NormalMaterial::getClassName() const
   return "NormalMaterial";
 }
 
-NormalMaterial* NormalMaterial::Parse(const Json::value& /*source*/,
-                                      Scene* /*scene*/,
+NormalMaterial* NormalMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                       const std::string& /*rootUrl*/)
 {
   return nullptr;

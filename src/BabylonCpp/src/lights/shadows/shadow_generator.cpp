@@ -1,9 +1,10 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
@@ -1246,143 +1247,15 @@ void ShadowGenerator::dispose()
   }
 }
 
-Json::object ShadowGenerator::serialize() const
+json ShadowGenerator::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-ShadowGenerator*
-ShadowGenerator::Parse(const Json::value& parsedShadowGenerator, Scene* scene)
+ShadowGenerator* ShadowGenerator::Parse(const json& /*parsedShadowGenerator*/,
+                                        Scene* /*scene*/)
 {
-  // Casting to point light, as light is missing the position attr and
-  // typescript complains.
-  const std::string parsedShadowGeneratorLightId
-    = Json::GetString(parsedShadowGenerator, "lightId");
-
-  if (parsedShadowGeneratorLightId.empty()) {
-    return nullptr;
-  }
-
-  auto light = std::static_pointer_cast<PointLight>(
-    scene->getLightByID(parsedShadowGeneratorLightId));
-
-  if (!light) {
-    return nullptr;
-  }
-
-  auto size            = Json::GetNumber(parsedShadowGenerator, "mapSize", 0);
-  auto shadowGenerator = new ShadowGenerator(ISize(size, size), light);
-  auto shadowMap       = shadowGenerator->getShadowMap();
-
-  for (const auto& renderItem :
-       Json::GetArray(parsedShadowGenerator, "renderList")) {
-    auto meshes = scene->getMeshesByID(renderItem.get<std::string>());
-    for (auto& mesh : meshes) {
-      if (!shadowMap) {
-        continue;
-      }
-      shadowMap->renderList().emplace_back(mesh);
-    }
-  }
-
-  if (Json::GetBool(parsedShadowGenerator, "usePoissonSampling")) {
-    shadowGenerator->usePoissonSampling = true;
-  }
-  else if (Json::GetBool(parsedShadowGenerator, "useExponentialShadowMap")) {
-    shadowGenerator->useExponentialShadowMap = true;
-  }
-  else if (Json::GetBool(parsedShadowGenerator,
-                         "useBlurExponentialShadowMap")) {
-    shadowGenerator->useBlurExponentialShadowMap = true;
-  }
-  else if (Json::GetBool(parsedShadowGenerator,
-                         "useCloseExponentialShadowMap")) {
-    shadowGenerator->useCloseExponentialShadowMap = true;
-  }
-  else if (Json::GetBool(parsedShadowGenerator,
-                         "useBlurCloseExponentialShadowMap")) {
-    shadowGenerator->useBlurCloseExponentialShadowMap = true;
-  }
-  else if (Json::GetBool(parsedShadowGenerator,
-                         "usePercentageCloserFiltering")) {
-    shadowGenerator->usePercentageCloserFiltering = true;
-  }
-  else if (Json::GetBool(parsedShadowGenerator, "useContactHardeningShadow")) {
-    shadowGenerator->useContactHardeningShadow = true;
-  }
-
-  if (parsedShadowGenerator.contains("filteringQuality")) {
-    shadowGenerator->filteringQuality
-      = Json::GetNumber(parsedShadowGenerator, "filteringQuality",
-                        ShadowGenerator::QUALITY_HIGH());
-  }
-
-  if (parsedShadowGenerator.contains("contactHardeningLightSizeUVRatio")) {
-    shadowGenerator->contactHardeningLightSizeUVRatio = Json::GetNumber(
-      parsedShadowGenerator, "contactHardeningLightSizeUVRatio", 0.1f);
-  }
-
-  // Backward compat
-  else if (Json::GetBool(parsedShadowGenerator, "useVarianceShadowMap")) {
-    shadowGenerator->useExponentialShadowMap = true;
-  }
-  else if (Json::GetBool(parsedShadowGenerator, "useBlurVarianceShadowMap")) {
-    shadowGenerator->useExponentialShadowMap = true;
-  }
-
-  if (parsedShadowGenerator.contains("depthScale")) {
-    shadowGenerator->depthScale
-      = Json::GetNumber(parsedShadowGenerator, "depthScale", 30.f);
-  }
-
-  if (parsedShadowGenerator.contains("blurScale")) {
-    shadowGenerator->blurScale
-      = Json::GetNumber(parsedShadowGenerator, "blurScale", 2.f);
-  }
-
-  if (parsedShadowGenerator.contains("blurBoxOffset")) {
-    shadowGenerator->blurBoxOffset
-      = Json::GetNumber(parsedShadowGenerator, "blurBoxOffset", 0);
-  }
-
-  if (parsedShadowGenerator.contains("useKernelBlur")) {
-    shadowGenerator->useKernelBlur
-      = Json::GetBool(parsedShadowGenerator, "useKernelBlur");
-  }
-
-  if (parsedShadowGenerator.contains("blurKernel")) {
-    shadowGenerator->blurKernel
-      = Json::GetNumber(parsedShadowGenerator, "blurKernel", 1.f);
-  }
-
-  if (parsedShadowGenerator.contains("bias")) {
-    shadowGenerator->bias
-      = Json::GetNumber(parsedShadowGenerator, "bias", 0.00005f);
-  }
-
-  if (parsedShadowGenerator.contains("normalBias")) {
-    shadowGenerator->normalBias
-      = Json::GetNumber(parsedShadowGenerator, "normalBias", 0.f);
-  }
-
-  if (parsedShadowGenerator.contains("frustumEdgeFalloff")) {
-    shadowGenerator->frustumEdgeFalloff
-      = Json::GetNumber(parsedShadowGenerator, "frustumEdgeFalloff", 0.f);
-  }
-
-  if (parsedShadowGenerator.contains("darkness")) {
-    shadowGenerator->setDarkness(
-      Json::GetNumber(parsedShadowGenerator, "darkness", 0.f));
-  }
-
-  if (parsedShadowGenerator.contains("transparencyShadow")) {
-    shadowGenerator->setTransparencyShadow(true);
-  }
-
-  shadowGenerator->forceBackFacesOnly
-    = Json::GetBool(parsedShadowGenerator, "forceBackFacesOnly");
-
-  return shadowGenerator;
+  return nullptr;
 }
 
 } // end of namespace BABYLON

@@ -1,6 +1,7 @@
 #include <babylon/particles/particle_system_set.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/materials/standard_material.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/mesh_builder.h>
@@ -81,14 +82,13 @@ void ParticleSystemSet::dispose(bool doNotRecurse,
   }
 }
 
-Json::object ParticleSystemSet::serialize() const
+json ParticleSystemSet::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<ParticleSystemSet>
-ParticleSystemSet::Parse(const Json::value& /*data*/, Scene* /*scene*/,
-                         bool /*gpu*/)
+ParticleSystemSet::Parse(const json& /*data*/, Scene* /*scene*/, bool /*gpu*/)
 {
   return nullptr;
 }

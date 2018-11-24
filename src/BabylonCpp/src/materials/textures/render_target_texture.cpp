@@ -688,9 +688,9 @@ RenderTargetTexturePtr RenderTargetTexture::clone()
   return newTexture;
 }
 
-Json::object RenderTargetTexture::serialize() const
+json RenderTargetTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 void RenderTargetTexture::disposeFramebufferObjects()

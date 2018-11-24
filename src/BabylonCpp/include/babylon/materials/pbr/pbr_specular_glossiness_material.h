@@ -52,13 +52,13 @@ public:
   /**
    * @brief Serialize the material to a parsable JSON object.
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parses a JSON object correponding to the serialize function.
    */
-  static PBRSpecularGlossinessMaterial*
-  Parse(const Json::value& source, Scene* scene, const std::string& rootUrl);
+  static PBRSpecularGlossinessMaterial* Parse(const json& source, Scene* scene,
+                                              const std::string& rootUrl);
 
 public:
   /**

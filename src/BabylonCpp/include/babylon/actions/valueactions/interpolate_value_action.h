@@ -25,7 +25,7 @@ public:
   void _prepare() override;
 
   void execute(const ActionEvent& evt) override;
-  Json::object serialize(Json::object& parent) const override;
+  json serialize(json& parent) const override;
 
 public:
   std::string propertyPath;

@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/perlinnoise/perlin_noise_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -65,13 +66,13 @@ void PerlinNoiseProceduralTexture::resize(const Size& size,
   ProceduralTexture::resize(size, generateMipMaps);
 }
 
-Json::object PerlinNoiseProceduralTexture::serialize() const
+json PerlinNoiseProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<PerlinNoiseProceduralTexture>
-PerlinNoiseProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+PerlinNoiseProceduralTexture::Parse(const json& /*parsedTexture*/,
                                     Scene* /*scene*/,
                                     const std::string& /*rootUrl*/)
 {

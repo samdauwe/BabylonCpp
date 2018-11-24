@@ -251,7 +251,7 @@ public:
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  Json::object serialize() const override;
+  json serialize() const override;
 
   /**
    * @brief Parses a JSON object to create a GPU particle system.
@@ -261,8 +261,8 @@ public:
    * texture
    * @returns the parsed GPU particle system
    */
-  static IParticleSystem* Parse(const Json::value& parsedParticleSystem,
-                                Scene* scene, const std::string& rootUrl);
+  static IParticleSystem* Parse(const json& parsedParticleSystem, Scene* scene,
+                                const std::string& rootUrl);
 
 protected:
   size_t get_activeParticleCount() const;

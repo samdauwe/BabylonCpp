@@ -243,7 +243,7 @@ public:
    * @brief Serializes the current material to its JSON representation.
    * @returns The JSON representation.
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Gets the class name of the material
@@ -259,7 +259,7 @@ public:
    * @returns the instantiated BackgroundMaterial.
    */
   static std::unique_ptr<BackgroundMaterial>
-  Parse(const Json::value& source, Scene* scene, const std::string& url);
+  Parse(const json& source, Scene* scene, const std::string& url);
 
   /** Getters / Setters **/
   const Color3& primaryColor() const;

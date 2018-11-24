@@ -1,7 +1,8 @@
 #include <babylon/materials/textures/base_texture.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/core/array_buffer_view.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
@@ -453,9 +454,9 @@ void BaseTexture::dispose()
   onDisposeObservable.clear();
 }
 
-Json::object BaseTexture::serialize() const
+json BaseTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 void BaseTexture::WhenAllReady(const std::vector<BaseTexture*>& textures,

@@ -1,8 +1,9 @@
 #include <babylon/materials/textures/mirror_texture.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/structs.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -239,9 +240,9 @@ MirrorTexturePtr MirrorTexture::clone()
   return newTexture;
 }
 
-Json::object MirrorTexture::serialize() const
+json MirrorTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 void MirrorTexture::dispose()

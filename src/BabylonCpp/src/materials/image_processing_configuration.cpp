@@ -1,7 +1,8 @@
 #include <babylon/materials/image_processing_configuration.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/core/random.h>
 #include <babylon/engine/engine.h>
 #include <babylon/materials/color_curves.h>
@@ -407,17 +408,18 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
   }
 }
 
-std::unique_ptr<ImageProcessingConfiguration> ImageProcessingConfiguration::clone()
+std::unique_ptr<ImageProcessingConfiguration>
+ImageProcessingConfiguration::clone()
 {
   return nullptr;
 }
 
-Json::object ImageProcessingConfiguration::serialize() const
+json ImageProcessingConfiguration::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-void ImageProcessingConfiguration::Parse(const Json::value& /*source*/)
+void ImageProcessingConfiguration::Parse(const json& /*source*/)
 {
 }
 

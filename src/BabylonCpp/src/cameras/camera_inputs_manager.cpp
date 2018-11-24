@@ -1,9 +1,10 @@
 #include <babylon/cameras/camera_inputs_manager.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 
 namespace BABYLON {
@@ -161,14 +162,13 @@ void CameraInputsManager<TCamera>::clear()
 }
 
 template <class TCamera>
-Json::object CameraInputsManager<TCamera>::serialize(
-  Json::object& /*serializedCamera*/) const
+json CameraInputsManager<TCamera>::serialize(json& /*serializedCamera*/) const
 {
-  return Json::object();
+  return nullptr;
 }
 
 template <class TCamera>
-void CameraInputsManager<TCamera>::parse(const Json::value& /*parsedCamera*/)
+void CameraInputsManager<TCamera>::parse(const json& /*parsedCamera*/)
 {
 }
 

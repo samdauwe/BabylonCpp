@@ -2,16 +2,13 @@
 #define BABYLON_ACTIONS_ACTION_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/tools/observable.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -23,12 +20,6 @@ class Condition;
 class IAnimatable;
 using ActionPtr      = std::shared_ptr<Action>;
 using IAnimatablePtr = std::shared_ptr<IAnimatable>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief The action to be carried out following a trigger.
@@ -107,7 +98,7 @@ public:
    * @param parent of child
    * @returns the serialized object
    */
-  virtual Json::object serialize(Json::object& parent) const;
+  virtual json serialize(json& parent) const;
 
   /** Statics **/
 
@@ -119,14 +110,13 @@ public:
   /**
    * @brief Internal only.
    */
-  static Json::object _GetTargetProperty(const IAnimatablePtr& target);
+  static json _GetTargetProperty(const IAnimatablePtr& target);
 
 protected:
   /**
    * @brief Internal only called by serialize.
    */
-  Json::object _serialize(const Json::object& serializedAction,
-                          Json::object& parent) const;
+  json _serialize(const json& serializedAction, json& parent) const;
 
 public:
   /**

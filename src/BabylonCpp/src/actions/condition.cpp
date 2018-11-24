@@ -1,7 +1,8 @@
 #include <babylon/actions/condition.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/actions/action_manager.h>
-#include <babylon/core/json.h>
 
 namespace BABYLON {
 
@@ -66,19 +67,14 @@ IAnimatablePtr Condition::_getEffectiveTarget(const IAnimatablePtr& target,
   return _actionManager->_getEffectiveTarget(target, propertyPath);
 }
 
-Json::object Condition::serialize() const
+json Condition::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-Json::object
-Condition::_serialize(const Json::object& serializedCondition) const
+json Condition::_serialize(const json& /*serializedCondition*/) const
 {
-  return Json::object(
-    {Json::Pair("type", 2.0), // Condition
-     Json::Pair("children", Json::array()),
-     Json::Pair("name", serializedCondition.at("name")),
-     Json::Pair("properties", serializedCondition.at("properties"))});
+  return nullptr;
 }
 
 } // end of namespace BABYLON

@@ -2,16 +2,13 @@
 #define BABYLON_MORPH_MORPH_TARGET_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
 #include <babylon/tools/observable.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -19,12 +16,6 @@ class MorphTarget;
 struct AnimationPropertiesOverride;
 class Scene;
 using MorphTargetPtr = std::shared_ptr<MorphTarget>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Defines a target to use with MorphTargetManager.
@@ -102,7 +93,7 @@ public:
    * @brief Serializes the current target into a Serialization object.
    * @returns the serialized object.
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   // Statics
 
@@ -111,8 +102,7 @@ public:
    * @param serializationObject defines the serialized data to use
    * @returns a new MorphTarget
    */
-  static std::unique_ptr<MorphTarget>
-  Parse(const Json::value& serializationObject);
+  static std::unique_ptr<MorphTarget> Parse(const json& serializationObject);
 
   /**
    * @brief Creates a MorphTarget from mesh data.

@@ -38,7 +38,7 @@ public:
    * @brief Serializes this fire procedural texture.
    * @returns a serialized fire procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Fire Procedural Texture from parsed fire procedural
@@ -50,8 +50,7 @@ public:
    * @returns a parsed Fire Procedural Texture
    */
   static std::unique_ptr<FireProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   FireProceduralTexture(const std::string& name, const Size& size, Scene* scene,

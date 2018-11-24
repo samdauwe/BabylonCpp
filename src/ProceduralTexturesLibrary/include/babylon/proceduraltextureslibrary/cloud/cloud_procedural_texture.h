@@ -31,7 +31,7 @@ public:
    * @brief Serializes this cloud procedural texture.
    * @returns a serialized cloud procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Cloud Procedural Texture from parsed cloud procedural
@@ -43,8 +43,7 @@ public:
    * @returns a parsed Cloud Procedural Texture
    */
   static std::unique_ptr<CloudProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   CloudProceduralTexture(const std::string& name, const Size& size,

@@ -67,10 +67,10 @@ public:
    * dependencies
    * @returns the newly created texture after parsing
    */
-  static HDRCubeTexture* Parse(const Json::value& parsedTexture, Scene* scene,
+  static HDRCubeTexture* Parse(const json& parsedTexture, Scene* scene,
                                const std::string& rootUrl);
 
-  Json::object serialize() const;
+  json serialize() const;
 
 protected:
   /**

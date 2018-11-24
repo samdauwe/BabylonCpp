@@ -1,8 +1,9 @@
 #include <babylon/actions/directactions/switch_boolean_action.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/ianimatable.h>
-#include <babylon/core/json.h>
 
 namespace BABYLON {
 
@@ -32,16 +33,9 @@ void SwitchBooleanAction::execute(const ActionEvent& /*evt*/)
   (*_effectiveTarget)[_property] = !(*_effectiveTarget)[_property];
 }
 
-Json::object SwitchBooleanAction::serialize(Json::object& parent) const
+json SwitchBooleanAction::serialize(json& /*parent*/) const
 {
-  return Action::_serialize(
-    Json::object(
-      {Json::Pair("name", "SwitchBooleanAction"),
-       Json::Pair(
-         "properties",
-         Json::array({{Json::value(Action::_GetTargetProperty(_target)),
-                       Json::NameValuePair("propertyPath", _propertyPath)}}))}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

@@ -1,6 +1,8 @@
 #ifndef BABYLON_CAMERAS_CAMERA_H
 #define BABYLON_CAMERAS_CAMERA_H
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/cameras/camera_inputs_manager.h>
 #include <babylon/engine/node.h>
@@ -10,6 +12,8 @@
 #include <babylon/math/vector3.h>
 #include <babylon/math/viewport.h>
 #include <babylon/tools/observable.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -220,14 +224,14 @@ public:
   FreeCameraPtr rightCamera();
   Vector3* getLeftTarget();
   Vector3* getRightTarget();
-  void setCameraRigMode(int mode, const Json::value& rigParams);
+  void setCameraRigMode(int mode, const json& rigParams);
   void setCameraRigParameter(const std::string& name, float value);
   virtual CameraPtr createRigCamera(const std::string& name, int cameraIndex);
   /** Hidden */
   virtual void _updateRigCameras();
   /** Hidden */
   virtual void _setupInputs();
-  virtual Json::object serialize() const;
+  virtual json serialize() const;
   virtual const std::string getClassName() const override;
   Camera* clone(const std::string& name);
   Vector3 getDirection(const Vector3& localAxis);
@@ -239,7 +243,7 @@ public:
                                           const std::string& name, Scene* scene,
                                           float interaxial_distance     = 0.f,
                                           bool isStereoscopicSideBySide = true);
-  static CameraPtr Parse(const Json::value& parsedCamera, Scene* scene);
+  static CameraPtr Parse(const json& parsedCamera, Scene* scene);
 
 protected:
   Camera(const std::string& name, const Vector3& position, Scene* scene,

@@ -1,6 +1,6 @@
 #include <babylon/actions/directactions/do_nothing_action.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
 
 namespace BABYLON {
 
@@ -18,12 +18,9 @@ void DoNothingAction::execute(const ActionEvent& /*evt*/)
 {
 }
 
-Json::object DoNothingAction::serialize(Json::object& parent) const
+json DoNothingAction::serialize(json& /*parent*/) const
 {
-  return Action::_serialize(
-    Json::object({Json::Pair("name", "DoNothingAction"),
-                  Json::Pair("properties", Json::array())}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

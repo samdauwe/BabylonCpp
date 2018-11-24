@@ -1,5 +1,6 @@
 #include <babylon/mesh/primitivegeometries/cylinder_geometry.h>
 
+#include <babylon/core/json_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -45,37 +46,35 @@ GeometryPtr CylinderGeometry::copy(const std::string& _id)
                                canBeRegenerated(), nullptr, side);
 }
 
-Json::object CylinderGeometry::serialize() const
+json CylinderGeometry::serialize() const
 {
   auto serializationObject = _PrimitiveGeometry::serialize();
 
-  serializationObject["height"] = picojson::value(static_cast<double>(height));
-  serializationObject["diameterTop"]
-    = picojson::value(static_cast<double>(diameterTop));
-  serializationObject["diameterBottom"]
-    = picojson::value(static_cast<double>(diameterBottom));
-  serializationObject["tessellation"]
-    = picojson::value(static_cast<double>(tessellation));
+  serializationObject["height"]         = height;
+  serializationObject["diameterTop"]    = diameterTop;
+  serializationObject["diameterBottom"] = diameterBottom;
+  serializationObject["tessellation"]   = tessellation;
 
   return serializationObject;
 }
 
-CylinderGeometryPtr CylinderGeometry::Parse(const Json::value& parsedCylinder,
+CylinderGeometryPtr CylinderGeometry::Parse(const json& parsedCylinder,
                                             Scene* scene)
 {
-  const auto parsedCylinderId = Json::GetString(parsedCylinder, "id");
+  const auto parsedCylinderId = json_util::get_string(parsedCylinder, "id");
   if (parsedCylinderId.empty() || scene->getGeometryByID(parsedCylinderId)) {
     return nullptr; // null since geometry could be something else than a
                     // cylinder...
   }
 
   return CylinderGeometry::New(
-    parsedCylinderId, scene, Json::GetNumber(parsedCylinder, "height", 2.f),
-    Json::GetNumber(parsedCylinder, "diameterTop", 1.f),
-    Json::GetNumber(parsedCylinder, "diameterBottom", 1.f),
-    Json::GetNumber(parsedCylinder, "tessellation", 24u),
-    Json::GetNumber(parsedCylinder, "subdivisions", 1u),
-    Json::GetBool(parsedCylinder, "canBeRegenerated", true), nullptr);
+    parsedCylinderId, scene,
+    json_util::get_number(parsedCylinder, "height", 2.f),
+    json_util::get_number(parsedCylinder, "diameterTop", 1.f),
+    json_util::get_number(parsedCylinder, "diameterBottom", 1.f),
+    json_util::get_number(parsedCylinder, "tessellation", 24u),
+    json_util::get_number(parsedCylinder, "subdivisions", 1u),
+    json_util::get_bool(parsedCylinder, "canBeRegenerated", true), nullptr);
 }
 
 } // end of namespace BABYLON

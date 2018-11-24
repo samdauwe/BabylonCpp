@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/brick/brick_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/brick/brick_procedural_texture_fragment_fx.h>
 
@@ -96,14 +97,14 @@ void BrickProceduralTexture::BrickProceduralTexture::set_brickColor(
   updateShaderUniforms();
 }
 
-Json::object BrickProceduralTexture::serialize() const
+json BrickProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<BrickProceduralTexture>
-BrickProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                              Scene* /*scene*/, const std::string& /*rootUrl*/)
+BrickProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
+                              const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

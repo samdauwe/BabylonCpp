@@ -362,9 +362,9 @@ void LensFlareSystem::dispose()
     _scene->lensFlareSystems.end());
 }
 
-LensFlareSystemPtr
-LensFlareSystem::Parse(const Json::value& /*parsedLensFlareSystem*/,
-                       Scene* /*scene*/, const std::string& /*rootUrl*/)
+LensFlareSystemPtr LensFlareSystem::Parse(const json& /*parsedLensFlareSystem*/,
+                                          Scene* /*scene*/,
+                                          const std::string& /*rootUrl*/)
 {
 #if 0
   auto emitterId = Json::GetString(parsedLensFlareSystem, "emitterId");
@@ -395,9 +395,9 @@ LensFlareSystem::Parse(const Json::value& /*parsedLensFlareSystem*/,
   return nullptr;
 }
 
-Json::object LensFlareSystem::serialize() const
+json LensFlareSystem::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 } // end of namespace BABYLON

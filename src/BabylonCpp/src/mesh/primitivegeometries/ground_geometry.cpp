@@ -1,5 +1,6 @@
 #include <babylon/mesh/primitivegeometries/ground_geometry.h>
 
+#include <babylon/core/json_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -37,32 +38,30 @@ GeometryPtr GroundGeometry::copy(const std::string& _id)
                              canBeRegenerated(), nullptr);
 }
 
-Json::object GroundGeometry::serialize() const
+json GroundGeometry::serialize() const
 {
   auto serializationObject = _PrimitiveGeometry::serialize();
 
-  serializationObject["width"]  = picojson::value(static_cast<double>(width));
-  serializationObject["height"] = picojson::value(static_cast<double>(height));
-  serializationObject["subdivisions"]
-    = picojson::value(static_cast<double>(subdivisions));
+  serializationObject["width"]        = width;
+  serializationObject["height"]       = height;
+  serializationObject["subdivisions"] = subdivisions;
 
   return serializationObject;
 }
 
-GroundGeometryPtr GroundGeometry::Parse(const Json::value& parsedGround,
-                                        Scene* scene)
+GroundGeometryPtr GroundGeometry::Parse(const json& parsedGround, Scene* scene)
 {
-  const auto parsedGroundId = Json::GetString(parsedGround, "id");
+  const auto parsedGroundId = json_util::get_string(parsedGround, "id");
   if (parsedGroundId.empty() || scene->getGeometryByID(parsedGroundId)) {
     return nullptr; // null since geometry could be something else than a
                     // ground...
   }
 
   return GroundGeometry::New(
-    parsedGroundId, scene, Json::GetNumber(parsedGround, "width", 1u),
-    Json::GetNumber(parsedGround, "height", 1u),
-    Json::GetNumber(parsedGround, "subdivisions", 1u),
-    Json::GetBool(parsedGround, "canBeRegenerated", true), nullptr);
+    parsedGroundId, scene, json_util::get_number(parsedGround, "width", 1u),
+    json_util::get_number(parsedGround, "height", 1u),
+    json_util::get_number(parsedGround, "subdivisions", 1u),
+    json_util::get_bool(parsedGround, "canBeRegenerated", true), nullptr);
 }
 
 } // end of namespace BABYLON

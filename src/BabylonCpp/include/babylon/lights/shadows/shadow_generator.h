@@ -303,7 +303,7 @@ public:
    * @brief Serializes the shadow generator setup to a json object.
    * @returns The serialized JSON object
    */
-  Json::object serialize() const override;
+  json serialize() const override;
 
   /**
    * @brief Parses a serialized ShadowGenerator and returns a new
@@ -312,7 +312,7 @@ public:
    * @param scene The scene to create the shadow map for
    * @returns The parsed shadow generator
    */
-  static ShadowGenerator* Parse(const Json::value& parsedShadowGenerator,
+  static ShadowGenerator* Parse(const json& parsedShadowGenerator,
                                 Scene* scene);
 
 protected:

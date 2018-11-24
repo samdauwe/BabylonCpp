@@ -3,15 +3,12 @@
 
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
 #include <babylon/babylon_api.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -19,12 +16,6 @@ class Effect;
 class Matrix;
 class Particle;
 class Vector3;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Particle emitter represents a volume emitting particles.
@@ -85,13 +76,13 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  virtual Json::object serialize() const = 0;
+  virtual json serialize() const = 0;
 
   /**
    * @brief Parse properties from a JSON object.
    * @param serializationObject defines the JSON object
    */
-  virtual void parse(const Json::value& serializationObject) = 0;
+  virtual void parse(const json& serializationObject) = 0;
 
 }; // end of struct IParticleEmitterType
 

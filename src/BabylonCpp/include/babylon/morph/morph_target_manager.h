@@ -58,7 +58,7 @@ public:
    * @brief Serializes the current manager into a Serialization object.
    * @returns the serialized object
    */
-  Json::object serialize();
+  json serialize();
 
   /**
    * @brief Synchronize the targets with all the meshes using this morph target
@@ -67,7 +67,7 @@ public:
   void synchronize();
 
   // Statics
-  static MorphTargetManager* Parse(const Json::value& serializationObject,
+  static MorphTargetManager* Parse(const json& serializationObject,
                                    Scene* scene);
 
 protected:

@@ -1,6 +1,6 @@
 #include <babylon/cameras/stereoscopic/anaglyph_gamepad_camera.h>
 
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 
 namespace BABYLON {
 
@@ -10,11 +10,11 @@ void AnaglyphGamepadCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "AnaglyphGamepadCamera", [](const std::string& name, Scene* scene,
-                                const std::optional<Json::value>& options) {
+                                const std::optional<json>& options) {
       float interaxialDistance = 0.f;
       if (options) {
         interaxialDistance
-          = Json::GetNumber<float>(*options, "interaxial_distance", 0.f);
+          = json_util::get_number<float>(*options, "interaxial_distance");
       }
       return AnaglyphGamepadCamera::New(name, Vector3::Zero(),
                                         interaxialDistance, scene);
@@ -29,11 +29,9 @@ AnaglyphGamepadCamera::AnaglyphGamepadCamera(const std::string& name,
     : GamepadCamera{name, position, scene}
 {
   interaxialDistance = iInteraxialDistance;
-  Json::object rigParams;
-  rigParams["interaxialDistance"]
-    = picojson::value(static_cast<double>(interaxialDistance));
-  setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH(),
-                   Json::value(rigParams));
+  json rigParams;
+  rigParams["interaxialDistance"] = interaxialDistance;
+  setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH(), rigParams);
 }
 
 AnaglyphGamepadCamera::~AnaglyphGamepadCamera()

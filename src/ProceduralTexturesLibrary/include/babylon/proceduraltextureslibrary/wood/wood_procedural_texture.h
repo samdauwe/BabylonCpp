@@ -31,7 +31,7 @@ public:
    * @brief Serializes this wood procedural texture.
    * @returns a serialized wood procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Wood Procedural Texture from parsed wood procedural
@@ -43,8 +43,7 @@ public:
    * @returns a parsed Wood Procedural Texture
    */
   static std::unique_ptr<WoodProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   WoodProceduralTexture(const std::string& name, const Size& size, Scene* scene,

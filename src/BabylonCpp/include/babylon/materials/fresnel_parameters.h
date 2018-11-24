@@ -2,23 +2,14 @@
 #define BABYLON_MATERIALS_FRESNEL_PARAMETERS_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 class BABYLON_SHARED_EXPORT FresnelParameters {
 
@@ -31,10 +22,10 @@ public:
   ~FresnelParameters();
 
   std::unique_ptr<FresnelParameters> clone() const;
-  Json::object serialize() const;
+  json serialize() const;
 
   static std::unique_ptr<FresnelParameters>
-  Parse(const Json::value& parsedFresnelParameters);
+  Parse(const json& parsedFresnelParameters);
 
 private:
   bool get_isEnabled() const;

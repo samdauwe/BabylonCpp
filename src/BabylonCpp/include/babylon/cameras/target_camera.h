@@ -80,7 +80,7 @@ public:
   /** Hidden */
   void _updateRigCameras() override;
   const std::string getClassName() const override;
-  virtual Json::object serialize() const override;
+  virtual json serialize() const override;
 
 protected:
   TargetCamera(const std::string& name, const Vector3& position, Scene* scene,

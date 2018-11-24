@@ -1,6 +1,7 @@
 #ifndef BABYLON_ENGINE_SCENE_H
 #define BABYLON_ENGINE_SCENE_H
 
+#include <nlohmann/json.hpp>
 #include <regex>
 #include <variant>
 
@@ -22,11 +23,7 @@
 #include <babylon/tools/observer.h>
 #include <babylon/tools/perf_counter.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -90,12 +87,6 @@ using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
 using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Represents a scene to be rendered by the engine.
@@ -2509,7 +2500,7 @@ public:
   /**
    * Gets or sets user defined metadata
    */
-  Json::object metadata;
+  json metadata;
 
   /**
    * Gets the name of the plugin used to load this scene (null by default)

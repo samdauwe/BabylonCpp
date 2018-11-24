@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/road/road_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/road/road_procedural_texture_fragment_fx.h>
 
@@ -48,14 +49,14 @@ void RoadProceduralTexture::set_roadColor(const Color3& value)
   updateShaderUniforms();
 }
 
-Json::object RoadProceduralTexture::serialize() const
+json RoadProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<RoadProceduralTexture>
-RoadProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                             Scene* /*scene*/, const std::string& /*rootUrl*/)
+RoadProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
+                             const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

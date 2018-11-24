@@ -1,6 +1,6 @@
 #include <babylon/cameras/stereoscopic/stereoscopic_free_camera.h>
 
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 
 namespace BABYLON {
 
@@ -10,14 +10,14 @@ void StereoscopicFreeCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "StereoscopicFreeCamera", [](const std::string& name, Scene* scene,
-                                 const std::optional<Json::value>& options) {
+                                 const std::optional<json>& options) {
       float interaxialDistance      = 0.f;
       bool isStereoscopicSideBySide = false;
       if (options) {
         interaxialDistance
-          = Json::GetNumber<float>(*options, "interaxial_distance", 0.f);
+          = json_util::get_number<float>(*options, "interaxial_distance");
         isStereoscopicSideBySide
-          = Json::GetBool(*options, "isStereoscopicSideBySide");
+          = json_util::get_bool(*options, "isStereoscopicSideBySide");
       }
       return StereoscopicFreeCamera::New(name, Vector3::Zero(),
                                          interaxialDistance,
@@ -35,13 +35,12 @@ StereoscopicFreeCamera::StereoscopicFreeCamera(const std::string& name,
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;
-  Json::object rigParams;
-  rigParams["interaxialDistance"]
-    = picojson::value(static_cast<double>(interaxialDistance));
+  json rigParams;
+  rigParams["interaxialDistance"] = interaxialDistance;
   setCameraRigMode(isStereoscopicSideBySide ?
                      Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL() :
                      Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER(),
-                   Json::value(rigParams));
+                   rigParams);
 }
 
 StereoscopicFreeCamera::~StereoscopicFreeCamera()

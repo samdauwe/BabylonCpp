@@ -46,10 +46,10 @@ public:
   const std::string getClassName() const override;
   MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
-  Json::object serialize() const;
+  json serialize() const;
 
   /** Statics **/
-  static CellMaterial* Parse(const Json::value& source, Scene* scene,
+  static CellMaterial* Parse(const json& source, Scene* scene,
                              const std::string& rootUrl);
 
 protected:

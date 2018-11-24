@@ -1,7 +1,7 @@
 #include <babylon/actions/directactions/play_sound_action.h>
 
 #include <babylon/audio/sound.h>
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
 
 namespace BABYLON {
 
@@ -26,13 +26,9 @@ void PlaySoundAction::execute(const ActionEvent& /*evt*/)
   }
 }
 
-Json::object PlaySoundAction::serialize(Json::object& parent) const
+json PlaySoundAction::serialize(json& /*parent*/) const
 {
-  return Action::_serialize(
-    Json::object({Json::Pair("name", "PlaySoundAction"),
-                  Json::Pair("properties", Json::array({{Json::NameValuePair(
-                                             "sound", _sound->name)}}))}),
-    parent);
+  return nullptr;
 }
 
 } // end of namespace BABYLON

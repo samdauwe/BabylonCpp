@@ -4,7 +4,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/culling/bounding_box.h>
@@ -2072,173 +2072,176 @@ void Mesh::_syncGeometryWithMorphTargetManager()
   }
 }
 
-MeshPtr Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
+MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
                     const std::string& rootUrl)
 {
   MeshPtr mesh = nullptr;
-  if (Json::GetString(parsedMesh, "type") == "GroundMesh") {
+  if (json_util::get_string(parsedMesh, "type") == "GroundMesh") {
     mesh = GroundMesh::Parse(parsedMesh, scene);
   }
   else {
-    mesh = Mesh::New(Json::GetString(parsedMesh, "name"), scene);
+    mesh = Mesh::New(json_util::get_string(parsedMesh, "name"), scene);
   }
-  mesh->id = Json::GetString(parsedMesh, "id");
+  mesh->id = json_util::get_string(parsedMesh, "id");
 
   // Tags.AddTagsTo(mesh, parsedMesh.tags);
 
-  if (parsedMesh.contains("position")) {
+  if (json_util::has_key(parsedMesh, "position")) {
     mesh->position
-      = Vector3::FromArray(Json::ToArray<float>(parsedMesh, "position"));
+      = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "position"));
   }
 
-  if (parsedMesh.contains("metadata")) {
+  if (json_util::has_key(parsedMesh, "metadata")) {
     // mesh.metadata = parsedMesh.metadata;
   }
 
-  if (parsedMesh.contains("rotationQuaternion")) {
+  if (json_util::has_key(parsedMesh, "rotationQuaternion")) {
     mesh->rotationQuaternion = Quaternion::FromArray(
-      Json::ToArray<float>(parsedMesh, "rotationQuaternion"));
+      json_util::get_array<float>(parsedMesh, "rotationQuaternion"));
   }
-  else if (parsedMesh.contains("rotation")) {
+  else if (json_util::has_key(parsedMesh, "rotation")) {
     mesh->rotation
-      = Vector3::FromArray(Json::ToArray<float>(parsedMesh, "rotation"));
+      = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "rotation"));
   }
 
-  if (parsedMesh.contains("scaling")) {
+  if (json_util::has_key(parsedMesh, "scaling")) {
     mesh->position
-      = Vector3::FromArray(Json::ToArray<float>(parsedMesh, "scaling"));
+      = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "scaling"));
   }
 
-  if (parsedMesh.contains("localMatrix")) {
-    auto tmpMatrix
-      = Matrix::FromArray(Json::ToArray<float>(parsedMesh, "localMatrix"));
+  if (json_util::has_key(parsedMesh, "localMatrix")) {
+    auto tmpMatrix = Matrix::FromArray(
+      json_util::get_array<float>(parsedMesh, "localMatrix"));
     mesh->setPreTransformMatrix(tmpMatrix);
   }
-  else if (parsedMesh.contains("pivotMatrix")) {
-    auto tmpMatrix
-      = Matrix::FromArray(Json::ToArray<float>(parsedMesh, "pivotMatrix"));
+  else if (json_util::has_key(parsedMesh, "pivotMatrix")) {
+    auto tmpMatrix = Matrix::FromArray(
+      json_util::get_array<float>(parsedMesh, "pivotMatrix"));
     mesh->setPivotMatrix(tmpMatrix);
   }
 
-  mesh->setEnabled(Json::GetBool(parsedMesh, "isEnabled", true));
-  mesh->isVisible        = Json::GetBool(parsedMesh, "isVisible", true);
-  mesh->infiniteDistance = Json::GetBool(parsedMesh, "infiniteDistance");
+  mesh->setEnabled(json_util::get_bool(parsedMesh, "isEnabled", true));
+  mesh->isVisible        = json_util::get_bool(parsedMesh, "isVisible", true);
+  mesh->infiniteDistance = json_util::get_bool(parsedMesh, "infiniteDistance");
 
   mesh->showSubMeshesBoundingBox
-    = Json::GetBool(parsedMesh, "showSubMeshesBoundingBox");
+    = json_util::get_bool(parsedMesh, "showSubMeshesBoundingBox");
 
-  if (parsedMesh.contains("applyFog")) {
-    mesh->applyFog = Json::GetBool(parsedMesh, "applyFog", true);
+  if (json_util::has_key(parsedMesh, "applyFog")) {
+    mesh->applyFog = json_util::get_bool(parsedMesh, "applyFog", true);
   }
 
-  if (parsedMesh.contains("isPickable")) {
-    mesh->isPickable = Json::GetBool(parsedMesh, "isPickable", true);
+  if (json_util::has_key(parsedMesh, "isPickable")) {
+    mesh->isPickable = json_util::get_bool(parsedMesh, "isPickable", true);
   }
 
-  if (parsedMesh.contains("alphaIndex")) {
-    mesh->alphaIndex = Json::GetNumber(parsedMesh, "alphaIndex",
-                                       std::numeric_limits<int>::max());
+  if (json_util::has_key(parsedMesh, "alphaIndex")) {
+    mesh->alphaIndex = json_util::get_number(parsedMesh, "alphaIndex",
+                                             std::numeric_limits<int>::max());
   }
 
-  mesh->receiveShadows = Json::GetBool(parsedMesh, "receiveShadows", false);
-  mesh->billboardMode  = Json::GetNumber(parsedMesh, "billboardMode",
-                                        AbstractMesh::BILLBOARDMODE_NONE);
+  mesh->receiveShadows
+    = json_util::get_bool(parsedMesh, "receiveShadows", false);
+  mesh->billboardMode = json_util::get_number(parsedMesh, "billboardMode",
+                                              AbstractMesh::BILLBOARDMODE_NONE);
 
-  if (parsedMesh.contains("visibility")) {
-    mesh->visibility = Json::GetNumber(parsedMesh, "visibility", 1.f);
+  if (json_util::has_key(parsedMesh, "visibility")) {
+    mesh->visibility = json_util::get_number(parsedMesh, "visibility", 1.f);
   }
 
-  mesh->checkCollisions = Json::GetBool(parsedMesh, "checkCollisions");
+  mesh->checkCollisions = json_util::get_bool(parsedMesh, "checkCollisions");
 
-  if (parsedMesh.contains("isBlocker")) {
-    mesh->isBlocker = Json::GetBool(parsedMesh, "isBlocker");
+  if (json_util::has_key(parsedMesh, "isBlocker")) {
+    mesh->isBlocker = json_util::get_bool(parsedMesh, "isBlocker");
   }
 
   mesh->_shouldGenerateFlatShading
-    = Json::GetBool(parsedMesh, "useFlatShading");
+    = json_util::get_bool(parsedMesh, "useFlatShading");
 
   // freezeWorldMatrix
-  if (parsedMesh.contains("freezeWorldMatrix")) {
+  if (json_util::has_key(parsedMesh, "freezeWorldMatrix")) {
     mesh->_waitingFreezeWorldMatrix
-      = Json::GetBool(parsedMesh, "freezeWorldMatrix");
+      = json_util::get_bool(parsedMesh, "freezeWorldMatrix");
   }
 
   // Parent
-  if (parsedMesh.contains("parentId")) {
-    mesh->_waitingParentId = Json::GetString(parsedMesh, "parentId");
+  if (json_util::has_key(parsedMesh, "parentId")) {
+    mesh->_waitingParentId = json_util::get_string(parsedMesh, "parentId");
   }
 
   // Actions
-  if (parsedMesh.contains("actions")) {
-    mesh->_waitingActions = Json::GetArray(parsedMesh, "actions");
+  if (json_util::has_key(parsedMesh, "actions")) {
+    mesh->_waitingActions = json_util::get_array<json>(parsedMesh, "actions");
   }
 
   // Overlay
-  if (parsedMesh.contains("overlayAlpha")) {
-    mesh->overlayAlpha = Json::GetNumber(parsedMesh, "overlayAlpha", 0.5f);
+  if (json_util::has_key(parsedMesh, "overlayAlpha")) {
+    mesh->overlayAlpha
+      = json_util::get_number(parsedMesh, "overlayAlpha", 0.5f);
   }
 
-  if (parsedMesh.contains("overlayColor")) {
-    mesh->overlayColor
-      = Color3::FromArray(Json::ToArray<float>(parsedMesh, "overlayColor"));
+  if (json_util::has_key(parsedMesh, "overlayColor")) {
+    mesh->overlayColor = Color3::FromArray(
+      json_util::get_array<float>(parsedMesh, "overlayColor"));
   }
 
-  if (parsedMesh.contains("renderOverlay")) {
-    mesh->renderOverlay = Json::GetBool(parsedMesh, "renderOverlay");
+  if (json_util::has_key(parsedMesh, "renderOverlay")) {
+    mesh->renderOverlay = json_util::get_bool(parsedMesh, "renderOverlay");
   }
 
   // Geometry
-  mesh->isUnIndexed    = Json::GetBool(parsedMesh, "isUnIndexed", false);
-  mesh->hasVertexAlpha = Json::GetBool(parsedMesh, "hasVertexAlpha", false);
+  mesh->isUnIndexed = json_util::get_bool(parsedMesh, "isUnIndexed", false);
+  mesh->hasVertexAlpha
+    = json_util::get_bool(parsedMesh, "hasVertexAlpha", false);
 
-  if (parsedMesh.contains("delayLoadingFile")) {
+  if (json_util::has_key(parsedMesh, "delayLoadingFile")) {
     mesh->delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     mesh->delayLoadingFile
-      = rootUrl + Json::GetString(parsedMesh, "delayLoadingFile");
+      = rootUrl + json_util::get_string(parsedMesh, "delayLoadingFile");
     mesh->_boundingInfo = std::make_unique<BoundingInfo>(
       Vector3::FromArray(
-        Json::ToArray<float>(parsedMesh, "boundingBoxMinimum")),
+        json_util::get_array<float>(parsedMesh, "boundingBoxMinimum")),
       Vector3::FromArray(
-        Json::ToArray<float>(parsedMesh, "boundingBoxMaximum")));
+        json_util::get_array<float>(parsedMesh, "boundingBoxMaximum")));
 
-    if (parsedMesh.contains("_binaryInfo")) {
-      mesh->_binaryInfo = Json::GetString(parsedMesh, "_binaryInfo");
+    if (json_util::has_key(parsedMesh, "_binaryInfo")) {
+      mesh->_binaryInfo = json_util::get_string(parsedMesh, "_binaryInfo");
     }
 
     mesh->_delayInfoKinds.clear();
-    if (parsedMesh.contains("hasUVs")) {
+    if (json_util::has_key(parsedMesh, "hasUVs")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UVKind);
     }
 
-    if (parsedMesh.contains("hasUVs2")) {
+    if (json_util::has_key(parsedMesh, "hasUVs2")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV2Kind);
     }
 
-    if (parsedMesh.contains("hasUVs3")) {
+    if (json_util::has_key(parsedMesh, "hasUVs3")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV3Kind);
     }
 
-    if (parsedMesh.contains("hasUVs4")) {
+    if (json_util::has_key(parsedMesh, "hasUVs4")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV4Kind);
     }
 
-    if (parsedMesh.contains("hasUVs5")) {
+    if (json_util::has_key(parsedMesh, "hasUVs5")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV5Kind);
     }
 
-    if (parsedMesh.contains("hasUVs6")) {
+    if (json_util::has_key(parsedMesh, "hasUVs6")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV6Kind);
     }
 
-    if (parsedMesh.contains("hasColors")) {
+    if (json_util::has_key(parsedMesh, "hasColors")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::ColorKind);
     }
 
-    if (parsedMesh.contains("hasMatricesIndices")) {
+    if (json_util::has_key(parsedMesh, "hasMatricesIndices")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::MatricesIndicesKind);
     }
 
-    if (parsedMesh.contains("hasMatricesWeights")) {
+    if (json_util::has_key(parsedMesh, "hasMatricesWeights")) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::MatricesWeightsKind);
     }
 
@@ -2253,8 +2256,8 @@ MeshPtr Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
   }
 
   // Material
-  if (parsedMesh.contains("materialId")) {
-    mesh->setMaterialByID(Json::GetString(parsedMesh, "materialId"));
+  if (json_util::has_key(parsedMesh, "materialId")) {
+    mesh->setMaterialByID(json_util::get_string(parsedMesh, "materialId"));
   }
   else {
     mesh->material = nullptr;
@@ -2262,102 +2265,107 @@ MeshPtr Mesh::Parse(const Json::value& parsedMesh, Scene* scene,
 
   // Morph targets
   const int morphTargetManagerId
-    = Json::GetNumber(parsedMesh, "morphTargetManagerId", -1);
+    = json_util::get_number(parsedMesh, "morphTargetManagerId", -1);
   if (morphTargetManagerId > -1) {
     mesh->morphTargetManager = scene->getMorphTargetManagerById(
       static_cast<unsigned>(morphTargetManagerId));
   }
 
   // Skeleton
-  if (parsedMesh.contains("skeletonId")) {
-    std::string parsedSkeletonId = Json::GetString(parsedMesh, "skeletonId");
+  if (json_util::has_key(parsedMesh, "skeletonId")) {
+    std::string parsedSkeletonId
+      = json_util::get_string(parsedMesh, "skeletonId");
     if (!parsedSkeletonId.empty()) {
       mesh->skeleton = scene->getLastSkeletonByID(parsedSkeletonId);
-      if (parsedMesh.contains("numBoneInfluencers")) {
+      if (json_util::has_key(parsedMesh, "numBoneInfluencers")) {
         mesh->numBoneInfluencers
-          = Json::GetNumber(parsedMesh, "numBoneInfluencers", 0u);
+          = json_util::get_number(parsedMesh, "numBoneInfluencers", 0u);
       }
     }
   }
 
   // Animations
-  if (parsedMesh.contains("animations")) {
-    for (auto& parsedAnimation : Json::GetArray(parsedMesh, "animations")) {
+  if (json_util::has_key(parsedMesh, "animations")) {
+    for (auto& parsedAnimation :
+         json_util::get_array<json>(parsedMesh, "animations")) {
       mesh->animations.emplace_back(Animation::Parse(parsedAnimation));
     }
     Node::ParseAnimationRanges(*mesh, parsedMesh, scene);
   }
 
-  if (parsedMesh.contains("autoAnimate")) {
-    scene->beginAnimation(mesh,
-                          Json::GetNumber(parsedMesh, "autoAnimateFrom", 0),
-                          Json::GetNumber(parsedMesh, "autoAnimateTo", 0),
-                          Json::GetBool(parsedMesh, "autoAnimateLoop", false),
-                          Json::GetNumber(parsedMesh, "autoAnimateSpeed", 1.f));
+  if (json_util::has_key(parsedMesh, "autoAnimate")) {
+    scene->beginAnimation(
+      mesh, json_util::get_number(parsedMesh, "autoAnimateFrom", 0),
+      json_util::get_number(parsedMesh, "autoAnimateTo", 0),
+      json_util::get_bool(parsedMesh, "autoAnimateLoop", false),
+      json_util::get_number(parsedMesh, "autoAnimateSpeed", 1.f));
   }
 
   // Layer Mask
-  if (parsedMesh.contains("layerMask")) {
-    auto layerMask = Json::GetString(parsedMesh, "layerMask");
+  if (json_util::has_key(parsedMesh, "layerMask")) {
+    auto layerMask = json_util::get_string(parsedMesh, "layerMask");
     if (!layerMask.empty()) {
       mesh->layerMask = static_cast<unsigned>(std::stoi(layerMask));
     }
   }
   else {
     mesh->layerMask = static_cast<unsigned>(
-      Json::GetNumber(parsedMesh, "layerMask", 0x0FFFFFFF));
+      json_util::get_number(parsedMesh, "layerMask", 0x0FFFFFFF));
   }
 
   // Instances
-  if (parsedMesh.contains("instances")) {
-    for (auto& parsedInstance : Json::GetArray(parsedMesh, "instances")) {
+  if (json_util::has_key(parsedMesh, "instances")) {
+    for (auto& parsedInstance :
+         json_util::get_array<json>(parsedMesh, "instances")) {
       auto instance
-        = mesh->createInstance(Json::GetString(parsedInstance, "name"));
+        = mesh->createInstance(json_util::get_string(parsedInstance, "name"));
 
-      if (parsedInstance.contains("id")) {
-        instance->id = Json::GetString(parsedInstance, "id");
+      if (json_util::has_key(parsedInstance, "id")) {
+        instance->id = json_util::get_string(parsedInstance, "id");
       }
 
       // Tags.AddTagsTo(instance, parsedInstance.tags);
 
-      mesh->position
-        = Vector3::FromArray(Json::ToArray<float>(parsedInstance, "position"));
+      mesh->position = Vector3::FromArray(
+        json_util::get_array<float>(parsedInstance, "position"));
 
-      if (parsedInstance.contains("parentId")) {
+      if (json_util::has_key(parsedInstance, "parentId")) {
         instance->_waitingParentId
-          = Json::GetString(parsedInstance, "parentId");
+          = json_util::get_string(parsedInstance, "parentId");
       }
 
-      if (parsedInstance.contains("rotationQuaternion")) {
+      if (json_util::has_key(parsedInstance, "rotationQuaternion")) {
         instance->rotationQuaternion = Quaternion::FromArray(
-          Json::ToArray<float>(parsedInstance, "rotationQuaternion"));
+          json_util::get_array<float>(parsedInstance, "rotationQuaternion"));
       }
-      else if (parsedInstance.contains("rotation")) {
+      else if (json_util::has_key(parsedInstance, "rotation")) {
         instance->rotation = Vector3::FromArray(
-          Json::ToArray<float>(parsedInstance, "rotation"));
+          json_util::get_array<float>(parsedInstance, "rotation"));
       }
 
-      if (parsedMesh.contains("scaling")) {
-        instance->position
-          = Vector3::FromArray(Json::ToArray<float>(parsedInstance, "scaling"));
+      if (json_util::has_key(parsedMesh, "scaling")) {
+        instance->position = Vector3::FromArray(
+          json_util::get_array<float>(parsedInstance, "scaling"));
       }
 
       instance->checkCollisions
-        = Json::GetBool(parsedInstance, "checkCollisions");
+        = json_util::get_bool(parsedInstance, "checkCollisions");
 
-      if (parsedMesh.contains("animations")) {
-        for (auto& parsedAnimation : Json::GetArray(parsedMesh, "animations")) {
+      if (json_util::has_key(parsedMesh, "animations")) {
+        for (auto& parsedAnimation :
+             json_util::get_array<json>(parsedMesh, "animations")) {
           instance->animations.emplace_back(Animation::Parse(parsedAnimation));
         }
         Node::ParseAnimationRanges(*instance, parsedMesh, scene);
 
-        if (parsedMesh.contains("autoAnimate")
-            && Json::GetBool(parsedMesh, "autoAnimate")) {
+        if (json_util::has_key(parsedMesh, "autoAnimate")
+            && json_util::get_bool(parsedMesh, "autoAnimate")) {
           scene->beginAnimation(
-            instance, Json::GetNumber<int>(parsedMesh, "autoAnimateFrom", 0),
-            Json::GetNumber<int>(parsedMesh, "autoAnimateTo", 0),
-            Json::GetBool(parsedMesh, "autoAnimateLoop"),
-            Json::GetNumber<float>(parsedMesh, "autoAnimateSpeed", 1.0));
+            instance,
+            json_util::get_number<int>(parsedMesh, "autoAnimateFrom", 0),
+            json_util::get_number<int>(parsedMesh, "autoAnimateTo", 0),
+            json_util::get_bool(parsedMesh, "autoAnimateLoop"),
+            json_util::get_number<float>(parsedMesh, "autoAnimateSpeed", 1.0));
         }
       }
     }

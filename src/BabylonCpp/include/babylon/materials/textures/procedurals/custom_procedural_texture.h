@@ -1,9 +1,12 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_PROCEDURALS_CUSTOM_PROCEDURAL_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_PROCEDURALS_CUSTOM_PROCEDURAL_TEXTURE_H
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_api.h>
-#include <babylon/core/json.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -41,7 +44,7 @@ private:
   bool _animate;
   float _time;
   bool _configSet;
-  Json::value _config;
+  json _config;
   std::string _texturePath;
 
 }; // end of class CustomProceduralTexture

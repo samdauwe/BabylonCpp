@@ -1,5 +1,6 @@
 #include <babylon/mesh/primitivegeometries/plane_geometry.h>
 
+#include <babylon/core/json_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -34,27 +35,26 @@ GeometryPtr PlaneGeometry::copy(const std::string& _id)
                             side);
 }
 
-Json::object PlaneGeometry::serialize() const
+json PlaneGeometry::serialize() const
 {
   auto serializationObject = _PrimitiveGeometry::serialize();
 
-  serializationObject["size"] = picojson::value(static_cast<double>(size));
+  serializationObject["size"] = size;
 
   return serializationObject;
 }
 
-PlaneGeometryPtr PlaneGeometry::Parse(const Json::value& parsedPlane,
-                                      Scene* scene)
+PlaneGeometryPtr PlaneGeometry::Parse(const json& parsedPlane, Scene* scene)
 {
-  const auto parsedPlaneId = Json::GetString(parsedPlane, "id");
+  const auto parsedPlaneId = json_util::get_string(parsedPlane, "id");
   if (parsedPlaneId.empty() || scene->getGeometryByID(parsedPlaneId)) {
     return nullptr; // null since geometry could be something else than a
                     // plane...
   }
 
   return PlaneGeometry::New(
-    parsedPlaneId, scene, Json::GetNumber(parsedPlane, "size", 1.f),
-    Json::GetBool(parsedPlane, "canBeRegenerated", true), nullptr);
+    parsedPlaneId, scene, json_util::get_number(parsedPlane, "size", 1.f),
+    json_util::get_bool(parsedPlane, "canBeRegenerated", true), nullptr);
 }
 
 } // end of namespace BABYLON

@@ -228,7 +228,7 @@ public:
    * @brief Serializes the current light into a Serialization object.
    * @returns the serialized object.
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Forces the meshes to update their light related information in their
@@ -281,7 +281,7 @@ public:
    * @param scene The scene to create the parsed light in
    * @returns the created light after parsing
    */
-  static LightPtr Parse(const Json::value& parsedLight, Scene* scene);
+  static LightPtr Parse(const json& parsedLight, Scene* scene);
 
 protected:
   /**

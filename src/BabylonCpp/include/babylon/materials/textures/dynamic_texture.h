@@ -100,7 +100,7 @@ public:
    * the dynamic texture is serialized.
    * @returns a serialized dynamic texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Hidden

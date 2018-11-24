@@ -1,9 +1,12 @@
 #ifndef BABYLON_MATERIALS_TEXTURES_PROCEDURALS_NOISE_PROCEDURAL_TEXTURE_H
 #define BABYLON_MATERIALS_TEXTURES_PROCEDURALS_NOISE_PROCEDURAL_TEXTURE_H
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
-#include <babylon/core/json.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -33,7 +36,7 @@ public:
    * @brief Serializes this noise procedural texture
    * @returns a serialized noise procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a NoiseProceduralTexture from parsed noise procedural
@@ -44,7 +47,7 @@ public:
    * information
    * @returns a parsed NoiseProceduralTexture
    */
-  static void Parse(const Json::value& serializationObject, Scene* scene,
+  static void Parse(const json& serializationObject, Scene* scene,
                     const std::string& rootUrl);
 
 protected:

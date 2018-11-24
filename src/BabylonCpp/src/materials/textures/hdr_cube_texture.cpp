@@ -1,6 +1,7 @@
 #include <babylon/materials/textures/hdr_cube_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/engine_constants.h>
@@ -141,16 +142,16 @@ void HDRCubeTexture::setReflectionTextureMatrix(const Matrix& value)
   _textureMatrix = value;
 }
 
-HDRCubeTexture* HDRCubeTexture::Parse(const Json::value& /*parsedTexture*/,
+HDRCubeTexture* HDRCubeTexture::Parse(const json& /*parsedTexture*/,
                                       Scene* /*scene*/,
                                       const std::string& /*rootUrl*/)
 {
   return nullptr;
 }
 
-Json::object HDRCubeTexture::serialize() const
+json HDRCubeTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 } // end of namespace BABYLON

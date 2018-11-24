@@ -2,16 +2,18 @@
 #define BABYLON_ENGINE_NODE_H
 
 #include <functional>
+#include <nlohmann/json.hpp>
 
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
 #include <babylon/behaviors/ibehavior_aware.h>
-#include <babylon/core/json.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -30,9 +32,8 @@ using TransformNodePtr = std::shared_ptr<TransformNode>;
 /**
  * Defines how a node can be built from a string name.
  */
-using NodeConstructor
-  = std::function<NodePtr(const std::string& name, Scene* scene,
-                          const std::optional<Json::value>& options)>;
+using NodeConstructor = std::function<NodePtr(
+  const std::string& name, Scene* scene, const std::optional<json>& options)>;
 
 /**
  * @brief Node is the basic class for all scene objects (Mesh, Light, Camera,
@@ -67,7 +68,7 @@ public:
    */
   static std::function<NodePtr()>
   Construct(const std::string& type, const std::string& name, Scene* scene,
-            const std::optional<Json::value>& options = std::nullopt);
+            const std::optional<json>& options = std::nullopt);
 
 public:
   /**
@@ -385,7 +386,7 @@ public:
    * @param parsedNode defines the serialization object to read data from
    * @param scene defines the hosting scene
    */
-  static void ParseAnimationRanges(Node& node, const Json::value& parsedNode,
+  static void ParseAnimationRanges(Node& node, const json& parsedNode,
                                    Scene* scene);
 
 protected:
@@ -441,7 +442,7 @@ public:
   /**
    * Gets or sets an object used to store user defined information for the node
    */
-  Json::object metadata;
+  json metadata;
 
   /**
    * Gets or sets a boolean used to define if the node must be serialized

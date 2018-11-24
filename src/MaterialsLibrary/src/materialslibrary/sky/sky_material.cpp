@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/sky/sky_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -234,9 +235,9 @@ MaterialPtr SkyMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object SkyMaterial::serialize() const
+json SkyMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string SkyMaterial::getClassName() const
@@ -244,7 +245,7 @@ const std::string SkyMaterial::getClassName() const
   return "SkyMaterial";
 }
 
-SkyMaterial* SkyMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
+SkyMaterial* SkyMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                 const std::string& /*rootUrl*/)
 {
   return nullptr;

@@ -1,8 +1,9 @@
 #include <babylon/layer/highlight_layer.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/core/json.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
@@ -552,14 +553,14 @@ std::string HighlightLayer::getClassName() const
   return "HighlightLayer";
 }
 
-Json::object HighlightLayer::serialize() const
+json HighlightLayer::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-HighlightLayer*
-HighlightLayer::Parse(const Json::value& /*parsedHightlightLayer*/,
-                      Scene* /*scene*/, const std::string& /*rootUrl*/)
+HighlightLayer* HighlightLayer::Parse(const json& /*parsedHightlightLayer*/,
+                                      Scene* /*scene*/,
+                                      const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

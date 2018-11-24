@@ -55,13 +55,12 @@ public:
    * @return A color gradind texture
    */
   static std::unique_ptr<ColorGradingTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
   /**
    * @brief Serializes the LUT texture to json format.
    */
-  Json::object serialize() const;
+  json serialize() const;
 
 private:
   /**

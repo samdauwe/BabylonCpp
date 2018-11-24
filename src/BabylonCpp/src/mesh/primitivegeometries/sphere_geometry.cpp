@@ -1,5 +1,6 @@
 #include <babylon/mesh/primitivegeometries/sphere_geometry.h>
 
+#include <babylon/core/json_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -37,31 +38,28 @@ GeometryPtr SphereGeometry::copy(const std::string& _id)
                              canBeRegenerated(), nullptr, side);
 }
 
-Json::object SphereGeometry::serialize() const
+json SphereGeometry::serialize() const
 {
   auto serializationObject = _PrimitiveGeometry::serialize();
 
-  serializationObject["segments"]
-    = picojson::value(static_cast<double>(segments));
-  serializationObject["diameter"]
-    = picojson::value(static_cast<double>(diameter));
+  serializationObject["segments"] = segments;
+  serializationObject["diameter"] = diameter;
 
   return serializationObject;
 }
 
-SphereGeometryPtr SphereGeometry::Parse(const Json::value& parsedSphere,
-                                        Scene* scene)
+SphereGeometryPtr SphereGeometry::Parse(const json& parsedSphere, Scene* scene)
 {
-  const auto parsedSphereId = Json::GetString(parsedSphere, "id");
+  const auto parsedSphereId = json_util::get_string(parsedSphere, "id");
   if (parsedSphereId.empty() || scene->getGeometryByID(parsedSphereId)) {
     return nullptr; // null since geometry could be something else than a
                     // sphere...
   }
 
   return SphereGeometry::New(
-    parsedSphereId, scene, Json::GetNumber(parsedSphere, "segments", 32u),
-    Json::GetNumber(parsedSphere, "diameter", 1.f),
-    Json::GetBool(parsedSphere, "canBeRegenerated", true), nullptr);
+    parsedSphereId, scene, json_util::get_number(parsedSphere, "segments", 32u),
+    json_util::get_number(parsedSphere, "diameter", 1.f),
+    json_util::get_bool(parsedSphere, "canBeRegenerated", true), nullptr);
 }
 
 } // end of namespace BABYLON

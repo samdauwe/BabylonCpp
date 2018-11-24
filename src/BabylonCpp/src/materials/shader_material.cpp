@@ -283,9 +283,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back(
-      "#define BonesPerMesh "
-      + std::to_string(mesh->skeleton()->bones.size() + 1));
+    defines.emplace_back("#define BonesPerMesh "
+                         + std::to_string(mesh->skeleton()->bones.size() + 1));
     fallbacks->addCPUSkinningFallback(0, mesh);
 
     if (!stl_util::contains(_options.uniforms, "mBones")) {
@@ -491,16 +490,17 @@ bool ShaderMaterial::hasTexture(const BaseTexturePtr& texture) const
 
   auto it1
     = std::find_if(_textures.begin(), _textures.end(),
-                     [&texture](const std::pair<std::string, TexturePtr>& tex) {
-                       return tex.second == texture;
-                     });
+                   [&texture](const std::pair<std::string, TexturePtr>& tex) {
+                     return tex.second == texture;
+                   });
   if (it1 != _textures.end()) {
     return true;
   }
 
   auto it2 = std::find_if(
     _textureArrays.begin(), _textureArrays.end(),
-    [&texture](const std::pair<std::string, std::vector<BaseTexturePtr>>& textures) {
+    [&texture](
+      const std::pair<std::string, std::vector<BaseTexturePtr>>& textures) {
       return stl_util::contains(textures.second, texture);
     });
   if (it2 != _textureArrays.end()) {
@@ -535,13 +535,13 @@ void ShaderMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }
 
-Json::object ShaderMaterial::serialize() const
+json ShaderMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<ShaderMaterial>
-ShaderMaterial::Parse(const Json::value& /*source*/, Scene* /*scene*/,
+ShaderMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                       const std::string& /*url*/)
 {
   return nullptr;

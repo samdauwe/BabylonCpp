@@ -1,5 +1,6 @@
 #include <babylon/mesh/primitivegeometries/box_geometry.h>
 
+#include <babylon/core/json_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -33,25 +34,25 @@ GeometryPtr BoxGeometry::copy(const std::string& _id)
                           side);
 }
 
-Json::object BoxGeometry::serialize() const
+json BoxGeometry::serialize() const
 {
   auto serializationObject = _PrimitiveGeometry::serialize();
 
-  serializationObject["size"] = picojson::value(static_cast<double>(size));
+  serializationObject["size"] = size;
 
   return serializationObject;
 }
 
-BoxGeometryPtr BoxGeometry::Parse(const Json::value& parsedBox, Scene* scene)
+BoxGeometryPtr BoxGeometry::Parse(const json& parsedBox, Scene* scene)
 {
-  const auto parsedBoxId = Json::GetString(parsedBox, "id");
+  const auto parsedBoxId = json_util::get_string(parsedBox, "id");
   if (parsedBoxId.empty() || scene->getGeometryByID(parsedBoxId)) {
     return nullptr; // null since geometry could be something else than a box...
   }
 
   return BoxGeometry::New(
-    parsedBoxId, scene, Json::GetNumber(parsedBox, "size", 1.f),
-    Json::GetBool(parsedBox, "canBeRegenerated", true), nullptr);
+    parsedBoxId, scene, json_util::get_number(parsedBox, "size", 1.f),
+    json_util::get_bool(parsedBox, "canBeRegenerated", true), nullptr);
 }
 
 } // end of namespace BABYLON

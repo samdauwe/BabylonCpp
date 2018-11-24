@@ -1,7 +1,8 @@
 #include <babylon/layer/glow_layer.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -378,13 +379,13 @@ std::string GlowLayer::getClassName() const
   return "GlowLayer";
 }
 
-Json::object GlowLayer::serialize() const
+json GlowLayer::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-GlowLayer* GlowLayer::Parse(const Json::value& /*parsedGlowLayer*/,
-                            Scene* /*scene*/, const std::string& /*rootUrl*/)
+GlowLayer* GlowLayer::Parse(const json& /*parsedGlowLayer*/, Scene* /*scene*/,
+                            const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

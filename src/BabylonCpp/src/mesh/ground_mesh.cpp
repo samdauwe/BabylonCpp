@@ -1,7 +1,7 @@
 #include <babylon/mesh/ground_mesh.h>
 
 #include <babylon/collisions/picking_info.h>
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/ray.h>
@@ -233,28 +233,29 @@ GroundMesh& GroundMesh::_computeHeightQuads()
   return *this;
 }
 
-Json::object GroundMesh::serialize(Json::object& /*serializationObject*/) const
+json GroundMesh::serialize(json& /*serializationObject*/) const
 {
-  return Json::object();
+  return json();
 }
 
-GroundMeshPtr GroundMesh::Parse(const Json::value& parsedMesh, Scene* scene)
+GroundMeshPtr GroundMesh::Parse(const json& parsedMesh, Scene* scene)
 {
-  auto result = GroundMesh::New(Json::GetString(parsedMesh, "name"), scene);
+  auto result
+    = GroundMesh::New(json_util::get_string(parsedMesh, "name"), scene);
 
   result->_subdivisionsX
-    = Json::GetNumber<size_t>(parsedMesh, "subdivisionsX", 1);
+    = json_util::get_number<size_t>(parsedMesh, "subdivisionsX", 1);
   result->_subdivisionsY
-    = Json::GetNumber<size_t>(parsedMesh, "subdivisionsY", 1);
+    = json_util::get_number<size_t>(parsedMesh, "subdivisionsY", 1);
 
-  result->_minX = Json::GetNumber(parsedMesh, "minX", 1.f);
-  result->_maxX = Json::GetNumber(parsedMesh, "maxX", 1.f);
+  result->_minX = json_util::get_number(parsedMesh, "minX", 1.f);
+  result->_maxX = json_util::get_number(parsedMesh, "maxX", 1.f);
 
-  result->_minZ = Json::GetNumber(parsedMesh, "minZ", 1.f);
-  result->_maxZ = Json::GetNumber(parsedMesh, "maxZ", 1.f);
+  result->_minZ = json_util::get_number(parsedMesh, "minZ", 1.f);
+  result->_maxZ = json_util::get_number(parsedMesh, "maxZ", 1.f);
 
-  result->_width  = Json::GetNumber(parsedMesh, "width", 1.f);
-  result->_height = Json::GetNumber(parsedMesh, "height", 1.f);
+  result->_width  = json_util::get_number(parsedMesh, "width", 1.f);
+  result->_height = json_util::get_number(parsedMesh, "height", 1.f);
 
   return result;
 }

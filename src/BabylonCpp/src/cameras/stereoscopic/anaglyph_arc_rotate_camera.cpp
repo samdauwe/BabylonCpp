@@ -1,6 +1,6 @@
 #include <babylon/cameras/stereoscopic/anaglyph_arc_rotate_camera.h>
 
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 
 namespace BABYLON {
 
@@ -10,11 +10,11 @@ void AnaglyphArcRotateCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "AnaglyphArcRotateCamera", [](const std::string& name, Scene* scene,
-                                  const std::optional<Json::value>& options) {
+                                  const std::optional<json>& options) {
       float interaxialDistance = 0.f;
       if (options) {
         interaxialDistance
-          = Json::GetNumber<float>(*options, "interaxial_distance", 0.f);
+          = json_util::get_number<float>(*options, "interaxial_distance");
       }
       return AnaglyphArcRotateCamera::New(name, 0.f, 0.f, 1.f, Vector3::Zero(),
                                           interaxialDistance, scene);
@@ -28,11 +28,9 @@ AnaglyphArcRotateCamera::AnaglyphArcRotateCamera(
     : ArcRotateCamera{name, alpha, beta, radius, target, scene}
 {
   interaxialDistance = iInteraxialDistance;
-  Json::object rigParams;
-  rigParams["interaxialDistance"]
-    = picojson::value(static_cast<double>(interaxialDistance));
-  setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH(),
-                   Json::value(rigParams));
+  json rigParams;
+  rigParams["interaxialDistance"] = interaxialDistance;
+  setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH(), rigParams);
 }
 
 AnaglyphArcRotateCamera::~AnaglyphArcRotateCamera()

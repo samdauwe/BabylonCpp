@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/marble/marble_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/marble/marble_procedural_texture_fragment_fx.h>
 
@@ -94,14 +95,14 @@ void MarbleProceduralTexture::set_jointColor(const Color3& value)
   updateShaderUniforms();
 }
 
-Json::object MarbleProceduralTexture::serialize() const
+json MarbleProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<MarbleProceduralTexture>
-MarbleProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                               Scene* /*scene*/, const std::string& /*rootUrl*/)
+MarbleProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
+                               const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

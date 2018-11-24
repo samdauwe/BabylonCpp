@@ -2,6 +2,7 @@
 #define BABYLON_BONES_SKELETON_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
@@ -10,11 +11,7 @@
 #include <babylon/math/matrix.h>
 #include <babylon/tools/observable.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -25,12 +22,6 @@ class IAnimatable;
 class Scene;
 using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 using BonePtr        = std::shared_ptr<Bone>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Class used to handle skinning animations.
@@ -193,7 +184,7 @@ public:
    * @brief Serialize the skeleton in a JSON object.
    * @returns a JSON object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   // Statics
 
@@ -203,7 +194,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new skeleton
    */
-  static Skeleton* Parse(const Json::value& parsedSkeleton, Scene* scene);
+  static Skeleton* Parse(const json& parsedSkeleton, Scene* scene);
 
   /**
    * @brief Compute all node absolute transforms.

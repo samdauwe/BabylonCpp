@@ -3,15 +3,12 @@
 
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
 #include <babylon/babylon_api.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -20,12 +17,6 @@ class Scene;
 class SubEmitter;
 using ParticleSystemPtr = std::shared_ptr<ParticleSystem>;
 using SubEmitterPtr     = std::shared_ptr<SubEmitter>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Type of sub emitter.
@@ -64,7 +55,7 @@ public:
    * @brief Serialize current object to a JSON object.
    * @returns the serialized object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a new SubEmitter from a serialized JSON version.
@@ -73,7 +64,7 @@ public:
    * @param rootUrl defines the rootUrl for data loading
    * @returns a new SubEmitter
    */
-  static SubEmitterPtr Parse(const Json::value& parsedLight, Scene* scene,
+  static SubEmitterPtr Parse(const json& parsedLight, Scene* scene,
                              const std::string& rootUrl);
 
   /**

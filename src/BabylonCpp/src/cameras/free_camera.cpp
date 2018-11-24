@@ -1,10 +1,11 @@
 #include <babylon/cameras/free_camera.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/universal_camera.h>
 #include <babylon/collisions/collider.h>
 #include <babylon/collisions/icollision_coordinator.h>
-#include <babylon/core/json.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -18,7 +19,7 @@ void FreeCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "FreeCamera", [](const std::string& name, Scene* scene,
-                     const std::optional<Json::value>& /*options*/) {
+                     const std::optional<json>& /*options*/) {
       // Forcing to use the Universal camera
       return UniversalCamera::New(name, Vector3::Zero(), scene);
     });
@@ -184,9 +185,9 @@ const std::string FreeCamera::getClassName() const
   return "FreeCamera";
 }
 
-Json::object FreeCamera::serialize() const
+json FreeCamera::serialize() const
 {
-  return Json::object();
+  return json();
 }
 
 } // end of namespace BABYLON

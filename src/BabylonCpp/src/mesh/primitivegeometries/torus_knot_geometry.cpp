@@ -1,5 +1,6 @@
 #include <babylon/mesh/primitivegeometries/torus_knot_geometry.h>
 
+#include <babylon/core/json_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/mesh/vertex_data.h>
 #include <babylon/mesh/vertex_data_options.h>
@@ -49,39 +50,38 @@ GeometryPtr TorusKnotGeometry::copy(const std::string& _id)
                                 nullptr, side);
 }
 
-Json::object TorusKnotGeometry::serialize() const
+json TorusKnotGeometry::serialize() const
 {
   auto serializationObject = _PrimitiveGeometry::serialize();
 
-  serializationObject["radius"] = picojson::value(static_cast<double>(radius));
-  serializationObject["tube"]   = picojson::value(static_cast<double>(tube));
-  serializationObject["radialSegments"]
-    = picojson::value(static_cast<double>(radialSegments));
-  serializationObject["tubularSegments"]
-    = picojson::value(static_cast<double>(tubularSegments));
-  serializationObject["p"] = picojson::value(static_cast<double>(p));
-  serializationObject["q"] = picojson::value(static_cast<double>(q));
+  serializationObject["radius"]          = radius;
+  serializationObject["tube"]            = tube;
+  serializationObject["radialSegments"]  = radialSegments;
+  serializationObject["tubularSegments"] = tubularSegments;
+  serializationObject["p"]               = p;
+  serializationObject["q"]               = q;
 
   return serializationObject;
 }
 
-TorusKnotGeometryPtr
-TorusKnotGeometry::Parse(const Json::value& parsedTorusKnot, Scene* scene)
+TorusKnotGeometryPtr TorusKnotGeometry::Parse(const json& parsedTorusKnot,
+                                              Scene* scene)
 {
-  const auto parsedTorusKnotId = Json::GetString(parsedTorusKnot, "id");
+  const auto parsedTorusKnotId = json_util::get_string(parsedTorusKnot, "id");
   if (parsedTorusKnotId.empty() || scene->getGeometryByID(parsedTorusKnotId)) {
     return nullptr; // null since geometry could be something else than a torus
                     // knot...
   }
 
   return TorusKnotGeometry::New(
-    parsedTorusKnotId, scene, Json::GetNumber(parsedTorusKnot, "radius", 2.f),
-    Json::GetNumber(parsedTorusKnot, "tube", 0.5f),
-    Json::GetNumber(parsedTorusKnot, "radialSegments", 32u),
-    Json::GetNumber(parsedTorusKnot, "tubularSegments", 32u),
-    Json::GetNumber(parsedTorusKnot, "p", 2.f),
-    Json::GetNumber(parsedTorusKnot, "q", 3.f),
-    Json::GetBool(parsedTorusKnot, "canBeRegenerated", true), nullptr);
+    parsedTorusKnotId, scene,
+    json_util::get_number(parsedTorusKnot, "radius", 2.f),
+    json_util::get_number(parsedTorusKnot, "tube", 0.5f),
+    json_util::get_number(parsedTorusKnot, "radialSegments", 32u),
+    json_util::get_number(parsedTorusKnot, "tubularSegments", 32u),
+    json_util::get_number(parsedTorusKnot, "p", 2.f),
+    json_util::get_number(parsedTorusKnot, "q", 3.f),
+    json_util::get_bool(parsedTorusKnot, "canBeRegenerated", true), nullptr);
 }
 
 } // end of namespace BABYLON

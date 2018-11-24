@@ -4,6 +4,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/directional_light.h>
@@ -1534,9 +1535,9 @@ MaterialPtr StandardMaterial::clone(const std::string& _name,
   return standardMaterial;
 }
 
-Json::object StandardMaterial::serialize() const
+json StandardMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 BaseTexturePtr& StandardMaterial::get_diffuseTexture()
@@ -2148,12 +2149,11 @@ void StandardMaterial::set_cameraColorCurves(
   _imageProcessingConfiguration->colorCurves = value;
 }
 
-StandardMaterialPtr StandardMaterial::Parse(const Json::value& source,
-                                            Scene* scene,
+StandardMaterialPtr StandardMaterial::Parse(const json& source, Scene* scene,
                                             const std::string& rootUrl)
 {
   return SerializationHelper::Parse(
-    StandardMaterial::New(Json::GetString(source, "name"), scene), source,
+    StandardMaterial::New(json_util::get_string(source, "name"), scene), source,
     scene, rootUrl);
 }
 

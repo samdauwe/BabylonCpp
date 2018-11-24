@@ -19,7 +19,7 @@ void ArcRotateCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "ArcRotateCamera", [](const std::string& name, Scene* scene,
-                          const std::optional<Json::value>& /*options*/) {
+                          const std::optional<json>& /*options*/) {
       return ArcRotateCamera::New(name, 0.f, 0.f, 1.f, Vector3::Zero(), scene);
     });
   ArcRotateCamera::NodeConstructorAdded = true;
@@ -99,9 +99,9 @@ void ArcRotateCamera::_initCache()
 {
   TargetCamera::_initCache();
 
-  _cache._target
-    = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max());
+  _cache._target            = Vector3(std::numeric_limits<float>::max(),
+                           std::numeric_limits<float>::max(),
+                           std::numeric_limits<float>::max());
   _cache.alpha              = 0.f;
   _cache.beta               = 0.f;
   _cache.radius             = 0.f;
@@ -356,8 +356,8 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
 
   // Alpha
   alpha = std::acos(_computationVector.x
-                      / std::sqrt(std::pow(_computationVector.x, 2.f)
-                                    + std::pow(_computationVector.z, 2.f)));
+                    / std::sqrt(std::pow(_computationVector.x, 2.f)
+                                + std::pow(_computationVector.z, 2.f)));
 
   if (_computationVector.z < 0.f) {
     alpha = Math::PI2 - alpha;
@@ -474,7 +474,8 @@ void ArcRotateCamera::set_useFramingBehavior(bool value)
   }
 }
 
-std::unique_ptr<AutoRotationBehavior>& ArcRotateCamera::get_autoRotationBehavior()
+std::unique_ptr<AutoRotationBehavior>&
+ArcRotateCamera::get_autoRotationBehavior()
 {
   return _autoRotationBehavior;
 }
@@ -682,9 +683,9 @@ const std::string ArcRotateCamera::getClassName() const
   return "ArcRotateCamera";
 }
 
-Json::object ArcRotateCamera::serialize() const
+json ArcRotateCamera::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 } // end of namespace BABYLON

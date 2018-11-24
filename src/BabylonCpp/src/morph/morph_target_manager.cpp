@@ -1,6 +1,6 @@
 #include <babylon/morph/morph_target_manager.h>
 
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -124,9 +124,9 @@ void MorphTargetManager::removeTarget(MorphTarget* target)
   }
 }
 
-Json::object MorphTargetManager::serialize()
+json MorphTargetManager::serialize()
 {
-  return Json::object();
+  return nullptr;
 }
 
 void MorphTargetManager::_syncActiveTargets(bool needUpdate)
@@ -190,17 +190,18 @@ void MorphTargetManager::synchronize()
   }
 }
 
-MorphTargetManager*
-MorphTargetManager::Parse(const Json::value& serializationObject, Scene* scene)
+MorphTargetManager* MorphTargetManager::Parse(const json& serializationObject,
+                                              Scene* scene)
 {
   auto result = MorphTargetManager::New(scene);
 
-  result->_uniqueId = Json::GetNumber<unsigned>(serializationObject, "id", 0);
+  result->_uniqueId
+    = json_util::get_number<unsigned>(serializationObject, "id", 0);
 
-  if (serializationObject.contains("targets")
-      && (serializationObject.get("targets").is<picojson::array>())) {
+  if (json_util::has_key(serializationObject, "targets")
+      && (serializationObject["targets"].is_array())) {
     for (auto& targetData :
-         serializationObject.get("targets").get<picojson::array>()) {
+         json_util::get_array<json>(serializationObject, "targets")) {
       result->addTarget(MorphTarget::Parse(targetData));
     }
   }

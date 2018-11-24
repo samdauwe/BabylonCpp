@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/lava/lava_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -411,9 +412,9 @@ MaterialPtr LavaMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object LavaMaterial::serialize() const
+json LavaMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string LavaMaterial::getClassName() const
@@ -421,8 +422,7 @@ const std::string LavaMaterial::getClassName() const
   return "LavaMaterial";
 }
 
-LavaMaterial* LavaMaterial::Parse(const Json::value& /*source*/,
-                                  Scene* /*scene*/,
+LavaMaterial* LavaMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
   return nullptr;

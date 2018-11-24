@@ -1,7 +1,8 @@
 #include <babylon/cameras/target_camera.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
@@ -101,9 +102,9 @@ void TargetCamera::_initCache()
   _cache.lockedTarget = std::make_unique<Vector3>(
     std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
     std::numeric_limits<float>::max());
-  _cache.rotation
-    = Vector3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
-              std::numeric_limits<float>::max());
+  _cache.rotation = Vector3(std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max(),
+                            std::numeric_limits<float>::max());
 }
 
 void TargetCamera::_updateCache(bool ignoreParentClass)
@@ -236,9 +237,9 @@ void TargetCamera::_updatePosition()
 
 void TargetCamera::_checkInputs()
 {
-  bool needToMove   = _decideIfNeedsToMove();
-  bool needToRotate = std::abs(cameraRotation->x) > 0.f
-                      || std::abs(cameraRotation->y) > 0.f;
+  bool needToMove = _decideIfNeedsToMove();
+  bool needToRotate
+    = std::abs(cameraRotation->x) > 0.f || std::abs(cameraRotation->y) > 0.f;
 
   // Move
   if (needToMove) {
@@ -458,9 +459,9 @@ const std::string TargetCamera::getClassName() const
   return "TargetCamera";
 }
 
-Json::object TargetCamera::serialize() const
+json TargetCamera::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 } // end of namespace BABYLON

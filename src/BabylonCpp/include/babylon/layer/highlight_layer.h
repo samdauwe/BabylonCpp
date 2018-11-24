@@ -151,7 +151,7 @@ public:
    * @brief Serializes this Highlight layer.
    * @returns a serialized Highlight layer object
    */
-  Json::object serialize() const override;
+  json serialize() const override;
 
   /**
    * @brief Creates a Highlight layer from parsed Highlight layer data.
@@ -161,8 +161,8 @@ public:
    * information
    * @returns a parsed Highlight layer
    */
-  static HighlightLayer* Parse(const Json::value& parsedHightlightLayer,
-                               Scene* scene, const std::string& rootUrl);
+  static HighlightLayer* Parse(const json& parsedHightlightLayer, Scene* scene,
+                               const std::string& rootUrl);
 
 protected:
   /**

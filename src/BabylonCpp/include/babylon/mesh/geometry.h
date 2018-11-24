@@ -3,16 +3,13 @@
 
 #include <functional>
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -31,12 +28,6 @@ namespace GL {
 class IGLBuffer;
 class IGLVertexArrayObject;
 } // end of namespace GL
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Class used to store geometry data (vertex buffers + index buffer).
@@ -327,13 +318,13 @@ public:
    * @return a JSON representation of the current geometry data (without the
    * vertices data)
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Serialize all vertices data into a JSON oject.
    * @returns a JSON representation of the current geometry data
    */
-  Json::object serializeVerticeData() const;
+  json serializeVerticeData() const;
 
   /** Statics **/
 
@@ -360,13 +351,12 @@ public:
   /**
    * @brief Hidden
    */
-  static void _ImportGeometry(const Json::value& parsedGeometry,
-                              const MeshPtr& mesh);
+  static void _ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh);
 
   /**
    * @brief Hidden
    */
-  static void _CleanMatricesWeights(const Json::value& parsedGeometry,
+  static void _CleanMatricesWeights(const json& parsedGeometry,
                                     const MeshPtr& mesh);
 
   /**
@@ -378,7 +368,7 @@ public:
    * data)
    * @returns the new geometry object
    */
-  static GeometryPtr Parse(const Json::value& parsedVertexData, Scene* scene,
+  static GeometryPtr Parse(const json& parsedVertexData, Scene* scene,
                            const std::string& rootUrl);
 
 protected:
@@ -463,7 +453,7 @@ public:
   /** Hidden */
   std::unique_ptr<BoundingInfo> _boundingInfo;
   /** Hidden */
-  std::function<void(const Json::value& parsedVertexData, Geometry& geometry)>
+  std::function<void(const json& parsedVertexData, Geometry& geometry)>
     _delayLoadingFunction;
   /** Hidden */
   int _softwareSkinningRenderId;

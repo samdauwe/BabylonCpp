@@ -130,7 +130,7 @@ public:
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
                                          bool autoClearDepthStencil);
   RenderTargetTexturePtr clone();
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief This will remove the attached framebuffer objects. The texture will

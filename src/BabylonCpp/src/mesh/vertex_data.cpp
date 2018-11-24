@@ -1,7 +1,7 @@
 #include <babylon/mesh/vertex_data.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/math/axis.h>
 #include <babylon/math/vector2.h>
@@ -439,9 +439,9 @@ void VertexData::_validate()
   }
 }
 
-Json::object VertexData::serialize() const
+json VertexData::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<VertexData>
@@ -2959,92 +2959,97 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
   }
 }
 
-void VertexData::ImportVertexData(const Json::value& parsedVertexData,
+void VertexData::ImportVertexData(const json& parsedVertexData,
                                   Geometry& geometry)
 {
   auto vertexData = std::make_unique<VertexData>();
 
   // positions
-  Float32Array positions = Json::ToArray<float>(parsedVertexData, "positions");
-  if (parsedVertexData.contains("positions")) {
+  Float32Array positions
+    = json_util::get_array<float>(parsedVertexData, "positions");
+  if (json_util::has_key(parsedVertexData, "positions")) {
     vertexData->set(positions, VertexBuffer::PositionKind);
   }
 
   // normals
-  if (parsedVertexData.contains("normals")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "normals"),
+  if (json_util::has_key(parsedVertexData, "normals")) {
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "normals"),
                     VertexBuffer::NormalKind);
   }
 
   // tangents
-  if (parsedVertexData.contains("tangents")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "tangents"),
+  if (json_util::has_key(parsedVertexData, "tangents")) {
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "tangents"),
                     VertexBuffer::TangentKind);
   }
 
   // uvs
-  if (parsedVertexData.contains("uvs")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "uvs"),
+  if (json_util::has_key(parsedVertexData, "uvs")) {
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uvs"),
                     VertexBuffer::UVKind);
   }
 
   // uv2s
-  if (parsedVertexData.contains("uv2s")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "uv2s"),
+  if (json_util::has_key(parsedVertexData, "uv2s")) {
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv2s"),
                     VertexBuffer::UV2Kind);
   }
 
   // uv3s
-  if (parsedVertexData.contains("uv3s")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "uv3s"),
+  if (json_util::has_key(parsedVertexData, "uv3s")) {
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv3s"),
                     VertexBuffer::UV3Kind);
   }
 
   // uv4s
-  if (parsedVertexData.contains("uv4s")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "uv4s"),
+  if (json_util::has_key(parsedVertexData, "uv4s")) {
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv4s"),
                     VertexBuffer::UV4Kind);
   }
 
   // uv5s
-  if (parsedVertexData.contains("uv5s")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "uv5s"),
+  if (json_util::has_key(parsedVertexData, "uv5s")) {
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv5s"),
                     VertexBuffer::UV5Kind);
   }
 
   // uv6s
-  if (parsedVertexData.contains("uv6s")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "uv6s"),
+  if (json_util::has_key(parsedVertexData, "uv6s")) {
+    vertexData->set(json_util::get_array<float>(parsedVertexData, "uv6s"),
                     VertexBuffer::UV6Kind);
   }
 
   // colors
-  if (parsedVertexData.contains("colors")) {
+  if (json_util::has_key(parsedVertexData, "colors")) {
     const Float32Array colors
-      = Json::ToArray<float>(parsedVertexData, "colors");
+      = json_util::get_array<float>(parsedVertexData, "colors");
     vertexData->set(Color4::CheckColors4(colors, positions.size() / 3),
                     VertexBuffer::ColorKind);
   }
 
   // matricesIndices
-  if (parsedVertexData.contains("matricesIndices")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "matricesIndices"),
-                    VertexBuffer::MatricesIndicesKind);
+  if (json_util::has_key(parsedVertexData, "matricesIndices")) {
+    vertexData->set(
+      json_util::get_array<float>(parsedVertexData, "matricesIndices"),
+      VertexBuffer::MatricesIndicesKind);
   }
 
   // matricesWeights
-  if (parsedVertexData.contains("matricesWeights")) {
-    vertexData->set(Json::ToArray<float>(parsedVertexData, "matricesWeights"),
-                    VertexBuffer::MatricesWeightsKind);
+  if (json_util::has_key(parsedVertexData, "matricesWeights")) {
+    vertexData->set(
+      json_util::get_array<float>(parsedVertexData, "matricesWeights"),
+      VertexBuffer::MatricesWeightsKind);
   }
 
   // indices
-  if (parsedVertexData.contains("indices")) {
-    vertexData->indices = Json::ToArray<uint32_t>(parsedVertexData, "indices");
+  if (json_util::has_key(parsedVertexData, "indices")) {
+    vertexData->indices
+      = json_util::get_array<uint32_t>(parsedVertexData, "indices");
   }
 
   geometry.setAllVerticesData(
-    vertexData.get(), Json::GetBool(parsedVertexData, "updatable", false));
+    vertexData.get(),
+    json_util::get_bool(parsedVertexData, "updatable", false));
 }
 
 } // end of namespace BABYLON

@@ -1,6 +1,6 @@
 #include <babylon/particles/emittertypes/point_particle_emitter.h>
 
-#include <babylon/core/json.h>
+#include <babylon/core/json_util.h>
 #include <babylon/materials/effect.h>
 #include <babylon/math/scalar.h>
 
@@ -59,20 +59,22 @@ const char* PointParticleEmitter::getClassName() const
   return "PointParticleEmitter";
 }
 
-Json::object PointParticleEmitter::serialize() const
+json PointParticleEmitter::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-void PointParticleEmitter::parse(const Json::value& serializationObject)
+void PointParticleEmitter::parse(const json& serializationObject)
 {
-  if (serializationObject.contains("direction1")) {
+  if (json_util::has_key(serializationObject, "direction1")) {
     Vector3::FromArrayToRef(
-      Json::ToArray<float>(serializationObject, "direction1"), 0, direction1);
+      json_util::get_array<float>(serializationObject, "direction1"), 0,
+      direction1);
   }
-  if (serializationObject.contains("direction2")) {
+  if (json_util::has_key(serializationObject, "direction2")) {
     Vector3::FromArrayToRef(
-      Json::ToArray<float>(serializationObject, "direction2"), 0, direction2);
+      json_util::get_array<float>(serializationObject, "direction2"), 0,
+      direction2);
   }
 }
 

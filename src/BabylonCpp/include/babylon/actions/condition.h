@@ -3,25 +3,18 @@
 
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 
 #include <babylon/babylon_api.h>
 
-namespace picojson {
-class value;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
 class ActionManager;
 class IAnimatable;
 using IAnimatablePtr = std::shared_ptr<IAnimatable>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief A Condition applied to an Action.
@@ -61,13 +54,13 @@ public:
    * @brief Serialize placeholder for child classes.
    * @returns the serialized object
    */
-  virtual Json::object serialize() const;
+  virtual json serialize() const;
 
 protected:
   /**
    * @brief Internal only.
    */
-  Json::object _serialize(const Json::object& serializedCondition) const;
+  json _serialize(const json& serializedCondition) const;
 
 public:
   /**

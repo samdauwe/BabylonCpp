@@ -1,8 +1,9 @@
 #include <babylon/materialslibrary/water/water_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/random.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -691,9 +692,9 @@ MaterialPtr WaterMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object WaterMaterial::serialize() const
+json WaterMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string WaterMaterial::getClassName() const
@@ -701,8 +702,7 @@ const std::string WaterMaterial::getClassName() const
   return "WaterMaterial";
 }
 
-WaterMaterial* WaterMaterial::Parse(const Json::value& /*source*/,
-                                    Scene* /*scene*/,
+WaterMaterial* WaterMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                     const std::string& /*rootUrl*/)
 {
   return nullptr;

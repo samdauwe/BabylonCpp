@@ -2,16 +2,13 @@
 #define BABYLON_PARTICLES_PARTICLE_SYSTEM_SET_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/particles/particle_system_set_emitter_creation_options.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -21,12 +18,6 @@ class Scene;
 class TransformNode;
 using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;
 using TransformNodePtr = std::shared_ptr<TransformNode>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief Represents a set of particle systems working together to create a
@@ -64,7 +55,7 @@ public:
    * @brief Serialize the set into a JSON compatible object.
    * @returns a JSON compatible representation of the set
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parse a new ParticleSystemSet from a serialized source.
@@ -74,7 +65,7 @@ public:
    * @returns a new ParticleSystemSet
    */
   static std::unique_ptr<ParticleSystemSet>
-  Parse(const Json::value& data, Scene* scene, bool gpu = false);
+  Parse(const json& data, Scene* scene, bool gpu = false);
 
 protected:
   /**

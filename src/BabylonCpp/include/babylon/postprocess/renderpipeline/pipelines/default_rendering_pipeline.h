@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESS_RENDER_PIPELINE_PIPELINES_DEFAULT_RENDERING_PIPLINE_H
 
 #include <map>
+#include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -10,11 +11,7 @@
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
 #include <babylon/tools/observer.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -40,12 +37,6 @@ using GlowLayerPtr                = std::shared_ptr<GlowLayer>;
 using GrainPostProcessPtr         = std::shared_ptr<GrainPostProcess>;
 using PostProcessPtr              = std::shared_ptr<PostProcess>;
 using SharpenPostProcessPtr       = std::shared_ptr<SharpenPostProcess>;
-
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
 
 /**
  * @brief The default rendering pipeline can be added to a scene to apply common
@@ -125,7 +116,7 @@ public:
    * @brief Serialize the rendering pipeline (Used when exporting)
    * @returns the serialized object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Parse the serialized pipeline
@@ -135,7 +126,7 @@ public:
    * @returns An instantiated pipeline from the serialized object.
    */
   static std::unique_ptr<DefaultRenderingPipeline>
-  Parse(const Json::value& source, Scene* scene, const std::string& rootUrl);
+  Parse(const json& source, Scene* scene, const std::string& rootUrl);
 
 protected:
   /**

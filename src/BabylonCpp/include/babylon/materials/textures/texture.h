@@ -91,7 +91,7 @@ public:
   Matrix* getTextureMatrix() override;
   Matrix* getReflectionTextureMatrix() override;
   TexturePtr clone() const;
-  Json::object serialize() const;
+  json serialize() const;
   void dispose() override;
 
   /** Statics **/
@@ -104,9 +104,8 @@ public:
                              const std::string& exception)>& onError
     = nullptr,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
-  static std::unique_ptr<BaseTexture> Parse(const Json::value& parsedTexture,
-                                            Scene* scene,
-                                            const std::string& rootUrl);
+  static std::unique_ptr<BaseTexture>
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
   static TexturePtr LoadFromDataString(
     const std::string& name,
     const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer,

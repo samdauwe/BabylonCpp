@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/simple/simple_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -353,9 +354,9 @@ MaterialPtr SimpleMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object SimpleMaterial::serialize() const
+json SimpleMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string SimpleMaterial::getClassName() const
@@ -363,8 +364,7 @@ const std::string SimpleMaterial::getClassName() const
   return "SimpleMaterial";
 }
 
-SimpleMaterial* SimpleMaterial::Parse(const Json::value& /*source*/,
-                                      Scene* /*scene*/,
+SimpleMaterial* SimpleMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                       const std::string& /*rootUrl*/)
 {
   return nullptr;

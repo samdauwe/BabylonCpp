@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/starfield/starfield_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/starfield/starfield_procedural_texture_fragment_fx.h>
 
@@ -199,13 +200,13 @@ void StarfieldProceduralTexture::set_saturation(float value)
   updateShaderUniforms();
 }
 
-Json::object StarfieldProceduralTexture::serialize() const
+json StarfieldProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<StarfieldProceduralTexture>
-StarfieldProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
+StarfieldProceduralTexture::Parse(const json& /*parsedTexture*/,
                                   Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {

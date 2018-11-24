@@ -1,6 +1,6 @@
 #include <babylon/materials/pbr/pbr_metallic_roughness_material.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
 
 namespace BABYLON {
 
@@ -69,14 +69,13 @@ MaterialPtr PBRMetallicRoughnessMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object PBRMetallicRoughnessMaterial::serialize() const
+json PBRMetallicRoughnessMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 PBRMetallicRoughnessMaterial*
-PBRMetallicRoughnessMaterial::Parse(const Json::value& /*source*/,
-                                    Scene* /*scene*/,
+PBRMetallicRoughnessMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                     const std::string& /*rootUrl*/)
 {
   return nullptr;

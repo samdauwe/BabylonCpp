@@ -82,12 +82,12 @@ public:
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
   const std::string getClassName() const override;
-  Json::object serialize() const override;
+  json serialize() const override;
 
 protected:
-  ArcRotateCamera(const std::string& name, float alpha, float beta, float radius,
-                  const std::optional<Vector3>& target, Scene* scene,
-                  bool setActiveOnSceneIfNoneActive = true);
+  ArcRotateCamera(const std::string& name, float alpha, float beta,
+                  float radius, const std::optional<Vector3>& target,
+                  Scene* scene, bool setActiveOnSceneIfNoneActive = true);
 
   Vector3 _getTargetPosition();
   void _checkLimits();

@@ -59,8 +59,7 @@ void EffectLayerSceneComponent::rebuild()
   }
 }
 
-void EffectLayerSceneComponent::serialize(
-  Json::value& /*serializationObject*/) const
+void EffectLayerSceneComponent::serialize(json& /*serializationObject*/) const
 {
 }
 

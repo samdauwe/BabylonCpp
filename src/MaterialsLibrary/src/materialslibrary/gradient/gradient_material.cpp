@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/gradient/gradient_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -271,9 +272,9 @@ MaterialPtr GradientMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object GradientMaterial::serialize() const
+json GradientMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string GradientMaterial::getClassName() const
@@ -281,7 +282,7 @@ const std::string GradientMaterial::getClassName() const
   return "GradientMaterial";
 }
 
-GradientMaterial* GradientMaterial::Parse(const Json::value& /*source*/,
+GradientMaterial* GradientMaterial::Parse(const json& /*source*/,
                                           Scene* /*scene*/,
                                           const std::string& /*rootUrl*/)
 {

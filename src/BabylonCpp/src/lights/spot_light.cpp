@@ -16,7 +16,7 @@ void SpotLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
     "Light_Type_2", [](const std::string& name, Scene* scene,
-                       const std::optional<Json::value>& /*options*/) {
+                       const std::optional<json>& /*options*/) {
       return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
                             scene);
     });
@@ -257,8 +257,7 @@ void SpotLight::_buildUniformLayout()
 void SpotLight::_computeAngleValues()
 {
   _lightAngleScale
-    = 1.f
-      / std::max(0.001f, (std::cos(_innerAngle * 0.5f) - _cosHalfAngle));
+    = 1.f / std::max(0.001f, (std::cos(_innerAngle * 0.5f) - _cosHalfAngle));
   _lightAngleOffset = -_cosHalfAngle * _lightAngleScale;
 }
 

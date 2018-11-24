@@ -1,6 +1,7 @@
 #include <babylon/proceduraltextureslibrary/fire/fire_procedural_texture.h>
 
-#include <babylon/core/json.h>
+#include <nlohmann/json.hpp>
+
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/fire/fire_procedural_texture_fragment_fx.h>
@@ -162,14 +163,14 @@ void FireProceduralTexture::set_alphaThreshold(float value)
   updateShaderUniforms();
 }
 
-Json::object FireProceduralTexture::serialize() const
+json FireProceduralTexture::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 std::unique_ptr<FireProceduralTexture>
-FireProceduralTexture::Parse(const Json::value& /*parsedTexture*/,
-                             Scene* /*scene*/, const std::string& /*rootUrl*/)
+FireProceduralTexture::Parse(const json& /*parsedTexture*/, Scene* /*scene*/,
+                             const std::string& /*rootUrl*/)
 {
   return nullptr;
 }

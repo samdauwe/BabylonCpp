@@ -3,15 +3,12 @@
 
 #include <map>
 #include <memory>
+#include <nlohmann/json_fwd.hpp>
 #include <vector>
 
 #include <babylon/babylon_api.h>
 
-namespace picojson {
-class value;
-typedef std::vector<value> array;
-typedef std::map<std::string, value> object;
-} // end of namespace picojson
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -24,23 +21,17 @@ using CameraPtr           = std::shared_ptr<Camera>;
 using LightPtr            = std::shared_ptr<Light>;
 using StandardMaterialPtr = std::shared_ptr<StandardMaterial>;
 
-namespace Json {
-typedef picojson::value value;
-typedef picojson::array array;
-typedef picojson::object object;
-} // namespace Json
-
 struct BABYLON_SHARED_EXPORT SerializationHelper {
 
   static BaseTexture* Parse(BaseTexture* baseTexture,
-                            const Json::value& parsedBaseTexture, Scene* scene);
-  static CameraPtr Parse(const CameraPtr& camera,
-                         const Json::value& parsedCamera, Scene* scene);
-  static LightPtr Parse(const LightPtr& light, const Json::value& parsedLight,
+                            const json& parsedBaseTexture, Scene* scene);
+  static CameraPtr Parse(const CameraPtr& camera, const json& parsedCamera,
+                         Scene* scene);
+  static LightPtr Parse(const LightPtr& light, const json& parsedLight,
                         Scene* scene);
   static StandardMaterialPtr Parse(const StandardMaterialPtr& standardMaterial,
-                                   const Json::value& parsedMaterial,
-                                   Scene* scene, const std::string& rootUrl);
+                                   const json& parsedMaterial, Scene* scene,
+                                   const std::string& rootUrl);
 
 }; // end of struct SerializationHelper
 

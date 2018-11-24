@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/fire/fire_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/core/time.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -372,13 +373,12 @@ MaterialPtr FireMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object FireMaterial::serialize() const
+json FireMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
-FireMaterial* FireMaterial::Parse(const Json::value& /*source*/,
-                                  Scene* /*scene*/,
+FireMaterial* FireMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
                                   const std::string& /*rootUrl*/)
 {
   return nullptr;

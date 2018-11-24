@@ -329,18 +329,18 @@ public:
    * @brief Serializes the particle system to a JSON object.
    * @returns the JSON object
    */
-  Json::object serialize() const override;
+  json serialize() const override;
 
   /**
    * @brief Hidden
    */
-  static void _Serialize(Json::object& serializationObject,
+  static void _Serialize(json& serializationObject,
                          IParticleSystem* particleSystem);
 
   /**
    * @brief Hidden
    */
-  static ParticleSystem* _Parse(const Json::value& parsedParticleSystem,
+  static ParticleSystem* _Parse(const json& parsedParticleSystem,
                                 IParticleSystem* particleSystem, Scene* scene,
                                 const std::string& url);
 
@@ -352,8 +352,8 @@ public:
    * texture
    * @returns the Parsed particle system
    */
-  static ParticleSystem* Parse(const Json::value& parsedParticleSystem,
-                               Scene* scene, const std::string& url);
+  static ParticleSystem* Parse(const json& parsedParticleSystem, Scene* scene,
+                               const std::string& url);
 
 protected:
   /**
@@ -405,7 +405,7 @@ public:
    * particle. It by default use the emitterType defined function
    */
   std::function<void(const Matrix& worldMatrix, Vector3& directionToUpdate,
-                       Particle* particle)>
+                     Particle* particle)>
     startDirectionFunction;
 
   /**
@@ -413,7 +413,7 @@ public:
    * particle. It by default use the emitterType defined function
    */
   std::function<void(const Matrix& worldMatrix, Vector3& positionToUpdate,
-                       Particle* particle)>
+                     Particle* particle)>
     startPositionFunction;
 
   /**

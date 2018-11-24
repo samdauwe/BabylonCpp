@@ -1,5 +1,7 @@
 #include <babylon/materialslibrary/shadowonly/shadow_only_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
@@ -238,9 +240,9 @@ MaterialPtr ShadowOnlyMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object ShadowOnlyMaterial::serialize() const
+json ShadowOnlyMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string ShadowOnlyMaterial::getClassName() const
@@ -248,7 +250,7 @@ const std::string ShadowOnlyMaterial::getClassName() const
   return "ShadowOnlyMaterial";
 }
 
-ShadowOnlyMaterial* ShadowOnlyMaterial::Parse(const Json::value& /*source*/,
+ShadowOnlyMaterial* ShadowOnlyMaterial::Parse(const json& /*source*/,
                                               Scene* /*scene*/,
                                               const std::string& /*rootUrl*/)
 {

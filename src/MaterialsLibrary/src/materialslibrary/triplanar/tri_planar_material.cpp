@@ -1,7 +1,8 @@
 #include <babylon/materialslibrary/triplanar/tri_planar_material.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/cameras/camera.h>
-#include <babylon/core/json.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -531,9 +532,9 @@ MaterialPtr TriPlanarMaterial::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-Json::object TriPlanarMaterial::serialize() const
+json TriPlanarMaterial::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 const std::string TriPlanarMaterial::getClassName() const
@@ -541,7 +542,7 @@ const std::string TriPlanarMaterial::getClassName() const
   return "TriPlanarMaterial";
 }
 
-TriPlanarMaterial* TriPlanarMaterial::Parse(const Json::value& /*source*/,
+TriPlanarMaterial* TriPlanarMaterial::Parse(const json& /*source*/,
                                             Scene* /*scene*/,
                                             const std::string& /*rootUrl*/)
 {

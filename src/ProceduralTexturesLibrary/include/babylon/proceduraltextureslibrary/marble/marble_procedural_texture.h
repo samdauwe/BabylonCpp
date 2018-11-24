@@ -31,7 +31,7 @@ public:
    * @brief Serializes this marble procedural texture.
    * @returns a serialized marble procedural texture object
    */
-  Json::object serialize() const;
+  json serialize() const;
 
   /**
    * @brief Creates a Marble Procedural Texture from parsed marble procedural
@@ -43,8 +43,7 @@ public:
    * @returns a parsed Marble Procedural Texture
    */
   static std::unique_ptr<MarbleProceduralTexture>
-  Parse(const Json::value& parsedTexture, Scene* scene,
-        const std::string& rootUrl);
+  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
 
 protected:
   MarbleProceduralTexture(const std::string& name, const Size& size,

@@ -1,7 +1,5 @@
 #include <babylon/actions/directactions/execute_code_action.h>
 
-#include <babylon/core/json.h>
-
 namespace BABYLON {
 
 ExecuteCodeAction::ExecuteCodeAction(

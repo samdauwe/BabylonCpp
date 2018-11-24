@@ -1,6 +1,7 @@
 #include <babylon/materials/material.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -464,8 +465,7 @@ std::vector<AbstractMesh*> Material::getBindedMeshes()
 }
 
 void Material::forceCompilation(
-  AbstractMesh* mesh,
-  const std::function<void(Material* material)>& onCompiled,
+  AbstractMesh* mesh, const std::function<void(Material* material)>& onCompiled,
   std::optional<bool> clipPlane)
 {
   auto subMesh = std::make_unique<BaseSubMesh>();
@@ -621,10 +621,10 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
 
   // Remove from scene
   _scene->materials.erase(std::remove_if(_scene->materials.begin(),
-                                           _scene->materials.end(),
-                                           [this](const MaterialPtr& material) {
-                                             return material.get() == this;
-                                           }),
+                                         _scene->materials.end(),
+                                         [this](const MaterialPtr& material) {
+                                           return material.get() == this;
+                                         }),
                           _scene->materials.end());
 
   // Remove from meshes
@@ -688,45 +688,21 @@ void Material::copyTo(Material* other) const
   other->pointsCloud           = pointsCloud();
 }
 
-Json::object Material::serialize() const
+json Material::serialize() const
 {
-  return Json::object();
+  return nullptr;
 }
 
 MultiMaterialPtr
-Material::ParseMultiMaterial(const Json::value& parsedMultiMaterial,
-                             Scene* scene)
+Material::ParseMultiMaterial(const json& /*parsedMultiMaterial*/,
+                             Scene* /*scene*/)
 {
-  auto multiMaterial
-    = MultiMaterial::New(Json::GetString(parsedMultiMaterial, "name"), scene);
-
-  multiMaterial->id = Json::GetString(parsedMultiMaterial, "id");
-
-  // Tags.AddTagsTo(multiMaterial, parsedMultiMaterial.tags);
-
-  for (auto& subMatId : Json::GetArray(parsedMultiMaterial, "materials")) {
-    auto _subMatId = subMatId.get<std::string>();
-    if (!_subMatId.empty()) {
-      multiMaterial->subMaterials().emplace_back(
-        scene->getMaterialByID(_subMatId));
-    }
-    else {
-      multiMaterial->subMaterials().emplace_back(nullptr);
-    }
-  }
-
-  return multiMaterial;
+  return nullptr;
 }
 
-MaterialPtr Material::Parse(const Json::value& parsedMaterial, Scene* scene,
-                            const std::string& rootUrl)
+MaterialPtr Material::Parse(const json& /*parsedMaterial*/, Scene* /*scene*/,
+                            const std::string& /*rootUrl*/)
 {
-  if (!parsedMaterial.contains("customType")
-      || Json::GetString(parsedMaterial, "customType")
-           == "BABYLON.StandardMaterial") {
-    return StandardMaterial::Parse(parsedMaterial, scene, rootUrl);
-  }
-
   return nullptr;
 }
 

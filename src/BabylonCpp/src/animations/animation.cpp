@@ -1,11 +1,12 @@
 #include <babylon/animations/animation.h>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/animations/runtime_animation.h>
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/json.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/color3.h>
@@ -650,132 +651,19 @@ void Animation::setKeys(const std::vector<IAnimationKey>& values)
   _keys = values;
 }
 
-Json::object Animation::serialize() const
+json Animation::serialize() const
 {
-  auto serializationObject
-    = Json::object({Json::Pair("name", name),                             //
-                    Json::Pair("property", targetProperty),               //
-                    Json::Pair<size_t>("framePerSecond", framePerSecond), //
-                    Json::Pair<int>("dataType", dataType),                //
-                    Json::Pair<unsigned>("loopBehavior", loopMode)});
-
-  // Animation keys
-  std::vector<Json::value> keys;
-  for (auto& animationKey : _keys) {
-    const AnimationValue& value = animationKey.value;
-    Float32Array keyValues;
-    switch (dataType) {
-      case Animation::ANIMATIONTYPE_FLOAT():
-        keyValues.emplace_back(value.floatData);
-        break;
-      case Animation::ANIMATIONTYPE_QUATERNION():
-        stl_util::concat(keyValues, value.quaternionData.asArray());
-        break;
-      case Animation::ANIMATIONTYPE_MATRIX():
-        stl_util::concat(keyValues, value.matrixData.asArray());
-        break;
-      case Animation::ANIMATIONTYPE_VECTOR3():
-        stl_util::concat(keyValues, value.vector3Data.asArray());
-        break;
-      case Animation::ANIMATIONTYPE_COLOR3():
-        stl_util::concat(keyValues, value.color3Data.asArray());
-        break;
-    }
-
-    keys.emplace_back(Json::value(
-      Json::object({Json::Pair<float>("frame", animationKey.frame), //
-                    /*Json::Pair("values", keyValues)*/})));
-  }
-  serializationObject["keys"] = Json::value(keys);
-
-  // Animation ranges
-  std::vector<Json::value> ranges;
-  for (auto& range : _ranges) {
-    ranges.emplace_back(Json::value(Json::object(
-      {Json::Pair("name", range.first),                              //
-       Json::Pair<int>("from", static_cast<int>(range.second.from)), //
-       Json::Pair<int>("to", static_cast<int>(range.second.to))})));
-  }
-  serializationObject["ranges"] = Json::value(ranges);
-
-  return serializationObject;
+  return nullptr;
 }
 
-Animation* Animation::Parse(const Json::value& parsedAnimation)
+Animation* Animation::Parse(const json& /*parsedAnimation*/)
 {
-  auto animation
-    = new Animation(Json::GetString(parsedAnimation, "name"),
-                    Json::GetString(parsedAnimation, "property"),
-                    Json::GetNumber(parsedAnimation, "framePerSecond", 30ull),
-                    Json::GetNumber(parsedAnimation, "dataType", 0),
-                    Json::GetNumber(parsedAnimation, "loopBehavior",
-                                    Animation::ANIMATIONLOOPMODE_CYCLE()));
-
-  auto dataType = Json::GetNumber(parsedAnimation, "dataType", 0);
-  std::vector<IAnimationKey> keys;
-
-  if (parsedAnimation.contains("enableBlending")) {
-    animation->enableBlending
-      = Json::GetBool(parsedAnimation, "enableBlending");
-  }
-
-  if (parsedAnimation.contains("blendingSpeed")) {
-    animation->blendingSpeed
-      = Json::GetNumber(parsedAnimation, "blendingSpeed", 0.01f);
-  }
-
-  for (auto& key : Json::GetArray(parsedAnimation, "keys")) {
-    AnimationValue data;
-
-    switch (dataType) {
-      case Animation::ANIMATIONTYPE_FLOAT():
-        data = AnimationValue(Json::ToArray<float>(key, "values")[0]);
-        break;
-      case Animation::ANIMATIONTYPE_QUATERNION():
-        data = AnimationValue(
-          Quaternion::FromArray(Json::ToArray<float>(key, "values")));
-        break;
-      case Animation::ANIMATIONTYPE_MATRIX():
-        data = AnimationValue(
-          Matrix::FromArray(Json::ToArray<float>(key, "values")));
-        break;
-      case Animation::ANIMATIONTYPE_COLOR3():
-        data = AnimationValue(
-          Color3::FromArray(Json::ToArray<float>(key, "values")));
-        break;
-      case Animation::ANIMATIONTYPE_VECTOR3():
-      default:
-        data = AnimationValue(
-          Vector3::FromArray(Json::ToArray<float>(key, "values")));
-        break;
-    }
-
-    keys.emplace_back(IAnimationKey(Json::GetNumber(key, "frame", 0), data));
-  }
-
-  animation->setKeys(keys);
-
-  if (parsedAnimation.contains("ranges")) {
-    for (auto& range : Json::GetArray(parsedAnimation, "ranges")) {
-      animation->createRange(Json::GetString(range, "name"),
-                             Json::GetNumber<float>(range, "from", 0),
-                             Json::GetNumber<float>(range, "to", 0));
-    }
-  }
-
-  return animation;
+  return nullptr;
 }
 
-void Animation::AppendSerializedAnimations(IAnimatable* source,
-                                           picojson::object& destination)
+void Animation::AppendSerializedAnimations(IAnimatable* /*source*/,
+                                           json& /*destination*/)
 {
-  picojson::array animations;
-  if (!source->getAnimations().empty()) {
-    for (auto& animation : source->getAnimations()) {
-      animations.push_back(picojson::value(animation->serialize()));
-    }
-  }
-  destination["animations"] = picojson::value(animations);
 }
 
 } // end of namespace BABYLON
