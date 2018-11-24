@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief Defines points to create a polygon.
  */
 struct BABYLON_SHARED_EXPORT PolygonPoints {
 

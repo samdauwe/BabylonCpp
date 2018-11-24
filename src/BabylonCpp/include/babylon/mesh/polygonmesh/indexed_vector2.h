@@ -7,7 +7,7 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief Vector2 wth index property.
  */
 class BABYLON_SHARED_EXPORT IndexedVector2 : public Vector2 {
 
@@ -21,6 +21,9 @@ public:
   ~IndexedVector2();
 
 public:
+  /**
+   * Index of the vector2
+   */
   int index;
 
 }; // end of class IndexedVector2

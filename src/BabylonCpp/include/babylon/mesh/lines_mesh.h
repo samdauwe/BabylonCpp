@@ -11,7 +11,8 @@ class ShaderMaterial;
 using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
 
 /**
- * @brief
+ * @brief Line mesh
+ * @see https://doc.babylonjs.com/babylon101/parametric_shapes
  */
 class BABYLON_SHARED_EXPORT LinesMesh : public Mesh {
 
@@ -34,8 +35,6 @@ public:
 
   IReflect::Type type() const override;
 
-  InstancedMesh* createInstance(const std::string& name);
-
   /**
    * @brief Hidden
    */
@@ -48,6 +47,11 @@ public:
              bool alternate = false) override;
 
   PickingInfo intersects(Ray& ray, bool fastCheck = true) override;
+
+  /**
+   * @brief Disposes of the line mesh.
+   * @param doNotRecurse If children should be disposed
+   */
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 
@@ -57,21 +61,19 @@ public:
   LinesMeshPtr clone(const std::string& name, Node* newParent = nullptr,
                      bool doNotCloneChildren = false);
 
-  /**
-   * @brief Enables the edge rendering mode on the mesh.
-   * This mode makes the mesh edges visible
-   * @param epsilon defines the maximal distance between two angles to detect a
-   * face
-   * @param checkVerticesInsteadOfIndices indicates that we should check vertex
-   * list directly instead of faces
-   * @returns the currentAbstractMesh
-   * @see https://www.babylonjs-playground.com/#19O9TU#0
-   */
-  AbstractMesh& enableEdgesRendering(float epsilon = 0.95f,
-                                     bool checkVerticesInsteadOfIndices
-                                     = false);
-
 protected:
+  /**
+   * @brief Creates a new LinesMesh.
+   * @param name defines the name
+   * @param scene defines the hosting scene
+   * @param parent defines the parent mesh if any
+   * @param source defines the optional source LinesMesh used to clone data from
+   * @param doNotCloneChildren When cloning, skip cloning child meshes of
+   * source, default False. When false, achieved by calling a clone(), also
+   * passing False. This will make creation of children, recursive.
+   * @param useVertexColor defines if this LinesMesh supports vertex color
+   * @param useVertexAlpha defines if this LinesMesh supports vertex alpha
+   */
   LinesMesh(const std::string& name, Scene* scene, Node* parent = nullptr,
             LinesMesh* source = nullptr, bool doNotCloneChildren = true,
             bool useVertexColor = false, bool useVertexAlpha = false);
@@ -111,9 +113,25 @@ protected:
 public:
   float dashSize;
   float gapSize;
+
+  /**
+   * Color of the line (Default: White)
+   */
   Color3 color;
+
+  /**
+   * Alpha of the line (Default: 1)
+   */
   float alpha;
+
+  /**
+   * If vertex color should be applied to the mesh
+   */
   bool useVertexColor;
+
+  /**
+   * If vertex alpha should be applied to the mesh
+   */
   bool useVertexAlpha;
 
   /**

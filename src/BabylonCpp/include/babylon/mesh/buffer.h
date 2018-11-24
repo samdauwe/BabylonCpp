@@ -17,7 +17,7 @@ class IGLBuffer;
 } // end of namespace GL
 
 /**
- * @brief Buffer representation.
+ * @brief Class used to store data that will be store in GPU memory.
  */
 class BABYLON_SHARED_EXPORT Buffer {
 
@@ -57,7 +57,7 @@ public:
   virtual ~Buffer();
 
   /**
-   * @brief Create a new {BABYLON.VertexBuffer} based on the current buffer.
+   * @brief Create a new VertexBuffer based on the current buffer.
    * @param kind defines the vertex buffer kind (position, normal, etc.)
    * @param offset defines offset in the buffer (0 by default)
    * @param size defines the size in floats of attributes (position is 3 for
@@ -75,8 +75,23 @@ public:
                      bool useBytes                 = false);
 
   // Properties
+
+  /**
+   * @brief Gets a boolean indicating if the Buffer is updatable?
+   * @returns true if the buffer is updatable
+   */
   bool isUpdatable() const;
+
+  /**
+   * @brief Gets current buffer's data
+   * @returns a DataArray or null
+   */
   Float32Array& getData();
+
+  /**
+   * @brief Gets underlying native buffer
+   * @returns underlying native buffer
+   */
   GL::IGLBuffer* getBuffer();
 
   /**
@@ -90,10 +105,21 @@ public:
   // Methods
 
   /**
+   * @brief Store data into the buffer. If the buffer was already used it will
+   * be either recreated or updated depending on isUpdatable property
+   * @param data defines the data to store
+   */
+  GL::IGLBuffer* create(Float32Array data = {});
+
+  /**
    * @brief Hidden
    */
   void _rebuild();
-  GL::IGLBuffer* create(Float32Array data = {});
+
+  /**
+   * @brief Update current buffer data
+   * @param data defines the data to store
+   */
   GL::IGLBuffer* update(const Float32Array& data);
 
   /**
@@ -108,6 +134,9 @@ public:
                                 = std::nullopt,
                                 bool useBytes = false);
 
+  /**
+   * @brief Release all resources
+   */
   void dispose();
 
 public:

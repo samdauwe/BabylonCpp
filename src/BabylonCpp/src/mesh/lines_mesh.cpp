@@ -36,7 +36,10 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
 
   std::vector<std::string> defines;
   ShaderMaterialOptions options;
-  options.attributes        = {VertexBuffer::PositionKindChars};
+  options.attributes
+    = {VertexBuffer::PositionKindChars, VertexBuffer::World0KindChars,
+       VertexBuffer::World1KindChars, VertexBuffer::World2KindChars,
+       VertexBuffer::World3KindChars};
   options.uniforms          = {"world", "viewProjection"};
   options.needAlphaBlending = true;
   options.defines           = defines;
@@ -104,13 +107,6 @@ bool LinesMesh::get_checkCollisions() const
   return false;
 }
 
-InstancedMesh* LinesMesh::createInstance(const std::string& /*name*/)
-{
-  BABYLON_LOG_ERROR("InstancedMesh",
-                    "LinesMeshes do not support createInstance.");
-  return nullptr;
-}
-
 void LinesMesh::_bind(SubMesh* /*subMesh*/, Effect* /*effect*/,
                       unsigned int /*fillMode*/)
 {
@@ -126,8 +122,8 @@ void LinesMesh::_bind(SubMesh* /*subMesh*/, Effect* /*effect*/,
   }
 }
 
-void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/,
-                      size_t /*instancesCount*/, bool /*alternate*/)
+void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/, size_t instancesCount,
+                      bool /*alternate*/)
 {
   if (!_geometry || _geometry->getVertexBuffers().empty()
       || (!_unIndexed && !_geometry->getIndexBuffer())) {
@@ -137,9 +133,9 @@ void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/,
   auto engine = getScene()->getEngine();
 
   // Draw order
-  engine->drawElementsType(Material::LineListDrawMode(),
-                           static_cast<int>(subMesh->indexStart),
-                           static_cast<int>(subMesh->indexCount));
+  engine->drawElementsType(
+    Material::LineListDrawMode(), static_cast<int>(subMesh->indexStart),
+    static_cast<int>(subMesh->indexCount), static_cast<int>(instancesCount));
 }
 
 PickingInfo LinesMesh::intersects(Ray& /*ray*/, bool /*fastCheck*/)
@@ -158,16 +154,6 @@ LinesMeshPtr LinesMesh::clone(const std::string& iName, Node* newParent,
                               bool doNotCloneChildren)
 {
   return LinesMesh::New(iName, getScene(), newParent, this, doNotCloneChildren);
-}
-
-AbstractMesh&
-LinesMesh::enableEdgesRendering(float epsilon,
-                                bool checkVerticesInsteadOfIndices)
-{
-  disableEdgesRendering();
-  _edgesRenderer = std::make_unique<LineEdgesRenderer>(
-    shared_from_base<LinesMesh>(), epsilon, checkVerticesInsteadOfIndices);
-  return *this;
 }
 
 } // end of namespace BABYLON

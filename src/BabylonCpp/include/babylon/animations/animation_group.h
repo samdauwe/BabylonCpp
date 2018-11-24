@@ -1,10 +1,14 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_GROUP_H
 #define BABYLON_ANIMATIONS_ANIMATION_GROUP_H
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/tools/observable.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -40,19 +44,20 @@ public:
    * @brief Add an animation (with its target) in the group.
    * @param animation defines the animation we want to add
    * @param target defines the target of the animation
-   * @returns the {BABYLON.TargetedAnimation} object
+   * @returns the TargetedAnimation object
    */
   TargetedAnimation addTargetedAnimation(const AnimationPtr& animation,
                                          const IAnimatablePtr& target);
 
   /**
    * @brief This function will normalize every animation in the group to make
-   * sure they all go from beginFrame to endFrame. It can add constant keys at
+   * sure they all go from beginFrame to endFrame It can add constant keys at
    * begin or end
    * @param beginFrame defines the new begin frame for all animations or the
    * smallest begin frame of all animations if null (defaults to null)
    * @param endFrame defines the new end frame for all animations or the largest
    * end frame of all animations if null (defaults to null)
+   * @returns the animation group
    */
   AnimationGroup& normalize(const std::optional<int>& beginFrame = std::nullopt,
                             const std::optional<int>& endFrame = std::nullopt);
@@ -72,29 +77,34 @@ public:
 
   /**
    * @brief Pause all animations.
+   * @returns the animation group
    */
   AnimationGroup& pause();
 
   /**
    * @brief Play all animations to initial state.
-   * This function will start() the animations if they were not started or
-   * will restart() them if they were paused
+   * This function will start() the animations if they were not started or will
+   * restart() them if they were paused
    * @param loop defines if animations must loop
+   * @returns the animation group
    */
   AnimationGroup& play(bool loop = false);
 
   /**
    * @brief Reset all animations to initial state.
+   * @returns the animation group
    */
   AnimationGroup& reset();
 
   /**
    * @brief Restart animations from key 0.
+   * @returns the animation group
    */
   AnimationGroup& restart();
 
   /**
    * @brief Stop all animations.
+   * @returns the animation group
    */
   AnimationGroup& stop();
 
@@ -128,7 +138,38 @@ public:
   void dispose(bool doNotRecurse               = false,
                bool disposeMaterialAndTextures = false) override;
 
+  // Statics
+
+  /**
+   * @brief Returns a new AnimationGroup object parsed from the source provided.
+   * @param parsedAnimationGroup defines the source
+   * @param scene defines the scene that will receive the animationGroup
+   * @returns a new AnimationGroup
+   */
+  static AnimationGroup* Parse(const json& parsedAnimationGroup, Scene* scene);
+
+  /**
+   * @brief Returns the string "AnimationGroup".
+   * @returns "AnimationGroup"
+   */
+  std::string getClassName() const;
+
+  /**
+   * @brief Creates a detailled string about the object
+   * @param fullDetails defines if the output string will support multiple
+   * levels of logging within scene loading
+   * @returns a string representing the object
+   */
+  std::string toString(bool fullDetails = false) const;
+
 protected:
+  /**
+   * @brief Instantiates a new Animation Group.
+   * This helps managing several animations at once.
+   * @see http://doc.babylonjs.com/how_to/group
+   * @param name Defines the name of the group
+   * @param scene Defines the scene the group belongs to
+   */
   AnimationGroup(const std::string& name, Scene* scene = nullptr);
 
 private:
@@ -171,7 +212,14 @@ private:
   void _checkAnimationGroupEnded(const AnimatablePtr& animatable);
 
 public:
+  /**
+   * The name of the animation group
+   */
   std::string name;
+
+  /**
+   * This observable will notify when one animation have ended.
+   */
   Observable<TargetedAnimation> onAnimationEndObservable;
 
   /**

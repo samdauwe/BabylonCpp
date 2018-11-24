@@ -18,8 +18,10 @@ class Polygon;
 class BABYLON_SHARED_EXPORT Plane {
 
 public:
-  // `BABYLON.CSG.Plane.EPSILON` is the tolerance used by `splitPolygon()` to
-  // decide if a point is on the plane.
+  /**
+   * `BABYLON.CSG.Plane.EPSILON` is the tolerance used by `splitPolygon()` to
+   * decide if a point is on the plane
+   */
   static const float EPSILON;
   // Polygon types
   static constexpr unsigned int COPLANAR = 0;
@@ -29,6 +31,12 @@ public:
 
 public:
   Plane();
+
+  /**
+   * @brief Initializes the plane.
+   * @param normal The normal for the plane
+   * @param w
+   */
   Plane(const Vector3& normal, float w);
   Plane(const Vector3& pos, const Vector3& normal, const Vector2& uv);
   Plane(const Plane& otherPlane);
@@ -36,24 +44,46 @@ public:
   Plane& operator=(const Plane& otherPlane);
   Plane& operator=(Plane&& otherPlane);
   ~Plane();
+
+  /**
+   * @brief Clone, or make a deep copy of the plane.
+   * @returns a new Plane
+   */
   Plane clone() const;
+
   std::unique_ptr<Plane> cloneToNewObject() const;
   friend std::ostream& operator<<(std::ostream& os, const Plane& plane);
   std::string toString() const;
 
+  /**
+   * @brief Flip the face of the plane.
+   */
   void flip();
 
   /**
-   * Split `polygon` by this plane if needed, then put the polygon or polygon
-   * fragments in the appropriate lists. Coplanar polygons go into either
-   * `coplanarFront` or `coplanarBack` depending on their orientation with
-   * `respect to this plane. Polygons in front or in back of this plane go into
-   * `either `front` or `back`.
+   * @brief Split `polygon` by this plane if needed, then put the polygon or
+   * polygon fragments in the appropriate lists. Coplanar polygons go into
+   * either coplanarFront` or `coplanarBack` depending on their orientation with
+   * respect to this plane. Polygons in front or in back of this plane go into
+   * either `front` or `back`
+   * @param polygon The polygon to be split
+   * @param coplanarFront Will contain polygons coplanar with the plane that are
+   * oriented to the front of the plane
+   * @param coplanarBack Will contain polygons coplanar with the plane that are
+   * oriented to the back of the plane
+   * @param front Will contain the polygons in front of the plane
+   * @param back Will contain the polygons begind the plane
    */
   void splitPolygon(const Polygon& polygon, std::vector<Polygon>& coplanarFront,
                     std::vector<Polygon>& coplanarBack,
                     std::vector<Polygon>& front, std::vector<Polygon>& back);
 
+  /**
+   * @brief Construct a plane from three points.
+   * @param a Point a
+   * @param b Point b
+   * @param c Point c
+   */
   static std::pair<bool, Plane> FromPoints(const Vector3& a, const Vector3& b,
                                            const Vector3& c);
 

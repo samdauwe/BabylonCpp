@@ -104,7 +104,7 @@ void BABYLON::CSG::Plane::splitPolygon(
 
   // std::cout << polygonType << std::endl;
 
-  // Put the polygon in the correct list, splitting it when necessary.
+  // Put the polygon in the correct list, splitting it when necessary
   switch (polygonType) {
     case COPLANAR:
       (Vector3::Dot(normal, polygon.plane.second.normal) > 0 ? coplanarFront :

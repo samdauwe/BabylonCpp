@@ -303,4 +303,31 @@ void AnimationGroup::_checkAnimationGroupEnded(const AnimatablePtr& animatable)
   }
 }
 
+AnimationGroup* AnimationGroup::Parse(const json& /*parsedAnimationGroup*/,
+                                      Scene* /*scene*/)
+{
+  return nullptr;
+}
+
+std::string AnimationGroup::getClassName() const
+{
+  return "AnimationGroup";
+}
+
+std::string AnimationGroup::toString(bool fullDetails) const
+{
+  std::ostringstream oss;
+  oss << "Name: " << name;
+  oss << ", type: " + getClassName();
+  if (fullDetails) {
+    oss << ", from: " << _from;
+    oss << ", to: " << _to;
+    oss << ", isStarted: " << _isStarted;
+    oss << ", speedRatio: " << _speedRatio;
+    oss << ", targetedAnimations length: " << _targetedAnimations.size();
+    oss << ", animatables length: " << _animatables;
+  }
+  return oss.str();
+}
+
 } // end of namespace BABYLON

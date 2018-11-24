@@ -1596,6 +1596,7 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
   const auto bufferHeight  = static_cast<float>(options.bufferHeight);
   const auto& buffer       = options.buffer;
   const auto& filter       = options.colorFilter;
+  const auto alphaFilter   = options.alphaFilter;
 
   // Vertices
   for (row = 0; row <= subdivisions; ++row) {
@@ -1616,13 +1617,23 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
 
       const unsigned int pos
         = (heightMapX + heightMapY * options.bufferWidth) * 4;
-      const float r = static_cast<float>(buffer[pos]) / 255.f;
-      const float g = static_cast<float>(buffer[pos + 1]) / 255.f;
-      const float b = static_cast<float>(buffer[pos + 2]) / 255.f;
+      const auto r = static_cast<float>(buffer[pos]) / 255.f;
+      const auto g = static_cast<float>(buffer[pos + 1]) / 255.f;
+      const auto b = static_cast<float>(buffer[pos + 2]) / 255.f;
+      const auto a = static_cast<float>(buffer[pos + 3]) / 255.f;
 
-      const float gradient = r * filter.r + g * filter.g + b * filter.b;
+      const auto gradient = r * filter.r + g * filter.g + b * filter.b;
 
-      position.y = minHeight + (maxHeight - minHeight) * gradient;
+      // If our alpha channel is not within our filter then we will assign a
+      // 'special' height Then when building the indices, we will ignore any
+      // vertex that is using the special height
+      if (a >= alphaFilter) {
+        position.y = minHeight + (maxHeight - minHeight) * gradient;
+      }
+      else {
+        // We can't have a height below minHeight, normally.
+        position.y = minHeight - Math::Epsilon;
+      }
 
       // Add  vertex
       stl_util::concat(positions, {position.x, position.y, position.z});
@@ -1634,13 +1645,32 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
   // Indices
   for (row = 0; row < subdivisions; ++row) {
     for (col = 0; col < subdivisions; ++col) {
-      indices.emplace_back(col + 1 + (row + 1) * (subdivisions + 1));
-      indices.emplace_back(col + 1 + row * (subdivisions + 1));
-      indices.emplace_back(col + row * (subdivisions + 1));
+      // Calculate Indices
+      const auto idx1 = col + 1 + (row + 1) * (subdivisions + 1);
+      const auto idx2 = col + 1 + row * (subdivisions + 1);
+      const auto idx3 = col + row * (subdivisions + 1);
 
-      indices.emplace_back(col + (row + 1) * (subdivisions + 1));
-      indices.emplace_back(col + 1 + (row + 1) * (subdivisions + 1));
-      indices.emplace_back(col + row * (subdivisions + 1));
+      const auto idx4 = col + (row + 1) * (subdivisions + 1);
+
+      // Check that all indices are visible (based on our special height)
+      // Only display the vertex if all Indices are visible
+      // Positions are stored x,y,z for each vertex, hence the * 3 and + 1 for
+      // height
+      const auto isVisibleIdx1 = positions[idx1 * 3 + 1] >= minHeight;
+      const auto isVisibleIdx2 = positions[idx2 * 3 + 1] >= minHeight;
+      const auto isVisibleIdx3 = positions[idx3 * 3 + 1] >= minHeight;
+      if (isVisibleIdx1 && isVisibleIdx2 && isVisibleIdx3) {
+        indices.emplace_back(idx1);
+        indices.emplace_back(idx2);
+        indices.emplace_back(idx3);
+      }
+
+      auto isVisibleIdx4 = positions[idx4 * 3 + 1] >= minHeight;
+      if (isVisibleIdx4 && isVisibleIdx1 && isVisibleIdx3) {
+        indices.emplace_back(idx4);
+        indices.emplace_back(idx1);
+        indices.emplace_back(idx3);
+      }
     }
   }
 

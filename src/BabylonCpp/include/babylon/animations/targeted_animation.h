@@ -17,8 +17,14 @@ using IAnimatablePtr = std::shared_ptr<IAnimatable>;
  * target.
  */
 struct BABYLON_SHARED_EXPORT TargetedAnimation {
+  /**
+   * Animation to perform
+   */
   AnimationPtr animation = nullptr;
-  IAnimatablePtr target  = nullptr;
+  /**
+   * Target to animate
+   */
+  IAnimatablePtr target = nullptr;
 }; // end of class TargetedAnimation
 
 } // end of namespace BABYLON

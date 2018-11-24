@@ -20,43 +20,100 @@ class IGLBuffer;
 } // end of namespace GL
 
 /**
- * @brief
+ * @brief Specialized buffer used to store vertex data.
  */
 class BABYLON_SHARED_EXPORT VertexBuffer {
 
   friend Scene;
 
 public:
-  static constexpr unsigned int PositionKind             = 1;
-  static constexpr unsigned int NormalKind               = 2;
-  static constexpr unsigned int TangentKind              = 3;
-  static constexpr unsigned int UVKind                   = 4;
-  static constexpr unsigned int UV2Kind                  = 5;
-  static constexpr unsigned int UV3Kind                  = 6;
-  static constexpr unsigned int UV4Kind                  = 7;
-  static constexpr unsigned int UV5Kind                  = 8;
-  static constexpr unsigned int UV6Kind                  = 9;
-  static constexpr unsigned int ColorKind                = 10;
-  static constexpr unsigned int MatricesIndicesKind      = 11;
-  static constexpr unsigned int MatricesWeightsKind      = 12;
+  // Enums
+  /**
+   * Positions
+   */
+  static constexpr unsigned int PositionKind = 1;
+
+  /**
+   * Normals
+   */
+  static constexpr unsigned int NormalKind = 2;
+
+  /**
+   * Tangents
+   */
+  static constexpr unsigned int TangentKind = 3;
+
+  /**
+   * Texture coordinates
+   */
+  static constexpr unsigned int UVKind = 4;
+
+  /**
+   * Texture coordinates 2
+   */
+  static constexpr unsigned int UV2Kind = 5;
+
+  /**
+   * Texture coordinates 3
+   */
+  static constexpr unsigned int UV3Kind = 6;
+
+  /**
+   * Texture coordinates 4
+   */
+  static constexpr unsigned int UV4Kind = 7;
+
+  /**
+   * Texture coordinates 5
+   */
+  static constexpr unsigned int UV5Kind = 8;
+
+  /**
+   * Texture coordinates 6
+   */
+  static constexpr unsigned int UV6Kind = 9;
+
+  /**
+   * Colors
+   */
+  static constexpr unsigned int ColorKind = 10;
+
+  /**
+   * Matrix indices (for bones)
+   */
+  static constexpr unsigned int MatricesIndicesKind = 11;
+
+  /**
+   * Matrix weights (for bones)
+   */
+  static constexpr unsigned int MatricesWeightsKind = 12;
+
+  /**
+   * Additional matrix indices (for bones)
+   */
   static constexpr unsigned int MatricesIndicesExtraKind = 13;
+
+  /**
+   * Additional matrix weights (for bones)
+   */
   static constexpr unsigned int MatricesWeightsExtraKind = 14;
-  static constexpr unsigned int World0Kind               = 15;
-  static constexpr unsigned int World1Kind               = 16;
-  static constexpr unsigned int World2Kind               = 17;
-  static constexpr unsigned int World3Kind               = 18;
-  static constexpr unsigned int CellInfoKind             = 19;
-  static constexpr unsigned int CellIndexKind            = 20;
-  static constexpr unsigned int OptionsKind              = 21;
-  static constexpr unsigned int AgeKind                  = 22;
-  static constexpr unsigned int LifeKind                 = 23;
-  static constexpr unsigned int VelocityKind             = 24;
-  static constexpr unsigned int DirectionKind            = 25;
-  static constexpr unsigned int InitialDirectionKind     = 26;
-  static constexpr unsigned int OffsetKind               = 27;
-  static constexpr unsigned int SeedKind                 = 28;
-  static constexpr unsigned int SizeKind                 = 29;
-  static constexpr unsigned int AngleKind                = 30;
+
+  static constexpr unsigned int World0Kind           = 15;
+  static constexpr unsigned int World1Kind           = 16;
+  static constexpr unsigned int World2Kind           = 17;
+  static constexpr unsigned int World3Kind           = 18;
+  static constexpr unsigned int CellInfoKind         = 19;
+  static constexpr unsigned int CellIndexKind        = 20;
+  static constexpr unsigned int OptionsKind          = 21;
+  static constexpr unsigned int AgeKind              = 22;
+  static constexpr unsigned int LifeKind             = 23;
+  static constexpr unsigned int VelocityKind         = 24;
+  static constexpr unsigned int DirectionKind        = 25;
+  static constexpr unsigned int InitialDirectionKind = 26;
+  static constexpr unsigned int OffsetKind           = 27;
+  static constexpr unsigned int SeedKind             = 28;
+  static constexpr unsigned int SizeKind             = 29;
+  static constexpr unsigned int AngleKind            = 30;
 
   static constexpr const char* PositionKindChars        = "position";
   static constexpr const char* NormalKindChars          = "normal";
@@ -173,71 +230,83 @@ public:
   /** Properties **/
 
   /**
-   * @brief Returns the kind of the VertexBuffer (string).
+   * @brief Returns the kind of the VertexBuffer.
+   * @returns a string
    */
   unsigned int getKind() const;
 
   /**
-   * @brief Returns if the VertexBuffer is updatable.
+   * @brief Gets a boolean indicating if the VertexBuffer is updatable?
+   * @returns true if the buffer is updatable
    */
   bool isUpdatable() const;
 
   /**
-   * @brief Returns a Float32Array containing the VertexBuffer data.
+   * @brief Gets current buffer's data.
+   * @returns a DataArray or null
    */
   Float32Array& getData();
 
   /**
-   * @brief Returns the WebGLBuffer associated to the VertexBuffer.
+   * @brief Gets underlying native buffer.
+   * @returns underlying native buffer
    */
   GL::IGLBuffer* getBuffer();
 
   /**
-   * Returns the stride of the VertexBuffer (integer).
+   * @brief Gets the stride in float32 units (i.e. byte stride / 4).
+   * May not be an integer if the byte stride is not divisible by 4.
+   * DEPRECATED. Use byteStride instead.
+   * @returns the stride in float32 units
    */
   size_t getStrideSize() const;
 
   /**
-   * @brief Returns the offset (integer).
+   * @brief Returns the offset as a multiple of the type byte length.
+   * DEPRECATED. Use byteOffset instead.
+   * @returns the offset in bytes
    */
   size_t getOffset() const;
 
   /**
-   * @brief Returns the VertexBuffer total size (integer).
+   * @brief Returns the number of components per vertex attribute (integer).
+   * @returns the size in float
    */
   size_t getSize() const;
 
   /**
-   * @brief Returns if the WebGLBuffer of the VertexBuffer instanced now.
+   * @brief Gets a boolean indicating is the internal buffer of the VertexBuffer
+   * is instanced.
+   * @returns true if this buffer is instanced
    */
   bool getIsInstanced() const;
 
   /**
    * @brief Returns the instancing divisor, zero for non-instanced (integer).
+   * @returns a number
    */
   unsigned int getInstanceDivisor() const;
 
   /** Methods **/
 
   /**
-   * @brief Creates the underlying WebGLBuffer from the passed numeric array or
-   * Float32Array.
-   * @returns The created WebGLBuffer.
+   * @brief Store data into the buffer. If the buffer was already used it will
+   * be either recreated or updated depending on isUpdatable property.
    */
   GL::IGLBuffer* create();
 
   /**
-   * @brief Creates the underlying WebGLBuffer from the passed numeric array or
-   * Float32Array.
-   * @returns The created WebGLBuffer.
+   * @brief Store data into the buffer. If the buffer was already used it will
+   * be either recreated or updated depending on isUpdatable property.
+   * @param data defines the data to store
    */
   GL::IGLBuffer* create(const Float32Array& data);
 
   /**
-   * @brief Updates the underlying WebGLBuffer according to the passed numeric
-   * array or Float32Array.
-   * This function will create a new buffer if the current one is not updatable
-   * @returns The updated WebGLBuffer.
+   * @briefUpdates the underlying buffer according to the passed numeric array
+   * or Float32Array. This function will create a new buffer if the current one
+   * is not updatable.
+   * @param data defines the data to store
    */
   GL::IGLBuffer* update(const Float32Array& data);
 

@@ -342,7 +342,7 @@ public:
   CreateTiledGround(TiledGroundOptions& options);
 
   /**
-   * @brief Creates the VertexData of the Ground designed from a heightmap.
+   * @brief Creates the VertexData of the Ground designed from a heightmap
    * @param options an object used to set the following parameters for the
    * Ground, required and provided by MeshBuilder.CreateGroundFromHeightMap
    * * width the width (x direction) of the ground
@@ -355,6 +355,8 @@ public:
    * * buffer the array holding the image color data
    * * bufferWidth the width of image
    * * bufferHeight the height of image
+   * * alphaFilter Remove any data where the alpha channel is below this value,
+   * defaults 0 (all data visible)
    * @returns the VertexData of the Ground designed from a heightmap
    */
   static std::unique_ptr<VertexData>
