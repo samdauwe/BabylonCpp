@@ -76,7 +76,7 @@ void initializeScene(ICanvas* canvas, Scene* scene)
   // Default intensity is 1. Let's dim the light a small amount
   light->intensity = 0.7f;
 
-  // Create a built-in "sphere" shape; its constructor takes 5 params: name,
+  // Create a built-in "sphere" shape; its constructor takes 4 params: name,
   // subdivs, size, scene
   auto sphere = Mesh::CreateSphere("sphere1", 32, 2.f, scene);
 
@@ -106,9 +106,11 @@ Example scenes can be found on the [samples](https://github.com/samdauwe/Babylon
 
 ## Available as git submodules ##
 * [Earcut](https://github.com/mapbox/earcut.hpp.git): A C++ port of earcut.js, a fast, header-only polygon triangulation library.
-* [Google Test](https://github.com/google/googletest): Google's framework for writing C++ tests on a variety of platforms, used for the unit tests (Optional).
 * [GLFW](https://github.com/glfw/glfw): Framework for OpenGL application development, used for the examples (Optional).
 * [GLXW](https://github.com/rikusalminen/glxw): OpenGL loader, used for the examples (Optional).
+* [Google Test](https://github.com/google/googletest): Google's framework for writing C++ tests on a variety of platforms, used for the unit tests (Optional).
+* [Dear ImGui](https://github.com/ocornut/imgui): Bloat-free Immediate Mode Graphical User interface for C++ with minimal dependencies.
+* [JSON for Modern C++](https://github.com/nlohmann/json)
 
 ## Supported Compilers ##
 * GCC >= 7.0.0
