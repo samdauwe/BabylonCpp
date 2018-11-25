@@ -75,8 +75,10 @@ void PhysicsViewer::showImpostor(PhysicsImpostor* impostor)
     _meshes[_numMeshes]    = debugMesh;
 
     if (_numMeshes == 0) {
-      // _renderFunction = [this](){_updateDebugMeshes();};
-      // _scene->registerBeforeRender(_renderFunction);
+      _renderFunction = [this](Scene* /*scene*/, EventState& /*es*/) {
+        _updateDebugMeshes();
+      };
+      _scene->registerBeforeRender(_renderFunction);
     }
 
     ++_numMeshes;
@@ -118,7 +120,7 @@ void PhysicsViewer::hideImpostor(PhysicsImpostor* impostor)
   }
 
   if (removed && _numMeshes == 0) {
-    // _scene->unregisterBeforeRender(_renderFunction);
+    _scene->unregisterBeforeRender(_renderFunction);
   }
 }
 

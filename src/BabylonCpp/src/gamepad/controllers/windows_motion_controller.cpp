@@ -104,11 +104,11 @@ WindowsMotionController::get_onTouchpadValuesChangedObservable()
 
 void WindowsMotionController::_updateTrackpad()
 {
-  if (_browserGamepad->axes.size() >= 4) {
-    if (!stl_util::almost_equal(_browserGamepad->axes[2], trackpad.x)
-        || !stl_util::almost_equal(_browserGamepad->axes[3], trackpad.y)) {
-      trackpad.x = _browserGamepad->axes[2];
-      trackpad.y = _browserGamepad->axes[3];
+  if (browserGamepad->axes.size() >= 4) {
+    if (!stl_util::almost_equal(browserGamepad->axes[2], trackpad.x)
+        || !stl_util::almost_equal(browserGamepad->axes[3], trackpad.y)) {
+      trackpad.x = browserGamepad->axes[2];
+      trackpad.y = browserGamepad->axes[3];
       onTrackpadValuesChangedObservable.notifyObservers(&trackpad);
     }
   }
@@ -117,13 +117,13 @@ void WindowsMotionController::_updateTrackpad()
 void WindowsMotionController::update()
 {
   WebVRController::update();
-  if (!_browserGamepad->axes.empty()) {
+  if (!browserGamepad->axes.empty()) {
     _updateTrackpad();
     // Only need to animate axes if there is a loaded mesh
     if (_loadedMeshInfo) {
       for (unsigned int axis = 0; axis < _mappingAxisMeshNames.size(); ++axis) {
-        if (axis < _browserGamepad->axes.size()) {
-          _lerpAxisTransform(axis, _browserGamepad->axes[axis]);
+        if (axis < browserGamepad->axes.size()) {
+          _lerpAxisTransform(axis, browserGamepad->axes[axis]);
         }
       }
     }
@@ -172,8 +172,8 @@ void WindowsMotionController::_handleButtonChange(
   _lerpButtonTransform(buttonName, static_cast<float>(state.value()));
 }
 
-void WindowsMotionController::_lerpButtonTransform(const std::string& buttonName,
-                                                   float buttonValue)
+void WindowsMotionController::_lerpButtonTransform(
+  const std::string& buttonName, float buttonValue)
 {
   // If there is no loaded mesh, there is nothing to transform.
   if (!_loadedMeshInfo) {

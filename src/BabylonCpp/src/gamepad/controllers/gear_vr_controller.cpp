@@ -10,8 +10,6 @@ namespace BABYLON {
 GearVRController::GearVRController(
   const std::shared_ptr<IBrowserGamepad>& vrGamepad)
     : WebVRController{vrGamepad}
-    , _maxRotationDistFromHeadset{Math::PI / 5.f}
-    , _draggedRoomRotation{0.f}
     , _buttonIndexToObservableNameMap{{
         "onTrackpadChangedObservable",    // Trackpad
         "onTriggerStateChangedObservable" // Trigger}
@@ -21,18 +19,11 @@ GearVRController::GearVRController(
   // Initial starting position defaults to where hand would be (incase of only
   // 3dof controller)
   _calculatedPosition = Vector3(hand == "left" ? -0.15f : 0.15f, -0.5f, 0.25f);
+  _disableTrackPosition(_calculatedPosition);
 }
 
 GearVRController::~GearVRController()
 {
-}
-
-void GearVRController::updateFromDevice(const DevicePose& poseData)
-{
-  WebVRController::updateFromDevice(poseData);
-  if (Engine::LastCreatedScene() && Engine::LastCreatedScene()->activeCamera) {
-    // Not implemented yet
-  }
 }
 
 void GearVRController::initControllerMesh(

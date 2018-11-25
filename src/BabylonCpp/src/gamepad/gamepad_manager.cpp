@@ -10,6 +10,11 @@ GamepadManager::~GamepadManager()
 {
 }
 
+std::vector<std::shared_ptr<Gamepad>>& GamepadManager::gamepads()
+{
+  return _babylonGamepads;
+}
+
 Gamepad* GamepadManager::getGamepadByType(unsigned int /*type*/)
 {
   return nullptr;

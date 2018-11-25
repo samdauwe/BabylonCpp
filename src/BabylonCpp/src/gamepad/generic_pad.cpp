@@ -16,7 +16,7 @@ GenericPad::~GenericPad()
 {
 }
 
-void GenericPad::setOnbuttondown(
+void GenericPad::onbuttondown(
   const std::function<void(unsigned int buttonPressed)>& callback)
 {
   _onbuttondown = callback;
@@ -55,7 +55,7 @@ void GenericPad::update()
 {
   Gamepad::update();
   for (unsigned int index = 0; index < _buttons.size(); ++index) {
-    _buttons[index] = _setButtonValue(_browserGamepad->buttons[index].value,
+    _buttons[index] = _setButtonValue(browserGamepad->buttons[index].value,
                                       _buttons[index], index);
   }
 }

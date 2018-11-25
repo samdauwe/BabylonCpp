@@ -15,6 +15,14 @@ class MirrorTexture;
 using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
 using MirrorTexturePtr   = std::shared_ptr<MirrorTexture>;
 
+/**
+ * @brief Mirror texture can be used to simulate the view from a mirror in a
+ * scene. It will dynamically be rendered every frame to adapt to the camera
+ * point of view. You can then easily use it as a reflectionTexture on a flat
+ * surface. In case the surface is not a plane, please consider relying on
+ * reflection probes.
+ * @see https://doc.babylonjs.com/how_to/reflect#mirrors
+ */
 class BABYLON_SHARED_EXPORT MirrorTexture : public RenderTargetTexture {
 
 public:
@@ -29,11 +37,41 @@ public:
   }
   ~MirrorTexture() override;
 
+  /**
+   * @brief Clone the mirror texture.
+   * @returns the cloned texture
+   */
   MirrorTexturePtr clone();
+
+  /**
+   * @brief Serialize the texture to a JSON representation you could use in
+   * Parse later on
+   * @returns the serialized JSON representation
+   */
   json serialize() const;
+
+  /**
+   * @brief Dispose the texture and release its associated resources.
+   */
   void dispose() override;
 
 protected:
+  /**
+   * @brief Instantiates a Mirror Texture.
+   * Mirror texture can be used to simulate the view from a mirror in a scene.
+   * It will dynamically be rendered every frame to adapt to the camera point of
+   * view. You can then easily use it as a reflectionTexture on a flat surface.
+   * In case the surface is not a plane, please consider relying on reflection
+   * probes.
+   * @see https://doc.babylonjs.com/how_to/reflect#mirrors
+   * @param name
+   * @param size
+   * @param scene
+   * @param generateMipMaps
+   * @param type
+   * @param samplingMode
+   * @param generateDepthBuffer
+   */
   MirrorTexture(const std::string& name, const ISize& size, Scene* scene,
                 bool generateMipMaps = false,
                 unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
@@ -58,12 +96,48 @@ private:
   void _preparePostProcesses();
 
 public:
+  /**
+   * Define the reflection plane we want to use. The mirrorPlane is usually set
+   * to the constructed reflector. It is possible to directly set the
+   * mirrorPlane by directly using a BABYLON.Plane(a, b, c, d) where a, b and c
+   * give the plane normal vector (a, b, c) and d is a scalar displacement from
+   * the mirrorPlane to the origin. However in all but the very simplest of
+   * situations it is more straight forward to set it to the reflector as stated
+   * in the doc.
+   * @see https://doc.babylonjs.com/how_to/reflect#mirrors
+   */
   Plane mirrorPlane;
 
+  /**
+   * Define the blur ratio used to blur the reflection if needed.
+   */
   Property<MirrorTexture, float> blurRatio;
+
+  /**
+   * Define the adaptive blur kernel used to blur the reflection if needed.
+   * This will autocompute the closest best match for the `blurKernel`
+   */
   WriteOnlyProperty<MirrorTexture, float> adaptiveBlurKernel;
+
+  /**
+   * Define the blur kernel used to blur the reflection if needed.
+   * Please consider using `adaptiveBlurKernel` as it could find the closest
+   * best value for you.
+   */
   WriteOnlyProperty<MirrorTexture, float> blurKernel;
+
+  /**
+   * Define the blur kernel on the X Axis used to blur the reflection if needed.
+   * Please consider using `adaptiveBlurKernel` as it could find the closest
+   * best value for you.
+   */
   Property<MirrorTexture, float> blurKernelX;
+
+  /**
+   * Define the blur kernel on the Y Axis used to blur the reflection if needed.
+   * Please consider using `adaptiveBlurKernel` as it could find the closest
+   * best value for you.
+   */
   Property<MirrorTexture, float> blurKernelY;
 
 private:

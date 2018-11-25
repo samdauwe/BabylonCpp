@@ -10,29 +10,62 @@ namespace BABYLON {
 
 class Scene;
 
+/**
+ * @brief Manager for handling gamepads.
+ */
 class BABYLON_SHARED_EXPORT GamepadManager {
 
   friend class Scene;
 
 public:
+  /**
+   * @brief Initializes the gamepad manager.
+   * @param _scene BabylonJS scene
+   */
   GamepadManager(Scene* scene);
   ~GamepadManager();
 
+  /**
+   * @brief The gamepads in the game pad manager.
+   */
+  std::vector<std::shared_ptr<Gamepad>>& gamepads();
+
+  /**
+   * @brief Get the gamepad controllers based on type.
+   * @param type The type of gamepad controller
+   * @returns Nullable gamepad
+   */
   Gamepad* getGamepadByType(unsigned int type = Gamepad::XBOX);
+
+  /**
+   * @brief Disposes the gamepad manager.
+   */
   void dispose();
-  Gamepad* _addNewGamepad(Gamepad* gamepad);
-  void _startMonitoringGamepads();
-  void _stopMonitoringGamepads();
-  /** Hidden */
+
+  /**
+   * @brief Hidden.
+   */
   void _checkGamepadsStatus();
 
 private:
+  Gamepad* _addNewGamepad(Gamepad* gamepad);
+  void _startMonitoringGamepads();
+  void _stopMonitoringGamepads();
   void _updateGamepadObjects();
 
 public:
   /** Hidden */
   bool _isMonitoring;
+
+  /**
+   * observable to be triggered when the gamepad controller has been connected
+   */
   Observable<Gamepad> onGamepadConnectedObservable;
+
+  /**
+   * observable to be triggered when the gamepad controller has been
+   * disconnected
+   */
   Observable<Gamepad> onGamepadDisconnectedObservable;
 
 private:

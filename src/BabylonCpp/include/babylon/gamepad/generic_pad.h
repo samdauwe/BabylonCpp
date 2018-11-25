@@ -7,19 +7,56 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Represents a generic gamepad.
+ */
 class BABYLON_SHARED_EXPORT GenericPad : public Gamepad {
 
 public:
+  /**
+   * @brief Initializes the generic gamepad.
+   * @param id The id of the generic gamepad
+   * @param index The index of the generic gamepad
+   * @param browserGamepad The browser gamepad
+   */
   GenericPad(const std::string& id, int index,
              const std::shared_ptr<IBrowserGamepad>& browserGamepad);
   virtual ~GenericPad() override;
 
-  void setOnbuttondown(
-    const std::function<void(unsigned int buttonPressed)>& callback);
+  /**
+   * @brief Callback triggered when a button has been pressed.
+   * @param callback Called when a button has been pressed
+   */
+  void
+  onbuttondown(const std::function<void(unsigned int buttonPressed)>& callback);
+
+  /**
+   * @brief Callback triggered when a button has been released.
+   * @param callback Called when a button has been released
+   */
   void
   onbuttonup(const std::function<void(unsigned int buttonPressed)>& callback);
+
+  /**
+   * @brief Updates the generic gamepad.
+   */
   void update() override;
+
+  /**
+   * @brief Disposes the generic gamepad.
+   */
   void dispose() override;
+
+public:
+  /**
+   * Observable triggered when a button has been pressed
+   */
+  Observable<unsigned int> onButtonDownObservable;
+
+  /**
+   * Observable triggered when a button has been released
+   */
+  Observable<unsigned int> onButtonUpObservable;
 
 private:
   unsigned int _setButtonValue(unsigned int newValue, unsigned int currentValue,
@@ -29,9 +66,6 @@ private:
   Uint32Array _buttons;
   std::function<void(unsigned int buttonPressed)> _onbuttondown;
   std::function<void(unsigned int buttonPressed)> _onbuttonup;
-
-  Observable<unsigned int> onButtonDownObservable;
-  Observable<unsigned int> onButtonUpObservable;
 
 }; // end of class GenericPad
 

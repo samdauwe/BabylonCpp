@@ -57,6 +57,11 @@ public:
   ~PoseEnabledController() override;
 
   /**
+   * Hidden
+   */
+  void _disableTrackPosition(const Vector3& fixedPosition);
+
+  /**
    * @brief Updates the state of the pose enbaled controller and mesh based on
    * the current position and rotation of the controller.
    */
@@ -156,6 +161,11 @@ private:
   Quaternion _deviceRoomRotationQuaternion;
 
   Quaternion _calculatedRotation;
+
+  // Used to convert 6dof controllers to 3dof
+  bool _trackPosition;
+  float _maxRotationDistFromHeadset;
+  float _draggedRoomRotation;
 
   TargetCamera* _poseControlledCamera;
   Quaternion _leftHandSystemQuaternion;

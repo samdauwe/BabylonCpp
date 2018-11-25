@@ -84,14 +84,14 @@ void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone,
   position.z = tmat.m[14];
 }
 
-void SkeletonViewer::_getLinesForBonesWithLength(const std::vector<BonePtr>& bones,
-                                                 const Matrix& meshMat)
+void SkeletonViewer::_getLinesForBonesWithLength(
+  const std::vector<BonePtr>& bones, const Matrix& meshMat)
 {
   _resizeDebugLines(bones.size());
 
   auto meshPos   = mesh->position();
   unsigned int i = 0;
-  for (auto& bone : bones) {
+  for (const auto& bone : bones) {
     auto& points = _debugLines[i];
     _getBonePosition(points[0], *bone, meshMat);
     _getBonePosition(points[1], *bone, meshMat, 0.f,
@@ -102,8 +102,8 @@ void SkeletonViewer::_getLinesForBonesWithLength(const std::vector<BonePtr>& bon
   }
 }
 
-void SkeletonViewer::_getLinesForBonesNoLength(const std::vector<BonePtr>& bones,
-                                               const Matrix& /*meshMat*/)
+void SkeletonViewer::_getLinesForBonesNoLength(
+  const std::vector<BonePtr>& bones, const Matrix& /*meshMat*/)
 {
   _resizeDebugLines(bones.size());
 

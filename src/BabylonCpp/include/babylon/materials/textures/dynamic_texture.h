@@ -19,7 +19,7 @@ struct DynamicTextureOptions {
 }; // end of struct struct DynamicTexture
 
 /**
- * @brief A class extending {BABYLON.Texture} allowing drawing on a texture.
+ * @brief A class extending Texture allowing drawing on a texture
  * @see http://doc.babylonjs.com/how_to/dynamictexture
  */
 class BABYLON_SHARED_EXPORT DynamicTexture : public Texture {
@@ -109,7 +109,7 @@ public:
 
 protected:
   /**
-   * @brief Creates a {BABYLON.DynamicTexture}.
+   * @brief Creates a DynamicTexture
    * @param name defines the name of the texture
    * @param options provides 3 alternatives for width and height of texture, a
    * canvas, object with width and height properties, number for both width and

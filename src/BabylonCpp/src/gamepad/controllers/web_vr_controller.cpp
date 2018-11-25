@@ -6,7 +6,8 @@
 
 namespace BABYLON {
 
-WebVRController::WebVRController(const std::shared_ptr<IBrowserGamepad>& vrGamepad)
+WebVRController::WebVRController(
+  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
     : PoseEnabledController(vrGamepad)
     , pad{StickValues(0.f, 0.f)}
     , hand{vrGamepad->hand}
@@ -36,7 +37,7 @@ AbstractMeshPtr& WebVRController::get_defaultModel()
 
 void WebVRController::setOnButtonStateChange(
   const std::function<void(int controlledIndex, unsigned int buttonIndex,
-                             const ExtendedGamepadButton& state)>& callback)
+                           const ExtendedGamepadButton& state)>& callback)
 {
   _onButtonStateChange = callback;
 }
@@ -45,7 +46,7 @@ void WebVRController::update()
 {
   PoseEnabledController::update();
   for (unsigned int index = 0; index < _buttons.size(); ++index) {
-    // _setButtonValue(_browserGamepad->buttons[index], _buttons[index], index);
+    // _setButtonValue(browserGamepad->buttons[index], _buttons[index], index);
   };
   const auto& pLeftStick = *leftStick();
   if (!stl_util::almost_equal(pLeftStick.x, pad.x)

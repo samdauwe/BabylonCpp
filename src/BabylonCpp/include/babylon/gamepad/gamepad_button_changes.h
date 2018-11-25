@@ -8,10 +8,28 @@
 
 namespace BABYLON {
 
+/**
+ * @brief An interface which manages callbacks for gamepad button changes.
+ */
 struct BABYLON_SHARED_EXPORT GamepadButtonChanges {
+  /**
+   * Called when a gamepad has been changed
+   */
   bool changed;
+
+  /**
+   * Called when a gamepad press event has been triggered
+   */
   bool pressChanged;
+
+  /**
+   * Called when a touch event has been triggered
+   */
   bool touchChanged;
+
+  /**
+   * Called when a value has changed
+   */
   bool valueChanged;
 
   std::string toString() const

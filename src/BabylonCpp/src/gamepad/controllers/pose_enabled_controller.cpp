@@ -3,6 +3,7 @@
 #include <babylon/culling/ray.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
+#include <babylon/math/tmp.h>
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
@@ -14,6 +15,9 @@ PoseEnabledController::PoseEnabledController(
     , _deviceToWorld{Matrix::Identity()}
     , _pointingPoseNode{nullptr}
     , mesh{this, &PoseEnabledController::get_mesh}
+    , _trackPosition{true}
+    , _maxRotationDistFromHeadset{Math::PI / 5.f}
+    , _draggedRoomRotation{0}
     , _workingMatrix{Matrix::Identity()}
 {
   type              = Gamepad::POSE_ENABLED;
@@ -31,6 +35,14 @@ PoseEnabledController::~PoseEnabledController()
 {
 }
 
+void PoseEnabledController::_disableTrackPosition(const Vector3& fixedPosition)
+{
+  if (_trackPosition) {
+    _calculatedPosition.copyFrom(fixedPosition);
+    _trackPosition = false;
+  }
+}
+
 void PoseEnabledController::update()
 {
   Gamepad::update();
@@ -39,7 +51,7 @@ void PoseEnabledController::update()
 
 void PoseEnabledController::_updatePoseAndMesh()
 {
-  const auto& pose = _browserGamepad->pose;
+  const auto& pose = browserGamepad->pose;
   if (pose) {
     updateFromDevice(*pose);
   }

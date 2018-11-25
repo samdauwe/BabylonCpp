@@ -108,8 +108,8 @@ public:
   unsigned int dataSource() const;
 
   /**
-   * @brief Increments the number of references (ie. the number of
-   * {BABYLON.Texture} that point to it).
+   * @brief Increments the number of references (ie. the number of Texture that
+   * point to it).
    */
   void incrementReferences();
 
@@ -166,11 +166,11 @@ public:
    */
   unsigned int samples;
   /**
-   * Gets the type of the texture
+   * Gets the type of the texture (int, float...)
    */
   unsigned int type;
   /**
-   * Gets the format of the texture
+   * Gets the format of the texture (RGB, RGBA...)
    */
   unsigned int format;
   /**

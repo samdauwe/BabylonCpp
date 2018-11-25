@@ -312,40 +312,40 @@ void Xbox360Pad::update()
 {
   Gamepad::update();
   if (_isXboxOnePad) {
-    buttonA          = _browserGamepad->buttons[0].value;
-    buttonB          = _browserGamepad->buttons[1].value;
-    buttonX          = _browserGamepad->buttons[2].value;
-    buttonY          = _browserGamepad->buttons[3].value;
-    buttonLB         = _browserGamepad->buttons[4].value;
-    buttonRB         = _browserGamepad->buttons[5].value;
-    leftTrigger      = _browserGamepad->axes[2];
-    rightTrigger     = _browserGamepad->axes[5];
-    buttonBack       = _browserGamepad->buttons[9].value;
-    buttonStart      = _browserGamepad->buttons[8].value;
-    buttonLeftStick  = _browserGamepad->buttons[6].value;
-    buttonRightStick = _browserGamepad->buttons[7].value;
-    dPadUp           = _browserGamepad->buttons[11].value;
-    dPadDown         = _browserGamepad->buttons[12].value;
-    dPadLeft         = _browserGamepad->buttons[13].value;
-    dPadRight        = _browserGamepad->buttons[14].value;
+    buttonA          = browserGamepad->buttons[0].value;
+    buttonB          = browserGamepad->buttons[1].value;
+    buttonX          = browserGamepad->buttons[2].value;
+    buttonY          = browserGamepad->buttons[3].value;
+    buttonLB         = browserGamepad->buttons[4].value;
+    buttonRB         = browserGamepad->buttons[5].value;
+    leftTrigger      = browserGamepad->axes[2];
+    rightTrigger     = browserGamepad->axes[5];
+    buttonBack       = browserGamepad->buttons[9].value;
+    buttonStart      = browserGamepad->buttons[8].value;
+    buttonLeftStick  = browserGamepad->buttons[6].value;
+    buttonRightStick = browserGamepad->buttons[7].value;
+    dPadUp           = browserGamepad->buttons[11].value;
+    dPadDown         = browserGamepad->buttons[12].value;
+    dPadLeft         = browserGamepad->buttons[13].value;
+    dPadRight        = browserGamepad->buttons[14].value;
   }
   else {
-    buttonA          = _browserGamepad->buttons[0].value;
-    buttonB          = _browserGamepad->buttons[1].value;
-    buttonX          = _browserGamepad->buttons[2].value;
-    buttonY          = _browserGamepad->buttons[3].value;
-    buttonLB         = _browserGamepad->buttons[4].value;
-    buttonRB         = _browserGamepad->buttons[5].value;
-    leftTrigger      = _browserGamepad->buttons[6].value;
-    rightTrigger     = _browserGamepad->buttons[7].value;
-    buttonBack       = _browserGamepad->buttons[8].value;
-    buttonStart      = _browserGamepad->buttons[9].value;
-    buttonLeftStick  = _browserGamepad->buttons[10].value;
-    buttonRightStick = _browserGamepad->buttons[11].value;
-    dPadUp           = _browserGamepad->buttons[12].value;
-    dPadDown         = _browserGamepad->buttons[13].value;
-    dPadLeft         = _browserGamepad->buttons[14].value;
-    dPadRight        = _browserGamepad->buttons[15].value;
+    buttonA          = browserGamepad->buttons[0].value;
+    buttonB          = browserGamepad->buttons[1].value;
+    buttonX          = browserGamepad->buttons[2].value;
+    buttonY          = browserGamepad->buttons[3].value;
+    buttonLB         = browserGamepad->buttons[4].value;
+    buttonRB         = browserGamepad->buttons[5].value;
+    leftTrigger      = browserGamepad->buttons[6].value;
+    rightTrigger     = browserGamepad->buttons[7].value;
+    buttonBack       = browserGamepad->buttons[8].value;
+    buttonStart      = browserGamepad->buttons[9].value;
+    buttonLeftStick  = browserGamepad->buttons[10].value;
+    buttonRightStick = browserGamepad->buttons[11].value;
+    dPadUp           = browserGamepad->buttons[12].value;
+    dPadDown         = browserGamepad->buttons[13].value;
+    dPadLeft         = browserGamepad->buttons[14].value;
+    dPadRight        = browserGamepad->buttons[15].value;
   }
 }
 

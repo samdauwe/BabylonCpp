@@ -80,8 +80,7 @@ public:
    * @brief Defines the callback to call when right trigger is pressed.
    * @param callback defines the callback to use
    */
-  void
-  onrighttriggerchanged(const std::function<void(float value)>& callback);
+  void onrighttriggerchanged(const std::function<void(float value)>& callback);
 
   /**
    * @brief Defines the callback to call when a button is pressed.
@@ -94,188 +93,189 @@ public:
    * @brief Defines the callback to call when a button is released.
    * @param callback defines the callback to use
    */
-  void onbuttonup(
-    const std::function<void(Xbox360Button buttonReleased)>& callback);
+  void
+  onbuttonup(const std::function<void(Xbox360Button buttonReleased)>& callback);
 
   /**
    * @brief Defines the callback to call when a pad is pressed.
    * @param callback defines the callback to use
    */
-  void
-  ondpaddown(const std::function<void(Xbox360Dpad dPadPressed)>& callback);
+  void ondpaddown(const std::function<void(Xbox360Dpad dPadPressed)>& callback);
 
   /**
    * @brief Defines the callback to call when a pad is released.
    * @param callback defines the callback to use
    */
-  void
-  ondpadup(const std::function<void(Xbox360Dpad dPadReleased)>& callback);
+  void ondpadup(const std::function<void(Xbox360Dpad dPadReleased)>& callback);
 
   /**
    * @brief Force the gamepad to synchronize with device values.
    */
   void update() override;
 
+  /**
+   * @brief Disposes the gamepad.
+   */
   void dispose() override;
 
 protected:
   /**
-   * @brief Gets left trigger value.
+   * @brief Gets the left trigger value.
    */
   float get_leftTrigger() const;
 
   /**
-   * @brief Sets left trigger value.
+   * @brief Sets the left trigger value.
    */
   void set_leftTrigger(float newValue);
 
   /**
-   * @brief Gets right trigger value.
+   * @brief Gets the right trigger value.
    */
   float get_rightTrigger() const;
 
   /**
-   * @brief Sets right trigger value.
+   * @brief Sets the right trigger value.
    */
   void set_rightTrigger(float newValue);
 
   /**
-   * @brief Gets value of A button.
+   * @brief Gets the value of the `A` button.
    */
   unsigned int get_buttonA() const;
 
   /**
-   * @brief Sets value of A button.
+   * @brief Sets the value of the `A` button.
    */
   void set_buttonA(unsigned int value);
 
   /**
-   * @brief Gets value of B button.
+   * @brief Gets the value of the `B` button.
    */
   unsigned int get_buttonB() const;
 
   /**
-   * @brief Sets value of B button.
+   * @brief Sets the value of the `B` button.
    */
   void set_buttonB(unsigned int value);
 
   /**
-   * @brief Gets value of X button.
+   * @brief Gets the value of the `X` button.
    */
   unsigned int get_buttonX() const;
 
   /**
-   * @brief Sets value of X button.
+   * @brief Sets the value of the `X` button.
    */
   void set_buttonX(unsigned int value);
 
   /**
-   * @brief Gets value of Y button.
+   * @brief Gets the value of the `Y` button.
    */
   unsigned int get_buttonY() const;
 
   /**
-   * @brief Sets value of Y button.
+   * @brief Sets the value of the `Y` button.
    */
   void set_buttonY(unsigned int value);
 
   /**
-   * @brief Gets value of Start button.
+   * @brief Gets the value of the `Start` button.
    */
   unsigned int get_buttonStart() const;
 
   /**
-   * @brief Sets value of Start button.
+   * @brief Sets the value of the `Start` button.
    */
   void set_buttonStart(unsigned int value);
 
   /**
-   * @brief Gets value of Back button.
+   * @brief Gets the value of the `Back` button.
    */
   unsigned int get_buttonBack() const;
 
   /**
-   * @brief Sets value of Back button.
+   * @brief Sets the value of the `Back` button.
    */
   void set_buttonBack(unsigned int value);
 
   /**
-   * @brief Gets value of Left button.
+   * @brief Gets the value of the `Left` button.
    */
   unsigned int get_buttonLB() const;
 
   /**
-   * @brief Sets value of Left button.
+   * @brief Sets the value of the `Left` button.
    */
   void set_buttonLB(unsigned int value);
 
   /**
-   * @brief Gets value of Right button.
+   * @brief Gets the value of the `Right` button.
    */
   unsigned int get_buttonRB() const;
 
   /**
-   * @brief Sets value of Right button.
+   * @brief Sets the value of the `Right` button.
    */
   void set_buttonRB(unsigned int value);
 
   /**
-   * @brief Gets value of left stick.
+   * @brief Gets the value of the Left joystick.
    */
   unsigned int get_buttonLeftStick() const;
 
   /**
-   * @brief Sets value of left stick.
+   * @brief Sets the value of the Left joystick.
    */
   void set_buttonLeftStick(unsigned int value);
 
   /**
-   * @brief Gets value of right stick.
+   * @brief Gets the value of the Right joystick.
    */
   unsigned int get_buttonRightStick() const;
 
   /**
-   * @brief Sets value of right stick.
+   * @brief Sets the value of the Right joystick.
    */
   void set_buttonRightStick(unsigned int value);
 
   /**
-   * @brief Gets value of DPad up.
+   * @brief Gets the value of D-pad up.
    */
   unsigned int get_dPadUp() const;
 
   /**
-   * @brief Sets value of DPad up.
+   * @brief  Sets the value of D-pad up.
    */
   void set_dPadUp(unsigned int value);
 
   /**
-   * @brief Getsvalue of DPad down.
+   * @brief Gets the value of D-pad down.
    */
   unsigned int get_dPadDown() const;
 
   /**
-   * @brief Sets value of DPad down.
+   * @brief Sets the value of D-pad down.
    */
   void set_dPadDown(unsigned int value);
 
   /**
-   * @brief Gets value of DPad left.
+   * @brief Gets the value of D-pad left.
    */
   unsigned int get_dPadLeft() const;
 
   /**
-   * @brief Sets value of DPad left.
+   * @brief Sets the value of D-pad left.
    */
   void set_dPadLeft(unsigned int value);
 
   /**
-   * @brief Gets value of DPad right.
+   * @brief Gets the value of D-pad right.
    */
   unsigned int get_dPadRight() const;
 
   /**
-   * @brief Sets value of DPad right.
+   * @brief Sets the value of D-pad right.
    */
   void set_dPadRight(unsigned int value);
 
