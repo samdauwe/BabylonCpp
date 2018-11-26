@@ -33,6 +33,7 @@ FramingBehavior::FramingBehavior()
                          &FramingBehavior::set_zoomStopsAnimation}
     , framingTime{this, &FramingBehavior::get_framingTime,
                   &FramingBehavior::set_framingTime}
+    , autoCorrectCameraLimitsAndSensibility{true}
     , _mode{FramingBehavior::FitFrustumSidesMode}
     , _radiusScale{1.f}
     , _positionScale{0.5f}
@@ -236,7 +237,8 @@ void FramingBehavior::zoomOnMeshesHierarchy(
   const std::vector<AbstractMesh*>& meshes, bool focusOnOriginXZ,
   const std::function<void()>& onAnimationEnd)
 {
-  Vector3 min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+  Vector3 min(std::numeric_limits<float>::max(),
+              std::numeric_limits<float>::max(),
               std::numeric_limits<float>::max());
   Vector3 max(std::numeric_limits<float>::lowest(),
               std::numeric_limits<float>::lowest(),
@@ -297,23 +299,28 @@ void FramingBehavior::zoomOnBoundingInfo(
   if (_mode == FramingBehavior::FitFrustumSidesMode) {
     auto position = _calculateLowerRadiusFromModelBoundingSphere(minimumWorld,
                                                                  maximumWorld);
-    _attachedCamera->lowerRadiusLimit
-      = radiusWorld.length() + _attachedCamera->minZ;
+    if (autoCorrectCameraLimitsAndSensibility) {
+      _attachedCamera->lowerRadiusLimit
+        = radiusWorld.length() + _attachedCamera->minZ;
+    }
     radius = position;
   }
   else if (_mode == FramingBehavior::IgnoreBoundsSizeMode) {
     radius = _calculateLowerRadiusFromModelBoundingSphere(minimumWorld,
                                                           maximumWorld);
-    if (_attachedCamera->lowerRadiusLimit == 0.f) {
+    if (autoCorrectCameraLimitsAndSensibility
+        && _attachedCamera->lowerRadiusLimit == 0.f) {
       _attachedCamera->lowerRadiusLimit = _attachedCamera->minZ;
     }
   }
 
   // Set sensibilities
-  // auto extend = maximumWorld.subtract(minimumWorld).length();
-  // Set property for backward compatibility for inputs
-  // _attachedCamera->panningSensibility = 5000.f / extend;
-  _attachedCamera->wheelPrecision = 100.f / radius;
+  if (autoCorrectCameraLimitsAndSensibility) {
+    // auto extend = maximumWorld.subtract(minimumWorld).length();
+    // Set property for backward compatibility for inputs
+    // _attachedCamera->panningSensibility = 5000.f / extend;
+    _attachedCamera->wheelPrecision = 100.f / radius;
+  }
 
   // transition to new radius
   if (!_radiusTransition) {
@@ -330,7 +337,7 @@ void FramingBehavior::zoomOnBoundingInfo(
         onAnimationEnd();
       }
 
-      if (_attachedCamera) {
+      if (_attachedCamera && _attachedCamera->useInputToRestoreState) {
         _attachedCamera->storeState();
       }
     });

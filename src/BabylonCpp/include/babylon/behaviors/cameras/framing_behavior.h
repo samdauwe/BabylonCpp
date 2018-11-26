@@ -20,6 +20,13 @@ class Vector3;
 using AnimationPtr       = std::shared_ptr<Animation>;
 using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
+/**
+ * @brief The framing behavior (BABYLON.FramingBehavior) is designed to
+ * automatically position an ArcRotateCamera when its target is set to a mesh.
+ * It is also useful if you want to prevent the camera to go under a virtual
+ * horizontal plane.
+ * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
+ */
 class BABYLON_SHARED_EXPORT FramingBehavior : public Behavior<ArcRotateCamera> {
 
 public:
@@ -49,12 +56,25 @@ public:
   FramingBehavior();
   virtual ~FramingBehavior();
 
+  /**
+   * @brief Gets the name of the behavior.
+   */
   const char* name() const;
 
+  /**
+   * @brief Initializes the behavior.
+   */
   void init() override;
 
+  /**
+   * @brief Attaches the behavior to its arc rotate camera.
+   * @param camera Defines the camera to attach the behavior to
+   */
   void attach(const ArcRotateCameraPtr& camera) override;
 
+  /**
+   * @brief Detaches the behavior from its current arc rotate camera.
+   */
   void detach() override;
 
   /**
@@ -108,12 +128,12 @@ public:
                              = nullptr);
 
   /**
-   * @brief Targets the given mesh and updates zoom level accordingly.
-   * @param mesh  The mesh to target.
-   * @param radius Optional. If a cached radius position already exists,
-   * overrides default.
-   * @param framingPositionY Position on mesh to center camera focus where 0
-   * corresponds bottom of its bounding box and 1, the top
+   * @brief Targets the bounding box info defined by its extends and updates
+   * zoom level accordingly.
+   * @param minimumWorld Determines the smaller position of the bounding box
+   * extend
+   * @param maximumWorld Determines the bigger position of the bounding box
+   * extend
    * @param focusOnOriginXZ Determines if the camera should focus on 0 in the X
    * and Z axis instead of the mesh
    * @param onAnimationEnd Callback triggered at the end of the framing
@@ -121,7 +141,7 @@ public:
    */
   void
   zoomOnBoundingInfo(const Vector3& minimumWorld, const Vector3& maximumWorld,
-                     bool focusOnOriginXZ                          = false,
+                     bool focusOnOriginXZ                        = false,
                      const std::function<void()>& onAnimationEnd = nullptr);
 
 protected:
@@ -310,6 +330,12 @@ public:
    * Transition time when framing the mesh, in milliseconds
    */
   Property<FramingBehavior, float> framingTime;
+
+  /**
+   * Define if the behavior should automatically change the configured
+   * camera limits and sensibilities.
+   */
+  bool autoCorrectCameraLimitsAndSensibility;
 
 private:
   unsigned int _mode;

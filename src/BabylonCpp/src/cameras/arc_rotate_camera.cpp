@@ -53,6 +53,7 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , zoomOnFactor{1.f}
     , targetScreenOffset{Vector2::Zero()}
     , allowUpsideDown{true}
+    , useInputToRestoreState{true}
     , panningAxis{std::make_unique<Vector3>(1.f, 1.f, 0.f)}
     , bouncingBehavior{this, &ArcRotateCamera::get_bouncingBehavior}
     , useBouncingBehavior{this, &ArcRotateCamera::get_useBouncingBehavior,

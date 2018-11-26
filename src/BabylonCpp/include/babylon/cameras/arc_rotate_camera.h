@@ -131,6 +131,7 @@ public:
   float wheelPrecision;
   Vector2 targetScreenOffset;
   bool allowUpsideDown;
+  bool useInputToRestoreState;
   /** Hidden */
   bool _useCtrlForPanning;
   /** Hidden */
