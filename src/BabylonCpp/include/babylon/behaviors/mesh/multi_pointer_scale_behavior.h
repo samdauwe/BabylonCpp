@@ -21,7 +21,8 @@ class BABYLON_SHARED_EXPORT MultiPointerScaleBehavior : public Behavior<Mesh> {
 
 public:
   /**
-   * @brief Creates the behavior.
+   * @brief Instantiate a new behavior that when attached to a mesh will allow
+   * the mesh to be scaled.
    */
   MultiPointerScaleBehavior();
   virtual ~MultiPointerScaleBehavior();

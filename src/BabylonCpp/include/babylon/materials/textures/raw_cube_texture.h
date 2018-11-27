@@ -28,7 +28,8 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
    * BABYLON.Texture.NEAREST_SAMPLINGMODE)
    * @param compression defines the compression used (null by default)
    */
-  RawCubeTexture(Scene* scene, const std::vector<Uint8Array>& data, int size,
+  RawCubeTexture(Scene* scene, const std::vector<ArrayBufferView>& data,
+                 int size,
                  unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
                  unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
                  bool generateMipMaps = false, bool invertY = false,
@@ -47,7 +48,7 @@ struct BABYLON_SHARED_EXPORT RawCubeTexture : public CubeTexture {
    * @param compression defines the compression used (null by default)
    * @param level defines which level of the texture to update
    */
-  void update(const std::vector<Uint8Array>& data, unsigned int format,
+  void update(const std::vector<ArrayBufferView>& data, unsigned int format,
               unsigned int type, bool invertY,
               const std::string& compression = "", unsigned int level = 0);
 

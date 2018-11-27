@@ -74,6 +74,11 @@ struct BABYLON_SHARED_EXPORT CubeMapInfo {
    */
   bool gammaSpace;
 
+  /**
+   * @brief Returns the face data by name.
+   */
+  ArrayBufferView& operator[](const std::string& face);
+
 }; // end of struct CubeMapInfo
 
 } // end of namespace BABYLON

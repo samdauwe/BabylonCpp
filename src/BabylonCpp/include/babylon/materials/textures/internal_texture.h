@@ -11,6 +11,7 @@
 
 namespace BABYLON {
 
+struct ArrayBufferView;
 class BaseTexture;
 class Engine;
 class ICanvasRenderingContext2D;
@@ -215,7 +216,7 @@ public:
   unsigned int _dataSource;
   std::variant<std::string, ArrayBuffer, Image> _buffer;
   ArrayBuffer _bufferView;
-  std::vector<ArrayBuffer> _bufferViewArray;
+  std::vector<ArrayBufferView> _bufferViewArray;
   std::vector<std::vector<ArrayBuffer>> _bufferViewArrayArray;
   int _size;
   std::string _extension;

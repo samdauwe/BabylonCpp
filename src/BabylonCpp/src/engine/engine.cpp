@@ -4301,7 +4301,7 @@ void Engine::_setCubeMapTextureParams(bool loadMipmap)
 }
 
 void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
-                                  const std::vector<Uint8Array>& data,
+                                  const std::vector<ArrayBufferView>& data,
                                   unsigned int format, unsigned int type,
                                   bool invertY, const std::string& compression,
                                   unsigned int level)
@@ -4312,9 +4312,9 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
   texture->invertY          = invertY;
   texture->_compression     = compression;
 
-  // auto textureType        = _getWebGLTextureType(type);
-  auto internalFormat = _getInternalFormat(format);
-  // auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
+  auto textureType        = _getWebGLTextureType(type);
+  auto internalFormat     = _getInternalFormat(format);
+  auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
 
   bool needConversion = false;
   if (internalFormat == GL::RGB) {
@@ -4323,7 +4323,6 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
   }
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
-
   _unpackFlipY(invertY ? true : false);
 
   if (texture->width % 4 != 0) {
@@ -4337,21 +4336,30 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
 
   // Data are known to be in +X +Y +Z -X -Y -Z
   for (std::size_t index = 0; index < facesIndex.size(); ++index) {
-    // const auto& faceData = data[index];
+    const auto& faceData = data[index];
 
     if (!compression.empty()) {
-      // _gl->compressedTexImage2D(facesIndex[index], level,
-      // getCaps().s3tc[compression], texture->_width, texture->_height, 0,
-      // faceData);
+#if 0
+      _gl->compressedTexImage2D(facesIndex[index], level,
+                                getCaps().s3tc[compression], texture->width,
+                                texture->height, 0, faceData.uint8Array);
+#endif
     }
     else {
       if (needConversion) {
-        // faceData = _convertRGBtoRGBATextureData(faceData, texture->_width,
-        // texture->_height, type);
+        auto convertedFaceData = _convertRGBtoRGBATextureData(
+          faceData, texture->width, texture->height, type);
+        _gl->texImage2D(facesIndex[index], static_cast<int>(level),
+                        static_cast<int>(internalSizedFomat), texture->width,
+                        texture->height, 0, internalFormat, textureType,
+                        convertedFaceData.uint8Array);
       }
-      // _gl->texImage2D(facesIndex[index], level, internalSizedFomat,
-      // texture->_width, texture->_height, 0, internalFormat, textureType,
-      // faceData);
+      else {
+        _gl->texImage2D(facesIndex[index], static_cast<int>(level),
+                        static_cast<int>(internalSizedFomat), texture->width,
+                        texture->height, 0, internalFormat, textureType,
+                        faceData.uint8Array);
+      }
     }
   }
 
@@ -4369,7 +4377,7 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
 }
 
 InternalTexturePtr Engine::createRawCubeTexture(
-  const std::vector<Uint8Array> data, int size, unsigned int format,
+  const std::vector<ArrayBufferView> data, int size, unsigned int format,
   unsigned int type, bool generateMipMaps, bool invertY,
   unsigned int samplingMode, const std::string& compression)
 {
@@ -4464,18 +4472,101 @@ InternalTexturePtr Engine::createRawCubeTexture(
   return texture;
 }
 
-InternalTexture* Engine::createRawCubeTextureFromUrl(
-  const std::string& /*url*/, Scene* /*scene*/, int /*size*/,
-  unsigned int /*format*/, unsigned int /*type*/, bool /*noMipmap*/,
-  const std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
-  /*callback*/,
+InternalTexturePtr Engine::createRawCubeTextureFromUrl(
+  const std::string& url, Scene* scene, int size, unsigned int format,
+  unsigned int type, bool noMipmap,
+  const std::function<ArrayBufferViewArray(const ArrayBuffer& arrayBuffer)>&
+    callback,
   const std::function<std::vector<ArrayBufferViewArray>(
-    const ArrayBufferViewArray& faces)>& /*mipmmapGenerator*/,
-  const std::function<void()>& /*onLoad*/,
-  const std::function<void()>& /*onError*/, unsigned int /*samplingMode*/,
-  bool /*invertY*/)
+    const ArrayBufferViewArray& faces)>& mipmapGenerator,
+  const std::function<void()>& onLoad,
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& onError,
+  unsigned int samplingMode, bool invertY)
 {
-  return nullptr;
+  auto texture = createRawCubeTexture({}, size, format, type, !noMipmap,
+                                      invertY, samplingMode);
+  scene->_addPendingData(texture);
+  texture->url = url;
+  _internalTexturesCache.emplace_back(texture);
+
+  const auto onerror
+    = [&](const std::string& message, const std::string& exception) -> void {
+    scene->_removePendingData(texture);
+    if (onError) {
+      onError(message, exception);
+    }
+  };
+
+  const auto internalCallback
+    = [&](const std::variant<std::string, ArrayBuffer>& data,
+          const std::string & /*responseURL*/) -> void {
+    auto width = texture->width;
+
+    if (!std::holds_alternative<ArrayBuffer>(data)) {
+      return;
+    }
+
+    auto faceDataArrays = callback(std::get<ArrayBuffer>(data));
+
+    if (faceDataArrays.empty()) {
+      return;
+    }
+
+    if (mipmapGenerator) {
+      auto textureType        = _getWebGLTextureType(type);
+      auto internalFormat     = _getInternalFormat(format);
+      auto internalSizedFomat = _getRGBABufferInternalSizedFormat(type);
+
+      auto needConversion = false;
+      if (internalFormat == GL::RGB) {
+        internalFormat = GL::RGBA;
+        needConversion = true;
+      }
+
+      _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
+      _unpackFlipY(false);
+
+      const auto& mipData = mipmapGenerator(faceDataArrays);
+      for (size_t level = 0; level < mipData.size(); level++) {
+        auto mipSize = width >> level;
+
+        for (unsigned int faceIndex = 0; faceIndex < 6; ++faceIndex) {
+          auto mipFaceData = mipData[level][faceIndex];
+          if (needConversion) {
+            mipFaceData = _convertRGBtoRGBATextureData(mipFaceData, mipSize,
+                                                       mipSize, type);
+          }
+          _gl->texImage2D(faceIndex, static_cast<int>(level),
+                          static_cast<int>(internalSizedFomat), mipSize,
+                          mipSize, 0, internalFormat, textureType,
+                          mipFaceData.uint8Array);
+        }
+      }
+
+      _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
+    }
+    else {
+      updateRawCubeTexture(texture, faceDataArrays, format, type, invertY);
+    }
+
+    texture->isReady = true;
+    // resetTextureCache();
+    scene->_removePendingData(texture);
+
+    if (onLoad) {
+      onLoad();
+    }
+  };
+
+  _loadFile(url,
+            [&](const std::variant<std::string, ArrayBuffer>& data,
+                const std::string& responseURL) -> void {
+              internalCallback(data, responseURL);
+            },
+            nullptr, true, onerror);
+
+  return texture;
 }
 
 void Engine::updateRawTexture3D(const InternalTexturePtr& texture,

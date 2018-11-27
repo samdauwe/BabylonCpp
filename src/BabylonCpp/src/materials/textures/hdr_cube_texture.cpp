@@ -8,6 +8,8 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
+#include <babylon/tools/hdr/hdr_tools.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -29,9 +31,6 @@ HDRCubeTexture::HDRCubeTexture(
                            const std::string& exception)>& onError)
     : BaseTexture(scene)
     , url{iUrl}
-    , coordinatesMode{TextureConstants::CUBIC_MODE}
-    , isBlocking{this, &HDRCubeTexture::get_isBlocking,
-                 &HDRCubeTexture::set_isBlocking}
     , rotationY{this, &HDRCubeTexture::get_rotationY,
                 &HDRCubeTexture::set_rotationY}
     , boundingBoxPosition{Vector3::Zero()}
@@ -48,14 +47,15 @@ HDRCubeTexture::HDRCubeTexture(
     return;
   }
 
-  name           = iUrl;
-  url            = iUrl;
-  hasAlpha       = false;
-  isCube         = true;
-  _textureMatrix = Matrix::Identity();
-  _onLoad        = onLoad;
-  _onError       = onError;
-  gammaSpace     = iGammaSpace;
+  name            = iUrl;
+  url             = iUrl;
+  hasAlpha        = false;
+  isCube          = true;
+  _textureMatrix  = Matrix::Identity();
+  _onLoad         = onLoad;
+  _onError        = onError;
+  gammaSpace      = iGammaSpace;
+  coordinatesMode = TextureConstants::CUBIC_MODE;
 
   _noMipmap = noMipmap;
   _size     = size;
@@ -118,18 +118,131 @@ std::optional<Vector3>& HDRCubeTexture::get_boundingBoxSize()
   return _boundingBoxSize;
 }
 
-Float32Array HDRCubeTexture::loadTexture()
+void HDRCubeTexture::loadTexture()
 {
-  return Float32Array();
+  const auto callback
+    = [this](const ArrayBuffer& buffer) -> std::vector<ArrayBufferView> {
+    lodGenerationOffset = 0.f;
+    lodGenerationScale  = 0.8f;
+
+    auto scene = getScene();
+
+    if (!scene) {
+      return {};
+    }
+    // Extract the raw linear data.
+    auto data = HDRTools::GetCubeMapTextureData(buffer, _size);
+
+    // Generate harmonics if needed.
+    if (_generateHarmonics) {
+      auto _sphericalPolynomial = CubeMapToSphericalPolynomialTools::
+        ConvertCubeMapToSphericalPolynomial(data);
+      sphericalPolynomial = _sphericalPolynomial;
+    }
+
+    std::vector<ArrayBufferView> results;
+    Uint8Array byteArray;
+
+    // Push each faces.
+    for (unsigned int j = 0; j < 6; ++j) {
+
+      // Create uintarray fallback.
+      if (!scene->getEngine()->getCaps().textureFloat) {
+        // 3 channels of 1 bytes per pixel in bytes.
+        byteArray.resize(_size * _size * 3);
+      }
+
+      auto& dataFace = data[HDRCubeTexture::_facesMapping[j]].float32Array;
+
+      // If special cases.
+      if (gammaSpace || !byteArray.empty()) {
+        for (size_t i = 0; i < _size * _size; ++i) {
+
+          // Put in gamma space if requested.
+          if (gammaSpace) {
+            dataFace[(i * 3) + 0]
+              = std::pow(dataFace[(i * 3) + 0], Math::ToGammaSpace);
+            dataFace[(i * 3) + 1]
+              = std::pow(dataFace[(i * 3) + 1], Math::ToGammaSpace);
+            dataFace[(i * 3) + 2]
+              = std::pow(dataFace[(i * 3) + 2], Math::ToGammaSpace);
+          }
+
+          // Convert to int texture for fallback.
+          if (!byteArray.empty()) {
+            auto r = std::max(dataFace[(i * 3) + 0] * 255, 0.f);
+            auto g = std::max(dataFace[(i * 3) + 1] * 255, 0.f);
+            auto b = std::max(dataFace[(i * 3) + 2] * 255, 0.f);
+
+            // May use luminance instead if the result is not accurate.
+            auto max = std::max(std::max(r, g), b);
+            if (max > 255) {
+              auto scale = 255.f / max;
+              r *= scale;
+              g *= scale;
+              b *= scale;
+            }
+
+            byteArray[(i * 3) + 0] = static_cast<uint8_t>(r);
+            byteArray[(i * 3) + 1] = static_cast<uint8_t>(g);
+            byteArray[(i * 3) + 2] = static_cast<uint8_t>(b);
+          }
+        }
+      }
+
+      if (!byteArray.empty()) {
+        results.emplace_back(byteArray);
+      }
+      else {
+        results.emplace_back(dataFace);
+      }
+    }
+    return results;
+  };
+
+  auto scene = getScene();
+  if (scene) {
+    _texture = scene->getEngine()->createRawCubeTextureFromUrl(
+      url, scene, static_cast<int>(_size), EngineConstants::TEXTUREFORMAT_RGB,
+      scene->getEngine()->getCaps().textureFloat ?
+        EngineConstants::TEXTURETYPE_FLOAT :
+        EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+      _noMipmap, callback, nullptr, _onLoad, _onError);
+  }
 }
 
-HDRCubeTexture* HDRCubeTexture::clone()
+HDRCubeTexturePtr HDRCubeTexture::clone() const
 {
-  return nullptr;
+  auto scene = getScene();
+  if (!scene) {
+    return nullptr;
+  }
+
+  auto newTexture = HDRCubeTexture::New(url, scene, _size, _noMipmap,
+                                        _generateHarmonics, gammaSpace);
+
+  // Base texture
+  newTexture->level            = level;
+  newTexture->wrapU            = wrapU;
+  newTexture->wrapV            = wrapV;
+  newTexture->coordinatesIndex = coordinatesIndex;
+  newTexture->coordinatesMode  = coordinatesMode();
+
+  return newTexture;
 }
 
 void HDRCubeTexture::delayLoad()
 {
+  if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
+    return;
+  }
+
+  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
+  _texture       = _getFromCache(url, _noMipmap);
+
+  if (!_texture) {
+    loadTexture();
+  }
 }
 
 Matrix* HDRCubeTexture::getReflectionTextureMatrix()

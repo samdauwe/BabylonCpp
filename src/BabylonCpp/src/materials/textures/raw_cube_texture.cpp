@@ -7,8 +7,8 @@
 namespace BABYLON {
 
 RawCubeTexture::RawCubeTexture(Scene* scene,
-                               const std::vector<Uint8Array>& data, int size,
-                               unsigned int format, unsigned int type,
+                               const std::vector<ArrayBufferView>& data,
+                               int size, unsigned int format, unsigned int type,
                                bool generateMipMaps, bool invertY,
                                unsigned int samplingMode,
                                const std::string& compression)
@@ -23,7 +23,7 @@ RawCubeTexture::~RawCubeTexture()
 {
 }
 
-void RawCubeTexture::update(const std::vector<Uint8Array>& data,
+void RawCubeTexture::update(const std::vector<ArrayBufferView>& data,
                             unsigned int format, unsigned int type,
                             bool invertY, const std::string& compression,
                             unsigned int /*level*/)

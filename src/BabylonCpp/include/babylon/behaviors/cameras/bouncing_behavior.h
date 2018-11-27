@@ -19,7 +19,8 @@ using AnimationPtr       = std::shared_ptr<Animation>;
 
 /**
  * @brief Add a bouncing effect to an ArcRotateCamera when reaching a specified
- * minimum and maximum radius.
+ * minimum and maximum radius
+ * @see http://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
  */
 class BABYLON_SHARED_EXPORT BouncingBehavior
     : public Behavior<ArcRotateCamera> {
@@ -39,12 +40,25 @@ public:
   BouncingBehavior();
   virtual ~BouncingBehavior();
 
+  /**
+   * @brief Gets the name of the behavior.
+   */
   const char* name() const;
 
+  /**
+   * @brief Initializes the behavior.
+   */
   void init() override;
 
+  /**
+   * @brief Attaches the behavior to its arc rotate camera.
+   * @param camera Defines the camera to attach the behavior to
+   */
   void attach(const ArcRotateCameraPtr& camera) override;
 
+  /**
+   * @brief Detaches the behavior from its current arc rotate camera.
+   */
   void detach() override;
 
   /**

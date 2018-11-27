@@ -1712,7 +1712,7 @@ public:
    * @param level defines which level of the texture to update
    */
   void updateRawCubeTexture(const InternalTexturePtr& texture,
-                            const std::vector<Uint8Array>& data,
+                            const std::vector<ArrayBufferView>& data,
                             unsigned int format, unsigned int type,
                             bool invertY                   = true,
                             const std::string& compression = "",
@@ -1733,12 +1733,10 @@ public:
    * @param compression defines the compression used (null by default)
    * @returns the cube texture as an InternalTexture
    */
-  InternalTexturePtr createRawCubeTexture(const std::vector<Uint8Array> data,
-                                          int size, unsigned int format,
-                                          unsigned int type,
-                                          bool generateMipMaps, bool invertY,
-                                          unsigned int samplingMode,
-                                          const std::string& compression = "");
+  InternalTexturePtr createRawCubeTexture(
+    const std::vector<ArrayBufferView> data, int size, unsigned int format,
+    unsigned int type, bool generateMipMaps, bool invertY,
+    unsigned int samplingMode, const std::string& compression = "");
 
   /**
    * @brief Creates a new raw cube texture from a specified url.
@@ -1761,15 +1759,17 @@ public:
    * @param invertY defines if data must be stored with Y axis inverted
    * @returns the cube texture as an InternalTexture
    */
-  InternalTexture* createRawCubeTextureFromUrl(
+  InternalTexturePtr createRawCubeTextureFromUrl(
     const std::string& url, Scene* scene, int size, unsigned int format,
     unsigned int type, bool noMipmap,
-    const std::function<ArrayBufferViewArray(const Uint8Array& arrayBuffer)>&
+    const std::function<ArrayBufferViewArray(const ArrayBuffer& arrayBuffer)>&
       callback,
     const std::function<std::vector<ArrayBufferViewArray>(
-      const ArrayBufferViewArray& faces)>& mipmmapGenerator,
-    const std::function<void()>& onLoad  = nullptr,
-    const std::function<void()>& onError = nullptr,
+      const ArrayBufferViewArray& faces)>& mipmapGenerator,
+    const std::function<void()>& onLoad = nullptr,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr,
     unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool invertY              = false);
 

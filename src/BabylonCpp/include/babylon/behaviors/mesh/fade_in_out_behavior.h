@@ -35,7 +35,7 @@ public:
   void init() override;
 
   /**
-   * Attaches the fade behavior on the passed in mesh
+   * @brief Attaches the fade behavior on the passed in mesh.
    * @param ownerNode The mesh that will be faded in/out once attached
    */
   void attach(const MeshPtr& ownerNode) override;
