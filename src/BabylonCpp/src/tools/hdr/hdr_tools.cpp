@@ -1,5 +1,6 @@
 #include <babylon/tools/hdr/hdr_tools.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/tools/hdr/panorama_to_cube_map_tools.h>
@@ -92,7 +93,7 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
   lineIndex += (line.size() + 1);
   line = readStringLine(uint8array, lineIndex);
 
-  const std::regex sizeRegexp("-Y (.*) +X (.*)$/g", std::regex::optimize);
+  const std::regex sizeRegexp("^\\-Y (.*) \\+X (.*)$", std::regex::optimize);
   std::smatch match;
 
   if (std::regex_search(line, match, sizeRegexp) && (match.size() == 3)) {
@@ -147,10 +148,12 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
   size_t dataIndex = hdrInfo.dataPosition;
   size_t index = 0, endIndex = 0, i = 0;
 
-  Uint8Array scanLineArray(scanline_width * 4); // four channel R G B E
+  ArrayBuffer scanLineArrayBuffer(scanline_width * 4); // four channel R G B E
+  Uint8Array scanLineArray = stl_util::to_array<uint8_t>(scanLineArrayBuffer);
 
   // 3 channels of 4 bytes per pixel in float.
-  Float32Array resultArray(hdrInfo.width * hdrInfo.height * 4 * 3);
+  ArrayBuffer resultBuffer(hdrInfo.width * hdrInfo.height * 4 * 3);
+  Float32Array resultArray = stl_util::to_array<float>(resultBuffer);
 
   // read in each successive scanline
   while (num_scanlines > 0) {
@@ -165,7 +168,7 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
       return resultArray;
     }
 
-    if (((c << 8) | d) != static_cast<std::uint8_t>(scanline_width)) {
+    if (static_cast<size_t>((c << 8) | d) != scanline_width) {
       BABYLON_LOG_ERROR("HDRTools",
                         "HDR Bad header format, wrong scan line width");
       return resultArray;

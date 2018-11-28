@@ -1,4 +1,4 @@
-#ifndef BABYLON_TOOLS_HDR_CUBE_MAP_INFO_H
+﻿#ifndef BABYLON_TOOLS_HDR_CUBE_MAP_INFO_H
 #define BABYLON_TOOLS_HDR_CUBE_MAP_INFO_H
 
 #include <babylon/babylon_api.h>
@@ -78,6 +78,7 @@ struct BABYLON_SHARED_EXPORT CubeMapInfo {
    * @brief Returns the face data by name.
    */
   ArrayBufferView& operator[](const std::string& face);
+  const ArrayBufferView& operator[](const std::string& face) const;
 
 }; // end of struct CubeMapInfo
 

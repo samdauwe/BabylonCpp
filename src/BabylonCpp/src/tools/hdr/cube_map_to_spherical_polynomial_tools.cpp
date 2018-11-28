@@ -93,26 +93,8 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
 
   for (unsigned int faceIndex = 0; faceIndex < 6; ++faceIndex) {
     const auto& fileFace = FileFaces[faceIndex];
-    Float32Array dataArray;
-    if (fileFace.name == "right") {
-      dataArray = cubeInfo.right.float32Array;
-    }
-    else if (fileFace.name == "left") {
-      dataArray = cubeInfo.left.float32Array;
-    }
-    else if (fileFace.name == "up") {
-      dataArray = cubeInfo.up.float32Array;
-    }
-    else if (fileFace.name == "down") {
-      dataArray = cubeInfo.down.float32Array;
-    }
-    else if (fileFace.name == "front") {
-      dataArray = cubeInfo.front.float32Array;
-    }
-    else if (fileFace.name == "back") {
-      dataArray = cubeInfo.back.float32Array;
-    }
-    float v = minUV;
+    const auto dataArray = cubeInfo[fileFace.name].float32Array;
+    float v              = minUV;
 
     // TODO: we could perform the summation directly into a SphericalPolynomial
     // (SP), which is more efficient than SphericalHarmonic (SH).

@@ -8,6 +8,10 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Helper class usefull to convert panorama picture to their cubemap
+ * representation in 6 faces.
+ */
 class BABYLON_SHARED_EXPORT PanoramaToCubeMapTools {
 
 private:
@@ -25,9 +29,9 @@ public:
    *
    * @param float32Array The source data.
    * @param inputWidth The width of the input panorama.
-   * @param inputhHeight The height of the input panorama.
-   * @param size The willing size of the generated cubemap (each faces
-   * will be size * size pixels)
+   * @param inputHeight The height of the input panorama.
+   * @param size The willing size of the generated cubemap (each faces will be
+   * size * size pixels)
    * @return The cubemap data
    */
   static CubeMapInfo ConvertPanoramaToCubemap(const Float32Array& float32Array,
