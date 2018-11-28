@@ -5,6 +5,7 @@
 #include <babylon/samples/textures/cube_texture_different_faces_scene.h>
 #include <babylon/samples/textures/custom_render_targets_scene.h>
 #include <babylon/samples/textures/equirectangular_map_as_reflection_texture_scene.h>
+#include <babylon/samples/textures/hdr_cube_texture_scene.h>
 #include <babylon/samples/textures/image_texture_scene.h>
 #include <babylon/samples/textures/mirror_texture_scene.h>
 #include <babylon/samples/textures/mirrors_scene.h>
@@ -50,6 +51,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
       return std::make_unique<EquirectangularMapAsReflectionTextureScene>(
         iCanvas); //
     });           //
+  // High Dynamic Range (HDR) cube texture scene
+  _samples["HDRCubeTextureScene"] = std::make_tuple(
+    true,                                                    //
+    [](ICanvas* iCanvas) {                                   //
+      return std::make_unique<HDRCubeTextureScene>(iCanvas); //
+    });                                                      //
   // Image Textures Scene
   _samples["ImageTextureScene"]
     = std::make_tuple(true,                                                  //
