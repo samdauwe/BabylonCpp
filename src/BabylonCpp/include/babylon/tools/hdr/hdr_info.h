@@ -26,16 +26,6 @@ struct BABYLON_SHARED_EXPORT HDRInfo {
    */
   size_t dataPosition;
 
-  /**
-   * Whether or not the header was sucessfully parsed.
-   */
-  bool isValid = false;
-
-  /**
-   * Header parse error message.
-   */
-  std::string errorMessage;
-
 }; // end of struct HDRInfo
 
 } // end of namespace BABYLON

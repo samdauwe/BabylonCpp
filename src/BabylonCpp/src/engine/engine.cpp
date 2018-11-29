@@ -4330,9 +4330,9 @@ void Engine::updateRawCubeTexture(const InternalTexturePtr& texture,
   }
 
   const std::vector<unsigned int> facesIndex
-    = {GL::TEXTURE_CUBE_MAP_POSITIVE_X, GL::TEXTURE_CUBE_MAP_POSITIVE_Y,
-       GL::TEXTURE_CUBE_MAP_POSITIVE_Z, GL::TEXTURE_CUBE_MAP_NEGATIVE_X,
-       GL::TEXTURE_CUBE_MAP_NEGATIVE_Y, GL::TEXTURE_CUBE_MAP_NEGATIVE_Z};
+    = {GL::TEXTURE_CUBE_MAP_POSITIVE_X, GL::TEXTURE_CUBE_MAP_NEGATIVE_X,
+       GL::TEXTURE_CUBE_MAP_POSITIVE_Y, GL::TEXTURE_CUBE_MAP_NEGATIVE_Y,
+       GL::TEXTURE_CUBE_MAP_POSITIVE_Z, GL::TEXTURE_CUBE_MAP_NEGATIVE_Z};
 
   // Data are known to be in +X +Y +Z -X -Y -Z
   for (std::size_t index = 0; index < facesIndex.size(); ++index) {

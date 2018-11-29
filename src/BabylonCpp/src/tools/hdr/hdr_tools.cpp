@@ -1,7 +1,6 @@
 #include <babylon/tools/hdr/hdr_tools.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/tools/hdr/panorama_to_cube_map_tools.h>
 
@@ -65,8 +64,7 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
 
   std::string line = readStringLine(uint8array, 0);
   if (line.at(0) != '#' || line.at(1) != '?') {
-    headerInfo.errorMessage = "Bad HDR Format.";
-    return headerInfo;
+    throw std::runtime_error("Bad HDR Format.");
   }
 
   bool endOfHeader = false;
@@ -86,8 +84,7 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
   } while (!endOfHeader);
 
   if (!findFormat) {
-    headerInfo.errorMessage = "HDR Bad header format, unsupported FORMAT";
-    return headerInfo;
+    throw std::runtime_error("HDR Bad header format, unsupported FORMAT");
   }
 
   lineIndex += (line.size() + 1);
@@ -102,13 +99,11 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
     height = std::stoul(match.str(1));
   }
   else {
-    headerInfo.errorMessage = "HDR Bad header format, no size";
-    return headerInfo;
+    throw std::runtime_error("HDR Bad header format, no size");
   }
 
   if (width < 8 || width > 0x7fff) {
-    headerInfo.errorMessage = "HDR Bad header format, unsupported size";
-    return headerInfo;
+    throw std::runtime_error("HDR Bad header format, unsupported size");
   }
 
   lineIndex += (line.size() + 1);
@@ -116,7 +111,6 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
   headerInfo.height       = height;
   headerInfo.width        = width;
   headerInfo.dataPosition = lineIndex;
-  headerInfo.isValid      = true;
 
   return headerInfo;
 }
@@ -164,14 +158,11 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
 
     if (a != 2 || b != 2 || (c & 0x80)) {
       // this file is not run length encoded
-      BABYLON_LOG_ERROR("HDRTools", "HDR Bad header format, not RLE");
-      return resultArray;
+      throw std::runtime_error("HDR Bad header format, not RLE");
     }
 
     if (static_cast<size_t>((c << 8) | d) != scanline_width) {
-      BABYLON_LOG_ERROR("HDRTools",
-                        "HDR Bad header format, wrong scan line width");
-      return resultArray;
+      throw std::runtime_error("HDR Bad header format, wrong scan line width");
     }
 
     index = 0;
@@ -188,9 +179,7 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
           // a run of the same value
           count = static_cast<std::uint8_t>(a - 128);
           if ((count == 0) || (count > endIndex - index)) {
-            BABYLON_LOG_ERROR("HDRTools",
-                              "HDR Bad Format, bad scanline data (run)");
-            return resultArray;
+            throw std::runtime_error("HDR Bad Format, bad scanline data (run)");
           }
 
           while (count-- > 0) {
@@ -201,9 +190,8 @@ Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
           // a non-run
           count = a;
           if ((count == 0) || (count > endIndex - index)) {
-            BABYLON_LOG_ERROR("HDRTools",
-                              "HDR Bad Format, bad scanline data (non-run)");
-            return resultArray;
+            throw std::runtime_error(
+              "HDR Bad Format, bad scanline data (non-run)");
           }
 
           scanLineArray[index++] = b;
