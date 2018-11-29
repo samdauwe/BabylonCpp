@@ -22,7 +22,7 @@ HDRCubeTextureScene::~HDRCubeTextureScene()
 
 const char* HDRCubeTextureScene::getName()
 {
-  return "High Dynamic Range (HDR) cube texture scene";
+  return "High Dynamic Range (HDR) Cube Texture Scene";
 }
 
 void HDRCubeTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
