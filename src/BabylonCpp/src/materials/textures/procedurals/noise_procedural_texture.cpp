@@ -18,6 +18,7 @@ NoiseProceduralTexture::NoiseProceduralTexture(const std::string& name,
     , animationSpeedFactor{1.f}
     , _time{0.f}
 {
+  autoClear = false;
   _updateShaderUniforms();
 }
 
@@ -36,9 +37,13 @@ void NoiseProceduralTexture::_updateShaderUniforms()
   _time += scene->getAnimationRatio() * animationSpeedFactor * 0.01f;
 
   setFloat("brightness", brightness);
-  setInt("octaves", octaves);
   setFloat("persistence", persistence);
   setFloat("timeScale", _time);
+}
+
+std::string NoiseProceduralTexture::_getDefines() const
+{
+  return "#define OCTAVES " + std::to_string(octaves);
 }
 
 void NoiseProceduralTexture::render(bool useCameraPostProcess)
@@ -52,10 +57,11 @@ json NoiseProceduralTexture::serialize() const
   return nullptr;
 }
 
-void NoiseProceduralTexture::Parse(const json& /*serializationObject*/,
-                                   Scene* /*scene*/,
-                                   const std::string& /*rootUrl*/)
+NoiseProceduralTexturePtr
+NoiseProceduralTexture::Parse(const json& /*serializationObject*/,
+                              Scene* /*scene*/, const std::string& /*rootUrl*/)
 {
+  return nullptr;
 }
 
 } // end of namespace BABYLON

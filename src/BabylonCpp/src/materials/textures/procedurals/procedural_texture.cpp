@@ -3,12 +3,14 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/engine/scene_component_constants.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
+#include <babylon/materials/textures/procedurals/procedural_texture_scene_component.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/mesh/vertex_buffer.h>
 
@@ -19,15 +21,25 @@ ProceduralTexture::ProceduralTexture(
   const std::unordered_map<std::string, std::string>& fragment, Scene* scene,
   Texture* fallbackTexture, bool generateMipMaps, bool isCube)
     : Texture("", scene, !generateMipMaps)
-    , _generateMipMaps{generateMipMaps}
     , isEnabled{true}
+    , autoClear{true}
+    , _generateMipMaps{generateMipMaps}
     , refreshRate{this, &ProceduralTexture::get_refreshRate,
                   &ProceduralTexture::set_refreshRate}
     , _currentRefreshId{-1}
     , _refreshRate{1}
     , _fallbackTextureUsed{false}
+    , _cachedDefines{""}
+    , _contentUpdateId{-1}
 {
   scene = getScene();
+
+  auto component
+    = scene->_getComponent(SceneComponentConstants::NAME_PROCEDURALTEXTURE);
+  if (!component) {
+    component = ProceduralTextureSceneComponent::New(scene);
+    scene->_addComponent(component);
+  }
 
   _engine = scene->getEngine();
 
@@ -71,15 +83,25 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
                                      Texture* fallbackTexture,
                                      bool generateMipMaps, bool isCube)
     : Texture("", scene, !generateMipMaps)
-    , _generateMipMaps{generateMipMaps}
     , isEnabled{true}
+    , autoClear{true}
+    , _generateMipMaps{generateMipMaps}
     , refreshRate{this, &ProceduralTexture::get_refreshRate,
                   &ProceduralTexture::set_refreshRate}
     , _currentRefreshId{-1}
     , _refreshRate{1}
     , _fallbackTextureUsed{false}
+    , _cachedDefines{""}
+    , _contentUpdateId{-1}
 {
   scene = getScene();
+
+  auto component
+    = scene->_getComponent(SceneComponentConstants::NAME_PROCEDURALTEXTURE);
+  if (!component) {
+    component = ProceduralTextureSceneComponent::New(scene);
+    scene->_addComponent(component);
+  }
 
   _engine = scene->getEngine();
 
@@ -92,14 +114,18 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
 
   if (isCube) {
     IRenderTargetOptions options;
-    options.generateMipMaps = generateMipMaps;
+    options.generateMipMaps       = generateMipMaps;
+    options.generateDepthBuffer   = false;
+    options.generateStencilBuffer = false;
     _texture = _engine->createRenderTargetCubeTexture(size, options);
     setFloat("face", 0);
   }
   else {
     IRenderTargetOptions options;
-    options.generateMipMaps = generateMipMaps;
-    _texture                = _engine->createRenderTargetTexture(size, options);
+    options.generateMipMaps       = generateMipMaps;
+    options.generateDepthBuffer   = false;
+    options.generateStencilBuffer = false;
+    _texture = _engine->createRenderTargetTexture(size, options);
   }
 
   // VBO
@@ -122,6 +148,18 @@ ProceduralTexture::~ProceduralTexture()
 void ProceduralTexture::addToScene(const ProceduralTexturePtr& newTexture)
 {
   getScene()->proceduralTextures.emplace_back(newTexture);
+}
+
+ArrayBufferView& ProceduralTexture::getContent()
+{
+  if (_contentData && _currentRefreshId == _contentUpdateId) {
+    return _contentData;
+  }
+
+  _contentData     = readPixels(0, 0, _contentData);
+  _contentUpdateId = _currentRefreshId;
+
+  return _contentData;
 }
 
 void ProceduralTexture::_createIndexBuffer()
@@ -164,6 +202,11 @@ void ProceduralTexture::reset()
   _engine->_releaseEffect(_effect);
 }
 
+std::string ProceduralTexture::_getDefines() const
+{
+  return "";
+}
+
 bool ProceduralTexture::isReady()
 {
   auto engine = _engine;
@@ -177,6 +220,11 @@ bool ProceduralTexture::isReady()
     return true;
   }
 
+  auto defines = _getDefines();
+  if (_effect && defines == _cachedDefines && _effect->isReady()) {
+    return true;
+  }
+
   if (stl_util::contains(_fragment, "fragmentElement")) {
     shaders["vertex"]          = "procedural";
     shaders["fragmentElement"] = _fragment["fragmentElement"];
@@ -185,16 +233,20 @@ bool ProceduralTexture::isReady()
     return false;
   }
 
+  _cachedDefines = defines;
+
   EffectCreationOptions options;
   options.attributes    = {VertexBuffer::PositionKindChars};
   options.uniformsNames = _uniforms;
   options.samplers      = _samplers;
+  options.defines       = defines;
   options.onError
     = [this](const Effect* /*effect*/, const std::string& /*errors*/) {
         releaseInternalTexture();
 
         if (_fallbackTexture) {
           _texture = _fallbackTexture->_texture;
+
           if (_texture) {
             _texture->incrementReferences();
           }
@@ -238,6 +290,9 @@ void ProceduralTexture::set_refreshRate(int value)
 bool ProceduralTexture::_shouldRender()
 {
   if (!isEnabled || !isReady() || !_texture) {
+    if (_texture) {
+      _texture->isReady = false;
+    }
     return false;
   }
 
@@ -452,7 +507,9 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
       _effect->setFloat("face", static_cast<float>(face));
 
       // Clear
-      engine->clear(scene->clearColor, true, true, true);
+      if (autoClear) {
+        engine->clear(scene->clearColor, true, false, false);
+      }
 
       // Draw order
       engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
@@ -471,7 +528,9 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
                         _indexBuffer.get(), _effect);
 
     // Clear
-    engine->clear(scene->clearColor, true, true, true);
+    if (autoClear) {
+      engine->clear(scene->clearColor, true, false, false);
+    }
 
     // Draw order
     engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
@@ -483,6 +542,8 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
   if (onGenerated) {
     onGenerated();
   }
+
+  onGeneratedObservable.notifyObservers(this);
 }
 
 ProceduralTexturePtr ProceduralTexture::clone()

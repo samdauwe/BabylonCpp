@@ -13,6 +13,8 @@ CustomProceduralTexture::CustomProceduralTexture(const std::string& name,
                                                  bool generateMipMaps)
     : ProceduralTexture{name,           size, nullptr, scene, fallbackTexture,
                         generateMipMaps}
+    , animate{this, &CustomProceduralTexture::get_animate,
+              &CustomProceduralTexture::set_animate}
     , _animate{true}
     , _time{0.f}
 {
@@ -20,7 +22,7 @@ CustomProceduralTexture::CustomProceduralTexture(const std::string& name,
 
   // Try to load json
   _configSet = false;
-  loadJson(texturePath);
+  _loadJson(texturePath);
   set_refreshRate(1);
 }
 
@@ -28,7 +30,7 @@ CustomProceduralTexture::~CustomProceduralTexture()
 {
 }
 
-void CustomProceduralTexture::loadJson(const std::string& /*jsonUrl*/)
+void CustomProceduralTexture::_loadJson(const std::string& /*jsonUrl*/)
 {
 }
 
@@ -115,12 +117,12 @@ void CustomProceduralTexture::updateShaderUniforms()
   setFloat("time", _time);
 }
 
-bool CustomProceduralTexture::animate() const
+bool CustomProceduralTexture::get_animate() const
 {
   return _animate;
 }
 
-void CustomProceduralTexture::setAnimate(bool value)
+void CustomProceduralTexture::set_animate(bool value)
 {
   _animate = value;
 }

@@ -10,6 +10,9 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class NoiseProceduralTexture;
+using NoiseProceduralTexturePtr = std::shared_ptr<NoiseProceduralTexture>;
+
 /**
  * @brief Class used to generate noise procedural textures.
  */
@@ -17,11 +20,11 @@ class BABYLON_SHARED_EXPORT NoiseProceduralTexture : public ProceduralTexture {
 
 public:
   template <typename... Ts>
-  static NoiseProceduralTexture* New(Ts&&... args)
+  static NoiseProceduralTexturePtr New(Ts&&... args)
   {
-    auto texture = new NoiseProceduralTexture(std::forward<Ts>(args)...);
-    texture->addToScene(
-      static_cast<std::unique_ptr<NoiseProceduralTexture>>(texture));
+    auto texture = std::shared_ptr<NoiseProceduralTexture>(
+      new NoiseProceduralTexture(std::forward<Ts>(args)...));
+    texture->addToScene(texture);
 
     return texture;
   }
@@ -47,8 +50,9 @@ public:
    * information
    * @returns a parsed NoiseProceduralTexture
    */
-  static void Parse(const json& serializationObject, Scene* scene,
-                    const std::string& rootUrl);
+  static NoiseProceduralTexturePtr Parse(const json& serializationObject,
+                                         Scene* scene,
+                                         const std::string& rootUrl);
 
 protected:
   /**
@@ -65,6 +69,8 @@ protected:
                          Scene* scene             = nullptr,
                          Texture* fallbackTexture = nullptr,
                          bool generateMipMaps     = false);
+
+  std::string _getDefines() const override;
 
 private:
   void _updateShaderUniforms();
