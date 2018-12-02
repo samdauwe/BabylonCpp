@@ -12,6 +12,7 @@ using AnaglyphArcRotateCameraPtr = std::shared_ptr<AnaglyphArcRotateCamera>;
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on
  * ArcRotateCamera).
+ * @see http://doc.babylonjs.com/features/cameras#anaglyph-cameras
  */
 class BABYLON_SHARED_EXPORT AnaglyphArcRotateCamera : public ArcRotateCamera {
 
@@ -31,14 +32,14 @@ public:
   ~AnaglyphArcRotateCamera() override;
 
   /**
-   * @brief Gets camera class name
+   * @brief Gets camera class name.
    * @returns AnaglyphArcRotateCamera
    */
   const std::string getClassName() const override;
 
 protected:
   /**
-   * Creates a new AnaglyphArcRotateCamera
+   * @brief Creates a new AnaglyphArcRotateCamera.
    * @param name defines camera name
    * @param alpha defines alpha angle (in radians)
    * @param beta defines beta angle (in radians)

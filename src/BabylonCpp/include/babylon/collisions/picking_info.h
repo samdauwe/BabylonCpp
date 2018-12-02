@@ -13,8 +13,8 @@ class Vector2;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
- * @brief Information about the result of picking within a scene.
- * See https://doc.babylonjs.com/babylon101/picking_collisions
+ * Information about the result of picking within a scene
+ * @see https://doc.babylonjs.com/babylon101/picking_collisions
  */
 class BABYLON_SHARED_EXPORT PickingInfo {
 

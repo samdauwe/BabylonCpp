@@ -127,19 +127,19 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(
         switch (evt.button) {
           case MouseButtonType::LEFT:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnLeftPickTrigger(),
+              ActionManager::OnLeftPickTrigger,
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
                                                evt));
             break;
           case MouseButtonType::MIDDLE:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnCenterPickTrigger(),
+              ActionManager::OnCenterPickTrigger,
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
                                                evt));
             break;
           case MouseButtonType::RIGHT:
             pickResult->pickedSprite->actionManager->processTrigger(
-              ActionManager::OnRightPickTrigger(),
+              ActionManager::OnRightPickTrigger,
               ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
                                                evt));
             break;
@@ -148,7 +148,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerDown(
         }
         if (pickResult->pickedSprite->actionManager) {
           pickResult->pickedSprite->actionManager->processTrigger(
-            ActionManager::OnPickDownTrigger(),
+            ActionManager::OnPickDownTrigger,
             ActionEvent::CreateNewFromSprite(pickResult->pickedSprite, scene,
                                              evt));
         }
@@ -172,13 +172,13 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(
       if (spritePickResult->hit && spritePickResult->pickedSprite) {
         if (spritePickResult->pickedSprite->actionManager) {
           spritePickResult->pickedSprite->actionManager->processTrigger(
-            ActionManager::OnPickUpTrigger(),
+            ActionManager::OnPickUpTrigger,
             ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite,
                                              scene, evt));
           if (spritePickResult->pickedSprite->actionManager) {
             if (!scene->_isPointerSwiping()) {
               spritePickResult->pickedSprite->actionManager->processTrigger(
-                ActionManager::OnPickTrigger(),
+                ActionManager::OnPickTrigger,
                 ActionEvent::CreateNewFromSprite(spritePickResult->pickedSprite,
                                                  scene, evt));
             }
@@ -188,7 +188,7 @@ std::optional<PickingInfo> SpriteSceneComponent::_pointerUp(
       if (scene->_pickedDownSprite && scene->_pickedDownSprite->actionManager
           && scene->_pickedDownSprite != spritePickResult->pickedSprite) {
         scene->_pickedDownSprite->actionManager->processTrigger(
-          ActionManager::OnPickOutTrigger(),
+          ActionManager::OnPickOutTrigger,
           ActionEvent::CreateNewFromSprite(scene->_pickedDownSprite, scene,
                                            evt));
       }

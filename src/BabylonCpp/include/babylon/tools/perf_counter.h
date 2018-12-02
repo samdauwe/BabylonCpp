@@ -26,6 +26,9 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT PerfCounter {
 
 public:
+  /**
+   * @brief Creates a new counter.
+   */
   PerfCounter()
       : _startMonitoringTime{Time::highresTimepointNow()}
       , _min{0}
@@ -154,11 +157,17 @@ public:
     return _current;
   }
 
+  /**
+   * @brief Gets the accumulated total.
+   */
   size_t total() const
   {
     return _totalAccumulated;
   }
 
+  /**
+   * @brief Gets the total value count.
+   */
   size_t count() const
   {
     return _totalValueCount;
@@ -216,8 +225,8 @@ public:
     }
 
     auto currentTime = Time::highresTimepointNow();
-    _current = Time::fpTimeDiff<size_t, std::milli>(_startMonitoringTime,
-                                                      currentTime);
+    _current
+      = Time::fpTimeDiff<size_t, std::milli>(_startMonitoringTime, currentTime);
 
     if (newFrame) {
       _fetchResult();

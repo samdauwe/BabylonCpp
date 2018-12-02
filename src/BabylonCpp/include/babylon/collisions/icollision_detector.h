@@ -10,6 +10,9 @@ namespace BABYLON {
 
 struct WorkerReply;
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT ICollisionDetector {
   virtual WorkerReply onInit(const InitPayload& payload)         = 0;
   virtual WorkerReply onUpdate(const UpdatePayload& payload)     = 0;

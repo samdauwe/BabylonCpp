@@ -9,6 +9,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT BabylonMessage {
   WorkerTaskType taskType;
   InitPayload initPayload;

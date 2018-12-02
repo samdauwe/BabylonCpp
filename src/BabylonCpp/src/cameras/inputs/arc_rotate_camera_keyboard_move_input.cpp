@@ -12,6 +12,7 @@ ArcRotateCameraKeyboardMoveInput::ArcRotateCameraKeyboardMoveInput()
     : panningSensibility{50.f}
     , zoomingSensibility{25.f}
     , useAltToZoom{true}
+    , angularSpeed{0.01f}
     , _canvas{nullptr}
     , _noPreventDefault{false}
     , _onCanvasBlurObserver{nullptr}
@@ -46,55 +47,55 @@ void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
   _onCanvasBlurObserver = _engine->onCanvasBlurObservable.add(
     [this](Engine*, EventState&) { _keys.clear(); });
 
-  _onKeyboardObserver = _scene->onKeyboardObservable.add(
-    [this](KeyboardInfo* info, EventState&) {
-      const auto& evt = info->event;
+  _onKeyboardObserver
+    = _scene->onKeyboardObservable.add([this](KeyboardInfo* info, EventState&) {
+        const auto& evt = info->event;
 
-      if (info->type == KeyboardEventTypes::KEYDOWN) {
-        _ctrlPressed = evt.ctrlKey;
-        _altPressed  = evt.altKey;
+        if (info->type == KeyboardEventTypes::KEYDOWN) {
+          _ctrlPressed = evt.ctrlKey;
+          _altPressed  = evt.altKey;
 
-        const int keyCode = evt.keyCode;
-        if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-            || (std::find(keysDown.begin(), keysDown.end(), keyCode)
-                != keysDown.end())
-            || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
-                != keysLeft.end())
-            || (std::find(keysRight.begin(), keysRight.end(), keyCode)
-                != keysRight.end())
-            || (std::find(keysReset.begin(), keysReset.end(), keyCode)
-                != keysReset.end())) {
+          const int keyCode = evt.keyCode;
+          if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+              || (std::find(keysDown.begin(), keysDown.end(), keyCode)
+                  != keysDown.end())
+              || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+                  != keysLeft.end())
+              || (std::find(keysRight.begin(), keysRight.end(), keyCode)
+                  != keysRight.end())
+              || (std::find(keysReset.begin(), keysReset.end(), keyCode)
+                  != keysReset.end())) {
 
-          if (std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
-            _keys.emplace_back(keyCode);
-          }
+            if (std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
+              _keys.emplace_back(keyCode);
+            }
 
-          if (!_noPreventDefault) {
-            evt.preventDefault();
-          }
-        }
-      }
-      else {
-        const int keyCode = evt.keyCode;
-        if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-            || (std::find(keysDown.begin(), keysDown.end(), keyCode)
-                != keysDown.end())
-            || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
-                != keysLeft.end())
-            || (std::find(keysRight.begin(), keysRight.end(), keyCode)
-                != keysRight.end())
-            || (std::find(keysReset.begin(), keysReset.end(), keyCode)
-                != keysReset.end())) {
-
-          _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode),
-                      _keys.end());
-
-          if (!_noPreventDefault) {
-            evt.preventDefault();
+            if (!_noPreventDefault) {
+              evt.preventDefault();
+            }
           }
         }
-      }
-    });
+        else {
+          const int keyCode = evt.keyCode;
+          if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+              || (std::find(keysDown.begin(), keysDown.end(), keyCode)
+                  != keysDown.end())
+              || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+                  != keysLeft.end())
+              || (std::find(keysRight.begin(), keysRight.end(), keyCode)
+                  != keysRight.end())
+              || (std::find(keysReset.begin(), keysReset.end(), keyCode)
+                  != keysReset.end())) {
+
+            _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode),
+                        _keys.end());
+
+            if (!_noPreventDefault) {
+              evt.preventDefault();
+            }
+          }
+        }
+      });
 }
 
 void ArcRotateCameraKeyboardMoveInput::detachControl(ICanvas* /*canvas*/)
@@ -123,7 +124,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
           camera->inertialPanningX -= 1.f / panningSensibility;
         }
         else {
-          camera->inertialAlphaOffset -= 0.01f;
+          camera->inertialAlphaOffset -= angularSpeed;
         }
       }
       else if (std::find(keysUp.begin(), keysUp.end(), keyCode)
@@ -135,7 +136,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
           camera->inertialRadiusOffset += 1.f / zoomingSensibility;
         }
         else {
-          camera->inertialBetaOffset -= 0.01f;
+          camera->inertialBetaOffset -= angularSpeed;
         }
       }
       else if (std::find(keysRight.begin(), keysRight.end(), keyCode)
@@ -144,7 +145,7 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
           camera->inertialPanningX += 1.f / panningSensibility;
         }
         else {
-          camera->inertialAlphaOffset += 0.01f;
+          camera->inertialAlphaOffset += angularSpeed;
         }
       }
       else if (std::find(keysDown.begin(), keysDown.end(), keyCode)
@@ -156,12 +157,14 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
           camera->inertialRadiusOffset -= 1.f / zoomingSensibility;
         }
         else {
-          camera->inertialBetaOffset += 0.01f;
+          camera->inertialBetaOffset += angularSpeed;
         }
       }
       else if (std::find(keysReset.begin(), keysReset.end(), keyCode)
                != keysReset.end()) {
-        camera->restoreState();
+        if (camera->useInputToRestoreState) {
+          camera->restoreState();
+        }
       }
     }
   }

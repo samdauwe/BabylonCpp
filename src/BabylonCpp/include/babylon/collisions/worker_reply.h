@@ -10,6 +10,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT WorkerReply {
   WorkerReplyType error;
   WorkerTaskType taskType;

@@ -13,6 +13,7 @@ using StereoscopicArcRotateCameraPtr
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on
  * ArcRotateCamera).
+ * @see http://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT StereoscopicArcRotateCamera
     : public ArcRotateCamera {

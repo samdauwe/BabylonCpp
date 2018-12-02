@@ -8,7 +8,7 @@
 namespace BABYLON {
 
 /**
- * @brief Class used to store color gradient.
+ * @brief Class used to store color4 gradient.
  */
 class BABYLON_SHARED_EXPORT ColorGradient : public IValueGradient {
 

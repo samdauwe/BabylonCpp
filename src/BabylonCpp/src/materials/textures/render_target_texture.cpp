@@ -39,6 +39,7 @@ RenderTargetTexture::RenderTargetTexture(
     , onBeforeRender{this, &RenderTargetTexture::set_onBeforeRender}
     , onAfterRender{this, &RenderTargetTexture::set_onAfterRender}
     , onClear{this, &RenderTargetTexture::set_onClear}
+    , renderTargetOptions{this, &RenderTargetTexture::get_renderTargetOptions}
     , samples{this, &RenderTargetTexture::get_samples,
               &RenderTargetTexture::set_samples}
     , refreshRate{this, &RenderTargetTexture::get_refreshRate,
@@ -180,13 +181,7 @@ void RenderTargetTexture::set_onClear(
   _onClearObserver = onClearObservable.add(callback);
 }
 
-RenderTargetCreationOptions& RenderTargetTexture::renderTargetOptions()
-{
-  return _renderTargetOptions;
-}
-
-const RenderTargetCreationOptions&
-RenderTargetTexture::renderTargetOptions() const
+RenderTargetCreationOptions& RenderTargetTexture::get_renderTargetOptions()
 {
   return _renderTargetOptions;
 }
@@ -748,8 +743,8 @@ void RenderTargetTexture::dispose()
 
 void RenderTargetTexture::_rebuild()
 {
-  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE()) {
-    refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE();
+  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
+    refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE;
   }
 
   if (_postProcessManager) {

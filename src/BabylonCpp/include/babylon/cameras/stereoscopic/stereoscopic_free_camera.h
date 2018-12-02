@@ -11,6 +11,7 @@ using StereoscopicFreeCameraPtr = std::shared_ptr<StereoscopicFreeCamera>;
 
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on FreeCamera).
+ * @see http://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT StereoscopicFreeCamera : public FreeCamera {
 

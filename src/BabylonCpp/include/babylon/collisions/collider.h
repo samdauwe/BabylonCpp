@@ -9,6 +9,9 @@ namespace BABYLON {
 
 class AbstractMesh;
 
+/**
+ * @brief Hidden
+ */
 class BABYLON_SHARED_EXPORT Collider {
 
 public:

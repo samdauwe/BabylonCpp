@@ -10,6 +10,7 @@ class Vector3;
 
 /**
  * @brief Interface describing the value associated with a geometry
+ * Hidden
  */
 struct BABYLON_SHARED_EXPORT SerializedGeometry {
   /**

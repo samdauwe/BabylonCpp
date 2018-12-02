@@ -9,7 +9,11 @@ class ICanvas;
 
 template <class TCamera>
 struct BABYLON_SHARED_EXPORT ICameraInput {
-  TCamera* camera                           = nullptr;
+  /**
+   * Defines the camera the input is attached to.
+   */
+  TCamera* camera = nullptr;
+
   bool hasCheckInputs                       = true;
   virtual const char* getClassName() const  = 0;
   virtual const char* getSimpleName() const = 0;

@@ -108,9 +108,9 @@ bool ActionManager::hasPointerTriggers() const
 
   return std::find_if(actions.begin(), actions.end(),
                       [](Action* action) {
-                        return action->trigger >= ActionManager::OnPickTrigger()
+                        return action->trigger >= ActionManager::OnPickTrigger
                                && action->trigger
-                                    <= ActionManager::OnPointerOutTrigger();
+                                    <= ActionManager::OnPointerOutTrigger;
                       })
          != actions.end();
 }
@@ -119,9 +119,9 @@ bool ActionManager::hasPickTriggers() const
 {
   return std::find_if(actions.begin(), actions.end(),
                       [](Action* action) {
-                        return action->trigger >= ActionManager::OnPickTrigger()
+                        return action->trigger >= ActionManager::OnPickTrigger
                                && action->trigger
-                                    <= ActionManager::OnPickUpTrigger();
+                                    <= ActionManager::OnPickUpTrigger;
                       })
          != actions.end();
 }
@@ -135,8 +135,8 @@ bool ActionManager::HasTriggers()
 
 bool ActionManager::HasPickTriggers()
 {
-  const auto start = ActionManager::OnPickTrigger();
-  const auto end   = ActionManager::OnPickUpTrigger() + 1;
+  const auto start = ActionManager::OnPickTrigger;
+  const auto end   = ActionManager::OnPickUpTrigger + 1;
 
   return std::accumulate(ActionManager::Triggers.begin() + start,
                          ActionManager::Triggers.begin() + end, 0)
@@ -151,7 +151,7 @@ bool ActionManager::HasSpecificTrigger(unsigned int trigger)
 
 Action* ActionManager::registerAction(Action* action)
 {
-  if (action->trigger == ActionManager::OnEveryFrameTrigger()) {
+  if (action->trigger == ActionManager::OnEveryFrameTrigger) {
     if (getScene()->actionManager != this) {
       BABYLON_LOG_WARN(
         "ActionManager",
@@ -192,8 +192,8 @@ void ActionManager::processTrigger(unsigned int trigger,
 {
   for (const auto& action : actions) {
     if (action->trigger == trigger) {
-      if (trigger == ActionManager::OnKeyUpTrigger()
-          || trigger == ActionManager::OnKeyDownTrigger()) {
+      if (trigger == ActionManager::OnKeyUpTrigger
+          || trigger == ActionManager::OnKeyDownTrigger) {
         const auto parameter   = action->getTriggerParameter();
         const auto sourceEvent = *evt.sourceEvent;
         if (!parameter.empty()
@@ -259,39 +259,39 @@ void ActionManager::Parse(const std::vector<json>& /*parsedActions*/,
 std::string ActionManager::GetTriggerName(unsigned int trigger)
 {
   switch (trigger) {
-    case ActionManager::NothingTrigger():
+    case ActionManager::NothingTrigger:
       return "NothingTrigger";
-    case ActionManager::OnPickTrigger():
+    case ActionManager::OnPickTrigger:
       return "OnPickTrigger";
-    case ActionManager::OnLeftPickTrigger():
+    case ActionManager::OnLeftPickTrigger:
       return "OnLeftPickTrigger";
-    case ActionManager::OnRightPickTrigger():
+    case ActionManager::OnRightPickTrigger:
       return "OnRightPickTrigger";
-    case ActionManager::OnCenterPickTrigger():
+    case ActionManager::OnCenterPickTrigger:
       return "OnCenterPickTrigger";
-    case ActionManager::OnPickDownTrigger():
+    case ActionManager::OnPickDownTrigger:
       return "OnPickDownTrigger";
-    case ActionManager::OnDoublePickTrigger():
+    case ActionManager::OnDoublePickTrigger:
       return "_OnDoublePickTrigger";
-    case ActionManager::OnPickUpTrigger():
+    case ActionManager::OnPickUpTrigger:
       return "OnPickUpTrigger";
-    case ActionManager::OnLongPressTrigger():
+    case ActionManager::OnLongPressTrigger:
       return "OnLongPressTrigger";
-    case ActionManager::OnPointerOverTrigger():
+    case ActionManager::OnPointerOverTrigger:
       return "OnPointerOverTrigger";
-    case ActionManager::OnPointerOutTrigger():
+    case ActionManager::OnPointerOutTrigger:
       return "OnPointerOutTrigger";
-    case ActionManager::OnEveryFrameTrigger():
+    case ActionManager::OnEveryFrameTrigger:
       return "OnEveryFrameTrigger";
-    case ActionManager::OnIntersectionEnterTrigger():
+    case ActionManager::OnIntersectionEnterTrigger:
       return "OnIntersectionEnterTrigger";
-    case ActionManager::OnIntersectionExitTrigger():
+    case ActionManager::OnIntersectionExitTrigger:
       return "OnIntersectionExitTrigger";
-    case ActionManager::OnKeyDownTrigger():
+    case ActionManager::OnKeyDownTrigger:
       return "OnKeyDownTrigger";
-    case ActionManager::OnKeyUpTrigger():
+    case ActionManager::OnKeyUpTrigger:
       return "OnKeyUpTrigger";
-    case ActionManager::OnPickOutTrigger():
+    case ActionManager::OnPickOutTrigger:
       return "OnPickOutTrigger";
     default:
       return "";

@@ -126,6 +126,9 @@ enum PixelFormat {
   RGBA_S3TC_DXT5_Format = 2004
 }; // end of enum PixelFormat
 
+/**
+ * @brief Class used to provide DDS decompression tools.
+ */
 class BABYLON_SHARED_EXPORT DDSTools {
 
 private:
@@ -168,6 +171,11 @@ private:
                                              const Uint8Array& arrayBuffer);
 
 public:
+  /**
+   * @brief Gets DDS information from an array buffer.
+   * @param arrayBuffer defines the array buffer to read data from
+   * @returns the DDS information
+   */
   static DDSInfo
   GetDDSInfo(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
 
@@ -184,7 +192,12 @@ public:
   ToArrayBuffer(const std::variant<std::string, ArrayBuffer>& arrayBuffer);
 
 public:
+  /**
+   * Gets or sets a boolean indicating that LOD info is stored in alpha channel
+   * (false by default)
+   */
   static bool StoreLODInAlphaChannel;
+
   static Float32Array _FloatView;
   static Int32Array _Int32View;
 

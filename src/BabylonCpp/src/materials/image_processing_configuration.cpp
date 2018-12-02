@@ -49,7 +49,11 @@ ImageProcessingConfiguration::ImageProcessingConfiguration()
     , isEnabled{this, &ImageProcessingConfiguration::get_isEnabled,
                 &ImageProcessingConfiguration::set_isEnabled}
     , colorCurves{std::make_unique<ColorCurves>()}
-    , colorGradingTexture{nullptr}
+    , colorGradingTexture{this,
+                          &ImageProcessingConfiguration::
+                            get_colorGradingTexture,
+                          &ImageProcessingConfiguration::
+                            set_colorGradingTexture}
     , _exposure{1.f}
     , vignetteStretch{0}
     , vignetteCentreX{0}
@@ -59,6 +63,7 @@ ImageProcessingConfiguration::ImageProcessingConfiguration()
     , vignetteCameraFov{0.5f}
     , _contrast{1.f}
     , _colorCurvesEnabled{false}
+    , _colorGradingTexture{nullptr}
     , _colorGradingEnabled{false}
     , _colorGradingWithGreenDepth{true}
     , _colorGradingBGR{true}
@@ -87,6 +92,22 @@ void ImageProcessingConfiguration::set_colorCurvesEnabled(bool value)
   }
 
   _colorCurvesEnabled = value;
+  _updateParameters();
+}
+
+BaseTexturePtr& ImageProcessingConfiguration::get_colorGradingTexture()
+{
+  return _colorGradingTexture;
+}
+
+void ImageProcessingConfiguration::set_colorGradingTexture(
+  const BaseTexturePtr& value)
+{
+  if (_colorGradingTexture == value) {
+    return;
+  }
+
+  _colorGradingTexture = value;
   _updateParameters();
 }
 
@@ -329,9 +350,9 @@ void ImageProcessingConfiguration::prepareDefines(
   defines.CONTRAST     = (contrast() != 1.f);
   defines.EXPOSURE     = (exposure() != 1.f);
   defines.COLORCURVES  = (colorCurvesEnabled() && !colorCurves);
-  defines.COLORGRADING = (colorGradingEnabled() && !colorGradingTexture);
+  defines.COLORGRADING = (colorGradingEnabled() && !_colorGradingTexture);
   if (defines.COLORGRADING) {
-    defines.COLORGRADING3D = colorGradingTexture->is3D;
+    defines.COLORGRADING3D = _colorGradingTexture->is3D;
   }
   else {
     defines.COLORGRADING3D = false;
@@ -350,8 +371,8 @@ void ImageProcessingConfiguration::prepareDefines(
 bool ImageProcessingConfiguration::isReady() const
 {
   // Color Grading texure can not be none blocking.
-  return !colorGradingEnabled() || !colorGradingTexture
-         || colorGradingTexture->isReady();
+  return !colorGradingEnabled() || !_colorGradingTexture
+         || _colorGradingTexture->isReady();
 }
 
 void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
@@ -393,12 +414,12 @@ void ImageProcessingConfiguration::bind(Effect* effect, float aspectRatio)
   effect->setFloat("contrast", contrast());
 
   // Color transform settings
-  if (colorGradingTexture) {
+  if (_colorGradingTexture) {
     effect->setTexture("txColorTransform", colorGradingTexture);
     const auto textureSize
-      = static_cast<float>(colorGradingTexture->getSize().height);
+      = static_cast<float>(_colorGradingTexture->getSize().height);
 
-    const auto weight = static_cast<float>(colorGradingTexture->level);
+    const auto weight = static_cast<float>(_colorGradingTexture->level);
     effect->setFloat4("colorTransformSettings",
                       (textureSize - 1) / textureSize, // textureScale
                       0.5f / textureSize,              // textureOffset

@@ -7,6 +7,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT SerializedMesh {
   std::string id;
   std::string name;

@@ -7,6 +7,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Hidden
+ */
 class BABYLON_SHARED_EXPORT CollisionCoordinatorLegacy
     : public ICollisionCoordinator {
 

@@ -7,6 +7,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT SerializedSubMesh {
   unsigned int position;
   unsigned int verticesStart;

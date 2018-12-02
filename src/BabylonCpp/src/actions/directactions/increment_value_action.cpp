@@ -7,14 +7,14 @@ namespace BABYLON {
 
 IncrementValueAction::IncrementValueAction(unsigned int triggerOptions,
                                            const IAnimatablePtr& target,
-                                           const std::string& propertyPath,
-                                           AnimationValue* value,
+                                           const std::string& iPropertyPath,
+                                           AnimationValue* iValue,
                                            Condition* condition)
     : Action(triggerOptions, condition)
+    , propertyPath{iPropertyPath}
+    , value{iValue}
     , _target{target}
     , _effectiveTarget{target}
-    , _propertyPath{propertyPath}
-    , _value{value}
 {
 }
 
@@ -24,8 +24,8 @@ IncrementValueAction::~IncrementValueAction()
 
 void IncrementValueAction::_prepare()
 {
-  _effectiveTarget = _getEffectiveTarget(_effectiveTarget, _propertyPath);
-  _property        = _getProperty(_propertyPath);
+  _effectiveTarget = _getEffectiveTarget(_effectiveTarget, propertyPath);
+  _property        = _getProperty(propertyPath);
 }
 
 void IncrementValueAction::execute(const ActionEvent& /*evt*/)

@@ -6,6 +6,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT SerializedColliderToWorker {
   Float32Array position;
   Float32Array velocity;

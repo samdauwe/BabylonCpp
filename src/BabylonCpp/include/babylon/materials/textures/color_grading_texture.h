@@ -15,7 +15,7 @@ class Engine;
  * and white to sixties or futuristic rendering...
  *
  * The only supported format is currently 3dl.
- * More information on LUT: https://en.wikipedia.org/wiki/3D_lookup_table/
+ * More information on LUT: https://en.wikipedia.org/wiki/3D_lookup_table
  */
 class BABYLON_SHARED_EXPORT ColorGradingTexture : public BaseTexture {
 

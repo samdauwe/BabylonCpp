@@ -64,14 +64,15 @@ public:
   ~ImageProcessingConfiguration();
 
   /**
-   * @brief Returns the string "ImageProcessingConfiguration".
+   * @brief Gets the current class name.
+   * @return "ImageProcessingConfiguration"
    */
   const std::string getClassName() const;
 
   /**
    * @brief Prepare the list of uniforms associated with the Image Processing
    * effects.
-   * @param uniformsList The list of uniforms used in the effect
+   * @param uniforms The list of uniforms used in the effect
    * @param defines the list of defines currently in use
    */
   static void
@@ -81,7 +82,7 @@ public:
   /**
    * @brief Prepare the list of samplers associated with the Image Processing
    * effects.
-   * @param uniformsList The list of uniforms used in the effect
+   * @param samplersList The list of uniforms used in the effect
    * @param defines the list of defines currently in use
    */
   static void
@@ -91,18 +92,22 @@ public:
   /**
    * @brief Prepare the list of defines associated to the shader.
    * @param defines the list of defines to complete
+   * @param forPostProcess Define if we are currently in post process mode or
+   * not
    */
   void prepareDefines(IImageProcessingConfigurationDefines& defines,
                       bool forPostProcess = false);
 
   /**
    * @brief Returns true if all the image processing information are ready.
+   * @returns True if ready, otherwise, false
    */
   bool isReady() const;
 
   /**
    * @brief Binds the image processing to the shader.
    * @param effect The effect to bind to
+   * @param aspectRatio Define the current aspect ratio of the effect
    */
   void bind(Effect* effect, float aspectRatio = 1.f);
 
@@ -136,6 +141,19 @@ protected:
    * @brief Sets wether the color curves effect is enabled.
    */
   void set_colorCurvesEnabled(bool value);
+
+  /**
+   * @brief Gets the color grading LUT texture used in the effect if
+   * colorGradingEnabled is set to true.
+   */
+
+  BaseTexturePtr& get_colorGradingTexture();
+
+  /**
+   * @brief Sets the color grading LUT texture used in the effect if
+   * colorGradingEnabled is set to true.
+   */
+  void set_colorGradingTexture(const BaseTexturePtr& value);
 
   /**
    * @brief Gets wether the color grading effect is enabled.
@@ -326,7 +344,7 @@ public:
    * Color grading LUT texture used in the effect if colorGradingEnabled is set
    * to true.
    */
-  BaseTexturePtr colorGradingTexture;
+  Property<ImageProcessingConfiguration, BaseTexturePtr> colorGradingTexture;
 
   /**
    * Hidden
@@ -375,6 +393,7 @@ protected:
 
 private:
   bool _colorCurvesEnabled;
+  BaseTexturePtr _colorGradingTexture;
   bool _colorGradingEnabled;
   bool _colorGradingWithGreenDepth;
   bool _colorGradingBGR;

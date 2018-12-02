@@ -11,6 +11,7 @@ using AnaglyphFreeCameraPtr = std::shared_ptr<AnaglyphFreeCamera>;
 
 /**
  * @brief Camera used to simulate anaglyphic rendering (based on FreeCamera).
+ * @see http://doc.babylonjs.com/features/cameras#anaglyph-cameras
  */
 class BABYLON_SHARED_EXPORT AnaglyphFreeCamera : public FreeCamera {
 

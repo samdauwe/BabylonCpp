@@ -12,6 +12,7 @@ using StereoscopicGamepadCameraPtr = std::shared_ptr<StereoscopicGamepadCamera>;
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on
  * GamepadCamera).
+ * @see http://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT StereoscopicGamepadCamera : public GamepadCamera {
 

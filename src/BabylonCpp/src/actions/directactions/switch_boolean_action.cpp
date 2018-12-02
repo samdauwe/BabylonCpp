@@ -9,12 +9,12 @@ namespace BABYLON {
 
 SwitchBooleanAction::SwitchBooleanAction(unsigned int triggerOptions,
                                          const IAnimatablePtr& target,
-                                         const std::string& propertyPath,
+                                         const std::string& iPropertyPath,
                                          Condition* condition)
     : Action(triggerOptions, condition)
+    , propertyPath{iPropertyPath}
     , _target{target}
     , _effectiveTarget{target}
-    , _propertyPath{propertyPath}
 {
 }
 
@@ -24,8 +24,8 @@ SwitchBooleanAction::~SwitchBooleanAction()
 
 void SwitchBooleanAction::_prepare()
 {
-  _effectiveTarget = _getEffectiveTarget(_effectiveTarget, _propertyPath);
-  _property        = _getProperty(_propertyPath);
+  _effectiveTarget = _getEffectiveTarget(_effectiveTarget, propertyPath);
+  _property        = _getProperty(propertyPath);
 }
 
 void SwitchBooleanAction::execute(const ActionEvent& /*evt*/)

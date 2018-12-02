@@ -11,6 +11,9 @@ namespace BABYLON {
 
 class CollisionCache;
 
+/**
+ * @brief Hidden
+ */
 class BABYLON_SHARED_EXPORT CollisionDetectorTransferable
     : public ICollisionDetector {
 

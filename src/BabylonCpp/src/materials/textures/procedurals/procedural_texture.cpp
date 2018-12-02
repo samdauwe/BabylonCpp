@@ -188,8 +188,8 @@ void ProceduralTexture::_rebuild()
 
   _createIndexBuffer();
 
-  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE()) {
-    refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE();
+  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
+    refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE;
   }
 }
 

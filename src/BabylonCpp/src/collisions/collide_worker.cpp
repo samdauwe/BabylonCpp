@@ -94,8 +94,10 @@ void CollideWorker::checkCollision(SerializedMesh& mesh)
 void CollideWorker::processCollisionsForSubMeshes(const Matrix& transformMatrix,
                                                   SerializedMesh& mesh)
 {
+  // No Octrees for now
+
   std::vector<SerializedSubMesh>& subMeshes = mesh.subMeshes;
-  size_t len                             = subMeshes.size();
+  size_t len                                = subMeshes.size();
 
   if (mesh.geometryId.empty()) {
     BABYLON_LOG_ERROR("CollideWorker", "no mesh geometry id");

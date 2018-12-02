@@ -8,8 +8,8 @@ namespace BABYLON {
 
 SetStateAction::SetStateAction(unsigned int triggerOptions,
                                const IAnimatablePtr& target,
-                               const std::string& value, Condition* condition)
-    : Action(triggerOptions, condition), _target{target}, _value{value}
+                               const std::string& iValue, Condition* condition)
+    : Action(triggerOptions, condition), value{iValue}, _target{target}
 {
 }
 
@@ -19,7 +19,7 @@ SetStateAction::~SetStateAction()
 
 void SetStateAction::execute(const ActionEvent& /*evt*/)
 {
-  _target->state = _value;
+  _target->state = value;
 }
 
 json SetStateAction::serialize(json& /*parent*/) const

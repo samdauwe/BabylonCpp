@@ -8,13 +8,13 @@ namespace BABYLON {
 
 SetValueAction::SetValueAction(unsigned int triggerOptions,
                                const IAnimatablePtr& target,
-                               const std::string& propertyPath,
-                               AnimationValue* value, Condition* condition)
+                               const std::string& iPropertyPath,
+                               AnimationValue* iValue, Condition* condition)
     : Action(triggerOptions, condition)
+    , propertyPath{iPropertyPath}
+    , value{iValue}
     , _target{target}
     , _effectiveTarget{target}
-    , _propertyPath{propertyPath}
-    , _value{value}
 {
 }
 
@@ -24,8 +24,8 @@ SetValueAction::~SetValueAction()
 
 void SetValueAction::_prepare()
 {
-  _effectiveTarget = _getEffectiveTarget(_effectiveTarget, _propertyPath);
-  _property        = _getProperty(_propertyPath);
+  _effectiveTarget = _getEffectiveTarget(_effectiveTarget, propertyPath);
+  _property        = _getProperty(propertyPath);
 }
 
 void SetValueAction::execute(const ActionEvent& /*evt*/)

@@ -239,12 +239,12 @@ MinMax Tools::ExtractMinAndMaxIndexed(const Float32Array& positions,
                   std::numeric_limits<float>::lowest());
 
   for (size_t index = indexStart; index < indexStart + indexCount; ++index) {
-    Vector3 current(positions[indices[index] * 3],
-                    positions[indices[index] * 3 + 1],
-                    positions[indices[index] * 3 + 2]);
-
-    minimum = Vector3::Minimize(current, minimum);
-    maximum = Vector3::Maximize(current, maximum);
+    const auto offset = indices[index] * 3;
+    const auto x      = positions[offset];
+    const auto y      = positions[offset + 1];
+    const auto z      = positions[offset + 2];
+    minimum.minimizeInPlaceFromFloats(x, y, z);
+    maximum.maximizeInPlaceFromFloats(x, y, z);
   }
 
   if (bias) {
@@ -276,12 +276,13 @@ MinMax Tools::ExtractMinAndMax(const Float32Array& positions, size_t start,
   }
 
   auto _stride = *stride;
-  for (size_t index = start; index < start + count; ++index) {
-    Vector3 current(positions[index * _stride], positions[index * _stride + 1],
-                    positions[index * _stride + 2]);
-
-    minimum = Vector3::Minimize(current, minimum);
-    maximum = Vector3::Maximize(current, maximum);
+  for (size_t index = start, offset = start * _stride; index < start + count;
+       index++, offset += _stride) {
+    const auto x = positions[offset];
+    const auto y = positions[offset + 1];
+    const auto z = positions[offset + 2];
+    minimum.minimizeInPlaceFromFloats(x, y, z);
+    maximum.maximizeInPlaceFromFloats(x, y, z);
   }
 
   if (bias) {

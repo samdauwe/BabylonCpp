@@ -6,6 +6,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT CollidePayload {
   unsigned int collisionId;
   SerializedColliderToWorker collider;

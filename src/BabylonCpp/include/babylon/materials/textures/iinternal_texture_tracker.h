@@ -11,8 +11,8 @@ class IInternalTextureTracker;
 using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
 
 /**
- * @brief Internal interface used to track {BABYLON.InternalTexture} already
- * bound to the GL context.
+ * @brief Internal interface used to track InternalTexture already bound to the
+ * GL context.
  */
 struct BABYLON_SHARED_EXPORT IInternalTextureTracker {
   /**

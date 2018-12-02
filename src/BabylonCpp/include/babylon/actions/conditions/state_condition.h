@@ -27,7 +27,8 @@ public:
   /** Methods **/
 
   /**
-   * @returns the validity of the state.
+   * @brief Gets a boolean indicating if the current condition is met.
+   * @returns the validity of the state
    */
   bool isValid() override;
 
@@ -38,6 +39,9 @@ public:
   json serialize() const override;
 
 public:
+  /**
+   * @brief Value to compare with target state.
+   */
   AnimationValue* value;
 
 private:

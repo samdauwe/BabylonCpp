@@ -25,28 +25,19 @@ using RenderTargetCreationOptions = IRenderTargetOptions;
 using RenderTargetTexturePtr      = std::shared_ptr<RenderTargetTexture>;
 using SubMeshPtr                  = std::shared_ptr<SubMesh>;
 
+/**
+ * @brief This Helps creating a texture that will be created from a camera in
+ * your scene. It is basically a dynamic texture that could be used to create
+ * special effects for instance. Actually, It is the base of lot of effects in
+ * the framework like post process, shadows, effect layers and rendering
+ * pipelines...
+ */
 class BABYLON_SHARED_EXPORT RenderTargetTexture : public Texture {
 
-private:
-  static constexpr unsigned int _REFRESHRATE_RENDER_ONCE             = 0;
-  static constexpr unsigned int _REFRESHRATE_RENDER_ONEVERYFRAME     = 1;
-  static constexpr unsigned int _REFRESHRATE_RENDER_ONEVERYTWOFRAMES = 2;
-
 public:
-  static constexpr unsigned int REFRESHRATE_RENDER_ONCE()
-  {
-    return RenderTargetTexture::_REFRESHRATE_RENDER_ONCE;
-  }
-
-  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYFRAME()
-  {
-    return RenderTargetTexture::_REFRESHRATE_RENDER_ONEVERYFRAME;
-  }
-
-  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYTWOFRAMES()
-  {
-    return RenderTargetTexture::_REFRESHRATE_RENDER_ONEVERYTWOFRAMES;
-  }
+  static constexpr unsigned int REFRESHRATE_RENDER_ONCE             = 0;
+  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYFRAME     = 1;
+  static constexpr unsigned int REFRESHRATE_RENDER_ONEVERYTWOFRAMES = 2;
 
 public:
   template <typename... Ts>
@@ -77,22 +68,97 @@ public:
 
   void _onRatioRescale();
 
-  RenderTargetCreationOptions& renderTargetOptions();
-  const RenderTargetCreationOptions& renderTargetOptions() const;
+  /**
+   * @brief Resets the refresh counter of the texture and start bak from
+   * scratch. Could be usefull to regenerate the texture if it is setup to
+   * render only once.
+   */
   void resetRefreshCounter();
+
+  /**
+   * @brief Adds a post process to the render target rendering passes.
+   * @param postProcess define the post process to add
+   */
   void addPostProcess(const PostProcessPtr& postProcess);
+
+  /**
+   * @brief Clear all the post processes attached to the render target.
+   * @param dispose define if the cleared post processesshould also be disposed
+   * (false by default)
+   */
   void clearPostProcesses(bool dispose = false);
+
+  /**
+   * @brief Remove one of the post process from the list of attached post
+   * processes to the texture.
+   * @param postProcess define the post process to remove from the list
+   */
   void removePostProcess(const PostProcessPtr& postProcess);
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   bool _shouldRender();
+
+  /**
+   * @brief Hidden
+   */
   bool isReady() override;
+
+  /**
+   * @brief Gets the actual render size of the texture.
+   * @returns the width of the render size
+   */
   ISize& getRenderSize();
+
+  /**
+   * @brief Gets the actual render width of the texture.
+   * @returns the width of the render size
+   */
   int getRenderWidth() const;
+
+  /**
+   * @brief Gets the actual render height of the texture.
+   * @returns the height of the render size
+   */
   int getRenderHeight() const;
+
+  /**
+   * @brief Get if the texture can be rescaled or not.
+   */
   bool canRescale() const;
+
+  /**
+   * @brief Resize the texture using a ratio.
+   * @param ratio the ratio to apply to the texture size in order to compute the
+   * new target size
+   */
   void scale(float ratio) override;
+
+  /**
+   * @brief Get the texture reflection matrix used to rotate/transform the
+   * reflection.
+   * @returns the reflection matrix
+   */
   Matrix* getReflectionTextureMatrix() override;
+
+  /**
+   * @brief Resize the texture to a new desired size.
+   * Be carrefull as it will recreate all the data in the new texture.
+   * @param size Define the new size. It can be:
+   *   - a number for squared texture,
+   *   - an object containing { width: number, height: number }
+   *   - or an object containing a ratio { ratio: number }
+   */
   void resize(const ISize& size);
+
+  /**
+   * @brief Renders all the objects from the render list into the texture.
+   * @param useCameraPostProcess Define if camera post processes should be used
+   * during the rendering
+   * @param dumpForDebug Define if the rendering result should be dumped
+   * (copied) for debugging purpose
+   */
   void render(bool useCameraPostProcess = false, bool dumpForDebug = false);
 
   /**
@@ -129,17 +195,34 @@ public:
    */
   void setRenderingAutoClearDepthStencil(unsigned int renderingGroupId,
                                          bool autoClearDepthStencil);
+
+  /**
+   * @brief Clones the texture.
+   * @returns the cloned texture
+   */
   RenderTargetTexturePtr clone();
+
+  /**
+   * @brief Serialize the texture to a JSON representation we can easily use in
+   * the resepective Parse function.
+   * @returns The JSON representation of the texture
+   */
   json serialize() const;
 
   /**
    * @brief This will remove the attached framebuffer objects. The texture will
-   * not be able to be used as render target anymore.
+   * not be able to be used as render target anymore
    */
   void disposeFramebufferObjects();
 
+  /**
+   * @brief Dispose the texture and release its associated resources.
+   */
   void dispose() override;
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   void _rebuild() override;
 
   /**
@@ -150,11 +233,11 @@ public:
 
 protected:
   /**
-   * @brief Instantiate a render target texture. This is mainly to render of
-   * screen the scene to for instance apply post processse or used a shadow,
+   * @brief Instantiate a render target texture. This is mainly used to render
+   * of screen the scene to for instance apply post processse or used a shadow,
    * depth texture...
    * @param name The friendly name of the texture
-   * @param size The size of the RTT (number if square, or {with: number,
+   * @param size The size of the RTT (number if square, or {width: number,
    * height:number} or {ratio:} to define a ratio from the main scene)
    * @param scene The scene the RTT belongs to. The latest created scene will be
    * used if not precised.
@@ -208,6 +291,7 @@ protected:
     const std::function<void(int* faceIndex, EventState&)>& callback);
   void
   set_onClear(const std::function<void(Engine* engine, EventState&)>& callback);
+  RenderTargetCreationOptions& get_renderTargetOptions();
 
   virtual unsigned int get_samples() const;
   virtual void set_samples(unsigned int value);
@@ -238,21 +322,51 @@ public:
    */
   Property<RenderTargetTexture, std::vector<AbstractMeshPtr>> renderList;
 
+  /**
+   * Define if particles should be rendered in your texture.
+   */
   bool renderParticles;
+
+  /**
+   * Define if sprites should be rendered in your texture.
+   */
   bool renderSprites;
+
+  /**
+   * Define the camera used to render the texture.
+   */
   CameraPtr activeCamera;
+
+  /**
+   * Override the render function of the texture with your own one.
+   */
   std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
                      const std::vector<SubMeshPtr>& alphaTestSubMeshes,
                      const std::vector<SubMeshPtr>& transparentSubMeshes,
                      const std::vector<SubMeshPtr>& depthOnlySubMeshes,
                      const std::function<void()>& beforeTransparents)>
     customRenderFunction;
+
+  /**
+   * Define if camera post processes should be use while rendering the texture.
+   */
   bool useCameraPostProcesses;
   bool ignoreCameraViewport;
+
+  /**
+   * Define the clear color of the Render Target if it should be different from
+   * the scene.
+   */
   std::optional<Color4> clearColor;
-  /** Hidden */
+
+  /**
+   * Hidden
+   */
   bool _generateMipMaps;
-  /** Hidden */
+
+  /**
+   * Hidden
+   */
   std::vector<std::string> _waitingRenderList;
   // std::function<void()> onAfterRender;
   // std::function<void()> onBeforeRender;
@@ -271,8 +385,6 @@ public:
    */
   InternalTexturePtr depthStencilTexture;
 
-  // Events
-
   /**
    * An event triggered when the texture is unbind.
    */
@@ -283,6 +395,11 @@ public:
    */
   Observable<RenderTargetTexture> onAfterUnbindObservable;
 
+  /**
+   * Set a after unbind callback in the texture.
+   * This has been kept for backward compatibility and use of
+   * onAfterUnbindObservable is recommended.
+   */
   WriteOnlyProperty<RenderTargetTexture,
                     std::function<void(RenderTargetTexture*, EventState&)>>
     onAfterUnbind;
@@ -292,6 +409,11 @@ public:
    */
   Observable<int> onBeforeRenderObservable;
 
+  /**
+   * Set a after render callback in the texture.
+   * This has been kept for backward compatibility and use of
+   * onAfterRenderObservable is recommended.
+   */
   WriteOnlyProperty<RenderTargetTexture,
                     std::function<void(int* faceIndex, EventState&)>>
     onBeforeRender;
@@ -310,12 +432,29 @@ public:
    */
   Observable<Engine> onClearObservable;
 
+  /**
+   * Set a clear callback in the texture.
+   * This has been kept for backward compatibility and use of onClearObservable
+   * is recommended.
+   */
   WriteOnlyProperty<RenderTargetTexture,
                     std::function<void(Engine* engine, EventState&)>>
     onClear;
 
+  ReadOnlyProperty<RenderTargetTexture, RenderTargetCreationOptions>
+    renderTargetOptions;
+
+  /**
+   * Define the number of samples to use in case of MSAA.
+   * It defaults to one meaning no MSAA has been enabled.
+   */
   Property<RenderTargetTexture, unsigned int> samples;
 
+  /**
+   * Define the refresh rate of the texture or the rendering frequency.
+   * Use 0 to render just once, 1 to render on every frame, 2 to render every
+   * two frames and so on...
+   */
   Property<RenderTargetTexture, int> refreshRate;
 
 protected:

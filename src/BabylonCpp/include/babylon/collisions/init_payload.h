@@ -5,6 +5,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT InitPayload {
 }; // end of struct InitPayload
 

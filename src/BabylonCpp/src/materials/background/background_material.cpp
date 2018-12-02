@@ -36,6 +36,8 @@ float BackgroundMaterial::StandardReflectance90()
 BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , useEquirectangularFOV{false}
+    , hasRenderTargetTextures{this,
+                              &BackgroundMaterial::get_hasRenderTargetTextures}
     , _primaryColor{Color3::White()}
     , __perceptualColor{std::nullopt}
     , _primaryColorShadowLevel{0.f}
@@ -240,6 +242,19 @@ void BackgroundMaterial::setCameraColorCurves(ColorCurves* value)
 {
   _imageProcessingConfiguration->colorCurves
     = std::make_unique<ColorCurves>(*value);
+}
+
+bool BackgroundMaterial::get_hasRenderTargetTextures() const
+{
+  if (_diffuseTexture && _diffuseTexture->isRenderTarget) {
+    return true;
+  }
+
+  if (_reflectionTexture && _reflectionTexture->isRenderTarget) {
+    return true;
+  }
+
+  return false;
 }
 
 bool BackgroundMaterial::needAlphaTesting() const
@@ -783,7 +798,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
     bindView(effect);
 
     // Fog
-    MaterialHelper::BindFogParameters(scene, mesh, _activeEffect);
+    MaterialHelper::BindFogParameters(scene, mesh, _activeEffect, true);
 
     // image processing
     if (_imageProcessingConfiguration) {

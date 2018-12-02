@@ -7,8 +7,8 @@
 namespace BABYLON {
 
 /**
- * @brief Internal class used by the engine to get list of
- * {BABYLON.InternalTexture} already bound to the GL context.
+ * @brief Internal class used by the engine to get list of InternalTexture
+ * already bound to the GL context.
  */
 struct BABYLON_SHARED_EXPORT DummyInternalTextureTracker
     : public IInternalTextureTracker {

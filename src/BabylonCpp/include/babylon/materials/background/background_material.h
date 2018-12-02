@@ -310,6 +310,12 @@ protected:
   void _attachImageProcessingConfiguration(
     ImageProcessingConfiguration* configuration);
 
+  /**
+   * @brief Gets a boolean indicating that current material needs to register
+   * RTT.
+   */
+  bool get_hasRenderTargetTextures() const;
+
 private:
   /**
    * @brief Compute the primary color according to the chosen perceptual color.
@@ -327,6 +333,11 @@ public:
    * Enable the FOV adjustment feature controlled by fovMultiplier.
    */
   bool useEquirectangularFOV;
+
+  /**
+   * Gets a boolean indicating that current material needs to register RTT
+   */
+  ReadOnlyProperty<BackgroundMaterial, bool> hasRenderTargetTextures;
 
 protected:
   /**

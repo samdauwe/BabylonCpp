@@ -6,6 +6,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief File request interface.
+ */
 struct BABYLON_SHARED_EXPORT IFileRequest {
   /**
    * @brief Raised when the request is complete (success or error).

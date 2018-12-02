@@ -15,20 +15,26 @@ using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using TexturePtr     = std::shared_ptr<Texture>;
 
 /**
- * @brief Represents the texture tools class.
+ * @brief Class used to host texture specific utilities.
  */
 struct BABYLON_SHARED_EXPORT TextureTools {
 
   /**
    * @brief Uses the GPU to create a copy texture rescaled at a given size.
    * @param texture Texture to copy from
-   * @param width Desired width
-   * @param height Desired height
-   * @return Generated texture
+   * @param width defines the desired width
+   * @param height defines the desired height
+   * @param useBilinearMode defines if bilinear mode has to be used
+   * @return the generated texture
    */
   static TexturePtr CreateResizedCopy(const TexturePtr& texture, int width,
                                       int height, bool useBilinearMode = true);
 
+  /**
+   * @brief Gets an environment BRDF texture for a given scene.
+   * @param scene defines the hosting scene
+   * @returns the environment BRDF texture
+   */
   static BaseTexturePtr& GetEnvironmentBRDFTexture(Scene* scene);
 
   static std::string _environmentBRDFBase64Texture;

@@ -10,6 +10,9 @@ namespace BABYLON {
 
 class Collider;
 
+/**
+ * @brief Hidden
+ */
 class BABYLON_SHARED_EXPORT CollideWorker {
 
 public:

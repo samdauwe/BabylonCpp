@@ -13,6 +13,7 @@ using StereoscopicUniversalCameraPtr
 /**
  * @brief Camera used to simulate stereoscopic rendering (based on
  * UniversalCamera).
+ * @see http://doc.babylonjs.com/features/cameras
  */
 class BABYLON_SHARED_EXPORT StereoscopicUniversalCamera
     : public UniversalCamera {
