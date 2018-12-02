@@ -128,6 +128,7 @@
 
 ## Optimizations ##
 ![building_instances_grid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/building_instances_grid_scene.png?raw=true "Building Instances Grid Scene")
+![many_box_instances_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/many_box_instances_scene.png?raw=true "Many Box Instances Scene")
 
 ## Special FX ##
 ![convolution_post_process_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/convolution_post_process_scene.png?raw=true "Convolution Post-process Scene")
