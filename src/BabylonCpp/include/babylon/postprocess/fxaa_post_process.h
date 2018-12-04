@@ -11,7 +11,8 @@ class FxaaPostProcess;
 using FxaaPostProcessPtr = std::shared_ptr<FxaaPostProcess>;
 
 /**
- * @brief
+ * @brief Fxaa post process.
+ * @see https://doc.babylonjs.com/how_to/how_to_use_postprocesses#fxaa
  */
 class BABYLON_SHARED_EXPORT FxaaPostProcess : public PostProcess {
 
@@ -40,7 +41,14 @@ private:
   std::string _getDefines();
 
 public:
+  /**
+   * Hidden
+   */
   float texelWidth;
+
+  /**
+   * Hidden
+   */
   float texelHeight;
 
 }; // end of class FxaaPostProcess

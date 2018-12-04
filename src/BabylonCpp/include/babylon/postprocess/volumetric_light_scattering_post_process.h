@@ -27,20 +27,18 @@ class BABYLON_SHARED_EXPORT VolumetricLightScatteringPostProcess
 public:
   /**
    * @brief Constructor
-   * @param {string} name - The post-process name
-   * @param {any} ratio - The size of the post-process and/or internal pass (0.5
-   * means that your postprocess will have a width = canvas.width 0.5 and a
-   * height = canvas.height 0.5)
-   * @param {BABYLON.Camera} camera - The camera that the post-process will be
-   * attached to
-   * @param {BABYLON.Mesh} mesh - The mesh used to create the light scattering
-   * @param {number} samples - The post-process quality, default 100
-   * @param {number} samplingMode - The post-process filtering mode
-   * @param {BABYLON.Engine} engine - The babylon engine
-   * @param {boolean} reusable - If the post-process is reusable
-   * @param {BABYLON.Scene} scene - The constructor needs a scene reference to
-   * initialize internal components. If "camera" is null a "scene" must be
-   * provided
+   * @param name The post-process name
+   * @param ratio The size of the post-process and/or internal pass (0.5 means
+   * that your postprocess will have a width = canvas.width 0.5 and a height =
+   * canvas.height 0.5)
+   * @param camera The camera that the post-process will be attached to
+   * @param mesh The mesh used to create the light scattering
+   * @param samples The post-process quality, default 100
+   * @param samplingModeThe post-process filtering mode
+   * @param engine The babylon engine
+   * @param reusable If the post-process is reusable
+   * @param scene The constructor needs a scene reference to initialize internal
+   * components. If "camera" is null a "scene" must be provided
    */
   VolumetricLightScatteringPostProcess(
     const std::string& name, float ratio, const CameraPtr& camera,
@@ -50,40 +48,42 @@ public:
   ~VolumetricLightScatteringPostProcess();
 
   /**
-   * @brief Returns the string "VolumetricLightScatteringPostProcess"
+   * @brief Returns the string "VolumetricLightScatteringPostProcess".
+   * @returns "VolumetricLightScatteringPostProcess"
    */
   const char* getClassName() const;
 
   /**
-   * Sets the new light position for light scattering effect
-   * @param {BABYLON.Vector3} The new custom light position
+   * @brief Sets the new light position for light scattering effect.
+   * @param position The new custom light position
    */
   void setCustomMeshPosition(const Vector3& position);
 
   /**
-   * Returns the light position for light scattering effect
-   * @return {BABYLON.Vector3} The custom light position
+   * @brief Returns the light position for light scattering effect.
+   * @return Vector3 The custom light position
    */
   Vector3& getCustomMeshPosition();
 
   /**
-   * Disposes the internal assets and detaches the post-process from the camera
+   * @brief Disposes the internal assets and detaches the post-process from the
+   * camera.
    */
   void dispose(Camera* camera);
 
   /**
-   * Returns the render target texture used by the post-process
-   * @return {BABYLON.RenderTargetTexture} The render target texture used by the
-   * post-process
+   * @brief Returns the render target texture used by the post-process.
+   * @return the render target texture used by the post-process
    */
   RenderTargetTexturePtr& getPass();
 
   //** Static methods **/ /
   /**
-   * Creates a default mesh for the Volumeric Light Scattering post-process
-   * @param {string} The mesh name
-   * @param {BABYLON.Scene} The scene where to create the mesh
-   * @return {BABYLON.Mesh} the default mesh
+   * @brief Creates a default mesh for the Volumeric Light Scattering
+   * post-process.
+   * @param name The mesh name
+   * @param scene The scene where to create the mesh
+   * @return the default mesh
    */
   static MeshPtr CreateDefaultMesh(const std::string& name, Scene* scene);
 

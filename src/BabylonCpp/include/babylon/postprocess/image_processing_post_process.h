@@ -17,7 +17,9 @@ using ImageProcessingPostProcessPtr
   = std::shared_ptr<ImageProcessingPostProcess>;
 
 /**
- * @brief
+ * @brief ImageProcessingPostProcess
+ * @see
+ * https://doc.babylonjs.com/how_to/how_to_use_postprocesses#imageprocessing
  */
 class BABYLON_SHARED_EXPORT ImageProcessingPostProcess : public PostProcess {
 
@@ -34,7 +36,8 @@ public:
   ~ImageProcessingPostProcess();
 
   /**
-   * @brief Returns the string "ImageProcessingPostProcess"
+   * "ImageProcessingPostProcess"
+   * @returns "ImageProcessingPostProcess"
    */
   const char* getClassName() const;
 

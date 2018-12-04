@@ -28,7 +28,9 @@ void PostProcessRenderPipelineManagerSceneComponent::_register()
 
 void PostProcessRenderPipelineManagerSceneComponent::rebuild()
 {
-  // Nothing to do for this component
+  if (scene->postProcessRenderPipelineManager()) {
+    scene->postProcessRenderPipelineManager()->_rebuild();
+  }
 }
 
 void PostProcessRenderPipelineManagerSceneComponent::dispose()
@@ -43,13 +45,6 @@ void PostProcessRenderPipelineManagerSceneComponent::_gatherRenderTargets(
 {
   if (scene->postProcessRenderPipelineManager()) {
     scene->postProcessRenderPipelineManager()->update();
-  }
-}
-
-void PostProcessRenderPipelineManagerSceneComponent::_rebuildGeometry()
-{
-  if (scene->postProcessRenderPipelineManager()) {
-    scene->postProcessRenderPipelineManager()->_rebuild();
   }
 }
 

@@ -8,12 +8,19 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief VRDistortionCorrectionPostProcess used for mobile VR.
  */
 class BABYLON_SHARED_EXPORT VRDistortionCorrectionPostProcess
     : public PostProcess {
 
 public:
+  /**
+   * @brief Initializes the VRDistortionCorrectionPostProcess.
+   * @param name The name of the effect.
+   * @param camera The camera to apply the render pass to.
+   * @param isRightEye If this is for the right eye distortion
+   * @param vrMetrics All the required metrics for the VR camera
+   */
   VRDistortionCorrectionPostProcess(const std::string& name,
                                     const CameraPtr& camera, bool isRightEye,
                                     const VRCameraMetrics& vrMetrics);

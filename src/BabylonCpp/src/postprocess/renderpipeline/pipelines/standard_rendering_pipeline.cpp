@@ -1,4 +1,4 @@
-#include <babylon/postprocess/renderpipeline/pipelines/standard_rendering_pipeline.h>
+﻿#include <babylon/postprocess/renderpipeline/pipelines/standard_rendering_pipeline.h>
 
 #include <nlohmann/json.hpp>
 
@@ -10,6 +10,7 @@
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
+#include <babylon/lights/shadow_light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/multi_render_target.h>
@@ -19,6 +20,7 @@
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>
 #include <babylon/postprocess/blur_post_process.h>
+#include <babylon/postprocess/fxaa_post_process.h>
 #include <babylon/postprocess/post_process.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
@@ -51,6 +53,7 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , lensFlareComposePostProcess{nullptr}
     , motionBlurPostProcess{nullptr}
     , depthOfFieldPostProcess{nullptr}
+    , fxaaPostProcess{nullptr}
     , brightThreshold{1.f}
     , blurWidth{512.f}
     , horizontalBlur{false}
@@ -73,6 +76,30 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , depthOfFieldDistance{10.f}
     , depthOfFieldBlurWidth{64.f}
     , motionStrength{1.f}
+    , bloomEnabled{this, &StandardRenderingPipeline::get_bloomEnabled,
+                   &StandardRenderingPipeline::set_bloomEnabled}
+    , depthOfFieldEnabled{this,
+                          &StandardRenderingPipeline::get_depthOfFieldEnabled,
+                          &StandardRenderingPipeline::set_depthOfFieldEnabled}
+    , lensFlareEnabled{this, &StandardRenderingPipeline::get_lensFlareEnabled,
+                       &StandardRenderingPipeline::set_lensFlareEnabled}
+    , HDREnabled{this, &StandardRenderingPipeline::get_HDREnabled,
+                 &StandardRenderingPipeline::set_HDREnabled}
+    , VLSEnabled{this, &StandardRenderingPipeline::get_VLSEnabled,
+                 &StandardRenderingPipeline::set_VLSEnabled}
+    , motionBlurEnabled{this, &StandardRenderingPipeline::get_motionBlurEnabled,
+                        &StandardRenderingPipeline::set_motionBlurEnabled}
+    , fxaaEnabled{this, &StandardRenderingPipeline::get_fxaaEnabled,
+                  &StandardRenderingPipeline::set_fxaaEnabled}
+    , volumetricLightStepsCount{this,
+                                &StandardRenderingPipeline::
+                                  get_volumetricLightStepsCount,
+                                &StandardRenderingPipeline::
+                                  set_volumetricLightStepsCount}
+    , motionBlurSamples{this, &StandardRenderingPipeline::get_motionBlurSamples,
+                        &StandardRenderingPipeline::set_motionBlurSamples}
+    , samples{this, &StandardRenderingPipeline::get_samples,
+              &StandardRenderingPipeline::set_samples}
     , _scene{scene}
     , _currentDepthOfFieldSource{nullptr}
     , _basePostProcess{iOriginalPostProcess}
@@ -81,14 +108,16 @@ StandardRenderingPipeline::StandardRenderingPipeline(
                           EngineConstants::TEXTURETYPE_FLOAT :
                           EngineConstants::TEXTURETYPE_HALF_FLOAT}
     , _ratio{ratio}
-    , _bloomEnabled{true}
+    , _bloomEnabled{false}
     , _depthOfFieldEnabled{false}
     , _vlsEnabled{false}
     , _lensFlareEnabled{false}
     , _hdrEnabled{false}
     , _motionBlurEnabled{false}
+    , _fxaaEnabled{false}
     , _motionBlurSamples{64.f}
     , _volumetricLightStepsCount{50.f}
+    , _samples{1}
 {
   for (auto& camera : cameras) {
     _cameras[camera->name] = camera;
@@ -166,12 +195,12 @@ float StandardRenderingPipeline::operator[](const std::string& key) const
   return 0.f;
 }
 
-bool StandardRenderingPipeline::bloomEnabled() const
+bool StandardRenderingPipeline::get_bloomEnabled() const
 {
   return _bloomEnabled;
 }
 
-void StandardRenderingPipeline::setBloomEnabled(bool enabled)
+void StandardRenderingPipeline::set_bloomEnabled(bool enabled)
 {
   if (_bloomEnabled == enabled) {
     return;
@@ -181,12 +210,12 @@ void StandardRenderingPipeline::setBloomEnabled(bool enabled)
   _buildPipeline();
 }
 
-bool StandardRenderingPipeline::depthOfFieldEnabled() const
+bool StandardRenderingPipeline::get_depthOfFieldEnabled() const
 {
   return _depthOfFieldEnabled;
 }
 
-void StandardRenderingPipeline::setDepthOfFieldEnabled(bool enabled)
+void StandardRenderingPipeline::set_depthOfFieldEnabled(bool enabled)
 {
   if (_depthOfFieldEnabled == enabled) {
     return;
@@ -196,12 +225,12 @@ void StandardRenderingPipeline::setDepthOfFieldEnabled(bool enabled)
   _buildPipeline();
 }
 
-bool StandardRenderingPipeline::lensFlareEnabled() const
+bool StandardRenderingPipeline::get_lensFlareEnabled() const
 {
   return _lensFlareEnabled;
 }
 
-void StandardRenderingPipeline::setLensFlareEnabled(bool enabled)
+void StandardRenderingPipeline::set_lensFlareEnabled(bool enabled)
 {
   if (_lensFlareEnabled == enabled) {
     return;
@@ -211,12 +240,12 @@ void StandardRenderingPipeline::setLensFlareEnabled(bool enabled)
   _buildPipeline();
 }
 
-bool StandardRenderingPipeline::HDREnabled() const
+bool StandardRenderingPipeline::get_HDREnabled() const
 {
   return _hdrEnabled;
 }
 
-void StandardRenderingPipeline::setHDREnabled(bool enabled)
+void StandardRenderingPipeline::set_HDREnabled(bool enabled)
 {
   if (_hdrEnabled == enabled) {
     return;
@@ -226,12 +255,12 @@ void StandardRenderingPipeline::setHDREnabled(bool enabled)
   _buildPipeline();
 }
 
-bool StandardRenderingPipeline::VLSEnabled() const
+bool StandardRenderingPipeline::get_VLSEnabled() const
 {
   return _vlsEnabled;
 }
 
-void StandardRenderingPipeline::setVLSEnabled(bool enabled)
+void StandardRenderingPipeline::set_VLSEnabled(bool enabled)
 {
   if (_vlsEnabled == enabled) {
     return;
@@ -251,12 +280,12 @@ void StandardRenderingPipeline::setVLSEnabled(bool enabled)
   _buildPipeline();
 }
 
-bool StandardRenderingPipeline::motionBlurEnabled() const
+bool StandardRenderingPipeline::get_motionBlurEnabled() const
 {
   return _motionBlurEnabled;
 }
 
-void StandardRenderingPipeline::setMotionBlurEnabled(bool enabled)
+void StandardRenderingPipeline::set_motionBlurEnabled(bool enabled)
 {
   if (_motionBlurEnabled == enabled) {
     return;
@@ -266,12 +295,27 @@ void StandardRenderingPipeline::setMotionBlurEnabled(bool enabled)
   _buildPipeline();
 }
 
-float StandardRenderingPipeline::volumetricLightStepsCount() const
+bool StandardRenderingPipeline::get_fxaaEnabled() const
+{
+  return _fxaaEnabled;
+}
+
+void StandardRenderingPipeline::set_fxaaEnabled(bool enabled)
+{
+  if (_fxaaEnabled == enabled) {
+    return;
+  }
+
+  _fxaaEnabled = enabled;
+  _buildPipeline();
+}
+
+float StandardRenderingPipeline::get_volumetricLightStepsCount() const
 {
   return _volumetricLightStepsCount;
 }
 
-void StandardRenderingPipeline::setVolumetricLightStepsCount(float count)
+void StandardRenderingPipeline::set_volumetricLightStepsCount(float count)
 {
   if (volumetricLightPostProcess) {
     volumetricLightPostProcess->updateEffect(
@@ -282,12 +326,12 @@ void StandardRenderingPipeline::setVolumetricLightStepsCount(float count)
   _volumetricLightStepsCount = count;
 }
 
-float StandardRenderingPipeline::motionBlurSamples() const
+float StandardRenderingPipeline::get_motionBlurSamples() const
 {
   return _motionBlurSamples;
 }
 
-void StandardRenderingPipeline::setMotionBlurSamples(float samples)
+void StandardRenderingPipeline::set_motionBlurSamples(float samples)
 {
   if (motionBlurPostProcess) {
     motionBlurPostProcess->updateEffect(
@@ -296,6 +340,21 @@ void StandardRenderingPipeline::setMotionBlurSamples(float samples)
   }
 
   _motionBlurSamples = samples;
+}
+
+unsigned int StandardRenderingPipeline::get_samples() const
+{
+  return _samples;
+}
+
+void StandardRenderingPipeline::set_samples(unsigned int sampleCount)
+{
+  if (_samples == sampleCount) {
+    return;
+  }
+
+  _samples = sampleCount;
+  _buildPipeline();
 }
 
 void StandardRenderingPipeline::_buildPipeline()
@@ -321,10 +380,13 @@ void StandardRenderingPipeline::_buildPipeline()
     originalPostProcess = _basePostProcess;
   }
 
-  addEffect(PostProcessRenderEffect::New(
-    scene->getEngine(), "HDRPassPostProcess",
-    [&]() -> std::vector<PostProcessPtr> { return {originalPostProcess}; },
-    true));
+  if (_bloomEnabled || _vlsEnabled || _lensFlareEnabled || _depthOfFieldEnabled
+      || _motionBlurEnabled) {
+    addEffect(PostProcessRenderEffect::New(
+      scene->getEngine(), "HDRPassPostProcess",
+      [&]() -> std::vector<PostProcessPtr> { return {originalPostProcess}; },
+      true));
+  }
 
   _currentDepthOfFieldSource = originalPostProcess;
 
@@ -420,10 +482,27 @@ void StandardRenderingPipeline::_buildPipeline()
     _createMotionBlurPostProcess(scene, ratio);
   }
 
+  if (_fxaaEnabled) {
+    // Create fxaa post-process
+    fxaaPostProcess = FxaaPostProcess::New(
+      "fxaa", 1.0, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+      scene->getEngine(), false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    addEffect(PostProcessRenderEffect::New(
+      scene->getEngine(), "HDRFxaa",
+      [this]() -> std::vector<PostProcessPtr> { return {fxaaPostProcess}; },
+      true));
+  }
+
   if (!_cameras.empty()) {
     auto cameras = stl_util::extract_values(_cameras);
     _scene->postProcessRenderPipelineManager()->attachCamerasToRenderPipeline(
       _name, cameras);
+  }
+
+  if (!_enableMSAAOnFirstPostProcess(_samples) && _samples > 1) {
+    BABYLON_LOG_WARN("StandardRenderingPipeline",
+                     "MSAA failed to enable, MSAA is only supported in "
+                     "browsers that support webGL >= 2.0");
   }
 }
 
@@ -587,9 +666,9 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
         effect->setTexture("positionSampler", geometry->textures()[2]);
 
         effect->setColor3("sunColor", sourceLight->diffuse);
-        effect->setVector3(
-          "sunDirection",
-          static_cast<IShadowLight*>(sourceLight)->getShadowDirection());
+        effect->setVector3("sunDirection",
+                           std::static_pointer_cast<IShadowLight>(sourceLight)
+                             ->getShadowDirection());
 
         effect->setVector3("cameraPosition",
                            scene->activeCamera->globalPosition());
@@ -599,10 +678,8 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
         effect->setFloat("scatteringCoefficient", volumetricLightCoefficient);
         effect->setFloat("scatteringPower", volumetricLightPower);
 
-        depthValues.x
-          = generator->getLight()->getDepthMinZ(*_scene->activeCamera);
-        depthValues.y
-          = generator->getLight()->getDepthMaxZ(*_scene->activeCamera);
+        depthValues.x = sourceLight->getDepthMinZ(*_scene->activeCamera);
+        depthValues.y = sourceLight->getDepthMaxZ(*_scene->activeCamera);
         effect->setVector2("depthValues", depthValues);
       }
     });
@@ -1035,6 +1112,10 @@ void StandardRenderingPipeline::_disposePostProcesses()
       motionBlurPostProcess->dispose(camera);
     }
 
+    if (fxaaPostProcess) {
+      fxaaPostProcess->dispose(camera);
+    }
+
     for (auto& blurHPostProcess : blurHPostProcesses) {
       blurHPostProcess->dispose(camera);
     }
@@ -1061,6 +1142,7 @@ void StandardRenderingPipeline::_disposePostProcesses()
   hdrFinalPostProcess               = nullptr;
   depthOfFieldPostProcess           = nullptr;
   motionBlurPostProcess             = nullptr;
+  fxaaPostProcess                   = nullptr;
 
   luminanceDownSamplePostProcesses.clear();
   blurHPostProcesses.clear();

@@ -66,7 +66,6 @@ protected:
 private:
   void _gatherRenderTargets(
     const std::vector<RenderTargetTexturePtr>& renderTargets);
-  void _rebuildGeometry();
 
 }; // end of class PostProcessRenderPipelineManagerSceneComponent
 
