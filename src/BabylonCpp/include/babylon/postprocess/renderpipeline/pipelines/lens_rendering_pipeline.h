@@ -33,7 +33,8 @@ struct LensRenderingPipelineParameters {
 }; // end of struct LensRenderingPipelineParameters
 
 /**
- * Chromatic Aberration GLSL Shader
+ * @brief BABYLON.JS Chromatic Aberration GLSL Shader.
+ * Author: Olivier Guyot
  * Separates very slightly R, G and B colors on the edges of the screen
  * Inspired by Francois Tarlier & Martins Upitis
  *
@@ -83,37 +84,124 @@ public:
 
   void addToScene(const LensRenderingPipelinePtr& lensRenderingPipeline);
 
-  /** Methods **/
+  // public methods (self explanatory)
+
+  /**
+   * @brief Sets the amount of blur at the edges.
+   * @param amount blur amount
+   */
   void setEdgeBlur(float amount);
+
+  /**
+   * @brief Sets edge blur to 0.
+   */
   void disableEdgeBlur();
+
+  /**
+   * @brief Sets the amout of grain.
+   * @param amount Amount of grain
+   */
   void setGrainAmount(float amount);
+
+  /**
+   * @brief Set grain amount to 0.
+   */
   void disableGrain();
+
+  /**
+   * @brief Sets the chromatic aberration amount.
+   * @param amount amount of chromatic aberration
+   */
   void setChromaticAberration(float amount);
+
+  /**
+   * @brief Sets chromatic aberration amount to 0.
+   */
   void disableChromaticAberration();
+
+  /**
+   * @brief Sets the EdgeDistortion amount.
+   * @param amount amount of EdgeDistortion
+   */
   void setEdgeDistortion(float amount);
+
+  /**
+   * @brief Sets edge distortion to 0.
+   */
   void disableEdgeDistortion();
+
+  /**
+   * @brief Sets the FocusDistance amount.
+   * @param amount amount of FocusDistance
+   */
   void setFocusDistance(float amount);
+
+  /**
+   * @brief Disables depth of field.
+   */
   void disableDepthOfField();
+
+  /**
+   * @brief Sets the Aperture amount.
+   * @param amount amount of Aperture
+   */
   void setAperture(float amount);
+
+  /**
+   * @brief Sets the DarkenOutOfFocus amount.
+   * @param amount amount of DarkenOutOfFocus
+   */
   void setDarkenOutOfFocus(float amount);
+
+  /**
+   * @brief Creates a pentagon bokeh effect.
+   */
   void enablePentagonBokeh();
+
+  /**
+   * @brief Disables the pentagon bokeh effect.
+   */
   void disablePentagonBokeh();
+
+  /**
+   * @brief Enables noise blur.
+   */
   void enableNoiseBlur();
+
+  /**
+   * @brief Disables noise blur.
+   */
   void disableNoiseBlur();
+
+  /**
+   * @brief Sets the HighlightsGain amount.
+   * @param amount amount of HighlightsGain
+   */
   void setHighlightsGain(float amount);
+
+  /**
+   * @brief Sets the HighlightsThreshold amount.
+   * @param amount amount of HighlightsThreshold
+   */
   void setHighlightsThreshold(float amount);
+
+  /**
+   * @brief Disables highlights.
+   */
   void disableHighlights();
 
   /**
-   * Removes the internal pipeline assets and detaches the pipeline from the
-   * scene cameras
+   * @brief Removes the internal pipeline assets and detaches the pipeline from
+   * the scene cameras.
+   * @param disableDepthRender If the scens depth rendering should be disabled
+   * (default: false)
    */
   void dispose(bool disableDepthRender         = false,
                bool disposeMaterialAndTextures = false) override;
 
 protected:
   /**
-   * Constructor
+   * @brief Constructor
    *
    * Effect parameters are as follow:
    * {
@@ -144,15 +232,13 @@ protected:
    * }
    * Note: if an effect parameter is unset, effect is disabled
    *
-   * @param {string} name - The rendering pipeline name
-   * @param {object} parameters - An object containing all parameters (see
-   * above)
-   * @param {BABYLON.Scene} scene - The scene linked to this pipeline
-   * @param {number} ratio - The size of the postprocesses (0.5 means that your
-   * postprocess will have a width = canvas.width 0.5 and a height =
-   * canvas.height 0.5)
-   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
-   * pipeline will be attached to
+   * @param name The rendering pipeline name
+   * @param parameters - An object containing all parameters (see above)
+   * @param scene The scene linked to this pipeline
+   * @param ratio The size of the postprocesses (0.5 means that your postprocess
+   * will have a width = canvas.width 0.5 and a height = canvas.height 0.5)
+   * @param cameras The array of cameras that the rendering pipeline will be
+   * attached to
    */
   LensRenderingPipeline(const std::string& name,
                         const LensRenderingPipelineParameters& parameters,

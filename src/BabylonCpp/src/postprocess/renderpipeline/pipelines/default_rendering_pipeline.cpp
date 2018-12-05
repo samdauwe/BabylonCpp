@@ -1,4 +1,4 @@
-#include <babylon/postprocess/renderpipeline/pipelines/default_rendering_pipeline.h>
+﻿#include <babylon/postprocess/renderpipeline/pipelines/default_rendering_pipeline.h>
 
 #include <nlohmann/json.hpp>
 
@@ -96,6 +96,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     , _hasCleared{false}
     , _prevPostProcess{nullptr}
     , _prevPrevPostProcess{nullptr}
+    , _depthOfFieldSceneObserver{nullptr}
 {
   _cameras             = cameras;
   _camerasToBeAttached = stl_util::extract_values(_cameras);
@@ -479,15 +480,41 @@ void DefaultRenderingPipeline::_buildPipeline()
   _hasCleared          = false;
 
   if (depthOfFieldEnabled) {
-    // TODO use indexing instead of "0"
-    auto depthTexture
-      = _scene->enableDepthRenderer(_cameras["0"])->getDepthMap();
-    depthOfField->depthTexture = depthTexture;
+    // Multi camera suport
+    if (_cameras.size() > 1) {
+      for (const auto& camera : _cameras) {
+        auto depthRenderer = _scene->enableDepthRenderer(camera.second);
+        depthRenderer->useOnlyInActiveCamera = true;
+      }
+#if 0
+      _depthOfFieldSceneObserver
+        = _scene->onAfterRenderTargetsRenderObservable.add(
+          [this](Scene* scene, EventState& /*es*/) {
+            auto cameras = stl_util::extract_values(_cameras);
+            if (stl_util::contains(_cameras, scene->activeCamera)) {
+              depthOfField->depthTexture
+                = scene->enableDepthRenderer(scene->activeCamera)
+                    ->getDepthMap();
+            }
+          });
+#endif
+    }
+    else {
+      _scene->onAfterRenderTargetsRenderObservable.remove(
+        _depthOfFieldSceneObserver);
+      auto depthRenderer         = _scene->enableDepthRenderer(_cameras["0"]);
+      depthOfField->depthTexture = depthRenderer->getDepthMap();
+    }
+
     if (!depthOfField->_isReady()) {
       depthOfField->_updateEffects();
     }
     addEffect(depthOfField);
     _setAutoClearAndTextureSharing(depthOfField->_effects[0], true);
+  }
+  else {
+    _scene->onAfterRenderTargetsRenderObservable.remove(
+      _depthOfFieldSceneObserver);
   }
 
   if (bloomEnabled) {
@@ -581,6 +608,8 @@ void DefaultRenderingPipeline::_disposePostProcesses(bool disposeNonRecreated)
       }
 
       if (depthOfField) {
+        _scene->onAfterRenderTargetsRenderObservable.remove(
+          _depthOfFieldSceneObserver);
         depthOfField->disposeEffects(camera);
       }
 

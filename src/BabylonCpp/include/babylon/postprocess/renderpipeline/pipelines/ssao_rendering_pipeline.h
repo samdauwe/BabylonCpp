@@ -26,6 +26,9 @@ struct SSARatio {
   float combineRatio;
 }; // end of struct SSARatio
 
+/**
+ * @brief Render pipeline to produce ssao effect.
+ */
 class BABYLON_SHARED_EXPORT SSAORenderingPipeline
     : public PostProcessRenderPipeline {
 
@@ -82,14 +85,14 @@ public:
 
 protected:
   /**
-   * Constructor
-   * @param {string} name - The rendering pipeline name
-   * @param {BABYLON.Scene} scene - The scene linked to this pipeline
-   * @param {any} ratio - The size of the postprocesses. Can be a number shared
+   * @brief Constructor
+   * @param name - The rendering pipeline name
+   * @param scene - The scene linked to this pipeline
+   * @param ratio - The size of the postprocesses. Can be a number shared
    * between passes or an object for more precision: { ssaoRatio: 0.5,
    * combineRatio: 1.0 }
-   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
-   * pipeline will be attached to
+   * @param cameras - The array of cameras that the rendering pipeline will be
+   * attached to
    */
   SSAORenderingPipeline(const std::string& name, Scene* scene, float ratio,
                         const std::vector<CameraPtr>& cameras);

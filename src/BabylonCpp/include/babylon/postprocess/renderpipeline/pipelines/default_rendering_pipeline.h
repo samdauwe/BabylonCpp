@@ -131,15 +131,14 @@ public:
 protected:
   /**
    * @brief constructor
-   * @param {string} name - The rendering pipeline name (default: "")
-   * @param {boolean} hdr - If high dynamic range textures should be used
-   * (default: true)
-   * @param {BABYLON.Scene} scene - The scene linked to this pipeline (default:
-   * the last created scene)
-   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
-   * pipeline will be attached to (default: scene.cameras)
-   * @param {boolean} automaticBuild - if false, you will have to manually call
-   * prepare() to update the pipeline (default: true)
+   * @param name - The rendering pipeline name (default: "")
+   * @param hdr - If high dynamic range textures should be used (default: true)
+   * @param scene - The scene linked to this pipeline (default: the last created
+   * scene)
+   * @param cameras - The array of cameras that the rendering pipeline will be
+   * attached to (default: scene.cameras)
+   * @param automaticBuild - if false, you will have to manually call prepare()
+   * to update the pipeline (default: true)
    */
   DefaultRenderingPipeline(
     const std::string& name = "", bool hdr = true, Scene* scene = nullptr,
@@ -399,6 +398,8 @@ private:
   bool _hasCleared;
   PostProcessPtr _prevPostProcess;
   PostProcessPtr _prevPrevPostProcess;
+
+  Observer<Scene>::Ptr _depthOfFieldSceneObserver;
 
 }; // end of class SSAORenderingPipeline
 

@@ -31,6 +31,9 @@ struct SSAO2Ratio {
   float blurRatio;
 }; // end of struct SSAO2Ratio
 
+/**
+ * @brief Render pipeline to produce ssao effect.
+ */
 class BABYLON_SHARED_EXPORT SSAO2RenderingPipeline
     : public PostProcessRenderPipeline {
 
@@ -105,13 +108,12 @@ public:
 protected:
   /**
    * @brief Constructor
-   * @param {string} name - The rendering pipeline name
-   * @param {BABYLON.Scene} scene - The scene linked to this pipeline
-   * @param {any} ratio - The size of the postprocesses. Can be a number shared
-   * between passes or an object for more precision: { ssaoRatio: 0.5,
-   * combineRatio: 1.0 }
-   * @param {BABYLON.Camera[]} cameras - The array of cameras that the rendering
-   * pipeline will be attached to
+   * @param name The rendering pipeline name
+   * @param scene The scene linked to this pipeline
+   * @param ratio The size of the postprocesses. Can be a number shared between
+   * passes or an object for more precision: { ssaoRatio: 0.5, blurRatio: 1.0 }
+   * @param cameras The array of cameras that the rendering pipeline will be
+   * attached to
    */
   SSAO2RenderingPipeline(const std::string& name, Scene* scene, float ratio,
                          const std::vector<CameraPtr>& cameras);
@@ -165,7 +167,7 @@ public:
   Property<SSAO2RenderingPipeline, unsigned int> textureSamples;
 
   /**
-   * Are we using bilateral blur ?
+   * If bilateral blur should be used.
    */
   Property<SSAO2RenderingPipeline, bool> expensiveBlur;
 

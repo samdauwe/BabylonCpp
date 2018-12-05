@@ -19,7 +19,8 @@ using PostProcessRenderEffectPtr   = std::shared_ptr<PostProcessRenderEffect>;
 using PostProcessRenderPipelinePtr = std::shared_ptr<PostProcessRenderPipeline>;
 
 /**
- * @brief
+ * @brief PostProcessRenderPipeline
+ * @see https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
  */
 class BABYLON_SHARED_EXPORT PostProcessRenderPipeline : public IDisposable {
 
@@ -33,41 +34,87 @@ public:
   virtual ~PostProcessRenderPipeline();
 
   /**
-   * Returns the string "PostProcessRenderPipeline"
+   * "PostProcessRenderPipeline"
+   * @returns "PostProcessRenderPipeline"
    */
   const char* getClassName() const;
 
   std::vector<CameraPtr> getCameras() const;
+
+  /**
+   * @brief If all the render effects in the pipeline are support.
+   */
   bool isSupported() const;
+
+  /**
+   * @brief Adds an effect to the pipeline.
+   * @param renderEffect the effect to add
+   */
   void addEffect(const PostProcessRenderEffectPtr& renderEffect);
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   virtual void _rebuild();
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   void _enableEffect(const std::string& renderEffectName,
                      const std::vector<CameraPtr>& cameras);
+
+  /**
+   * @brief Hidden
+   */
   void _disableEffect(const std::string& renderEffectName,
                       const std::vector<CameraPtr>& cameras);
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   void _attachCameras(const std::vector<CameraPtr>& cameras, bool unique);
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   void _detachCameras(const std::vector<CameraPtr>& cameras);
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   void _update();
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   void _reset();
+
+  /**
+   * @brief Disposes of the pipeline.
+   */
   virtual void dispose(bool doNotRecurse               = false,
                        bool disposeMaterialAndTextures = false) override;
 
 protected:
+  /**
+   * @brief Initializes a PostProcessRenderPipeline.
+   * @param engine engine to add the pipeline to
+   * @param name name of the pipeline
+   */
   PostProcessRenderPipeline(Engine* engine, const std::string& name);
 
   bool _enableMSAAOnFirstPostProcess(unsigned int sampleCount);
 
 public:
-  /** Hidden */
+  /**
+   * Hidden
+   */
   std::string _name;
 
 protected:
+  /**
+   * Hidden
+   */
   std::unordered_map<std::string, CameraPtr> _cameras;
 
 private:
