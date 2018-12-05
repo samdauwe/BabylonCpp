@@ -35,11 +35,11 @@ public:
 
 protected:
   FollowCamera(const std::string& name, const Vector3& position, Scene* scene,
-               AbstractMesh* iLockedTarget = nullptr);
+               const AbstractMeshPtr& iLockedTarget = nullptr);
 
 private:
   float getRadians(float degrees) const;
-  void follow(AbstractMesh* cameraTarget);
+  void follow(const AbstractMeshPtr& cameraTarget);
 
 public:
   float radius;
@@ -47,7 +47,7 @@ public:
   float heightOffset;
   float cameraAcceleration;
   float maxCameraSpeed;
-  AbstractMesh* lockedTarget;
+  AbstractMeshPtr lockedTarget;
 
   static bool NodeConstructorAdded;
 

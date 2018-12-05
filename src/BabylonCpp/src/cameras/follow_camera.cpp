@@ -17,7 +17,7 @@ void FollowCamera::AddNodeConstructor()
 }
 
 FollowCamera::FollowCamera(const std::string& iName, const Vector3& iPosition,
-                           Scene* scene, AbstractMesh* iLockedTarget)
+                           Scene* scene, const AbstractMeshPtr& iLockedTarget)
     : TargetCamera{iName, iPosition, scene}
     , radius{12.f}
     , rotationOffset{0.f}
@@ -42,7 +42,7 @@ float FollowCamera::getRadians(float degrees) const
   return degrees * Math::PI / 180.f;
 }
 
-void FollowCamera::follow(AbstractMesh* cameraTarget)
+void FollowCamera::follow(const AbstractMeshPtr& cameraTarget)
 {
   if (!cameraTarget) {
     return;
