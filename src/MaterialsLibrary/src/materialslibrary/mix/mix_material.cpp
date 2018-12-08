@@ -392,7 +392,7 @@ bool MixMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   return true;
 }
 
-void MixMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
+void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
@@ -410,7 +410,7 @@ void MixMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones

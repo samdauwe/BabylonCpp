@@ -50,9 +50,9 @@ public:
   virtual void markAsDirty(unsigned int /*flag*/)
   {
   }
-  virtual Matrix* getWorldMatrix()
+  virtual Matrix& getWorldMatrix()
   {
-    return nullptr;
+    return _identityMatrix;
   }
   virtual AnimationValue operator[](const std::string& /*key*/)
   {
@@ -71,6 +71,7 @@ public:
 
 private:
   Node* nullNode;
+  Matrix _identityMatrix;
 
 }; // end of struct IAnimatable
 

@@ -140,7 +140,7 @@ std::optional<Vector3> PickingInfo::getNormal(bool useWorldCoordinates,
   }
 
   if (useWorldCoordinates) {
-    auto wm = *pickedMesh->getWorldMatrix();
+    auto wm = pickedMesh->getWorldMatrix();
 
     if (pickedMesh->nonUniformScaling()) {
       Tmp::MatrixArray[0].copyFrom(wm);

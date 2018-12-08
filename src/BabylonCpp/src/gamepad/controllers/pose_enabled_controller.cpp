@@ -168,10 +168,10 @@ Ray PoseEnabledController::getForwardRay(float length)
 
   auto m = _pointingPoseNode ? _pointingPoseNode->getWorldMatrix() :
                                mesh()->getWorldMatrix();
-  auto origin = m->getTranslation();
+  auto origin = m.getTranslation();
 
   Vector3 forward{0.f, 0.f, -1.f};
-  auto forwardWorld = Vector3::TransformNormal(forward, *m);
+  auto forwardWorld = Vector3::TransformNormal(forward, m);
 
   auto direction = Vector3::Normalize(forwardWorld);
 

@@ -186,7 +186,7 @@ void AirplaneModelScene::_reBake(const MeshPtr& mesh)
   mesh->bakeCurrentTransformIntoVertices();
   mesh->updateFacetData();
   auto myVertexData = VertexData::ExtractFromMesh(mesh.get(), true);
-  myVertexData->transform(*mesh->getWorldMatrix());
+  myVertexData->transform(mesh->getWorldMatrix());
   myVertexData->applyToMesh(*mesh);
 }
 

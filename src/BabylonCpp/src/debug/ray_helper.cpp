@@ -130,7 +130,7 @@ void RayHelper::_updateToMesh()
 
   _attachedToMesh->getDirectionToRef(_meshSpaceDirection, ray->direction);
   Vector3::TransformCoordinatesToRef(
-    _meshSpaceOrigin, *_attachedToMesh->getWorldMatrix(), ray->origin);
+    _meshSpaceOrigin, _attachedToMesh->getWorldMatrix(), ray->origin);
 }
 
 void RayHelper::dispose()

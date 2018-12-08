@@ -1269,7 +1269,7 @@ public:
    * by default)
    * @returns a Ray
    */
-  Ray createPickingRay(int x, int y, Matrix* world,
+  Ray createPickingRay(int x, int y, Matrix& world,
                        const CameraPtr& camera = nullptr,
                        bool cameraViewSpace    = false);
 
@@ -1285,8 +1285,9 @@ public:
    * by default)
    * @returns the current scene
    */
-  Scene& createPickingRayToRef(int x, int y, Matrix* world, Ray& result,
-                               CameraPtr camera, bool cameraViewSpace = false);
+  Scene& createPickingRayToRef(int x, int y, const std::optional<Matrix>& world,
+                               Ray& result, CameraPtr camera,
+                               bool cameraViewSpace = false);
 
   /**
    * @brief Creates a ray that can be used to pick in the scene.

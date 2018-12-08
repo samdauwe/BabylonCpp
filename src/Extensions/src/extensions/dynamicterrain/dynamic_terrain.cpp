@@ -455,7 +455,7 @@ void DynamicTerrain::_updateTerrain()
   _terrain->updateVerticesData(VertexBuffer::UVKind, _uvs, false, false);
   _terrain->updateVerticesData(VertexBuffer::ColorKind, _colors, false, false);
   _terrain->_boundingInfo = std::make_unique<BoundingInfo>(_bbMin, _bbMax);
-  _terrain->_boundingInfo->update(*_terrain->_worldMatrix);
+  _terrain->_boundingInfo->update(_terrain->_worldMatrix);
 }
 
 DynamicTerrain& DynamicTerrain::updateTerrainSize()

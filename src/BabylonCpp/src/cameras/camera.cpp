@@ -41,12 +41,12 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , minZ{1.f}
     , maxZ{10000.f}
     , inertia{0.9f}
-    , mode{Camera::PERSPECTIVE_CAMERA()}
+    , mode{Camera::PERSPECTIVE_CAMERA}
     , isIntermediate{false}
     , viewport{Viewport(0.f, 0.f, 1.f, 1.f)}
     , layerMask{0x0FFFFFFF}
-    , fovMode{Camera::FOVMODE_VERTICAL_FIXED()}
-    , cameraRigMode{Camera::RIG_MODE_NONE()}
+    , fovMode{Camera::FOVMODE_VERTICAL_FIXED}
+    , cameraRigMode{Camera::RIG_MODE_NONE}
     , _skipRendering{false}
     , _alternateCamera{nullptr}
     , _projectionMatrix{Matrix()}
@@ -55,7 +55,6 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _globalPosition{Vector3::Zero()}
     , _computedViewMatrix{Matrix::Identity()}
     , _doNotComputeProjectionMatrix{false}
-    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _transformMatrix{Matrix::Zero()}
     , _webvrProjectionMatrix{Matrix::Identity()}
     , _refreshFrustumPlanes{true}
@@ -219,7 +218,7 @@ bool Camera::_isSynchronizedProjectionMatrix()
 
   auto engine = getEngine();
 
-  if (mode == Camera::PERSPECTIVE_CAMERA()) {
+  if (mode == Camera::PERSPECTIVE_CAMERA) {
     check = stl_util::almost_equal(_cache.fov, fov) && _cache.fovMode == fovMode
             && stl_util::almost_equal(_cache.aspectRatio,
                                       engine->getAspectRatio(*this));
@@ -250,7 +249,7 @@ void Camera::detachControl(ICanvas* /*canvas*/)
 void Camera::update()
 {
   _checkInputs();
-  if (cameraRigMode != Camera::RIG_MODE_NONE()) {
+  if (cameraRigMode != Camera::RIG_MODE_NONE) {
     _updateRigCameras();
   }
 }
@@ -359,16 +358,16 @@ void Camera::detachPostProcess(PostProcess* postProcess)
   _cascadePostProcessesToRigCams(); // also ensures framebuffer invalidated
 }
 
-Matrix* Camera::getWorldMatrix()
+Matrix& Camera::getWorldMatrix()
 {
   if (_isSynchronizedViewMatrix()) {
-    return _worldMatrix.get();
+    return _worldMatrix;
   }
 
   // Getting the the view matrix will also compute the world matrix.
   getViewMatrix();
 
-  return _worldMatrix.get();
+  return _worldMatrix;
 }
 
 Matrix Camera::_getViewMatrix()
@@ -396,7 +395,7 @@ Matrix& Camera::getViewMatrix(bool force)
 
   onViewMatrixChangedObservable.notifyObservers(this);
 
-  _computedViewMatrix.invertToRef(*_worldMatrix);
+  _computedViewMatrix.invertToRef(_worldMatrix);
 
   return _computedViewMatrix;
 }
@@ -434,7 +433,7 @@ Matrix& Camera::getProjectionMatrix(bool force)
 
   auto engine = getEngine();
   auto scene  = getScene();
-  if (mode == Camera::PERSPECTIVE_CAMERA()) {
+  if (mode == Camera::PERSPECTIVE_CAMERA) {
     _cache.fov         = fov;
     _cache.fovMode     = fovMode;
     _cache.aspectRatio = engine->getAspectRatio(*this);
@@ -444,14 +443,14 @@ Matrix& Camera::getProjectionMatrix(bool force)
     }
 
     if (scene->useRightHandedSystem()) {
-      Matrix::PerspectiveFovRHToRef(
-        fov, engine->getAspectRatio(*this), minZ, maxZ, _projectionMatrix,
-        fovMode == Camera::FOVMODE_VERTICAL_FIXED());
+      Matrix::PerspectiveFovRHToRef(fov, engine->getAspectRatio(*this), minZ,
+                                    maxZ, _projectionMatrix,
+                                    fovMode == Camera::FOVMODE_VERTICAL_FIXED);
     }
     else {
-      Matrix::PerspectiveFovLHToRef(
-        fov, engine->getAspectRatio(*this), minZ, maxZ, _projectionMatrix,
-        fovMode == Camera::FOVMODE_VERTICAL_FIXED());
+      Matrix::PerspectiveFovLHToRef(fov, engine->getAspectRatio(*this), minZ,
+                                    maxZ, _projectionMatrix,
+                                    fovMode == Camera::FOVMODE_VERTICAL_FIXED);
     }
   }
   else {
@@ -493,7 +492,7 @@ Matrix& Camera::getTransformationMatrix()
   return _transformMatrix;
 }
 
-void Camera::updateFrustumPlanes()
+void Camera::_updateFrustumPlanes()
 {
   if (!_refreshFrustumPlanes) {
     return;
@@ -513,21 +512,21 @@ void Camera::updateFrustumPlanes()
 
 bool Camera::isInFrustum(ICullable* target)
 {
-  updateFrustumPlanes();
+  _updateFrustumPlanes();
 
   return target->isInFrustum(_frustumPlanes);
 }
 
 bool Camera::isCompletelyInFrustum(ICullable* target)
 {
-  updateFrustumPlanes();
+  _updateFrustumPlanes();
 
   return target->isCompletelyInFrustum(_frustumPlanes);
 }
 
 Ray Camera::getForwardRay(float length)
 {
-  return getForwardRay(length, *getWorldMatrix(), position);
+  return getForwardRay(length, getWorldMatrix(), position);
 }
 
 Ray Camera::getForwardRay(float length, const Matrix& transform)
@@ -538,7 +537,8 @@ Ray Camera::getForwardRay(float length, const Matrix& transform)
 Ray Camera::getForwardRay(float length, const Matrix& transform,
                           const Vector3& origin)
 {
-  Vector3 forward(0.f, 0.f, 1.f);
+  auto forward = _scene->useRightHandedSystem ? Vector3(0.f, 0.f, -1.f) :
+                                                Vector3(0.f, 0.f, 1.f);
   auto forwardWorld = Vector3::TransformNormal(forward, transform);
 
   auto direction = Vector3::Normalize(forwardWorld);
@@ -572,7 +572,7 @@ void Camera::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     _rigPostProcess = nullptr;
     _postProcesses.clear();
   }
-  else if (cameraRigMode != Camera::RIG_MODE_NONE()) {
+  else if (cameraRigMode != Camera::RIG_MODE_NONE) {
     _rigPostProcess = nullptr;
     _postProcesses.clear();
   }
@@ -706,7 +706,7 @@ void Camera::_updateRigCameras()
   }
 
   // only update viewport when ANAGLYPH
-  if (cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH()) {
+  if (cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH) {
     _rigCameras[0]->viewport = _rigCameras[1]->viewport = viewport;
   }
 }
@@ -741,12 +741,12 @@ Vector3 Camera::getDirection(const Vector3& localAxis)
 
 void Camera::getDirectionToRef(const Vector3& localAxis, Vector3& result)
 {
-  Vector3::TransformNormalToRef(localAxis, *getWorldMatrix(), result);
+  Vector3::TransformNormalToRef(localAxis, getWorldMatrix(), result);
 }
 
-Matrix& Camera::computeWorldMatrix(bool /*force*/)
+Matrix& Camera::computeWorldMatrix(bool /*force*/, bool /*useWasUpdatedFlag*/)
 {
-  return *getWorldMatrix();
+  return getWorldMatrix();
 }
 
 CameraPtr Camera::GetConstructorFromName(const std::string& /*type*/,

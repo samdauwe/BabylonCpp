@@ -45,7 +45,7 @@ public:
    */
   void bindOnlyNormalMatrix(Matrix& normalMatrix);
 
-  void bind(Matrix* world, Mesh* mesh) override;
+  void bind(Matrix& world, Mesh* mesh) override;
 
 protected:
   PushMaterial(const std::string& name, Scene* scene);

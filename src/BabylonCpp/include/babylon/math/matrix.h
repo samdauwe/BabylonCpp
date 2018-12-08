@@ -1,9 +1,9 @@
 #ifndef BABYLON_MATH_MATRIX_H
 #define BABYLON_MATH_MATRIX_H
 
+#include <array>
 #include <memory>
 #include <optional>
-#include <array>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>

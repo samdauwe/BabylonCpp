@@ -221,7 +221,7 @@ public:
    * @param world The world matrix to bind.
    * @param subMesh The submesh to bind for.
    */
-  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
+  void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
 
   /**
    * @brief Dispose the material.

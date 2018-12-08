@@ -420,7 +420,7 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   return true;
 }
 
-void WaterMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
+void WaterMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
@@ -438,7 +438,7 @@ void WaterMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones
@@ -497,7 +497,7 @@ void WaterMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   }
 
   auto wrvp = _mesh->getWorldMatrix()
-                ->multiply(_reflectionTransform)
+                .multiply(_reflectionTransform)
                 .multiply(scene->getProjectionMatrix());
 
   // Add delta time. Prevent adding delta time if it hasn't changed.

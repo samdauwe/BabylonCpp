@@ -331,7 +331,7 @@ public:
    * @brief Gets the current world matrix.
    * @returns a Matrix
    */
-  Matrix* getWorldMatrix() override;
+  Matrix& getWorldMatrix() override;
 
   /**
    * @brief Hidden

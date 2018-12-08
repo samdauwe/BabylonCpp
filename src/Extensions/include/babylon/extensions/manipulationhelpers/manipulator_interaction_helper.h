@@ -110,7 +110,7 @@ private:
   static Vector3 ComputeRayHit(const Ray& ray, float distance);
   static bool instanceofAbstractMesh(Node* node);
   void setManipulatedNodeWorldMatrix(Matrix mtx);
-  Matrix* getManipulatedNodeWorldMatrix();
+  std::optional<Matrix> getManipulatedNodeWorldMatrix();
   std::tuple<Plane, Vector3> setupIntersectionPlane(RadixFeatures mode,
                                                     bool plane2);
   std::tuple<Plane, Plane> setupIntersectionPlanes(RadixFeatures mode);

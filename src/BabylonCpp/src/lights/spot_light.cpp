@@ -102,7 +102,7 @@ void SpotLight::set_angle(float value)
 
 float SpotLight::get_innerAngle() const
 {
-  return _angle;
+  return _innerAngle;
 }
 
 void SpotLight::set_innerAngle(float value)

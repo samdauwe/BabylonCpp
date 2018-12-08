@@ -143,10 +143,10 @@ void SkeletonViewer::update()
   }
 
   if (!skeleton->bones.empty() && skeleton->bones[0]->length == -1) {
-    _getLinesForBonesNoLength(skeleton->bones, *mesh->getWorldMatrix());
+    _getLinesForBonesNoLength(skeleton->bones, mesh->getWorldMatrix());
   }
   else {
-    _getLinesForBonesWithLength(skeleton->bones, *mesh->getWorldMatrix());
+    _getLinesForBonesWithLength(skeleton->bones, mesh->getWorldMatrix());
   }
 
   LineSystemOptions options;

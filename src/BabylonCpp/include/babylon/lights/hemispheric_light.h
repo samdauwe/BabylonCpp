@@ -52,7 +52,7 @@ public:
    * @returns Always null for hemispheric lights because it does not support
    * shadows.
    */
-  ShadowGeneratorPtr getShadowGenerator() override;
+  IShadowGeneratorPtr getShadowGenerator() override;
 
   /**
    * @brief Sets the passed Effect object with the HemisphericLight normalized
@@ -64,9 +64,14 @@ public:
   void transferToEffect(Effect* effect, const std::string& lightIndex) override;
 
   /**
-   * @brief Internal use only.
+   * @brief Computes the world matrix of the node
+   * @param force defines if the cache version should be invalidated forcing the
+   * world matrix to be created from scratch
+   * @param useWasUpdatedFlag defines a reserved property
+   * @returns the world matrix
    */
-  Matrix* _getWorldMatrix() override;
+  Matrix& computeWorldMatrix(bool force             = false,
+                             bool useWasUpdatedFlag = false) override;
 
   /**
    * @brief Returns the integer 3.
@@ -114,8 +119,6 @@ public:
   Vector3 direction;
 
 private:
-  std::unique_ptr<Matrix> _worldMatrix;
-
   static bool NodeConstructorAdded;
 
 }; // end of class HemisphericLight

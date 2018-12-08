@@ -31,10 +31,10 @@ public:
   Vector3& transformedDirection() override;
 
   /**
-   * @brief Computes the transformed information (transformedPosition and
-   * transformedDirection in World space) of the current light
-   * @returns true if the information has been computed, false if it does not
-   * need to (no parenting)
+   * @brief Computes the world matrix of the node
+   * @param force defines if the cache version should be invalidated forcing the
+   * world matrix to be created from scratch
+   * @returns the world matrix
    */
   bool computeTransformedInformation() override;
 
@@ -100,10 +100,23 @@ public:
   void forceProjectionMatrixCompute() override;
 
   /**
-   * @brief Get the world matrix of the sahdow lights.
-   * Internal Use Only
+   * @brief Hidden
    */
-  Matrix* _getWorldMatrix() override;
+  void _initCache() override;
+
+  /**
+   * @brief Hidden
+   */
+  bool _isSynchronized() override;
+
+  /**
+   * @brief Computes the world matrix of the node
+   * @param force defines if the cache version should be invalidated forcing the
+   * world matrix to be created from scratch
+   * @returns the world matrix
+   */
+  Matrix& computeWorldMatrix(bool force             = false,
+                             bool useWasUpdatedFlag = false) override;
 
   /**
    * @brief Gets the minZ used for shadow according to both the scene and the
@@ -197,8 +210,8 @@ public:
    * This can be used to override the default projection matrix computation.
    */
   std::function<void(const Matrix& viewMatrix,
-                       const std::vector<AbstractMeshPtr>& renderList,
-                       Matrix& result)>
+                     const std::vector<AbstractMeshPtr>& renderList,
+                     Matrix& result)>
     customProjectionMatrixBuilder;
 
   /**

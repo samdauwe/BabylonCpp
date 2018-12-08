@@ -398,7 +398,7 @@ void EdgesRenderer::render()
   scene->resetCachedMaterial();
   _lineShader->setColor4("color", _source->edgesColor);
 
-  if (scene->activeCamera->mode == Camera::ORTHOGRAPHIC_CAMERA()) {
+  if (scene->activeCamera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
     _lineShader->setFloat("width", _source->edgesWidth
                                      / edgesWidthScalerForOrthographic);
   }

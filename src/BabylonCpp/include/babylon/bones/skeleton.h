@@ -228,7 +228,7 @@ protected:
 
 private:
   float _getHighestAnimationFrame();
-  void _sortBones(unsigned int index, std::vector<Bone*>& bones,
+  void _sortBones(unsigned int index, std::vector<BonePtr>& bones,
                   std::vector<bool>& visited);
 
 public:

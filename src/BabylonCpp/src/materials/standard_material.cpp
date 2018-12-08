@@ -1028,7 +1028,7 @@ void StandardMaterial::unbind()
   PushMaterial::unbind();
 }
 
-void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
+void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
                                       SubMesh* subMesh)
 {
   auto scene = getScene();
@@ -1047,11 +1047,11 @@ void StandardMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
 
   // Normal Matrix
   if (defines["OBJECTSPACE_NORMALMAP"]) {
-    world->toNormalMatrix(_normalMatrix);
+    world.toNormalMatrix(_normalMatrix);
     bindOnlyNormalMatrix(_normalMatrix);
   }
 

@@ -11,8 +11,8 @@ namespace BABYLON {
 std::array<Vector3, 2> Bone::_tmpVecs{{Vector3::Zero(), Vector3::Zero()}};
 Quaternion Bone::_tmpQuat{Quaternion::Identity()};
 std::array<Matrix, 5> Bone::_tmpMats{{Matrix::Identity(), Matrix::Identity(),
-                                   Matrix::Identity(), Matrix::Identity(),
-                                   Matrix::Identity()}};
+                                      Matrix::Identity(), Matrix::Identity(),
+                                      Matrix::Identity()}};
 
 Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
            const std::optional<Matrix>& localMatrix,
@@ -37,7 +37,6 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
     , _scaleVector{Vector3::One()}
     , _negateScaleChildren{Vector3::One()}
     , _scalingDeterminant{1.f}
-    , _worldTransform{std::make_unique<Matrix>()}
     , _needToDecompose{true}
     , _needToCompose{false}
 {
@@ -129,9 +128,9 @@ Matrix& Bone::getRestPose()
   return _restPose;
 }
 
-Matrix* Bone::getWorldMatrix()
+Matrix& Bone::getWorldMatrix()
 {
-  return _worldTransform.get();
+  return _worldTransform;
 }
 
 void Bone::returnToRest()
@@ -390,7 +389,7 @@ void Bone::translate(const Vector3& vec, Space space, AbstractMesh* mesh)
   }
   else {
 
-    Matrix* wm = nullptr;
+    std::optional<Matrix> wm = std::nullopt;
     // mesh.getWorldMatrix() needs to be called before
     // skeleton.computeAbsoluteTransforms()
     if (mesh) {
@@ -402,7 +401,7 @@ void Bone::translate(const Vector3& vec, Space space, AbstractMesh* mesh)
     auto& tvec = Bone::_tmpVecs[0];
 
     if (_parent) {
-      if (mesh && wm) {
+      if (mesh && wm.has_value()) {
         tmat.copyFrom(_parent->getAbsoluteTransform());
         tmat.multiplyToRef(*wm, tmat);
       }
@@ -438,7 +437,7 @@ void Bone::setPosition(const Vector3& position, Space space, AbstractMesh* mesh)
   }
   else {
 
-    Matrix* wm = nullptr;
+    std::optional<Matrix> wm = std::nullopt;
     // mesh.getWorldMatrix() needs to be called before
     // skeleton.computeAbsoluteTransforms()
     if (mesh) {
@@ -451,7 +450,7 @@ void Bone::setPosition(const Vector3& position, Space space, AbstractMesh* mesh)
     auto& vec  = Bone::_tmpVecs[0];
 
     if (_parent) {
-      if (mesh && wm) {
+      if (mesh && wm.has_value()) {
         tmat.copyFrom(_parent->getAbsoluteTransform());
         tmat.multiplyToRef(*wm, tmat);
       }
@@ -651,7 +650,7 @@ void Bone::_rotateWithMatrix(const Matrix& rmat, Space space,
 
   if (parent && space == Space::WORLD) {
     if (mesh) {
-      parentScale.copyFrom(*mesh->getWorldMatrix());
+      parentScale.copyFrom(mesh->getWorldMatrix());
       parent->getAbsoluteTransform().multiplyToRef(parentScale, parentScale);
     }
     else {
@@ -665,7 +664,7 @@ void Bone::_rotateWithMatrix(const Matrix& rmat, Space space,
   }
   else {
     if (space == Space::WORLD && mesh) {
-      parentScale.copyFrom(*mesh->getWorldMatrix());
+      parentScale.copyFrom(mesh->getWorldMatrix());
       parentScaleInv.copyFrom(parentScale);
       parentScaleInv.invert();
       lmat.multiplyToRef(parentScale, lmat);
@@ -692,7 +691,7 @@ bool Bone::_getNegativeRotationToRef(Matrix& rotMatInv, AbstractMesh* mesh)
   rotMatInv.copyFrom(getAbsoluteTransform());
 
   if (mesh) {
-    rotMatInv.multiplyToRef(*mesh->getWorldMatrix(), rotMatInv);
+    rotMatInv.multiplyToRef(mesh->getWorldMatrix(), rotMatInv);
     Matrix::ScalingToRef(mesh->scaling().x, mesh->scaling().y,
                          mesh->scaling().z, scaleMatrix);
   }
@@ -732,7 +731,7 @@ void Bone::getPositionToRef(Vector3& result, Space space,
   }
   else {
 
-    Matrix* wm = nullptr;
+    std::optional<Matrix> wm = std::nullopt;
     // mesh.getWorldMatrix() needs to be called before
     // skeleton.computeAbsoluteTransforms()
     if (mesh) {
@@ -743,7 +742,7 @@ void Bone::getPositionToRef(Vector3& result, Space space,
 
     auto& tmat = Bone::_tmpMats[0];
 
-    if (mesh && wm) {
+    if (mesh && wm.has_value()) {
       tmat.copyFrom(getAbsoluteTransform());
       tmat.multiplyToRef(*wm, tmat);
     }
@@ -805,7 +804,7 @@ Vector3 Bone::getDirection(const Vector3& localAxis, AbstractMesh* mesh) const
 void Bone::getDirectionToRef(const Vector3& localAxis, Vector3& result,
                              AbstractMesh* mesh) const
 {
-  Matrix* wm = nullptr;
+  std::optional<Matrix> wm = std::nullopt;
   // mesh.getWorldMatrix() needs to be called before
   // skeleton.computeAbsoluteTransforms()
   if (mesh) {
@@ -818,7 +817,7 @@ void Bone::getDirectionToRef(const Vector3& localAxis, Vector3& result,
 
   mat.copyFrom(getAbsoluteTransform());
 
-  if (mesh && wm) {
+  if (mesh && wm.has_value()) {
     mat.multiplyToRef(*wm, mat);
   }
 
@@ -866,7 +865,7 @@ void Bone::getRotationQuaternionToRef(Quaternion& result, const Space& space,
     auto amat = getAbsoluteTransform();
 
     if (mesh) {
-      amat.multiplyToRef(*mesh->getWorldMatrix(), mat);
+      amat.multiplyToRef(mesh->getWorldMatrix(), mat);
     }
     else {
       mat.copyFrom(amat);
@@ -900,7 +899,7 @@ void Bone::getRotationMatrixToRef(Matrix& result, Space space,
     auto amat = getAbsoluteTransform();
 
     if (mesh) {
-      amat.multiplyToRef(*mesh->getWorldMatrix(), mat);
+      amat.multiplyToRef(mesh->getWorldMatrix(), mat);
     }
     else {
       mat.copyFrom(amat);
@@ -928,7 +927,7 @@ void Bone::getAbsolutePositionFromLocalToRef(const Vector3& position,
                                              AbstractMesh* mesh,
                                              Vector3& result) const
 {
-  Matrix* wm = nullptr;
+  std::optional<Matrix> wm = std::nullopt;
   // mesh.getWorldMatrix() needs to be called before
   // skeleton.computeAbsoluteTransforms()
   if (mesh) {
@@ -939,7 +938,7 @@ void Bone::getAbsolutePositionFromLocalToRef(const Vector3& position,
 
   auto& tmat = Bone::_tmpMats[0];
 
-  if (mesh && wm) {
+  if (mesh && wm.has_value()) {
     tmat.copyFrom(getAbsoluteTransform());
     tmat.multiplyToRef(*wm, tmat);
   }
@@ -964,7 +963,7 @@ void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& position,
                                              AbstractMesh* mesh,
                                              Vector3& result) const
 {
-  Matrix* wm = nullptr;
+  std::optional<Matrix> wm = std::nullopt;
   // mesh.getWorldMatrix() needs to be called before
   // skeleton.computeAbsoluteTransforms()
   if (mesh) {
@@ -977,7 +976,7 @@ void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& position,
 
   tmat.copyFrom(getAbsoluteTransform());
 
-  if (mesh && wm) {
+  if (mesh && wm.has_value()) {
     tmat.multiplyToRef(*wm, tmat);
   }
 

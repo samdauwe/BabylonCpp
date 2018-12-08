@@ -147,7 +147,7 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   return true;
 }
 
-void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
+void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
@@ -164,7 +164,7 @@ void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   if (_mustRebind(scene, effect)) {
@@ -189,7 +189,7 @@ void SkyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   // Sky
   auto camera = scene->activeCamera;
   if (camera) {
-    auto cameraWorldMatrix = *camera->getWorldMatrix();
+    auto cameraWorldMatrix = camera->getWorldMatrix();
     _cameraPosition.x      = cameraWorldMatrix.m[12];
     _cameraPosition.y      = cameraWorldMatrix.m[13];
     _cameraPosition.z      = cameraWorldMatrix.m[14];

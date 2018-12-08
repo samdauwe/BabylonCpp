@@ -291,7 +291,7 @@ PickingInfo Ray::intersectsMesh(AbstractMesh* mesh, bool fastCheck)
 {
   auto& tm = Tmp::MatrixArray[0];
 
-  mesh->getWorldMatrix()->invertToRef(tm);
+  mesh->getWorldMatrix().invertToRef(tm);
 
   if (_tmpRay) {
     Ray::TransformToRef(*this, tm, *_tmpRay);

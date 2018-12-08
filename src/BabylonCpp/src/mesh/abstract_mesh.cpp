@@ -825,7 +825,7 @@ void AbstractMesh::_activate(int renderId)
   _renderId = renderId;
 }
 
-Matrix* AbstractMesh::getWorldMatrix()
+Matrix& AbstractMesh::getWorldMatrix()
 {
   if (_masterMesh) {
     return _masterMesh->getWorldMatrix();
@@ -1355,10 +1355,10 @@ PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck)
   if (intersectInfo) {
     // Get picked point
     auto world          = getWorldMatrix();
-    auto worldOrigin    = Vector3::TransformCoordinates(ray.origin, *world);
+    auto worldOrigin    = Vector3::TransformCoordinates(ray.origin, world);
     auto direction      = ray.direction;
     direction           = direction.scale(intersectInfo->distance);
-    auto worldDirection = Vector3::TransformNormal(direction, *world);
+    auto worldDirection = Vector3::TransformNormal(direction, world);
 
     auto pickedPoint = worldOrigin.add(worldDirection);
 
@@ -1626,7 +1626,7 @@ AbstractMesh& AbstractMesh::updateFacetData()
   _facetParameters.depthSort         = _facetDepthSort;
   if (_facetDepthSort && _facetDepthSortEnabled) {
     computeWorldMatrix(true);
-    _worldMatrix->invertToRef(_invertedMatrix);
+    _worldMatrix.invertToRef(_invertedMatrix);
     Vector3::TransformCoordinatesToRef(*_facetDepthSortFrom, _invertedMatrix,
                                        _facetDepthSortOrigin);
     _facetParameters.distanceTo = _facetDepthSortOrigin;
@@ -1687,7 +1687,7 @@ AbstractMesh& AbstractMesh::getFacetPositionToRef(unsigned int i, Vector3& ref)
 {
   auto localPos = (getFacetLocalPositions())[i];
   auto world    = getWorldMatrix();
-  Vector3::TransformCoordinatesToRef(localPos, *world, ref);
+  Vector3::TransformCoordinatesToRef(localPos, world, ref);
   return *this;
 }
 
@@ -1701,7 +1701,7 @@ Vector3 AbstractMesh::getFacetNormal(unsigned int i)
 AbstractMesh& AbstractMesh::getFacetNormalToRef(unsigned int i, Vector3& ref)
 {
   auto localNorm = (getFacetLocalNormals())[i];
-  Vector3::TransformNormalToRef(localNorm, *getWorldMatrix(), ref);
+  Vector3::TransformNormalToRef(localNorm, getWorldMatrix(), ref);
   return *this;
 }
 
@@ -1741,7 +1741,7 @@ int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z,
 {
   auto world   = getWorldMatrix();
   auto& invMat = Tmp::MatrixArray[5];
-  world->invertToRef(invMat);
+  world.invertToRef(invMat);
   auto& invVect = Tmp::Vector3Array[8];
   int closest   = -1;
   // transform (x,y,z) to coordinates in the mesh local space
@@ -1750,8 +1750,8 @@ int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z,
                                               projected, checkFace, facing);
   if (projectedSet) {
     // tranform the local computed projected vector to world coordinates
-    Vector3::TransformCoordinatesFromFloatsToRef(
-      projected.x, projected.y, projected.z, *world, projected);
+    Vector3::TransformCoordinatesFromFloatsToRef(projected.x, projected.y,
+                                                 projected.z, world, projected);
   }
   return closest;
 }

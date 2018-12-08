@@ -67,7 +67,7 @@ public:
   bool isReady(AbstractMesh* mesh = nullptr,
                bool useInstances  = false) override;
   void bindOnlyWorldMatrix(Matrix& world) override;
-  void bind(Matrix* world, Mesh* mesh = nullptr) override;
+  void bind(Matrix& world, Mesh* mesh = nullptr) override;
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;
   MaterialPtr clone(const std::string& name,

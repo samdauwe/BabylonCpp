@@ -203,7 +203,7 @@ void PointerDragBehavior::_startDrag(
   }
   else {
     _startDragRay.origin.copyFrom(_scene->activeCamera->position);
-    _attachedNode->getWorldMatrix()->getTranslationToRef(_tmpVector);
+    _attachedNode->getWorldMatrix().getTranslationToRef(_tmpVector);
     _tmpVector.subtractToRef(_scene->activeCamera->position,
                              _startDragRay.direction);
   }
@@ -255,8 +255,8 @@ void PointerDragBehavior::_moveDrag(const Ray& ray)
     if (_options.dragAxis) {
       // Convert local drag axis to world
       Vector3::TransformCoordinatesToRef(
-        *_options.dragAxis,
-        _attachedNode->getWorldMatrix()->getRotationMatrix(), _worldDragAxis);
+        *_options.dragAxis, _attachedNode->getWorldMatrix().getRotationMatrix(),
+        _worldDragAxis);
 
       // Project delta drag from the drag plane onto the drag axis
       pickedPoint->subtractToRef(lastDragPosition, _tmpVector);

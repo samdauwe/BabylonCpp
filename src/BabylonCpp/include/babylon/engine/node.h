@@ -36,8 +36,7 @@ using NodeConstructor = std::function<NodePtr(
   const std::string& name, Scene* scene, const std::optional<json>& options)>;
 
 /**
- * @brief Node is the basic class for all scene objects (Mesh, Light, Camera,
- * etc.).
+ * @brief Node is the basic class for all scene objects (Mesh, Light, Camera.)
  */
 class BABYLON_SHARED_EXPORT Node : public std::enable_shared_from_this<Node>,
                                    public IAnimatable,
@@ -72,9 +71,9 @@ public:
 
 public:
   /**
-   * @brief Creates a new Node.
-   * @param {string} name - the name and id to be given to this node
-   * @param {BABYLON.Scene} the scene this node will be added to
+   * @brief Creates a new Node
+   * @param name the name and id to be given to this node
+   * @param scene the scene this node will be added to
    */
   Node(const std::string& name, Scene* scene = nullptr);
   virtual ~Node() override;
@@ -100,8 +99,8 @@ public:
   virtual const std::string getClassName() const;
 
   /**
-   * @brief Gets the scene of the node.
-   * @returns a {BABYLON.Scene}
+   * @brief Gets the engine of the node
+   * @returns a Engine
    */
   virtual Scene* getScene() const;
 
@@ -116,9 +115,12 @@ public:
    * @brief Attach a behavior to the node.
    * @see http://doc.babylonjs.com/features/behaviour
    * @param behavior defines the behavior to attach
+   * @param attachImmediately defines that the behavior must be attached even if
+   * the scene is still loading
    * @returns the current Node
    */
-  Node& addBehavior(Behavior<Node>* behavior) override;
+  Node& addBehavior(Behavior<Node>* behavior,
+                    bool attachImmediately = false) override;
 
   /**
    * @brief Remove an attached behavior.
@@ -137,15 +139,21 @@ public:
   Behavior<Node>* getBehaviorByName(const std::string& name) override;
 
   /**
-   * @brief Returns the world matrix of the node.
-   * @returns a matrix containing the node's world matrix
+   * @brief Returns the latest update of the World matrix
+   * @returns a Matrix
    */
-  virtual Matrix* getWorldMatrix() override;
+  virtual Matrix& getWorldMatrix() override;
 
   /**
    * @brief Hidden
    */
   virtual float _getWorldMatrixDeterminant() const;
+
+  /**
+   * @brief Returns directly the latest state of the mesh World matrix.
+   * A Matrix is returned.
+   */
+  Matrix& worldMatrixFromCache();
 
   /**
    * @brief Hidden
@@ -180,12 +188,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool isSynchronized(bool updateCache = false);
-
-  /**
-   * @brief Hidden
-   */
-  bool hasNewParent(bool update = false);
+  bool isSynchronized();
 
   /**
    * @brief Is this node ready to be used/rendered.
@@ -267,7 +270,7 @@ public:
    * @param predicate defines an optional predicate that will be called on every
    * evaluated child, the predicate must return true for a given child to be
    * part of the result, otherwise it will be ignored
-   * @returns an array of {BABYLON.AbstractMesh}
+   * @returns an array of AbstractMesh
    */
   virtual std::vector<AbstractMeshPtr>
   getChildMeshes(bool directDescendantsOnly = false,
@@ -283,7 +286,7 @@ public:
    * @param predicate defines an optional predicate that will be called on every
    * evaluated child, the predicate must return true for a given child to be
    * part of the result, otherwise it will be ignored
-   * @returns an array of {BABYLON.TransformNode}
+   * @returns an array of TransformNode
    */
   virtual std::vector<TransformNodePtr> getChildTransformNodes(
     bool directDescendantsOnly                                = false,
@@ -294,7 +297,7 @@ public:
    * @param predicate defines an optional predicate that will be called on every
    * evaluated child, the predicate must return true for a given child to be
    * part of the result, otherwise it will be ignored
-   * @returns an array of {BABYLON.Node}
+   * @returns an array of Node
    */
   std::vector<NodePtr>
   getChildren(const std::function<bool(const NodePtr& node)>& predicate
@@ -367,7 +370,8 @@ public:
    * world matrix to be created from scratch
    * @returns the world matrix
    */
-  virtual Matrix& computeWorldMatrix(bool force = false);
+  virtual Matrix& computeWorldMatrix(bool force             = false,
+                                     bool useWasUpdatedFlag = false);
 
   /**
    * @brief Releases resources associated with this node.
@@ -423,6 +427,15 @@ protected:
    */
   std::vector<Behavior<Node>*>& get_behaviors();
 
+  /**
+   * @brief Hidden
+   */
+  virtual void _syncParentEnabledState();
+
+private:
+  void addToSceneRootNodes();
+  void removeFromSceneRootNodes();
+
 public:
   /**
    * Gets or sets the name of the node
@@ -471,6 +484,11 @@ public:
   /** Hidden */
   NodeCache _cache;
 
+  /** Hidden */
+  Matrix _worldMatrix;
+  /** Hidden */
+  float _worldMatrixDeterminant;
+
   /**
    * Animation properties override.
    */
@@ -498,12 +516,13 @@ protected:
 
 private:
   bool _isEnabled;
+  bool _isParentEnabled;
   bool _isReady;
   int _parentRenderId;
   Node* _parentNode;
   std::vector<NodePtr> _children;
+  int _sceneRootNodesIndex;
   AnimationPropertiesOverride* _animationPropertiesOverride;
-  std::unique_ptr<Matrix> _worldMatrix;
   Observer<Node>::Ptr _onDisposeObserver;
 
   // Behaviors

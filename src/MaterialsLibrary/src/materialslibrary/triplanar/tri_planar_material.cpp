@@ -359,7 +359,7 @@ bool TriPlanarMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   return true;
 }
 
-void TriPlanarMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
+void TriPlanarMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
                                        SubMesh* subMesh)
 {
   auto scene = getScene();
@@ -378,7 +378,7 @@ void TriPlanarMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones

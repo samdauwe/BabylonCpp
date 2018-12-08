@@ -286,7 +286,7 @@ Ray WindowsMotionController::getForwardRay(float length)
     return WebVRController::getForwardRay(length);
   }
 
-  auto m      = *(*_loadedMeshInfo).pointingPoseNode->getWorldMatrix();
+  auto m      = (*_loadedMeshInfo).pointingPoseNode->getWorldMatrix();
   auto origin = m.getTranslation();
 
   Vector3 forward(0.f, 0.f, -1.f);

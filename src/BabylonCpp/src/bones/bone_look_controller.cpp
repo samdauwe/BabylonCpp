@@ -242,7 +242,7 @@ void BoneLookController::update()
       parentBone->getRotationMatrixToRef(spaceMat, Space::WORLD, mesh);
     }
     else if (upAxisSpace == Space::LOCAL && upAxis.y == 1.f && !parentBone) {
-      spaceMat.copyFrom(*mesh->getWorldMatrix());
+      spaceMat.copyFrom(mesh->getWorldMatrix());
     }
     else {
 
@@ -279,7 +279,7 @@ void BoneLookController::update()
       Vector3::TransformCoordinatesToRef(localTarget, spaceMatInv, localTarget);
 
       xzlen          = std::sqrt(localTarget.x * localTarget.x
-                          + localTarget.z * localTarget.z);
+                        + localTarget.z * localTarget.z);
       float pitch    = std::atan2(localTarget.y, xzlen);
       float newPitch = pitch;
 
@@ -311,7 +311,7 @@ void BoneLookController::update()
 
         if (!xzlenSet) {
           xzlen    = std::sqrt(localTarget.x * localTarget.x
-                              + localTarget.z * localTarget.z);
+                            + localTarget.z * localTarget.z);
           xzlenSet = true;
         }
 
@@ -352,7 +352,7 @@ void BoneLookController::update()
 
         auto& boneRotMat = BoneLookController::_tmpMats[4];
         _boneQuat.toRotationMatrix(boneRotMat);
-        mesh->getWorldMatrix()->multiplyToRef(boneRotMat, boneRotMat);
+        mesh->getWorldMatrix().multiplyToRef(boneRotMat, boneRotMat);
         Vector3::TransformCoordinatesToRef(boneFwd, boneRotMat, boneFwd);
         Vector3::TransformCoordinatesToRef(boneFwd, spaceMatInv, boneFwd);
 
@@ -364,7 +364,7 @@ void BoneLookController::update()
 
           if (!xzlenSet) {
             xzlen    = std::sqrt(localTarget.x * localTarget.x
-                                + localTarget.z * localTarget.z);
+                              + localTarget.z * localTarget.z);
             xzlenSet = true;
           }
 

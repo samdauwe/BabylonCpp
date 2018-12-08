@@ -143,7 +143,7 @@ void MeshAdapter::_drawAxis()
   onBeforeRenderObserver = _obj->getScene()->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
       if (auto mesh = std::static_pointer_cast<TransformNode>(_obj)) {
-        auto matrix = *mesh->getWorldMatrix();
+        auto matrix = mesh->getWorldMatrix();
         Vector3 extend(1.f, 1.f, 1.f);
         if (_abstractMesh) {
           extend = _abstractMesh->getBoundingInfo().boundingBox.extendSizeWorld;

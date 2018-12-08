@@ -11,12 +11,12 @@
 namespace BABYLON {
 
 class Effect;
+struct IShadowGenerator;
 class Light;
 struct MaterialDefines;
-class ShadowGenerator;
 class UniformBuffer;
-using LightPtr           = std::shared_ptr<Light>;
-using ShadowGeneratorPtr = std::shared_ptr<ShadowGenerator>;
+using IShadowGeneratorPtr = std::shared_ptr<IShadowGenerator>;
+using LightPtr            = std::shared_ptr<Light>;
 
 /**
  * @brief Base class of all the lights in Babylon. It groups all the generic
@@ -156,7 +156,7 @@ public:
    * @brief Returns the Light associated shadow generator if any.
    * @return the associated shadow generator.
    */
-  virtual ShadowGeneratorPtr getShadowGenerator();
+  virtual IShadowGeneratorPtr getShadowGenerator();
 
   /**
    * @brief Returns a Vector3, the absolute light position in the World.
@@ -177,22 +177,11 @@ public:
                                 const std::string& uniformName1);
 
   /**
-   * @brief Internal use only.
-   */
-  virtual Matrix* _getWorldMatrix() = 0;
-
-  /**
    * @brief Specifies if the light will affect the passed mesh.
    * @param mesh The mesh to test against the light
    * @return true the mesh is affected otherwise, false.
    */
   bool canAffectMesh(AbstractMesh* mesh);
-
-  /**
-   * @brief Computes and Returns the light World matrix.
-   * @returns the world matrix
-   */
-  Matrix* getWorldMatrix() override;
 
   /**
    * @brief Releases resources associated with this node.
@@ -412,6 +401,11 @@ protected:
    */
   void set_lightmapMode(unsigned int value);
 
+  /**
+   * @brief Hidden
+   */
+  void _syncParentEnabledState() override;
+
   virtual void _buildUniformLayout();
   void _resyncMeshes();
 
@@ -471,7 +465,7 @@ public:
    * Shadow generator associted to the light.
    * Hidden Internal use only.
    */
-  ShadowGeneratorPtr _shadowGenerator;
+  IShadowGeneratorPtr _shadowGenerator;
 
   /**
    * Internal use only.
@@ -557,8 +551,6 @@ private:
   unsigned int _includeOnlyWithLayerMask;
   unsigned int _excludeWithLayerMask;
   unsigned int _lightmapMode;
-  std::unique_ptr<Matrix> _parentedWorldMatrix;
-  std::unique_ptr<Matrix> _worldMatrix;
 
 }; // end of class Light
 

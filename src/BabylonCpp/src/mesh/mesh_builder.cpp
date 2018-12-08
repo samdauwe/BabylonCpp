@@ -158,7 +158,7 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
     positionFunction(positions);
     instance->setBoundingInfo(
       BoundingInfo(Tmp::Vector3Array[0], Tmp::Vector3Array[1]));
-    instance->getBoundingInfo().update(*instance->_worldMatrix);
+    instance->getBoundingInfo().update(instance->_worldMatrix);
     instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
                                  false);
     if (!options.colors.empty()) {
@@ -804,7 +804,7 @@ MeshPtr MeshBuilder::CreateDecal(const std::string& name,
     Vector3 target(0.f, 0.f, 1.f);
     auto camera = sourceMesh->getScene()->activeCamera;
     auto cameraWorldTarget
-      = Vector3::TransformCoordinates(target, *camera->getWorldMatrix());
+      = Vector3::TransformCoordinates(target, camera->getWorldMatrix());
 
     normal = camera->globalPosition().subtract(cameraWorldTarget);
   }
@@ -819,7 +819,7 @@ MeshPtr MeshBuilder::CreateDecal(const std::string& name,
         .multiply(Matrix::Translation(position.x, position.y, position.z));
   auto inverseDecalWorldMatrix = Matrix::Invert(decalWorldMatrix);
   auto meshWorldMatrix         = sourceMesh->getWorldMatrix();
-  auto transformMatrix = meshWorldMatrix->multiply(inverseDecalWorldMatrix);
+  auto transformMatrix = meshWorldMatrix.multiply(inverseDecalWorldMatrix);
 
   auto vertexData = std::make_unique<VertexData>();
   vertexData->indices.clear();

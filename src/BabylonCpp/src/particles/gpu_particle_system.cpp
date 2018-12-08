@@ -1030,7 +1030,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   Matrix emitterWM;
   if (std::holds_alternative<AbstractMeshPtr>(emitter)) {
     auto emitterMesh = std::get<AbstractMeshPtr>(emitter);
-    emitterWM        = *emitterMesh->getWorldMatrix();
+    emitterWM        = emitterMesh->getWorldMatrix();
   }
   else {
     auto emitterPosition = std::get<Vector3>(emitter);

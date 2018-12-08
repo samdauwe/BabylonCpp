@@ -792,7 +792,7 @@ void ParticleSystem::_update(int newParticles)
 
   if (std::holds_alternative<AbstractMeshPtr>(emitter)) {
     auto emitterMesh    = std::get<AbstractMeshPtr>(emitter);
-    _emitterWorldMatrix = *emitterMesh->getWorldMatrix();
+    _emitterWorldMatrix = emitterMesh->getWorldMatrix();
   }
   else {
     auto emitterPosition = std::get<Vector3>(emitter);

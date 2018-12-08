@@ -31,7 +31,6 @@ HemisphericLight::HemisphericLight(const std::string& iName,
     : Light{iName, scene}
     , groundColor{Color3(0.f, 0.f, 0.f)}
     , direction{iDirection}
-    , _worldMatrix{nullptr}
 {
 }
 
@@ -66,7 +65,7 @@ Vector3 HemisphericLight::setDirectionToTarget(const Vector3& target)
   return direction;
 }
 
-ShadowGeneratorPtr HemisphericLight::getShadowGenerator()
+IShadowGeneratorPtr HemisphericLight::getShadowGenerator()
 {
   return nullptr;
 }
@@ -87,13 +86,10 @@ void HemisphericLight::transferToEffect(Effect* /*effect*/,
                                lightIndex);
 }
 
-Matrix* HemisphericLight::_getWorldMatrix()
+Matrix& HemisphericLight::computeWorldMatrix(bool /*force*/,
+                                             bool /*useWasUpdatedFlag*/)
 {
-  if (!_worldMatrix) {
-    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
-  }
-
-  return _worldMatrix.get();
+  return _worldMatrix;
 }
 
 unsigned int HemisphericLight::getTypeID() const

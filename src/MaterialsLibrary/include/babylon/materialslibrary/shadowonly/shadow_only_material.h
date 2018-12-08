@@ -24,7 +24,7 @@ public:
   BaseTexturePtr getAlphaTestTexture() override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances) override;
-  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
+  void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   const std::string getClassName() const override;
   MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;

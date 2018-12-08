@@ -90,7 +90,7 @@ void CrowdSimulation::addObstacleByBoundingBox(const AbstractMeshPtr& mesh,
   mesh->position  = position;
   mesh->isVisible = isVisible;
 
-  mesh->getBoundingInfo().update(*mesh->getWorldMatrix());
+  mesh->getBoundingInfo().update(mesh->getWorldMatrix());
   const auto bbox = mesh->getBoundingInfo().boundingBox;
   const auto min  = bbox.minimumWorld;
   const auto max  = bbox.maximumWorld;

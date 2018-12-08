@@ -462,7 +462,7 @@ MeshPtr EditControl::getPickPlane(Mesh* axis)
     }
     else {
       // Get the position of camera in the mesh frame of reference
-      const auto invMat = mesh->getWorldMatrix()->copy().invert();
+      const auto invMat = mesh->getWorldMatrix().copy().invert();
       const auto c
         = Vector3::TransformCoordinates(mainCamera->position, invMat);
       const auto s = mesh->scaling();
@@ -689,7 +689,7 @@ void EditControl::scaleWithSnap(const MeshPtr& mesh, Vector3& p)
 void EditControl::doRotation(const MeshPtr& mesh, Mesh* axis,
                              const Vector3& newPos)
 {
-  auto cN = Vector3::TransformNormal(Axis::Z(), *mainCamera->getWorldMatrix());
+  auto cN = Vector3::TransformNormal(Axis::Z(), mainCamera->getWorldMatrix());
   auto angle
     = EditControl::getAngle(prevPos, newPos, mesh->getAbsolutePivotPoint(), cN);
 
@@ -1410,7 +1410,7 @@ void EditControl::createScaleAxes()
 
 void EditControl::setLocalAxes(const MeshPtr& mesh)
 {
-  auto meshMatrix = *mesh->getWorldMatrix();
+  auto meshMatrix = mesh->getWorldMatrix();
   Vector3::FromArrayToRef(meshMatrix.asArray(), 0, localX);
   Vector3::FromArrayToRef(meshMatrix.asArray(), 4, localY);
   Vector3::FromArrayToRef(meshMatrix.asArray(), 8, localZ);
@@ -1469,7 +1469,7 @@ void EditControl::setScaleSnapValue(float r)
 void EditControl::setAxesScale()
 {
   theParent->position().subtractToRef(mainCamera->position, toParent);
-  Vector3::FromArrayToRef(mainCamera->getWorldMatrix()->asArray(), 8,
+  Vector3::FromArrayToRef(mainCamera->getWorldMatrix().asArray(), 8,
                           cameraNormal);
   // Get distance of axes from the camera plane - project camera to axes vector
   // on the camera normal

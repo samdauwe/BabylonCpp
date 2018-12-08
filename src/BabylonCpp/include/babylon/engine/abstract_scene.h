@@ -200,7 +200,7 @@ public:
   /**
    * Gets the list of root nodes (ie. nodes with no parent)
    */
-  std::vector<NodePtr> rootNodes;
+  std::vector<Node*> rootNodes;
 
   /**
    * All of the cameras added to this scene

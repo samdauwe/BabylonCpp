@@ -63,7 +63,7 @@ void MirrorTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
     auto glassNormal
       = Vector3(glass_vertexData[0], glass_vertexData[1], glass_vertexData[2]);
     // Use worldMatrix to transform normal into its current value
-    glassNormal = Vector3::TransformNormal(glassNormal, *glass_worldMatrix);
+    glassNormal = Vector3::TransformNormal(glassNormal, glass_worldMatrix);
 
     // Create reflecting surface for mirror surface
     auto reflector

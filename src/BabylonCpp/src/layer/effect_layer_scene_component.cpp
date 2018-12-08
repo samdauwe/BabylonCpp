@@ -121,11 +121,9 @@ void EffectLayerSceneComponent::_renderMainTexture(Camera* camera)
     for (const auto& effectLayer : layers) {
       if (effectLayer->shouldRender()
           && (!effectLayer->camera()
-              || (effectLayer->camera()->cameraRigMode
-                    == Camera::RIG_MODE_NONE()
+              || (effectLayer->camera()->cameraRigMode == Camera::RIG_MODE_NONE
                   && camera == effectLayer->camera().get())
-              || (effectLayer->camera()->cameraRigMode
-                    != Camera::RIG_MODE_NONE()
+              || (effectLayer->camera()->cameraRigMode != Camera::RIG_MODE_NONE
                   && stl_util::contains(effectLayer->camera()->_rigCameras,
                                         camera)))) {
 

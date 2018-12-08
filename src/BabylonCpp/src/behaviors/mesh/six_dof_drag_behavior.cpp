@@ -73,7 +73,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
           && pointerInfo->pickInfo.pickedMesh && pointerInfo->pickInfo.ray
           && pickPredicate(pointerInfo->pickInfo.pickedMesh)) {
         if (_scene->activeCamera
-            && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE()) {
+            && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE) {
           auto ray = *pointerInfo->pickInfo.ray;
           ray.origin.copyFrom(_scene->activeCamera->position);
           pointerInfo->pickInfo.ray = ray;
@@ -144,7 +144,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
           && dragging && pointerInfo->pickInfo.ray && pickedMesh) {
         auto _zDragFactor = zDragFactor;
         if (_scene->activeCamera
-            && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE()) {
+            && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE) {
           auto ray = *pointerInfo->pickInfo.ray;
           ray.origin.copyFrom(_scene->activeCamera->position);
           pointerInfo->pickInfo.ray = ray;
@@ -184,7 +184,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         // needed
         _targetPosition.copyFrom(_virtualDragMesh->absolutePosition());
         if (pickedMesh->parent) {
-          auto worldMat = *pickedMesh->parent()->getWorldMatrix();
+          auto worldMat = pickedMesh->parent()->getWorldMatrix();
           Vector3::TransformCoordinatesToRef(
             _targetPosition, Matrix::Invert(worldMat), _targetPosition);
         }

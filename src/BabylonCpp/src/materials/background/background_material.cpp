@@ -664,7 +664,7 @@ void BackgroundMaterial::bindOnlyWorldMatrix(Matrix& world)
   _activeEffect->setMatrix("world", world);
 }
 
-void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
+void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
                                         SubMesh* subMesh)
 {
   auto scene = getScene();
@@ -683,7 +683,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
 
   // Bones
   MaterialHelper::BindBonesParameters(mesh, _activeEffect);

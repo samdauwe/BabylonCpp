@@ -1,6 +1,7 @@
 #include <babylon/lights/shadow_light.h>
 
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/scene.h>
 #include <babylon/math/axis.h>
 #include <babylon/math/vector3.h>
 
@@ -84,11 +85,11 @@ void ShadowLight::set_shadowMaxZ(const std::optional<float>& value)
 
 bool ShadowLight::computeTransformedInformation()
 {
-  if (parent() && parent()->getWorldMatrix()) {
+  if (parent()) {
     if (!_transformedPosition) {
       _transformedPosition = std::make_unique<Vector3>(Vector3::Zero());
     }
-    Vector3::TransformCoordinatesToRef(position, *parent()->getWorldMatrix(),
+    Vector3::TransformCoordinatesToRef(position, parent()->getWorldMatrix(),
                                        *_transformedPosition);
 
     // In case the direction is present.
@@ -96,7 +97,7 @@ bool ShadowLight::computeTransformedInformation()
       if (!_transformedDirection) {
         _transformedDirection = std::make_unique<Vector3>(Vector3::Zero());
       }
-      Vector3::TransformNormalToRef(direction(), *parent()->getWorldMatrix(),
+      Vector3::TransformNormalToRef(direction(), parent()->getWorldMatrix(),
                                     *_transformedDirection);
     }
     return true;
@@ -153,8 +154,32 @@ void ShadowLight::forceProjectionMatrixCompute()
   _needProjectionMatrixCompute = true;
 }
 
-Matrix* ShadowLight::_getWorldMatrix()
+void ShadowLight::_initCache()
 {
+  IShadowLight::_initCache();
+
+  _cache.position = Vector3::Zero();
+}
+
+bool ShadowLight::_isSynchronized()
+{
+  if (!_cache.position.equals(position)) {
+    return false;
+  }
+
+  return true;
+}
+
+Matrix& ShadowLight::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/)
+{
+  if (!force && isSynchronized()) {
+    _currentRenderId = getScene()->getRenderId();
+    return *_worldMatrix;
+  }
+
+  _updateCache();
+  _cache.position.copyFrom(position);
+
   if (!_worldMatrix) {
     _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
   }
@@ -162,7 +187,16 @@ Matrix* ShadowLight::_getWorldMatrix()
   Matrix::TranslationToRef(position().x, position().y, position().z,
                            *_worldMatrix);
 
-  return _worldMatrix.get();
+  if (parent) {
+    _worldMatrix->multiplyToRef(parent()->getWorldMatrix(), *_worldMatrix);
+
+    _markSyncedWithParent();
+  }
+
+  // Cache the determinant
+  _worldMatrixDeterminant = _worldMatrix->determinant();
+
+  return *_worldMatrix;
 }
 
 float ShadowLight::getDepthMinZ(const Camera& activeCamera) const

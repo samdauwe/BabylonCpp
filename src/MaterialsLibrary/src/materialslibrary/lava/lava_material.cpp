@@ -271,7 +271,7 @@ bool LavaMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   return true;
 }
 
-void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
+void LavaMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
@@ -291,7 +291,7 @@ void LavaMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   defines->boolDef["UNLIT"] = _unlit;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones

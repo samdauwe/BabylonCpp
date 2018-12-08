@@ -80,7 +80,7 @@ public:
    * @brief Gets a matrix used to store world matrix (ie. the matrix sent to
    * shaders).
    */
-  Matrix* getWorldMatrix() override;
+  Matrix& getWorldMatrix() override;
 
   /**
    * @brief Sets the local matrix to rest pose matrix.
@@ -593,7 +593,7 @@ private:
   Vector3 _scaleVector;
   Vector3 _negateScaleChildren;
   float _scalingDeterminant;
-  std::unique_ptr<Matrix> _worldTransform;
+  Matrix _worldTransform;
   std::optional<Vector3> _localScaling;
   Quaternion _localRotation;
   Vector3 _localPosition;

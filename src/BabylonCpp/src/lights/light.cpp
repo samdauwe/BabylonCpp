@@ -49,8 +49,6 @@ Light::Light(const std::string& iName, Scene* scene)
     , _includeOnlyWithLayerMask{0}
     , _excludeWithLayerMask{0}
     , _lightmapMode{0}
-    , _parentedWorldMatrix{nullptr}
-    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
 {
 }
 
@@ -95,6 +93,12 @@ std::string Light::toString(bool fullDetails) const
 
 void Light::_buildUniformLayout()
 {
+}
+
+void Light::_syncParentEnabledState()
+{
+  Node::_syncParentEnabledState();
+  _resyncMeshes();
 }
 
 void Light::setEnabled(bool value)
@@ -221,7 +225,7 @@ void Light::set_lightmapMode(unsigned int value)
   _markMeshesAsLightDirty();
 }
 
-ShadowGeneratorPtr Light::getShadowGenerator()
+IShadowGeneratorPtr Light::getShadowGenerator()
 {
   return _shadowGenerator;
 }
@@ -269,29 +273,6 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
   }
 
   return true;
-}
-
-Matrix* Light::getWorldMatrix()
-{
-  _currentRenderId = getScene()->getRenderId();
-  _childRenderId   = _currentRenderId;
-
-  auto worldMatrix = _getWorldMatrix();
-
-  if (parent() && parent()->getWorldMatrix()) {
-    if (!_parentedWorldMatrix) {
-      _parentedWorldMatrix = std::make_unique<Matrix>(Matrix::Identity());
-    }
-
-    worldMatrix->multiplyToRef(*parent()->getWorldMatrix(),
-                               *_parentedWorldMatrix);
-
-    _markSyncedWithParent();
-
-    return _parentedWorldMatrix.get();
-  }
-
-  return worldMatrix;
 }
 
 int Light::CompareLightsPriority(Light* a, Light* b)

@@ -358,10 +358,10 @@ void ShaderMaterial::bindOnlyWorldMatrix(Matrix& world)
   }
 }
 
-void ShaderMaterial::bind(Matrix* world, Mesh* mesh)
+void ShaderMaterial::bind(Matrix& world, Mesh* mesh)
 {
   // Std values
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
 
   if (_effect && getScene()->getCachedMaterial() != this) {
     if (stl_util::contains(_options.uniforms, "view")) {

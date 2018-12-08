@@ -1122,7 +1122,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
 
   auto world = getWorldMatrix();
   if (batch->renderSelf[subMesh->_id]) {
-    world->copyToArray(_instancesData, offset);
+    world.copyToArray(_instancesData, offset);
     offset += 16;
     instancesCount++;
   }
@@ -1131,7 +1131,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
     for (size_t instanceIndex = 0; instanceIndex < visibleInstances.size();
          ++instanceIndex) {
       auto instance = visibleInstances[instanceIndex];
-      instance->getWorldMatrix()->copyToArray(_instancesData, offset);
+      instance->getWorldMatrix().copyToArray(_instancesData, offset);
       offset += 16;
       ++instancesCount;
     }
@@ -1186,7 +1186,7 @@ Mesh& Mesh::_processRendering(
     if (batch->renderSelf[subMesh->_id]) {
       // Draw
       if (onBeforeDraw) {
-        onBeforeDraw(false, *getWorldMatrix(), effectiveMaterial);
+        onBeforeDraw(false, getWorldMatrix(), effectiveMaterial);
       }
 
       _draw(subMesh, fillMode, _overridenInstanceCount);
@@ -1198,7 +1198,7 @@ Mesh& Mesh::_processRendering(
         // World
         auto world = instance->getWorldMatrix();
         if (onBeforeDraw) {
-          onBeforeDraw(true, *world, effectiveMaterial);
+          onBeforeDraw(true, world, effectiveMaterial);
         }
 
         // Draw
@@ -1637,7 +1637,7 @@ Mesh& Mesh::bakeCurrentTransformIntoVertices()
   if (rotationQuaternion()) {
     rotationQuaternion = Quaternion::Identity();
   }
-  _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
+  _worldMatrix = Matrix::Identity();
   return *this;
 }
 

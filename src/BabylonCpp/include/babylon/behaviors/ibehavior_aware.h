@@ -19,9 +19,12 @@ struct BABYLON_SHARED_EXPORT IBehaviorAware {
   /**
    * @brief Attach a behavior.
    * @param behavior defines the behavior to attach
+   * @param attachImmediately defines that the behavior must be attached even if
+   * the scene is still loading
    * @returns the current host
    */
-  virtual T& addBehavior(Behavior<T>* behavior) = 0;
+  virtual T& addBehavior(Behavior<T>* behavior, bool attachImmediately = false)
+    = 0;
   /**
    * @brief Remove a behavior from the current object.
    * @param behavior defines the behavior to detach

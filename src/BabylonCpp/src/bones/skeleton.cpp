@@ -281,16 +281,16 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
     auto parentBone = bone->getParent();
 
     if (parentBone) {
-      bone->getLocalMatrix().multiplyToRef(*parentBone->getWorldMatrix(),
-                                           *bone->getWorldMatrix());
+      bone->getLocalMatrix().multiplyToRef(parentBone->getWorldMatrix(),
+                                           bone->getWorldMatrix());
     }
     else {
       if (initialSkinMatrixSet) {
         bone->getLocalMatrix().multiplyToRef(initialSkinMatrix,
-                                             *bone->getWorldMatrix());
+                                             bone->getWorldMatrix());
       }
       else {
-        bone->getWorldMatrix()->copyFrom(bone->getLocalMatrix());
+        bone->getWorldMatrix().copyFrom(bone->getLocalMatrix());
       }
     }
 
@@ -299,7 +299,7 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
                            index :
                            static_cast<unsigned int>(*bone->_index);
       bone->getInvertedAbsoluteTransform().multiplyToArray(
-        *bone->getWorldMatrix(), targetMatrix, mappedIndex * 16);
+        bone->getWorldMatrix(), targetMatrix, mappedIndex * 16);
     }
     ++index;
   }
@@ -450,16 +450,16 @@ Matrix* Skeleton::getPoseMatrix() const
 
 void Skeleton::sortBones()
 {
-  std::vector<Bone*> bones;
+  std::vector<BonePtr> _bones;
   std::vector<bool> visited(bones.size());
   for (unsigned int index = 0; index < bones.size(); ++index) {
-    _sortBones(index, bones, visited);
+    _sortBones(index, _bones, visited);
   }
 
-  bones = bones;
+  bones = _bones;
 }
 
-void Skeleton::_sortBones(unsigned int index, std::vector<Bone*>& iBones,
+void Skeleton::_sortBones(unsigned int index, std::vector<BonePtr>& iBones,
                           std::vector<bool>& visited)
 {
   if (visited[index]) {
@@ -492,7 +492,7 @@ void Skeleton::_sortBones(unsigned int index, std::vector<Bone*>& iBones,
     }
   }
 
-  iBones.emplace_back(bone.get());
+  iBones.emplace_back(bone);
 }
 
 } // end of namespace BABYLON

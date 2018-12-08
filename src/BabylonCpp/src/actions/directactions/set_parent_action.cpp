@@ -27,7 +27,7 @@ void SetParentAction::execute(const ActionEvent& /*evt*/)
   //  return;
   //}
 
-  Matrix invertParentWorldMatrix = _parent->getWorldMatrix()->copy();
+  Matrix invertParentWorldMatrix = _parent->getWorldMatrix().copy();
   invertParentWorldMatrix.invert();
 
   // _target.position = Vector3::TransformCoordinates(_target.position,

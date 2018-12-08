@@ -38,7 +38,7 @@ public:
   bool needAlphaBlendingForMesh(const AbstractMesh& mesh) const override;
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
-  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
+  void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   const std::string getClassName() const override;
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;

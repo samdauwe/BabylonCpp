@@ -178,7 +178,7 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   return true;
 }
 
-void ShadowOnlyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
+void ShadowOnlyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
                                         SubMesh* subMesh)
 {
   auto scene = getScene();
@@ -196,7 +196,7 @@ void ShadowOnlyMaterial::bindForSubMesh(Matrix* world, Mesh* mesh,
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
+  bindOnlyWorldMatrix(world);
   _activeEffect->setMatrix("viewProjection", scene->getTransformMatrix());
 
   // Bones

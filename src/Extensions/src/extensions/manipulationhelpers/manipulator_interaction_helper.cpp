@@ -214,8 +214,8 @@ void ManipulatorInteractionHelper::doPos(const Vector2& rayPos)
   auto v        = Vector3::Zero();
   auto identity = std::make_unique<Matrix>(Matrix::Identity());
   auto ray      = _scene->createPickingRay(static_cast<int>(rayPos.x),
-                                      static_cast<int>(rayPos.y),
-                                      identity.get(), _scene->activeCamera);
+                                      static_cast<int>(rayPos.y), *identity,
+                                      _scene->activeCamera);
 
   if (hasManipulatedMode(RadixFeatures::PlaneSelectionXY
                          | RadixFeatures::PlaneSelectionXZ
@@ -361,7 +361,7 @@ void ManipulatorInteractionHelper::setManipulatedNodeWorldMatrix(Matrix mtx)
     auto mesh = static_cast<AbstractMesh*>(_manipulatedNode);
 
     if (mesh->parent()) {
-      auto worldMatrix = *mesh->parent()->getWorldMatrix();
+      auto worldMatrix = mesh->parent()->getWorldMatrix();
       mtx              = mtx.multiply(worldMatrix.invert());
     }
 
@@ -375,17 +375,18 @@ void ManipulatorInteractionHelper::setManipulatedNodeWorldMatrix(Matrix mtx)
   }
 }
 
-Matrix* ManipulatorInteractionHelper::getManipulatedNodeWorldMatrix()
+std::optional<Matrix>
+ManipulatorInteractionHelper::getManipulatedNodeWorldMatrix()
 {
   if (!_manipulatedNode) {
-    return nullptr;
+    return std::nullopt;
   }
 
   if (instanceofAbstractMesh(_manipulatedNode)) {
     return _manipulatedNode->getWorldMatrix();
   }
 
-  return nullptr;
+  return std::nullopt;
 }
 
 std::tuple<Plane, Vector3>
@@ -484,14 +485,14 @@ void ManipulatorInteractionHelper::renderManipulator()
     auto mesh     = static_cast<AbstractMesh*>(_manipulatedNode);
     auto worldMtx = mesh->getWorldMatrix();
     auto l        = Vector3::Distance(_scene->activeCamera->position,
-                               worldMtx->getTranslation());
+                               worldMtx.getTranslation());
     auto vpWidth  = _scene->getEngine()->getRenderWidth();
     auto s        = fromScreenToWorld(vpWidth / 100.f, l) * 20.f;
     auto scale    = Vector3::Zero();
     auto position = Vector3::Zero();
     auto rotation = Quaternion::Identity();
 
-    auto res = Matrix::Scaling(s, s, s).multiply(*worldMtx);
+    auto res = Matrix::Scaling(s, s, s).multiply(worldMtx);
 
     res.decompose(scale, rotation, position);
 
@@ -503,10 +504,10 @@ float ManipulatorInteractionHelper::fromScreenToWorld(float l, float z)
 {
   auto camera   = _scene->activeCamera;
   auto identity = std::make_unique<Matrix>(Matrix::Identity());
-  auto r0       = _scene->createPickingRay(0, 0, identity.get(), camera, true);
+  auto r0       = _scene->createPickingRay(0, 0, *identity, camera, true);
   identity      = std::make_unique<Matrix>(Matrix::Identity());
-  auto r1 = _scene->createPickingRay(static_cast<int>(l), 0, identity.get(),
-                                     camera, true);
+  auto r1
+    = _scene->createPickingRay(static_cast<int>(l), 0, *identity, camera, true);
 
   auto p0 = ManipulatorInteractionHelper::evalPosition(r0, z);
   auto p1 = ManipulatorInteractionHelper::evalPosition(r1, z);

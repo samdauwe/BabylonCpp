@@ -232,7 +232,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
             updateBoundingBox();
 
             if (scalePivot) {
-              attachedMesh()->getWorldMatrix()->getRotationMatrixToRef(
+              attachedMesh()->getWorldMatrix().getRotationMatrixToRef(
                 _tmpRotationMatrix);
               // Move anchor to desired pivot point (Bottom left corner +
               // dimension/2)

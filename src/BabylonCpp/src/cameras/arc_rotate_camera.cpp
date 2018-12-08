@@ -626,14 +626,14 @@ CameraPtr ArcRotateCamera::createRigCamera(const std::string& iName,
   float alphaShift = 0.f;
 
   switch (cameraRigMode) {
-    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH():
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL():
-    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER():
-    case Camera::RIG_MODE_VR():
+    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
+    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER:
+    case Camera::RIG_MODE_VR:
       alphaShift
         = _cameraRigParams.stereoHalfAngle * (cameraIndex == 0 ? 1 : -1);
       break;
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED():
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
       alphaShift
         = _cameraRigParams.stereoHalfAngle * (cameraIndex == 0 ? -1 : 1);
       break;
@@ -655,14 +655,14 @@ void ArcRotateCamera::_updateRigCameras()
   camLeft->radius = camRight->radius = radius;
 
   switch (cameraRigMode) {
-    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH():
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL():
-    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER():
-    case Camera::RIG_MODE_VR():
+    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
+    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER:
+    case Camera::RIG_MODE_VR:
       camLeft->alpha  = alpha - _cameraRigParams.stereoHalfAngle;
       camRight->alpha = alpha + _cameraRigParams.stereoHalfAngle;
       break;
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED():
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
       camLeft->alpha  = alpha + _cameraRigParams.stereoHalfAngle;
       camRight->alpha = alpha - _cameraRigParams.stereoHalfAngle;
       break;

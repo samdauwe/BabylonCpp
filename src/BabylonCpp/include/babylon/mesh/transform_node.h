@@ -9,7 +9,11 @@ namespace BABYLON {
 class Bone;
 
 /**
- * @brief TransformNode class.
+ * @brief A TransformNode is an object that is not rendered but can be used as a
+ * center of transformation. This can decrease memory usage and increase
+ * rendering speed compared to using an empty mesh as a parent and is less
+ * complicated than using a pivot matrix.
+ * @see https://doc.babylonjs.com/how_to/transformnode
  */
 class BABYLON_SHARED_EXPORT TransformNode : public Node {
 
@@ -17,27 +21,27 @@ public:
   // Statics
 
   /**
-   * No billboard
+   * Object will not rotate to face the camera
    */
   static constexpr unsigned int BILLBOARDMODE_NONE = 0;
 
   /**
-   * Billboard on X axis
+   * Object will rotate to face the camera but only on the x axis
    */
   static constexpr unsigned int BILLBOARDMODE_X = 1;
 
   /**
-   * Billboard on Y axis
+   * Object will rotate to face the camera but only on the y axis
    */
   static constexpr unsigned int BILLBOARDMODE_Y = 2;
 
   /**
-   * Billboard on Z axis
+   * Object will rotate to face the camera but only on the z axis
    */
   static constexpr unsigned int BILLBOARDMODE_Z = 4;
 
   /**
-   * Billboard on all axes
+   * Object will rotate to face the camera
    */
   static constexpr unsigned int BILLBOARDMODE_ALL = 7;
 
@@ -55,27 +59,22 @@ public:
   const std::string getClassName() const override;
 
   /**
-   * @brief Returns the latest update of the World matrix.
-   * @returns a Matrix.
-   */
-  Matrix* getWorldMatrix() override;
-
-  /**
-   * @brief Hidden
-   */
-  float _getWorldMatrixDeterminant() const override;
-
-  /**
    * @brief Copies the parameter passed Matrix into the mesh Pose matrix.
-   * Returns the TransformNode.
+   * @param matrix the matrix to copy the pose from
+   * @returns this TransformNode.
    */
   TransformNode& updatePoseMatrix(const Matrix& matrix);
 
   /**
    * @brief Returns the mesh Pose matrix.
-   * Returned object : Matrix
+   * @returns the pose matrix
    */
   Matrix& getPoseMatrix();
+
+  /**
+   * @brief Returns the mesh Pose matrix.
+   * @returns the pose matrix
+   */
   const Matrix& getPoseMatrix() const;
 
   /**
@@ -88,6 +87,12 @@ public:
    */
   void _initCache() override;
 
+  /**
+   * @brief Flag the transform node as dirty (Forcing it to update everything).
+   * @param property if set to "rotation" the objects rotationQuaternion will be
+   * set to null
+   * @returns this transform node
+   */
   TransformNode& markAsDirty(const std::string& property) override;
 
   /**
@@ -112,9 +117,15 @@ public:
   /**
    * @brief Returns the mesh pivot matrix.
    * Default : Identity.
-   * A Matrix is returned.
+   * @returns the matrix
    */
   Matrix& getPivotMatrix();
+
+  /**
+   * @brief Returns the mesh pivot matrix.
+   * Default : Identity.
+   * @returns the matrix
+   */
   const Matrix& getPivotMatrix() const;
 
   /**
@@ -125,19 +136,20 @@ public:
 
   /**
    * @brief Allows back the World matrix computation.
-   * @returns Returns the TransformNode.
+   * @returns the TransformNode.
    */
   TransformNode& unfreezeWorldMatrix();
 
   /**
    * @brief Retuns the mesh absolute position in the World.
-   * Returns a Vector3.
+   * @returns a Vector3.
    */
   Vector3& getAbsolutePosition();
 
   /**
    * @brief Sets the mesh absolute position in the World from a Vector3 or an
    * Array(3).
+   * @param absolutePosition the absolute position to set
    * @returns the TransformNode.
    */
   TransformNode&
@@ -145,6 +157,7 @@ public:
 
   /**
    * @brief Sets the mesh position in its local space.
+   * @param vector3 the position to set in localspace
    * @returns the TransformNode.
    */
   TransformNode& setPositionWithLocalVector(const Vector3& vector3);
@@ -158,6 +171,7 @@ public:
 
   /**
    * @brief Translates the mesh along the passed Vector3 in its local space.
+   * @param vector3 the distance to translate in localspace
    * @returns the TransformNode.
    */
   TransformNode& locallyTranslate(const Vector3& vector3);
@@ -178,18 +192,22 @@ public:
                         Space space = Space::LOCAL);
 
   /**
-   * @brief Returns a new Vector3 what is the localAxis, expressed in the mesh
-   * local space, rotated like the mesh.
-   * This Vector3 is expressed in the World space.
+   * @brief Returns a new Vector3 that is the localAxis, expressed in the mesh
+   * local space, rotated like the mesh. This Vector3 is expressed in the World
+   * space.
+   * @param localAxis axis to rotate
+   * @returns a new Vector3 that is the localAxis, expressed in the mesh local
+   * space, rotated like the mesh.
    */
   Vector3 getDirection(const Vector3& localAxis);
 
   /**
    * @brief Sets the Vector3 "result" as the rotated Vector3 "localAxis" in the
-   * same rotation than the mesh.
-   * localAxis is expressed in the mesh local space.
-   * result is computed in the Wordl space from the mesh World matrix.
-   * @returns the TransformNode.
+   * same rotation than the mesh. localAxis is expressed in the mesh local
+   * space. result is computed in the Wordl space from the mesh World matrix.
+   * @param localAxis axis to rotate
+   * @param result the resulting transformnode
+   * @returns this TransformNode.
    */
   TransformNode& getDirectionToRef(const Vector3& localAxis, Vector3& result);
 
@@ -205,26 +223,30 @@ public:
   /**
    * @brief Returns a new Vector3 set with the mesh pivot point coordinates in
    * the local space.
+   * @returns the pivot point
    */
   Vector3 getPivotPoint();
 
   /**
    * @brief Sets the passed Vector3 "result" with the coordinates of the mesh
    * pivot point in the local space.
-   * @returns the TransformNode.
+   * @param result the vector3 to store the result
+   * @returns this TransformNode.
    */
   TransformNode& getPivotPointToRef(Vector3& result);
 
   /**
    * @brief Returns a new Vector3 set with the mesh pivot point World
    * coordinates.
+   * @returns a new Vector3 set with the mesh pivot point World coordinates.
    */
   Vector3 getAbsolutePivotPoint();
 
   /**
    * @brief Sets the Vector3 "result" coordinates with the mesh pivot point
    * World coordinates.
-   * @returns the TransformNode.
+   * @param result vector3 to store the result
+   * @returns this TransformNode.
    */
   TransformNode& getAbsolutePivotPointToRef(Vector3& result);
 
@@ -232,7 +254,8 @@ public:
    * @brief Defines the passed node as the parent of the current node.
    * The node will remain exactly where it is and its position / rotation will
    * be updated accordingly
-   * @returns the TransformNode.
+   * @param node the node ot set as the parent
+   * @returns this TransformNode.
    */
   TransformNode& setParent(Node* node);
 
@@ -246,41 +269,52 @@ public:
    * with a bone.
    * @param bone Bone affecting the TransformNode
    * @param affectedTransformNode TransformNode associated with the bone
+   * @returns this object
    */
   TransformNode& attachToBone(Bone* bone, TransformNode* affectedTransformNode);
 
+  /**
+   * @brief Detach the transform node if its associated with a bone.
+   * @returns this object
+   */
   TransformNode& detachFromBone();
 
   /**
    * @brief  Rotates the mesh around the axis vector for the passed angle
-   * (amount) expressed in radians, in the given space.
-   * @param space (default LOCAL) can be either BABYLON.Space.LOCAL, either
-   * BABYLON.Space.WORLD.
-   * Note that the property `rotationQuaternion` is then automatically updated
-   * and the property `rotation` is set to (0,0,0) and no longer used.
-   * The passed axis is also normalized.
+   * (amount) expressed in radians, in the given space. space (default LOCAL)
+   * can be either BABYLON.Space.LOCAL, either BABYLON.Space.WORLD. Note that
+   * the property `rotationQuaternion` is then automatically updated and the
+   * property `rotation` is set to (0,0,0) and no longer used. The passed axis
+   * is also normalized.
+   * @param axis the axis to rotate around
+   * @param amount the amount to rotate in radians
+   * @param space Space to rotate in (Default: local)
    * @returns the TransformNode.
    */
   TransformNode& rotate(Vector3 axis, float amount, Space space = Space::LOCAL);
 
   /**
    * @brief Rotates the mesh around the axis vector for the passed angle
-   * (amount) expressed in radians, in world space.
-   * Note that the property `rotationQuaternion` is then automatically updated
-   * and the property `rotation` is set to (0,0,0) and no longer used.
-   * The passed axis is also normalized.
-   * @returns the TransformNode.
-   * Method is based on
+   * (amount) expressed in radians, in world space. Note that the property
+   * `rotationQuaternion` is then automatically updated and the property
+   * `rotation` is set to (0,0,0) and no longer used. The passed axis is also
+   * normalized. . Method is based on
    * http://www.euclideanspace.com/maths/geometry/affine/aroundPoint/index.htm
+   * @param point the point to rotate around
+   * @param axis the axis to rotate around
+   * @param amount the amount to rotate in radians
+   * @returns the TransformNode
    */
   TransformNode& rotateAround(const Vector3& point, Vector3& axis,
                               float amount);
 
   /**
    * @brief Translates the mesh along the axis vector for the passed distance in
-   * the given space.
-   * @param space (default LOCAL) can be either BABYLON.Space.LOCAL, either
-   * BABYLON.Space.WORLD.
+   * the given space. space (default LOCAL) can be either BABYLON.Space.LOCAL,
+   * either BABYLON.Space.WORLD.
+   * @param axis the axis to translate in
+   * @param distance the distance to translate
+   * @param space Space to rotate in (Default: local)
    * @returns the TransformNode.
    */
   TransformNode& translate(const Vector3& axis, float distance,
@@ -289,40 +323,39 @@ public:
    * @brief Adds a rotation step to the mesh current rotation.
    * x, y, z are Euler angles expressed in radians.
    * This methods updates the current mesh rotation, either mesh.rotation,
-   * either mesh.rotationQuaternion if it's set.
-   * This means this rotation is made in the mesh local space only.
-   * It's useful to set a custom rotation order different from the BJS standard
-   * one YXZ.
-   * Example : this rotates the mesh first around its local X axis, then around
-   * its local Z axis, finally around its local Y axis.
+   * either mesh.rotationQuaternion if it's set. This means this rotation is
+   * made in the mesh local space only. It's useful to set a custom rotation
+   * order different from the BJS standard one YXZ. Example : this rotates the
+   * mesh first around its local X axis, then around its local Z axis, finally
+   * around its local Y axis.
    * ```javascript
    * mesh.addRotation(x1, 0, 0).addRotation(0, 0, z2).addRotation(0, 0, y3);
    * ```
    * Note that `addRotation()` accumulates the passed rotation values to the
    * current ones and computes the .rotation or .rotationQuaternion updated
-   * values.
-   * Under the hood, only quaternions are used. So it's a little faster is you
-   * use .rotationQuaternion because it doesn't need to translate them back to
-   * Euler angles.
+   * values. Under the hood, only quaternions are used. So it's a little faster
+   * is you use .rotationQuaternion because it doesn't need to translate them
+   * back to Euler angles.
+   * @param x Rotation to add
+   * @param y Rotation to add
+   * @param z Rotation to add
    * @returns the TransformNode.
    */
   TransformNode& addRotation(float x, float y, float z);
 
   /**
-   * @brief Computes the mesh World matrix and returns it.
-   * If the mesh world matrix is frozen, this computation does nothing more than
-   * returning the last frozen values.
-   * If the parameter `force` is let to `false` (default), the current cached
-   * World matrix is returned.
-   * If the parameter `force`is set to `true`, the actual computation is done.
-   * @returns the mesh World Matrix.
+   * @brief Computes the world matrix of the node
+   * @param force defines if the cache version should be invalidated forcing the
+   * world matrix to be created from scratch
+   * @returns the world matrix
    */
-  Matrix& computeWorldMatrix(bool force = false) override;
+  Matrix& computeWorldMatrix(bool force             = false,
+                             bool useWasUpdatedFlag = false) override;
 
   /**
    * @brief If you'd like to be called back after the mesh position, rotation or
    * scaling has been updated.
-   * @param func: callback function to add
+   * @param func callback function to add
    * @returns the TransformNode.
    */
   TransformNode& registerAfterWorldMatrixUpdate(
@@ -330,13 +363,14 @@ public:
 
   /**
    * @brief Removes a registered callback function.
+   * @param func callback function to remove
    * @returns the TransformNode.
    */
   TransformNode& unregisterAfterWorldMatrixUpdate(
     const std::function<void(TransformNode* mesh, EventState& es)>& func);
 
   /**
-   * @brief Clone the current transform node.
+   * @brief Clone the current transform node
    * @param name Name of the new clone
    * @param newParent New parent for the clone
    * @param doNotCloneChildren Do not clone children hierarchy
@@ -345,14 +379,21 @@ public:
   TransformNodePtr clone(const std::string& name, Node* newParent,
                          bool doNotCloneChildren = false);
 
+  /**
+   * @brief Serializes the objects information.
+   * @param currentSerializationObject defines the object to serialize in
+   * @returns the serialized object
+   */
   json serialize(json& currentSerializationObject);
 
   // Statics
   /**
    * @brief Returns a new TransformNode object parsed from the source provided.
-   * @param `parsedMesh` is the source.
-   * @param `rootUrl` is a string, it's the root URL to prefix the
+   * @param parsedTransformNode is the source.
+   * @param scene the scne the object belongs to
+   * @param rootUrl is a string, it's the root URL to prefix the
    * `delayLoadingFile` property with
+   * @returns a new TransformNode object parsed from the source provided.
    */
   static TransformNodePtr Parse(const json& parsedTransformNode, Scene* scene,
                                 const std::string& rootUrl);
@@ -381,38 +422,47 @@ protected:
   void set_position(const Vector3& newPosition);
 
   /**
-   * @brief Rotation property : a Vector3 depicting the rotation value in
-   * radians around each local axis X, Y, Z.
-   * If rotation quaternion is set, this Vector3 will (almost always) be the
-   * Zero vector!
-   * Default : (0.0, 0.0, 0.0)
+   * @brief Gets the rotation property : a Vector3 defining the rotation value
+   * in radians around each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If
+   * rotation quaternion is set, this Vector3 will be ignored and copy from the
+   * quaternion.
    */
   Vector3& get_rotation();
+
+  /**
+   * @brief Sets the rotation property : a Vector3 defining the rotation value
+   * in radians around each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If
+   * rotation quaternion is set, this Vector3 will be ignored and copy from the
+   * quaternion.
+   */
   void set_rotation(const Vector3& newRotation);
 
   /**
-   * @brief Scaling property : a Vector3 depicting the mesh scaling along each
-   * local axis X, Y, Z.
-   * Default : (1.0, 1.0, 1.0)
+   * @brief Gets the scaling property : a Vector3 defining the node scaling
+   * along each local axis X, Y, Z (default is (0.0, 0.0, 0.0)).
    */
   virtual Vector3& get_scaling();
 
   /**
-   * @brief Scaling property : a Vector3 depicting the mesh scaling along each
-   * local axis X, Y, Z.
-   * Default : (1.0, 1.0, 1.0)
+   * @brief Sets the scaling property : a Vector3 defining the node scaling
+   * along each local axis X, Y, Z (default is (0.0, 0.0, 0.0)).
    */
   virtual void set_scaling(const Vector3& newScaling);
 
   /**
-   * @brief Rotation Quaternion property : this a Quaternion object depicting
-   * the mesh rotation by using a unit quaternion.
-   * It's null by default.
-   * If set, only the rotationQuaternion is then used to compute the mesh
-   * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
-   * 0.0)
+   * @brief Gets the rotation Quaternion property : this a Quaternion object
+   * defining the node rotation by using a unit quaternion (null by default). If
+   * set, only the rotationQuaternion is then used to compute the node rotation
+   * (ie. node.rotation will be ignored).
    */
   std::optional<Quaternion>& get_rotationQuaternion();
+
+  /**
+   * @brief Sets the rotation Quaternion property : this a Quaternion object
+   * defining the node rotation by using a unit quaternion (null by default). If
+   * set, only the rotationQuaternion is then used to compute the node rotation
+   * (ie. node.rotation will be ignored).
+   */
   void set_rotationQuaternion(const std::optional<Quaternion>& quaternion);
 
   /**
@@ -431,12 +481,6 @@ protected:
   Vector3& get_right();
 
   /**
-   * @brief Returns directly the latest state of the mesh World matrix.
-   * A Matrix is returned.
-   */
-  Matrix& get_worldMatrixFromCache();
-
-  /**
    * @brief Retuns the mesh absolute position in the World.
    * @returns a Vector3.
    */
@@ -448,6 +492,10 @@ protected:
    */
   bool get_isWorldMatrixFrozen() const;
 
+  /**
+   * @brief True if the scaling property of this object is non uniform eg.
+   * (1,2,1)
+   */
   bool get_nonUniformScaling() const;
 
 public:
@@ -464,7 +512,16 @@ public:
    *
    */
   unsigned int billboardMode;
+
+  /**
+   * Multiplication factor on scale x/y/z when computing the world matrix. Eg.
+   * for a 1x1x1 cube setting this to 2 will make it a 2x2x2 cube
+   */
   float scalingDeterminant;
+
+  /**
+   * Sets the distance of the object to max, often used by skybox
+   */
   bool infiniteDistance;
 
   /**
@@ -477,72 +534,62 @@ public:
   // Cache
   /** Hidden */
   std::unique_ptr<Matrix> _poseMatrix;
-  /** Hidden */
-  std::unique_ptr<Matrix> _worldMatrix;
-  /** Hidden */
-  float _worldMatrixDeterminant;
 
   /**
-   * Position property
+   * Gets or set the node position (default is (0.0, 0.0, 0.0))
    */
   Property<TransformNode, Vector3> position;
 
   /**
-   * Rotation property : a Vector3 depicting the rotation value in radians
-   * around each local axis X, Y, Z. If rotation quaternion is set, this Vector3
-   * will (almost always) be the Zero vector! Default : (0.0, 0.0, 0.0)
+   * Gets or sets the rotation property : a Vector3 defining the rotation value
+   * in radians around each local axis X, Y, Z  (default is (0.0, 0.0, 0.0)). If
+   * rotation quaternion is set, this Vector3 will be ignored and copy from the
+   * quaternion
    */
   Property<TransformNode, Vector3> rotation;
 
   /**
-   * Scaling property : a Vector3 depicting the mesh scaling along each local
-   * axis X, Y, Z. Default : (1.0, 1.0, 1.0)
+   * Gets or sets the scaling property : a Vector3 defining the node scaling
+   * along each local axis X, Y, Z (default is (0.0, 0.0, 0.0)).
    */
   Property<TransformNode, Vector3> scaling;
 
   /**
-   * @brief Rotation Quaternion property : this a Quaternion object depicting
-   * the mesh rotation by using a unit quaternion.
-   * It's null by default.
-   * If set, only the rotationQuaternion is then used to compute the mesh
-   * rotation and its property `.rotation\ is then ignored and set to (0.0, 0.0,
-   * 0.0)
+   * Gets or sets the rotation Quaternion property : this a Quaternion object
+   * defining the node rotation by using a unit quaternion (null by default). If
+   * set, only the rotationQuaternion is then used to compute the node rotation
+   * (ie. node.rotation will be ignored)
    */
   Property<TransformNode, std::optional<Quaternion>> rotationQuaternion;
 
   /**
-   * @brief The forward direction of that transform in world space.
+   * The forward direction of that transform in world space.
    */
   ReadOnlyProperty<TransformNode, Vector3> forward;
 
   /**
-   * @brief The up direction of that transform in world space.
+   * The up direction of that transform in world space.
    */
   ReadOnlyProperty<TransformNode, Vector3> up;
 
   /**
-   * @brief The right direction of that transform in world space.
+   * The right direction of that transform in world space.
    */
   ReadOnlyProperty<TransformNode, Vector3> right;
 
   /**
-   * @brief Returns directly the latest state of the mesh World matrix.
-   * A Matrix is returned.
-   */
-  ReadOnlyProperty<TransformNode, Matrix> worldMatrixFromCache;
-
-  /**
-   * @brief Retuns the mesh absolute position in the World.
-   * @returns a Vector3.
+   * Retuns the mesh absolute position in the World.
    */
   ReadOnlyProperty<TransformNode, Vector3> absolutePosition;
 
   /**
-   * @brief True if the World matrix has been frozen.
-   * @returns a boolean.
+   * True if the World matrix has been frozen.
    */
   ReadOnlyProperty<TransformNode, bool> isWorldMatrixFrozen;
 
+  /**
+   * True if the scaling property of this object is non uniform eg. (1,2,1)
+   */
   ReadOnlyProperty<TransformNode, bool> nonUniformScaling;
 
 protected:

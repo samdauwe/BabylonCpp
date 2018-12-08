@@ -178,7 +178,7 @@ void BoneIKController::update()
   }
   else if (poleTargetMesh) {
     Vector3::TransformCoordinatesToRef(
-      poleTargetLocalOffset, *poleTargetMesh->getWorldMatrix(), poleTarget);
+      poleTargetLocalOffset, poleTargetMesh->getWorldMatrix(), poleTarget);
   }
 
   auto& bonePos = BoneIKController::_tmpVecs[0];

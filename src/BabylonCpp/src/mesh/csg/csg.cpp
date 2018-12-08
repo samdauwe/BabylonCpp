@@ -45,7 +45,7 @@ std::unique_ptr<BABYLON::CSG::CSG> CSG::CSG::FromMesh(const MeshPtr& mesh)
   Vector3 meshScaling;
 
   mesh->computeWorldMatrix(true);
-  matrix       = *mesh->getWorldMatrix();
+  matrix       = mesh->getWorldMatrix();
   meshPosition = mesh->position();
   meshRotation = mesh->rotation();
   if (mesh->rotationQuaternion()) {

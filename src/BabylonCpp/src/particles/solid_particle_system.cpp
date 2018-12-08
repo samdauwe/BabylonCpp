@@ -173,9 +173,9 @@ SolidParticleSystem::digest(Mesh* _mesh,
   // compute size from number
   if (number) {
     number = (number > totalFacets) ? totalFacets : number;
-    size   = static_cast<size_t>(std::round(static_cast<float>(totalFacets)
-                                            / static_cast<float>(number)));
-    delta  = 0;
+    size   = static_cast<size_t>(
+      std::round(static_cast<float>(totalFacets) / static_cast<float>(number)));
+    delta = 0;
   }
   else {
     size = (size > totalFacets) ? totalFacets : size;
@@ -190,8 +190,8 @@ SolidParticleSystem::digest(Mesh* _mesh,
 
   while (f < totalFacets) {
     size = sizeO
-           + static_cast<size_t>(std::floor((1.f + static_cast<float>(delta))
-                                              * Math::random()));
+           + static_cast<size_t>(
+               std::floor((1.f + static_cast<float>(delta)) * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -638,7 +638,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   // cases when the World Matrix is to be computed first
   if (billboard || _depthSort) {
     mesh->computeWorldMatrix(true);
-    mesh->_worldMatrix->invertToRef(_invertMatrix);
+    mesh->_worldMatrix.invertToRef(_invertMatrix);
   }
   // if the particles will always face the camera
   if (billboard) {
@@ -1026,7 +1026,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
                               + _cam_axisY.z * _rotated.y
                               + _cam_axisZ.z * _rotated.z;
         }
-        bBox._update(*mesh->_worldMatrix);
+        bBox._update(mesh->_worldMatrix);
       }
       // place and scale the particle bouding sphere in the SPS local system,
       // then update it
@@ -1051,10 +1051,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       bSphere.radius
         = _bSphereRadiusFactor * 0.5f
           * std::sqrt((_maxBbox.x - _minBbox.x) * (_maxBbox.x - _minBbox.x)
-                        + (_maxBbox.y - _minBbox.y) * (_maxBbox.y - _minBbox.y)
-                        + (_maxBbox.z - _minBbox.z)
-                            * (_maxBbox.z - _minBbox.z));
-      bSphere._update(*mesh->_worldMatrix);
+                      + (_maxBbox.y - _minBbox.y) * (_maxBbox.y - _minBbox.y)
+                      + (_maxBbox.z - _minBbox.z) * (_maxBbox.z - _minBbox.z));
+      bSphere._update(mesh->_worldMatrix);
     }
 
     // increment indexes for the next particle
@@ -1097,7 +1096,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     }
     if (_depthSort && _depthSortParticles) {
       std::sort(depthSortedParticles.begin(), depthSortedParticles.end(),
-                  _depthSortFunction);
+                _depthSortFunction);
       auto dspl     = depthSortedParticles.size();
       size_t sorted = 0;
       size_t lind   = 0;
@@ -1116,7 +1115,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   }
   if (_computeBoundingBox) {
     mesh->_boundingInfo.reset(new BoundingInfo(_minimum, _maximum));
-    mesh->_boundingInfo->update(*mesh->_worldMatrix);
+    mesh->_boundingInfo->update(mesh->_worldMatrix);
   }
   afterUpdateParticles(start, _end, update);
 

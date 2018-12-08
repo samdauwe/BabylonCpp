@@ -149,7 +149,7 @@ public:
    * @param mesh - The BJS mesh.
    * @param subMesh - A submesh of the BJS mesh.
    */
-  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
+  void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
 
   /**
    * @brief Returns the animatable textures.

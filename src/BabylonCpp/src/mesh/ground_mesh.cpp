@@ -60,7 +60,7 @@ float GroundMesh::getHeightAtCoordinates(float x, float z)
 {
   auto world   = getWorldMatrix();
   auto& invMat = Tmp::MatrixArray[5];
-  world->invertToRef(invMat);
+  world.invertToRef(invMat);
   auto& tmpVect = Tmp::Vector3Array[8];
   // transform x,z in the mesh local space
   Vector3::TransformCoordinatesFromFloatsToRef(x, 0.f, z, invMat, tmpVect);
@@ -76,7 +76,7 @@ float GroundMesh::getHeightAtCoordinates(float x, float z)
   auto facet = _getFacetAt(x, z);
   auto y     = -(facet.x * x + facet.z * z + facet.w) / facet.y;
   // return y in the World system
-  Vector3::TransformCoordinatesFromFloatsToRef(0.f, y, 0.f, *world, tmpVect);
+  Vector3::TransformCoordinatesFromFloatsToRef(0.f, y, 0.f, world, tmpVect);
   return tmpVect.y;
 }
 
@@ -92,7 +92,7 @@ GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z,
 {
   auto world   = getWorldMatrix();
   auto& tmpMat = Tmp::MatrixArray[5];
-  world->invertToRef(tmpMat);
+  world.invertToRef(tmpMat);
   auto& tmpVect = Tmp::Vector3Array[8];
   // transform x,z in the mesh local space
   Vector3::TransformCoordinatesFromFloatsToRef(x, 0.f, z, tmpMat, tmpVect);
@@ -106,7 +106,7 @@ GroundMesh& GroundMesh::getNormalAtCoordinatesToRef(float x, float z,
     _computeHeightQuads();
   }
   auto facet = _getFacetAt(x, z);
-  Vector3::TransformNormalFromFloatsToRef(facet.x, facet.y, facet.z, *world,
+  Vector3::TransformNormalFromFloatsToRef(facet.x, facet.y, facet.z, world,
                                           ref);
   return *this;
 }

@@ -65,7 +65,7 @@ public:
                          bool useInstances = false) override;
   void buildUniformLayout();
   void unbind() override;
-  void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh) override;
+  void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
   std::vector<IAnimatablePtr> getAnimatables();
   std::vector<BaseTexturePtr> getActiveTextures() const override;
   bool hasTexture(const BaseTexturePtr& texture) const override;

@@ -936,12 +936,12 @@ void Scene::_setRayOnPointerInfo(PointerInfo& pointerInfo)
       if (pointerInfo.type == PointerEventTypes::POINTERWHEEL) {
         pointerInfo.pickInfo.ray = createPickingRay(
           pointerInfo.mouseWheelEvent.offsetX,
-          pointerInfo.mouseWheelEvent.offsetY, &identityMatrix, activeCamera);
+          pointerInfo.mouseWheelEvent.offsetY, identityMatrix, activeCamera);
       }
       else if (pointerInfo.type == PointerEventTypes::POINTERMOVE) {
         pointerInfo.pickInfo.ray = createPickingRay(
           pointerInfo.pointerEvent.offsetX, pointerInfo.pointerEvent.offsetY,
-          &identityMatrix, activeCamera);
+          identityMatrix, activeCamera);
       }
     }
   }
@@ -3586,7 +3586,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
 
 void Scene::_processSubCameras(const CameraPtr& camera)
 {
-  if (camera->cameraRigMode == Camera::RIG_MODE_NONE()) {
+  if (camera->cameraRigMode == Camera::RIG_MODE_NONE) {
     _renderForCamera(camera);
     return;
   }
@@ -3710,7 +3710,7 @@ void Scene::render(bool updateCameras)
     if (!activeCameras.empty()) {
       for (auto& camera : activeCameras) {
         camera->update();
-        if (camera->cameraRigMode != Camera::RIG_MODE_NONE()) {
+        if (camera->cameraRigMode != Camera::RIG_MODE_NONE) {
           // Rig cameras
           for (auto& rigCamera : camera->_rigCameras) {
             rigCamera->update();
@@ -3720,7 +3720,7 @@ void Scene::render(bool updateCameras)
     }
     else if (activeCamera) {
       activeCamera->update();
-      if (activeCamera->cameraRigMode != Camera::RIG_MODE_NONE()) {
+      if (activeCamera->cameraRigMode != Camera::RIG_MODE_NONE) {
         // rig cameras
         for (auto& rigCamera : activeCamera->_rigCameras) {
           rigCamera->update();
@@ -4304,7 +4304,7 @@ Octree<AbstractMesh*>*
 }
 
 /** Picking **/
-Ray Scene::createPickingRay(int x, int y, Matrix* world,
+Ray Scene::createPickingRay(int x, int y, Matrix& world,
                             const CameraPtr& camera, bool cameraViewSpace)
 {
   auto result = Ray::Zero();
@@ -4314,8 +4314,10 @@ Ray Scene::createPickingRay(int x, int y, Matrix* world,
   return result;
 }
 
-Scene& Scene::createPickingRayToRef(int x, int y, Matrix* world, Ray& result,
-                                    CameraPtr camera, bool cameraViewSpace)
+Scene& Scene::createPickingRayToRef(int x, int y,
+                                    const std::optional<Matrix>& world,
+                                    Ray& result, CameraPtr camera,
+                                    bool cameraViewSpace)
 {
   auto engine = _engine;
 
@@ -4342,8 +4344,9 @@ Scene& Scene::createPickingRayToRef(int x, int y, Matrix* world, Ray& result,
     _engine->getHardwareScalingLevel()
     - (_engine->getRenderHeight() - viewport.y - viewport.height));
 
+  auto _world = world.has_value() ? *world : identity;
   result.update(_x, _y, static_cast<float>(viewport.width),
-                static_cast<float>(viewport.height), world ? *world : identity,
+                static_cast<float>(viewport.height), _world,
                 cameraViewSpace ? identity : camera->getViewMatrix(),
                 camera->getProjectionMatrix());
   return *this;
@@ -4408,7 +4411,7 @@ std::optional<PickingInfo> Scene::_internalPick(
     }
 
     auto world = mesh->getWorldMatrix();
-    auto ray   = rayFunction(*world);
+    auto ray   = rayFunction(world);
 
     auto result = mesh->intersects(ray, fastCheck);
     if (/*!result || */ !result.hit) {
@@ -4447,7 +4450,7 @@ std::vector<std::optional<PickingInfo>> Scene::_internalMultiPick(
     }
 
     auto world = mesh->getWorldMatrix();
-    auto ray   = rayFunction(*world);
+    auto ray   = rayFunction(world);
 
     auto result = mesh->intersects(ray, false);
     if (/*!result || */ !result.hit) {
@@ -4508,7 +4511,7 @@ Scene::pick(int x, int y,
 {
   auto result = _internalPick(
     [this, x, y, &camera](Matrix& world) -> Ray {
-      createPickingRayToRef(x, y, &world, *_tempPickingRay, camera);
+      createPickingRayToRef(x, y, world, *_tempPickingRay, camera);
       return *_tempPickingRay;
     },
     predicate, fastCheck);
@@ -4516,7 +4519,7 @@ Scene::pick(int x, int y,
     auto _result     = *result;
     auto identityMat = Matrix::Identity();
     _result.ray
-      = createPickingRay(x, y, &identityMat, camera ? camera : nullptr);
+      = createPickingRay(x, y, identityMat, camera ? camera : nullptr);
     result = _result;
   }
   return result;
@@ -4591,7 +4594,7 @@ Scene::multiPick(int x, int y,
 {
   return _internalMultiPick(
     [this, x, y, &camera](Matrix& world) -> Ray {
-      return createPickingRay(x, y, &world, camera);
+      return createPickingRay(x, y, world, camera);
     },
     predicate);
 }

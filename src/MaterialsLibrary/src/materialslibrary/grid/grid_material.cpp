@@ -136,7 +136,7 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   return true;
 }
 
-void GridMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
+void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
@@ -153,9 +153,8 @@ void GridMaterial::bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh)
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(*world);
-  _activeEffect->setMatrix("worldView",
-                           world->multiply(scene->getViewMatrix()));
+  bindOnlyWorldMatrix(world);
+  _activeEffect->setMatrix("worldView", world.multiply(scene->getViewMatrix()));
   _activeEffect->setMatrix("view", scene->getViewMatrix());
   _activeEffect->setMatrix("projection", scene->getProjectionMatrix());
 

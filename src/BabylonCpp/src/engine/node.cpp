@@ -43,23 +43,28 @@ Node::Node(const std::string& iName, Scene* scene)
     , doNotSerialize{false}
     , _isDisposed{false}
     , _currentRenderId{-1}
+    , _worldMatrix{Matrix::Identity()}
+    , _worldMatrixDeterminant{0.f}
     , animationPropertiesOverride{this, &Node::get_animationPropertiesOverride,
                                   &Node::set_animationPropertiesOverride}
     , onDispose{this, &Node::set_onDispose}
     , behaviors{this, &Node::get_behaviors}
     , _childRenderId{-1}
     , _isEnabled{true}
+    , _isParentEnabled{true}
     , _isReady{true}
     , _parentRenderId{-1}
     , _parentNode{nullptr}
+    , _sceneRootNodesIndex{-1}
     , _animationPropertiesOverride{nullptr}
-    , _worldMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _onDisposeObserver{nullptr}
 {
   state    = "";
   _scene   = scene ? scene : Engine::LastCreatedScene();
   uniqueId = _scene->getUniqueId();
   _initCache();
+
+  addToSceneRootNodes();
 }
 
 Node::~Node()
@@ -82,6 +87,8 @@ void Node::set_parent(Node* const& parent)
     return;
   }
 
+  auto previousParentNode = _parentNode;
+
   // Remove self from list of children of parent
   if (_parentNode && !_parentNode->_children.empty()) {
     _parentNode->_children.erase(std::remove_if(_parentNode->_children.begin(),
@@ -90,6 +97,10 @@ void Node::set_parent(Node* const& parent)
                                                   return node.get() == this;
                                                 }),
                                  _parentNode->_children.end());
+
+    if (!parent) {
+      addToSceneRootNodes();
+    }
   }
 
   // Store new parent
@@ -98,12 +109,40 @@ void Node::set_parent(Node* const& parent)
   // Add as child to new parent
   if (_parentNode) {
     _parentNode->_children.emplace_back(this);
+
+    if (!previousParentNode) {
+      removeFromSceneRootNodes();
+    }
   }
+
+  // Enabled state
+  _syncParentEnabledState();
 }
 
 Node*& Node::get_parent()
 {
   return _parentNode;
+}
+
+void Node::addToSceneRootNodes()
+{
+  if (_sceneRootNodesIndex == -1) {
+    _sceneRootNodesIndex = static_cast<int>(_scene->rootNodes.size());
+    _scene->rootNodes.emplace_back(this);
+  }
+}
+
+void Node::removeFromSceneRootNodes()
+{
+  if (_sceneRootNodesIndex != -1) {
+    auto rootNodes                                       = _scene->rootNodes;
+    auto lastIdx                                         = rootNodes.size() - 1;
+    rootNodes[static_cast<size_t>(_sceneRootNodesIndex)] = rootNodes[lastIdx];
+    rootNodes[static_cast<size_t>(_sceneRootNodesIndex)]->_sceneRootNodesIndex
+      = _sceneRootNodesIndex;
+    _scene->rootNodes.pop_back();
+    _sceneRootNodesIndex = -1;
+  }
 }
 
 AnimationPropertiesOverride*& Node::get_animationPropertiesOverride()
@@ -144,7 +183,7 @@ Engine* Node::getEngine()
   return _scene->getEngine();
 }
 
-Node& Node::addBehavior(Behavior<Node>* behavior)
+Node& Node::addBehavior(Behavior<Node>* behavior, bool attachImmediately)
 {
   auto it = std::find(_behaviors.begin(), _behaviors.end(), behavior);
 
@@ -153,7 +192,8 @@ Node& Node::addBehavior(Behavior<Node>* behavior)
   }
 
   behavior->init();
-  if (_scene->isLoading()) {
+
+  if (_scene->isLoading() && !attachImmediately) {
     // We defer the attach when the scene will be loaded
     _scene->onDataLoadedObservable.addOnce(
       [this, &behavior](Scene* /*scene*/, EventState /*es*/) {
@@ -197,14 +237,22 @@ Behavior<Node>* Node::getBehaviorByName(const std::string& iName)
   return (it != _behaviors.end() ? *it : nullptr);
 }
 
-Matrix* Node::getWorldMatrix()
+Matrix& Node::getWorldMatrix()
 {
-  return _worldMatrix.get();
+  if (_currentRenderId != _scene->getRenderId()) {
+    computeWorldMatrix();
+  }
+  return _worldMatrix;
 }
 
 float Node::_getWorldMatrixDeterminant() const
 {
-  return 1.f;
+  return _worldMatrixDeterminant;
+}
+
+Matrix& Node::worldMatrixFromCache()
+{
+  return _worldMatrix;
 }
 
 void Node::_initCache()
@@ -234,50 +282,36 @@ bool Node::_isSynchronized()
 
 void Node::_markSyncedWithParent()
 {
-  if (parent()) {
-    _parentRenderId = parent()->_childRenderId;
+  if (_parentNode) {
+    _parentRenderId = _parentNode->_childRenderId;
   }
 }
 
 bool Node::isSynchronizedWithParent() const
 {
-  if (!parent()) {
+  if (!_parentNode) {
     return true;
   }
 
-  if (_parentRenderId != parent()->_childRenderId) {
+  if (_parentRenderId != _parentNode->_childRenderId) {
     return false;
   }
 
-  return parent()->isSynchronized();
+  return _parentNode->isSynchronized();
 }
 
-bool Node::isSynchronized(bool iUpdateCache)
+bool Node::isSynchronized()
 {
-  bool check = hasNewParent();
-
-  check = check ? check : !isSynchronizedWithParent();
-
-  check = check ? check : !_isSynchronized();
-
-  if (iUpdateCache) {
-    updateCache(true);
-  }
-
-  return !check;
-}
-
-bool Node::hasNewParent(bool update)
-{
-  if (_cache.parent == parent()) {
+  if (_cache.parent != _parentNode) {
+    _cache.parent = _parentNode;
     return false;
   }
 
-  if (update) {
-    _cache.parent = parent();
+  if (_parentNode && !isSynchronizedWithParent()) {
+    return false;
   }
 
-  return true;
+  return _isSynchronized();
 }
 
 bool Node::isReady(bool /*completeCheck*/, bool /*forceInstanceSupport*/)
@@ -291,20 +325,29 @@ bool Node::isEnabled(bool checkAncestors)
     return _isEnabled;
   }
 
-  if (_isEnabled == false) {
+  if (!_isEnabled) {
     return false;
   }
 
-  if (parent()) {
-    return parent()->isEnabled(checkAncestors);
-  }
+  return _isParentEnabled;
+}
 
-  return true;
+void Node::_syncParentEnabledState()
+{
+  _isParentEnabled = _parentNode ? _parentNode->isEnabled() : true;
+
+  if (!_children.empty()) {
+    for (auto& c : _children) {
+      c->_syncParentEnabledState(); // Force children to update accordingly
+    }
+  }
 }
 
 void Node::setEnabled(bool value)
 {
   _isEnabled = value;
+
+  _syncParentEnabledState();
 }
 
 bool Node::isDescendantOf(const Node* ancestor)
@@ -477,9 +520,9 @@ std::vector<AnimationRange> Node::serializeAnimationRanges()
   return serializationRanges;
 }
 
-Matrix& Node::computeWorldMatrix(bool /*force*/)
+Matrix& Node::computeWorldMatrix(bool /*force*/, bool /*useWasUpdatedFlag*/)
 {
-  return *_worldMatrix;
+  return _worldMatrix;
 }
 
 void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
@@ -498,7 +541,12 @@ void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     }
   }
 
-  parent = nullptr;
+  if (!parent()) {
+    removeFromSceneRootNodes();
+  }
+  else {
+    parent = nullptr;
+  }
 
   // Callback
   onDisposeObservable.notifyObservers(this);

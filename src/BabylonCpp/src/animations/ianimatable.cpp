@@ -5,6 +5,7 @@ namespace BABYLON {
 IAnimatable::IAnimatable()
     : parent{this, &IAnimatable::get_parent, &IAnimatable::set_parent}
     , nullNode{nullptr}
+    , _identityMatrix{Matrix::Identity()}
 {
 }
 

@@ -316,7 +316,7 @@ public:
    * @param world defines the world transformation matrix
    * @param mesh defines the mesh to bind the material to
    */
-  virtual void bind(Matrix* world, Mesh* mesh);
+  virtual void bind(Matrix& world, Mesh* mesh);
 
   /**
    * @brief Binds the submesh to the material.
@@ -324,7 +324,7 @@ public:
    * @param mesh defines the mesh containing the submesh
    * @param subMesh defines the submesh to bind the material to
    */
-  virtual void bindForSubMesh(Matrix* world, Mesh* mesh, SubMesh* subMesh);
+  virtual void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh);
 
   /**
    * @brief Binds the world matrix to the material.

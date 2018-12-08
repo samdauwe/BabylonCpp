@@ -361,11 +361,11 @@ bool Material::_preBind(Effect* effect,
   return reverse;
 }
 
-void Material::bind(Matrix* /*world*/, Mesh* /*mesh*/)
+void Material::bind(Matrix& /*world*/, Mesh* /*mesh*/)
 {
 }
 
-void Material::bindForSubMesh(Matrix* /*world*/, Mesh* /*mesh*/,
+void Material::bindForSubMesh(Matrix& /*world*/, Mesh* /*mesh*/,
                               SubMesh* /*subMesh*/)
 {
 }

@@ -66,7 +66,7 @@ void RaycastOnHeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
             Vector3(0.f, -1.f, 0.f)); // Direction
 
     Matrix worldInverse;
-    _ground->getWorldMatrix()->invertToRef(worldInverse);
+    _ground->getWorldMatrix().invertToRef(worldInverse);
 
     ray           = Ray::Transform(ray, worldInverse);
     auto pickInfo = _ground->intersects(ray);

@@ -87,7 +87,7 @@ void FreeCamera::_collideWithWorld(Vector3& displacement)
 
   if (parent()) {
     globalPosition_
-      = Vector3::TransformCoordinates(position, *parent()->getWorldMatrix());
+      = Vector3::TransformCoordinates(position, parent()->getWorldMatrix());
   }
   else {
     globalPosition_ = position;

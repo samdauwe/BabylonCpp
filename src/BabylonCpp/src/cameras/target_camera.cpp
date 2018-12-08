@@ -226,7 +226,7 @@ bool TargetCamera::_decideIfNeedsToMove()
 void TargetCamera::_updatePosition()
 {
   if (parent()) {
-    parent()->getWorldMatrix()->invertToRef(Tmp::MatrixArray[0]);
+    parent()->getWorldMatrix().invertToRef(Tmp::MatrixArray[0]);
     Vector3::TransformNormalToRef(*cameraDirection, Tmp::MatrixArray[0],
                                   Tmp::Vector3Array[0]);
     position.addInPlace(Tmp::Vector3Array[0]);
@@ -350,7 +350,7 @@ void TargetCamera::_computeViewMatrix(const Vector3& position,
                                       const Vector3& target, const Vector3& up)
 {
   if (parent()) {
-    auto parentWorldMatrix = *parent()->getWorldMatrix();
+    auto parentWorldMatrix = parent()->getWorldMatrix();
     Vector3::TransformCoordinatesToRef(position, parentWorldMatrix,
                                        _globalPosition);
     Vector3::TransformCoordinatesToRef(target, parentWorldMatrix,
@@ -379,10 +379,10 @@ void TargetCamera::_computeViewMatrix(const Vector3& position,
 CameraPtr TargetCamera::createRigCamera(const std::string& iName,
                                         int /*cameraIndex*/)
 {
-  if (cameraRigMode != Camera::RIG_MODE_NONE()) {
+  if (cameraRigMode != Camera::RIG_MODE_NONE) {
     auto rigCamera = TargetCamera::New(iName, position, getScene());
-    if (cameraRigMode == Camera::RIG_MODE_VR()
-        || cameraRigMode == Camera::RIG_MODE_WEBVR()) {
+    if (cameraRigMode == Camera::RIG_MODE_VR
+        || cameraRigMode == Camera::RIG_MODE_WEBVR) {
       if (!rotationQuaternion) {
         rotationQuaternion = std::make_unique<Quaternion>();
       }
@@ -400,20 +400,19 @@ void TargetCamera::_updateRigCameras()
   auto camRight = std::static_pointer_cast<TargetCamera>(_rigCameras[1]);
 
   switch (cameraRigMode) {
-    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH():
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL():
-    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED():
-    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER(): {
+    case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
+    case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
+    case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER: {
       // provisionnaly using _cameraRigParams.stereoHalfAngle instead of
       // calculations based on _cameraRigParams.interaxialDistance:
-      float leftSign
-        = (cameraRigMode
-           == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED()) ?
-            1.f :
-            -1.f;
+      float leftSign = (cameraRigMode
+                        == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ?
+                         1.f :
+                         -1.f;
       float rightSign
         = (cameraRigMode
-           == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED()) ?
+           == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED) ?
             -1.f :
             1.f;
       _getRigCamPosition(_cameraRigParams.stereoHalfAngle * leftSign,
@@ -424,7 +423,7 @@ void TargetCamera::_updateRigCameras()
       camLeft->setTarget(getTarget());
       camRight->setTarget(getTarget());
     } break;
-    case Camera::RIG_MODE_VR(): {
+    case Camera::RIG_MODE_VR: {
       if (camLeft->rotationQuaternion) {
         camLeft->rotationQuaternion->copyFrom(*rotationQuaternion);
         camRight->rotationQuaternion->copyFrom(*rotationQuaternion);
