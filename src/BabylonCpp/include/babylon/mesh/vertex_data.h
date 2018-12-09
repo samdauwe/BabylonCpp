@@ -565,8 +565,8 @@ public:
   static void
   _ComputeSides(unsigned int sideOrientation, Float32Array& positions,
                 Uint32Array& indices, Float32Array& normals, Float32Array& uvs,
-                const Vector4& frontUVs = Vector4(0.f, 0.f, 1.f, 1.f),
-                const Vector4& backUVs  = Vector4(0.f, 0.f, 1.f, 1.f));
+                const std::optional<Vector4>& frontUVs = std::nullopt,
+                const std::optional<Vector4>& backUVs  = std::nullopt);
 
 private:
   VertexData& _applyTo(IGetSetVerticesData& meshOrGeometry,

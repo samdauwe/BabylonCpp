@@ -3,6 +3,7 @@
 #include <babylon/samples/cameras/cameras_scene.h>
 #include <babylon/samples/cameras/follow_camera_scene.h>
 #include <babylon/samples/cameras/multi_views_scene.h>
+#include <babylon/samples/cameras/rollercoaster_scene.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -29,6 +30,12 @@ _CamerasSamplesIndex::_CamerasSamplesIndex()
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<MultiViewsScene>(iCanvas); //
                       });                                                  //
+  // Rollercoaster Scene
+  _samples["RollercoasterScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<RollercoasterScene>(iCanvas); //
+                      });                                                     //
 }
 
 _CamerasSamplesIndex::~_CamerasSamplesIndex()

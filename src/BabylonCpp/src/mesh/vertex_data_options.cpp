@@ -158,6 +158,7 @@ DiscOptions::DiscOptions()
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
+    , _arc{1.f}
 {
 }
 
@@ -473,17 +474,14 @@ PolyhedronOptions::~PolyhedronOptions()
 // Ribbon mesh options
 //------------------------------------------------------------------------------
 
-Vector4 RibbonOptions::DefaultFrontUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-Vector4 RibbonOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-
 RibbonOptions::RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
                              int offset)
     : closeArray{false}
     , closePath{false}
     , invertUV{false}
     , sideOrientation{Mesh::DEFAULTSIDE()}
-    , frontUVs{DefaultFrontUVs}
-    , backUVs{DefaultBackUVs}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
     , updatable{false}
     , instance{nullptr}
     , _pathArray{pathArray}

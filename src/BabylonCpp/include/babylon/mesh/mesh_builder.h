@@ -817,12 +817,14 @@ public:
 private:
   static MeshPtr _ExtrudeShapeGeneric(
     const std::string& name, const std::vector<Vector3>& shape,
-    const std::vector<Vector3>& curve, float scale, float rotation,
+    const std::vector<Vector3>& curve, const std::optional<float>& scale,
+    const std::optional<float>& rotation,
     const std::function<float(float i, float distance)>& scaleFunction,
     const std::function<float(float i, float distance)>& rotateFunction,
     bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
     bool updtbl, unsigned int side, MeshPtr instance, bool invertUV,
-    Vector4& frontUVs, Vector4& backUVs);
+    const std::optional<Vector4>& frontUVs,
+    const std::optional<Vector4>& backUVs);
   static unsigned int updateSideOrientation(unsigned int orientation
                                             = Mesh::FRONTSIDE());
 

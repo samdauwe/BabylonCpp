@@ -11,7 +11,9 @@
 
 ## Cameras ##
 ![cameras_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cameras_scene.png?raw=true "Cameras Scene")
+![follow_camera_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/follow_camera_scene.png?raw=true "Follow Camera Scene")
 ![multi_views_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/multi_views_scene.png?raw=true "Multi-Views Scene")
+![rollercoaster_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rollercoaster_scene.png?raw=true "Rollercoaster Scene")
 
 ## Lights ##
 ![directional_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/directional_light_scene.png?raw=true "Directional Light Scene")

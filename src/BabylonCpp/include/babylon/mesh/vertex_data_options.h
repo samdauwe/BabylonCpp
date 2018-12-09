@@ -519,11 +519,6 @@ public:
 class BABYLON_SHARED_EXPORT RibbonOptions {
 
 public:
-  /** Statics **/
-  static Vector4 DefaultFrontUVs;
-  static Vector4 DefaultBackUVs;
-
-public:
   RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
                 int offset = -1);
   ~RibbonOptions();
@@ -537,8 +532,8 @@ public:
   bool closePath;
   bool invertUV;
   unsigned int sideOrientation;
-  Vector4 frontUVs;
-  Vector4 backUVs;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
   bool updatable;
   MeshPtr instance;
   std::vector<Vector2> uvs;

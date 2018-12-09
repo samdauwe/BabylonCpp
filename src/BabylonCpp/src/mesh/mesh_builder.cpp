@@ -1022,18 +1022,20 @@ MeshPtr MeshBuilder::CreateDecal(const std::string& name,
 
 MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
   const std::string& name, const std::vector<Vector3>& shape,
-  const std::vector<Vector3>& curve, float scale, float rotation,
+  const std::vector<Vector3>& curve, const std::optional<float>& scale,
+  const std::optional<float>& rotation,
   const std::function<float(float i, float distance)>& scaleFunction,
   const std::function<float(float i, float distance)>& rotateFunction,
   bool rbCA, bool rbCP, unsigned int cap, bool custom, Scene* scene,
   bool updtbl, unsigned int side, MeshPtr instance, bool invertUV,
-  Vector4& frontUVs, Vector4& backUVs)
+  const std::optional<Vector4>& frontUVs, const std::optional<Vector4>& backUVs)
 {
   // extrusion geometry
   const auto extrusionPathArray
     = [](const std::vector<Vector3>& _shape, const std::vector<Vector3>& _curve,
          Path3D& path3D, std::vector<std::vector<Vector3>> shapePaths,
-         float _scale, float _rotation,
+         const std::optional<float>& _scale,
+         const std::optional<float>& _rotation,
          const std::function<float(float i, float distance)>& _scaleFunction,
          const std::function<float(float i, float distance)>& _rotateFunction,
          unsigned int _cap, bool _custom) {
@@ -1042,11 +1044,13 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
         const auto& binormals = path3D.getBinormals();
         const auto& distances = path3D.getDistances();
 
-        auto angle = 0.f;
-        auto returnScale
-          = [_scale](float /*i*/, float /*distance*/) { return _scale; };
-        auto returnRotation
-          = [_rotation](float /*i*/, float /*distance*/) { return _rotation; };
+        auto angle       = 0.f;
+        auto returnScale = [_scale](float /*i*/, float /*distance*/) {
+          return _scale.has_value() ? *_scale : 1.f;
+        };
+        auto returnRotation = [_rotation](float /*i*/, float /*distance*/) {
+          return _rotation.has_value() ? *_rotation : 0.f;
+        };
         auto rotate = _custom ? _rotateFunction : returnRotation;
         auto scl    = _custom ? _scaleFunction : returnScale;
         unsigned int index

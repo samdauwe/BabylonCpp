@@ -2931,7 +2931,8 @@ void VertexData::ComputeNormals(const Float32Array& positions,
 void VertexData::_ComputeSides(unsigned int sideOrientation,
                                Float32Array& positions, Uint32Array& indices,
                                Float32Array& normals, Float32Array& uvs,
-                               const Vector4& frontUVs, const Vector4& backUVs)
+                               const std::optional<Vector4>& iFrontUVs,
+                               const std::optional<Vector4>& iBackUVs)
 {
   size_t li = indices.size();
   size_t ln = normals.size();
@@ -2978,6 +2979,10 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
       for (std::size_t u = 0; u < lu; ++u) {
         uvs[u + lu] = uvs[u];
       }
+      auto frontUVs
+        = iFrontUVs.has_value() ? *iFrontUVs : Vector4(0.f, 0.f, 1.f, 1.f);
+      auto backUVs
+        = iBackUVs.has_value() ? *iBackUVs : Vector4(0.f, 0.f, 1.f, 1.f);
       for (std::size_t u = 0, i = 0; i < lu / 2; ++i) {
         uvs[u]          = frontUVs.x + (frontUVs.z - frontUVs.x) * uvs[u];
         uvs[u + 1]      = frontUVs.y + (frontUVs.w - frontUVs.y) * uvs[u + 1];
