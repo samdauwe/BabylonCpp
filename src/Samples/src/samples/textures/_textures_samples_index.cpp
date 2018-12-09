@@ -11,6 +11,8 @@
 #include <babylon/samples/textures/mirrors_scene.h>
 #include <babylon/samples/textures/procedural_textures_scene.h>
 #include <babylon/samples/textures/render_target_texture_scene.h>
+#include <babylon/samples/textures/sphere_textures_scene.h>
+#include <babylon/samples/textures/sphere_transparent_textures_scene.h>
 #include <babylon/samples/textures/spherical_reflection_texture_scene.h>
 
 namespace BABYLON {
@@ -87,6 +89,18 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     [](ICanvas* iCanvas) {                                        //
       return std::make_unique<RenderTargetTextureScene>(iCanvas); //
     });                                                           //
+  // Sphere Textures Scene
+  _samples["SphereTexturesScene"] = std::make_tuple(
+    true,                                                    //
+    [](ICanvas* iCanvas) {                                   //
+      return std::make_unique<SphereTexturesScene>(iCanvas); //
+    });                                                      //
+  // Sphere Transparent Textures Scene
+  _samples["SphereTransparentTexturesScene"] = std::make_tuple(
+    true,                                                               //
+    [](ICanvas* iCanvas) {                                              //
+      return std::make_unique<SphereTransparentTexturesScene>(iCanvas); //
+    });                                                                 //
   // Spherical Reflection Texture Scene
   _samples["SphericalReflectionTextureScene"] = std::make_tuple(
     true,                                                                //

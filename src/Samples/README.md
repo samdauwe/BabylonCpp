@@ -155,6 +155,8 @@
 ![hdr_cube_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/hdr_cube_texture_scene.png?raw=true "High Dynamic Range (HDR) Cube Texture Scene")
 ![image_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/image_texture_scene.png?raw=true "Image Texture Scene")
 ![render_target_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/render_target_texture_scene.png?raw=true "Render Target Texture Scene")
+![sphere_textures_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/sphere_textures_scene.png?raw=true "Sphere Textures Scene")
+![sphere_transparent_textures_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/sphere_transparent_textures_scene.png?raw=true "Sphere Transparent Textures Scene")
 
 ## Extensions ##
 
