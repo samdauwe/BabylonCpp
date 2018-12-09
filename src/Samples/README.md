@@ -18,6 +18,7 @@
 ## Lights ##
 ![directional_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/directional_light_scene.png?raw=true "Directional Light Scene")
 ![hemispheric_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/hemispheric_light_scene.png?raw=true "Hemispheric Light Scene")
+![intersecting_lights_colors_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/intersecting_lights_colors_scene.png?raw=true "Intersecting Lights Colors Scene")
 ![light_projected_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/light_projected_texture_scene.png?raw=true "Light Projected Texture Scene")
 ![lights_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lights_scene.png?raw=true "Lights Scene")
 ![point_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/point_light_scene.png?raw=true "Point Light Scene")
