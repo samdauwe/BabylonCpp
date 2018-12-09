@@ -10,7 +10,11 @@ class UniversalCamera;
 using UniversalCameraPtr = std::shared_ptr<UniversalCamera>;
 
 /**
- * @brief We're mainly based on the logic defined into the FreeCamera code.
+ * @brief The Universal Camera is the one to choose for first person shooter
+ * type games, and works with all the keyboard, mouse, touch and gamepads. This
+ * replaces the earlier Free Camera, which still works and will still be found
+ * in many Playgrounds.
+ * @see http://doc.babylonjs.com/features/cameras#universal-camera
  */
 class BABYLON_SHARED_EXPORT UniversalCamera : public TouchCamera {
 
@@ -26,9 +30,23 @@ public:
   }
   ~UniversalCamera() override;
 
+  /**
+   * @brief Gets the current object class name.
+   * @return the class name
+   */
   const std::string getClassName() const override;
 
 protected:
+  /**
+   * @brief The Universal Camera is the one to choose for first person shooter
+   * type games, and works with all the keyboard, mouse, touch and gamepads.
+   * This replaces the earlier Free Camera, which still works and will still be
+   * found in many Playgrounds.
+   * @see http://doc.babylonjs.com/features/cameras#universal-camera
+   * @param name Define the name of the camera in the scene
+   * @param position Define the start position of the camera in the scene
+   * @param scene Define the scene the camera belongs to
+   */
   UniversalCamera(const std::string& name, const Vector3& position,
                   Scene* scene);
 
@@ -39,10 +57,19 @@ protected:
   void set_gamepadMoveSensibility(float value);
 
 public:
-  //-- Begin properties for backward compatibility for inputs
+  /**
+   * Defines the gamepad rotation sensiblity.
+   * This is the threshold from when rotation starts to be accounted for to
+   * prevent jittering.
+   */
   Property<UniversalCamera, float> gamepadAngularSensibility;
+
+  /**
+   * Defines the gamepad move sensiblity.
+   * This is the threshold from when moving starts to be accounted for for to
+   * prevent jittering.
+   */
   Property<UniversalCamera, float> gamepadMoveSensibility;
-  //-- end properties for backward compatibility for inputs
 
 }; // end of class UniversalCamera
 

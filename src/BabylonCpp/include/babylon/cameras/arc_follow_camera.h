@@ -10,6 +10,11 @@ namespace BABYLON {
 class ArcFollowCamera;
 using ArcFollowCameraPtr = std::shared_ptr<ArcFollowCamera>;
 
+/**
+ * @brief Arc Rotate version of the follow camera.
+ * It still follows a Defined mesh but in an Arc Rotate Camera fashion.
+ * @see http://doc.babylonjs.com/features/cameras#follow-camera
+ */
 class BABYLON_SHARED_EXPORT ArcFollowCamera : public TargetCamera {
 
 public:
@@ -29,21 +34,56 @@ public:
 
   virtual IReflect::Type type() const override;
 
-  /** Hidden */
+  /**
+   * @brief Hidden
+   */
   void _checkInputs() override;
+
+  /**
+   * @brief Returns the class name of the object.
+   * It is mostly used internally for serialization purposes.
+   */
   const std::string getClassName() const override;
 
 protected:
+  /**
+   * @brief Instantiates a new ArcFollowCamera.
+   * @see http://doc.babylonjs.com/features/cameras#follow-camera
+   * @param name Define the name of the camera
+   * @param alpha Define the rotation angle of the camera around the logitudinal
+   * axis
+   * @param beta Define the rotation angle of the camera around the elevation
+   * axis
+   * @param radius Define the radius of the camera from its target point
+   * @param target Define the target of the camera
+   * @param scene Define the scene the camera belongs to
+   */
   ArcFollowCamera(const std::string& name, float alpha, float beta,
                   float radius, AbstractMesh* target, Scene* scene);
 
 private:
-  void follow();
+  void _follow();
 
 public:
+  /**
+   * The longitudinal angle of the camera
+   */
+
   float alpha;
+  /**
+   * The latitudinal angle of the camera
+   */
+
   float beta;
+  /**
+   * The radius of the camera from its target
+   */
+
   float radius;
+
+  /**
+   * Define the camera target (the messh it should follow)
+   */
   AbstractMesh* target;
 
 private:

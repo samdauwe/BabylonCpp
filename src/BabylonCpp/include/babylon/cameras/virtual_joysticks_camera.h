@@ -10,7 +10,11 @@ class VirtualJoysticksCamera;
 using VirtualJoysticksCameraPtr = std::shared_ptr<VirtualJoysticksCamera>;
 
 /**
- * @brief We're mainly based on the logic defined into the FreeCamera code.
+ * @brief This represents a free type of camera. It can be usefull in First
+ * Person Shooter game for instance. It is identical to the Free Camera and
+ * simply adds by default a virtual joystick. Virtual Joysticks are on-screen 2D
+ * graphics that are used to control the camera or other scene items.
+ * @see http://doc.babylonjs.com/features/cameras#virtual-joysticks-camera
  */
 class BABYLON_SHARED_EXPORT VirtualJoysticksCamera : public FreeCamera {
 
@@ -29,9 +33,23 @@ public:
   }
   ~VirtualJoysticksCamera() override;
 
+  /**
+   * @brief Gets the current object class name.
+   * @return the class name
+   */
   const std::string getClassName() const override;
 
 protected:
+  /**
+   * @brief Intantiates a VirtualJoysticksCamera. It can be usefull in First
+   * Person Shooter game for instance. It is identical to the Free Camera and
+   * simply adds by default a virtual joystick. Virtual Joysticks are on-screen
+   * 2D graphics that are used to control the camera or other scene items.
+   * @see http://doc.babylonjs.com/features/cameras#virtual-joysticks-camera
+   * @param name Define the name of the camera in the scene
+   * @param position Define the start position of the camera in the scene
+   * @param scene Define the scene the camera belongs to
+   */
   VirtualJoysticksCamera(const std::string& name, const Vector3& position,
                          Scene* scene);
 

@@ -17,75 +17,10 @@ void GamepadCamera::AddNodeConstructor()
   GamepadCamera::NodeConstructorAdded = true;
 }
 
-//-- Begin properties for backward compatibility for inputs
-
-float GamepadCamera::get_gamepadAngularSensibility() const
-{
-  auto& inputsAttached = inputs->attached();
-  if (stl_util::contains(inputsAttached, "gamepad")
-      && inputsAttached["gamepad"]) {
-    auto gamepad
-      = static_cast<FreeCameraGamepadInput*>(inputsAttached["gamepad"].get());
-    if (gamepad) {
-      return gamepad->gamepadAngularSensibility;
-    }
-  }
-
-  return 0.f;
-}
-
-void GamepadCamera::set_gamepadAngularSensibility(float value)
-{
-  auto& inputsAttached = inputs->attached();
-  if (stl_util::contains(inputsAttached, "gamepad")
-      && inputsAttached["gamepad"]) {
-    auto gamepad
-      = static_cast<FreeCameraGamepadInput*>(inputsAttached["gamepad"].get());
-    if (gamepad) {
-      gamepad->gamepadAngularSensibility = value;
-    }
-  }
-}
-
-float GamepadCamera::get_gamepadMoveSensibility() const
-{
-  auto& inputsAttached = inputs->attached();
-  if (stl_util::contains(inputsAttached, "gamepad")
-      && inputsAttached["gamepad"]) {
-    auto gamepad
-      = static_cast<FreeCameraGamepadInput*>(inputsAttached["gamepad"].get());
-    if (gamepad) {
-      return gamepad->gamepadMoveSensibility;
-    }
-  }
-
-  return 0.f;
-}
-
-void GamepadCamera::set_gamepadMoveSensibility(float value)
-{
-  auto& inputsAttached = inputs->attached();
-  if (stl_util::contains(inputsAttached, "gamepad")
-      && inputsAttached["gamepad"]) {
-    auto gamepad
-      = static_cast<FreeCameraGamepadInput*>(inputsAttached["gamepad"].get());
-    if (gamepad) {
-      gamepad->gamepadMoveSensibility = value;
-    }
-  }
-}
-
-//-- end properties for backward compatibility for inputs
-
 GamepadCamera::GamepadCamera::GamepadCamera(const std::string& name,
                                             const Vector3& position,
                                             Scene* scene)
     : UniversalCamera{name, position, scene}
-    , gamepadAngularSensibility{this,
-                                &GamepadCamera::get_gamepadAngularSensibility,
-                                &GamepadCamera::set_gamepadAngularSensibility}
-    , gamepadMoveSensibility{this, &GamepadCamera::get_gamepadMoveSensibility,
-                             &GamepadCamera::set_gamepadMoveSensibility}
 {
 }
 

@@ -9,21 +9,41 @@ namespace BABYLON {
 class ArcRotateCamera;
 
 /**
- * @brief Interface representing an arc rotate camera inputs manager.
+ * @brief Default Inputs manager for the ArcRotateCamera.
+ * It groups all the default supported inputs for ease of use.
+ * @see http://doc.babylonjs.com/how_to/customizing_camera_inputs
  */
 struct BABYLON_SHARED_EXPORT ArcRotateCameraInputsManager
     : public CameraInputsManager<ArcRotateCamera> {
 
+  /**
+   * @brief Instantiates a new ArcRotateCameraInputsManager.
+   * @param camera Defines the camera the inputs belong to
+   */
   ArcRotateCameraInputsManager(ArcRotateCamera* camera);
   ~ArcRotateCameraInputsManager();
 
+  /**
+   * @brief Add mouse wheel input support to the input manager.
+   * @returns the current input manager
+   */
   ArcRotateCameraInputsManager& addMouseWheel();
+
+  /**
+   * @brief Add pointers input support to the input manager.
+   * @returns the current input manager
+   */
   ArcRotateCameraInputsManager& addPointers();
+
+  /**
+   * @brief Add keyboard input support to the input manager.
+   * @returns the current input manager
+   */
   ArcRotateCameraInputsManager& addKeyboard();
 
   /**
-   * @brief Adds gamepad input support to the ArcRotateCamera InputManager.
-   * @returns the camera inputs manager
+   * @brief Adds gamepad input support to the input manager.
+   * @returns the current input manager
    */
   ArcRotateCameraInputsManager& addGamepad();
 

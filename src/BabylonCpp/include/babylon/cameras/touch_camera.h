@@ -10,7 +10,9 @@ class TouchCamera;
 using TouchCameraPtr = std::shared_ptr<TouchCamera>;
 
 /**
- * @brief We're mainly based on the logic defined into the FreeCamera code.
+ * @brief This represents a FPS type of camera controlled by touch.
+ * This is like a universal camera minus the Gamepad controls.
+ * @see http://doc.babylonjs.com/features/cameras#universal-camera
  */
 class BABYLON_SHARED_EXPORT TouchCamera : public FreeCamera {
 
@@ -29,11 +31,27 @@ public:
   }
   ~TouchCamera() override;
 
+  /**
+   * @brief Gets the current object class name.
+   * @return the class name
+   */
   const std::string getClassName() const override;
-  /** Hidden */
+
+  /**
+   * @brief Hidden
+   */
   void _setupInputs() override;
 
 protected:
+  /**
+   * @brief Instantiates a new touch camera.
+   * This represents a FPS type of camera controlled by touch.
+   * This is like a universal camera minus the Gamepad controls.
+   * @see http://doc.babylonjs.com/features/cameras#universal-camera
+   * @param name Define the name of the camera in the scene
+   * @param position Define the start position of the camera in the scene
+   * @param scene Define the scene the camera belongs to
+   */
   TouchCamera(const std::string& name, const Vector3& position, Scene* scene);
 
   float get_touchAngularSensibility() const;
@@ -43,10 +61,17 @@ protected:
   void set_touchMoveSensibility(float value);
 
 public:
-  //-- Begin properties for backward compatibility for inputs
+  /**
+   * Defines the touch sensibility for rotation.
+   * The higher the faster.
+   */
   Property<TouchCamera, float> touchAngularSensibility;
+
+  /**
+   * Defines the touch sensibility for move.
+   * The higher the faster.
+   */
   Property<TouchCamera, float> touchMoveSensibility;
-  //-- end properties for backward compatibility for inputs
 
 private:
   static bool NodeConstructorAdded;

@@ -28,7 +28,7 @@ ArcFollowCamera::ArcFollowCamera(const std::string& iName, float iAlpha,
     , target{iTarget}
     , _cartesianCoordinates{Vector3::Zero()}
 {
-  follow();
+  _follow();
 }
 
 ArcFollowCamera::~ArcFollowCamera()
@@ -40,7 +40,7 @@ IReflect::Type ArcFollowCamera::type() const
   return IReflect::Type::ARCFOLLOWCAMERA;
 }
 
-void ArcFollowCamera::follow()
+void ArcFollowCamera::_follow()
 {
   if (!target) {
     return;
@@ -58,7 +58,7 @@ void ArcFollowCamera::follow()
 void ArcFollowCamera::_checkInputs()
 {
   TargetCamera::_checkInputs();
-  follow();
+  _follow();
 }
 
 const std::string ArcFollowCamera::getClassName() const

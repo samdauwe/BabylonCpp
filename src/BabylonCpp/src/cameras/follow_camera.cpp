@@ -1,6 +1,7 @@
 #include <babylon/cameras/follow_camera.h>
 
 #include <babylon/mesh/abstract_mesh.h>
+#include <babylon/tools/tools.h>
 
 namespace BABYLON {
 
@@ -37,12 +38,7 @@ IReflect::Type FollowCamera::type() const
   return IReflect::Type::FOLLOWCAMERA;
 }
 
-float FollowCamera::getRadians(float degrees) const
-{
-  return degrees * Math::PI / 180.f;
-}
-
-void FollowCamera::follow(const AbstractMeshPtr& cameraTarget)
+void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
 {
   if (!cameraTarget) {
     return;
@@ -57,7 +53,7 @@ void FollowCamera::follow(const AbstractMeshPtr& cameraTarget)
   else {
     yRotation = cameraTarget->rotation().y;
   }
-  float radians       = getRadians(rotationOffset) + yRotation;
+  float radians       = Tools::ToRadians(rotationOffset) + yRotation;
   auto targetPosition = cameraTarget->getAbsolutePosition();
   float targetX       = targetPosition.x + std::sin(radians) * radius;
   float targetZ       = targetPosition.z + std::cos(radians) * radius;
@@ -89,7 +85,7 @@ void FollowCamera::_checkInputs()
 {
   TargetCamera::_checkInputs();
   if (lockedTarget) {
-    follow(lockedTarget);
+    _follow(lockedTarget);
   }
 }
 

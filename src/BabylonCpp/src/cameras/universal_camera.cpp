@@ -9,7 +9,7 @@ namespace BABYLON {
 
 float UniversalCamera::get_gamepadAngularSensibility() const
 {
-  auto& inputsAttached = inputs->attached();
+  auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "gamepad")
       && inputsAttached["gamepad"]) {
     auto gamepad
@@ -24,7 +24,7 @@ float UniversalCamera::get_gamepadAngularSensibility() const
 
 void UniversalCamera::set_gamepadAngularSensibility(float value)
 {
-  auto& inputsAttached = inputs->attached();
+  auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "gamepad")
       && inputsAttached["gamepad"]) {
     auto gamepad
@@ -37,7 +37,7 @@ void UniversalCamera::set_gamepadAngularSensibility(float value)
 
 float UniversalCamera::get_gamepadMoveSensibility() const
 {
-  auto& inputsAttached = inputs->attached();
+  auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "gamepad")
       && inputsAttached["gamepad"]) {
     auto gamepad
@@ -52,7 +52,7 @@ float UniversalCamera::get_gamepadMoveSensibility() const
 
 void UniversalCamera::set_gamepadMoveSensibility(float value)
 {
-  auto& inputsAttached = inputs->attached();
+  auto& inputsAttached = inputs->attached;
   if (stl_util::contains(inputsAttached, "gamepad")
       && inputsAttached["gamepad"]) {
     auto gamepad

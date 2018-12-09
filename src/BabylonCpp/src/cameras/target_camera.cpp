@@ -32,6 +32,7 @@ TargetCamera::TargetCamera(const std::string& iName, const Vector3& iPosition,
     , _globalCurrentUpVector{Vector3::Zero()}
     , _defaultUp{Vector3::Up()}
     , _cachedRotationZ{0.f}
+    , _cachedQuaternionRotationZ{0.f}
 {
   _initCache();
 }
@@ -329,8 +330,14 @@ Matrix TargetCamera::_getViewMatrix()
   // Compute
   _updateCameraRotationMatrix();
 
-  // Apply the changed rotation to the upVector.
-  if (!stl_util::almost_equal(_cachedRotationZ, rotation->z)) {
+  // Apply the changed rotation to the upVector
+  if (rotationQuaternion
+      && !stl_util::almost_equal(_cachedQuaternionRotationZ,
+                                 rotationQuaternion->z)) {
+    _rotateUpVectorWithCameraRotationMatrix();
+    _cachedQuaternionRotationZ = rotationQuaternion->z;
+  }
+  else if (!stl_util::almost_equal(_cachedRotationZ, rotation->z)) {
     _rotateUpVectorWithCameraRotationMatrix();
     _cachedRotationZ = rotation->z;
   }

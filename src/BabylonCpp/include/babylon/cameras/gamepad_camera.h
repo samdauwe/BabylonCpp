@@ -10,7 +10,9 @@ class GamepadCamera;
 using GamepadCameraPtr = std::shared_ptr<GamepadCamera>;
 
 /**
- * @brief We're mainly based on the logic defined into the FreeCamera code.
+ * @brief This represents a FPS type of camera. This is only here for back
+ * compat purpose. Please use the UniversalCamera instead as both are identical.
+ * @see http://doc.babylonjs.com/features/cameras#universal-camera
  */
 class BABYLON_SHARED_EXPORT GamepadCamera : public UniversalCamera {
 
@@ -29,22 +31,23 @@ public:
   }
   ~GamepadCamera() override;
 
+  /**
+   * @brief Gets the current object class name.
+   * @return the class name
+   */
   const std::string getClassName() const override;
 
 protected:
+  /**
+   * @brief Instantiates a new Gamepad Camera.
+   * This represents a FPS type of camera. This is only here for back compat
+   * purpose. Please use the UniversalCamera instead as both are identical.
+   * @see http://doc.babylonjs.com/features/cameras#universal-camera
+   * @param name Define the name of the camera in the scene
+   * @param position Define the start position of the camera in the scene
+   * @param scene Define the scene the camera belongs to
+   */
   GamepadCamera(const std::string& name, const Vector3& position, Scene* scene);
-
-  float get_gamepadAngularSensibility() const;
-  void set_gamepadAngularSensibility(float value);
-
-  float get_gamepadMoveSensibility() const;
-  void set_gamepadMoveSensibility(float value);
-
-public:
-  //-- Begin properties for backward compatibility for inputs
-  Property<GamepadCamera, float> gamepadAngularSensibility;
-  Property<GamepadCamera, float> gamepadMoveSensibility;
-  //-- end properties for backward compatibility for inputs
 
 private:
   static bool NodeConstructorAdded;
