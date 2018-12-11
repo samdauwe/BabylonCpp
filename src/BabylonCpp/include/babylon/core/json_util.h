@@ -8,7 +8,7 @@ using json = nlohmann::json;
 namespace BABYLON {
 namespace json_util {
 
-inline json has_key(const json& o, const std::string& key)
+inline bool has_key(const json& o, const std::string& key)
 {
   return (o.find(key) != o.end());
 }
