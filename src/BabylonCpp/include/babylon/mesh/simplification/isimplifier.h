@@ -7,12 +7,13 @@ namespace BABYLON {
 
 /**
  * @brief A simplifier interface for future simplification implementations.
+ * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 class BABYLON_SHARED_EXPORT ISimplifier {
 
 public:
   /**
-   * Simplification of a given mesh according to the given settings.
+   * @brief Simplification of a given mesh according to the given settings.
    * Since this requires computation, it is assumed that the function runs
    * async.
    * @param settings The settings of the simplification, including quality and

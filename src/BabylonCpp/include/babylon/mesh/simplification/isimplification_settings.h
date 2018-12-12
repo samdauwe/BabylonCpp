@@ -7,11 +7,21 @@ namespace BABYLON {
 
 /**
  * @brief Expected simplification settings.
- * Quality should be between 0 and 1 (1 being 100%, 0 being 0%);
+ * Quality should be between 0 and 1 (1 being 100%, 0 being 0%)
+ * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 struct BABYLON_SHARED_EXPORT ISimplificationSettings {
+  /**
+   * Gets or sets the expected quality
+   */
   float quality;
+  /**
+   * Gets or sets the distance when this optimized version should be used
+   */
   float distance;
+  /**
+   * Gets an already optimized mesh
+   */
   bool optimizeMesh;
 }; // end of class ISimplificationSettings
 

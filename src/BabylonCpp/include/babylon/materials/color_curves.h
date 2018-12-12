@@ -35,7 +35,8 @@ public:
   ~ColorCurves();
 
   /**
-   * @brief Returns the string "ColorCurves".
+   * @brief Returns the class name.
+   * @returns The class name
    */
   const std::string getClassName() const;
 
@@ -56,6 +57,9 @@ public:
    * @brief Binds the color curves to the shader.
    * @param colorCurves The color curve to bind
    * @param effect The effect to bind to
+   * @param positiveUniform The positive uniform shader parameter
+   * @param neutralUniform The neutral uniform shader parameter
+   * @param negativeUniform The negative uniform shader parameter
    */
   static void
   Bind(ColorCurves& colorCurves, Effect* effect,

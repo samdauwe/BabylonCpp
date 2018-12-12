@@ -7,12 +7,19 @@
 namespace BABYLON {
 
 /**
- * @brief
+ * @brief Class used to specify simplification options.
+ * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 class BABYLON_SHARED_EXPORT SimplificationSettings
     : public ISimplificationSettings {
 
 public:
+  /**
+   * @brief Creates a SimplificationSettings.
+   * @param quality expected quality
+   * @param distance distance when this optimized version should be used
+   * @param optimizeMesh already optimized mesh
+   */
   SimplificationSettings(float quality, float distance, bool optimizeMesh);
   ~SimplificationSettings();
 

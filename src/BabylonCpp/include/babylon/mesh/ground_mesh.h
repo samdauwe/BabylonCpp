@@ -16,7 +16,7 @@ struct Quad {
 }; // end of struct Quad
 
 /**
- * @brief
+ * @brief Mesh representing the ground.
  */
 class BABYLON_SHARED_EXPORT GroundMesh : public Mesh {
 
@@ -33,52 +33,74 @@ public:
   ~GroundMesh() override;
 
   /**
-   * @brief Returns the string "GroundMesh"
+   * @brief "GroundMesh"
+   * @returns "GroundMesh"
    */
   const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
+  /**
+   * @brief This function will update an octree to help to select the right
+   * submeshes for rendering, picking and collision computations. Please note
+   * that you must have a decent number of submeshes to get performance
+   * improvements when using an octree
+   * @param chunksCount the number of subdivisions for x and y
+   * @param octreeBlocksSize (Default: 32)
+   */
   void optimize(size_t chunksCount, size_t octreeBlocksSize = 32);
 
   /**
    * @brief Returns a height (y) value in the Worl system :
    * the ground altitude at the coordinates (x, z) expressed in the World
    * system.
-   * Returns the ground y position if (x, z) are outside the ground
-   * surface.
+   * @param x x coordinate
+   * @param z z coordinate
+   * @returns the ground y position if (x, z) are outside the ground surface.
    */
   float getHeightAtCoordinates(float x, float z);
 
   /**
    * @brief Returns a normalized vector (Vector3) orthogonal to the ground
    * at the ground coordinates (x, z) expressed in the World system.
-   * Returns Vector3(0, 1, 0) if (x, z) are outside the ground surface.
-   * Not pertinent if the ground is rotated.
+   * @param x x coordinate
+   * @param z z coordinate
+   * @returns Vector3(0.0, 1.0, 0.0) if (x, z) are outside the ground surface.
    */
   Vector3 getNormalAtCoordinates(float x, float z);
 
   /**
    * @brief Updates the Vector3 passed a reference with a normalized vector
-   * orthogonal to the ground
-   * at the ground coordinates (x, z) expressed in the World system.
-   * Doesn't uptade the reference Vector3 if (x, z) are outside the ground
-   * surface.
-   * @returns The GroundMesh.
+   * orthogonal to the ground at the ground coordinates (x, z) expressed in the
+   * World system. Doesn't uptade the reference Vector3 if (x, z) are outside
+   * the ground surface.
+   * @param x x coordinate
+   * @param z z coordinate
+   * @param ref vector to store the result
+   * @returns the GroundMesh.
    */
   GroundMesh& getNormalAtCoordinatesToRef(float x, float z, Vector3& ref);
 
   /**
    * @brief Force the heights to be recomputed for getHeightAtCoordinates() or
-   * getNormalAtCoordinates()
-   * if the ground has been updated.
-   * This can be used in the render loop
-   * @returns The GroundMesh.
+   * getNormalAtCoordinates() if the ground has been updated. This can be used
+   * in the render loop.
+   * @returns the GroundMesh.
    */
   GroundMesh& updateCoordinateHeights();
 
+  /**
+   * @brief Serializes this ground mesh.
+   * @param serializationObject object to write serialization to
+   */
   json serialize(json& serializationObject) const;
 
+  /**
+   * @brief Parses a serialized ground mesh.
+   * @param parsedMesh the serialized mesh
+   * @param scene the scene to create the ground mesh in
+   * @returns the created ground mesh
+   */
   static GroundMeshPtr Parse(const json& parsedMesh, Scene* scene);
 
 private:
@@ -126,6 +148,7 @@ protected:
   GroundMesh(const std::string& name, Scene* scene);
 
 public:
+  /** If octree should be generated */
   bool generateOctree;
   /** Hidden */
   size_t _subdivisionsX;
@@ -144,8 +167,19 @@ public:
   /** Hidden */
   float _maxZ;
 
+  /**
+   * The minimum of x and y subdivisions
+   */
   ReadOnlyProperty<GroundMesh, size_t> subdivisions;
+
+  /**
+   * X subdivisions
+   */
   ReadOnlyProperty<GroundMesh, size_t> subdivisionsX;
+
+  /**
+   * Y subdivisions
+   */
   ReadOnlyProperty<GroundMesh, size_t> subdivisionsY;
 
 private:

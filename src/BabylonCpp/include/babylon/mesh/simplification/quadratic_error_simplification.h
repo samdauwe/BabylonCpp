@@ -13,6 +13,7 @@ namespace BABYLON {
  * http://voxels.blogspot.de/2014/05/quadric-mesh-simplification-with-source.html
  * to babylon JS
  * @author RaananW
+ * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 class BABYLON_SHARED_EXPORT QuadraticErrorSimplification : public ISimplifier {
 

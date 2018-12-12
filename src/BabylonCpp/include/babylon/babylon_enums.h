@@ -126,6 +126,7 @@ enum class Orientation {
 /**
  * @brief The implemented types of simplification.
  * At the moment only Quadratic Error Decimation is implemented
+ * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 enum class SimplificationType {
   /** Quadratic error decimation */

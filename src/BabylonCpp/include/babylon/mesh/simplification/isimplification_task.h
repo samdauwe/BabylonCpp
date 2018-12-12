@@ -13,13 +13,28 @@ namespace BABYLON {
 class Mesh;
 
 /**
- * @brief
+ * @brief Interface used to define a simplification task.
  */
 struct BABYLON_SHARED_EXPORT ISimplificationTask {
+  /**
+   * Array of settings
+   */
   std::vector<ISimplificationSettings> settings;
+  /**
+   * Simplification type
+   */
   SimplificationType simplificationType;
+  /**
+   * Mesh to simplify
+   */
   Mesh* mesh;
+  /**
+   * Callback called on success
+   */
   std::function<void()> successCallback;
+  /**
+   * Defines if parallel processing can be used
+   */
   bool parallelProcessing;
 }; // end of class ISimplificationTask
 

@@ -11,22 +11,42 @@ namespace BABYLON {
 class ISimplifier;
 
 /**
- * @brief
+ * @brief Queue used to order the simplification tasks.
+ * @see http://doc.babylonjs.com/how_to/in-browser_mesh_simplification
  */
 class BABYLON_SHARED_EXPORT SimplificationQueue {
 
 public:
+  /**
+   * @brief Creates a new queue.
+   */
   SimplificationQueue();
   ~SimplificationQueue();
 
+  /**
+   * @brief Adds a new simplification task.
+   * @param task defines a task to add
+   */
   void addTask(const ISimplificationTask& task);
+
+  /**
+   * @brief Execute next task.
+   */
   void executeNext();
+
+  /**
+   * @brief Execute a simplification task.
+   * @param task defines the task to run
+   */
   void runSimplification(const ISimplificationTask& task);
 
 private:
   ISimplifier* getSimplifier(const ISimplificationTask& task);
 
 public:
+  /**
+   * Gets a boolean indicating that the process is still running
+   */
   bool running;
 
 private:
