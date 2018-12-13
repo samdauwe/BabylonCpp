@@ -563,6 +563,17 @@ void MaterialHelper::PrepareAttributesForInstances(
   }
 }
 
+void MaterialHelper::PrepareAttributesForInstances(
+  std::vector<std::string>& attribs, std::vector<std::string>& defines)
+{
+  if (stl_util::contains(defines, "INSTANCES")) {
+    attribs.emplace_back(VertexBuffer::World0KindChars);
+    attribs.emplace_back(VertexBuffer::World1KindChars);
+    attribs.emplace_back(VertexBuffer::World2KindChars);
+    attribs.emplace_back(VertexBuffer::World3KindChars);
+  }
+}
+
 void MaterialHelper::BindLightShadow(Light& light, Scene* /*scene*/,
                                      AbstractMesh& mesh,
                                      unsigned int lightIndex, Effect* effect)

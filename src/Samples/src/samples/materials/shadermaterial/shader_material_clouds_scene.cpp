@@ -52,7 +52,7 @@ void ShaderMaterialCloudsScene::initializeScene(ICanvas* /*canvas*/,
   _camera->maxZ = 3000.f;
 
   // Create shader material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.needAlphaBlending = true;
   shaderMaterialOptions.attributes        = {"position", "uv"};
   shaderMaterialOptions.uniforms          = {"worldViewProjection"};

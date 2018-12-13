@@ -648,7 +648,7 @@ void Effect::_rebuildProgram(
   };
   this->onCompiled = [&](Effect* /*effect*/) {
     for (auto& scene : getEngine()->scenes) {
-      scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+      scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
     }
 
     if (onCompiled) {

@@ -58,31 +58,6 @@ private:
    */
   static constexpr unsigned int _CounterClockWiseSideOrientation = 1;
 
-  /**
-   * The dirty texture flag value
-   */
-  static constexpr unsigned int _TextureDirtyFlag = 1;
-
-  /**
-   * The dirty light flag value
-   */
-  static constexpr unsigned int _LightDirtyFlag = 2;
-
-  /**
-   * The dirty fresnel flag value
-   */
-  static constexpr unsigned int _FresnelDirtyFlag = 4;
-
-  /**
-   * The dirty attribute flag value
-   */
-  static constexpr unsigned int _AttributesDirtyFlag = 8;
-
-  /**
-   * The dirty misc flag value
-   */
-  static constexpr unsigned int _MiscDirtyFlag = 16;
-
 public:
   /**
    * @brief Returns the triangle fill mode.
@@ -173,44 +148,34 @@ public:
   }
 
   /**
-   * @brief Returns the dirty texture flag value.
+   * The dirty texture flag value
    */
-  static constexpr unsigned int TextureDirtyFlag()
-  {
-    return Material::_TextureDirtyFlag;
-  }
+  static constexpr unsigned int TextureDirtyFlag = 1;
 
   /**
-   * @brief Returns the dirty light flag value.
+   * The dirty light flag value
    */
-  static constexpr unsigned int LightDirtyFlag()
-  {
-    return Material::_LightDirtyFlag;
-  }
+  static constexpr unsigned int LightDirtyFlag = 2;
 
   /**
-   * @brief Returns the dirty fresnel flag value.
+   * The dirty fresnel flag value
    */
-  static constexpr unsigned int FresnelDirtyFlag()
-  {
-    return Material::_FresnelDirtyFlag;
-  }
+  static constexpr unsigned int FresnelDirtyFlag = 4;
 
   /**
-   * @brief Returns the dirty attributes flag value.
+   * The dirty attribute flag value
    */
-  static constexpr unsigned int AttributesDirtyFlag()
-  {
-    return Material::_AttributesDirtyFlag;
-  }
+  static constexpr unsigned int AttributesDirtyFlag = 8;
 
   /**
-   * @brief Returns the dirty misc flag value.
+   * The dirty misc flag value
    */
-  static constexpr unsigned int MiscDirtyFlag()
-  {
-    return Material::_MiscDirtyFlag;
-  }
+  static constexpr unsigned int MiscDirtyFlag = 16;
+
+  /**
+   * The all dirty flag value
+   */
+  static constexpr unsigned int AllDirtyFlag = 31;
 
   virtual ~Material() override;
 
@@ -479,6 +444,12 @@ protected:
   bool get_backFaceCulling() const;
 
   /**
+   * @brief Gets a boolean indicating that current material needs to register
+   * RTT.
+   */
+  virtual bool get_hasRenderTargetTextures() const;
+
+  /**
    * @brief Called during a dispose event.
    */
   void
@@ -693,6 +664,11 @@ public:
    * The back-face culling state
    */
   Property<Material, bool> backFaceCulling;
+
+  /**
+   * Gets a boolean indicating that current material needs to register RTT
+   */
+  ReadOnlyProperty<Material, bool> hasRenderTargetTextures;
 
   /**
    * Stores the value for side orientation

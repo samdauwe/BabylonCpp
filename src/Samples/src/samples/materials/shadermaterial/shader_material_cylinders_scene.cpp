@@ -78,7 +78,7 @@ void ShaderMaterialCylindersScene::initializeScene(ICanvas* canvas,
     // box->enableEdgesRendering(0.99f);
     cylinder->edgesWidth = 2.f;
     // Create shader material
-    ShaderMaterialOptions shaderMaterialOptions;
+    IShaderMaterialOptions shaderMaterialOptions;
     shaderMaterialOptions.attributes = {"position", "normal", "uv"};
     shaderMaterialOptions.uniforms   = {"time", "worldViewProjection"};
     auto shaderMaterial              = ShaderMaterial::New(

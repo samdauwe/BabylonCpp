@@ -51,7 +51,6 @@ WaterMaterial::WaterMaterial(const std::string& iName, Scene* scene,
     , colorBlendFactor2{0.2f}
     , waveLength{0.1f}
     , waveSpeed{1.f}
-    , hasRenderTargetTextures{this, &WaterMaterial::get_hasRenderTargetTextures}
     , refractionTexture{this, &WaterMaterial::get_refractionTexture}
     , reflectionTexture{this, &WaterMaterial::get_reflectionTexture}
     , renderTargetsEnabled{this, &WaterMaterial::get_renderTargetsEnabled}

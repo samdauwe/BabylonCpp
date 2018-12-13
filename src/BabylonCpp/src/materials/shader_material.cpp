@@ -24,7 +24,7 @@ namespace BABYLON {
 
 ShaderMaterial::ShaderMaterial(const std::string& iName, Scene* scene,
                                const std::string& shaderPath,
-                               const ShaderMaterialOptions& options)
+                               const IShaderMaterialOptions& options)
     : Material{iName, scene}, _shaderPath{shaderPath}, _renderId{-1}
 {
   _options.needAlphaBlending = options.needAlphaBlending;
@@ -52,7 +52,7 @@ IReflect::Type ShaderMaterial::type() const
 
 bool ShaderMaterial::needAlphaBlending() const
 {
-  return _options.needAlphaBlending;
+  return (alpha < 1.f) || _options.needAlphaBlending;
 }
 
 bool ShaderMaterial::needAlphaTesting() const
@@ -255,9 +255,6 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   std::vector<std::string> defines;
   std::vector<std::string> attribs;
   auto fallbacks = std::make_unique<EffectFallbacks>();
-  if (useInstances) {
-    defines.emplace_back("#define INSTANCES");
-  }
 
   for (auto& _define : _options.defines) {
     defines.emplace_back(_define);
@@ -270,6 +267,11 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   if (mesh && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
     attribs.emplace_back(VertexBuffer::ColorKindChars);
     defines.emplace_back("#define VERTEXCOLOR");
+  }
+
+  if (useInstances) {
+    defines.emplace_back("#define INSTANCES");
+    MaterialHelper::PrepareAttributesForInstances(attribs, defines);
   }
 
   // Bones

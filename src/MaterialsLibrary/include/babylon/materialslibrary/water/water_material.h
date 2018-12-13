@@ -85,7 +85,7 @@ protected:
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  bool get_hasRenderTargetTextures() const;
+  bool get_hasRenderTargetTextures() const override;
 
   RenderTargetTexturePtr& get_refractionTexture();
   RenderTargetTexturePtr& get_reflectionTexture();
@@ -158,11 +158,6 @@ public:
    * Defines the waves speed
    */
   float waveSpeed;
-
-  /**
-   * Gets a boolean indicating that current material needs to register RTT
-   */
-  ReadOnlyProperty<WaterMaterial, bool> hasRenderTargetTextures;
 
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> refractionTexture;
   ReadOnlyProperty<WaterMaterial, RenderTargetTexturePtr> reflectionTexture;

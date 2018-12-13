@@ -82,8 +82,8 @@ void FresnelParameters::set_isEnabled(bool value)
   }
 
   _isEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag()
-                                  | Material::MiscDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag
+                                  | Material::MiscDirtyFlag);
 }
 
 std::unique_ptr<FresnelParameters> FresnelParameters::clone() const

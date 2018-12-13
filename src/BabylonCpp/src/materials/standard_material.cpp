@@ -2169,7 +2169,7 @@ void StandardMaterial::SetDiffuseTextureEnabled(bool value)
   }
 
   StandardMaterial::_DiffuseTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::AmbientTextureEnabled()
@@ -2184,7 +2184,7 @@ void StandardMaterial::SetAmbientTextureEnabled(bool value)
   }
 
   StandardMaterial::_AmbientTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::OpacityTextureEnabled()
@@ -2199,7 +2199,7 @@ void StandardMaterial::SetOpacityTextureEnabled(bool value)
   }
 
   StandardMaterial::_OpacityTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::ReflectionTextureEnabled()
@@ -2214,7 +2214,7 @@ void StandardMaterial::SetReflectionTextureEnabled(bool value)
   }
 
   StandardMaterial::_ReflectionTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::EmissiveTextureEnabled()
@@ -2229,7 +2229,7 @@ void StandardMaterial::SetEmissiveTextureEnabled(bool value)
   }
 
   StandardMaterial::_EmissiveTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::SpecularTextureEnabled()
@@ -2244,7 +2244,7 @@ void StandardMaterial::SetSpecularTextureEnabled(bool value)
   }
 
   StandardMaterial::_SpecularTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::BumpTextureEnabled()
@@ -2259,7 +2259,7 @@ void StandardMaterial::SetBumpTextureEnabled(bool value)
   }
 
   StandardMaterial::_BumpTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::LightmapTextureEnabled()
@@ -2274,7 +2274,7 @@ void StandardMaterial::SetLightmapTextureEnabled(bool value)
   }
 
   StandardMaterial::_LightmapTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::RefractionTextureEnabled()
@@ -2289,7 +2289,7 @@ void StandardMaterial::SetRefractionTextureEnabled(bool value)
   }
 
   StandardMaterial::_RefractionTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::ColorGradingTextureEnabled()
@@ -2304,7 +2304,7 @@ void StandardMaterial::SetColorGradingTextureEnabled(bool value)
   }
 
   StandardMaterial::_ColorGradingTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool StandardMaterial::FresnelEnabled()
@@ -2319,7 +2319,7 @@ void StandardMaterial::SetFresnelEnabled(bool value)
   }
 
   StandardMaterial::_FresnelEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag());
+  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag);
 }
 
 } // end of namespace BABYLON

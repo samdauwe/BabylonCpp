@@ -10,6 +10,8 @@ namespace BABYLON {
 
 MultiMaterial::MultiMaterial(const std::string iName, Scene* scene)
     : Material{iName, scene, true}
+    , subMaterials{this, &MultiMaterial::get_subMaterials,
+                   &MultiMaterial::set_subMaterials}
 {
   // multimaterial is considered like a push material
   storeEffectOnSubMeshes = true;
@@ -30,12 +32,12 @@ IReflect::Type MultiMaterial::type() const
 }
 
 // Properties
-std::vector<MaterialPtr>& MultiMaterial::subMaterials()
+std::vector<MaterialPtr>& MultiMaterial::get_subMaterials()
 {
   return _subMaterials;
 }
 
-void MultiMaterial::setSubMaterials(const std::vector<MaterialPtr>& value)
+void MultiMaterial::set_subMaterials(const std::vector<MaterialPtr>& value)
 {
   _subMaterials = value;
   _hookArray(value);

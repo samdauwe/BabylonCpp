@@ -444,7 +444,7 @@ void Scene::set_environmentTexture(const BaseTexturePtr& value)
   }
 
   _environmentTexture = value;
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool Scene::get_useRightHandedSystem() const
@@ -458,7 +458,7 @@ void Scene::set_useRightHandedSystem(bool value)
     return;
   }
   _useRightHandedSystem = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
 }
 
 void Scene::setStepId(unsigned int newStepId)
@@ -487,7 +487,7 @@ void Scene::set_forceWireframe(bool value)
     return;
   }
   _forceWireframe = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
 }
 
 bool Scene::get_forceWireframe() const
@@ -506,7 +506,7 @@ void Scene::set_forcePointsCloud(bool value)
     return;
   }
   _forcePointsCloud = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
 }
 
 bool Scene::get_forceShowBoundingBoxes() const
@@ -540,7 +540,7 @@ void Scene::set_fogEnabled(bool value)
     return;
   }
   _fogEnabled = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
 }
 
 bool Scene::get_fogEnabled() const
@@ -554,7 +554,7 @@ void Scene::set_fogMode(unsigned int value)
     return;
   }
   _fogMode = value;
-  markAllMaterialsAsDirty(Material::MiscDirtyFlag());
+  markAllMaterialsAsDirty(Material::MiscDirtyFlag);
 }
 
 unsigned int Scene::get_fogMode() const
@@ -568,7 +568,7 @@ void Scene::set_shadowsEnabled(bool value)
     return;
   }
   _shadowsEnabled = value;
-  markAllMaterialsAsDirty(Material::LightDirtyFlag());
+  markAllMaterialsAsDirty(Material::LightDirtyFlag);
 }
 
 bool Scene::get_shadowsEnabled() const
@@ -582,7 +582,7 @@ void Scene::set_lightsEnabled(bool value)
     return;
   }
   _lightsEnabled = value;
-  markAllMaterialsAsDirty(Material::LightDirtyFlag());
+  markAllMaterialsAsDirty(Material::LightDirtyFlag);
 }
 
 bool Scene::get_lightsEnabled() const
@@ -596,7 +596,7 @@ void Scene::set_texturesEnabled(bool value)
     return;
   }
   _texturesEnabled = value;
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 bool Scene::get_texturesEnabled() const
@@ -610,7 +610,7 @@ void Scene::set_skeletonsEnabled(bool value)
     return;
   }
   _skeletonsEnabled = value;
-  markAllMaterialsAsDirty(Material::AttributesDirtyFlag());
+  markAllMaterialsAsDirty(Material::AttributesDirtyFlag);
 }
 
 bool Scene::get_skeletonsEnabled() const
@@ -4741,7 +4741,7 @@ void Scene::_rebuildTextures()
     texture->_rebuild();
   }
 
-  markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+  markAllMaterialsAsDirty(Material::TextureDirtyFlag);
 }
 
 void Scene::createDefaultLight(bool replace)

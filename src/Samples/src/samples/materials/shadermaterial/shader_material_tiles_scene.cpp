@@ -83,7 +83,7 @@ void ShaderMaterialTilesScene::initializeScene(ICanvas* canvas, Scene* scene)
     _boxTopFaceResolution  = Vector2(options.width, options.depth);
     _boxTopFaceAspectRatio = _boxTopFaceResolution.x / _boxTopFaceResolution.y;
     // Create shader material
-    ShaderMaterialOptions shaderMaterialOptions;
+    IShaderMaterialOptions shaderMaterialOptions;
     shaderMaterialOptions.attributes = {"position", "normal", "uv"};
     shaderMaterialOptions.uniforms
       = {"time", "worldViewProjection", "aspectRatio", "resolution"};

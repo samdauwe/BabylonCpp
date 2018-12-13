@@ -5,8 +5,8 @@
 #include <babylon/engine/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/effect.h>
+#include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/shader_material.h>
-#include <babylon/materials/shader_material_options.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -51,7 +51,7 @@ void PortalsScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Depth material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes        = {"position"};
   shaderMaterialOptions.uniforms          = {"worldViewProjection"};
   shaderMaterialOptions.needAlphaBlending = true;

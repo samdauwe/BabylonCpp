@@ -109,7 +109,7 @@ void HDRCubeTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
   _boundingBoxSize = value;
   auto scene       = getScene();
   if (scene) {
-    scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+    scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
   }
 }
 

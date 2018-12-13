@@ -50,7 +50,7 @@ void ShaderMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   _camera->attachControl(canvas, true);
 
   // Create shader material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {"position", "normal"};
   shaderMaterialOptions.uniforms
     = {"worldViewProjection", "world", "vPositionW", "vNormalW", "time"};

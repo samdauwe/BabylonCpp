@@ -285,7 +285,7 @@ Matrix* Texture::getTextureMatrix()
   }
 
   scene->markAllMaterialsAsDirty(
-    Material::TextureDirtyFlag(), [this](Material* mat) {
+    Material::TextureDirtyFlag, [this](Material* mat) {
       return mat->hasTexture(shared_from_base<Texture>());
     });
 
@@ -359,7 +359,7 @@ Matrix* Texture::getReflectionTextureMatrix()
   }
 
   scene->markAllMaterialsAsDirty(
-    Material::TextureDirtyFlag(), [this](Material* mat) {
+    Material::TextureDirtyFlag, [this](Material* mat) {
       return (std::find_if(mat->getActiveTextures().begin(),
                            mat->getActiveTextures().end(),
                            [this](const BaseTexturePtr& texture) {

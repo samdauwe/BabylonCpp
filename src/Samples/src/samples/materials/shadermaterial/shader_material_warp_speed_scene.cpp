@@ -41,7 +41,7 @@ void ShaderMaterialWarpSpeedScene::initializeScene(ICanvas* canvas,
   camera->setPosition(Vector3(-10.0, 0, -0.5f));
 
   // Create shader material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {"position", "normal", "uv"};
   shaderMaterialOptions.uniforms
     = {"world", "worldView", "worldViewProjection", "view", "projection"};

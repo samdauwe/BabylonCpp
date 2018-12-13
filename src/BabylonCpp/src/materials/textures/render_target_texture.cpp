@@ -136,7 +136,7 @@ void RenderTargetTexture::set_boundingBoxSize(
   _boundingBoxSize = value;
   auto scene       = getScene();
   if (scene) {
-    scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+    scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
   }
 }
 

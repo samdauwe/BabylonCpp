@@ -48,7 +48,7 @@ void ShaderMaterialBoxScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto box = Mesh::CreateBox("box1", 5.f, scene);
 
   // Create shader material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {"position", "uv"};
   shaderMaterialOptions.uniforms   = {"worldViewProjection", "time"};
   _shaderMaterial

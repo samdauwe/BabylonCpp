@@ -4,8 +4,8 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/shader_material.h>
-#include <babylon/materials/shader_material_options.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/mesh/vertex_data.h>
@@ -82,7 +82,7 @@ void BoundingBoxRenderer::_prepareResources()
     return;
   }
 
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {VertexBuffer::PositionKindChars};
   shaderMaterialOptions.uniforms   = {"world", "viewProjection", "color"};
 

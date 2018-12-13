@@ -25,6 +25,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , alpha{this, &Material::get_alpha, &Material::set_alpha}
     , backFaceCulling{this, &Material::get_backFaceCulling,
                       &Material::set_backFaceCulling}
+    , hasRenderTargetTextures{this, &Material::get_hasRenderTargetTextures}
     , doNotSerialize{false}
     , storeEffectOnSubMeshes{false}
     , onDispose{this, &Material::set_onDispose}
@@ -86,7 +87,7 @@ void Material::set_alpha(float value)
     return;
   }
   _alpha = value;
-  markAsDirty(Material::MiscDirtyFlag());
+  markAsDirty(Material::MiscDirtyFlag);
 }
 
 float Material::get_alpha() const
@@ -100,12 +101,17 @@ void Material::set_backFaceCulling(bool value)
     return;
   }
   _backFaceCulling = value;
-  markAsDirty(Material::TextureDirtyFlag());
+  markAsDirty(Material::TextureDirtyFlag);
 }
 
 bool Material::get_backFaceCulling() const
 {
   return _backFaceCulling;
+}
+
+bool Material::get_hasRenderTargetTextures() const
+{
+  return false;
 }
 
 IReflect::Type Material::type() const
@@ -116,6 +122,7 @@ IReflect::Type Material::type() const
 void Material::addMaterialToScene(const MaterialPtr& newMaterial)
 {
   _scene->materials.emplace_back(newMaterial);
+  _scene->onNewMaterialAddedObservable.notifyObservers(newMaterial.get());
 }
 
 void Material::addMultiMaterialToScene(const MultiMaterialPtr& newMultiMaterial)
@@ -134,7 +141,7 @@ void Material::set_alphaMode(unsigned int value)
     return;
   }
   _alphaMode = value;
-  markAsDirty(Material::TextureDirtyFlag());
+  markAsDirty(Material::TextureDirtyFlag);
 }
 
 bool Material::get_needDepthPrePass() const
@@ -164,7 +171,7 @@ void Material::set_fogEnabled(bool value)
     return;
   }
   _fogEnabled = value;
-  markAsDirty(Material::MiscDirtyFlag());
+  markAsDirty(Material::MiscDirtyFlag);
 }
 
 bool Material::get_useLogarithmicDepth() const
@@ -253,7 +260,7 @@ void Material::set_fillMode(unsigned int value)
   }
 
   _fillMode = value;
-  markAsDirty(Material::MiscDirtyFlag());
+  markAsDirty(Material::MiscDirtyFlag);
 }
 
 unsigned int Material::get_fillMode() const
@@ -517,23 +524,23 @@ void Material::forceCompilation(
 
 void Material::markAsDirty(unsigned int flag)
 {
-  if (flag & Material::TextureDirtyFlag()) {
+  if (flag & Material::TextureDirtyFlag) {
     _markAllSubMeshesAsTexturesDirty();
   }
 
-  if (flag & Material::LightDirtyFlag()) {
+  if (flag & Material::LightDirtyFlag) {
     _markAllSubMeshesAsLightsDirty();
   }
 
-  if (flag & Material::FresnelDirtyFlag()) {
+  if (flag & Material::FresnelDirtyFlag) {
     _markAllSubMeshesAsFresnelDirty();
   }
 
-  if (flag & Material::AttributesDirtyFlag()) {
+  if (flag & Material::AttributesDirtyFlag) {
     _markAllSubMeshesAsAttributesDirty();
   }
 
-  if (flag & Material::MiscDirtyFlag()) {
+  if (flag & Material::MiscDirtyFlag) {
     _markAllSubMeshesAsMiscDirty();
   }
 
@@ -626,6 +633,8 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
                                            return material.get() == this;
                                          }),
                           _scene->materials.end());
+
+  _scene->onMaterialRemovedObservable.notifyObservers(this);
 
   // Remove from meshes
   Mesh* _mesh = nullptr;

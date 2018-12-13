@@ -35,7 +35,7 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
   _intersectionThreshold = 0.1f;
 
   std::vector<std::string> defines;
-  ShaderMaterialOptions options;
+  IShaderMaterialOptions options;
   options.attributes
     = {VertexBuffer::PositionKindChars, VertexBuffer::World0KindChars,
        VertexBuffer::World1KindChars, VertexBuffer::World2KindChars,

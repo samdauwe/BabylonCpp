@@ -36,8 +36,6 @@ float BackgroundMaterial::StandardReflectance90()
 BackgroundMaterial::BackgroundMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
     , useEquirectangularFOV{false}
-    , hasRenderTargetTextures{this,
-                              &BackgroundMaterial::get_hasRenderTargetTextures}
     , _primaryColor{Color3::White()}
     , __perceptualColor{std::nullopt}
     , _primaryColorShadowLevel{0.f}

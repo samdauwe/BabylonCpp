@@ -89,8 +89,8 @@ void BaseTexture::set_hasAlpha(bool value)
   }
   _hasAlpha = value;
   if (_scene) {
-    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag()
-                                    | Material::MiscDirtyFlag());
+    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag
+                                    | Material::MiscDirtyFlag);
   }
 }
 
@@ -106,7 +106,7 @@ void BaseTexture::set_coordinatesMode(unsigned int value)
   }
   _coordinatesMode = value;
   if (_scene) {
-    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag());
+    _scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
   }
 }
 

@@ -4,8 +4,8 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/shader_material.h>
-#include <babylon/materials/shader_material_options.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/rendering/face_adjacencies.h>
@@ -47,7 +47,7 @@ void EdgesRenderer::_prepareResources()
     return;
   }
 
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {"position", "normal"};
   shaderMaterialOptions.uniforms
     = {"worldViewProjection", "color", "width", "aspectRatio"};

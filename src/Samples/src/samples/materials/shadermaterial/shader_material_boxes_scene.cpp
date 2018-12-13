@@ -76,7 +76,7 @@ void ShaderMaterialBoxesScene::initializeScene(ICanvas* canvas, Scene* scene)
     // box->enableEdgesRendering(0.99f);
     box->edgesWidth = 2.f;
     // Create shader material
-    ShaderMaterialOptions shaderMaterialOptions;
+    IShaderMaterialOptions shaderMaterialOptions;
     shaderMaterialOptions.attributes = {"position", "normal", "uv"};
     shaderMaterialOptions.uniforms   = {"time", "worldViewProjection"};
     auto shaderMaterial              = ShaderMaterial::New(

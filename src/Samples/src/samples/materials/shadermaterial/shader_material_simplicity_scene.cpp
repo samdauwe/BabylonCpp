@@ -58,7 +58,7 @@ void ShaderMaterialSimplicityScene::initializeScene(ICanvas* canvas,
   auto skybox             = MeshBuilder::CreateBox("skybox", options, scene);
 
   // Create shader material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {"position", "uv"};
   shaderMaterialOptions.uniforms
     = {"iTime", "worldViewProjection", "iAspectRatio", "iResolution"};

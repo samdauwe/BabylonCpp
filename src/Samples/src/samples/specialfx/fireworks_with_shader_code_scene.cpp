@@ -52,7 +52,7 @@ void FireworksWithShaderCodeScene::initializeScene(ICanvas* canvas,
   light2->intensity = 0.5f;
 
   // Create shader material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {"position", "normal", "uv"};
   shaderMaterialOptions.uniforms
     = {"world", "worldView", "worldViewProjection", "view", "projection"};

@@ -47,7 +47,7 @@ void ShaderMaterialSkyboxScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto skybox = Mesh::CreateSphere("skyBox", 10u, 1000.f, scene);
 
   // Create shader material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.attributes = {"position", "normal", "uv"};
   shaderMaterialOptions.uniforms   = {"worldViewProjection"};
   _shaderMaterial

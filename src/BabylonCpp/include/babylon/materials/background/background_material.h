@@ -314,7 +314,7 @@ protected:
    * @brief Gets a boolean indicating that current material needs to register
    * RTT.
    */
-  bool get_hasRenderTargetTextures() const;
+  bool get_hasRenderTargetTextures() const override;
 
 private:
   /**
@@ -333,11 +333,6 @@ public:
    * Enable the FOV adjustment feature controlled by fovMultiplier.
    */
   bool useEquirectangularFOV;
-
-  /**
-   * Gets a boolean indicating that current material needs to register RTT
-   */
-  ReadOnlyProperty<BackgroundMaterial, bool> hasRenderTargetTextures;
 
 protected:
   /**

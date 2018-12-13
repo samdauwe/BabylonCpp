@@ -49,7 +49,7 @@ void ShaderMaterialWithFogScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto box = Mesh::CreateBox("box1", 1.f, scene);
 
   // Create shader material
-  ShaderMaterialOptions shaderMaterialOptions;
+  IShaderMaterialOptions shaderMaterialOptions;
   shaderMaterialOptions.needAlphaBlending = true;
   shaderMaterialOptions.attributes        = {"position"};
   shaderMaterialOptions.uniforms

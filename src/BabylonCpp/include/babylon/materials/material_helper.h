@@ -214,6 +214,15 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
                                             MaterialDefines& defines);
 
   /**
+   * @brief Prepares the list of attributes required for instances according to
+   * the effect defines.
+   * @param attribs The current list of supported attribs
+   * @param defines The current Defines of the effect
+   */
+  static void PrepareAttributesForInstances(std::vector<std::string>& attribs,
+                                            std::vector<std::string>& defines);
+
+  /**
    * @brief Binds the light shadow information to the effect for the given mesh.
    * @param light The light containing the generator
    * @param scene The scene the lights belongs to
