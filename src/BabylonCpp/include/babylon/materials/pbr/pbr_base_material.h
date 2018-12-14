@@ -53,12 +53,6 @@ public:
   ~PBRBaseMaterial() override;
 
   /**
-   * @brief Gets a boolean indicating that current material needs to register
-   * RTT.
-   */
-  bool hasRenderTargetTextures() const;
-
-  /**
    * @brief Gets the name of the material class.
    */
   const std::string getClassName() const override;
@@ -174,6 +168,12 @@ protected:
     const ImageProcessingConfigurationPtr& configuration);
 
   bool _shouldUseAlphaFromAlbedoTexture() const;
+
+  /**
+   * @brief Gets a boolean indicating that current material needs to register
+   * RTT.
+   */
+  bool get_hasRenderTargetTextures() const override;
 
   /**
    * @brief Enabled the use of logarithmic depth buffers, which is good for wide

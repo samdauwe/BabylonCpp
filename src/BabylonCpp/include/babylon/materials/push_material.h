@@ -9,6 +9,10 @@ namespace BABYLON {
 class PushMaterial;
 using PushMaterialPtr = std::shared_ptr<PushMaterial>;
 
+/**
+ * @brief Base class of materials working in push mode in babylon JS.
+ * Hidden
+ */
 class BABYLON_SHARED_EXPORT PushMaterial : public Material {
 
 public:

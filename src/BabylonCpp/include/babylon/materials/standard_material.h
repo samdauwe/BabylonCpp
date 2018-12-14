@@ -18,6 +18,11 @@ using FresnelParametersPtr = std::shared_ptr<FresnelParameters>;
 using IAnimatablePtr       = std::shared_ptr<IAnimatable>;
 using StandardMaterialPtr  = std::shared_ptr<StandardMaterial>;
 
+/**
+ * @brief This is the default material used in Babylon. It is the best trade off
+ * between quality and performances.
+ * @see http://doc.babylonjs.com/babylon101/materials
+ */
 class BABYLON_SHARED_EXPORT StandardMaterial : public PushMaterial {
 
 private:
@@ -48,60 +53,192 @@ public:
   ~StandardMaterial() override;
 
   /**
-   * @brief Returns the string "StandardMaterial".
+   * @brief Gets the current class name of the material e.g. "StandardMaterial".
+   * Mainly use in serialization.
+   * @returns the class name
    */
   const std::string getClassName() const override;
 
   IReflect::Type type() const override;
 
+  /**
+   * @brief Specifies if the material will require alpha blending.
+   * @returns a boolean specifying if alpha blending is needed
+   */
   bool needAlphaBlending() const override;
+
+  /**
+   * @brief Specifies if this material should be rendered in alpha test mode.
+   * @returns a boolean specifying if an alpha test is needed.
+   */
   bool needAlphaTesting() const override;
+
+  /**
+   * @brief Get the texture used for alpha test purpose.
+   * @returns the diffuse texture in case of the standard material.
+   */
   BaseTexturePtr getAlphaTestTexture() override;
 
   /**
-   * Child classes can use it to update shaders
+   * @brief Get if the submesh is ready to be used and all its information
+   * available. Child classes can use it to update shaders.
+   * @param mesh defines the mesh to check
+   * @param subMesh defines which submesh to check
+   * @param useInstances specifies that instances should be used
+   * @returns a boolean indicating that the submesh is ready or not
    */
   bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                          bool useInstances = false) override;
+
+  /**
+   * @brief Builds the material UBO layouts.
+   * Used internally during the effect preparation.
+   */
   void buildUniformLayout();
+
+  /**
+   * @brief Unbinds the material from the mesh.
+   */
   void unbind() override;
+
+  /**
+   * @brief Binds the submesh to this material by preparing the effect and
+   * shader to draw.
+   * @param world defines the world transformation matrix
+   * @param mesh defines the mesh containing the submesh
+   * @param subMesh defines the submesh to bind the material to
+   */
   void bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh) override;
+
+  /**
+   * @brief Get the list of animatables in the material.
+   * @returns the list of animatables object used in the material
+   */
   std::vector<IAnimatablePtr> getAnimatables();
+
+  /**
+   * @brief Gets the active textures from the material.
+   * @returns an array of textures
+   */
   std::vector<BaseTexturePtr> getActiveTextures() const override;
+
+  /**
+   * @brief Specifies if the material uses a texture.
+   * @param texture defines the texture to check against the material
+   * @returns a boolean specifying if the material uses the texture
+   */
   bool hasTexture(const BaseTexturePtr& texture) const override;
+
+  /**
+   * @brief Disposes the material.
+   * @param forceDisposeEffect specifies if effects should be forcefully
+   * disposed
+   * @param forceDisposeTextures specifies if textures should be forcefully
+   * disposed
+   */
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false) override;
+
+  /**
+   * @brief Makes a duplicate of the material, and gives it a new name.
+   * @param name defines the new name for the duplicated material
+   * @returns the cloned material
+   */
   MaterialPtr clone(const std::string& name,
                     bool cloneChildren = false) const override;
+
+  /**
+   * @brief Serializes this material in a JSON representation.
+   * @returns the serialized material object
+   */
   json serialize() const;
 
-  // Statics
+  /**
+   * @brief Creates a standard material from parsed material data.
+   * @param source defines the JSON represnetation of the material
+   * @param scene defines the hosting scene
+   * @param rootUrl defines the root URL to use to load textures and relative
+   * dependencies
+   * @returns a new material
+   */
   static StandardMaterialPtr Parse(const json& source, Scene* scene,
                                    const std::string& rootUrl);
+
+  /**
+   * Are diffuse textures enabled in the application.
+   */
   static bool DiffuseTextureEnabled();
   static void SetDiffuseTextureEnabled(bool value);
+
+  /**
+   * Are ambient textures enabled in the application.
+   */
   static bool AmbientTextureEnabled();
   static void SetAmbientTextureEnabled(bool value);
+
+  /**
+   * Are opacity textures enabled in the application.
+   */
   static bool OpacityTextureEnabled();
   static void SetOpacityTextureEnabled(bool value);
+
+  /**
+   * Are reflection textures enabled in the application.
+   */
   static bool ReflectionTextureEnabled();
   static void SetReflectionTextureEnabled(bool value);
+
+  /**
+   * Are emissive textures enabled in the application.
+   */
   static bool EmissiveTextureEnabled();
   static void SetEmissiveTextureEnabled(bool value);
+
+  /**
+   * Are specular textures enabled in the application.
+   */
   static bool SpecularTextureEnabled();
   static void SetSpecularTextureEnabled(bool value);
+
+  /**
+   * Are bump textures enabled in the application.
+   */
   static bool BumpTextureEnabled();
   static void SetBumpTextureEnabled(bool value);
+
+  /**
+   * Are lightmap textures enabled in the application.
+   */
   static bool LightmapTextureEnabled();
   static void SetLightmapTextureEnabled(bool value);
+
+  /**
+   * Are refraction textures enabled in the application.
+   */
   static bool RefractionTextureEnabled();
   static void SetRefractionTextureEnabled(bool value);
+
+  /**
+   * Are color grading textures enabled in the application.
+   */
   static bool ColorGradingTextureEnabled();
   static void SetColorGradingTextureEnabled(bool value);
+
+  /**
+   * Are fresnels enabled in the application.
+   */
   static bool FresnelEnabled();
   static void SetFresnelEnabled(bool value);
 
 protected:
+  /**
+   * @brief Instantiates a new standard material.
+   * This is the default material used in Babylon. It is the best trade off
+   * between quality and performances.
+   * @see http://doc.babylonjs.com/babylon101/materials
+   * @param name Define the name of the material in the scene
+   * @param scene Define the scene the material belong to
+   */
   StandardMaterial(const std::string& name, Scene* scene);
   StandardMaterial(const StandardMaterial& other);
 
@@ -283,6 +420,12 @@ protected:
   void set_cameraColorCurves(const std::shared_ptr<ColorCurves>& value);
 
   /**
+   * @brief Gets a boolean indicating that current material needs to register
+   * RTT.
+   */
+  bool get_hasRenderTargetTextures() const override;
+
+  /**
    * @brief Gets the logarithmic depth setting.
    */
   bool get_useLogarithmicDepth() const override;
@@ -304,37 +447,183 @@ protected:
   bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
 
 public:
+  /**
+   * The basic texture of the material as viewed under a light.
+   */
   Property<StandardMaterial, BaseTexturePtr> diffuseTexture;
+
+  /**
+   * AKA Occlusion Texture in other nomenclature, it helps adding baked shadows
+   * into your material.
+   */
   Property<StandardMaterial, BaseTexturePtr> ambientTexture;
+
+  /**
+   * Define the transparency of the material from a texture.
+   * The final alpha value can be read either from the red channel (if
+   * texture.getAlphaFromRGB is false) or from the luminance or the current
+   * texel (if texture.getAlphaFromRGB is true)
+   */
   Property<StandardMaterial, BaseTexturePtr> opacityTexture;
+
+  /**
+   * Define the texture used to display the reflection.
+   * @see
+   * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   */
   Property<StandardMaterial, BaseTexturePtr> reflectionTexture;
+
+  /**
+   * Define texture of the material as if self lit.
+   * This will be mixed in the final result even in the absence of light.
+   */
   Property<StandardMaterial, BaseTexturePtr> emissiveTexture;
+
+  /**
+   * Define how the color and intensity of the highlight given by the light in
+   * the material.
+   */
   Property<StandardMaterial, BaseTexturePtr> specularTexture;
+
+  /**
+   * Bump mapping is a technique to simulate bump and dents on a rendered
+   * surface. These are made by creating a normal map from an image. The means
+   * to do this can be found on the web, a search for 'normal map generator'
+   * will bring up free and paid for methods of doing this.
+   * @see http://doc.babylonjs.com/how_to/more_materials#bump-map
+   */
   Property<StandardMaterial, BaseTexturePtr> bumpTexture;
+
+  /**
+   * Complex lighting can be computationally expensive to compute at runtime.
+   * To save on computation, lightmaps may be used to store calculated lighting
+   * in a texture which will be applied to a given mesh.
+   * @see http://doc.babylonjs.com/babylon101/lights#lightmaps
+   */
   Property<StandardMaterial, BaseTexturePtr> lightmapTexture;
+
+  /**
+   * Define the texture used to display the refraction.
+   * @see
+   * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   */
   Property<StandardMaterial, BaseTexturePtr> refractionTexture;
 
+  /**
+   * The color of the material lit by the environmental background lighting.
+   * @see http://doc.babylonjs.com/babylon101/materials#ambient-color-example
+   */
   Color3 ambientColor;
+
+  /**
+   * The basic color of the material as viewed under a light.
+   */
   Color3 diffuseColor;
+
+  /**
+   * Define how the color and intensity of the highlight given by the light in
+   * the material.
+   */
   Color3 specularColor;
+
+  /**
+   * Define the color of the material as if self lit.
+   * This will be mixed in the final result even in the absence of light.
+   */
   Color3 emissiveColor;
+
+  /**
+   * Defines how sharp are the highlights in the material.
+   * The bigger the value the sharper giving a more glossy feeling to the
+   * result. Reversely, the smaller the value the blurrier giving a more rough
+   * feeling to the result.
+   */
   float specularPower;
 
+  /**
+   * Does the transparency come from the diffuse texture alpha channel.
+   */
   Property<StandardMaterial, bool> useAlphaFromDiffuseTexture;
+
+  /**
+   * If true, the emissive value is added into the end result, otherwise it is
+   * multiplied in.
+   */
   Property<StandardMaterial, bool> useEmissiveAsIllumination;
+
+  /**
+   * If true, some kind of energy conservation will prevent the end result to be
+   * more than 1 by reducing the emissive level when the final color is close to
+   * one.
+   */
   Property<StandardMaterial, bool> linkEmissiveWithDiffuse;
+
+  /**
+   * Specifies that the material will keep the specular highlights over a
+   * transparent surface (only the most limunous ones). A car glass is a good
+   * exemple of that. When sun reflects on it you can not see what is behind.
+   */
   Property<StandardMaterial, bool> useSpecularOverAlpha;
+
+  /**
+   * Specifies that the material will keeps the reflection highlights over a
+   * transparent surface (only the most limunous ones). A car glass is a good
+   * exemple of that. When the street lights reflects on it you can not see what
+   * is behind.
+   */
   Property<StandardMaterial, bool> useReflectionOverAlpha;
+
+  /**
+   * Does lights from the scene impacts this material.
+   * It can be a nice trick for performance to disable lighting on a fully
+   * emissive material.
+   */
   Property<StandardMaterial, bool> disableLighting;
+
+  /**
+   * Allows using an object space normal map (instead of tangent space).
+   */
   Property<StandardMaterial, bool> useObjectSpaceNormalMap;
+
+  /**
+   * Is parallax enabled or not.
+   * @see http://doc.babylonjs.com/how_to/using_parallax_mapping
+   */
   Property<StandardMaterial, bool> useParallax;
+
+  /**
+   * Is parallax occlusion enabled or not.
+   * If true, the outcome is way more realistic than traditional Parallax but
+   * you can expect a performance hit that worthes consideration.
+   * @see http://doc.babylonjs.com/how_to/using_parallax_mapping
+   */
   Property<StandardMaterial, bool> useParallaxOcclusion;
 
+  /**
+   * Apply a scaling factor that determine which "depth" the height map should
+   * reprensent. A value between 0.05 and 0.1 is reasonnable in Parallax, you
+   * can reach 0.2 using Parallax Occlusion.
+   */
   float parallaxScaleBias;
 
+  /**
+   * Helps to define how blurry the reflections should appears in the material.
+   */
   Property<StandardMaterial, float> roughness;
 
+  /**
+   * In case of refraction, define the value of the indice of refraction.
+   * @see
+   * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   */
   float indexOfRefraction;
+
+  /**
+   * Invert the refraction texture alongside the y axis.
+   * It can be usefull with procedural textures or probe for instance.
+   * @see
+   * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
+   */
   bool invertRefractionY;
 
   /**
@@ -342,21 +631,82 @@ public:
    */
   float alphaCutOff;
 
+  /**
+   * In case of light mapping, define whether the map contains light or shadow
+   * informations.
+   */
   Property<StandardMaterial, bool> useLightmapAsShadowmap;
 
   // Fresnel
+
+  /**
+   * Define the diffuse fresnel parameters of the material.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   */
   Property<StandardMaterial, FresnelParametersPtr> diffuseFresnelParameters;
+
+  /**
+   * Define the opacity fresnel parameters of the material.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   */
   Property<StandardMaterial, FresnelParametersPtr> opacityFresnelParameters;
+
+  /**
+   * Define the reflection fresnel parameters of the material.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   */
   Property<StandardMaterial, FresnelParametersPtr> reflectionFresnelParameters;
+
+  /**
+   * Define the refraction fresnel parameters of the material.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   */
   Property<StandardMaterial, FresnelParametersPtr> refractionFresnelParameters;
+
+  /**
+   * Define the emissive fresnel parameters of the material.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   */
   Property<StandardMaterial, FresnelParametersPtr> emissiveFresnelParameters;
+
+  /**
+   * If true automatically deducts the fresnels values from the material
+   * specularity.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
+   */
   Property<StandardMaterial, bool> useReflectionFresnelFromSpecular;
+
+  /**
+   * Defines if the glossiness/roughness of the material should be read from the
+   * specular map alpha channel
+   */
   Property<StandardMaterial, bool> useGlossinessFromSpecularMapAlpha;
+
+  /**
+   * Defines the maximum number of lights that can be used in the material
+   */
   Property<StandardMaterial, unsigned int> maxSimultaneousLights;
+
+  /**
+   * If sets to true, x component of normal map value will invert (x = 1.0 - x).
+   */
   Property<StandardMaterial, bool> invertNormalMapX;
+
+  /**
+   * If sets to true, y component of normal map value will invert (y = 1.0 - y).
+   */
   Property<StandardMaterial, bool> invertNormalMapY;
+
+  /**
+   * If sets to true and backfaceCulling is false, normals will be flipped on
+   * the backside.
+   */
   Property<StandardMaterial, bool> twoSidedLighting;
 
+  /**
+   * Custom callback helping to override the default shader used in the
+   * material.
+   */
   std::function<std::string(
     const std::string& shaderName, std::vector<std::string>& uniforms,
     std::vector<std::string>& uniformBuffers,

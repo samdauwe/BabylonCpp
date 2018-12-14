@@ -430,6 +430,21 @@ IReflect::Type StandardMaterial::type() const
   return IReflect::Type::STANDARDMATERIAL;
 }
 
+bool StandardMaterial::get_hasRenderTargetTextures() const
+{
+  if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
+      && _reflectionTexture->isRenderTarget) {
+    return true;
+  }
+
+  if (StandardMaterial::RefractionTextureEnabled() && _refractionTexture
+      && _refractionTexture->isRenderTarget) {
+    return true;
+  }
+
+  return false;
+}
+
 bool StandardMaterial::get_useLogarithmicDepth() const
 {
   return _useLogarithmicDepth;

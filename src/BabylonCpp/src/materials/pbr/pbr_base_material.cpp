@@ -161,7 +161,7 @@ void PBRBaseMaterial::_attachImageProcessingConfiguration(
   }
 }
 
-bool PBRBaseMaterial::hasRenderTargetTextures() const
+bool PBRBaseMaterial::get_hasRenderTargetTextures() const
 {
   if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
       && _reflectionTexture->isRenderTarget) {

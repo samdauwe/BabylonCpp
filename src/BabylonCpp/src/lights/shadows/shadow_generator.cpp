@@ -11,6 +11,7 @@
 #include <babylon/engine/scene.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/point_light.h>
+#include <babylon/lights/shadows/shadow_generator_scene_component.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -136,6 +137,13 @@ ShadowGenerator::ShadowGenerator(const ISize& mapSize,
     , _textureType{0}
     , _defaultTextureMatrix{Matrix::Identity()}
 {
+  auto component
+    = _scene->_getComponent(SceneComponentConstants::NAME_SHADOWGENERATOR);
+  if (!component) {
+    component = ShadowGeneratorSceneComponent::New(_scene);
+    _scene->_addComponent(component);
+  }
+
   // Texture type fallback from float to int if not supported.
   const auto& caps = _scene->getEngine()->getCaps();
 
