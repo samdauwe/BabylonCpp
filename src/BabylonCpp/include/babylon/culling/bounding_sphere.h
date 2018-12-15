@@ -7,6 +7,9 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Class used to store bounding sphere information.
+ */
 class BABYLON_SHARED_EXPORT BoundingSphere {
 
 public:
@@ -43,19 +46,59 @@ public:
    */
   void _update(const Matrix& world);
 
+  /**
+   * @brief Tests if the bounding sphere is intersecting the frustum planes.
+   * @param frustumPlanes defines the frustum planes to test
+   * @returns true if there is an intersection
+   */
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
+
+  /**
+   * @brief Tests if a point is inside the bounding sphere.
+   * @param point defines the point to test
+   * @returns true if the point is inside the bounding sphere
+   */
   bool intersectsPoint(const Vector3& point);
 
   /** Statics **/
+  /**
+   * @brief Checks if two sphere intersect.
+   * @param sphere0 sphere 0
+   * @param sphere1 sphere 1
+   * @returns true if the speres intersect
+   */
   static bool Intersects(const BoundingSphere& sphere0,
                          const BoundingSphere& sphere1);
 
 public:
+  /**
+   * Gets the center of the bounding sphere in local space
+   */
   Vector3 center;
+
+  /**
+   * Radius of the bounding sphere in local space
+   */
   float radius;
+
+  /**
+   * Gets the center of the bounding sphere in world space
+   */
   Vector3 centerWorld;
+
+  /**
+   * Radius of the bounding sphere in world space
+   */
   float radiusWorld;
+
+  /**
+   * Gets the minimum vector in local space
+   */
   Vector3 minimum;
+
+  /**
+   * Gets the maximum vector in local space
+   */
   Vector3 maximum;
 
 private:

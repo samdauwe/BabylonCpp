@@ -4,6 +4,7 @@
 
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
+#include <babylon/math/tmp.h>
 
 namespace BABYLON {
 
@@ -12,6 +13,8 @@ BoundingSphere::BoundingSphere(const Vector3& min, const Vector3& max)
     , radius{0.f}
     , centerWorld{Vector3::Zero()}
     , radiusWorld{0.f}
+    , minimum{Vector3::Zero()}
+    , maximum{Vector3::Zero()}
     , _identityMatrix{Matrix::Identity()}
     , _tempRadiusVector{Vector3::Zero()}
 {
@@ -80,8 +83,8 @@ BoundingSphere::~BoundingSphere()
 
 void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max)
 {
-  minimum = min;
-  maximum = max;
+  minimum.copyFrom(min);
+  maximum.copyFrom(max);
 
   auto distance = Vector3::Distance(min, max);
 
@@ -94,11 +97,13 @@ void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max)
 
 BoundingSphere& BoundingSphere::scale(float factor)
 {
-  auto newRadius = radius * factor;
-  _tempRadiusVector.set(newRadius, newRadius, newRadius);
-
-  auto min = center.subtract(_tempRadiusVector);
-  auto max = center.add(_tempRadiusVector);
+  const auto newRadius = radius * factor;
+  const auto tempRadiusVector
+    = Tmp::Vector3Array[0].set(newRadius, newRadius, newRadius);
+  const auto min
+    = Tmp::Vector3Array[1].copyFrom(center).subtractInPlace(tempRadiusVector);
+  const auto max
+    = Tmp::Vector3Array[2].copyFrom(center).addInPlace(tempRadiusVector);
 
   reConstruct(min, max);
 
@@ -109,14 +114,12 @@ BoundingSphere& BoundingSphere::scale(float factor)
 void BoundingSphere::_update(const Matrix& world)
 {
   Vector3::TransformCoordinatesToRef(center, world, centerWorld);
-  Vector3::TransformNormalFromFloatsToRef(1.f, 1.f, 1.f, world,
-                                          _tempRadiusVector);
-
+  auto& tempVector = Tmp::Vector3Array[0];
+  Vector3::TransformNormalFromFloatsToRef(1.f, 1.f, 1.f, world, tempVector);
   radiusWorld
-    = static_cast<float>(std::max(std::max(std::abs(_tempRadiusVector.x),
-                                           std::abs(_tempRadiusVector.y)),
-                                  std::abs(_tempRadiusVector.z))
-                         * radius);
+    = std::max(std::abs(tempVector.x),
+               std::max(std::abs(tempVector.y), std::abs(tempVector.z)))
+      * radius;
 }
 
 bool BoundingSphere::isInFrustum(
@@ -133,11 +136,11 @@ bool BoundingSphere::isInFrustum(
 
 bool BoundingSphere::intersectsPoint(const Vector3& point)
 {
-  const float x = centerWorld.x - point.x;
-  const float y = centerWorld.y - point.y;
-  const float z = centerWorld.z - point.z;
+  const auto x = centerWorld.x - point.x;
+  const auto y = centerWorld.y - point.y;
+  const auto z = centerWorld.z - point.z;
 
-  const float distance = std::sqrt((x * x) + (y * y) + (z * z));
+  const auto distance = std::sqrt((x * x) + (y * y) + (z * z));
 
   if (radiusWorld < distance) {
     return false;
@@ -149,11 +152,11 @@ bool BoundingSphere::intersectsPoint(const Vector3& point)
 bool BoundingSphere::Intersects(const BoundingSphere& sphere0,
                                 const BoundingSphere& sphere1)
 {
-  const float x = sphere0.centerWorld.x - sphere1.centerWorld.x;
-  const float y = sphere0.centerWorld.y - sphere1.centerWorld.y;
-  const float z = sphere0.centerWorld.z - sphere1.centerWorld.z;
+  const auto x = sphere0.centerWorld.x - sphere1.centerWorld.x;
+  const auto y = sphere0.centerWorld.y - sphere1.centerWorld.y;
+  const auto z = sphere0.centerWorld.z - sphere1.centerWorld.z;
 
-  const float distance = std::sqrt((x * x) + (y * y) + (z * z));
+  const auto distance = std::sqrt((x * x) + (y * y) + (z * z));
 
   if (sphere0.radiusWorld + sphere1.radiusWorld < distance) {
     return false;
