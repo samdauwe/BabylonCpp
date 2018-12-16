@@ -584,6 +584,18 @@ void Vector3::FromArrayToRef(const std::array<float, 16>& array,
   result.z = array[offset + 2];
 }
 
+void Vector3::FromFloatArrayToRef(const Float32Array& array,
+                                  unsigned int offset, Vector3& result)
+{
+  return Vector3::FromArrayToRef(array, offset, result);
+}
+
+void Vector3::FromFloatArrayToRef(const std::array<float, 16>& array,
+                                  unsigned int offset, Vector3& result)
+{
+  return Vector3::FromArrayToRef(array, offset, result);
+}
+
 void Vector3::FromFloatsToRef(float ix, float iy, float iz, Vector3& result)
 {
   result.x = ix;

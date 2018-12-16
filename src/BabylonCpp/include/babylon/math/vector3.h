@@ -489,6 +489,28 @@ public:
                              unsigned int offset, Vector3& result);
 
   /**
+   * @brief Sets the given vector "result" with the element values from the
+   * index "offset" of the given Float32Array. This function is deprecated.  Use
+   * FromArrayToRef instead.
+   * @param array defines the source array
+   * @param offset defines the offset in the source array
+   * @param result defines the Vector3 where to store the result
+   */
+  static void FromFloatArrayToRef(const Float32Array& array,
+                                  unsigned int offset, Vector3& result);
+
+  /**
+   * @brief Sets the given vector "result" with the element values from the
+   * index "offset" of the given Float32Array. This function is deprecated.  Use
+   * FromArrayToRef instead.
+   * @param array defines the source array
+   * @param offset defines the offset in the source array
+   * @param result defines the Vector3 where to store the result
+   */
+  static void FromFloatArrayToRef(const std::array<float, 16>& array,
+                                  unsigned int offset, Vector3& result);
+
+  /**
    * Sets the given vector "result" with the given floats.
    * @param x defines the x coordinate of the source
    * @param y defines the y coordinate of the source

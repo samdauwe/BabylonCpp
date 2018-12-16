@@ -18,9 +18,9 @@ Octree<T>::Octree()
 template <class T>
 Octree<T>::Octree(
   const std::function<void(T& entry, OctreeBlock<T>& block)>& creationFunc,
-  size_t maxBlockCapacity, size_t maxDepth)
-    : _maxBlockCapacity{maxBlockCapacity}
-    , _maxDepth{maxDepth}
+  size_t maxBlockCapacity, size_t iMaxDepth)
+    : maxDepth{iMaxDepth}
+    , _maxBlockCapacity{maxBlockCapacity}
     , _creationFunc{creationFunc}
 {
   _selectionContent.resize(1024);
@@ -36,7 +36,7 @@ void Octree<T>::update(const Vector3& worldMin, const Vector3& worldMax,
                        std::vector<T>& entries)
 {
   Octree<T>::_CreateBlocks(worldMin, worldMax, entries, _maxBlockCapacity, 0,
-                           _maxDepth, *this, _creationFunc);
+                           maxDepth, *this, _creationFunc);
 }
 
 template <class T>
@@ -49,7 +49,7 @@ void Octree<T>::addMesh(T& entry)
 
 template <class T>
 std::vector<T>& Octree<T>::select(const std::array<Plane, 6>& frustumPlanes,
-                               bool allowDuplicate)
+                                  bool allowDuplicate)
 {
   _selectionContent.clear();
 
@@ -69,7 +69,7 @@ std::vector<T>& Octree<T>::select(const std::array<Plane, 6>& frustumPlanes,
 
 template <class T>
 std::vector<T>& Octree<T>::intersects(const Vector3& sphereCenter,
-                                   float sphereRadius, bool allowDuplicate)
+                                      float sphereRadius, bool allowDuplicate)
 {
   _selectionContent.clear();
 

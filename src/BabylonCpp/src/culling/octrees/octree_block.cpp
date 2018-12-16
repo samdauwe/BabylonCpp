@@ -21,25 +21,25 @@ OctreeBlock<T>::OctreeBlock(
     , _maxPoint{iMaxPoint}
     , _creationFunc{creationFunc}
 {
-  _boundingVectors.emplace_back(_minPoint);
-  _boundingVectors.emplace_back(_maxPoint);
+  _boundingVectors[0] = _minPoint;
+  _boundingVectors[1] = _maxPoint;
 
-  _boundingVectors.emplace_back(_minPoint);
+  _boundingVectors[2]   = _minPoint;
   _boundingVectors[2].x = _maxPoint.x;
 
-  _boundingVectors.emplace_back(_minPoint);
+  _boundingVectors[3]   = _minPoint;
   _boundingVectors[3].y = _maxPoint.y;
 
-  _boundingVectors.emplace_back(_minPoint);
+  _boundingVectors[4]   = _minPoint;
   _boundingVectors[4].z = _maxPoint.z;
 
-  _boundingVectors.emplace_back(_maxPoint);
+  _boundingVectors[5]   = _maxPoint;
   _boundingVectors[5].z = _minPoint.z;
 
-  _boundingVectors.emplace_back(_maxPoint);
+  _boundingVectors[6]   = _maxPoint;
   _boundingVectors[6].x = _minPoint.x;
 
-  _boundingVectors.emplace_back(_maxPoint);
+  _boundingVectors[7]   = _maxPoint;
   _boundingVectors[7].y = _minPoint.y;
 }
 

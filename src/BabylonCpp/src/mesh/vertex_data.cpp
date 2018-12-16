@@ -2833,32 +2833,32 @@ void VertexData::ComputeNormals(const Float32Array& positions,
       // compute each facet vertex (+ facet barycenter) index in the partiniong
       // array
       ox  = static_cast<unsigned>(std::floor(
-        (options->facetPositions[index].x - options->bInfo.minimum.x * ratio)
+        (options->facetPositions[index].x - options->bInfo.minimum().x * ratio)
         * xSubRatio));
       oy  = static_cast<unsigned>(std::floor(
-        (options->facetPositions[index].y - options->bInfo.minimum.y * ratio)
+        (options->facetPositions[index].y - options->bInfo.minimum().y * ratio)
         * ySubRatio));
       oz  = static_cast<unsigned>(std::floor(
-        (options->facetPositions[index].z - options->bInfo.minimum.z * ratio)
+        (options->facetPositions[index].z - options->bInfo.minimum().z * ratio)
         * zSubRatio));
       b1x = static_cast<unsigned>(std::floor(
-        (positions[v1x] - options->bInfo.minimum.x * ratio) * xSubRatio));
+        (positions[v1x] - options->bInfo.minimum().x * ratio) * xSubRatio));
       b1y = static_cast<unsigned>(std::floor(
-        (positions[v1y] - options->bInfo.minimum.y * ratio) * ySubRatio));
+        (positions[v1y] - options->bInfo.minimum().y * ratio) * ySubRatio));
       b1z = static_cast<unsigned>(std::floor(
-        (positions[v1z] - options->bInfo.minimum.z * ratio) * zSubRatio));
+        (positions[v1z] - options->bInfo.minimum().z * ratio) * zSubRatio));
       b2x = static_cast<unsigned>(std::floor(
-        (positions[v2x] - options->bInfo.minimum.x * ratio) * xSubRatio));
+        (positions[v2x] - options->bInfo.minimum().x * ratio) * xSubRatio));
       b2y = static_cast<unsigned>(std::floor(
-        (positions[v2y] - options->bInfo.minimum.y * ratio) * ySubRatio));
+        (positions[v2y] - options->bInfo.minimum().y * ratio) * ySubRatio));
       b2z = static_cast<unsigned>(std::floor(
-        (positions[v2z] - options->bInfo.minimum.z * ratio) * zSubRatio));
+        (positions[v2z] - options->bInfo.minimum().z * ratio) * zSubRatio));
       b3x = static_cast<unsigned>(std::floor(
-        (positions[v3x] - options->bInfo.minimum.x * ratio) * xSubRatio));
+        (positions[v3x] - options->bInfo.minimum().x * ratio) * xSubRatio));
       b3y = static_cast<unsigned>(std::floor(
-        (positions[v3y] - options->bInfo.minimum.y * ratio) * ySubRatio));
+        (positions[v3y] - options->bInfo.minimum().y * ratio) * ySubRatio));
       b3z = static_cast<unsigned>(std::floor(
-        (positions[v3z] - options->bInfo.minimum.z * ratio) * zSubRatio));
+        (positions[v3z] - options->bInfo.minimum().z * ratio) * zSubRatio));
 
       block_idx_v1 = b1x + options->subDiv.max * b1y + subSq * b1z;
       block_idx_v2 = b2x + options->subDiv.max * b2y + subSq * b2z;

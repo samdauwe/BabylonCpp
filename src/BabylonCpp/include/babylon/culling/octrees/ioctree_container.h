@@ -10,10 +10,16 @@ namespace BABYLON {
 template <class T>
 class OctreeBlock;
 
+/**
+ * @brief Contains an array of blocks representing the octree.
+ */
 template <class T>
 struct BABYLON_SHARED_EXPORT IOctreeContainer {
+  /**
+   * Blocks within the octree
+   */
   static std::vector<OctreeBlock<T>> blocks;
-}; // end of struct IOctreeContainer
+}; // end of struct IOctreeContainer<T>
 
 template <class T>
 std::vector<OctreeBlock<T>> IOctreeContainer<T>::blocks;

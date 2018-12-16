@@ -3,30 +3,46 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/math/plane.h>
+#include <babylon/math/tmp.h>
 
 namespace BABYLON {
 
 BoundingBox::BoundingBox(const Vector3& min, const Vector3& max)
-    : _tag{-1}, _worldMatrix{Matrix::Identity()}
+    : vectors{{Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
+               Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
+               Vector3::Zero(), Vector3::Zero()}}
+    , center{Vector3::Zero()}
+    , centerWorld{Vector3::Zero()}
+    , extendSize{Vector3::Zero()}
+    , extendSizeWorld{Vector3::Zero()}
+    , directions{{Vector3::Zero(), Vector3::Zero(), Vector3::Zero()}}
+    , vectorsWorld{{Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
+                    Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
+                    Vector3::Zero(), Vector3::Zero()}}
+    , minimumWorld{Vector3::Zero()}
+    , maximumWorld{Vector3::Zero()}
+    , minimum{Vector3::Zero()}
+    , maximum{Vector3::Zero()}
+    , _tag{-1}
+    , _worldMatrix{Matrix::Identity()}
 {
   reConstruct(min, max);
 }
 
 void BoundingBox::reConstruct(const Vector3& min, const Vector3& max)
 {
-  minimum = min;
-  maximum = max;
+  minimum.copyFrom(min);
+  maximum.copyFrom(max);
+
   // Bounding vectors
-  vectors = {
-    minimum, //
-    maximum, //
-    minimum, //
-    minimum, //
-    minimum, //
-    maximum, //
-    maximum, //
-    maximum  //
-  };
+  vectors[0].copyFrom(minimum);
+  vectors[1].copyFrom(maximum);
+  vectors[2].copyFrom(minimum);
+  vectors[3].copyFrom(minimum);
+  vectors[4].copyFrom(minimum);
+  vectors[5].copyFrom(maximum);
+  vectors[6].copyFrom(maximum);
+  vectors[7].copyFrom(maximum);
 
   vectors[2].x = maximum.x;
   vectors[3].y = maximum.y;
@@ -36,20 +52,21 @@ void BoundingBox::reConstruct(const Vector3& min, const Vector3& max)
   vectors[7].y = minimum.y;
 
   // OBB
-  center     = maximum.add(minimum).scale(0.5f);
-  extendSize = maximum.subtract(minimum).scale(0.5f);
-  stl_util::concat(directions,
-                   {Vector3::Zero(), Vector3::Zero(), Vector3::Zero()});
+  center.copyFrom(maximum).addInPlace(minimum).scaleInPlace(0.5f);
+  extendSize.copyFrom(maximum).subtractInPlace(minimum).scaleInPlace(0.5f);
+  for (unsigned int index = 0; index < 3; ++index) {
+    directions[index].copyFromFloats(0.f, 0.f, 0.f);
+  }
 
   // World
-  vectorsWorld.clear();
-  vectorsWorld.reserve(vectors.size());
-  vectorsWorld.resize(vectors.size());
-  std::fill(vectorsWorld.begin(), vectorsWorld.end(), Vector3::Zero());
-  minimumWorld    = Vector3::Zero();
-  maximumWorld    = Vector3::Zero();
-  centerWorld     = Vector3::Zero();
-  extendSizeWorld = Vector3::Zero();
+  for (unsigned int index = 0; index < 8; ++index) {
+    vectorsWorld[index].copyFromFloats(0.f, 0.f, 0.f);
+  }
+
+  minimumWorld.copyFromFloats(0.f, 0.f, 0.f);
+  maximumWorld.copyFromFloats(0.f, 0.f, 0.f);
+  centerWorld.copyFromFloats(0.f, 0.f, 0.f);
+  extendSizeWorld.copyFromFloats(0.f, 0.f, 0.f);
 
   _update(_worldMatrix);
 }
@@ -124,13 +141,14 @@ BoundingBox::~BoundingBox()
 
 BoundingBox& BoundingBox::scale(float factor)
 {
-  auto diff     = maximum.subtract(minimum);
+  auto diff = Tmp::Vector3Array[0].copyFrom(maximum).subtractInPlace(minimum);
   auto distance = diff.length() * factor;
   diff.normalize();
-  auto newRadius = diff.scale(distance / 2.f);
+  auto newRadius = diff.scaleInPlace(distance * 0.5f);
 
-  auto min = center.subtract(newRadius);
-  auto max = center.add(newRadius);
+  const auto min
+    = Tmp::Vector3Array[1].copyFrom(center).subtractInPlace(newRadius);
+  const auto max = Tmp::Vector3Array[2].copyFrom(center).addInPlace(newRadius);
 
   reConstruct(min, max);
 
@@ -157,32 +175,11 @@ void BoundingBox::_update(const Matrix& world)
                            std::numeric_limits<float>::lowest(),
                            std::numeric_limits<float>::lowest(), maximumWorld);
 
-  unsigned int index = 0;
-  for (auto& vector : vectors) {
+  for (unsigned int index = 0; index < 8; ++index) {
     auto& v = vectorsWorld[index];
-    Vector3::TransformCoordinatesToRef(vector, world, v);
-
-    if (v.x < minimumWorld.x) {
-      minimumWorld.x = v.x;
-    }
-    if (v.y < minimumWorld.y) {
-      minimumWorld.y = v.y;
-    }
-    if (v.z < minimumWorld.z) {
-      minimumWorld.z = v.z;
-    }
-
-    if (v.x > maximumWorld.x) {
-      maximumWorld.x = v.x;
-    }
-    if (v.y > maximumWorld.y) {
-      maximumWorld.y = v.y;
-    }
-    if (v.z > maximumWorld.z) {
-      maximumWorld.z = v.z;
-    }
-
-    ++index;
+    Vector3::TransformCoordinatesToRef(vectors[index], world, v);
+    minimumWorld.minimizeInPlace(v);
+    maximumWorld.maximizeInPlace(v);
   }
 
   // Extend
@@ -193,9 +190,9 @@ void BoundingBox::_update(const Matrix& world)
   maximumWorld.addToRef(minimumWorld, centerWorld);
   centerWorld.scaleInPlace(0.5f);
 
-  Vector3::FromArrayToRef(world.m, 0, directions[0]);
-  Vector3::FromArrayToRef(world.m, 4, directions[1]);
-  Vector3::FromArrayToRef(world.m, 8, directions[2]);
+  Vector3::FromFloatArrayToRef(world.m, 0, directions[0]);
+  Vector3::FromFloatArrayToRef(world.m, 4, directions[1]);
+  Vector3::FromFloatArrayToRef(world.m, 8, directions[2]);
 
   _worldMatrix = world;
 }
@@ -286,7 +283,7 @@ bool BoundingBox::IntersectsSphere(const Vector3& minPoint,
 }
 
 bool BoundingBox::IsCompletelyInFrustum(
-  const std::vector<Vector3>& boundingVectors,
+  const std::array<Vector3, 8>& boundingVectors,
   const std::array<Plane, 6>& frustumPlanes)
 {
   for (unsigned int p = 0; p < 6; ++p) {
@@ -299,7 +296,7 @@ bool BoundingBox::IsCompletelyInFrustum(
   return true;
 }
 
-bool BoundingBox::IsInFrustum(const std::vector<Vector3>& boundingVectors,
+bool BoundingBox::IsInFrustum(const std::array<Vector3, 8>& boundingVectors,
                               const std::array<Plane, 6>& frustumPlanes)
 {
   for (size_t p = 0; p < 6; ++p) {

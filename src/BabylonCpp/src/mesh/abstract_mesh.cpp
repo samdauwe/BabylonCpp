@@ -1591,14 +1591,14 @@ AbstractMesh& AbstractMesh::updateFacetData()
     _facetDepthSortOrigin = Vector3::Zero();
   }
 
-  _bbSize.x = (bInfo.maximum.x - bInfo.minimum.x > Math::Epsilon) ?
-                bInfo.maximum.x - bInfo.minimum.x :
+  _bbSize.x = (bInfo.maximum().x - bInfo.minimum().x > Math::Epsilon) ?
+                bInfo.maximum().x - bInfo.minimum().x :
                 Math::Epsilon;
-  _bbSize.y = (bInfo.maximum.y - bInfo.minimum.y > Math::Epsilon) ?
-                bInfo.maximum.y - bInfo.minimum.y :
+  _bbSize.y = (bInfo.maximum().y - bInfo.minimum().y > Math::Epsilon) ?
+                bInfo.maximum().y - bInfo.minimum().y :
                 Math::Epsilon;
-  _bbSize.z = (bInfo.maximum.z - bInfo.minimum.z > Math::Epsilon) ?
-                bInfo.maximum.z - bInfo.minimum.z :
+  _bbSize.z = (bInfo.maximum().z - bInfo.minimum().z > Math::Epsilon) ?
+                bInfo.maximum().z - bInfo.minimum().z :
                 Math::Epsilon;
   auto bbSizeMax = (_bbSize.x > _bbSize.y) ? _bbSize.x : _bbSize.y;
   bbSizeMax      = (bbSizeMax > _bbSize.z) ? bbSizeMax : _bbSize.z;
@@ -1710,13 +1710,13 @@ Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
   auto bInfo = getBoundingInfo();
 
   int ox = static_cast<int>(
-    std::floor((x - bInfo.minimum.x * _partitioningBBoxRatio) * _subDiv.X
+    std::floor((x - bInfo.minimum().x * _partitioningBBoxRatio) * _subDiv.X
                * _partitioningBBoxRatio / _bbSize.x));
   int oy = static_cast<int>(
-    std::floor((y - bInfo.minimum.y * _partitioningBBoxRatio) * _subDiv.Y
+    std::floor((y - bInfo.minimum().y * _partitioningBBoxRatio) * _subDiv.Y
                * _partitioningBBoxRatio / _bbSize.y));
   int oz = static_cast<int>(
-    std::floor((z - bInfo.minimum.z * _partitioningBBoxRatio) * _subDiv.Z
+    std::floor((z - bInfo.minimum().z * _partitioningBBoxRatio) * _subDiv.Z
                * _partitioningBBoxRatio / _bbSize.z));
 
   if (ox < 0 || oy < 0 || oz < 0) {

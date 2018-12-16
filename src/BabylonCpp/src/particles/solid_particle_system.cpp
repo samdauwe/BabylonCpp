@@ -1031,17 +1031,17 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       // place and scale the particle bouding sphere in the SPS local system,
       // then update it
       _minBbox.x
-        = _particle->_modelBoundingInfo->minimum.x * _particle->scaling.x;
+        = _particle->_modelBoundingInfo->minimum().x * _particle->scaling.x;
       _minBbox.y
-        = _particle->_modelBoundingInfo->minimum.y * _particle->scaling.y;
+        = _particle->_modelBoundingInfo->minimum().y * _particle->scaling.y;
       _minBbox.z
-        = _particle->_modelBoundingInfo->minimum.z * _particle->scaling.z;
+        = _particle->_modelBoundingInfo->minimum().z * _particle->scaling.z;
       _maxBbox.x
-        = _particle->_modelBoundingInfo->maximum.x * _particle->scaling.x;
+        = _particle->_modelBoundingInfo->maximum().x * _particle->scaling.x;
       _maxBbox.y
-        = _particle->_modelBoundingInfo->maximum.y * _particle->scaling.y;
+        = _particle->_modelBoundingInfo->maximum().y * _particle->scaling.y;
       _maxBbox.z
-        = _particle->_modelBoundingInfo->maximum.z * _particle->scaling.z;
+        = _particle->_modelBoundingInfo->maximum().z * _particle->scaling.z;
       bSphere.center.x
         = _particle->_globalPosition.x + (_minBbox.x + _maxBbox.x) * 0.5f;
       bSphere.center.y

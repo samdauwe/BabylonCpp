@@ -3,35 +3,36 @@
 #include <babylon/collisions/collider.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_sphere.h>
+#include <babylon/math/tmp.h>
 #include <babylon/mesh/abstract_mesh.h>
 
 namespace BABYLON {
 
 BoundingInfo::BoundingInfo(const Vector3& iMinimum, const Vector3& iMaximum)
-    : minimum{iMinimum}
-    , maximum{iMaximum}
-    , boundingBox{BoundingBox(iMinimum, iMaximum)}
+    : boundingBox{BoundingBox(iMinimum, iMaximum)}
     , boundingSphere{BoundingSphere(iMinimum, iMaximum)}
+    , minimum{this, &BoundingInfo::get_minimum}
+    , maximum{this, &BoundingInfo::get_maximum}
     , isLocked{this, &BoundingInfo::get_isLocked, &BoundingInfo::set_isLocked}
     , _isLocked{false}
 {
 }
 
 BoundingInfo::BoundingInfo(const BoundingInfo& boundingInfo)
-    : minimum{boundingInfo.minimum}
-    , maximum{boundingInfo.maximum}
-    , boundingBox{BoundingBox(boundingInfo.boundingBox)}
+    : boundingBox{BoundingBox(boundingInfo.boundingBox)}
     , boundingSphere{BoundingSphere(boundingInfo.boundingSphere)}
+    , minimum{this, &BoundingInfo::get_minimum}
+    , maximum{this, &BoundingInfo::get_maximum}
     , isLocked{this, &BoundingInfo::get_isLocked, &BoundingInfo::set_isLocked}
     , _isLocked{boundingInfo._isLocked}
 {
 }
 
 BoundingInfo::BoundingInfo(BoundingInfo&& other)
-    : minimum{std::move(other.minimum)}
-    , maximum{std::move(other.maximum)}
-    , boundingBox{BoundingBox(std::move(other.boundingBox))}
+    : boundingBox{BoundingBox(std::move(other.boundingBox))}
     , boundingSphere{BoundingSphere(std::move(other.boundingSphere))}
+    , minimum{this, &BoundingInfo::get_minimum}
+    , maximum{this, &BoundingInfo::get_maximum}
     , isLocked{this, &BoundingInfo::get_isLocked, &BoundingInfo::set_isLocked}
     , _isLocked{std::move(other._isLocked)}
 {
@@ -40,8 +41,6 @@ BoundingInfo::BoundingInfo(BoundingInfo&& other)
 BoundingInfo& BoundingInfo::operator=(const BoundingInfo& other)
 {
   if (&other != this) {
-    minimum        = other.minimum;
-    maximum        = other.maximum;
     boundingBox    = other.boundingBox;
     boundingSphere = other.boundingSphere;
     _isLocked      = other._isLocked;
@@ -53,8 +52,6 @@ BoundingInfo& BoundingInfo::operator=(const BoundingInfo& other)
 BoundingInfo& BoundingInfo::operator=(BoundingInfo&& other)
 {
   if (&other != this) {
-    minimum        = std::move(other.minimum);
-    maximum        = std::move(other.maximum);
     boundingBox    = std::move(other.boundingBox);
     boundingSphere = std::move(other.boundingSphere);
     _isLocked      = std::move(other._isLocked);
@@ -65,6 +62,16 @@ BoundingInfo& BoundingInfo::operator=(BoundingInfo&& other)
 
 BoundingInfo::~BoundingInfo()
 {
+}
+
+Vector3& BoundingInfo::get_minimum()
+{
+  return boundingBox.minimum;
+}
+
+Vector3& BoundingInfo::get_maximum()
+{
+  return boundingBox.maximum;
 }
 
 bool BoundingInfo::get_isLocked() const
@@ -90,11 +97,12 @@ void BoundingInfo::update(const Matrix& world)
 BoundingInfo& BoundingInfo::centerOn(const Vector3& center,
                                      const Vector3& extend)
 {
-  minimum = center.subtract(extend);
-  maximum = center.add(extend);
+  const auto minimum
+    = Tmp::Vector3Array[0].copyFrom(center).subtractInPlace(extend);
+  const auto maximum = Tmp::Vector3Array[1].copyFrom(center).addInPlace(extend);
 
-  boundingBox    = BoundingBox(minimum, maximum);
-  boundingSphere = BoundingSphere(minimum, maximum);
+  boundingBox.reConstruct(minimum, maximum);
+  boundingSphere.reConstruct(minimum, maximum);
 
   return *this;
 }

@@ -14,7 +14,7 @@ class IntersectionInfo;
 class PickingInfo;
 
 /**
- * @brief Represents a Ray.
+ * @brief Class representing a ray with position and direction.
  */
 class BABYLON_SHARED_EXPORT Ray {
 
@@ -24,6 +24,13 @@ public:
 
 public:
   Ray();
+
+  /**
+   * @brief Creates a new ray.
+   * @param origin origin point
+   * @param direction direction
+   * @param length length of the ray
+   */
   Ray(const Vector3& origin, const Vector3& direction,
       float length = std::numeric_limits<float>::max());
   Ray(const Ray& otherRay);
@@ -35,22 +42,69 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Ray& ray);
 
   /** Methods **/
+  /**
+   * @brief Checks if the ray intersects a box.
+   * @param minimum bound of the box
+   * @param maximum bound of the box
+   * @returns if the box was hit
+   */
   bool intersectsBoxMinMax(const Vector3& minimum,
                            const Vector3& maximum) const;
+
+  /**
+   * @brief Checks if the ray intersects a box.
+   * @param box the bounding box to check
+   * @returns if the box was hit
+   */
   bool intersectsBox(const BoundingBox& box) const;
+
+  /**
+   * @brief If the ray hits a sphere.
+   * @param sphere the bounding sphere to check
+   * @returns true if it hits the sphere
+   */
   bool intersectsSphere(const BoundingSphere& sphere) const;
+
+  /**
+   * @brief If the ray hits a triange.
+   * @param vertex0 triangle vertex
+   * @param vertex1 triangle vertex
+   * @param vertex2 triangle vertex
+   * @returns intersection information if hit
+   */
   std::optional<IntersectionInfo> intersectsTriangle(const Vector3& vertex0,
                                                      const Vector3& vertex1,
                                                      const Vector3& vertex2);
+
+  /**
+   * @brief Checks if ray intersects a plane.
+   * @param plane the plane to check
+   * @returns the distance away it was hit
+   */
   std::optional<float> intersectsPlane(const Plane& plane);
+
+  /**
+   * @brief Checks if ray intersects a mesh.
+   * @param mesh the mesh to check
+   * @param fastCheck if only the bounding box should checked
+   * @returns picking info of the intersecton
+   */
   PickingInfo intersectsMesh(AbstractMesh* mesh, bool fastCheck = false);
+
+  /**
+   * @brief Checks if ray intersects a mesh.
+   * @param meshes the meshes to check
+   * @param fastCheck if only the bounding box should checked
+   * @param results array to store result in
+   * @returns Array of picking infos
+   */
   std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
                                             bool fastCheck,
                                             std::vector<PickingInfo>& results);
 
   /**
-   * Intersection test between the ray and a given segment whithin a given
-   * tolerance (threshold)
+   * @brief Intersection test between the ray and a given segment whithin a
+   * given tolerance (threshold).
    * @param sega the first point of the segment to test the intersection
    * against
    * @param segb the second point of the segment to test the intersection
@@ -64,29 +118,69 @@ public:
   float intersectionSegment(const Vector3& sega, const Vector3& segb,
                             float threshold) const;
 
+  /**
+   * @brief Update the ray from viewport position.
+   * @param x position
+   * @param y y position
+   * @param viewportWidth viewport width
+   * @param viewportHeight viewport height
+   * @param world world matrix
+   * @param view view matrix
+   * @param projection projection matrix
+   * @returns this ray updated
+   */
   Ray& update(float x, float y, float viewportWidth, float viewportHeight,
               Matrix& world, Matrix& view, Matrix& projection);
 
   /** Statics **/
+  /**
+   * @brief Creates a ray with origin and direction of 0,0,0.
+   * @returns the new ray
+   */
   static Ray Zero();
+
+  /**
+   * @brief Creates a new ray from screen space and viewport.
+   * @param x position
+   * @param y y position
+   * @param viewportWidth viewport width
+   * @param viewportHeight viewport height
+   * @param world world matrix
+   * @param view view matrix
+   * @param projection projection matrix
+   * @returns new ray
+   */
   static Ray CreateNew(float x, float y, float viewportWidth,
                        float viewportHeight, Matrix& world, Matrix& view,
                        Matrix& projection);
 
   /**
-   * Function will create a new transformed ray starting from origin and ending
-   * at the end point. Ray's length will be set, and ray will be
+   * @brief Function will create a new transformed ray starting from origin and
+   * ending at the end point. Ray's length will be set, and ray will be
    * transformed to the given world matrix.
    * @param origin The origin point
    * @param end The end point
    * @param world a matrix to transform the ray to. Default is the identity
    * matrix.
+   * @returns the new ray
    */
   static Ray CreateNewFromTo(const Vector3& origin, const Vector3& end,
                              const Matrix& world = Matrix::Identity());
 
+  /**
+   * @brief Transforms a ray by a matrix.
+   * @param ray ray to transform
+   * @param matrix matrix to apply
+   * @returns the resulting new ray
+   */
   static Ray Transform(const Ray& ray, const Matrix& matrix);
 
+  /**
+   * @brief Transforms a ray by a matrix.
+   * @param ray ray to transform
+   * @param matrix matrix to apply
+   * @param result ray to store result in
+   */
   static void TransformToRef(const Ray& ray, const Matrix& matrix, Ray& result);
 
 private:
@@ -94,8 +188,19 @@ private:
                                  const PickingInfo& pickingInfoB);
 
 public:
+  /**
+   * origin point
+   */
   Vector3 origin;
+
+  /**
+   * direction
+   */
   Vector3 direction;
+
+  /**
+   * length of the ray
+   */
   float length;
 
 private:

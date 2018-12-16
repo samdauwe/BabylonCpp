@@ -11,9 +11,17 @@ namespace BABYLON {
 
 class Collider;
 
+/**
+ * @brief Info for a bounding data of a mesh.
+ */
 class BABYLON_SHARED_EXPORT BoundingInfo : public ICullable {
 
 public:
+  /**
+   * @brief Constructs bounding info.
+   * @param minimum min vector of the bounding box/sphere
+   * @param maximum max vector of the bounding box/sphere
+   */
   BoundingInfo(const Vector3& minimum, const Vector3& maximum);
   BoundingInfo(const BoundingInfo& boundingInfo);
   BoundingInfo(BoundingInfo&& other);
@@ -22,6 +30,10 @@ public:
   virtual ~BoundingInfo();
 
   /** Methods **/
+  /**
+   * @brief Updates the boudning sphere and box.
+   * @param world world matrix to be used to update
+   */
   void update(const Matrix& world);
 
   /**
@@ -29,6 +41,7 @@ public:
    * given a specific extend.
    * @param center New center of the bounding info
    * @param extend New extend of the bounding info
+   * @returns the current bounding info
    */
   BoundingInfo& centerOn(const Vector3& center, const Vector3& extend);
 
@@ -57,6 +70,12 @@ public:
    */
   float diagonalLength() const;
 
+  /**
+   * @brief Checks if a cullable object (mesh...) is in the camera frustum.
+   * Unlike isInFrustum this cheks the full bounding box
+   * @param frustumPlanes Camera near/planes
+   * @returns true if the object is in frustum otherwise false
+   */
   bool isCompletelyInFrustum(
     const std::array<Plane, 6>& frustumPlanes) const override;
 
@@ -65,10 +84,28 @@ public:
    */
   bool _checkCollision(const Collider& collider) const;
 
+  /**
+   * @brief Checks if a point is inside the bounding box and bounding sphere or
+   * the mesh.
+   * @see https://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
+   * @param point the point to check intersection with
+   * @returns if the point intersects
+   */
   bool intersectsPoint(const Vector3& point);
+
+  /**
+   * @brief Checks if another bounding info intersects the bounding box and
+   * bounding sphere or the mesh.
+   * @see https://doc.babylonjs.com/babylon101/intersect_collisions_-_mesh
+   * @param boundingInfo the bounding info to check intersection with
+   * @param precise if the intersection should be done using OBB
+   * @returns if the bounding info intersects
+   */
   bool intersects(const BoundingInfo& boundingInfo, bool precise);
 
 protected:
+  Vector3& get_minimum();
+  Vector3& get_maximum();
   bool get_isLocked() const;
   void set_isLocked(bool value);
 
@@ -79,10 +116,29 @@ private:
                    const BoundingBox& box1) const;
 
 public:
-  Vector3 minimum;
-  Vector3 maximum;
+  /**
+   * Bounding box for the mesh
+   */
   BoundingBox boundingBox;
+
+  /**
+   * Bounding sphere for the mesh
+   */
   BoundingSphere boundingSphere;
+
+  /**
+   * min vector of the bounding box/sphere
+   */
+  ReadOnlyProperty<BoundingInfo, Vector3> minimum;
+
+  /**
+   * max vector of the bounding box/sphere
+   */
+  ReadOnlyProperty<BoundingInfo, Vector3> maximum;
+
+  /**
+   * If the info is locked and won't be updated to avoid perf overhead
+   */
   Property<BoundingInfo, bool> isLocked;
 
 private:
