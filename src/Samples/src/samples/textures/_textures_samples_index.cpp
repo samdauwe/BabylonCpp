@@ -4,6 +4,7 @@
 #include <babylon/samples/textures/bump_texture_spheres_scene.h>
 #include <babylon/samples/textures/cube_texture_different_faces_scene.h>
 #include <babylon/samples/textures/custom_render_targets_scene.h>
+#include <babylon/samples/textures/environment_texture_scene.h>
 #include <babylon/samples/textures/equirectangular_map_as_reflection_texture_scene.h>
 #include <babylon/samples/textures/hdr_cube_texture_scene.h>
 #include <babylon/samples/textures/image_texture_scene.h>
@@ -46,6 +47,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     [](ICanvas* iCanvas) {                                        //
       return std::make_unique<CustomRenderTargetsScene>(iCanvas); //
     });                                                           //
+  // Environment Texture Scene
+  _samples["EnvironmentTextureScene"] = std::make_tuple(
+    true,                                                        //
+    [](ICanvas* iCanvas) {                                       //
+      return std::make_unique<EnvironmentTextureScene>(iCanvas); //
+    });                                                          //
   // Equirectangular Map as Reflection Texture Scene
   _samples["EquirectangularMapAsReflectionTextureScene"] = std::make_tuple(
     true,                  //
