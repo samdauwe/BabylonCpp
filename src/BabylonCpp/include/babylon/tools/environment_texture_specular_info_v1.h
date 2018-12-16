@@ -1,9 +1,13 @@
 #ifndef BABYLON_TOOLS_ENVIRONMENT_TEXTURE_SPECULAR_INFO_V1
 #define BABYLON_TOOLS_ENVIRONMENT_TEXTURE_SPECULAR_INFO_V1
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/tools/buffer_image_data.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -23,6 +27,13 @@ public:
   EnvironmentTextureSpecularInfoV1&
   operator=(EnvironmentTextureSpecularInfoV1&& other);
   ~EnvironmentTextureSpecularInfoV1();
+
+  /**
+   * @brief Creates the specular information from the parsed specular data.
+   * @param parsedSpecular defines specular data
+   * @returns the parsed specular information
+   */
+  static EnvironmentTextureSpecularInfoV1 Parse(const json& parsedSpecular);
 
 public:
   /**

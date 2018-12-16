@@ -371,10 +371,9 @@ void StandardRenderingPipeline::_buildPipeline()
       "HDRPass", "standard", {}, {}, ratio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
       "#define PASS_POST_PROCESS", _floatTextureType);
-    originalPostProcess->setOnApply(
-      [&](Effect* /*effect*/, EventState& /*es*/) {
-        _currentDepthOfFieldSource = originalPostProcess;
-      });
+    originalPostProcess->onApply = [&](Effect* /*effect*/, EventState& /*es*/) {
+      _currentDepthOfFieldSource = originalPostProcess;
+    };
   }
   else {
     originalPostProcess = _basePostProcess;
@@ -514,7 +513,7 @@ void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define DOWN_SAMPLE_X4", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
-  downSampleX4PostProcess->setOnApply([&](Effect* effect, EventState&) {
+  downSampleX4PostProcess->onApply = [&](Effect* effect, EventState&) {
     Float32Array downSampleX4Offsets(32);
     unsigned int id   = 0;
     const auto width  = static_cast<float>(downSampleX4PostProcess->width);
@@ -527,7 +526,7 @@ void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
       }
     }
     effect->setArray2("dsOffsets", downSampleX4Offsets);
-  });
+  };
 
   // Add to pipeline
   addEffect(PostProcessRenderEffect::New(
@@ -544,7 +543,7 @@ void StandardRenderingPipeline::_createBrightPassPostProcess(Scene* scene,
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define BRIGHT_PASS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
-  brightPassPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  brightPassPostProcess->onApply = [&](Effect* effect, EventState&) {
     const float sU = (1.f / brightPassPostProcess->width);
     const float sV = (1.f / brightPassPostProcess->height);
 
@@ -560,7 +559,7 @@ void StandardRenderingPipeline::_createBrightPassPostProcess(Scene* scene,
 
     effect->setArray2("dsOffsets", brightOffsets);
     effect->setFloat("brightThreshold", brightThreshold);
-  });
+  };
 
   // Add to pipeline
   addEffect(PostProcessRenderEffect::New(
@@ -619,7 +618,7 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
     {"otherSampler", "lensSampler"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define TEXTURE_ADDER", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-  textureAdderPostProcess->setOnApply([&](Effect* effect, EventState& /*es*/) {
+  textureAdderPostProcess->onApply = [&](Effect* effect, EventState& /*es*/) {
     effect->setTextureFromPostProcess(
       "otherSampler", _vlsEnabled ? _currentDepthOfFieldSource.get() :
                                     originalPostProcess.get());
@@ -628,7 +627,7 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
     effect->setFloat("exposure", exposure);
 
     _currentDepthOfFieldSource = textureAdderFinalPostProcess;
-  });
+  };
 
   // Add to pipeline
   addEffect(PostProcessRenderEffect::New(
@@ -655,34 +654,34 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
     "#define VLS\n#define NB_STEPS "
       + std::to_string(std::round(_volumetricLightStepsCount * 10.f) / 10.f));
 
-  volumetricLightPostProcess->setOnApply(
-    [&](Effect* effect, EventState& /*es*/) {
-      if (sourceLight && sourceLight->getShadowGenerator()
-          && _scene->activeCamera) {
-        auto depthValues = Vector2::Zero();
-        auto generator   = sourceLight->getShadowGenerator();
+  volumetricLightPostProcess->onApply
+    = [&](Effect* effect, EventState& /*es*/) {
+        if (sourceLight && sourceLight->getShadowGenerator()
+            && _scene->activeCamera) {
+          auto depthValues = Vector2::Zero();
+          auto generator   = sourceLight->getShadowGenerator();
 
-        effect->setTexture("shadowMapSampler", generator->getShadowMap());
-        effect->setTexture("positionSampler", geometry->textures()[2]);
+          effect->setTexture("shadowMapSampler", generator->getShadowMap());
+          effect->setTexture("positionSampler", geometry->textures()[2]);
 
-        effect->setColor3("sunColor", sourceLight->diffuse);
-        effect->setVector3("sunDirection",
-                           std::static_pointer_cast<IShadowLight>(sourceLight)
-                             ->getShadowDirection());
+          effect->setColor3("sunColor", sourceLight->diffuse);
+          effect->setVector3("sunDirection",
+                             std::static_pointer_cast<IShadowLight>(sourceLight)
+                               ->getShadowDirection());
 
-        effect->setVector3("cameraPosition",
-                           scene->activeCamera->globalPosition());
-        effect->setMatrix("shadowViewProjection",
-                          generator->getTransformMatrix());
+          effect->setVector3("cameraPosition",
+                             scene->activeCamera->globalPosition());
+          effect->setMatrix("shadowViewProjection",
+                            generator->getTransformMatrix());
 
-        effect->setFloat("scatteringCoefficient", volumetricLightCoefficient);
-        effect->setFloat("scatteringPower", volumetricLightPower);
+          effect->setFloat("scatteringCoefficient", volumetricLightCoefficient);
+          effect->setFloat("scatteringPower", volumetricLightPower);
 
-        depthValues.x = sourceLight->getDepthMinZ(*_scene->activeCamera);
-        depthValues.y = sourceLight->getDepthMaxZ(*_scene->activeCamera);
-        effect->setVector2("depthValues", depthValues);
-      }
-    });
+          depthValues.x = sourceLight->getDepthMinZ(*_scene->activeCamera);
+          depthValues.y = sourceLight->getDepthMaxZ(*_scene->activeCamera);
+          effect->setVector2("depthValues", depthValues);
+        }
+      };
 
   addEffect(
     PostProcessRenderEffect::New(scene->getEngine(), "HDRVLS",
@@ -700,14 +699,14 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
                        ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
                        scene->getEngine(), false, "#define VLSMERGE");
 
-  volumetricLightMergePostProces->setOnApply(
-    [this](Effect* effect, EventState& /*es*/) {
-      effect->setTextureFromPostProcess(
-        "originalSampler", _bloomEnabled ? textureAdderFinalPostProcess.get() :
-                                           originalPostProcess.get());
+  volumetricLightMergePostProces->onApply = [this](Effect* effect,
+                                                   EventState& /*es*/) {
+    effect->setTextureFromPostProcess(
+      "originalSampler", _bloomEnabled ? textureAdderFinalPostProcess.get() :
+                                         originalPostProcess.get());
 
-      _currentDepthOfFieldSource = volumetricLightFinalPostProcess;
-    });
+    _currentDepthOfFieldSource = volumetricLightFinalPostProcess;
+  };
 
   addEffect(
     PostProcessRenderEffect::New(scene->getEngine(), "HDRVLSMerge",
@@ -728,7 +727,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define LUMINANCE", textureType);
 
-  luminancePostProcess->setOnApply([&](Effect* effect, EventState&) {
+  luminancePostProcess->onApply = [&](Effect* effect, EventState&) {
     const float sU = (1.f / luminancePostProcess->width);
     const float sV = (1.f / luminancePostProcess->height);
 
@@ -743,7 +742,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
     offsets[7] = -0.5f * sV;
 
     effect->setArray2("lumOffsets", offsets);
-  });
+  };
 
   // Add to pipeline
   addEffect(PostProcessRenderEffect::New(
@@ -777,7 +776,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
     const std::string indexStr = std::to_string(index);
     Float32Array downSampleOffsets(18);
 
-    pp->setOnApply([&](Effect* effect, EventState&) {
+    pp->onApply = [&](Effect* effect, EventState&) {
       if (!lastLuminance) {
         return;
       }
@@ -800,10 +799,10 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
       else {
         lastLuminance = pp;
       }
-    });
+    };
 
     if (index == luminanceDownSamplePostProcesses.size() - 1) {
-      pp->setOnAfterRender([&](Effect*, EventState&) {
+      pp->onAfterRender = [&](Effect*, EventState&) {
         auto pixel = scene->getEngine()->readPixels(0, 0, 1, 1);
         Vector4 bit_shift(1.f / (255.f * 255.f * 255.f), 1.f / (255.f * 255.f),
                           1.f / 255.f, 1.f);
@@ -811,7 +810,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
           = (pixel[0] * bit_shift.x + pixel[1] * bit_shift.y
              + pixel[2] * bit_shift.z + pixel[3] * bit_shift.w)
             / 100.f;
-      });
+      };
     }
 
     addEffect(PostProcessRenderEffect::New(
@@ -832,7 +831,7 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
   float time            = 0.f;
   float lastTime        = 0.f;
 
-  hdrPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  hdrPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("textureAdderSampler",
                                       _currentDepthOfFieldSource.get());
 
@@ -863,7 +862,7 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
     lastTime = time;
 
     _currentDepthOfFieldSource = hdrFinalPostProcess;
-  });
+  };
 
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), "HDR",
@@ -900,7 +899,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
                                          false));
 
   // Lens flare
-  lensFlarePostProcess->setOnApply([&](Effect* effect, EventState&) {
+  lensFlarePostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess(
       "textureSampler",
       _bloomEnabled ? blurHPostProcesses[0].get() : originalPostProcess.get());
@@ -916,10 +915,10 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     effect->setVector2("resolution", resolution);
 
     effect->setFloat("distortionStrength", lensFlareDistortionStrength);
-  });
+  };
 
   // Compose
-  lensFlareComposePostProcess->setOnApply([&](Effect* effect, EventState&) {
+  lensFlareComposePostProcess->onApply = [&](Effect* effect, EventState&) {
     if (!_scene->activeCamera) {
       return;
     }
@@ -961,7 +960,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     effect->setMatrix("lensStarMatrix", lensStarMatrix);
 
     _currentDepthOfFieldSource = lensFlareFinalPostProcess;
-  });
+  };
 }
 
 void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
@@ -972,13 +971,13 @@ void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
     {"otherSampler", "depthSampler"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     "#define DEPTH_OF_FIELD", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
-  depthOfFieldPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  depthOfFieldPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("otherSampler",
                                       textureAdderFinalPostProcess.get());
     effect->setTexture("depthSampler", _getDepthTexture());
 
     effect->setFloat("distance", depthOfFieldDistance);
-  });
+  };
 
   // Add to pipeline
   addEffect(PostProcessRenderEffect::New(
@@ -1001,7 +1000,7 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
       + std::to_string(motionBlurSamples()),
     EngineConstants::TEXTURETYPE_UNSIGNED_INT);
 
-  motionBlurPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  motionBlurPostProcess->onApply = [&](Effect* effect, EventState&) {
     auto motionScale        = 0.f;
     auto prevViewProjection = Matrix::Identity();
     auto invViewProjection  = Matrix::Identity();
@@ -1026,7 +1025,7 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
     effect->setFloat("motionStrength", motionStrength);
 
     effect->setTexture("depthSampler", _getDepthTexture());
-  });
+  };
 
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), "HDRMotionBlur",

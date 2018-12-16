@@ -1620,7 +1620,8 @@ public:
    * @brief Hidden
    */
   void _uploadImageToTexture(const InternalTexturePtr& texture,
-                             unsigned int faceIndex, int lod, ICanvas* image);
+                             const Image& image, unsigned int faceIndex = 0,
+                             int lod = 0);
 
   /**
    * @brief Creates a new render target cube texture.
@@ -1633,16 +1634,16 @@ public:
                                 const RenderTargetCreationOptions& options);
 
   /**
-   * @brief Create a cube texture from prefiltered data (ie. the mipmaps contain
-   * ready to use data for PBR reflection)
+   * @brief Create a cube texture from prefiltered data (ie. the mipmaps
+   * contain ready to use data for PBR reflection)
    * @param rootUrl defines the url where the file to load is located
    * @param scene defines the current scene
    * @param lodScale defines scale to apply to the mip map selection
    * @param lodOffset defines offset to apply to the mip map selection
    * @param onLoad defines an optional callback raised when the texture is
    * loaded
-   * @param onError defines an optional callback raised if there is an issue to
-   * load the texture
+   * @param onError defines an optional callback raised if there is an issue
+   * to load the texture
    * @param format defines the format of the data
    * @param forcedExtension defines the extension to use to pick the right
    * loader
@@ -1672,8 +1673,8 @@ public:
    * generated (false by default)
    * @param onLoad defines an optional callback raised when the texture is
    * loaded
-   * @param onError defines an optional callback raised if there is an issue to
-   * load the texture
+   * @param onError defines an optional callback raised if there is an issue
+   * to load the texture
    * @param format defines the format of the data
    * @param forcedExtension defines the extension to use to pick the right
    * loader
@@ -1683,8 +1684,8 @@ public:
    * manages the range of LOD level used for IBL according to the roughness
    * @param lodOffset defines the offset applied to environment texture. This
    * manages first LOD level used for IBL according to the roughness
-   * @param fallback defines texture to use while falling back when (compressed)
-   * texture file not found.
+   * @param fallback defines texture to use while falling back when
+   * (compressed) texture file not found.
    * @returns the cube texture as an InternalTexture
    */
   InternalTexturePtr createCubeTexture(
@@ -1748,10 +1749,10 @@ public:
    * BABYLON.Engine.TEXTURETYPE_UNSIGNED_INT)
    * @param noMipmap defines if the engine should avoid generating the mip
    * levels
-   * @param callback defines a callback used to extract texture data from loaded
-   * data
-   * @param mipmapGenerator defines to provide an optional tool to generate mip
-   * levels
+   * @param callback defines a callback used to extract texture data from
+   * loaded data
+   * @param mipmapGenerator defines to provide an optional tool to generate
+   * mip levels
    * @param onLoad defines a callback called when texture is loaded
    * @param onError defines a callback called if there is an error
    * @param samplingMode defines the required sampling mode (like
@@ -1894,7 +1895,8 @@ public:
    * @param y defines the y coordinate of the rectangle where pixels must be
    * read
    * @param width defines the width of the rectangle where pixels must be read
-   * @param height defines the height of the rectangle where pixels must be read
+   * @param height defines the height of the rectangle where pixels must be
+   * read
    * @returns a Uint8Array containing RGBA colors
    */
   Uint8Array readPixels(int x, int y, int width, int height);
@@ -1905,9 +1907,9 @@ public:
   void unbindAllAttributes();
 
   /**
-   * @brief Force the engine to release all cached effects. This means that next
-   * effect compilation will have to be done completely even if a similar effect
-   * was already compiled.
+   * @brief Force the engine to release all cached effects. This means that
+   * next effect compilation will have to be done completely even if a similar
+   * effect was already compiled.
    */
   void releaseEffects();
 
@@ -1955,8 +1957,8 @@ public:
   void loadingUIBackgroundColor(const std::string& color);
 
   /**
-   * @brief Gets the source code of the vertex shader associated with a specific
-   * webGL program.
+   * @brief Gets the source code of the vertex shader associated with a
+   * specific webGL program.
    * @param program defines the program to use
    * @returns a string containing the source code of the vertex shader
    * associated with the program
@@ -2167,8 +2169,8 @@ public:
    * @brief Will flag all materials in all scenes in all engines as dirty to
    * trigger new shader compilation.
    * @param flag defines which part of the materials must be marked as dirty
-   * @param predicate defines a predicate used to filter which materials should
-   * be affected
+   * @param predicate defines a predicate used to filter which materials
+   * should be affected
    */
   static void
   MarkAllMaterialsAsDirty(unsigned int flag,
@@ -2181,8 +2183,8 @@ public:
   static std::vector<IInternalTextureLoaderPtr> _TextureLoaders;
 
   /**
-   * @brief Gets a boolean indicating if the engine can be instanciated (ie. if
-   * a webGL context can be found).
+   * @brief Gets a boolean indicating if the engine can be instanciated (ie.
+   * if a webGL context can be found).
    * @returns true if the engine can be created
    */
   static bool isSupported();
@@ -2191,15 +2193,15 @@ protected:
   /**
    * @brief Creates a new engine.
    * @param canvasOrContext defines the canvas or WebGL context to use for
-   * rendering. If you provide a WebGL context, Babylon.js will not hook events
-   * on the canvas (like pointers, keyboards, etc...) so no event observables
-   * will be available. This is mostly used when Babylon.js is used as a plugin
-   * on a system which alreay used the WebGL context
+   * rendering. If you provide a WebGL context, Babylon.js will not hook
+   * events on the canvas (like pointers, keyboards, etc...) so no event
+   * observables will be available. This is mostly used when Babylon.js is
+   * used as a plugin on a system which alreay used the WebGL context
    * @param antialias defines enable antialiasing (default: false)
    * @param options defines further options to be sent to the getContext()
    * function
-   * @param adaptToDeviceRatio defines whether to adapt to the device's viewport
-   * characteristics (default: false)
+   * @param adaptToDeviceRatio defines whether to adapt to the device's
+   * viewport characteristics (default: false)
    */
   Engine(ICanvas* canvas, const EngineOptions& options = EngineOptions());
 
@@ -2372,8 +2374,8 @@ public:
   bool cullBackFaces;
 
   /**
-   * Gets or sets a boolean indicating if the engine must keep rendering even if
-   * the window is not in foregroun
+   * Gets or sets a boolean indicating if the engine must keep rendering even
+   * if the window is not in foregroun
    */
   bool renderEvenInBackground;
 
@@ -2383,8 +2385,8 @@ public:
   bool preventCacheWipeBetweenFrames;
 
   /**
-   * Gets or sets a boolean to enable/disable IndexedDB support and avoid XHR on
-   *.manifest
+   * Gets or sets a boolean to enable/disable IndexedDB support and avoid XHR
+   *on .manifest
    **/
   bool enableOfflineSupport;
 
@@ -2471,9 +2473,9 @@ public:
   /**
    * Gets or sets a value indicating if we want to disable texture binding
    * optmization. This could be required on some buggy drivers which wants to
-   * have textures bound in a progressive order. By default Babylon.js will try
-   * to let textures bound where they are and only update the samplers to point
-   * where the texture is
+   * have textures bound in a progressive order. By default Babylon.js will
+   * try to let textures bound where they are and only update the samplers to
+   * point where the texture is
    */
   bool disableTextureBindingOptimization;
 
@@ -2535,7 +2537,8 @@ public:
   Observable<Engine> onContextRestoredObservable;
 
   /**
-   * Turn this value on if you want to pause FPS computation when in background
+   * Turn this value on if you want to pause FPS computation when in
+   * background
    */
   bool disablePerformanceMonitorInBackground;
 

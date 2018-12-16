@@ -647,9 +647,9 @@ TexturePtr TextureTools::CreateResizedCopy(const TexturePtr& texture, int width,
                       TextureConstants::NEAREST_SAMPLINGMODE,
     engine, false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
   passPostProcess->getEffect()->executeWhenCompiled([&](Effect* /*effect*/) {
-    passPostProcess->setOnApply([&](Effect* effect, EventState&) {
+    passPostProcess->onApply = [&](Effect* effect, EventState&) {
       effect->setTexture("textureSampler", texture);
-    });
+    };
 
     auto internalTexture = rtt->getInternalTexture();
 

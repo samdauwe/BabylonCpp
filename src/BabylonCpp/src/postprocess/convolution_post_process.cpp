@@ -27,11 +27,11 @@ ConvolutionPostProcess::ConvolutionPostProcess(
                   "",           textureType}
     , kernel{iKernel}
 {
-  setOnApply([&](Effect* effect, EventState&) {
+  onApply = [&](Effect* effect, EventState&) {
     effect->setFloat2("screenSize", static_cast<float>(width),
                       static_cast<float>(height));
     effect->setArray("kernel", kernel);
-  });
+  };
 }
 
 ConvolutionPostProcess::~ConvolutionPostProcess()

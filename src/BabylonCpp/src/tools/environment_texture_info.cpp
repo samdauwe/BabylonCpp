@@ -1,5 +1,7 @@
 #include <babylon/tools/environment_texture_info.h>
 
+#include <babylon/core/json_util.h>
+
 namespace BABYLON {
 
 EnvironmentTextureInfo::EnvironmentTextureInfo()
@@ -52,6 +54,30 @@ operator=(EnvironmentTextureInfo&& other)
 
 EnvironmentTextureInfo::~EnvironmentTextureInfo()
 {
+}
+
+EnvironmentTextureInfo EnvironmentTextureInfo::Parse(const json& parsedManifest)
+{
+  EnvironmentTextureInfo manifest;
+  manifest.version = json_util::get_number(parsedManifest, "version", 0u);
+  manifest.width   = json_util::get_number(parsedManifest, "width", 0);
+
+  // Irradiance information
+  if (json_util::has_key(parsedManifest, "irradiance")
+      && parsedManifest["irradiance"].is_object()) {
+    auto parsedIrradiance = parsedManifest["irradiance"];
+    manifest.irradiance
+      = EnvironmentTextureIrradianceInfoV1::Parse(parsedIrradiance);
+  }
+
+  // Specular information
+  if (json_util::has_key(parsedManifest, "specular")
+      && parsedManifest["specular"].is_object()) {
+    auto parsedSpecular = parsedManifest["specular"];
+    manifest.specular = EnvironmentTextureSpecularInfoV1::Parse(parsedSpecular);
+  }
+
+  return manifest;
 }
 
 } // end of namespace BABYLON

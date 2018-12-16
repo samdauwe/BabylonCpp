@@ -56,13 +56,13 @@ VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   // Configure
   _createPass(scene, ratio);
 
-  setOnActivate([&](Camera* iCamera, EventState&) {
+  onActivate = [&](Camera* iCamera, EventState&) {
     if (!isSupported()) {
       dispose(iCamera);
     }
 
-    setOnActivate(nullptr);
-  });
+    onActivate = nullptr;
+  };
 
   onApplyObservable.add([&](Effect* effect, EventState&) {
     _updateMeshScreenCoordinates(scene);

@@ -9,6 +9,7 @@
 
 namespace BABYLON {
 
+class ArrayBufferView;
 class EnvironmentTextureInfo;
 class InternalTexture;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
@@ -45,11 +46,20 @@ public:
    * @param arrayBuffer defines the buffer cotaining the data to load
    * @param info defines the texture info retrieved through the GetEnvInfo
    * method
-   * @returns a promise
    */
-  static bool UploadEnvLevels(const InternalTexturePtr& texture,
+  static void UploadEnvLevels(const InternalTexturePtr& texture,
                               const ArrayBuffer& arrayBuffer,
                               const EnvironmentTextureInfo& info);
+
+  /**
+   * @brief Uploads the levels of image data to the GPU.
+   * @param texture defines the internal texture to upload to
+   * @param imageData defines the array buffer views of image data
+   * [mipmap][face]
+   */
+  static void
+  UploadLevels(const InternalTexturePtr& texture,
+               const std::vector<std::vector<ArrayBufferView>>& imageData);
 
   /**
    * @brief Uploads spherical polynomials information to the texture.

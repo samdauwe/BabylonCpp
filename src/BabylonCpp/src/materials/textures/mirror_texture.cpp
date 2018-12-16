@@ -179,7 +179,7 @@ void MirrorTexture::_preparePostProcesses()
     _blurX->autoClear = false;
 
     if (_blurRatio == 1.f && samples() < 2 && _texture) {
-      _blurX->setInputTexture(_texture);
+      _blurX->inputTexture = _texture;
     }
     else {
       _blurX->alwaysForcePOT = true;

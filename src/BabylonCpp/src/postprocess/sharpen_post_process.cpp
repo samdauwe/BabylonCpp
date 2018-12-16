@@ -29,11 +29,11 @@ SharpenPostProcess::SharpenPostProcess(
     , colorAmount{1.f}
     , edgeAmount{0.3f}
 {
-  setOnApply([this](Effect* effect, EventState& /*ev*/) {
+  onApply = [this](Effect* effect, EventState& /*ev*/) {
     effect->setFloat2("screenSize", static_cast<float>(width),
                       static_cast<float>(height));
     effect->setFloat2("sharpnessAmounts", edgeAmount, colorAmount);
-  });
+  };
 }
 
 SharpenPostProcess::~SharpenPostProcess()

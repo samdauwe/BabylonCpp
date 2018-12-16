@@ -60,7 +60,8 @@ void ENVTextureLoader::loadCubeData(
     texture->height = info->width;
 
     EnvironmentTextureTools::UploadEnvSpherical(texture, *info);
-    if (EnvironmentTextureTools::UploadEnvLevels(texture, data, *info)) {
+    EnvironmentTextureTools::UploadEnvLevels(texture, data, *info);
+    {
       texture->isReady = true;
       if (onLoad) {
         // onLoad();

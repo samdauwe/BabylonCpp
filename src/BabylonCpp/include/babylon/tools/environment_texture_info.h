@@ -21,6 +21,13 @@ public:
   EnvironmentTextureInfo& operator=(EnvironmentTextureInfo&& other);
   ~EnvironmentTextureInfo();
 
+  /**
+   * @brief Creates raw texture data from parsed data.
+   * @param parsedEnvironmentTextureInfo defines EnvironmentTextureInfo data
+   * @returns the parsed raw texture data
+   */
+  static EnvironmentTextureInfo Parse(const json& parsedEnvironmentTextureInfo);
+
 public:
   /**
    * Version of the environment map

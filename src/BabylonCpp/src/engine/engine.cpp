@@ -29,6 +29,7 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/loaders/dds_texture_loader.h>
+#include <babylon/materials/textures/loaders/env_texture_loader.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/uniform_buffer.h>
@@ -51,8 +52,9 @@ namespace BABYLON {
 
 // Register the loaders
 std::vector<IInternalTextureLoaderPtr> Engine::_TextureLoaders = {
-  // DDS Texture Loader
-  std::make_shared<DDSTextureLoader>()};
+  std::make_shared<DDSTextureLoader>(), // DDS Texture Loader
+  std::make_shared<ENVTextureLoader>()  // ENV Texture Loader
+};
 
 std::string Engine::Version()
 {
@@ -2952,9 +2954,9 @@ void Engine::_rescaleTexture(const InternalTexturePtr& source,
 
   _rescalePostProcess->getEffect()->executeWhenCompiled(
     [&](Effect* /*effect*/) {
-      _rescalePostProcess->setOnApply([&](Effect* effect, EventState&) {
+      _rescalePostProcess->onApply = [&](Effect* effect, EventState&) {
         effect->_bindTexture("textureSampler", source);
-      });
+      };
 
       auto hostingScene = scene;
 
@@ -3939,8 +3941,8 @@ void Engine::_uploadArrayBufferViewToTexture(const InternalTexturePtr& texture,
 }
 
 void Engine::_uploadImageToTexture(const InternalTexturePtr& texture,
-                                   unsigned int faceIndex, int lod,
-                                   ICanvas* image)
+                                   const Image& image, unsigned int faceIndex,
+                                   int lod)
 {
   auto textureType = _getWebGLTextureType(texture->type);
   auto format      = _getInternalFormat(texture->format);
@@ -3958,7 +3960,8 @@ void Engine::_uploadImageToTexture(const InternalTexturePtr& texture,
       = static_cast<GL::GLenum>(GL::TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex);
   }
 
-  _gl->texImage2D(target, lod, internalFormat, format, textureType, image);
+  _gl->texImage2D(target, lod, static_cast<int>(internalFormat), image.width,
+                  image.height, 0, format, textureType, image.data);
   _bindTextureDirectly(bindTarget, nullptr, true);
 }
 

@@ -1,8 +1,12 @@
 #ifndef BABYLON_TOOLS_ENVIRONMENT_TEXTURE_IRRADIANCE_INFO_V1
 #define BABYLON_TOOLS_ENVIRONMENT_TEXTURE_IRRADIANCE_INFO_V1
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -23,6 +27,13 @@ public:
   EnvironmentTextureIrradianceInfoV1&
   operator=(EnvironmentTextureIrradianceInfoV1&& other);
   ~EnvironmentTextureIrradianceInfoV1();
+
+  /**
+   * @brief Creates the irradiance information from the parsed irradiance data.
+   * @param parsedIrradiance defines irradiance data
+   * @returns the parsed irradiance information
+   */
+  static EnvironmentTextureIrradianceInfoV1 Parse(const json& parsedIrradiance);
 
 public:
   Float32Array x;

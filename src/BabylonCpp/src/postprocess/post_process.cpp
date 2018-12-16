@@ -35,6 +35,13 @@ PostProcess::PostProcess(
     , scaleMode{EngineConstants::SCALEMODE_FLOOR}
     , alwaysForcePOT{false}
     , samples{this, &PostProcess::get_samples, &PostProcess::set_samples}
+    , onActivate{this, &PostProcess::set_onActivate}
+    , onSizeChanged{this, &PostProcess::set_onSizeChanged}
+    , onApply{this, &PostProcess::set_onApply}
+    , onBeforeRender{this, &PostProcess::set_onBeforeRender}
+    , onAfterRender{this, &PostProcess::set_onAfterRender}
+    , inputTexture{this, &PostProcess::get_inputTexture,
+                   &PostProcess::set_inputTexture}
     , adaptScaleToCurrentViewport{false}
     , _currentRenderTextureInd{0}
     , _samples{1}
@@ -113,7 +120,7 @@ void PostProcess::set_samples(unsigned int n)
   }
 }
 
-void PostProcess::setOnActivate(
+void PostProcess::set_onActivate(
   const std::function<void(Camera* camera, EventState&)>& callback)
 {
   if (_onActivateObserver) {
@@ -124,7 +131,7 @@ void PostProcess::setOnActivate(
   }
 }
 
-void PostProcess::setOnSizeChanged(
+void PostProcess::set_onSizeChanged(
   const std::function<void(PostProcess* postProcess, EventState&)>& callback)
 {
   if (_onSizeChangedObserver) {
@@ -133,7 +140,7 @@ void PostProcess::setOnSizeChanged(
   _onSizeChangedObserver = onSizeChangedObservable.add(callback);
 }
 
-void PostProcess::setOnApply(
+void PostProcess::set_onApply(
   const std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onApplyObserver) {
@@ -142,7 +149,7 @@ void PostProcess::setOnApply(
   _onApplyObserver = onApplyObservable.add(callback);
 }
 
-void PostProcess::setOnBeforeRender(
+void PostProcess::set_onBeforeRender(
   const std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onBeforeRenderObserver) {
@@ -151,7 +158,7 @@ void PostProcess::setOnBeforeRender(
   _onBeforeRenderObserver = onBeforeRenderObservable.add(callback);
 }
 
-void PostProcess::setOnAfterRender(
+void PostProcess::set_onAfterRender(
   const std::function<void(Effect* effect, EventState&)>& callback)
 {
   if (_onAfterRenderObserver) {
@@ -160,12 +167,12 @@ void PostProcess::setOnAfterRender(
   _onAfterRenderObserver = onAfterRenderObservable.add(callback);
 }
 
-InternalTexturePtr& PostProcess::inputTexture()
+InternalTexturePtr& PostProcess::get_inputTexture()
 {
   return _textures[_currentRenderTextureInd];
 }
 
-void PostProcess::setInputTexture(const InternalTexturePtr& value)
+void PostProcess::set_inputTexture(const InternalTexturePtr& value)
 {
   _forcedOutputTexture = value;
 }

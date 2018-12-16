@@ -45,7 +45,7 @@ public:
       const std::unordered_map<std::string, unsigned int>& indexParameters = {},
       bool blockCompilation = false)
   {
-    auto  postProcess = std::shared_ptr<PostProcess>(
+    auto postProcess = std::shared_ptr<PostProcess>(
       new PostProcess(name, fragmentUrl, parameters, samplers, options, camera,
                       samplingMode, engine, reusable, defines, textureType,
                       vertexUrl, indexParameters, blockCompilation));
@@ -56,47 +56,6 @@ public:
   virtual ~PostProcess();
 
   void add(const PostProcessPtr& newPostProcess);
-
-  // Events
-
-  /**
-   * @brief A function that is added to the onActivateObservable.
-   */
-  void setOnActivate(
-    const std::function<void(Camera* camera, EventState&)>& callback);
-
-  /**
-   * @brief A function that is added to the onSizeChangedObservable.
-   */
-  void setOnSizeChanged(
-    const std::function<void(PostProcess* postProcess, EventState&)>& callback);
-
-  /**
-   * @brief A function that is added to the onApplyObservable.
-   */
-  void
-  setOnApply(const std::function<void(Effect* effect, EventState&)>& callback);
-
-  /**
-   * @brief A function that is added to the onBeforeRenderObservable.
-   */
-  void setOnBeforeRender(
-    const std::function<void(Effect* effect, EventState&)>& callback);
-
-  /**
-   * @brief A function that is added to the onAfterRenderObservable.
-   */
-  void setOnAfterRender(
-    const std::function<void(Effect* effect, EventState&)>& callback);
-
-  /**
-   * @brief The input texture for this post process and the output texture of
-   * the previous post process. When added to a pipeline the previous post
-   * process will render it's output into this texture and this texture will be
-   * used as textureSampler in the fragment shader of this post process.
-   */
-  InternalTexturePtr& inputTexture();
-  void setInputTexture(const InternalTexturePtr& value);
 
   /**
    * @brief Gets the camera which post process is applied to.
@@ -280,6 +239,47 @@ protected:
    */
   void set_samples(unsigned int n);
 
+  // Events
+
+  /**
+   * @brief A function that is added to the onActivateObservable.
+   */
+  void set_onActivate(
+    const std::function<void(Camera* camera, EventState&)>& callback);
+
+  /**
+   * @brief A function that is added to the onSizeChangedObservable.
+   */
+  void set_onSizeChanged(
+    const std::function<void(PostProcess* postProcess, EventState&)>& callback);
+
+  /**
+   * @brief A function that is added to the onApplyObservable.
+   */
+  void
+  set_onApply(const std::function<void(Effect* effect, EventState&)>& callback);
+
+  /**
+   * @brief A function that is added to the onBeforeRenderObservable.
+   */
+  void set_onBeforeRender(
+    const std::function<void(Effect* effect, EventState&)>& callback);
+
+  /**
+   * @brief A function that is added to the onAfterRenderObservable.
+   */
+  void set_onAfterRender(
+    const std::function<void(Effect* effect, EventState&)>& callback);
+
+  /**
+   * @brief The input texture for this post process and the output texture of
+   * the previous post process. When added to a pipeline the previous post
+   * process will render it's output into this texture and this texture will be
+   * used as textureSampler in the fragment shader of this post process.
+   */
+  InternalTexturePtr& get_inputTexture();
+  void set_inputTexture(const InternalTexturePtr& value);
+
 public:
   /**
    * Name of the PostProcess
@@ -372,6 +372,51 @@ public:
    * Number of sample textures (default: 1)
    */
   Property<PostProcess, unsigned int> samples;
+
+  // Events
+
+  /**
+   * A function that is added to the onActivateObservable.
+   */
+  WriteOnlyProperty<PostProcess,
+                    const std::function<void(Camera* camera, EventState&)>>
+    onActivate;
+
+  /**
+   * A function that is added to the onSizeChangedObservable.
+   */
+  WriteOnlyProperty<PostProcess,
+                    std::function<void(PostProcess* postProcess, EventState&)>>
+    onSizeChanged;
+
+  /**
+   * A function that is added to the onApplyObservable.
+   */
+  WriteOnlyProperty<PostProcess,
+                    std::function<void(Effect* effect, EventState&)>>
+    onApply;
+
+  /**
+   * A function that is added to the onBeforeRenderObservable.
+   */
+  WriteOnlyProperty<PostProcess,
+                    std::function<void(Effect* effect, EventState&)>>
+    onBeforeRender;
+
+  /**
+   * A function that is added to the onAfterRenderObservable.
+   */
+  WriteOnlyProperty<PostProcess,
+                    std::function<void(Effect* effect, EventState&)>>
+    onAfterRender;
+
+  /**
+   * The input texture for this post process and the output texture of
+   * the previous post process. When added to a pipeline the previous post
+   * process will render it's output into this texture and this texture will be
+   * used as textureSampler in the fragment shader of this post process.
+   */
+  Property<PostProcess, InternalTexturePtr> inputTexture;
 
   /**
    * Modify the scale of the post process to be the same as the viewport

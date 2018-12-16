@@ -182,7 +182,7 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
     _scene->getEngine(), false,
     "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
 
-  _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _ssaoPostProcess->onApply = [&](Effect* effect, EventState&) {
     if (_firstUpdate) {
       effect->setArray3("sampleSphere", sampleSphere);
       effect->setFloat("samplesFactor", samplesFactor);
@@ -197,7 +197,7 @@ void SSAORenderingPipeline::_createSSAOPostProcess(float ratio)
 
     effect->setTexture("textureSampler", _depthTexture);
     effect->setTexture("randomSampler", _randomTexture);
-  });
+  };
 }
 
 void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
@@ -207,12 +207,12 @@ void SSAORenderingPipeline::_createSSAOCombinePostProcess(float ratio)
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false);
 
-  _ssaoCombinePostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _ssaoCombinePostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setVector4("viewport",
                        Tmp::Vector4Array[0].copyFromFloats(0.f, 0.f, 1.f, 1.f));
     effect->setTextureFromPostProcess("originalColor",
                                       _originalColorPostProcess.get());
-  });
+  };
 }
 
 void SSAORenderingPipeline::_createRandomTexture()

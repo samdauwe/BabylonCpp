@@ -215,7 +215,7 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
     ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
     _scene->getEngine(), false);
 
-  _chromaticAberrationPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _chromaticAberrationPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setFloat("chromatic_aberration", _chromaticAberration);
     effect->setFloat("screen_width",
                      static_cast<float>(_scene->getEngine()->getRenderWidth()));
@@ -225,7 +225,7 @@ void LensRenderingPipeline::_createChromaticAberrationPostProcess(float ratio)
     effect->setFloat("radialIntensity", 1.f);
     effect->setFloat2("direction", 17.f, 17.f);
     effect->setFloat2("centerPosition", 0.5f, 0.5f);
-  });
+  };
 }
 
 void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
@@ -237,7 +237,7 @@ void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
     ratio, nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE,
     _scene->getEngine(), false, _dofPentagon ? "#define PENTAGON\n" : "");
 
-  _highlightsPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _highlightsPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setFloat("gain", _highlightsGain);
     effect->setFloat("threshold", _highlightsThreshold);
     effect->setTextureFromPostProcess("textureSampler",
@@ -247,7 +247,7 @@ void LensRenderingPipeline::_createHighlightsPostProcess(float ratio)
     effect->setFloat(
       "screen_height",
       static_cast<float>(_scene->getEngine()->getRenderHeight()));
-  });
+  };
 }
 
 void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
@@ -260,7 +260,7 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
     {"depthSampler", "grainSampler", "highlightsSampler"}, ratio, nullptr,
     TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(), false);
 
-  _depthOfFieldPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _depthOfFieldPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setTexture("depthSampler", _depthTexture);
     effect->setTexture("grainSampler", _grainTexture);
     effect->setTextureFromPostProcess("textureSampler",
@@ -293,7 +293,7 @@ void LensRenderingPipeline::_createDepthOfFieldPostProcess(float ratio)
       effect->setFloat("near", _scene->activeCamera->minZ);
       effect->setFloat("far", _scene->activeCamera->maxZ);
     }
-  });
+  };
 }
 
 void LensRenderingPipeline::_createGrainTexture()

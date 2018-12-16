@@ -229,7 +229,7 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false,
     "#define BILATERAL_BLUR\n#define BILATERAL_BLUR_H\n#define SAMPLES 16");
-  _blurHPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _blurHPostProcess->onApply = [&](Effect* effect, EventState&) {
     if (!_scene->activeCamera) {
       return;
     }
@@ -245,13 +245,13 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
     if (_firstUpdate) {
       effect->setArray("samplerOffsets", samplerOffsets);
     }
-  });
+  };
 
   _blurVPostProcess = PostProcess::New(
     "BlurV", "ssao", {"outSize", "samplerOffsets"}, {"depthSampler"}, blurRatio,
     nullptr, TextureConstants::TRILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false, "#define BILATERAL_BLUR\n#define SAMPLES 16");
-  _blurVPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _blurVPostProcess->onApply = [&](Effect* effect, EventState&) {
     if (!_scene->activeCamera) {
       return;
     }
@@ -268,7 +268,7 @@ void SSAO2RenderingPipeline::_createBlurPostProcess(float ssaoRatio,
       effect->setArray("samplerOffsets", samplerOffsets);
       _firstUpdate = false;
     }
-  });
+  };
 
   _blurHPostProcess->samples = textureSamples;
   _blurVPostProcess->samples = textureSamples;
@@ -349,7 +349,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     "#define SAMPLES " + std::to_string(numSamples) + "\n#define SSAO");
 
-  _ssaoPostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _ssaoPostProcess->onApply = [&](Effect* effect, EventState&) {
     if (_firstUpdate) {
       effect->setArray3("sampleSphere", sampleSphere);
       effect->setFloat("randTextureTiles", 32.f);
@@ -379,7 +379,7 @@ void SSAO2RenderingPipeline::_createSSAOPostProcess(float ratio)
     effect->setTexture("textureSampler", _depthTexture);
     effect->setTexture("normalSampler", _normalTexture);
     effect->setTexture("randomSampler", _randomTexture);
-  });
+  };
   _ssaoPostProcess->samples = textureSamples;
 }
 
@@ -390,7 +390,7 @@ void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(),
     false);
 
-  _ssaoCombinePostProcess->setOnApply([&](Effect* effect, EventState&) {
+  _ssaoCombinePostProcess->onApply = [&](Effect* effect, EventState&) {
     const auto& viewport = _scene->activeCamera->viewport;
     effect->setVector4("viewport", Tmp::Vector4Array[0].copyFromFloats(
                                      static_cast<float>(viewport.x),
@@ -399,7 +399,7 @@ void SSAO2RenderingPipeline::_createSSAOCombinePostProcess(float ratio)
                                      static_cast<float>(viewport.height)));
     effect->setTextureFromPostProcess("originalColor",
                                       _originalColorPostProcess.get());
-  });
+  };
   _ssaoCombinePostProcess->samples = textureSamples;
 }
 

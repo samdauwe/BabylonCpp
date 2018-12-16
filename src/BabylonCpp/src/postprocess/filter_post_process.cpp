@@ -13,9 +13,9 @@ FilterPostProcess::FilterPostProcess(const std::string& iName,
                   camera, samplingMode, engine,           reusable}
     , kernelMatrix{_kernelMatrix}
 {
-  setOnApply([&](Effect* effect, EventState&) {
+  onApply = [&](Effect* effect, EventState&) {
     effect->setMatrix("kernelMatrix", kernelMatrix);
-  });
+  };
 }
 
 FilterPostProcess::~FilterPostProcess()
