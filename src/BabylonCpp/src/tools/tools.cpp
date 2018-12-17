@@ -413,8 +413,7 @@ Image Tools::ArrayBufferToImage(const ArrayBuffer& buffer, bool flipVertically)
   auto bufferSize = static_cast<int>(buffer.size());
   int w = -1, h = -1, n = -1;
   stbi_set_flip_vertically_on_load(flipVertically);
-  stbi_ptr data(stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n,
-                                      STBI_rgb_alpha),
+  stbi_ptr data(stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, 0),
                 [](unsigned char* _data) {
                   if (_data) {
                     stbi_image_free(_data);
@@ -445,7 +444,7 @@ void Tools::LoadImageFromUrl(
 
     int w = -1, h = -1, n = -1;
     stbi_set_flip_vertically_on_load(flipVertically);
-    stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, 0),
+    stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, STBI_rgb_alpha),
                   [](unsigned char* _data) {
                     if (_data) {
                       stbi_image_free(_data);
