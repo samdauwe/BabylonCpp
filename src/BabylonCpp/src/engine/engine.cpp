@@ -2917,14 +2917,14 @@ InternalTexturePtr Engine::createTexture(
         samplingMode);
     };
 
-    if (!fromData || isBase64) {
+    if (!url.empty() && (!fromData || isBase64)) {
       Tools::LoadImageFromUrl(url, onload, onInternalError);
     }
     else if (buffer.has_value()
              && (std::holds_alternative<std::string>(*buffer)
                  || std::holds_alternative<ArrayBuffer>(*buffer)
                  || std::holds_alternative<Image>(*buffer))) {
-      Tools::LoadImageFromBuffer(url, onload, onInternalError);
+      Tools::LoadImageFromBuffer(*buffer, onload, onInternalError);
     }
   }
 

@@ -99,9 +99,9 @@ void EnvironmentTextureTools::UploadEnvLevels(
 
   texture->_lodGenerationScale = *specularInfo->lodGenerationScale;
 
-  std::vector<std::vector<ArrayBufferView>> imageData(mipmapsCount);
+  std::vector<std::vector<ArrayBuffer>> imageData(mipmapsCount);
   for (size_t i = 0; i < mipmapsCount; ++i) {
-    imageData[i] = std::vector<ArrayBufferView>(6);
+    imageData[i] = std::vector<ArrayBuffer>(6);
     for (size_t face = 0; face < 6; ++face) {
       auto imageInfo     = specularInfo->mipmaps[i * 6 + face];
       imageData[i][face] = stl_util::to_array<uint8_t>(
@@ -115,7 +115,7 @@ void EnvironmentTextureTools::UploadEnvLevels(
 
 void EnvironmentTextureTools::UploadLevels(
   const InternalTexturePtr& texture,
-  const std::vector<std::vector<ArrayBufferView>>& imageData)
+  const std::vector<std::vector<ArrayBuffer>>& imageData)
 {
   if (!Tools::IsExponentOfTwo(static_cast<size_t>(texture->width))) {
     throw std::runtime_error("Texture size must be a power of two");
@@ -242,8 +242,8 @@ void EnvironmentTextureTools::UploadLevels(
     // All faces
     for (unsigned int face = 0; face < 6; face++) {
       // Constructs an image element from image data
-      // const auto& bytes = imageData[i][face];
-      auto image = Image(); // TODO FIXME
+      const auto& bytes = imageData[i][face];
+      auto image        = Tools::ArrayBufferToImage(bytes);
 
       // Upload to the texture.
       if (expandTexture) {

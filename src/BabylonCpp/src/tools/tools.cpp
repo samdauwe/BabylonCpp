@@ -401,6 +401,34 @@ std::string Tools::DecodeURIComponent(const std::string& s)
   return s;
 }
 
+Image Tools::ArrayBufferToImage(const ArrayBuffer& buffer, bool flipVertically)
+{
+  if (buffer.empty()) {
+    return Image();
+  }
+
+  using stbi_ptr
+    = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
+
+  auto bufferSize = static_cast<int>(buffer.size());
+  int w = -1, h = -1, n = -1;
+  stbi_set_flip_vertically_on_load(flipVertically);
+  stbi_ptr data(stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n,
+                                      STBI_rgb_alpha),
+                [](unsigned char* _data) {
+                  if (_data) {
+                    stbi_image_free(_data);
+                  }
+                });
+
+  if (!data) {
+    return Image();
+  }
+
+  n = STBI_rgb_alpha;
+  return Image(data.get(), w * h * n, w, h, n, (n == 3) ? GL::RGB : GL::RGBA);
+}
+
 void Tools::LoadImageFromUrl(
   std::string url, const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& message,
@@ -415,9 +443,9 @@ void Tools::LoadImageFromUrl(
     using stbi_ptr
       = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
 
-    int w, h, n;
+    int w = -1, h = -1, n = -1;
     stbi_set_flip_vertically_on_load(flipVertically);
-    stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, STBI_rgb_alpha),
+    stbi_ptr data(stbi_load(url.substr(5).c_str(), &w, &h, &n, 0),
                   [](unsigned char* _data) {
                     if (_data) {
                       stbi_image_free(_data);
@@ -437,23 +465,28 @@ void Tools::LoadImageFromUrl(
 
 void Tools::LoadImageFromBuffer(
   const std::variant<std::string, ArrayBuffer, Image>& input,
-  const std::function<void(const Image& img)>& /*onLoad*/,
+  const std::function<void(const Image& img)>& onLoad,
   const std::function<void(const std::string& message,
-                           const std::string& exception)>& /*onError*/)
+                           const std::string& exception)>& onError)
 {
-  std::string url;
-  bool usingObjectURL = false;
+  if (!onLoad) {
+    return;
+  }
 
   if (std::holds_alternative<ArrayBuffer>(input)) {
-    usingObjectURL = true;
+    onLoad(Tools::ArrayBufferToImage(std::get<ArrayBuffer>(input)));
   }
   else if (std::holds_alternative<Image>(input)) {
-    usingObjectURL = true;
+    onLoad(std::get<Image>(input));
   }
   else {
-    auto _input = std::get<std::string>(input);
-    url         = Tools::CleanUrl(_input);
-    url         = Tools::PreprocessUrl(_input);
+    auto errorMessage = "Loading image from url not supported";
+    if (onError) {
+      onError(errorMessage, "");
+    }
+    else {
+      throw std::runtime_error(errorMessage);
+    }
   }
 }
 

@@ -176,6 +176,14 @@ struct BABYLON_SHARED_EXPORT Tools {
    */
   static std::function<std::string(std::string url)> PreprocessUrl;
 
+  /**
+   * @brief Converts an ArrayBuffer to an image.
+   * @param buffer the arraybuffer holding the image data
+   * @return the decoded image
+   */
+  static Image ArrayBufferToImage(const ArrayBuffer& buffer,
+                                  bool flipVertically = true);
+
   static void LoadImageFromUrl(
     std::string url, const std::function<void(const Image& img)>& onLoad,
     const std::function<void(const std::string& message,

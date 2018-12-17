@@ -59,7 +59,7 @@ public:
    */
   static void
   UploadLevels(const InternalTexturePtr& texture,
-               const std::vector<std::vector<ArrayBufferView>>& imageData);
+               const std::vector<std::vector<ArrayBuffer>>& imageData);
 
   /**
    * @brief Uploads spherical polynomials information to the texture.
