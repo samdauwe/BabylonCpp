@@ -77,6 +77,7 @@ set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 file(GLOB ACTIONS_HDR_FILES         ${INCLUDE_PATH}/actions/*.h
                                     ${INCLUDE_PATH}/actions/conditions/*.h
                                     ${INCLUDE_PATH}/actions/directactions/*.h
+                                    ${INCLUDE_PATH}/actions/directaudioactions/*.h
                                     ${INCLUDE_PATH}/actions/valueactions/*.h)
 file(GLOB ANIMATIONS_HDR_FILES      ${INCLUDE_PATH}/animations/*.h
                                     ${INCLUDE_PATH}/animations/easing/*.h)
@@ -203,6 +204,7 @@ set(BABYLON_HEADERS
 file(GLOB ACTIONS_SRC_FILES         ${SOURCE_PATH}/actions/*.cpp
                                     ${SOURCE_PATH}/actions/conditions/*.cpp
                                     ${SOURCE_PATH}/actions/directactions/*.cpp
+                                    ${SOURCE_PATH}/actions/directaudioactions/*.cpp
                                     ${SOURCE_PATH}/actions/valueactions/*.cpp)
 file(GLOB ANIMATIONS_SRC_FILES      ${SOURCE_PATH}/animations/*.cpp
                                     ${SOURCE_PATH}/animations/easing/*.cpp)
