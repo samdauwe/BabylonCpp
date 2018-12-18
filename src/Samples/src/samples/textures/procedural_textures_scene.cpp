@@ -42,77 +42,77 @@ const char* ProceduralTexturesScene::getName()
   return "Procedural Textures Scene";
 }
 
-void ProceduralTexturesScene::initializeScene(ICanvas* /*canvas*/,
-                                              Scene* /*scene*/)
+void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-#if 0
   // Helper functions
   const auto CreateBosquet
     = [](const std::string& name, float x, float y, float z, Scene* scene,
-         ShadowGenerator* shadowGenerator, const MaterialPtr& grassMaterial) {
+         const ShadowGeneratorPtr& shadowGenerator,
+         const MaterialPtr& grassMaterial) {
         auto bosquet      = Mesh::CreateBox(name, 2.f, scene);
         bosquet->position = Vector3(x, y, z);
         bosquet->material = grassMaterial;
 
         auto bosquetbawl      = Mesh::CreateBox(name + "bawl", 1, scene);
-        bosquetbawl->position = Vector3(x, y + 1, z);
+        bosquetbawl->position = Vector3(x, y + 1.f, z);
         bosquetbawl->material = grassMaterial;
 
         shadowGenerator->getShadowMap()->renderList().emplace_back(bosquet);
         shadowGenerator->getShadowMap()->renderList().emplace_back(bosquetbawl);
       };
 
-  const auto CreateTree = [](const std::string& name, float x, float y, float z,
-                             Scene* scene, ShadowGenerator* shadowGenerator,
-                             const MaterialPtr& woodMaterial,
-                             const MaterialPtr& grassMaterial) {
-    auto trunk = Mesh::CreateCylinder(name + "trunk", 7, 2, 2, 12, 1, scene);
-    trunk->position = Vector3(x, y, z);
-    trunk->material = woodMaterial;
+  const auto CreateTree =
+    [](const std::string& name, float x, float y, float z, Scene* scene,
+       const ShadowGeneratorPtr& shadowGenerator,
+       const MaterialPtr& woodMaterial, const MaterialPtr& grassMaterial) {
+      auto trunk = Mesh::CreateCylinder(name + "trunk", 7, 2, 2, 12, 1, scene);
+      trunk->position = Vector3(x, y, z);
+      trunk->material = woodMaterial;
 
-    auto leafs      = Mesh::CreateSphere(name + "leafs", 20, 7, scene);
-    leafs->position = Vector3(x, y + 5.f, z);
-    leafs->material = grassMaterial;
+      auto leafs      = Mesh::CreateSphere(name + "leafs", 20, 7, scene);
+      leafs->position = Vector3(x, y + 5.f, z);
+      leafs->material = grassMaterial;
 
-    shadowGenerator->getShadowMap()->renderList().emplace_back(trunk);
-    shadowGenerator->getShadowMap()->renderList().emplace_back(leafs);
+      shadowGenerator->getShadowMap()->renderList().emplace_back(trunk);
+      shadowGenerator->getShadowMap()->renderList().emplace_back(leafs);
+    };
+
+  const auto CreateFontain = [](const std::string& name, float x, float y,
+                                float z, Scene* scene,
+                                const ShadowGeneratorPtr& shadowGenerator,
+                                const MaterialPtr& marbleMaterial,
+                                const MaterialPtr& fireMaterial) {
+    auto torus      = Mesh::CreateTorus(name + "torus", 5, 1, 20, scene);
+    torus->position = Vector3(x, y, z);
+    torus->material = marbleMaterial;
+
+    auto fontainGround      = Mesh::CreateBox(name + "fontainGround", 4, scene);
+    fontainGround->position = Vector3(x, y - 2.f, z);
+    fontainGround->material = marbleMaterial;
+
+    auto fontainSculptur1
+      = Mesh::CreateCylinder(name + "fontainSculptur1", 2, 2, 1, 10, 1, scene);
+    fontainSculptur1->position = Vector3(x, y, z);
+    fontainSculptur1->material = marbleMaterial;
+
+    auto fontainSculptur2
+      = Mesh::CreateSphere(name + "fontainSculptur2", 7, 1.7f, scene);
+    fontainSculptur2->position = Vector3(x, y + 0.9f, z);
+    fontainSculptur2->material = fireMaterial;
+    fontainSculptur2->rotate(Vector3(1.f, 0.f, 0.f), Math::PI_2, Space::LOCAL);
+
+    shadowGenerator->getShadowMap()->renderList().emplace_back(torus);
+    shadowGenerator->getShadowMap()->renderList().emplace_back(
+      fontainSculptur1);
+    shadowGenerator->getShadowMap()->renderList().emplace_back(
+      fontainSculptur2);
   };
-
-  const auto CreateFontain
-    = [](const std::string& name, float x, float y, float z, Scene* scene,
-         ShadowGenerator* shadowGenerator, const MaterialPtr& marbleMaterial,
-         const MaterialPtr& fireMaterial) {
-        auto torus      = Mesh::CreateTorus(name + "torus", 5, 1, 20, scene);
-        torus->position = Vector3(x, y, z);
-        torus->material = marbleMaterial;
-
-        auto fontainGround = Mesh::CreateBox(name + "fontainGround", 4, scene);
-        fontainGround->position = Vector3(x, y - 2, z);
-        fontainGround->material = marbleMaterial;
-
-        auto fontainSculptur1 = Mesh::CreateCylinder(name + "fontainSculptur1",
-                                                     2, 2, 1, 10, 1, scene);
-        fontainSculptur1->position = Vector3(x, y, z);
-        fontainSculptur1->material = marbleMaterial;
-
-        Vector3 rotateAxis(1.f, 0.f, 0.f);
-        auto fontainSculptur2
-          = Mesh::CreateSphere(name + "fontainSculptur2", 7, 1.7f, scene);
-        fontainSculptur2->position = Vector3(x, y + 0.9f, z);
-        fontainSculptur2->material = fireMaterial;
-        fontainSculptur2->rotate(rotateAxis, Math::PI_2, Space::LOCAL);
-
-        shadowGenerator->getShadowMap()->renderList().emplace_back(torus);
-        shadowGenerator->getShadowMap()->renderList().emplace_back(
-          fontainSculptur1);
-        shadowGenerator->getShadowMap()->renderList().emplace_back(
-          fontainSculptur2);
-      };
 
   const auto CreateTorch
     = [](const std::string& name, float x, float y, float z, Scene* scene,
-         ShadowGenerator* shadowGenerator, const MaterialPtr& brickMaterial,
-         const MaterialPtr& woodMaterial, const MaterialPtr& grassMaterial) {
+         const ShadowGeneratorPtr& shadowGenerator,
+         const MaterialPtr& brickMaterial, const MaterialPtr& woodMaterial,
+         const MaterialPtr& grassMaterial) {
         // createBrickBlock
         auto brickblock      = Mesh::CreateBox(name + "brickblock", 1, scene);
         brickblock->position = Vector3(x, y, z);
@@ -121,12 +121,12 @@ void ProceduralTexturesScene::initializeScene(ICanvas* /*canvas*/,
         // createWood
         auto torchwood = Mesh::CreateCylinder(name + "torchwood", 2, 0.25, 0.1f,
                                               12, 1, scene);
-        torchwood->position = Vector3(x, y + 1, z);
+        torchwood->position = Vector3(x, y + 1.f, z);
         torchwood->material = woodMaterial;
 
         // leafs
         auto leafs2      = Mesh::CreateSphere(name + "leafs2", 10, 1.2f, scene);
-        leafs2->position = Vector3(x, y + 2, z);
+        leafs2->position = Vector3(x, y + 2.f, z);
         leafs2->material = grassMaterial;
 
         shadowGenerator->getShadowMap()->renderList().emplace_back(torchwood);
@@ -143,36 +143,35 @@ void ProceduralTexturesScene::initializeScene(ICanvas* /*canvas*/,
   // Material declaration
   auto woodMaterial = StandardMaterial::New("woodMaterial", scene);
   auto woodTexture  = WoodProceduralTexture::New("woodTexture", 1024, scene);
-  woodTexture->ampScale = 50.f;
-  woodMaterial->setDiffuseTexture(woodTexture);
+  woodTexture->ampScale        = 50.f;
+  woodMaterial->diffuseTexture = woodTexture;
 
   auto grassMaterial = StandardMaterial::New("grassMaterial", scene);
   auto grassTexture  = GrassProceduralTexture::New("grassTexture", 256, scene);
-  grassMaterial->setAmbientTexture(grassTexture);
+  grassMaterial->ambientTexture = grassTexture;
 
   auto marbleMaterial = StandardMaterial::New("torus", scene);
   auto marbleTexture  = MarbleProceduralTexture::New("marble", 512, scene);
   marbleTexture->numberOfTilesWidth  = 5;
   marbleTexture->numberOfTilesHeight = 5;
-  marbleMaterial->setAmbientTexture(marbleTexture);
+  marbleMaterial->ambientTexture     = marbleTexture;
 
   auto fireMaterial = StandardMaterial::New("fontainSculptur2", scene);
   auto fireTexture  = FireProceduralTexture::New("fire", 256, scene);
-  fireMaterial->setDiffuseTexture(fireTexture);
-  fireMaterial->setOpacityTexture(fireTexture);
+  fireMaterial->diffuseTexture = fireTexture;
+  fireMaterial->opacityTexture = fireTexture;
 
   auto brickMaterial = StandardMaterial::New("brickMaterial", scene);
   auto brickTexture  = BrickProceduralTexture::New("brickTexture", 512, scene);
   brickTexture->numberOfBricksHeight = 2;
   brickTexture->numberOfBricksWidth  = 3;
-  brickMaterial->setDiffuseTexture(brickTexture);
+  brickMaterial->diffuseTexture      = brickTexture;
 
   // Light
   auto light = DirectionalLight::New("dir01", Vector3(-0.5, -1, -0.5), scene);
-  light->diffuse  = Color3(1, 1, 1);
-  light->specular = Color3(1, 1, 1);
-  // light->groundColor = Color3(0, 0, 0);
-  light->position = Vector3(20, 40, 20);
+  light->diffuse  = Color3(1.f, 1.f, 1.f);
+  light->specular = Color3(1.f, 1.f, 1.f);
+  light->position = Vector3(20.f, 40.f, 20.f);
 
   // Create a square of grass using a custom procedural texture
   auto square         = Mesh::CreateGround("square", 20, 20, 2, scene);
@@ -180,11 +179,11 @@ void ProceduralTexturesScene::initializeScene(ICanvas* /*canvas*/,
   auto customMaterial = StandardMaterial::New("custommat", scene);
   auto customProcText = CustomProceduralTexture::New(
     "customtext", "textures/customProceduralTextures/land", 1024, scene);
-  customMaterial->setAmbientTexture(customProcText);
-  square->material = customMaterial;
+  customMaterial->ambientTexture = customProcText;
+  square->material               = customMaterial;
 
   // Applying some shadows
-  auto shadowGenerator   = new ShadowGenerator(1024, light);
+  auto shadowGenerator   = ShadowGenerator::New(1024, light);
   square->receiveShadows = true;
 
   // Creating 4 bosquets
@@ -199,13 +198,13 @@ void ProceduralTexturesScene::initializeScene(ICanvas* /*canvas*/,
 
   // Creating macadam
   auto macadam               = Mesh::CreateGround("square", 20, 20, 2, scene);
-  macadam->position          = Vector3(20, 0, 0);
+  macadam->position          = Vector3(20.f, 0.f, 0.f);
   auto customMaterialmacadam = StandardMaterial::New("macadam", scene);
   auto customProcTextmacadam
     = RoadProceduralTexture::New("customtext", 512, scene);
-  customMaterialmacadam->setDiffuseTexture(customProcTextmacadam);
-  macadam->material       = customMaterialmacadam;
-  macadam->receiveShadows = true;
+  customMaterialmacadam->diffuseTexture = customProcTextmacadam;
+  macadam->material                     = customMaterialmacadam;
+  macadam->receiveShadows               = true;
 
   // Creating a fontain
   CreateFontain("fontain", 20, 0.25f, 0, scene, shadowGenerator, marbleMaterial,
@@ -224,7 +223,7 @@ void ProceduralTexturesScene::initializeScene(ICanvas* /*canvas*/,
   boxCloud->position = Vector3(0.f, 0.f, 12.f);
   auto cloudMaterial = StandardMaterial::New("cloudMat", scene);
   auto cloudProcText = CloudProceduralTexture::New("cloud", 1024, scene);
-  cloudMaterial->setEmissiveTexture(cloudProcText);
+  cloudMaterial->emissiveTexture = cloudProcText;
   cloudMaterial->backFaceCulling = false;
   cloudMaterial->emissiveTexture()->coordinatesMode
     = TextureConstants::SKYBOX_MODE;
@@ -233,7 +232,6 @@ void ProceduralTexturesScene::initializeScene(ICanvas* /*canvas*/,
   scene->registerBeforeRender([this](Scene* scene, EventState& /*es*/) {
     _camera->alpha += 0.001f * scene->getAnimationRatio();
   });
-#endif
 }
 
 } // namespace Samples
