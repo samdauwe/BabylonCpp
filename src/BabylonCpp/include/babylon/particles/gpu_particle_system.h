@@ -15,6 +15,7 @@ struct EffectCreationOptions;
 class GPUParticleSystem;
 class Mesh;
 class RawTexture;
+using EffectPtr     = std::shared_ptr<Effect>;
 using RawTexturePtr = std::shared_ptr<RawTexture>;
 
 namespace GL {
@@ -315,8 +316,8 @@ private:
   size_t _activeCount;
   size_t _currentActiveCount;
   size_t _accumulatedCount;
-  std::unique_ptr<Effect> _renderEffect;
-  std::unique_ptr<Effect> _updateEffect;
+  EffectPtr _renderEffect;
+  EffectPtr _updateEffect;
 
   std::unique_ptr<Buffer> _buffer0;
   std::unique_ptr<Buffer> _buffer1;

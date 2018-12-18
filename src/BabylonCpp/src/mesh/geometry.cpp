@@ -277,7 +277,7 @@ void Geometry::_updateBoundingInfo(bool updateExtends, const Float32Array& data)
   }
 }
 
-void Geometry::_bind(Effect* effect, GL::IGLBuffer* indexToBind)
+void Geometry::_bind(const EffectPtr& effect, GL::IGLBuffer* indexToBind)
 {
   if (!effect) {
     return;
@@ -495,7 +495,7 @@ GL::IGLBuffer* Geometry::getIndexBuffer()
   return _indexBuffer.get();
 }
 
-void Geometry::_releaseVertexArrayObject(Effect* effect)
+void Geometry::_releaseVertexArrayObject(const EffectPtr& effect)
 {
   if (!effect || _vertexArrayObjects.empty()) {
     return;

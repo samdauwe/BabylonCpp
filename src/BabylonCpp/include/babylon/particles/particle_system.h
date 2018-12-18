@@ -16,6 +16,7 @@ class Mesh;
 class Particle;
 class Scene;
 class VertexBuffer;
+using EffectPtr = std::shared_ptr<Effect>;
 
 namespace GL {
 class IGLBuffer;
@@ -48,7 +49,7 @@ public:
    * @param epsilon Offset used to render the particles
    */
   ParticleSystem(const std::string& name, size_t capacity, Scene* scene,
-                 Effect* customEffect         = nullptr,
+                 const EffectPtr& customEffect = nullptr,
                  bool isAnimationSheetEnabled = false, float epsilon = 0.01f);
   virtual ~ParticleSystem() override;
 
@@ -382,7 +383,7 @@ private:
   void _emitFromParticle(Particle* particle);
   // End of sub system methods
   void _update(int newParticles);
-  Effect* _getEffect();
+  EffectPtr _getEffect();
   void _appendParticleVertices(unsigned int offset, Particle* particle);
 
 public:
@@ -455,8 +456,8 @@ private:
   std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<Buffer> _spriteBuffer;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
-  Effect* _effect;
-  Effect* _customEffect;
+  EffectPtr _effect;
+  EffectPtr _customEffect;
   std::string _cachedDefines;
 
   Color4 _scaledColorStep;

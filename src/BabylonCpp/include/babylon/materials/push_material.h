@@ -6,7 +6,9 @@
 
 namespace BABYLON {
 
+class Effect;
 class PushMaterial;
+using EffectPtr       = std::shared_ptr<Effect>;
 using PushMaterialPtr = std::shared_ptr<PushMaterial>;
 
 /**
@@ -34,7 +36,7 @@ public:
 
   IReflect::Type type() const override;
 
-  Effect* getEffect();
+  EffectPtr& getEffect();
   bool isReady(AbstractMesh* mesh, bool useInstances) override;
 
   /**
@@ -54,11 +56,12 @@ public:
 protected:
   PushMaterial(const std::string& name, Scene* scene);
 
-  void _afterBind(Mesh* mesh, Effect* effect = nullptr);
-  bool _mustRebind(Scene* scene, Effect* effect, float visibility = 1.f);
+  void _afterBind(Mesh* mesh, const EffectPtr& effect = nullptr);
+  bool _mustRebind(Scene* scene, const EffectPtr& effect,
+                   float visibility = 1.f);
 
 protected:
-  Effect* _activeEffect;
+  EffectPtr _activeEffect;
   Matrix _normalMatrix;
 
 }; // end of class PushMaterial

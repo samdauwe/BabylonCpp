@@ -411,7 +411,7 @@ bool PBRBaseMaterial::isMetallicWorkflow() const
   return false;
 }
 
-Effect* PBRBaseMaterial::_prepareEffect(
+EffectPtr PBRBaseMaterial::_prepareEffect(
   AbstractMesh* mesh, PBRMaterialDefines& defines,
   const std::function<void(Effect* effect)>& onCompiled,
   std::function<void(Effect* effect, const std::string& errors)> onError,
@@ -1058,7 +1058,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
   MaterialHelper::BindBonesParameters(mesh, effect);
 
   if (mustRebind) {
-    _uniformBuffer->bindToEffect(effect, "Material");
+    _uniformBuffer->bindToEffect(effect.get(), "Material");
 
     bindViewProjection(effect);
 
@@ -1389,7 +1389,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     if ((scene->fogEnabled() && mesh->applyFog()
          && scene->fogMode() != Scene::FOGMODE_NONE)
         || _reflectionTexture) {
-      bindView(effect);
+      bindView(effect.get());
     }
 
     // Fog
@@ -1401,7 +1401,7 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     }
 
     // image processing
-    _imageProcessingConfiguration->bind(_activeEffect);
+    _imageProcessingConfiguration->bind(_activeEffect.get());
 
     // Log. depth
     MaterialHelper::BindLogDepth(defines, _activeEffect, scene);

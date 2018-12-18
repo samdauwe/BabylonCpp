@@ -101,7 +101,7 @@ std::string GlowLayer::getEffectName() const
   return GlowLayer::EffectName;
 }
 
-Effect* GlowLayer::_createMergeEffect()
+EffectPtr GlowLayer::_createMergeEffect()
 {
   // Effect
   EffectCreationOptions effectCreationOptions;
@@ -247,7 +247,7 @@ bool GlowLayer::needStencil() const
   return false;
 }
 
-void GlowLayer::_internalRender(Effect* effect)
+void GlowLayer::_internalRender(const EffectPtr& effect)
 {
   // Texture
   effect->setTexture("textureSampler", _blurTexture1);

@@ -15,6 +15,7 @@ class SubMesh;
 class MultiRenderTarget;
 class Scene;
 class SubMesh;
+using EffectPtr            = std::shared_ptr<Effect>;
 using MeshPtr              = std::shared_ptr<Mesh>;
 using SubMeshPtr           = std::shared_ptr<SubMesh>;
 using MultiRenderTargetPtr = std::shared_ptr<MultiRenderTarget>;
@@ -142,7 +143,7 @@ public:
   Property<GeometryBufferRenderer, unsigned int> samples;
 
 protected:
-  Effect* _effect;
+  EffectPtr _effect;
   std::string _cachedDefines;
 
 private:

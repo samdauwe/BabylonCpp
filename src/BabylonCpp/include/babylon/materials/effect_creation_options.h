@@ -9,7 +9,9 @@
 
 namespace BABYLON {
 
+class Effect;
 struct MaterialDefines;
+using EffectPtr = std::shared_ptr<Effect>;
 
 /**
  * @brief Options to be used when creating an effect.

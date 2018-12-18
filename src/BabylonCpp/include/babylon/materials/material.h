@@ -26,6 +26,7 @@ class Scene;
 class SubMesh;
 class UniformBuffer;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using EffectPtr              = std::shared_ptr<Effect>;
 using MaterialPtr            = std::shared_ptr<Material>;
 using MultiMaterialPtr       = std::shared_ptr<MultiMaterial>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
@@ -232,7 +233,7 @@ public:
    * @brief Returns the material effect.
    * @returns the effect associated with the material
    */
-  Effect* getEffect();
+  EffectPtr& getEffect();
 
   /**
    * @brief Returns the current scene.
@@ -273,7 +274,7 @@ public:
   /**
    * @brief Hidden
    */
-  bool _preBind(Effect* effect                                  = nullptr,
+  bool _preBind(const EffectPtr& effect                         = nullptr,
                 std::optional<unsigned int> overrideOrientation = std::nullopt);
 
   /**
@@ -314,7 +315,7 @@ public:
    * @brief Binds the view projection matrix to the effect.
    * @param effect defines the effect to bind the view projection matrix to
    */
-  void bindViewProjection(Effect* effect);
+  void bindViewProjection(const EffectPtr& effect);
 
   /**
    * @brief Unbinds the material from the mesh.
@@ -384,10 +385,10 @@ public:
    */
   json serialize() const;
 
-  virtual void trackCreation(
-    const std::function<void(const Effect* effect)>& onCompiled,
-    const std::function<void(const Effect* effect, const std::string& errors)>&
-      onError);
+  virtual void
+  trackCreation(const std::function<void(const EffectPtr& effect)>& onCompiled,
+                const std::function<void(const EffectPtr& effect,
+                                         const std::string& errors)>& onError);
 
   void addMaterialToScene(const MaterialPtr& newMaterial);
   void addMultiMaterialToScene(const MultiMaterialPtr& newMultiMaterial);
@@ -786,7 +787,7 @@ public:
    * Stores the effects for the material
    * Hidden
    */
-  Effect* _effect;
+  EffectPtr _effect;
 
   /**
    * Specifies if the material was previously ready

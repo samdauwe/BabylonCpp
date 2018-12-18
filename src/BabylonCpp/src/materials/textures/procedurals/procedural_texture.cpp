@@ -24,6 +24,7 @@ ProceduralTexture::ProceduralTexture(
     , isEnabled{true}
     , autoClear{true}
     , _generateMipMaps{generateMipMaps}
+    , _effect{nullptr}
     , refreshRate{this, &ProceduralTexture::get_refreshRate,
                   &ProceduralTexture::set_refreshRate}
     , _currentRefreshId{-1}
@@ -188,7 +189,8 @@ void ProceduralTexture::_rebuild()
 
   _createIndexBuffer();
 
-  if (refreshRate() == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
+  if (static_cast<unsigned>(refreshRate())
+      == RenderTargetTexture::REFRESHRATE_RENDER_ONCE) {
     refreshRate = RenderTargetTexture::REFRESHRATE_RENDER_ONCE;
   }
 }
@@ -276,12 +278,12 @@ void ProceduralTexture::setFragment(const std::string& fragment)
   _fragment["fragmentElement"] = fragment;
 }
 
-int ProceduralTexture::get_refreshRate() const
+float ProceduralTexture::get_refreshRate() const
 {
   return _refreshRate;
 }
 
-void ProceduralTexture::set_refreshRate(int value)
+void ProceduralTexture::set_refreshRate(float value)
 {
   _refreshRate = value;
   resetRefreshCounter();
@@ -305,7 +307,7 @@ bool ProceduralTexture::_shouldRender()
     return true;
   }
 
-  if (refreshRate() == _currentRefreshId) {
+  if (static_cast<int>(refreshRate()) == _currentRefreshId) {
     _currentRefreshId = 1;
     return true;
   }

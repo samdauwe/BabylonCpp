@@ -10,6 +10,7 @@ namespace BABYLON {
 
 InstancedMesh::InstancedMesh(const std::string& _name, Mesh* source)
     : AbstractMesh(_name, source->getScene())
+    , sourceMesh{this, &InstancedMesh::get_sourceMesh}
     , _sourceMesh{source}
     , _currentLOD{nullptr}
 {
@@ -49,17 +50,17 @@ IReflect::Type InstancedMesh::type() const
   return IReflect::Type::INSTANCEDMESH;
 }
 
-bool InstancedMesh::receiveShadows() const
+bool InstancedMesh::get_receiveShadows() const
 {
   return _sourceMesh->receiveShadows();
 }
 
-MaterialPtr& InstancedMesh::material() const
+MaterialPtr& InstancedMesh::get_material()
 {
   return _sourceMesh->material();
 }
 
-float InstancedMesh::visibility() const
+float InstancedMesh::get_visibility() const
 {
   return _sourceMesh->visibility();
 }
@@ -91,7 +92,7 @@ size_t InstancedMesh::getTotalVertices() const
   return _sourceMesh->getTotalVertices();
 }
 
-Mesh* InstancedMesh::sourceMesh() const
+Mesh*& InstancedMesh::get_sourceMesh()
 {
   return _sourceMesh;
 }

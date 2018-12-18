@@ -22,6 +22,7 @@ struct MaterialDefines;
 class Scene;
 class UniformBuffer;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using EffectPtr      = std::shared_ptr<Effect>;
 
 /**
  * @brief "Static Class" containing the most commonly used helper while dealing
@@ -40,7 +41,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect to be bound
    * @param scene The scene the eyes position is used from
    */
-  static void BindEyePosition(Effect* effect, Scene* scene);
+  static void BindEyePosition(const EffectPtr& effect, Scene* scene);
 
   /**
    * @brief Helps preparing the defines values about the UVs in used in the
@@ -231,7 +232,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    */
   static void BindLightShadow(Light& light, Scene* scene, AbstractMesh& mesh,
-                              unsigned int lightIndex, Effect* effect);
+                              unsigned int lightIndex, const EffectPtr& effect);
 
   /**
    * @brief Binds the light information to the effect.
@@ -239,7 +240,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param lightIndex The light index in the effect used to render
    */
-  static void BindLightProperties(Light& light, Effect* effect,
+  static void BindLightProperties(Light& light, const EffectPtr& effect,
                                   unsigned int lightIndex);
 
   /**
@@ -254,8 +255,8 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param usePhysicalLightFalloff Specifies whether the light falloff is
    * defined physically or not
    */
-  static void BindLights(Scene* scene, AbstractMesh* mesh, Effect* effect,
-                         MaterialDefines& defines,
+  static void BindLights(Scene* scene, AbstractMesh* mesh,
+                         const EffectPtr& effect, MaterialDefines& defines,
                          unsigned int maxSimultaneousLights = 4,
                          bool usePhysicalLightFalloff       = false);
 
@@ -268,14 +269,15 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param linearSpace Defines if the fog effect is applied in linear space
    */
   static void BindFogParameters(Scene* scene, AbstractMesh* mesh,
-                                Effect* effect, bool linearSpace = false);
+                                const EffectPtr& effect,
+                                bool linearSpace = false);
 
   /**
    * @brief Binds the bones information from the mesh to the effect.
    * @param mesh The mesh we are binding the information to render
    * @param effect The effect we are binding the data to
    */
-  static void BindBonesParameters(AbstractMesh* mesh, Effect* effect);
+  static void BindBonesParameters(AbstractMesh* mesh, const EffectPtr& effect);
 
   /**
    * @brief Binds the morph targets information from the mesh to the effect.
@@ -283,7 +285,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    */
   static void BindMorphTargetParameters(AbstractMesh* abstractMesh,
-                                        Effect* effect);
+                                        const EffectPtr& effect);
 
   /**
    * @brief Binds the logarithmic depth information from the scene to the effect
@@ -292,7 +294,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param effect The effect we are binding the data to
    * @param scene The scene we are willing to render with logarithmic scale for
    */
-  static void BindLogDepth(MaterialDefines& defines, Effect* effect,
+  static void BindLogDepth(MaterialDefines& defines, const EffectPtr& effect,
                            Scene* scene);
 
   /**
@@ -300,7 +302,7 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
    * @param scene The scene the clip plane information are extracted from
    * @param effect The effect we are binding the data to
    */
-  static void BindClipPlane(Effect* effect, Scene* scene);
+  static void BindClipPlane(const EffectPtr& effect, Scene* scene);
 
   static Color3 _tempFogColor;
 

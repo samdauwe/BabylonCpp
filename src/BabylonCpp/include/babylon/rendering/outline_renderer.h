@@ -16,6 +16,7 @@ class Effect;
 class Engine;
 class Scene;
 class SubMesh;
+using EffectPtr          = std::shared_ptr<Effect>;
 using OutlineRendererPtr = std::shared_ptr<OutlineRenderer>;
 
 /**
@@ -104,7 +105,7 @@ public:
 
 private:
   Engine* _engine;
-  Effect* _effect;
+  EffectPtr _effect;
   std::string _cachedDefines;
   bool _savedDepthWrite;
 

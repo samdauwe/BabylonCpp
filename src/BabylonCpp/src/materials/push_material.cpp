@@ -27,7 +27,7 @@ IReflect::Type PushMaterial::type() const
   return IReflect::Type::PUSHMATERIAL;
 }
 
-Effect* PushMaterial::getEffect()
+EffectPtr& PushMaterial::getEffect()
 {
   return _activeEffect;
 }
@@ -64,13 +64,14 @@ void PushMaterial::bind(Matrix& world, Mesh* mesh)
   bindForSubMesh(world, mesh, mesh->subMeshes[0].get());
 }
 
-void PushMaterial::_afterBind(Mesh* mesh, Effect* effect)
+void PushMaterial::_afterBind(Mesh* mesh, const EffectPtr& effect)
 {
   Material::_afterBind(mesh);
   getScene()->_cachedEffect = effect;
 }
 
-bool PushMaterial::_mustRebind(Scene* scene, Effect* effect, float visibility)
+bool PushMaterial::_mustRebind(Scene* scene, const EffectPtr& effect,
+                               float visibility)
 {
   return scene->isCachedMaterialInvalid(this, effect, visibility);
 }

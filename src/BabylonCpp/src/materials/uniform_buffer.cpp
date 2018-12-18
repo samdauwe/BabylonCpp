@@ -22,19 +22,21 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
     , _noUBO{!engine->supportsUniformBuffers()}
 {
   if (_noUBO) {
-    updateMatrix3x3 = [this](const std::string& name, const Float32Array& matrix) {
-      _updateMatrix3x3ForEffect(name, matrix);
-    };
-    updateMatrix2x2 = [this](const std::string& name, const Float32Array& matrix) {
-      _updateMatrix2x2ForEffect(name, matrix);
-    };
+    updateMatrix3x3
+      = [this](const std::string& name, const Float32Array& matrix) {
+          _updateMatrix3x3ForEffect(name, matrix);
+        };
+    updateMatrix2x2
+      = [this](const std::string& name, const Float32Array& matrix) {
+          _updateMatrix2x2ForEffect(name, matrix);
+        };
     updateFloat = [this](const std::string& name, float x) {
       _updateFloatForEffect(name, x);
     };
-    updateFloat2
-      = [this](const std::string& name, float x, float y, const std::string& suffix) {
-          _updateFloat2ForEffect(name, x, y, suffix);
-        };
+    updateFloat2 = [this](const std::string& name, float x, float y,
+                          const std::string& suffix) {
+      _updateFloat2ForEffect(name, x, y, suffix);
+    };
     updateFloat3 = [this](const std::string& name, float x, float y, float z,
                           const std::string& suffix = "") {
       _updateFloat3ForEffect(name, x, y, z, suffix);
@@ -64,12 +66,14 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
   else {
     _engine->_uniformBuffers.emplace_back(this);
 
-    updateMatrix3x3 = [this](const std::string& name, const Float32Array& matrix) {
-      _updateMatrix3x3ForUniform(name, matrix);
-    };
-    updateMatrix2x2 = [this](const std::string& name, const Float32Array& matrix) {
-      _updateMatrix2x2ForUniform(name, matrix);
-    };
+    updateMatrix3x3
+      = [this](const std::string& name, const Float32Array& matrix) {
+          _updateMatrix3x3ForUniform(name, matrix);
+        };
+    updateMatrix2x2
+      = [this](const std::string& name, const Float32Array& matrix) {
+          _updateMatrix2x2ForUniform(name, matrix);
+        };
     updateFloat = [this](const std::string& name, float x) {
       _updateFloatForUniform(name, x);
     };
@@ -186,7 +190,8 @@ void UniformBuffer::addUniform(const std::string& name, size_t size)
   _needSync = true;
 }
 
-void UniformBuffer::addUniform(const std::string& name, const Float32Array& size)
+void UniformBuffer::addUniform(const std::string& name,
+                               const Float32Array& size)
 {
   if (_noUBO) {
     return;
@@ -224,7 +229,8 @@ void UniformBuffer::addFloat2(const std::string& name, float x, float y)
   addUniform(name, {x, y});
 }
 
-void UniformBuffer::addFloat3(const std::string& name, float x, float y, float z)
+void UniformBuffer::addFloat3(const std::string& name, float x, float y,
+                              float z)
 {
   addUniform(name, {x, y, z});
 }
@@ -409,7 +415,8 @@ void UniformBuffer::_updateFloat2ForEffect(const std::string& name, float x,
 }
 
 void UniformBuffer::_updateFloat2ForUniform(const std::string& name, float x,
-                                            float y, const std::string& /*suffix*/)
+                                            float y,
+                                            const std::string& /*suffix*/)
 {
   UniformBuffer::_tempBuffer[0] = x;
   UniformBuffer::_tempBuffer[1] = y;
@@ -552,10 +559,10 @@ void UniformBuffer::dispose()
 
   _engine->_uniformBuffers.erase(
     std::remove_if(_engine->_uniformBuffers.begin(),
-                     _engine->_uniformBuffers.end(),
-                     [this](const UniformBuffer* uniformBuffer) {
-                       return uniformBuffer == this;
-                     }),
+                   _engine->_uniformBuffers.end(),
+                   [this](const UniformBuffer* uniformBuffer) {
+                     return uniformBuffer == this;
+                   }),
     _engine->_uniformBuffers.end());
 
   if (!_buffer) {

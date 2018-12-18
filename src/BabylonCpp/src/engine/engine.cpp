@@ -1518,7 +1518,7 @@ void Engine::_bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer)
 
 void Engine::_bindVertexBuffersAttributes(
   const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
-  Effect* effect)
+  const EffectPtr& effect)
 {
   auto attributes = effect->getAttributesNames();
 
@@ -1569,7 +1569,7 @@ void Engine::_bindVertexBuffersAttributes(
 
 std::unique_ptr<GL::IGLVertexArrayObject> Engine::recordVertexArrayObject(
   const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
-  GL::IGLBuffer* indexBuffer, Effect* effect)
+  GL::IGLBuffer* indexBuffer, const EffectPtr& effect)
 {
   auto vao = _gl->createVertexArray();
 
@@ -1606,7 +1606,7 @@ void Engine::bindVertexArrayObject(GL::IGLVertexArrayObject* vertexArrayObject,
 void Engine::bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
                                  GL::IGLBuffer* indexBuffer,
                                  const Float32Array& vertexDeclaration,
-                                 int vertexStrideSize, Effect* effect)
+                                 int vertexStrideSize, const EffectPtr& effect)
 {
   if (_cachedVertexBuffers != vertexBuffer
       || _cachedEffectForVertexBuffers != effect) {
@@ -1655,7 +1655,7 @@ void Engine::_unbindVertexArrayObject()
 
 void Engine::bindBuffers(
   const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
-  GL::IGLBuffer* indexBuffer, Effect* effect)
+  GL::IGLBuffer* indexBuffer, const EffectPtr& effect)
 {
   if (_cachedVertexBuffersMap != vertexBuffers
       || _cachedEffectForVertexBuffers != effect) {
@@ -1880,7 +1880,7 @@ unsigned int Engine::_drawMode(unsigned int fillMode)
 }
 
 // Shaders
-void Engine::_releaseEffect(Effect* effect)
+void Engine::_releaseEffect(const EffectPtr& effect)
 {
   if (stl_util::contains(_compiledEffects, effect->_key)) {
     _deleteProgram(effect->getProgram());
@@ -1902,28 +1902,27 @@ void Engine::_deleteProgram(GL::IGLProgram* program)
   }
 }
 
-Effect*
-Engine::createEffect(const std::string& baseName,
-                     EffectCreationOptions& options, Engine* engine,
-                     const std::function<void(Effect* effect)>& onCompiled)
+EffectPtr Engine::createEffect(
+  const std::string& baseName, EffectCreationOptions& options, Engine* engine,
+  const std::function<void(const EffectPtr& effect)>& onCompiled)
 {
   std::string name = baseName + "+" + baseName + "@" + options.defines;
   if (stl_util::contains(_compiledEffects, name)) {
-    auto compiledEffect = _compiledEffects[name].get();
+    auto compiledEffect = _compiledEffects[name];
     if (onCompiled && compiledEffect->isReady()) {
       onCompiled(compiledEffect);
     }
     return compiledEffect;
   }
 
-  auto effect            = std::make_unique<Effect>(baseName, options, engine);
+  auto effect            = Effect::New(baseName, options, engine);
   effect->_key           = name;
-  _compiledEffects[name] = std::move(effect);
+  _compiledEffects[name] = effect;
 
-  return _compiledEffects[name].get();
+  return effect;
 }
 
-Effect*
+EffectPtr
 Engine::createEffect(std::unordered_map<std::string, std::string>& baseName,
                      EffectCreationOptions& options, Engine* engine)
 {
@@ -1939,14 +1938,14 @@ Engine::createEffect(std::unordered_map<std::string, std::string>& baseName,
 
   std::string name = vertex + "+" + fragment + "@" + options.defines;
   if (stl_util::contains(_compiledEffects, name)) {
-    return _compiledEffects[name].get();
+    return _compiledEffects[name];
   }
 
-  auto effect            = std::make_unique<Effect>(baseName, options, engine);
+  auto effect            = Effect::New(baseName, options, engine);
   effect->_key           = name;
-  _compiledEffects[name] = std::move(effect);
+  _compiledEffects[name] = effect;
 
-  return _compiledEffects[name].get();
+  return effect;
 }
 
 std::unique_ptr<GL::IGLShader>
@@ -2078,6 +2077,11 @@ std::unique_ptr<GL::IGLProgram> Engine::_createShaderProgram(
   return shaderProgram;
 }
 
+bool Engine::_isProgramCompiled(GL::IGLProgram* /*shaderProgram*/)
+{
+  return false;
+}
+
 std::unordered_map<std::string, std::unique_ptr<GL::IGLUniformLocation>>
 Engine::getUniforms(GL::IGLProgram* shaderProgram,
                     const std::vector<std::string>& uniformsNames)
@@ -2108,21 +2112,21 @@ Engine::getAttributes(GL::IGLProgram* shaderProgram,
   return results;
 }
 
-void Engine::enableEffect(Effect* effect)
+void Engine::enableEffect(const EffectPtr& effect)
 {
   if (!effect || effect == _currentEffect) {
     return;
   }
 
   // Use program
-  bindSamplers(effect);
+  bindSamplers(*effect);
 
   _currentEffect = effect;
 
   if (effect->onBind) {
-    effect->onBind(effect);
+    effect->onBind(effect.get());
   }
-  effect->onBindObservable().notifyObservers(effect);
+  effect->onBindObservable().notifyObservers(effect.get());
 }
 
 void Engine::setIntArray(GL::IGLUniformLocation* uniform,
@@ -4868,13 +4872,13 @@ void Engine::setProgram(GL::IGLProgram* program)
   }
 }
 
-void Engine::bindSamplers(Effect* effect)
+void Engine::bindSamplers(Effect& effect)
 {
-  setProgram(effect->getProgram());
+  setProgram(effect.getProgram());
 
-  const auto& samplers = effect->getSamplers();
+  const auto& samplers = effect.getSamplers();
   for (size_t index = 0; index < samplers.size(); ++index) {
-    auto uniform = effect->getUniform(samplers[index]);
+    auto uniform = effect.getUniform(samplers[index]);
 
     if (uniform) {
       _boundUniforms[static_cast<int>(index)] = uniform;

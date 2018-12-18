@@ -49,7 +49,7 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     });                                                           //
   // Environment Texture Scene
   _samples["EnvironmentTextureScene"] = std::make_tuple(
-    true,                                                        //
+    false,                                                       //
     [](ICanvas* iCanvas) {                                       //
       return std::make_unique<EnvironmentTextureScene>(iCanvas); //
     });                                                          //
@@ -86,7 +86,7 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
                       });                                               //
   // Procedural Textures Scene
   _samples["ProceduralTexturesScene"] = std::make_tuple(
-    false,                                                       //
+    true,                                                        //
     [](ICanvas* iCanvas) {                                       //
       return std::make_unique<ProceduralTexturesScene>(iCanvas); //
     });                                                          //

@@ -41,8 +41,7 @@ void FireProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto fireball = Mesh::CreatePlane("firebawl", 20, scene);
 
   fireball->material = fireMaterial;
-  Vector3 axis(1.f, 1.f, 0.5f);
-  fireball->rotate(axis, Math::PI / 3.f, Space::LOCAL);
+  fireball->rotate(Vector3(1.f, 1.f, 0.5f), Math::PI / 3.f, Space::LOCAL);
 }
 
 } // end of namespace Samples

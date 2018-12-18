@@ -1084,7 +1084,7 @@ void ShadowGenerator::prepareDefines(MaterialDefines& defines,
 }
 
 void ShadowGenerator::bindShadowLight(const std::string& lightIndex,
-                                      Effect* effect)
+                                      const EffectPtr& effect)
 {
   auto& scene = _scene;
   auto& light = _light;

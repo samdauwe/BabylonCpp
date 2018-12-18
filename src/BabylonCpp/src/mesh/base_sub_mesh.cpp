@@ -4,7 +4,10 @@
 
 namespace BABYLON {
 
-BaseSubMesh::BaseSubMesh() : _materialDefines{nullptr}, _materialEffect{nullptr}
+BaseSubMesh::BaseSubMesh()
+    : _materialDefines{nullptr}
+    , _materialEffect{nullptr}
+    , effect{this, &BaseSubMesh::get_effect}
 {
 }
 
@@ -12,12 +15,12 @@ BaseSubMesh::~BaseSubMesh()
 {
 }
 
-Effect* BaseSubMesh::effect()
+EffectPtr& BaseSubMesh::get_effect()
 {
   return _materialEffect;
 }
 
-void BaseSubMesh::setEffect(Effect* effect)
+void BaseSubMesh::setEffect(const EffectPtr& effect)
 {
   if (_materialEffect == effect) {
     if (!effect) {
@@ -29,7 +32,8 @@ void BaseSubMesh::setEffect(Effect* effect)
   _materialEffect  = effect;
 }
 
-void BaseSubMesh::setEffect(Effect* effect, const MaterialDefines& defines)
+void BaseSubMesh::setEffect(const EffectPtr& effect,
+                            const MaterialDefines& defines)
 {
   if (_materialEffect == effect) {
     if (!effect) {

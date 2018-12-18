@@ -261,7 +261,8 @@ void SpotLight::_computeAngleValues()
   _lightAngleOffset = -_cosHalfAngle * _lightAngleScale;
 }
 
-void SpotLight::transferToEffect(Effect* effect, const std::string& lightIndex)
+void SpotLight::transferToEffect(const EffectPtr& effect,
+                                 const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Zero();
 

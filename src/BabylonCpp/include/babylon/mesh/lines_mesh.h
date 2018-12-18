@@ -38,7 +38,8 @@ public:
   /**
    * @brief Hidden
    */
-  void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode) override;
+  void _bind(SubMesh* subMesh, const EffectPtr& effect,
+             unsigned int fillMode) override;
 
   /**
    * @brief Hidden

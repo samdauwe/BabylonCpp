@@ -780,7 +780,7 @@ Material* Scene::getCachedMaterial()
   return _cachedMaterial;
 }
 
-Effect* Scene::getCachedEffect()
+EffectPtr& Scene::getCachedEffect()
 {
   return _cachedEffect;
 }
@@ -790,7 +790,7 @@ std::optional<float> Scene::getCachedVisibility()
   return _cachedVisibility;
 }
 
-bool Scene::isCachedMaterialInvalid(Material* material, Effect* effect,
+bool Scene::isCachedMaterialInvalid(Material* material, const EffectPtr& effect,
                                     float visibility)
 {
   return _cachedEffect != effect || _cachedMaterial != material

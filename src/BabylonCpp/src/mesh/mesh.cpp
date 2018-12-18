@@ -928,7 +928,8 @@ Mesh& Mesh::toLeftHanded()
   return *this;
 }
 
-void Mesh::_bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode)
+void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect,
+                 unsigned int fillMode)
 {
   if (!_geometry) {
     return;
@@ -1000,7 +1001,7 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
       return;
     }
     scene->_switchToAlternateCameraConfiguration(true);
-    _effectiveMaterial->bindView(effect);
+    _effectiveMaterial->bindView(effect.get());
     _effectiveMaterial->bindViewProjection(effect);
 
     engine->setViewport(scene->activeCamera->_alternateCamera->viewport);
@@ -1008,7 +1009,7 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
     engine->setViewport(scene->activeCamera->viewport);
 
     scene->_switchToAlternateCameraConfiguration(false);
-    _effectiveMaterial->bindView(effect);
+    _effectiveMaterial->bindView(effect.get());
     _effectiveMaterial->bindViewProjection(effect);
   }
 }
@@ -1090,8 +1091,8 @@ _InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
 }
 
 Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
-                                 _InstancesBatch* batch, Effect* effect,
-                                 Engine* engine)
+                                 _InstancesBatch* batch,
+                                 const EffectPtr& effect, Engine* engine)
 {
   if (batch->visibleInstances.find(subMesh->_id)
       == batch->visibleInstances.end()) {
@@ -1168,8 +1169,8 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
 }
 
 Mesh& Mesh::_processRendering(
-  SubMesh* subMesh, Effect* effect, int fillMode, _InstancesBatch* batch,
-  bool hardwareInstancedRendering,
+  SubMesh* subMesh, const EffectPtr& effect, int fillMode,
+  _InstancesBatch* batch, bool hardwareInstancedRendering,
   std::function<void(bool isInstance, const Matrix& world,
                      Material* effectiveMaterial)>
     onBeforeDraw,
@@ -1274,7 +1275,7 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
     engine->setDepthWrite(savedDepthWrite);
   }
 
-  Effect* effect = nullptr;
+  EffectPtr effect = nullptr;
   if (_effectiveMaterial->storeEffectOnSubMeshes) {
     effect = subMesh->effect();
   }

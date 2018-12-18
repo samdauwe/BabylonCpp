@@ -122,9 +122,8 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
   if (_mesh && _mesh->computeBonesUsingShaders()
       && _mesh->numBoneInfluencers() > 0 && _mesh->material()) {
     _mesh->computeBonesUsingShaders = false;
-    const std::string toReplace
-      = std::string("#define NUM_BONE_INFLUENCERS ")
-        + std::to_string(_mesh->numBoneInfluencers());
+    const std::string toReplace = std::string("#define NUM_BONE_INFLUENCERS ")
+                                  + std::to_string(_mesh->numBoneInfluencers());
     String::replaceInPlace(currentDefines, toReplace,
                            "#define NUM_BONE_INFLUENCERS 0");
     effect->_bonesComputationForcedToCPU = true;
@@ -140,14 +139,14 @@ std::string EffectFallbacks::reduce(std::string currentDefines, Effect* effect)
         continue;
       }
 
-      if (otherMesh->material()->getEffect() == effect) {
+      if (otherMesh->material()->getEffect().get() == effect) {
         otherMesh->computeBonesUsingShaders = false;
       }
       else if (!otherMesh->subMeshes.empty()) {
         for (auto& subMesh : otherMesh->subMeshes) {
           auto subMeshEffect = subMesh->effect();
 
-          if (subMeshEffect == effect) {
+          if (subMeshEffect.get() == effect) {
             otherMesh->computeBonesUsingShaders = false;
             break;
           }

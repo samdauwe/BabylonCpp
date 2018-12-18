@@ -11,6 +11,7 @@ namespace BABYLON {
 class BaseTexture;
 class Color3;
 class Color4;
+class Effect;
 struct EffectCreationOptions;
 class EffectFallbacks;
 class Engine;
@@ -22,6 +23,7 @@ class Vector2;
 class Vector3;
 class Vector4;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using EffectPtr              = std::shared_ptr<Effect>;
 using InternalTexturePtr     = std::shared_ptr<InternalTexture>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
@@ -52,30 +54,11 @@ public:
   static std::unordered_map<std::string, std::string>& IncludesShadersStore();
 
 public:
-  /**
-   * @brief Instantiates an effect.
-   * An effect can be used to create/manage/execute vertex and fragment shaders.
-   * @param baseName Name of the effect.
-   * @param attributesNamesOrOptions List of attribute names that will be passed
-   * to the shader or set of all options to create the effect.
-   * @param uniformsNamesOrEngine List of uniform variable names that will be
-   * passed to the shader or the engine that will be used to render effect.
-   * @param samplers List of sampler variables that will be passed to the
-   * shader.
-   * @param engine Engine to be used to render the effect
-   * @param defines Define statements to be added to the shader.
-   * @param fallbacks Possible fallbacks for this effect to improve performance
-   * when needed.
-   * @param onCompiled Callback that will be called when the shader is compiled.
-   * @param onError Callback that will be called if an error occurs during
-   * shader compilation.
-   * @param indexParameters Parameters to be used with Babylons include syntax
-   * to iterate over an array (eg. {lights: 10})
-   */
-  Effect(const std::string& baseName, EffectCreationOptions& options,
-         Engine* engine);
-  Effect(const std::unordered_map<std::string, std::string>& baseName,
-         EffectCreationOptions& options, Engine* engine);
+  template <typename... Ts>
+  static EffectPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<Effect>(new Effect(std::forward<Ts>(args)...));
+  }
   ~Effect();
 
   /** Properties **/
@@ -564,6 +547,31 @@ public:
   static void ResetCache();
 
 protected:
+  /**
+   * @brief Instantiates an effect.
+   * An effect can be used to create/manage/execute vertex and fragment shaders.
+   * @param baseName Name of the effect.
+   * @param attributesNamesOrOptions List of attribute names that will be passed
+   * to the shader or set of all options to create the effect.
+   * @param uniformsNamesOrEngine List of uniform variable names that will be
+   * passed to the shader or the engine that will be used to render effect.
+   * @param samplers List of sampler variables that will be passed to the
+   * shader.
+   * @param engine Engine to be used to render the effect
+   * @param defines Define statements to be added to the shader.
+   * @param fallbacks Possible fallbacks for this effect to improve performance
+   * when needed.
+   * @param onCompiled Callback that will be called when the shader is compiled.
+   * @param onError Callback that will be called if an error occurs during
+   * shader compilation.
+   * @param indexParameters Parameters to be used with Babylons include syntax
+   * to iterate over an array (eg. {lights: 10})
+   */
+  Effect(const std::string& baseName, EffectCreationOptions& options,
+         Engine* engine);
+  Effect(const std::unordered_map<std::string, std::string>& baseName,
+         EffectCreationOptions& options, Engine* engine);
+
   /**
    * @brief Observable that will be called when effect is bound.
    */

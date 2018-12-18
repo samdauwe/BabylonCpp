@@ -217,6 +217,11 @@ std::string Effect::key() const
 
 bool Effect::isReady() const
 {
+#if 0
+  if (!_isReady && _program && _program->isParallelCompiled) {
+    return _engine->_isProgramCompiled(_program.get());
+  }
+#endif
   return _isReady;
 }
 
@@ -641,12 +646,12 @@ void Effect::_rebuildProgram(
 
   _vertexSourceCodeOverride   = vertexSourceCode;
   _fragmentSourceCodeOverride = fragmentSourceCode;
-  this->onError = [&](Effect* /*effect*/, const std::string& error) {
+  this->onError = [&](const Effect* /*effect*/, const std::string& error) {
     if (onError) {
       onError(error);
     }
   };
-  this->onCompiled = [&](Effect* /*effect*/) {
+  this->onCompiled = [&](const Effect* /*effect*/) {
     for (auto& scene : getEngine()->scenes) {
       scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
     }
@@ -722,7 +727,7 @@ void Effect::_prepareEffect()
       }
     }
 
-    engine->bindSamplers(this);
+    engine->bindSamplers(*this);
 
     _compilationError.clear();
     _isReady = true;

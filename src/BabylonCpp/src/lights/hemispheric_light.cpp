@@ -70,7 +70,7 @@ IShadowGeneratorPtr HemisphericLight::getShadowGenerator()
   return nullptr;
 }
 
-void HemisphericLight::transferToEffect(Effect* /*effect*/,
+void HemisphericLight::transferToEffect(const EffectPtr& /*effect*/,
                                         const std::string& lightIndex)
 {
   auto normalizeDirection = Vector3::Normalize(direction);

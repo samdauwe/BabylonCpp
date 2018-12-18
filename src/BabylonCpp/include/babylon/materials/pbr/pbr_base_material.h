@@ -188,7 +188,7 @@ protected:
   void set_useLogarithmicDepth(bool value) override;
 
 private:
-  Effect* _prepareEffect(
+  EffectPtr _prepareEffect(
     AbstractMesh* mesh, PBRMaterialDefines& defines,
     const std::function<void(Effect* effect)>& onCompiled = nullptr,
     std::function<void(Effect* effect, const std::string& errors)> onError

@@ -481,8 +481,7 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
   }
 
   auto vao = _engine->recordVertexArrayObject(
-    stl_util::to_raw_ptr_map(updateVertexBuffers), nullptr,
-    _updateEffect.get());
+    stl_util::to_raw_ptr_map(updateVertexBuffers), nullptr, _updateEffect);
   _engine->bindArrayBuffer(nullptr);
 
   return vao;
@@ -542,8 +541,7 @@ GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
     = spriteSource->createVertexBuffer(VertexBuffer::UVKind, 2, 2);
 
   auto vao = _engine->recordVertexArrayObject(
-    stl_util::to_raw_ptr_map(renderVertexBuffers), nullptr,
-    _renderEffect.get());
+    stl_util::to_raw_ptr_map(renderVertexBuffers), nullptr, _renderEffect);
   _engine->bindArrayBuffer(nullptr);
 
   return vao;
@@ -723,8 +721,8 @@ void GPUParticleSystem::_recreateUpdateEffect()
   }
 
   _updateEffectOptions->defines = std::move(defines);
-  _updateEffect                 = std::make_unique<Effect>(
-    "gpuUpdateParticles", *_updateEffectOptions, _scene->getEngine());
+  _updateEffect = Effect::New("gpuUpdateParticles", *_updateEffectOptions,
+                              _scene->getEngine());
 }
 
 void GPUParticleSystem::_recreateRenderEffect()
@@ -798,8 +796,8 @@ void GPUParticleSystem::_recreateRenderEffect()
   renderEffectOptions.samplers      = samplers;
   renderEffectOptions.defines       = std::move(defines);
 
-  _renderEffect = std::make_unique<Effect>(
-    "gpuRenderParticles", renderEffectOptions, _scene->getEngine());
+  _renderEffect = Effect::New("gpuRenderParticles", renderEffectOptions,
+                              _scene->getEngine());
 }
 
 void GPUParticleSystem::animate(bool preWarm)
@@ -979,7 +977,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   }
 
   // Enable update effect
-  _engine->enableEffect(_updateEffect.get());
+  _engine->enableEffect(_updateEffect);
   _engine->setState(false);
 
   _updateEffect->setFloat("currentCount", _currentActiveCount);
@@ -1054,7 +1052,7 @@ size_t GPUParticleSystem::render(bool preWarm)
 
   if (!preWarm) {
     // Enable render effect
-    _engine->enableEffect(_renderEffect.get());
+    _engine->enableEffect(_renderEffect);
     auto viewMatrix = _scene->getViewMatrix();
     _renderEffect->setMatrix("view", viewMatrix);
     _renderEffect->setMatrix("projection", _scene->getProjectionMatrix());
@@ -1089,7 +1087,7 @@ size_t GPUParticleSystem::render(bool preWarm)
       invView.invert();
       _renderEffect->setMatrix("invView", invView);
 
-      MaterialHelper::BindClipPlane(_renderEffect.get(), _scene);
+      MaterialHelper::BindClipPlane(_renderEffect, _scene);
     }
 
     // image processing

@@ -19,6 +19,7 @@ class Matrix;
 class RenderTargetTexture;
 class ShadowGenerator;
 class SubMesh;
+using EffectPtr              = std::shared_ptr<Effect>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 struct ShadowGeneratorCompileOptions {
@@ -74,7 +75,8 @@ struct BABYLON_SHARED_EXPORT IShadowGenerator {
    * material owning the effect
    * @param effect The effect we are binfing the information for
    */
-  virtual void bindShadowLight(const std::string& lightIndex, Effect* effect)
+  virtual void bindShadowLight(const std::string& lightIndex,
+                               const EffectPtr& effect)
     = 0;
 
   /**

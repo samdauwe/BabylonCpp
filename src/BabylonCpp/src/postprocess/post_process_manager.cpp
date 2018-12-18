@@ -120,7 +120,7 @@ void PostProcessManager::directRender(
     auto effect = pp->apply();
 
     if (effect) {
-      pp->onBeforeRenderObservable.notifyObservers(effect);
+      pp->onBeforeRenderObservable.notifyObservers(effect.get());
 
       // VBOs
       _prepareBuffers();
@@ -129,7 +129,7 @@ void PostProcessManager::directRender(
       // Draw order
       engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
 
-      pp->onAfterRenderObservable.notifyObservers(effect);
+      pp->onAfterRenderObservable.notifyObservers(effect.get());
     }
   }
 
@@ -187,7 +187,7 @@ void PostProcessManager::_finalizeFrame(
     auto effect = pp->apply();
 
     if (effect) {
-      pp->onBeforeRenderObservable.notifyObservers(effect);
+      pp->onBeforeRenderObservable.notifyObservers(effect.get());
 
       // VBOs
       _prepareBuffers();
@@ -196,7 +196,7 @@ void PostProcessManager::_finalizeFrame(
       // Draw order
       engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
 
-      pp->onAfterRenderObservable.notifyObservers(effect);
+      pp->onAfterRenderObservable.notifyObservers(effect.get());
     }
   }
 

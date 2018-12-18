@@ -12,6 +12,7 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class Effect;
+using EffectPtr = std::shared_ptr<Effect>;
 
 /**
  * @brief The color grading curves provide additional color adjustmnent that is

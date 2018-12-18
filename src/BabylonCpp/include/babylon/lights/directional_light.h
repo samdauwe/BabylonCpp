@@ -56,7 +56,8 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The directional light
    */
-  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
+  void transferToEffect(const EffectPtr& effect,
+                        const std::string& lightIndex) override;
 
   /**
    * @brief Gets the minZ used for shadow according to both the scene and the

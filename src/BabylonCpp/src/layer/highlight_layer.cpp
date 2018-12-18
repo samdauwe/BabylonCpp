@@ -123,7 +123,7 @@ std::string HighlightLayer::getEffectName() const
   return HighlightLayer::EffectName;
 }
 
-Effect* HighlightLayer::_createMergeEffect()
+EffectPtr HighlightLayer::_createMergeEffect()
 {
   // Effect
   EffectCreationOptions effectCreationOptions;
@@ -272,7 +272,7 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances)
   return EffectLayer::_isReady(subMesh, useInstances, emissiveTexture);
 }
 
-void HighlightLayer::_internalRender(Effect* effect)
+void HighlightLayer::_internalRender(const EffectPtr& effect)
 {
   // Texture
   effect->setTexture("textureSampler", _blurTexture);

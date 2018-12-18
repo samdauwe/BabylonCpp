@@ -143,7 +143,7 @@ public:
   float density;
 
 private:
-  Effect* _volumetricLightScatteringPass;
+  EffectPtr _volumetricLightScatteringPass;
   RenderTargetTexturePtr _volumetricLightScatteringRTT;
   Viewport _viewPort;
   Vector2 _screenCoordinates;

@@ -180,7 +180,7 @@ protected:
    * @brief Create the merge effect. This is the shader use to blit the
    * information back to the main canvas at the end of the scene rendering.
    */
-  Effect* _createMergeEffect() override;
+  EffectPtr _createMergeEffect() override;
 
   /**
    * @brief Creates the render target textures and post processes used in the
@@ -193,7 +193,7 @@ protected:
    * main canvas.
    * @param effect The effect used to render through
    */
-  void _internalRender(Effect* effect) override;
+  void _internalRender(const EffectPtr& effect) override;
 
   /**
    * @brief Returns true if the mesh should render, otherwise false.

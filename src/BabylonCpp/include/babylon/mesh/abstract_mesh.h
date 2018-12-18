@@ -924,7 +924,7 @@ protected:
   /**
    * @brief Gets mesh visibility between 0 and 1 (default is 1).
    */
-  float get_visibility() const;
+  virtual float get_visibility() const;
 
   /**
    * @brief Sets mesh visibility between 0 and 1 (default is 1).
@@ -968,7 +968,7 @@ protected:
    * shadows.
    * @see http://doc.babylonjs.com/babylon101/shadows
    */
-  bool get_receiveShadows() const;
+  virtual bool get_receiveShadows() const;
 
   /**
    * @brief Sets a boolean indicating that this mesh can receive realtime

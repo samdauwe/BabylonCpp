@@ -21,6 +21,7 @@ class PostProcess;
 class Scene;
 class InternalTexture;
 using CameraPtr          = std::shared_ptr<Camera>;
+using EffectPtr          = std::shared_ptr<Effect>;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 using PostProcessPtr     = std::shared_ptr<PostProcess>;
 
@@ -79,7 +80,7 @@ public:
    * @brief The effect that is created when initializing the post process.
    * @returns The created effect corrisponding the the postprocess.
    */
-  Effect* getEffect();
+  EffectPtr& getEffect();
 
   /**
    * @brief To avoid multiple redundant textures for multiple post process, the
@@ -174,7 +175,7 @@ public:
    * @returns the effect corrisponding to this post process. Null if not
    * compiled or not ready.
    */
-  Effect* apply();
+  EffectPtr apply();
 
   void _disposeTextures();
 
@@ -475,7 +476,7 @@ private:
   std::variant<float, PostProcessOptions> _options;
   bool _reusable;
   unsigned int _textureType;
-  Effect* _effect;
+  EffectPtr _effect;
   std::vector<std::string> _samplers;
   std::string _fragmentUrl;
   std::string _vertexUrl;

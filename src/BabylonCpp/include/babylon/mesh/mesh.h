@@ -25,6 +25,7 @@ class MeshLODLevel;
 class MorphTargetManager;
 class PolyhedronOptions;
 class VertexBuffer;
+using EffectPtr             = std::shared_ptr<Effect>;
 using GroundMeshPtr         = std::shared_ptr<GroundMesh>;
 using IAnimatablePtr        = std::shared_ptr<IAnimatable>;
 using InstancedMeshPtr      = std::shared_ptr<InstancedMesh>;
@@ -436,7 +437,8 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _bind(SubMesh* subMesh, Effect* effect, unsigned int fillMode);
+  virtual void _bind(SubMesh* subMesh, const EffectPtr& effect,
+                     unsigned int fillMode);
 
   /**
    * @brief Hidden
@@ -489,14 +491,14 @@ public:
    * @brief Hidden
    */
   Mesh& _renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
-                             _InstancesBatch* batch, Effect* effect,
+                             _InstancesBatch* batch, const EffectPtr& effect,
                              Engine* engine);
 
   /**
    * @brief Hidden
    */
   Mesh&
-  _processRendering(SubMesh* subMesh, Effect* effect, int fillMode,
+  _processRendering(SubMesh* subMesh, const EffectPtr& effect, int fillMode,
                     _InstancesBatch* batch, bool hardwareInstancedRendering,
                     std::function<void(bool isInstance, const Matrix& world,
                                        Material* effectiveMaterial)>

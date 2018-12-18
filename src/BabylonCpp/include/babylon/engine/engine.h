@@ -59,6 +59,7 @@ class VertexBuffer;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using DummyInternalTextureTrackerPtr
   = std::shared_ptr<DummyInternalTextureTracker>;
+using EffectPtr                  = std::shared_ptr<Effect>;
 using IInternalTextureLoaderPtr  = std::shared_ptr<IInternalTextureLoader>;
 using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
 using InternalTexturePtr         = std::shared_ptr<InternalTexture>;
@@ -781,7 +782,7 @@ public:
    */
   GLVertexArrayObjectPtr recordVertexArrayObject(
     const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
-    GL::IGLBuffer* indexBuffer, Effect* effect);
+    GL::IGLBuffer* indexBuffer, const EffectPtr& effect);
 
   /**
    * @brief Bind a specific vertex array object.
@@ -804,7 +805,8 @@ public:
   void bindBuffersDirectly(GL::IGLBuffer* vertexBuffer,
                            GL::IGLBuffer* indexBuffer,
                            const Float32Array& vertexDeclaration,
-                           int vertexStrideSize = 3, Effect* effect = nullptr);
+                           int vertexStrideSize    = 3,
+                           const EffectPtr& effect = nullptr);
 
   /**
    * @brief Bind a list of vertex buffers to the webGL context.
@@ -814,7 +816,7 @@ public:
    */
   void bindBuffers(
     const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
-    GL::IGLBuffer* indexBuffer, Effect* effect);
+    GL::IGLBuffer* indexBuffer, const EffectPtr& effect);
 
   /**
    * @brief Unbind all instance attributes.
@@ -935,7 +937,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _releaseEffect(Effect* effect);
+  void _releaseEffect(const EffectPtr& effect);
 
   /**
    * @brief Hidden
@@ -963,10 +965,9 @@ public:
    * to compile shaders (like the maximum number of simultaneous lights)
    * @returns the new Effect
    */
-  Effect* createEffect(const std::string& baseName,
-                       EffectCreationOptions& options, Engine* engine,
-                       const std::function<void(Effect* effect)>& onCompiled
-                       = nullptr);
+  EffectPtr createEffect(
+    const std::string& baseName, EffectCreationOptions& options, Engine* engine,
+    const std::function<void(const EffectPtr& effect)>& onCompiled = nullptr);
 
   /**
    * @brief Create a new effect (used to store vertex/fragment shaders).
@@ -989,8 +990,8 @@ public:
    * to compile shaders (like the maximum number of simultaneous lights)
    * @returns the new Effect
    */
-  Effect* createEffect(std::unordered_map<std::string, std::string>& baseName,
-                       EffectCreationOptions& options, Engine* engine);
+  EffectPtr createEffect(std::unordered_map<std::string, std::string>& baseName,
+                         EffectCreationOptions& options, Engine* engine);
 
   /**
    * @brief Directly creates a webGL program.
@@ -1025,6 +1026,11 @@ public:
     const std::vector<std::string>& transformFeedbackVaryings = {});
 
   /**
+   * @brief Hidden
+   */
+  bool _isProgramCompiled(GL::IGLProgram* shaderProgram);
+
+  /**
    * @brief Gets the list of webGL uniform locations associated with a specific
    * program based on a list of uniform names.
    * @param shaderProgram defines the webGL program to use
@@ -1049,7 +1055,7 @@ public:
    * rendering).
    * @param effect defines the effect to activate
    */
-  void enableEffect(Effect* effect);
+  void enableEffect(const EffectPtr& effect);
 
   /**
    * @brief Set the value of an uniform to an array of int32.
@@ -1826,7 +1832,7 @@ public:
    * @brief Binds an effect to the webGL context.
    * @param effect defines the effect to bind
    */
-  void bindSamplers(Effect* effect);
+  void bindSamplers(Effect& effect);
 
   /**
    * @brief Hidden
@@ -2241,7 +2247,7 @@ private:
   void _bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer);
   void _bindVertexBuffersAttributes(
     const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
-    Effect* effect);
+    const EffectPtr& effect);
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
   void _moveBoundTextureOnTop(const InternalTexturePtr& internalTexture);
@@ -2592,7 +2598,7 @@ protected:
   /**
    * Hidden
    */
-  Effect* _currentEffect;
+  EffectPtr _currentEffect;
 
   /**
    * Hidden
@@ -2622,7 +2628,7 @@ protected:
   /**
    * Hidden
    */
-  Effect* _cachedEffectForVertexBuffers;
+  EffectPtr _cachedEffectForVertexBuffers;
 
   /**
    * Hidden
@@ -2689,7 +2695,7 @@ private:
    */
   int _currentTextureChannel;
 
-  std::unordered_map<std::string, std::unique_ptr<Effect>> _compiledEffects;
+  std::unordered_map<std::string, EffectPtr> _compiledEffects;
   std::vector<bool> _vertexAttribArraysEnabled;
   GL::IGLVertexArrayObject* _cachedVertexArrayObject;
   bool _uintIndicesCurrentlySet;

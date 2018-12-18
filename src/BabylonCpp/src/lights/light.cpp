@@ -235,12 +235,12 @@ Vector3 Light::getAbsolutePosition()
   return Vector3::Zero();
 }
 
-void Light::transferToEffect(Effect* /*effect*/,
+void Light::transferToEffect(const EffectPtr& /*effect*/,
                              const std::string& /*lightIndex*/)
 {
 }
 
-void Light::transferToEffect(Effect* /*effect*/,
+void Light::transferToEffect(const EffectPtr& /*effect*/,
                              const std::string& /*uniformName0*/,
                              const std::string& /*uniformName1*/)
 {

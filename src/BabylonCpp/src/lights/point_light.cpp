@@ -132,7 +132,7 @@ void PointLight::_buildUniformLayout()
   _uniformBuffer->create();
 }
 
-void PointLight::transferToEffect(Effect* /*effect*/,
+void PointLight::transferToEffect(const EffectPtr& /*effect*/,
                                   const std::string& lightIndex)
 {
   if (computeTransformedInformation()) {

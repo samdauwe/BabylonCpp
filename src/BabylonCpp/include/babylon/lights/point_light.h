@@ -24,8 +24,8 @@ public:
   template <typename... Ts>
   static PointLightPtr New(Ts&&... args)
   {
-    auto light = std::shared_ptr<PointLight>(
-      new PointLight(std::forward<Ts>(args)...));
+    auto light
+      = std::shared_ptr<PointLight>(new PointLight(std::forward<Ts>(args)...));
     light->addToScene(light);
 
     return light;
@@ -82,7 +82,8 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The point light
    */
-  void transferToEffect(Effect* effect, const std::string& lightIndex) override;
+  void transferToEffect(const EffectPtr& effect,
+                        const std::string& lightIndex) override;
 
   /**
    * @brief Prepares the list of defines specific to the light type.

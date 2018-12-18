@@ -107,7 +107,7 @@ bool LinesMesh::get_checkCollisions() const
   return false;
 }
 
-void LinesMesh::_bind(SubMesh* /*subMesh*/, Effect* /*effect*/,
+void LinesMesh::_bind(SubMesh* /*subMesh*/, const EffectPtr& /*effect*/,
                       unsigned int /*fillMode*/)
 {
   if (!_geometry) {

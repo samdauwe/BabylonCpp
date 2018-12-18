@@ -10,6 +10,7 @@ class Effect;
 class Engine;
 class ProceduralTexture;
 class VertexBuffer;
+using EffectPtr            = std::shared_ptr<Effect>;
 using ProceduralTexturePtr = std::shared_ptr<ProceduralTexture>;
 
 namespace GL {
@@ -240,14 +241,14 @@ protected:
    * Use 0 to render just once, 1 to render on every frame, 2 to render every
    * two frames and so on...
    */
-  int get_refreshRate() const;
+  float get_refreshRate() const;
 
   /**
    * @brief Define the refresh rate of the texture or the rendering frequency.
    * Use 0 to render just once, 1 to render on every frame, 2 to render every
    * two frames and so on...
    */
-  void set_refreshRate(int value);
+  void set_refreshRate(float value);
 
   virtual std::string _getDefines() const;
 
@@ -284,7 +285,7 @@ public:
   /**
    * Hidden
    */
-  Effect* _effect;
+  EffectPtr _effect;
 
   /**
    * Hidden
@@ -296,13 +297,13 @@ public:
    * Use 0 to render just once, 1 to render on every frame, 2 to render every
    * two frames and so on...
    */
-  Property<ProceduralTexture, int> refreshRate;
+  Property<ProceduralTexture, float> refreshRate;
 
 private:
   Size _size;
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
-  int _refreshRate;
+  float _refreshRate;
   std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   std::vector<std::string> _uniforms;

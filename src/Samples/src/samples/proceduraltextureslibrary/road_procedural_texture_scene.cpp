@@ -38,8 +38,7 @@ void RoadProceduralTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto plane      = Mesh::CreatePlane("RoadPlane", 20, scene);
   plane->material = roadMaterial;
-  Vector3 axis(1.f, 1.f, 0.5f);
-  plane->rotate(axis, Math::PI / 3.f, Space::LOCAL);
+  plane->rotate(Vector3(1.f, 1.f, 0.5f), Math::PI / 3.f, Space::LOCAL);
 }
 
 } // end of namespace Samples

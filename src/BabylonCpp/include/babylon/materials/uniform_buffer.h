@@ -17,16 +17,28 @@ class Matrix;
 class Vector3;
 class Vector4;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using EffectPtr      = std::shared_ptr<Effect>;
 
 namespace GL {
 class IGLBuffer;
 } // end of namespace GL
 
+/**
+ * @brief Uniform buffer objects.
+ *
+ * Handles blocks of uniform on the GPU.
+ *
+ * If WebGL 2 is not available, this class falls back on traditionnal
+ * setUniformXXX calls.
+ *
+ * For more information, please refer to :
+ * https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
+ */
 class BABYLON_SHARED_EXPORT UniformBuffer {
 
 public:
   /**
-   * @brief Uniform buffer objects.
+   * @brief Instantiates a new Uniform buffer objects.
    *
    * Handles blocks of uniform on the GPU.
    *
@@ -34,7 +46,10 @@ public:
    * setUniformXXX calls.
    *
    * For more information, please refer to :
-   * https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
+   * @see https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
+   * @param engine Define the engine the buffer is associated with
+   * @param data Define the data contained in the buffer
+   * @param dynamic Define if the buffer is updatable
    */
   UniformBuffer(Engine* engine, const Float32Array& data = Float32Array(),
                 bool dynamic = false);
@@ -58,94 +73,96 @@ public:
    * @brief Indicates if the WebGL underlying uniform buffer is dynamic.
    * Also, a dynamic UniformBuffer will disable cache verification and always
    * update the underlying WebGL uniform buffer to the GPU.
+   * @returns if Dynamic, otherwise false
    */
   bool isDynamic() const;
 
   /**
    * @brief The data cache on JS side.
+   * @returns the underlying data as a float array
    */
   Float32Array& getData();
 
   /**
    * @brief The underlying WebGL Uniform buffer.
+   * @returns the webgl buffer
    */
   GL::IGLBuffer* getBuffer();
 
   /**
    * @brief Adds an uniform in the buffer.
    * Warning : the subsequents calls of this function must be in the same order
-   * as declared in the shader
-   * for the layout to be correct !
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {number|number[]} size Data size, or data directly.
+   * as declared in the shader for the layout to be correct !
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
+   * @param size Data size, or data directly.
    */
   void addUniform(const std::string& name, size_t size);
   void addUniform(const std::string& name, const Float32Array& size);
 
   /**
-   * @brief Wrapper for addUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Matrix} mat A 4x4 matrix.
+   * @brief Adds a Matrix 4x4 to the uniform buffer.
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
+   * @param mat A 4x4 matrix.
    */
   void addMatrix(const std::string& name, const Matrix& mat);
 
   /**
-   * @brief Wrapper for addUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {number} x
-   * @param {number} y
+   * @brief Adds a vec2 to the uniform buffer.
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
+   * @param x Define the x component value of the vec2
+   * @param y Define the y component value of the vec2
    */
   void addFloat2(const std::string& name, float x, float y);
 
   /**
-   * @brief Wrapper for addUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {number} x
-   * @param {number} y
-   * @param {number} z
+   * @brief Adds a vec3 to the uniform buffer.
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
+   * @param x Define the x component value of the vec3
+   * @param y Define the y component value of the vec3
+   * @param z Define the z component value of the vec3
    */
   void addFloat3(const std::string& name, float x, float y, float z);
 
   /**
-   * @brief Wrapper for addUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Color3} color
+   * @brief Adds a vec3 to the uniform buffer.
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
+   * @param color Define the vec3 from a Color
    */
   void addColor3(const std::string& name, const Color3& color);
 
   /**
-   * @brief Wrapper for addUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Color3} color
-   * @param {number} alpha
+   * @brief Adds a vec4 to the uniform buffer.
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
+   * @param color Define the rgb components from a Color
+   * @param alpha Define the a component of the vec4
    */
   void addColor4(const std::string& name, const Color3& color, float alpha);
 
   /**
-   * @brief Wrapper for addUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Vector3} vector
+   * @brief Adds a vec3 to the uniform buffer.
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
+   * @param vector Define the vec3 components from a Vector
    */
   void addVector3(const std::string& name, const Vector3& vector);
 
   /**
-   * @brief Wrapper for addUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
+   * @brief Adds a Matrix 3x3 to the uniform buffer.
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
    */
   void addMatrix3x3(const std::string& name);
 
   /**
-   * @brief Wrapper for addUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
+   * @brief Adds a Matrix 2x2 to the uniform buffer.
+   * @param name Name of the uniform, as used in the uniform block in the
+   * shader.
    */
   void addMatrix2x2(const std::string& name);
 
@@ -170,35 +187,35 @@ public:
   /**
    * @brief Updates the value of an uniform. The `update` method must be called
    * afterwards to make it effective in the GPU.
-   * @param {string} uniformName Name of the uniform, as used in the uniform
+   * @param uniformName Define the name of the uniform, as used in the uniform
    * block in the shader.
-   * @param {number[]|Float32Array} data Flattened data
-   * @param {number} size Size of the data.
+   * @param data Define the flattened data
+   * @param size Define the size of the data.
    */
   void updateUniform(const std::string& uniformName, const Float32Array& data,
                      size_t size);
 
   /**
    * @brief Sets a sampler uniform on the effect.
-   * @param {string} name Name of the sampler.
-   * @param {Texture} texture
+   * @param name Define the name of the sampler.
+   * @param texture Define the texture to set in the sampler
    */
   void setTexture(const std::string& name, const BaseTexturePtr& texture);
 
   /**
    * @brief Directly updates the value of the uniform in the cache AND on the
    * GPU.
-   * @param {string} uniformName Name of the uniform, as used in the uniform
+   * @param uniformName Define the name of the uniform, as used in the uniform
    * block in the shader.
-   * @param {number[]|Float32Array} data Flattened data
+   * @param data Define the flattened data
    */
   void updateUniformDirectly(const std::string& uniformName,
                              const Float32Array& data);
 
   /**
    * @brief Binds this uniform buffer to an effect.
-   * @param {Effect} effect
-   * @param {string} name Name of the uniform block in the shader.
+   * @param effect Define the effect to bind the buffer to
+   * @param name Name of the uniform block in the shader.
    */
   void bindToEffect(Effect* effect, const std::string& name);
 
@@ -257,115 +274,91 @@ private:
 
 public:
   /**
-   * @brief Wrapper for updateUniform.
-   * @method updateMatrix3x3
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Float32Array} matrix
+   * Lambda to Update a 3x3 Matrix in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, const Float32Array& matrix)>
     updateMatrix3x3;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Float32Array} matrix
+   * Lambda to Update a 2x2 Matrix in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, const Float32Array& matrix)>
     updateMatrix2x2;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {number} x
+   * Lambda to Update a single float in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, float x)> updateFloat;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {number} x
-   * @param {number} y
-   * @param {string} [suffix] Suffix to add to the uniform name.
+   * Lambda to Update a vec2 of float in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, float x, float y,
                      const std::string& suffix)>
     updateFloat2;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {number} x
-   * @param {number} y
-   * @param {number} z
-   * @param {string} [suffix] Suffix to add to the uniform name.
+   * Lambda to Update a vec3 of float in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, float x, float y, float z,
                      const std::string& suffix)>
     updateFloat3;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {number} x
-   * @param {number} y
-   * @param {number} z
-   * @param {number} w
-   * @param {string} [suffix] Suffix to add to the uniform name.
+   * Lambda to Update a vec4 of float in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, float x, float y, float z,
                      float w, const std::string& suffix)>
     updateFloat4;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Matrix} A 4x4 matrix.
+   * Lambda to Update a 4x4 Matrix in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, const Matrix& mat)> updateMatrix;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Vector3} vector
+   * Lambda to Update vec3 of float from a Vector in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, const Vector3& vector)>
     updateVector3;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Vector4} vector
+   * Lambda to Update vec4 of float from a Vector in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, const Vector4& vector)>
     updateVector4;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Color3} color
-   * @param {string} [suffix] Suffix to add to the uniform name.
+   * Lambda to Update vec3 of float from a Color in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, const Color3& color,
                      const std::string& suffix)>
     updateColor3;
 
   /**
-   * @brief Wrapper for updateUniform.
-   * @param {string} name Name of the uniform, as used in the uniform block in
-   * the shader.
-   * @param {Color3} color
-   * @param {number} alpha
-   * @param {string} [suffix] Suffix to add to the uniform name.
+   * Lambda to Update vec4 of float from a Color in a uniform buffer.
+   * This is dynamic to allow compat with webgl 1 and 2.
+   * You will need to pass the name of the uniform as well as the value.
    */
   std::function<void(const std::string& name, const Color3& color, float alpha,
                      const std::string& suffix)>

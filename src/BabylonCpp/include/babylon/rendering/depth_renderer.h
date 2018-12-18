@@ -13,6 +13,7 @@ class RenderTargetTexture;
 class Scene;
 class SubMesh;
 using CameraPtr              = std::shared_ptr<Camera>;
+using EffectPtr              = std::shared_ptr<Effect>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
@@ -67,7 +68,7 @@ public:
 private:
   Scene* _scene;
   RenderTargetTexturePtr _depthMap;
-  Effect* _effect;
+  EffectPtr _effect;
   std::string _cachedDefines;
   CameraPtr _camera;
 

@@ -27,7 +27,7 @@ namespace BABYLON {
 
 Color3 MaterialHelper::_tempFogColor = Color3::Black();
 
-void MaterialHelper::BindEyePosition(Effect* effect, Scene* scene)
+void MaterialHelper::BindEyePosition(const EffectPtr& effect, Scene* scene)
 {
   if (scene->_forcedViewPosition) {
     effect->setVector3("vEyePosition", *scene->_forcedViewPosition.get());
@@ -576,7 +576,8 @@ void MaterialHelper::PrepareAttributesForInstances(
 
 void MaterialHelper::BindLightShadow(Light& light, Scene* /*scene*/,
                                      AbstractMesh& mesh,
-                                     unsigned int lightIndex, Effect* effect)
+                                     unsigned int lightIndex,
+                                     const EffectPtr& effect)
 {
   if (light.shadowEnabled && mesh.receiveShadows()) {
     auto shadowGenerator = light.getShadowGenerator();
@@ -586,14 +587,15 @@ void MaterialHelper::BindLightShadow(Light& light, Scene* /*scene*/,
   }
 }
 
-void MaterialHelper::BindLightProperties(Light& light, Effect* effect,
+void MaterialHelper::BindLightProperties(Light& light, const EffectPtr& effect,
                                          unsigned int lightIndex)
 {
   light.transferToEffect(effect, std::to_string(lightIndex));
 }
 
 void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
-                                Effect* effect, MaterialDefines& defines,
+                                const EffectPtr& effect,
+                                MaterialDefines& defines,
                                 unsigned int maxSimultaneousLights,
                                 bool usePhysicalLightFalloff)
 {
@@ -606,7 +608,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
     auto iAsString = std::to_string(i);
 
     auto scaledIntensity = light->getScaledIntensity();
-    light->_uniformBuffer->bindToEffect(effect, "Light" + iAsString);
+    light->_uniformBuffer->bindToEffect(effect.get(), "Light" + iAsString);
 
     MaterialHelper::BindLightProperties(*light, effect, i);
 
@@ -629,7 +631,8 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
 }
 
 void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
-                                       Effect* effect, bool linearSpace)
+                                       const EffectPtr& effect,
+                                       bool linearSpace)
 {
   if (scene->fogEnabled() && mesh->applyFog()
       && scene->fogMode() != Scene::FOGMODE_NONE) {
@@ -647,7 +650,8 @@ void MaterialHelper::BindFogParameters(Scene* scene, AbstractMesh* mesh,
   }
 }
 
-void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect)
+void MaterialHelper::BindBonesParameters(AbstractMesh* mesh,
+                                         const EffectPtr& effect)
 {
   if (!effect || !mesh) {
     return;
@@ -668,7 +672,7 @@ void MaterialHelper::BindBonesParameters(AbstractMesh* mesh, Effect* effect)
 }
 
 void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh,
-                                               Effect* effect)
+                                               const EffectPtr& effect)
 {
   auto mesh = static_cast<Mesh*>(abstractMesh);
   if (mesh) {
@@ -681,8 +685,8 @@ void MaterialHelper::BindMorphTargetParameters(AbstractMesh* abstractMesh,
   }
 }
 
-void MaterialHelper::BindLogDepth(MaterialDefines& defines, Effect* effect,
-                                  Scene* scene)
+void MaterialHelper::BindLogDepth(MaterialDefines& defines,
+                                  const EffectPtr& effect, Scene* scene)
 {
   if (defines["LOGARITHMICDEPTH"]) {
     effect->setFloat(
@@ -691,7 +695,7 @@ void MaterialHelper::BindLogDepth(MaterialDefines& defines, Effect* effect,
   }
 }
 
-void MaterialHelper::BindClipPlane(Effect* effect, Scene* scene)
+void MaterialHelper::BindClipPlane(const EffectPtr& effect, Scene* scene)
 {
   if (scene->clipPlane) {
     const auto& clipPlane = *scene->clipPlane;

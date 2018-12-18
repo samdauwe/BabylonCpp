@@ -27,6 +27,7 @@ class Scene;
 class SubMesh;
 class VertexBuffer;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
+using EffectPtr              = std::shared_ptr<Effect>;
 using MaterialPtr            = std::shared_ptr<Material>;
 using MeshPtr                = std::shared_ptr<Mesh>;
 using PostProcessPtr         = std::shared_ptr<PostProcess>;
@@ -165,7 +166,7 @@ protected:
    * @returns The effect containing the shader used to merge the effect on the
    * main canvas
    */
-  virtual Effect* _createMergeEffect() = 0;
+  virtual EffectPtr _createMergeEffect() = 0;
 
   /**
    * @brief Creates the render target textures and post processes used in the
@@ -178,7 +179,7 @@ protected:
    * main canvas.
    * @param effect The effect used to render through
    */
-  virtual void _internalRender(Effect* effect) = 0;
+  virtual void _internalRender(const EffectPtr& effect) = 0;
 
   /**
    * @brief Sets the required values for both the emissive texture and and the
@@ -324,9 +325,9 @@ private:
   std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   std::string _cachedDefines;
-  Effect* _effectLayerMapGenerationEffect;
+  EffectPtr _effectLayerMapGenerationEffect;
   IEffectLayerOptions _effectLayerOptions;
-  Effect* _mergeEffect;
+  EffectPtr _mergeEffect;
 
 }; // end of struct EffectLayer
 

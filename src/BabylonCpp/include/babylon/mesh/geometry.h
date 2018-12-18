@@ -21,6 +21,7 @@ class Mesh;
 class Scene;
 class VertexBuffer;
 class VertexData;
+using EffectPtr   = std::shared_ptr<Effect>;
 using GeometryPtr = std::shared_ptr<Geometry>;
 using MeshPtr     = std::shared_ptr<Mesh>;
 
@@ -153,7 +154,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _bind(Effect* effect, GL::IGLBuffer* indexToBind = nullptr);
+  void _bind(const EffectPtr& effect, GL::IGLBuffer* indexToBind = nullptr);
 
   /**
    * @brief Gets total number of vertices.
@@ -253,7 +254,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _releaseVertexArrayObject(Effect* effect = nullptr);
+  void _releaseVertexArrayObject(const EffectPtr& effect = nullptr);
 
   /**
    * @brief Release the associated resources for a specific mesh.

@@ -29,6 +29,7 @@ class VertexBuffer;
 class Viewport;
 using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
 using CameraPtr          = std::shared_ptr<Camera>;
+using EffectPtr          = std::shared_ptr<Effect>;
 using IShadowLightPtr    = std::shared_ptr<IShadowLight>;
 using LensFlarePtr       = std::shared_ptr<LensFlare>;
 using LensFlareSystemPtr = std::shared_ptr<LensFlareSystem>;
@@ -204,7 +205,7 @@ private:
   // int _vertexStrideSize;
   std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
-  Effect* _effect;
+  EffectPtr _effect;
   float _positionX;
   float _positionY;
   bool _isEnabled;

@@ -309,7 +309,7 @@ bool Material::isReadyForSubMesh(AbstractMesh* /*mesh*/,
   return false;
 }
 
-Effect* Material::getEffect()
+EffectPtr& Material::getEffect()
 {
   return _effect;
 }
@@ -341,8 +341,8 @@ BaseTexturePtr Material::getAlphaTestTexture()
 }
 
 void Material::trackCreation(
-  const std::function<void(const Effect* effect)>& /*onCompiled*/,
-  const std::function<void(const Effect* effect, const std::string& errors)>&
+  const std::function<void(const EffectPtr& effect)>& /*onCompiled*/,
+  const std::function<void(const EffectPtr& effect, const std::string& errors)>&
   /*onError*/)
 {
 }
@@ -352,7 +352,7 @@ void Material::markDirty()
   _wasPreviouslyReady = false;
 }
 
-bool Material::_preBind(Effect* effect,
+bool Material::_preBind(const EffectPtr& effect,
                         std::optional<unsigned int> overrideOrientation)
 {
   auto engine = _scene->getEngine();
@@ -396,13 +396,13 @@ void Material::bindView(Effect* effect)
   }
 }
 
-void Material::bindViewProjection(Effect* effect)
+void Material::bindViewProjection(const EffectPtr& effect)
 {
   if (!_useUBO) {
     effect->setMatrix("viewProjection", getScene()->getTransformMatrix());
   }
   else {
-    bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
+    bindSceneUniformBuffer(effect.get(), getScene()->getSceneUniformBuffer());
   }
 }
 

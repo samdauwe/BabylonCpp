@@ -19,6 +19,7 @@ class SpriteManager;
 class Texture;
 class VertexBuffer;
 using CameraPtr        = std::shared_ptr<Camera>;
+using EffectPtr        = std::shared_ptr<Effect>;
 using SpriteManagerPtr = std::shared_ptr<SpriteManager>;
 using TexturePtr       = std::shared_ptr<Texture>;
 
@@ -158,8 +159,8 @@ private:
   std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
   std::unordered_map<std::string, VertexBuffer*> _vertexBufferPtrs;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
-  Effect* _effectBase;
-  Effect* _effectFog;
+  EffectPtr _effectBase;
+  EffectPtr _effectFog;
 
 }; // end of class Sprite
 

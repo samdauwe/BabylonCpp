@@ -18,6 +18,7 @@ class Effect;
 struct IImageProcessingConfigurationDefines;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using ColorCurvesPtr = std::shared_ptr<ColorCurves>;
+using EffectPtr      = std::shared_ptr<Effect>;
 
 /**
  * @brief This groups together the common properties used for image processing

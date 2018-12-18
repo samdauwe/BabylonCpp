@@ -688,7 +688,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
   auto mustRebind = _mustRebind(scene, effect, mesh->visibility());
   if (mustRebind) {
-    _uniformBuffer->bindToEffect(effect, "Material");
+    _uniformBuffer->bindToEffect(effect.get(), "Material");
 
     bindViewProjection(effect);
 
@@ -793,14 +793,14 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     }
 
     // View
-    bindView(effect);
+    bindView(effect.get());
 
     // Fog
     MaterialHelper::BindFogParameters(scene, mesh, _activeEffect, true);
 
     // image processing
     if (_imageProcessingConfiguration) {
-      _imageProcessingConfiguration->bind(_activeEffect);
+      _imageProcessingConfiguration->bind(_activeEffect.get());
     }
   }
 

@@ -548,13 +548,15 @@ class BABYLON_SHARED_EXPORT IGLProgram {
 
 public:
   IGLProgram(GLuint _value)
-      : value{_value}
+      : isParallelCompiled{false}
+      , value{_value}
       , transformFeedback{nullptr}
       , __SPECTOR_rebuildProgram{nullptr}
   {
   }
 
 public:
+  bool isParallelCompiled;
   GLuint value;
   IGLTransformFeedback* transformFeedback;
   std::function<void(

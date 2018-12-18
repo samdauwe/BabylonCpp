@@ -10,7 +10,7 @@ class InstancedMesh;
 using InstancedMeshPtr = std::shared_ptr<InstancedMesh>;
 
 /**
- * @brief Represents an instance based on a source mesh.
+ * @brief Creates an instance based on a source mesh.
  */
 class BABYLON_SHARED_EXPORT InstancedMesh : public AbstractMesh {
 
@@ -37,17 +37,11 @@ public:
   IReflect::Type type() const override;
 
   /** Methods **/
-  bool receiveShadows() const;
-  MaterialPtr& material() const;
-  float visibility() const;
-  SkeletonPtr& get_skeleton() override;
 
   /**
    * @brief Returns the total number of vertices (integer).
    */
   size_t getTotalVertices() const override;
-
-  Mesh* sourceMesh() const;
 
   /**
    * @brief Is this node ready to be used/rendered.
@@ -59,8 +53,15 @@ public:
                bool forceInstanceSupport = false) override;
 
   /**
-   * @brief Returns Float32Array of the requested kind of data : positons,
-   * normals, uvs, etc.
+   * @brief Returns an array of integers or a typed array (Int32Array,
+   * Uint32Array, Uint16Array) populated with the mesh indices.
+   * @param kind kind of verticies to retreive (eg. positons, normals, uvs,
+   * etc.)
+   * @param copyWhenShared If true (default false) and and if the mesh geometry
+   * is shared among some other meshes, the returned array is a copy of the
+   * internal one.
+   * @returns a float array or a Float32Array of the requested kind of data :
+   * positons, normals, uvs, etc.
    */
   Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
                                bool forceCopy = false) override;
@@ -164,7 +165,7 @@ public:
 
   /**
    * @brief Sets a new updated BoundingInfo to the mesh.
-   * @returns The mesh.
+   * @returns the mesh.
    */
   InstancedMesh& refreshBoundingInfo();
 
@@ -215,9 +216,46 @@ public:
 protected:
   InstancedMesh(const std::string& name, Mesh* source);
 
-private:
+  /**
+   * @brief Gets if the source mesh receives shadows.
+   */
+  bool get_receiveShadows() const override;
+
+  /**
+   * @brief Gets the material of the source mesh.
+   */
+  MaterialPtr& get_material() override;
+
+  /**
+   * @brief Gets the visibility of the source mesh.
+   */
+  float get_visibility() const override;
+
+  /**
+   * @brief Gets the skeleton of the source mesh.
+   */
+  SkeletonPtr& get_skeleton() override;
+
+  /**
+   * @brief Gets the rendering ground id of the source mesh.
+   */
   int get_renderingGroupId() const override;
+
+  /**
+   * @brief Sets the rendering ground id of the source mesh.
+   */
   void set_renderingGroupId(int value) override;
+
+  /**
+   * @brief Gets the source mesh of the instance.
+   */
+  Mesh*& get_sourceMesh();
+
+public:
+  /**
+   * The source mesh of the instance.
+   */
+  ReadOnlyProperty<InstancedMesh, Mesh*> sourceMesh;
 
 private:
   Mesh* _sourceMesh;

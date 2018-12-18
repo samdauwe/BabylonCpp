@@ -10,12 +10,14 @@
 namespace BABYLON {
 
 class AbstractMesh;
+class Effect;
 class IShadowLight;
 class PostProcess;
 class Scene;
 class ShadowGenerator;
 class SubMesh;
 using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using EffectPtr          = std::shared_ptr<Effect>;
 using IShadowLightPtr    = std::shared_ptr<IShadowLight>;
 using PostProcessPtr     = std::shared_ptr<PostProcess>;
 using ShadowGeneratorPtr = std::shared_ptr<ShadowGenerator>;
@@ -276,7 +278,8 @@ public:
    * material owning the effect
    * @param effect The effect we are binfing the information for
    */
-  void bindShadowLight(const std::string& lightIndex, Effect* effect) override;
+  void bindShadowLight(const std::string& lightIndex,
+                       const EffectPtr& effect) override;
 
   /**
    * @brief Gets the transformation matrix used to project the meshes into the
@@ -727,7 +730,7 @@ private:
   IShadowLightPtr _light;
   Scene* _scene;
   Vector3 _lightDirection;
-  Effect* _effect;
+  EffectPtr _effect;
   Matrix _viewMatrix;
   Matrix _projectionMatrix;
   Matrix _transformMatrix;

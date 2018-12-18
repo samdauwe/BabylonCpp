@@ -33,7 +33,7 @@
 namespace BABYLON {
 
 ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
-                               Scene* scene, Effect* customEffect,
+                               Scene* scene, const EffectPtr& customEffect,
                                bool isAnimationSheetEnabled, float epsilon)
     : BaseParticleSystem{iName}
     , onDispose{this, &ParticleSystem::set_onDispose}
@@ -1016,7 +1016,7 @@ ParticleSystem::_GetEffectCreationOptions(bool isAnimationSheetEnabled)
   return effectCreationOption;
 }
 
-Effect* ParticleSystem::_getEffect()
+EffectPtr ParticleSystem::_getEffect()
 {
   if (_customEffect) {
     return _customEffect;
@@ -1271,7 +1271,7 @@ size_t ParticleSystem::render(bool /*preWarm*/)
   // image processing
   if (_imageProcessingConfiguration
       && !_imageProcessingConfiguration->applyByPostProcess) {
-    _imageProcessingConfiguration->bind(effect);
+    _imageProcessingConfiguration->bind(effect.get());
   }
 
   // Draw order

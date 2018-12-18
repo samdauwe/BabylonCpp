@@ -1075,7 +1075,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
   // Bones
   MaterialHelper::BindBonesParameters(mesh, effect);
   if (mustRebind) {
-    _uniformBuffer->bindToEffect(effect, "Material");
+    _uniformBuffer->bindToEffect(effect.get(), "Material");
 
     bindViewProjection(effect);
     if (!_uniformBuffer->useUbo() || !isFrozen() || !_uniformBuffer->isSync()) {
@@ -1336,7 +1336,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     if ((scene->fogEnabled() && mesh->applyFog()
          && (scene->fogMode() != Scene::FOGMODE_NONE))
         || _reflectionTexture || _refractionTexture) {
-      bindView(effect);
+      bindView(effect.get());
     }
 
     // Fog
@@ -1353,7 +1353,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     // Image processing
     if (_imageProcessingConfiguration
         && !_imageProcessingConfiguration->applyByPostProcess()) {
-      _imageProcessingConfiguration->bind(_activeEffect);
+      _imageProcessingConfiguration->bind(_activeEffect.get());
     }
   }
 

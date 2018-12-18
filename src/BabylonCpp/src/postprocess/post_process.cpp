@@ -201,7 +201,7 @@ Engine* PostProcess::getEngine()
   return _engine;
 }
 
-Effect* PostProcess::getEffect()
+EffectPtr& PostProcess::getEffect()
 {
   return _effect;
 }
@@ -422,7 +422,7 @@ bool PostProcess::isReady() const
   return _effect && _effect->isReady();
 }
 
-Effect* PostProcess::apply()
+EffectPtr PostProcess::apply()
 {
   // Check
   if (!_effect || !_effect->isReady()) {
@@ -459,7 +459,7 @@ Effect* PostProcess::apply()
 
   // Parameters
   _effect->setVector2("scale", _scaleRatio);
-  onApplyObservable.notifyObservers(_effect);
+  onApplyObservable.notifyObservers(_effect.get());
 
   return _effect;
 }

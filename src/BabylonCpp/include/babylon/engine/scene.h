@@ -70,6 +70,7 @@ class UniformBuffer;
 using AnimatablePtr             = std::shared_ptr<Animatable>;
 using BoundingBoxRendererPtr    = std::shared_ptr<BoundingBoxRenderer>;
 using BonePtr                   = std::shared_ptr<Bone>;
+using EffectPtr                 = std::shared_ptr<Effect>;
 using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
 using IAnimatablePtr            = std::shared_ptr<IAnimatable>;
 using ImageProcessingConfigurationPtr
@@ -201,7 +202,7 @@ public:
    * @brief Gets the cached effect (ie. the latest rendered one).
    * @returns the cached effect
    */
-  Effect* getCachedEffect();
+  EffectPtr& getCachedEffect();
 
   /**
    * @brief Gets the cached visibility state (ie. the latest rendered one).
@@ -217,7 +218,7 @@ public:
    * @param visibility defines the current visibility state
    * @returns true if one parameter is not cached
    */
-  bool isCachedMaterialInvalid(Material* material, Effect* effect,
+  bool isCachedMaterialInvalid(Material* material, const EffectPtr& effect,
                                float visibility = 1.f);
 
   /**
@@ -1474,7 +1475,7 @@ public:
    * @param replace has the default false, when true replaces the existing
    * lights in the scene with a hemispheric light
    */
-  void createDefaultLight(bool replace);
+  void createDefaultLight(bool replace = false);
 
   /**
    * @brief Creates a default camera for the scene.
@@ -1524,7 +1525,7 @@ public:
                               bool setGlobalEnvTexture = true);
 
   /**
-   * @brief Creates a new environment.
+   * Creates a new environment.
    * @see http://doc.babylonjs.com/How_To/Fast_Build#create-default-environment
    * @param options defines the options you can use to configure the environment
    * @returns the new EnvironmentHelper
@@ -2870,7 +2871,7 @@ public:
   /** Hidden */
   Material* _cachedMaterial;
   /** Hidden */
-  Effect* _cachedEffect;
+  EffectPtr _cachedEffect;
   /** Hidden */
   std::optional<float> _cachedVisibility;
   /** Hidden */

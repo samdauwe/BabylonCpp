@@ -15,6 +15,7 @@ struct IShadowGenerator;
 class Light;
 struct MaterialDefines;
 class UniformBuffer;
+using EffectPtr           = std::shared_ptr<Effect>;
 using IShadowGeneratorPtr = std::shared_ptr<IShadowGenerator>;
 using LightPtr            = std::shared_ptr<Light>;
 
@@ -170,10 +171,12 @@ public:
    * @param lightIndex The index of the light in the effect to update
    * @returns The light
    */
-  virtual void transferToEffect(Effect* effect, const std::string& lightIndex)
+  virtual void transferToEffect(const EffectPtr& effect,
+                                const std::string& lightIndex)
     = 0;
 
-  virtual void transferToEffect(Effect* effect, const std::string& uniformName0,
+  virtual void transferToEffect(const EffectPtr& effect,
+                                const std::string& uniformName0,
                                 const std::string& uniformName1);
 
   /**
