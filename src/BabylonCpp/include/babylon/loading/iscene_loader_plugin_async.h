@@ -16,6 +16,16 @@ class Scene;
 class SceneLoaderProgressEvent;
 class Skeleton;
 
+/**
+ * @brief The loaded meshes, particle systems, skeletons, and animation groups.
+ */
+struct ImportedMeshes {
+  std::vector<AbstractMesh*> meshes;
+  std::vector<IParticleSystem*> particleSystems;
+  std::vector<Skeleton*> skeletons;
+  std::vector<AnimationGroup*> animationGroups;
+}; // end of struct ImportedMeshes
+
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
 
   /**
@@ -26,20 +36,16 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
    * @param data The data to import
    * @param rootUrl The root url for scene and resources
    * @param onProgress The callback when the load progresses
+   * @param fileName Defines the name of the file to load
    * @returns The loaded meshes, particle systems, skeletons, and animation
    * groups
    */
-  virtual bool importMeshAsync(
+  virtual ImportedMeshes importMeshAsync(
     const std::vector<std::string>& meshesNames, Scene* scene,
     const std::string& data, const std::string& rootUrl,
-    const std::function<void(const SceneLoaderProgressEvent& event)>&
-      onProgress,
-    const std::function<void(std::vector<AbstractMesh*>& meshes,
-                             std::vector<IParticleSystem*>& particleSystems,
-                             std::vector<Skeleton*>& skeletons,
-                             std::vector<AnimationGroup*>& animationGroups)>&
-      onSuccess,
-    const std::function<void()>& onError)
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "")
     = 0;
 
   /**
@@ -48,14 +54,14 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
    * @param data The data to import
    * @param rootUrl The root url for scene and resources
    * @param onProgress The callback when the load progresses
+   * @param fileName Defines the name of the file to load
    * @returns Nothing
    */
-  virtual bool
-  loadAsync(Scene* scene, const std::string& data, const std::string& rootUrl,
-            const std::function<void(const SceneLoaderProgressEvent& event)>&
-              onProgress,
-            const std::function<void()>& onsuccess,
-            const std::function<void()>& onerror)
+  virtual void loadAsync(
+    Scene* scene, const std::string& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "")
     = 0;
 
   /**

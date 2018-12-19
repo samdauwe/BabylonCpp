@@ -9,27 +9,16 @@ namespace BABYLON {
 class ProgressEvent;
 
 /**
- * @brief The SceneLoaderProgressEvent class represents events measuring
- * progress of an scene loading.
+ * @brief Class used to represent data loading progression.
  */
 class BABYLON_SHARED_EXPORT SceneLoaderProgressEvent {
 
 public:
   /**
-   * @brief Creates a SceneLoaderProgressEvent event with the given parameters.
-   * @param lengthComputable indicates if the total work to be done, and the
-   * amount of work already done, by the underlying process is calculable. In
-   * other words, it tells if the progress is measurable or not. It defaults to
-   * false.
-   * @param loaded represents the amount of work already performed by the
-   * underlying process. The ratio of work done can be calculated with the
-   * property and SceneLoaderProgressEvent.total. When downloading a resource
-   * using HTTP, this only represent the part of the content itself, not headers
-   * and other overhead. It defaults to 0.
-   * @param total represents the total amount of work that the underlying
-   * process is in the progress of performing. When downloading a resource using
-   * HTTP, this only represent the content itself, not headers and other
-   * overhead. It defaults to 0.
+   * @brief Create a new progress event.
+   * @param lengthComputable defines if data length to load can be evaluated
+   * @param loaded defines the loaded data length
+   * @param total defines the data length to load
    */
   SceneLoaderProgressEvent(bool lengthComputable = false, size_t loaded = 0,
                            size_t total = 0);
@@ -39,6 +28,11 @@ public:
   SceneLoaderProgressEvent& operator=(SceneLoaderProgressEvent&& other);
   ~SceneLoaderProgressEvent();
 
+  /**
+   * @brief Creates a new SceneLoaderProgressEvent from a ProgressEvent.
+   * @param event defines the source event
+   * @returns a new SceneLoaderProgressEvent
+   */
   static SceneLoaderProgressEvent FromProgressEvent(const ProgressEvent& event);
 
 protected:
@@ -64,22 +58,17 @@ protected:
 
 public:
   /**
-   * The Boolean flag indicating if the total work to be done, and the amount of
-   * work already done, by the underlying process is calculable. In other words,
-   * it tells if the progress is measurable or not.
+   * defines if data length to load can be evaluated
    */
   ReadOnlyProperty<SceneLoaderProgressEvent, bool> lengthComputable;
 
   /**
-   * The amount of work already performed by the underlying process. The ratio
-   * of work done can be calculated with the property and
-   * SceneLoaderProgressEvent.total.
+   * defines the loaded data length
    */
   ReadOnlyProperty<SceneLoaderProgressEvent, size_t> loaded;
 
   /**
-   * The total amount of work that the underlying process is in the progress of
-   * performing.
+   * defines the data length to load
    */
   ReadOnlyProperty<SceneLoaderProgressEvent, size_t> total;
 

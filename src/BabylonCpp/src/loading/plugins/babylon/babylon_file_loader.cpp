@@ -2,6 +2,7 @@
 
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/animation.h>
+#include <babylon/animations/animation_group.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
@@ -97,15 +98,15 @@ bool BabylonFileLoader::importMesh(
                               const json& parsedData) {
     const auto _log = log.str();
     if (!_log.empty()
-        && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING()) {
+        && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING) {
       std::string msg
         = json_util::has_key(parsedData, "producer") ?
             logOperation("importMesh",
                          json_util::get_string(parsedData, "producer")) :
             logOperation("importMesh");
       std::string logStr
-        = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING() ? _log :
-                                                                          "";
+        = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log :
+                                                                        "";
       BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(),
                         logStr.c_str());
     }
@@ -121,7 +122,7 @@ bool BabylonFileLoader::importMesh(
     log.clear();
 
     bool fullDetails
-      = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING();
+      = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
 
     std::vector<std::string> loadedSkeletonsIds;
     std::vector<std::string> loadedMaterialsIds;
@@ -358,7 +359,7 @@ bool BabylonFileLoader::load(
 
   std::ostringstream log;
   bool fullDetails
-    = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING();
+    = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
 
   // Scene
   scene->useDelayedTextureLoading
@@ -618,19 +619,25 @@ bool BabylonFileLoader::load(
   }
 
   const auto _log = log.str();
-  if (!_log.empty()
-      && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING()) {
+  if (!_log.empty() && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING) {
     std::string msg = json_util::has_key(parsedData, "producer") ?
                         logOperation("importScene", parsedData["producer"]) :
                         logOperation("importScene");
     std::string logStr
-      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING() ? _log :
-                                                                        "";
+      = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());
   }
 
   // Finish
   return true;
+}
+
+AssetContainerPtr BabylonFileLoader::loadAssetContainer(
+  Scene* /*scene*/, const std::string& /*data*/, const std::string& /*rootUrl*/,
+  const std::function<void(const std::string& message,
+                           const std::string& exception)>& /*onError*/) const
+{
+  return nullptr;
 }
 
 } // end of namespace BABYLON

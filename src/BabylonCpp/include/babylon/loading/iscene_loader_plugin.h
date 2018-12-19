@@ -12,14 +12,29 @@
 namespace BABYLON {
 
 class AbstractMesh;
+class AssetContainer;
 struct IParticleSystem;
 class Scene;
 class Skeleton;
 using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using AssetContainerPtr  = std::shared_ptr<AssetContainer>;
 using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
 using SkeletonPtr        = std::shared_ptr<Skeleton>;
 
+/**
+ * @brief Interface used to define a SceneLoader plugin.
+ */
 struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
+
+  /**
+   * The friendly name of this plugin.
+   */
+  std::string name;
+
+  /**
+   * The file extensions supported by this plugin.
+   */
+  ISceneLoaderPluginExtensions extensions;
 
   /**
    * @brief Import meshes into a scene.
@@ -72,14 +87,18 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
     rewriteRootURL = nullptr;
 
   /**
-   * The friendly name of this plugin.
+   * @brief Load into an asset container.
+   * @param scene The scene to load into
+   * @param data The data to import
+   * @param rootUrl The root url for scene and resources
+   * @param onError The callback when import fails
+   * @returns The loaded asset container
    */
-  std::string name;
-
-  /**
-   * The file extensions supported by this plugin.
-   */
-  ISceneLoaderPluginExtensions extensions;
+  virtual AssetContainerPtr loadAssetContainer(
+    Scene* scene, const std::string& data, const std::string& rootUrl,
+    const std::function<void(const std::string& message,
+                             const std::string& exception)>& onError
+    = nullptr) const = 0;
 
 }; // end of struct ISceneLoaderPlugin
 

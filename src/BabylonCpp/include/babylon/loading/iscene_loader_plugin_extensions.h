@@ -8,7 +8,14 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Interface used by SceneLoader plugins to define supported file
+ * extensions.
+ */
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginExtensions {
+  /**
+   * Defines the list of supported extensions
+   */
   std::unordered_map<std::string, bool> mapping;
 }; // end of struct ISceneLoaderPlugin
 

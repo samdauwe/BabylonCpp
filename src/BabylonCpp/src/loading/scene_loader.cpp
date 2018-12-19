@@ -5,6 +5,7 @@
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/loading/ifileInfo.h>
 #include <babylon/loading/iregistered_plugin.h>
 #include <babylon/loading/plugins/babylon/babylon_file_loader.h>
 #include <babylon/loading/scene_loader_progress_event.h>
@@ -15,7 +16,7 @@ namespace BABYLON {
 bool SceneLoader::_ForceFullSceneLoadingForIncremental = false;
 bool SceneLoader::_ShowLoadingScreen                   = true;
 bool SceneLoader::_CleanBoneMatrixWeights              = false;
-unsigned int SceneLoader::_loggingLevel = SceneLoader::NO_LOGGING();
+unsigned int SceneLoader::_loggingLevel = SceneLoader::NO_LOGGING;
 Observable<ISceneLoaderPlugin> SceneLoader::OnPluginActivatedObservable;
 
 bool SceneLoader::ForceFullSceneLoadingForIncremental()
@@ -61,6 +62,23 @@ void SceneLoader::setCleanBoneMatrixWeights(bool value)
 std::unordered_map<std::string, IRegisteredPlugin>
   SceneLoader::_registeredPlugins{};
 
+void SceneLoader::RegisterPlugins()
+{
+  // Register babylon.js file loader
+  auto bjsFileLoader  = std::make_shared<BabylonFileLoader>();
+  bjsFileLoader->name = "babylon.js";
+  bjsFileLoader->extensions.mapping[".babylon"] = false;
+  bjsFileLoader->canDirectLoad                  = [](const std::string& data) {
+    // We consider that the producer string is filled
+    if (String::endsWith(data, "babylon")) {
+      return true;
+    }
+
+    return false;
+  };
+  SceneLoader::RegisterPlugin(bjsFileLoader);
+}
+
 IRegisteredPlugin SceneLoader::_getDefaultPlugin()
 {
   // Add default plugin
@@ -76,6 +94,11 @@ SceneLoader::_getPluginForExtension(const std::string& extension)
 {
   if (stl_util::contains(SceneLoader::_registeredPlugins, extension)) {
     return SceneLoader::_registeredPlugins[extension];
+  }
+
+  if (extension == ".babylon" && SceneLoader::_registeredPlugins.empty()) {
+    SceneLoader::RegisterPlugins();
+    return SceneLoader::_getDefaultPlugin();
   }
 
   BABYLON_LOGF_WARN(
@@ -126,7 +149,7 @@ std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
 }
 
 std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
-  const std::string& rootUrl, const std::string& sceneFilename, Scene* scene,
+  const IFileInfo& fileInfo, Scene* scene,
   const std::function<void(const std::shared_ptr<ISceneLoaderPlugin>& plugin,
                            const std::string& data,
                            const std::string& responseURL)>& onSuccess,
@@ -136,13 +159,13 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
   const std::function<void()>& /*onDispose*/,
   const std::string& pluginExtension)
 {
-  auto directLoad = SceneLoader::_getDirectLoad(sceneFilename);
+  auto directLoad = SceneLoader::_getDirectLoad(fileInfo.name);
   auto registeredPlugin
     = (!pluginExtension.empty()) ?
         SceneLoader::_getPluginForExtension(pluginExtension) :
         (!directLoad.empty() ?
-           SceneLoader::_getPluginForDirectLoad(sceneFilename) :
-           SceneLoader::_getPluginForFilename(sceneFilename));
+           SceneLoader::_getPluginForDirectLoad(fileInfo.name) :
+           SceneLoader::_getPluginForFilename(fileInfo.name));
   auto& plugin         = registeredPlugin.plugin;
   auto& useArrayBuffer = registeredPlugin.isBinary;
 
@@ -160,7 +183,6 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
       };
 
   const auto manifestChecked = [&]() {
-    auto url = rootUrl + sceneFilename;
     std::function<void(const ProgressEvent& event)> progressCallback = nullptr;
     if (onProgress) {
       progressCallback = [&](const ProgressEvent& event) {
@@ -169,7 +191,7 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
     }
 
     Tools::LoadFile(
-      url, dataCallback, progressCallback, useArrayBuffer,
+      fileInfo.url, dataCallback, progressCallback, useArrayBuffer,
       [&](const std::string& message, const std::string& exception) {
         onError("Failed to load scene."
                   + (message.empty() ? "" : " " + message),
@@ -184,14 +206,42 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
   }
 
   // Loading file from disk
-  if (!sceneFilename.empty()) {
+  if (!fileInfo.name.empty()) {
     manifestChecked();
   }
   else {
-    onError("Unable to find file named " + sceneFilename, "");
+    onError("Unable to find file named " + fileInfo.name, "");
   }
 
   return plugin;
+}
+
+std::optional<IFileInfo>
+SceneLoader::_getFileInfo(std::string rootUrl, const std::string& sceneFilename)
+{
+  std::string url;
+  std::string name;
+
+  if (sceneFilename.empty()) {
+    url     = rootUrl;
+    name    = Tools::GetFilename(rootUrl);
+    rootUrl = Tools::GetFolderPath(rootUrl);
+  }
+  else {
+    if (sceneFilename.substr(0, 1) == "/") {
+      BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter");
+      return std::nullopt;
+    }
+
+    url  = rootUrl + sceneFilename;
+    name = sceneFilename;
+  }
+
+  return IFileInfo{
+    url,     // url
+    rootUrl, // rootUrl
+    name,    // name
+  };
 }
 
 ISceneLoaderPlugin*
@@ -236,34 +286,29 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::ImportMesh(
     return nullptr;
   }
 
-  if (sceneFilename.empty()) {
-    sceneFilename = Tools::GetFilename(rootUrl);
-    rootUrl       = Tools::GetFolderPath(rootUrl);
-  }
-
-  if (String::startsWith(sceneFilename, "/")) {
-    BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter");
+  auto fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
+  if (!fileInfo) {
     return nullptr;
   }
 
   const auto disposeHandler = []() {};
 
-  const auto errorHandler = [&](const std::string& message,
-                                const std::string& exception) {
-    const auto errorMessage
-      = String::concat("Unable to import meshes from ", rootUrl, sceneFilename,
-                       (!message.empty() ? ": " + message : ""));
+  const auto errorHandler
+    = [&](const std::string& message, const std::string& exception) {
+        const auto errorMessage
+          = String::concat("Unable to import meshes from ", fileInfo->url,
+                           (!message.empty() ? ": " + message : ""));
 
-    if (onError) {
-      onError(scene, errorMessage, exception);
-    }
-    else {
-      BABYLON_LOG_ERROR("SceneLoader", errorMessage);
-      // should the exception be thrown?
-    }
+        if (onError) {
+          onError(scene, errorMessage, exception);
+        }
+        else {
+          BABYLON_LOG_ERROR("SceneLoader", errorMessage);
+          // should the exception be thrown?
+        }
 
-    disposeHandler();
-  };
+        disposeHandler();
+      };
 
   std::function<void(const SceneLoaderProgressEvent& event)> progressHandler
     = nullptr;
@@ -283,6 +328,8 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::ImportMesh(
           const std::vector<IParticleSystemPtr>& particleSystems,
           const std::vector<SkeletonPtr>& skeletons,
           const std::vector<AnimationGroupPtr>& animationGroups) {
+        scene->importedMeshesFiles.emplace_back(fileInfo->url);
+
         if (onSuccess) {
           try {
             onSuccess(meshes, particleSystems, skeletons, animationGroups);
@@ -294,17 +341,12 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::ImportMesh(
       };
 
   return SceneLoader::_loadData(
-    rootUrl, sceneFilename, scene,
+    *fileInfo, scene,
     [&](const std::shared_ptr<ISceneLoaderPlugin>& plugin,
         const std::string& data, const std::string& responseURL) {
       if (plugin->rewriteRootURL) {
-        rootUrl = plugin->rewriteRootURL(rootUrl, responseURL);
-      }
-
-      if (sceneFilename == "") {
-        if (sceneFilename == "") {
-          rootUrl = Tools::GetFolderPath(rootUrl, true);
-        }
+        fileInfo->rootUrl
+          = plugin->rewriteRootURL(fileInfo->rootUrl, responseURL);
       }
 
       auto& syncedPlugin = plugin;
@@ -313,8 +355,9 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::ImportMesh(
       std::vector<SkeletonPtr> skeletons;
       std::vector<AnimationGroupPtr> animationGroups;
 
-      if (!syncedPlugin->importMesh(meshNames, scene, data, rootUrl, meshes,
-                                    particleSystems, skeletons, errorHandler)) {
+      if (!syncedPlugin->importMesh(meshNames, scene, data, fileInfo->rootUrl,
+                                    meshes, particleSystems, skeletons,
+                                    errorHandler)) {
         return;
       }
 
@@ -353,13 +396,8 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::Append(
     return nullptr;
   }
 
-  if (sceneFilename.empty()) {
-    sceneFilename = Tools::GetFilename(rootUrl);
-    rootUrl       = Tools::GetFolderPath(rootUrl);
-  }
-
-  if (String::startsWith(sceneFilename, "/")) {
-    BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter");
+  auto fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
+  if (!fileInfo) {
     return nullptr;
   }
 
@@ -373,7 +411,7 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::Append(
   const auto errorHandler
     = [&](const std::string& message, const std::string& exception) {
         const auto errorMessage
-          = String::concat("Unable to load from ", rootUrl, sceneFilename,
+          = String::concat("Unable to load from ", fileInfo->url,
                            (!message.empty() ? ": " + message : ""));
         if (onError) {
           onError(scene, errorMessage, exception);
@@ -411,15 +449,11 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::Append(
   };
 
   return SceneLoader::_loadData(
-    rootUrl, sceneFilename, scene,
+    *fileInfo, scene,
     [&](const std::shared_ptr<ISceneLoaderPlugin>& plugin,
         const std::string& data, const std::string& /*responseURL*/) {
-      if (sceneFilename == "") {
-        rootUrl = Tools::GetFolderPath(rootUrl, true);
-      }
-
       auto& syncedPlugin = plugin;
-      if (!syncedPlugin->load(scene, data, rootUrl, errorHandler)) {
+      if (!syncedPlugin->load(scene, data, fileInfo->rootUrl, errorHandler)) {
         return;
       }
 
