@@ -61,12 +61,12 @@ AxisScaleGizmo::AxisScaleGizmo(
 
   // Add drag behavior to handle events when the gizmo is dragged
   PointerDragBehaviorOptions options;
-  options.dragAxis            = dragAxis;
-  _dragBehavior               = std::make_unique<PointerDragBehavior>(options);
-  _dragBehavior->moveAttached = false;
-  _rootMesh->addBehavior(_dragBehavior.get());
+  options.dragAxis           = dragAxis;
+  dragBehavior               = std::make_unique<PointerDragBehavior>(options);
+  dragBehavior->moveAttached = false;
+  // _rootMesh->addBehavior(dragBehavior.get());
 
-  _dragBehavior->onDragObservable.add(
+  dragBehavior->onDragObservable.add(
     [&](DragMoveEvent* event, EventState& /*es*/) {
       if (attachedMesh()) {
         // Snapping logic
@@ -139,8 +139,8 @@ AxisScaleGizmo::~AxisScaleGizmo()
 
 void AxisScaleGizmo::_attachedMeshChanged(AbstractMesh* value)
 {
-  if (_dragBehavior) {
-    _dragBehavior->enabled = value ? true : false;
+  if (dragBehavior) {
+    dragBehavior->enabled = value ? true : false;
   }
 }
 
@@ -148,7 +148,7 @@ void AxisScaleGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   onSnapObservable.clear();
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
-  _dragBehavior->detach();
+  dragBehavior->detach();
   Gizmo::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 

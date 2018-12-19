@@ -54,7 +54,7 @@ public:
   /**
    * Drag behavior responsible for the gizmos dragging interactions
    */
-  std::unique_ptr<PointerDragBehavior> _dragBehavior;
+  std::unique_ptr<PointerDragBehavior> dragBehavior;
 
   /**
    * Scale distance in babylon units that the gizmo will snap to when dragged

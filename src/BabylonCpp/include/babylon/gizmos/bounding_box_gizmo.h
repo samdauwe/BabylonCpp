@@ -34,6 +34,16 @@ public:
   ~BoundingBoxGizmo() override;
 
   /**
+   * @brief Hidden
+   */
+  static void _RemoveAndStorePivotPoint(AbstractMesh* mesh);
+
+  /**
+   * @brief Hidden
+   */
+  static void _RestorePivotPoint(AbstractMesh* mesh);
+
+  /**
    * @brief Updates the bounding box information for the Gizmo.
    */
   void updateBoundingBox();
@@ -71,10 +81,7 @@ protected:
   void _attachedMeshChanged(AbstractMesh* value) override;
 
 private:
-  void removeAndStorePivotPoint();
-  void restorePivotPoint();
   void _selectNode(const MeshPtr& selectedMesh);
-  void _recurseComputeWorld(Node* node);
 
 public:
   /**
@@ -83,6 +90,13 @@ public:
    * (Default: false)
    */
   bool ignoreChildren;
+  /**
+   * Returns true if a descendant should be included when computing the bounding
+   * box. When null, all descendants are included. If ignoreChildren is set this
+   * will be ignored. (Default: null)
+   */
+  std::function<bool(AbstractMesh* abstractMesh)> includeChildPredicate;
+
   /**
    * The size of the rotation spheres attached to the bounding box (Default:
    * 0.1)
@@ -147,8 +161,13 @@ private:
   AbstractMeshPtr _anchorMesh;
   Vector3 _existingMeshScale;
 
-  Vector3 _oldPivotPoint;
-  Vector3 _pivotTranslation;
+  // Stores the state of the pivot cache (_oldPivotPoint, _pivotTranslation)
+  // store/remove pivot point should only be applied during their outermost
+  // calls
+  static int _PivotCached;
+  static Vector3 _OldPivotPoint;
+  static Vector3 _PivotTranslation;
+  static Vector3 _PivotTmpVector;
 
 }; // end of class BoundingBoxGizmo
 

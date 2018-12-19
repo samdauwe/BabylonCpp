@@ -84,8 +84,8 @@ void MultiPointerScaleBehavior::attach(const MeshPtr& ownerNode)
       });
   }
 
-  _ownerNode->addBehavior(_dragBehaviorA.get());
-  _ownerNode->addBehavior(_dragBehaviorB.get());
+  // _ownerNode->addBehavior(_dragBehaviorA.get());
+  // _ownerNode->addBehavior(_dragBehaviorB.get());
 
   // On every frame move towards target scaling to avoid jitter caused by vr
   // controllers
@@ -107,7 +107,7 @@ void MultiPointerScaleBehavior::detach()
   for (auto& behavior : {_dragBehaviorA.get(), _dragBehaviorB.get()}) {
     behavior->onDragStartObservable.clear();
     behavior->onDragObservable.clear();
-    _ownerNode->removeBehavior(behavior);
+    // _ownerNode->removeBehavior(behavior);
   }
 }
 

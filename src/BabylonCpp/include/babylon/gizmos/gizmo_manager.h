@@ -16,7 +16,9 @@ class RotationGizmo;
 class ScaleGizmo;
 class Scene;
 class SixDofDragBehavior;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+class UtilityLayerRenderer;
+using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
+using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 struct Gizmos {
   std::unique_ptr<PositionGizmo> positionGizmo       = nullptr;
@@ -90,6 +92,12 @@ public:
   Gizmos gizmos;
 
   /**
+   * When bounding box gizmo is enabled, this can be used to track drag/end
+   * events
+   */
+  std::unique_ptr<SixDofDragBehavior> boundingBoxDragBehavior;
+
+  /**
    * Array of meshes which will have the gizmo attached when a pointer selected
    * them. If null, all meshes are attachable. (Default: null)
    */
@@ -127,7 +135,8 @@ private:
   Observer<PointerInfo>::Ptr _pointerObserver;
   AbstractMesh* _attachedMesh;
   Color3 _boundingBoxColor;
-  std::unique_ptr<SixDofDragBehavior> _dragBehavior;
+  UtilityLayerRendererPtr _defaultUtilityLayer;
+  UtilityLayerRendererPtr _defaultKeepDepthUtilityLayer;
 
 }; // end of class GizmoManager
 

@@ -16,10 +16,16 @@
 
 namespace BABYLON {
 
+int BoundingBoxGizmo::_PivotCached          = 0;
+Vector3 BoundingBoxGizmo::_OldPivotPoint    = Vector3();
+Vector3 BoundingBoxGizmo::_PivotTranslation = Vector3();
+Vector3 BoundingBoxGizmo::_PivotTmpVector   = Vector3();
+
 BoundingBoxGizmo::BoundingBoxGizmo(
   const Color3& color, const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , ignoreChildren{false}
+    , includeChildPredicate{nullptr}
     , rotationSphereSize{0.1f}
     , scaleBoxSize{0.1f}
     , fixedDragMeshScreenSize{false}
@@ -112,7 +118,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
     PointerDragBehavior _dragBehavior;
     _dragBehavior.moveAttached    = false;
     _dragBehavior.updateDragPlane = false;
-    sphere->addBehavior(&_dragBehavior);
+    // sphere->addBehavior(&_dragBehavior);
     Vector3 startingTurnDirection{1.f, 0.f, 0.f};
     auto totalTurnAmountOfDrag = 0;
     _dragBehavior.onDragStartObservable.add(
@@ -124,7 +130,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
                                            EventState& /*es*/) {
       onRotationSphereDragObservable.notifyObservers({});
       if (attachedMesh()) {
-        removeAndStorePivotPoint();
+        BoundingBoxGizmo::_RemoveAndStorePivotPoint(attachedMesh());
 
         auto worldDragDirection = startingTurnDirection;
 
@@ -177,7 +183,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         }
         updateBoundingBox();
 
-        restorePivotPoint();
+        BoundingBoxGizmo::_RestorePivotPoint(attachedMesh());
       }
     });
 
@@ -216,12 +222,12 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         options.dragAxis = dragAxis;
         PointerDragBehavior _dragBehavior(options);
         _dragBehavior.moveAttached = false;
-        box->addBehavior(&_dragBehavior);
+        // box->addBehavior(&_dragBehavior);
         _dragBehavior.onDragObservable.add([&](DragMoveEvent* event,
                                                EventState& /*es*/) {
           onScaleBoxDragObservable.notifyObservers(nullptr);
           if (attachedMesh()) {
-            removeAndStorePivotPoint();
+            BoundingBoxGizmo::_RemoveAndStorePivotPoint(attachedMesh());
 
             auto relativeDragDistance
               = (event->dragDistance / _boundingDimensions.length())
@@ -260,7 +266,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
             }
             _anchorMesh->removeChild(*attachedMesh());
 
-            restorePivotPoint();
+            BoundingBoxGizmo::_RestorePivotPoint(attachedMesh());
           }
         });
 
@@ -329,36 +335,37 @@ BoundingBoxGizmo::~BoundingBoxGizmo()
 {
 }
 
-void BoundingBoxGizmo::removeAndStorePivotPoint()
+void BoundingBoxGizmo::_RemoveAndStorePivotPoint(AbstractMesh* mesh)
 {
-  if (attachedMesh()) {
+  if (mesh && BoundingBoxGizmo::_PivotCached == 0) {
     // Save old pivot and set pivot to 0,0,0
-    attachedMesh()->getPivotPointToRef(_oldPivotPoint);
-    if (_oldPivotPoint.equalsToFloats(0.f, 0.f, 0.f)) {
-      return;
+    mesh->getPivotPointToRef(BoundingBoxGizmo::_OldPivotPoint);
+    if (!BoundingBoxGizmo::_OldPivotPoint.equalsToFloats(0.f, 0.f, 0.f)) {
+      mesh->setPivotMatrix(Matrix::IdentityReadOnly());
+      BoundingBoxGizmo::_OldPivotPoint.subtractToRef(
+        mesh->getPivotPoint(), BoundingBoxGizmo::_PivotTranslation);
+      BoundingBoxGizmo::_PivotTmpVector.copyFromFloats(1.f, 1.f, 1.f);
+      BoundingBoxGizmo::_PivotTmpVector.subtractInPlace(mesh->scaling());
+      BoundingBoxGizmo::_PivotTmpVector.multiplyInPlace(
+        BoundingBoxGizmo::_PivotTranslation);
+      mesh->position().addInPlace(BoundingBoxGizmo::_PivotTmpVector);
     }
-    auto identityReadOnly = Matrix::IdentityReadOnly();
-    attachedMesh()->setPivotMatrix(identityReadOnly);
-    _oldPivotPoint.subtractToRef(attachedMesh()->getPivotPoint(),
-                                 _pivotTranslation);
-    _tmpVector.copyFromFloats(1.f, 1.f, 1.f);
-    _tmpVector.subtractInPlace(attachedMesh()->scaling());
-    _tmpVector.multiplyInPlace(_pivotTranslation);
-    attachedMesh()->position().addInPlace(_tmpVector);
   }
+  ++BoundingBoxGizmo::_PivotCached;
 }
 
-void BoundingBoxGizmo::restorePivotPoint()
+void BoundingBoxGizmo::_RestorePivotPoint(AbstractMesh* mesh)
 {
-  if (attachedMesh() && !_oldPivotPoint.equalsToFloats(0, 0, 0)) {
-    attachedMesh()->setPivotPoint(_oldPivotPoint);
-    _oldPivotPoint.subtractToRef(attachedMesh()->getPivotPoint(),
-                                 _pivotTranslation);
-    _tmpVector.copyFromFloats(1, 1, 1);
-    _tmpVector.subtractInPlace(attachedMesh()->scaling());
-    _tmpVector.multiplyInPlace(_pivotTranslation);
-    attachedMesh()->position().subtractInPlace(_tmpVector);
+  if (mesh && !BoundingBoxGizmo::_OldPivotPoint.equalsToFloats(0.f, 0.f, 0.f)
+      && BoundingBoxGizmo::_PivotCached == 1) {
+    mesh->setPivotPoint(BoundingBoxGizmo::_OldPivotPoint);
+    BoundingBoxGizmo::_PivotTmpVector.copyFromFloats(1.f, 1.f, 1.f);
+    BoundingBoxGizmo::_PivotTmpVector.subtractInPlace(mesh->scaling());
+    BoundingBoxGizmo::_PivotTmpVector.multiplyInPlace(
+      BoundingBoxGizmo::_PivotTranslation);
+    mesh->position().subtractInPlace(BoundingBoxGizmo::_PivotTmpVector);
   }
+  --_PivotCached;
 }
 
 void BoundingBoxGizmo::_attachedMeshChanged(AbstractMesh* value)
@@ -366,8 +373,10 @@ void BoundingBoxGizmo::_attachedMeshChanged(AbstractMesh* value)
   if (value) {
     // Reset anchor mesh to match attached mesh's scale
     // This is needed to avoid invalid box/sphere position on first drag
+    BoundingBoxGizmo::_RemoveAndStorePivotPoint(value);
     _anchorMesh->addChild(*value);
     _anchorMesh->removeChild(*value);
+    BoundingBoxGizmo::_RestorePivotPoint(value);
     updateBoundingBox();
   }
 }
@@ -380,21 +389,10 @@ void BoundingBoxGizmo::_selectNode(const MeshPtr& selectedMesh)
   }
 }
 
-void BoundingBoxGizmo::_recurseComputeWorld(Node* node)
-{
-  node->computeWorldMatrix(true);
-
-  if (!ignoreChildren) {
-    for (const auto& n : node->getDescendants()) {
-      _recurseComputeWorld(n.get());
-    }
-  }
-}
-
 void BoundingBoxGizmo::updateBoundingBox()
 {
   if (attachedMesh()) {
-    removeAndStorePivotPoint();
+    BoundingBoxGizmo::_RemoveAndStorePivotPoint(attachedMesh());
     _update();
 
     // Rotate based on axis
@@ -419,8 +417,8 @@ void BoundingBoxGizmo::updateBoundingBox()
     attachedMesh()->position().set(0.f, 0.f, 0.f);
 
     // Update bounding dimensions/positions
-    auto boundingMinMax
-      = attachedMesh()->getHierarchyBoundingVectors(!ignoreChildren);
+    auto boundingMinMax = attachedMesh()->getHierarchyBoundingVectors(
+      !ignoreChildren, includeChildPredicate);
     boundingMinMax.max.subtractToRef(boundingMinMax.min, _boundingDimensions);
 
     // Update gizmo to match bounding box scaling and rotation
@@ -437,7 +435,6 @@ void BoundingBoxGizmo::updateBoundingBox()
     // restore position/rotation values
     attachedMesh()->rotationQuaternion()->copyFrom(_tmpQuaternion);
     attachedMesh()->position().copyFrom(_tmpVector);
-    _recurseComputeWorld(attachedMesh());
   }
 
   // Update rotation sphere locations
@@ -542,7 +539,7 @@ void BoundingBoxGizmo::updateBoundingBox()
   }
   if (attachedMesh()) {
     _existingMeshScale.copyFrom(attachedMesh()->scaling());
-    restorePivotPoint();
+    BoundingBoxGizmo::_RestorePivotPoint(attachedMesh());
   }
 }
 

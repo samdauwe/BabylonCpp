@@ -4,10 +4,12 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/gizmos/bounding_box_gizmo.h>
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
 
+int PointerDragBehavior::_AnyMouseID                    = -2;
 std::unique_ptr<Scene> PointerDragBehavior::_planeScene = nullptr;
 
 PointerDragBehavior::PointerDragBehavior(
@@ -71,7 +73,7 @@ void PointerDragBehavior::init()
 {
 }
 
-void PointerDragBehavior::attach(const NodePtr& ownerNode)
+void PointerDragBehavior::attach(const MeshPtr& ownerNode)
 {
   _scene        = ownerNode->getScene();
   _attachedNode = ownerNode;
@@ -126,6 +128,20 @@ void PointerDragBehavior::attach(const NodePtr& ownerNode)
       }
       else if (pointerInfo->type == PointerEventTypes::POINTERMOVE) {
         auto pointerId = pointerInfo->pointerEvent.pointerId;
+
+        // If drag was started with anyMouseID specified, set pointerID to the
+        // next mouse that moved
+        if (currentDraggingPointerID == PointerDragBehavior::_AnyMouseID
+            && pointerId != PointerDragBehavior::_AnyMouseID
+            && (pointerInfo->pointerEvent.pointerType == PointerType::MOUSE)) {
+          if (stl_util::contains(_lastPointerRay, currentDraggingPointerID)) {
+            _lastPointerRay[pointerId]
+              = _lastPointerRay[currentDraggingPointerID];
+            _lastPointerRay.erase(currentDraggingPointerID);
+          }
+          currentDraggingPointerID = pointerId;
+        }
+
         // Keep track of last pointer ray, this is used simulating the start of
         // a drag in startDrag()
         if (!stl_util::contains(_lastPointerRay, pointerId)) {
@@ -146,16 +162,14 @@ void PointerDragBehavior::attach(const NodePtr& ownerNode)
   _beforeRenderObserver = _scene->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
       if (_moving && moveAttached) {
+        BoundingBoxGizmo::_RemoveAndStorePivotPoint(_attachedNode.get());
         // Slowly move mesh to avoid jitter
-        _targetPosition.subtractToRef(
-          std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition(),
-          _tmpVector);
+        _targetPosition.subtractToRef((_attachedNode)->absolutePosition,
+                                      _tmpVector);
         _tmpVector.scaleInPlace(dragDeltaRatio);
-        std::static_pointer_cast<Mesh>(_attachedNode)
-          ->getAbsolutePosition()
-          .addToRef(_tmpVector, _tmpVector);
-        std::static_pointer_cast<Mesh>(_attachedNode)
-          ->setAbsolutePosition(_tmpVector);
+        (_attachedNode)->getAbsolutePosition().addToRef(_tmpVector, _tmpVector);
+        (_attachedNode)->setAbsolutePosition(_tmpVector);
+        BoundingBoxGizmo::_RestorePivotPoint(_attachedNode.get());
       }
     });
 }
@@ -182,20 +196,31 @@ void PointerDragBehavior::startDrag(
   const std::optional<Vector3>& startPickedPoint)
 {
   _startDrag(pointerId, fromRay, startPickedPoint);
+
+  std::optional<Ray> lastRay = std::nullopt;
   if (stl_util::contains(_lastPointerRay, pointerId)) {
+    lastRay = _lastPointerRay[pointerId];
+  }
+  if (pointerId == PointerDragBehavior::_AnyMouseID
+      && stl_util::contains(_lastPointerRay, 0)) {
+    lastRay = _lastPointerRay[0];
+  }
+
+  if (lastRay.has_value()) {
     // if there was a last pointer ray drag the object there
-    _moveDrag(_lastPointerRay[pointerId]);
+    _moveDrag(*lastRay);
   }
 }
 
 void PointerDragBehavior::_startDrag(
-  int /*pointerId*/, const std::optional<Ray>& fromRay,
+  int pointerId, const std::optional<Ray>& fromRay,
   const std::optional<Vector3>& startPickedPoint)
 {
   if (!_scene->activeCamera || dragging || !_attachedNode) {
     return;
   }
 
+  BoundingBoxGizmo::_RemoveAndStorePivotPoint(_attachedNode.get());
   // Create start ray from the camera to the object
   if (fromRay) {
     _startDragRay.direction.copyFrom(fromRay->direction);
@@ -214,7 +239,7 @@ void PointerDragBehavior::_startDrag(
   auto pickedPoint = _pickWithRayOnDragPlane(_startDragRay);
   if (pickedPoint) {
     dragging                 = true;
-    currentDraggingPointerID = 1;
+    currentDraggingPointerID = pointerId;
     lastDragPosition.copyFrom(*pickedPoint);
 
     DragStartOrEndEvent dragStartOrEndEvent;
@@ -238,6 +263,7 @@ void PointerDragBehavior::_startDrag(
       }
     }
   }
+  BoundingBoxGizmo::_RestorePivotPoint(_attachedNode.get());
 }
 
 void PointerDragBehavior::_moveDrag(const Ray& ray)
@@ -301,9 +327,8 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
     if (_useAlternatePickedPointAboveMaxDragAngle) {
       // Invert ray direction along the towards object axis
       _tmpVector.copyFrom((*ray).direction);
-      std::static_pointer_cast<Mesh>(_attachedNode)
-        ->absolutePosition()
-        .subtractToRef((*ray).origin, _alternatePickedPoint);
+      _attachedNode->absolutePosition().subtractToRef((*ray).origin,
+                                                      _alternatePickedPoint);
       _alternatePickedPoint.normalize();
       _alternatePickedPoint.scaleInPlace(
         -2.f * Vector3::Dot(_alternatePickedPoint, _tmpVector));
@@ -314,8 +339,7 @@ PointerDragBehavior::_pickWithRayOnDragPlane(const std::optional<Ray>& ray)
       auto dot = Vector3::Dot(_dragPlane->forward(), _tmpVector);
       _dragPlane->forward().scaleToRef(-dot, _alternatePickedPoint);
       _alternatePickedPoint.addInPlace(_tmpVector);
-      _alternatePickedPoint.addInPlace(
-        std::static_pointer_cast<Mesh>(_attachedNode)->absolutePosition());
+      _alternatePickedPoint.addInPlace(_attachedNode->absolutePosition());
       return _alternatePickedPoint;
     }
     else {

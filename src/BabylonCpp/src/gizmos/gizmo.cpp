@@ -8,14 +8,20 @@
 namespace BABYLON {
 
 Gizmo::Gizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
-    : scaleRatio{1.f}
+    : scaleRatio{this, &Gizmo::get_scaleRatio, &Gizmo::set_scaleRatio}
     , attachedMesh{this, &Gizmo::get_attachedMesh, &Gizmo::set_attachedMesh}
     , gizmoLayer{iGizmoLayer}
-    , updateGizmoRotationToMatchAttachedMesh{true}
+    , updateGizmoRotationToMatchAttachedMesh{this,
+                                             &Gizmo::
+                                               get_updateGizmoRotationToMatchAttachedMesh,
+                                             &Gizmo::
+                                               set_updateGizmoRotationToMatchAttachedMesh}
     , updateGizmoPositionToMatchAttachedMesh{true}
     , _customMeshSet{false}
     , _updateScale{true}
     , _interactionsEnabled{true}
+    , _scaleRatio{1.f}
+    , _updateGizmoRotationToMatchAttachedMesh{true}
 {
   _rootMesh = Mesh::New("gizmoRootNode", gizmoLayer->utilityLayerScene.get());
   _beforeRenderObserver
@@ -28,6 +34,16 @@ Gizmo::~Gizmo()
 {
 }
 
+void Gizmo::set_scaleRatio(float value)
+{
+  _scaleRatio = value;
+}
+
+float Gizmo::get_scaleRatio() const
+{
+  return _scaleRatio;
+}
+
 AbstractMesh*& Gizmo::get_attachedMesh()
 {
   return _attachedMesh;
@@ -38,6 +54,16 @@ void Gizmo::set_attachedMesh(AbstractMesh* const& value)
   _attachedMesh = value;
   _rootMesh->setEnabled(value ? true : false);
   _attachedMeshChanged(value);
+}
+
+void Gizmo::set_updateGizmoRotationToMatchAttachedMesh(bool value)
+{
+  _updateGizmoRotationToMatchAttachedMesh = value;
+}
+
+bool Gizmo::get_updateGizmoRotationToMatchAttachedMesh() const
+{
+  return _updateGizmoRotationToMatchAttachedMesh;
 }
 
 void Gizmo::setCustomMesh(const MeshPtr& mesh, bool /*useGizmoMaterial*/)

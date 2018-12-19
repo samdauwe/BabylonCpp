@@ -13,7 +13,8 @@ namespace BABYLON {
 
 PlaneRotationGizmo::PlaneRotationGizmo(
   const Vector3& planeNormal, const Color3& color,
-  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
+  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer,
+  unsigned int tessellation)
     : Gizmo{iGizmoLayer}
     , snapDistance{0.f}
     , _pointerObserver{nullptr}
@@ -34,8 +35,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   auto parentMesh = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
 
   // Create circle out of lines
-  auto tessellation = 20ul;
-  auto radius       = 0.8f;
+  auto radius = 0.8f;
   std::vector<Vector3> points;
   for (size_t i = 0; i < tessellation; ++i) {
     auto radian = (Math::PI2) * (i / (tessellation - 1));
@@ -62,7 +62,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
   dragBehavior->moveAttached = false;
   dragBehavior->maxDragAngle = Math::PI * 9.f / 20.f;
   dragBehavior->_useAlternatePickedPointAboveMaxDragAngle = true;
-  _rootMesh->addBehavior(dragBehavior.get());
+  // _rootMesh->addBehavior(dragBehavior.get());
 
   dragBehavior->onDragStartObservable.add(
     [&](DragStartOrEndEvent* e, EventState& /*es*/) {

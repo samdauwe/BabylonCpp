@@ -48,6 +48,16 @@ public:
 
 protected:
   /**
+   * @brief Sets the ratio for the scale of the gizmo (Default: 1).
+   */
+  virtual void set_scaleRatio(float value);
+
+  /**
+   * @brief Sets the ratio for the scale of the gizmo (Default: 1).
+   */
+  virtual float get_scaleRatio() const;
+
+  /**
    * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag
    * gizmo the mesh that will be dragged).
    */
@@ -59,6 +69,21 @@ protected:
    */
   virtual void set_attachedMesh(AbstractMesh* const& value);
 
+  /**
+   * @brief Sets if set the gizmo's position will be updated to match the
+   * attached mesh each frame (Default: true).
+   */
+  virtual void set_updateGizmoRotationToMatchAttachedMesh(bool value);
+
+  /**
+   * @brief Gets if set the gizmo's position will be updated to match the
+   * attached mesh each frame (Default: true).
+   */
+  virtual bool get_updateGizmoRotationToMatchAttachedMesh() const;
+
+  /**
+   * @brief Hidden
+   */
   virtual void _attachedMeshChanged(AbstractMesh* value);
 
   /**
@@ -71,7 +96,7 @@ public:
   /**
    * Ratio for the scale of the gizmo (Default: 1)
    */
-  float scaleRatio;
+  Property<Gizmo, float> scaleRatio;
 
   /**
    * Mesh that the gizmo will be attached to. (eg. on a drag gizmo the mesh that
@@ -89,7 +114,7 @@ public:
    * If set the gizmo's rotation will be updated to match the attached mesh each
    * frame (Default: true)
    */
-  bool updateGizmoRotationToMatchAttachedMesh;
+  Property<Gizmo, bool> updateGizmoRotationToMatchAttachedMesh;
 
   /**
    * If set the gizmo's position will be updated to match the attached mesh each
@@ -116,6 +141,8 @@ protected:
   bool _interactionsEnabled;
 
 private:
+  float _scaleRatio;
+  bool _updateGizmoRotationToMatchAttachedMesh;
   AbstractMesh* _attachedMesh;
   Matrix _tmpMatrix;
   Vector3 _tempVector;

@@ -13,7 +13,8 @@
 namespace BABYLON {
 
 GizmoManager::GizmoManager(Scene* iScene)
-    : attachableMeshes{std::nullopt}
+    : boundingBoxDragBehavior{std::make_unique<SixDofDragBehavior>()}
+    , attachableMeshes{std::nullopt}
     , usePointerToAttachGizmos{true}
     , positionGizmoEnabled{this, &GizmoManager::get_positionGizmoEnabled,
                            &GizmoManager::set_positionGizmoEnabled}
@@ -28,8 +29,12 @@ GizmoManager::GizmoManager(Scene* iScene)
     , _pointerObserver{nullptr}
     , _attachedMesh{nullptr}
     , _boundingBoxColor{Color3::FromHexString("#0984e3")}
-    , _dragBehavior{std::make_unique<SixDofDragBehavior>()}
 {
+  _defaultKeepDepthUtilityLayer = UtilityLayerRenderer::New(iScene);
+  _defaultKeepDepthUtilityLayer->utilityLayerScene->autoClearDepthAndStencil
+    = false;
+  _defaultUtilityLayer = UtilityLayerRenderer::New(iScene);
+
   // Instatiate/dispose gizmos based on pointer actions
   _pointerObserver = _scene->onPointerObservable.add(
     [this](PointerInfo* pointerInfo, EventState& /*es*/) {
@@ -62,7 +67,9 @@ GizmoManager::GizmoManager(Scene* iScene)
             }
           }
           if (node && node->type() == IReflect::Type::ABSTRACTMESH) {
-            attachToMesh(static_cast<AbstractMesh*>(node));
+            if (_attachedMesh != node) {
+              attachToMesh(static_cast<AbstractMesh*>(node));
+            }
           }
           else {
             attachToMesh(nullptr);
@@ -82,7 +89,7 @@ GizmoManager::~GizmoManager()
 void GizmoManager::attachToMesh(AbstractMesh* mesh)
 {
   if (_attachedMesh) {
-    // _attachedMesh->removeBehavior(_dragBehavior);
+    // _attachedMesh->removeBehavior(boundingBoxDragBehavior);
   }
   _attachedMesh = mesh;
 
@@ -100,7 +107,7 @@ void GizmoManager::attachToMesh(AbstractMesh* mesh)
   }
 
   if (boundingBoxGizmoEnabled && _attachedMesh) {
-    //  _attachedMesh.addBehavior(_dragBehavior);
+    //  _attachedMesh.addBehavior(boundingBoxDragBehavior);
   }
 }
 
@@ -108,8 +115,8 @@ void GizmoManager::set_positionGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.positionGizmo) {
-      gizmos.positionGizmo = std::make_unique<PositionGizmo>();
-      gizmos.positionGizmo->updateGizmoRotationToMatchAttachedMesh = false;
+      gizmos.positionGizmo
+        = std::make_unique<PositionGizmo>(_defaultUtilityLayer);
     }
     gizmos.positionGizmo->attachedMesh = _attachedMesh;
   }
@@ -128,7 +135,8 @@ void GizmoManager::set_rotationGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.rotationGizmo) {
-      gizmos.rotationGizmo = std::make_unique<RotationGizmo>();
+      gizmos.rotationGizmo
+        = std::make_unique<RotationGizmo>(_defaultUtilityLayer);
     }
     gizmos.rotationGizmo->updateGizmoRotationToMatchAttachedMesh = false;
     gizmos.rotationGizmo->attachedMesh = _attachedMesh;
@@ -148,7 +156,7 @@ void GizmoManager::set_scaleGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.scaleGizmo) {
-      gizmos.scaleGizmo = std::make_unique<ScaleGizmo>();
+      gizmos.scaleGizmo = std::make_unique<ScaleGizmo>(_defaultUtilityLayer);
     }
     gizmos.scaleGizmo->attachedMesh = _attachedMesh;
   }
@@ -167,13 +175,13 @@ void GizmoManager::set_boundingBoxGizmoEnabled(bool value)
 {
   if (value) {
     if (!gizmos.boundingBoxGizmo) {
-      gizmos.boundingBoxGizmo
-        = std::make_unique<BoundingBoxGizmo>(_boundingBoxColor);
+      gizmos.boundingBoxGizmo = std::make_unique<BoundingBoxGizmo>(
+        _boundingBoxColor, _defaultKeepDepthUtilityLayer);
     }
     gizmos.boundingBoxGizmo->attachedMesh = _attachedMesh;
     if (_attachedMesh) {
-      // _attachedMesh->removeBehavior(_dragBehavior);
-      // _attachedMesh->addBehavior(_dragBehavior);
+      // _attachedMesh->removeBehavior(boundingBoxDragBehavior);
+      // _attachedMesh->addBehavior(boundingBoxDragBehavior);
     }
   }
   else if (gizmos.boundingBoxGizmo) {
@@ -208,8 +216,9 @@ void GizmoManager::dispose(bool /*doNotRecurse*/,
     gizmos.boundingBoxGizmo->dispose();
     gizmos.boundingBoxGizmo = nullptr;
   }
-
-  _dragBehavior->detach();
+  _defaultKeepDepthUtilityLayer->dispose();
+  _defaultUtilityLayer->dispose();
+  boundingBoxDragBehavior->detach();
 }
 
 } // end of namespace BABYLON

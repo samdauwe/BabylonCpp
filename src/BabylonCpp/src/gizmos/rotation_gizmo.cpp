@@ -1,5 +1,6 @@
 #include <babylon/gizmos/rotation_gizmo.h>
 
+#include <babylon/behaviors/mesh/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
 #include <babylon/gizmos/plane_rotation_gizmo.h>
 #include <babylon/math/color3.h>
@@ -8,22 +9,33 @@
 namespace BABYLON {
 
 RotationGizmo::RotationGizmo(
-  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
+  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer,
+  unsigned int tessellation)
     : Gizmo{iGizmoLayer}
-    , xGizmo{std::make_unique<PlaneRotationGizmo>(
-        Vector3(1.f, 0.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}
-    , yGizmo{std::make_unique<PlaneRotationGizmo>(
-        Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
-    , zGizmo{std::make_unique<PlaneRotationGizmo>(
-        Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
+    , xGizmo{std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f),
+                                                  Color3::Red().scale(0.5f),
+                                                  iGizmoLayer, tessellation)}
+    , yGizmo{std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 1.f, 0.f),
+                                                  Color3::Green().scale(0.5f),
+                                                  iGizmoLayer, tessellation)}
+    , zGizmo{std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 0.f, 1.f),
+                                                  Color3::Blue().scale(0.5f),
+                                                  iGizmoLayer, tessellation)}
     , snapDistance{this, &RotationGizmo::get_snapDistance,
                    &RotationGizmo::set_snapDistance}
-    , scaleRatio{this, &RotationGizmo::get_scaleRatio,
-                 &RotationGizmo::set_scaleRatio}
-    , updateGizmoRotationToMatchAttachedMesh{
-        this, &RotationGizmo::get_updateGizmoRotationToMatchAttachedMesh,
-        &RotationGizmo::set_updateGizmoRotationToMatchAttachedMesh}
 {
+  // Relay drag events
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
+    gizmo->dragBehavior->onDragStartObservable.add(
+      [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+        onDragStartObservable.notifyObservers(nullptr);
+      });
+    gizmo->dragBehavior->onDragEndObservable.add(
+      [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+        onDragEndObservable.notifyObservers(nullptr);
+      });
+  }
+
   attachedMesh = nullptr;
 }
 
@@ -87,6 +99,8 @@ void RotationGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   xGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
   yGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
   zGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
+  onDragStartObservable.clear();
+  onDragEndObservable.clear();
 }
 
 void RotationGizmo::setCustomMesh(const MeshPtr& /*mesh*/,

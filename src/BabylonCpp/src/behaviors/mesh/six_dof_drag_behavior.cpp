@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/gizmos/bounding_box_gizmo.h>
 #include <babylon/mesh/mesh.h>
 
 namespace BABYLON {
@@ -45,6 +46,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
   _scene     = _ownerNode->getScene();
   if (!SixDofDragBehavior::_virtualScene) {
     SixDofDragBehavior::_virtualScene = Scene::New(_scene->getEngine());
+    SixDofDragBehavior::_virtualScene->detachControl();
     _scene->getEngine()->scenes.pop_back();
   }
 
@@ -80,6 +82,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         }
 
         pickedMesh = _ownerNode;
+        BoundingBoxGizmo::_RemoveAndStorePivotPoint(pickedMesh.get());
         lastSixDofOriginPosition.copyFrom((*pointerInfo->pickInfo.ray).origin);
 
         // Set position and orientation of the controller
@@ -92,6 +95,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         // Attach the virtual drag mesh to the virtual origin mesh so it can be
         // dragged
         _virtualOriginMesh->removeChild(*_virtualDragMesh);
+        pickedMesh->computeWorldMatrix();
         _virtualDragMesh->position().copyFrom(pickedMesh->absolutePosition());
         if (!pickedMesh->rotationQuaternion()) {
           pickedMesh->rotationQuaternion = Quaternion::RotationYawPitchRoll(
@@ -110,7 +114,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         dragging                 = true;
         currentDraggingPointerID = (pointerInfo->pointerEvent).pointerId;
 
-        // Detatch camera controls
+        // Detach camera controls
         if (detachCameraControls && _scene->activeCamera
             && !_scene->activeCamera->leftCamera()) {
           if (_scene->activeCamera->inputs.attachedElement) {
@@ -122,6 +126,8 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
             attachedElement = nullptr;
           }
         }
+        BoundingBoxGizmo::_RestorePivotPoint(pickedMesh.get());
+        onDragStartObservable.notifyObservers({});
       }
     }
     else if (pointerInfo->type == PointerEventTypes::POINTERUP) {
@@ -137,6 +143,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
             && !_scene->activeCamera->leftCamera()) {
           _scene->activeCamera->attachControl(attachedElement, true);
         }
+        onDragEndObservable.notifyObservers(nullptr);
       }
     }
     else if (pointerInfo->type == PointerEventTypes::POINTERMOVE) {
@@ -204,6 +211,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
   _sceneRenderObserver = ownerNode->getScene()->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
       if (dragging && _moving && pickedMesh) {
+        BoundingBoxGizmo::_RemoveAndStorePivotPoint(pickedMesh.get());
         // Slowly move mesh to avoid jitter
         pickedMesh->position().addInPlace(
           _targetPosition.subtract(pickedMesh->position())
@@ -227,6 +235,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
                                dragDeltaRatio,
                                *pickedMesh->rotationQuaternion());
         pickedMesh->setParent(oldParent);
+        BoundingBoxGizmo::_RestorePivotPoint(pickedMesh.get());
       }
     });
 }
@@ -246,6 +255,8 @@ void SixDofDragBehavior::detach()
   if (_virtualDragMesh) {
     _virtualDragMesh->dispose();
   }
+  onDragEndObservable.clear();
+  onDragStartObservable.clear();
 }
 
 } // end of namespace BABYLON

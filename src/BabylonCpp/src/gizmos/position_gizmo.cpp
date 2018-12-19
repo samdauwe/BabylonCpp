@@ -1,5 +1,6 @@
 #include <babylon/gizmos/position_gizmo.h>
 
+#include <babylon/behaviors/mesh/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
 #include <babylon/gizmos/axis_drag_gizmo.h>
 #include <babylon/math/color3.h>
@@ -11,19 +12,26 @@ PositionGizmo::PositionGizmo(
   const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
     , xGizmo{std::make_unique<AxisDragGizmo>(
-        Vector3(1.f, 0.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}
+        Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
     , yGizmo{std::make_unique<AxisDragGizmo>(
-        Vector3(0.f, 1.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
+        Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}
     , zGizmo{std::make_unique<AxisDragGizmo>(
         Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
     , snapDistance{this, &PositionGizmo::get_snapDistance,
                    &PositionGizmo::set_snapDistance}
-    , scaleRatio{this, &PositionGizmo::get_scaleRatio,
-                 &PositionGizmo::set_scaleRatio}
-    , updateGizmoRotationToMatchAttachedMesh{
-        this, &PositionGizmo::get_updateGizmoRotationToMatchAttachedMesh,
-        &PositionGizmo::set_updateGizmoRotationToMatchAttachedMesh}
 {
+  // Relay drag events
+  for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
+    gizmo->dragBehavior->onDragStartObservable.add(
+      [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+        onDragStartObservable.notifyObservers(nullptr);
+      });
+    gizmo->dragBehavior->onDragEndObservable.add(
+      [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
+        onDragEndObservable.notifyObservers(nullptr);
+      });
+  }
+
   attachedMesh = nullptr;
 }
 
@@ -82,12 +90,13 @@ float PositionGizmo::get_scaleRatio() const
   return xGizmo->scaleRatio;
 }
 
-void PositionGizmo::dispose(bool /*doNotRecurse*/,
-                            bool /*disposeMaterialAndTextures*/)
+void PositionGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
-  xGizmo->dispose();
-  yGizmo->dispose();
-  zGizmo->dispose();
+  xGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
+  yGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
+  zGizmo->dispose(doNotRecurse, disposeMaterialAndTextures);
+  onDragStartObservable.clear();
+  onDragEndObservable.clear();
 }
 
 void PositionGizmo::setCustomMesh(const MeshPtr& /*mesh*/,

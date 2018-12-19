@@ -22,7 +22,7 @@ using NodePtr = std::shared_ptr<Node>;
  * @brief A behavior that when attached to a mesh will allow the mesh to be
  * dragged around the screen based on pointer events.
  */
-class BABYLON_SHARED_EXPORT PointerDragBehavior : public Behavior<Node> {
+class BABYLON_SHARED_EXPORT PointerDragBehavior : public Behavior<Mesh> {
 
 public:
   /**
@@ -49,20 +49,23 @@ public:
    * @brief Attaches the drag behavior the passed in mesh.
    * @param ownerNode The mesh that will be dragged around once attached
    */
-  void attach(const NodePtr& ownerNode) override;
+  void attach(const MeshPtr& ownerNode) override;
 
+  /**
+   * @brief Force relase the drag action by code.
+   */
   void releaseDrag();
 
   /**
    * @brief Simulates the start of a pointer drag event on the behavior.
    * @param pointerId pointerID of the pointer that should be simulated
-   * (Default: 1 for mouse pointer)
+   * (Default: Any mouse pointer ID)
    * @param fromRay initial ray of the pointer to be simulated (Default: Ray
    * from camera to attached mesh)
    * @param startPickedPoint picked point of the pointer to be simulated
    * (Default: attached mesh position)
    */
-  void startDrag(int pointerId                                  = 1,
+  void startDrag(int pointerId = PointerDragBehavior::_AnyMouseID,
                  const std::optional<Ray>& fromRay              = std::nullopt,
                  const std::optional<Vector3>& startPickedPoint = std::nullopt);
 
@@ -157,7 +160,8 @@ public:
   static std::unique_ptr<Scene> _planeScene;
 
 private:
-  NodePtr _attachedNode;
+  static int _AnyMouseID;
+  MeshPtr _attachedNode;
   MeshPtr _dragPlane;
   Scene* _scene;
   Observer<PointerInfo>::Ptr _pointerObserver;

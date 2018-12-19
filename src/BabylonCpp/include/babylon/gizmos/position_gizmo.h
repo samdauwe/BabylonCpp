@@ -41,12 +41,12 @@ public:
 
 protected:
   void set_attachedMesh(AbstractMesh* const& mesh) override;
-  void set_updateGizmoRotationToMatchAttachedMesh(bool value);
-  bool get_updateGizmoRotationToMatchAttachedMesh() const;
+  void set_updateGizmoRotationToMatchAttachedMesh(bool value) override;
+  bool get_updateGizmoRotationToMatchAttachedMesh() const override;
   void set_snapDistance(float value);
   float get_snapDistance() const;
-  void set_scaleRatio(float value);
-  float get_scaleRatio() const;
+  void set_scaleRatio(float value) override;
+  float get_scaleRatio() const override;
 
 public:
   /**
@@ -65,17 +65,20 @@ public:
   std::unique_ptr<AxisDragGizmo> zGizmo;
 
   /**
+   * Fires an event when any of it's sub gizmos are dragged
+   */
+  Observable<DragStartOrEndEvent> onDragStartObservable;
+
+  /**
+   * Fires an event when any of it's sub gizmos are released from dragging
+   */
+  Observable<DragStartOrEndEvent> onDragEndObservable;
+
+  /**
    * Drag distance in babylon units that the gizmo will snap to when dragged
    * (Default: 0)
    */
   Property<PositionGizmo, float> snapDistance;
-
-  /**
-   * Ratio for the scale of the gizmo (Default: 1)
-   */
-  Property<PositionGizmo, float> scaleRatio;
-
-  Property<PositionGizmo, bool> updateGizmoRotationToMatchAttachedMesh;
 
 }; // end of class PositionGizmo
 

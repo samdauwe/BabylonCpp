@@ -3,8 +3,10 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/behaviors/behavior.h>
+#include <babylon/core/structs.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
+#include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
@@ -24,7 +26,9 @@ class BABYLON_SHARED_EXPORT SixDofDragBehavior : public Behavior<Mesh> {
 
 public:
   /**
-   * @brief Creates the behavior.
+   * @brief Instantiates a behavior that when attached to a mesh will allow the
+   * mesh to be dragged around based on directions and origin of the pointer's
+   * ray.
    */
   SixDofDragBehavior();
   virtual ~SixDofDragBehavior();
@@ -72,6 +76,16 @@ public:
    * If camera controls should be detached during the drag
    */
   bool detachCameraControls;
+
+  /**
+   * Fires each time a drag starts
+   */
+  Observable<DragStartOrEndEvent> onDragStartObservable;
+
+  /**
+   * Fires each time a drag ends (eg. mouse release after drag)
+   */
+  Observable<DragStartOrEndEvent> onDragEndObservable;
 
 private:
   static std::unique_ptr<Scene> _virtualScene;

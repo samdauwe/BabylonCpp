@@ -24,11 +24,14 @@ public:
    * @param planeNormal The normal of the plane which the gizmo will be able to
    * rotate on
    * @param color The color of the gizmo
+   * @param tessellation Amount of tessellation to be used when creating
+   * rotation circles
    */
   PlaneRotationGizmo(const Vector3& planeNormal,
                      const Color3& color = Color3::Gray(),
                      const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
-                     = UtilityLayerRenderer::DefaultUtilityLayer());
+                     = UtilityLayerRenderer::DefaultUtilityLayer(),
+                     unsigned int tessellation = 32);
   ~PlaneRotationGizmo() override;
 
   /**

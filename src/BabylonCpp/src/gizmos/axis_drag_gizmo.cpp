@@ -65,11 +65,11 @@ AxisDragGizmo::AxisDragGizmo(
   PointerDragBehaviorOptions options;
   options.dragAxis = dragAxis;
   // options.pointerObservableScene = gizmoLayer->originalScene;
-  _dragBehavior               = std::make_unique<PointerDragBehavior>(options);
-  _dragBehavior->moveAttached = false;
-  _rootMesh->addBehavior(_dragBehavior.get());
-  _dragBehavior->onDragObservable.add([&](DragMoveEvent* event,
-                                          EventState& /*es*/) {
+  dragBehavior               = std::make_unique<PointerDragBehavior>(options);
+  dragBehavior->moveAttached = false;
+  // _rootMesh->addBehavior(dragBehavior.get());
+  dragBehavior->onDragObservable.add([&](DragMoveEvent* event,
+                                         EventState& /*es*/) {
     if (attachedMesh()) {
       // Convert delta to local translation if it has a parent
       if (attachedMesh()->parent()) {
@@ -133,8 +133,8 @@ AxisDragGizmo::~AxisDragGizmo()
 
 void AxisDragGizmo::_attachedMeshChanged(AbstractMesh* value)
 {
-  if (_dragBehavior) {
-    _dragBehavior->enabled = value ? true : false;
+  if (dragBehavior) {
+    dragBehavior->enabled = value ? true : false;
   }
 }
 
@@ -142,7 +142,7 @@ void AxisDragGizmo::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   onSnapObservable.clear();
   gizmoLayer->utilityLayerScene->onPointerObservable.remove(_pointerObserver);
-  _dragBehavior->detach();
+  dragBehavior->detach();
   Gizmo::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 
