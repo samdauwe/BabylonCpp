@@ -32,6 +32,7 @@ struct AnimationPropertiesOverride;
 class Bone;
 class BoundingBoxRenderer;
 class ClickInfo;
+class Collider;
 class DebugLayer;
 class DepthRenderer;
 class Effect;
@@ -190,7 +191,28 @@ public:
    */
   unsigned int getInternalStep() const;
 
+  /**
+   * @brief Hidden
+   */
   void setMirroredCameraPosition(const Vector3& newPosition);
+
+  /**
+   * @brief Hidden
+   */
+  std::vector<AbstractMesh*> _getDefaultMeshCandidates();
+
+  /**
+   * @brief Hidden
+   */
+  std::vector<SubMesh*> _getDefaultSubMeshCandidates(AbstractMesh* mesh);
+
+  /**
+   * @brief Sets the default candidate providers for the scene.
+   * This sets the getActiveMeshCandidates, getActiveSubMeshCandidates,
+   * getIntersectingSubMeshCandidates and getCollidingSubMeshCandidates to their
+   * default function
+   */
+  void setDefaultCandidateProviders();
 
   /**
    * @brief Gets the cached material (ie. the latest rendered one).
@@ -2382,6 +2404,11 @@ public:
    */
   Observable<RenderingGroupInfo> onAfterRenderingGroupObservable;
 
+  /**
+   * This Observable will when a mesh has been imported into the scene.
+   */
+  Observable<AbstractMesh> onMeshImportedObservable;
+
   // Pointers
 
   /**
@@ -3152,6 +3179,30 @@ public:
    * (ie. the materials won't be updated if they are out of sync) */
   bool blockMaterialDirtyMechanism;
 
+  /**
+   * Lambda returning the list of potentially active meshes.
+   */
+  std::function<std::vector<AbstractMesh*>()> getActiveMeshCandidates;
+
+  /**
+   * Lambda returning the list of potentially active sub meshes.
+   */
+  std::function<std::vector<SubMesh*>(AbstractMesh* mesh)>
+    getActiveSubMeshCandidates;
+
+  /**
+   * Lambda returning the list of potentially intersecting sub meshes.
+   */
+  std::function<std::vector<SubMesh*>(AbstractMesh* mesh, const Ray& localRay)>
+    getIntersectingSubMeshCandidates;
+
+  /**
+   * Lambda returning the list of potentially colliding sub meshes.
+   */
+  std::function<std::vector<SubMesh*>(AbstractMesh* mesh,
+                                      const Collider& collider)>
+    getCollidingSubMeshCandidates;
+
 protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
@@ -3309,7 +3360,10 @@ private:
   bool _alternateRendering;
   bool _frustumPlanesSet;
   std::array<Plane, 6> _frustumPlanes;
+
+  /** Hidden (Backing field) */
   Octree<AbstractMesh*>* _selectionOctree;
+
   Vector2 _unTranslatedPointer;
   AbstractMesh* _pointerOverMesh;
   std::unique_ptr<DebugLayer> _debugLayer;
@@ -3327,6 +3381,9 @@ private:
 
   std::unique_ptr<Ray> _tempPickingRay;
   std::unique_ptr<Ray> _cachedRayForTransform;
+
+  std::vector<AbstractMesh*> _defaultMeshCandidates;
+  std::vector<SubMesh*> _defaultSubMeshCandidates;
 
 }; // end of class Scene
 

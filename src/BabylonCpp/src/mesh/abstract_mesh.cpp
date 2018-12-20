@@ -10,6 +10,7 @@
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
+#include <babylon/culling/octrees/octree_scene_component.h>
 #include <babylon/culling/ray.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -1183,6 +1184,13 @@ void AbstractMesh::_onCollisionPositionChange(int /*collisionId*/,
 Octree<SubMesh*>*
 AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
 {
+  auto scene     = getScene();
+  auto component = scene->_getComponent(SceneComponentConstants::NAME_OCTREE);
+  if (!component) {
+    component = OctreeSceneComponent::New(scene);
+    scene->_addComponent(component);
+  }
+
   if (!_submeshesOctree) {
     _submeshesOctree = new Octree<SubMesh*>(
       [](SubMesh* entry, OctreeBlock<SubMesh*>& block) {
@@ -1196,14 +1204,10 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
   auto boundingInfo = getBoundingInfo();
 
   // Update octree
-  std::vector<SubMesh*> subMeshPtrs;
-  subMeshPtrs.reserve(subMeshes.size());
-  for (auto& subMesh : subMeshes) {
-    subMeshPtrs.emplace_back(subMesh.get());
-  }
-
-  BoundingBox& bbox = boundingInfo.boundingBox;
-  _submeshesOctree->update(bbox.minimumWorld, bbox.maximumWorld, subMeshPtrs);
+  auto& bbox          = boundingInfo.boundingBox;
+  auto rawSubMeshPtrs = stl_util::to_raw_ptr_vector(subMeshes);
+  _submeshesOctree->update(bbox.minimumWorld, bbox.maximumWorld,
+                           rawSubMeshPtrs);
 
   return _submeshesOctree;
 }

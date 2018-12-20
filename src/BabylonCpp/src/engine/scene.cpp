@@ -19,6 +19,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
+#include <babylon/culling/octrees/octree_scene_component.h>
 #include <babylon/culling/ray.h>
 #include <babylon/debug/debug_layer.h>
 #include <babylon/engine/click_info.h>
@@ -773,6 +774,34 @@ int Scene::get_pointerX() const
 int Scene::get_pointerY() const
 {
   return _pointerY;
+}
+
+std::vector<AbstractMesh*> Scene::_getDefaultMeshCandidates()
+{
+  _defaultMeshCandidates = stl_util::to_raw_ptr_vector(meshes);
+  return _defaultMeshCandidates;
+}
+
+std::vector<SubMesh*> Scene::_getDefaultSubMeshCandidates(AbstractMesh* mesh)
+{
+  _defaultSubMeshCandidates = stl_util::to_raw_ptr_vector(mesh->subMeshes);
+  return _defaultSubMeshCandidates;
+}
+
+void Scene::setDefaultCandidateProviders()
+{
+  getActiveMeshCandidates = [this]() { return _getDefaultMeshCandidates(); };
+
+  getActiveSubMeshCandidates
+    = [this](AbstractMesh* mesh) { return _getDefaultSubMeshCandidates(mesh); };
+  getIntersectingSubMeshCandidates
+    = [this](AbstractMesh* mesh, const Ray& /*localRay*/) {
+        return _getDefaultSubMeshCandidates(mesh);
+      };
+  getCollidingSubMeshCandidates
+    = [this](AbstractMesh* mesh, const Collider& /*collider*/) {
+        return _getDefaultSubMeshCandidates(mesh);
+      };
 }
 
 Material* Scene::getCachedMaterial()
@@ -4278,27 +4307,28 @@ MinMax Scene::getWorldExtends(
   return {min, max};
 }
 
-Octree<AbstractMesh*>*
-  Scene::createOrUpdateSelectionOctree(size_t /*maxCapacity*/,
-                                       size_t /*maxDepth*/)
+Octree<AbstractMesh*>* Scene::createOrUpdateSelectionOctree(size_t maxCapacity,
+                                                            size_t maxDepth)
 {
+  auto component = _getComponent(SceneComponentConstants::NAME_OCTREE);
+  if (!component) {
+    component = OctreeSceneComponent::New(this);
+    _addComponent(component);
+  }
+
   if (!_selectionOctree) {
-#if 0
-    _selectionOctree = new Octree<AbstractMeshPtr>(
-      [](const AbstractMeshPtr& entry, OctreeBlock<AbstractMeshPtr>& block) {
-        Octree<AbstractMeshPtr>::CreationFuncForMeshes(entry, block);
+    _selectionOctree = new Octree<AbstractMesh*>(
+      [](AbstractMesh*& entry, OctreeBlock<AbstractMesh*>& block) {
+        Octree<AbstractMesh*>::CreationFuncForMeshes(entry, block);
       },
       maxCapacity, maxDepth);
-#else
-    return nullptr;
-#endif
   }
 
   auto worldExtends = getWorldExtends();
 
   // Update octree
-  auto _meshes = getMeshes();
-  // _selectionOctree->update(worldExtends.min, worldExtends.max, _meshes);
+  auto rawMeshPtrs = stl_util::to_raw_ptr_vector(meshes);
+  _selectionOctree->update(worldExtends.min, worldExtends.max, rawMeshPtrs);
 
   return _selectionOctree;
 }

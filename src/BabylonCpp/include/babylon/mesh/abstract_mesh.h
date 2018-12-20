@@ -526,10 +526,10 @@ public:
   /** Submeshes octree **/
 
   /**
-   * @brief his function will create an octree to help to select the right
+   * @brief This function will create an octree to help to select the right
    * submeshes for rendering, picking and collision computations. Please note
    * that you must have a decent number of submeshes to get performance
-   * improvements when using an octree
+   * improvements when using an octree.
    * @param maxCapacity defines the maximum size of each block (64 by default)
    * @param maxDepth defines the maximum depth to use (no more than 2 levels by
    * default)
@@ -1571,7 +1571,7 @@ public:
    */
   std::vector<std::shared_ptr<SubMesh>> subMeshes;
 
-  /** Hidden */
+  /** Hidden (Backing field) */
   Octree<SubMesh*>* _submeshesOctree;
 
   /** Hidden */
