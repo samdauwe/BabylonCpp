@@ -10,6 +10,7 @@
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
+#include <babylon/materials/effect.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/procedurals/custom_procedural_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
@@ -31,6 +32,9 @@ namespace Samples {
 ProceduralTexturesScene::ProceduralTexturesScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
 {
+  // Fragment shader
+  Effect::ShadersStore()["customProceduralTexturePixelShader"]
+    = customProceduralTexturePixelShader;
 }
 
 ProceduralTexturesScene::~ProceduralTexturesScene()
@@ -179,6 +183,7 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto customMaterial = StandardMaterial::New("custommat", scene);
   auto customProcText = CustomProceduralTexture::New(
     "customtext", "textures/customProceduralTextures/land", 1024, scene);
+  customProcText->setFragment("customProceduralTexture");
   customMaterial->ambientTexture = customProcText;
   square->material               = customMaterial;
 

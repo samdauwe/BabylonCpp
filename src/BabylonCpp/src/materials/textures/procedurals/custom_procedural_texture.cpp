@@ -132,36 +132,43 @@ void CustomProceduralTexture::updateTextures()
 void CustomProceduralTexture::updateShaderUniforms()
 {
   if (_configSet) {
+    const auto getFloatFromUniform
+      = [](const json& uniform, const std::string& key) {
+          float value = 0.f;
+          if (!uniform.is_null() && json_util::has_key(uniform, key)) {
+            value = uniform[key].is_number() ?
+                      json_util::get_number<float>(uniform, key) :
+                      std::stof(json_util::get_string(uniform, key));
+          }
+          return value;
+        };
+
     for (auto& uniform : json_util::get_array<json>(_config, "uniforms")) {
       const auto uniformType = json_util::get_string(uniform, "type");
       const auto uniformName = json_util::get_string(uniform, "name");
 
       if (uniformType == "float") {
-        setFloat(uniformName, json_util::get_number<float>(uniform, "value"));
+        setFloat(uniformName, getFloatFromUniform(uniform, "value"));
       }
       else if (uniformType == "color3") {
-        setColor3(uniformName,
-                  Color3(json_util::get_number<float>(uniform, "r"),
-                         json_util::get_number<float>(uniform, "g"),
-                         json_util::get_number<float>(uniform, "b")));
+        setColor3(uniformName, Color3(getFloatFromUniform(uniform, "r"),
+                                      getFloatFromUniform(uniform, "g"),
+                                      getFloatFromUniform(uniform, "b")));
       }
       else if (uniformType == "color4") {
-        setColor4(uniformName,
-                  Color4(json_util::get_number<float>(uniform, "r"),
-                         json_util::get_number<float>(uniform, "g"),
-                         json_util::get_number<float>(uniform, "b"),
-                         json_util::get_number<float>(uniform, "a")));
+        setColor4(uniformName, Color4(getFloatFromUniform(uniform, "r"),
+                                      getFloatFromUniform(uniform, "g"),
+                                      getFloatFromUniform(uniform, "b"),
+                                      getFloatFromUniform(uniform, "a")));
       }
       else if (uniformType == "vector2") {
-        setVector2(uniformName,
-                   Vector2(json_util::get_number<float>(uniform, "x"),
-                           json_util::get_number<float>(uniform, "y")));
+        setVector2(uniformName, Vector2(getFloatFromUniform(uniform, "x"),
+                                        getFloatFromUniform(uniform, "y")));
       }
       else if (uniformType == "vector3") {
-        setVector3(uniformName,
-                   Vector3(json_util::get_number<float>(uniform, "x"),
-                           json_util::get_number<float>(uniform, "y"),
-                           json_util::get_number<float>(uniform, "z")));
+        setVector3(uniformName, Vector3(getFloatFromUniform(uniform, "x"),
+                                        getFloatFromUniform(uniform, "y"),
+                                        getFloatFromUniform(uniform, "z")));
       }
     }
   }
