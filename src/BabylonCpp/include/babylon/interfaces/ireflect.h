@@ -54,8 +54,9 @@ public:
     MESH          = 154,
     TRANSFORMNODE = 155,
     // Particles
-    PARTICLE       = 200,
-    PARTICLESYSTEM = 201,
+    PARTICLE          = 200,
+    PARTICLESYSTEM    = 201,
+    GPUPARTICLESYSTEM = 202,
     // Texture
     BASETEXTURE = 250,
     TEXTURE     = 251,
