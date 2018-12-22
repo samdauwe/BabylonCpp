@@ -14,31 +14,36 @@ class Ray;
 class Scene;
 
 /**
- * @brief Radial explosion.
+ * @brief Represents a physics radial explosion event.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 class BABYLON_SHARED_EXPORT PhysicsRadialExplosionEvent {
 
 public:
+  /**
+   * @brief Initializes a radial explosioin event.
+   * @param scene BabylonJS scene
+   */
   PhysicsRadialExplosionEvent(Scene* scene);
   ~PhysicsRadialExplosionEvent();
 
   /**
    * @brief Returns the data related to the radial explosion event (sphere &
    * rays).
-   * @returns {PhysicsRadialExplosionEventData}
+   * @returns The radial explosion event data
    */
   PhysicsRadialExplosionEventData getData();
 
   /**
    * @brief Returns the force and contact point of the impostor or false, if the
    * impostor is not affected by the force/impulse.
-   * @param impostor
-   * @param {Vector3} origin the origin of the explosion
-   * @param {number} radius the explosion radius
-   * @param {number} strength the explosion strength
-   * @param {PhysicsRadialImpulseFalloff} falloff possible options: Constant &
-   * Linear
-   * @returns {Nullable<PhysicsForceAndContactPoint>}
+   * @param impostor A physics imposter
+   * @param origin the origin of the explosion
+   * @param radius the explosion radius
+   * @param strength the explosion strength
+   * @param falloff possible options: Constant & Linear
+   * @returns {Nullable<PhysicsForceAndContactPoint>} A physics force and
+   * contact point, or null
    */
   std::unique_ptr<PhysicsForceAndContactPoint> getImpostorForceAndContactPoint(
     PhysicsImpostor* impostor, const Vector3& origin, float radius,
@@ -46,7 +51,7 @@ public:
 
   /**
    * @brief Disposes the sphere.
-   * @param {bolean} force
+   * @param force Specifies if the sphere should be disposed by force
    */
   void dispose(bool force = true);
 

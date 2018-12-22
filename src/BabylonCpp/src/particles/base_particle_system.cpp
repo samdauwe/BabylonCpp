@@ -1,27 +1,27 @@
 #include <babylon/particles/base_particle_system.h>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/image_processing_configuration_defines.h>
+#include <babylon/materials/textures/raw_texture.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/cone_particle_emitter.h>
+#include <babylon/particles/emittertypes/cylinder_directed_particle_emitter.h>
 #include <babylon/particles/emittertypes/cylinder_particle_emitter.h>
 #include <babylon/particles/emittertypes/hemispheric_particle_emitter.h>
 #include <babylon/particles/emittertypes/point_particle_emitter.h>
 #include <babylon/particles/emittertypes/sphere_directed_particle_emitter.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/tools/color3_gradient.h>
 
 namespace BABYLON {
 
 BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     : manualEmitCount{-1}
-    , disposeOnStop{false}
     , onAnimationEnd{nullptr}
     , forceDepthWrite{false}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
-    , isAnimationSheetEnabled{this,
-                              &BaseParticleSystem::get_isAnimationSheetEnabled,
-                              &BaseParticleSystem::set_isAnimationSheetEnabled}
     , direction1{this, &BaseParticleSystem::get_direction1,
                  &BaseParticleSystem::set_direction1}
     , direction2{this, &BaseParticleSystem::get_direction2,
@@ -32,6 +32,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
                  &BaseParticleSystem::set_maxEmitBox}
     , imageProcessingConfiguration{this, &BaseParticleSystem::get_direction1,
                                    &BaseParticleSystem::set_direction1}
+    , _isSubEmitter{false}
     , _isBillboardBased{true}
     , _imageProcessingConfigurationDefines{std::make_shared<
         ImageProcessingConfigurationDefines>()}
@@ -46,6 +47,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     layerMask             = 0x0FFFFFFF;
     updateSpeed           = 0.01f;
     targetStopDuration    = 0;
+    disposeOnStop         = false;
     particleTexture       = nullptr;
     blendMode             = ParticleSystem::BLENDMODE_ONEONE;
     minLifeTime           = 1.f;
@@ -75,16 +77,33 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     endSpriteCellID       = 0;
     spriteCellWidth       = 0;
     spriteCellHeight      = 0;
+    spriteRandomStartCell = false;
     translationPivot      = Vector2(0.f, 0.f);
+    beginAnimationOnStart = false;
+    beginAnimationFrom    = 0;
+    beginAnimationTo      = 60;
+    beginAnimationLoop    = false;
     noiseTexture          = nullptr;
     noiseStrength         = Vector3(10.f, 10.f, 10.f);
-    billboardMode         = AbstractMesh::BILLBOARDMODE_ALL;
+    billboardMode         = ParticleSystem::BILLBOARDMODE_ALL;
     limitVelocityDamping  = 0.4f;
+    startDelay            = 0;
   }
 }
 
 BaseParticleSystem::~BaseParticleSystem()
 {
+}
+
+bool BaseParticleSystem::hasEmitter() const
+{
+  return std::holds_alternative<AbstractMeshPtr>(emitter)
+         || std::holds_alternative<Vector3>(emitter);
+}
+
+Scene* BaseParticleSystem::getScene() const
+{
+  return _scene;
 }
 
 bool BaseParticleSystem::get_isAnimationSheetEnabled() const
@@ -101,6 +120,12 @@ void BaseParticleSystem::set_isAnimationSheetEnabled(bool value)
   _isAnimationSheetEnabled = value;
 
   _reset();
+}
+
+bool BaseParticleSystem::_hasTargetStopDurationDependantGradient() const
+{
+  return (_startSizeGradients.size() > 0) || (_emitRateGradients.size() > 0)
+         || (_lifeTimeGradients.size() > 0);
 }
 
 std::vector<FactorGradient>& BaseParticleSystem::getDragGradients()
@@ -123,6 +148,16 @@ std::vector<FactorGradient>& BaseParticleSystem::getSizeGradients()
   return _sizeGradients;
 }
 
+std::vector<FactorGradient>& BaseParticleSystem::getColorRemapGradients()
+{
+  return _colorRemapGradients;
+}
+
+std::vector<FactorGradient>& BaseParticleSystem::getAlphaRemapGradients()
+{
+  return _alphaRemapGradients;
+}
+
 std::vector<FactorGradient>& BaseParticleSystem::getLifeTimeGradients()
 {
   return _lifeTimeGradients;
@@ -136,6 +171,16 @@ std::vector<FactorGradient>& BaseParticleSystem::getAngularSpeedGradients()
 std::vector<FactorGradient>& BaseParticleSystem::getVelocityGradients()
 {
   return _velocityGradients;
+}
+
+std::vector<FactorGradient>& BaseParticleSystem::getStartSizeGradients()
+{
+  return _startSizeGradients;
+}
+
+std::vector<FactorGradient>& BaseParticleSystem::getEmitRateGradients()
+{
+  return _emitRateGradients;
 }
 
 Vector3& BaseParticleSystem::get_direction1()
@@ -257,6 +302,74 @@ void BaseParticleSystem::_reset()
 {
 }
 
+BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
+  float gradient, std::vector<ColorGradient>& gradients,
+  const RawTexturePtr& texture)
+{
+  if (gradients.empty()) {
+    return *this;
+  }
+
+  gradients.erase(std::remove_if(gradients.begin(), gradients.end(),
+                                 [gradient](const ColorGradient& gradientItem) {
+                                   return stl_util::almost_equal(
+                                     gradientItem.gradient, gradient);
+                                 }),
+                  gradients.end());
+
+  if (texture) {
+    texture->dispose();
+  }
+
+  return *this;
+}
+
+BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
+  float gradient, std::vector<Color3Gradient>& gradients,
+  const RawTexturePtr& texture)
+{
+  if (gradients.empty()) {
+    return *this;
+  }
+
+  gradients.erase(
+    std::remove_if(gradients.begin(), gradients.end(),
+                   [gradient](const Color3Gradient& gradientItem) {
+                     return stl_util::almost_equal(gradientItem.gradient,
+                                                   gradient);
+                   }),
+    gradients.end());
+
+  if (texture) {
+    texture->dispose();
+  }
+
+  return *this;
+}
+
+BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
+  float gradient, std::vector<FactorGradient>& gradients,
+  const RawTexturePtr& texture)
+{
+  if (gradients.empty()) {
+    return *this;
+  }
+
+  gradients.erase(
+    std::remove_if(gradients.begin(), gradients.end(),
+                   [gradient](const FactorGradient& gradientItem) {
+                     return stl_util::almost_equal(gradientItem.gradient,
+                                                   gradient);
+                   }),
+    gradients.end());
+
+  if (texture) {
+    texture->dispose();
+  }
+
+  return *this;
+}
+
 PointParticleEmitterPtr
 BaseParticleSystem::createPointEmitter(const Vector3& direction1,
                                        const Vector3& direction2)
@@ -312,6 +425,18 @@ ConeParticleEmitterPtr BaseParticleSystem::createConeEmitter(float radius,
 {
   auto particleEmitter = std::make_shared<ConeParticleEmitter>(radius, angle);
   particleEmitterType  = particleEmitter;
+  return particleEmitter;
+}
+
+CylinderDirectedParticleEmitterPtr
+BaseParticleSystem::createDirectedCylinderEmitter(float radius, float height,
+                                                  float radiusRange,
+                                                  const Vector3& direction1,
+                                                  const Vector3& direction2)
+{
+  auto particleEmitter = std::make_shared<CylinderDirectedParticleEmitter>(
+    radius, height, radiusRange, direction1, direction2);
+  particleEmitterType = particleEmitter;
   return particleEmitter;
 }
 

@@ -10,20 +10,31 @@
 namespace BABYLON {
 
 class EventState;
+struct IPhysicsEngine;
 class Mesh;
-class PhysicsEngine;
 struct PhysicsForceAndContactPoint;
 class PhysicsImpostor;
 struct PhysicsUpdraftEventData;
 class Scene;
-using MeshPtr = std::shared_ptr<Mesh>;
+using IPhysicsEnginePtr = std::shared_ptr<IPhysicsEngine>;
+using MeshPtr           = std::shared_ptr<Mesh>;
 
 /**
- * @brief Updraft.
+ * @brief Represents a physics updraft event.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 class BABYLON_SHARED_EXPORT PhysicsUpdraftEvent {
 
 public:
+  /**
+   * @brief Initializes the physics updraft event.
+   * @param _scene BabylonJS scene
+   * @param _origin The origin position of the updraft
+   * @param _radius The radius of the updraft
+   * @param _strength The strength of the updraft
+   * @param _height The height of the updraft
+   * @param _updraftMode The mode of the updraft
+   */
   PhysicsUpdraftEvent(Scene* scene, Vector3 origin, float radius,
                       float strength, float height,
                       PhysicsUpdraftMode updraftMode);
@@ -31,7 +42,7 @@ public:
 
   /**
    * @brief Returns the data related to the updraft event (cylinder).
-   * @returns {PhysicsUpdraftEventData}
+   * @returns A physics updraft event
    */
   PhysicsUpdraftEventData getData();
 
@@ -47,7 +58,7 @@ public:
 
   /**
    * @brief Disposes the sphere.
-   * @param {bolean} force
+   * @param force Specifies if the updraft should be disposed by force
    */
   void dispose(bool force = true);
 
@@ -70,7 +81,7 @@ private:
   float _strength;
   float _height;
   PhysicsUpdraftMode _updraftMode;
-  PhysicsEngine* _physicsEngine;
+  IPhysicsEnginePtr _physicsEngine;
   // the most upper part of the cylinder
   Vector3 _originTop;
   // used if the updraftMode is perpendicular

@@ -6,8 +6,18 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Interface for a physics force and contact point.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
+ */
 struct BABYLON_SHARED_EXPORT PhysicsForceAndContactPoint {
+  /**
+   * The force applied at the contact point
+   */
   Vector3 force;
+  /**
+   * The contact point
+   */
   Vector3 contactPoint;
 }; // end of struct PhysicsForceAndContactPoint
 

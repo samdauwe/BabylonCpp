@@ -35,6 +35,10 @@ constexpr unsigned int VertexBuffer::OffsetKind;
 constexpr unsigned int VertexBuffer::SeedKind;
 constexpr unsigned int VertexBuffer::SizeKind;
 constexpr unsigned int VertexBuffer::AngleKind;
+constexpr unsigned int VertexBuffer::CellStartOffsetKind;
+constexpr unsigned int VertexBuffer::NoiseCoordinates1Kind;
+constexpr unsigned int VertexBuffer::NoiseCoordinates2Kind;
+constexpr unsigned int VertexBuffer::RemapDataKind;
 
 constexpr const char* VertexBuffer::PositionKindChars;
 constexpr const char* VertexBuffer::NormalKindChars;
@@ -65,6 +69,10 @@ constexpr const char* VertexBuffer::OffsetKindChars;
 constexpr const char* VertexBuffer::SeedKindChars;
 constexpr const char* VertexBuffer::SizeKindChars;
 constexpr const char* VertexBuffer::AngleKindChars;
+constexpr const char* VertexBuffer::CellStartOffsetKindChars;
+constexpr const char* VertexBuffer::NoiseCoordinates1KindChars;
+constexpr const char* VertexBuffer::NoiseCoordinates2KindChars;
+constexpr const char* VertexBuffer::RemapDataKindChars;
 
 constexpr const unsigned int VertexBuffer::BYTE;
 constexpr const unsigned int VertexBuffer::UNSIGNED_BYTE;
@@ -220,6 +228,14 @@ std::string VertexBuffer::KindAsString(unsigned int kind)
       return std::string(VertexBuffer::SizeKindChars);
     case VertexBuffer::AngleKind:
       return std::string(VertexBuffer::AngleKindChars);
+    case VertexBuffer::CellStartOffsetKind:
+      return std::string(VertexBuffer::CellStartOffsetKindChars);
+    case VertexBuffer::NoiseCoordinates1Kind:
+      return std::string(VertexBuffer::NoiseCoordinates1KindChars);
+    case VertexBuffer::NoiseCoordinates2Kind:
+      return std::string(VertexBuffer::NoiseCoordinates2KindChars);
+    case VertexBuffer::RemapDataKind:
+      return std::string(VertexBuffer::RemapDataKindChars);
   }
 }
 

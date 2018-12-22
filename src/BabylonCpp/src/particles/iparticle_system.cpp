@@ -7,6 +7,11 @@ namespace BABYLON {
 IParticleSystem::IParticleSystem()
     : isBillboardBased{this, &IParticleSystem::get_isBillboardBased,
                        &IParticleSystem::set_isBillboardBased}
+    , isAnimationSheetEnabled{this,
+                              &IParticleSystem::get_isAnimationSheetEnabled,
+                              &IParticleSystem::set_isAnimationSheetEnabled}
+    , useRampGradients{this, &IParticleSystem::get_useRampGradients,
+                       &IParticleSystem::set_useRampGradients}
 {
 }
 

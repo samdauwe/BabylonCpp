@@ -6,8 +6,17 @@
 
 namespace BABYLON {
 
+/**
+ * @brief Joint data for a Distance-Joint.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
+ */
 struct BABYLON_SHARED_EXPORT DistanceJointData : public PhysicsJointData {
+  /**
+   * Max distance the 2 joint objects can be apart
+   */
   float maxDistance;
+  // Oimo - minDistance
+  // Cannon - maxForce
 }; // end of struct DistanceJointData
 
 } // end of namespace BABYLON

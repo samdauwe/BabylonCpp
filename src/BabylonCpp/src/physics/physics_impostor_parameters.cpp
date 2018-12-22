@@ -22,7 +22,7 @@ float PhysicsImpostorParameters::operator[](const std::string& key) const
     return *restitution;
   }
   else if (key == "ignoreParent") {
-    return ignoreParent;
+    return *ignoreParent;
   }
   else {
     auto it = nativeOptions.find(key);

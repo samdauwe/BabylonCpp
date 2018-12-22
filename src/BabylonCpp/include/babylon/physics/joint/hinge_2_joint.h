@@ -9,15 +9,20 @@ namespace BABYLON {
 /**
  * @brief This class represents a dual hinge physics joint (same as wheel
  * joint).
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 class BABYLON_SHARED_EXPORT Hinge2Joint : public MotorEnabledJoint {
 
 public:
+  /**
+   * @brief Initializes the Hinge2-Joint.
+   * @param jointData The joint data for the Hinge2-Joint
+   */
   Hinge2Joint(const PhysicsJointData& jointData);
   ~Hinge2Joint();
 
   /**
-   * Set the motor values.
+   * @brief Set the motor values.
    * Attention, this function is plugin specific. Engines won't react 100%
    * the same.
    * @param {number} force the force to apply
@@ -27,7 +32,7 @@ public:
   void setMotor(float force, float maxForce, unsigned int motorIndex = 0);
 
   /**
-   * Set the motor limits.
+   * @brief Set the motor limits.
    * Attention, this function is plugin specific. Engines won't react 100% the
    * same.
    * @param {number} upperLimit the upper limit

@@ -8,12 +8,14 @@
 
 namespace BABYLON {
 
-PhysicsEngine::PhysicsEngine(const Vector3& _gravity,
+float PhysicsEngine::Epsilon = 0.001f;
+
+PhysicsEngine::PhysicsEngine(const std::optional<Vector3>& iGravity,
                              IPhysicsEnginePlugin* physicsPlugin)
     : _initialized{false}, _physicsPlugin{physicsPlugin}
 {
   if (_physicsPlugin && _physicsPlugin->isSupported()) {
-    setGravity(_gravity);
+    setGravity(iGravity.has_value() ? *iGravity : Vector3(0.f, -9.807f, 0.f));
     setTimeStep();
     _initialized = true;
   }
@@ -77,7 +79,7 @@ void PhysicsEngine::removeImpostor(PhysicsImpostor* impostor)
     });
   if (it != _impostors.end()) {
     // this will also remove it from the world.
-    (*it)->setPhysicsBody(nullptr);
+    (*it)->physicsBody = nullptr;
     _impostors.erase(it);
   }
 }
@@ -91,7 +93,7 @@ void PhysicsEngine::addJoint(PhysicsImpostor* mainImpostor,
   impostorJoint->connectedImpostor = connectedImpostor;
   impostorJoint->joint             = joint;
 
-  joint->setPhysicsPlugin(_physicsPlugin);
+  joint->physicsPlugin = _physicsPlugin;
   _joints.emplace_back(impostorJoint);
   _physicsPlugin->generateJoint(impostorJoint.get());
 }

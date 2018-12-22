@@ -9,29 +9,15 @@
 
 namespace BABYLON {
 
-class BoxParticleEmitter;
-class ConeParticleEmitter;
-class CylinderParticleEmitter;
-class HemisphericParticleEmitter;
 struct ImageProcessingConfigurationDefines;
 class ImageProcessingConfiguration;
-class PointParticleEmitter;
-class SphereDirectedParticleEmitter;
-class SphereParticleEmitter;
+class RawTexture;
 class Scene;
-using BoxParticleEmitterPtr      = std::shared_ptr<BoxParticleEmitter>;
-using ConeParticleEmitterPtr     = std::shared_ptr<ConeParticleEmitter>;
-using CylinderParticleEmitterPtr = std::shared_ptr<CylinderParticleEmitter>;
-using HemisphericParticleEmitterPtr
-  = std::shared_ptr<HemisphericParticleEmitter>;
 using ImageProcessingConfigurationPtr
   = std::shared_ptr<ImageProcessingConfiguration>;
 using ImageProcessingConfigurationDefinesPtr
   = std::shared_ptr<ImageProcessingConfigurationDefines>;
-using PointParticleEmitterPtr = std::shared_ptr<PointParticleEmitter>;
-using SphereDirectedParticleEmitterPtr
-  = std::shared_ptr<SphereDirectedParticleEmitter>;
-using SphereParticleEmitterPtr = std::shared_ptr<SphereParticleEmitter>;
+using RawTexturePtr = std::shared_ptr<RawTexture>;
 
 /**
  * @brief This represents the base class for particle system in Babylon.
@@ -47,18 +33,28 @@ public:
   /** Statics **/
   /**
    * Source color is added to the destination color without alpha affecting the
-   * result.
+   * result
    */
   static constexpr int BLENDMODE_ONEONE = 0;
   /**
-   * Blend current color and particle color using particle’s alpha.
+   * Blend current color and particle color using particle’s alpha
    */
   static constexpr int BLENDMODE_STANDARD = 1;
 
   /**
-   * Add current color and particle color multiplied by particle’s alpha.
+   * Add current color and particle color multiplied by particle’s alpha
    */
   static constexpr int BLENDMODE_ADD = 2;
+  /**
+   * Multiply current color with particle color
+   */
+  static constexpr int BLENDMODE_MULTIPLY = 3;
+
+  /**
+   * Multiply current color with particle color then add current color and
+   * particle color multiplied by particle’s alpha
+   */
+  static constexpr int BLENDMODE_MULTIPLYADD = 4;
 
 public:
   /**
@@ -69,14 +65,26 @@ public:
    * @param name The name of the particle system
    */
   BaseParticleSystem(const std::string& name);
-  ~BaseParticleSystem();
+  ~BaseParticleSystem() override;
+
+  /**
+   * @brief Returns whether or not the particle system has an emitter.
+   * @return Whether or not the particle system has an emitter
+   */
+  bool hasEmitter() const override;
+
+  /**
+   * @brief Get hosting scene.
+   * @returns the scene
+   */
+  Scene* getScene() const override;
 
   /**
    * @brief Gets the current list of drag gradients.
    * You must use addDragGradient and removeDragGradient to udpate this list
    * @returns the list of drag gradients
    */
-  std::vector<FactorGradient>& getDragGradients();
+  std::vector<FactorGradient>& getDragGradients() override;
 
   /**
    * @brief Gets the current list of limit velocity gradients.
@@ -84,21 +92,37 @@ public:
    * udpate this list
    * @returns the list of limit velocity gradients
    */
-  std::vector<FactorGradient>& getLimitVelocityGradients();
+  std::vector<FactorGradient>& getLimitVelocityGradients() override;
 
   /**
    * @brief Gets the current list of color gradients.
    * You must use addColorGradient and removeColorGradient to udpate this list
    * @returns the list of color gradients
    */
-  std::vector<ColorGradient>& getColorGradients();
+  std::vector<ColorGradient>& getColorGradients() override;
 
   /**
    * @brief Gets the current list of size gradients.
    * You must use addSizeGradient and removeSizeGradient to udpate this list
    * @returns the list of size gradients
    */
-  std::vector<FactorGradient>& getSizeGradients();
+  std::vector<FactorGradient>& getSizeGradients() override;
+
+  /**
+   * @brief Gets the current list of color remap gradients.
+   * You must use addColorRemapGradient and removeColorRemapGradient to udpate
+   * this list
+   * @returns the list of color remap gradients
+   */
+  std::vector<FactorGradient>& getColorRemapGradients() override;
+
+  /**
+   * @brief Gets the current list of alpha remap gradients.
+   * You must use addAlphaRemapGradient and removeAlphaRemapGradient to udpate
+   * this list
+   * @returns the list of alpha remap gradients
+   */
+  std::vector<FactorGradient>& getAlphaRemapGradients() override;
 
   /**
    * @brief Gets the current list of life time gradients.
@@ -106,7 +130,7 @@ public:
    * list
    * @returns the list of life time gradients
    */
-  std::vector<FactorGradient>& getLifeTimeGradients();
+  std::vector<FactorGradient>& getLifeTimeGradients() override;
 
   /**
    * @brief Gets the current list of angular speed gradients.
@@ -114,7 +138,7 @@ public:
    * udpate this list
    * @returns the list of angular speed gradients
    */
-  std::vector<FactorGradient>& getAngularSpeedGradients();
+  std::vector<FactorGradient>& getAngularSpeedGradients() override;
 
   /**
    * @brief Gets the current list of velocity gradients.
@@ -122,7 +146,23 @@ public:
    * list
    * @returns the list of velocity gradients
    */
-  std::vector<FactorGradient>& getVelocityGradients();
+  std::vector<FactorGradient>& getVelocityGradients() override;
+
+  /**
+   * @brief Gets the current list of start size gradients.
+   * You must use addStartSizeGradient and removeStartSizeGradient to udpate
+   * this list
+   * @returns the list of start size gradients
+   */
+  std::vector<FactorGradient>& getStartSizeGradients() override;
+
+  /**
+   * @brief Gets the current list of emit rate gradients.
+   * You must use addEmitRateGradient and removeEmitRateGradient to udpate this
+   * list
+   * @returns the list of emit rate gradients
+   */
+  std::vector<FactorGradient>& getEmitRateGradients() override;
 
   /**
    * @brief Creates a Point Emitter for the particle system (emits directly from
@@ -133,8 +173,9 @@ public:
    * direction2 from within the box
    * @returns the emitter
    */
-  PointParticleEmitterPtr createPointEmitter(const Vector3& direction1,
-                                             const Vector3& direction2);
+  PointParticleEmitterPtr
+  createPointEmitter(const Vector3& direction1,
+                     const Vector3& direction2) override;
 
   /**
    * @brief Creates a Hemisphere Emitter for the particle system (emits along
@@ -144,8 +185,9 @@ public:
    * Only, 1 Entire Radius
    * @returns the emitter
    */
-  HemisphericParticleEmitterPtr
-  createHemisphericEmitter(float radius = 1.f, float radiusRange = 1.f);
+  HemisphericParticleEmitterPtr createHemisphericEmitter(float radius = 1.f,
+                                                         float radiusRange
+                                                         = 1.f) override;
 
   /**
    * @brief Creates a Sphere Emitter for the particle system (emits along the
@@ -155,8 +197,8 @@ public:
    * Only, 1 Entire Radius
    * @returns the emitter
    */
-  SphereParticleEmitterPtr createSphereEmitter(float radius      = 1.f,
-                                               float radiusRange = 1.f);
+  SphereParticleEmitterPtr
+  createSphereEmitter(float radius = 1.f, float radiusRange = 1.f) override;
 
   /**
    * @brief Creates a Directed Sphere Emitter for the particle system (emits
@@ -170,7 +212,7 @@ public:
    */
   SphereDirectedParticleEmitterPtr createDirectedSphereEmitter(
     float radius = 1.f, const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
-    const Vector3& direction2 = Vector3(0.f, 1.f, 0.f));
+    const Vector3& direction2 = Vector3(0.f, 1.f, 0.f)) override;
 
   /**
    * @brief Creates a Cylinder Emitter for the particle system (emits from the
@@ -186,7 +228,7 @@ public:
   CylinderParticleEmitterPtr
   createCylinderEmitter(float radius = 1.f, float height = 1.f,
                         float radiusRange         = 1.f,
-                        float directionRandomizer = 0.f);
+                        float directionRandomizer = 0.f) override;
 
   /**
    * @brief Creates a Cone Emitter for the particle system (emits from the cone
@@ -196,7 +238,25 @@ public:
    * @returns the emitter
    */
   ConeParticleEmitterPtr createConeEmitter(float radius = 1.f,
-                                           float angle  = Math::PI_4);
+                                           float angle  = Math::PI_4) override;
+
+  /**
+   * @brief Creates a Directed Cylinder Emitter for the particle system (emits
+   * between direction1 and direction2).
+   * @param radius The radius of the cylinder to emit from
+   * @param height The height of the emission cylinder
+   * @param radiusRange the range of the emission cylinder [0-1] 0 Surface only,
+   * 1 Entire Radius (1 by default)
+   * @param direction1 Particles are emitted between the direction1 and
+   * direction2 from within the cylinder
+   * @param direction2 Particles are emitted between the direction1 and
+   * direction2 from within the cylinder
+   * @returns the emitter
+   */
+  CylinderDirectedParticleEmitterPtr createDirectedCylinderEmitter(
+    float radius = 1.f, float height = 1.f, float radiusRange = 1.f,
+    const Vector3& direction1 = Vector3(0.f, 1.f, 0.f),
+    const Vector3& direction2 = Vector3(0.f, 1.f, 0.f)) override;
 
   /**
    * @brief Creates a Box Emitter for the particle system. (emits between
@@ -215,20 +275,25 @@ public:
   BoxParticleEmitterPtr createBoxEmitter(const Vector3& direction1,
                                          const Vector3& direction2,
                                          const Vector3& minEmitBox,
-                                         const Vector3& maxEmitBox);
+                                         const Vector3& maxEmitBox) override;
 
 protected:
   /**
    * @brief Gets whether an animation sprite sheet is enabled or not on the
    * particle system.
    */
-  bool get_isAnimationSheetEnabled() const;
+  bool get_isAnimationSheetEnabled() const override;
 
   /**
    * @brief Sets whether an animation sprite sheet is enabled or not on the
    * particle system.
    */
-  void set_isAnimationSheetEnabled(bool value);
+  void set_isAnimationSheetEnabled(bool value) override;
+
+  /**
+   * @brief Hidden
+   */
+  bool _hasTargetStopDurationDependantGradient() const;
 
   /**
    * @brief Random direction of each particle after it has been emitted, between
@@ -268,13 +333,13 @@ protected:
    * @brief Gets or sets a boolean indicating if the particles must be rendered
    * as billboard or aligned with the direction.
    */
-  bool get_isBillboardBased() const;
+  bool get_isBillboardBased() const override;
 
   /**
    * @brief Sets a boolean indicating if the particles must be rendered as
    * billboard or aligned with the direction.
    */
-  void set_isBillboardBased(bool value);
+  void set_isBillboardBased(bool value) override;
 
   /**
    * @brief Gets the image processing configuration used either in this
@@ -304,18 +369,36 @@ protected:
    */
   virtual void _reset();
 
+  /**
+   * Hidden
+   */
+  virtual BaseParticleSystem&
+  _removeGradientAndTexture(float gradient,
+                            std::vector<ColorGradient>& gradients,
+                            const RawTexturePtr& texture);
+
+  /**
+   * Hidden
+   */
+  virtual BaseParticleSystem&
+  _removeGradientAndTexture(float gradient,
+                            std::vector<Color3Gradient>& gradients,
+                            const RawTexturePtr& texture);
+
+  /**
+   * Hidden
+   */
+  virtual BaseParticleSystem&
+  _removeGradientAndTexture(float gradient,
+                            std::vector<FactorGradient>& gradients,
+                            const RawTexturePtr& texture);
+
 public:
   /**
    * If you want to launch only a few particles at once, that can be done, as
    * well.
    */
   int manualEmitCount;
-
-  /**
-   * Specifies whether the particle system will be disposed once it reaches the
-   * end of the animation.
-   */
-  bool disposeOnStop;
 
   /**
    * By default particle system starts as soon as they are created. This
@@ -340,12 +423,6 @@ public:
    * of the alpha channel
    */
   Color4 textureMask;
-
-  /**
-   * Gets or sets whether an animation sprite sheet is enabled or not on the
-   * particle system
-   */
-  Property<BaseParticleSystem, bool> isAnimationSheetEnabled;
 
   /**
    * Random direction of each particle after it has been emitted, between
@@ -382,6 +459,11 @@ public:
    */
   Property<BaseParticleSystem, Vector3> imageProcessingConfiguration;
 
+  /**
+   * Hidden
+   */
+  bool _isSubEmitter;
+
 protected:
   /** Hidden */
   bool _isAnimationSheetEnabled;
@@ -412,6 +494,11 @@ protected:
   std::vector<FactorGradient> _velocityGradients;
   std::vector<FactorGradient> _limitVelocityGradients;
   std::vector<FactorGradient> _dragGradients;
+  std::vector<FactorGradient> _emitRateGradients;
+  std::vector<FactorGradient> _startSizeGradients;
+  std::vector<Color3Gradient> _rampGradients;
+  std::vector<FactorGradient> _colorRemapGradients;
+  std::vector<FactorGradient> _alphaRemapGradients;
 
 private:
   Vector3 _zeroVector3;

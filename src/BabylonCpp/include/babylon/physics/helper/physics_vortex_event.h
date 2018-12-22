@@ -9,27 +9,37 @@
 namespace BABYLON {
 
 class EventState;
+struct IPhysicsEngine;
 class Mesh;
-class PhysicsEngine;
 struct PhysicsForceAndContactPoint;
 class PhysicsImpostor;
 struct PhysicsVortexEventData;
 class Scene;
-using MeshPtr = std::shared_ptr<Mesh>;
+using IPhysicsEnginePtr = std::shared_ptr<IPhysicsEngine>;
+using MeshPtr           = std::shared_ptr<Mesh>;
 
 /**
- * @brief Vortex.
+ * @brief Represents a physics vortex event.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 class BABYLON_SHARED_EXPORT PhysicsVortexEvent {
 
 public:
+  /**
+   * @brief Initializes the physics vortex event.
+   * @param _scene The BabylonJS scene
+   * @param _origin The origin position of the vortex
+   * @param _radius The radius of the vortex
+   * @param _strength The strength of the vortex
+   * @param _height The height of the vortex
+   */
   PhysicsVortexEvent(Scene* scene, Vector3 origin, float radius, float strength,
                      float height);
   ~PhysicsVortexEvent();
 
   /**
    * @brief Returns the data related to the vortex event (cylinder).
-   * @returns {PhysicsVortexEventData}
+   * @returns The physics vortex event data
    */
   PhysicsVortexEventData getData();
 
@@ -45,7 +55,7 @@ public:
 
   /**
    * @brief Disposes the sphere.
-   * @param {bolean} force
+   * @param force
    */
   void dispose(bool force = true);
 
@@ -67,7 +77,7 @@ private:
   float _radius;
   float _strength;
   float _height;
-  PhysicsEngine* _physicsEngine;
+  IPhysicsEnginePtr _physicsEngine;
   // the most upper part of the cylinder
   Vector3 _originTop;
   // at which distance, relative to the radius the centripetal forces should

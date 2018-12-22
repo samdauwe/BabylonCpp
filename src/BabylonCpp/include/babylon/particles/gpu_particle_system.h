@@ -51,10 +51,16 @@ public:
    * animate the particles texture
    */
   GPUParticleSystem(const std::string& name, size_t capacity = 5000,
-                    std::optional<int> randomTextureSize = std::nullopt,
-                    Scene* scene                         = nullptr,
-                    bool isAnimationSheetEnabled         = false);
+                    std::optional<size_t> randomTextureSize = std::nullopt,
+                    Scene* scene                            = nullptr,
+                    bool isAnimationSheetEnabled            = false);
   virtual ~GPUParticleSystem() override;
+
+  /**
+   * @brief Returns the object type.
+   * @return the object type
+   */
+  virtual IReflect::Type type() const override;
 
   /**
    * @brief Gets the maximum number of particles active at the same time.
@@ -69,7 +75,8 @@ public:
   bool isReady() override;
 
   /**
-   * @brief Gets Wether the system has been started.
+   * @brief Gets if the system has been started. (Note: this will still be true
+   * after stop is called).
    * @returns True if it has been started, otherwise false.
    */
   bool isStarted() const override;
@@ -100,7 +107,7 @@ public:
   /**
    * @brief Adds a new color gradient.
    * @param gradient defines the gradient to use (between 0 and 1)
-   * @param color defines the color to affect to the specified gradient
+   * @param color1 defines the color to affect to the specified gradient
    * @param color2 defines an additional color used to define a range ([color,
    * color2]) with main color to pick the final color from
    * @returns the current particle system
@@ -196,11 +203,141 @@ public:
                                    = std::nullopt) override;
 
   /**
-   * Remove a specific drag gradient.
+   * @brief Remove a specific drag gradient.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
   IParticleSystem& removeDragGradient(float gradient) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the emit rate value to affect to the specified
+   * gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  IParticleSystem& addEmitRateGradient(float gradient, float factor,
+                                       const std::optional<float>& factor2
+                                       = std::nullopt) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeEmitRateGradient(float gradient) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the start size value to affect to the specified
+   * gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  IParticleSystem& addStartSizeGradient(float gradient, float factor,
+                                        const std::optional<float>& factor2
+                                        = std::nullopt) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeStartSizeGradient(float gradient) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param min defines the color remap minimal range
+   * @param max defines the color remap maximal range
+   * @returns the current particle system
+   */
+  IParticleSystem& addColorRemapGradient(float gradient, float min,
+                                         float max) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeColorRemapGradient(float gradient) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param min defines the alpha remap minimal range
+   * @param max defines the alpha remap maximal range
+   * @returns the current particle system
+   */
+  IParticleSystem& addAlphaRemapGradient(float gradient, float min,
+                                         float max) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeAlphaRemapGradient(float gradient) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param color defines the color to affect to the specified gradient
+   * @returns the current particle system
+   */
+  IParticleSystem& addRampGradient(float gradient,
+                                   const Color3& color) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeRampGradient(float gradient) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem
+   * @returns the list of ramp gradients
+   */
+  std::vector<Color3Gradient>& getRampGradients() override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * Gets a boolean indicating that ramp gradients must be used
+   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   */
+  bool get_useRampGradients() const override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * Sets a boolean indicating that ramp gradients must be used
+   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   */
+  void set_useRampGradients(bool value) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the life time factor to affect to the specified
+   * gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  IParticleSystem& addLifeTimeGradient(float gradient, float factor,
+                                       const std::optional<float>& factor2
+                                       = std::nullopt) override;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeLifeTimeGradient(float gradient) override;
 
   /**
    * @brief Hidden
@@ -260,10 +397,12 @@ public:
    * @param scene The scene to create the particle system in
    * @param rootUrl The root url to use to load external dependencies like
    * texture
+   * @param doNotStart Ignore the preventAutoStart attribute and does not start
    * @returns the parsed GPU particle system
    */
   static IParticleSystem* Parse(const json& parsedParticleSystem, Scene* scene,
-                                const std::string& rootUrl);
+                                const std::string& rootUrl,
+                                bool doNotStart = false);
 
 protected:
   size_t get_activeParticleCount() const;
@@ -271,10 +410,31 @@ protected:
 
   void _reset() override;
 
+  /**
+   * Hidden
+   */
+  BaseParticleSystem&
+  _removeGradientAndTexture(float gradient,
+                            std::vector<ColorGradient>& gradients,
+                            const RawTexturePtr& texture) override;
+
+  /**
+   * Hidden
+   */
+  BaseParticleSystem&
+  _removeGradientAndTexture(float gradient,
+                            std::vector<Color3Gradient>& gradients,
+                            const RawTexturePtr& texture) override;
+
+  /**
+   * Hidden
+   */
+  BaseParticleSystem&
+  _removeGradientAndTexture(float gradient,
+                            std::vector<FactorGradient>& gradients,
+                            const RawTexturePtr& texture) override;
+
 private:
-  template <typename T>
-  GPUParticleSystem& _removeGradient(float gradient, std::vector<T>& gradients,
-                                     RawTexture* texture);
   void _addFactorGradient(std::vector<FactorGradient>& factorGradients,
                           float gradient, float factor);
   std::unique_ptr<GL::IGLVertexArrayObject> _createUpdateVAO(Buffer* source);
@@ -290,6 +450,8 @@ private:
   void _createSizeGradientTexture();
   void _createAngularSpeedGradientTexture();
   void _createVelocityGradientTexture();
+  void _createLimitVelocityGradientTexture();
+  void _createDragGradientTexture();
   void _createColorGradientTexture();
   void _releaseBuffers();
   void _releaseVAOs();
@@ -304,12 +466,6 @@ public:
    * Gets or set the number of active particles
    */
   Property<GPUParticleSystem, size_t> activeParticleCount;
-
-  /**
-   * Gets whether an animation sprite sheet is enabled or not on the particle
-   * system
-   */
-  ReadOnlyProperty<GPUParticleSystem, bool> isAnimationSheetEnabled;
 
 private:
   size_t _capacity;
@@ -343,7 +499,7 @@ private:
   int _attributesStrideSize;
   EffectCreationOptions* _updateEffectOptions;
 
-  int _randomTextureSize;
+  size_t _randomTextureSize;
   int _actualFrame;
 
   Vector3 _zeroVector3;
@@ -356,6 +512,8 @@ private:
   RawTexturePtr _velocityGradientsTexture;
   RawTexturePtr _limitVelocityGradientsTexture;
   RawTexturePtr _dragGradientsTexture;
+
+  std::vector<Color3Gradient> _emptyRampGradients;
 
 }; // end of class GPUParticleSystem
 

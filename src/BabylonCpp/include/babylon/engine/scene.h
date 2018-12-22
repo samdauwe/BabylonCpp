@@ -46,6 +46,7 @@ struct ICollisionCoordinator;
 struct IEnvironmentHelperOptions;
 class ImageProcessingConfiguration;
 class InternalTexture;
+struct IPhysicsEngine;
 struct IPhysicsEnginePlugin;
 struct IRenderingManagerAutoClearSetup;
 struct ISceneComponent;
@@ -56,7 +57,6 @@ class KeyboardInfoPre;
 class Mesh;
 class Node;
 class OutlineRenderer;
-class PhysicsEngine;
 class PostProcess;
 class PostProcessManager;
 class PostProcessRenderPipelineManager;
@@ -74,6 +74,7 @@ using BonePtr                   = std::shared_ptr<Bone>;
 using EffectPtr                 = std::shared_ptr<Effect>;
 using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
 using IAnimatablePtr            = std::shared_ptr<IAnimatable>;
+using IPhysicsEnginePtr         = std::shared_ptr<IPhysicsEngine>;
 using ImageProcessingConfigurationPtr
   = std::shared_ptr<ImageProcessingConfiguration>;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
@@ -1458,7 +1459,7 @@ public:
    * @brief Gets the current physics engine.
    * @returns a PhysicsEngine or null if none attached
    */
-  PhysicsEngine* getPhysicsEngine();
+  IPhysicsEnginePtr& getPhysicsEngine();
 
   /**
    * @brief Enables physics to the current scene.
@@ -1466,7 +1467,8 @@ public:
    * @param plugin defines the physics engine to be used. defaults to OimoJS.
    * @return a boolean indicating if the physics engine was initialized
    */
-  bool enablePhysics(const Vector3& gravity, IPhysicsEnginePlugin* plugin);
+  bool enablePhysics(const std::optional<Vector3>& gravity = std::nullopt,
+                     IPhysicsEnginePlugin* plugin          = nullptr);
 
   /**
    * @brief Disables and disposes the physics engine associated with the scene.
@@ -1478,6 +1480,11 @@ public:
    * @returns a boolean indicating if there is an active physics engine
    */
   bool isPhysicsEnabled();
+
+  /**
+   * @brief Hidden
+   */
+  void _advancePhysicsEngineStep(float step);
 
   /** Misc. **/
 
@@ -3203,6 +3210,17 @@ public:
                                       const Collider& collider)>
     getCollidingSubMeshCandidates;
 
+  /**
+   * Hidden (Backing field)
+   */
+  IPhysicsEnginePtr _physicsEngine;
+
+  /**
+   * User updatable function that will return a deterministic frame time when
+   * engine is in deterministic lock step mode
+   */
+  std::function<float()> getDeterministicFrameTime;
+
 protected:
   /** Hidden */
   BaseTexturePtr _environmentTexture;
@@ -3334,7 +3352,6 @@ private:
   std::vector<SkeletonPtr> _activeSkeletons;
   std::vector<Mesh*> _softwareSkinnedMeshes;
   std::unique_ptr<RenderingManager> _renderingManager;
-  std::unique_ptr<PhysicsEngine> _physicsEngine;
   Matrix _transformMatrix;
   std::unique_ptr<UniformBuffer> _sceneUbo;
   std::unique_ptr<UniformBuffer> _alternateSceneUbo;

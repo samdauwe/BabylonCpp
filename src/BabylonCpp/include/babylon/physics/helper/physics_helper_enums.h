@@ -5,7 +5,8 @@ namespace BABYLON {
 
 /**
  * @brief The strenght of the force in correspondence to the distance of the
- * affected object
+ * affected object.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 enum class PhysicsRadialImpulseFalloff {
   /**
@@ -19,8 +20,9 @@ enum class PhysicsRadialImpulseFalloff {
 }; // end of enum class PhysicsRadialImpulseFalloff
 
 /**
- * @brief The strenght of the force in correspondence to the distance of the
- * affected object
+ * @brief The strength of the force in correspondence to the distance of the
+ * affected object.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 enum class PhysicsUpdraftMode {
   /**

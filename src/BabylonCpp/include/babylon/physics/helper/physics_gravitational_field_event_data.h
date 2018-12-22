@@ -10,7 +10,14 @@ namespace BABYLON {
 class Mesh;
 using MeshPtr = std::shared_ptr<Mesh>;
 
+/**
+ * @brief Interface for gravitational field event data.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
+ */
 struct BABYLON_SHARED_EXPORT PhysicsGravitationalFieldEventData {
+  /**
+   * A sphere mesh used for the gravitational field event
+   */
   MeshPtr sphere;
 }; // end of struct PhysicsGravitationalFieldEventData
 

@@ -1404,7 +1404,7 @@ std::vector<IParticleSystemPtr> Mesh::getHierarchyEmittedParticleSystems()
       if (std::find(descendants.begin(), descendants.end(),
                     std::get<AbstractMeshPtr>(particleSystem->emitter))
           != descendants.end()) {
-        results.emplace_back(particleSystem.get());
+        results.emplace_back(particleSystem);
       }
     }
   }

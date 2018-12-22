@@ -9,8 +9,18 @@ namespace BABYLON {
 class Mesh;
 using MeshPtr = std::shared_ptr<Mesh>;
 
+/**
+ * @brief Interface for radial explosion event data.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
+ */
 struct BABYLON_SHARED_EXPORT PhysicsRadialExplosionEventData {
+  /**
+   * A sphere used for the radial explosion event
+   */
   MeshPtr sphere;
+  /**
+   * An array of rays for the radial explosion event
+   */
   std::vector<Ray> rays;
 }; // end of struct PhysicsRadialExplosionEventData
 

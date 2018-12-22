@@ -169,11 +169,11 @@ AbstractMeshPtr PhysicsViewer::_getDebugMesh(PhysicsImpostor* impostor,
 {
   AbstractMeshPtr mesh = nullptr;
 
-  if (impostor->type() == PhysicsImpostor::BoxImpostor) {
+  if (impostor->physicsImposterType == PhysicsImpostor::BoxImpostor) {
     mesh = _getDebugBoxMesh(scene);
     impostor->getBoxSizeToRef(mesh->scaling());
   }
-  else if (impostor->type() == PhysicsImpostor::SphereImpostor) {
+  else if (impostor->physicsImposterType == PhysicsImpostor::SphereImpostor) {
     mesh              = _getDebugSphereMesh(scene);
     auto radius       = impostor->getRadius();
     mesh->scaling().x = radius * 2.f;

@@ -1,12 +1,18 @@
 #include <babylon/particles/particle.h>
 
 #include <babylon/math/scalar.h>
+#include <babylon/math/tmp.h>
+#include <babylon/mesh/abstract_mesh.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/particles/sub_emitter.h>
 
 namespace BABYLON {
 
+size_t Particle::_Count = 0;
+
 Particle::Particle(ParticleSystem* iParticleSystem)
-    : position{Vector3::Zero()}
+    : id{Particle::_Count++}
+    , position{Vector3::Zero()}
     , direction{Vector3::Zero()}
     , color{Color4(0.f, 0.f, 0.f, 0.f)}
     , colorStep{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -17,6 +23,7 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , angle{0.f}
     , angularSpeed{0.f}
     , cellIndex{0}
+    , _randomCellOffset{std::nullopt}
     , _initialDirection{std::nullopt}
     , _initialStartSpriteCellID{0}
     , _initialEndSpriteCellID{0}
@@ -38,9 +45,9 @@ Particle::Particle(ParticleSystem* iParticleSystem)
     , _currentDragGradient{std::nullopt}
     , _currentDrag1{0.f}
     , _currentDrag2{0.f}
+    , _randomNoiseCoordinates1{std::nullopt}
     , particleSystem{iParticleSystem}
     , _currentFrameCounter{0}
-
 {
   if (!particleSystem->isAnimationSheetEnabled()) {
     return;
@@ -50,7 +57,8 @@ Particle::Particle(ParticleSystem* iParticleSystem)
 }
 
 Particle::Particle(const Particle& other)
-    : position{other.position}
+    : id{other.id}
+    , position{other.position}
     , direction{other.direction}
     , color{other.color}
     , colorStep{other.colorStep}
@@ -61,7 +69,10 @@ Particle::Particle(const Particle& other)
     , angle{other.angle}
     , angularSpeed{other.angularSpeed}
     , cellIndex{other.cellIndex}
+    , remapData{other.remapData}
+    , _randomCellOffset{other._randomCellOffset}
     , _initialDirection{other._initialDirection}
+    , _attachedSubEmitters{other._attachedSubEmitters}
     , _initialStartSpriteCellID{other._initialStartSpriteCellID}
     , _initialEndSpriteCellID{other._initialEndSpriteCellID}
     , _currentColorGradient{other._currentColorGradient}
@@ -82,6 +93,8 @@ Particle::Particle(const Particle& other)
     , _currentDragGradient{other._currentDragGradient}
     , _currentDrag1{other._currentDrag1}
     , _currentDrag2{other._currentDrag2}
+    , _randomNoiseCoordinates1{other._randomNoiseCoordinates1}
+    , _randomNoiseCoordinates2{other._randomNoiseCoordinates2}
     , particleSystem{other.particleSystem}
     , _currentFrameCounter{other._currentFrameCounter}
 {
@@ -95,6 +108,7 @@ Particle::Particle(Particle&& other)
 Particle& Particle::operator=(const Particle& other)
 {
   if (&other != this) {
+    id                            = other.id;
     position                      = other.position;
     direction                     = other.direction;
     color                         = other.color;
@@ -106,7 +120,10 @@ Particle& Particle::operator=(const Particle& other)
     angle                         = other.angle;
     angularSpeed                  = other.angularSpeed;
     cellIndex                     = other.cellIndex;
+    remapData                     = other.remapData;
+    _randomCellOffset             = other._randomCellOffset;
     _initialDirection             = other._initialDirection;
+    _attachedSubEmitters          = other._attachedSubEmitters;
     _initialStartSpriteCellID     = other._initialStartSpriteCellID;
     _initialEndSpriteCellID       = other._initialEndSpriteCellID;
     _currentColorGradient         = other._currentColorGradient;
@@ -127,6 +144,8 @@ Particle& Particle::operator=(const Particle& other)
     _currentDragGradient          = other._currentDragGradient;
     _currentDrag1                 = other._currentDrag1;
     _currentDrag2                 = other._currentDrag2;
+    _randomNoiseCoordinates1      = other._randomNoiseCoordinates1;
+    _randomNoiseCoordinates2      = other._randomNoiseCoordinates2;
     particleSystem                = other.particleSystem;
     _currentFrameCounter          = other._currentFrameCounter;
   }
@@ -137,6 +156,7 @@ Particle& Particle::operator=(const Particle& other)
 Particle& Particle::operator=(Particle&& other)
 {
   if (&other != this) {
+    id                        = std::move(other.id);
     position                  = std::move(other.position);
     direction                 = std::move(other.direction);
     color                     = std::move(other.color);
@@ -148,7 +168,10 @@ Particle& Particle::operator=(Particle&& other)
     angle                     = std::move(other.angle);
     angularSpeed              = std::move(other.angularSpeed);
     cellIndex                 = std::move(other.cellIndex);
+    remapData                 = std::move(other.remapData);
+    _randomCellOffset         = std::move(other._randomCellOffset);
     _initialDirection         = std::move(other._initialDirection);
+    _attachedSubEmitters      = std::move(other._attachedSubEmitters);
     _initialStartSpriteCellID = std::move(other._initialStartSpriteCellID);
     _initialEndSpriteCellID   = std::move(other._initialEndSpriteCellID);
     _currentColorGradient     = std::move(other._currentColorGradient);
@@ -166,13 +189,15 @@ Particle& Particle::operator=(Particle&& other)
     _currentVelocity2        = std::move(other._currentVelocity2);
     _currentLimitVelocityGradient
       = std::move(other._currentLimitVelocityGradient);
-    _currentLimitVelocity1 = std::move(other._currentLimitVelocity1);
-    _currentLimitVelocity2 = std::move(other._currentLimitVelocity2);
-    _currentDragGradient   = std::move(other._currentDragGradient);
-    _currentDrag1          = std::move(other._currentDrag1);
-    _currentDrag2          = std::move(other._currentDrag2);
-    particleSystem         = std::move(other.particleSystem);
-    _currentFrameCounter   = std::move(other._currentFrameCounter);
+    _currentLimitVelocity1   = std::move(other._currentLimitVelocity1);
+    _currentLimitVelocity2   = std::move(other._currentLimitVelocity2);
+    _currentDragGradient     = std::move(other._currentDragGradient);
+    _currentDrag1            = std::move(other._currentDrag1);
+    _currentDrag2            = std::move(other._currentDrag2);
+    _randomNoiseCoordinates1 = std::move(other._randomNoiseCoordinates1);
+    _randomNoiseCoordinates2 = std::move(other._randomNoiseCoordinates2);
+    particleSystem           = std::move(other.particleSystem);
+    _currentFrameCounter     = std::move(other._currentFrameCounter);
   }
 
   return *this;
@@ -194,13 +219,78 @@ void Particle::updateCellInfoFromSystem()
 
 void Particle::updateCellIndex()
 {
-  auto dist  = (_initialEndSpriteCellID - _initialStartSpriteCellID);
-  auto ratio = Scalar::Clamp(
-    std::fmod((age * particleSystem->spriteCellChangeSpeed), lifeTime)
-    / lifeTime);
+  auto offsetAge   = age;
+  auto changeSpeed = particleSystem->spriteCellChangeSpeed;
+
+  if (particleSystem->spriteRandomStartCell) {
+    if (!_randomCellOffset.has_value()) {
+      _randomCellOffset = Math::random() * lifeTime;
+    }
+
+    if (changeSpeed == 0.f) { // Special case when speed = 0 meaning we want to
+                              // stay on initial cell
+      changeSpeed = 1.f;
+      offsetAge   = *_randomCellOffset;
+    }
+    else {
+      offsetAge += *_randomCellOffset;
+    }
+  }
+
+  auto dist = (_initialEndSpriteCellID - _initialStartSpriteCellID);
+  auto ratio
+    = Scalar::Clamp(std::fmod((offsetAge * changeSpeed), lifeTime) / lifeTime);
 
   cellIndex
     = static_cast<unsigned int>(_initialStartSpriteCellID + (ratio * dist));
+}
+
+void Particle::_inheritParticleInfoToSubEmitter(const SubEmitterPtr& subEmitter)
+{
+  if (std::holds_alternative<AbstractMeshPtr>(
+        subEmitter->particleSystem->emitter)) {
+    auto emitterMesh
+      = std::get<AbstractMeshPtr>(subEmitter->particleSystem->emitter);
+    emitterMesh->position().copyFrom(position);
+    if (subEmitter->inheritDirection) {
+      emitterMesh->position().subtractToRef(direction, Tmp::Vector3Array[0]);
+      // Look at using Y as forward
+      emitterMesh->lookAt(Tmp::Vector3Array[0], 0.f, Math::PI_2);
+    }
+  }
+  else if (std::holds_alternative<Vector3>(
+             subEmitter->particleSystem->emitter)) {
+    auto emitterPosition
+      = std::get<Vector3>(subEmitter->particleSystem->emitter);
+    emitterPosition.copyFrom(position);
+  }
+  // Set inheritedVelocityOffset to be used when new particles are created
+  direction.scaleToRef(subEmitter->inheritedVelocityAmount / 2.f,
+                       Tmp::Vector3Array[0]);
+  subEmitter->particleSystem->_inheritedVelocityOffset.copyFrom(
+    Tmp::Vector3Array[0]);
+}
+
+void Particle::_inheritParticleInfoToSubEmitters()
+{
+  if (!_attachedSubEmitters.empty()) {
+    for (const auto& subEmitter : _attachedSubEmitters) {
+      _inheritParticleInfoToSubEmitter(subEmitter);
+    }
+  }
+}
+
+void Particle::_reset()
+{
+  age                           = 0.f;
+  _currentColorGradient         = std::nullopt;
+  _currentSizeGradient          = std::nullopt;
+  _currentAngularSpeedGradient  = std::nullopt;
+  _currentVelocityGradient      = std::nullopt;
+  _currentLimitVelocityGradient = std::nullopt;
+  _currentDragGradient          = std::nullopt;
+  cellIndex                     = particleSystem->startSpriteCellID;
+  _randomCellOffset             = std::nullopt;
 }
 
 void Particle::copyTo(Particle& other)
@@ -220,14 +310,17 @@ void Particle::copyTo(Particle& other)
   other.direction.copyFrom(direction);
   other.color.copyFrom(color);
   other.colorStep.copyFrom(colorStep);
-  other.lifeTime = lifeTime;
-  other.age      = age;
-  other.size     = size;
+  other.lifeTime          = lifeTime;
+  other.age               = age;
+  other._randomCellOffset = _randomCellOffset;
+  other.size              = size;
   other.scale.copyFrom(scale);
-  other.angle          = angle;
-  other.angularSpeed   = angularSpeed;
-  other.particleSystem = particleSystem;
-  other.cellIndex      = cellIndex;
+  other.angle                = angle;
+  other.angularSpeed         = angularSpeed;
+  other.particleSystem       = particleSystem;
+  other.cellIndex            = cellIndex;
+  other.id                   = id;
+  other._attachedSubEmitters = _attachedSubEmitters;
   if (_currentColorGradient) {
     other._currentColorGradient = _currentColorGradient;
     other._currentColor1.copyFrom(_currentColor1);
@@ -261,6 +354,19 @@ void Particle::copyTo(Particle& other)
   if (particleSystem->isAnimationSheetEnabled) {
     other._initialStartSpriteCellID = _initialStartSpriteCellID;
     other._initialEndSpriteCellID   = _initialEndSpriteCellID;
+  }
+  if (particleSystem->useRampGradients) {
+    other.remapData.copyFrom(remapData);
+  }
+  if (_randomNoiseCoordinates1) {
+    if (other._randomNoiseCoordinates1) {
+      other._randomNoiseCoordinates1->copyFrom(*_randomNoiseCoordinates1);
+      other._randomNoiseCoordinates2.copyFrom(_randomNoiseCoordinates2);
+    }
+    else {
+      other._randomNoiseCoordinates1 = _randomNoiseCoordinates1;
+      other._randomNoiseCoordinates2 = _randomNoiseCoordinates2;
+    }
   }
 }
 

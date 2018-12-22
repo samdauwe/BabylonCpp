@@ -10,15 +10,22 @@ struct DistanceJointData;
 
 /**
  * @brief A class representing a physics distance joint.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 class BABYLON_SHARED_EXPORT DistanceJoint : public PhysicsJoint {
 
 public:
+  /**
+   * @brief Initializes the Distance-Joint.
+   * @param jointData The data for the Distance-Joint
+   */
   DistanceJoint(const DistanceJointData& jointData);
   ~DistanceJoint();
 
   /**
-   * Update the predefined distance.
+   * @brief Update the predefined distance.
+   * @param maxDistance The maximum preferred distance
+   * @param minDistance The minimum preferred distance
    */
   void updateDistance(float maxDistance, float minDistance);
 

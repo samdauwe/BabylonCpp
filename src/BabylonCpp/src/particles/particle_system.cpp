@@ -15,6 +15,8 @@
 #include <babylon/materials/image_processing_configuration_defines.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/textures/procedurals/procedural_texture.h>
+#include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/tmp.h>
@@ -28,6 +30,8 @@
 #include <babylon/particles/emittertypes/sphere_directed_particle_emitter.h>
 #include <babylon/particles/emittertypes/sphere_particle_emitter.h>
 #include <babylon/particles/particle.h>
+#include <babylon/particles/sub_emitter.h>
+#include <babylon/tools/color3_gradient.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -37,7 +41,13 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
                                bool isAnimationSheetEnabled, float epsilon)
     : BaseParticleSystem{iName}
     , onDispose{this, &ParticleSystem::set_onDispose}
-    , _vertexBufferSize{11}
+    , _currentEmitRateGradient{std::nullopt}
+    , _currentEmitRate1{0.f}
+    , _currentEmitRate2{0.f}
+    , _currentStartSizeGradient{std::nullopt}
+    , _currentStartSize1{0.f}
+    , _currentStartSize2{0.f}
+    , _disposeEmitterOnDispose{false}
     , _newPartsExcess{0}
     , _scaledColorStep{Color4(0.f, 0.f, 0.f, 0.f)}
     , _colorDiff{Color4(0.f, 0.f, 0.f, 0.f)}
@@ -48,7 +58,12 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
     , _started{false}
     , _stopped{false}
     , _actualFrame{0}
+    , _vertexBufferSize{11}
+    , _rawTextureWidth{256}
+    , _rampGradientsTexture{nullptr}
+    , _useRampGradients{false}
     , _appendParticleVertexes{nullptr}
+    , _rootParticleSystem{nullptr}
     , _zeroVector3{Vector3::Zero()}
 {
   _capacity = capacity;
@@ -73,195 +88,243 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
   // Default emitter type
   particleEmitterType = std::make_unique<BoxParticleEmitter>();
 
+  // Update
   updateFunction = [this](std::vector<Particle*>& _particles) {
-    std::optional<Uint8Array> noiseTextureData;
     std::optional<ISize> noiseTextureSize = std::nullopt;
+    std::optional<Uint8Array> noiseTextureData;
 
     if (noiseTexture) { // We need to get texture data back to CPU
-      noiseTextureData = noiseTexture->readPixels().uint8Array;
       noiseTextureSize = noiseTexture->getSize();
+      noiseTextureData = noiseTexture->getContent().uint8Array;
     }
 
     for (unsigned int index = 0; index < _particles.size(); ++index) {
-      auto particle = _particles[index];
-      particle->age += static_cast<float>(_scaledUpdateSpeed);
+      auto particle          = _particles[index];
+      auto scaledUpdateSpeed = static_cast<float>(_scaledUpdateSpeed);
+      auto previousAge       = particle->age;
+      particle->age += scaledUpdateSpeed;
 
+      // Evaluate step to death
+      if (particle->age > particle->lifeTime) {
+        auto diff    = particle->age - previousAge;
+        auto oldDiff = particle->lifeTime - previousAge;
+
+        scaledUpdateSpeed = (oldDiff * scaledUpdateSpeed) / diff;
+
+        particle->age = particle->lifeTime;
+      }
+
+      auto ratio = particle->age / particle->lifeTime;
+
+      // Color
+      if (!_colorGradients.empty()) {
+        Tools::GetCurrentGradient<ColorGradient>(
+          ratio, _colorGradients,
+          [&](ColorGradient& currentGradient, ColorGradient& nextGradient,
+              float scale) {
+            if (currentGradient != *particle->_currentColorGradient) {
+              particle->_currentColor1.copyFrom(particle->_currentColor2);
+              static_cast<ColorGradient&>(nextGradient)
+                .getColorToRef(particle->_currentColor2);
+              particle->_currentColorGradient
+                = static_cast<ColorGradient&>(currentGradient);
+            }
+            Color4::LerpToRef(particle->_currentColor1,
+                              particle->_currentColor2, scale, particle->color);
+          });
+      }
+      else {
+        particle->colorStep.scaleToRef(scaledUpdateSpeed, _scaledColorStep);
+        particle->color.addInPlace(_scaledColorStep);
+
+        if (particle->color.a < 0.f) {
+          particle->color.a = 0.f;
+        }
+      }
+
+      // Angular speed
+      if (!_angularSpeedGradients.empty()) {
+        Tools::GetCurrentGradient<FactorGradient>(
+          ratio, _angularSpeedGradients,
+          [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+              float scale) {
+            if (currentGradient != particle->_currentAngularSpeedGradient) {
+              particle->_currentAngularSpeed1 = particle->_currentAngularSpeed2;
+              particle->_currentAngularSpeed2 = nextGradient.getFactor();
+              particle->_currentAngularSpeedGradient = currentGradient;
+            }
+            particle->angularSpeed
+              = Scalar::Lerp(particle->_currentAngularSpeed1,
+                             particle->_currentAngularSpeed2, scale);
+          });
+      }
+      particle->angle += particle->angularSpeed * scaledUpdateSpeed;
+
+      // Direction
+      auto directionScale = scaledUpdateSpeed;
+
+      // Velocity
+      if (_velocityGradients.size() > 0) {
+        Tools::GetCurrentGradient<FactorGradient>(
+          ratio, _velocityGradients,
+          [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+              float scale) {
+            if (currentGradient != particle->_currentVelocityGradient) {
+              particle->_currentVelocity1        = particle->_currentVelocity2;
+              particle->_currentVelocity2        = nextGradient.getFactor();
+              particle->_currentVelocityGradient = currentGradient;
+            }
+            directionScale *= Scalar::Lerp(particle->_currentVelocity1,
+                                           particle->_currentVelocity2, scale);
+          });
+      }
+      particle->direction.scaleToRef(directionScale, _scaledDirection);
+
+      // Limit velocity
+      if (!_limitVelocityGradients.empty()) {
+        Tools::GetCurrentGradient<FactorGradient>(
+          ratio, _limitVelocityGradients,
+          [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+              float scale) {
+            if (currentGradient != particle->_currentLimitVelocityGradient) {
+              particle->_currentLimitVelocity1
+                = particle->_currentLimitVelocity2;
+              particle->_currentLimitVelocity2 = nextGradient.getFactor();
+              particle->_currentLimitVelocityGradient = currentGradient;
+            }
+
+            auto limitVelocity
+              = Scalar::Lerp(particle->_currentLimitVelocity1,
+                             particle->_currentLimitVelocity2, scale);
+            auto currentVelocity = particle->direction.length();
+
+            if (currentVelocity > limitVelocity) {
+              particle->direction.scaleInPlace(limitVelocityDamping);
+            }
+          });
+      }
+
+      /// Drag
+      if (!_dragGradients.empty()) {
+        Tools::GetCurrentGradient<FactorGradient>(
+          ratio, _dragGradients,
+          [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+              float scale) {
+            if (currentGradient != particle->_currentDragGradient) {
+              particle->_currentDrag1        = particle->_currentDrag2;
+              particle->_currentDrag2        = nextGradient.getFactor();
+              particle->_currentDragGradient = currentGradient;
+            }
+
+            auto drag = Scalar::Lerp(particle->_currentDrag1,
+                                     particle->_currentDrag2, scale);
+
+            _scaledDirection.scaleInPlace(1.f - drag);
+          });
+      }
+
+      particle->position.addInPlace(_scaledDirection);
+
+      // Noise
+      if (noiseTextureData && noiseTextureSize) {
+        auto fetchedColorR = _fetchR(
+          particle->_randomNoiseCoordinates1->x,
+          particle->_randomNoiseCoordinates1->y, noiseTextureSize->width,
+          noiseTextureSize->height, *noiseTextureData);
+        auto fetchedColorG = _fetchR(
+          particle->_randomNoiseCoordinates1->z,
+          particle->_randomNoiseCoordinates2.x, noiseTextureSize->width,
+          noiseTextureSize->height, *noiseTextureData);
+        auto fetchedColorB = _fetchR(
+          particle->_randomNoiseCoordinates2.y,
+          particle->_randomNoiseCoordinates2.z, noiseTextureSize->width,
+          noiseTextureSize->height, *noiseTextureData);
+
+        auto& force       = Tmp::Vector3Array[0];
+        auto& scaledForce = Tmp::Vector3Array[1];
+
+        force.copyFromFloats((2.f * fetchedColorR - 1.f) * noiseStrength.x,
+                             (2.f * fetchedColorG - 1.f) * noiseStrength.y,
+                             (2.f * fetchedColorB - 1.f) * noiseStrength.z);
+
+        force.scaleToRef(scaledUpdateSpeed, scaledForce);
+        particle->direction.addInPlace(scaledForce);
+      }
+
+      // Gravity
+      gravity.scaleToRef(scaledUpdateSpeed, _scaledGravity);
+      particle->direction.addInPlace(_scaledGravity);
+
+      // Size
+      if (!_sizeGradients.empty()) {
+        Tools::GetCurrentGradient<FactorGradient>(
+          ratio, _sizeGradients,
+          [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+              float scale) {
+            if (currentGradient != particle->_currentSizeGradient) {
+              particle->_currentSize1        = particle->_currentSize2;
+              particle->_currentSize2        = nextGradient.getFactor();
+              particle->_currentSizeGradient = currentGradient;
+            }
+            particle->size = Scalar::Lerp(particle->_currentSize1,
+                                          particle->_currentSize2, scale);
+          });
+      }
+
+      // Remap data
+      if (_useRampGradients) {
+        if (!_colorRemapGradients.empty()) {
+          Tools::GetCurrentGradient<FactorGradient>(
+            ratio, _colorRemapGradients,
+            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+                float scale) {
+              auto min = Scalar::Lerp(currentGradient.factor1,
+                                      nextGradient.factor1, scale);
+              auto max = Scalar::Lerp(*currentGradient.factor2,
+                                      *nextGradient.factor2, scale);
+
+              particle->remapData.x = min;
+              particle->remapData.y = max - min;
+            });
+        }
+
+        if (!_alphaRemapGradients.empty()) {
+          Tools::GetCurrentGradient<FactorGradient>(
+            ratio, _alphaRemapGradients,
+            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+                float scale) {
+              auto min = Scalar::Lerp(currentGradient.factor1,
+                                      nextGradient.factor1, scale);
+              auto max = Scalar::Lerp(*currentGradient.factor2,
+                                      *nextGradient.factor2, scale);
+
+              particle->remapData.z = min;
+              particle->remapData.w = max - min;
+            });
+        }
+      }
+
+      if (_isAnimationSheetEnabled) {
+        particle->updateCellIndex();
+      }
+
+      // Update the position of the attached sub-emitters to match their
+      // attached particle
+      particle->_inheritParticleInfoToSubEmitters();
+
+      // Recycle by swapping with last particle
       if (particle->age >= particle->lifeTime) {
-        // Recycle by swapping with last particle
         _emitFromParticle(particle);
+        if (!particle->_attachedSubEmitters.empty()) {
+          for (auto& subEmitter : particle->_attachedSubEmitters) {
+            subEmitter->particleSystem->disposeOnStop = true;
+            subEmitter->particleSystem->stop();
+          }
+          particle->_attachedSubEmitters.clear();
+        }
         recycleParticle(particle);
         --index;
         continue;
-      }
-      else {
-        auto ratio = particle->age / particle->lifeTime;
-
-        // Color
-        if (!_colorGradients.empty()) {
-          Tools::GetCurrentGradient<ColorGradient>(
-            ratio, _colorGradients,
-            [&](ColorGradient& currentGradient, ColorGradient& nextGradient,
-                float scale) {
-              if (currentGradient != *particle->_currentColorGradient) {
-                particle->_currentColor1.copyFrom(particle->_currentColor2);
-                static_cast<ColorGradient&>(nextGradient)
-                  .getColorToRef(particle->_currentColor2);
-                particle->_currentColorGradient
-                  = static_cast<ColorGradient&>(currentGradient);
-              }
-              Color4::LerpToRef(particle->_currentColor1,
-                                particle->_currentColor2, scale,
-                                particle->color);
-            });
-        }
-        else {
-          particle->colorStep.scaleToRef(_scaledUpdateSpeed, _scaledColorStep);
-          particle->color.addInPlace(_scaledColorStep);
-
-          if (particle->color.a < 0.f) {
-            particle->color.a = 0.f;
-          }
-        }
-
-        // Angular speed
-        if (!_angularSpeedGradients.empty()) {
-          Tools::GetCurrentGradient<FactorGradient>(
-            ratio, _angularSpeedGradients,
-            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
-                float scale) {
-              if (currentGradient != particle->_currentAngularSpeedGradient) {
-                particle->_currentAngularSpeed1
-                  = particle->_currentAngularSpeed2;
-                particle->_currentAngularSpeed2 = nextGradient.getFactor();
-                particle->_currentAngularSpeedGradient = currentGradient;
-              }
-              particle->angularSpeed
-                = Scalar::Lerp(particle->_currentAngularSpeed1,
-                               particle->_currentAngularSpeed2, scale);
-            });
-        }
-        particle->angle += particle->angularSpeed * _scaledUpdateSpeed;
-
-        // Direction
-        auto directionScale = _scaledUpdateSpeed;
-
-        // Velocity
-        if (_velocityGradients.size() > 0) {
-          Tools::GetCurrentGradient<FactorGradient>(
-            ratio, _velocityGradients,
-            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
-                float scale) {
-              if (currentGradient != particle->_currentVelocityGradient) {
-                particle->_currentVelocity1 = particle->_currentVelocity2;
-                particle->_currentVelocity2 = nextGradient.getFactor();
-                particle->_currentVelocityGradient = currentGradient;
-              }
-              directionScale
-                *= Scalar::Lerp(particle->_currentVelocity1,
-                                particle->_currentVelocity2, scale);
-            });
-        }
-        particle->direction.scaleToRef(directionScale, _scaledDirection);
-
-        // Limit velocity
-        if (!_limitVelocityGradients.empty()) {
-          Tools::GetCurrentGradient<FactorGradient>(
-            ratio, _limitVelocityGradients,
-            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
-                float scale) {
-              if (currentGradient != particle->_currentLimitVelocityGradient) {
-                particle->_currentLimitVelocity1
-                  = particle->_currentLimitVelocity2;
-                particle->_currentLimitVelocity2 = nextGradient.getFactor();
-                particle->_currentLimitVelocityGradient = currentGradient;
-              }
-
-              auto limitVelocity
-                = Scalar::Lerp(particle->_currentLimitVelocity1,
-                               particle->_currentLimitVelocity2, scale);
-              auto currentVelocity = particle->direction.length();
-
-              if (currentVelocity > limitVelocity) {
-                particle->direction.scaleInPlace(limitVelocityDamping);
-              }
-            });
-        }
-
-        /// Drag
-        if (!_dragGradients.empty()) {
-          Tools::GetCurrentGradient<FactorGradient>(
-            ratio, _dragGradients,
-            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
-                float scale) {
-              if (currentGradient != particle->_currentDragGradient) {
-                particle->_currentDrag1        = particle->_currentDrag2;
-                particle->_currentDrag2        = nextGradient.getFactor();
-                particle->_currentDragGradient = currentGradient;
-              }
-
-              auto drag = Scalar::Lerp(particle->_currentDrag1,
-                                       particle->_currentDrag2, scale);
-
-              _scaledDirection.scaleInPlace(drag);
-            });
-        }
-
-        particle->position.addInPlace(_scaledDirection);
-
-        // Noise
-        if (noiseTextureData && noiseTextureSize) {
-          auto& localPosition   = Tmp::Vector3Array[0];
-          auto& emitterPosition = Tmp::Vector3Array[1];
-
-          _emitterWorldMatrix.getTranslationToRef(emitterPosition);
-          particle->position.subtractToRef(emitterPosition, localPosition);
-
-          auto fetchedColorR
-            = _fetchR(localPosition.y, localPosition.z, noiseTextureSize->width,
-                      noiseTextureSize->height, *noiseTextureData);
-          auto fetchedColorG
-            = _fetchR(localPosition.x + 0.33f, localPosition.z + 0.33f,
-                      noiseTextureSize->width, noiseTextureSize->height,
-                      *noiseTextureData);
-          auto fetchedColorB
-            = _fetchR(localPosition.x - 0.3f, localPosition.y - 0.33f,
-                      noiseTextureSize->width, noiseTextureSize->height,
-                      *noiseTextureData);
-
-          auto& force       = Tmp::Vector3Array[0];
-          auto& scaledForce = Tmp::Vector3Array[1];
-
-          force.copyFromFloats((2.f * fetchedColorR - 1.f) * noiseStrength.x,
-                               (2.f * fetchedColorG - 1.f) * noiseStrength.y,
-                               (2.f * fetchedColorB - 1.f) * noiseStrength.z);
-
-          force.scaleToRef(_scaledUpdateSpeed, scaledForce);
-          particle->direction.addInPlace(scaledForce);
-        }
-
-        // Gravity
-        gravity.scaleToRef(_scaledUpdateSpeed, _scaledGravity);
-        particle->direction.addInPlace(_scaledGravity);
-
-        // Size
-        if (!_sizeGradients.empty()) {
-          Tools::GetCurrentGradient<FactorGradient>(
-            ratio, _sizeGradients,
-            [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
-                float scale) {
-              if (currentGradient != particle->_currentSizeGradient) {
-                particle->_currentSize1        = particle->_currentSize2;
-                particle->_currentSize2        = nextGradient.getFactor();
-                particle->_currentSizeGradient = currentGradient;
-              }
-              particle->size = Scalar::Lerp(particle->_currentSize1,
-                                            particle->_currentSize2, scale);
-            });
-        }
-
-        if (_isAnimationSheetEnabled) {
-          particle->updateCellIndex();
-        }
       }
     }
   };
@@ -281,16 +344,6 @@ const char* ParticleSystem::getClassName() const
   return "ParticleSystem";
 }
 
-Scene* ParticleSystem::getScene() const
-{
-  return _scene;
-}
-
-std::vector<Particle*>& ParticleSystem::particles()
-{
-  return _particles;
-}
-
 void ParticleSystem::set_onDispose(
   const std::function<void(ParticleSystem*, EventState&)>& callback)
 {
@@ -298,6 +351,22 @@ void ParticleSystem::set_onDispose(
     onDisposeObservable.remove(_onDisposeObserver);
   }
   _onDisposeObserver = onDisposeObservable.add(callback);
+}
+
+bool ParticleSystem::get_useRampGradients() const
+{
+  return _useRampGradients;
+}
+
+void ParticleSystem::set_useRampGradients(bool value)
+{
+  if (_useRampGradients == value) {
+    return;
+  }
+
+  _useRampGradients = value;
+
+  _resetEffect();
 }
 
 void ParticleSystem::_addFactorGradient(
@@ -371,6 +440,36 @@ IParticleSystem& ParticleSystem::removeSizeGradient(float gradient)
   return *this;
 }
 
+IParticleSystem& ParticleSystem::addColorRemapGradient(float gradient,
+                                                       float min, float max)
+{
+  _addFactorGradient(_colorRemapGradients, gradient, min, max);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeColorRemapGradient(float gradient)
+{
+  _removeFactorGradient(_colorRemapGradients, gradient);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::addAlphaRemapGradient(float gradient,
+                                                       float min, float max)
+{
+  _addFactorGradient(_alphaRemapGradients, gradient, min, max);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeAlphaRemapGradient(float gradient)
+{
+  _removeFactorGradient(_alphaRemapGradients, gradient);
+
+  return *this;
+}
+
 IParticleSystem&
 ParticleSystem::addAngularSpeedGradient(float gradient, float factor,
                                         const std::optional<float>& factor2)
@@ -436,12 +535,120 @@ IParticleSystem& ParticleSystem::removeDragGradient(float gradient)
 }
 
 IParticleSystem&
-ParticleSystem::addColorGradient(float gradient, const Color4& color,
+ParticleSystem::addEmitRateGradient(float gradient, float factor,
+                                    const std::optional<float>& factor2)
+{
+  _addFactorGradient(_emitRateGradients, gradient, factor, factor2);
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeEmitRateGradient(float gradient)
+{
+  _removeFactorGradient(_emitRateGradients, gradient);
+
+  return *this;
+}
+
+IParticleSystem&
+ParticleSystem::addStartSizeGradient(float gradient, float factor,
+                                     const std::optional<float>& factor2)
+{
+  _addFactorGradient(_startSizeGradients, gradient, factor, factor2);
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeStartSizeGradient(float gradient)
+{
+  _removeFactorGradient(_emitRateGradients, gradient);
+
+  return *this;
+}
+
+void ParticleSystem::_createRampGradientTexture()
+{
+  if (_rampGradients.empty() || _rampGradientsTexture) {
+    return;
+  }
+
+  Uint8Array data(static_cast<size_t>(_rawTextureWidth) * 4);
+  auto tmpColor = Tmp::Color3Array[0];
+
+  for (size_t x = 0; x < static_cast<size_t>(_rawTextureWidth); ++x) {
+    auto ratio = static_cast<float>(x) / static_cast<float>(_rawTextureWidth);
+
+    Tools::GetCurrentGradient<Color3Gradient>(
+      ratio, _rampGradients,
+      [&](Color3Gradient& currentGradient, Color3Gradient& nextGradient,
+          float scale) {
+        Color3::LerpToRef(currentGradient.color, nextGradient.color, scale,
+                          tmpColor);
+        data[x * 4]     = static_cast<uint8_t>(tmpColor.r * 255);
+        data[x * 4 + 1] = static_cast<uint8_t>(tmpColor.g * 255);
+        data[x * 4 + 2] = static_cast<uint8_t>(tmpColor.b * 255);
+        data[x * 4 + 3] = 255;
+      });
+  }
+
+  _rampGradientsTexture = RawTexture::CreateRGBATexture(
+    data, _rawTextureWidth, 1, _scene, false, false,
+    TextureConstants::NEAREST_SAMPLINGMODE);
+}
+
+std::vector<Color3Gradient>& ParticleSystem::getRampGradients()
+{
+  return _rampGradients;
+}
+
+IParticleSystem& ParticleSystem::addRampGradient(float gradient,
+                                                 const Color3& color)
+{
+  Color3Gradient rampGradient;
+  rampGradient.gradient = gradient;
+  rampGradient.color    = color;
+  _rampGradients.emplace_back(rampGradient);
+
+  std::sort(_rampGradients.begin(), _rampGradients.end(),
+            [](const Color3Gradient& a, const Color3Gradient& b) {
+              if (a.gradient < b.gradient) {
+                return -1;
+              }
+              else if (a.gradient > b.gradient) {
+                return 1;
+              }
+
+              return 0;
+            });
+
+  if (_rampGradientsTexture) {
+    _rampGradientsTexture->dispose();
+    _rampGradientsTexture = nullptr;
+  }
+
+  _createRampGradientTexture();
+
+  return *this;
+}
+
+IParticleSystem& ParticleSystem::removeRampGradient(float gradient)
+{
+  _removeGradientAndTexture(gradient, _rampGradients, _rampGradientsTexture);
+  _rampGradientsTexture = nullptr;
+
+  if (!_rampGradients.empty()) {
+    _createRampGradientTexture();
+  }
+
+  return *this;
+}
+
+IParticleSystem&
+ParticleSystem::addColorGradient(float gradient, const Color4& color1,
                                  const std::optional<Color4>& color2)
 {
   ColorGradient colorGradient;
   colorGradient.gradient = gradient;
-  colorGradient.color1   = color;
+  colorGradient.color1   = color1;
   colorGradient.color2   = color2;
   _colorGradients.emplace_back(colorGradient);
 
@@ -516,8 +723,13 @@ void ParticleSystem::_createVertexBuffers()
     _vertexBufferSize += 1;
   }
 
-  if (!_isBillboardBased) {
+  if (!_isBillboardBased
+      || billboardMode == ParticleSystem::BILLBOARDMODE_STRETCHED) {
     _vertexBufferSize += 3;
+  }
+
+  if (_useRampGradients) {
+    _vertexBufferSize += 4;
   }
 
   auto engine = _scene->getEngine();
@@ -557,13 +769,23 @@ void ParticleSystem::_createVertexBuffers()
     dataOffset += 1;
   }
 
-  if (!_isBillboardBased) {
+  if (!_isBillboardBased
+      || billboardMode == ParticleSystem::BILLBOARDMODE_STRETCHED) {
     auto directionBuffer = _vertexBuffer->createVertexBuffer(
       VertexBuffer::DirectionKind, dataOffset, 3, _vertexBufferSize,
       _useInstancing);
     _vertexBuffers[VertexBuffer::DirectionKindChars]
       = std::move(directionBuffer);
     dataOffset += 3;
+  }
+
+  if (_useRampGradients) {
+    auto rampDataBuffer = _vertexBuffer->createVertexBuffer(
+      VertexBuffer::RemapDataKind, dataOffset, 4, _vertexBufferSize,
+      _useInstancing);
+    _vertexBuffers[VertexBuffer::RemapDataKindChars]
+      = std::move(rampDataBuffer);
+    dataOffset += 4;
   }
 
   std::unique_ptr<VertexBuffer> offsets = nullptr;
@@ -616,17 +838,51 @@ bool ParticleSystem::isStarted() const
   return _started;
 }
 
+void ParticleSystem::_prepareSubEmitterInternalArray()
+{
+}
+
 void ParticleSystem::start(size_t delay)
 {
+  if (!targetStopDuration && _hasTargetStopDurationDependantGradient()) {
+    throw std::runtime_error(
+      "Particle system started with a targetStopDuration dependant gradient "
+      "(eg. startSizeGradients) but no targetStopDuration set");
+  }
   if (delay > 0) {
     // Timeout
   }
+  // Convert the subEmitters field to the constant type field _subEmitters
+  _prepareSubEmitterInternalArray();
 
   _started     = true;
   _stopped     = false;
   _actualFrame = 0;
-  if (!subEmitters.empty()) {
+  if (!_subEmitters.empty()) {
     activeSubSystems.clear();
+  }
+
+  // Reset emit gradient so it acts the same on every start
+  if (!_emitRateGradients.empty()) {
+    if (_emitRateGradients.size() > 0) {
+      _currentEmitRateGradient = _emitRateGradients[0];
+      _currentEmitRate1        = _currentEmitRateGradient->getFactor();
+      _currentEmitRate2        = _currentEmitRate1;
+    }
+    if (_emitRateGradients.size() > 1) {
+      _currentEmitRate2 = _emitRateGradients[1].getFactor();
+    }
+  }
+  // Reset start size gradient so it acts the same on every start
+  if (!_startSizeGradients.empty()) {
+    if (_startSizeGradients.size() > 0) {
+      _currentStartSizeGradient = _startSizeGradients[0];
+      _currentStartSize1        = _currentStartSizeGradient->getFactor();
+      _currentStartSize2        = _currentStartSize1;
+    }
+    if (_startSizeGradients.size() > 1) {
+      _currentStartSize2 = _startSizeGradients[1].getFactor();
+    }
   }
 
   if (preWarmCycles) {
@@ -692,6 +948,18 @@ void ParticleSystem::_appendParticleVertex(unsigned int index,
       _vertexData[offset++] = particle->direction.z;
     }
   }
+  else if (billboardMode == ParticleSystem::BILLBOARDMODE_STRETCHED) {
+    _vertexData[offset++] = particle->direction.x;
+    _vertexData[offset++] = particle->direction.y;
+    _vertexData[offset++] = particle->direction.z;
+  }
+
+  if (_useRampGradients) {
+    _vertexData[offset++] = particle->remapData.x;
+    _vertexData[offset++] = particle->remapData.y;
+    _vertexData[offset++] = particle->remapData.z;
+    _vertexData[offset++] = particle->remapData.w;
+  }
 
   if (!_useInstancing) {
     auto _offsetX = static_cast<float>(offsetX);
@@ -720,6 +988,7 @@ void ParticleSystem::_appendParticleVertex(unsigned int index,
 
 void ParticleSystem::recycleParticle(Particle* particle)
 {
+  // move particle from activeParticle list to stock particles
   auto lastParticle = _particles.back();
   _particles.pop_back();
 
@@ -746,13 +1015,15 @@ Particle* ParticleSystem::_createParticle()
   if (!_stockParticles.empty()) {
     particle = _stockParticles.back();
     _stockParticles.pop_back();
-    particle->age                   = 0;
-    particle->_currentColorGradient = std::nullopt;
-    particle->cellIndex             = startSpriteCellID;
+    particle->_reset();
   }
   else {
     particle = new Particle(this);
   }
+
+  // Attach emitters
+  // TODO FIXME
+
   return particle;
 }
 
@@ -766,11 +1037,13 @@ void ParticleSystem::_removeFromRoot()
     std::remove(_rootParticleSystem->activeSubSystems.begin(),
                 _rootParticleSystem->activeSubSystems.end(), this),
     _rootParticleSystem->activeSubSystems.end());
+
+  _rootParticleSystem = nullptr;
 }
 
 void ParticleSystem::_emitFromParticle(Particle* /*particle*/)
 {
-  if (subEmitters.empty()) {
+  if (_subEmitters.empty()) {
     return;
   }
 #if 0
@@ -888,6 +1161,26 @@ void ParticleSystem::_update(int newParticles)
     particle->scale.copyFromFloats(Scalar::RandomRange(minScaleX, maxScaleX),
                                    Scalar::RandomRange(minScaleY, maxScaleY));
 
+    // Adjust scale by start size
+    if (!_startSizeGradients.empty() && targetStopDuration) {
+      auto ratio = static_cast<float>(_actualFrame)
+                   / static_cast<float>(targetStopDuration);
+      Tools::GetCurrentGradient<FactorGradient>(
+        ratio, _startSizeGradients,
+        [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+            float scale) {
+          if (currentGradient != _currentStartSizeGradient) {
+            _currentStartSize1        = _currentStartSize2;
+            _currentStartSize2        = nextGradient.getFactor();
+            _currentStartSizeGradient = currentGradient;
+          }
+
+          auto value
+            = Scalar::Lerp(_currentStartSize1, _currentStartSize2, scale);
+          particle->scale.scaleInPlace(value);
+        });
+    }
+
     // Angle
     if (!_angularSpeedGradients.empty()) {
       particle->angularSpeed
@@ -979,12 +1272,39 @@ void ParticleSystem::_update(int newParticles)
       particle->_initialStartSpriteCellID = startSpriteCellID;
       particle->_initialEndSpriteCellID   = endSpriteCellID;
     }
+
+    // Inherited Velocity
+    particle->direction.addInPlace(_inheritedVelocityOffset);
+
+    // Ramp
+    if (_useRampGradients) {
+      particle->remapData = Vector4(0.f, 1.f, 0.f, 1.f);
+    }
+
+    // Noise texture coordinates
+    if (noiseTexture) {
+      if (particle->_randomNoiseCoordinates1.has_value()) {
+        particle->_randomNoiseCoordinates1->copyFromFloats(
+          Math::random(), Math::random(), Math::random());
+        particle->_randomNoiseCoordinates2.copyFromFloats(
+          Math::random(), Math::random(), Math::random());
+      }
+      else {
+        particle->_randomNoiseCoordinates1
+          = Vector3(Math::random(), Math::random(), Math::random());
+        particle->_randomNoiseCoordinates2
+          = Vector3(Math::random(), Math::random(), Math::random());
+      }
+    }
+
+    // Update the position of the attached sub-emitters to match their attached
+    // particle
+    particle->_inheritParticleInfoToSubEmitters();
   }
 }
 
-std::vector<std::string>
-ParticleSystem::_GetAttributeNamesOrOptions(bool isAnimationSheetEnabled,
-                                            bool isBillboardBased)
+std::vector<std::string> ParticleSystem::_GetAttributeNamesOrOptions(
+  bool isAnimationSheetEnabled, bool isBillboardBased, bool useRampGradients)
 {
   std::vector<std::string> attributeNamesOrOptions{
     VertexBuffer::PositionKindChars, VertexBuffer::ColorKindChars, "angle",
@@ -996,6 +1316,10 @@ ParticleSystem::_GetAttributeNamesOrOptions(bool isAnimationSheetEnabled,
 
   if (!isBillboardBased) {
     attributeNamesOrOptions.emplace_back("direction");
+  }
+
+  if (useRampGradients) {
+    attributeNamesOrOptions.emplace_back("remapData");
   }
 
   return attributeNamesOrOptions;
@@ -1016,7 +1340,7 @@ ParticleSystem::_GetEffectCreationOptions(bool isAnimationSheetEnabled)
   return effectCreationOption;
 }
 
-EffectPtr ParticleSystem::_getEffect()
+EffectPtr ParticleSystem::_getEffect(unsigned int blendMode)
 {
   if (_customEffect) {
     return _customEffect;
@@ -1044,14 +1368,25 @@ EffectPtr ParticleSystem::_getEffect()
     defines.emplace_back("#define ANIMATESHEET");
   }
 
+  if (blendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
+    defines.emplace_back("#define BLENDMULTIPLYMODE");
+  }
+
+  if (_useRampGradients) {
+    defines.emplace_back("#define RAMPGRADIENT");
+  }
+
   if (_isBillboardBased) {
     defines.emplace_back("#define BILLBOARD");
 
     switch (billboardMode) {
-      case AbstractMesh::BILLBOARDMODE_Y:
+      case ParticleSystem::BILLBOARDMODE_Y:
         defines.emplace_back("#define BILLBOARDY");
         break;
-      case AbstractMesh::BILLBOARDMODE_ALL:
+      case ParticleSystem::BILLBOARDMODE_STRETCHED:
+        defines.emplace_back("#define BILLBOARDSTRETCHED");
+        break;
+      case ParticleSystem::BILLBOARDMODE_ALL:
       default:
         break;
     }
@@ -1069,11 +1404,14 @@ EffectPtr ParticleSystem::_getEffect()
     _cachedDefines = join;
 
     auto attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions(
-      _isAnimationSheetEnabled, _isBillboardBased);
+      _isAnimationSheetEnabled,
+      _isBillboardBased
+        && billboardMode != ParticleSystem::BILLBOARDMODE_STRETCHED,
+      _useRampGradients);
     auto effectCreationOption
       = ParticleSystem::_GetEffectCreationOptions(_isAnimationSheetEnabled);
 
-    std::vector<std::string> samplers{"diffuseSampler"};
+    std::vector<std::string> samplers{"diffuseSampler", "rampSampler"};
 
     // if (ImageProcessingConfiguration)
     {
@@ -1103,13 +1441,10 @@ void ParticleSystem::animate(bool preWarmOnly)
   }
 
   if (!preWarmOnly) {
-    auto effect = _getEffect();
-
     // Check
-    if (!hasEmitter() || !_imageProcessingConfiguration->isReady()
-        || !effect->isReady() || !particleTexture
-        || !particleTexture->isReady())
+    if (!isReady()) {
       return;
+    }
 
     if (_currentRenderId == _scene->getRenderId()) {
       return;
@@ -1121,7 +1456,7 @@ void ParticleSystem::animate(bool preWarmOnly)
     updateSpeed
     * (preWarmOnly ? preWarmStepOffset : _scene->getAnimationRatio()));
 
-  // determine the number of particles we need to create
+  // Determine the number of particles we need to create
   int newParticles = 0;
 
   if (manualEmitCount > -1) {
@@ -1130,8 +1465,27 @@ void ParticleSystem::animate(bool preWarmOnly)
     manualEmitCount = 0;
   }
   else {
-    newParticles = ((emitRate * _scaledUpdateSpeed) >> 0);
-    _newPartsExcess += emitRate * _scaledUpdateSpeed - newParticles;
+    auto rate = static_cast<float>(emitRate);
+
+    if (!_emitRateGradients.empty() && targetStopDuration) {
+      auto ratio = static_cast<float>(_actualFrame)
+                   / static_cast<float>(targetStopDuration);
+      Tools::GetCurrentGradient<FactorGradient>(
+        ratio, _emitRateGradients,
+        [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
+            float scale) {
+          if (currentGradient != _currentEmitRateGradient) {
+            _currentEmitRate1        = _currentEmitRate2;
+            _currentEmitRate2        = nextGradient.getFactor();
+            _currentEmitRateGradient = currentGradient;
+          }
+
+          rate = Scalar::Lerp(_currentEmitRate1, _currentEmitRate2, scale);
+        });
+    }
+
+    newParticles = static_cast<int>(rate * _scaledUpdateSpeed);
+    _newPartsExcess += rate * _scaledUpdateSpeed - newParticles;
   }
 
   if (_newPartsExcess > 1) {
@@ -1144,8 +1498,9 @@ void ParticleSystem::animate(bool preWarmOnly)
   if (!_stopped) {
     _actualFrame += _scaledUpdateSpeed;
 
-    if (targetStopDuration && _actualFrame >= targetStopDuration)
+    if (targetStopDuration && _actualFrame >= targetStopDuration) {
       stop();
+    }
   }
   else {
     newParticles = 0;
@@ -1205,30 +1560,38 @@ void ParticleSystem::rebuild()
 
 bool ParticleSystem::isReady()
 {
-  auto effect = _getEffect();
-  if (!hasEmitter() || !_imageProcessingConfiguration->isReady()
-      || !effect->isReady() || !particleTexture
+  if (!std::holds_alternative<AbstractMeshPtr>(emitter)
+      || !std::holds_alternative<Vector3>(emitter)
+      || !_imageProcessingConfiguration->isReady() || !particleTexture
       || !particleTexture->isReady()) {
     return false;
+  }
+
+  if (blendMode != ParticleSystem::BLENDMODE_MULTIPLYADD) {
+    if (!_getEffect(blendMode)->isReady()) {
+      return false;
+    }
+  }
+  else {
+    if (!_getEffect(ParticleSystem::BLENDMODE_MULTIPLY)->isReady()) {
+      return false;
+    }
+    if (!_getEffect(ParticleSystem::BLENDMODE_ADD)->isReady()) {
+      return false;
+    }
   }
 
   return true;
 }
 
-size_t ParticleSystem::render(bool /*preWarm*/)
+size_t ParticleSystem::_render(unsigned int blendMode)
 {
-  auto effect = _getEffect();
-
-  // Check
-  if (!isReady() || _particles.empty()) {
-    return 0;
-  }
+  auto effect = _getEffect(blendMode);
 
   auto engine = _scene->getEngine();
 
   // Render
   engine->enableEffect(effect);
-  engine->setState(false);
 
   auto viewMatrix = _scene->getViewMatrix();
   effect->setTexture("diffuseSampler", particleTexture);
@@ -1250,6 +1613,10 @@ size_t ParticleSystem::render(bool /*preWarm*/)
   if (_isBillboardBased) {
     auto camera = _scene->activeCamera;
     effect->setVector3("eyePosition", camera->globalPosition);
+  }
+
+  if (_rampGradientsTexture) {
+    effect->setTexture("rampSampler", _rampGradientsTexture);
   }
 
   if (_scene->clipPlane.has_value() || _scene->clipPlane2.has_value()
@@ -1275,32 +1642,59 @@ size_t ParticleSystem::render(bool /*preWarm*/)
   }
 
   // Draw order
-  if (blendMode == ParticleSystem::BLENDMODE_ADD) {
-    engine->setAlphaMode(EngineConstants::ALPHA_ADD);
-  }
-  else if (blendMode == ParticleSystem::BLENDMODE_ONEONE) {
-    engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
-  }
-  else if (blendMode == ParticleSystem::BLENDMODE_STANDARD) {
-    engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
-  }
-
-  if (forceDepthWrite) {
-    engine->setDepthWrite(true);
+  switch (blendMode) {
+    case ParticleSystem::BLENDMODE_ADD:
+      engine->setAlphaMode(EngineConstants::ALPHA_ADD);
+      break;
+    case ParticleSystem::BLENDMODE_ONEONE:
+      engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
+      break;
+    case ParticleSystem::BLENDMODE_STANDARD:
+      engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+      break;
+    case ParticleSystem::BLENDMODE_MULTIPLY:
+      engine->setAlphaMode(EngineConstants::ALPHA_MULTIPLY);
+      break;
   }
 
   if (_useInstancing) {
     engine->drawArraysType(Material::TriangleFanDrawMode(), 0, 4,
                            static_cast<int>(_particles.size()));
-    engine->unbindInstanceAttributes();
   }
   else {
     engine->drawElementsType(Material::TriangleFillMode(), 0,
                              static_cast<int>(_particles.size() * 6));
   }
-  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 
   return _particles.size();
+}
+
+size_t ParticleSystem::render(bool /*preWarm*/)
+{
+  // Check
+  if (!isReady() || !_particles.empty()) {
+    return 0;
+  }
+
+  auto engine = _scene->getEngine();
+  engine->setState(false);
+
+  if (forceDepthWrite) {
+    engine->setDepthWrite(true);
+  }
+
+  size_t outparticles = 0;
+
+  if (blendMode == ParticleSystem::BLENDMODE_MULTIPLYADD) {
+    outparticles = _render(ParticleSystem::BLENDMODE_MULTIPLY)
+                   + _render(ParticleSystem::BLENDMODE_ADD);
+  }
+  outparticles = _render(blendMode);
+
+  engine->unbindInstanceAttributes();
+  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+
+  return outparticles;
 }
 
 void ParticleSystem::dispose(bool disposeTexture,
@@ -1331,7 +1725,28 @@ void ParticleSystem::dispose(bool disposeTexture,
     noiseTexture = nullptr;
   }
 
+  if (_rampGradientsTexture) {
+    _rampGradientsTexture->dispose();
+    _rampGradientsTexture = nullptr;
+  }
+
   _removeFromRoot();
+
+  if (!_subEmitters.empty()) {
+    for (size_t index = 0; index < _subEmitters.size(); ++index) {
+      for (auto& subEmitter : _subEmitters[index]) {
+        subEmitter->dispose();
+      }
+    }
+
+    _subEmitters.clear();
+    subEmitters.clear();
+  }
+
+  if (_disposeEmitterOnDispose
+      && std::holds_alternative<AbstractMeshPtr>(emitter)) {
+    std::get<AbstractMeshPtr>(emitter)->dispose(true);
+  }
 
   // Remove from scene
   _scene->particleSystems.erase(
@@ -1342,9 +1757,13 @@ void ParticleSystem::dispose(bool disposeTexture,
                    }),
     _scene->particleSystems.end());
 
+  _scene->_activeParticleSystems.clear();
+
   // Callback
   onDisposeObservable.notifyObservers(this);
   onDisposeObservable.clear();
+
+  reset();
 }
 
 std::vector<AnimationPtr> ParticleSystem::getAnimations()

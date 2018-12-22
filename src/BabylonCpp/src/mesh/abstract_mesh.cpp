@@ -107,7 +107,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
                 &AbstractMesh::set_layerMask}
     , alwaysSelectAsActiveMesh{false}
     , actionManager{nullptr}
-    , physicsImpostor{nullptr}
+    , physicsImpostor{this, &AbstractMesh::get_physicsImpostor,
+                      &AbstractMesh::set_physicsImpostor}
     , ellipsoid{Vector3(0.5f, 1.f, 0.5f)}
     , ellipsoidOffset{Vector3(0, 0, 0)}
     , collisionMask{this, &AbstractMesh::get_collisionMask,
@@ -162,6 +163,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _collider{nullptr}
     , _oldPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _diffPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
+    , _physicsImpostor{nullptr}
+    , _disposePhysicsObserver{nullptr}
     , _collisionsTransformMatrix{Matrix::Zero()}
     , _collisionsScalingMatrix{Matrix::Zero()}
     , _skeleton{nullptr}
@@ -667,8 +670,8 @@ Vector3& AbstractMesh::get_scaling()
 void AbstractMesh::set_scaling(const Vector3& newScaling)
 {
   _scaling = newScaling;
-  if (physicsImpostor) {
-    physicsImpostor->forceUpdate();
+  if (_physicsImpostor) {
+    _physicsImpostor->forceUpdate();
   }
 }
 
@@ -1043,9 +1046,9 @@ bool AbstractMesh::intersectsPoint(const Vector3& point)
   return _boundingInfo->intersectsPoint(point);
 }
 
-PhysicsImpostor* AbstractMesh::getPhysicsImpostor()
+PhysicsImpostorPtr& AbstractMesh::getPhysicsImpostor()
 {
-  return physicsImpostor ? physicsImpostor.get() : nullptr;
+  return physicsImpostor;
 }
 
 Vector3 AbstractMesh::getPositionInCameraSpace(CameraPtr camera)
@@ -1070,23 +1073,29 @@ float AbstractMesh::getDistanceToCamera(CameraPtr camera)
 AbstractMesh& AbstractMesh::applyImpulse(const Vector3& force,
                                          const Vector3& contactPoint)
 {
-  if (!physicsImpostor) {
+  if (!_physicsImpostor) {
     return *this;
   }
 
-  physicsImpostor->applyImpulse(force, contactPoint);
-
+  _physicsImpostor->applyImpulse(force, contactPoint);
   return *this;
 }
 
 AbstractMesh& AbstractMesh::setPhysicsLinkWith(Mesh* otherMesh,
-                                               const Vector3& /*pivot1*/,
-                                               const Vector3& /*pivot2*/,
-                                               const PhysicsParams& /*options*/)
+                                               const Vector3& pivot1,
+                                               const Vector3& pivot2,
+                                               const PhysicsParams& options)
 {
-  if (!physicsImpostor || !otherMesh->physicsImpostor) {
+  if (!_physicsImpostor || !otherMesh->_physicsImpostor) {
     return *this;
   }
+
+  PhysicsJointData jointData;
+  jointData.mainPivot      = pivot1;
+  jointData.connectedPivot = pivot2;
+  jointData.nativeParams   = options;
+  _physicsImpostor->createJoint(otherMesh->physicsImpostor(),
+                                PhysicsJoint::HingeJoint, jointData);
 
   return *this;
 }
@@ -1112,6 +1121,34 @@ std::unique_ptr<Collider>& AbstractMesh::get_collider()
 bool AbstractMesh::get_renderOutline() const
 {
   return _renderOutline;
+}
+
+PhysicsImpostorPtr& AbstractMesh::get_physicsImpostor()
+{
+  return _physicsImpostor;
+}
+
+void AbstractMesh::set_physicsImpostor(const PhysicsImpostorPtr& value)
+{
+  if (_physicsImpostor == value) {
+    return;
+  }
+  if (_disposePhysicsObserver) {
+    onDisposeObservable.remove(_disposePhysicsObserver);
+  }
+
+  _physicsImpostor = value;
+
+  if (value) {
+    _disposePhysicsObserver
+      = onDisposeObservable.add([this](Node* /*node*/, EventState& /*es*/) {
+          // Physics
+          if (_physicsImpostor) {
+            _physicsImpostor->dispose(/*!doNotRecurse*/);
+            physicsImpostor = nullptr;
+          }
+        });
+  }
 }
 
 void AbstractMesh::set_renderOutline(bool value)
@@ -1417,8 +1454,8 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _skeleton = nullptr;
 
   // Physics
-  if (physicsImpostor) {
-    physicsImpostor->dispose(/*!doNotRecurse*/);
+  if (_physicsImpostor) {
+    _physicsImpostor->dispose(/*!doNotRecurse*/);
   }
 
   // Intersections in progress

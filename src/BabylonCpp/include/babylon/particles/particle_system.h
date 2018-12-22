@@ -35,6 +35,21 @@ class BABYLON_SHARED_EXPORT ParticleSystem : public BaseParticleSystem,
 
 public:
   /**
+   * Billboard mode will only apply to Y axis
+   */
+  static constexpr unsigned int BILLBOARDMODE_Y = 2;
+  /**
+   * Billboard mode will apply to all axes
+   */
+  static constexpr unsigned int BILLBOARDMODE_ALL = 7;
+  /**
+   * Special billboard mode where the particle will be biilboard to the camera
+   * but rotated to align with direction
+   */
+  static constexpr unsigned int BILLBOARDMODE_STRETCHED = 8;
+
+public:
+  /**
    * @brief Instantiates a particle system.
    * Particles are often small sprites used to simulate hard-to-reproduce
    * phenomena like fire, smoke, water, or abstract visual effects like magic
@@ -53,13 +68,11 @@ public:
                  bool isAnimationSheetEnabled = false, float epsilon = 0.01f);
   virtual ~ParticleSystem() override;
 
-  virtual IReflect::Type type() const override;
-
   /**
-   * @brief Get hosting scene.
-   * @returns the scene
+   * @brief Returns the object type.
+   * @return the object type
    */
-  Scene* getScene() const;
+  virtual IReflect::Type type() const override;
 
   /**
    * @brief Adds a new life time gradient.
@@ -72,14 +85,14 @@ public:
    */
   IParticleSystem& addLifeTimeGradient(float gradient, float factor,
                                        const std::optional<float>& factor2
-                                       = std::nullopt);
+                                       = std::nullopt) override;
 
   /**
    * @brief Remove a specific life time gradient.
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
-  IParticleSystem& removeLifeTimeGradient(float gradient);
+  IParticleSystem& removeLifeTimeGradient(float gradient) override;
 
   /**
    * @brief Adds a new size gradient.
@@ -99,6 +112,40 @@ public:
    * @returns the current particle system
    */
   IParticleSystem& removeSizeGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new color remap gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param min defines the color remap minimal range
+   * @param max defines the color remap maximal range
+   * @returns the current particle system
+   */
+  IParticleSystem& addColorRemapGradient(float gradient, float min,
+                                         float max) override;
+
+  /**
+   * @brief Remove a specific color remap gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeColorRemapGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new alpha remap gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param min defines the alpha remap minimal range
+   * @param max defines the alpha remap maximal range
+   * @returns the current particle system
+   */
+  IParticleSystem& addAlphaRemapGradient(float gradient, float min,
+                                         float max) override;
+
+  /**
+   * @brief Remove a specific alpha remap gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeAlphaRemapGradient(float gradient) override;
 
   /**
    * @brief Adds a new angular speed gradient.
@@ -179,19 +226,86 @@ public:
   IParticleSystem& removeDragGradient(float gradient) override;
 
   /**
-   * @brief Adds a new color gradient.
+   * @brief Adds a new emit rate gradient (please note that this will only work
+   * if you set the targetStopDuration property).
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the emit rate value to affect to the specified
+   * gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  IParticleSystem& addEmitRateGradient(float gradient, float factor,
+                                       const std::optional<float>& factor2
+                                       = std::nullopt) override;
+
+  /**
+   * @brief  Remove a specific emit rate gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeEmitRateGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new start size gradient (please note that this will only work
+   * if you set the targetStopDuration property).
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param factor defines the start size value to affect to the specified
+   * gradient
+   * @param factor2 defines an additional factor used to define a range
+   * ([factor, factor2]) with main value to pick the final value from
+   * @returns the current particle system
+   */
+  IParticleSystem& addStartSizeGradient(float gradient, float factor,
+                                        const std::optional<float>& factor2
+                                        = std::nullopt) override;
+
+  /**
+   * @brief Remove a specific start size gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeStartSizeGradient(float gradient) override;
+
+  /**
+   * @brief Gets the current list of ramp gradients.
+   * You must use addRampGradient and removeRampGradient to udpate this list
+   * @returns the list of ramp gradients
+   */
+  std::vector<Color3Gradient>& getRampGradients() override;
+
+  /**
+   * @brief Adds a new ramp gradient used to remap particle colors.
    * @param gradient defines the gradient to use (between 0 and 1)
    * @param color defines the color to affect to the specified gradient
+   * @returns the current particle system
+   */
+  IParticleSystem& addRampGradient(float gradient,
+                                   const Color3& color) override;
+
+  /**
+   * @brief Remove a specific ramp gradient.
+   * @param gradient defines the gradient to remove
+   * @returns the current particle system
+   */
+  IParticleSystem& removeRampGradient(float gradient) override;
+
+  /**
+   * @brief Adds a new color gradient.
+   * @param gradient defines the gradient to use (between 0 and 1)
+   * @param color1 defines the color to affect to the specified gradient
    * @param color2 defines an additional color used to define a range ([color,
    * color2]) with main color to pick the final color from
+   * @returns this particle system
    */
-  IParticleSystem& addColorGradient(float gradient, const Color4& color,
+  IParticleSystem& addColorGradient(float gradient, const Color4& color1,
                                     const std::optional<Color4>& color2
                                     = std::nullopt) override;
 
   /**
    * @brief Remove a specific color gradient.
    * @param gradient defines the gradient to remove
+   * @returns this particle system
    */
   IParticleSystem& removeColorGradient(float gradient) override;
 
@@ -219,7 +333,8 @@ public:
   bool isAlive() const;
 
   /**
-   * @brief Gets whether the system has been started.
+   * @brief Gets if the system has been started. (Note: this will still be true
+   * after stop is called).
    * @returns True if it has been started, otherwise false.
    */
   bool isStarted() const override;
@@ -227,7 +342,7 @@ public:
   /**
    * @brief Starts the particle system and begins to emit.
    * @param delay defines the delay in milliseconds before starting the system
-   * (0 by default)
+   * (this.startDelay by default)
    */
   void start(size_t delay = 0) override;
 
@@ -268,7 +383,8 @@ public:
    */
   static std::vector<std::string>
   _GetAttributeNamesOrOptions(bool isAnimationSheetEnabled = false,
-                              bool isBillboardBased        = false);
+                              bool isBillboardBased        = false,
+                              bool useRampGradients        = false);
 
   /**
    * @brief Hidden
@@ -304,6 +420,8 @@ public:
 
   /**
    * @brief Renders the particle system in its current state.
+   * @param preWarm defines if the system should only update the particles but
+   * not render them
    * @returns the current number of particles
    */
   size_t render(bool preWarm = false) override;
@@ -363,6 +481,16 @@ protected:
   void set_onDispose(
     const std::function<void(ParticleSystem*, EventState&)>& callback);
 
+  /** @brief Gets a boolean indicating that ramp gradients must be used.
+   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   */
+  bool get_useRampGradients() const override;
+
+  /** @brief Sets a boolean indicating that ramp gradients must be used.
+   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   */
+  void set_useRampGradients(bool value) override;
+
   void _reset() override;
 
 private:
@@ -373,9 +501,11 @@ private:
                           const std::optional<float>& factor2 = std::nullopt);
   void _removeFactorGradient(std::vector<FactorGradient>& factorGradients,
                              float gradient);
+  void _createRampGradientTexture();
   void _resetEffect();
   void _createVertexBuffers();
   void _createIndexBuffer();
+  void _prepareSubEmitterInternalArray();
   // Start of sub system methods
   void _stopSubEmitters();
   Particle* _createParticle();
@@ -383,8 +513,9 @@ private:
   void _emitFromParticle(Particle* particle);
   // End of sub system methods
   void _update(int newParticles);
-  EffectPtr _getEffect();
+  EffectPtr _getEffect(unsigned int blendMode);
   void _appendParticleVertices(unsigned int offset, Particle* particle);
+  size_t _render(unsigned int blendMode);
 
 public:
   /**
@@ -418,6 +549,11 @@ public:
     startPositionFunction;
 
   /**
+   * Hidden
+   */
+  Vector3 _inheritedVelocityOffset;
+
+  /**
    * An event triggered when the system is disposed
    */
   Observable<ParticleSystem> onDisposeObservable;
@@ -429,15 +565,37 @@ public:
                     std::function<void(ParticleSystem*, EventState&)>>
     onDispose;
 
-  unsigned int _vertexBufferSize;
+  /** Hidden */
+  std::optional<FactorGradient> _currentEmitRateGradient;
+  /** Hidden */
+  float _currentEmitRate1;
+  /** Hidden */
+  float _currentEmitRate2;
+
+  /** Hidden */
+  std::optional<FactorGradient> _currentStartSizeGradient;
+  /** Hidden */
+  float _currentStartSize1;
+  /** Hidden */
+  float _currentStartSize2;
 
   // Sub-emitters
   /**
-   * this is the Sub-emitters templates that will be used to generate particle
-   * system when the particle dies, this property is used by the root particle
-   * system only.
+   * The Sub-emitters templates that will be used to generate the sub particle
+   * system to be associated with the system, this property is used by the root
+   * particle system only. When a particle is spawned, an array will be chosen
+   * at random and all the emitters in that array will be attached to the
+   * particle.  (Default: [])
    */
   std::vector<ParticleSystem*> subEmitters;
+
+  /**
+   * Hidden
+   * If the particle systems emitter should be disposed when the particle system
+   * is disposed
+   */
+  bool _disposeEmitterOnDispose;
+
   /**
    * The current active Sub-systems, this property is used by the root
    * particle system only.
@@ -472,10 +630,15 @@ private:
   bool _stopped;
   int _actualFrame;
   int _scaledUpdateSpeed;
+  unsigned int _vertexBufferSize;
+  int _rawTextureWidth;
+  RawTexturePtr _rampGradientsTexture;
+  bool _useRampGradients;
 
   std::function<void(unsigned int offset, Particle* particle)>
     _appendParticleVertexes;
 
+  std::vector<std::vector<ParticleSystem*>> _subEmitters;
   ParticleSystem* _rootParticleSystem;
   Vector3 _zeroVector3;
 

@@ -1948,6 +1948,39 @@ Engine::createEffect(std::unordered_map<std::string, std::string>& baseName,
   return effect;
 }
 
+EffectPtr Engine::createEffectForParticles(const std::string& fragmentName,
+                                           EffectCreationOptions& options)
+{
+  auto attributesNamesOrOptions = ParticleSystem::_GetAttributeNamesOrOptions();
+  auto effectCreationOption     = ParticleSystem::_GetEffectCreationOptions();
+
+  auto defines = options.defines;
+  if (!String::contains(defines, " BILLBOARD")) {
+    defines += "\n#define BILLBOARD\n";
+  }
+
+  auto samplers = options.samplers;
+  if (!stl_util::contains(samplers, "diffuseSampler")) {
+    samplers.emplace_back("diffuseSampler");
+  }
+
+  EffectCreationOptions effectOptions;
+  std::unordered_map<std::string, std::string> baseName{
+    {"vertex", "particles"},           //
+    {"fragmentElement", fragmentName}, //
+  };
+  effectOptions.attributes = options.attributes;
+  effectOptions.uniformsNames
+    = stl_util::concat(effectCreationOption, options.uniformsNames);
+  effectOptions.samplers   = std::move(samplers);
+  effectOptions.defines    = std::move(defines);
+  effectOptions.fallbacks  = std::move(options.fallbacks);
+  effectOptions.onCompiled = options.onCompiled;
+  effectOptions.onError    = options.onError;
+
+  return createEffect(baseName, effectOptions, this);
+}
+
 std::unique_ptr<GL::IGLShader>
 Engine::_compileShader(const std::string& source, const std::string& type,
                        const std::string& defines,

@@ -17,11 +17,21 @@ class Scene;
 using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
- * @brief Gravitational Field.
+ * @brief Represents a gravitational field event.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 class BABYLON_SHARED_EXPORT PhysicsGravitationalFieldEvent {
 
 public:
+  /**
+   * @brief Initializes the physics gravitational field event.
+   * @param physicsHelper A physics helper
+   * @param scene BabylonJS scene
+   * @param origin The origin position of the gravitational field event
+   * @param radius The radius of the gravitational field event
+   * @param strength The strength of the gravitational field event
+   * @param falloff The falloff for the gravitational field event
+   */
   PhysicsGravitationalFieldEvent(PhysicsHelper* physicsHelper, Scene* scene,
                                  const Vector3& origin, float radius,
                                  float strength,
@@ -31,7 +41,7 @@ public:
 
   /**
    * @brief Returns the data related to the gravitational field event (sphere).
-   * @returns {PhysicsGravitationalFieldEventData}
+   * @returns A gravitational field event
    */
   PhysicsGravitationalFieldEventData getData();
 
@@ -47,7 +57,7 @@ public:
 
   /**
    * @brief Disposes the sphere.
-   * @param {bolean} force
+   * @param force The force to dispose from the gravitational field event
    */
   void dispose(bool force = true);
 

@@ -1,33 +1,38 @@
-#ifndef BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_PARTICLE_EMITTER_H
-#define BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_PARTICLE_EMITTER_H
+#ifndef BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_DIRECTED_PARTICLE_EMITTER_H
+#define BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_DIRECTED_PARTICLE_EMITTER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
+#include <babylon/math/vector3.h>
+#include <babylon/particles/emittertypes/cylinder_particle_emitter.h>
 
 namespace BABYLON {
 
 /**
  * @brief Particle emitter emitting particles from the inside of a cylinder.
- * It emits the particles alongside the cylinder radius. The emission direction
- * might be randomized.
+ * It emits the particles randomly between two vectors.
  */
-class BABYLON_SHARED_EXPORT CylinderParticleEmitter
-    : public IParticleEmitterType {
+class BABYLON_SHARED_EXPORT CylinderDirectedParticleEmitter
+    : public CylinderParticleEmitter {
 
 public:
   /**
-   * @brief Creates a new instance CylinderParticleEmitter.
+   * @brief Creates a new instance CylinderDirectedParticleEmitter.
    * @param radius the radius of the emission cylinder (1 by default)
    * @param height the height of the emission cylinder (1 by default)
    * @param radiusRange the range of the emission cylinder [0-1] 0 Surface only,
    * 1 Entire Radius (1 by default)
-   * @param directionRandomizer defines how much to randomize the particle
-   * direction [0-1]
+   * @param direction1 the min limit of the emission direction (up vector by
+   * default)
+   * @param direction2 the max limit of the emission direction (up vector by
+   * default)
    */
-  CylinderParticleEmitter(float radius = 1.f, float height = 1.f,
-                          float radiusRange         = 1.f,
-                          float directionRandomizer = 0.f);
-  virtual ~CylinderParticleEmitter();
+  CylinderDirectedParticleEmitter(float radius = 1.f, float height = 1.f,
+                                  float radiusRange = 1.f,
+                                  const Vector3& direction1
+                                  = Vector3{0.f, 1.f, 0.f},
+                                  const Vector3& direction2
+                                  = Vector3{0.f, 1.f, 0.f});
+  ~CylinderDirectedParticleEmitter() override;
 
   /**
    * @brief Called by the particle System when the direction is computed for the
@@ -39,17 +44,6 @@ public:
   void startDirectionFunction(const Matrix& worldMatrix,
                               Vector3& directionToUpdate,
                               Particle* particle) override;
-
-  /**
-   * @brief Called by the particle System when the position is computed for the
-   * created particle.
-   * @param worldMatrix is the world matrix of the particle system
-   * @param positionToUpdate is the position vector to update with the result
-   * @param particle is the particle we are computed the position for
-   */
-  void startPositionFunction(const Matrix& worldMatrix,
-                             Vector3& positionToUpdate,
-                             Particle* particle) override;
 
   /**
    * @brief Clones the current emitter and returns a copy of it.
@@ -64,13 +58,13 @@ public:
   void applyToShader(Effect* effect) override;
 
   /**
-   * @brief Returns a string to use to update the GPU particles update shader.
+   * @brief Returns a string to use to update the GPU particles update shader
    * @returns a string containng the defines string
    */
   const char* getEffectDefines() const override;
 
   /**
-   * @brief Returns the string "CylinderParticleEmitter".
+   * @brief Returns the string "CylinderDirectedParticleEmitter".
    * @returns a string containing the class name
    */
   const char* getClassName() const override;
@@ -89,24 +83,17 @@ public:
 
 public:
   /**
-   * The radius of the emission cylinder.
+   * The min limit of the emission direction.
    */
-  float radius;
+  Vector3 direction1;
   /**
-   * The height of the emission cylinder.
+   * The max limit of the emission direction.
    */
-  float height;
-  /**
-   * The range of emission [0-1] 0 Surface only, 1 Entire Radius.
-   */
-  float radiusRange;
-  /**
-   * How much to randomize the particle direction [0-1].
-   */
-  float directionRandomizer;
+  Vector3 direction2;
 
 }; // end of class CylinderParticleEmitter
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_PARTICLE_EMITTER_H
+#endif // end of
+       // BABYLON_PARTICLES_EMITTER_TYPES_CYLINDER_DIRECTED_PARTICLE_EMITTER_H

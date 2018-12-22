@@ -1,12 +1,14 @@
 #include <babylon/engine/abstract_scene.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engine/asset_container.h>
 #include <babylon/engine/scene_component_constants.h>
 #include <babylon/layer/effect_layer.h>
 #include <babylon/layer/glow_layer.h>
 #include <babylon/layer/highlight_layer.h>
 #include <babylon/lensflare/lens_flare_system.h>
+#include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/particles/gpu_particle_system.h>
 #include <babylon/particles/particle_system.h>
 
@@ -29,13 +31,12 @@ AbstractScene::~AbstractScene()
 
 void AbstractScene::_addIndividualParsers()
 {
-#if 0
   // Particle system parser
   AbstractScene::AddIndividualParser(
     SceneComponentConstants::NAME_PARTICLESYSTEM,
-    [](const nlohmann::json& parsedParticleSystem, Scene* scene,
+    [](const json& parsedParticleSystem, Scene* scene,
        const std::string& rootUrl) -> any {
-      if (parsedParticleSystem.contains("activeParticleCount")) {
+      if (json_util::has_key(parsedParticleSystem, "activeParticleCount")) {
         auto ps
           = GPUParticleSystem::Parse(parsedParticleSystem, scene, rootUrl);
         return ps;
@@ -45,20 +46,18 @@ void AbstractScene::_addIndividualParsers()
         return ps;
       }
     });
-#endif
 }
 
 void AbstractScene::_addParsers()
 {
-#if 0
   // Effect layer parser
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_EFFECTLAYER,
     [](const nlohmann::json& parsedData, Scene* scene,
        AssetContainer& container, const std::string& rootUrl) {
-      if (parsedData.contains("effectLayers")) {
+      if (json_util::has_key(parsedData, "effectLayers")) {
         for (const auto& effectLayer :
-             Json::GetArray(parsedData, "effectLayers")) {
+             json_util::get_array<json>(parsedData, "effectLayers")) {
           auto parsedEffectLayer
             = EffectLayer::Parse(effectLayer, scene, rootUrl);
           container.effectLayers.emplace_back(parsedEffectLayer);
@@ -71,9 +70,9 @@ void AbstractScene::_addParsers()
     [](const nlohmann::json& parsedData, Scene* scene,
        AssetContainer& container, const std::string& rootUrl) {
       // Lens flares
-      if (parsedData.contains("lensFlareSystems")) {
+      if (json_util::has_key(parsedData, "lensFlareSystems")) {
         for (const auto& parsedLensFlareSystem :
-             Json::GetArray(parsedData, "lensFlareSystems")) {
+             json_util::get_array<json>(parsedData, "lensFlareSystems")) {
           auto lf
             = LensFlareSystem::Parse(parsedLensFlareSystem, scene, rootUrl);
           container.lensFlareSystems.emplace_back(lf);
@@ -92,9 +91,9 @@ void AbstractScene::_addParsers()
       }
 
       // Particles Systems
-      if (parsedData.contains("particleSystems")) {
+      if (json_util::has_key(parsedData, "particleSystems")) {
         for (const auto& parsedParticleSystem :
-             Json::GetArray(parsedData, "particleSystems")) {
+             json_util::get_array<json>(parsedData, "particleSystems")) {
           auto particleSystem
             = individualParser.value()(parsedParticleSystem, scene, rootUrl)
                 ._<ParticleSystem*>();
@@ -106,14 +105,16 @@ void AbstractScene::_addParsers()
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_SHADOWGENERATOR,
     [](const nlohmann::json& parsedData, Scene* scene,
-       AssetContainer& container, const std::string& rootUrl) {
-      auto individualParser = AbstractScene::GetIndividualParser(
-        SceneComponentConstants::NAME_PARTICLESYSTEM);
-      if (!individualParser) {
-        return;
+       AssetContainer& /*container*/, const std::string& /*rootUrl*/) {
+      // Shadows
+      if (json_util::has_key(parsedData, "shadowGenerators")) {
+        for (const auto& parsedShadowGenerator :
+             json_util::get_array<json>(parsedData, "shadowGenerators")) {
+          ShadowGenerator::Parse(parsedShadowGenerator, scene);
+          // SG would be available on their associated lights
+        }
       }
     });
-#endif
 }
 
 void AbstractScene::AddParser(const std::string& name,

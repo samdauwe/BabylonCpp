@@ -518,12 +518,14 @@ public:
   /**
    * @brief Returns an array populated with IParticleSystem objects whose the
    * mesh is the emitter.
+   * @returns an array of IParticleSystem
    */
   std::vector<IParticleSystemPtr> getEmittedParticleSystems();
 
   /**
    * @brief Returns an array populated with IParticleSystem objects whose the
    * mesh or its children are the emitter.
+   * @returns an array of IParticleSystem
    */
   std::vector<IParticleSystemPtr> getHierarchyEmittedParticleSystems();
 

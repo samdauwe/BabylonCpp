@@ -2,6 +2,7 @@
 #define BABYLON_PHYSICS_IPHYSICS_ENGINE_PLUGIN_H
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -18,6 +19,9 @@ struct PhysicsImpostorJoint;
 class Quaternion;
 class Vector3;
 
+/**
+ * @brief Hidden
+ */
 struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
   Mesh* world;
   std::string name;
@@ -45,10 +49,10 @@ struct BABYLON_SHARED_EXPORT IPhysicsEnginePlugin {
                                             const Quaternion& newRotation)
     = 0;
   virtual void setLinearVelocity(PhysicsImpostor* impostor,
-                                 const Vector3& velocity)
+                                 const std::optional<Vector3>& velocity)
     = 0;
   virtual void setAngularVelocity(PhysicsImpostor* impostor,
-                                  const Vector3& velocity)
+                                  const std::optional<Vector3>& velocity)
     = 0;
   virtual Vector3 getLinearVelocity(PhysicsImpostor* impostor)            = 0;
   virtual Vector3 getAngularVelocity(PhysicsImpostor* impostor)           = 0;

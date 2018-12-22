@@ -30,7 +30,7 @@ enum class SubEmitterType {
    * Created when the particle dies
    */
   END
-};
+}; // end of enum class SubEmitterType
 
 /**
  * @brief Sub emitter class used to emit particles from an existing particle.

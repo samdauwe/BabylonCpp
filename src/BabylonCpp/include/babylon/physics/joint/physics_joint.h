@@ -13,56 +13,126 @@ class Mesh;
 
 /**
  * @brief This is a holder class for the physics joint created by the physics
- * plugin. It holds a set of functions to control the underlying joint.
+ * plugin It holds a set of functions to control the underlying joint.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
  */
 class BABYLON_SHARED_EXPORT PhysicsJoint {
 
 public:
   // Joint Types
-  static constexpr unsigned int DistanceJoint      = 0;
-  static constexpr unsigned int HingeJoint         = 1;
+  /**
+   * Distance-Joint type
+   */
+  static constexpr unsigned int DistanceJoint = 0;
+  /**
+   * Hinge-Joint type
+   */
+  static constexpr unsigned int HingeJoint = 1;
+  /**
+   * Ball-and-Socket joint type
+   */
   static constexpr unsigned int BallAndSocketJoint = 2;
-  static constexpr unsigned int WheelJoint         = 3;
-  static constexpr unsigned int SliderJoint        = 4;
+  /**
+   * Wheel-Joint type
+   */
+  static constexpr unsigned int WheelJoint = 3;
+  /**
+   * Slider-Joint type
+   */
+  static constexpr unsigned int SliderJoint = 4;
   // OIMO
+  /**
+   * Prismatic-Joint type
+   */
   static constexpr unsigned int PrismaticJoint = 5;
-  // ENERGY FTW! (compare with this -
-  // http://ode-wiki.org/wiki/index.php?title=Manual:_Joint_Types_and_Functions)
+  //
+  /**
+   * Universal-Joint type
+   * ENERGY FTW! (compare with this
+   * @see
+   * http://ode-wiki.org/wiki/index.php?title=Manual:_Joint_Types_and_Functions)
+   */
   static constexpr unsigned int UniversalJoint = 6;
-  static constexpr unsigned int Hinge2Joint    = PhysicsJoint::WheelJoint;
+  /**
+   * Hinge-Joint 2 type
+   */
+  static constexpr unsigned int Hinge2Joint = PhysicsJoint::WheelJoint;
   // Cannon
-  // Similar to a Ball-Joint. Different in params
+  /**
+   * Point to Point Joint type.  Similar to a Ball-Joint.  Different in
+   * parameters
+   */
   static constexpr unsigned int PointToPointJoint = 8;
   // Cannon only at the moment
+  /**
+   * Spring-Joint type
+   */
   static constexpr unsigned int SpringJoint = 9;
-  static constexpr unsigned int LockJoint   = 10;
+  /**
+   * Lock-Joint type
+   */
+  static constexpr unsigned int LockJoint = 10;
 
 public:
+  /**
+   * @brief Initializes the physics joint.
+   * @param type The type of the physics joint
+   * @param jointData The data for the physics joint
+   */
   PhysicsJoint(unsigned int jointType, const PhysicsJointData& jointData);
   ~PhysicsJoint();
-
-  PhysicsJoint* physicsJoint();
-  void setPhysicsJoint(PhysicsJoint* newJoint);
-  void setPhysicsPlugin(IPhysicsEnginePlugin* physicsPlugin);
 
   /**
    * Execute a function that is physics-plugin specific.
    * @param {Function} func the function that will be executed.
    *                        It accepts two parameters: the physics world and the
-   * physics joint.
+   * physics joint
    */
   void executeNativeFunction(
     const std::function<void(Mesh* world, PhysicsJoint* physicsJoint)>& func);
 
+protected:
+  /**
+   * @brief Gets the physics joint.
+   */
+  PhysicsJoint*& get_physicsJoint();
+
+  /**
+   * @brief Sets the physics joint.
+   */
+  void set_physicsJoint(PhysicsJoint* const& newJoint);
+
+  /**
+   * @brief Sets the physics plugin.
+   */
+  void set_physicsPlugin(IPhysicsEnginePlugin* const& physicsPlugin);
+
 public:
-  unsigned int _jointType;
+  /**
+   * The type of the physics joint
+   */
+  unsigned int jointType;
+
+  /**
+   * The data for the physics joint
+   */
+  PhysicsJointData jointData;
+
+  /**
+   * Gets or sets the physics joint
+   */
+  Property<PhysicsJoint, PhysicsJoint*> physicsJoint;
+
+  /**
+   * Sets the physics plugin
+   */
+  WriteOnlyProperty<PhysicsJoint, IPhysicsEnginePlugin*> physicsPlugin;
 
 protected:
   IPhysicsEnginePlugin* _physicsPlugin;
 
 private:
   PhysicsJoint* _physicsJoint;
-  PhysicsJointData _jointData;
 
 }; // end of class PhysicsJoint
 

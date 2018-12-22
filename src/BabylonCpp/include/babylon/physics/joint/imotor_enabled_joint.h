@@ -7,11 +7,30 @@ namespace BABYLON {
 
 class PhysicsJoint;
 
+/**
+ * @brief Interface for a motor enabled joint.
+ * @see https://doc.babylonjs.com/how_to/using_the_physics_engine
+ */
 struct BABYLON_SHARED_EXPORT IMotorEnabledJoint {
+  /**
+   * Physics joint
+   */
   PhysicsJoint* physicsJoint;
+  /**
+   * @brief Sets the motor of the motor-enabled joint.
+   * @param force The force of the motor
+   * @param maxForce The maximum force of the motor
+   * @param motorIndex The index of the motor
+   */
   virtual void setMotor(float force, float maxForce,
                         unsigned int motorIndex = 0)
     = 0;
+  /**
+   * @brief Sets the limit of the motor.
+   * @param upperLimit The upper limit of the motor
+   * @param lowerLimit The lower limit of the motor
+   * @param motorIndex The index of the motor
+   */
   virtual void setLimit(float upperLimit, float lowerLimit,
                         unsigned int motorIndex = 0)
     = 0;

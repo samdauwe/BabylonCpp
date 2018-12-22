@@ -14,6 +14,7 @@
 #include <babylon/materials/image_processing_configuration_defines.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/material_helper.h>
+#include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/tmp.h>
@@ -23,6 +24,7 @@
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 #include <babylon/particles/particle_system.h>
+#include <babylon/tools/color3_gradient.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -36,13 +38,11 @@ bool GPUParticleSystem::IsSupported()
 }
 
 GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
-                                     std::optional<int> randomTextureSize,
+                                     std::optional<size_t> randomTextureSize,
                                      Scene* scene, bool isAnimationSheetEnabled)
     : BaseParticleSystem{iName}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
                           &GPUParticleSystem::set_activeParticleCount}
-    , isAnimationSheetEnabled{this,
-                              &GPUParticleSystem::get_isAnimationSheetEnabled}
     , _accumulatedCount{0}
     , _renderEffect{nullptr}
     , _updateEffect{nullptr}
@@ -86,22 +86,35 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
 
   scene->particleSystems.emplace_back(this);
 
-  _updateEffectOptions->attributes
-    = {"position", "age",      "life",      "seed",
-       "size",     "color",    "direction", "initialDirection",
-       "angle",    "cellIndex"};
+  _updateEffectOptions->attributes = {"position",
+                                      "age",
+                                      "life",
+                                      "seed",
+                                      "size",
+                                      "color",
+                                      "direction",
+                                      "initialDirection",
+                                      "angle",
+                                      "cellIndex",
+                                      "cellStartOffset",
+                                      "noiseCoordinates1",
+                                      "noiseCoordinates2"};
   _updateEffectOptions->uniformsNames
-    = {"currentCount", "timeDelta",  "emitterWM",    "lifeTime",
-       "color1",       "color2",     "sizeRange",    "scaleRange",
-       "gravity",      "emitPower",  "direction1",   "direction2",
-       "minEmitBox",   "maxEmitBox", "radius",       "directionRandomizer",
-       "height",       "coneAngle",  "stopFactor",   "angleRange",
-       "radiusRange",  "cellInfos",  "noiseStrength"};
-  _updateEffectOptions->uniformBuffersNames = {};
-  _updateEffectOptions->samplers
-    = {"randomSampler",           "randomSampler2",
-       "sizeGradientSampler",     "angularSpeedGradientSampler",
-       "velocityGradientSampler", "noiseSampler"};
+    = {"currentCount", "timeDelta",  "emitterWM",     "lifeTime",
+       "color1",       "color2",     "sizeRange",     "scaleRange",
+       "gravity",      "emitPower",  "direction1",    "direction2",
+       "minEmitBox",   "maxEmitBox", "radius",        "directionRandomizer",
+       "height",       "coneAngle",  "stopFactor",    "angleRange",
+       "radiusRange",  "cellInfos",  "noiseStrength", "limitVelocityDamping"};
+  _updateEffectOptions->uniformBuffersNames       = {};
+  _updateEffectOptions->samplers                  = {"randomSampler",
+                                    "randomSampler2",
+                                    "sizeGradientSampler",
+                                    "angularSpeedGradientSampler",
+                                    "velocityGradientSampler",
+                                    "limitVelocityGradientSampler",
+                                    "noiseSampler",
+                                    "dragGradientSampler"};
   _updateEffectOptions->defines                   = "";
   _updateEffectOptions->fallbacks                 = nullptr;
   _updateEffectOptions->onCompiled                = nullptr;
@@ -113,10 +126,10 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   particleEmitterType = std::make_unique<BoxParticleEmitter>();
 
   // Random data
-  auto maxTextureSize
-    = std::min(_engine->getCaps().maxTextureSize, *randomTextureSize);
+  auto maxTextureSize = std::min(
+    static_cast<size_t>(_engine->getCaps().maxTextureSize), *randomTextureSize);
   Float32Array d;
-  for (int i = 0; i < maxTextureSize; ++i) {
+  for (size_t i = 0; i < maxTextureSize; ++i) {
     d.emplace_back(Math::random());
     d.emplace_back(Math::random());
     d.emplace_back(Math::random());
@@ -130,7 +143,7 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
   d.clear();
-  for (int i = 0; i < maxTextureSize; ++i) {
+  for (size_t i = 0; i < maxTextureSize; ++i) {
     d.emplace_back(Math::random());
     d.emplace_back(Math::random());
     d.emplace_back(Math::random());
@@ -148,6 +161,11 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
 
 GPUParticleSystem::~GPUParticleSystem()
 {
+}
+
+IReflect::Type GPUParticleSystem::type() const
+{
+  return IReflect::Type::GPUPARTICLESYSTEM;
 }
 
 size_t GPUParticleSystem::getCapacity() const
@@ -189,12 +207,23 @@ bool GPUParticleSystem::isStarted() const
 
 void GPUParticleSystem::start(size_t delay)
 {
+  if (!targetStopDuration && _hasTargetStopDurationDependantGradient()) {
+    throw std::runtime_error(
+      "Particle system started with a targetStopDuration dependant gradient "
+      "(eg. startSizeGradients) but no targetStopDuration set");
+  }
   if (delay > 0) {
     // Timeout
   }
   _started     = true;
   _stopped     = false;
   _preWarmDone = false;
+
+  // Animations
+  if (beginAnimationOnStart && !animations.empty()) {
+    // getScene()->beginAnimation(this, beginAnimationFrom, beginAnimationTo,
+    //                            beginAnimationLoop);
+  }
 }
 
 void GPUParticleSystem::stop()
@@ -215,26 +244,33 @@ const char* GPUParticleSystem::getClassName() const
   return "GPUParticleSystem";
 }
 
-template <typename T>
-GPUParticleSystem& GPUParticleSystem::_removeGradient(float gradient,
-                                                      std::vector<T>& gradients,
-                                                      RawTexture* texture)
+BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
+  float gradient, std::vector<ColorGradient>& gradients,
+  const RawTexturePtr& texture)
 {
-  if (gradients.empty()) {
-    return *this;
-  }
+  BaseParticleSystem::_removeGradientAndTexture(gradient, gradients, texture);
 
-  gradients.erase(
-    std::remove_if(gradients.begin(), gradients.end(),
-                   [&gradient](const IValueGradient& valueGradient) {
-                     return stl_util::almost_equal(valueGradient.gradient,
-                                                   gradient);
-                   }),
-    gradients.end());
+  _releaseBuffers();
 
-  if (texture) {
-    texture->dispose();
-  }
+  return *this;
+}
+
+BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
+  float gradient, std::vector<Color3Gradient>& gradients,
+  const RawTexturePtr& texture)
+{
+  BaseParticleSystem::_removeGradientAndTexture(gradient, gradients, texture);
+
+  _releaseBuffers();
+
+  return *this;
+}
+
+BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
+  float gradient, std::vector<FactorGradient>& gradients,
+  const RawTexturePtr& texture)
+{
+  BaseParticleSystem::_removeGradientAndTexture(gradient, gradients, texture);
 
   _releaseBuffers();
 
@@ -274,8 +310,7 @@ GPUParticleSystem::addColorGradient(float gradient, const Color4& color1,
 
 GPUParticleSystem& GPUParticleSystem::removeColorGradient(float gradient)
 {
-  _removeGradient<ColorGradient>(gradient, _colorGradients,
-                                 _colorGradientsTexture.get());
+  _removeGradientAndTexture(gradient, _colorGradients, _colorGradientsTexture);
   _colorGradientsTexture = nullptr;
 
   return *this;
@@ -322,7 +357,7 @@ GPUParticleSystem::addSizeGradient(float gradient, float factor,
 
 GPUParticleSystem& GPUParticleSystem::removeSizeGradient(float gradient)
 {
-  _removeGradient(gradient, _sizeGradients, _sizeGradientsTexture.get());
+  _removeGradientAndTexture(gradient, _sizeGradients, _sizeGradientsTexture);
   _sizeGradientsTexture = nullptr;
 
   return *this;
@@ -345,8 +380,8 @@ GPUParticleSystem& GPUParticleSystem::addAngularSpeedGradient(
 
 GPUParticleSystem& GPUParticleSystem::removeAngularSpeedGradient(float gradient)
 {
-  _removeGradient(gradient, _angularSpeedGradients,
-                  _angularSpeedGradientsTexture.get());
+  _removeGradientAndTexture(gradient, _angularSpeedGradients,
+                            _angularSpeedGradientsTexture);
   _angularSpeedGradientsTexture = nullptr;
 
   return *this;
@@ -370,8 +405,8 @@ GPUParticleSystem::addVelocityGradient(float gradient, float factor,
 
 GPUParticleSystem& GPUParticleSystem::removeVelocityGradient(float gradient)
 {
-  _removeGradient(gradient, _velocityGradients,
-                  _velocityGradientsTexture.get());
+  _removeGradientAndTexture(gradient, _velocityGradients,
+                            _velocityGradientsTexture);
   _velocityGradientsTexture = nullptr;
 
   return *this;
@@ -394,8 +429,8 @@ IParticleSystem& GPUParticleSystem::addLimitVelocityGradient(
 
 IParticleSystem& GPUParticleSystem::removeLimitVelocityGradient(float gradient)
 {
-  _removeGradient(gradient, _limitVelocityGradients,
-                  _limitVelocityGradientsTexture.get());
+  _removeGradientAndTexture(gradient, _limitVelocityGradients,
+                            _limitVelocityGradientsTexture);
   _limitVelocityGradientsTexture = nullptr;
 
   return *this;
@@ -419,9 +454,108 @@ IParticleSystem& GPUParticleSystem::addDragGradient(
 
 IParticleSystem& GPUParticleSystem::removeDragGradient(float gradient)
 {
-  _removeGradient(gradient, _dragGradients, _dragGradientsTexture.get());
+  _removeGradientAndTexture(gradient, _dragGradients, _dragGradientsTexture);
   _dragGradientsTexture = nullptr;
 
+  return *this;
+}
+
+IParticleSystem&
+GPUParticleSystem::addEmitRateGradient(float /*gradient*/, float /*factor*/,
+                                       const std::optional<float>& /*factor2*/)
+{
+  // Do nothing as emit rate is not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::removeEmitRateGradient(float /*gradient*/)
+{
+  // Do nothing as emit rate is not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem&
+GPUParticleSystem::addStartSizeGradient(float /*gradient*/, float /*factor*/,
+                                        const std::optional<float>& /*factor2*/)
+{
+  // Do nothing as start size is not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::removeStartSizeGradient(float /*gradient*/)
+{
+  // Do nothing as start size is not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::addColorRemapGradient(float /*gradient*/,
+                                                          float /*min*/,
+                                                          float /* max*/)
+{
+  // Do nothing as start size is not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::removeColorRemapGradient(float /*gradient*/)
+{
+  // Do nothing as start size is not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::addAlphaRemapGradient(float /*gradient*/,
+                                                          float /*min*/,
+                                                          float /*max*/)
+{
+  // Do nothing as start size is not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::removeAlphaRemapGradient(float /*gradient*/)
+{
+  // Do nothing as start size is not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::addRampGradient(float /*gradient*/,
+                                                    const Color3& /*color*/)
+{
+  // Not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::removeRampGradient(float /*gradient*/)
+{
+  // Not supported by GPUParticleSystem
+  return *this;
+}
+
+std::vector<Color3Gradient>& GPUParticleSystem::getRampGradients()
+{
+  return _emptyRampGradients;
+}
+
+bool GPUParticleSystem::get_useRampGradients() const
+{
+  // Not supported by GPUParticleSystem
+  return false;
+}
+
+void GPUParticleSystem::set_useRampGradients(bool /*value*/)
+{
+  // Not supported by GPUParticleSystem
+}
+
+IParticleSystem&
+GPUParticleSystem::addLifeTimeGradient(float /*gradient*/, float /*factor*/,
+                                       const std::optional<float>& /*factor2*/)
+{
+  // Not supported by GPUParticleSystem
+  return *this;
+}
+
+IParticleSystem& GPUParticleSystem::removeLifeTimeGradient(float /*gradient*/)
+{
+  // Not supported by GPUParticleSystem
   return *this;
 }
 
@@ -478,6 +612,20 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
     updateVertexBuffers["cellIndex"]
       = source->createVertexBuffer(VertexBuffer::CellIndexKind, offset, 1);
     offset += 1;
+    if (spriteRandomStartCell) {
+      updateVertexBuffers["cellStartOffset"] = source->createVertexBuffer(
+        VertexBuffer::CellStartOffsetKind, offset, 1);
+      offset += 1;
+    }
+  }
+
+  if (noiseTexture) {
+    updateVertexBuffers["noiseCoordinates1"] = source->createVertexBuffer(
+      VertexBuffer::NoiseCoordinates1Kind, offset, 3);
+    offset += 3;
+    updateVertexBuffers["noiseCoordinates2"] = source->createVertexBuffer(
+      VertexBuffer::NoiseCoordinates2Kind, offset, 3);
+    offset += 3;
   }
 
   auto vao = _engine->recordVertexArrayObject(
@@ -510,6 +658,10 @@ GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
     offset += 4;
   }
 
+  if (billboardMode == ParticleSystem::BILLBOARDMODE_STRETCHED) {
+    renderVertexBuffers["direction"] = source->createVertexBuffer(
+      VertexBuffer::DirectionKind, offset, 3, _attributesStrideSize, true);
+  }
   offset += 3; // Direction
 
   if (!_isBillboardBased) {
@@ -533,6 +685,23 @@ GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
       VertexBuffer::CellIndexKind, attributesStrideSizeT, 1,
       _attributesStrideSize, true);
     offset += 1;
+    if (spriteRandomStartCell) {
+      renderVertexBuffers["cellStartOffset"]
+        = source->createVertexBuffer(VertexBuffer::CellStartOffsetKind, offset,
+                                     1, _attributesStrideSize, true);
+      offset += 1;
+    }
+  }
+
+  if (noiseTexture) {
+    renderVertexBuffers["noiseCoordinates1"]
+      = source->createVertexBuffer(VertexBuffer::NoiseCoordinates1Kind, offset,
+                                   3, _attributesStrideSize, true);
+    offset += 3;
+    renderVertexBuffers["noiseCoordinates2"]
+      = source->createVertexBuffer(VertexBuffer::NoiseCoordinates2Kind, offset,
+                                   3, _attributesStrideSize, true);
+    offset += 3;
   }
 
   renderVertexBuffers["offset"]
@@ -570,6 +739,13 @@ void GPUParticleSystem::_initialize(bool force)
 
   if (_isAnimationSheetEnabled) {
     _attributesStrideSize += 1;
+    if (spriteRandomStartCell) {
+      _attributesStrideSize += 1;
+    }
+  }
+
+  if (noiseTexture) {
+    _attributesStrideSize += 6;
   }
 
   for (size_t particleIndex = 0; particleIndex < _capacity; ++particleIndex) {
@@ -623,6 +799,18 @@ void GPUParticleSystem::_initialize(bool force)
 
     if (_isAnimationSheetEnabled) {
       data.emplace_back(0.f);
+      if (spriteRandomStartCell) {
+        data.emplace_back(0.f);
+      }
+    }
+
+    if (noiseTexture) { // Random coordinates for reading into noise texture
+      data.emplace_back(Math::random());
+      data.emplace_back(Math::random());
+      data.emplace_back(Math::random());
+      data.emplace_back(Math::random());
+      data.emplace_back(Math::random());
+      data.emplace_back(Math::random());
     }
   }
 
@@ -685,8 +873,19 @@ void GPUParticleSystem::_recreateUpdateEffect()
     definesStream << "\n#define VELOCITYGRADIENTS";
   }
 
+  if (_limitVelocityGradientsTexture) {
+    definesStream << "\n#define LIMITVELOCITYGRADIENTS";
+  }
+
+  if (_dragGradientsTexture) {
+    definesStream << "\n#define DRAGGRADIENTS";
+  }
+
   if (isAnimationSheetEnabled) {
     definesStream << "\n#define ANIMATESHEET";
+    if (spriteRandomStartCell) {
+      definesStream << "\n#define ANIMATESHEETRANDOMSTART";
+    }
   }
 
   if (noiseTexture) {
@@ -718,6 +917,17 @@ void GPUParticleSystem::_recreateUpdateEffect()
   if (isAnimationSheetEnabled) {
     _updateEffectOptions->transformFeedbackVaryings.emplace_back(
       "outCellIndex");
+    if (spriteRandomStartCell) {
+      _updateEffectOptions->transformFeedbackVaryings.emplace_back(
+        "outCellStartOffset");
+    }
+  }
+
+  if (noiseTexture) {
+    _updateEffectOptions->transformFeedbackVaryings.emplace_back(
+      "outNoiseCoordinates1");
+    _updateEffectOptions->transformFeedbackVaryings.emplace_back(
+      "outNoiseCoordinates2");
   }
 
   _updateEffectOptions->defines = std::move(defines);
@@ -741,14 +951,21 @@ void GPUParticleSystem::_recreateRenderEffect()
     definesStream << "\n#define CLIPPLANE4";
   }
 
+  if (blendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
+    definesStream << "\n#define BLENDMULTIPLYMODE";
+  }
+
   if (_isBillboardBased) {
     definesStream << "\n#define BILLBOARD";
 
     switch (billboardMode) {
-      case AbstractMesh::BILLBOARDMODE_Y:
+      case ParticleSystem::BILLBOARDMODE_Y:
         definesStream << "\n#define BILLBOARDY";
         break;
-      case AbstractMesh::BILLBOARDMODE_ALL:
+      case ParticleSystem::BILLBOARDMODE_STRETCHED:
+        definesStream << "\n#define BILLBOARDSTRETCHED";
+        break;
+      case ParticleSystem::BILLBOARDMODE_ALL:
       default:
         break;
     }
@@ -789,9 +1006,10 @@ void GPUParticleSystem::_recreateRenderEffect()
   }
 
   EffectCreationOptions renderEffectOptions;
-  renderEffectOptions.attributes
-    = {"position",         "age",   "life",     "size", "color", "offset", "uv",
-       "initialDirection", "angle", "cellIndex"};
+  renderEffectOptions.attributes    = {"position", "age",       "life",
+                                    "size",     "color",     "offset",
+                                    "uv",       "direction", "initialDirection",
+                                    "angle",    "cellIndex"};
   renderEffectOptions.uniformsNames = uniforms;
   renderEffectOptions.samplers      = samplers;
   renderEffectOptions.defines       = std::move(defines);
@@ -897,6 +1115,17 @@ void GPUParticleSystem::_createVelocityGradientTexture()
   _createFactorGradientTexture(_velocityGradients, "_velocityGradientsTexture");
 }
 
+void GPUParticleSystem::_createLimitVelocityGradientTexture()
+{
+  _createFactorGradientTexture(_limitVelocityGradients,
+                               "_limitVelocityGradientsTexture");
+}
+
+void GPUParticleSystem::_createDragGradientTexture()
+{
+  _createFactorGradientTexture(_dragGradients, "_dragGradientsTexture");
+}
+
 void GPUParticleSystem::_createColorGradientTexture()
 {
   if (_colorGradients.empty() || _colorGradientsTexture) {
@@ -937,6 +1166,8 @@ size_t GPUParticleSystem::render(bool preWarm)
   _createSizeGradientTexture();
   _createAngularSpeedGradientTexture();
   _createVelocityGradientTexture();
+  _createLimitVelocityGradientTexture();
+  _createDragGradientTexture();
 
   _recreateUpdateEffect();
   _recreateRenderEffect();
@@ -1010,6 +1241,16 @@ size_t GPUParticleSystem::render(bool preWarm)
   if (_velocityGradientsTexture) {
     _updateEffect->setTexture("velocityGradientSampler",
                               _velocityGradientsTexture);
+  }
+
+  if (_limitVelocityGradientsTexture) {
+    _updateEffect->setTexture("limitVelocityGradientSampler",
+                              _limitVelocityGradientsTexture);
+    _updateEffect->setFloat("limitVelocityDamping", limitVelocityDamping);
+  }
+
+  if (_dragGradientsTexture) {
+    _updateEffect->setTexture("dragGradientSampler", _dragGradientsTexture);
   }
 
   if (particleEmitterType) {
@@ -1106,6 +1347,9 @@ size_t GPUParticleSystem::render(bool preWarm)
         break;
       case ParticleSystem::BLENDMODE_STANDARD:
         _engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+        break;
+      case ParticleSystem::BLENDMODE_MULTIPLY:
+        _engine->setAlphaMode(EngineConstants::ALPHA_MULTIPLY);
         break;
     }
 
@@ -1212,6 +1456,11 @@ void GPUParticleSystem::dispose(bool disposeTexture,
     _limitVelocityGradientsTexture = nullptr;
   }
 
+  if (_dragGradientsTexture) {
+    _dragGradientsTexture->dispose();
+    _dragGradientsTexture = nullptr;
+  }
+
   if (_randomTexture) {
     _randomTexture->dispose();
     _randomTexture = nullptr;
@@ -1250,7 +1499,8 @@ json GPUParticleSystem::serialize() const
 
 IParticleSystem* GPUParticleSystem::Parse(const json& /*parsedParticleSystem*/,
                                           Scene* /*scene*/,
-                                          const std::string& /*rootUrl*/)
+                                          const std::string& /*rootUrl*/,
+                                          bool /*doNotStart*/)
 {
   return nullptr;
 }

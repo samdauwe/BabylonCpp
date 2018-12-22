@@ -5,18 +5,24 @@
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
+#include <babylon/math/vector4.h>
 #include <babylon/tools/color_gradient.h>
 #include <babylon/tools/factor_gradient.h>
 
 namespace BABYLON {
 
 class ParticleSystem;
+class SubEmitter;
+using SubEmitterPtr = std::shared_ptr<SubEmitter>;
 
 /**
  * @brief A particle represents one of the element emitted by a particle system.
  * This is mainly define by its coordinates, direction, velocity and age.
  */
 class BABYLON_SHARED_EXPORT Particle {
+
+private:
+  static size_t _Count;
 
 public:
   /**
@@ -37,6 +43,21 @@ public:
   void updateCellIndex();
 
   /**
+   * @brief Hidden
+   */
+  void _inheritParticleInfoToSubEmitter(const SubEmitterPtr& subEmitter);
+
+  /**
+   * @brief Hidden
+   */
+  void _inheritParticleInfoToSubEmitters();
+
+  /**
+   * @brief Hidden
+   */
+  void _reset();
+
+  /**
    * @brief Copy the properties of particle to another one.
    * @param other the particle to copy the information to.
    */
@@ -46,6 +67,11 @@ private:
   void updateCellInfoFromSystem();
 
 public:
+  /**
+   * Unique ID of the particle
+   */
+  size_t id;
+
   /**
    * The world position of the particle in the scene.
    */
@@ -101,11 +127,23 @@ public:
    */
   unsigned int cellIndex;
 
+  /**
+   * The information required to support color remapping
+   */
+  Vector4 remapData;
+
+  /** @hidden */
+  std::optional<float> _randomCellOffset;
+
   /** Hidden */
   std::optional<Vector3> _initialDirection;
 
   /** Hidden */
+  std::vector<SubEmitterPtr> _attachedSubEmitters;
+
+  /** Hidden */
   unsigned int _initialStartSpriteCellID;
+  /** Hidden */
   unsigned int _initialEndSpriteCellID;
 
   /** Hidden */
@@ -149,6 +187,11 @@ public:
   float _currentDrag1;
   /** Hidden */
   float _currentDrag2;
+
+  /** Hidden */
+  std::optional<Vector3> _randomNoiseCoordinates1;
+  /** Hidden */
+  Vector3 _randomNoiseCoordinates2;
 
   /**
    * The particle system the particle belongs to.

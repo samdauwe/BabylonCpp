@@ -7,7 +7,7 @@
 #include <babylon/physics/helper/physics_radial_explosion_event.h>
 #include <babylon/physics/helper/physics_updraft_event.h>
 #include <babylon/physics/helper/physics_vortex_event.h>
-#include <babylon/physics/physics_engine.h>
+#include <babylon/physics/iphysics_engine.h>
 #include <babylon/physics/physics_impostor.h>
 
 namespace BABYLON {

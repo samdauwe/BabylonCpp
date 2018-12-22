@@ -19,6 +19,9 @@ struct IWorld;
 class PhysicsImpostor;
 struct PhysicsImpostorJoint;
 
+/**
+ * @brief Hidden
+ */
 class BABYLON_SHARED_EXPORT OimoPhysicsEnginePlugin {
 
 public:

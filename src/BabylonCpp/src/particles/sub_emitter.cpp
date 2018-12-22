@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/mesh/abstract_mesh.h>
 #include <babylon/particles/particle_system.h>
 
 namespace BABYLON {
@@ -12,6 +13,19 @@ SubEmitter::SubEmitter(const ParticleSystemPtr& iParticleSystem)
     , inheritDirection{false}
     , inheritedVelocityAmount{0.f}
 {
+  // Create mesh as emitter to support rotation
+  if (!std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
+    particleSystem->emitter = AbstractMesh::New("SubemitterSystemEmitter",
+                                                particleSystem->getScene());
+  }
+
+  // Automatically dispose of subemitter when system is disposed
+  particleSystem->onDisposeObservable.add(
+    [this](ParticleSystem* /*ps*/, EventState& /*es*/) {
+      if (std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)) {
+        std::get<AbstractMeshPtr>(particleSystem->emitter)->dispose();
+      }
+    });
 }
 
 SubEmitter::~SubEmitter()

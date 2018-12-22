@@ -994,6 +994,27 @@ public:
                          EffectCreationOptions& options, Engine* engine);
 
   /**
+   * @brief Create an effect to use with particle systems.
+   * Please note that some parameters like animation sheets or not being
+   * billboard are not supported in this configuration
+   * @param fragmentName defines the base name of the effect (The name of file
+   * without .fragment.fx)
+   * @param uniformsNames defines a list of attribute names
+   * @param samplers defines an array of string used to represent textures
+   * @param defines defines the string containing the defines to use to compile
+   * the shaders
+   * @param fallbacks defines the list of potential fallbacks to use if shader
+   * conmpilation fails
+   * @param onCompiled defines a function to call when the effect creation is
+   * successful
+   * @param onError defines a function to call when the effect creation has
+   * failed
+   * @returns the new Effect
+   */
+  EffectPtr createEffectForParticles(const std::string& fragmentName,
+                                     EffectCreationOptions& options);
+
+  /**
    * @brief Directly creates a webGL program.
    * @param vertexCode defines the vertex shader code to use
    * @param fragmentCode defines the fragment shader code to use

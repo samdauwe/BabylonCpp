@@ -64,6 +64,7 @@
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/physics_engine.h>
+#include <babylon/physics/physics_engine_component.h>
 #include <babylon/postprocess/post_process.h>
 #include <babylon/postprocess/post_process_manager.h>
 #include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
@@ -204,6 +205,7 @@ Scene::Scene(Engine* engine)
     , isDisposed{this, &Scene::get_isDisposed}
     , _allowPostProcessClearColor{true}
     , blockMaterialDirtyMechanism{false}
+    , _physicsEngine{nullptr}
     , _environmentTexture{nullptr}
     , _animationPropertiesOverride{nullptr}
     , _spritePredicate{nullptr}
@@ -266,7 +268,6 @@ Scene::Scene(Engine* engine)
     , _activeMeshCandidateProvider{nullptr}
     , _activeMeshesFrozen{false}
     , _renderingManager{nullptr}
-    , _physicsEngine{nullptr}
     , _transformMatrix{Matrix::Zero()}
     , _sceneUbo{nullptr}
     , _alternateSceneUbo{nullptr}
@@ -312,6 +313,10 @@ Scene::Scene(Engine* engine)
     _imageProcessingConfiguration
       = std::make_shared<ImageProcessingConfiguration>();
   }
+
+  getDeterministicFrameTime = []() -> float {
+    return 1000.f / 60.f; // frame time in ms
+  };
 }
 
 Scene::~Scene()
@@ -4704,18 +4709,26 @@ Sprite* Scene::getPointerOverSprite() const
 }
 
 /** Physics **/
-PhysicsEngine* Scene::getPhysicsEngine()
+IPhysicsEnginePtr& Scene::getPhysicsEngine()
 {
-  return _physicsEngine.get();
+  return _physicsEngine;
 }
 
-bool Scene::enablePhysics(const Vector3& iGravity, IPhysicsEnginePlugin* plugin)
+bool Scene::enablePhysics(const std::optional<Vector3>& iGravity,
+                          IPhysicsEnginePlugin* plugin)
 {
   if (_physicsEngine) {
     return true;
   }
 
-  _physicsEngine     = std::make_unique<PhysicsEngine>(iGravity, plugin);
+  // Register the component to the scene
+  auto component = _getComponent(SceneComponentConstants::NAME_PHYSICSENGINE);
+  if (!component) {
+    component = PhysicsEngineSceneComponent::New(this);
+    _addComponent(component);
+  }
+
+  _physicsEngine     = PhysicsEngine::New(iGravity, plugin);
   bool isInitialized = _physicsEngine->isInitialized();
   if (!isInitialized) {
     _physicsEngine = nullptr;
@@ -4737,6 +4750,15 @@ void Scene::disablePhysicsEngine()
 bool Scene::isPhysicsEnabled()
 {
   return _physicsEngine != nullptr;
+}
+
+void Scene::_advancePhysicsEngineStep(float step)
+{
+  if (_physicsEngine) {
+    onBeforePhysicsObservable.notifyObservers(this);
+    _physicsEngine->_step(step / 1000.f);
+    onAfterPhysicsObservable.notifyObservers(this);
+  }
 }
 
 void Scene::_rebuildGeometries()

@@ -33,10 +33,11 @@ class PickingInfo;
 struct PhysicsParams;
 class Skeleton;
 class SolidParticle;
-using CameraPtr   = std::shared_ptr<Camera>;
-using LightPtr    = std::shared_ptr<Light>;
-using MaterialPtr = std::shared_ptr<Material>;
-using SkeletonPtr = std::shared_ptr<Skeleton>;
+using CameraPtr          = std::shared_ptr<Camera>;
+using LightPtr           = std::shared_ptr<Light>;
+using MaterialPtr        = std::shared_ptr<Material>;
+using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
+using SkeletonPtr        = std::shared_ptr<Skeleton>;
 
 namespace GL {
 class IGLQuery;
@@ -474,7 +475,7 @@ public:
    * @see http://doc.babylonjs.com/features/physics_engine
    * @returns a physics impostor or null
    */
-  PhysicsImpostor* getPhysicsImpostor();
+  PhysicsImpostorPtr& getPhysicsImpostor();
 
   /**
    * @brief Gets the position of the current mesh in camera space.
@@ -1146,6 +1147,20 @@ protected:
    */
   std::unique_ptr<Collider>& get_collider();
 
+  /** Physics **/
+
+  /**
+   * @brief Gets the impostor used for physic simulation.
+   * @see http://doc.babylonjs.com/features/physics_engine
+   */
+  PhysicsImpostorPtr& get_physicsImpostor();
+
+  /**
+   * @brief Sets the impostor used for physic simulation.
+   * @see http://doc.babylonjs.com/features/physics_engine
+   */
+  void set_physicsImpostor(const PhysicsImpostorPtr& value);
+
   /**
    * Gets or sets a boolean indicating if the outline must be rendered as well
    */
@@ -1502,7 +1517,7 @@ public:
    * Gets or sets impostor used for physic simulation
    * @see http://doc.babylonjs.com/features/physics_engine
    */
-  std::unique_ptr<PhysicsImpostor> physicsImpostor;
+  Property<AbstractMesh, PhysicsImpostorPtr> physicsImpostor;
 
   // Collisions
 
@@ -1709,6 +1724,10 @@ private:
   std::unique_ptr<Collider> _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;
+  /** @hidden */
+  PhysicsImpostorPtr _physicsImpostor;
+  /** @hidden */
+  Observer<Node>::Ptr _disposePhysicsObserver;
   // Cache
   Matrix _collisionsTransformMatrix;
   Matrix _collisionsScalingMatrix;
