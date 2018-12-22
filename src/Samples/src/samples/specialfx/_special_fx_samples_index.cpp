@@ -7,6 +7,7 @@
 #include <babylon/samples/specialfx/fresnel_scene.h>
 #include <babylon/samples/specialfx/infinite_loader_scene.h>
 #include <babylon/samples/specialfx/lens_flares_scene.h>
+#include <babylon/samples/specialfx/points_cloud_scene.h>
 #include <babylon/samples/specialfx/portals_scene.h>
 #include <babylon/samples/specialfx/realtime_reflection_scene.h>
 #include <babylon/samples/specialfx/realtime_refraction_scene.h>
@@ -65,6 +66,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<LensFlaresScene>(iCanvas); //
                       });                                                  //
+  // Points Cloud Scene
+  _samples["PointsCloudScene"]
+    = std::make_tuple(false,                                                //
+                      [](ICanvas* iCanvas) {                                //
+                        return std::make_unique<PointsCloudScene>(iCanvas); //
+                      });                                                   //
   // Portals Scene
   _samples["PortalsScene"]
     = std::make_tuple(true,                                             //
