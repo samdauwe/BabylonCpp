@@ -12,6 +12,7 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
+#include <babylon/mesh/_facet_data_storage.h>
 #include <babylon/mesh/facet_parameters.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 #include <babylon/mesh/transform_node.h>
@@ -25,7 +26,7 @@ namespace BABYLON {
 
 class ActionManager;
 class Camera;
-class EdgesRenderer;
+class IEdgesRenderer;
 class Light;
 class Material;
 struct MaterialDefines;
@@ -1109,7 +1110,7 @@ protected:
   /**
    * @brief Gets the edgesRenderer associated with the mesh.
    */
-  std::unique_ptr<EdgesRenderer>& get_edgesRenderer();
+  std::unique_ptr<IEdgesRenderer>& get_edgesRenderer();
 
   /**
    * @brief Returns true if the mesh is blocked. Implemented by child classes.
@@ -1564,7 +1565,7 @@ public:
   Color4 edgesColor;
 
   /** Hidden */
-  std::unique_ptr<EdgesRenderer> _edgesRenderer;
+  std::unique_ptr<IEdgesRenderer> _edgesRenderer;
 
   // Cache
 
@@ -1632,7 +1633,7 @@ public:
   /**
    * Gets the edgesRenderer associated with the mesh
    */
-  ReadOnlyProperty<AbstractMesh, std::unique_ptr<EdgesRenderer>> edgesRenderer;
+  ReadOnlyProperty<AbstractMesh, std::unique_ptr<IEdgesRenderer>> edgesRenderer;
 
   /**
    * Returns true if the mesh is blocked. Implemented by child classes
@@ -1662,43 +1663,7 @@ public:
   ReadOnlyProperty<AbstractMesh, std::unique_ptr<Collider>> collider;
 
 private:
-  // FacetData private properties
-  // Facet local positions
-  std::vector<Vector3> _facetPositions;
-  // Facet local normals
-  std::vector<Vector3> _facetNormals;
-  // Partitioning array of facet index arrays
-  std::vector<Uint32Array> _facetPartitioning;
-  // facet number
-  size_t _facetNb;
-  // Number of subdivisions per axis in the partioning space
-  unsigned int _partitioningSubdivisions;
-  // The partioning array space is by default 1% bigger than the bounding box
-  float _partitioningBBoxRatio;
-  // Is the facet data feature enabled on this mesh ?
-  bool _facetDataEnabled;
-  // Keep a reference to the object parameters to avoid memory re-allocation
-  FacetParameters _facetParameters;
-  // bbox size approximated for facet data
-  Vector3 _bbSize;
-  // Actual number of subdivisions per axis for ComputeNormals()
-  SubdivisionsPerAxis _subDiv;
-  // is the facet depth sort to be computed
-  bool _facetDepthSort;
-  // is the facet depth sort initialized
-  bool _facetDepthSortEnabled;
-  // copy of the indices array to store them once sorted
-  IndicesArray _depthSortedIndices;
-  // array of depth sorted facets
-  std::vector<DepthSortedFacet> _depthSortedFacets;
-  // facet depth sort function
-  std::function<int(const DepthSortedFacet& f1, const DepthSortedFacet& f2)>
-    _facetDepthSortFunction;
-  // location where to depth sort from
-  std::unique_ptr<Vector3> _facetDepthSortFrom;
-  // same as facetDepthSortFrom but expressed in the mesh local space
-  Vector3 _facetDepthSortOrigin;
-  Matrix _invertedMatrix;
+  _FacetDataStorage _facetData;
   // Events
   Observer<AbstractMesh>::Ptr _onCollideObserver;
   Observer<Vector3>::Ptr _onCollisionPositionChangeObserver;

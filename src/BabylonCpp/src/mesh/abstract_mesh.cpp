@@ -133,16 +133,6 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , checkCollisions{this, &AbstractMesh::get_checkCollisions,
                       &AbstractMesh::set_checkCollisions}
     , collider{this, &AbstractMesh::get_collider}
-    , _facetNb{0}
-    , _partitioningSubdivisions{10}
-    , _partitioningBBoxRatio{1.01f}
-    , _facetDataEnabled{false}
-    , _bbSize{Vector3::Zero()}
-    , _subDiv{1, 1, 1, 1}
-    , _facetDepthSort{false}
-    , _facetDepthSortEnabled{false}
-    , _facetDepthSortFunction{nullptr}
-    , _facetDepthSortFrom{std::make_unique<Vector3>(Vector3::Zero())}
     , _onCollideObserver{nullptr}
     , _onCollisionPositionChangeObserver{nullptr}
     , _visibility{1.f}
@@ -189,52 +179,52 @@ void AbstractMesh::addToScene(const AbstractMeshPtr& newMesh)
 
 size_t AbstractMesh::get_facetNb() const
 {
-  return _facetNb;
+  return _facetData.facetNb;
 }
 
 unsigned int AbstractMesh::get_partitioningSubdivisions() const
 {
-  return _partitioningSubdivisions;
+  return _facetData.partitioningSubdivisions;
 }
 
 void AbstractMesh::set_partitioningSubdivisions(unsigned int nb)
 {
-  _partitioningSubdivisions = nb;
+  _facetData.partitioningSubdivisions = nb;
 }
 
 float AbstractMesh::get_partitioningBBoxRatio() const
 {
-  return _partitioningBBoxRatio;
+  return _facetData.partitioningBBoxRatio;
 }
 
 void AbstractMesh::set_partitioningBBoxRatio(float ratio)
 {
-  _partitioningBBoxRatio = ratio;
+  _facetData.partitioningBBoxRatio = ratio;
 }
 
 bool AbstractMesh::get_mustDepthSortFacets() const
 {
-  return _facetDepthSort;
+  return _facetData.facetDepthSort;
 }
 
 void AbstractMesh::set_mustDepthSortFacets(bool sort)
 {
-  _facetDepthSort = sort;
+  _facetData.facetDepthSort = sort;
 }
 
 Vector3& AbstractMesh::get_facetDepthSortFrom()
 {
-  return *_facetDepthSortFrom.get();
+  return *_facetData.facetDepthSortFrom;
 }
 
 void AbstractMesh::set_facetDepthSortFrom(const Vector3& location)
 {
-  _facetDepthSortFrom = std::make_unique<Vector3>(location);
+  _facetData.facetDepthSortFrom = location;
 }
 
 bool AbstractMesh::get_isFacetDataEnabled() const
 {
-  return _facetDataEnabled;
+  return _facetData.facetDataEnabled;
 }
 
 bool AbstractMesh::_updateNonUniformScalingState(bool value)
@@ -523,12 +513,10 @@ void AbstractMesh::_resyncLightSources()
 
 void AbstractMesh::_rebuild()
 {
+  onRebuildObservable.notifyObservers(this);
+
   if (_occlusionQuery) {
     _occlusionQuery = nullptr;
-  }
-
-  if (_edgesRenderer) {
-    _edgesRenderer->_rebuild();
   }
 
   if (subMeshes.empty()) {
@@ -710,7 +698,7 @@ AbstractMesh::enableEdgesRendering(float epsilon,
   return *this;
 }
 
-std::unique_ptr<EdgesRenderer>& AbstractMesh::get_edgesRenderer()
+std::unique_ptr<IEdgesRenderer>& AbstractMesh::get_edgesRenderer()
 {
   return _edgesRenderer;
 }
@@ -964,8 +952,10 @@ AbstractMesh& AbstractMesh::_updateSubMeshesBoundingInfo(const Matrix& matrix)
     return *this;
   }
 
-  for (auto& subMesh : subMeshes) {
-    if (!subMesh->isGlobal()) {
+  auto count = subMeshes.size();
+  for (size_t subIndex = 0; subIndex < count; ++subIndex) {
+    auto& subMesh = subMeshes[subIndex];
+    if (count > 1 || !subMesh->isGlobal()) {
       subMesh->updateBoundingInfo(matrix);
     }
   }
@@ -1249,84 +1239,75 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
   return _submeshesOctree;
 }
 
-AbstractMesh&
-AbstractMesh::_collideForSubMesh(SubMesh* /*subMesh*/,
-                                 const Matrix& /*transformMatrix*/,
-                                 Collider* /*collider*/)
+AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
+                                               const Matrix& transformMatrix,
+                                               Collider* collider)
 {
-  /*_generatePointsArray();
+  _generatePointsArray();
+
+  if (_positions().empty()) {
+    return *this;
+  }
+
   // Transformation
-  if (!subMesh._lastColliderWorldVertices
-      || !subMesh._lastColliderTransformMatrix.equals(transformMatrix)) {
-    subMesh._lastColliderTransformMatrix = transformMatrix.clone();
-    subMesh._lastColliderWorldVertices   = [];
-    subMesh._trianglePlanes              = [];
-    var start                            = subMesh.verticesStart;
-    var end = (subMesh.verticesStart + subMesh.verticesCount);
-    for (var i = start; i < end; i++) {
-      subMesh._lastColliderWorldVertices.push(
-        Vector3.TransformCoordinates(_positions[i], transformMatrix));
+  if (subMesh->_lastColliderWorldVertices.empty()
+      || !subMesh->_lastColliderTransformMatrix.equals(transformMatrix)) {
+    subMesh->_lastColliderTransformMatrix = transformMatrix;
+    subMesh->_lastColliderWorldVertices   = {};
+    subMesh->_trianglePlanes              = {};
+    auto start                            = subMesh->verticesStart;
+    auto end = (subMesh->verticesStart + subMesh->verticesCount);
+    for (unsigned int i = start; i < end; i++) {
+      subMesh->_lastColliderWorldVertices.emplace_back(
+        Vector3::TransformCoordinates(_positions()[i], transformMatrix));
     }
   }
   // Collide
-  collider._collide(subMesh._trianglePlanes, subMesh._lastColliderWorldVertices,
-                    getIndices(), subMesh.indexStart,
-                    subMesh.indexStart + subMesh.indexCount,
-                    subMesh.verticesStart, !!subMesh.getMaterial());
-  if (collider.collisionFound) {
-    collider.collidedMesh = this;
-  }*/
+  collider->_collide(
+    subMesh->_trianglePlanes, subMesh->_lastColliderWorldVertices, getIndices(),
+    subMesh->indexStart, subMesh->indexStart + subMesh->indexCount,
+    subMesh->verticesStart, subMesh->getMaterial() != nullptr);
+  if (collider->collisionFound) {
+    collider->collidedMesh = this;
+  }
   return *this;
 }
 
 AbstractMesh&
-AbstractMesh::_processCollisionsForSubMeshes(Collider* /*collider*/,
-                                             const Matrix& /*transformMatrix*/)
+AbstractMesh::_processCollisionsForSubMeshes(Collider* collider,
+                                             const Matrix& transformMatrix)
 {
-  /*var subMeshes : SubMesh[];
-  var len : number;
+  auto subMeshes = _scene->getCollidingSubMeshCandidates(this, *collider);
+  auto len       = subMeshes.size();
 
-  // Octrees
-  if (_submeshesOctree && useOctreeForCollisions) {
-    var radius
-      = collider.velocityWorldLength
-        + Math.max(collider.radius.x, collider.radius.y, collider.radius.z);
-    var intersections
-      = _submeshesOctree.intersects(collider.basePointWorld, radius);
-
-    len       = intersections.length;
-    subMeshes = intersections.data;
-  }
-  else {
-    subMeshes = subMeshes;
-    len       = subMeshes.length;
-  }
-
-  for (var index = 0; index < len; index++) {
-    var subMesh = subMeshes[index];
+  for (size_t index = 0; index < len; index++) {
+    auto& subMesh = subMeshes[index];
 
     // Bounding test
-    if (len > 1 && !subMesh._checkCollision(collider))
+    if (len > 1 && !subMesh->_checkCollision(*collider)) {
       continue;
+    }
 
     _collideForSubMesh(subMesh, transformMatrix, collider);
-  }*/
+  }
   return *this;
 }
 
-AbstractMesh& AbstractMesh::_checkCollision(Collider* /*collider*/)
+AbstractMesh& AbstractMesh::_checkCollision(Collider* collider)
 {
   // Bounding box test
-  /*if (!_boundingInfo->_checkCollision(collider))
-    return;
+  if (!_boundingInfo->_checkCollision(*collider)) {
+    return *this;
+  }
 
   // Transformation matrix
-  Matrix.ScalingToRef(1.0 / collider.radius.x, 1.0 / collider.radius.y,
-                      1.0 / collider.radius.z, _collisionsScalingMatrix);
-  worldMatrixFromCache.multiplyToRef(_collisionsScalingMatrix,
-                                     _collisionsTransformMatrix);
-
-  _processCollisionsForSubMeshes(collider, _collisionsTransformMatrix);*/
+  auto& collisionsScalingMatrix   = Tmp::MatrixArray[0];
+  auto& collisionsTransformMatrix = Tmp::MatrixArray[1];
+  Matrix::ScalingToRef(1.f / collider->_radius.x, 1.f / collider->_radius.y,
+                       1.f / collider->_radius.z, collisionsScalingMatrix);
+  worldMatrixFromCache().multiplyToRef(collisionsScalingMatrix,
+                                       collisionsTransformMatrix);
+  _processCollisionsForSubMeshes(collider, collisionsTransformMatrix);
   return *this;
 }
 
@@ -1345,29 +1326,15 @@ PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck)
     return pickingInfo;
   }
 
-  if (!_generatePointsArray()) {
+  if (!_generatePointsArray() || !_scene->getIntersectingSubMeshCandidates) {
     return pickingInfo;
   }
 
   std::optional<IntersectionInfo> intersectInfo = std::nullopt;
 
   // Octrees
-  std::vector<SubMeshPtr> _subMeshes;
-  size_t len = 0;
-
-  if (_submeshesOctree && useOctreeForPicking) {
-#if 0
-    auto worldRay      = Ray::Transform(ray, *getWorldMatrix());
-    auto intersections = _submeshesOctree->intersectsRay(worldRay);
-
-    len        = intersections.size();
-    _subMeshes = intersections;
-#endif
-  }
-  else {
-    _subMeshes = subMeshes;
-    len        = _subMeshes.size();
-  }
+  auto _subMeshes = _scene->getIntersectingSubMeshCandidates(this, ray);
+  size_t len      = _subMeshes.size();
 
   for (size_t index = 0; index < len; ++index) {
     auto& subMesh = _subMeshes[index];
@@ -1453,11 +1420,6 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Skeleton
   _skeleton = nullptr;
 
-  // Physics
-  if (_physicsImpostor) {
-    _physicsImpostor->dispose(/*!doNotRecurse*/);
-  }
-
   // Intersections in progress
   for (auto& other : _intersectionsInProgress) {
     std::remove(other->_intersectionsInProgress.begin(),
@@ -1499,18 +1461,6 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     releaseSubMeshes();
   }
 
-  // Octree
-  auto sceneOctree = getScene()->selectionOctree();
-  if (sceneOctree) {
-#if 0
-    sceneOctree->dynamicContent.erase(
-      std::remove_if(
-        sceneOctree->dynamicContent.begin(), sceneOctree->dynamicContent.end(),
-        [this](const AbstractMeshPtr& mesh) { return mesh.get() == this; }),
-      sceneOctree->dynamicContent.end());
-#endif
-  }
-
   // Query
   auto engine = getScene()->getEngine();
   if (_occlusionQuery) {
@@ -1542,13 +1492,14 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 
   // facet data
-  if (_facetDataEnabled) {
+  if (_facetData.facetDataEnabled) {
     disableFacetData();
   }
 
   onAfterWorldMatrixUpdateObservable.clear();
   onCollideObservable.clear();
   onCollisionPositionChangeObservable.clear();
+  onRebuildObservable.clear();
 
   _isDisposed = true;
 
@@ -1572,29 +1523,33 @@ AbstractMesh& AbstractMesh::removeChild(AbstractMesh& mesh)
 
 AbstractMesh& AbstractMesh::_initFacetData()
 {
-  _facetNb = getIndices().size() / 3;
+  auto& data   = _facetData;
+  data.facetNb = getIndices().size() / 3;
 
   // default nb of partitioning subdivisions = 10
-  _partitioningSubdivisions
-    = (_partitioningSubdivisions) ? _partitioningSubdivisions : 10;
+  data.partitioningSubdivisions
+    = (data.partitioningSubdivisions) ? data.partitioningSubdivisions : 10;
   // default ratio 1.01 = the partitioning is 1% bigger than the bounding box
-  _partitioningBBoxRatio
-    = (_partitioningBBoxRatio != 0.f) ? _partitioningBBoxRatio : 1.01f;
+  data.partitioningBBoxRatio
+    = (data.partitioningBBoxRatio != 0.f) ? data.partitioningBBoxRatio : 1.01f;
 
-  _facetNormals.resize(_facetNb);
-  std::fill(_facetNormals.begin(), _facetNormals.end(), Vector3::Zero());
+  data.facetNormals.resize(data.facetNb);
+  std::fill(data.facetNormals.begin(), data.facetNormals.end(),
+            Vector3::Zero());
 
-  _facetPositions.resize(_facetNb);
-  std::fill(_facetPositions.begin(), _facetPositions.end(), Vector3::Zero());
+  data.facetPositions.resize(data.facetNb);
+  std::fill(data.facetPositions.begin(), data.facetPositions.end(),
+            Vector3::Zero());
 
-  _facetDataEnabled = true;
+  data.facetDataEnabled = true;
 
   return *this;
 }
 
 AbstractMesh& AbstractMesh::updateFacetData()
 {
-  if (!_facetDataEnabled) {
+  auto& data = _facetData;
+  if (!data.facetDataEnabled) {
     _initFacetData();
   }
   auto positions = getVerticesData(VertexBuffer::PositionKind);
@@ -1602,90 +1557,89 @@ AbstractMesh& AbstractMesh::updateFacetData()
   auto normals   = getVerticesData(VertexBuffer::NormalKind);
   auto bInfo     = getBoundingInfo();
 
-  if (_facetDepthSort && !_facetDepthSortEnabled) {
+  if (data.facetDepthSort && !data.facetDepthSortEnabled) {
     // init arrays, matrix and sort function on first call
-    _facetDepthSortEnabled = true;
+    data.facetDepthSortEnabled = true;
     // indices instanceof Uint32Array
     {
-      _depthSortedIndices = Uint32Array(indices);
+      data.depthSortedIndices = Uint32Array(indices);
     }
 
-    _facetDepthSortFunction
+    data.facetDepthSortFunction
       = [](const DepthSortedFacet& f1, const DepthSortedFacet& f2) {
           const auto diff = f2.sqDistance - f1.sqDistance;
           return (diff < 0.f) ? -1 : (diff > 0.f) ? 1 : 0;
         };
-    if (!_facetDepthSortFrom) {
-      auto& camera        = getScene()->activeCamera;
-      _facetDepthSortFrom = (camera) ?
-                              std::make_unique<Vector3>(camera->position) :
-                              std::make_unique<Vector3>(Vector3::Zero());
+    if (!data.facetDepthSortFrom) {
+      auto& camera            = getScene()->activeCamera;
+      data.facetDepthSortFrom = (camera) ? camera->position : Vector3::Zero();
     }
-    _depthSortedFacets.clear();
-    for (unsigned int f = 0; f < _facetNb; f++) {
+    data.depthSortedFacets.clear();
+    for (unsigned int f = 0; f < data.facetNb; f++) {
       DepthSortedFacet depthSortedFacet;
       depthSortedFacet.ind        = f * 3;
       depthSortedFacet.sqDistance = 0.f;
-      _depthSortedFacets.emplace_back(depthSortedFacet);
+      data.depthSortedFacets.emplace_back(depthSortedFacet);
     }
-    _invertedMatrix       = Matrix::Identity();
-    _facetDepthSortOrigin = Vector3::Zero();
+    data.invertedMatrix       = Matrix::Identity();
+    data.facetDepthSortOrigin = Vector3::Zero();
   }
 
-  _bbSize.x = (bInfo.maximum().x - bInfo.minimum().x > Math::Epsilon) ?
-                bInfo.maximum().x - bInfo.minimum().x :
-                Math::Epsilon;
-  _bbSize.y = (bInfo.maximum().y - bInfo.minimum().y > Math::Epsilon) ?
-                bInfo.maximum().y - bInfo.minimum().y :
-                Math::Epsilon;
-  _bbSize.z = (bInfo.maximum().z - bInfo.minimum().z > Math::Epsilon) ?
-                bInfo.maximum().z - bInfo.minimum().z :
-                Math::Epsilon;
-  auto bbSizeMax = (_bbSize.x > _bbSize.y) ? _bbSize.x : _bbSize.y;
-  bbSizeMax      = (bbSizeMax > _bbSize.z) ? bbSizeMax : _bbSize.z;
-  _subDiv.max    = _partitioningSubdivisions;
+  data.bbSize.x = (bInfo.maximum().x - bInfo.minimum().x > Math::Epsilon) ?
+                    bInfo.maximum().x - bInfo.minimum().x :
+                    Math::Epsilon;
+  data.bbSize.y = (bInfo.maximum().y - bInfo.minimum().y > Math::Epsilon) ?
+                    bInfo.maximum().y - bInfo.minimum().y :
+                    Math::Epsilon;
+  data.bbSize.z = (bInfo.maximum().z - bInfo.minimum().z > Math::Epsilon) ?
+                    bInfo.maximum().z - bInfo.minimum().z :
+                    Math::Epsilon;
+  auto bbSizeMax
+    = (data.bbSize.x > data.bbSize.y) ? data.bbSize.x : data.bbSize.y;
+  bbSizeMax       = (bbSizeMax > data.bbSize.z) ? bbSizeMax : data.bbSize.z;
+  data.subDiv.max = data.partitioningSubdivisions;
   // adjust the number of subdivisions per axis
-  _subDiv.X
-    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.x / bbSizeMax));
+  data.subDiv.X = static_cast<unsigned>(
+    std::floor(data.subDiv.max * data.bbSize.x / bbSizeMax));
   // according to each bbox size per axis
-  _subDiv.Y
-    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.y / bbSizeMax));
+  data.subDiv.Y = static_cast<unsigned>(
+    std::floor(data.subDiv.max * data.bbSize.y / bbSizeMax));
   // at least one subdivision
-  _subDiv.Z
-    = static_cast<unsigned>(std::floor(_subDiv.max * _bbSize.z / bbSizeMax));
-  _subDiv.X = _subDiv.X < 1 ? 1 : _subDiv.X;
-  _subDiv.Y = _subDiv.Y < 1 ? 1 : _subDiv.Y;
-  _subDiv.Z = _subDiv.Z < 1 ? 1 : _subDiv.Z;
+  data.subDiv.Z = static_cast<unsigned>(
+    std::floor(data.subDiv.max * data.bbSize.z / bbSizeMax));
+  data.subDiv.X = data.subDiv.X < 1 ? 1 : data.subDiv.X;
+  data.subDiv.Y = data.subDiv.Y < 1 ? 1 : data.subDiv.Y;
+  data.subDiv.Z = data.subDiv.Z < 1 ? 1 : data.subDiv.Z;
   // set the parameters for ComputeNormals()
-  _facetParameters.facetNormals      = getFacetLocalNormals();
-  _facetParameters.facetPositions    = getFacetLocalPositions();
-  _facetParameters.facetPartitioning = getFacetLocalPartitioning();
-  _facetParameters.bInfo             = bInfo;
-  _facetParameters.bbSize            = _bbSize;
-  _facetParameters.subDiv            = _subDiv;
-  _facetParameters.ratio             = partitioningBBoxRatio();
-  _facetParameters.depthSort         = _facetDepthSort;
-  if (_facetDepthSort && _facetDepthSortEnabled) {
+  data.facetParameters.facetNormals      = getFacetLocalNormals();
+  data.facetParameters.facetPositions    = getFacetLocalPositions();
+  data.facetParameters.facetPartitioning = getFacetLocalPartitioning();
+  data.facetParameters.bInfo             = bInfo;
+  data.facetParameters.bbSize            = data.bbSize;
+  data.facetParameters.subDiv            = data.subDiv;
+  data.facetParameters.ratio             = partitioningBBoxRatio();
+  data.facetParameters.depthSort         = data.facetDepthSort;
+  if (data.facetDepthSort && data.facetDepthSortEnabled) {
     computeWorldMatrix(true);
-    _worldMatrix.invertToRef(_invertedMatrix);
-    Vector3::TransformCoordinatesToRef(*_facetDepthSortFrom, _invertedMatrix,
-                                       _facetDepthSortOrigin);
-    _facetParameters.distanceTo = _facetDepthSortOrigin;
+    _worldMatrix.invertToRef(data.invertedMatrix);
+    Vector3::TransformCoordinatesToRef(
+      *data.facetDepthSortFrom, data.invertedMatrix, data.facetDepthSortOrigin);
+    data.facetParameters.distanceTo = data.facetDepthSortOrigin;
   }
-  _facetParameters.depthSortedFacets = _depthSortedFacets;
-  VertexData::ComputeNormals(positions, indices, normals, _facetParameters);
+  data.facetParameters.depthSortedFacets = data.depthSortedFacets;
+  VertexData::ComputeNormals(positions, indices, normals, data.facetParameters);
 
-  if (_facetDepthSort && _facetDepthSortEnabled) {
-    std::sort(_depthSortedFacets.begin(), _depthSortedFacets.end(),
-              _facetDepthSortFunction);
-    auto l = (_depthSortedIndices.size() / 3);
+  if (data.facetDepthSort && data.facetDepthSortEnabled) {
+    std::sort(data.depthSortedFacets.begin(), data.depthSortedFacets.end(),
+              data.facetDepthSortFunction);
+    auto l = (data.depthSortedIndices.size() / 3);
     for (size_t f = 0; f < l; f++) {
-      const auto& sind               = _depthSortedFacets[f].ind;
-      _depthSortedIndices[f * 3]     = indices[sind];
-      _depthSortedIndices[f * 3 + 1] = indices[sind + 1];
-      _depthSortedIndices[f * 3 + 2] = indices[sind + 2];
+      const auto& sind                   = data.depthSortedFacets[f].ind;
+      data.depthSortedIndices[f * 3]     = indices[sind];
+      data.depthSortedIndices[f * 3 + 1] = indices[sind + 1];
+      data.depthSortedIndices[f * 3 + 2] = indices[sind + 2];
     }
-    updateIndices(_depthSortedIndices);
+    updateIndices(data.depthSortedIndices);
   }
 
   return *this;
@@ -1693,18 +1647,18 @@ AbstractMesh& AbstractMesh::updateFacetData()
 
 std::vector<Vector3>& AbstractMesh::getFacetLocalNormals()
 {
-  if (_facetNormals.empty()) {
+  if (_facetData.facetNormals.empty()) {
     updateFacetData();
   }
-  return _facetNormals;
+  return _facetData.facetNormals;
 }
 
 std::vector<Vector3>& AbstractMesh::getFacetLocalPositions()
 {
-  if (_facetPositions.empty()) {
+  if (_facetData.facetPositions.empty()) {
     updateFacetData();
   }
-  return _facetPositions;
+  return _facetData.facetPositions;
 }
 
 std::vector<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
@@ -1714,7 +1668,7 @@ std::vector<Uint32Array>& AbstractMesh::getFacetLocalPartitioning()
     updateFacetData();
   }
 #endif
-  return _facetPartitioning;
+  return _facetData.facetPartitioning;
 }
 
 Vector3 AbstractMesh::getFacetPosition(unsigned int i)
@@ -1749,16 +1703,17 @@ AbstractMesh& AbstractMesh::getFacetNormalToRef(unsigned int i, Vector3& ref)
 Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
 {
   auto bInfo = getBoundingInfo();
+  auto& data = _facetData;
 
   int ox = static_cast<int>(
-    std::floor((x - bInfo.minimum().x * _partitioningBBoxRatio) * _subDiv.X
-               * _partitioningBBoxRatio / _bbSize.x));
+    std::floor((x - bInfo.minimum().x * data.partitioningBBoxRatio)
+               * data.subDiv.X * data.partitioningBBoxRatio / data.bbSize.x));
   int oy = static_cast<int>(
-    std::floor((y - bInfo.minimum().y * _partitioningBBoxRatio) * _subDiv.Y
-               * _partitioningBBoxRatio / _bbSize.y));
+    std::floor((y - bInfo.minimum().y * data.partitioningBBoxRatio)
+               * data.subDiv.Y * data.partitioningBBoxRatio / data.bbSize.y));
   int oz = static_cast<int>(
-    std::floor((z - bInfo.minimum().z * _partitioningBBoxRatio) * _subDiv.Z
-               * _partitioningBBoxRatio / _bbSize.z));
+    std::floor((z - bInfo.minimum().z * data.partitioningBBoxRatio)
+               * data.subDiv.Z * data.partitioningBBoxRatio / data.bbSize.z));
 
   if (ox < 0 || oy < 0 || oz < 0) {
     return Uint32Array();
@@ -1767,12 +1722,12 @@ Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
   unsigned int _ox = static_cast<unsigned>(ox);
   unsigned int _oy = static_cast<unsigned>(oy);
   unsigned int _oz = static_cast<unsigned>(oz);
-  if (_ox > _subDiv.max || _oy > _subDiv.max || _oz > _subDiv.max) {
+  if (_ox > data.subDiv.max || _oy > data.subDiv.max || _oz > data.subDiv.max) {
     return Uint32Array();
   }
 
-  return _facetPartitioning[_ox + _subDiv.max * _oy
-                            + _subDiv.max * _subDiv.max * _oz];
+  return data.facetPartitioning[_ox + data.subDiv.max * _oy
+                                + data.subDiv.max * data.subDiv.max * _oz];
 }
 
 int AbstractMesh::getClosestFacetAtCoordinates(float x, float y, float z,
@@ -1863,18 +1818,18 @@ int AbstractMesh::getClosestFacetAtLocalCoordinates(float x, float y, float z,
 
 FacetParameters& AbstractMesh::getFacetDataParameters()
 {
-  return _facetParameters;
+  return _facetData.facetParameters;
 }
 
 AbstractMesh& AbstractMesh::disableFacetData()
 {
-  if (_facetDataEnabled) {
-    _facetDataEnabled = false;
-    _facetPositions.clear();
-    _facetNormals.clear();
-    _facetPartitioning.clear();
-    _facetParameters = FacetParameters();
-    _depthSortedIndices.clear();
+  if (_facetData.facetDataEnabled) {
+    _facetData.facetDataEnabled = false;
+    _facetData.facetPositions.clear();
+    _facetData.facetNormals.clear();
+    _facetData.facetPartitioning.clear();
+    _facetData.facetParameters = FacetParameters();
+    _facetData.depthSortedIndices.clear();
   }
   return *this;
 }

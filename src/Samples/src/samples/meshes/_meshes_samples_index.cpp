@@ -45,7 +45,7 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
 
   // Airplane Model Scene
   _samples["AirplaneModelScene"]
-    = std::make_tuple(true,                                                   //
+    = std::make_tuple(false,                                                  //
                       [](ICanvas* iCanvas) {                                  //
                         return std::make_unique<AirplaneModelScene>(iCanvas); //
                       });                                                     //
@@ -166,7 +166,7 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
     });                                                         //
   // Merged Meshes Scene
   _samples["MergedMeshesScene"]
-    = std::make_tuple(true,                                                  //
+    = std::make_tuple(false,                                                 //
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<MergedMeshesScene>(iCanvas); //
                       });                                                    //

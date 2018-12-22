@@ -205,6 +205,10 @@ Scene::Scene(Engine* engine)
     , isDisposed{this, &Scene::get_isDisposed}
     , _allowPostProcessClearColor{true}
     , blockMaterialDirtyMechanism{false}
+    , getActiveMeshCandidates{nullptr}
+    , getActiveSubMeshCandidates{nullptr}
+    , getIntersectingSubMeshCandidates{nullptr}
+    , getCollidingSubMeshCandidates{nullptr}
     , _physicsEngine{nullptr}
     , _environmentTexture{nullptr}
     , _animationPropertiesOverride{nullptr}
