@@ -113,7 +113,7 @@ bool PhysicsRadialExplosionEvent::_intersectsWithSphere(
   _sphere->_updateBoundingInfo();
   _sphere->computeWorldMatrix(true);
 
-  return _sphere->intersectsMesh(impostorObject, true);
+  return _sphere->intersectsMesh(*impostorObject, true);
 }
 
 } // end of namespace BABYLON

@@ -217,10 +217,7 @@ void RenderingGroup::renderSorted(
 
   // sort using a custom function object
   if (sortCompareFn) {
-    std::sort(sortedArray.begin(), sortedArray.end(),
-              [&sortCompareFn](const SubMeshPtr& a, const SubMeshPtr& b) {
-                return sortCompareFn(a, b);
-              });
+    std::stable_sort(sortedArray.begin(), sortedArray.end(), sortCompareFn);
   }
 
   for (auto& subMesh : sortedArray) {

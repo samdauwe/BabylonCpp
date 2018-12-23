@@ -5,6 +5,7 @@
 
 ## Animations ##
 ![animations_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/animations_scene.png?raw=true "Animations Scene")
+![bouncing_cube_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/bouncing_cube_scene.png?raw=true "Bouncing Cube Scene")
 ![easing_functions_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/easing_functions_scene.png?raw=true "Easing Functions Scene")
 ![shape_easings_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/shape_easings_scene.png?raw=true "Shape Easings Scene")
 ![pump_jack_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/pump_jack_scene.png?raw=true "Pump Jack Scene")

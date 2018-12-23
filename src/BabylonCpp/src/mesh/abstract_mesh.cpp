@@ -983,14 +983,14 @@ bool AbstractMesh::isCompletelyInFrustum(
          && _boundingInfo->isCompletelyInFrustum(frustumPlanes);
 }
 
-bool AbstractMesh::intersectsMesh(class AbstractMesh* mesh, bool precise,
+bool AbstractMesh::intersectsMesh(AbstractMesh& mesh, bool precise,
                                   bool includeDescendants)
 {
-  if (!_boundingInfo || !mesh->_boundingInfo) {
+  if (!_boundingInfo || !mesh._boundingInfo) {
     return false;
   }
 
-  if (_boundingInfo->intersects(*mesh->_boundingInfo, precise)) {
+  if (_boundingInfo->intersects(*mesh._boundingInfo, precise)) {
     return true;
   }
 
@@ -1005,14 +1005,14 @@ bool AbstractMesh::intersectsMesh(class AbstractMesh* mesh, bool precise,
   return false;
 }
 
-bool AbstractMesh::intersectsMesh(SolidParticle* sp, bool precise,
+bool AbstractMesh::intersectsMesh(SolidParticle& sp, bool precise,
                                   bool includeDescendants)
 {
-  if (!_boundingInfo || !sp->_boundingInfo) {
+  if (!_boundingInfo || !sp._boundingInfo) {
     return false;
   }
 
-  if (_boundingInfo->intersects(*sp->_boundingInfo, precise)) {
+  if (_boundingInfo->intersects(*sp._boundingInfo, precise)) {
     return true;
   }
 

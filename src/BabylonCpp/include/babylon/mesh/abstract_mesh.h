@@ -452,7 +452,7 @@ public:
    * parameters intersects with the current mesh or any child meshes
    * @returns true if there is an intersection
    */
-  bool intersectsMesh(class AbstractMesh* mesh, bool precise = false,
+  bool intersectsMesh(AbstractMesh& mesh, bool precise = false,
                       bool includeDescendants = false);
 
   /**
@@ -465,7 +465,7 @@ public:
    * parameters intersects with the current mesh or any child meshes
    * @returns true if there is an intersection
    */
-  bool intersectsMesh(SolidParticle* sp, bool precise = false,
+  bool intersectsMesh(SolidParticle& sp, bool precise = false,
                       bool includeDescendants = false);
 
   /**

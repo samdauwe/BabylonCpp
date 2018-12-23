@@ -165,7 +165,7 @@ bool PhysicsVortexEvent::_intersectsWithCylinder(PhysicsImpostor* impostor)
 
   _cylinder->position = _cylinderPosition;
 
-  return _cylinder->intersectsMesh(impostorObject, true);
+  return _cylinder->intersectsMesh(*impostorObject, true);
 }
 
 } // end of namespace BABYLON
