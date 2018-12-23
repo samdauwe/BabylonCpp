@@ -2,6 +2,7 @@
 
 #include <babylon/samples/specialfx/convolution_post_process_scene.h>
 #include <babylon/samples/specialfx/environment_scene.h>
+#include <babylon/samples/specialfx/fade_in_out_scene.h>
 #include <babylon/samples/specialfx/fireworks_with_shader_code_scene.h>
 #include <babylon/samples/specialfx/fog_scene.h>
 #include <babylon/samples/specialfx/fresnel_scene.h>
@@ -30,6 +31,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
     [](ICanvas* iCanvas) {                                           //
       return std::make_unique<ConvolutionPostProcessScene>(iCanvas); //
     });                                                              //
+  // Fade In / Out Scene
+  _samples["FadeInOutScene"]
+    = std::make_tuple(true,                                               //
+                      [](ICanvas* iCanvas) {                              //
+                        return std::make_unique<FadeInOutScene>(iCanvas); //
+                      });                                                 //
   // Environment Scene
   _samples["EnvironmentScene"]
     = std::make_tuple(true,                                                 //
