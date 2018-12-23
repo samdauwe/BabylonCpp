@@ -13,6 +13,7 @@
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
 #include <babylon/mesh/_facet_data_storage.h>
+#include <babylon/mesh/abstract_mesh_constants.h>
 #include <babylon/mesh/facet_parameters.h>
 #include <babylon/mesh/iget_set_vertices_data.h>
 #include <babylon/mesh/transform_node.h>
@@ -52,25 +53,31 @@ class BABYLON_SHARED_EXPORT AbstractMesh : public TransformNode,
                                            public IGetSetVerticesData {
 
 public:
-  // Statics
-
   /** No occlusion */
-  static constexpr unsigned int OCCLUSION_TYPE_NONE = 0;
+  static constexpr unsigned int OCCLUSION_TYPE_NONE
+    = AbstractMeshConstants::OCCLUSION_TYPE_NONE;
   /** Occlusion set to optimisitic */
-  static constexpr unsigned int OCCLUSION_TYPE_OPTIMISTIC = 1;
+  static constexpr unsigned int OCCLUSION_TYPE_OPTIMISTIC
+    = AbstractMeshConstants::OCCLUSION_TYPE_OPTIMISTIC;
   /** Occlusion set to strict */
-  static constexpr unsigned int OCCLUSION_TYPE_STRICT = 2;
+  static constexpr unsigned int OCCLUSION_TYPE_STRICT
+    = AbstractMeshConstants::OCCLUSION_TYPE_STRICT;
   /** Use an accurante occlusion algorithm */
-  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE = 0;
+  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_ACCURATE
+    = AbstractMeshConstants::OCCLUSION_ALGORITHM_TYPE_ACCURATE;
   /** Use a conservative occlusion algorithm */
-  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE = 1;
+  static constexpr unsigned int OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE
+    = AbstractMeshConstants::OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
 
   /** Default culling strategy with bounding box and bounding sphere and then
    * frustum culling */
-  static constexpr unsigned int CULLINGSTRATEGY_STANDARD = 0;
+  static constexpr unsigned int CULLINGSTRATEGY_STANDARD
+    = AbstractMeshConstants::CULLINGSTRATEGY_STANDARD;
   /** Culling strategy with bounding sphere only and then frustum culling */
-  static constexpr unsigned int CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY = 1;
+  static constexpr unsigned int CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
+    = AbstractMeshConstants::CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY;
 
+public:
   static Vector3 _lookAtVectorCache;
 
   template <typename... Ts>
