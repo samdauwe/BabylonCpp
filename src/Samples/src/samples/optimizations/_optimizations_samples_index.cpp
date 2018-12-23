@@ -2,6 +2,7 @@
 
 #include <babylon/samples/optimizations/box_instances_scene.h>
 #include <babylon/samples/optimizations/building_instances_grid_scene.h>
+#include <babylon/samples/optimizations/cube_chaos_scene.h>
 #include <babylon/samples/optimizations/many_box_instances_scene.h>
 
 namespace BABYLON {
@@ -23,6 +24,12 @@ _OptimizationsSamplesIndex::_OptimizationsSamplesIndex()
     [](ICanvas* iCanvas) {                                          //
       return std::make_unique<BuildingInstancesGridScene>(iCanvas); //
     });                                                             //
+  // Cube Chaos Scene
+  _samples["CubeChaosScene"]
+    = std::make_tuple(true,                                               //
+                      [](ICanvas* iCanvas) {                              //
+                        return std::make_unique<CubeChaosScene>(iCanvas); //
+                      });                                                 //
   // Many Box Instances Scene
   _samples["ManyBoxInstancesScene"] = std::make_tuple(
     true,                                                      //
