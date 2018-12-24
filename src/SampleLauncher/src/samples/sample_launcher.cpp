@@ -34,8 +34,8 @@ namespace Samples {
 const SampleLauncher::ResolutionSize SampleLauncher::DESIGN_RESOLUTION_SIZE
   = std::make_pair(1280, 720);
 const SampleLauncher::ResolutionSize SampleLauncher::SMALL_RESOLUTION_SIZE
-  = std::make_pair(240, 160);
- // = std::make_pair(800, 600);
+  // = std::make_pair(240, 160);
+  = std::make_pair(800, 600);
 const SampleLauncher::ResolutionSize SampleLauncher::MEDIUM_RESOLUTION_SIZE
   = std::make_pair(1024, 768);
 const SampleLauncher::ResolutionSize SampleLauncher::LARGE_RESOLUTION_SIZE

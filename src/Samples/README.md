@@ -140,6 +140,7 @@
 
 ## Special FX ##
 ![convolution_post_process_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/convolution_post_process_scene.png?raw=true "Convolution Post-process Scene")
+![dawn_bringer_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/dawn_bringer_scene.png?raw=true "Dawn Bringer Scene")
 ![environment_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/environment_scene.png?raw=true "Environment Scene")
 ![fireworks_with_shader_code_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fireworks_with_shader_code_scene.png?raw=true "Fireworks with Shader Code Scene")
 ![fog_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fog_scene.png?raw=true "Fog Scene")
