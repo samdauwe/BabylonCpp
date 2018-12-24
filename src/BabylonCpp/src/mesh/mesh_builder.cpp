@@ -648,9 +648,10 @@ MeshPtr MeshBuilder::ExtrudePolygon(const std::string& name,
 MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
                                 Scene* scene)
 {
-  const auto& path           = options.path;
-  const auto& radius         = options.radius;
-  const auto& tessellation   = options.tessellation;
+  const auto& path   = options.path;
+  const auto& radius = options.radius;
+  const auto& tessellation
+    = options.tessellation == 0 ? 64 : options.tessellation;
   const auto& radiusFunction = options.radiusFunction;
   auto cap                   = options.cap;
   const auto& invertUV       = options.invertUV;
@@ -680,7 +681,7 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
         Matrix rotationMatrix = Tmp::MatrixArray[0];
         unsigned int index
           = (_cap == Mesh::NO_CAP() || _cap == Mesh::CAP_END()) ? 0 : 2;
-        circlePaths.resize(_path.size() + index + 2);
+        circlePaths.resize(_path.size() + index);
         for (unsigned int i = 0; i < _path.size(); ++i) {
           rad = (_radiusFunction == nullptr) ?
                   _radius :

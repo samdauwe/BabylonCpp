@@ -2,6 +2,7 @@
 
 #include <babylon/samples/animations/animations_scene.h>
 #include <babylon/samples/animations/bouncing_cube_scene.h>
+#include <babylon/samples/animations/cannon_ball_scene.h>
 #include <babylon/samples/animations/cartoon_animations_scene.h>
 #include <babylon/samples/animations/easing/easing_functions_scene.h>
 #include <babylon/samples/animations/easing/shape_easings_scene.h>
@@ -27,6 +28,12 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<BouncingCubeScene>(iCanvas); //
                       });                                                    //
+  // Cannon Ball Scene
+  _samples["CannonBallScene"]
+    = std::make_tuple(true,                                                //
+                      [](ICanvas* iCanvas) {                               //
+                        return std::make_unique<CannonBallScene>(iCanvas); //
+                      });                                                  //
   // Cartoon Animations Scene
   _samples["CartoonAnimationsScene"] = std::make_tuple(
     false,                                                      //

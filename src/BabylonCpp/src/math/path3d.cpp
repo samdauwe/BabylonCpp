@@ -156,6 +156,10 @@ Float32Array& Path3D::getDistances()
 Path3D& Path3D::update(const std::vector<Vector3>& path,
                        const std::optional<Vector3>& firstNormal)
 {
+  if (_curve.size() < path.size()) {
+    _curve.resize(path.size());
+  }
+
   for (unsigned int p = 0; p < path.size(); ++p) {
     _curve[p].x = path[p].x;
     _curve[p].y = path[p].y;
@@ -269,12 +273,10 @@ Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
           Math::Epsilon)) { // search for a point in the plane
       point = Vector3(0.f, -1.f, 0.f);
     }
-    else if (!Scalar::WithinEpsilon(std::abs(vt.x) / tgl, 1.f,
-                                    Math::Epsilon)) {
+    else if (!Scalar::WithinEpsilon(std::abs(vt.x) / tgl, 1.f, Math::Epsilon)) {
       point = Vector3(1.f, 0.f, 0.f);
     }
-    else if (!Scalar::WithinEpsilon(std::abs(vt.z) / tgl, 1.f,
-                                    Math::Epsilon)) {
+    else if (!Scalar::WithinEpsilon(std::abs(vt.z) / tgl, 1.f, Math::Epsilon)) {
       point = Vector3(0.f, 0.f, 1.f);
     }
     else {
