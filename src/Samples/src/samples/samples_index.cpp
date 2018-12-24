@@ -5,6 +5,7 @@
 #include <babylon/interfaces/irenderable_scene.h>
 #include <babylon/samples/animations/_animations_samples_index.h>
 #include <babylon/samples/cameras/_cameras_samples_index.h>
+#include <babylon/samples/collisionsandintersections/_collisions_and_intersections_samples_index.h>
 #include <babylon/samples/extensions/_extensions_samples_index.h>
 #include <babylon/samples/lights/_lights_samples_index.h>
 #include <babylon/samples/loaders/_loaders_samples_index.h>
@@ -22,12 +23,15 @@ namespace Samples {
 
 SamplesIndex::SamplesIndex()
 {
-  // Inintialize the samples index
+  // Initialize the samples index
   _samplesIndex = {
     // Animations samples
     {_AnimationsSamplesIndex::CategoryName(), _AnimationsSamplesIndex()},
     // Cameras samples
     {_CamerasSamplesIndex::CategoryName(), _CamerasSamplesIndex()},
+    // Collisions and Intersections samples
+    {_CollisionsAndIntersectionsSamplesIndex::CategoryName(),
+     _CollisionsAndIntersectionsSamplesIndex()},
     // Extensions samples
     {_ExtensionsSamplesIndex::CategoryName(), _ExtensionsSamplesIndex()},
     // Lights samples

@@ -16,6 +16,9 @@
 ![multi_views_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/multi_views_scene.png?raw=true "Multi-Views Scene")
 ![rollercoaster_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rollercoaster_scene.png?raw=true "Rollercoaster Scene")
 
+## Collisions and Intersections ##
+![intersections_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/intersections_scene.png?raw=true "Intersections Scene")
+
 ## Lights ##
 ![directional_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/directional_light_scene.png?raw=true "Directional Light Scene")
 ![hemispheric_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/hemispheric_light_scene.png?raw=true "Hemispheric Light Scene")
