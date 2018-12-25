@@ -7,6 +7,7 @@
 #include <babylon/samples/specialfx/fireworks_with_shader_code_scene.h>
 #include <babylon/samples/specialfx/fog_scene.h>
 #include <babylon/samples/specialfx/fresnel_scene.h>
+#include <babylon/samples/specialfx/heat_wave_scene.h>
 #include <babylon/samples/specialfx/infinite_loader_scene.h>
 #include <babylon/samples/specialfx/lens_flares_scene.h>
 #include <babylon/samples/specialfx/points_cloud_scene.h>
@@ -68,6 +69,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
                       [](ICanvas* iCanvas) {                            //
                         return std::make_unique<FresnelScene>(iCanvas); //
                       });                                               //
+  // Heat wave Scene
+  _samples["HeatWaveScene"]
+    = std::make_tuple(true,                                              //
+                      [](ICanvas* iCanvas) {                             //
+                        return std::make_unique<HeatWaveScene>(iCanvas); //
+                      });                                                //
   // Infinite Loader Scene
   _samples["InfiniteLoaderScene"] = std::make_tuple(
     false,                                                   //

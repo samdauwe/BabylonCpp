@@ -145,6 +145,7 @@
 ![fireworks_with_shader_code_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fireworks_with_shader_code_scene.png?raw=true "Fireworks with Shader Code Scene")
 ![fog_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fog_scene.png?raw=true "Fog Scene")
 ![fresnel_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_scene.png?raw=true "Fresnel Scene")
+![heat_wave_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/heat_wave_scene.png?raw=true "Heat Wave Scene")
 ![infinite_loader_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png?raw=true "Infinite Loader Scene")
 ![lens_flares_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lens_flares_scene.png?raw=true "Lens Flares Scene")
 ![portals_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/portals_scene.png?raw=true "Portals Scene")
