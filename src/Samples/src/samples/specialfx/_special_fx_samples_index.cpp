@@ -16,6 +16,7 @@
 #include <babylon/samples/specialfx/realtime_refraction_scene.h>
 #include <babylon/samples/specialfx/refraction_and_reflection_dds_scene.h>
 #include <babylon/samples/specialfx/refraction_and_reflection_scene.h>
+#include <babylon/samples/specialfx/rgb_shift_glitch_scene.h>
 #include <babylon/samples/specialfx/simple_post_process_render_pipeline_scene.h>
 #include <babylon/samples/specialfx/sprites_scene.h>
 #include <babylon/samples/specialfx/waves_scene.h>
@@ -117,12 +118,18 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
     [](ICanvas* iCanvas) {                                               //
       return std::make_unique<RefractionAndReflectionDDSScene>(iCanvas); //
     });                                                                  //
-  // Refraction And Reflection Scene
-  _samples["RefractionAndReflectionScene"] = std::make_tuple(
-    true,                                                             //
-    [](ICanvas* iCanvas) {                                            //
-      return std::make_unique<RefractionAndReflectionScene>(iCanvas); //
-    });                                                               //
+  // Refraction And Reflection DDS Scene
+  _samples["RefractionAndReflectionDDSScene"] = std::make_tuple(
+    true,                                                                //
+    [](ICanvas* iCanvas) {                                               //
+      return std::make_unique<RefractionAndReflectionDDSScene>(iCanvas); //
+    });                                                                  //
+  // RGB Shift Glitch Scene
+  _samples["RGBShiftGlitchScene"] = std::make_tuple(
+    true,                                                    //
+    [](ICanvas* iCanvas) {                                   //
+      return std::make_unique<RGBShiftGlitchScene>(iCanvas); //
+    });                                                      //
   // Simple Post Process Render Pipeline Scene
   _samples["SimplePostProcessRenderPipelineScene"] = std::make_tuple(
     true,                                                                     //

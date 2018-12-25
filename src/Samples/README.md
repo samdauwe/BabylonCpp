@@ -151,6 +151,7 @@
 ![portals_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/portals_scene.png?raw=true "Portals Scene")
 ![refraction_and_reflection_dds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/refraction_and_reflection_dds_scene.png?raw=true "Refraction And Reflection DDS Texture Scene")
 ![refraction_and_reflection_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/refraction_and_reflection_scene.png?raw=true "Refraction And Reflection Scene")
+![rgb_shift_glitch_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rgb_shift_glitch_scene.png?raw=true "RGB Shift Glitch Scene")
 ![simple_post_process_render_pipeline_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simple_post_process_render_pipeline_scene.png?raw=true "Simple Post Process Render Pipeline Scene")
 ![waves_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/waves_scene.png?raw=true "Waves Scene")
 
