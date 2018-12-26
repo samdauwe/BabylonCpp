@@ -691,7 +691,7 @@ public:
 
 public:
   std::vector<Vector3> path;
-  float radius;
+  std::optional<float> radius;
   unsigned int tessellation;
   std::function<float(unsigned int i, float distance)> radiusFunction;
   unsigned int cap;

@@ -1762,10 +1762,6 @@ private:
   unsigned int _tessellation;
   unsigned int _cap;
   float _arc;
-  // For ribbon
-  bool _closePath;
-  bool _closeArray;
-  Uint32Array _idx;
 
 }; // end of class Mesh
 

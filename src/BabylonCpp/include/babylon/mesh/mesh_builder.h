@@ -40,7 +40,7 @@ public:
    * @brief Creates a box mesh.
    * * The parameter `size` sets the size (float) of each box side (default 1)
    * * You can set some different box dimensions by using the parameters
-   * `width`, `height` and `depth` (all by default have the same value than
+   * `width`, `height` and `depth` (all by default have the same value of
    * `size`)
    * * You can set different colors and different images to each box side by
    * using the parameters `faceColors` (an array of 6 Color3 elements) and
@@ -72,7 +72,7 @@ public:
    * (default 1)
    * * You can set some different sphere dimensions, for instance to build an
    * ellipsoid, by using the parameters `diameterX`, `diameterY` and `diameterZ`
-   * (all by default have the same value than `diameter`)
+   * (all by default have the same value of `diameter`)
    * * The parameter `segments` sets the sphere number of horizontal stripes
    * (positive integer, default 32)
    * * You can create an unclosed sphere with the parameter `arc` (positive
@@ -135,7 +135,7 @@ public:
    * (default 1)
    * * You can set some different icosphere dimensions, for instance to build an
    * ellipsoid, by using the parameters `radiusX`, `radiusY` and `radiusZ` (all
-   * by default have the same value than `radius`)
+   * by default have the same value of `radius`)
    * * The parameter `subdivisions` sets the number of subdivisions (postive
    * integer, default 4). The more subdivisions, the more faces on the icosphere
    * whatever its size
@@ -567,7 +567,7 @@ public:
    * * The parameter `size` sets the size (float) of both sides of the plane at
    * once (default 1)
    * * You can set some different plane dimensions by using the parameters
-   * `width` and `height` (both by default have the same value than `size`)
+   * `width` and `height` (both by default have the same value of `size`)
    * * The parameter `sourcePlane` is a Plane instance. It builds a mesh plane
    * from a Math plane
    * * You can also set the mesh side orientation with the values :
@@ -649,6 +649,8 @@ public:
    * * The parameter `onReady` is a javascript callback function that will be
    * called  once the mesh is just built (the height map download can last some
    * time).
+   * * The parameter `alphaFilter` will filter any data where the alpha channel
+   * is below this value, defaults 0 (all data visible)
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once
    * created.

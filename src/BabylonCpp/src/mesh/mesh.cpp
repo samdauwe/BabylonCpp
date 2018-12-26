@@ -77,8 +77,6 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , _source{nullptr}
     , _tessellation{0}
     , _arc{1.f}
-    , _closePath{false}
-    , _closeArray{false}
 {
   _boundingInfo                    = nullptr;
   _instanceDataStorage->batchCache = std::make_shared<_InstancesBatch>();

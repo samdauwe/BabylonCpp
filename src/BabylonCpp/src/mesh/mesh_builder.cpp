@@ -8,6 +8,7 @@
 #include <babylon/math/path3d.h>
 #include <babylon/math/position_normal_vertex.h>
 #include <babylon/math/tmp.h>
+#include <babylon/mesh/_creation_data_storage.h>
 #include <babylon/mesh/ground_mesh.h>
 #include <babylon/mesh/lines_mesh.h>
 #include <babylon/mesh/polygonmesh/polygon_mesh_builder.h>
@@ -109,10 +110,10 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
                              Tmp::Vector3Array[1]);
     const auto positionFunction = [&](Float32Array& positions) {
       auto minlg     = pathArray[0].size();
+      auto& mesh     = instance;
       unsigned int i = 0;
       unsigned int ns
-        = (instance->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2 :
-                                                                            1;
+        = (mesh->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2 : 1;
       for (std::size_t si = 1; si <= ns; ++si) {
         for (std::size_t p = 0; p < pathArray.size(); ++p) {
           const auto& path = pathArray[p];
@@ -144,7 +145,8 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
             ++j;
             i += 3;
           }
-          if (instance->_closePath) {
+          if (mesh->_creationDataStorage
+              && mesh->_creationDataStorage->closePath) {
             positions[i + 0] = path[0].x;
             positions[i + 1] = path[0].y;
             positions[i + 2] = path[0].z;
@@ -156,7 +158,7 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
     auto positions = instance->getVerticesData(VertexBuffer::PositionKind);
     positionFunction(positions);
     instance->setBoundingInfo(
-      BoundingInfo(Tmp::Vector3Array[0], Tmp::Vector3Array[1]));
+      BoundingInfo(Tmp::Vector3Array[2], Tmp::Vector3Array[3]));
     instance->getBoundingInfo().update(instance->_worldMatrix);
     instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
                                  false);
@@ -190,13 +192,14 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
         VertexData::ComputeNormals(positions, indices, normals);
       }
 
-      if (instance->_closePath) {
+      if (instance->_creationDataStorage
+          && instance->_creationDataStorage->closePath) {
         unsigned int indexFirst = 0;
         size_t indexLast        = 0;
         for (std::size_t p = 0; p < pathArray.size(); ++p) {
-          indexFirst = instance->_idx[p] * 3;
+          indexFirst = instance->_creationDataStorage->idx[p] * 3;
           if (p + 1 < pathArray.size()) {
-            indexLast = (instance->_idx[p + 1] - 1) * 3;
+            indexLast = (instance->_creationDataStorage->idx[p + 1] - 1) * 3;
           }
           else {
             indexLast = normals.size() - 3;
@@ -224,13 +227,14 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
   else { // new ribbon creation
     auto ribbon                             = Mesh::New(name, scene);
     ribbon->_originalBuilderSideOrientation = sideOrientation;
+    ribbon->_creationDataStorage = std::make_shared<_CreationDataStorage>();
 
     auto vertexData = VertexData::CreateRibbon(options);
     if (closePath) {
-      ribbon->_idx = vertexData->_idx;
+      ribbon->_creationDataStorage->idx = vertexData->_idx;
     }
-    ribbon->_closePath  = closePath;
-    ribbon->_closeArray = closeArray;
+    ribbon->_creationDataStorage->closePath  = closePath;
+    ribbon->_creationDataStorage->closeArray = closeArray;
 
     vertexData->applyToMesh(*ribbon, updatable);
 
@@ -369,9 +373,10 @@ LinesMeshPtr MeshBuilder::CreateDashedLines(const std::string& name,
         points[i + 1].subtractToRef(points[i], curvect);
         lg += curvect.length();
       }
-      shft     = lg / static_cast<float>(nbSeg);
-      dashshft = static_cast<float>(instance->dashSize) * shft
-                 / static_cast<float>(instance->dashSize + instance->gapSize);
+      shft          = lg / static_cast<float>(nbSeg);
+      auto dashSize = instance->_creationDataStorage->dashSize;
+      auto gapSize  = instance->_creationDataStorage->gapSize;
+      dashshft      = dashSize * shft / static_cast<float>(dashSize + gapSize);
       std::size_t i = 0;
       for (i = 0; i < points.size() - 1; ++i) {
         points[i + 1].subtractToRef(points[i], curvect);
@@ -404,8 +409,9 @@ LinesMeshPtr MeshBuilder::CreateDashedLines(const std::string& name,
   auto dashedLines = LinesMesh::New(name, scene);
   auto vertexData  = VertexData::CreateDashedLines(options);
   vertexData->applyToMesh(*dashedLines, options.updatable);
-  dashedLines->dashSize = dashSize;
-  dashedLines->gapSize  = gapSize;
+  dashedLines->_creationDataStorage = std::make_shared<_CreationDataStorage>();
+  dashedLines->_creationDataStorage->dashSize = dashSize;
+  dashedLines->_creationDataStorage->gapSize  = gapSize;
   return dashedLines;
 }
 
@@ -509,7 +515,9 @@ MeshPtr MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,
       = std::acos(Vector3::Dot(options.sourcePlane->normal, Axis::Z()));
     auto vectorProduct = Vector3::Cross(Axis::Z(), options.sourcePlane->normal);
 
-    plane->rotate(vectorProduct, product);
+    if (vectorProduct.lengthSquared() > Math::Epsilon) {
+      plane->rotate(vectorProduct, product);
+    }
   }
 
   return plane;
@@ -647,8 +655,14 @@ MeshPtr MeshBuilder::ExtrudePolygon(const std::string& name,
 MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
                                 Scene* scene)
 {
-  const auto& path   = options.path;
-  const auto& radius = options.radius;
+  const auto& path = options.path;
+  auto radius      = 1.f;
+  if (options.radius.has_value()) {
+    radius = *options.radius;
+  }
+  else if (options.instance) {
+    radius = options.instance->_creationDataStorage->radius;
+  }
   const auto& tessellation
     = options.tessellation == 0 ? 64 : options.tessellation;
   const auto& radiusFunction = options.radiusFunction;
@@ -678,8 +692,9 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
         Vector3 normal;
         Vector3 rotated;
         Matrix rotationMatrix = Tmp::MatrixArray[0];
+        // TODO FIXME
         unsigned int index
-          = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
+          = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 0;
         circlePaths.resize(_path.size() + index);
         for (unsigned int i = 0; i < _path.size(); ++i) {
           rad = (_radiusFunction == nullptr) ?
@@ -736,15 +751,19 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
   std::vector<std::vector<Vector3>> pathArray;
   if (instance) {
     // tube update
-    path3D    = path3D.update(path);
-    pathArray = tubePathArray(path, path3D, pathArray, radius, tessellation,
-                              radiusFunction, cap, arc);
+    auto& storage = instance->_creationDataStorage;
+    auto arc      = (options.arc() != 0.f) ? options.arc() : storage->arc;
+    path3D        = storage->path3D.update(path);
+    pathArray
+      = tubePathArray(path, path3D, storage->pathArray, radius,
+                      storage->tessellation, radiusFunction, storage->cap, arc);
     RibbonOptions ribbonOptions(pathArray);
-    ribbonOptions.instance = instance;
-    instance             = MeshBuilder::CreateRibbon("", ribbonOptions, scene);
-    instance->_path3D    = path3D;
-    instance->_pathArray = pathArray;
-    instance->_arc       = arc;
+    instance = MeshBuilder::CreateRibbon("", ribbonOptions, scene);
+    // Update mode, no need to recreate the storage.
+    storage->path3D    = path3D;
+    storage->pathArray = pathArray;
+    storage->arc       = arc;
+    storage->radius    = radius;
 
     return instance;
   }
@@ -760,12 +779,13 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
   ribbonOptions.updatable       = updatable;
   ribbonOptions.sideOrientation = sideOrientation;
   ribbonOptions.invertUV        = invertUV;
-  auto tube           = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
-  tube->_pathArray    = std::move(pathArray);
-  tube->_path3D       = std::move(path3D);
-  tube->_tessellation = tessellation;
-  tube->_cap          = cap;
-  tube->_arc          = arc;
+  auto tube = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
+  tube->_creationDataStorage->pathArray    = pathArray;
+  tube->_creationDataStorage->path3D       = path3D;
+  tube->_creationDataStorage->tessellation = tessellation;
+  tube->_creationDataStorage->cap          = cap;
+  tube->_creationDataStorage->arc          = options.arc();
+  tube->_creationDataStorage->radius       = radius;
 
   return tube;
 }
@@ -1115,10 +1135,11 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
   Path3D path3D;
   std::vector<std::vector<Vector3>> pathArray;
   if (instance) { // instance update
-    path3D    = path3D.update(curve);
-    pathArray = extrusionPathArray(
-      shape, curve, instance->_path3D, instance->_pathArray, scale, rotation,
-      scaleFunction, rotateFunction, instance->_cap, custom);
+    auto& storage = instance->_creationDataStorage;
+    path3D        = storage->path3D.update(curve);
+    pathArray     = extrusionPathArray(
+      shape, curve, storage->path3D, storage->pathArray, scale, rotation,
+      scaleFunction, rotateFunction, storage->cap, custom);
     instance = Mesh::CreateRibbon("", pathArray, false, false, 0, scene, false,
                                   Mesh::DEFAULTSIDE, instance);
 
@@ -1140,9 +1161,9 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
   ribbonOptions.frontUVs        = frontUVs;
   ribbonOptions.backUVs         = backUVs;
   auto extrudedGeneric = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
-  extrudedGeneric->_pathArray = std::move(pathArray);
-  extrudedGeneric->_path3D    = std::move(path3D);
-  extrudedGeneric->_cap       = _cap;
+  extrudedGeneric->_creationDataStorage->pathArray = pathArray;
+  extrudedGeneric->_creationDataStorage->path3D    = path3D;
+  extrudedGeneric->_creationDataStorage->cap       = _cap;
 
   return extrudedGeneric;
 }

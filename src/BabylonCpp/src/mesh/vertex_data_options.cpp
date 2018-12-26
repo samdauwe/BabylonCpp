@@ -238,7 +238,7 @@ GroundFromHeightMapOptions::GroundFromHeightMapOptions()
     , maxHeight{1.f}
     , bufferWidth{1}
     , bufferHeight{1}
-    , alphaFilter{std::nullopt}
+    , alphaFilter{0.f}
     , colorFilter{Color3(0.3f, 0.59f, 0.11f)}
     , updatable{false}
     , onReady{nullptr}

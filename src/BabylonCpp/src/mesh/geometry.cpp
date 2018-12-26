@@ -82,11 +82,16 @@ std::optional<Vector2>& Geometry::get_boundingBias()
 
 void Geometry::set_boundingBias(const std::optional<Vector2>& value)
 {
-  if (_boundingBias && (*_boundingBias).equals(*value)) {
-    return;
-  }
+  if (_boundingBias && value.has_value()) {
+    if (_boundingBias->equals(*value)) {
+      return;
+    }
 
-  _boundingBias = value;
+    _boundingBias->copyFrom(*value);
+  }
+  else {
+    _boundingBias = value;
+  }
 
   _updateBoundingInfo(true, Float32Array());
 }
@@ -602,6 +607,13 @@ void Geometry::_applyToMesh(Mesh* mesh)
   if (_indexBuffer) {
     _indexBuffer->references = numOfMeshes;
   }
+
+  // morphTargets
+#if 0
+  mesh->_syncGeometryWithMorphTargetManager();
+#else
+  // TODO FIXME
+#endif
 }
 
 void Geometry::notifyUpdate(unsigned int kind)
@@ -933,11 +945,7 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
   // Update
   mesh->computeWorldMatrix(true);
 
-  // Octree
-  auto sceneOctree = scene->selectionOctree();
-  if (sceneOctree) {
-    // sceneOctree->addMesh(mesh);
-  }
+  scene->onMeshImportedObservable.notifyObservers(mesh.get());
 }
 
 void Geometry::_CleanMatricesWeights(const json& parsedGeometry,

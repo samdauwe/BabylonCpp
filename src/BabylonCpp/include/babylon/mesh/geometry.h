@@ -57,21 +57,21 @@ public:
   void addToScene(const GeometryPtr& newGeometry);
 
   /**
-   * @brief Static function used to attach a new empty geometry to a mesh.
+   * @brief Static function used to attach a new empty geometry to a mesh
    * @param mesh defines the mesh to attach the geometry to
-   * @returns the new {BABYLON.Geometry}
+   * @returns the new Geometry
    */
   static GeometryPtr CreateGeometryForMesh(Mesh* mesh);
 
   /**
    * @brief Gets the hosting scene.
-   * @returns the hosting {BABYLON.Scene}
+   * @returns the hosting Scene
    */
   Scene* getScene();
 
   /**
    * @brief Gets the hosting engine.
-   * @returns the hosting {BABYLON.Engine}
+   * @returns the hosting Engine
    */
   Engine* getEngine();
 
@@ -186,13 +186,14 @@ public:
   /**
    * @brief Gets a specific vertex buffer.
    * @param kind defines the data kind (Position, normal, etc...)
-   * @returns a {BABYLON.VertexBuffer}
+   * @returns a VertexBuffer
    */
   VertexBuffer* getVertexBuffer(unsigned int kind) const;
 
   /**
-   * @brief Returns all vertex buffers.
-   * @return an object holding all vertex buffers indexed by kind
+   * @brief Gets a specific vertex buffer.
+   * @param kind defines the data kind (Position, normal, etc...)
+   * @returns a VertexBuffer
    */
   std::unordered_map<std::string, VertexBuffer*> getVertexBuffers();
 
@@ -377,8 +378,7 @@ protected:
    * @brief Creates a new geometry.
    * @param id defines the unique ID
    * @param scene defines the hosting scene
-   * @param vertexData defines the {BABYLON.VertexData} used to get geometry
-   * data
+   * @param vertexData defines the VertexData used to get geometry data
    * @param updatable defines if geometry must be updatable (false by default)
    * @param mesh defines the mesh that will be associated with the geometry
    */
