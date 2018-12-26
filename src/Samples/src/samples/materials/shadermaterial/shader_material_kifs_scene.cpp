@@ -51,7 +51,7 @@ void ShaderMaterialKIFSScene::initializeScene(ICanvas* canvas, Scene* scene)
   const float ratio = static_cast<float>(getEngine()->getRenderWidth())
                       / static_cast<float>(getEngine()->getRenderHeight());
   BoxOptions options(5.f);
-  options.sideOrientation = Mesh::DEFAULTSIDE();
+  options.sideOrientation = Mesh::DEFAULTSIDE;
   options.updatable       = false;
   options.width           = options.width * ratio;
   auto skybox             = MeshBuilder::CreateBox("skybox", options, scene);

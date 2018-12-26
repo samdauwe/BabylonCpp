@@ -11,12 +11,12 @@ namespace BABYLON {
 class InstancedMesh;
 
 /**
- * @brief
+ * @brief Hidden
  */
 class BABYLON_SHARED_EXPORT _InstancesBatch {
 
 public:
-  bool mustReturn;
+  bool mustReturn = false;
   std::unordered_map<size_t, std::vector<InstancedMesh*>> visibleInstances;
   std::unordered_map<size_t, bool> renderSelf;
 

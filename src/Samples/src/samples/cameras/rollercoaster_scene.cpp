@@ -42,8 +42,7 @@ void RollercoasterScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.7f;
 
   // Then the sky with a Skybox
-  auto skybox
-    = Mesh::CreateBox("skyBox", 2000.f, scene, false, Mesh::BACKSIDE());
+  auto skybox = Mesh::CreateBox("skyBox", 2000.f, scene, false, Mesh::BACKSIDE);
   auto skyboxMaterial                = StandardMaterial::New("skyBox", scene);
   auto reflectionTexture             = CubeTexture::New(urlSkyBox, scene);
   reflectionTexture->coordinatesMode = TextureConstants::SKYBOX_MODE;
@@ -157,7 +156,7 @@ void RollercoasterScene::initializeScene(ICanvas* canvas, Scene* scene)
   // coaster
   auto origin = Vector3::Zero();
   auto rollerCoaster
-    = Mesh::ExtrudeShape("rc", shape, _points, 2, 0, Mesh::NO_CAP(), scene);
+    = Mesh::ExtrudeShape("rc", shape, _points, 2, 0, Mesh::NO_CAP, scene);
   auto mat                = StandardMaterial::New("mat1", scene);
   mat->diffuseColor       = Color3(1.f, 0.8f, 1.f);
   mat->wireframe          = true;

@@ -826,7 +826,7 @@ private:
     const std::optional<Vector4>& frontUVs,
     const std::optional<Vector4>& backUVs);
   static unsigned int updateSideOrientation(unsigned int orientation
-                                            = Mesh::FRONTSIDE());
+                                            = Mesh::FRONTSIDE);
 
 }; // end of class MeshBuilder
 

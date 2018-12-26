@@ -91,17 +91,17 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto fuselageXer = 7.f;
   auto fuselength  = radius * fuselageXer;
   auto noseOptions
-    = createSphereOptions1(diameter, 0.5f, 16u, true, Mesh::FRONTSIDE());
+    = createSphereOptions1(diameter, 0.5f, 16u, true, Mesh::FRONTSIDE);
   auto nose = MeshBuilder::CreateSphere("nose", noseOptions, scene);
   auto noseconeOptions
     = createCylinderOptions1(radius * 2.02f, radius, diameter, 32);
   auto nosecone
     = MeshBuilder::CreateCylinder("nosecone", noseconeOptions, scene);
   auto taperOptions
-    = createSphereOptions1(radius * 2.05f, 0.45f, 16u, true, Mesh::FRONTSIDE());
+    = createSphereOptions1(radius * 2.05f, 0.45f, 16u, true, Mesh::FRONTSIDE);
   auto taper = MeshBuilder::CreateSphere("taper", taperOptions, scene);
   auto flightdeckOptions
-    = createSphereOptions2(diameter, 16u, true, Mesh::FRONTSIDE());
+    = createSphereOptions2(diameter, 16u, true, Mesh::FRONTSIDE);
   auto flightdeck
     = MeshBuilder::CreateSphere("flightdeck", flightdeckOptions, scene);
   auto flightdecktaperOptions

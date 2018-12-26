@@ -25,7 +25,7 @@ BoxOptions::BoxOptions()
     , depth{1.f}
     , faceUV{DefaultBoxFaceUV}
     , faceColors{DefaultBoxFaceColors}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -38,7 +38,7 @@ BoxOptions::BoxOptions(float size)
     , depth{size}
     , faceUV{DefaultBoxFaceUV}
     , faceColors{DefaultBoxFaceColors}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -71,7 +71,7 @@ CylinderOptions::CylinderOptions()
     , hasRings{false}
     , enclose{false}
     , faceUV{DefaultCylinderFaceUV}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -88,7 +88,7 @@ CylinderOptions::CylinderOptions(float diameter)
     , hasRings{false}
     , enclose{false}
     , faceUV{DefaultCylinderFaceUV}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -154,7 +154,7 @@ Vector4 DiscOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
 DiscOptions::DiscOptions()
     : radius{0.5f}
     , tessellation{64}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -186,10 +186,10 @@ Vector4 ExtrudeShapeOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
 ExtrudeShapeOptions::ExtrudeShapeOptions()
     : rotation{0.f}
     , scale{1.f}
-    , cap{Mesh::NO_CAP()}
+    , cap{Mesh::NO_CAP}
     , instance{nullptr}
     , invertUV{false}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -210,10 +210,10 @@ Vector4 ExtrudeShapeCustomOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
 ExtrudeShapeCustomOptions::ExtrudeShapeCustomOptions()
     : ribbonCloseArray{false}
     , ribbonClosePath{false}
-    , cap{Mesh::NO_CAP()}
+    , cap{Mesh::NO_CAP}
     , instance{nullptr}
     , invertUV{false}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -238,7 +238,7 @@ GroundFromHeightMapOptions::GroundFromHeightMapOptions()
     , maxHeight{1.f}
     , bufferWidth{1}
     , bufferHeight{1}
-    , alphaFilter{0.f}
+    , alphaFilter{std::nullopt}
     , colorFilter{Color3(0.3f, 0.59f, 0.11f)}
     , updatable{false}
     , onReady{nullptr}
@@ -280,7 +280,7 @@ IcoSphereOptions::IcoSphereOptions()
     , radiusZ{1.f}
     , flat{true}
     , subdivisions{4}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -294,7 +294,7 @@ IcoSphereOptions::IcoSphereOptions(float _radius)
     , radiusZ{_radius}
     , flat{true}
     , subdivisions{4}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -318,10 +318,10 @@ LatheOptions::LatheOptions()
     , clip{0}
     , closed{true}
     , updatable{false}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
-    , cap{Mesh::NO_CAP()}
+    , cap{Mesh::NO_CAP}
     , invertUV{false}
     , _arc{1.f}
 {
@@ -388,7 +388,7 @@ Vector4 PlaneOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
 PlaneOptions::PlaneOptions()
     : width{1.f}
     , height{1.f}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -399,7 +399,7 @@ PlaneOptions::PlaneOptions()
 PlaneOptions::PlaneOptions(float size)
     : width{size}
     , height{size}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -421,7 +421,7 @@ Vector4 PolygonOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
 PolygonOptions::PolygonOptions()
     : depth{0.f}
     , updatable{false}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
 {
@@ -445,7 +445,7 @@ PolyhedronOptions::PolyhedronOptions()
     , sizeY{1.f}
     , sizeZ{1.f}
     , flat{true}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -459,7 +459,7 @@ PolyhedronOptions::PolyhedronOptions(float _size)
     , sizeY{_size}
     , sizeZ{_size}
     , flat{true}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -479,7 +479,7 @@ RibbonOptions::RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
     : closeArray{false}
     , closePath{false}
     , invertUV{false}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{std::nullopt}
     , backUVs{std::nullopt}
     , updatable{false}
@@ -525,7 +525,7 @@ SphereOptions::SphereOptions()
     , diameterX{1.f}
     , diameterY{1.f}
     , diameterZ{1.f}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -539,7 +539,7 @@ SphereOptions::SphereOptions(float diameter)
     , diameterX{diameter}
     , diameterY{diameter}
     , diameterZ{diameter}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -605,7 +605,7 @@ TorusKnotOptions::TorusKnotOptions()
     , tubularSegments{32}
     , p{2}
     , q{3}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -627,7 +627,7 @@ TorusOptions::TorusOptions()
     : diameter{1.f}
     , thickness{0.5f}
     , tessellation{16}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , updatable{false}
@@ -649,8 +649,8 @@ TubeOptions::TubeOptions()
     : radius{1.f}
     , tessellation{64}
     , radiusFunction{nullptr}
-    , cap{Mesh::NO_CAP()}
-    , sideOrientation{Mesh::DEFAULTSIDE()}
+    , cap{Mesh::NO_CAP}
+    , sideOrientation{Mesh::DEFAULTSIDE}
     , frontUVs{DefaultFrontUVs}
     , backUVs{DefaultBackUVs}
     , instance{nullptr}

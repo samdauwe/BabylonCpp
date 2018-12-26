@@ -69,7 +69,7 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
   ExtrudeShapeOptions extrudeShapeOptions;
   extrudeShapeOptions.shape = side;
   extrudeShapeOptions.path  = extrudePath;
-  extrudeShapeOptions.cap   = Mesh::NO_CAP();
+  extrudeShapeOptions.cap   = Mesh::NO_CAP;
   _carBody = MeshBuilder::ExtrudeShape("body", extrudeShapeOptions, scene);
   _carBody->material = bodyMaterial;
   /*----------------------- End Car Body -------------------------------------*/

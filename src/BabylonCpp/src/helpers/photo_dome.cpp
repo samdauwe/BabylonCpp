@@ -44,7 +44,7 @@ PhotoDome::PhotoDome(
   auto material = _material
     = BackgroundMaterial::New(name + "_material", scene);
   _mesh = Mesh::CreateSphere(name + "_mesh", *options.resolution, *options.size,
-                             scene, false, Mesh::BACKSIDE());
+                             scene, false, Mesh::BACKSIDE);
 
   // configure material
   material->setOpacityFresnel(false);

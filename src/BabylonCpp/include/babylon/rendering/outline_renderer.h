@@ -16,6 +16,7 @@ class Effect;
 class Engine;
 class Scene;
 class SubMesh;
+using _InstancesBatchPtr = std::shared_ptr<_InstancesBatch>;
 using EffectPtr          = std::shared_ptr<Effect>;
 using OutlineRendererPtr = std::shared_ptr<OutlineRenderer>;
 
@@ -69,7 +70,7 @@ public:
    * @param useOverlay Defines if the rendering is for the overlay or the
    * outline
    */
-  void render(SubMesh* subMesh, _InstancesBatch* batch,
+  void render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
               bool useOverlay = false);
 
   /**
@@ -93,9 +94,9 @@ protected:
 
 private:
   void _beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
-                            _InstancesBatch* batch);
+                            const _InstancesBatchPtr& batch);
   void _afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
-                           _InstancesBatch* batch);
+                           const _InstancesBatchPtr& batch);
 
 public:
   /**

@@ -61,7 +61,7 @@ protected:
                    float diameterTop, float diameterBottom,
                    unsigned int tessellation, unsigned int subdivisions,
                    bool canBeRegenerated, Mesh* mesh = nullptr,
-                   unsigned int side = Mesh::DEFAULTSIDE());
+                   unsigned int side = Mesh::DEFAULTSIDE);
 
 public:
   /**

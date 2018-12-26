@@ -58,7 +58,7 @@ protected:
                  const std::vector<std::vector<Vector3>>& pathArray,
                  bool closeArray, bool closePath, int offset,
                  bool canBeRegenerated, Mesh* mesh,
-                 unsigned int side = Mesh::DEFAULTSIDE());
+                 unsigned int side = Mesh::DEFAULTSIDE);
 
 public:
   /**

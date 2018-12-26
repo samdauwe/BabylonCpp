@@ -50,7 +50,7 @@ MeshPtr SimplePineGenerator::CreateTree(Scene* scene,
   };
 
   auto leaves = Mesh::CreateTube("leaves", curve, 0.f, tessellation,
-                                 radiusFunction, Mesh::CAP_START(), scene);
+                                 radiusFunction, Mesh::CAP_START, scene);
   // leaves->convertToFlatShadedMesh();
 
   auto trunk

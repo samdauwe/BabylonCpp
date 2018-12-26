@@ -17,6 +17,7 @@ class PickingInfo;
 struct PointerEvent;
 class RenderTargetTexture;
 class SubMesh;
+using _InstancesBatchPtr     = std::shared_ptr<_InstancesBatch>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
@@ -51,7 +52,7 @@ using RenderingGroupStageAction = std::function<void(int renderingGroupId)>;
  * Strong typing of a Mesh Render related stage step action
  */
 using RenderingMeshStageAction = std::function<void(
-  AbstractMesh* mesh, SubMesh* subMesh, _InstancesBatch* batch)>;
+  AbstractMesh* mesh, SubMesh* subMesh, const _InstancesBatchPtr& batch)>;
 
 /**
  * Strong typing of a simple stage step action

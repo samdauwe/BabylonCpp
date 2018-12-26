@@ -35,12 +35,14 @@ void OutlineRenderer::_register()
 {
   scene->_beforeRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_BEFORERENDERINGMESH_OUTLINE, this,
-    [this](AbstractMesh* mesh, SubMesh* subMesh, _InstancesBatch* batch) {
+    [this](AbstractMesh* mesh, SubMesh* subMesh,
+           const _InstancesBatchPtr& batch) {
       _beforeRenderingMesh(mesh, subMesh, batch);
     });
   scene->_afterRenderingMeshStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGMESH_OUTLINE, this,
-    [this](AbstractMesh* mesh, SubMesh* subMesh, _InstancesBatch* batch) {
+    [this](AbstractMesh* mesh, SubMesh* subMesh,
+           const _InstancesBatchPtr& batch) {
       _afterRenderingMesh(mesh, subMesh, batch);
     });
 }
@@ -55,7 +57,7 @@ void OutlineRenderer::dispose()
   // Nothing to do here.
 }
 
-void OutlineRenderer::render(SubMesh* subMesh, _InstancesBatch* batch,
+void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
                              bool useOverlay)
 {
   auto engine = scene->getEngine();
@@ -199,7 +201,7 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
 }
 
 void OutlineRenderer::_beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
-                                           _InstancesBatch* batch)
+                                           const _InstancesBatchPtr& batch)
 {
   // Outline - step 1
   _savedDepthWrite = _engine->getDepthWrite();
@@ -211,7 +213,7 @@ void OutlineRenderer::_beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
 }
 
 void OutlineRenderer::_afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
-                                          _InstancesBatch* batch)
+                                          const _InstancesBatchPtr& batch)
 {
   // Outline - step 2
   if (mesh->renderOutline && _savedDepthWrite) {

@@ -266,7 +266,7 @@ public:
   Uint8Array buffer;
   unsigned int bufferWidth;
   unsigned int bufferHeight;
-  float alphaFilter;
+  std::optional<float> alphaFilter;
   Color3 colorFilter;
   bool updatable;
   std::function<void(GroundMesh* mesh)> onReady;

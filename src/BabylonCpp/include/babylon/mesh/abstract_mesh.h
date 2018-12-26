@@ -800,7 +800,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _checkOcclusionQuery();
+  bool _checkOcclusionQuery();
 
 protected:
   // Constructor

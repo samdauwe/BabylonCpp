@@ -457,7 +457,7 @@ public:
   std::function<void(const json& parsedVertexData, Geometry& geometry)>
     _delayLoadingFunction;
   /** Hidden */
-  int _softwareSkinningRenderId;
+  int _softwareSkinningFrameId;
   // Cache
   /** Hidden */
   std::vector<Vector3> _positions;

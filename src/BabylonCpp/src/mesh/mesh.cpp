@@ -23,6 +23,8 @@
 #include <babylon/math/matrix.h>
 #include <babylon/math/tmp.h>
 #include <babylon/math/vector2.h>
+#include <babylon/mesh/_creation_data_storage.h>
+#include <babylon/mesh/_instance_data_storage.h>
 #include <babylon/mesh/_instances_batch.h>
 #include <babylon/mesh/_visible_instances.h>
 #include <babylon/mesh/buffer.h>
@@ -56,31 +58,30 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , morphTargetManager{this, &Mesh::get_morphTargetManager,
                          &Mesh::set_morphTargetManager}
     , _geometry{nullptr}
-    , _visibleInstances{nullptr}
     , _shouldGenerateFlatShading{false}
-    , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE()}
+    , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
     , overrideMaterialSideOrientation{std::nullopt}
     , source{this, &Mesh::get_source}
     , isUnIndexed{this, &Mesh::get_isUnIndexed, &Mesh::set_isUnIndexed}
     , hasLODLevels{this, &Mesh::get_hasLODLevels}
     , geometry{this, &Mesh::get_geometry}
     , areNormalsFrozen{this, &Mesh::get_areNormalsFrozen}
+    , overridenInstanceCount{this, &Mesh::set_overridenInstanceCount}
     , _onBeforeDrawObserver{nullptr}
     , _morphTargetManager{nullptr}
-    , _batchCache{std::make_unique<_InstancesBatch>()}
-    , _instancesBufferSize{32 * 16 * 4} // maximum of 32 instances
-    , _overridenInstanceCount{0}
+    , _creationDataStorage{std::make_shared<_CreationDataStorage>()}
+    , _instanceDataStorage{std::make_unique<_InstanceDataStorage>()}
     , _effectiveMaterial{nullptr}
     , _preActivateId{-1}
     , _areNormalsFrozen{false}
     , _source{nullptr}
     , _tessellation{0}
-    , _cap{Mesh::NO_CAP()}
     , _arc{1.f}
     , _closePath{false}
     , _closeArray{false}
 {
-  _boundingInfo = nullptr;
+  _boundingInfo                    = nullptr;
+  _instanceDataStorage->batchCache = std::make_shared<_InstancesBatch>();
 
   scene = getScene();
 
@@ -105,6 +106,12 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
 
     // Source mesh
     _source = source;
+
+    // Construction Params
+    // Clone parameters allowing mesh to be updated in case of parametric
+    // shapes.
+    _originalBuilderSideOrientation = source->_originalBuilderSideOrientation;
+    _creationDataStorage            = source->_creationDataStorage;
 
     // Parent
     Node::set_parent(source->parent());
@@ -580,9 +587,9 @@ Mesh& Mesh::unfreezeNormals()
   return *this;
 }
 
-void Mesh::setOverridenInstanceCount(size_t count)
+void Mesh::set_overridenInstanceCount(size_t count)
 {
-  _overridenInstanceCount = count;
+  _instanceDataStorage->overridenInstanceCount = count;
 }
 
 void Mesh::_preActivate()
@@ -592,31 +599,35 @@ void Mesh::_preActivate()
     return;
   }
 
-  _preActivateId    = sceneRenderId;
-  _visibleInstances = nullptr;
+  _preActivateId                         = sceneRenderId;
+  _instanceDataStorage->visibleInstances = nullptr;
 }
 
 void Mesh::_preActivateForIntermediateRendering(int renderId)
 {
-  if (_visibleInstances) {
-    _visibleInstances->intermediateDefaultRenderId = renderId;
+  if (_instanceDataStorage->visibleInstances) {
+    _instanceDataStorage->visibleInstances->intermediateDefaultRenderId
+      = renderId;
   }
 }
 
 Mesh& Mesh::_registerInstanceForRenderId(InstancedMesh* instance, int renderId)
 {
-  if (!_visibleInstances) {
-    _visibleInstances                  = std::make_unique<_VisibleInstances>();
-    _visibleInstances->defaultRenderId = renderId;
-    _visibleInstances->selfDefaultRenderId = _renderId;
+  if (!_instanceDataStorage->visibleInstances) {
+    _instanceDataStorage->visibleInstances
+      = std::make_shared<_VisibleInstances>();
+    _instanceDataStorage->visibleInstances->defaultRenderId     = renderId;
+    _instanceDataStorage->visibleInstances->selfDefaultRenderId = _renderId;
   }
 
-  if (_visibleInstances->meshes.find(renderId)
-      == _visibleInstances->meshes.end()) {
-    _visibleInstances->meshes[renderId] = std::vector<InstancedMesh*>();
+  if (_instanceDataStorage->visibleInstances->meshes.find(renderId)
+      == _instanceDataStorage->visibleInstances->meshes.end()) {
+    _instanceDataStorage->visibleInstances->meshes[renderId]
+      = std::vector<InstancedMesh*>();
   }
 
-  _visibleInstances->meshes[renderId].emplace_back(instance);
+  _instanceDataStorage->visibleInstances->meshes[renderId].emplace_back(
+    instance);
 
   return *this;
 }
@@ -634,7 +645,11 @@ Mesh& Mesh::_refreshBoundingInfo(bool applySkeleton)
 
   auto data = _getPositionData(applySkeleton);
   if (!data.empty()) {
-    auto extend   = Tools::ExtractMinAndMax(data, 0, getTotalVertices());
+    std::optional<Vector2> bias = std::nullopt;
+    if (geometry) {
+      bias = geometry()->boundingBias;
+    }
+    auto extend   = Tools::ExtractMinAndMax(data, 0, getTotalVertices(), bias);
     _boundingInfo = std::make_unique<BoundingInfo>(extend.min, extend.max);
   }
 
@@ -949,7 +964,7 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect,
         indexToBind = nullptr;
         break;
       case Material::WireFrameFillMode():
-        indexToBind = subMesh->getLinesIndexBuffer(getIndices(), engine);
+        indexToBind = subMesh->_getLinesIndexBuffer(getIndices(), engine);
         break;
       default:
       case Material::TriangleFillMode():
@@ -985,7 +1000,7 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
   else if (fillMode == Material::WireFrameFillMode()) {
     // Triangles as wireframe
     engine->drawElementsType(_fillMode, 0,
-                             static_cast<int>(subMesh->linesIndexCount),
+                             static_cast<int>(subMesh->_linesIndexCount),
                              static_cast<int>(instancesCount));
   }
   else {
@@ -1042,56 +1057,60 @@ Mesh& Mesh::unregisterAfterRender(
   return *this;
 }
 
-_InstancesBatch* Mesh::_getInstancesRenderList(size_t subMeshId)
+_InstancesBatchPtr Mesh::_getInstancesRenderList(size_t subMeshId)
 {
-  auto scene                               = getScene();
-  _batchCache->mustReturn                  = false;
-  _batchCache->renderSelf[subMeshId]       = isEnabled() && isVisible;
-  _batchCache->visibleInstances[subMeshId] = std::vector<InstancedMesh*>();
+  auto scene                              = getScene();
+  auto& batchCache                        = _instanceDataStorage->batchCache;
+  batchCache->mustReturn                  = false;
+  batchCache->renderSelf[subMeshId]       = isEnabled() && isVisible;
+  batchCache->visibleInstances[subMeshId] = std::vector<InstancedMesh*>();
 
-  if (_visibleInstances) {
-    auto currentRenderId_ = scene->getRenderId();
-    auto defaultRenderId  = scene->_isInIntermediateRendering() ?
-                             _visibleInstances->intermediateDefaultRenderId :
-                             _visibleInstances->defaultRenderId;
-    _batchCache->visibleInstances[subMeshId]
-      = _visibleInstances->meshes[currentRenderId_];
-    int selfRenderId = _renderId;
+  if (_instanceDataStorage->visibleInstances) {
+    auto& visibleInstances = _instanceDataStorage->visibleInstances;
+    auto currentRenderId   = scene->getRenderId();
+    auto defaultRenderId   = (scene->_isInIntermediateRendering() ?
+                              visibleInstances->intermediateDefaultRenderId :
+                              visibleInstances->defaultRenderId);
+    batchCache->visibleInstances[subMeshId]
+      = visibleInstances->meshes[currentRenderId];
+    auto selfRenderId = _renderId;
 
-    if ((_batchCache->visibleInstances.find(subMeshId)
-         == _batchCache->visibleInstances.end())
-        && defaultRenderId) {
-      _batchCache->visibleInstances[subMeshId]
-        = _visibleInstances->meshes[defaultRenderId];
-      currentRenderId_ = std::max(defaultRenderId, currentRenderId_);
+    if ((batchCache->visibleInstances.find(subMeshId)
+         == batchCache->visibleInstances.end())
+        && batchCache->visibleInstances[subMeshId].empty() && defaultRenderId) {
+      batchCache->visibleInstances[subMeshId]
+        = visibleInstances->meshes[defaultRenderId];
+      currentRenderId = std::max(defaultRenderId, currentRenderId);
       selfRenderId
-        = std::max(_visibleInstances->selfDefaultRenderId, currentRenderId_);
+        = std::max(visibleInstances->selfDefaultRenderId, currentRenderId);
     }
 
-    if ((_batchCache->visibleInstances.find(subMeshId)
-         != _batchCache->visibleInstances.end())
-        && _batchCache->visibleInstances[subMeshId].size() > 0) {
-      if (subMeshId < _renderIdForInstances.size()
-          && _renderIdForInstances[subMeshId] == currentRenderId_) {
-        _batchCache->mustReturn = true;
-        return _batchCache.get();
+    auto visibleInstancesForSubMesh = batchCache->visibleInstances[subMeshId];
+    if ((batchCache->visibleInstances.find(subMeshId)
+         != batchCache->visibleInstances.end())
+        && batchCache->visibleInstances[subMeshId].size() > 0) {
+      if (subMeshId < _instanceDataStorage->renderIdForInstances.size()
+          && _instanceDataStorage->renderIdForInstances[subMeshId]
+               == currentRenderId) {
+        batchCache->mustReturn = true;
+        return batchCache;
       }
 
-      if (currentRenderId_ != selfRenderId) {
-        _batchCache->renderSelf[subMeshId] = false;
+      if (currentRenderId != selfRenderId) {
+        batchCache->renderSelf[subMeshId] = false;
       }
     }
-    if (subMeshId >= _renderIdForInstances.size()) {
-      _renderIdForInstances.resize(subMeshId + 1);
+    if (subMeshId >= _instanceDataStorage->renderIdForInstances.size()) {
+      _instanceDataStorage->renderIdForInstances.resize(subMeshId + 1);
     }
-    _renderIdForInstances[subMeshId] = currentRenderId_;
+    _instanceDataStorage->renderIdForInstances[subMeshId] = currentRenderId;
   }
 
-  return _batchCache.get();
+  return batchCache;
 }
 
 Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
-                                 _InstancesBatch* batch,
+                                 const _InstancesBatchPtr& batch,
                                  const EffectPtr& effect, Engine* engine)
 {
   if (batch->visibleInstances.find(subMesh->_id)
@@ -1107,15 +1126,18 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
   size_t matricesCount = visibleInstances.size() + 1;
   size_t bufferSize    = matricesCount * 16 * 4;
 
-  auto currentInstancesBufferSize = _instancesBufferSize;
+  auto& instanceStorage           = _instanceDataStorage;
+  auto currentInstancesBufferSize = instanceStorage->instancesBufferSize;
+  auto& instancesBuffer           = instanceStorage->instancesBuffer;
 
-  while (_instancesBufferSize < bufferSize) {
-    _instancesBufferSize *= 2;
+  while (instanceStorage->instancesBufferSize < bufferSize) {
+    instanceStorage->instancesBufferSize *= 2;
   }
 
-  if (_instancesData.empty()
-      || currentInstancesBufferSize != _instancesBufferSize) {
-    _instancesData = Float32Array(_instancesBufferSize / 4);
+  if (instanceStorage->instancesData.empty()
+      || currentInstancesBufferSize != instanceStorage->instancesBufferSize) {
+    instanceStorage->instancesData
+      = Float32Array(instanceStorage->instancesBufferSize / 4);
   }
 
   unsigned int offset         = 0;
@@ -1123,7 +1145,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
 
   auto world = getWorldMatrix();
   if (batch->renderSelf[subMesh->_id]) {
-    world.copyToArray(_instancesData, offset);
+    world.copyToArray(instanceStorage->instancesData, offset);
     offset += 16;
     instancesCount++;
   }
@@ -1132,31 +1154,34 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
     for (size_t instanceIndex = 0; instanceIndex < visibleInstances.size();
          ++instanceIndex) {
       auto instance = visibleInstances[instanceIndex];
-      instance->getWorldMatrix().copyToArray(_instancesData, offset);
+      instance->getWorldMatrix().copyToArray(instanceStorage->instancesData,
+                                             offset);
       offset += 16;
       ++instancesCount;
     }
   }
 
-  if (!_instancesBuffer || currentInstancesBufferSize != _instancesBufferSize) {
-    if (_instancesBuffer) {
-      _instancesBuffer->dispose();
+  if (!instancesBuffer
+      || currentInstancesBufferSize != instanceStorage->instancesBufferSize) {
+    if (instancesBuffer) {
+      instancesBuffer->dispose();
     }
 
-    _instancesBuffer
-      = std::make_unique<Buffer>(engine, _instancesData, true, 16, false, true);
+    instancesBuffer = std::make_shared<Buffer>(
+      engine, instanceStorage->instancesData, true, 16, false, true);
 
     setVerticesBuffer(
-      _instancesBuffer->createVertexBuffer(VertexBuffer::World0Kind, 0, 4));
+      instancesBuffer->createVertexBuffer(VertexBuffer::World0Kind, 0, 4));
     setVerticesBuffer(
-      _instancesBuffer->createVertexBuffer(VertexBuffer::World1Kind, 4, 4));
+      instancesBuffer->createVertexBuffer(VertexBuffer::World1Kind, 4, 4));
     setVerticesBuffer(
-      _instancesBuffer->createVertexBuffer(VertexBuffer::World2Kind, 8, 4));
+      instancesBuffer->createVertexBuffer(VertexBuffer::World2Kind, 8, 4));
     setVerticesBuffer(
-      _instancesBuffer->createVertexBuffer(VertexBuffer::World3Kind, 12, 4));
+      instancesBuffer->createVertexBuffer(VertexBuffer::World3Kind, 12, 4));
   }
   else {
-    _instancesBuffer->updateDirectly(_instancesData, 0, instancesCount);
+    instancesBuffer->updateDirectly(instanceStorage->instancesData, 0,
+                                    instancesCount);
   }
 
   _bind(subMesh, effect, fillMode);
@@ -1170,7 +1195,7 @@ Mesh& Mesh::_renderWithInstances(SubMesh* subMesh, unsigned int fillMode,
 
 Mesh& Mesh::_processRendering(
   SubMesh* subMesh, const EffectPtr& effect, int fillMode,
-  _InstancesBatch* batch, bool hardwareInstancedRendering,
+  const _InstancesBatchPtr& batch, bool hardwareInstancedRendering,
   std::function<void(bool isInstance, const Matrix& world,
                      Material* effectiveMaterial)>
     onBeforeDraw,
@@ -1190,7 +1215,7 @@ Mesh& Mesh::_processRendering(
         onBeforeDraw(false, getWorldMatrix(), effectiveMaterial);
       }
 
-      _draw(subMesh, fillMode, _overridenInstanceCount);
+      _draw(subMesh, fillMode, _instanceDataStorage->overridenInstanceCount);
     }
 
     auto& visibleInstancesForSubMesh = batch->visibleInstances[subMesh->_id];
@@ -1213,8 +1238,7 @@ Mesh& Mesh::_processRendering(
 
 Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 {
-  _checkOcclusionQuery();
-  if (_isOccluded) {
+  if (_checkOcclusionQuery()) {
     return *this;
   }
 
@@ -1267,12 +1291,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
       static_cast<unsigned>(_effectiveMaterial->alphaMode()));
   }
 
-  // Outline - step 1
-  auto savedDepthWrite = engine->getDepthWrite();
-  if (renderOutline) {
-    engine->setDepthWrite(false);
-    scene->getOutlineRenderer()->render(subMesh, batch);
-    engine->setDepthWrite(savedDepthWrite);
+  for (auto& step : scene->_beforeRenderingMeshStage) {
+    step.action(this, subMesh, batch);
   }
 
   EffectPtr effect = nullptr;
@@ -1349,20 +1369,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   // Unbind
   _effectiveMaterial->unbind();
 
-  // Outline - step 2
-  if (renderOutline && savedDepthWrite) {
-    engine->setDepthWrite(true);
-    engine->setColorWrite(false);
-    scene->getOutlineRenderer()->render(subMesh, batch);
-    engine->setColorWrite(true);
-  }
-
-  // Overlay
-  if (renderOverlay) {
-    auto currentMode = engine->getAlphaMode();
-    engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
-    scene->getOutlineRenderer()->render(subMesh, batch, true);
-    engine->setAlphaMode(currentMode);
+  for (auto& step : scene->_afterRenderingMeshStage) {
+    step.action(this, subMesh, batch);
   }
 
   onAfterRenderObservable().notifyObservers(this);
@@ -1414,81 +1422,13 @@ std::vector<IParticleSystemPtr> Mesh::getHierarchyEmittedParticleSystems()
 
 void Mesh::cleanMatrixWeights()
 {
-  const float epsilon = 1e-3f;
-
-  size_t noInfluenceBoneIndex = 0;
-  if (skeleton()) {
-    noInfluenceBoneIndex = skeleton()->bones.size();
-  }
-  else {
-    return;
-  }
-
-  auto matricesIndices = getVerticesData(VertexBuffer::MatricesIndicesKind);
-  auto matricesIndicesExtra
-    = getVerticesData(VertexBuffer::MatricesIndicesExtraKind);
-  auto matricesWeights = getVerticesData(VertexBuffer::MatricesWeightsKind);
-  auto matricesWeightsExtra
-    = getVerticesData(VertexBuffer::MatricesWeightsExtraKind);
-  auto influencers = static_cast<int>(numBoneInfluencers());
-  auto size        = matricesWeights.size();
-
-  for (size_t i = 0; i < size; i += 4) {
-    float weight        = 0.f;
-    int firstZeroWeight = -1;
-    for (size_t j = 0; j < 4; j++) {
-      auto w = matricesWeights[i + j];
-      weight += w;
-      if (w < epsilon && firstZeroWeight < 0) {
-        firstZeroWeight = static_cast<int>(j);
-      }
-    }
-    if (!matricesWeightsExtra.empty()) {
-      for (size_t j = 0; j < 4; j++) {
-        auto w = matricesWeightsExtra[i + j];
-        weight += w;
-        if (w < epsilon && firstZeroWeight < 0) {
-          firstZeroWeight = static_cast<int>(j) + 4;
-        }
-      }
-    }
-    if (firstZeroWeight < 0 || firstZeroWeight > (influencers - 1)) {
-      firstZeroWeight = influencers - 1;
-    }
-    if (weight > epsilon) {
-      auto mweight = 1.f / weight;
-      for (size_t j = 0; j < 4; j++) {
-        matricesWeights[i + j] *= mweight;
-      }
-      if (!matricesWeightsExtra.empty()) {
-        for (size_t j = 0; j < 4; j++) {
-          matricesWeightsExtra[i + j] *= mweight;
-        }
-      }
+  if (isVerticesDataPresent(VertexBuffer::MatricesWeightsKind)) {
+    if (isVerticesDataPresent(VertexBuffer::MatricesWeightsExtraKind)) {
+      normalizeSkinWeightsAndExtra();
     }
     else {
-      auto _firstZeroWeight = static_cast<size_t>(firstZeroWeight);
-      if (firstZeroWeight >= 4) {
-        matricesWeightsExtra[i + _firstZeroWeight - 4] = 1.f - weight;
-        matricesIndicesExtra[i + _firstZeroWeight - 4] = noInfluenceBoneIndex;
-      }
-      else {
-        matricesWeights[i + _firstZeroWeight] = 1.f - weight;
-        matricesIndices[i + _firstZeroWeight] = noInfluenceBoneIndex;
-      }
+      normalizeSkinFourWeights();
     }
-  }
-
-  setVerticesData(VertexBuffer::MatricesIndicesKind, matricesIndices);
-  if (!matricesIndicesExtra.empty()) {
-    setVerticesData(VertexBuffer::MatricesIndicesExtraKind,
-                    matricesIndicesExtra);
-  }
-
-  setVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeights);
-  if (!matricesWeightsExtra.empty()) {
-    setVerticesData(VertexBuffer::MatricesWeightsExtraKind,
-                    matricesWeightsExtra);
   }
 }
 
@@ -1502,6 +1442,176 @@ std::vector<NodePtr> Mesh::getChildren()
   }
 
   return results;
+}
+
+void Mesh::normalizeSkinFourWeights()
+{
+  auto matricesWeights = getVerticesData(VertexBuffer::MatricesWeightsKind);
+  auto numWeights      = matricesWeights.size();
+
+  for (size_t a = 0; a < numWeights; a += 4) {
+    // accumulate weights
+    auto t = matricesWeights[a] + matricesWeights[a + 1]
+             + matricesWeights[a + 2] + matricesWeights[a + 3];
+    // check for invalid weight and just set it to 1.
+    if (t == 0.f) {
+      matricesWeights[a] = 1.f;
+    }
+    else {
+      // renormalize so everything adds to 1 use reciprical
+      auto recip = 1.f / t;
+      matricesWeights[a] *= recip;
+      matricesWeights[a + 1] *= recip;
+      matricesWeights[a + 2] *= recip;
+      matricesWeights[a + 3] *= recip;
+    }
+  }
+  setVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeights);
+}
+
+void Mesh::normalizeSkinWeightsAndExtra()
+{
+  auto matricesWeightsExtra
+    = getVerticesData(VertexBuffer::MatricesWeightsExtraKind);
+  auto matricesWeights = getVerticesData(VertexBuffer::MatricesWeightsKind);
+  auto numWeights      = matricesWeights.size();
+
+  for (size_t a = 0; a < numWeights; a += 4) {
+    // accumulate weights
+    auto t = matricesWeights[a] + matricesWeights[a + 1]
+             + matricesWeights[a + 2] + matricesWeights[a + 3];
+    t += matricesWeightsExtra[a] + matricesWeightsExtra[a + 1]
+         + matricesWeightsExtra[a + 2] + matricesWeightsExtra[a + 3];
+    // check for invalid weight and just set it to 1.
+    if (t == 0.f) {
+      matricesWeights[a] = 1.f;
+    }
+    else {
+      // renormalize so everything adds to 1 use reciprical
+      auto recip = 1.f / t;
+      matricesWeights[a] *= recip;
+      matricesWeights[a + 1] *= recip;
+      matricesWeights[a + 2] *= recip;
+      matricesWeights[a + 3] *= recip;
+      // same goes for extras
+      matricesWeightsExtra[a] *= recip;
+      matricesWeightsExtra[a + 1] *= recip;
+      matricesWeightsExtra[a + 2] *= recip;
+      matricesWeightsExtra[a + 3] *= recip;
+    }
+  }
+  setVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeights);
+  setVerticesData(VertexBuffer::MatricesWeightsKind, matricesWeightsExtra);
+}
+
+SkinningValidationResult Mesh::validateSkinning()
+{
+  auto matricesWeightsExtra
+    = getVerticesData(VertexBuffer::MatricesWeightsExtraKind);
+  auto matricesWeights = getVerticesData(VertexBuffer::MatricesWeightsKind);
+  if (matricesWeights.empty() || skeleton() == nullptr) {
+    return {
+      false,        // skinned
+      true,         // valid
+      "not skinned" // report
+    };
+  }
+
+  auto numWeights          = matricesWeights.size();
+  auto numberNotSorted     = 0u;
+  auto missingWeights      = 0u;
+  auto maxUsedWeights      = 0u;
+  auto numberNotNormalized = 0u;
+  auto numInfluences       = matricesWeightsExtra.empty() ? 4u : 8u;
+  Float32Array usedWeightCounts;
+  for (size_t a = 0; a <= numInfluences; a++) {
+    usedWeightCounts[a] = 0;
+  }
+  const float toleranceEpsilon = 0.001f;
+
+  for (size_t a = 0; a < numWeights; a += 4) {
+    auto lastWeight  = matricesWeights[a];
+    auto t           = lastWeight;
+    auto usedWeights = (t == 0.f) ? 0u : 1u;
+
+    for (size_t b = 1; b < numInfluences; b++) {
+      auto d = b < 4 ? matricesWeights[a + b] : matricesWeightsExtra[a + b - 4];
+      if (d > lastWeight) {
+        ++numberNotSorted;
+      }
+      if (d != 0.f) {
+        ++usedWeights;
+      }
+      t += d;
+      lastWeight = d;
+    }
+    // count the buffer weights usage
+    usedWeightCounts[usedWeights]++;
+
+    // max influences
+    if (usedWeights > maxUsedWeights) {
+      maxUsedWeights = usedWeights;
+    }
+
+    // check for invalid weight and just set it to 1.
+    if (t == 0.f) {
+      ++missingWeights;
+    }
+    else {
+      // renormalize so everything adds to 1 use reciprical
+      auto recip     = 1.f / t;
+      auto tolerance = 0.f;
+      for (size_t b = 0; b < numInfluences; ++b) {
+        if (b < 4) {
+          tolerance += std::abs(matricesWeights[a + b]
+                                - (matricesWeights[a + b] * recip));
+        }
+        else {
+          tolerance += std::abs(matricesWeightsExtra[a + b - 4]
+                                - (matricesWeightsExtra[a + b - 4] * recip));
+        }
+      }
+      // arbitary epsilon value for dicdating not normalized
+      if (tolerance > toleranceEpsilon) {
+        numberNotNormalized++;
+      }
+    }
+  }
+
+  // validate bone indices are in range of the skeleton
+  auto numBones        = skeleton()->bones.size();
+  auto matricesIndices = getVerticesData(VertexBuffer::MatricesIndicesKind);
+  auto matricesIndicesExtra
+    = getVerticesData(VertexBuffer::MatricesIndicesExtraKind);
+  auto numBadBoneIndices = 0u;
+  for (size_t a = 0; a < numWeights; a++) {
+    for (size_t b = 0; b < numInfluences; b++) {
+      auto index = b < 4 ? matricesIndices[b] : matricesIndicesExtra[b - 4];
+      if (index >= numBones || index < 0) {
+        numBadBoneIndices++;
+      }
+    }
+  }
+
+  // log mesh stats
+  std::ostringstream output;
+  output << "Number of Weights = " << (numWeights / 4)
+         << "\nMaximum influences = " << maxUsedWeights
+         << "\nMissing Weights = " << missingWeights
+         << "\nNot Sorted = " << numberNotSorted
+         << "\nNot Normalized = " << numberNotNormalized << "\nWeightCounts = ["
+         << usedWeightCounts << "]"
+         << "\nNumber of bones = " << numBones
+         << "\nBad Bone Indices = " << numBadBoneIndices;
+
+  bool isValid = (missingWeights == 0 && numberNotNormalized == 0
+                  && numBadBoneIndices == 0);
+
+  return {
+    true,        // skinned
+    isValid,     // valid
+    output.str() // report
+  };
 }
 
 Mesh& Mesh::_checkDelayState()
@@ -1699,9 +1809,9 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   _source = nullptr;
 
   // Instances
-  if (_instancesBuffer) {
-    _instancesBuffer->dispose();
-    _instancesBuffer.reset(nullptr);
+  if (_instanceDataStorage->instancesBuffer) {
+    _instanceDataStorage->instancesBuffer->dispose();
+    _instanceDataStorage->instancesBuffer = nullptr;
   }
 
   for (auto& instance : instances) {
@@ -2006,6 +2116,10 @@ void Mesh::optimizeIndices(
   const std::function<void(Mesh* mesh)>& successCallback)
 {
   successCallback(nullptr);
+}
+
+void Mesh::serialize(json& /*serializationObject*/)
+{
 }
 
 void Mesh::_syncGeometryWithMorphTargetManager()
@@ -2580,7 +2694,7 @@ MeshPtr Mesh::ExtrudeShapeCustom(
   options.rotationFunction = rotationFunction;
   options.ribbonCloseArray = ribbonCloseArray;
   options.ribbonClosePath  = ribbonClosePath;
-  options.cap              = (cap == 0) ? 0 : Mesh::NO_CAP();
+  options.cap              = (cap == 0) ? 0 : Mesh::NO_CAP;
   options.sideOrientation  = sideOrientation;
   options.instance         = instance;
   options.updatable        = updatable;
@@ -2647,7 +2761,8 @@ GroundMeshPtr Mesh::CreateGroundFromHeightMap(
   const std::string& name, const std::string& url, unsigned int width,
   unsigned int height, unsigned int subdivisions, unsigned int minHeight,
   unsigned int maxHeight, Scene* scene, bool updatable,
-  const std::function<void(GroundMesh* mesh)>& onReady)
+  const std::function<void(GroundMesh* mesh)>& onReady,
+  std::optional<float> alphaFilter)
 {
   GroundFromHeightMapOptions options;
   options.width        = static_cast<float>(width);
@@ -2657,6 +2772,7 @@ GroundMeshPtr Mesh::CreateGroundFromHeightMap(
   options.maxHeight    = static_cast<float>(maxHeight);
   options.updatable    = updatable;
   options.onReady      = onReady;
+  options.alphaFilter  = alphaFilter;
 
   return MeshBuilder::CreateGroundFromHeightMap(name, url, options, scene);
 }
@@ -2749,11 +2865,11 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& skeleton)
     return this;
   }
 
-  if (_geometry->_softwareSkinningRenderId == getScene()->getRenderId()) {
+  if (_geometry->_softwareSkinningFrameId == getScene()->getRenderId()) {
     return this;
   }
 
-  _geometry->_softwareSkinningRenderId = getScene()->getRenderId();
+  _geometry->_softwareSkinningFrameId = getScene()->getRenderId();
 
   if (!isVerticesDataPresent(VertexBuffer::PositionKind)) {
     return this;

@@ -172,7 +172,7 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
 
   RibbonOptions ribbonOptions(terrainData);
   ribbonOptions.sideOrientation
-    = (options.invertSide) ? Mesh::FRONTSIDE() : Mesh::BACKSIDE();
+    = (options.invertSide) ? Mesh::FRONTSIDE : Mesh::BACKSIDE;
   ribbonOptions.colors    = terrainColor;
   ribbonOptions.uvs       = terrainUV;
   ribbonOptions.updatable = true;

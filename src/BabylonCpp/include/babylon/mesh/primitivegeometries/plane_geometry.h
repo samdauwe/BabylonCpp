@@ -54,7 +54,7 @@ protected:
    */
   PlaneGeometry(const std::string& id, Scene* scene, float size,
                 bool canBeRegenerated, Mesh* mesh = nullptr,
-                unsigned int side = Mesh::DEFAULTSIDE());
+                unsigned int side = Mesh::DEFAULTSIDE);
 
 public:
   /**

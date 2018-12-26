@@ -11,17 +11,14 @@ namespace BABYLON {
 class InstancedMesh;
 
 /**
- * @brief
+ * @brief Hidden
  */
-class BABYLON_SHARED_EXPORT _VisibleInstances {
-
-public:
+struct BABYLON_SHARED_EXPORT _VisibleInstances {
   int defaultRenderId;
   int selfDefaultRenderId;
   int intermediateDefaultRenderId;
   std::unordered_map<int, std::vector<InstancedMesh*>> meshes;
-
-}; // end of class _VisibleInstances
+}; // end of struct _VisibleInstances
 
 } // end of namespace BABYLON
 

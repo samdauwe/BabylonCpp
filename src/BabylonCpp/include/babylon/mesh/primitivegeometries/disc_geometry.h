@@ -51,7 +51,7 @@ protected:
    */
   DiscGeometry(const std::string& id, Scene* scene, float radius,
                unsigned int tessellation, bool canBeRegenerated,
-               Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE());
+               Mesh* mesh = nullptr, unsigned int side = Mesh::DEFAULTSIDE);
 
 public:
   /**

@@ -889,7 +889,7 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
   vertexData->uvs       = std::move(uvs);
 
   if (!faceColors.empty()) {
-    if (sideOrientation == Mesh::DOUBLESIDE()) {
+    if (sideOrientation == Mesh::DOUBLESIDE) {
       colors.insert(colors.end(), colors.begin(), colors.end());
     }
     vertexData->colors = std::move(colors);
@@ -1858,7 +1858,7 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
   vertexData->uvs       = std::move(uvs);
 
   if (!faceColors.empty()) {
-    auto totalColors = (sideOrientation == Mesh::DOUBLESIDE()) ?
+    auto totalColors = (sideOrientation == Mesh::DOUBLESIDE) ?
                          stl_util::concat(colors, colors) :
                          colors;
     vertexData->colors = std::move(totalColors);
@@ -2940,11 +2940,11 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
   size_t n;
 
   switch (sideOrientation) {
-    case Mesh::FRONTSIDE():
+    case Mesh::FRONTSIDE:
     default:
       // nothing changed
       break;
-    case Mesh::BACKSIDE():
+    case Mesh::BACKSIDE:
       uint16_t tmp;
       // indices
       for (i = 0; i < li; i += 3) {
@@ -2957,7 +2957,7 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
         normals[n] = -normals[n];
       }
       break;
-    case Mesh::DOUBLESIDE():
+    case Mesh::DOUBLESIDE:
       // positions
       size_t lp      = positions.size();
       unsigned int l = static_cast<unsigned>(lp / 3);

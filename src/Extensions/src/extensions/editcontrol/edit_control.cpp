@@ -1281,7 +1281,7 @@ MeshPtr EditControl::createTube(float r, int t) const
     points.emplace_back(Vector3(x, 0, z));
   }
   auto tube
-    = Mesh::CreateTube("", points, 0.02f, 3, nullptr, Mesh::NO_CAP(), scene);
+    = Mesh::CreateTube("", points, 0.02f, 3, nullptr, Mesh::NO_CAP, scene);
   return tube;
 }
 

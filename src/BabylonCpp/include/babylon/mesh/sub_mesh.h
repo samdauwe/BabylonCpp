@@ -107,8 +107,8 @@ public:
    * @brief Returns a new Index Buffer.
    * @returns The WebGLBuffer.
    */
-  GL::IGLBuffer* getLinesIndexBuffer(const Uint32Array& indices,
-                                     Engine* engine);
+  GL::IGLBuffer* _getLinesIndexBuffer(const Uint32Array& indices,
+                                      Engine* engine);
 
   /**
    * @brief Returns if the passed Ray intersects the submesh bounding box.
@@ -181,7 +181,7 @@ public:
   unsigned int indexStart;
   size_t indexCount;
   bool createBoundingBox;
-  size_t linesIndexCount;
+  size_t _linesIndexCount;
   /** Hidden */
   std::vector<Vector3> _lastColliderWorldVertices;
   /** Hidden */

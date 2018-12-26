@@ -207,8 +207,8 @@ SubMesh& SubMesh::render(bool enableAlphaMode)
   return *this;
 }
 
-GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
-                                            Engine* engine)
+GL::IGLBuffer* SubMesh::_getLinesIndexBuffer(const Uint32Array& indices,
+                                             Engine* engine)
 {
   if (!_linesIndexBuffer) {
     Uint32Array linesIndices;
@@ -221,7 +221,7 @@ GL::IGLBuffer* SubMesh::getLinesIndexBuffer(const Uint32Array& indices,
     }
 
     _linesIndexBuffer = engine->createIndexBuffer(linesIndices);
-    linesIndexCount   = linesIndices.size();
+    _linesIndexCount  = linesIndices.size();
   }
   return _linesIndexBuffer.get();
 }

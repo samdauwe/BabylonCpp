@@ -1877,14 +1877,14 @@ AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,
   return *this;
 }
 
-void AbstractMesh::_checkOcclusionQuery()
+bool AbstractMesh::_checkOcclusionQuery()
 {
   auto engine = getEngine();
 
   if (engine->webGLVersion() < 2.f
       || occlusionType == AbstractMesh::OCCLUSION_TYPE_NONE) {
     _isOccluded = false;
-    return;
+    return false;
   }
 
   if (isOcclusionQueryInProgress() && _occlusionQuery) {
@@ -1913,7 +1913,7 @@ void AbstractMesh::_checkOcclusionQuery()
                         _isOccluded;
       }
       else {
-        return;
+        return false;
       }
     }
   }
@@ -1929,6 +1929,8 @@ void AbstractMesh::_checkOcclusionQuery()
   occlusionBoundingBoxRenderer->renderOcclusionBoundingBox(this);
   engine->endOcclusionQuery(occlusionQueryAlgorithmType);
   _isOcclusionQueryInProgress = true;
+
+  return false;
 }
 
 } // end of namespace BABYLON

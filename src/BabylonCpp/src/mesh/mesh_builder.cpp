@@ -111,9 +111,8 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
       auto minlg     = pathArray[0].size();
       unsigned int i = 0;
       unsigned int ns
-        = (instance->_originalBuilderSideOrientation == Mesh::DOUBLESIDE()) ?
-            2 :
-            1;
+        = (instance->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2 :
+                                                                            1;
       for (std::size_t si = 1; si <= ns; ++si) {
         for (std::size_t p = 0; p < pathArray.size(); ++p) {
           const auto& path = pathArray[p];
@@ -459,7 +458,7 @@ MeshPtr MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
   Vector3 rotated;
   for (float i = 0.f; i <= tessellation - clip; ++i) {
     std::vector<Vector3> path;
-    if (cap == Mesh::CAP_START() || cap == Mesh::CAP_ALL()) {
+    if (cap == Mesh::CAP_START || cap == Mesh::CAP_ALL) {
       path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
       path.emplace_back(Vector3(std::cos(i * step) * shape[0].x * radius,
                                 shape[0].y,
@@ -470,7 +469,7 @@ MeshPtr MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
                         std::sin(i * step) * shape[p].x * radius);
       path.emplace_back(rotated);
     }
-    if (cap == Mesh::CAP_END() || cap == Mesh::CAP_ALL()) {
+    if (cap == Mesh::CAP_END || cap == Mesh::CAP_ALL) {
       path.emplace_back(
         Vector3(std::cos(i * step) * shape[shape.size() - 1].x * radius,
                 shape[shape.size() - 1].y,
@@ -680,7 +679,7 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
         Vector3 rotated;
         Matrix rotationMatrix = Tmp::MatrixArray[0];
         unsigned int index
-          = (_cap == Mesh::NO_CAP() || _cap == Mesh::CAP_END()) ? 0 : 2;
+          = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
         circlePaths.resize(_path.size() + index);
         for (unsigned int i = 0; i < _path.size(); ++i) {
           rad = (_radiusFunction == nullptr) ?
@@ -710,18 +709,18 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
               return pointCap;
             };
         switch (_cap) {
-          case Mesh::NO_CAP():
+          case Mesh::NO_CAP:
             break;
-          case Mesh::CAP_START():
+          case Mesh::CAP_START:
             circlePaths[0] = capPath(_tessellation, 0);
             circlePaths[1] = circlePaths[2];
             break;
-          case Mesh::CAP_END():
+          case Mesh::CAP_END:
             circlePaths[index]     = circlePaths[index - 1];
             circlePaths[index + 1] = capPath(
               _tessellation, static_cast<unsigned int>(_path.size() - 1));
             break;
-          case Mesh::CAP_ALL():
+          case Mesh::CAP_ALL:
             circlePaths[0]         = capPath(_tessellation, 0);
             circlePaths[1]         = circlePaths[2];
             circlePaths[index]     = circlePaths[index - 1];
@@ -1055,7 +1054,7 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
         auto rotate = _custom ? _rotateFunction : returnRotation;
         auto scl    = _custom ? _scaleFunction : returnScale;
         unsigned int index
-          = (_cap == Mesh::NO_CAP() || _cap == Mesh::CAP_END()) ? 0 : 2;
+          = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 2;
         auto& rotationMatrix = Tmp::MatrixArray[0];
         shapePaths.resize(_curve.size());
 
@@ -1091,17 +1090,17 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
           return pointCap;
         };
         switch (_cap) {
-          case Mesh::NO_CAP():
+          case Mesh::NO_CAP:
             break;
-          case Mesh::CAP_START():
+          case Mesh::CAP_START:
             shapePaths[0] = capPath(shapePaths[2]);
             shapePaths[1] = shapePaths[2];
             break;
-          case Mesh::CAP_END():
+          case Mesh::CAP_END:
             shapePaths[index + 0] = shapePaths[index - 1];
             shapePaths[index + 1] = capPath(shapePaths[index - 1]);
             break;
-          case Mesh::CAP_ALL():
+          case Mesh::CAP_ALL:
             shapePaths[0]         = capPath(shapePaths[2]);
             shapePaths[1]         = shapePaths[2];
             shapePaths[index + 0] = shapePaths[index - 1];
@@ -1121,7 +1120,7 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
       shape, curve, instance->_path3D, instance->_pathArray, scale, rotation,
       scaleFunction, rotateFunction, instance->_cap, custom);
     instance = Mesh::CreateRibbon("", pathArray, false, false, 0, scene, false,
-                                  Mesh::DEFAULTSIDE(), instance);
+                                  Mesh::DEFAULTSIDE, instance);
 
     return instance;
   }
@@ -1150,12 +1149,12 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
 
 unsigned int MeshBuilder::updateSideOrientation(unsigned int orientation)
 {
-  if (orientation == Mesh::DOUBLESIDE()) {
-    return Mesh::DOUBLESIDE();
+  if (orientation == Mesh::DOUBLESIDE) {
+    return Mesh::DOUBLESIDE;
   }
 
-  if (orientation == Mesh::DEFAULTSIDE()) {
-    return Mesh::FRONTSIDE();
+  if (orientation == Mesh::DEFAULTSIDE) {
+    return Mesh::FRONTSIDE;
   }
 
   return orientation;

@@ -64,7 +64,7 @@ void BouncingCubeScene::initializeScene(ICanvas* canvas, Scene* scene)
   _velocity.addInPlace(initialVel);
 
   BoxOptions boxOptions(boxSize);
-  boxOptions.sideOrientation = Mesh::BACKSIDE();
+  boxOptions.sideOrientation = Mesh::BACKSIDE;
   auto box                   = MeshBuilder::CreateBox("b", boxOptions, scene);
   auto boxmat                = StandardMaterial::New("boxmat", scene);
   boxmat->diffuseColor       = Color3(0.4f, 0.6f, 1.f);

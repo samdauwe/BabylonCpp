@@ -87,8 +87,8 @@ void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene)
   });
 }
 
-MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls, float ply,
-                                               float height,
+MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls,
+                                               float ply, float height,
                                                BuildFromPlanOptions& options,
                                                Scene* scene)
 {
@@ -129,7 +129,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls, float p
   for (size_t w = 0; w < nbWalls; ++w) {
     angle = Math::PI
             - std::acos(Vector3::Dot(line, nextLine)
-                          / (line.length() * nextLine.length()));
+                        / (line.length() * nextLine.length()));
     direction       = Vector3::Cross(nextLine, line).normalize().y;
     auto lineNormal = Vector3(line.z, 0.f, -1.f * line.x).normalize();
     line.normalize();
@@ -161,9 +161,9 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls, float p
   auto maxL = 0.f;
   for (size_t w = 0; w < nbWalls; ++w) {
     maxL = std::max(innerBaseCorners[(w + 1) % nbWalls]
-                        .subtract(innerBaseCorners[w])
-                        .length(),
-                      maxL);
+                      .subtract(innerBaseCorners[w])
+                      .length(),
+                    maxL);
   }
 
   auto maxH = height; // for when gables introduced
@@ -955,8 +955,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls, float p
   }
 
   VertexData::ComputeNormals(positions, indices, normals);
-  VertexData::_ComputeSides(Mesh::FRONTSIDE(), positions, indices, normals,
-                            uvs);
+  VertexData::_ComputeSides(Mesh::FRONTSIDE, positions, indices, normals, uvs);
 
   // Create a custom mesh
   auto customMesh = Mesh::New("custom", scene);

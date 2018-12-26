@@ -96,7 +96,7 @@ void PointerDragBehavior::attach(const MeshPtr& ownerNode)
   }
   _dragPlane = Mesh::CreatePlane("pointerDragPlane", _debugMode ? 1 : 10000,
                                  PointerDragBehavior::_planeScene.get(), false,
-                                 Mesh::DOUBLESIDE());
+                                 Mesh::DOUBLESIDE);
 
   // State of the drag
   Vector3 lastPosition{0.f, 0.f, 0.f};

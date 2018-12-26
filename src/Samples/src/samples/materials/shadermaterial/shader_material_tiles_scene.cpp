@@ -74,7 +74,7 @@ void ShaderMaterialTilesScene::initializeScene(ICanvas* canvas, Scene* scene)
     // Create box
     auto id = std::to_string(i + 1);
     BoxOptions options(1.5f);
-    options.sideOrientation = Mesh::DEFAULTSIDE();
+    options.sideOrientation = Mesh::DEFAULTSIDE;
     options.updatable       = false;
     options.height          = options.height * 0.01f;
     auto box               = MeshBuilder::CreateBox("box" + id, options, scene);
