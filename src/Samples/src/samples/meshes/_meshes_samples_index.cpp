@@ -18,6 +18,7 @@
 #include <babylon/samples/meshes/ico_sphere_scene.h>
 #include <babylon/samples/meshes/lathe_scene.h>
 #include <babylon/samples/meshes/lines_mesh_spiral_scene.h>
+#include <babylon/samples/meshes/look_at_scene.h>
 #include <babylon/samples/meshes/lorenz_attractor_scene.h>
 #include <babylon/samples/meshes/mandelbrot_fractal_scene.h>
 #include <babylon/samples/meshes/merged_meshes_scene.h>
@@ -152,6 +153,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
     [](ICanvas* iCanvas) {                                    //
       return std::make_unique<LinesMeshSpiralScene>(iCanvas); //
     });                                                       //
+  // Look At Scene
+  _samples["LookAtScene"]
+    = std::make_tuple(true,                                            //
+                      [](ICanvas* iCanvas) {                           //
+                        return std::make_unique<LookAtScene>(iCanvas); //
+                      });                                              //
   // Lorenz Attractor Scene
   _samples["LorenzAttractorScene"] = std::make_tuple(
     true,                                                     //
