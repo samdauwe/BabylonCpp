@@ -50,6 +50,14 @@ public:
                 bool isPure = true);
   ~TransformNode() override;
 
+  /**
+   * @brief Adds the transform node to the scene.
+   */
+  void addToScene(const TransformNodePtr& transformNode);
+
+  /**
+   * @brief Returns the object type.
+   */
   IReflect::Type type() const override;
 
   /**
@@ -609,6 +617,7 @@ private:
   static std::unique_ptr<Quaternion> _rotationAxisCache;
 
 private:
+  bool _isPure;
   Vector3 _forward;
   Vector3 _forwardNormalized;
   Vector3 _forwardInverted;

@@ -1,4 +1,4 @@
-#ifndef BABYLON_MATERIALS_BACKGROUND_BACKGROUND_MATERIAL_H
+﻿#ifndef BABYLON_MATERIALS_BACKGROUND_BACKGROUND_MATERIAL_H
 #define BABYLON_MATERIALS_BACKGROUND_BACKGROUND_MATERIAL_H
 
 #include <babylon/babylon_api.h>
@@ -12,8 +12,12 @@
 namespace BABYLON {
 
 class BackgroundMaterial;
+class ImageProcessingConfiguration;
 class IShadowLight;
 using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
+using ImageProcessingConfigurationPtr
+  = std::shared_ptr<ImageProcessingConfiguration>;
+using IShadowLightPtr = std::shared_ptr<IShadowLight>;
 
 /**
  * @brief Background material used to create an efficient environement around
@@ -43,138 +47,6 @@ public:
     return material;
   }
   ~BackgroundMaterial() override;
-
-  /**
-   * @brief Sets the reflection reflectance fresnel values according to the
-   * default standard empirically know to work well :-)
-   */
-  void setReflectionStandardFresnelWeight(float value);
-
-  /**
-   * @brief Gets the current fov(field of view) multiplier.
-   * @return The current fov(field of view) multiplier.
-   */
-  float fovMultiplier() const;
-
-  /**
-   * @brief Sets the current fov(field of view) multiplier, 0.0 - 2.0. Defaults
-   * to 1.0. Lower values "zoom in" and higher values "zoom out". Best used when
-   * trying to implement visual zoom effects like fish-eye or binoculars while
-   * not adjusting camera fov. Recommended to be keep at 1.0 except for special
-   * cases.
-   * @param value The fov(field of view) multiplier value.
-   */
-  void setFovMultiplier(float value);
-
-  /**
-   * @brief Gets the image processing configuration used either in this
-   * material.
-   */
-  ImageProcessingConfiguration* imageProcessingConfiguration() const;
-
-  /**
-   * @brief Sets the Default image processing configuration used either in the
-   * this material.
-   *
-   * If sets to null, the scene one is in use.
-   */
-  void setImageProcessingConfiguration(ImageProcessingConfiguration* value);
-
-  /**
-   * @brief Gets wether the color curves effect is enabled.
-   */
-  bool cameraColorCurvesEnabled() const;
-
-  /**
-   * @brief Sets wether the color curves effect is enabled.
-   */
-  void setCameraColorCurvesEnabled(bool value);
-
-  /**
-   * @brief Gets wether the color grading effect is enabled.
-   */
-  bool cameraColorGradingEnabled() const;
-
-  /**
-   * @brief Gets wether the color grading effect is enabled.
-   */
-  void setCameraColorGradingEnabled(bool value);
-
-  /**
-   * @brief Gets wether tonemapping is enabled or not.
-   */
-  bool cameraToneMappingEnabled() const;
-
-  /**
-   * @brief Sets wether tonemapping is enabled or not
-   */
-  void setCameraToneMappingEnabled(bool value);
-
-  /**
-   * @brief The camera exposure used on this material.
-   * This property is here and not in the camera to allow controlling exposure
-   * without full screen post process.
-   * This corresponds to a photographic exposure.
-   */
-  float cameraExposure();
-
-  /**
-   * @brief The camera exposure used on this material.
-   * This property is here and not in the camera to allow controlling exposure
-   * without full screen post process.
-   * This corresponds to a photographic exposure.
-   */
-  void setCameraExposure(float value);
-
-  /**
-   * @brief Gets The camera contrast used on this material.
-   */
-  float cameraContrast() const;
-
-  /**
-   * @brief Sets The camera contrast used on this material.
-   */
-  void setCameraContrast(float value);
-
-  /**
-   * @brief Gets the Color Grading 2D Lookup Texture.
-   */
-  BaseTexturePtr& cameraColorGradingTexture();
-
-  /**
-   * @brief Sets the Color Grading 2D Lookup Texture.
-   */
-  void setCameraColorGradingTexture(const BaseTexturePtr& value);
-
-  /**
-   * @brief The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
-   */
-  ColorCurves* cameraColorCurves();
-
-  /**
-   * @brief The color grading curves provide additional color adjustmnent that
-   * is applied after any color grading transform (3D LUT).
-   * They allow basic adjustment of saturation and small exposure adjustments,
-   * along with color filter tinting to provide white balance adjustment or more
-   * stylistic effects.
-   * These are similar to controls found in many professional imaging or
-   * colorist software. The global controls are applied to the entire image. For
-   * advanced tuning, extra controls are provided to adjust the shadow, midtone
-   * and highlight areas of the image;
-   * corresponding to low luminance, medium luminance, and high luminance areas
-   * respectively.
-   */
-  void setCameraColorCurves(ColorCurves* value);
 
   /**
    * @brief The entire material has been created in order to prevent overdraw.
@@ -261,40 +133,6 @@ public:
   static std::unique_ptr<BackgroundMaterial>
   Parse(const json& source, Scene* scene, const std::string& url);
 
-  /** Getters / Setters **/
-  const Color3& primaryColor() const;
-  void setPrimaryColor(const Color3& value);
-  std::optional<Color3>& _perceptualColor();
-  void setPerceptualColor(const std::optional<Color3>& value);
-  float primaryColorShadowLevel() const;
-  void setPrimaryColorShadowLevel(float value);
-  float primaryColorHighlightLevel() const;
-  void setPrimaryColorHighlightLevel(float value);
-  BaseTexturePtr reflectionTexture();
-  void setReflectionTexture(const RenderTargetTexturePtr& value);
-  BaseTexturePtr diffuseTexture();
-  void setDiffuseTexture(const RenderTargetTexturePtr& value);
-  float shadowLevel() const;
-  void setShadowLevel(float value);
-  const Vector3& sceneCenter() const;
-  void setSceneCenter(const Vector3& value);
-  bool opacityFresnel() const;
-  void setOpacityFresnel(bool value);
-  bool reflectionFresnel() const;
-  void setReflectionFresnel(bool value);
-  float reflectionFalloffDistance() const;
-  void setReflectionFalloffDistance(float value);
-  float reflectionAmount() const;
-  void setReflectionAmount(float value);
-  float reflectionReflectance0() const;
-  void setReflectionReflectance0(float value);
-  float reflectionReflectance90() const;
-  void setReflectionReflectance90(float value);
-  bool useRGBColor() const;
-  void setUseRGBColor(bool value);
-  bool enableNoise() const;
-  void setEnableNoise(bool value);
-
 protected:
   /**
    * @brief Instantiates a Background Material in the given scene
@@ -308,7 +146,382 @@ protected:
    * @param configuration (if null the scene configuration will be use)
    */
   void _attachImageProcessingConfiguration(
-    ImageProcessingConfiguration* configuration);
+    const ImageProcessingConfigurationPtr& configuration);
+
+  /**
+   * @brief Gets the key light Color (multiply against the environement
+   * texture).
+   */
+  Color3& get_primaryColor();
+
+  /**
+   * @brief Sets the key light Color (multiply against the environement
+   * texture).
+   */
+  void set_primaryColor(const Color3& value);
+
+  /**
+   * @brief Gets the key light Color in "perceptual value" meaning the color you
+   * would like to see on screen. This acts as a helper to set the primary color
+   * to a more "human friendly" value. Conversion to linear space as well as
+   * exposure and tone mapping correction will be applied to keep the output
+   * color as close as possible from the chosen value. (This does not account
+   * for contrast color grading and color curves as they are considered post
+   * effect and not directly part of lighting setup.)
+   */
+  std::optional<Color3>& get__perceptualColor();
+
+  /**
+   * @brief Sets the key light Color in "perceptual value" meaning the color you
+   * would like to see on screen. This acts as a helper to set the primary color
+   * to a more "human friendly" value. Conversion to linear space as well as
+   * exposure and tone mapping correction will be applied to keep the output
+   * color as close as possible from the chosen value. (This does not account
+   * for contrast color grading and color curves as they are considered post
+   * effect and not directly part of lighting setup.)
+   */
+  void set__perceptualColor(const std::optional<Color3>& value);
+
+  /**
+   * @brief Gets the level of the shadows (dark area of the reflection map) in
+   * order to help scaling the colors. The color opposite to the primary color
+   * is used at the level chosen to define what the black area would look.
+   */
+  float get_primaryColorShadowLevel() const;
+
+  /**
+   * @brief Sets the level of the shadows (dark area of the reflection map) in
+   * order to help scaling the colors. The color opposite to the primary color
+   * is used at the level chosen to define what the black area would look.
+   */
+  void set_primaryColorShadowLevel(float value);
+
+  /**
+   *  @brief Gets the level of the highliights (highlight area of the reflection
+   * map) in order to help scaling the colors. The primary color is used at the
+   * level chosen to define what the white area would look.
+   */
+  float get_primaryColorHighlightLevel() const;
+
+  /**
+   *  @brief Sets the level of the highliights (highlight area of the reflection
+   * map) in order to help scaling the colors. The primary color is used at the
+   * level chosen to define what the white area would look.
+   */
+  void set_primaryColorHighlightLevel(float value);
+
+  /**
+   *  @brief Gets reflection Texture used in the material.
+   * Should be author in a specific way for the best result (refer to the
+   * documentation).
+   */
+  BaseTexturePtr& get_reflectionTexture();
+
+  /**
+   *  @brief Sets reflection Texture used in the material.
+   * Should be author in a specific way for the best result (refer to the
+   * documentation).
+   */
+  void set_reflectionTexture(const BaseTexturePtr& value);
+
+  /**
+   *  @brief Gets the reflection Texture level of blur.
+   *
+   * Can be use to reuse an existing HDR Texture and target a specific LOD to
+   * prevent authoring the texture twice.
+   */
+  float get_reflectionBlur() const;
+
+  /**
+   *  @brief Sets the reflection Texture level of blur.
+   *
+   * Can be use to reuse an existing HDR Texture and target a specific LOD to
+   * prevent authoring the texture twice.
+   */
+  void set_reflectionBlur(float value);
+
+  /**
+   * @brief Gets the diffuse Texture used in the material.
+   * Should be author in a specific way for the best result (refer to the
+   * documentation).
+   */
+  BaseTexturePtr& get_diffuseTexture();
+
+  /**
+   * @brief Sets the diffuse Texture used in the material.
+   * Should be author in a specific way for the best result (refer to the
+   * documentation).
+   */
+  void set_diffuseTexture(const BaseTexturePtr& value);
+
+  /**
+   * @brief Gets the list of lights casting shadow on the material.
+   * All scene shadow lights will be included if null.
+   */
+  std::vector<IShadowLightPtr>& get_shadowLights();
+
+  /**
+   * @brief Sets the list of lights casting shadow on the material.
+   * All scene shadow lights will be included if null.
+   */
+  void set_shadowLights(const std::vector<IShadowLightPtr>& shadowLights);
+
+  /**
+   * @brief Helps adjusting the shadow to a softer level if required.
+   * 0 means black shadows and 1 means no shadows.
+   */
+  float get_shadowLevel() const;
+
+  /**
+   * @brief Helps adjusting the shadow to a softer level if required.
+   * 0 means black shadows and 1 means no shadows.
+   */
+  void set_shadowLevel(float value);
+
+  /**
+   * @brief In case of opacity Fresnel or reflection falloff, this is use as a
+   * scene center. It is usually zero but might be interesting to modify
+   * according to your setup.
+   */
+  Vector3& get_sceneCenter();
+
+  /**
+   * @brief In case of opacity Fresnel or reflection falloff, this is use as a
+   * scene center. It is usually zero but might be interesting to modify
+   * according to your setup.
+   */
+  void set_sceneCenter(const Vector3& value);
+
+  /**
+   * @brief This helps specifying that the material is falling off to the sky
+   * box at grazing angle. This helps ensuring a nice transition when the camera
+   * goes under the ground.
+   */
+  bool get_opacityFresnel() const;
+
+  /**
+   * @brief This helps specifying that the material is falling off to the sky
+   * box at grazing angle. This helps ensuring a nice transition when the camera
+   * goes under the ground.
+   */
+  void set_opacityFresnel(bool value);
+
+  /**
+   * @brief This helps specifying that the material is falling off from diffuse
+   * to the reflection texture at grazing angle. This helps adding a mirror
+   * texture on the ground.
+   */
+  bool get_reflectionFresnel() const;
+
+  /**
+   * @brief This helps specifying that the material is falling off from diffuse
+   * to the reflection texture at grazing angle. This helps adding a mirror
+   * texture on the ground.
+   */
+  void set_reflectionFresnel(bool value);
+
+  /**
+   * @brief This helps specifying the falloff radius off the reflection texture
+   * from the sceneCenter. This helps adding a nice falloff effect to the
+   * reflection if used as a mirror for instance.
+   */
+  float get_reflectionFalloffDistance() const;
+
+  /**
+   * @brief This helps specifying the falloff radius off the reflection texture
+   * from the sceneCenter. This helps adding a nice falloff effect to the
+   * reflection if used as a mirror for instance.
+   */
+  void set_reflectionFalloffDistance(float value);
+
+  /**
+   * @brief Gets the weight of the reflection against the background in case of
+   * reflection Fresnel.
+   */
+  float get_reflectionAmount() const;
+
+  /**
+   * @brief Sets the weight of the reflection against the background in case of
+   * reflection Fresnel.
+   */
+  void set_reflectionAmount(float value);
+
+  /**
+   * @brief Gets the weight of the reflection at grazing angle.
+   */
+  float get_reflectionReflectance0() const;
+
+  /**
+   * @brief Sets the weight of the reflection at grazing angle.
+   */
+  void set_reflectionReflectance0(float value);
+
+  /**
+   * @brief Gets the weight of the reflection at a perpendicular point of view.
+   */
+  float get_reflectionReflectance90() const;
+
+  /**
+   * @brief Sets the weight of the reflection at a perpendicular point of view.
+   */
+  void set_reflectionReflectance90(float value);
+
+  /**
+   * @brief Gets the reflection reflectance fresnel values according to the
+   * default standard empirically know to work well :-)
+   */
+  void set_reflectionStandardFresnelWeight(float value);
+
+  /**
+   * @brief Helps to directly use the maps channels instead of their level.
+   */
+  bool get_useRGBColor() const;
+
+  /**
+   * @brief Helps to directly use the maps channels instead of their level.
+   */
+  void set_useRGBColor(bool value);
+
+  /**
+   * @brief This helps reducing the banding effect that could occur on the
+   * background.
+   */
+  bool get_enableNoise() const;
+
+  /**
+   * @brief This helps reducing the banding effect that could occur on the
+   * background.
+   */
+  void set_enableNoise(bool value);
+
+  /**
+   * @brief Gets the current fov(field of view) multiplier.
+   * @return The current fov(field of view) multiplier.
+   */
+  float get_fovMultiplier() const;
+
+  /**
+   * @brief Sets the reflection reflectance fresnel values according to the
+   * default standard empirically know to work well :-)
+   */
+  void set_fovMultiplier(float value);
+
+  /**
+   * @brief Gets the number of Simultaneous lights allowed on the material.
+   */
+  unsigned int get_maxSimultaneousLights() const;
+
+  /**
+   * @brief Sets the number of Simultaneous lights allowed on the material.
+   */
+  void set_maxSimultaneousLights(unsigned int value);
+
+  /**
+   * @brief Gets the image processing configuration used either in this
+   * material.
+   */
+  ImageProcessingConfigurationPtr& get_imageProcessingConfiguration();
+
+  /**
+   * @brief Sets the Default image processing configuration used either in the
+   * this material.
+   *
+   * If sets to null, the scene one is in use.
+   */
+  void set_imageProcessingConfiguration(
+    const ImageProcessingConfigurationPtr& value);
+
+  /**
+   * @brief Gets wether the color curves effect is enabled.
+   */
+  bool get_cameraColorCurvesEnabled() const;
+
+  /**
+   * @brief Sets wether the color curves effect is enabled.
+   */
+  void set_cameraColorCurvesEnabled(bool value);
+
+  /**
+   * @brief Gets wether the color grading effect is enabled.
+   */
+  bool get_cameraColorGradingEnabled() const;
+
+  /**
+   * @brief Gets wether the color grading effect is enabled.
+   */
+  void set_cameraColorGradingEnabled(bool value);
+
+  /**
+   * @brief Gets wether tonemapping is enabled or not.
+   */
+  bool get_cameraToneMappingEnabled() const;
+
+  /**
+   * @brief Sets wether tonemapping is enabled or not
+   */
+  void set_cameraToneMappingEnabled(bool value);
+
+  /**
+   * @brief The camera exposure used on this material.
+   * This property is here and not in the camera to allow controlling exposure
+   * without full screen post process. This corresponds to a photographic
+   * exposure.
+   */
+  float get_cameraExposure() const;
+
+  /**
+   * @brief The camera exposure used on this material.
+   * This property is here and not in the camera to allow controlling exposure
+   * without full screen post process. This corresponds to a photographic
+   * exposure.
+   */
+  void set_cameraExposure(float value);
+
+  /**
+   * @brief Gets The camera contrast used on this material.
+   */
+  float get_cameraContrast() const;
+
+  /**
+   * @brief Sets The camera contrast used on this material.
+   */
+  void set_cameraContrast(float value);
+
+  /**
+   * @brief Gets the Color Grading 2D Lookup Texture.
+   */
+  BaseTexturePtr& get_cameraColorGradingTexture();
+
+  /**
+   * @brief Sets the Color Grading 2D Lookup Texture.
+   */
+  void set_cameraColorGradingTexture(const BaseTexturePtr& value);
+
+  /**
+   * @brief The color grading curves provide additional color adjustmnent that
+   * is applied after any color grading transform (3D LUT). They allow basic
+   * adjustment of saturation and small exposure adjustments, along with color
+   * filter tinting to provide white balance adjustment or more stylistic
+   * effects. These are similar to controls found in many professional imaging
+   * or colorist software. The global controls are applied to the entire image.
+   * For advanced tuning, extra controls are provided to adjust the shadow,
+   * midtone and highlight areas of the image; corresponding to low luminance,
+   * medium luminance, and high luminance areas respectively.
+   */
+  ColorCurvesPtr& get_cameraColorCurves();
+
+  /**
+   * @brief The color grading curves provide additional color adjustmnent that
+   * is applied after any color grading transform (3D LUT). They allow basic
+   * adjustment of saturation and small exposure adjustments, along with color
+   * filter tinting to provide white balance adjustment or more stylistic
+   * effects. These are similar to controls found in many professional imaging
+   * or colorist software. The global controls are applied to the entire image.
+   * For advanced tuning, extra controls are provided to adjust the shadow,
+   * midtone and highlight areas of the image; corresponding to low luminance,
+   * medium luminance, and high luminance areas respectively.
+   */
+  void set_cameraColorCurves(const ColorCurvesPtr& value);
 
   /**
    * @brief Gets a boolean indicating that current material needs to register
@@ -330,9 +543,201 @@ private:
 
 public:
   /**
+   * Key light Color (multiply against the environement texture)
+   */
+  Property<BackgroundMaterial, Color3> primaryColor;
+
+  /**
+   * Experimental Internal Use Only.
+   *
+   * Key light Color in "perceptual value" meaning the color you would like to
+   * see on screen. This acts as a helper to set the primary color to a more
+   * "human friendly" value. Conversion to linear space as well as exposure and
+   * tone mapping correction will be applied to keep the output color as close
+   * as possible from the chosen value. (This does not account for contrast
+   * color grading and color curves as they are considered post effect and not
+   * directly part of lighting setup.)
+   */
+  Property<BackgroundMaterial, std::optional<Color3>> _perceptualColor;
+
+  /**
+   * Defines the level of the shadows (dark area of the reflection map) in order
+   * to help scaling the colors. The color opposite to the primary color is used
+   * at the level chosen to define what the black area would look.
+   */
+  Property<BackgroundMaterial, float> primaryColorShadowLevel;
+
+  /**
+   * Defines the level of the highliights (highlight area of the reflection map)
+   * in order to help scaling the colors. The primary color is used at the level
+   * chosen to define what the white area would look.
+   */
+  Property<BackgroundMaterial, float> primaryColorHighlightLevel;
+
+  /**
+   * Reflection Texture used in the material.
+   * Should be author in a specific way for the best result (refer to the
+   * documentation).
+   */
+  Property<BackgroundMaterial, BaseTexturePtr> reflectionTexture;
+
+  /**
+   * Reflection Texture level of blur.
+   *
+   * Can be use to reuse an existing HDR Texture and target a specific LOD to
+   * prevent authoring the texture twice.
+   */
+  Property<BackgroundMaterial, float> reflectionBlur;
+
+  /**
+   * Diffuse Texture used in the material.
+   * Should be author in a specific way for the best result (refer to the
+   * documentation).
+   */
+  Property<BackgroundMaterial, BaseTexturePtr> diffuseTexture;
+
+  /**
+   * Specify the list of lights casting shadow on the material.
+   * All scene shadow lights will be included if null.
+   */
+  Property<BackgroundMaterial, std::vector<IShadowLightPtr>> shadowLights;
+
+  /**
+   * Helps adjusting the shadow to a softer level if required.
+   * 0 means black shadows and 1 means no shadows.
+   */
+  Property<BackgroundMaterial, float> shadowLevel;
+
+  /**
+   * In case of opacity Fresnel or reflection falloff, this is use as a scene
+   * center. It is usually zero but might be interesting to modify according to
+   * your setup.
+   */
+  Property<BackgroundMaterial, Vector3> sceneCenter;
+  /**
+   * This helps specifying that the material is falling off to the sky box at
+   * grazing angle. This helps ensuring a nice transition when the camera goes
+   * under the ground.
+   */
+  Property<BackgroundMaterial, bool> opacityFresnel;
+
+  /**
+   * This helps specifying that the material is falling off from diffuse to the
+   * reflection texture at grazing angle. This helps adding a mirror texture on
+   * the ground.
+   */
+  Property<BackgroundMaterial, bool> reflectionFresnel;
+
+  /**
+   * This helps specifying the falloff radius off the reflection texture from
+   * the sceneCenter. This helps adding a nice falloff effect to the reflection
+   * if used as a mirror for instance.
+   */
+  Property<BackgroundMaterial, float> reflectionFalloffDistance;
+
+  /**
+   * This specifies the weight of the reflection against the background in case
+   * of reflection Fresnel.
+   */
+  Property<BackgroundMaterial, float> reflectionAmount;
+
+  /**
+   * This specifies the weight of the reflection at grazing angle.
+   */
+  Property<BackgroundMaterial, float> reflectionReflectance0;
+
+  /**
+   * This specifies the weight of the reflection at a perpendicular point of
+   * view.
+   */
+  Property<BackgroundMaterial, float> reflectionReflectance90;
+
+  /**
+   * Sets the reflection reflectance fresnel values according to the default
+   * standard empirically know to work well :-)
+   */
+  WriteOnlyProperty<BackgroundMaterial, float> reflectionStandardFresnelWeight;
+
+  /**
+   * Helps to directly use the maps channels instead of their level.
+   */
+  Property<BackgroundMaterial, bool> useRGBColor;
+
+  /**
+   * This helps reducing the banding effect that could occur on the background.
+   */
+  Property<BackgroundMaterial, bool> enableNoise;
+
+  /**
+   * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults to 1.0.
+   * Lower values "zoom in" and higher values "zoom out". Best used when trying
+   * to implement visual zoom effects like fish-eye or binoculars while not
+   * adjusting camera fov. Recommended to be keep at 1.0 except for special
+   * cases.
+   */
+  Property<BackgroundMaterial, float> fovMultiplier;
+
+  /**
    * Enable the FOV adjustment feature controlled by fovMultiplier.
    */
   bool useEquirectangularFOV;
+
+  /**
+   * Number of Simultaneous lights allowed on the material.
+   */
+  Property<BackgroundMaterial, unsigned int> maxSimultaneousLights;
+
+  /**
+   * Gets the image processing configuration used either in this material.
+   */
+  Property<BackgroundMaterial, ImageProcessingConfigurationPtr>
+    imageProcessingConfiguration;
+
+  /**
+   * Gets wether the color curves effect is enabled.
+   */
+  Property<BackgroundMaterial, bool> cameraColorCurvesEnabled;
+
+  /**
+   * Gets wether the color grading effect is enabled.
+   */
+  Property<BackgroundMaterial, bool> cameraColorGradingEnabled;
+
+  /**
+   * Gets wether tonemapping is enabled or not.
+   */
+  Property<BackgroundMaterial, bool> cameraToneMappingEnabled;
+
+  /**
+   * The camera exposure used on this material.
+   * This property is here and not in the camera to allow controlling exposure
+   * without full screen post process. This corresponds to a photographic
+   * exposure.
+   */
+  Property<BackgroundMaterial, float> cameraExposure;
+
+  /**
+   * Gets The camera contrast used on this material.
+   */
+  Property<BackgroundMaterial, float> cameraContrast;
+
+  /**
+   * Gets the Color Grading 2D Lookup Texture.
+   */
+  Property<BackgroundMaterial, BaseTexturePtr> cameraColorGradingTexture;
+
+  /**
+   * The color grading curves provide additional color adjustmnent that is
+   * applied after any color grading transform (3D LUT). They allow basic
+   * adjustment of saturation and small exposure adjustments, along with color
+   * filter tinting to provide white balance adjustment or more stylistic
+   * effects. These are similar to controls found in many professional imaging
+   * or colorist software. The global controls are applied to the entire image.
+   * For advanced tuning, extra controls are provided to adjust the shadow,
+   * midtone and highlight areas of the image; corresponding to low luminance,
+   * medium luminance, and high luminance areas respectively.
+   */
+  Property<BackgroundMaterial, ColorCurvesPtr> cameraColorCurves;
 
 protected:
   /**
@@ -372,7 +777,7 @@ protected:
    * Should be author in a specific way for the best result (refer to the
    * documentation).
    */
-  RenderTargetTexturePtr _reflectionTexture;
+  BaseTexturePtr _reflectionTexture;
 
   /**
    * Reflection Texture level of blur.
@@ -388,13 +793,13 @@ protected:
    * Should be author in a specific way for the best result (refer to the
    * documentation).
    */
-  RenderTargetTexturePtr _diffuseTexture;
+  BaseTexturePtr _diffuseTexture;
 
   /**
    * Specify the list of lights casting shadow on the material.
    * All scene shadow lights will be included if null.
    */
-  std::vector<IShadowLight*> _shadowLights;
+  std::vector<IShadowLightPtr> _shadowLights;
 
   /**
    * Helps adjusting the shadow to a softer level if required.
@@ -464,7 +869,7 @@ protected:
    * Default configuration related to image processing available in the
    * Background Material.
    */
-  ImageProcessingConfiguration* _imageProcessingConfiguration;
+  ImageProcessingConfigurationPtr _imageProcessingConfiguration;
 
 private:
   /**
@@ -505,7 +910,7 @@ private:
   Observer<ImageProcessingConfiguration>::Ptr _imageProcessingObserver;
 
   // Temp values kept as cache in the material.
-  std::vector<RenderTargetTexture*> _renderTargets;
+  std::vector<RenderTargetTexturePtr> _renderTargets;
   Vector4 _reflectionControls;
   Color3 _white;
   Color3 _primaryShadowColor;

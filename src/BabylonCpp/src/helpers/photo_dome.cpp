@@ -23,9 +23,10 @@ PhotoDome::PhotoDome(
     , _useDirectMapping{false}
 {
   // set defaults and manage values
-  name               = !iName.empty() ? iName : "photoDome";
-  options.resolution = options.resolution ? *options.resolution : 32;
-  options.size       = options.size ?
+  name = !iName.empty() ? iName : "photoDome";
+  options.resolution
+    = options.resolution.has_value() ? *options.resolution : 32u;
+  options.size = options.size ?
                    *options.size :
                    (scene->activeCamera ?
                       static_cast<unsigned>(scene->activeCamera->maxZ * 0.48f) :
@@ -47,9 +48,9 @@ PhotoDome::PhotoDome(
                              scene, false, Mesh::BACKSIDE);
 
   // configure material
-  material->setOpacityFresnel(false);
+  material->opacityFresnel        = false;
   material->useEquirectangularFOV = true;
-  material->setFovMultiplier(1.f);
+  material->fovMultiplier         = 1.f;
 
   photoTexture = Texture::New(urlOfPhoto, scene, true, !_useDirectMapping);
 
@@ -77,16 +78,16 @@ void PhotoDome::set_photoTexture(const TexturePtr& value)
   }
   _photoTexture = value;
   if (_useDirectMapping) {
-    _photoTexture->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
-    _photoTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
-    // _material->setDiffuseTexture(_photoTexture);
+    _photoTexture->wrapU      = TextureConstants::CLAMP_ADDRESSMODE;
+    _photoTexture->wrapV      = TextureConstants::CLAMP_ADDRESSMODE;
+    _material->diffuseTexture = _photoTexture;
   }
   else {
     _photoTexture->coordinatesMode
       = TextureConstants::FIXED_EQUIRECTANGULAR_MIRRORED_MODE; // matches
                                                                // orientation
-    _photoTexture->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
-    // _material->setReflectionTexture(_photoTexture);
+    _photoTexture->wrapV         = TextureConstants::CLAMP_ADDRESSMODE;
+    _material->reflectionTexture = _photoTexture;
   }
 }
 
@@ -97,7 +98,7 @@ float PhotoDome::get_fovMultiplier() const
 
 void PhotoDome::set_fovMultiplier(float value)
 {
-  _material->setFovMultiplier(value);
+  _material->fovMultiplier = value;
 }
 
 void PhotoDome::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)

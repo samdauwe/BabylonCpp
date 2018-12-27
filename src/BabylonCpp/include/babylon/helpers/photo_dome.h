@@ -8,9 +8,11 @@ namespace BABYLON {
 
 class BackgroundMaterial;
 class Mesh;
+class PhotoDome;
 struct PhotoDomeOptions;
 class Texture;
 using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
+using PhotoDomePtr          = std::shared_ptr<PhotoDome>;
 using MeshPtr               = std::shared_ptr<Mesh>;
 using TexturePtr            = std::shared_ptr<Texture>;
 
@@ -25,6 +27,28 @@ using TexturePtr            = std::shared_ptr<Texture>;
 class BABYLON_SHARED_EXPORT PhotoDome : public TransformNode {
 
 public:
+  template <typename... Ts>
+  static PhotoDomePtr New(Ts&&... args)
+  {
+    auto photoDome
+      = std::shared_ptr<PhotoDome>(new PhotoDome(std::forward<Ts>(args)...));
+    photoDome->addToScene(photoDome);
+
+    return photoDome;
+  }
+  ~PhotoDome() override;
+
+  /**
+   * @brief Releases resources associated with this node.
+   * @param doNotRecurse Set to true to not recurse into each children (recurse
+   * into each children by default)
+   * @param disposeMaterialAndTextures Set to true to also dispose referenced
+   * materials and textures (false by default)
+   */
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
+
+protected:
   /**
    * @brief Create an instance of this class and pass through the parameters to
    * the relevant classes, Texture, StandardMaterial, and Mesh.
@@ -40,19 +64,7 @@ public:
             PhotoDomeOptions options, Scene* scene,
             const std::function<void(const std::string& message)>& onError
             = nullptr);
-  ~PhotoDome() override;
 
-  /**
-   * @brief Releases resources associated with this node.
-   * @param doNotRecurse Set to true to not recurse into each children (recurse
-   * into each children by default)
-   * @param disposeMaterialAndTextures Set to true to also dispose referenced
-   * materials and textures (false by default)
-   */
-  void dispose(bool doNotRecurse               = false,
-               bool disposeMaterialAndTextures = false) override;
-
-protected:
   /**
    * @brief Gets the texture being displayed on the sphere.
    */
@@ -79,7 +91,7 @@ protected:
 
 public:
   /**
-   * The texture being displayed on the sphere
+   * Gets or sets the texture being displayed on the sphere
    */
   Property<PhotoDome, TexturePtr> photoTexture;
 
@@ -89,9 +101,9 @@ public:
   Observable<std::string> onLoadErrorObservable;
 
   /**
-   * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults
-   * to 1.0. Lower values "zoom in" and higher values "zoom out". Also see the
-   * options.resolution property
+   * The current fov(field of view) multiplier, 0.0 - 2.0. Defaults to 1.0.
+   * Lower values "zoom in" and higher values "zoom out". Also see the
+   * options.resolution property.
    */
   Property<PhotoDome, float> fovMultiplier;
 

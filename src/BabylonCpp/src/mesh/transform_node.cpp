@@ -37,6 +37,7 @@ TransformNode::TransformNode(const std::string& name, Scene* scene, bool isPure)
     , _scaling{Vector3::One()}
     , _isDirty{false}
     , _isWorldMatrixFrozen{false}
+    , _isPure{isPure}
     , _forward{Vector3{0.f, 0.f, 1.f}}
     , _forwardNormalized{Vector3{0.f, 0.f, 1.f}}
     , _forwardInverted{Vector3{0.f, 0.f, -1.f}}
@@ -56,13 +57,17 @@ TransformNode::TransformNode(const std::string& name, Scene* scene, bool isPure)
     , _postMultiplyPivotMatrix{false}
     , _nonUniformScaling{false}
 {
-  if (isPure) {
-    getScene()->addTransformNode(shared_from_base<TransformNode>());
-  }
 }
 
 TransformNode::~TransformNode()
 {
+}
+
+void TransformNode::addToScene(const TransformNodePtr& transformNode)
+{
+  if (transformNode->_isPure) {
+    transformNode->getScene()->addTransformNode(transformNode);
+  }
 }
 
 IReflect::Type TransformNode::type() const

@@ -103,11 +103,11 @@ void EnvironmentHelper::updateOptions(const IEnvironmentHelperOptions& options)
 void EnvironmentHelper::setMainColor(const Color3& color)
 {
   if (groundMaterial()) {
-    groundMaterial()->setPrimaryColor(color);
+    groundMaterial()->primaryColor = color;
   }
 
   if (skyboxMaterial()) {
-    skyboxMaterial()->setPrimaryColor(color);
+    skyboxMaterial()->primaryColor = color;
   }
 
   if (groundMirror()) {
@@ -322,10 +322,10 @@ void EnvironmentHelper::_setupGroundMaterial()
   }
   _groundMaterial->alpha     = _options.groundOpacity;
   _groundMaterial->alphaMode = EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF;
-  _groundMaterial->setShadowLevel(_options.groundShadowLevel);
-  _groundMaterial->setPrimaryColor(_options.groundColor);
-  _groundMaterial->setUseRGBColor(false);
-  _groundMaterial->setEnableNoise(true);
+  _groundMaterial->shadowLevel  = _options.groundShadowLevel;
+  _groundMaterial->primaryColor = _options.groundColor;
+  _groundMaterial->useRGBColor  = false;
+  _groundMaterial->enableNoise  = true;
 
   if (_ground) {
     _ground->material = _groundMaterial;
@@ -390,13 +390,13 @@ void EnvironmentHelper::_setupGroundMirrorTexture(ISceneSize* sceneSize)
 void EnvironmentHelper::_setupMirrorInGroundMaterial()
 {
   if (_groundMaterial) {
-    _groundMaterial->setReflectionTexture(_groundMirror);
-    _groundMaterial->setReflectionFresnel(true);
-    _groundMaterial->setReflectionAmount(_options.groundMirrorAmount);
-    _groundMaterial->setReflectionStandardFresnelWeight(
-      _options.groundMirrorFresnelWeight);
-    _groundMaterial->setReflectionFalloffDistance(
-      _options.groundMirrorFallOffDistance);
+    _groundMaterial->reflectionTexture = _groundMirror;
+    _groundMaterial->reflectionFresnel = true;
+    _groundMaterial->reflectionAmount  = _options.groundMirrorAmount;
+    _groundMaterial->reflectionStandardFresnelWeight
+      = _options.groundMirrorFresnelWeight;
+    _groundMaterial->reflectionFalloffDistance
+      = _options.groundMirrorFallOffDistance;
   }
 }
 
@@ -421,9 +421,9 @@ void EnvironmentHelper::_setupSkyboxMaterial()
     _skyboxMaterial
       = BackgroundMaterial::New("BackgroundSkyboxMaterial", _scene);
   }
-  _skyboxMaterial->setUseRGBColor(false);
-  _skyboxMaterial->setPrimaryColor(_options.skyboxColor);
-  _skyboxMaterial->setEnableNoise(true);
+  _skyboxMaterial->useRGBColor  = false;
+  _skyboxMaterial->primaryColor = _options.skyboxColor;
+  _skyboxMaterial->enableNoise  = true;
 
   _skybox->material = _skyboxMaterial;
 }
@@ -439,17 +439,16 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
   }
 
   if (std::holds_alternative<BaseTexturePtr>(_options.skyboxTexture)) {
-    _skyboxMaterial->setReflectionTexture(
-      std::static_pointer_cast<RenderTargetTexture>(
-        std::get<BaseTexturePtr>(_options.skyboxTexture)));
+    _skyboxMaterial->reflectionTexture
+      = std::get<BaseTexturePtr>(_options.skyboxTexture);
     return;
   }
 
   // _skyboxTexture
   //  = new CubeTexture(_options.skyboxTexture.get<std::string>(), _scene);
-  _skyboxTexture->coordinatesMode = TextureConstants::SKYBOX_MODE;
-  _skyboxTexture->gammaSpace      = false;
-  _skyboxMaterial->setReflectionTexture(_skyboxTexture);
+  _skyboxTexture->coordinatesMode    = TextureConstants::SKYBOX_MODE;
+  _skyboxTexture->gammaSpace         = false;
+  _skyboxMaterial->reflectionTexture = _skyboxTexture;
 }
 
 void EnvironmentHelper::_errorHandler(const std::string& message,
