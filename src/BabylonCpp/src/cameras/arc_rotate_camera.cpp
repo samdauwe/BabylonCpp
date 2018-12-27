@@ -18,9 +18,9 @@ bool ArcRotateCamera::NodeConstructorAdded = false;
 void ArcRotateCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "ArcRotateCamera", [](const std::string& name, Scene* scene,
+    "ArcRotateCamera", [](const std::string& iName, Scene* scene,
                           const std::optional<json>& /*options*/) {
-      return ArcRotateCamera::New(name, 0.f, 0.f, 1.f, Vector3::Zero(), scene);
+      return ArcRotateCamera::New(iName, 0.f, 0.f, 1.f, Vector3::Zero(), scene);
     });
   ArcRotateCamera::NodeConstructorAdded = true;
 }
@@ -514,10 +514,10 @@ Matrix ArcRotateCamera::_getViewMatrix()
     sinb = 0.0001f;
   }
 
-  auto _target = _getTargetPosition();
+  auto targetPostion = _getTargetPosition();
   _computationVector.copyFromFloats(radius * cosa * sinb, radius * cosb,
                                     radius * sina * sinb);
-  _target.addToRef(_computationVector, _newPosition);
+  targetPostion.addToRef(_computationVector, _newPosition);
   if (getScene()->collisionsEnabled && checkCollisions) {
     if (!_collider) {
       _collider = std::make_unique<Collider>();
@@ -545,7 +545,7 @@ Matrix ArcRotateCamera::_getViewMatrix()
     _viewMatrix.m[12] += targetScreenOffset.x;
     _viewMatrix.m[13] += targetScreenOffset.y;
   }
-  _currentTarget = _target;
+  _currentTarget = targetPostion;
 
   return _viewMatrix;
 }
@@ -579,10 +579,10 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
     sinb = 0.0001f;
   }
 
-  auto _target = _getTargetPosition();
+  auto targetPostion = _getTargetPosition();
   _computationVector.copyFromFloats(radius * cosa * sinb, radius * cosb,
                                     radius * sina * sinb);
-  _target.addToRef(_computationVector, _newPosition);
+  targetPostion.addToRef(_computationVector, _newPosition);
   position.copyFrom(_newPosition);
 
   auto up = upVector;

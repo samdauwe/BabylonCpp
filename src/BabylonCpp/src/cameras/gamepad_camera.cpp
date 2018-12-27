@@ -10,9 +10,9 @@ bool GamepadCamera::NodeConstructorAdded = false;
 void GamepadCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "GamepadCamera", [](const std::string& name, Scene* scene,
+    "GamepadCamera", [](const std::string& iName, Scene* scene,
                         const std::optional<json>& /*options*/) {
-      return GamepadCamera::New(name, Vector3::Zero(), scene);
+      return GamepadCamera::New(iName, Vector3::Zero(), scene);
     });
   GamepadCamera::NodeConstructorAdded = true;
 }

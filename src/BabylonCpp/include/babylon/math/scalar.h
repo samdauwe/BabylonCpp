@@ -108,7 +108,7 @@ constexpr T Clamp(T value)
 template <typename T>
 constexpr T Log2(T value)
 {
-  return std::log2(value);
+  return static_cast<T>(std::log2(value));
 }
 
 constexpr int IMul(int a, int b)

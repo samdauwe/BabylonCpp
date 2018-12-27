@@ -249,13 +249,13 @@ WindowsMotionController::processModel(Scene* scene,
   // Find the root node in the loaded glTF scene, and attach it as a child of
   // 'parentMesh'
   AbstractMesh* childMesh = nullptr;
-  for (auto& mesh : meshes) {
-    if (!mesh->parent()) {
+  for (auto& iMesh : meshes) {
+    if (!iMesh->parent()) {
       // Exclude controller meshes from picking results
-      mesh->isPickable = false;
+      iMesh->isPickable = false;
 
       // Handle root node, attach to the new parentMesh
-      childMesh = mesh;
+      childMesh = iMesh;
       break;
     }
   }

@@ -25,7 +25,7 @@ struct BABYLON_SHARED_EXPORT TargetedAnimation {
    * Target to animate
    */
   IAnimatablePtr target = nullptr;
-}; // end of class TargetedAnimation
+}; // end of struct TargetedAnimation
 
 } // end of namespace BABYLON
 

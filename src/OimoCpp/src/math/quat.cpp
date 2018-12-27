@@ -76,14 +76,14 @@ Quat& Quat::set(float _x, float _y, float _z, float _w)
   return *this;
 }
 
-Quat& Quat::setFromEuler(float x, float y, float z)
+Quat& Quat::setFromEuler(float _x, float _y, float _z)
 {
-  const float c1 = std::cos(x * 0.5f);
-  const float c2 = std::cos(y * 0.5f);
-  const float c3 = std::cos(z * 0.5f);
-  const float s1 = std::sin(x * 0.5f);
-  const float s2 = std::sin(y * 0.5f);
-  const float s3 = std::sin(z * 0.5f);
+  const float c1 = std::cos(_x * 0.5f);
+  const float c2 = std::cos(_y * 0.5f);
+  const float c3 = std::cos(_z * 0.5f);
+  const float s1 = std::sin(_x * 0.5f);
+  const float s2 = std::sin(_y * 0.5f);
+  const float s3 = std::sin(_z * 0.5f);
 
   // XYZ
   x = s1 * c2 * c3 + c1 * s2 * s3;

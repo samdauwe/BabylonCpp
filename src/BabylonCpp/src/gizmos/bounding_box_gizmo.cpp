@@ -120,11 +120,11 @@ BoundingBoxGizmo::BoundingBoxGizmo(
     _dragBehavior.updateDragPlane = false;
     // sphere->addBehavior(&_dragBehavior);
     Vector3 startingTurnDirection{1.f, 0.f, 0.f};
-    auto totalTurnAmountOfDrag = 0;
+    auto totalTurnAmountOfDrag = 0.f;
     _dragBehavior.onDragStartObservable.add(
       [&](DragStartOrEndEvent* /*event*/, EventState& /*es*/) {
         startingTurnDirection.copyFrom(sphere->forward());
-        totalTurnAmountOfDrag = 0;
+        totalTurnAmountOfDrag = 0.f;
       });
     _dragBehavior.onDragObservable.add([&](DragMoveEvent* event,
                                            EventState& /*es*/) {
@@ -216,8 +216,8 @@ BoundingBoxGizmo::BoundingBoxGizmo(
         box->material = coloredMaterial;
 
         // Dragging logic
-        auto dragAxis
-          = Vector3(i == 0 ? -1 : 1, j == 0 ? -1 : 1, k == 0 ? -1 : 1);
+        auto dragAxis = Vector3(i == 0 ? -1.f : 1.f, j == 0 ? -1.f : 1.f,
+                                k == 0 ? -1.f : 1.f);
         PointerDragBehaviorOptions options;
         options.dragAxis = dragAxis;
         PointerDragBehavior _dragBehavior(options);

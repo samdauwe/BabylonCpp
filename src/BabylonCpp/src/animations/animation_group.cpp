@@ -139,9 +139,9 @@ AnimationGroup& AnimationGroup::normalize(const std::optional<int>& iBeginFrame,
   return *this;
 }
 
-AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
-                                      std::optional<float> from,
-                                      std::optional<float> to)
+AnimationGroup& AnimationGroup::start(bool loop, float iSpeedRatio,
+                                      std::optional<float> iFrom,
+                                      std::optional<float> iTo)
 {
   if (_isStarted || _targetedAnimations.empty()) {
     return *this;
@@ -150,8 +150,8 @@ AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
   for (auto& targetedAnimation : _targetedAnimations) {
     auto animatable = _scene->beginDirectAnimation(
       targetedAnimation->target, {targetedAnimation->animation},
-      from.has_value() ? *from : _from, to.has_value() ? *to : _to, loop,
-      speedRatio);
+      iFrom.has_value() ? *iFrom : _from, iTo.has_value() ? *iTo : _to, loop,
+      iSpeedRatio);
     animatable->onAnimationEnd = [&]() {
       onAnimationEndObservable.notifyObservers(targetedAnimation.get());
       _checkAnimationGroupEnded(animatable);
@@ -159,7 +159,7 @@ AnimationGroup& AnimationGroup::start(bool loop, float speedRatio,
     _animatables.emplace_back(animatable);
   }
 
-  _speedRatio = speedRatio;
+  _speedRatio = iSpeedRatio;
 
   _isStarted = true;
 

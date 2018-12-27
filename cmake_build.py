@@ -53,11 +53,15 @@ class Tools(object):
         Executes the command in the specified directory.
         '''
         import os, subprocess
+        try:
+            basestring
+        except NameError:
+            basestring = str
         shell = isinstance(command, basestring)
         env = os.environ.copy()
         if extraEnv:
             env.update(extraEnv)
-        print "Executing command '%s' in directory '%s'" % (command, directory)
+        print("Executing command '%s' in directory '%s'" % (command, directory))
         subprocess.check_call(command, shell=shell, env=env, cwd=directory)
 
 class Build(object):
@@ -89,7 +93,7 @@ The supported build commands are:
         parser.add_argument('command', help='Subcommand to run')
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
-            print 'Unrecognized command'
+            print('Unrecognized command')
             parser.print_help()
             exit(1)
         # helper vars

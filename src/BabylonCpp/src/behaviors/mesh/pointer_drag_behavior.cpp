@@ -94,7 +94,7 @@ void PointerDragBehavior::attach(const MeshPtr& ownerNode)
         });
     }
   }
-  _dragPlane = Mesh::CreatePlane("pointerDragPlane", _debugMode ? 1 : 10000,
+  _dragPlane = Mesh::CreatePlane("pointerDragPlane", _debugMode ? 1.f : 10000.f,
                                  PointerDragBehavior::_planeScene.get(), false,
                                  Mesh::DOUBLESIDE);
 

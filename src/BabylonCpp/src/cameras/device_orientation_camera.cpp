@@ -7,9 +7,9 @@ bool DeviceOrientationCamera::NodeConstructorAdded = false;
 void DeviceOrientationCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "DeviceOrientationCamera", [](const std::string& name, Scene* scene,
+    "DeviceOrientationCamera", [](const std::string& iName, Scene* scene,
                                   const std::optional<json>& /*options*/) {
-      return DeviceOrientationCamera::New(name, Vector3::Zero(), scene);
+      return DeviceOrientationCamera::New(iName, Vector3::Zero(), scene);
     });
   DeviceOrientationCamera::NodeConstructorAdded = true;
 }

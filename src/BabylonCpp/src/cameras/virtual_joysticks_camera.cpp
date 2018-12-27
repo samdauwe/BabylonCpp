@@ -7,9 +7,9 @@ bool VirtualJoysticksCamera::NodeConstructorAdded = false;
 void VirtualJoysticksCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "VirtualJoysticksCamera", [](const std::string& name, Scene* scene,
+    "VirtualJoysticksCamera", [](const std::string& iName, Scene* scene,
                                  const std::optional<json>& /*options*/) {
-      return VirtualJoysticksCamera::New(name, Vector3::Zero(), scene);
+      return VirtualJoysticksCamera::New(iName, Vector3::Zero(), scene);
     });
   VirtualJoysticksCamera::NodeConstructorAdded = true;
 }

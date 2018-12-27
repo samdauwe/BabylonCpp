@@ -262,8 +262,8 @@ void EnvironmentHelper::_setupBackground()
 
 ISceneSize EnvironmentHelper::_getSceneSize()
 {
-  auto groundSize   = _options.groundSize;
-  auto skyboxSize   = _options.skyboxSize;
+  auto groundSize   = static_cast<float>(_options.groundSize);
+  auto skyboxSize   = static_cast<float>(_options.skyboxSize);
   auto rootPosition = _options.rootPosition;
   if (_scene->meshes.empty() || _scene->meshes.size() == 1) {
     // 1 only means the root of the helper.
@@ -297,14 +297,15 @@ ISceneSize EnvironmentHelper::_getSceneSize()
     rootPosition.y = sceneExtends.min.y - _options.groundYBias;
   }
 
-  return ISceneSize{groundSize, skyboxSize, rootPosition};
+  return ISceneSize{static_cast<int>(groundSize), static_cast<int>(skyboxSize),
+                    rootPosition};
 }
 
 void EnvironmentHelper::_setupGround(const ISceneSize& sceneSize)
 {
   if (!_ground || _ground->isDisposed()) {
-    _ground
-      = Mesh::CreatePlane("BackgroundPlane", sceneSize.groundSize, _scene);
+    _ground = Mesh::CreatePlane(
+      "BackgroundPlane", static_cast<float>(sceneSize.groundSize), _scene);
     _ground->rotation().x = Math::PI_2; // Face up by default.
     _ground->setParent(_rootMesh.get());
     _ground->onDisposeObservable.add(
@@ -403,7 +404,8 @@ void EnvironmentHelper::_setupMirrorInGroundMaterial()
 void EnvironmentHelper::_setupSkybox(const ISceneSize& sceneSize)
 {
   if (!_skybox || _skybox->isDisposed()) {
-    _skybox = Mesh::CreateBox("BackgroundSkybox", sceneSize.skyboxSize, _scene,
+    _skybox = Mesh::CreateBox("BackgroundSkybox",
+                              static_cast<float>(sceneSize.skyboxSize), _scene,
                               false, Mesh::BACKSIDE);
     _skybox->onDisposeObservable.add(
       [this](Node* /*node*/, EventState& /*es*/) { _skybox = nullptr; });

@@ -336,8 +336,8 @@ void Xbox360Pad::update()
     buttonY          = browserGamepad->buttons[3].value;
     buttonLB         = browserGamepad->buttons[4].value;
     buttonRB         = browserGamepad->buttons[5].value;
-    leftTrigger      = browserGamepad->buttons[6].value;
-    rightTrigger     = browserGamepad->buttons[7].value;
+    leftTrigger      = static_cast<float>(browserGamepad->buttons[6].value);
+    rightTrigger     = static_cast<float>(browserGamepad->buttons[7].value);
     buttonBack       = browserGamepad->buttons[8].value;
     buttonStart      = browserGamepad->buttons[9].value;
     buttonLeftStick  = browserGamepad->buttons[10].value;

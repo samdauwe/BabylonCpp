@@ -486,9 +486,9 @@ void Skeleton::_sortBones(unsigned int index, std::vector<BonePtr>& iBones,
 
   const auto& parentBone = bone->getParent();
   if (parentBone) {
-    auto index = boneIndexOf(parentBone);
-    if (index >= 0) {
-      _sortBones(static_cast<unsigned int>(index), iBones, visited);
+    auto _index = boneIndexOf(parentBone);
+    if (_index >= 0) {
+      _sortBones(static_cast<unsigned int>(_index), iBones, visited);
     }
   }
 

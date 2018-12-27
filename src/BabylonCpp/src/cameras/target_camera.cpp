@@ -353,12 +353,12 @@ Matrix TargetCamera::_getViewMatrix()
   return _viewMatrix;
 }
 
-void TargetCamera::_computeViewMatrix(const Vector3& position,
+void TargetCamera::_computeViewMatrix(const Vector3& iPosition,
                                       const Vector3& target, const Vector3& up)
 {
   if (parent()) {
     auto parentWorldMatrix = parent()->getWorldMatrix();
-    Vector3::TransformCoordinatesToRef(position, parentWorldMatrix,
+    Vector3::TransformCoordinatesToRef(iPosition, parentWorldMatrix,
                                        _globalPosition);
     Vector3::TransformCoordinatesToRef(target, parentWorldMatrix,
                                        _globalCurrentTarget);
@@ -367,7 +367,7 @@ void TargetCamera::_computeViewMatrix(const Vector3& position,
     _markSyncedWithParent();
   }
   else {
-    _globalPosition.copyFrom(position);
+    _globalPosition.copyFrom(iPosition);
     _globalCurrentTarget.copyFrom(target);
     _globalCurrentUpVector.copyFrom(up);
   }

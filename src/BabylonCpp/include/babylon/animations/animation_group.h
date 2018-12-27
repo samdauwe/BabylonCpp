@@ -15,7 +15,7 @@ namespace BABYLON {
 class Animatable;
 class Animation;
 class IAnimatable;
-class TargetedAnimation;
+struct TargetedAnimation;
 class Scene;
 using AnimatablePtr  = std::shared_ptr<Animatable>;
 using AnimationPtr   = std::shared_ptr<Animation>;

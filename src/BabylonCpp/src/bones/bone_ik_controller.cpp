@@ -187,7 +187,7 @@ void BoneIKController::update()
   auto& yaxis   = BoneIKController::_tmpVecs[3];
   auto& upAxis  = BoneIKController::_tmpVecs[4];
 
-  auto& _tmpQuat = BoneIKController::_tmpQuat;
+  auto& _iTmpQuat = BoneIKController::_tmpQuat;
 
   bone1->getAbsolutePositionToRef(mesh, bonePos);
 
@@ -273,8 +273,8 @@ void BoneIKController::update()
       if (!_slerping) {
         Quaternion::FromRotationMatrixToRef(_bone1Mat, _bone1Quat);
       }
-      Quaternion::FromRotationMatrixToRef(mat1, _tmpQuat);
-      Quaternion::SlerpToRef(_bone1Quat, _tmpQuat, slerpAmount, _bone1Quat);
+      Quaternion::FromRotationMatrixToRef(mat1, _iTmpQuat);
+      Quaternion::SlerpToRef(_bone1Quat, _iTmpQuat, slerpAmount, _bone1Quat);
       angC = _bone2Ang * (1.f - slerpAmount) + angC * slerpAmount;
       _bone1->setRotationQuaternion(_bone1Quat, Space::WORLD, mesh);
       _slerping = true;

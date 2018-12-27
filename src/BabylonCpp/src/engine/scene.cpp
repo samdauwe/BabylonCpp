@@ -1058,21 +1058,21 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
     }
 
     if (onPointerObservable.hasObservers()) {
-      auto type = evt.type == EventType::MOUSE_WHEEL
-                      || evt.type == EventType::DOM_MOUSE_SCROLL ?
-                    PointerEventTypes::POINTERWHEEL :
-                    PointerEventTypes::POINTERMOVE;
+      auto iType = evt.type == EventType::MOUSE_WHEEL
+                       || evt.type == EventType::DOM_MOUSE_SCROLL ?
+                     PointerEventTypes::POINTERWHEEL :
+                     PointerEventTypes::POINTERMOVE;
 
-      if (type == PointerEventTypes::POINTERWHEEL) {
-        PointerInfo pi(type, *static_cast<MouseWheelEvent const*>(&evt),
+      if (iType == PointerEventTypes::POINTERWHEEL) {
+        PointerInfo pi(iType, *static_cast<MouseWheelEvent const*>(&evt),
                        *pickResult);
         _setRayOnPointerInfo(pi);
-        onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+        onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
       }
       else {
-        PointerInfo pi(type, evt, *pickResult);
+        PointerInfo pi(iType, evt, *pickResult);
         _setRayOnPointerInfo(pi);
-        onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+        onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
       }
     }
   }
@@ -1084,7 +1084,8 @@ bool Scene::_checkPrePointerObservable(
   const std::optional<PickingInfo>& pickResult, const PointerEvent& evt,
   PointerEventTypes type)
 {
-  PointerInfoPre pi(type, evt, _unTranslatedPointerX, _unTranslatedPointerY);
+  PointerInfoPre pi(type, evt, static_cast<float>(_unTranslatedPointerX),
+                    static_cast<float>(_unTranslatedPointerY));
   if (pickResult) {
     pi.ray = (*pickResult).ray;
   }
@@ -1113,26 +1114,26 @@ Scene& Scene::_processPointerDown(const std::optional<PickingInfo>& pickResult,
                                   const PointerEvent& evt)
 {
   if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh) {
-    _pickedDownMesh    = (*pickResult).pickedMesh;
-    auto actionManager = _pickedDownMesh->actionManager;
-    if (actionManager) {
-      if (actionManager->hasPickTriggers()) {
-        actionManager->processTrigger(
+    _pickedDownMesh     = (*pickResult).pickedMesh;
+    auto iActionManager = _pickedDownMesh->actionManager;
+    if (iActionManager) {
+      if (iActionManager->hasPickTriggers()) {
+        iActionManager->processTrigger(
           ActionManager::OnPickDownTrigger,
           ActionEvent::CreateNew(_pickedDownMesh, evt));
         switch (evt.button) {
           case MouseButtonType::LEFT:
-            actionManager->processTrigger(
+            iActionManager->processTrigger(
               ActionManager::OnLeftPickTrigger,
               ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
           case MouseButtonType::MIDDLE:
-            actionManager->processTrigger(
+            iActionManager->processTrigger(
               ActionManager::OnCenterPickTrigger,
               ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
           case MouseButtonType::RIGHT:
-            actionManager->processTrigger(
+            iActionManager->processTrigger(
               ActionManager::OnRightPickTrigger,
               ActionEvent::CreateNew(_pickedDownMesh, evt));
             break;
@@ -1141,7 +1142,7 @@ Scene& Scene::_processPointerDown(const std::optional<PickingInfo>& pickResult,
         }
       }
 
-      if (actionManager->hasSpecificTrigger(
+      if (iActionManager->hasSpecificTrigger(
             ActionManager::OnLongPressTrigger)) {
 #if 0
         window.setTimeout(
@@ -1265,26 +1266,26 @@ Scene& Scene::_processPointerUp(const std::optional<PickingInfo>& pickResult,
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
-          auto type = PointerEventTypes::POINTERTAP;
-          PointerInfo pi(type, evt, *pickResult);
+          auto iType = PointerEventTypes::POINTERTAP;
+          PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
-          onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+          onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
-          auto type = PointerEventTypes::POINTERDOUBLETAP;
-          PointerInfo pi(type, evt, *pickResult);
+          auto iType = PointerEventTypes::POINTERDOUBLETAP;
+          PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
-          onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+          onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
         }
       }
     }
     else {
-      auto type = PointerEventTypes::POINTERUP;
-      PointerInfo pi(type, evt, *pickResult);
+      auto iType = PointerEventTypes::POINTERUP;
+      PointerInfo pi(iType, evt, *pickResult);
       _setRayOnPointerInfo(pi);
-      onPointerObservable.notifyObservers(&pi, static_cast<int>(type));
+      onPointerObservable.notifyObservers(&pi, static_cast<int>(iType));
     }
   }
 
@@ -1628,8 +1629,8 @@ void Scene::_onPointerDownEvent(PointerEvent&& evt)
   }
 
   _pointerCaptures[evt.pointerId] = true;
-  _startingPointerPosition.x      = _pointerX;
-  _startingPointerPosition.y      = _pointerY;
+  _startingPointerPosition.x      = static_cast<float>(_pointerX);
+  _startingPointerPosition.y      = static_cast<float>(_pointerY);
   _startingPointerTime            = Time::highresTimepointNow();
 
   if (!pointerDownPredicate) {
@@ -2041,14 +2042,14 @@ AnimatablePtr Scene::beginAnimation(
 
   // Children animations
   std::vector<IAnimatablePtr> animatables;
-  if (auto s = std::dynamic_pointer_cast<Skeleton>(target)) {
-    animatables = s->getAnimatables();
+  if (auto skeleton = std::dynamic_pointer_cast<Skeleton>(target)) {
+    animatables = skeleton->getAnimatables();
   }
-  else if (auto s = std::dynamic_pointer_cast<StandardMaterial>(target)) {
-    animatables = s->getAnimatables();
+  else if (auto mat = std::dynamic_pointer_cast<StandardMaterial>(target)) {
+    animatables = mat->getAnimatables();
   }
-  else if (auto m = std::dynamic_pointer_cast<Mesh>(target)) {
-    animatables = m->getAnimatables();
+  else if (auto mesh = std::dynamic_pointer_cast<Mesh>(target)) {
+    animatables = mesh->getAnimatables();
   }
 
   if (!animatables.empty()) {
@@ -2075,17 +2076,19 @@ Scene::beginDirectAnimation(const IAnimatablePtr& target,
 
 std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
   const NodePtr& target, bool directDescendantsOnly,
-  const std::vector<AnimationPtr>& animations, int from, int to, bool loop,
+  const std::vector<AnimationPtr>& iAnimations, int from, int to, bool loop,
   float speedRatio, const std::function<void()>& onAnimationEnd)
 {
   auto children = target->getDescendants(directDescendantsOnly);
 
   std::vector<AnimatablePtr> result;
-  result.emplace_back(beginDirectAnimation(target, animations, from, to, loop,
-                                           speedRatio, onAnimationEnd));
+  result.emplace_back(beginDirectAnimation(
+    target, iAnimations, static_cast<float>(from), static_cast<float>(to), loop,
+    speedRatio, onAnimationEnd));
   for (auto& child : children) {
-    result.emplace_back(beginDirectAnimation(child, animations, from, to, loop,
-                                             speedRatio, onAnimationEnd));
+    result.emplace_back(beginDirectAnimation(
+      child, iAnimations, static_cast<float>(from), static_cast<float>(to),
+      loop, speedRatio, onAnimationEnd));
   }
 
   return result;
@@ -2223,16 +2226,16 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
   for (size_t animIndex = startIndex; animIndex < holderAnimations.size();
        ++animIndex) {
     auto& runtimeAnimation  = holderAnimations[animIndex];
-    auto scale              = runtimeAnimation->weight / normalizer;
+    auto iScale             = runtimeAnimation->weight / normalizer;
     auto& currentPosition   = Tmp::Vector3Array[2];
     auto& currentScaling    = Tmp::Vector3Array[3];
     auto& currentQuaternion = Tmp::QuaternionArray[1];
 
     (*runtimeAnimation->currentValue())
       .matrixData.decompose(currentScaling, currentQuaternion, currentPosition);
-    currentScaling.scaleAndAddToRef(scale, finalScaling);
-    currentQuaternion.scaleAndAddToRef(scale, finalQuaternion);
-    currentPosition.scaleAndAddToRef(scale, finalPosition);
+    currentScaling.scaleAndAddToRef(iScale, finalScaling);
+    currentQuaternion.scaleAndAddToRef(iScale, finalQuaternion);
+    currentPosition.scaleAndAddToRef(iScale, finalPosition);
   }
 
   auto workValue = *originalAnimation->_workValue;
@@ -3236,9 +3239,9 @@ void Scene::freeActiveMeshes()
     activeCamera->_activeMeshes.clear();
   }
   if (!activeCameras.empty()) {
-    for (auto& activeCamera : activeCameras) {
-      if (activeCamera && !activeCamera->_activeMeshes.empty()) {
-        activeCamera->_activeMeshes.clear();
+    for (auto& iActiveCamera : activeCameras) {
+      if (iActiveCamera && !iActiveCamera->_activeMeshes.empty()) {
+        iActiveCamera->_activeMeshes.clear();
       }
     }
   }

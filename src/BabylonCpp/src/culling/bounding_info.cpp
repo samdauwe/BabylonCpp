@@ -97,12 +97,13 @@ void BoundingInfo::update(const Matrix& world)
 BoundingInfo& BoundingInfo::centerOn(const Vector3& center,
                                      const Vector3& extend)
 {
-  const auto minimum
+  const auto iMinimum
     = Tmp::Vector3Array[0].copyFrom(center).subtractInPlace(extend);
-  const auto maximum = Tmp::Vector3Array[1].copyFrom(center).addInPlace(extend);
+  const auto iMaximum
+    = Tmp::Vector3Array[1].copyFrom(center).addInPlace(extend);
 
-  boundingBox.reConstruct(minimum, maximum);
-  boundingSphere.reConstruct(minimum, maximum);
+  boundingBox.reConstruct(iMinimum, iMaximum);
+  boundingSphere.reConstruct(iMinimum, iMaximum);
 
   return *this;
 }

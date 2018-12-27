@@ -11,9 +11,9 @@ bool TouchCamera::NodeConstructorAdded = false;
 void TouchCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "TouchCamera", [](const std::string& name, Scene* scene,
+    "TouchCamera", [](const std::string& iName, Scene* scene,
                       const std::optional<json>& /*options*/) {
-      return TouchCamera::New(name, Vector3::Zero(), scene);
+      return TouchCamera::New(iName, Vector3::Zero(), scene);
     });
   TouchCamera::NodeConstructorAdded = true;
 }

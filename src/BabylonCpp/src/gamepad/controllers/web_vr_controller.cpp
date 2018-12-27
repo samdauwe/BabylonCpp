@@ -45,7 +45,7 @@ void WebVRController::setOnButtonStateChange(
 void WebVRController::update()
 {
   PoseEnabledController::update();
-  for (unsigned int index = 0; index < _buttons.size(); ++index) {
+  for (unsigned int _index = 0; _index < _buttons.size(); ++_index) {
     // _setButtonValue(browserGamepad->buttons[index], _buttons[index], index);
   };
   const auto& pLeftStick = *leftStick();
@@ -82,7 +82,7 @@ void WebVRController::_setButtonValue(
   _buttons[buttonIndex].setTouched((*newState).touched());
   // oculus triggers are never 0, thou not touched.
   _buttons[buttonIndex].setValue(
-    (*newState).value() < 0.00000001f ? 0.f : (*newState).value());
+    (*newState).value() < 0.00000001f ? 0 : (*newState).value());
 }
 
 GamepadButtonChanges&

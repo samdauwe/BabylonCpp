@@ -21,11 +21,11 @@ namespace BABYLON {
 
 HashValue Hash(const char* str)
 {
-  const size_t npos = -1;
+  const auto npos = -1;
   return Hash(str, npos);
 }
 
-HashValue Hash(const char* str, size_t len)
+HashValue Hash(const char* str, int len)
 {
   if (str == nullptr || *str == 0 || len == 0) {
     return 0;
@@ -33,7 +33,7 @@ HashValue Hash(const char* str, size_t len)
 
   // A quick good hash, from:
   // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
-  size_t count    = 0;
+  auto count      = 0;
   HashValue value = kHashOffsetBasis;
   while (*str && count < len) {
     value = (value ^ static_cast<unsigned char>(*str++)) * kHashPrimeMultiplier;

@@ -11,9 +11,9 @@ bool ArcFollowCamera::NodeConstructorAdded = false;
 void ArcFollowCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "ArcFollowCamera", [](const std::string& name, Scene* scene,
+    "ArcFollowCamera", [](const std::string& iName, Scene* scene,
                           const std::optional<json>& /*options*/) {
-      return ArcFollowCamera::New(name, 0.f, 0.f, 1.f, nullptr, scene);
+      return ArcFollowCamera::New(iName, 0.f, 0.f, 1.f, nullptr, scene);
     });
   ArcFollowCamera::NodeConstructorAdded = true;
 }

@@ -951,7 +951,8 @@ Viewport& Engine::setDirectViewport(int x, int y, int width, int height)
   auto currentViewport = _cachedViewport;
   _cachedViewport      = nullptr;
 
-  _viewport(x, y, width, height);
+  _viewport(static_cast<float>(x), static_cast<float>(y),
+            static_cast<float>(width), static_cast<float>(height));
 
   return *currentViewport;
 }
@@ -1075,7 +1076,8 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
       }
     }
 
-    _viewport(0, 0, *requiredWidth, *requiredHeight);
+    _viewport(0.f, 0.f, static_cast<float>(*requiredWidth),
+              static_cast<float>(*requiredHeight));
   }
 
   wipeCaches();
@@ -2416,7 +2418,9 @@ void Engine::setState(bool culling, float zOffset, bool force, bool reverseSide)
 
   // Cull face
   const auto cullFace = cullBackFaces ? GL::BACK : GL::FRONT;
-  if (_depthCullingState->cullFace() != cullFace || force) {
+  if ((_depthCullingState->cullFace().has_value()
+       && *_depthCullingState->cullFace() != static_cast<int>(cullFace))
+      || force) {
     _depthCullingState->cullFace = static_cast<int>(cullFace);
   }
 

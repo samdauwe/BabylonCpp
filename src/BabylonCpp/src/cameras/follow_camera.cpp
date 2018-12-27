@@ -10,9 +10,9 @@ bool FollowCamera::NodeConstructorAdded = false;
 void FollowCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "FollowCamera", [](const std::string& name, Scene* scene,
+    "FollowCamera", [](const std::string& iName, Scene* scene,
                        const std::optional<json>& /*options*/) {
-      return FollowCamera::New(name, Vector3::Zero(), scene);
+      return FollowCamera::New(iName, Vector3::Zero(), scene);
     });
   FollowCamera::NodeConstructorAdded = true;
 }

@@ -9,7 +9,7 @@ bool StereoscopicUniversalCamera::NodeConstructorAdded = false;
 void StereoscopicUniversalCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "StereoscopicUniversalCamera", [](const std::string& name, Scene* scene,
+    "StereoscopicUniversalCamera", [](const std::string& iName, Scene* scene,
                                       const std::optional<json>& options) {
       float interaxialDistance      = 0.f;
       bool isStereoscopicSideBySide = false;
@@ -19,7 +19,7 @@ void StereoscopicUniversalCamera::AddNodeConstructor()
         isStereoscopicSideBySide
           = json_util::get_bool(*options, "isStereoscopicSideBySide");
       }
-      return StereoscopicUniversalCamera::New(name, Vector3::Zero(),
+      return StereoscopicUniversalCamera::New(iName, Vector3::Zero(),
                                               interaxialDistance,
                                               isStereoscopicSideBySide, scene);
     });

@@ -311,9 +311,9 @@ void RigidBody::applyImpulse(const Vec3& _position, const Vec3& force)
   angularVelocity.add(rel);
 }
 
-void RigidBody::setPosition(const Vec3& pos)
+void RigidBody::setPosition(const Vec3& iPos)
 {
-  newPosition.copy(pos).multiplyScalar(World::INV_SCALE);
+  newPosition.copy(iPos).multiplyScalar(World::INV_SCALE);
   controlPos = true;
   if (!isKinematic) {
     isKinematic = true;

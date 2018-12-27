@@ -204,20 +204,21 @@ void BoneLookController::update()
 
   auto parentBone = bone->getParent();
 
-  auto& upAxis = BoneLookController::_tmpVecs[1];
-  upAxis.copyFrom(upAxis);
+  auto& _upAxis = BoneLookController::_tmpVecs[1];
+  _upAxis.copyFrom(upAxis);
 
   if (upAxisSpace == Space::BONE && parentBone) {
     if (_transformYawPitch) {
-      Vector3::TransformCoordinatesToRef(upAxis, _transformYawPitchInv, upAxis);
+      Vector3::TransformCoordinatesToRef(_upAxis, _transformYawPitchInv,
+                                         _upAxis);
     }
-    parentBone->getDirectionToRef(upAxis, upAxis, mesh);
+    parentBone->getDirectionToRef(_upAxis, _upAxis, mesh);
   }
   else if (upAxisSpace == Space::LOCAL) {
-    mesh->getDirectionToRef(upAxis, upAxis);
+    mesh->getDirectionToRef(_upAxis, _upAxis);
     if (mesh->scaling().x != 1.f || mesh->scaling().y != 1.f
         || mesh->scaling().z != 1.f) {
-      upAxis.normalize();
+      _upAxis.normalize();
     }
   }
 
@@ -238,10 +239,10 @@ void BoneLookController::update()
     auto& spaceMat    = BoneLookController::_tmpMats[2];
     auto& spaceMatInv = BoneLookController::_tmpMats[3];
 
-    if (upAxisSpace == Space::BONE && upAxis.y == 1.f && parentBone) {
+    if (upAxisSpace == Space::BONE && _upAxis.y == 1.f && parentBone) {
       parentBone->getRotationMatrixToRef(spaceMat, Space::WORLD, mesh);
     }
-    else if (upAxisSpace == Space::LOCAL && upAxis.y == 1.f && !parentBone) {
+    else if (upAxisSpace == Space::LOCAL && _upAxis.y == 1.f && !parentBone) {
       spaceMat.copyFrom(mesh->getWorldMatrix());
     }
     else {
@@ -261,9 +262,9 @@ void BoneLookController::update()
         mesh->getDirectionToRef(forwardAxis, forwardAxis);
       }
 
-      auto rightAxis = Vector3::Cross(upAxis, forwardAxis);
+      auto rightAxis = Vector3::Cross(_upAxis, forwardAxis);
       rightAxis.normalize();
-      forwardAxis = Vector3::Cross(rightAxis, upAxis);
+      forwardAxis = Vector3::Cross(rightAxis, _upAxis);
 
       Matrix::FromXYZAxesToRef(rightAxis, upAxis, forwardAxis, spaceMat);
     }
@@ -395,11 +396,11 @@ void BoneLookController::update()
   auto& zaxis    = BoneLookController::_tmpVecs[5];
   auto& xaxis    = BoneLookController::_tmpVecs[6];
   auto& yaxis    = BoneLookController::_tmpVecs[7];
-  auto& _tmpQuat = BoneLookController::_tmpQuat;
+  auto& iTmpQuat = BoneLookController::_tmpQuat;
 
   target.subtractToRef(bonePos, zaxis);
   zaxis.normalize();
-  Vector3::CrossToRef(upAxis, zaxis, xaxis);
+  Vector3::CrossToRef(_upAxis, zaxis, xaxis);
   xaxis.normalize();
   Vector3::CrossToRef(zaxis, xaxis, yaxis);
   yaxis.normalize();
@@ -432,8 +433,8 @@ void BoneLookController::update()
       transformYawPitch.multiplyToRef(_tmpMat1, _tmpMat1);
       _transformYawPitch = std::move(transformYawPitch);
     }
-    Quaternion::FromRotationMatrixToRef(_tmpMat1, _tmpQuat);
-    Quaternion::SlerpToRef(_boneQuat, _tmpQuat, slerpAmount, _boneQuat);
+    Quaternion::FromRotationMatrixToRef(_tmpMat1, iTmpQuat);
+    Quaternion::SlerpToRef(_boneQuat, iTmpQuat, slerpAmount, _boneQuat);
 
     bone->setRotationQuaternion(_boneQuat, Space::WORLD, mesh);
     _slerping = true;

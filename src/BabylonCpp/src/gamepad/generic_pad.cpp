@@ -54,9 +54,9 @@ unsigned int GenericPad::_setButtonValue(unsigned int newValue,
 void GenericPad::update()
 {
   Gamepad::update();
-  for (unsigned int index = 0; index < _buttons.size(); ++index) {
-    _buttons[index] = _setButtonValue(browserGamepad->buttons[index].value,
-                                      _buttons[index], index);
+  for (unsigned int _index = 0; _index < _buttons.size(); ++_index) {
+    _buttons[_index] = _setButtonValue(browserGamepad->buttons[_index].value,
+                                       _buttons[_index], _index);
   }
 }
 

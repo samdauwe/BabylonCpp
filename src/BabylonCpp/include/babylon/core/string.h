@@ -2,6 +2,7 @@
 #define BABYLON_CORE_STRING_H
 
 #include <algorithm>
+#include <cctype>
 #include <ostream>
 #include <random>
 #include <regex>
@@ -563,23 +564,24 @@ inline std::vector<char> toCharArray(const std::string& str)
  * @param source Required. The string to convert.
  * @return A String, representing the value of a string converted to lowercase.
  */
-inline std::string toLowerCase(const std::string& source)
+inline std::string toLowerCase(std::string source)
 {
-  std::string lcs = source;
-  std::transform(lcs.begin(), lcs.end(), lcs.begin(), ::tolower);
-  return lcs;
+  std::transform(
+    source.begin(), source.end(), source.begin(),
+    [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+  return source;
 }
-
 /**
  * @brief Converts a string to uppercase letters.
  * @param source Required. The string to convert.
  * @return A String, representing the value of a string converted to uppercase.
  */
-inline std::string toUpperCase(const std::string& source)
+inline std::string toUpperCase(std::string source)
 {
-  std::string ucs = source;
-  std::transform(ucs.begin(), ucs.end(), ucs.begin(), ::toupper);
-  return ucs;
+  std::transform(
+    source.begin(), source.end(), source.begin(),
+    [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+  return source;
 }
 
 /**

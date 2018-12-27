@@ -105,12 +105,12 @@ void PoseEnabledController::updateFromDevice(const DevicePose& poseData)
   }
 }
 
-void PoseEnabledController::attachToMesh(const AbstractMeshPtr& mesh)
+void PoseEnabledController::attachToMesh(const AbstractMeshPtr& iMesh)
 {
   if (_mesh) {
     _mesh->setParent(nullptr);
   }
-  _mesh = mesh;
+  _mesh = iMesh;
   if (_poseControlledCamera) {
     // _mesh->setParent(_poseControlledCamera);
   }
@@ -134,7 +134,7 @@ void PoseEnabledController::attachToMesh(const AbstractMeshPtr& mesh)
     }
   }
 
-  _meshAttachedObservable.notifyObservers(mesh.get());
+  _meshAttachedObservable.notifyObservers(iMesh.get());
 }
 
 void PoseEnabledController::attachToPoseControlledCamera(TargetCamera* camera)

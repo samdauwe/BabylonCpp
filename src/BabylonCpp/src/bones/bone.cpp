@@ -84,17 +84,17 @@ Bone* Bone::getParent() const
   return _parent;
 }
 
-void Bone::setParent(Bone* parent, bool updateDifferenceMatrix)
+void Bone::setParent(Bone* iParent, bool updateDifferenceMatrix)
 {
-  if (_parent == parent) {
+  if (_parent == iParent) {
     return;
   }
 
   if (_parent) {
-    stl_util::erase(parent->children, this);
+    stl_util::erase(_parent->children, this);
   }
 
-  _parent = parent;
+  _parent = iParent;
 
   if (_parent) {
     _parent->children.emplace_back(this);
@@ -324,17 +324,17 @@ bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
   // rescaling prep
   int sourceBoneLength   = source->length;
   auto sourceParent      = source->getParent();
-  auto parent            = getParent();
+  auto parentBone        = getParent();
   bool parentScalingReqd = rescaleAsRequired && sourceParent
                            && sourceBoneLength > 0 && length > 0
                            && sourceBoneLength != length;
-  float parentRatio = parentScalingReqd && parent && sourceParent ?
-                        static_cast<float>(parent->length)
+  float parentRatio = parentScalingReqd && parentBone && sourceParent ?
+                        static_cast<float>(parentBone->length)
                           / static_cast<float>(sourceParent->length) :
                         1.f;
 
   bool dimensionsScalingReqd
-    = rescaleAsRequired && !parent && hasSkelDimensionsRatio
+    = rescaleAsRequired && !parentBone && hasSkelDimensionsRatio
       && (!stl_util::almost_equal(skelDimensionsRatio.x, 1.f)
           || !stl_util::almost_equal(skelDimensionsRatio.y, 1.f)
           || !stl_util::almost_equal(skelDimensionsRatio.z, 1.f));
@@ -425,15 +425,16 @@ void Bone::translate(const Vector3& vec, Space space, AbstractMesh* mesh)
   _markAsDirtyAndDecompose();
 }
 
-void Bone::setPosition(const Vector3& position, Space space, AbstractMesh* mesh)
+void Bone::setPosition(const Vector3& iPosition, Space space,
+                       AbstractMesh* mesh)
 {
   auto& lm = getLocalMatrix();
 
   if (space == Space::LOCAL) {
 
-    lm.m[12] = position.x;
-    lm.m[13] = position.y;
-    lm.m[14] = position.z;
+    lm.m[12] = iPosition.x;
+    lm.m[13] = iPosition.y;
+    lm.m[14] = iPosition.z;
   }
   else {
 
@@ -460,7 +461,7 @@ void Bone::setPosition(const Vector3& position, Space space, AbstractMesh* mesh)
     }
 
     tmat.invert();
-    Vector3::TransformCoordinatesToRef(position, tmat, vec);
+    Vector3::TransformCoordinatesToRef(iPosition, tmat, vec);
 
     lm.m[12] = vec.x;
     lm.m[13] = vec.y;
@@ -470,9 +471,9 @@ void Bone::setPosition(const Vector3& position, Space space, AbstractMesh* mesh)
   _markAsDirtyAndDecompose();
 }
 
-void Bone::setAbsolutePosition(const Vector3& position, AbstractMesh* mesh)
+void Bone::setAbsolutePosition(const Vector3& iPosition, AbstractMesh* mesh)
 {
-  setPosition(position, Space::WORLD, mesh);
+  setPosition(iPosition, Space::WORLD, mesh);
 }
 
 void Bone::scale(float x, float y, float z, bool scaleChildren)
@@ -584,9 +585,10 @@ void Bone::setAxisAngle(Vector3& axis, float angle, Space space,
   _rotateWithMatrix(rotMat, space, mesh);
 }
 
-void Bone::setRotation(const Vector3& rotation, Space space, AbstractMesh* mesh)
+void Bone::setRotation(const Vector3& iRotation, Space space,
+                       AbstractMesh* mesh)
 {
-  setYawPitchRoll(rotation.y, rotation.x, rotation.z, space, mesh);
+  setYawPitchRoll(iRotation.y, iRotation.x, iRotation.z, space, mesh);
 }
 
 void Bone::setRotationQuaternion(const Quaternion& quat, Space space,
@@ -644,17 +646,18 @@ void Bone::_rotateWithMatrix(const Matrix& rmat, Space space,
   float lx             = lmat.m[12];
   float ly             = lmat.m[13];
   float lz             = lmat.m[14];
-  auto parent          = getParent();
+  auto parentBone      = getParent();
   auto& parentScale    = Bone::_tmpMats[3];
   auto& parentScaleInv = Bone::_tmpMats[4];
 
-  if (parent && space == Space::WORLD) {
+  if (parentBone && space == Space::WORLD) {
     if (mesh) {
       parentScale.copyFrom(mesh->getWorldMatrix());
-      parent->getAbsoluteTransform().multiplyToRef(parentScale, parentScale);
+      parentBone->getAbsoluteTransform().multiplyToRef(parentScale,
+                                                       parentScale);
     }
     else {
-      parentScale.copyFrom(parent->getAbsoluteTransform());
+      parentScale.copyFrom(parentBone->getAbsoluteTransform());
     }
     parentScaleInv.copyFrom(parentScale);
     parentScaleInv.invert();
@@ -913,17 +916,17 @@ void Bone::getRotationMatrixToRef(Matrix& result, Space space,
   }
 }
 
-Vector3 Bone::getAbsolutePositionFromLocal(const Vector3& position,
+Vector3 Bone::getAbsolutePositionFromLocal(const Vector3& iPosition,
                                            AbstractMesh* mesh) const
 {
   auto result = Vector3::Zero();
 
-  getAbsolutePositionFromLocalToRef(position, mesh, result);
+  getAbsolutePositionFromLocalToRef(iPosition, mesh, result);
 
   return result;
 }
 
-void Bone::getAbsolutePositionFromLocalToRef(const Vector3& position,
+void Bone::getAbsolutePositionFromLocalToRef(const Vector3& iPosition,
                                              AbstractMesh* mesh,
                                              Vector3& result) const
 {
@@ -946,20 +949,20 @@ void Bone::getAbsolutePositionFromLocalToRef(const Vector3& position,
     tmat = getAbsoluteTransform();
   }
 
-  Vector3::TransformCoordinatesToRef(position, tmat, result);
+  Vector3::TransformCoordinatesToRef(iPosition, tmat, result);
 }
 
-Vector3 Bone::getLocalPositionFromAbsolute(const Vector3& position,
+Vector3 Bone::getLocalPositionFromAbsolute(const Vector3& iPosition,
                                            AbstractMesh* mesh) const
 {
   auto result = Vector3::Zero();
 
-  getLocalPositionFromAbsoluteToRef(position, mesh, result);
+  getLocalPositionFromAbsoluteToRef(iPosition, mesh, result);
 
   return result;
 }
 
-void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& position,
+void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& iPosition,
                                              AbstractMesh* mesh,
                                              Vector3& result) const
 {
@@ -982,7 +985,7 @@ void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& position,
 
   tmat.invert();
 
-  Vector3::TransformCoordinatesToRef(position, tmat, result);
+  Vector3::TransformCoordinatesToRef(iPosition, tmat, result);
 }
 
 } // end of namespace BABYLON

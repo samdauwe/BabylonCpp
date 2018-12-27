@@ -18,10 +18,10 @@ bool FreeCamera::NodeConstructorAdded = false;
 void FreeCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "FreeCamera", [](const std::string& name, Scene* scene,
+    "FreeCamera", [](const std::string& iName, Scene* scene,
                      const std::optional<json>& /*options*/) {
       // Forcing to use the Universal camera
-      return UniversalCamera::New(name, Vector3::Zero(), scene);
+      return UniversalCamera::New(iName, Vector3::Zero(), scene);
     });
   FreeCamera::NodeConstructorAdded = true;
 }

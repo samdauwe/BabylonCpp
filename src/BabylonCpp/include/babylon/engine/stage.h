@@ -8,7 +8,7 @@
 
 namespace BABYLON {
 
-class _InstancesBatch;
+struct _InstancesBatch;
 class AbstractMesh;
 class Camera;
 class ICanvas;

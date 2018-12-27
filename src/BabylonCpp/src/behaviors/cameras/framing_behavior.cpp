@@ -63,9 +63,9 @@ const char* FramingBehavior::name() const
   return "Framing";
 }
 
-void FramingBehavior::set_mode(unsigned int mode)
+void FramingBehavior::set_mode(unsigned int iMode)
 {
-  _mode = mode;
+  _mode = iMode;
 }
 
 unsigned int FramingBehavior::get_mode() const

@@ -280,9 +280,9 @@ bool Animatable::_animate(const millisecond_t& delay)
   bool running = false;
 
   for (auto& animation : _runtimeAnimations) {
-    bool isRunning
-      = animation->animate(delay - (*_localDelayOffset), fromFrame, toFrame,
-                           loopAnimation, speedRatio(), _weight);
+    bool isRunning = animation->animate(
+      delay - (*_localDelayOffset), static_cast<float>(fromFrame),
+      static_cast<float>(toFrame), loopAnimation, speedRatio(), _weight);
     running = running || isRunning;
   }
 

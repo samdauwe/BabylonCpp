@@ -52,8 +52,8 @@ AnimationPtr Animation::_PrepareAnimation(
     = Animation::New(name, targetProperty, framePerSecond, dataType, loopMode);
 
   animation->setKeys({
-    IAnimationKey(0, from),
-    IAnimationKey(totalFrame, to),
+    IAnimationKey(0.f, from),
+    IAnimationKey(static_cast<float>(totalFrame), to),
   });
 
   if (easingFunction != nullptr) {
@@ -94,8 +94,8 @@ AnimatablePtr Animation::CreateAndStartAnimation(
   }
 
   return node->getScene()->beginDirectAnimation(
-    node, {animation}, 0, totalFrame, (animation->loopMode == 1), 1.f,
-    onAnimationEnd);
+    node, {animation}, 0.f, static_cast<float>(totalFrame),
+    (animation->loopMode == 1), 1.f, onAnimationEnd);
 }
 
 std::vector<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
@@ -376,7 +376,7 @@ AnimationValue Animation::_getKeyValue(const AnimationValue& value) const
 
 AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                                        std::optional<AnimationValue>& workValue,
-                                       unsigned int loopMode,
+                                       unsigned int iLoopMode,
                                        const AnimationValue& offsetValue,
                                        const AnimationValue& highLimitValue)
 {
@@ -446,7 +446,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                   gradient) :
                 floatInterpolateFunction(startValue.floatData,
                                          endValue.floatData, gradient);
-          switch (loopMode) {
+          switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.floatData = floatValue;
@@ -471,7 +471,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                   gradient) :
                 quaternionInterpolateFunction(
                   startValue.quaternionData, endValue.quaternionData, gradient);
-          switch (loopMode) {
+          switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.quaternionData = quatValue;
@@ -495,7 +495,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                   (*endKey.inTangent).vector3Data.scale(frameDelta), gradient) :
                 vector3InterpolateFunction(startValue.vector3Data,
                                            endValue.vector3Data, gradient);
-          switch (loopMode) {
+          switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.vector3Data = vec3Value;
@@ -519,7 +519,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
                   (*endKey.inTangent).vector2Data.scale(frameDelta), gradient) :
                 vector2InterpolateFunction(startValue.vector2Data,
                                            endValue.vector2Data, gradient);
-          switch (loopMode) {
+          switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.vector2Data = vec2Value;
@@ -534,7 +534,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
         } break;
         // Size
         case Animation::ANIMATIONTYPE_SIZE():
-          switch (loopMode) {
+          switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.sizeData = sizeInterpolateFunction(
@@ -552,7 +552,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           break;
         // Color3
         case Animation::ANIMATIONTYPE_COLOR3():
-          switch (loopMode) {
+          switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               newVale.color3Data = color3InterpolateFunction(
@@ -570,7 +570,7 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           break;
         // Matrix
         case Animation::ANIMATIONTYPE_MATRIX():
-          switch (loopMode) {
+          switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               if (Animation::AllowMatricesInterpolation()) {

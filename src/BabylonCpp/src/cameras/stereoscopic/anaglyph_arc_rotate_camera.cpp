@@ -9,14 +9,14 @@ bool AnaglyphArcRotateCamera::NodeConstructorAdded = false;
 void AnaglyphArcRotateCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "AnaglyphArcRotateCamera", [](const std::string& name, Scene* scene,
+    "AnaglyphArcRotateCamera", [](const std::string& iName, Scene* scene,
                                   const std::optional<json>& options) {
       float interaxialDistance = 0.f;
       if (options) {
         interaxialDistance
           = json_util::get_number<float>(*options, "interaxial_distance");
       }
-      return AnaglyphArcRotateCamera::New(name, 0.f, 0.f, 1.f, Vector3::Zero(),
+      return AnaglyphArcRotateCamera::New(iName, 0.f, 0.f, 1.f, Vector3::Zero(),
                                           interaxialDistance, scene);
     });
   AnaglyphArcRotateCamera::NodeConstructorAdded = true;

@@ -9,7 +9,7 @@ bool StereoscopicGamepadCamera::NodeConstructorAdded = false;
 void StereoscopicGamepadCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "StereoscopicGamepadCamera", [](const std::string& name, Scene* scene,
+    "StereoscopicGamepadCamera", [](const std::string& iName, Scene* scene,
                                     const std::optional<json>& options) {
       float interaxialDistance      = 0.f;
       bool isStereoscopicSideBySide = false;
@@ -19,7 +19,7 @@ void StereoscopicGamepadCamera::AddNodeConstructor()
         isStereoscopicSideBySide
           = json_util::get_bool(*options, "isStereoscopicSideBySide");
       }
-      return StereoscopicGamepadCamera::New(name, Vector3::Zero(),
+      return StereoscopicGamepadCamera::New(iName, Vector3::Zero(),
                                             interaxialDistance,
                                             isStereoscopicSideBySide, scene);
     });

@@ -9,14 +9,14 @@ bool AnaglyphFreeCamera::NodeConstructorAdded = false;
 void AnaglyphFreeCamera::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "AnaglyphFreeCamera", [](const std::string& name, Scene* scene,
+    "AnaglyphFreeCamera", [](const std::string& iName, Scene* scene,
                              const std::optional<json>& options) {
       float interaxialDistance = 0.f;
       if (options) {
         interaxialDistance
           = json_util::get_number<float>(*options, "interaxial_distance");
       }
-      return AnaglyphFreeCamera::New(name, Vector3::Zero(), interaxialDistance,
+      return AnaglyphFreeCamera::New(iName, Vector3::Zero(), interaxialDistance,
                                      scene);
     });
   AnaglyphFreeCamera::NodeConstructorAdded = true;

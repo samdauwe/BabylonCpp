@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-class IInternalTextureTracker;
+struct IInternalTextureTracker;
 using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
 
 /**
