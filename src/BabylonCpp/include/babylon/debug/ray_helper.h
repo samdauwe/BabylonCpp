@@ -10,10 +10,12 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
 class Color3;
 class LinesMesh;
 class Scene;
-using LinesMeshPtr = std::shared_ptr<LinesMesh>;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using LinesMeshPtr    = std::shared_ptr<LinesMesh>;
 
 /**
  * @brief As raycast might be hard to debug, the RayHelper can help rendering
@@ -47,9 +49,15 @@ public:
   /**
    * @brief Shows the ray we are willing to debug.
    * @param scene Defines the scene the ray needs to be rendered in
+   */
+  void show(Scene* scene);
+
+  /**
+   * @brief Shows the ray we are willing to debug.
+   * @param scene Defines the scene the ray needs to be rendered in
    * @param color Defines the color the ray needs to be rendered in
    */
-  void show(Scene* scene, const std::optional<Color3>& color);
+  void show(Scene* scene, const Color3& color);
 
   /**
    * @brief Hides the ray we are debugging.
@@ -66,7 +74,7 @@ public:
    * space of the mesh node)
    * @param length Defines the length of the ray
    */
-  void attachToMesh(AbstractMesh* mesh,
+  void attachToMesh(const AbstractMeshPtr& mesh,
                     const Vector3& meshSpaceDirection = Vector3::Zero(),
                     const Vector3& meshSpaceOrigin    = Vector3(0.f, 0.f, -1.f),
                     float length                      = 0.f);
@@ -99,7 +107,7 @@ private:
   Scene* _scene;
 
   std::function<void(Scene*, EventState&)> _updateToMeshFunction;
-  AbstractMesh* _attachedToMesh;
+  AbstractMeshPtr _attachedToMesh;
   Vector3 _meshSpaceDirection;
   Vector3 _meshSpaceOrigin;
 

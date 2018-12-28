@@ -27,6 +27,7 @@ public:
   Color3(const Color3& otherColor);            // Copy constructor
   Color3(Color3&& otherColor);                 // Move constructor
   Color3& operator=(const Color3& otherColor); // Copy assignment operator
+  Color3& operator=(const Color4& otherColor); // Copy assignment operator
   Color3& operator=(Color3&& otherColor);      // Move assignment operator
   ~Color3();                                   // Destructor
   Color3 copy() const;

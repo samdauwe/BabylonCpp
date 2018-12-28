@@ -95,6 +95,15 @@ public:
    * @brief Checks if ray intersects a mesh.
    * @param meshes the meshes to check
    * @param fastCheck if only the bounding box should checked
+   * @returns Array of picking infos
+   */
+  std::vector<PickingInfo> intersectsMeshes(std::vector<AbstractMesh*>& meshes,
+                                            bool fastCheck = false);
+
+  /**
+   * @brief Checks if ray intersects a mesh.
+   * @param meshes the meshes to check
+   * @param fastCheck if only the bounding box should checked
    * @param results array to store result in
    * @returns Array of picking infos
    */

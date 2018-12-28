@@ -35,6 +35,15 @@ Color3& Color3::operator=(const Color3& otherColor)
   return *this;
 }
 
+Color3& Color3::operator=(const Color4& otherColor)
+{
+  r = otherColor.r;
+  g = otherColor.g;
+  b = otherColor.b;
+
+  return *this;
+}
+
 Color3& Color3::operator=(Color3&& otherColor)
 {
   if (&otherColor != this) {

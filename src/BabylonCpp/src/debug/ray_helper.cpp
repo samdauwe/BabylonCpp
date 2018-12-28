@@ -31,7 +31,7 @@ RayHelper::~RayHelper()
 {
 }
 
-void RayHelper::show(Scene* scene, const std::optional<Color3>& color)
+void RayHelper::show(Scene* scene)
 {
   if (!_renderFunction && ray) {
     _renderFunction = [this](Scene*, EventState&) { _render(); };
@@ -44,9 +44,14 @@ void RayHelper::show(Scene* scene, const std::optional<Color3>& color)
       _scene->registerBeforeRender(_renderFunction);
     }
   }
+}
 
-  if (color && _renderLine) {
-    _renderLine->color.copyFrom(*color);
+void RayHelper::show(Scene* scene, const Color3& color)
+{
+  show(scene);
+
+  if (_renderLine) {
+    _renderLine->color.copyFrom(color);
   }
 }
 
@@ -80,7 +85,7 @@ void RayHelper::_render()
   Mesh::CreateLines("ray", _renderPoints, _scene, true, _renderLine);
 }
 
-void RayHelper::attachToMesh(AbstractMesh* mesh,
+void RayHelper::attachToMesh(const AbstractMeshPtr& mesh,
                              const Vector3& meshSpaceDirection,
                              const Vector3& meshSpaceOrigin, float length)
 {
