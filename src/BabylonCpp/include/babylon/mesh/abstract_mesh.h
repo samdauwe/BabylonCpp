@@ -25,6 +25,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+struct _OcclusionDataStorage;
 class ActionManager;
 class Camera;
 class IEdgesRenderer;
@@ -35,11 +36,12 @@ class PickingInfo;
 struct PhysicsParams;
 class Skeleton;
 class SolidParticle;
-using CameraPtr          = std::shared_ptr<Camera>;
-using LightPtr           = std::shared_ptr<Light>;
-using MaterialPtr        = std::shared_ptr<Material>;
-using PhysicsImpostorPtr = std::shared_ptr<PhysicsImpostor>;
-using SkeletonPtr        = std::shared_ptr<Skeleton>;
+using _OcclusionDataStoragePtr = std::shared_ptr<_OcclusionDataStorage>;
+using CameraPtr                = std::shared_ptr<Camera>;
+using LightPtr                 = std::shared_ptr<Light>;
+using MaterialPtr              = std::shared_ptr<Material>;
+using PhysicsImpostorPtr       = std::shared_ptr<PhysicsImpostor>;
+using SkeletonPtr              = std::shared_ptr<Skeleton>;
 
 namespace GL {
 class IGLQuery;
@@ -911,6 +913,17 @@ protected:
     const std::function<void(Vector3*, EventState&)>& callback);
 
   /**
+   * @brief Flag to check the progress status of the query.
+   * @see http://doc.babylonjs.com/features/occlusionquery
+   */
+  bool get_isOcclusionQueryInProgress() const;
+
+  /**
+   * @brief Gets the occlusion data storage reference.
+   */
+  _OcclusionDataStoragePtr& get__occlusionDataStorage();
+
+  /**
    * @brief Gets whether the mesh is occluded or not, it is used also to set the
    * intial state of the mesh to be occluded or not.
    * @see http://doc.babylonjs.com/features/occlusionquery
@@ -925,10 +938,48 @@ protected:
   void set_isOccluded(bool value);
 
   /**
-   * @brief Flag to check the progress status of the query.
-   * @see http://doc.babylonjs.com/features/occlusionquery
+   * @brief Gets the property that determines the type of occlusion query
+   * algorithm to run in WebGl.
    */
-  bool get_isOcclusionQueryInProgress() const;
+  unsigned int get_occlusionQueryAlgorithmType() const;
+
+  /**
+   * @brief Sets the property that determines the type of occlusion query
+   * algorithm to run in WebGl.
+   */
+  void set_occlusionQueryAlgorithmType(unsigned int value);
+
+  /**
+   * @brief Gets the property that is responsible for starting the occlusion
+   * query within the Mesh or not, this property is also used to determine what
+   * should happen when the occlusionRetryCount is reached.
+   */
+  unsigned int get_occlusionType() const;
+
+  /**
+   * @brief Sets the property that is responsible for starting the occlusion
+   * query within the Mesh or not, this property is also used to determine what
+   * should happen when the occlusionRetryCount is reached.
+   */
+  void set_occlusionType(unsigned int value);
+
+  /**
+   * @brief Gets the number that indicates the number of allowed retries before
+   * stop the occlusion query, this is useful if the occlusion query is taking
+   * long time before to the query result is retireved, the query result
+   * indicates if the object is visible within the scene or not and based on
+   * that Babylon.Js engine decideds to show or hide the object.
+   */
+  int get_occlusionRetryCount() const;
+
+  /**
+   * @brief Sets the number that indicates the number of allowed retries before
+   * stop the occlusion query, this is useful if the occlusion query is taking
+   * long time before to the query result is retireved, the query result
+   * indicates if the object is visible within the scene or not and based on
+   * that Babylon.Js engine decideds to show or hide the object.
+   */
+  void set_occlusionRetryCount(int value);
 
   /**
    * @brief Gets mesh visibility between 0 and 1 (default is 1).
@@ -1285,16 +1336,22 @@ public:
   bool definedFacingForward;
 
   /**
-   * This property determines the type of occlusion query algorithm to run in
-   * WebGl, you can use:
-   * * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_ACCURATE which is mapped to
-   * GL_ANY_SAMPLES_PASSED.
-   * * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE (Default Value) which
-   * is mapped to GL_ANY_SAMPLES_PASSED_CONSERVATIVE which is a false positive
-   * algorithm that is faster than GL_ANY_SAMPLES_PASSED but less accurate.
+   * Access property
+   * Hidden
+   */
+  ReadOnlyProperty<AbstractMesh, _OcclusionDataStoragePtr>
+    _occlusionDataStorage;
+
+  /**
+   * This number indicates the number of allowed retries before stop the
+   * occlusion query, this is useful if the occlusion query is taking long time
+   * before to the query result is retireved, the query result indicates if the
+   * object is visible within the scene or not and based on that Babylon.Js
+   * engine decideds to show or hide the object. The default value is -1 which
+   * means don't break the query and wait till the result
    * @see http://doc.babylonjs.com/features/occlusionquery
    */
-  unsigned int occlusionQueryAlgorithmType;
+  Property<AbstractMesh, int> occlusionRetryCount;
 
   /**
    * This property is responsible for starting the occlusion query within the
@@ -1310,47 +1367,30 @@ public:
    * was hidden then hide don't show.
    * @see http://doc.babylonjs.com/features/occlusionquery
    */
-  unsigned int occlusionType;
+  Property<AbstractMesh, unsigned int> occlusionType;
 
   /**
-   * This number indicates the number of allowed retries before stop the
-   * occlusion query, this is useful if the occlusion query is taking long time
-   * before to the query result is retireved, the query result indicates if the
-   * object is visible within the scene or not and based on that Babylon.Js
-   * engine decideds to show or hide the object. The default value is -1 which
-   * means don't break the query and wait till the result
+   * This property determines the type of occlusion query algorithm to run in
+   * WebGl, you can use:
+   * * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_ACCURATE which is mapped to
+   * GL_ANY_SAMPLES_PASSED.
+   * * AbstractMesh.OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE (Default Value) which
+   * is mapped to GL_ANY_SAMPLES_PASSED_CONSERVATIVE which is a false positive
+   * algorithm that is faster than GL_ANY_SAMPLES_PASSED but less accurate.
    * @see http://doc.babylonjs.com/features/occlusionquery
    */
-  int occlusionRetryCount;
+  Property<AbstractMesh, unsigned int> occlusionQueryAlgorithmType;
 
   /**
-   * Hidden
-   */
-  int _occlusionInternalRetryCounter;
-
-  /**
-   * Hidden
-   */
-  bool _isOccluded;
-
-  /**
-   * Hidden
-   */
-  bool _isOcclusionQueryInProgress;
-
-  /**
-   * Hidden
-   */
-  std::unique_ptr<GL::IGLQuery> _occlusionQuery;
-
-  /**
-   * Whether the mesh is occluded or not, it is used also to set the intial
-   * state of the mesh to be occluded or not
+   * Gets or sets whether the mesh is occluded or not, it is used also to set
+   * the intial state of the mesh to be occluded or not
+   * @see http://doc.babylonjs.com/features/occlusionquery
    */
   Property<AbstractMesh, bool> isOccluded;
 
   /**
    * Flag to check the progress status of the query
+   * @see http://doc.babylonjs.com/features/occlusionquery
    */
   ReadOnlyProperty<AbstractMesh, bool> isOcclusionQueryInProgress;
 
@@ -1696,10 +1736,14 @@ private:
   std::unique_ptr<Collider> _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;
-  /** @hidden */
+  /** Hidden */
   PhysicsImpostorPtr _physicsImpostor;
-  /** @hidden */
+  /** Hidden */
   Observer<Node>::Ptr _disposePhysicsObserver;
+  /** Hidden */
+  _OcclusionDataStoragePtr __occlusionDataStorage;
+  /** Hidden */
+  std::unique_ptr<GL::IGLQuery> _occlusionQuery;
   // Cache
   Matrix _collisionsTransformMatrix;
   Matrix _collisionsScalingMatrix;

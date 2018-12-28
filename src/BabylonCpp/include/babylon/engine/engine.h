@@ -11,6 +11,7 @@
 #include <babylon/engine/engine_capabilities.h>
 #include <babylon/engine/engine_constants.h>
 #include <babylon/engine/engine_options.h>
+#include <babylon/instrumentation/_time_token.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/size.h>
 #include <babylon/math/vector4.h>
@@ -26,7 +27,6 @@ namespace BABYLON {
 class _AlphaState;
 class _DepthCullingState;
 class _StencilState;
-struct _TimeToken;
 class AudioEngine;
 class BaseTexture;
 class Camera;
@@ -2363,7 +2363,31 @@ private:
   GL::GLenum _getInternalFormat(unsigned int format) const;
 
   /** Occlusion Queries **/
-  unsigned int getGlAlgorithmType(unsigned int algorithmType) const;
+
+  /**
+   * @brief Hidden
+   */
+  GLQueryPtr _createTimeQuery();
+
+  /**
+   * @brief Hidden
+   */
+  void _deleteTimeQuery(const GLQueryPtr& query);
+
+  /**
+   * @brief Hidden
+   */
+  unsigned int _getGlAlgorithmType(unsigned int algorithmType) const;
+
+  /**
+   * @brief Hidden
+   */
+  unsigned int _getTimeQueryResult(const GLQueryPtr& query);
+
+  /**
+   * @brief Hidden
+   */
+  bool _getTimeQueryAvailability(const GLQueryPtr& query);
 
   /** File loading */
   void _cascadeLoadFiles(
@@ -2375,8 +2399,6 @@ private:
                              const std::string& exception)>& onError);
 
 public:
-  // Public members
-
   /**
    * Gets or sets a boolean that indicates if textures must be forced to power
    * of 2 size even if not required
@@ -2711,10 +2733,11 @@ private:
   float _fps;
   float _deltaTime;
 
-  /**
-   * Hidden
-   */
+  /** Hidden */
   int _currentTextureChannel;
+
+  /** Occlusion Queries **/
+  std::optional<_TimeToken> _currentNonTimestampToken;
 
   std::unordered_map<std::string, EffectPtr> _compiledEffects;
   std::vector<bool> _vertexAttribArraysEnabled;

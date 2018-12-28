@@ -44,7 +44,7 @@ HashValue Hash(const char* str, int len)
 
 HashValue Hash(string_view str)
 {
-  return Hash(str.data(), str.length());
+  return Hash(str.data(), static_cast<int>(str.length()));
 }
 
 HashValue HashCaseInsensitive(const char* str, size_t len)

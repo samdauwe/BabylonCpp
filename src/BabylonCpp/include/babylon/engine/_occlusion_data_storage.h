@@ -11,22 +11,22 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT _OcclusionDataStorage {
 
-  /** @hidden */
+  /** Hidden */
   int occlusionInternalRetryCounter = 0;
 
-  /** @hidden */
+  /** Hidden */
   bool isOcclusionQueryInProgress = false;
 
-  /** @hidden */
+  /** Hidden */
   bool isOccluded = false;
 
-  /** @hidden */
+  /** Hidden */
   int occlusionRetryCount = -1;
 
-  /** @hidden */
+  /** Hidden */
   unsigned int occlusionType = AbstractMeshConstants::OCCLUSION_TYPE_NONE;
 
-  /** @hidden */
+  /** Hidden */
   unsigned int occlusionQueryAlgorithmType
     = AbstractMeshConstants::OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE;
 

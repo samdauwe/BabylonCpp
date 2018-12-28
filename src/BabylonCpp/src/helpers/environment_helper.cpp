@@ -262,8 +262,8 @@ void EnvironmentHelper::_setupBackground()
 
 ISceneSize EnvironmentHelper::_getSceneSize()
 {
-  auto groundSize   = static_cast<float>(_options.groundSize);
-  auto skyboxSize   = static_cast<float>(_options.skyboxSize);
+  auto groundSize   = _options.groundSize;
+  auto skyboxSize   = _options.skyboxSize;
   auto rootPosition = _options.rootPosition;
   if (_scene->meshes.empty() || _scene->meshes.size() == 1) {
     // 1 only means the root of the helper.
@@ -291,8 +291,8 @@ ISceneSize EnvironmentHelper::_getSceneSize()
     }
 
     // 10 % bigger.
-    groundSize *= 1.1f;
-    skyboxSize *= 1.5f;
+    groundSize     = static_cast<int>(groundSize * 1.1f);
+    skyboxSize     = static_cast<int>(skyboxSize * 1.5f);
     rootPosition   = sceneExtends.min.add(sceneDiagonal.scale(0.5f));
     rootPosition.y = sceneExtends.min.y - _options.groundYBias;
   }

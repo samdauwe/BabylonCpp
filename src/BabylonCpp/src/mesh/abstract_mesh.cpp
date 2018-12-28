@@ -12,6 +12,7 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/octrees/octree_scene_component.h>
 #include <babylon/culling/ray.h>
+#include <babylon/engine/_occlusion_data_storage.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/light.h>
@@ -54,14 +55,16 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , onCollisionPositionChange{this,
                                 &AbstractMesh::set_onCollisionPositionChange}
     , definedFacingForward{true} // orientation for POV movement & rotation
-    , occlusionQueryAlgorithmType{AbstractMesh::
-                                    OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE}
-    , occlusionType{AbstractMesh::OCCLUSION_TYPE_NONE}
-    , occlusionRetryCount{-1}
-    , _occlusionInternalRetryCounter{0}
-    , _isOccluded{false}
-    , _isOcclusionQueryInProgress{false}
-    , _occlusionQuery{nullptr}
+    , _occlusionDataStorage{this, &AbstractMesh::get__occlusionDataStorage}
+    , occlusionRetryCount{this, &AbstractMesh::get_occlusionRetryCount,
+                          &AbstractMesh::set_occlusionRetryCount}
+    , occlusionType{this, &AbstractMesh::get_occlusionType,
+                    &AbstractMesh::set_occlusionType}
+    , occlusionQueryAlgorithmType{this,
+                                  &AbstractMesh::
+                                    get_occlusionQueryAlgorithmType,
+                                  &AbstractMesh::
+                                    set_occlusionQueryAlgorithmType}
     , isOccluded{this, &AbstractMesh::get_isOccluded,
                  &AbstractMesh::set_isOccluded}
     , isOcclusionQueryInProgress{this,
@@ -155,6 +158,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _diffPositionForCollisions{Vector3(0.f, 0.f, 0.f)}
     , _physicsImpostor{nullptr}
     , _disposePhysicsObserver{nullptr}
+    , __occlusionDataStorage{nullptr}
+    , _occlusionQuery{nullptr}
     , _collisionsTransformMatrix{Matrix::Zero()}
     , _collisionsScalingMatrix{Matrix::Zero()}
     , _skeleton{nullptr}
@@ -386,19 +391,57 @@ void AbstractMesh::set_layerMask(unsigned int value)
   _resyncLightSources();
 }
 
+bool AbstractMesh::get_isOcclusionQueryInProgress() const
+{
+  return _occlusionDataStorage()->isOcclusionQueryInProgress;
+}
+
+_OcclusionDataStoragePtr& AbstractMesh::get__occlusionDataStorage()
+{
+  if (!__occlusionDataStorage) {
+    __occlusionDataStorage = std::make_shared<_OcclusionDataStorage>();
+  }
+  return __occlusionDataStorage;
+}
+
 bool AbstractMesh::get_isOccluded() const
 {
-  return _isOccluded;
+  return _occlusionDataStorage()->isOccluded;
 }
 
 void AbstractMesh::set_isOccluded(bool value)
 {
-  _isOccluded = value;
+  _occlusionDataStorage()->isOccluded = value;
 }
 
-bool AbstractMesh::get_isOcclusionQueryInProgress() const
+unsigned int AbstractMesh::get_occlusionQueryAlgorithmType() const
 {
-  return _isOcclusionQueryInProgress;
+  return _occlusionDataStorage()->occlusionQueryAlgorithmType;
+}
+
+void AbstractMesh::set_occlusionQueryAlgorithmType(unsigned int value)
+{
+  _occlusionDataStorage()->occlusionQueryAlgorithmType = value;
+}
+
+unsigned int AbstractMesh::get_occlusionType() const
+{
+  return _occlusionDataStorage()->occlusionType;
+}
+
+void AbstractMesh::set_occlusionType(unsigned int value)
+{
+  _occlusionDataStorage()->occlusionType = value;
+}
+
+int AbstractMesh::get_occlusionRetryCount() const
+{
+  return _occlusionDataStorage()->occlusionRetryCount;
+}
+
+void AbstractMesh::set_occlusionRetryCount(int value)
+{
+  _occlusionDataStorage()->occlusionRetryCount = value;
 }
 
 float AbstractMesh::get_visibility() const
@@ -1464,7 +1507,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Query
   auto engine = getScene()->getEngine();
   if (_occlusionQuery) {
-    _isOcclusionQueryInProgress = false;
+    _occlusionDataStorage()->isOcclusionQueryInProgress = false;
     engine->deleteQuery(_occlusionQuery);
     _occlusionQuery = nullptr;
   }
@@ -1879,38 +1922,48 @@ AbstractMesh& AbstractMesh::alignWithNormal(Vector3& normal,
 
 bool AbstractMesh::_checkOcclusionQuery()
 {
-  auto engine = getEngine();
+  auto dataStorage = *_occlusionDataStorage();
 
-  if (engine->webGLVersion() < 2.f
-      || occlusionType == AbstractMesh::OCCLUSION_TYPE_NONE) {
-    _isOccluded = false;
+  if (dataStorage.occlusionType == AbstractMesh::OCCLUSION_TYPE_NONE) {
+    dataStorage.isOccluded = false;
     return false;
   }
 
-  if (isOcclusionQueryInProgress() && _occlusionQuery) {
+  auto engine = getEngine();
+
+  if (engine->webGLVersion() < 2.f) {
+    dataStorage.isOccluded = false;
+    return false;
+  }
+
+  if (isOcclusionQueryInProgress && _occlusionQuery) {
     auto isOcclusionQueryAvailable
       = engine->isQueryResultAvailable(_occlusionQuery);
     if (isOcclusionQueryAvailable) {
       auto occlusionQueryResult = engine->getQueryResult(_occlusionQuery);
 
-      _isOcclusionQueryInProgress    = false;
-      _occlusionInternalRetryCounter = 0;
-      _isOccluded                    = occlusionQueryResult == 1 ? false : true;
+      dataStorage.isOcclusionQueryInProgress    = false;
+      dataStorage.occlusionInternalRetryCounter = 0;
+      dataStorage.isOccluded = occlusionQueryResult == 1 ? false : true;
     }
     else {
-      ++_occlusionInternalRetryCounter;
 
-      if (occlusionRetryCount != -1
-          && _occlusionInternalRetryCounter > occlusionRetryCount) {
-        _isOcclusionQueryInProgress    = false;
-        _occlusionInternalRetryCounter = 0;
+      dataStorage.occlusionInternalRetryCounter++;
+
+      if (dataStorage.occlusionRetryCount != -1
+          && dataStorage.occlusionInternalRetryCounter
+               > dataStorage.occlusionRetryCount) {
+        dataStorage.isOcclusionQueryInProgress    = false;
+        dataStorage.occlusionInternalRetryCounter = 0;
 
         // if optimistic set isOccluded to false regardless of the status of
-        // isOccluded. (Render in the current render loop)
-        // if strict continue the last state of the object.
-        _isOccluded = occlusionType == AbstractMesh::OCCLUSION_TYPE_OPTIMISTIC ?
-                        false :
-                        _isOccluded;
+        // isOccluded. (Render in the current render loop) if strict continue
+        // the last state of the object.
+        dataStorage.isOccluded
+          = dataStorage.occlusionType
+                == AbstractMesh::OCCLUSION_TYPE_OPTIMISTIC ?
+              false :
+              dataStorage.isOccluded;
       }
       else {
         return false;
@@ -1918,19 +1971,22 @@ bool AbstractMesh::_checkOcclusionQuery()
     }
   }
 
-  auto scene                        = getScene();
-  auto occlusionBoundingBoxRenderer = scene->getBoundingBoxRenderer();
+  auto scene = getScene();
+  if (scene->getBoundingBoxRenderer()) {
+    auto occlusionBoundingBoxRenderer = scene->getBoundingBoxRenderer();
 
-  if (!_occlusionQuery) {
-    _occlusionQuery = engine->createQuery();
+    if (!_occlusionQuery) {
+      _occlusionQuery = engine->createQuery();
+    }
+
+    engine->beginOcclusionQuery(dataStorage.occlusionQueryAlgorithmType,
+                                _occlusionQuery);
+    occlusionBoundingBoxRenderer->renderOcclusionBoundingBox(this);
+    engine->endOcclusionQuery(dataStorage.occlusionQueryAlgorithmType);
+    dataStorage.isOcclusionQueryInProgress = true;
   }
 
-  engine->beginOcclusionQuery(occlusionQueryAlgorithmType, _occlusionQuery);
-  occlusionBoundingBoxRenderer->renderOcclusionBoundingBox(this);
-  engine->endOcclusionQuery(occlusionQueryAlgorithmType);
-  _isOcclusionQueryInProgress = true;
-
-  return false;
+  return dataStorage.isOccluded;
 }
 
 } // end of namespace BABYLON

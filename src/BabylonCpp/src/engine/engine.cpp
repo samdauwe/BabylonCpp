@@ -13,7 +13,6 @@
 #include <babylon/engine/depth_texture_creation_options.h>
 #include <babylon/engine/instancing_attribute_info.h>
 #include <babylon/engine/scene.h>
-#include <babylon/instrumentation/_time_token.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/interfaces/igl_rendering_context.h>
@@ -112,6 +111,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _fps{60.f}
     , _deltaTime{0.f}
     , _currentTextureChannel{-1}
+    , _currentNonTimestampToken{std::nullopt}
     , _cachedVertexArrayObject{nullptr}
     , _uintIndicesCurrentlySet{false}
     , _firstBoundInternalTextureTracker{std::make_unique<
@@ -6016,7 +6016,7 @@ unsigned int Engine::getQueryResult(const GLQueryPtr& query)
 Engine& Engine::beginOcclusionQuery(unsigned int algorithmType,
                                     const GLQueryPtr& query)
 {
-  const auto glAlgorithm = getGlAlgorithmType(algorithmType);
+  const auto glAlgorithm = _getGlAlgorithmType(algorithmType);
   _gl->beginQuery(glAlgorithm, query);
 
   return *this;
@@ -6024,10 +6024,30 @@ Engine& Engine::beginOcclusionQuery(unsigned int algorithmType,
 
 Engine& Engine::endOcclusionQuery(unsigned int algorithmType)
 {
-  const auto glAlgorithm = getGlAlgorithmType(algorithmType);
+  const auto glAlgorithm = _getGlAlgorithmType(algorithmType);
   _gl->endQuery(glAlgorithm);
 
   return *this;
+}
+
+Engine::GLQueryPtr Engine::_createTimeQuery()
+{
+  return createQuery();
+}
+
+void Engine::_deleteTimeQuery(const Engine::GLQueryPtr& query)
+{
+  deleteQuery(query);
+}
+
+unsigned int Engine::_getTimeQueryResult(const Engine::GLQueryPtr& query)
+{
+  return getQueryResult(query);
+}
+
+bool Engine::_getTimeQueryAvailability(const Engine::GLQueryPtr& query)
+{
+  return isQueryResultAvailable(query);
 }
 
 std::optional<_TimeToken> Engine::startTimeQuery()
@@ -6038,6 +6058,13 @@ std::optional<_TimeToken> Engine::startTimeQuery()
 int Engine::endTimeQuery(std::optional<_TimeToken>& /*token*/)
 {
   return -1;
+}
+
+unsigned int Engine::_getGlAlgorithmType(unsigned int algorithmType) const
+{
+  return algorithmType == AbstractMesh::OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE ?
+           GL::ANY_SAMPLES_PASSED_CONSERVATIVE :
+           GL::ANY_SAMPLES_PASSED;
 }
 
 Engine::GLTransformFeedbackPtr Engine::createTransformFeedback()
@@ -6087,13 +6114,6 @@ IFileRequest Engine::_loadFile(
 {
   Tools::LoadFile(url, onSuccess, onProgress, useArrayBuffer, onError);
   return IFileRequest();
-}
-
-unsigned int Engine::getGlAlgorithmType(unsigned int algorithmType) const
-{
-  return algorithmType == AbstractMesh::OCCLUSION_ALGORITHM_TYPE_CONSERVATIVE ?
-           GL::ANY_SAMPLES_PASSED_CONSERVATIVE :
-           GL::ANY_SAMPLES_PASSED;
 }
 
 std::promise<std::string> Engine::_loadFileAsync(const std::string& /*url*/)
