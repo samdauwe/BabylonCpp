@@ -65,14 +65,12 @@ set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
 file(GLOB EXTENSIONS_HDR_FILES  ${INCLUDE_PATH}/extensions/dynamicterrain/*.h
-                                ${INCLUDE_PATH}/extensions/editcontrol/*.h
                                 ${INCLUDE_PATH}/extensions/entitycomponentsystem/*.h
                                 ${INCLUDE_PATH}/extensions/entitycomponentsystem/detail/*.h
                                 ${INCLUDE_PATH}/extensions/entitycomponentsystem/util/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/terrain/*.h
                                 ${INCLUDE_PATH}/extensions/hexplanetgeneration/utils/*.h
-                                ${INCLUDE_PATH}/extensions/manipulationhelpers/*.h
                                 ${INCLUDE_PATH}/extensions/navigation/*.h
                                 ${INCLUDE_PATH}/extensions/navigation/rvo2/*.h
                                 ${INCLUDE_PATH}/extensions/navigationmesh/*.h
@@ -88,13 +86,11 @@ set(BABYLON_EXTENSIONS_HEADERS
 
 # Source files
 file(GLOB EXTENSIONS_SRC_FILES  ${SOURCE_PATH}/extensions/dynamicterrain/*.cpp
-                                ${SOURCE_PATH}/extensions/editcontrol/*.cpp
                                 ${SOURCE_PATH}/extensions/entitycomponentsystem/*.cpp
                                 ${SOURCE_PATH}/extensions/entitycomponentsystem/detail/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/terrain/*.cpp
                                 ${SOURCE_PATH}/extensions/hexplanetgeneration/utils/*.cpp
-                                ${SOURCE_PATH}/extensions/manipulationhelpers/*.cpp
                                 ${SOURCE_PATH}/extensions/navigation/*.cpp
                                 ${SOURCE_PATH}/extensions/navigation/rvo2/*.cpp
                                 ${SOURCE_PATH}/extensions/navigationmesh/*.cpp
