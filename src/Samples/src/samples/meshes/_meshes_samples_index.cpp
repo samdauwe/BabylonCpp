@@ -10,6 +10,7 @@
 #include <babylon/samples/meshes/cuboid_scene.h>
 #include <babylon/samples/meshes/curved_helix_meshes_scene.h>
 #include <babylon/samples/meshes/displacement_map_cpu_scene.h>
+#include <babylon/samples/meshes/edges_renderer_scene.h>
 #include <babylon/samples/meshes/extrude_polygon_scene.h>
 #include <babylon/samples/meshes/extruded_polygon_scene.h>
 #include <babylon/samples/meshes/extrusion_scene.h>
@@ -29,6 +30,7 @@
 #include <babylon/samples/meshes/polygonmesh/polygon_mesh_stars_scene.h>
 #include <babylon/samples/meshes/polygonmesh/polygon_mesh_stars_with_holes_scene.h>
 #include <babylon/samples/meshes/polyhedron_scene.h>
+#include <babylon/samples/meshes/ray_helper_scene.h>
 #include <babylon/samples/meshes/raycast_on_height_map_scene.h>
 #include <babylon/samples/meshes/ribbon_scene.h>
 #include <babylon/samples/meshes/rotation_and_scaling_scene.h>
@@ -105,6 +107,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
     [](ICanvas* iCanvas) {                                       //
       return std::make_unique<DisplacementMapCPUScene>(iCanvas); //
     });                                                          //
+  // Edges Render Scene
+  _samples["EdgesRenderScene"]
+    = std::make_tuple(true,                                                 //
+                      [](ICanvas* iCanvas) {                                //
+                        return std::make_unique<EdgesRenderScene>(iCanvas); //
+                      });                                                   //
   // Extrude Polygon Scene
   _samples["ExtrudePolygonScene"] = std::make_tuple(
     true,                                                    //
@@ -189,6 +197,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<PolyhedronScene>(iCanvas); //
                       });                                                  //
+  // Ray Helper Scene
+  _samples["RayHelperScene"]
+    = std::make_tuple(true,                                               //
+                      [](ICanvas* iCanvas) {                              //
+                        return std::make_unique<RayHelperScene>(iCanvas); //
+                      });                                                 //
   // Raycast On Height Map Scene
   _samples["RaycastOnHeightMapScene"] = std::make_tuple(
     true,                                                        //

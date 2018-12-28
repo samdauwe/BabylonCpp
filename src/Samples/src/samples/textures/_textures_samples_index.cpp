@@ -1,5 +1,6 @@
 #include <babylon/samples/textures/_textures_samples_index.h>
 
+#include <babylon/samples/textures/blur_mode_for_mirrors_scene.h>
 #include <babylon/samples/textures/bump_texture_scene.h>
 #include <babylon/samples/textures/bump_texture_spheres_scene.h>
 #include <babylon/samples/textures/cube_texture_different_faces_scene.h>
@@ -10,6 +11,7 @@
 #include <babylon/samples/textures/image_texture_scene.h>
 #include <babylon/samples/textures/mirror_texture_scene.h>
 #include <babylon/samples/textures/mirrors_scene.h>
+#include <babylon/samples/textures/multi_sample_render_targets_scene.h>
 #include <babylon/samples/textures/photo_dome_scene.h>
 #include <babylon/samples/textures/procedural_textures_scene.h>
 #include <babylon/samples/textures/render_target_texture_scene.h>
@@ -24,7 +26,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
 {
   // -- Textures examples --
 
-  // Bump Texture Scene
+  // Blur Mode For Mirrors Scene
+  _samples["BlurModeForMirrorsScene"] = std::make_tuple(
+    true,                                                        //
+    [](ICanvas* iCanvas) {                                       //
+      return std::make_unique<BlurModeForMirrorsScene>(iCanvas); //
+    });                                                          //
   _samples["BumpTextureScene"]
     = std::make_tuple(true,                                                 //
                       [](ICanvas* iCanvas) {                                //
@@ -85,6 +92,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
                       [](ICanvas* iCanvas) {                            //
                         return std::make_unique<MirrorsScene>(iCanvas); //
                       });                                               //
+  // Multisample Render Targets Scene
+  _samples["MultiSampleRenderTargetsScene"] = std::make_tuple(
+    true,                                                              //
+    [](ICanvas* iCanvas) {                                             //
+      return std::make_unique<MultiSampleRenderTargetsScene>(iCanvas); //
+    });                                                                //
   // Photo Dome Scene
   _samples["PhotoDomeScene"]
     = std::make_tuple(false,                                              //

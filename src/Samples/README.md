@@ -148,6 +148,7 @@
 ![fresnel_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_scene.png?raw=true "Fresnel Scene")
 ![heat_wave_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/heat_wave_scene.png?raw=true "Heat Wave Scene")
 ![infinite_loader_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/infinite_loader_scene.png?raw=true "Infinite Loader Scene")
+![kernel_based_blur_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/kernel_based_blur_scene.png?raw=true "Kernel Based Blur Scene")
 ![lens_flares_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lens_flares_scene.png?raw=true "Lens Flares Scene")
 ![portals_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/portals_scene.png?raw=true "Portals Scene")
 ![refraction_and_reflection_dds_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/refraction_and_reflection_dds_scene.png?raw=true "Refraction And Reflection DDS Texture Scene")
