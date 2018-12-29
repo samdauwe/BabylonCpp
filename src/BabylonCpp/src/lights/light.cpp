@@ -166,23 +166,23 @@ void Light::set_renderPriority(int value)
   _reorderLightsInScene();
 }
 
-std::vector<AbstractMesh*>& Light::get_includedOnlyMeshes()
+std::vector<AbstractMeshPtr>& Light::get_includedOnlyMeshes()
 {
   return _includedOnlyMeshes;
 }
 
-void Light::set_includedOnlyMeshes(const std::vector<AbstractMesh*>& value)
+void Light::set_includedOnlyMeshes(const std::vector<AbstractMeshPtr>& value)
 {
   _includedOnlyMeshes = value;
   _hookArrayForIncludedOnly(value);
 }
 
-std::vector<AbstractMesh*>& Light::get_excludedMeshes()
+std::vector<AbstractMeshPtr>& Light::get_excludedMeshes()
 {
   return _excludedMeshes;
 }
 
-void Light::set_excludedMeshes(const std::vector<AbstractMesh*>& value)
+void Light::set_excludedMeshes(const std::vector<AbstractMeshPtr>& value)
 {
   _excludedMeshes = value;
   _hookArrayForExcluded(value);
@@ -253,12 +253,18 @@ bool Light::canAffectMesh(AbstractMesh* mesh)
   }
 
   auto it1
-    = std::find(_includedOnlyMeshes.begin(), _includedOnlyMeshes.end(), mesh);
+    = std::find_if(_includedOnlyMeshes.begin(), _includedOnlyMeshes.end(),
+                   [mesh](const AbstractMeshPtr& includedOnlyMesh) {
+                     return includedOnlyMesh.get() == mesh;
+                   });
   if (_includedOnlyMeshes.size() > 0 && it1 == _includedOnlyMeshes.end()) {
     return false;
   }
 
-  auto it2 = std::find(_excludedMeshes.begin(), _excludedMeshes.end(), mesh);
+  auto it2 = std::find_if(_excludedMeshes.begin(), _excludedMeshes.end(),
+                          [mesh](const AbstractMeshPtr& excludedMesh) {
+                            return excludedMesh.get() == mesh;
+                          });
   if (_excludedMeshes.size() > 0 && it2 != _excludedMeshes.end()) {
     return false;
   }
@@ -350,12 +356,12 @@ LightPtr Light::Parse(const json& /*parsedLight*/, Scene* /*scene*/)
   return nullptr;
 }
 
-void Light::_hookArrayForExcluded(const std::vector<AbstractMesh*>& /*array*/)
+void Light::_hookArrayForExcluded(const std::vector<AbstractMeshPtr>& /*array*/)
 {
 }
 
 void Light::_hookArrayForIncludedOnly(
-  const std::vector<AbstractMesh*>& /*array*/)
+  const std::vector<AbstractMeshPtr>& /*array*/)
 {
 }
 

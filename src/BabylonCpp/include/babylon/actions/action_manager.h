@@ -20,6 +20,7 @@ class ActionEvent;
 class ActionManager;
 class IAnimatable;
 class Scene;
+using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;
 using ActionManagerPtr = std::shared_ptr<ActionManager>;
 using IAnimatablePtr   = std::shared_ptr<IAnimatable>;
 
@@ -285,7 +286,7 @@ public:
    * @param scene defines the hosting scene
    */
   static void Parse(const std::vector<json>& parsedActions,
-                    AbstractMesh* object, Scene* scene);
+                    const AbstractMeshPtr& object, Scene* scene);
 
   /**
    * @brief Get a trigger name by index.

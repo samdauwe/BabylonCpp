@@ -41,6 +41,7 @@ using AbstractMeshPtr       = std::shared_ptr<AbstractMesh>;
 using ActionManagerPtr      = std::shared_ptr<ActionManager>;
 using AnimationPtr          = std::shared_ptr<Animation>;
 using AnimationGroupPtr     = std::shared_ptr<AnimationGroup>;
+using AssetContainerPtr     = std::shared_ptr<AssetContainer>;
 using BaseTexturePtr        = std::shared_ptr<BaseTexture>;
 using CameraPtr             = std::shared_ptr<Camera>;
 using EffectLayerPtr        = std::shared_ptr<EffectLayer>;
@@ -131,7 +132,8 @@ public:
    * @param rootUrl Defines the root url of the data
    */
   static void Parse(const nlohmann::json& jsonData, Scene* scene,
-                    AssetContainer& container, const std::string& rootUrl);
+                    const AssetContainerPtr& container,
+                    const std::string& rootUrl);
 
   /**
    * @brief Removes the given effect layer from this scene.

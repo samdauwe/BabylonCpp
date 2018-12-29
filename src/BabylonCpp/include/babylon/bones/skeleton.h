@@ -20,8 +20,10 @@ struct AnimationPropertiesOverride;
 class Bone;
 class IAnimatable;
 class Scene;
+class Skeleton;
 using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 using BonePtr        = std::shared_ptr<Bone>;
+using SkeletonPtr    = std::shared_ptr<Skeleton>;
 
 /**
  * @brief Class used to handle skinning animations.
@@ -194,7 +196,7 @@ public:
    * @param scene defines the hosting scene
    * @returns a new skeleton
    */
-  static Skeleton* Parse(const json& parsedSkeleton, Scene* scene);
+  static SkeletonPtr Parse(const json& parsedSkeleton, Scene* scene);
 
   /**
    * @brief Compute all node absolute transforms.

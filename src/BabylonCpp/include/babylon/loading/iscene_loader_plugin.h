@@ -98,7 +98,8 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
     Scene* scene, const std::string& data, const std::string& rootUrl,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
-    = nullptr) const = 0;
+    = nullptr,
+    bool addToScene = false) const = 0;
 
 }; // end of struct ISceneLoaderPlugin
 

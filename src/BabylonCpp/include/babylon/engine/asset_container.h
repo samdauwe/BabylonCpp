@@ -6,8 +6,10 @@
 
 namespace BABYLON {
 
+class AssetContainer;
 class Mesh;
-using MeshPtr = std::shared_ptr<Mesh>;
+using AssetContainerPtr = std::shared_ptr<AssetContainer>;
+using MeshPtr           = std::shared_ptr<Mesh>;
 
 /**
  * @brief Container with a set of assets that can be added or removed from a
@@ -16,11 +18,12 @@ using MeshPtr = std::shared_ptr<Mesh>;
 class BABYLON_SHARED_EXPORT AssetContainer : public AbstractScene {
 
 public:
-  /**
-   * @brief Instantiates an AssetContainer.
-   * @param scene The scene the AssetContainer belongs to.
-   */
-  AssetContainer(Scene* scene);
+  template <typename... Ts>
+  static AssetContainerPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<AssetContainer>(
+      new AssetContainer(std::forward<Ts>(args)...));
+  }
   ~AssetContainer();
 
   /**
@@ -40,6 +43,13 @@ public:
    * @returns the root mesh
    */
   MeshPtr createRootMesh();
+
+protected:
+  /**
+   * @brief Instantiates an AssetContainer.
+   * @param scene The scene the AssetContainer belongs to.
+   */
+  AssetContainer(Scene* scene);
 
 public:
   /**

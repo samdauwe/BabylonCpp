@@ -191,7 +191,7 @@ AbstractScene::GetIndividualParser(const std::string& name)
 }
 
 void AbstractScene::Parse(const json& /*jsonData*/, Scene* /*scene*/,
-                          AssetContainer& /*container*/,
+                          const AssetContainerPtr& /*container*/,
                           const std::string& /*rootUrl*/)
 {
 #if 0

@@ -8,6 +8,11 @@ using json = nlohmann::json;
 namespace BABYLON {
 namespace json_util {
 
+inline bool is_null(const json& j)
+{
+  return j.is_null();
+}
+
 inline bool has_key(const json& o, const std::string& key)
 {
   return (o.find(key) != o.end());

@@ -35,9 +35,9 @@ MorphTargetManager::~MorphTargetManager()
 }
 
 void MorphTargetManager::addToScene(
-  std::unique_ptr<MorphTargetManager>&& newMorphTargetManager)
+  const MorphTargetManagerPtr& newMorphTargetManager)
 {
-  _scene->morphTargetManagers.emplace_back(std::move(newMorphTargetManager));
+  _scene->morphTargetManagers.emplace_back(newMorphTargetManager);
 }
 
 size_t MorphTargetManager::get_uniqueId() const
@@ -190,8 +190,8 @@ void MorphTargetManager::synchronize()
   }
 }
 
-MorphTargetManager* MorphTargetManager::Parse(const json& serializationObject,
-                                              Scene* scene)
+MorphTargetManagerPtr MorphTargetManager::Parse(const json& serializationObject,
+                                                Scene* scene)
 {
   auto result = MorphTargetManager::New(scene);
 

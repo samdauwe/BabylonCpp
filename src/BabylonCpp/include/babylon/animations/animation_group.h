@@ -14,12 +14,14 @@ namespace BABYLON {
 
 class Animatable;
 class Animation;
+class AnimationGroup;
 class IAnimatable;
 struct TargetedAnimation;
 class Scene;
-using AnimatablePtr  = std::shared_ptr<Animatable>;
-using AnimationPtr   = std::shared_ptr<Animation>;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
+using AnimatablePtr     = std::shared_ptr<Animatable>;
+using AnimationPtr      = std::shared_ptr<Animation>;
+using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
+using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
 
 /**
  * @brief Use this class to create coordinated animations on multiple targets.
@@ -28,17 +30,17 @@ class BABYLON_SHARED_EXPORT AnimationGroup : public IDisposable {
 
 public:
   template <typename... Ts>
-  static AnimationGroup* New(Ts&&... args)
+  static AnimationGroupPtr New(Ts&&... args)
   {
-    auto animationGroup = new AnimationGroup(std::forward<Ts>(args)...);
-    animationGroup->addToScene(
-      static_cast<std::unique_ptr<AnimationGroup>>(animationGroup));
+    auto animationGroup = std::shared_ptr<AnimationGroup>(
+      new AnimationGroup(std::forward<Ts>(args)...));
+    animationGroup->addToScene(animationGroup);
 
     return animationGroup;
   }
   virtual ~AnimationGroup();
 
-  void addToScene(std::unique_ptr<AnimationGroup>&& newAnimationGroup);
+  void addToScene(const AnimationGroupPtr& newAnimationGroup);
 
   /**
    * @brief Add an animation (with its target) in the group.
@@ -146,7 +148,8 @@ public:
    * @param scene defines the scene that will receive the animationGroup
    * @returns a new AnimationGroup
    */
-  static AnimationGroup* Parse(const json& parsedAnimationGroup, Scene* scene);
+  static AnimationGroupPtr Parse(const json& parsedAnimationGroup,
+                                 Scene* scene);
 
   /**
    * @brief Returns the string "AnimationGroup".

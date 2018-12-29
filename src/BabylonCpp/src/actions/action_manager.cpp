@@ -251,7 +251,7 @@ json ActionManager::serialize(const std::string& /*name*/) const
 }
 
 void ActionManager::Parse(const std::vector<json>& /*parsedActions*/,
-                          AbstractMesh* /*object*/, Scene* /*scene*/)
+                          const AbstractMeshPtr& /*object*/, Scene* /*scene*/)
 {
   // TODO FIXME
 }

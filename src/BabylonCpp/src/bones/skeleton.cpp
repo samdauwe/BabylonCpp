@@ -421,7 +421,7 @@ json Skeleton::serialize() const
   return json();
 }
 
-Skeleton* Skeleton::Parse(const json& /*parsedSkeleton*/, Scene* /*scene*/)
+SkeletonPtr Skeleton::Parse(const json& /*parsedSkeleton*/, Scene* /*scene*/)
 {
   return nullptr;
 }

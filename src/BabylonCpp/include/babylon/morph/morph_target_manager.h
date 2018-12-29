@@ -7,6 +7,9 @@
 
 namespace BABYLON {
 
+class MorphTargetManager;
+using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
+
 /**
  * @brief This class is used to deform meshes using morphing between different
  * targets.
@@ -16,16 +19,17 @@ class BABYLON_SHARED_EXPORT MorphTargetManager {
 
 public:
   template <typename... Ts>
-  static MorphTargetManager* New(Ts&&... args)
+  static MorphTargetManagerPtr New(Ts&&... args)
   {
-    auto mtm = new MorphTargetManager(std::forward<Ts>(args)...);
-    mtm->addToScene(static_cast<std::unique_ptr<MorphTargetManager>>(mtm));
+    auto mtm = std::shared_ptr<MorphTargetManager>(
+      new MorphTargetManager(std::forward<Ts>(args)...));
+    mtm->addToScene(mtm);
 
     return mtm;
   }
   ~MorphTargetManager();
 
-  void addToScene(std::unique_ptr<MorphTargetManager>&& newMorphTargetManager);
+  void addToScene(const MorphTargetManagerPtr& newMorphTargetManager);
 
   /**
    * @brief Gets the active target at specified index. An active target is a
@@ -67,8 +71,8 @@ public:
   void synchronize();
 
   // Statics
-  static MorphTargetManager* Parse(const json& serializationObject,
-                                   Scene* scene);
+  static MorphTargetManagerPtr Parse(const json& serializationObject,
+                                     Scene* scene);
 
 protected:
   /**

@@ -351,22 +351,22 @@ protected:
   /**
    * @brief Gets the only meshes impacted by this light.
    */
-  std::vector<AbstractMesh*>& get_includedOnlyMeshes();
+  std::vector<AbstractMeshPtr>& get_includedOnlyMeshes();
 
   /**
    * @brief Sets the only meshes impacted by this light.
    */
-  void set_includedOnlyMeshes(const std::vector<AbstractMesh*>& value);
+  void set_includedOnlyMeshes(const std::vector<AbstractMeshPtr>& value);
 
   /**
    * @brief Gets the meshes not impacted by this light.
    */
-  std::vector<AbstractMesh*>& get_excludedMeshes();
+  std::vector<AbstractMeshPtr>& get_excludedMeshes();
 
   /**
    * @brief Sets the meshes not impacted by this light.
    */
-  void set_excludedMeshes(const std::vector<AbstractMesh*>& value);
+  void set_excludedMeshes(const std::vector<AbstractMeshPtr>& value);
 
   /**
    * @brief Gets the layer id use to find what meshes are not impacted by the
@@ -413,8 +413,8 @@ protected:
   void _resyncMeshes();
 
 private:
-  void _hookArrayForExcluded(const std::vector<AbstractMesh*>& array);
-  void _hookArrayForIncludedOnly(const std::vector<AbstractMesh*>& array);
+  void _hookArrayForExcluded(const std::vector<AbstractMeshPtr>& array);
+  void _hookArrayForIncludedOnly(const std::vector<AbstractMeshPtr>& array);
 
   /**
    * @brief Recomputes the cached photometric scale if needed.
@@ -511,12 +511,12 @@ public:
   /**
    * Meshes impacted by this light
    */
-  Property<Light, std::vector<AbstractMesh*>> includedOnlyMeshes;
+  Property<Light, std::vector<AbstractMeshPtr>> includedOnlyMeshes;
 
   /**
    * Meshes not impacted by this light
    */
-  Property<Light, std::vector<AbstractMesh*>> excludedMeshes;
+  Property<Light, std::vector<AbstractMeshPtr>> excludedMeshes;
 
   /**
    * Layer id use to find what meshes are not impacted by the light
@@ -549,8 +549,8 @@ private:
   float _radius;
   int _renderPriority;
   bool _shadowEnabled;
-  std::vector<AbstractMesh*> _includedOnlyMeshes;
-  std::vector<AbstractMesh*> _excludedMeshes;
+  std::vector<AbstractMeshPtr> _includedOnlyMeshes;
+  std::vector<AbstractMeshPtr> _excludedMeshes;
   unsigned int _includeOnlyWithLayerMask;
   unsigned int _excludeWithLayerMask;
   unsigned int _lightmapMode;

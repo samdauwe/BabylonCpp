@@ -157,7 +157,7 @@ public:
   /**
    * Gets or sets the list of animations
    */
-  std::vector<Animation*> animations;
+  std::vector<AnimationPtr> animations;
 
   /**
    * Observable raised when the influence changes

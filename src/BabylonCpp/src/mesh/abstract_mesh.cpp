@@ -1474,12 +1474,22 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Lights
   for (auto& light : getScene()->lights) {
     // Included meshes
-    std::remove(light->includedOnlyMeshes().begin(),
-                light->includedOnlyMeshes().end(), this);
+    light->includedOnlyMeshes().erase(
+      std::remove_if(light->includedOnlyMeshes().begin(),
+                     light->includedOnlyMeshes().end(),
+                     [this](const AbstractMeshPtr& includedOnlyMesh) {
+                       return includedOnlyMesh.get() == this;
+                     }),
+      light->includedOnlyMeshes().end());
 
     // Excluded meshes
-    std::remove(light->excludedMeshes().begin(), light->excludedMeshes().end(),
-                this);
+    light->excludedMeshes().erase(
+      std::remove_if(light->excludedMeshes().begin(),
+                     light->excludedMeshes().end(),
+                     [this](const AbstractMeshPtr& excludedMesh) {
+                       return excludedMesh.get() == this;
+                     }),
+      light->excludedMeshes().end());
 
     // Shadow generators
     auto generator = light->getShadowGenerator();

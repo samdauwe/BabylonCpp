@@ -31,10 +31,9 @@ AnimationGroup::~AnimationGroup()
 {
 }
 
-void AnimationGroup::addToScene(
-  std::unique_ptr<AnimationGroup>&& newAnimationGroup)
+void AnimationGroup::addToScene(const AnimationGroupPtr& newAnimationGroup)
 {
-  _scene->animationGroups.emplace_back(std::move(newAnimationGroup));
+  _scene->animationGroups.emplace_back(newAnimationGroup);
 }
 
 float AnimationGroup::get_from() const
@@ -303,8 +302,8 @@ void AnimationGroup::_checkAnimationGroupEnded(const AnimatablePtr& animatable)
   }
 }
 
-AnimationGroup* AnimationGroup::Parse(const json& /*parsedAnimationGroup*/,
-                                      Scene* /*scene*/)
+AnimationGroupPtr AnimationGroup::Parse(const json& /*parsedAnimationGroup*/,
+                                        Scene* /*scene*/)
 {
   return nullptr;
 }

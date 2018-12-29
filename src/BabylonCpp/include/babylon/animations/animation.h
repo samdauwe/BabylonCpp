@@ -639,7 +639,7 @@ public:
    * @param parsedAnimation Parsed animation object
    * @returns Animation object
    */
-  static Animation* Parse(const json& parsedAnimation);
+  static AnimationPtr Parse(const json& parsedAnimation);
 
   /**
    * @brief Appends the serialized animations from the source animations.

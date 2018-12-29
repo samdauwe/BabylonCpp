@@ -44,7 +44,10 @@ struct BABYLON_SHARED_EXPORT BabylonFileLoader : public ISceneLoaderPlugin {
     Scene* scene, const std::string& data, const std::string& rootUrl,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError
-    = nullptr) const override;
+    = nullptr,
+    bool addToScene = false) const override;
+  void finally(const std::string& producer, const std::ostringstream& log,
+               const json& parsedData) const;
 
 }; // end of struct BabylonFileLoader
 

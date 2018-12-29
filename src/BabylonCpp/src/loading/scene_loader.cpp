@@ -65,18 +65,7 @@ std::unordered_map<std::string, IRegisteredPlugin>
 void SceneLoader::RegisterPlugins()
 {
   // Register babylon.js file loader
-  auto bjsFileLoader  = std::make_shared<BabylonFileLoader>();
-  bjsFileLoader->name = "babylon.js";
-  bjsFileLoader->extensions.mapping[".babylon"] = false;
-  bjsFileLoader->canDirectLoad                  = [](const std::string& data) {
-    // We consider that the producer string is filled
-    if (String::endsWith(data, "babylon")) {
-      return true;
-    }
-
-    return false;
-  };
-  SceneLoader::RegisterPlugin(bjsFileLoader);
+  SceneLoader::RegisterPlugin(std::make_shared<BabylonFileLoader>());
 }
 
 IRegisteredPlugin SceneLoader::_getDefaultPlugin()

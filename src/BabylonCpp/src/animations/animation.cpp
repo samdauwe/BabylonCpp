@@ -656,7 +656,7 @@ json Animation::serialize() const
   return nullptr;
 }
 
-Animation* Animation::Parse(const json& /*parsedAnimation*/)
+AnimationPtr Animation::Parse(const json& /*parsedAnimation*/)
 {
   return nullptr;
 }
