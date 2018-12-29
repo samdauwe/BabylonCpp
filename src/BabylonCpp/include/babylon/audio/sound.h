@@ -1,14 +1,33 @@
 #ifndef BABYLON_AUDIO_SOUND_H
 #define BABYLON_AUDIO_SOUND_H
 
+#include <variant>
+
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/tools/observable.h>
+#include <nlohmann/json_fwd.hpp>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
+
+class Scene;
+class Sound;
+using SoundPtr = std::shared_ptr<Sound>;
 
 class BABYLON_SHARED_EXPORT Sound {
 
 public:
+  template <typename... Ts>
+  static SoundPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<Sound>(new Sound(std::forward<Ts>(args)...));
+  }
+  virtual ~Sound()
+  {
+  }
+
   bool isReady()
   {
     return false;
@@ -26,8 +45,23 @@ public:
   void setVolume(unsigned int /*volume*/)
   {
   }
+  static SoundPtr Parse(const json& /*parsedSound*/, Scene* /*scene*/,
+                        const std::string& /*rootUrl*/,
+                        const SoundPtr& /*sound*/ = nullptr)
+  {
+    return nullptr;
+  }
+
+protected:
+  Sound(const std::string& /*name*/,
+        const std::optional<std::variant<std::string, ArrayBuffer>>&
+        /*urlOrArrayBuffer*/,
+        Scene* /*scene*/)
+  {
+  }
 
 public:
+  bool isPaused;
   std::string name;
   bool autoplay;
   float directionalConeInnerAngle;

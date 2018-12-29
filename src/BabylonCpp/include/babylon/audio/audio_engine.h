@@ -7,6 +7,9 @@ namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT AudioEngine {
 
+public:
+    bool canUseWebAudio;
+
 }; // end of class AudioEngine
 
 } // end of namespace BABYLON

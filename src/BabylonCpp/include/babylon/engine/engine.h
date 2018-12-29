@@ -56,6 +56,7 @@ class Scene;
 class Texture;
 class UniformBuffer;
 class VertexBuffer;
+using AudioEnginePtr = std::shared_ptr<AudioEngine>;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using DummyInternalTextureTrackerPtr
   = std::shared_ptr<DummyInternalTextureTracker>;
@@ -88,8 +89,23 @@ public:
 
   friend class BaseTexture;
 
+private:
+  /**
+   * The audio engine
+   */
+  static AudioEnginePtr _audioEngine;
+
 public:
+  /**
+   * @brief Gets the engine version.
+   */
   static std::string Version();
+
+  /**
+   * @brief Gets the audio engine.
+   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
+   */
+  static AudioEnginePtr AudioEngine();
 
   // Updatable statics so stick with vars here
 
@@ -2556,12 +2572,6 @@ public:
    * Hidden
    */
   GL::IGLRenderingContext* _gl;
-
-  /**
-   * Gets the audio engine
-   * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
-   */
-  static AudioEngine* audioEngine;
 
   /**
    * Hidden

@@ -81,7 +81,11 @@ void SceneTab::_buildPropertiesView()
     [&](const size_t& value) { _scene->animationTimeScale = value; });
   // - audioEnabled
   view.addBoolProperty(
-    "audioEnabled", [&]() -> bool { return _scene->audioEnabled(); },
+    "audioEnabled",
+    [&]() -> bool {
+      return _scene->audioEnabled().has_value() ? *_scene->audioEnabled() :
+                                                  false;
+    },
     [&](const bool& value) { _scene->audioEnabled = value; });
   // - autoClear
   view.addBoolProperty("autoClear", [&]() -> bool { return _scene->autoClear; },
@@ -166,7 +170,11 @@ void SceneTab::_buildPropertiesView()
     [&](const Vector3& value) { _scene->gravity = value; });
   // - headphone
   view.addBoolProperty("headphone",
-                       [&]() -> bool { return _scene->headphone(); },
+                       [&]() -> bool {
+                         return _scene->headphone().has_value() ?
+                                  *_scene->headphone() :
+                                  false;
+                       },
                        [&](const bool& value) { _scene->headphone = value; });
   // - hoverCursor
   view.addStringProperty(

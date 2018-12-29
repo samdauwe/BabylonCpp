@@ -5,6 +5,8 @@
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/animation_group.h>
 #include <babylon/animations/runtime_animation.h>
+#include <babylon/audio/audio_scene_component.h>
+#include <babylon/audio/sound.h>
 #include <babylon/audio/sound_track.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
@@ -256,8 +258,6 @@ Scene::Scene(Engine* engine)
     , _postProcessRenderPipelineManager{nullptr}
     , _hasAudioEngine{false}
     , _mainSoundTrack{nullptr}
-    , _audioEnabled{true}
-    , _headphone{false}
     , _engine{engine ? engine : Engine::LastCreatedEngine()}
     , _animationRatio{1.f}
     , _animationTimeLastSet{false}
@@ -293,6 +293,8 @@ Scene::Scene(Engine* engine)
     , _uid{Tools::RandomId()}
     , _tempPickingRay{std::make_unique<Ray>(Ray::Zero())}
     , _cachedRayForTransform{nullptr}
+    , _audioEnabled{std::nullopt}
+    , _headphone{std::nullopt}
 {
   engine->scenes.emplace_back(this);
 
@@ -355,7 +357,7 @@ void Scene::_addComponent(const ISceneComponentPtr& component)
   }
 }
 
-ISceneComponentPtr Scene::_getComponent(const std::string& name)
+ISceneComponentPtr Scene::_getComponent(const std::string& name) const
 {
   auto it = std::find_if(_components.begin(), _components.end(),
                          [&name](const ISceneComponentPtr& component) {
@@ -647,10 +649,19 @@ Scene::get_postProcessRenderPipelineManager()
   return _postProcessRenderPipelineManager;
 }
 
-std::unique_ptr<SoundTrack>& Scene::get_mainSoundTrack()
+SoundTrackPtr& Scene::get_mainSoundTrack()
 {
+  auto compo = _getComponent(SceneComponentConstants::NAME_AUDIO);
+  if (!compo) {
+    compo = AudioSceneComponent::New(this);
+    _addComponent(compo);
+  }
+
   if (!_mainSoundTrack) {
-    _mainSoundTrack = std::make_unique<SoundTrack>(this, true);
+    _mainSoundTrack = SoundTrack::New(this, ISoundTrackOptions{
+                                              std::nullopt, // volume
+                                              true,         // mainTrack
+                                            });
   }
 
   return _mainSoundTrack;
@@ -3167,8 +3178,26 @@ TransformNodePtr Scene::getTransformNodeByName(const std::string& name)
   return (it == transformNodes.end()) ? nullptr : *it;
 }
 
-SoundPtr Scene::getSoundByName(const std::string& /*name*/)
+SoundPtr Scene::getSoundByName(const std::string& name)
 {
+  size_t index = 0;
+  for (index = 0; index < mainSoundTrack()->soundCollection.size(); ++index) {
+    if (mainSoundTrack()->soundCollection[index]->name == name) {
+      return mainSoundTrack()->soundCollection[index];
+    }
+  }
+
+  if (!soundTracks.empty()) {
+    for (size_t sdIndex = 0; sdIndex < soundTracks.size(); ++sdIndex) {
+      for (index = 0; index < soundTracks[sdIndex]->soundCollection.size();
+           ++index) {
+        if (soundTracks[sdIndex]->soundCollection[index]->name == name) {
+          return soundTracks[sdIndex]->soundCollection[index];
+        }
+      }
+    }
+  }
+
   return nullptr;
 }
 
@@ -3926,56 +3955,74 @@ void Scene::_updateAudioParameters()
 {
 }
 
-bool Scene::get_audioEnabled() const
+std::optional<bool>& Scene::get_audioEnabled()
 {
+  auto compo = std::static_pointer_cast<AudioSceneComponent>(
+    _getComponent(SceneComponentConstants::NAME_AUDIO));
+  if (!compo) {
+    compo = AudioSceneComponent::New(this);
+    _addComponent(compo);
+  }
+
+  _audioEnabled = compo->audioEnabled();
+
   return _audioEnabled;
 }
 
-void Scene::set_audioEnabled(bool value)
+void Scene::set_audioEnabled(const std::optional<bool>& value)
 {
-  _audioEnabled = value;
-  if (_hasAudioEngine) {
-    if (_audioEnabled) {
-      _enableAudio();
-    }
-    else {
-      _disableAudio();
-    }
+  if (!value.has_value()) {
+    return;
+  }
+
+  auto compo = std::static_pointer_cast<AudioSceneComponent>(
+    _getComponent(SceneComponentConstants::NAME_AUDIO));
+  if (!compo) {
+    compo = AudioSceneComponent::New(this);
+    _addComponent(compo);
+  }
+
+  if (*value) {
+    compo->enableAudio();
+  }
+  else {
+    compo->disableAudio();
   }
 }
 
-void Scene::_disableAudio()
+std::optional<bool>& Scene::get_headphone()
 {
-}
+  auto compo = std::static_pointer_cast<AudioSceneComponent>(
+    _getComponent(SceneComponentConstants::NAME_AUDIO));
+  if (!compo) {
+    compo = AudioSceneComponent::New(this);
+    _addComponent(compo);
+  }
 
-void Scene::_enableAudio()
-{
-}
+  headphone = compo->headphone();
 
-bool Scene::get_headphone() const
-{
   return _headphone;
 }
 
-void Scene::set_headphone(bool value)
+void Scene::set_headphone(const std::optional<bool>& value)
 {
-  _headphone = value;
-  if (_hasAudioEngine) {
-    if (_headphone) {
-      _switchAudioModeForHeadphones();
-    }
-    else {
-      _switchAudioModeForNormalSpeakers();
-    }
+  if (!value.has_value()) {
+    return;
   }
-}
 
-void Scene::_switchAudioModeForHeadphones()
-{
-}
+  auto compo = std::static_pointer_cast<AudioSceneComponent>(
+    _getComponent(SceneComponentConstants::NAME_AUDIO));
+  if (!compo) {
+    compo = AudioSceneComponent::New(this);
+    _addComponent(compo);
+  }
 
-void Scene::_switchAudioModeForNormalSpeakers()
-{
+  if (*value) {
+    compo->switchAudioModeForHeadphones();
+  }
+  else {
+    compo->switchAudioModeForHeadphones();
+  }
 }
 
 DepthRenderer* Scene::enableDepthRenderer(const CameraPtr& camera)

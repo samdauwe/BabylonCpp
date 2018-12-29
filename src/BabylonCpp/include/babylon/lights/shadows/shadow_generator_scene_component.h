@@ -6,6 +6,8 @@
 #include <babylon/engine/iscene_serializable_component.h>
 #include <babylon/engine/scene_component_constants.h>
 
+using json = nlohmann::json;
+
 namespace BABYLON {
 
 class AbstractScene;
@@ -54,19 +56,19 @@ public:
    * @brief Serializes the component data to the specified json object
    * @param serializationObject The object to serialize to
    */
-  void serialize(const nlohmann::json& serializationObject) override;
+  void serialize(json& serializationObject) override;
 
   /**
    * @brief Adds all the element from the container to the scene
    * @param container the container holding the elements
    */
-  void addFromContainer(AbstractScene* container) override;
+  void addFromContainer(AbstractScene& container) override;
 
   /**
    * Removes all the elements in the container from the scene
    * @param container contains the elements to remove
    */
-  void removeFromContainer(AbstractScene* container) override;
+  void removeFromContainer(AbstractScene& container) override;
 
   /**
    * @brief Disposes the component and the associated resources.

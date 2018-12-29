@@ -30,19 +30,18 @@ void ShadowGeneratorSceneComponent::rebuild()
   // Nothing To Do Here.
 }
 
-void ShadowGeneratorSceneComponent::serialize(
-  const nlohmann::json& /*serializationObject*/)
+void ShadowGeneratorSceneComponent::serialize(json& /*serializationObject*/)
 {
 }
 
 void ShadowGeneratorSceneComponent::addFromContainer(
-  AbstractScene* /*container*/)
+  AbstractScene& /*container*/)
 {
   // Nothing To Do Here. (directly attached to a light)
 }
 
 void ShadowGeneratorSceneComponent::removeFromContainer(
-  AbstractScene* /*container*/)
+  AbstractScene& /*container*/)
 {
   // Nothing To Do Here. (directly attached to a light)
 }

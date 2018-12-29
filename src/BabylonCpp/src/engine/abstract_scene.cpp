@@ -1,8 +1,11 @@
 #include <babylon/engine/abstract_scene.h>
 
+#include <babylon/audio/audio_engine.h>
+#include <babylon/audio/sound.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/engine/asset_container.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene_component_constants.h>
 #include <babylon/layer/effect_layer.h>
 #include <babylon/layer/glow_layer.h>
@@ -53,8 +56,8 @@ void AbstractScene::_addParsers()
   // Effect layer parser
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_EFFECTLAYER,
-    [](const nlohmann::json& parsedData, Scene* scene,
-       AssetContainer& container, const std::string& rootUrl) {
+    [](const json& parsedData, Scene* scene, AssetContainer& container,
+       const std::string& rootUrl) {
       if (json_util::has_key(parsedData, "effectLayers")) {
         for (const auto& effectLayer :
              json_util::get_array<json>(parsedData, "effectLayers")) {
@@ -67,8 +70,8 @@ void AbstractScene::_addParsers()
   // Lens flare system parser
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_LENSFLARESYSTEM,
-    [](const nlohmann::json& parsedData, Scene* scene,
-       AssetContainer& container, const std::string& rootUrl) {
+    [](const json& parsedData, Scene* scene, AssetContainer& container,
+       const std::string& rootUrl) {
       // Lens flares
       if (json_util::has_key(parsedData, "lensFlareSystems")) {
         for (const auto& parsedLensFlareSystem :
@@ -82,8 +85,8 @@ void AbstractScene::_addParsers()
   // Particle system parser
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_PARTICLESYSTEM,
-    [](const nlohmann::json& parsedData, Scene* scene,
-       AssetContainer& container, const std::string& rootUrl) {
+    [](const json& parsedData, Scene* scene, AssetContainer& container,
+       const std::string& rootUrl) {
       auto individualParser = AbstractScene::GetIndividualParser(
         SceneComponentConstants::NAME_PARTICLESYSTEM);
       if (!individualParser) {
@@ -104,8 +107,8 @@ void AbstractScene::_addParsers()
   // Shadows parser
   AbstractScene::AddParser(
     SceneComponentConstants::NAME_SHADOWGENERATOR,
-    [](const nlohmann::json& parsedData, Scene* scene,
-       AssetContainer& /*container*/, const std::string& /*rootUrl*/) {
+    [](const json& parsedData, Scene* scene, AssetContainer& /*container*/,
+       const std::string& /*rootUrl*/) {
       // Shadows
       if (json_util::has_key(parsedData, "shadowGenerators")) {
         for (const auto& parsedShadowGenerator :
@@ -114,6 +117,44 @@ void AbstractScene::_addParsers()
           // SG would be available on their associated lights
         }
       }
+    });
+  // Sound parsers
+  AbstractScene::AddParser(
+    SceneComponentConstants::NAME_AUDIO,
+    [](const json& parsedData, Scene* scene, AssetContainer& container,
+       const std::string& rootUrl) {
+      std::unordered_map<std::string, SoundPtr> loadedSounds;
+      SoundPtr loadedSound;
+      if (json_util::has_key(parsedData, "sounds")) {
+        for (const auto& parsedSound :
+             json_util::get_array<json>(parsedData, "sounds")) {
+          auto parsedSoundName = json_util::get_string(parsedSound, "name");
+          if (Engine::AudioEngine()->canUseWebAudio) {
+            std::string parsedSoundUrl;
+            if (!json_util::has_key(parsedSound, "url")) {
+              parsedSoundUrl = parsedSoundName;
+            }
+            else {
+              parsedSoundUrl = json_util::get_string(parsedSound, "url");
+            }
+            if (!stl_util::contains(loadedSounds, parsedSoundUrl)) {
+              loadedSound = Sound::Parse(parsedSound, scene, rootUrl);
+              loadedSounds[parsedSoundUrl] = loadedSound;
+              container.sounds.emplace_back(loadedSound);
+            }
+            else {
+              container.sounds.emplace_back(Sound::Parse(
+                parsedSound, scene, rootUrl, loadedSounds[parsedSoundUrl]));
+            }
+          }
+          else {
+            container.sounds.emplace_back(
+              Sound::New(parsedSoundName, std::nullopt, scene));
+          }
+        }
+      }
+
+      loadedSounds.clear();
     });
 }
 

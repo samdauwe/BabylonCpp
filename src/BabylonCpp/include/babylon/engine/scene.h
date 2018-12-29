@@ -89,6 +89,7 @@ using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
 using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
+using SoundTrackPtr          = std::shared_ptr<SoundTrack>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
 
 /**
@@ -167,7 +168,7 @@ public:
    * @returns the component or null if not present
    * Hidden
    */
-  ISceneComponentPtr _getComponent(const std::string& name);
+  ISceneComponentPtr _getComponent(const std::string& name) const;
 
   /** Properties **/
 
@@ -1719,11 +1720,6 @@ private:
   void _onPointerUpEvent(PointerEvent&& evt);
   void _onKeyDownEvent(KeyboardEvent&& evt);
   void _onKeyUpEvent(KeyboardEvent&& evt);
-  /** Audio **/
-  void _disableAudio();
-  void _enableAudio();
-  void _switchAudioModeForHeadphones();
-  void _switchAudioModeForNormalSpeakers();
   /** Picking **/
   std::optional<PickingInfo> _internalPick(
     const std::function<Ray(Matrix& world)>& rayFunction,
@@ -1962,9 +1958,10 @@ protected:
   get_postProcessRenderPipelineManager();
 
   /**
-   * @brief Gets the main soundtrack associated with the scene.
+   * @brief Gets the main sound track played by the scene.
+   * It cotains your primary collection of sounds.
    */
-  std::unique_ptr<SoundTrack>& get_mainSoundTrack();
+  SoundTrackPtr& get_mainSoundTrack();
 
   /**
    * Gets the simplification queue attached to the scene.
@@ -2088,25 +2085,25 @@ protected:
    * @brief Gets if audio support is enabled.
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
-  bool get_audioEnabled() const;
+  std::optional<bool>& get_audioEnabled();
 
   /**
    * @brief Sets if audio support is enabled.
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
-  void set_audioEnabled(bool value);
+  void set_audioEnabled(const std::optional<bool>& value);
 
   /**
    * @brief Gets if audio will be output to headphones.
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
-  bool get_headphone() const;
+  std::optional<bool>& get_headphone();
 
   /**
    * @brief Sets if audio will be output to headphones.
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
-  void set_headphone(bool value);
+  void set_headphone(const std::optional<bool>& value);
 
   /**
    * @brief Gets if the scene is already disposed.
@@ -2875,9 +2872,10 @@ public:
   std::vector<SoundTrack*> soundTracks;
 
   /**
-   * Gets the main soundtrack associated with the scene
+   * The main sound track played by the scene.
+   * It cotains your primary collection of sounds.
    */
-  ReadOnlyProperty<Scene, std::unique_ptr<SoundTrack>> mainSoundTrack;
+  ReadOnlyProperty<Scene, SoundTrackPtr> mainSoundTrack;
 
   // Simplification Queue
 
@@ -3044,13 +3042,13 @@ public:
    * Gets if audio support is enabled
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
-  Property<Scene, bool> audioEnabled;
+  Property<Scene, std::optional<bool>> audioEnabled;
 
   /**
    * Gets if audio will be output to headphones
    * @see http://doc.babylonjs.com/how_to/playing_sounds_and_music
    */
-  Property<Scene, bool> headphone;
+  Property<Scene, std::optional<bool>> headphone;
 
   /**
    * Gets if the scene is already disposed
@@ -3323,9 +3321,7 @@ private:
   std::vector<AbstractMeshPtr> _meshesForIntersections;
   // Sound Tracks
   bool _hasAudioEngine;
-  std::unique_ptr<SoundTrack> _mainSoundTrack;
-  bool _audioEnabled;
-  bool _headphone;
+  SoundTrackPtr _mainSoundTrack;
   // Render engine
   Engine* _engine;
   // Performance counters
@@ -3401,6 +3397,9 @@ private:
 
   std::vector<AbstractMesh*> _defaultMeshCandidates;
   std::vector<SubMesh*> _defaultSubMeshCandidates;
+
+  std::optional<bool> _audioEnabled;
+  std::optional<bool> _headphone;
 
 }; // end of class Scene
 

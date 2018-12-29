@@ -59,7 +59,7 @@ void AssetContainer::addAllToScene()
   }
 
   for (const auto& component : scene->_serializableComponents) {
-    component->addFromContainer(scene);
+    component->addFromContainer(*scene);
   }
 }
 
@@ -106,7 +106,7 @@ void AssetContainer::removeAllFromScene()
   }
 
   for (const auto& component : scene->_serializableComponents) {
-    component->removeFromContainer(scene);
+    component->removeFromContainer(*scene);
   }
 }
 

@@ -60,6 +60,12 @@ std::string Engine::Version()
   return BABYLONCPP_VERSION;
 }
 
+AudioEnginePtr Engine::AudioEngine()
+{
+  return _audioEngine;
+}
+
+AudioEnginePtr Engine::_audioEngine   = nullptr;
 float Engine::CollisionsEpsilon       = 0.001f;
 std::string Engine::CodeRepository    = "src/";
 std::string Engine::ShadersRepository = "src/shaders/";

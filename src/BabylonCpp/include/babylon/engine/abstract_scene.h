@@ -10,6 +10,8 @@
 #include <babylon/babylon_api.h>
 #include <babylon/core/any.h>
 
+using json = nlohmann::json;
+
 namespace BABYLON {
 
 class AbstractMesh;
@@ -298,6 +300,11 @@ public:
    * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
    */
   std::vector<LensFlareSystemPtr> lensFlareSystems;
+
+  /**
+   * The list of sounds used in the scene.
+   */
+  std::vector<SoundPtr> sounds;
 
 private:
   /**
