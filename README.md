@@ -98,6 +98,9 @@ This code results in the following scene:
 
 Example scenes can be found on the [samples](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) page.
 
+# Development Roadmap
+A summary of the development roadmap can be found on [this page](https://github.com/samdauwe/BabylonCpp/wiki/Roadmap).
+
 # Dependencies
 
 ## System ##
