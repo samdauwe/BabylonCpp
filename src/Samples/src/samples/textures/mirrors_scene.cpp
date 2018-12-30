@@ -102,7 +102,7 @@ void MirrorsScene::initializeScene(ICanvas* canvas, Scene* scene)
     auto iStr           = std::to_string(i);
     auto mirrorMaterial = StandardMaterial::New("texture" + iStr, scene);
     auto mirrorTexture = MirrorTexture::New("mirror" + iStr, 1024, scene, true);
-    mirrorTexture->renderList().emplace_back(_box1);
+    mirrorTexture->renderList().emplace_back(_box1.get());
     mirrorTexture->level            = 0.6f;
     mirrorMaterial->backFaceCulling = true;
     auto points                     = getPointsTranformed(planes[i], {0, 1, 2});

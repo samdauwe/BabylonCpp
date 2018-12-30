@@ -80,7 +80,7 @@ void CustomRenderTargetsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Render target
   _renderTarget = RenderTargetTexture::New("depth", 1024, scene, true);
-  _renderTarget->renderList().emplace_back(skybox);
+  _renderTarget->renderList().emplace_back(skybox.get());
   scene->customRenderTargets.emplace_back(_renderTarget);
 
   _renderTarget->onBeforeRender
@@ -111,7 +111,7 @@ void CustomRenderTargetsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
     alpha += Math::PI2 / spheresCount;
 
-    _renderTarget->renderList().emplace_back(sphere);
+    _renderTarget->renderList().emplace_back(sphere.get());
   }
 
   // Plane material

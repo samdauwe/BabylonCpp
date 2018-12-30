@@ -86,7 +86,7 @@ void DirectionalLight::set_shadowOrthoScale(float value)
 
 void DirectionalLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
-  const std::vector<AbstractMeshPtr>& renderList)
+  const std::vector<AbstractMesh*>& renderList)
 {
   if (shadowFrustumSize() > 0.f) {
     _setDefaultFixedFrustumShadowProjectionMatrix(matrix, viewMatrix);
@@ -113,7 +113,7 @@ void DirectionalLight::_setDefaultFixedFrustumShadowProjectionMatrix(
 
 void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
   Matrix& matrix, const Matrix& viewMatrix,
-  const std::vector<AbstractMeshPtr>& renderList)
+  const std::vector<AbstractMesh*>& renderList)
 {
   auto& activeCamera = getScene()->activeCamera;
 

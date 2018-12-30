@@ -211,7 +211,7 @@ float ShadowLight::getDepthMaxZ(const Camera& activeCamera) const
 
 IShadowLight* ShadowLight::setShadowProjectionMatrix(
   Matrix& matrix, Matrix& viewMatrix,
-  const std::vector<AbstractMeshPtr>& renderList)
+  const std::vector<AbstractMesh*>& renderList)
 {
   if (customProjectionMatrixBuilder) {
     customProjectionMatrixBuilder(viewMatrix, renderList, matrix);

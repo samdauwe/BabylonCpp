@@ -73,7 +73,7 @@ void MirrorTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
     auto mirrorMaterial    = StandardMaterial::New("mirror", scene);
     auto reflectionTexture = MirrorTexture::New("mirror", 1024, scene, true);
     reflectionTexture->mirrorPlane    = reflector;
-    reflectionTexture->renderList     = {sphere};
+    reflectionTexture->renderList     = {sphere.get()};
     reflectionTexture->level          = 1;
     mirrorMaterial->reflectionTexture = reflectionTexture;
 

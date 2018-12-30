@@ -49,13 +49,13 @@ void RenderingManager::_clearDepthStencilBuffer(bool depth, bool stencil)
 }
 
 void RenderingManager::render(
-  std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
-                     const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-                     const std::vector<SubMeshPtr>& transparentSubMeshes,
-                     const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+  std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                     const std::vector<SubMesh*>& alphaTestSubMeshes,
+                     const std::vector<SubMesh*>& transparentSubMeshes,
+                     const std::vector<SubMesh*>& depthOnlySubMeshes,
                      const std::function<void()>& beforeTransparents)>
     customRenderFunction,
-  const std::vector<AbstractMeshPtr>& activeMeshes, bool renderParticles,
+  const std::vector<AbstractMesh*>& activeMeshes, bool renderParticles,
   bool renderSprites)
 {
   // Update the observable context (not null as it only goes away on dispose)
@@ -193,7 +193,7 @@ void RenderingManager::dispatchParticles(IParticleSystem* particleSystem)
   _renderingGroups[renderingGroupId]->dispatchParticles(particleSystem);
 }
 
-void RenderingManager::dispatch(const SubMeshPtr& subMesh, AbstractMesh* mesh,
+void RenderingManager::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
                                 const MaterialPtr& material)
 {
   if (!mesh) {
@@ -208,11 +208,11 @@ void RenderingManager::dispatch(const SubMeshPtr& subMesh, AbstractMesh* mesh,
 
 void RenderingManager::setRenderingOrder(
   unsigned int renderingGroupId,
-  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMesh* a, const SubMesh* b)>&
     opaqueSortCompareFn,
-  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMesh* a, const SubMesh* b)>&
     alphaTestSortCompareFn,
-  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMesh* a, const SubMesh* b)>&
     transparentSortCompareFn)
 {
   _customOpaqueSortCompareFn[renderingGroupId]      = opaqueSortCompareFn;

@@ -107,7 +107,7 @@ private:
    * @brief Custom render function.
    * @param subMesh
    */
-  void renderSubMesh(const SubMeshPtr& subMesh);
+  void renderSubMesh(SubMesh* subMesh);
 
 public:
   /**

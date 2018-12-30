@@ -190,7 +190,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMeshPtr>& renderList) override;
+    const std::vector<AbstractMesh*>& renderList) override;
 
   void _computeProjectionTextureViewLightMatrix();
   void _computeProjectionTextureProjectionLightMatrix();

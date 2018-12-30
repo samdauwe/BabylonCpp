@@ -49,21 +49,22 @@ const char* ProceduralTexturesScene::getName()
 void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Helper functions
-  const auto CreateBosquet
-    = [](const std::string& name, float x, float y, float z, Scene* scene,
-         const ShadowGeneratorPtr& shadowGenerator,
-         const MaterialPtr& grassMaterial) {
-        auto bosquet      = Mesh::CreateBox(name, 2.f, scene);
-        bosquet->position = Vector3(x, y, z);
-        bosquet->material = grassMaterial;
+  const auto CreateBosquet = [](const std::string& name, float x, float y,
+                                float z, Scene* scene,
+                                const ShadowGeneratorPtr& shadowGenerator,
+                                const MaterialPtr& grassMaterial) {
+    auto bosquet      = Mesh::CreateBox(name, 2.f, scene);
+    bosquet->position = Vector3(x, y, z);
+    bosquet->material = grassMaterial;
 
-        auto bosquetbawl      = Mesh::CreateBox(name + "bawl", 1, scene);
-        bosquetbawl->position = Vector3(x, y + 1.f, z);
-        bosquetbawl->material = grassMaterial;
+    auto bosquetbawl      = Mesh::CreateBox(name + "bawl", 1, scene);
+    bosquetbawl->position = Vector3(x, y + 1.f, z);
+    bosquetbawl->material = grassMaterial;
 
-        shadowGenerator->getShadowMap()->renderList().emplace_back(bosquet);
-        shadowGenerator->getShadowMap()->renderList().emplace_back(bosquetbawl);
-      };
+    shadowGenerator->getShadowMap()->renderList().emplace_back(bosquet.get());
+    shadowGenerator->getShadowMap()->renderList().emplace_back(
+      bosquetbawl.get());
+  };
 
   const auto CreateTree =
     [](const std::string& name, float x, float y, float z, Scene* scene,
@@ -77,8 +78,8 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
       leafs->position = Vector3(x, y + 5.f, z);
       leafs->material = grassMaterial;
 
-      shadowGenerator->getShadowMap()->renderList().emplace_back(trunk);
-      shadowGenerator->getShadowMap()->renderList().emplace_back(leafs);
+      shadowGenerator->getShadowMap()->renderList().emplace_back(trunk.get());
+      shadowGenerator->getShadowMap()->renderList().emplace_back(leafs.get());
     };
 
   const auto CreateFontain = [](const std::string& name, float x, float y,
@@ -105,38 +106,40 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
     fontainSculptur2->material = fireMaterial;
     fontainSculptur2->rotate(Vector3(1.f, 0.f, 0.f), Math::PI_2, Space::LOCAL);
 
-    shadowGenerator->getShadowMap()->renderList().emplace_back(torus);
+    shadowGenerator->getShadowMap()->renderList().emplace_back(torus.get());
     shadowGenerator->getShadowMap()->renderList().emplace_back(
-      fontainSculptur1);
+      fontainSculptur1.get());
     shadowGenerator->getShadowMap()->renderList().emplace_back(
-      fontainSculptur2);
+      fontainSculptur2.get());
   };
 
-  const auto CreateTorch
-    = [](const std::string& name, float x, float y, float z, Scene* scene,
-         const ShadowGeneratorPtr& shadowGenerator,
-         const MaterialPtr& brickMaterial, const MaterialPtr& woodMaterial,
-         const MaterialPtr& grassMaterial) {
-        // createBrickBlock
-        auto brickblock      = Mesh::CreateBox(name + "brickblock", 1, scene);
-        brickblock->position = Vector3(x, y, z);
-        brickblock->material = brickMaterial;
+  const auto CreateTorch = [](const std::string& name, float x, float y,
+                              float z, Scene* scene,
+                              const ShadowGeneratorPtr& shadowGenerator,
+                              const MaterialPtr& brickMaterial,
+                              const MaterialPtr& woodMaterial,
+                              const MaterialPtr& grassMaterial) {
+    // createBrickBlock
+    auto brickblock      = Mesh::CreateBox(name + "brickblock", 1, scene);
+    brickblock->position = Vector3(x, y, z);
+    brickblock->material = brickMaterial;
 
-        // createWood
-        auto torchwood = Mesh::CreateCylinder(name + "torchwood", 2, 0.25, 0.1f,
-                                              12, 1, scene);
-        torchwood->position = Vector3(x, y + 1.f, z);
-        torchwood->material = woodMaterial;
+    // createWood
+    auto torchwood
+      = Mesh::CreateCylinder(name + "torchwood", 2, 0.25, 0.1f, 12, 1, scene);
+    torchwood->position = Vector3(x, y + 1.f, z);
+    torchwood->material = woodMaterial;
 
-        // leafs
-        auto leafs2      = Mesh::CreateSphere(name + "leafs2", 10, 1.2f, scene);
-        leafs2->position = Vector3(x, y + 2.f, z);
-        leafs2->material = grassMaterial;
+    // leafs
+    auto leafs2      = Mesh::CreateSphere(name + "leafs2", 10, 1.2f, scene);
+    leafs2->position = Vector3(x, y + 2.f, z);
+    leafs2->material = grassMaterial;
 
-        shadowGenerator->getShadowMap()->renderList().emplace_back(torchwood);
-        shadowGenerator->getShadowMap()->renderList().emplace_back(leafs2);
-        shadowGenerator->getShadowMap()->renderList().emplace_back(brickblock);
-      };
+    shadowGenerator->getShadowMap()->renderList().emplace_back(torchwood.get());
+    shadowGenerator->getShadowMap()->renderList().emplace_back(leafs2.get());
+    shadowGenerator->getShadowMap()->renderList().emplace_back(
+      brickblock.get());
+  };
 
   // Ok, enough helpers, let the building start
   _camera = ArcRotateCamera::New("Camera", 1, 1.2f, 25, Vector3(10.f, 0.f, 0.f),

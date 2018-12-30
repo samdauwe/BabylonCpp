@@ -67,7 +67,7 @@ public:
    */
   virtual IShadowLight*
   setShadowProjectionMatrix(Matrix& matrix, Matrix& viewMatrix,
-                            const std::vector<AbstractMeshPtr>& renderList)
+                            const std::vector<AbstractMesh*>& renderList)
     = 0;
 
   /**

@@ -231,7 +231,7 @@ protected:
   /**
    * @brief Renders the submesh passed in parameter to the generation map.
    */
-  void _renderSubMesh(const SubMeshPtr& subMesh);
+  void _renderSubMesh(SubMesh* subMesh);
 
 private:
   /**

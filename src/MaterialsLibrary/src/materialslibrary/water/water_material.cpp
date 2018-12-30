@@ -203,11 +203,11 @@ RenderTargetTexturePtr& WaterMaterial::get_reflectionTexture()
 void WaterMaterial::addToRenderList(const AbstractMeshPtr& node)
 {
   if (_refractionRTT) {
-    _refractionRTT->renderList().emplace_back(node);
+    _refractionRTT->renderList().emplace_back(node.get());
   }
 
   if (_reflectionRTT) {
-    _reflectionRTT->renderList().emplace_back(node);
+    _reflectionRTT->renderList().emplace_back(node.get());
   }
 }
 
@@ -224,7 +224,7 @@ void WaterMaterial::enableRenderTargets(bool enable)
   }
 }
 
-std::vector<AbstractMeshPtr>& WaterMaterial::getRenderList()
+std::vector<AbstractMesh*>& WaterMaterial::getRenderList()
 {
   return _refractionRTT->renderList();
 }

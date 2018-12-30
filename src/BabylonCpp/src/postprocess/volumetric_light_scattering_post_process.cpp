@@ -85,7 +85,7 @@ const char* VolumetricLightScatteringPostProcess::getClassName() const
   return "VolumetricLightScatteringPostProcess";
 }
 
-bool VolumetricLightScatteringPostProcess::_isReady(const SubMeshPtr& subMesh,
+bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
                                                     bool useInstances)
 {
   auto _mesh = subMesh->getMesh();
@@ -227,7 +227,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
   }
 
   // Custom render function for submeshes
-  auto renderSubMesh = [&](const SubMeshPtr& subMesh) {
+  auto renderSubMesh = [&](SubMesh* subMesh) {
     auto _mesh = subMesh->getRenderingMesh();
     if (_meshExcluded(_mesh)) {
       return;
@@ -264,7 +264,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       }
 
       engine_->enableEffect(effect);
-      _mesh->_bind(subMesh.get(), effect, Material::TriangleFillMode());
+      _mesh->_bind(subMesh, effect, Material::TriangleFillMode());
 
       if (_mesh == mesh) {
         material->bind(_mesh->getWorldMatrix(), _mesh.get());
@@ -297,7 +297,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
       }
 
       // Draw
-      mesh->_processRendering(subMesh.get(), _volumetricLightScatteringPass,
+      mesh->_processRendering(subMesh, _volumetricLightScatteringPass,
                               Material::TriangleFillMode(), batch,
                               hardwareInstancedRendering,
                               [&](bool /*isInstance*/, Matrix world,
@@ -321,10 +321,10 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     [&](int*, EventState&) { scene->clearColor = savedSceneClearColor; });
 
   _volumetricLightScatteringRTT->customRenderFunction
-    = [&](const std::vector<SubMeshPtr>& opaqueSubMeshes,
-          const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-          const std::vector<SubMeshPtr>& transparentSubMeshes,
-          const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+    = [&](const std::vector<SubMesh*>& opaqueSubMeshes,
+          const std::vector<SubMesh*>& alphaTestSubMeshes,
+          const std::vector<SubMesh*>& transparentSubMeshes,
+          const std::vector<SubMesh*>& depthOnlySubMeshes,
           const std::function<void()>& /*beforeTransparents*/) {
         auto pEngine = scene->getEngine();
 
@@ -362,7 +362,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
             = stl_util::slice(transparentSubMeshes, 0,
                               static_cast<int>(transparentSubMeshes.size()));
           std::sort(sortedArray.begin(), sortedArray.end(),
-                    [](const SubMeshPtr& a, const SubMeshPtr& b) {
+                    [](const SubMesh* a, const SubMesh* b) {
                       // Alpha index first
                       if (a->_alphaIndex > b->_alphaIndex) {
                         return 1;

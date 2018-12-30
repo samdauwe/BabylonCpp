@@ -102,7 +102,7 @@ protected:
     Engine* engine = nullptr, bool reusable = false, Scene* scene = nullptr);
 
 private:
-  bool _isReady(const SubMeshPtr& subMesh, bool useInstances);
+  bool _isReady(SubMesh* subMesh, bool useInstances);
   bool _meshExcluded(const AbstractMeshPtr& mesh);
   void _createPass(Scene* scene, float ratio);
   void _updateMeshScreenCoordinates(Scene* scene);

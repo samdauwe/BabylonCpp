@@ -97,7 +97,7 @@ void PortalsScene::initializeScene(ICanvas* canvas, Scene* scene)
     sphere->material     = material;
 
     alpha += Math::PI2 / spheresCount;
-    _renderTarget->renderList().emplace_back(sphere);
+    _renderTarget->renderList().emplace_back(sphere.get());
   }
 
   // Plane material

@@ -10,6 +10,7 @@
 #include <babylon/core/structs.h>
 #include <babylon/culling/octrees/octree.h>
 #include <babylon/engine/abstract_scene.h>
+#include <babylon/engine/scene_options.h>
 #include <babylon/engine/stage.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info.h>
@@ -294,13 +295,13 @@ public:
    * @brief Gets the array of active meshes.
    * @returns an array of AbstractMesh
    */
-  std::vector<AbstractMeshPtr>& getActiveMeshes();
+  std::vector<AbstractMesh*>& getActiveMeshes();
 
   /**
    * @brief Gets the array of active meshes.
    * @returns an array of AbstractMesh
    */
-  const std::vector<AbstractMeshPtr>& getActiveMeshes() const;
+  const std::vector<AbstractMesh*>& getActiveMeshes() const;
 
   /**
    * @brief Gets the animation ratio (which is 1.0 is the scene renders at 60fps
@@ -310,10 +311,16 @@ public:
   float getAnimationRatio() const;
 
   /**
-   * @brief Gets an unique Id for the current frame.
+   * @brief Gets an unique Id for the current render phase.
    * @returns a number
    */
   int getRenderId() const;
+
+  /**
+   * @brief Gets an unique Id for the current frame.
+   * @returns a number
+   */
+  int getFrameId() const;
 
   /**
    * @brief Call this function if you want to manually increment the render Id.
@@ -344,7 +351,7 @@ public:
    * pointer event (eg. pointer id for multitouch)
    * @returns the current scene
    */
-  Scene& simulatePointerDown(const std::optional<PickingInfo>& pickResult);
+  Scene& simulatePointerDown(std::optional<PickingInfo>& pickResult);
 
   /**
    * @brief Use this method to simulate a pointer up on a mesh.
@@ -356,7 +363,7 @@ public:
    * pointer event (eg. pointer id for multitouch)
    * @returns the current scene
    */
-  Scene& simulatePointerUp(const std::optional<PickingInfo>& pickResult);
+  Scene& simulatePointerUp(std::optional<PickingInfo>& pickResult);
 
   /**
    * @brief Gets a boolean indicating if the current pointer event is captured
@@ -1242,11 +1249,6 @@ public:
   void dispose();
 
   /**
-   *  @brief Releases sounds & soundtracks.
-   */
-  void disposeSounds();
-
-  /**
    * @brief Call this function to reduce memory footprint of the scene.
    * Vertex buffers will not store CPU data anymore (this will prevent picking,
    * collisions or physics to work correctly)
@@ -1390,8 +1392,8 @@ public:
   /**
    * @brief Use the given ray to pick a mesh in the scene.
    * @param ray The ray to use to pick meshes
-   * @param predicate Predicate function used to determine eligible sprites. Can
-   * be set to null. In this case, a sprite must have isPickable set to true
+   * @param predicate Predicate function used to determine eligible meshes. Can
+   * be set to null. In this case, a mesh must have isPickable set to true
    * @param fastCheck Launch a fast check only using the bounding boxes. Can be
    * set to null
    * @returns a PickingInfo
@@ -1612,13 +1614,13 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMesh* a, const SubMesh* b)>&
       opaqueSortCompareFn
     = nullptr,
-    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMesh* a, const SubMesh* b)>&
       alphaTestSortCompareFn
     = nullptr,
-    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMesh* a, const SubMesh* b)>&
       transparentSortCompareFn
     = nullptr);
 
@@ -1672,7 +1674,8 @@ protected:
    * @brief Creates a new Scene.
    * @param engine defines the engine to use to render this scene
    */
-  explicit Scene(Engine* engine);
+  explicit Scene(Engine* engine,
+                 const std::optional<SceneOptions>& options = std::nullopt);
 
 private:
   /**
@@ -1694,9 +1697,9 @@ private:
   bool _checkPrePointerObservable(const std::optional<PickingInfo>& pickResult,
                                   const PointerEvent& evt,
                                   PointerEventTypes type);
-  Scene& _processPointerDown(const std::optional<PickingInfo>& pickResult,
+  Scene& _processPointerDown(std::optional<PickingInfo>& pickResult,
                              const PointerEvent& evt);
-  Scene& _processPointerUp(const std::optional<PickingInfo>& pickResult,
+  Scene& _processPointerUp(std::optional<PickingInfo>& pickResult,
                            const PointerEvent& evt, const ClickInfo& clickInfo);
   void _animate();
   AnimationValue _processLateAnimationBindingsForMatrices(
@@ -1706,14 +1709,13 @@ private:
     float holderTotalWeight, std::vector<RuntimeAnimation*>& holderAnimations,
     Quaternion& holderOriginalValue, Quaternion& refQuaternion);
   void _processLateAnimationBindings();
-  void _evaluateSubMesh(const SubMeshPtr& subMesh, AbstractMesh* mesh);
+  void _evaluateSubMesh(SubMesh* subMesh, AbstractMesh* mesh);
   void _evaluateActiveMeshes();
-  void _activeMesh(const AbstractMeshPtr& sourceMesh, AbstractMesh* mesh);
+  void _activeMesh(AbstractMesh* sourceMesh, AbstractMesh* mesh);
   void _renderForCamera(const CameraPtr& camera,
                         const CameraPtr& rigParent = nullptr);
   void _processSubCameras(const CameraPtr& camera);
   void _checkIntersections();
-  void _updateAudioParameters();
   /** Pointers handling **/
   void _onPointerMoveEvent(PointerEvent&& evt);
   void _onPointerDownEvent(PointerEvent&& evt);
@@ -2109,6 +2111,18 @@ protected:
    * @brief Gets if the scene is already disposed.
    */
   bool get_isDisposed() const;
+
+  /**
+   * @brief Gets a boolean blocking all the calls to markAllMaterialsAsDirty
+   * (ie. the materials won't be updated if they are out of sync)
+   */
+  bool get_blockMaterialDirtyMechanism() const;
+
+  /**
+   * @brief Sets a boolean blocking all the calls to markAllMaterialsAsDirty
+   * (ie. the materials won't be updated if they are out of sync)
+   */
+  void set_blockMaterialDirtyMechanism(bool value);
 
 public:
   // Members
@@ -2621,32 +2635,42 @@ public:
   Property<Scene, bool> fogEnabled;
 
   /**
-   * Gets the fog mode to use.
+   * Gets or sets the fog mode to use
    * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * | mode | value |
+   * | --- | --- |
+   * | FOGMODE_NONE | 0 |
+   * | FOGMODE_EXP | 1 |
+   * | FOGMODE_EXP2 | 2 |
+   * | FOGMODE_LINEAR | 3 |
    */
   Property<Scene, unsigned int> fogMode;
 
   /**
    * Gets or sets the fog color to use
    * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * (Default is Color3(0.2, 0.2, 0.3))
    */
   Color3 fogColor;
 
   /**
    * Gets or sets the fog density to use
    * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * (Default is 0.1)
    */
   float fogDensity;
 
   /**
    * Gets or sets the fog start distance to use
    * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * (Default is 0)
    */
   float fogStart;
 
   /**
    * Gets or sets the fog end distance to use
    * @see http://doc.babylonjs.com/babylon101/environment#fog
+   * (Default is 1000)
    */
   float fogEnd;
 
@@ -3180,9 +3204,11 @@ public:
    */
   Stage<SimpleStageAction> _rebuildGeometryStage;
 
-  /** Gets or sets a boolean blocking all the calls to markAllMaterialsAsDirty
-   * (ie. the materials won't be updated if they are out of sync) */
-  bool blockMaterialDirtyMechanism;
+  /**
+   * Gets or sets a boolean blocking all the calls to markAllMaterialsAsDirty
+   * (ie. the materials won't be updated if they are out of sync)
+   */
+  Property<Scene, bool> blockMaterialDirtyMechanism;
 
   /**
    * Lambda returning the list of potentially active meshes.
@@ -3318,7 +3344,7 @@ private:
   // Collisions
   bool _workerCollisions;
   // Actions
-  std::vector<AbstractMeshPtr> _meshesForIntersections;
+  std::vector<AbstractMesh*> _meshesForIntersections;
   // Sound Tracks
   bool _hasAudioEngine;
   SoundTrackPtr _mainSoundTrack;
@@ -3331,6 +3357,7 @@ private:
   high_res_time_point_t _animationTimeLast;
   int _animationTime;
   int _renderId;
+  int _frameId;
   int _executeWhenReadyTimeoutId;
   bool _intermediateRendering;
   int _viewUpdateFlag;
@@ -3340,7 +3367,7 @@ private:
   std::vector<IFileRequest> _activeRequests;
   std::vector<std::string> _pendingData;
   bool _isDisposed;
-  std::vector<AbstractMeshPtr> _activeMeshes;
+  std::vector<AbstractMesh*> _activeMeshes;
   IActiveMeshCandidateProvider* _activeMeshCandidateProvider;
   bool _activeMeshesFrozen;
   std::vector<MaterialPtr> _processedMaterials;
@@ -3352,6 +3379,12 @@ private:
   std::unique_ptr<UniformBuffer> _sceneUbo;
   std::unique_ptr<UniformBuffer> _alternateSceneUbo;
   std::unique_ptr<Matrix> _pickWithRayInverseMatrix;
+
+  /**
+   * An optional map from Geometry Id to Geometry index in the 'geometries'
+   * array
+   */
+  std::unordered_map<std::string, size_t> geometriesById;
 
   /** Hidden (Backing field) */
   SimplificationQueuePtr _simplificationQueue;
@@ -3386,6 +3419,7 @@ private:
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;
   std::string _uid;
+  bool _blockMaterialDirtyMechanism;
 
   /**
    * List of components to register on the next registration step

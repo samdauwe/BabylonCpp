@@ -89,7 +89,7 @@ private:
   void set_samples(unsigned int value);
   int get_refreshRate() const;
   void set_refreshRate(int value);
-  std::vector<AbstractMeshPtr>& get_renderList();
+  std::vector<AbstractMesh*>& get_renderList();
 
 public:
   /**
@@ -116,7 +116,7 @@ public:
   /**
    * Gets the list of meshes to render
    */
-  ReadOnlyProperty<ReflectionProbe, std::vector<AbstractMeshPtr>> renderList;
+  ReadOnlyProperty<ReflectionProbe, std::vector<AbstractMesh*>> renderList;
 
 private:
   Scene* _scene;

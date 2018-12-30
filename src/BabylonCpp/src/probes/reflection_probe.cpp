@@ -120,7 +120,7 @@ RenderTargetTexturePtr& ReflectionProbe::cubeTexture()
   return _renderTargetTexture;
 }
 
-std::vector<AbstractMeshPtr>& ReflectionProbe::get_renderList()
+std::vector<AbstractMesh*>& ReflectionProbe::get_renderList()
 {
   return _renderTargetTexture->renderList;
 }

@@ -131,14 +131,14 @@ Vector3& Camera::get_globalPosition()
   return _globalPosition;
 }
 
-std::vector<AbstractMeshPtr>& Camera::getActiveMeshes()
+std::vector<AbstractMesh*>& Camera::getActiveMeshes()
 {
   return _activeMeshes;
 }
 
 bool Camera::isActiveMesh(const AbstractMeshPtr& mesh)
 {
-  return std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh)
+  return std::find(_activeMeshes.begin(), _activeMeshes.end(), mesh.get())
          != _activeMeshes.end();
 }
 

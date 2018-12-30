@@ -40,7 +40,7 @@ public:
   // Methods
   void addToRenderList(const AbstractMeshPtr& node);
   void enableRenderTargets(bool enable);
-  std::vector<AbstractMeshPtr>& getRenderList();
+  std::vector<AbstractMesh*>& getRenderList();
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;
   BaseTexturePtr getAlphaTestTexture() override;

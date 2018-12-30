@@ -59,7 +59,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
   });
 
   // Custom render function
-  auto renderSubMesh = [this](const SubMeshPtr& subMesh) {
+  auto renderSubMesh = [this](SubMesh* subMesh) {
     auto mesh     = subMesh->getRenderingMesh();
     auto scene    = _scene;
     auto engine   = scene->getEngine();
@@ -86,9 +86,9 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
             != batch->visibleInstances.end());
 
     auto camera = (!_camera) ? _camera : scene->activeCamera;
-    if (isReady(subMesh.get(), hardwareInstancedRendering) && camera) {
+    if (isReady(subMesh, hardwareInstancedRendering) && camera) {
       engine->enableEffect(_effect);
-      mesh->_bind(subMesh.get(), _effect, Material::TriangleFillMode());
+      mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
@@ -113,9 +113,8 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
       }
 
       // Draw
-      mesh->_processRendering(subMesh.get(), _effect,
-                              Material::TriangleFillMode(), batch,
-                              hardwareInstancedRendering,
+      mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
+                              batch, hardwareInstancedRendering,
                               [this](bool /*isInstance*/, Matrix world,
                                      Material* /*effectiveMaterial*/) {
                                 _effect->setMatrix("world", world);
@@ -125,10 +124,10 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
 
   _depthMap->customRenderFunction
     = [engine,
-       renderSubMesh](const std::vector<SubMeshPtr>& opaqueSubMeshes,
-                      const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-                      const std::vector<SubMeshPtr>& /*transparentSubMeshes*/,
-                      const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+       renderSubMesh](const std::vector<SubMesh*>& opaqueSubMeshes,
+                      const std::vector<SubMesh*>& alphaTestSubMeshes,
+                      const std::vector<SubMesh*>& /*transparentSubMeshes*/,
+                      const std::vector<SubMesh*>& depthOnlySubMeshes,
                       const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);

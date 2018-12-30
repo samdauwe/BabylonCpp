@@ -116,13 +116,13 @@ void RenderTargetTexture::_onRatioRescale()
   }
 }
 
-std::vector<AbstractMeshPtr>& RenderTargetTexture::get_renderList()
+std::vector<AbstractMesh*>& RenderTargetTexture::get_renderList()
 {
   return _renderList;
 }
 
 void RenderTargetTexture::set_renderList(
-  const std::vector<AbstractMeshPtr>& value)
+  const std::vector<AbstractMesh*>& value)
 {
   _renderList = value;
 }
@@ -392,7 +392,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
     for (auto& id : _waitingRenderList) {
       auto mesh = scene->getMeshByID(id);
       if (mesh) {
-        renderList().emplace_back(mesh);
+        renderList().emplace_back(mesh.get());
       }
     }
 
@@ -412,7 +412,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
     for (auto& mesh : sceneMeshes) {
       if (renderListPredicate(mesh.get())) {
-        renderList().emplace_back(mesh);
+        renderList().emplace_back(mesh.get());
       }
     }
   }
@@ -447,8 +447,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   if (renderList().empty()) {
     auto& activeMeshes = scene->getActiveMeshes();
     for (auto& mesh : activeMeshes) {
-      currentRenderList().emplace_back(
-        std::static_pointer_cast<AbstractMesh>(mesh));
+      currentRenderList().emplace_back(static_cast<AbstractMesh*>(mesh));
     }
   }
   auto currentRenderListLength = currentRenderList().size();
@@ -475,7 +474,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
         mesh->_activate(scene->getRenderId());
         for (auto& subMesh : mesh->subMeshes) {
           scene->_activeIndices.addCount(subMesh->indexCount, false);
-          _renderingManager->dispatch(subMesh, mesh.get());
+          _renderingManager->dispatch(subMesh.get(), mesh);
         }
       }
     }
@@ -488,8 +487,9 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
                   ->isEnabled())) {
       continue;
     }
-    if (stl_util::index_of(currentRenderList(),
-                           std::get<AbstractMeshPtr>(particleSystem->emitter))
+    if (stl_util::index_of(
+          currentRenderList(),
+          std::get<AbstractMeshPtr>(particleSystem->emitter).get())
         >= 0) {
       _renderingManager->dispatchParticles(particleSystem.get());
     }
@@ -546,10 +546,9 @@ void RenderTargetTexture::unbindFrameBuffer(Engine* engine,
 }
 
 void RenderTargetTexture::renderToTarget(
-  unsigned int faceIndex, const std::vector<AbstractMeshPtr>& currentRenderList,
+  unsigned int faceIndex, const std::vector<AbstractMesh*>& currentRenderList,
   size_t /*currentRenderListLength*/, bool useCameraPostProcess,
   bool dumpForDebug)
-
 {
   auto scene = getScene();
   if (!scene) {
@@ -635,11 +634,11 @@ void RenderTargetTexture::renderToTarget(
 
 void RenderTargetTexture::setRenderingOrder(
   unsigned int renderingGroupId,
-  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMesh* a, const SubMesh* b)>&
     opaqueSortCompareFn,
-  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMesh* a, const SubMesh* b)>&
     alphaTestSortCompareFn,
-  const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+  const std::function<int(const SubMesh* a, const SubMesh* b)>&
     transparentSortCompareFn)
 {
   _renderingManager->setRenderingOrder(renderingGroupId, opaqueSortCompareFn,

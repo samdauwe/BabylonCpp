@@ -86,7 +86,7 @@ void LookAtScene::initializeScene(ICanvas* canvas, Scene* scene)
   _sphere->material = _sphereMat;
 
   auto probe = ReflectionProbe::New("probe", 512, scene);
-  probe->renderList().emplace_back(_sphere);
+  probe->renderList().emplace_back(_sphere.get());
 
   _cubesMat           = StandardMaterial::New("m", scene);
   _cubes[0]->material = _cubesMat;

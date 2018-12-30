@@ -150,7 +150,7 @@ MirrorTexturePtr& EnvironmentHelper::groundMirror()
   return _groundMirror;
 }
 
-std::vector<AbstractMeshPtr>& EnvironmentHelper::groundMirrorRenderList()
+std::vector<AbstractMesh*>& EnvironmentHelper::groundMirrorRenderList()
 {
   if (_groundMirror) {
     return _groundMirror->renderList;
@@ -375,7 +375,7 @@ void EnvironmentHelper::_setupGroundMirrorTexture(ISceneSize* sceneSize)
     if (!_groundMirror->renderList().empty()) {
       for (const auto& mesh : _scene->meshes) {
         if (mesh != _ground && mesh != _skybox && mesh != _rootMesh) {
-          _groundMirror->renderList().emplace_back(mesh);
+          _groundMirror->renderList().emplace_back(mesh.get());
         }
       }
     }

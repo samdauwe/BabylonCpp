@@ -144,12 +144,12 @@ public:
    */
   IShadowLight* setShadowProjectionMatrix(
     Matrix& matrix, Matrix& viewMatrix,
-    const std::vector<AbstractMeshPtr>& renderList) override;
+    const std::vector<AbstractMesh*>& renderList) override;
 
 protected:
   virtual void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMeshPtr>& renderList)
+    const std::vector<AbstractMesh*>& renderList)
     = 0;
 
   /**
@@ -210,7 +210,7 @@ public:
    * This can be used to override the default projection matrix computation.
    */
   std::function<void(const Matrix& viewMatrix,
-                     const std::vector<AbstractMeshPtr>& renderList,
+                     const std::vector<AbstractMesh*>& renderList,
                      Matrix& result)>
     customProjectionMatrixBuilder;
 

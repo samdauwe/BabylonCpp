@@ -97,7 +97,7 @@ public:
    * @brief Gets the ground mirror render list to helps pushing the meshes
    * you wish in the ground reflection.
    */
-  std::vector<AbstractMeshPtr>& groundMirrorRenderList();
+  std::vector<AbstractMesh*>& groundMirrorRenderList();
 
   /**
    * @brief Gets the ground material created by the helper.
@@ -176,7 +176,7 @@ private:
    */
   void _setupSkyboxReflectionTexture();
 
-  void _errorHandler(const std::string& message        = "",
+  void _errorHandler(const std::string& message      = "",
                      const std::exception& exception = std::exception());
 
 public:
@@ -214,7 +214,7 @@ private:
   BaseTexture* _groundTexture;
   MirrorTexturePtr _groundMirror;
   BackgroundMaterialPtr _groundMaterial;
-  std::vector<AbstractMeshPtr> _emptyGroundMirrorRenderList;
+  std::vector<AbstractMesh*> _emptyGroundMirrorRenderList;
 
   /**
    * Stores the creation options.

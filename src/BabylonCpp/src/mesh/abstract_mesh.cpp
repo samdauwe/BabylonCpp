@@ -1498,7 +1498,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
       if (shadowMap && !shadowMap->renderList().empty()) {
         std::remove_if(
           shadowMap->renderList().begin(), shadowMap->renderList().end(),
-          [this](const AbstractMeshPtr& mesh) { return mesh.get() == this; });
+          [this](const AbstractMesh* mesh) { return mesh == this; });
       }
     }
   }

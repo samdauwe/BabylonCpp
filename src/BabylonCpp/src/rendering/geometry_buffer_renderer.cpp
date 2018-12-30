@@ -58,7 +58,7 @@ void GeometryBufferRenderer::set_renderList(const std::vector<MeshPtr>& meshes)
   _multiRenderTarget->renderList().clear();
   _multiRenderTarget->renderList().reserve(meshes.size());
   for (auto& mesh : meshes) {
-    _multiRenderTarget->renderList().emplace_back(mesh);
+    _multiRenderTarget->renderList().emplace_back(mesh.get());
   }
 }
 
@@ -100,7 +100,7 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   std::vector<std::string> defines;
 
   std::vector<std::string> attribs{VertexBuffer::PositionKindChars,
-                             VertexBuffer::NormalKindChars};
+                                   VertexBuffer::NormalKindChars};
 
   auto mesh = subMesh->getMesh();
 
@@ -132,9 +132,9 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back(
-      "#define BonesPerMesh "
-      + std::to_string(mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 :
+    defines.emplace_back("#define BonesPerMesh "
+                         + std::to_string(mesh->skeleton() ?
+                                            mesh->skeleton()->bones.size() + 1 :
                                             0));
   }
   else {
@@ -225,10 +225,10 @@ void GeometryBufferRenderer::_createRenderTargets()
 
   // Custom render function
   _multiRenderTarget->customRenderFunction
-    = [this, engine](const std::vector<SubMeshPtr>& opaqueSubMeshes,
-                     const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-                     const std::vector<SubMeshPtr>& /*transparentSubMeshes*/,
-                     const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+    = [this, engine](const std::vector<SubMesh*>& opaqueSubMeshes,
+                     const std::vector<SubMesh*>& alphaTestSubMeshes,
+                     const std::vector<SubMesh*>& /*transparentSubMeshes*/,
+                     const std::vector<SubMesh*>& depthOnlySubMeshes,
                      const std::function<void()>& /*beforeTransparents*/) {
         if (!depthOnlySubMeshes.empty()) {
           engine->setColorWrite(false);
@@ -248,7 +248,7 @@ void GeometryBufferRenderer::_createRenderTargets()
       };
 }
 
-void GeometryBufferRenderer::renderSubMesh(const SubMeshPtr& subMesh)
+void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 {
   auto mesh     = subMesh->getRenderingMesh();
   auto scene    = _scene;
@@ -275,9 +275,9 @@ void GeometryBufferRenderer::renderSubMesh(const SubMeshPtr& subMesh)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty());
 
-  if (isReady(subMesh.get(), hardwareInstancedRendering)) {
+  if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
-    mesh->_bind(subMesh.get(), _effect, Material::TriangleFillMode());
+    mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
     _effect->setMatrix("viewProjection", scene->getTransformMatrix());
     _effect->setMatrix("view", scene->getViewMatrix());
@@ -299,9 +299,8 @@ void GeometryBufferRenderer::renderSubMesh(const SubMeshPtr& subMesh)
     }
 
     // Draw
-    mesh->_processRendering(subMesh.get(), _effect,
-                            Material::TriangleFillMode(), batch,
-                            hardwareInstancedRendering,
+    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
+                            batch, hardwareInstancedRendering,
                             [this](bool /*isInstance*/, Matrix world,
                                    Material* /*effectiveMaterial*/) {
                               _effect->setMatrix("world", world);

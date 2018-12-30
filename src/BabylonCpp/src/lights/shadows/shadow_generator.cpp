@@ -524,10 +524,11 @@ ShadowGenerator& ShadowGenerator::addShadowCaster(const AbstractMeshPtr& mesh,
     return *this;
   }
 
-  _shadowMap->renderList().emplace_back(mesh);
+  _shadowMap->renderList().emplace_back(mesh.get());
 
   if (includeDescendants) {
-    stl_util::concat(_shadowMap->renderList(), mesh->getChildMeshes(false));
+    stl_util::concat(_shadowMap->renderList(),
+                     stl_util::to_raw_ptr_vector(mesh->getChildMeshes(false)));
   }
 
   return *this;
@@ -543,7 +544,7 @@ ShadowGenerator::removeShadowCaster(const AbstractMeshPtr& mesh,
 
   _shadowMap->renderList().erase(std::remove(_shadowMap->renderList().begin(),
                                              _shadowMap->renderList().end(),
-                                             mesh),
+                                             mesh.get()),
                                  _shadowMap->renderList().end());
 
   if (includeDescendants) {
@@ -601,10 +602,10 @@ void ShadowGenerator::_initializeShadowMap()
 
   // Custom render function.
   _shadowMap->customRenderFunction
-    = [this](const std::vector<SubMeshPtr>& opaqueSubMeshes,
-             const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-             const std::vector<SubMeshPtr>& transparentSubMeshes,
-             const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
+             const std::vector<SubMesh*>& alphaTestSubMeshes,
+             const std::vector<SubMesh*>& transparentSubMeshes,
+             const std::vector<SubMesh*>& depthOnlySubMeshes,
              const std::function<void()>& /*beforeTransparents*/) {
         _renderForShadowMap(opaqueSubMeshes, transparentSubMeshes,
                             alphaTestSubMeshes, depthOnlySubMeshes);
@@ -709,10 +710,10 @@ void ShadowGenerator::_initializeBlurRTTAndPostProcesses()
 }
 
 void ShadowGenerator::_renderForShadowMap(
-  const std::vector<SubMeshPtr>& opaqueSubMeshes,
-  const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-  const std::vector<SubMeshPtr>& transparentSubMeshes,
-  const std::vector<SubMeshPtr>& depthOnlySubMeshes)
+  const std::vector<SubMesh*>& opaqueSubMeshes,
+  const std::vector<SubMesh*>& alphaTestSubMeshes,
+  const std::vector<SubMesh*>& transparentSubMeshes,
+  const std::vector<SubMesh*>& depthOnlySubMeshes)
 {
   auto engine = _scene->getEngine();
 
@@ -739,7 +740,7 @@ void ShadowGenerator::_renderForShadowMap(
   }
 }
 
-void ShadowGenerator::_renderSubMeshForShadowMap(const SubMeshPtr& subMesh)
+void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
 {
   auto mesh     = subMesh->getRenderingMesh();
   auto scene    = _scene;
@@ -763,9 +764,9 @@ void ShadowGenerator::_renderSubMeshForShadowMap(const SubMeshPtr& subMesh)
     = (engine->getCaps().instancedArrays)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty());
-  if (isReady(subMesh.get(), hardwareInstancedRendering)) {
+  if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
-    mesh->_bind(subMesh.get(), _effect, Material::TriangleFillMode());
+    mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
     _effect->setFloat3("biasAndScale", bias(), normalBias(), depthScale());
 
@@ -810,9 +811,8 @@ void ShadowGenerator::_renderSubMeshForShadowMap(const SubMeshPtr& subMesh)
     }
 
     // Draw
-    mesh->_processRendering(subMesh.get(), _effect,
-                            Material::TriangleFillMode(), batch,
-                            hardwareInstancedRendering,
+    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
+                            batch, hardwareInstancedRendering,
                             [&](bool /*isInstance*/, const Matrix& world,
                                 Material* /*effectiveMaterial*/) {
                               _effect->setMatrix("world", world);
@@ -1177,10 +1177,10 @@ Matrix ShadowGenerator::getTransformMatrix()
     auto shadowMap = getShadowMap();
 
     if (shadowMap) {
-      auto& renderList = shadowMap->renderList;
-      if (!renderList().empty()) {
+      auto& renderList = shadowMap->renderList();
+      if (!renderList.empty()) {
         _light->setShadowProjectionMatrix(_projectionMatrix, _viewMatrix,
-                                          renderList());
+                                          renderList);
       }
     }
 

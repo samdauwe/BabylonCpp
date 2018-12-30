@@ -143,7 +143,7 @@ public:
    * excluded by lod s in the frame).
    * @returns the active meshe list
    */
-  std::vector<AbstractMeshPtr>& getActiveMeshes();
+  std::vector<AbstractMesh*>& getActiveMeshes();
 
   /**
    * @brief Check wether a mesh is part of the current active mesh list of the
@@ -682,7 +682,7 @@ public:
   Uint32Array _postProcessesTakenIndices;
 
   /** Hidden */
-  std::vector<AbstractMeshPtr> _activeMeshes;
+  std::vector<AbstractMesh*> _activeMeshes;
 
   /** Hidden */
   ReadOnlyProperty<Camera, Vector3> globalPosition;

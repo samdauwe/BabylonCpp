@@ -46,7 +46,7 @@ void BlurModeForMirrorsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto mirrorMaterial    = StandardMaterial::New("mirror", scene);
   auto reflectionTexture = MirrorTexture::New("mirror", 512, scene, true);
   reflectionTexture->mirrorPlane    = Plane(0.f, -1.f, 0.f, -2.f);
-  reflectionTexture->renderList     = {knot};
+  reflectionTexture->renderList     = {knot.get()};
   reflectionTexture->level          = 1.f;
   reflectionTexture->samples        = 8;
   reflectionTexture->blurKernel     = 32.f;

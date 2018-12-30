@@ -176,13 +176,13 @@ public:
    */
   void setRenderingOrder(
     unsigned int renderingGroupId,
-    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMesh* a, const SubMesh* b)>&
       opaqueSortCompareFn
     = nullptr,
-    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMesh* a, const SubMesh* b)>&
       alphaTestSortCompareFn
     = nullptr,
-    const std::function<int(const SubMeshPtr& a, const SubMeshPtr& b)>&
+    const std::function<int(const SubMesh* a, const SubMesh* b)>&
       transparentSortCompareFn
     = nullptr);
 
@@ -267,8 +267,8 @@ protected:
   /**
    * @brief Use this list to define the list of mesh you want to render.
    */
-  std::vector<AbstractMeshPtr>& get_renderList();
-  void set_renderList(const std::vector<AbstractMeshPtr>& value);
+  std::vector<AbstractMesh*>& get_renderList();
+  void set_renderList(const std::vector<AbstractMesh*>& value);
 
   /**
    * @brief Gets or sets the size of the bounding box associated with the
@@ -305,7 +305,7 @@ private:
   int _bestReflectionRenderTargetDimension(int renderDimension,
                                            float scale) const;
   void renderToTarget(unsigned int faceIndex,
-                      const std::vector<AbstractMeshPtr>& currentRenderList,
+                      const std::vector<AbstractMesh*>& currentRenderList,
                       size_t currentRenderListLength, bool useCameraPostProcess,
                       bool dumpForDebug);
 
@@ -320,7 +320,7 @@ public:
   /**
    * Use this list to define the list of mesh you want to render
    */
-  Property<RenderTargetTexture, std::vector<AbstractMeshPtr>> renderList;
+  Property<RenderTargetTexture, std::vector<AbstractMesh*>> renderList;
 
   /**
    * Define if particles should be rendered in your texture.
@@ -340,10 +340,10 @@ public:
   /**
    * Override the render function of the texture with your own one.
    */
-  std::function<void(const std::vector<SubMeshPtr>& opaqueSubMeshes,
-                     const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-                     const std::vector<SubMeshPtr>& transparentSubMeshes,
-                     const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+  std::function<void(const std::vector<SubMesh*>& opaqueSubMeshes,
+                     const std::vector<SubMesh*>& alphaTestSubMeshes,
+                     const std::vector<SubMesh*>& transparentSubMeshes,
+                     const std::vector<SubMesh*>& depthOnlySubMeshes,
                      const std::function<void()>& beforeTransparents)>
     customRenderFunction;
 
@@ -471,7 +471,7 @@ protected:
   Engine* _engine;
 
 private:
-  std::vector<AbstractMeshPtr> _renderList;
+  std::vector<AbstractMesh*> _renderList;
   std::unique_ptr<PostProcessManager> _postProcessManager;
   std::vector<PostProcessPtr> _postProcesses;
   Observer<Engine>::Ptr _resizeObserver;

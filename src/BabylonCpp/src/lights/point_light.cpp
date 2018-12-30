@@ -109,7 +109,7 @@ Vector3 PointLight::getShadowDirection(unsigned int faceIndex)
 
 void PointLight::_setDefaultShadowProjectionMatrix(
   Matrix& matrix, const Matrix& /*viewMatrix*/,
-  const std::vector<AbstractMeshPtr>& /*renderList*/)
+  const std::vector<AbstractMesh*>& /*renderList*/)
 {
   auto activeCamera = getScene()->activeCamera;
 

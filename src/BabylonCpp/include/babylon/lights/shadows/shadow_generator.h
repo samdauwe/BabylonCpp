@@ -577,11 +577,11 @@ private:
   void _initializeGenerator();
   void _initializeShadowMap();
   void _initializeBlurRTTAndPostProcesses();
-  void _renderForShadowMap(const std::vector<SubMeshPtr>& opaqueSubMeshes,
-                           const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-                           const std::vector<SubMeshPtr>& transparentSubMeshes,
-                           const std::vector<SubMeshPtr>& depthOnlySubMeshes);
-  void _renderSubMeshForShadowMap(const SubMeshPtr& subMesh);
+  void _renderForShadowMap(const std::vector<SubMesh*>& opaqueSubMeshes,
+                           const std::vector<SubMesh*>& alphaTestSubMeshes,
+                           const std::vector<SubMesh*>& transparentSubMeshes,
+                           const std::vector<SubMesh*>& depthOnlySubMeshes);
+  void _renderSubMeshForShadowMap(SubMesh* subMesh);
   void _applyFilterValues();
   void _disposeBlurPostProcesses();
   void _disposeRTTandPostProcesses();

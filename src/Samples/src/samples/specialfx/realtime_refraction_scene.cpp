@@ -71,9 +71,9 @@ void RealtimeRefractionScene::initializeScene(ICanvas* canvas, Scene* scene)
   knot->material    = mainMaterial;
 
   auto probe = ReflectionProbe::New("main", 512, scene);
-  probe->renderList().emplace_back(_yellowSphere);
-  probe->renderList().emplace_back(_greenSphere);
-  probe->renderList().emplace_back(ground);
+  probe->renderList().emplace_back(_yellowSphere.get());
+  probe->renderList().emplace_back(_greenSphere.get());
+  probe->renderList().emplace_back(ground.get());
   mainMaterial->diffuseColor                         = Color3(1.f, 0.5f, 0.5f);
   mainMaterial->reflectionTexture                    = probe->cubeTexture();
   mainMaterial->reflectionFresnelParameters()->bias  = 0.5f;

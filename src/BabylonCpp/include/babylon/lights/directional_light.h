@@ -107,7 +107,7 @@ protected:
    */
   void _setDefaultShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMeshPtr>& renderList) override;
+    const std::vector<AbstractMesh*>& renderList) override;
 
   /**
    * @brief Sets the passed matrix "matrix" as fixed frustum projection matrix
@@ -124,7 +124,7 @@ protected:
    */
   void _setDefaultAutoExtendShadowProjectionMatrix(
     Matrix& matrix, const Matrix& viewMatrix,
-    const std::vector<AbstractMeshPtr>& renderList);
+    const std::vector<AbstractMesh*>& renderList);
 
   void _buildUniformLayout() override;
 

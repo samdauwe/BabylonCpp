@@ -64,7 +64,7 @@ void RealtimeReflectionScene::initializeScene(ICanvas* canvas, Scene* scene)
       auto probe
         = ReflectionProbe::New("satelliteProbe" + root->name, 512, scene);
       for (const auto& other : others) {
-        probe->renderList().emplace_back(other);
+        probe->renderList().emplace_back(other.get());
       }
 
       material->reflectionTexture                   = probe->cubeTexture();
@@ -85,7 +85,7 @@ void RealtimeReflectionScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto reflectionTexture = MirrorTexture::New("mirror", 1024, scene, true);
   reflectionTexture->mirrorPlane = Plane(0.f, -1.f, 0.f, -2.f);
   reflectionTexture->renderList
-    = {_greenSphere, _yellowSphere, _blueSphere, knot};
+    = {_greenSphere.get(), _yellowSphere.get(), _blueSphere.get(), knot.get()};
   reflectionTexture->level          = 0.5f;
   mirrorMaterial->reflectionTexture = reflectionTexture;
   mirror->position                  = Vector3(0.f, -2.f, 0.f);
@@ -96,10 +96,10 @@ void RealtimeReflectionScene::initializeScene(ICanvas* canvas, Scene* scene)
   knot->material    = mainMaterial;
 
   auto probe = ReflectionProbe::New("main", 512, scene);
-  probe->renderList().emplace_back(_yellowSphere);
-  probe->renderList().emplace_back(_greenSphere);
-  probe->renderList().emplace_back(_blueSphere);
-  probe->renderList().emplace_back(mirror);
+  probe->renderList().emplace_back(_yellowSphere.get());
+  probe->renderList().emplace_back(_greenSphere.get());
+  probe->renderList().emplace_back(_blueSphere.get());
+  probe->renderList().emplace_back(mirror.get());
   mainMaterial->diffuseColor                        = Color3(1.f, 0.5f, 0.5f);
   mainMaterial->reflectionTexture                   = probe->cubeTexture();
   mainMaterial->reflectionFresnelParameters()->bias = 0.02f;

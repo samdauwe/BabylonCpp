@@ -151,10 +151,10 @@ void EffectLayer::_createMainTexture()
 
   // Custom render function
   _mainTexture->customRenderFunction
-    = [this](const std::vector<SubMeshPtr>& opaqueSubMeshes,
-             const std::vector<SubMeshPtr>& alphaTestSubMeshes,
-             const std::vector<SubMeshPtr>& transparentSubMeshes,
-             const std::vector<SubMeshPtr>& depthOnlySubMeshes,
+    = [this](const std::vector<SubMesh*>& opaqueSubMeshes,
+             const std::vector<SubMesh*>& alphaTestSubMeshes,
+             const std::vector<SubMesh*>& transparentSubMeshes,
+             const std::vector<SubMesh*>& depthOnlySubMeshes,
              const std::function<void()>& /*beforeTransparents*/) {
         onBeforeRenderMainTextureObservable.notifyObservers(this);
 
@@ -393,7 +393,7 @@ bool EffectLayer::_shouldRenderEmissiveTextureForMesh(Mesh* /*mesh*/) const
   return true;
 }
 
-void EffectLayer::_renderSubMesh(const SubMeshPtr& subMesh)
+void EffectLayer::_renderSubMesh(SubMesh* subMesh)
 {
   if (!shouldRender()) {
     return;
@@ -432,12 +432,12 @@ void EffectLayer::_renderSubMesh(const SubMeshPtr& subMesh)
       && (stl_util::contains(batch->visibleInstances, subMesh->_id))
       && (!batch->visibleInstances[subMesh->_id].empty());
 
-  _setEmissiveTextureAndColor(mesh, subMesh.get(), material);
+  _setEmissiveTextureAndColor(mesh, subMesh, material);
 
-  if (_isReady(subMesh.get(), hardwareInstancedRendering,
+  if (_isReady(subMesh, hardwareInstancedRendering,
                _emissiveTextureAndColor.texture)) {
     engine->enableEffect(_effectLayerMapGenerationEffect);
-    mesh->_bind(subMesh.get(), _effectLayerMapGenerationEffect,
+    mesh->_bind(subMesh, _effectLayerMapGenerationEffect,
                 Material::TriangleFillMode());
 
     _effectLayerMapGenerationEffect->setMatrix("viewProjection",
@@ -488,8 +488,8 @@ void EffectLayer::_renderSubMesh(const SubMeshPtr& subMesh)
 
     // Draw
     mesh->_processRendering(
-      subMesh.get(), _effectLayerMapGenerationEffect,
-      Material::TriangleFillMode(), batch, hardwareInstancedRendering,
+      subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode(),
+      batch, hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world,
           Material* /*effectiveMaterial*/) {
         _effectLayerMapGenerationEffect->setMatrix("world", world);

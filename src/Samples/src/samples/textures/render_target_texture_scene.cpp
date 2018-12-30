@@ -56,10 +56,10 @@ void RenderTargetTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create the render target texture
   auto renderTexture = RenderTargetTexture::New("render", 512, scene);
-  renderTexture->renderList().emplace_back(sphere);
+  renderTexture->renderList().emplace_back(sphere.get());
   groundMaterial->diffuseTexture = renderTexture;
 
-  scene->customRenderTargets.emplace_back(renderTexture);
+  scene->customRenderTargets.emplace_back(renderTexture.get());
 }
 
 } // end of namespace Samples
