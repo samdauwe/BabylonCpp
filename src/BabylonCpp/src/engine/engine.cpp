@@ -1,4 +1,4 @@
-#include <babylon/engine/engine.h>
+﻿#include <babylon/engine/engine.h>
 
 #include <future>
 
@@ -89,6 +89,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     , _gl{nullptr}
     , disablePerformanceMonitorInBackground{false}
     , premultipliedAlpha{options.premultipliedAlpha}
+    , enableUnpackFlipYCached{true}
     , _depthCullingState{std::make_unique<_DepthCullingState>()}
     , _stencilState{std::make_unique<_StencilState>()}
     , _alphaState{std::make_unique<_AlphaState>()}
@@ -408,6 +409,9 @@ void Engine::_initGLContext()
   if (_webGLVersion > 1.f) {
     _caps.drawBuffersExtension = true;
   }
+
+  // Shader compiler threads
+  _caps.parallelShaderCompile = false;
 
   // Depth Texture
   if (_webGLVersion > 1.f) {
@@ -2003,6 +2007,13 @@ Engine::_compileRawShader(const std::string& source, const std::string& type)
 {
   auto shader = _gl->createShader(type == "vertex" ? GL::VERTEX_SHADER :
                                                      GL::FRAGMENT_SHADER);
+
+  if (!shader) {
+    BABYLON_LOG_ERROR("Engine",
+                      "Something went wrong while compile the shader.");
+    return nullptr;
+  }
+
   _gl->shaderSource(shader, source);
   _gl->compileShader(shader);
 
@@ -2012,12 +2023,6 @@ Engine::_compileRawShader(const std::string& source, const std::string& type)
       BABYLON_LOG_ERROR("Engine", log);
       BABYLON_LOG_ERROR("Engine", source);
     }
-    return nullptr;
-  }
-
-  if (!shader) {
-    BABYLON_LOG_ERROR("Engine",
-                      "Something went wrong while compile the shader.");
     return nullptr;
   }
 
@@ -2091,11 +2096,27 @@ std::unique_ptr<GL::IGLProgram> Engine::_createShaderProgram(
     bindTransformFeedback(nullptr);
   }
 
+  if (!_caps.parallelShaderCompile) {
+    _finalizeProgram(shaderProgram, vertexShader, fragmentShader, context,
+                     linked);
+  }
+  else {
+    shaderProgram->isParallelCompiled = true;
+  }
+
+  return shaderProgram;
+}
+
+void Engine::_finalizeProgram(
+  const std::unique_ptr<GL::IGLProgram>& shaderProgram,
+  const std::unique_ptr<GL::IGLShader>& vertexShader,
+  const std::unique_ptr<GL::IGLShader>& fragmentShader,
+  GL::IGLRenderingContext* context, bool linked)
+{
   if (!linked) {
     const auto error = context->getProgramInfoLog(shaderProgram);
     if (!error.empty()) {
       BABYLON_LOG_ERROR("Engine", error);
-      return nullptr;
     }
   }
 
@@ -2107,15 +2128,12 @@ std::unique_ptr<GL::IGLProgram> Engine::_createShaderProgram(
       const auto error = context->getProgramInfoLog(shaderProgram);
       if (!error.empty()) {
         BABYLON_LOG_ERROR("Engine", error);
-        return nullptr;
       }
     }
   }
 
   context->deleteShader(vertexShader);
   context->deleteShader(fragmentShader);
-
-  return shaderProgram;
 }
 
 bool Engine::_isProgramCompiled(GL::IGLProgram* /*shaderProgram*/)
@@ -2573,12 +2591,12 @@ void Engine::wipeCaches(bool bruteForce)
   if (preventCacheWipeBetweenFrames && !bruteForce) {
     return;
   }
-  _currentEffect     = nullptr;
-  _unpackFlipYCached = std::nullopt;
-  _viewportCached.x  = 0;
-  _viewportCached.y  = 0;
-  _viewportCached.z  = 0;
-  _viewportCached.w  = 0;
+  _currentEffect = nullptr;
+
+  _viewportCached.x = 0.f;
+  _viewportCached.y = 0.f;
+  _viewportCached.z = 0.f;
+  _viewportCached.w = 0.f;
 
   if (bruteForce) {
     resetTextureCache();
@@ -2588,6 +2606,8 @@ void Engine::wipeCaches(bool bruteForce)
     _depthCullingState->reset();
     setDepthFunctionToLessOrEqual();
     _alphaState->reset();
+
+    _unpackFlipYCached = std::nullopt;
   }
 
   _resetVertexBufferBinding();
@@ -3128,8 +3148,10 @@ int Engine::_getUnpackAlignement() const
 void Engine::_unpackFlipY(bool value)
 {
   if (!_unpackFlipYCached.has_value() || *_unpackFlipYCached != value) {
-    _unpackFlipYCached = value;
     _gl->pixelStorei(GL::UNPACK_FLIP_Y_WEBGL, value ? 1 : 0);
+    if (enableUnpackFlipYCached) {
+      _unpackFlipYCached = value;
+    }
   }
 }
 
@@ -5592,7 +5614,7 @@ void Engine::_measureFps()
 ArrayBufferView
 Engine::_readTexturePixels(const InternalTexturePtr& texture, int width,
                            int height, int faceIndex, int level,
-                           std::optional<ArrayBufferView> /*buffer*/)
+                           std::optional<ArrayBufferView> buffer)
 {
   if (!_dummyFramebuffer) {
     auto dummy = _gl->createFramebuffer();
@@ -5619,29 +5641,32 @@ Engine::_readTexturePixels(const InternalTexturePtr& texture, int width,
   }
 
   auto readType = _getWebGLTextureType(texture->type);
-  ArrayBufferView buffer;
 
   switch (readType) {
     case GL::UNSIGNED_BYTE: {
-      buffer = ArrayBufferView(
-        Uint8Array(static_cast<std::size_t>(4 * width * height)));
+      if (!buffer.has_value()) {
+        buffer = ArrayBufferView(
+          Uint8Array(static_cast<std::size_t>(4 * width * height)));
+      }
       readType = GL::UNSIGNED_BYTE;
       _gl->readPixels(0, 0, width, height, GL::RGBA, readType,
-                      buffer.uint8Array);
+                      buffer->uint8Array);
       _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer);
 
     } break;
     default: {
-      buffer = ArrayBufferView(
-        Float32Array(static_cast<std::size_t>(4 * width * height)));
+      if (!buffer.has_value()) {
+        buffer = ArrayBufferView(
+          Float32Array(static_cast<std::size_t>(4 * width * height)));
+      }
       readType = GL::FLOAT;
       _gl->readPixels(0, 0, width, height, GL::RGBA, readType,
-                      buffer.float32Array);
+                      buffer->float32Array);
       _gl->bindFramebuffer(GL::FRAMEBUFFER, _currentFramebuffer);
     } break;
   }
 
-  return buffer;
+  return *buffer;
 }
 
 bool Engine::_canRenderToFloatFramebuffer()

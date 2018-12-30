@@ -13,11 +13,11 @@ struct BABYLON_SHARED_EXPORT AnisotropicFilterExtension {
 struct BABYLON_SHARED_EXPORT InstancedArrays {
   std::function<void(unsigned int, int)> vertexAttribDivisorANGLE;
   std::function<void(unsigned int mode, int indexCount,
-                       unsigned int indexFormat, unsigned int start,
-                       int instancesCount)>
+                     unsigned int indexFormat, unsigned int start,
+                     int instancesCount)>
     drawElementsInstancedANGLE;
   std::function<void(unsigned int mode, int verticesStart, int verticesCount,
-                       int instancesCount)>
+                     int instancesCount)>
     drawArraysInstancedANGLE;
 }; // end of struct InstancedArrays
 
@@ -99,6 +99,8 @@ struct BABYLON_SHARED_EXPORT EngineCapabilities {
   GL::EXT_disjoint_timer_query* timerQuery = nullptr;
   /** Defines if timestamp can be used with timer query */
   bool canUseTimestampForTimerQuery;
+  /** Function used to let the system compiles shaders in background */
+  bool parallelShaderCompile;
 }; // end of struct EngineCapabilities
 
 } // end of namespace BABYLON

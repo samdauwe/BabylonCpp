@@ -56,10 +56,10 @@ class Scene;
 class Texture;
 class UniformBuffer;
 class VertexBuffer;
-using AudioEnginePtr = std::shared_ptr<AudioEngine>;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using DummyInternalTextureTrackerPtr
   = std::shared_ptr<DummyInternalTextureTracker>;
+using AudioEnginePtr             = std::shared_ptr<AudioEngine>;
 using EffectPtr                  = std::shared_ptr<Effect>;
 using IInternalTextureLoaderPtr  = std::shared_ptr<IInternalTextureLoader>;
 using IInternalTextureTrackerPtr = std::shared_ptr<IInternalTextureTracker>;
@@ -2346,6 +2346,10 @@ private:
                        GL::IGLRenderingContext* context,
                        const std::vector<std::string>& transformFeedbackVaryings
                        = {});
+  void _finalizeProgram(const std::unique_ptr<GL::IGLProgram>& shaderProgram,
+                        const std::unique_ptr<GL::IGLShader>& vertexShader,
+                        const std::unique_ptr<GL::IGLShader>& fragmentShader,
+                        GL::IGLRenderingContext* context, bool linked);
   SamplingParameters _getSamplingParameters(unsigned int samplingMode,
                                             bool generateMipMaps);
   GLRenderBufferPtr
@@ -2606,6 +2610,13 @@ public:
    * option on or not.
    */
   bool premultipliedAlpha;
+
+  /**
+   * In case you are sharing the context with other applications, it might
+   * be interested to not cache the unpack flip y state to ensure a consistent
+   * value would be set.
+   */
+  bool enableUnpackFlipYCached;
 
 protected:
   /**
