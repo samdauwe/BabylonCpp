@@ -2205,7 +2205,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   if (json_util::has_key(parsedMesh, "metadata")) {
-    // mesh.metadata = parsedMesh.metadata;
+    mesh->metadata = parsedMesh["metadata"];
   }
 
   if (json_util::has_key(parsedMesh, "rotationQuaternion")) {
@@ -2237,6 +2237,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   mesh->isVisible        = json_util::get_bool(parsedMesh, "isVisible", true);
   mesh->infiniteDistance = json_util::get_bool(parsedMesh, "infiniteDistance");
 
+  mesh->showBoundingBox = json_util::get_bool(parsedMesh, "showBoundingBox");
   mesh->showSubMeshesBoundingBox
     = json_util::get_bool(parsedMesh, "showSubMeshesBoundingBox");
 
@@ -2386,8 +2387,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
   // Skeleton
   if (json_util::has_key(parsedMesh, "skeletonId")) {
-    std::string parsedSkeletonId
-      = json_util::get_string(parsedMesh, "skeletonId");
+    auto parsedSkeletonId = json_util::get_string(parsedMesh, "skeletonId");
     if (!parsedSkeletonId.empty()) {
       mesh->skeleton = scene->getLastSkeletonByID(parsedSkeletonId);
       if (json_util::has_key(parsedMesh, "numBoneInfluencers")) {

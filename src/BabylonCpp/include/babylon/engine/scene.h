@@ -15,6 +15,7 @@
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/events/pointer_info.h>
 #include <babylon/events/pointer_info_pre.h>
+#include <babylon/helpers/ienvironment_helper_options.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
@@ -44,7 +45,6 @@ class GeometryBufferRenderer;
 struct IActiveMeshCandidateProvider;
 class IAnimatable;
 struct ICollisionCoordinator;
-struct IEnvironmentHelperOptions;
 class ImageProcessingConfiguration;
 class InternalTexture;
 struct IPhysicsEngine;
@@ -1563,7 +1563,7 @@ public:
    * @returns the new EnvironmentHelper
    */
   std::unique_ptr<EnvironmentHelper>
-  createDefaultEnvironment(const IEnvironmentHelperOptions& options);
+  createDefaultEnvironment(const IEnvironmentHelperOptions& options = {});
 
   /** Tags **/
 

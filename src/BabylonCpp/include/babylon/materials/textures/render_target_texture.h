@@ -150,7 +150,7 @@ public:
    *   - an object containing { width: number, height: number }
    *   - or an object containing a ratio { ratio: number }
    */
-  void resize(const ISize& size);
+  void resize(const std::variant<ISize, float>& size);
 
   /**
    * @brief Renders all the objects from the render list into the texture.
@@ -255,11 +255,12 @@ protected:
    * RGBA, ALPHA...)
    */
   RenderTargetTexture(
-    const std::string& name, const ISize& size, Scene* scene,
-    bool generateMipMaps = false, bool doNotChangeAspectRatio = true,
-    unsigned int type         = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    bool isCube               = false,
-    unsigned int samplingMode = TextureConstants::TRILINEAR_SAMPLINGMODE,
+    const std::string& name, const std::variant<ISize, float>& size,
+    Scene* scene, bool generateMipMaps = false,
+    bool doNotChangeAspectRatio = true,
+    unsigned int type           = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    bool isCube                 = false,
+    unsigned int samplingMode   = TextureConstants::TRILINEAR_SAMPLINGMODE,
     bool generateDepthBuffer = true, bool generateStencilBuffer = false,
     bool isMulti        = false,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
@@ -301,7 +302,7 @@ protected:
   void unbindFrameBuffer(Engine* engine, unsigned int faceIndex);
 
 private:
-  void _processSizeParameter(const ISize& size);
+  void _processSizeParameter(const std::variant<ISize, float>& size);
   int _bestReflectionRenderTargetDimension(int renderDimension,
                                            float scale) const;
   void renderToTarget(unsigned int faceIndex,
@@ -460,7 +461,7 @@ public:
 protected:
   RenderTargetCreationOptions _renderTargetOptions;
   ISize _size;
-  ISize _initialSizeParameter;
+  std::variant<ISize, float> _initialSizeParameter;
   float _sizeRatio;
   std::unique_ptr<RenderingManager> _renderingManager;
   bool _doNotChangeAspectRatio;

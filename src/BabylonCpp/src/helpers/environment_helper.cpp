@@ -244,7 +244,7 @@ void EnvironmentHelper::_setupBackground()
     _setupGroundDiffuseTexture();
 
     if (_options.enableGroundMirror) {
-      // _setupGroundMirrorTexture(sceneSize);
+      _setupGroundMirrorTexture(sceneSize);
     }
     _setupMirrorInGroundMaterial();
   }
@@ -344,29 +344,27 @@ void EnvironmentHelper::_setupGroundDiffuseTexture()
   }
 
   if (std::holds_alternative<BaseTexturePtr>(_options.skyboxTexture)) {
-    // _groundMaterial->setDiffuseTexture ( _options.groundTexture);
+    _groundMaterial->diffuseTexture
+      = std::get<BaseTexturePtr>(_options.groundTexture);
     return;
   }
 
   const auto diffuseTexture
     = Texture::New(std::get<std::string>(_options.groundTexture), _scene);
-  diffuseTexture->gammaSpace = false;
-  diffuseTexture->hasAlpha   = true;
-  // _groundMaterial->setDiffuseTexture(diffuseTexture);
+  diffuseTexture->gammaSpace      = false;
+  diffuseTexture->hasAlpha        = true;
+  _groundMaterial->diffuseTexture = diffuseTexture;
 }
 
-void EnvironmentHelper::_setupGroundMirrorTexture(ISceneSize* sceneSize)
+void EnvironmentHelper::_setupGroundMirrorTexture(const ISceneSize& sceneSize)
 {
   auto wrapping = TextureConstants::CLAMP_ADDRESSMODE;
   if (!_groundMirror) {
-    /*_groundMirror = new MirrorTexture("BackgroundPlaneMirrorTexture",
-        { ratio: _options.groundMirrorSizeRatio },
-        _scene,
-        false,
-        _options.groundMirrorTextureType,
-        TextureConstants::BILINEAR_SAMPLINGMODE,
-        true);*/
-    _groundMirror->mirrorPlane = Plane(0, -1, 0, sceneSize->rootPosition.y);
+    _groundMirror = MirrorTexture::New(
+      "BackgroundPlaneMirrorTexture", _options.groundMirrorSizeRatio, _scene,
+      false, _options.groundMirrorTextureType,
+      TextureConstants::BILINEAR_SAMPLINGMODE, true);
+    _groundMirror->mirrorPlane = Plane(0, -1, 0, sceneSize.rootPosition.y);
     _groundMirror->anisotropicFilteringLevel = 1;
     _groundMirror->wrapU                     = wrapping;
     _groundMirror->wrapV                     = wrapping;
@@ -381,11 +379,11 @@ void EnvironmentHelper::_setupGroundMirrorTexture(ISceneSize* sceneSize)
     }
   }
 
-  _groundMirror->clearColor = Color4(_options.groundColor.r, //
+  _groundMirror->clearColor         = Color4(_options.groundColor.r, //
                                      _options.groundColor.g, //
                                      _options.groundColor.b, //
                                      1.f);
-  // _groundMirror->adaptiveBlurKernel = _options.groundMirrorBlurKernel
+  _groundMirror->adaptiveBlurKernel = _options.groundMirrorBlurKernel;
 }
 
 void EnvironmentHelper::_setupMirrorInGroundMaterial()
@@ -446,8 +444,8 @@ void EnvironmentHelper::_setupSkyboxReflectionTexture()
     return;
   }
 
-  // _skyboxTexture
-  //  = new CubeTexture(_options.skyboxTexture.get<std::string>(), _scene);
+  _skyboxTexture
+    = CubeTexture::New(std::get<std::string>(_options.skyboxTexture), _scene);
   _skyboxTexture->coordinatesMode    = TextureConstants::SKYBOX_MODE;
   _skyboxTexture->gammaSpace         = false;
   _skyboxMaterial->reflectionTexture = _skyboxTexture;

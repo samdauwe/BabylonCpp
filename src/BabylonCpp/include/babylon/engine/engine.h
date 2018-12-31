@@ -1599,7 +1599,8 @@ public:
    * @returns a new render target texture stored in an InternalTexture
    */
   InternalTexturePtr
-  createRenderTargetTexture(ISize size, const IRenderTargetOptions& options);
+  createRenderTargetTexture(const std::variant<ISize, float>& size,
+                            const IRenderTargetOptions& options);
 
   /**
    * @brief Create a multi render target texture.

@@ -3502,7 +3502,7 @@ void Engine::setFrameBufferDepthStencilTexture(
 }
 
 InternalTexturePtr
-Engine::createRenderTargetTexture(ISize size,
+Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
                                   const IRenderTargetOptions& options)
 {
   // old version had a "generateMipMaps" arg instead of options.
@@ -3532,8 +3532,17 @@ Engine::createRenderTargetTexture(ISize size,
     this, InternalTexture::DATASOURCE_RENDERTARGET);
   _bindTextureDirectly(GL::TEXTURE_2D, texture, true);
 
-  int width  = size.width;
-  int height = size.height;
+  int width = 0, height = 0;
+  if (std::holds_alternative<ISize>(size)) {
+    auto textureSize = std::get<ISize>(size);
+    width            = textureSize.width;
+    height           = textureSize.height;
+  }
+  else if (std::holds_alternative<float>(size)) {
+    auto textureSize = std::get<float>(size);
+    width            = static_cast<int>(textureSize);
+    height           = static_cast<int>(textureSize);
+  }
 
   auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
 

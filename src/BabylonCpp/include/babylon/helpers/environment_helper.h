@@ -153,7 +153,7 @@ private:
   /**
    * @brief Setup the ground mirror texture according to the specified options.
    */
-  void _setupGroundMirrorTexture(ISceneSize* sceneSize);
+  void _setupGroundMirrorTexture(const ISceneSize& sceneSize);
 
   /**
    * @brief Setup the ground to receive the mirror texture.
@@ -208,7 +208,7 @@ private:
 private:
   MeshPtr _rootMesh;
   MeshPtr _skybox;
-  RenderTargetTexturePtr _skyboxTexture;
+  BaseTexturePtr _skyboxTexture;
   BackgroundMaterialPtr _skyboxMaterial;
   MeshPtr _ground;
   BaseTexture* _groundTexture;

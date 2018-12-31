@@ -20,10 +20,11 @@
 namespace BABYLON {
 
 RenderTargetTexture::RenderTargetTexture(
-  const std::string& iName, const ISize& size, Scene* scene,
-  bool generateMipMaps, bool doNotChangeAspectRatio, unsigned int type,
-  bool iIsCube, unsigned int samplingMode, bool generateDepthBuffer,
-  bool generateStencilBuffer, bool isMulti, unsigned int format)
+  const std::string& iName, const std::variant<ISize, float>& size,
+  Scene* scene, bool generateMipMaps, bool doNotChangeAspectRatio,
+  unsigned int type, bool iIsCube, unsigned int samplingMode,
+  bool generateDepthBuffer, bool generateStencilBuffer, bool isMulti,
+  unsigned int format)
     : Texture{"", scene, !generateMipMaps}
     , renderListPredicate{nullptr}
     , renderList{this, &RenderTargetTexture::get_renderList,
@@ -205,9 +206,21 @@ void RenderTargetTexture::createDepthStencilTexture(int comparisonFunction,
   engine->setFrameBufferDepthStencilTexture(this);
 }
 
-void RenderTargetTexture::_processSizeParameter(const ISize& size)
+void RenderTargetTexture::_processSizeParameter(
+  const std::variant<ISize, float>& size)
 {
-  _size = size;
+  if (std::holds_alternative<float>(size)) {
+    _sizeRatio = std::get<float>(size);
+    _size      = ISize{
+      _bestReflectionRenderTargetDimension(_engine->getRenderWidth(),
+                                           _sizeRatio), // width
+      _bestReflectionRenderTargetDimension(_engine->getRenderHeight(),
+                                           _sizeRatio) // height
+    };
+  }
+  else if (std::holds_alternative<ISize>(size)) {
+    _size = std::get<ISize>(size);
+  }
 }
 
 unsigned int RenderTargetTexture::get_samples() const
@@ -357,7 +370,7 @@ Matrix* RenderTargetTexture::getReflectionTextureMatrix()
   return Texture::getReflectionTextureMatrix();
 }
 
-void RenderTargetTexture::resize(const ISize& size)
+void RenderTargetTexture::resize(const std::variant<ISize, float>& size)
 {
   releaseInternalTexture();
 

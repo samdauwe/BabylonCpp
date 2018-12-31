@@ -12,7 +12,8 @@
 
 namespace BABYLON {
 
-MirrorTexture::MirrorTexture(const std::string& iName, const ISize& size,
+MirrorTexture::MirrorTexture(const std::string& iName,
+                             const std::variant<ISize, float>& size,
                              Scene* iScene, bool generateMipMaps,
                              unsigned int type, unsigned int samplingMode,
                              bool generateDepthBuffer)
