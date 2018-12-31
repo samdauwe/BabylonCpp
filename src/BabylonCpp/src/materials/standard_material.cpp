@@ -2168,8 +2168,11 @@ StandardMaterialPtr StandardMaterial::Parse(const json& source, Scene* scene,
                                             const std::string& rootUrl)
 {
   return SerializationHelper::Parse(
-    StandardMaterial::New(json_util::get_string(source, "name"), scene), source,
-    scene, rootUrl);
+    [source, scene, rootUrl]() {
+      return StandardMaterial::New(json_util::get_string(source, "name"),
+                                   scene);
+    },
+    source, scene, rootUrl);
 }
 
 bool StandardMaterial::DiffuseTextureEnabled()

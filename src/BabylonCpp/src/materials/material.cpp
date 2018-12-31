@@ -702,16 +702,37 @@ json Material::serialize() const
   return nullptr;
 }
 
-MultiMaterialPtr
-Material::ParseMultiMaterial(const json& /*parsedMultiMaterial*/,
-                             Scene* /*scene*/)
+MultiMaterialPtr Material::ParseMultiMaterial(const json& parsedMultiMaterial,
+                                              Scene* scene)
 {
-  return nullptr;
+  auto multiMaterial = MultiMaterial::New(
+    json_util::get_string(parsedMultiMaterial, "name"), scene);
+
+  multiMaterial->id = json_util::get_string(parsedMultiMaterial, "id");
+
+  for (const auto& subMatId :
+       json_util::get_array<json>(parsedMultiMaterial, "materials")) {
+    if (!subMatId.is_null()) {
+      multiMaterial->subMaterials().emplace_back(
+        scene->getMaterialByID(subMatId));
+    }
+    else {
+      multiMaterial->subMaterials().emplace_back(nullptr);
+    }
+  }
+
+  return multiMaterial;
 }
 
-MaterialPtr Material::Parse(const json& /*parsedMaterial*/, Scene* /*scene*/,
-                            const std::string& /*rootUrl*/)
+MaterialPtr Material::Parse(const json& parsedMaterial, Scene* scene,
+                            const std::string& rootUrl)
 {
+  if (!json_util::has_key(parsedMaterial, "customType")
+      || json_util::get_string(parsedMaterial, "customType")
+           == "BABYLON.StandardMaterial") {
+    return StandardMaterial::Parse(parsedMaterial, scene, rootUrl);
+  }
+
   return nullptr;
 }
 

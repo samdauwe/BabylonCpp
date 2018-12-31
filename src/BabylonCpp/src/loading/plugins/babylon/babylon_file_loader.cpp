@@ -120,7 +120,7 @@ bool BabylonFileLoader::importMesh(
     auto fullDetails
       = SceneLoader::LoggingLevel() == SceneLoader::DETAILED_LOGGING;
 
-    std::vector<std::string> loadedSkeletonsIds;
+    std::vector<size_t> loadedSkeletonsIds;
     std::vector<std::string> loadedMaterialsIds;
     std::vector<std::string> hierarchyIds;
 
@@ -134,11 +134,13 @@ bool BabylonFileLoader::importMesh(
           = json_util::get_string(parsedMesh, "id");
 
         // Geometry ?
-        if (json_util::has_key(parsedMesh, "geometryId")) {
+        if (json_util::has_key(parsedMesh, "geometryId")
+            && !json_util::is_null(parsedMesh["geometryId"])) {
           const auto parsedMeshGeometryId
             = json_util::get_string(parsedMesh, "geometryId");
           // Does the file contain geometries?
-          if (json_util::has_key(parsedMesh, "geometries")) {
+          if (json_util::has_key(parsedMesh, "geometries")
+              && !json_util::is_null(parsedMesh["geometries"])) {
             auto geometries = parsedData["geometries"];
             // find the correct geometry and add it to the scene
             bool found = false;
@@ -248,21 +250,21 @@ bool BabylonFileLoader::importMesh(
         // Skeleton ?
         if (json_util::has_key(parsedMesh, "skeletonId")) {
           const auto parsedMeshSkeletonId
-            = json_util::get_string(parsedMesh, "skeletonId");
-          auto skeletonAlreadyLoaded
-            = stl_util::contains(loadedSkeletonsIds, parsedMeshSkeletonId);
-          if (!parsedMeshSkeletonId.empty() && !skeletonAlreadyLoaded
+            = json_util::get_number<int>(parsedMesh, "skeletonId", -1);
+          if ((parsedMeshSkeletonId > -1)
               && json_util::has_key(parsedData, "skeletons")
-              && parsedData["skeletons"].is_array()) {
+              && parsedData["skeletons"].is_array()
+              && !stl_util::contains(loadedSkeletonsIds,
+                                     parsedMeshSkeletonId)) {
             for (const auto& parsedSkeleton :
                  json_util::get_array<json>(parsedData, "skeletons")) {
-              const std::string parsedSkeletonId
-                = json_util::get_string(parsedSkeleton, "id");
-              if ((!parsedSkeletonId.empty())
-                  && (parsedSkeletonId == parsedMeshSkeletonId)) {
+              const auto parsedSkeletonId
+                = json_util::get_number<int>(parsedSkeleton, "id", -1);
+              if (parsedSkeletonId == parsedMeshSkeletonId) {
                 auto skeleton = Skeleton::Parse(parsedSkeleton, scene);
                 skeletons.emplace_back(skeleton);
-                loadedSkeletonsIds.emplace_back(parsedSkeletonId);
+                loadedSkeletonsIds.emplace_back(
+                  static_cast<size_t>(parsedSkeletonId));
                 log << "\n\tSkeleton " << skeleton->toString(fullDetails);
               }
             }

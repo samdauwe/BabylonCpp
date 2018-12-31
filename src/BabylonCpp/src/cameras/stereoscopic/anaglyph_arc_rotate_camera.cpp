@@ -28,8 +28,8 @@ AnaglyphArcRotateCamera::AnaglyphArcRotateCamera(
     : ArcRotateCamera{name, alpha, beta, radius, target, scene}
 {
   interaxialDistance = iInteraxialDistance;
-  json rigParams;
-  rigParams["interaxialDistance"] = interaxialDistance;
+  RigParamaters rigParams;
+  rigParams.interaxialDistance = interaxialDistance;
   setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH, rigParams);
 }
 

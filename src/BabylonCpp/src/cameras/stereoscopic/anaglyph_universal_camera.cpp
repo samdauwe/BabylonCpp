@@ -29,8 +29,8 @@ AnaglyphUniversalCamera::AnaglyphUniversalCamera(const std::string& name,
     : UniversalCamera{name, position, scene}
 {
   interaxialDistance = iInteraxialDistance;
-  json rigParams;
-  rigParams["interaxialDistance"] = interaxialDistance;
+  RigParamaters rigParams;
+  rigParams.interaxialDistance = interaxialDistance;
   setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH, rigParams);
 }
 

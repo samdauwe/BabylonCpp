@@ -29,22 +29,23 @@ using SkeletonPtr    = std::shared_ptr<Skeleton>;
  * @brief Class used to handle skinning animations.
  * @see http://doc.babylonjs.com/how_to/how_to_use_bones_and_skeletons
  */
-class BABYLON_SHARED_EXPORT Skeleton
-    : public std::enable_shared_from_this<Skeleton>,
-      public IAnimatable,
-      public IDisposable {
+class BABYLON_SHARED_EXPORT Skeleton : public IAnimatable, public IDisposable {
 
 public:
-  /**
-   * @brief Creates a new skeleton.
-   * @param name defines the skeleton name
-   * @param id defines the skeleton Id
-   * @param scene defines the hosting scene
-   */
-  Skeleton(const std::string& name, const std::string& id, Scene* scene);
+  template <typename... Ts>
+  static SkeletonPtr New(Ts&&... args)
+  {
+    auto skeleton
+      = std::shared_ptr<Skeleton>(new Skeleton(std::forward<Ts>(args)...));
+    skeleton->addToScene(skeleton);
+
+    return skeleton;
+  }
   virtual ~Skeleton() override;
 
   virtual IReflect::Type type() const override;
+
+  void addToScene(const SkeletonPtr& newSkeleton);
 
   /** Members **/
 
@@ -217,6 +218,14 @@ public:
   void sortBones();
 
 protected:
+  /**
+   * @brief Creates a new skeleton.
+   * @param name defines the skeleton name
+   * @param id defines the skeleton Id
+   * @param scene defines the hosting scene
+   */
+  Skeleton(const std::string& name, const std::string& id, Scene* scene);
+
   /**
    * @brief Gets the animation properties override.
    */

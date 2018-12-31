@@ -1,12 +1,11 @@
 #include <babylon/animations/animation.h>
 
-#include <nlohmann/json.hpp>
-
 #include <babylon/animations/animatable.h>
 #include <babylon/animations/easing/ieasing_function.h>
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/animations/runtime_animation.h>
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json_util.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/scene.h>
 #include <babylon/math/color3.h>
@@ -656,9 +655,101 @@ json Animation::serialize() const
   return nullptr;
 }
 
-AnimationPtr Animation::Parse(const json& /*parsedAnimation*/)
+AnimationPtr Animation::Parse(const json& parsedAnimation)
 {
-  return nullptr;
+  auto animation = Animation::New(
+    json_util::get_string(parsedAnimation, "name"),
+    json_util::get_string(parsedAnimation, "property"),
+    json_util::get_number(parsedAnimation, "framePerSecond", 30ull),
+    json_util::get_number(parsedAnimation, "dataType", 0),
+    json_util::get_number(parsedAnimation, "loopBehavior",
+                          Animation::ANIMATIONLOOPMODE_CYCLE()));
+
+  auto dataType = json_util::get_number(parsedAnimation, "dataType", 0u);
+  std::vector<IAnimationKey> keys;
+
+  if (json_util::has_key(parsedAnimation, "enableBlending")) {
+    animation->enableBlending
+      = json_util::get_bool(parsedAnimation, "enableBlending");
+  }
+
+  if (json_util::has_key(parsedAnimation, "blendingSpeed")) {
+    animation->blendingSpeed
+      = json_util::get_number<float>(parsedAnimation, "blendingSpeed");
+  }
+
+  for (auto& key : json_util::get_array<json>(parsedAnimation, "keys")) {
+    std::optional<AnimationValue> inTangent  = std::nullopt;
+    std::optional<AnimationValue> outTangent = std::nullopt;
+    AnimationValue data;
+
+    switch (dataType) {
+      case Animation::ANIMATIONTYPE_FLOAT(): {
+        auto values = json_util::get_array<float>(key, "values");
+        data        = AnimationValue(values[0]);
+        if (values.size() >= 1) {
+          inTangent = values[1];
+        }
+        if (values.size() >= 2) {
+          outTangent = values[2];
+        }
+      } break;
+      case Animation::ANIMATIONTYPE_QUATERNION(): {
+        auto values = json_util::get_array<float>(key, "values");
+        data        = AnimationValue(Quaternion::FromArray(values));
+        if (values.size() >= 8) {
+          auto _inTangent
+            = Quaternion::FromArray(stl_util::slice(values, 4, 8));
+          if (!_inTangent.equals(Quaternion::Zero())) {
+            inTangent = _inTangent;
+          }
+        }
+        if (values.size() >= 12) {
+          auto _outTangent
+            = Quaternion::FromArray(stl_util::slice(values, 8, 12));
+          if (!_outTangent.equals(Quaternion::Zero())) {
+            outTangent = _outTangent;
+          }
+        }
+      } break;
+      case Animation::ANIMATIONTYPE_MATRIX():
+        data = AnimationValue(
+          Matrix::FromArray(json_util::get_array<float>(key, "values")));
+        break;
+      case Animation::ANIMATIONTYPE_COLOR3():
+        data = AnimationValue(
+          Color3::FromArray(json_util::get_array<float>(key, "values")));
+        break;
+      case Animation::ANIMATIONTYPE_VECTOR3():
+      default:
+        data = AnimationValue(
+          Vector3::FromArray(json_util::get_array<float>(key, "values")));
+        break;
+    }
+
+    IAnimationKey keyData(json_util::get_number(key, "frame", 0), data);
+    if (inTangent.has_value()) {
+      keyData.inTangent = *inTangent;
+    }
+    if (outTangent.has_value()) {
+      keyData.outTangent = *outTangent;
+    }
+
+    keys.emplace_back(keyData);
+  }
+
+  animation->setKeys(keys);
+
+  if (json_util::has_key(parsedAnimation, "ranges")) {
+    for (const auto& data :
+         json_util::get_array<json>(parsedAnimation, "ranges")) {
+      animation->createRange(json_util::get_string(data, "name"),
+                             json_util::get_number(data, "from", 0),
+                             json_util::get_number(data, "to", 0));
+    }
+  }
+
+  return animation;
 }
 
 void Animation::AppendSerializedAnimations(IAnimatable* /*source*/,

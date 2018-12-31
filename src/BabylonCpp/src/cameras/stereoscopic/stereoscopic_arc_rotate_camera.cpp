@@ -34,8 +34,8 @@ StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;
-  json rigParams;
-  rigParams["interaxialDistance"] = interaxialDistance;
+  RigParamaters rigParams;
+  rigParams.interaxialDistance = interaxialDistance;
   setCameraRigMode(isStereoscopicSideBySide ?
                      Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL :
                      Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER,

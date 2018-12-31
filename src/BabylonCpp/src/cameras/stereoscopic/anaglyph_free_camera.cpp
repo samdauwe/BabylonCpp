@@ -28,8 +28,8 @@ AnaglyphFreeCamera::AnaglyphFreeCamera(const std::string& name,
     : FreeCamera{name, position, scene}
 {
   interaxialDistance = iInteraxialDistance;
-  json rigParams;
-  rigParams["interaxialDistance"] = interaxialDistance;
+  RigParamaters rigParams;
+  rigParams.interaxialDistance = interaxialDistance;
   setCameraRigMode(Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH, rigParams);
 }
 

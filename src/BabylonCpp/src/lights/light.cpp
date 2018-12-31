@@ -2,6 +2,7 @@
 
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -351,9 +352,55 @@ std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
   return nullptr;
 }
 
-LightPtr Light::Parse(const json& /*parsedLight*/, Scene* /*scene*/)
+LightPtr Light::Parse(const json& parsedLight, Scene* scene)
 {
-  return nullptr;
+  auto constructor = Light::GetConstructorFromName(
+    json_util::get_number<unsigned>(parsedLight, "type"),
+    json_util::get_string(parsedLight, "name"), scene);
+
+  if (!constructor) {
+    return nullptr;
+  }
+
+  auto light = SerializationHelper::Parse(constructor, parsedLight, scene);
+
+  // Inclusion / exclusions
+  if (json_util::has_key(parsedLight, "excludedMeshesIds")
+      && !json_util::is_null(parsedLight["excludedMeshesIds"])) {
+    light->_excludedMeshesIds
+      = json_util::get_array<std::string>(parsedLight, "excludedMeshesIds");
+  }
+
+  if (json_util::has_key(parsedLight, "includedOnlyMeshesIds")
+      && !json_util::is_null(parsedLight["includedOnlyMeshesIds"])) {
+    light->_includedOnlyMeshesIds
+      = json_util::get_array<std::string>(parsedLight, "includedOnlyMeshesIds");
+  }
+
+  // Parent
+  if (json_util::has_key(parsedLight, "parentId")
+      && !json_util::is_null(parsedLight["parentId"])) {
+    light->_waitingParentId = json_util::get_string(parsedLight, "parentId");
+  }
+
+  // Animations
+  if (json_util::has_key(parsedLight, "animations")) {
+    for (const auto& parsedAnimation :
+         json_util::get_array<json>(parsedLight, "animations")) {
+      light->animations.emplace_back(Animation::Parse(parsedAnimation));
+    }
+    Node::ParseAnimationRanges(*light, parsedLight, scene);
+  }
+
+  if (json_util::has_key(parsedLight, "autoAnimate")) {
+    scene->beginAnimation(
+      light, json_util::get_number(parsedLight, "autoAnimateFrom", 0),
+      json_util::get_number(parsedLight, "autoAnimateTo", 0),
+      json_util::get_bool(parsedLight, "autoAnimateLoop"),
+      json_util::get_number(parsedLight, "autoAnimateSpeed", 1.f));
+  }
+
+  return light;
 }
 
 void Light::_hookArrayForExcluded(const std::vector<AbstractMeshPtr>& /*array*/)

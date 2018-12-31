@@ -1,10 +1,9 @@
 #include <babylon/bones/skeleton.h>
 
-#include <nlohmann/json.hpp>
-
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
+#include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -29,7 +28,6 @@ Skeleton::Skeleton(const std::string& iName, const std::string& iId,
     , _animationPropertiesOverride{nullptr}
 {
   bones.clear();
-  scene->skeletons.emplace_back(this);
   // make sure it will recalculate the matrix next time prepare is called.
   _isDirty = true;
 }
@@ -43,7 +41,12 @@ IReflect::Type Skeleton::type() const
   return IReflect::Type::SKELETON;
 }
 
-AnimationPropertiesOverride*& Skeleton ::get_animationPropertiesOverride()
+void Skeleton::addToScene(const SkeletonPtr& newSkeleton)
+{
+  _scene->skeletons.emplace_back(newSkeleton);
+}
+
+AnimationPropertiesOverride*& Skeleton::get_animationPropertiesOverride()
 {
   if (!_animationPropertiesOverride) {
     return _scene->animationPropertiesOverride;
@@ -421,9 +424,71 @@ json Skeleton::serialize() const
   return json();
 }
 
-SkeletonPtr Skeleton::Parse(const json& /*parsedSkeleton*/, Scene* /*scene*/)
+SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
 {
-  return nullptr;
+  auto skeleton
+    = Skeleton::New(json_util::get_string(parsedSkeleton, "name"),
+                    json_util::get_string(parsedSkeleton, "id"), scene);
+  if (json_util::has_key(parsedSkeleton, "dimensionsAtRest")
+      && !json_util::is_null(parsedSkeleton["dimensionsAtRest"])) {
+    skeleton->dimensionsAtRest = std::make_unique<Vector3>(Vector3::FromArray(
+      json_util::get_array<float>(parsedSkeleton, "dimensionsAtRest")));
+  }
+
+  skeleton->needInitialSkinMatrix
+    = json_util::get_bool(parsedSkeleton, "needInitialSkinMatrix");
+
+  for (const auto& parsedBone :
+       json_util::get_array<json>(parsedSkeleton, "bones")) {
+    BonePtr parentBone = nullptr;
+    if (json_util::get_number<int>(parsedBone, "parentBoneIndex", -1) > -1) {
+      auto parentBoneIndex = static_cast<size_t>(
+        json_util::get_number<int>(parsedBone, "parentBoneIndex", -1));
+      parentBone = skeleton->bones[parentBoneIndex];
+    }
+    std::optional<Matrix> rest = std::nullopt;
+    if (json_util::has_key(parsedBone, "rest")
+        && parsedBone["rest"].is_array()) {
+      rest = Matrix::FromArray(json_util::get_array<float>(parsedBone, "rest"));
+    }
+
+    auto bone = Bone::New(
+      json_util::get_string(parsedBone, "name"), skeleton.get(),
+      parentBone.get(),
+      Matrix::FromArray(json_util::get_array<float>(parsedBone, "matrix")),
+      rest);
+
+    if (json_util::has_key(parsedBone, "id")
+        && !json_util::is_null(parsedBone["id"])) {
+      bone->id = json_util::get_string(parsedBone, "id");
+    }
+
+    if (json_util::has_key(parsedBone, "length")
+        && !json_util::is_null(parsedBone["length"])) {
+      bone->length = json_util::get_number<float>(parsedBone, "length");
+    }
+
+    if (json_util::has_key(parsedBone, "metadata")
+        && !json_util::is_null(parsedBone["metadata"])) {
+      bone->metadata = parsedBone["metadata"];
+    }
+
+    if (json_util::has_key(parsedBone, "animation")
+        && !json_util::is_null(parsedBone["animation"])) {
+      bone->animations.emplace_back(Animation::Parse(parsedBone["animation"]));
+    }
+  }
+
+  // placed after bones, so createAnimationRange can cascade down
+  if (json_util::has_key(parsedSkeleton, "ranges")) {
+    for (const auto& data :
+         json_util::get_array<json>(parsedSkeleton, "ranges")) {
+      skeleton->createAnimationRange(json_util::get_string(data, "name"),
+                                     json_util::get_number<int>(data, "from"),
+                                     json_util::get_number<int>(data, "to"));
+    }
+  }
+  return skeleton;
 }
 
 void Skeleton::computeAbsoluteTransforms(bool forceUpdate)

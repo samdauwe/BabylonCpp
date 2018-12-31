@@ -322,12 +322,12 @@ bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
   const auto& sourceKeys  = source->animations[0]->getKeys();
 
   // rescaling prep
-  int sourceBoneLength   = source->length;
+  auto sourceBoneLength  = source->length;
   auto sourceParent      = source->getParent();
   auto parentBone        = getParent();
   bool parentScalingReqd = rescaleAsRequired && sourceParent
                            && sourceBoneLength > 0 && length > 0
-                           && sourceBoneLength != length;
+                           && !stl_util::almost_equal(sourceBoneLength, length);
   float parentRatio = parentScalingReqd && parentBone && sourceParent ?
                         static_cast<float>(parentBone->length)
                           / static_cast<float>(sourceParent->length) :
@@ -550,7 +550,7 @@ void Bone::setYawPitchRoll(float yaw, float pitch, float roll, Space space,
   _rotateWithMatrix(rotMat, space, mesh);
 }
 
-void Bone::rotate(Vector3& axis, float amount, Space space, AbstractMesh* mesh)
+void Bone::rotate(Vector3 axis, float amount, Space space, AbstractMesh* mesh)
 {
   auto& rmat = Bone::_tmpMats[0];
   rmat.m[12] = 0.f;
@@ -700,7 +700,7 @@ bool Bone::_getNegativeRotationToRef(Matrix& rotMatInv, AbstractMesh* mesh)
   }
 
   rotMatInv.invert();
-  if (isNan(rotMatInv.m[0])) {
+  if (std::isnan(rotMatInv.m[0])) {
     // Matrix failed to invert.
     // This can happen if scale is zero for example.
     return false;

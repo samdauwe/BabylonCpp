@@ -1,6 +1,7 @@
 #ifndef BABYLON_TOOLS_SERIALIZATION_HELPER_H
 #define BABYLON_TOOLS_SERIALIZATION_HELPER_H
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <nlohmann/json_fwd.hpp>
@@ -25,13 +26,15 @@ struct BABYLON_SHARED_EXPORT SerializationHelper {
 
   static BaseTexture* Parse(BaseTexture* baseTexture,
                             const json& parsedBaseTexture, Scene* scene);
-  static CameraPtr Parse(const CameraPtr& camera, const json& parsedCamera,
-                         Scene* scene);
-  static LightPtr Parse(const LightPtr& light, const json& parsedLight,
-                        Scene* scene);
-  static StandardMaterialPtr Parse(const StandardMaterialPtr& standardMaterial,
-                                   const json& parsedMaterial, Scene* scene,
-                                   const std::string& rootUrl);
+  static CameraPtr Parse(const std::function<CameraPtr()>& creationFunction,
+                         const json& source, Scene* scene,
+                         const std::string& rootUrl = "");
+  static LightPtr Parse(const std::function<LightPtr()>& creationFunction,
+                        const json& source, Scene* scene,
+                        const std::string& rootUrl = "");
+  static StandardMaterialPtr
+  Parse(const std::function<StandardMaterialPtr()>& creationFunction,
+        const json& source, Scene* scene, const std::string& rootUrl = "");
 
 }; // end of struct SerializationHelper
 

@@ -28,6 +28,10 @@ using FreeCameraPtr          = std::shared_ptr<FreeCamera>;
 using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
+struct RigParamaters {
+  std::optional<float> interaxialDistance = std::nullopt;
+}; // end of struct RigParamaters
+
 /**
  * @brief This is the base class of all the camera used in the application.
  * @see http://doc.babylonjs.com/features/cameras
@@ -396,7 +400,7 @@ public:
   /**
    * @brief Hidden
    */
-  void setCameraRigMode(int mode, const json& rigParams);
+  void setCameraRigMode(int mode, const RigParamaters& rigParams);
 
   /**
    * @brief Hidden
@@ -472,10 +476,10 @@ public:
    * sereo be side b side
    * @returns a factory method to construc the camera
    */
-  static CameraPtr GetConstructorFromName(const std::string& type,
-                                          const std::string& name, Scene* scene,
-                                          float interaxial_distance     = 0.f,
-                                          bool isStereoscopicSideBySide = true);
+  static std::function<CameraPtr()>
+  GetConstructorFromName(const std::string& type, const std::string& name,
+                         Scene* scene, float interaxial_distance = 0.f,
+                         bool isStereoscopicSideBySide = true);
 
   /**
    * @brief Parse a JSON and creates the camera from the parsed information
