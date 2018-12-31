@@ -8,7 +8,6 @@ namespace Samples {
 
 struct AnimationsScene : public IRenderableScene {
 
-public:
   AnimationsScene(ICanvas* iCanvas);
   ~AnimationsScene() override;
 

@@ -12,7 +12,7 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
 
   // Import Babylon JS Logo Scene
   _samples["ImportBabylonJSLogoScene"] = std::make_tuple(
-    true,                                                         //
+    false,                                                        //
     [](ICanvas* iCanvas) {                                        //
       return std::make_unique<ImportBabylonJSLogoScene>(iCanvas); //
     });                                                           //
