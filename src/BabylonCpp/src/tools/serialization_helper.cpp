@@ -154,19 +154,49 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
   else if (cameraClassName == "FreeCamera") {
     /** FreeCamera **/
     auto freeCamera = std::static_pointer_cast<FreeCamera>(camera);
-    // ellipsoid
-    if (json_util::has_key(source, "ellipsoid")) {
-      freeCamera->ellipsoid
-        = Vector3::FromArray(json_util::get_array<float>(source, "ellipsoid"));
+    // applyGravity
+    if (json_util::has_key(source, "applyGravity")) {
+      freeCamera->applyGravity = json_util::get_bool(source, "applyGravity");
+    }
+    // cameraRigMode
+    if (json_util::has_key(source, "cameraRigMode")) {
+      freeCamera->cameraRigMode
+        = json_util::get_number<unsigned>(source, "cameraRigMode");
     }
     // checkCollisions
     if (json_util::has_key(source, "checkCollisions")) {
       freeCamera->checkCollisions
         = json_util::get_bool(source, "checkCollisions");
     }
-    // applyGravity
-    if (json_util::has_key(source, "applyGravity")) {
-      freeCamera->applyGravity = json_util::get_bool(source, "applyGravity");
+    // ellipsoid
+    if (json_util::has_key(source, "ellipsoid")) {
+      freeCamera->ellipsoid
+        = Vector3::FromArray(json_util::get_array<float>(source, "ellipsoid"));
+    }
+    // fov
+    if (json_util::has_key(source, "fov")) {
+      freeCamera->fov = json_util::get_number<float>(source, "fov");
+    }
+    // fov
+    if (json_util::has_key(source, "inertia")) {
+      freeCamera->inertia = json_util::get_number<float>(source, "inertia");
+    }
+    // maxZ
+    if (json_util::has_key(source, "maxZ")) {
+      freeCamera->maxZ = json_util::get_number<float>(source, "maxZ");
+    }
+    // minZ
+    if (json_util::has_key(source, "minZ")) {
+      freeCamera->minZ = json_util::get_number<float>(source, "minZ");
+    }
+    // position
+    if (json_util::has_key(source, "position")) {
+      freeCamera->position
+        = Vector3::FromArray(json_util::get_array<float>(source, "position"));
+    }
+    // speed
+    if (json_util::has_key(source, "speed")) {
+      freeCamera->speed = json_util::get_number<float>(source, "speed");
     }
   }
 
@@ -271,25 +301,34 @@ StandardMaterialPtr SerializationHelper::Parse(
     return nullptr;
   }
 
+  // alpha
+  if (json_util::has_key(source, "alpha")) {
+    standardMaterial->alpha = json_util::get_number<float>(source, "alpha");
+  }
   // ambient
   if (json_util::has_key(source, "ambient")) {
     standardMaterial->ambientColor
       = Color3::FromArray(json_util::get_array<float>(source, "ambient"));
+  }
+  // backFaceCulling
+  if (json_util::has_key(source, "backFaceCulling")) {
+    standardMaterial->backFaceCulling
+      = json_util::get_bool(source, "backFaceCulling");
   }
   // diffuse
   if (json_util::has_key(source, "diffuse")) {
     standardMaterial->diffuseColor
       = Color3::FromArray(json_util::get_array<float>(source, "diffuse"));
   }
-  // specular
-  if (json_util::has_key(source, "specular")) {
-    standardMaterial->specularColor
-      = Color3::FromArray(json_util::get_array<float>(source, "specular"));
-  }
   // emissive
   if (json_util::has_key(source, "emissive")) {
     standardMaterial->emissiveColor
       = Color3::FromArray(json_util::get_array<float>(source, "emissive"));
+  }
+  // specular
+  if (json_util::has_key(source, "specular")) {
+    standardMaterial->specularColor
+      = Color3::FromArray(json_util::get_array<float>(source, "specular"));
   }
   // specularPower
   if (json_util::has_key(source, "specularPower")) {
