@@ -2378,7 +2378,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   // Morph targets
-  const int morphTargetManagerId
+  const auto morphTargetManagerId
     = json_util::get_number(parsedMesh, "morphTargetManagerId", -1);
   if (morphTargetManagerId > -1) {
     mesh->morphTargetManager = scene->getMorphTargetManagerById(
@@ -2386,14 +2386,14 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   // Skeleton
-  if (json_util::has_key(parsedMesh, "skeletonId")) {
-    auto parsedSkeletonId = json_util::get_string(parsedMesh, "skeletonId");
-    if (!parsedSkeletonId.empty()) {
-      mesh->skeleton = scene->getLastSkeletonByID(parsedSkeletonId);
-      if (json_util::has_key(parsedMesh, "numBoneInfluencers")) {
-        mesh->numBoneInfluencers
-          = json_util::get_number(parsedMesh, "numBoneInfluencers", 0u);
-      }
+  const auto parsedSkeletonId
+    = json_util::get_number(parsedMesh, "skeletonId", -1);
+  if (parsedSkeletonId > -1) {
+    mesh->skeleton
+      = scene->getLastSkeletonByID(std::to_string(parsedSkeletonId));
+    if (json_util::has_key(parsedMesh, "numBoneInfluencers")) {
+      mesh->numBoneInfluencers
+        = json_util::get_number(parsedMesh, "numBoneInfluencers", 0u);
     }
   }
 

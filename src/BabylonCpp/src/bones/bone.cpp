@@ -550,7 +550,7 @@ void Bone::setYawPitchRoll(float yaw, float pitch, float roll, Space space,
   _rotateWithMatrix(rotMat, space, mesh);
 }
 
-void Bone::rotate(Vector3 axis, float amount, Space space, AbstractMesh* mesh)
+void Bone::rotate(Vector3& axis, float amount, Space space, AbstractMesh* mesh)
 {
   auto& rmat = Bone::_tmpMats[0];
   rmat.m[12] = 0.f;

@@ -297,7 +297,7 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
       }
     }
 
-    if (*bone->_index != -1) {
+    if (!bone->_index.has_value() || *bone->_index != -1) {
       auto mappedIndex = !bone->_index.has_value() ?
                            index :
                            static_cast<unsigned int>(*bone->_index);
@@ -426,9 +426,9 @@ json Skeleton::serialize() const
 
 SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
 {
-  auto skeleton
-    = Skeleton::New(json_util::get_string(parsedSkeleton, "name"),
-                    json_util::get_string(parsedSkeleton, "id"), scene);
+  auto skeleton = Skeleton::New(
+    json_util::get_string(parsedSkeleton, "name"),
+    std::to_string(json_util::get_number(parsedSkeleton, "id", -1)), scene);
   if (json_util::has_key(parsedSkeleton, "dimensionsAtRest")
       && !json_util::is_null(parsedSkeleton["dimensionsAtRest"])) {
     skeleton->dimensionsAtRest = std::make_unique<Vector3>(Vector3::FromArray(

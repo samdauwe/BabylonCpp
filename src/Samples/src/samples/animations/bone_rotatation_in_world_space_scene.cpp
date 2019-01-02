@@ -43,16 +43,16 @@ void BoneRotationInWorldSpaceScene::initializeScene(ICanvas* canvas,
   // import all meshes
   SceneLoader::ImportMesh(
     {}, "scenes/", "boneRotation.babylon", scene,
-    [this](const std::vector<AbstractMeshPtr>& newMeshes,
-           const std::vector<IParticleSystemPtr>& /*newParticleSystems*/,
-           const std::vector<SkeletonPtr>& newSkeletons,
-           const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
-      if (!newMeshes.empty() && !newSkeletons.empty()) {
+    [this](const std::vector<AbstractMeshPtr>& meshes,
+           const std::vector<IParticleSystemPtr>& /*particleSystems*/,
+           const std::vector<SkeletonPtr>& skeletons,
+           const std::vector<AnimationGroupPtr>& /*animationGroups*/) {
+      if (!meshes.empty() && !skeletons.empty()) {
         // Update mesh rotation
-        _mesh               = newMeshes[0];
+        _mesh               = meshes[0];
         _mesh->rotation().x = Math::PI * 0.25f;
         // Bone rotate animations
-        _skeleton = newSkeletons[0];
+        _skeleton = skeletons[0];
         _scene->registerBeforeRender(
           [this](Scene* /*scene*/, EventState& /*es*/) {
             _skeleton->bones[0]->rotate(_rotationAxis, 0.01f, Space::WORLD,

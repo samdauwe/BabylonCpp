@@ -464,11 +464,63 @@ const Matrix& Matrix::multiplyToArray(const Matrix& other, Float32Array& result,
     return *this;
   }
 
-  std::array<float, 16> array;
-  multiplyToArray(other, array, offset);
-  for (unsigned int i = 0; i != 16; ++i) {
-    result[i] = array[i];
-  }
+#if BABYLONCPP_OPTION_ENABLE_SIMD == true
+  simdMatrix.multiplyToArraySIMD(other, result, offset);
+#else
+  const float tm0     = m[0];
+  const float tm1     = m[1];
+  const float tm2     = m[2];
+  const float tm3     = m[3];
+  const float tm4     = m[4];
+  const float tm5     = m[5];
+  const float tm6     = m[6];
+  const float tm7     = m[7];
+  const float tm8     = m[8];
+  const float tm9     = m[9];
+  const float tm10    = m[10];
+  const float tm11    = m[11];
+  const float tm12    = m[12];
+  const float tm13    = m[13];
+  const float tm14    = m[14];
+  const float tm15    = m[15];
+
+  const float om0  = other.m[0];
+  const float om1  = other.m[1];
+  const float om2  = other.m[2];
+  const float om3  = other.m[3];
+  const float om4  = other.m[4];
+  const float om5  = other.m[5];
+  const float om6  = other.m[6];
+  const float om7  = other.m[7];
+  const float om8  = other.m[8];
+  const float om9  = other.m[9];
+  const float om10 = other.m[10];
+  const float om11 = other.m[11];
+  const float om12 = other.m[12];
+  const float om13 = other.m[13];
+  const float om14 = other.m[14];
+  const float om15 = other.m[15];
+
+  result[offset]     = tm0 * om0 + tm1 * om4 + tm2 * om8 + tm3 * om12;
+  result[offset + 1] = tm0 * om1 + tm1 * om5 + tm2 * om9 + tm3 * om13;
+  result[offset + 2] = tm0 * om2 + tm1 * om6 + tm2 * om10 + tm3 * om14;
+  result[offset + 3] = tm0 * om3 + tm1 * om7 + tm2 * om11 + tm3 * om15;
+
+  result[offset + 4] = tm4 * om0 + tm5 * om4 + tm6 * om8 + tm7 * om12;
+  result[offset + 5] = tm4 * om1 + tm5 * om5 + tm6 * om9 + tm7 * om13;
+  result[offset + 6] = tm4 * om2 + tm5 * om6 + tm6 * om10 + tm7 * om14;
+  result[offset + 7] = tm4 * om3 + tm5 * om7 + tm6 * om11 + tm7 * om15;
+
+  result[offset + 8]  = tm8 * om0 + tm9 * om4 + tm10 * om8 + tm11 * om12;
+  result[offset + 9]  = tm8 * om1 + tm9 * om5 + tm10 * om9 + tm11 * om13;
+  result[offset + 10] = tm8 * om2 + tm9 * om6 + tm10 * om10 + tm11 * om14;
+  result[offset + 11] = tm8 * om3 + tm9 * om7 + tm10 * om11 + tm11 * om15;
+
+  result[offset + 12] = tm12 * om0 + tm13 * om4 + tm14 * om8 + tm15 * om12;
+  result[offset + 13] = tm12 * om1 + tm13 * om5 + tm14 * om9 + tm15 * om13;
+  result[offset + 14] = tm12 * om2 + tm13 * om6 + tm14 * om10 + tm15 * om14;
+  result[offset + 15] = tm12 * om3 + tm13 * om7 + tm14 * om11 + tm15 * om15;
+#endif
 
   return *this;
 }

@@ -228,7 +228,7 @@ public:
    * @param mesh The mesh that this bone is attached to. This is only used in
    * world space
    */
-  void rotate(Vector3 axis, float amount, Space space = Space::LOCAL,
+  void rotate(Vector3& axis, float amount, Space space = Space::LOCAL,
               AbstractMesh* mesh = nullptr);
 
   /**
