@@ -829,9 +829,8 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
   auto scene = mesh->getScene();
 
   if (json_util::has_key(parsedGeometry, "geometryId")) {
-    std::string geometryId
-      = json_util::get_string(parsedGeometry, "geometryId");
-    auto geometry = scene->getGeometryByID(geometryId);
+    auto geometryId = json_util::get_string(parsedGeometry, "geometryId");
+    auto geometry   = scene->getGeometryByID(geometryId);
     if (geometry) {
       geometry->applyToMesh(mesh.get());
     }
@@ -897,8 +896,45 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
         Color4::CheckColors4(parsedColors, parsedPositions.size() / 3), false);
     }
 
+    if (json_util::has_key(parsedGeometry, "matricesIndices")) {
+      auto matricesIndices
+        = json_util::get_array<float>(parsedGeometry, "matricesIndices");
+      Float32Array floatIndices;
+
+      for (size_t i = 0; i < matricesIndices.size(); ++i) {
+        auto matricesIndex = static_cast<int>(matricesIndices[i]);
+
+        floatIndices.emplace_back(
+          static_cast<float>(matricesIndex & 0x000000FF));
+        floatIndices.emplace_back(
+          static_cast<float>((matricesIndex & 0x0000FF00) >> 8));
+        floatIndices.emplace_back(
+          static_cast<float>((matricesIndex & 0x00FF0000) >> 16));
+        floatIndices.emplace_back(static_cast<float>(matricesIndex >> 24));
+      }
+
+      mesh->setVerticesData(VertexBuffer::MatricesIndicesKind, floatIndices);
+    }
+
     if (json_util::has_key(parsedGeometry, "matricesIndicesExtra")) {
-      // TODO
+      auto matricesIndicesExtra
+        = json_util::get_array<float>(parsedGeometry, "matricesIndicesExtra");
+      Float32Array floatIndices;
+
+      for (size_t i = 0; i < matricesIndicesExtra.size(); ++i) {
+        auto matricesIndexExtra = static_cast<int>(matricesIndicesExtra[i]);
+
+        floatIndices.emplace_back(
+          static_cast<float>(matricesIndexExtra & 0x000000FF));
+        floatIndices.emplace_back(
+          static_cast<float>((matricesIndexExtra & 0x0000FF00) >> 8));
+        floatIndices.emplace_back(
+          static_cast<float>((matricesIndexExtra & 0x00FF0000) >> 16));
+        floatIndices.emplace_back(static_cast<float>(matricesIndexExtra >> 24));
+      }
+
+      mesh->setVerticesData(VertexBuffer::MatricesIndicesExtraKind,
+                            floatIndices);
     }
 
     if (json_util::has_key(parsedGeometry, "matricesWeights")) {

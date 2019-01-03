@@ -315,6 +315,11 @@ StandardMaterialPtr SerializationHelper::Parse(
     standardMaterial->backFaceCulling
       = json_util::get_bool(source, "backFaceCulling");
   }
+  // checkReadyOnlyOnce
+  if (json_util::has_key(source, "checkReadyOnlyOnce")) {
+    standardMaterial->checkReadyOnlyOnce
+      = json_util::get_bool(source, "checkReadyOnlyOnce");
+  }
   // diffuse
   if (json_util::has_key(source, "diffuse")) {
     standardMaterial->diffuseColor

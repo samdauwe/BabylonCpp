@@ -54,7 +54,7 @@ BabylonFileLoader::parseMaterialById(const std::string& id,
 {
   for (const auto& parsedMaterial :
        json_util::get_array<json>(parsedData, "materials")) {
-    if (json_util::get_string(parsedData, "id") == id) {
+    if (json_util::get_string(parsedMaterial, "id") == id) {
       return Material::Parse(parsedMaterial, scene, rootUrl);
     }
   }
@@ -219,14 +219,18 @@ bool BabylonFileLoader::importMesh(
                       subMatId.get<std::string>());
                     auto mat = parseMaterialById(subMatId.get<std::string>(),
                                                  parsedData, scene, rootUrl);
-                    log << "\n\tMaterial " << mat->toString(fullDetails);
+                    if (mat) {
+                      log << "\n\tMaterial " << mat->toString(fullDetails);
+                    }
                   }
                 }
                 loadedMaterialsIds.emplace_back(parsedMultiMaterialId);
                 auto mmat
                   = Material::ParseMultiMaterial(parsedMultiMaterial, scene);
-                materialFound = true;
-                log << "\n\tMulti-Material " << mmat->toString(fullDetails);
+                if (mmat) {
+                  materialFound = true;
+                  log << "\n\tMulti-Material " << mmat->toString(fullDetails);
+                }
                 break;
               }
             }

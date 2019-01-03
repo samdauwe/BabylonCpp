@@ -684,7 +684,6 @@ void Bone::_rotateWithMatrix(const Matrix& rmat, Space space,
   lmat.m[14] = lz;
 
   computeAbsoluteTransforms();
-
   _markAsDirtyAndDecompose();
 }
 

@@ -2218,7 +2218,7 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   if (json_util::has_key(parsedMesh, "scaling")) {
-    mesh->position
+    mesh->scaling
       = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "scaling"));
   }
 
