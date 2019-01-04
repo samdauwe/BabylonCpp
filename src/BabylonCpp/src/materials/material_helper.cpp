@@ -205,14 +205,14 @@ bool MaterialHelper::PrepareDefinesForAttributes(
       defines.boolDef["MORPHTARGETS_NORMAL"]
         = manager->supportsNormals() && defines["NORMAL"];
       defines.boolDef["MORPHTARGETS"] = (manager->numInfluencers() > 0);
-      defines.intDef["NUM_BONE_INFLUENCERS"]
+      defines.intDef["NUM_MORPH_INFLUENCERS"]
         = static_cast<unsigned>(manager->numInfluencers());
     }
     else {
       defines.boolDef["MORPHTARGETS_TANGENT"] = false;
       defines.boolDef["MORPHTARGETS_NORMAL"]  = false;
       defines.boolDef["MORPHTARGETS"]         = false;
-      defines.intDef["NUM_BONE_INFLUENCERS"]  = 0;
+      defines.intDef["NUM_MORPH_INFLUENCERS"] = 0;
     }
   }
 
