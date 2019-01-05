@@ -12,6 +12,7 @@
 #include <babylon/samples/textures/mirror_texture_scene.h>
 #include <babylon/samples/textures/mirrors_scene.h>
 #include <babylon/samples/textures/multi_sample_render_targets_scene.h>
+#include <babylon/samples/textures/opacity_texture_scene.h>
 #include <babylon/samples/textures/photo_dome_scene.h>
 #include <babylon/samples/textures/procedural_textures_scene.h>
 #include <babylon/samples/textures/render_target_texture_scene.h>
@@ -98,6 +99,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     [](ICanvas* iCanvas) {                                             //
       return std::make_unique<MultiSampleRenderTargetsScene>(iCanvas); //
     });                                                                //
+  // Opacity Textur Scene
+  _samples["OpacityTexturScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<OpacityTexturScene>(iCanvas); //
+                      });                                                     //
   // Photo Dome Scene
   _samples["PhotoDomeScene"]
     = std::make_tuple(false,                                              //
