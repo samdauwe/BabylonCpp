@@ -108,7 +108,7 @@ void Node::set_parent(Node* const& parent)
 
   // Add as child to new parent
   if (_parentNode) {
-    _parentNode->_children.emplace_back(this);
+    _parentNode->_children.emplace_back(shared_from_this());
 
     if (!previousParentNode) {
       removeFromSceneRootNodes();

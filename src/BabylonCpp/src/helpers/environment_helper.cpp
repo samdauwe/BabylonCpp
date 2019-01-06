@@ -26,7 +26,16 @@ EnvironmentHelper::EnvironmentHelper(Scene* scene)
 
 EnvironmentHelper::EnvironmentHelper(const IEnvironmentHelperOptions& options,
                                      Scene* scene)
-    : _scene{scene}, _options{options}
+    : _rootMesh{nullptr}
+    , _skybox{nullptr}
+    , _skyboxTexture{nullptr}
+    , _skyboxMaterial{nullptr}
+    , _ground{nullptr}
+    , _groundTexture{nullptr}
+    , _groundMirror{nullptr}
+    , _groundMaterial{nullptr}
+    , _scene{scene}
+    , _options{options}
 {
   _setupBackground();
   _setupImageProcessing();

@@ -2440,7 +2440,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   if (json_util::has_key(parsedMesh, "autoAnimate")
-      && !json_util::is_null(parsedMesh["autoAnimate"])) {
+      && !json_util::is_null(parsedMesh["autoAnimate"])
+      && json_util::get_bool(parsedMesh, "autoAnimate")) {
     scene->beginAnimation(
       mesh, json_util::get_number(parsedMesh, "autoAnimateFrom", 0),
       json_util::get_number(parsedMesh, "autoAnimateTo", 0),

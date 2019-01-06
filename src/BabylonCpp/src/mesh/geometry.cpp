@@ -828,7 +828,8 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
 {
   auto scene = mesh->getScene();
 
-  if (json_util::has_key(parsedGeometry, "geometryId")) {
+  if (json_util::has_key(parsedGeometry, "geometryId")
+      && !json_util::is_null(parsedGeometry["geometryId"])) {
     auto geometryId = json_util::get_string(parsedGeometry, "geometryId");
     auto geometry   = scene->getGeometryByID(geometryId);
     if (geometry) {
@@ -846,49 +847,57 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
       VertexBuffer::NormalKind,
       json_util::get_array<float>(parsedGeometry, "normals"), false);
 
-    if (json_util::has_key(parsedGeometry, "tangents")) {
+    if (json_util::has_key(parsedGeometry, "tangents")
+        && !json_util::is_null(parsedGeometry["tangents"])) {
       mesh->setVerticesData(
         VertexBuffer::TangentKind,
         json_util::get_array<float>(parsedGeometry, "tangents"), false);
     }
 
-    if (json_util::has_key(parsedGeometry, "uvs")) {
+    if (json_util::has_key(parsedGeometry, "uvs")
+        && !json_util::is_null(parsedGeometry["uvs"])) {
       mesh->setVerticesData(VertexBuffer::UVKind,
                             json_util::get_array<float>(parsedGeometry, "uvs"),
                             false);
     }
 
-    if (json_util::has_key(parsedGeometry, "uvs2")) {
+    if (json_util::has_key(parsedGeometry, "uvs2")
+        && !json_util::is_null(parsedGeometry["uvs2"])) {
       mesh->setVerticesData(VertexBuffer::UV2Kind,
                             json_util::get_array<float>(parsedGeometry, "uvs2"),
                             false);
     }
 
-    if (json_util::has_key(parsedGeometry, "uvs3")) {
+    if (json_util::has_key(parsedGeometry, "uvs3")
+        && !json_util::is_null(parsedGeometry["uvs3"])) {
       mesh->setVerticesData(VertexBuffer::UV3Kind,
                             json_util::get_array<float>(parsedGeometry, "uvs3"),
                             false);
     }
 
-    if (json_util::has_key(parsedGeometry, "uvs4")) {
+    if (json_util::has_key(parsedGeometry, "uvs4")
+        && !json_util::is_null(parsedGeometry["uvs4"])) {
       mesh->setVerticesData(VertexBuffer::UV4Kind,
                             json_util::get_array<float>(parsedGeometry, "uvs4"),
                             false);
     }
 
-    if (json_util::has_key(parsedGeometry, "uvs5")) {
+    if (json_util::has_key(parsedGeometry, "uvs5")
+        && !json_util::is_null(parsedGeometry["uvs5"])) {
       mesh->setVerticesData(VertexBuffer::UV5Kind,
                             json_util::get_array<float>(parsedGeometry, "uvs5"),
                             false);
     }
 
-    if (json_util::has_key(parsedGeometry, "uvs6")) {
+    if (json_util::has_key(parsedGeometry, "uvs6")
+        && !json_util::is_null(parsedGeometry["uvs6"])) {
       mesh->setVerticesData(VertexBuffer::UV6Kind,
                             json_util::get_array<float>(parsedGeometry, "uvs6"),
                             false);
     }
 
-    if (json_util::has_key(parsedGeometry, "colors")) {
+    if (json_util::has_key(parsedGeometry, "colors")
+        && !json_util::is_null(parsedGeometry["colors"])) {
       const auto parsedColors
         = json_util::get_array<float>(parsedGeometry, "colors");
       mesh->setVerticesData(
@@ -896,7 +905,8 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
         Color4::CheckColors4(parsedColors, parsedPositions.size() / 3), false);
     }
 
-    if (json_util::has_key(parsedGeometry, "matricesIndices")) {
+    if (json_util::has_key(parsedGeometry, "matricesIndices")
+        && !json_util::is_null(parsedGeometry["matricesIndices"])) {
       auto matricesIndices
         = json_util::get_array<float>(parsedGeometry, "matricesIndices");
       Float32Array floatIndices;
@@ -916,7 +926,8 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
       mesh->setVerticesData(VertexBuffer::MatricesIndicesKind, floatIndices);
     }
 
-    if (json_util::has_key(parsedGeometry, "matricesIndicesExtra")) {
+    if (json_util::has_key(parsedGeometry, "matricesIndicesExtra")
+        && !json_util::is_null(parsedGeometry["matricesIndicesExtra"])) {
       auto matricesIndicesExtra
         = json_util::get_array<float>(parsedGeometry, "matricesIndicesExtra");
       Float32Array floatIndices;
@@ -937,7 +948,8 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
                             floatIndices);
     }
 
-    if (json_util::has_key(parsedGeometry, "matricesWeights")) {
+    if (json_util::has_key(parsedGeometry, "matricesWeights")
+        && !json_util::is_null(parsedGeometry["matricesWeights"])) {
       auto matricesWeights
         = json_util::get_array<float>(parsedGeometry, "matricesWeights");
       Geometry::_CleanMatricesWeights(parsedGeometry, mesh);
@@ -945,14 +957,16 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
                             false);
     }
 
-    if (json_util::has_key(parsedGeometry, "matricesWeightsExtra")) {
+    if (json_util::has_key(parsedGeometry, "matricesWeightsExtra")
+        && !json_util::is_null(parsedGeometry["matricesWeightsExtra"])) {
       auto matricesWeightsExtra
         = json_util::get_array<float>(parsedGeometry, "matricesWeightsExtra");
       mesh->setVerticesData(VertexBuffer::MatricesWeightsExtraKind,
                             matricesWeightsExtra, false);
     }
 
-    if (json_util::has_key(parsedGeometry, "indices")) {
+    if (json_util::has_key(parsedGeometry, "indices")
+        && !json_util::is_null(parsedGeometry["indices"])) {
       mesh->setIndices(
         json_util::get_array<uint32_t>(parsedGeometry, "indices"), 0);
     }
@@ -960,6 +974,7 @@ void Geometry::_ImportGeometry(const json& parsedGeometry, const MeshPtr& mesh)
 
   // SubMeshes
   if (json_util::has_key(parsedGeometry, "subMeshes")
+      && !json_util::is_null(parsedGeometry["subMeshes"])
       && parsedGeometry["subMeshes"].is_array()) {
     mesh->subMeshes.clear();
     for (auto& parsedSubMesh :

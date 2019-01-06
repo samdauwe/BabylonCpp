@@ -231,47 +231,67 @@ SerializationHelper::Parse(const std::function<CameraPtr()>& creationFunction,
     /** FreeCamera **/
     auto freeCamera = std::static_pointer_cast<FreeCamera>(camera);
     // applyGravity
-    if (json_util::has_key(source, "applyGravity")) {
+    if (json_util::has_key(source, "applyGravity")
+        && !json_util::is_null(source["applyGravity"])) {
       freeCamera->applyGravity = json_util::get_bool(source, "applyGravity");
     }
     // cameraRigMode
-    if (json_util::has_key(source, "cameraRigMode")) {
+    if (json_util::has_key(source, "cameraRigMode")
+        && !json_util::is_null(source["cameraRigMode"])) {
       freeCamera->cameraRigMode
         = json_util::get_number<unsigned>(source, "cameraRigMode");
     }
     // checkCollisions
-    if (json_util::has_key(source, "checkCollisions")) {
+    if (json_util::has_key(source, "checkCollisions")
+        && !json_util::is_null(source["checkCollisions"])) {
       freeCamera->checkCollisions
         = json_util::get_bool(source, "checkCollisions");
     }
     // ellipsoid
-    if (json_util::has_key(source, "ellipsoid")) {
+    if (json_util::has_key(source, "ellipsoid")
+        && !json_util::is_null(source["ellipsoid"])) {
       freeCamera->ellipsoid
         = Vector3::FromArray(json_util::get_array<float>(source, "ellipsoid"));
     }
     // fov
-    if (json_util::has_key(source, "fov")) {
+    if (json_util::has_key(source, "fov")
+        && !json_util::is_null(source["fov"])) {
       freeCamera->fov = json_util::get_number<float>(source, "fov");
     }
-    // fov
-    if (json_util::has_key(source, "inertia")) {
+    // id
+    if (json_util::has_key(source, "id") && !json_util::is_null(source["id"])) {
+      freeCamera->id = json_util::get_string(source, "id");
+    }
+    // inertia
+    if (json_util::has_key(source, "inertia")
+        && !json_util::is_null(source["inertia"])) {
       freeCamera->inertia = json_util::get_number<float>(source, "inertia");
     }
     // maxZ
-    if (json_util::has_key(source, "maxZ")) {
+    if (json_util::has_key(source, "maxZ")
+        && !json_util::is_null(source["maxZ"])) {
       freeCamera->maxZ = json_util::get_number<float>(source, "maxZ");
     }
     // minZ
-    if (json_util::has_key(source, "minZ")) {
+    if (json_util::has_key(source, "minZ")
+        && !json_util::is_null(source["minZ"])) {
       freeCamera->minZ = json_util::get_number<float>(source, "minZ");
     }
     // position
-    if (json_util::has_key(source, "position")) {
+    if (json_util::has_key(source, "position")
+        && !json_util::is_null(source["position"])) {
       freeCamera->position
         = Vector3::FromArray(json_util::get_array<float>(source, "position"));
     }
+    // rotation
+    if (json_util::has_key(source, "rotation")
+        && !json_util::is_null(source["rotation"])) {
+      freeCamera->rotation = std::make_unique<Vector3>(
+        Vector3::FromArray(json_util::get_array<float>(source, "rotation")));
+    }
     // speed
-    if (json_util::has_key(source, "speed")) {
+    if (json_util::has_key(source, "speed")
+        && !json_util::is_null(source["speed"])) {
       freeCamera->speed = json_util::get_number<float>(source, "speed");
     }
   }
@@ -378,15 +398,16 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
     case 3: {
       /** HemisphericLight **/
       auto hemisphericLight = std::static_pointer_cast<HemisphericLight>(light);
+      // direction
+      if (json_util::has_key(source, "direction")
+          && !json_util::is_null(source["direction"])) {
+        hemisphericLight->direction = Vector3::FromArray(
+          json_util::get_array<float>(source, "direction"));
+      }
       // groundColor
       if (json_util::has_key(source, "groundColor")) {
         hemisphericLight->groundColor = Color3::FromArray(
           json_util::get_array<float>(source, "groundColor"));
-      }
-      // direction
-      if (json_util::has_key(source, "direction")) {
-        hemisphericLight->direction = Vector3::FromArray(
-          json_util::get_array<float>(source, "direction"));
       }
     } break;
     default:

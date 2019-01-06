@@ -107,7 +107,7 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
                       });                                                     //
   // Photo Dome Scene
   _samples["PhotoDomeScene"]
-    = std::make_tuple(false,                                              //
+    = std::make_tuple(true,                                               //
                       [](ICanvas* iCanvas) {                              //
                         return std::make_unique<PhotoDomeScene>(iCanvas); //
                       });                                                 //

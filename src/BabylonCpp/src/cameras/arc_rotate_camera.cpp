@@ -31,9 +31,9 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
                                  Scene* scene,
                                  bool setActiveOnSceneIfNoneActive)
     : TargetCamera{iName, Vector3::Zero(), scene, setActiveOnSceneIfNoneActive}
-    , alpha{iAlpha}
-    , beta{iBeta}
-    , radius{iRadius}
+    , alpha{0.f}
+    , beta{0.f}
+    , radius{0.f}
     , target{this, &ArcRotateCamera::get_target, &ArcRotateCamera::set_target}
     , inertialAlphaOffset{0.f}
     , inertialBetaOffset{0.f}
@@ -67,7 +67,6 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
                               &ArcRotateCamera::set_useAutoRotationBehavior}
     , checkCollisions{false}
     , collisionRadius{std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
-    , _target{Vector3::Zero()}
     , _targetHost{nullptr}
     , _collider{nullptr}
     , _previousPosition{Vector3::Zero()}
@@ -79,9 +78,15 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , _autoRotationBehavior{nullptr}
     , _computationVector{Vector3::Zero()}
 {
-  if (iTarget) {
+  _target = Vector3::Zero();
+  if (iTarget.has_value()) {
     setTarget(*iTarget);
   }
+
+  alpha  = iAlpha;
+  beta   = iBeta;
+  radius = iRadius;
+
   getViewMatrix();
   inputs = std::make_unique<ArcRotateCameraInputsManager>(this);
   inputs->addKeyboard().addMouseWheel().addPointers();
@@ -394,17 +399,17 @@ void ArcRotateCamera::set_target(const Vector3& value)
 void ArcRotateCamera::setTarget(AbstractMesh* iTarget, bool toBoundingCenter,
                                 bool /*allowSamePosition*/)
 {
-  {
-    if (toBoundingCenter) {
-      _targetBoundingCenter
-        = iTarget->getBoundingInfo().boundingBox.centerWorld.clone();
-    }
-    else {
-      _targetBoundingCenter.reset(nullptr);
-    }
-    _targetHost = iTarget;
-    _target     = _getTargetPosition();
+  if (toBoundingCenter) {
+    _targetBoundingCenter
+      = iTarget->getBoundingInfo().boundingBox.centerWorld.clone();
   }
+  else {
+    _targetBoundingCenter.reset(nullptr);
+  }
+  _targetHost = iTarget;
+  _target     = _getTargetPosition();
+
+  onMeshTargetChangedObservable.notifyObservers(_targetHost);
 
   rebuildAnglesAndRadius();
 }
@@ -417,8 +422,10 @@ void ArcRotateCamera::setTarget(const Vector3& iTarget,
   if (!allowSamePosition && _getTargetPosition().equals(newTarget)) {
     return;
   }
-  _target = newTarget;
-  _targetBoundingCenter.reset(nullptr);
+  _targetHost           = nullptr;
+  _target               = newTarget;
+  _targetBoundingCenter = nullptr;
+  onMeshTargetChangedObservable.notifyObservers(nullptr);
 
   rebuildAnglesAndRadius();
 }

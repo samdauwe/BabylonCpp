@@ -2111,7 +2111,9 @@ void Scene::_animate()
   _animationTime += static_cast<int>(deltaTime);
   _animationTimeLast = now;
   for (auto& activeAnimatable : _activeAnimatables) {
-    activeAnimatable->_animate(std::chrono::milliseconds(_animationTime));
+    if (activeAnimatable) {
+      activeAnimatable->_animate(std::chrono::milliseconds(_animationTime));
+    }
   }
 
   // Late animation bindings
