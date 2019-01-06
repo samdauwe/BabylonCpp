@@ -2,6 +2,8 @@
 
 #include <babylon/samples/materialslibrary/cell_material_scene.h>
 #include <babylon/samples/materialslibrary/cell_shading_material_scene.h>
+#include <babylon/samples/materialslibrary/fire_material_scene.h>
+#include <babylon/samples/materialslibrary/fur_material_scene.h>
 #include <babylon/samples/materialslibrary/gradient_material_scene.h>
 #include <babylon/samples/materialslibrary/gradient_material_sphere_scene.h>
 #include <babylon/samples/materialslibrary/grid_material_scene.h>
@@ -33,6 +35,18 @@ _MaterialsLibrarySamplesIndex::_MaterialsLibrarySamplesIndex()
     [](ICanvas* iCanvas) {                                        //
       return std::make_unique<CellShadingMaterialScene>(iCanvas); //
     });                                                           //
+  // Fire Material Scene
+  _samples["FireMaterialScene"]
+    = std::make_tuple(true,                                                  //
+                      [](ICanvas* iCanvas) {                                 //
+                        return std::make_unique<FireMaterialScene>(iCanvas); //
+                      });                                                    //
+  // Fur Material Scene
+  _samples["FurMaterialScene"]
+    = std::make_tuple(false,                                                //
+                      [](ICanvas* iCanvas) {                                //
+                        return std::make_unique<FurMaterialScene>(iCanvas); //
+                      });                                                   //
   // Gradient Material Scene
   _samples["GradientMaterialScene"] = std::make_tuple(
     true,                                                      //

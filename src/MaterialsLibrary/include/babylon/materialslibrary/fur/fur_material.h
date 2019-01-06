@@ -12,16 +12,29 @@ namespace BABYLON {
 class AbstractMesh;
 class DynamicTexture;
 class IAnimatable;
-using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
+class Mesh;
 using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
 using DynamicTexturePtr = std::shared_ptr<DynamicTexture>;
+using IAnimatablePtr    = std::shared_ptr<IAnimatable>;
+using MeshPtr           = std::shared_ptr<Mesh>;
 
 namespace MaterialsLibrary {
+
+class FurMaterial;
+using FurMaterialPtr = std::shared_ptr<FurMaterial>;
 
 class BABYLON_SHARED_EXPORT FurMaterial : public PushMaterial {
 
 public:
-  FurMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static FurMaterialPtr New(Ts&&... args)
+  {
+    auto material = std::shared_ptr<FurMaterial>(
+      new FurMaterial(std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~FurMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -44,16 +57,26 @@ public:
   /** Statics **/
   static FurMaterial* Parse(const json& source, Scene* scene,
                             const std::string& rootUrl);
-  static DynamicTexture* GenerateTexture(const std::string& name, Scene* scene);
+  static DynamicTexturePtr GenerateTexture(const std::string& name,
+                                           Scene* scene);
 
   /**
    * Creates and returns an array of meshes used as shells for the Fur Material
    * that can be disposed later in your code
    * The quality is in interval [0, 100]
    */
-  static std::vector<Mesh*> FurifyMesh(Mesh* sourceMesh, unsigned int quality);
+  static std::vector<Mesh*> FurifyMesh(const MeshPtr& sourceMesh,
+                                       float quality);
 
 protected:
+  /**
+   * Constructor
+   * @param name The name given to the material in order to identify it
+   * afterwards.
+   * @param scene The scene the material is used in.
+   */
+  FurMaterial(const std::string& name, Scene* scene);
+
   BaseTexturePtr& get_diffuseTexture();
   void set_diffuseTexture(const BaseTexturePtr& value);
   BaseTexturePtr& get_heightTexture();

@@ -12,6 +12,8 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materialslibrary/fire/fire_fragment_fx.h>
+#include <babylon/materialslibrary/fire/fire_vertex_fx.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -37,6 +39,11 @@ FireMaterial::FireMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
     , _lastTime{0.f}
 {
+  // Vertex shader
+  Effect::ShadersStore()["fireVertexShader"] = fireVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore()["firePixelShader"] = firePixelShader;
 }
 
 FireMaterial::~FireMaterial()

@@ -12,6 +12,8 @@
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/dynamic_texture.h>
+#include <babylon/materialslibrary/fur/fur_fragment_fx.h>
+#include <babylon/materialslibrary/fur/fur_vertex_fx.h>
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
@@ -50,6 +52,11 @@ FurMaterial::FurMaterial(const std::string& iName, Scene* scene)
     , _renderId{-1}
     , _furTime{0.f}
 {
+  // Vertex shader
+  Effect::ShadersStore()["furVertexShader"] = furVertexShader;
+
+  // Fragment shader
+  Effect::ShadersStore()["furPixelShader"] = furPixelShader;
 }
 
 FurMaterial::~FurMaterial()
@@ -482,14 +489,14 @@ FurMaterial* FurMaterial::Parse(const json& /*source*/, Scene* /*scene*/,
   return nullptr;
 }
 
-DynamicTexture* FurMaterial::GenerateTexture(const std::string& /*name*/,
-                                             Scene* /*scene*/)
+DynamicTexturePtr FurMaterial::GenerateTexture(const std::string& /*name*/,
+                                               Scene* /*scene*/)
 {
   return nullptr;
 }
 
-std::vector<Mesh*> FurMaterial::FurifyMesh(Mesh* /*sourceMesh*/,
-                                           unsigned int /*quality*/)
+std::vector<Mesh*> FurMaterial::FurifyMesh(const MeshPtr& /*sourceMesh*/,
+                                           float /*quality*/)
 {
   return std::vector<Mesh*>();
 }

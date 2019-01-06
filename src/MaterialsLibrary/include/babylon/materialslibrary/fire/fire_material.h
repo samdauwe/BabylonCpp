@@ -13,13 +13,24 @@ using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 namespace MaterialsLibrary {
 
+class FireMaterial;
+using FireMaterialPtr = std::shared_ptr<FireMaterial>;
+
 class BABYLON_SHARED_EXPORT FireMaterial : public PushMaterial {
 
 public:
   static unsigned int maxSimultaneousLights;
 
 public:
-  FireMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static FireMaterialPtr New(Ts&&... args)
+  {
+    auto material = std::shared_ptr<FireMaterial>(
+      new FireMaterial(std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~FireMaterial() override;
 
   bool needAlphaBlending() const override;
@@ -43,6 +54,14 @@ public:
                              const std::string& rootUrl);
 
 protected:
+  /**
+   * Constructor
+   * @param name The name given to the material in order to identify it
+   * afterwards.
+   * @param scene The scene the material is used in.
+   */
+  FireMaterial(const std::string& name, Scene* scene);
+
   BaseTexturePtr& get_diffuseTexture();
   void set_diffuseTexture(const BaseTexturePtr& value);
   BaseTexturePtr& get_distortionTexture();
