@@ -1,13 +1,15 @@
 #include <babylon/materials/textures/texture.h>
 
-#include <nlohmann/json.hpp>
-
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/internal_texture.h>
+#include <babylon/materials/textures/mirror_texture.h>
 #include <babylon/mesh/buffer.h>
+#include <babylon/tools/serialization_helper.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -427,10 +429,100 @@ TexturePtr Texture::CreateFromBase64String(
                       onLoad, onError, data, false, format);
 }
 
-std::unique_ptr<BaseTexture> Texture::Parse(const json& /*parsedTexture*/,
-                                            Scene* /*scene*/,
-                                            const std::string& /*rootUrl*/)
+BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
+                              const std::string& rootUrl)
 {
+  if (json_util::has_key(parsedTexture, "isCube")
+      && !json_util::is_null(parsedTexture["isCube"])
+      && json_util::get_bool(parsedTexture, "isCube")) {
+    return CubeTexture::Parse(parsedTexture, scene, rootUrl);
+  }
+
+  if ((!json_util::has_key(parsedTexture, "name")
+       || json_util::is_null(parsedTexture["name"]))
+      && (!json_util::has_key(parsedTexture, "isRenderTarget")
+          || json_util::is_null(parsedTexture["isRenderTarget"]))) {
+    return nullptr;
+  }
+
+  auto texture = SerializationHelper::Parse(
+    [&]() -> TexturePtr {
+      auto generateMipMaps = true;
+      if (json_util::has_key(parsedTexture, "noMipmap")
+          && !json_util::is_null(parsedTexture["noMipmap"])
+          && json_util::get_bool(parsedTexture, "noMipmap")) {
+        generateMipMaps = true;
+      }
+      if (json_util::has_key(parsedTexture, "mirrorPlane")
+          && !json_util::is_null(parsedTexture["mirrorPlane"])) {
+        auto mirrorTexture = MirrorTexture::New(
+          json_util::get_string(parsedTexture, "name"),
+          json_util::get_number<float>(parsedTexture, "renderTargetSize"),
+          scene, generateMipMaps);
+        mirrorTexture->_waitingRenderList
+          = json_util::get_array<std::string>(parsedTexture, "renderList");
+        mirrorTexture->mirrorPlane = Plane::FromArray(
+          json_util::get_array<float>(parsedTexture, "mirrorPlane"));
+
+        return std::move(mirrorTexture);
+      }
+      else if (json_util::has_key(parsedTexture, "isRenderTarget")
+               && !json_util::is_null(parsedTexture["isRenderTarget"])
+               && json_util::get_bool(parsedTexture, "isRenderTarget")) {
+        auto renderTargetTexture = RenderTargetTexture::New(
+          json_util::get_string(parsedTexture, "name"),
+          json_util::get_number<float>(parsedTexture, "renderTargetSize"),
+          scene, generateMipMaps);
+        renderTargetTexture->_waitingRenderList
+          = json_util::get_array<std::string>(parsedTexture, "renderList");
+
+        return std::move(renderTargetTexture);
+      }
+      else {
+        TexturePtr texture = nullptr;
+        if (json_util::has_key(parsedTexture, "base64String")
+            && !json_util::is_null(parsedTexture["base64String"])) {
+          texture = Texture::CreateFromBase64String(
+            json_util::get_string(parsedTexture, "base64String"),
+            json_util::get_string(parsedTexture, "name"), scene,
+            !generateMipMaps);
+        }
+        else {
+          auto url = rootUrl + json_util::get_string(parsedTexture, "name");
+
+          if (Texture::UseSerializedUrlIfAny
+              && json_util::has_key(parsedTexture, "url")
+              && !json_util::is_null(parsedTexture["url"])) {
+            url = json_util::get_string(parsedTexture, "url");
+          }
+          texture
+            = Texture::New(url, scene, !generateMipMaps,
+                           json_util::get_bool(parsedTexture, "invertY", true));
+        }
+
+        return texture;
+      }
+    },
+    parsedTexture, scene);
+
+  // Update Sampling Mode
+  if (json_util::has_key(parsedTexture, "samplingMode")
+      && !json_util::is_null(parsedTexture["samplingMode"])) {
+    auto sampling
+      = json_util::get_number<unsigned>(parsedTexture, "samplingMode");
+    if (texture->_samplingMode != sampling) {
+      texture->updateSamplingMode(sampling);
+    }
+  }
+
+  // Animations
+  if (json_util::has_key(parsedTexture, "animations")) {
+    for (auto parsedAnimation :
+         json_util::get_array<json>(parsedTexture, "animations")) {
+      texture->animations.emplace_back(Animation::Parse(parsedAnimation));
+    }
+  }
+
   return nullptr;
 }
 

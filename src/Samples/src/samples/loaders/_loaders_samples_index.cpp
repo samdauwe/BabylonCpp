@@ -2,6 +2,7 @@
 
 #include <babylon/samples/loaders/import_babylon_js_logo_scene.h>
 #include <babylon/samples/loaders/import_meshes_skull_scene.h>
+#include <babylon/samples/loaders/import_rabbit_scene.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -22,6 +23,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
     [](ICanvas* iCanvas) {                                      //
       return std::make_unique<ImportMeshesSkullScene>(iCanvas); //
     });                                                         //
+  // Import Rabbit Scene
+  _samples["ImportRabbitScene"]
+    = std::make_tuple(false,                                                 //
+                      [](ICanvas* iCanvas) {                                 //
+                        return std::make_unique<ImportRabbitScene>(iCanvas); //
+                      });                                                    //
 }
 
 _LoadersSamplesIndex::~_LoadersSamplesIndex()

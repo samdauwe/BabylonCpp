@@ -11,14 +11,90 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
 
-BaseTexture* SerializationHelper::Parse(BaseTexture* baseTexture,
-                                        const json& /*parsedBaseTexture*/,
-                                        Scene* /*scene*/)
+TexturePtr
+SerializationHelper::Parse(const std::function<TexturePtr()>& creationFunction,
+                           const json& source, Scene* /*scene*/,
+                           const std::string& /*rootUrl*/)
 {
-  return baseTexture;
+  auto texture = creationFunction();
+
+  if (!texture) {
+    return nullptr;
+  }
+
+  // coordinatesIndex
+  if (json_util::has_key(source, "coordinatesIndex")
+      && !json_util::is_null(source["coordinatesIndex"])) {
+    texture->coordinatesIndex
+      = json_util::get_number<unsigned>(source, "coordinatesIndex");
+  }
+  // coordinatesMode
+  if (json_util::has_key(source, "coordinatesMode")
+      && !json_util::is_null(source["coordinatesMode"])) {
+    texture->coordinatesMode
+      = json_util::get_number<unsigned>(source, "coordinatesMode");
+  }
+  // hasAlpha
+  if (json_util::has_key(source, "hasAlpha")
+      && !json_util::is_null(source["hasAlpha"])) {
+    texture->hasAlpha = json_util::get_bool(source, "hasAlpha");
+  }
+  // coordinatesMode
+  if (json_util::has_key(source, "level")
+      && !json_util::is_null(source["level"])) {
+    texture->level = json_util::get_number<unsigned>(source, "level");
+  }
+  // uAng
+  if (json_util::has_key(source, "uAng")
+      && !json_util::is_null(source["uAng"])) {
+    texture->uAng = json_util::get_number<float>(source, "uAng");
+  }
+  // uOffset
+  if (json_util::has_key(source, "uOffset")
+      && !json_util::is_null(source["uOffset"])) {
+    texture->uOffset = json_util::get_number<float>(source, "uOffset");
+  }
+  // uScale
+  if (json_util::has_key(source, "uScale")
+      && !json_util::is_null(source["uScale"])) {
+    texture->uScale = json_util::get_number<float>(source, "uScale");
+  }
+  // vAng
+  if (json_util::has_key(source, "vAng")
+      && !json_util::is_null(source["vAng"])) {
+    texture->vAng = json_util::get_number<float>(source, "vAng");
+  }
+  // vOffset
+  if (json_util::has_key(source, "vOffset")
+      && !json_util::is_null(source["vOffset"])) {
+    texture->vOffset = json_util::get_number<float>(source, "vOffset");
+  }
+  // vScale
+  if (json_util::has_key(source, "vScale")
+      && !json_util::is_null(source["vScale"])) {
+    texture->vScale = json_util::get_number<float>(source, "vScale");
+  }
+  // wAng
+  if (json_util::has_key(source, "wAng")
+      && !json_util::is_null(source["wAng"])) {
+    texture->wAng = json_util::get_number<float>(source, "wAng");
+  }
+  // wrapU
+  if (json_util::has_key(source, "wrapU")
+      && !json_util::is_null(source["wrapU"])) {
+    texture->wrapU = json_util::get_number<unsigned>(source, "wrapU");
+  }
+  // wrapV
+  if (json_util::has_key(source, "wrapV")
+      && !json_util::is_null(source["wrapV"])) {
+    texture->wrapV = json_util::get_number<unsigned>(source, "wrapV");
+  }
+
+  return texture;
 }
 
 CameraPtr
@@ -218,10 +294,39 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
     case 0: {
       /** PointLight **/
       auto pointLight = std::static_pointer_cast<PointLight>(light);
+      // diffuse
+      if (json_util::has_key(source, "diffuse")
+          && !json_util::is_null(source["diffuse"])) {
+        pointLight->diffuse
+          = Color3::FromArray(json_util::get_array<float>(source, "diffuse"));
+      }
+      // direction
+      if (json_util::has_key(source, "direction")
+          && !json_util::is_null(source["direction"])) {
+        pointLight->direction = Vector3::FromArray(
+          json_util::get_array<float>(source, "direction"));
+      }
+      // id
+      if (json_util::has_key(source, "id")
+          && !json_util::is_null(source["id"])) {
+        pointLight->id = json_util::get_string(source, "id");
+      }
+      // intensity
+      if (json_util::has_key(source, "intensity")
+          && !json_util::is_null(source["intensity"])) {
+        pointLight->intensity = json_util::get_number(source, "direction", 1.f);
+      }
       // position
-      if (json_util::has_key(source, "position")) {
+      if (json_util::has_key(source, "position")
+          && !json_util::is_null(source["position"])) {
         pointLight->position
           = Vector3::FromArray(json_util::get_array<float>(source, "position"));
+      }
+      // specular
+      if (json_util::has_key(source, "specular")
+          && !json_util::is_null(source["specular"])) {
+        pointLight->specular
+          = Color3::FromArray(json_util::get_array<float>(source, "specular"));
       }
     } break;
     case 1: {
@@ -293,7 +398,7 @@ SerializationHelper::Parse(const std::function<LightPtr()>& creationFunction,
 
 StandardMaterialPtr SerializationHelper::Parse(
   const std::function<StandardMaterialPtr()>& creationFunction,
-  const json& source, Scene* /*scene*/, const std::string& /*rootUrl*/)
+  const json& source, Scene* scene, const std::string& rootUrl)
 {
   auto standardMaterial = creationFunction();
 
@@ -302,132 +407,198 @@ StandardMaterialPtr SerializationHelper::Parse(
   }
 
   // alpha
-  if (json_util::has_key(source, "alpha")) {
+  if (json_util::has_key(source, "alpha")
+      && !json_util::is_null(source["alpha"])) {
     standardMaterial->alpha = json_util::get_number<float>(source, "alpha");
   }
   // ambient
-  if (json_util::has_key(source, "ambient")) {
+  if (json_util::has_key(source, "ambient")
+      && !json_util::is_null(source["ambient"])) {
     standardMaterial->ambientColor
       = Color3::FromArray(json_util::get_array<float>(source, "ambient"));
   }
+  // ambientTexture
+  if (json_util::has_key(source, "ambientTexture")
+      && !json_util::is_null(source["ambientTexture"])) {
+    standardMaterial->ambientTexture
+      = Texture::Parse(source["ambientTexture"], scene, rootUrl);
+  }
   // backFaceCulling
-  if (json_util::has_key(source, "backFaceCulling")) {
+  if (json_util::has_key(source, "backFaceCulling")
+      && !json_util::is_null(source["backFaceCulling"])) {
     standardMaterial->backFaceCulling
       = json_util::get_bool(source, "backFaceCulling");
   }
   // checkReadyOnlyOnce
-  if (json_util::has_key(source, "checkReadyOnlyOnce")) {
+  if (json_util::has_key(source, "checkReadyOnlyOnce")
+      && !json_util::is_null(source["checkReadyOnlyOnce"])) {
     standardMaterial->checkReadyOnlyOnce
       = json_util::get_bool(source, "checkReadyOnlyOnce");
   }
   // diffuse
-  if (json_util::has_key(source, "diffuse")) {
+  if (json_util::has_key(source, "diffuse")
+      && !json_util::is_null(source["diffuse"])) {
     standardMaterial->diffuseColor
       = Color3::FromArray(json_util::get_array<float>(source, "diffuse"));
   }
-  // emissive
-  if (json_util::has_key(source, "emissive")) {
-    standardMaterial->emissiveColor
-      = Color3::FromArray(json_util::get_array<float>(source, "emissive"));
-  }
-  // specular
-  if (json_util::has_key(source, "specular")) {
-    standardMaterial->specularColor
-      = Color3::FromArray(json_util::get_array<float>(source, "specular"));
-  }
-  // specularPower
-  if (json_util::has_key(source, "specularPower")) {
-    standardMaterial->specularPower
-      = json_util::get_number<float>(source, "specularPower", 64.f);
-  }
-  // useAlphaFromDiffuseTexture
-  if (json_util::has_key(source, "useAlphaFromDiffuseTexture")) {
-    standardMaterial->useAlphaFromDiffuseTexture
-      = json_util::get_bool(source, "useAlphaFromDiffuseTexture");
-  }
-  // useEmissiveAsIllumination
-  if (json_util::has_key(source, "useEmissiveAsIllumination")) {
-    standardMaterial->useEmissiveAsIllumination
-      = json_util::get_bool(source, "useEmissiveAsIllumination");
-  }
-  // linkEmissiveWithDiffuse
-  if (json_util::has_key(source, "linkEmissiveWithDiffuse")) {
-    standardMaterial->linkEmissiveWithDiffuse
-      = json_util::get_bool(source, "linkEmissiveWithDiffuse");
-  }
-  // useReflectionFresnelFromSpecular
-  if (json_util::has_key(source, "useReflectionFresnelFromSpecular")) {
-    standardMaterial->useReflectionFresnelFromSpecular
-      = json_util::get_bool(source, "useReflectionFresnelFromSpecular");
-  }
-  // useSpecularOverAlpha
-  if (json_util::has_key(source, "useSpecularOverAlpha")) {
-    standardMaterial->useSpecularOverAlpha
-      = json_util::get_bool(source, "useSpecularOverAlpha");
-  }
-  // useReflectionOverAlpha
-  if (json_util::has_key(source, "useReflectionOverAlpha")) {
-    standardMaterial->useReflectionOverAlpha
-      = json_util::get_bool(source, "useReflectionOverAlpha");
+  // diffuseTexture
+  if (json_util::has_key(source, "diffuseTexture")
+      && !json_util::is_null(source["diffuseTexture"])) {
+    standardMaterial->diffuseTexture
+      = Texture::Parse(source["diffuseTexture"], scene, rootUrl);
   }
   // disableLighting
-  if (json_util::has_key(source, "disableLighting")) {
+  if (json_util::has_key(source, "disableLighting")
+      && !json_util::is_null(source["disableLighting"])) {
     standardMaterial->disableLighting
       = json_util::get_bool(source, "disableLighting");
   }
-  // useParallax
-  if (json_util::has_key(source, "useParallax")) {
-    standardMaterial->useParallax = json_util::get_bool(source, "useParallax");
+  // emissive
+  if (json_util::has_key(source, "emissive")
+      && !json_util::is_null(source["emissive"])) {
+    standardMaterial->emissiveColor
+      = Color3::FromArray(json_util::get_array<float>(source, "emissive"));
   }
-  // useParallaxOcclusion
-  if (json_util::has_key(source, "useParallaxOcclusion")) {
-    standardMaterial->useParallaxOcclusion
-      = json_util::get_bool(source, "useParallaxOcclusion");
+  // emissiveTexture
+  if (json_util::has_key(source, "emissiveTexture")
+      && !json_util::is_null(source["emissiveTexture"])) {
+    standardMaterial->emissiveTexture
+      = Texture::Parse(source["emissiveTexture"], scene, rootUrl);
   }
-  // parallaxScaleBias
-  if (json_util::has_key(source, "parallaxScaleBias")) {
-    standardMaterial->parallaxScaleBias
-      = json_util::get_number<float>(source, "parallaxScaleBias", 0.5f);
-  }
-  // roughness
-  if (json_util::has_key(source, "roughness")) {
-    standardMaterial->roughness
-      = json_util::get_number<float>(source, "roughness", 0.f);
+  // id
+  if (json_util::has_key(source, "id") && !json_util::is_null(source["id"])) {
+    standardMaterial->id = json_util::get_string(source, "id");
   }
   // indexOfRefraction
-  if (json_util::has_key(source, "indexOfRefraction")) {
+  if (json_util::has_key(source, "indexOfRefraction")
+      && !json_util::is_null(source["indexOfRefraction"])) {
     standardMaterial->indexOfRefraction
       = json_util::get_number<float>(source, "indexOfRefraction", 0.98f);
   }
-  // invertRefractionY
-  if (json_util::has_key(source, "invertRefractionY")) {
-    standardMaterial->invertRefractionY
-      = json_util::get_bool(source, "invertRefractionY", true);
-  }
-  // useLightmapAsShadowmap
-  if (json_util::has_key(source, "useLightmapAsShadowmap")) {
-    standardMaterial->useLightmapAsShadowmap
-      = json_util::get_bool(source, "useLightmapAsShadowmap", true);
-  }
-  // useGlossinessFromSpecularMapAlpha
-  if (json_util::has_key(source, "useGlossinessFromSpecularMapAlpha")) {
-    standardMaterial->useGlossinessFromSpecularMapAlpha
-      = json_util::get_bool(source, "useGlossinessFromSpecularMapAlpha");
-  }
-  // maxSimultaneousLights
-  if (json_util::has_key(source, "maxSimultaneousLights")) {
-    standardMaterial->maxSimultaneousLights
-      = json_util::get_number<unsigned>(source, "maxSimultaneousLights", 4);
-  }
   // invertNormalMapX
-  if (json_util::has_key(source, "invertNormalMapX")) {
+  if (json_util::has_key(source, "invertNormalMapX")
+      && !json_util::is_null(source["invertNormalMapX"])) {
     standardMaterial->invertNormalMapX
       = json_util::get_bool(source, "invertNormalMapX");
   }
   // invertNormalMapY
-  if (json_util::has_key(source, "invertNormalMapY")) {
+  if (json_util::has_key(source, "invertNormalMapY")
+      && !json_util::is_null(source["invertNormalMapY"])) {
     standardMaterial->invertNormalMapY
       = json_util::get_bool(source, "invertNormalMapY");
+  }
+  // invertRefractionY
+  if (json_util::has_key(source, "invertRefractionY")
+      && !json_util::is_null(source["invertRefractionY"])) {
+    standardMaterial->invertRefractionY
+      = json_util::get_bool(source, "invertRefractionY", true);
+  }
+  // linkEmissiveWithDiffuse
+  if (json_util::has_key(source, "linkEmissiveWithDiffuse")
+      && !json_util::is_null(source["linkEmissiveWithDiffuse"])) {
+    standardMaterial->linkEmissiveWithDiffuse
+      = json_util::get_bool(source, "linkEmissiveWithDiffuse");
+  }
+  // maxSimultaneousLights
+  if (json_util::has_key(source, "maxSimultaneousLights")
+      && !json_util::is_null(source["maxSimultaneousLights"])) {
+    standardMaterial->maxSimultaneousLights
+      = json_util::get_number<unsigned>(source, "maxSimultaneousLights", 4);
+  }
+  // opacityTexture
+  if (json_util::has_key(source, "opacityTexture")
+      && !json_util::is_null(source["opacityTexture"])) {
+    standardMaterial->opacityTexture
+      = Texture::Parse(source["opacityTexture"], scene, rootUrl);
+  }
+  // parallaxScaleBias
+  if (json_util::has_key(source, "parallaxScaleBias")
+      && !json_util::is_null(source["parallaxScaleBias"])) {
+    standardMaterial->parallaxScaleBias
+      = json_util::get_number<float>(source, "parallaxScaleBias", 0.5f);
+  }
+  // reflectionTexture
+  if (json_util::has_key(source, "reflectionTexture")
+      && !json_util::is_null(source["reflectionTexture"])) {
+    standardMaterial->reflectionTexture
+      = Texture::Parse(source["reflectionTexture"], scene, rootUrl);
+  }
+  // roughness
+  if (json_util::has_key(source, "roughness")
+      && !json_util::is_null(source["roughness"])) {
+    standardMaterial->roughness
+      = json_util::get_number<float>(source, "roughness", 0.f);
+  }
+  // specular
+  if (json_util::has_key(source, "specular")
+      && !json_util::is_null(source["specular"])) {
+    standardMaterial->specularColor
+      = Color3::FromArray(json_util::get_array<float>(source, "specular"));
+  }
+  // specularPower
+  if (json_util::has_key(source, "specularPower")
+      && !json_util::is_null(source["specularPower"])) {
+    standardMaterial->specularPower
+      = json_util::get_number<float>(source, "specularPower", 64.f);
+  }
+  // specularTexture
+  if (json_util::has_key(source, "specularTexture")
+      && !json_util::is_null(source["specularTexture"])) {
+    standardMaterial->reflectionTexture
+      = Texture::Parse(source["specularTexture"], scene, rootUrl);
+  }
+  // useAlphaFromDiffuseTexture
+  if (json_util::has_key(source, "useAlphaFromDiffuseTexture")
+      && !json_util::is_null(source["useAlphaFromDiffuseTexture"])) {
+    standardMaterial->useAlphaFromDiffuseTexture
+      = json_util::get_bool(source, "useAlphaFromDiffuseTexture");
+  }
+  // useEmissiveAsIllumination
+  if (json_util::has_key(source, "useEmissiveAsIllumination")
+      && !json_util::is_null(source["useEmissiveAsIllumination"])) {
+    standardMaterial->useEmissiveAsIllumination
+      = json_util::get_bool(source, "useEmissiveAsIllumination");
+  }
+  // useGlossinessFromSpecularMapAlpha
+  if (json_util::has_key(source, "useGlossinessFromSpecularMapAlpha")
+      && !json_util::is_null(source["useGlossinessFromSpecularMapAlpha"])) {
+    standardMaterial->useGlossinessFromSpecularMapAlpha
+      = json_util::get_bool(source, "useGlossinessFromSpecularMapAlpha");
+  }
+  // useLightmapAsShadowmap
+  if (json_util::has_key(source, "useLightmapAsShadowmap")
+      && !json_util::is_null(source["useLightmapAsShadowmap"])) {
+    standardMaterial->useLightmapAsShadowmap
+      = json_util::get_bool(source, "useLightmapAsShadowmap", true);
+  }
+  // useParallax
+  if (json_util::has_key(source, "useParallax")
+      && !json_util::is_null(source["useParallax"])) {
+    standardMaterial->useParallax = json_util::get_bool(source, "useParallax");
+  }
+  // useParallaxOcclusion
+  if (json_util::has_key(source, "useParallaxOcclusion")
+      && !json_util::is_null(source["useParallaxOcclusion"])) {
+    standardMaterial->useParallaxOcclusion
+      = json_util::get_bool(source, "useParallaxOcclusion");
+  }
+  // useReflectionFresnelFromSpecular
+  if (json_util::has_key(source, "useReflectionFresnelFromSpecular")
+      && !json_util::is_null(source["useReflectionFresnelFromSpecular"])) {
+    standardMaterial->useReflectionFresnelFromSpecular
+      = json_util::get_bool(source, "useReflectionFresnelFromSpecular");
+  }
+  // useReflectionOverAlpha
+  if (json_util::has_key(source, "useReflectionOverAlpha")
+      && !json_util::is_null(source["useReflectionOverAlpha"])) {
+    standardMaterial->useReflectionOverAlpha
+      = json_util::get_bool(source, "useReflectionOverAlpha");
+  }
+  // useSpecularOverAlpha
+  if (json_util::has_key(source, "useSpecularOverAlpha")
+      && !json_util::is_null(source["useSpecularOverAlpha"])) {
+    standardMaterial->useSpecularOverAlpha
+      = json_util::get_bool(source, "useSpecularOverAlpha");
   }
 
   return standardMaterial;

@@ -141,8 +141,8 @@ public:
    * relative dependencies
    * @returns The parsed texture if successful
    */
-  static std::unique_ptr<BaseTexture>
-  Parse(const json& parsedTexture, Scene* scene, const std::string& rootUrl);
+  static BaseTexturePtr Parse(const json& parsedTexture, Scene* scene,
+                              const std::string& rootUrl);
 
   /**
    * @brief Creates a texture from its base 64 representation.

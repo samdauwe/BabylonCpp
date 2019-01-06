@@ -2199,35 +2199,42 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 
   // Tags.AddTagsTo(mesh, parsedMesh.tags);
 
-  if (json_util::has_key(parsedMesh, "position")) {
+  if (json_util::has_key(parsedMesh, "position")
+      && !json_util::is_null(parsedMesh["position"])) {
     mesh->position
       = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "position"));
   }
 
-  if (json_util::has_key(parsedMesh, "metadata")) {
+  if (json_util::has_key(parsedMesh, "metadata")
+      && !json_util::is_null(parsedMesh["metadata"])) {
     mesh->metadata = parsedMesh["metadata"];
   }
 
-  if (json_util::has_key(parsedMesh, "rotationQuaternion")) {
+  if (json_util::has_key(parsedMesh, "rotationQuaternion")
+      && !json_util::is_null(parsedMesh["rotationQuaternion"])) {
     mesh->rotationQuaternion = Quaternion::FromArray(
       json_util::get_array<float>(parsedMesh, "rotationQuaternion"));
   }
-  else if (json_util::has_key(parsedMesh, "rotation")) {
+  else if (json_util::has_key(parsedMesh, "rotation")
+           && !json_util::is_null(parsedMesh["rotation"])) {
     mesh->rotation
       = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "rotation"));
   }
 
-  if (json_util::has_key(parsedMesh, "scaling")) {
+  if (json_util::has_key(parsedMesh, "scaling")
+      && !json_util::is_null(parsedMesh["scaling"])) {
     mesh->scaling
       = Vector3::FromArray(json_util::get_array<float>(parsedMesh, "scaling"));
   }
 
-  if (json_util::has_key(parsedMesh, "localMatrix")) {
+  if (json_util::has_key(parsedMesh, "localMatrix")
+      && !json_util::is_null(parsedMesh["localMatrix"])) {
     auto tmpMatrix = Matrix::FromArray(
       json_util::get_array<float>(parsedMesh, "localMatrix"));
     mesh->setPreTransformMatrix(tmpMatrix);
   }
-  else if (json_util::has_key(parsedMesh, "pivotMatrix")) {
+  else if (json_util::has_key(parsedMesh, "pivotMatrix")
+           && !json_util::is_null(parsedMesh["pivotMatrix"])) {
     auto tmpMatrix = Matrix::FromArray(
       json_util::get_array<float>(parsedMesh, "pivotMatrix"));
     mesh->setPivotMatrix(tmpMatrix);
@@ -2241,15 +2248,18 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   mesh->showSubMeshesBoundingBox
     = json_util::get_bool(parsedMesh, "showSubMeshesBoundingBox");
 
-  if (json_util::has_key(parsedMesh, "applyFog")) {
+  if (json_util::has_key(parsedMesh, "applyFog")
+      && !json_util::is_null(parsedMesh["applyFog"])) {
     mesh->applyFog = json_util::get_bool(parsedMesh, "applyFog", true);
   }
 
-  if (json_util::has_key(parsedMesh, "isPickable")) {
+  if (json_util::has_key(parsedMesh, "isPickable")
+      && !json_util::is_null(parsedMesh["isPickable"])) {
     mesh->isPickable = json_util::get_bool(parsedMesh, "isPickable", true);
   }
 
-  if (json_util::has_key(parsedMesh, "alphaIndex")) {
+  if (json_util::has_key(parsedMesh, "alphaIndex")
+      && !json_util::is_null(parsedMesh["alphaIndex"])) {
     mesh->alphaIndex = json_util::get_number(parsedMesh, "alphaIndex",
                                              std::numeric_limits<int>::max());
   }
@@ -2259,13 +2269,15 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   mesh->billboardMode = json_util::get_number(parsedMesh, "billboardMode",
                                               AbstractMesh::BILLBOARDMODE_NONE);
 
-  if (json_util::has_key(parsedMesh, "visibility")) {
+  if (json_util::has_key(parsedMesh, "visibility")
+      && !json_util::is_null(parsedMesh["visibility"])) {
     mesh->visibility = json_util::get_number(parsedMesh, "visibility", 1.f);
   }
 
   mesh->checkCollisions = json_util::get_bool(parsedMesh, "checkCollisions");
 
-  if (json_util::has_key(parsedMesh, "isBlocker")) {
+  if (json_util::has_key(parsedMesh, "isBlocker")
+      && !json_util::is_null(parsedMesh["isBlocker"])) {
     mesh->isBlocker = json_util::get_bool(parsedMesh, "isBlocker");
   }
 
@@ -2273,33 +2285,39 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
     = json_util::get_bool(parsedMesh, "useFlatShading");
 
   // freezeWorldMatrix
-  if (json_util::has_key(parsedMesh, "freezeWorldMatrix")) {
+  if (json_util::has_key(parsedMesh, "freezeWorldMatrix")
+      && !json_util::is_null(parsedMesh["freezeWorldMatrix"])) {
     mesh->_waitingFreezeWorldMatrix
       = json_util::get_bool(parsedMesh, "freezeWorldMatrix");
   }
 
   // Parent
-  if (json_util::has_key(parsedMesh, "parentId")) {
+  if (json_util::has_key(parsedMesh, "parentId")
+      && !json_util::is_null(parsedMesh["parentId"])) {
     mesh->_waitingParentId = json_util::get_string(parsedMesh, "parentId");
   }
 
   // Actions
-  if (json_util::has_key(parsedMesh, "actions")) {
+  if (json_util::has_key(parsedMesh, "actions")
+      && !json_util::is_null(parsedMesh["actions"])) {
     mesh->_waitingActions = json_util::get_array<json>(parsedMesh, "actions");
   }
 
   // Overlay
-  if (json_util::has_key(parsedMesh, "overlayAlpha")) {
+  if (json_util::has_key(parsedMesh, "overlayAlpha")
+      && !json_util::is_null(parsedMesh["overlayAlpha"])) {
     mesh->overlayAlpha
       = json_util::get_number(parsedMesh, "overlayAlpha", 0.5f);
   }
 
-  if (json_util::has_key(parsedMesh, "overlayColor")) {
+  if (json_util::has_key(parsedMesh, "overlayColor")
+      && !json_util::is_null(parsedMesh["overlayColor"])) {
     mesh->overlayColor = Color3::FromArray(
       json_util::get_array<float>(parsedMesh, "overlayColor"));
   }
 
-  if (json_util::has_key(parsedMesh, "renderOverlay")) {
+  if (json_util::has_key(parsedMesh, "renderOverlay")
+      && !json_util::is_null(parsedMesh["renderOverlay"])) {
     mesh->renderOverlay = json_util::get_bool(parsedMesh, "renderOverlay");
   }
 
@@ -2308,7 +2326,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   mesh->hasVertexAlpha
     = json_util::get_bool(parsedMesh, "hasVertexAlpha", false);
 
-  if (json_util::has_key(parsedMesh, "delayLoadingFile")) {
+  if (json_util::has_key(parsedMesh, "delayLoadingFile")
+      && !json_util::is_null(parsedMesh["delayLoadingFile"])) {
     mesh->delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     mesh->delayLoadingFile
       = rootUrl + json_util::get_string(parsedMesh, "delayLoadingFile");
@@ -2318,50 +2337,61 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
       Vector3::FromArray(
         json_util::get_array<float>(parsedMesh, "boundingBoxMaximum")));
 
-    if (json_util::has_key(parsedMesh, "_binaryInfo")) {
+    if (json_util::has_key(parsedMesh, "_binaryInfo")
+        && !json_util::is_null(parsedMesh["_binaryInfo"])) {
       mesh->_binaryInfo = json_util::get_string(parsedMesh, "_binaryInfo");
     }
 
     mesh->_delayInfoKinds.clear();
-    if (json_util::has_key(parsedMesh, "hasUVs")) {
+    if (json_util::has_key(parsedMesh, "hasUVs")
+        && !json_util::is_null(parsedMesh["hasUVs"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UVKind);
     }
 
-    if (json_util::has_key(parsedMesh, "hasUVs2")) {
+    if (json_util::has_key(parsedMesh, "hasUVs2")
+        && !json_util::is_null(parsedMesh["hasUVs2"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV2Kind);
     }
 
-    if (json_util::has_key(parsedMesh, "hasUVs3")) {
+    if (json_util::has_key(parsedMesh, "hasUVs3")
+        && !json_util::is_null(parsedMesh["hasUVs3"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV3Kind);
     }
 
-    if (json_util::has_key(parsedMesh, "hasUVs4")) {
+    if (json_util::has_key(parsedMesh, "hasUVs4")
+        && !json_util::is_null(parsedMesh["hasUVs4"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV4Kind);
     }
 
-    if (json_util::has_key(parsedMesh, "hasUVs5")) {
+    if (json_util::has_key(parsedMesh, "hasUVs5")
+        && !json_util::is_null(parsedMesh["hasUVs5"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV5Kind);
     }
 
-    if (json_util::has_key(parsedMesh, "hasUVs6")) {
+    if (json_util::has_key(parsedMesh, "hasUVs6")
+        && !json_util::is_null(parsedMesh["hasUVs6"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::UV6Kind);
     }
 
-    if (json_util::has_key(parsedMesh, "hasColors")) {
+    if (json_util::has_key(parsedMesh, "hasColors")
+        && !json_util::is_null(parsedMesh["hasColors"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::ColorKind);
     }
 
-    if (json_util::has_key(parsedMesh, "hasMatricesIndices")) {
+    if (json_util::has_key(parsedMesh, "hasMatricesIndices")
+        && !json_util::is_null(parsedMesh["hasMatricesIndices"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::MatricesIndicesKind);
     }
 
-    if (json_util::has_key(parsedMesh, "hasMatricesWeights")) {
+    if (json_util::has_key(parsedMesh, "hasMatricesWeights")
+        && !json_util::is_null(parsedMesh["hasMatricesWeights"])) {
       mesh->_delayInfoKinds.emplace_back(VertexBuffer::MatricesWeightsKind);
     }
 
     mesh->_delayLoadingFunction = Geometry::_ImportGeometry;
 
-    if (SceneLoader::ForceFullSceneLoadingForIncremental()) {
+    if (SceneLoader::ForceFullSceneLoadingForIncremental()
+        && !json_util::is_null(parsedMesh["localMatrix"])) {
       mesh->_checkDelayState();
     }
   }
@@ -2370,7 +2400,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   // Material
-  if (json_util::has_key(parsedMesh, "materialId")) {
+  if (json_util::has_key(parsedMesh, "materialId")
+      && !json_util::is_null(parsedMesh["materialId"])) {
     mesh->setMaterialByID(json_util::get_string(parsedMesh, "materialId"));
   }
   else {
@@ -2391,14 +2422,16 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   if (parsedSkeletonId > -1) {
     mesh->skeleton
       = scene->getLastSkeletonByID(std::to_string(parsedSkeletonId));
-    if (json_util::has_key(parsedMesh, "numBoneInfluencers")) {
+    if (json_util::has_key(parsedMesh, "numBoneInfluencers")
+        && !json_util::is_null(parsedMesh["numBoneInfluencers"])) {
       mesh->numBoneInfluencers
         = json_util::get_number(parsedMesh, "numBoneInfluencers", 0u);
     }
   }
 
   // Animations
-  if (json_util::has_key(parsedMesh, "animations")) {
+  if (json_util::has_key(parsedMesh, "animations")
+      && !json_util::is_null(parsedMesh["animations"])) {
     for (auto& parsedAnimation :
          json_util::get_array<json>(parsedMesh, "animations")) {
       mesh->animations.emplace_back(Animation::Parse(parsedAnimation));
@@ -2406,7 +2439,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
     Node::ParseAnimationRanges(*mesh, parsedMesh, scene);
   }
 
-  if (json_util::has_key(parsedMesh, "autoAnimate")) {
+  if (json_util::has_key(parsedMesh, "autoAnimate")
+      && !json_util::is_null(parsedMesh["autoAnimate"])) {
     scene->beginAnimation(
       mesh, json_util::get_number(parsedMesh, "autoAnimateFrom", 0),
       json_util::get_number(parsedMesh, "autoAnimateTo", 0),
@@ -2415,7 +2449,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   // Layer Mask
-  if (json_util::has_key(parsedMesh, "layerMask")) {
+  if (json_util::has_key(parsedMesh, "layerMask")
+      && !json_util::is_null(parsedMesh["layerMask"])) {
     auto layerMask = json_util::get_string(parsedMesh, "layerMask");
     if (!layerMask.empty()) {
       mesh->layerMask = static_cast<unsigned>(std::stoi(layerMask));
@@ -2427,13 +2462,15 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
   }
 
   // Instances
-  if (json_util::has_key(parsedMesh, "instances")) {
+  if (json_util::has_key(parsedMesh, "instances")
+      && !json_util::is_null(parsedMesh["instances"])) {
     for (auto& parsedInstance :
          json_util::get_array<json>(parsedMesh, "instances")) {
       auto instance
         = mesh->createInstance(json_util::get_string(parsedInstance, "name"));
 
-      if (json_util::has_key(parsedInstance, "id")) {
+      if (json_util::has_key(parsedInstance, "id")
+          && !json_util::is_null(parsedMesh["localMatrix"])) {
         instance->id = json_util::get_string(parsedInstance, "id");
       }
 
@@ -2442,21 +2479,25 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
       mesh->position = Vector3::FromArray(
         json_util::get_array<float>(parsedInstance, "position"));
 
-      if (json_util::has_key(parsedInstance, "parentId")) {
+      if (json_util::has_key(parsedInstance, "parentId")
+          && !json_util::is_null(parsedMesh["parentId"])) {
         instance->_waitingParentId
           = json_util::get_string(parsedInstance, "parentId");
       }
 
-      if (json_util::has_key(parsedInstance, "rotationQuaternion")) {
+      if (json_util::has_key(parsedInstance, "rotationQuaternion")
+          && !json_util::is_null(parsedMesh["rotationQuaternion"])) {
         instance->rotationQuaternion = Quaternion::FromArray(
           json_util::get_array<float>(parsedInstance, "rotationQuaternion"));
       }
-      else if (json_util::has_key(parsedInstance, "rotation")) {
+      else if (json_util::has_key(parsedInstance, "rotation")
+               && !json_util::is_null(parsedMesh["rotation"])) {
         instance->rotation = Vector3::FromArray(
           json_util::get_array<float>(parsedInstance, "rotation"));
       }
 
-      if (json_util::has_key(parsedMesh, "scaling")) {
+      if (json_util::has_key(parsedMesh, "scaling")
+          && !json_util::is_null(parsedMesh["scaling"])) {
         instance->position = Vector3::FromArray(
           json_util::get_array<float>(parsedInstance, "scaling"));
       }
@@ -2464,7 +2505,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
       instance->checkCollisions
         = json_util::get_bool(parsedInstance, "checkCollisions");
 
-      if (json_util::has_key(parsedMesh, "animations")) {
+      if (json_util::has_key(parsedMesh, "animations")
+          && !json_util::is_null(parsedMesh["animations"])) {
         for (auto& parsedAnimation :
              json_util::get_array<json>(parsedMesh, "animations")) {
           instance->animations.emplace_back(Animation::Parse(parsedAnimation));
