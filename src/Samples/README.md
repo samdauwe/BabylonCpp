@@ -105,6 +105,7 @@
 ![basic_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/basic_scene.png?raw=true "Basic Scene")
 ![circle_curves_from_beziers](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/circle_curves_from_beziers.png?raw=true "Circle Curves From Beziers Scene")
 ![colored_cube_faces_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/colored_cube_faces_scene.png?raw=true "Colored Cube Faces Scene")
+![colored_ribbon_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/colored_ribbon_scene.png?raw=true "Colored Ribbon Scene")
 ![colored_triangle_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/colored_triangle_scene.png?raw=true "Colored Triangle Scene")
 ![constructive_solid_geometries_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/constructive_solid_geometries_scene.png?raw=true "Constructive Solid Geometries Scene")
 ![cuboid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cuboid_scene.png?raw=true "Cuboid Scene")

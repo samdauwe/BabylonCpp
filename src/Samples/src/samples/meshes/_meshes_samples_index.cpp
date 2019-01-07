@@ -5,6 +5,7 @@
 #include <babylon/samples/meshes/basic_scene.h>
 #include <babylon/samples/meshes/circle_curves_from_beziers.h>
 #include <babylon/samples/meshes/colored_cube_faces_scene.h>
+#include <babylon/samples/meshes/colored_ribbon_scene.h>
 #include <babylon/samples/meshes/colored_triangle_scene.h>
 #include <babylon/samples/meshes/constructive_solid_geometries_scene.h>
 #include <babylon/samples/meshes/cuboid_scene.h>
@@ -77,6 +78,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
     [](ICanvas* iCanvas) {                                     //
       return std::make_unique<ColoredCubeFacesScene>(iCanvas); //
     });                                                        //
+  // Colored Ribbon Scene
+  _samples["ColoredRibbonScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<ColoredRibbonScene>(iCanvas); //
+                      });                                                     //
   // Colored Triangle Scene
   _samples["ColoredTriangleScene"] = std::make_tuple(
     true,                                                     //
