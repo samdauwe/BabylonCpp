@@ -5,6 +5,7 @@
 #include <babylon/samples/textures/bump_texture_spheres_scene.h>
 #include <babylon/samples/textures/cube_texture_different_faces_scene.h>
 #include <babylon/samples/textures/custom_render_targets_scene.h>
+#include <babylon/samples/textures/cylinder_with_texture_scene.h>
 #include <babylon/samples/textures/environment_texture_scene.h>
 #include <babylon/samples/textures/equirectangular_map_as_reflection_texture_scene.h>
 #include <babylon/samples/textures/hdr_cube_texture_scene.h>
@@ -55,6 +56,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     true,                                                         //
     [](ICanvas* iCanvas) {                                        //
       return std::make_unique<CustomRenderTargetsScene>(iCanvas); //
+    });                                                           //
+  // Cylinder With Texture Scene
+  _samples["CylinderWithTextureScene"] = std::make_tuple(
+    true,                                                         //
+    [](ICanvas* iCanvas) {                                        //
+      return std::make_unique<CylinderWithTextureScene>(iCanvas); //
     });                                                           //
   // Environment Texture Scene
   _samples["EnvironmentTextureScene"] = std::make_tuple(
