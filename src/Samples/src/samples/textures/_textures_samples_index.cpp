@@ -16,6 +16,7 @@
 #include <babylon/samples/textures/opacity_texture_scene.h>
 #include <babylon/samples/textures/photo_dome_scene.h>
 #include <babylon/samples/textures/procedural_textures_scene.h>
+#include <babylon/samples/textures/reflecting_one_face_sprite_texture_scene.h>
 #include <babylon/samples/textures/render_target_texture_scene.h>
 #include <babylon/samples/textures/sphere_textures_scene.h>
 #include <babylon/samples/textures/sphere_transparent_textures_scene.h>
@@ -130,6 +131,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     [](ICanvas* iCanvas) {                                        //
       return std::make_unique<RenderTargetTextureScene>(iCanvas); //
     });                                                           //
+  // Reflecting One Face Sprite Texture Scene
+  _samples["ReflectingOneFaceSpriteTextureScene"] = std::make_tuple(
+    true,                                                                    //
+    [](ICanvas* iCanvas) {                                                   //
+      return std::make_unique<ReflectingOneFaceSpriteTextureScene>(iCanvas); //
+    });                                                                      //
   // Sphere Textures Scene
   _samples["SphereTexturesScene"] = std::make_tuple(
     true,                                                    //

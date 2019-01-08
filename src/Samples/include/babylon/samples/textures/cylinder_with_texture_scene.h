@@ -7,7 +7,7 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Cylinder With Texture Scenee. Example demonstrating how to wrap an
+ * @brief Cylinder With Texture Scene. Example demonstrating how to wrap an
  * image image around a cylinder.
  * @see https://www.babylonjs-playground.com/#VA2AC#3
  * @see https://doc.babylonjs.com/how_to/createbox_per_face_textures_and_colors
