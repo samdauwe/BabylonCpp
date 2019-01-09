@@ -21,6 +21,7 @@
 #include <babylon/samples/textures/sphere_textures_scene.h>
 #include <babylon/samples/textures/sphere_transparent_textures_scene.h>
 #include <babylon/samples/textures/spherical_reflection_texture_scene.h>
+#include <babylon/samples/textures/two_sided_texture_scene.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -155,6 +156,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     [](ICanvas* iCanvas) {                                               //
       return std::make_unique<SphericalReflectionTextureScene>(iCanvas); //
     });                                                                  //
+  // Two Sided Texture Scene
+  _samples["TwoSidedTextureScene"] = std::make_tuple(
+    false,                                                    //
+    [](ICanvas* iCanvas) {                                    //
+      return std::make_unique<TwoSidedTextureScene>(iCanvas); //
+    });                                                       //
 }
 
 _TexturesSamplesIndex::~_TexturesSamplesIndex()
