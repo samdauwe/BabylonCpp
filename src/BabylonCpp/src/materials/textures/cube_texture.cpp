@@ -1,7 +1,6 @@
 #include <babylon/materials/textures/cube_texture.h>
 
-#include <nlohmann/json.hpp>
-
+#include <babylon/core/json_util.h>
 #include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
@@ -217,12 +216,44 @@ void CubeTexture::setReflectionTextureMatrix(const Matrix& value)
   _textureMatrix = std::make_unique<Matrix>(value);
 }
 
-CubeTexturePtr CubeTexture::Parse(const json& /*parsedTexture*/,
-                                  Scene* /*scene*/,
-                                  const std::string& /*rootUrl*/)
+CubeTexturePtr CubeTexture::Parse(const json& parsedTexture, Scene* scene,
+                                  const std::string& rootUrl)
 {
 
-  return nullptr;
+  auto texture = SerializationHelper::Parse(
+    [&]() -> CubeTexturePtr {
+      auto prefiltered = false;
+      if (json_util::get_bool(parsedTexture, "prefiltered")) {
+        prefiltered = true;
+      }
+      return CubeTexture::New(
+        rootUrl + json_util::get_string(parsedTexture, "name"), scene,
+        json_util::get_array<std::string>(parsedTexture, "extensions"), false,
+        std::vector<std::string>{}, nullptr, nullptr,
+        EngineConstants::TEXTUREFORMAT_RGBA, prefiltered);
+    },
+    parsedTexture, scene);
+
+  // Local Cubemaps
+  if (json_util::has_key(parsedTexture, "boundingBoxPosition")
+      && !json_util::is_null(parsedTexture["boundingBoxPosition"])) {
+    texture->boundingBoxPosition = Vector3::FromArray(
+      json_util::get_array<float>(parsedTexture, "boundingBoxPosition"));
+  }
+  if (json_util::has_key(parsedTexture, "boundingBoxSize")
+      && !json_util::is_null(parsedTexture["boundingBoxSize"])) {
+    texture->boundingBoxSize = Vector3::FromArray(
+      json_util::get_array<float>(parsedTexture, "boundingBoxSize"));
+  }
+
+  // Animations
+  if (json_util::has_key(parsedTexture, "animations")) {
+    for (auto& parsedAnimation :
+         json_util::get_array<json>(parsedTexture, "animations"))
+      texture->animations.emplace_back(Animation::Parse(parsedAnimation));
+  }
+
+  return texture;
 }
 
 CubeTexturePtr CubeTexture::clone() const

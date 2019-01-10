@@ -15,6 +15,19 @@
 
 namespace BABYLON {
 
+CubeTexturePtr SerializationHelper::Parse(
+  const std::function<CubeTexturePtr()>& creationFunction,
+  const json& /*source*/, Scene* /*scene*/, const std::string& /*rootUrl*/)
+{
+  auto texture = creationFunction();
+
+  if (!texture) {
+    return nullptr;
+  }
+
+  return texture;
+}
+
 TexturePtr
 SerializationHelper::Parse(const std::function<TexturePtr()>& creationFunction,
                            const json& source, Scene* /*scene*/,
