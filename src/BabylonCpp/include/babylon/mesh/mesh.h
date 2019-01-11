@@ -856,6 +856,21 @@ public:
   void optimizeIndices(const std::function<void(Mesh* mesh)>& successCallback);
 
   /**
+   * @brief This function will remove some indices and vertices from a mesh. It
+   * removes facets where two of its vertices share the same position and forces
+   * vertices to share normals. So it will, therefore, also change a flat shaded
+   * mesh to a smooth (for the want of a better word) shaded mesh.
+   *
+   * Sometimes the additional facets and vertices are necessary, for example to
+   * prevent seams when using textures. So use carefully.
+   *
+   * More information on the need for extra facets, which turn out to be lines,
+   * can be found in http://babylonjsguide.github.io/advanced/Facets.html
+   * @see http://babylonjsguide.github.io/snippets/Minimise_Vertices
+   */
+  void minimizeVertices();
+
+  /**
    * @brief Serialize current mesh.
    * @param serializationObject defines the object which will receive the
    * serialization data

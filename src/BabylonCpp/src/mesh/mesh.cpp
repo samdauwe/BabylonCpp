@@ -2116,6 +2116,71 @@ void Mesh::optimizeIndices(
   successCallback(nullptr);
 }
 
+void Mesh::minimizeVertices()
+{
+  auto _pdata = getVerticesData(VertexBuffer::PositionKind);
+  auto _ndata = getVerticesData(VertexBuffer::NormalKind);
+  auto _idata = getIndices();
+
+  Float32Array _newPdata; // new positions array
+  IndicesArray _newIdata; // new indices array
+
+  auto _mapPtr = 0;                          // new index;
+  std::vector<std::string> _uniquePositions; // unique vertex positions
+  for (size_t _i = 0; _i < _idata.size(); _i += 3) {
+    // facet vertex indices
+    IndicesArray _facet{_idata[_i], _idata[_i + 1], _idata[_i + 2]};
+    // lists facet vertex positions (x,y,z) as string "xyz""
+    std::vector<std::string> _pstring(3);
+    for (unsigned int _j = 0; _j < 3; ++_j) { //
+      _pstring[_j] = "";
+      for (size_t _k = 0; _k < 3; ++_k) {
+        // small values make 0
+        if (std::abs(_pdata[3 * _facet[_j] + _k]) < 0.0001f) {
+          _pdata[3 * _facet[_j] + _k] = 0;
+        }
+        _pstring[_j] += std::to_string(_pdata[3 * _facet[_j] + _k]) + "|";
+      }
+      _pstring[_j] = _pstring[_j].substr(0, _pstring[_j].size() - 1);
+    }
+    // check facet vertices to see that none are repeated
+    // do not process any facet that has a repeated vertex, ie is a line
+    if (!(_pstring[0] == _pstring[1] || _pstring[0] == _pstring[2]
+          || _pstring[1] == _pstring[2])) {
+      // for each facet position check if already listed in uniquePositions
+      // if not listed add to uniquePositions and set index pointer
+      // if listed use its index in uniquePositions and new index pointer
+      for (unsigned int _j = 0; _j < 3; ++_j) {
+        int _ptr = stl_util::index_of(_uniquePositions, _pstring[_j]);
+        if (_ptr < 0) {
+          _uniquePositions.emplace_back(_pstring[_j]);
+          _ptr = _mapPtr++;
+          // not listed so add individual x, y, z coordinates to new positions
+          // array newPdata and add matching normal data to new normals array
+          // newNdata
+          for (unsigned int _k = 0; _k < 3; ++_k) {
+            _newPdata.emplace_back(_pdata[3 * _facet[_j] + _k]);
+          }
+        }
+        // add new index pointer to new indices array newIdata
+        _newIdata.emplace_back(_ptr);
+      }
+    }
+  }
+
+  Float32Array _newNdata; // new normal data
+
+  VertexData::ComputeNormals(_newPdata, _newIdata, _newNdata);
+
+  // create new vertex data object and update
+  auto _vertexData       = std::make_unique<VertexData>();
+  _vertexData->positions = std::move(_newPdata);
+  _vertexData->indices   = std::move(_newIdata);
+  _vertexData->normals   = std::move(_newNdata);
+
+  _vertexData->applyToMesh(*this);
+}
+
 void Mesh::serialize(json& /*serializationObject*/)
 {
 }
