@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 EnvironmentTextureSpecularInfoV1::EnvironmentTextureSpecularInfoV1()
-    : specularDataPosition{std::nullopt}, lodGenerationScale{0.f}
+    : specularDataPosition{std::nullopt}, lodGenerationScale{std::nullopt}
 {
 }
 
@@ -53,7 +53,7 @@ EnvironmentTextureSpecularInfoV1::~EnvironmentTextureSpecularInfoV1()
 {
 }
 
-EnvironmentTextureSpecularInfoV1
+EnvironmentTextureSpecularInfoV1Ptr
 EnvironmentTextureSpecularInfoV1::Parse(const json& parsedSpecular)
 {
   EnvironmentTextureSpecularInfoV1 specular;
@@ -84,7 +84,7 @@ EnvironmentTextureSpecularInfoV1::Parse(const json& parsedSpecular)
       = json_util::get_number<float>(parsedSpecular, "lodGenerationScale");
   }
 
-  return specular;
+  return std::make_shared<EnvironmentTextureSpecularInfoV1>(specular);
 }
 
 } // end of namespace BABYLON

@@ -31,7 +31,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
    * Specifies the ground size.
    * 15 by default.
    */
-  int groundSize = 15;
+  float groundSize = 15.f;
 
   /**
    * The texture used on the ground for the main color.
@@ -127,7 +127,7 @@ struct BABYLON_SHARED_EXPORT IEnvironmentHelperOptions {
    * Specifies the skybox size.
    * 20 by default.
    */
-  int skyboxSize = 20;
+  float skyboxSize = 20.f;
 
   /**
    * The texture used on the skybox for the main color.

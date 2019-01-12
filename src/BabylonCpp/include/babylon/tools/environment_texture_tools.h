@@ -12,7 +12,8 @@ namespace BABYLON {
 class ArrayBufferView;
 class EnvironmentTextureInfo;
 class InternalTexture;
-using InternalTexturePtr = std::shared_ptr<InternalTexture>;
+using EnvironmentTextureInfoPtr = std::shared_ptr<EnvironmentTextureInfo>;
+using InternalTexturePtr        = std::shared_ptr<InternalTexture>;
 
 /**
  * @brief Sets of helpers addressing the serialization and deserialization of
@@ -37,8 +38,7 @@ public:
    * @returns the environment file info (the json header) if successfully
    * parsed.
    */
-  static std::optional<EnvironmentTextureInfo>
-  GetEnvInfo(const ArrayBuffer& data);
+  static EnvironmentTextureInfoPtr GetEnvInfo(const ArrayBuffer& data);
 
   /**
    * @brief Uploads the texture info contained in the env file to the GPU.

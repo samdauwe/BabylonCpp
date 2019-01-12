@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 EnvironmentTextureInfo::EnvironmentTextureInfo()
-    : version{0}, width{0}, irradiance{std::nullopt}, specular{std::nullopt}
+    : version{0}, width{0}, irradiance{nullptr}, specular{nullptr}
 {
 }
 
@@ -56,7 +56,8 @@ EnvironmentTextureInfo::~EnvironmentTextureInfo()
 {
 }
 
-EnvironmentTextureInfo EnvironmentTextureInfo::Parse(const json& parsedManifest)
+EnvironmentTextureInfoPtr
+EnvironmentTextureInfo::Parse(const json& parsedManifest)
 {
   EnvironmentTextureInfo manifest;
   manifest.version = json_util::get_number(parsedManifest, "version", 0u);
@@ -77,7 +78,7 @@ EnvironmentTextureInfo EnvironmentTextureInfo::Parse(const json& parsedManifest)
     manifest.specular = EnvironmentTextureSpecularInfoV1::Parse(parsedSpecular);
   }
 
-  return manifest;
+  return std::make_shared<EnvironmentTextureInfo>(manifest);
 }
 
 } // end of namespace BABYLON

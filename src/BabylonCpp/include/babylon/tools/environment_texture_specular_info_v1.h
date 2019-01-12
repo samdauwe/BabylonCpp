@@ -11,6 +11,10 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class EnvironmentTextureSpecularInfoV1;
+using EnvironmentTextureSpecularInfoV1Ptr
+  = std::shared_ptr<EnvironmentTextureSpecularInfoV1>;
+
 /**
  * @brief Defines the specular data enclosed in the file.
  * This corresponds to the version 1 of the data.
@@ -33,7 +37,7 @@ public:
    * @param parsedSpecular defines specular data
    * @returns the parsed specular information
    */
-  static EnvironmentTextureSpecularInfoV1 Parse(const json& parsedSpecular);
+  static EnvironmentTextureSpecularInfoV1Ptr Parse(const json& parsedSpecular);
 
 public:
   /**

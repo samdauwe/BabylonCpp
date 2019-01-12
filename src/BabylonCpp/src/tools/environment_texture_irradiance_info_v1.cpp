@@ -76,7 +76,7 @@ EnvironmentTextureIrradianceInfoV1::~EnvironmentTextureIrradianceInfoV1()
 {
 }
 
-EnvironmentTextureIrradianceInfoV1
+EnvironmentTextureIrradianceInfoV1Ptr
 EnvironmentTextureIrradianceInfoV1::Parse(const json& parsedIrradiance)
 {
   EnvironmentTextureIrradianceInfoV1 irradiance;
@@ -92,7 +92,7 @@ EnvironmentTextureIrradianceInfoV1::Parse(const json& parsedIrradiance)
   irradiance.zx = json_util::get_array<float>(parsedIrradiance, "zx");
   irradiance.xy = json_util::get_array<float>(parsedIrradiance, "xy");
 
-  return irradiance;
+  return std::make_shared<EnvironmentTextureIrradianceInfoV1>(irradiance);
 }
 
 } // end of namespace BABYLON

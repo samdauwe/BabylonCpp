@@ -7,8 +7,8 @@
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT ISceneSize {
-  int groundSize;
-  int skyboxSize;
+  float groundSize;
+  float skyboxSize;
   Vector3 rootPosition;
 }; // end of class ISceneSize
 

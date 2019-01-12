@@ -8,6 +8,9 @@
 
 namespace BABYLON {
 
+class EnvironmentTextureInfo;
+using EnvironmentTextureInfoPtr = std::shared_ptr<EnvironmentTextureInfo>;
+
 /**
  * @brief Raw texture data and descriptor sufficient for WebGL texture upload.
  */
@@ -26,7 +29,8 @@ public:
    * @param parsedEnvironmentTextureInfo defines EnvironmentTextureInfo data
    * @returns the parsed raw texture data
    */
-  static EnvironmentTextureInfo Parse(const json& parsedEnvironmentTextureInfo);
+  static EnvironmentTextureInfoPtr
+  Parse(const json& parsedEnvironmentTextureInfo);
 
 public:
   /**
@@ -42,12 +46,12 @@ public:
   /**
    * Irradiance information stored in the file.
    */
-  std::optional<EnvironmentTextureIrradianceInfoV1> irradiance;
+  EnvironmentTextureIrradianceInfoV1Ptr irradiance;
 
   /**
    * Specular information stored in the file.
    */
-  std::optional<EnvironmentTextureSpecularInfoV1> specular;
+  EnvironmentTextureSpecularInfoV1Ptr specular;
 
 }; // end of class EnvironmentTextureInfo
 

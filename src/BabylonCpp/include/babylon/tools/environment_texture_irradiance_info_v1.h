@@ -10,6 +10,10 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class EnvironmentTextureIrradianceInfoV1;
+using EnvironmentTextureIrradianceInfoV1Ptr
+  = std::shared_ptr<EnvironmentTextureIrradianceInfoV1>;
+
 /**
  * @brief Defines the required storage to save the environment irradiance
  * information.
@@ -33,7 +37,8 @@ public:
    * @param parsedIrradiance defines irradiance data
    * @returns the parsed irradiance information
    */
-  static EnvironmentTextureIrradianceInfoV1 Parse(const json& parsedIrradiance);
+  static EnvironmentTextureIrradianceInfoV1Ptr
+  Parse(const json& parsedIrradiance);
 
 public:
   Float32Array x;

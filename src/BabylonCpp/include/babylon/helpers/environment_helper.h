@@ -29,6 +29,25 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
  */
 class BABYLON_SHARED_EXPORT EnvironmentHelper {
 
+private:
+  /**
+   * Default ground texture URL.
+   */
+  static constexpr const char* _groundTextureCDNUrl
+    = "https://assets.babylonjs.com/environments/backgroundGround.png";
+
+  /**
+   * Default skybox texture URL.
+   */
+  static constexpr const char* _skyboxTextureCDNUrl
+    = "https://assets.babylonjs.com/environments/backgroundSkybox.dds";
+
+  /**
+   * Default environment texture URL.
+   */
+  static constexpr const char* _environmentTextureCDNUrl
+    = "https://assets.babylonjs.com/environments/environmentSpecular.env";
+
 public:
   /**
    * @brief constructor
@@ -186,25 +205,6 @@ public:
    * the environment, mainly texture creation errors.
    */
   Observable<Exception> onErrorObservable;
-
-private:
-  /**
-   * Default ground texture URL.
-   */
-  static constexpr const char* _groundTextureCDNUrl
-    = "https://assets.babylonjs.com/environments/backgroundGround.png";
-
-  /**
-   * Default skybox texture URL.
-   */
-  static constexpr const char* _skyboxTextureCDNUrl
-    = "https://assets.babylonjs.com/environments/backgroundSkybox.dds";
-
-  /**
-   * Default environment texture URL.
-   */
-  static constexpr const char* _environmentTextureCDNUrl
-    = "https://assets.babylonjs.com/environments/environmentSpecular.env";
 
 private:
   MeshPtr _rootMesh;

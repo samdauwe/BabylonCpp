@@ -300,32 +300,33 @@ ISceneSize EnvironmentHelper::_getSceneSize()
     if (_scene->activeCamera->type() == IReflect::Type::ARCROTATECAMERA) {
       auto activecamera
         = std::static_pointer_cast<ArcRotateCamera>(_scene->activeCamera);
-      groundSize = static_cast<int>(*activecamera->upperRadiusLimit * 2.f);
-      skyboxSize = groundSize;
+      if (activecamera->upperRadiusLimit.has_value()) {
+        groundSize = *activecamera->upperRadiusLimit * 2.f;
+        skyboxSize = groundSize;
+      }
     }
 
     const auto sceneDiagonalLenght = sceneDiagonal.length();
     if (sceneDiagonalLenght > groundSize) {
-      groundSize = static_cast<int>(sceneDiagonalLenght * 2.f);
+      groundSize = sceneDiagonalLenght * 2.f;
       skyboxSize = groundSize;
     }
 
     // 10 % bigger.
-    groundSize     = static_cast<int>(groundSize * 1.1f);
-    skyboxSize     = static_cast<int>(skyboxSize * 1.5f);
+    groundSize *= 1.1f;
+    skyboxSize *= 1.5f;
     rootPosition   = sceneExtends.min.add(sceneDiagonal.scale(0.5f));
     rootPosition.y = sceneExtends.min.y - _options.groundYBias;
   }
 
-  return ISceneSize{static_cast<int>(groundSize), static_cast<int>(skyboxSize),
-                    rootPosition};
+  return ISceneSize{groundSize, skyboxSize, rootPosition};
 }
 
 void EnvironmentHelper::_setupGround(const ISceneSize& sceneSize)
 {
   if (!_ground || _ground->isDisposed()) {
-    _ground = Mesh::CreatePlane(
-      "BackgroundPlane", static_cast<float>(sceneSize.groundSize), _scene);
+    _ground
+      = Mesh::CreatePlane("BackgroundPlane", sceneSize.groundSize, _scene);
     _ground->rotation().x = Math::PI_2; // Face up by default.
     _ground->setParent(_rootMesh.get());
     _ground->onDisposeObservable.add(
@@ -422,13 +423,12 @@ void EnvironmentHelper::_setupMirrorInGroundMaterial()
 void EnvironmentHelper::_setupSkybox(const ISceneSize& sceneSize)
 {
   if (!_skybox || _skybox->isDisposed()) {
-    _skybox = Mesh::CreateBox("BackgroundSkybox",
-                              static_cast<float>(sceneSize.skyboxSize), _scene,
+    _skybox = Mesh::CreateBox("BackgroundSkybox", sceneSize.skyboxSize, _scene,
                               false, Mesh::BACKSIDE);
     _skybox->onDisposeObservable.add(
       [this](Node* /*node*/, EventState& /*es*/) { _skybox = nullptr; });
   }
-  _skybox->setParent(_rootMesh.get());
+  _skybox->parent = _rootMesh.get();
 }
 
 void EnvironmentHelper::_setupSkyboxMaterial()

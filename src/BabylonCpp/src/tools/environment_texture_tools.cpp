@@ -34,7 +34,7 @@ EnvironmentTextureTools::~EnvironmentTextureTools()
 {
 }
 
-std::optional<EnvironmentTextureInfo>
+EnvironmentTextureInfoPtr
 EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
 {
   const auto& dataView = data;
@@ -45,7 +45,7 @@ EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
     if (dataView[pos++] != EnvironmentTextureTools::_MagicBytes[i]) {
       BABYLON_LOG_ERROR("EnvironmentTextureTools",
                         "Not a babylon environment map");
-      return std::nullopt;
+      return nullptr;
     }
   }
 
@@ -58,16 +58,15 @@ EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
 
   // Parse JSON string
   auto parsedManifest = json::parse(manifestString.str());
-  EnvironmentTextureInfo manifest
-    = EnvironmentTextureInfo::Parse(parsedManifest);
-  if (manifest.specular.has_value()) {
+  auto manifest       = EnvironmentTextureInfo::Parse(parsedManifest);
+  if (manifest->specular) {
     // Extend the header with the position of the payload.
-    manifest.specular->specularDataPosition = pos;
+    manifest->specular->specularDataPosition = pos;
     // Fallback to 0.8 exactly if lodGenerationScale is not defined for backward
     // compatibility.
-    manifest.specular->lodGenerationScale
-      = manifest.specular->lodGenerationScale.has_value() ?
-          *manifest.specular->lodGenerationScale :
+    manifest->specular->lodGenerationScale
+      = manifest->specular->lodGenerationScale.has_value() ?
+          *manifest->specular->lodGenerationScale :
           0.8f;
   }
 
@@ -84,7 +83,7 @@ void EnvironmentTextureTools::UploadEnvLevels(
   }
 
   auto& specularInfo = info.specular;
-  if (!specularInfo.has_value()) {
+  if (!specularInfo) {
     // Nothing else parsed so far
     return;
   }
