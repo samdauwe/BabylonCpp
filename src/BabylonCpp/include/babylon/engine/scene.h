@@ -1562,8 +1562,8 @@ public:
    * @param options defines the options you can use to configure the environment
    * @returns the new EnvironmentHelper
    */
-  std::unique_ptr<EnvironmentHelper>
-  createDefaultEnvironment(const IEnvironmentHelperOptions& options = {});
+  std::unique_ptr<EnvironmentHelper> createDefaultEnvironment(
+    const std::optional<IEnvironmentHelperOptions>& options = std::nullopt);
 
   /** Tags **/
 

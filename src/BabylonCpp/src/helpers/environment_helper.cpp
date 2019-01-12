@@ -2,6 +2,7 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/core/string.h>
 #include <babylon/engine/scene.h>
 #include <babylon/helpers/iscene_size.h>
 #include <babylon/materials/background/background_material.h>
@@ -24,8 +25,8 @@ EnvironmentHelper::EnvironmentHelper(Scene* scene)
 {
 }
 
-EnvironmentHelper::EnvironmentHelper(const IEnvironmentHelperOptions& options,
-                                     Scene* scene)
+EnvironmentHelper::EnvironmentHelper(
+  const std::optional<IEnvironmentHelperOptions>& options, Scene* scene)
     : _rootMesh{nullptr}
     , _skybox{nullptr}
     , _skyboxTexture{nullptr}
@@ -35,7 +36,8 @@ EnvironmentHelper::EnvironmentHelper(const IEnvironmentHelperOptions& options,
     , _groundMirror{nullptr}
     , _groundMaterial{nullptr}
     , _scene{scene}
-    , _options{options}
+    , _options{options.has_value() ? *options :
+                                     EnvironmentHelper::_getDefaultOptions()}
 {
   _setupBackground();
   _setupImageProcessing();
@@ -174,10 +176,19 @@ BackgroundMaterialPtr& EnvironmentHelper::groundMaterial()
 
 IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
 {
+  const auto preprocessCDNUrl = [](const char* textureCDNUrl) -> std::string {
+    std::string textureCDNUrlStr(textureCDNUrl);
+    if (String::startsWith(textureCDNUrlStr, "https://assets.babylonjs.com")) {
+      textureCDNUrlStr = String::replace(
+        textureCDNUrlStr, "https://assets.babylonjs.com", "textures");
+    }
+    return textureCDNUrlStr;
+  };
+
   IEnvironmentHelperOptions options;
   options.createGround  = true;
   options.groundSize    = 15;
-  options.groundTexture = _groundTextureCDNUrl;
+  options.groundTexture = preprocessCDNUrl(_groundTextureCDNUrl);
   options.groundColor   = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
   options.groundOpacity = 0.9f;
   options.enableGroundShadow = true;
@@ -195,7 +206,7 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
 
   options.createSkybox  = true;
   options.skyboxSize    = 20;
-  options.skyboxTexture = _skyboxTextureCDNUrl;
+  options.skyboxTexture = preprocessCDNUrl(_skyboxTextureCDNUrl);
   options.skyboxColor   = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
 
   options.backgroundYRotation = 0;
@@ -203,7 +214,7 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
   options.rootPosition        = Vector3::Zero();
 
   options.setupImageProcessing = true;
-  options.environmentTexture   = _environmentTextureCDNUrl;
+  options.environmentTexture   = preprocessCDNUrl(_environmentTextureCDNUrl);
   options.cameraExposure       = 0.8f;
   options.cameraContrast       = 1.2f;
   options.toneMappingEnabled   = true;

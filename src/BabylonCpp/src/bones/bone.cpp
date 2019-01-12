@@ -33,6 +33,7 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
     , _restPose{restPose ? *restPose : Matrix::Identity()}
     , _baseMatrix{baseMatrix ? *baseMatrix : _localMatrix}
     , _invertedAbsoluteTransform{std::make_unique<Matrix>()}
+    , _parent{nullptr}
     , _scaleMatrix{Matrix::Identity()}
     , _scaleVector{Vector3::One()}
     , _negateScaleChildren{Vector3::One()}

@@ -523,7 +523,7 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
     }
   }
 
-  return nullptr;
+  return std::move(texture);
 }
 
 TexturePtr Texture::LoadFromDataString(

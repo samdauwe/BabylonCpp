@@ -4892,8 +4892,8 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
   return hdrSkybox;
 }
 
-std::unique_ptr<EnvironmentHelper>
-Scene::createDefaultEnvironment(const IEnvironmentHelperOptions& options)
+std::unique_ptr<EnvironmentHelper> Scene::createDefaultEnvironment(
+  const std::optional<IEnvironmentHelperOptions>& options)
 {
   return std::make_unique<EnvironmentHelper>(options, this);
 }

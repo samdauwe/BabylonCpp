@@ -236,7 +236,7 @@ bool BabylonFileLoader::importMesh(
             }
           }
 
-          if (!materialFound) {
+          if (!materialFound && !parsedMeshMaterialId.empty()) {
             loadedMaterialsIds.emplace_back(parsedMeshMaterialId);
             auto mat = parseMaterialById(parsedMeshMaterialId, parsedData,
                                          scene, rootUrl);

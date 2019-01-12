@@ -42,7 +42,8 @@ public:
    * @param options
    * @param scene The scene to add the material to
    */
-  EnvironmentHelper(const IEnvironmentHelperOptions& options, Scene* scene);
+  EnvironmentHelper(const std::optional<IEnvironmentHelperOptions>& options,
+                    Scene* scene);
 
   ~EnvironmentHelper();
 
