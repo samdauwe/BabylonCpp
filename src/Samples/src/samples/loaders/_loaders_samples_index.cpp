@@ -3,6 +3,7 @@
 #include <babylon/samples/loaders/import_babylon_js_logo_scene.h>
 #include <babylon/samples/loaders/import_candle_scene.h>
 #include <babylon/samples/loaders/import_dude_scene.h>
+#include <babylon/samples/loaders/import_dummy3_scene.h>
 #include <babylon/samples/loaders/import_meshes_skull_scene.h>
 #include <babylon/samples/loaders/import_rabbit_scene.h>
 #include <babylon/samples/loaders/import_suzanne_scene.h>
@@ -32,6 +33,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<ImportDudeScene>(iCanvas); //
                       });                                                  //
+  // Import Dummy 3 Scene
+  _samples["ImportDummy3Scene"]
+    = std::make_tuple(true,                                                  //
+                      [](ICanvas* iCanvas) {                                 //
+                        return std::make_unique<ImportDummy3Scene>(iCanvas); //
+                      });                                                    //
   // Import Meshes Skull Scene
   _samples["ImportMeshesSkullScene"] = std::make_tuple(
     true,                                                       //
