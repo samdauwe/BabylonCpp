@@ -61,7 +61,7 @@ void FurMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   scene->createDefaultLight();
 
-  SceneLoader::Append("scenes/", "Rabbit.babylon", scene,
+  SceneLoader::Append("scenes/Rabbit/", "Rabbit.babylon", scene,
                       [this, scene](Scene* /*iScene*/) {
                         scene->activeCamera = _camera;
 

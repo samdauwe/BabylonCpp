@@ -2,6 +2,7 @@
 
 #include <babylon/samples/loaders/import_babylon_js_logo_scene.h>
 #include <babylon/samples/loaders/import_candle_scene.h>
+#include <babylon/samples/loaders/import_dude_scene.h>
 #include <babylon/samples/loaders/import_meshes_skull_scene.h>
 #include <babylon/samples/loaders/import_rabbit_scene.h>
 
@@ -14,7 +15,7 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
 
   // Import Babylon JS Logo Scene
   _samples["ImportBabylonJSLogoScene"] = std::make_tuple(
-    true,                                                        //
+    true,                                                         //
     [](ICanvas* iCanvas) {                                        //
       return std::make_unique<ImportBabylonJSLogoScene>(iCanvas); //
     });                                                           //
@@ -24,6 +25,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<ImportCandleScene>(iCanvas); //
                       });                                                    //
+  // Import Dude Scene
+  _samples["ImportDudeScene"]
+    = std::make_tuple(true,                                                //
+                      [](ICanvas* iCanvas) {                               //
+                        return std::make_unique<ImportDudeScene>(iCanvas); //
+                      });                                                  //
   // Import Meshes Skull Scene
   _samples["ImportMeshesSkullScene"] = std::make_tuple(
     true,                                                       //
@@ -32,7 +39,7 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
     });                                                         //
   // Import Rabbit Scene
   _samples["ImportRabbitScene"]
-    = std::make_tuple(true,                                                 //
+    = std::make_tuple(true,                                                  //
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<ImportRabbitScene>(iCanvas); //
                       });                                                    //

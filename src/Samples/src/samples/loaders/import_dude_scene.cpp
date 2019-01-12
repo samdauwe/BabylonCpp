@@ -1,4 +1,4 @@
-#include <babylon/samples/loaders/import_rabbit_scene.h>
+#include <babylon/samples/loaders/import_dude_scene.h>
 
 #include <babylon/engine/scene.h>
 #include <babylon/helpers/environment_helper.h>
@@ -7,24 +7,23 @@
 namespace BABYLON {
 namespace Samples {
 
-ImportRabbitScene::ImportRabbitScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas)
+ImportDudeScene::ImportDudeScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
 {
 }
 
-ImportRabbitScene::~ImportRabbitScene()
+ImportDudeScene::~ImportDudeScene()
 {
 }
 
-const char* ImportRabbitScene::getName()
+const char* ImportDudeScene::getName()
 {
-  return "Import Rabbit Scene";
+  return "Import Dude Scene";
 }
 
-void ImportRabbitScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
+void ImportDudeScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
 {
   SceneLoader::ImportMesh(
-    {}, "scenes/Rabbit/", "Rabbit.babylon", scene,
+    {}, "scenes/Dude/", "Dude.babylon", scene,
     [scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
             const std::vector<IParticleSystemPtr>& /*particleSystems*/,
             const std::vector<SkeletonPtr>& /*skeletons*/,
