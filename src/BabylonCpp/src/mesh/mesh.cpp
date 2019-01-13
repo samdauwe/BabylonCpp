@@ -21,6 +21,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/math/matrix.h>
+#include <babylon/math/scalar.h>
 #include <babylon/math/tmp.h>
 #include <babylon/math/vector2.h>
 #include <babylon/mesh/_creation_data_storage.h>
@@ -2248,6 +2249,111 @@ void Mesh::_syncGeometryWithMorphTargetManager()
       ++index;
     }
   }
+}
+
+std::vector<Vector3> Mesh::createInnerPoints(size_t pointsNb)
+{
+  const auto& boundInfo = getBoundingInfo();
+  const auto diameter   = 2.f * boundInfo.boundingSphere.radius;
+  updateFacetData();
+
+  auto positions = getVerticesData(VertexBuffer::PositionKind);
+  auto indices   = getIndices();
+
+  auto point = Vector3::Zero();
+  std::vector<Vector3> points;
+  std::vector<Vector3> directions;
+
+  auto index   = 0u;
+  auto id0     = 0u;
+  auto id1     = 0u;
+  auto id2     = 0u;
+  auto v0X     = 0.f;
+  auto v0Y     = 0.f;
+  auto v0Z     = 0.f;
+  auto v1X     = 0.f;
+  auto v1Y     = 0.f;
+  auto v1Z     = 0.f;
+  auto v2X     = 0.f;
+  auto v2Y     = 0.f;
+  auto v2Z     = 0.f;
+  auto vertex0 = Vector3::Zero();
+  auto vertex1 = Vector3::Zero();
+  auto vertex2 = Vector3::Zero();
+  auto vec0    = Vector3::Zero();
+  auto vec1    = Vector3::Zero();
+
+  auto lamda         = 0.f;
+  auto mu            = 0.f;
+  auto norm          = Vector3::Zero();
+  auto tang          = Vector3::Zero();
+  auto biNorm        = Vector3::Zero();
+  auto angle         = 0.f;
+  auto facetPlaneVec = Vector3::Zero();
+
+  auto gap      = 0.f;
+  auto distance = 0.f;
+  Ray ray(Vector3::Zero(), Axis::X());
+  PickingInfo pickInfo;
+  auto facetPoint        = Vector3::Zero();
+  auto direction         = Vector3::Zero();
+  auto particleDirection = Vector3::Zero();
+  auto testPoint         = Vector3::Zero();
+
+  for (size_t p = 0; p < pointsNb; ++p) {
+    index = static_cast<unsigned>(
+      std::floor(Scalar::RandomRange(0.f, indices.size() / 3.f)));
+    id0 = indices[3 * index];
+    id1 = indices[3 * index + 1];
+    id2 = indices[3 * index + 2];
+    v0X = positions[3 * id0];
+    v0Y = positions[3 * id0 + 1];
+    v0Z = positions[3 * id0 + 2];
+    v1X = positions[3 * id1];
+    v1Y = positions[3 * id1 + 1];
+    v1Z = positions[3 * id1 + 2];
+    v2X = positions[3 * id2];
+    v2Y = positions[3 * id2 + 1];
+    v2Z = positions[3 * id2 + 2];
+    vertex0.set(v0X, v0Y, v0Z);
+    vertex1.set(v1X, v1Y, v1Z);
+    vertex2.set(v2X, v2Y, v2Z);
+    vertex1.subtractToRef(vertex0, vec0);
+    vertex2.subtractToRef(vertex1, vec1);
+
+    norm   = getFacetNormal(index).normalize().scale(-1.f);
+    tang   = vec0.copy().normalize();
+    biNorm = Vector3::Cross(norm, tang);
+    angle  = Scalar::RandomRange(0.f, Math::PI2);
+    facetPlaneVec
+      = tang.scale(std::cos(angle)).add(biNorm.scale(std::sin(angle)));
+    angle = Scalar::RandomRange(0.1f, Math::PI);
+    direction
+      = facetPlaneVec.scale(std::cos(angle)).add(norm.scale(std::sin(angle)));
+
+    // form a point inside the facet v0, v1, v2;
+    lamda      = Scalar::RandomRange(0.f, 1.f);
+    mu         = Scalar::RandomRange(0.f, 1.f);
+    facetPoint = vertex0.add(vec0.scale(lamda)).add(vec1.scale(lamda * mu));
+
+    gap           = 0.f;
+    distance      = 0.f;
+    ray.origin    = facetPoint;
+    ray.direction = direction;
+    ray.length    = diameter;
+    pickInfo      = ray.intersectsMesh(this);
+    if (pickInfo.hit) {
+      distance = pickInfo.pickedPoint->subtract(facetPoint).length();
+      gap      = Scalar::RandomRange(0.f, 1.f) * distance;
+      point    = facetPoint.add(direction.scale(gap));
+    }
+    else {
+      point.set(0.f, 0.f, 0.f);
+    }
+    points.emplace_back(point);
+  }
+
+  return points;
 }
 
 MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,

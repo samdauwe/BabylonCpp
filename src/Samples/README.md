@@ -117,6 +117,7 @@
 ![height_map_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/height_map_scene.png?raw=true "Height Map Scene")
 ![house_from_floorplan](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/house_from_floorplan.png?raw=true "House from a Floorplan Scene")
 ![ico_sphere_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/ico_sphere_scene.png?raw=true "Icosphere Scene")
+![inner_mesh_points_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/inner_mesh_points_scene.png?raw=true "Inner Mesh Points Scene")
 ![lathe_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lathe_scene.png?raw=true "Lathe Scene")
 ![look_at_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/look_at_scene.png?raw=true "Look At Scene")
 ![lorenz_attractor_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/lorenz_attractor_scene.png?raw=true "Lorenz Attractor Scene")

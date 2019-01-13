@@ -882,6 +882,16 @@ public:
    */
   void _syncGeometryWithMorphTargetManager();
 
+  /**
+   * @brief Creates points inside a mesh. This utility enables you to create and
+   * store Vector3 points each of which is randomly positioned inside a given
+   * mesh.
+   * @param pointsNb defines how many inside points to generate
+   * @return a list of inner mesh points
+   * @see https://doc.babylonjs.com/snippets/innermeshpoints
+   */
+  std::vector<Vector3> createInnerPoints(size_t pointsNb);
+
   /** Statics **/
 
   /**

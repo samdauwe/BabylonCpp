@@ -18,6 +18,7 @@
 #include <babylon/samples/meshes/height_map_scene.h>
 #include <babylon/samples/meshes/house_from_floorplan.h>
 #include <babylon/samples/meshes/ico_sphere_scene.h>
+#include <babylon/samples/meshes/inner_mesh_points_scene.h>
 #include <babylon/samples/meshes/lathe_scene.h>
 #include <babylon/samples/meshes/lines_mesh_spiral_scene.h>
 #include <babylon/samples/meshes/look_at_scene.h>
@@ -156,6 +157,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
                       [](ICanvas* iCanvas) {                              //
                         return std::make_unique<IcoSphereScene>(iCanvas); //
                       });                                                 //
+  // Inner MeshP oints Scene
+  _samples["InnerMeshPointsScene"] = std::make_tuple(
+    true,                                                     //
+    [](ICanvas* iCanvas) {                                    //
+      return std::make_unique<InnerMeshPointsScene>(iCanvas); //
+    });                                                       //
   // Lathe Scene
   _samples["LatheScene"]
     = std::make_tuple(true,                                           //
