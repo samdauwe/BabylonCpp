@@ -892,6 +892,14 @@ public:
    */
   std::vector<Vector3> createInnerPoints(size_t pointsNb);
 
+  /**
+   * @brief Check whether or not a point is inside this mesh
+   * @param point the point to check
+   * @return true if point is inside mesh, false otherwise.
+   * @see https://doc.babylonjs.com/snippets/isinside
+   */
+  bool pointIsInside(Vector3 point);
+
   /** Statics **/
 
   /**

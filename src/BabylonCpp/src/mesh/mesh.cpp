@@ -2356,6 +2356,53 @@ std::vector<Vector3> Mesh::createInnerPoints(size_t pointsNb)
   return points;
 }
 
+bool Mesh::pointIsInside(Vector3 point)
+{
+  auto boundInfo = getBoundingInfo();
+  auto max       = boundInfo.maximum();
+  auto min       = boundInfo.minimum();
+  auto diameter  = 2.f * boundInfo.boundingSphere.radius;
+  if (point.x < min.x || point.x > max.x) {
+    return false;
+  }
+  if (point.y < min.y || point.y > max.y) {
+    return false;
+  }
+  if (point.z < min.z || point.z > max.z) {
+    return false;
+  }
+
+  auto pointFound = false;
+  auto d          = 0.f;
+  auto hitCount   = 0;
+  Ray ray(Vector3::Zero(), Axis::X(), diameter);
+  PickingInfo pickInfo;
+  auto direction = Vector3::Zero();
+
+  while (d < 2.f && !pointFound) {
+    hitCount      = 0;
+    direction     = Axis::X().scale(2.f * (0.5f - d));
+    ray.origin    = point;
+    ray.direction = direction;
+    pickInfo      = ray.intersectsMesh(this);
+    while (pickInfo.hit) {
+      ++hitCount;
+      pickInfo.pickedPoint->addToRef(direction.scale(0.00000001f), point);
+      ray.origin = point;
+      pickInfo   = ray.intersectsMesh(this);
+    }
+    if ((hitCount % 2) == 1) {
+      pointFound = true;
+    }
+    else if ((hitCount % 2) == 0 && hitCount > 0) {
+      pointFound = true;
+    }
+    ++d;
+  }
+
+  return pointFound;
+}
+
 MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
                     const std::string& rootUrl)
 {
