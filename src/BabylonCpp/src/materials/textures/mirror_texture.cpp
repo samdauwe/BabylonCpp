@@ -219,13 +219,13 @@ MirrorTexturePtr MirrorTexture::clone()
 
   auto textureSize = getSize();
   auto newTexture
-    = MirrorTexture::New(name,                                        //
-                         Size(textureSize.width, textureSize.height), //
-                         scene,                                       //
-                         _renderTargetOptions.generateMipMaps,        //
-                         _renderTargetOptions.type,                   //
-                         _renderTargetOptions.samplingMode,           //
-                         _renderTargetOptions.generateDepthBuffer     //
+    = MirrorTexture::New(name,                                            //
+                         Size(textureSize.width, textureSize.height),     //
+                         scene,                                           //
+                         _renderTargetOptions.generateMipMaps.value(),    //
+                         _renderTargetOptions.type.value(),               //
+                         _renderTargetOptions.samplingMode.value(),       //
+                         _renderTargetOptions.generateDepthBuffer.value() //
     );
 
   // Base texture

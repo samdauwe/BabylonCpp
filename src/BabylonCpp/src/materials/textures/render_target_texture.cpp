@@ -670,17 +670,17 @@ void RenderTargetTexture::setRenderingAutoClearDepthStencil(
 RenderTargetTexturePtr RenderTargetTexture::clone()
 {
   auto textureSize = getSize();
-  auto newTexture
-    = RenderTargetTexture::New(name,                                      //
-                               textureSize, getScene(),                   //
-                               _renderTargetOptions.generateMipMaps,      //
-                               _doNotChangeAspectRatio,                   //
-                               _renderTargetOptions.type,                 //
-                               isCube,                                    //
-                               _renderTargetOptions.samplingMode,         //
-                               _renderTargetOptions.generateDepthBuffer,  //
-                               _renderTargetOptions.generateStencilBuffer //
-    );
+  auto newTexture  = RenderTargetTexture::New(
+    name,                                              //
+    textureSize, getScene(),                           //
+    _renderTargetOptions.generateMipMaps.value(),      //
+    _doNotChangeAspectRatio,                           //
+    _renderTargetOptions.type.value(),                 //
+    isCube,                                            //
+    _renderTargetOptions.samplingMode.value(),         //
+    _renderTargetOptions.generateDepthBuffer.value(),  //
+    _renderTargetOptions.generateStencilBuffer.value() //
+  );
 
   // Base texture
   newTexture->hasAlpha = hasAlpha();

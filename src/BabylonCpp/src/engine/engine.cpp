@@ -3505,27 +3505,40 @@ InternalTexturePtr
 Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
                                   const IRenderTargetOptions& options)
 {
-  // old version had a "generateMipMaps" arg instead of options.
-  // if options.generateMipMaps is undefined, consider that options itself if
-  // the generateMipmaps value in the same way, generateDepthBuffer is defaulted
-  // to true
-  bool generateMipMaps     = options.generateMipMaps;
-  bool generateDepthBuffer = options.generateDepthBuffer;
-  bool generateStencilBuffer
-    = generateDepthBuffer && options.generateStencilBuffer;
+  RenderTargetCreationOptions fullOptions;
+  fullOptions.generateMipMaps = options.generateMipMaps.has_value() ?
+                                  options.generateMipMaps.value() :
+                                  true;
+  fullOptions.generateDepthBuffer = options.generateDepthBuffer.has_value() ?
+                                      options.generateDepthBuffer.value() :
+                                      true;
+  fullOptions.generateStencilBuffer
+    = fullOptions.generateDepthBuffer
+      && (options.generateStencilBuffer.has_value() ?
+            options.generateStencilBuffer.value() :
+            false);
+  fullOptions.type = options.type.has_value() ?
+                       options.type.value() :
+                       EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  fullOptions.samplingMode = options.samplingMode.has_value() ?
+                               options.samplingMode.value() :
+                               EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE;
+  fullOptions.format = options.format.has_value() ?
+                         options.format.value() :
+                         EngineConstants::TEXTUREFORMAT_RGBA;
+  fullOptions.generateStencilBuffer
+    = fullOptions.generateDepthBuffer.value()
+      && fullOptions.generateStencilBuffer.value();
 
-  unsigned int type         = options.type;
-  unsigned int samplingMode = options.samplingMode;
-
-  if (type == EngineConstants::TEXTURETYPE_FLOAT
+  if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_FLOAT
       && !_caps.textureFloatLinearFiltering) {
-    // if floating point linear (GL::FLOAT) then force to NEAREST_SAMPLINGMODE
-    samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    // if floating point linear (gl.FLOAT) then force to NEAREST_SAMPLINGMODE
+    fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
-  else if (type == EngineConstants::TEXTURETYPE_HALF_FLOAT
+  else if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_HALF_FLOAT
            && !_caps.textureHalfFloatLinearFiltering) {
     // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
-    samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+    fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
   }
 
   auto texture = std::make_shared<InternalTexture>(
@@ -3544,10 +3557,13 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
     height           = static_cast<int>(textureSize);
   }
 
-  auto filters = _getSamplingParameters(samplingMode, generateMipMaps);
+  auto filters = _getSamplingParameters(
+    fullOptions.samplingMode.value(),
+    fullOptions.generateMipMaps.value() ? true : false);
 
-  if (type == EngineConstants::TEXTURETYPE_FLOAT && !_caps.textureFloat) {
-    type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_FLOAT
+      && !_caps.textureFloat) {
+    fullOptions.type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
     BABYLON_LOG_WARN(
       "Engine",
       "Float textures are not supported. Render target forced to "
@@ -3560,9 +3576,11 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
 
   _gl->texImage2D(GL::TEXTURE_2D, 0,
-                  static_cast<int>(_getRGBABufferInternalSizedFormat(type)),
-                  width, height, 0, GL::RGBA, _getWebGLTextureType(type),
-                  Uint8Array());
+                  static_cast<GL::GLint>(_getRGBABufferInternalSizedFormat(
+                    fullOptions.type.value(), fullOptions.format.value())),
+                  width, height, 0,
+                  _getInternalFormat(fullOptions.format.value()),
+                  _getWebGLTextureType(fullOptions.type.value()), Uint8Array());
 
   // Create the framebuffer
   auto currentFrameBuffer = _currentFramebuffer;
@@ -3572,9 +3590,10 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
                             GL::TEXTURE_2D, texture->_webGLTexture.get(), 0);
 
   texture->_depthStencilBuffer = _setupFramebufferDepthAttachments(
-    generateStencilBuffer ? true : false, generateDepthBuffer, width, height);
+    fullOptions.generateStencilBuffer.value() ? true : false,
+    fullOptions.generateDepthBuffer.value(), width, height);
 
-  if (generateMipMaps) {
+  if (fullOptions.generateMipMaps.value()) {
     _gl->generateMipmap(GL::TEXTURE_2D);
   }
 
@@ -3583,18 +3602,20 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   bindUnboundFramebuffer(currentFrameBuffer);
 
-  texture->_framebuffer           = std::move(framebuffer);
-  texture->baseWidth              = width;
-  texture->baseHeight             = height;
-  texture->width                  = width;
-  texture->height                 = height;
-  texture->isReady                = true;
-  texture->samples                = 1;
-  texture->generateMipMaps        = generateMipMaps ? true : false;
-  texture->samplingMode           = samplingMode;
-  texture->type                   = type;
-  texture->_generateDepthBuffer   = generateDepthBuffer;
-  texture->_generateStencilBuffer = generateStencilBuffer ? true : false;
+  texture->_framebuffer    = std::move(framebuffer);
+  texture->baseWidth       = width;
+  texture->baseHeight      = height;
+  texture->width           = width;
+  texture->height          = height;
+  texture->isReady         = true;
+  texture->samples         = 1;
+  texture->generateMipMaps = fullOptions.generateMipMaps.value() ? true : false;
+  texture->samplingMode    = fullOptions.samplingMode.value();
+  texture->type            = fullOptions.type.value();
+  texture->format          = fullOptions.format.value();
+  texture->_generateDepthBuffer = fullOptions.generateDepthBuffer.value();
+  texture->_generateStencilBuffer
+    = fullOptions.generateStencilBuffer.value() ? true : false;
 
   // resetTextureCache();
 
@@ -4046,29 +4067,54 @@ void Engine::_uploadImageToTexture(const InternalTexturePtr& texture,
 InternalTexturePtr Engine::createRenderTargetCubeTexture(
   const ISize& size, const RenderTargetCreationOptions& options)
 {
+  RenderTargetCreationOptions fullOptions;
+  fullOptions.generateMipMaps = options.generateMipMaps.has_value() ?
+                                  options.generateMipMaps.value() :
+                                  true;
+  fullOptions.generateDepthBuffer = options.generateDepthBuffer.has_value() ?
+                                      options.generateDepthBuffer.value() :
+                                      true;
+  fullOptions.generateStencilBuffer
+    = options.generateStencilBuffer.has_value() ?
+        options.generateStencilBuffer.value() :
+        false;
+  fullOptions.type = options.type.has_value() ?
+                       options.type.value() :
+                       EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  fullOptions.samplingMode = options.samplingMode.has_value() ?
+                               options.samplingMode.value() :
+                               EngineConstants::TEXTURE_TRILINEAR_SAMPLINGMODE;
+  fullOptions.format = options.format.has_value() ?
+                         options.format.value() :
+                         EngineConstants::TEXTUREFORMAT_RGBA;
+  fullOptions.generateStencilBuffer
+    = fullOptions.generateDepthBuffer.value()
+      && fullOptions.generateStencilBuffer.value();
+
+  if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_FLOAT
+      && !_caps.textureFloatLinearFiltering) {
+    // if floating point linear (gl.FLOAT) then force to NEAREST_SAMPLINGMODE
+    fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+  }
+  else if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_HALF_FLOAT
+           && !_caps.textureHalfFloatLinearFiltering) {
+    // if floating point linear (HALF_FLOAT) then force to NEAREST_SAMPLINGMODE
+    fullOptions.samplingMode = EngineConstants::TEXTURE_NEAREST_SAMPLINGMODE;
+  }
+
   auto texture = std::make_shared<InternalTexture>(
     this, InternalTexture::DATASOURCE_RENDERTARGET);
-
-  bool generateMipMaps     = options.generateMipMaps;
-  bool generateDepthBuffer = options.generateDepthBuffer;
-  bool generateStencilBuffer
-    = (generateDepthBuffer && options.generateStencilBuffer) ? true : false;
-
-  unsigned int samplingMode = options.samplingMode;
-
-  texture->isCube          = true;
-  texture->generateMipMaps = generateMipMaps;
-  texture->samples         = 1;
-  texture->samplingMode    = samplingMode;
-
-  auto filters = Engine::_getSamplingParameters(samplingMode, generateMipMaps);
-
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture, true);
 
-  for (unsigned int face = 0; face < 6; ++face) {
-    _gl->texImage2D((GL::TEXTURE_CUBE_MAP_POSITIVE_X + face), 0, GL::RGBA,
-                    size.width, size.height, 0, GL::RGBA, GL::UNSIGNED_BYTE,
-                    Uint8Array());
+  auto filters = Engine::_getSamplingParameters(
+    fullOptions.samplingMode.value(), fullOptions.generateMipMaps.value());
+
+  if (fullOptions.type.value() == EngineConstants::TEXTURETYPE_FLOAT
+      && !_caps.textureFloat) {
+    fullOptions.type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+    BABYLON_LOG_WARN("Engine",
+                     "Float textures are not supported. Cube render target "
+                     "forced to TEXTURETYPE_UNESIGNED_BYTE type");
   }
 
   _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, filters.mag);
@@ -4078,19 +4124,26 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
   _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_WRAP_T,
                      GL::CLAMP_TO_EDGE);
 
-  // Create the depth buffer
-  GLRenderBufferPtr depthStencilBuffer = nullptr;
+  for (unsigned int face = 0; face < 6; ++face) {
+    _gl->texImage2D((GL::TEXTURE_CUBE_MAP_POSITIVE_X + face), 0,
+                    static_cast<GL::GLint>(_getRGBABufferInternalSizedFormat(
+                      fullOptions.type.value(), fullOptions.format.value())),
+                    size.width, size.height, 0,
+                    _getInternalFormat(fullOptions.format.value()),
+                    _getWebGLTextureType(fullOptions.type.value()),
+                    Uint8Array());
+  }
 
   // Create the framebuffer
-  GLFrameBufferPtr framebuffer = _gl->createFramebuffer();
+  auto framebuffer = _gl->createFramebuffer();
   bindUnboundFramebuffer(framebuffer.get());
 
   texture->_depthStencilBuffer = _setupFramebufferDepthAttachments(
-    generateStencilBuffer, generateDepthBuffer, size.width, size.height);
+    fullOptions.generateStencilBuffer.value(),
+    fullOptions.generateDepthBuffer.value(), size.width, size.height);
 
   // Mipmaps
   if (texture->generateMipMaps) {
-    _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, texture);
     _gl->generateMipmap(GL::TEXTURE_CUBE_MAP);
   }
 
@@ -4099,12 +4152,18 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
   _gl->bindRenderbuffer(GL::RENDERBUFFER, nullptr);
   bindUnboundFramebuffer(nullptr);
 
-  texture->_framebuffer = std::move(framebuffer);
-  texture->width        = size.width;
-  texture->height       = size.height;
-  texture->isReady      = true;
-
-  // resetTextureCache();
+  texture->_framebuffer           = std::move(framebuffer);
+  texture->width                  = size.width;
+  texture->height                 = size.height;
+  texture->isReady                = true;
+  texture->isCube                 = true;
+  texture->samples                = 1;
+  texture->generateMipMaps        = fullOptions.generateMipMaps.value();
+  texture->samplingMode           = fullOptions.samplingMode.value();
+  texture->type                   = fullOptions.type.value();
+  texture->format                 = fullOptions.format.value();
+  texture->_generateDepthBuffer   = fullOptions.generateDepthBuffer.value();
+  texture->_generateStencilBuffer = fullOptions.generateStencilBuffer.value();
 
   _internalTexturesCache.emplace_back(texture);
 
