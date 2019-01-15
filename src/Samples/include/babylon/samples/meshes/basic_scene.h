@@ -9,6 +9,7 @@ namespace Samples {
 /**
  * @brief Basic Scene. Example demonstrating how to create ball and plane.
  * @see https://www.babylonjs-playground.com/#TAZ2CB#0
+ * @see https://doc.babylonjs.com/features/scene
  */
 struct BasicScene : public IRenderableScene {
 
