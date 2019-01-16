@@ -138,6 +138,7 @@
 
 ## Optimizations ##
 ![building_instances_grid_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/building_instances_grid_scene.png?raw=true "Building Instances Grid Scene")
+![clip_planes_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/clip_planes_scene.png?raw=true "Clip Planes Scene")
 ![cube_chaos_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/cube_chaos_scene.png?raw=true "Cube Chaos Scene")
 ![many_box_instances_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/many_box_instances_scene.png?raw=true "Many Box Instances Scene")
 
