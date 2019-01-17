@@ -398,6 +398,15 @@ public:
   Vector3& normalize();
 
   /**
+   * @brief Rotates the vector around 0,0,0 by a quaternion.
+   * @param quaternion the rotation quaternion
+   * @param result vector to store the result
+   * @returns the resulting vector
+   */
+  Vector3& rotateByQuaternionToRef(const Quaternion& quaternion,
+                                   Vector3& result);
+
+  /**
    * @brief Normalize the current Vector3 to a new vector.
    * @returns the new Vector3
    */

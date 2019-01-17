@@ -20,6 +20,7 @@
 #include <babylon/samples/textures/render_target_texture_scene.h>
 #include <babylon/samples/textures/sphere_textures_scene.h>
 #include <babylon/samples/textures/sphere_transparent_textures_scene.h>
+#include <babylon/samples/textures/spherical_panning_scene.h>
 #include <babylon/samples/textures/spherical_reflection_texture_scene.h>
 #include <babylon/samples/textures/two_sided_texture_scene.h>
 
@@ -109,11 +110,11 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
       return std::make_unique<MultiSampleRenderTargetsScene>(iCanvas); //
     });                                                                //
   // Opacity Textur Scene
-  _samples["OpacityTexturScene"]
-    = std::make_tuple(true,                                                   //
-                      [](ICanvas* iCanvas) {                                  //
-                        return std::make_unique<OpacityTexturScene>(iCanvas); //
-                      });                                                     //
+  _samples["OpacityTextureScene"] = std::make_tuple(
+    true,                                                    //
+    [](ICanvas* iCanvas) {                                   //
+      return std::make_unique<OpacityTextureScene>(iCanvas); //
+    });                                                      //
   // Photo Dome Scene
   _samples["PhotoDomeScene"]
     = std::make_tuple(true,                                               //
@@ -150,6 +151,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
     [](ICanvas* iCanvas) {                                              //
       return std::make_unique<SphereTransparentTexturesScene>(iCanvas); //
     });                                                                 //
+  // Spherical Panning Scene
+  _samples["SphericalPanningScene"] = std::make_tuple(
+    true,                                                      //
+    [](ICanvas* iCanvas) {                                     //
+      return std::make_unique<SphericalPanningScene>(iCanvas); //
+    });                                                        //
   // Spherical Reflection Texture Scene
   _samples["SphericalReflectionTextureScene"] = std::make_tuple(
     true,                                                                //

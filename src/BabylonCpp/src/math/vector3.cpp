@@ -493,6 +493,14 @@ Vector3& Vector3::normalize()
   return *this;
 }
 
+Vector3& Vector3::rotateByQuaternionToRef(const Quaternion& quaternion,
+                                          Vector3& result)
+{
+  quaternion.toRotationMatrix(MathTmp::MatrixArray[0]);
+  Vector3::TransformCoordinatesToRef(*this, MathTmp::MatrixArray[0], result);
+  return result;
+}
+
 Vector3 Vector3::normalizeToNew() const
 {
   Vector3 normalized(0.f, 0.f, 0.f);

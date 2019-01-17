@@ -10,21 +10,21 @@
 namespace BABYLON {
 namespace Samples {
 
-OpacityTexturScene::OpacityTexturScene(ICanvas* iCanvas)
+OpacityTextureScene::OpacityTextureScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
 {
 }
 
-OpacityTexturScene::~OpacityTexturScene()
+OpacityTextureScene::~OpacityTextureScene()
 {
 }
 
-const char* OpacityTexturScene::getName()
+const char* OpacityTextureScene::getName()
 {
-  return "Opacity Textur Scene";
+  return "Opacity Texture Scene";
 }
 
-void OpacityTexturScene::initializeScene(ICanvas* canvas, Scene* scene)
+void OpacityTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Camera
   auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 5,

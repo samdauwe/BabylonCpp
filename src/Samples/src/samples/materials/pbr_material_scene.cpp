@@ -36,7 +36,7 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Environment Texture
   auto hdrTexture
-    = CubeTexture::CreateFromPrefilteredData("textures/environment.dds", scene);
+    = CubeTexture::CreateFromPrefilteredData("textures/environments/environmentSpecular.env", scene);
 
   scene->imageProcessingConfiguration()->exposure = 0.6f;
   scene->imageProcessingConfiguration()->contrast = 1.6f;
@@ -51,61 +51,6 @@ void PBRMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   hdrSkyboxMaterial->microSurface    = 1.f;
   hdrSkyboxMaterial->disableLighting = true;
   hdrSkybox->material                = hdrSkyboxMaterial;
-  hdrSkybox->infiniteDistance        = true;
-
-  // Create meshes
-  auto sphereGlass = Mesh::CreateSphere("sphereGlass", 48, 30.f, scene);
-  sphereGlass->translate(Vector3(1.f, 0.f, 0.f), -60.f);
-
-  auto sphereMetal = Mesh::CreateSphere("sphereMetal", 48, 30.f, scene);
-  sphereMetal->translate(Vector3(1.f, 0.f, 0.f), 60.f);
-
-  auto spherePlastic = Mesh::CreateSphere("spherePlastic", 48, 30.f, scene);
-  spherePlastic->translate(Vector3(0.f, 0.f, 1.f), -60.f);
-
-  BoxOptions woodPlankOptions;
-  woodPlankOptions.width  = 65.f;
-  woodPlankOptions.height = 1.f;
-  woodPlankOptions.depth  = 65.f;
-  auto woodPlank = MeshBuilder::CreateBox("plane", woodPlankOptions, scene);
-
-  // Create materials
-  auto glass                            = PBRMaterial::New("glass", scene);
-  glass->reflectionTexture              = hdrTexture;
-  glass->refractionTexture              = hdrTexture;
-  glass->linkRefractionWithTransparency = true;
-  glass->indexOfRefraction              = 0.52f;
-  glass->alpha                          = 0.f;
-  glass->microSurface                   = 1;
-  glass->reflectivityColor              = Color3(0.2f, 0.2f, 0.2f);
-  glass->albedoColor                    = Color3(0.85f, 0.85f, 0.85f);
-  sphereGlass->material                 = glass;
-
-  auto metal               = PBRMaterial::New("metal", scene);
-  metal->reflectionTexture = hdrTexture;
-  metal->microSurface      = 0.96f;
-  metal->reflectivityColor = Color3(0.85f, 0.85f, 0.85f);
-  metal->albedoColor       = Color3(0.01f, 0.01f, 0.01f);
-  sphereMetal->material    = metal;
-
-  auto plastic               = PBRMaterial::New("plastic", scene);
-  plastic->reflectionTexture = hdrTexture;
-  plastic->microSurface      = 0.96f;
-  plastic->albedoColor       = Color3(0.206f, 0.94f, 1.f);
-  plastic->reflectivityColor = Color3(0.003f, 0.003f, 0.003f);
-  spherePlastic->material    = plastic;
-
-  auto wood                  = PBRMaterial::New("wood", scene);
-  wood->reflectionTexture    = hdrTexture;
-  wood->environmentIntensity = 1.f;
-  wood->specularIntensity    = 0.3f;
-
-  wood->reflectivityTexture = Texture::New("textures/reflectivity.png", scene);
-  wood->useMicroSurfaceFromReflectivityMapAlpha = true;
-
-  wood->albedoColor   = Color3::White();
-  wood->albedoTexture = Texture::New("textures/albedo.png", scene);
-  woodPlank->material = wood;
 }
 
 } // end of namespace Samples
