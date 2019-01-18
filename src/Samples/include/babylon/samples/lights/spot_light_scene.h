@@ -10,6 +10,7 @@ namespace Samples {
  * @brief Scene demonstrating the use of the spot light. This light defines a
  * cone of light pointing in a direction.
  * @see https://www.babylonjs-playground.com/#20OAV9#3
+ * @see https://doc.babylonjs.com/babylon101/lights#the-spot-light
  */
 struct SpotLightScene : public IRenderableScene {
 

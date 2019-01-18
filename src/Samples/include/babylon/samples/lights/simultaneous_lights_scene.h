@@ -17,6 +17,7 @@ namespace Samples {
 /**
  * @brief Scene demonstrating the use multiple lights on a single mesh.
  * @see https://www.babylonjs-playground.com/#ZU5TKG#0
+ * @see https://doc.babylonjs.com/babylon101/lights
  */
 class SimultaneousLightsScene : public IRenderableScene {
 

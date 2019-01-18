@@ -10,6 +10,7 @@ namespace Samples {
  * @brief Scene demonstrating the use of the point light. This light is emitting
  * from a single point.
  * @see https://www.babylonjs-playground.com/#20OAV9#0
+ * @see https://doc.babylonjs.com/babylon101/lights#the-point-light
  */
 struct PointLightScene : public IRenderableScene {
 

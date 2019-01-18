@@ -14,6 +14,7 @@ namespace Samples {
  * @brief Light projected texture scene. Example demonstrating how to project a
  * texture from a spot light.
  * @see https://www.babylonjs-playground.com/#CQNGRK#0
+ * @see https://doc.babylonjs.com/babylon101/lights#projection-texture
  */
 class LightProjectedTextureScene : public IRenderableScene {
 

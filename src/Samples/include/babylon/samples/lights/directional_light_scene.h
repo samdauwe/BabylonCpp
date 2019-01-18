@@ -11,6 +11,7 @@ namespace Samples {
  * emitted from everywhere in the specified direction, and has an infinite
  * range.
  * @see https://www.babylonjs-playground.com/#20OAV9#1
+ * @see https://doc.babylonjs.com/babylon101/lights#the-directional-light
  */
 struct DirectionalLightScene : public IRenderableScene {
 
