@@ -30,7 +30,13 @@
 ![spot_light_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/spot_light_scene.png?raw=true "Spot Light Scene")
 
 ## Loaders ##
+![import_babylon_js_logo_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_babylon_js_logo_scene.png?raw=true "Import Babylon JS Logo Scene")
+![import_candle_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_candle_scene.png?raw=true "Import Candle Scene")
+![import_dude_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_dude_scene.png?raw=true "Import Dude Scene")
+![import_dummy3_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_dummy3_scene.png?raw=true "Import Dummy 3 Scene")
 ![import_meshes_skull_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_meshes_skull_scene.png?raw=true "Import Meshes Skull Scene")
+![import_rabbit_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_rabbit_scene.png?raw=true "Import Rabbit Scene")
+![import_suzanne_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/import_suzanne_scene.png?raw=true "Import Suzanne Scene")
 
 ## Materials ##
 ![fresnel_parameters_torus_knot_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/fresnel_parameters_torus_knot_scene.png?raw=true "Fresnel Parameters TorusKnot Scene")
