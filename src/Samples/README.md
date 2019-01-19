@@ -169,6 +169,7 @@
 ![equirectangular_map_as_reflection_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/equirectangular_map_as_reflection_texture_scene.png?raw=true "Equirectangular Map as Reflection Texture Scene")
 ![hdr_cube_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/hdr_cube_texture_scene.png?raw=true "High Dynamic Range (HDR) Cube Texture Scene")
 ![image_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/image_texture_scene.png?raw=true "Image Texture Scene")
+![local_cubemaps_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/local_cubemaps_scene.png?raw=true "Local Cubemaps Scene")
 ![reflecting_one_face_sprite_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/reflecting_one_face_sprite_texture_scene.png?raw=true "Reflecting One Face Sprite Texture Scene")
 ![render_target_texture_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/render_target_texture_scene.png?raw=true "Render Target Texture Scene")
 ![sphere_textures_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/sphere_textures_scene.png?raw=true "Sphere Textures Scene")

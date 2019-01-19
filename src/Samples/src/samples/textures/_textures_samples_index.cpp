@@ -10,6 +10,7 @@
 #include <babylon/samples/textures/equirectangular_map_as_reflection_texture_scene.h>
 #include <babylon/samples/textures/hdr_cube_texture_scene.h>
 #include <babylon/samples/textures/image_texture_scene.h>
+#include <babylon/samples/textures/local_cubemaps_scene.h>
 #include <babylon/samples/textures/mirror_texture_scene.h>
 #include <babylon/samples/textures/mirrors_scene.h>
 #include <babylon/samples/textures/multi_sample_render_targets_scene.h>
@@ -91,6 +92,12 @@ _TexturesSamplesIndex::_TexturesSamplesIndex()
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<ImageTextureScene>(iCanvas); //
                       });                                                    //
+  // "Local Cubemaps Scene
+  _samples["LocalCubemapsScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<LocalCubemapsScene>(iCanvas); //
+                      });                                                     //
   // Mirror Textures Scene
   _samples["MirrorTextureScene"]
     = std::make_tuple(true,                                                   //
