@@ -10,6 +10,7 @@ namespace Samples {
  * @brief Materials scene. Example demonstrating how to create and add materials
  * to a mesh.
  * @see https://www.babylonjs-playground.com/#DXARSP#0
+ * @see https://doc.babylonjs.com/babylon101/materials
  */
 struct MaterialsScene : public IRenderableScene {
 

@@ -16,6 +16,7 @@ namespace Samples {
  * @brief Scene demonstrating the use of the fur material from the materials
  * library.
  * @see https://www.babylonjs-playground.com/#VABI8A#0
+ * @see https://doc.babylonjs.com/extensions/fur
  */
 class FurMaterialScene : public IRenderableScene {
 

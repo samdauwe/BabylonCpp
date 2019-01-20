@@ -14,6 +14,7 @@ namespace Samples {
  * @brief Multi material scene. Example demonstrating how to apply multiple
  * materials to a single mesh using MultiMaterial class
  * @see https://www.babylonjs-playground.com/#2Q4S2S#0
+ * @see https://doc.babylonjs.com/how_to/multi_materials
  */
 class MultiMaterialScene : public IRenderableScene {
 

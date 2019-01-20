@@ -10,6 +10,7 @@ namespace Samples {
  * @brief Cell shading material scene. Scene demonstrating the use of the cell
  * material from the materials library.
  * @see https://www.babylonjs-playground.com/#0ZB1A3#1
+ * @see https://doc.babylonjs.com/extensions/cell
  */
 struct CellShadingMaterialScene : public IRenderableScene {
 

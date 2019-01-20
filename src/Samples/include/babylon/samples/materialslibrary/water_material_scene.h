@@ -10,6 +10,7 @@ namespace Samples {
  * @brief Scene demonstrating the use of the water material from the materials
  * library.
  * @see https://www.babylonjs-playground.com/#L76FB1#0
+ * @see https://doc.babylonjs.com/extensions/water
  */
 struct WaterMaterialScene : public IRenderableScene {
 

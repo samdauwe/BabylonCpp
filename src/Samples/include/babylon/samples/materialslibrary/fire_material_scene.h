@@ -23,6 +23,7 @@ namespace Samples {
  * @brief Scene demonstrating the use of the fire material from the materials
  * library.
  * @see https://www.babylonjs-playground.com/#LR4YHT#0
+ * @see https://doc.babylonjs.com/extensions/Fire
  */
 class FireMaterialScene : public IRenderableScene {
 

@@ -10,6 +10,7 @@ namespace Samples {
  * @brief Glossiness and roughness scene. Example demonstrating glossiness and
  * rouphness features of standard material.
  * @see https://www.babylonjs-playground.com/#RNBKQ#8
+ * @see https://doc.babylonjs.com/api/classes/babylon.standardmaterial
  */
 struct GlossinessAndRoughnessScene : public IRenderableScene {
 

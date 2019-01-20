@@ -16,6 +16,7 @@ namespace Samples {
  * @brief Scene demonstrating the use of fresnel parameters to simulate an x-ray
  * effect.
  * @see https://www.babylonjs-playground.com/#GK7FK#0
+ * @see https://doc.babylonjs.com/how_to/how_to_use_fresnelparameters
  */
 class XRayMaterialWithFresnelSkullScene : public IRenderableScene {
 
