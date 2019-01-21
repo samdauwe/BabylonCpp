@@ -413,8 +413,8 @@ bool PBRBaseMaterial::isMetallicWorkflow() const
 
 EffectPtr PBRBaseMaterial::_prepareEffect(
   AbstractMesh* mesh, PBRMaterialDefines& defines,
-  const std::function<void(Effect* effect)>& onCompiled,
-  std::function<void(Effect* effect, const std::string& errors)> onError,
+  const std::function<void(Effect* effect)>& iOnCompiled,
+  std::function<void(Effect* effect, const std::string& errors)> iOnError,
   const std::optional<bool>& useInstances,
   const std::optional<bool>& useClipPlane)
 {
@@ -616,8 +616,8 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   options.materialDefines       = &defines;
   options.defines               = std::move(join);
   options.fallbacks             = std::move(fallbacks);
-  options.onCompiled            = onCompiled;
-  options.onError               = onError;
+  options.onCompiled            = iOnCompiled;
+  options.onError               = iOnError;
   options.indexParameters       = std::move(indexParameters);
   options.maxSimultaneousLights = _maxSimultaneousLights;
 
@@ -950,22 +950,22 @@ void PBRBaseMaterial::_prepareDefines(AbstractMesh* mesh,
 }
 
 void PBRBaseMaterial::forceCompilation(
-  AbstractMesh* mesh, std::function<void(Material* material)>& onCompiled,
+  AbstractMesh* mesh, std::function<void(Material* material)>& iOnCompiled,
   bool clipPlane)
 {
   PBRMaterialDefines defines;
   auto effect
     = _prepareEffect(mesh, defines, nullptr, nullptr, std::nullopt, clipPlane);
   if (effect->isReady()) {
-    if (onCompiled) {
-      onCompiled(this);
+    if (iOnCompiled) {
+      iOnCompiled(this);
     }
   }
   else {
     effect->onCompileObservable.add(
       [&](Effect* /*effect*/, EventState& /*es*/) {
-        if (onCompiled) {
-          onCompiled(this);
+        if (iOnCompiled) {
+          iOnCompiled(this);
         }
       });
   }

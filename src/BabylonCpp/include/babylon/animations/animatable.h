@@ -102,7 +102,7 @@ public:
    * @brief Jump directly to a given frame.
    * @param frame defines the frame to jump to
    */
-  void goToFrame(int frame);
+  void goToFrame(float frame);
 
   /**
    * @brief Pause the animation.

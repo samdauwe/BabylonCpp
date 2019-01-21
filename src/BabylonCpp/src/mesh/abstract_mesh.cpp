@@ -652,9 +652,9 @@ void AbstractMesh::_markSubMeshesAsMiscDirty()
   }
 
   for (auto& subMesh : subMeshes) {
-    auto material = subMesh->getMaterial();
-    if (material) {
-      material->markAsDirty(Material::MiscDirtyFlag);
+    auto iMaterial = subMesh->getMaterial();
+    if (iMaterial) {
+      iMaterial->markAsDirty(Material::MiscDirtyFlag);
     }
   }
 }
@@ -1284,7 +1284,7 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
 
 AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
                                                const Matrix& transformMatrix,
-                                               Collider* collider)
+                                               Collider* iCollider)
 {
   _generatePointsArray();
 
@@ -1306,51 +1306,51 @@ AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
     }
   }
   // Collide
-  collider->_collide(
+  iCollider->_collide(
     subMesh->_trianglePlanes, subMesh->_lastColliderWorldVertices, getIndices(),
     subMesh->indexStart, subMesh->indexStart + subMesh->indexCount,
     subMesh->verticesStart, subMesh->getMaterial() != nullptr);
-  if (collider->collisionFound) {
-    collider->collidedMesh = this;
+  if (iCollider->collisionFound) {
+    iCollider->collidedMesh = this;
   }
   return *this;
 }
 
 AbstractMesh&
-AbstractMesh::_processCollisionsForSubMeshes(Collider* collider,
+AbstractMesh::_processCollisionsForSubMeshes(Collider* iCollider,
                                              const Matrix& transformMatrix)
 {
-  auto subMeshes = _scene->getCollidingSubMeshCandidates(this, *collider);
-  auto len       = subMeshes.size();
+  auto iSubMeshes = _scene->getCollidingSubMeshCandidates(this, *iCollider);
+  auto len        = iSubMeshes.size();
 
   for (size_t index = 0; index < len; index++) {
-    auto& subMesh = subMeshes[index];
+    auto& subMesh = iSubMeshes[index];
 
     // Bounding test
-    if (len > 1 && !subMesh->_checkCollision(*collider)) {
+    if (len > 1 && !subMesh->_checkCollision(*iCollider)) {
       continue;
     }
 
-    _collideForSubMesh(subMesh, transformMatrix, collider);
+    _collideForSubMesh(subMesh, transformMatrix, iCollider);
   }
   return *this;
 }
 
-AbstractMesh& AbstractMesh::_checkCollision(Collider* collider)
+AbstractMesh& AbstractMesh::_checkCollision(Collider* iCollider)
 {
   // Bounding box test
-  if (!_boundingInfo->_checkCollision(*collider)) {
+  if (!_boundingInfo->_checkCollision(*iCollider)) {
     return *this;
   }
 
   // Transformation matrix
   auto& collisionsScalingMatrix   = Tmp::MatrixArray[0];
   auto& collisionsTransformMatrix = Tmp::MatrixArray[1];
-  Matrix::ScalingToRef(1.f / collider->_radius.x, 1.f / collider->_radius.y,
-                       1.f / collider->_radius.z, collisionsScalingMatrix);
+  Matrix::ScalingToRef(1.f / iCollider->_radius.x, 1.f / iCollider->_radius.y,
+                       1.f / iCollider->_radius.z, collisionsScalingMatrix);
   worldMatrixFromCache().multiplyToRef(collisionsScalingMatrix,
                                        collisionsTransformMatrix);
-  _processCollisionsForSubMeshes(collider, collisionsTransformMatrix);
+  _processCollisionsForSubMeshes(iCollider, collisionsTransformMatrix);
   return *this;
 }
 
@@ -1465,8 +1465,10 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   // Intersections in progress
   for (auto& other : _intersectionsInProgress) {
-    std::remove(other->_intersectionsInProgress.begin(),
-                other->_intersectionsInProgress.end(), this);
+    other->_intersectionsInProgress.erase(
+      std::remove(other->_intersectionsInProgress.begin(),
+                  other->_intersectionsInProgress.end(), this),
+      other->_intersectionsInProgress.end());
   }
 
   _intersectionsInProgress.clear();
@@ -1496,9 +1498,11 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
     if (generator) {
       auto shadowMap = generator->getShadowMap();
       if (shadowMap && !shadowMap->renderList().empty()) {
-        std::remove_if(
-          shadowMap->renderList().begin(), shadowMap->renderList().end(),
-          [this](const AbstractMesh* mesh) { return mesh == this; });
+        shadowMap->renderList().erase(
+          std::remove_if(
+            shadowMap->renderList().begin(), shadowMap->renderList().end(),
+            [this](const AbstractMesh* mesh) { return mesh == this; }),
+          shadowMap->renderList().end());
       }
     }
   }

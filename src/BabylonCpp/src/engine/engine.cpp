@@ -1076,7 +1076,8 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
     if (!requiredWidth) {
       requiredWidth = texture->width;
       if (lodLevel) {
-        requiredWidth = *requiredWidth / std::pow(2, lodLevel);
+        requiredWidth
+          = static_cast<int>(*requiredWidth / std::pow(2, lodLevel));
       }
     }
     if (!requiredHeight) {

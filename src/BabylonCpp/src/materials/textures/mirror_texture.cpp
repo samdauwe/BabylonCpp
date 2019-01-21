@@ -170,13 +170,13 @@ void MirrorTexture::_preparePostProcesses()
   if (_blurKernelX != 0.f && _blurKernelY != 0.f) {
     auto engine = getScene()->getEngine();
 
-    auto textureType = engine->getCaps().textureFloatRender ?
-                         EngineConstants::TEXTURETYPE_FLOAT :
-                         EngineConstants::TEXTURETYPE_HALF_FLOAT;
+    auto iTextureType = engine->getCaps().textureFloatRender ?
+                          EngineConstants::TEXTURETYPE_FLOAT :
+                          EngineConstants::TEXTURETYPE_HALF_FLOAT;
 
     _blurX = BlurPostProcess::New(
       "horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio, nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
+      TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, iTextureType);
     _blurX->autoClear = false;
 
     if (_blurRatio == 1.f && samples() < 2 && _texture) {
@@ -188,7 +188,7 @@ void MirrorTexture::_preparePostProcesses()
 
     _blurY = BlurPostProcess::New(
       "vertical blur", Vector2(0.f, 1.f), _blurKernelY, _blurRatio, nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, textureType);
+      TextureConstants::BILINEAR_SAMPLINGMODE, engine, false, iTextureType);
     _blurY->autoClear      = false;
     _blurY->alwaysForcePOT = _blurRatio != 1.f;
 
@@ -211,9 +211,9 @@ void MirrorTexture::_preparePostProcesses()
 
 MirrorTexturePtr MirrorTexture::clone()
 {
-  auto scene = getScene();
+  auto iScene = getScene();
 
-  if (!scene) {
+  if (!iScene) {
     return nullptr;
   }
 
@@ -221,7 +221,7 @@ MirrorTexturePtr MirrorTexture::clone()
   auto newTexture
     = MirrorTexture::New(name,                                            //
                          Size(textureSize.width, textureSize.height),     //
-                         scene,                                           //
+                         iScene,                                          //
                          _renderTargetOptions.generateMipMaps.value(),    //
                          _renderTargetOptions.type.value(),               //
                          _renderTargetOptions.samplingMode.value(),       //

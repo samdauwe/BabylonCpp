@@ -1,6 +1,8 @@
 #ifndef BABYLON_LOADING_SCENE_LOADER_H
 #define BABYLON_LOADING_SCENE_LOADER_H
 
+#include <optional>
+
 #include <babylon/babylon_api.h>
 #include <babylon/loading/iscene_loader_plugin.h>
 #include <babylon/tools/observable.h>

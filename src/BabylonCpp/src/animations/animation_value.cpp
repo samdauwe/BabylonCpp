@@ -206,7 +206,8 @@ AnimationValue AnimationValue::operator-(const AnimationValue& fromValue)
 
 AnimationValue AnimationValue::operator!()
 {
-  if (dataType == Animation::ANIMATIONTYPE_BOOL()) {
+  if (dataType != -1
+      && static_cast<unsigned>(dataType) == Animation::ANIMATIONTYPE_BOOL()) {
     return AnimationValue(!boolData);
   }
   return *this;

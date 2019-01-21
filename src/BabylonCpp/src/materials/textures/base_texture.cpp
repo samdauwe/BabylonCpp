@@ -334,7 +334,7 @@ unsigned int BaseTexture::get_textureFormat() const
                             EngineConstants::TEXTUREFORMAT_RGBA;
 }
 
-ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int level,
+ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int iLevel,
                                         std::optional<ArrayBufferView> buffer)
 {
   if (!_texture) {
@@ -352,9 +352,9 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int level,
 
   auto engine = scene->getEngine();
 
-  if (level != 0) {
-    width  = width / static_cast<int>(std::pow(2, level));
-    height = height / static_cast<int>(std::pow(2, level));
+  if (iLevel != 0) {
+    width  = width / static_cast<int>(std::pow(2, iLevel));
+    height = height / static_cast<int>(std::pow(2, iLevel));
 
     width  = static_cast<int>(std::round(width));
     height = static_cast<int>(std::round(height));
@@ -362,12 +362,12 @@ ArrayBufferView BaseTexture::readPixels(unsigned int faceIndex, int level,
 
   if (_texture->isCube) {
     return engine->_readTexturePixels(_texture, size.width, size.height,
-                                      static_cast<int>(faceIndex), level,
+                                      static_cast<int>(faceIndex), iLevel,
                                       buffer);
   }
 
   return engine->_readTexturePixels(_texture, size.width, size.height, -1,
-                                    level, buffer);
+                                    iLevel, buffer);
 }
 
 void BaseTexture::releaseInternalTexture()

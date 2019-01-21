@@ -14,9 +14,9 @@ bool HemisphericLight::NodeConstructorAdded = false;
 void HemisphericLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "Light_Type_3", [](const std::string& name, Scene* scene,
+    "Light_Type_3", [](const std::string& iName, Scene* scene,
                        const std::optional<json>& /*options*/) {
-      return HemisphericLight::New(name, Vector3::Zero(), scene);
+      return HemisphericLight::New(iName, Vector3::Zero(), scene);
     });
   HemisphericLight::NodeConstructorAdded = true;
 }

@@ -157,7 +157,7 @@ void GlowLayer::_createTextureAndPostProcesses()
   _textures = {_blurTexture1, _blurTexture2};
 
   _horizontalBlurPostprocess1 = BlurPostProcess::New(
-    "GlowLayerHBP1", Vector2(1.f, 0.f), _options.blurKernelSize / 2,
+    "GlowLayerHBP1", Vector2(1.f, 0.f), _options.blurKernelSize / 2.f,
     PostProcessOptions{blurTextureWidth, blurTextureHeight}, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     textureType);

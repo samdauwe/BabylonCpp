@@ -727,7 +727,7 @@ AnimationPtr Animation::Parse(const json& parsedAnimation)
         break;
     }
 
-    IAnimationKey keyData(json_util::get_number(key, "frame", 0), data);
+    IAnimationKey keyData(json_util::get_number(key, "frame", 0.f), data);
     if (inTangent.has_value()) {
       keyData.inTangent = *inTangent;
     }
@@ -744,8 +744,8 @@ AnimationPtr Animation::Parse(const json& parsedAnimation)
     for (const auto& data :
          json_util::get_array<json>(parsedAnimation, "ranges")) {
       animation->createRange(json_util::get_string(data, "name"),
-                             json_util::get_number(data, "from", 0),
-                             json_util::get_number(data, "to", 0));
+                             json_util::get_number(data, "from", 0.f),
+                             json_util::get_number(data, "to", 0.f));
     }
   }
 

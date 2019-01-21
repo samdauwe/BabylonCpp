@@ -77,7 +77,7 @@ public:
    * @brief Move the current animation to a given frame.
    * @param frame defines the frame to move to
    */
-  void goToFrame(int frame);
+  void goToFrame(float frame);
 
   /**
    * @brief Hidden Internal use only

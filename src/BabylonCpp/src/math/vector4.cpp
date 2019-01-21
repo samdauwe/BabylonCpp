@@ -473,9 +473,9 @@ Vector4& Vector4::copyFromFloats(float ix, float iy, float iz, float iw)
   return *this;
 }
 
-Vector4& Vector4::set(float x, float y, float z, float w)
+Vector4& Vector4::set(float ix, float iy, float iz, float iw)
 {
-  return copyFromFloats(x, y, z, w);
+  return copyFromFloats(ix, iy, iz, iw);
 }
 
 /** Statics **/

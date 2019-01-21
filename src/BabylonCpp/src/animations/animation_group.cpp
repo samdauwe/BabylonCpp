@@ -260,7 +260,7 @@ AnimationGroup& AnimationGroup::syncAllAnimationsWith(Animatable* root)
   return *this;
 }
 
-AnimationGroup& AnimationGroup::goToFrame(int frame)
+AnimationGroup& AnimationGroup::goToFrame(float frame)
 {
   if (!_isStarted) {
     return *this;

@@ -472,7 +472,7 @@ std::vector<AbstractMesh*> Material::getBindedMeshes()
 }
 
 void Material::forceCompilation(
-  AbstractMesh* mesh, const std::function<void(Material* material)>& onCompiled,
+  AbstractMesh* mesh, const std::function<void(Material* material)>& iOnCompiled,
   std::optional<bool> clipPlane)
 {
   auto subMesh = std::make_unique<BaseSubMesh>();
@@ -495,8 +495,8 @@ void Material::forceCompilation(
 
     if (storeEffectOnSubMeshes) {
       if (isReadyForSubMesh(mesh, subMesh.get())) {
-        if (onCompiled) {
-          onCompiled(this);
+        if (iOnCompiled) {
+          iOnCompiled(this);
         }
       }
       else {
@@ -505,8 +505,8 @@ void Material::forceCompilation(
     }
     else {
       if (isReady(mesh)) {
-        if (onCompiled) {
-          onCompiled(this);
+        if (iOnCompiled) {
+          iOnCompiled(this);
         }
       }
       else {

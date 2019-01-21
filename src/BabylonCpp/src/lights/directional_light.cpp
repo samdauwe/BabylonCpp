@@ -17,9 +17,9 @@ bool DirectionalLight::NodeConstructorAdded = false;
 void DirectionalLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "Light_Type_1", [](const std::string& name, Scene* scene,
+    "Light_Type_1", [](const std::string& iName, Scene* scene,
                        const std::optional<json>& /*options*/) {
-      return DirectionalLight::New(name, Vector3::Zero(), scene);
+      return DirectionalLight::New(iName, Vector3::Zero(), scene);
     });
   DirectionalLight::NodeConstructorAdded = true;
 }
@@ -193,9 +193,9 @@ void DirectionalLight::transferToEffect(const EffectPtr& /*effect*/,
     return;
   }
 
-  const auto& _direction = direction();
-  _uniformBuffer->updateFloat4("vLightData", _direction.x, _direction.y,
-                               _direction.z, 1, lightIndex);
+  const auto& iDirection = direction();
+  _uniformBuffer->updateFloat4("vLightData", iDirection.x, iDirection.y,
+                               iDirection.z, 1, lightIndex);
 }
 
 float DirectionalLight::getDepthMinZ(const Camera& /*activeCamera*/) const

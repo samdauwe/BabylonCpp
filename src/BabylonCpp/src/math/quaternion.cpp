@@ -124,9 +124,9 @@ Quaternion& Quaternion::copyFromFloats(float ix, float iy, float iz, float iw)
   return *this;
 }
 
-Quaternion& Quaternion::set(float x, float y, float z, float w)
+Quaternion& Quaternion::set(float ix, float iy, float iz, float iw)
 {
-  return copyFromFloats(x, y, z, w);
+  return copyFromFloats(ix, iy, iz, iw);
 }
 
 Quaternion Quaternion::add(const Quaternion& other) const

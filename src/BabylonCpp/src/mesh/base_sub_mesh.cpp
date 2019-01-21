@@ -20,29 +20,29 @@ EffectPtr& BaseSubMesh::get_effect()
   return _materialEffect;
 }
 
-void BaseSubMesh::setEffect(const EffectPtr& effect)
+void BaseSubMesh::setEffect(const EffectPtr& iEffect)
 {
-  if (_materialEffect == effect) {
-    if (!effect) {
+  if (_materialEffect == iEffect) {
+    if (!iEffect) {
       _materialDefines = nullptr;
     }
     return;
   }
   _materialDefines = nullptr;
-  _materialEffect  = effect;
+  _materialEffect  = iEffect;
 }
 
-void BaseSubMesh::setEffect(const EffectPtr& effect,
+void BaseSubMesh::setEffect(const EffectPtr& iEffect,
                             const MaterialDefines& defines)
 {
-  if (_materialEffect == effect) {
-    if (!effect) {
+  if (_materialEffect == iEffect) {
+    if (!iEffect) {
       _materialDefines = nullptr;
     }
     return;
   }
   _materialDefines = std::make_unique<MaterialDefines>(defines);
-  _materialEffect  = effect;
+  _materialEffect  = iEffect;
 }
 
 } // end of namespace BABYLON

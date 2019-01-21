@@ -173,7 +173,7 @@ void Animatable::disableBlending()
   }
 }
 
-void Animatable::goToFrame(int frame)
+void Animatable::goToFrame(float frame)
 {
   if (!_runtimeAnimations.empty() && _runtimeAnimations[0]) {
     auto fps          = _runtimeAnimations[0]->animation()->framePerSecond;

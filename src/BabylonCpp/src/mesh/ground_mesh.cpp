@@ -142,10 +142,8 @@ Vector4 GroundMesh::_getFacetAt(float x, float z)
 
 GroundMesh& GroundMesh::_initHeightQuads()
 {
-  const auto& subdivisionsX = _subdivisionsX;
-  const auto& subdivisionsY = _subdivisionsY;
-  for (size_t row = 0; row < subdivisionsX; ++row) {
-    for (size_t col = 0; col < subdivisionsY; ++col) {
+  for (size_t row = 0; row < _subdivisionsX; ++row) {
+    for (size_t col = 0; col < _subdivisionsY; ++col) {
       Quad quad;
       quad.slope  = Vector2::Zero();
       quad.facet1 = Vector4(0.f, 0.f, 0.f, 0.f);
@@ -182,14 +180,11 @@ GroundMesh& GroundMesh::_computeHeightQuads()
   auto d1     = 0.f; // facet plane equation : ax + by + cz + d = 0
   auto d2     = 0.f;
 
-  const auto& subdivisionsX = _subdivisionsX;
-  const auto& subdivisionsY = _subdivisionsY;
-
   for (size_t row = 0; row < subdivisionsY; ++row) {
-    for (size_t col = 0; col < subdivisionsX; ++col) {
+    for (size_t col = 0; col < _subdivisionsX; ++col) {
       i    = col * 3;
-      j    = row * (subdivisionsX + 1) * 3;
-      k    = (row + 1) * (subdivisionsX + 1) * 3;
+      j    = row * (_subdivisionsX + 1) * 3;
+      k    = (row + 1) * (_subdivisionsX + 1) * 3;
       v1.x = positions[j + i];
       v1.y = positions[j + i + 1];
       v1.z = positions[j + i + 2];
@@ -224,7 +219,7 @@ GroundMesh& GroundMesh::_computeHeightQuads()
       d1 = -(norm1.x * v1.x + norm1.y * v1.y + norm1.z * v1.z);
       d2 = -(norm2.x * v2.x + norm2.y * v2.y + norm2.z * v2.z);
 
-      auto& quad = _heightQuads[row * subdivisionsX + col];
+      auto& quad = _heightQuads[row * _subdivisionsX + col];
       quad.slope.copyFromFloats(cd, h);
       quad.facet1.copyFromFloats(norm1.x, norm1.y, norm1.z, d1);
       quad.facet2.copyFromFloats(norm2.x, norm2.y, norm2.z, d2);

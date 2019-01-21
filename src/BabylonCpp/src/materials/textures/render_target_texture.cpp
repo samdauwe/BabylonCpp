@@ -416,12 +416,12 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
   if (renderListPredicate) {
     renderList().clear(); // Clear previous renderList
 
-    auto scene = getScene();
-    if (!scene) {
+    auto iScene = getScene();
+    if (!iScene) {
       return;
     }
 
-    auto& sceneMeshes = scene->meshes;
+    auto& sceneMeshes = iScene->meshes;
 
     for (auto& mesh : sceneMeshes) {
       if (renderListPredicate(mesh.get())) {

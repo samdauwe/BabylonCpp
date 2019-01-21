@@ -28,7 +28,7 @@ namespace BABYLON {
 struct _OcclusionDataStorage;
 class ActionManager;
 class Camera;
-class IEdgesRenderer;
+struct IEdgesRenderer;
 class Light;
 class Material;
 struct MaterialDefines;

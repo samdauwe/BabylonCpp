@@ -2983,7 +2983,8 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
         = iFrontUVs.has_value() ? *iFrontUVs : Vector4(0.f, 0.f, 1.f, 1.f);
       auto backUVs
         = iBackUVs.has_value() ? *iBackUVs : Vector4(0.f, 0.f, 1.f, 1.f);
-      for (std::size_t u = 0, i = 0; i < lu / 2; ++i) {
+      auto u = 0ull;
+      for (u = 0, i = 0; i < lu / 2; ++i) {
         uvs[u]          = frontUVs.x + (frontUVs.z - frontUVs.x) * uvs[u];
         uvs[u + 1]      = frontUVs.y + (frontUVs.w - frontUVs.y) * uvs[u + 1];
         uvs[u + lu]     = backUVs.x + (backUVs.z - backUVs.x) * uvs[u + lu];

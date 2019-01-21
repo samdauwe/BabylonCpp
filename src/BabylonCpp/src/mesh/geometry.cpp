@@ -1071,11 +1071,13 @@ void Geometry::_CleanMatricesWeights(const json& parsedGeometry,
     else {
       if (_firstZeroWeight >= 4) {
         matricesWeightsExtra[i + _firstZeroWeight - 4] = 1.f - weight;
-        matricesIndicesExtra[i + _firstZeroWeight - 4] = noInfluenceBoneIndex;
+        matricesIndicesExtra[i + _firstZeroWeight - 4]
+          = static_cast<float>(noInfluenceBoneIndex);
       }
       else {
         matricesWeights[i + _firstZeroWeight] = 1.f - weight;
-        matricesIndices[i + _firstZeroWeight] = noInfluenceBoneIndex;
+        matricesIndices[i + _firstZeroWeight]
+          = static_cast<float>(noInfluenceBoneIndex);
       }
     }
   }

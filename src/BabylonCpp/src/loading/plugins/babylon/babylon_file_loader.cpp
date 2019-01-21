@@ -65,8 +65,8 @@ bool BabylonFileLoader::isDescendantOf(
   const json& mesh, const std::vector<std::string>& names,
   std::vector<std::string>& hierarchyIds) const
 {
-  for (const auto& name : names) {
-    if (json_util::get_string(mesh, "name") == name) {
+  for (const auto& iName : names) {
+    if (json_util::get_string(mesh, "name") == iName) {
       hierarchyIds.emplace_back(json_util::get_string(mesh, "id"));
       return true;
     }

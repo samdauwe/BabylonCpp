@@ -299,14 +299,14 @@ Vector3& TransformNode::getAbsolutePosition()
 }
 
 TransformNode& TransformNode::setAbsolutePosition(
-  const std::optional<Vector3>& absolutePosition)
+  const std::optional<Vector3>& iAbsolutePosition)
 {
-  if (!absolutePosition) {
+  if (!iAbsolutePosition) {
     return *this;
   }
-  auto absolutePositionX = (*absolutePosition).x;
-  auto absolutePositionY = (*absolutePosition).y;
-  auto absolutePositionZ = (*absolutePosition).z;
+  auto absolutePositionX = (*iAbsolutePosition).x;
+  auto absolutePositionY = (*iAbsolutePosition).y;
+  auto absolutePositionZ = (*iAbsolutePosition).z;
 
   if (parent()) {
     auto invertParentWorldMatrix = parent()->getWorldMatrix();
@@ -440,7 +440,7 @@ TransformNode& TransformNode::setParent(Node* node)
     return *this;
   }
   if (!node) {
-    auto& rotation    = Tmp::QuaternionArray[0];
+    auto& iRotation   = Tmp::QuaternionArray[0];
     auto& newPosition = Tmp::Vector3Array[0];
     auto& scale       = Tmp::Vector3Array[1];
 
@@ -448,13 +448,13 @@ TransformNode& TransformNode::setParent(Node* node)
       parent()->computeWorldMatrix(true);
     }
     computeWorldMatrix(true);
-    getWorldMatrix().decompose(scale, rotation, newPosition);
+    getWorldMatrix().decompose(scale, iRotation, newPosition);
 
     if (rotationQuaternion()) {
-      (*rotationQuaternion()).copyFrom(rotation);
+      (*rotationQuaternion()).copyFrom(iRotation);
     }
     else {
-      rotation.toEulerAnglesToRef(this->rotation());
+      iRotation.toEulerAnglesToRef(this->rotation());
     }
 
     scaling().x = scale.x;
@@ -466,7 +466,7 @@ TransformNode& TransformNode::setParent(Node* node)
     position().z = newPosition.z;
   }
   else {
-    auto& rotation        = Tmp::QuaternionArray[0];
+    auto& iRotation       = Tmp::QuaternionArray[0];
     auto& newPosition     = Tmp::Vector3Array[0];
     auto& scale           = Tmp::Vector3Array[1];
     auto& diffMatrix      = Tmp::MatrixArray[0];
@@ -477,13 +477,13 @@ TransformNode& TransformNode::setParent(Node* node)
 
     node->getWorldMatrix().invertToRef(invParentMatrix);
     getWorldMatrix().multiplyToRef(invParentMatrix, diffMatrix);
-    diffMatrix.decompose(scale, rotation, newPosition);
+    diffMatrix.decompose(scale, iRotation, newPosition);
 
     if (rotationQuaternion()) {
-      (*rotationQuaternion()).copyFrom(rotation);
+      (*rotationQuaternion()).copyFrom(iRotation);
     }
     else {
-      rotation.toEulerAnglesToRef(this->rotation());
+      iRotation.toEulerAnglesToRef(this->rotation());
     }
 
     position().x = newPosition.x;
@@ -548,12 +548,12 @@ TransformNode& TransformNode::rotate(Vector3 axis, float amount, Space space)
       rotation().y, rotation().x, rotation().z);
     rotation = Vector3::Zero();
   }
-  Quaternion rotationQuaternion;
+  Quaternion iRotationQuaternion;
   if (space == Space::LOCAL) {
-    rotationQuaternion = Quaternion::RotationAxisToRef(
+    iRotationQuaternion = Quaternion::RotationAxisToRef(
       axis, amount, *TransformNode::_rotationAxisCache);
-    this->rotationQuaternion()->multiplyToRef(rotationQuaternion,
-                                              *this->rotationQuaternion());
+    this->rotationQuaternion()->multiplyToRef(iRotationQuaternion,
+                                              *rotationQuaternion());
   }
   else {
     if (parent()) {
@@ -561,10 +561,10 @@ TransformNode& TransformNode::rotate(Vector3 axis, float amount, Space space)
       invertParentWorldMatrix.invert();
       axis = Vector3::TransformNormal(axis, invertParentWorldMatrix);
     }
-    rotationQuaternion = Quaternion::RotationAxisToRef(
+    iRotationQuaternion = Quaternion::RotationAxisToRef(
       axis, amount, *TransformNode::_rotationAxisCache);
-    rotationQuaternion.multiplyToRef(*this->rotationQuaternion(),
-                                     *this->rotationQuaternion());
+    iRotationQuaternion.multiplyToRef(*rotationQuaternion(),
+                                      *rotationQuaternion());
   }
   return *this;
 }

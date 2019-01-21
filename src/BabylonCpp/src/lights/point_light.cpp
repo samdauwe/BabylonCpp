@@ -14,9 +14,9 @@ bool PointLight::NodeConstructorAdded = false;
 void PointLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "Light_Type_0", [](const std::string& name, Scene* scene,
+    "Light_Type_0", [](const std::string& iName, Scene* scene,
                        const std::optional<json>& /*options*/) {
-      return PointLight::New(name, Vector3::Zero(), scene);
+      return PointLight::New(iName, Vector3::Zero(), scene);
     });
   PointLight::NodeConstructorAdded = true;
 }

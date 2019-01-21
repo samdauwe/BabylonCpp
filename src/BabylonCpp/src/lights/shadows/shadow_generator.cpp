@@ -199,9 +199,9 @@ float ShadowGenerator::get_normalBias() const
   return _normalBias;
 }
 
-void ShadowGenerator::set_normalBias(float normalBias)
+void ShadowGenerator::set_normalBias(float iNormalBias)
 {
-  _normalBias = normalBias;
+  _normalBias = iNormalBias;
 }
 
 int ShadowGenerator::get_blurBoxOffset() const
@@ -448,9 +448,9 @@ unsigned int ShadowGenerator::get_filteringQuality() const
   return _filteringQuality;
 }
 
-void ShadowGenerator::set_filteringQuality(unsigned int filteringQuality)
+void ShadowGenerator::set_filteringQuality(unsigned int iFilteringQuality)
 {
-  _filteringQuality = filteringQuality;
+  _filteringQuality = iFilteringQuality;
 }
 
 bool ShadowGenerator::get_useContactHardeningShadow() const
@@ -473,9 +473,9 @@ float ShadowGenerator::get_contactHardeningLightSizeUVRatio() const
 }
 
 void ShadowGenerator::set_contactHardeningLightSizeUVRatio(
-  float contactHardeningLightSizeUVRatio)
+  float iContactHardeningLightSizeUVRatio)
 {
-  _contactHardeningLightSizeUVRatio = contactHardeningLightSizeUVRatio;
+  _contactHardeningLightSizeUVRatio = iContactHardeningLightSizeUVRatio;
 }
 
 float ShadowGenerator::getDarkness() const
@@ -975,10 +975,10 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
       morphInfluencers = static_cast<unsigned int>(manager->numInfluencers());
       defines.emplace_back("#define NUM_MORPH_INFLUENCERS "
                            + std::to_string(morphInfluencers));
-      MaterialDefines defines;
-      defines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
+      MaterialDefines iDefines;
+      iDefines.intDef["NUM_MORPH_INFLUENCERS"] = morphInfluencers;
       MaterialHelper::PrepareAttributesForMorphTargets(attribs, mesh.get(),
-                                                       defines);
+                                                       iDefines);
     }
   }
 
@@ -1112,15 +1112,16 @@ void ShadowGenerator::bindShadowLight(const std::string& lightIndex,
     effect->setDepthStencilTexture("shadowSampler" + lightIndex,
                                    getShadowMapForRendering());
     light->_uniformBuffer->updateFloat4(
-      "shadowsInfo", getDarkness(), shadowMap->getSize().width,
-      1 / shadowMap->getSize().width, frustumEdgeFalloff, lightIndex);
+      "shadowsInfo", getDarkness(),
+      static_cast<float>(shadowMap->getSize().width),
+      1.f / shadowMap->getSize().width, frustumEdgeFalloff, lightIndex);
   }
   else if (_filter == ShadowGenerator::FILTER_PCSS()) {
     effect->setDepthStencilTexture("shadowSampler" + lightIndex,
                                    getShadowMapForRendering());
     effect->setTexture("depthSampler" + lightIndex, getShadowMapForRendering());
     light->_uniformBuffer->updateFloat4(
-      "shadowsInfo", getDarkness(), 1 / shadowMap->getSize().width,
+      "shadowsInfo", getDarkness(), 1.f / shadowMap->getSize().width,
       _contactHardeningLightSizeUVRatio * shadowMap->getSize().width,
       frustumEdgeFalloff, lightIndex);
   }

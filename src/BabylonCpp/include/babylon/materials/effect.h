@@ -165,7 +165,7 @@ public:
    * @brief Hidden
    */
   void _dumpShadersSource(std::string vertexCode, std::string fragmentCode,
-                          std::string defines);
+                          const std::string& defines);
 
   /**
    * @brief Recompiles the webGL program

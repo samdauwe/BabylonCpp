@@ -398,9 +398,9 @@ Geometry*& Mesh::get_geometry()
   return _geometry;
 }
 
-void Mesh::setGeometry(Geometry* geometry)
+void Mesh::setGeometry(Geometry* iGeometry)
 {
-  _geometry = geometry;
+  _geometry = iGeometry;
 }
 
 size_t Mesh::getTotalVertices() const
@@ -989,14 +989,14 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
   auto scene  = getScene();
   auto engine = scene->getEngine();
 
-  auto _fillMode = static_cast<unsigned>(fillMode);
-  if (_unIndexed || fillMode == Material::PointFillMode()) {
+  const auto _fillMode = static_cast<unsigned int>(fillMode);
+  if (_unIndexed || _fillMode == Material::PointFillMode()) {
     // or triangles as points
     engine->drawArraysType(_fillMode, static_cast<int>(subMesh->verticesStart),
                            static_cast<int>(subMesh->verticesCount),
                            static_cast<int>(instancesCount));
   }
-  else if (fillMode == Material::WireFrameFillMode()) {
+  else if (_fillMode == Material::WireFrameFillMode()) {
     // Triangles as wireframe
     engine->drawElementsType(_fillMode, 0,
                              static_cast<int>(subMesh->_linesIndexCount),
@@ -1197,7 +1197,7 @@ Mesh& Mesh::_processRendering(
   const _InstancesBatchPtr& batch, bool hardwareInstancedRendering,
   std::function<void(bool isInstance, const Matrix& world,
                      Material* effectiveMaterial)>
-    onBeforeDraw,
+    iOnBeforeDraw,
   Material* effectiveMaterial)
 {
   auto scene  = getScene();
@@ -1210,8 +1210,8 @@ Mesh& Mesh::_processRendering(
   else {
     if (batch->renderSelf[subMesh->_id]) {
       // Draw
-      if (onBeforeDraw) {
-        onBeforeDraw(false, getWorldMatrix(), effectiveMaterial);
+      if (iOnBeforeDraw) {
+        iOnBeforeDraw(false, getWorldMatrix(), effectiveMaterial);
       }
 
       _draw(subMesh, fillMode, _instanceDataStorage->overridenInstanceCount);
@@ -1222,8 +1222,8 @@ Mesh& Mesh::_processRendering(
       for (auto& instance : visibleInstancesForSubMesh) {
         // World
         auto world = instance->getWorldMatrix();
-        if (onBeforeDraw) {
-          onBeforeDraw(true, world, effectiveMaterial);
+        if (iOnBeforeDraw) {
+          iOnBeforeDraw(true, world, effectiveMaterial);
         }
 
         // Draw
@@ -1266,13 +1266,13 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
       && (!batch->visibleInstances[subMesh->_id].empty());
 
   // Material
-  auto material = subMesh->getMaterial();
+  auto iMaterial = subMesh->getMaterial();
 
-  if (!material) {
+  if (!iMaterial) {
     return *this;
   }
 
-  _effectiveMaterial = material;
+  _effectiveMaterial = iMaterial;
 
   if (_effectiveMaterial->storeEffectOnSubMeshes) {
     if (!_effectiveMaterial->isReadyForSubMesh(this, subMesh,
@@ -1863,7 +1863,7 @@ void Mesh::applyDisplacementMapFromBuffer(
   auto positions = getVerticesData(VertexBuffer::PositionKind, true, true);
   auto normals   = getVerticesData(VertexBuffer::NormalKind);
   auto uvs       = getVerticesData(VertexBuffer::UVKind);
-  auto position  = Vector3::Zero();
+  auto iPosition = Vector3::Zero();
   auto normal    = Vector3::Zero();
   auto uv        = Vector2::Zero();
 
@@ -1871,7 +1871,7 @@ void Mesh::applyDisplacementMapFromBuffer(
   Vector2 uvScale  = iUvScale.has_value() ? *iUvScale : Vector2(1.f, 1.f);
 
   for (unsigned int index = 0; index < positions.size(); index += 3) {
-    Vector3::FromArrayToRef(positions, index, position);
+    Vector3::FromArrayToRef(positions, index, iPosition);
     Vector3::FromArrayToRef(normals, index, normal);
     Vector2::FromArrayToRef(uvs, (index / 3) * 2, uv);
 
@@ -1892,9 +1892,9 @@ void Mesh::applyDisplacementMapFromBuffer(
 
     normal.normalize();
     normal.scaleInPlace(minHeight + (maxHeight - minHeight) * gradient);
-    position = position.add(normal);
+    iPosition = iPosition.add(normal);
 
-    position.toArray(positions, index);
+    iPosition.toArray(positions, index);
   }
 
   VertexData::ComputeNormals(positions, getIndices(), normals);
@@ -2188,26 +2188,26 @@ void Mesh::serialize(json& /*serializationObject*/)
 
 void Mesh::_syncGeometryWithMorphTargetManager()
 {
-  auto _geometry = geometry();
-  if (!_geometry) {
+  auto iGeometry = geometry();
+  if (!iGeometry) {
     return;
   }
 
   _markSubMeshesAsAttributesDirty();
 
-  auto morphTargetManager = _morphTargetManager;
-  if (morphTargetManager && morphTargetManager->vertexCount()) {
-    if (morphTargetManager->vertexCount() != getTotalVertices()) {
+  auto iMorphTargetManager = _morphTargetManager;
+  if (iMorphTargetManager && iMorphTargetManager->vertexCount()) {
+    if (iMorphTargetManager->vertexCount() != getTotalVertices()) {
       BABYLON_LOG_ERROR("Mesh",
                         "Mesh is incompatible with morph targets. Targets and "
                         "mesh must all have the same vertices count.");
-      morphTargetManager = nullptr;
+      iMorphTargetManager = nullptr;
       return;
     }
 
-    for (unsigned int index = 0; index < morphTargetManager->numInfluencers();
+    for (unsigned int index = 0; index < iMorphTargetManager->numInfluencers();
          ++index) {
-      auto morphTarget = morphTargetManager->getActiveTarget(index);
+      auto morphTarget = iMorphTargetManager->getActiveTarget(index);
 
       const auto positions = morphTarget->getPositions();
       if (positions.empty()) {
@@ -2216,18 +2216,18 @@ void Mesh::_syncGeometryWithMorphTargetManager()
         return;
       }
 
-      _geometry->setVerticesData(VertexBuffer::PositionKind + index, positions,
+      iGeometry->setVerticesData(VertexBuffer::PositionKind + index, positions,
                                  false, 3);
 
       const auto normals = morphTarget->getNormals();
       if (!normals.empty()) {
-        _geometry->setVerticesData(VertexBuffer::NormalKind + index, normals,
+        iGeometry->setVerticesData(VertexBuffer::NormalKind + index, normals,
                                    false, 3);
       }
 
       const auto tangents = morphTarget->getTangents();
       if (!tangents.empty()) {
-        _geometry->setVerticesData(VertexBuffer::TangentKind + index, tangents,
+        iGeometry->setVerticesData(VertexBuffer::TangentKind + index, tangents,
                                    false, 3);
       }
     }
@@ -2237,14 +2237,14 @@ void Mesh::_syncGeometryWithMorphTargetManager()
 
     // Positions
     while (
-      _geometry->isVerticesDataPresent(VertexBuffer::PositionKind + index)) {
-      _geometry->removeVerticesData(VertexBuffer::PositionKind + index);
+      iGeometry->isVerticesDataPresent(VertexBuffer::PositionKind + index)) {
+      iGeometry->removeVerticesData(VertexBuffer::PositionKind + index);
 
-      if (_geometry->isVerticesDataPresent(VertexBuffer::NormalKind + index)) {
-        _geometry->removeVerticesData(VertexBuffer::NormalKind + index);
+      if (iGeometry->isVerticesDataPresent(VertexBuffer::NormalKind + index)) {
+        iGeometry->removeVerticesData(VertexBuffer::NormalKind + index);
       }
-      if (_geometry->isVerticesDataPresent(VertexBuffer::TangentKind + index)) {
-        _geometry->removeVerticesData(VertexBuffer::TangentKind + index);
+      if (iGeometry->isVerticesDataPresent(VertexBuffer::TangentKind + index)) {
+        iGeometry->removeVerticesData(VertexBuffer::TangentKind + index);
       }
       ++index;
     }
@@ -3084,17 +3084,17 @@ MeshPtr Mesh::CreateDecal(const std::string& name, AbstractMesh* sourceMesh,
 
 Float32Array& Mesh::setPositionsForCPUSkinning()
 {
-  Float32Array source;
+  Float32Array iSource;
   if (_sourcePositions.empty()) {
-    source = getVerticesData(VertexBuffer::PositionKind);
-    if (source.empty()) {
+    iSource = getVerticesData(VertexBuffer::PositionKind);
+    if (iSource.empty()) {
       return _sourceNormals;
     }
 
-    _sourcePositions = source;
+    _sourcePositions = iSource;
 
     if (!isVertexBufferUpdatable(VertexBuffer::PositionKind)) {
-      setVerticesData(VertexBuffer::PositionKind, source, true);
+      setVerticesData(VertexBuffer::PositionKind, iSource, true);
     }
   }
   return _sourcePositions;
@@ -3102,23 +3102,23 @@ Float32Array& Mesh::setPositionsForCPUSkinning()
 
 Float32Array& Mesh::setNormalsForCPUSkinning()
 {
-  Float32Array source;
+  Float32Array iSource;
   if (_sourceNormals.empty()) {
-    source = getVerticesData(VertexBuffer::NormalKind);
-    if (source.empty()) {
+    iSource = getVerticesData(VertexBuffer::NormalKind);
+    if (iSource.empty()) {
       return _sourceNormals;
     }
 
-    _sourceNormals = source;
+    _sourceNormals = iSource;
 
     if (!isVertexBufferUpdatable(VertexBuffer::NormalKind)) {
-      setVerticesData(VertexBuffer::NormalKind, source, true);
+      setVerticesData(VertexBuffer::NormalKind, iSource, true);
     }
   }
   return _sourceNormals;
 }
 
-Mesh* Mesh::applySkeleton(const SkeletonPtr& skeleton)
+Mesh* Mesh::applySkeleton(const SkeletonPtr& iSkeleton)
 {
   if (!_geometry) {
     return this;
@@ -3182,7 +3182,7 @@ Mesh* Mesh::applySkeleton(const SkeletonPtr& skeleton)
     = needExtras ? getVerticesData(VertexBuffer::MatricesWeightsExtraKind) :
                    Float32Array();
 
-  auto skeletonMatrices = skeleton->getTransformMatrices(this);
+  auto skeletonMatrices = iSkeleton->getTransformMatrices(this);
 
   auto tempVector3 = Vector3::Zero();
   Matrix finalMatrix;

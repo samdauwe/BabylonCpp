@@ -109,8 +109,8 @@ CubeTexture::CubeTexture(
     _files.clear();
 
     if (!_extensions.empty()) {
-      for (const auto& extension : _extensions) {
-        _files.emplace_back(rootUrl + extension);
+      for (const auto& iExtension : _extensions) {
+        _files.emplace_back(rootUrl + iExtension);
       }
     }
   }

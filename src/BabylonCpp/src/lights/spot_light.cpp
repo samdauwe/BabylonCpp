@@ -15,9 +15,9 @@ bool SpotLight::NodeConstructorAdded = false;
 void SpotLight::AddNodeConstructor()
 {
   Node::AddNodeConstructor(
-    "Light_Type_2", [](const std::string& name, Scene* scene,
+    "Light_Type_2", [](const std::string& iName, Scene* scene,
                        const std::optional<json>& /*options*/) {
-      return SpotLight::New(name, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
+      return SpotLight::New(iName, Vector3::Zero(), Vector3::Zero(), 0.f, 0.f,
                             scene);
     });
   SpotLight::NodeConstructorAdded = true;
@@ -194,9 +194,9 @@ void SpotLight::_setDefaultShadowProjectionMatrix(
   }
 
   _shadowAngleScale = _shadowAngleScale ? *_shadowAngleScale : 1.f;
-  auto angle        = *_shadowAngleScale * _angle;
+  auto iAngle       = *_shadowAngleScale * _angle;
 
-  Matrix::PerspectiveFovLHToRef(angle, 1.f, getDepthMinZ(*activeCamera),
+  Matrix::PerspectiveFovLHToRef(iAngle, 1.f, getDepthMinZ(*activeCamera),
                                 getDepthMaxZ(*activeCamera), matrix);
 }
 

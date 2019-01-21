@@ -484,8 +484,8 @@ SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
     for (const auto& data :
          json_util::get_array<json>(parsedSkeleton, "ranges")) {
       skeleton->createAnimationRange(json_util::get_string(data, "name"),
-                                     json_util::get_number<int>(data, "from"),
-                                     json_util::get_number<int>(data, "to"));
+                                     json_util::get_number<float>(data, "from"),
+                                     json_util::get_number<float>(data, "to"));
     }
   }
   return skeleton;

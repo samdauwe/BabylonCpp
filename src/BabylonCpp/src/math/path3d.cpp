@@ -153,17 +153,17 @@ Float32Array& Path3D::getDistances()
   return _distances;
 }
 
-Path3D& Path3D::update(const std::vector<Vector3>& path,
+Path3D& Path3D::update(const std::vector<Vector3>& iPath,
                        const std::optional<Vector3>& firstNormal)
 {
-  if (_curve.size() < path.size()) {
-    _curve.resize(path.size());
+  if (_curve.size() < iPath.size()) {
+    _curve.resize(iPath.size());
   }
 
-  for (unsigned int p = 0; p < path.size(); ++p) {
-    _curve[p].x = path[p].x;
-    _curve[p].y = path[p].y;
-    _curve[p].z = path[p].z;
+  for (unsigned int p = 0; p < iPath.size(); ++p) {
+    _curve[p].x = iPath[p].x;
+    _curve[p].y = iPath[p].y;
+    _curve[p].z = iPath[p].z;
   }
   _compute(firstNormal);
   return *this;

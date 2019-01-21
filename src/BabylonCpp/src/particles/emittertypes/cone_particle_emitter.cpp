@@ -100,11 +100,11 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
   else {
     h = 0.0001f;
   }
-  auto radius = _radius - Scalar::RandomRange(0.f, _radius * radiusRange);
-  radius      = radius * h;
+  auto iRadius = _radius - Scalar::RandomRange(0.f, _radius * radiusRange);
+  iRadius      = iRadius * h;
 
-  const auto randX = radius * std::sin(s);
-  const auto randZ = radius * std::cos(s);
+  const auto randX = iRadius * std::sin(s);
+  const auto randZ = iRadius * std::cos(s);
   const auto randY = h * _height;
 
   Vector3::TransformCoordinatesFromFloatsToRef(randX, randY, randZ, worldMatrix,

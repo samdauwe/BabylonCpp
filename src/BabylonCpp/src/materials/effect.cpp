@@ -310,7 +310,6 @@ void Effect::_loadVertexShader(
   // Is in local store ?
   const std::string vertexShaderName = vertex + "VertexShader";
   if (stl_util::contains(Effect::ShadersStore(), vertexShaderName)) {
-    const std::string vertexShaderName = vertex + "VertexShader";
     callback(Effect::ShadersStore()[vertexShaderName]);
     return;
   }
@@ -368,12 +367,13 @@ void Effect::_loadFragmentShader(
 }
 
 void Effect::_dumpShadersSource(std::string vertexCode,
-                                std::string fragmentCode, std::string defines)
+                                std::string fragmentCode,
+                                const std::string& iDefines)
 {
   // Rebuild shaders source code
   auto shaderVersion
     = (_engine->webGLVersion() > 1.f) ? "#version 300 es\n" : "";
-  auto prefix  = shaderVersion + (!defines.empty() ? defines + "\n" : "");
+  auto prefix  = shaderVersion + (!iDefines.empty() ? iDefines + "\n" : "");
   vertexCode   = prefix + vertexCode;
   fragmentCode = prefix + fragmentCode;
 
@@ -530,16 +530,16 @@ void Effect::_processIncludes(
                 const auto istr = std::to_string(i);
                 if (!_engine->supportsUniformBuffers()) {
                   // Ubo replacement
-                  const auto callback = [](const std::smatch& m) {
+                  const auto iCallback = [](const std::smatch& m) {
                     if (m.size() == 2) {
                       return m.str(1) + "{X}";
                     }
                     return m.str(0);
                   };
-                  const std::regex regex{"light\\{X\\}.(\\w*)",
-                                         std::regex::optimize};
+                  const std::regex iRegex{"light\\{X\\}.(\\w*)",
+                                          std::regex::optimize};
                   sourceIncludeContent = String::regexReplace(
-                    sourceIncludeContent, regex, callback);
+                    sourceIncludeContent, iRegex, iCallback);
                 }
                 includeContent
                   += String::regexReplace(sourceIncludeContent, "\\{X\\}", istr)
@@ -551,15 +551,16 @@ void Effect::_processIncludes(
         else {
           if (!_engine->supportsUniformBuffers()) {
             // Ubo replacement
-            const auto callback = [](const std::smatch& m) {
+            const auto iCallback = [](const std::smatch& m) {
               if (m.size() == 2) {
                 return m.str(1) + "{X}";
               }
               return m.str(0);
             };
-            const std::regex regex{"light\\{X\\}.(\\w*)", std::regex::optimize};
+            const std::regex iRegex{"light\\{X\\}.(\\w*)",
+                                    std::regex::optimize};
             includeContent
-              = String::regexReplace(includeContent, regex, callback);
+              = String::regexReplace(includeContent, iRegex, iCallback);
           }
           includeContent
             = String::regexReplace(includeContent, "\\{X\\}", indexString);
@@ -639,16 +640,16 @@ std::string Effect::_processPrecision(std::string source)
 
 void Effect::_rebuildProgram(
   const std::string& vertexSourceCode, const std::string& fragmentSourceCode,
-  const std::function<void(GL::IGLProgram* program)>& onCompiled,
-  const std::function<void(const std::string& message)>& onError)
+  const std::function<void(GL::IGLProgram* program)>& iOnCompiled,
+  const std::function<void(const std::string& message)>& iOnError)
 {
   _isReady = false;
 
   _vertexSourceCodeOverride   = vertexSourceCode;
   _fragmentSourceCodeOverride = fragmentSourceCode;
-  this->onError = [&](const Effect* /*effect*/, const std::string& error) {
-    if (onError) {
-      onError(error);
+  onError = [&](const Effect* /*effect*/, const std::string& error) {
+    if (iOnError) {
+      iOnError(error);
     }
   };
   this->onCompiled = [&](const Effect* /*effect*/) {
@@ -657,7 +658,7 @@ void Effect::_rebuildProgram(
     }
 
     if (onCompiled) {
-      onCompiled(_program.get());
+      iOnCompiled(_program.get());
     }
   };
   _fallbacks = nullptr;
@@ -933,20 +934,20 @@ bool Effect::_cacheFloat4(const std::string& uniformName, float x, float y,
   return changed;
 }
 
-void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& name)
+void Effect::bindUniformBuffer(GL::IGLBuffer* _buffer, const std::string& iName)
 {
-  if (stl_util::contains(_uniformBuffersNames, name)) {
-    const auto& bufferName = _uniformBuffersNames[name];
+  if (stl_util::contains(_uniformBuffersNames, iName)) {
+    const auto& bufferName = _uniformBuffersNames[iName];
     if (stl_util::contains(Effect::_baseCache, bufferName)
         && Effect::_baseCache[bufferName] == _buffer) {
       return;
     }
   }
   else {
-    _uniformBuffersNames[name] = 0;
+    _uniformBuffersNames[iName] = 0;
   }
 
-  const auto& bufferName         = _uniformBuffersNames[name];
+  const auto& bufferName         = _uniformBuffersNames[iName];
   Effect::_baseCache[bufferName] = _buffer;
   _engine->bindUniformBufferBase(_buffer, bufferName);
 }

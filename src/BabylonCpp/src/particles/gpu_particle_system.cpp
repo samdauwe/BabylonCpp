@@ -278,12 +278,12 @@ BaseParticleSystem& GPUParticleSystem::_removeGradientAndTexture(
 }
 
 GPUParticleSystem&
-GPUParticleSystem::addColorGradient(float gradient, const Color4& color1,
+GPUParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
                                     const std::optional<Color4>& /*color2*/)
 {
   ColorGradient colorGradient;
   colorGradient.gradient = gradient;
-  colorGradient.color1   = color1;
+  colorGradient.color1   = iColor1;
   _colorGradients.emplace_back(colorGradient);
 
   std::sort(_colorGradients.begin(), _colorGradients.end(),
@@ -1196,7 +1196,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   // Get everything ready to render
   _initialize();
 
-  _accumulatedCount += emitRate * _timeDelta;
+  _accumulatedCount += static_cast<size_t>(emitRate * _timeDelta);
   if (_accumulatedCount > 1) {
     auto intPart = _accumulatedCount;
     _accumulatedCount -= intPart;
@@ -1211,7 +1211,8 @@ size_t GPUParticleSystem::render(bool preWarm)
   _engine->enableEffect(_updateEffect);
   _engine->setState(false);
 
-  _updateEffect->setFloat("currentCount", _currentActiveCount);
+  _updateEffect->setFloat("currentCount",
+                          static_cast<float>(_currentActiveCount));
   _updateEffect->setFloat("timeDelta", _timeDelta);
   _updateEffect->setFloat("stopFactor", _stopped ? 0.f : 1.f);
   _updateEffect->setTexture("randomSampler", _randomTexture);
@@ -1257,7 +1258,8 @@ size_t GPUParticleSystem::render(bool preWarm)
     particleEmitterType->applyToShader(_updateEffect.get());
   }
   if (_isAnimationSheetEnabled) {
-    _updateEffect->setFloat3("cellInfos", startSpriteCellID, endSpriteCellID,
+    _updateEffect->setFloat3("cellInfos", static_cast<float>(startSpriteCellID),
+                             static_cast<float>(endSpriteCellID),
                              spriteCellChangeSpeed);
   }
 

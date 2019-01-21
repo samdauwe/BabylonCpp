@@ -132,7 +132,7 @@ public:
    * @param frame the frame number to go to
    * @return the animationGroup
    */
-  AnimationGroup& goToFrame(int frame);
+  AnimationGroup& goToFrame(float frame);
 
   /**
    * @brief Dispose all associated resources.

@@ -40,17 +40,17 @@ float MorphTarget::get_influence() const
   return _influence;
 }
 
-void MorphTarget::set_influence(float influence)
+void MorphTarget::set_influence(float iInfluence)
 {
-  if (stl_util::almost_equal(_influence, influence)) {
+  if (stl_util::almost_equal(_influence, iInfluence)) {
     return;
   }
 
   float previous = _influence;
-  _influence     = influence;
+  _influence     = iInfluence;
 
   if (onInfluenceChanged.hasObservers()) {
-    auto value = std::make_unique<bool>(previous == 0.f || influence == 0.f);
+    auto value = std::make_unique<bool>(previous == 0.f || iInfluence == 0.f);
     onInfluenceChanged.notifyObservers(value.get());
   }
 }

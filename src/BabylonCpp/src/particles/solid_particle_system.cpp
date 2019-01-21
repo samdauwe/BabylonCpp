@@ -224,14 +224,14 @@ SolidParticleSystem::digest(Mesh* _mesh,
     auto shapeUV = _uvsToShapeUV(facetUV);
 
     // compute the barycenter of the shape
-    for (auto& _shape : shape) {
-      barycenter.addInPlace(_shape);
+    for (auto& iShape : shape) {
+      barycenter.addInPlace(iShape);
     }
     barycenter.scaleInPlace(1.f / static_cast<float>(shape.size()));
 
     // shift the shape from its barycenter to the origin
-    for (auto& _shape : shape) {
-      _shape.subtractInPlace(barycenter);
+    for (auto& iShape : shape) {
+      iShape.subtractInPlace(barycenter);
     }
     BoundingInfo bInfo{Vector3::Zero(), Vector3::Zero()};
     if (_particlesIntersect) {
@@ -264,15 +264,15 @@ void SolidParticleSystem::_unrotateFixedNormals()
 {
   size_t index = 0;
   size_t idx   = 0;
-  for (auto& _particle : particles) {
-    _shape = _particle->_model->_shape;
-    if (_particle->rotationQuaternion) {
-      _quaternion.copyFrom(*_particle->rotationQuaternion);
+  for (auto& iParticle : particles) {
+    _shape = iParticle->_model->_shape;
+    if (iParticle->rotationQuaternion) {
+      _quaternion.copyFrom(*iParticle->rotationQuaternion);
     }
     else {
-      _yaw   = _particle->rotation.y;
-      _pitch = _particle->rotation.x;
-      _roll  = _particle->rotation.z;
+      _yaw   = iParticle->rotation.y;
+      _pitch = iParticle->rotation.x;
+      _roll  = iParticle->rotation.z;
       _quaternionRotationYPR();
     }
     _quaternionToRotationMatrix();

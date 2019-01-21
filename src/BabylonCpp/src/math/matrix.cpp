@@ -686,11 +686,11 @@ void Matrix::toNormalMatrix(Matrix& ref)
 {
   invertToRef(ref);
   ref.transpose();
-  const auto& m = ref.m;
-  Matrix::FromValuesToRef(m[0], m[1], m[2], 0.f,  //
-                          m[4], m[5], m[6], 0.f,  //
-                          m[8], m[9], m[10], 0.f, //
-                          0.f, 0.f, 0.f, 1.f, ref //
+  const auto& _m = ref.m;
+  Matrix::FromValuesToRef(_m[0], _m[1], _m[2], 0.f,  //
+                          _m[4], _m[5], _m[6], 0.f,  //
+                          _m[8], _m[9], _m[10], 0.f, //
+                          0.f, 0.f, 0.f, 1.f, ref    //
   );
 }
 
@@ -1202,36 +1202,36 @@ void Matrix::LookAtLHToRef(const Vector3& eye, const Vector3& target,
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   SIMD::SIMDMatrix::LookAtLHToRefSIMD(eye, target, up, result);
 #else
-  Vector3 _xAxis      = Vector3::Zero();
-  Vector3 _yAxis      = Vector3::Zero();
-  Vector3 _zAxis      = Vector3::Zero();
+  Vector3 iXAxis      = Vector3::Zero();
+  Vector3 iYAxis      = Vector3::Zero();
+  Vector3 iZAxis      = Vector3::Zero();
 
   // Z axis
-  target.subtractToRef(eye, _zAxis);
-  _zAxis.normalize();
+  target.subtractToRef(eye, iZAxis);
+  iZAxis.normalize();
 
   // X axis
-  Vector3::CrossToRef(up, _zAxis, _xAxis);
+  Vector3::CrossToRef(up, iZAxis, iXAxis);
 
-  if (stl_util::almost_equal(_xAxis.lengthSquared(), 0.f)) {
-    _xAxis.x = 1.f;
+  if (stl_util::almost_equal(iXAxis.lengthSquared(), 0.f)) {
+    iXAxis.x = 1.f;
   }
   else {
-    _xAxis.normalize();
+    iXAxis.normalize();
   }
 
   // Y axis
-  Vector3::CrossToRef(_zAxis, _xAxis, _yAxis);
-  _yAxis.normalize();
+  Vector3::CrossToRef(iZAxis, iXAxis, iYAxis);
+  iYAxis.normalize();
 
   // Eye angles
-  const float ex = -Vector3::Dot(_xAxis, eye);
-  const float ey = -Vector3::Dot(_yAxis, eye);
-  const float ez = -Vector3::Dot(_zAxis, eye);
+  const float ex = -Vector3::Dot(iXAxis, eye);
+  const float ey = -Vector3::Dot(iYAxis, eye);
+  const float ez = -Vector3::Dot(iZAxis, eye);
 
-  return Matrix::FromValuesToRef(_xAxis.x, _yAxis.x, _zAxis.x, 0.f, //
-                                 _xAxis.y, _yAxis.y, _zAxis.y, 0.f, //
-                                 _xAxis.z, _yAxis.z, _zAxis.z, 0.f, //
+  return Matrix::FromValuesToRef(iXAxis.x, iYAxis.x, iZAxis.x, 0.f, //
+                                 iXAxis.y, iYAxis.y, iZAxis.y, 0.f, //
+                                 iXAxis.z, iYAxis.z, iZAxis.z, 0.f, //
                                  ex, ey, ez, 1.f, result);
 #endif
 }
@@ -1248,36 +1248,36 @@ Matrix Matrix::LookAtRH(const Vector3& eye, Vector3& target, const Vector3& up)
 void Matrix::LookAtRHToRef(const Vector3& eye, const Vector3& target,
                            const Vector3& up, Matrix& result)
 {
-  Vector3 _xAxis = Vector3::Zero();
-  Vector3 _yAxis = Vector3::Zero();
-  Vector3 _zAxis = Vector3::Zero();
+  Vector3 iXAxis = Vector3::Zero();
+  Vector3 iYAxis = Vector3::Zero();
+  Vector3 iZAxis = Vector3::Zero();
 
   // Z axis
-  eye.subtractToRef(target, _zAxis);
-  _zAxis.normalize();
+  eye.subtractToRef(target, iZAxis);
+  iZAxis.normalize();
 
   // X axis
-  Vector3::CrossToRef(up, _zAxis, _xAxis);
+  Vector3::CrossToRef(up, iZAxis, iXAxis);
 
-  if (stl_util::almost_equal(_xAxis.lengthSquared(), 0.f)) {
-    _xAxis.x = 1.f;
+  if (stl_util::almost_equal(iXAxis.lengthSquared(), 0.f)) {
+    iXAxis.x = 1.f;
   }
   else {
-    _xAxis.normalize();
+    iXAxis.normalize();
   }
 
   // Y axis
-  Vector3::CrossToRef(_zAxis, _xAxis, _yAxis);
-  _yAxis.normalize();
+  Vector3::CrossToRef(iZAxis, iXAxis, iYAxis);
+  iYAxis.normalize();
 
   // Eye angles
-  const float ex = -Vector3::Dot(_xAxis, eye);
-  const float ey = -Vector3::Dot(_yAxis, eye);
-  const float ez = -Vector3::Dot(_zAxis, eye);
+  const float ex = -Vector3::Dot(iXAxis, eye);
+  const float ey = -Vector3::Dot(iYAxis, eye);
+  const float ez = -Vector3::Dot(iZAxis, eye);
 
-  return Matrix::FromValuesToRef(_xAxis.x, _yAxis.x, _zAxis.x, 0, _xAxis.y,
-                                 _yAxis.y, _zAxis.y, 0.f, _xAxis.z, _yAxis.z,
-                                 _zAxis.z, 0.f, ex, ey, ez, 1.f, result);
+  return Matrix::FromValuesToRef(iXAxis.x, iYAxis.x, iZAxis.x, 0, iXAxis.y,
+                                 iYAxis.y, iZAxis.y, 0.f, iXAxis.z, iYAxis.z,
+                                 iZAxis.z, 0.f, ex, ey, ez, 1.f, result);
 }
 
 Matrix Matrix::OrthoLH(float width, float height, float znear, float zfar)

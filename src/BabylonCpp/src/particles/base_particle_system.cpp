@@ -371,12 +371,12 @@ BaseParticleSystem& BaseParticleSystem::_removeGradientAndTexture(
 }
 
 PointParticleEmitterPtr
-BaseParticleSystem::createPointEmitter(const Vector3& direction1,
-                                       const Vector3& direction2)
+BaseParticleSystem::createPointEmitter(const Vector3& iDirection1,
+                                       const Vector3& iDirection2)
 {
   auto particleEmitter        = std::make_shared<PointParticleEmitter>();
-  particleEmitter->direction1 = direction1;
-  particleEmitter->direction2 = direction2;
+  particleEmitter->direction1 = iDirection1;
+  particleEmitter->direction2 = iDirection2;
 
   particleEmitterType = particleEmitter;
   return particleEmitter;
@@ -402,11 +402,11 @@ BaseParticleSystem::createSphereEmitter(float radius, float radiusRange)
 
 SphereDirectedParticleEmitterPtr
 BaseParticleSystem::createDirectedSphereEmitter(float radius,
-                                                const Vector3& direction1,
-                                                const Vector3& direction2)
+                                                const Vector3& iDirection1,
+                                                const Vector3& iDirection2)
 {
   auto particleEmitter = std::make_shared<SphereDirectedParticleEmitter>(
-    radius, direction1, direction2);
+    radius, iDirection1, iDirection2);
   particleEmitterType = particleEmitter;
   return particleEmitter;
 }
@@ -431,11 +431,11 @@ ConeParticleEmitterPtr BaseParticleSystem::createConeEmitter(float radius,
 CylinderDirectedParticleEmitterPtr
 BaseParticleSystem::createDirectedCylinderEmitter(float radius, float height,
                                                   float radiusRange,
-                                                  const Vector3& direction1,
-                                                  const Vector3& direction2)
+                                                  const Vector3& iDirection1,
+                                                  const Vector3& iDirection2)
 {
   auto particleEmitter = std::make_shared<CylinderDirectedParticleEmitter>(
-    radius, height, radiusRange, direction1, direction2);
+    radius, height, radiusRange, iDirection1, iDirection2);
   particleEmitterType = particleEmitter;
   return particleEmitter;
 }

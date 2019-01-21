@@ -275,9 +275,9 @@ std::vector<IShadowLightPtr>& BackgroundMaterial::get_shadowLights()
 }
 
 void BackgroundMaterial::set_shadowLights(
-  const std::vector<IShadowLightPtr>& shadowLights)
+  const std::vector<IShadowLightPtr>& iShadowLights)
 {
-  _shadowLights = shadowLights;
+  _shadowLights = iShadowLights;
   _markAllSubMeshesAsTexturesDirty();
 }
 
@@ -680,33 +680,33 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.boolDef["OPACITYFRESNEL"]  = false;
       }
 
-      auto reflectionTexture = _reflectionTexture;
-      if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
-        if (!reflectionTexture->isReadyOrNotBlocking()) {
+      auto iReflectionTexture = _reflectionTexture;
+      if (iReflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
+        if (!iReflectionTexture->isReadyOrNotBlocking()) {
           return false;
         }
 
         defines.boolDef["REFLECTION"]      = true;
-        defines.boolDef["GAMMAREFLECTION"] = reflectionTexture->gammaSpace;
-        defines.boolDef["RGBDREFLECTION"]  = reflectionTexture->isRGBD();
+        defines.boolDef["GAMMAREFLECTION"] = iReflectionTexture->gammaSpace;
+        defines.boolDef["RGBDREFLECTION"]  = iReflectionTexture->isRGBD();
         defines.boolDef["REFLECTIONBLUR"]  = _reflectionBlur > 0.f;
         defines.boolDef["REFLECTIONMAP_OPPOSITEZ"]
-          = getScene()->useRightHandedSystem() ? !reflectionTexture->invertZ :
-                                                 reflectionTexture->invertZ;
+          = getScene()->useRightHandedSystem() ? !iReflectionTexture->invertZ :
+                                                 iReflectionTexture->invertZ;
         defines.boolDef["LODINREFLECTIONALPHA"]
-          = reflectionTexture->lodLevelInAlpha;
+          = iReflectionTexture->lodLevelInAlpha;
         defines.boolDef["EQUIRECTANGULAR_RELFECTION_FOV"]
           = useEquirectangularFOV;
         defines.boolDef["REFLECTIONBGR"] = switchToBGR;
 
-        if (reflectionTexture->coordinatesMode
+        if (iReflectionTexture->coordinatesMode
             == TextureConstants::INVCUBIC_MODE) {
           defines.boolDef["INVERTCUBICMAP"] = true;
         }
 
-        defines.boolDef["REFLECTIONMAP_3D"] = reflectionTexture->isCube;
+        defines.boolDef["REFLECTIONMAP_3D"] = iReflectionTexture->isCube;
 
-        switch (reflectionTexture->coordinatesMode) {
+        switch (iReflectionTexture->coordinatesMode) {
           case TextureConstants::EXPLICIT_MODE:
             defines.boolDef["REFLECTIONMAP_EXPLICIT"] = true;
             break;
@@ -719,7 +719,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
           case TextureConstants::SKYBOX_MODE:
             defines.boolDef["REFLECTIONMAP_SKYBOX"] = true;
             defines.boolDef["REFLECTIONMAP_SKYBOX_TRANSFORMED"]
-              = !reflectionTexture->getReflectionTextureMatrix()->isIdentity();
+              = !iReflectionTexture->getReflectionTextureMatrix()->isIdentity();
             break;
           case TextureConstants::SPHERICAL_MODE:
             defines.boolDef["REFLECTIONMAP_SPHERICAL"] = true;
@@ -906,9 +906,9 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     std::unordered_map<std::string, unsigned int> indexParameters{
       {"maxSimultaneousLights", _maxSimultaneousLights}};
 
-    std::function<void(Effect * effect)> onCompiled = [this](Effect* effect) {
-      if (this->onCompiled) {
-        this->onCompiled(effect);
+    std::function<void(Effect * effect)> iOnCompiled = [this](Effect* effect) {
+      if (onCompiled) {
+        onCompiled(effect);
       }
 
       bindSceneUniformBuffer(effect, getScene()->getSceneUniformBuffer());
@@ -924,7 +924,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     options.materialDefines       = &defines;
     options.defines               = std::move(join);
     options.fallbacks             = std::move(fallbacks);
-    options.onCompiled            = onCompiled;
+    options.onCompiled            = iOnCompiled;
     options.onError               = onError;
     options.indexParameters       = std::move(indexParameters);
     options.maxSimultaneousLights = _maxSimultaneousLights;
@@ -1053,30 +1053,33 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
     bindViewProjection(effect);
 
-    auto reflectionTexture = _reflectionTexture;
+    auto iReflectionTexture = _reflectionTexture;
     if (!_uniformBuffer->useUbo() || !isFrozen() || !_uniformBuffer->isSync()) {
 
       // Texture uniforms
       if (scene->texturesEnabled()) {
         if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
-          _uniformBuffer->updateFloat2("vDiffuseInfos",
-                                       _diffuseTexture->coordinatesIndex,
-                                       _diffuseTexture->level, "");
+          _uniformBuffer->updateFloat2(
+            "vDiffuseInfos",
+            static_cast<float>(_diffuseTexture->coordinatesIndex),
+            _diffuseTexture->level, "");
           MaterialHelper::BindTextureMatrix(*_diffuseTexture, *_uniformBuffer,
                                             "diffuse");
         }
 
-        if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
+        if (iReflectionTexture
+            && StandardMaterial::ReflectionTextureEnabled()) {
           _uniformBuffer->updateMatrix(
             "reflectionMatrix",
-            *reflectionTexture->getReflectionTextureMatrix());
+            *iReflectionTexture->getReflectionTextureMatrix());
           _uniformBuffer->updateFloat2(
-            "vReflectionInfos", reflectionTexture->level, _reflectionBlur, "");
+            "vReflectionInfos", iReflectionTexture->level, _reflectionBlur, "");
 
           _uniformBuffer->updateFloat3(
-            "vReflectionMicrosurfaceInfos", reflectionTexture->getSize().width,
-            reflectionTexture->lodGenerationScale,
-            reflectionTexture->lodGenerationOffset, "");
+            "vReflectionMicrosurfaceInfos",
+            static_cast<float>(iReflectionTexture->getSize().width),
+            iReflectionTexture->lodGenerationScale,
+            iReflectionTexture->lodGenerationOffset, "");
         }
       }
 
@@ -1109,26 +1112,26 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
         _uniformBuffer->setTexture("diffuseSampler", _diffuseTexture);
       }
 
-      if (reflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
+      if (iReflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
         if (defines["REFLECTIONBLUR"] && defines["TEXTURELODSUPPORT"]) {
-          _uniformBuffer->setTexture("reflectionSampler", reflectionTexture);
+          _uniformBuffer->setTexture("reflectionSampler", iReflectionTexture);
         }
         else if (!defines["REFLECTIONBLUR"]) {
-          _uniformBuffer->setTexture("reflectionSampler", reflectionTexture);
+          _uniformBuffer->setTexture("reflectionSampler", iReflectionTexture);
         }
         else {
           _uniformBuffer->setTexture("reflectionSampler",
-                                     reflectionTexture->_lodTextureMid() ?
-                                       reflectionTexture->_lodTextureMid() :
-                                       reflectionTexture);
+                                     iReflectionTexture->_lodTextureMid() ?
+                                       iReflectionTexture->_lodTextureMid() :
+                                       iReflectionTexture);
           _uniformBuffer->setTexture("reflectionSamplerLow",
-                                     reflectionTexture->_lodTextureLow() ?
-                                       reflectionTexture->_lodTextureLow() :
-                                       reflectionTexture);
+                                     iReflectionTexture->_lodTextureLow() ?
+                                       iReflectionTexture->_lodTextureLow() :
+                                       iReflectionTexture);
           _uniformBuffer->setTexture("reflectionSamplerHigh",
-                                     reflectionTexture->_lodTextureHigh() ?
-                                       reflectionTexture->_lodTextureHigh() :
-                                       reflectionTexture);
+                                     iReflectionTexture->_lodTextureHigh() ?
+                                       iReflectionTexture->_lodTextureHigh() :
+                                       iReflectionTexture);
         }
 
         if (defines["REFLECTIONFRESNEL"]) {

@@ -752,17 +752,17 @@ MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
   if (instance) {
     // tube update
     auto& storage = instance->_creationDataStorage;
-    auto arc      = (options.arc() != 0.f) ? options.arc() : storage->arc;
+    auto iArc     = (options.arc() != 0.f) ? options.arc() : storage->arc;
     path3D        = storage->path3D.update(path);
-    pathArray
-      = tubePathArray(path, path3D, storage->pathArray, radius,
-                      storage->tessellation, radiusFunction, storage->cap, arc);
+    pathArray     = tubePathArray(path, path3D, storage->pathArray, radius,
+                              storage->tessellation, radiusFunction,
+                              storage->cap, iArc);
     RibbonOptions ribbonOptions(pathArray);
     instance = MeshBuilder::CreateRibbon("", ribbonOptions, scene);
     // Update mode, no need to recreate the storage.
     storage->path3D    = path3D;
     storage->pathArray = pathArray;
-    storage->arc       = arc;
+    storage->arc       = iArc;
     storage->radius    = radius;
 
     return instance;

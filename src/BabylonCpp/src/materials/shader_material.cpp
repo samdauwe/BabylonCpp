@@ -93,10 +93,10 @@ ShaderMaterial::setTextureArray(const std::string& iName,
   return *this;
 }
 
-ShaderMaterial& ShaderMaterial::setInt(const std::string& name, int value)
+ShaderMaterial& ShaderMaterial::setInt(const std::string& iName, int value)
 {
-  _checkUniform(name);
-  _ints[name] = value;
+  _checkUniform(iName);
+  _ints[iName] = value;
 
   return *this;
 }

@@ -153,11 +153,11 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
 
     auto& positions = target->getPositions();
     if (!positions.empty()) {
-      const auto vertexCount = positions.size() / 3;
+      const auto iVertexCount = positions.size() / 3;
       if (_vertexCount == 0) {
-        _vertexCount = vertexCount;
+        _vertexCount = iVertexCount;
       }
-      else if (_vertexCount != vertexCount) {
+      else if (_vertexCount != iVertexCount) {
         BABYLON_LOG_ERROR(
           "MorphTargetManager",
           "Incompatible target. Targets must all have the same vertices "

@@ -198,7 +198,7 @@ void Texture::delayLoad()
   _delayedOnError = nullptr;
 }
 
-void Texture::updateSamplingMode(unsigned int samplingMode)
+void Texture::updateSamplingMode(unsigned int iSamplingMode)
 {
   if (!_texture) {
     return;
@@ -209,8 +209,8 @@ void Texture::updateSamplingMode(unsigned int samplingMode)
     return;
   }
 
-  _samplingMode = samplingMode;
-  scene->getEngine()->updateTextureSamplingMode(samplingMode, _texture);
+  _samplingMode = iSamplingMode;
+  scene->getEngine()->updateTextureSamplingMode(iSamplingMode, _texture);
 }
 
 void Texture::_prepareRowForTextureGeneration(float x, float y, float z,

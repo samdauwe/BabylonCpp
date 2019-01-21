@@ -229,16 +229,19 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
       if (noiseTextureData && noiseTextureSize) {
         auto fetchedColorR = _fetchR(
           particle->_randomNoiseCoordinates1->x,
-          particle->_randomNoiseCoordinates1->y, noiseTextureSize->width,
-          noiseTextureSize->height, *noiseTextureData);
+          particle->_randomNoiseCoordinates1->y,
+          static_cast<float>(noiseTextureSize->width),
+          static_cast<float>(noiseTextureSize->height), *noiseTextureData);
         auto fetchedColorG = _fetchR(
           particle->_randomNoiseCoordinates1->z,
-          particle->_randomNoiseCoordinates2.x, noiseTextureSize->width,
-          noiseTextureSize->height, *noiseTextureData);
+          particle->_randomNoiseCoordinates2.x,
+          static_cast<float>(noiseTextureSize->width),
+          static_cast<float>(noiseTextureSize->height), *noiseTextureData);
         auto fetchedColorB = _fetchR(
           particle->_randomNoiseCoordinates2.y,
-          particle->_randomNoiseCoordinates2.z, noiseTextureSize->width,
-          noiseTextureSize->height, *noiseTextureData);
+          particle->_randomNoiseCoordinates2.z,
+          static_cast<float>(noiseTextureSize->width),
+          static_cast<float>(noiseTextureSize->height), *noiseTextureData);
 
         auto& force       = Tmp::Vector3Array[0];
         auto& scaledForce = Tmp::Vector3Array[1];
@@ -643,13 +646,13 @@ IParticleSystem& ParticleSystem::removeRampGradient(float gradient)
 }
 
 IParticleSystem&
-ParticleSystem::addColorGradient(float gradient, const Color4& color1,
-                                 const std::optional<Color4>& color2)
+ParticleSystem::addColorGradient(float gradient, const Color4& iColor1,
+                                 const std::optional<Color4>& iColor2)
 {
   ColorGradient colorGradient;
   colorGradient.gradient = gradient;
-  colorGradient.color1   = color1;
-  colorGradient.color2   = color2;
+  colorGradient.color1   = iColor1;
+  colorGradient.color2   = iColor2;
   _colorGradients.emplace_back(colorGradient);
 
   std::sort(_colorGradients.begin(), _colorGradients.end(),
@@ -932,7 +935,7 @@ void ParticleSystem::_appendParticleVertex(unsigned int index,
   _vertexData[offset++] = particle->scale.y * particle->size;
 
   if (_isAnimationSheetEnabled) {
-    _vertexData[offset++] = particle->cellIndex;
+    _vertexData[offset++] = static_cast<float>(particle->cellIndex);
   }
 
   if (!_isBillboardBased) {
@@ -1122,7 +1125,8 @@ void ParticleSystem::_update(int newParticles)
 
     // Life time
     if (targetStopDuration && !_lifeTimeGradients.empty()) {
-      auto ratio = Scalar::Clamp(_actualFrame / targetStopDuration);
+      auto ratio
+        = static_cast<float>(Scalar::Clamp(_actualFrame / targetStopDuration));
       Tools::GetCurrentGradient<FactorGradient>(
         ratio, _lifeTimeGradients,
         [&](FactorGradient& currentGradient, FactorGradient& nextGradient,
@@ -1340,7 +1344,7 @@ ParticleSystem::_GetEffectCreationOptions(bool isAnimationSheetEnabled)
   return effectCreationOption;
 }
 
-EffectPtr ParticleSystem::_getEffect(unsigned int blendMode)
+EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
 {
   if (_customEffect) {
     return _customEffect;
@@ -1368,7 +1372,7 @@ EffectPtr ParticleSystem::_getEffect(unsigned int blendMode)
     defines.emplace_back("#define ANIMATESHEET");
   }
 
-  if (blendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
+  if (iBlendMode == ParticleSystem::BLENDMODE_MULTIPLY) {
     defines.emplace_back("#define BLENDMULTIPLYMODE");
   }
 
@@ -1485,7 +1489,8 @@ void ParticleSystem::animate(bool preWarmOnly)
     }
 
     newParticles = static_cast<int>(rate * _scaledUpdateSpeed);
-    _newPartsExcess += rate * _scaledUpdateSpeed - newParticles;
+    _newPartsExcess
+      += static_cast<int>(rate * _scaledUpdateSpeed - newParticles);
   }
 
   if (_newPartsExcess > 1) {
@@ -1584,9 +1589,9 @@ bool ParticleSystem::isReady()
   return true;
 }
 
-size_t ParticleSystem::_render(unsigned int blendMode)
+size_t ParticleSystem::_render(unsigned int iBlendMode)
 {
-  auto effect = _getEffect(blendMode);
+  auto effect = _getEffect(iBlendMode);
 
   auto engine = _scene->getEngine();
 
@@ -1642,7 +1647,7 @@ size_t ParticleSystem::_render(unsigned int blendMode)
   }
 
   // Draw order
-  switch (blendMode) {
+  switch (iBlendMode) {
     case ParticleSystem::BLENDMODE_ADD:
       engine->setAlphaMode(EngineConstants::ALPHA_ADD);
       break;
