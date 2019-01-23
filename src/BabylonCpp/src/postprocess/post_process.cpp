@@ -290,8 +290,9 @@ PostProcess::activate(const CameraPtr& camera,
       auto currentViewport = engine->currentViewport();
 
       if (currentViewport) {
-        desiredWidth *= currentViewport->width;
-        desiredHeight *= currentViewport->height;
+        desiredWidth = static_cast<int>(desiredWidth * currentViewport->width);
+        desiredHeight
+          = static_cast<int>(desiredHeight * currentViewport->height);
       }
     }
 

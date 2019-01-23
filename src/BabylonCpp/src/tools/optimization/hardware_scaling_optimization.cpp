@@ -7,7 +7,9 @@ namespace BABYLON {
 
 HardwareScalingOptimization::HardwareScalingOptimization(int iPriority,
                                                          int iMaximumSize)
-    : SceneOptimization{iPriority}, maximumScale{iMaximumSize}, _currentScale{1}
+    : SceneOptimization{iPriority}
+    , maximumScale{iMaximumSize}
+    , _currentScale{1.f}
 {
 }
 

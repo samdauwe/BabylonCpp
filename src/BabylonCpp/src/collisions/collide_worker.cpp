@@ -36,8 +36,7 @@ void CollideWorker::collideWithWorld(Vector3& position, Vector3& velocity,
   collider->_initialize(position, velocity, closeDistance);
 
   // Check all meshes
-  std::unordered_map<unsigned int, SerializedMesh>& meshes
-    = _collisionCache.getMeshes();
+  auto& meshes = _collisionCache.getMeshes();
 
   if (excludedMeshUniqueId >= 0) {
     unsigned _excludedMeshUniqueId

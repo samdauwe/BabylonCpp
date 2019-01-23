@@ -59,7 +59,7 @@ SerializationHelper::Parse(const std::function<TexturePtr()>& creationFunction,
   // coordinatesMode
   if (json_util::has_key(source, "level")
       && !json_util::is_null(source["level"])) {
-    texture->level = json_util::get_number<unsigned>(source, "level");
+    texture->level = json_util::get_number<float>(source, "level");
   }
   // uAng
   if (json_util::has_key(source, "uAng")

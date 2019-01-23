@@ -495,7 +495,7 @@ public:
    * @returns the animatable object created for this animation
    */
   AnimatablePtr beginWeightedAnimation(
-    const IAnimatablePtr& target, int from, int to, float weight = 1.f,
+    const IAnimatablePtr& target, float from, float to, float weight = 1.f,
     bool loop = false, float speedRatio = 1.f,
     const std::function<void()>& onAnimationEnd                = nullptr,
     AnimatablePtr animatable                                   = nullptr,
@@ -521,7 +521,7 @@ public:
    * @returns the animatable object created for this animation
    */
   AnimatablePtr
-  beginAnimation(const IAnimatablePtr& target, int from, int to,
+  beginAnimation(const IAnimatablePtr& target, float from, float to,
                  bool loop = false, float speedRatio = 1.f,
                  const std::function<void()>& onAnimationEnd = nullptr,
                  AnimatablePtr animatable = nullptr, bool stopCurrent = true,
@@ -563,7 +563,7 @@ public:
    */
   std::vector<AnimatablePtr> beginDirectHierarchyAnimation(
     const NodePtr& target, bool directDescendantsOnly,
-    const std::vector<AnimationPtr>& animations, int from, int to,
+    const std::vector<AnimationPtr>& animations, float from, float to,
     bool loop = false, float speedRatio = 1.f,
     const std::function<void()>& onAnimationEnd = nullptr);
 

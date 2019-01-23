@@ -87,7 +87,7 @@ VertexBuffer::VertexBuffer(
   unsigned int kind, bool updatable,
   const std::optional<bool>& postponeInternalCreation,
   std::optional<size_t> stride, const std::optional<bool>& instanced,
-  const std::optional<unsigned int>& offset, const std::optional<size_t>& size,
+  const std::optional<size_t>& offset, const std::optional<size_t>& size,
   std::optional<unsigned int> iType, bool iNormalized, bool useBytes)
     : instanceDivisor{this, &VertexBuffer::get_instanceDivisor,
                       &VertexBuffer::set_instanceDivisor}

@@ -2661,8 +2661,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
       && !json_util::is_null(parsedMesh["autoAnimate"])
       && json_util::get_bool(parsedMesh, "autoAnimate")) {
     scene->beginAnimation(
-      mesh, json_util::get_number(parsedMesh, "autoAnimateFrom", 0),
-      json_util::get_number(parsedMesh, "autoAnimateTo", 0),
+      mesh, json_util::get_number(parsedMesh, "autoAnimateFrom", 0.f),
+      json_util::get_number(parsedMesh, "autoAnimateTo", 0.f),
       json_util::get_bool(parsedMesh, "autoAnimateLoop", false),
       json_util::get_number(parsedMesh, "autoAnimateSpeed", 1.f));
   }
@@ -2736,8 +2736,8 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
             && json_util::get_bool(parsedMesh, "autoAnimate")) {
           scene->beginAnimation(
             instance,
-            json_util::get_number<int>(parsedMesh, "autoAnimateFrom", 0),
-            json_util::get_number<int>(parsedMesh, "autoAnimateTo", 0),
+            json_util::get_number(parsedMesh, "autoAnimateFrom", 0.f),
+            json_util::get_number(parsedMesh, "autoAnimateTo", 0.f),
             json_util::get_bool(parsedMesh, "autoAnimateLoop"),
             json_util::get_number<float>(parsedMesh, "autoAnimateSpeed", 1.0));
         }

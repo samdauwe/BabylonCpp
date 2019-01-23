@@ -19,7 +19,7 @@ public:
   int maximumScale;
 
 private:
-  int _currentScale;
+  float _currentScale;
 
 }; // end of class SceneOptimization
 
