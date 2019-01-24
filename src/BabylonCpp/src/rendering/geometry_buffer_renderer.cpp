@@ -251,7 +251,8 @@ void GeometryBufferRenderer::_createRenderTargets()
 void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 {
   auto mesh     = subMesh->getRenderingMesh();
-  auto engine   = _scene->getEngine();
+  auto scene    = _scene;
+  auto engine   = scene->getEngine();
   auto material = subMesh->getMaterial();
 
   if (!material) {
@@ -260,7 +261,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
   // Culling
   engine->setState(material->backFaceCulling(), 0, false,
-                   _scene->useRightHandedSystem());
+                   scene->useRightHandedSystem());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -278,8 +279,8 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     engine->enableEffect(_effect);
     mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
-    _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
-    _effect->setMatrix("view", _scene->getViewMatrix());
+    _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+    _effect->setMatrix("view", scene->getViewMatrix());
 
     // Alpha test
     if (material && material->needAlphaTesting()) {

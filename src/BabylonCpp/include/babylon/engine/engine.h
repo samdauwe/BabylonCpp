@@ -308,7 +308,7 @@ public:
    * the canvas.
    * @param level defines the level to use
    */
-  void setHardwareScalingLevel(float level);
+  void setHardwareScalingLevel(int level);
 
   /**
    * @brief Gets the current hardware scaling level.
@@ -318,7 +318,7 @@ public:
    * the canvas.
    * @returns a number indicating the current hardware scaling level
    */
-  float getHardwareScalingLevel() const;
+  int getHardwareScalingLevel() const;
 
   /**
    * @brief Gets the list of loaded textures.
@@ -2724,7 +2724,7 @@ private:
   std::function<void()> _onFullscreenChange;
   std::function<void()> _onPointerLockChange;
 
-  float _hardwareScalingLevel;
+  int _hardwareScalingLevel;
   bool _pointerLockRequested;
   bool _isStencilEnable;
   bool _colorWrite;

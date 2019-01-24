@@ -39,7 +39,7 @@ public:
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
 private:
-  high_res_time_point_t _startTime;
+  system_time_point_t _startTime;
   float _msFade;
   float _fadeLevel;
 

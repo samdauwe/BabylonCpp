@@ -145,8 +145,8 @@ protected:
    * is not looping
    * @param animations defines a group of animation to add to the new Animatable
    */
-  Animatable(Scene* scene, const IAnimatablePtr& target, float fromFrame = 0.f,
-             float toFrame = 100.f, bool loopAnimation = false,
+  Animatable(Scene* scene, const IAnimatablePtr& target, int fromFrame = 0,
+             int toFrame = 100, bool loopAnimation = false,
              float speedRatio                            = 1.f,
              const std::function<void()>& onAnimationEnd = nullptr,
              const std::vector<AnimationPtr>& animations = {});

@@ -187,7 +187,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
     = [this]() { onCanvasPointerOutObservable.notifyObservers(this); };
 
   // Viewport
-  _hardwareScalingLevel = options.adaptToDeviceRatio ? 1.f : 1.f;
+  _hardwareScalingLevel = options.adaptToDeviceRatio ? 1 : 1;
   resize();
 
   _isStencilEnable = options.stencil ? true : false;
@@ -585,13 +585,13 @@ std::optional<ClientRect> Engine::getRenderingCanvasClientRect()
   return _renderingCanvas->getBoundingClientRect();
 }
 
-void Engine::setHardwareScalingLevel(float level)
+void Engine::setHardwareScalingLevel(int level)
 {
   _hardwareScalingLevel = level;
   resize();
 }
 
-float Engine::getHardwareScalingLevel() const
+int Engine::getHardwareScalingLevel() const
 {
   return _hardwareScalingLevel;
 }
@@ -994,8 +994,7 @@ void Engine::resize()
   if (!_vrDisplayEnabled) {
     const int width  = _renderingCanvas ? _renderingCanvas->clientWidth : 0;
     const int height = _renderingCanvas ? _renderingCanvas->clientHeight : 0;
-    setSize(static_cast<int>(width / _hardwareScalingLevel),
-            static_cast<int>(height / _hardwareScalingLevel));
+    setSize(width / _hardwareScalingLevel, height / _hardwareScalingLevel);
   }
 }
 
@@ -1084,8 +1083,7 @@ void Engine::bindFramebuffer(const InternalTexturePtr& texture,
     if (!requiredHeight) {
       requiredHeight = texture->height;
       if (lodLevel) {
-        requiredHeight
-          = static_cast<int>(*requiredHeight / std::pow(2, lodLevel));
+        requiredHeight = *requiredHeight / std::pow(2, lodLevel);
       }
     }
 
@@ -1402,12 +1400,14 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices,
   }
 
   if (need32Bits) {
-    Uint32Array arrayBuffer = stl_util::to_array<uint32_t>(indices);
+    Uint32Array arrayBuffer;
+    arrayBuffer.assign(indices.begin(), indices.end());
     _gl->bufferData(GL::ELEMENT_ARRAY_BUFFER, arrayBuffer,
                     updatable ? GL::DYNAMIC_DRAW : GL::STATIC_DRAW);
   }
   else {
-    Uint16Array arrayBuffer = stl_util::to_array<uint16_t>(indices);
+    Uint16Array arrayBuffer;
+    arrayBuffer.assign(indices.begin(), indices.end());
     _gl->bufferData(GL::ELEMENT_ARRAY_BUFFER, arrayBuffer,
                     updatable ? GL::DYNAMIC_DRAW : GL::STATIC_DRAW);
   }

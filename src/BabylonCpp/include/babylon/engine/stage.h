@@ -140,7 +140,7 @@ public:
                     const T& action)
   {
     size_t i        = 0;
-    size_t maxIndex = (std::numeric_limits<size_t>::max)();
+    size_t maxIndex = std::numeric_limits<size_t>::max();
     for (; i < _steps.size(); ++i) {
       const auto& step = _steps[i];
       maxIndex         = step.index;

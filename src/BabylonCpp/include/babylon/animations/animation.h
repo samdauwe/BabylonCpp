@@ -250,7 +250,7 @@ public:
    */
   static AnimationPtr
   _PrepareAnimation(const std::string& name, const std::string& targetProperty,
-                    size_t framePerSecond, float totalFrame,
+                    size_t framePerSecond, int totalFrame,
                     const AnimationValue& from, const AnimationValue& to,
                     unsigned int loopMode
                     = Animation::ANIMATIONLOOPMODE_CYCLE(),
@@ -287,7 +287,7 @@ public:
    */
   static AnimatablePtr CreateAndStartAnimation(
     const std::string& name, const NodePtr& node,
-    const std::string& targetProperty, size_t framePerSecond, float totalFrame,
+    const std::string& targetProperty, size_t framePerSecond, int totalFrame,
     const AnimationValue& from, const AnimationValue& to,
     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
     const IEasingFunctionPtr& easingFunction    = nullptr,
@@ -316,7 +316,7 @@ public:
    */
   static std::vector<AnimatablePtr> CreateAndStartHierarchyAnimation(
     const std::string& name, const NodePtr& node, bool directDescendantsOnly,
-    const std::string& targetProperty, size_t framePerSecond, float totalFrame,
+    const std::string& targetProperty, size_t framePerSecond, int totalFrame,
     const AnimationValue& from, const AnimationValue& to,
     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
     const IEasingFunctionPtr& easingFunction    = nullptr,
@@ -340,7 +340,7 @@ public:
    */
   static AnimatablePtr CreateMergeAndStartAnimation(
     const std::string& name, const NodePtr& node,
-    const std::string& targetProperty, size_t framePerSecond, float totalFrame,
+    const std::string& targetProperty, size_t framePerSecond, int totalFrame,
     const AnimationValue& from, const AnimationValue& to,
     unsigned int loopMode = Animation::ANIMATIONLOOPMODE_CYCLE(),
     const IEasingFunctionPtr& easingFunction    = nullptr,

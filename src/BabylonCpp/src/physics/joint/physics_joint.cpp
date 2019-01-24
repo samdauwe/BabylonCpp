@@ -32,9 +32,9 @@ void PhysicsJoint::set_physicsJoint(PhysicsJoint* const& newJoint)
   _physicsJoint = newJoint;
 }
 
-void PhysicsJoint::set_physicsPlugin(IPhysicsEnginePlugin* const& iPhysicsPlugin)
+void PhysicsJoint::set_physicsPlugin(IPhysicsEnginePlugin* const& physicsPlugin)
 {
-  _physicsPlugin = iPhysicsPlugin;
+  _physicsPlugin = physicsPlugin;
 }
 
 void PhysicsJoint::executeNativeFunction(

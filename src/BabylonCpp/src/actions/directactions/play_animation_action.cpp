@@ -11,7 +11,7 @@ namespace BABYLON {
 
 PlayAnimationAction::PlayAnimationAction(unsigned int triggerOptions,
                                          const IAnimatablePtr& target,
-                                         float iFrom, float iTo, bool iLoop,
+                                         int iFrom, int iTo, bool iLoop,
                                          Condition* condition)
     : Action(triggerOptions, condition)
     , from{iFrom}

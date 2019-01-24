@@ -212,11 +212,11 @@ public:
                unsigned int kind, bool updatable,
                const std::optional<bool>& postponeInternalCreation
                = std::nullopt,
-               std::optional<size_t> stride         = std::nullopt,
-               const std::optional<bool>& instanced = std::nullopt,
-               const std::optional<size_t>& offset  = std::nullopt,
-               const std::optional<size_t>& size    = std::nullopt,
-               std::optional<unsigned int> type     = std::nullopt,
+               std::optional<size_t> stride              = std::nullopt,
+               const std::optional<bool>& instanced      = std::nullopt,
+               const std::optional<unsigned int>& offset = std::nullopt,
+               const std::optional<size_t>& size         = std::nullopt,
+               std::optional<unsigned int> type          = std::nullopt,
                bool normalized = false, bool useBytes = false);
   virtual ~VertexBuffer();
 

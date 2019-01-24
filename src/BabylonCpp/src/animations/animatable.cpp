@@ -9,15 +9,15 @@
 namespace BABYLON {
 
 Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget,
-                       float iFromFrame, float iToFrame, bool iLoopAnimation,
+                       int iFromFrame, int iToFrame, bool iLoopAnimation,
                        float iSpeedRatio,
                        const std::function<void()>& iOnAnimationEnd,
                        const std::vector<AnimationPtr>& animations)
     : target{iTarget}
     , disposeOnEnd{true}
     , animationStarted{false}
-    , fromFrame{static_cast<int>(iFromFrame)}
-    , toFrame{static_cast<int>(iToFrame)}
+    , fromFrame{iFromFrame}
+    , toFrame{iToFrame}
     , loopAnimation{iLoopAnimation}
     , onAnimationEnd{iOnAnimationEnd}
     , syncRoot{this, &Animatable::get_syncRoot}

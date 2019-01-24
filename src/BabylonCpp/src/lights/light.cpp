@@ -394,8 +394,8 @@ LightPtr Light::Parse(const json& parsedLight, Scene* scene)
 
   if (json_util::has_key(parsedLight, "autoAnimate")) {
     scene->beginAnimation(
-      light, json_util::get_number(parsedLight, "autoAnimateFrom", 0.f),
-      json_util::get_number(parsedLight, "autoAnimateTo", 0.f),
+      light, json_util::get_number(parsedLight, "autoAnimateFrom", 0),
+      json_util::get_number(parsedLight, "autoAnimateTo", 0),
       json_util::get_bool(parsedLight, "autoAnimateLoop"),
       json_util::get_number(parsedLight, "autoAnimateSpeed", 1.f));
   }

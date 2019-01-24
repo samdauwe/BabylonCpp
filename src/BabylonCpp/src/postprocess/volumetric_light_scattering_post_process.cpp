@@ -270,14 +270,14 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
         material->bind(_mesh->getWorldMatrix(), _mesh.get());
       }
       else {
-        auto iMaterial = subMesh->getMaterial();
+        auto material = subMesh->getMaterial();
 
         _volumetricLightScatteringPass->setMatrix("viewProjection",
                                                   scene_->getTransformMatrix());
 
         // Alpha test
-        if (iMaterial && iMaterial->needAlphaTesting()) {
-          auto alphaTexture = iMaterial->getAlphaTestTexture();
+        if (material && material->needAlphaTesting()) {
+          auto alphaTexture = material->getAlphaTestTexture();
 
           _volumetricLightScatteringPass->setTexture("diffuseSampler",
                                                      alphaTexture);

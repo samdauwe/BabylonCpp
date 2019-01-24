@@ -1,8 +1,6 @@
 #ifndef BABYLON_CULLING_RAY_H
 #define BABYLON_CULLING_RAY_H
 
-#include <limits>
-
 #include <babylon/babylon_api.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
@@ -34,7 +32,7 @@ public:
    * @param length length of the ray
    */
   Ray(const Vector3& origin, const Vector3& direction,
-      float length = (std::numeric_limits<float>::max)());
+      float length = std::numeric_limits<float>::max());
   Ray(const Ray& otherRay);
   Ray(Ray&& otherRay);
   Ray& operator=(const Ray& otherRay);

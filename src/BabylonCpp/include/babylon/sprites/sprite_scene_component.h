@@ -2,7 +2,6 @@
 #define BABYLON_SPRITES_SPRITE_SCENE_COMPONENT_H
 
 #include <functional>
-#include <optional>
 
 #include <babylon/babylon_api.h>
 #include <babylon/engine/iscene_component.h>

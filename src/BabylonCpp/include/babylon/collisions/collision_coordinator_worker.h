@@ -57,7 +57,7 @@ private:
   Worker _worker;
   std::unordered_map<unsigned int, SerializedMesh> _addUpdateMeshesList;
   std::unordered_map<std::string, SerializedGeometry> _addUpdateGeometriesList;
-  std::vector<size_t> _toRemoveMeshesArray;
+  Uint32Array _toRemoveMeshesArray;
   std::vector<std::string> _toRemoveGeometryArray;
 
 }; // end of class CollisionCoordinatorWorker

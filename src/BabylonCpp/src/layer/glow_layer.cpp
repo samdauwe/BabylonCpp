@@ -169,13 +169,13 @@ void GlowLayer::_createTextureAndPostProcesses()
     });
 
   _verticalBlurPostprocess1 = BlurPostProcess::New(
-    "GlowLayerVBP1", Vector2(0.f, 1.f), _options.blurKernelSize / 2.f,
+    "GlowLayerVBP1", Vector2(0.f, 1.f), _options.blurKernelSize / 2,
     PostProcessOptions{blurTextureWidth, blurTextureHeight}, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     textureType);
 
   _horizontalBlurPostprocess2 = BlurPostProcess::New(
-    "GlowLayerHBP2", Vector2(1.f, 0.f), _options.blurKernelSize / 2.f,
+    "GlowLayerHBP2", Vector2(1.f, 0.f), _options.blurKernelSize / 2,
     PostProcessOptions{blurTextureWidth2, blurTextureHeight2}, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     textureType);
@@ -187,7 +187,7 @@ void GlowLayer::_createTextureAndPostProcesses()
     });
 
   _verticalBlurPostprocess2 = BlurPostProcess::New(
-    "GlowLayerVBP2", Vector2(0.f, 1.f), _options.blurKernelSize / 2.f,
+    "GlowLayerVBP2", Vector2(0.f, 1.f), _options.blurKernelSize / 2,
     PostProcessOptions{blurTextureWidth2, blurTextureHeight2}, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
     textureType);

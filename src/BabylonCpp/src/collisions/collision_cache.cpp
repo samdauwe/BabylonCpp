@@ -12,7 +12,7 @@ CollisionCache::~CollisionCache()
 {
 }
 
-std::unordered_map<size_t, SerializedMesh>& CollisionCache::getMeshes()
+std::unordered_map<unsigned int, SerializedMesh>& CollisionCache::getMeshes()
 {
   return _meshes;
 }
@@ -37,7 +37,7 @@ void CollisionCache::addMesh(const SerializedMesh& mesh)
   _meshes[mesh.uniqueId] = mesh;
 }
 
-void CollisionCache::removeMesh(size_t uniqueId)
+void CollisionCache::removeMesh(unsigned int uniqueId)
 {
   _meshes.erase(uniqueId);
 }

@@ -25,7 +25,7 @@ public:
    * @param condition defines the trigger related conditions
    */
   PlayAnimationAction(unsigned int triggerOptions, const IAnimatablePtr& target,
-                      float from, float to, bool loop = false,
+                      int from, int to, bool loop = false,
                       Condition* condition = nullptr);
   ~PlayAnimationAction() override;
 
@@ -50,12 +50,12 @@ public:
   /**
    * Where the animation should start (animation frame)
    */
-  float from;
+  int from;
 
   /**
    * Where the animation should stop (animation frame)
    */
-  float to;
+  int to;
 
   /**
    * Define if the animation should loop or stop after the first play.

@@ -132,7 +132,7 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
               originalScene->pickWithRay(*prePointerInfo->ray) :
               originalScene->pick(originalScene->pointerX(),
                                   originalScene->pointerY());
-        auto iPointerEvent = prePointerInfo->pointerEvent;
+        auto pointerEvent = prePointerInfo->pointerEvent;
 
         // If the layer can be occluded by the original scene, only fire pointer
         // events to the first layer that hit they ray
@@ -145,37 +145,37 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
                 && mainSceneTrackerPredicate((*originalScenePick).pickedMesh)) {
               // We touched an utility mesh present in the main scene
               _notifyObservers(*prePointerInfo, *originalScenePick,
-                               iPointerEvent);
+                               pointerEvent);
               prePointerInfo->skipOnPointerObservable = true;
             }
             else if (prePointerInfo->type == PointerEventTypes::POINTERDOWN) {
-              _pointerCaptures[iPointerEvent.pointerId] = true;
+              _pointerCaptures[pointerEvent.pointerId] = true;
             }
             else if (stl_util::contains(_lastPointerEvents,
-                                        iPointerEvent.pointerId)
-                     && _lastPointerEvents[iPointerEvent.pointerId]) {
+                                        pointerEvent.pointerId)
+                     && _lastPointerEvents[pointerEvent.pointerId]) {
               // We need to send a last pointerup to the utilityLayerScene to
               // make sure animations can complete
-              onPointerOutObservable.notifyObservers(&iPointerEvent.pointerId);
-              _lastPointerEvents.erase(iPointerEvent.pointerId);
+              onPointerOutObservable.notifyObservers(&pointerEvent.pointerId);
+              _lastPointerEvents.erase(pointerEvent.pointerId);
             }
           }
-          else if (stl_util::contains(_pointerCaptures, iPointerEvent.pointerId)
-                   && !_pointerCaptures[iPointerEvent.pointerId]
+          else if (stl_util::contains(_pointerCaptures, pointerEvent.pointerId)
+                   && !_pointerCaptures[pointerEvent.pointerId]
                    && ((*utilityScenePick).distance
                          < (*originalScenePick).distance
                        || (*originalScenePick).distance == 0.f)) {
             // We pick something in utility scene or the pick in utility is
             // closer than the one in main scene
-            _notifyObservers(*prePointerInfo, *utilityScenePick, iPointerEvent);
+            _notifyObservers(*prePointerInfo, *utilityScenePick, pointerEvent);
             // If a previous utility layer set this, do not unset this
             if (!prePointerInfo->skipOnPointerObservable) {
               prePointerInfo->skipOnPointerObservable
                 = (*utilityScenePick).distance > 0.f;
             }
           }
-          else if (stl_util::contains(_pointerCaptures, iPointerEvent.pointerId)
-                   && !_pointerCaptures[iPointerEvent.pointerId]
+          else if (stl_util::contains(_pointerCaptures, pointerEvent.pointerId)
+                   && !_pointerCaptures[pointerEvent.pointerId]
                    && ((*utilityScenePick).distance
                        > (*originalScenePick).distance)) {
             // We have a pick in both scenes but main is closer than utility
@@ -184,22 +184,22 @@ UtilityLayerRenderer::UtilityLayerRenderer(Scene* iOriginalScene)
             if (mainSceneTrackerPredicate
                 && mainSceneTrackerPredicate((*originalScenePick).pickedMesh)) {
               _notifyObservers(*prePointerInfo, *originalScenePick,
-                               iPointerEvent);
+                               pointerEvent);
               prePointerInfo->skipOnPointerObservable = true;
             }
             else if (stl_util::contains(_lastPointerEvents,
-                                        iPointerEvent.pointerId)) {
+                                        pointerEvent.pointerId)) {
               // We need to send a last pointerup to the utilityLayerScene to
               // make sure animations can complete
-              onPointerOutObservable.notifyObservers(&iPointerEvent.pointerId);
-              _lastPointerEvents.erase(iPointerEvent.pointerId);
+              onPointerOutObservable.notifyObservers(&pointerEvent.pointerId);
+              _lastPointerEvents.erase(pointerEvent.pointerId);
             }
           }
 
           if (prePointerInfo->type == PointerEventTypes::POINTERUP
-              && stl_util::contains(_pointerCaptures, iPointerEvent.pointerId)
-              && _pointerCaptures[iPointerEvent.pointerId]) {
-            _pointerCaptures[iPointerEvent.pointerId] = false;
+              && stl_util::contains(_pointerCaptures, pointerEvent.pointerId)
+              && _pointerCaptures[pointerEvent.pointerId]) {
+            _pointerCaptures[pointerEvent.pointerId] = false;
           }
         }
       }

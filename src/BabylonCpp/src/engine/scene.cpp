@@ -1937,7 +1937,7 @@ std::vector<AnimationPtr> Scene::getAnimations()
 }
 
 AnimatablePtr Scene::beginWeightedAnimation(
-  const IAnimatablePtr& target, float from, float to, float weight, bool loop,
+  const IAnimatablePtr& target, int from, int to, float weight, bool loop,
   float speedRatio, const std::function<void()>& onAnimationEnd,
   AnimatablePtr animatable,
   const std::function<bool(IAnimatable* target)>& targetMask)
@@ -1951,10 +1951,9 @@ AnimatablePtr Scene::beginWeightedAnimation(
 }
 
 AnimatablePtr Scene::beginAnimation(
-  const IAnimatablePtr& target, float from, float to, bool loop,
-  float speedRatio, const std::function<void()>& onAnimationEnd,
-  AnimatablePtr animatable, bool stopCurrent,
-  const std::function<bool(IAnimatable* target)>& targetMask)
+  const IAnimatablePtr& target, int from, int to, bool loop, float speedRatio,
+  const std::function<void()>& onAnimationEnd, AnimatablePtr animatable,
+  bool stopCurrent, const std::function<bool(IAnimatable* target)>& targetMask)
 {
   if (from > to && speedRatio > 0.f) {
     speedRatio *= -1.f;
@@ -2013,17 +2012,19 @@ Scene::beginDirectAnimation(const IAnimatablePtr& target,
 
 std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
   const NodePtr& target, bool directDescendantsOnly,
-  const std::vector<AnimationPtr>& iAnimations, float from, float to, bool loop,
+  const std::vector<AnimationPtr>& iAnimations, int from, int to, bool loop,
   float speedRatio, const std::function<void()>& onAnimationEnd)
 {
   auto children = target->getDescendants(directDescendantsOnly);
 
   std::vector<AnimatablePtr> result;
-  result.emplace_back(beginDirectAnimation(target, iAnimations, from, to, loop,
-                                           speedRatio, onAnimationEnd));
+  result.emplace_back(beginDirectAnimation(
+    target, iAnimations, static_cast<float>(from), static_cast<float>(to), loop,
+    speedRatio, onAnimationEnd));
   for (auto& child : children) {
-    result.emplace_back(beginDirectAnimation(child, iAnimations, from, to, loop,
-                                             speedRatio, onAnimationEnd));
+    result.emplace_back(beginDirectAnimation(
+      child, iAnimations, static_cast<float>(from), static_cast<float>(to),
+      loop, speedRatio, onAnimationEnd));
   }
 
   return result;

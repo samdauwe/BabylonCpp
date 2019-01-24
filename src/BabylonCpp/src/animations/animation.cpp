@@ -37,7 +37,7 @@ bool Animation::AllowMatrixDecomposeForInterpolation()
 
 AnimationPtr Animation::_PrepareAnimation(
   const std::string& name, const std::string& targetProperty,
-  size_t framePerSecond, float totalFrame, const AnimationValue& from,
+  size_t framePerSecond, int totalFrame, const AnimationValue& from,
   const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction)
 {
@@ -52,7 +52,7 @@ AnimationPtr Animation::_PrepareAnimation(
 
   animation->setKeys({
     IAnimationKey(0.f, from),
-    IAnimationKey(totalFrame, to),
+    IAnimationKey(static_cast<float>(totalFrame), to),
   });
 
   if (easingFunction != nullptr) {
@@ -78,7 +78,7 @@ Animation::CreateAnimation(const std::string& property, int animationType,
 
 AnimatablePtr Animation::CreateAndStartAnimation(
   const std::string& name, const NodePtr& node,
-  const std::string& targetProperty, size_t framePerSecond, float totalFrame,
+  const std::string& targetProperty, size_t framePerSecond, int totalFrame,
   const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
   const std::function<void()>& onAnimationEnd)
@@ -99,7 +99,7 @@ AnimatablePtr Animation::CreateAndStartAnimation(
 
 std::vector<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
   const std::string& name, const NodePtr& node, bool directDescendantsOnly,
-  const std::string& targetProperty, size_t framePerSecond, float totalFrame,
+  const std::string& targetProperty, size_t framePerSecond, int totalFrame,
   const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
   const std::function<void()>& onAnimationEnd)
@@ -120,7 +120,7 @@ std::vector<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
 
 AnimatablePtr Animation::CreateMergeAndStartAnimation(
   const std::string& name, const NodePtr& node,
-  const std::string& targetProperty, size_t framePerSecond, float totalFrame,
+  const std::string& targetProperty, size_t framePerSecond, int totalFrame,
   const AnimationValue& from, const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction,
   const std::function<void()>& onAnimationEnd)
@@ -136,7 +136,7 @@ AnimatablePtr Animation::CreateMergeAndStartAnimation(
   node->animations.emplace_back(animation);
 
   return node->getScene()->beginAnimation(
-    node, 0.f, totalFrame, (animation->loopMode == 1), 1.f, onAnimationEnd);
+    node, 0, totalFrame, (animation->loopMode == 1), 1.f, onAnimationEnd);
 }
 
 Animatable* Animation::TransitionTo(

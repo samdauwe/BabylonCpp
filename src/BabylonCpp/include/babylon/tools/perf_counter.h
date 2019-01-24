@@ -1,16 +1,6 @@
 #ifndef BABYLON_TOOLS_PERF_COUNTER_H
 #define BABYLON_TOOLS_PERF_COUNTER_H
 
-#if _WIN32
-#define NOMINMAX
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
-#endif
-
 #include <babylon/babylon_api.h>
 #include <babylon/core/time.h>
 
