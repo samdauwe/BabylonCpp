@@ -164,7 +164,7 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
   }
   else {
     path        = targetPropertyPath[0];
-    destination = iTarget;
+    destination = target;
   }
 
   _targetPath   = path;
