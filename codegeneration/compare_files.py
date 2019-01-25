@@ -71,7 +71,7 @@ def main():
         "3.3.0"         : "3.3.0_2018_10_02",
     }
     # List containing the files to ignore
-    whiteList = ["babylon.nullEngine.ts", "babylon.khronosTextureContainer.ts",
+    whiteList = ["babylon.nullEngine.ts", "babylon.cannonJSPlugin.ts",
                  "babylon.assetsManager.ts", "babylon.virtualJoystick.ts",
                  "babylon.decorators.ts", "babylon.andOrNotEvaluator.ts",
                  "babylon.dracoCompression.ts", "babylon.vrExperienceHelper.ts",
@@ -86,7 +86,7 @@ def main():
                  "babylon.sound.ts", "babylon.ktxTextureLoader.ts",
                  "babylon.tgaTextureLoader.ts", "babylon.videoRecorder.ts",
                  "babylon.weightedsound.ts", "babylon.audioEngine.ts",
-                 "babylon.soundtrack.ts", "babylon.cannonJSPlugin.ts"]
+                 "babylon.soundtrack.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         modules = {
