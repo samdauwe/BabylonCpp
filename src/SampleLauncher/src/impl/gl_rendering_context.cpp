@@ -1055,18 +1055,20 @@ void GLRenderingContext::texImage2D(GLenum target, GLint level,
 }
 
 void GLRenderingContext::texImage2D(GLenum /*target*/, GLint /*level*/,
-                                    GLenum /*internalformat*/,
-                                    GLenum /*format*/, GLenum /*type*/,
-                                    ICanvas* /*pixels*/)
+                                    GLint /*internalformat*/, GLenum /*format*/,
+                                    GLenum /*type*/, ICanvas* /*pixels*/)
 {
 }
 
-void GLRenderingContext::texImage2D(GLenum /*target*/, GLint /*level*/,
-                                    GLenum /*internalformat*/,
-                                    GLsizei /*width*/, GLsizei /*height*/,
-                                    GLsizei /*border*/, GLenum /*format*/,
-                                    GLenum /*type*/, ICanvas* /*pixels*/)
+void GLRenderingContext::texImage2D(GLenum target, GLint level,
+                                    GLint internalformat, GLsizei width,
+                                    GLsizei height, GLsizei border,
+                                    GLenum format, GLenum type, ICanvas* pixels)
 {
+  if (!pixels) {
+    glTexImage2D(target, level, internalformat, width, height, border, format,
+                 type, nullptr);
+  }
 }
 
 void GLRenderingContext::texImage3D(GLenum target, GLint level,

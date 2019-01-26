@@ -3348,7 +3348,7 @@ InternalTexturePtr
 Engine::createDepthStencilTexture(const std::variant<int, ISize>& size,
                                   const DepthTextureCreationOptions& options)
 {
-  if (options.isCube) {
+  if (options.isCube.has_value() && *options.isCube) {
     auto width = std::holds_alternative<int>(size) ?
                    std::get<int>(size) :
                    std::get<ISize>(size).width;
@@ -3372,13 +3372,14 @@ Engine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
     return internalTexture;
   }
 
-  auto internalOptions = options;
-  internalOptions.bilinearFiltering
-    = options.bilinearFiltering ? *options.bilinearFiltering : false;
+  auto internalOptions              = options;
+  internalOptions.bilinearFiltering = options.bilinearFiltering.has_value() ?
+                                        *options.bilinearFiltering :
+                                        false;
   internalOptions.comparisonFunction
-    = options.comparisonFunction ? *options.comparisonFunction : 0;
+    = options.comparisonFunction.has_value() ? *options.comparisonFunction : 0;
   internalOptions.generateStencil
-    = options.generateStencil ? *options.generateStencil : false;
+    = options.generateStencil.has_value() ? *options.generateStencil : false;
 
   _bindTextureDirectly(GL::TEXTURE_2D, internalTexture, true);
 
@@ -3387,7 +3388,8 @@ Engine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
     *internalOptions.bilinearFiltering, *internalOptions.comparisonFunction);
 
   if (webGLVersion() > 1.f) {
-    if (internalOptions.generateStencil) {
+    if (internalOptions.generateStencil.has_value()
+        && *internalOptions.generateStencil) {
       _gl->texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH24_STENCIL8,
                       internalTexture->width, internalTexture->height, 0,
                       GL::DEPTH_STENCIL, GL::UNSIGNED_INT_24_8, nullptr);
@@ -3399,7 +3401,8 @@ Engine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
     }
   }
   else {
-    if (internalOptions.generateStencil) {
+    if (internalOptions.generateStencil.has_value()
+        && *internalOptions.generateStencil) {
       _gl->texImage2D(GL::TEXTURE_2D, 0, GL::DEPTH_STENCIL,
                       internalTexture->width, internalTexture->height, 0,
                       GL::DEPTH_STENCIL, GL::UNSIGNED_INT_24_8, nullptr);

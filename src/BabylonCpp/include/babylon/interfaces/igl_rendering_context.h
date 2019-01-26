@@ -2007,7 +2007,7 @@ public:
    * @param type A GLenum specifying the data type of the texel data.
    * @param pixels An ICanvas pixel source for the texture.
    */
-  virtual void texImage2D(GLenum target, GLint level, GLenum internalformat,
+  virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
                           GLenum format, GLenum type, ICanvas* pixels)
     = 0;
 
@@ -2026,7 +2026,7 @@ public:
    * @param type A GLenum specifying the data type of the texel data.
    * @param pixels An ICanvas pixel source for the texture.
    */
-  virtual void texImage2D(GLenum target, GLint level, GLenum internalformat,
+  virtual void texImage2D(GLenum target, GLint level, GLint internalformat,
                           GLsizei width, GLsizei height, GLsizei border,
                           GLenum format, GLenum type, ICanvas* pixels)
     = 0;

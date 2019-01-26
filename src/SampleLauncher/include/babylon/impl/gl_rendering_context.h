@@ -204,9 +204,9 @@ public:
   void texImage2D(GLenum target, GLint level, GLint internalformat,
                   GLsizei width, GLsizei height, GLint border, GLenum format,
                   GLenum type, const Uint8Array& pixels) override;
-  void texImage2D(GLenum target, GLint level, GLenum internalformat,
+  void texImage2D(GLenum target, GLint level, GLint internalformat,
                   GLenum format, GLenum type, ICanvas* pixels) override;
-  void texImage2D(GLenum target, GLint level, GLenum internalformat,
+  void texImage2D(GLenum target, GLint level, GLint internalformat,
                   GLsizei width, GLsizei height, GLsizei border, GLenum format,
                   GLenum type, ICanvas* pixels) override;
   void texImage3D(GLenum target, GLint level, GLint internalformat,
