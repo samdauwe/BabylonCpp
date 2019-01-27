@@ -32,7 +32,7 @@ public:
    * @param length length of the ray
    */
   Ray(const Vector3& origin, const Vector3& direction,
-      float length = std::numeric_limits<float>::max());
+      float length = (std::numeric_limits<float>::max)());
   Ray(const Ray& otherRay);
   Ray(Ray&& otherRay);
   Ray& operator=(const Ray& otherRay);
