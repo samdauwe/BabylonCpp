@@ -1,7 +1,9 @@
 #ifndef BABYLON_CORE_LOGGING_LOGGER_H
 #define BABYLON_CORE_LOGGING_LOGGER_H
 
-#include <babylon/core/active.h>
+#include <algorithm>
+#include <unordered_map>
+
 #include <babylon/core/delegates/delegate.h>
 #include <babylon/core/logging/log_levels.h>
 #include <babylon/core/logging/log_message.h>
@@ -33,7 +35,6 @@ struct LogMessageHandler {
 
   std::unordered_map<unsigned int, std::vector<LogMessageListener*>>
     _logMessageListeners;
-  std::unique_ptr<Active> _bg;
   unsigned int _minLevel, _maxLevel;
 };
 
@@ -93,7 +94,7 @@ private:
       = BABYLON::Logger::CreateMessage(level, _ctx.str(), __FILE__, __LINE__,  \
                                        __FUNCTION__, __PRETTY_FUNCTION__);     \
     _logMessage.write(__VA_ARGS__);                                            \
-    BABYLON::Logger::Instance().log(std::move(_logMessage));                 \
+    BABYLON::Logger::Instance().log(std::move(_logMessage));                   \
   }
 
 #define BABYLON_LOGF_MSG(level, context, printf_like_message, ...)             \
@@ -104,7 +105,7 @@ private:
       = BABYLON::Logger::CreateMessage(level, _ctx.str(), __FILE__, __LINE__,  \
                                        __FUNCTION__, __PRETTY_FUNCTION__);     \
     _logMessage.writef(printf_like_message, __VA_ARGS__);                      \
-    BABYLON::Logger::Instance().log(std::move(_logMessage));                 \
+    BABYLON::Logger::Instance().log(std::move(_logMessage));                   \
   }
 
 // -- Default API syntax with variadic input parameters --

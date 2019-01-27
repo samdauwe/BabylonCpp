@@ -3432,13 +3432,14 @@ InternalTexturePtr Engine::_createDepthStencilCubeTexture(
     return internalTexture;
   }
 
-  auto internalOptions = options;
-  internalOptions.bilinearFiltering
-    = options.bilinearFiltering ? *options.bilinearFiltering : false;
+  auto internalOptions              = options;
+  internalOptions.bilinearFiltering = options.bilinearFiltering.has_value() ?
+                                        *options.bilinearFiltering :
+                                        false;
   internalOptions.comparisonFunction
-    = options.comparisonFunction ? *options.comparisonFunction : 0;
+    = options.comparisonFunction.has_value() ? *options.comparisonFunction : 0;
   internalOptions.generateStencil
-    = options.generateStencil ? *options.generateStencil : false;
+    = options.generateStencil.has_value() ? *options.generateStencil : false;
 
   _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, internalTexture, true);
 
@@ -3448,7 +3449,8 @@ InternalTexturePtr Engine::_createDepthStencilCubeTexture(
 
   // Create the depth/stencil buffer
   for (unsigned int face = 0; face < 6; ++face) {
-    if (internalOptions.generateStencil) {
+    if (internalOptions.generateStencil.has_value()
+        && *internalOptions.generateStencil) {
       _gl->texImage2D(GL::TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,
                       GL::DEPTH24_STENCIL8, size, size, 0, GL::DEPTH_STENCIL,
                       GL::UNSIGNED_INT_24_8, nullptr);

@@ -31,8 +31,15 @@ LogMessage::LogMessage(const LogMessage& otherLogMessage)
 }
 
 LogMessage::LogMessage(LogMessage&& otherLogMessage)
+    : _level{std::move(otherLogMessage._level)}
+    , _timestamp{std::move(otherLogMessage._timestamp)}
+    , _file{std::move(otherLogMessage._file)}
+    , _lineNumber{std::move(otherLogMessage._lineNumber)}
+    , _threadId{std::move(otherLogMessage._threadId)}
+    , _context{std::move(otherLogMessage._context)}
+    , _function{std::move(otherLogMessage._function)}
+    , _prettyFunction{std::move(otherLogMessage._prettyFunction)}
 {
-  *this = std::move(otherLogMessage);
 }
 
 LogMessage& LogMessage::operator=(const LogMessage& otherLogMessage)

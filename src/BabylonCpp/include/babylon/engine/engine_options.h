@@ -6,7 +6,7 @@
 namespace BABYLON {
 
 /**
- * Interface defining initialization parameters for Engine class
+ * @brief Interface defining initialization parameters for Engine class.
  */
 struct BABYLON_SHARED_EXPORT EngineOptions {
   /**
@@ -29,7 +29,7 @@ struct BABYLON_SHARED_EXPORT EngineOptions {
    * @see http://doc.babylonjs.com/how_to/webvr_camera
    */
   bool autoEnableWebVR       = false;
-  bool preserveDrawingBuffer = false;
+  bool preserveDrawingBuffer = true;
   bool stencil               = true;
   /**
    * Defines if webgl2 should be turned off even if supported
