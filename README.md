@@ -95,10 +95,15 @@ This code results in the following scene:
 ![Basic scene](assets/screenshots/basic_scene.png?raw=true "Basic scene")
 
 # Examples
-
 Example scenes can be found on the [samples](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) page.
 
-# Development Roadmap
+# Status
+The master branch code is in sync with the last released version [Babylon.js 3.3.0](https://doc.babylonjs.com/whats-new).
+
+The [example scenes](https://github.com/samdauwe/BabylonCpp/tree/master/src/Samples) give a good overview which features are currenlty ported and working.
+
+Known issues are summarized [here](https://github.com/samdauwe/BabylonCpp/issues).
+
 A summary of the development roadmap can be found on [this page](https://github.com/samdauwe/BabylonCpp/wiki/Roadmap).
 
 # Dependencies
