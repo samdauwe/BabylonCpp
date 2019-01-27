@@ -3,19 +3,13 @@
 #---------------------------------#
 
 # Version format
-version: 3.1.{build}
+version: 3.3.{build}
 
 # Branches to build
 branches:
   # whitelist
   only:
     - master
-
-# Do not build on tags (GitHub and BitBucket)
-skip_tags: true
-
-# Start builds on tags only (GitHub and BitBucket)
-skip_non_tags: true
 
 #---------------------------------#
 #    Environment configuration    #
