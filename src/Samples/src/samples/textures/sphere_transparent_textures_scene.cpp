@@ -28,7 +28,7 @@ void SphereTransparentTexturesScene::initializeScene(ICanvas* canvas,
                                                      Scene* scene)
 {
   auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, 3 * Math::PI / 8.f,
-                                     5, Vector3::Zero(), scene);
+                                     5.f, Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   // Light direction is up and left

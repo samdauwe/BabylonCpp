@@ -29,8 +29,8 @@ void EquirectangularMapAsReflectionTextureScene::initializeScene(
   ICanvas* canvas, Scene* scene)
 {
   // This creates and positions a free camera (non-mesh)
-  auto camera
-    = ArcRotateCamera::New("camera1", 0, Math::PI_4, 6, Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("camera1", 0.f, Math::PI_4, 6.f,
+                                     Vector3::Zero(), scene);
 
   // This targets the camera to scene origin
   camera->setTarget(Vector3::Zero());

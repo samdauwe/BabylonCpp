@@ -31,8 +31,8 @@ const char* ShapeEasingsScene::getName()
 void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
-  _camera = ArcRotateCamera::New("camera1", -Math::PI_2, 1.2f, 25,
-                                 Vector3(0, 1, 0), scene);
+  _camera = ArcRotateCamera::New("camera1", -Math::PI_2, 1.2f, 25.f,
+                                 Vector3(0.f, 1.f, 0.f), scene);
   _camera->setPosition(Vector3(0.f, 15.f, -30.f));
   _camera->attachControl(canvas, true);
 

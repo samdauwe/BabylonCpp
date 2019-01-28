@@ -28,7 +28,7 @@ const char* AirplaneModelScene::getName()
 
 void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 12,
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 12.f,
                                      Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
   camera->setPosition(Vector3(0.f, 0.f, -200.f));
@@ -41,7 +41,7 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   light2->intensity   = 0.2f;
 
   auto spot       = SpotLight::New("spot", Vector3(25.f, 15.f, -10.f),
-                             Vector3(-1.f, -0.8f, 1.f), 15, 1, scene);
+                             Vector3(-1.f, -0.8f, 1.f), 15.f, 1.f, scene);
   spot->diffuse   = Color3(1.f, 1.f, 1.f);
   spot->specular  = Color3(0.f, 0.f, 0.f);
   spot->intensity = 0.1f;

@@ -36,7 +36,7 @@ const char* ShaderMaterialStarNestScene::getName()
 void ShaderMaterialStarNestScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a FreeCamera, and set its position to (x:0, y:0, z:-10)
-  auto camera = FreeCamera::New("camera1", Vector3(0, 0, -8), scene);
+  auto camera = FreeCamera::New("camera1", Vector3(0.f, 0.f, -8.f), scene);
 
   // Target the camera to scene origin
   camera->setTarget(Vector3::Zero());
@@ -45,7 +45,7 @@ void ShaderMaterialStarNestScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Create a basic light, aiming 0,1,0 - meaning, to the sky
-  HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
+  HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);
 
   // Create a built-in "box" shape
   const float ratio = static_cast<float>(getEngine()->getRenderWidth())

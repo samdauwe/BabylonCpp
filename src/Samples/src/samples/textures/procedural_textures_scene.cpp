@@ -142,8 +142,8 @@ void ProceduralTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
   };
 
   // Ok, enough helpers, let the building start
-  _camera = ArcRotateCamera::New("Camera", 1, 1.2f, 25, Vector3(10.f, 0.f, 0.f),
-                                 scene);
+  _camera                 = ArcRotateCamera::New("Camera", 1.f, 1.2f, 25.f,
+                                 Vector3(10.f, 0.f, 0.f), scene);
   _camera->upperBetaLimit = 1.2f;
   _camera->attachControl(canvas, false);
 

@@ -521,7 +521,7 @@ public:
    * @returns the animatable object created for this animation
    */
   AnimatablePtr
-  beginAnimation(const IAnimatablePtr& target, int from, int to,
+  beginAnimation(const IAnimatablePtr& target, float from, float to,
                  bool loop = false, float speedRatio = 1.f,
                  const std::function<void()>& onAnimationEnd = nullptr,
                  AnimatablePtr animatable = nullptr, bool stopCurrent = true,

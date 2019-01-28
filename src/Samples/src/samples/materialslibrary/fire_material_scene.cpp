@@ -42,13 +42,13 @@ const char* FireMaterialScene::getName()
 void FireMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Camera
-  auto camera = ArcRotateCamera::New("Camera", 3.f * Math::PI_2, Math::PI_4, 30,
-                                     Vector3(0.f, 4.f, 0.f), scene);
+  auto camera = ArcRotateCamera::New("Camera", 3.f * Math::PI_2, Math::PI_4,
+                                     30.f, Vector3(0.f, 4.f, 0.f), scene);
   camera->attachControl(canvas, true);
 
   // Light
   auto light = SpotLight::New("light", Vector3(8.f, 16.f, 8.f),
-                              Vector3(-1.f, -2.f, -1.f), 3, 1, scene);
+                              Vector3(-1.f, -2.f, -1.f), 3.f, 1.f, scene);
   if (_renderWithShadows) {
     _shadowGenerator = ShadowGenerator::New(512, light);
     _shadowGenerator->useBlurExponentialShadowMap = true;
@@ -74,8 +74,8 @@ void FireMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 
     previous = rand;
 
-    keys.emplace_back(IAnimationKey(i,                   // frame
-                                    AnimationValue(rand) // value
+    keys.emplace_back(IAnimationKey(static_cast<float>(i), // frame
+                                    AnimationValue(rand)   // value
                                     ));
   }
 
@@ -85,7 +85,7 @@ void FireMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   anim->setKeys(keys);
 
   light2->animations.emplace_back(anim);
-  scene->beginAnimation(light2, 0, static_cast<int>(keys.size()), true, 8);
+  scene->beginAnimation(light2, 0.f, static_cast<float>(keys.size()), true, 8);
 
   // Skybox
   auto skybox                     = Mesh::CreateBox("skyBox", 300.f, scene);

@@ -27,7 +27,7 @@ const char* OpacityTextureScene::getName()
 void OpacityTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Camera
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 5,
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 5.f,
                                      Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 

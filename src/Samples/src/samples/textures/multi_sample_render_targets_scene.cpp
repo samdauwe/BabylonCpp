@@ -28,7 +28,7 @@ void MultiSampleRenderTargetsScene::initializeScene(ICanvas* canvas,
                                                     Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
 
   camera->setPosition(Vector3(0.f, 5.f, -10.f));
   camera->attachControl(canvas, true);
@@ -45,7 +45,7 @@ void MultiSampleRenderTargetsScene::initializeScene(ICanvas* canvas,
   auto mirror            = Mesh::CreateBox("Mirror", 1.0, scene);
   mirror->scaling        = Vector3(100.f, 0.01f, 100.f);
   auto mirrorMaterial    = StandardMaterial::New("mirror", scene);
-  auto reflectionTexture = MirrorTexture::New("mirror", 512, scene, true);
+  auto reflectionTexture = MirrorTexture::New("mirror", 512.f, scene, true);
   reflectionTexture->mirrorPlane    = Plane(0.f, -1.f, 0.f, -2.f);
   reflectionTexture->renderList     = {knot.get()};
   reflectionTexture->level          = 1.f;

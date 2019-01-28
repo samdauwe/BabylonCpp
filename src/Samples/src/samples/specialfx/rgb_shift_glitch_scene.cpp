@@ -67,14 +67,15 @@ void RGBShiftGlitchScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Create Dawn Bringer postprocess
   _postEffect = PostProcess::New("rgbGlitchEffect", "rgbGlitchEffect",
                                  {"time", "screenSize"},
-                                 {"noiseRef0", "noiseRef1"}, 1, _camera);
+                                 {"noiseRef0", "noiseRef1"}, 1.f, _camera);
 
   _noiseTexture0 = Texture::New("./textures/grass.jpg", scene);
   _noiseTexture1 = Texture::New("./textures/ground.jpg", scene);
 
   _postEffect->onApply = [this](Effect* effect, EventState& /*es*/) {
     effect->setVector2("screenSize",
-                       Vector2(_postEffect->width, _postEffect->height));
+                       Vector2(static_cast<float>(_postEffect->width),
+                               static_cast<float>(_postEffect->height)));
     effect->setFloat("time", _time);
     effect->setTexture("noiseRef0", _noiseTexture0);
     effect->setTexture("noiseRef1", _noiseTexture1);

@@ -34,7 +34,7 @@ void CircleCurvesFromBeziersScene::initializeScene(ICanvas* canvas,
   camera->attachControl(canvas, true);
 
   // Create a basic light, aiming 0,1,0 - meaning, to the sky
-  auto light = HemisphericLight::New("Light", Vector3(0, 1, 0), scene);
+  auto light = HemisphericLight::New("Light", Vector3(0.f, 1.f, 0.f), scene);
 
   // Default intensity is 1. Let's dim the light a small amount
   light->intensity = 0.98f;

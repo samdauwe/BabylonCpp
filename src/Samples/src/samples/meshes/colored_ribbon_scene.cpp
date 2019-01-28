@@ -35,12 +35,12 @@ void ColoredRibbonScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create camera and lights
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 0, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3::Zero(), scene);
   camera->wheelPrecision = 10.0;
   camera->setPosition(Vector3(0.f, 50.f, -50.f));
   camera->attachControl(canvas, true);
 
-  auto light = HemisphericLight::New("light1", Vector3(0.0, 1.0, 0.0), scene);
+  auto light = HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);
   light->intensity   = 0.75f;
   light->groundColor = Color3::Gray();
   light->specular    = Color3::Black();

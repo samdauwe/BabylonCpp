@@ -30,7 +30,7 @@ const char* RealtimeRefractionScene::getName()
 void RealtimeRefractionScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
 
   camera->setPosition(Vector3(0.f, 5.f, -10.f));
   camera->attachControl(canvas, true);

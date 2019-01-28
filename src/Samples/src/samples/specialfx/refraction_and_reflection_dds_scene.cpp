@@ -31,7 +31,7 @@ void RefractionAndReflectionDDSScene::initializeScene(ICanvas* canvas,
                                                       Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   auto material = StandardMaterial::New("kosh", scene);
   auto sphere1  = Mesh::CreateSphere("Sphere1", 32, 5, scene);
   auto light = PointLight::New("Omni0", Vector3(-17.6f, 18.8f, -49.9f), scene);

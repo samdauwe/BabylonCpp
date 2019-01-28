@@ -1951,9 +1951,10 @@ AnimatablePtr Scene::beginWeightedAnimation(
 }
 
 AnimatablePtr Scene::beginAnimation(
-  const IAnimatablePtr& target, int from, int to, bool loop, float speedRatio,
-  const std::function<void()>& onAnimationEnd, AnimatablePtr animatable,
-  bool stopCurrent, const std::function<bool(IAnimatable* target)>& targetMask)
+  const IAnimatablePtr& target, float from, float to, bool loop,
+  float speedRatio, const std::function<void()>& onAnimationEnd,
+  AnimatablePtr animatable, bool stopCurrent,
+  const std::function<bool(IAnimatable* target)>& targetMask)
 {
   if (from > to && speedRatio > 0.f) {
     speedRatio *= -1.f;

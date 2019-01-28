@@ -33,15 +33,15 @@ void CurvedHelixMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
   scene->clearColor = Color4(0.5f, 0.5f, 0.5f);
 
   // Create a camera
-  auto camera
-    = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3(0, 0, -0), scene);
+  auto camera = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f,
+                                     Vector3(0.f, 0.f, -0.f), scene);
   camera->setPosition(Vector3(5.f, 5.f, -12.f));
 
   // Attach the camera to the canvas
   camera->attachControl(canvas, true);
 
   // Create a basic light
-  auto light = HemisphericLight::New("light1", Vector3(1, 0.5f, 0), scene);
+  auto light = HemisphericLight::New("light1", Vector3(1.f, 0.5f, 0.f), scene);
 
   // Default intensity is 1. Let's dim the light a small amount
   light->intensity = 0.7f;

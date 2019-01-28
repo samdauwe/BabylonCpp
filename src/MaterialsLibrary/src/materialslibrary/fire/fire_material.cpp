@@ -230,9 +230,9 @@ void FireMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
 {
   auto scene = getScene();
 
-  auto _defines
+  auto iDefines
     = static_cast<FireMaterialDefines*>(subMesh->_materialDefines.get());
-  if (!_defines) {
+  if (!iDefines) {
     return;
   }
 

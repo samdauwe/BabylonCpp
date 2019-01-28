@@ -29,17 +29,17 @@ void MaterialsScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.98f;
 
   // Create an Arc Rotate Camera - aimed negative z this time
-  auto camera = ArcRotateCamera::New("Camera", Math::PI / 2, 1.0, 110,
+  auto camera = ArcRotateCamera::New("Camera", Math::PI / 2, 1.f, 110.f,
                                      Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   // Creation of 6 spheres
-  auto sphere1 = Mesh::CreateSphere("Sphere1", 10.f, 9.f, scene);
-  auto sphere2 = Mesh::CreateSphere("Sphere2", 2.f, 9.f, scene);
-  auto sphere3 = Mesh::CreateSphere("Sphere3", 10.f, 9.f, scene);
-  auto sphere4 = Mesh::CreateSphere("Sphere4", 10.f, 9.f, scene);
-  auto sphere5 = Mesh::CreateSphere("Sphere5", 10.f, 9.f, scene);
-  auto sphere6 = Mesh::CreateSphere("Sphere6", 10.f, 9.f, scene);
+  auto sphere1 = Mesh::CreateSphere("Sphere1", 10u, 9.f, scene);
+  auto sphere2 = Mesh::CreateSphere("Sphere2", 2u, 9.f, scene);
+  auto sphere3 = Mesh::CreateSphere("Sphere3", 10u, 9.f, scene);
+  auto sphere4 = Mesh::CreateSphere("Sphere4", 10u, 9.f, scene);
+  auto sphere5 = Mesh::CreateSphere("Sphere5", 10u, 9.f, scene);
+  auto sphere6 = Mesh::CreateSphere("Sphere6", 10u, 9.f, scene);
 
   // Position the spheres
   sphere1->position().x = 40.f;

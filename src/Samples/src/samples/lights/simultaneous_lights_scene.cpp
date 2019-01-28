@@ -38,7 +38,7 @@ const char* SimultaneousLightsScene::getName()
 void SimultaneousLightsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   _light0       = PointLight::New("Omni0", Vector3(0.f, 10.f, 0.f), scene);
   _light1       = PointLight::New("Omni1", Vector3(0.f, -10.f, 0.f), scene);
   _light2       = PointLight::New("Omni2", Vector3(10.f, 0.f, 0.f), scene);

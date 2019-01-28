@@ -26,12 +26,12 @@ const char* MixMaterialScene::getName()
 void MixMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Camera
-  auto camera = FreeCamera::New("camera1", Vector3(5, 4, -47), scene);
+  auto camera = FreeCamera::New("camera1", Vector3(5.f, 4.f, -47.f), scene);
   camera->setTarget(Vector3::Zero());
   camera->attachControl(canvas, true);
 
   // Light
-  auto light = HemisphericLight::New("light", Vector3(0, 1, 0), scene);
+  auto light = HemisphericLight::New("light", Vector3(0.f, 1.f, 0.f), scene);
 
   // Create mix material
   auto mix = MaterialsLibrary::MixMaterial::New("mix", scene);

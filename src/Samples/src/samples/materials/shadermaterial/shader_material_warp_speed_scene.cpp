@@ -33,12 +33,12 @@ void ShaderMaterialWarpSpeedScene::initializeScene(ICanvas* canvas,
                                                    Scene* scene)
 {
   // Create a camera
-  auto camera = ArcRotateCamera::New("Camera", 0, Math::PI_2, 12.f,
+  auto camera = ArcRotateCamera::New("Camera", 0.f, Math::PI_2, 12.f,
                                      Vector3::Zero(), scene);
   camera->attachControl(canvas, false);
   camera->lowerRadiusLimit = 1.f;
   camera->minZ             = 1.f;
-  camera->setPosition(Vector3(-10.0, 0, -0.5f));
+  camera->setPosition(Vector3(-10.f, 0.f, -0.5f));
 
   // Create shader material
   IShaderMaterialOptions shaderMaterialOptions;
@@ -49,7 +49,7 @@ void ShaderMaterialWarpSpeedScene::initializeScene(ICanvas* canvas,
     = ShaderMaterial::New("shader", scene, "custom", shaderMaterialOptions);
 
   // Create plane mesh
-  auto mesh       = Mesh::CreatePlane("mesh", 10.0, scene);
+  auto mesh       = Mesh::CreatePlane("mesh", 10.f, scene);
   auto rotateAxis = Axis::Y();
   mesh->rotate(rotateAxis, Math::PI * 0.5f);
 
@@ -58,7 +58,7 @@ void ShaderMaterialWarpSpeedScene::initializeScene(ICanvas* canvas,
 
   // Configure the shader material
   _shaderMaterial->setTexture("refSampler", refTexture);
-  _shaderMaterial->setFloat("time", 0);
+  _shaderMaterial->setFloat("time", 0.f);
   _shaderMaterial->setVector3("cameraPosition", Vector3::Zero());
   _shaderMaterial->backFaceCulling = false;
 

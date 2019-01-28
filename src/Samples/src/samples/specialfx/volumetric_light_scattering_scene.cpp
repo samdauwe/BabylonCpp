@@ -34,8 +34,8 @@ void VolumetricLightScatteringScene::initializeScene(ICanvas* canvas,
   auto light = PointLight::New("Omni", Vector3(20.f, 20.f, 100.f), scene);
 
   // Adding an Arc Rotate Camera
-  _camera
-    = ArcRotateCamera::New("Camera", -0.5f, 2.2f, 100, Vector3::Zero(), scene);
+  _camera = ArcRotateCamera::New("Camera", -0.5f, 2.2f, 100.f, Vector3::Zero(),
+                                 scene);
   _camera->attachControl(canvas, true);
 
   // The first parameter can be used to specify which mesh to import. Here we

@@ -86,8 +86,8 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
       "spotlight" + iStr, sphereLights[i]->position(),
       Vector3(lightDirections[3 * i], lightDirections[3 * i + 1],
               lightDirections[3 * i + 2]),
-      Math::PI / 8.f, 5, scene);
-    spotLights[i]->diffuse   = Color3(1, 1, 1);
+      Math::PI / 8.f, 5.f, scene);
+    spotLights[i]->diffuse   = Color3(1.f, 1.f, 1.f);
     spotLights[i]->specular  = Color3(0.5f, 0.5f, 0.5f);
     spotLights[i]->intensity = 0.f;
   }
@@ -102,9 +102,9 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Create rotate animation keys
   auto frameRateInt = static_cast<int>(frameRate);
   std::vector<IAnimationKey> rotateKeys{
-    IAnimationKey(0, AnimationValue(0.f)),
-    IAnimationKey(9 * frameRateInt, AnimationValue(0.f)),
-    IAnimationKey(14 * frameRateInt, AnimationValue(Math::PI)),
+    IAnimationKey(0.f, AnimationValue(0.f)),
+    IAnimationKey(9.f * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(14.f * frameRateInt, AnimationValue(Math::PI)),
   };
 
   // Set rotate animation keys
@@ -117,10 +117,10 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create movein animation keys
   std::vector<IAnimationKey> moveinKeys{
-    IAnimationKey(0, AnimationValue(Vector3(0, 5, -30))),
-    IAnimationKey(3, AnimationValue(Vector3(0, 2, -10))),
-    IAnimationKey(5, AnimationValue(Vector3(0, 2, -10))),
-    IAnimationKey(8, AnimationValue(Vector3(-2, 2, 3))),
+    IAnimationKey(0.f, AnimationValue(Vector3(0, 5, -30))),
+    IAnimationKey(3.f, AnimationValue(Vector3(0, 2, -10))),
+    IAnimationKey(5.f, AnimationValue(Vector3(0, 2, -10))),
+    IAnimationKey(8.f, AnimationValue(Vector3(-2, 2, 3))),
   };
 
   // Set movein animation keys
@@ -133,11 +133,11 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create sweep animation keys
   std::vector<IAnimationKey> sweepKeys{
-    IAnimationKey(0, AnimationValue(0)),
-    IAnimationKey(3 * frameRateInt, AnimationValue(0.f)),
-    IAnimationKey(5 * frameRateInt, AnimationValue(Math::PI / 3.f)),
-    IAnimationKey(13 * frameRateInt, AnimationValue(Math::PI / 3.f)),
-    IAnimationKey(15 * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(0.f, AnimationValue(0)),
+    IAnimationKey(3.f * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(5.f * frameRateInt, AnimationValue(Math::PI / 3.f)),
+    IAnimationKey(13.f * frameRateInt, AnimationValue(Math::PI / 3.f)),
+    IAnimationKey(15.f * frameRateInt, AnimationValue(0.f)),
   };
 
   // Set sweep animation keys
@@ -150,24 +150,24 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create light dimmer animation keys
   std::vector<IAnimationKey> lightKeys{
-    IAnimationKey(0, AnimationValue(0)),
-    IAnimationKey(7 * frameRateInt, AnimationValue(0.f)),
-    IAnimationKey(10 * frameRateInt, AnimationValue(1.f)),
-    IAnimationKey(14 * frameRateInt, AnimationValue(1.f)),
-    IAnimationKey(15 * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(0.f, AnimationValue(0)),
+    IAnimationKey(7.f * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(10.f * frameRateInt, AnimationValue(1.f)),
+    IAnimationKey(14.f * frameRateInt, AnimationValue(1.f)),
+    IAnimationKey(15.f * frameRateInt, AnimationValue(0.f)),
   };
 
   // Set light dimmer animation keys
   lightDimmer->setKeys(lightKeys);
 
   /******* Run Clips **********/
-  scene->beginDirectAnimation(camera, {movein, rotate}, 0, 25 * frameRateInt,
-                              false);
-  scene->beginDirectAnimation(hinge, {sweep}, 0, 25 * frameRateInt, false);
-  scene->beginDirectAnimation(spotLights[0], {lightDimmer}, 0,
-                              25 * frameRateInt, false);
+  scene->beginDirectAnimation(camera, {movein, rotate}, 0.f,
+                              25.f * frameRateInt, false);
+  scene->beginDirectAnimation(hinge, {sweep}, 0.f, 25.f * frameRateInt, false);
+  scene->beginDirectAnimation(spotLights[0], {lightDimmer}, 0.f,
+                              25.f * frameRateInt, false);
   scene->beginDirectAnimation(spotLights[1], {lightDimmer /*->clone()*/}, 0,
-                              25 * frameRateInt, false);
+                              25.f * frameRateInt, false);
 
   /************** Peripherals of Scene ***************/
   GroundOptions groundOptions;

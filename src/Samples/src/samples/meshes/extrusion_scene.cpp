@@ -34,7 +34,7 @@ void ExtrusionScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Create a basic light, aiming 0,1,0 - meaning, to the sky
-  auto light      = HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
+  auto light = HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);
   light->diffuse  = Color3::FromInts(246, 135, 18); // "0xf68712"
   light->specular = Color3::FromInts(241, 71, 29);  // "0xf1471d"
 

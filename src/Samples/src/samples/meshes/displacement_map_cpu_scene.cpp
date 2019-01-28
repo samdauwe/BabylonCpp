@@ -27,7 +27,7 @@ const char* DisplacementMapCPUScene::getName()
 void DisplacementMapCPUScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   auto light = HemisphericLight::New("Omni0", Vector3(0.f, 1.f, 0.f), scene);
   light->intensity = 0.98f;
   auto material    = StandardMaterial::New("kosh", scene);

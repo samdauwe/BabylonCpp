@@ -92,10 +92,10 @@ private:
 
   // Local state variables which will be used in the spherical pan method;
   // declared outside because they must persist from frame to frame.
-  int _ptrX;
-  int _ptrY;
-  int _inertiaX;
-  int _inertiaY;
+  float _ptrX;
+  float _ptrY;
+  float _inertiaX;
+  float _inertiaY;
   int _pointersDown;
 
   // Variables internal to spherical pan, declared here just to avoid

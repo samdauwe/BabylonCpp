@@ -32,14 +32,14 @@ void MultiViewsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Camera 1
   auto camera1
     = ArcRotateCamera::New("camera1", 3.f * Math::PI / 8.f,
-                           3.f * Math::PI / 8.f, 15, Vector3::Zero(), scene);
+                           3.f * Math::PI / 8.f, 15.f, Vector3::Zero(), scene);
   camera1->setTarget(Vector3(0.f, 2.f, 0.f));
   camera1->attachControl(canvas, true);
 
   // Camera 2
   auto camera2
     = ArcRotateCamera::New("camera1", 5.f * Math::PI / 8.f,
-                           5.f * Math::PI / 8.f, 30, Vector3::Zero(), scene);
+                           5.f * Math::PI / 8.f, 30.f, Vector3::Zero(), scene);
   camera2->setTarget(Vector3(0.f, 2.f, 0.f));
   camera2->attachControl(canvas, true);
 

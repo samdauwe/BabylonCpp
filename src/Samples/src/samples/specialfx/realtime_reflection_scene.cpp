@@ -33,7 +33,7 @@ const char* RealtimeReflectionScene::getName()
 void RealtimeReflectionScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
 
   camera->setPosition(Vector3(0.f, 5.f, -10.f));
   camera->attachControl(canvas, true);
@@ -82,7 +82,7 @@ void RealtimeReflectionScene::initializeScene(ICanvas* canvas, Scene* scene)
   diffuseTexture->uScale         = 10.f;
   diffuseTexture->vScale         = 10.f;
   mirrorMaterial->diffuseTexture = diffuseTexture;
-  auto reflectionTexture = MirrorTexture::New("mirror", 1024, scene, true);
+  auto reflectionTexture = MirrorTexture::New("mirror", 1024.f, scene, true);
   reflectionTexture->mirrorPlane = Plane(0.f, -1.f, 0.f, -2.f);
   reflectionTexture->renderList
     = {_greenSphere.get(), _yellowSphere.get(), _blueSphere.get(), knot.get()};

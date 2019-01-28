@@ -25,7 +25,7 @@ const char* NormalMaterialScene::getName()
 void NormalMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 30, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 30.f, Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   auto light = HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);

@@ -43,8 +43,8 @@ void FurMaterialScene::_configureFur(const AbstractMeshPtr& mesh,
 
   mesh->material = fur;
 
-  size_t quality = 30; // It is enougth
-  auto shells    = MaterialsLibrary::FurMaterial::FurifyMesh(
+  float quality = 30.f; // It is enougth
+  auto shells   = MaterialsLibrary::FurMaterial::FurifyMesh(
     std::static_pointer_cast<Mesh>(mesh), quality);
 
   // Special for bunny (ears)
@@ -55,7 +55,7 @@ void FurMaterialScene::_configureFur(const AbstractMeshPtr& mesh,
 
 void FurMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  _camera = ArcRotateCamera::New("Camera", -2.5f, 1.f, 200,
+  _camera = ArcRotateCamera::New("Camera", -2.5f, 1.f, 200.f,
                                  Vector3(0.f, 5.f, 0.f), scene);
   _camera->attachControl(canvas, true);
 

@@ -55,7 +55,7 @@ void ShaderMaterialCylindersScene::initializeScene(ICanvas* canvas,
   auto camera1 = ArcRotateCamera::New("ArcRotateCamera", 1.f, 0.8f, 6.f,
                                       Vector3::Zero(), scene);
   camera1->attachControl(canvas, false);
-  camera1->lowerRadiusLimit = 1;
+  camera1->lowerRadiusLimit = 1.f;
   scene->activeCamera       = camera1;
 
   // Create a light

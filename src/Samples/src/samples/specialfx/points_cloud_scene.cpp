@@ -30,7 +30,7 @@ void PointsCloudScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 0, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3::Zero(), scene);
   camera->setPosition(Vector3(0.f, 50.f, -300.f));
   camera->attachControl(canvas, true);
 

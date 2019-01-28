@@ -36,13 +36,13 @@ void FresnelParametersTorusKnotScene::initializeScene(ICanvas* canvas,
   auto light = PointLight::New("Omni0", Vector3(-17.6f, 18.8f, -49.9f), scene);
   light->intensity = 0.9f;
 
-  camera->setPosition(Vector3(-10, 3, 0));
+  camera->setPosition(Vector3(-10.f, 3.f, 0.f));
   camera->attachControl(canvas, true);
 
   // Set the TorusKnot material
-  material->diffuseColor  = Color3(0, 0, 0);
-  material->emissiveColor = Color3(1, 1, 1);
-  material->specularPower = 128;
+  material->diffuseColor  = Color3(0.f, 0.f, 0.f);
+  material->emissiveColor = Color3(1.f, 1.f, 1.f);
+  material->specularPower = 128.f;
   material->alpha         = 0.2f;
   material->alphaMode     = EngineConstants::ALPHA_PREMULTIPLIED;
   torusKnot->material     = material;

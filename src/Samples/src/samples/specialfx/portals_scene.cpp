@@ -39,7 +39,7 @@ void PortalsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto engine = scene->getEngine();
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   auto material          = StandardMaterial::New("kosh", scene);
   material->diffuseColor = Color3::Purple();
   auto light = PointLight::New("Omni0", Vector3(-17.6f, 18.8f, -49.9f), scene);
@@ -67,7 +67,7 @@ void PortalsScene::initializeScene(ICanvas* canvas, Scene* scene)
   plane->visibility   = 1.f;
 
   // Render target
-  _renderTarget = RenderTargetTexture::New("depth", 1024, scene);
+  _renderTarget = RenderTargetTexture::New("depth", 1024.f, scene);
   scene->customRenderTargets.emplace_back(_renderTarget);
 
   _renderTarget->onBeforeRender

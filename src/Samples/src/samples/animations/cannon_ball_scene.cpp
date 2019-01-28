@@ -55,7 +55,8 @@ void CannonBallScene::initializeScene(ICanvas* canvas, Scene* scene)
   scene->clearColor = Color3(0.5f, 0.5f, 0.5f);
 
   // Camera
-  _camera = ArcRotateCamera::New("camera1", 0, 0, 0, Vector3::Zero(), scene);
+  _camera
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3::Zero(), scene);
   _camera->setPosition(Vector3(-160.f, 100.f, -100.f));
   _camera->attachControl(canvas, true);
 

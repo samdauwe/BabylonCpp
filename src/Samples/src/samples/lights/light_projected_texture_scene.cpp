@@ -33,8 +33,8 @@ void LightProjectedTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
     = ArcRotateCamera::New("Camera", 0.f, 0.8f, 90.f, Vector3::Zero(), scene);
   camera->lowerBetaLimit   = 0.1f;
   camera->upperBetaLimit   = Math::PI_2 * 0.9f;
-  camera->lowerRadiusLimit = 30;
-  camera->upperRadiusLimit = 150;
+  camera->lowerRadiusLimit = 30.f;
+  camera->upperRadiusLimit = 150.f;
   camera->attachControl(canvas, true);
 
   // Hemispheric light

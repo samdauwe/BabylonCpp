@@ -41,7 +41,8 @@ const char* CustomRenderTargetsScene::getName()
 void CustomRenderTargetsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto engine = scene->getEngine();
-  _camera = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+  _camera
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   auto material          = StandardMaterial::New("kosh", scene);
   material->diffuseColor = Color3::Purple();
   auto light = PointLight::New("Omni0", Vector3(-17.6f, 18.8f, -49.9f), scene);
@@ -79,7 +80,7 @@ void CustomRenderTargetsScene::initializeScene(ICanvas* canvas, Scene* scene)
   plane->scaling().y   = 1.f / engine->getAspectRatio(*scene->activeCamera);
 
   // Render target
-  _renderTarget = RenderTargetTexture::New("depth", 1024, scene, true);
+  _renderTarget = RenderTargetTexture::New("depth", 1024.f, scene, true);
   _renderTarget->renderList().emplace_back(skybox.get());
   scene->customRenderTargets.emplace_back(_renderTarget);
 

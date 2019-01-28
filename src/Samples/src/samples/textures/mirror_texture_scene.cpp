@@ -27,8 +27,9 @@ const char* MirrorTextureScene::getName()
 
 void MirrorTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  auto camera = ArcRotateCamera::New(
-    "Camera", -7 * Math::PI / 16, 4 * Math::PI / 8, 20, Vector3::Zero(), scene);
+  auto camera
+    = ArcRotateCamera::New("Camera", -7 * Math::PI / 16, 4 * Math::PI / 8, 20.f,
+                           Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   auto light = HemisphericLight::New("hemi", Vector3(0.f, 10.f, -5.f), scene);
@@ -71,7 +72,7 @@ void MirrorTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 
     // Create the mirror material
     auto mirrorMaterial    = StandardMaterial::New("mirror", scene);
-    auto reflectionTexture = MirrorTexture::New("mirror", 1024, scene, true);
+    auto reflectionTexture = MirrorTexture::New("mirror", 1024.f, scene, true);
     reflectionTexture->mirrorPlane    = reflector;
     reflectionTexture->renderList     = {sphere.get()};
     reflectionTexture->level          = 1;

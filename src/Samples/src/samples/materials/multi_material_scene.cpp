@@ -29,7 +29,7 @@ const char* MultiMaterialScene::getName()
 void MultiMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   auto light       = PointLight::New("Omni", Vector3(20.f, 100.f, 2.f), scene);

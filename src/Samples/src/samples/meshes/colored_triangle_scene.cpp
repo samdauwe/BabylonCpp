@@ -45,24 +45,24 @@ void ColoredTriangleScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto vertexData = std::make_unique<VertexData>();
 
   vertexData->positions = {
-    -1, -1, 0, // left bottom
-    1,  -1, 0, // top middel
-    0,  1,  0  // right bottom
+    -1.f, -1.f, 0.f, // left bottom
+    1.f,  -1.f, 0.f, // top middel
+    0.f,  1.f,  0.f  // right bottom
   };
 
   vertexData->indices = {2, 1, 0};
 
   vertexData->colors = {
-    1, 0, 0, 0, // red   - left
-    0, 1, 0, 0, // blue  - top
-    0, 0, 1, 0  // green - right
+    1.f, 0.f, 0.f, 0.f, // red   - left
+    0.f, 1.f, 0.f, 0.f, // blue  - top
+    0.f, 0.f, 1.f, 0.f  // green - right
   };
 
   // https://doc.babylonjs.com/resources/normals
   vertexData->normals = {
-    0, 0, 1, //
-    0, 0, 1, //
-    0, 0, 1  //
+    0.f, 0.f, 1.f, //
+    0.f, 0.f, 1.f, //
+    0.f, 0.f, 1.f  //
   };
 
   vertexData->applyToMesh(*customMesh);

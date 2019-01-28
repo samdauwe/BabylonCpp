@@ -81,9 +81,9 @@ void ShaderMaterialCloudsScene::initializeScene(ICanvas* /*canvas*/,
     auto transformMatrix = Matrix::Scaling(randomScaling, randomScaling, 1.f);
     transformMatrix
       = transformMatrix.multiply(Matrix::RotationZ(Math::random() * Math::PI));
-    transformMatrix = transformMatrix.multiply(
-      Matrix::Translation(Math::random() * 1000.f - 500.f,
-                          -Math::random() * Math::random() * 100, count - i));
+    transformMatrix = transformMatrix.multiply(Matrix::Translation(
+      Math::random() * 1000.f - 500.f, -Math::random() * Math::random() * 100.f,
+      static_cast<float>(count - i)));
 
     planeVertexData->transform(transformMatrix);
 

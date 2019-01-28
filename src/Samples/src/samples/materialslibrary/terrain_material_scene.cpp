@@ -37,7 +37,7 @@ void TerrainMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   // Create terrain material
   auto terrainMaterial
     = MaterialsLibrary::TerrainMaterial::New("terrainMaterial", scene);
-  terrainMaterial->specularColor = Color3(0.5, 0.5, 0.5);
+  terrainMaterial->specularColor = Color3(0.5f, 0.5f, 0.5f);
   terrainMaterial->specularPower = 64.f;
 
   // Set the mix texture (represents the RGB values)

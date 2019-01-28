@@ -30,12 +30,12 @@ void TubeScene::initializeScene(ICanvas* canvas, Scene* scene)
   scene->clearColor = Color4(0.5f, 0.5f, 0.5f);
 
   // camera
-  auto camera
-    = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3(0, 0, -0), scene);
+  auto camera = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f,
+                                     Vector3(0.f, 0.f, -0.f), scene);
   camera->setPosition(Vector3(0, 0, -60));
   camera->attachControl(canvas, true);
 
-  auto light       = HemisphericLight::New("light1", Vector3(1, 0.5, 0), scene);
+  auto light = HemisphericLight::New("light1", Vector3(1.f, 0.5f, 0.f), scene);
   light->intensity = 0.7f;
 
   auto spot       = SpotLight::New("spot", Vector3(25.f, 15.f, -10.f),

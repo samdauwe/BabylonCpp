@@ -34,7 +34,7 @@ void ShaderMaterialWithFogScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
   auto camera = ArcRotateCamera::New("camera1", Math::PI, Math::PI_2, 5.f,
-                                     Vector3(0, 0, 0), scene);
+                                     Vector3(0.f, 0.f, 0.f), scene);
 
   // Target the camera to scene origin
   camera->setTarget(Vector3::Zero());
@@ -43,7 +43,7 @@ void ShaderMaterialWithFogScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Create a basic light, aiming 0,1,0 - meaning, to the sky
-  HemisphericLight::New("light1", Vector3(0, 1, 0), scene);
+  HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);
 
   // Create a built-in "box" shape
   auto box = Mesh::CreateBox("box1", 1.f, scene);
@@ -60,8 +60,8 @@ void ShaderMaterialWithFogScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   _boxMaterial->onBind = [this](AbstractMesh*, EventState&) {
     auto effect = _boxMaterial->getEffect();
-    effect->setFloat4("vFogInfos", _scene->fogMode(), _scene->fogStart,
-                      _scene->fogEnd, _scene->fogDensity);
+    effect->setFloat4("vFogInfos", static_cast<float>(_scene->fogMode()),
+                      _scene->fogStart, _scene->fogEnd, _scene->fogDensity);
     effect->setColor3("vFogColor", _scene->fogColor);
   };
 

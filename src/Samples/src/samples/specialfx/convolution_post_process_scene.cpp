@@ -34,7 +34,7 @@ const char* ConvolutionPostProcessScene::getName()
 void ConvolutionPostProcessScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   auto light = DirectionalLight::New("dir01", Vector3(0.f, -1.f, -0.2f), scene);
   auto light2 = DirectionalLight::New("dir02", Vector3(-1.f, 2.f, -1.f), scene);
   light->position  = Vector3(0.f, 30.f, 0.f);

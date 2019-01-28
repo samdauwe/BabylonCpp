@@ -87,17 +87,17 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   if (_activeLight) {
     for (const auto& light : mesh->_lightSources) {
       if (light->shadowEnabled) {
-        auto activeLight = std::dynamic_pointer_cast<Light>(_activeLight);
-        if (activeLight == light) {
+        auto iActiveLight = std::dynamic_pointer_cast<Light>(_activeLight);
+        if (iActiveLight == light) {
           break; // We are good
         }
 
         auto it = std::find(mesh->_lightSources.begin(),
-                            mesh->_lightSources.end(), activeLight);
+                            mesh->_lightSources.end(), iActiveLight);
 
         if (it != mesh->_lightSources.end()) {
           mesh->_lightSources.erase(it);
-          mesh->_lightSources.insert(mesh->_lightSources.begin(), activeLight);
+          mesh->_lightSources.insert(mesh->_lightSources.begin(), iActiveLight);
         }
         break;
       }

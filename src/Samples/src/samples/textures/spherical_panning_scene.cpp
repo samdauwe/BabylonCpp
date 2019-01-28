@@ -103,8 +103,8 @@ void SphericalPanningScene::_addSphericalPanningCameraToScene(
 
     // Store the current pointer position to clean out whatever values were left
     // in there from prior iterations.
-    _ptrX = _scene->pointerX;
-    _ptrY = _scene->pointerY;
+    _ptrX = static_cast<float>(_scene->pointerX);
+    _ptrY = static_cast<float>(_scene->pointerY);
 
     // Enable spherical panning.
     _sphericalPanObserver = _scene->onBeforeRenderObservable.add(
@@ -153,9 +153,9 @@ void SphericalPanningScene::pan(float currX, float currY)
 
     // Create the new world-space rotation matrix from the computed forward,
     // right, and up vectors.
-    _matrix.setRowFromFloats(0.f, _newRight.x, _newRight.y, _newRight.z, 0.f);
-    _matrix.setRowFromFloats(1.f, _newUp.x, _newUp.y, _newUp.z, 0.f);
-    _matrix.setRowFromFloats(2.f, _newForward.x, _newForward.y, _newForward.z,
+    _matrix.setRowFromFloats(0, _newRight.x, _newRight.y, _newRight.z, 0.f);
+    _matrix.setRowFromFloats(1, _newUp.x, _newUp.y, _newUp.z, 0.f);
+    _matrix.setRowFromFloats(2, _newForward.x, _newForward.y, _newForward.z,
                              0.f);
 
     Quaternion::FromRotationMatrixToRef(_matrix.getRotationMatrix(),
@@ -169,12 +169,12 @@ void SphericalPanningScene::_getPointerViewSpaceDirectionToRef(float x, float y,
   auto identityMatrix1 = Matrix::Identity();
   auto identityMatrix2 = Matrix::Identity();
 
-  Vector3::UnprojectToRef(Vector3(x, y, 0.f),             //
-                          _canvas->width,                 //
-                          _canvas->height,                //
-                          identityMatrix1,                //
-                          identityMatrix2,                //
-                          _camera->getProjectionMatrix(), //
+  Vector3::UnprojectToRef(Vector3(x, y, 0.f),                  //
+                          static_cast<float>(_canvas->width),  //
+                          static_cast<float>(_canvas->height), //
+                          identityMatrix1,                     //
+                          identityMatrix2,                     //
+                          _camera->getProjectionMatrix(),      //
                           ref);
   ref.normalize();
 }
@@ -210,13 +210,14 @@ bool SphericalPanningScene::_computeNewForward(float x, float y)
 
 void SphericalPanningScene::sphericalPan()
 {
-  pan(_scene->pointerX, _scene->pointerY);
+  pan(static_cast<float>(_scene->pointerX),
+      static_cast<float>(_scene->pointerY));
 
   // Store the state variables for use in the next frame.
   _inertiaX = _scene->pointerX - _ptrX;
   _inertiaY = _scene->pointerY - _ptrY;
-  _ptrX     = _scene->pointerX;
-  _ptrY     = _scene->pointerY;
+  _ptrX     = static_cast<float>(_scene->pointerX);
+  _ptrY     = static_cast<float>(_scene->pointerY);
 }
 
 void SphericalPanningScene::inertialPan()

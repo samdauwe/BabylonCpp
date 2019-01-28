@@ -41,7 +41,7 @@ void ShaderMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create a Camera
   _camera = ArcRotateCamera::New("ArcRotateCamera", 0.f, 1.5f, 150.f,
-                                 Vector3(0, 0, 0), scene);
+                                 Vector3(0.f, 0.f, 0.f), scene);
 
   // Target the camera to scene origin
   _camera->setTarget(Vector3::Zero());
@@ -65,7 +65,7 @@ void ShaderMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   _polyhedron->material = _shaderMaterial;
 
   // Create box
-  auto box = Mesh::CreateBox("Box", 500, scene);
+  auto box = Mesh::CreateBox("Box", 500.f, scene);
   box->flipFaces(true);
   box->material = _shaderMaterial;
 

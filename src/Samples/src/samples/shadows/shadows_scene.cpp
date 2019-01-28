@@ -31,7 +31,7 @@ void ShadowsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Setup environment
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0.8f, 90, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.8f, 90.f, Vector3::Zero(), scene);
   camera->lowerBetaLimit   = 0.1f;
   camera->upperBetaLimit   = Math::PI_2 * 0.9f;
   camera->lowerRadiusLimit = 30.f;
@@ -51,7 +51,7 @@ void ShadowsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // light2
   auto light2       = SpotLight::New("spot02", Vector3(30.f, 40.f, 20.f),
-                               Vector3(-1.f, -2.f, -1.f), 1.1f, 16, scene);
+                               Vector3(-1.f, -2.f, -1.f), 1.1f, 16.f, scene);
   light2->intensity = 0.5f;
 
   auto lightSphere2         = Mesh::CreateSphere("sphere", 10, 2, scene);

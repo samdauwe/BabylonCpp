@@ -55,7 +55,7 @@ void RenderTargetTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   ground->material    = groundMaterial;
 
   // Create the render target texture
-  auto renderTexture = RenderTargetTexture::New("render", 512, scene);
+  auto renderTexture = RenderTargetTexture::New("render", 512.f, scene);
   renderTexture->renderList().emplace_back(sphere.get());
   groundMaterial->diffuseTexture = renderTexture;
 

@@ -36,7 +36,7 @@ void BouncingCubeScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   scene->clearColor = Color3::Black();
   auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 0, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f, Vector3::Zero(), scene);
   camera->setPosition(Vector3(0.f, 10.f, -500.f));
   camera->attachControl(canvas, true);
 

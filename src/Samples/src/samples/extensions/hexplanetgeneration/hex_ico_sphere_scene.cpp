@@ -32,8 +32,8 @@ const char* HexIcosphereScene::getName()
 
 void HexIcosphereScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  // Create a FreeCamera, and set its position to (x:0, y:5, z:-10)
-  auto camera = FreeCamera::New("camera1", Vector3(0, 0, -2.8f), scene);
+  // Create a FreeCamera, and set its position to (x:0, y:5, z:-2.8)
+  auto camera = FreeCamera::New("camera1", Vector3(0.f, 0.f, -2.8f), scene);
 
   // Target the camera to scene origin
   camera->setTarget(Vector3::Zero());
@@ -42,9 +42,9 @@ void HexIcosphereScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Create a Sun & Moon
-  auto sun        = HemisphericLight::New("sun", Vector3(0, 1.f, 0), scene);
-  sun->intensity  = 0.96f;
-  auto moon       = HemisphericLight::New("moon", Vector3(0, -1.f, 0), scene);
+  auto sun       = HemisphericLight::New("sun", Vector3(0.f, 1.f, 0.f), scene);
+  sun->intensity = 0.96f;
+  auto moon = HemisphericLight::New("moon", Vector3(0.f, -1.f, 0.f), scene);
   moon->intensity = 0.25f;
 
   // Create the icosphere

@@ -28,7 +28,7 @@ void ManyBoxInstancesScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   float gridSize = 10;
 
-  auto camera  = ArcRotateCamera::New("camera", 0, 0, gridSize * 1.5f,
+  auto camera  = ArcRotateCamera::New("camera", 0.f, 0.f, gridSize * 1.5f,
                                      Vector3::Zero(), scene);
   camera->fov  = 60.f / 180.f * Math::PI;
   camera->minZ = 0.01f;

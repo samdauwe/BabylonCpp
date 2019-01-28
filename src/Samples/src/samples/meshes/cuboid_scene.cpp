@@ -107,14 +107,14 @@ MeshPtr CuboidScene::CreateCuboid(const std::string& name, float length,
                      {vertex.x * length / 2.f, vertex.y * height / 2.f,
                       vertex.z * width / 2.f});
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
-    stl_util::concat(uvs, {0.0, 0.0});
+    stl_util::concat(uvs, {0.f, 0.f});
     // - Vertex 4
     vertex = normal.add(side1).subtract(side2);
     stl_util::concat(positions,
                      {vertex.x * length / 2.f, vertex.y * height / 2.f,
                       vertex.z * width / 2.f});
     stl_util::concat(normals, {normal.x, normal.y, normal.z});
-    stl_util::concat(uvs, {1.0, 0.0});
+    stl_util::concat(uvs, {1.f, 0.f});
   }
   cuboid->setVerticesData(VertexBuffer::PositionKind, positions);
   cuboid->setVerticesData(VertexBuffer::NormalKind, normals);

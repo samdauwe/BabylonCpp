@@ -420,8 +420,9 @@ void MixMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
     // Textures
     if (_mixTexture1) {
       _activeEffect->setTexture("mixMap1Sampler", _mixTexture1);
-      _activeEffect->setFloat2("vTextureInfos", _mixTexture1->coordinatesIndex,
-                               _mixTexture1->level);
+      _activeEffect->setFloat2(
+        "vTextureInfos", static_cast<float>(_mixTexture1->coordinatesIndex),
+        _mixTexture1->level);
       _activeEffect->setMatrix("textureMatrix",
                                *_mixTexture1->getTextureMatrix());
 

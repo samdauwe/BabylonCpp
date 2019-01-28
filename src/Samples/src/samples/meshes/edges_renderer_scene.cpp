@@ -22,7 +22,7 @@ const char* EdgesRenderScene::getName()
 
 void EdgesRenderScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  auto camera = ArcRotateCamera::New("camera1", 0, Math::PI / 3.f, 10.f,
+  auto camera = ArcRotateCamera::New("camera1", 0.f, Math::PI / 3.f, 10.f,
                                      Vector3::Zero(), scene);
   camera->setTarget(Vector3::Zero());
   camera->attachControl(canvas, true);

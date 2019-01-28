@@ -53,7 +53,7 @@ void SimplePostProcessRenderPipelineScene::initializeScene(ICanvas* canvas,
   // Create post processes
   _blackAndWhite
     = BlackAndWhitePostProcess::New("bw", 1.f, nullptr, 0, engine, false);
-  _horizontalBlur = BlurPostProcess::New("hb", Vector2(1.f, 0.f), 20, 1.f,
+  _horizontalBlur = BlurPostProcess::New("hb", Vector2(1.f, 0.f), 20.f, 1.f,
                                          nullptr, std::nullopt, engine, false);
 
   // Create effect with multiple post processes and add to pipeline

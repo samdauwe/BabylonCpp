@@ -46,7 +46,7 @@ const char* PumpJackScene::getName()
 void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Configuration
-  int animationFrames        = 200;
+  float animationFrames      = 200.f;
   float lengthOfStick        = 6.f;
   float lengthOfTopStick     = 10.f;
   float lengthOfPumpStick    = lengthOfStick + 5.f;
@@ -85,14 +85,14 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Animation keys
   std::vector<IAnimationKey> motorIAnimationKeys{
-    IAnimationKey(0, AnimationValue(0.f)),
+    IAnimationKey(0.f, AnimationValue(0.f)),
     IAnimationKey(animationFrames,
                   AnimationValue(Math::PI2 * (moveDirection ? -1.f : 1.f))),
   };
 
   motorAnimation->setKeys(motorIAnimationKeys);
   parentObject->animations.emplace_back(motorAnimation);
-  scene->beginAnimation(parentObject, 0, animationFrames, true);
+  scene->beginAnimation(parentObject, 0.f, animationFrames, true);
 
   //###########//
   // Front Arm //
@@ -139,7 +139,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   frontStickAnimation->setKeys(frontStickIAnimationKeys);
   frontStickAnimation->setEasingFunction(myEase);
   frontPivot->animations.emplace_back(frontStickAnimation);
-  scene->beginAnimation(frontPivot, 0, animationFrames, true);
+  scene->beginAnimation(frontPivot, 0.f, animationFrames, true);
 
   //###########//
   // Back Arm //
@@ -186,7 +186,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   backStickAnimation->setKeys(backStickIAnimationKeys);
   backStickAnimation->setEasingFunction(myEase);
   backPivot->animations.emplace_back(backStickAnimation);
-  scene->beginAnimation(backPivot, 0, animationFrames, true);
+  scene->beginAnimation(backPivot, 0.f, animationFrames, true);
 
   //############//
   // Top Pieces //
@@ -214,7 +214,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
   topStickAnimation->setEasingFunction(
     BezierCurveEase::New(0.35f, 0.1f, 0.65f, 0.9f));
   topStick->animations.emplace_back(topStickAnimation);
-  scene->beginAnimation(topStick, 0, animationFrames, true);
+  scene->beginAnimation(topStick, 0.f, animationFrames, true);
 
   auto topBar
     = Mesh::CreateCylinder("topBar", 5.5f, 0.7f, 0.7f, 24, 1, scene, true, 0);
@@ -257,7 +257,7 @@ void PumpJackScene::initializeScene(ICanvas* canvas, Scene* scene)
     BezierCurveEase::New(0.35f, 0.1f, 0.65f, 0.9f));
 
   pumpStick->animations.emplace_back(pumpStickAnimation);
-  scene->beginAnimation(pumpStick, 0, animationFrames, true);
+  scene->beginAnimation(pumpStick, 0.f, animationFrames, true);
 
   //####################//
   // Visual Complements //

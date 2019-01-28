@@ -31,7 +31,7 @@ void GridMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   // This creates and positions a free camera (non-mesh)
   _camera
     = ArcRotateCamera::New("camera1", -Math::PI / 3.f, 5.f * Math::PI / 12.f,
-                           50, Vector3::Zero(), scene);
+                           50.f, Vector3::Zero(), scene);
   _camera->setTarget(Vector3(0.f, 5.f, 0.f));
 
   // This attaches the camera to the canvas

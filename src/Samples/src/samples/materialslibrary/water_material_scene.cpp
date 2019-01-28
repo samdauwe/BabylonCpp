@@ -30,7 +30,7 @@ void WaterMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Camera
   auto camera = ArcRotateCamera::New("Camera", 3.f * Math::PI_2, Math::PI_4,
-                                     100, Vector3::Zero(), scene);
+                                     100.f, Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   // Light
@@ -38,7 +38,7 @@ void WaterMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.98f;
 
   // Skybox
-  auto skybox                     = Mesh::CreateBox("skyBox", 5000.0, scene);
+  auto skybox                     = Mesh::CreateBox("skyBox", 5000.f, scene);
   auto skyboxMaterial             = StandardMaterial::New("skyBox", scene);
   skyboxMaterial->backFaceCulling = false;
   skyboxMaterial->reflectionTexture

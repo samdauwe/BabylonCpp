@@ -28,13 +28,13 @@ void ColoredCubeFacesScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
   auto camera
-    = ArcRotateCamera::New("camera", 1.f, 1.f, 12, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("camera", 1.f, 1.f, 12.f, Vector3::Zero(), scene);
 
   // Attach camera to canvas
   camera->attachControl(canvas, false);
 
   // Add a light
-  auto light = HemisphericLight::New("hemi", Vector3(0, 1, 0), scene);
+  auto light = HemisphericLight::New("hemi", Vector3(0.f, 1.f, 0.f), scene);
 
   // Reflect the light off the ground to light the mesh bottom
   light->groundColor = Color3(0.5f, 0.5f, 0.5f);

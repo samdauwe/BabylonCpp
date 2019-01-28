@@ -31,7 +31,7 @@ void ConstructiveSolidGeometriesScene::initializeScene(ICanvas* canvas,
 {
   auto light = DirectionalLight::New("dir01", Vector3(0.f, -0.5f, -1.f), scene);
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   camera->setPosition(Vector3(10.f, 10.f, 10.f));
   light->position = Vector3(20.f, 150.f, 70.f);
   camera->minZ    = 10.f;

@@ -30,7 +30,7 @@ void MirrorsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // scene->clearColor = Color3::Black();
 
   // Setup environment
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, 1.57f, 180,
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, 1.57f, 180.f,
                                      Vector3::Zero(), scene);
   camera->attachControl(canvas);
 
@@ -101,7 +101,8 @@ void MirrorsScene::initializeScene(ICanvas* canvas, Scene* scene)
   for (unsigned int i = 0; i < 5; ++i) {
     auto iStr           = std::to_string(i);
     auto mirrorMaterial = StandardMaterial::New("texture" + iStr, scene);
-    auto mirrorTexture = MirrorTexture::New("mirror" + iStr, 1024, scene, true);
+    auto mirrorTexture
+      = MirrorTexture::New("mirror" + iStr, 1024.f, scene, true);
     mirrorTexture->renderList().emplace_back(_box1.get());
     mirrorTexture->level            = 0.6f;
     mirrorMaterial->backFaceCulling = true;

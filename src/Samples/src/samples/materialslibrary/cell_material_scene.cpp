@@ -29,8 +29,8 @@ void CellMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   scene->clearColor = Color3(0.5f, 0.5f, 0.5f);
 
-  auto camera
-    = ArcRotateCamera::New("Camera", 0, Math::PI_2, 12, Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("Camera", 0.f, Math::PI_2, 12.f,
+                                     Vector3::Zero(), scene);
   camera->attachControl(canvas, true, true);
 
   auto knot  = Mesh::CreateTorusKnot("knot", 2, 0.5f, 128, 64, 2, 3, scene);

@@ -29,7 +29,7 @@ const char* LensFlaresScene::getName()
 void LensFlaresScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   auto light0 = PointLight::New("Omni0", Vector3(21.84f, 50.f, -28.26f), scene);
   light0->intensity = 0.98f;
 

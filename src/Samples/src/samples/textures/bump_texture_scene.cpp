@@ -27,7 +27,7 @@ const char* BumpTextureScene::getName()
 void BumpTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   camera->setPosition(Vector3(-5.f, 5.f, 0.f));
   camera->attachControl(canvas, true);
 

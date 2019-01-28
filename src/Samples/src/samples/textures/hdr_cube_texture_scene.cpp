@@ -28,7 +28,7 @@ const char* HDRCubeTextureScene::getName()
 void HDRCubeTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera = ArcRotateCamera::New("Camera", -Math::PI_4, Math::PI / 2.5f,
-                                     200, Vector3::Zero(), scene);
+                                     200.f, Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
   camera->minZ = 0.1f;
 

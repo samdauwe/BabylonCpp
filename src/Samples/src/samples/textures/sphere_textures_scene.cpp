@@ -26,7 +26,7 @@ const char* SphereTexturesScene::getName()
 
 void SphereTexturesScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_4, 5,
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_4, 5.f,
                                      Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 

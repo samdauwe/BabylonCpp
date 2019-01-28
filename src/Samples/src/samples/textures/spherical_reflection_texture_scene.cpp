@@ -29,14 +29,14 @@ const char* SphericalReflectionTextureScene::getName()
 void SphericalReflectionTextureScene::initializeScene(ICanvas* canvas,
                                                       Scene* scene)
 {
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 5,
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 5.f,
                                      Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   scene->ambientColor = Color3(1.f, 1.f, 1.f);
 
   auto light
-    = HemisphericLight::New("hemiLight", Vector3(-1.f, 10.f -10.f), scene);
+    = HemisphericLight::New("hemiLight", Vector3(-1.f, 10.f - 10.f), scene);
   light->diffuse   = Color3(1.f, 1.f, 1.f);
   light->intensity = 0.5f;
 

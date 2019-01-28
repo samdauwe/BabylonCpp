@@ -26,7 +26,7 @@ void SpritesScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create camera and light
   auto camera
-    = ArcRotateCamera::New("Camera", 1, 0.8f, 8, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 1.f, 0.8f, 8.f, Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
 
   auto light       = PointLight::New("Point", Vector3(5.f, 10.f, 5.f), scene);

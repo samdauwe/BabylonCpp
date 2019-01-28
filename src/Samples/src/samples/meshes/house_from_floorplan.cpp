@@ -29,13 +29,14 @@ const char* HouseFromFloorplanScene::getName()
 void HouseFromFloorplanScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f, 25,
-                                     Vector3(0.f, 0.f, 4.5f), scene);
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI / 3.f,
+                                     25.f, Vector3(0.f, 0.f, 4.5f), scene);
   camera->setPosition(Vector3(0, 5, 12));
   camera->attachControl(canvas, true);
 
   // Create a light
-  auto light = HemisphericLight::New("hemiLight", Vector3(5, 10, 0), scene);
+  auto light
+    = HemisphericLight::New("hemiLight", Vector3(5.f, 10.f, 0.f), scene);
   light->intensity = 0.95f;
 
   // Create the house from a floor plan
@@ -277,7 +278,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls,
     positions     = stl_util::concat(positions, wallData.positions);
     interiorIndex = positions.size() / 3;
     for (auto& idx : wallData.indices) {
-      indices.emplace_back(idx + nbIndices);
+      indices.emplace_back(static_cast<uint32_t>(idx + nbIndices));
     }
 
     // WallData has format for inner wall [base left, 0 or more doors, base
@@ -385,7 +386,7 @@ MeshPtr HouseFromFloorplanScene::buildFromPlan(std::vector<Wall>& walls,
     // Reverse indices for correct normals
     std::reverse(wallData.indices.begin(), wallData.indices.end());
     for (const auto& idx : wallData.indices) {
-      indices.emplace_back(idx + nbIndices);
+      indices.emplace_back(static_cast<uint32_t>(idx + nbIndices));
     }
 
     // Construct facets for base and door top and door sides, repeating

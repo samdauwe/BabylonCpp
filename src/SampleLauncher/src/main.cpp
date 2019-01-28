@@ -98,13 +98,13 @@ int sampleLauncherMain(int l, int v, int i, const char* sampleGroup,
   if (l > 0) {
     std::ostringstream oss;
     // Get sample names and category names
-    const auto sampleNames   = samples.getSampleNames();
-    const auto categoryNames = samples.getCategoryNames();
+    auto sampleNames   = samples.getSampleNames();
+    auto categoryNames = samples.getCategoryNames();
     oss << "Found " << sampleNames.size() << " in " << categoryNames.size()
         << " categories:\n";
     // Print categorized samples
     for (const auto& categoryName : categoryNames) {
-      const auto sampleNames = samples.getSampleNamesInCategory(categoryName);
+      sampleNames = samples.getSampleNamesInCategory(categoryName);
       oss << "       |- ";
       if (sampleNames.size() < 10) {
         oss << " " << sampleNames.size();
@@ -135,8 +135,9 @@ int sampleLauncherMain(int l, int v, int i, const char* sampleGroup,
       else {
         categoryNames = {categoryName};
       }
-      for (const auto& categoryName : categoryNames) {
-        const auto sampleNames = samples.getSampleNamesInCategory(categoryName);
+      for (const auto& _categoryName : categoryNames) {
+        const auto sampleNames
+          = samples.getSampleNamesInCategory(_categoryName);
         for (const auto& sampleName : sampleNames) {
           exitcode = runSample(samples, sampleName, i > 0, 10000);
           if (exitcode == 0) {

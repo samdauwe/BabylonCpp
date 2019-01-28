@@ -32,7 +32,7 @@ const char* ShaderMaterialSkyboxScene::getName()
 void ShaderMaterialSkyboxScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a FreeCamera
-  auto camera = FreeCamera::New("cam", Vector3(0, 0, -500), scene);
+  auto camera = FreeCamera::New("cam", Vector3(0.f, 0.f, -500.f), scene);
 
   // Target the camera to scene origin
   camera->setTarget(Vector3::Zero());
@@ -41,7 +41,7 @@ void ShaderMaterialSkyboxScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Hemispheric light to light the scene
-  HemisphericLight::New("hemi", Vector3(0, 1, 0), scene);
+  HemisphericLight::New("hemi", Vector3(0.f, 1.f, 0.f), scene);
 
   // The skybox creation
   auto skybox = Mesh::CreateSphere("skyBox", 10u, 1000.f, scene);

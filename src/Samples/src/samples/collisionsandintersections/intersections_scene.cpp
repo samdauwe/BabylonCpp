@@ -34,7 +34,7 @@ const char* IntersectionsScene::getName()
 void IntersectionsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 1, 0.8f, 70, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 1.f, 0.8f, 70.f, Vector3::Zero(), scene);
   camera->setTarget(Vector3(5.f, 0.f, 0.f));
   camera->attachControl(canvas, true);
 

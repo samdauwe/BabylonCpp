@@ -34,7 +34,7 @@ void SkyMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   camera->attachControl(canvas, true);
 
   // Light
-  auto light       = HemisphericLight::New("light", Vector3(0, 1, 0), scene);
+  auto light = HemisphericLight::New("light", Vector3(0.f, 1.f, 0.f), scene);
   light->intensity = 1.f;
 
   // Ground
@@ -54,7 +54,7 @@ void SkyMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
   _skyboxMaterial->backFaceCulling = false;
 
   // Sky mesh (box)
-  auto skybox      = Mesh::CreateBox("skyBox", 1000.0, scene);
+  auto skybox      = Mesh::CreateBox("skyBox", 1000.f, scene);
   skybox->material = _skyboxMaterial;
 
   // Events

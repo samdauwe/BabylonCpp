@@ -27,7 +27,7 @@ const char* GlossinessAndRoughnessScene::getName()
 
 void GlossinessAndRoughnessScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  auto camera = ArcRotateCamera::New("camera1", 0, Math::PI_2, 5,
+  auto camera = ArcRotateCamera::New("camera1", 0.f, Math::PI_2, 5.f,
                                      Vector3(0.f, 0.f, 0.f), scene);
   camera->attachControl(canvas, true);
 

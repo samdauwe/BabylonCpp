@@ -49,7 +49,7 @@ void ProceduralHexPlanetGenerationScene::initializeScene(ICanvas* canvas,
 
   // Create the icosphere
   _hexPlanet
-    = std::make_unique<Extensions::SimplePlanet>(2.f, 6, scene, "sdasy");
+    = std::make_unique<Extensions::SimplePlanet>(2.f, 6.f, scene, "sdasy");
   _hexPlanet->initialize();
   _hexPlanet->render();
 

@@ -30,7 +30,7 @@ const char* RaycastOnHeightMapScene::getName()
 void RaycastOnHeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto camera
-    = ArcRotateCamera::New("Camera", 0, 0, 10, Vector3::Zero(), scene);
+    = ArcRotateCamera::New("Camera", 0.f, 0.f, 10.f, Vector3::Zero(), scene);
   auto sun       = PointLight::New("Omni0", Vector3(60.f, 100.f, 10.f), scene);
   sun->intensity = 0.98f;
 

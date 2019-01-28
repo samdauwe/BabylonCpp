@@ -85,7 +85,7 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Animation keys
   std::vector<IAnimationKey> keys;
-  int frame = 0;
+  float frame = 0.f;
   for (const auto& point : curve) {
     keys.emplace_back(IAnimationKey(frame, AnimationValue(point)));
     ++frame;
@@ -131,7 +131,7 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
   cubeRotationAnimation->setKeys(rotationKeys);
   cube->animations.emplace_back(cubeRotationAnimation);
 
-  scene->beginAnimation(cube, 0, frame - 2, true);
+  scene->beginAnimation(cube, 0.f, frame - 2.f, true);
 }
 
 } // end of namespace Samples

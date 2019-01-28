@@ -36,9 +36,9 @@ const char* SimpleCarFollowingPathScene::getName()
 void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   // Create a camera
-  auto camera
-    = ArcRotateCamera::New("camera1", 0, 0, 0, Vector3(0, 0, 0), scene);
-  camera->setPosition(Vector3(0, 60, -130));
+  auto camera = ArcRotateCamera::New("camera1", 0.f, 0.f, 0.f,
+                                     Vector3(0.f, 0.f, 0.f), scene);
+  camera->setPosition(Vector3(0.f, 60.f, -130.f));
   camera->attachControl(canvas, true);
 
   // Create a light
@@ -53,17 +53,18 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Array of points for trapezium side of car.
   std::vector<Vector3> side{
-    Vector3(-4, 2, -2), //
-    Vector3(4, 2, -2),  //
-    Vector3(5, -2, -2), //
-    Vector3(-7, -2, -2) //
+    Vector3(-4.f, 2.f, -2.f), //
+    Vector3(4.f, 2.f, -2.f),  //
+    Vector3(5.f, -2.f, -2.f), //
+    Vector3(-7.f, -2.f, -2.f) //
   };
 
   // Close trapezium
   side.emplace_back(side[0]);
 
   // Array of points for the extrusion path
-  const std::vector<Vector3> extrudePath = {Vector3(0, 0, 0), Vector3(0, 0, 4)};
+  const std::vector<Vector3> extrudePath
+    = {Vector3(0.f, 0.f, 0.f), Vector3(0.f, 0.f, 4.f)};
 
   // Create body and apply material
   ExtrudeShapeOptions extrudeShapeOptions;
@@ -87,10 +88,10 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
     cylinderOptions.height       = 1.f;
     cylinderOptions.tessellation = 24;
     // - Set color for wheel tread as black
-    cylinderOptions.faceColors[1] = Color4(0, 0, 0);
+    cylinderOptions.faceColors[1] = Color4(0.f, 0.f, 0.f);
     // - Set texture for flat face of wheel
-    cylinderOptions.faceUV[0] = Vector4(0, 0, 1, 1);
-    cylinderOptions.faceUV[2] = Vector4(0, 0, 1, 1);
+    cylinderOptions.faceUV[0] = Vector4(0.f, 0.f, 1.f, 1.f);
+    cylinderOptions.faceUV[2] = Vector4(0.f, 0.f, 1.f, 1.f);
     auto wheel = MeshBuilder::CreateCylinder(wheelName, cylinderOptions, scene);
     wheel->material = wheelMaterial;
     // Rotate wheel so tread in xz plane

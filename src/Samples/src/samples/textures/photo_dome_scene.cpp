@@ -22,7 +22,7 @@ const char* PhotoDomeScene::getName()
 
 void PhotoDomeScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 5,
+  auto camera = ArcRotateCamera::New("Camera", -Math::PI_2, Math::PI_2, 5.f,
                                      Vector3::Zero(), scene);
   camera->attachControl(canvas, true);
   camera->inputs->attached["mousewheel"]->detachControl(canvas);

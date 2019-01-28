@@ -29,7 +29,7 @@ const char* CellShadingMaterialScene::getName()
 void CellShadingMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto light  = PointLight::New("point01", Vector3(0.f, 8.f, 0.f), scene);
-  auto camera = FreeCamera::New("camera", Vector3(0, 10, 7), scene);
+  auto camera = FreeCamera::New("camera", Vector3(0.f, 10.f, 7.f), scene);
   camera->setTarget(Vector3::Zero());
   camera->speed = 0.4f;
   camera->attachControl(canvas, true);
@@ -70,7 +70,7 @@ void CellShadingMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
     auto newInstance = knot->createInstance("i" + indexStr);
     auto x           = range / 2.f - Math::random() * range;
     auto z           = range / 2.f - Math::random() * range;
-    auto y           = 3;
+    auto y           = 3.f;
 
     newInstance->position = Vector3(x, y, z);
     newInstance->rotate(Axis::Y(), Math::random() * Math::PI2, Space::WORLD);

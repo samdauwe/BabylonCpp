@@ -161,7 +161,6 @@ target_compile_definitions(${TARGET}
 # Compile options
 target_compile_options(${TARGET}
     PRIVATE
-    -fno-var-tracking
     PUBLIC
 )
 
