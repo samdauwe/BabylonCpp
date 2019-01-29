@@ -504,8 +504,7 @@ AnimatablePtr Node::beginAnimation(const std::string& iName, bool loop,
 
   auto _this = std::static_pointer_cast<IAnimatable>(shared_from_this());
 
-  return _scene->beginAnimation(_this, static_cast<int>(range->from),
-                                static_cast<int>(range->to), loop, speedRatio,
+  return _scene->beginAnimation(_this, range->from, range->to, loop, speedRatio,
                                 onAnimationEnd);
 }
 

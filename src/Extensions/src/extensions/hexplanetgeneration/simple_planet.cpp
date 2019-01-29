@@ -131,9 +131,10 @@ void SimplePlanet::render()
       colors.emplace_back(1.f);
     }
 
-    for (size_t i = relativeZeroIndex; i < (positions.size() / 3) - 2; ++i) {
-      _planet.faceToTile[indices.size() / 3] = static_cast<unsigned>(n);
-      indices.emplace_back(relativeZeroIndex);
+    auto _relativeZeroIndex = static_cast<uint32_t>(relativeZeroIndex);
+    for (uint32_t i = _relativeZeroIndex; i < (positions.size() / 3) - 2; ++i) {
+      _planet.faceToTile[indices.size() / 3] = static_cast<uint32_t>(n);
+      indices.emplace_back(_relativeZeroIndex);
       indices.emplace_back(i + 1);
       indices.emplace_back(i + 2);
     }

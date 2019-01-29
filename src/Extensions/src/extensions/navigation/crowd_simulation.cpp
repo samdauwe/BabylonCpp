@@ -136,7 +136,7 @@ void CrowdSimulation::computeRoadMap()
       for (size_t j = 0; j < roadmap.size(); ++j) {
         if (_simulator->queryVisibility(roadmap[i].position,
                                         roadmap[j].position, agentRadius)) {
-          roadmap[i].neighbors.push_back(j);
+          roadmap[i].neighbors.push_back(static_cast<uint32_t>(j));
         }
       }
 
@@ -227,7 +227,7 @@ void CrowdSimulation::setPrecision(unsigned int precision)
 bool CrowdSimulation::isRunning() const
 {
   // Check if all agents reached their goal
-  long numEntitiesReachedGoal = std::count_if(
+  auto numEntitiesReachedGoal = std::count_if(
     _agents.begin(), _agents.end(), [](const ECS::Entity& entity) {
       return entity.getComponent<CrowdAgent>().reachedGoal();
     });

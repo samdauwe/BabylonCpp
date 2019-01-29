@@ -89,7 +89,7 @@ SolidParticleSystem::SolidParticleSystem(
 {
   _depthSortFunction
     = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) {
-        return (p2.sqDistance - p1.sqDistance);
+        return static_cast<int>(p2.sqDistance - p1.sqDistance);
       };
 }
 

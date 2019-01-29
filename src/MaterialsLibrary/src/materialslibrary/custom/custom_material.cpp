@@ -50,17 +50,17 @@ void CustomMaterial::AttachAfterBind(Mesh* /*mesh*/, Effect* effect)
 }
 
 std::vector<std::string>
-CustomMaterial::ReviewUniform(const std::string& name,
+CustomMaterial::ReviewUniform(const std::string& iName,
                               std::vector<std::string> arr)
 {
-  if (name == "uniform") {
+  if (iName == "uniform") {
     for (const auto& ind : _newUniforms) {
       if (!String::contains(ind, "sampler")) {
         arr.emplace_back(ind);
       }
     }
   }
-  if (name == "sampler") {
+  if (iName == "sampler") {
     for (const auto& ind : _newUniforms) {
       if (!String::contains(ind, "sampler")) {
         arr.emplace_back(ind);
@@ -83,7 +83,8 @@ CustomMaterial::Builder(const std::string& /*shaderName*/,
   _isCreatedShader = false;
 
   ++CustomMaterial::ShaderIndexer;
-  std::string name = "custom_" + std::to_string(CustomMaterial::ShaderIndexer);
+  std::string customName
+    = "custom_" + std::to_string(CustomMaterial::ShaderIndexer);
 
   ReviewUniform("uniform", uniforms);
   ReviewUniform("sampler", samplers);
@@ -109,7 +110,7 @@ CustomMaterial::Builder(const std::string& /*shaderName*/,
                          (!CustomParts.Vertex_Before_NormalUpdated.empty() ?
                             CustomParts.Vertex_Before_NormalUpdated :
                             ""));
-  Effect::ShadersStore()[name + "VertexShader"] = _VertexShader;
+  Effect::ShadersStore()[customName + "VertexShader"] = _VertexShader;
 
   // #define CUSTOM_VERTEX_MAIN_END
 
@@ -141,32 +142,32 @@ CustomMaterial::Builder(const std::string& /*shaderName*/,
                          (!CustomParts.Fragment_Before_FragColor.empty() ?
                             CustomParts.Fragment_Before_FragColor :
                             ""));
-  Effect::ShadersStore()[name + "PixelShader"] = _FragmentShader;
+  Effect::ShadersStore()[customName + "PixelShader"] = _FragmentShader;
 
   // #define CUSTOM_FRAGMENT_BEFORE_LIGHTS
 
   // #define CUSTOM_FRAGMENT_BEFORE_FOG
 
   _isCreatedShader   = true;
-  _createdShaderName = name;
+  _createdShaderName = customName;
 
-  return name;
+  return customName;
 }
 
 CustomMaterial&
-CustomMaterial::AddUniform(const std::string& name, const std::string& kind,
+CustomMaterial::AddUniform(const std::string& iName, const std::string& kind,
                            const std::optional<UniformInstance>& param)
 {
   if (param) {
     if (!String::contains(kind, "sampler")) {
-      _newUniformInstances[kind + "-" + name] = *param;
+      _newUniformInstances[kind + "-" + iName] = *param;
     }
     else {
-      _newUniformInstances[kind + "-" + name] = *param;
+      _newUniformInstances[kind + "-" + iName] = *param;
     }
   }
-  _customUniform.emplace_back("uniform " + kind + " " + name + ";");
-  _newUniforms.emplace_back(name);
+  _customUniform.emplace_back("uniform " + kind + " " + iName + ";");
+  _newUniforms.emplace_back(iName);
 
   return *this;
 }

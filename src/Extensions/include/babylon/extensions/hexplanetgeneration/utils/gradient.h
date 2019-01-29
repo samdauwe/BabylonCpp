@@ -35,7 +35,7 @@ public:
   T& getValue(size_t index)
   {
     const auto idx = std::floor(index * (_resolution - 1.f));
-    return _gradient[idx];
+    return _gradient[static_cast<size_t>(idx)];
   }
 
   void calculate()
@@ -53,7 +53,8 @@ public:
       auto step = (nextStop.second - currentStop.second) / (totalSteps - 1);
 
       for (size_t i = 0; i < totalSteps; ++i) {
-        auto gradIdx       = i + std::ceil(currentStop.first * _resolution);
+        auto gradIdx
+          = static_cast<size_t>(i + std::ceil(currentStop.first * _resolution));
         auto val           = currentStop.second + (step * i);
         _gradient[gradIdx] = val;
       }

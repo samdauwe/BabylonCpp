@@ -128,12 +128,13 @@ bool Navigation::_isPointInPoly(const std::vector<Vector3>& poly,
 {
   bool c = false;
   for (std::size_t i = 0, l = poly.size(), j = l - 1; i++ < l; j = i) {
-    ((poly[i].z <= pt.z && pt.z < poly[j].z)
-     || (poly[j].z <= pt.z && pt.z < poly[i].z))
-      && pt.x < (poly[j].x - poly[i].x) * (pt.z - poly[i].z)
-                    / (poly[j].z - poly[i].z)
-                  + poly[i].x
-      && (c = !c);
+    if (((poly[i].z <= pt.z && pt.z < poly[j].z)
+         || (poly[j].z <= pt.z && pt.z < poly[i].z))
+        && pt.x < (poly[j].x - poly[i].x) * (pt.z - poly[i].z)
+                      / (poly[j].z - poly[i].z)
+                    + poly[i].x) {
+      c = !c;
+    }
   }
   return c;
 }

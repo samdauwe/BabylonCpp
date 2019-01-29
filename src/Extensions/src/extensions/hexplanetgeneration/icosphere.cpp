@@ -739,10 +739,11 @@ float Icosphere::relaxMesh(IcosahedronMesh& mesh, float multiplier)
     ++i;
   }
 
-  for (size_t i = 0; i < mesh.nodes.size(); ++i) {
-    pointShifts[i] = mesh.nodes[i].p
-                     + Tools::projectOnPlane(pointShifts[i], mesh.nodes[i].p);
-    pointShifts[i].normalize();
+  for (size_t ni = 0; ni < mesh.nodes.size(); ++ni) {
+    pointShifts[ni]
+      = mesh.nodes[ni].p
+        + Tools::projectOnPlane(pointShifts[ni], mesh.nodes[ni].p);
+    pointShifts[ni].normalize();
   }
 
   Float32Array rotationSupressions(mesh.nodes.size());

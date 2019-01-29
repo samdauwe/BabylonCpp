@@ -122,10 +122,10 @@ void Tools::FetchToRef(int u, int v, int width, int height,
   auto wrappedV = ((std::abs(v) * height) % height);
 
   auto position = static_cast<size_t>((wrappedU + wrappedV * width) * 4);
-  color.r       = pixels[position] / 255;
-  color.g       = pixels[position + 1] / 255;
-  color.b       = pixels[position + 2] / 255;
-  color.a       = pixels[position + 3] / 255;
+  color.r       = pixels[position] / 255.f;
+  color.g       = pixels[position + 1] / 255.f;
+  color.b       = pixels[position + 2] / 255.f;
+  color.a       = pixels[position + 3] / 255.f;
 }
 
 float Tools::Mix(float a, float b, float alpha)

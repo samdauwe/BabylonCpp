@@ -2090,7 +2090,7 @@ void SimplexNoise::seed(uint32_t s)
   gen.seed(s);
   std::uniform_int_distribution<> distribution(1, 255);
   for (size_t i = 0; i < 256; ++i) {
-    perm[i] = perm[i + 256] = distribution(gen);
+    perm[i] = perm[i + 256] = static_cast<unsigned char>(distribution(gen));
   }
 }
 

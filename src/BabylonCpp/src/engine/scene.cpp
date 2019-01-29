@@ -1937,7 +1937,7 @@ std::vector<AnimationPtr> Scene::getAnimations()
 }
 
 AnimatablePtr Scene::beginWeightedAnimation(
-  const IAnimatablePtr& target, int from, int to, float weight, bool loop,
+  const IAnimatablePtr& target, float from, float to, float weight, bool loop,
   float speedRatio, const std::function<void()>& onAnimationEnd,
   AnimatablePtr animatable,
   const std::function<bool(IAnimatable* target)>& targetMask)
@@ -2013,7 +2013,7 @@ Scene::beginDirectAnimation(const IAnimatablePtr& target,
 
 std::vector<AnimatablePtr> Scene::beginDirectHierarchyAnimation(
   const NodePtr& target, bool directDescendantsOnly,
-  const std::vector<AnimationPtr>& iAnimations, int from, int to, bool loop,
+  const std::vector<AnimationPtr>& iAnimations, float from, float to, bool loop,
   float speedRatio, const std::function<void()>& onAnimationEnd)
 {
   auto children = target->getDescendants(directDescendantsOnly);

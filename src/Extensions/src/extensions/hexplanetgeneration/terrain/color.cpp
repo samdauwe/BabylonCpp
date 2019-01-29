@@ -56,6 +56,10 @@ void Color::setupGradient()
   _terrainGradient.addStop(1.f,
                            Color3(230.f / 255.f, 255.f / 255.f, 255.f / 255.f));
 
+#if _MSC_VER && !__INTEL_COMPILER
+#pragma warning(disable : 4244)
+#endif
+
   _terrainGradient.calculate();
 
   _terrainGradient2D = ColorGradient2D(256);

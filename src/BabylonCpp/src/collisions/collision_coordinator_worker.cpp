@@ -177,7 +177,7 @@ void CollisionCoordinatorWorker::onMeshUpdated(TransformNode* transformNode)
 
 void CollisionCoordinatorWorker::onMeshRemoved(AbstractMesh* mesh)
 {
-  _toRemoveMeshesArray.emplace_back(mesh->uniqueId);
+  _toRemoveMeshesArray.emplace_back(static_cast<uint32_t>(mesh->uniqueId));
 }
 
 void CollisionCoordinatorWorker::onGeometryAdded(Geometry* geometry)

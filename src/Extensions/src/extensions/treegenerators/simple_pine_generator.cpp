@@ -36,7 +36,7 @@ MeshPtr SimplePineGenerator::CreateTree(Scene* scene,
     return path;
   };
 
-  auto nbL   = canopies + 1;
+  auto nbL   = canopies + 1.f;
   auto nbS   = height;
   auto curve = curvePoints(nbS, nbL);
 

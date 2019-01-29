@@ -834,8 +834,8 @@ CameraPtr Camera::Parse(const json& parsedCamera, Scene* scene)
 
   if (json_util::has_key(parsedCamera, "autoAnimate")) {
     scene->beginAnimation(
-      camera, json_util::get_number(parsedCamera, "autoAnimateFrom", 0),
-      json_util::get_number(parsedCamera, "autoAnimateTo", 0),
+      camera, json_util::get_number(parsedCamera, "autoAnimateFrom", 0.f),
+      json_util::get_number(parsedCamera, "autoAnimateTo", 0.f),
       json_util::get_bool(parsedCamera, "autoAnimateLoop"),
       json_util::get_number(parsedCamera, "autoAnimateSpeed", 1.f));
   }
