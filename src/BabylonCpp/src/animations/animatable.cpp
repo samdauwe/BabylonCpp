@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 Animatable::Animatable(Scene* scene, const IAnimatablePtr& iTarget,
-                       int iFromFrame, int iToFrame, bool iLoopAnimation,
+                       float iFromFrame, float iToFrame, bool iLoopAnimation,
                        float iSpeedRatio,
                        const std::function<void()>& iOnAnimationEnd,
                        const std::vector<AnimationPtr>& animations)

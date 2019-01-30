@@ -119,15 +119,15 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     _defaultPipelineTextureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
   }
 
-  auto engine = _scene->getEngine();
+  auto iEngine = _scene->getEngine();
   // Create post processes before hand so they can be modified before enabled.
   // Block compilation flag is set to true to avoid compilation prior to use,
   // these will be updated on first use in build pipeline.
   sharpen = SharpenPostProcess::New(
-    "sharpen", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine,
+    "sharpen", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, iEngine,
     false, _defaultPipelineTextureType, true);
   _sharpenEffect = PostProcessRenderEffect::New(
-    engine, SharpenPostProcessId,
+    iEngine, SharpenPostProcessId,
     [this]() -> std::vector<PostProcessPtr> { return {sharpen}; }, true);
 
   depthOfField = DepthOfFieldEffect::New(
@@ -137,24 +137,25 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
                            _defaultPipelineTextureType, true);
 
   chromaticAberration = ChromaticAberrationPostProcess::New(
-    "ChromaticAberration", engine->getRenderWidth(), engine->getRenderHeight(),
-    1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, engine, false,
+    "ChromaticAberration", iEngine->getRenderWidth(),
+    iEngine->getRenderHeight(), 1.f, nullptr,
+    TextureConstants::BILINEAR_SAMPLINGMODE, iEngine, false,
     _defaultPipelineTextureType, true);
   _chromaticAberrationEffect = PostProcessRenderEffect::New(
-    engine, ChromaticAberrationPostProcessId,
+    iEngine, ChromaticAberrationPostProcessId,
     [this]() -> std::vector<PostProcessPtr> { return {chromaticAberration}; },
     true);
 
-  grain        = GrainPostProcess::New("Grain", 1.f, nullptr,
-                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
-                                false, _defaultPipelineTextureType, true);
+  grain = GrainPostProcess::New(
+    "Grain", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, iEngine,
+    false, _defaultPipelineTextureType, true);
   _grainEffect = PostProcessRenderEffect::New(
-    engine, GrainPostProcessId,
+    iEngine, GrainPostProcessId,
     [this]() -> std::vector<PostProcessPtr> { return {grain}; }, true);
 
-  _resizeObserver = engine->onResizeObservable.add(
+  _resizeObserver = iEngine->onResizeObservable.add(
     [this](Engine* engine, EventState& /*es*/) {
-      _hardwareScaleLevel = engine->getHardwareScalingLevel();
+      _hardwareScaleLevel = engine->getHardwareScalingLevel() * 1.f;
       bloomKernel         = bloomKernel();
     });
 
@@ -462,7 +463,7 @@ void DefaultRenderingPipeline::_buildPipeline()
 
   _scene->autoClear = true;
 
-  auto engine = _scene->getEngine();
+  auto iEngine = _scene->getEngine();
 
   _disposePostProcesses();
   if (!_cameras.empty()) {
@@ -528,10 +529,10 @@ void DefaultRenderingPipeline::_buildPipeline()
   if (_imageProcessingEnabled) {
     imageProcessing = ImageProcessingPostProcess::New(
       "imageProcessing", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-      engine, false, _defaultPipelineTextureType);
+      iEngine, false, _defaultPipelineTextureType);
     if (_hdr) {
       addEffect(PostProcessRenderEffect::New(
-        engine, ImageProcessingPostProcessId,
+        iEngine, ImageProcessingPostProcessId,
         [this]() -> std::vector<PostProcessPtr> { return {imageProcessing}; },
         true));
       _setAutoClearAndTextureSharing(imageProcessing);
@@ -566,11 +567,11 @@ void DefaultRenderingPipeline::_buildPipeline()
   }
 
   if (fxaaEnabled) {
-    fxaa = FxaaPostProcess::New("fxaa", 1.0, nullptr,
-                                TextureConstants::BILINEAR_SAMPLINGMODE, engine,
-                                false, _defaultPipelineTextureType);
+    fxaa = FxaaPostProcess::New("fxaa", 1.f, nullptr,
+                                TextureConstants::BILINEAR_SAMPLINGMODE,
+                                iEngine, false, _defaultPipelineTextureType);
     addEffect(PostProcessRenderEffect::New(
-      engine, FxaaPostProcessId,
+      iEngine, FxaaPostProcessId,
       [this]() -> std::vector<PostProcessPtr> { return {fxaa}; }, true));
     _setAutoClearAndTextureSharing(fxaa, true);
   }

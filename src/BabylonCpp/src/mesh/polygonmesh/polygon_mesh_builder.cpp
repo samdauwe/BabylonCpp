@@ -14,7 +14,14 @@
 // Use of GNU statement expression extension
 #endif
 #endif
+#if _MSC_VER && !__INTEL_COMPILER
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
 #include <earcut.hpp>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
@@ -55,7 +62,8 @@ void PolygonMeshBuilder::_addToepoint(const std::vector<Vector2>& points)
   }
 }
 
-PolygonMeshBuilder& PolygonMeshBuilder::addHole(const std::vector<Vector2>& hole)
+PolygonMeshBuilder&
+PolygonMeshBuilder::addHole(const std::vector<Vector2>& hole)
 {
   _points.add(hole);
   PolygonPoints holepoints;
@@ -258,12 +266,13 @@ void PolygonMeshBuilder::addHoles(const std::vector<Point2D>& epoints,
     }
     // Add outer ring
     std::vector<Point2D> ring(epoints.begin(),
-                           epoints.begin() + static_cast<long>(holes[0][0]));
+                              epoints.begin() + static_cast<long>(holes[0][0]));
     polygon.emplace_back(ring);
     // Add holes
     for (auto& holeRange : holes) {
-      std::vector<Point2D> hole(epoints.begin() + static_cast<long>(holeRange[0]),
-                             epoints.begin() + static_cast<long>(holeRange[1]));
+      std::vector<Point2D> hole(
+        epoints.begin() + static_cast<long>(holeRange[0]),
+        epoints.begin() + static_cast<long>(holeRange[1]));
       polygon.emplace_back(hole);
     }
   }

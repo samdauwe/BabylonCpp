@@ -18,7 +18,7 @@ Buffer::Buffer(Engine* engine, const Float32Array& data, bool updatable,
     , _instanced{instanced}
 {
   if (!stride.has_value()) {
-    stride = 0ul;
+    stride = 0ull;
   }
 
   byteStride = useBytes ? *stride : *stride * sizeof(float);
@@ -38,7 +38,7 @@ Buffer::Buffer(Mesh* mesh, const Float32Array& data, bool updatable,
     , _instanced{instanced}
 {
   if (!stride.has_value()) {
-    stride = 0ul;
+    stride = 0ull;
   }
 
   byteStride = useBytes ? *stride : *stride * sizeof(float);
@@ -53,7 +53,7 @@ Buffer::~Buffer()
 }
 
 std::unique_ptr<VertexBuffer>
-Buffer::createVertexBuffer(unsigned int kind, size_t offset, int size,
+Buffer::createVertexBuffer(unsigned int kind, size_t offset, size_t size,
                            std::optional<size_t> stride,
                            std::optional<bool> instanced, bool useBytes)
 {

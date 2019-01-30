@@ -24,14 +24,14 @@ BloomEffect::BloomEffect(const std::string& name, Scene* scene,
     scene->getEngine(), false, pipelineTextureType, blockCompilation);
 
   _blurX = BlurPostProcess::New(
-    "horizontal blur", Vector2(1.f, 0.f), 10.0, bloomScale, nullptr,
+    "horizontal blur", Vector2(1.f, 0.f), 10.f, bloomScale, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     pipelineTextureType, "", blockCompilation);
   _blurX->alwaysForcePOT = true;
   _blurX->autoClear      = false;
 
   _blurY = BlurPostProcess::New(
-    "vertical blur", Vector2(0.f, 1.f), 10.0, bloomScale, nullptr,
+    "vertical blur", Vector2(0.f, 1.f), 10.f, bloomScale, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
     pipelineTextureType, "", blockCompilation);
   _blurY->alwaysForcePOT = true;

@@ -48,19 +48,19 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
     }
   };
 
-  const auto preprocessUrl = [](std::string url) {
+  const auto preprocessUrl = [](std::string iUrl) {
     // Check if the file is locally available
     // - Check in local folder
-    auto absolutePath = Filesystem::absolutePath(url);
+    auto absolutePath = Filesystem::absolutePath(iUrl);
     if (Filesystem::exists(absolutePath)) {
       return absolutePath;
     }
     // - Check in assets folder
-    absolutePath = Filesystem::absolutePath("../assets/" + url);
+    absolutePath = Filesystem::absolutePath("../assets/" + iUrl);
     if (Filesystem::exists(absolutePath)) {
       return absolutePath;
     }
-    return url;
+    return iUrl;
   };
 
   const auto configFileUrl = preprocessUrl(jsonUrl + "/config.json");

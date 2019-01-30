@@ -121,7 +121,7 @@ void SSAORenderingPipeline::dispose(bool disableDepthRender,
 
 void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
 {
-  auto size = 16;
+  auto size = 16.f;
 
   _blurHPostProcess = BlurPostProcess::New(
     "BlurH", Vector2(1.f, 0.f), size, ratio, nullptr,

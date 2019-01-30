@@ -66,8 +66,9 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
       break;
     }
   }
-  auto adjustedKernelSize = kernelSize / std::pow(2, blurCount - 1);
-  auto ratio              = 1.f;
+  auto adjustedKernelSize
+    = static_cast<float>(kernelSize / std::pow(2, blurCount - 1));
+  auto ratio = 1.f;
   for (int i = 0; i < blurCount; ++i) {
     auto blurY = DepthOfFieldBlurPostProcess::New(
       "verticle blur", scene, Vector2(0.f, 1.f), adjustedKernelSize, ratio,

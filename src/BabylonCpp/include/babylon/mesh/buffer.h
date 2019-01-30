@@ -69,7 +69,7 @@ public:
    * @returns the new vertex buffer
    */
   std::unique_ptr<VertexBuffer>
-  createVertexBuffer(unsigned int kind, size_t offset, int size,
+  createVertexBuffer(unsigned int kind, size_t offset, size_t size,
                      std::optional<size_t> stride  = std::nullopt,
                      std::optional<bool> instanced = std::nullopt,
                      bool useBytes                 = false);

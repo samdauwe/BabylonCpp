@@ -136,9 +136,9 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
     d.emplace_back(Math::random());
   }
   _randomTexture = std::make_unique<RawTexture>(
-    ArrayBufferView(d), maxTextureSize, 1, EngineConstants::TEXTUREFORMAT_RGBA,
-    _scene, false, false, TextureConstants::NEAREST_SAMPLINGMODE,
-    EngineConstants::TEXTURETYPE_FLOAT);
+    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1,
+    EngineConstants::TEXTUREFORMAT_RGBA, _scene, false, false,
+    TextureConstants::NEAREST_SAMPLINGMODE, EngineConstants::TEXTURETYPE_FLOAT);
   _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
@@ -150,9 +150,9 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
     d.emplace_back(Math::random());
   }
   _randomTexture2 = std::make_unique<RawTexture>(
-    ArrayBufferView(d), maxTextureSize, 1, EngineConstants::TEXTUREFORMAT_RGBA,
-    _scene, false, false, TextureConstants::NEAREST_SAMPLINGMODE,
-    EngineConstants::TEXTURETYPE_FLOAT);
+    ArrayBufferView(d), static_cast<int>(maxTextureSize), 1,
+    EngineConstants::TEXTUREFORMAT_RGBA, _scene, false, false,
+    TextureConstants::NEAREST_SAMPLINGMODE, EngineConstants::TEXTURETYPE_FLOAT);
   _randomTexture2->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture2->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 

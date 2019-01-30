@@ -155,12 +155,12 @@ void PhysicsImpostor::set_parent(PhysicsImpostor* const& value)
   _parent = value;
 }
 
-void PhysicsImpostor::set_physicsBody(IPhysicsBody* const& physicsBody)
+void PhysicsImpostor::set_physicsBody(IPhysicsBody* const& iPhysicsBody)
 {
-  if (_physicsBody && _physicsEngine) {
+  if (iPhysicsBody && _physicsEngine) {
     _physicsEngine->getPhysicsPlugin()->removePhysicsBody(this);
   }
-  _physicsBody = physicsBody;
+  _physicsBody = iPhysicsBody;
   resetUpdateFlags();
 }
 
@@ -267,13 +267,13 @@ void PhysicsImpostor::set_restitution(float value)
   _physicsEngine->getPhysicsPlugin()->setBodyRestitution(this, value);
 }
 
-void PhysicsImpostor::setMass(float mass)
+void PhysicsImpostor::setMass(float iMass)
 {
-  if (stl_util::almost_equal(getParam("mass"), mass)) {
-    setParam("mass", mass);
+  if (stl_util::almost_equal(getParam("mass"), iMass)) {
+    setParam("mass", iMass);
   }
   if (_physicsEngine) {
-    _physicsEngine->getPhysicsPlugin()->setBodyMass(this, mass);
+    _physicsEngine->getPhysicsPlugin()->setBodyMass(this, iMass);
   }
 }
 
