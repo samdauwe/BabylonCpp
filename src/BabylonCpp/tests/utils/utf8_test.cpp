@@ -18,7 +18,7 @@ TEST(TestUTF8, next)
 {
   const char* twochars = "\xe6\x97\xa5\xd1\x88";
   const char* w        = twochars;
-  auto cp              = utf8::next(w, twochars + 6);
+  auto cp              = static_cast<int>(utf8::next(w, twochars + 6));
   EXPECT_EQ(cp, 0x65e5);
   EXPECT_EQ(w, twochars + 3);
 }
@@ -27,7 +27,7 @@ TEST(TestUTF8, peek_next)
 {
   const char* twochars = "\xe6\x97\xa5\xd1\x88";
   const char* w        = twochars;
-  auto cp              = utf8::peek_next(w, twochars + 6);
+  auto cp              = static_cast<int>(utf8::peek_next(w, twochars + 6));
   EXPECT_EQ(cp, 0x65e5);
   EXPECT_EQ(w, twochars);
 }
@@ -36,7 +36,7 @@ TEST(TestUTF8, prior)
 {
   const char* twochars = "\xe6\x97\xa5\xd1\x88";
   const char* w        = twochars + 3;
-  auto cp              = utf8::prior(w, twochars);
+  auto cp              = static_cast<int>(utf8::prior(w, twochars));
   EXPECT_EQ(cp, 0x65e5);
   EXPECT_EQ(w, twochars);
 }
@@ -45,7 +45,7 @@ TEST(TestUTF8, previous)
 {
   const char* twochars = "\xe6\x97\xa5\xd1\x88";
   const char* w        = twochars + 3;
-  auto cp              = utf8::previous(w, twochars - 1);
+  auto cp              = static_cast<int>(utf8::previous(w, twochars - 1));
   EXPECT_EQ(cp, 0x65e5);
   EXPECT_EQ(w, twochars);
 }

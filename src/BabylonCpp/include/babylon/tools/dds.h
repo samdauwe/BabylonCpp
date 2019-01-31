@@ -137,25 +137,25 @@ private:
   static Float32Array
   _GetHalfFloatAsFloatRGBAArrayBuffer(float width, float height, int dataOffset,
                                       size_t dataLength,
-                                      const Uint8Array& arrayBuffer, float lod);
+                                      const Uint8Array& arrayBuffer, int lod);
   static Uint16Array _GetHalfFloatRGBAArrayBuffer(float width, float height,
                                                   int dataOffset,
                                                   size_t dataLength,
                                                   const Uint8Array& arrayBuffer,
-                                                  float lod);
+                                                  int lod);
   static Float32Array _GetFloatRGBAArrayBuffer(float width, float height,
                                                int dataOffset,
                                                size_t dataLength,
                                                const Uint8Array& arrayBuffer,
-                                               float lod);
+                                               int lod);
   static Float32Array
   _GetFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
                                  size_t dataLength,
-                                 const Uint8Array& arrayBuffer, float lod);
+                                 const Uint8Array& arrayBuffer, int lod);
   static Float32Array
   _GetHalfFloatAsUIntRGBAArrayBuffer(float width, float height, int dataOffset,
                                      size_t dataLength,
-                                     const Uint8Array& arrayBuffer, float lod);
+                                     const Uint8Array& arrayBuffer, int lod);
   static Uint8Array _GetRGBAArrayBuffer(float width, float height,
                                         int dataOffset, size_t dataLength,
                                         const Uint8Array& arrayBuffer,

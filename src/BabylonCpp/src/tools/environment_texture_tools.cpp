@@ -51,9 +51,10 @@ EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
 
   // Read json manifest - collect characters up to null terminator
   std::ostringstream manifestString;
-  char charCode = 0x00;
-  while ((charCode = static_cast<char>(dataView[pos++]))) {
+  char charCode = static_cast<char>(dataView[pos++]);
+  while (charCode) {
     manifestString << String::fromCharCode(charCode);
+    charCode = static_cast<char>(dataView[pos++]);
   }
 
   // Parse JSON string

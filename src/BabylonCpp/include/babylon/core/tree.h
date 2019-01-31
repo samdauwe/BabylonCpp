@@ -325,9 +325,10 @@ public:
    * @brief Returns the number of nodes (including the root node) in the tree.
    * @return Number of nodes (including the root node) in the tree.
    */
-  long size() const
+  size_t size() const
   {
-    return std::distance(begin(), end());
+    auto distance = std::distance(begin(), end());
+    return (distance >= 0) ? static_cast<size_t>(distance) : 0ull;
   }
 
   /**
@@ -361,7 +362,7 @@ public:
  */
 template <typename T>
 class Tree<T>::iterator
-  : public std::iterator<std::bidirectional_iterator_tag, T> {
+    : public std::iterator<std::bidirectional_iterator_tag, T> {
 
 public:
   /**

@@ -30,9 +30,9 @@ TEST(TestTree, BasicTree)
   Tree<int> tree(0);
   initializeChildNodes(tree);
 
-  EXPECT_EQ(tree.size(), 8);
-  EXPECT_EQ(tree.root().arity(), 3);
-  EXPECT_EQ(tree.root().depth(), 0);
+  EXPECT_EQ(tree.size(), 8ull);
+  EXPECT_EQ(tree.root().arity(), 3ull);
+  EXPECT_EQ(tree.root().depth(), 0u);
   EXPECT_TRUE(tree.root().isRoot());
   EXPECT_FALSE(tree.root().isLeaf());
 }

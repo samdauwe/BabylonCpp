@@ -90,8 +90,8 @@ TEST(TestCompileTimeCalculation, Factorial)
     static_assert(factorial(8) == 40320, "f(8) == 40320");
     static_assert(factorial(13) == 6227020800, "f(13) == 6227020800");
 
-    EXPECT_EQ(factorial(8), 40320);
-    EXPECT_EQ(factorial(13), 6227020800);
+    EXPECT_EQ(factorial(8), 40320ull);
+    EXPECT_EQ(factorial(13), 6227020800ull);
   }
 }
 

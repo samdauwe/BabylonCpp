@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <array>
+
 #include <babylon/core/filesystem.h>
 
 TEST(TestFilesystem, extension)

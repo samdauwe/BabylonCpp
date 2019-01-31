@@ -170,7 +170,8 @@ void KhronosTextureContainer::_upload2DCompressedLevels(
 
       auto engine = texture->getEngine();
       engine->_uploadCompressedDataToTextureDirectly(
-        texture, glInternalFormat, width, height, byteArray, face, level);
+        texture, glInternalFormat, static_cast<float>(width),
+        static_cast<float>(height), byteArray, face, level);
 
       dataOffset += static_cast<size_t>(
         imageSize); // add size of the image for the next face/mipmap

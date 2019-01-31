@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <array>
+
 #include <babylon/babylon_common.h>
 #include <babylon/babylon_constants.h>
 #include <babylon/babylon_stl_util.h>

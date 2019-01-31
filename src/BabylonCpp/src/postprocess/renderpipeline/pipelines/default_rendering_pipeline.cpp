@@ -154,8 +154,8 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
     [this]() -> std::vector<PostProcessPtr> { return {grain}; }, true);
 
   _resizeObserver = iEngine->onResizeObservable.add(
-    [this](Engine* engine, EventState& /*es*/) {
-      _hardwareScaleLevel = engine->getHardwareScalingLevel() * 1.f;
+    [this](Engine* iEngine, EventState& /*es*/) {
+      _hardwareScaleLevel = iEngine->getHardwareScalingLevel() * 1.f;
       bloomKernel         = bloomKernel();
     });
 

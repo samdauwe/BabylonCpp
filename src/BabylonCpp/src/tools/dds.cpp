@@ -93,7 +93,7 @@ float DDSTools::_ToHalfFloat(float value)
   /* If zero, or denormal, or exponent underflows too much for a denormal
    * half, return signed zero. */
   if (e < 103) {
-    return bits;
+    return static_cast<float>(bits);
   }
 
   /* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
@@ -102,7 +102,7 @@ float DDSTools::_ToHalfFloat(float value)
     /* If exponent was 0xff and one mantissa bit was set, it means NaN,
      * not Inf, so make sure we set one mantissa bit too. */
     bits |= ((e == 255) ? 0 : 1) && (x & 0x007fffff);
-    return bits;
+    return static_cast<float>(bits);
   }
 
   /* If exponent underflows but not too much, return a denormal */
@@ -111,12 +111,12 @@ float DDSTools::_ToHalfFloat(float value)
     /* Extra rounding may overflow and set mantissa to 0 and exponent
      * to 1, which is OK. */
     bits |= (m >> (114 - e)) + ((m >> (113 - e)) & 1);
-    return bits;
+    return static_cast<float>(bits);
   }
 
   bits |= ((e - 112) << 10) | (m >> 1);
   bits += m & 1;
-  return bits;
+  return static_cast<float>(bits);
 }
 
 float DDSTools::_FromHalfFloat(uint16_t value)
@@ -130,7 +130,7 @@ float DDSTools::_FromHalfFloat(uint16_t value)
     return static_cast<float>(result);
   }
   else if (e == 0x1F) {
-    return f ? 0 : ((s ? -1 : 1) * std::numeric_limits<int>::infinity());
+    return f ? 0.f : ((s ? -1.f : 1.f) * std::numeric_limits<int>::infinity());
   }
 
   auto result
@@ -140,7 +140,7 @@ float DDSTools::_FromHalfFloat(uint16_t value)
 
 Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
   float width, float height, int dataOffset, size_t dataLength,
-  const Uint8Array& arrayBuffer, float lod)
+  const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
   Uint16Array srcData(
@@ -153,7 +153,7 @@ Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
       destArray[index + 1] = DDSTools::_FromHalfFloat(srcData[srcPos + 1]);
       destArray[index + 2] = DDSTools::_FromHalfFloat(srcData[srcPos + 2]);
       if (DDSTools::StoreLODInAlphaChannel) {
-        destArray[index + 3] = lod;
+        destArray[index + 3] = static_cast<float>(lod);
       }
       else {
         destArray[index + 3] = DDSTools::_FromHalfFloat(srcData[srcPos + 3]);
@@ -168,7 +168,7 @@ Float32Array DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
 Uint16Array
 DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
                                        int dataOffset, size_t dataLength,
-                                       const Uint8Array& arrayBuffer, float lod)
+                                       const Uint8Array& arrayBuffer, int lod)
 {
   if (DDSTools::StoreLODInAlphaChannel) {
     Uint16Array destArray(dataLength);
@@ -181,8 +181,8 @@ DDSTools::_GetHalfFloatRGBAArrayBuffer(float width, float height,
         destArray[index]     = srcData[srcPos];
         destArray[index + 1] = srcData[srcPos + 1];
         destArray[index + 2] = srcData[srcPos + 2];
-        destArray[index + 3]
-          = static_cast<uint8_t>(DDSTools::_ToHalfFloat(lod));
+        destArray[index + 3] = static_cast<uint8_t>(
+          DDSTools::_ToHalfFloat(static_cast<float>(lod)));
         index += 4;
       }
     }
@@ -198,7 +198,7 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
                                                 int dataOffset,
                                                 size_t dataLength,
                                                 const Uint8Array& arrayBuffer,
-                                                float lod)
+                                                int lod)
 {
   if (DDSTools::StoreLODInAlphaChannel) {
     Float32Array destArray(dataLength);
@@ -211,7 +211,7 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
         destArray[index]     = srcData[srcPos];
         destArray[index + 1] = srcData[srcPos + 1];
         destArray[index + 2] = srcData[srcPos + 2];
-        destArray[index + 3] = lod;
+        destArray[index + 3] = static_cast<float>(lod);
         index += 4;
       }
     }
@@ -222,9 +222,10 @@ Float32Array DDSTools::_GetFloatRGBAArrayBuffer(float width, float height,
                                    dataLength);
 }
 
-Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
-  float width, float height, int dataOffset, size_t dataLength,
-  const Uint8Array& arrayBuffer, float lod)
+Float32Array
+DDSTools::_GetFloatAsUIntRGBAArrayBuffer(float width, float height,
+                                         int dataOffset, size_t dataLength,
+                                         const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
   Float32Array srcData(
@@ -237,7 +238,7 @@ Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
       destArray[index + 1] = Scalar::Clamp(srcData[srcPos + 1]) * 255;
       destArray[index + 2] = Scalar::Clamp(srcData[srcPos + 2]) * 255;
       if (DDSTools::StoreLODInAlphaChannel) {
-        destArray[index + 3] = lod;
+        destArray[index + 3] = static_cast<float>(lod);
       }
       else {
         destArray[index + 3] = Scalar::Clamp(srcData[srcPos + 3]) * 255;
@@ -251,7 +252,7 @@ Float32Array DDSTools::_GetFloatAsUIntRGBAArrayBuffer(
 
 Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
   float width, float height, int dataOffset, size_t dataLength,
-  const Uint8Array& arrayBuffer, float lod)
+  const Uint8Array& arrayBuffer, int lod)
 {
   Float32Array destArray(dataLength);
   Uint16Array srcData(
@@ -268,7 +269,7 @@ Float32Array DDSTools::_GetHalfFloatAsUIntRGBAArrayBuffer(
       destArray[index + 2]
         = Scalar::Clamp(DDSTools::_FromHalfFloat(srcData[srcPos + 2])) * 255;
       if (DDSTools::StoreLODInAlphaChannel) {
-        destArray[index + 3] = lod;
+        destArray[index + 3] = static_cast<float>(lod);
       }
       else {
         destArray[index + 3]
@@ -579,9 +580,8 @@ void DDSTools::UploadDDSLevels(
         else {
           dataLength = static_cast<size_t>(
             std::max(4.f, width) / 4 * std::max(4.f, height) / 4 * blockBytes);
-          byteArray = Uint8Array(
-            reinterpret_cast<const int*>(arrayBuffer.data() + dataOffset),
-            reinterpret_cast<const int*>(arrayBuffer.data() + dataLength));
+          byteArray
+            = stl_util::to_array<uint8_t>(arrayBuffer, dataOffset, dataLength);
 
           texture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
           engine->_uploadCompressedDataToTextureDirectly(
@@ -589,7 +589,8 @@ void DDSTools::UploadDDSLevels(
             i);
         }
       }
-      dataOffset += bpp ? (width * height * (bpp / 8)) : dataLength;
+      dataOffset += bpp ? static_cast<int>(width * height * (bpp / 8)) :
+                          static_cast<int>(dataLength);
       width *= 0.5f;
       height *= 0.5f;
 

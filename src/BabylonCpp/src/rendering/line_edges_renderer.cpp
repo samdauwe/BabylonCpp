@@ -23,7 +23,7 @@ void LineEdgesRenderer::_checkEdge(size_t /*faceIndex*/, int /*edge*/,
                                    const std::vector<Vector3>& /*faceNormals*/,
                                    const Vector3& p0, const Vector3& p1)
 {
-  auto offset = _linesPositions.size() / 3;
+  auto offset = static_cast<uint32_t>(_linesPositions.size() / 3);
   auto normal = p0.subtract(p1);
   normal.normalize();
 
@@ -53,7 +53,7 @@ void LineEdgesRenderer::_checkEdge(size_t /*faceIndex*/, int /*edge*/,
   _linesNormals.emplace_back(p1.x);
   _linesNormals.emplace_back(p1.y);
   _linesNormals.emplace_back(p1.z);
-  _linesNormals.emplace_back(1);
+  _linesNormals.emplace_back(1.f);
 
   _linesNormals.emplace_back(p0.x);
   _linesNormals.emplace_back(p0.y);

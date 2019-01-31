@@ -14,12 +14,17 @@
 #endif
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #endif
+#if _MSC_VER && !__INTEL_COMPILER
+#define NOMINMAX
+#pragma warning(push)
+#pragma warning(disable : 4244)
+#endif
 #include <babylon/utils/stb_image.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #if defined(__GNUC__) || defined(__MINGW32__)
 #pragma GCC diagnostic pop
-#endif
-#if _WIN32
-#define NOMINMAX
 #endif
 
 #include <babylon/core/filesystem.h>

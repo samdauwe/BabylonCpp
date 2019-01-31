@@ -331,15 +331,15 @@ float StandardRenderingPipeline::get_motionBlurSamples() const
   return _motionBlurSamples;
 }
 
-void StandardRenderingPipeline::set_motionBlurSamples(float samples)
+void StandardRenderingPipeline::set_motionBlurSamples(float iSamples)
 {
   if (motionBlurPostProcess) {
     motionBlurPostProcess->updateEffect(
       "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
-      + std::to_string(std::round(samples * 10.f) / 10.f));
+      + std::to_string(std::round(iSamples * 10.f) / 10.f));
   }
 
-  _motionBlurSamples = samples;
+  _motionBlurSamples = iSamples;
 }
 
 unsigned int StandardRenderingPipeline::get_samples() const
@@ -484,7 +484,7 @@ void StandardRenderingPipeline::_buildPipeline()
   if (_fxaaEnabled) {
     // Create fxaa post-process
     fxaaPostProcess = FxaaPostProcess::New(
-      "fxaa", 1.0, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
+      "fxaa", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
       scene->getEngine(), false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(PostProcessRenderEffect::New(
       scene->getEngine(), "HDRFxaa",
@@ -572,7 +572,7 @@ void StandardRenderingPipeline::_createBlurPostProcesses(
   Scene* scene, float ratio, unsigned int indice,
   const std::string& blurWidthKey)
 {
-  auto engine = scene->getEngine();
+  auto iEngine = scene->getEngine();
 
   const std::string underscore = "_";
   const auto indiceStr         = std::to_string(indice);
@@ -589,13 +589,13 @@ void StandardRenderingPipeline::_createBlurPostProcesses(
 
   blurX->onActivateObservable.add([&](Camera* /*camera*/, EventState& /*es*/) {
     auto dw = static_cast<float>(blurX->width)
-              / static_cast<float>(engine->getRenderWidth());
+              / static_cast<float>(iEngine->getRenderWidth());
     blurX->kernel = (*this)[blurWidthKey] * dw;
   });
 
   blurY->onActivateObservable.add([&](Camera* /*camera*/, EventState& /*es*/) {
     auto dw = static_cast<float>(blurY->height)
-              / static_cast<float>(engine->getRenderHeight());
+              / static_cast<float>(iEngine->getRenderHeight());
     blurY->kernel = horizontalBlur ? 64.f * dw : (*this)[blurWidthKey] * dw;
   });
 
@@ -691,7 +691,7 @@ void StandardRenderingPipeline::_createVolumetricLightPostProcess(Scene* scene,
                                  true));
 
   // Smooth
-  _createBlurPostProcesses(scene, ratio / 4.f, 0.f, "volumetricLightBlurScale");
+  _createBlurPostProcesses(scene, ratio / 4.f, 0u, "volumetricLightBlurScale");
 
   // Merge
   volumetricLightMergePostProces
@@ -753,7 +753,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
   // Create down sample luminance
   for (unsigned int i = StandardRenderingPipeline::LuminanceSteps; i-- > 0;) {
     const std::string iStr = std::to_string(i);
-    float size             = static_cast<float>(std::pow(3, i));
+    float iSize            = static_cast<float>(std::pow(3, i));
 
     std::string defines = "#define LUMINANCE_DOWN_SAMPLE\n";
     if (i == 0) {
@@ -762,7 +762,7 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
 
     auto postProcess
       = PostProcess::New("HDRLuminanceDownSample" + iStr, "standard",
-                         {"dsOffsets", "halfDestPixelSize"}, {}, size, nullptr,
+                         {"dsOffsets", "halfDestPixelSize"}, {}, iSize, nullptr,
                          TextureConstants::BILINEAR_SAMPLINGMODE,
                          scene->getEngine(), false, defines, textureType);
     luminanceDownSamplePostProcesses.emplace_back(postProcess);

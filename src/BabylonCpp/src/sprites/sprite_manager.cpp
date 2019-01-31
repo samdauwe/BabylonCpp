@@ -104,26 +104,27 @@ SpriteManager::SpriteManager(const std::string& iName,
   // Effects
 
   {
-    EffectCreationOptions options;
-    options.attributes    = {VertexBuffer::PositionKindChars, "options",
-                          "cellInfo", VertexBuffer::ColorKindChars};
-    options.uniformsNames = {"view", "projection", "textureInfos", "alphaTest"};
-    options.samplers      = {"diffuseSampler"};
+    EffectCreationOptions spriteOptions;
+    spriteOptions.attributes = {VertexBuffer::PositionKindChars, "options",
+                                "cellInfo", VertexBuffer::ColorKindChars};
+    spriteOptions.uniformsNames
+      = {"view", "projection", "textureInfos", "alphaTest"};
+    spriteOptions.samplers = {"diffuseSampler"};
 
-    _effectBase = _scene->getEngine()->createEffect("sprites", options,
+    _effectBase = _scene->getEngine()->createEffect("sprites", spriteOptions,
                                                     _scene->getEngine());
   }
 
   {
-    EffectCreationOptions options;
-    options.attributes    = {VertexBuffer::PositionKindChars, "options",
-                          "cellInfo", VertexBuffer::ColorKindChars};
-    options.uniformsNames = {"view",      "projection", "textureInfos",
-                             "alphaTest", "vFogInfos",  "vFogColor"};
-    options.samplers      = {"diffuseSampler"};
-    options.defines       = "#define FOG";
+    EffectCreationOptions spriteOptions;
+    spriteOptions.attributes    = {VertexBuffer::PositionKindChars, "options",
+                                "cellInfo", VertexBuffer::ColorKindChars};
+    spriteOptions.uniformsNames = {"view",      "projection", "textureInfos",
+                                   "alphaTest", "vFogInfos",  "vFogColor"};
+    spriteOptions.samplers      = {"diffuseSampler"};
+    spriteOptions.defines       = "#define FOG";
 
-    _effectFog = _scene->getEngine()->createEffect("sprites", options,
+    _effectFog = _scene->getEngine()->createEffect("sprites", spriteOptions,
                                                    _scene->getEngine());
   }
 }
