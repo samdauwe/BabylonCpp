@@ -144,8 +144,7 @@ file(GLOB STATES_HDR_FILES          ${INCLUDE_PATH}/states/*.h)
 file(GLOB TOOLS_HDR_FILES           ${INCLUDE_PATH}/tools/*.h
                                     ${INCLUDE_PATH}/tools/hdr/*.h
                                     ${INCLUDE_PATH}/tools/optimization/*.h)
-file(GLOB UTILS_HDR_FILES           ${INCLUDE_PATH}/utils/*.h
-                                    ${INCLUDE_PATH}/utils/utf8/*.h)
+file(GLOB UTILS_HDR_FILES           ${INCLUDE_PATH}/utils/*.h)
 
 if (UNIX)
     set(CORE_HDR_FILES ${CORE_HDR_FILES} ${INCLUDE_PATH}/core/filesystem/filesystem_unix.h
