@@ -10,28 +10,12 @@ struct GLFWwindow;
 namespace BABYLON {
 
 class ActionStore;
+class ActionTabsComponent;
 struct InspectorAction;
 class Scene;
 class Tab;
 
 class BABYLON_SHARED_EXPORT Inspector {
-
-public:
-  // Const statics
-  // - Scene tab
-  static constexpr unsigned int SCENE_TAB = 0;
-  // - Logs tab
-  static constexpr unsigned int LOGS_TAB = 1;
-  // - Statistics tab
-  static constexpr unsigned int STATS_TAB = 2;
-  // - Mesh tab
-  static constexpr unsigned int MESH_TAB = 3;
-  // - Ligt tab
-  static constexpr unsigned int LIGHT_TAB = 4;
-  // - Material tab
-  static constexpr unsigned int MATERIAL_TAB = 5;
-  // - Camera tab
-  static constexpr unsigned int CAMERA_TAB = 6;
 
 public:
   Inspector(GLFWwindow* glfwWindow, Scene* scene = nullptr);
@@ -56,10 +40,10 @@ private:
   // Actions
   std::unique_ptr<ActionStore> _actionStore;
   // GUI
-  bool _showDockingWindow;
+  bool _showInspectorWindow;
   int _menuHeight;
-  // Tabs
-  std::array<std::unique_ptr<Tab>, 7> _tabs;
+  // Widgets
+  std::unique_ptr<ActionTabsComponent> _actionTabsHost;
 
 }; // end of class Inspector
 

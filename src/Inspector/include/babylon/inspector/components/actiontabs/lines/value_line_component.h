@@ -1,0 +1,55 @@
+#ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_VALUE_LINE_COMPONENT_H
+#define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_VALUE_LINE_COMPONENT_H
+
+#include <optional>
+
+// ImGui
+#include <imgui.h>
+
+#include <babylon/babylon_api.h>
+#include <babylon/core/string.h>
+
+namespace BABYLON {
+
+struct BABYLON_SHARED_EXPORT ValueLineComponent {
+
+  static void render(const std::string& label, int value, float offsetX = 0.f,
+                     const std::optional<ImVec4>& color = std::nullopt,
+                     const std::string& units           = "")
+  {
+    ImGui::TextWrapped("%s", label.c_str());
+    ImGui::SameLine(offsetX);
+    if (color.has_value()) {
+      ImGui::PushStyleColor(ImGuiCol_Text, *color);
+    }
+    ImGui::TextWrapped("%d %s", value, units.c_str());
+    if (color.has_value()) {
+      ImGui::PopStyleColor();
+    }
+  }
+
+  static void render(const std::string& label, float value, float offsetX = 0.f,
+                     const std::optional<ImVec4>& color       = std::nullopt,
+                     const std::optional<int>& fractionDigits = std::nullopt,
+                     const std::string& units                 = "")
+  {
+    const auto digits = fractionDigits.has_value() ? *fractionDigits : 2;
+
+    ImGui::TextWrapped("%s", label.c_str());
+    ImGui::SameLine(offsetX);
+    if (color.has_value()) {
+      ImGui::PushStyleColor(ImGuiCol_Text, *color);
+    }
+    ImGui::TextWrapped("%.*f %s", digits, static_cast<double>(value),
+                       units.c_str());
+    if (color.has_value()) {
+      ImGui::PopStyleColor();
+    }
+  }
+
+}; // end of struct ValueLineComponent
+
+} // end of namespace BABYLON
+
+#endif // end of
+       // BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_VALUE_LINE_COMPONENT_H

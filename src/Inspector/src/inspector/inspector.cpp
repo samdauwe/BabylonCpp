@@ -20,17 +20,11 @@
 
 // ImGUI bindings and utils
 #include <babylon/imgui/icons_font_awesome.h>
-#include <babylon/imgui/imgui_dock.h>
+#include <babylon/imgui/imgui_utils.h>
 
 // Inspector
 #include <babylon/inspector/actions/action_store.h>
-#include <babylon/inspector/tabs/camera_tab.h>
-#include <babylon/inspector/tabs/light_tab.h>
-#include <babylon/inspector/tabs/logs_tab.h>
-#include <babylon/inspector/tabs/material_tab.h>
-#include <babylon/inspector/tabs/mesh_tab.h>
-#include <babylon/inspector/tabs/scene_tab.h>
-#include <babylon/inspector/tabs/stats_tab.h>
+#include <babylon/inspector/components/actiontabs/action_tabs_component.h>
 
 namespace BABYLON {
 
@@ -40,12 +34,9 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     : _glfwWindow{glfwWindow}
     , _scene{scene}
     , _actionStore{std::make_unique<ActionStore>()}
-    , _showDockingWindow{true}
+    , _showInspectorWindow{true}
+    , _actionTabsHost{nullptr}
 {
-  // Reset tabs
-  std::fill(_tabs.begin(), _tabs.end(), nullptr);
-  // Create log tab
-  _tabs[LOGS_TAB] = std::make_unique<LogsTab>();
 }
 
 Inspector::~Inspector()
@@ -60,13 +51,11 @@ Scene* Inspector::scene() const
 void Inspector::setScene(Scene* scene)
 {
   _scene = scene;
-  // Reset tabs
-  _tabs[SCENE_TAB]    = std::make_unique<SceneTab>(*this);
-  _tabs[STATS_TAB]    = std::make_unique<StatsTab>(*this);
-  _tabs[MESH_TAB]     = std::make_unique<MeshTab>(*this);
-  _tabs[LIGHT_TAB]    = std::make_unique<LightTab>(*this);
-  _tabs[MATERIAL_TAB] = std::make_unique<MaterialTab>(*this);
-  _tabs[CAMERA_TAB]   = std::make_unique<CameraTab>(*this);
+
+  // Create action tabs
+  IActionTabsComponentProps props;
+  props.scene     = scene;
+  _actionTabsHost = std::make_unique<ActionTabsComponent>(props);
 }
 
 void Inspector::intialize()
@@ -74,8 +63,6 @@ void Inspector::intialize()
   // Setup ImGui binding
   ImGui::CreateContext();
   ImGui_ImplGlfwGL2_Init(_glfwWindow, true);
-  // ImGui docking (Auto-load the imgui.ini settings)
-  ImGui::InitDock();
   // Loads fonts
   ImGuiIO& io = ImGui::GetIO();
   io.Fonts->AddFontDefault();
@@ -83,7 +70,7 @@ void Inspector::intialize()
   ImFontConfig config;
   config.MergeMode = true;
   _font            = io.Fonts->AddFontFromFileTTF(
-    "..//assets/fonts/fontawesome-webfont.ttf", 16.0f, &config, ranges);
+    "../assets/fonts/fontawesome-webfont.ttf", 16.0f, &config, ranges);
   // Setup style
   ImGui::StyleColorsDark();
   // Actions
@@ -125,11 +112,7 @@ void Inspector::render()
 
 void Inspector::dispose()
 {
-  // Dispose tabs
-  for (auto& tab : _tabs) {
-    tab->dispose();
-  }
-  // Shotdown ImGui
+  // Shutdown ImGui
   ImGui_ImplGlfwGL2_Shutdown();
   ImGui::DestroyContext();
   glfwDestroyWindow(_glfwWindow);
@@ -170,22 +153,27 @@ void Inspector::_renderDockGUI()
 
   ImGui::SetNextWindowPos(pos, ImGuiSetCond_Always);
   ImGui::SetNextWindowSize(size, ImGuiSetCond_Always);
-  if (ImGui::Begin("Inspector", &_showDockingWindow,
+  if (ImGui::Begin("INSPECTOR", &_showInspectorWindow,
                    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
                      | ImGuiWindowFlags_NoScrollbar
                      | ImGuiWindowFlags_NoScrollWithMouse
                      | ImGuiWindowFlags_NoBringToFrontOnFocus)) {
-    // Dock layout by hard-coded or .ini file
-    ImGui::BeginDockspace();
-
-    // Render tab
-    for (auto& tab : _tabs) {
-      if (tab) {
-        tab->render();
+    auto width      = ImGui::GetContentRegionMax().x - 4.f;
+    static auto sz1 = ImGui::GetContentRegionMax().y / 2.f;
+    auto sz2        = ImGui::GetContentRegionMax().y - sz1 - 8.f;
+    ImGui::Splitter(false, 1.f, &sz1, &sz2, 4, 4, width);
+    // Render the scene explorer
+    if (ImGui::BeginChild("SceneExplorer", ImVec2(width, sz1), true)) {
+      ImGui::Text("Scene explorer");
+    }
+    ImGui::EndChild();
+    // Render the action tabs
+    if (ImGui::BeginChild("ActionTabs", ImVec2(width, sz2), true)) {
+      if (_actionTabsHost) {
+        _actionTabsHost->render();
       }
     }
-
-    ImGui::EndDockspace();
+    ImGui::EndChild();
   }
   ImGui::End();
 }

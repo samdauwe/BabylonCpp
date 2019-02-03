@@ -45,6 +45,9 @@ release_build
 # Not yet finished code
 src/Editor
 
+# Absolete code
+src/InspectorV1
+
 # Executables
 *.exe
 *.out
