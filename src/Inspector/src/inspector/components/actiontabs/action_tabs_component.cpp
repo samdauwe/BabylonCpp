@@ -45,9 +45,9 @@ void ActionTabsComponent::render()
   if (ImGui::BeginTabBar("ActionTabs", tab_bar_flags)) {
     // Properties grid tab
     if (_propertyGridTabComponent) {
-      static const auto popertiesTabLabel
-        = String::concat(FILE_TEXT_ICON, " ", "Poperties");
-      if (ImGui::BeginTabItem(popertiesTabLabel.c_str())) {
+      static const auto propertiesTabLabel
+        = String::concat(FILE_TEXT_ICON, " ", "Properties");
+      if (ImGui::BeginTabItem(propertiesTabLabel.c_str())) {
         _propertyGridTabComponent->render();
         ImGui::EndTabItem();
       }
