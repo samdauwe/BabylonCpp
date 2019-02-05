@@ -13,6 +13,7 @@ class ActionStore;
 class ActionTabsComponent;
 struct InspectorAction;
 class Scene;
+class SceneExplorerComponent;
 class Tab;
 
 class BABYLON_SHARED_EXPORT Inspector {
@@ -32,7 +33,7 @@ private:
   void _fileMenu();
   void _addActions();
   void _doMenuItem(InspectorAction& a, bool enabled);
-  void _renderDockGUI();
+  void _renderInspector();
 
 private:
   GLFWwindow* _glfwWindow;
@@ -43,6 +44,7 @@ private:
   bool _showInspectorWindow;
   int _menuHeight;
   // Widgets
+  std::unique_ptr<SceneExplorerComponent> _sceneExplorerHost;
   std::unique_ptr<ActionTabsComponent> _actionTabsHost;
 
 }; // end of class Inspector

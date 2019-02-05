@@ -25,6 +25,7 @@
 // Inspector
 #include <babylon/inspector/actions/action_store.h>
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
+#include <babylon/inspector/components/sceneexplorer/scene_explorer_component.h>
 
 namespace BABYLON {
 
@@ -35,6 +36,7 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     , _scene{scene}
     , _actionStore{std::make_unique<ActionStore>()}
     , _showInspectorWindow{true}
+    , _sceneExplorerHost{nullptr}
     , _actionTabsHost{nullptr}
 {
 }
@@ -52,10 +54,17 @@ void Inspector::setScene(Scene* scene)
 {
   _scene = scene;
 
+  // Create Scene explorer
+  ISceneExplorerComponentProps sceneExplorerComponentProps;
+  sceneExplorerComponentProps.scene = scene;
+  _sceneExplorerHost
+    = std::make_unique<SceneExplorerComponent>(sceneExplorerComponentProps);
+
   // Create action tabs
-  IActionTabsComponentProps props;
-  props.scene     = scene;
-  _actionTabsHost = std::make_unique<ActionTabsComponent>(props);
+  IActionTabsComponentProps actionTabsComponentProps;
+  actionTabsComponentProps.scene = scene;
+  _actionTabsHost
+    = std::make_unique<ActionTabsComponent>(actionTabsComponentProps);
 }
 
 void Inspector::intialize()
@@ -102,7 +111,7 @@ void Inspector::render()
     ImGui::EndMainMenuBar();
   }
   // Render dock widgets
-  _renderDockGUI();
+  _renderInspector();
   // Pop font
   ImGui::PopFont();
   // Rendering
@@ -140,13 +149,13 @@ void Inspector::_doMenuItem(InspectorAction& a, bool enabled)
   }
 }
 
-void Inspector::_renderDockGUI()
+void Inspector::_renderInspector()
 {
   if (ImGui::GetIO().DisplaySize.y <= 0) {
     return;
   }
 
-  // Setup root docking window size
+  // Setup window size
   auto pos  = ImVec2(0, _menuHeight);
   auto size = ImGui::GetIO().DisplaySize;
   size.y -= pos.y;
@@ -164,7 +173,9 @@ void Inspector::_renderDockGUI()
     ImGui::Splitter(false, 1.f, &sz1, &sz2, 4, 4, width);
     // Render the scene explorer
     if (ImGui::BeginChild("SceneExplorer", ImVec2(width, sz1), true)) {
-      ImGui::Text("Scene explorer");
+      if (_sceneExplorerHost) {
+        _sceneExplorerHost->render();
+      }
     }
     ImGui::EndChild();
     // Render the action tabs
