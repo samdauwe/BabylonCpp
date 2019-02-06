@@ -35,28 +35,27 @@ void SceneExplorerComponent::render()
   {
     ImGui::SetNextTreeNodeOpen(true);
     ImGui::Unindent();
-    if (ImGui::TreeNode("Scene"))
-    {
-        if (ImGui::TreeNode("Nodes"))
-        {
-            ImGui::Indent();
-            ImGui::Text("A Node");
-            ImGui::Unindent();
-            ImGui::TreePop();
+    if (ImGui::TreeNode("Scene")) {
+      if (ImGui::TreeNode("Nodes")) {
+        ImGui::Indent();
+        // Render tree item
+        static bool isActive = true;
+        if (ImGui::Selectable("camera1", isActive)) {
+          isActive = !isActive;
         }
-        if (ImGui::TreeNode("Materials"))
-        {
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNode("Textures"))
-        {
-            ImGui::TreePop();
-        }
-        if (ImGui::TreeNode("Render pipelines"))
-        {
-            ImGui::TreePop();
-        }
+        ImGui::Unindent();
         ImGui::TreePop();
+      }
+      if (ImGui::TreeNode("Materials")) {
+        ImGui::TreePop();
+      }
+      if (ImGui::TreeNode("Textures")) {
+        ImGui::TreePop();
+      }
+      if (ImGui::TreeNode("Render pipelines")) {
+        ImGui::TreePop();
+      }
+      ImGui::TreePop();
     }
     ImGui::Indent();
   }
