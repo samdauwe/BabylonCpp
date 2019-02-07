@@ -20,7 +20,7 @@ struct BABYLON_SHARED_EXPORT TreeItemLabelComponent {
     if (color.has_value()) {
       ImGui::PushStyleColor(ImGuiCol_Text, *color);
     }
-    ImGui::TextWrapped("%s ", icon.c_str());
+    ImGui::TextWrapped("%s", icon.c_str());
     if (color.has_value()) {
       ImGui::PopStyleColor();
     }

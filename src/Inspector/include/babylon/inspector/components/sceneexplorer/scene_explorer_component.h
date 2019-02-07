@@ -1,10 +1,15 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_SCENE_EXPLORER_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_SCENE_EXPLORER_COMPONENT_H
 
+#include <memory>
+
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
+class CameraTreeItemComponent;
+class LightTreeItemComponent;
+class MeshTreeItemComponent;
 class Scene;
 
 struct ISceneExplorerComponentProps {
@@ -21,6 +26,10 @@ public:
 
 private:
   ISceneExplorerComponentProps props;
+  // Testing
+  std::unique_ptr<CameraTreeItemComponent> _cameraTreeItemComponent;
+  std::unique_ptr<LightTreeItemComponent> _lightTreeItemComponent;
+  std::unique_ptr<MeshTreeItemComponent> _meshTreeItemComponent;
 
 }; // end of class SceneExplorerComponent
 

@@ -6,12 +6,31 @@
 // ImGui
 #include <imgui.h>
 
+#include <babylon/engine/scene.h>
+#include <babylon/inspector/components/sceneexplorer/entities/camera_tree_item_component.h>
+#include <babylon/inspector/components/sceneexplorer/entities/light_tree_item_component.h>
+#include <babylon/inspector/components/sceneexplorer/entities/mesh_tree_item_component.h>
+
 namespace BABYLON {
 
 SceneExplorerComponent::SceneExplorerComponent(
   const ISceneExplorerComponentProps& iProps)
     : props{iProps}
 {
+  // Camera
+  ICameraTreeItemComponentProps cameraProps;
+  cameraProps.camera = props.scene->cameras.front();
+  _cameraTreeItemComponent
+    = std::make_unique<CameraTreeItemComponent>(cameraProps);
+  // Light
+  ILightTreeItemComponentProps lightProps;
+  lightProps.light = props.scene->lights.front();
+  _lightTreeItemComponent
+    = std::make_unique<LightTreeItemComponent>(lightProps);
+  // Light
+  IMeshTreeItemComponentProps meshProps;
+  meshProps.mesh         = props.scene->meshes.front();
+  _meshTreeItemComponent = std::make_unique<MeshTreeItemComponent>(meshProps);
 }
 
 SceneExplorerComponent::~SceneExplorerComponent()
@@ -31,6 +50,23 @@ void SceneExplorerComponent::render()
       }
     }
   }
+
+  // Testing
+  {
+    // Camera
+    if (_cameraTreeItemComponent) {
+      _cameraTreeItemComponent->render();
+    }
+    // Light
+    if (_lightTreeItemComponent) {
+      _lightTreeItemComponent->render();
+    }
+    // Mesh
+    if (_meshTreeItemComponent) {
+      _meshTreeItemComponent->render();
+    }
+  }
+
   // Tree
   {
     ImGui::SetNextTreeNodeOpen(true);
