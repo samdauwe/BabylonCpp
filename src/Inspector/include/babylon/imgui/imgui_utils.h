@@ -5,7 +5,7 @@
 #include <imgui_internal.h>
 
 // from https://github.com/juliettef/IconFontCppHeaders
-#include <babylon/imgui/icons_font_awesome.h>
+#include <babylon/imgui/icons_font_awesome_5.h>
 
 namespace ImGui {
 
@@ -164,7 +164,7 @@ inline bool CheckBoxFont(const char* name_, bool* pB_, const char* pOn_ = "[X]",
 
 inline bool CheckBoxTick(const char* name_, bool* pB_)
 {
-  return CheckBoxFont(name_, pB_, ICON_FA_CHECK_SQUARE_O, ICON_FA_SQUARE_O);
+  return CheckBoxFont(name_, pB_, ICON_FA_CHECK_SQUARE, ICON_FA_SQUARE);
 }
 
 inline bool MenuItemCheckbox(const char* name_, bool* pB_)
@@ -172,10 +172,10 @@ inline bool MenuItemCheckbox(const char* name_, bool* pB_)
   bool retval = ImGui::MenuItem(name_);
   ImGui::SameLine();
   if (*pB_) {
-    ImGui::Text(ICON_FA_CHECK_SQUARE_O);
+    ImGui::Text(ICON_FA_CHECK_SQUARE);
   }
   else {
-    ImGui::Text(ICON_FA_SQUARE_O);
+    ImGui::Text(ICON_FA_SQUARE);
   }
   if (retval) {
     *pB_ = !*pB_;

@@ -19,8 +19,11 @@
 #include <babylon/imgui/imgui_impl_glfw_gl2.h>
 
 // ImGUI bindings and utils
-#include <babylon/imgui/icons_font_awesome.h>
+#include <babylon/imgui/icons_font_awesome_5.h>
 #include <babylon/imgui/imgui_utils.h>
+
+// BabylonCpp
+#include <babylon/core/string.h>
 
 // Inspector
 #include <babylon/inspector/actions/action_store.h>
@@ -29,7 +32,8 @@
 
 namespace BABYLON {
 
-static ImFont* _font = nullptr;
+static ImFont* _fontRegular = nullptr;
+static ImFont* _fontSolid   = nullptr;
 
 Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     : _glfwWindow{glfwWindow}
@@ -75,11 +79,17 @@ void Inspector::intialize()
   // Loads fonts
   ImGuiIO& io = ImGui::GetIO();
   io.Fonts->AddFontDefault();
-  static ImWchar ranges[] = {0xf000, 0xf3ff, 0};
+  static ImWchar ranges[] = {0xf000, 0xf82f, 0};
   ImFontConfig config;
   config.MergeMode = true;
-  _font            = io.Fonts->AddFontFromFileTTF(
-    "../assets/fonts/fontawesome-webfont.ttf", 16.0f, &config, ranges);
+  auto fontRegularPath
+    = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAR);
+  _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(), 12.0f,
+                                              &config, ranges);
+  auto fontSolidPath
+    = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAS);
+  _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(), 12.0f,
+                                            &config, ranges);
   // Setup style
   ImGui::StyleColorsDark();
   // Actions
@@ -91,7 +101,7 @@ void Inspector::render()
   // New ImGUI frame
   ImGui_ImplGlfwGL2_NewFrame();
   // Push Font
-  ImGui::PushFont(_font);
+  _pushFonts();
   // Render main menu bar
   if (ImGui::BeginMainMenuBar()) {
     _fileMenu();
@@ -113,7 +123,7 @@ void Inspector::render()
   // Render dock widgets
   _renderInspector();
   // Pop font
-  ImGui::PopFont();
+  _popFonts();
   // Rendering
   ImGui::Render();
   ImGui_ImplGlfwGL2_RenderDrawData(ImGui::GetDrawData());
@@ -147,6 +157,18 @@ void Inspector::_doMenuItem(InspectorAction& a, bool enabled)
                       enabled)) {
     a.invoke();
   }
+}
+
+void Inspector::_pushFonts()
+{
+  ImGui::PushFont(_fontRegular);
+  ImGui::PushFont(_fontSolid);
+}
+
+void Inspector::_popFonts()
+{
+  ImGui::PopFont();
+  ImGui::PopFont();
 }
 
 void Inspector::_renderInspector()

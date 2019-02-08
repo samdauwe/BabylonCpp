@@ -33,6 +33,8 @@ private:
   void _fileMenu();
   void _addActions();
   void _doMenuItem(InspectorAction& a, bool enabled);
+  void _pushFonts();
+  void _popFonts();
   void _renderInspector();
 
 private:

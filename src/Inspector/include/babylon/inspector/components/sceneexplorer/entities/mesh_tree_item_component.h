@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/imgui/icons_font_awesome.h>
+#include <babylon/imgui/icons_font_awesome_5.h>
 
 namespace BABYLON {
 
@@ -33,8 +33,8 @@ public:
   static constexpr const char* faEye = ICON_FA_EYE;
   // fa-eye-slash
   static constexpr const char* faEyeSlash = ICON_FA_EYE_SLASH;
-  // fa-eye-slash
-  static constexpr const char* faVectorSquare = ICON_FA_SQUARE_O;
+  // fa-vector-square
+  static constexpr const char* faVectorSquare = ICON_FA_VECTOR_SQUARE;
 
 public:
   MeshTreeItemComponent(const IMeshTreeItemComponentProps& props);

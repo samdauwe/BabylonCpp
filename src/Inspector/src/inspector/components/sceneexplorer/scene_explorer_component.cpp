@@ -9,13 +9,14 @@
 #include <babylon/engine/scene.h>
 #include <babylon/inspector/components/sceneexplorer/entities/camera_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/light_tree_item_component.h>
+#include <babylon/inspector/components/sceneexplorer/entities/material_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/mesh_tree_item_component.h>
 
 namespace BABYLON {
 
 SceneExplorerComponent::SceneExplorerComponent(
   const ISceneExplorerComponentProps& iProps)
-    : props{iProps}
+    : props{iProps}, _materialTreeItemComponent{nullptr}
 {
   // Camera
   ICameraTreeItemComponentProps cameraProps;
@@ -64,6 +65,19 @@ void SceneExplorerComponent::render()
     // Mesh
     if (_meshTreeItemComponent) {
       _meshTreeItemComponent->render();
+    }
+    // Material
+    if (_materialTreeItemComponent) {
+      _materialTreeItemComponent->render();
+    }
+    else {
+      if (!props.scene->materials.empty()) {
+        // Material
+        IMaterialTreeItemComponentProps materialProps;
+        materialProps.material = props.scene->materials.front();
+        _materialTreeItemComponent
+          = std::make_unique<MaterialTreeItemComponent>(materialProps);
+      }
     }
   }
 

@@ -46,7 +46,7 @@ void ActionTabsComponent::render()
     // Properties grid tab
     if (_propertyGridTabComponent) {
       static const auto propertiesTabLabel
-        = String::concat(FILE_TEXT_ICON, " ", "Properties");
+        = String::concat(faFileAlt, " ", "Properties");
       if (ImGui::BeginTabItem(propertiesTabLabel.c_str())) {
         _propertyGridTabComponent->render();
         ImGui::EndTabItem();
@@ -54,7 +54,7 @@ void ActionTabsComponent::render()
     }
     // Debug tab
     if (_debugTabComponent) {
-      static const auto debugTabLabel = String::concat(BUG_ICON, " ", "Debug");
+      static const auto debugTabLabel = String::concat(faBug, " ", "Debug");
       if (ImGui::BeginTabItem(debugTabLabel.c_str())) {
         _debugTabComponent->render();
         ImGui::EndTabItem();
@@ -62,7 +62,7 @@ void ActionTabsComponent::render()
     }
     if (_statisticsTabComponent) {
       static const auto statisticsTabLabel
-        = String::concat(BAR_CHART_ICON, " ", "Statistics");
+        = String::concat(faChartBar, " ", "Statistics");
       if (ImGui::BeginTabItem(statisticsTabLabel.c_str())) {
         _statisticsTabComponent->render();
         ImGui::EndTabItem();

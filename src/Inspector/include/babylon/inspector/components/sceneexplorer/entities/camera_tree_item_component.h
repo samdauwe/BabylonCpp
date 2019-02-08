@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/imgui/icons_font_awesome.h>
+#include <babylon/imgui/icons_font_awesome_5.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
@@ -28,7 +28,7 @@ class BABYLON_SHARED_EXPORT CameraTreeItemComponent {
 public:
   /** Font Awesome Icon Unicodes **/
   // fa-video-camera
-  static constexpr const char* faVideo = ICON_FA_VIDEO_CAMERA;
+  static constexpr const char* faVideo = ICON_FA_VIDEO;
   // fa-camera
   static constexpr const char* faCamera = ICON_FA_CAMERA;
 

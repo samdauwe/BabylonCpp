@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
-#include <babylon/imgui/icons_font_awesome.h>
+#include <babylon/imgui/icons_font_awesome_5.h>
 
 namespace BABYLON {
 
@@ -27,10 +27,10 @@ class BABYLON_SHARED_EXPORT LightTreeItemComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
-  // fa-lightbulb-o
-  static constexpr const char* faLightbulb = ICON_FA_LIGHTBULB_O;
-  // fa-lightbulb-o
-  static constexpr const char* faLightbubRegular = ICON_FA_LIGHTBULB_O;
+  // fa-lightbulb
+  static constexpr const char* faLightbulb = ICON_FA_LIGHTBULB;
+  // fa-lightbulb
+  static constexpr const char* faLightbubRegular = ICON_FA_LIGHTBULB;
   // fa-eye
   static constexpr const char* faEye = ICON_FA_EYE;
 

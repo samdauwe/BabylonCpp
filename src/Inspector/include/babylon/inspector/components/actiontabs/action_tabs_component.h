@@ -5,7 +5,7 @@
 #include <string>
 
 #include <babylon/babylon_api.h>
-#include <babylon/imgui/icons_font_awesome.h>
+#include <babylon/imgui/icons_font_awesome_5.h>
 
 namespace BABYLON {
 
@@ -22,14 +22,14 @@ class BABYLON_SHARED_EXPORT ActionTabsComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
-  // fa-file
-  static constexpr const char* FILE_TEXT_ICON = ICON_FA_FILE_TEXT;
+  // fa-file-alt
+  static constexpr const char* faFileAlt = ICON_FA_FILE_ALT;
   // fa-wrench
-  static constexpr const char* WRENCH_ICON = ICON_FA_WRENCH;
+  static constexpr const char* faWrench = ICON_FA_WRENCH;
   // fa-bug
-  static constexpr const char* BUG_ICON = ICON_FA_BUG;
+  static constexpr const char* faBug = ICON_FA_BUG;
   // fa-chart-bar
-  static constexpr const char* BAR_CHART_ICON = ICON_FA_BAR_CHART;
+  static constexpr const char* faChartBar = ICON_FA_CHART_BAR;
 
 public:
   ActionTabsComponent(const IActionTabsComponentProps& props);
