@@ -22,13 +22,9 @@ class BABYLON_SHARED_EXPORT ActionTabsComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
-  // fa-file-alt
-  static constexpr const char* faFileAlt = ICON_FA_FILE_ALT;
-  // fa-wrench
-  static constexpr const char* faWrench = ICON_FA_WRENCH;
-  // fa-bug
-  static constexpr const char* faBug = ICON_FA_BUG;
-  // fa-chart-bar
+  static constexpr const char* faFileAlt  = ICON_FA_FILE_ALT;
+  static constexpr const char* faWrench   = ICON_FA_WRENCH;
+  static constexpr const char* faBug      = ICON_FA_BUG;
   static constexpr const char* faChartBar = ICON_FA_CHART_BAR;
 
 public:

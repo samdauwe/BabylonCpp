@@ -27,12 +27,9 @@ class BABYLON_SHARED_EXPORT LightTreeItemComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
-  // fa-lightbulb
-  static constexpr const char* faLightbulb = ICON_FA_LIGHTBULB;
-  // fa-lightbulb
+  static constexpr const char* faLightbulb       = ICON_FA_LIGHTBULB;
   static constexpr const char* faLightbubRegular = ICON_FA_LIGHTBULB;
-  // fa-eye
-  static constexpr const char* faEye = ICON_FA_EYE;
+  static constexpr const char* faEye             = ICON_FA_EYE;
 
 public:
   LightTreeItemComponent(const ILightTreeItemComponentProps& props);

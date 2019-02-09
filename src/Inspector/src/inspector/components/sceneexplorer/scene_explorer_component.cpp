@@ -53,7 +53,7 @@ void SceneExplorerComponent::render()
   }
 
   // Testing
-  {
+  const auto renderNodes = [this]() {
     // Camera
     if (_cameraTreeItemComponent) {
       _cameraTreeItemComponent->render();
@@ -66,6 +66,9 @@ void SceneExplorerComponent::render()
     if (_meshTreeItemComponent) {
       _meshTreeItemComponent->render();
     }
+  };
+
+  const auto renderMaterials = [this]() {
     // Material
     if (_materialTreeItemComponent) {
       _materialTreeItemComponent->render();
@@ -79,7 +82,7 @@ void SceneExplorerComponent::render()
           = std::make_unique<MaterialTreeItemComponent>(materialProps);
       }
     }
-  }
+  };
 
   // Tree
   {
@@ -89,19 +92,39 @@ void SceneExplorerComponent::render()
       if (ImGui::TreeNode("Nodes")) {
         ImGui::Indent();
         // Render tree item
-        static bool isActive = true;
-        if (ImGui::Selectable("camera1", isActive)) {
-          isActive = !isActive;
-        }
+        // static bool isActive = true;
+        // if (ImGui::Selectable("camera1", isActive)) {
+        //  isActive = !isActive;
+        //}
+
+        renderNodes();
+
         ImGui::Unindent();
         ImGui::TreePop();
       }
       if (ImGui::TreeNode("Materials")) {
+        ImGui::Indent();
+        renderMaterials();
+        ImGui::Unindent();
         ImGui::TreePop();
       }
-      if (ImGui::TreeNode("Textures")) {
+      // ImGuiTreeNodeFlags TreeNodeEx_flags = ImGuiTreeNodeFlags_None;
+      bool selected                       = false;
+      ImGuiTreeNodeFlags node_flags
+        = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick
+          | (selected ? ImGuiTreeNodeFlags_Selected : 0);
+      node_flags
+        |= ImGuiTreeNodeFlags_Leaf
+           /*| ImGuiTreeNodeFlags_NoTreePushOnOpen*/;
+      if (ImGui::TreeNodeEx("Textures", node_flags, "Textures")) {
+        if (ImGui::IsItemClicked()) {
+        }
         ImGui::TreePop();
       }
+
+      /*if (ImGui::TreeNode("Textures")) {
+        ImGui::TreePop();
+      }*/
       if (ImGui::TreeNode("Render pipelines")) {
         ImGui::TreePop();
       }
@@ -139,7 +162,11 @@ void SceneExplorerComponent::render()
         if (ImGui::IsItemClicked())
           node_clicked = i;
         if (node_open) {
-          ImGui::Text("A Node");
+          // Render tree item
+          static bool isActive = true;
+          if (ImGui::Selectable("camera1", isActive)) {
+            isActive = !isActive;
+          }
           ImGui::TreePop();
         }
       }

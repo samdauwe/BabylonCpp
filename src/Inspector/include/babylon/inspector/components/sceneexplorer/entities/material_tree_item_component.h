@@ -22,7 +22,6 @@ class BABYLON_SHARED_EXPORT MaterialTreeItemComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
-  // fa-brush
   static constexpr const char* faBrush = ICON_FA_BRUSH;
 
 public:

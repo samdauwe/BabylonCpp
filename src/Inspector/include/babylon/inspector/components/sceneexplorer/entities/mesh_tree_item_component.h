@@ -27,13 +27,9 @@ class BABYLON_SHARED_EXPORT MeshTreeItemComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
-  // fa-cube
-  static constexpr const char* faCube = ICON_FA_CUBE;
-  // fa-eye
-  static constexpr const char* faEye = ICON_FA_EYE;
-  // fa-eye-slash
-  static constexpr const char* faEyeSlash = ICON_FA_EYE_SLASH;
-  // fa-vector-square
+  static constexpr const char* faCube         = ICON_FA_CUBE;
+  static constexpr const char* faEye          = ICON_FA_EYE;
+  static constexpr const char* faEyeSlash     = ICON_FA_EYE_SLASH;
   static constexpr const char* faVectorSquare = ICON_FA_VECTOR_SQUARE;
 
 public:

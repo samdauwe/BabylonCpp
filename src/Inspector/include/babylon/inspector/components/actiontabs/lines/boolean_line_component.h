@@ -14,9 +14,7 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT BooleanLineComponent {
 
   /** Font Awesome Icon Unicodes **/
-  // fa-check
-  static constexpr const char* faCheck = ICON_FA_CHECK;
-  // fa-times-circle
+  static constexpr const char* faCheck       = ICON_FA_CHECK;
   static constexpr const char* faTimesCircle = ICON_FA_TIMES_CIRCLE;
 
   static void render(const std::string& label, bool value, float offsetX = 0.f)

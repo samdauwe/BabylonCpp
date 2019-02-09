@@ -27,9 +27,7 @@ class BABYLON_SHARED_EXPORT CameraTreeItemComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
-  // fa-video-camera
-  static constexpr const char* faVideo = ICON_FA_VIDEO;
-  // fa-camera
+  static constexpr const char* faVideo  = ICON_FA_VIDEO;
   static constexpr const char* faCamera = ICON_FA_CAMERA;
 
 public:
