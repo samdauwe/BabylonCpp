@@ -12,6 +12,11 @@ using PointLightPtr = std::shared_ptr<PointLight>;
 
 namespace Samples {
 
+/**
+ * @brief Lights Scene. Example demonstrating how to add lights to a scene.
+ * @see https://www.babylonjs-playground.com/#AQRDKW#0
+ * @see https://doc.babylonjs.com/babylon101/lights
+ */
 class LightsScene : public IRenderableScene {
 
 public:

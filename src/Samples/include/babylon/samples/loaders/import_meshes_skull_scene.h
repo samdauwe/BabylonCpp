@@ -13,8 +13,10 @@ using PointLightPtr      = std::shared_ptr<PointLight>;
 namespace Samples {
 
 /**
- * @brief Import Meshes Skull Scene.
+ * @brief Import Meshes Skull Scene. Example demonstrating how to Load a mesh
+ * from a file and add it to the scene.
  * @see https://www.babylonjs-playground.com/#UKNERM#0
+ * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
  */
 class ImportMeshesSkullScene : public IRenderableScene {
 

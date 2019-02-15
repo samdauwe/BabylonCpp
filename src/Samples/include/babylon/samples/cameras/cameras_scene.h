@@ -9,6 +9,7 @@ namespace Samples {
 /**
  * @brief Cameras scene demonstrating the types of cameras in babylonjs.
  * @see https://www.babylonjs-playground.com/#1A3M5C#0
+ * @see https://doc.babylonjs.com/babylon101/cameras
  */
 struct CamerasScene : public IRenderableScene {
 
