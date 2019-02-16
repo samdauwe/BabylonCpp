@@ -2945,8 +2945,8 @@ InternalTexturePtr Engine::createTexture(
 
             _workingContext->drawImage(img, 0, 0, img.width, img.height, 0, 0,
                                        potWidth, potHeight);
-            _gl->texImage2D(GL::TEXTURE_2D, 0, internalFormat, internalFormat,
-                            GL::UNSIGNED_BYTE, _workingCanvas);
+            _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
+                            internalFormat, GL::UNSIGNED_BYTE, _workingCanvas);
 
             texture->width  = potWidth;
             texture->height = potHeight;
@@ -2986,7 +2986,7 @@ InternalTexturePtr Engine::createTexture(
     };
 
     if (!url.empty() && (!fromData || isBase64)) {
-      Tools::LoadImageFromUrl(url, onload, onInternalError);
+      Tools::LoadImageFromUrl(url, onload, onInternalError, invertY);
     }
     else if (buffer.has_value()
              && (std::holds_alternative<std::string>(*buffer)

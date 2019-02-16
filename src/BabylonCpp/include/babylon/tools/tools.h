@@ -188,7 +188,7 @@ struct BABYLON_SHARED_EXPORT Tools {
     std::string url, const std::function<void(const Image& img)>& onLoad,
     const std::function<void(const std::string& message,
                              const std::string& exception)>& onError,
-    bool flipVertically = true);
+    bool flipVertically = false);
   static void LoadImageFromBuffer(
     const std::variant<std::string, ArrayBuffer, Image>& input,
     const std::function<void(const Image& img)>& onLoad,

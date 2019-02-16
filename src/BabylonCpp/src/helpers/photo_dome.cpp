@@ -26,7 +26,7 @@ PhotoDome::PhotoDome(
   name = !iName.empty() ? iName : "photoDome";
   options.resolution
     = options.resolution.has_value() ? *options.resolution : 32u;
-  options.size = options.size ?
+  options.size = options.size.has_value() ?
                    *options.size :
                    (scene->activeCamera ?
                       static_cast<unsigned>(scene->activeCamera->maxZ * 0.48f) :
