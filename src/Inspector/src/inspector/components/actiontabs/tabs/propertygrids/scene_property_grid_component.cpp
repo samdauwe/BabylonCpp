@@ -7,6 +7,7 @@
 #include <babylon/inspector/components/actiontabs/lines/radio_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/vector3_line_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/fog_property_grid_component.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/physics/physics_engine.h>
 
@@ -82,13 +83,13 @@ void ScenePropertyGridComponent::render()
 
   const auto& imageProcessing = scene->imageProcessingConfiguration();
 
-  static std::vector<std::pair<const char*, unsigned int>> toneMappingOptions
-    = {{"Standard", ImageProcessingConfiguration::TONEMAPPING_STANDARD},
-       {"ACES", ImageProcessingConfiguration::TONEMAPPING_ACES}};
+  static std::vector<std::pair<const char*, unsigned int>> toneMappingOptions{
+    {"Standard", ImageProcessingConfiguration::TONEMAPPING_STANDARD},
+    {"ACES", ImageProcessingConfiguration::TONEMAPPING_ACES}};
 
   // --- RENDERING MODE ---
-  static auto renderingModeOpened = true;
-  ImGui::SetNextTreeNodeOpen(renderingModeOpened, ImGuiCond_Always);
+  static auto renderingModeContainerOpened = true;
+  ImGui::SetNextTreeNodeOpen(renderingModeContainerOpened, ImGuiCond_Always);
   if (ImGui::CollapsingHeader("RENDERING MODE")) {
     RadioButtonLineComponent::render(
       "Point", scene->forcePointsCloud,
@@ -100,14 +101,14 @@ void ScenePropertyGridComponent::render()
       "Solid", !scene->forcePointsCloud && !scene->forceWireframe,
       [this]() { setRenderingModes(false, false); });
 
-    renderingModeOpened = true;
+    renderingModeContainerOpened = true;
   }
   else {
-    renderingModeOpened = false;
+    renderingModeContainerOpened = false;
   }
   // --- ENVIRONMENT ---
-  static auto environmentOpened = true;
-  ImGui::SetNextTreeNodeOpen(environmentOpened, ImGuiCond_Always);
+  static auto environmentContainerOpened = true;
+  ImGui::SetNextTreeNodeOpen(environmentContainerOpened, ImGuiCond_Always);
   if (ImGui::CollapsingHeader("ENVIRONMENT")) {
     Color3LineComponent::render("Clear color", scene->clearColor);
     CheckBoxLineComponent::render("Clear color enabled", scene->autoClear);
@@ -115,14 +116,15 @@ void ScenePropertyGridComponent::render()
     CheckBoxLineComponent::render("Environment texture (IBL)",
                                   scene->environmentTexture() != nullptr,
                                   [this](bool /*value*/) { switchIBL(); });
-    environmentOpened = true;
+    FogPropertyGridComponent::render(scene);
+    environmentContainerOpened = true;
   }
   else {
-    environmentOpened = false;
+    environmentContainerOpened = false;
   }
   // --- IMAGE PROCESSING ---
-  static auto imageprocessingOpened = true;
-  ImGui::SetNextTreeNodeOpen(imageprocessingOpened, ImGuiCond_Always);
+  static auto imageprocessingContainerOpened = true;
+  ImGui::SetNextTreeNodeOpen(imageprocessingContainerOpened, ImGuiCond_Always);
   if (ImGui::CollapsingHeader("IMAGE PROCESSING")) {
     SliderLineComponent::render(
       "Contrast", imageProcessing->contrast(), 0.f, 4.f, 0.1f,
@@ -137,31 +139,31 @@ void ScenePropertyGridComponent::render()
       "Tone mapping type", imageProcessing->toneMappingType(),
       toneMappingOptions,
       [&](unsigned int value) { imageProcessing->toneMappingType = value; });
-    imageprocessingOpened = true;
+    imageprocessingContainerOpened = true;
   }
   else {
-    imageprocessingOpened = false;
+    imageprocessingContainerOpened = false;
   }
   // --- PHYSICS ---
   if (_dummy.has_value()) {
-    static auto physicsOpened = false;
-    ImGui::SetNextTreeNodeOpen(physicsOpened, ImGuiCond_Always);
+    static auto physicsContainerOpened = false;
+    ImGui::SetNextTreeNodeOpen(physicsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("PHYSICS")) {
-      physicsOpened = true;
+      physicsContainerOpened = true;
     }
     else {
-      physicsOpened = false;
+      physicsContainerOpened = false;
     }
   }
   // --- COLLISIONS ---
-  static auto collisionsOpened = false;
-  ImGui::SetNextTreeNodeOpen(collisionsOpened, ImGuiCond_Always);
+  static auto collisionsContainerOpened = false;
+  ImGui::SetNextTreeNodeOpen(collisionsContainerOpened, ImGuiCond_Always);
   if (ImGui::CollapsingHeader("COLLISIONS")) {
     Vector3LineComponent::render("Gravity", scene->gravity);
-    collisionsOpened = true;
+    collisionsContainerOpened = true;
   }
   else {
-    collisionsOpened = false;
+    collisionsContainerOpened = false;
   }
 } // namespace BABYLON
 

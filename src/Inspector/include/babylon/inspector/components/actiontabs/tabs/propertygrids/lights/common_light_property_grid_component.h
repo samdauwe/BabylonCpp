@@ -4,29 +4,35 @@
 #include <memory>
 
 #include <babylon/babylon_api.h>
+#include <babylon/inspector/components/actiontabs/lines/float_line_component.h>
+#include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
+#include <babylon/lights/light.h>
 
 namespace BABYLON {
 
 class Light;
 using LightPtr = std::shared_ptr<Light>;
 
-struct ICommonLightPropertyGridComponentProps {
-  LightPtr light;
-}; // end of ICommonLightPropertyGridComponentProps
+struct BABYLON_SHARED_EXPORT CommonLightPropertyGridComponent {
 
-class BABYLON_SHARED_EXPORT CommonLightPropertyGridComponent {
+  static void render(const LightPtr& light)
+  {
+    // --- GENERAL ---
+    static auto generalContainerOpened = true;
+    ImGui::SetNextTreeNodeOpen(generalContainerOpened, ImGuiCond_Always);
+    if (ImGui::CollapsingHeader("GENERAL")) {
+      TextLineComponent::render("ID", light->id);
+      TextLineComponent::render("Unique ID", std::to_string(light->uniqueId));
+      TextLineComponent::render("Class", light->getClassName());
+      FloatLineComponent::render("Intensity", light->intensity);
+      generalContainerOpened = true;
+    }
+    else {
+      generalContainerOpened = false;
+    }
+  }
 
-public:
-  CommonLightPropertyGridComponent(
-    const ICommonLightPropertyGridComponentProps& props);
-  ~CommonLightPropertyGridComponent();
-
-  void render();
-
-public:
-  ICommonLightPropertyGridComponentProps props;
-
-}; // end of class CommonLightPropertyGridComponent
+}; // end of struct CommonLightPropertyGridComponent
 
 } // end of namespace BABYLON
 
