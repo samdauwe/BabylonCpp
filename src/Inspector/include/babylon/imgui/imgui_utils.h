@@ -117,7 +117,7 @@ inline void SetupImGuiStyle(bool bStyleDark_, float alpha_)
 /**
  * @brief Splitter implementation using SplitterBehavior in imgui_internal.h as
  * a helper.
- * Ref: https://github.com/ocornut/imgui/issues/319
+ * @see https://github.com/ocornut/imgui/issues/319
  */
 inline bool Splitter(bool split_vertically, float thickness, float* size1,
                      float* size2, float min_size1, float min_size2,
@@ -139,6 +139,31 @@ inline bool Splitter(bool split_vertically, float thickness, float* size1,
   bb.Max.y   = bb.Min.y + bbMax.y;
   return SplitterBehavior(bb, id, split_vertically ? ImGuiAxis_X : ImGuiAxis_Y,
                           size1, size2, min_size1, min_size2, 0.0f);
+}
+
+/**
+ * @brief SliderFloat implementation with steps.
+ * @see https://github.com/ocornut/imgui/issues/1183
+ */
+inline bool SliderFloatWithSteps(const char* label, float* v, float v_min,
+                                 float v_max, float v_step,
+                                 const char* display_format = nullptr)
+{
+  if (!display_format) {
+    display_format = "%.3f";
+  }
+
+  char text_buf[64] = {};
+  ImFormatString(text_buf, IM_ARRAYSIZE(text_buf), display_format, *v);
+
+  // Map from [v_min,v_max] to [0,N]
+  const int countValues    = int((v_max - v_min) / v_step);
+  int v_i                  = int((*v - v_min) / v_step);
+  const bool value_changed = SliderInt(label, &v_i, 0, countValues, text_buf);
+
+  // Remap from [0,N] to [v_min,v_max]
+  *v = v_min + float(v_i) * v_step;
+  return value_changed;
 }
 
 inline bool CheckBoxFont(const char* name_, bool* pB_, const char* pOn_ = "[X]",
