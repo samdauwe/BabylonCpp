@@ -52,6 +52,15 @@ public:
    * @brief Returns the data object stored in the node.
    * @return The data object stored in the node.
    */
+  T& data()
+  {
+    return _data;
+  }
+
+  /**
+   * @brief Returns the data object stored in the node.
+   * @return The data object stored in the node.
+   */
   const T& data() const
   {
     return _data;
@@ -281,6 +290,27 @@ public:
   const std::unique_ptr<TreeNode<T>>& rootPtr() const
   {
     return _root;
+  }
+
+  /**
+   * @brief Recursively visits each node of the tree and calls the visitor
+   * lambda
+   * @param node the node to visit
+   * @param visitor callback lambda
+   */
+  static void
+  recursive_visit(TreeNode<T>& node,
+                  const std::function<void(TreeNode<T>& node)>& visitor)
+  {
+    if (node.isLeaf()) {
+      visitor(node);
+    }
+    else {
+      visitor(node);
+      for (const auto& child : node.children()) {
+        recursive_visit(*child, visitor);
+      }
+    }
   }
 
   /**
