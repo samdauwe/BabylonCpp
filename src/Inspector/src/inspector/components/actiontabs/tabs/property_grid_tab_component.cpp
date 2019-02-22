@@ -43,14 +43,19 @@ void PropertyGridTabComponent::componentWillMount()
       .addChild(NodeData("Materials"))
       .addChild(NodeData("A material"));
     tree.root().addChild(NodeData("Textures")).addChild(NodeData("A texture"));
-    tree.root()
-      .addChild(NodeData("Render pipelines"))
-      .addChild(NodeData("A render pipeline"));
+    tree.root().addChild(NodeData("Render pipelines"));
   }
 }
 
 void PropertyGridTabComponent::componentWillUnmount()
 {
+}
+
+static void deSelectAll()
+{
+  Tree<NodeData>::recursive_visit(
+    tree.root(),
+    [](TreeNode<NodeData>& nodeData) { nodeData.data().isActive = false; });
 }
 
 /**
@@ -59,31 +64,48 @@ void PropertyGridTabComponent::componentWillUnmount()
 static void DisplayTree(TreeNode<NodeData>& node)
 {
 
-  if (node.children().size() == 0) {
-    // Render tree item
-    ImGui::Text(">");
-    ImGui::SameLine();
-    auto& nodeData = node.data();
-    if (ImGui::Selectable(nodeData.name, nodeData.isActive)) {
-      if (!nodeData.isActive) {
-        Tree<NodeData>::recursive_visit(tree.root(),
-                                        [](TreeNode<NodeData>& nodeData) {
-                                          nodeData.data().isActive = false;
-                                        });
-        std::cout << nodeData.name << std::endl;
+  ImGuiTreeNodeFlags node_flags
+    = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+  if (node.isLeaf()) {
+    if (node.depth() == 1) {
+      node_flags |= ImGuiTreeNodeFlags_Leaf;
+      if (ImGui::TreeNodeEx(node.data().name, node_flags)) {
+        if (ImGui::IsItemClicked()) {
+        }
+        ImGui::TreePop();
       }
-      nodeData.isActive = !nodeData.isActive;
     }
-    ImGui::NextColumn();
+    else {
+      // Render tree item
+      // ImGui::Text(">");
+      // ImGui::SameLine();
+      auto& nodeData = node.data();
+      if (ImGui::Selectable(nodeData.name, nodeData.isActive)) {
+        if (!nodeData.isActive) {
+          deSelectAll();
+          nodeData.isActive = !nodeData.isActive;
+          std::cout << nodeData.name << std::endl;
+        }
+      }
+      ImGui::NextColumn();
 
-    ImGui::Button(nodeData.name);
-    ImGui::NextColumn();
+      // ImGui::Button(nodeData.name);
+      ImGui::NextColumn();
+    }
   }
   else {
     ImGui::AlignFirstTextHeightToWidgets(); // not needed to solve bug. Helps
                                             // make vertical spacing more
                                             // consistent
-    if (ImGui::TreeNode(node.data().name)) {
+    if (node.isRoot()) {
+      node_flags |= (node.data().isActive ? ImGuiTreeNodeFlags_Selected : 0);
+    }
+    if (ImGui::TreeNodeEx(node.data().name, node_flags)) {
+      if (ImGui::IsItemClicked() && node.isRoot() && !node.data().isActive) {
+        deSelectAll();
+        auto& nodeData    = node.data();
+        nodeData.isActive = !nodeData.isActive;
+      }
       // ADDED THESE TWO LINES
       ImGui::NextColumn();
       ImGui::NextColumn();
@@ -107,7 +129,9 @@ void PropertyGridTabComponent::render()
     ImGui::Separator();
     ImGui::Columns(2);
     ImGui::SetNextTreeNodeOpen(true);
+    ImGui::Unindent();
     DisplayTree(tree.root());
+    ImGui::Indent();
     ImGui::Columns(1);
   }
 #endif

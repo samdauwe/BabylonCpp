@@ -376,6 +376,14 @@ public:
     }
   }
 
+  /**
+   * @brief Removed all the children of the root fro, the tree..
+   */
+  void clear()
+  {
+    releaseSubtree(_root);
+  }
+
 }; // end class class Tree
 
 /**
