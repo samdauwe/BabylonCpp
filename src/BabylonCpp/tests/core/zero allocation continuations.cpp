@@ -14,7 +14,7 @@ struct sctr {
   }
 };
 
-TEST(ZeroAllocationContinuations, Test1)
+TEST(ZeroAllocationContinuations, DISABLED_Test1)
 {
   using namespace BABYLON;
 
@@ -89,7 +89,7 @@ TEST(ZeroAllocationContinuations, Test1)
   }
 }
 
-TEST(ZeroAllocationContinuations, Test2)
+TEST(ZeroAllocationContinuations, DISABLED_Test2)
 {
   using namespace BABYLON;
 
