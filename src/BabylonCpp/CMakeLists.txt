@@ -93,6 +93,7 @@ file(GLOB CAMERAS_HDR_FILES         ${INCLUDE_PATH}/cameras/*.h
 file(GLOB COLLISIONS_HDR_FILES      ${INCLUDE_PATH}/collisions/*.h)
 file(GLOB COMMON_HDR_FILES          ${INCLUDE_PATH}/*.h)
 file(GLOB CORE_HDR_FILES            ${INCLUDE_PATH}/core/*.h
+                                    ${INCLUDE_PATH}/core/continuations/*.h
                                     ${INCLUDE_PATH}/core/delegates/*.h
                                     ${INCLUDE_PATH}/core/filesystem/filesystem_common.h
                                     ${INCLUDE_PATH}/core/logging/*.h)
