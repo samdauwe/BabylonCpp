@@ -24,7 +24,7 @@ add_subdirectory(MaterialsLibrary)
 # - Procedural Textures Library
 add_subdirectory(ProceduralTexturesLibrary)
 # - Loaders
-add_subdirectory(Loaders)
+#add_subdirectory(Loaders)
 # - Inspector
 if (OPTION_BUILD_INSPECTOR)
     # Include Inspector
