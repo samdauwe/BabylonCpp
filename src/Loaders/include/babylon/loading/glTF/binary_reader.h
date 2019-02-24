@@ -1,7 +1,9 @@
 #ifndef BABYLON_LOADING_GLTF_BINARY_READER_H
 #define BABYLON_LOADING_GLTF_BINARY_READER_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
+#include <babylon/core/data_view.h>
 
 namespace BABYLON {
 namespace GLTF2 {

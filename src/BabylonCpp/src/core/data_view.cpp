@@ -73,6 +73,11 @@ uint16_t DataView::getUint16(size_t /*byteOffset*/, bool /*littleEndian*/) const
   return uint16_t{0};
 }
 
+uint32_t DataView::getUint32(size_t /*byteOffset*/, bool /*littleEndian*/) const
+{
+  return uint32_t{0};
+}
+
 float DataView::getFloat32(size_t /*byteOffset*/, bool /*littleEndian*/) const
 {
   return float{0};

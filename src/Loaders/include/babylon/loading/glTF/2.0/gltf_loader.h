@@ -1,9 +1,7 @@
 #ifndef BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_H
 #define BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_H
 
-#include <babylon/babylon_global.h>
-#include <babylon/core/nullable.h>
-#include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
+#include <babylon/babylon_api.h>
 
 namespace BABYLON {
 namespace GLTF2 {

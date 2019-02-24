@@ -1,296 +1,241 @@
 #ifndef BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_INTERFACES_H
 #define BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_INTERFACES_H
 
-#include <babylon/babylon_global.h>
-#include <babylon/core/structs.h>
-#include <babylon/tools/observable.h>
+#include <future>
+
+#include <babylon/loading/glTF/2.0/gltf2_interface.h>
+#include <babylon/mesh/vertex_buffer.h>
 
 namespace BABYLON {
+
+class AbstractMesh;
+class AnimationGroup;
+struct ArrayBufferView;
+class Bone;
+class Material;
+class Mesh;
+class Skeleton;
+class TransformNode;
+using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
+using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
+using BonePtr           = std::shared_ptr<Bone>;
+using MaterialPtr       = std::shared_ptr<Material>;
+using MeshPtr           = std::shared_ptr<Mesh>;
+using SkeletonPtr       = std::shared_ptr<Skeleton>;
+using TransformNodePtr  = std::shared_ptr<TransformNode>;
+
 namespace GLTF2 {
 
 /**
- * Enums
+ * @brief Loader interface with an index field.
  */
-enum class EComponentType {
-  BYTE           = 5120,
-  UNSIGNED_BYTE  = 5121,
-  SHORT          = 5122,
-  UNSIGNED_SHORT = 5123,
-  UNSIGNED_INT   = 5125,
-  FLOAT          = 5126
-}; // end of class EComponentType
-
-enum class EMeshPrimitiveMode {
-  POINTS         = 0,
-  LINES          = 1,
-  LINE_LOOP      = 2,
-  LINE_STRIP     = 3,
-  TRIANGLES      = 4,
-  TRIANGLE_STRIP = 5,
-  TRIANGLE_FAN   = 6
-}; // end of enum class EMeshPrimitiveMode
-
-enum class ETextureMagFilter {
-  NEAREST = 9728,
-  LINEAR  = 9729,
-}; // end of enum class ETextureMagFilter
-
-enum class ETextureMinFilter {
-  NEAREST                = 9728,
-  LINEAR                 = 9729,
-  NEAREST_MIPMAP_NEAREST = 9984,
-  LINEAR_MIPMAP_NEAREST  = 9985,
-  NEAREST_MIPMAP_LINEAR  = 9986,
-  LINEAR_MIPMAP_LINEAR   = 9987
-}; // end of enum class ETextureMinFilter
-
-enum class ETextureWrapMode {
-  CLAMP_TO_EDGE   = 33071,
-  MIRRORED_REPEAT = 33648,
-  REPEAT          = 10497
-}; // end of enum class ETextureWrapMode
+struct IArrayItem {
+  /**
+   * The index of this item in the array.
+   */
+  size_t index;
+}; // end of struct IArrayItem
 
 /**
- * Interfaces
+ * @brief Loader interface with additional members.
  */
-struct IGLTFProperty {
-  std::unordered_map<std::string, std::string> extensions;
-  std::string extras;
-}; // end of struct IGLTFProperty
+struct IAccessor : public IGLTF2::IAccessor, IArrayItem {
+  /** @hidden */
+  std::promise<ArrayBufferView> _data;
 
-struct IGLTFChildRootProperty : public IGLTFProperty {
-  std::string name;
-}; // end of struct IGLTFChildRootProperty
+  /** @hidden */
+  std::promise<VertexBuffer> _babylonVertexBuffer;
+}; // end of struct IAccessor
 
-struct IGLTFAccessorSparseIndices : public IGLTFProperty {
-  int bufferView;
-  int byteOffset;
-  EComponentType componentType;
-}; // end of struct IGLTFAccessorSparseIndices
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IAnimationChannel : public IGLTF2::IAnimationChannel, IArrayItem {
+}; // end of struct IAnimationChannel
 
-struct IGLTFAccessorSparseValues : public IGLTFProperty {
-  int bufferView;
-  int byteOffset;
-}; // end of struct IGLTFAccessorSparseValues
+/** @hidden */
+struct _IAnimationSamplerData {
+  Float32Array input;
+  IGLTF2::AnimationSamplerInterpolation interpolation;
+  Float32Array output;
+}; // end of struct _IAnimationSamplerData
 
-struct IGLTFAccessorSparse : public IGLTFProperty {
-  int count;
-  IGLTFAccessorSparseIndices indices;
-  IGLTFAccessorSparseValues values;
-}; // end of struct IGLTFAccessorSparse
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IAnimationSampler : public IGLTF2::IAnimationSampler, IArrayItem {
+  /** @hidden */
+  std::promise<_IAnimationSamplerData> _data;
+}; // end of struct IAnimationSampler
 
-struct IGLTFAccessor : public IGLTFChildRootProperty {
-  unsigned int bufferView;
-  Nullable<unsigned int> byteOffset;
-  EComponentType componentType;
-  bool normalized;
-  unsigned int count;
-  std::string type;
-  Float32Array max;
-  Float32Array min;
-  Nullable<IGLTFAccessorSparse> sparse;
-  // Runtime values
-  int index;
-}; // end of struct IGLTFAccessor
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
+  /** @hidden */
+  std::optional<AnimationGroupPtr> _babylonAnimationGroup;
+}; // end of struct IAnimation
 
-struct IGLTFAnimationChannelTarget : public IGLTFProperty {
-  unsigned int node;
-  std::string path;
-}; // end of struct IGLTFAnimationChannelTarget
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IBuffer : public IGLTF2::IBuffer, IArrayItem {
+  /** @hidden */
+  std::promise<ArrayBufferView> _data;
+}; // end of struct IBuffer
 
-struct IGLTFAnimationChannel : public IGLTFProperty {
-  unsigned int sampler;
-  IGLTFAnimationChannelTarget target;
-}; // end of struct IGLTFAnimationChannel
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IBufferView : public IGLTF2::IBufferView, IArrayItem {
+  /** @hidden */
+  std::promise<ArrayBufferView> _data;
 
-struct IGLTFAnimationSampler : public IGLTFProperty {
-  unsigned int input;
-  std::string interpolation;
-  unsigned int output;
-}; // end of struct IGLTFAnimationSampler
+  /** @hidden */
+  std::promise<Buffer> _babylonBuffer;
+}; // end of struct IBufferView
 
-struct IGLTFAnimation : public IGLTFChildRootProperty {
-  std::vector<IGLTFAnimationChannel> channels;
-  std::vector<IGLTFAnimationSampler> samplers;
+/**
+ * @brief Loader interface with additional members.
+ */
+struct ICamera : public IGLTF2::ICamera, IArrayItem {
+}; // end of struct ICamera
 
-  // Runtime values
-  int index;
-  std::vector<Node*> targets;
-}; // end of struct IGLTFAnimation
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IImage : public IGLTF2::IImage, IArrayItem {
+  /** @hidden */
+  std::promise<ArrayBufferView> _data;
+}; // end of struct IImage
 
-struct IGLTFAsset : public IGLTFChildRootProperty {
-  std::string copyright;
-  std::string generator;
-  std::string version;
-  std::string minVersion;
-}; // end of struct IGLTFAsset
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IMaterialNormalTextureInfo : public IGLTF2::IMaterialNormalTextureInfo {
+}; // end of struct IMaterialNormalTextureInfo
 
-struct IGLTFBuffer : public IGLTFChildRootProperty {
-  std::string uri;
-  int byteLength;
-  // Runtime values
-  int index;
-  Nullable<ArrayBufferView> loadedData;
-  Observable<IGLTFBuffer>::SPtr loadedObservable;
-}; // end of struct IGLTFBuffer
+/**
+ * Loader interface with additional members.
+ */
+struct IMaterialOcclusionTextureInfo
+    : public IGLTF2::IMaterialOcclusionTextureInfo {
+}; // end of struct IMaterialOcclusionTextureInfo
 
-struct IGLTFBufferView : public IGLTFChildRootProperty {
-  unsigned int buffer;
-  int byteOffset;
-  int byteLength;
-  unsigned int byteStride;
-  // Runtime values
-  int index;
-}; // end of struct IGLTFBufferView
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IMaterialPbrMetallicRoughness
+    : public IGLTF2::IMaterialPbrMetallicRoughness {
+}; // end of struct IMaterialPbrMetallicRoughness
 
-struct IGLTFCameraOrthographic : public IGLTFProperty {
-  float xmag;
-  float ymag;
-  float zfar;
-  float znear;
-}; // end of struct IGLTFCameraOrthographic
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IMaterial : public IGLTF2::IMaterial, IArrayItem {
+  struct IMaterialData {
+    MaterialPtr babylonMaterial;
+    std::vector<AbstractMeshPtr> babylonMeshes;
+    std::promise<void> promise;
+  }; // end of struct IMaterialData
 
-struct IGLTFCameraPerspective : public IGLTFProperty {
-  float aspectRatio;
-  float yfov;
-  float zfar;
-  float znear;
-}; // end of struct IGLTFCameraPerspective
+  /** @hidden */
+  // babylonDrawMode -> IMaterialData
+  std::unordered_map<unsigned int, IMaterialData> _data;
+}; // end of struct IMaterial
 
-struct IGLTFCamera : public IGLTFChildRootProperty {
-  IGLTFCameraOrthographic orthographic;
-  IGLTFCameraPerspective perspective;
-  std::string type;
-}; // end of struct IGLTFCamera
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IMesh : public IGLTF2::IMesh, IArrayItem {
+}; // end of struct IMesh
 
-struct IGLTFImage : public IGLTFChildRootProperty {
-  std::string uri;
-  std::string mimeType;
-  int bufferView;
-  // Runtime values
-  int index;
-}; // end of struct IGLTFImage
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IMeshPrimitive : public IGLTF2::IMeshPrimitive, IArrayItem {
+  struct IMeshPrimitiveData {
+    MeshPtr babylonSourceMesh;
+    std::promise<json> promise;
+  }; // end of struct IMaterialData
 
-struct IGLTFTextureInfo {
-  unsigned int index;
-  unsigned int texCoord;
-}; // end of struct IGLTFTextureInfo
+  /** @hidden */
+  std::optional<IMeshPrimitiveData> _instanceData = std::nullopt;
+}; // end of struct IMeshPrimitive
 
-struct IGLTFMaterialNormalTextureInfo : public IGLTFTextureInfo {
-  Nullable<float> scale;
-}; // end of struct IGLTFMaterialNormalTextureInfo
+/**
+ * @brief Loader interface with additional members.
+ */
+struct INode : public IGLTF2::INode, IArrayItem {
+  /**
+   * The parent glTF node.
+   */
+  std::optional<INode> parent;
 
-struct IGLTFMaterialOcclusionTextureInfo : public IGLTFTextureInfo {
-  Nullable<float> strength;
-}; // end of struct IGLTFMaterialOcclusionTextureInfo
+  /** @hidden */
+  TransformNodePtr _babylonTransformNode = nullptr;
 
-struct IGLTFMaterialPbrMetallicRoughness {
-  Float32Array baseColorFactor;
-  Nullable<IGLTFTextureInfo> baseColorTexture;
-  Nullable<float> metallicFactor;
-  Nullable<float> roughnessFactor;
-  Nullable<IGLTFTextureInfo> metallicRoughnessTexture;
-}; // end of struct IGLTFMaterialPbrMetallicRoughness
+  /** @hidden */
+  std::vector<AbstractMeshPtr> _primitiveBabylonMeshes;
 
-struct IGLTFMaterial : public IGLTFChildRootProperty {
-  Nullable<IGLTFMaterialPbrMetallicRoughness> pbrMetallicRoughness;
-  Nullable<IGLTFMaterialNormalTextureInfo> normalTexture;
-  Nullable<IGLTFMaterialOcclusionTextureInfo> occlusionTexture;
-  Nullable<IGLTFTextureInfo> emissiveTexture;
-  Float32Array emissiveFactor;
-  std::string alphaMode;
-  Nullable<float> alphaCutoff;
-  bool doubleSided;
-  // Runtime values
-  int index;
-  Material* babylonMaterial;
-}; // end of struct IGLTFMaterial
+  /** @hidden */
+  std::vector<BonePtr> _babylonBones;
 
-struct IGLTFMeshPrimitive : public IGLTFProperty {
-  std::unordered_map<std::string, int> attributes;
-  int indices;
-  int material;
-  EMeshPrimitiveMode mode;
-  std::vector<std::unordered_map<std::string, int>> targets;
-  // Runtime values
-  VertexData* vertexData;
-  std::vector<VertexData> targetsVertexData;
-}; // end of struct IGLTFMeshPrimitive
+  /** @hidden */
+  IndicesArray _numMorphTargets;
+}; // end of struct INode
 
-struct IGLTFMesh : public IGLTFChildRootProperty {
-  std::vector<IGLTFMeshPrimitive*> primitives;
-  Float32Array weights;
-  // Runtime values
-  int index;
-}; // end of struct IGLTFMesh
+/** @hidden */
+struct _ISamplerData {
+  bool noMipMaps;
+  unsigned int samplingMode;
+  float wrapU;
+  float wrapV;
+}; // end of struct _ISamplerData
 
-struct IGLTFNode : public IGLTFChildRootProperty {
-  int camera;
-  Float32Array children;
-  int skin;
-  Float32Array matrix;
-  int mesh;
-  Float32Array rotation;
-  Float32Array scale;
-  Float32Array translation;
-  Float32Array weights;
-  // Runtime values
-  int index;
-  IGLTFNode* parent;
-  Mesh* babylonMesh;
-  std::unordered_map<int, Bone*> babylonBones;
-  std::vector<Node*> babylonAnimationTargets;
-}; // end of struct IGLTFNode
+/**
+ * @brief Loader interface with additional members.
+ */
+struct ISampler : public IGLTF2::ISampler, IArrayItem {
+  /** @hidden */
+  std::optional<_ISamplerData> _data = std::nullopt;
+}; // end of struct ISampler
 
-struct IGLTFSampler : public IGLTFChildRootProperty {
-  ETextureMagFilter magFilter;
-  ETextureMagFilter minFilter;
-  ETextureWrapMode wrapS;
-  ETextureWrapMode wrapT;
-}; // end of struct IGLTFSampler
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IScene : public IGLTF2::IScene, IArrayItem {
+}; // end of struct IScene
 
-struct IGLTFScene : public IGLTFChildRootProperty {
-  Uint32Array nodes;
-  // Runtime values
-  int index;
-}; // end of struct IGLTFScene
+/**
+ * @brief Loader interface with additional members.
+ */
+struct ISkin : public IGLTF2::ISkin, IArrayItem {
+  struct ISkinData {
+    SkeletonPtr babylonSkeleton;
+    std::promise<void> promise;
+  }; // end of struct ISkinData
 
-struct IGLTFSkin : public IGLTFChildRootProperty {
-  Nullable<unsigned int> inverseBindMatrices;
-  int skeleton;
-  Uint32Array joints;
-  // Runtime values
-  int index;
-  Skeleton* babylonSkeleton;
-}; // end of struct IGLTFSkin
+  /** @hidden */
+  std::optional<ISkinData> _data = std::nullopt;
+}; // end of struct ISkin
 
-struct IGLTFTexture : public IGLTFChildRootProperty {
-  int sampler;
-  int source;
-  // Runtime values
-  int index;
-  std::string url;
-  Observable<IGLTFTexture> dataReadyObservable;
-}; // end of struct IGLTFTexture
+/**
+ * @brief Loader interface with additional members.
+ */
+struct ITexture : public IGLTF2::ITexture, IArrayItem {
+}; // end of struct ITexture
 
-struct IGLTF : public IGLTFProperty {
-  std::vector<IGLTFAccessor> accessors;
-  std::vector<IGLTFAnimation> animations;
-  std::vector<IGLTFAsset> asset;
-  std::vector<IGLTFBuffer> buffers;
-  std::vector<IGLTFBufferView> bufferViews;
-  std::vector<IGLTFCamera> cameras;
-  std::vector<std::string> extensionsUsed;
-  std::vector<std::string> extensionsRequired;
-  std::vector<IGLTFImage> images;
-  std::vector<IGLTFMaterial> materials;
-  std::vector<IGLTFMesh> meshes;
-  std::vector<IGLTFNode> nodes;
-  std::vector<IGLTFSampler> sampler;
-  Nullable<unsigned int> scene;
-  std::vector<IGLTFScene> scenes;
-  std::vector<IGLTFSkin> skins;
-  std::vector<IGLTFTexture> textures;
+/**
+ * @brief Loader interface with additional members.
+ */
+struct ITextureInfo : public IGLTF2::ITextureInfo {
+}; // end of struct ITextureInfo
+
+/**
+ * @brief Loader interface with additional members.
+ */
+struct IGLTF : public IGLTF2::IGLTF {
 }; // end of struct IGLTF
 
 } // end of namespace GLTF2
