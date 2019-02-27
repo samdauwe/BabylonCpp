@@ -5,36 +5,67 @@
 #include <memory>
 #include <unordered_map>
 
+#include <nlohmann/json.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 namespace GLTF2 {
 
+struct _IAnimationSamplerData;
+struct _ISamplerData;
 class AbstractMesh;
+struct AccessorComponentType;
 class AnimationGroup;
+struct ArrayBufferView;
+class BaseTexture;
 class Bone;
+class Buffer;
+class Camera;
 class Geometry;
 struct GLTFFileLoader;
 struct GLTFLoaderExtension;
 struct GLTFLoaderTracker;
+struct IAccessor;
+struct IAnimation;
+struct IAnimationChannel;
+struct IAnimationSampler;
+struct IBuffer;
+struct IBufferView;
+struct ICamera;
 struct IGLTFLoaderData;
+struct IGLTFLoaderExtension;
+struct IImage;
+struct IMaterial;
+struct IMaterialPbrMetallicRoughness;
 struct IMesh;
 struct IMeshPrimitive;
 struct INode;
+struct ISampler;
 struct IScene;
 struct ISkin;
+struct ITexture;
+struct ITextureInfo;
+class Material;
 class Matrix;
 class Mesh;
 class MorphTarget;
 struct ProgressEvent;
 class Skeleton;
+struct TextureWrapMode;
 class TransformNode;
+class VertexBuffer;
 using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
 using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
+using BaseTexturePtr    = std::shared_ptr<BaseTexture>;
 using BonePtr           = std::shared_ptr<Bone>;
+using CameraPtr         = std::shared_ptr<Camera>;
 using GeometryPtr       = std::shared_ptr<Geometry>;
 using GLTFFileLoaderPtr = std::shared_ptr<GLTFFileLoader>;
+using MaterialPtr       = std::shared_ptr<Material>;
 using MeshPtr           = std::shared_ptr<Mesh>;
 using MorphTargetPtr    = std::shared_ptr<MorphTarget>;
 using SkeletonPtr       = std::shared_ptr<Skeleton>;
@@ -94,6 +125,163 @@ public:
     const std::function<void(const TransformNodePtr& babylonTransformNode)>&
       assign);
 
+  /**
+   * @brief Loads a glTF camera.
+   * @param context The context when loading the asset
+   * @param camera The glTF camera property
+   * @param assign A function called synchronously after parsing the glTF
+   * properties
+   * @returns A promise that resolves with the loaded Babylon camera when the
+   * load is complete
+   */
+  CameraPtr loadCameraAsync(
+    const std::string& context, const ICamera& camera,
+    const std::function<void(const CameraPtr& babylonCamera)>& assign);
+
+  /**
+   * @brief Loads a glTF animation.
+   * @param context The context when loading the asset
+   * @param animation The glTF animation property
+   * @returns A promise that resolves with the loaded Babylon animation group
+   * when the load is complete
+   */
+  AnimationGroupPtr loadAnimationAsync(const std::string& context,
+                                       const IAnimation& animation);
+
+  /**
+   * @brief Loads a glTF buffer view.
+   * @param context The context when loading the asset
+   * @param bufferView The glTF buffer view property
+   * @returns A promise that resolves with the loaded data when the load is
+   * complete
+   */
+  ArrayBufferView loadBufferViewAsync(const std::string& context,
+                                      const IBufferView& bufferView);
+
+  /**
+   * @brief Hidden
+   */
+  MaterialPtr _loadMaterialAsync(
+    const std::string& context, const IMaterial& material,
+    const MeshPtr& babylonMesh, unsigned int babylonDrawMode,
+    const std::function<void(const MaterialPtr& babylonMaterial)>& assign);
+
+  /**
+   * @brief Creates a Babylon material from a glTF material.
+   * @param context The context when loading the asset
+   * @param material The glTF material property
+   * @param babylonDrawMode The draw mode for the Babylon material
+   * @returns The Babylon material
+   */
+  MaterialPtr createMaterial(const std::string& context,
+                             const IMaterial& material,
+                             unsigned int babylonDrawMode);
+
+  /**
+   * @brief Loads properties from a glTF material into a Babylon material.
+   * @param context The context when loading the asset
+   * @param material The glTF material property
+   * @param babylonMaterial The Babylon material
+   * @returns A promise that resolves when the load is complete
+   */
+  void loadMaterialPropertiesAsync(const std::string& context,
+                                   const IMaterial& material,
+                                   const MaterialPtr& babylonMaterial);
+
+  /**
+   * @brief Loads the normal, occlusion, and emissive properties from a glTF
+   * material into a Babylon material.
+   * @param context The context when loading the asset
+   * @param material The glTF material property
+   * @param babylonMaterial The Babylon material
+   * @returns A promise that resolves when the load is complete
+   */
+  void loadMaterialBasePropertiesAsync(const std::string& context,
+                                       const IMaterial& material,
+                                       const MaterialPtr& babylonMaterial);
+
+  /**
+   * @brief Loads the alpha properties from a glTF material into a Babylon
+   * material. Must be called after the setting the albedo texture of the
+   * Babylon material when the material has an albedo texture.
+   * @param context The context when loading the asset
+   * @param material The glTF material property
+   * @param babylonMaterial The Babylon material
+   */
+  void loadMaterialAlphaProperties(const std::string& context,
+                                   const IMaterial& material,
+                                   const MaterialPtr& babylonMaterial);
+
+  /**
+   * @brief Loads a glTF texture info.
+   * @param context The context when loading the asset
+   * @param textureInfo The glTF texture info property
+   * @param assign A function called synchronously after parsing the glTF
+   * properties
+   * @returns A promise that resolves with the loaded Babylon texture when the
+   * load is complete
+   */
+  BaseTexturePtr loadTextureInfoAsync(
+    const std::string& context, const ITextureInfo& textureInfo,
+    const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
+
+  /**
+   * @brief Loads a glTF image.
+   * @param context The context when loading the asset
+   * @param image The glTF image property
+   * @returns A promise that resolves with the loaded data when the load is
+   * complete
+   */
+  ArrayBufferView loadImageAsync(const std::string& context,
+                                 const IImage& image);
+  /**
+   * @brief Loads a glTF uri.
+   * @param context The context when loading the asset
+   * @param uri The base64 or relative uri
+   * @returns A promise that resolves with the loaded data when the load is
+   * complete
+   */
+  ArrayBufferView loadUriAsync(const std::string& context,
+                               const std::string& uri);
+
+  /**
+   * @brief Adds a JSON pointer to the metadata of the Babylon object at
+   * `<object>.metadata.gltf.pointers`.
+   * @param babylonObject the Babylon object with metadata
+   * @param pointer the JSON pointer
+   */
+  void AddPointerMetadata(const json& babylonObject,
+                          const std::string& pointer);
+
+  /**
+   * @brief Increments the indentation level and logs a message.
+   * @param message The message to log
+   */
+  void logOpen(const std::string& message);
+
+  /**
+   * @brief Decrements the indentation level.
+   */
+  void logClose();
+
+  /**
+   * @brief Logs a message
+   * @param message The message to log
+   */
+  void log(const std::string& message);
+
+  /**
+   * @brief Starts a performance counter.
+   * @param counterName The name of the performance counter
+   */
+  void startPerformanceCounter(const std::string& counterName);
+
+  /**
+   * @brief Ends a performance counter.
+   * @param counterName The name of the performance counter
+   */
+  void endPerformanceCounter(const std::string& counterName);
+
 protected:
   /** Hidden */
   GLTFLoader(const GLTFFileLoaderPtr& parent);
@@ -151,6 +339,90 @@ private:
   void _updateBoneMatrices(const SkeletonPtr& babylonSkeleton,
                            const Float32Array& inverseBindMatricesData);
   Matrix _getNodeMatrix(const INode& node);
+  void _loadAnimationsAsync();
+  void _loadAnimationChannelAsync(const std::string& context,
+                                  const std::string& animationContext,
+                                  const IAnimation& animation,
+                                  const IAnimationChannel& channel,
+                                  const AnimationGroup& babylonAnimationGroup);
+  _IAnimationSamplerData
+  _loadAnimationSamplerAsync(const std::string& context,
+                             const IAnimationSampler& sampler);
+  ArrayBufferView _loadBufferAsync(const std::string& context,
+                                   const IBuffer& buffer);
+  IndicesArray _loadIndicesAccessorAsync(const std::string& context,
+                                         const IAccessor& accessor);
+  Float32Array _loadFloatAccessorAsync(const std::string& context,
+                                       const IAccessor& accessor);
+  Buffer _loadVertexBufferViewAsync(const IBufferView& bufferView,
+                                    const std::string& kind);
+  VertexBuffer _loadVertexAccessorAsync(const std::string& context,
+                                        const IAccessor& accessor,
+                                        const std::string& kind);
+  void _loadMaterialMetallicRoughnessPropertiesAsync(
+    const std::string& context, const IMaterialPbrMetallicRoughness& properties,
+    const MaterialPtr& babylonMaterial);
+  MaterialPtr _createDefaultMaterial(const std::string& context,
+                                     unsigned int babylonDrawMode);
+  BaseTexturePtr _loadTextureAsync(
+    const std::string& context, const ITexture& texture,
+    const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
+  _ISamplerData _loadSampler(const std::string& context,
+                             const ISampler& sampler);
+  void _onProgress();
+  static unsigned int
+  _GetTextureWrapMode(const std::string& context,
+                      const std::optional<unsigned int>& mode = std::nullopt);
+  static unsigned int _GetTextureSamplingMode(const std::string& context,
+                                              const ISampler& sampler);
+  static ArrayBufferView
+  _GetTypedArray(const std::string& context,
+                 const AccessorComponentType& componentType,
+                 const ArrayBufferView& bufferView,
+                 const std::optional<unsigned int> byteOffset = std::nullopt,
+                 size_t length                                = 0);
+  static unsigned int _GetNumComponents(const std::string& context,
+                                        const std::string& type);
+  static bool _ValidateUri(const std::string& uri);
+  static unsigned int _GetDrawMode(const std::string& context,
+                                   const std::optional<unsigned int>& mode
+                                   = std::nullopt);
+  void _compileMaterialsAsync();
+  void _compileShadowGeneratorsAsync();
+  void _forEachExtensions(
+    const std::function<void(const IGLTFLoaderExtension& extension)>& action);
+  void _extensionsOnLoading();
+  void _extensionsOnReady();
+  void _extensionsLoadSceneAsync(const std::string& context,
+                                 const IScene& scene);
+  TransformNodePtr _extensionsLoadNodeAsync(
+    const std::string& context, INode& node,
+    const std::function<void(const TransformNode& babylonTransformNode)>&
+      assign);
+  CameraPtr _extensionsLoadCameraAsync(
+    const std::string& context, const ICamera& camera,
+    const std::function<void(const Camera& babylonCamera)>& assign);
+  GeometryPtr _extensionsLoadVertexDataAsync(const std::string& context,
+                                             const IMeshPrimitive& primitive,
+                                             const Mesh& babylonMesh);
+  MaterialPtr _extensionsLoadMaterialAsync(
+    const std::string& context, const IMaterial& material,
+    const Mesh& babylonMesh, unsigned int babylonDrawMode,
+    const std::function<void(const MaterialPtr& babylonMaterial)>& assign);
+  MaterialPtr _extensionsCreateMaterial(const std::string& context,
+                                        const IMaterial& material,
+                                        unsigned int babylonDrawMode);
+  void
+  _extensionsLoadMaterialPropertiesAsync(const std::string& context,
+                                         const IMaterial& material,
+                                         const MaterialPtr& babylonMaterial);
+  BaseTexturePtr& _extensionsLoadTextureInfoAsync(
+    const std::string& context, const ITextureInfo& textureInfo,
+    const std::function<void(const BaseTexture& babylonTexture)>& assign);
+  AnimationGroupPtr& _extensionsLoadAnimationAsync(const std::string& context,
+                                                   const IAnimation& animation);
+  ArrayBufferView _extensionsLoadUriAsync(const std::string& context,
+                                          const std::string& uri);
 
 }; // end of class GLTFLoader
 
