@@ -1,61 +1,186 @@
 #ifndef BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_EXTENSION_H
 #define BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_EXTENSION_H
 
-#include <babylon/babylon_global.h>
+#include <babylon/babylon_api.h>
+#include <babylon/loading/glTF/igltf_loader.h>
 
 namespace BABYLON {
+
+class BaseTexture;
+class Camera;
+class Geometry;
+class Material;
+class Mesh;
+class TransformNode;
+using BaseTexturePtr   = std::shared_ptr<BaseTexture>;
+using CameraPtr        = std::shared_ptr<Camera>;
+using GeometryPtr      = std::shared_ptr<Geometry>;
+using MaterialPtr      = std::shared_ptr<Material>;
+using MeshPtr          = std::shared_ptr<Mesh>;
+using TransformNodePtr = std::shared_ptr<TransformNode>;
+
 namespace GLTF2 {
 
-class BABYLON_SHARED_EXPORT GLTFLoaderExtension {
+struct IAnimation;
+struct ICamera;
+struct IMaterial;
+struct IMeshPrimitive;
+struct INode;
+struct IScene;
+struct ITextureInfo;
 
-public:
-  bool enabled() const;
-  const char* name() const;
+/**
+ * @brief Interface for a glTF loader extension.
+ */
+struct BABYLON_SHARED_EXPORT IGLTFLoaderExtension
+    : public IGLTFBaseLoaderExtension,
+      public IDisposable {
+  /**
+   * @brief Called after the loader state changes to LOADING.
+   */
+  virtual void onLoading() = 0;
 
-  //
-  // Utilities
-  //
-  static bool TraverseNode(
-    GLTFLoader& loader, const std::string& context, IGLTFNode* node,
-    const std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
-    IGLTFNode* parentNode);
-  static bool LoadNode(GLTFLoader& loader, const std::string& context,
-                       IGLTFNode* node);
-  static bool LoadMaterial(
-    GLTFLoader& loader, const std::string& context, IGLTFMaterial& material,
-    const std::function<void(Material* babylonMaterial, bool isNew)>& assign);
+  /**
+   * @brief Called after the loader state changes to READY.
+   */
+  virtual void onReady() = 0;
 
-protected:
-  virtual bool _traverseNode(
-    GLTFLoader& loader, const std::string& context, IGLTFNode* node,
-    const std::function<bool(IGLTFNode* node, IGLTFNode* parentNode)>& action,
-    IGLTFNode* parentNode);
-  virtual bool _loadNode(GLTFLoader& loader, const std::string& context,
-                         IGLTFNode* node);
-  virtual bool _loadMaterial(
-    GLTFLoader& loader, const std::string& context, IGLTFMaterial& material,
-    const std::function<void(Material* babylonMaterial, bool isNew)>& assign);
-  template <typename T>
-  bool _loadExtension(
-    const std::string& context, IGLTFProperty& property,
-    const std::function<void(const std::string& context, const T& extension,
-                               const std::function<void()>& onComplete)>&
-      action);
+  /**
+   * @brief Define this method to modify the default behavior when loading
+   * scenes.
+   * @param context The context when loading the asset
+   * @param scene The glTF scene property
+   * @returns A promise that resolves when the load is complete or null if not
+   * handled
+   */
+  virtual void loadSceneAsync(const std::string& context, const IScene& scene)
+    = 0;
 
-private:
-  //
-  // Utilities
-  //
-  static _ApplyExtensions(
-    const std::function<bool(const GLTFLoaderExtension& extension)>& action);
+  /**
+   * @brief Define this method to modify the default behavior when loading
+   * nodes.
+   * @param context The context when loading the asset
+   * @param node The glTF node property
+   * @param assign A function called synchronously after parsing the glTF
+   * properties
+   * @returns A promise that resolves with the loaded Babylon transform node
+   * when the load is complete or null if not handled
+   */
+  virtual TransformNodePtr loadNodeAsync(
+    const std::string& context, const INode& node,
+    const std::function<void(const TransformNode& babylonMesh)>& assign)
+    = 0;
 
-public:
-  std::vector<GLTFLoaderExtension> _Extensions;
+  /**
+   * @brief Define this method to modify the default behavior when loading
+   * cameras.
+   * @param context The context when loading the asset
+   * @param camera The glTF camera property
+   * @param assign A function called synchronously after parsing the glTF
+   * properties
+   * @returns A promise that resolves with the loaded Babylon camera when the
+   * load is complete or null if not handled
+   */
+  virtual CameraPtr loadCameraAsync(
+    const std::string& context, const ICamera& camera,
+    const std::function<void(const Camera& babylonCamera)>& assign)
+    = 0;
 
-private:
-  bool _enabled;
+  /**
+   * @brief  Define this method to modify the default behavior when loading
+   * vertex data for mesh primitives.
+   * @param context The context when loading the asset
+   * @param primitive The glTF mesh primitive property
+   * @returns A promise that resolves with the loaded geometry when the load is
+   * complete or null if not handled
+   */
+  virtual GeometryPtr _loadVertexDataAsync(const std::string& context,
+                                           const IMeshPrimitive& primitive,
+                                           const MeshPtr& babylonMesh)
+    = 0;
 
-}; // end of class GLTFLoaderExtension
+  /**
+   * @brief  Define this method to modify the default behavior when loading
+   * materials. Load material creates the material and then loads material
+   * properties.
+   * @param context The context when loading the asset
+   * @param material The glTF material property
+   * @param assign A function called synchronously after parsing the glTF
+   * properties
+   * @returns A promise that resolves with the loaded Babylon material when the
+   * load is complete or null if not handled
+   */
+  virtual MaterialPtr _loadMaterialAsync(
+    const std::string& context, const IMaterial& material,
+    const MeshPtr& babylonMesh, unsigned int babylonDrawMode,
+    const std::function<void(const MaterialPtr& babylonMaterial)>& assign)
+    = 0;
+
+  /**
+   * @brief Define this method to modify the default behavior when creating
+   * materials.
+   * @param context The context when loading the asset
+   * @param material The glTF material property
+   * @param babylonDrawMode The draw mode for the Babylon material
+   * @returns The Babylon material or null if not handled
+   */
+  virtual MaterialPtr createMaterial(const std::string& context,
+                                     const IMaterial& material,
+                                     unsigned int babylonDrawMode)
+    = 0;
+
+  /**
+   * @brief Define this method to modify the default behavior when loading
+   * material properties.
+   * @param context The context when loading the asset
+   * @param material The glTF material property
+   * @param babylonMaterial The Babylon material
+   * @returns A promise that resolves when the load is complete or null if not
+   * handled
+   */
+  virtual void loadMaterialPropertiesAsync(const std::string& context,
+                                           const IMaterial& material,
+                                           const Material& babylonMaterial)
+    = 0;
+
+  /**
+   * @brief Define this method to modify the default behavior when loading
+   * texture infos.
+   * @param context The context when loading the asset
+   * @param textureInfo The glTF texture info property
+   * @param assign A function called synchronously after parsing the glTF
+   * properties
+   * @returns A promise that resolves with the loaded Babylon texture when the
+   * load is complete or null if not handled
+   */
+  virtual BaseTexturePtr loadTextureInfoAsync(
+    const std::string& context, const ITextureInfo& textureInfo,
+    const std::function<void(const BaseTexture& babylonTexture)>& assign)
+    = 0;
+
+  /**
+   * @brief Define this method to modify the default behavior when loading
+   * animations.
+   * @param context The context when loading the asset
+   * @param animation The glTF animation property
+   * @returns A promise that resolves with the loaded Babylon animation group
+   * when the load is complete or null if not handled
+   */
+  virtual AnimationGroupPtr loadAnimationAsync(const std::string& context,
+                                               const IAnimation& animation)
+    = 0;
+
+  /**
+   * @brief Define this method to modify the default behavior when loading uris.
+   * @param context The context when loading the asset
+   * @param uri The uri to load
+   * @returns A promise that resolves with the loaded data when the load is
+   * complete or null if not handled
+   */
+  virtual ArrayBufferView _loadUriAsync(const std::string& context,
+                                        const std::string& uri)
+    = 0;
+}; // end of struct IGLTFLoaderExtension
 
 } // end of namespace GLTF2
 } // end of namespace BABYLON

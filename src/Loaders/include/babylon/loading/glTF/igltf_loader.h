@@ -13,7 +13,18 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractMesh;
+class AnimationGroup;
 struct ArrayBufferView;
+struct IParticleSystem;
+class ProgressEvent;
+class Scene;
+class SceneLoaderProgressEvent;
+class Skeleton;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using AnimationGroupPtr  = std::shared_ptr<AnimationGroup>;
+using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
+using SkeletonPtr        = std::shared_ptr<Skeleton>;
 
 namespace GLTF2 {
 
@@ -71,7 +82,7 @@ struct IGLTFLoaderData {
 /**
  * @brief Interface for extending the loader.
  */
-struct IGLTFLoaderExtension {
+struct IGLTFBaseLoaderExtension {
   /**
    * The name of this extension.
    */
@@ -81,7 +92,7 @@ struct IGLTFLoaderExtension {
    * Defines whether this extension is enabled.
    */
   bool enabled;
-}; // end of struct IGLTFLoaderExtension
+}; // end of struct IGLTFBaseLoaderExtension
 
 /**
  * @brief Loader state.
@@ -103,27 +114,33 @@ enum class GLTFLoaderState {
   COMPLETE
 }; // end of enum class GLTFLoaderState
 
+struct ImportMeshResut {
+  std::vector<AbstractMeshPtr> meshes;
+  std::vector<IParticleSystemPtr> particleSystems;
+  std::vector<SkeletonPtr> skeletons;
+  std::vector<AnimationGroupPtr> animationGroups;
+}; // end of struct ImportMeshResut
+
 /**
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT IGLTFLoader : public IDisposable {
 
-  virtual void importMeshAsync(
+  std::optional<GLTFLoaderState> state;
+
+  virtual ImportMeshResut importMeshAsync(
     const std::vector<std::string>& meshesNames, Scene* scene,
     const IGLTFLoaderData& data, const std::string& rootUrl,
-    const std::function<
-      void(const std::vector<AbstractMesh*>& meshes,
-           const std::vector<ParticleSystem*>& particleSystems,
-           const std::vector<Skeleton*>& skeletons)>& onSuccess,
-    const std::function<void(const ProgressEvent& event)>& onProgress,
-    const std::function<void(const std::string& message)>& onError)
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "")
     = 0;
 
-  virtual void
-  loadAsync(Scene* scene, const IGLTFLoaderData& data,
-            const std::string& rootUrl, const std::function<void()>& onSuccess,
-            const std::function<void(const ProgressEvent& event)>& onProgress,
-            const std::function<void(const std::string& message)>& onError)
+  virtual void loadAsync(
+    Scene* scene, const IGLTFLoaderData& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "")
     = 0;
 
 }; // end of struct IGLTFLoader
