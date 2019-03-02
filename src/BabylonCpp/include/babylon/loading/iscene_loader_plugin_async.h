@@ -2,6 +2,7 @@
 #define BABYLON_LOADING_ISCENE_LOADER_PLUGIN_ASYNC_H
 
 #include <functional>
+#include <memory>
 #include <vector>
 
 #include <babylon/babylon_api.h>
@@ -11,10 +12,12 @@ namespace BABYLON {
 
 class AbstractMesh;
 class AnimationGroup;
+class AssetContainer;
 struct IParticleSystem;
 class Scene;
 class SceneLoaderProgressEvent;
 class Skeleton;
+using AssetContainerPtr = std::shared_ptr<AssetContainer>;
 
 /**
  * @brief The loaded meshes, particle systems, skeletons, and animation groups.
@@ -27,6 +30,16 @@ struct ImportedMeshes {
 }; // end of struct ImportedMeshes
 
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
+
+  /**
+   * The friendly name of this plugin.
+   */
+  std::string name;
+
+  /**
+   * The file extensions supported by this plugin.
+   */
+  ISceneLoaderPluginExtensions extensions;
 
   /**
    * @brief Import meshes into a scene.
@@ -65,14 +78,33 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {
     = 0;
 
   /**
-   * The friendly name of this plugin.
+   * The callback that returns true if the data can be directly loaded.
    */
-  std::string name;
+  std::function<bool(const std::string& data)> canDirectLoad = nullptr;
 
   /**
-   * The file extensions supported by this plugin.
+   * The callback that allows custom handling of the root url based on the
+   * response url.
    */
-  ISceneLoaderPluginExtensions extensions;
+  std::function<bool(const std::string& rootUrl,
+                     const std::string& responseURL)>
+    rewriteRootURL = nullptr;
+
+  /**
+   * @brief Load into an asset container.
+   * @param scene The scene to load into
+   * @param data The data to import
+   * @param rootUrl The root url for scene and resources
+   * @param onProgress The callback when the load progresses
+   * @param fileName Defines the name of the file to load
+   * @returns The loaded asset container
+   */
+  virtual AssetContainerPtr loadAssetContainerAsync(
+    Scene* scene, const std::string& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "")
+    = 0;
 
 }; // end of struct ISceneLoaderPluginAsync
 

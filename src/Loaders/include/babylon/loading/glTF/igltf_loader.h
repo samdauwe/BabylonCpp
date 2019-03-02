@@ -114,12 +114,12 @@ enum class GLTFLoaderState {
   COMPLETE
 }; // end of enum class GLTFLoaderState
 
-struct ImportMeshResut {
+struct ImportMeshResult {
   std::vector<AbstractMeshPtr> meshes;
   std::vector<IParticleSystemPtr> particleSystems;
   std::vector<SkeletonPtr> skeletons;
   std::vector<AnimationGroupPtr> animationGroups;
-}; // end of struct ImportMeshResut
+}; // end of struct ImportMeshResult
 
 /**
  * @brief Hidden
@@ -128,7 +128,7 @@ struct BABYLON_SHARED_EXPORT IGLTFLoader : public IDisposable {
 
   std::optional<GLTFLoaderState> state;
 
-  virtual ImportMeshResut importMeshAsync(
+  virtual ImportMeshResult importMeshAsync(
     const std::vector<std::string>& meshesNames, Scene* scene,
     const IGLTFLoaderData& data, const std::string& rootUrl,
     const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress

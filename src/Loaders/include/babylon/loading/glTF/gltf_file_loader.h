@@ -1,8 +1,11 @@
 #ifndef BABYLON_LOADING_GLTF_GLTF_FILE_LOADER_H
 #define BABYLON_LOADING_GLTF_GLTF_FILE_LOADER_H
 
+#include <variant>
+
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/loading/iscene_loader_plugin_async.h>
 #include <babylon/tools/observable.h>
@@ -11,20 +14,141 @@ namespace BABYLON {
 
 class AbstractMesh;
 class BaseTexture;
+class BinaryReader;
 class Camera;
+struct ISceneLoaderPluginAsync;
 class Material;
-using AbstractMeshPtr = std::function<AbstractMesh>;
-using BaseTexturePtr  = std::function<BaseTexture>;
-using CameraPtr       = std::function<Camera>;
-using MaterialPtr     = std::function<Material>;
+using AbstractMeshPtr            = std::shared_ptr<AbstractMesh>;
+using BaseTexturePtr             = std::shared_ptr<BaseTexture>;
+using CameraPtr                  = std::shared_ptr<Camera>;
+using MaterialPtr                = std::shared_ptr<Material>;
+using ISceneLoaderPluginAsyncPtr = std::shared_ptr<ISceneLoaderPluginAsync>;
 
 namespace GLTF2 {
 
+struct IGLTFLoader;
 struct IGLTFLoaderData;
 struct IGLTFLoaderExtension;
+struct IGLTFValidationResults;
+struct GLTFLoaderState;
+using IGLTFLoaderPtr = std::shared_ptr<IGLTFLoader>;
+
+struct UnpackedBinary {
+  std::string json;
+  ArrayBufferView bin;
+}; // end of struct UnpackedBinary
+
+struct Version {
+  unsigned int major;
+  unsigned int minor;
+}; // end of struct Version
 
 class BABYLON_SHARED_EXPORT GLTFFileLoader : public IDisposable,
                                              public ISceneLoaderPluginAsync {
+
+private:
+  static constexpr const char* _logSpaces = "                                ";
+
+public:
+  /**
+   * @brief Disposes the loader, releases resources during load, and cancels any
+   * outstanding requests.
+   */
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
+
+  /**
+   * @brief Hidden
+   */
+  void clear();
+
+  /**
+   * @brief Imports one or more meshes from the loaded glTF data and adds them
+   * to the scene.
+   * @param meshesNames a string or array of strings of the mesh names that
+   * should be loaded from the file
+   * @param scene the scene the meshes should be added to
+   * @param data the glTF data to load
+   * @param rootUrl root url to load from
+   * @param onProgress event that fires when loading progress has occured
+   * @param fileName Defines the name of the file to load
+   * @returns a promise containg the loaded meshes, particles, skeletons and
+   * animations
+   */
+  ImportedMeshes importMeshAsync(
+    const std::vector<std::string>& meshesNames, Scene* scene,
+    const std::string& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "") override;
+
+  /**
+   * @brief Imports all objects from the loaded glTF data and adds them to the
+   * scene.
+   * @param scene the scene the objects should be added to
+   * @param data the glTF data to load
+   * @param rootUrl root url to load from
+   * @param onProgress event that fires when loading progress has occured
+   * @param fileName Defines the name of the file to load
+   * @returns a promise which completes when objects have been loaded to the
+   * scene
+   */
+  void loadAsync(
+    Scene* scene, const std::string& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "") override;
+
+  /**
+   * @brief Load into an asset container.
+   * @param scene The scene to load into
+   * @param data The data to import
+   * @param rootUrl The root url for scene and resources
+   * @param onProgress The callback when the load progresses
+   * @param fileName Defines the name of the file to load
+   * @returns The loaded asset container
+   */
+  AssetContainerPtr loadAssetContainerAsync(
+    Scene* scene, const std::string& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "") override;
+
+  /**
+   * @brief Instantiates a glTF file loader plugin.
+   * @returns the created plugin
+   */
+  ISceneLoaderPluginAsyncPtr createPlugin();
+
+  /**
+   * @brief The loader state or null if the loader is not active.
+   */
+  std::optional<GLTFLoaderState> loaderState();
+
+  /**
+   * @brief Hidden
+   */
+  void _log(const std::string& message);
+
+  /**
+   * @brief Hidden
+   */
+  void _logOpen(const std::string& message);
+
+  /**
+   * @brief Hidden
+   */
+  void _logClose();
+
+  /**
+   * @brief Hidden
+   */
+  void _startPerformanceCounter(const std::string& counterName);
+
+  /**
+   * @brief Hidden
+   */
+  void _endPerformanceCounter(const std::string& counterName);
 
 protected:
   /**
@@ -85,6 +209,45 @@ protected:
    */
   void set_onExtensionLoaded(
     const std::function<void(const IGLTFLoaderExtension& extension)>& callback);
+
+  /**
+   * @brief Defines if the loader logging is enabled.
+   */
+  bool get_loggingEnabled() const;
+  void set_loggingEnabled(bool value);
+
+  /**
+   * @brief Defines if the loader should capture performance counters.
+   */
+  bool get_capturePerformanceCounters() const;
+  void set_capturePerformanceCounters(bool value);
+
+  /**
+   * @brief Callback raised after a loader extension is created.
+   */
+  void set_onValidated(
+    const std::function<void(const IGLTFValidationResults& results)>& callback);
+
+private:
+  IGLTFLoaderData
+  _parseAsync(Scene* scene, const std::variant<std::string, ArrayBuffer>& data,
+              const std::string& rootUrl, const std::string& fileName = "");
+  void _validateAsync(Scene* scene, const std::string& json,
+                      const std::string& rootUrl,
+                      const std::string& fileName = "");
+  IGLTFLoader& _getLoader(const IGLTFLoaderData& loaderData);
+  UnpackedBinary _unpackBinary(const ArrayBuffer& data);
+  UnpackedBinary _unpackBinaryV1(const BinaryReader& binaryReader);
+  UnpackedBinary _unpackBinaryV2(const BinaryReader& binaryReader);
+  static std::optional<Version> _parseVersion(const std::string& version);
+  static int _compareVersion(const Version& a, const Version& b);
+  static std::string _decodeBufferToText(const Uint8Array& buffer);
+  void _logEnabled(const std::string& message);
+  void _logDisabled(const std::string& message);
+  void _startPerformanceCounterEnabled(const std::string& counterName);
+  void _startPerformanceCounterDisabled(const std::string& counterName);
+  void _endPerformanceCounterEnabled(const std::string& counterName);
+  void _endPerformanceCounterDisabled(const std::string& counterName);
 
 public:
   // --------------
@@ -277,6 +440,34 @@ public:
                     std::function<void(const IGLTFLoaderExtension& extension)>>
     onExtensionLoaded;
 
+  /**
+   * Defines if the loader logging is enabled.
+   */
+  Property<GLTFFileLoader, bool> loggingEnabled;
+
+  /**
+   * Defines if the loader should capture performance counters.
+   */
+  Property<GLTFFileLoader, bool> capturePerformanceCounters;
+
+  /**
+   * Defines if the loader should validate the asset.
+   */
+  bool validate;
+
+  /**
+   * Observable raised after validation when validate is set to true. The event
+   * data is the result of the validation.
+   */
+  Observable<IGLTFValidationResults> onValidatedObservable;
+
+  /**
+   * Callback raised after a loader extension is created.
+   */
+  WriteOnlyProperty<GLTFFileLoader,
+                    std::function<void(const IGLTFValidationResults& results)>>
+    onValidated;
+
 private:
   Observer<IGLTFLoaderData>::Ptr _onParsedObserver;
   Observer<AbstractMeshPtr>::Ptr _onMeshLoadedObserver;
@@ -287,6 +478,11 @@ private:
   Observer<std::string>::Ptr _onErrorObserver;
   Observer<void>::Ptr _onDisposeObserver;
   Observer<IGLTFLoaderExtension>::Ptr _onExtensionLoadedObserver;
+  Observer<IGLTFValidationResults>::Ptr _onValidatedObserver;
+  IGLTFLoaderPtr _loader;
+  int _logIndentLevel;
+  bool _loggingEnabled;
+  bool _capturePerformanceCounters;
 
 }; // end of class GLTFFileLoader
 
