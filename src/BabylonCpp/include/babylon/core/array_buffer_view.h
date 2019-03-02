@@ -19,6 +19,7 @@ namespace BABYLON {
 struct ArrayBufferView {
 
   ArrayBufferView();
+  ArrayBufferView(const Int8Array& buffer);
   ArrayBufferView(const ArrayBuffer& arrayBuffer);
   ArrayBufferView(const Uint16Array& buffer);
   ArrayBufferView(const Uint32Array& buffer);
@@ -31,6 +32,7 @@ struct ArrayBufferView {
 
   operator bool() const;
 
+  size_t byteOffset;
   Int8Array int8Array;
   Uint8Array uint8Array;
   Int16Array int16Array;

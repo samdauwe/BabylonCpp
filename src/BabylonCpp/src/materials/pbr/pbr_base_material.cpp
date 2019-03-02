@@ -31,6 +31,8 @@ Color3 PBRBaseMaterial::_scaledReflectivity = Color3();
 
 PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
     : PushMaterial{iName, scene}
+    , transparencyMode{this, &PBRBaseMaterial::get_transparencyMode,
+                       &PBRBaseMaterial::set_transparencyMode}
     , _directIntensity{1.f}
     , _emissiveIntensity{1.f}
     , _environmentIntensity{1.f}
@@ -192,12 +194,12 @@ void PBRBaseMaterial::set_useLogarithmicDepth(bool value)
     = value && getScene()->getEngine()->getCaps().fragmentDepthSupported;
 }
 
-std::optional<unsigned int> PBRBaseMaterial::transparencyMode() const
+std::optional<unsigned int>& PBRBaseMaterial::get_transparencyMode()
 {
   return _transparencyMode;
 }
 
-void PBRBaseMaterial::setTransparencyMode(
+void PBRBaseMaterial::set_transparencyMode(
   const std::optional<unsigned int>& value)
 {
   if (_transparencyMode == value) {

@@ -253,6 +253,13 @@ struct BABYLON_SHARED_EXPORT Tools {
   static std::string RandomId();
 
   /**
+   * @brief Test if the given uri is a base64 string.
+   * @param uri The uri to test
+   * @return True if the uri is a base64 string or false otherwise
+   */
+  static bool IsBase64(const std::string& uri);
+
+  /**
    * @brief Polyfill for setImmediate.
    * @param action defines the action to execute after the current execution
    * block

@@ -1,4 +1,4 @@
-#ifndef BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_H
+﻿#ifndef BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_H
 #define BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_H
 
 #include <functional>
@@ -9,16 +9,13 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/loading/glTF/igltf_loader.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
-namespace GLTF2 {
 
-struct _IAnimationSamplerData;
-struct _ISamplerData;
 class AbstractMesh;
-struct AccessorComponentType;
 class AnimationGroup;
 struct ArrayBufferView;
 class BaseTexture;
@@ -26,7 +23,31 @@ class Bone;
 class Buffer;
 class Camera;
 class Geometry;
+class Material;
+class Matrix;
+class Mesh;
+class MorphTarget;
+class Skeleton;
+class TransformNode;
+class VertexBuffer;
+using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
+using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
+using BaseTexturePtr    = std::shared_ptr<BaseTexture>;
+using BonePtr           = std::shared_ptr<Bone>;
+using CameraPtr         = std::shared_ptr<Camera>;
+using GeometryPtr       = std::shared_ptr<Geometry>;
+using MaterialPtr       = std::shared_ptr<Material>;
+using MeshPtr           = std::shared_ptr<Mesh>;
+using MorphTargetPtr    = std::shared_ptr<MorphTarget>;
+using SkeletonPtr       = std::shared_ptr<Skeleton>;
+using TransformNodePtr  = std::shared_ptr<TransformNode>;
+
+namespace GLTF2 {
+
+struct _IAnimationSamplerData;
+struct _ISamplerData;
 struct GLTFFileLoader;
+struct GLTFLoader;
 struct GLTFLoaderExtension;
 struct GLTFLoaderTracker;
 struct IAccessor;
@@ -36,6 +57,7 @@ struct IAnimationSampler;
 struct IBuffer;
 struct IBufferView;
 struct ICamera;
+struct IGLTF;
 struct IGLTFLoaderData;
 struct IGLTFLoaderExtension;
 struct IImage;
@@ -49,32 +71,37 @@ struct IScene;
 struct ISkin;
 struct ITexture;
 struct ITextureInfo;
-class Material;
-class Matrix;
-class Mesh;
-class MorphTarget;
-struct ProgressEvent;
-class Skeleton;
-struct TextureWrapMode;
-class TransformNode;
-class VertexBuffer;
-using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
-using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
-using BaseTexturePtr    = std::shared_ptr<BaseTexture>;
-using BonePtr           = std::shared_ptr<Bone>;
-using CameraPtr         = std::shared_ptr<Camera>;
-using GeometryPtr       = std::shared_ptr<Geometry>;
-using GLTFFileLoaderPtr = std::shared_ptr<GLTFFileLoader>;
-using MaterialPtr       = std::shared_ptr<Material>;
-using MeshPtr           = std::shared_ptr<Mesh>;
-using MorphTargetPtr    = std::shared_ptr<MorphTarget>;
-using SkeletonPtr       = std::shared_ptr<Skeleton>;
-using TransformNodePtr  = std::shared_ptr<TransformNode>;
+using GLTFFileLoaderPtr  = std::shared_ptr<GLTFFileLoader>;
+using GLTFLoaderPtr      = std::shared_ptr<GLTFLoader>;
+using GLTFLoaderStatePtr = std::shared_ptr<GLTFLoaderState>;
+
+namespace IGLTF2 {
+enum class AccessorComponentType;
+enum class MeshPrimitiveMode;
+enum class TextureWrapMode;
+} // namespace IGLTF2
+
+/**
+ * @brief Helper class for working with arrays when loading the glTF asset.
+ */
+struct BABYLON_SHARED_EXPORT ArrayItem {
+
+  template <typename IArrItem>
+  static void Assign(std::vector<IArrItem>& array)
+  {
+    if (!array.empty()) {
+      for (size_t index = 0; index < array.size(); ++index) {
+        array[index].index = index;
+      }
+    }
+  }
+
+}; // end of struct ArrayItem
 
 /**
  * @brief The glTF 2.0 loader.
  */
-class BABYLON_SHARED_EXPORT GLTFLoader {
+class BABYLON_SHARED_EXPORT GLTFLoader : public IGLTFLoader {
 
 public:
   /**
@@ -91,8 +118,12 @@ public:
    */
   static bool UnregisterExtension(const std::string& name);
 
+private:
+  static std::vector<std::string> _ExtensionNames;
+  static std::unordered_map<std::string, GLTFLoaderPtr> _ExtensionFactories;
+
 public:
-  ~GLTFLoader();
+  virtual ~GLTFLoader();
 
   /** Hidden */
   void dispose();
@@ -146,7 +177,7 @@ public:
    * when the load is complete
    */
   AnimationGroupPtr loadAnimationAsync(const std::string& context,
-                                       const IAnimation& animation);
+                                       IAnimation& animation);
 
   /**
    * @brief Loads a glTF buffer view.
@@ -289,7 +320,6 @@ protected:
 private:
   /** Hidden */
   void _loadAsync();
-
   void _loadData();
   void _setupData();
   void _loadExtensions();
@@ -331,20 +361,19 @@ private:
                       const ISkin& skin);
   void _loadBones(const std::string& context, const ISkin& skin,
                   const SkeletonPtr& babylonSkeleton);
-  BonePtr _loadBone(const INode& node, const ISkin& skin,
-                    const Skeleton& babylonSkeleton,
-                    const std::unordered_map<size_t, BonePtr>& babylonBones);
+  BonePtr _loadBone(INode& node, const ISkin& skin,
+                    const SkeletonPtr& babylonSkeleton,
+                    std::unordered_map<size_t, BonePtr>& babylonBones);
   Float32Array _loadSkinInverseBindMatricesDataAsync(const std::string& context,
                                                      const ISkin& skin);
   void _updateBoneMatrices(const SkeletonPtr& babylonSkeleton,
                            const Float32Array& inverseBindMatricesData);
   Matrix _getNodeMatrix(const INode& node);
   void _loadAnimationsAsync();
-  void _loadAnimationChannelAsync(const std::string& context,
-                                  const std::string& animationContext,
-                                  const IAnimation& animation,
-                                  const IAnimationChannel& channel,
-                                  const AnimationGroup& babylonAnimationGroup);
+  void _loadAnimationChannelAsync(
+    const std::string& context, const std::string& animationContext,
+    const IAnimation& animation, const IAnimationChannel& channel,
+    const AnimationGroupPtr& babylonAnimationGroup);
   _IAnimationSamplerData
   _loadAnimationSamplerAsync(const std::string& context,
                              const IAnimationSampler& sampler);
@@ -362,30 +391,28 @@ private:
   void _loadMaterialMetallicRoughnessPropertiesAsync(
     const std::string& context, const IMaterialPbrMetallicRoughness& properties,
     const MaterialPtr& babylonMaterial);
-  MaterialPtr _createDefaultMaterial(const std::string& context,
+  MaterialPtr _createDefaultMaterial(const std::string& name,
                                      unsigned int babylonDrawMode);
   BaseTexturePtr _loadTextureAsync(
     const std::string& context, const ITexture& texture,
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
-  _ISamplerData _loadSampler(const std::string& context,
-                             const ISampler& sampler);
+  _ISamplerData _loadSampler(const std::string& context, ISampler& sampler);
   void _onProgress();
   static unsigned int
   _GetTextureWrapMode(const std::string& context,
-                      const std::optional<unsigned int>& mode = std::nullopt);
+                      std::optional<IGLTF2::TextureWrapMode> mode
+                      = std::nullopt);
   static unsigned int _GetTextureSamplingMode(const std::string& context,
                                               const ISampler& sampler);
-  static ArrayBufferView
-  _GetTypedArray(const std::string& context,
-                 const AccessorComponentType& componentType,
-                 const ArrayBufferView& bufferView,
-                 const std::optional<unsigned int> byteOffset = std::nullopt,
-                 size_t length                                = 0);
+  static ArrayBufferView _GetTypedArray(
+    const std::string& context, IGLTF2::AccessorComponentType componentType,
+    const ArrayBufferView& bufferView,
+    std::optional<size_t> byteOffset = std::nullopt, size_t length = 0);
   static unsigned int _GetNumComponents(const std::string& context,
                                         const std::string& type);
   static bool _ValidateUri(const std::string& uri);
   static unsigned int _GetDrawMode(const std::string& context,
-                                   const std::optional<unsigned int>& mode
+                                   std::optional<IGLTF2::MeshPrimitiveMode> mode
                                    = std::nullopt);
   void _compileMaterialsAsync();
   void _compileShadowGeneratorsAsync();
@@ -419,10 +446,23 @@ private:
   BaseTexturePtr& _extensionsLoadTextureInfoAsync(
     const std::string& context, const ITextureInfo& textureInfo,
     const std::function<void(const BaseTexture& babylonTexture)>& assign);
-  AnimationGroupPtr& _extensionsLoadAnimationAsync(const std::string& context,
-                                                   const IAnimation& animation);
+  AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,
+                                                  const IAnimation& animation);
   ArrayBufferView _extensionsLoadUriAsync(const std::string& context,
                                           const std::string& uri);
+
+public:
+  /** The glTF object parsed from the JSON. */
+  std::unique_ptr<IGLTF> gltf;
+
+  /** The Babylon scene when loading the asset. */
+  Scene* babylonScene;
+
+private:
+  GLTFFileLoaderPtr _parent;
+  GLTFLoaderStatePtr _state;
+  std::unordered_map<std::string, IGLTFLoaderExtension> _extensions;
+  MeshPtr _rootBabylonMesh;
 
 }; // end of class GLTFLoader
 

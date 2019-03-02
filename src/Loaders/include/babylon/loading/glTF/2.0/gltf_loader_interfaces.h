@@ -1,7 +1,7 @@
 #ifndef BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_INTERFACES_H
 #define BABYLON_LOADING_GLTF_2_0_GLTF_LOADER_INTERFACES_H
 
-#include <future>
+#include <optional>
 
 #include <babylon/loading/glTF/2.0/gltf2_interface.h>
 #include <babylon/mesh/vertex_buffer.h>
@@ -41,10 +41,10 @@ struct IArrayItem {
  */
 struct IAccessor : public IGLTF2::IAccessor, IArrayItem {
   /** @hidden */
-  std::promise<ArrayBufferView> _data;
+  std::optional<ArrayBufferView> _data;
 
   /** @hidden */
-  std::promise<VertexBuffer> _babylonVertexBuffer;
+  std::optional<VertexBuffer> _babylonVertexBuffer;
 }; // end of struct IAccessor
 
 /**
@@ -65,7 +65,7 @@ struct _IAnimationSamplerData {
  */
 struct IAnimationSampler : public IGLTF2::IAnimationSampler, IArrayItem {
   /** @hidden */
-  std::promise<_IAnimationSamplerData> _data;
+  std::optional<_IAnimationSamplerData> _data;
 }; // end of struct IAnimationSampler
 
 /**
@@ -81,7 +81,7 @@ struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
  */
 struct IBuffer : public IGLTF2::IBuffer, IArrayItem {
   /** @hidden */
-  std::promise<ArrayBufferView> _data;
+  std::optional<ArrayBufferView> _data = std::nullopt;
 }; // end of struct IBuffer
 
 /**
@@ -89,10 +89,10 @@ struct IBuffer : public IGLTF2::IBuffer, IArrayItem {
  */
 struct IBufferView : public IGLTF2::IBufferView, IArrayItem {
   /** @hidden */
-  std::promise<ArrayBufferView> _data;
+  std::optional<ArrayBufferView> _data;
 
   /** @hidden */
-  std::promise<Buffer> _babylonBuffer;
+  std::optional<Buffer> _babylonBuffer;
 }; // end of struct IBufferView
 
 /**
@@ -106,7 +106,7 @@ struct ICamera : public IGLTF2::ICamera, IArrayItem {
  */
 struct IImage : public IGLTF2::IImage, IArrayItem {
   /** @hidden */
-  std::promise<ArrayBufferView> _data;
+  std::optional<ArrayBufferView> _data;
 }; // end of struct IImage
 
 /**
@@ -136,7 +136,7 @@ struct IMaterial : public IGLTF2::IMaterial, IArrayItem {
   struct IMaterialData {
     MaterialPtr babylonMaterial;
     std::vector<AbstractMeshPtr> babylonMeshes;
-    std::promise<void> promise;
+    std::optional<void> promise;
   }; // end of struct IMaterialData
 
   /** @hidden */
@@ -156,7 +156,7 @@ struct IMesh : public IGLTF2::IMesh, IArrayItem {
 struct IMeshPrimitive : public IGLTF2::IMeshPrimitive, IArrayItem {
   struct IMeshPrimitiveData {
     MeshPtr babylonSourceMesh;
-    std::promise<json> promise;
+    std::optional<json> promise;
   }; // end of struct IMaterialData
 
   /** @hidden */
@@ -189,8 +189,8 @@ struct INode : public IGLTF2::INode, IArrayItem {
 struct _ISamplerData {
   bool noMipMaps;
   unsigned int samplingMode;
-  float wrapU;
-  float wrapV;
+  unsigned int wrapU;
+  unsigned int wrapV;
 }; // end of struct _ISamplerData
 
 /**
@@ -213,7 +213,7 @@ struct IScene : public IGLTF2::IScene, IArrayItem {
 struct ISkin : public IGLTF2::ISkin, IArrayItem {
   struct ISkinData {
     SkeletonPtr babylonSkeleton;
-    std::promise<void> promise;
+    std::optional<void> promise;
   }; // end of struct ISkinData
 
   /** @hidden */

@@ -11,6 +11,11 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 namespace GLTF2 {
+
+struct IAnimation;
+struct IAnimationChannel;
+struct INode;
+
 namespace IGLTF2 {
 
 /**
@@ -23,6 +28,10 @@ namespace IGLTF2 {
  * @brief The datatype of the components in the attribute.
  */
 enum class AccessorComponentType {
+  /**
+   * Invalid
+   */
+  INVALID = 0,
   /**
    * Byte
    */
@@ -160,23 +169,27 @@ struct ImageMimeType {
 /**
  * @brief The alpha rendering mode of the material.
  */
-struct MaterialAlphaMode {
+enum class MaterialAlphaMode {
+  /**
+   * Invalid mode
+   */
+  INVALID,
   /**
    * The alpha value is ignored and the rendered output is fully opaque
    */
-  static constexpr const char* OPAQUE = "OPAQUE";
+  OPAQUE,
   /**
    * The rendered output is either fully opaque or fully transparent depending
    * on the alpha value and the specified alpha cutoff value
    */
-  static constexpr const char* MASK = "MASK";
+  MASK,
   /**
    * The alpha value is used to composite the source and destination areas. The
    * rendered output is combined with the background using the normal painting
    * operation (i.e. the Porter and Duff over operator)
    */
-  static constexpr const char* BLEND = "BLEND";
-}; // end of struct MaterialAlphaMode
+  BLEND,
+}; // end of enum class MaterialAlphaMode
 
 /**
  * @brief The type of the primitives to render.
@@ -232,6 +245,10 @@ enum class TextureMagFilter {
  */
 enum class TextureMinFilter {
   /**
+   * Invalid filter
+   */
+  INVALID = 0,
+  /**
    * Nearest
    */
   NEAREST = 9728,
@@ -261,6 +278,10 @@ enum class TextureMinFilter {
  * @brief S (U) wrapping mode.  All valid values correspond to WebGL enums.
  */
 enum class TextureWrapMode {
+  /**
+   * Invalid mode
+   */
+  INVALID = 0,
   /**
    * Clamp to Edge
    */
@@ -464,7 +485,7 @@ struct IAnimation : public IChildRootProperty {
    * An array of channels, each of which targets an animation's sampler at a
    * node's property
    */
-  std::vector<IAnimationChannel> channels;
+  std::vector<GLTF2::IAnimationChannel> channels;
   /**
    * An array of samplers that combines input and output accessors with an
    * interpolation algorithm to define a keyframe graph (but not its target)
@@ -901,7 +922,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of keyframe animations
    */
-  std::vector<IAnimation> animations;
+  std::vector<GLTF2::IAnimation> animations;
   /**
    * Metadata about the glTF asset
    */
@@ -943,7 +964,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of nodes
    */
-  std::vector<INode> nodes;
+  std::vector<GLTF2::INode> nodes;
   /**
    * An array of samplers.  A sampler contains properties for texture filtering
    * and wrapping modes

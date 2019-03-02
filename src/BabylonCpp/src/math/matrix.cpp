@@ -869,7 +869,7 @@ Matrix Matrix::FromValues(float initialM11, float initialM12, float initialM13,
   return result;
 }
 
-Matrix Matrix::Compose(const Vector3& scale, Quaternion& rotation,
+Matrix Matrix::Compose(const Vector3& scale, const Quaternion& rotation,
                        const Vector3& translation)
 {
   auto result = Matrix::Identity();
@@ -877,7 +877,7 @@ Matrix Matrix::Compose(const Vector3& scale, Quaternion& rotation,
   return result;
 }
 
-void Matrix::ComposeToRef(const Vector3& scale, Quaternion& rotation,
+void Matrix::ComposeToRef(const Vector3& scale, const Quaternion& rotation,
                           const Vector3& translation, Matrix& result)
 {
   Matrix::FromValuesToRef(scale.x, 0.f, 0.f, 0.f, //

@@ -473,7 +473,7 @@ public:
    * @param translation defines the translation vector3
    * @returns a new matrix
    */
-  static Matrix Compose(const Vector3& scale, Quaternion& rotation,
+  static Matrix Compose(const Vector3& scale, const Quaternion& rotation,
                         const Vector3& translation);
 
   /**
@@ -484,7 +484,7 @@ public:
    * @param translation defines the translation vector3
    * @param result defines the target matrix
    */
-  static void ComposeToRef(const Vector3& scale, Quaternion& rotation,
+  static void ComposeToRef(const Vector3& scale, const Quaternion& rotation,
                            const Vector3& translation, Matrix& result);
 
   /**

@@ -58,24 +58,6 @@ public:
   const std::string getClassName() const override;
 
   /**
-   * @brief Gets the current transparency mode.
-   */
-  std::optional<unsigned int> transparencyMode() const;
-
-  /**
-   * @brief Sets the transparency mode of the material.
-   *
-   * | Value | Type                                | Description |
-   * | ----- | ----------------------------------- | ----------- |
-   * | 0     | OPAQUE                              |             |
-   * | 1     | ALPHATEST                           |             |
-   * | 2     | ALPHABLEND                          |             |
-   * | 3     | ALPHATESTANDBLEND                   |             |
-   *
-   */
-  void setTransparencyMode(const std::optional<unsigned int>& value);
-
-  /**
    * @brief Returns true if alpha blending should be disabled.
    */
   bool _disableAlphaBlending() const;
@@ -187,6 +169,24 @@ protected:
    */
   void set_useLogarithmicDepth(bool value) override;
 
+  /**
+   * @brief Gets the current transparency mode.
+   */
+  std::optional<unsigned int>& get_transparencyMode();
+
+  /**
+   * @brief Sets the transparency mode of the material.
+   *
+   * | Value | Type                                | Description |
+   * | ----- | ----------------------------------- | ----------- |
+   * | 0     | OPAQUE                              |             |
+   * | 1     | ALPHATEST                           |             |
+   * | 2     | ALPHABLEND                          |             |
+   * | 3     | ALPHATESTANDBLEND                   |             |
+   *
+   */
+  void set_transparencyMode(const std::optional<unsigned int>& value);
+
 private:
   EffectPtr _prepareEffect(
     AbstractMesh* mesh, PBRMaterialDefines& defines,
@@ -213,6 +213,12 @@ private:
    * Otherwise, returns null.
    */
   BaseTexturePtr _getRefractionTexture() const;
+
+public:
+  /**
+   * The transparency mode of the material.
+   */
+  Property<PBRBaseMaterial, std::optional<unsigned int>> transparencyMode;
 
 protected:
   /**

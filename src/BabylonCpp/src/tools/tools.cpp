@@ -606,6 +606,11 @@ std::string Tools::RandomId()
   return randomId;
 }
 
+bool Tools::IsBase64(const std::string& uri)
+{
+  return uri.size() < 5 ? false : uri.substr(0, 5) == "data:";
+}
+
 void Tools::SetImmediate(const std::function<void()>& immediate)
 {
   if (immediate) {
