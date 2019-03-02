@@ -7,6 +7,7 @@
 #include <babylon/babylon_common.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/loading/glTF/igltf_loader.h>
 #include <babylon/loading/iscene_loader_plugin_async.h>
 #include <babylon/tools/observable.h>
 
@@ -14,7 +15,6 @@ namespace BABYLON {
 
 class AbstractMesh;
 class BaseTexture;
-class BinaryReader;
 class Camera;
 struct ISceneLoaderPluginAsync;
 class Material;
@@ -26,6 +26,7 @@ using ISceneLoaderPluginAsyncPtr = std::shared_ptr<ISceneLoaderPluginAsync>;
 
 namespace GLTF2 {
 
+class BinaryReader;
 struct IGLTFLoader;
 struct IGLTFLoaderData;
 struct IGLTFLoaderExtension;
@@ -47,9 +48,12 @@ class BABYLON_SHARED_EXPORT GLTFFileLoader : public IDisposable,
                                              public ISceneLoaderPluginAsync {
 
 private:
-  static constexpr const char* _logSpaces = "                                ";
+  static const std::string _logSpaces;
 
 public:
+  GLTFFileLoader();
+  virtual ~GLTFFileLoader();
+
   /**
    * @brief Disposes the loader, releases resources during load, and cancels any
    * outstanding requests.
@@ -60,7 +64,7 @@ public:
   /**
    * @brief Hidden
    */
-  void clear();
+  void _clear();
 
   /**
    * @brief Imports one or more meshes from the loaded glTF data and adds them
@@ -126,9 +130,15 @@ public:
   std::optional<GLTFLoaderState> loaderState();
 
   /**
+   * @brief Returns a promise that resolves when the asset is completely loaded.
+   * @returns a promise that resolves when the asset is completely loaded.
+   */
+  void whenCompleteAsync();
+
+  /**
    * @brief Hidden
    */
-  void _log(const std::string& message);
+  std::function<void(const std::string& message)> _log;
 
   /**
    * @brief Hidden
@@ -143,47 +153,47 @@ public:
   /**
    * @brief Hidden
    */
-  void _startPerformanceCounter(const std::string& counterName);
+  std::function<void(const std::string& counterName)> _startPerformanceCounter;
 
   /**
    * @brief Hidden
    */
-  void _endPerformanceCounter(const std::string& counterName);
+  std::function<void(const std::string& counterName)> _endPerformanceCounter;
 
 protected:
   /**
    * @brief Raised when the asset has been parsed.
    */
-  void set_onParsed(
-    const std::function<void(const IGLTFLoaderData& loaderData)>& callback);
+  void set_onParsed(const std::function<void(IGLTFLoaderData* loaderData,
+                                             EventState& es)>& callback);
 
   /**
    * @brief Callback raised when the loader creates a mesh after parsing the
    * glTF properties of the mesh.
    */
-  void set_onMeshLoaded(
-    const std::function<void(const AbstractMeshPtr& callback)>& callback);
+  void set_onMeshLoaded(const std::function<void(AbstractMesh* callback,
+                                                 EventState& es)>& callback);
 
   /**
    * @brief Callback raised when the loader creates a texture after parsing the
    * glTF properties of the texture.
    */
   void set_onTextureLoaded(
-    const std::function<void(const BaseTexturePtr& texture)>& callback);
+    const std::function<void(BaseTexture* texture, EventState& es)>& callback);
 
   /**
    * @brief Callback raised when the loader creates a material after parsing the
    * glTF properties of the material.
    */
   void set_onMaterialLoaded(
-    const std::function<void(const MaterialPtr& material)>& callback);
+    const std::function<void(Material* material, EventState& es)>& callback);
 
   /**
    * @brief Callback raised when the loader creates a camera after parsing the
    * glTF properties of the camera.
    */
   void set_onCameraLoaded(
-    const std::function<void(const CameraPtr& camera)>& callback);
+    const std::function<void(Camera* camera, EventState& es)>& callback);
 
   /**
    * @brief Callback raised when the asset is completely loaded, immediately
@@ -191,24 +201,27 @@ protected:
    * LODs are complete. For assets without LODs, raised when the model is
    * complete, immediately after the loader resolves the returned promise.
    */
-  void set_onComplete(const std::function<void()>& callback);
+  void
+  set_onComplete(const std::function<void(void*, EventState& es)>& callback);
 
   /**
    * @brief Callback raised when an error occurs.
    */
-  void
-  set_onError(const std::function<void(const std::string& reason)>& callback);
+  void set_onError(
+    const std::function<void(std::string* reason, EventState& es)>& callback);
 
   /**
    * @brief Callback raised after the loader is disposed.
    */
-  void set_onDispose(const std::function<void()>& callback);
+  void
+  set_onDispose(const std::function<void(void*, EventState& es)>& callback);
 
   /**
    * @brief Callback raised after a loader extension is created.
    */
   void set_onExtensionLoaded(
-    const std::function<void(const IGLTFLoaderExtension& extension)>& callback);
+    const std::function<void(IGLTFLoaderExtension* extension, EventState& es)>&
+      callback);
 
   /**
    * @brief Defines if the loader logging is enabled.
@@ -225,8 +238,8 @@ protected:
   /**
    * @brief Callback raised after a loader extension is created.
    */
-  void set_onValidated(
-    const std::function<void(const IGLTFValidationResults& results)>& callback);
+  void set_onValidated(const std::function<void(IGLTFValidationResults* results,
+                                                EventState& es)>& callback);
 
 private:
   IGLTFLoaderData
@@ -237,8 +250,8 @@ private:
                       const std::string& fileName = "");
   IGLTFLoader& _getLoader(const IGLTFLoaderData& loaderData);
   UnpackedBinary _unpackBinary(const ArrayBuffer& data);
-  UnpackedBinary _unpackBinaryV1(const BinaryReader& binaryReader);
-  UnpackedBinary _unpackBinaryV2(const BinaryReader& binaryReader);
+  UnpackedBinary _unpackBinaryV1(BinaryReader& binaryReader) const;
+  UnpackedBinary _unpackBinaryV2(BinaryReader& binaryReader) const;
   static std::optional<Version> _parseVersion(const std::string& version);
   static int _compareVersion(const Version& a, const Version& b);
   static std::string _decodeBufferToText(const Uint8Array& buffer);
@@ -262,8 +275,9 @@ public:
   /**
    * Raised when the asset has been parsed
    */
-  WriteOnlyProperty<GLTFFileLoader,
-                    std::function<void(const IGLTFLoaderData& loaderData)>>
+  WriteOnlyProperty<
+    GLTFFileLoader,
+    std::function<void(IGLTFLoaderData* loaderData, EventState& es)>>
     onParsed;
 
   // ----------
@@ -295,12 +309,12 @@ public:
   /**
    * The coordinate system mode. Defaults to AUTO.
    */
-  unsigned int coordinateSystemMode;
+  GLTFLoaderCoordinateSystemMode coordinateSystemMode;
 
   /**
    * The animation start mode. Defaults to FIRST.
    */
-  unsigned int animationStartMode;
+  GLTFLoaderAnimationStartMode animationStartMode;
 
   /**
    * Defines if the loader should compile materials before raising the success
@@ -337,56 +351,56 @@ public:
    * Observable raised when the loader creates a mesh after parsing the glTF
    * properties of the mesh.
    */
-  Observable<AbstractMeshPtr> onMeshLoadedObservable;
+  Observable<AbstractMesh> onMeshLoadedObservable;
 
   /**
    * Callback raised when the loader creates a mesh after parsing the glTF
    * properties of the mesh.
    */
   WriteOnlyProperty<GLTFFileLoader,
-                    std::function<void(const AbstractMeshPtr& mesh)>>
+                    std::function<void(AbstractMesh* mesh, EventState& es)>>
     onMeshLoaded;
 
   /**
    * Observable raised when the loader creates a texture after parsing the glTF
    * properties of the texture.
    */
-  Observable<BaseTexturePtr> onTextureLoadedObservable;
+  Observable<BaseTexture> onTextureLoadedObservable;
 
   /**
    * Callback raised when the loader creates a texture after parsing the
    * glTF properties of the texture.
    */
   WriteOnlyProperty<GLTFFileLoader,
-                    std::function<void(const BaseTexturePtr& texture)>>
+                    std::function<void(BaseTexture* texture, EventState& es)>>
     onTextureLoaded;
 
   /**
    * Observable raised when the loader creates a material after parsing the glTF
    * properties of the material.
    */
-  Observable<MaterialPtr> onMaterialLoadedObservable;
+  Observable<Material> onMaterialLoadedObservable;
 
   /**
    * Callback raised when the loader creates a material after parsing the
    * glTF properties of the material.
    */
   WriteOnlyProperty<GLTFFileLoader,
-                    std::function<void(const MaterialPtr& material)>>
+                    std::function<void(Material* material, EventState& es)>>
     onMaterialLoaded;
 
   /**
    * Observable raised when the loader creates a camera after parsing the glTF
    * properties of the camera.
    */
-  Observable<CameraPtr> onCameraLoadedObservable;
+  Observable<Camera> onCameraLoadedObservable;
 
   /**
    * Callback raised when the loader creates a camera after parsing the glTF
    * properties of the camera.
    */
   WriteOnlyProperty<GLTFFileLoader,
-                    std::function<void(const CameraPtr& camera)>>
+                    std::function<void(Camera* camera, EventState& es)>>
     onCameraLoaded;
 
   /**
@@ -403,7 +417,8 @@ public:
    * LODs are complete. For assets without LODs, raised when the model is
    * complete, immediately after the loader resolves the returned promise.
    */
-  WriteOnlyProperty<GLTFFileLoader, std::function<void()>> onComplete;
+  WriteOnlyProperty<GLTFFileLoader, std::function<void(void*, EventState& es)>>
+    onComplete;
 
   /**
    * Observable raised when an error occurs.
@@ -414,7 +429,7 @@ public:
    * Callback raised when an error occurs.
    */
   WriteOnlyProperty<GLTFFileLoader,
-                    std::function<void(const std::string& reason)>>
+                    std::function<void(std::string* reason, EventState& es)>>
     onError;
 
   /**
@@ -425,7 +440,8 @@ public:
   /**
    * Callback raised after the loader is disposed.
    */
-  WriteOnlyProperty<GLTFFileLoader, std::function<void()>> onDispose;
+  WriteOnlyProperty<GLTFFileLoader, std::function<void(void*, EventState& es)>>
+    onDispose;
 
   /**
    * Observable raised after a loader extension is created.
@@ -436,8 +452,9 @@ public:
   /**
    * Callback raised after a loader extension is created.
    */
-  WriteOnlyProperty<GLTFFileLoader,
-                    std::function<void(const IGLTFLoaderExtension& extension)>>
+  WriteOnlyProperty<
+    GLTFFileLoader,
+    std::function<void(IGLTFLoaderExtension* extension, EventState& es)>>
     onExtensionLoaded;
 
   /**
@@ -464,13 +481,14 @@ public:
   /**
    * Callback raised after a loader extension is created.
    */
-  WriteOnlyProperty<GLTFFileLoader,
-                    std::function<void(const IGLTFValidationResults& results)>>
+  WriteOnlyProperty<
+    GLTFFileLoader,
+    std::function<void(IGLTFValidationResults* results, EventState& es)>>
     onValidated;
 
 private:
   Observer<IGLTFLoaderData>::Ptr _onParsedObserver;
-  Observer<AbstractMeshPtr>::Ptr _onMeshLoadedObserver;
+  Observer<AbstractMesh>::Ptr _onMeshLoadedObserver;
   Observer<BaseTexture>::Ptr _onTextureLoadedObserver;
   Observer<Material>::Ptr _onMaterialLoadedObserver;
   Observer<Camera>::Ptr _onCameraLoadedObserver;
@@ -480,7 +498,7 @@ private:
   Observer<IGLTFLoaderExtension>::Ptr _onExtensionLoadedObserver;
   Observer<IGLTFValidationResults>::Ptr _onValidatedObserver;
   IGLTFLoaderPtr _loader;
-  int _logIndentLevel;
+  size_t _logIndentLevel;
   bool _loggingEnabled;
   bool _capturePerformanceCounters;
 
