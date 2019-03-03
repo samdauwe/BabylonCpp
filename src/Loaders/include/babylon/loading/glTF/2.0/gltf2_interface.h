@@ -12,9 +12,19 @@ using json = nlohmann::json;
 namespace BABYLON {
 namespace GLTF2 {
 
+struct IAccessor;
 struct IAnimation;
 struct IAnimationChannel;
+struct IBuffer;
+struct IBufferView;
+struct IMaterial;
+struct IMaterialNormalTextureInfo;
+struct IMaterialOcclusionTextureInfo;
+struct IMaterialPbrMetallicRoughness;
 struct INode;
+struct ISkin;
+struct ITexture;
+struct ITextureInfo;
 
 namespace IGLTF2 {
 
@@ -61,36 +71,36 @@ enum class AccessorComponentType {
 /**
  * @brief Specifies if the attirbute is a scalar, vector, or matrix.
  */
-struct AccessorType {
+enum class AccessorType {
   /**
    * Scalar
    */
-  static constexpr const char* SCALAR = "SCALAR";
+  SCALAR,
   /**
    * Vector2
    */
-  static constexpr const char* VEC2 = "VEC2";
+  VEC2,
   /**
    * Vector3
    */
-  static constexpr const char* VEC3 = "VEC3";
+  VEC3,
   /**
    * Vector4
    */
-  static constexpr const char* VEC4 = "VEC4";
+  VEC4,
   /**
    * Matrix2x2
    */
-  static constexpr const char* MAT2 = "MAT2";
+  MAT2,
   /**
    * Matrix3x3
    */
-  static constexpr const char* MAT3 = "MAT3";
+  MAT3,
   /**
    * Matrix4x4
    */
-  static constexpr const char* MAT4 = "MAT4";
-}; // end struct AccessorType
+  MAT4
+}; // end enum class AccessorType
 
 /**
  * @brief The name of the node's TRS property to modify, or the weights of the
@@ -118,22 +128,26 @@ struct AnimationChannelTargetPath {
 /**
  * @brief Interpolation algorithm.
  */
-struct AnimationSamplerInterpolation {
+enum class AnimationSamplerInterpolation {
+  /**
+   * Invalid
+   */
+  INVALID = 0,
   /**
    * The animated values are linearly interpolated between keyframes
    */
-  static constexpr const char* LINEAR = "LINEAR";
+  LINEAR,
   /**
    * The animated values remain constant to the output of the first keyframe,
    * until the next keyframe
    */
-  static constexpr const char* STEP = "STEP";
+  STEP,
   /**
    * The animation's interpolation is computed using a cubic spline with
    * specified tangents
    */
-  static constexpr const char* CUBICSPLINE = "CUBICSPLINE";
-}; // end of struct AnimationSamplerInterpolation
+  CUBICSPLINE
+}; // end of enum class AnimationSamplerInterpolation
 
 /**
  * @brief A camera's projection.  A node can reference a camera to apply a
@@ -654,7 +668,7 @@ struct ITextureInfo : public IProperty {
    * The set index of texture's TEXCOORD attribute used for texture coordinate
    * mapping
    */
-  std::optional<size_t> texCoord = std::nullopt;
+  std::optional<unsigned int> texCoord = std::nullopt;
 }; // end of struct ITextureInfo
 
 /**
@@ -690,7 +704,7 @@ struct IMaterialPbrMetallicRoughness {
   /**
    * The base color texture
    */
-  std::optional<ITextureInfo> baseColorTexture = std::nullopt;
+  std::optional<GLTF2::ITextureInfo> baseColorTexture = std::nullopt;
   /**
    * The metalness of the material
    */
@@ -702,7 +716,7 @@ struct IMaterialPbrMetallicRoughness {
   /**
    * The metallic-roughness texture
    */
-  std::optional<ITextureInfo> metallicRoughnessTexture = std::nullopt;
+  std::optional<GLTF2::ITextureInfo> metallicRoughnessTexture = std::nullopt;
 }; // end of struct IMaterialPbrMetallicRoughness
 
 /**
@@ -714,20 +728,21 @@ struct IMaterial : public IChildRootProperty {
    * material model from Physically-Based Rendering (PBR) methodology. When not
    * specified, all the default values of pbrMetallicRoughness apply
    */
-  std::optional<IMaterialPbrMetallicRoughness> pbrMetallicRoughness
+  std::optional<GLTF2::IMaterialPbrMetallicRoughness> pbrMetallicRoughness
     = std::nullopt;
   /**
    * The normal map texture
    */
-  std::optional<IMaterialNormalTextureInfo> normalTexture = std::nullopt;
+  std::optional<GLTF2::IMaterialNormalTextureInfo> normalTexture = std::nullopt;
   /**
    * The occlusion map texture
    */
-  std::optional<IMaterialOcclusionTextureInfo> occlusionTexture = std::nullopt;
+  std::optional<GLTF2::IMaterialOcclusionTextureInfo> occlusionTexture
+    = std::nullopt;
   /**
    * The emissive map texture
    */
-  std::optional<ITextureInfo> emissiveTexture = std::nullopt;
+  std::optional<GLTF2::ITextureInfo> emissiveTexture = std::nullopt;
   /**
    * The RGB components of the emissive color of the material. These values are
    * linear. If an emissiveTexture is specified, this value is multiplied with
@@ -918,7 +933,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of accessors. An accessor is a typed view into a bufferView
    */
-  std::vector<IAccessor> accessors;
+  std::vector<GLTF2::IAccessor> accessors;
   /**
    * An array of keyframe animations
    */
@@ -931,12 +946,12 @@ struct IGLTF : public IProperty {
    * An array of buffers.  A buffer points to binary geometry, animation, or
    * skins
    */
-  std::vector<IBuffer> buffers;
+  std::vector<GLTF2::IBuffer> buffers;
   /**
    * An array of bufferViews.  A bufferView is a view into a buffer generally
    * representing a subset of the buffer
    */
-  std::vector<IBufferView> bufferViews;
+  std::vector<GLTF2::IBufferView> bufferViews;
   /**
    * An array of cameras
    */
@@ -956,7 +971,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of materials.  A material defines the appearance of a primitive
    */
-  std::vector<IMaterial> materials;
+  std::vector<GLTF2::IMaterial> materials;
   /**
    * An array of meshes.  A mesh is a set of primitives to be rendered
    */
@@ -981,11 +996,11 @@ struct IGLTF : public IProperty {
   /**
    * An array of skins.  A skin is defined by joints and matrices
    */
-  std::vector<ISkin> skins;
+  std::vector<GLTF2::ISkin> skins;
   /**
    * An array of textures
    */
-  std::vector<ITexture> textures;
+  std::vector<GLTF2::ITexture> textures;
 }; // end of struct struct IGLTF
 
 /**

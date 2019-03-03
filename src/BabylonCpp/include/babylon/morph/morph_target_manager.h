@@ -37,20 +37,20 @@ public:
    * @param index defines the index to check
    * @returns the requested target
    */
-  MorphTarget* getActiveTarget(std::size_t index);
+  MorphTargetPtr getActiveTarget(std::size_t index);
 
   /**
    * @brief Gets the target at specified index.
    * @param index defines the index to check
    * @returns the requested target
    */
-  MorphTarget* getTarget(std::size_t index);
+  MorphTargetPtr getTarget(std::size_t index);
 
   /**
    * @brief Add a new target to this manager.
    * @param target defines the target to add
    */
-  void addTarget(std::unique_ptr<MorphTarget>&& target);
+  void addTarget(const MorphTargetPtr& target);
 
   /**
    * @brief Removes a target from the manager.
@@ -161,7 +161,7 @@ private:
   std::vector<MorphTargetPtr> _targets;
   std::vector<Observer<bool>::Ptr> _targetInfluenceChangedObservers;
   std::vector<Observer<void>::Ptr> _targetDataLayoutChangedObservers;
-  std::vector<MorphTarget*> _activeTargets;
+  std::vector<MorphTargetPtr> _activeTargets;
   Scene* _scene;
   Float32Array _influences;
   bool _supportsNormals;

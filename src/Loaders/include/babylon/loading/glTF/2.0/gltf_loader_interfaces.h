@@ -182,7 +182,7 @@ struct INode : public IGLTF2::INode, IArrayItem {
   std::vector<BonePtr> _babylonBones;
 
   /** @hidden */
-  IndicesArray _numMorphTargets;
+  std::optional<size_t> _numMorphTargets = std::nullopt;
 }; // end of struct INode
 
 /** @hidden */

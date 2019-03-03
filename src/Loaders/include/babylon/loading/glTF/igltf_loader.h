@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
 
 using json = nlohmann::json;
@@ -33,6 +34,11 @@ namespace GLTF2 {
  */
 enum class GLTFLoaderCoordinateSystemMode {
   /**
+   * Invalid mode
+   */
+  INVALID,
+
+  /**
    * Automatically convert the glTF right-handed data to the appropriate system
    * based on the current coordinate system mode of the scene.
    */
@@ -48,6 +54,11 @@ enum class GLTFLoaderCoordinateSystemMode {
  * @brief Mode that determines what animations will start.
  */
 enum class GLTFLoaderAnimationStartMode {
+  /**
+   * Invalid mode
+   */
+  INVALID,
+
   /**
    * No animation will start.
    */
@@ -125,8 +136,6 @@ struct ImportMeshResult {
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT IGLTFLoader : public IDisposable {
-
-  std::optional<GLTFLoaderState> state;
 
   virtual ImportMeshResult importMeshAsync(
     const std::vector<std::string>& meshesNames, Scene* scene,

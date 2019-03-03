@@ -71,9 +71,8 @@ struct IScene;
 struct ISkin;
 struct ITexture;
 struct ITextureInfo;
-using GLTFFileLoaderPtr  = std::shared_ptr<GLTFFileLoader>;
-using GLTFLoaderPtr      = std::shared_ptr<GLTFLoader>;
-using GLTFLoaderStatePtr = std::shared_ptr<GLTFLoaderState>;
+using GLTFFileLoaderPtr = std::shared_ptr<GLTFFileLoader>;
+using GLTFLoaderPtr     = std::shared_ptr<GLTFLoader>;
 
 namespace IGLTF2 {
 enum class AccessorComponentType;
@@ -86,6 +85,29 @@ enum class TextureWrapMode;
  */
 struct BABYLON_SHARED_EXPORT ArrayItem {
 
+  /**
+   * @brief Gets an item from the given array.
+   * @param context The context when loading the asset
+   * @param array The array to get the item from
+   * @param index The index to the array
+   * @returns The array item
+   */
+  template <typename T>
+  static T& Get(const std::string& context, std::vector<T>& array,
+                size_t index = 0)
+  {
+    if (array.empty() || index >= array.size()) {
+      throw std::runtime_error(context + ": Failed to find index ("
+                               + std::to_string(index) + ")");
+    }
+
+    return array[index];
+  }
+
+  /**
+   * @brief Assign an `index` field to each item of the given array.
+   * @param array The array of items
+   */
   template <typename IArrItem>
   static void Assign(std::vector<IArrItem>& array)
   {
@@ -109,7 +131,9 @@ public:
    * @param name The name of the loader extension.
    * @param factory The factory function that creates the loader extension.
    */
-  static void RegisterExtension(const std::string& name);
+  static void RegisterExtension(
+    const std::string& name,
+    const std::function<IGLTFLoaderExtension(GLTFLoader& loader)>& factory);
 
   /**
    * @brief Unregisters a loader extension.
@@ -120,10 +144,17 @@ public:
 
 private:
   static std::vector<std::string> _ExtensionNames;
-  static std::unordered_map<std::string, GLTFLoaderPtr> _ExtensionFactories;
+  static std::unordered_map<
+    std::string, std::function<IGLTFLoaderExtension(GLTFLoader& loader)>>
+    _ExtensionFactories;
 
 public:
   virtual ~GLTFLoader();
+
+  /**
+   * @brief Gets the loader state.
+   */
+  GLTFLoaderState& state();
 
   /** Hidden */
   void dispose();
@@ -281,7 +312,7 @@ public:
    * @param babylonObject the Babylon object with metadata
    * @param pointer the JSON pointer
    */
-  void AddPointerMetadata(const json& babylonObject,
+  void AddPointerMetadata(const BaseTexturePtr& babylonObject,
                           const std::string& pointer);
 
   /**
@@ -324,7 +355,7 @@ private:
   void _setupData();
   void _loadExtensions();
   void _checkExtensions();
-  void _setState();
+  void _setState(const GLTFLoaderState& state);
   INode _createRootNode();
   void _forEachPrimitive(
     const INode& node,
@@ -344,7 +375,7 @@ private:
   GeometryPtr _loadVertexDataAsync(const std::string& context,
                                    IMeshPrimitive& primitive,
                                    const MeshPtr& babylonMesh);
-  void _createMorphTargets(const std::string& context, const INode& node,
+  void _createMorphTargets(const std::string& context, INode& node,
                            const IMesh& mesh, const IMeshPrimitive& primitive,
                            const MeshPtr& babylonMesh);
   void _loadMorphTargetsAsync(const std::string& context,
@@ -389,8 +420,9 @@ private:
                                         const IAccessor& accessor,
                                         const std::string& kind);
   void _loadMaterialMetallicRoughnessPropertiesAsync(
-    const std::string& context, const IMaterialPbrMetallicRoughness& properties,
-    const MaterialPtr& babylonMaterial);
+    const std::string& context,
+    std::optional<IMaterialPbrMetallicRoughness> properties = std::nullopt,
+    const MaterialPtr& babylonMaterial                      = nullptr);
   MaterialPtr _createDefaultMaterial(const std::string& name,
                                      unsigned int babylonDrawMode);
   BaseTexturePtr _loadTextureAsync(
@@ -445,7 +477,7 @@ private:
                                          const MaterialPtr& babylonMaterial);
   BaseTexturePtr& _extensionsLoadTextureInfoAsync(
     const std::string& context, const ITextureInfo& textureInfo,
-    const std::function<void(const BaseTexture& babylonTexture)>& assign);
+    const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,
                                                   const IAnimation& animation);
   ArrayBufferView _extensionsLoadUriAsync(const std::string& context,
@@ -460,7 +492,7 @@ public:
 
 private:
   GLTFFileLoaderPtr _parent;
-  GLTFLoaderStatePtr _state;
+  GLTFLoaderState _state;
   std::unordered_map<std::string, IGLTFLoaderExtension> _extensions;
   MeshPtr _rootBabylonMesh;
 

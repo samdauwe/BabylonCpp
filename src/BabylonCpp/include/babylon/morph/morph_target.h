@@ -24,13 +24,14 @@ using MorphTargetPtr = std::shared_ptr<MorphTarget>;
 class BABYLON_SHARED_EXPORT MorphTarget : public IAnimatable {
 
 public:
-  /**
-   * @brief Creates a new MorphTarget.
-   * @param name defines the name of the target
-   * @param influence defines the influence to use
-   */
-  MorphTarget(const std::string& name, float influence = 0.f,
-              Scene* scene = nullptr);
+  template <typename... Ts>
+  static MorphTargetPtr New(Ts&&... args)
+  {
+    auto mtm = std::shared_ptr<MorphTarget>(
+      new MorphTarget(std::forward<Ts>(args)...));
+
+    return mtm;
+  }
   ~MorphTarget() override;
 
   IReflect::Type type() const override;
@@ -154,6 +155,14 @@ protected:
   bool get_hasTangents() const;
 
 public:
+  /**
+   * @brief Creates a new MorphTarget.
+   * @param name defines the name of the target
+   * @param influence defines the influence to use
+   */
+  MorphTarget(const std::string& name, float influence = 0.f,
+              Scene* scene = nullptr);
+
   /**
    * Gets or sets the list of animations
    */

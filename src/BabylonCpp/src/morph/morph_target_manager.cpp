@@ -75,7 +75,7 @@ Float32Array& MorphTargetManager::get_influences()
   return _influences;
 }
 
-MorphTarget* MorphTargetManager::getActiveTarget(size_t index)
+MorphTargetPtr MorphTargetManager::getActiveTarget(size_t index)
 {
   if (index < _activeTargets.size()) {
     return _activeTargets[index];
@@ -84,18 +84,18 @@ MorphTarget* MorphTargetManager::getActiveTarget(size_t index)
   return nullptr;
 }
 
-MorphTarget* MorphTargetManager::getTarget(std::size_t index)
+MorphTargetPtr MorphTargetManager::getTarget(std::size_t index)
 {
   if (index < _targets.size()) {
-    return _targets[index].get();
+    return _targets[index];
   }
 
   return nullptr;
 }
 
-void MorphTargetManager::addTarget(std::unique_ptr<MorphTarget>&& target)
+void MorphTargetManager::addTarget(const MorphTargetPtr& target)
 {
-  _targets.emplace_back(std::move(target));
+  _targets.emplace_back(target);
   _targetInfluenceChangedObservers.emplace_back(
     _targets.back()->onInfluenceChanged.add(
       [this](bool needUpdate, EventState&) {
