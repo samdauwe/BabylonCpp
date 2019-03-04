@@ -22,6 +22,7 @@ struct IMaterialNormalTextureInfo;
 struct IMaterialOcclusionTextureInfo;
 struct IMaterialPbrMetallicRoughness;
 struct INode;
+struct IScene;
 struct ISkin;
 struct ITexture;
 struct ITextureInfo;
@@ -885,7 +886,7 @@ struct IScene : public IChildRootProperty {
   /**
    * The indices of each root node
    */
-  IndicesArray nodes;
+  std::vector<size_t> nodes;
 }; // end of struct IScene
 
 /**
@@ -992,7 +993,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of scenes
    */
-  std::vector<IScene> scenes;
+  std::vector<GLTF2::IScene> scenes;
   /**
    * An array of skins.  A skin is defined by joints and matrices
    */

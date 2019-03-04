@@ -160,10 +160,19 @@ public:
   void dispose();
 
   /** Hidden */
-  void importMeshAsync();
+  ImportMeshResult importMeshAsync(
+    const std::vector<std::string>& meshesNames, Scene* scene,
+    const IGLTFLoaderData& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "") override;
 
   /** Hidden */
-  void loadAsync();
+  void loadAsync(
+    Scene* scene, const IGLTFLoaderData& data, const std::string& rootUrl,
+    const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
+    = nullptr,
+    const std::string& fileName = "") override;
 
   /**
    * @brief Loads a glTF scene.
@@ -171,7 +180,7 @@ public:
    * @param scene The glTF scene property
    * @returns A promise that resolves when the load is complete
    */
-  void loadSceneAsync(const std::string& context, const IScene& scene);
+  bool loadSceneAsync(const std::string& context, const IScene& scene);
 
   /**
    * @brief Loads a glTF node.
@@ -350,8 +359,9 @@ protected:
 
 private:
   /** Hidden */
-  void _loadAsync();
-  void _loadData();
+  void _loadAsync(const std::vector<size_t> nodes,
+                  const std::function<void()>& resultFunc);
+  void _loadData(const IGLTFLoaderData& data);
   void _setupData();
   void _loadExtensions();
   void _checkExtensions();
@@ -452,7 +462,7 @@ private:
     const std::function<void(const IGLTFLoaderExtension& extension)>& action);
   void _extensionsOnLoading();
   void _extensionsOnReady();
-  void _extensionsLoadSceneAsync(const std::string& context,
+  bool _extensionsLoadSceneAsync(const std::string& context,
                                  const IScene& scene);
   TransformNodePtr _extensionsLoadNodeAsync(
     const std::string& context, INode& node,
@@ -491,10 +501,16 @@ public:
   Scene* babylonScene;
 
 private:
+  bool _disposed;
   GLTFFileLoaderPtr _parent;
   GLTFLoaderState _state;
   std::unordered_map<std::string, IGLTFLoaderExtension> _extensions;
+  std::string _rootUrl;
+  std::string _fileName;
+  std::string _uniqueRootUrl;
   MeshPtr _rootBabylonMesh;
+  std::unordered_map<unsigned int, MaterialPtr> _defaultBabylonMaterialData;
+  std::function<void(const SceneLoaderProgressEvent& event)> _progressCallback;
 
 }; // end of class GLTFLoader
 

@@ -154,6 +154,10 @@ const Matrix& Bone::getAbsoluteTransform() const
   return _absoluteTransform;
 }
 
+void linkTransformNode(const TransformNodePtr& /*transformNode*/)
+{
+}
+
 Vector3& Bone::get_position()
 {
   _decompose();

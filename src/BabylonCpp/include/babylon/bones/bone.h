@@ -103,6 +103,14 @@ public:
   Matrix& getAbsoluteTransform();
 
   /**
+   * @brief Links with the given transform node.
+   * The local matrix of this bone is copied from the transform node every
+   * frame.
+   * @param transformNode defines the transform node to link to
+   */
+  void linkTransformNode(const TransformNodePtr& transformNode);
+
+  /**
    * @brief Gets the absolute transform matrix (ie base matrix * parent world
    * matrix).
    * @returns a matrix

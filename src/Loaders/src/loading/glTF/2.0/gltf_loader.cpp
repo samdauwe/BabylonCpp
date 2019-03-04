@@ -6,6 +6,7 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
+#include <babylon/core/time.h>
 #include <babylon/engine/scene.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_extension.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
@@ -50,7 +51,13 @@ bool GLTFLoader::UnregisterExtension(const std::string& name)
   return true;
 }
 
-GLTFLoader::GLTFLoader(const GLTFFileLoaderPtr& parent) : _parent{parent}
+GLTFLoader::GLTFLoader(const GLTFFileLoaderPtr& parent)
+    : gltf{nullptr}
+    , babylonScene{nullptr}
+    , _disposed{false}
+    , _parent{parent}
+    , _rootBabylonMesh{nullptr}
+    , _progressCallback{nullptr}
 {
 }
 
@@ -67,20 +74,164 @@ void GLTFLoader::dispose()
 {
 }
 
-void GLTFLoader::importMeshAsync()
+ImportMeshResult GLTFLoader::importMeshAsync(
+  const std::vector<std::string>& meshesNames, Scene* scene,
+  const IGLTFLoaderData& data, const std::string& rootUrl,
+  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
+  const std::string& fileName)
 {
+  babylonScene      = scene;
+  _rootUrl          = rootUrl;
+  _fileName         = !fileName.empty() ? fileName : "scene";
+  _progressCallback = onProgress;
+  _loadData(data);
+
+  std::vector<size_t> nodes;
+
+  if (!meshesNames.empty()) {
+    std::unordered_map<std::string, size_t> nodeMap;
+    if (!gltf->nodes.empty()) {
+      for (const auto& node : gltf->nodes) {
+        if (!node.name.empty()) {
+          nodeMap[node.name] = node.index;
+        }
+      }
+    }
+
+    const auto& names = meshesNames;
+    for (const auto& name : names) {
+      if (!stl_util::contains(nodeMap, name)) {
+        throw std::runtime_error(
+          String::printf("Failed to find node %s", name.c_str()));
+      }
+      nodes.emplace_back(nodeMap[name]);
+    }
+  }
+
+  ImportMeshResult result;
+  _loadAsync(nodes, [this, &result]() -> void {
+    result = {
+      _getMeshes(),         // meshes
+      {},                   // particleSystems
+      _getSkeletons(),      // skeletons
+      _getAnimationGroups() // animationGroups
+    };
+  });
+
+  return result;
 }
 
-void GLTFLoader::loadAsync()
+void GLTFLoader::loadAsync(
+  Scene* scene, const IGLTFLoaderData& data, const std::string& rootUrl,
+  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
+  const std::string& fileName)
 {
+  babylonScene      = scene;
+  _rootUrl          = rootUrl;
+  _fileName         = !fileName.empty() ? fileName : "scene";
+  _progressCallback = onProgress;
+  _loadData(data);
+  _loadAsync({}, []() -> void {});
 }
 
-void GLTFLoader::_loadAsync()
+void GLTFLoader::_loadAsync(const std::vector<size_t> nodes,
+                            const std::function<void()>& resultFunc)
 {
+  _uniqueRootUrl
+    = (!String::contains(_rootUrl, "file:") && !_fileName.empty()) ?
+        _rootUrl :
+        String::printf("%s%ld/", _rootUrl.c_str(), Time::unixtimeInMs());
+
+  _loadExtensions();
+  _checkExtensions();
+
+  const std::string loadingToReadyCounterName    = "LOADING => READY";
+  const std::string loadingToCompleteCounterName = "LOADING => COMPLETE";
+
+  _parent->_startPerformanceCounter(loadingToReadyCounterName);
+  _parent->_startPerformanceCounter(loadingToCompleteCounterName);
+
+  _setState(GLTFLoaderState::LOADING);
+  _extensionsOnLoading();
+
+  std::vector<std::function<void()>> promises;
+
+  if (!nodes.empty()) {
+    GLTF2::IScene scene;
+    scene.nodes = nodes;
+    promises.emplace_back(
+      [this, scene]() -> void { loadSceneAsync("/nodes", scene); });
+  }
+  else if (gltf->scene.has_value()) {
+    const auto& scene = ArrayItem::Get("/scene", gltf->scenes, *gltf->scene);
+    promises.emplace_back([this, scene]() -> void {
+      loadSceneAsync(String::printf("/scenes/%ld", scene.index), scene);
+    });
+  }
+
+  if (_parent->compileMaterials) {
+    promises.emplace_back([this]() -> void { _compileMaterialsAsync(); });
+  }
+
+  if (_parent->compileShadowGenerators) {
+    promises.emplace_back(
+      [this]() -> void { _compileShadowGeneratorsAsync(); });
+  }
+
+  for (auto&& promise : promises) {
+    promise();
+  }
+
+  // LOADING => READY
+  if (_rootBabylonMesh) {
+    _rootBabylonMesh->setEnabled(true);
+  }
+
+  _setState(GLTFLoaderState::READY);
+  _extensionsOnReady();
+
+  _startAnimations();
+
+  resultFunc();
+
+  // READY => COMPLETE
+  _parent->_endPerformanceCounter(loadingToReadyCounterName);
+
+  if (!_disposed) {
+    _parent->_endPerformanceCounter(loadingToCompleteCounterName);
+
+    _setState(GLTFLoaderState::COMPLETE);
+
+    _parent->onCompleteObservable.notifyObservers(nullptr);
+    _parent->onCompleteObservable.clear();
+
+    dispose();
+  }
 }
 
-void GLTFLoader::_loadData()
+void GLTFLoader::_loadData(const IGLTFLoaderData& data)
 {
+  gltf = nullptr; // Parse json !
+  _setupData();
+
+  if (data.bin.has_value()) {
+    const auto& buffers = gltf->buffers;
+    if (!buffers.empty() && !buffers[0].uri.empty()) {
+      const auto& binaryBuffer = buffers[0];
+      if (binaryBuffer.byteLength < data.bin.byteLength - 3
+          || binaryBuffer.byteLength > data.bin.byteLength) {
+        BABYLON_LOGF_WARN("GLTFLoader",
+                          "Binary buffer length (%ld) from JSON does not match "
+                          "chunk length (%ld)",
+                          binaryBuffer.byteLength, data.bin.byteLength);
+      }
+
+      binaryBuffer._data = data.bin;
+    }
+    else {
+      BABYLON_LOG_WARN("GLTFLoader", "Unexpected BIN chunk");
+    }
+  }
 }
 
 void GLTFLoader::_setupData()
@@ -182,8 +333,53 @@ INode GLTFLoader::_createRootNode()
   return rootNode;
 }
 
-void GLTFLoader::loadSceneAsync(const std::string& context, const IScene& scene)
+bool GLTFLoader::loadSceneAsync(const std::string& context, const IScene& scene)
 {
+  const auto extensionPromise = _extensionsLoadSceneAsync(context, scene);
+  if (extensionPromise) {
+    return extensionPromise;
+  }
+
+  std::vector<std::function<void()>> promises;
+
+  logOpen(String::printf("%s %s", context.c_str(), scene.name.c_str()));
+
+  if (!scene.nodes.empty()) {
+    for (const auto& index : scene.nodes) {
+      const auto& node
+        = ArrayItem::Get(String::printf("%s/nodes/%ld", context.c_str(), index),
+                         gltf->nodes, index);
+      promises.emplace_back([&]() -> void {
+        loadNodeAsync(String::printf("/nodes/%ld", node.index), node,
+                      [&](const TransformNodePtr& babylonMesh) -> void {
+                        babylonMesh->parent = _rootBabylonMesh.get();
+                      });
+      });
+    }
+  }
+
+  // Link all Babylon bones for each glTF node with the corresponding Babylon
+  // transform node. A glTF joint is a pointer to a glTF node in the glTF node
+  // hierarchy similar to Unity3D.
+  if (!gltf->nodes.empty()) {
+    for (const auto& node : gltf->nodes) {
+      if (node._babylonTransformNode && !node._babylonBones.empty()) {
+        for (auto& babylonBone : node._babylonBones) {
+          babylonBone->linkTransformNode(node._babylonTransformNode);
+        }
+      }
+    }
+  }
+
+  promises.emplace_back([this]() -> void { _loadAnimationsAsync(); });
+
+  logClose();
+
+  for (auto&& promise : promises) {
+    promise();
+  }
+
+  return true;
 }
 
 void GLTFLoader::_forEachPrimitive(
@@ -1216,9 +1412,10 @@ void GLTFLoader::_extensionsOnReady()
 {
 }
 
-void GLTFLoader::_extensionsLoadSceneAsync(const std::string& context,
+bool GLTFLoader::_extensionsLoadSceneAsync(const std::string& context,
                                            const IScene& scene)
 {
+  return false;
 }
 
 TransformNodePtr GLTFLoader::_extensionsLoadNodeAsync(
