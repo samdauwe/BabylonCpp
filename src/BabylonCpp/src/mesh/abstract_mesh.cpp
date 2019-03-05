@@ -976,6 +976,11 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
   return {min, max};
 }
 
+AbstractMesh& AbstractMesh::refreshBoundingInfo(bool /*applySkeleton*/)
+{
+  return *this;
+}
+
 AbstractMesh& AbstractMesh::_updateBoundingInfo()
 {
   if (!_boundingInfo) {

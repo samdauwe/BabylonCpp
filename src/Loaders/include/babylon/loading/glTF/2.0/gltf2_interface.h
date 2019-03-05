@@ -17,10 +17,13 @@ struct IAnimation;
 struct IAnimationChannel;
 struct IBuffer;
 struct IBufferView;
+struct ICamera;
 struct IMaterial;
 struct IMaterialNormalTextureInfo;
 struct IMaterialOcclusionTextureInfo;
 struct IMaterialPbrMetallicRoughness;
+struct IMesh;
+struct IMeshPrimitive;
 struct INode;
 struct IScene;
 struct ISkin;
@@ -777,7 +780,7 @@ struct IMeshPrimitive : public IProperty {
   /**
    * The index of the accessor that contains the indices
    */
-  IndicesArray indices;
+  std::optional<size_t> indices = std::nullopt;
   /**
    * The index of the material to apply to this primitive when rendering
    */
@@ -804,7 +807,7 @@ struct IMesh : public IChildRootProperty {
    * An array of primitives, each defining geometry to be rendered with a
    * material
    */
-  std::vector<IMeshPrimitive> primitives;
+  std::vector<GLTF2::IMeshPrimitive> primitives;
   /**
    * Array of weights to be applied to the Morph Targets
    */
@@ -956,7 +959,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of cameras
    */
-  std::vector<ICamera> cameras;
+  std::vector<GLTF2::ICamera> cameras;
   /**
    * Names of glTF extensions used somewhere in this asset
    */
@@ -976,7 +979,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of meshes.  A mesh is a set of primitives to be rendered
    */
-  std::vector<IMesh> meshes;
+  std::vector<GLTF2::IMesh> meshes;
   /**
    * An array of nodes
    */

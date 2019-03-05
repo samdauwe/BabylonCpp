@@ -415,6 +415,16 @@ public:
     const std::function<bool(AbstractMesh* abstractMesh)>& predicate = nullptr);
 
   /**
+   * @brief This method recomputes and sets a new BoundingInfo to the mesh
+   * unless it is locked. This means the mesh underlying bounding box and sphere
+   * are recomputed.
+   * @param applySkeleton defines whether to apply the skeleton before computing
+   * the bounding info
+   * @returns the current mesh
+   */
+  AbstractMesh& refreshBoundingInfo(bool applySkeleton = false);
+
+  /**
    * @brief Hidden
    */
   AbstractMesh& _updateBoundingInfo();

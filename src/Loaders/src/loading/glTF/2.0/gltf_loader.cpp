@@ -4,6 +4,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
+#include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
@@ -14,6 +15,7 @@
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
@@ -474,30 +476,320 @@ void GLTFLoader::_startAnimations()
 }
 
 TransformNodePtr GLTFLoader::loadNodeAsync(
-  const std::string& context, const INode& node,
+  const std::string& context, INode& node,
   const std::function<void(const TransformNodePtr& babylonTransformNode)>&
     assign)
 {
+  const auto extensionPromise = _extensionsLoadNodeAsync(context, node, assign);
+  if (extensionPromise) {
+    return extensionPromise;
+  }
+
+  if (node._babylonTransformNode) {
+    throw std::runtime_error(
+      String::printf("%s: Invalid recursive node hierarchy", context.c_str()));
+  }
+
+  std::vector<std::function<void()>> promises;
+
+  logOpen(String::printf("%s %s", context.c_str(), node.name.c_str()));
+
+  const auto loadNode
+    = [&](const TransformNodePtr& babylonTransformNode) -> void {
+    GLTFLoader::AddPointerMetadata(babylonTransformNode, context);
+    GLTFLoader::_LoadTransform(node, babylonTransformNode);
+
+    if (node.camera.has_value()) {
+      const auto& camera
+        = ArrayItem::Get(String::printf("%s/camera", context.c_str()),
+                         gltf->cameras, *node.camera);
+      promises.emplace_back([&]() -> void {
+        loadCameraAsync(String::printf("/cameras/%ld", camera.index), camera,
+                        [&](const CameraPtr& babylonCamera) -> void {
+                          babylonCamera->parent = babylonTransformNode.get();
+                        });
+      });
+    }
+
+    if (!node.children.empty()) {
+      for (const auto& index : node.children) {
+        auto& childNode = ArrayItem::Get(
+          String::printf("%s/children/%ld", context.c_str(), index),
+          gltf->nodes, index);
+        promises.emplace_back([&]() -> void {
+          loadNodeAsync(String::printf("/nodes/%ld", childNode.index),
+                        childNode,
+                        [&](const TransformNodePtr& childBabylonMesh) -> void {
+                          childBabylonMesh->parent = babylonTransformNode.get();
+                        });
+        });
+      }
+    }
+
+    assign(babylonTransformNode);
+  };
+
+  if (!node.mesh.has_value()) {
+    const auto nodeName
+      = !node.name.empty() ? node.name : String::printf("node%ld", node.index);
+    node._babylonTransformNode
+      = std::make_shared<TransformNode>(nodeName, babylonScene);
+    loadNode(node._babylonTransformNode);
+  }
+  else {
+    auto& mesh = ArrayItem::Get(String::printf("%s/mesh", context.c_str()),
+                                gltf->meshes, *node.mesh);
+    promises.emplace_back([&]() -> void {
+      _loadMeshAsync(String::printf("/meshes/%ld", mesh.index), node, mesh,
+                     loadNode);
+    });
+  }
+
+  logClose();
+
+  for (auto&& promise : promises) {
+    promise();
+  }
+
+  _forEachPrimitive(node, [](const AbstractMeshPtr& babylonMesh) -> void {
+    babylonMesh->refreshBoundingInfo(true);
+  });
+
+  return node._babylonTransformNode;
 }
 
 TransformNodePtr GLTFLoader::_loadMeshAsync(
-  const std::string& context, const INode& node, const IMesh& mesh,
+  const std::string& context, INode& node, IMesh& mesh,
   const std::function<void(const TransformNodePtr& babylonTransformNode)>&
-    callback)
+    assign)
 {
+  auto& primitives = mesh.primitives;
+  if (primitives.empty()) {
+    throw std::runtime_error(
+      String::printf("%s: Primitives are missing", context.c_str()));
+  }
+
+  if (!primitives[0].index) {
+    ArrayItem::Assign(primitives);
+  }
+
+  std::vector<std::function<void()>> promises;
+
+  logOpen(String::printf("%s %s", context.c_str(), mesh.name.c_str()));
+
+  const auto name
+    = !node.name.empty() ? node.name : String::printf("node%ld", node.index);
+
+  if (primitives.size() == 1) {
+    auto& primitive = mesh.primitives[0];
+    promises.emplace_back([&]() -> void {
+      _loadMeshPrimitiveAsync(
+        String::printf("%s/primitives/%ld", context.c_str(), primitive.index),
+        name, node, mesh, primitive,
+        [&](const TransformNodePtr& babylonMesh) -> void {
+          node._babylonTransformNode = babylonMesh;
+          node._primitiveBabylonMeshes
+            = {std::static_pointer_cast<AbstractMesh>(babylonMesh)};
+        });
+    });
+  }
+  else {
+    node._babylonTransformNode
+      = std::make_shared<TransformNode>(name, babylonScene);
+    node._primitiveBabylonMeshes.clear();
+    for (auto& primitive : primitives) {
+      promises.emplace_back([&]() -> void {
+        _loadMeshPrimitiveAsync(
+          String::printf("%s/primitives/%ld", context.c_str(), primitive.index),
+          String::printf("%s_primitive%ld", name.c_str(), primitive.index),
+          node, mesh, primitive,
+          [&](const TransformNodePtr& babylonMesh) -> void {
+            node._babylonTransformNode = babylonMesh;
+            node._primitiveBabylonMeshes.emplace_back(
+              std::static_pointer_cast<AbstractMesh>(babylonMesh));
+          });
+      });
+    }
+  }
+
+  if (node.skin.has_value()) {
+    const auto& skin = ArrayItem::Get(
+      String::printf("%s/skin", context.c_str()), gltf->skins, *node.skin);
+    promises.emplace_back([&]() -> void {
+      _loadSkinAsync(String::printf("/skins/%ld", skin.index), node, skin);
+    });
+  }
+
+  assign(node._babylonTransformNode);
+
+  logClose();
+
+  for (auto&& promise : promises) {
+    promise();
+  }
+
+  return node._babylonTransformNode;
 }
 
 AbstractMeshPtr GLTFLoader::_loadMeshPrimitiveAsync(
-  const std::string& context, const std::string& name, const INode& node,
-  const IMesh& mesh, const IMeshPrimitive& primitive,
+  const std::string& context, const std::string& name, INode& node,
+  const IMesh& mesh, IMeshPrimitive& primitive,
   const std::function<void(const AbstractMeshPtr& babylonMesh)>& assign)
 {
+  logOpen(context);
+
+  const auto canInstance
+    = (!node.skin.has_value() && mesh.primitives[0].targets.empty());
+
+  AbstractMeshPtr babylonAbstractMesh = nullptr;
+
+  std::vector<std::function<void()>> promises;
+
+  const auto& instanceData = primitive._instanceData;
+  if (canInstance && instanceData.has_value()) {
+    babylonAbstractMesh = std::static_pointer_cast<AbstractMesh>(
+      instanceData->babylonSourceMesh->createInstance(name));
+  }
+  else {
+    const auto babylonMesh = Mesh::New(name, babylonScene);
+
+    _createMorphTargets(context, node, mesh, primitive, babylonMesh);
+    promises.emplace_back([&]() -> void {
+      auto babylonGeometry
+        = _loadVertexDataAsync(context, primitive, babylonMesh);
+      _loadMorphTargetsAsync(context, primitive, babylonMesh, babylonGeometry);
+      babylonGeometry->applyToMesh(babylonMesh.get());
+    });
+
+    const auto babylonDrawMode
+      = GLTFLoader::_GetDrawMode(context, primitive.mode);
+    if (!primitive.material.has_value()) {
+      auto babylonMaterial
+        = stl_util::contains(_defaultBabylonMaterialData, babylonDrawMode) ?
+            _defaultBabylonMaterialData[babylonDrawMode] :
+            nullptr;
+      if (!babylonMaterial) {
+        babylonMaterial
+          = _createDefaultMaterial("__GLTFLoader._default", babylonDrawMode);
+        _parent->onMaterialLoadedObservable.notifyObservers(
+          babylonMaterial.get());
+        _defaultBabylonMaterialData[babylonDrawMode] = babylonMaterial;
+      }
+      babylonMesh->material = babylonMaterial;
+    }
+    else {
+      const auto& material
+        = ArrayItem::Get(String::printf("%s/material", context.c_str()),
+                         gltf->materials, *primitive.material);
+      promises.emplace_back([&]() -> void {
+        _loadMaterialAsync(String::printf("/materials/%ld", material.index),
+                           material, babylonMesh, babylonDrawMode,
+                           [&](const MaterialPtr& babylonMaterial) -> void {
+                             babylonMesh->material = babylonMaterial;
+                           });
+      });
+    }
+
+    if (canInstance) {
+      primitive._instanceData->babylonSourceMesh = babylonMesh;
+    }
+
+    babylonAbstractMesh = babylonMesh;
+  }
+
+  GLTFLoader::AddPointerMetadata(babylonAbstractMesh, context);
+  _parent->onMeshLoadedObservable.notifyObservers(babylonAbstractMesh.get());
+  assign(babylonAbstractMesh);
+
+  logClose();
+
+  for (auto&& promise : promises) {
+    promise();
+  }
+
+  return babylonAbstractMesh;
 }
 
 GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
                                              IMeshPrimitive& primitive,
                                              const MeshPtr& babylonMesh)
 {
+  const auto extensionPromise
+    = _extensionsLoadVertexDataAsync(context, primitive, babylonMesh);
+  if (extensionPromise) {
+    return extensionPromise;
+  }
+
+  auto& attributes = primitive.attributes;
+  if (attributes.empty()) {
+    throw std::runtime_error(
+      String::printf("%s: Attributes are missing", context.c_str()));
+  }
+
+  std::vector<std::function<void()>> promises;
+
+  auto babylonGeometry = Geometry::New(babylonMesh->name, babylonScene);
+
+  if (!primitive.indices.has_value()) {
+    babylonMesh->isUnIndexed = true;
+  }
+  else {
+    const auto& accessor
+      = ArrayItem::Get(String::printf("%s/indices", context.c_str()),
+                       gltf->accessors, *primitive.indices);
+    promises.emplace_back([this, &babylonGeometry, &accessor]() {
+      auto data = _loadIndicesAccessorAsync(
+        String::printf("/accessors/%ld", accessor.index), accessor);
+      babylonGeometry->setIndices(data);
+    });
+  }
+
+  const auto loadAttribute
+    = [&](const std::string& attribute, const std::string& kind,
+          const std::function<void(const IAccessor& accessor)>& callback
+          = nullptr) -> void {
+    if (!stl_util::contains(attributes, attribute)) {
+      return;
+    }
+
+    // if (stl_util::contains(babylonMesh->_delayInfo, kind)) {
+    //   babylonMesh->_delayInfo.emplace_back(kind);
+    // }
+
+    const auto& accessor = ArrayItem::Get(
+      String::printf("%s/attributes/%s", context.c_str(), attribute.c_str()),
+      gltf->accessors, attributes[attribute]);
+    promises.emplace_back([&]() -> void {
+      babylonGeometry->setVerticesBuffer(
+        _loadVertexAccessorAsync(
+          String::printf("/accessors/%ld", accessor.index), accessor, kind),
+        accessor.count);
+    });
+
+    if (callback) {
+      callback(accessor);
+    }
+  };
+
+  loadAttribute("POSITION", VertexBuffer::PositionKindChars);
+  loadAttribute("NORMAL", VertexBuffer::NormalKindChars);
+  loadAttribute("TANGENT", VertexBuffer::TangentKindChars);
+  loadAttribute("TEXCOORD_0", VertexBuffer::UVKindChars);
+  loadAttribute("TEXCOORD_1", VertexBuffer::UV2KindChars);
+  loadAttribute("JOINTS_0", VertexBuffer::MatricesIndicesKindChars);
+  loadAttribute("WEIGHTS_0", VertexBuffer::MatricesWeightsKindChars);
+  loadAttribute("COLOR_0", VertexBuffer::ColorKindChars,
+                [&](const IAccessor& accessor) -> void {
+                  if (accessor.type == IGLTF2::AccessorType::VEC4) {
+                    babylonMesh->hasVertexAlpha = true;
+                  }
+                });
+
+  for (auto&& promise : promises) {
+    promise();
+  }
+
+  return babylonGeometry;
 }
 
 void GLTFLoader::_createMorphTargets(const std::string& context, INode& node,
@@ -533,12 +825,31 @@ void GLTFLoader::_loadMorphTargetsAsync(const std::string& context,
                                         const MeshPtr& babylonMesh,
                                         const GeometryPtr& babylonGeometry)
 {
+  if (primitive.targets.empty()) {
+    return;
+  }
+
+  std::vector<std::function<void()>> promises;
+
+  const auto& morphTargetManager = babylonMesh->morphTargetManager();
+  for (size_t index = 0; index < morphTargetManager->numTargets; ++index) {
+    const auto babylonMorphTarget = morphTargetManager->getTarget(index);
+    promises.emplace_back([&]() -> void {
+      _loadMorphTargetVertexDataAsync(
+        String::printf("%s/targets/%ld", context.c_str(), index),
+        babylonGeometry, primitive.targets[index], babylonMorphTarget);
+    });
+  }
+
+  for (auto&& promise : promises) {
+    promise();
+  }
 }
 
 void GLTFLoader::_loadMorphTargetVertexDataAsync(
-  const std::string& context, const GeometryPtr& babylonGeometry,
-  const std::unordered_map<std::string, size_t>& attributes,
-  const MorphTargetPtr& babylonMorphTarget)
+  const std::string& /*context*/, const GeometryPtr& /*babylonGeometry*/,
+  const std::unordered_map<std::string, size_t>& /*attributes*/,
+  const MorphTargetPtr& /*babylonMorphTarget*/)
 {
 }
 
@@ -581,6 +892,38 @@ void GLTFLoader::_LoadTransform(const INode& node,
 void GLTFLoader::_loadSkinAsync(const std::string& context, const INode& node,
                                 const ISkin& skin)
 {
+  const auto& assignSkeleton = [&](const SkeletonPtr& skeleton) -> void {
+    _forEachPrimitive(node, [&](const AbstractMeshPtr& babylonMesh) -> void {
+      babylonMesh->skeleton = skeleton;
+    });
+  };
+
+  if (skin._data.has_value()) {
+    assignSkeleton(skin._data.babylonSkeleton);
+    return;
+  }
+
+  const auto skeletonId      = String::printf("skeleton%ld", skin.index);
+  const auto babylonSkeleton = Skeleton::New(
+    !skin.name.empty() ? skin.name : skeletonId, skeletonId, babylonScene);
+
+  // See
+  // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#skins
+  // (second implementation note)
+  babylonSkeleton->overrideMesh = _rootBabylonMesh;
+
+  _loadBones(context, skin, babylonSkeleton);
+  assignSkeleton(babylonSkeleton);
+
+  const auto& promise = [&]() {
+    auto inverseBindMatricesData
+      = _loadSkinInverseBindMatricesDataAsync(context, skin);
+    _updateBoneMatrices(babylonSkeleton, inverseBindMatricesData);
+  };
+
+  skin._data->babylonSkeleton = babylonSkeleton;
+
+  promise();
 }
 
 void GLTFLoader::_loadBones(const std::string& context, const ISkin& skin,
@@ -751,7 +1094,7 @@ void GLTFLoader::_loadAnimationChannelAsync(
 
 _IAnimationSamplerData
 GLTFLoader::_loadAnimationSamplerAsync(const std::string& context,
-                                       const IAnimationSampler& sampler)
+                                       IAnimationSampler& sampler)
 {
   if (sampler._data.has_value()) {
     return *sampler._data;
@@ -875,9 +1218,10 @@ Buffer GLTFLoader::_loadVertexBufferViewAsync(const IBufferView& bufferView,
 {
 }
 
-VertexBuffer GLTFLoader::_loadVertexAccessorAsync(const std::string& context,
-                                                  const IAccessor& accessor,
-                                                  const std::string& kind)
+std::unique_ptr<VertexBuffer>
+GLTFLoader::_loadVertexAccessorAsync(const std::string& context,
+                                     const IAccessor& accessor,
+                                     const std::string& kind)
 {
 }
 
@@ -1210,6 +1554,11 @@ void GLTFLoader::AddPointerMetadata(const BaseTexturePtr& babylonObject,
 {
 }
 
+void GLTFLoader::AddPointerMetadata(const TransformNodePtr& babylonObject,
+                                    const std::string& pointer)
+{
+}
+
 unsigned int
 GLTFLoader::_GetTextureWrapMode(const std::string& context,
                                 std::optional<IGLTF2::TextureWrapMode> mode)
@@ -1419,8 +1768,9 @@ bool GLTFLoader::_extensionsLoadSceneAsync(const std::string& context,
 }
 
 TransformNodePtr GLTFLoader::_extensionsLoadNodeAsync(
-  const std::string& context, INode& node,
-  const std::function<void(const TransformNode& babylonTransformNode)>& assign)
+  const std::string& context, const INode& node,
+  const std::function<void(const TransformNodePtr& babylonTransformNode)>&
+    assign)
 {
 }
 
@@ -1432,7 +1782,7 @@ CameraPtr GLTFLoader::_extensionsLoadCameraAsync(
 
 GeometryPtr _extensionsLoadVertexDataAsync(const std::string& context,
                                            const IMeshPrimitive& primitive,
-                                           const Mesh& babylonMesh)
+                                           const MeshPtr& babylonMesh)
 {
 }
 

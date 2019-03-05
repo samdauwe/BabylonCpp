@@ -192,7 +192,7 @@ public:
    * is complete
    */
   TransformNodePtr loadNodeAsync(
-    const std::string& context, const INode& node,
+    const std::string& context, INode& node,
     const std::function<void(const TransformNodePtr& babylonTransformNode)>&
       assign);
 
@@ -325,6 +325,15 @@ public:
                           const std::string& pointer);
 
   /**
+   * @brief Adds a JSON pointer to the metadata of the Babylon object at
+   * `<object>.metadata.gltf.pointers`.
+   * @param babylonObject the Babylon object with metadata
+   * @param pointer the JSON pointer
+   */
+  void AddPointerMetadata(const TransformNodePtr& babylonObject,
+                          const std::string& pointer);
+
+  /**
    * @brief Increments the indentation level and logs a message.
    * @param message The message to log
    */
@@ -375,12 +384,12 @@ private:
   std::vector<AnimationGroupPtr> _getAnimationGroups();
   void _startAnimations();
   TransformNodePtr _loadMeshAsync(
-    const std::string& context, const INode& node, const IMesh& mesh,
+    const std::string& context, INode& node, IMesh& mesh,
     const std::function<void(const TransformNodePtr& babylonTransformNode)>&
-      callback);
+      assign);
   AbstractMeshPtr _loadMeshPrimitiveAsync(
-    const std::string& context, const std::string& name, const INode& node,
-    const IMesh& mesh, const IMeshPrimitive& primitive,
+    const std::string& context, const std::string& name, INode& node,
+    const IMesh& mesh, IMeshPrimitive& primitive,
     const std::function<void(const AbstractMeshPtr& babylonMesh)>& assign);
   GeometryPtr _loadVertexDataAsync(const std::string& context,
                                    IMeshPrimitive& primitive,
@@ -415,9 +424,8 @@ private:
     const std::string& context, const std::string& animationContext,
     const IAnimation& animation, const IAnimationChannel& channel,
     const AnimationGroupPtr& babylonAnimationGroup);
-  _IAnimationSamplerData
-  _loadAnimationSamplerAsync(const std::string& context,
-                             const IAnimationSampler& sampler);
+  _IAnimationSamplerData _loadAnimationSamplerAsync(const std::string& context,
+                                                    IAnimationSampler& sampler);
   ArrayBufferView _loadBufferAsync(const std::string& context,
                                    const IBuffer& buffer);
   IndicesArray _loadIndicesAccessorAsync(const std::string& context,
@@ -426,9 +434,9 @@ private:
                                        const IAccessor& accessor);
   Buffer _loadVertexBufferViewAsync(const IBufferView& bufferView,
                                     const std::string& kind);
-  VertexBuffer _loadVertexAccessorAsync(const std::string& context,
-                                        const IAccessor& accessor,
-                                        const std::string& kind);
+  std::unique_ptr<VertexBuffer>
+  _loadVertexAccessorAsync(const std::string& context,
+                           const IAccessor& accessor, const std::string& kind);
   void _loadMaterialMetallicRoughnessPropertiesAsync(
     const std::string& context,
     std::optional<IMaterialPbrMetallicRoughness> properties = std::nullopt,
@@ -465,15 +473,15 @@ private:
   bool _extensionsLoadSceneAsync(const std::string& context,
                                  const IScene& scene);
   TransformNodePtr _extensionsLoadNodeAsync(
-    const std::string& context, INode& node,
-    const std::function<void(const TransformNode& babylonTransformNode)>&
+    const std::string& context, const INode& node,
+    const std::function<void(const TransformNodePtr& babylonTransformNode)>&
       assign);
   CameraPtr _extensionsLoadCameraAsync(
     const std::string& context, const ICamera& camera,
     const std::function<void(const Camera& babylonCamera)>& assign);
   GeometryPtr _extensionsLoadVertexDataAsync(const std::string& context,
                                              const IMeshPrimitive& primitive,
-                                             const Mesh& babylonMesh);
+                                             const MeshPtr& babylonMesh);
   MaterialPtr _extensionsLoadMaterialAsync(
     const std::string& context, const IMaterial& material,
     const Mesh& babylonMesh, unsigned int babylonDrawMode,
