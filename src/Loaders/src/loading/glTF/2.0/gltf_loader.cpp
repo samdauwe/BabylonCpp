@@ -15,6 +15,7 @@
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/mesh/buffer.h>
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
 #include <babylon/morph/morph_target.h>
@@ -1211,18 +1212,136 @@ IndicesArray GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
 Float32Array GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
                                                  const IAccessor& accessor)
 {
+  // TODO: support normalized and stride
+
+  if (accessor.componentType != IGLTF2::AccessorComponentType::FLOAT) {
+    throw new std::runtime_error("Invalid component type");
+  }
+
+  if (!accessor._data.has_value()) {
+    return accessor._data->float32Array;
+  }
+
+  const auto numComponents
+    = GLTFLoader::_GetNumComponents(context, accessor.type);
+  const auto length = numComponents * accessor.count;
+
+  if (!accessor.bufferView.has_value()) {
+    accessor._data = Float32Array(length);
+  }
+  else {
+    const auto& bufferView
+      = ArrayItem::Get(String::printf("%s/bufferView", context.c_str()),
+                       gltf->bufferViews, *accessor.bufferView);
+    auto data = loadBufferViewAsync(
+      String::printf("/bufferViews/%ld", bufferView.index), bufferView);
+    accessor._data = GLTFLoader::_GetTypedArray(
+      context, accessor.componentType, data, accessor.byteOffset, length);
+  }
+
+  if (accessor.sparse.has_value()) {
+    const auto sparse = *accessor.sparse;
+    const auto accessor_data_then
+      = [this, &context, &sparse, &numComponents,
+         &accessor](const ArrayBufferView& view) -> Float32Array {
+      auto data                     = view.float32Array;
+      const auto& indicesBufferView = ArrayItem::Get(
+        String::printf("%s/sparse/indices/bufferView", context.c_str()),
+        gltf->bufferViews, sparse.indices.bufferView);
+      const auto& valuesBufferView = ArrayItem::Get(
+        String::printf("%s/sparse/values/bufferView", context.c_str()),
+        gltf->bufferViews, sparse.values.bufferView);
+      const auto indicesData = loadBufferViewAsync(
+        String::printf("/bufferViews/%ld", indicesBufferView.index),
+        indicesBufferView);
+      const auto valuesData = loadBufferViewAsync(
+        String::printf("/bufferViews/%ld", valuesBufferView.index),
+        valuesBufferView);
+      const auto& indices
+        = GLTFLoader::_GetTypedArray(
+            String::printf("%s/sparse/indices", context.c_str()),
+            sparse.indices.componentType, indicesData,
+            sparse.indices.byteOffset, sparse.count)
+            .uint32Array;
+      const auto& values
+        = GLTFLoader::_GetTypedArray(
+            String::printf("%s/sparse/values", context.c_str()),
+            accessor.componentType, valuesData, sparse.values.byteOffset,
+            numComponents * sparse.count)
+            .float32Array;
+      size_t valuesIndex = 0;
+      for (size_t indicesIndex = 0; indicesIndex < indices.size();
+           ++indicesIndex) {
+        auto dataIndex = indices[indicesIndex] * numComponents;
+        for (size_t componentIndex = 0; componentIndex < numComponents;
+             componentIndex++) {
+          data[dataIndex++] = values[valuesIndex++];
+        }
+      }
+      return data;
+    };
+    accessor._data = accessor_data_then(accessor._data);
+  }
+
+  return accessor._data->float32Array;
 }
 
-Buffer GLTFLoader::_loadVertexBufferViewAsync(const IBufferView& bufferView,
-                                              const std::string& kind)
+BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
+                                                 const std::string& /*kind*/)
 {
+  if (bufferView._babylonBuffer) {
+    return bufferView._babylonBuffer;
+  }
+
+  auto data = loadBufferViewAsync(
+    String::printf("/bufferViews/%ld", bufferView.index), bufferView);
+  bufferView._babylonBuffer
+    = std::make_shared<Buffer>(babylonScene->getEngine(), data, false);
+
+  return bufferView._babylonBuffer;
 }
 
-std::unique_ptr<VertexBuffer>
-GLTFLoader::_loadVertexAccessorAsync(const std::string& context,
-                                     const IAccessor& accessor,
-                                     const std::string& kind)
+std::unique_ptr<VertexBuffer>& GLTFLoader::_loadVertexAccessorAsync(
+  const std::string& context, IAccessor& accessor, const std::string& kind)
 {
+  if (accessor._babylonVertexBuffer) {
+    return accessor._babylonVertexBuffer;
+  }
+
+  if (accessor.sparse) {
+    auto data = _loadFloatAccessorAsync(
+      String::printf("/accessors/%ld", accessor.index), accessor);
+    accessor._babylonVertexBuffer = std::make_unique<VertexBuffer>(
+      babylonScene->getEngine(), data, kind, false);
+  }
+  // HACK: If byte offset is not a multiple of component type byte length then
+  // load as a float array instead of using Babylon buffers.
+  else if (accessor.byteOffset
+           && static_cast<unsigned int>(*accessor.byteOffset)
+                  % VertexBuffer::GetTypeByteLength(
+                      static_cast<unsigned int>(accessor.componentType))
+                != 0) {
+    BABYLON_LOG_WARN(
+      "GLTFLoader",
+      "Accessor byte offset is not a multiple of component type byte length");
+    auto data = _loadFloatAccessorAsync(
+      String::printf("/accessors/%ld", accessor.index), accessor);
+    accessor._babylonVertexBuffer = std::make_unique<VertexBuffer>(
+      babylonScene->getEngine(), data, kind, false);
+  }
+  else {
+    auto& bufferView
+      = ArrayItem::Get(String::printf("%s/bufferView", context.c_str()),
+                       gltf->bufferViews, *accessor.bufferView);
+    auto babylonBuffer = _loadVertexBufferViewAsync(bufferView, kind);
+    const auto size    = GLTFLoader::_GetNumComponents(context, accessor.type);
+    accessor._babylonVertexBuffer = std::make_unique<VertexBuffer>(
+      babylonScene->getEngine(), babylonBuffer, kind, false, false,
+      bufferView.byteStride, false, accessor.byteOffset, size,
+      accessor.componentType, accessor.normalized, true);
+  }
+
+  return accessor._babylonVertexBuffer;
 }
 
 void GLTFLoader::_loadMaterialMetallicRoughnessPropertiesAsync(
@@ -1670,6 +1789,29 @@ GLTFLoader::_GetTypedArray(const std::string& context,
 }
 
 unsigned int GLTFLoader::_GetNumComponents(const std::string& context,
+                                           IGLTF2::AccessorType type)
+{
+  switch (type) {
+    case IGLTF2::AccessorType::SCALAR:
+      return 1;
+    case IGLTF2::AccessorType::VEC2:
+      return 2;
+    case IGLTF2::AccessorType::VEC3:
+      return 3;
+    case IGLTF2::AccessorType::VEC4:
+      return 4;
+    case IGLTF2::AccessorType::MAT2:
+      return 4;
+    case IGLTF2::AccessorType::MAT3:
+      return 9;
+    case IGLTF2::AccessorType::MAT4:
+      return 16;
+  }
+
+  throw std::runtime_error(String::printf("%s: Invalid type", context.c_str()));
+}
+
+unsigned int GLTFLoader::_GetNumComponents(const std::string& context,
                                            const std::string& type)
 {
   if (type == "SCALAR") {
@@ -1695,7 +1837,7 @@ unsigned int GLTFLoader::_GetNumComponents(const std::string& context,
   }
 
   throw std::runtime_error(
-    String::printf("%s: Invalid type (%d)", context.c_str(), type));
+    String::printf("%s: Invalid type (%s)", context.c_str(), type.c_str()));
 }
 
 bool GLTFLoader::_ValidateUri(const std::string& uri)

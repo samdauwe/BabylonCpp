@@ -12,6 +12,7 @@ class AbstractMesh;
 class AnimationGroup;
 struct ArrayBufferView;
 class Bone;
+class Buffer;
 class Material;
 class Mesh;
 class Skeleton;
@@ -19,6 +20,7 @@ class TransformNode;
 using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
 using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
 using BonePtr           = std::shared_ptr<Bone>;
+using BufferPtr         = std::shared_ptr<Buffer>;
 using MaterialPtr       = std::shared_ptr<Material>;
 using MeshPtr           = std::shared_ptr<Mesh>;
 using SkeletonPtr       = std::shared_ptr<Skeleton>;
@@ -41,10 +43,10 @@ struct IArrayItem {
  */
 struct IAccessor : public IGLTF2::IAccessor, IArrayItem {
   /** @hidden */
-  std::optional<ArrayBufferView> _data;
+  std::optional<ArrayBufferView> _data = std::nullopt;
 
   /** @hidden */
-  std::optional<VertexBuffer> _babylonVertexBuffer;
+  std::unique_ptr<VertexBuffer> _babylonVertexBuffer = nullptr;
 }; // end of struct IAccessor
 
 /**
@@ -92,7 +94,7 @@ struct IBufferView : public IGLTF2::IBufferView, IArrayItem {
   std::optional<ArrayBufferView> _data;
 
   /** @hidden */
-  std::optional<Buffer> _babylonBuffer;
+  BufferPtr _babylonBuffer = nullptr;
 }; // end of struct IBufferView
 
 /**

@@ -34,6 +34,7 @@ using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
 using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
 using BaseTexturePtr    = std::shared_ptr<BaseTexture>;
 using BonePtr           = std::shared_ptr<Bone>;
+using BufferPtr         = std::shared_ptr<Buffer>;
 using CameraPtr         = std::shared_ptr<Camera>;
 using GeometryPtr       = std::shared_ptr<Geometry>;
 using MaterialPtr       = std::shared_ptr<Material>;
@@ -76,6 +77,7 @@ using GLTFLoaderPtr     = std::shared_ptr<GLTFLoader>;
 
 namespace IGLTF2 {
 enum class AccessorComponentType;
+enum class AccessorType;
 enum class MeshPrimitiveMode;
 enum class TextureWrapMode;
 } // namespace IGLTF2
@@ -432,11 +434,11 @@ private:
                                          const IAccessor& accessor);
   Float32Array _loadFloatAccessorAsync(const std::string& context,
                                        const IAccessor& accessor);
-  Buffer _loadVertexBufferViewAsync(const IBufferView& bufferView,
-                                    const std::string& kind);
-  std::unique_ptr<VertexBuffer>
-  _loadVertexAccessorAsync(const std::string& context,
-                           const IAccessor& accessor, const std::string& kind);
+  BufferPtr _loadVertexBufferViewAsync(IBufferView& bufferView,
+                                       const std::string& kind);
+  std::unique_ptr<VertexBuffer>&
+  _loadVertexAccessorAsync(const std::string& context, IAccessor& accessor,
+                           const std::string& kind);
   void _loadMaterialMetallicRoughnessPropertiesAsync(
     const std::string& context,
     std::optional<IMaterialPbrMetallicRoughness> properties = std::nullopt,
@@ -458,6 +460,8 @@ private:
     const std::string& context, IGLTF2::AccessorComponentType componentType,
     const ArrayBufferView& bufferView,
     std::optional<size_t> byteOffset = std::nullopt, size_t length = 0);
+  static unsigned int _GetNumComponents(const std::string& context,
+                                        IGLTF2::AccessorType type);
   static unsigned int _GetNumComponents(const std::string& context,
                                         const std::string& type);
   static bool _ValidateUri(const std::string& uri);
