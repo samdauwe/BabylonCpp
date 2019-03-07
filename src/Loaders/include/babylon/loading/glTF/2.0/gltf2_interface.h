@@ -110,24 +110,28 @@ enum class AccessorType {
  * @brief The name of the node's TRS property to modify, or the weights of the
  * Morph Targets it instantiates.
  */
-struct AnimationChannelTargetPath {
+enum class AnimationChannelTargetPath {
+  /**
+   * Invalid
+   */
+  INVALID = 0,
   /**
    * Translation
    */
-  static constexpr const char* TRANSLATION = "translation";
+  TRANSLATION,
   /**
    * Rotation
    */
-  static constexpr const char* ROTATION = "rotation";
+  ROTATION,
   /**
    * Scale
    */
-  static constexpr const char* SCALE = "scale";
+  SCALE,
   /**
    * Weights
    */
-  static constexpr const char* WEIGHTS = "weights";
-}; // end of struct AnimationChannelTargetPath
+  WEIGHTS,
+}; // end of enum class AnimationChannelTargetPath
 
 /**
  * @brief Interpolation algorithm.
@@ -157,18 +161,22 @@ enum class AnimationSamplerInterpolation {
  * @brief A camera's projection.  A node can reference a camera to apply a
  * transform to place the camera in the scene.
  */
-struct CameraType {
+enum class CameraType {
+  /**
+   * Invalid
+   */
+  INVALID = 0,
   /**
    * A perspective camera containing properties to create a perspective
    * projection matrix
    */
-  static constexpr const char* PERSPECTIVE = "perspective";
+  PERSPECTIVE,
   /**
    * An orthographic camera containing properties to create an orthographic
    * projection matrix
    */
-  static constexpr const char* ORTHOGRAPHIC = "orthographic";
-}; // end of struct CameraType
+  ORTHOGRAPHIC
+}; // end of enum class CameraType
 
 /**
  * @brief The mime-type of the image.
@@ -453,7 +461,7 @@ struct IAnimationChannelTarget : public IProperty {
   /**
    * The index of the node to target
    */
-  size_t node;
+  std::optional<size_t> node = std::nullopt;
   /**
    * The name of the node's TRS property to modify, or the weights of the Morph
    * Targets it instantiates

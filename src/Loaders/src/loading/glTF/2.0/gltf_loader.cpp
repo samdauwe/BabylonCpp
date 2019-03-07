@@ -1,10 +1,13 @@
 #include <babylon/loading/glTF/2.0/gltf_loader.h>
 
 #include <babylon/animations/animation_group.h>
+#include <babylon/animations/ianimation_key.h>
+#include <babylon/animations/targeted_animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/cameras/free_camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
@@ -349,7 +352,7 @@ bool GLTFLoader::loadSceneAsync(const std::string& context, const IScene& scene)
 
   if (!scene.nodes.empty()) {
     for (const auto& index : scene.nodes) {
-      const auto& node
+      auto& node
         = ArrayItem::Get(String::printf("%s/nodes/%ld", context.c_str(), index),
                          gltf->nodes, index);
       promises.emplace_back([&]() -> void {
@@ -757,11 +760,11 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
     //   babylonMesh->_delayInfo.emplace_back(kind);
     // }
 
-    const auto& accessor = ArrayItem::Get(
+    auto& accessor = ArrayItem::Get(
       String::printf("%s/attributes/%s", context.c_str(), attribute.c_str()),
       gltf->accessors, attributes[attribute]);
     promises.emplace_back([&]() -> void {
-      babylonGeometry->setVerticesBuffer(
+      auto babylonVertexBuffer = babylonGeometry->setVerticesBuffer(
         _loadVertexAccessorAsync(
           String::printf("/accessors/%ld", accessor.index), accessor, kind),
         accessor.count);
@@ -794,7 +797,7 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
 }
 
 void GLTFLoader::_createMorphTargets(const std::string& context, INode& node,
-                                     const IMesh& mesh,
+                                     const IMesh& /*mesh*/,
                                      const IMeshPrimitive& primitive,
                                      const MeshPtr& babylonMesh)
 {
@@ -1026,6 +1029,61 @@ CameraPtr GLTFLoader::loadCameraAsync(
   const std::string& context, const ICamera& camera,
   const std::function<void(const CameraPtr& babylonCamera)>& assign)
 {
+  const auto extensionPromise
+    = _extensionsLoadCameraAsync(context, camera, assign);
+  if (extensionPromise) {
+    return extensionPromise;
+  }
+
+  logOpen(String::printf("%s %s", context.c_str(), camera.name.c_str()));
+
+  const auto babylonCamera = FreeCamera::New(
+    !camera.name.empty() ? camera.name :
+                           String::printf("camera%ld", camera.index),
+    Vector3::Zero(), babylonScene, false);
+  babylonCamera->rotation = std::make_unique<Vector3>(0.f, Math::PI, 0.f);
+
+  switch (camera.type) {
+    case IGLTF2::CameraType::PERSPECTIVE: {
+      const auto& perspective = camera.perspective;
+      if (!perspective.has_value()) {
+        throw new std::runtime_error(String::printf(
+          "%s: Camera perspective properties are missing", context.c_str()));
+      }
+
+      babylonCamera->fov  = perspective->yfov;
+      babylonCamera->minZ = perspective->znear;
+      babylonCamera->maxZ = perspective->zfar.has_value() ?
+                              *perspective->zfar :
+                              std::numeric_limits<float>::max();
+      break;
+    }
+    case IGLTF2::CameraType::ORTHOGRAPHIC: {
+      if (!camera.orthographic.has_value()) {
+        throw new std::runtime_error(String::printf(
+          "%s: Camera orthographic properties are missing", context.c_str()));
+      }
+
+      babylonCamera->mode        = Camera::ORTHOGRAPHIC_CAMERA;
+      babylonCamera->orthoLeft   = -camera.orthographic->xmag;
+      babylonCamera->orthoRight  = camera.orthographic->xmag;
+      babylonCamera->orthoBottom = -camera.orthographic->ymag;
+      babylonCamera->orthoTop    = camera.orthographic->ymag;
+      babylonCamera->minZ        = camera.orthographic->znear;
+      babylonCamera->maxZ        = camera.orthographic->zfar;
+      break;
+    }
+    default: {
+      throw new std::runtime_error(
+        String::printf("%s: Invalid camera type", context.c_str()));
+    }
+  }
+
+  GLTFLoader::AddPointerMetadata(babylonCamera, context);
+  _parent->onCameraLoadedObservable.notifyObservers(babylonCamera.get());
+  assign(babylonCamera);
+
+  return babylonCamera;
 }
 
 void GLTFLoader::_loadAnimationsAsync()
@@ -1091,6 +1149,176 @@ void GLTFLoader::_loadAnimationChannelAsync(
   const IAnimation& animation, const IAnimationChannel& channel,
   const AnimationGroupPtr& babylonAnimationGroup)
 {
+  if (!channel.target.node.has_value()) {
+    return;
+  }
+
+  const auto targetNode
+    = ArrayItem::Get(String::printf("%s/target/node", context.c_str()),
+                     gltf->nodes, *channel.target.node);
+
+  // Ignore animations that have no animation targets.
+  if ((channel.target.path == IGLTF2::AnimationChannelTargetPath::WEIGHTS
+       && !targetNode._numMorphTargets)
+      || (channel.target.path != IGLTF2::AnimationChannelTargetPath::WEIGHTS
+          && !targetNode._babylonTransformNode)) {
+    return;
+  }
+
+  const auto sampler
+    = ArrayItem::Get(String::printf("%s/sampler", context.c_str()),
+                     animation.samplers, *channel.sampler);
+  auto data = _loadAnimationSamplerAsync(
+    String::printf("%s/samplers/%ld", animationContext.c_str(),
+                   channel.sampler),
+    sampler);
+
+  std::string targetPath;
+  unsigned int animationType;
+  switch (channel.target.path) {
+    case IGLTF2::AnimationChannelTargetPath::TRANSLATION: {
+      targetPath    = "position";
+      animationType = Animation::ANIMATIONTYPE_VECTOR3();
+      break;
+    }
+    case IGLTF2::AnimationChannelTargetPath::ROTATION: {
+      targetPath    = "rotationQuaternion";
+      animationType = Animation::ANIMATIONTYPE_QUATERNION();
+      break;
+    }
+    case IGLTF2::AnimationChannelTargetPath::SCALE: {
+      targetPath    = "scaling";
+      animationType = Animation::ANIMATIONTYPE_VECTOR3();
+      break;
+    }
+    case IGLTF2::AnimationChannelTargetPath::WEIGHTS: {
+      targetPath    = "influence";
+      animationType = Animation::ANIMATIONTYPE_FLOAT();
+      break;
+    }
+    default: {
+      throw std::runtime_error(
+        String::printf("%s/target/path: Invalid value", context.c_str()));
+    }
+  }
+
+  size_t outputBufferOffset = 0;
+  std::function<AnimationValue()> getNextOutputValue;
+  if (targetPath == "position") {
+    getNextOutputValue = [&]() -> AnimationValue {
+      const auto value = Vector3::FromArray(data.output, outputBufferOffset);
+      outputBufferOffset += 3;
+      return value;
+    };
+  }
+  else if (targetPath == "rotationQuaternion") {
+    getNextOutputValue = [&]() -> AnimationValue {
+      const auto value = Quaternion::FromArray(data.output, outputBufferOffset);
+      outputBufferOffset += 4;
+      return value;
+    };
+  }
+  else if (targetPath == "scaling") {
+    getNextOutputValue = [&]() -> AnimationValue {
+      const auto value = Vector3::FromArray(data.output, outputBufferOffset);
+      outputBufferOffset += 3;
+      return value;
+    };
+  }
+  else if (targetPath == "influence") {
+    getNextOutputValue = [&]() -> AnimationValue {
+      Float32Array value(*targetNode._numMorphTargets);
+      for (size_t i = 0; i < *targetNode._numMorphTargets; ++i) {
+        value[i] = data.output[outputBufferOffset++];
+      }
+      return value;
+    };
+  }
+
+  std::function<IAnimationKey(size_t frameIndex)> getNextKey;
+  switch (data.interpolation) {
+    case IGLTF2::AnimationSamplerInterpolation::STEP: {
+      getNextKey = [&](size_t frameIndex) -> IAnimationKey {
+        return IAnimationKey
+        {
+          data.input[frameIndex],           // frame
+            getNextOutputValue(),           // value
+            std::nullopt,                   // inTangent
+            std::nullopt,                   // outTangent
+            AnimationKeyInterpolation::STEP // interpolation
+        }
+      };
+      break;
+    }
+    case IGLTF2::AnimationSamplerInterpolation::LINEAR: {
+      getNextKey = [&](size_t frameIndex) -> IAnimationKey {
+        return IAnimationKey
+        {
+          data.input[frameIndex], // frame
+            getNextOutputValue(), // value
+            std::nullopt,         // inTangent
+            std::nullopt,         // outTangent
+            std::nullopt          // interpolation
+        }
+      };
+      break;
+    }
+    case IGLTF2::AnimationSamplerInterpolation::CUBICSPLINE: {
+      getNextKey = [&](size_t frameIndex) -> IAnimationKey {
+        return IAnimationKey
+        {
+          data.input[frameIndex], // frame
+            getNextOutputValue(), // value
+            getNextOutputValue(), // inTangent
+            getNextOutputValue(), // outTangent
+            std::nullopt          // interpolation
+        }
+      };
+      break;
+    }
+  }
+
+  std::vector<IAnimationKey> keys(data.input.length);
+  for (size_t frameIndex = 0; frameIndex < data.input.length; ++frameIndex) {
+    keys[frameIndex] = getNextKey(frameIndex);
+  }
+
+  if (targetPath == "influence") {
+    for (size_t targetIndex = 0; targetIndex < targetNode._numMorphTargets;
+         targetIndex++) {
+      const auto animationName
+        = String::printf("%s_channel%ld", babylonAnimationGroup->name.c_str(),
+                         babylonAnimationGroup->targetedAnimations().size());
+      auto babylonAnimation
+        = Animation::New(animationName, targetPath, 1, animationType);
+      std::vector<IAnimationKey> values;
+      babylonAnimation->setKeys(values);
+
+      _forEachPrimitive(
+        targetNode, [&](const AbstractMeshPtr& babylonAbstractMesh) -> void {
+          const auto babylonMesh
+            = std::static_pointer_cast<Mesh>(babylonAbstractMesh);
+          const auto morphTarget
+            = babylonMesh->morphTargetManager()->getTarget(targetIndex);
+          const auto babylonAnimationClone = babylonAnimation->clone();
+          morphTarget->animations.emplace_back(babylonAnimationClone);
+          babylonAnimationGroup->addTargetedAnimation(babylonAnimationClone,
+                                                      morphTarget);
+        });
+    }
+  }
+  else {
+    const auto animationName
+      = String::printf("%s_channel%ld", babylonAnimationGroup->name.c_str(),
+                       babylonAnimationGroup->targetedAnimations().size());
+    const auto babylonAnimation
+      = Animation::New(animationName, targetPath, 1, animationType);
+    babylonAnimation->setKeys(keys);
+
+    targetNode._babylonTransformNode->animations.emplace_back(babylonAnimation);
+    babylonAnimationGroup->addTargetedAnimation(
+      babylonAnimation, targetNode._babylonTransformNode);
+  }
 }
 
 _IAnimationSamplerData
@@ -1678,6 +1906,11 @@ void GLTFLoader::AddPointerMetadata(const TransformNodePtr& babylonObject,
 {
 }
 
+void GLTFLoader::AddPointerMetadata(const CameraPtr& babylonObject,
+                                    const std::string& pointer)
+{
+}
+
 unsigned int
 GLTFLoader::_GetTextureWrapMode(const std::string& context,
                                 std::optional<IGLTF2::TextureWrapMode> mode)
@@ -1918,7 +2151,7 @@ TransformNodePtr GLTFLoader::_extensionsLoadNodeAsync(
 
 CameraPtr GLTFLoader::_extensionsLoadCameraAsync(
   const std::string& context, const ICamera& camera,
-  const std::function<void(const Camera& babylonCamera)>& assign)
+  const std::function<void(const CameraPtr& babylonCamera)>& assign)
 {
 }
 

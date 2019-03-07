@@ -336,6 +336,15 @@ public:
                           const std::string& pointer);
 
   /**
+   * @brief Adds a JSON pointer to the metadata of the Babylon object at
+   * `<object>.metadata.gltf.pointers`.
+   * @param babylonObject the Babylon object with metadata
+   * @param pointer the JSON pointer
+   */
+  void AddPointerMetadata(const CameraPtr& babylonObject,
+                          const std::string& pointer);
+
+  /**
    * @brief Increments the indentation level and logs a message.
    * @param message The message to log
    */
@@ -482,7 +491,7 @@ private:
       assign);
   CameraPtr _extensionsLoadCameraAsync(
     const std::string& context, const ICamera& camera,
-    const std::function<void(const Camera& babylonCamera)>& assign);
+    const std::function<void(const CameraPtr& babylonCamera)>& assign);
   GeometryPtr _extensionsLoadVertexDataAsync(const std::string& context,
                                              const IMeshPrimitive& primitive,
                                              const MeshPtr& babylonMesh);
