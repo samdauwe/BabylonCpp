@@ -1165,9 +1165,9 @@ void GLTFLoader::_loadAnimationChannelAsync(
     return;
   }
 
-  const auto sampler
+  const auto& sampler
     = ArrayItem::Get(String::printf("%s/sampler", context.c_str()),
-                     animation.samplers, *channel.sampler);
+                     animation.samplers, channel.sampler);
   auto data = _loadAnimationSamplerAsync(
     String::printf("%s/samplers/%ld", animationContext.c_str(),
                    channel.sampler),
@@ -1657,8 +1657,8 @@ MaterialPtr GLTFLoader::_createDefaultMaterial(const std::string& name,
   babylonMaterial->useRadianceOverAlpha = !_parent->transparencyAsCoverage;
   babylonMaterial->useSpecularOverAlpha = !_parent->transparencyAsCoverage;
   babylonMaterial->transparencyMode     = PBRMaterial::PBRMATERIAL_OPAQUE;
-  babylonMaterial->metallic             = 1;
-  babylonMaterial->roughness            = 1;
+  babylonMaterial->metallic             = 1.f;
+  babylonMaterial->roughness            = 1.f;
   return std::move(babylonMaterial);
 }
 
