@@ -5,7 +5,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/core/array_buffer_view.h>
 
 using json = nlohmann::json;
 
@@ -20,6 +20,7 @@ class Material;
 class Mesh;
 class Skeleton;
 class TransformNode;
+class VertexBuffer;
 using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
 using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
 using BonePtr           = std::shared_ptr<Bone>;
@@ -51,8 +52,23 @@ struct IScene;
 struct ISkin;
 struct ITexture;
 struct ITextureInfo;
+using IMaterialNormalTextureInfoPtr
+  = std::shared_ptr<IMaterialNormalTextureInfo>;
+using IMaterialOcclusionTextureInfoPtr
+  = std::shared_ptr<IMaterialOcclusionTextureInfo>;
+using IMaterialPbrMetallicRoughnessPtr
+  = std::shared_ptr<IMaterialPbrMetallicRoughness>;
+using INodePtr        = std::shared_ptr<INode>;
+using ITextureInfoPtr = std::shared_ptr<ITextureInfo>;
 
 namespace IGLTF2 {
+
+struct IAccessorSparse;
+struct ICameraOrthographic;
+struct ICameraPerspective;
+using IAccessorSparsePtr     = std::shared_ptr<IAccessorSparse>;
+using ICameraOrthographicPtr = std::shared_ptr<ICameraOrthographic>;
+using ICameraPerspectivePtr  = std::shared_ptr<ICameraPerspective>;
 
 /**
  * @brief Module for glTF 2.0 Interface.
@@ -203,16 +219,16 @@ enum class CameraType {
 /**
  * @brief The mime-type of the image.
  */
-struct ImageMimeType {
+enum class ImageMimeType {
   /**
    * JPEG Mime-type
    */
-  static constexpr const char* JPEG = "image/jpeg";
+  JPEG,
   /**
    * PNG Mime-type
    */
-  static constexpr const char* PNG = "image/png";
-}; // end of struct ImageMimeType
+  PNG
+}; // end of enum class ImageMimeType
 
 /**
  * @brief The alpha rendering mode of the material.
@@ -444,7 +460,7 @@ struct IAccessor : public IChildRootProperty {
   /**
    * The offset relative to the start of the bufferView in bytes
    */
-  std::optional<int> byteOffset = std::nullopt;
+  std::optional<size_t> byteOffset = std::nullopt;
   /**
    * The datatype of components in the attribute
    */
@@ -472,7 +488,7 @@ struct IAccessor : public IChildRootProperty {
   /**
    * Sparse storage of attributes that deviate from their initialization value
    */
-  std::optional<IAccessorSparse> sparse;
+  IAccessorSparsePtr sparse;
 }; // end of struct IAccessor
 
 /**
@@ -656,12 +672,12 @@ struct ICamera : public IChildRootProperty {
    * An orthographic camera containing properties to create an orthographic
    * projection matrix
    */
-  std::optional<ICameraOrthographic> orthographic = std::nullopt;
+  ICameraOrthographicPtr orthographic = nullptr;
   /**
    * A perspective camera containing properties to create a perspective
    * projection matrix
    */
-  std::optional<ICameraPerspective> perspective = std::nullopt;
+  ICameraPerspectivePtr perspective = nullptr;
   /**
    * Specifies if the camera uses a perspective or orthographic projection
    */
@@ -738,7 +754,7 @@ struct IMaterialPbrMetallicRoughness {
   /**
    * The base color texture
    */
-  std::optional<GLTF2::ITextureInfo> baseColorTexture = std::nullopt;
+  ITextureInfoPtr baseColorTexture = nullptr;
   /**
    * The metalness of the material
    */
@@ -750,7 +766,7 @@ struct IMaterialPbrMetallicRoughness {
   /**
    * The metallic-roughness texture
    */
-  std::optional<GLTF2::ITextureInfo> metallicRoughnessTexture = std::nullopt;
+  ITextureInfoPtr metallicRoughnessTexture = nullptr;
 }; // end of struct IMaterialPbrMetallicRoughness
 
 /**
@@ -762,21 +778,19 @@ struct IMaterial : public IChildRootProperty {
    * material model from Physically-Based Rendering (PBR) methodology. When not
    * specified, all the default values of pbrMetallicRoughness apply
    */
-  std::optional<GLTF2::IMaterialPbrMetallicRoughness> pbrMetallicRoughness
-    = std::nullopt;
+  IMaterialPbrMetallicRoughnessPtr pbrMetallicRoughness = nullptr;
   /**
    * The normal map texture
    */
-  std::optional<GLTF2::IMaterialNormalTextureInfo> normalTexture = std::nullopt;
+  IMaterialNormalTextureInfoPtr normalTexture = nullptr;
   /**
    * The occlusion map texture
    */
-  std::optional<GLTF2::IMaterialOcclusionTextureInfo> occlusionTexture
-    = std::nullopt;
+  IMaterialOcclusionTextureInfoPtr occlusionTexture = nullptr;
   /**
    * The emissive map texture
    */
-  std::optional<GLTF2::ITextureInfo> emissiveTexture = std::nullopt;
+  ITextureInfoPtr emissiveTexture = nullptr;
   /**
    * The RGB components of the emissive color of the material. These values are
    * linear. If an emissiveTexture is specified, this value is multiplied with
@@ -1013,7 +1027,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of nodes
    */
-  std::vector<GLTF2::INode> nodes;
+  std::vector<INodePtr> nodes;
   /**
    * An array of samplers.  A sampler contains properties for texture filtering
    * and wrapping modes
@@ -1129,7 +1143,7 @@ struct _IAnimationSamplerData {
  */
 struct IAnimationSampler : public IGLTF2::IAnimationSampler, IArrayItem {
   /** @hidden */
-  std::optional<_IAnimationSamplerData> _data;
+  std::optional<_IAnimationSamplerData> _data = std::nullopt;
 }; // end of struct IAnimationSampler
 
 /**
@@ -1137,7 +1151,7 @@ struct IAnimationSampler : public IGLTF2::IAnimationSampler, IArrayItem {
  */
 struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
   /** @hidden */
-  std::optional<AnimationGroupPtr> _babylonAnimationGroup;
+  AnimationGroupPtr _babylonAnimationGroup = nullptr;
 }; // end of struct IAnimation
 
 /**
@@ -1145,7 +1159,7 @@ struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
  */
 struct IBuffer : public IGLTF2::IBuffer, IArrayItem {
   /** @hidden */
-  std::optional<ArrayBufferView> _data = std::nullopt;
+  ArrayBufferView _data;
 }; // end of struct IBuffer
 
 /**
@@ -1153,7 +1167,7 @@ struct IBuffer : public IGLTF2::IBuffer, IArrayItem {
  */
 struct IBufferView : public IGLTF2::IBufferView, IArrayItem {
   /** @hidden */
-  std::optional<ArrayBufferView> _data;
+  ArrayBufferView _data;
 
   /** @hidden */
   BufferPtr _babylonBuffer = nullptr;
@@ -1170,7 +1184,7 @@ struct ICamera : public IGLTF2::ICamera, IArrayItem {
  */
 struct IImage : public IGLTF2::IImage, IArrayItem {
   /** @hidden */
-  std::optional<ArrayBufferView> _data;
+  ArrayBufferView _data;
 }; // end of struct IImage
 
 /**
@@ -1219,8 +1233,8 @@ struct IMesh : public IGLTF2::IMesh, IArrayItem {
  */
 struct IMeshPrimitive : public IGLTF2::IMeshPrimitive, IArrayItem {
   struct IMeshPrimitiveData {
-    MeshPtr babylonSourceMesh;
-    std::optional<json> promise;
+    MeshPtr babylonSourceMesh   = nullptr;
+    std::optional<json> promise = std::nullopt;
   }; // end of struct IMaterialData
 
   /** @hidden */
@@ -1234,7 +1248,7 @@ struct INode : public IGLTF2::INode, IArrayItem {
   /**
    * The parent glTF node.
    */
-  std::optional<INode> parent;
+  INode* parent = nullptr;
 
   /** @hidden */
   TransformNodePtr _babylonTransformNode = nullptr;
@@ -1276,8 +1290,7 @@ struct IScene : public IGLTF2::IScene, IArrayItem {
  */
 struct ISkin : public IGLTF2::ISkin, IArrayItem {
   struct ISkinData {
-    SkeletonPtr babylonSkeleton;
-    std::optional<void> promise;
+    SkeletonPtr babylonSkeleton = nullptr;
   }; // end of struct ISkinData
 
   /** @hidden */

@@ -250,25 +250,28 @@ void GLTFFileLoader::_clear()
 }
 
 ImportedMeshes GLTFFileLoader::importMeshAsync(
-  const std::vector<std::string>& meshesNames, Scene* scene,
-  const std::string& data, const std::string& rootUrl,
-  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
-  const std::string& fileName)
+  const std::vector<std::string>& /*meshesNames*/, Scene* /*scene*/,
+  const std::string& /*data*/, const std::string& /*rootUrl*/,
+  const std::function<
+    void(const SceneLoaderProgressEvent& event)>& /*onProgress*/,
+  const std::string& /*fileName*/)
 {
   return {};
 }
 
 void GLTFFileLoader::loadAsync(
-  Scene* scene, const std::string& data, const std::string& rootUrl,
-  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
-  const std::string& fileName)
+  Scene* /*scene*/, const std::string& /*data*/, const std::string& /*rootUrl*/,
+  const std::function<
+    void(const SceneLoaderProgressEvent& event)>& /*onProgress*/,
+  const std::string& /*fileName*/)
 {
 }
 
 AssetContainerPtr GLTFFileLoader::loadAssetContainerAsync(
-  Scene* scene, const std::string& data, const std::string& rootUrl,
-  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
-  const std::string& fileName)
+  Scene* /*scene*/, const std::string& /*data*/, const std::string& /*rootUrl*/,
+  const std::function<
+    void(const SceneLoaderProgressEvent& event)>& /*onProgress*/,
+  const std::string& /*fileName*/)
 {
   return nullptr;
 }
@@ -288,21 +291,23 @@ void GLTFFileLoader::whenCompleteAsync()
 }
 
 IGLTFLoaderData GLTFFileLoader::_parseAsync(
-  Scene* scene, const std::variant<std::string, ArrayBuffer>& data,
-  const std::string& rootUrl, const std::string& fileName)
+  Scene* /*scene*/, const std::variant<std::string, ArrayBuffer>& /*data*/,
+  const std::string& /*rootUrl*/, const std::string& /*fileName*/)
 {
   return IGLTFLoaderData{nullptr, std::nullopt};
 }
 
-void GLTFFileLoader::_validateAsync(Scene* scene, const std::string& json,
-                                    const std::string& rootUrl,
-                                    const std::string& fileName)
+void GLTFFileLoader::_validateAsync(Scene* /*scene*/,
+                                    const std::string& /*json*/,
+                                    const std::string& /*rootUrl*/,
+                                    const std::string& /*fileName*/)
 {
 }
 
-IGLTFLoader& GLTFFileLoader::_getLoader(const IGLTFLoaderData& loaderData)
-{
-}
+// IGLTFLoader& GLTFFileLoader::_getLoader(const IGLTFLoaderData&
+// /*loaderData*/)
+//{
+//}
 
 UnpackedBinary GLTFFileLoader::_unpackBinary(const ArrayBuffer& data)
 {

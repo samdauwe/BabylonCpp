@@ -10,8 +10,8 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/core/array_buffer_view.h>
-#include <babylon/loading/glTF/igltf_loader.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
+#include <babylon/loading/glTF/igltf_loader.h>
 
 using json = nlohmann::json;
 
@@ -47,43 +47,10 @@ using TransformNodePtr  = std::shared_ptr<TransformNode>;
 
 namespace GLTF2 {
 
-struct _IAnimationSamplerData;
-struct _ISamplerData;
-struct GLTFFileLoader;
-class GLTFLoader;
-struct GLTFLoaderExtension;
-struct GLTFLoaderTracker;
-struct IAccessor;
-struct IAnimation;
-struct IAnimationChannel;
-struct IAnimationSampler;
-struct IBuffer;
-struct IBufferView;
-struct ICamera;
-struct IGLTF;
-struct IGLTFLoaderData;
 struct IGLTFLoaderExtension;
-struct IImage;
-struct IMaterial;
-struct IMaterialData;
-struct IMaterialPbrMetallicRoughness;
-struct IMesh;
-struct IMeshPrimitive;
-struct INode;
-struct ISampler;
-struct IScene;
-struct ISkin;
-struct ITexture;
-struct ITextureInfo;
-using GLTFFileLoaderPtr = std::shared_ptr<GLTFFileLoader>;
-using GLTFLoaderPtr     = std::shared_ptr<GLTFLoader>;
-
-namespace IGLTF2 {
-enum class AccessorComponentType;
-enum class AccessorType;
-enum class MeshPrimitiveMode;
-enum class TextureWrapMode;
-} // namespace IGLTF2
+class GLTFFileLoader;
+using IGLTFLoaderExtensionPtr = std::shared_ptr<IGLTFLoaderExtension>;
+using GLTFFileLoaderPtr       = std::shared_ptr<GLTFFileLoader>;
 
 /**
  * @brief Helper class for working with arrays when loading the glTF asset.
@@ -114,13 +81,15 @@ struct BABYLON_SHARED_EXPORT ArrayItem {
    * @param array The array of items
    */
   template <typename IArrItem>
-  static void Assign(std::vector<IArrItem>& array)
+  static void Assign(std::vector<IArrItem>& /*array*/)
   {
+#if 0
     if (!array.empty()) {
       for (size_t index = 0; index < array.size(); ++index) {
         array[index].index = index;
       }
     }
+#endif
   }
 
 }; // end of struct ArrayItem
@@ -138,7 +107,7 @@ public:
    */
   static void RegisterExtension(
     const std::string& name,
-    const std::function<IGLTFLoaderExtension(GLTFLoader& loader)>& factory);
+    const std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>& factory);
 
   /**
    * @brief Unregisters a loader extension.
@@ -150,7 +119,7 @@ public:
 private:
   static std::vector<std::string> _ExtensionNames;
   static std::unordered_map<
-    std::string, std::function<IGLTFLoaderExtension(GLTFLoader& loader)>>
+    std::string, std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>>
     _ExtensionFactories;
 
 public:
@@ -232,8 +201,8 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  ArrayBufferView loadBufferViewAsync(const std::string& context,
-                                      const IBufferView& bufferView);
+  ArrayBufferView& loadBufferViewAsync(const std::string& context,
+                                       IBufferView& bufferView);
 
   /**
    * @brief Hidden
@@ -309,8 +278,7 @@ public:
    * @returns A promise that resolves with the loaded data when the load is
    * complete
    */
-  ArrayBufferView loadImageAsync(const std::string& context,
-                                 const IImage& image);
+  ArrayBufferView& loadImageAsync(const std::string& context, IImage& image);
   /**
    * @brief Loads a glTF uri.
    * @param context The context when loading the asset
@@ -399,7 +367,7 @@ private:
   void _loadExtensions();
   void _checkExtensions();
   void _setState(const GLTFLoaderState& state);
-  INode _createRootNode();
+  INodePtr _createRootNode();
   void _forEachPrimitive(
     const INode& node,
     const std::function<void(const AbstractMeshPtr& babylonMesh)>& callback);
@@ -432,7 +400,7 @@ private:
   static void _LoadTransform(const INode& node,
                              const TransformNodePtr& babylonNode);
   void _loadSkinAsync(const std::string& context, const INode& node,
-                      const ISkin& skin);
+                      ISkin& skin);
   void _loadBones(const std::string& context, const ISkin& skin,
                   const SkeletonPtr& babylonSkeleton);
   BonePtr _loadBone(INode& node, const ISkin& skin,
@@ -450,17 +418,17 @@ private:
     const AnimationGroupPtr& babylonAnimationGroup);
   _IAnimationSamplerData _loadAnimationSamplerAsync(const std::string& context,
                                                     IAnimationSampler& sampler);
-  ArrayBufferView _loadBufferAsync(const std::string& context,
-                                   const IBuffer& buffer);
-  IndicesArray _loadIndicesAccessorAsync(const std::string& context,
-                                         const IAccessor& accessor);
-  Float32Array _loadFloatAccessorAsync(const std::string& context,
-                                       const IAccessor& accessor);
+  ArrayBufferView& _loadBufferAsync(const std::string& context,
+                                    IBuffer& buffer);
+  IndicesArray& _loadIndicesAccessorAsync(const std::string& context,
+                                          IAccessor& accessor);
+  Float32Array& _loadFloatAccessorAsync(const std::string& context,
+                                        IAccessor& accessor);
   BufferPtr _loadVertexBufferViewAsync(IBufferView& bufferView,
-                                       const std::string& kind);
+                                       unsigned int kind);
   std::unique_ptr<VertexBuffer>&
   _loadVertexAccessorAsync(const std::string& context, IAccessor& accessor,
-                           const std::string& kind);
+                           unsigned int kind);
   void _loadMaterialMetallicRoughnessPropertiesAsync(
     const std::string& context,
     std::optional<IMaterialPbrMetallicRoughness> properties = std::nullopt,
@@ -538,7 +506,7 @@ private:
   bool _disposed;
   GLTFFileLoaderPtr _parent;
   GLTFLoaderState _state;
-  std::unordered_map<std::string, IGLTFLoaderExtension> _extensions;
+  std::unordered_map<std::string, IGLTFLoaderExtensionPtr> _extensions;
   std::string _rootUrl;
   std::string _fileName;
   std::string _uniqueRootUrl;

@@ -22,6 +22,7 @@
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/vertex_buffer.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/tools/tools.h>
@@ -31,7 +32,7 @@ namespace GLTF2 {
 
 void GLTFLoader::RegisterExtension(
   const std::string& name,
-  const std::function<IGLTFLoaderExtension(GLTFLoader& loader)>& factory)
+  const std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>& factory)
 {
   if (GLTFLoader::UnregisterExtension(name)) {
     BABYLON_LOGF_WARN("GLTFLoader",
@@ -51,10 +52,10 @@ bool GLTFLoader::UnregisterExtension(const std::string& name)
   if (!stl_util::contains(GLTFLoader::_ExtensionFactories, name)) {
     return false;
   }
-
+#if 0
   stl_util::erase(GLTFLoader::_ExtensionFactories, name);
   stl_util::erase(GLTFLoader::_ExtensionNames, name);
-
+#endif
   return true;
 }
 
@@ -100,8 +101,8 @@ ImportMeshResult GLTFLoader::importMeshAsync(
     std::unordered_map<std::string, size_t> nodeMap;
     if (!gltf->nodes.empty()) {
       for (const auto& node : gltf->nodes) {
-        if (!node.name.empty()) {
-          nodeMap[node.name] = node.index;
+        if (!node->name.empty()) {
+          nodeMap[node->name] = node->index;
         }
       }
     }
@@ -226,15 +227,15 @@ void GLTFLoader::_loadData(const IGLTFLoaderData& data)
     const auto& buffers = gltf->buffers;
     if (!buffers.empty() && !buffers[0].uri.empty()) {
       const auto& binaryBuffer = buffers[0];
-      if (binaryBuffer.byteLength < data.bin.byteLength - 3
-          || binaryBuffer.byteLength > data.bin.byteLength) {
+      if (binaryBuffer.byteLength < data.bin->byteLength() - 3
+          || binaryBuffer.byteLength > data.bin->byteLength()) {
         BABYLON_LOGF_WARN("GLTFLoader",
                           "Binary buffer length (%ld) from JSON does not match "
                           "chunk length (%ld)",
-                          binaryBuffer.byteLength, data.bin.byteLength);
+                          binaryBuffer.byteLength, data.bin->byteLength());
       }
 
-      binaryBuffer._data = data.bin;
+      // binaryBuffer._data = data.bin;
     }
     else {
       BABYLON_LOG_WARN("GLTFLoader", "Unexpected BIN chunk");
@@ -261,21 +262,21 @@ void GLTFLoader::_setupData()
   if (!gltf->nodes.empty()) {
     std::unordered_map<size_t, size_t> nodeParents;
     for (const auto& node : gltf->nodes) {
-      if (!node.children.empty()) {
-        for (const auto& index : node.children) {
-          nodeParents[index] = node.index;
+      if (!node->children.empty()) {
+        for (const auto& index : node->children) {
+          nodeParents[index] = node->index;
         }
       }
     }
 
     auto rootNode = _createRootNode();
     for (auto& node : gltf->nodes) {
-      if (stl_util::contains(nodeParents, node.index)) {
-        const auto parentIndex = nodeParents[node.index];
-        node.parent            = gltf->nodes[parentIndex];
+      if (stl_util::contains(nodeParents, node->index)) {
+        const auto& parentIndex = nodeParents[node->index];
+        node->parent            = gltf->nodes[parentIndex].get();
       }
       else {
-        node.parent = rootNode;
+        node->parent = rootNode.get();
       }
     }
   }
@@ -298,7 +299,7 @@ void GLTFLoader::_checkExtensions()
   if (!gltf->extensionsRequired.empty()) {
     for (const auto& name : gltf->extensionsRequired) {
       if (!stl_util::contains(_extensions, name)
-          || !_extensions[name].enabled) {
+          || !_extensions[name]->enabled) {
         throw std::runtime_error(String::printf(
           "Required extension %s is not available", name.c_str()));
       }
@@ -311,20 +312,20 @@ void GLTFLoader::_setState(const GLTFLoaderState& state)
   _state = state;
 }
 
-INode GLTFLoader::_createRootNode()
+INodePtr GLTFLoader::_createRootNode()
 {
   _rootBabylonMesh = Mesh::New("__root__", babylonScene);
   _rootBabylonMesh->setEnabled(false);
 
-  INode rootNode;
-  rootNode._babylonTransformNode = _rootBabylonMesh;
+  auto rootNode                   = std::make_shared<INode>();
+  rootNode->_babylonTransformNode = _rootBabylonMesh;
 
   switch (_parent->coordinateSystemMode) {
     case GLTFLoaderCoordinateSystemMode::AUTO: {
       if (!babylonScene->useRightHandedSystem()) {
-        rootNode.rotation = {0.f, 1.f, 0.f, 0.f};
-        rootNode.scale    = {1.f, 1.f, -1.f};
-        GLTFLoader::_LoadTransform(rootNode, _rootBabylonMesh);
+        rootNode->rotation = {0.f, 1.f, 0.f, 0.f};
+        rootNode->scale    = {1.f, 1.f, -1.f};
+        GLTFLoader::_LoadTransform(*rootNode, _rootBabylonMesh);
       }
       break;
     }
@@ -358,7 +359,7 @@ bool GLTFLoader::loadSceneAsync(const std::string& context, const IScene& scene)
         = ArrayItem::Get(String::printf("%s/nodes/%ld", context.c_str(), index),
                          gltf->nodes, index);
       promises.emplace_back([&]() -> void {
-        loadNodeAsync(String::printf("/nodes/%ld", node.index), node,
+        loadNodeAsync(String::printf("/nodes/%ld", node->index), *node,
                       [&](const TransformNodePtr& babylonMesh) -> void {
                         babylonMesh->parent = _rootBabylonMesh.get();
                       });
@@ -371,9 +372,9 @@ bool GLTFLoader::loadSceneAsync(const std::string& context, const IScene& scene)
   // hierarchy similar to Unity3D.
   if (!gltf->nodes.empty()) {
     for (const auto& node : gltf->nodes) {
-      if (node._babylonTransformNode && !node._babylonBones.empty()) {
-        for (auto& babylonBone : node._babylonBones) {
-          babylonBone->linkTransformNode(node._babylonTransformNode);
+      if (node->_babylonTransformNode && !node->_babylonBones.empty()) {
+        for (auto& babylonBone : node->_babylonBones) {
+          babylonBone->linkTransformNode(node->_babylonTransformNode);
         }
       }
     }
@@ -411,7 +412,7 @@ std::vector<AbstractMeshPtr> GLTFLoader::_getMeshes()
   const auto& nodes = gltf->nodes;
   if (!nodes.empty()) {
     for (const auto& node : nodes) {
-      _forEachPrimitive(node,
+      _forEachPrimitive(*node,
                         [&meshes](const AbstractMeshPtr& babylonMesh) -> void {
                           meshes.emplace_back(babylonMesh);
                         });
@@ -428,7 +429,7 @@ std::vector<SkeletonPtr> GLTFLoader::_getSkeletons()
   const auto& skins = gltf->skins;
   if (!skins.empty()) {
     for (const auto& skin : skins) {
-      if (skin._data.has_value()) {
+      if (skin._data) {
         skeletons.emplace_back(skin._data->babylonSkeleton);
       }
     }
@@ -440,16 +441,16 @@ std::vector<SkeletonPtr> GLTFLoader::_getSkeletons()
 std::vector<AnimationGroupPtr> GLTFLoader::_getAnimationGroups()
 {
   std::vector<AnimationGroupPtr> animationGroups;
-
+#if 0
   const auto& animations = gltf->animations;
   if (!animations.empty()) {
     for (const auto& animation : animations) {
-      if (animation._babylonAnimationGroup.has_value()) {
+      if (animation._babylonAnimationGroup) {
         animationGroups.emplace_back(*animation._babylonAnimationGroup);
       }
     }
   }
-
+#endif
   return animationGroups;
 }
 
@@ -523,8 +524,8 @@ TransformNodePtr GLTFLoader::loadNodeAsync(
           String::printf("%s/children/%ld", context.c_str(), index),
           gltf->nodes, index);
         promises.emplace_back([&]() -> void {
-          loadNodeAsync(String::printf("/nodes/%ld", childNode.index),
-                        childNode,
+          loadNodeAsync(String::printf("/nodes/%ld", childNode->index),
+                        *childNode,
                         [&](const TransformNodePtr& childBabylonMesh) -> void {
                           childBabylonMesh->parent = babylonTransformNode.get();
                         });
@@ -619,8 +620,8 @@ TransformNodePtr GLTFLoader::_loadMeshAsync(
   }
 
   if (node.skin.has_value()) {
-    const auto& skin = ArrayItem::Get(
-      String::printf("%s/skin", context.c_str()), gltf->skins, *node.skin);
+    auto& skin = ArrayItem::Get(String::printf("%s/skin", context.c_str()),
+                                gltf->skins, *node.skin);
     promises.emplace_back([&]() -> void {
       _loadSkinAsync(String::printf("/skins/%ld", skin.index), node, skin);
     });
@@ -638,10 +639,11 @@ TransformNodePtr GLTFLoader::_loadMeshAsync(
 }
 
 AbstractMeshPtr GLTFLoader::_loadMeshPrimitiveAsync(
-  const std::string& context, const std::string& name, INode& node,
-  const IMesh& mesh, IMeshPrimitive& primitive,
-  const std::function<void(const AbstractMeshPtr& babylonMesh)>& assign)
+  const std::string& /*context*/, const std::string& /*name*/, INode& /*node*/,
+  const IMesh& /*mesh*/, IMeshPrimitive& /*primitive*/,
+  const std::function<void(const AbstractMeshPtr& babylonMesh)>& /*assign*/)
 {
+#if 0
   logOpen(context);
 
   const auto canInstance
@@ -652,7 +654,7 @@ AbstractMeshPtr GLTFLoader::_loadMeshPrimitiveAsync(
   std::vector<std::function<void()>> promises;
 
   const auto& instanceData = primitive._instanceData;
-  if (canInstance && instanceData.has_value()) {
+  if (canInstance && instanceData) {
     babylonAbstractMesh = std::static_pointer_cast<AbstractMesh>(
       instanceData->babylonSourceMesh->createInstance(name));
   }
@@ -714,6 +716,8 @@ AbstractMeshPtr GLTFLoader::_loadMeshPrimitiveAsync(
   }
 
   return babylonAbstractMesh;
+#endif
+  return nullptr;
 }
 
 GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
@@ -740,7 +744,7 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
     babylonMesh->isUnIndexed = true;
   }
   else {
-    const auto& accessor
+    auto& accessor
       = ArrayItem::Get(String::printf("%s/indices", context.c_str()),
                        gltf->accessors, *primitive.indices);
     promises.emplace_back([this, &babylonGeometry, &accessor]() {
@@ -898,7 +902,7 @@ void GLTFLoader::_LoadTransform(const INode& node,
 }
 
 void GLTFLoader::_loadSkinAsync(const std::string& context, const INode& node,
-                                const ISkin& skin)
+                                ISkin& skin)
 {
   const auto& assignSkeleton = [&](const SkeletonPtr& skeleton) -> void {
     _forEachPrimitive(node, [&](const AbstractMeshPtr& babylonMesh) -> void {
@@ -906,8 +910,8 @@ void GLTFLoader::_loadSkinAsync(const std::string& context, const INode& node,
     });
   };
 
-  if (skin._data.has_value()) {
-    assignSkeleton(skin._data.babylonSkeleton);
+  if (skin._data) {
+    assignSkeleton(skin._data->babylonSkeleton);
     return;
   }
 
@@ -944,7 +948,7 @@ void GLTFLoader::_loadBones(const std::string& context, const ISkin& skin,
     auto& node
       = ArrayItem::Get(String::printf("%s/joints/%d", context.c_str(), index),
                        gltf->nodes, index);
-    _loadBone(node, skin, babylonSkeleton, babylonBones);
+    _loadBone(*node, skin, babylonSkeleton, babylonBones);
   }
 }
 
@@ -958,9 +962,9 @@ BonePtr GLTFLoader::_loadBone(INode& node, const ISkin& skin,
   }
 
   BonePtr babylonParentBone = nullptr;
-  if (node.parent && node.parent._babylonTransformNode != _rootBabylonMesh) {
+  if (node.parent && node.parent->_babylonTransformNode != _rootBabylonMesh) {
     babylonParentBone
-      = _loadBone(node.parent, skin, babylonSkeleton, babylonBones);
+      = _loadBone(*node.parent, skin, babylonSkeleton, babylonBones);
   }
 
   const auto boneIndex = stl_util::index_of(skin.joints, node.index);
@@ -985,7 +989,7 @@ GLTFLoader::_loadSkinInverseBindMatricesDataAsync(const std::string& context,
     return {};
   }
 
-  const auto& accessor
+  auto& accessor
     = ArrayItem::Get(String::printf("%s/inverseBindMatrices", context.c_str()),
                      gltf->accessors, *skin.inverseBindMatrices);
   return _loadFloatAccessorAsync(
@@ -1052,7 +1056,7 @@ CameraPtr GLTFLoader::loadCameraAsync(
   switch (camera.type) {
     case IGLTF2::CameraType::PERSPECTIVE: {
       const auto& perspective = camera.perspective;
-      if (!perspective.has_value()) {
+      if (!perspective) {
         throw new std::runtime_error(String::printf(
           "%s: Camera perspective properties are missing", context.c_str()));
       }
@@ -1065,7 +1069,7 @@ CameraPtr GLTFLoader::loadCameraAsync(
       break;
     }
     case IGLTF2::CameraType::ORTHOGRAPHIC: {
-      if (!camera.orthographic.has_value()) {
+      if (!camera.orthographic) {
         throw new std::runtime_error(String::printf(
           "%s: Camera orthographic properties are missing", context.c_str()));
       }
@@ -1165,9 +1169,9 @@ void GLTFLoader::_loadAnimationChannelAsync(
 
   // Ignore animations that have no animation targets.
   if ((channel.target.path == IGLTF2::AnimationChannelTargetPath::WEIGHTS
-       && !targetNode._numMorphTargets)
+       && !targetNode->_numMorphTargets)
       || (channel.target.path != IGLTF2::AnimationChannelTargetPath::WEIGHTS
-          && !targetNode._babylonTransformNode)) {
+          && !targetNode->_babylonTransformNode)) {
     return;
   }
 
@@ -1232,14 +1236,15 @@ void GLTFLoader::_loadAnimationChannelAsync(
   }
   else if (targetPath == "influence") {
     getNextOutputValue = [&]() -> AnimationValue {
-      Float32Array value(*targetNode._numMorphTargets);
-      for (size_t i = 0; i < *targetNode._numMorphTargets; ++i) {
+      Float32Array value(*targetNode->_numMorphTargets);
+      for (size_t i = 0; i < *targetNode->_numMorphTargets; ++i) {
         value[i] = data.output[outputBufferOffset++];
       }
       return value;
     };
   }
 
+  std::cout << animationType << std::endl;
 #if 0
   std::function<IAnimationKey(size_t frameIndex)> getNextKey;
   switch (data.interpolation) {
@@ -1332,7 +1337,7 @@ _IAnimationSamplerData
 GLTFLoader::_loadAnimationSamplerAsync(const std::string& context,
                                        IAnimationSampler& sampler)
 {
-  if (sampler._data.has_value()) {
+  if (sampler._data) {
     return *sampler._data;
   }
 
@@ -1350,10 +1355,10 @@ GLTFLoader::_loadAnimationSamplerAsync(const std::string& context,
     }
   }
 
-  const auto& inputAccessor
+  auto& inputAccessor
     = ArrayItem::Get(String::printf("%s/input", context.c_str()),
                      gltf->accessors, sampler.input);
-  const auto& outputAccessor
+  auto& outputAccessor
     = ArrayItem::Get(String::printf("%s/output", context.c_str()),
                      gltf->accessors, sampler.output);
   _IAnimationSamplerData samplerDdata{
@@ -1370,11 +1375,11 @@ GLTFLoader::_loadAnimationSamplerAsync(const std::string& context,
   return *sampler._data;
 }
 
-ArrayBufferView GLTFLoader::_loadBufferAsync(const std::string& context,
-                                             const IBuffer& buffer)
+ArrayBufferView& GLTFLoader::_loadBufferAsync(const std::string& context,
+                                              IBuffer& buffer)
 {
-  if (buffer._data.has_value()) {
-    return *buffer._data;
+  if (buffer._data) {
+    return buffer._data;
   }
 
   if (buffer.uri.empty()) {
@@ -1388,16 +1393,15 @@ ArrayBufferView GLTFLoader::_loadBufferAsync(const std::string& context,
   return buffer._data;
 }
 
-ArrayBufferView GLTFLoader::loadBufferViewAsync(const std::string& context,
-                                                const IBufferView& bufferView)
+ArrayBufferView& GLTFLoader::loadBufferViewAsync(const std::string& context,
+                                                 IBufferView& bufferView)
 {
-  if (bufferView._data.has_value()) {
-    return *bufferView._data;
+  if (bufferView._data) {
+    return bufferView._data;
   }
 
-  const auto& buffer
-    = ArrayItem::Get(String::printf("%s/buffer", context.c_str()),
-                     gltf->buffers, bufferView.buffer);
+  auto& buffer = ArrayItem::Get(String::printf("%s/buffer", context.c_str()),
+                                gltf->buffers, bufferView.buffer);
   const auto data
     = _loadBufferAsync(String::printf("/buffers/%ld", buffer.index), buffer);
   try {
@@ -1410,11 +1414,11 @@ ArrayBufferView GLTFLoader::loadBufferViewAsync(const std::string& context,
       String::printf("%s: %s", context.c_str(), e.what()));
   }
 
-  return *bufferView._data;
+  return bufferView._data;
 }
 
-IndicesArray GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
-                                                   const IAccessor& accessor)
+IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
+                                                    IAccessor& accessor)
 {
   if (accessor.type != IGLTF2::AccessorType::SCALAR) {
     throw new std::runtime_error(
@@ -1430,10 +1434,10 @@ IndicesArray GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
   }
 
   if (accessor._data.has_value()) {
-    return *accessor._data;
+    return accessor._data->uint32Array;
   }
 
-  const auto& bufferView
+  auto& bufferView
     = ArrayItem::Get(String::printf("%s/bufferView", context.c_str()),
                      gltf->bufferViews, *accessor.bufferView);
   const auto data = loadBufferViewAsync(
@@ -1441,11 +1445,11 @@ IndicesArray GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
   accessor._data = GLTFLoader::_GetTypedArray(
     context, accessor.componentType, data, accessor.byteOffset, accessor.count);
 
-  return *accessor._data;
+  return accessor._data->uint32Array;
 }
 
-Float32Array GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
-                                                 const IAccessor& accessor)
+Float32Array& GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
+                                                  IAccessor& accessor)
 {
   // TODO: support normalized and stride
 
@@ -1465,7 +1469,7 @@ Float32Array GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
     accessor._data = Float32Array(length);
   }
   else {
-    const auto& bufferView
+    auto& bufferView
       = ArrayItem::Get(String::printf("%s/bufferView", context.c_str()),
                        gltf->bufferViews, *accessor.bufferView);
     auto data = loadBufferViewAsync(
@@ -1474,16 +1478,16 @@ Float32Array GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
       context, accessor.componentType, data, accessor.byteOffset, length);
   }
 
-  if (accessor.sparse.has_value()) {
-    const auto sparse = *accessor.sparse;
+  if (accessor.sparse) {
+    const auto& sparse = *accessor.sparse;
     const auto accessor_data_then
       = [this, &context, &sparse, &numComponents,
          &accessor](const ArrayBufferView& view) -> Float32Array {
-      auto data                     = view.float32Array;
-      const auto& indicesBufferView = ArrayItem::Get(
+      auto data               = view.float32Array;
+      auto& indicesBufferView = ArrayItem::Get(
         String::printf("%s/sparse/indices/bufferView", context.c_str()),
         gltf->bufferViews, sparse.indices.bufferView);
-      const auto& valuesBufferView = ArrayItem::Get(
+      auto& valuesBufferView = ArrayItem::Get(
         String::printf("%s/sparse/values/bufferView", context.c_str()),
         gltf->bufferViews, sparse.values.bufferView);
       const auto indicesData = loadBufferViewAsync(
@@ -1515,29 +1519,30 @@ Float32Array GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
       }
       return data;
     };
-    accessor._data = accessor_data_then(accessor._data);
+    accessor._data = accessor_data_then(*accessor._data);
   }
 
   return accessor._data->float32Array;
 }
 
 BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
-                                                 const std::string& /*kind*/)
+                                                 unsigned int /*kind*/)
 {
   if (bufferView._babylonBuffer) {
     return bufferView._babylonBuffer;
   }
-
+#if 0
   auto data = loadBufferViewAsync(
     String::printf("/bufferViews/%ld", bufferView.index), bufferView);
   bufferView._babylonBuffer
     = std::make_shared<Buffer>(babylonScene->getEngine(), data, false);
-
+#endif
   return bufferView._babylonBuffer;
 }
 
-std::unique_ptr<VertexBuffer>& GLTFLoader::_loadVertexAccessorAsync(
-  const std::string& context, IAccessor& accessor, const std::string& kind)
+std::unique_ptr<VertexBuffer>&
+GLTFLoader::_loadVertexAccessorAsync(const std::string& /*context*/,
+                                     IAccessor& accessor, unsigned int kind)
 {
   if (accessor._babylonVertexBuffer) {
     return accessor._babylonVertexBuffer;
@@ -1565,25 +1570,28 @@ std::unique_ptr<VertexBuffer>& GLTFLoader::_loadVertexAccessorAsync(
       babylonScene->getEngine(), data, kind, false);
   }
   else {
+#if 0
     auto& bufferView
       = ArrayItem::Get(String::printf("%s/bufferView", context.c_str()),
                        gltf->bufferViews, *accessor.bufferView);
     auto babylonBuffer = _loadVertexBufferViewAsync(bufferView, kind);
     const auto size    = GLTFLoader::_GetNumComponents(context, accessor.type);
     accessor._babylonVertexBuffer = std::make_unique<VertexBuffer>(
-      babylonScene->getEngine(), babylonBuffer, kind, false, false,
+      babylonScene->getEngine(), babylonBuffer.get(), kind, false, false,
       bufferView.byteStride, false, accessor.byteOffset, size,
       accessor.componentType, accessor.normalized, true);
+#endif
   }
 
   return accessor._babylonVertexBuffer;
 }
 
 void GLTFLoader::_loadMaterialMetallicRoughnessPropertiesAsync(
-  const std::string& context,
-  std::optional<IMaterialPbrMetallicRoughness> properties,
-  const MaterialPtr& babylonMaterial)
+  const std::string& /*context*/,
+  std::optional<IMaterialPbrMetallicRoughness> /*properties*/,
+  const MaterialPtr& /*babylonMaterial*/)
 {
+#if 0
   auto babylonPBRMaterial
     = std::static_pointer_cast<PBRMaterial>(babylonMaterial);
   if (!babylonPBRMaterial) {
@@ -1606,7 +1614,7 @@ void GLTFLoader::_loadMaterialMetallicRoughnessPropertiesAsync(
     babylonPBRMaterial->metallic  = properties->metallicFactor.value_or(1.f);
     babylonPBRMaterial->roughness = properties->roughnessFactor.value_or(1.f);
 
-    if (properties->baseColorTexture.has_value()) {
+    if (properties->baseColorTexture) {
       promises.emplace_back([&]() {
         loadTextureInfoAsync(
           String::printf("%s/baseColorTexture", context.c_str()),
@@ -1615,11 +1623,11 @@ void GLTFLoader::_loadMaterialMetallicRoughnessPropertiesAsync(
             texture->name = String::printf("%s (Base Color)",
                                            babylonPBRMaterial->name.c_str());
             babylonPBRMaterial->albedoTexture = texture;
-          })
+          });
       });
     }
 
-    if (properties->metallicRoughnessTexture.has_value()) {
+    if (properties->metallicRoughnessTexture) {
       promises.emplace_back([&]() {
         loadTextureInfoAsync(
           String::printf("%s/metallicRoughnessTexture", context.c_str()),
@@ -1628,7 +1636,7 @@ void GLTFLoader::_loadMaterialMetallicRoughnessPropertiesAsync(
             texture->name = String::printf("%s (Metallic Roughness)",
                                            babylonPBRMaterial->name.c_str());
             babylonPBRMaterial->metallicTexture = texture;
-          })
+          });
       });
 
       babylonPBRMaterial->useMetallnessFromMetallicTextureBlue = true;
@@ -1640,7 +1648,7 @@ void GLTFLoader::_loadMaterialMetallicRoughnessPropertiesAsync(
   for (auto&& promise : promises) {
     promise();
   }
-
+#endif
   return;
 }
 
@@ -1749,11 +1757,11 @@ bool GLTFLoader::loadMaterialPropertiesAsync(const std::string& context,
     loadMaterialBasePropertiesAsync(context, material, babylonMaterial);
   });
 
-  if (material.pbrMetallicRoughness.has_value()) {
+  if (material.pbrMetallicRoughness) {
     promises.emplace_back([&]() -> void {
       _loadMaterialMetallicRoughnessPropertiesAsync(
         String::printf("%s/pbrMetallicRoughness", context.c_str()),
-        material.pbrMetallicRoughness, babylonMaterial);
+        *material.pbrMetallicRoughness, babylonMaterial);
     });
   }
 
@@ -1767,9 +1775,10 @@ bool GLTFLoader::loadMaterialPropertiesAsync(const std::string& context,
 }
 
 void GLTFLoader::loadMaterialBasePropertiesAsync(
-  const std::string& context, const IMaterial& material,
-  const MaterialPtr& babylonMaterial)
+  const std::string& /*context*/, const IMaterial& /*material*/,
+  const MaterialPtr& /*babylonMaterial*/)
 {
+#if 0
   auto babylonPBRMaterial
     = std::static_pointer_cast<PBRMaterial>(babylonMaterial);
   if (!babylonPBRMaterial) {
@@ -1788,7 +1797,7 @@ void GLTFLoader::loadMaterialBasePropertiesAsync(
     babylonPBRMaterial->twoSidedLighting = true;
   }
 
-  if (material.normalTexture.has_value()) {
+  if (material.normalTexture) {
     promises.emplace_back([&]() {
       loadTextureInfoAsync(
         String::printf("%s/normalTexture", context.c_str()),
@@ -1834,7 +1843,7 @@ void GLTFLoader::loadMaterialBasePropertiesAsync(
           texture->name
             = String::printf("%s (Emissive)", babylonPBRMaterial->name.c_str());
           babylonPBRMaterial->emissiveTexture = texture;
-        })
+        });
     });
   }
 
@@ -1843,6 +1852,7 @@ void GLTFLoader::loadMaterialBasePropertiesAsync(
   }
 
   return;
+#endif
 }
 
 void GLTFLoader::loadMaterialAlphaProperties(const std::string& context,
@@ -1982,7 +1992,7 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
 _ISamplerData GLTFLoader::_loadSampler(const std::string& context,
                                        ISampler& sampler)
 {
-  if (!sampler._data.has_value()) {
+  if (!sampler._data) {
     sampler._data = {
       (sampler.minFilter == IGLTF2::TextureMinFilter::NEAREST
        || sampler.minFilter == IGLTF2::TextureMinFilter::LINEAR), // noMipMaps
@@ -1997,10 +2007,10 @@ _ISamplerData GLTFLoader::_loadSampler(const std::string& context,
   return *sampler._data;
 }
 
-ArrayBufferView GLTFLoader::loadImageAsync(const std::string& context,
-                                           const IImage& image)
+ArrayBufferView& GLTFLoader::loadImageAsync(const std::string& context,
+                                            IImage& image)
 {
-  if (image._data.has_value()) {
+  if (image._data) {
     logOpen(String::printf("%s %s", context.c_str(), image.name.c_str()));
 
     if (!image.uri.empty()) {
@@ -2008,7 +2018,7 @@ ArrayBufferView GLTFLoader::loadImageAsync(const std::string& context,
         = loadUriAsync(String::printf("%s/uri", context.c_str()), image.uri);
     }
     else {
-      const auto& bufferView
+      auto& bufferView
         = ArrayItem::Get(String::printf("%s/bufferView", context.c_str()),
                          gltf->bufferViews, *image.bufferView);
       image._data = loadBufferViewAsync(
@@ -2024,6 +2034,7 @@ ArrayBufferView GLTFLoader::loadImageAsync(const std::string& context,
 ArrayBufferView GLTFLoader::loadUriAsync(const std::string& /*context*/,
                                          const std::string& /*uri*/)
 {
+  return ArrayBufferView();
 }
 
 void GLTFLoader::_onProgress()
@@ -2260,8 +2271,8 @@ void GLTFLoader::_forEachExtensions(
   for (const auto& name : GLTFLoader::_ExtensionNames) {
     if (stl_util::contains(_extensions, name)) {
       const auto& extension = _extensions[name];
-      if (extension.enabled) {
-        action(extension);
+      if (extension->enabled) {
+        action(*extension);
       }
     }
   }
@@ -2344,6 +2355,7 @@ ArrayBufferView
 GLTFLoader::_extensionsLoadUriAsync(const std::string& /*context*/,
                                     const std::string& /*uri*/)
 {
+  return ArrayBufferView();
 }
 
 void GLTFLoader::logOpen(const std::string& message)

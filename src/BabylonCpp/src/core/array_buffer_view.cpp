@@ -128,6 +128,11 @@ ArrayBufferView::~ArrayBufferView()
 {
 }
 
+size_t ArrayBufferView::byteLength() const
+{
+  return uint8Array.size();
+}
+
 ArrayBufferView::operator bool() const
 {
   return !int8Array.empty() && !uint8Array.empty() && !int16Array.empty()

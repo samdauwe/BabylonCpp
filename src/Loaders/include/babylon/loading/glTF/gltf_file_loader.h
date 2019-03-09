@@ -31,7 +31,6 @@ struct IGLTFLoader;
 struct IGLTFLoaderData;
 struct IGLTFLoaderExtension;
 struct IGLTFValidationResults;
-struct GLTFLoaderState;
 using IGLTFLoaderPtr = std::shared_ptr<IGLTFLoader>;
 
 struct UnpackedBinary {
@@ -248,7 +247,7 @@ private:
   void _validateAsync(Scene* scene, const std::string& json,
                       const std::string& rootUrl,
                       const std::string& fileName = "");
-  IGLTFLoader& _getLoader(const IGLTFLoaderData& loaderData);
+  //IGLTFLoader& _getLoader(const IGLTFLoaderData& loaderData);
   UnpackedBinary _unpackBinary(const ArrayBuffer& data);
   UnpackedBinary _unpackBinaryV1(BinaryReader& binaryReader) const;
   UnpackedBinary _unpackBinaryV2(BinaryReader& binaryReader) const;

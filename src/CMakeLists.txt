@@ -2,7 +2,7 @@
 #                            Configuration options                             #
 # ============================================================================ #
 option(OPTION_BUILD_INSPECTOR "Build the inspector debugging tool."  ON)
-option(OPTION_BUILD_LOADERS   "Build the loaders."                   OFF)
+option(OPTION_BUILD_LOADERS   "Build the loaders."                   ON)
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
     set(OPTION_BUILD_INSPECTOR OFF)
@@ -27,7 +27,7 @@ add_subdirectory(MaterialsLibrary)
 add_subdirectory(ProceduralTexturesLibrary)
 if (OPTION_BUILD_LOADERS)
     # - Loaders
-    #add_subdirectory(Loaders)
+    add_subdirectory(Loaders)
 endif()
 # - Inspector
 if (OPTION_BUILD_INSPECTOR)

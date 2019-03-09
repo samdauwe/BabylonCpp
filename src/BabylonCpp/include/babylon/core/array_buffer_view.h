@@ -30,6 +30,7 @@ struct ArrayBufferView {
   ArrayBufferView& operator=(ArrayBufferView&& other);
   ~ArrayBufferView();
 
+  size_t byteLength() const;
   operator bool() const;
 
   size_t byteOffset;
