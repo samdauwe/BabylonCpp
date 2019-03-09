@@ -9,7 +9,9 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/core/array_buffer_view.h>
 #include <babylon/loading/glTF/igltf_loader.h>
+#include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 
 using json = nlohmann::json;
 
@@ -48,7 +50,7 @@ namespace GLTF2 {
 struct _IAnimationSamplerData;
 struct _ISamplerData;
 struct GLTFFileLoader;
-struct GLTFLoader;
+class GLTFLoader;
 struct GLTFLoaderExtension;
 struct GLTFLoaderTracker;
 struct IAccessor;
@@ -63,6 +65,7 @@ struct IGLTFLoaderData;
 struct IGLTFLoaderExtension;
 struct IImage;
 struct IMaterial;
+struct IMaterialData;
 struct IMaterialPbrMetallicRoughness;
 struct IMesh;
 struct IMeshPrimitive;
@@ -159,7 +162,8 @@ public:
   GLTFLoaderState& state();
 
   /** Hidden */
-  void dispose();
+  void dispose(bool doNotRecurse               = false,
+               bool disposeMaterialAndTextures = false) override;
 
   /** Hidden */
   ImportMeshResult importMeshAsync(
@@ -235,8 +239,8 @@ public:
    * @brief Hidden
    */
   MaterialPtr _loadMaterialAsync(
-    const std::string& context, const IMaterial& material,
-    const MeshPtr& babylonMesh, unsigned int babylonDrawMode,
+    const std::string& context, IMaterial& material, const MeshPtr& babylonMesh,
+    unsigned int babylonDrawMode,
     const std::function<void(const MaterialPtr& babylonMaterial)>& assign);
 
   /**
@@ -257,7 +261,7 @@ public:
    * @param babylonMaterial The Babylon material
    * @returns A promise that resolves when the load is complete
    */
-  void loadMaterialPropertiesAsync(const std::string& context,
+  bool loadMaterialPropertiesAsync(const std::string& context,
                                    const IMaterial& material,
                                    const MaterialPtr& babylonMaterial);
 
@@ -333,6 +337,15 @@ public:
    * @param pointer the JSON pointer
    */
   void AddPointerMetadata(const TransformNodePtr& babylonObject,
+                          const std::string& pointer);
+
+  /**
+   * @brief Adds a JSON pointer to the metadata of the Babylon object at
+   * `<object>.metadata.gltf.pointers`.
+   * @param babylonObject the Babylon object with metadata
+   * @param pointer the JSON pointer
+   */
+  void AddPointerMetadata(const MaterialPtr& babylonObject,
                           const std::string& pointer);
 
   /**
@@ -433,7 +446,7 @@ private:
   void _loadAnimationsAsync();
   void _loadAnimationChannelAsync(
     const std::string& context, const std::string& animationContext,
-    const IAnimation& animation, const IAnimationChannel& channel,
+    IAnimation& animation, const IAnimationChannel& channel,
     const AnimationGroupPtr& babylonAnimationGroup);
   _IAnimationSamplerData _loadAnimationSamplerAsync(const std::string& context,
                                                     IAnimationSampler& sampler);
@@ -497,16 +510,16 @@ private:
                                              const MeshPtr& babylonMesh);
   MaterialPtr _extensionsLoadMaterialAsync(
     const std::string& context, const IMaterial& material,
-    const Mesh& babylonMesh, unsigned int babylonDrawMode,
+    const MeshPtr& babylonMesh, unsigned int babylonDrawMode,
     const std::function<void(const MaterialPtr& babylonMaterial)>& assign);
   MaterialPtr _extensionsCreateMaterial(const std::string& context,
                                         const IMaterial& material,
                                         unsigned int babylonDrawMode);
-  void
+  bool
   _extensionsLoadMaterialPropertiesAsync(const std::string& context,
                                          const IMaterial& material,
                                          const MaterialPtr& babylonMaterial);
-  BaseTexturePtr& _extensionsLoadTextureInfoAsync(
+  BaseTexturePtr _extensionsLoadTextureInfoAsync(
     const std::string& context, const ITextureInfo& textureInfo,
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,

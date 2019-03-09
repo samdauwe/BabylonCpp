@@ -1,10 +1,12 @@
 # ============================================================================ #
 #                            Configuration options                             #
 # ============================================================================ #
-option(OPTION_BUILD_INSPECTOR "Build shared the inspector debugging tool."  ON)
+option(OPTION_BUILD_INSPECTOR "Build the inspector debugging tool."  ON)
+option(OPTION_BUILD_LOADERS   "Build the loaders."                   OFF)
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
     set(OPTION_BUILD_INSPECTOR OFF)
+    set(OPTION_BUILD_LOADERS   OFF)
 endif()
 
 # ============================================================================ #
@@ -23,8 +25,10 @@ add_subdirectory(Extensions)
 add_subdirectory(MaterialsLibrary)
 # - Procedural Textures Library
 add_subdirectory(ProceduralTexturesLibrary)
-# - Loaders
-#add_subdirectory(Loaders)
+if (OPTION_BUILD_LOADERS)
+    # - Loaders
+    #add_subdirectory(Loaders)
+endif()
 # - Inspector
 if (OPTION_BUILD_INSPECTOR)
     # Include Inspector

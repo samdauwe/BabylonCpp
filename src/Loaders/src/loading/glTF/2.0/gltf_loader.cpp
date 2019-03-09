@@ -11,12 +11,13 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/core/time.h>
+#include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_extension.h>
-#include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/geometry.h>
@@ -76,7 +77,8 @@ GLTFLoaderState& GLTFLoader::state()
   return _state;
 }
 
-void GLTFLoader::dispose()
+void GLTFLoader::dispose(bool /*doNotRecurse*/,
+                         bool /*disposeMaterialAndTextures*/)
 {
 }
 
@@ -285,7 +287,7 @@ void GLTFLoader::_loadExtensions()
     const auto& extension = GLTFLoader::_ExtensionFactories[name](*this);
     _extensions[name]     = extension;
 
-    _parent->onExtensionLoadedObservable.notifyObservers(extension);
+    // _parent->onExtensionLoadedObservable.notifyObservers(extension);
   }
 
   _parent->onExtensionLoadedObservable.clear();
@@ -682,7 +684,7 @@ AbstractMeshPtr GLTFLoader::_loadMeshPrimitiveAsync(
       babylonMesh->material = babylonMaterial;
     }
     else {
-      const auto& material
+      auto& material
         = ArrayItem::Get(String::printf("%s/material", context.c_str()),
                          gltf->materials, *primitive.material);
       promises.emplace_back([&]() -> void {
@@ -749,7 +751,7 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
   }
 
   const auto loadAttribute
-    = [&](const std::string& attribute, const std::string& kind,
+    = [&](const std::string& attribute, const std::string& /*kind*/,
           const std::function<void(const IAccessor& accessor)>& callback
           = nullptr) -> void {
     if (!stl_util::contains(attributes, attribute)) {
@@ -764,10 +766,12 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
       String::printf("%s/attributes/%s", context.c_str(), attribute.c_str()),
       gltf->accessors, attributes[attribute]);
     promises.emplace_back([&]() -> void {
+#if 0
       auto babylonVertexBuffer = babylonGeometry->setVerticesBuffer(
         _loadVertexAccessorAsync(
           String::printf("/accessors/%ld", accessor.index), accessor, kind),
         accessor.count);
+#endif
     });
 
     if (callback) {
@@ -914,7 +918,9 @@ void GLTFLoader::_loadSkinAsync(const std::string& context, const INode& node,
   // See
   // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#skins
   // (second implementation note)
+#if 0
   babylonSkeleton->overrideMesh = _rootBabylonMesh;
+#endif
 
   _loadBones(context, skin, babylonSkeleton);
   assignSkeleton(babylonSkeleton);
@@ -1146,8 +1152,8 @@ AnimationGroupPtr GLTFLoader::loadAnimationAsync(const std::string& context,
 
 void GLTFLoader::_loadAnimationChannelAsync(
   const std::string& context, const std::string& animationContext,
-  const IAnimation& animation, const IAnimationChannel& channel,
-  const AnimationGroupPtr& babylonAnimationGroup)
+  IAnimation& animation, const IAnimationChannel& channel,
+  const AnimationGroupPtr& /*babylonAnimationGroup*/)
 {
   if (!channel.target.node.has_value()) {
     return;
@@ -1165,10 +1171,9 @@ void GLTFLoader::_loadAnimationChannelAsync(
     return;
   }
 
-  const auto& sampler
-    = ArrayItem::Get(String::printf("%s/sampler", context.c_str()),
-                     animation.samplers, channel.sampler);
-  auto data = _loadAnimationSamplerAsync(
+  auto& sampler = ArrayItem::Get(String::printf("%s/sampler", context.c_str()),
+                                 animation.samplers, channel.sampler);
+  auto data     = _loadAnimationSamplerAsync(
     String::printf("%s/samplers/%ld", animationContext.c_str(),
                    channel.sampler),
     sampler);
@@ -1202,7 +1207,7 @@ void GLTFLoader::_loadAnimationChannelAsync(
     }
   }
 
-  size_t outputBufferOffset = 0;
+  unsigned int outputBufferOffset = 0;
   std::function<AnimationValue()> getNextOutputValue;
   if (targetPath == "position") {
     getNextOutputValue = [&]() -> AnimationValue {
@@ -1235,6 +1240,7 @@ void GLTFLoader::_loadAnimationChannelAsync(
     };
   }
 
+#if 0
   std::function<IAnimationKey(size_t frameIndex)> getNextKey;
   switch (data.interpolation) {
     case IGLTF2::AnimationSamplerInterpolation::STEP: {
@@ -1319,6 +1325,7 @@ void GLTFLoader::_loadAnimationChannelAsync(
     babylonAnimationGroup->addTargetedAnimation(
       babylonAnimation, targetNode._babylonTransformNode);
   }
+#endif
 }
 
 _IAnimationSamplerData
@@ -1638,10 +1645,56 @@ void GLTFLoader::_loadMaterialMetallicRoughnessPropertiesAsync(
 }
 
 MaterialPtr GLTFLoader::_loadMaterialAsync(
-  const std::string& context, const IMaterial& material,
-  const MeshPtr& babylonMesh, unsigned int babylonDrawMode,
+  const std::string& context, IMaterial& material, const MeshPtr& babylonMesh,
+  unsigned int babylonDrawMode,
   const std::function<void(const MaterialPtr& babylonMaterial)>& assign)
 {
+  const auto extensionPromise = _extensionsLoadMaterialAsync(
+    context, material, babylonMesh, babylonDrawMode, assign);
+  if (extensionPromise) {
+    return extensionPromise;
+  }
+
+  std::optional<GLTF2::IMaterialData> babylonData = std::nullopt;
+  if (stl_util::contains(material._data, babylonDrawMode)) {
+    babylonData = material._data[babylonDrawMode];
+  }
+
+  if (!babylonData.has_value()) {
+    logOpen(String::printf("%s %s", context.c_str(), material.name.c_str()));
+
+    const auto babylonMaterial
+      = createMaterial(context, material, babylonDrawMode);
+
+    babylonData = GLTF2::IMaterialData{
+      babylonMaterial, // babylonMaterial
+      {},              // babylonMeshes
+      [&]() -> void {
+        loadMaterialPropertiesAsync(context, material, babylonMaterial);
+      } // promise
+    };
+
+    material._data[babylonDrawMode] = *babylonData;
+
+    GLTFLoader::AddPointerMetadata(babylonMaterial, context);
+    _parent->onMaterialLoadedObservable.notifyObservers(babylonMaterial.get());
+
+    logClose();
+  }
+
+  babylonData->babylonMeshes.emplace_back(babylonMesh);
+
+  babylonMesh->onDisposeObservable.addOnce([&](Node*, EventState&) -> void {
+    auto it = std::find(babylonData->babylonMeshes.begin(),
+                        babylonData->babylonMeshes.end(), babylonMesh);
+    if (it != babylonData->babylonMeshes.end()) {
+      babylonData->babylonMeshes.erase(it);
+    }
+  });
+
+  assign(babylonData->babylonMaterial);
+
+  return babylonData->babylonMaterial;
 }
 
 MaterialPtr GLTFLoader::_createDefaultMaterial(const std::string& name,
@@ -1680,10 +1733,37 @@ MaterialPtr GLTFLoader::createMaterial(const std::string& context,
   return babylonMaterial;
 }
 
-void GLTFLoader::loadMaterialPropertiesAsync(const std::string& context,
+bool GLTFLoader::loadMaterialPropertiesAsync(const std::string& context,
                                              const IMaterial& material,
                                              const MaterialPtr& babylonMaterial)
 {
+  const auto extensionPromise = _extensionsLoadMaterialPropertiesAsync(
+    context, material, babylonMaterial);
+  if (extensionPromise) {
+    return extensionPromise;
+  }
+
+  std::vector<std::function<void()>> promises;
+
+  promises.emplace_back([&]() -> void {
+    loadMaterialBasePropertiesAsync(context, material, babylonMaterial);
+  });
+
+  if (material.pbrMetallicRoughness.has_value()) {
+    promises.emplace_back([&]() -> void {
+      _loadMaterialMetallicRoughnessPropertiesAsync(
+        String::printf("%s/pbrMetallicRoughness", context.c_str()),
+        material.pbrMetallicRoughness, babylonMaterial);
+    });
+  }
+
+  loadMaterialAlphaProperties(context, material, babylonMaterial);
+
+  for (auto&& promise : promises) {
+    promise();
+  }
+
+  return true;
 }
 
 void GLTFLoader::loadMaterialBasePropertiesAsync(
@@ -1843,6 +1923,60 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
   const std::string& context, const ITexture& texture,
   const std::function<void(const BaseTexturePtr& babylonTexture)>& assign)
 {
+  std::vector<std::function<void()>> promises;
+
+  logOpen(String::printf("%s %s", context.c_str(), texture.name.c_str()));
+
+#if 0
+  const auto& sampler
+    = (!texture.sampler.has_value() ?
+         GLTFLoader::_DefaultSampler :
+         ArrayItem::Get(String::printf("%s/sample", context.c_str()),
+                        gltf->samplers, *texture.sampler));
+#else
+  auto& sampler = gltf->samplers[0];
+#endif
+  const auto samplerData
+    = _loadSampler(String::printf("/samplers/%ld", sampler.index), sampler);
+
+  const auto image = ArrayItem::Get(
+    String::printf("%s/source", context.c_str()), gltf->images, texture.source);
+  std::string url;
+  if (!image.uri.empty()) {
+    if (Tools::IsBase64(image.uri)) {
+      url = image.uri;
+    }
+    else if (!babylonScene->getEngine()->textureFormatInUse().empty()) {
+      // If an image uri and a texture format is set like (eg. KTX) load from
+      // url instead of blob to support texture format and fallback
+      url = _rootUrl + image.uri;
+    }
+  }
+
+  auto babylonTexture = Texture::New(
+    url, babylonScene, samplerData.noMipMaps, false, samplerData.samplingMode,
+    nullptr,
+    [this, &context](const std::string& message, const std::string& exception) {
+      if (!_disposed) {
+        throw std::runtime_error(String::printf(
+          "%s: %s", context.c_str(),
+          !exception.empty() ?
+            exception :
+            !message.empty() ? message.c_str() : "Failed to load texture"));
+      }
+    });
+
+  babylonTexture->wrapU = samplerData.wrapU;
+  babylonTexture->wrapV = samplerData.wrapV;
+  assign(babylonTexture);
+
+  logClose();
+
+  for (auto&& promise : promises) {
+    promise();
+  }
+
+  return std::move(babylonTexture);
 }
 
 _ISamplerData GLTFLoader::_loadSampler(const std::string& context,
@@ -1887,8 +2021,8 @@ ArrayBufferView GLTFLoader::loadImageAsync(const std::string& context,
   return image._data;
 }
 
-ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context,
-                                         const std::string& uri)
+ArrayBufferView GLTFLoader::loadUriAsync(const std::string& /*context*/,
+                                         const std::string& /*uri*/)
 {
 }
 
@@ -1896,18 +2030,23 @@ void GLTFLoader::_onProgress()
 {
 }
 
-void GLTFLoader::AddPointerMetadata(const BaseTexturePtr& babylonObject,
-                                    const std::string& pointer)
+void GLTFLoader::AddPointerMetadata(const BaseTexturePtr& /*babylonObject*/,
+                                    const std::string& /*pointer*/)
 {
 }
 
-void GLTFLoader::AddPointerMetadata(const TransformNodePtr& babylonObject,
-                                    const std::string& pointer)
+void GLTFLoader::AddPointerMetadata(const TransformNodePtr& /*babylonObject*/,
+                                    const std::string& /*pointer*/)
 {
 }
 
-void GLTFLoader::AddPointerMetadata(const CameraPtr& babylonObject,
-                                    const std::string& pointer)
+void GLTFLoader::AddPointerMetadata(const CameraPtr& /*babylonObject*/,
+                                    const std::string& /*pointer*/)
+{
+}
+
+void GLTFLoader::AddPointerMetadata(const MaterialPtr& /*babylonObject*/,
+                                    const std::string& /*pointer*/)
 {
 }
 
@@ -2136,64 +2275,74 @@ void GLTFLoader::_extensionsOnReady()
 {
 }
 
-bool GLTFLoader::_extensionsLoadSceneAsync(const std::string& context,
-                                           const IScene& scene)
+bool GLTFLoader::_extensionsLoadSceneAsync(const std::string& /*context*/,
+                                           const IScene& /*scene*/)
 {
   return false;
 }
 
 TransformNodePtr GLTFLoader::_extensionsLoadNodeAsync(
-  const std::string& context, const INode& node,
+  const std::string& /*context*/, const INode& /*node*/,
   const std::function<void(const TransformNodePtr& babylonTransformNode)>&
-    assign)
+  /*assign*/)
 {
+  return nullptr;
 }
 
 CameraPtr GLTFLoader::_extensionsLoadCameraAsync(
-  const std::string& context, const ICamera& camera,
-  const std::function<void(const CameraPtr& babylonCamera)>& assign)
+  const std::string& /*context*/, const ICamera& /*camera*/,
+  const std::function<void(const CameraPtr& babylonCamera)>& /*assign*/)
 {
+  return nullptr;
 }
 
-GeometryPtr _extensionsLoadVertexDataAsync(const std::string& context,
-                                           const IMeshPrimitive& primitive,
-                                           const MeshPtr& babylonMesh)
+GeometryPtr _extensionsLoadVertexDataAsync(const std::string& /*context*/,
+                                           const IMeshPrimitive& /*primitive*/,
+                                           const MeshPtr& /*babylonMesh*/)
 {
+  return nullptr;
 }
 
 MaterialPtr GLTFLoader::_extensionsLoadMaterialAsync(
-  const std::string& context, const IMaterial& material,
-  const Mesh& babylonMesh, unsigned int babylonDrawMode,
-  const std::function<void(const MaterialPtr& babylonMaterial)>& assign)
+  const std::string& /*context*/, const IMaterial& /*material*/,
+  const MeshPtr& /*babylonMesh*/, unsigned int /*babylonDrawMode*/,
+  const std::function<void(const MaterialPtr& babylonMaterial)>& /*assign*/)
 {
+  return nullptr;
 }
 
-MaterialPtr GLTFLoader::_extensionsCreateMaterial(const std::string& context,
-                                                  const IMaterial& material,
-                                                  unsigned int babylonDrawMode)
+MaterialPtr
+GLTFLoader::_extensionsCreateMaterial(const std::string& /*context*/,
+                                      const IMaterial& /*material*/,
+                                      unsigned int /*babylonDrawMode*/)
 {
+  return nullptr;
 }
 
-void GLTFLoader::_extensionsLoadMaterialPropertiesAsync(
-  const std::string& context, const IMaterial& material,
-  const MaterialPtr& babylonMaterial)
+bool GLTFLoader::_extensionsLoadMaterialPropertiesAsync(
+  const std::string& /*context*/, const IMaterial& /*material*/,
+  const MaterialPtr& /*babylonMaterial*/)
 {
+  return false;
 }
 
-BaseTexturePtr& GLTFLoader::_extensionsLoadTextureInfoAsync(
-  const std::string& context, const ITextureInfo& textureInfo,
-  const std::function<void(const BaseTexture& babylonTexture)>& assign)
+BaseTexturePtr GLTFLoader::_extensionsLoadTextureInfoAsync(
+  const std::string& /*context*/, const ITextureInfo& /*textureInfo*/,
+  const std::function<void(const BaseTexturePtr& babylonTexture)>& /*assign*/)
 {
+  return nullptr;
 }
 
 AnimationGroupPtr
-GLTFLoader::_extensionsLoadAnimationAsync(const std::string& context,
-                                          const IAnimation& animation)
+GLTFLoader::_extensionsLoadAnimationAsync(const std::string& /*context*/,
+                                          const IAnimation& /*animation*/)
 {
+  return nullptr;
 }
 
-ArrayBufferView GLTFLoader::_extensionsLoadUriAsync(const std::string& context,
-                                                    const std::string& uri)
+ArrayBufferView
+GLTFLoader::_extensionsLoadUriAsync(const std::string& /*context*/,
+                                    const std::string& /*uri*/)
 {
 }
 
