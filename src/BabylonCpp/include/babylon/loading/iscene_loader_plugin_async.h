@@ -17,16 +17,20 @@ struct IParticleSystem;
 class Scene;
 class SceneLoaderProgressEvent;
 class Skeleton;
-using AssetContainerPtr = std::shared_ptr<AssetContainer>;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using AnimationGroupPtr  = std::shared_ptr<AnimationGroup>;
+using AssetContainerPtr  = std::shared_ptr<AssetContainer>;
+using IParticleSystemPtr = std::shared_ptr<IParticleSystem>;
+using SkeletonPtr        = std::shared_ptr<Skeleton>;
 
 /**
  * @brief The loaded meshes, particle systems, skeletons, and animation groups.
  */
 struct ImportedMeshes {
-  std::vector<AbstractMesh*> meshes;
-  std::vector<IParticleSystem*> particleSystems;
-  std::vector<Skeleton*> skeletons;
-  std::vector<AnimationGroup*> animationGroups;
+  std::vector<AbstractMeshPtr> meshes;
+  std::vector<IParticleSystemPtr> particleSystems;
+  std::vector<SkeletonPtr> skeletons;
+  std::vector<AnimationGroupPtr> animationGroups;
 }; // end of struct ImportedMeshes
 
 struct BABYLON_SHARED_EXPORT ISceneLoaderPluginAsync {

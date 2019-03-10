@@ -46,6 +46,10 @@ struct Version {
 class BABYLON_SHARED_EXPORT GLTFFileLoader : public IDisposable,
                                              public ISceneLoaderPluginAsync {
 
+public:
+  /** Hidden */
+  static IGLTFLoaderPtr _CreateGLTF2Loader(GLTFFileLoader& parent);
+
 private:
   static const std::string _logSpaces;
 
@@ -247,7 +251,7 @@ private:
   void _validateAsync(Scene* scene, const std::string& json,
                       const std::string& rootUrl,
                       const std::string& fileName = "");
-  //IGLTFLoader& _getLoader(const IGLTFLoaderData& loaderData);
+  IGLTFLoaderPtr _getLoader(const IGLTFLoaderData& loaderData);
   UnpackedBinary _unpackBinary(const ArrayBuffer& data);
   UnpackedBinary _unpackBinaryV1(BinaryReader& binaryReader) const;
   UnpackedBinary _unpackBinaryV2(BinaryReader& binaryReader) const;
@@ -344,7 +348,7 @@ public:
   /**
    * Function called before loading a url referenced by the asset.
    */
-  std::function<void(const std::string& url)> preprocessUrlAsync;
+  std::function<std::string(const std::string& url)> preprocessUrlAsync;
 
   /**
    * Observable raised when the loader creates a mesh after parsing the glTF

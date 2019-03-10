@@ -4979,4 +4979,12 @@ IFileRequest Scene::_loadFile(
   return IFileRequest();
 }
 
+std::variant<std::string, ArrayBuffer>
+Scene::_loadFileAsync(const std::string& /*url*/,
+                      const std::optional<bool>& /*useDatabase*/,
+                      const std::optional<bool>& /*useArrayBuffer*/)
+{
+  return ArrayBuffer();
+}
+
 } // end of namespace BABYLON

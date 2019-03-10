@@ -1669,6 +1669,14 @@ public:
     const std::function<void(std::variant<std::string, ArrayBuffer>& data,
                              const std::string& responseURL)>& onSuccess);
 
+  /**
+   * @brief Hidden
+   */
+  std::variant<std::string, ArrayBuffer>
+  _loadFileAsync(const std::string& url,
+                 const std::optional<bool>& useDatabase    = std::nullopt,
+                 const std::optional<bool>& useArrayBuffer = std::nullopt);
+
 protected:
   /**
    * @brief Creates a new Scene.

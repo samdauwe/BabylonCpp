@@ -49,8 +49,9 @@ namespace GLTF2 {
 
 struct IGLTFLoaderExtension;
 class GLTFFileLoader;
+class GLTFLoader;
 using IGLTFLoaderExtensionPtr = std::shared_ptr<IGLTFLoaderExtension>;
-using GLTFFileLoaderPtr       = std::shared_ptr<GLTFFileLoader>;
+using GLTFLoaderPtr           = std::shared_ptr<GLTFLoader>;
 
 /**
  * @brief Helper class for working with arrays when loading the glTF asset.
@@ -123,6 +124,12 @@ private:
     _ExtensionFactories;
 
 public:
+  template <typename... Ts>
+  static GLTFLoaderPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<GLTFLoader>(
+      new GLTFLoader(std::forward<Ts>(args)...));
+  }
   virtual ~GLTFLoader();
 
   /**
@@ -135,7 +142,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
   /** Hidden */
-  ImportMeshResult importMeshAsync(
+  ImportedMeshes importMeshAsync(
     const std::vector<std::string>& meshesNames, Scene* scene,
     const IGLTFLoaderData& data, const std::string& rootUrl,
     const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
@@ -356,7 +363,7 @@ public:
 
 protected:
   /** Hidden */
-  GLTFLoader(const GLTFFileLoaderPtr& parent);
+  GLTFLoader(GLTFFileLoader& parent);
 
 private:
   /** Hidden */
@@ -504,7 +511,7 @@ public:
 
 private:
   bool _disposed;
-  GLTFFileLoaderPtr _parent;
+  GLTFFileLoader& _parent;
   GLTFLoaderState _state;
   std::unordered_map<std::string, IGLTFLoaderExtensionPtr> _extensions;
   std::string _rootUrl;

@@ -17,6 +17,7 @@ namespace BABYLON {
 class AbstractMesh;
 class AnimationGroup;
 struct ArrayBufferView;
+struct ImportedMeshes;
 struct IParticleSystem;
 class ProgressEvent;
 class Scene;
@@ -125,19 +126,14 @@ enum class GLTFLoaderState {
   COMPLETE
 }; // end of enum class GLTFLoaderState
 
-struct ImportMeshResult {
-  std::vector<AbstractMeshPtr> meshes;
-  std::vector<IParticleSystemPtr> particleSystems;
-  std::vector<SkeletonPtr> skeletons;
-  std::vector<AnimationGroupPtr> animationGroups;
-}; // end of struct ImportMeshResult
-
 /**
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT IGLTFLoader : public IDisposable {
 
-  virtual ImportMeshResult importMeshAsync(
+  std::optional<GLTFLoaderState> state = std::nullopt;
+
+  virtual ImportedMeshes importMeshAsync(
     const std::vector<std::string>& meshesNames, Scene* scene,
     const IGLTFLoaderData& data, const std::string& rootUrl,
     const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress

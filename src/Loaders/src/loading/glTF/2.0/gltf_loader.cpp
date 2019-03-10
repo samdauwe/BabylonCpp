@@ -22,7 +22,6 @@
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/tools/tools.h>
@@ -59,7 +58,7 @@ bool GLTFLoader::UnregisterExtension(const std::string& name)
   return true;
 }
 
-GLTFLoader::GLTFLoader(const GLTFFileLoaderPtr& parent)
+GLTFLoader::GLTFLoader(GLTFFileLoader& parent)
     : gltf{nullptr}
     , babylonScene{nullptr}
     , _disposed{false}
@@ -83,7 +82,7 @@ void GLTFLoader::dispose(bool /*doNotRecurse*/,
 {
 }
 
-ImportMeshResult GLTFLoader::importMeshAsync(
+ImportedMeshes GLTFLoader::importMeshAsync(
   const std::vector<std::string>& meshesNames, Scene* scene,
   const IGLTFLoaderData& data, const std::string& rootUrl,
   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
@@ -117,7 +116,7 @@ ImportMeshResult GLTFLoader::importMeshAsync(
     }
   }
 
-  ImportMeshResult result;
+  ImportedMeshes result;
   _loadAsync(nodes, [this, &result]() -> void {
     result = {
       _getMeshes(),         // meshes
@@ -157,8 +156,8 @@ void GLTFLoader::_loadAsync(const std::vector<size_t> nodes,
   const std::string loadingToReadyCounterName    = "LOADING => READY";
   const std::string loadingToCompleteCounterName = "LOADING => COMPLETE";
 
-  _parent->_startPerformanceCounter(loadingToReadyCounterName);
-  _parent->_startPerformanceCounter(loadingToCompleteCounterName);
+  _parent._startPerformanceCounter(loadingToReadyCounterName);
+  _parent._startPerformanceCounter(loadingToCompleteCounterName);
 
   _setState(GLTFLoaderState::LOADING);
   _extensionsOnLoading();
@@ -178,11 +177,11 @@ void GLTFLoader::_loadAsync(const std::vector<size_t> nodes,
     });
   }
 
-  if (_parent->compileMaterials) {
+  if (_parent.compileMaterials) {
     promises.emplace_back([this]() -> void { _compileMaterialsAsync(); });
   }
 
-  if (_parent->compileShadowGenerators) {
+  if (_parent.compileShadowGenerators) {
     promises.emplace_back(
       [this]() -> void { _compileShadowGeneratorsAsync(); });
   }
@@ -204,15 +203,15 @@ void GLTFLoader::_loadAsync(const std::vector<size_t> nodes,
   resultFunc();
 
   // READY => COMPLETE
-  _parent->_endPerformanceCounter(loadingToReadyCounterName);
+  _parent._endPerformanceCounter(loadingToReadyCounterName);
 
   if (!_disposed) {
-    _parent->_endPerformanceCounter(loadingToCompleteCounterName);
+    _parent._endPerformanceCounter(loadingToCompleteCounterName);
 
     _setState(GLTFLoaderState::COMPLETE);
 
-    _parent->onCompleteObservable.notifyObservers(nullptr);
-    _parent->onCompleteObservable.clear();
+    _parent.onCompleteObservable.notifyObservers(nullptr);
+    _parent.onCompleteObservable.clear();
 
     dispose();
   }
@@ -291,7 +290,7 @@ void GLTFLoader::_loadExtensions()
     // _parent->onExtensionLoadedObservable.notifyObservers(extension);
   }
 
-  _parent->onExtensionLoadedObservable.clear();
+  _parent.onExtensionLoadedObservable.clear();
 }
 
 void GLTFLoader::_checkExtensions()
@@ -320,7 +319,7 @@ INodePtr GLTFLoader::_createRootNode()
   auto rootNode                   = std::make_shared<INode>();
   rootNode->_babylonTransformNode = _rootBabylonMesh;
 
-  switch (_parent->coordinateSystemMode) {
+  switch (_parent.coordinateSystemMode) {
     case GLTFLoaderCoordinateSystemMode::AUTO: {
       if (!babylonScene->useRightHandedSystem()) {
         rootNode->rotation = {0.f, 1.f, 0.f, 0.f};
@@ -338,7 +337,7 @@ INodePtr GLTFLoader::_createRootNode()
     }
   }
 
-  _parent->onMeshLoadedObservable.notifyObservers(_rootBabylonMesh.get());
+  _parent.onMeshLoadedObservable.notifyObservers(_rootBabylonMesh.get());
   return rootNode;
 }
 
@@ -456,7 +455,7 @@ std::vector<AnimationGroupPtr> GLTFLoader::_getAnimationGroups()
 
 void GLTFLoader::_startAnimations()
 {
-  switch (_parent->animationStartMode) {
+  switch (_parent.animationStartMode) {
     case GLTFLoaderAnimationStartMode::NONE: {
       // do nothing
       break;
@@ -1057,7 +1056,7 @@ CameraPtr GLTFLoader::loadCameraAsync(
     case IGLTF2::CameraType::PERSPECTIVE: {
       const auto& perspective = camera.perspective;
       if (!perspective) {
-        throw new std::runtime_error(String::printf(
+        throw std::runtime_error(String::printf(
           "%s: Camera perspective properties are missing", context.c_str()));
       }
 
@@ -1070,7 +1069,7 @@ CameraPtr GLTFLoader::loadCameraAsync(
     }
     case IGLTF2::CameraType::ORTHOGRAPHIC: {
       if (!camera.orthographic) {
-        throw new std::runtime_error(String::printf(
+        throw std::runtime_error(String::printf(
           "%s: Camera orthographic properties are missing", context.c_str()));
       }
 
@@ -1084,13 +1083,13 @@ CameraPtr GLTFLoader::loadCameraAsync(
       break;
     }
     default: {
-      throw new std::runtime_error(
+      throw std::runtime_error(
         String::printf("%s: Invalid camera type", context.c_str()));
     }
   }
 
   GLTFLoader::AddPointerMetadata(babylonCamera, context);
-  _parent->onCameraLoadedObservable.notifyObservers(babylonCamera.get());
+  _parent.onCameraLoadedObservable.notifyObservers(babylonCamera.get());
   assign(babylonCamera);
 
   return babylonCamera;
@@ -1410,7 +1409,7 @@ ArrayBufferView& GLTFLoader::loadBufferViewAsync(const std::string& context,
       bufferView.byteLength);
   }
   catch (const std::exception& e) {
-    throw new std::runtime_error(
+    throw std::runtime_error(
       String::printf("%s: %s", context.c_str(), e.what()));
   }
 
@@ -1421,7 +1420,7 @@ IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
                                                     IAccessor& accessor)
 {
   if (accessor.type != IGLTF2::AccessorType::SCALAR) {
-    throw new std::runtime_error(
+    throw std::runtime_error(
       String::printf("%s/type: Invalid value", context.c_str()));
   }
 
@@ -1429,7 +1428,7 @@ IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
       && accessor.componentType != IGLTF2::AccessorComponentType::UNSIGNED_SHORT
       && accessor.componentType
            != IGLTF2::AccessorComponentType::UNSIGNED_INT) {
-    throw new std::runtime_error(
+    throw std::runtime_error(
       String::printf("%s/componentType: Invalid value", context.c_str()));
   }
 
@@ -1454,7 +1453,7 @@ Float32Array& GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
   // TODO: support normalized and stride
 
   if (accessor.componentType != IGLTF2::AccessorComponentType::FLOAT) {
-    throw new std::runtime_error("Invalid component type");
+    throw std::runtime_error("Invalid component type");
   }
 
   if (!accessor._data.has_value()) {
@@ -1685,7 +1684,7 @@ MaterialPtr GLTFLoader::_loadMaterialAsync(
     material._data[babylonDrawMode] = *babylonData;
 
     GLTFLoader::AddPointerMetadata(babylonMaterial, context);
-    _parent->onMaterialLoadedObservable.notifyObservers(babylonMaterial.get());
+    _parent.onMaterialLoadedObservable.notifyObservers(babylonMaterial.get());
 
     logClose();
   }
@@ -1715,11 +1714,11 @@ MaterialPtr GLTFLoader::_createDefaultMaterial(const std::string& name,
         Material::ClockWiseSideOrientation();
   babylonMaterial->fillMode                   = babylonDrawMode;
   babylonMaterial->enableSpecularAntiAliasing = true;
-  babylonMaterial->useRadianceOverAlpha = !_parent->transparencyAsCoverage;
-  babylonMaterial->useSpecularOverAlpha = !_parent->transparencyAsCoverage;
-  babylonMaterial->transparencyMode     = PBRMaterial::PBRMATERIAL_OPAQUE;
-  babylonMaterial->metallic             = 1.f;
-  babylonMaterial->roughness            = 1.f;
+  babylonMaterial->useRadianceOverAlpha       = !_parent.transparencyAsCoverage;
+  babylonMaterial->useSpecularOverAlpha       = !_parent.transparencyAsCoverage;
+  babylonMaterial->transparencyMode           = PBRMaterial::PBRMATERIAL_OPAQUE;
+  babylonMaterial->metallic                   = 1.f;
+  babylonMaterial->roughness                  = 1.f;
   return std::move(babylonMaterial);
 }
 
@@ -1920,7 +1919,7 @@ BaseTexturePtr GLTFLoader::loadTextureInfoAsync(
       babylonTexture->coordinatesIndex = textureInfo.texCoord.value_or(0u);
 
       GLTFLoader::AddPointerMetadata(babylonTexture, context);
-      _parent->onTextureLoadedObservable.notifyObservers(babylonTexture.get());
+      _parent.onTextureLoadedObservable.notifyObservers(babylonTexture.get());
       assign(babylonTexture);
     });
 
@@ -2360,27 +2359,27 @@ GLTFLoader::_extensionsLoadUriAsync(const std::string& /*context*/,
 
 void GLTFLoader::logOpen(const std::string& message)
 {
-  _parent->_logOpen(message);
+  _parent._logOpen(message);
 }
 
 void GLTFLoader::logClose()
 {
-  _parent->_logClose();
+  _parent._logClose();
 }
 
 void GLTFLoader::log(const std::string& message)
 {
-  _parent->_log(message);
+  _parent._log(message);
 }
 
 void GLTFLoader::startPerformanceCounter(const std::string& counterName)
 {
-  _parent->_startPerformanceCounter(counterName);
+  _parent._startPerformanceCounter(counterName);
 }
 
 void GLTFLoader::endPerformanceCounter(const std::string& counterName)
 {
-  _parent->_endPerformanceCounter(counterName);
+  _parent._endPerformanceCounter(counterName);
 }
 
 } // end of namespace GLTF2

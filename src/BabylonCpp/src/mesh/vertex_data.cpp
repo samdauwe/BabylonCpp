@@ -366,16 +366,16 @@ Float32Array VertexData::_mergeElement(const Float32Array& source,
 void VertexData::_validate()
 {
   if (positions.empty()) {
-    throw new std::runtime_error("Positions are required");
+    throw std::runtime_error("Positions are required");
   }
 
   const auto getElementCount
     = [](unsigned int kind, const Float32Array& values) -> size_t {
     const auto stride = VertexBuffer::DeduceStride(kind);
     if ((values.size() % stride) != 0) {
-      throw new std::runtime_error("The " + VertexBuffer::KindAsString(kind)
-                                   + "s array count must be a multiple of "
-                                   + std::to_string(stride));
+      throw std::runtime_error("The " + VertexBuffer::KindAsString(kind)
+                               + "s array count must be a multiple of "
+                               + std::to_string(stride));
     }
 
     return values.size() / stride;
@@ -384,17 +384,17 @@ void VertexData::_validate()
   const auto positionsElementCount
     = getElementCount(VertexBuffer::PositionKind, positions);
 
-  const auto validateElementCount
-    = [&](unsigned int kind, const Float32Array& values) {
-        const auto elementCount = getElementCount(kind, values);
-        if (elementCount != positionsElementCount) {
-          throw new std::runtime_error(
-            "The " + VertexBuffer::KindAsString(kind) + "s element count ("
-            + std::to_string(elementCount)
-            + ") does not match the positions count ("
-            + std::to_string(positionsElementCount) + ")");
-        }
-      };
+  const auto validateElementCount = [&](unsigned int kind,
+                                        const Float32Array& values) {
+    const auto elementCount = getElementCount(kind, values);
+    if (elementCount != positionsElementCount) {
+      throw std::runtime_error("The " + VertexBuffer::KindAsString(kind)
+                               + "s element count ("
+                               + std::to_string(elementCount)
+                               + ") does not match the positions count ("
+                               + std::to_string(positionsElementCount) + ")");
+    }
+  };
 
   if (!normals.empty()) {
     validateElementCount(VertexBuffer::NormalKind, normals);

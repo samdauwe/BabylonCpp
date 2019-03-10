@@ -1,7 +1,13 @@
 #include <babylon/loading/glTF/gltf_file_loader.h>
 
+#include <babylon/babylon_stl_util.h>
+#include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
+#include <babylon/engine/asset_container.h>
+#include <babylon/engine/scene.h>
+#include <babylon/loading/glTF/2.0/gltf_loader.h>
+#include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 #include <babylon/loading/glTF/binary_reader.h>
 #include <babylon/tools/tools.h>
 
@@ -12,6 +18,11 @@ const std::string GLTFFileLoader::_logSpaces
   = "                                ";
 bool GLTFFileLoader::IncrementalLoading     = true;
 bool GLTFFileLoader::HomogeneousCoordinates = false;
+
+IGLTFLoaderPtr GLTFFileLoader::_CreateGLTF2Loader(GLTFFileLoader& parent)
+{
+  return GLTF2::GLTFLoader::New(parent);
+}
 
 GLTFFileLoader::GLTFFileLoader()
     : onParsed{this, &GLTFFileLoader::set_onParsed}
@@ -250,40 +261,56 @@ void GLTFFileLoader::_clear()
 }
 
 ImportedMeshes GLTFFileLoader::importMeshAsync(
-  const std::vector<std::string>& /*meshesNames*/, Scene* /*scene*/,
-  const std::string& /*data*/, const std::string& /*rootUrl*/,
-  const std::function<
-    void(const SceneLoaderProgressEvent& event)>& /*onProgress*/,
-  const std::string& /*fileName*/)
+  const std::vector<std::string>& meshesNames, Scene* scene,
+  const std::string& data, const std::string& rootUrl,
+  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
+  const std::string& fileName)
 {
-  return {};
+  auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
+  _log(String::printf("Loading %s", fileName.c_str()));
+  _loader = _getLoader(loaderData);
+  return _loader->importMeshAsync(meshesNames, scene, loaderData, rootUrl,
+                                  onProgress, fileName);
 }
 
 void GLTFFileLoader::loadAsync(
-  Scene* /*scene*/, const std::string& /*data*/, const std::string& /*rootUrl*/,
-  const std::function<
-    void(const SceneLoaderProgressEvent& event)>& /*onProgress*/,
-  const std::string& /*fileName*/)
+  Scene* scene, const std::string& data, const std::string& rootUrl,
+  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
+  const std::string& fileName)
 {
+  auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
+  _log(String::printf("Loading %s", fileName.c_str()));
+  _loader = _getLoader(loaderData);
+  _loader->loadAsync(scene, loaderData, rootUrl, onProgress, fileName);
 }
 
 AssetContainerPtr GLTFFileLoader::loadAssetContainerAsync(
-  Scene* /*scene*/, const std::string& /*data*/, const std::string& /*rootUrl*/,
-  const std::function<
-    void(const SceneLoaderProgressEvent& event)>& /*onProgress*/,
-  const std::string& /*fileName*/)
+  Scene* scene, const std::string& data, const std::string& rootUrl,
+  const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
+  const std::string& fileName)
 {
-  return nullptr;
+  auto loaderData = _parseAsync(scene, data, rootUrl, fileName);
+  _log(String::printf("Loading %s", fileName.c_str()));
+  _loader        = _getLoader(loaderData);
+  auto result    = _loader->importMeshAsync({}, scene, loaderData, rootUrl,
+                                         onProgress, fileName);
+  auto container = AssetContainer::New(scene);
+  stl_util::concat(container->meshes, result.meshes);
+  stl_util::concat(container->particleSystems, result.particleSystems);
+  stl_util::concat(container->skeletons, result.skeletons);
+  stl_util::concat(container->animationGroups, result.animationGroups);
+  container->removeAllFromScene();
+  return container;
 }
 
 ISceneLoaderPluginAsyncPtr GLTFFileLoader::createPlugin()
 {
-  return nullptr;
+  return std::make_shared<GLTFFileLoader>();
 }
 
 std::optional<GLTFLoaderState> GLTFFileLoader::loaderState()
 {
-  return std::nullopt;
+  return _loader ? _loader->state : std::nullopt;
 }
 
 void GLTFFileLoader::whenCompleteAsync()
@@ -291,10 +318,33 @@ void GLTFFileLoader::whenCompleteAsync()
 }
 
 IGLTFLoaderData GLTFFileLoader::_parseAsync(
-  Scene* /*scene*/, const std::variant<std::string, ArrayBuffer>& /*data*/,
-  const std::string& /*rootUrl*/, const std::string& /*fileName*/)
+  Scene* scene, const std::variant<std::string, ArrayBuffer>& data,
+  const std::string& rootUrl, const std::string& fileName)
 {
-  return IGLTFLoaderData{nullptr, std::nullopt};
+  UnpackedBinary unpacked;
+  if (std::holds_alternative<ArrayBuffer>(data)) {
+    unpacked = _unpackBinary(std::get<ArrayBuffer>(data));
+  }
+  else if (std::holds_alternative<std::string>(data)) {
+    unpacked.json = std::get<std::string>(data);
+    unpacked.bin  = ArrayBufferView();
+  }
+
+  _validateAsync(scene, unpacked.json, rootUrl, fileName);
+  _startPerformanceCounter("Parse JSON");
+  _log(String::printf("JSON length: %ls", unpacked.json.size()));
+
+  IGLTFLoaderData loaderData{
+    json::parse(unpacked.json), // json
+    unpacked.bin                // bin
+  };
+
+  _endPerformanceCounter("Parse JSON");
+
+  onParsedObservable.notifyObservers(&loaderData);
+  onParsedObservable.clear();
+
+  return loaderData;
 }
 
 void GLTFFileLoader::_validateAsync(Scene* /*scene*/,
@@ -304,10 +354,58 @@ void GLTFFileLoader::_validateAsync(Scene* /*scene*/,
 {
 }
 
-// IGLTFLoader& GLTFFileLoader::_getLoader(const IGLTFLoaderData&
-// /*loaderData*/)
-//{
-//}
+IGLTFLoaderPtr GLTFFileLoader::_getLoader(const IGLTFLoaderData& loaderData)
+{
+  if (!json_util::has_key(loaderData.object, "asset")) {
+    return nullptr;
+  }
+
+  auto asset           = loaderData.object["asset"];
+  auto assetVersion    = json_util::get_string(asset, "version");
+  auto assetMinVersion = json_util::get_string(asset, "minVersion");
+  if (!assetMinVersion.empty()) {
+    _log(String::printf("Asset minimum version: %s", assetMinVersion.c_str()));
+  }
+  auto assetGenerator = json_util::get_string(asset, "generator");
+  if (!assetGenerator.empty()) {
+    _log(String::printf("Asset generator: %s", assetGenerator.c_str()));
+  }
+
+  auto version = GLTFFileLoader::_parseVersion(assetVersion);
+  if (!version.has_value()) {
+    throw std::runtime_error("Invalid version: " + assetVersion);
+  }
+
+  if (!assetMinVersion.empty()) {
+    const auto minVersion = GLTFFileLoader::_parseVersion(assetMinVersion);
+    if (!minVersion.has_value()) {
+      throw std::runtime_error("Invalid minimum version: " + assetMinVersion);
+    }
+
+    if (GLTFFileLoader::_compareVersion(*minVersion,
+                                        Version{
+                                          2u, // major
+                                          0u, // minor
+                                        })
+        > 0) {
+      throw std::runtime_error("Incompatible minimum version: "
+                               + assetMinVersion);
+    }
+  }
+
+  std::unordered_map<unsigned int,
+                     std::function<IGLTFLoaderPtr(GLTFFileLoader & parent)>>
+    createLoaders;
+  createLoaders[2] = [](GLTFFileLoader& parent) -> IGLTFLoaderPtr {
+    return GLTFFileLoader::_CreateGLTF2Loader(parent);
+  };
+
+  if (!stl_util::contains(createLoaders, version->major)) {
+    throw std::runtime_error("Unsupported version: " + assetVersion);
+  }
+
+  return createLoaders[version->major](*this);
+}
 
 UnpackedBinary GLTFFileLoader::_unpackBinary(const ArrayBuffer& data)
 {
