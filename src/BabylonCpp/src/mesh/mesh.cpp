@@ -420,7 +420,7 @@ Float32Array Mesh::getVerticesData(unsigned int kind, bool copyWhenShared,
   return _geometry->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
-VertexBuffer* Mesh::getVertexBuffer(unsigned int kind) const
+VertexBufferPtr Mesh::getVertexBuffer(unsigned int kind) const
 {
   if (!_geometry) {
     return nullptr;
@@ -730,7 +730,7 @@ Float32Array Mesh::_getPositionData(bool applySkeleton)
   return data;
 }
 
-std::shared_ptr<SubMesh> Mesh::_createGlobalSubMesh(bool force)
+SubMeshPtr Mesh::_createGlobalSubMesh(bool force)
 {
   auto totalVertices = getTotalVertices();
   if (!totalVertices || (!_geometry->isReady() && getIndices().empty())) {
@@ -1912,7 +1912,7 @@ void Mesh::applyDisplacementMapFromBuffer(
 Mesh& Mesh::convertToFlatShadedMesh()
 {
   auto kinds = getVerticesDataKinds();
-  std::map<unsigned int, VertexBuffer*> vbs;
+  std::map<unsigned int, VertexBufferPtr> vbs;
   std::map<unsigned int, Float32Array> data;
   std::map<unsigned int, Float32Array> newdata;
   bool updatableNormals = false;
@@ -2006,7 +2006,7 @@ Mesh& Mesh::convertToFlatShadedMesh()
 Mesh& Mesh::convertToUnIndexedMesh()
 {
   auto kinds = getVerticesDataKinds();
-  std::map<unsigned int, VertexBuffer*> vbs;
+  std::map<unsigned int, VertexBufferPtr> vbs;
   std::map<unsigned int, Float32Array> data;
   std::map<unsigned int, Float32Array> newdata;
   unsigned int kindIndex;

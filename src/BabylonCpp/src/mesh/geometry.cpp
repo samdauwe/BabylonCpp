@@ -168,10 +168,10 @@ AbstractMesh* Geometry::setVerticesData(unsigned int kind,
                                         bool updatable,
                                         const std::optional<size_t>& stride)
 {
-  auto buffer = std::make_unique<VertexBuffer>(_engine, data, kind, updatable,
+  auto buffer = std::make_shared<VertexBuffer>(_engine, data, kind, updatable,
                                                _meshes.empty(), stride);
 
-  setVerticesBuffer(std::move(buffer));
+  setVerticesBuffer(buffer);
 
   return nullptr;
 }
@@ -180,11 +180,11 @@ void Geometry::removeVerticesData(unsigned int kind)
 {
   if (stl_util::contains(_vertexBuffers, kind)) {
     _vertexBuffers[kind]->dispose();
-    _vertexBuffers[kind].reset(nullptr);
+    _vertexBuffers[kind] = nullptr;
   }
 }
 
-void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer,
+void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
                                  const std::optional<size_t>& totalVertices)
 {
   auto kind = buffer->getKind();
@@ -192,18 +192,17 @@ void Geometry::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer,
     _vertexBuffers[kind]->dispose();
   }
 
-  _vertexBuffers[kind] = std::move(buffer);
-  auto _buffer         = _vertexBuffers[kind].get();
+  _vertexBuffers[kind] = buffer;
 
   if (kind == VertexBuffer::PositionKind) {
-    auto& data = _buffer->getData();
+    auto& data = buffer->getData();
 
     if (totalVertices.has_value()) {
       _totalVertices = *totalVertices;
     }
     else {
       if (!data.empty()) {
-        _totalVertices = data.size() / (_buffer->byteStride / 4);
+        _totalVertices = data.size() / (buffer->byteStride / 4);
       }
     }
 
@@ -366,7 +365,7 @@ bool Geometry::isVertexBufferUpdatable(unsigned int kind) const
   return it->second->isUpdatable();
 }
 
-VertexBuffer* Geometry::getVertexBuffer(unsigned int kind) const
+VertexBufferPtr Geometry::getVertexBuffer(unsigned int kind) const
 {
   if (!isReady() || _vertexBuffers.empty()) {
     return nullptr;
@@ -374,7 +373,7 @@ VertexBuffer* Geometry::getVertexBuffer(unsigned int kind) const
 
   auto it = _vertexBuffers.find(kind);
   if (it != _vertexBuffers.end()) {
-    return it->second.get();
+    return it->second;
   }
   else {
     return nullptr;
@@ -732,7 +731,7 @@ void Geometry::dispose()
 
   for (auto& item : _vertexBuffers) {
     _vertexBuffers[item.first]->dispose();
-    _vertexBuffers[item.first].reset(nullptr);
+    _vertexBuffers[item.first] = nullptr;
   }
   _vertexBuffers.clear();
   _totalVertices = 0;

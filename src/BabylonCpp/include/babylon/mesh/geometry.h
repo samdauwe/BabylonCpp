@@ -21,9 +21,10 @@ class Mesh;
 class Scene;
 class VertexBuffer;
 class VertexData;
-using EffectPtr   = std::shared_ptr<Effect>;
-using GeometryPtr = std::shared_ptr<Geometry>;
-using MeshPtr     = std::shared_ptr<Mesh>;
+using EffectPtr       = std::shared_ptr<Effect>;
+using GeometryPtr     = std::shared_ptr<Geometry>;
+using MeshPtr         = std::shared_ptr<Mesh>;
+using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -121,7 +122,7 @@ public:
    * @param totalVertices defines the total number of vertices for position kind
    * (could be null)
    */
-  void setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer,
+  void setVerticesBuffer(const VertexBufferPtr& buffer,
                          const std::optional<size_t>& totalVertices
                          = std::nullopt);
 
@@ -188,7 +189,7 @@ public:
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns a VertexBuffer
    */
-  VertexBuffer* getVertexBuffer(unsigned int kind) const;
+  VertexBufferPtr getVertexBuffer(unsigned int kind) const;
 
   /**
    * @brief Gets a specific vertex buffer.
@@ -445,8 +446,7 @@ public:
   /** Hidden */
   IndicesArray _indices;
   /** Hidden */
-  std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>>
-    _vertexBuffers;
+  std::unordered_map<unsigned int, VertexBufferPtr> _vertexBuffers;
   /** Hidden */
   Uint32Array _delayInfo;
   /** Hidden */

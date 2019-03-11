@@ -37,6 +37,8 @@ using IParticleSystemPtr      = std::shared_ptr<IParticleSystem>;
 using LinesMeshPtr            = std::shared_ptr<LinesMesh>;
 using MeshPtr                 = std::shared_ptr<Mesh>;
 using MorphTargetManagerPtr   = std::shared_ptr<MorphTargetManager>;
+using SubMeshPtr              = std::shared_ptr<SubMesh>;
+using VertexBufferPtr         = std::shared_ptr<VertexBuffer>;
 
 struct SkinningValidationResult {
   bool skinned;
@@ -236,7 +238,7 @@ public:
    * @returns a FloatArray or null if the mesh has no vertex buffer for this
    * kind.
    */
-  VertexBuffer* getVertexBuffer(unsigned int kind) const;
+  VertexBufferPtr getVertexBuffer(unsigned int kind) const;
 
   /**
    * @brief Tests if a specific vertex buffer is associated with this mesh.
@@ -382,7 +384,7 @@ public:
   /**
    * @brief Hidden
    */
-  std::shared_ptr<SubMesh> _createGlobalSubMesh(bool force);
+  SubMeshPtr _createGlobalSubMesh(bool force);
 
   /**
    * @brief This function will subdivide the mesh into multiple submeshes.

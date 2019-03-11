@@ -61,6 +61,7 @@ using IMaterialPbrMetallicRoughnessPtr
   = std::shared_ptr<IMaterialPbrMetallicRoughness>;
 using INodePtr        = std::shared_ptr<INode>;
 using ITextureInfoPtr = std::shared_ptr<ITextureInfo>;
+using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
 
 namespace IGLTF2 {
 
@@ -1148,7 +1149,7 @@ struct IAccessor : public IGLTF2::IAccessor, IArrayItem {
   std::optional<ArrayBufferView> _data = std::nullopt;
 
   /** @hidden */
-  std::unique_ptr<VertexBuffer> _babylonVertexBuffer = nullptr;
+  VertexBufferPtr _babylonVertexBuffer = nullptr;
 }; // end of struct IAccessor
 
 /**

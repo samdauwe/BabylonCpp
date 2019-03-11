@@ -750,7 +750,7 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
   }
 
   const auto loadAttribute
-    = [&](const std::string& attribute, const std::string& /*kind*/,
+    = [&](const std::string& attribute, const std::string& kind,
           const std::function<void(const IAccessor& accessor)>& callback
           = nullptr) -> void {
     if (!stl_util::contains(attributes, attribute)) {
@@ -765,13 +765,11 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
       String::printf("%s/attributes/%s", context.c_str(), attribute.c_str()),
       gltf->accessors, attributes[attribute]);
     promises.emplace_back([&]() -> void {
-#if 0
-      auto babylonVertexBuffer = babylonGeometry->setVerticesBuffer(
+      babylonGeometry->setVerticesBuffer(
         _loadVertexAccessorAsync(
           String::printf("/accessors/%ld", accessor.index), accessor,
           VertexBuffer::KindAsNumber(kind)),
         accessor.count);
-#endif
     });
 
     if (callback) {
@@ -1533,7 +1531,7 @@ BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
   return bufferView._babylonBuffer;
 }
 
-std::unique_ptr<VertexBuffer>&
+VertexBufferPtr&
 GLTFLoader::_loadVertexAccessorAsync(const std::string& context,
                                      IAccessor& accessor, unsigned int kind)
 {

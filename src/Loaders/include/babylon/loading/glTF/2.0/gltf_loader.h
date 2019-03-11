@@ -44,6 +44,7 @@ using MeshPtr           = std::shared_ptr<Mesh>;
 using MorphTargetPtr    = std::shared_ptr<MorphTarget>;
 using SkeletonPtr       = std::shared_ptr<Skeleton>;
 using TransformNodePtr  = std::shared_ptr<TransformNode>;
+using VertexBufferPtr   = std::shared_ptr<VertexBuffer>;
 
 namespace GLTF2 {
 
@@ -433,9 +434,9 @@ private:
                                         IAccessor& accessor);
   BufferPtr _loadVertexBufferViewAsync(IBufferView& bufferView,
                                        unsigned int kind);
-  std::unique_ptr<VertexBuffer>&
-  _loadVertexAccessorAsync(const std::string& context, IAccessor& accessor,
-                           unsigned int kind);
+  VertexBufferPtr& _loadVertexAccessorAsync(const std::string& context,
+                                            IAccessor& accessor,
+                                            unsigned int kind);
   void _loadMaterialMetallicRoughnessPropertiesAsync(
     const std::string& context,
     std::optional<IMaterialPbrMetallicRoughness> properties = std::nullopt,
