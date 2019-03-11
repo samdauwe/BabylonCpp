@@ -82,9 +82,9 @@ struct BABYLON_SHARED_EXPORT ArrayItem {
    * @param array The array of items
    */
   template <typename IArrItem>
-  static void Assign(std::vector<IArrItem>& /*array*/)
+  static void Assign(std::vector<IArrItem>& array)
   {
-#if 0
+#if 10
     if (!array.empty()) {
       for (size_t index = 0; index < array.size(); ++index) {
         array[index].index = index;
@@ -275,7 +275,7 @@ public:
    * load is complete
    */
   BaseTexturePtr loadTextureInfoAsync(
-    const std::string& context, const ITextureInfo& textureInfo,
+    const std::string& context, const IGLTF2::ITextureInfo& textureInfo,
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
 
   /**
@@ -374,7 +374,7 @@ private:
   void _loadExtensions();
   void _checkExtensions();
   void _setState(const GLTFLoaderState& state);
-  INodePtr _createRootNode();
+  INode _createRootNode();
   void _forEachPrimitive(
     const INode& node,
     const std::function<void(const AbstractMeshPtr& babylonMesh)>& callback);
@@ -495,7 +495,7 @@ private:
                                          const IMaterial& material,
                                          const MaterialPtr& babylonMaterial);
   BaseTexturePtr _extensionsLoadTextureInfoAsync(
-    const std::string& context, const ITextureInfo& textureInfo,
+    const std::string& context, const IGLTF2::ITextureInfo& textureInfo,
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,
                                                   const IAnimation& animation);

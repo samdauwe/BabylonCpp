@@ -11,7 +11,17 @@ namespace BABYLON {
  */
 struct BABYLON_SHARED_EXPORT IAnimationKey {
 
+  IAnimationKey();
   IAnimationKey(float frame, AnimationValue value);
+  IAnimationKey(float frame, AnimationValue value,
+                const std::optional<AnimationValue>& inTangent,
+                const std::optional<AnimationValue>& outTangent,
+                const std::optional<AnimationValue>& interpolation);
+  IAnimationKey(const IAnimationKey& other);
+  IAnimationKey(IAnimationKey&& other);
+  IAnimationKey& operator=(const IAnimationKey& other);
+  IAnimationKey& operator=(IAnimationKey&& other);
+  ~IAnimationKey();
 
   /**
    * Frame of the key frame

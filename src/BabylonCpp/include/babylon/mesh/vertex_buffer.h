@@ -222,6 +222,7 @@ public:
 
   /** Statics **/
   static std::string KindAsString(unsigned int kind);
+  static unsigned int KindAsNumber(const std::string& kind);
 
   /**
    * @brief Deduces the stride given a kind.

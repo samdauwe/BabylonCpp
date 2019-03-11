@@ -167,7 +167,6 @@ void VertexBuffer::set_instanceDivisor(unsigned int value)
 
 std::string VertexBuffer::KindAsString(unsigned int kind)
 {
-
   switch (kind) {
     case VertexBuffer::PositionKind:
     default:
@@ -237,6 +236,114 @@ std::string VertexBuffer::KindAsString(unsigned int kind)
     case VertexBuffer::RemapDataKind:
       return std::string(VertexBuffer::RemapDataKindChars);
   }
+}
+
+unsigned int VertexBuffer::KindAsNumber(const std::string& kind)
+{
+  if (kind == VertexBuffer::PositionKindChars) {
+    return PositionKind;
+  }
+  else if (kind == VertexBuffer::NormalKindChars) {
+    return NormalKind;
+  }
+  else if (kind == TangentKindChars) {
+    return TangentKind;
+  }
+  else if (kind == UVKindChars) {
+    return UVKind;
+  }
+  else if (kind == UV2KindChars) {
+    return UV2Kind;
+  }
+  else if (kind == UV3KindChars) {
+    return UV3Kind;
+  }
+  else if (kind == UV4KindChars) {
+    return UV4Kind;
+  }
+  else if (kind == UV5KindChars) {
+    return UV5Kind;
+  }
+  else if (kind == UV6KindChars) {
+    return UV6Kind;
+  }
+  else if (kind == ColorKindChars) {
+    return ColorKind;
+  }
+  else if (kind == MatricesIndicesKindChars) {
+    return MatricesIndicesKind;
+  }
+  else if (kind == MatricesWeightsKindChars) {
+    return MatricesWeightsKind;
+  }
+  else if (kind == MatricesIndicesExtraKindChars) {
+    return MatricesIndicesExtraKind;
+  }
+  else if (kind == MatricesWeightsExtraKindChars) {
+    return MatricesWeightsExtraKind;
+  }
+  else if (kind == World0KindChars) {
+    return World0Kind;
+  }
+  else if (kind == World1KindChars) {
+    return World1Kind;
+  }
+  else if (kind == World2KindChars) {
+    return World2Kind;
+  }
+  else if (kind == World3KindChars) {
+    return World3Kind;
+  }
+  else if (kind == CellInfoKindChars) {
+    return CellInfoKind;
+  }
+  else if (kind == CellIndexKindChars) {
+    return CellIndexKind;
+  }
+  else if (kind == OptionsKindChars) {
+    return OptionsKind;
+  }
+  else if (kind == AgeKindChars) {
+    return AgeKind;
+  }
+  else if (kind == LifeKindChars) {
+    return LifeKind;
+  }
+  else if (kind == VelocityKindChars) {
+    return VelocityKind;
+  }
+  else if (kind == DirectionKindChars) {
+    return DirectionKind;
+  }
+  else if (kind == InitialDirectionKindChars) {
+    return InitialDirectionKind;
+  }
+  else if (kind == OffsetKindChars) {
+    return OffsetKind;
+  }
+  else if (kind == SeedKindChars) {
+    return SeedKind;
+  }
+  else if (kind == SizeKindChars) {
+    return SizeKind;
+  }
+  else if (kind == AngleKindChars) {
+    return AngleKind;
+  }
+  else if (kind == CellStartOffsetKindChars) {
+    return CellStartOffsetKind;
+  }
+  else if (kind == NoiseCoordinates1KindChars) {
+    return NoiseCoordinates1Kind;
+  }
+  else if (kind == NoiseCoordinates2KindChars) {
+    return NoiseCoordinates2Kind;
+  }
+  else if (kind == RemapDataKindChars) {
+    return RemapDataKind;
+  }
+
+  return 0;
 }
 
 void VertexBuffer::_rebuild()

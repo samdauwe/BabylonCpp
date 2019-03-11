@@ -361,6 +361,31 @@ enum class TextureWrapMode {
   REPEAT = 10497,
 }; // end of enum class TextureWrapMode
 
+struct EnumUtils {
+
+  static unsigned int
+  AccessorComponentTypeToNumber(const AccessorComponentType& type)
+  {
+    switch (type) {
+      case AccessorComponentType::BYTE:
+        return 5120;
+      case AccessorComponentType::UNSIGNED_BYTE:
+        return 5121;
+      case AccessorComponentType::SHORT:
+        return 5122;
+      case AccessorComponentType::UNSIGNED_SHORT:
+        return 5123;
+      case AccessorComponentType::UNSIGNED_INT:
+        return 5125;
+      case AccessorComponentType::FLOAT:
+        return 5126;
+      default:
+        return 0;
+    }
+  }
+
+}; // end of struct IGLTF2Utils
+
 /**
  * @brief glTF Property
  */
@@ -1028,7 +1053,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of nodes
    */
-  std::vector<INodePtr> nodes;
+  std::vector<GLTF2::INode> nodes;
   /**
    * An array of samplers.  A sampler contains properties for texture filtering
    * and wrapping modes
