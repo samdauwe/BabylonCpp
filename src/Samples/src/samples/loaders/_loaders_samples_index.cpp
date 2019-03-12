@@ -8,6 +8,11 @@
 #include <babylon/samples/loaders/import_rabbit_scene.h>
 #include <babylon/samples/loaders/import_suzanne_scene.h>
 
+// Loaders plugins
+#ifdef WITH_LOADERS
+#include <babylon/samples/loaders/gltf/import_box_scene.h>
+#endif
+
 namespace BABYLON {
 namespace Samples {
 
@@ -57,6 +62,14 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       [](ICanvas* iCanvas) {                                  //
                         return std::make_unique<ImportSuzanneScene>(iCanvas); //
                       });                                                     //
+#ifdef WITH_LOADERS
+  // Import Box Scene
+  _samples["ImportBoxScene"]
+    = std::make_tuple(false,                                              //
+                      [](ICanvas* iCanvas) {                              //
+                        return std::make_unique<ImportBoxScene>(iCanvas); //
+                      });                                                 //
+#endif
 }
 
 _LoadersSamplesIndex::~_LoadersSamplesIndex()
