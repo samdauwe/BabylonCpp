@@ -2,7 +2,7 @@
 #                            Configuration options                             #
 # ============================================================================ #
 option(OPTION_BUILD_INSPECTOR "Build the inspector debugging tool."  ON)
-option(OPTION_BUILD_LOADERS   "Build the loaders."                   ON)
+option(OPTION_BUILD_LOADERS   "Build the loader plugins."            ON)
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
     set(OPTION_BUILD_INSPECTOR OFF)

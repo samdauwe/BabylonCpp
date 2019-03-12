@@ -85,13 +85,11 @@ struct BABYLON_SHARED_EXPORT ArrayItem {
   template <typename IArrItem>
   static void Assign(std::vector<IArrItem>& array)
   {
-#if 10
     if (!array.empty()) {
       for (size_t index = 0; index < array.size(); ++index) {
         array[index].index = index;
       }
     }
-#endif
   }
 
 }; // end of struct ArrayItem

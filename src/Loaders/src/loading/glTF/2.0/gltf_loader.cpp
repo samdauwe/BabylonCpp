@@ -30,6 +30,11 @@
 namespace BABYLON {
 namespace GLTF2 {
 
+std::vector<std::string> GLTFLoader::_ExtensionNames;
+std::unordered_map<std::string,
+                   std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>>
+  GLTFLoader::_ExtensionFactories;
+
 void GLTFLoader::RegisterExtension(
   const std::string& name,
   const std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>& factory)
@@ -2292,7 +2297,8 @@ CameraPtr GLTFLoader::_extensionsLoadCameraAsync(
   return nullptr;
 }
 
-GeometryPtr _extensionsLoadVertexDataAsync(const std::string& /*context*/,
+GeometryPtr
+GLTFLoader::_extensionsLoadVertexDataAsync(const std::string& /*context*/,
                                            const IMeshPrimitive& /*primitive*/,
                                            const MeshPtr& /*babylonMesh*/)
 {

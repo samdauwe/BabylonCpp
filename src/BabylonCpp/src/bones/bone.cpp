@@ -154,7 +154,7 @@ const Matrix& Bone::getAbsoluteTransform() const
   return _absoluteTransform;
 }
 
-void linkTransformNode(const TransformNodePtr& /*transformNode*/)
+void Bone::linkTransformNode(const TransformNodePtr& /*transformNode*/)
 {
 }
 

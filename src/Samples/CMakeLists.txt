@@ -54,27 +54,115 @@ set(META_NAME_VERSION        "${META_PROJECT_NAME} v${META_VERSION} (${META_VERS
 string(TOUPPER ${META_PROJECT_NAME} META_PROJECT_NAME_UPPER)
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${BABYLON_NAMESPACE}/${BABYLON_NAMESPACE}_version.h)
 
+# Loader plugins
+if (OPTION_BUILD_LOADERS)
+    # Set define for usage in source code
+    add_definitions(-DWITH_LOADERS)
+endif()
+
 # ============================================================================ #
 #                       Sources                                                #
 # ============================================================================ #
 
 # Include, Source and Tests path
-set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}")
-set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/${BABYLON_NAMESPACE}/samples")
+set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src/samples")
 set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB_RECURSE SAMPLES_HDR_FILES   ${INCLUDE_PATH}/samples/*.h)
+file(GLOB ANIMATIONS_HDR_FILES                      ${INCLUDE_PATH}/animations/*.h
+                                                    ${INCLUDE_PATH}/animations/easing/*.h)
+file(GLOB CAMERAS_HDR_FILES                         ${INCLUDE_PATH}/cameras/*.h)
+file(GLOB COLLISION_AND_INTERSECTIONS_HDR_FILES     ${INCLUDE_PATH}/collisionsandintersections/*.h)
+file(GLOB COMMON_HDR_FILES                          ${INCLUDE_PATH}/*.h)
+file(GLOB EXTENSIONS_HDR_FILES                      ${INCLUDE_PATH}/extensions/*.h
+                                                    ${INCLUDE_PATH}/extensions/hexplanetgeneration/*.h
+                                                    ${INCLUDE_PATH}/extensions/navigation/*.h
+                                                    ${INCLUDE_PATH}/extensions/noisegeneration/*.h
+                                                    ${INCLUDE_PATH}/extensions/polyhedron/*.h
+                                                    ${INCLUDE_PATH}/extensions/treegenerators/*.h)
+file(GLOB LIGHTS_HDR_FILES                          ${INCLUDE_PATH}/lights/*.h)
+if (OPTION_BUILD_LOADERS)
+    file(GLOB LOADERS_HDR_FILES                     ${INCLUDE_PATH}/loaders/*.h
+                                                    ${INCLUDE_PATH}/loaders/gltf/*.h)
+else()
+    file(GLOB LOADERS_HDR_FILES                     ${INCLUDE_PATH}/loaders/*.h)
+endif()
+file(GLOB MATERIALS_HDR_FILES                       ${INCLUDE_PATH}/materials/*.h
+                                                    ${INCLUDE_PATH}/materials/shadermaterial/*.h)
+file(GLOB MATERIALS_LIBRARY_HDR_FILES               ${INCLUDE_PATH}/materialslibrary/*.h)
+file(GLOB MESHES_HDR_FILES                          ${INCLUDE_PATH}/meshes/*.h
+                                                    ${INCLUDE_PATH}/meshes/polygonmesh/*.h)
+file(GLOB OPTIMIZATIONS_HDR_FILES                   ${INCLUDE_PATH}/optimizations/*.h)
+file(GLOB PROCEDURAL_TEXTURES_LIBRARY_HDR_FILES     ${INCLUDE_PATH}/proceduraltextureslibrary/*.h)
+file(GLOB SHADOWS_HDR_FILES                         ${INCLUDE_PATH}/shadows/*.h)
+file(GLOB SPECIAL_FX_HDR_FILES                      ${INCLUDE_PATH}/specialfx/*.h)
+file(GLOB TEXTURES_FX_HDR_FILES                     ${INCLUDE_PATH}/textures/*.h)
 
 set(BABYLON_SAMPLES_HEADERS
-    ${SAMPLES_HDR_FILES}
+    ${ANIMATIONS_HDR_FILES}
+    ${CAMERAS_HDR_FILES}
+    ${COLLISION_AND_INTERSECTIONS_HDR_FILES}
+    ${COMMON_HDR_FILES}
+    ${EXTENSIONS_HDR_FILES}
+    ${LIGHTS_HDR_FILES}
+    ${LOADERS_HDR_FILES}
+    ${MATERIALS_HDR_FILES}
+    ${MATERIALS_LIBRARY_HDR_FILES}
+    ${MESHES_HDR_FILES}
+    ${OPTIMIZATIONS_HDR_FILES}
+    ${PROCEDURAL_TEXTURES_LIBRARY_HDR_FILES}
+    ${SHADOWS_HDR_FILES}
+    ${SPECIAL_FX_HDR_FILES}
+    ${TEXTURES_FX_HDR_FILES}
 )
 
 # Source files
-file(GLOB_RECURSE SAMPLES_SRC_FILES   ${SOURCE_PATH}/samples/*.cpp)
+file(GLOB ANIMATIONS_SRC_FILES                      ${SOURCE_PATH}/animations/*.cpp
+                                                    ${SOURCE_PATH}/animations/easing/*.cpp)
+file(GLOB CAMERAS_SRC_FILES                         ${SOURCE_PATH}/cameras/*.cpp)
+file(GLOB COLLISION_AND_INTERSECTIONS_SRC_FILES     ${SOURCE_PATH}/collisionsandintersections/*.cpp)
+file(GLOB COMMON_SRC_FILES                          ${SOURCE_PATH}/*.cpp)
+file(GLOB EXTENSIONS_SRC_FILES                      ${SOURCE_PATH}/extensions/*.cpp
+                                                    ${SOURCE_PATH}/extensions/hexplanetgeneration/*.cpp
+                                                    ${SOURCE_PATH}/extensions/navigation/*.cpp
+                                                    ${SOURCE_PATH}/extensions/noisegeneration/*.cpp
+                                                    ${SOURCE_PATH}/extensions/polyhedron/*.cpp
+                                                    ${SOURCE_PATH}/extensions/treegenerators/*.cpp)
+file(GLOB LIGHTS_SRC_FILES                          ${SOURCE_PATH}/lights/*.cpp)
+if (OPTION_BUILD_LOADERS)
+    file(GLOB LOADERS_SRC_FILES                     ${SOURCE_PATH}/loaders/*.cpp
+                                                    ${SOURCE_PATH}/loaders/gltf/*.cpp)
+else()
+    file(GLOB LOADERS_SRC_FILES                     ${SOURCE_PATH}/loaders/*.cpp)
+endif()
+file(GLOB MATERIALS_SRC_FILES                       ${SOURCE_PATH}/materials/*.cpp
+                                                    ${SOURCE_PATH}/materials/shadermaterial/*.cpp)
+file(GLOB MATERIALS_LIBRARY_SRC_FILES               ${SOURCE_PATH}/materialslibrary/*.cpp)
+file(GLOB MESHES_SRC_FILES                          ${SOURCE_PATH}/meshes/*.cpp
+                                                    ${SOURCE_PATH}/meshes/polygonmesh/*.cpp)
+file(GLOB OPTIMIZATIONS_SRC_FILES                   ${SOURCE_PATH}/optimizations/*.cpp)
+file(GLOB PROCEDURAL_TEXTURES_LIBRARY_SRC_FILES     ${SOURCE_PATH}/proceduraltextureslibrary/*.cpp)
+file(GLOB SHADOWS_SRC_FILES                         ${SOURCE_PATH}/shadows/*.cpp)
+file(GLOB SPECIAL_FX_SRC_FILES                      ${SOURCE_PATH}/specialfx/*.cpp)
+file(GLOB TEXTURES_FX_SRC_FILES                     ${SOURCE_PATH}/textures/*.cpp)
 
 set(BABYLON_SAMPLES_SOURCES
-    ${SAMPLES_SRC_FILES}
+    ${ANIMATIONS_SRC_FILES}
+    ${CAMERAS_SRC_FILES}
+    ${COLLISION_AND_INTERSECTIONS_SRC_FILES}
+    ${COMMON_SRC_FILES}
+    ${EXTENSIONS_SRC_FILES}
+    ${LIGHTS_SRC_FILES}
+    ${LOADERS_SRC_FILES}
+    ${MATERIALS_SRC_FILES}
+    ${MATERIALS_LIBRARY_SRC_FILES}
+    ${MESHES_SRC_FILES}
+    ${OPTIMIZATIONS_SRC_FILES}
+    ${PROCEDURAL_TEXTURES_LIBRARY_SRC_FILES}
+    ${SHADOWS_SRC_FILES}
+    ${SPECIAL_FX_SRC_FILES}
+    ${TEXTURES_FX_SRC_FILES}
 )
 
 # Group source files
@@ -145,6 +233,14 @@ target_include_directories(${TARGET}
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 
+if (OPTION_BUILD_LOADERS)
+    target_include_directories(${TARGET}
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Loaders/include
+        ${CMAKE_CURRENT_BINARY_DIR}/../Loaders/include
+    )
+endif()
+
 # Libraries
 target_link_libraries(${TARGET}
     PUBLIC
@@ -154,6 +250,13 @@ target_link_libraries(${TARGET}
     MaterialsLibrary
     ProceduralTexturesLibrary
 )
+
+if (OPTION_BUILD_LOADERS)
+    target_link_libraries(${TARGET}
+        PRIVATE
+        Loaders
+    )
+endif()
 
 # Compile definitions
 target_compile_definitions(${TARGET}
