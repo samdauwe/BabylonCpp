@@ -17,7 +17,7 @@ ImportBoxScene::~ImportBoxScene()
 
 const char* ImportBoxScene::getName()
 {
-  return "Import Box Scene";
+  return "Import Box Scene (glTF)";
 }
 
 void ImportBoxScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
