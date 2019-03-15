@@ -7,7 +7,7 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Import Box Scene. Example demonstrating how to easily load a glTF
+ * @brief Import Box Scene (glTF). Example demonstrating how to easily load a glTF
  * model.
  * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
  * @see https://www.babylonjs-playground.com/#FY6DP6#0
