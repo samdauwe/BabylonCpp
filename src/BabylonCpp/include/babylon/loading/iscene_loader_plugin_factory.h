@@ -10,6 +10,11 @@
 
 namespace BABYLON {
 
+struct ISceneLoaderPlugin;
+struct ISceneLoaderPluginAsync;
+using ISceneLoaderPluginPtr      = std::shared_ptr<ISceneLoaderPlugin>;
+using ISceneLoaderPluginAsyncPtr = std::shared_ptr<ISceneLoaderPluginAsync>;
+
 /**
  * @brief Interface used by SceneLoader plugin factory.
  */
@@ -17,17 +22,17 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPluginFactory {
   /**
    * Defines the name of the factory
    */
-  std::string name;
+  std::string factoryName;
   /**
    * Function called to create a new plugin
    * @return the new plugin
    */
-  virtual std::variant<ISceneLoaderPlugin, ISceneLoaderPluginAsync>
+  virtual std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>
   createPlugin() = 0;
   /**
    * Boolean indicating if the plugin can direct load specific data
    */
-  std::function<bool(const std::string& data)> canDirectLoad = nullptr;
+  std::function<bool(const std::string& data)> factoryCanDirectLoad = nullptr;
 }; // end of struct ISceneLoaderPluginFactory
 
 } // end of namespace BABYLON

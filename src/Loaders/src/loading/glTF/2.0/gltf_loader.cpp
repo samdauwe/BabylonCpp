@@ -2179,6 +2179,8 @@ unsigned int GLTFLoader::_GetNumComponents(const std::string& context,
       return 9;
     case IGLTF2::AccessorType::MAT4:
       return 16;
+    default:
+      break;
   }
 
   throw std::runtime_error(String::printf("%s: Invalid type", context.c_str()));
@@ -2241,6 +2243,8 @@ GLTFLoader::_GetDrawMode(const std::string& context,
       return Material::TriangleStripDrawMode();
     case IGLTF2::MeshPrimitiveMode::TRIANGLE_FAN:
       return Material::TriangleFanDrawMode();
+    default:
+      break;
   }
 
   throw std::runtime_error(

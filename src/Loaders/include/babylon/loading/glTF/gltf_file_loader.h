@@ -9,6 +9,7 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/loading/glTF/igltf_loader.h>
 #include <babylon/loading/iscene_loader_plugin_async.h>
+#include <babylon/loading/iscene_loader_plugin_factory.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
@@ -44,9 +45,11 @@ struct Version {
 }; // end of struct Version
 
 class BABYLON_SHARED_EXPORT GLTFFileLoader : public IDisposable,
-                                             public ISceneLoaderPluginAsync {
+                                             public ISceneLoaderPluginAsync,
+                                             public ISceneLoaderPluginFactory {
 
 public:
+  static void RegisterAsSceneLoaderPlugin();
   /** Hidden */
   static IGLTFLoaderPtr _CreateGLTF2Loader(GLTFFileLoader& parent);
 
@@ -125,7 +128,8 @@ public:
    * @brief Instantiates a glTF file loader plugin.
    * @returns the created plugin
    */
-  ISceneLoaderPluginAsyncPtr createPlugin();
+  std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>
+  createPlugin() override;
 
   /**
    * @brief The loader state or null if the loader is not active.

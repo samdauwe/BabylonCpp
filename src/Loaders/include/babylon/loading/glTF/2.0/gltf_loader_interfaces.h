@@ -117,6 +117,10 @@ enum class AccessorComponentType {
  */
 enum class AccessorType {
   /**
+   * Invalid
+   */
+  INVALID = 0,
+  /**
    * Scalar
    */
   SCALAR,
@@ -289,6 +293,10 @@ enum class MeshPrimitiveMode {
    * Triangle Fan
    */
   TRIANGLE_FAN = 6,
+  /**
+   * Invalid mode
+   */
+  INVALID = 7,
 }; // end of class enum class MeshPrimitiveMode
 
 /**
@@ -382,6 +390,93 @@ struct EnumUtils {
         return 5126;
       default:
         return 0;
+    }
+  }
+
+  static MaterialAlphaMode StringToMaterialAlphaMode(const std::string& modeStr)
+  {
+    if (modeStr == "OPAQUE") {
+      return MaterialAlphaMode::OPAQUE;
+    }
+    else if (modeStr == "MASK") {
+      return MaterialAlphaMode::MASK;
+    }
+    else if (modeStr == "BLEND") {
+      return MaterialAlphaMode::BLEND;
+    }
+    else {
+      return MaterialAlphaMode::INVALID;
+    }
+  }
+
+  static AccessorComponentType
+  NumberToAccessorComponentType(const size_t typeNumber)
+  {
+    switch (typeNumber) {
+      case 5120:
+        return AccessorComponentType::BYTE;
+      case 5121:
+        return AccessorComponentType::UNSIGNED_BYTE;
+      case 5122:
+        return AccessorComponentType::SHORT;
+      case 5123:
+        return AccessorComponentType::UNSIGNED_SHORT;
+      case 5125:
+        return AccessorComponentType::UNSIGNED_INT;
+      case 5126:
+        return AccessorComponentType::FLOAT;
+      default:
+        return AccessorComponentType::INVALID;
+    }
+  }
+
+  static MeshPrimitiveMode NumberToMeshPrimitiveMode(const size_t modeNumber)
+  {
+    switch (modeNumber) {
+      case 0:
+        return MeshPrimitiveMode::POINTS;
+      case 1:
+        return MeshPrimitiveMode::LINES;
+      case 2:
+        return MeshPrimitiveMode::LINE_LOOP;
+      case 3:
+        return MeshPrimitiveMode::LINE_STRIP;
+      case 4:
+        return MeshPrimitiveMode::TRIANGLES;
+      case 5:
+        return MeshPrimitiveMode::TRIANGLE_STRIP;
+      case 6:
+        return MeshPrimitiveMode::TRIANGLE_FAN;
+      default:
+        return MeshPrimitiveMode::INVALID;
+    }
+  }
+
+  static AccessorType StringToAccessorType(const std::string& typeStr)
+  {
+    if (typeStr == "SCALAR") {
+      return AccessorType::SCALAR;
+    }
+    else if (typeStr == "VEC2") {
+      return AccessorType::VEC2;
+    }
+    else if (typeStr == "VEC3") {
+      return AccessorType::VEC3;
+    }
+    else if (typeStr == "VEC4") {
+      return AccessorType::VEC4;
+    }
+    else if (typeStr == "MAT2") {
+      return AccessorType::MAT2;
+    }
+    else if (typeStr == "MAT3") {
+      return AccessorType::MAT3;
+    }
+    else if (typeStr == "MAT4") {
+      return AccessorType::MAT4;
+    }
+    else {
+      return AccessorType::INVALID;
     }
   }
 
@@ -604,6 +699,9 @@ struct IAsset : public IChildRootProperty {
    * The minimum glTF version that this asset targets
    */
   std::string minVersion;
+
+  static IAsset Parse(const json& parsedAsset);
+
 }; // end of struct IAsset
 
 /**
@@ -632,9 +730,9 @@ struct IBufferView : public IChildRootProperty {
   /**
    * The offset into the buffer in bytes
    */
-  std::optional<int> byteOffset = std::nullopt;
+  std::optional<size_t> byteOffset = std::nullopt;
   /**
-   * The lenth of the bufferView in bytes
+   * The length of the bufferView in bytes
    */
   size_t byteLength;
   /**
@@ -1150,6 +1248,9 @@ struct IAccessor : public IGLTF2::IAccessor, IArrayItem {
 
   /** @hidden */
   VertexBufferPtr _babylonVertexBuffer = nullptr;
+
+  static IAccessor Parse(const json& parsedAccessor);
+
 }; // end of struct IAccessor
 
 /**
@@ -1187,6 +1288,9 @@ struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
 struct IBuffer : public IGLTF2::IBuffer, IArrayItem {
   /** @hidden */
   ArrayBufferView _data;
+
+  static IBuffer Parse(const json& parsedBuffer);
+
 }; // end of struct IBuffer
 
 /**
@@ -1198,6 +1302,9 @@ struct IBufferView : public IGLTF2::IBufferView, IArrayItem {
 
   /** @hidden */
   BufferPtr _babylonBuffer = nullptr;
+
+  static IBufferView Parse(const json& parsedBufferView);
+
 }; // end of struct IBufferView
 
 /**
@@ -1218,6 +1325,10 @@ struct IImage : public IGLTF2::IImage, IArrayItem {
  * @brief Loader interface with additional members.
  */
 struct IMaterialNormalTextureInfo : public IGLTF2::IMaterialNormalTextureInfo {
+
+  static IMaterialNormalTextureInfoPtr
+  Parse(const json& parsedMaterialNormalTextureInfo);
+
 }; // end of struct IMaterialNormalTextureInfo
 
 /**
@@ -1225,6 +1336,10 @@ struct IMaterialNormalTextureInfo : public IGLTF2::IMaterialNormalTextureInfo {
  */
 struct IMaterialOcclusionTextureInfo
     : public IGLTF2::IMaterialOcclusionTextureInfo {
+
+  static IMaterialOcclusionTextureInfoPtr
+  Parse(const json& parsedMaterialOcclusionTextureInfo);
+
 }; // end of struct IMaterialOcclusionTextureInfo
 
 /**
@@ -1232,6 +1347,10 @@ struct IMaterialOcclusionTextureInfo
  */
 struct IMaterialPbrMetallicRoughness
     : public IGLTF2::IMaterialPbrMetallicRoughness {
+
+  static IMaterialPbrMetallicRoughnessPtr
+  Parse(const json& parsedMaterialPbrMetallicRoughness);
+
 }; // end of struct IMaterialPbrMetallicRoughness
 
 struct IMaterialData {
@@ -1247,12 +1366,18 @@ struct IMaterial : public IGLTF2::IMaterial, IArrayItem {
   /** @hidden */
   // babylonDrawMode -> IMaterialData
   std::unordered_map<unsigned int, GLTF2::IMaterialData> _data;
+
+  static IMaterial Parse(const json& parsedMaterial);
+
 }; // end of struct IMaterial
 
 /**
  * @brief Loader interface with additional members.
  */
 struct IMesh : public IGLTF2::IMesh, IArrayItem {
+
+  static IMesh Parse(const json& parsedMesh);
+
 }; // end of struct IMesh
 
 /**
@@ -1266,6 +1391,9 @@ struct IMeshPrimitive : public IGLTF2::IMeshPrimitive, IArrayItem {
 
   /** @hidden */
   std::optional<IMeshPrimitiveData> _instanceData = std::nullopt;
+
+  static IMeshPrimitive Parse(const json& parsedMeshPrimitive);
+
 }; // end of struct IMeshPrimitive
 
 /**
@@ -1288,6 +1416,9 @@ struct INode : public IGLTF2::INode, IArrayItem {
 
   /** @hidden */
   std::optional<size_t> _numMorphTargets = std::nullopt;
+
+  static INode Parse(const json& parsedNode);
+
 }; // end of struct INode
 
 /** @hidden */
@@ -1310,6 +1441,9 @@ struct ISampler : public IGLTF2::ISampler, IArrayItem {
  * @brief Loader interface with additional members.
  */
 struct IScene : public IGLTF2::IScene, IArrayItem {
+
+  static IScene Parse(const json& parsedScene);
+
 }; // end of struct IScene
 
 /**
@@ -1334,12 +1468,18 @@ struct ITexture : public IGLTF2::ITexture, IArrayItem {
  * @brief Loader interface with additional members.
  */
 struct ITextureInfo : public IGLTF2::ITextureInfo {
+
+  static ITextureInfoPtr Parse(const json& parsedTextureInfo);
+
 }; // end of struct ITextureInfo
 
 /**
  * @brief Loader interface with additional members.
  */
 struct IGLTF : public IGLTF2::IGLTF {
+
+  static IGLTF Parse(const json& parsedGLTFObject);
+
 }; // end of struct IGLTF
 
 } // end of namespace GLTF2

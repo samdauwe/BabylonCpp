@@ -7,6 +7,9 @@
 #include <babylon/engine/scene.h>
 #include <babylon/loading/ifileInfo.h>
 #include <babylon/loading/iregistered_plugin.h>
+#include <babylon/loading/iscene_loader_plugin.h>
+#include <babylon/loading/iscene_loader_plugin_async.h>
+#include <babylon/loading/iscene_loader_plugin_factory.h>
 #include <babylon/loading/plugins/babylon/babylon_file_loader.h>
 #include <babylon/loading/scene_loader_progress_event.h>
 #include <babylon/tools/tools.h>
@@ -18,6 +21,8 @@ bool SceneLoader::_ShowLoadingScreen                   = true;
 bool SceneLoader::_CleanBoneMatrixWeights              = false;
 unsigned int SceneLoader::_loggingLevel = SceneLoader::NO_LOGGING;
 Observable<ISceneLoaderPlugin> SceneLoader::OnPluginActivatedObservable;
+Observable<ISceneLoaderPluginAsync>
+  SceneLoader::OnPluginAsyncActivatedObservable;
 
 bool SceneLoader::ForceFullSceneLoadingForIncremental()
 {
@@ -104,9 +109,28 @@ IRegisteredPlugin SceneLoader::_getPluginForDirectLoad(const std::string& data)
   for (const auto& pluginItem : SceneLoader::_registeredPlugins) {
     const auto& registeredPlugin = pluginItem.second;
 
-    if (registeredPlugin.plugin->canDirectLoad
-        && registeredPlugin.plugin->canDirectLoad(data)) {
-      return registeredPlugin;
+    if (std::holds_alternative<ISceneLoaderPluginPtr>(
+          registeredPlugin.plugin)) {
+      auto plugin = std::get<ISceneLoaderPluginPtr>(registeredPlugin.plugin);
+      if (plugin->canDirectLoad && plugin->canDirectLoad(data)) {
+        return registeredPlugin;
+      }
+    }
+    else if (std::holds_alternative<ISceneLoaderPluginAsyncPtr>(
+               registeredPlugin.plugin)) {
+      auto plugin
+        = std::get<ISceneLoaderPluginAsyncPtr>(registeredPlugin.plugin);
+      if (plugin->canDirectLoad && plugin->canDirectLoad(data)) {
+        return registeredPlugin;
+      }
+    }
+    else if (std::holds_alternative<ISceneLoaderPluginFactoryPtr>(
+               registeredPlugin.plugin)) {
+      auto plugin
+        = std::get<ISceneLoaderPluginFactoryPtr>(registeredPlugin.plugin);
+      if (plugin->factoryCanDirectLoad && plugin->factoryCanDirectLoad(data)) {
+        return registeredPlugin;
+      }
     }
   }
 
@@ -137,11 +161,13 @@ std::string SceneLoader::_getDirectLoad(const std::string& sceneFilename)
   return "";
 }
 
-std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
+std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>
+SceneLoader::_loadData(
   const IFileInfo& fileInfo, Scene* scene,
-  const std::function<void(const std::shared_ptr<ISceneLoaderPlugin>& plugin,
-                           const std::string& data,
-                           const std::string& responseURL)>& onSuccess,
+  const std::function<
+    void(const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>&
+           plugin,
+         const std::string& data, const std::string& responseURL)>& onSuccess,
   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
   const std::function<void(const std::string& message,
                            const std::string& exception)>& onError,
@@ -155,10 +181,25 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
         (!directLoad.empty() ?
            SceneLoader::_getPluginForDirectLoad(fileInfo.name) :
            SceneLoader::_getPluginForFilename(fileInfo.name));
-  auto& plugin         = registeredPlugin.plugin;
+
+  ISceneLoaderPluginPtr plugin           = nullptr;
+  ISceneLoaderPluginAsyncPtr pluginAsync = nullptr;
+  if (std::holds_alternative<ISceneLoaderPluginPtr>(registeredPlugin.plugin)) {
+    plugin = std::get<ISceneLoaderPluginPtr>(registeredPlugin.plugin);
+  }
+  else if (std::holds_alternative<ISceneLoaderPluginAsyncPtr>(
+             registeredPlugin.plugin)) {
+    pluginAsync = std::get<ISceneLoaderPluginAsyncPtr>(registeredPlugin.plugin);
+  }
   auto& useArrayBuffer = registeredPlugin.isBinary;
 
-  SceneLoader::OnPluginActivatedObservable.notifyObservers(plugin.get());
+  if (plugin) {
+    SceneLoader::OnPluginActivatedObservable.notifyObservers(plugin.get());
+  }
+  else {
+    SceneLoader::OnPluginAsyncActivatedObservable.notifyObservers(
+      pluginAsync.get());
+  }
 
   const auto dataCallback
     = [&](const std::variant<std::string, ArrayBuffer>& data,
@@ -191,7 +232,7 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
   if (!directLoad.empty()) {
     // Direct load
     dataCallback(directLoad, "");
-    return plugin;
+    return std::move(plugin);
   }
 
   // Loading file from disk
@@ -202,7 +243,7 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::_loadData(
     onError("Unable to find file named " + fileInfo.name, "");
   }
 
-  return plugin;
+  return std::move(plugin);
 }
 
 std::optional<IFileInfo>
@@ -233,10 +274,11 @@ SceneLoader::_getFileInfo(std::string rootUrl, const std::string& sceneFilename)
   };
 }
 
-ISceneLoaderPlugin*
+std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr,
+             ISceneLoaderPluginFactoryPtr>
 SceneLoader::GetPluginForExtension(const std::string& extension)
 {
-  return SceneLoader::_getPluginForExtension(extension).plugin.get();
+  return SceneLoader::_getPluginForExtension(extension).plugin;
 }
 
 bool SceneLoader::IsPluginForExtensionAvailable(const std::string& extension)
@@ -244,18 +286,40 @@ bool SceneLoader::IsPluginForExtensionAvailable(const std::string& extension)
   return stl_util::contains(SceneLoader::_registeredPlugins, extension);
 }
 
-void SceneLoader::RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin)
+void SceneLoader::RegisterPlugin(
+  const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>& plugin)
 {
-  auto& extensions = plugin->extensions.mapping;
-  for (auto& item : extensions) {
-    SceneLoader::_registeredPlugins[String::toLowerCase(item.first)] = {
-      std::move(plugin), // plugin
-      item.second        // isBinary
+  ISceneLoaderPluginPtr syncedPlugin       = nullptr;
+  ISceneLoaderPluginAsyncPtr asyncedPlugin = nullptr;
+  if (std::holds_alternative<ISceneLoaderPluginPtr>(plugin)) {
+    syncedPlugin = std::get<ISceneLoaderPluginPtr>(plugin);
+  }
+  else {
+    asyncedPlugin = std::get<ISceneLoaderPluginAsyncPtr>(plugin);
+  }
+
+  auto& extensions
+    = syncedPlugin ? syncedPlugin->extensions : asyncedPlugin->extensions;
+  if (std::holds_alternative<std::string>(extensions)) {
+    auto extension = std::get<std::string>(extensions);
+    SceneLoader::_registeredPlugins[String::toLowerCase(extension)] = {
+      plugin, // plugin
+      false   // isBinary
     };
+  }
+  else {
+    auto extensionList = std::get<ISceneLoaderPluginExtensions>(extensions);
+    for (auto& item : extensionList.mapping) {
+      SceneLoader::_registeredPlugins[String::toLowerCase(item.first)] = {
+        plugin,     // plugin
+        item.second // isBinary
+      };
+    }
   }
 }
 
-std::shared_ptr<ISceneLoaderPlugin> SceneLoader::ImportMesh(
+std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
+SceneLoader::ImportMesh(
   const std::vector<std::string>& meshNames, std::string rootUrl,
   std::string sceneFilename, Scene* scene,
   const std::function<
@@ -272,12 +336,12 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::ImportMesh(
 
   if (!scene) {
     BABYLON_LOG_ERROR("SceneLoader", "No scene available to import mesh to");
-    return nullptr;
+    return std::nullopt;
   }
 
   auto fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
   if (!fileInfo) {
-    return nullptr;
+    return std::nullopt;
   }
 
   const auto disposeHandler = []() {};
@@ -331,27 +395,40 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::ImportMesh(
 
   return SceneLoader::_loadData(
     *fileInfo, scene,
-    [&](const std::shared_ptr<ISceneLoaderPlugin>& plugin,
-        const std::string& data, const std::string& responseURL) {
-      if (plugin->rewriteRootURL) {
-        fileInfo->rootUrl
-          = plugin->rewriteRootURL(fileInfo->rootUrl, responseURL);
+    [&](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>&
+          plugin,
+        const std::string& data, const std::string& responseURL) -> void {
+      if (std::holds_alternative<ISceneLoaderPluginPtr>(plugin)) {
+        auto syncedPlugin = std::get<ISceneLoaderPluginPtr>(plugin);
+
+        if (syncedPlugin->rewriteRootURL) {
+          fileInfo->rootUrl
+            = syncedPlugin->rewriteRootURL(fileInfo->rootUrl, responseURL);
+        }
+
+        std::vector<AbstractMeshPtr> meshes;
+        std::vector<IParticleSystemPtr> particleSystems;
+        std::vector<SkeletonPtr> skeletons;
+        std::vector<AnimationGroupPtr> animationGroups;
+
+        if (!syncedPlugin->importMesh(meshNames, scene, data, fileInfo->rootUrl,
+                                      meshes, particleSystems, skeletons,
+                                      errorHandler)) {
+          return;
+        }
+
+        scene->loadingPluginName = syncedPlugin->name;
+        successHandler(meshes, particleSystems, skeletons, animationGroups);
       }
-
-      auto& syncedPlugin = plugin;
-      std::vector<AbstractMeshPtr> meshes;
-      std::vector<IParticleSystemPtr> particleSystems;
-      std::vector<SkeletonPtr> skeletons;
-      std::vector<AnimationGroupPtr> animationGroups;
-
-      if (!syncedPlugin->importMesh(meshNames, scene, data, fileInfo->rootUrl,
-                                    meshes, particleSystems, skeletons,
-                                    errorHandler)) {
-        return;
+      else {
+        auto asyncedPlugin = std::get<ISceneLoaderPluginAsyncPtr>(plugin);
+        auto result        = asyncedPlugin->importMeshAsync(
+          meshNames, scene, data, fileInfo->rootUrl, progressHandler,
+          fileInfo->name);
+        scene->loadingPluginName = asyncedPlugin->name;
+        successHandler(result.meshes, result.particleSystems, result.skeletons,
+                       result.animationGroups);
       }
-
-      scene->loadingPluginName = plugin->name;
-      successHandler(meshes, particleSystems, skeletons, animationGroups);
     },
     progressHandler, errorHandler, disposeHandler, pluginExtension);
 }
@@ -370,7 +447,8 @@ std::unique_ptr<Scene> SceneLoader::Load(
   return scene;
 }
 
-std::shared_ptr<ISceneLoaderPlugin> SceneLoader::Append(
+std::optional<std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
+SceneLoader::Append(
   std::string rootUrl, std::string sceneFilename, Scene* scene,
   const std::function<void(Scene* scene)>& onSuccess,
   const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress,
@@ -382,12 +460,12 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::Append(
 
   if (!scene) {
     BABYLON_LOG_ERROR("SceneLoader", "No scene available to append to");
-    return nullptr;
+    return std::nullopt;
   }
 
   auto fileInfo = SceneLoader::_getFileInfo(rootUrl, sceneFilename);
   if (!fileInfo) {
-    return nullptr;
+    return std::nullopt;
   }
 
   if (SceneLoader::ShowLoadingScreen()) {
@@ -439,15 +517,25 @@ std::shared_ptr<ISceneLoaderPlugin> SceneLoader::Append(
 
   return SceneLoader::_loadData(
     *fileInfo, scene,
-    [&](const std::shared_ptr<ISceneLoaderPlugin>& plugin,
-        const std::string& data, const std::string& /*responseURL*/) {
-      auto& syncedPlugin = plugin;
-      if (!syncedPlugin->load(scene, data, fileInfo->rootUrl, errorHandler)) {
-        return;
-      }
+    [&](const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>&
+          plugin,
+        const std::string& data, const std::string & /*responseURL*/) -> void {
+      if (std::holds_alternative<ISceneLoaderPluginPtr>(plugin)) {
+        auto syncedPlugin = std::get<ISceneLoaderPluginPtr>(plugin);
+        if (!syncedPlugin->load(scene, data, fileInfo->rootUrl, errorHandler)) {
+          return;
+        }
 
-      scene->loadingPluginName = plugin->name;
-      successHandler();
+        scene->loadingPluginName = syncedPlugin->name;
+        successHandler();
+      }
+      else {
+        auto asyncedPlugin = std::get<ISceneLoaderPluginAsyncPtr>(plugin);
+        asyncedPlugin->loadAsync(scene, data, fileInfo->rootUrl,
+                                 progressHandler, fileInfo->name);
+        scene->loadingPluginName = asyncedPlugin->name;
+        successHandler();
+      }
 
       if (SceneLoader::ShowLoadingScreen()) {
         scene->executeWhenReady([](Scene* scene, EventState& /*es*/) {

@@ -9,6 +9,7 @@
 #include <babylon/loading/glTF/2.0/gltf_loader.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 #include <babylon/loading/glTF/binary_reader.h>
+#include <babylon/loading/scene_loader.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -18,6 +19,11 @@ const std::string GLTFFileLoader::_logSpaces
   = "                                ";
 bool GLTFFileLoader::IncrementalLoading     = true;
 bool GLTFFileLoader::HomogeneousCoordinates = false;
+
+void GLTFFileLoader::RegisterAsSceneLoaderPlugin()
+{
+  SceneLoader::RegisterPlugin(std::make_shared<GLTFFileLoader>());
+}
 
 IGLTFLoaderPtr GLTFFileLoader::_CreateGLTF2Loader(GLTFFileLoader& parent)
 {
@@ -66,12 +72,16 @@ GLTFFileLoader::GLTFFileLoader()
     , _capturePerformanceCounters{false}
 {
   // Name of the loader ("gltf")
-  name = "gltf";
+  factoryName = name = "gltf";
   // Supported file extensions of the loader (.gltf, .glb)
-  extensions.mapping.emplace(std::make_pair(".gltf", false));
-  extensions.mapping.emplace(std::make_pair(".glb", true));
+  ISceneLoaderPluginExtensions supportedFileExtensions;
+  supportedFileExtensions.mapping = {
+    {".gltf", false}, // .gltf
+    {".glb", true}    // ".glb"
+  };
+  extensions = supportedFileExtensions;
   // If the data string can be loaded directly
-  canDirectLoad = [](const std::string& data) {
+  factoryCanDirectLoad = canDirectLoad = [](const std::string& data) {
     return String::contains(data, "scene") && String::contains(data, "node");
   };
 
@@ -303,7 +313,8 @@ AssetContainerPtr GLTFFileLoader::loadAssetContainerAsync(
   return container;
 }
 
-ISceneLoaderPluginAsyncPtr GLTFFileLoader::createPlugin()
+std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>
+GLTFFileLoader::createPlugin()
 {
   return std::make_shared<GLTFFileLoader>();
 }

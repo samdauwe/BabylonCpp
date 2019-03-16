@@ -31,8 +31,8 @@ namespace BABYLON {
 
 BabylonFileLoader::BabylonFileLoader()
 {
-  name = "babylon.js";
-  extensions.mapping.emplace(std::make_pair(".babylon", false));
+  name          = "babylon.js";
+  extensions    = ".babylon";
   canDirectLoad = [](const std::string& data) {
     // We consider that the producer string is filled
     if (String::endsWith(data, "babylon")) {

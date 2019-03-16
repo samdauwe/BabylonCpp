@@ -1,20 +1,33 @@
-#ifndef BABYLON_LOADING_SCENE_LOADER_H
+﻿#ifndef BABYLON_LOADING_SCENE_LOADER_H
 #define BABYLON_LOADING_SCENE_LOADER_H
 
 #include <optional>
+#include <variant>
 
 #include <babylon/babylon_api.h>
-#include <babylon/loading/iscene_loader_plugin.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
 
+class AbstractMesh;
 class AnimationGroup;
 class Engine;
 struct IFileInfo;
+class IParticleSystem;
 struct IRegisteredPlugin;
+class Scene;
 class SceneLoaderProgressEvent;
-using AnimationGroupPtr = std::shared_ptr<AnimationGroup>;
+class Skeleton;
+struct ISceneLoaderPlugin;
+struct ISceneLoaderPluginAsync;
+struct ISceneLoaderPluginFactory;
+using AbstractMeshPtr              = std::shared_ptr<AbstractMesh>;
+using AnimationGroupPtr            = std::shared_ptr<AnimationGroup>;
+using IParticleSystemPtr           = std::shared_ptr<IParticleSystem>;
+using ISceneLoaderPluginPtr        = std::shared_ptr<ISceneLoaderPlugin>;
+using ISceneLoaderPluginAsyncPtr   = std::shared_ptr<ISceneLoaderPluginAsync>;
+using ISceneLoaderPluginFactoryPtr = std::shared_ptr<ISceneLoaderPluginFactory>;
+using SkeletonPtr                  = std::shared_ptr<Skeleton>;
 
 /**
  * @brief Class used to load scene from various file formats using registered
@@ -105,11 +118,13 @@ private:
   static IRegisteredPlugin _getPluginForDirectLoad(const std::string& data);
   static IRegisteredPlugin _getPluginForFilename(std::string sceneFilename);
   static std::string _getDirectLoad(const std::string& sceneFilename);
-  static std::shared_ptr<ISceneLoaderPlugin> _loadData(
+  static std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>
+  _loadData(
     const IFileInfo& fileInfo, Scene* scene,
-    const std::function<void(const std::shared_ptr<ISceneLoaderPlugin>& plugin,
-                             const std::string& data,
-                             const std::string& responseURL)>& onSuccess,
+    const std::function<void(
+      const std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>&
+        plugin,
+      const std::string& data, const std::string& responseURL)>& onSuccess,
     const std::function<void(const SceneLoaderProgressEvent& event)>&
       onProgress,
     const std::function<void(const std::string& message,
@@ -124,7 +139,8 @@ public:
    * @param extension defines the extension to load
    * @returns a plugin or null if none works
    */
-  static ISceneLoaderPlugin*
+  static std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr,
+                      ISceneLoaderPluginFactoryPtr>
   GetPluginForExtension(const std::string& extension);
 
   /**
@@ -138,7 +154,9 @@ public:
    * @brief Adds a new plugin to the list of registered plugins.
    * @param plugin defines the plugin to add
    */
-  static void RegisterPlugin(std::shared_ptr<ISceneLoaderPlugin>&& plugin);
+  static void
+  RegisterPlugin(const std::variant<ISceneLoaderPluginPtr,
+                                    ISceneLoaderPluginAsyncPtr>& plugin);
 
   /**
    * @brief Import meshes into a scene
@@ -160,7 +178,9 @@ public:
    * @param pluginExtension the extension used to determine the plugin
    * @returns The loaded plugin
    */
-  static std::shared_ptr<ISceneLoaderPlugin> ImportMesh(
+  static std::optional<
+    std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
+  ImportMesh(
     const std::vector<std::string>& meshNames, std::string rootUrl,
     std::string sceneFilename, Scene* scene = nullptr,
     const std::function<
@@ -221,7 +241,9 @@ public:
    * @param pluginExtension the extension used to determine the plugin
    * @returns The loaded plugin
    */
-  static std::shared_ptr<ISceneLoaderPlugin> Append(
+  static std::optional<
+    std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr>>
+  Append(
     std::string rootUrl, std::string sceneFilename = "", Scene* scene = nullptr,
     const std::function<void(Scene* scene)>& onSuccess = nullptr,
     const std::function<void(const SceneLoaderProgressEvent& event)>& onProgress
@@ -238,6 +260,7 @@ public:
    * Event raised when a plugin is used to load a scene
    */
   static Observable<ISceneLoaderPlugin> OnPluginActivatedObservable;
+  static Observable<ISceneLoaderPluginAsync> OnPluginAsyncActivatedObservable;
 
 private:
   static std::unordered_map<std::string, IRegisteredPlugin> _registeredPlugins;

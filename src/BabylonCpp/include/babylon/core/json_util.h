@@ -18,6 +18,11 @@ inline bool has_key(const json& o, const std::string& key)
   return (o.find(key) != o.end());
 }
 
+inline bool has_valid_key_value(const json& o, const std::string& key)
+{
+  return has_key(o, key) && !is_null(o[key]);
+}
+
 template <typename T = bool>
 inline T get_bool(const json& j, const std::string& key, T defaultValue = T())
 {

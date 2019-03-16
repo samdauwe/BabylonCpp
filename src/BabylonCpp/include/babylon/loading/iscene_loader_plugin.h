@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <babylon/babylon_api.h>
@@ -34,7 +35,7 @@ struct BABYLON_SHARED_EXPORT ISceneLoaderPlugin {
   /**
    * The file extensions supported by this plugin.
    */
-  ISceneLoaderPluginExtensions extensions;
+  std::variant<std::string, ISceneLoaderPluginExtensions> extensions;
 
   /**
    * @brief Import meshes into a scene.
