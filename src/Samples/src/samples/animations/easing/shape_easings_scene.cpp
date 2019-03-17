@@ -176,9 +176,9 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
   // -- Make an Animatable --
   // params: (scene, target, fromFrame, toFrame, loopAnimation, speedRatio,
   // onAnimationEnd, animations)
-  auto aa1 = Animatable::New(scene, box1, 1000, 1120, 1, 1.f, nullptr,
+  auto aa1 = Animatable::New(scene, box1, 1000.f, 1120.f, true, 1.f, nullptr,
                              std::vector<AnimationPtr>{a1});
-  auto aa2 = Animatable::New(scene, box2, 1000, 1120, 1, 1.f, nullptr,
+  auto aa2 = Animatable::New(scene, box2, 1000.f, 1120.f, true, 1.f, nullptr,
                              std::vector<AnimationPtr>{a2});
   // Start the animatables
   aa1->_animate(millisecond_t(1));
@@ -186,13 +186,13 @@ void ShapeEasingsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // -- Start animations using Scene.beginAnimation --
   // params: (target, from, to, loop, speedRatio, onAnimationEnd, animatable)
-  scene->beginAnimation(box3, 1000, 1120, true, 1.f, nullptr);
-  scene->beginAnimation(shape5, 1000, 1120, true, 1.f, nullptr);
+  scene->beginAnimation(box3, 1000.f, 1120.f, true, 1.f, nullptr);
+  scene->beginAnimation(shape5, 1000.f, 1120.f, true, 1.f, nullptr);
 
   // -- Start animations using Scene.beginDirectAnimation --
   // params: (target, animations, from, to, loop, speedRatio, onAnimationEnd)
-  scene->beginDirectAnimation(box4, {a4}, 1000, 1120, true, 1.f, nullptr);
-  scene->beginDirectAnimation(shape6, {a6}, 1000, 1120, true, 1.f, nullptr);
+  scene->beginDirectAnimation(box4, {a4}, 1000.f, 1120.f, true, 1.f, nullptr);
+  scene->beginDirectAnimation(shape6, {a6}, 1000.f, 1120.f, true, 1.f, nullptr);
 
   /** a7a - a7b - easing animations on shape 7 **/
 

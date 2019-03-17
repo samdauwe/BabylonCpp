@@ -61,8 +61,8 @@ void BoxShadowScene::initializeScene(ICanvas* canvas, Scene* scene)
   ground->receiveShadows = true;
 
   // Camera
-  auto camera = ArcRotateCamera::New("arcCam", 0, Tools::ToRadians(45.f), 60,
-                                     box->position(), scene);
+  auto camera = ArcRotateCamera::New("arcCam", 0.f, Tools::ToRadians(45.f),
+                                     60.f, box->position(), scene);
   camera->attachControl(canvas, true);
 }
 

@@ -13,7 +13,7 @@ class AbstractMesh;
 class AnimationGroup;
 class Engine;
 struct IFileInfo;
-class IParticleSystem;
+struct IParticleSystem;
 struct IRegisteredPlugin;
 class Scene;
 class SceneLoaderProgressEvent;
