@@ -70,7 +70,7 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       [](ICanvas* iCanvas) {                              //
                         return std::make_unique<ImportBoxScene>(iCanvas); //
                       });                                                 //
-  // Import Box Scene (glTF)
+  // Import Triangle Without Indices Scene (glTF)
   _samples["TriangleWithoutIndicesScene"] = std::make_tuple(
     true,                                                            //
     [](ICanvas* iCanvas) {                                           //

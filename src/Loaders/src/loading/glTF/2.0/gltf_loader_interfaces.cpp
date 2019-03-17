@@ -252,12 +252,14 @@ IMeshPrimitive IMeshPrimitive::Parse(const json& parsedMeshPrimitive)
   IMeshPrimitive meshPrimitive;
 
   // Attributes
-  for (const auto& attribute :
-       json_util::get_array<json>(parsedMeshPrimitive, "attributes")) {
-    for (const auto& attributeElement : attribute.items()) {
-      auto key                      = attributeElement.key();
-      auto value                    = attributeElement.value();
-      meshPrimitive.attributes[key] = value;
+  if (json_util::has_valid_key_value(parsedMeshPrimitive, "attributes")) {
+    for (const auto& attributeElement :
+         parsedMeshPrimitive["attributes"].items()) {
+      auto key   = attributeElement.key();
+      auto value = attributeElement.value();
+      if (value.is_number_unsigned()) {
+        meshPrimitive.attributes[key] = value.get<size_t>();
+      }
     }
   }
 
@@ -349,9 +351,10 @@ ITextureInfoPtr ITextureInfo::Parse(const json& parsedTextureInfo)
   return textureInfo;
 }
 
-IGLTF IGLTF::Parse(const json& parsedGLTFObject)
+std::unique_ptr<IGLTF> IGLTF::Parse(const json& parsedGLTFObject)
 {
-  IGLTF glTFObject;
+  auto glTFObjectPtr = std::make_unique<IGLTF>();
+  auto& glTFObject   = *glTFObjectPtr;
 
   // Accessors
   for (const auto& accessor :
@@ -405,7 +408,7 @@ IGLTF IGLTF::Parse(const json& parsedGLTFObject)
     glTFObject.scenes.emplace_back(IScene::Parse(scene));
   }
 
-  return glTFObject;
+  return glTFObjectPtr;
 }
 
 } // end of namespace GLTF2

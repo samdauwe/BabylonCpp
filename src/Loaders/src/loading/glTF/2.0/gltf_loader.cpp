@@ -225,7 +225,7 @@ void GLTFLoader::_loadAsync(const std::vector<size_t> nodes,
 
 void GLTFLoader::_loadData(const IGLTFLoaderData& data)
 {
-  gltf = nullptr; // Parse json !
+  gltf = IGLTF::Parse(data.jsonObject);
   _setupData();
 
   if (data.bin.has_value()) {

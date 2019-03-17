@@ -2,6 +2,7 @@
 
 #include <babylon/engine/scene.h>
 #include <babylon/helpers/environment_helper.h>
+#include <babylon/loading/glTF/gltf_file_loader.h>
 #include <babylon/loading/scene_loader.h>
 
 namespace BABYLON {
@@ -10,6 +11,7 @@ namespace Samples {
 TriangleWithoutIndicesScene::TriangleWithoutIndicesScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
 {
+  GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
 }
 
 TriangleWithoutIndicesScene::~TriangleWithoutIndicesScene()

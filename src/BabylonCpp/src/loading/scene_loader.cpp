@@ -182,23 +182,27 @@ SceneLoader::_loadData(
            SceneLoader::_getPluginForDirectLoad(fileInfo.name) :
            SceneLoader::_getPluginForFilename(fileInfo.name));
 
-  ISceneLoaderPluginPtr plugin           = nullptr;
-  ISceneLoaderPluginAsyncPtr pluginAsync = nullptr;
+  std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> plugin;
+  ISceneLoaderPluginPtr syncedPlugin       = nullptr;
+  ISceneLoaderPluginAsyncPtr asyncedPlugin = nullptr;
   if (std::holds_alternative<ISceneLoaderPluginPtr>(registeredPlugin.plugin)) {
-    plugin = std::get<ISceneLoaderPluginPtr>(registeredPlugin.plugin);
+    plugin = syncedPlugin
+      = std::get<ISceneLoaderPluginPtr>(registeredPlugin.plugin);
   }
   else if (std::holds_alternative<ISceneLoaderPluginAsyncPtr>(
              registeredPlugin.plugin)) {
-    pluginAsync = std::get<ISceneLoaderPluginAsyncPtr>(registeredPlugin.plugin);
+    plugin = asyncedPlugin
+      = std::get<ISceneLoaderPluginAsyncPtr>(registeredPlugin.plugin);
   }
   auto& useArrayBuffer = registeredPlugin.isBinary;
 
-  if (plugin) {
-    SceneLoader::OnPluginActivatedObservable.notifyObservers(plugin.get());
+  if (syncedPlugin) {
+    SceneLoader::OnPluginActivatedObservable.notifyObservers(
+      syncedPlugin.get());
   }
   else {
     SceneLoader::OnPluginAsyncActivatedObservable.notifyObservers(
-      pluginAsync.get());
+      asyncedPlugin.get());
   }
 
   const auto dataCallback
@@ -232,7 +236,7 @@ SceneLoader::_loadData(
   if (!directLoad.empty()) {
     // Direct load
     dataCallback(directLoad, "");
-    return std::move(plugin);
+    return plugin;
   }
 
   // Loading file from disk
@@ -243,7 +247,7 @@ SceneLoader::_loadData(
     onError("Unable to find file named " + fileInfo.name, "");
   }
 
-  return std::move(plugin);
+  return plugin;
 }
 
 std::optional<IFileInfo>
@@ -298,7 +302,7 @@ void SceneLoader::RegisterPlugin(
     asyncedPlugin = std::get<ISceneLoaderPluginAsyncPtr>(plugin);
   }
 
-  auto& extensions
+  auto extensions
     = syncedPlugin ? syncedPlugin->extensions : asyncedPlugin->extensions;
   if (std::holds_alternative<std::string>(extensions)) {
     auto extension = std::get<std::string>(extensions);

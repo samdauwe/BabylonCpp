@@ -83,7 +83,7 @@ struct IGLTFLoaderData {
   /**
    * Object that represents the glTF JSON.
    */
-  json object;
+  json jsonObject;
 
   /**
    * The BIN chunk of a binary glTF.

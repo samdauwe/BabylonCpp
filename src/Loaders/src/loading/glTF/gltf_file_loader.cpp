@@ -343,7 +343,7 @@ IGLTFLoaderData GLTFFileLoader::_parseAsync(
 
   _validateAsync(scene, unpacked.json, rootUrl, fileName);
   _startPerformanceCounter("Parse JSON");
-  _log(String::printf("JSON length: %ls", unpacked.json.size()));
+  _log(String::printf("JSON length: %ld", unpacked.json.size()));
 
   IGLTFLoaderData loaderData{
     json::parse(unpacked.json), // json
@@ -367,11 +367,11 @@ void GLTFFileLoader::_validateAsync(Scene* /*scene*/,
 
 IGLTFLoaderPtr GLTFFileLoader::_getLoader(const IGLTFLoaderData& loaderData)
 {
-  if (!json_util::has_key(loaderData.object, "asset")) {
+  if (!json_util::has_key(loaderData.jsonObject, "asset")) {
     return nullptr;
   }
 
-  auto asset           = loaderData.object["asset"];
+  auto asset           = loaderData.jsonObject["asset"];
   auto assetVersion    = json_util::get_string(asset, "version");
   auto assetMinVersion = json_util::get_string(asset, "minVersion");
   if (!assetMinVersion.empty()) {

@@ -19,56 +19,15 @@ using ISceneLoaderPluginFactoryPtr = std::shared_ptr<ISceneLoaderPluginFactory>;
  * @brief Defines a plugin registered by the SceneLoader.
  */
 struct BABYLON_SHARED_EXPORT IRegisteredPlugin {
-  IRegisteredPlugin() : isBinary{false}
-  {
-  }
-
-  IRegisteredPlugin(
-    std::variant<ISceneLoaderPluginPtr, ISceneLoaderPluginAsyncPtr> iPlugin,
-    bool iIsBinary)
-      : isBinary{iIsBinary}
-  {
-    if (std::holds_alternative<ISceneLoaderPluginPtr>(plugin)) {
-      plugin = std::get<ISceneLoaderPluginPtr>(iPlugin);
-    }
-    else {
-      plugin = std::get<ISceneLoaderPluginAsyncPtr>(iPlugin);
-    }
-  }
-
-  IRegisteredPlugin(const IRegisteredPlugin& other)
-      : plugin{other.plugin}, isBinary{other.isBinary}
-  {
-  }
-
-  IRegisteredPlugin(IRegisteredPlugin&& other)
-      : plugin{std::move(other.plugin)}, isBinary{std::move(other.isBinary)}
-  {
-  }
-
-  IRegisteredPlugin& operator=(const IRegisteredPlugin& other)
-  {
-    if (&other != this) {
-      plugin   = other.plugin;
-      isBinary = other.isBinary;
-    }
-
-    return *this;
-  }
-
-  IRegisteredPlugin& operator=(IRegisteredPlugin&& other)
-  {
-    if (&other != this) {
-      plugin   = std::move(other.plugin);
-      isBinary = std::move(other.isBinary);
-    }
-
-    return *this;
-  }
-
-  ~IRegisteredPlugin()
-  {
-  }
+  IRegisteredPlugin();
+  IRegisteredPlugin(const std::variant<ISceneLoaderPluginPtr,
+                                       ISceneLoaderPluginAsyncPtr>& iPlugin,
+                    bool iIsBinary);
+  IRegisteredPlugin(const IRegisteredPlugin& other);
+  IRegisteredPlugin(IRegisteredPlugin&& other);
+  IRegisteredPlugin& operator=(const IRegisteredPlugin& other);
+  IRegisteredPlugin& operator=(IRegisteredPlugin&& other);
+  ~IRegisteredPlugin();
 
   /**
    * Defines the plugin to use

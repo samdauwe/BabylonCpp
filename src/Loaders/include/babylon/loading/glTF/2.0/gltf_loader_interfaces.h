@@ -504,7 +504,7 @@ struct IChildRootProperty : public IProperty {
   /**
    * The user-defined name of this object
    */
-  std::string name;
+  std::string name = "";
 }; // end of struct IChildRootProperty
 
 /**
@@ -516,7 +516,7 @@ struct IAccessorSparseIndices : public IProperty {
    * The index of the bufferView with sparse indices. Referenced bufferView
    * can't have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target
    */
-  size_t bufferView;
+  size_t bufferView = 0;
   /**
    * The offset relative to the start of the bufferView in bytes. Must be
    * aligned
@@ -538,7 +538,7 @@ struct IAccessorSparseValues : public IProperty {
    * The index of the bufferView with sparse values. Referenced bufferView can't
    * have ARRAY_BUFFER or ELEMENT_ARRAY_BUFFER target
    */
-  size_t bufferView;
+  size_t bufferView = 0;
   /**
    * The offset relative to the start of the bufferView in bytes. Must be
    * aligned
@@ -554,7 +554,7 @@ struct IAccessorSparse : public IProperty {
   /**
    * The number of attributes encoded in this sparse accessor
    */
-  size_t count;
+  size_t count = 0;
   /**
    * Index array of size count that points to those accessor attributes that
    * deviate from their initialization value. Indices must strictly increase
@@ -594,7 +594,7 @@ struct IAccessor : public IChildRootProperty {
   /**
    * The number of attributes referenced by this accessor
    */
-  size_t count;
+  size_t count = 0;
   /**
    * Specifies if the attribute is a scalar, vector, or matrix
    */
@@ -637,7 +637,7 @@ struct IAnimationChannel : public IProperty {
    * The index of a sampler in this animation used to compute the value for the
    * target
    */
-  size_t sampler;
+  size_t sampler = 0;
   /**
    * The index of the node and TRS property to target
    */
@@ -652,7 +652,7 @@ struct IAnimationSampler : public IProperty {
   /**
    * The index of an accessor containing keyframe input values, e.g., time
    */
-  size_t input;
+  size_t input = 0;
   /**
    * Interpolation algorithm
    */
@@ -660,7 +660,7 @@ struct IAnimationSampler : public IProperty {
   /**
    * The index of an accessor, containing keyframe output values
    */
-  size_t output;
+  size_t output = 0;
 }; // end of struct IAnimationSampler
 
 /**
@@ -686,19 +686,19 @@ struct IAsset : public IChildRootProperty {
   /**
    * A copyright message suitable for display to credit the content creator
    */
-  std::string copyright;
+  std::string copyright = "";
   /**
    * Tool that generated this glTF model.  Useful for debugging
    */
-  std::string generator;
+  std::string generator = "";
   /**
    * The glTF version that this asset targets
    */
-  std::string version;
+  std::string version = "";
   /**
    * The minimum glTF version that this asset targets
    */
-  std::string minVersion;
+  std::string minVersion = "";
 
   static IAsset Parse(const json& parsedAsset);
 
@@ -712,11 +712,11 @@ struct IBuffer : public IChildRootProperty {
    * The uri of the buffer.  Relative paths are relative to the .gltf file.
    * Instead of referencing an external file, the uri can also be a data-uri
    */
-  std::string uri;
+  std::string uri = "";
   /**
    * The length of the buffer in bytes
    */
-  size_t byteLength;
+  size_t byteLength = 0;
 }; // end of struct IBuffer
 
 /**
@@ -726,7 +726,7 @@ struct IBufferView : public IChildRootProperty {
   /**
    * The index of the buffer
    */
-  size_t buffer;
+  size_t buffer = 0;
   /**
    * The offset into the buffer in bytes
    */
@@ -734,7 +734,7 @@ struct IBufferView : public IChildRootProperty {
   /**
    * The length of the bufferView in bytes
    */
-  size_t byteLength;
+  size_t byteLength = 0;
   /**
    * The stride, in bytes
    */
@@ -749,20 +749,20 @@ struct ICameraOrthographic : public IProperty {
   /**
    * The floating-point horizontal magnification of the view. Must not be zero
    */
-  float xmag;
+  float xmag = 0.f;
   /**
    * The floating-point vertical magnification of the view. Must not be zero
    */
-  float ymag;
+  float ymag = 0.f;
   /**
    * The floating-point distance to the far clipping plane. zfar must be greater
    * than znear
    */
-  float zfar;
+  float zfar = 0.f;
   /**
    * The floating-point distance to the near clipping plane
    */
-  float znear;
+  float znear = 0.f;
 }; // end of struct ICameraOrthographic
 
 /**
@@ -777,7 +777,7 @@ struct ICameraPerspective : public IProperty {
   /**
    * The floating-point vertical field of view in radians
    */
-  float yfov;
+  float yfov = 0.f;
   /**
    * The floating-point distance to the far clipping plane
    */
@@ -785,7 +785,7 @@ struct ICameraPerspective : public IProperty {
   /**
    * The floating-point distance to the near clipping plane
    */
-  float znear;
+  float znear = 0.f;
 }; // end of struct IProperty
 
 /**
@@ -819,7 +819,7 @@ struct IImage : public IChildRootProperty {
    * Instead of referencing an external file, the uri can also be a data-uri.
    * The image format must be jpg or png
    */
-  std::string uri;
+  std::string uri = "";
   /**
    * The image's MIME type
    */
@@ -838,7 +838,7 @@ struct ITextureInfo : public IProperty {
   /**
    * The index of the texture
    */
-  size_t index;
+  size_t index = 0;
   /**
    * The set index of texture's TEXCOORD attribute used for texture coordinate
    * mapping
@@ -1096,7 +1096,7 @@ struct ITexture : public IChildRootProperty {
   /**
    * The index of the image used by this texture
    */
-  size_t source;
+  size_t source = 0;
 }; // end of struct ITexture
 
 /**
@@ -1236,7 +1236,7 @@ struct IArrayItem {
   /**
    * The index of this item in the array.
    */
-  size_t index;
+  size_t index = 0;
 }; // end of struct IArrayItem
 
 /**
@@ -1478,7 +1478,7 @@ struct ITextureInfo : public IGLTF2::ITextureInfo {
  */
 struct IGLTF : public IGLTF2::IGLTF {
 
-  static IGLTF Parse(const json& parsedGLTFObject);
+  static std::unique_ptr<IGLTF> Parse(const json& parsedGLTFObject);
 
 }; // end of struct IGLTF
 
