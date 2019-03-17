@@ -344,6 +344,10 @@ export(TARGETS ${TARGET}
 )
 
 # Copy asset directories
+# Loaders assets
+if (OPTION_BUILD_LOADERS)
+    copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/glTF-Sample-Models")
+endif()
 ## - Scenes
 copy_resource_dirs("${CMAKE_SOURCE_DIR}/assets/scenes")
 ## - Textures
