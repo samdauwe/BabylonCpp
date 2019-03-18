@@ -338,7 +338,7 @@ IGLTFLoaderData GLTFFileLoader::_parseAsync(
   }
   else if (std::holds_alternative<std::string>(data)) {
     unpacked.json = std::get<std::string>(data);
-    unpacked.bin  = ArrayBufferView();
+    unpacked.bin  = std::nullopt;
   }
 
   _validateAsync(scene, unpacked.json, rootUrl, fileName);

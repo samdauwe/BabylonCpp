@@ -35,8 +35,8 @@ struct IGLTFValidationResults;
 using IGLTFLoaderPtr = std::shared_ptr<IGLTFLoader>;
 
 struct UnpackedBinary {
-  std::string json;
-  ArrayBufferView bin;
+  std::string json                   = "";
+  std::optional<ArrayBufferView> bin = std::nullopt;
 }; // end of struct UnpackedBinary
 
 struct Version {

@@ -106,8 +106,8 @@ ImportedMeshes GLTFLoader::importMeshAsync(
     std::unordered_map<std::string, size_t> nodeMap;
     if (!gltf->nodes.empty()) {
       for (const auto& node : gltf->nodes) {
-        if (!node.name.empty()) {
-          nodeMap[node.name] = node.index;
+        if (!node->name.empty()) {
+          nodeMap[node->name] = node->index;
         }
       }
     }
@@ -148,7 +148,7 @@ void GLTFLoader::loadAsync(
   _loadAsync({}, []() -> void {});
 }
 
-void GLTFLoader::_loadAsync(const std::vector<size_t> nodes,
+void GLTFLoader::_loadAsync(const std::vector<size_t>& nodes,
                             const std::function<void()>& resultFunc)
 {
   _uniqueRootUrl
@@ -176,8 +176,9 @@ void GLTFLoader::_loadAsync(const std::vector<size_t> nodes,
     promises.emplace_back(
       [this, scene]() -> void { loadSceneAsync("/nodes", scene); });
   }
-  else if (gltf->scene.has_value()) {
-    const auto& scene = ArrayItem::Get("/scene", gltf->scenes, *gltf->scene);
+  else if (gltf->scene.has_value() || !gltf->scenes.empty()) {
+    const auto& scene
+      = ArrayItem::Get("/scene", gltf->scenes, gltf->scene.value_or(0));
     promises.emplace_back([this, scene]() -> void {
       loadSceneAsync(String::printf("/scenes/%ld", scene.index), scene);
     });
@@ -267,21 +268,21 @@ void GLTFLoader::_setupData()
   if (!gltf->nodes.empty()) {
     std::unordered_map<size_t, size_t> nodeParents;
     for (const auto& node : gltf->nodes) {
-      if (!node.children.empty()) {
-        for (const auto& index : node.children) {
-          nodeParents[index] = node.index;
+      if (!node->children.empty()) {
+        for (const auto& index : node->children) {
+          nodeParents[index] = node->index;
         }
       }
     }
 
     auto rootNode = _createRootNode();
     for (auto& node : gltf->nodes) {
-      if (stl_util::contains(nodeParents, node.index)) {
-        const auto& parentIndex = nodeParents[node.index];
-        node.parent             = &gltf->nodes[parentIndex];
+      if (stl_util::contains(nodeParents, node->index)) {
+        const auto& parentIndex = nodeParents[node->index];
+        node->parent            = gltf->nodes[parentIndex];
       }
       else {
-        node.parent = &rootNode;
+        node->parent = rootNode;
       }
     }
   }
@@ -317,20 +318,20 @@ void GLTFLoader::_setState(const GLTFLoaderState& state)
   _state = state;
 }
 
-INode GLTFLoader::_createRootNode()
+INodePtr GLTFLoader::_createRootNode()
 {
   _rootBabylonMesh = Mesh::New("__root__", babylonScene);
   _rootBabylonMesh->setEnabled(false);
 
-  INode rootNode;
-  rootNode._babylonTransformNode = _rootBabylonMesh;
+  auto rootNode                   = std::make_shared<INode>();
+  rootNode->_babylonTransformNode = _rootBabylonMesh;
 
   switch (_parent.coordinateSystemMode) {
     case GLTFLoaderCoordinateSystemMode::AUTO: {
       if (!babylonScene->useRightHandedSystem()) {
-        rootNode.rotation = {0.f, 1.f, 0.f, 0.f};
-        rootNode.scale    = {1.f, 1.f, -1.f};
-        GLTFLoader::_LoadTransform(rootNode, _rootBabylonMesh);
+        rootNode->rotation = {0.f, 1.f, 0.f, 0.f};
+        rootNode->scale    = {1.f, 1.f, -1.f};
+        GLTFLoader::_LoadTransform(*rootNode, _rootBabylonMesh);
       }
       break;
     }
@@ -364,7 +365,7 @@ bool GLTFLoader::loadSceneAsync(const std::string& context, const IScene& scene)
         = ArrayItem::Get(String::printf("%s/nodes/%ld", context.c_str(), index),
                          gltf->nodes, index);
       promises.emplace_back([&]() -> void {
-        loadNodeAsync(String::printf("/nodes/%ld", node.index), node,
+        loadNodeAsync(String::printf("/nodes/%ld", node->index), *node,
                       [&](const TransformNodePtr& babylonMesh) -> void {
                         babylonMesh->parent = _rootBabylonMesh.get();
                       });
@@ -377,9 +378,9 @@ bool GLTFLoader::loadSceneAsync(const std::string& context, const IScene& scene)
   // hierarchy similar to Unity3D.
   if (!gltf->nodes.empty()) {
     for (const auto& node : gltf->nodes) {
-      if (node._babylonTransformNode && !node._babylonBones.empty()) {
-        for (auto& babylonBone : node._babylonBones) {
-          babylonBone->linkTransformNode(node._babylonTransformNode);
+      if (node->_babylonTransformNode && !node->_babylonBones.empty()) {
+        for (auto& babylonBone : node->_babylonBones) {
+          babylonBone->linkTransformNode(node->_babylonTransformNode);
         }
       }
     }
@@ -417,7 +418,7 @@ std::vector<AbstractMeshPtr> GLTFLoader::_getMeshes()
   const auto& nodes = gltf->nodes;
   if (!nodes.empty()) {
     for (const auto& node : nodes) {
-      _forEachPrimitive(node,
+      _forEachPrimitive(*node,
                         [&meshes](const AbstractMeshPtr& babylonMesh) -> void {
                           meshes.emplace_back(babylonMesh);
                         });
@@ -527,8 +528,8 @@ TransformNodePtr GLTFLoader::loadNodeAsync(
           String::printf("%s/children/%ld", context.c_str(), index),
           gltf->nodes, index);
         promises.emplace_back([&]() -> void {
-          loadNodeAsync(String::printf("/nodes/%ld", childNode.index),
-                        childNode,
+          loadNodeAsync(String::printf("/nodes/%ld", childNode->index),
+                        *childNode,
                         [&](const TransformNodePtr& childBabylonMesh) -> void {
                           childBabylonMesh->parent = babylonTransformNode.get();
                         });
@@ -947,7 +948,7 @@ void GLTFLoader::_loadBones(const std::string& context, const ISkin& skin,
     auto& node
       = ArrayItem::Get(String::printf("%s/joints/%d", context.c_str(), index),
                        gltf->nodes, index);
-    _loadBone(node, skin, babylonSkeleton, babylonBones);
+    _loadBone(*node, skin, babylonSkeleton, babylonBones);
   }
 }
 
@@ -1168,9 +1169,9 @@ void GLTFLoader::_loadAnimationChannelAsync(
 
   // Ignore animations that have no animation targets.
   if ((channel.target.path == IGLTF2::AnimationChannelTargetPath::WEIGHTS
-       && !targetNode._numMorphTargets)
+       && !targetNode->_numMorphTargets)
       || (channel.target.path != IGLTF2::AnimationChannelTargetPath::WEIGHTS
-          && !targetNode._babylonTransformNode)) {
+          && !targetNode->_babylonTransformNode)) {
     return;
   }
 
@@ -1235,8 +1236,8 @@ void GLTFLoader::_loadAnimationChannelAsync(
   }
   else if (targetPath == "influence") {
     getNextOutputValue = [&]() -> AnimationValue {
-      Float32Array value(*targetNode._numMorphTargets);
-      for (size_t i = 0; i < *targetNode._numMorphTargets; ++i) {
+      Float32Array value(*targetNode->_numMorphTargets);
+      for (size_t i = 0; i < *targetNode->_numMorphTargets; ++i) {
         value[i] = data.output[outputBufferOffset++];
       }
       return value;
@@ -1292,7 +1293,7 @@ void GLTFLoader::_loadAnimationChannelAsync(
   }
 
   if (targetPath == "influence") {
-    for (size_t targetIndex = 0; targetIndex < targetNode._numMorphTargets;
+    for (size_t targetIndex = 0; targetIndex < targetNode->_numMorphTargets;
          targetIndex++) {
       const auto animationName
         = String::printf("%s_channel%ld", babylonAnimationGroup->name.c_str(),
@@ -1303,7 +1304,7 @@ void GLTFLoader::_loadAnimationChannelAsync(
       babylonAnimation->setKeys(values);
 
       _forEachPrimitive(
-        targetNode, [&](const AbstractMeshPtr& babylonAbstractMesh) -> void {
+        *targetNode, [&](const AbstractMeshPtr& babylonAbstractMesh) -> void {
           const auto babylonMesh
             = std::static_pointer_cast<Mesh>(babylonAbstractMesh);
           const auto morphTarget
@@ -1323,9 +1324,10 @@ void GLTFLoader::_loadAnimationChannelAsync(
       = Animation::New(animationName, targetPath, 1, animationType);
     babylonAnimation->setKeys(keys);
 
-    targetNode._babylonTransformNode->animations.emplace_back(babylonAnimation);
+    targetNode->_babylonTransformNode->animations.emplace_back(
+      babylonAnimation);
     babylonAnimationGroup->addTargetedAnimation(
-      babylonAnimation, targetNode._babylonTransformNode);
+      babylonAnimation, targetNode->_babylonTransformNode);
   }
 }
 
@@ -2021,9 +2023,11 @@ ArrayBufferView& GLTFLoader::loadImageAsync(const std::string& context,
   return image._data;
 }
 
-ArrayBufferView GLTFLoader::loadUriAsync(const std::string& /*context*/,
-                                         const std::string& /*uri*/)
+ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context,
+                                         const std::string& uri)
 {
+  std::cout << context << std::endl;
+  std::cout << uri << std::endl;
   return ArrayBufferView();
 }
 

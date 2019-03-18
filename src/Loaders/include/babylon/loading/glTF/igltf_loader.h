@@ -88,7 +88,7 @@ struct IGLTFLoaderData {
   /**
    * The BIN chunk of a binary glTF.
    */
-  std::optional<ArrayBufferView> bin;
+  std::optional<ArrayBufferView> bin = std::nullopt;
 }; // end of struct IGLTFLoaderData
 
 /**

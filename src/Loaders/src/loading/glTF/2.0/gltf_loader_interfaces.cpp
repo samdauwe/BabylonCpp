@@ -284,42 +284,42 @@ IMeshPrimitive IMeshPrimitive::Parse(const json& parsedMeshPrimitive)
   return meshPrimitive;
 }
 
-INode INode::Parse(const json& parsedNode)
+INodePtr INode::Parse(const json& parsedNode)
 {
-  INode node;
+  auto node = std::make_shared<INode>();
 
   // Camera
   if (json_util::has_valid_key_value(parsedNode, "camera")) {
-    node.camera = json_util::get_number<size_t>(parsedNode, "camera");
+    node->camera = json_util::get_number<size_t>(parsedNode, "camera");
   }
 
   // Children
-  node.children = json_util::get_array<uint32_t>(parsedNode, "children");
+  node->children = json_util::get_array<uint32_t>(parsedNode, "children");
 
   // Skin
   if (json_util::has_valid_key_value(parsedNode, "skin")) {
-    node.skin = json_util::get_number<size_t>(parsedNode, "skin");
+    node->skin = json_util::get_number<size_t>(parsedNode, "skin");
   }
 
   // Matrix
-  node.matrix = json_util::get_array<float>(parsedNode, "matrix");
+  node->matrix = json_util::get_array<float>(parsedNode, "matrix");
 
   // Mesh
   if (json_util::has_valid_key_value(parsedNode, "mesh")) {
-    node.mesh = json_util::get_number<size_t>(parsedNode, "mesh");
+    node->mesh = json_util::get_number<size_t>(parsedNode, "mesh");
   }
 
   // Rotation
-  node.rotation = json_util::get_array<float>(parsedNode, "rotation");
+  node->rotation = json_util::get_array<float>(parsedNode, "rotation");
 
   // Scale
-  node.scale = json_util::get_array<float>(parsedNode, "scale");
+  node->scale = json_util::get_array<float>(parsedNode, "scale");
 
   // Translation
-  node.translation = json_util::get_array<float>(parsedNode, "translation");
+  node->translation = json_util::get_array<float>(parsedNode, "translation");
 
   // Weights
-  node.weights = json_util::get_array<float>(parsedNode, "weights");
+  node->weights = json_util::get_array<float>(parsedNode, "weights");
 
   return node;
 }

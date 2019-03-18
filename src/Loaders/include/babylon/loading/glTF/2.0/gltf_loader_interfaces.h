@@ -1152,7 +1152,7 @@ struct IGLTF : public IProperty {
   /**
    * An array of nodes
    */
-  std::vector<GLTF2::INode> nodes;
+  std::vector<INodePtr> nodes;
   /**
    * An array of samplers.  A sampler contains properties for texture filtering
    * and wrapping modes
@@ -1403,7 +1403,7 @@ struct INode : public IGLTF2::INode, IArrayItem {
   /**
    * The parent glTF node.
    */
-  INode* parent = nullptr;
+  INodePtr parent = nullptr;
 
   /** @hidden */
   TransformNodePtr _babylonTransformNode = nullptr;
@@ -1417,7 +1417,7 @@ struct INode : public IGLTF2::INode, IArrayItem {
   /** @hidden */
   std::optional<size_t> _numMorphTargets = std::nullopt;
 
-  static INode Parse(const json& parsedNode);
+  static INodePtr Parse(const json& parsedNode);
 
 }; // end of struct INode
 

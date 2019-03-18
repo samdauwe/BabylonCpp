@@ -15,6 +15,13 @@
 
 using json = nlohmann::json;
 
+template <typename T>
+struct is_shared_ptr : std::false_type {
+};
+template <typename T>
+struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {
+};
+
 namespace BABYLON {
 
 class AbstractMesh;
@@ -83,11 +90,29 @@ struct BABYLON_SHARED_EXPORT ArrayItem {
    * @param array The array of items
    */
   template <typename IArrItem>
-  static void Assign(std::vector<IArrItem>& array)
+  static typename std::enable_if<!is_shared_ptr<decltype(IArrItem())>::value,
+                                 void>::type // non shared_ptr version
+  Assign(std::vector<IArrItem>& array)
   {
     if (!array.empty()) {
       for (size_t index = 0; index < array.size(); ++index) {
         array[index].index = index;
+      }
+    }
+  }
+
+  /**
+   * @brief Assign an `index` field to each item of the given array.
+   * @param array The array of items
+   */
+  template <typename IArrItem>
+  static typename std::enable_if<!is_shared_ptr<decltype(IArrItem())>::value,
+                                 void>::type // shared_ptr version
+  Assign(std::vector<std::shared_ptr<IArrItem>>& array)
+  {
+    if (!array.empty()) {
+      for (size_t index = 0; index < array.size(); ++index) {
+        array[index]->index = index;
       }
     }
   }
@@ -366,14 +391,14 @@ protected:
 
 private:
   /** Hidden */
-  void _loadAsync(const std::vector<size_t> nodes,
+  void _loadAsync(const std::vector<size_t>& nodes,
                   const std::function<void()>& resultFunc);
   void _loadData(const IGLTFLoaderData& data);
   void _setupData();
   void _loadExtensions();
   void _checkExtensions();
   void _setState(const GLTFLoaderState& state);
-  INode _createRootNode();
+  INodePtr _createRootNode();
   void _forEachPrimitive(
     const INode& node,
     const std::function<void(const AbstractMeshPtr& babylonMesh)>& callback);
