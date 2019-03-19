@@ -35,6 +35,7 @@
 #include <babylon/loading/progress_event.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector3.h>
+#include <babylon/utils/base64.h>
 
 namespace BABYLON {
 
@@ -609,6 +610,24 @@ std::string Tools::RandomId()
 bool Tools::IsBase64(const std::string& uri)
 {
   return uri.size() < 5 ? false : uri.substr(0, 5) == "data:";
+}
+
+ArrayBuffer Tools::DecodeBase64(const std::string& uri)
+{
+  auto uriSplit = String::split(uri, ',');
+  if (uriSplit.size() < 2) {
+    return ArrayBuffer();
+  }
+
+  const auto decodedString = Base64::atob(uriSplit[1]);
+  const auto bufferLength  = decodedString.size();
+  Uint8Array bufferView(bufferLength);
+
+  for (size_t i = 0; i < bufferLength; ++i) {
+    bufferView[i] = String::charCodeAt(decodedString, i);
+  }
+
+  return bufferView;
 }
 
 void Tools::SetImmediate(const std::function<void()>& immediate)

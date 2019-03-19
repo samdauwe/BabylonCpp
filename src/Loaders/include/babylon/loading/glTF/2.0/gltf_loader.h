@@ -523,8 +523,8 @@ private:
     const std::function<void(const BaseTexturePtr& babylonTexture)>& assign);
   AnimationGroupPtr _extensionsLoadAnimationAsync(const std::string& context,
                                                   const IAnimation& animation);
-  ArrayBufferView _extensionsLoadUriAsync(const std::string& context,
-                                          const std::string& uri);
+  std::optional<ArrayBufferView>
+  _extensionsLoadUriAsync(const std::string& context, const std::string& uri);
 
 public:
   /** The glTF object parsed from the JSON. */

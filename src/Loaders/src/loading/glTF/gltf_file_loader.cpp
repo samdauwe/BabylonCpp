@@ -85,6 +85,9 @@ GLTFFileLoader::GLTFFileLoader()
     return String::contains(data, "scene") && String::contains(data, "node");
   };
 
+  preprocessUrlAsync
+    = [](const std::string& url) -> std::string { return url; };
+
   _log = [this](const std::string& message) { _logDisabled(message); };
 
   _startPerformanceCounter = [this](const std::string& counterName) {

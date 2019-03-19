@@ -260,6 +260,13 @@ struct BABYLON_SHARED_EXPORT Tools {
   static bool IsBase64(const std::string& uri);
 
   /**
+   * @brief Decode the given base64 uri.
+   * @param uri The uri to decode
+   * @return The decoded base64 data.
+   */
+  static ArrayBuffer DecodeBase64(const std::string& uri);
+
+  /**
    * @brief Polyfill for setImmediate.
    * @param action defines the action to execute after the current execution
    * block

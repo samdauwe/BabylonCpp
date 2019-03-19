@@ -302,7 +302,7 @@ void Effect::_loadVertexShader(
 {
   // Base64 encoded ?
   if (vertex.substr(0, 7) == "base64:") {
-    auto vertexBinary = base64_atob(vertex.substr(7));
+    auto vertexBinary = Base64::atob(vertex.substr(7));
     callback(vertexBinary);
     return;
   }
@@ -334,7 +334,7 @@ void Effect::_loadFragmentShader(
 {
   // Base64 encoded ?
   if (fragment.substr(0, 7) == "base64:") {
-    auto fragmentBinary = base64_atob(fragment.substr(7));
+    auto fragmentBinary = Base64::atob(fragment.substr(7));
     callback(fragmentBinary);
     return;
   }

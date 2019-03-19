@@ -631,13 +631,13 @@ TransformNodePtr GLTFLoader::_loadMeshAsync(
     });
   }
 
-  assign(node._babylonTransformNode);
-
-  logClose();
-
   for (auto&& promise : promises) {
     promise();
   }
+
+  assign(node._babylonTransformNode);
+
+  logClose();
 
   return node._babylonTransformNode;
 }
@@ -2026,9 +2026,50 @@ ArrayBufferView& GLTFLoader::loadImageAsync(const std::string& context,
 ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context,
                                          const std::string& uri)
 {
-  std::cout << context << std::endl;
-  std::cout << uri << std::endl;
-  return ArrayBufferView();
+  const auto extensionPromise = _extensionsLoadUriAsync(context, uri);
+  if (extensionPromise.has_value()) {
+    return *extensionPromise;
+  }
+
+  if (!GLTFLoader::_ValidateUri(uri)) {
+    throw std::runtime_error(
+      String::printf("%s: '%s' is invalid", context.c_str(), uri.c_str()));
+  }
+
+  if (Tools::IsBase64(uri)) {
+    const auto data = Tools::DecodeBase64(uri);
+    log(String::printf("Decoded %s... (%ld bytes)", uri.substr(0, 64),
+                       data.size()));
+    return data;
+  }
+
+  log(String::printf("Loading %s", uri.c_str()));
+
+  ArrayBuffer data;
+  auto url = _parent.preprocessUrlAsync(_rootUrl + uri);
+  if (!_disposed) {
+    Tools::LoadFile(
+      url,
+      [this, &data,
+       &uri](const std::variant<std::string, ArrayBuffer>& fileData,
+             const std::string & /*responseURL*/) -> void {
+        if (!_disposed) {
+          if (std::holds_alternative<ArrayBuffer>(fileData)) {
+            data = std::get<ArrayBuffer>(fileData);
+            log(String::printf("Loaded %s (%ld bytes)", uri.c_str(),
+                               data.size()));
+          }
+        }
+      },
+      nullptr, true,
+      [this, &context, &uri](const std::string& message,
+                             const std::string& exception) -> void {
+        log(String::printf("%s: Failed to load (%s %s)", context.c_str(),
+                           uri.c_str(), message.c_str(), exception.c_str()));
+      });
+  }
+
+  return data;
 }
 
 void GLTFLoader::_onProgress()
@@ -2350,11 +2391,11 @@ GLTFLoader::_extensionsLoadAnimationAsync(const std::string& /*context*/,
   return nullptr;
 }
 
-ArrayBufferView
+std::optional<ArrayBufferView>
 GLTFLoader::_extensionsLoadUriAsync(const std::string& /*context*/,
                                     const std::string& /*uri*/)
 {
-  return ArrayBufferView();
+  return std::nullopt;
 }
 
 void GLTFLoader::logOpen(const std::string& message)
