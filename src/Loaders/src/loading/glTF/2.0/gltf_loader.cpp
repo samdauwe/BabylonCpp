@@ -1404,7 +1404,7 @@ ArrayBufferView& GLTFLoader::loadBufferViewAsync(const std::string& context,
     = _loadBufferAsync(String::printf("/buffers/%ld", buffer.index), buffer);
   try {
     bufferView._data = stl_util::to_array<uint8_t>(
-      data.uint8Array, data.byteOffset + (bufferView.byteOffset || 0),
+      data.uint8Array, data.byteOffset + (bufferView.byteOffset.value_or(0)),
       bufferView.byteLength);
   }
   catch (const std::exception& e) {
@@ -1530,10 +1530,12 @@ BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
     return bufferView._babylonBuffer;
   }
 
+
   auto data = loadBufferViewAsync(
     String::printf("/bufferViews/%ld", bufferView.index), bufferView);
-  bufferView._babylonBuffer = std::make_shared<Buffer>(
-    babylonScene->getEngine(), data.float32Array, false);
+  auto buffer = stl_util::cast_array_elements<float, uint8_t>(data.uint8Array);
+  bufferView._babylonBuffer
+    = std::make_shared<Buffer>(babylonScene->getEngine(), buffer, false);
 
   return bufferView._babylonBuffer;
 }

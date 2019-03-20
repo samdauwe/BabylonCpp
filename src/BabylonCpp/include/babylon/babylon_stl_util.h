@@ -151,6 +151,23 @@ std::vector<C> to_array(const std::vector<T> buffer)
   return to_array<C>(buffer, 0, (buffer.size() * sizeof(T)) / sizeof(C));
 }
 
+template <typename C, typename T>
+std::vector<C> cast_array_elements(const std::vector<T> buffer)
+{
+  struct to_result_type {
+    float operator()(T value)
+    {
+      return static_cast<C>(value);
+    }
+  };
+
+  std::vector<C> result;
+  std::transform(buffer.begin(), buffer.end(), back_inserter(result),
+                 to_result_type());
+
+  return result;
+}
+
 // -- String helper functions --
 
 // Compares two strings in compile time constant fashion
