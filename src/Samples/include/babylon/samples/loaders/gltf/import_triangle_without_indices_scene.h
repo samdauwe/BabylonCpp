@@ -15,15 +15,15 @@ namespace Samples {
  * @see
  * https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/TriangleWithoutIndices
  */
-struct TriangleWithoutIndicesScene : public IRenderableScene {
+struct ImportTriangleWithoutIndicesScene : public IRenderableScene {
 
-  TriangleWithoutIndicesScene(ICanvas* iCanvas);
-  ~TriangleWithoutIndicesScene() override;
+  ImportTriangleWithoutIndicesScene(ICanvas* iCanvas);
+  ~ImportTriangleWithoutIndicesScene() override;
 
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
-}; // end of struct TriangleWithoutIndicesScene
+}; // end of struct ImportTriangleWithoutIndicesScene
 
 } // end of namespace Samples
 } // end of namespace BABYLON

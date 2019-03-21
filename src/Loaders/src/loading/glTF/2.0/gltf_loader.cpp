@@ -1530,12 +1530,10 @@ BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
     return bufferView._babylonBuffer;
   }
 
-
   auto data = loadBufferViewAsync(
     String::printf("/bufferViews/%ld", bufferView.index), bufferView);
-  auto buffer = stl_util::cast_array_elements<float, uint8_t>(data.uint8Array);
-  bufferView._babylonBuffer
-    = std::make_shared<Buffer>(babylonScene->getEngine(), buffer, false);
+  bufferView._babylonBuffer = std::make_shared<Buffer>(
+    babylonScene->getEngine(), data.float32Array, false);
 
   return bufferView._babylonBuffer;
 }

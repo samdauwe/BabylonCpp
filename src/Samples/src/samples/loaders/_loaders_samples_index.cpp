@@ -71,11 +71,11 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                         return std::make_unique<ImportBoxScene>(iCanvas); //
                       });                                                 //
   // Import Triangle Without Indices Scene (glTF)
-  _samples["TriangleWithoutIndicesScene"] = std::make_tuple(
-    true,                                                            //
-    [](ICanvas* iCanvas) {                                           //
-      return std::make_unique<TriangleWithoutIndicesScene>(iCanvas); //
-    });                                                              //
+  _samples["ImportTriangleWithoutIndicesScene"] = std::make_tuple(
+    true,                                                                  //
+    [](ICanvas* iCanvas) {                                                 //
+      return std::make_unique<ImportTriangleWithoutIndicesScene>(iCanvas); //
+    });                                                                    //
 #endif
 }
 
