@@ -4785,7 +4785,8 @@ void Scene::createDefaultLight(bool replace)
 
   // Light
   if (lights.empty()) {
-    HemisphericLight::New("default light", Vector3::Up(), this);
+    auto light = HemisphericLight::New("default light", Vector3::Up(), this);
+    light->setEnabled(true);
   }
 }
 

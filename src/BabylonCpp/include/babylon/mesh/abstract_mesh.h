@@ -128,7 +128,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _resyncLighSource(Light* light);
+  void _resyncLighSource(const LightPtr& light);
 
   /**
    * @brief Hidden

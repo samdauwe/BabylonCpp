@@ -571,15 +571,11 @@ void AbstractMesh::_rebuild()
   }
 }
 
-void AbstractMesh::_resyncLighSource(Light* light)
+void AbstractMesh::_resyncLighSource(const LightPtr& light)
 {
-  bool isIn = light->isEnabled() && light->canAffectMesh(this);
+  bool isIn = light && light->isEnabled() && light->canAffectMesh(this);
 
-  auto index = std::find_if(_lightSources.begin(), _lightSources.end(),
-                            [light](const LightPtr& lightSource) {
-                              return lightSource.get() == light;
-                            });
-
+  auto index = std::find(_lightSources.begin(), _lightSources.end(), light);
   if (index != _lightSources.end()) {
     if (!isIn) {
       return;

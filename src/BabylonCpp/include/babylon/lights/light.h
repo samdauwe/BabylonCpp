@@ -131,6 +131,7 @@ public:
 
   virtual IReflect::Type type() const override;
   void addToScene(const LightPtr& newLight);
+  LightPtr _this() const;
 
   /**
    * @brief Returns the string "Light".

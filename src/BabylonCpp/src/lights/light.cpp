@@ -64,9 +64,19 @@ IReflect::Type Light::type() const
 
 void Light::addToScene(const LightPtr& newLight)
 {
+  getScene()->addLight(newLight); // Need to add light first to the scene!
   newLight->_buildUniformLayout();
   newLight->_resyncMeshes();
-  getScene()->addLight(newLight);
+}
+
+LightPtr Light::_this() const
+{
+  const auto& lights = getScene()->lights;
+  auto it
+    = std::find_if(lights.begin(), lights.end(), [this](const LightPtr& light) {
+        return light.get() == this;
+      });
+  return (it != lights.end()) ? (*it) : nullptr;
 }
 
 const std::string Light::getClassName() const
@@ -415,7 +425,7 @@ void Light::_hookArrayForIncludedOnly(
 void Light::_resyncMeshes()
 {
   for (auto& mesh : getScene()->meshes) {
-    mesh->_resyncLighSource(this);
+    mesh->_resyncLighSource(_this());
   }
 }
 
