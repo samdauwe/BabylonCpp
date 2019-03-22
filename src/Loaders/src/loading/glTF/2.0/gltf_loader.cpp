@@ -1431,7 +1431,23 @@ IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
       String::printf("%s/componentType: Invalid value", context.c_str()));
   }
 
+  const auto convertDataTo32bit = [](IAccessor& accessor) -> void {
+    switch (accessor.componentType) {
+      case IGLTF2::AccessorComponentType::UNSIGNED_BYTE:
+        accessor._data->uint32Array
+          = stl_util::cast_array_elements<uint32_t, uint8_t>(
+            accessor._data->uint8Array);
+      case IGLTF2::AccessorComponentType::UNSIGNED_SHORT:
+        accessor._data->uint32Array
+          = stl_util::cast_array_elements<uint32_t, uint16_t>(
+            accessor._data->uint16Array);
+      default:
+        break;
+    }
+  };
+
   if (accessor._data.has_value()) {
+    convertDataTo32bit(accessor);
     return accessor._data->uint32Array;
   }
 
@@ -1442,6 +1458,7 @@ IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
     String::printf("/bufferViews/%ld", bufferView.index), bufferView);
   accessor._data = GLTFLoader::_GetTypedArray(
     context, accessor.componentType, data, accessor.byteOffset, accessor.count);
+  convertDataTo32bit(accessor);
 
   return accessor._data->uint32Array;
 }
@@ -2178,7 +2195,7 @@ GLTFLoader::_GetTypedArray(const std::string& context,
                            const ArrayBufferView& bufferView,
                            std::optional<size_t> byteOffset, size_t length)
 {
-  const auto& buffer = bufferView.int8Array;
+  const auto& buffer = bufferView.uint8Array;
   byteOffset         = bufferView.byteOffset + byteOffset.value_or(0);
 
   try {
