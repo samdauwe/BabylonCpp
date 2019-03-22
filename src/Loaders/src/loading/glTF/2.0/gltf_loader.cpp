@@ -1437,10 +1437,12 @@ IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
         accessor._data->uint32Array
           = stl_util::cast_array_elements<uint32_t, uint8_t>(
             accessor._data->uint8Array);
+        break;
       case IGLTF2::AccessorComponentType::UNSIGNED_SHORT:
         accessor._data->uint32Array
           = stl_util::cast_array_elements<uint32_t, uint16_t>(
             accessor._data->uint16Array);
+        break;
       default:
         break;
     }
