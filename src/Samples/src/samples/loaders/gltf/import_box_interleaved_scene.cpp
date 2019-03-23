@@ -1,4 +1,4 @@
-#include <babylon/samples/loaders/gltf/import_box_scene.h>
+#include <babylon/samples/loaders/gltf/import_box_interleaved_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engine/scene.h>
@@ -9,24 +9,27 @@
 namespace BABYLON {
 namespace Samples {
 
-ImportBoxScene::ImportBoxScene(ICanvas* iCanvas) : IRenderableScene(iCanvas)
+ImportBoxInterleavedScene::ImportBoxInterleavedScene(ICanvas* iCanvas)
+    : IRenderableScene(iCanvas)
 {
   GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
 }
 
-ImportBoxScene::~ImportBoxScene()
+ImportBoxInterleavedScene::~ImportBoxInterleavedScene()
 {
 }
 
-const char* ImportBoxScene::getName()
+const char* ImportBoxInterleavedScene::getName()
 {
-  return "Import Box Scene (glTF)";
+  return "Import Box Interleaved Scene (glTF)";
 }
 
-void ImportBoxScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
+void ImportBoxInterleavedScene::initializeScene(ICanvas* /*canvas*/,
+                                                Scene* scene)
 {
   SceneLoader::ImportMesh(
-    {}, "glTF-Sample-Models/2.0/Box/glTF/", "Box.gltf", scene,
+    {}, "glTF-Sample-Models/2.0/BoxInterleaved/glTF/", "BoxInterleaved.gltf",
+    scene,
     [scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
             const std::vector<IParticleSystemPtr>& /*particleSystems*/,
             const std::vector<SkeletonPtr>& /*skeletons*/,

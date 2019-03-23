@@ -1700,13 +1700,12 @@ MaterialPtr GLTFLoader::_loadMaterialAsync(
 
     const auto babylonMaterial
       = createMaterial(context, material, babylonDrawMode);
+    loadMaterialPropertiesAsync(context, material, babylonMaterial);
 
     babylonData = GLTF2::IMaterialData{
       babylonMaterial, // babylonMaterial
       {},              // babylonMeshes
-      [&]() -> void {
-        loadMaterialPropertiesAsync(context, material, babylonMaterial);
-      } // promise
+      nullptr          // promise
     };
 
     material._data[babylonDrawMode] = *babylonData;

@@ -406,7 +406,9 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
 bool PBRBaseMaterial::isMetallicWorkflow() const
 {
-  if (_metallic != 0.f || _roughness != 0.f || _metallicTexture) {
+  if ((_metallic.has_value() && _metallic.value() != 0.f)
+      || (_roughness.has_value() && _roughness.value() != 0.f)
+      || _metallicTexture) {
     return true;
   }
 
@@ -1248,9 +1250,9 @@ void PBRBaseMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
       // Colors
       if (defines["METALLICWORKFLOW"]) {
         PBRMaterial::_scaledReflectivity.r
-          = (!_metallic.has_value()) ? 1 : *_metallic;
+          = (!_metallic.has_value()) ? 1.f : *_metallic;
         PBRMaterial::_scaledReflectivity.g
-          = (!_roughness.has_value()) ? 1 : *_roughness;
+          = (!_roughness.has_value()) ? 1.f : *_roughness;
         _uniformBuffer->updateColor4("vReflectivityColor",
                                      PBRMaterial::_scaledReflectivity, 0, "");
       }
