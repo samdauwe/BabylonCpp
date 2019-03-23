@@ -177,6 +177,74 @@ IBufferView IBufferView::Parse(const json& parsedBufferView)
   return bufferView;
 }
 
+IGLTF2::ICameraOrthographicPtr
+IGLTF2::ICameraOrthographic::Parse(const json& parsedCamera)
+{
+  auto camera = std::make_shared<ICameraOrthographic>();
+
+  // xmag
+  camera->xmag = json_util::get_number<float>(parsedCamera, "xmag");
+
+  // ymag
+  camera->ymag = json_util::get_number<float>(parsedCamera, "ymag");
+
+  // zfar
+  camera->zfar = json_util::get_number<float>(parsedCamera, "zfar");
+
+  // znear
+  camera->znear = json_util::get_number<float>(parsedCamera, "znear");
+
+  return camera;
+}
+
+IGLTF2::ICameraPerspectivePtr
+IGLTF2::ICameraPerspective::Parse(const json& parsedCamera)
+{
+  auto camera = std::make_shared<ICameraPerspective>();
+
+  // Aspect ratio
+  if (json_util::has_valid_key_value(parsedCamera, "aspectRatio")) {
+    camera->aspectRatio
+      = json_util::get_number<float>(parsedCamera, "aspectRatio");
+  }
+
+  // yfov
+  camera->yfov = json_util::get_number<float>(parsedCamera, "yfov");
+
+  // zfar
+  if (json_util::has_valid_key_value(parsedCamera, "zfar")) {
+    camera->zfar = json_util::get_number<float>(parsedCamera, "zfar");
+  }
+
+  // znear
+  camera->znear = json_util::get_number<float>(parsedCamera, "znear");
+
+  return camera;
+}
+
+ICamera ICamera::Parse(const json& parsedCamera)
+{
+  ICamera camera;
+
+  // Orthographic
+  if (json_util::has_valid_key_value(parsedCamera, "orthographic")) {
+    camera.orthographic
+      = IGLTF2::ICameraOrthographic::Parse(parsedCamera["orthographic"]);
+  }
+
+  // Perspective
+  if (json_util::has_valid_key_value(parsedCamera, "perspective")) {
+    camera.perspective
+      = IGLTF2::ICameraPerspective::Parse(parsedCamera["perspective"]);
+  }
+
+  // Camera type
+  camera.type = IGLTF2::EnumUtils::StringToCameraType(
+    json_util::get_string(parsedCamera, "type"));
+
+  return camera;
+}
+
 IMaterial IMaterial::Parse(const json& parsedMaterial)
 {
   IMaterial material;
@@ -450,6 +518,12 @@ std::unique_ptr<IGLTF> IGLTF::Parse(const json& parsedGLTFObject)
   for (const auto& bufferView :
        json_util::get_array<json>(parsedGLTFObject, "bufferViews")) {
     glTFObject.bufferViews.emplace_back(IBufferView::Parse(bufferView));
+  }
+
+  // Cameras
+  for (const auto& camera :
+       json_util::get_array<json>(parsedGLTFObject, "cameras")) {
+    glTFObject.cameras.emplace_back(ICamera::Parse(camera));
   }
 
   // Materials

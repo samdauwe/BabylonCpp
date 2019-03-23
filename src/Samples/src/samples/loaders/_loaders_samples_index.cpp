@@ -11,6 +11,7 @@
 // Loaders plugins
 #ifdef WITH_LOADERS
 #include <babylon/samples/loaders/gltf/import_box_scene.h>
+#include <babylon/samples/loaders/gltf/import_cameras_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_meshes_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_sparse_accessor_scene.h>
 #include <babylon/samples/loaders/gltf/import_triangle_scene.h>
@@ -73,6 +74,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       [](ICanvas* iCanvas) {                              //
                         return std::make_unique<ImportBoxScene>(iCanvas); //
                       });                                                 //
+  // Import Cameras Scene (glTF)
+  _samples["ImportCamerasScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<ImportCamerasScene>(iCanvas); //
+                      });                                                     //
   // Import Simple Meshes Scene (glTF)
   _samples["ImportSimpleMeshesScene"] = std::make_tuple(
     true,                                                        //

@@ -393,6 +393,19 @@ struct EnumUtils {
     }
   }
 
+  static CameraType StringToCameraType(const std::string& cameraType)
+  {
+    if (cameraType == "perspective") {
+      return CameraType::PERSPECTIVE;
+    }
+    else if (cameraType == "orthographic") {
+      return CameraType::ORTHOGRAPHIC;
+    }
+    else {
+      return CameraType::INVALID;
+    }
+  }
+
   static MaterialAlphaMode StringToMaterialAlphaMode(const std::string& modeStr)
   {
     if (modeStr == "OPAQUE") {
@@ -769,6 +782,8 @@ struct ICameraOrthographic : public IProperty {
    * The floating-point distance to the near clipping plane
    */
   float znear = 0.f;
+
+  static ICameraOrthographicPtr Parse(const json& parsedCamera);
 }; // end of struct ICameraOrthographic
 
 /**
@@ -792,6 +807,8 @@ struct ICameraPerspective : public IProperty {
    * The floating-point distance to the near clipping plane
    */
   float znear = 0.f;
+
+  static ICameraPerspectivePtr Parse(const json& parsedCamera);
 }; // end of struct IProperty
 
 /**
@@ -1317,6 +1334,7 @@ struct IBufferView : public IGLTF2::IBufferView, IArrayItem {
  * @brief Loader interface with additional members.
  */
 struct ICamera : public IGLTF2::ICamera, IArrayItem {
+  static ICamera Parse(const json& parsedCamera);
 }; // end of struct ICamera
 
 /**
