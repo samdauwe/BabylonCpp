@@ -521,12 +521,14 @@ struct IAccessorSparseIndices : public IProperty {
    * The offset relative to the start of the bufferView in bytes. Must be
    * aligned
    */
-  std::optional<int> byteOffset = std::nullopt;
+  std::optional<size_t> byteOffset = std::nullopt;
   /**
    * The indices data type.  Valid values correspond to WebGL enums: 5121
    * (UNSIGNED_BYTE), 5123 (UNSIGNED_SHORT), 5125 (UNSIGNED_INT)
    */
   AccessorComponentType componentType;
+
+  static IAccessorSparseIndices Parse(const json& parsedAccessorSparseIndices);
 }; // end of struct IAccessorSparseIndices
 
 /**
@@ -544,6 +546,8 @@ struct IAccessorSparseValues : public IProperty {
    * aligned
    */
   std::optional<int> byteOffset = std::nullopt;
+
+  static IAccessorSparseValues Parse(const json& parsedAccessorSparseValues);
 }; // end of struct IAccessorSparseValues
 
 /**
@@ -566,6 +570,8 @@ struct IAccessorSparse : public IProperty {
    * same componentType and number of components as the base accessor
    */
   IAccessorSparseValues values;
+
+  static IAccessorSparsePtr Parse(const json& parsedAccessorSparse);
 }; // end of struct IAccessorSparse
 
 /**
@@ -610,7 +616,7 @@ struct IAccessor : public IChildRootProperty {
   /**
    * Sparse storage of attributes that deviate from their initialization value
    */
-  IAccessorSparsePtr sparse;
+  IAccessorSparsePtr sparse = nullptr;
 }; // end of struct IAccessor
 
 /**

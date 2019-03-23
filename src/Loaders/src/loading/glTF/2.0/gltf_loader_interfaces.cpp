@@ -43,7 +43,80 @@ IAccessor IAccessor::Parse(const json& parsedAccessor)
   // Min
   accessor.min = json_util::get_array<int32_t>(parsedAccessor, "min");
 
+  // Sparse
+  if (json_util::has_valid_key_value(parsedAccessor, "sparse")) {
+    accessor.sparse = IGLTF2::IAccessorSparse::Parse(parsedAccessor["sparse"]);
+  }
+
   return accessor;
+}
+
+IGLTF2::IAccessorSparsePtr
+IGLTF2::IAccessorSparse::Parse(const json& parsedAccessorSparse)
+{
+  auto accessorSparse = std::make_shared<IAccessorSparse>();
+
+  // Count
+  accessorSparse->count
+    = json_util::get_number<size_t>(parsedAccessorSparse, "count");
+
+  // Indices
+  if (json_util::has_valid_key_value(parsedAccessorSparse, "indices")) {
+    accessorSparse->indices
+      = IAccessorSparseIndices::Parse(parsedAccessorSparse["indices"]);
+  }
+
+  // Values
+  if (json_util::has_valid_key_value(parsedAccessorSparse, "values")) {
+    accessorSparse->values
+      = IAccessorSparseValues::Parse(parsedAccessorSparse["values"]);
+  }
+
+  return accessorSparse;
+}
+
+IGLTF2::IAccessorSparseIndices
+IGLTF2::IAccessorSparseIndices::Parse(const json& parsedAccessorSparseIndices)
+{
+  IAccessorSparseIndices accessorSparseIndices;
+
+  // Buffer view
+  accessorSparseIndices.bufferView
+    = json_util::get_number<size_t>(parsedAccessorSparseIndices, "bufferView");
+
+  // Byte offset
+  if (json_util::has_valid_key_value(parsedAccessorSparseIndices,
+                                     "byteOffset")) {
+    accessorSparseIndices.byteOffset = json_util::get_number<size_t>(
+      parsedAccessorSparseIndices, "byteOffset");
+  }
+
+  // Component type
+  accessorSparseIndices.componentType
+    = IGLTF2::EnumUtils::NumberToAccessorComponentType(
+      json_util::get_number<size_t>(parsedAccessorSparseIndices,
+                                    "componentType"));
+
+  return accessorSparseIndices;
+}
+
+IGLTF2::IAccessorSparseValues
+IGLTF2::IAccessorSparseValues::Parse(const json& parsedAccessorSparseValues)
+{
+  IAccessorSparseValues accessorSparseValues;
+
+  // Buffer view
+  accessorSparseValues.bufferView
+    = json_util::get_number<size_t>(parsedAccessorSparseValues, "bufferView");
+
+  // Byte offset
+  if (json_util::has_valid_key_value(parsedAccessorSparseValues,
+                                     "byteOffset")) {
+    accessorSparseValues.byteOffset
+      = json_util::get_number<size_t>(parsedAccessorSparseValues, "byteOffset");
+  }
+
+  return accessorSparseValues;
 }
 
 IGLTF2::IAsset IGLTF2::IAsset::Parse(const json& parsedAsset)

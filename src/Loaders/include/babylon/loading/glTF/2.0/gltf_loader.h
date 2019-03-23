@@ -451,6 +451,9 @@ private:
                                                     IAnimationSampler& sampler);
   ArrayBufferView& _loadBufferAsync(const std::string& context,
                                     IBuffer& buffer);
+  IndicesArray& _getConverted32bitIndices(IAccessor& accessor);
+  IndicesArray _castIndicesTo32bit(const IGLTF2::AccessorComponentType& type,
+                                   const ArrayBufferView& buffer);
   IndicesArray& _loadIndicesAccessorAsync(const std::string& context,
                                           IAccessor& accessor);
   Float32Array& _loadFloatAccessorAsync(const std::string& context,

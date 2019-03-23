@@ -1415,6 +1415,39 @@ ArrayBufferView& GLTFLoader::loadBufferViewAsync(const std::string& context,
   return bufferView._data;
 }
 
+IndicesArray
+GLTFLoader::_castIndicesTo32bit(const IGLTF2::AccessorComponentType& type,
+                                const ArrayBufferView& buffer)
+{
+  switch (type) {
+    case IGLTF2::AccessorComponentType::UNSIGNED_BYTE:
+      return stl_util::cast_array_elements<uint32_t, uint8_t>(
+        buffer.uint8Array);
+      break;
+    case IGLTF2::AccessorComponentType::UNSIGNED_SHORT:
+      return stl_util::cast_array_elements<uint32_t, uint16_t>(
+        buffer.uint16Array);
+      break;
+    default:
+      return buffer.uint32Array;
+  }
+}
+
+IndicesArray& GLTFLoader::_getConverted32bitIndices(IAccessor& accessor)
+{
+  switch (accessor.componentType) {
+    case IGLTF2::AccessorComponentType::UNSIGNED_BYTE:
+    case IGLTF2::AccessorComponentType::UNSIGNED_SHORT:
+      accessor._data->uint32Array
+        = _castIndicesTo32bit(accessor.componentType, *accessor._data);
+      break;
+    default:
+      break;
+  }
+
+  return accessor._data->uint32Array;
+}
+
 IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
                                                     IAccessor& accessor)
 {
@@ -1431,26 +1464,8 @@ IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
       String::printf("%s/componentType: Invalid value", context.c_str()));
   }
 
-  const auto convertDataTo32bit = [](IAccessor& accessor) -> void {
-    switch (accessor.componentType) {
-      case IGLTF2::AccessorComponentType::UNSIGNED_BYTE:
-        accessor._data->uint32Array
-          = stl_util::cast_array_elements<uint32_t, uint8_t>(
-            accessor._data->uint8Array);
-        break;
-      case IGLTF2::AccessorComponentType::UNSIGNED_SHORT:
-        accessor._data->uint32Array
-          = stl_util::cast_array_elements<uint32_t, uint16_t>(
-            accessor._data->uint16Array);
-        break;
-      default:
-        break;
-    }
-  };
-
   if (accessor._data.has_value()) {
-    convertDataTo32bit(accessor);
-    return accessor._data->uint32Array;
+    return _getConverted32bitIndices(accessor);
   }
 
   auto& bufferView
@@ -1460,9 +1475,8 @@ IndicesArray& GLTFLoader::_loadIndicesAccessorAsync(const std::string& context,
     String::printf("/bufferViews/%ld", bufferView.index), bufferView);
   accessor._data = GLTFLoader::_GetTypedArray(
     context, accessor.componentType, data, accessor.byteOffset, accessor.count);
-  convertDataTo32bit(accessor);
 
-  return accessor._data->uint32Array;
+  return _getConverted32bitIndices(accessor);
 }
 
 Float32Array& GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
@@ -1474,7 +1488,7 @@ Float32Array& GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
     throw std::runtime_error("Invalid component type");
   }
 
-  if (!accessor._data.has_value()) {
+  if (accessor._data.has_value()) {
     return accessor._data->float32Array;
   }
 
@@ -1513,12 +1527,12 @@ Float32Array& GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
       const auto valuesData = loadBufferViewAsync(
         String::printf("/bufferViews/%ld", valuesBufferView.index),
         valuesBufferView);
-      const auto& indices
-        = GLTFLoader::_GetTypedArray(
-            String::printf("%s/sparse/indices", context.c_str()),
-            sparse.indices.componentType, indicesData,
-            sparse.indices.byteOffset, sparse.count)
-            .uint32Array;
+      const auto& indices = _castIndicesTo32bit(
+        sparse.indices.componentType,
+        GLTFLoader::_GetTypedArray(
+          String::printf("%s/sparse/indices", context.c_str()),
+          sparse.indices.componentType, indicesData, sparse.indices.byteOffset,
+          sparse.count));
       const auto& values
         = GLTFLoader::_GetTypedArray(
             String::printf("%s/sparse/values", context.c_str()),
