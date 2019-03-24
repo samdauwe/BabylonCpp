@@ -16,6 +16,7 @@
 #include <babylon/samples/loaders/gltf/import_box_textured_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_vertex_colors_scene.h>
 #include <babylon/samples/loaders/gltf/import_cameras_scene.h>
+#include <babylon/samples/loaders/gltf/import_duck_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_meshes_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_sparse_accessor_scene.h>
 #include <babylon/samples/loaders/gltf/import_triangle_scene.h>
@@ -108,6 +109,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       [](ICanvas* iCanvas) {                                  //
                         return std::make_unique<ImportCamerasScene>(iCanvas); //
                       });                                                     //
+  // Import Duck Scene (glTF)
+  _samples["ImportDuckScene"]
+    = std::make_tuple(false,                                               //
+                      [](ICanvas* iCanvas) {                               //
+                        return std::make_unique<ImportDuckScene>(iCanvas); //
+                      });                                                  //
   // Import Simple Meshes Scene (glTF)
   _samples["ImportSimpleMeshesScene"] = std::make_tuple(
     true,                                                        //
