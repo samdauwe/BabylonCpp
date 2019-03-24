@@ -14,6 +14,7 @@
 #include <babylon/samples/loaders/gltf/import_box_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_textured_non_power_of_two_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_textured_scene.h>
+#include <babylon/samples/loaders/gltf/import_box_vertex_colors_scene.h>
 #include <babylon/samples/loaders/gltf/import_cameras_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_meshes_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_sparse_accessor_scene.h>
@@ -95,6 +96,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
     [](ICanvas* iCanvas) {                                      //
       return std::make_unique<ImportBoxTexturedScene>(iCanvas); //
     });                                                         //
+  // Import Box Vertex Colors Scene (glTF)
+  _samples["ImportBoxVertexColorsScene"] = std::make_tuple(
+    true,                                                           //
+    [](ICanvas* iCanvas) {                                          //
+      return std::make_unique<ImportBoxVertexColorsScene>(iCanvas); //
+    });                                                             //
   // Import Cameras Scene (glTF)
   _samples["ImportCamerasScene"]
     = std::make_tuple(true,                                                   //

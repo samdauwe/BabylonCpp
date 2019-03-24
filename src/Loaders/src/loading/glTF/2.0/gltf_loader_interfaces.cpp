@@ -493,6 +493,11 @@ INodePtr INode::Parse(const json& parsedNode)
   // Weights
   node->weights = json_util::get_array<float>(parsedNode, "weights");
 
+  // Name
+  if (json_util::has_valid_key_value(parsedNode, "name")) {
+    node->name = json_util::get_string(parsedNode, "name");
+  }
+
   return node;
 }
 
