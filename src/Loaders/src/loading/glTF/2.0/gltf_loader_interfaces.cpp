@@ -245,6 +245,27 @@ ICamera ICamera::Parse(const json& parsedCamera)
   return camera;
 }
 
+IImage IImage::Parse(const json& parsedImage)
+{
+  IImage image;
+
+  // Uri
+  image.uri = json_util::get_string(parsedImage, "uri");
+
+  // Mime type
+  if (json_util::has_valid_key_value(parsedImage, "mimeType")) {
+    image.mimeType
+      = IGLTF2::EnumUtils::StringToImageMimeType(parsedImage["mimeType"]);
+  }
+
+  // Buffer view
+  if (json_util::has_valid_key_value(parsedImage, "bufferView")) {
+    image.bufferView = json_util::get_number<size_t>(parsedImage, "bufferView");
+  }
+
+  return image;
+}
+
 IMaterial IMaterial::Parse(const json& parsedMaterial)
 {
   IMaterial material;
@@ -292,6 +313,11 @@ IMaterial IMaterial::Parse(const json& parsedMaterial)
   // Double sided
   if (json_util::has_valid_key_value(parsedMaterial, "doubleSided")) {
     material.doubleSided = json_util::get_bool(parsedMaterial, "doubleSided");
+  }
+
+  // Name
+  if (json_util::has_valid_key_value(parsedMaterial, "name")) {
+    material.name = json_util::get_string(parsedMaterial, "name");
   }
 
   return material;
@@ -385,6 +411,11 @@ IMesh IMesh::Parse(const json& parsedMesh)
   // Weights
   mesh.weights = json_util::get_array<float>(parsedMesh, "weights");
 
+  // Name
+  if (json_util::has_valid_key_value(parsedMesh, "name")) {
+    mesh.name = json_util::get_string(parsedMesh, "name");
+  }
+
   return mesh;
 }
 
@@ -465,6 +496,37 @@ INodePtr INode::Parse(const json& parsedNode)
   return node;
 }
 
+ISampler ISampler::Parse(const json& parsedSampler)
+{
+  ISampler sampler;
+
+  // Mag filter
+  if (json_util::has_valid_key_value(parsedSampler, "magFilter")) {
+    sampler.magFilter = IGLTF2::EnumUtils::NumberToTextureMagFilter(
+      json_util::get_number<size_t>(parsedSampler, "magFilter"));
+  }
+
+  // Min filter
+  if (json_util::has_valid_key_value(parsedSampler, "minFilter")) {
+    sampler.minFilter = IGLTF2::EnumUtils::NumberToTextureMinFilter(
+      json_util::get_number<size_t>(parsedSampler, "minFilter"));
+  }
+
+  // Wrap S
+  if (json_util::has_valid_key_value(parsedSampler, "wrapS")) {
+    sampler.wrapS = IGLTF2::EnumUtils::NumberToTextureWrapMode(
+      json_util::get_number<size_t>(parsedSampler, "wrapS"));
+  }
+
+  // Wrap T
+  if (json_util::has_valid_key_value(parsedSampler, "wrapT")) {
+    sampler.wrapT = IGLTF2::EnumUtils::NumberToTextureWrapMode(
+      json_util::get_number<size_t>(parsedSampler, "wrapT"));
+  }
+
+  return sampler;
+}
+
 IScene IScene::Parse(const json& parsedScene)
 {
   IScene scene;
@@ -473,6 +535,21 @@ IScene IScene::Parse(const json& parsedScene)
   scene.nodes = json_util::get_array<size_t>(parsedScene, "nodes");
 
   return scene;
+}
+
+ITexture ITexture::Parse(const json& parsedTexture)
+{
+  ITexture texture;
+
+  // Sampler
+  if (json_util::has_valid_key_value(parsedTexture, "sampler")) {
+    texture.sampler = json_util::get_number<size_t>(parsedTexture, "sampler");
+  }
+
+  // Source
+  texture.source = json_util::get_number<size_t>(parsedTexture, "source");
+
+  return texture;
 }
 
 ITextureInfoPtr ITextureInfo::Parse(const json& parsedTextureInfo)
@@ -526,6 +603,12 @@ std::unique_ptr<IGLTF> IGLTF::Parse(const json& parsedGLTFObject)
     glTFObject.cameras.emplace_back(ICamera::Parse(camera));
   }
 
+  // Images
+  for (const auto& image :
+       json_util::get_array<json>(parsedGLTFObject, "images")) {
+    glTFObject.images.emplace_back(IImage::Parse(image));
+  }
+
   // Materials
   for (const auto& material :
        json_util::get_array<json>(parsedGLTFObject, "materials")) {
@@ -544,6 +627,12 @@ std::unique_ptr<IGLTF> IGLTF::Parse(const json& parsedGLTFObject)
     glTFObject.nodes.emplace_back(INode::Parse(node));
   }
 
+  // Samplers
+  for (const auto& sampler :
+       json_util::get_array<json>(parsedGLTFObject, "samplers")) {
+    glTFObject.samplers.emplace_back(ISampler::Parse(sampler));
+  }
+
   // Scene
   if (json_util::has_valid_key_value(parsedGLTFObject, "scene")) {
     glTFObject.scene = json_util::get_number<size_t>(parsedGLTFObject, "scene");
@@ -553,6 +642,12 @@ std::unique_ptr<IGLTF> IGLTF::Parse(const json& parsedGLTFObject)
   for (const auto& scene :
        json_util::get_array<json>(parsedGLTFObject, "scenes")) {
     glTFObject.scenes.emplace_back(IScene::Parse(scene));
+  }
+
+  // Textures
+  for (const auto& texture :
+       json_util::get_array<json>(parsedGLTFObject, "textures")) {
+    glTFObject.textures.emplace_back(ITexture::Parse(texture));
   }
 
   return glTFObjectPtr;

@@ -1935,7 +1935,7 @@ BaseTexturePtr GLTFLoader::loadTextureInfoAsync(
 
   logOpen(context);
 
-  const auto texture
+  const auto& texture
     = ArrayItem::Get(String::printf("%s/index", context.c_str()),
                      gltf->textures, textureInfo.index);
   const auto promise = _loadTextureAsync(
@@ -1967,14 +1967,13 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
   auto& sampler
     = (!texture.sampler.has_value() ?
          defaultSampler :
-         ArrayItem::Get(String::printf("%s/sample", context.c_str()),
+         ArrayItem::Get(String::printf("%s/sampler", context.c_str()),
                         gltf->samplers, *texture.sampler));
-
   const auto samplerData
     = _loadSampler(String::printf("/samplers/%ld", sampler.index), sampler);
 
-  const auto image = ArrayItem::Get(
-    String::printf("%s/source", context.c_str()), gltf->images, texture.source);
+  auto& image = ArrayItem::Get(String::printf("%s/source", context.c_str()),
+                               gltf->images, texture.source);
   std::string url;
   if (!image.uri.empty()) {
     if (Tools::IsBase64(image.uri)) {
@@ -1999,6 +1998,20 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
             !message.empty() ? message.c_str() : "Failed to load texture"));
       }
     });
+
+  if (url.empty()) {
+    promises.emplace_back([this, &image, &babylonTexture]() -> void {
+      const auto data
+        = loadImageAsync(String::printf("/images/%ld", image.index), image);
+      const auto name
+        = !image.uri.empty() ?
+            image.uri :
+            String::printf("%s#image%ld", _fileName.c_str(), image.index);
+      const auto dataUrl
+        = String::printf("data:%s%s", _uniqueRootUrl.c_str(), name.c_str());
+      babylonTexture->updateURL(dataUrl, data.uint8Array);
+    });
+  }
 
   babylonTexture->wrapU = samplerData.wrapU;
   babylonTexture->wrapV = samplerData.wrapV;
@@ -2034,7 +2047,7 @@ _ISamplerData GLTFLoader::_loadSampler(const std::string& context,
 ArrayBufferView& GLTFLoader::loadImageAsync(const std::string& context,
                                             IImage& image)
 {
-  if (image._data) {
+  if (!image._data) {
     logOpen(String::printf("%s %s", context.c_str(), image.name.c_str()));
 
     if (!image.uri.empty()) {

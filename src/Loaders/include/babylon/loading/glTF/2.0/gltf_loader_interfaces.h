@@ -227,6 +227,10 @@ enum class CameraType {
  */
 enum class ImageMimeType {
   /**
+   * Invalid
+   */
+  INVALID = 0,
+  /**
    * JPEG Mime-type
    */
   JPEG,
@@ -305,6 +309,10 @@ enum class MeshPrimitiveMode {
  */
 enum class TextureMagFilter {
   /**
+   * Invalid filter
+   */
+  INVALID = 0,
+  /**
    * Nearest
    */
   NEAREST = 9728,
@@ -373,9 +381,9 @@ enum class TextureWrapMode {
 struct EnumUtils {
 
   static unsigned int
-  AccessorComponentTypeToNumber(const AccessorComponentType& type)
+  AccessorComponentTypeToNumber(const AccessorComponentType& value)
   {
-    switch (type) {
+    switch (value) {
       case AccessorComponentType::BYTE:
         return 5120;
       case AccessorComponentType::UNSIGNED_BYTE:
@@ -393,39 +401,9 @@ struct EnumUtils {
     }
   }
 
-  static CameraType StringToCameraType(const std::string& cameraType)
+  static AccessorComponentType NumberToAccessorComponentType(const size_t value)
   {
-    if (cameraType == "perspective") {
-      return CameraType::PERSPECTIVE;
-    }
-    else if (cameraType == "orthographic") {
-      return CameraType::ORTHOGRAPHIC;
-    }
-    else {
-      return CameraType::INVALID;
-    }
-  }
-
-  static MaterialAlphaMode StringToMaterialAlphaMode(const std::string& modeStr)
-  {
-    if (modeStr == "OPAQUE") {
-      return MaterialAlphaMode::OPAQUE;
-    }
-    else if (modeStr == "MASK") {
-      return MaterialAlphaMode::MASK;
-    }
-    else if (modeStr == "BLEND") {
-      return MaterialAlphaMode::BLEND;
-    }
-    else {
-      return MaterialAlphaMode::INVALID;
-    }
-  }
-
-  static AccessorComponentType
-  NumberToAccessorComponentType(const size_t typeNumber)
-  {
-    switch (typeNumber) {
+    switch (value) {
       case 5120:
         return AccessorComponentType::BYTE;
       case 5121:
@@ -443,9 +421,9 @@ struct EnumUtils {
     }
   }
 
-  static MeshPrimitiveMode NumberToMeshPrimitiveMode(const size_t modeNumber)
+  static MeshPrimitiveMode NumberToMeshPrimitiveMode(const size_t value)
   {
-    switch (modeNumber) {
+    switch (value) {
       case 0:
         return MeshPrimitiveMode::POINTS;
       case 1:
@@ -465,31 +443,119 @@ struct EnumUtils {
     }
   }
 
-  static AccessorType StringToAccessorType(const std::string& typeStr)
+  static TextureMagFilter NumberToTextureMagFilter(const size_t value)
   {
-    if (typeStr == "SCALAR") {
+    switch (value) {
+      case 9728:
+        return TextureMagFilter::NEAREST;
+      case 9729:
+        return TextureMagFilter::LINEAR;
+      default:
+        return TextureMagFilter::INVALID;
+    }
+  }
+
+  static TextureMinFilter NumberToTextureMinFilter(const size_t value)
+  {
+    switch (value) {
+      case 9728:
+        return TextureMinFilter::NEAREST;
+      case 9729:
+        return TextureMinFilter::LINEAR;
+      case 9984:
+        return TextureMinFilter::NEAREST_MIPMAP_NEAREST;
+      case 9985:
+        return TextureMinFilter::LINEAR_MIPMAP_NEAREST;
+      case 9986:
+        return TextureMinFilter::NEAREST_MIPMAP_LINEAR;
+      case 9987:
+        return TextureMinFilter::LINEAR_MIPMAP_LINEAR;
+      default:
+        return TextureMinFilter::INVALID;
+    }
+  }
+
+  static TextureWrapMode NumberToTextureWrapMode(const size_t value)
+  {
+    switch (value) {
+      case 33071:
+        return TextureWrapMode::CLAMP_TO_EDGE;
+      case 33648:
+        return TextureWrapMode::MIRRORED_REPEAT;
+      case 10497:
+        return TextureWrapMode::REPEAT;
+      default:
+        return TextureWrapMode::INVALID;
+    }
+  }
+
+  static AccessorType StringToAccessorType(const std::string& value)
+  {
+    if (value == "SCALAR") {
       return AccessorType::SCALAR;
     }
-    else if (typeStr == "VEC2") {
+    else if (value == "VEC2") {
       return AccessorType::VEC2;
     }
-    else if (typeStr == "VEC3") {
+    else if (value == "VEC3") {
       return AccessorType::VEC3;
     }
-    else if (typeStr == "VEC4") {
+    else if (value == "VEC4") {
       return AccessorType::VEC4;
     }
-    else if (typeStr == "MAT2") {
+    else if (value == "MAT2") {
       return AccessorType::MAT2;
     }
-    else if (typeStr == "MAT3") {
+    else if (value == "MAT3") {
       return AccessorType::MAT3;
     }
-    else if (typeStr == "MAT4") {
+    else if (value == "MAT4") {
       return AccessorType::MAT4;
     }
     else {
       return AccessorType::INVALID;
+    }
+  }
+
+  static CameraType StringToCameraType(const std::string& value)
+  {
+    if (value == "perspective") {
+      return CameraType::PERSPECTIVE;
+    }
+    else if (value == "orthographic") {
+      return CameraType::ORTHOGRAPHIC;
+    }
+    else {
+      return CameraType::INVALID;
+    }
+  }
+
+  static ImageMimeType StringToImageMimeType(const std::string& value)
+  {
+    if (value == "image/jpeg") {
+      return ImageMimeType::JPEG;
+    }
+    else if (value == "image/png") {
+      return ImageMimeType::PNG;
+    }
+    else {
+      return ImageMimeType::INVALID;
+    }
+  }
+
+  static MaterialAlphaMode StringToMaterialAlphaMode(const std::string& value)
+  {
+    if (value == "OPAQUE") {
+      return MaterialAlphaMode::OPAQUE;
+    }
+    else if (value == "MASK") {
+      return MaterialAlphaMode::MASK;
+    }
+    else if (value == "BLEND") {
+      return MaterialAlphaMode::BLEND;
+    }
+    else {
+      return MaterialAlphaMode::INVALID;
     }
   }
 
@@ -1343,6 +1409,9 @@ struct ICamera : public IGLTF2::ICamera, IArrayItem {
 struct IImage : public IGLTF2::IImage, IArrayItem {
   /** @hidden */
   ArrayBufferView _data;
+
+  static IImage Parse(const json& parsedImage);
+
 }; // end of struct IImage
 
 /**
@@ -1459,6 +1528,9 @@ struct _ISamplerData {
 struct ISampler : public IGLTF2::ISampler, IArrayItem {
   /** @hidden */
   std::optional<_ISamplerData> _data = std::nullopt;
+
+  static ISampler Parse(const json& parsedSampler);
+
 }; // end of struct ISampler
 
 /**
@@ -1486,6 +1558,9 @@ struct ISkin : public IGLTF2::ISkin, IArrayItem {
  * @brief Loader interface with additional members.
  */
 struct ITexture : public IGLTF2::ITexture, IArrayItem {
+
+  static ITexture Parse(const json& parsedTexture);
+
 }; // end of struct ITexture
 
 /**

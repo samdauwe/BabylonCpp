@@ -171,14 +171,12 @@ void Texture::delayLoad()
   _texture       = _getFromCache(url, _noMipmap, _samplingMode);
 
   if (!_texture) {
-#if 0
     _texture = scene->getEngine()->createTexture(
       url, _noMipmap, _invertY, getScene(), _samplingMode, _delayedOnLoad,
       _delayedOnError, _buffer, nullptr, _format);
     if (_deleteBuffer) {
-      delete _buffer;
+      // delete _buffer;
     }
-#endif
   }
   else {
     if (_delayedOnLoad) {
