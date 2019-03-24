@@ -7,9 +7,9 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Simple Meshes Scene (glTF). This is an example showing how the same
- * mesh may be appended to several nodes, to be rendered multiple times. It also
- * shows how additional vertex attributes are defined in a mesh.primitive -
+ * @brief Import Simple Meshes Scene (glTF). This is an example showing how the
+ * same mesh may be appended to several nodes, to be rendered multiple times. It
+ * also shows how additional vertex attributes are defined in a mesh.primitive -
  * namely, attributes for the vertex normals.
  * @note The additional vertex normal attribute in this example is not yet used
  * by any technique. This may cause a warning to be printed during the

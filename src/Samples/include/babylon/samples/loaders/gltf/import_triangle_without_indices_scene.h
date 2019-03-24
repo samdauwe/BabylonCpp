@@ -7,8 +7,8 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Triangle Without Indices Scene (glTF). The simplest possible glTF
- * asset: A single scene with a single node and a single mesh with a single
+ * @brief Import Triangle Without Indices Scene (glTF). The simplest possible
+ * glTF asset: A single scene with a single node and a single mesh with a single
  * mesh.primitive with a single triangle with a single attribute, without
  * indices and without a material.
  * @see https://doc.babylonjs.com/how_to/load_from_any_file_type

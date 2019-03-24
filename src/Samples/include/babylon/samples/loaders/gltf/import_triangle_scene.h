@@ -7,9 +7,9 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Triangle Scene (glTF). A very simple glTF asset: The basic structure
- * is the same as in Triangle Without Indices, but here, the mesh.primitive
- * describes an indexed geometry.
+ * @brief Import Triangle Scene (glTF). A very simple glTF asset: The basic
+ * structure is the same as in Triangle Without Indices, but here, the
+ * mesh.primitive describes an indexed geometry.
  * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
  * @see
  * https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Triangle

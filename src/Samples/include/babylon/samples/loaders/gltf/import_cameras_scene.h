@@ -7,7 +7,8 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Cameras Scene (glTF). A sample with two different camera objects.
+ * @brief Import Cameras Scene (glTF). A sample with two different camera
+ * objects.
  * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
  * @see
  * https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/Cameras
