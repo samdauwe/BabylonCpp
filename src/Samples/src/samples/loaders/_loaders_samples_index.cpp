@@ -12,6 +12,7 @@
 #ifdef WITH_LOADERS
 #include <babylon/samples/loaders/gltf/import_box_interleaved_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_scene.h>
+#include <babylon/samples/loaders/gltf/import_box_textured_non_power_of_two_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_textured_scene.h>
 #include <babylon/samples/loaders/gltf/import_cameras_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_meshes_scene.h>
@@ -82,6 +83,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       [](ICanvas* iCanvas) {                              //
                         return std::make_unique<ImportBoxScene>(iCanvas); //
                       });                                                 //
+  // Import Box Textured Non Power Of Two Scene (glTF)
+  _samples["ImportBoxTexturedNonPowerOfTwoScene"] = std::make_tuple(
+    false,                                                                   //
+    [](ICanvas* iCanvas) {                                                   //
+      return std::make_unique<ImportBoxTexturedNonPowerOfTwoScene>(iCanvas); //
+    });                                                                      //
   // Import Box Textured Scene (glTF)
   _samples["ImportBoxTexturedScene"] = std::make_tuple(
     true,                                                       //
