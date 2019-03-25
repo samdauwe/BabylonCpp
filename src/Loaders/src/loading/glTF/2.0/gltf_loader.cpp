@@ -702,6 +702,10 @@ AbstractMeshPtr GLTFLoader::_loadMeshPrimitiveAsync(
     }
 
     if (canInstance) {
+      if (!primitive._instanceData) {
+        primitive._instanceData
+          = std::make_unique<IMeshPrimitive::IMeshPrimitiveData>();
+      }
       primitive._instanceData->babylonSourceMesh = babylonMesh;
     }
 
