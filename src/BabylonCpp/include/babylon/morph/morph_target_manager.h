@@ -79,7 +79,7 @@ protected:
    * @brief Creates a new MorphTargetManager.
    * @param scene defines the current scene
    */
-  MorphTargetManager(Scene* scene);
+  MorphTargetManager(Scene* scene = nullptr);
 
   /**
    * @brief Gets the unique ID of this manager.
@@ -166,7 +166,7 @@ private:
   Float32Array _influences;
   bool _supportsNormals;
   bool _supportsTangents;
-  std::size_t _vertexCount;
+  size_t _vertexCount;
   size_t _uniqueId;
   Float32Array _tempInfluences;
 

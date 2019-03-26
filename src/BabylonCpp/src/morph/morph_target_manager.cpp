@@ -25,7 +25,6 @@ MorphTargetManager::MorphTargetManager(Scene* scene)
   _scene = scene ? scene : Engine::LastCreatedScene();
 
   if (_scene) {
-    _scene->morphTargetManagers.emplace_back(this);
     _uniqueId = _scene->getUniqueId();
   }
 }
@@ -131,7 +130,7 @@ json MorphTargetManager::serialize()
 
 void MorphTargetManager::_syncActiveTargets(bool needUpdate)
 {
-  std::size_t influenceCount = 0;
+  size_t influenceCount = 0;
   _activeTargets.clear();
   _tempInfluences.clear();
   _influences.clear();

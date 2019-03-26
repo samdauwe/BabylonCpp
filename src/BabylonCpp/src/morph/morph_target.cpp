@@ -50,8 +50,8 @@ void MorphTarget::set_influence(float iInfluence)
   _influence     = iInfluence;
 
   if (onInfluenceChanged.hasObservers()) {
-    auto value = std::make_unique<bool>(previous == 0.f || iInfluence == 0.f);
-    onInfluenceChanged.notifyObservers(value.get());
+    bool value = (previous == 0.f || iInfluence == 0.f);
+    onInfluenceChanged.notifyObservers(&value);
   }
 }
 
@@ -182,15 +182,14 @@ std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
   return result;
 }
 
-std::unique_ptr<MorphTarget>
-MorphTarget::FromMesh(AbstractMesh* mesh, std::string name, float influence)
+MorphTargetPtr MorphTarget::FromMesh(const AbstractMeshPtr& mesh,
+                                     std::string name, float influence)
 {
   if (name.empty()) {
     name = mesh->name;
   }
 
-  auto result
-    = std::make_unique<MorphTarget>(name, influence, mesh->getScene());
+  auto result = MorphTarget::New(name, influence, mesh->getScene());
 
   result->setPositions(mesh->getVerticesData(VertexBuffer::PositionKind));
 

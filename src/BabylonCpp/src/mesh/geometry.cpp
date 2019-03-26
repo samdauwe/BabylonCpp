@@ -178,9 +178,10 @@ AbstractMesh* Geometry::setVerticesData(unsigned int kind,
 
 void Geometry::removeVerticesData(unsigned int kind)
 {
-  if (stl_util::contains(_vertexBuffers, kind)) {
+  if (stl_util::contains(_vertexBuffers, kind) && _vertexBuffers[kind]) {
     _vertexBuffers[kind]->dispose();
     _vertexBuffers[kind] = nullptr;
+    _vertexBuffers.erase(kind);
   }
 }
 
@@ -188,8 +189,9 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
                                  const std::optional<size_t>& totalVertices)
 {
   auto kind = buffer->getKind();
-  if (stl_util::contains(_vertexBuffers, kind)) {
+  if (stl_util::contains(_vertexBuffers, kind) && _vertexBuffers[kind]) {
     _vertexBuffers[kind]->dispose();
+    _vertexBuffers.erase(kind);
   }
 
   _vertexBuffers[kind] = buffer;

@@ -12,10 +12,12 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
-class MorphTarget;
+class AbstractMesh;
 struct AnimationPropertiesOverride;
+class MorphTarget;
 class Scene;
-using MorphTargetPtr = std::shared_ptr<MorphTarget>;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using MorphTargetPtr  = std::shared_ptr<MorphTarget>;
 
 /**
  * @brief Defines a target to use with MorphTargetManager.
@@ -27,10 +29,8 @@ public:
   template <typename... Ts>
   static MorphTargetPtr New(Ts&&... args)
   {
-    auto mtm = std::shared_ptr<MorphTarget>(
+    return std::shared_ptr<MorphTarget>(
       new MorphTarget(std::forward<Ts>(args)...));
-
-    return mtm;
   }
   ~MorphTarget() override;
 
@@ -112,8 +112,8 @@ public:
    * @param influence defines the influence to attach to the target
    * @returns a new MorphTarget
    */
-  static std::unique_ptr<MorphTarget>
-  FromMesh(AbstractMesh* mesh, std::string name, float influence = 0.f);
+  static MorphTargetPtr FromMesh(const AbstractMeshPtr& mesh, std::string name,
+                                 float influence = 0.f);
 
 protected:
   /**
