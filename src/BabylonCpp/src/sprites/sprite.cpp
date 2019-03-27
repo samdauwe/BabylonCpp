@@ -12,9 +12,9 @@ Sprite::Sprite(const std::string& iName, const ISpriteManagerPtr& manager)
     : name{iName}
     , position{Vector3::Zero()}
     , color{std::make_unique<Color4>(1.f, 1.f, 1.f, 1.f)}
-    , width{1}
-    , height{1}
-    , angle{0}
+    , width{1.f}
+    , height{1.f}
+    , angle{0.f}
     , cellIndex{0}
     , invertU{0}
     , invertV{0}
@@ -78,8 +78,9 @@ void Sprite::stopAnimation()
 
 void Sprite::_animate(float deltaTime)
 {
-  if (!_animationStarted)
+  if (!_animationStarted) {
     return;
+  }
 
   _time += deltaTime;
   if (_time > _delay) {

@@ -319,7 +319,7 @@ void SpriteManager::render()
   effect->setFloat2(
     "textureInfos",
     static_cast<float>(cellWidth) / static_cast<float>(baseSize.width),
-    static_cast<float>(cellWidth) / static_cast<float>(baseSize.height));
+    static_cast<float>(cellHeight) / static_cast<float>(baseSize.height));
 
   // Fog
   if (_scene->fogEnabled() && _scene->fogMode() != Scene::FOGMODE_NONE
