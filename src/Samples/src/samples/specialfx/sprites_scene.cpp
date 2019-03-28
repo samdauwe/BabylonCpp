@@ -34,8 +34,8 @@ void SpritesScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create a sprite manager to optimize GPU ressources
   // Parameters : name, imgUrl, capacity, cellSize, scene
-  auto spriteManagerTrees
-    = SpriteManager::New("treesManager", "textures/palm.png", 2000, 800, scene);
+  auto spriteManagerTrees = SpriteManager::New(
+    "treesManager", "textures/palm.png", 2000, 1024, scene);
 
   // We create 2000 trees at random positions
   for (size_t i = 0; i < 2000; ++i) {

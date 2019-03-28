@@ -146,7 +146,7 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
     });                                                                       //
   // Sprites Scene
   _samples["SpritesScene"]
-    = std::make_tuple(false,                                            //
+    = std::make_tuple(true,                                             //
                       [](ICanvas* iCanvas) {                            //
                         return std::make_unique<SpritesScene>(iCanvas); //
                       });                                               //

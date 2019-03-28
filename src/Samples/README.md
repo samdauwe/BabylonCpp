@@ -165,6 +165,7 @@
 ![refraction_and_reflection_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/refraction_and_reflection_scene.png?raw=true "Refraction And Reflection Scene")
 ![rgb_shift_glitch_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/rgb_shift_glitch_scene.png?raw=true "RGB Shift Glitch Scene")
 ![simple_post_process_render_pipeline_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/simple_post_process_render_pipeline_scene.png?raw=true "Simple Post Process Render Pipeline Scene")
+![sprites_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/sprites_scene.png?raw=true "Sprites_scene Scene")
 ![waves_scene](https://raw.github.com/samdauwe/BabylonCpp/master/assets/screenshots/samples/waves_scene.png?raw=true "Waves Scene")
 
 ## Textures ##

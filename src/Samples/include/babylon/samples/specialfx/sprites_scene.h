@@ -14,6 +14,7 @@ namespace Samples {
 /**
  * @brief Sprites scene. Example demonstrating how to Load and display sprites.
  * @see https://www.babylonjs-playground.com/#9RI8CG#0
+ * @see https://doc.babylonjs.com/babylon101/sprites
  */
 class SpritesScene : public IRenderableScene {
 
