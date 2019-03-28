@@ -46,7 +46,7 @@ void SpritesScene::initializeScene(ICanvas* canvas, Scene* scene)
 
     // Some "dead" trees
     if (std::round(Math::random() * 5.f) == 0.f) {
-      tree->angle      = Math::PI * 90 / 180;
+      tree->angle      = Math::PI * 90.f / 180.f;
       tree->position.y = -0.3f;
     }
   }
@@ -67,7 +67,7 @@ void SpritesScene::initializeScene(ICanvas* canvas, Scene* scene)
   player2->stopAnimation(); // Not animated
   player2->cellIndex  = 2;  // Going to frame number 2
   player2->position.y = -0.3f;
-  player2->position.x = 1;
+  player2->position.x = 1.f;
   player2->size       = 0.3f;
   player2->invertU    = -1; // Change orientation
   player2->isPickable = true;
