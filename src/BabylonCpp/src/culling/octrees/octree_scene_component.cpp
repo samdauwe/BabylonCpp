@@ -12,7 +12,8 @@ OctreeSceneComponent::OctreeSceneComponent(Scene* iScene)
     , _checksIsEnabled{true}
     , _tempRay{Ray(Vector3::Zero(), Vector3(1.f, 1.f, 1.f))}
 {
-  scene = iScene;
+  ISceneComponent::name = OctreeSceneComponent::name;
+  scene                 = iScene;
 
   scene->getActiveMeshCandidates
     = [this]() { return getActiveMeshCandidates(); };

@@ -9,7 +9,8 @@ namespace BABYLON {
 
 ShadowGeneratorSceneComponent::ShadowGeneratorSceneComponent(Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = ShadowGeneratorSceneComponent::name;
+  scene                 = iScene;
 }
 
 ShadowGeneratorSceneComponent::~ShadowGeneratorSceneComponent()

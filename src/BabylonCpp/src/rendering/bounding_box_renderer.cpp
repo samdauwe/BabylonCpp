@@ -31,6 +31,7 @@ BoundingBoxRenderer::~BoundingBoxRenderer()
 void BoundingBoxRenderer::addToScene(
   const BoundingBoxRendererPtr& newBoundingBoxRenderer)
 {
+  ISceneComponent::name = BoundingBoxRenderer::name;
   scene->_addComponent(newBoundingBoxRenderer);
 }
 

@@ -12,7 +12,8 @@ AudioSceneComponent::AudioSceneComponent(Scene* iScene)
     , _audioEnabled{true}
     , _headphone{true}
 {
-  scene = iScene;
+  ISceneComponent::name = AudioSceneComponent::name;
+  scene                 = iScene;
 }
 
 AudioSceneComponent::~AudioSceneComponent()

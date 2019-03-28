@@ -8,7 +8,8 @@ namespace BABYLON {
 PostProcessRenderPipelineManagerSceneComponent::
   PostProcessRenderPipelineManagerSceneComponent(Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = PostProcessRenderPipelineManagerSceneComponent::name;
+  scene                 = iScene;
 }
 
 PostProcessRenderPipelineManagerSceneComponent::

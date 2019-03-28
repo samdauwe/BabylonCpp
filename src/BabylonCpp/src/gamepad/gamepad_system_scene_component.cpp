@@ -7,7 +7,8 @@ namespace BABYLON {
 
 GamepadSystemSceneComponent::GamepadSystemSceneComponent(Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = GamepadSystemSceneComponent::name;
+  scene                 = iScene;
 }
 
 GamepadSystemSceneComponent::~GamepadSystemSceneComponent()

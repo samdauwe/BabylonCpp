@@ -32,8 +32,11 @@ SpriteManager::SpriteManager(const std::string& iName,
     , _epsilon{epsilon}
     , _scene{scene}
 {
-  if (!scene->_getComponent(SceneComponentConstants::NAME_SPRITE)) {
-    scene->_addComponent(SpriteSceneComponent::New(scene));
+  auto component = std::static_pointer_cast<SpriteSceneComponent>(
+    scene->_getComponent(SceneComponentConstants::NAME_SPRITE));
+  if (!component) {
+    component = SpriteSceneComponent::New(scene);
+    scene->_addComponent(component);
   }
 
   // ISpriteManager interface properties
@@ -158,7 +161,7 @@ void SpriteManager::set_texture(const TexturePtr& value)
 }
 
 void SpriteManager::_appendSpriteVertex(size_t index, const Sprite& sprite,
-                                        int offsetX, int offsetY, float rowSize)
+                                        int offsetX, int offsetY, int rowSize)
 {
   size_t arrayOffset = index * 16;
 
@@ -189,11 +192,10 @@ void SpriteManager::_appendSpriteVertex(size_t index, const Sprite& sprite,
   _vertexData[arrayOffset + 7] = offsetYVal;
   _vertexData[arrayOffset + 8] = sprite.invertU ? 1.f : 0.f;
   _vertexData[arrayOffset + 9] = sprite.invertV ? 1.f : 0.f;
-  float offset                 = sprite.cellIndex / rowSize;
+  int offset = (rowSize == 0) ? 0 : sprite.cellIndex / rowSize;
   _vertexData[arrayOffset + 10]
-    = static_cast<float>(static_cast<float>(sprite.cellIndex)
-                         - offset * static_cast<float>(rowSize));
-  _vertexData[arrayOffset + 11] = offset;
+    = static_cast<float>(sprite.cellIndex - offset * rowSize);
+  _vertexData[arrayOffset + 11] = static_cast<float>(offset);
   // Color
   _vertexData[arrayOffset + 12] = sprite.color->r;
   _vertexData[arrayOffset + 13] = sprite.color->g;
@@ -282,8 +284,7 @@ void SpriteManager::render()
   // Sprites
   auto deltaTime = engine->getDeltaTime();
   size_t max     = std::min(_capacity, sprites.size());
-  float rowSize
-    = static_cast<float>(baseSize.width) / static_cast<float>(cellWidth);
+  int rowSize    = baseSize.width / cellWidth;
 
   unsigned int offset = 0;
   for (size_t index = 0; index < max; index++) {

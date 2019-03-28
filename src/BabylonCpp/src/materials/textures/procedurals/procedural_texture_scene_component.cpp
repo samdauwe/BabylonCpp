@@ -8,7 +8,8 @@ namespace BABYLON {
 
 ProceduralTextureSceneComponent::ProceduralTextureSceneComponent(Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = ProceduralTextureSceneComponent::name;
+  scene                 = iScene;
 }
 
 ProceduralTextureSceneComponent::~ProceduralTextureSceneComponent()

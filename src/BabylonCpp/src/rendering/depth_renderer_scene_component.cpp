@@ -8,7 +8,8 @@ namespace BABYLON {
 
 DepthRendererSceneComponent::DepthRendererSceneComponent(Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = DepthRendererSceneComponent::name;
+  scene                 = iScene;
 }
 
 DepthRendererSceneComponent::~DepthRendererSceneComponent()

@@ -107,7 +107,7 @@ protected:
 
 private:
   void _appendSpriteVertex(size_t index, const Sprite& sprite, int offsetX,
-                           int offsetY, float rowSize);
+                           int offsetY, int rowSize);
 
 public:
   /**

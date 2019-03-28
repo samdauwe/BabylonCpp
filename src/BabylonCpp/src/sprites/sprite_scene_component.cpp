@@ -11,6 +11,7 @@ namespace BABYLON {
 
 SpriteSceneComponent::SpriteSceneComponent(Scene* iScene)
 {
+  ISceneComponent::name        = SpriteSceneComponent::name;
   scene                        = iScene;
   scene->spriteManagers        = {};
   scene->_tempSpritePickingRay = Ray::Zero();

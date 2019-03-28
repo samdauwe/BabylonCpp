@@ -18,8 +18,9 @@ namespace BABYLON {
 
 OutlineRenderer::OutlineRenderer(Scene* iScene) : zOffset{1.f}
 {
-  scene   = iScene;
-  _engine = scene->getEngine();
+  ISceneComponent::name = OutlineRenderer::name;
+  scene                 = iScene;
+  _engine               = scene->getEngine();
 }
 
 OutlineRenderer::~OutlineRenderer()

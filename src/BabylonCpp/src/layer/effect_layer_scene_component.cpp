@@ -14,8 +14,9 @@ namespace BABYLON {
 EffectLayerSceneComponent::EffectLayerSceneComponent(Scene* iScene)
     : _renderEffects{false}, _needStencil{false}, _previousStencilState{false}
 {
-  scene   = iScene;
-  _engine = scene->getEngine();
+  ISceneComponent::name = EffectLayerSceneComponent::name;
+  scene                 = iScene;
+  _engine               = scene->getEngine();
 }
 
 EffectLayerSceneComponent::~EffectLayerSceneComponent()

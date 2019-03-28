@@ -9,8 +9,9 @@ namespace BABYLON {
 
 LayerSceneComponent::LayerSceneComponent(Scene* iScene)
 {
-  scene   = iScene;
-  _engine = scene->getEngine();
+  ISceneComponent::name = LayerSceneComponent::name;
+  scene                 = iScene;
+  _engine               = scene->getEngine();
 }
 
 LayerSceneComponent::~LayerSceneComponent()

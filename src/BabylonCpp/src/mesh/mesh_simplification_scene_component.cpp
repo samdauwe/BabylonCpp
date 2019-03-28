@@ -7,7 +7,8 @@ namespace BABYLON {
 
 SimplicationQueueSceneComponent::SimplicationQueueSceneComponent(Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = SimplicationQueueSceneComponent::name;
+  scene                 = iScene;
 }
 
 SimplicationQueueSceneComponent::~SimplicationQueueSceneComponent()

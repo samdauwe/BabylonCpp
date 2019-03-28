@@ -9,7 +9,8 @@ namespace BABYLON {
 GeometryBufferRendererSceneComponent::GeometryBufferRendererSceneComponent(
   Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = GeometryBufferRendererSceneComponent::name;
+  scene                 = iScene;
 }
 
 GeometryBufferRendererSceneComponent::~GeometryBufferRendererSceneComponent()

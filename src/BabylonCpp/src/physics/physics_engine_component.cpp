@@ -7,7 +7,8 @@ namespace BABYLON {
 
 PhysicsEngineSceneComponent::PhysicsEngineSceneComponent(Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = PhysicsEngineSceneComponent::name;
+  scene                 = iScene;
 
   // Replace the function used to get the deterministic frame time
   scene->getDeterministicFrameTime = [this]() -> float {

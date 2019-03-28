@@ -10,7 +10,8 @@ namespace BABYLON {
 
 LensFlareSystemSceneComponent::LensFlareSystemSceneComponent(Scene* iScene)
 {
-  scene = iScene;
+  ISceneComponent::name = LensFlareSystemSceneComponent::name;
+  scene                 = iScene;
 }
 
 LensFlareSystemSceneComponent::~LensFlareSystemSceneComponent()
