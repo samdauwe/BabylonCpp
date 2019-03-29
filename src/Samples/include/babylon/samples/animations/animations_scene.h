@@ -6,6 +6,10 @@
 namespace BABYLON {
 namespace Samples {
 
+/**
+ * @brief Animations scene. Example demonstrating how to add animations.
+ * @see https://doc.babylonjs.com/babylon101/animations
+ */
 struct AnimationsScene : public IRenderableScene {
 
   AnimationsScene(ICanvas* iCanvas);
