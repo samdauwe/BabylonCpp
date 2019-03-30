@@ -6,6 +6,10 @@
 
 namespace BABYLON {
 
+class PBRMetallicRoughnessMaterial;
+using PBRMetallicRoughnessMaterialPtr
+  = std::shared_ptr<PBRMetallicRoughnessMaterial>;
+
 /**
  * @brief The PBR material of BJS following the metal roughness convention.
  *
@@ -16,13 +20,15 @@ class BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterial
     : public PBRBaseSimpleMaterial {
 
 public:
-  /**
-   * @brief Instantiates a new PBRMetalRoughnessMaterial instance.
-   *
-   * @param name The material name
-   * @param scene The scene the material will be use in.
-   */
-  PBRMetallicRoughnessMaterial(const std::string& name, Scene* scene);
+  template <typename... Ts>
+  static PBRMetallicRoughnessMaterialPtr New(Ts&&... args)
+  {
+    auto material = std::shared_ptr<PBRMetallicRoughnessMaterial>(
+      new PBRMetallicRoughnessMaterial(std::forward<Ts>(args)...));
+    material->addMaterialToScene(material);
+
+    return material;
+  }
   ~PBRMetallicRoughnessMaterial() override;
 
   /**
@@ -59,6 +65,15 @@ public:
    */
   static PBRMetallicRoughnessMaterial* Parse(const json& source, Scene* scene,
                                              const std::string& rootUrl);
+
+protected:
+  /**
+   * @brief Instantiates a new PBRMetalRoughnessMaterial instance.
+   *
+   * @param name The material name
+   * @param scene The scene the material will be use in.
+   */
+  PBRMetallicRoughnessMaterial(const std::string& name, Scene* scene);
 
 public:
   /**

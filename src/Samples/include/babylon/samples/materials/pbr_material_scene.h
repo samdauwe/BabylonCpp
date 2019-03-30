@@ -7,7 +7,7 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief PBR baterial scene. Example demonstrating how to create physically
+ * @brief PBR material scene. Example demonstrating how to create physically
  * based rendering materials.
  * @see https://www.babylonjs-playground.com/#8MGKWK#0
  * @see https://doc.babylonjs.com/how_to/physically_based_rendering
