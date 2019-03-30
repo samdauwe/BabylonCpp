@@ -26,8 +26,8 @@ const char* PBRMetallicRoughnessMaterialScene::getName()
 void PBRMetallicRoughnessMaterialScene::initializeScene(ICanvas* canvas,
                                                         Scene* scene)
 {
-  auto camera
-    = ArcRotateCamera::New("camera1", 0, Math::PI_2, 5, Vector3::Zero(), scene);
+  auto camera = ArcRotateCamera::New("camera1", 0.f, Math::PI_2, 5.f,
+                                     Vector3::Zero(), scene);
 
   camera->lowerRadiusLimit = 2.f;
   camera->upperRadiusLimit = 10.f;

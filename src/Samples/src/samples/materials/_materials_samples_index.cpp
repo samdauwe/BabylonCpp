@@ -7,6 +7,7 @@
 #include <babylon/samples/materials/pbr_material_scene.h>
 #include <babylon/samples/materials/pbr_metallic_roughness_gold_material_scene.h>
 #include <babylon/samples/materials/pbr_metallic_roughness_material_scene.h>
+#include <babylon/samples/materials/pbr_metallic_roughness_texture_material_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_box_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_carved_trees_scene.h>
@@ -81,7 +82,7 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
                       });                                                   //
   // PBR Metallic Roughness Gold Material
   _samples["PBRMetallicRoughnessGoldMaterialScene"] = std::make_tuple(
-    true,                  //
+    false,                 //
     [](ICanvas* iCanvas) { //
       return std::make_unique<PBRMetallicRoughnessGoldMaterialScene>(
         iCanvas); //
@@ -92,6 +93,13 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
     [](ICanvas* iCanvas) {                                                 //
       return std::make_unique<PBRMetallicRoughnessMaterialScene>(iCanvas); //
     });                                                                    //
+  // PBR Metallic Roughness Texture Material Scene
+  _samples["PBRMetallicRoughnessTextureMaterialScene"] = std::make_tuple(
+    false,                 //
+    [](ICanvas* iCanvas) { //
+      return std::make_unique<PBRMetallicRoughnessTextureMaterialScene>(
+        iCanvas); //
+    });           //
   // X-ray Material with Fresnel Skull Scene
   _samples["XRayMaterialWithFresnelSkullScene"] = std::make_tuple(
     true,                                                                  //
