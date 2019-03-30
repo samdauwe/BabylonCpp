@@ -21,6 +21,7 @@
 #include <babylon/samples/specialfx/simple_post_process_render_pipeline_scene.h>
 #include <babylon/samples/specialfx/sprites_scene.h>
 #include <babylon/samples/specialfx/volumetric_light_scattering_scene.h>
+#include <babylon/samples/specialfx/wave_of_sprites_scene.h>
 #include <babylon/samples/specialfx/waves_scene.h>
 
 namespace BABYLON {
@@ -150,6 +151,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
                       [](ICanvas* iCanvas) {                            //
                         return std::make_unique<SpritesScene>(iCanvas); //
                       });                                               //
+  // Wave Of Sprites Scene
+  _samples["WaveOfSpritesScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<WaveOfSpritesScene>(iCanvas); //
+                      });                                                     //
   // Waves Scene
   _samples["WavesScene"]
     = std::make_tuple(true,                                           //

@@ -97,7 +97,7 @@ public:
   /**
    * Gets or sets the main color
    */
-  std::unique_ptr<Color4> color;
+  std::optional<Color4> color;
 
   /**
    * Gets or sets the width
