@@ -5,6 +5,7 @@
 #include <babylon/samples/materials/materials_scene.h>
 #include <babylon/samples/materials/multi_material_scene.h>
 #include <babylon/samples/materials/pbr_material_scene.h>
+#include <babylon/samples/materials/pbr_metallic_roughness_gold_material_scene.h>
 #include <babylon/samples/materials/pbr_metallic_roughness_material_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_box_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_boxes_scene.h>
@@ -78,6 +79,13 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
                       [](ICanvas* iCanvas) {                                //
                         return std::make_unique<PBRMaterialScene>(iCanvas); //
                       });                                                   //
+  // PBR Metallic Roughness Gold Material
+  _samples["PBRMetallicRoughnessGoldMaterialScene"] = std::make_tuple(
+    true,                  //
+    [](ICanvas* iCanvas) { //
+      return std::make_unique<PBRMetallicRoughnessGoldMaterialScene>(
+        iCanvas); //
+    });           //
   // PBR Metallic Roughness Material
   _samples["PBRMetallicRoughnessMaterialScene"] = std::make_tuple(
     false,                                                                 //

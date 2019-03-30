@@ -44,7 +44,7 @@ void PBRMetallicRoughnessMaterialScene::initializeScene(ICanvas* canvas,
 
   pbr->baseColor = Color3(1.f, 0.766f, 0.336f);
   pbr->metallic  = 0.f;
-  pbr->roughness = 1.0;
+  pbr->roughness = 1.f;
 }
 
 } // end of namespace Samples

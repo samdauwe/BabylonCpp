@@ -7,8 +7,8 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief PBR Metallic Roughness Material. Example demonstrating how to create
- * physically based rendering metallic roughness materials.
+ * @brief PBR Metallic Roughness Material Scene. Example demonstrating how to
+ * create physically based rendering metallic roughness materials.
  * @see https://www.babylonjs-playground.com/#2FDQT5#0
  * @see https://doc.babylonjs.com/how_to/physically_based_rendering
  */
