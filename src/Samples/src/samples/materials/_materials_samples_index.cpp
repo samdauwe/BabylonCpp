@@ -9,6 +9,7 @@
 #include <babylon/samples/materials/pbr_metallic_roughness_material_scene.h>
 #include <babylon/samples/materials/pbr_metallic_roughness_texture_material_scene.h>
 #include <babylon/samples/materials/pbr_specular_glossiness_material_scene.h>
+#include <babylon/samples/materials/pbr_specular_glossiness_texture_material_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_box_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_boxes_scene.h>
 #include <babylon/samples/materials/shadermaterial/shader_material_carved_trees_scene.h>
@@ -107,6 +108,13 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
     [](ICanvas* iCanvas) {                                                  //
       return std::make_unique<PBRSpecularGlossinessMaterialScene>(iCanvas); //
     });                                                                     //
+  // PBR Specular Glossiness Texture Material Scene
+  _samples["PBRSpecularGlossinessTextureMaterialScene"] = std::make_tuple(
+    false,                 //
+    [](ICanvas* iCanvas) { //
+      return std::make_unique<PBRSpecularGlossinessTextureMaterialScene>(
+        iCanvas); //
+    });           //
   // X-ray Material with Fresnel Skull Scene
   _samples["XRayMaterialWithFresnelSkullScene"] = std::make_tuple(
     true,                                                                  //
