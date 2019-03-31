@@ -813,7 +813,8 @@ public:
    * @returns the decal mesh
    * @see http://doc.babylonjs.com/how_to/decals
    */
-  static MeshPtr CreateDecal(const std::string& name, AbstractMesh* sourceMesh,
+  static MeshPtr CreateDecal(const std::string& name,
+                             const AbstractMeshPtr& sourceMesh,
                              DecalOptions& options);
 
 private:

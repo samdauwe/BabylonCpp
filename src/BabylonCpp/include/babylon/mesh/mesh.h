@@ -1465,7 +1465,8 @@ public:
    * @param angle sets the angle to rotate the decal
    * @returns a new Mesh
    */
-  static MeshPtr CreateDecal(const std::string& name, AbstractMesh* sourceMesh,
+  static MeshPtr CreateDecal(const std::string& name,
+                             const AbstractMeshPtr& sourceMesh,
                              const Vector3& position, const Vector3& normal,
                              const Vector3& size, float angle = 0.f);
 

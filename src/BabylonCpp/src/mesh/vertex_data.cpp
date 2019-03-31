@@ -3001,8 +3001,7 @@ void VertexData::ImportVertexData(const json& parsedVertexData,
   auto vertexData = std::make_unique<VertexData>();
 
   // positions
-  Float32Array positions
-    = json_util::get_array<float>(parsedVertexData, "positions");
+  auto positions = json_util::get_array<float>(parsedVertexData, "positions");
   if (json_util::has_key(parsedVertexData, "positions")) {
     vertexData->set(positions, VertexBuffer::PositionKind);
   }

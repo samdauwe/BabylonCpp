@@ -134,13 +134,11 @@ bool BabylonFileLoader::importMesh(
           = json_util::get_string(parsedMesh, "id");
 
         // Geometry ?
-        if (json_util::has_key(parsedMesh, "geometryId")
-            && !json_util::is_null(parsedMesh["geometryId"])) {
+        if (json_util::has_valid_key_value(parsedMesh, "geometryId")) {
           const auto parsedMeshGeometryId
             = json_util::get_string(parsedMesh, "geometryId");
           // Does the file contain geometries?
-          if (json_util::has_key(parsedMesh, "geometries")
-              && !json_util::is_null(parsedMesh["geometries"])) {
+          if (json_util::has_valid_key_value(parsedMesh, "geometries")) {
             auto geometries = parsedData["geometries"];
             // find the correct geometry and add it to the scene
             bool found = false;
@@ -377,28 +375,24 @@ bool BabylonFileLoader::load(
     log.clear();
 
     // Scene
-    if (json_util::has_key(parsedData, "useDelayedTextureLoading")
-        && !json_util::is_null(parsedData["useDelayedTextureLoading"])) {
+    if (json_util::has_valid_key_value(parsedData,
+                                       "useDelayedTextureLoading")) {
       scene->useDelayedTextureLoading
         = json_util::get_bool(parsedData, "useDelayedTextureLoading")
           && !SceneLoader::ForceFullSceneLoadingForIncremental();
     }
-    if (json_util::has_key(parsedData, "autoClear")
-        && !json_util::is_null(parsedData["autoClear"])) {
+    if (json_util::has_valid_key_value(parsedData, "autoClear")) {
       scene->autoClear = json_util::get_bool(parsedData, "autoClear", true);
     }
-    if (json_util::has_key(parsedData, "clearColor")
-        && !json_util::is_null(parsedData["clearColor"])) {
+    if (json_util::has_valid_key_value(parsedData, "clearColor")) {
       scene->clearColor = Color4::FromArray(
         json_util::get_array<float>(parsedData, "clearColor"));
     }
-    if (json_util::has_key(parsedData, "ambientColor")
-        && !json_util::is_null(parsedData["ambientColor"])) {
+    if (json_util::has_valid_key_value(parsedData, "ambientColor")) {
       scene->ambientColor = Color3::FromArray(
         json_util::get_array<float>(parsedData, "ambientColor"));
     }
-    if (json_util::has_key(parsedData, "gravity")
-        && !json_util::is_null(parsedData["gravity"])) {
+    if (json_util::has_valid_key_value(parsedData, "gravity")) {
       scene->gravity = Vector3::FromArray(
         json_util::get_array<float>(parsedData, "gravity"));
     }
@@ -433,14 +427,12 @@ bool BabylonFileLoader::load(
     }
 
     // Metadata
-    if (json_util::has_key(parsedData, "metadata")
-        && !json_util::is_null(parsedData["metadata"])) {
+    if (json_util::has_valid_key_value(parsedData, "metadata")) {
       scene->metadata = parsedData["metadata"];
     }
 
     // Collisions, if defined. otherwise, default is true
-    if (json_util::has_key(parsedData, "collisionsEnabled")
-        && !json_util::is_null(parsedData["collisionsEnabled"])) {
+    if (json_util::has_valid_key_value(parsedData, "collisionsEnabled")) {
       scene->collisionsEnabled
         = json_util::get_bool(parsedData, "collisionsEnabled", true);
     }
@@ -458,15 +450,13 @@ bool BabylonFileLoader::load(
     }
 
     // Collisions, if defined. otherwise, default is true
-    if (json_util::has_key(parsedData, "activeCameraID")
-        && !json_util::is_null(parsedData["activeCameraID"])) {
+    if (json_util::has_valid_key_value(parsedData, "activeCameraID")) {
       scene->setActiveCameraByID(
         json_util::get_string(parsedData, "activeCameraID"));
     }
 
     // Environment texture
-    if (json_util::has_key(parsedData, "environmentTexture")
-        && !json_util::is_null(parsedData["environmentTexture"])) {
+    if (json_util::has_valid_key_value(parsedData, "environmentTexture")) {
       if (json_util::has_key(parsedData, "environmentTextureType")
           && json_util::get_string(parsedData, "environmentTextureType")
                == "BABYLON.HDRCubeTexture") {
@@ -622,8 +612,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
       ++index;
     }
 
-    if (json_util::has_key(parsedData, "geometries")
-        && !json_util::is_null(parsedData["geometries"])) {
+    if (json_util::has_valid_key_value(parsedData, "geometries")) {
       const auto geometries = parsedData["geometries"];
       std::vector<GeometryPtr> addedGeometry;
 

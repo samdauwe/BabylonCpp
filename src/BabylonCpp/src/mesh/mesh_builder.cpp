@@ -807,7 +807,7 @@ MeshPtr MeshBuilder::CreatePolyhedron(const std::string& name,
 }
 
 MeshPtr MeshBuilder::CreateDecal(const std::string& name,
-                                 AbstractMesh* sourceMesh,
+                                 const AbstractMeshPtr& sourceMesh,
                                  DecalOptions& options)
 {
   const auto indices = sourceMesh->getIndices();

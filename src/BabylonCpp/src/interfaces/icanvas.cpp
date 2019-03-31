@@ -33,6 +33,7 @@ void ICanvas::addMouseEventListener(
     listeners.emplace_back(listener);
   }
   else {
+#if 0
     // Add when listener is not yet in the listeners list
     auto it = std::find_if(
       listeners.begin(), listeners.end(),
@@ -44,6 +45,9 @@ void ICanvas::addMouseEventListener(
     if (it == listeners.end()) {
       listeners.emplace_back(listener);
     }
+#else
+    listeners.emplace_back(listener);
+#endif
   }
 }
 
@@ -209,7 +213,8 @@ void ICanvas::onMouseWheel(bool ctrlKey, bool shiftKey, int iMouseX,
   }
 }
 
-void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode, std::string code)
+void ICanvas::onKeyDown(bool ctrlKey, bool altKey, int keyCode,
+                        std::string code)
 {
   const unsigned int type = static_cast<unsigned>(EventType::KEY_DOWN);
   for (auto& listener : keyEventListeners[type]) {

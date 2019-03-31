@@ -10,6 +10,7 @@
 #include <babylon/samples/meshes/constructive_solid_geometries_scene.h>
 #include <babylon/samples/meshes/cuboid_scene.h>
 #include <babylon/samples/meshes/curved_helix_meshes_scene.h>
+#include <babylon/samples/meshes/decals_scene.h>
 #include <babylon/samples/meshes/displacement_map_cpu_scene.h>
 #include <babylon/samples/meshes/edges_renderer_scene.h>
 #include <babylon/samples/meshes/extrude_polygon_scene.h>
@@ -110,6 +111,12 @@ _MeshesSamplesIndex::_MeshesSamplesIndex()
     [](ICanvas* iCanvas) {                                      //
       return std::make_unique<CurvedHelixMeshesScene>(iCanvas); //
     });                                                         //
+  // Decals Scene
+  _samples["DecalsScene"]
+    = std::make_tuple(false,                                           //
+                      [](ICanvas* iCanvas) {                           //
+                        return std::make_unique<DecalsScene>(iCanvas); //
+                      });                                              //
   // Displacement map (CPU) Scene
   _samples["DisplacementMapCPUScene"] = std::make_tuple(
     true,                                                        //
