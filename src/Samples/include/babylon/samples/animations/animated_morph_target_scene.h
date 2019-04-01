@@ -11,6 +11,12 @@ using MorphTargetPtr = std::shared_ptr<MorphTarget>;
 
 namespace Samples {
 
+/**
+ * @brief Animated Morph Target Scene. Example demonstrating how to morph a mesh
+ * between multiple targets.
+ * @see https://www.babylonjs-playground.com/#HPV2TZ#8
+ * @see https://doc.babylonjs.com/how_to/how_to_use_morphtargets
+ */
 class AnimatedMorphTargetScene : public IRenderableScene {
 
 public:
