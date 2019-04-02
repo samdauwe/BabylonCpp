@@ -1,8 +1,13 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_VALUE_H
 #define BABYLON_ANIMATIONS_ANIMATION_VALUE_H
 
+#include <cmath>
+#include <optional>
+#include <string>
+#include <variant>
+
 #include <babylon/babylon_api.h>
-#include <babylon/core/any.h>
+
 #include <babylon/math/color3.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
@@ -11,24 +16,52 @@
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 
+#ifndef isNan
+#define isNan(a) (a != a)
+#endif
+
 namespace BABYLON {
 
 class BABYLON_SHARED_EXPORT AnimationValue {
 
 public:
+  using AnimationValueType
+    = std::variant<bool, int, float, std::string, Size, Color3, Color4, Vector2,
+                   Vector3, Quaternion, Matrix, Float32Array>;
+
+public:
   AnimationValue();
-  AnimationValue(float value);
-  AnimationValue(const Vector3& value);
-  AnimationValue(const Quaternion& value);
-  AnimationValue(const Matrix& value);
-  AnimationValue(const Color3& value);
-  AnimationValue(const Vector2& value);
-  AnimationValue(const Size& value);
-  AnimationValue(bool value);
-  AnimationValue(int value);
-  AnimationValue(const std::string& value);
-  AnimationValue(const Color4& value);
-  AnimationValue(const Float32Array& value);
+
+  template <typename T,
+            typename
+            = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
+  AnimationValue(T value)
+  {
+    if (!isNan(value) && std::isfinite(value)) {
+      _value = value;
+    }
+  }
+
+  template <typename T,
+            typename
+            = typename std::enable_if<!std::is_arithmetic<T>::value, T>::type>
+  AnimationValue(const T& value)
+  {
+    _value = value;
+  }
+
+  template <typename T>
+  T& get()
+  {
+    return std::get<T>(_value.value());
+  }
+
+  template <typename T>
+  const T& get() const
+  {
+    return std::get<T>(_value.value());
+  }
+
   AnimationValue(const AnimationValue& other);
   AnimationValue(AnimationValue&& other);
   AnimationValue& operator=(const AnimationValue& other);
@@ -43,25 +76,13 @@ public:
 
   operator bool() const
   {
-    return dataType != -1;
+    return _value.has_value();
   }
 
-  any getValue() const;
+  std::optional<unsigned int> animationType() const;
 
-public:
-  int dataType;
-  float floatData;
-  Vector3 vector3Data;
-  Quaternion quaternionData;
-  Matrix matrixData;
-  Color3 color3Data;
-  Vector2 vector2Data;
-  Size sizeData;
-  bool boolData;
-  int intData;
-  std::string stringData;
-  Color4 color4Data;
-  Float32Array float32ArrayData;
+private:
+  std::optional<AnimationValueType> _value;
 
 }; // end of class AnimationValue
 

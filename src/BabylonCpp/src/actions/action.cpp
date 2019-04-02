@@ -124,30 +124,35 @@ json Action::_serialize(const json& /*serializedAction*/,
 
 std::string Action::_SerializeValueAsString(const AnimationValue& value)
 {
-  switch (value.dataType) {
+  auto animationType = value.animationType();
+  if (!animationType.has_value()) {
+    return "";
+  }
+
+  switch (animationType.value()) {
     case Animation::ANIMATIONTYPE_INT():
-      return std::to_string(value.intData);
+      return std::to_string(value.get<int>());
     case Animation::ANIMATIONTYPE_FLOAT():
-      return std::to_string(value.floatData);
+      return std::to_string(value.get<float>());
     case Animation::ANIMATIONTYPE_BOOL():
-      return value.boolData ? "true" : "false";
+      return value.get<bool>() ? "true" : "false";
     case Animation::ANIMATIONTYPE_STRING():
-      return value.stringData;
+      return value.get<std::string>();
     case Animation::ANIMATIONTYPE_COLOR3(): {
-      const Color3& _value = value.color3Data;
+      const auto& _value = value.get<Color3>();
       return String::concat(_value.r, ", ", _value.g, ", ", _value.b);
     }
     case Animation::ANIMATIONTYPE_COLOR4(): {
-      const Color4& _value = value.color4Data;
+      const auto& _value = value.get<Color4>();
       return String::concat(_value.r, ", ", _value.g, ", ", _value.b, ", ",
                             _value.a);
     }
     case Animation::ANIMATIONTYPE_VECTOR2(): {
-      const Vector2& _value = value.vector2Data;
+      const auto& _value = value.get<Vector2>();
       return String::concat(_value.x, ", ", _value.y);
     }
     case Animation::ANIMATIONTYPE_VECTOR3(): {
-      const Vector3& _value = value.vector3Data;
+      const auto& _value = value.get<Vector3>();
       return String::concat(_value.x, ", ", _value.y, ", ", _value.z);
     }
     default:

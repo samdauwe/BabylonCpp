@@ -2151,7 +2151,8 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
     // We need to normalize the weights
     normalizer = holderTotalWeight;
     (*originalAnimation->currentValue())
-      .matrixData.decompose(finalScaling, finalQuaternion, finalPosition);
+      .get<Matrix>()
+      .decompose(finalScaling, finalQuaternion, finalPosition);
     scale = originalAnimation->weight / normalizer;
     if (scale == 1.f) {
       return *originalAnimation->currentValue();
@@ -2171,7 +2172,8 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
     auto& currentQuaternion = Tmp::QuaternionArray[1];
 
     (*runtimeAnimation->currentValue())
-      .matrixData.decompose(currentScaling, currentQuaternion, currentPosition);
+      .get<Matrix>()
+      .decompose(currentScaling, currentQuaternion, currentPosition);
     currentScaling.scaleAndAddToRef(iScale, finalScaling);
     currentQuaternion.scaleAndAddToRef(iScale, finalQuaternion);
     currentPosition.scaleAndAddToRef(iScale, finalPosition);
@@ -2179,7 +2181,7 @@ AnimationValue Scene::_processLateAnimationBindingsForMatrices(
 
   auto workValue = *originalAnimation->_workValue;
   Matrix::ComposeToRef(finalScaling, finalQuaternion, finalPosition,
-                       workValue.matrixData);
+                       workValue.get<Matrix>());
   originalAnimation->_workValue = workValue;
   return (*originalAnimation->_workValue);
 }
@@ -2192,9 +2194,9 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   auto& originalValue     = holderOriginalValue;
 
   if (holderAnimations.size() == 1) {
-    Quaternion::SlerpToRef(originalValue,
-                           (*originalAnimation->currentValue()).quaternionData,
-                           std::min(1.f, holderTotalWeight), refQuaternion);
+    Quaternion::SlerpToRef(
+      originalValue, (*originalAnimation->currentValue()).get<Quaternion>(),
+      std::min(1.f, holderTotalWeight), refQuaternion);
     return refQuaternion;
   }
 
@@ -2214,8 +2216,8 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   else {
     if (holderAnimations.size() == 2) { // Slerp as soon as we can
       Quaternion::SlerpToRef(
-        (*holderAnimations[0]->currentValue()).quaternionData,
-        (*holderAnimations[1]->currentValue()).quaternionData,
+        (*holderAnimations[0]->currentValue()).get<Quaternion>(),
+        (*holderAnimations[1]->currentValue()).get<Quaternion>(),
         holderAnimations[1]->weight / holderTotalWeight, refQuaternion);
       return refQuaternion;
     }
@@ -2226,7 +2228,7 @@ Quaternion Scene::_processLateAnimationBindingsForQuaternions(
   }
   for (auto& runtimeAnimation : holderAnimations) {
     quaternions.emplace_back(
-      (*runtimeAnimation->currentValue()).quaternionData);
+      (*runtimeAnimation->currentValue()).get<Quaternion>());
     weights.emplace_back(runtimeAnimation->weight / normalizer);
   }
 

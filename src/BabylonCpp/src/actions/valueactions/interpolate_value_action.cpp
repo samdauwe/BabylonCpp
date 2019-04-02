@@ -46,16 +46,16 @@ void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
     IAnimationKey(0, (*_effectiveTarget)[_property]), //
     IAnimationKey(100, *value)};
 
-  int dataType = value->dataType;
-  if (dataType == -1) {
+  auto dataType = value->animationType();
+  if (!dataType.has_value()) {
     BABYLON_LOG_WARN("InterpolateValueAction",
                      "InterpolateValueAction: Unsupported type");
   }
 
   AnimationPtr animation
     = Animation::New("InterpolateValueAction", _property,
-                     static_cast<size_t>(100 * (1000.0 / duration)), dataType,
-                     Animation::ANIMATIONLOOPMODE_CONSTANT());
+                     static_cast<size_t>(100 * (1000.f / duration)),
+                     dataType.value(), Animation::ANIMATIONLOOPMODE_CONSTANT());
   animation->setKeys(keys);
 
   if (stopOtherAnimations) {

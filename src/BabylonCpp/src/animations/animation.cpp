@@ -41,14 +41,13 @@ AnimationPtr Animation::_PrepareAnimation(
   const AnimationValue& to, unsigned int loopMode,
   const IEasingFunctionPtr& easingFunction)
 {
-  auto dataType = from.dataType;
-
-  if (dataType == -1) {
+  auto animationType = from.animationType();
+  if (!animationType.has_value()) {
     return nullptr;
   }
 
-  auto animation
-    = Animation::New(name, targetProperty, framePerSecond, dataType, loopMode);
+  auto animation = Animation::New(name, targetProperty, framePerSecond,
+                                  *animationType, loopMode);
 
   animation->setKeys({
     IAnimationKey(0.f, from),
@@ -412,8 +411,8 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
 
       const auto& startKey = keys[key];
       auto startValue      = _getKeyValue(startKey.value);
-      if ((*startKey.interpolation).dataType
-          == static_cast<int>(AnimationKeyInterpolation::STEP)) {
+      if ((*startKey.interpolation).animationType().value()
+          == static_cast<unsigned>(AnimationKeyInterpolation::STEP)) {
         return startValue;
       }
       auto endValue = _getKeyValue(endKey.value);
@@ -440,19 +439,18 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           const auto floatValue
             = useTangent ?
                 floatInterpolateFunctionWithTangents(
-                  startValue.floatData, *startKey.outTangent * frameDelta,
-                  endValue.floatData, *endKey.inTangent * frameDelta,
+                  startValue.get<float>(), *startKey.outTangent * frameDelta,
+                  endValue.get<float>(), *endKey.inTangent * frameDelta,
                   gradient) :
-                floatInterpolateFunction(startValue.floatData,
-                                         endValue.floatData, gradient);
+                floatInterpolateFunction(startValue.get<float>(),
+                                         endValue.get<float>(), gradient);
           switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
-              newVale.floatData = floatValue;
+              newVale = floatValue;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale.floatData
-                = offsetValue.floatData * _repeatCount + floatValue;
+              newVale = offsetValue.get<float>() * _repeatCount + floatValue;
               return newVale;
             default:
               break;
@@ -463,21 +461,22 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           const auto quatValue
             = useTangent ?
                 quaternionInterpolateFunctionWithTangents(
-                  startValue.quaternionData,
-                  (*startKey.outTangent).quaternionData.scale(frameDelta),
-                  endValue.quaternionData,
-                  (*endKey.inTangent).quaternionData.scale(frameDelta),
+                  startValue.get<Quaternion>(),
+                  (*startKey.outTangent).get<Quaternion>().scale(frameDelta),
+                  endValue.get<Quaternion>(),
+                  (*endKey.inTangent).get<Quaternion>().scale(frameDelta),
                   gradient) :
-                quaternionInterpolateFunction(
-                  startValue.quaternionData, endValue.quaternionData, gradient);
+                quaternionInterpolateFunction(startValue.get<Quaternion>(),
+                                              endValue.get<Quaternion>(),
+                                              gradient);
           switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
-              newVale.quaternionData = quatValue;
+              newVale = quatValue;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale.quaternionData
-                = quatValue.add(offsetValue.quaternionData.scale(_repeatCount));
+              newVale = quatValue.add(
+                offsetValue.get<Quaternion>().scale(_repeatCount));
               return newVale;
             default:
               break;
@@ -488,20 +487,21 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           const auto vec3Value
             = useTangent ?
                 vector3InterpolateFunctionWithTangents(
-                  startValue.vector3Data,
-                  (*startKey.outTangent).vector3Data.scale(frameDelta),
-                  endValue.vector3Data,
-                  (*endKey.inTangent).vector3Data.scale(frameDelta), gradient) :
-                vector3InterpolateFunction(startValue.vector3Data,
-                                           endValue.vector3Data, gradient);
+                  startValue.get<Vector3>(),
+                  (*startKey.outTangent).get<Vector3>().scale(frameDelta),
+                  endValue.get<Vector3>(),
+                  (*endKey.inTangent).get<Vector3>().scale(frameDelta),
+                  gradient) :
+                vector3InterpolateFunction(startValue.get<Vector3>(),
+                                           endValue.get<Vector3>(), gradient);
           switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
-              newVale.vector3Data = vec3Value;
+              newVale = vec3Value;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale.vector3Data
-                = vec3Value.add(offsetValue.vector3Data.scale(_repeatCount));
+              newVale
+                = vec3Value.add(offsetValue.get<Vector3>().scale(_repeatCount));
               return newVale;
             default:
               break;
@@ -512,20 +512,21 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           const auto vec2Value
             = useTangent ?
                 vector2InterpolateFunctionWithTangents(
-                  startValue.vector2Data,
-                  (*startKey.outTangent).vector2Data.scale(frameDelta),
-                  endValue.vector2Data,
-                  (*endKey.inTangent).vector2Data.scale(frameDelta), gradient) :
-                vector2InterpolateFunction(startValue.vector2Data,
-                                           endValue.vector2Data, gradient);
+                  startValue.get<Vector2>(),
+                  (*startKey.outTangent).get<Vector2>().scale(frameDelta),
+                  endValue.get<Vector2>(),
+                  (*endKey.inTangent).get<Vector2>().scale(frameDelta),
+                  gradient) :
+                vector2InterpolateFunction(startValue.get<Vector2>(),
+                                           endValue.get<Vector2>(), gradient);
           switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
-              newVale.vector2Data = vec2Value;
+              newVale = vec2Value;
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale.vector2Data
-                = vec2Value.add(offsetValue.vector2Data.scale(_repeatCount));
+              newVale
+                = vec2Value.add(offsetValue.get<Vector2>().scale(_repeatCount));
               return newVale;
             default:
               break;
@@ -536,14 +537,13 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
-              newVale.sizeData = sizeInterpolateFunction(
-                startValue.sizeData, endValue.sizeData, gradient);
+              newVale = sizeInterpolateFunction(startValue.get<Size>(),
+                                                endValue.get<Size>(), gradient);
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale.sizeData
-                = sizeInterpolateFunction(startValue.sizeData,
-                                          endValue.sizeData, gradient)
-                    .add(offsetValue.sizeData.scale(_repeatCount));
+              newVale = sizeInterpolateFunction(startValue.get<Size>(),
+                                                endValue.get<Size>(), gradient)
+                          .add(offsetValue.get<Size>().scale(_repeatCount));
               return newVale;
             default:
               break;
@@ -554,14 +554,14 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
           switch (iLoopMode) {
             case Animation::ANIMATIONLOOPMODE_CYCLE():
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
-              newVale.color3Data = color3InterpolateFunction(
-                startValue.color3Data, endValue.color3Data, gradient);
+              newVale = color3InterpolateFunction(
+                startValue.get<Color3>(), endValue.get<Color3>(), gradient);
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale.color3Data
-                = color3InterpolateFunction(startValue.color3Data,
-                                            endValue.color3Data, gradient)
-                    .add(offsetValue.color3Data.scale(_repeatCount));
+              newVale
+                = color3InterpolateFunction(startValue.get<Color3>(),
+                                            endValue.get<Color3>(), gradient)
+                    .add(offsetValue.get<Color3>().scale(_repeatCount));
               return newVale;
             default:
               break;
@@ -574,18 +574,18 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
             case Animation::ANIMATIONLOOPMODE_CONSTANT():
               if (Animation::AllowMatricesInterpolation()) {
                 if (workValue) {
-                  auto _workValue    = *workValue;
-                  newVale.matrixData = matrixInterpolateFunction(
-                    startValue.matrixData, endValue.matrixData, gradient,
-                    _workValue.matrixData);
+                  auto& _workValue = *workValue;
+                  newVale          = matrixInterpolateFunction(
+                    startValue.get<Matrix>(), endValue.get<Matrix>(), gradient,
+                    _workValue.get<Matrix>());
                   workValue = _workValue;
                 }
                 return newVale;
               }
-              newVale.matrixData = startValue.matrixData;
+              newVale = startValue.get<Matrix>();
               return newVale;
             case Animation::ANIMATIONLOOPMODE_RELATIVE():
-              newVale.matrixData = startValue.matrixData;
+              newVale = startValue.get<Matrix>();
               return newVale;
             default:
               break;

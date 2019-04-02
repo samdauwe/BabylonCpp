@@ -1,139 +1,27 @@
 #include <babylon/animations/animation_value.h>
 
-#include <cmath>
-
 #include <babylon/animations/animation.h>
-#include <babylon/babylon_stl_util.h>
 
 namespace BABYLON {
 
-AnimationValue::AnimationValue() : dataType{-1}
-{
-}
-
-AnimationValue::AnimationValue(float value)
-{
-  if (!isNan(value) && std::isfinite(value)) {
-    dataType  = Animation::ANIMATIONTYPE_FLOAT();
-    floatData = value;
-  }
-}
-
-AnimationValue::AnimationValue(const Vector3& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_VECTOR3())}
-    , vector3Data{value}
-{
-}
-
-AnimationValue::AnimationValue(const Quaternion& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_QUATERNION())}
-    , quaternionData{value}
-{
-}
-
-AnimationValue::AnimationValue(const Matrix& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_MATRIX())}
-    , matrixData{value}
-{
-}
-
-AnimationValue::AnimationValue(const Color3& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_COLOR3())}
-    , color3Data{value}
-{
-}
-
-AnimationValue::AnimationValue(const Vector2& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_VECTOR2())}
-    , vector2Data{value}
-{
-}
-
-AnimationValue::AnimationValue(const Size& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_SIZE())}
-    , sizeData{value}
-{
-}
-
-AnimationValue::AnimationValue(bool value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_BOOL())}
-    , boolData{value}
-{
-}
-
-AnimationValue::AnimationValue(int value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_INT())}, intData{value}
-{
-}
-
-AnimationValue::AnimationValue(const std::string& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_STRING())}
-    , stringData{value}
-{
-}
-
-AnimationValue::AnimationValue(const Color4& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_COLOR4())}
-    , color4Data{value}
-{
-}
-
-AnimationValue::AnimationValue(const Float32Array& value)
-    : dataType{static_cast<int>(Animation::ANIMATIONTYPE_FLOAT32ARRAY())}
-    , float32ArrayData{value}
+AnimationValue::AnimationValue() : _value{std::nullopt}
 {
 }
 
 AnimationValue::AnimationValue(const AnimationValue& other)
-    : dataType{other.dataType}
-    , floatData{other.floatData}
-    , vector3Data{other.vector3Data}
-    , quaternionData{other.quaternionData}
-    , matrixData{other.matrixData}
-    , color3Data{other.color3Data}
-    , vector2Data{other.vector2Data}
-    , sizeData{other.sizeData}
-    , boolData{other.boolData}
-    , intData{other.intData}
-    , stringData{other.stringData}
-    , color4Data{other.color4Data}
-    , float32ArrayData{other.float32ArrayData}
+    : _value{other._value}
 {
 }
 
 AnimationValue::AnimationValue(AnimationValue&& other)
-    : dataType{std::move(other.dataType)}
-    , floatData{std::move(other.floatData)}
-    , vector3Data{std::move(other.vector3Data)}
-    , quaternionData{std::move(other.quaternionData)}
-    , matrixData{std::move(other.matrixData)}
-    , color3Data{std::move(other.color3Data)}
-    , vector2Data{std::move(other.vector2Data)}
-    , sizeData{std::move(other.sizeData)}
-    , boolData{std::move(other.boolData)}
-    , intData{std::move(other.intData)}
-    , stringData{std::move(other.stringData)}
-    , color4Data{std::move(other.color4Data)}
-    , float32ArrayData{std::move(other.float32ArrayData)}
+    : _value{std::move(other._value)}
 {
 }
 
 AnimationValue& AnimationValue::operator=(const AnimationValue& other)
 {
   if (&other != this) {
-    dataType         = other.dataType;
-    floatData        = other.floatData;
-    vector3Data      = other.vector3Data;
-    quaternionData   = other.quaternionData;
-    matrixData       = other.matrixData;
-    color3Data       = other.color3Data;
-    vector2Data      = other.vector2Data;
-    sizeData         = other.sizeData;
-    boolData         = other.boolData;
-    intData          = other.intData;
-    stringData       = other.stringData;
-    color4Data       = other.color4Data;
-    float32ArrayData = other.float32ArrayData;
+    _value = other._value;
   }
 
   return *this;
@@ -142,19 +30,7 @@ AnimationValue& AnimationValue::operator=(const AnimationValue& other)
 AnimationValue& AnimationValue::operator=(AnimationValue&& other)
 {
   if (&other != this) {
-    dataType         = std::move(other.dataType);
-    floatData        = std::move(other.floatData);
-    vector3Data      = std::move(other.vector3Data);
-    quaternionData   = std::move(other.quaternionData);
-    matrixData       = std::move(other.matrixData);
-    color3Data       = std::move(other.color3Data);
-    vector2Data      = std::move(other.vector2Data);
-    sizeData         = std::move(other.sizeData);
-    boolData         = std::move(other.boolData);
-    intData          = std::move(other.intData);
-    stringData       = std::move(other.stringData);
-    color4Data       = std::move(other.color4Data);
-    float32ArrayData = std::move(other.float32ArrayData);
+    _value = std::move(other._value);
   }
 
   return *this;
@@ -166,31 +42,38 @@ AnimationValue::~AnimationValue()
 
 AnimationValue AnimationValue::subtract(const AnimationValue& fromValue)
 {
-  switch (dataType) {
+  auto dataType = animationType();
+  if (!dataType.has_value()) {
+    return *this;
+  }
+
+  switch (dataType.value()) {
     case Animation::ANIMATIONTYPE_FLOAT():
-      return AnimationValue(floatData - fromValue.floatData);
+      return AnimationValue(get<float>() - fromValue.get<float>());
     case Animation::ANIMATIONTYPE_VECTOR3():
-      return AnimationValue(vector3Data.subtract(fromValue.vector3Data));
+      return AnimationValue(get<Vector3>().subtract(fromValue.get<Vector3>()));
     case Animation::ANIMATIONTYPE_QUATERNION():
-      return AnimationValue(quaternionData.subtract(fromValue.quaternionData));
+      return AnimationValue(
+        get<Quaternion>().subtract(fromValue.get<Quaternion>()));
     case Animation::ANIMATIONTYPE_MATRIX():
-      return AnimationValue(matrixData.subtract(fromValue.matrixData));
+      return AnimationValue(get<Matrix>().subtract(fromValue.get<Matrix>()));
     case Animation::ANIMATIONTYPE_COLOR3():
-      return AnimationValue(color3Data.subtract(fromValue.color3Data));
+      return AnimationValue(get<Color3>().subtract(fromValue.get<Color3>()));
     case Animation::ANIMATIONTYPE_VECTOR2():
-      return AnimationValue(vector2Data.subtract(fromValue.vector2Data));
+      return AnimationValue(get<Vector2>().subtract(fromValue.get<Vector2>()));
     case Animation::ANIMATIONTYPE_SIZE():
-      return AnimationValue(sizeData.subtract(fromValue.sizeData));
+      return AnimationValue(get<Size>().subtract(fromValue.get<Size>()));
     case Animation::ANIMATIONTYPE_INT():
-      return AnimationValue(intData = fromValue.intData);
+      return AnimationValue(get<int>() = fromValue.get<int>());
     case Animation::ANIMATIONTYPE_COLOR4():
-      return AnimationValue(color4Data.subtract(fromValue.color4Data));
+      return AnimationValue(get<Color4>().subtract(fromValue.get<Color4>()));
     case Animation::ANIMATIONTYPE_FLOAT32ARRAY(): {
-      auto count
-        = std::min(float32ArrayData.size(), fromValue.float32ArrayData.size());
+      const auto& currentArray = get<Float32Array>();
+      const auto& otherArray   = fromValue.get<Float32Array>();
+      auto count = std::min(currentArray.size(), otherArray.size());
       Float32Array result(count);
       for (size_t i = 0; i < count; ++i) {
-        result[i] = float32ArrayData[i] - fromValue.float32ArrayData[i];
+        result[i] = currentArray[i] - otherArray[i];
       }
       return AnimationValue(result);
     }
@@ -206,9 +89,9 @@ AnimationValue AnimationValue::operator-(const AnimationValue& fromValue)
 
 AnimationValue AnimationValue::operator!()
 {
-  if (dataType != -1
-      && static_cast<unsigned>(dataType) == Animation::ANIMATIONTYPE_BOOL()) {
-    return AnimationValue(!boolData);
+  if (_value.has_value()
+      && animationType() == Animation::ANIMATIONTYPE_BOOL()) {
+    return AnimationValue(!std::get<bool>(_value.value()));
   }
   return *this;
 }
@@ -220,97 +103,45 @@ AnimationValue AnimationValue::operator[](const std::string& /*property*/)
 
 AnimationValue AnimationValue::copy() const
 {
-  AnimationValue v;
-  v.dataType = dataType;
-  switch (dataType) {
-    case Animation::ANIMATIONTYPE_FLOAT():
-      v.floatData = floatData;
-      break;
-    case Animation::ANIMATIONTYPE_VECTOR3():
-      v.vector3Data = vector3Data;
-      break;
-    case Animation::ANIMATIONTYPE_QUATERNION():
-      v.quaternionData = quaternionData;
-      break;
-    case Animation::ANIMATIONTYPE_MATRIX():
-      v.matrixData = matrixData;
-      break;
-    case Animation::ANIMATIONTYPE_COLOR3():
-      v.color3Data = color3Data;
-      break;
-    case Animation::ANIMATIONTYPE_VECTOR2():
-      v.vector2Data = vector2Data;
-      break;
-    case Animation::ANIMATIONTYPE_SIZE():
-      v.sizeData = sizeData;
-      break;
-    case Animation::ANIMATIONTYPE_BOOL():
-      v.boolData = boolData;
-      break;
-    case Animation::ANIMATIONTYPE_INT():
-      v.intData = intData;
-      break;
-    case Animation::ANIMATIONTYPE_STRING():
-      v.stringData = stringData;
-      break;
-    case Animation::ANIMATIONTYPE_COLOR4():
-      v.color4Data = color4Data;
-      break;
-    case Animation::ANIMATIONTYPE_FLOAT32ARRAY():
-      v.float32ArrayData = float32ArrayData;
-      break;
-    default:
-      break;
-  }
-
-  return v;
+  return AnimationValue(*this);
 }
 
-any AnimationValue::getValue() const
+std::optional<unsigned int> AnimationValue::animationType() const
 {
-  any value = nullptr;
-  switch (dataType) {
-    case Animation::ANIMATIONTYPE_FLOAT():
-      value = &floatData;
-      break;
-    case Animation::ANIMATIONTYPE_VECTOR3():
-      value = &vector3Data;
-      break;
-    case Animation::ANIMATIONTYPE_QUATERNION():
-      value = &quaternionData;
-      break;
-    case Animation::ANIMATIONTYPE_MATRIX():
-      value = &matrixData;
-      break;
-    case Animation::ANIMATIONTYPE_COLOR3():
-      value = &color3Data;
-      break;
-    case Animation::ANIMATIONTYPE_VECTOR2():
-      value = &vector2Data;
-      break;
-    case Animation::ANIMATIONTYPE_SIZE():
-      value = &sizeData;
-      break;
-    case Animation::ANIMATIONTYPE_BOOL():
-      value = &boolData;
-      break;
-    case Animation::ANIMATIONTYPE_INT():
-      value = &intData;
-      break;
-    case Animation::ANIMATIONTYPE_STRING():
-      value = &stringData;
-      break;
-    case Animation::ANIMATIONTYPE_COLOR4():
-      value = &color4Data;
-      break;
-    case Animation::ANIMATIONTYPE_FLOAT32ARRAY():
-      value = &float32ArrayData;
-      break;
+  if (!_value.has_value()) {
+    return std::nullopt;
+  }
+
+  switch (_value->index()) {
+    case 0:
+      return Animation::ANIMATIONTYPE_BOOL();
+    case 1:
+      return Animation::ANIMATIONTYPE_INT();
+    case 2:
+      return Animation::ANIMATIONTYPE_FLOAT();
+    case 3:
+      return Animation::ANIMATIONTYPE_STRING();
+    case 4:
+      return Animation::ANIMATIONTYPE_SIZE();
+    case 5:
+      return Animation::ANIMATIONTYPE_COLOR3();
+    case 6:
+      return Animation::ANIMATIONTYPE_COLOR4();
+    case 7:
+      return Animation::ANIMATIONTYPE_VECTOR2();
+    case 8:
+      return Animation::ANIMATIONTYPE_VECTOR3();
+    case 9:
+      return Animation::ANIMATIONTYPE_QUATERNION();
+    case 10:
+      return Animation::ANIMATIONTYPE_MATRIX();
+    case 11:
+      return Animation::ANIMATIONTYPE_FLOAT32ARRAY();
     default:
       break;
   }
 
-  return value;
+  return std::nullopt;
 }
 
 } // end of namespace BABYLON

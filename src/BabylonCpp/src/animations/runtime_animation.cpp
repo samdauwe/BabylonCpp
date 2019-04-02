@@ -187,8 +187,8 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
   if (!stl_util::almost_equal(iWeight, -1.f)) {
   }
   else {
-    any newValue = (*_currentValue).getValue();
-    iTarget->setProperty(destination, path, newValue);
+    // any newValue = (*_currentValue).getValue();
+    // iTarget->setProperty(destination, path, newValue);
   }
 }
 
@@ -326,7 +326,8 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
     }
   }
 
-  if (offsetValue.dataType == -1) {
+  auto animationType = offsetValue.animationType();
+  if (!animationType.has_value()) {
     switch (_animation->dataType) {
       // Float
       case Animation::ANIMATIONTYPE_FLOAT():

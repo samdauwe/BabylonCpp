@@ -353,7 +353,7 @@ bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
   for (const auto& orig : sourceKeys) {
     if (orig.frame >= from && orig.frame <= to) {
       if (rescaleAsRequired) {
-        mat = orig.value.matrixData;
+        mat = orig.value.get<Matrix>();
 
         if (parentScalingReqd) {
           // scale based on parent ratio, when bone has parent
@@ -369,11 +369,11 @@ bool Bone::copyAnimationRange(Bone* source, const std::string& rangeName,
         }
         else {
           // use original when root bone, and no data for skelDimensionsRatio
-          mat = orig.value.matrixData;
+          mat = orig.value.get<Matrix>();
         }
       }
       else {
-        mat = orig.value.matrixData;
+        mat = orig.value.get<Matrix>();
       }
       destKeys.emplace_back(IAnimationKey(orig.frame + frameOffset, mat));
     }
