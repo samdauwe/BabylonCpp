@@ -1,7 +1,6 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_VALUE_H
 #define BABYLON_ANIMATIONS_ANIMATION_VALUE_H
 
-#include <cmath>
 #include <optional>
 #include <string>
 #include <variant>
@@ -37,7 +36,7 @@ public:
             = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
   AnimationValue(T value)
   {
-    if (!isNan(value) && std::isfinite(value)) {
+    if (!isNan(value)) {
       _value = value;
     }
   }

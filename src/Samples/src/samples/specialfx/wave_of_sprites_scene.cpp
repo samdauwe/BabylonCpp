@@ -32,8 +32,9 @@ void WaveOfSpritesScene::initializeScene(ICanvas* canvas, Scene* scene)
   scene->clearColor = Color3::Black();
 
   // Create a camera
-  auto camera = ArcRotateCamera::New(
-    "Camera", 5.6f, 1.4f, 80, Vector3(countf / 2.f, 0.f, countf / 2.f), scene);
+  auto camera
+    = ArcRotateCamera::New("Camera", 5.6f, 1.4f, 80.f,
+                           Vector3(countf / 2.f, 0.f, countf / 2.f), scene);
   camera->attachControl(canvas, true);
 
   // Create a light
