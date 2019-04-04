@@ -96,9 +96,9 @@ ArcRotateCamera::~ArcRotateCamera()
 {
 }
 
-IReflect::Type ArcRotateCamera::type() const
+Type ArcRotateCamera::type() const
 {
-  return IReflect::Type::ARCROTATECAMERA;
+  return Type::ARCROTATECAMERA;
 }
 
 void ArcRotateCamera::_initCache()

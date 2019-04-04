@@ -32,7 +32,7 @@ public:
   }
   ~ArcFollowCamera() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   /**
    * @brief Hidden

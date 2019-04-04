@@ -234,7 +234,7 @@ bool GlowLayer::isReady(SubMesh* subMesh, bool useInstances)
   }
 
   BaseTexturePtr emissiveTexture = nullptr;
-  if (material->type() == IReflect::Type::STANDARDMATERIAL) {
+  if (material->type() == Type::STANDARDMATERIAL) {
     emissiveTexture
       = std::static_pointer_cast<StandardMaterial>(material)->emissiveTexture();
   }
@@ -272,7 +272,7 @@ void GlowLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh,
                                             const MaterialPtr& iMaterial)
 {
   StandardMaterialPtr material = nullptr;
-  if (iMaterial->type() == IReflect::Type::STANDARDMATERIAL) {
+  if (iMaterial->type() == Type::STANDARDMATERIAL) {
     material = std::static_pointer_cast<StandardMaterial>(iMaterial);
   }
 

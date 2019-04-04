@@ -84,7 +84,7 @@ public:
     return std::static_pointer_cast<Derived>(shared_from_this());
   }
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   /**
    * @brief Gets a boolean indicating if the node has been disposed.

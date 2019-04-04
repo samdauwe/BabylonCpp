@@ -227,7 +227,7 @@ void Animatable::stop(
         if (runtimeAnimation->animation()->name != animationName) {
           continue;
         }
-        if (targetMask && !targetMask(runtimeAnimation->target)) {
+        if (targetMask && !targetMask(runtimeAnimation->target().get())) {
           continue;
         }
 

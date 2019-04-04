@@ -114,9 +114,9 @@ bool Material::get_hasRenderTargetTextures() const
   return false;
 }
 
-IReflect::Type Material::type() const
+Type Material::type() const
 {
-  return IReflect::Type::MATERIAL;
+  return Type::MATERIAL;
 }
 
 void Material::addMaterialToScene(const MaterialPtr& newMaterial)
@@ -472,7 +472,8 @@ std::vector<AbstractMesh*> Material::getBindedMeshes()
 }
 
 void Material::forceCompilation(
-  AbstractMesh* mesh, const std::function<void(Material* material)>& iOnCompiled,
+  AbstractMesh* mesh,
+  const std::function<void(Material* material)>& iOnCompiled,
   std::optional<bool> clipPlane)
 {
   auto subMesh = std::make_unique<BaseSubMesh>();

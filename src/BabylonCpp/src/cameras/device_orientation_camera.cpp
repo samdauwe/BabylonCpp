@@ -28,9 +28,9 @@ DeviceOrientationCamera::~DeviceOrientationCamera()
 {
 }
 
-IReflect::Type DeviceOrientationCamera::type() const
+Type DeviceOrientationCamera::type() const
 {
-  return IReflect::Type::DEVICEORIENTATIONCAMERA;
+  return Type::DEVICEORIENTATIONCAMERA;
 }
 
 const std::string DeviceOrientationCamera::getClassName() const

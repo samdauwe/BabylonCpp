@@ -93,7 +93,7 @@ public:
   }
   ~AbstractMesh() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
   void addToScene(const AbstractMeshPtr& newMesh);
 
   /**

@@ -31,9 +31,9 @@ MergeMeshesOptimization::~MergeMeshesOptimization()
 bool MergeMeshesOptimization::_canBeMerged(const AbstractMeshPtr& abstractMesh)
 {
   // Check if instance of Mesh
-  if (!((abstractMesh->type() == IReflect::Type::MESH)
-        || (abstractMesh->type() == IReflect::Type::GROUNDMESH)
-        || (abstractMesh->type() == IReflect::Type::LINESMESH))) {
+  if (!((abstractMesh->type() == Type::MESH)
+        || (abstractMesh->type() == Type::GROUNDMESH)
+        || (abstractMesh->type() == Type::LINESMESH))) {
     return false;
   }
 

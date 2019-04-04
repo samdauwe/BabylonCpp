@@ -45,9 +45,9 @@ const std::string InstancedMesh::getClassName() const
   return "InstancedMesh";
 }
 
-IReflect::Type InstancedMesh::type() const
+Type InstancedMesh::type() const
 {
-  return IReflect::Type::INSTANCEDMESH;
+  return Type::INSTANCEDMESH;
 }
 
 bool InstancedMesh::get_receiveShadows() const

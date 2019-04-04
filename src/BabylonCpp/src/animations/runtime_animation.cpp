@@ -11,7 +11,7 @@
 
 namespace BABYLON {
 
-RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& target,
+RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& iTarget,
                                    const AnimationPtr& animation, Scene* scene,
                                    Animatable* host)
     : currentFrame{this, &RuntimeAnimation::get_currentFrame}
@@ -22,7 +22,7 @@ RuntimeAnimation::RuntimeAnimation(const IAnimatablePtr& target,
     , target{this, &RuntimeAnimation::get_target}
     , _currentFrame{0}
     , _animation{animation}
-    , _target{target}
+    , _target{iTarget}
     , _host{host}
     , _stopped{false}
     , _blendingFactor{0.f}
@@ -73,7 +73,7 @@ std::string RuntimeAnimation::get_targetPath() const
   return _targetPath;
 }
 
-IAnimatable*& RuntimeAnimation::get_target()
+IAnimatablePtr& RuntimeAnimation::get_target()
 {
   return _activeTarget;
 }
@@ -147,20 +147,14 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
                                  float iWeight, unsigned int targetIndex)
 {
   // Set value
-  std::string path = "";
-  any destination  = nullptr;
+  std::string path           = "";
+  IAnimatablePtr destination = nullptr;
 
   const auto& targetPropertyPath = _animation->targetPropertyPath;
 
   if (targetPropertyPath.size() > 1) {
-    auto property = iTarget->getProperty(targetPropertyPath[0]);
-
-    for (size_t index = 1; index < targetPropertyPath.size() - 1; ++index) {
-      property = iTarget->getProperty(property, targetPropertyPath[index]);
-    }
-
     path        = targetPropertyPath.back();
-    destination = property;
+    destination = iTarget;
   }
   else {
     path        = targetPropertyPath[0];
@@ -187,8 +181,7 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
   if (!stl_util::almost_equal(iWeight, -1.f)) {
   }
   else {
-    // any newValue = (*_currentValue).getValue();
-    // iTarget->setProperty(destination, path, newValue);
+    destination->setProperty(targetPropertyPath, _currentValue);
   }
 }
 
@@ -399,7 +392,7 @@ bool RuntimeAnimation::animate(millisecond_t delay, float from, float to,
          && events[index].frame >= from)
         || (range < 0.f && iCurrentFrame <= events[index].frame
             && events[index].frame <= from)) {
-      AnimationEvent& event = events[index];
+      auto& event = events[index];
       if (!event.isDone) {
         // If event should be done only once, remove it.
         if (event.onlyOnce) {

@@ -72,7 +72,7 @@ public:
    * @brief Returns the object type.
    * @return the object type
    */
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   /**
    * @brief Adds a new life time gradient.

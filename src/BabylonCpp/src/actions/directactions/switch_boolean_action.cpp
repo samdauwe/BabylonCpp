@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/animations/animation.h>
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/ianimatable.h>
 
@@ -30,7 +31,11 @@ void SwitchBooleanAction::_prepare()
 
 void SwitchBooleanAction::execute(const ActionEvent& /*evt*/)
 {
-  (*_effectiveTarget)[_property] = !(*_effectiveTarget)[_property];
+  auto prop = _effectiveTarget->getProperty({_property});
+  if (prop && (prop.animationType() == Animation::ANIMATIONTYPE_BOOL())) {
+    prop = !prop.get<bool>();
+    _effectiveTarget->setProperty({_property}, prop);
+  }
 }
 
 json SwitchBooleanAction::serialize(json& /*parent*/) const

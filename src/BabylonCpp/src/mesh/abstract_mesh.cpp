@@ -172,9 +172,9 @@ AbstractMesh::~AbstractMesh()
 {
 }
 
-IReflect::Type AbstractMesh::type() const
+Type AbstractMesh::type() const
 {
-  return IReflect::Type::ABSTRACTMESH;
+  return Type::ABSTRACTMESH;
 }
 
 void AbstractMesh::addToScene(const AbstractMeshPtr& newMesh)
@@ -512,7 +512,7 @@ std::string AbstractMesh::toString(bool fullDetails) const
 {
   std::ostringstream oss;
   oss << "Name: " << name << ", isInstance: ";
-  oss << ((type() == IReflect::Type::INSTANCEDMESH) ? "YES" : "NO");
+  oss << ((type() == Type::INSTANCEDMESH) ? "YES" : "NO");
   oss << ", # of submeshes: " << (subMeshes.size());
   if (_skeleton) {
     oss << ", skeleton: " << _skeleton->name;
@@ -704,7 +704,7 @@ void AbstractMesh::set_scaling(const Vector3& newScaling)
 
 AbstractMesh* AbstractMesh::getParent()
 {
-  if (parent()->type() == IReflect::Type::ABSTRACTMESH) {
+  if (parent()->type() == Type::ABSTRACTMESH) {
     return dynamic_cast<AbstractMesh*>(parent());
   }
 
@@ -1515,7 +1515,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 
   // SubMeshes
-  if (type() != IReflect::Type::INSTANCEDMESH) {
+  if (type() != Type::INSTANCEDMESH) {
     releaseSubMeshes();
   }
 

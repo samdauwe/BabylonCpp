@@ -32,7 +32,7 @@ public:
   }
   ~DeviceOrientationCamera() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   /**
    * @brief Gets the current instance class name ("DeviceOrientationCamera").

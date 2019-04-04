@@ -265,7 +265,7 @@ bool HighlightLayer::isReady(SubMesh* subMesh, bool useInstances)
 
   if ((_meshes.find(mesh->uniqueId) != _meshes.end())
       && _meshes[mesh->uniqueId].glowEmissiveOnly && material
-      && (material->type() == IReflect::Type::STANDARDMATERIAL)) {
+      && (material->type() == Type::STANDARDMATERIAL)) {
     emissiveTexture
       = std::static_pointer_cast<StandardMaterial>(material)->emissiveTexture();
   }
@@ -365,7 +365,7 @@ void HighlightLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh,
   }
 
   if (hasHighlightLayerMesh && _meshes[mesh->uniqueId].glowEmissiveOnly
-      && material && (material->type() == IReflect::Type::STANDARDMATERIAL)) {
+      && material && (material->type() == Type::STANDARDMATERIAL)) {
     _emissiveTextureAndColor.texture
       = std::static_pointer_cast<StandardMaterial>(material)->emissiveTexture();
     _emissiveTextureAndColor.color.set(1.0, //

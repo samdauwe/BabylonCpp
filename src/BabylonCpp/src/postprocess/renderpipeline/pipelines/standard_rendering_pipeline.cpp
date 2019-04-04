@@ -136,9 +136,9 @@ void StandardRenderingPipeline::addToScene(
   renderingPipeline->_buildPipeline();
 }
 
-IReflect::Type StandardRenderingPipeline::type() const
+Type StandardRenderingPipeline::type() const
 {
-  return IReflect::Type::STANDARDRENDERINGPIPLINE;
+  return Type::STANDARDRENDERINGPIPLINE;
 }
 
 float StandardRenderingPipeline::operator[](const std::string& key) const

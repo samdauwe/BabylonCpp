@@ -66,9 +66,9 @@ Camera::~Camera()
 {
 }
 
-IReflect::Type Camera::type() const
+Type Camera::type() const
 {
-  return IReflect::Type::CAMERA;
+  return Type::CAMERA;
 }
 
 void Camera::addToScene(const CameraPtr& newCamera)
@@ -793,7 +793,7 @@ CameraPtr Camera::Parse(const json& parsedCamera, Scene* scene)
   // }
 
   // Need to force position
-  if (camera->type() == IReflect::Type::ARCROTATECAMERA) {
+  if (camera->type() == Type::ARCROTATECAMERA) {
     camera->position.copyFromFloats(0.f, 0.f, 0.f);
     if (auto arcRotateCamera
         = std::static_pointer_cast<ArcRotateCamera>(camera)) {

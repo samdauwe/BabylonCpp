@@ -36,9 +36,9 @@ Skeleton::~Skeleton()
 {
 }
 
-IReflect::Type Skeleton::type() const
+Type Skeleton::type() const
 {
-  return IReflect::Type::SKELETON;
+  return Type::SKELETON;
 }
 
 void Skeleton::addToScene(const SkeletonPtr& newSkeleton)

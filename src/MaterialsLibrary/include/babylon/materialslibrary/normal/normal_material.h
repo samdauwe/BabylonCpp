@@ -30,7 +30,7 @@ public:
   }
   ~NormalMaterial() override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   bool needAlphaBlending() const override;
   bool needAlphaTesting() const override;

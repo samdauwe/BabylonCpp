@@ -337,9 +337,9 @@ Scene::~Scene()
 {
 }
 
-IReflect::Type Scene::type() const
+Type Scene::type() const
 {
-  return IReflect::Type::SCENE;
+  return Type::SCENE;
 }
 
 void Scene::_registerTransientComponents()

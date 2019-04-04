@@ -337,9 +337,9 @@ ParticleSystem::~ParticleSystem()
 {
 }
 
-IReflect::Type ParticleSystem::type() const
+Type ParticleSystem::type() const
 {
-  return IReflect::Type::PARTICLESYSTEM;
+  return Type::PARTICLESYSTEM;
 }
 
 const char* ParticleSystem::getClassName() const

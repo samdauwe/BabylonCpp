@@ -45,9 +45,9 @@ const std::string ShaderMaterial::getClassName() const
   return "ShaderMaterial";
 }
 
-IReflect::Type ShaderMaterial::type() const
+Type ShaderMaterial::type() const
 {
-  return IReflect::Type::SHADERMATERIAL;
+  return Type::SHADERMATERIAL;
 }
 
 bool ShaderMaterial::needAlphaBlending() const

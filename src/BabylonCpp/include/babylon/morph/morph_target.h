@@ -34,7 +34,7 @@ public:
   }
   ~MorphTarget() override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Affects position data to this target.

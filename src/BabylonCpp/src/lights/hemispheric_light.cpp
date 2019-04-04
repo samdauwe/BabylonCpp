@@ -54,9 +54,9 @@ const std::string HemisphericLight::getClassName() const
   return "HemisphericLight";
 }
 
-IReflect::Type HemisphericLight::type() const
+Type HemisphericLight::type() const
 {
-  return IReflect::Type::HEMISPHERICLIGHT;
+  return Type::HEMISPHERICLIGHT;
 }
 
 Vector3 HemisphericLight::setDirectionToTarget(const Vector3& target)

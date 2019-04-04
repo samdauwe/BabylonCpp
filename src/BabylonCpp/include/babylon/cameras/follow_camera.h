@@ -32,7 +32,7 @@ public:
   }
   ~FollowCamera() override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Hidden

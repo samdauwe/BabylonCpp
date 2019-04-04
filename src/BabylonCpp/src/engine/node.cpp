@@ -71,9 +71,9 @@ Node::~Node()
 {
 }
 
-IReflect::Type Node::type() const
+Type Node::type() const
 {
-  return IReflect::Type::NODE;
+  return Type::NODE;
 }
 
 bool Node::isDisposed() const

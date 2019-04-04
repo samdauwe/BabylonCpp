@@ -129,7 +129,7 @@ public:
 public:
   ~Light() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
   void addToScene(const LightPtr& newLight);
   LightPtr _this() const;
 

@@ -41,9 +41,9 @@ TargetCamera::~TargetCamera()
 {
 }
 
-IReflect::Type TargetCamera::type() const
+Type TargetCamera::type() const
 {
-  return IReflect::Type::TARGETCAMERA;
+  return Type::TARGETCAMERA;
 }
 
 Vector3 TargetCamera::getFrontPosition(float distance)

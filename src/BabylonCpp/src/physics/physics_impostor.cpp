@@ -114,7 +114,7 @@ void PhysicsImpostor::_init()
 
 PhysicsImpostorPtr PhysicsImpostor::_getPhysicsParent()
 {
-  if (object->parent()->type() == IReflect::Type::ABSTRACTMESH) {
+  if (object->parent()->type() == Type::ABSTRACTMESH) {
     auto parentMesh = static_cast<AbstractMesh*>(object->parent());
     return parentMesh->physicsImpostor();
   }

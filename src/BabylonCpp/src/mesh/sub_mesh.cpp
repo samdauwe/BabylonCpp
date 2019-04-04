@@ -105,8 +105,7 @@ MaterialPtr SubMesh::getMaterial()
   if (!rootMaterial) {
     return _mesh->getScene()->defaultMaterial();
   }
-  else if (rootMaterial
-           && (rootMaterial->type() == IReflect::Type::MULTIMATERIAL)) {
+  else if (rootMaterial && (rootMaterial->type() == Type::MULTIMATERIAL)) {
     auto multiMaterial = std::static_pointer_cast<MultiMaterial>(rootMaterial);
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
     if (_currentMaterial != effectiveMaterial) {
@@ -264,7 +263,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
   }
 
   // LineMesh first as it's also a Mesh...
-  if (_mesh->type() == IReflect::Type::LINESMESH) {
+  if (_mesh->type() == Type::LINESMESH) {
     auto lineMesh = std::static_pointer_cast<LinesMesh>(_mesh);
 
     // Line test

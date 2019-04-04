@@ -47,9 +47,9 @@ DirectionalLight::~DirectionalLight()
 {
 }
 
-IReflect::Type DirectionalLight::type() const
+Type DirectionalLight::type() const
 {
-  return IReflect::Type::DIRECTIONALLIGHT;
+  return Type::DIRECTIONALLIGHT;
 }
 
 const std::string DirectionalLight::getClassName() const

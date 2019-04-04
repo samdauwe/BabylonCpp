@@ -69,9 +69,9 @@ const std::string LinesMesh::getClassName() const
   return "LinesMesh";
 }
 
-IReflect::Type LinesMesh::type() const
+Type LinesMesh::type() const
 {
-  return IReflect::Type::LINESMESH;
+  return Type::LINESMESH;
 }
 
 float LinesMesh::get_intersectionThreshold() const

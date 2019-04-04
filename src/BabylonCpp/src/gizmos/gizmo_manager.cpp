@@ -66,7 +66,7 @@ GizmoManager::GizmoManager(Scene* iScene)
               node = nullptr;
             }
           }
-          if (node && node->type() == IReflect::Type::ABSTRACTMESH) {
+          if (node && node->type() == Type::ABSTRACTMESH) {
             if (_attachedMesh != node) {
               attachToMesh(static_cast<AbstractMesh*>(node));
             }

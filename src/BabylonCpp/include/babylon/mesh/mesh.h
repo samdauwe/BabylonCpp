@@ -119,7 +119,7 @@ public:
    * @brief Returns the class type.
    * @return the class type.
    */
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   /** Methods **/
 

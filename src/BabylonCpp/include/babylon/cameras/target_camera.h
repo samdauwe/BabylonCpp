@@ -30,7 +30,7 @@ public:
   }
   ~TargetCamera() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   /**
    * @brief Gets the position in front of the camera at a given distance.

@@ -59,7 +59,7 @@ public:
   virtual ~StandardRenderingPipeline() override;
 
   void addToScene(const StandardRenderingPipelinePtr& renderingPipeline);
-  IReflect::Type type() const override;
+  Type type() const override;
   float operator[](const std::string& key) const;
 
   /**

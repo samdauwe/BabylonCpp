@@ -52,7 +52,7 @@ public:
     return std::static_pointer_cast<Derived>(shared_from_this());
   }
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
   void addToScene(const BaseTexturePtr& newTexture);
 
   /**

@@ -35,7 +35,7 @@ public:
   }
   ~FreeCamera() override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Attached controls to the current camera.

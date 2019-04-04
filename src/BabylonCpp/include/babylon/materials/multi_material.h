@@ -36,7 +36,7 @@ public:
    */
   const std::string getClassName() const override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Get one of the submaterial by its index in the submaterials array.

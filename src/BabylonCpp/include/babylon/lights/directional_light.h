@@ -35,7 +35,7 @@ public:
   }
   ~DirectionalLight() override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Returns the string "DirectionalLight".

@@ -3,7 +3,7 @@
 
 #include <babylon/animations/animation_value.h>
 #include <babylon/babylon_api.h>
-#include <babylon/interfaces/ireflect.h>
+#include <babylon/babylon_enums.h>
 
 namespace BABYLON {
 
@@ -11,53 +11,41 @@ class Animation;
 class Node;
 using AnimationPtr = std::shared_ptr<Animation>;
 
-class BABYLON_SHARED_EXPORT IAnimatable : public IReflect {
-
-public:
-  enum class Type {
-    UNKNOWN = 0,
-    CAMERA  = 1,
-    LIGHT   = 2,
-    MESH    = 3,
-    SCENE   = 4,
-  }; // end of enum class Type
+class BABYLON_SHARED_EXPORT IAnimatable {
 
 public:
   IAnimatable();
-  ~IAnimatable();
+  virtual ~IAnimatable();
 
-  /**
-   * Gets or sets a string used to store user defined state for the node
-   */
-  std::string state;
+  virtual Type type() const = 0;
+  virtual std::vector<AnimationPtr> getAnimations();
+  virtual bool markTargetAsDirty() const;
+  virtual IAnimatable& markAsDirty(const std::string& property = "");
+  virtual void markAsDirty(unsigned int /*flag*/);
+  virtual Matrix& getWorldMatrix();
 
-  virtual Type animatableType() const
-  {
-    return Type::UNKNOWN;
-  }
-  virtual std::vector<AnimationPtr> getAnimations()
-  {
-    return std::vector<AnimationPtr>();
-  }
-  virtual bool markTargetAsDirty() const
-  {
-    return false;
-  }
-  virtual IAnimatable& markAsDirty(const std::string& /*property*/ = "")
-  {
-    return *this;
-  }
-  virtual void markAsDirty(unsigned int /*flag*/)
-  {
-  }
-  virtual Matrix& getWorldMatrix()
-  {
-    return _identityMatrix;
-  }
-  virtual AnimationValue operator[](const std::string& /*key*/)
-  {
-    return AnimationValue(true);
-  }
+  virtual AnimationValue
+  getProperty(const std::vector<std::string>& targetPropertyPath);
+  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
+                           const AnimationValue& value);
+
+  static AnimationValue getProperty(const std::string& key,
+                                    const Color3& color);
+  static AnimationValue getProperty(const std::string& key,
+                                    const Color4& color);
+  static AnimationValue getProperty(const std::string& key,
+                                    const Vector2& vector);
+  static AnimationValue getProperty(const std::string& key,
+                                    const Vector3& vector);
+  static AnimationValue getProperty(const std::string& key,
+                                    const Quaternion& quaternion);
+
+  static void setProperty(const std::string& key, Color3& color, float value);
+  static void setProperty(const std::string& key, Color4& color, float value);
+  static void setProperty(const std::string& key, Vector2& vector, float value);
+  static void setProperty(const std::string& key, Vector3& vector, float value);
+  static void setProperty(const std::string& key, Quaternion& quaternion,
+                          float value);
 
 protected:
   virtual Node*& get_parent();
@@ -68,6 +56,11 @@ public:
    * Parent of the node.
    */
   Property<IAnimatable, Node*> parent;
+
+  /**
+   * Gets or sets a string used to store user defined state for the node
+   */
+  std::string state;
 
 private:
   Node* nullNode;

@@ -27,7 +27,7 @@ public:
   }
   ~Bone() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
   void addToSkeleton(const BonePtr& newBone);
 
   /** Members **/

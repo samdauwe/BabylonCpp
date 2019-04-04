@@ -163,9 +163,9 @@ GPUParticleSystem::~GPUParticleSystem()
 {
 }
 
-IReflect::Type GPUParticleSystem::type() const
+Type GPUParticleSystem::type() const
 {
-  return IReflect::Type::GPUPARTICLESYSTEM;
+  return Type::GPUPARTICLESYSTEM;
 }
 
 size_t GPUParticleSystem::getCapacity() const

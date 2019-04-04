@@ -28,9 +28,9 @@ const std::string GroundMesh::getClassName() const
   return "GroundMesh";
 }
 
-IReflect::Type GroundMesh::type() const
+Type GroundMesh::type() const
 {
-  return IReflect::Type::GROUNDMESH;
+  return Type::GROUNDMESH;
 }
 
 size_t GroundMesh::get_subdivisions() const

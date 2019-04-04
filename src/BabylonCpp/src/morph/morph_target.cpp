@@ -30,9 +30,9 @@ MorphTarget::~MorphTarget()
 {
 }
 
-IReflect::Type MorphTarget::type() const
+Type MorphTarget::type() const
 {
-  return IReflect::Type::MORPHTARGET;
+  return Type::MORPHTARGET;
 }
 
 float MorphTarget::get_influence() const

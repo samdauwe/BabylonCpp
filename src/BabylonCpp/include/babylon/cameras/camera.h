@@ -119,7 +119,7 @@ public:
 public:
   virtual ~Camera() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
   void addToScene(const CameraPtr& newCamera);
 
   /**

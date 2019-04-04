@@ -132,7 +132,7 @@ protected:
   /**
    * @brief Gets the actual target of the runtime animation.
    */
-  IAnimatable*& get_target();
+  IAnimatablePtr& get_target();
 
 private:
   /**
@@ -183,7 +183,7 @@ public:
   /**
    * Actual target of the runtime animation
    */
-  ReadOnlyProperty<RuntimeAnimation, IAnimatable*> target;
+  ReadOnlyProperty<RuntimeAnimation, IAnimatablePtr> target;
 
 private:
   std::vector<AnimationEvent> _events;
@@ -251,7 +251,7 @@ private:
   /**
    * The active target of the runtime animation
    */
-  IAnimatable* _activeTarget;
+  IAnimatablePtr _activeTarget;
 
   /**
    * The target path of the runtime animation

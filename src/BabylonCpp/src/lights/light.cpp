@@ -57,9 +57,9 @@ Light::~Light()
 {
 }
 
-IReflect::Type Light::type() const
+Type Light::type() const
 {
-  return IReflect::Type::LIGHT;
+  return Type::LIGHT;
 }
 
 void Light::addToScene(const LightPtr& newLight)

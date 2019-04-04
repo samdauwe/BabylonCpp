@@ -152,7 +152,7 @@ public:
   }
   virtual ~Scene() override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Add a component to the scene.

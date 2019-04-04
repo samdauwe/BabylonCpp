@@ -46,9 +46,9 @@ NormalMaterial::~NormalMaterial()
 {
 }
 
-IReflect::Type NormalMaterial::type() const
+Type NormalMaterial::type() const
 {
-  return IReflect::Type::NORMALMATERIAL;
+  return Type::NORMALMATERIAL;
 }
 
 BaseTexturePtr& NormalMaterial::get_diffuseTexture()

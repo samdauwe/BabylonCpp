@@ -34,7 +34,7 @@ public:
    */
   const std::string getClassName() const override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   EffectPtr& getEffect();
   bool isReady(AbstractMesh* mesh, bool useInstances) override;

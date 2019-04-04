@@ -22,9 +22,9 @@ const std::string PushMaterial::getClassName() const
   return "PushMaterial";
 }
 
-IReflect::Type PushMaterial::type() const
+Type PushMaterial::type() const
 {
-  return IReflect::Type::PUSHMATERIAL;
+  return Type::PUSHMATERIAL;
 }
 
 EffectPtr& PushMaterial::getEffect()

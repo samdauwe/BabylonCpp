@@ -71,9 +71,9 @@ SpotLight::~SpotLight()
 {
 }
 
-IReflect::Type SpotLight::type() const
+Type SpotLight::type() const
 {
-  return IReflect::Type::SPOTLIGHT;
+  return Type::SPOTLIGHT;
 }
 
 const std::string SpotLight::getClassName() const

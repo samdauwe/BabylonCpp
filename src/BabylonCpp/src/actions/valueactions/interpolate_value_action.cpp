@@ -43,7 +43,7 @@ void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
 {
   auto scene = _actionManager->getScene();
   std::vector<IAnimationKey> keys{
-    IAnimationKey(0, (*_effectiveTarget)[_property]), //
+    IAnimationKey(0, _effectiveTarget->getProperty({_property})), //
     IAnimationKey(100, *value)};
 
   auto dataType = value->animationType();

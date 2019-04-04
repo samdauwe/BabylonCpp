@@ -200,9 +200,9 @@ const std::string Mesh::getClassName() const
   return "Mesh";
 }
 
-IReflect::Type Mesh::type() const
+Type Mesh::type() const
 {
-  return IReflect::Type::MESH;
+  return Type::MESH;
 }
 
 Observable<Mesh>& Mesh::get_onBeforeRenderObservable()
@@ -1798,7 +1798,7 @@ void Mesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 
   // Sources
   for (auto& mesh : getScene()->meshes) {
-    if (mesh->type() == IReflect::Type::MESH) {
+    if (mesh->type() == Type::MESH) {
       auto _mesh = static_cast<Mesh*>(mesh.get());
       if (_mesh->_source && _mesh->_source == this) {
         _mesh->_source = nullptr;

@@ -70,9 +70,9 @@ BaseTexture::~BaseTexture()
 {
 }
 
-IReflect::Type BaseTexture::type() const
+Type BaseTexture::type() const
 {
-  return IReflect::Type::BASETEXTURE;
+  return Type::BASETEXTURE;
 }
 
 void BaseTexture::addToScene(const BaseTexturePtr& newTexture)

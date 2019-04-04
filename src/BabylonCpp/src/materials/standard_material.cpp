@@ -425,9 +425,9 @@ const std::string StandardMaterial::getClassName() const
   return "StandardMaterial";
 }
 
-IReflect::Type StandardMaterial::type() const
+Type StandardMaterial::type() const
 {
-  return IReflect::Type::STANDARDMATERIAL;
+  return Type::STANDARDMATERIAL;
 }
 
 bool StandardMaterial::get_hasRenderTargetTextures() const

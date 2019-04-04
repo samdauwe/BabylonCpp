@@ -32,7 +32,7 @@ public:
   }
   ~PointLight() override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Gets the direction if it has been set.

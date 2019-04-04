@@ -36,7 +36,7 @@ public:
   }
   ~SpotLight() override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Returns the string "SpotLight".

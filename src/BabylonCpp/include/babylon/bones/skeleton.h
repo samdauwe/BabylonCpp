@@ -15,6 +15,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractMesh;
 class Animatable;
 struct AnimationPropertiesOverride;
 class Bone;
@@ -43,7 +44,7 @@ public:
   }
   virtual ~Skeleton() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   void addToScene(const SkeletonPtr& newSkeleton);
 

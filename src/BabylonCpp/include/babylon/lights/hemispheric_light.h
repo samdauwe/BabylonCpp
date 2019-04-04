@@ -37,7 +37,7 @@ public:
    */
   const std::string getClassName() const override;
 
-  IReflect::Type type() const override;
+  Type type() const override;
 
   /**
    * @brief Sets the HemisphericLight direction towards the passed target

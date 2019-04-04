@@ -26,9 +26,9 @@ const std::string MultiMaterial::getClassName() const
   return "MultiMaterial";
 }
 
-IReflect::Type MultiMaterial::type() const
+Type MultiMaterial::type() const
 {
-  return IReflect::Type::MULTIMATERIAL;
+  return Type::MULTIMATERIAL;
 }
 
 // Properties

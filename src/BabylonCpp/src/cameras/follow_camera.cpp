@@ -33,9 +33,9 @@ FollowCamera::~FollowCamera()
 {
 }
 
-IReflect::Type FollowCamera::type() const
+Type FollowCamera::type() const
 {
-  return IReflect::Type::FOLLOWCAMERA;
+  return Type::FOLLOWCAMERA;
 }
 
 void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)

@@ -44,7 +44,7 @@ public:
   }
   virtual ~Texture() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   /**
    * @brief Update the url (and optional buffer) of this texture if url was null

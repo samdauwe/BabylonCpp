@@ -112,9 +112,9 @@ Texture::~Texture()
 {
 }
 
-IReflect::Type Texture::type() const
+Type Texture::type() const
 {
-  return IReflect::Type::TEXTURE;
+  return Type::TEXTURE;
 }
 
 const char* Texture::getClassName() const

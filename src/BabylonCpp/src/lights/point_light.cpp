@@ -35,9 +35,9 @@ PointLight::~PointLight()
 {
 }
 
-IReflect::Type PointLight::type() const
+Type PointLight::type() const
 {
-  return IReflect::Type::POINTLIGHT;
+  return Type::POINTLIGHT;
 }
 
 float PointLight::get_shadowAngle() const

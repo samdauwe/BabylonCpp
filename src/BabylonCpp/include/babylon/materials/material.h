@@ -14,6 +14,7 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractMesh;
 class BaseSubMesh;
 class BaseTexture;
 class Effect;
@@ -180,7 +181,7 @@ public:
 
   virtual ~Material() override;
 
-  virtual IReflect::Type type() const override;
+  virtual Type type() const override;
 
   /**
    * @param Returns a string representation of the current material.

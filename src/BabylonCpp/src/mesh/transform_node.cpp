@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/cameras/camera.h>
@@ -70,9 +71,52 @@ void TransformNode::addToScene(const TransformNodePtr& transformNode)
   }
 }
 
-IReflect::Type TransformNode::type() const
+Type TransformNode::type() const
 {
-  return IReflect::Type::TRANSFORMNODE;
+  return Type::TRANSFORMNODE;
+}
+
+AnimationValue
+TransformNode::getProperty(const std::vector<std::string>& targetPropertyPath)
+{
+  if (targetPropertyPath.size() == 2) {
+    const auto& target = targetPropertyPath[0];
+    const auto& key    = targetPropertyPath[1];
+    // Rotation
+    if (target == "rotation") {
+      return IAnimatable::getProperty(key, rotation());
+    }
+    // Scaling
+    if (target == "scaling") {
+      return IAnimatable::getProperty(key, scaling());
+    }
+  }
+
+  return AnimationValue();
+}
+
+void TransformNode::setProperty(
+  const std::vector<std::string>& targetPropertyPath,
+  const AnimationValue& value)
+{
+  const auto animationType = value.animationType();
+  if (animationType.has_value()) {
+    if (targetPropertyPath.size() == 2) {
+      const auto& target = targetPropertyPath[0];
+      const auto& key    = targetPropertyPath[1];
+      if (*animationType == Animation::ANIMATIONTYPE_FLOAT()) {
+        auto floatValue = value.get<float>();
+        // Rotation
+        if (target == "rotation") {
+          IAnimatable::setProperty(key, rotation(), floatValue);
+        }
+        // Scaling
+        if (target == "scaling") {
+          IAnimatable::setProperty(key, scaling(), floatValue);
+        }
+      }
+    }
+  }
 }
 
 const std::string TransformNode::getClassName() const

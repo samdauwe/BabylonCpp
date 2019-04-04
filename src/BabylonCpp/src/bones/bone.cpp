@@ -52,9 +52,9 @@ Bone::~Bone()
 {
 }
 
-IReflect::Type Bone::type() const
+Type Bone::type() const
 {
-  return IReflect::Type::BONE;
+  return Type::BONE;
 }
 
 void Bone::addToSkeleton(const BonePtr& newBone)
