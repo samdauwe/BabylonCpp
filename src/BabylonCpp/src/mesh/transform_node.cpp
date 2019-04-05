@@ -79,7 +79,16 @@ Type TransformNode::type() const
 AnimationValue
 TransformNode::getProperty(const std::vector<std::string>& targetPropertyPath)
 {
-  if (targetPropertyPath.size() == 2) {
+  if (targetPropertyPath.size() == 1) {
+    const auto& target = targetPropertyPath[0];
+    if (target == "position") {
+      return position();
+    }
+    if (target == "rotationQuaternion") {
+      return rotationQuaternion().value_or(Quaternion());
+    }
+  }
+  else if (targetPropertyPath.size() == 2) {
     const auto& target = targetPropertyPath[0];
     const auto& key    = targetPropertyPath[1];
     // Rotation
@@ -101,6 +110,21 @@ void TransformNode::setProperty(
 {
   const auto animationType = value.animationType();
   if (animationType.has_value()) {
+    if (targetPropertyPath.size() == 1) {
+      const auto& target = targetPropertyPath[0];
+      if (*animationType == Animation::ANIMATIONTYPE_QUATERNION()) {
+        auto quaternionValue = value.get<Quaternion>();
+        if (target == "rotationQuaternion") {
+          rotationQuaternion = quaternionValue;
+        }
+      }
+      if (*animationType == Animation::ANIMATIONTYPE_VECTOR3()) {
+        auto vector3Value = value.get<Vector3>();
+        if (target == "position") {
+          position = vector3Value;
+        }
+      }
+    }
     if (targetPropertyPath.size() == 2) {
       const auto& target = targetPropertyPath[0];
       const auto& key    = targetPropertyPath[1];
