@@ -1,6 +1,7 @@
 #include <babylon/samples/animations/_animations_samples_index.h>
 
 #include <babylon/samples/animations/animated_morph_target_scene.h>
+#include <babylon/samples/animations/animations_101_scene.h>
 #include <babylon/samples/animations/animations_scene.h>
 #include <babylon/samples/animations/bone_rotatation_in_world_space_scene.h>
 #include <babylon/samples/animations/bouncing_cube_scene.h>
@@ -30,6 +31,12 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<AnimationsScene>(iCanvas); //
                       });                                                  //
+  // Animations 101 Scene
+  _samples["Animations101Scene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<Animations101Scene>(iCanvas); //
+                      });                                                     //
   // Bone Rotation In World Space Scene
   _samples["BoneRotationInWorldSpaceScene"] = std::make_tuple(
     true,                                                              //
