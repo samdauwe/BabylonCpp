@@ -31,17 +31,19 @@ const char* CartoonAnimationsScene::getName()
 void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
   auto light1
-    = DirectionalLight::New("DirectionalLight", Vector3(0, -1, 0), scene);
-  auto light2 = HemisphericLight::New("HemiLight", Vector3(0, 1, -1), scene);
+    = DirectionalLight::New("DirectionalLight", Vector3(0.f, -1.f, 0.f), scene);
+  auto light2
+    = HemisphericLight::New("HemiLight", Vector3(0.f, 1.f, -1.f), scene);
   light1->intensity = 0.25f;
   light2->intensity = 0.5f;
 
-  size_t frameRate = 20;
+  auto frameRate = 20.f;
 
   /********* Performers *********/
 
   // Camera
-  auto camera = TargetCamera::New("TargetCamera", Vector3(0, 3, -30), scene);
+  auto camera
+    = TargetCamera::New("TargetCamera", Vector3(0.f, 3.f, -30.f), scene);
   camera->attachControl(canvas, false);
 
   // Door
@@ -62,7 +64,7 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   SphereOptions spereOptions(0.2f);
   auto sphereLight = MeshBuilder::CreateSphere("sphere", spereOptions, scene);
   auto sphereMaterial           = StandardMaterial::New("", scene);
-  sphereMaterial->emissiveColor = Color3(1, 1, 1);
+  sphereMaterial->emissiveColor = Color3(1.f, 1.f, 1.f);
   sphereLight->material         = sphereMaterial;
   sphereLight->position().x     = 2.f;
   sphereLight->position().y     = 3.f;
@@ -100,11 +102,10 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
                                Animation::ANIMATIONLOOPMODE_CONSTANT());
 
   // Create rotate animation keys
-  auto frameRateInt = static_cast<int>(frameRate);
   std::vector<IAnimationKey> rotateKeys{
     IAnimationKey(0.f, AnimationValue(0.f)),
-    IAnimationKey(9.f * frameRateInt, AnimationValue(0.f)),
-    IAnimationKey(14.f * frameRateInt, AnimationValue(Math::PI)),
+    IAnimationKey(9.f * frameRate, AnimationValue(0.f)),
+    IAnimationKey(14.f * frameRate, AnimationValue(Math::PI)),
   };
 
   // Set rotate animation keys
@@ -117,10 +118,10 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create movein animation keys
   std::vector<IAnimationKey> moveinKeys{
-    IAnimationKey(0.f, AnimationValue(Vector3(0, 5, -30))),
-    IAnimationKey(3.f, AnimationValue(Vector3(0, 2, -10))),
-    IAnimationKey(5.f, AnimationValue(Vector3(0, 2, -10))),
-    IAnimationKey(8.f, AnimationValue(Vector3(-2, 2, 3))),
+    IAnimationKey(0.f, AnimationValue(Vector3(0.f, 5.f, -30.f))),
+    IAnimationKey(3.f, AnimationValue(Vector3(0.f, 2.f, -10.f))),
+    IAnimationKey(5.f, AnimationValue(Vector3(0.f, 2.f, -10.f))),
+    IAnimationKey(8.f, AnimationValue(Vector3(-2.f, 2.f, 3.f))),
   };
 
   // Set movein animation keys
@@ -133,11 +134,11 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create sweep animation keys
   std::vector<IAnimationKey> sweepKeys{
-    IAnimationKey(0.f, AnimationValue(0)),
-    IAnimationKey(3.f * frameRateInt, AnimationValue(0.f)),
-    IAnimationKey(5.f * frameRateInt, AnimationValue(Math::PI / 3.f)),
-    IAnimationKey(13.f * frameRateInt, AnimationValue(Math::PI / 3.f)),
-    IAnimationKey(15.f * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(0.f, AnimationValue(0.f)),
+    IAnimationKey(3.f * frameRate, AnimationValue(0.f)),
+    IAnimationKey(5.f * frameRate, AnimationValue(Math::PI / 3.f)),
+    IAnimationKey(13.f * frameRate, AnimationValue(Math::PI / 3.f)),
+    IAnimationKey(15.f * frameRate, AnimationValue(0.f)),
   };
 
   // Set sweep animation keys
@@ -150,24 +151,24 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   // Create light dimmer animation keys
   std::vector<IAnimationKey> lightKeys{
-    IAnimationKey(0.f, AnimationValue(0)),
-    IAnimationKey(7.f * frameRateInt, AnimationValue(0.f)),
-    IAnimationKey(10.f * frameRateInt, AnimationValue(1.f)),
-    IAnimationKey(14.f * frameRateInt, AnimationValue(1.f)),
-    IAnimationKey(15.f * frameRateInt, AnimationValue(0.f)),
+    IAnimationKey(0.f, AnimationValue(0.f)),
+    IAnimationKey(7.f * frameRate, AnimationValue(0.f)),
+    IAnimationKey(10.f * frameRate, AnimationValue(1.f)),
+    IAnimationKey(14.f * frameRate, AnimationValue(1.f)),
+    IAnimationKey(15.f * frameRate, AnimationValue(0.f)),
   };
 
   // Set light dimmer animation keys
   lightDimmer->setKeys(lightKeys);
 
   /******* Run Clips **********/
-  scene->beginDirectAnimation(camera, {movein, rotate}, 0.f,
-                              25.f * frameRateInt, false);
-  scene->beginDirectAnimation(hinge, {sweep}, 0.f, 25.f * frameRateInt, false);
+  scene->beginDirectAnimation(camera, {movein, rotate}, 0.f, 25.f * frameRate,
+                              false);
+  scene->beginDirectAnimation(hinge, {sweep}, 0.f, 25.f * frameRate, false);
   scene->beginDirectAnimation(spotLights[0], {lightDimmer}, 0.f,
-                              25.f * frameRateInt, false);
+                              25.f * frameRate, false);
   scene->beginDirectAnimation(spotLights[1], {lightDimmer /*->clone()*/}, 0,
-                              25.f * frameRateInt, false);
+                              25.f * frameRate, false);
 
   /************** Peripherals of Scene ***************/
   GroundOptions groundOptions;

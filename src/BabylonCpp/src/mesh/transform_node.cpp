@@ -93,11 +93,11 @@ TransformNode::getProperty(const std::vector<std::string>& targetPropertyPath)
     const auto& key    = targetPropertyPath[1];
     // Rotation
     if (target == "rotation") {
-      return IAnimatable::getProperty(key, rotation());
+      return IAnimatable::getProperty(key.c_str(), rotation());
     }
     // Scaling
     if (target == "scaling") {
-      return IAnimatable::getProperty(key, scaling());
+      return IAnimatable::getProperty(key.c_str(), scaling());
     }
   }
 
@@ -118,10 +118,19 @@ void TransformNode::setProperty(
           rotationQuaternion = quaternionValue;
         }
       }
-      if (*animationType == Animation::ANIMATIONTYPE_VECTOR3()) {
+      else if (*animationType == Animation::ANIMATIONTYPE_VECTOR3()) {
         auto vector3Value = value.get<Vector3>();
+        // Position
         if (target == "position") {
           position = vector3Value;
+        }
+        // Rotation
+        if (target == "rotation") {
+          rotation = vector3Value;
+        }
+        // Scaling
+        if (target == "scaling") {
+          scaling = vector3Value;
         }
       }
     }
@@ -129,14 +138,18 @@ void TransformNode::setProperty(
       const auto& target = targetPropertyPath[0];
       const auto& key    = targetPropertyPath[1];
       if (*animationType == Animation::ANIMATIONTYPE_FLOAT()) {
-        auto floatValue = value.get<float>();
+        const auto& floatValue = value.get<float>();
+        // Position
+        if (target == "position") {
+          IAnimatable::setProperty(key.c_str(), position(), floatValue);
+        }
         // Rotation
         if (target == "rotation") {
-          IAnimatable::setProperty(key, rotation(), floatValue);
+          IAnimatable::setProperty(key.c_str(), rotation(), floatValue);
         }
         // Scaling
         if (target == "scaling") {
-          IAnimatable::setProperty(key, scaling(), floatValue);
+          IAnimatable::setProperty(key.c_str(), scaling(), floatValue);
         }
       }
     }

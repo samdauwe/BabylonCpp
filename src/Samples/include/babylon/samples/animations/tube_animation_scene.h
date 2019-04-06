@@ -9,6 +9,7 @@ namespace Samples {
 /**
  * @brief Tube Animation Scene.
  * @see https://www.babylonjs-playground.com/#14EGUT#39
+ * @see https://doc.babylonjs.com/babylon101/animations
  */
 struct TubeAnimationScene : public IRenderableScene {
 

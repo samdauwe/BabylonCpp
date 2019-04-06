@@ -181,7 +181,9 @@ void RuntimeAnimation::_setValue(const IAnimatablePtr& iTarget,
   if (!stl_util::almost_equal(iWeight, -1.f)) {
   }
   else {
-    destination->setProperty(targetPropertyPath, _currentValue);
+    if (_currentValue.has_value()) {
+      destination->setProperty(targetPropertyPath, _currentValue.value());
+    }
   }
 }
 

@@ -7,7 +7,7 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Easing Functions Scen. Example demonstarting how to create animations
+ * @brief Easing Functions Scene. Example demonstarting how to create animations
  * with different easing functions.
  * @see https://www.babylonjs-playground.com/#8ZNVGR#0
  * @see https://doc.babylonjs.com/babylon101/animations#easing-functions

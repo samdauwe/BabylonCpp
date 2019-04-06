@@ -24,6 +24,7 @@ private:
 /**
  * @brief Pump Jack Scene.
  * @see https://www.babylonjs-playground.com/#1XA6UQ#50
+ * @see https://doc.babylonjs.com/babylon101/animations
  */
 struct PumpJackScene : public IRenderableScene {
 

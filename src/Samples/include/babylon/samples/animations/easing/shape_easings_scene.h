@@ -10,6 +10,12 @@ using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
 namespace Samples {
 
+/**
+ * @brief Shape Easings Scene. Example demonstarting how to create animations
+ * with different easing functions.
+ * @see https://www.babylonjs-playground.com/#HH1U5#62
+ * @see https://doc.babylonjs.com/babylon101/animations#easing-functions
+ */
 class ShapeEasingsScene : public IRenderableScene {
 
 public:

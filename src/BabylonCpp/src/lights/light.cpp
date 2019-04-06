@@ -62,6 +62,36 @@ Type Light::type() const
   return Type::LIGHT;
 }
 
+AnimationValue
+Light::getProperty(const std::vector<std::string>& targetPropertyPath)
+{
+  if (targetPropertyPath.size() == 1) {
+    const auto& target = targetPropertyPath[0];
+    if (target == "intensity") {
+      return intensity;
+    }
+  }
+
+  return AnimationValue();
+}
+
+void Light::setProperty(const std::vector<std::string>& targetPropertyPath,
+                        const AnimationValue& value)
+{
+  const auto animationType = value.animationType();
+  if (animationType.has_value()) {
+    if (targetPropertyPath.size() == 1) {
+      const auto& target = targetPropertyPath[0];
+      if (*animationType == Animation::ANIMATIONTYPE_FLOAT()) {
+        auto floatValue = value.get<float>();
+        if (target == "intensity") {
+          intensity = floatValue;
+        }
+      }
+    }
+  }
+}
+
 void Light::addToScene(const LightPtr& newLight)
 {
   getScene()->addLight(newLight); // Need to add light first to the scene!
@@ -488,11 +518,11 @@ float Light::_getPhotometricScale()
         case Light::INTENSITYMODE_LUMINANCE:
           // When radius (and therefore solid angle) is non-zero a directional
           // lights brightness can be specified via central (peak) luminance.
-          // For a directional light the 'radius' defines the angular radius (in
-          // radians) rather than world-space radius (e.g. in metres).
+          // For a directional light the 'radius' defines the angular radius
+          // (in radians) rather than world-space radius (e.g. in metres).
           auto apexAngleRadians = radius();
-          // Impose a minimum light angular size to avoid the light becoming an
-          // infinitely small angular light source (i.e. a dirac delta
+          // Impose a minimum light angular size to avoid the light becoming
+          // an infinitely small angular light source (i.e. a dirac delta
           // function).
           apexAngleRadians = std::max(apexAngleRadians, 0.001f);
           auto solidAngle = 2.f * Math::PI * (1.f - std::cos(apexAngleRadians));

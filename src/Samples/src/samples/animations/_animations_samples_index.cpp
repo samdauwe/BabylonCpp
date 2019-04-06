@@ -71,13 +71,13 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 
   // Easing Functions Scene
   _samples["EasingFunctionsScene"] = std::make_tuple(
-    false,                                                    //
+    true,                                                     //
     [](ICanvas* iCanvas) {                                    //
       return std::make_unique<EasingFunctionsScene>(iCanvas); //
     });                                                       //
   // Shape Easings Scene
   _samples["ShapeEasingsScene"]
-    = std::make_tuple(false,                                                 //
+    = std::make_tuple(true,                                                  //
                       [](ICanvas* iCanvas) {                                 //
                         return std::make_unique<ShapeEasingsScene>(iCanvas); //
                       });                                                    //

@@ -6,6 +6,13 @@
 namespace BABYLON {
 namespace Samples {
 
+/**
+ * @brief Cartoon Animations Scene. Example demonstrating how to combining a
+ * number of clips to form a cartoon is to give start times to each animation
+ * clip
+ * @see https://www.babylonjs-playground.com/#2L26P1#8
+ * @see https://doc.babylonjs.com/how_to/sequence#cartoon
+ */
 struct CartoonAnimationsScene : public IRenderableScene {
 
 public:

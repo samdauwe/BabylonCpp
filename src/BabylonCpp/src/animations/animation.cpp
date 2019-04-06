@@ -51,7 +51,7 @@ AnimationPtr Animation::_PrepareAnimation(
 
   animation->setKeys({
     IAnimationKey(0.f, from),
-    IAnimationKey(static_cast<float>(totalFrame), to),
+    IAnimationKey(totalFrame, to),
   });
 
   if (easingFunction != nullptr) {
@@ -92,8 +92,8 @@ AnimatablePtr Animation::CreateAndStartAnimation(
   }
 
   return node->getScene()->beginDirectAnimation(
-    node, {animation}, 0.f, static_cast<float>(totalFrame),
-    (animation->loopMode == 1), 1.f, onAnimationEnd);
+    node, {animation}, 0.f, totalFrame, (animation->loopMode == 1), 1.f,
+    onAnimationEnd);
 }
 
 std::vector<AnimatablePtr> Animation::CreateAndStartHierarchyAnimation(
@@ -411,19 +411,19 @@ AnimationValue Animation::_interpolate(float currentFrame, int repeatCount,
 
       const auto& startKey = keys[key];
       auto startValue      = _getKeyValue(startKey.value);
-      if ((*startKey.interpolation).animationType().value()
-          == static_cast<unsigned>(AnimationKeyInterpolation::STEP)) {
+      if ((*startKey.interpolation).animationType().has_value()
+          && (*startKey.interpolation).animationType().value()
+               == static_cast<unsigned>(AnimationKeyInterpolation::STEP)) {
         return startValue;
       }
       auto endValue = _getKeyValue(endKey.value);
 
       bool useTangent  = startKey.outTangent && endKey.inTangent;
-      float frameDelta = static_cast<float>(endKey.frame - startKey.frame);
+      float frameDelta = endKey.frame - startKey.frame;
 
       // gradient : percent of currentFrame between the frame inf and the frame
       // sup
-      float gradient
-        = static_cast<float>(currentFrame - startKey.frame) / frameDelta;
+      float gradient = (currentFrame - startKey.frame) / frameDelta;
 
       // check for easingFunction and correction of gradient
       auto easingFunction = getEasingFunction();
