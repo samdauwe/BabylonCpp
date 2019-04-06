@@ -119,6 +119,85 @@ IGLTF2::IAccessorSparseValues::Parse(const json& parsedAccessorSparseValues)
   return accessorSparseValues;
 }
 
+IAnimation IAnimation::Parse(const json& parsedAnimation)
+{
+  IAnimation animation;
+
+  // Channels
+  for (const auto& channel :
+       json_util::get_array<json>(parsedAnimation, "channels")) {
+    animation.channels.emplace_back(IAnimationChannel::Parse(channel));
+  }
+
+  // Samplers
+  for (const auto& sampler :
+       json_util::get_array<json>(parsedAnimation, "samplers")) {
+    animation.samplers.emplace_back(IAnimationSampler::Parse(sampler));
+  }
+
+  // Name
+  if (json_util::has_valid_key_value(parsedAnimation, "name")) {
+    animation.name = json_util::get_string(parsedAnimation, "name");
+  }
+
+  return animation;
+}
+
+IAnimationChannel IAnimationChannel::Parse(const json& parsedAnimationChannel)
+{
+  IAnimationChannel channel;
+
+  // Count
+  channel.sampler
+    = json_util::get_number<size_t>(parsedAnimationChannel, "sampler");
+
+  // Target
+  channel.target
+    = IGLTF2::IAnimationChannelTarget::Parse(parsedAnimationChannel["target"]);
+
+  return channel;
+}
+
+IGLTF2::IAnimationChannelTarget
+IGLTF2::IAnimationChannelTarget::Parse(const json& parsedAnimationChannelTarget)
+{
+  IAnimationChannelTarget target;
+
+  // Node
+  if (json_util::has_valid_key_value(parsedAnimationChannelTarget, "node")) {
+    target.node
+      = json_util::get_number<size_t>(parsedAnimationChannelTarget, "node");
+  }
+
+  // Path
+  target.path = IGLTF2::EnumUtils::StringToAnimationChannelTargetPath(
+    json_util::get_string(parsedAnimationChannelTarget, "path"));
+
+  return target;
+}
+
+IAnimationSampler IAnimationSampler::Parse(const json& parsedAnimationSampler)
+{
+  IAnimationSampler sampler;
+
+  // Input
+  sampler.input
+    = json_util::get_number<size_t>(parsedAnimationSampler, "input");
+
+  // Interpolation
+  if (json_util::has_valid_key_value(parsedAnimationSampler, "interpolation")) {
+    sampler.interpolation
+      = IGLTF2::EnumUtils::StringToAnimationSamplerInterpolation(
+        json_util::get_string(parsedAnimationSampler, "interpolation"));
+  }
+
+  // Output
+  sampler.output
+    = json_util::get_number<size_t>(parsedAnimationSampler, "output");
+
+  return sampler;
+}
+
 IGLTF2::IAsset IGLTF2::IAsset::Parse(const json& parsedAsset)
 {
   IGLTF2::IAsset asset;
@@ -583,6 +662,12 @@ std::unique_ptr<IGLTF> IGLTF::Parse(const json& parsedGLTFObject)
   for (const auto& accessor :
        json_util::get_array<json>(parsedGLTFObject, "accessors")) {
     glTFObject.accessors.emplace_back(IAccessor::Parse(accessor));
+  }
+
+  // Animations
+  for (const auto& animation :
+       json_util::get_array<json>(parsedGLTFObject, "animations")) {
+    glTFObject.animations.emplace_back(IAnimation::Parse(animation));
   }
 
   // Asset

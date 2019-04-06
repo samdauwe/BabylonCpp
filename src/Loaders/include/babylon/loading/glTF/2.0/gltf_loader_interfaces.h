@@ -517,6 +517,43 @@ struct EnumUtils {
     }
   }
 
+  static AnimationChannelTargetPath
+  StringToAnimationChannelTargetPath(const std::string& value)
+  {
+    if (value == "translation") {
+      return AnimationChannelTargetPath::TRANSLATION;
+    }
+    else if (value == "rotation") {
+      return AnimationChannelTargetPath::ROTATION;
+    }
+    else if (value == "scale") {
+      return AnimationChannelTargetPath::SCALE;
+    }
+    else if (value == "weights") {
+      return AnimationChannelTargetPath::WEIGHTS;
+    }
+    else {
+      return AnimationChannelTargetPath::INVALID;
+    }
+  }
+
+  static AnimationSamplerInterpolation
+  StringToAnimationSamplerInterpolation(const std::string& value)
+  {
+    if (value == "LINEAR") {
+      return AnimationSamplerInterpolation::LINEAR;
+    }
+    else if (value == "STEP") {
+      return AnimationSamplerInterpolation::STEP;
+    }
+    else if (value == "CUBICSPLINE") {
+      return AnimationSamplerInterpolation::CUBICSPLINE;
+    }
+    else {
+      return AnimationSamplerInterpolation::INVALID;
+    }
+  }
+
   static CameraType StringToCameraType(const std::string& value)
   {
     if (value == "perspective") {
@@ -712,6 +749,9 @@ struct IAnimationChannelTarget : public IProperty {
    * Targets it instantiates
    */
   AnimationChannelTargetPath path;
+
+  static IAnimationChannelTarget
+  Parse(const json& parsedAnimationChannelTarget);
 };
 
 /**
@@ -1346,6 +1386,9 @@ struct IAccessor : public IGLTF2::IAccessor, IArrayItem {
  * @brief Loader interface with additional members.
  */
 struct IAnimationChannel : public IGLTF2::IAnimationChannel, IArrayItem {
+
+  static IAnimationChannel Parse(const json& parsedAnimationChannel);
+
 }; // end of struct IAnimationChannel
 
 /** @hidden */
@@ -1361,6 +1404,9 @@ struct _IAnimationSamplerData {
 struct IAnimationSampler : public IGLTF2::IAnimationSampler, IArrayItem {
   /** @hidden */
   std::optional<_IAnimationSamplerData> _data = std::nullopt;
+
+  static IAnimationSampler Parse(const json& parsedAnimationSampler);
+
 }; // end of struct IAnimationSampler
 
 /**
@@ -1369,6 +1415,9 @@ struct IAnimationSampler : public IGLTF2::IAnimationSampler, IArrayItem {
 struct IAnimation : public IGLTF2::IAnimation, IArrayItem {
   /** @hidden */
   AnimationGroupPtr _babylonAnimationGroup = nullptr;
+
+  static IAnimation Parse(const json& parsedAnimation);
+
 }; // end of struct IAnimation
 
 /**

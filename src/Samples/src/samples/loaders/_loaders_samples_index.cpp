@@ -11,6 +11,7 @@
 // Loaders plugins
 #ifdef WITH_LOADERS
 #include <babylon/samples/loaders/gltf/import_2cylinder_engine_scene.h>
+#include <babylon/samples/loaders/gltf/import_animated_triangle_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_interleaved_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_textured_non_power_of_two_scene.h>
@@ -18,6 +19,7 @@
 #include <babylon/samples/loaders/gltf/import_box_vertex_colors_scene.h>
 #include <babylon/samples/loaders/gltf/import_cameras_scene.h>
 #include <babylon/samples/loaders/gltf/import_duck_scene.h>
+#include <babylon/samples/loaders/gltf/import_interpolation_test_scene.h>
 #include <babylon/samples/loaders/gltf/import_reciprocating_saw_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_meshes_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_sparse_accessor_scene.h>
@@ -81,6 +83,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
     [](ICanvas* iCanvas) {                                          //
       return std::make_unique<Import2CylinderEngineScene>(iCanvas); //
     });                                                             //
+  // Import Animated Triangle Scene (glTF)
+  _samples["ImportAnimatedTriangleScene"] = std::make_tuple(
+    true,                                                            //
+    [](ICanvas* iCanvas) {                                           //
+      return std::make_unique<ImportAnimatedTriangleScene>(iCanvas); //
+    });                                                              //
   // Import Box Interleaved Scene (glTF)
   _samples["ImportBoxInterleavedScene"] = std::make_tuple(
     true,                                                          //
@@ -123,6 +131,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<ImportDuckScene>(iCanvas); //
                       });                                                  //
+  // Import Interpolation Test Scene (glTF)
+  _samples["ImportInterpolationTestScene"] = std::make_tuple(
+    false,                                                            //
+    [](ICanvas* iCanvas) {                                            //
+      return std::make_unique<ImportInterpolationTestScene>(iCanvas); //
+    });                                                               //
   // Import Reciprocating Saw Scene (glTF)
   _samples["ImportReciprocatingSawScene"] = std::make_tuple(
     false,                                                           //
