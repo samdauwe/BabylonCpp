@@ -84,14 +84,14 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
                       });                                                   //
   // PBR Metallic Roughness Gold Material
   _samples["PBRMetallicRoughnessGoldMaterialScene"] = std::make_tuple(
-    false,                 //
+    true,                  //
     [](ICanvas* iCanvas) { //
       return std::make_unique<PBRMetallicRoughnessGoldMaterialScene>(
         iCanvas); //
     });           //
   // PBR Metallic Roughness Material
   _samples["PBRMetallicRoughnessMaterialScene"] = std::make_tuple(
-    false,                                                                 //
+    true,                                                                  //
     [](ICanvas* iCanvas) {                                                 //
       return std::make_unique<PBRMetallicRoughnessMaterialScene>(iCanvas); //
     });                                                                    //
@@ -104,13 +104,13 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
     });           //
   // PBR Specular Glossiness Material Scene
   _samples["PBRSpecularGlossinessMaterialScene"] = std::make_tuple(
-    false,                                                                  //
+    true,                                                                   //
     [](ICanvas* iCanvas) {                                                  //
       return std::make_unique<PBRSpecularGlossinessMaterialScene>(iCanvas); //
     });                                                                     //
   // PBR Specular Glossiness Texture Material Scene
   _samples["PBRSpecularGlossinessTextureMaterialScene"] = std::make_tuple(
-    false,                 //
+    true,                  //
     [](ICanvas* iCanvas) { //
       return std::make_unique<PBRSpecularGlossinessTextureMaterialScene>(
         iCanvas); //

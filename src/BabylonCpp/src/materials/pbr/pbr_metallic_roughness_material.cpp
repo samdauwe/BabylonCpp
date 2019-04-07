@@ -2,15 +2,24 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/babylon_stl_util.h>
+
 namespace BABYLON {
 
 PBRMetallicRoughnessMaterial::PBRMetallicRoughnessMaterial(
   const std::string& iName, Scene* scene)
     : PBRBaseSimpleMaterial{iName, scene}
-    , baseTexture{nullptr}
-    , metallic{0.f}
-    , roughness{0.f}
-    , metallicRoughnessTexture{nullptr}
+    , baseColor{this, &PBRMetallicRoughnessMaterial::get_baseColor,
+                &PBRMetallicRoughnessMaterial::set_baseColor}
+    , baseTexture{this, &PBRMetallicRoughnessMaterial::get_baseTexture,
+                  &PBRMetallicRoughnessMaterial::set_baseTexture}
+    , metallic{this, &PBRMetallicRoughnessMaterial::get_metallic,
+               &PBRMetallicRoughnessMaterial::set_metallic}
+    , roughness{this, &PBRMetallicRoughnessMaterial::get_roughness,
+                &PBRMetallicRoughnessMaterial::set_roughness}
+    , metallicRoughnessTexture{
+        this, &PBRMetallicRoughnessMaterial::get_metallicRoughnessTexture,
+        &PBRMetallicRoughnessMaterial::set_metallicRoughnessTexture}
 {
   _useRoughnessFromMetallicTextureAlpha = false;
   _useRoughnessFromMetallicTextureGreen = true;
@@ -29,16 +38,96 @@ const std::string PBRMetallicRoughnessMaterial::getClassName() const
   return "PBRMetallicRoughnessMaterial";
 }
 
+Color3& PBRMetallicRoughnessMaterial::get_baseColor()
+{
+  return _albedoColor;
+}
+
+void PBRMetallicRoughnessMaterial::set_baseColor(const Color3& value)
+{
+  if (_albedoColor == value) {
+    return;
+  }
+
+  _albedoColor = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+BaseTexturePtr& PBRMetallicRoughnessMaterial::get_baseTexture()
+{
+  return _albedoTexture;
+}
+
+void PBRMetallicRoughnessMaterial::set_baseTexture(const BaseTexturePtr& value)
+{
+  if (_albedoTexture == value) {
+    return;
+  }
+
+  _albedoTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+float PBRMetallicRoughnessMaterial::get_metallic() const
+{
+  return _metallic.value_or(1.f);
+}
+
+void PBRMetallicRoughnessMaterial::set_metallic(float value)
+{
+  if (_metallic.has_value()) {
+    if (stl_util::almost_equal(_metallic.value(), value)) {
+      return;
+    }
+  }
+
+  _metallic = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+float PBRMetallicRoughnessMaterial::get_roughness() const
+{
+  return _roughness.value_or(1.f);
+}
+
+void PBRMetallicRoughnessMaterial::set_roughness(float value)
+{
+  if (_roughness.has_value()) {
+    if (stl_util::almost_equal(_roughness.value(), value)) {
+      return;
+    }
+  }
+
+  _roughness = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
+BaseTexturePtr& PBRMetallicRoughnessMaterial::get_metallicRoughnessTexture()
+{
+  return _metallicTexture;
+}
+
+void PBRMetallicRoughnessMaterial::set_metallicRoughnessTexture(
+  const BaseTexturePtr& value)
+{
+  if (_metallicTexture == value) {
+    return;
+  }
+
+  _metallicTexture = value;
+  _markAllSubMeshesAsTexturesDirty();
+}
+
 std::vector<BaseTexturePtr>
 PBRMetallicRoughnessMaterial::getActiveTextures() const
 {
   auto activeTextures = PBRBaseSimpleMaterial::getActiveTextures();
 
-  if (baseTexture) {
+  if (baseTexture()) {
     activeTextures.emplace_back(baseTexture);
   }
 
-  if (metallicRoughnessTexture) {
+  if (metallicRoughnessTexture()) {
     activeTextures.emplace_back(metallicRoughnessTexture);
   }
 
@@ -52,11 +141,11 @@ bool PBRMetallicRoughnessMaterial::hasTexture(
     return true;
   }
 
-  if (baseTexture == texture) {
+  if (baseTexture() == texture) {
     return true;
   }
 
-  if (metallicRoughnessTexture == texture) {
+  if (metallicRoughnessTexture() == texture) {
     return true;
   }
 

@@ -75,6 +75,45 @@ protected:
    */
   PBRMetallicRoughnessMaterial(const std::string& name, Scene* scene);
 
+  /**
+   * @brief The base color has two different interpretations depending on the
+   * value of metalness. When the material is a metal, the base color is the
+   * specific measured reflectance value at normal incidence (F0). For a
+   * non-metal the base color represents the reflected diffuse color of the
+   * material.
+   */
+  Color3& get_baseColor();
+  void set_baseColor(const Color3& value);
+
+  /**
+   * @brief Base texture of the metallic workflow. It contains both the
+   * baseColor information in RGB as well as opacity information in the alpha
+   * channel.
+   */
+  BaseTexturePtr& get_baseTexture();
+  void set_baseTexture(const BaseTexturePtr& value);
+
+  /**
+   * @brief Specifies the metallic scalar value of the material.
+   * Can also be used to scale the metalness values of the metallic texture.
+   */
+  float get_metallic() const;
+  void set_metallic(float value);
+
+  /**
+   * @brief Specifies the roughness scalar value of the material.
+   * Can also be used to scale the roughness values of the metallic texture.
+   */
+  float get_roughness() const;
+  void set_roughness(float value);
+
+  /**
+   * @brief Texture containing both the metallic value in the B channel and the
+   * roughness value in the G channel to keep better precision.
+   */
+  BaseTexturePtr& get_metallicRoughnessTexture();
+  void set_metallicRoughnessTexture(const BaseTexturePtr& value);
+
 public:
   /**
    * The base color has two different interpretations depending on the value of
@@ -83,31 +122,32 @@ public:
    * reflectance value at normal incidence (F0). For a non-metal the base color
    * represents the reflected diffuse color of the material.
    */
-  Color3 baseColor;
+  Property<PBRMetallicRoughnessMaterial, Color3> baseColor;
 
   /**
    * Base texture of the metallic workflow. It contains both the baseColor
    * information in RGB as well as opacity information in the alpha channel.
    */
-  BaseTexturePtr baseTexture;
+  Property<PBRMetallicRoughnessMaterial, BaseTexturePtr> baseTexture;
 
   /**
    * Specifies the metallic scalar value of the material.
    * Can also be used to scale the metalness values of the metallic texture.
    */
-  float metallic;
+  Property<PBRMetallicRoughnessMaterial, float> metallic;
 
   /**
    * Specifies the roughness scalar value of the material.
    * Can also be used to scale the roughness values of the metallic texture.
    */
-  float roughness;
+  Property<PBRMetallicRoughnessMaterial, float> roughness;
 
   /**
    * Texture containing both the metallic value in the B channel and the
    * roughness value in the G channel to keep better precision.
    */
-  BaseTexturePtr metallicRoughnessTexture;
+  Property<PBRMetallicRoughnessMaterial, BaseTexturePtr>
+    metallicRoughnessTexture;
 
 }; // end of class PBRMetallicRoughnessMaterial
 
