@@ -1339,8 +1339,8 @@ _IAnimationSamplerData
 GLTFLoader::_loadAnimationSamplerAsync(const std::string& context,
                                        IAnimationSampler& sampler)
 {
-  if (sampler._data) {
-    return *sampler._data;
+  if (sampler._data.has_value()) {
+    return sampler._data.value();
   }
 
   const auto interpolation = sampler.interpolation.value_or(
@@ -1374,7 +1374,7 @@ GLTFLoader::_loadAnimationSamplerAsync(const std::string& context,
   };
   sampler._data = std::move(samplerDdata);
 
-  return *sampler._data;
+  return sampler._data.value();
 }
 
 ArrayBufferView& GLTFLoader::_loadBufferAsync(const std::string& context,

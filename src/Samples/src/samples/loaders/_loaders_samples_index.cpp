@@ -85,7 +85,7 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
     });                                                             //
   // Import Animated Triangle Scene (glTF)
   _samples["ImportAnimatedTriangleScene"] = std::make_tuple(
-    true,                                                            //
+    false,                                                           //
     [](ICanvas* iCanvas) {                                           //
       return std::make_unique<ImportAnimatedTriangleScene>(iCanvas); //
     });                                                              //
