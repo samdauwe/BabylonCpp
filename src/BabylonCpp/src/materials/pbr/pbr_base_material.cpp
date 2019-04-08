@@ -107,7 +107,7 @@ PBRBaseMaterial::PBRBaseMaterial(const std::string& iName, Scene* scene)
   // Setup the default processing configuration to the scene.
   _attachImageProcessingConfiguration(nullptr);
 
-  getRenderTargetTextures = [this]() {
+  getRenderTargetTextures = [this]() -> std::vector<RenderTargetTexturePtr> {
     _renderTargets.clear();
 
     if (StandardMaterial::ReflectionTextureEnabled() && _reflectionTexture
@@ -249,7 +249,7 @@ bool PBRBaseMaterial::needAlphaTesting() const
   }
 
   return _albedoTexture != nullptr && _albedoTexture->hasAlpha()
-         && (_transparencyMode == std::nullopt
+         && (!_transparencyMode.has_value()
              || _transparencyMode == PBRMaterial::PBRMATERIAL_ALPHATEST);
 }
 

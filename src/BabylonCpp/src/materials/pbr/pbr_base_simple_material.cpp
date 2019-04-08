@@ -48,7 +48,7 @@ PBRBaseSimpleMaterial::PBRBaseSimpleMaterial(const std::string& iName,
     invertNormalMapX       = false;
     invertNormalMapY       = false;
     normalTexture          = nullptr;
-    emissiveColor          = Color3(0, 0, 0);
+    emissiveColor          = Color3(0.f, 0.f, 0.f);
     emissiveTexture        = nullptr;
     occlusionStrength      = 1.f;
     occlusionTexture       = nullptr;
@@ -111,7 +111,7 @@ void PBRBaseSimpleMaterial::set_environmentTexture(const BaseTexturePtr& value)
   }
 
   _reflectionTexture = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 bool PBRBaseSimpleMaterial::get_invertNormalMapX() const
@@ -126,7 +126,7 @@ void PBRBaseSimpleMaterial::set_invertNormalMapX(bool value)
   }
 
   _invertNormalMapX = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 bool PBRBaseSimpleMaterial::get_invertNormalMapY() const
@@ -141,7 +141,7 @@ void PBRBaseSimpleMaterial::set_invertNormalMapY(bool value)
   }
 
   _invertNormalMapY = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 BaseTexturePtr& PBRBaseSimpleMaterial::get_normalTexture()
@@ -156,7 +156,7 @@ void PBRBaseSimpleMaterial::set_normalTexture(const BaseTexturePtr& value)
   }
 
   _bumpTexture = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 Color3& PBRBaseSimpleMaterial::get_emissiveColor()
@@ -171,7 +171,7 @@ void PBRBaseSimpleMaterial::set_emissiveColor(const Color3& value)
   }
 
   _emissiveColor = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 BaseTexturePtr& PBRBaseSimpleMaterial::get_emissiveTexture()
@@ -186,7 +186,7 @@ void PBRBaseSimpleMaterial::set_emissiveTexture(const BaseTexturePtr& value)
   }
 
   _emissiveTexture = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 float PBRBaseSimpleMaterial::get_occlusionStrength() const
@@ -201,7 +201,7 @@ void PBRBaseSimpleMaterial::set_occlusionStrength(float value)
   }
 
   _ambientTextureStrength = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 BaseTexturePtr& PBRBaseSimpleMaterial::get_occlusionTexture()
@@ -216,7 +216,7 @@ void PBRBaseSimpleMaterial::set_occlusionTexture(const BaseTexturePtr& value)
   }
 
   _ambientTexture = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 float PBRBaseSimpleMaterial::get_alphaCutOff() const
@@ -231,7 +231,7 @@ void PBRBaseSimpleMaterial::set_alphaCutOff(float value)
   }
 
   _alphaCutOff = value;
-  _markAllSubMeshesAsLightsDirty();
+  _markAllSubMeshesAsTexturesDirty();
 }
 
 bool PBRBaseSimpleMaterial::get_doubleSided() const
