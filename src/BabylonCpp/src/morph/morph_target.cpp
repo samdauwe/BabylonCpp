@@ -46,11 +46,11 @@ void MorphTarget::set_influence(float iInfluence)
     return;
   }
 
-  float previous = _influence;
-  _influence     = iInfluence;
+  auto previous = _influence;
+  _influence    = iInfluence;
 
   if (onInfluenceChanged.hasObservers()) {
-    bool value = (previous == 0.f || iInfluence == 0.f);
+    auto value = (previous == 0.f || iInfluence == 0.f);
     onInfluenceChanged.notifyObservers(&value);
   }
 }
@@ -91,7 +91,7 @@ void MorphTarget::setPositions(const Float32Array& data)
   _positions = data;
 
   if (hadPositions != hasPositions) {
-    _onDataLayoutChanged.notifyObservers();
+    _onDataLayoutChanged.notifyObservers(nullptr);
   }
 }
 
@@ -107,7 +107,7 @@ void MorphTarget::setNormals(const Float32Array& data)
   _normals = data;
 
   if (hadNormals != hasNormals) {
-    _onDataLayoutChanged.notifyObservers();
+    _onDataLayoutChanged.notifyObservers(nullptr);
   }
 }
 
@@ -133,7 +133,7 @@ void MorphTarget::setTangents(const Float32Array& data)
   _tangents = data;
 
   if (hadTangents != hasTangents) {
-    _onDataLayoutChanged.notifyObservers();
+    _onDataLayoutChanged.notifyObservers(nullptr);
   }
 }
 

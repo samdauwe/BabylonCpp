@@ -23,10 +23,6 @@ MorphTargetManager::MorphTargetManager(Scene* scene)
     , _uniqueId{0}
 {
   _scene = scene ? scene : Engine::LastCreatedScene();
-
-  if (_scene) {
-    _uniqueId = _scene->getUniqueId();
-  }
 }
 
 MorphTargetManager::~MorphTargetManager()
@@ -36,7 +32,11 @@ MorphTargetManager::~MorphTargetManager()
 void MorphTargetManager::addToScene(
   const MorphTargetManagerPtr& newMorphTargetManager)
 {
-  _scene->morphTargetManagers.emplace_back(newMorphTargetManager);
+  if (_scene) {
+    _scene->morphTargetManagers.emplace_back(newMorphTargetManager);
+
+    _uniqueId = _scene->getUniqueId();
+  }
 }
 
 size_t MorphTargetManager::get_uniqueId() const
