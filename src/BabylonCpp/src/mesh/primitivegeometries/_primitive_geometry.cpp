@@ -47,10 +47,9 @@ void _PrimitiveGeometry::setAllVerticesData(VertexData* vertexData,
   Geometry::setAllVerticesData(vertexData, false);
 }
 
-AbstractMesh*
-_PrimitiveGeometry::setVerticesData(unsigned int kind, const Float32Array& data,
-                                    bool /*updatable*/,
-                                    const std::optional<size_t>& /*stride*/)
+AbstractMesh* _PrimitiveGeometry::setVerticesData(
+  const std::string& kind, const Float32Array& data, bool /*updatable*/,
+  const std::optional<size_t>& /*stride*/)
 {
   if (!_beingRegenerated) {
     return nullptr;

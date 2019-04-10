@@ -18,6 +18,7 @@ class SubMesh;
 class VertexBuffer;
 using BoundingBoxRendererPtr = std::shared_ptr<BoundingBoxRenderer>;
 using ShaderMaterialPtr      = std::shared_ptr<ShaderMaterial>;
+using VertexBufferPtr        = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -122,8 +123,7 @@ public:
 
 private:
   ShaderMaterialPtr _colorShader;
-  std::vector<std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<std::string, VertexBuffer*> _vertexBuffersMap;
+  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
 
 }; // end of class BoundingBoxRenderer

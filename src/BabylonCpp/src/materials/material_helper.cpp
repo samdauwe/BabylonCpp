@@ -514,17 +514,14 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
     auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
     for (unsigned int index = 0; index < influencers; ++index) {
       const auto indexStr = std::to_string(index);
-      attribs.emplace_back(std::string(VertexBuffer::PositionKindChars)
-                           + indexStr);
+      attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
 
       if (normal) {
-        attribs.emplace_back(std::string(VertexBuffer::NormalKindChars)
-                             + indexStr);
+        attribs.emplace_back(VertexBuffer::NormalKind + indexStr);
       }
 
       if (tangent) {
-        attribs.emplace_back(std::string(VertexBuffer::TangentKindChars)
-                             + indexStr);
+        attribs.emplace_back(VertexBuffer::TangentKind + indexStr);
       }
 
       if (attribs.size() > maxAttributesCount) {
@@ -543,11 +540,11 @@ void MaterialHelper::PrepareAttributesForBones(
   if (defines.intDef["NUM_BONE_INFLUENCERS"] > 0) {
     fallbacks.addCPUSkinningFallback(0, mesh);
 
-    attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
-    attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
+    attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
+    attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
     if (defines.intDef["NUM_BONE_INFLUENCERS"] > 4) {
-      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
-      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
+      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKind);
+      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKind);
     }
   }
 }
@@ -556,10 +553,10 @@ void MaterialHelper::PrepareAttributesForInstances(
   std::vector<std::string>& attribs, MaterialDefines& defines)
 {
   if (defines["INSTANCES"]) {
-    attribs.emplace_back(VertexBuffer::World0KindChars);
-    attribs.emplace_back(VertexBuffer::World1KindChars);
-    attribs.emplace_back(VertexBuffer::World2KindChars);
-    attribs.emplace_back(VertexBuffer::World3KindChars);
+    attribs.emplace_back(VertexBuffer::World0Kind);
+    attribs.emplace_back(VertexBuffer::World1Kind);
+    attribs.emplace_back(VertexBuffer::World2Kind);
+    attribs.emplace_back(VertexBuffer::World3Kind);
   }
 }
 
@@ -567,10 +564,10 @@ void MaterialHelper::PrepareAttributesForInstances(
   std::vector<std::string>& attribs, std::vector<std::string>& defines)
 {
   if (stl_util::contains(defines, "INSTANCES")) {
-    attribs.emplace_back(VertexBuffer::World0KindChars);
-    attribs.emplace_back(VertexBuffer::World1KindChars);
-    attribs.emplace_back(VertexBuffer::World2KindChars);
-    attribs.emplace_back(VertexBuffer::World3KindChars);
+    attribs.emplace_back(VertexBuffer::World0Kind);
+    attribs.emplace_back(VertexBuffer::World1Kind);
+    attribs.emplace_back(VertexBuffer::World2Kind);
+    attribs.emplace_back(VertexBuffer::World3Kind);
   }
 }
 

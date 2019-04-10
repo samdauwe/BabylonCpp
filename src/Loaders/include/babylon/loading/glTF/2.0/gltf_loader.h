@@ -459,10 +459,10 @@ private:
   Float32Array& _loadFloatAccessorAsync(const std::string& context,
                                         IAccessor& accessor);
   BufferPtr _loadVertexBufferViewAsync(IBufferView& bufferView,
-                                       unsigned int kind);
+                                       const std::string& kind);
   VertexBufferPtr& _loadVertexAccessorAsync(const std::string& context,
                                             IAccessor& accessor,
-                                            unsigned int kind);
+                                            const std::string& kind);
   void _loadMaterialMetallicRoughnessPropertiesAsync(
     const std::string& context,
     std::optional<IMaterialPbrMetallicRoughness> properties = std::nullopt,

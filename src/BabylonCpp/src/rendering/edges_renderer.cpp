@@ -99,7 +99,6 @@ void EdgesRenderer::dispose(bool /*doNotRecurse*/,
   }
 
   _buffers.clear();
-  _bufferPtrs.clear();
 
   _source->getScene()->getEngine()->_releaseBuffer(_ib.get());
   _lineShader->dispose();
@@ -355,14 +354,10 @@ void EdgesRenderer::_generateEdgesLines()
   // Merge into a single mesh
   auto engine = _source->getScene()->getEngine();
 
-  _buffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
+  _buffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
     engine, _linesPositions, VertexBuffer::PositionKind, false);
-  _buffers[VertexBuffer::NormalKind] = std::make_unique<VertexBuffer>(
+  _buffers[VertexBuffer::NormalKind] = std::make_shared<VertexBuffer>(
     engine, _linesNormals, VertexBuffer::NormalKind, false, false, 4);
-  _bufferPtrs[VertexBuffer::PositionKindChars]
-    = _buffers[VertexBuffer::PositionKind].get();
-  _bufferPtrs[VertexBuffer::NormalKindChars]
-    = _buffers[VertexBuffer::NormalKind].get();
 
   _ib = engine->createIndexBuffer(_linesIndices);
 
@@ -393,7 +388,7 @@ void EdgesRenderer::render()
   }
 
   // VBOs
-  engine->bindBuffers(_bufferPtrs, _ib.get(), _lineShader->getEffect());
+  engine->bindBuffers(_buffers, _ib.get(), _lineShader->getEffect());
 
   scene->resetCachedMaterial();
   _lineShader->setColor4("color", _source->edgesColor);

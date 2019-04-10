@@ -163,7 +163,7 @@ void Geometry::setAllVerticesData(VertexData* vertexData, bool updatable)
   notifyUpdate();
 }
 
-AbstractMesh* Geometry::setVerticesData(unsigned int kind,
+AbstractMesh* Geometry::setVerticesData(const std::string& kind,
                                         const Float32Array& data,
                                         bool updatable,
                                         const std::optional<size_t>& stride)
@@ -176,7 +176,7 @@ AbstractMesh* Geometry::setVerticesData(unsigned int kind,
   return nullptr;
 }
 
-void Geometry::removeVerticesData(unsigned int kind)
+void Geometry::removeVerticesData(const std::string& kind)
 {
   if (stl_util::contains(_vertexBuffers, kind) && _vertexBuffers[kind]) {
     _vertexBuffers[kind]->dispose();
@@ -228,7 +228,7 @@ void Geometry::setVerticesBuffer(const VertexBufferPtr& buffer,
   }
 }
 
-void Geometry::updateVerticesDataDirectly(unsigned int kind,
+void Geometry::updateVerticesDataDirectly(const std::string& kind,
                                           const Float32Array& data,
                                           size_t offset, bool useBytes)
 {
@@ -242,7 +242,7 @@ void Geometry::updateVerticesDataDirectly(unsigned int kind,
   notifyUpdate(kind);
 }
 
-AbstractMesh* Geometry::updateVerticesData(unsigned int kind,
+AbstractMesh* Geometry::updateVerticesData(const std::string& kind,
                                            const Float32Array& data,
                                            bool updateExtends,
                                            bool /*makeItUnique*/)
@@ -323,8 +323,8 @@ size_t Geometry::getTotalVertices() const
   return _totalVertices;
 }
 
-Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared,
-                                       bool forceCopy)
+Float32Array Geometry::getVerticesData(const std::string& kind,
+                                       bool copyWhenShared, bool forceCopy)
 {
   auto vertexBuffer = getVertexBuffer(kind);
   if (!vertexBuffer) {
@@ -356,7 +356,7 @@ Float32Array Geometry::getVerticesData(unsigned int kind, bool copyWhenShared,
   return data;
 }
 
-bool Geometry::isVertexBufferUpdatable(unsigned int kind) const
+bool Geometry::isVertexBufferUpdatable(const std::string& kind) const
 {
   auto it = _vertexBuffers.find(kind);
 
@@ -367,38 +367,24 @@ bool Geometry::isVertexBufferUpdatable(unsigned int kind) const
   return it->second->isUpdatable();
 }
 
-VertexBufferPtr Geometry::getVertexBuffer(unsigned int kind) const
+VertexBufferPtr Geometry::getVertexBuffer(const std::string& kind)
 {
-  if (!isReady() || _vertexBuffers.empty()) {
+  if (!isReady() || _vertexBuffers.empty()
+      || !stl_util::contains(_vertexBuffers, kind)) {
     return nullptr;
   }
-
-  auto it = _vertexBuffers.find(kind);
-  if (it != _vertexBuffers.end()) {
-    return it->second;
-  }
-  else {
-    return nullptr;
-  }
+  return _vertexBuffers[kind];
 }
 
-std::unordered_map<std::string, VertexBuffer*> Geometry::getVertexBuffers()
+std::unordered_map<std::string, VertexBufferPtr> Geometry::getVertexBuffers()
 {
-  std::unordered_map<std::string, VertexBuffer*> vertexBuffers;
-
   if (!isReady()) {
-    return vertexBuffers;
+    return std::unordered_map<std::string, VertexBufferPtr>();
   }
-
-  for (const auto& item : _vertexBuffers) {
-    const std::string kind = VertexBuffer::KindAsString(item.first);
-    vertexBuffers[kind]    = item.second.get();
-  }
-
-  return vertexBuffers;
+  return _vertexBuffers;
 }
 
-bool Geometry::isVerticesDataPresent(unsigned int kind) const
+bool Geometry::isVerticesDataPresent(const std::string& kind) const
 {
   if (_vertexBuffers.empty()) {
     if (!_delayInfo.empty()) {
@@ -407,12 +393,12 @@ bool Geometry::isVerticesDataPresent(unsigned int kind) const
     }
     return false;
   }
-  return (_vertexBuffers.find(kind) != _vertexBuffers.end());
+  return stl_util::contains(_vertexBuffers, kind);
 }
 
-Uint32Array Geometry::getVerticesDataKinds()
+std::vector<std::string> Geometry::getVerticesDataKinds()
 {
-  Uint32Array result;
+  std::vector<std::string> result;
   if (_vertexBuffers.empty() && !_delayInfo.empty()) {
     for (auto& kind : _delayInfo) {
       result.emplace_back(kind);
@@ -573,7 +559,7 @@ void Geometry::_applyToMesh(Mesh* mesh)
 
   // vertexBuffers
   for (auto& item : _vertexBuffers) {
-    const unsigned int kind = item.first;
+    const auto& kind = item.first;
     if (numOfMeshes == 1) {
       _vertexBuffers[kind]->create();
     }
@@ -584,8 +570,6 @@ void Geometry::_applyToMesh(Mesh* mesh)
     }
 
     if (kind == VertexBuffer::PositionKind) {
-      mesh->_resetPointsArrayCache();
-
       if (!_extend) {
         _updateExtend(Float32Array());
       }
@@ -610,14 +594,10 @@ void Geometry::_applyToMesh(Mesh* mesh)
   }
 
   // morphTargets
-#if 0
   mesh->_syncGeometryWithMorphTargetManager();
-#else
-  // TODO FIXME
-#endif
 }
 
-void Geometry::notifyUpdate(unsigned int kind)
+void Geometry::notifyUpdate(const std::string& kind)
 {
   if (onGeometryUpdated) {
     onGeometryUpdated(this, kind);
@@ -771,13 +751,14 @@ GeometryPtr Geometry::copy(const std::string& iId)
 
   bool updatable    = false;
   bool stopChecking = false;
-  unsigned int kind = 0;
+  std::string kind;
   for (auto& vertexBuffer : _vertexBuffers) {
     kind      = vertexBuffer.first;
     auto data = getVerticesData(kind);
     vertexData->set(data, kind);
     if (!stopChecking) {
       auto vb = getVertexBuffer(kind);
+
       if (vb) {
         updatable    = getVertexBuffer(kind)->isUpdatable();
         stopChecking = !updatable;

@@ -33,6 +33,7 @@ using MeshPtr                = std::shared_ptr<Mesh>;
 using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
+using VertexBufferPtr        = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -322,7 +323,7 @@ protected:
   EmissiveTextureAndColor _emissiveTextureAndColor;
 
 private:
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   std::string _cachedDefines;
   EffectPtr _effectLayerMapGenerationEffect;

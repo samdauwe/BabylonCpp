@@ -37,7 +37,7 @@ public:
    * @param data a linear array of floating numbers
    * @param kind the type of data that is being set, eg positions, colors etc
    */
-  void set(const Float32Array& data, unsigned int kind);
+  void set(const Float32Array& data, const std::string& kind);
 
   /**
    * @brief Associates the vertexData to the passed Mesh.

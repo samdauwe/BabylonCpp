@@ -69,9 +69,8 @@ ProceduralTexture::ProceduralTexture(
                         -1.f, -1.f, //
                         1.f,  -1.f};
 
-  _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(
-      _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
+    _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
   Uint32Array indices{0, 1, 2, 0, 2, 3};
@@ -135,9 +134,8 @@ ProceduralTexture::ProceduralTexture(const std::string& iName, const Size& size,
                         -1.f, -1.f, //
                         1.f,  -1.f};
 
-  _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(
-      _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
+    _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
 }
@@ -180,8 +178,8 @@ void ProceduralTexture::_createIndexBuffer()
 
 void ProceduralTexture::_rebuild()
 {
-  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
-    auto& vb = _vertexBuffers[VertexBuffer::PositionKindChars];
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
+    auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
     if (vb) {
       vb->_rebuild();
     }
@@ -238,7 +236,7 @@ bool ProceduralTexture::isReady()
   _cachedDefines = defines;
 
   EffectCreationOptions options;
-  options.attributes    = {VertexBuffer::PositionKindChars};
+  options.attributes    = {VertexBuffer::PositionKind};
   options.uniformsNames = _uniforms;
   options.samplers      = _samplers;
   options.defines       = defines;
@@ -503,8 +501,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
       engine->bindFramebuffer(_texture, face, std::nullopt, std::nullopt, true);
 
       // VBOs
-      engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
-                          _indexBuffer.get(), _effect);
+      engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), _effect);
 
       _effect->setFloat("face", static_cast<float>(face));
 
@@ -526,8 +523,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     engine->bindFramebuffer(_texture, 0u, std::nullopt, std::nullopt, true);
 
     // VBOs
-    engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
-                        _indexBuffer.get(), _effect);
+    engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), _effect);
 
     // Clear
     if (autoClear) {
@@ -581,11 +577,11 @@ void ProceduralTexture::dispose()
                    }),
     scene->proceduralTextures.end());
 
-  auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
+  auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
   if (vertexBuffer) {
     vertexBuffer->dispose();
     vertexBuffer = nullptr;
-    _vertexBuffers.erase(VertexBuffer::PositionKindChars);
+    _vertexBuffers.erase(VertexBuffer::PositionKind);
   }
 
   if (_indexBuffer && _engine->_releaseBuffer(_indexBuffer.get())) {

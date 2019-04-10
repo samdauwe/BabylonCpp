@@ -745,30 +745,29 @@ void ParticleSystem::_createVertexBuffers()
   auto positions
     = _vertexBuffer->createVertexBuffer(VertexBuffer::PositionKind, dataOffset,
                                         3, _vertexBufferSize, _useInstancing);
-  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(positions);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::move(positions);
   dataOffset += 3;
 
   auto colors = _vertexBuffer->createVertexBuffer(
     VertexBuffer::ColorKind, dataOffset, 4, _vertexBufferSize, _useInstancing);
-  _vertexBuffers[VertexBuffer::ColorKindChars] = std::move(colors);
+  _vertexBuffers[VertexBuffer::ColorKind] = std::move(colors);
   dataOffset += 4;
 
   auto options = _vertexBuffer->createVertexBuffer(
     VertexBuffer::AngleKind, dataOffset, 1, _vertexBufferSize, _useInstancing);
-  _vertexBuffers[VertexBuffer::AngleKindChars] = std::move(options);
+  _vertexBuffers[VertexBuffer::AngleKind] = std::move(options);
   dataOffset += 1;
 
   auto size = _vertexBuffer->createVertexBuffer(
     VertexBuffer::SizeKind, dataOffset, 2, _vertexBufferSize, _useInstancing);
-  _vertexBuffers[VertexBuffer::SizeKindChars] = std::move(size);
+  _vertexBuffers[VertexBuffer::SizeKind] = std::move(size);
   dataOffset += 2;
 
   if (_isAnimationSheetEnabled) {
     auto cellIndexBuffer = _vertexBuffer->createVertexBuffer(
       VertexBuffer::CellIndexKind, dataOffset, 1, _vertexBufferSize,
       _useInstancing);
-    _vertexBuffers[VertexBuffer::CellIndexKindChars]
-      = std::move(cellIndexBuffer);
+    _vertexBuffers[VertexBuffer::CellIndexKind] = std::move(cellIndexBuffer);
     dataOffset += 1;
   }
 
@@ -777,8 +776,7 @@ void ParticleSystem::_createVertexBuffers()
     auto directionBuffer = _vertexBuffer->createVertexBuffer(
       VertexBuffer::DirectionKind, dataOffset, 3, _vertexBufferSize,
       _useInstancing);
-    _vertexBuffers[VertexBuffer::DirectionKindChars]
-      = std::move(directionBuffer);
+    _vertexBuffers[VertexBuffer::DirectionKind] = std::move(directionBuffer);
     dataOffset += 3;
   }
 
@@ -786,8 +784,7 @@ void ParticleSystem::_createVertexBuffers()
     auto rampDataBuffer = _vertexBuffer->createVertexBuffer(
       VertexBuffer::RemapDataKind, dataOffset, 4, _vertexBufferSize,
       _useInstancing);
-    _vertexBuffers[VertexBuffer::RemapDataKindChars]
-      = std::move(rampDataBuffer);
+    _vertexBuffers[VertexBuffer::RemapDataKind] = std::move(rampDataBuffer);
     dataOffset += 4;
   }
 
@@ -803,7 +800,7 @@ void ParticleSystem::_createVertexBuffers()
                                           2, _vertexBufferSize, _useInstancing);
     dataOffset += 2;
   }
-  _vertexBuffers[VertexBuffer::OffsetKindChars] = std::move(offsets);
+  _vertexBuffers[VertexBuffer::OffsetKind] = std::move(offsets);
 }
 
 void ParticleSystem::_createIndexBuffer()
@@ -1310,9 +1307,9 @@ void ParticleSystem::_update(int newParticles)
 std::vector<std::string> ParticleSystem::_GetAttributeNamesOrOptions(
   bool isAnimationSheetEnabled, bool isBillboardBased, bool useRampGradients)
 {
-  std::vector<std::string> attributeNamesOrOptions{
-    VertexBuffer::PositionKindChars, VertexBuffer::ColorKindChars, "angle",
-    "offset", "size"};
+  std::vector<std::string> attributeNamesOrOptions{VertexBuffer::PositionKind,
+                                                   VertexBuffer::ColorKind,
+                                                   "angle", "offset", "size"};
 
   if (isAnimationSheetEnabled) {
     attributeNamesOrOptions.emplace_back("cellIndex");
@@ -1634,11 +1631,7 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   }
 
   // VBOs
-  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
-  for (auto& item : _vertexBuffers) {
-    vertexBuffersTmp[item.first] = item.second.get();
-  }
-  engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), effect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
 
   // image processing
   if (_imageProcessingConfiguration

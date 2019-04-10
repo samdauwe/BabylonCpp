@@ -63,8 +63,9 @@ public:
    * @returns a float array or a Float32Array of the requested kind of data :
    * positons, normals, uvs, etc.
    */
-  Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
-                               bool forceCopy = false) override;
+  Float32Array getVerticesData(const std::string& kind,
+                               bool copyWhenShared = false,
+                               bool forceCopy      = false) override;
 
   /**
    * @brief Sets the vertex data of the mesh geometry for the requested `kind`.
@@ -96,10 +97,10 @@ public:
    *
    * @returns The Mesh.
    */
-  AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                                bool updatable = false,
-                                const std::optional<size_t>& stride
-                                = std::nullopt) override;
+  AbstractMesh*
+  setVerticesData(const std::string& kind, const Float32Array& data,
+                  bool updatable                      = false,
+                  const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
    * @brief Updates the existing vertex data of the mesh geometry for the
@@ -129,7 +130,8 @@ public:
    *
    * @returns The Mesh.
    */
-  AbstractMesh* updateVerticesData(unsigned int kind, const Float32Array& data,
+  AbstractMesh* updateVerticesData(const std::string& kind,
+                                   const Float32Array& data,
                                    bool updateExtends = false,
                                    bool makeItUnique  = false) override;
 
@@ -150,7 +152,7 @@ public:
   /**
    * @brief Returns if the mesh owns the requested kind of data.
    */
-  bool isVerticesDataPresent(unsigned int kind) const override;
+  bool isVerticesDataPresent(const std::string& kind) const override;
 
   /**
    * @brief Returns an array of indices (IndicesArray).

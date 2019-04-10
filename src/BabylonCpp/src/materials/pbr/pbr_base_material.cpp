@@ -510,26 +510,26 @@ EffectPtr PBRBaseMaterial::_prepareEffect(
   }
 
   // Attributes
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+  std::vector<std::string> attribs{VertexBuffer::PositionKind};
 
   if (defines["NORMAL"]) {
-    attribs.emplace_back(VertexBuffer::NormalKindChars);
+    attribs.emplace_back(VertexBuffer::NormalKind);
   }
 
   if (defines["TANGENT"]) {
-    attribs.emplace_back(VertexBuffer::TangentKindChars);
+    attribs.emplace_back(VertexBuffer::TangentKind);
   }
 
   if (defines["UV1"]) {
-    attribs.emplace_back(VertexBuffer::UVKindChars);
+    attribs.emplace_back(VertexBuffer::UVKind);
   }
 
   if (defines["UV2"]) {
-    attribs.emplace_back(VertexBuffer::UV2KindChars);
+    attribs.emplace_back(VertexBuffer::UV2Kind);
   }
 
   if (defines["VERTEXCOLOR"]) {
-    attribs.emplace_back(VertexBuffer::ColorKindChars);
+    attribs.emplace_back(VertexBuffer::ColorKind);
   }
 
   MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines, *fallbacks);

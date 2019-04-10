@@ -97,8 +97,8 @@ bool GridMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     scene->resetCachedMaterial();
 
     // Attributes
-    std::vector<std::string> attribs{VertexBuffer::PositionKindChars,
-                                     VertexBuffer::NormalKindChars};
+    std::vector<std::string> attribs{VertexBuffer::PositionKind,
+                                     VertexBuffer::NormalKind};
 
     // Defines
     const std::string join = defines.toString();

@@ -102,15 +102,15 @@ bool InstancedMesh::isReady(bool completeCheck, bool /*forceInstanceSupport*/)
   return _sourceMesh->isReady(completeCheck, true);
 }
 
-Float32Array InstancedMesh::getVerticesData(unsigned int kind,
+Float32Array InstancedMesh::getVerticesData(const std::string& kind,
                                             bool copyWhenShared, bool forceCopy)
 {
   return _sourceMesh->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
 AbstractMesh*
-InstancedMesh::setVerticesData(unsigned int kind, const Float32Array& data,
-                               bool updatable,
+InstancedMesh::setVerticesData(const std::string& kind,
+                               const Float32Array& data, bool updatable,
                                const std::optional<size_t>& stride)
 {
   if (sourceMesh()) {
@@ -119,7 +119,7 @@ InstancedMesh::setVerticesData(unsigned int kind, const Float32Array& data,
   return sourceMesh();
 }
 
-AbstractMesh* InstancedMesh::updateVerticesData(unsigned int kind,
+AbstractMesh* InstancedMesh::updateVerticesData(const std::string& kind,
                                                 const Float32Array& data,
                                                 bool updateExtends,
                                                 bool makeItUnique)
@@ -140,7 +140,7 @@ AbstractMesh* InstancedMesh::setIndices(const IndicesArray& indices,
   return sourceMesh();
 }
 
-bool InstancedMesh::isVerticesDataPresent(unsigned int kind) const
+bool InstancedMesh::isVerticesDataPresent(const std::string& kind) const
 {
   return _sourceMesh->isVerticesDataPresent(kind);
 }

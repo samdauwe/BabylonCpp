@@ -61,9 +61,8 @@ LensFlareSystem::LensFlareSystem(const std::string iName,
                            -1.f, -1.f, //
                            1.f,  -1.f};
 
-  _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(
-      engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
+    engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   // Indices
   Uint32Array indices = {
@@ -78,7 +77,7 @@ LensFlareSystem::LensFlareSystem(const std::string iName,
 
   // Effects
   EffectCreationOptions effectCreationOptions;
-  effectCreationOptions.attributes    = {VertexBuffer::PositionKindChars};
+  effectCreationOptions.attributes    = {VertexBuffer::PositionKind};
   effectCreationOptions.uniformsNames = {"color", "viewportMatrix"};
   effectCreationOptions.samplers      = {"textureSampler"};
 
@@ -285,12 +284,7 @@ bool LensFlareSystem::render()
   engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
 
   // VBOs
-  std::unordered_map<std::string, VertexBuffer*> vertexBuffersTmp;
-  vertexBuffersTmp.reserve(_vertexBuffers.size());
-  for (const auto& item : _vertexBuffers) {
-    vertexBuffersTmp[item.first] = item.second.get();
-  }
-  engine->bindBuffers(vertexBuffersTmp, _indexBuffer.get(), _effect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), _effect);
 
   // Flares
   for (auto& flare : lensFlares) {
@@ -332,11 +326,11 @@ bool LensFlareSystem::render()
 
 void LensFlareSystem::dispose()
 {
-  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
-    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
+    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
     if (vertexBuffer) {
       vertexBuffer->dispose();
-      _vertexBuffers.erase(VertexBuffer::PositionKindChars);
+      _vertexBuffers.erase(VertexBuffer::PositionKind);
       vertexBuffer = nullptr;
     }
   }

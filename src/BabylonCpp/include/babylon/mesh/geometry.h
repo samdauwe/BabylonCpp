@@ -104,16 +104,16 @@ public:
    * @param stride defines the stride to use (0 by default). This value is
    * deduced from the kind value if not specified
    */
-  AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                                bool updatable = false,
-                                const std::optional<size_t>& stride
-                                = std::nullopt) override;
+  AbstractMesh*
+  setVerticesData(const std::string& kind, const Float32Array& data,
+                  bool updatable                      = false,
+                  const std::optional<size_t>& stride = std::nullopt) override;
 
   /**
    * @brief Removes a specific vertex data.
    * @param kind defines the data kind (Position, normal, etc...)
    */
-  void removeVerticesData(unsigned int kind);
+  void removeVerticesData(const std::string& kind);
 
   /**
    * @brief Affect a vertex buffer to the geometry. the vertexBuffer.getKind()
@@ -137,8 +137,9 @@ public:
    * data
    * @param useBytes set to true if the offset is in bytes
    */
-  void updateVerticesDataDirectly(unsigned int kind, const Float32Array& data,
-                                  size_t offset, bool useBytes = false);
+  void updateVerticesDataDirectly(const std::string& kind,
+                                  const Float32Array& data, size_t offset,
+                                  bool useBytes = false);
 
   /**
    * @brief Update a specific vertex buffer.
@@ -148,7 +149,8 @@ public:
    * @param updateExtends defines if the geometry extends must be recomputed
    * (false by default)
    */
-  AbstractMesh* updateVerticesData(unsigned int kind, const Float32Array& data,
+  AbstractMesh* updateVerticesData(const std::string& kind,
+                                   const Float32Array& data,
                                    bool updateExtends = false,
                                    bool makeItUnique  = false) override;
 
@@ -173,8 +175,9 @@ public:
    * be cloned upon returning it
    * @returns a float array containing vertex data
    */
-  Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
-                               bool forceCopy = false) override;
+  Float32Array getVerticesData(const std::string& kind,
+                               bool copyWhenShared = false,
+                               bool forceCopy      = false) override;
 
   /**
    * @brief Returns a boolean defining if the vertex data for the requested
@@ -182,34 +185,34 @@ public:
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns true if the vertex buffer with the specified kind is updatable
    */
-  bool isVertexBufferUpdatable(unsigned int kind) const;
+  bool isVertexBufferUpdatable(const std::string& kind) const;
 
   /**
    * @brief Gets a specific vertex buffer.
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns a VertexBuffer
    */
-  VertexBufferPtr getVertexBuffer(unsigned int kind) const;
+  VertexBufferPtr getVertexBuffer(const std::string& kind);
 
   /**
    * @brief Gets a specific vertex buffer.
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns a VertexBuffer
    */
-  std::unordered_map<std::string, VertexBuffer*> getVertexBuffers();
+  std::unordered_map<std::string, VertexBufferPtr> getVertexBuffers();
 
   /**
    * @brief Gets a boolean indicating if specific vertex buffer is present.
    * @param kind defines the data kind (Position, normal, etc...)
    * @returns true if data is present
    */
-  bool isVerticesDataPresent(unsigned int kind) const override;
+  bool isVerticesDataPresent(const std::string& kind) const override;
 
   /**
    * @brief Gets a list of all attached data kinds (Position, normal, etc...).
    * @returns a list of string containing all kinds
    */
-  Uint32Array getVerticesDataKinds();
+  std::vector<std::string> getVerticesDataKinds();
 
   /**
    * @brief Update index buffer.
@@ -416,7 +419,7 @@ private:
   void _updateBoundingInfo(bool updateExtends, const Float32Array& data);
   void _updateExtend(Float32Array data);
   void _applyToMesh(Mesh* mesh);
-  void notifyUpdate(unsigned int kind = 1);
+  void notifyUpdate(const std::string& kind = "");
   void _queueLoad(Scene* scene, const std::function<void()>& onLoaded);
   void _disposeVertexArrayObjects();
 
@@ -441,16 +444,17 @@ public:
   /**
    * Callback called when the geometry is updated
    */
-  std::function<void(Geometry* geometry, unsigned int kind)> onGeometryUpdated;
+  std::function<void(Geometry* geometry, const std::string& kind)>
+    onGeometryUpdated;
 
   /** Hidden */
   IndicesArray _indices;
   /** Hidden */
-  std::unordered_map<unsigned int, VertexBufferPtr> _vertexBuffers;
+  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   /** Hidden */
-  Uint32Array _delayInfo;
+  std::vector<std::string> _delayInfo;
   /** Hidden */
-  Uint32Array _delayInfoKinds;
+  std::vector<std::string> _delayInfoKinds;
   /** Hidden */
   std::unique_ptr<BoundingInfo> _boundingInfo;
   /** Hidden */

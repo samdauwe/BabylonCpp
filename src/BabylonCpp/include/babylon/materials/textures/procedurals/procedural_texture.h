@@ -12,6 +12,7 @@ class ProceduralTexture;
 class VertexBuffer;
 using EffectPtr            = std::shared_ptr<Effect>;
 using ProceduralTexturePtr = std::shared_ptr<ProceduralTexture>;
+using VertexBufferPtr      = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -304,7 +305,7 @@ private:
   bool _doNotChangeAspectRatio;
   int _currentRefreshId;
   float _refreshRate;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   std::vector<std::string> _uniforms;
   std::vector<std::string> _samplers;

@@ -22,6 +22,7 @@ using CameraPtr        = std::shared_ptr<Camera>;
 using EffectPtr        = std::shared_ptr<Effect>;
 using SpriteManagerPtr = std::shared_ptr<SpriteManager>;
 using TexturePtr       = std::shared_ptr<Texture>;
+using VertexBufferPtr  = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -156,8 +157,7 @@ private:
   Scene* _scene;
   Float32Array _vertexData;
   std::unique_ptr<Buffer> _buffer;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<std::string, VertexBuffer*> _vertexBufferPtrs;
+  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   EffectPtr _effectBase;
   EffectPtr _effectFog;

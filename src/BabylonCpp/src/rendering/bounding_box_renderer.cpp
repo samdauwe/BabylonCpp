@@ -84,7 +84,7 @@ void BoundingBoxRenderer::_prepareResources()
   }
 
   IShaderMaterialOptions shaderMaterialOptions;
-  shaderMaterialOptions.attributes = {VertexBuffer::PositionKindChars};
+  shaderMaterialOptions.attributes = {VertexBuffer::PositionKind};
   shaderMaterialOptions.uniforms   = {"world", "viewProjection", "color"};
 
   _colorShader
@@ -92,12 +92,9 @@ void BoundingBoxRenderer::_prepareResources()
 
   auto engine = scene->getEngine();
   BoxOptions options(1.f);
-  auto boxdata = VertexData::CreateBox(options);
-  _vertexBuffers.resize(VertexBuffer::PositionKind + 1);
-  _vertexBuffers[VertexBuffer::PositionKind] = std::make_unique<VertexBuffer>(
+  auto boxdata                               = VertexData::CreateBox(options);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
     engine, boxdata->positions, VertexBuffer::PositionKind, false);
-  _vertexBuffersMap[VertexBuffer::PositionKindChars]
-    = _vertexBuffers[VertexBuffer::PositionKind].get();
   _createIndexBuffer();
 }
 
@@ -111,7 +108,7 @@ void BoundingBoxRenderer::_createIndexBuffer()
 
 void BoundingBoxRenderer::rebuild()
 {
-  if (VertexBuffer::PositionKind < _vertexBuffers.size()) {
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
     auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
     if (vb) {
       vb->_rebuild();
@@ -155,7 +152,7 @@ void BoundingBoxRenderer::render(int renderingGroupId)
           .multiply(boundingBox.getWorldMatrix());
 
     // VBOs
-    engine->bindBuffers(_vertexBuffersMap, _indexBuffer.get(),
+    engine->bindBuffers(_vertexBuffers, _indexBuffer.get(),
                         _colorShader->getEffect());
 
     if (showBackLines) {
@@ -207,7 +204,7 @@ void BoundingBoxRenderer::renderOcclusionBoundingBox(AbstractMesh* mesh)
         .multiply(Matrix::Translation(median.x, median.y, median.z))
         .multiply(boundingBox.getWorldMatrix());
 
-  engine->bindBuffers(_vertexBuffersMap, _indexBuffer.get(),
+  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(),
                       _colorShader->getEffect());
 
   engine->setDepthFunctionToLess();
@@ -232,12 +229,12 @@ void BoundingBoxRenderer::dispose()
 
   _colorShader->dispose();
 
-  if (stl_util::contains(_vertexBuffersMap, VertexBuffer::PositionKindChars)) {
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
     auto& buffer = _vertexBuffers[VertexBuffer::PositionKind];
     if (buffer) {
       buffer->dispose();
-      buffer.reset(nullptr);
-      _vertexBuffersMap.erase(VertexBuffer::PositionKindChars);
+      buffer = nullptr;
+      _vertexBuffers.erase(VertexBuffer::PositionKind);
     }
   }
 

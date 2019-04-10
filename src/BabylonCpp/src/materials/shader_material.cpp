@@ -265,7 +265,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   }
 
   if (mesh && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
-    attribs.emplace_back(VertexBuffer::ColorKindChars);
+    attribs.emplace_back(VertexBuffer::ColorKind);
     defines.emplace_back("#define VERTEXCOLOR");
   }
 
@@ -277,11 +277,11 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
   // Bones
   if (mesh && mesh->useBones() && mesh->computeBonesUsingShaders()
       && mesh->skeleton()) {
-    attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
-    attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
+    attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
+    attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
     if (mesh->numBoneInfluencers() > 4) {
-      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
-      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
+      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKind);
+      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKind);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));

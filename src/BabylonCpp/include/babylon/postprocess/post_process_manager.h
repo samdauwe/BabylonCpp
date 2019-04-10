@@ -15,6 +15,7 @@ class Scene;
 class VertexBuffer;
 using InternalTexturePtr = std::shared_ptr<InternalTexture>;
 using PostProcessPtr     = std::shared_ptr<PostProcess>;
+using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -97,8 +98,7 @@ private:
   Scene* _scene;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   Float32Array _vertexDeclaration;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
-  std::unordered_map<std::string, VertexBuffer*> _vertexBufferPtrs;
+  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
 
 }; // end of class PostProcessManager
 

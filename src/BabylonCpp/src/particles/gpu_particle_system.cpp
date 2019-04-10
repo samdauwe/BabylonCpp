@@ -567,8 +567,7 @@ void GPUParticleSystem::_reset()
 std::unique_ptr<GL::IGLVertexArrayObject>
 GPUParticleSystem::_createUpdateVAO(Buffer* source)
 {
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>>
-    updateVertexBuffers;
+  std::unordered_map<std::string, VertexBufferPtr> updateVertexBuffers;
   updateVertexBuffers["position"]
     = source->createVertexBuffer(VertexBuffer::PositionKind, 0, 3);
   updateVertexBuffers["age"]
@@ -628,8 +627,8 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
     offset += 3;
   }
 
-  auto vao = _engine->recordVertexArrayObject(
-    stl_util::to_raw_ptr_map(updateVertexBuffers), nullptr, _updateEffect);
+  auto vao = _engine->recordVertexArrayObject(updateVertexBuffers, nullptr,
+                                              _updateEffect);
   _engine->bindArrayBuffer(nullptr);
 
   return vao;
@@ -638,8 +637,7 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
 std::unique_ptr<GL::IGLVertexArrayObject>
 GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
 {
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>>
-    renderVertexBuffers;
+  std::unordered_map<std::string, VertexBufferPtr> renderVertexBuffers;
   auto attributesStrideSizeT      = static_cast<size_t>(_attributesStrideSize);
   renderVertexBuffers["position"] = source->createVertexBuffer(
     VertexBuffer::PositionKind, 0, 3, attributesStrideSizeT, true);
@@ -709,8 +707,8 @@ GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
   renderVertexBuffers["uv"]
     = spriteSource->createVertexBuffer(VertexBuffer::UVKind, 2, 2);
 
-  auto vao = _engine->recordVertexArrayObject(
-    stl_util::to_raw_ptr_map(renderVertexBuffers), nullptr, _renderEffect);
+  auto vao = _engine->recordVertexArrayObject(renderVertexBuffers, nullptr,
+                                              _renderEffect);
   _engine->bindArrayBuffer(nullptr);
 
   return vao;

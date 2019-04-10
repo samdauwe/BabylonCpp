@@ -31,130 +31,82 @@ public:
   /**
    * Positions
    */
-  static constexpr unsigned int PositionKind = 1;
-
+  static constexpr const char* PositionKind = "position";
   /**
    * Normals
    */
-  static constexpr unsigned int NormalKind = 2;
-
+  static constexpr const char* NormalKind = "normal";
   /**
    * Tangents
    */
-  static constexpr unsigned int TangentKind = 3;
-
+  static constexpr const char* TangentKind = "tangent";
   /**
    * Texture coordinates
    */
-  static constexpr unsigned int UVKind = 4;
-
+  static constexpr const char* UVKind = "uv";
   /**
    * Texture coordinates 2
    */
-  static constexpr unsigned int UV2Kind = 5;
-
+  static constexpr const char* UV2Kind = "uv2";
   /**
    * Texture coordinates 3
    */
-  static constexpr unsigned int UV3Kind = 6;
-
+  static constexpr const char* UV3Kind = "uv3";
   /**
    * Texture coordinates 4
    */
-  static constexpr unsigned int UV4Kind = 7;
-
+  static constexpr const char* UV4Kind = "uv4";
   /**
    * Texture coordinates 5
    */
-  static constexpr unsigned int UV5Kind = 8;
-
+  static constexpr const char* UV5Kind = "uv5";
   /**
    * Texture coordinates 6
    */
-  static constexpr unsigned int UV6Kind = 9;
-
+  static constexpr const char* UV6Kind = "uv6";
   /**
    * Colors
    */
-  static constexpr unsigned int ColorKind = 10;
-
+  static constexpr const char* ColorKind = "color";
   /**
    * Matrix indices (for bones)
    */
-  static constexpr unsigned int MatricesIndicesKind = 11;
-
+  static constexpr const char* MatricesIndicesKind = "matricesIndices";
   /**
    * Matrix weights (for bones)
    */
-  static constexpr unsigned int MatricesWeightsKind = 12;
-
+  static constexpr const char* MatricesWeightsKind = "matricesWeights";
   /**
    * Additional matrix indices (for bones)
    */
-  static constexpr unsigned int MatricesIndicesExtraKind = 13;
-
+  static constexpr const char* MatricesIndicesExtraKind
+    = "matricesIndicesExtra";
   /**
    * Additional matrix weights (for bones)
    */
-  static constexpr unsigned int MatricesWeightsExtraKind = 14;
-
-  static constexpr unsigned int World0Kind            = 15;
-  static constexpr unsigned int World1Kind            = 16;
-  static constexpr unsigned int World2Kind            = 17;
-  static constexpr unsigned int World3Kind            = 18;
-  static constexpr unsigned int CellInfoKind          = 19;
-  static constexpr unsigned int CellIndexKind         = 20;
-  static constexpr unsigned int OptionsKind           = 21;
-  static constexpr unsigned int AgeKind               = 22;
-  static constexpr unsigned int LifeKind              = 23;
-  static constexpr unsigned int VelocityKind          = 24;
-  static constexpr unsigned int DirectionKind         = 25;
-  static constexpr unsigned int InitialDirectionKind  = 26;
-  static constexpr unsigned int OffsetKind            = 27;
-  static constexpr unsigned int SeedKind              = 28;
-  static constexpr unsigned int SizeKind              = 29;
-  static constexpr unsigned int AngleKind             = 30;
-  static constexpr unsigned int CellStartOffsetKind   = 31;
-  static constexpr unsigned int NoiseCoordinates1Kind = 32;
-  static constexpr unsigned int NoiseCoordinates2Kind = 33;
-  static constexpr unsigned int RemapDataKind         = 34;
-
-  static constexpr const char* PositionKindChars        = "position";
-  static constexpr const char* NormalKindChars          = "normal";
-  static constexpr const char* TangentKindChars         = "tangent";
-  static constexpr const char* UVKindChars              = "uv";
-  static constexpr const char* UV2KindChars             = "uv2";
-  static constexpr const char* UV3KindChars             = "uv3";
-  static constexpr const char* UV4KindChars             = "uv4";
-  static constexpr const char* UV5KindChars             = "uv5";
-  static constexpr const char* UV6KindChars             = "uv6";
-  static constexpr const char* ColorKindChars           = "color";
-  static constexpr const char* MatricesIndicesKindChars = "matricesIndices";
-  static constexpr const char* MatricesWeightsKindChars = "matricesWeights";
-  static constexpr const char* MatricesIndicesExtraKindChars
-    = "matricesIndicesExtra";
-  static constexpr const char* MatricesWeightsExtraKindChars
+  static constexpr const char* MatricesWeightsExtraKind
     = "matricesWeightsExtra";
-  static constexpr const char* World0KindChars            = "world0";
-  static constexpr const char* World1KindChars            = "world1";
-  static constexpr const char* World2KindChars            = "world2";
-  static constexpr const char* World3KindChars            = "world3";
-  static constexpr const char* CellInfoKindChars          = "cellInfo";
-  static constexpr const char* CellIndexKindChars         = "cellIndex";
-  static constexpr const char* OptionsKindChars           = "options";
-  static constexpr const char* AgeKindChars               = "age";
-  static constexpr const char* LifeKindChars              = "life";
-  static constexpr const char* VelocityKindChars          = "velocity";
-  static constexpr const char* DirectionKindChars         = "direction";
-  static constexpr const char* InitialDirectionKindChars  = "initialDirection";
-  static constexpr const char* OffsetKindChars            = "offset";
-  static constexpr const char* SeedKindChars              = "seed";
-  static constexpr const char* SizeKindChars              = "size";
-  static constexpr const char* AngleKindChars             = "angle";
-  static constexpr const char* CellStartOffsetKindChars   = "cellStartOffset";
-  static constexpr const char* NoiseCoordinates1KindChars = "noiseCoordinates1";
-  static constexpr const char* NoiseCoordinates2KindChars = "noiseCoordinates2";
-  static constexpr const char* RemapDataKindChars         = "remapData";
+
+  static constexpr const char* World0Kind            = "world0";
+  static constexpr const char* World1Kind            = "world1";
+  static constexpr const char* World2Kind            = "world2";
+  static constexpr const char* World3Kind            = "world3";
+  static constexpr const char* CellInfoKind          = "cellInfo";
+  static constexpr const char* CellIndexKind         = "cellIndex";
+  static constexpr const char* OptionsKind           = "options";
+  static constexpr const char* AgeKind               = "age";
+  static constexpr const char* LifeKind              = "life";
+  static constexpr const char* VelocityKind          = "velocity";
+  static constexpr const char* DirectionKind         = "direction";
+  static constexpr const char* InitialDirectionKind  = "initialDirection";
+  static constexpr const char* OffsetKind            = "offset";
+  static constexpr const char* SeedKind              = "seed";
+  static constexpr const char* SizeKind              = "size";
+  static constexpr const char* AngleKind             = "angle";
+  static constexpr const char* CellStartOffsetKind   = "cellStartOffset";
+  static constexpr const char* NoiseCoordinates1Kind = "noiseCoordinates1";
+  static constexpr const char* NoiseCoordinates2Kind = "noiseCoordinates2";
+  static constexpr const char* RemapDataKind         = "remapData";
 
   /**
    * The byte type.
@@ -209,7 +161,7 @@ public:
    * @param useBytes set to true if stride and offset are in bytes (optional)
    */
   VertexBuffer(Engine* engine, const std::variant<Float32Array, Buffer*> data,
-               unsigned int kind, bool updatable,
+               const std::string& kind, bool updatable,
                const std::optional<bool>& postponeInternalCreation
                = std::nullopt,
                std::optional<size_t> stride         = std::nullopt,
@@ -220,16 +172,12 @@ public:
                bool normalized = false, bool useBytes = false);
   virtual ~VertexBuffer();
 
-  /** Statics **/
-  static std::string KindAsString(unsigned int kind);
-  static unsigned int KindAsNumber(const std::string& kind);
-
   /**
    * @brief Deduces the stride given a kind.
    * @param kind The kind string to deduce
    * @returns The deduced stride
    */
-  static size_t DeduceStride(unsigned int kind);
+  static size_t DeduceStride(const std::string& kind);
 
   /**
    * @brief Hidden
@@ -242,7 +190,7 @@ public:
    * @brief Returns the kind of the VertexBuffer.
    * @returns a string
    */
-  unsigned int getKind() const;
+  const std::string& getKind() const;
 
   /**
    * @brief Gets a boolean indicating if the VertexBuffer is updatable?
@@ -437,7 +385,7 @@ public:
   unsigned int type;
 
 private:
-  unsigned int _kind;
+  std::string _kind;
   size_t _size;
   bool _ownsBuffer;
   bool _instanced;

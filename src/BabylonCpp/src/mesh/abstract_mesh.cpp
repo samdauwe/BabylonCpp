@@ -764,7 +764,7 @@ Uint32Array AbstractMesh::getIndices(bool /*copyWhenShared*/,
   return Uint32Array();
 }
 
-Float32Array AbstractMesh::getVerticesData(unsigned int /*kind*/,
+Float32Array AbstractMesh::getVerticesData(const std::string& /*kind*/,
                                            bool /*copyWhenShared*/,
                                            bool /*forceCopy*/)
 {
@@ -772,14 +772,14 @@ Float32Array AbstractMesh::getVerticesData(unsigned int /*kind*/,
 }
 
 AbstractMesh*
-AbstractMesh::setVerticesData(unsigned int /*kind*/,
+AbstractMesh::setVerticesData(const std::string& /*kind*/,
                               const Float32Array& /*data*/, bool /*updatable*/,
                               const std::optional<size_t>& /*stride*/)
 {
   return this;
 }
 
-AbstractMesh* AbstractMesh::updateVerticesData(unsigned int /*kind*/,
+AbstractMesh* AbstractMesh::updateVerticesData(const std::string& /*kind*/,
                                                const Float32Array& /*data*/,
                                                bool /*updateExtends*/,
                                                bool /*makeItUnique*/)
@@ -794,7 +794,7 @@ AbstractMesh* AbstractMesh::setIndices(const IndicesArray& /*indices*/,
   return this;
 }
 
-bool AbstractMesh::isVerticesDataPresent(unsigned int /*kind*/) const
+bool AbstractMesh::isVerticesDataPresent(const std::string& /*kind*/) const
 {
   return false;
 }

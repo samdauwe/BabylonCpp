@@ -127,8 +127,8 @@ void OutlineRenderer::render(SubMesh* subMesh, const _InstancesBatchPtr& batch,
 bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
 {
   std::vector<std::string> defines;
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars,
-                                   VertexBuffer::NormalKindChars};
+  std::vector<std::string> attribs{VertexBuffer::PositionKind,
+                                   VertexBuffer::NormalKind};
 
   auto mesh     = subMesh->getMesh();
   auto material = subMesh->getMaterial();
@@ -138,11 +138,11 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     if (material->needAlphaTesting()) {
       defines.emplace_back("#define ALPHATEST");
       if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-        attribs.emplace_back(VertexBuffer::UVKindChars);
+        attribs.emplace_back(VertexBuffer::UVKind);
         defines.emplace_back("#define UV1");
       }
       if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-        attribs.emplace_back(VertexBuffer::UV2KindChars);
+        attribs.emplace_back(VertexBuffer::UV2Kind);
         defines.emplace_back("#define UV2");
       }
     }
@@ -155,11 +155,11 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
 
   // Bones
   if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
-    attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
-    attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
+    attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
+    attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
     if (mesh->numBoneInfluencers() > 4) {
-      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
-      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
+      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKind);
+      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKind);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
@@ -175,10 +175,10 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0KindChars);
-    attribs.emplace_back(VertexBuffer::World1KindChars);
-    attribs.emplace_back(VertexBuffer::World2KindChars);
-    attribs.emplace_back(VertexBuffer::World3KindChars);
+    attribs.emplace_back(VertexBuffer::World0Kind);
+    attribs.emplace_back(VertexBuffer::World1Kind);
+    attribs.emplace_back(VertexBuffer::World2Kind);
+    attribs.emplace_back(VertexBuffer::World3Kind);
   }
 
   // Get correct effect

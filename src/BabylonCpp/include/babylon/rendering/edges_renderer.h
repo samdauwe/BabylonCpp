@@ -16,6 +16,7 @@ class ShaderMaterial;
 class VertexBuffer;
 using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
 using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
+using VertexBufferPtr   = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -113,8 +114,7 @@ protected:
   size_t _indicesCount;
   ShaderMaterialPtr _lineShader;
   std::unique_ptr<GL::IGLBuffer> _ib;
-  std::unordered_map<unsigned int, std::unique_ptr<VertexBuffer>> _buffers;
-  std::unordered_map<std::string, VertexBuffer*> _bufferPtrs;
+  std::unordered_map<std::string, VertexBufferPtr> _buffers;
   bool _checkVerticesInsteadOfIndices;
 
 private:

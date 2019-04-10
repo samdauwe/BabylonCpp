@@ -105,7 +105,7 @@ EffectPtr GlowLayer::_createMergeEffect()
 {
   // Effect
   EffectCreationOptions effectCreationOptions;
-  effectCreationOptions.attributes          = {VertexBuffer::PositionKindChars};
+  effectCreationOptions.attributes          = {VertexBuffer::PositionKind};
   effectCreationOptions.uniformBuffersNames = {"offset"};
   effectCreationOptions.samplers = {"textureSampler", "textureSampler2"};
   effectCreationOptions.defines  = "#define EMISSIVE \n";

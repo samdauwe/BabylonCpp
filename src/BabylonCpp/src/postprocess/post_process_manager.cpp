@@ -21,8 +21,8 @@ PostProcessManager::~PostProcessManager()
 
 void PostProcessManager::_prepareBuffers()
 {
-  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)
-      && _vertexBuffers[VertexBuffer::PositionKindChars]) {
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)
+      && _vertexBuffers[VertexBuffer::PositionKind]) {
     return;
   }
 
@@ -33,12 +33,8 @@ void PostProcessManager::_prepareBuffers()
     -1.f, -1.f, //
     1.f,  -1.f  //
   };
-  _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(_scene->getEngine(), vertices,
-                                     VertexBuffer::PositionKind, false, false,
-                                     2);
-  _vertexBufferPtrs[VertexBuffer::PositionKindChars]
-    = _vertexBuffers[VertexBuffer::PositionKindChars].get();
+  _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
+    _scene->getEngine(), vertices, VertexBuffer::PositionKind, false, false, 2);
 
   _buildIndexBuffer();
 }
@@ -60,11 +56,11 @@ void PostProcessManager::_buildIndexBuffer()
 
 void PostProcessManager::_rebuild()
 {
-  if (!stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)
-      || !_vertexBuffers[VertexBuffer::PositionKindChars]) {
+  if (!stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)
+      || !_vertexBuffers[VertexBuffer::PositionKind]) {
     return;
   }
-  _vertexBuffers[VertexBuffer::PositionKindChars]->_rebuild();
+  _vertexBuffers[VertexBuffer::PositionKind]->_rebuild();
   _buildIndexBuffer();
 }
 
@@ -124,7 +120,7 @@ void PostProcessManager::directRender(
 
       // VBOs
       _prepareBuffers();
-      engine->bindBuffers(_vertexBufferPtrs, _indexBuffer.get(), effect);
+      engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
 
       // Draw order
       engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
@@ -191,7 +187,7 @@ void PostProcessManager::_finalizeFrame(
 
       // VBOs
       _prepareBuffers();
-      engine->bindBuffers(_vertexBufferPtrs, _indexBuffer.get(), effect);
+      engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
 
       // Draw order
       engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
@@ -208,13 +204,12 @@ void PostProcessManager::_finalizeFrame(
 
 void PostProcessManager::dispose()
 {
-  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
-    auto& buffer = _vertexBuffers[VertexBuffer::PositionKindChars];
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
+    auto& buffer = _vertexBuffers[VertexBuffer::PositionKind];
     if (buffer) {
       buffer->dispose();
-      _vertexBuffers[VertexBuffer::PositionKindChars] = nullptr;
-      _vertexBuffers.erase(VertexBuffer::PositionKindChars);
-      _vertexBufferPtrs.erase(VertexBuffer::PositionKindChars);
+      _vertexBuffers[VertexBuffer::PositionKind] = nullptr;
+      _vertexBuffers.erase(VertexBuffer::PositionKind);
     }
   }
 

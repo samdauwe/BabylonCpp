@@ -94,22 +94,17 @@ SpriteManager::SpriteManager(const std::string& iName,
   auto cellInfo = _buffer->createVertexBuffer(VertexBuffer::CellInfoKind, 8, 4);
   auto colors   = _buffer->createVertexBuffer(VertexBuffer::ColorKind, 12, 4);
 
-  _vertexBufferPtrs[VertexBuffer::PositionKindChars] = positions.get();
-  _vertexBufferPtrs[VertexBuffer::OptionsKindChars]  = options.get();
-  _vertexBufferPtrs[VertexBuffer::CellInfoKindChars] = cellInfo.get();
-  _vertexBufferPtrs[VertexBuffer::ColorKindChars]    = colors.get();
-
-  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(positions);
-  _vertexBuffers[VertexBuffer::OptionsKindChars]  = std::move(options);
-  _vertexBuffers[VertexBuffer::CellInfoKindChars] = std::move(cellInfo);
-  _vertexBuffers[VertexBuffer::ColorKindChars]    = std::move(colors);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::move(positions);
+  _vertexBuffers[VertexBuffer::OptionsKind]  = std::move(options);
+  _vertexBuffers[VertexBuffer::CellInfoKind] = std::move(cellInfo);
+  _vertexBuffers[VertexBuffer::ColorKind]    = std::move(colors);
 
   // Effects
 
   {
     EffectCreationOptions spriteOptions;
-    spriteOptions.attributes = {VertexBuffer::PositionKindChars, "options",
-                                "cellInfo", VertexBuffer::ColorKindChars};
+    spriteOptions.attributes = {VertexBuffer::PositionKind, "options",
+                                "cellInfo", VertexBuffer::ColorKind};
     spriteOptions.uniformsNames
       = {"view", "projection", "textureInfos", "alphaTest"};
     spriteOptions.samplers = {"diffuseSampler"};
@@ -120,8 +115,8 @@ SpriteManager::SpriteManager(const std::string& iName,
 
   {
     EffectCreationOptions spriteOptions;
-    spriteOptions.attributes    = {VertexBuffer::PositionKindChars, "options",
-                                "cellInfo", VertexBuffer::ColorKindChars};
+    spriteOptions.attributes    = {VertexBuffer::PositionKind, "options",
+                                "cellInfo", VertexBuffer::ColorKind};
     spriteOptions.uniformsNames = {"view",      "projection", "textureInfos",
                                    "alphaTest", "vFogInfos",  "vFogColor"};
     spriteOptions.samplers      = {"diffuseSampler"};
@@ -331,7 +326,7 @@ void SpriteManager::render()
   }
 
   // VBOs
-  engine->bindBuffers(_vertexBufferPtrs, _indexBuffer.get(), effect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
 
   // Draw order
   engine->setDepthFunctionToLessOrEqual();

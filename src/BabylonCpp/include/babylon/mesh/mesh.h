@@ -216,8 +216,9 @@ public:
    * @returns a FloatArray or null if the mesh has no geometry or no vertex
    * buffer for this kind.
    */
-  Float32Array getVerticesData(unsigned int kind, bool copyWhenShared = false,
-                               bool forceCopy = false) override;
+  Float32Array getVerticesData(const std::string& kind,
+                               bool copyWhenShared = false,
+                               bool forceCopy      = false) override;
 
   /**
    * @brief Returns the mesh VertexBuffer object from the requested `kind`.
@@ -238,7 +239,7 @@ public:
    * @returns a FloatArray or null if the mesh has no vertex buffer for this
    * kind.
    */
-  VertexBufferPtr getVertexBuffer(unsigned int kind) const;
+  VertexBufferPtr getVertexBuffer(const std::string& kind) const;
 
   /**
    * @brief Tests if a specific vertex buffer is associated with this mesh.
@@ -258,7 +259,7 @@ public:
    * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
    * @returns a boolean
    */
-  bool isVerticesDataPresent(unsigned int kind) const override;
+  bool isVerticesDataPresent(const std::string& kind) const override;
 
   /**
    * @brief Returns a boolean defining if the vertex data for the requested
@@ -279,7 +280,7 @@ public:
    * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
    * @returns a boolean
    */
-  bool isVertexBufferUpdatable(unsigned int kind) const;
+  bool isVertexBufferUpdatable(const std::string& kind) const;
 
   /**
    * @brief Returns a string which contains the list of existing `kinds` of
@@ -300,7 +301,7 @@ public:
    * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
    * @returns an array of strings
    */
-  Uint32Array getVerticesDataKinds() const;
+  std::vector<std::string> getVerticesDataKinds() const;
 
   /**
    * @brief Returns a positive integer : the total number of indices in this
@@ -414,7 +415,7 @@ public:
    * @param stride defines the data stride size (can be null)
    * @returns the current mesh
    */
-  Mesh* setVerticesData(unsigned int kind, const Float32Array& data,
+  Mesh* setVerticesData(const std::string& kind, const Float32Array& data,
                         bool updatable = false,
                         const std::optional<size_t>& stride
                         = std::nullopt) override;
@@ -438,7 +439,8 @@ public:
    * @param updatable defines if the updated vertex buffer must be flagged as
    * updatable
    */
-  void markVerticesDataAsUpdatable(unsigned int kind, bool updatable = true);
+  void markVerticesDataAsUpdatable(const std::string& kind,
+                                   bool updatable = true);
 
   /**
    * @brief Sets the mesh global Vertex Buffer.
@@ -471,7 +473,7 @@ public:
    * associated with the same geometry)
    * @returns the current mesh
    */
-  Mesh* updateVerticesData(unsigned int kind, const Float32Array& data,
+  Mesh* updateVerticesData(const std::string& kind, const Float32Array& data,
                            bool updateExtends = false,
                            bool makeItUnique  = false) override;
 
@@ -1713,7 +1715,7 @@ public:
   /**
    * Hidden
    */
-  Uint32Array _delayInfoKinds;
+  std::vector<std::string> _delayInfoKinds;
 
   /**
    * Hidden

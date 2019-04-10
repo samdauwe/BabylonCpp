@@ -1530,7 +1530,7 @@ void Engine::_bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer)
 }
 
 void Engine::_bindVertexBuffersAttributes(
-  const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+  const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
   const EffectPtr& effect)
 {
   auto attributes = effect->getAttributesNames();
@@ -1581,7 +1581,7 @@ void Engine::_bindVertexBuffersAttributes(
 }
 
 std::unique_ptr<GL::IGLVertexArrayObject> Engine::recordVertexArrayObject(
-  const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+  const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
   GL::IGLBuffer* indexBuffer, const EffectPtr& effect)
 {
   auto vao = _gl->createVertexArray();
@@ -1667,7 +1667,7 @@ void Engine::_unbindVertexArrayObject()
 }
 
 void Engine::bindBuffers(
-  const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+  const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
   GL::IGLBuffer* indexBuffer, const EffectPtr& effect)
 {
   if (_cachedVertexBuffersMap != vertexBuffers

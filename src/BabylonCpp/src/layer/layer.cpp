@@ -51,16 +51,15 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
     1.f,  -1.f  //
   };
 
-  _vertexBuffers[VertexBuffer::PositionKindChars]
-    = std::make_unique<VertexBuffer>(
-      engine, vertices, VertexBuffer::PositionKind, false, false, 2);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
+    engine, vertices, VertexBuffer::PositionKind, false, false, 2);
 
   _createIndexBuffer();
 
   // Effects
   {
     EffectCreationOptions options;
-    options.attributes    = {VertexBuffer::PositionKindChars};
+    options.attributes    = {VertexBuffer::PositionKind};
     options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
     options.samplers      = {"textureSampler"};
     options.defines       = "";
@@ -70,7 +69,7 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
 
   {
     EffectCreationOptions options;
-    options.attributes    = {VertexBuffer::PositionKindChars};
+    options.attributes    = {VertexBuffer::PositionKind};
     options.uniformsNames = {"textureMatrix", "color", "scale", "offset"};
     options.samplers      = {"textureSampler"};
     options.defines       = "#define ALPHATEST";
@@ -127,7 +126,7 @@ void Layer::_createIndexBuffer()
 
 void Layer::_rebuild()
 {
-  auto& vb = _vertexBuffers[VertexBuffer::PositionKindChars];
+  auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
 
   if (vb) {
     vb->_rebuild();
@@ -165,8 +164,7 @@ void Layer::render()
   currentEffect->setVector2("scale", scale);
 
   // VBOs
-  engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
-                      _indexBuffer.get(), currentEffect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), currentEffect);
 
   // Draw order
   if (!alphaTest) {
@@ -183,11 +181,11 @@ void Layer::render()
 
 void Layer::dispose()
 {
-  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
-    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
+    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
     if (vertexBuffer) {
       vertexBuffer->dispose();
-      _vertexBuffers.erase(VertexBuffer::PositionKindChars);
+      _vertexBuffers.erase(VertexBuffer::PositionKind);
     }
   }
 

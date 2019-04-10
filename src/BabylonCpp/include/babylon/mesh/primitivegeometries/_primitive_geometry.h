@@ -53,10 +53,10 @@ public:
    */
   void setAllVerticesData(VertexData* vertexData, bool updatable);
 
-  AbstractMesh* setVerticesData(unsigned int kind, const Float32Array& data,
-                                bool updatable = false,
-                                const std::optional<size_t>& stride
-                                = std::nullopt) override;
+  AbstractMesh*
+  setVerticesData(const std::string& kind, const Float32Array& data,
+                  bool updatable                      = false,
+                  const std::optional<size_t>& stride = std::nullopt) override;
 
   // to override
   virtual std::unique_ptr<VertexData> _regenerateVertexData() = 0;

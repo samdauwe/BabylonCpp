@@ -14,8 +14,9 @@ class Effect;
 class Layer;
 class Texture;
 class VertexBuffer;
-using EffectPtr  = std::shared_ptr<Effect>;
-using TexturePtr = std::shared_ptr<Texture>;
+using EffectPtr       = std::shared_ptr<Effect>;
+using TexturePtr      = std::shared_ptr<Texture>;
+using VertexBufferPtr = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -167,7 +168,7 @@ private:
   // Properties
   std::string _name;
   Scene* _scene;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   EffectPtr _effect;
   EffectPtr _alphaTestEffect;

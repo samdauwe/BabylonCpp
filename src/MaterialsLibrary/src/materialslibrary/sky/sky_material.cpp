@@ -104,10 +104,10 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     }
 
     // Attributes
-    std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+    std::vector<std::string> attribs{VertexBuffer::PositionKind};
 
     if (defines["VERTEXCOLOR"]) {
-      attribs.emplace_back(VertexBuffer::ColorKindChars);
+      attribs.emplace_back(VertexBuffer::ColorKind);
     }
 
     const std::string shaderName{"sky"};

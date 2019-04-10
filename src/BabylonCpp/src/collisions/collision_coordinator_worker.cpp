@@ -183,7 +183,7 @@ void CollisionCoordinatorWorker::onMeshRemoved(AbstractMesh* mesh)
 void CollisionCoordinatorWorker::onGeometryAdded(Geometry* geometry)
 {
   geometry->onGeometryUpdated
-    = [this](Geometry* geometry, unsigned int /*kind*/) {
+    = [this](Geometry* geometry, const std::string& /*kind*/) {
         onGeometryUpdated(geometry);
       };
   onGeometryUpdated(geometry);

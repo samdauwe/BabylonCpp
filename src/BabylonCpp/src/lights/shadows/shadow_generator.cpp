@@ -912,7 +912,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back("#define DEPTHTEXTURE");
   }
 
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+  std::vector<std::string> attribs{VertexBuffer::PositionKind};
 
   auto mesh     = subMesh->getMesh();
   auto material = subMesh->getMaterial();
@@ -920,7 +920,7 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   // Normal bias.
   if (normalBias() > 0.f
       && mesh->isVerticesDataPresent(VertexBuffer::NormalKind)) {
-    attribs.emplace_back(VertexBuffer::NormalKindChars);
+    attribs.emplace_back(VertexBuffer::NormalKind);
     defines.emplace_back("#define NORMAL");
     if (mesh->nonUniformScaling()) {
       defines.emplace_back("#define NONUNIFORMSCALING");
@@ -936,12 +936,12 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
     if (alphaTexture) {
       defines.emplace_back("#define ALPHATEST");
       if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-        attribs.emplace_back(VertexBuffer::UVKindChars);
+        attribs.emplace_back(VertexBuffer::UVKind);
         defines.emplace_back("#define UV1");
       }
       if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
         if (alphaTexture->coordinatesIndex == 1) {
-          attribs.emplace_back(VertexBuffer::UV2KindChars);
+          attribs.emplace_back(VertexBuffer::UV2Kind);
           defines.emplace_back("#define UV2");
         }
       }
@@ -950,11 +950,11 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
 
   // Bones
   if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
-    attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
-    attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
+    attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
+    attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
     if (mesh->numBoneInfluencers() > 4) {
-      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
-      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
+      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKind);
+      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKind);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
@@ -985,10 +985,10 @@ bool ShadowGenerator::isReady(SubMesh* subMesh, bool useInstances)
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0KindChars);
-    attribs.emplace_back(VertexBuffer::World1KindChars);
-    attribs.emplace_back(VertexBuffer::World2KindChars);
-    attribs.emplace_back(VertexBuffer::World3KindChars);
+    attribs.emplace_back(VertexBuffer::World0Kind);
+    attribs.emplace_back(VertexBuffer::World1Kind);
+    attribs.emplace_back(VertexBuffer::World2Kind);
+    attribs.emplace_back(VertexBuffer::World3Kind);
   }
 
   // Get correct effect

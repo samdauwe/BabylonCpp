@@ -67,6 +67,7 @@ using InternalTexturePtr         = std::shared_ptr<InternalTexture>;
 using PassPostProcessPtr         = std::shared_ptr<PassPostProcess>;
 using PostProcessPtr             = std::shared_ptr<PostProcess>;
 using RenderTargetTexturePtr     = std::shared_ptr<RenderTargetTexture>;
+using VertexBufferPtr            = std::shared_ptr<VertexBuffer>;
 
 /**
  * @brief The engine class is responsible for interfacing with all lower-level
@@ -797,7 +798,7 @@ public:
    * @returns the new vertex array object
    */
   GLVertexArrayObjectPtr recordVertexArrayObject(
-    const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+    const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
     GL::IGLBuffer* indexBuffer, const EffectPtr& effect);
 
   /**
@@ -831,7 +832,7 @@ public:
    * @param effect defines the effect associated with the vertex buffers
    */
   void bindBuffers(
-    const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+    const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
     GL::IGLBuffer* indexBuffer, const EffectPtr& effect);
 
   /**
@@ -2284,7 +2285,7 @@ private:
                             int offset);
   void _bindIndexBufferWithCache(GL::IGLBuffer* indexBuffer);
   void _bindVertexBuffersAttributes(
-    const std::unordered_map<std::string, VertexBuffer*>& vertexBuffers,
+    const std::unordered_map<std::string, VertexBufferPtr>& vertexBuffers,
     const EffectPtr& effect);
   void _unbindVertexArrayObject();
   void setProgram(GL::IGLProgram* program);
@@ -2678,7 +2679,7 @@ protected:
   /**
    * Hidden
    */
-  std::unordered_map<std::string, VertexBuffer*> _cachedVertexBuffersMap;
+  std::unordered_map<std::string, VertexBufferPtr> _cachedVertexBuffersMap;
 
   /**
    * Hidden

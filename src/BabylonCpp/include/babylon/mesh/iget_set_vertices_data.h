@@ -19,7 +19,7 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * @param kind defines the vertex data kind to use
    * @returns true is data kind is present
    */
-  virtual bool isVerticesDataPresent(unsigned int kind) const = 0;
+  virtual bool isVerticesDataPresent(const std::string& kind) const = 0;
 
   /**
    * @brief Gets a specific vertex data attached to this geometry. Float data is
@@ -31,7 +31,7 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * be cloned upon returning it
    * @returns a float array containing vertex data
    */
-  virtual Float32Array getVerticesData(unsigned int kind,
+  virtual Float32Array getVerticesData(const std::string& kind,
                                        bool copyWhenShared = false,
                                        bool forceCopy      = false)
     = 0;
@@ -59,7 +59,7 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * deduced from the kind value if not specified
    */
   virtual AbstractMesh*
-  setVerticesData(unsigned int kind, const Float32Array& data,
+  setVerticesData(const std::string& kind, const Float32Array& data,
                   bool updatable                      = false,
                   const std::optional<size_t>& stride = std::nullopt)
     = 0;
@@ -88,7 +88,7 @@ struct BABYLON_SHARED_EXPORT IGetSetVerticesData {
    * associated with the same geometry)
    */
   virtual AbstractMesh*
-  updateVerticesData(unsigned int kind, const Float32Array& data,
+  updateVerticesData(const std::string& kind, const Float32Array& data,
                      bool updateExtends = false, bool makeItUnique = false)
     = 0;
 

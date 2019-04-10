@@ -777,8 +777,7 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
     promises.emplace_back([&]() -> void {
       babylonGeometry->setVerticesBuffer(
         _loadVertexAccessorAsync(
-          String::printf("/accessors/%ld", accessor.index), accessor,
-          VertexBuffer::KindAsNumber(kind)),
+          String::printf("/accessors/%ld", accessor.index), accessor, kind),
         accessor.count);
     });
 
@@ -787,14 +786,14 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
     }
   };
 
-  loadAttribute("POSITION", VertexBuffer::PositionKindChars);
-  loadAttribute("NORMAL", VertexBuffer::NormalKindChars);
-  loadAttribute("TANGENT", VertexBuffer::TangentKindChars);
-  loadAttribute("TEXCOORD_0", VertexBuffer::UVKindChars);
-  loadAttribute("TEXCOORD_1", VertexBuffer::UV2KindChars);
-  loadAttribute("JOINTS_0", VertexBuffer::MatricesIndicesKindChars);
-  loadAttribute("WEIGHTS_0", VertexBuffer::MatricesWeightsKindChars);
-  loadAttribute("COLOR_0", VertexBuffer::ColorKindChars,
+  loadAttribute("POSITION", VertexBuffer::PositionKind);
+  loadAttribute("NORMAL", VertexBuffer::NormalKind);
+  loadAttribute("TANGENT", VertexBuffer::TangentKind);
+  loadAttribute("TEXCOORD_0", VertexBuffer::UVKind);
+  loadAttribute("TEXCOORD_1", VertexBuffer::UV2Kind);
+  loadAttribute("JOINTS_0", VertexBuffer::MatricesIndicesKind);
+  loadAttribute("WEIGHTS_0", VertexBuffer::MatricesWeightsKind);
+  loadAttribute("COLOR_0", VertexBuffer::ColorKind,
                 [&](const IAccessor& accessor) -> void {
                   if (accessor.type == IGLTF2::AccessorType::VEC4) {
                     babylonMesh->hasVertexAlpha = true;
@@ -1561,7 +1560,7 @@ Float32Array& GLTFLoader::_loadFloatAccessorAsync(const std::string& context,
 }
 
 BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
-                                                 unsigned int /*kind*/)
+                                                 const std::string& /*kind*/)
 {
   if (bufferView._babylonBuffer) {
     return bufferView._babylonBuffer;
@@ -1575,9 +1574,8 @@ BufferPtr GLTFLoader::_loadVertexBufferViewAsync(IBufferView& bufferView,
   return bufferView._babylonBuffer;
 }
 
-VertexBufferPtr&
-GLTFLoader::_loadVertexAccessorAsync(const std::string& context,
-                                     IAccessor& accessor, unsigned int kind)
+VertexBufferPtr& GLTFLoader::_loadVertexAccessorAsync(
+  const std::string& context, IAccessor& accessor, const std::string& kind)
 {
   if (accessor._babylonVertexBuffer) {
     return accessor._babylonVertexBuffer;

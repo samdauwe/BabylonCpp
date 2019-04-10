@@ -22,53 +22,49 @@ VertexData::~VertexData()
 {
 }
 
-void VertexData::set(const Float32Array& data, unsigned int kind)
+void VertexData::set(const Float32Array& data, const std::string& kind)
 {
-  switch (kind) {
-    case VertexBuffer::PositionKind:
-      positions = data;
-      break;
-    case VertexBuffer::NormalKind:
-      normals = data;
-      break;
-    case VertexBuffer::TangentKind:
-      tangents = data;
-      break;
-    case VertexBuffer::UVKind:
-      uvs = data;
-      break;
-    case VertexBuffer::UV2Kind:
-      uvs2 = data;
-      break;
-    case VertexBuffer::UV3Kind:
-      uvs3 = data;
-      break;
-    case VertexBuffer::UV4Kind:
-      uvs4 = data;
-      break;
-    case VertexBuffer::UV5Kind:
-      uvs5 = data;
-      break;
-    case VertexBuffer::UV6Kind:
-      uvs6 = data;
-      break;
-    case VertexBuffer::ColorKind:
-      colors = data;
-      break;
-    case VertexBuffer::MatricesIndicesKind:
-      matricesIndices = data;
-      break;
-    case VertexBuffer::MatricesWeightsKind:
-      matricesWeights = data;
-      break;
-    case VertexBuffer::MatricesIndicesExtraKind:
-      matricesIndicesExtra = data;
-      break;
-    case VertexBuffer::MatricesWeightsExtraKind:
-      matricesWeightsExtra = data;
-      break;
-    default:
-      break;
+  if (kind == VertexBuffer::PositionKind) {
+    positions = data;
+  }
+  else if (kind == VertexBuffer::NormalKind) {
+    normals = data;
+  }
+  else if (kind == VertexBuffer::TangentKind) {
+    tangents = data;
+  }
+  else if (kind == VertexBuffer::UVKind) {
+    uvs = data;
+  }
+  else if (kind == VertexBuffer::UV2Kind) {
+    uvs2 = data;
+  }
+  else if (kind == VertexBuffer::UV3Kind) {
+    uvs3 = data;
+  }
+  else if (kind == VertexBuffer::UV4Kind) {
+    uvs4 = data;
+  }
+  else if (kind == VertexBuffer::UV5Kind) {
+    uvs5 = data;
+  }
+  else if (kind == VertexBuffer::UV6Kind) {
+    uvs6 = data;
+  }
+  else if (kind == VertexBuffer::ColorKind) {
+    colors = data;
+  }
+  else if (kind == VertexBuffer::MatricesIndicesKind) {
+    matricesIndices = data;
+  }
+  else if (kind == VertexBuffer::MatricesWeightsKind) {
+    matricesWeights = data;
+  }
+  else if (kind == VertexBuffer::MatricesIndicesExtraKind) {
+    matricesIndicesExtra = data;
+  }
+  else if (kind == VertexBuffer::MatricesWeightsExtraKind) {
+    matricesWeightsExtra = data;
   }
 }
 
@@ -370,10 +366,10 @@ void VertexData::_validate()
   }
 
   const auto getElementCount
-    = [](unsigned int kind, const Float32Array& values) -> size_t {
+    = [](const std::string& kind, const Float32Array& values) -> size_t {
     const auto stride = VertexBuffer::DeduceStride(kind);
     if ((values.size() % stride) != 0) {
-      throw std::runtime_error("The " + VertexBuffer::KindAsString(kind)
+      throw std::runtime_error("The " + kind
                                + "s array count must be a multiple of "
                                + std::to_string(stride));
     }
@@ -384,12 +380,11 @@ void VertexData::_validate()
   const auto positionsElementCount
     = getElementCount(VertexBuffer::PositionKind, positions);
 
-  const auto validateElementCount = [&](unsigned int kind,
+  const auto validateElementCount = [&](const std::string& kind,
                                         const Float32Array& values) {
     const auto elementCount = getElementCount(kind, values);
     if (elementCount != positionsElementCount) {
-      throw std::runtime_error("The " + VertexBuffer::KindAsString(kind)
-                               + "s element count ("
+      throw std::runtime_error("The " + kind + "s element count ("
                                + std::to_string(elementCount)
                                + ") does not match the positions count ("
                                + std::to_string(positionsElementCount) + ")");

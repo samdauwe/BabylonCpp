@@ -96,7 +96,7 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
   }
 
   std::vector<std::string> defines;
-  std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+  std::vector<std::string> attribs{VertexBuffer::PositionKind};
   auto material = subMesh->getMaterial();
 
   // Alpha test
@@ -106,19 +106,19 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
     }
 
     if (mesh->isVerticesDataPresent(VertexBuffer::UVKind)) {
-      attribs.emplace_back(VertexBuffer::UVKindChars);
+      attribs.emplace_back(VertexBuffer::UVKind);
       defines.emplace_back("#define UV1");
     }
     if (mesh->isVerticesDataPresent(VertexBuffer::UV2Kind)) {
-      attribs.emplace_back(VertexBuffer::UV2KindChars);
+      attribs.emplace_back(VertexBuffer::UV2Kind);
       defines.emplace_back("#define UV2");
     }
   }
 
   // Bones
   if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
-    attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
-    attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
+    attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
+    attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
     defines.emplace_back(
@@ -133,10 +133,10 @@ bool VolumetricLightScatteringPostProcess::_isReady(SubMesh* subMesh,
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0KindChars);
-    attribs.emplace_back(VertexBuffer::World1KindChars);
-    attribs.emplace_back(VertexBuffer::World2KindChars);
-    attribs.emplace_back(VertexBuffer::World3KindChars);
+    attribs.emplace_back(VertexBuffer::World0Kind);
+    attribs.emplace_back(VertexBuffer::World1Kind);
+    attribs.emplace_back(VertexBuffer::World2Kind);
+    attribs.emplace_back(VertexBuffer::World3Kind);
   }
 
   // Get correct effect

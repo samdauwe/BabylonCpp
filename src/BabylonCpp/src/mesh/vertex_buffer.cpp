@@ -1,78 +1,45 @@
 #include <babylon/mesh/vertex_buffer.h>
 
 #include <babylon/core/data_view.h>
+#include <babylon/core/string.h>
 #include <babylon/engine/engine.h>
 #include <babylon/mesh/buffer.h>
 
 namespace BABYLON {
 
-constexpr unsigned int VertexBuffer::PositionKind;
-constexpr unsigned int VertexBuffer::NormalKind;
-constexpr unsigned int VertexBuffer::TangentKind;
-constexpr unsigned int VertexBuffer::UVKind;
-constexpr unsigned int VertexBuffer::UV2Kind;
-constexpr unsigned int VertexBuffer::UV3Kind;
-constexpr unsigned int VertexBuffer::UV4Kind;
-constexpr unsigned int VertexBuffer::UV5Kind;
-constexpr unsigned int VertexBuffer::UV6Kind;
-constexpr unsigned int VertexBuffer::ColorKind;
-constexpr unsigned int VertexBuffer::MatricesIndicesKind;
-constexpr unsigned int VertexBuffer::MatricesWeightsKind;
-constexpr unsigned int VertexBuffer::MatricesIndicesExtraKind;
-constexpr unsigned int VertexBuffer::MatricesWeightsExtraKind;
-constexpr unsigned int VertexBuffer::World0Kind;
-constexpr unsigned int VertexBuffer::World1Kind;
-constexpr unsigned int VertexBuffer::World2Kind;
-constexpr unsigned int VertexBuffer::World3Kind;
-constexpr unsigned int VertexBuffer::CellInfoKind;
-constexpr unsigned int VertexBuffer::OptionsKind;
-constexpr unsigned int VertexBuffer::AgeKind;
-constexpr unsigned int VertexBuffer::LifeKind;
-constexpr unsigned int VertexBuffer::VelocityKind;
-constexpr unsigned int VertexBuffer::DirectionKind;
-constexpr unsigned int VertexBuffer::InitialDirectionKind;
-constexpr unsigned int VertexBuffer::OffsetKind;
-constexpr unsigned int VertexBuffer::SeedKind;
-constexpr unsigned int VertexBuffer::SizeKind;
-constexpr unsigned int VertexBuffer::AngleKind;
-constexpr unsigned int VertexBuffer::CellStartOffsetKind;
-constexpr unsigned int VertexBuffer::NoiseCoordinates1Kind;
-constexpr unsigned int VertexBuffer::NoiseCoordinates2Kind;
-constexpr unsigned int VertexBuffer::RemapDataKind;
-
-constexpr const char* VertexBuffer::PositionKindChars;
-constexpr const char* VertexBuffer::NormalKindChars;
-constexpr const char* VertexBuffer::TangentKindChars;
-constexpr const char* VertexBuffer::UVKindChars;
-constexpr const char* VertexBuffer::UV2KindChars;
-constexpr const char* VertexBuffer::UV3KindChars;
-constexpr const char* VertexBuffer::UV4KindChars;
-constexpr const char* VertexBuffer::UV5KindChars;
-constexpr const char* VertexBuffer::UV6KindChars;
-constexpr const char* VertexBuffer::ColorKindChars;
-constexpr const char* VertexBuffer::MatricesIndicesKindChars;
-constexpr const char* VertexBuffer::MatricesWeightsKindChars;
-constexpr const char* VertexBuffer::MatricesIndicesExtraKindChars;
-constexpr const char* VertexBuffer::MatricesWeightsExtraKindChars;
-constexpr const char* VertexBuffer::World0KindChars;
-constexpr const char* VertexBuffer::World1KindChars;
-constexpr const char* VertexBuffer::World2KindChars;
-constexpr const char* VertexBuffer::World3KindChars;
-constexpr const char* VertexBuffer::CellInfoKindChars;
-constexpr const char* VertexBuffer::OptionsKindChars;
-constexpr const char* VertexBuffer::AgeKindChars;
-constexpr const char* VertexBuffer::LifeKindChars;
-constexpr const char* VertexBuffer::VelocityKindChars;
-constexpr const char* VertexBuffer::DirectionKindChars;
-constexpr const char* VertexBuffer::InitialDirectionKindChars;
-constexpr const char* VertexBuffer::OffsetKindChars;
-constexpr const char* VertexBuffer::SeedKindChars;
-constexpr const char* VertexBuffer::SizeKindChars;
-constexpr const char* VertexBuffer::AngleKindChars;
-constexpr const char* VertexBuffer::CellStartOffsetKindChars;
-constexpr const char* VertexBuffer::NoiseCoordinates1KindChars;
-constexpr const char* VertexBuffer::NoiseCoordinates2KindChars;
-constexpr const char* VertexBuffer::RemapDataKindChars;
+constexpr const char* VertexBuffer::PositionKind;
+constexpr const char* VertexBuffer::NormalKind;
+constexpr const char* VertexBuffer::TangentKind;
+constexpr const char* VertexBuffer::UVKind;
+constexpr const char* VertexBuffer::UV2Kind;
+constexpr const char* VertexBuffer::UV3Kind;
+constexpr const char* VertexBuffer::UV4Kind;
+constexpr const char* VertexBuffer::UV5Kind;
+constexpr const char* VertexBuffer::UV6Kind;
+constexpr const char* VertexBuffer::ColorKind;
+constexpr const char* VertexBuffer::MatricesIndicesKind;
+constexpr const char* VertexBuffer::MatricesWeightsKind;
+constexpr const char* VertexBuffer::MatricesIndicesExtraKind;
+constexpr const char* VertexBuffer::MatricesWeightsExtraKind;
+constexpr const char* VertexBuffer::World0Kind;
+constexpr const char* VertexBuffer::World1Kind;
+constexpr const char* VertexBuffer::World2Kind;
+constexpr const char* VertexBuffer::World3Kind;
+constexpr const char* VertexBuffer::CellInfoKind;
+constexpr const char* VertexBuffer::OptionsKind;
+constexpr const char* VertexBuffer::AgeKind;
+constexpr const char* VertexBuffer::LifeKind;
+constexpr const char* VertexBuffer::VelocityKind;
+constexpr const char* VertexBuffer::DirectionKind;
+constexpr const char* VertexBuffer::InitialDirectionKind;
+constexpr const char* VertexBuffer::OffsetKind;
+constexpr const char* VertexBuffer::SeedKind;
+constexpr const char* VertexBuffer::SizeKind;
+constexpr const char* VertexBuffer::AngleKind;
+constexpr const char* VertexBuffer::CellStartOffsetKind;
+constexpr const char* VertexBuffer::NoiseCoordinates1Kind;
+constexpr const char* VertexBuffer::NoiseCoordinates2Kind;
+constexpr const char* VertexBuffer::RemapDataKind;
 
 constexpr const unsigned int VertexBuffer::BYTE;
 constexpr const unsigned int VertexBuffer::UNSIGNED_BYTE;
@@ -84,7 +51,7 @@ constexpr const unsigned int VertexBuffer::FLOAT;
 
 VertexBuffer::VertexBuffer(
   Engine* engine, const std::variant<Float32Array, Buffer*> data,
-  unsigned int kind, bool updatable,
+  const std::string& kind, bool updatable,
   const std::optional<bool>& postponeInternalCreation,
   std::optional<size_t> stride, const std::optional<bool>& instanced,
   const std::optional<size_t>& offset, const std::optional<size_t>& size,
@@ -165,187 +132,6 @@ void VertexBuffer::set_instanceDivisor(unsigned int value)
   }
 }
 
-std::string VertexBuffer::KindAsString(unsigned int kind)
-{
-  switch (kind) {
-    case VertexBuffer::PositionKind:
-    default:
-      return std::string(VertexBuffer::PositionKindChars);
-    case VertexBuffer::NormalKind:
-      return std::string(VertexBuffer::NormalKindChars);
-    case VertexBuffer::TangentKind:
-      return std::string(VertexBuffer::TangentKindChars);
-    case VertexBuffer::UVKind:
-      return std::string(VertexBuffer::UVKindChars);
-    case VertexBuffer::UV2Kind:
-      return std::string(VertexBuffer::UV2KindChars);
-    case VertexBuffer::UV3Kind:
-      return std::string(VertexBuffer::UV3KindChars);
-    case VertexBuffer::UV4Kind:
-      return std::string(VertexBuffer::UV4KindChars);
-    case VertexBuffer::UV5Kind:
-      return std::string(VertexBuffer::UV5KindChars);
-    case VertexBuffer::UV6Kind:
-      return std::string(VertexBuffer::UV6KindChars);
-    case VertexBuffer::ColorKind:
-      return std::string(VertexBuffer::ColorKindChars);
-    case VertexBuffer::MatricesIndicesKind:
-      return std::string(VertexBuffer::MatricesIndicesKindChars);
-    case VertexBuffer::MatricesWeightsKind:
-      return std::string(VertexBuffer::MatricesWeightsKindChars);
-    case VertexBuffer::MatricesIndicesExtraKind:
-      return std::string(VertexBuffer::MatricesIndicesExtraKindChars);
-    case VertexBuffer::MatricesWeightsExtraKind:
-      return std::string(VertexBuffer::MatricesWeightsExtraKindChars);
-    case VertexBuffer::World0Kind:
-      return std::string(VertexBuffer::World0KindChars);
-    case VertexBuffer::World1Kind:
-      return std::string(VertexBuffer::World1KindChars);
-    case VertexBuffer::World2Kind:
-      return std::string(VertexBuffer::World2KindChars);
-    case VertexBuffer::World3Kind:
-      return std::string(VertexBuffer::World3KindChars);
-    case VertexBuffer::CellInfoKind:
-      return std::string(VertexBuffer::CellInfoKindChars);
-    case VertexBuffer::OptionsKind:
-      return std::string(VertexBuffer::OptionsKindChars);
-    case VertexBuffer::AgeKind:
-      return std::string(VertexBuffer::AgeKindChars);
-    case VertexBuffer::LifeKind:
-      return std::string(VertexBuffer::LifeKindChars);
-    case VertexBuffer::VelocityKind:
-      return std::string(VertexBuffer::VelocityKindChars);
-    case VertexBuffer::DirectionKind:
-      return std::string(VertexBuffer::DirectionKindChars);
-    case VertexBuffer::InitialDirectionKind:
-      return std::string(VertexBuffer::InitialDirectionKindChars);
-    case VertexBuffer::OffsetKind:
-      return std::string(VertexBuffer::OffsetKindChars);
-    case VertexBuffer::SeedKind:
-      return std::string(VertexBuffer::SeedKindChars);
-    case VertexBuffer::SizeKind:
-      return std::string(VertexBuffer::SizeKindChars);
-    case VertexBuffer::AngleKind:
-      return std::string(VertexBuffer::AngleKindChars);
-    case VertexBuffer::CellStartOffsetKind:
-      return std::string(VertexBuffer::CellStartOffsetKindChars);
-    case VertexBuffer::NoiseCoordinates1Kind:
-      return std::string(VertexBuffer::NoiseCoordinates1KindChars);
-    case VertexBuffer::NoiseCoordinates2Kind:
-      return std::string(VertexBuffer::NoiseCoordinates2KindChars);
-    case VertexBuffer::RemapDataKind:
-      return std::string(VertexBuffer::RemapDataKindChars);
-  }
-}
-
-unsigned int VertexBuffer::KindAsNumber(const std::string& kind)
-{
-  if (kind == VertexBuffer::PositionKindChars) {
-    return PositionKind;
-  }
-  else if (kind == VertexBuffer::NormalKindChars) {
-    return NormalKind;
-  }
-  else if (kind == TangentKindChars) {
-    return TangentKind;
-  }
-  else if (kind == UVKindChars) {
-    return UVKind;
-  }
-  else if (kind == UV2KindChars) {
-    return UV2Kind;
-  }
-  else if (kind == UV3KindChars) {
-    return UV3Kind;
-  }
-  else if (kind == UV4KindChars) {
-    return UV4Kind;
-  }
-  else if (kind == UV5KindChars) {
-    return UV5Kind;
-  }
-  else if (kind == UV6KindChars) {
-    return UV6Kind;
-  }
-  else if (kind == ColorKindChars) {
-    return ColorKind;
-  }
-  else if (kind == MatricesIndicesKindChars) {
-    return MatricesIndicesKind;
-  }
-  else if (kind == MatricesWeightsKindChars) {
-    return MatricesWeightsKind;
-  }
-  else if (kind == MatricesIndicesExtraKindChars) {
-    return MatricesIndicesExtraKind;
-  }
-  else if (kind == MatricesWeightsExtraKindChars) {
-    return MatricesWeightsExtraKind;
-  }
-  else if (kind == World0KindChars) {
-    return World0Kind;
-  }
-  else if (kind == World1KindChars) {
-    return World1Kind;
-  }
-  else if (kind == World2KindChars) {
-    return World2Kind;
-  }
-  else if (kind == World3KindChars) {
-    return World3Kind;
-  }
-  else if (kind == CellInfoKindChars) {
-    return CellInfoKind;
-  }
-  else if (kind == CellIndexKindChars) {
-    return CellIndexKind;
-  }
-  else if (kind == OptionsKindChars) {
-    return OptionsKind;
-  }
-  else if (kind == AgeKindChars) {
-    return AgeKind;
-  }
-  else if (kind == LifeKindChars) {
-    return LifeKind;
-  }
-  else if (kind == VelocityKindChars) {
-    return VelocityKind;
-  }
-  else if (kind == DirectionKindChars) {
-    return DirectionKind;
-  }
-  else if (kind == InitialDirectionKindChars) {
-    return InitialDirectionKind;
-  }
-  else if (kind == OffsetKindChars) {
-    return OffsetKind;
-  }
-  else if (kind == SeedKindChars) {
-    return SeedKind;
-  }
-  else if (kind == SizeKindChars) {
-    return SizeKind;
-  }
-  else if (kind == AngleKindChars) {
-    return AngleKind;
-  }
-  else if (kind == CellStartOffsetKindChars) {
-    return CellStartOffsetKind;
-  }
-  else if (kind == NoiseCoordinates1KindChars) {
-    return NoiseCoordinates1Kind;
-  }
-  else if (kind == NoiseCoordinates2KindChars) {
-    return NoiseCoordinates2Kind;
-  }
-  else if (kind == RemapDataKindChars) {
-    return RemapDataKind;
-  }
-
-  return 0;
-}
-
 void VertexBuffer::_rebuild()
 {
   if (!_buffer) {
@@ -355,7 +141,7 @@ void VertexBuffer::_rebuild()
   _buffer->_rebuild();
 }
 
-unsigned int VertexBuffer::getKind() const
+const std::string& VertexBuffer::getKind() const
 {
   return _kind;
 }
@@ -447,29 +233,29 @@ void VertexBuffer::forEach(
                         count, normalized, callback);
 }
 
-size_t VertexBuffer::DeduceStride(unsigned int kind)
+size_t VertexBuffer::DeduceStride(const std::string& kind)
 {
   // Deduce stride from kind
-  switch (kind) {
-    case VertexBuffer::UVKind:
-    case VertexBuffer::UV2Kind:
-    case VertexBuffer::UV3Kind:
-    case VertexBuffer::UV4Kind:
-    case VertexBuffer::UV5Kind:
-    case VertexBuffer::UV6Kind:
-      return 2;
-    case VertexBuffer::NormalKind:
-    case VertexBuffer::PositionKind:
-      return 3;
-    case VertexBuffer::ColorKind:
-    case VertexBuffer::MatricesIndicesKind:
-    case VertexBuffer::MatricesIndicesExtraKind:
-    case VertexBuffer::MatricesWeightsKind:
-    case VertexBuffer::MatricesWeightsExtraKind:
-    case VertexBuffer::TangentKind:
-      return 4;
-    default:
-      throw std::runtime_error("Invalid kind '" + std::to_string(kind) + "'");
+  if (kind == VertexBuffer::UVKind || kind == VertexBuffer::UV2Kind
+      || kind == VertexBuffer::UV3Kind || kind == VertexBuffer::UV4Kind
+      || kind == VertexBuffer::UV5Kind || kind == VertexBuffer::UV6Kind) {
+    return 2;
+  }
+  else if (kind == VertexBuffer::NormalKind
+           || kind == VertexBuffer::PositionKind) {
+    return 3;
+  }
+  else if (kind == VertexBuffer::ColorKind
+           || kind == VertexBuffer::MatricesIndicesKind
+           || kind == VertexBuffer::MatricesIndicesExtraKind
+           || kind == VertexBuffer::MatricesIndicesExtraKind
+           || kind == VertexBuffer::MatricesWeightsKind
+           || kind == VertexBuffer::MatricesWeightsExtraKind
+           || kind == VertexBuffer::TangentKind) {
+    return 4;
+  }
+  else {
+    throw std::runtime_error(String::printf("Invalid kind '%s'", kind.c_str()));
   }
 }
 

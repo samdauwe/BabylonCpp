@@ -127,7 +127,7 @@ EffectPtr HighlightLayer::_createMergeEffect()
 {
   // Effect
   EffectCreationOptions effectCreationOptions;
-  effectCreationOptions.attributes          = {VertexBuffer::PositionKindChars};
+  effectCreationOptions.attributes          = {VertexBuffer::PositionKind};
   effectCreationOptions.uniformBuffersNames = {"offset"};
   effectCreationOptions.samplers            = {"textureSampler"};
   effectCreationOptions.defines = _options.isStroke ? "#define STROKE \n" : "";

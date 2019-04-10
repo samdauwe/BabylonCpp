@@ -411,7 +411,7 @@ size_t Mesh::getTotalVertices() const
   return _geometry->getTotalVertices();
 }
 
-Float32Array Mesh::getVerticesData(unsigned int kind, bool copyWhenShared,
+Float32Array Mesh::getVerticesData(const std::string& kind, bool copyWhenShared,
                                    bool forceCopy)
 {
   if (!_geometry) {
@@ -420,7 +420,7 @@ Float32Array Mesh::getVerticesData(unsigned int kind, bool copyWhenShared,
   return _geometry->getVerticesData(kind, copyWhenShared, forceCopy);
 }
 
-VertexBufferPtr Mesh::getVertexBuffer(unsigned int kind) const
+VertexBufferPtr Mesh::getVertexBuffer(const std::string& kind) const
 {
   if (!_geometry) {
     return nullptr;
@@ -428,7 +428,7 @@ VertexBufferPtr Mesh::getVertexBuffer(unsigned int kind) const
   return _geometry->getVertexBuffer(kind);
 }
 
-bool Mesh::isVerticesDataPresent(unsigned int kind) const
+bool Mesh::isVerticesDataPresent(const std::string& kind) const
 {
   if (!_geometry) {
     if (!_delayInfo.empty()) {
@@ -443,7 +443,7 @@ bool Mesh::isVerticesDataPresent(unsigned int kind) const
   return _geometry->isVerticesDataPresent(kind);
 }
 
-bool Mesh::isVertexBufferUpdatable(unsigned int kind) const
+bool Mesh::isVertexBufferUpdatable(const std::string& kind) const
 {
   if (!_geometry) {
     if (!_delayInfo.empty()) {
@@ -458,10 +458,10 @@ bool Mesh::isVertexBufferUpdatable(unsigned int kind) const
   return _geometry->isVertexBufferUpdatable(kind);
 }
 
-Uint32Array Mesh::getVerticesDataKinds() const
+std::vector<std::string> Mesh::getVerticesDataKinds() const
 {
   if (!_geometry) {
-    Uint32Array result;
+    std::vector<std::string> result;
     if (!_delayInfo.empty()) {
       for (auto& vertexBuffer : _delayInfo) {
         result.emplace_back(vertexBuffer->getKind());
@@ -806,7 +806,7 @@ void Mesh::subdivide(size_t count)
   synchronizeInstances();
 }
 
-Mesh* Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
+Mesh* Mesh::setVerticesData(const std::string& kind, const Float32Array& data,
                             bool updatable, const std::optional<size_t>& stride)
 {
   if (!_geometry) {
@@ -825,7 +825,7 @@ Mesh* Mesh::setVerticesData(unsigned int kind, const Float32Array& data,
   return this;
 }
 
-void Mesh::markVerticesDataAsUpdatable(unsigned int kind, bool updatable)
+void Mesh::markVerticesDataAsUpdatable(const std::string& kind, bool updatable)
 {
   auto vb = getVertexBuffer(kind);
 
@@ -847,8 +847,9 @@ Mesh& Mesh::setVerticesBuffer(std::unique_ptr<VertexBuffer>&& buffer)
   return *this;
 }
 
-Mesh* Mesh::updateVerticesData(unsigned int kind, const Float32Array& data,
-                               bool updateExtends, bool makeItUnique)
+Mesh* Mesh::updateVerticesData(const std::string& kind,
+                               const Float32Array& data, bool updateExtends,
+                               bool makeItUnique)
 {
   if (!_geometry) {
     return this;
@@ -1912,12 +1913,12 @@ void Mesh::applyDisplacementMapFromBuffer(
 Mesh& Mesh::convertToFlatShadedMesh()
 {
   auto kinds = getVerticesDataKinds();
-  std::map<unsigned int, VertexBufferPtr> vbs;
-  std::map<unsigned int, Float32Array> data;
-  std::map<unsigned int, Float32Array> newdata;
-  bool updatableNormals = false;
-  unsigned int kindIndex;
-  unsigned int kind;
+  std::unordered_map<std::string, VertexBufferPtr> vbs;
+  std::unordered_map<std::string, Float32Array> data;
+  std::unordered_map<std::string, Float32Array> newdata;
+  bool updatableNormals  = false;
+  unsigned int kindIndex = 0;
+  std::string kind       = "";
   for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
     kind              = kinds[kindIndex];
     auto vertexBuffer = getVertexBuffer(kind);
@@ -2006,11 +2007,11 @@ Mesh& Mesh::convertToFlatShadedMesh()
 Mesh& Mesh::convertToUnIndexedMesh()
 {
   auto kinds = getVerticesDataKinds();
-  std::map<unsigned int, VertexBufferPtr> vbs;
-  std::map<unsigned int, Float32Array> data;
-  std::map<unsigned int, Float32Array> newdata;
-  unsigned int kindIndex;
-  unsigned int kind;
+  std::map<std::string, VertexBufferPtr> vbs;
+  std::map<std::string, Float32Array> data;
+  std::map<std::string, Float32Array> newdata;
+  unsigned int kindIndex = 0;
+  std::string kind       = "";
   for (kindIndex = 0; kindIndex < kinds.size(); ++kindIndex) {
     kind          = kinds[kindIndex];
     vbs[kind]     = getVertexBuffer(kind);
@@ -2205,8 +2206,10 @@ void Mesh::_syncGeometryWithMorphTargetManager()
       return;
     }
 
+    std::string indexStr;
     for (unsigned int index = 0; index < iMorphTargetManager->numInfluencers();
          ++index) {
+      indexStr         = std::to_string(index);
       auto morphTarget = iMorphTargetManager->getActiveTarget(index);
 
       const auto positions = morphTarget->getPositions();
@@ -2216,37 +2219,41 @@ void Mesh::_syncGeometryWithMorphTargetManager()
         return;
       }
 
-      iGeometry->setVerticesData(VertexBuffer::PositionKind + index, positions,
-                                 false, 3);
+      iGeometry->setVerticesData(VertexBuffer::PositionKind + indexStr,
+                                 positions, false, 3);
 
       const auto normals = morphTarget->getNormals();
       if (!normals.empty()) {
-        iGeometry->setVerticesData(VertexBuffer::NormalKind + index, normals,
+        iGeometry->setVerticesData(VertexBuffer::NormalKind + indexStr, normals,
                                    false, 3);
       }
 
       const auto tangents = morphTarget->getTangents();
       if (!tangents.empty()) {
-        iGeometry->setVerticesData(VertexBuffer::TangentKind + index, tangents,
-                                   false, 3);
+        iGeometry->setVerticesData(VertexBuffer::TangentKind + indexStr,
+                                   tangents, false, 3);
       }
     }
   }
   else {
     unsigned int index = 0;
+    auto indexStr      = std::to_string(index);
 
     // Positions
     while (
-      iGeometry->isVerticesDataPresent(VertexBuffer::PositionKind + index)) {
-      iGeometry->removeVerticesData(VertexBuffer::PositionKind + index);
+      iGeometry->isVerticesDataPresent(VertexBuffer::PositionKind + indexStr)) {
+      iGeometry->removeVerticesData(VertexBuffer::PositionKind + indexStr);
 
-      if (iGeometry->isVerticesDataPresent(VertexBuffer::NormalKind + index)) {
+      if (iGeometry->isVerticesDataPresent(VertexBuffer::NormalKind
+                                           + indexStr)) {
         iGeometry->removeVerticesData(VertexBuffer::NormalKind + index);
       }
-      if (iGeometry->isVerticesDataPresent(VertexBuffer::TangentKind + index)) {
-        iGeometry->removeVerticesData(VertexBuffer::TangentKind + index);
+      if (iGeometry->isVerticesDataPresent(VertexBuffer::TangentKind
+                                           + indexStr)) {
+        iGeometry->removeVerticesData(VertexBuffer::TangentKind + indexStr);
       }
       ++index;
+      indexStr = std::to_string(index);
     }
   }
 }

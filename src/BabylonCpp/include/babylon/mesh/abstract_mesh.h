@@ -214,7 +214,7 @@ public:
    * @param kind defines the vertex data kind to use
    * @returns null
    */
-  virtual Float32Array getVerticesData(unsigned int kind,
+  virtual Float32Array getVerticesData(const std::string& kind,
                                        bool copyWhenShared = false,
                                        bool forceCopy      = false) override;
 
@@ -246,7 +246,7 @@ public:
    * @returns the current mesh
    */
   virtual AbstractMesh*
-  setVerticesData(unsigned int kind, const Float32Array& data,
+  setVerticesData(const std::string& kind, const Float32Array& data,
                   bool updatable                      = false,
                   const std::optional<size_t>& stride = std::nullopt) override;
 
@@ -275,7 +275,7 @@ public:
    * data and is set to the mesh
    * @returns the current mesh
    */
-  virtual AbstractMesh* updateVerticesData(unsigned int kind,
+  virtual AbstractMesh* updateVerticesData(const std::string& kind,
                                            const Float32Array& data,
                                            bool updateExtends = false,
                                            bool makeItUnique  = false) override;
@@ -298,7 +298,7 @@ public:
    * @param kind defines the vertex data kind to use
    * @returns true is data kind is present
    */
-  virtual bool isVerticesDataPresent(unsigned int kind) const override;
+  virtual bool isVerticesDataPresent(const std::string& kind) const override;
 
   /**
    * @brief Returns the mesh BoundingInfo object or creates a new one and

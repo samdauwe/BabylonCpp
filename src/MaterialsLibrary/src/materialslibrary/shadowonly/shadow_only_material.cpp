@@ -136,10 +136,10 @@ bool ShadowOnlyMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
 
     // Attributes
-    std::vector<std::string> attribs{VertexBuffer::PositionKindChars};
+    std::vector<std::string> attribs{VertexBuffer::PositionKind};
 
     if (defines["NORMAL"]) {
-      attribs.emplace_back(VertexBuffer::NormalKindChars);
+      attribs.emplace_back(VertexBuffer::NormalKind);
     }
 
     MaterialHelper::PrepareAttributesForBones(attribs, mesh, defines,

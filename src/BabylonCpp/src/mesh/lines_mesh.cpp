@@ -36,11 +36,10 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
 
   std::vector<std::string> defines;
   IShaderMaterialOptions options;
-  options.attributes
-    = {VertexBuffer::PositionKindChars, VertexBuffer::World0KindChars,
-       VertexBuffer::World1KindChars, VertexBuffer::World2KindChars,
-       VertexBuffer::World3KindChars};
-  options.uniforms          = {"world", "viewProjection"};
+  options.attributes = {VertexBuffer::PositionKind, VertexBuffer::World0Kind,
+                        VertexBuffer::World1Kind, VertexBuffer::World2Kind,
+                        VertexBuffer::World3Kind};
+  options.uniforms   = {"world", "viewProjection"};
   options.needAlphaBlending = true;
   options.defines           = defines;
 
@@ -53,7 +52,7 @@ LinesMesh::LinesMesh(const std::string& iName, Scene* scene, Node* iParent,
   }
   else {
     options.defines.emplace_back("#define VERTEXCOLOR");
-    options.attributes.emplace_back(VertexBuffer::ColorKindChars);
+    options.attributes.emplace_back(VertexBuffer::ColorKind);
   }
 
   _colorShader

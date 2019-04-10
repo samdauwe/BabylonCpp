@@ -101,9 +101,9 @@ void EffectLayer::_generateVertexBuffer()
     1,  -1  //
   };
 
-  auto vertexBuffer = std::make_unique<VertexBuffer>(
+  auto vertexBuffer = std::make_shared<VertexBuffer>(
     _engine, vertices, VertexBuffer::PositionKind, false, false, 2);
-  _vertexBuffers[VertexBuffer::PositionKindChars] = std::move(vertexBuffer);
+  _vertexBuffers[VertexBuffer::PositionKind] = std::move(vertexBuffer);
 }
 
 void EffectLayer::_setMainTextureSize()
@@ -202,7 +202,7 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
 
   std::vector<std::string> defines = {};
 
-  std::vector<std::string> attribs = {VertexBuffer::PositionKindChars};
+  std::vector<std::string> attribs = {VertexBuffer::PositionKind};
 
   auto mesh = subMesh->getMesh();
   auto uv1  = false;
@@ -240,21 +240,21 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   }
 
   if (uv1) {
-    attribs.emplace_back(VertexBuffer::UVKindChars);
+    attribs.emplace_back(VertexBuffer::UVKind);
     defines.emplace_back("#define UV1");
   }
   if (uv2) {
-    attribs.emplace_back(VertexBuffer::UV2KindChars);
+    attribs.emplace_back(VertexBuffer::UV2Kind);
     defines.emplace_back("#define UV2");
   }
 
   // Bones
   if (mesh->useBones() && mesh->computeBonesUsingShaders()) {
-    attribs.emplace_back(VertexBuffer::MatricesIndicesKindChars);
-    attribs.emplace_back(VertexBuffer::MatricesWeightsKindChars);
+    attribs.emplace_back(VertexBuffer::MatricesIndicesKind);
+    attribs.emplace_back(VertexBuffer::MatricesWeightsKind);
     if (mesh->numBoneInfluencers() > 4) {
-      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKindChars);
-      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKindChars);
+      attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKind);
+      attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKind);
     }
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
@@ -288,10 +288,10 @@ bool EffectLayer::_isReady(SubMesh* subMesh, bool useInstances,
   // Instances
   if (useInstances) {
     defines.emplace_back("#define INSTANCES");
-    attribs.emplace_back(VertexBuffer::World0KindChars);
-    attribs.emplace_back(VertexBuffer::World1KindChars);
-    attribs.emplace_back(VertexBuffer::World2KindChars);
-    attribs.emplace_back(VertexBuffer::World3KindChars);
+    attribs.emplace_back(VertexBuffer::World0Kind);
+    attribs.emplace_back(VertexBuffer::World1Kind);
+    attribs.emplace_back(VertexBuffer::World2Kind);
+    attribs.emplace_back(VertexBuffer::World3Kind);
   }
 
   // Get correct effect
@@ -340,8 +340,7 @@ void EffectLayer::render()
   engine->setState(false);
 
   // VBOs
-  engine->bindBuffers(stl_util::to_raw_ptr_map(_vertexBuffers),
-                      _indexBuffer.get(), currentEffect);
+  engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), currentEffect);
 
   // Cache
   auto previousAlphaMode = engine->getAlphaMode();
@@ -503,8 +502,8 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
 
 void EffectLayer::_rebuild()
 {
-  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
-    auto& vb = _vertexBuffers[VertexBuffer::PositionKindChars];
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
+    auto& vb = _vertexBuffers[VertexBuffer::PositionKind];
 
     if (vb) {
       vb->_rebuild();
@@ -535,11 +534,11 @@ void EffectLayer::_disposeTextureAndPostProcesses()
 
 void EffectLayer::dispose()
 {
-  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKindChars)) {
-    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKindChars];
+  if (stl_util::contains(_vertexBuffers, VertexBuffer::PositionKind)) {
+    auto& vertexBuffer = _vertexBuffers[VertexBuffer::PositionKind];
     if (vertexBuffer) {
       vertexBuffer->dispose();
-      _vertexBuffers[VertexBuffer::PositionKindChars] = nullptr;
+      _vertexBuffers[VertexBuffer::PositionKind] = nullptr;
     }
   }
 

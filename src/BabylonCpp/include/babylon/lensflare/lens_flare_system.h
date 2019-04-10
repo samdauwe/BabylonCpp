@@ -36,6 +36,7 @@ using LensFlareSystemPtr = std::shared_ptr<LensFlareSystem>;
 using LightPtr           = std::shared_ptr<Light>;
 using MeshPtr            = std::shared_ptr<Mesh>;
 using TransformNodePtr   = std::shared_ptr<TransformNode>;
+using VertexBufferPtr    = std::shared_ptr<VertexBuffer>;
 
 namespace GL {
 class IGLBuffer;
@@ -203,7 +204,7 @@ private:
   LensFlareEmitterType _emitter;
   // Float32Array _vertexDeclaration;
   // int _vertexStrideSize;
-  std::unordered_map<std::string, std::unique_ptr<VertexBuffer>> _vertexBuffers;
+  std::unordered_map<std::string, VertexBufferPtr> _vertexBuffers;
   std::unique_ptr<GL::IGLBuffer> _indexBuffer;
   EffectPtr _effect;
   float _positionX;

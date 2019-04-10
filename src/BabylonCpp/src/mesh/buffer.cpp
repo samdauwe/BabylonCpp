@@ -53,7 +53,7 @@ Buffer::~Buffer()
 }
 
 std::unique_ptr<VertexBuffer>
-Buffer::createVertexBuffer(unsigned int kind, size_t offset, size_t size,
+Buffer::createVertexBuffer(const std::string& kind, size_t offset, size_t size,
                            std::optional<size_t> stride,
                            std::optional<bool> instanced, bool useBytes)
 {
