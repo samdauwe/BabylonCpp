@@ -21,7 +21,7 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
 
   // Animated Morph Target Scene
   _samples["AnimatedMorphTargetScene"] = std::make_tuple(
-    false,                                                        //
+    true,                                                         //
     [](ICanvas* iCanvas) {                                        //
       return std::make_unique<AnimatedMorphTargetScene>(iCanvas); //
     });                                                           //

@@ -143,7 +143,7 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
       continue;
     }
 
-    _activeTargets.emplace_back(target.get());
+    _activeTargets.emplace_back(target);
     _tempInfluences.emplace_back(target->influence());
     ++influenceCount;
 

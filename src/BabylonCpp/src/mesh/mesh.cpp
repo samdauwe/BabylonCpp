@@ -2212,7 +2212,7 @@ void Mesh::_syncGeometryWithMorphTargetManager()
       indexStr         = std::to_string(index);
       auto morphTarget = iMorphTargetManager->getActiveTarget(index);
 
-      const auto positions = morphTarget->getPositions();
+      const auto& positions = morphTarget->getPositions();
       if (positions.empty()) {
         BABYLON_LOG_ERROR("Mesh",
                           "Invalid morph target. Target must have positions.");
@@ -2222,13 +2222,13 @@ void Mesh::_syncGeometryWithMorphTargetManager()
       iGeometry->setVerticesData(VertexBuffer::PositionKind + indexStr,
                                  positions, false, 3);
 
-      const auto normals = morphTarget->getNormals();
+      const auto& normals = morphTarget->getNormals();
       if (!normals.empty()) {
         iGeometry->setVerticesData(VertexBuffer::NormalKind + indexStr, normals,
                                    false, 3);
       }
 
-      const auto tangents = morphTarget->getTangents();
+      const auto& tangents = morphTarget->getTangents();
       if (!tangents.empty()) {
         iGeometry->setVerticesData(VertexBuffer::TangentKind + indexStr,
                                    tangents, false, 3);
@@ -2246,7 +2246,7 @@ void Mesh::_syncGeometryWithMorphTargetManager()
 
       if (iGeometry->isVerticesDataPresent(VertexBuffer::NormalKind
                                            + indexStr)) {
-        iGeometry->removeVerticesData(VertexBuffer::NormalKind + index);
+        iGeometry->removeVerticesData(VertexBuffer::NormalKind + indexStr);
       }
       if (iGeometry->isVerticesDataPresent(VertexBuffer::TangentKind
                                            + indexStr)) {
