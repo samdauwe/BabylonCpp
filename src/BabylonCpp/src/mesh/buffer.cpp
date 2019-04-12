@@ -118,6 +118,9 @@ GL::IGLBuffer* Buffer::create(Float32Array data)
     _engine->updateDynamicVertexBuffer(_buffer, data);
     _data = std::move(data);
   }
+  else { // Update data
+    _data = std::move(data);
+  }
 
   return _buffer ? _buffer.get() : nullptr;
 }

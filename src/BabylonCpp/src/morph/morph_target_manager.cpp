@@ -150,7 +150,7 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
     _supportsNormals  = _supportsNormals && target->hasNormals();
     _supportsTangents = _supportsTangents && target->hasTangents();
 
-    auto& positions = target->getPositions();
+    const auto& positions = target->getPositions();
     if (!positions.empty()) {
       const auto iVertexCount = positions.size() / 3;
       if (_vertexCount == 0) {
