@@ -1,7 +1,6 @@
 #include <babylon/samples/materials/pbr_metallic_roughness_texture_material_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/pbr/pbr_metallic_roughness_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture.h>
@@ -36,9 +35,6 @@ void PBRMetallicRoughnessTextureMaterialScene::initializeScene(ICanvas* canvas,
   camera->upperRadiusLimit = 10.f;
 
   camera->attachControl(canvas, true);
-
-  auto light = HemisphericLight::New("light1", Vector3(0.f, 1.f, 0.f), scene);
-  light->intensity = 0.97f;
 
   auto sphere = Mesh::CreateSphere("sphere1", 16, 2.f, scene);
 

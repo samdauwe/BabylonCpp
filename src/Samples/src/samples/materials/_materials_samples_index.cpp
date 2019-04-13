@@ -97,7 +97,7 @@ _MaterialsSamplesIndex::_MaterialsSamplesIndex()
     });                                                                    //
   // PBR Metallic Roughness Texture Material Scene
   _samples["PBRMetallicRoughnessTextureMaterialScene"] = std::make_tuple(
-    false,                 //
+    true,                  //
     [](ICanvas* iCanvas) { //
       return std::make_unique<PBRMetallicRoughnessTextureMaterialScene>(
         iCanvas); //
