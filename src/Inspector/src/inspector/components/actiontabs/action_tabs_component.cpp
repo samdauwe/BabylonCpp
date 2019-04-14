@@ -41,14 +41,17 @@ void ActionTabsComponent::componentWillUnmount()
 
 void ActionTabsComponent::render()
 {
-  ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+  static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
   if (ImGui::BeginTabBar("ActionTabs", tab_bar_flags)) {
     // Properties grid tab
     if (_propertyGridTabComponent) {
       static const auto propertiesTabLabel
         = String::concat(faFileAlt, " ", "Properties");
       if (ImGui::BeginTabItem(propertiesTabLabel.c_str())) {
-        _propertyGridTabComponent->render();
+        if (ImGui::BeginChild("scrollingArea")) {
+          _propertyGridTabComponent->render();
+          ImGui::EndChild();
+        }
         ImGui::EndTabItem();
       }
     }
@@ -56,7 +59,10 @@ void ActionTabsComponent::render()
     if (_debugTabComponent) {
       static const auto debugTabLabel = String::concat(faBug, " ", "Debug");
       if (ImGui::BeginTabItem(debugTabLabel.c_str())) {
-        _debugTabComponent->render();
+        if (ImGui::BeginChild("scrollingArea")) {
+          _debugTabComponent->render();
+          ImGui::EndChild();
+        }
         ImGui::EndTabItem();
       }
     }
@@ -64,7 +70,10 @@ void ActionTabsComponent::render()
       static const auto statisticsTabLabel
         = String::concat(faChartBar, " ", "Statistics");
       if (ImGui::BeginTabItem(statisticsTabLabel.c_str())) {
-        _statisticsTabComponent->render();
+        if (ImGui::BeginChild("scrollingArea")) {
+          _statisticsTabComponent->render();
+          ImGui::EndChild();
+        }
         ImGui::EndTabItem();
       }
     }

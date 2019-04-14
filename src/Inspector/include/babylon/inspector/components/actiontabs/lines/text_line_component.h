@@ -29,14 +29,14 @@ struct BABYLON_SHARED_EXPORT TextLineComponent {
   }
 
   static void render(const std::string& label, const std::string& value,
-                     float offsetX                       = 0.f,
                      const std::optional<ImVec4>& color  = std::nullopt,
                      bool underline                      = false,
                      const std::function<void()>& onLink = nullptr)
   {
     ImGui::TextWrapped("%s", label.c_str());
-    ImGui::SameLine(offsetX);
+    ImGui::NextColumn();
     TextLineComponent::renderContent(value, color, underline, onLink);
+    ImGui::NextColumn();
   }
 
   static void render(const std::string& text)

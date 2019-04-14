@@ -1,6 +1,7 @@
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
 
 #include <babylon/engine/scene.h>
+#include <babylon/inspector/components/actiontabs/line_container_component.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/materials/standard_material.h>
 
@@ -44,24 +45,21 @@ void DebugTabComponent::render()
   }
 
   // --- HELPERS ---
-  static auto helpersOpened = true;
-  ImGui::SetNextTreeNodeOpen(helpersOpened, ImGuiCond_Always);
-  if (ImGui::CollapsingHeader("HELPERS")) {
+  static auto helpersOpenedClosed = false;
+  if (LineContainerComponent::begin("HELPERS", helpersOpenedClosed)) {
     CheckBoxLineComponent::render(
       "Bones", _skeletonViewersEnabled,
       [this](bool /*value*/) { switchSkeletonViewers(); });
     CheckBoxLineComponent::render(
       "Physics", _physicsViewersEnabled,
       [this](bool /*value*/) { switchPhysicsViewers(); });
-    helpersOpened = true;
-  }
-  else {
-    helpersOpened = false;
+    LineContainerComponent::end();
   }
   // --- TEXTURE CHANNELS ---
-  static auto textureChannelsOpened = true;
-  ImGui::SetNextTreeNodeOpen(textureChannelsOpened, ImGuiCond_Always);
-  if (ImGui::CollapsingHeader("TEXTURE CHANNELS")) {
+  static auto textureChannelsClosed = false;
+  ImGui::SetNextTreeNodeOpen(textureChannelsClosed, ImGuiCond_Always);
+  if (LineContainerComponent::begin("TEXTURE CHANNELS",
+                                    textureChannelsClosed)) {
     CheckBoxLineComponent::render(
       "Diffuse", StandardMaterial::DiffuseTextureEnabled(), [](bool /*value*/) {
         StandardMaterial::SetDiffuseTextureEnabled(
@@ -123,15 +121,11 @@ void DebugTabComponent::render()
                                     StandardMaterial::SetFresnelEnabled(
                                       !StandardMaterial::FresnelEnabled());
                                   });
-    textureChannelsOpened = true;
-  }
-  else {
-    textureChannelsOpened = false;
+    LineContainerComponent::end();
   }
   // --- FEATURES ---
-  static auto featuresOpened = true;
-  ImGui::SetNextTreeNodeOpen(featuresOpened, ImGuiCond_Always);
-  if (ImGui::CollapsingHeader("FEATURES")) {
+  static auto featuresClosed = false;
+  if (LineContainerComponent::begin("FEATURES", featuresClosed)) {
     CheckBoxLineComponent::render(
       "Animations", scene->animationsEnabled, [&scene](bool /*value*/) {
         scene->animationsEnabled = !scene->animationsEnabled;
@@ -188,10 +182,7 @@ void DebugTabComponent::render()
       "Sprites", scene->spritesEnabled, [&scene](bool /*value*/) {
         scene->spritesEnabled = !scene->spritesEnabled;
       });
-    featuresOpened = true;
-  }
-  else {
-    featuresOpened = false;
+    LineContainerComponent::end();
   }
 }
 

@@ -13,14 +13,19 @@ struct BABYLON_SHARED_EXPORT CheckBoxLineComponent {
 
   static void render(const char* label, bool& isSelected)
   {
-    ImGui::Checkbox(label, &isSelected);
+    ImGui::TextWrapped("%s", label);
+    ImGui::NextColumn();
+    ImGui::PushID(label);
+    ImGui::Checkbox("", &isSelected);
+    ImGui::PopID();
+    ImGui::NextColumn();
   }
 
   static void render(const char* label, bool isSelected,
                      const SA::delegate<void(bool value)>& onSelect)
   {
     bool origValue = isSelected;
-    ImGui::Checkbox(label, &isSelected);
+    CheckBoxLineComponent::render(label, isSelected);
     if (origValue != isSelected) {
       onSelect(isSelected);
     }

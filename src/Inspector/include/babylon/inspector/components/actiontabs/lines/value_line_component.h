@@ -12,12 +12,12 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT ValueLineComponent {
 
-  static void render(const char* label, int value, float offsetX = 0.f,
+  static void render(const char* label, int value,
                      const std::optional<ImVec4>& color = std::nullopt,
                      const std::string& units           = "")
   {
     ImGui::TextWrapped("%s", label);
-    ImGui::SameLine(offsetX);
+    ImGui::NextColumn();
     if (color.has_value()) {
       ImGui::PushStyleColor(ImGuiCol_Text, *color);
     }
@@ -25,9 +25,10 @@ struct BABYLON_SHARED_EXPORT ValueLineComponent {
     if (color.has_value()) {
       ImGui::PopStyleColor();
     }
+    ImGui::NextColumn();
   }
 
-  static void render(const char* label, float value, float offsetX = 0.f,
+  static void render(const char* label, float value,
                      const std::optional<ImVec4>& color       = std::nullopt,
                      const std::optional<int>& fractionDigits = std::nullopt,
                      const std::string& units                 = "")
@@ -35,7 +36,7 @@ struct BABYLON_SHARED_EXPORT ValueLineComponent {
     const auto digits = fractionDigits.has_value() ? *fractionDigits : 2;
 
     ImGui::TextWrapped("%s", label);
-    ImGui::SameLine(offsetX);
+    ImGui::NextColumn();
     if (color.has_value()) {
       ImGui::PushStyleColor(ImGuiCol_Text, *color);
     }
@@ -44,6 +45,7 @@ struct BABYLON_SHARED_EXPORT ValueLineComponent {
     if (color.has_value()) {
       ImGui::PopStyleColor();
     }
+    ImGui::NextColumn();
   }
 
 }; // end of struct ValueLineComponent

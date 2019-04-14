@@ -15,16 +15,17 @@ struct BABYLON_SHARED_EXPORT BooleanLineComponent {
   static constexpr const char* faCheck       = ICON_FA_CHECK;
   static constexpr const char* faTimesCircle = ICON_FA_TIMES_CIRCLE;
 
-  static void render(const char* label, bool value, float offsetX = 0.f)
+  static void render(const char* label, bool value)
   {
     static ImVec4 red   = ImColor(1.0f, 0.0f, 0.0f, 1.0f);
     static ImVec4 green = ImColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     ImGui::TextWrapped("%s", label);
-    ImGui::SameLine(offsetX);
+    ImGui::NextColumn();
     ImGui::PushStyleColor(ImGuiCol_Text, value ? green : red);
     ImGui::TextWrapped("%s", value ? faCheck : faTimesCircle);
     ImGui::PopStyleColor();
+    ImGui::NextColumn();
   }
 
 }; // end of struct BooleanLineComponent
