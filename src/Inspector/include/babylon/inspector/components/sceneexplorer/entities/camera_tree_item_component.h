@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
+#include <babylon/inspector/components/sceneexplorer/tree_item_specialized_component.h>
 #include <babylon/tools/observer.h>
 
 namespace BABYLON {
@@ -23,7 +24,8 @@ struct CameraTreeItemComponentState {
   bool isActive = false;
 }; // end of struct CameraTreeItemComponentState
 
-class BABYLON_SHARED_EXPORT CameraTreeItemComponent {
+class BABYLON_SHARED_EXPORT CameraTreeItemComponent
+    : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -32,12 +34,12 @@ public:
 
 public:
   CameraTreeItemComponent(const ICameraTreeItemComponentProps& props);
-  ~CameraTreeItemComponent();
+  virtual ~CameraTreeItemComponent();
 
   void setActive();
   void componentWillMount();
   void componentWillUnmount();
-  void render();
+  void render() override;
 
 public:
   ICameraTreeItemComponentProps props;

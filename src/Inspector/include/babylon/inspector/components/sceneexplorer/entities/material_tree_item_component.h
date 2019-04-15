@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
+#include <babylon/inspector/components/sceneexplorer/tree_item_specialized_component.h>
 
 namespace BABYLON {
 
@@ -18,7 +19,8 @@ struct IMaterialTreeItemComponentProps {
   std::function<void()> onClick = nullptr;
 }; // end of struct IMaterialTreeItemComponentProps
 
-class BABYLON_SHARED_EXPORT MaterialTreeItemComponent {
+class BABYLON_SHARED_EXPORT MaterialTreeItemComponent
+    : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -26,9 +28,9 @@ public:
 
 public:
   MaterialTreeItemComponent(const IMaterialTreeItemComponentProps& props);
-  ~MaterialTreeItemComponent();
+  virtual ~MaterialTreeItemComponent();
 
-  void render();
+  void render() override;
 
 public:
   IMaterialTreeItemComponentProps props;

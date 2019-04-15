@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
+#include <babylon/inspector/components/sceneexplorer/tree_item_specialized_component.h>
 
 namespace BABYLON {
 
@@ -24,7 +25,8 @@ struct SceneTreeItemComponentState {
   unsigned int gizmoMode;
 }; // end of struct SceneTreeItemComponentState
 
-class BABYLON_SHARED_EXPORT SceneTreeItemComponent {
+class BABYLON_SHARED_EXPORT SceneTreeItemComponent
+    : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -37,14 +39,14 @@ public:
 
 public:
   SceneTreeItemComponent(const ISceneTreeItemComponentProps& props);
-  ~SceneTreeItemComponent();
+  virtual ~SceneTreeItemComponent();
 
   void componentWillMount();
   void componentWillUnmount();
   void onSelect();
   void onPickingMode();
   void setGizmoMode(unsigned int mode);
-  void render();
+  void render() override;
 
 public:
   ISceneTreeItemComponentProps props;

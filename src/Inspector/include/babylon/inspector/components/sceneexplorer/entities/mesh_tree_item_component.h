@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
+#include <babylon/inspector/components/sceneexplorer/tree_item_specialized_component.h>
 
 namespace BABYLON {
 
@@ -23,7 +24,8 @@ struct MeshTreeItemComponentState {
   bool isGizmoEnabled = false;
 }; // end of struct MeshTreeItemComponentState
 
-class BABYLON_SHARED_EXPORT MeshTreeItemComponent {
+class BABYLON_SHARED_EXPORT MeshTreeItemComponent
+    : public TreeItemSpecializedComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
@@ -34,11 +36,11 @@ public:
 
 public:
   MeshTreeItemComponent(const IMeshTreeItemComponentProps& props);
-  ~MeshTreeItemComponent();
+  virtual ~MeshTreeItemComponent();
 
   void showGizmos();
   void switchVisibility();
-  void render();
+  void render() override;
 
 public:
   IMeshTreeItemComponentProps props;

@@ -7,11 +7,8 @@
 
 namespace BABYLON {
 
-class CameraTreeItemComponent;
-class LightTreeItemComponent;
-class MaterialTreeItemComponent;
-class MeshTreeItemComponent;
 class Scene;
+class SceneGraphComponent;
 
 struct ISceneExplorerComponentProps {
   Scene* scene;
@@ -27,11 +24,7 @@ public:
 
 private:
   ISceneExplorerComponentProps props;
-  // Testing
-  std::unique_ptr<CameraTreeItemComponent> _cameraTreeItemComponent;
-  std::unique_ptr<LightTreeItemComponent> _lightTreeItemComponent;
-  std::unique_ptr<MeshTreeItemComponent> _meshTreeItemComponent;
-  std::unique_ptr<MaterialTreeItemComponent> _materialTreeItemComponent;
+  std::unique_ptr<SceneGraphComponent> _sceneGraphComponent;
 
 }; // end of class SceneExplorerComponent
 
