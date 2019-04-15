@@ -1,6 +1,7 @@
 #ifndef BABYLON_CORE_TREE_H
 #define BABYLON_CORE_TREE_H
 
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -178,6 +179,29 @@ public:
     node->_parent = this;
     _children.emplace_back(std::move(node));
     return *_children.back();
+  }
+
+  /**
+   * @brief Creates a child node using the given data object and adds the item
+   * defined by the comparator argument.
+   * @param data The data object to be encapsulated in the new child node.
+   * @param comparator The comparator function to insert a new element in a
+   * sorted vector.
+   * @return Reference to the created node.
+   */
+  TreeNode<T>&
+  addChildSorted(T data,
+                 const std::function<bool(const T& a, const T& b)>& comparator)
+  {
+    auto node     = std::make_unique<TreeNode<T>>(data);
+    node->_parent = this;
+    auto pos      = std::find_if(
+      _children.begin(), _children.end(),
+      [&node, &comparator](const std::unique_ptr<TreeNode<T>>& treeNode) {
+        return comparator(node->data(), treeNode->data());
+      });
+    auto it = _children.insert(pos, std::move(node));
+    return *(*it);
   }
 
   /**
