@@ -110,6 +110,12 @@ public:
    */
   Engine* getEngine();
 
+  /**
+   * @brief Gets the shared pointer to this object.
+   * @return the shared pointer to this object
+   */
+  NodePtr getAsNodePtr();
+
   // Behaviors
   /**
    * @brief Attach a behavior to the node.

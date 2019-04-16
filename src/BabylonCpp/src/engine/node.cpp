@@ -183,6 +183,11 @@ Engine* Node::getEngine()
   return _scene->getEngine();
 }
 
+NodePtr Node::getAsNodePtr()
+{
+  return shared_from_this();
+}
+
 Node& Node::addBehavior(Behavior<Node>* behavior, bool attachImmediately)
 {
   auto it = std::find(_behaviors.begin(), _behaviors.end(), behavior);
