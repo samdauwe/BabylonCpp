@@ -40,7 +40,8 @@ public:
 
   void showGizmos();
   void switchVisibility();
-  void render() override;
+  void renderLabelWithIcon() override;
+  void renderControls() override;
 
 public:
   IMeshTreeItemComponentProps props;

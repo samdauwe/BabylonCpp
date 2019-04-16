@@ -2,24 +2,22 @@
 #define BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_SCENE_GRAPH_COMPONENT_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/core/string.h>
 #include <babylon/core/tree.h>
 
 namespace BABYLON {
 
-struct TreeItem {
-  const char* label = nullptr;
-  char icon         = '?';
-  bool isActive     = false;
-}; // end of struct SceneGraphItem
-
+class Material;
 class Node;
 class Scene;
+struct TreeItemSpecializedComponent;
+using MaterialPtr = std::shared_ptr<Material>;
+using NodePtr     = std::shared_ptr<Node>;
+using TreeItemSpecializedComponentPtr
+  = std::shared_ptr<TreeItemSpecializedComponent>;
+using TreeItem = TreeItemSpecializedComponentPtr;
 
 class BABYLON_SHARED_EXPORT SceneGraphComponent {
-
-private:
-    template <typename T>
-    using TreeItemFactoryMethod = std::function<TreeItem(const T& node)>;
 
 public:
   SceneGraphComponent(Scene* scene);
@@ -35,32 +33,32 @@ public:
 
 private:
   /**
-   * @brief Initializes the "Nodes" subtree.
+   * @brief Initializes a subtree.
    */
   template <typename T>
-  void _initializeNodesTreeItem(TreeNode<TreeItem>& parentTreeItem,
-                                const T& node)
+  void _initializeTreeItem(TreeNode<TreeItem>& parentTreeItem, const T& entity)
   {
-    // Create TreeItem
-    auto& treeItem = parentTreeItem.addChild(TreeItem{node->name.c_str()});
-
-    // Create Children
-    for (auto&& child : node->getChildren()) {
-      if (child) {
-        _initializeTreeItem(treeItem, child.get());
-      }
+    if (String::contains(entity->getClassName(), "Material")) {
+      parentTreeItem.addChildSorted(
+        createMaterialTreeItem(std::static_pointer_cast<Material>(entity)),
+        _treeItemComparator);
+    }
+    else {
+      // Create TreeItem
+      parentTreeItem.addChild(createGroupContainer(entity->name.c_str()));
     }
   }
 
   /**
-   * @brief Initializes a subtree.
+   * @brief Initializes the "Nodes" subtree.
    */
-  template <typename T>
-  void _initializeTreeItem(TreeNode<TreeItem>& parentTreeItem, const T& node)
-  {
-    // Create TreeItem
-    parentTreeItem.addChild(TreeItem{node->name.c_str()});
-  }
+  void _initializeNodesTreeItem(TreeNode<TreeItem>& parentTreeItem,
+                                const NodePtr& node);
+
+  TreeItem createGroupContainer(const char* label);
+  TreeItem createMaterialTreeItem(const MaterialPtr& material);
+  TreeItem createNodeTreeItem(const NodePtr& node);
+  TreeItem createSceneTreeItem(Scene* scene);
 
   /**
    * @brief Render the scene graph.
@@ -72,6 +70,7 @@ private:
   Scene* _scene;
   Tree<TreeItem> _sceneGraph;
   bool _initialized;
+  std::function<bool(const TreeItem& a, const TreeItem& b)> _treeItemComparator;
 
 }; // end of class SceneGraphComponent
 

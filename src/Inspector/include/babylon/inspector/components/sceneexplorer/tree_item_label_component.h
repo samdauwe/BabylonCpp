@@ -14,18 +14,20 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT TreeItemLabelComponent {
 
-  static void render(const std::string& label, const std::string& icon,
+  static void render(const char* label, const char* icon,
                      const std::optional<ImVec4>& color = std::nullopt)
   {
+    // Title icon
     if (color.has_value()) {
       ImGui::PushStyleColor(ImGuiCol_Text, *color);
     }
-    ImGui::TextWrapped("%s", icon.c_str());
+    ImGui::TextWrapped("%s", icon);
     if (color.has_value()) {
       ImGui::PopStyleColor();
     }
     ImGui::SameLine();
-    ImGui::TextWrapped("%s", label.c_str());
+    // Title text
+    ImGui::TextWrapped("%s", label);
   }
 
 }; // end of struct TreeItemLabelComponent

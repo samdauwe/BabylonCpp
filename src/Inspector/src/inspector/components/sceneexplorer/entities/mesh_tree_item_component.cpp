@@ -11,6 +11,7 @@ MeshTreeItemComponent::MeshTreeItemComponent(
 {
   const auto& mesh = props.mesh;
 
+  labelWithoutIcon     = props.mesh->name;
   state.isVisible      = mesh->isVisible;
   state.isGizmoEnabled = false;
 }
@@ -27,15 +28,14 @@ void MeshTreeItemComponent::switchVisibility()
 {
 }
 
-void MeshTreeItemComponent::render()
+void MeshTreeItemComponent::renderLabelWithIcon()
 {
   static ImVec4 dodgerblue = ImColor(0.0f, 0.0f, 1.0f, 1.0f);
+  TreeItemLabelComponent::render(labelWithoutIcon.c_str(), faCube, dodgerblue);
+}
 
-  static auto textSize = ImGui::CalcTextSize("4096x2160");
-  const auto offsetX   = ImGui::GetContentRegionMax().x - textSize.x;
-
-  TreeItemLabelComponent::render(props.mesh->name, faCube, dodgerblue);
-  ImGui::SameLine(offsetX);
+void MeshTreeItemComponent::renderControls()
+{
   if (ImGui::Button(faVectorSquare)) {
   }
   if (ImGui::IsItemHovered()) {

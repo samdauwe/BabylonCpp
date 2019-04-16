@@ -14,7 +14,8 @@ CameraTreeItemComponent::CameraTreeItemComponent(
   const auto& camera = props.camera;
   const auto& scene  = camera->getScene();
 
-  state.isActive = scene->activeCamera == camera;
+  labelWithoutIcon = props.camera->name;
+  state.isActive   = scene->activeCamera == camera;
 }
 
 CameraTreeItemComponent::~CameraTreeItemComponent()
@@ -40,15 +41,14 @@ void CameraTreeItemComponent::componentWillUnmount()
 {
 }
 
-void CameraTreeItemComponent::render()
+void CameraTreeItemComponent::renderLabelWithIcon()
 {
   static ImVec4 green = ImColor(0.0f, 1.0f, 0.0f, 1.0f);
+  TreeItemLabelComponent::render(labelWithoutIcon.c_str(), faCamera, green);
+}
 
-  static auto textSize = ImGui::CalcTextSize("4096x2160");
-  const auto offsetX   = ImGui::GetContentRegionMax().x - textSize.x;
-
-  TreeItemLabelComponent::render(props.camera->name, faCamera, green);
-  ImGui::SameLine(offsetX);
+void CameraTreeItemComponent::renderControls()
+{
   if (ImGui::Button(faVideo)) {
   }
   if (ImGui::IsItemHovered()) {

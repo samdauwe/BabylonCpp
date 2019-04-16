@@ -10,12 +10,10 @@
 
 namespace BABYLON {
 
-class Camera;
 class Scene;
-using CameraPtr = std::shared_ptr<Camera>;
 
 struct ISceneTreeItemComponentProps {
-  CameraPtr camera                = nullptr;
+  Scene* scene                    = nullptr;
   std::function<void()> onRefresh = nullptr;
 }; // end of struct ISceneTreeItemComponentProps
 
@@ -46,7 +44,8 @@ public:
   void onSelect();
   void onPickingMode();
   void setGizmoMode(unsigned int mode);
-  void render() override;
+  void renderLabelWithIcon() override;
+  void renderControls() override;
 
 public:
   ISceneTreeItemComponentProps props;

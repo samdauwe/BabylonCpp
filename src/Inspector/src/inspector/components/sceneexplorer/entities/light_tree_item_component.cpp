@@ -11,6 +11,7 @@ LightTreeItemComponent::LightTreeItemComponent(
 {
   const auto& light = props.light;
 
+  labelWithoutIcon     = props.light->name;
   state.isEnabled      = light->isEnabled();
   state.isGizmoEnabled = false;
 }
@@ -27,15 +28,14 @@ void LightTreeItemComponent::toggleGizmo()
 {
 }
 
-void LightTreeItemComponent::render()
+void LightTreeItemComponent::renderLabelWithIcon()
 {
   static ImVec4 yellow = ImColor(1.0f, 1.0f, 0.0f, 1.0f);
+  TreeItemLabelComponent::render(labelWithoutIcon.c_str(), faLightbulb, yellow);
+}
 
-  static auto textSize = ImGui::CalcTextSize("4096x2160");
-  const auto offsetX   = ImGui::GetContentRegionMax().x - textSize.x;
-
-  TreeItemLabelComponent::render(props.light->name, faLightbulb, yellow);
-  ImGui::SameLine(offsetX);
+void LightTreeItemComponent::renderControls()
+{
   if (ImGui::Button(faLightbubRegular)) {
   }
   if (ImGui::IsItemHovered()) {

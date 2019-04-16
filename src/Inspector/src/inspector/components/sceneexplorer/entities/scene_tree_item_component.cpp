@@ -1,11 +1,14 @@
 #include <babylon/inspector/components/sceneexplorer/entities/scene_tree_item_component.h>
 
+#include <cstdio>
+
 namespace BABYLON {
 
 SceneTreeItemComponent::SceneTreeItemComponent(
   const ISceneTreeItemComponentProps& iProps)
     : props{iProps}
 {
+  sprintf(label, "%s %s", faImage, "Scene");
 }
 
 SceneTreeItemComponent::~SceneTreeItemComponent()
@@ -32,7 +35,11 @@ void SceneTreeItemComponent::setGizmoMode(unsigned int /*mode*/)
 {
 }
 
-void SceneTreeItemComponent::render()
+void SceneTreeItemComponent::renderLabelWithIcon()
+{
+}
+
+void SceneTreeItemComponent::renderControls()
 {
 }
 
