@@ -39,8 +39,7 @@ public:
 
   void switchIsEnabled();
   void toggleGizmo();
-  void renderLabelWithIcon() override;
-  void renderControls() override;
+  void render() override;
 
 public:
   ILightTreeItemComponentProps props;

@@ -9,21 +9,17 @@ MaterialTreeItemComponent::MaterialTreeItemComponent(
   const IMaterialTreeItemComponentProps& iProps)
     : props{iProps}
 {
-  labelWithoutIcon = props.material->name;
+  sprintf(label, "%s", props.material->name.c_str());
 }
 
 MaterialTreeItemComponent::~MaterialTreeItemComponent()
 {
 }
 
-void MaterialTreeItemComponent::renderLabelWithIcon()
+void MaterialTreeItemComponent::render()
 {
   static ImVec4 orange = ImColor(1.0f, 165.f / 255.f, 0.0f, 1.0f);
-  TreeItemLabelComponent::render(labelWithoutIcon.c_str(), faBrush, orange);
-}
-
-void MaterialTreeItemComponent::renderControls()
-{
+  TreeItemLabelComponent::render(label, faBrush, orange);
 }
 
 } // end of namespace BABYLON

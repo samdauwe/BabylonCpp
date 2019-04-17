@@ -1,5 +1,6 @@
 #include <babylon/inspector/components/sceneexplorer/entities/mesh_tree_item_component.h>
 
+#include <babylon/imgui/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/mesh/abstract_mesh.h>
 
@@ -11,7 +12,7 @@ MeshTreeItemComponent::MeshTreeItemComponent(
 {
   const auto& mesh = props.mesh;
 
-  labelWithoutIcon     = props.mesh->name;
+  sprintf(label, "%s", props.mesh->name.c_str());
   state.isVisible      = mesh->isVisible;
   state.isGizmoEnabled = false;
 }
@@ -28,22 +29,19 @@ void MeshTreeItemComponent::switchVisibility()
 {
 }
 
-void MeshTreeItemComponent::renderLabelWithIcon()
+void MeshTreeItemComponent::render()
 {
   static ImVec4 dodgerblue = ImColor(0.0f, 0.0f, 1.0f, 1.0f);
-  TreeItemLabelComponent::render(labelWithoutIcon.c_str(), faCube, dodgerblue);
-}
+  TreeItemLabelComponent::render(props.mesh->name.c_str(), faCube, dodgerblue);
 
-void MeshTreeItemComponent::renderControls()
-{
-  if (ImGui::Button(faVectorSquare)) {
-  }
+  ImGui::SameLine(ImGui::GetWindowWidth() - 2.f * ImGui::DoubleIconSize);
+  ImGui::TextWrapped("%s", faVectorSquare);
   if (ImGui::IsItemHovered()) {
     ImGui::SetTooltip("%s", "Show/Hide position gizmo");
   }
-  ImGui::SameLine();
-  if (ImGui::Button(state.isVisible ? faEye : faEyeSlash)) {
-  }
+
+  ImGui::SameLine(ImGui::GetWindowWidth() - ImGui::DoubleIconSize);
+  ImGui::TextWrapped("%s", state.isVisible ? faEye : faEyeSlash);
   if (ImGui::IsItemHovered()) {
     ImGui::SetTooltip("%s", "Show/Hide mesh");
   }

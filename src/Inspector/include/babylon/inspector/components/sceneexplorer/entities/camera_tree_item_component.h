@@ -39,8 +39,7 @@ public:
   void setActive();
   void componentWillMount();
   void componentWillUnmount();
-  void renderLabelWithIcon() override;
-  void renderControls() override;
+  void render() override;
 
 public:
   ICameraTreeItemComponentProps props;

@@ -3,6 +3,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
+#include <babylon/imgui/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 
 namespace BABYLON {
@@ -14,8 +15,8 @@ CameraTreeItemComponent::CameraTreeItemComponent(
   const auto& camera = props.camera;
   const auto& scene  = camera->getScene();
 
-  labelWithoutIcon = props.camera->name;
-  state.isActive   = scene->activeCamera == camera;
+  sprintf(label, "%s", props.camera->name.c_str());
+  state.isActive = scene->activeCamera == camera;
 }
 
 CameraTreeItemComponent::~CameraTreeItemComponent()
@@ -41,16 +42,14 @@ void CameraTreeItemComponent::componentWillUnmount()
 {
 }
 
-void CameraTreeItemComponent::renderLabelWithIcon()
+void CameraTreeItemComponent::render()
 {
   static ImVec4 green = ImColor(0.0f, 1.0f, 0.0f, 1.0f);
-  TreeItemLabelComponent::render(labelWithoutIcon.c_str(), faCamera, green);
-}
+  TreeItemLabelComponent::render(label, faCamera, green);
 
-void CameraTreeItemComponent::renderControls()
-{
-  if (ImGui::Button(faVideo)) {
-  }
+  ImGui::SameLine(ImGui::GetWindowWidth() - ImGui::DoubleIconSize);
+
+  ImGui::TextWrapped("%s", faVideo);
   if (ImGui::IsItemHovered()) {
     ImGui::SetTooltip("%s", "Set as main camera");
   }

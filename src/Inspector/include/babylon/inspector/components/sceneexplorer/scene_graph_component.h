@@ -4,20 +4,26 @@
 #include <babylon/babylon_api.h>
 #include <babylon/core/string.h>
 #include <babylon/core/tree.h>
+#include <babylon/imgui/icons_font_awesome_5.h>
+
+#include <babylon/inspector/components/sceneexplorer/tree_item_component.h>
 
 namespace BABYLON {
 
 class Material;
 class Node;
 class Scene;
-struct TreeItemSpecializedComponent;
+struct TreeItemComponent;
 using MaterialPtr = std::shared_ptr<Material>;
 using NodePtr     = std::shared_ptr<Node>;
-using TreeItemSpecializedComponentPtr
-  = std::shared_ptr<TreeItemSpecializedComponent>;
-using TreeItem = TreeItemSpecializedComponentPtr;
+using TreeItem    = TreeItemComponent;
 
 class BABYLON_SHARED_EXPORT SceneGraphComponent {
+
+public:
+  /** Font Awesome Icon Unicodes **/
+  static constexpr const char* faMinus = ICON_FA_MINUS;
+  static constexpr const char* faPlus  = ICON_FA_PLUS;
 
 public:
   SceneGraphComponent(Scene* scene);
@@ -40,12 +46,8 @@ private:
   {
     if (String::contains(entity->getClassName(), "Material")) {
       parentTreeItem.addChildSorted(
-        createMaterialTreeItem(std::static_pointer_cast<Material>(entity)),
+        _createMaterialTreeItem(std::static_pointer_cast<Material>(entity)),
         _treeItemComparator);
-    }
-    else {
-      // Create TreeItem
-      parentTreeItem.addChild(createGroupContainer(entity->name.c_str()));
     }
   }
 
@@ -55,10 +57,23 @@ private:
   void _initializeNodesTreeItem(TreeNode<TreeItem>& parentTreeItem,
                                 const NodePtr& node);
 
-  TreeItem createGroupContainer(const char* label);
-  TreeItem createMaterialTreeItem(const MaterialPtr& material);
-  TreeItem createNodeTreeItem(const NodePtr& node);
-  TreeItem createSceneTreeItem(Scene* scene);
+  TreeItem _createTreeItem(const char* label);
+  TreeItem _createMaterialTreeItem(const MaterialPtr& material);
+  TreeItem _createNodeTreeItem(const NodePtr& node);
+  TreeItem _createSceneTreeItem(Scene* scene);
+
+  float _calculateOffset(unsigned int nodeLevel);
+
+  /**
+   * @brief Render a selectable tree item.
+   * @param node
+   */
+  void _renderSelectableTreeItem(TreeNode<TreeItem>& node);
+
+  /**
+   * @brief Renders the selectable children
+   */
+  void _renderChildren(TreeNode<TreeItem>& node);
 
   /**
    * @brief Render the scene graph.

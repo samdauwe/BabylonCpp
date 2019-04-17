@@ -44,8 +44,7 @@ public:
   void onSelect();
   void onPickingMode();
   void setGizmoMode(unsigned int mode);
-  void renderLabelWithIcon() override;
-  void renderControls() override;
+  void render() override;
 
 public:
   ISceneTreeItemComponentProps props;

@@ -1,4 +1,4 @@
-#include <babylon/inspector/components/sceneexplorer/scene_graph_component.h>
+﻿#include <babylon/inspector/components/sceneexplorer/scene_graph_component.h>
 
 #include <imgui.h>
 
@@ -9,13 +9,13 @@
 #include <babylon/materials/material.h>
 #include <babylon/mesh/mesh.h>
 
+#include <babylon/imgui/imgui_utils.h>
+
 #include <babylon/inspector/components/sceneexplorer/entities/camera_tree_item_component.h>
-#include <babylon/inspector/components/sceneexplorer/entities/group_container_tree_item.h>
 #include <babylon/inspector/components/sceneexplorer/entities/light_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/material_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/mesh_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/scene_tree_item_component.h>
-
 #include <babylon/inspector/components/sceneexplorer/tree_item_expandable_header_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_root_header_component.h>
 
@@ -23,11 +23,13 @@ namespace BABYLON {
 
 SceneGraphComponent::SceneGraphComponent(Scene* scene)
     : _scene{scene}
-    , _sceneGraph{createSceneTreeItem(scene)}
+    , _sceneGraph{_createSceneTreeItem(scene)}
     , _initialized{false}
 {
   _treeItemComparator = [](const TreeItem& a, const TreeItem& b) -> bool {
-    return a->labelWithoutIcon < b->labelWithoutIcon;
+    const auto labelA = std::string(a.label);
+    const auto labelB = std::string(b.label);
+    return labelA < labelB;
   };
 }
 
@@ -39,22 +41,27 @@ void SceneGraphComponent::reinitialize()
 {
   // Nodes
   const auto& rootNodes = _scene->rootNodes;
-  auto& nodesTreeItem
-    = _sceneGraph.root().addChild(createGroupContainer("Nodes"));
-  for (auto&& rootNode : rootNodes) {
+  auto& nodesTreeItem   = _sceneGraph.root().addChild(_createTreeItem("Nodes"));
+  for (const auto& rootNode : rootNodes) {
     _initializeNodesTreeItem(nodesTreeItem, rootNode->getAsNodePtr());
   }
   // Materials
   const auto& materials = _scene->materials;
   auto& materialsTreeItem
-    = _sceneGraph.root().addChild(createGroupContainer("Materials"));
-  for (auto&& material : materials) {
+    = _sceneGraph.root().addChild(_createTreeItem("Materials"));
+  for (const auto& material : materials) {
     _initializeTreeItem(materialsTreeItem, material);
   }
   // Textures
-  _sceneGraph.root().addChild(createGroupContainer("Textures"));
+  _sceneGraph.root().addChild(_createTreeItem("Textures"));
   // Rendering pipelines
-  _sceneGraph.root().addChild(createGroupContainer("Rendering pipelines"));
+  _sceneGraph.root().addChild(_createTreeItem("Rendering pipelines"));
+
+  // Set the offset
+  Tree<TreeItem>::recursive_visit(
+    _sceneGraph.root(), [this](TreeNode<TreeItem>& node) {
+      node.data().offset = _calculateOffset(node.depth());
+    });
 
   _initialized = true;
 }
@@ -62,9 +69,8 @@ void SceneGraphComponent::reinitialize()
 void SceneGraphComponent::DeSelectAll(TreeNode<TreeItem>& node)
 {
   {
-    Tree<TreeItem>::recursive_visit(node, [](TreeNode<TreeItem>& TteeItem) {
-      TteeItem.data()->isActive = false;
-    });
+    Tree<TreeItem>::recursive_visit(
+      node, [](TreeNode<TreeItem>& node) { node.data().isSelected = false; });
   }
 }
 
@@ -72,7 +78,7 @@ void SceneGraphComponent::_initializeNodesTreeItem(
   TreeNode<TreeItem>& parentTreeItem, const NodePtr& node)
 {
   // Create TreeItem
-  auto& treeItem = parentTreeItem.addChildSorted(createNodeTreeItem(node),
+  auto& treeItem = parentTreeItem.addChildSorted(_createNodeTreeItem(node),
                                                  _treeItemComparator);
 
   // Create Children
@@ -83,191 +89,196 @@ void SceneGraphComponent::_initializeNodesTreeItem(
   }
 }
 
-TreeItem SceneGraphComponent::createGroupContainer(const char* label)
+TreeItem SceneGraphComponent::_createTreeItem(const char* label)
 {
-  return std::make_shared<GroupContainerTreeItemComponent>(label);
+  TreeItem treeItem;
+  sprintf(treeItem.label, "%s", label);
+
+  return treeItem;
 }
 
 TreeItem
-SceneGraphComponent::createMaterialTreeItem(const MaterialPtr& material)
+SceneGraphComponent::_createMaterialTreeItem(const MaterialPtr& material)
 {
+  TreeItem treeItem;
+  std::string label;
+  size_t key;
+
   if (material) {
     IMaterialTreeItemComponentProps props;
-    props.material = material;
-    return std::make_shared<MaterialTreeItemComponent>(props);
+    props.material     = material;
+    label              = props.material->name;
+    key                = props.material->uniqueId;
+    treeItem.component = std::make_shared<MaterialTreeItemComponent>(props);
   }
 
-  return nullptr;
+  sprintf(treeItem.label, "%s", label.c_str());
+  sprintf(treeItem.key, "%ld", key);
+
+  return treeItem;
 }
 
-TreeItem SceneGraphComponent::createNodeTreeItem(const NodePtr& node)
+TreeItem SceneGraphComponent::_createNodeTreeItem(const NodePtr& node)
 {
+  TreeItem treeItem;
+  std::string label;
+  size_t key;
+
   if (node) {
     if (String::contains(node->getClassName(), "Bone")) {
     }
     else if (String::contains(node->getClassName(), "Camera")) {
       ICameraTreeItemComponentProps props;
-      props.camera = std::static_pointer_cast<Camera>(node);
-      return std::make_shared<CameraTreeItemComponent>(props);
+      props.camera       = std::static_pointer_cast<Camera>(node);
+      label              = props.camera->name;
+      key                = props.camera->uniqueId;
+      treeItem.component = std::make_shared<CameraTreeItemComponent>(props);
     }
     else if (String::contains(node->getClassName(), "Light")) {
       ILightTreeItemComponentProps props;
-      props.light = std::static_pointer_cast<Light>(node);
-      return std::make_shared<LightTreeItemComponent>(props);
+      props.light        = std::static_pointer_cast<Light>(node);
+      label              = props.light->name;
+      key                = props.light->uniqueId;
+      treeItem.component = std::make_shared<LightTreeItemComponent>(props);
     }
     else if (String::contains(node->getClassName(), "Mesh")) {
       auto mesh = std::static_pointer_cast<Mesh>(node);
       if (mesh->getTotalVertices() > 0) {
         IMeshTreeItemComponentProps props;
-        props.mesh = std::static_pointer_cast<Mesh>(node);
-        return std::make_shared<MeshTreeItemComponent>(props);
+        props.mesh         = std::static_pointer_cast<Mesh>(node);
+        label              = props.mesh->name;
+        key                = props.mesh->uniqueId;
+        treeItem.component = std::make_shared<MeshTreeItemComponent>(props);
       }
     }
   }
 
-  return nullptr;
+  sprintf(treeItem.label, "%s", label.c_str());
+  sprintf(treeItem.key, "%ld", key);
+
+  return treeItem;
 }
 
-TreeItem SceneGraphComponent::createSceneTreeItem(Scene* scene)
+TreeItem SceneGraphComponent::_createSceneTreeItem(Scene* scene)
 {
+  TreeItem treeItem;
+
   if (scene) {
     ISceneTreeItemComponentProps props;
     props.scene = scene;
-    return std::make_shared<SceneTreeItemComponent>(props);
+    sprintf(treeItem.key, "%s", "Scene");
+    treeItem.component = std::make_shared<SceneTreeItemComponent>(props);
   }
 
-  return nullptr;
+  return treeItem;
+}
+
+float SceneGraphComponent::_calculateOffset(unsigned int nodeLevel)
+{
+  if (nodeLevel < 2) {
+    return ImGui::IconSize;
+  }
+
+  return (10.f * (nodeLevel - 2.f + 0.5f));
+}
+
+void SceneGraphComponent::_renderSelectableTreeItem(TreeNode<TreeItem>& node)
+{
+  auto& nodeData = node.data();
+
+  if (nodeData.component) {
+    if (node.isRoot()) {
+      ImGui::Unindent(nodeData.offset);
+    }
+    // Expandable children
+    if (!node.isRoot() && node.arity() > 0) {
+      ImGui::PushID("TreeItemChildren");
+      ImGui::TextWrapped("%s", nodeData.isExpanded ? faMinus : faPlus);
+      if (ImGui::IsItemClicked(0)) {
+        // Switch expanded state
+        nodeData.isExpanded = !nodeData.isExpanded;
+      }
+      ImGui::PopID();
+      ImGui::SameLine();
+    }
+    // Make tree item selectable
+    ImGui::PushID(nodeData.key);
+    if (ImGui::Selectable("", nodeData.isSelected)) {
+      DeSelectAll(_sceneGraph.root());
+      nodeData.isSelected = !nodeData.isSelected;
+    }
+    ImGui::PopID();
+    ImGui::SameLine();
+    // Render specialized tree item
+    nodeData.component->render();
+    if (node.isRoot()) {
+      ImGui::Indent(nodeData.offset);
+    }
+  }
+}
+
+void SceneGraphComponent::_renderChildren(TreeNode<TreeItem>& node)
+{
+  // Render the specialized tree item selectable component
+  _renderSelectableTreeItem(node);
+
+  auto& nodeData = node.data();
+  if (node.arity() == 0 || !nodeData.isExpanded) {
+    return;
+  }
+
+  ImGui::Indent(nodeData.offset);
+  for (const auto& child : node.children()) {
+    child->data().mustExpand = nodeData.mustExpand;
+    _renderChildren(*child);
+  }
+  ImGui::Unindent(nodeData.offset);
 }
 
 void SceneGraphComponent::_renderTree(TreeNode<TreeItem>& node)
 {
-  if (!_initialized) {
-    reinitialize();
-  }
+  auto& nodeData = node.data();
 
-  ImGuiTreeNodeFlags node_flags
-    = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-  if (node.isLeaf()) {
-    if (node.depth() == 1) { // Render group containers
-      node_flags |= ImGuiTreeNodeFlags_Leaf;
-      if (ImGui::TreeNodeEx(node.data()->label, node_flags)) {
-        if (ImGui::IsItemClicked()) {
-        }
-        ImGui::TreePop();
-      }
+  if (node.depth() == 1) {
+    ImGui::Indent(nodeData.offset);
+    if (node.isLeaf()) { // Render group containers
+      TreeItemRootHeaderComponent::render(nodeData.label);
+    }
+    else if (!nodeData.isExpanded) { // Render expandable header
+      TreeItemExpandableHeaderComponent::render(
+        nodeData.isExpanded, nodeData.label, nodeData.mustExpand);
     }
     else {
-      auto& nodeData = node.data();
-      if (nodeData) {
-        ImGui::PushID(nodeData->labelWithoutIcon.c_str());
-        if (ImGui::Selectable("", nodeData->isActive,
-                              ImGuiSelectableFlags_SpanAllColumns)) {
-          if (!nodeData->isActive) {
-            DeSelectAll(_sceneGraph.root());
-            nodeData->isActive = !nodeData->isActive;
-            std::cout << nodeData->label << std::endl;
-          }
-        }
-        ImGui::PopID();
-        ImGui::SameLine();
-        nodeData->renderLabelWithIcon();
-        ImGui::NextColumn();
-        nodeData->renderControls();
-        ImGui::NextColumn();
+      // Render expandable header
+      TreeItemExpandableHeaderComponent::render(
+        nodeData.isExpanded, nodeData.label, nodeData.mustExpand);
+      for (const auto& child : node.children()) {
+        child->data().mustExpand = nodeData.mustExpand;
       }
-      /*else { // Render tree item
-        ImGui::Text(">");
-        ImGui::SameLine();
-        if (ImGui::Selectable(nodeData->label, nodeData->isActive)) {
-          if (!nodeData->isActive) {
-            DeSelectAll(_sceneGraph.root());
-            nodeData->isActive = !nodeData->isActive;
-            std::cout << nodeData->label << std::endl;
-          }
-        }
-        ImGui::NextColumn();
-
-        // ImGui::Button(nodeData.name);
-        ImGui::NextColumn();
-      }*/
+      // Render tree item specialized components
+      _renderChildren(node);
     }
+    ImGui::Unindent(nodeData.offset);
   }
   else {
-    ImGui::AlignFirstTextHeightToWidgets(); // not needed to solve bug. Helps
-                                            // make vertical spacing more
-                                            // consistent
-    if (node.isRoot()) {
-      node_flags |= (node.data()->isActive ? ImGuiTreeNodeFlags_Selected : 0);
-    }
-    if (ImGui::TreeNodeEx(node.data()->label, node_flags)) {
-      if (ImGui::IsItemClicked() && node.isRoot() && !node.data()->isActive) {
-        DeSelectAll(_sceneGraph.root());
-        auto& nodeData     = node.data();
-        nodeData->isActive = !nodeData->isActive;
-      }
-      ImGui::NextColumn();
-      node.data()->renderControls();
-      ImGui::NextColumn();
+    // Render the scene tree item selectable component
+    _renderSelectableTreeItem(node);
 
-      for (const auto& child : node.children()) {
-        _renderTree(*child);
-      }
-      ImGui::TreePop();
+    // Render the scene graph
+    for (const auto& child : node.children()) {
+      child->data().mustExpand = nodeData.mustExpand;
+      _renderTree(*child);
     }
   }
 }
 
 void SceneGraphComponent::render()
 {
-#if 0
-  ImGui::Columns(2, "SceneGraphComponent", false);
-  ImGui::SetNextTreeNodeOpen(true);
-  ImGui::Unindent();
-  _renderTree(_sceneGraph.root());
-  ImGui::Indent();
-  ImGui::Columns(1);
-
-  ImGui::Columns(2, "mycolumns"); // 4-ways, with border
-  ImGui::Separator();
-  ImGui::Text("ID");
-  ImGui::NextColumn();
-  ImGui::Text("Name");
-  ImGui::NextColumn();
-  ImGui::Separator();
-  const char* names[3] = {"One", "Two", "Three"};
-  static int selected  = -1;
-  for (int i = 0; i < 3; i++) {
-    char label[32];
-    sprintf(label, "%04d", i);
-    if (ImGui::Selectable(label, selected == i,
-                          ImGuiSelectableFlags_SpanAllColumns)) {
-      selected = i;
-    }
-    ImGui::NextColumn();
-    if (selected == 0 && i == 0)
-      ImGui::Text(" v %s", names[i]);
-    else
-      ImGui::Text("> %s", names[i]);
-    ImGui::NextColumn();
-
-    if (selected == 0 && i == 0) {
-      ImGui::Text("---> %s", names[i]);
-      ImGui::NextColumn();
-      ImGui::Text("***> %s", names[i]);
-      if (ImGui::IsItemClicked(0)) {
-          std::cout << "Clicked" << std::endl;
-        names[i] = "###";
-      }
-      ImGui::NextColumn();
-    }
+  if (!_initialized) {
+    reinitialize();
   }
-  ImGui::Columns(1);
-#else
-  TreeItemExpandableHeaderComponent({false, "Nodes"}).render();
-  TreeItemExpandableHeaderComponent({false, "Materials"}).render();
-  TreeItemRootHeaderComponent::render("Textures");
-  TreeItemRootHeaderComponent::render("Rendering pipelines");
-#endif
+
+  _renderTree(_sceneGraph.root());
 }
 
 } // namespace BABYLON

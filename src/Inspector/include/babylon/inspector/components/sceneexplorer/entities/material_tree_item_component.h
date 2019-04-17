@@ -30,8 +30,7 @@ public:
   MaterialTreeItemComponent(const IMaterialTreeItemComponentProps& props);
   virtual ~MaterialTreeItemComponent();
 
-  void renderLabelWithIcon() override;
-  void renderControls() override;
+  void render() override;
 
 public:
   IMaterialTreeItemComponentProps props;

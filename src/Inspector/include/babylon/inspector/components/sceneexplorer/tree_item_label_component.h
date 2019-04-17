@@ -1,14 +1,12 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_TREE_ITEM_LABEL_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_TREE_ITEM_LABEL_COMPONENT_H
 
-#include <functional>
-#include <string>
+#include <optional>
 
 // ImGui
 #include <imgui.h>
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/string.h>
 
 namespace BABYLON {
 
