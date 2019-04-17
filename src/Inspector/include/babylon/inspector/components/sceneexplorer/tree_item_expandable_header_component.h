@@ -30,7 +30,7 @@ struct BABYLON_SHARED_EXPORT TreeItemExpandableHeaderComponent {
     ImGui::SameLine();
     // Text value
     ImGui::TextWrapped("%s", label);
-    ImGui::SameLine(ImGui::GetWindowWidth() - ImGui::DoubleIconSize);
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - ImGui::IconSizeHalf);
     // ExpandAll icon
     ImGui::TextWrapped("%s", isExpanded ? faCompress : faExpandArrowsAlt);
     if (ImGui::IsItemClicked(0)) {

@@ -28,12 +28,13 @@ class BABYLON_SHARED_EXPORT SceneTreeItemComponent
 
 public:
   /** Font Awesome Icon Unicodes **/
-  static constexpr const char* faSyncAlt    = ICON_FA_SYNC_ALT;
-  static constexpr const char* faImage      = ICON_FA_IMAGE;
-  static constexpr const char* faCrosshairs = ICON_FA_CROSSHAIRS;
-  static constexpr const char* faArrowsAlt  = ICON_FA_ARROWS_ALT;
-  static constexpr const char* faCompress   = ICON_FA_COMPRESS;
-  static constexpr const char* faRedoAlt    = ICON_FA_REDO_ALT;
+  static constexpr const char* faArrowsAlt    = ICON_FA_ARROWS_ALT;
+  static constexpr const char* faCompress     = ICON_FA_COMPRESS;
+  static constexpr const char* faCrosshairs   = ICON_FA_CROSSHAIRS;
+  static constexpr const char* faImage        = ICON_FA_IMAGE;
+  static constexpr const char* faRedoAlt      = ICON_FA_REDO_ALT;
+  static constexpr const char* faSyncAlt      = ICON_FA_SYNC_ALT;
+  static constexpr const char* faVectorSquare = ICON_FA_VECTOR_SQUARE;
 
 public:
   SceneTreeItemComponent(const ISceneTreeItemComponentProps& props);

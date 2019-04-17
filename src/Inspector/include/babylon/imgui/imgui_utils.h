@@ -9,6 +9,10 @@
 
 namespace ImGui {
 
+static constexpr float IconSize       = 9.f;
+static constexpr float IconSizeDouble = 20.f;
+static constexpr float IconSizeHalf   = 4.5f;
+
 /**
  * @brief Returns color "color-bot" #5db0d7 -> rgba(93, 176, 215, 1)
  * @return color "color-bot"

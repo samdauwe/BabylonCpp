@@ -84,12 +84,12 @@ void Inspector::intialize()
   config.MergeMode = true;
   auto fontRegularPath
     = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAR);
-  _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(), 9.0f,
-                                              &config, ranges);
+  _fontRegular = io.Fonts->AddFontFromFileTTF(fontRegularPath.c_str(),
+                                              ImGui::IconSize, &config, ranges);
   auto fontSolidPath
     = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAS);
-  _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(), 9.0f,
-                                            &config, ranges);
+  _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
+                                            ImGui::IconSize, &config, ranges);
   // Setup style
   ImGui::StyleColorsDark();
   // Actions

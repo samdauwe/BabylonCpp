@@ -26,6 +26,7 @@ void SceneExplorerComponent::render()
 {
   // Filter
   {
+    ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() - 120.f);
     static ImGuiTextFilter filter;
     filter.Draw();
     const std::vector<std::string> lines;
@@ -35,6 +36,8 @@ void SceneExplorerComponent::render()
       }
     }
   }
+
+  ImGui::Separator();
 
   // The Scene Graph
   if (_sceneGraphComponent) {

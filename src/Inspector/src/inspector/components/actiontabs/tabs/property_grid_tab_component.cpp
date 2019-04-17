@@ -1,5 +1,7 @@
 #include <babylon/inspector/components/actiontabs/tabs/property_grid_tab_component.h>
 
+#include <imgui.h>
+
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/scene_property_grid_component.h>
 
 namespace BABYLON {
@@ -29,6 +31,8 @@ void PropertyGridTabComponent::render()
   if (_scenePropertyGridComponent) {
     _scenePropertyGridComponent->render();
   }
+
+  ImGui::TextWrapped("%s", "Please select an entity in the scene explorer.");
 }
 
 } // end of namespace BABYLON
