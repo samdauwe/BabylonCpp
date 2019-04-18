@@ -1255,7 +1255,7 @@ private:
    * @brief Hidden
    */
   void _markSubMeshesAsDirty(
-    const std::function<void(const MaterialDefines& defines)>& func);
+    const std::function<void(MaterialDefines& defines)>& func);
 
   /**
    * @brief Hidden

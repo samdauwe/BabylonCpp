@@ -21,9 +21,10 @@ MorphTarget::MorphTarget(const std::string& name, float iInfluence,
     , hasTangents{this, &MorphTarget::get_hasTangents}
     , _name{name}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
-    , _influence{iInfluence}
+    , _influence{-1.f} // -1  means Undefined
     , _animationPropertiesOverride{nullptr}
 {
+  influence = iInfluence;
 }
 
 MorphTarget::~MorphTarget()

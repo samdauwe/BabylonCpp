@@ -14,6 +14,10 @@ namespace BABYLON {
 struct BABYLON_SHARED_EXPORT MaterialDefines : public IMaterialDefines {
 
   MaterialDefines();
+  MaterialDefines(const MaterialDefines& other);
+  MaterialDefines(MaterialDefines&& other);
+  MaterialDefines& operator=(const MaterialDefines& other);
+  MaterialDefines& operator=(MaterialDefines&& other);
   virtual ~MaterialDefines();
 
   bool operator[](const std::string& define) const;

@@ -620,7 +620,7 @@ void AbstractMesh::_removeLightSource(Light* light)
 }
 
 void AbstractMesh::_markSubMeshesAsDirty(
-  const std::function<void(const MaterialDefines& defines)>& func)
+  const std::function<void(MaterialDefines& defines)>& func)
 {
   if (subMeshes.empty()) {
     return;
@@ -635,10 +635,16 @@ void AbstractMesh::_markSubMeshesAsDirty(
 
 void AbstractMesh::_markSubMeshesAsLightDirty()
 {
+  const auto func
+    = [](MaterialDefines& defines) { defines.markAsLightDirty(); };
+  _markSubMeshesAsDirty(func);
 }
 
 void AbstractMesh::_markSubMeshesAsAttributesDirty()
 {
+  const auto func
+    = [](MaterialDefines& defines) { defines.markAsAttributesDirty(); };
+  _markSubMeshesAsDirty(func);
 }
 
 void AbstractMesh::_markSubMeshesAsMiscDirty()

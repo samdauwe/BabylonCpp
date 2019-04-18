@@ -20,6 +20,94 @@ MaterialDefines::MaterialDefines()
 {
 }
 
+MaterialDefines::MaterialDefines(const MaterialDefines& other)
+    : boolDef{other.boolDef}
+    , intDef{other.intDef}
+    , floatDef{other.floatDef}
+    , stringDef{other.stringDef}
+    , _isDirty{other._isDirty}
+    , _renderId{other._renderId}
+    , _areLightsDirty{other._areLightsDirty}
+    , _areAttributesDirty{other._areAttributesDirty}
+    , _areTexturesDirty{other._areTexturesDirty}
+    , _areFresnelDirty{other._areFresnelDirty}
+    , _areMiscDirty{other._areMiscDirty}
+    , _areImageProcessingDirty{other._areImageProcessingDirty}
+    , _normals{other._normals}
+    , _uvs{other._uvs}
+    , _needNormals{other._needNormals}
+    , _needUVs{other._needUVs}
+{
+}
+
+MaterialDefines::MaterialDefines(MaterialDefines&& other)
+    : boolDef{std::move(other.boolDef)}
+    , intDef{std::move(other.intDef)}
+    , floatDef{std::move(other.floatDef)}
+    , stringDef{std::move(other.stringDef)}
+    , _isDirty{std::move(other._isDirty)}
+    , _renderId{std::move(other._renderId)}
+    , _areLightsDirty{std::move(other._areLightsDirty)}
+    , _areAttributesDirty{std::move(other._areAttributesDirty)}
+    , _areTexturesDirty{std::move(other._areTexturesDirty)}
+    , _areFresnelDirty{std::move(other._areFresnelDirty)}
+    , _areMiscDirty{std::move(other._areMiscDirty)}
+    , _areImageProcessingDirty{std::move(other._areImageProcessingDirty)}
+    , _normals{std::move(other._normals)}
+    , _uvs{std::move(other._uvs)}
+    , _needNormals{std::move(other._needNormals)}
+    , _needUVs{std::move(other._needUVs)}
+{
+}
+
+MaterialDefines& MaterialDefines::operator=(const MaterialDefines& other)
+{
+  if (&other != this) {
+    boolDef                  = other.boolDef;
+    intDef                   = other.intDef;
+    floatDef                 = other.floatDef;
+    stringDef                = other.stringDef;
+    _isDirty                 = other._isDirty;
+    _renderId                = other._renderId;
+    _areLightsDirty          = other._areLightsDirty;
+    _areAttributesDirty      = other._areAttributesDirty;
+    _areTexturesDirty        = other._areTexturesDirty;
+    _areFresnelDirty         = other._areFresnelDirty;
+    _areMiscDirty            = other._areMiscDirty;
+    _areImageProcessingDirty = other._areImageProcessingDirty;
+    _normals                 = other._normals;
+    _uvs                     = other._uvs;
+    _needNormals             = other._needNormals;
+    _needUVs                 = other._needUVs;
+  }
+
+  return *this;
+}
+
+MaterialDefines& MaterialDefines::operator=(MaterialDefines&& other)
+{
+  if (&other != this) {
+    boolDef                  = std::move(other.boolDef);
+    intDef                   = std::move(other.intDef);
+    floatDef                 = std::move(other.floatDef);
+    stringDef                = std::move(other.stringDef);
+    _isDirty                 = std::move(other._isDirty);
+    _renderId                = std::move(other._renderId);
+    _areLightsDirty          = std::move(other._areLightsDirty);
+    _areAttributesDirty      = std::move(other._areAttributesDirty);
+    _areTexturesDirty        = std::move(other._areTexturesDirty);
+    _areFresnelDirty         = std::move(other._areFresnelDirty);
+    _areMiscDirty            = std::move(other._areMiscDirty);
+    _areImageProcessingDirty = std::move(other._areImageProcessingDirty);
+    _normals                 = std::move(other._normals);
+    _uvs                     = std::move(other._uvs);
+    _needNormals             = std::move(other._needNormals);
+    _needUVs                 = std::move(other._needUVs);
+  }
+
+  return *this;
+}
+
 MaterialDefines::~MaterialDefines()
 {
 }
