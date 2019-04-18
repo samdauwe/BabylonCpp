@@ -902,6 +902,13 @@ public:
   MaterialPtr getMaterialByID(const std::string& id);
 
   /**
+   * @brief Gets a material using its unique id.
+   * @param uniqueId defines the unique id to look for
+   * @returns the material or null if not found
+   */
+  MaterialPtr getMaterialByUniqueID(size_t uniqueId);
+
+  /**
    * @brief Gets a material using its name.
    * @param name defines the material's name
    * @return the material or null if none found.
@@ -916,11 +923,11 @@ public:
   CameraPtr getCameraByID(const std::string& id);
 
   /**
-   * Gets a camera using its unique id.
+   * @brief Gets a camera using its unique id.
    * @param uniqueId defines the unique id to look for
    * @returns the camera or null if not found
    */
-  CameraPtr getCameraByUniqueID(unsigned int uniqueId);
+  CameraPtr getCameraByUniqueID(size_t uniqueId);
 
   /**
    * @brief Gets a camera using its name.
@@ -962,7 +969,7 @@ public:
    * @param uniqueId defines the light's unique id
    * @return the light or null if none found.
    */
-  LightPtr getLightByUniqueID(unsigned int uniqueId);
+  LightPtr getLightByUniqueID(size_t uniqueId);
 
   /**
    * @brief Gets a particle system by id.
@@ -1034,7 +1041,7 @@ public:
    * @param uniqueId defines the unique id to search for
    * @return the found mesh or null if not found at all.
    */
-  AbstractMeshPtr getMeshByUniqueID(unsigned int uniqueId);
+  AbstractMeshPtr getMeshByUniqueID(size_t uniqueId);
 
   /**
    * @brief Gets a the last added mesh using a given id.

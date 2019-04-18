@@ -2788,6 +2788,16 @@ MaterialPtr Scene::getMaterialByID(const std::string& id)
   return (it == materials.end()) ? nullptr : *it;
 }
 
+MaterialPtr Scene::getMaterialByUniqueID(size_t uniqueId)
+{
+  auto it = std::find_if(materials.begin(), materials.end(),
+                         [uniqueId](const MaterialPtr& material) {
+                           return material->uniqueId == uniqueId;
+                         });
+
+  return (it == materials.end()) ? nullptr : *it;
+}
+
 MaterialPtr Scene::getMaterialByName(const std::string& name)
 {
   auto it = std::find_if(
@@ -2806,7 +2816,7 @@ CameraPtr Scene::getCameraByID(const std::string& id)
   return (it == cameras.end()) ? nullptr : *it;
 }
 
-CameraPtr Scene::getCameraByUniqueID(unsigned int uniqueId)
+CameraPtr Scene::getCameraByUniqueID(size_t uniqueId)
 {
   auto it = std::find_if(cameras.begin(), cameras.end(),
                          [uniqueId](const CameraPtr& camera) {
@@ -2869,7 +2879,7 @@ LightPtr Scene::getLightByID(const std::string& id)
   return (it == lights.end()) ? nullptr : *it;
 }
 
-LightPtr Scene::getLightByUniqueID(unsigned int uniqueId)
+LightPtr Scene::getLightByUniqueID(size_t uniqueId)
 {
   auto it = std::find_if(
     lights.begin(), lights.end(),
@@ -3021,7 +3031,7 @@ Scene::getTransformNodesByID(const std::string& id)
   return filteredTransformNodes;
 }
 
-AbstractMeshPtr Scene::getMeshByUniqueID(unsigned int uniqueId)
+AbstractMeshPtr Scene::getMeshByUniqueID(size_t uniqueId)
 {
   auto it = std::find_if(meshes.begin(), meshes.end(),
                          [&uniqueId](const AbstractMeshPtr& mesh) {
