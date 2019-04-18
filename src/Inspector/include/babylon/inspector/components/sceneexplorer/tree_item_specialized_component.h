@@ -1,18 +1,12 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_TREE_ITEM_SPECIALIZED_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_TREE_ITEM_SPECIALIZED_COMPONENT_H
 
-#include <optional>
-
 #include <babylon/babylon_api.h>
 
 #include <babylon/inspector/components/sceneexplorer/tree_item_component.h>
+#include <babylon/inspector/entity.h>
 
 namespace BABYLON {
-
-struct SpecializedComponentInfo {
-  EntityType entityType          = EntityType::Unknown;
-  std::optional<size_t> uniqueId = std::nullopt;
-}; // end of struct SpecializedComponentInfo
 
 struct BABYLON_SHARED_EXPORT TreeItemSpecializedComponent {
 
@@ -20,8 +14,8 @@ struct BABYLON_SHARED_EXPORT TreeItemSpecializedComponent {
 
   // Label to be rendered in the item tree
   char label[128] = {"no label"};
-  // Used identify the specialized component
-  SpecializedComponentInfo specializedComponentInfo{};
+  // Used to identify the entity contained in the component
+  EntityInfo entityInfo{};
 
 }; // end of struct TreeItemSpecializedComponent
 

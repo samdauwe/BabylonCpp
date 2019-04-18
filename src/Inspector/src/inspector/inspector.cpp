@@ -28,6 +28,7 @@
 // Inspector
 #include <babylon/inspector/actions/action_store.h>
 #include <babylon/inspector/components/actiontabs/action_tabs_component.h>
+#include <babylon/inspector/components/global_state.h>
 #include <babylon/inspector/components/sceneexplorer/scene_explorer_component.h>
 
 namespace BABYLON {
@@ -40,6 +41,7 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     , _scene{scene}
     , _actionStore{std::make_unique<ActionStore>()}
     , _showInspectorWindow{true}
+    , _globalState{GlobalState::New()}
     , _sceneExplorerHost{nullptr}
     , _actionTabsHost{nullptr}
 {
@@ -60,13 +62,15 @@ void Inspector::setScene(Scene* scene)
 
   // Create Scene explorer
   ISceneExplorerComponentProps sceneExplorerComponentProps;
-  sceneExplorerComponentProps.scene = scene;
+  sceneExplorerComponentProps.scene       = scene;
+  sceneExplorerComponentProps.globalState = _globalState;
   _sceneExplorerHost
     = std::make_unique<SceneExplorerComponent>(sceneExplorerComponentProps);
 
   // Create action tabs
   IActionTabsComponentProps actionTabsComponentProps;
-  actionTabsComponentProps.scene = scene;
+  actionTabsComponentProps.scene       = scene;
+  actionTabsComponentProps.globalState = _globalState;
   _actionTabsHost
     = std::make_unique<ActionTabsComponent>(actionTabsComponentProps);
 }

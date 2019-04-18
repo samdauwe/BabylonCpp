@@ -14,28 +14,26 @@ MaterialTreeItemComponent::MaterialTreeItemComponent(
 
   sprintf(label, "%s", material->name.c_str());
 
-  // Set the specialized component info
-  specializedComponentInfo.uniqueId = material->uniqueId;
-  const auto className              = material->getClassName();
+  // Set the entity info
+  entityInfo.uniqueId  = material->uniqueId;
+  const auto className = material->getClassName();
   if (String::contains(className, "BackgroundMaterial")) {
-    specializedComponentInfo.entityType = EntityType::BackgroundMaterial;
+    entityInfo.type = EntityType::BackgroundMaterial;
   }
   else if (String::contains(className, "PBRMaterial")) {
-    specializedComponentInfo.entityType = EntityType::PBRMaterial;
+    entityInfo.type = EntityType::PBRMaterial;
   }
   else if (String::contains(className, "PBRMetallicRoughnessMaterial")) {
-    specializedComponentInfo.entityType
-      = EntityType::PBRMetallicRoughnessMaterial;
+    entityInfo.type = EntityType::PBRMetallicRoughnessMaterial;
   }
   else if (String::contains(className, "PBRSpecularGlossinessMaterial")) {
-    specializedComponentInfo.entityType
-      = EntityType::PBRSpecularGlossinessMaterial;
+    entityInfo.type = EntityType::PBRSpecularGlossinessMaterial;
   }
   else if (String::contains(className, "StandardMaterial")) {
-    specializedComponentInfo.entityType = EntityType::StandardMaterial;
+    entityInfo.type = EntityType::StandardMaterial;
   }
   else if (String::contains(className, "Material")) {
-    specializedComponentInfo.entityType = EntityType::Material;
+    entityInfo.type = EntityType::Material;
   }
 }
 

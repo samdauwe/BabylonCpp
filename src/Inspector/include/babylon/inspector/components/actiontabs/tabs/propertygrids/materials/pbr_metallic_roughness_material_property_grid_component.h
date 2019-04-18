@@ -65,10 +65,12 @@ struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
     static auto levelsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(levelsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
-      SliderLineComponent::render("Metallic", material->metallic, 0.f, 1.f,
-                                  0.01f, "%.2f");
-      SliderLineComponent::render("Roughness", material->roughness, 0.f, 1.f,
-                                  0.01f, "%.2f");
+      SliderLineComponent::render(
+        "Metallic", material->metallic(), 0.f, 1.f, 0.01f,
+        [&](float value) { material->metallic = value; }, "%.2f");
+      SliderLineComponent::render(
+        "Roughness", material->roughness(), 0.f, 1.f, 0.01f,
+        [&](float value) { material->roughness = value; }, "%.2f");
       levelsContainerOpened = true;
     }
     else {

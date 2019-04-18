@@ -19,17 +19,17 @@ CameraTreeItemComponent::CameraTreeItemComponent(
   sprintf(label, "%s", props.camera->name.c_str());
   state.isActive = scene->activeCamera == camera;
 
-  // Set the specialized component info
-  specializedComponentInfo.uniqueId = camera->uniqueId;
-  const auto className              = camera->getClassName();
+  // Set the entity info
+  entityInfo.uniqueId  = camera->uniqueId;
+  const auto className = camera->getClassName();
   if (String::contains(className, "ArcRotateCamera")) {
-    specializedComponentInfo.entityType = EntityType::ArcRotateCamera;
+    entityInfo.type = EntityType::ArcRotateCamera;
   }
   else if (String::contains(className, "FreeCamera")) {
-    specializedComponentInfo.entityType = EntityType::FreeCamera;
+    entityInfo.type = EntityType::FreeCamera;
   }
   else if (String::contains(className, "UniversalCamera")) {
-    specializedComponentInfo.entityType = EntityType::UniversalCamera;
+    entityInfo.type = EntityType::UniversalCamera;
   }
 }
 

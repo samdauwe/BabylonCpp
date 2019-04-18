@@ -14,8 +14,11 @@ namespace BABYLON {
 SceneExplorerComponent::SceneExplorerComponent(
   const ISceneExplorerComponentProps& iProps)
     : props{iProps}
-    , _sceneGraphComponent{std::make_unique<SceneGraphComponent>(iProps.scene)}
 {
+  SceneGraphComponentProps props;
+  props.scene          = iProps.scene;
+  props.globalState    = iProps.globalState;
+  _sceneGraphComponent = std::make_unique<SceneGraphComponent>(props);
 }
 
 SceneExplorerComponent::~SceneExplorerComponent()

@@ -7,11 +7,14 @@
 
 namespace BABYLON {
 
+class GlobalState;
 class Scene;
+using GlobalStatePtr = std::shared_ptr<GlobalState>;
 class SceneGraphComponent;
 
 struct ISceneExplorerComponentProps {
-  Scene* scene;
+  Scene* scene               = nullptr;
+  GlobalStatePtr globalState = nullptr;
 }; // end of struct ISceneExplorerComponentProps
 
 class BABYLON_SHARED_EXPORT SceneExplorerComponent {

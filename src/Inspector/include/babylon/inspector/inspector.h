@@ -11,10 +11,12 @@ namespace BABYLON {
 
 class ActionStore;
 class ActionTabsComponent;
+class GlobalState;
 struct InspectorAction;
 class Scene;
 class SceneExplorerComponent;
 class Tab;
+using GlobalStatePtr = std::shared_ptr<GlobalState>;
 
 class BABYLON_SHARED_EXPORT Inspector {
 
@@ -45,6 +47,8 @@ private:
   // GUI
   bool _showInspectorWindow;
   int _menuHeight;
+  // The global state
+  GlobalStatePtr _globalState;
   // Widgets
   std::unique_ptr<SceneExplorerComponent> _sceneExplorerHost;
   std::unique_ptr<ActionTabsComponent> _actionTabsHost;

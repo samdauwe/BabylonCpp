@@ -11,6 +11,7 @@
 
 #include <babylon/imgui/imgui_utils.h>
 
+#include <babylon/inspector/components/global_state.h>
 #include <babylon/inspector/components/sceneexplorer/entities/camera_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/light_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/material_tree_item_component.h>
@@ -21,9 +22,9 @@
 
 namespace BABYLON {
 
-SceneGraphComponent::SceneGraphComponent(Scene* scene)
-    : _scene{scene}
-    , _sceneGraph{_createSceneTreeItem(scene)}
+SceneGraphComponent::SceneGraphComponent(const SceneGraphComponentProps& iProps)
+    : props{iProps}
+    , _sceneGraph{_createSceneTreeItem(iProps.scene)}
     , _initialized{false}
 {
   _treeItemComparator = [](const TreeItem& a, const TreeItem& b) -> bool {
@@ -40,13 +41,13 @@ SceneGraphComponent::SceneGraphComponent::~SceneGraphComponent()
 void SceneGraphComponent::reinitialize()
 {
   // Nodes
-  const auto& rootNodes = _scene->rootNodes;
+  const auto& rootNodes = props.scene->rootNodes;
   auto& nodesTreeItem   = _sceneGraph.root().addChild(_createTreeItem("Nodes"));
   for (const auto& rootNode : rootNodes) {
     _initializeNodesTreeItem(nodesTreeItem, rootNode->getAsNodePtr());
   }
   // Materials
-  const auto& materials = _scene->materials;
+  const auto& materials = props.scene->materials;
   auto& materialsTreeItem
     = _sceneGraph.root().addChild(_createTreeItem("Materials"));
   for (const auto& material : materials) {
@@ -182,6 +183,14 @@ float SceneGraphComponent::_calculateOffset(unsigned int nodeLevel)
   return (10.f * (nodeLevel - 2.f + 0.5f));
 }
 
+void SceneGraphComponent::notifySelectionChange(EntityInfo& entityInfo)
+{
+  if (props.globalState->onSelectionChangedObservable.hasObservers()) {
+    props.globalState->onSelectionChangedObservable.notifyObservers(
+      &entityInfo);
+  }
+}
+
 void SceneGraphComponent::_renderSelectableTreeItem(TreeNode<TreeItem>& node)
 {
   auto& nodeData = node.data();
@@ -206,6 +215,9 @@ void SceneGraphComponent::_renderSelectableTreeItem(TreeNode<TreeItem>& node)
     if (ImGui::Selectable("", nodeData.isSelected)) {
       DeSelectAll(_sceneGraph.root());
       nodeData.isSelected = !nodeData.isSelected;
+      if (nodeData.isSelected) {
+        notifySelectionChange(nodeData.component->entityInfo);
+      }
     }
     ImGui::PopID();
     ImGui::SameLine();

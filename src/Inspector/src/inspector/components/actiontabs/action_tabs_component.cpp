@@ -6,6 +6,9 @@
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/property_grid_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/statistics_tab_component.h>
+#include <babylon/inspector/components/global_state.h>
+
+#include <iostream>
 
 namespace BABYLON {
 
@@ -15,6 +18,7 @@ ActionTabsComponent::ActionTabsComponent(
     , _propertyGridTabComponent{nullptr}
     , _debugTabComponent{nullptr}
     , _statisticsTabComponent{nullptr}
+    , _onSelectionChangeObserver{nullptr}
 {
   componentWillMount();
 }
@@ -26,24 +30,37 @@ ActionTabsComponent::~ActionTabsComponent()
 
 void ActionTabsComponent::componentWillMount()
 {
-  IPaneComponentProps paneProps;
-  paneProps.scene = props.scene;
+  // Create selection change observer
+  _onSelectionChangeObserver
+    = props.globalState->onSelectionChangedObservable.add(
+      [this](EntityInfo* entity, EventState & /*es*/) -> void {
+        if (entity && entity->uniqueId.has_value()) {
+          _paneProps.selectedEntity = {entity->type, *entity->uniqueId};
+        }
+      });
 
+  // Create tab widgets
+  _paneProps.scene = props.scene;
   _propertyGridTabComponent
-    = std::make_unique<PropertyGridTabComponent>(paneProps);
-  _debugTabComponent      = std::make_unique<DebugTabComponent>(paneProps);
-  _statisticsTabComponent = std::make_unique<StatisticsTabComponent>(paneProps);
+    = std::make_unique<PropertyGridTabComponent>(_paneProps);
+  _debugTabComponent = std::make_unique<DebugTabComponent>(_paneProps);
+  _statisticsTabComponent
+    = std::make_unique<StatisticsTabComponent>(_paneProps);
 }
 
 void ActionTabsComponent::componentWillUnmount()
 {
+  if (_onSelectionChangeObserver) {
+    props.globalState->onSelectionChangedObservable.remove(
+      _onSelectionChangeObserver);
+  }
 }
 
 void ActionTabsComponent::render()
 {
   static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
   if (ImGui::BeginTabBar("ActionTabs", tab_bar_flags)) {
-    // Properties grid tab
+    // Properties tab
     if (_propertyGridTabComponent) {
       static const auto propertiesTabLabel
         = String::concat(faFileAlt, " ", "Properties");
@@ -66,6 +83,7 @@ void ActionTabsComponent::render()
         ImGui::EndTabItem();
       }
     }
+    // Statistics tab
     if (_statisticsTabComponent) {
       static const auto statisticsTabLabel
         = String::concat(faChartBar, " ", "Statistics");

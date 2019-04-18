@@ -17,14 +17,14 @@ MeshTreeItemComponent::MeshTreeItemComponent(
   state.isVisible      = mesh->isVisible;
   state.isGizmoEnabled = false;
 
-  // Set the specialized component info
-  specializedComponentInfo.uniqueId = mesh->uniqueId;
-  const auto className              = mesh->getClassName();
+  // Set the entity info
+  entityInfo.uniqueId  = mesh->uniqueId;
+  const auto className = mesh->getClassName();
   if (String::contains(className, "Mesh")) {
-    specializedComponentInfo.entityType = EntityType::Mesh;
+    entityInfo.type = EntityType::Mesh;
   }
   else if (String::contains(className, "TransformNode")) {
-    specializedComponentInfo.entityType = EntityType::TransformNode;
+    entityInfo.type = EntityType::TransformNode;
   }
 }
 

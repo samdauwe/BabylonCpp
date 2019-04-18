@@ -84,7 +84,8 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
     static auto transparencyContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(transparencyContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TRANSPARENCY")) {
-      SliderLineComponent::render("Alpha", material->alpha, 0.f, 1.f, 0.01f,
+      SliderLineComponent::render("Alpha", material->alpha(), 0.f, 1.f, 0.01f,
+                                  [&](float value) { material->alpha = value; },
                                   "%.3f");
       auto pbrBaseMaterial
         = std::static_pointer_cast<PBRBaseMaterial>(material);
@@ -92,7 +93,7 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
         OptionsLineComponent::render(
           "Transparency mode", *pbrBaseMaterial->transparencyMode(),
           transparencyModeOptions, [&](unsigned int value) {
-            pbrBaseMaterial->setTransparencyMode(value);
+            pbrBaseMaterial->transparencyMode = value;
           });
       }
       OptionsLineComponent::render(

@@ -6,16 +6,22 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
+#include <babylon/inspector/components/actiontabs/pane_component.h>
+#include <babylon/inspector/entity.h>
+#include <babylon/tools/observer.h>
 
 namespace BABYLON {
 
 class DebugTabComponent;
+class GlobalState;
 class PropertyGridTabComponent;
 class Scene;
 class StatisticsTabComponent;
+using GlobalStatePtr = std::shared_ptr<GlobalState>;
 
 struct BABYLON_SHARED_EXPORT IActionTabsComponentProps {
-  Scene* scene = nullptr;
+  Scene* scene               = nullptr;
+  GlobalStatePtr globalState = nullptr;
 }; // end of struct IActionTabsComponentProps
 
 class BABYLON_SHARED_EXPORT ActionTabsComponent {
@@ -39,9 +45,14 @@ protected:
   IActionTabsComponentProps props;
 
 private:
+  // Shared pane properties
+  IPaneComponentProps _paneProps;
+  // Tabs
   std::unique_ptr<PropertyGridTabComponent> _propertyGridTabComponent;
   std::unique_ptr<DebugTabComponent> _debugTabComponent;
   std::unique_ptr<StatisticsTabComponent> _statisticsTabComponent;
+  // Observers
+  Observer<EntityInfo>::Ptr _onSelectionChangeObserver;
 
 }; // end of class ActionTabsComponent
 

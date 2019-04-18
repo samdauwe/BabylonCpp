@@ -15,7 +15,7 @@ class Scene;
 using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 
 struct IScenePropertyGridComponentProps {
-  Scene* scene;
+  Scene* scene = nullptr;
 }; // end of struct IScenePropertyGridComponentProps
 
 struct PhysicsEngineSettings {

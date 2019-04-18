@@ -17,20 +17,20 @@ LightTreeItemComponent::LightTreeItemComponent(
   state.isEnabled      = light->isEnabled();
   state.isGizmoEnabled = false;
 
-  // Set the specialized component info
-  specializedComponentInfo.uniqueId = light->uniqueId;
-  const auto className              = light->getClassName();
+  // Set the entity info
+  entityInfo.uniqueId  = light->uniqueId;
+  const auto className = light->getClassName();
   if (String::contains(className, "DirectionalLight")) {
-    specializedComponentInfo.entityType = EntityType::DirectionalLight;
+    entityInfo.type = EntityType::DirectionalLight;
   }
   else if (String::contains(className, "HemisphericLight")) {
-    specializedComponentInfo.entityType = EntityType::HemisphericLight;
+    entityInfo.type = EntityType::HemisphericLight;
   }
   else if (String::contains(className, "PointLight")) {
-    specializedComponentInfo.entityType = EntityType::PointLight;
+    entityInfo.type = EntityType::PointLight;
   }
   else if (String::contains(className, "SpotLight")) {
-    specializedComponentInfo.entityType = EntityType::SpotLight;
+    entityInfo.type = EntityType::SpotLight;
   }
 }
 

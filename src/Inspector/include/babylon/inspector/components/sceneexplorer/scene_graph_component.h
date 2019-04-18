@@ -10,13 +10,21 @@
 
 namespace BABYLON {
 
+struct EntityInfo;
+class GlobalState;
 class Material;
 class Node;
 class Scene;
 struct TreeItemComponent;
-using MaterialPtr = std::shared_ptr<Material>;
-using NodePtr     = std::shared_ptr<Node>;
-using TreeItem    = TreeItemComponent;
+using GlobalStatePtr = std::shared_ptr<GlobalState>;
+using MaterialPtr    = std::shared_ptr<Material>;
+using NodePtr        = std::shared_ptr<Node>;
+using TreeItem       = TreeItemComponent;
+
+struct SceneGraphComponentProps {
+  Scene* scene               = nullptr;
+  GlobalStatePtr globalState = nullptr;
+}; // end of struct ISceneExplorerComponentProps
 
 class BABYLON_SHARED_EXPORT SceneGraphComponent {
 
@@ -26,7 +34,7 @@ public:
   static constexpr const char* faPlus  = ICON_FA_PLUS;
 
 public:
-  SceneGraphComponent(Scene* scene);
+  SceneGraphComponent(const SceneGraphComponentProps& props);
   ~SceneGraphComponent();
 
   void reinitialize();
@@ -81,8 +89,14 @@ private:
    */
   void _renderTree(TreeNode<TreeItem>& node);
 
+  /**
+   * @brief Notifies the selected entity in the scene graph.
+   * @param entityInfo
+   */
+  void notifySelectionChange(EntityInfo& entityInfo);
+
 private:
-  Scene* _scene;
+  SceneGraphComponentProps props;
   Tree<TreeItem> _sceneGraph;
   bool _initialized;
   std::function<bool(const TreeItem& a, const TreeItem& b)> _treeItemComparator;

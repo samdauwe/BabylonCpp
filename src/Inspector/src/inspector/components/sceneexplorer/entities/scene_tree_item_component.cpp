@@ -11,9 +11,9 @@ SceneTreeItemComponent::SceneTreeItemComponent(
 {
   sprintf(label, "%s", "Scene");
 
-  // Set the specialized component info
-  specializedComponentInfo.uniqueId   = 0;
-  specializedComponentInfo.entityType = EntityType::Scene;
+  // Set the entity info
+  entityInfo.uniqueId = 0;
+  entityInfo.type     = EntityType::Scene;
 }
 
 SceneTreeItemComponent::~SceneTreeItemComponent()

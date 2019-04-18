@@ -1,5 +1,5 @@
-#ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_STANDARD_MATERIAL_PROPERTY_GRID_COMPONENT_H
-#define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_STANDARD_MATERIAL_PROPERTY_GRID_COMPONENT_H
+#ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_BACKGROUND_MATERIAL_PROPERTY_GRID_COMPONENT_H
+#define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_BACKGROUND_MATERIAL_PROPERTY_GRID_COMPONENT_H
 
 #include <memory>
 
@@ -16,7 +16,7 @@ namespace BABYLON {
 class BackgroundMaterial;
 using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
 
-struct BABYLON_SHARED_EXPORT StandardMaterialPropertyGridComponent {
+struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
 
   static void renderTextures(const BackgroundMaterialPtr& material)
   {
@@ -29,8 +29,9 @@ struct BABYLON_SHARED_EXPORT StandardMaterialPropertyGridComponent {
       TextureLinkLineComponent::render("Reflection", material,
                                        material->reflectionTexture());
       if (material->reflectionTexture()) {
-        SliderLineComponent::render("Reflection blur", material->reflectionBlur,
-                                    0.f, 1.f, 0.01f, "%.2f");
+        SliderLineComponent::render(
+          "Reflection blur", material->reflectionBlur(), 0.f, 1.f, 0.01f,
+          [&](float value) { material->reflectionBlur = value; }, "%.2f");
       }
       texturesContainerOpened = true;
     }
@@ -90,9 +91,9 @@ struct BABYLON_SHARED_EXPORT StandardMaterialPropertyGridComponent {
     }
   }
 
-}; // end of struct StandardMaterialPropertyGridComponent
+}; // end of struct BackgroundMaterialPropertyGridComponent
 
 } // end of namespace BABYLON
 
 #endif // end of
-       // BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_STANDARD_MATERIAL_PROPERTY_GRID_COMPONENT_H
+       // BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_MATERIALS_BACKGROUND_MATERIAL_PROPERTY_GRID_COMPONENT_H

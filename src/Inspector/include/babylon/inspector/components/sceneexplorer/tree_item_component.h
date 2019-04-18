@@ -11,48 +11,6 @@ struct TreeItemSpecializedComponent;
 using TreeItemSpecializedComponentPtr
   = std::shared_ptr<TreeItemSpecializedComponent>;
 
-enum class EntityType {
-  // Default option
-  Unknown = 0,
-  // Animations
-  AnimationGroup,
-  // Bones
-  Bone,
-  Skeleton,
-  // Cameras
-  ArcRotateCamera,
-  FreeCamera,
-  UniversalCamera,
-  // Engine
-  Scene,
-  // Lights
-  DirectionalLight,
-  HemisphericLight,
-  PointLight,
-  SpotLight,
-  // Materials
-  BackgroundMaterial,
-  Image,
-  Material,
-  PBRMaterial,
-  PBRMetallicRoughnessMaterial,
-  PBRSpecularGlossinessMaterial,
-  StandardMaterial,
-  // Meshes
-  Mesh,
-  TransformNode,
-  // Post process
-  PostProcess,
-  // Rendering pipelines
-  DefaultRenderingPipeline,
-  RenderingPipeline,
-  LensRenderingPipeline,
-  SSAORenderingPipeline,
-  SSAO2RenderingPipeline,
-  // Texture
-  Texture,
-}; // end of enum class EntityType
-
 struct BABYLON_SHARED_EXPORT TreeItemComponent {
   char label[128]                           = {"no label"};
   char key[128]                             = {"no key"};
