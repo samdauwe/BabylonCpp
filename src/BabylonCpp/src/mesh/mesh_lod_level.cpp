@@ -5,7 +5,7 @@
 
 namespace BABYLON {
 
-MeshLODLevel::MeshLODLevel(float iDistance, Mesh* iMesh)
+MeshLODLevel::MeshLODLevel(float iDistance, const MeshPtr& iMesh)
     : distance{iDistance}, mesh{iMesh}
 {
 }

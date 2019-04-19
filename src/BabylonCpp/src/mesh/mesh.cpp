@@ -280,9 +280,9 @@ bool Mesh::get_hasLODLevels() const
   return _LODLevels.size() > 0;
 }
 
-std::vector<MeshLODLevel*> Mesh::getLODLevels()
+std::vector<std::unique_ptr<MeshLODLevel>>& Mesh::getLODLevels()
 {
-  return stl_util::to_raw_ptr_vector(_LODLevels);
+  return _LODLevels;
 }
 
 void Mesh::_sortLODLevels()
@@ -301,7 +301,7 @@ void Mesh::_sortLODLevels()
             });
 }
 
-Mesh& Mesh::addLODLevel(float distance, Mesh* mesh)
+Mesh& Mesh::addLODLevel(float distance, const MeshPtr& mesh)
 {
   if (mesh && mesh->_masterMesh) {
     BABYLON_LOG_WARN("Mesh", "You cannot use a mesh as LOD level twice");
@@ -320,7 +320,7 @@ Mesh& Mesh::addLODLevel(float distance, Mesh* mesh)
   return *this;
 }
 
-Mesh* Mesh::getLODLevelAtDistance(float distance)
+MeshPtr Mesh::getLODLevelAtDistance(float distance)
 {
   for (const auto& level : _LODLevels) {
     if (stl_util::almost_equal(level->distance, distance)) {
@@ -330,7 +330,7 @@ Mesh* Mesh::getLODLevelAtDistance(float distance)
   return nullptr;
 }
 
-Mesh& Mesh::removeLODLevel(Mesh* mesh)
+Mesh& Mesh::removeLODLevel(const MeshPtr& mesh)
 {
   for (auto& level : _LODLevels) {
     if (level->mesh == mesh) {
@@ -368,7 +368,8 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera,
 
   if (_LODLevels.back()->distance > distanceToCamera) {
     if (onLODLevelSelection) {
-      onLODLevelSelection(distanceToCamera, this, _LODLevels.back()->mesh);
+      onLODLevelSelection(distanceToCamera, this,
+                          _LODLevels.back()->mesh.get());
     }
     return this;
   }
@@ -381,9 +382,9 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera,
       }
 
       if (onLODLevelSelection) {
-        onLODLevelSelection(distanceToCamera, this, level->mesh);
+        onLODLevelSelection(distanceToCamera, this, level->mesh.get());
       }
-      return level->mesh;
+      return level->mesh.get();
     }
   }
 

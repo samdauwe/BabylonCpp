@@ -1,11 +1,14 @@
 #ifndef BABYLON_MESH_MESH_LOD_LEVEL_H
 #define BABYLON_MESH_MESH_LOD_LEVEL_H
 
+#include <memory>
+
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
 
 class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief Class used to represent a specific level of detail of a mesh.
@@ -20,7 +23,7 @@ public:
    * displayed
    * @param mesh defines the mesh to use to render this level
    */
-  MeshLODLevel(float distance, Mesh* mesh);
+  MeshLODLevel(float distance, const MeshPtr& mesh);
   MeshLODLevel(const MeshLODLevel& other);
   MeshLODLevel(MeshLODLevel&& other);
   MeshLODLevel& operator=(const MeshLODLevel& other);
@@ -39,7 +42,7 @@ public:
   /**
    * Defines the mesh to use to render this level
    */
-  Mesh* mesh;
+  MeshPtr mesh;
 
 }; // end of class MeshLODLevel
 

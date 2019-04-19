@@ -141,7 +141,7 @@ public:
    * @brief Gets the list of MeshLODLevel associated with the current mesh.
    * @returns an array of MeshLODLevel
    */
-  std::vector<MeshLODLevel*> getLODLevels();
+  std::vector<std::unique_ptr<MeshLODLevel>>& getLODLevels();
 
   /**
    * @brief Add a mesh as LOD level triggered at the given distance.
@@ -151,7 +151,7 @@ public:
    * @param mesh The mesh to be added as LOD level (can be null)
    * @return This mesh (for chaining)
    */
-  Mesh& addLODLevel(float distance, Mesh* mesh);
+  Mesh& addLODLevel(float distance, const MeshPtr& mesh);
 
   /**
    * @brief Returns the LOD level mesh at the passed distance or null if not
@@ -161,7 +161,7 @@ public:
    * level
    * @returns a Mesh or `null`
    */
-  Mesh* getLODLevelAtDistance(float distance);
+  MeshPtr getLODLevelAtDistance(float distance);
 
   /**
    * @brief Remove a mesh from the LOD array.
@@ -169,7 +169,7 @@ public:
    * @param mesh defines the mesh to be removed
    * @return This mesh (for chaining)
    */
-  Mesh& removeLODLevel(Mesh* mesh);
+  Mesh& removeLODLevel(const MeshPtr& mesh);
 
   /**
    * @brief Returns the registered LOD mesh distant from the parameter `camera`
