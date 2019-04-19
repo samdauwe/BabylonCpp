@@ -9,6 +9,7 @@
 #include <babylon/samples/animations/cartoon_animations_scene.h>
 #include <babylon/samples/animations/easing/easing_functions_scene.h>
 #include <babylon/samples/animations/easing/shape_easings_scene.h>
+#include <babylon/samples/animations/morph_targets_scene.h>
 #include <babylon/samples/animations/pump_jack_scene.h>
 #include <babylon/samples/animations/tube_animation_scene.h>
 
@@ -55,6 +56,12 @@ _AnimationsSamplesIndex::_AnimationsSamplesIndex()
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<CannonBallScene>(iCanvas); //
                       });                                                  //
+  // Morph Targets Scene
+  _samples["MorphTargetsScene"]
+    = std::make_tuple(true,                                                  //
+                      [](ICanvas* iCanvas) {                                 //
+                        return std::make_unique<MorphTargetsScene>(iCanvas); //
+                      });                                                    //
   // Cartoon Animations Scene
   _samples["CartoonAnimationsScene"] = std::make_tuple(
     false,                                                      //
