@@ -259,12 +259,13 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<WaterMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<WaterMaterialDefines>();
   }
 
-  auto defines
-    = *(static_cast<WaterMaterialDefines*>(subMesh->_materialDefines.get()));
-  auto scene = getScene();
+  auto definesPtr
+    = std::static_pointer_cast<WaterMaterialDefines>(subMesh->_materialDefines);
+  auto& defines = *definesPtr.get();
+  auto scene    = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -406,7 +407,8 @@ bool WaterMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
     subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine), defines);
+      scene->getEngine()->createEffect(shaderName, options, engine),
+      definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {

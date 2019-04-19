@@ -114,12 +114,13 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<FireMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<FireMaterialDefines>();
   }
 
-  auto defines
-    = *(static_cast<FireMaterialDefines*>(subMesh->_materialDefines.get()));
-  auto scene = getScene();
+  auto definesPtr
+    = std::static_pointer_cast<FireMaterialDefines>(subMesh->_materialDefines);
+  auto& defines = *definesPtr.get();
+  auto scene    = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -213,7 +214,8 @@ bool FireMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.maxSimultaneousLights = 4;
 
     subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine), defines);
+      scene->getEngine()->createEffect(shaderName, options, engine),
+      definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {

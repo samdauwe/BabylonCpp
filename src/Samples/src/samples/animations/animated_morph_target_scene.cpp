@@ -13,7 +13,7 @@ namespace BABYLON {
 namespace Samples {
 
 AnimatedMorphTargetScene::AnimatedMorphTargetScene(ICanvas* iCanvas)
-    : IRenderableScene(iCanvas), _angle{0.01f}, _target0{nullptr}
+    : IRenderableScene(iCanvas), _angle{0.f}, _target0{nullptr}
 {
 }
 

@@ -275,12 +275,13 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<PBRMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<PBRMaterialDefines>();
   }
 
   auto scene = getScene();
-  auto defines
-    = *(static_cast<PBRMaterialDefines*>(subMesh->_materialDefines.get()));
+  auto definesPtr
+    = std::static_pointer_cast<PBRMaterialDefines>(subMesh->_materialDefines);
+  auto& defines = *definesPtr.get();
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (defines._renderId == scene->getRenderId()) {
       return true;
@@ -390,7 +391,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     = _prepareEffect(mesh, defines, onCompiled, onError, useInstances);
   if (effect) {
     scene->resetCachedMaterial();
-    subMesh->setEffect(effect, defines);
+    subMesh->setEffect(effect, definesPtr);
     buildUniformLayout();
   }
 

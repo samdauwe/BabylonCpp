@@ -110,7 +110,7 @@ MaterialPtr SubMesh::getMaterial()
     auto effectiveMaterial = multiMaterial->getSubMaterial(materialIndex);
     if (_currentMaterial != effectiveMaterial) {
       _currentMaterial = effectiveMaterial;
-      _materialDefines.reset(nullptr);
+      _materialDefines = nullptr;
     }
 
     return effectiveMaterial;

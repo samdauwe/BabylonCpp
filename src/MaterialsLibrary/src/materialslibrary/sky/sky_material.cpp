@@ -70,12 +70,13 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<SkyMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<SkyMaterialDefines>();
   }
 
-  auto defines
-    = *(static_cast<SkyMaterialDefines*>(subMesh->_materialDefines.get()));
-  auto scene = getScene();
+  auto definesPtr
+    = std::static_pointer_cast<SkyMaterialDefines>(subMesh->_materialDefines);
+  auto& defines = *definesPtr.get();
+  auto scene    = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -134,7 +135,8 @@ bool SkyMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
     options.onError             = onError;
 
     subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine), defines);
+      scene->getEngine()->createEffect(shaderName, options, engine),
+      definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {

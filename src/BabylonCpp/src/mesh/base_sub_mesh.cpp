@@ -33,7 +33,7 @@ void BaseSubMesh::setEffect(const EffectPtr& iEffect)
 }
 
 void BaseSubMesh::setEffect(const EffectPtr& iEffect,
-                            const MaterialDefines& defines)
+                            const MaterialDefinesPtr& defines)
 {
   if (_materialEffect == iEffect) {
     if (!iEffect) {
@@ -41,7 +41,7 @@ void BaseSubMesh::setEffect(const EffectPtr& iEffect,
     }
     return;
   }
-  _materialDefines = std::make_unique<MaterialDefines>(defines);
+  _materialDefines = defines;
   _materialEffect  = iEffect;
 }
 

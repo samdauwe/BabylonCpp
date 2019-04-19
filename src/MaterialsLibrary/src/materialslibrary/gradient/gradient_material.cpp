@@ -83,12 +83,13 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<GradientMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<GradientMaterialDefines>();
   }
 
-  auto defines
-    = *(static_cast<GradientMaterialDefines*>(subMesh->_materialDefines.get()));
-  auto scene = getScene();
+  auto definesPtr = std::static_pointer_cast<GradientMaterialDefines>(
+    subMesh->_materialDefines);
+  auto& defines = *definesPtr.get();
+  auto scene    = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -181,7 +182,8 @@ bool GradientMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
     subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine), defines);
+      scene->getEngine()->createEffect(shaderName, options, engine),
+      definesPtr);
   }
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
     return false;

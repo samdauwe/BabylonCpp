@@ -10,7 +10,8 @@ namespace BABYLON {
 
 class Effect;
 struct MaterialDefines;
-using EffectPtr = std::shared_ptr<Effect>;
+using EffectPtr          = std::shared_ptr<Effect>;
+using MaterialDefinesPtr = std::shared_ptr<MaterialDefines>;
 
 /**
  * @brief Base class for submeshes.
@@ -27,7 +28,7 @@ public:
    * @param defines defines the set of defines used to compile this effect
    */
   void setEffect(const EffectPtr& effect);
-  void setEffect(const EffectPtr& effect, const MaterialDefines& defines);
+  void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines);
 
 protected:
   /**
@@ -39,7 +40,7 @@ public:
   /**
    * Hidden
    */
-  std::unique_ptr<MaterialDefines> _materialDefines;
+  MaterialDefinesPtr _materialDefines;
 
   /**
    * Hidden

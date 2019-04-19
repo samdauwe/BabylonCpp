@@ -635,12 +635,13 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<BackgroundMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<BackgroundMaterialDefines>();
   }
 
-  auto scene   = getScene();
-  auto defines = *(
-    static_cast<BackgroundMaterialDefines*>(subMesh->_materialDefines.get()));
+  auto scene      = getScene();
+  auto definesPtr = std::static_pointer_cast<BackgroundMaterialDefines>(
+    subMesh->_materialDefines);
+  auto& defines = *definesPtr.get();
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (defines._renderId == scene->getRenderId()) {
       return true;
@@ -932,7 +933,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     MaterialHelper::PrepareUniformsAndSamplersList(options);
 
     subMesh->setEffect(
-      scene->getEngine()->createEffect("background", options, engine), defines);
+      scene->getEngine()->createEffect("background", options, engine),
+      definesPtr);
 
     buildUniformLayout();
   }

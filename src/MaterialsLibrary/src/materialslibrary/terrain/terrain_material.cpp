@@ -208,12 +208,13 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<TerrainMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<TerrainMaterialDefines>();
   }
 
-  auto defines
-    = *(static_cast<TerrainMaterialDefines*>(subMesh->_materialDefines.get()));
-  auto scene = getScene();
+  auto definesPtr = std::static_pointer_cast<TerrainMaterialDefines>(
+    subMesh->_materialDefines);
+  auto& defines = *definesPtr.get();
+  auto scene    = getScene();
 
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (_renderId == scene->getRenderId()) {
@@ -331,7 +332,8 @@ bool TerrainMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     MaterialHelper::PrepareUniformsAndSamplersList(options);
     subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine), defines);
+      scene->getEngine()->createEffect(shaderName, options, engine),
+      definesPtr);
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {

@@ -492,12 +492,13 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   }
 
   if (!subMesh->_materialDefines) {
-    subMesh->_materialDefines = std::make_unique<StandardMaterialDefines>();
+    subMesh->_materialDefines = std::make_shared<StandardMaterialDefines>();
   }
 
-  auto scene = getScene();
-  auto defines
-    = *(static_cast<StandardMaterialDefines*>(subMesh->_materialDefines.get()));
+  auto scene      = getScene();
+  auto definesPtr = std::static_pointer_cast<StandardMaterialDefines>(
+    subMesh->_materialDefines);
+  auto& defines = *definesPtr.get();
   if (!checkReadyOnEveryCall && subMesh->effect()) {
     if (defines._renderId == scene->getRenderId()) {
       return true;
@@ -963,7 +964,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
 
     subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine), defines);
+      scene->getEngine()->createEffect(shaderName, options, engine),
+      definesPtr);
 
     buildUniformLayout();
   }
