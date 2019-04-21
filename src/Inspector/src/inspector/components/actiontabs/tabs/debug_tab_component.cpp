@@ -46,143 +46,123 @@ void DebugTabComponent::render()
 
   // --- HELPERS ---
   static auto helpersOpenedClosed = false;
-  if (LineContainerComponent::begin("HELPERS", helpersOpenedClosed)) {
-    CheckBoxLineComponent::render(
-      "Bones", _skeletonViewersEnabled,
-      [this](bool /*value*/) { switchSkeletonViewers(); });
-    CheckBoxLineComponent::render(
-      "Physics", _physicsViewersEnabled,
-      [this](bool /*value*/) { switchPhysicsViewers(); });
-    LineContainerComponent::end();
+  if (LineContainerComponent::render("HELPERS", helpersOpenedClosed)) {
+    if (CheckBoxLineComponent::render("Bones", _skeletonViewersEnabled)) {
+      switchSkeletonViewers();
+    }
+    if (CheckBoxLineComponent::render("Physics", _physicsViewersEnabled)) {
+      switchPhysicsViewers();
+    }
   }
   // --- TEXTURE CHANNELS ---
   static auto textureChannelsClosed = false;
   ImGui::SetNextTreeNodeOpen(textureChannelsClosed, ImGuiCond_Always);
-  if (LineContainerComponent::begin("TEXTURE CHANNELS",
-                                    textureChannelsClosed)) {
-    CheckBoxLineComponent::render(
-      "Diffuse", StandardMaterial::DiffuseTextureEnabled(), [](bool /*value*/) {
-        StandardMaterial::SetDiffuseTextureEnabled(
-          !StandardMaterial::DiffuseTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "Ambient", StandardMaterial::AmbientTextureEnabled(), [](bool /*value*/) {
-        StandardMaterial::SetAmbientTextureEnabled(
-          !StandardMaterial::AmbientTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "Specular", StandardMaterial::SpecularTextureEnabled(),
-      [](bool /*value*/) {
-        StandardMaterial::SetSpecularTextureEnabled(
-          !StandardMaterial::SpecularTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "Emissive", StandardMaterial::EmissiveTextureEnabled(),
-      [](bool /*value*/) {
-        StandardMaterial::SetEmissiveTextureEnabled(
-          !StandardMaterial::EmissiveTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "Bump", StandardMaterial::BumpTextureEnabled(), [](bool /*value*/) {
-        StandardMaterial::SetBumpTextureEnabled(
-          !StandardMaterial::BumpTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "Opacity", StandardMaterial::OpacityTextureEnabled(), [](bool /*value*/) {
-        StandardMaterial::SetOpacityTextureEnabled(
-          !StandardMaterial::OpacityTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "Reflection", StandardMaterial::ReflectionTextureEnabled(),
-      [](bool /*value*/) {
-        StandardMaterial::SetReflectionTextureEnabled(
-          !StandardMaterial::ReflectionTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "Refraction", StandardMaterial::RefractionTextureEnabled(),
-      [](bool /*value*/) {
-        StandardMaterial::SetRefractionTextureEnabled(
-          !StandardMaterial::RefractionTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "ColorGrading", StandardMaterial::ColorGradingTextureEnabled(),
-      [](bool /*value*/) {
-        StandardMaterial::SetColorGradingTextureEnabled(
-          !StandardMaterial::ColorGradingTextureEnabled());
-      });
-    CheckBoxLineComponent::render(
-      "Lightmap", StandardMaterial::LightmapTextureEnabled(),
-      [](bool /*value*/) {
-        StandardMaterial::SetLightmapTextureEnabled(
-          !StandardMaterial::LightmapTextureEnabled());
-      });
-    CheckBoxLineComponent::render("Fresnel", StandardMaterial::FresnelEnabled(),
-                                  [](bool /*value*/) {
-                                    StandardMaterial::SetFresnelEnabled(
-                                      !StandardMaterial::FresnelEnabled());
-                                  });
-    LineContainerComponent::end();
+  if (LineContainerComponent::render("TEXTURE CHANNELS",
+                                     textureChannelsClosed)) {
+    if (CheckBoxLineComponent::render(
+          "Diffuse", StandardMaterial::DiffuseTextureEnabled())) {
+      StandardMaterial::SetDiffuseTextureEnabled(
+        !StandardMaterial::DiffuseTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render(
+          "Ambient", StandardMaterial::AmbientTextureEnabled())) {
+      StandardMaterial::SetAmbientTextureEnabled(
+        !StandardMaterial::AmbientTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render(
+          "Specular", StandardMaterial::SpecularTextureEnabled())) {
+      StandardMaterial::SetSpecularTextureEnabled(
+        !StandardMaterial::SpecularTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render(
+          "Emissive", StandardMaterial::EmissiveTextureEnabled())) {
+      StandardMaterial::SetEmissiveTextureEnabled(
+        !StandardMaterial::EmissiveTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render("Bump",
+                                      StandardMaterial::BumpTextureEnabled())) {
+      StandardMaterial::SetBumpTextureEnabled(
+        !StandardMaterial::BumpTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render(
+          "Opacity", StandardMaterial::OpacityTextureEnabled())) {
+      StandardMaterial::SetOpacityTextureEnabled(
+        !StandardMaterial::OpacityTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render(
+          "Reflection", StandardMaterial::ReflectionTextureEnabled())) {
+      StandardMaterial::SetReflectionTextureEnabled(
+        !StandardMaterial::ReflectionTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render(
+          "Refraction", StandardMaterial::RefractionTextureEnabled())) {
+      StandardMaterial::SetRefractionTextureEnabled(
+        !StandardMaterial::RefractionTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render(
+          "ColorGrading", StandardMaterial::ColorGradingTextureEnabled())) {
+      StandardMaterial::SetColorGradingTextureEnabled(
+        !StandardMaterial::ColorGradingTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render(
+          "Lightmap", StandardMaterial::LightmapTextureEnabled())) {
+      StandardMaterial::SetLightmapTextureEnabled(
+        !StandardMaterial::LightmapTextureEnabled());
+    }
+    if (CheckBoxLineComponent::render("Fresnel",
+                                      StandardMaterial::FresnelEnabled())) {
+      StandardMaterial::SetFresnelEnabled(!StandardMaterial::FresnelEnabled());
+    }
   }
   // --- FEATURES ---
   static auto featuresClosed = false;
-  if (LineContainerComponent::begin("FEATURES", featuresClosed)) {
-    CheckBoxLineComponent::render(
-      "Animations", scene->animationsEnabled, [&scene](bool /*value*/) {
-        scene->animationsEnabled = !scene->animationsEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Collisions", scene->collisionsEnabled, [&scene](bool /*value*/) {
-        scene->collisionsEnabled = !scene->collisionsEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Fog", scene->fogEnabled,
-      [&scene](bool /*value*/) { scene->fogEnabled = !scene->fogEnabled; });
-    CheckBoxLineComponent::render(
-      "Lens flares", scene->lensFlaresEnabled, [&scene](bool /*value*/) {
-        scene->lensFlaresEnabled = !scene->lensFlaresEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Lights", scene->lightsEnabled, [&scene](bool /*value*/) {
-        scene->lightsEnabled = !scene->lightsEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Particles", scene->particlesEnabled, [&scene](bool /*value*/) {
-        scene->particlesEnabled = !scene->particlesEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Post-processes", scene->postProcessesEnabled, [&scene](bool /*value*/) {
-        scene->postProcessesEnabled = !scene->postProcessesEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Probes", scene->probesEnabled, [&scene](bool /*value*/) {
-        scene->probesEnabled = !scene->probesEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Textures", scene->texturesEnabled, [&scene](bool /*value*/) {
-        scene->texturesEnabled = !scene->texturesEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Procedural textures", scene->proceduralTexturesEnabled,
-      [&scene](bool /*value*/) {
-        scene->proceduralTexturesEnabled = !scene->proceduralTexturesEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Render targets", scene->renderTargetsEnabled, [&scene](bool /*value*/) {
-        scene->renderTargetsEnabled = !scene->renderTargetsEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Shadows", scene->shadowsEnabled, [&scene](bool /*value*/) {
-        scene->shadowsEnabled = !scene->shadowsEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Skeletons", scene->skeletonsEnabled, [&scene](bool /*value*/) {
-        scene->skeletonsEnabled = !scene->skeletonsEnabled;
-      });
-    CheckBoxLineComponent::render(
-      "Sprites", scene->spritesEnabled, [&scene](bool /*value*/) {
-        scene->spritesEnabled = !scene->spritesEnabled;
-      });
-    LineContainerComponent::end();
+  if (LineContainerComponent::render("FEATURES", featuresClosed)) {
+    if (CheckBoxLineComponent::render("Animations", scene->animationsEnabled)) {
+      scene->animationsEnabled = !scene->animationsEnabled;
+    }
+    if (CheckBoxLineComponent::render("Collisions", scene->collisionsEnabled)) {
+      scene->collisionsEnabled = !scene->collisionsEnabled;
+    }
+    if (CheckBoxLineComponent::render("Fog", scene->fogEnabled)) {
+      scene->fogEnabled = !scene->fogEnabled;
+    }
+    if (CheckBoxLineComponent::render("Lens flares",
+                                      scene->lensFlaresEnabled)) {
+      scene->lensFlaresEnabled = !scene->lensFlaresEnabled;
+    }
+    if (CheckBoxLineComponent::render("Lights", scene->lightsEnabled)) {
+      scene->lightsEnabled = !scene->lightsEnabled;
+    }
+    if (CheckBoxLineComponent::render("Particles", scene->particlesEnabled)) {
+      scene->particlesEnabled = !scene->particlesEnabled;
+    }
+    if (CheckBoxLineComponent::render("Post-processes",
+                                      scene->postProcessesEnabled)) {
+      scene->postProcessesEnabled = !scene->postProcessesEnabled;
+    }
+    if (CheckBoxLineComponent::render("Probes", scene->probesEnabled)) {
+      scene->probesEnabled = !scene->probesEnabled;
+    }
+    if (CheckBoxLineComponent::render("Textures", scene->texturesEnabled)) {
+      scene->texturesEnabled = !scene->texturesEnabled;
+    }
+    if (CheckBoxLineComponent::render("Procedural textures",
+                                      scene->proceduralTexturesEnabled)) {
+      scene->proceduralTexturesEnabled = !scene->proceduralTexturesEnabled;
+    }
+    if (CheckBoxLineComponent::render("Render targets",
+                                      scene->renderTargetsEnabled)) {
+      scene->renderTargetsEnabled = !scene->renderTargetsEnabled;
+    }
+    if (CheckBoxLineComponent::render("Shadows", scene->shadowsEnabled)) {
+      scene->shadowsEnabled = !scene->shadowsEnabled;
+    }
+    if (CheckBoxLineComponent::render("Skeletons", scene->skeletonsEnabled)) {
+      scene->skeletonsEnabled = !scene->skeletonsEnabled;
+    }
+    if (CheckBoxLineComponent::render("Sprites", scene->spritesEnabled)) {
+      scene->spritesEnabled = !scene->spritesEnabled;
+    }
   }
 }
 

@@ -10,22 +10,16 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT LineContainerComponent {
 
-  static bool begin(const char* title, bool& closed, bool border = false)
+  static bool render(const char* title, bool& closed)
   {
     ImGui::SetNextTreeNodeOpen(!closed, ImGuiCond_Always);
     if (ImGui::CollapsingHeader(title)) {
-      ImGui::Columns(2, title, border);
       closed = false;
     }
     else {
       closed = true;
     }
     return !closed;
-  }
-
-  static void end()
-  {
-    ImGui::Columns(1);
   }
 
 }; // end of class LineContainerComponent

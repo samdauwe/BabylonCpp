@@ -87,7 +87,7 @@ void StatisticsTabComponent::render()
 
   // --- COUNT ---
   static auto countClosed = false;
-  if (LineContainerComponent::begin("COUNT", countClosed)) {
+  if (LineContainerComponent::render("COUNT", countClosed)) {
     TextLineComponent::render("Total meshes",
                               std::to_string(scene->meshes.size()));
     TextLineComponent::render("Active meshes",
@@ -111,12 +111,11 @@ void StatisticsTabComponent::render()
                               std::to_string(scene->materials.size()));
     TextLineComponent::render("Total textures",
                               std::to_string(scene->textures.size()));
-    LineContainerComponent::end();
   }
   // --- FRAME STEPS DURATION ---
   static auto frameStepsDurationClosed = false;
-  if (LineContainerComponent::begin("FRAME STEPS DURATION",
-                                    frameStepsDurationClosed)) {
+  if (LineContainerComponent::render("FRAME STEPS DURATION",
+                                     frameStepsDurationClosed)) {
     ValueLineComponent::render(
       "Absolute FPS",
       (1000.f / sceneInstrumentation->frameTimeCounter().current()),
@@ -159,11 +158,10 @@ void StatisticsTabComponent::render()
       static_cast<float>(engineInstrumentation->gpuFrameTimeCounter().average())
         * 0.000001f,
       std::nullopt, std::nullopt, "ms");
-    LineContainerComponent::end();
   }
   // --- SYSTEM INFO ---
   static auto systemInfoClosed = false;
-  if (LineContainerComponent::begin("SYSTEM INFO", systemInfoClosed)) {
+  if (LineContainerComponent::render("SYSTEM INFO", systemInfoClosed)) {
     TextLineComponent::render(
       "Resolution",
       String::concat(engine->getRenderWidth(), "x", engine->getRenderHeight()));
@@ -191,15 +189,13 @@ void StatisticsTabComponent::render()
     ValueLineComponent::render("Max textures size", caps.maxTextureSize);
     ValueLineComponent::render("Max anisotropy",
                                static_cast<int>(caps.maxAnisotropy));
-    LineContainerComponent::end();
   }
   // --- OPENGL INFO ---
   static auto openGLInfoClosed = false;
-  if (LineContainerComponent::begin("OPENGL INFO", openGLInfoClosed)) {
+  if (LineContainerComponent::render("OPENGL INFO", openGLInfoClosed)) {
     TextLineComponent::render("Version: ", engine->getGlInfo().version);
     TextLineComponent::render("Driver: ", engine->getGlInfo().renderer);
     TextLineComponent::render("Vendor: ", engine->getGlInfo().vendor);
-    LineContainerComponent::end();
   }
 }
 

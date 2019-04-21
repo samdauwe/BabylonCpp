@@ -3,6 +3,7 @@
 
 // ImGui
 #include <imgui.h>
+#include <iostream>
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/delegates/delegate.h>
@@ -11,21 +12,31 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT CheckBoxLineComponent {
 
-  static void render(const char* label, bool& isSelected)
+  static constexpr float Width = 19.f;
+
+  /**
+   * @brief Renders a checkbox widget
+   * @param label checkbox label
+   * @param isSelected if the checbox is selected
+   * @return whether or not the checbox value was changed
+   */
+  static bool render(const char* label, bool isSelected)
   {
+    bool origValue = isSelected;
     ImGui::TextWrapped("%s", label);
-    ImGui::NextColumn();
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - CheckBoxLineComponent::Width);
     ImGui::PushID(label);
     ImGui::Checkbox("", &isSelected);
     ImGui::PopID();
-    ImGui::NextColumn();
+    return origValue != isSelected;
   }
 
   static void render(const char* label, bool isSelected,
                      const SA::delegate<void(bool value)>& onSelect)
   {
     bool origValue = isSelected;
-    CheckBoxLineComponent::render(label, isSelected);
+    isSelected     = CheckBoxLineComponent::render(label, isSelected);
     if (origValue != isSelected) {
       onSelect(isSelected);
     }
