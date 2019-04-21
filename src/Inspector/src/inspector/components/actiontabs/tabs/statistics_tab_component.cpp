@@ -76,14 +76,10 @@ void StatisticsTabComponent::render()
   const auto& engineInstrumentation = _engineInstrumentation;
   const auto& caps                  = engine->getCaps();
 
-  ImGui::Columns(2, "general info", false);
-  {
-    TextLineComponent::render(
-      "Version", Engine::Version(),
-      ImVec4(113 / 255.f, 159 / 255.f, 255 / 255.f, 1.0f));
-    ValueLineComponent::render("FPS", engine->getFps(), std::nullopt, 0);
-  }
-  ImGui::Columns(1);
+  TextLineComponent::render(
+    "Version", Engine::Version(),
+    ImVec4(113 / 255.f, 159 / 255.f, 255 / 255.f, 1.0f));
+  ValueLineComponent::render("FPS", static_cast<int>(engine->getFps()));
 
   // --- COUNT ---
   static auto countClosed = false;
@@ -118,8 +114,8 @@ void StatisticsTabComponent::render()
                                      frameStepsDurationClosed)) {
     ValueLineComponent::render(
       "Absolute FPS",
-      (1000.f / sceneInstrumentation->frameTimeCounter().current()),
-      std::nullopt, 0);
+      static_cast<int>(1000.f
+                       / sceneInstrumentation->frameTimeCounter().current()));
     ValueLineComponent::render(
       "Meshes selection",
       sceneInstrumentation->activeMeshesEvaluationTimeCounter().current(),
@@ -193,9 +189,23 @@ void StatisticsTabComponent::render()
   // --- OPENGL INFO ---
   static auto openGLInfoClosed = false;
   if (LineContainerComponent::render("OPENGL INFO", openGLInfoClosed)) {
-    TextLineComponent::render("Version: ", engine->getGlInfo().version);
-    TextLineComponent::render("Driver: ", engine->getGlInfo().renderer);
-    TextLineComponent::render("Vendor: ", engine->getGlInfo().vendor);
+    ImGui::Columns(2, "OpenGL Info", false);
+    // OpenGL Version
+    ImGui::TextWrapped("%s", "Version:");
+    ImGui::NextColumn();
+    ImGui::TextWrapped("%s", engine->getGlInfo().version.c_str());
+    ImGui::NextColumn();
+    // OpenGL Driver
+    ImGui::TextWrapped("%s", "Driver:");
+    ImGui::NextColumn();
+    ImGui::TextWrapped("%s", engine->getGlInfo().renderer.c_str());
+    ImGui::NextColumn();
+    // Vendor Driver
+    ImGui::TextWrapped("%s", "Vendor:");
+    ImGui::NextColumn();
+    ImGui::TextWrapped("%s", engine->getGlInfo().vendor.c_str());
+    ImGui::NextColumn();
+    ImGui::Columns(1);
   }
 }
 

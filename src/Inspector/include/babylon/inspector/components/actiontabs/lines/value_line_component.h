@@ -12,40 +12,47 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT ValueLineComponent {
 
+  static constexpr float CharacterWidth = 7.f;
+
   static void render(const char* label, int value,
                      const std::optional<ImVec4>& color = std::nullopt,
-                     const std::string& units           = "")
+                     const char* units                  = "")
   {
     ImGui::TextWrapped("%s", label);
-    ImGui::NextColumn();
     if (color.has_value()) {
       ImGui::PushStyleColor(ImGuiCol_Text, *color);
     }
-    ImGui::TextWrapped("%d %s", value, units.c_str());
+    char valueStr[16] = {};
+    sprintf(valueStr, "%d %s", value, units);
+    const auto strLen = strlen(valueStr);
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - strLen * ValueLineComponent::CharacterWidth);
+    ImGui::TextWrapped("%s", valueStr);
     if (color.has_value()) {
       ImGui::PopStyleColor();
     }
-    ImGui::NextColumn();
   }
 
   static void render(const char* label, float value,
                      const std::optional<ImVec4>& color       = std::nullopt,
                      const std::optional<int>& fractionDigits = std::nullopt,
-                     const std::string& units                 = "")
+                     const char* units                        = "")
   {
     const auto digits = fractionDigits.has_value() ? *fractionDigits : 2;
 
     ImGui::TextWrapped("%s", label);
-    ImGui::NextColumn();
     if (color.has_value()) {
       ImGui::PushStyleColor(ImGuiCol_Text, *color);
     }
-    ImGui::TextWrapped("%.*f %s", digits, static_cast<double>(value),
-                       units.c_str());
+    char valueStr[16] = {};
+    sprintf(valueStr, "%.*f %s", digits, static_cast<double>(value), units);
+    const auto strLen = strlen(valueStr) + 1;
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - strLen * ValueLineComponent::CharacterWidth);
+    ImGui::TextWrapped("%s", valueStr);
     if (color.has_value()) {
       ImGui::PopStyleColor();
     }
-    ImGui::NextColumn();
   }
 
 }; // end of struct ValueLineComponent

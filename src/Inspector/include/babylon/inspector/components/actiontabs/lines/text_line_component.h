@@ -14,7 +14,9 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT TextLineComponent {
 
-  static void renderContent(const std::string& value,
+  static constexpr float CharacterWidth = 7.f;
+
+  static void renderContent(const char* value,
                             const std::optional<ImVec4>& color = std::nullopt,
                             bool /*underline*/                 = false,
                             const std::function<void()>& /*onLink*/ = nullptr)
@@ -22,26 +24,27 @@ struct BABYLON_SHARED_EXPORT TextLineComponent {
     if (color.has_value()) {
       ImGui::PushStyleColor(ImGuiCol_Text, *color);
     }
-    ImGui::TextWrapped("%s", value.empty() ? "no name" : value.c_str());
+    const auto strLen = strlen(value) + 1;
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - strLen * TextLineComponent::CharacterWidth);
+    ImGui::TextWrapped("%s", (strLen == 0) ? "no name" : value);
     if (color.has_value()) {
       ImGui::PopStyleColor();
     }
   }
 
-  static void render(const std::string& label, const std::string& value,
+  static void render(const char* label, const std::string& value,
                      const std::optional<ImVec4>& color  = std::nullopt,
                      bool underline                      = false,
                      const std::function<void()>& onLink = nullptr)
   {
-    ImGui::TextWrapped("%s", label.c_str());
-    ImGui::NextColumn();
-    TextLineComponent::renderContent(value, color, underline, onLink);
-    ImGui::NextColumn();
+    ImGui::TextWrapped("%s", label);
+    TextLineComponent::renderContent(value.c_str(), color, underline, onLink);
   }
 
-  static void render(const std::string& text)
+  static void render(const char* text)
   {
-    ImGui::TextWrapped("%s", text.c_str());
+    ImGui::TextWrapped("%s", text);
   }
 
 }; // end of struct TextLineComponent

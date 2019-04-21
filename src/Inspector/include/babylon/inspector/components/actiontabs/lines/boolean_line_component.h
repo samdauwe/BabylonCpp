@@ -1,11 +1,9 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_BOOLEAN_LINE_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_BOOLEAN_LINE_COMPONENT_H
 
-// ImGui
-#include <imgui.h>
-
 #include <babylon/babylon_api.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
+#include <babylon/imgui/imgui_utils.h>
 
 namespace BABYLON {
 
@@ -17,15 +15,12 @@ struct BABYLON_SHARED_EXPORT BooleanLineComponent {
 
   static void render(const char* label, bool value)
   {
-    static ImVec4 red   = ImColor(1.0f, 0.0f, 0.0f, 1.0f);
-    static ImVec4 green = ImColor(0.0f, 1.0f, 0.0f, 1.0f);
-
     ImGui::TextWrapped("%s", label);
-    ImGui::NextColumn();
-    ImGui::PushStyleColor(ImGuiCol_Text, value ? green : red);
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - ImGui::IconSizeDouble);
+    ImGui::PushStyleColor(ImGuiCol_Text, value ? ImGui::green : ImGui::red);
     ImGui::TextWrapped("%s", value ? faCheck : faTimesCircle);
     ImGui::PopStyleColor();
-    ImGui::NextColumn();
   }
 
 }; // end of struct BooleanLineComponent
