@@ -18,9 +18,9 @@ struct ISceneTreeItemComponentProps {
 }; // end of struct ISceneTreeItemComponentProps
 
 struct SceneTreeItemComponentState {
-  bool isSelected      = false;
-  bool isInPickingMode = false;
-  unsigned int gizmoMode;
+  bool isSelected        = false;
+  bool isInPickingMode   = false;
+  unsigned int gizmoMode = 0;
 }; // end of struct SceneTreeItemComponentState
 
 class BABYLON_SHARED_EXPORT SceneTreeItemComponent

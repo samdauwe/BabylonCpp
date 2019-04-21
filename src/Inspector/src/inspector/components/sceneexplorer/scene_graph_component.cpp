@@ -199,17 +199,6 @@ void SceneGraphComponent::_renderSelectableTreeItem(TreeNode<TreeItem>& node)
     if (node.isRoot()) {
       ImGui::Unindent(nodeData.offset);
     }
-    // Expandable children
-    if (!node.isRoot() && node.arity() > 0) {
-      ImGui::PushID("TreeItemChildren");
-      ImGui::TextWrapped("%s", nodeData.isExpanded ? faMinus : faPlus);
-      if (ImGui::IsItemClicked(0)) {
-        // Switch expanded state
-        nodeData.isExpanded = !nodeData.isExpanded;
-      }
-      ImGui::PopID();
-      ImGui::SameLine();
-    }
     // Make tree item selectable
     ImGui::PushID(nodeData.key);
     if (ImGui::Selectable("", nodeData.isSelected)) {
@@ -220,8 +209,24 @@ void SceneGraphComponent::_renderSelectableTreeItem(TreeNode<TreeItem>& node)
       }
     }
     ImGui::PopID();
+    // Expandable children
+    ImGui::SetItemAllowOverlap();
+    if (!node.isRoot() && node.arity() > 0) {
+      ImGui::PushID("TreeItemChildren");
+      ImGui::TextWrapped("%s", nodeData.isExpanded ? faMinus : faPlus);
+      ImGui::PopID();
+      if (ImGui::IsItemHovered()) {
+        ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+      }
+      if (ImGui::IsItemClicked(0)) {
+        // Switch expanded state
+        nodeData.isExpanded = !nodeData.isExpanded;
+      }
+      ImGui::SameLine();
+    }
     ImGui::SameLine();
     // Render specialized tree item
+    ImGui::SetItemAllowOverlap();
     nodeData.component->render();
     if (node.isRoot()) {
       ImGui::Indent(nodeData.offset);

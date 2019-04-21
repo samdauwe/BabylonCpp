@@ -21,7 +21,13 @@ struct BABYLON_SHARED_EXPORT TreeItemExpandableHeaderComponent {
   static void render(bool& isExpanded, const char* label, bool& mustExpand)
   {
     // Arrow icon
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImVec4(1.0f, 1.0f, 1.0f, ImGui::IsNotActiveOpacity));
     ImGui::TextWrapped("%s", isExpanded ? faMinus : faPlus);
+    ImGui::PopStyleColor();
+    if (ImGui::IsItemHovered()) {
+      ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+    }
     if (ImGui::IsItemClicked(0)) {
       // Switch expanded state
       isExpanded = !isExpanded;
@@ -30,15 +36,19 @@ struct BABYLON_SHARED_EXPORT TreeItemExpandableHeaderComponent {
     ImGui::SameLine();
     // Text value
     ImGui::TextWrapped("%s", label);
-    ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - ImGui::IconSizeHalf);
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - ImGui::IconSize);
     // ExpandAll icon
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImVec4(1.0f, 1.0f, 1.0f, ImGui::IsNotActiveOpacity));
     ImGui::TextWrapped("%s", isExpanded ? faCompress : faExpandArrowsAlt);
+    ImGui::PopStyleColor();
     if (ImGui::IsItemClicked(0)) {
       // Expand all
       isExpanded = !isExpanded;
       mustExpand = !isExpanded;
     }
     if (ImGui::IsItemHovered()) {
+      ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
       ImGui::SetTooltip("%s", isExpanded ? "Collapse all" : "Expand all");
     }
   }

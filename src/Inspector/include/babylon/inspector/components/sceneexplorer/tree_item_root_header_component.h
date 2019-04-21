@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
+#include <babylon/imgui/imgui_utils.h>
 
 namespace BABYLON {
 
@@ -17,7 +18,10 @@ struct BABYLON_SHARED_EXPORT TreeItemRootHeaderComponent {
   static void render(const char* label)
   {
     // Arrow icon
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImVec4(1.0f, 1.0f, 1.0f, ImGui::IsNotActiveOpacity));
     ImGui::TextWrapped("%s", faBan);
+    ImGui::PopStyleColor();
     ImGui::SameLine();
     // Text value
     ImGui::TextWrapped("%s", label);

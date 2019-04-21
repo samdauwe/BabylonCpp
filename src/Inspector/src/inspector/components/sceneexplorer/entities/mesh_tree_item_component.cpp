@@ -2,6 +2,7 @@
 
 #include <babylon/core/string.h>
 #include <babylon/imgui/imgui_utils.h>
+#include <babylon/inspector/components/sceneexplorer/tree_item_icon_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/mesh/abstract_mesh.h>
 
@@ -14,8 +15,8 @@ MeshTreeItemComponent::MeshTreeItemComponent(
   const auto& mesh = props.mesh;
 
   sprintf(label, "%s", props.mesh->name.c_str());
-  state.isVisible      = mesh->isVisible;
-  state.isGizmoEnabled = false;
+  state.isBoundingBoxEnabled = mesh->showBoundingBox();
+  state.isVisible            = mesh->isVisible;
 
   // Set the entity info
   entityInfo.uniqueId  = mesh->uniqueId;
@@ -32,29 +33,39 @@ MeshTreeItemComponent::~MeshTreeItemComponent()
 {
 }
 
-void MeshTreeItemComponent::showGizmos()
+void MeshTreeItemComponent::showBoundingBox()
 {
+  const auto& mesh           = props.mesh;
+  mesh->showBoundingBox      = !state.isBoundingBoxEnabled;
+  state.isBoundingBoxEnabled = !state.isBoundingBoxEnabled;
 }
 
 void MeshTreeItemComponent::switchVisibility()
 {
+  const auto newState   = !state.isVisible;
+  state.isVisible       = newState;
+  props.mesh->isVisible = newState;
 }
 
 void MeshTreeItemComponent::render()
 {
-  static ImVec4 dodgerblue = ImColor(0.0f, 0.0f, 1.0f, 1.0f);
-  TreeItemLabelComponent::render(props.mesh->name.c_str(), faCube, dodgerblue);
+  // Mesh tree item label
+  TreeItemLabelComponent::render(label, faCube, ImGui::dodgerblue);
 
-  ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - ImGui::IconSizeDouble);
-  ImGui::TextWrapped("%s", faVectorSquare);
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("%s", "Show/Hide position gizmo");
+  // Enable bounding box icon
+  if (TreeItemIconComponent::render(faSquare, "Show/Hide bounding box",
+                                    ImGui::GetWindowContentRegionWidth()
+                                      - 3.f * ImGui::IconSize,
+                                    state.isBoundingBoxEnabled)) {
+    showBoundingBox();
   }
 
-  ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - ImGui::IconSizeHalf);
-  ImGui::TextWrapped("%s", state.isVisible ? faEye : faEyeSlash);
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("%s", "Show/Hide mesh");
+  // Visibility icon
+  if (TreeItemIconComponent::render(
+        state.isVisible ? faEye : faEyeSlash, "Show/Hide mesh",
+        ImGui::GetWindowContentRegionWidth() - ImGui::IconSize,
+        state.isVisible)) {
+    switchVisibility();
   }
 }
 

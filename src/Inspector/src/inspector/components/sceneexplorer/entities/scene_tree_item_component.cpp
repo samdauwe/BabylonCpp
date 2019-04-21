@@ -1,6 +1,7 @@
 #include <babylon/inspector/components/sceneexplorer/entities/scene_tree_item_component.h>
 
 #include <babylon/imgui/imgui_utils.h>
+#include <babylon/inspector/components/sceneexplorer/tree_item_icon_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 
 namespace BABYLON {
@@ -42,47 +43,64 @@ void SceneTreeItemComponent::setGizmoMode(unsigned int /*mode*/)
 
 void SceneTreeItemComponent::render()
 {
+  // Scene tree item label
   TreeItemLabelComponent::render(label, faImage);
 
+  // Translation icon
+  if (TreeItemIconComponent::render(faArrowsAlt, "Enable/Disable position mode",
+                                    ImGui::GetWindowContentRegionWidth()
+                                      - 6.f * ImGui::IconSizeDouble,
+                                    state.gizmoMode == 1)) {
+    setGizmoMode(1);
+  }
+
+  // Rotation icon
+  if (TreeItemIconComponent::render(faRedoAlt, "Enable/Disable rotation mode",
+                                    ImGui::GetWindowContentRegionWidth()
+                                      - 5.f * ImGui::IconSizeDouble,
+                                    state.gizmoMode == 2)) {
+    setGizmoMode(2);
+  }
+
+  // Scaling icon
+  if (TreeItemIconComponent::render(faCompress, "Enable/Disable scaling mode",
+                                    ImGui::GetWindowContentRegionWidth()
+                                      - 4.f * ImGui::IconSizeDouble,
+                                    state.gizmoMode == 3)) {
+    setGizmoMode(3);
+  }
+
+  // Bounding icon
+  if (TreeItemIconComponent::render(
+        faVectorSquare, "Enable/Disable bounding box mode",
+        ImGui::GetWindowContentRegionWidth() - 3.f * ImGui::IconSizeDouble,
+        state.gizmoMode == 4)) {
+    setGizmoMode(4);
+  }
+
+  // Separator icon
   ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
-                  - 12.f * ImGui::IconSize);
-  ImGui::TextWrapped("%s", faArrowsAlt);
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("%s", "Enable/Disable position mode");
+                  - 2.f * ImGui::IconSizeDouble
+                  - (ImGui::GetStyle().ItemSpacing.x / 2.f));
+  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.48f, 0.72f, 1.0f));
+  ImGui::TextWrapped("%s", " | ");
+  ImGui::PopStyleColor();
+
+  // Picking mode icon
+  if (TreeItemIconComponent::render(faCrosshairs, "Turn picking mode on/off",
+                                    ImGui::GetWindowContentRegionWidth()
+                                      - 3.f * ImGui::IconSize,
+                                    state.isInPickingMode)) {
+    onPickingMode();
   }
 
-  ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
-                  - 10.f * ImGui::IconSize);
-  ImGui::TextWrapped("%s", faRedoAlt);
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("%s", "Enable/Disable rotation mode");
-  }
-
-  ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 8.f * ImGui::IconSize);
-  ImGui::TextWrapped("%s", faCompress);
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("%s", "Enable/Disable scaling mode");
-  }
-
-  ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 6.f * ImGui::IconSize);
-  ImGui::TextWrapped("%s", faVectorSquare);
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("%s", "Enable/Disable bounding box mode");
-  }
-
-  ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - 4.f * ImGui::IconSize);
-  ImGui::TextWrapped("%s", "| ");
-
-  ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - ImGui::IconSizeDouble);
-  ImGui::TextWrapped("%s", faCrosshairs);
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("%s", "Turn picking mode on/off");
-  }
-
-  ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - ImGui::IconSizeHalf);
-  ImGui::TextWrapped("%s", faSyncAlt);
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("%s", "Refresh the explorer");
+  // Refresh icon
+  if (TreeItemIconComponent::render(faSyncAlt, "Refresh the explorer",
+                                    ImGui::GetWindowContentRegionWidth()
+                                      - ImGui::IconSize)) {
+    if (props.onRefresh) {
+      props.onRefresh();
+    }
   }
 }
 

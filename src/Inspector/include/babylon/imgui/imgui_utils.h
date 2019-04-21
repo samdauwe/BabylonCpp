@@ -13,6 +13,13 @@ static constexpr float IconSize       = 9.f;
 static constexpr float IconSizeDouble = 20.f;
 static constexpr float IconSizeHalf   = 4.5f;
 
+static constexpr float IsNotActiveOpacity = 0.5f;
+
+static ImVec4 dodgerblue = ImColor(0.12f, 0.56f, 1.0f, 1.0f); // #1E90FF
+static ImVec4 green      = ImColor(0.0f, 0.5f, 0.0f, 1.0f);
+static ImVec4 orange     = ImColor(1.0f, 0.65f, 0.0f, 1.0f);
+static ImVec4 yellow     = ImColor(1.0f, 1.0f, 0.0f, 1.0f);
+
 /**
  * @brief Returns color "color-bot" #5db0d7 -> rgba(93, 176, 215, 1)
  * @return color "color-bot"

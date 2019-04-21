@@ -1,6 +1,7 @@
 #include <babylon/inspector/components/sceneexplorer/entities/material_tree_item_component.h>
 
 #include <babylon/core/string.h>
+#include <babylon/imgui/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
 #include <babylon/materials/material.h>
 
@@ -43,8 +44,8 @@ MaterialTreeItemComponent::~MaterialTreeItemComponent()
 
 void MaterialTreeItemComponent::render()
 {
-  static ImVec4 orange = ImColor(1.0f, 165.f / 255.f, 0.0f, 1.0f);
-  TreeItemLabelComponent::render(label, faBrush, orange);
+  // Material tree item label
+  TreeItemLabelComponent::render(label, faBrush, ImGui::orange);
 }
 
 } // end of namespace BABYLON

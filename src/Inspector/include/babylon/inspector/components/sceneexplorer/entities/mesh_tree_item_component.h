@@ -1,4 +1,4 @@
-#ifndef BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_ENTITIES_MESH_TREE_ITEM_COMPONENT_H
+﻿#ifndef BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_ENTITIES_MESH_TREE_ITEM_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_SCENE_EXPLORER_ENTITIES_MESH_TREE_ITEM_COMPONENT_H
 
 #include <functional>
@@ -20,8 +20,8 @@ struct IMeshTreeItemComponentProps {
 }; // end of struct IMeshTreeItemComponentProps
 
 struct MeshTreeItemComponentState {
-  bool isVisible      = false;
-  bool isGizmoEnabled = false;
+  bool isBoundingBoxEnabled = false;
+  bool isVisible            = false;
 }; // end of struct MeshTreeItemComponentState
 
 class BABYLON_SHARED_EXPORT MeshTreeItemComponent
@@ -29,16 +29,16 @@ class BABYLON_SHARED_EXPORT MeshTreeItemComponent
 
 public:
   /** Font Awesome Icon Unicodes **/
-  static constexpr const char* faCube         = ICON_FA_CUBE;
-  static constexpr const char* faEye          = ICON_FA_EYE;
-  static constexpr const char* faEyeSlash     = ICON_FA_EYE_SLASH;
-  static constexpr const char* faVectorSquare = ICON_FA_VECTOR_SQUARE;
+  static constexpr const char* faCube     = ICON_FA_CUBE;
+  static constexpr const char* faEye      = ICON_FA_EYE;
+  static constexpr const char* faEyeSlash = ICON_FA_EYE_SLASH;
+  static constexpr const char* faSquare   = ICON_FA_SQUARE;
 
 public:
   MeshTreeItemComponent(const IMeshTreeItemComponentProps& props);
   virtual ~MeshTreeItemComponent();
 
-  void showGizmos();
+  void showBoundingBox();
   void switchVisibility();
   void render() override;
 
