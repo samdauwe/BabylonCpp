@@ -35,9 +35,9 @@ struct BABYLON_SHARED_EXPORT CommonCameraPropertyGridComponent {
       FloatLineComponent::render("Far plane", camera->maxZ);
       SliderLineComponent::render("Inertia", camera->inertia, 0.f, 1.f, 0.01f,
                                   "%.3f");
-      OptionsLineComponent::render(
+      /*OptionsLineComponent::render(
         "Mode", camera->mode, modeOptions,
-        [&](unsigned int value) { camera->mode = value; });
+        [&](unsigned int value) { camera->mode = value; });*/
       if (camera->mode == Camera::PERSPECTIVE_CAMERA) {
         SliderLineComponent::render("Field of view", camera->fov, 0.1f,
                                     Math::PI, 0.1f, "%.2f");

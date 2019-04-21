@@ -55,11 +55,11 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
       CheckBoxLineComponent::render(
         "Backface culling", material->backFaceCulling(),
         [&material](bool value) { material->backFaceCulling = value; });
-      OptionsLineComponent::render(
+      /*OptionsLineComponent::render(
         "Orientation", static_cast<unsigned int>(material->sideOrientation),
         orientationOptions, [&](unsigned int value) {
           material->sideOrientation = static_cast<int>(value);
-        });
+        });*/
       CheckBoxLineComponent::render("Disable depth write",
                                     material->disableDepthWrite);
       CheckBoxLineComponent::render(
@@ -90,15 +90,15 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
       auto pbrBaseMaterial
         = std::static_pointer_cast<PBRBaseMaterial>(material);
       if (pbrBaseMaterial) {
-        OptionsLineComponent::render(
+        /*OptionsLineComponent::render(
           "Transparency mode", *pbrBaseMaterial->transparencyMode(),
           transparencyModeOptions, [&](unsigned int value) {
             pbrBaseMaterial->transparencyMode = value;
-          });
+          });*/
       }
-      OptionsLineComponent::render(
+      /*OptionsLineComponent::render(
         "Alpha mode", material->alphaMode(), alphaModeOptions,
-        [&](unsigned int value) { material->alphaMode = value; });
+        [&](unsigned int value) { material->alphaMode = value; });*/
       CheckBoxLineComponent::render("Separate culling pass",
                                     material->separateCullingPass);
       transparencyContainerOpened = true;

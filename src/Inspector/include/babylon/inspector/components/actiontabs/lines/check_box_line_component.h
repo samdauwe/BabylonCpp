@@ -15,7 +15,7 @@ struct BABYLON_SHARED_EXPORT CheckBoxLineComponent {
   static constexpr float Width = 19.f;
 
   /**
-   * @brief Renders a checkbox widget
+   * @brief Renders a checkbox widget.
    * @param label checkbox label
    * @param isSelected if the checbox is selected
    * @return whether or not the checbox value was changed

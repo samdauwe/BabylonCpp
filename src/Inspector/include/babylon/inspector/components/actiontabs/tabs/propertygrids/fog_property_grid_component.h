@@ -22,9 +22,9 @@ struct BABYLON_SHARED_EXPORT FogPropertyGridComponent {
 
     const auto& stateMode = scene->fogMode();
 
-    OptionsLineComponent::render(
+    /*OptionsLineComponent::render(
       "Fog mode", scene->fogMode(), fogModeOptions,
-      [&](unsigned int value) { scene->fogMode = value; });
+      [&](unsigned int value) { scene->fogMode = value; });*/
     if (stateMode != Scene::FOGMODE_NONE) {
       Color3LineComponent::render("Fog color", scene->fogColor);
     }

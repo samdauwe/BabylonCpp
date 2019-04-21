@@ -91,16 +91,16 @@ void ScenePropertyGridComponent::render()
   static auto renderingModeContainerOpened = true;
   ImGui::SetNextTreeNodeOpen(renderingModeContainerOpened, ImGuiCond_Always);
   if (ImGui::CollapsingHeader("RENDERING MODE")) {
-    RadioButtonLineComponent::render(
-      "Point", scene->forcePointsCloud,
-      [this]() { setRenderingModes(true, false); });
-    RadioButtonLineComponent::render(
-      "Wireframe", scene->forceWireframe,
-      [this]() { setRenderingModes(false, true); });
-    RadioButtonLineComponent::render(
-      "Solid", !scene->forcePointsCloud && !scene->forceWireframe,
-      [this]() { setRenderingModes(false, false); });
-
+    if (RadioButtonLineComponent::render("Point", scene->forcePointsCloud)) {
+      setRenderingModes(true, false);
+    }
+    if (RadioButtonLineComponent::render("Wireframe", scene->forceWireframe)) {
+      setRenderingModes(false, true);
+    }
+    if (RadioButtonLineComponent::render(
+          "Solid", !scene->forcePointsCloud && !scene->forceWireframe)) {
+      setRenderingModes(false, false);
+    }
     renderingModeContainerOpened = true;
   }
   else {
