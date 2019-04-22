@@ -84,7 +84,7 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraPropertyGridComponent {
     static auto behaviorsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(behaviorsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("BEHAVIORS")) {
-      CheckBoxLineComponent::render(
+      /*CheckBoxLineComponent::render(
         "Auto rotation", camera->useAutoRotationBehavior(),
         [&camera](bool value) { camera->useAutoRotationBehavior = value; });
       CheckBoxLineComponent::render(
@@ -92,7 +92,7 @@ struct BABYLON_SHARED_EXPORT ArcRotateCameraPropertyGridComponent {
         [&camera](bool value) { camera->useBouncingBehavior = value; });
       CheckBoxLineComponent::render(
         "Framing", camera->useFramingBehavior(),
-        [&camera](bool value) { camera->useFramingBehavior = value; });
+        [&camera](bool value) { camera->useFramingBehavior = value; });*/
       behaviorsContainerOpened = true;
     }
     else {

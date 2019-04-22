@@ -65,9 +65,9 @@ struct BABYLON_SHARED_EXPORT
     static auto levelsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(levelsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
-      SliderLineComponent::render(
+      /*SliderLineComponent::render(
         "Glossiness", material->glossiness, 0.f, 1.f, 0.01f,
-        [&](float value) { material->glossiness = value; }, "%.2f");
+        [&](float value) { material->glossiness = value; }, "%.2f");*/
       levelsContainerOpened = true;
     }
     else {

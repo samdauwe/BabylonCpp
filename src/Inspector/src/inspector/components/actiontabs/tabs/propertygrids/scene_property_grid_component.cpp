@@ -15,7 +15,7 @@ namespace BABYLON {
 
 ScenePropertyGridComponent::ScenePropertyGridComponent(
   const IScenePropertyGridComponentProps& iProps)
-    : props{iProps}, _dummy{std::nullopt}
+    : props{iProps}, _storedEnvironmentTexture{nullptr}, _dummy{std::nullopt}
 {
 }
 
@@ -87,18 +87,23 @@ void ScenePropertyGridComponent::render()
     {"Standard", ImageProcessingConfiguration::TONEMAPPING_STANDARD},
     {"ACES", ImageProcessingConfiguration::TONEMAPPING_ACES}};
 
+  static std::vector<std::pair<const char*, unsigned int>> vignetteModeOptions{
+    {"Multiply", ImageProcessingConfiguration::VIGNETTEMODE_MULTIPLY()},
+    {"Opaque", ImageProcessingConfiguration::VIGNETTEMODE_OPAQUE()}};
+
   // --- RENDERING MODE ---
   static auto renderingModeContainerOpened = true;
   ImGui::SetNextTreeNodeOpen(renderingModeContainerOpened, ImGuiCond_Always);
   if (ImGui::CollapsingHeader("RENDERING MODE")) {
-    if (RadioButtonLineComponent::render("Point", scene->forcePointsCloud)) {
+    if (RadioButtonLineComponent::render("Point", scene->forcePointsCloud())) {
       setRenderingModes(true, false);
     }
-    if (RadioButtonLineComponent::render("Wireframe", scene->forceWireframe)) {
+    if (RadioButtonLineComponent::render("Wireframe",
+                                         scene->forceWireframe())) {
       setRenderingModes(false, true);
     }
     if (RadioButtonLineComponent::render(
-          "Solid", !scene->forcePointsCloud && !scene->forceWireframe)) {
+          "Solid", !scene->forcePointsCloud() && !scene->forceWireframe())) {
       setRenderingModes(false, false);
     }
     renderingModeContainerOpened = true;
@@ -113,32 +118,83 @@ void ScenePropertyGridComponent::render()
     Color3LineComponent::render("Clear color", scene->clearColor);
     CheckBoxLineComponent::render("Clear color enabled", scene->autoClear);
     Color3LineComponent::render("Ambient color", scene->ambientColor);
-    CheckBoxLineComponent::render("Environment texture (IBL)",
-                                  scene->environmentTexture() != nullptr,
-                                  [this](bool /*value*/) { switchIBL(); });
+    if (CheckBoxLineComponent::render("Environment texture (IBL)",
+                                      scene->environmentTexture() != nullptr)) {
+      switchIBL();
+    }
     FogPropertyGridComponent::render(scene);
     environmentContainerOpened = true;
   }
   else {
     environmentContainerOpened = false;
   }
-  // --- IMAGE PROCESSING ---
+  // --- MATERIAL IMAGE PROCESSING ---
   static auto imageprocessingContainerOpened = true;
   ImGui::SetNextTreeNodeOpen(imageprocessingContainerOpened, ImGuiCond_Always);
-  if (ImGui::CollapsingHeader("IMAGE PROCESSING")) {
-    SliderLineComponent::render(
-      "Contrast", imageProcessing->contrast(), 0.f, 4.f, 0.1f,
-      [&](float value) { imageProcessing->contrast = value; }, "%.2f");
-    SliderLineComponent::render(
-      "Exposure", imageProcessing->exposure(), 0.f, 4.f, 0.1f,
-      [&](float value) { imageProcessing->exposure = value; }, "%.2f");
-    CheckBoxLineComponent::render(
-      "Tone mapping", imageProcessing->toneMappingEnabled(),
-      [&](bool value) { imageProcessing->toneMappingEnabled = value; });
-    OptionsLineComponent::render(
+  if (ImGui::CollapsingHeader("MATERIAL IMAGE PROCESSING")) {
+    auto sliderChange = SliderLineComponent::render(
+      "Contrast", imageProcessing->contrast(), 0.f, 4.f, 0.1f, "%.2f");
+    if (sliderChange) {
+      imageProcessing->contrast = sliderChange.value();
+    }
+    sliderChange = SliderLineComponent::render(
+      "Exposure", imageProcessing->exposure(), 0.f, 4.f, 0.1f, "%.2f");
+    if (sliderChange) {
+      imageProcessing->exposure = sliderChange.value();
+    }
+    if (CheckBoxLineComponent::render("Tone mapping",
+                                      imageProcessing->toneMappingEnabled())) {
+      imageProcessing->toneMappingEnabled
+        = !imageProcessing->toneMappingEnabled();
+    }
+    auto optionChange = OptionsLineComponent::render(
       "Tone mapping type", imageProcessing->toneMappingType(),
-      toneMappingOptions,
-      [&](unsigned int value) { imageProcessing->toneMappingType = value; });
+      toneMappingOptions);
+    if (optionChange) {
+      imageProcessing->toneMappingType = optionChange.value();
+    }
+    if (CheckBoxLineComponent::render("Vignette",
+                                      imageProcessing->vignetteEnabled())) {
+      imageProcessing->vignetteEnabled = !imageProcessing->vignetteEnabled();
+    }
+    sliderChange = SliderLineComponent::render("Vignette weight",
+                                               imageProcessing->vignetteWeight,
+                                               0.f, 4.f, 0.1f, "%.2f");
+    if (sliderChange) {
+      imageProcessing->vignetteWeight = sliderChange.value();
+    }
+    sliderChange = SliderLineComponent::render("Vignette stretch",
+                                               imageProcessing->vignetteStretch,
+                                               0.f, 1.f, 0.1f, "%.2f");
+    if (sliderChange) {
+      imageProcessing->vignetteStretch = sliderChange.value();
+    }
+    sliderChange = SliderLineComponent::render(
+      "Vignette FOV", imageProcessing->vignetteCameraFov, 0.f, Math::PI, 0.1f,
+      "%.2f");
+    if (sliderChange) {
+      imageProcessing->vignetteCameraFov = sliderChange.value();
+    }
+    sliderChange = SliderLineComponent::render("Vignette center X",
+                                               imageProcessing->vignetteCentreX,
+                                               0.f, 1.f, 0.1f, "%.2f");
+    if (sliderChange) {
+      imageProcessing->vignetteCentreX = sliderChange.value();
+    }
+    sliderChange = SliderLineComponent::render("Vignette center Y",
+                                               imageProcessing->vignetteCentreY,
+                                               0.f, 1.f, 0.1f, "%.2f");
+    if (sliderChange) {
+      imageProcessing->vignetteCentreY = sliderChange.value();
+    }
+    Color3LineComponent::render("Vignette color",
+                                imageProcessing->vignetteColor);
+    optionChange = OptionsLineComponent::render(
+      "Vignette blend mode", imageProcessing->vignetteBlendMode(),
+      vignetteModeOptions);
+    if (optionChange) {
+      imageProcessing->vignetteBlendMode = optionChange.value();
+    }
     imageprocessingContainerOpened = true;
   }
   else {
@@ -156,7 +212,7 @@ void ScenePropertyGridComponent::render()
     }
   }
   // --- COLLISIONS ---
-  static auto collisionsContainerOpened = false;
+  static auto collisionsContainerOpened = true;
   ImGui::SetNextTreeNodeOpen(collisionsContainerOpened, ImGuiCond_Always);
   if (ImGui::CollapsingHeader("COLLISIONS")) {
     Vector3LineComponent::render("Gravity", scene->gravity);
@@ -165,6 +221,6 @@ void ScenePropertyGridComponent::render()
   else {
     collisionsContainerOpened = false;
   }
-} // namespace BABYLON
+}
 
 } // end of namespace BABYLON

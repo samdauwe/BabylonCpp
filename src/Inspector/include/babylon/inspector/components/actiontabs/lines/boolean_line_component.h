@@ -2,6 +2,7 @@
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_BOOLEAN_LINE_COMPONENT_H
 
 #include <babylon/babylon_api.h>
+
 #include <babylon/imgui/icons_font_awesome_5.h>
 #include <babylon/imgui/imgui_utils.h>
 

@@ -86,7 +86,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto levelsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(levelsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
-      SliderLineComponent::render(
+      /*SliderLineComponent::render(
         "Environment", material->environmentIntensity(), 0.f, 1.f, 0.01f,
         [&material](float value) { material->environmentIntensity = value; },
         "%.2f");
@@ -102,21 +102,21 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
       SliderLineComponent::render(
         "Specular", material->specularIntensity(), 0.f, 1.f, 0.01f,
         [&material](float value) { material->specularIntensity = value; },
-        "%.2f");
+        "%.2f");*/
       if (material->bumpTexture()) {
-        SliderLineComponent::render("Bump strength",
+        /*SliderLineComponent::render("Bump strength",
                                     material->bumpTexture()->level, 0.f, 1.f,
-                                    0.01f, "%.2f");
+                                    0.01f, "%.2f");*/
       }
       if (material->ambientTexture()) {
-        SliderLineComponent::render("Ambient strength",
+        /*SliderLineComponent::render("Ambient strength",
                                     material->ambientTexture()->level, 0.f, 1.f,
-                                    0.01f, "%.2f");
+                                    0.01f, "%.2f");*/
       }
       if (material->reflectionTexture()) {
-        SliderLineComponent::render("Reflection strength",
+        /*SliderLineComponent::render("Reflection strength",
                                     material->reflectionTexture()->level, 0.f,
-                                    1.f, 0.01f, "%.2f");
+                                    1.f, 0.01f, "%.2f");*/
       }
       levelsContainerOpened = true;
     }
@@ -127,7 +127,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto renderingContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(renderingContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("RENDERING")) {
-      CheckBoxLineComponent::render(
+      /*CheckBoxLineComponent::render(
         "Alpha from albedo", material->useAlphaFromAlbedoTexture(),
         [&material](bool value) {
           material->useAlphaFromAlbedoTexture = value;
@@ -156,7 +156,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
         "Specular anti-aliasing", material->enableSpecularAntiAliasing(),
         [&material](bool value) {
           material->enableSpecularAntiAliasing = value;
-        });
+        });*/
       renderingContainerOpened = true;
     }
     else {
@@ -166,7 +166,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto advancedContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(advancedContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("ADVANCED")) {
-      CheckBoxLineComponent::render(
+      /*CheckBoxLineComponent::render(
         "Radiance occlusion", material->useRadianceOcclusion(),
         [&material](bool value) { material->useRadianceOcclusion = value; });
       CheckBoxLineComponent::render(
@@ -174,7 +174,7 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
         [&material](bool value) { material->useHorizonOcclusion = value; });
       CheckBoxLineComponent::render(
         "Unlit", material->unlit(),
-        [&material](bool value) { material->unlit = value; });
+        [&material](bool value) { material->unlit = value; });*/
       advancedContainerOpened = true;
     }
     else {

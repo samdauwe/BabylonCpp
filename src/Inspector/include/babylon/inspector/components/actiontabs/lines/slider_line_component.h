@@ -1,33 +1,35 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_SLIDER_LINE_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_SLIDER_LINE_COMPONENT_H
 
-#include <babylon/babylon_api.h>
-#include <babylon/core/delegates/delegate.h>
-#include <babylon/imgui/imgui_utils.h>
+#include <optional>
 
-#include <iostream>
+#include <babylon/babylon_api.h>
+#include <babylon/imgui/imgui_utils.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT SliderLineComponent {
 
-  static void render(const char* label, float& value, float minimum,
-                     float maximum, float step,
-                     const char* displayFormat = nullptr)
-  {
-    ImGui::SliderFloatWithSteps(label, &value, minimum, maximum, step,
-                                displayFormat);
-  }
+  static constexpr float Width = 241.f;
 
-  static void render(const char* label, float value, float minimum,
-                     float maximum, float step,
-                     const SA::delegate<void(float)>& onChange,
-                     const char* displayFormat = nullptr)
+  static std::optional<float> render(const char* label, float value,
+                                     float minimum, float maximum, float step,
+                                     const char* displayFormat = nullptr)
   {
-    if (ImGui::SliderFloatWithSteps(label, &value, minimum, maximum, step,
+    std::optional<float> result = std::nullopt;
+
+    ImGui::TextWrapped("%s", label);
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - SliderLineComponent::Width);
+    ImGui::PushID(label);
+    ImGui::PushItemWidth(SliderLineComponent::Width);
+    if (ImGui::SliderFloatWithSteps("", &value, minimum, maximum, step,
                                     displayFormat)) {
-      onChange(value);
+      result = value;
     }
+    ImGui::PopID();
+
+    return result;
   }
 
 }; // end of struct SliderLineComponent

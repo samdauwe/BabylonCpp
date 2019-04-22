@@ -29,9 +29,9 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
       TextureLinkLineComponent::render("Reflection", material,
                                        material->reflectionTexture());
       if (material->reflectionTexture()) {
-        SliderLineComponent::render(
+        /*SliderLineComponent::render(
           "Reflection blur", material->reflectionBlur(), 0.f, 1.f, 0.01f,
-          [&](float value) { material->reflectionBlur = value; }, "%.2f");
+          [&](float value) { material->reflectionBlur = value; }, "%.2f");*/
       }
       texturesContainerOpened = true;
     }
@@ -51,7 +51,7 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
       Color3LineComponent::render(
         "Primary", material->primaryColor(),
         [&material](const Color3& color) { material->primaryColor = color; });
-      SliderLineComponent::render(
+      /*SliderLineComponent::render(
         "Shadow level", material->primaryColorShadowLevel(), 0.f, 1.f, 0.01f,
         [&material](float value) { material->primaryColorShadowLevel = value; },
         "%.2f");
@@ -61,7 +61,7 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
         [&material](float value) {
           material->primaryColorHighlightLevel = value;
         },
-        "%.2f");
+        "%.2f");*/
       lightingAndColorsContainerOpened = true;
     }
     else {
@@ -71,7 +71,7 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
     static auto renderingContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(renderingContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("RENDERING")) {
-      CheckBoxLineComponent::render(
+      /*CheckBoxLineComponent::render(
         "Enable noise", material->enableNoise(),
         [&material](bool value) { material->enableNoise = value; });
       CheckBoxLineComponent::render(
@@ -79,11 +79,11 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
         [&material](bool value) { material->opacityFresnel = value; });
       CheckBoxLineComponent::render(
         "Reflection fresnel", material->reflectionFresnel(),
-        [&material](bool value) { material->reflectionFresnel = value; });
-      SliderLineComponent::render(
+        [&material](bool value) { material->reflectionFresnel = value; });*/
+      /*SliderLineComponent::render(
         "Reflection amount", material->reflectionAmount(), 0.f, 1.f, 0.01f,
         [&material](float value) { material->reflectionAmount = value; },
-        "%.2f");
+        "%.2f");*/
       renderingContainerOpened = true;
     }
     else {

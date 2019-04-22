@@ -17,17 +17,16 @@ struct BABYLON_SHARED_EXPORT Color3LineComponent {
 
   static void render(const char* label, Color3& color)
   {
-    static auto componentWidth = Color3LineComponent::Width;
-    float col3[3]              = {color.r, color.g, color.b};
+    float col3[3] = {color.r, color.g, color.b};
     ImGui::TextWrapped("%s", label);
-    ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - componentWidth);
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - Color3LineComponent::Width);
     ImGui::PushID(label);
+    ImGui::PushItemWidth(Color3LineComponent::Width);
     if (ImGui::ColorEdit3("", col3)) {
       color.set(col3[0], col3[1], col3[2]);
     }
     ImGui::PopID();
-    // Get the actual width for next frame.
-    componentWidth = ImGui::GetItemRectSize().x;
   }
 
   static void render(const char* label, const Color3& color,
@@ -41,25 +40,24 @@ struct BABYLON_SHARED_EXPORT Color3LineComponent {
 
   static void render(const char* label, Color4& color)
   {
-    static auto componentWidth = Color3LineComponent::Width;
-    float col3[3]              = {color.r, color.g, color.b};
+    float col4[4] = {color.r, color.g, color.b, color.a};
     ImGui::TextWrapped("%s", label);
-    ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - componentWidth);
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - Color3LineComponent::Width);
     ImGui::PushID(label);
-    if (ImGui::ColorEdit3("", col3)) {
-      color.set(col3[0], col3[1], col3[2], color.a);
+    ImGui::PushItemWidth(Color3LineComponent::Width);
+    if (ImGui::ColorEdit4("", col4)) {
+      color.set(col4[0], col4[1], col4[2], col4[3]);
     }
     ImGui::PopID();
-    // Get the actual width for next frame.
-    componentWidth = ImGui::GetItemRectSize().x;
   }
 
   static void render(const char* label, const Color4& color,
                      const SA::delegate<void(const Color4& color)>& onChange)
   {
-    float col3[3] = {color.r, color.g, color.b};
-    if (ImGui::ColorEdit3(label, col3)) {
-      onChange(Color4(col3[0], col3[1], col3[2], color.a));
+    float col4[4] = {color.r, color.g, color.b, color.a};
+    if (ImGui::ColorEdit4(label, col4)) {
+      onChange(Color4(col4[0], col4[1], col4[2], col4[3]));
     }
   }
 

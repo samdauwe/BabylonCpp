@@ -52,9 +52,9 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
       TextLineComponent::render("Unique ID",
                                 std::to_string(material->uniqueId));
       TextLineComponent::render("Class", material->getClassName());
-      CheckBoxLineComponent::render(
+      /*CheckBoxLineComponent::render(
         "Backface culling", material->backFaceCulling(),
-        [&material](bool value) { material->backFaceCulling = value; });
+        [&material](bool value) { material->backFaceCulling = value; });*/
       /*OptionsLineComponent::render(
         "Orientation", static_cast<unsigned int>(material->sideOrientation),
         orientationOptions, [&](unsigned int value) {
@@ -62,7 +62,7 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
         });*/
       CheckBoxLineComponent::render("Disable depth write",
                                     material->disableDepthWrite);
-      CheckBoxLineComponent::render(
+      /*CheckBoxLineComponent::render(
         "Need depth pre-pass", material->needDepthPrePass(),
         [&material](bool value) { material->needDepthPrePass = value; });
       CheckBoxLineComponent::render(
@@ -70,7 +70,7 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
         [&material](bool value) { material->wireframe = value; });
       CheckBoxLineComponent::render(
         "Point cloud", material->pointsCloud(),
-        [&material](bool value) { material->pointsCloud = value; });
+        [&material](bool value) { material->pointsCloud = value; });*/
       SliderLineComponent::render("Point size", material->pointSize, 0.f, 100.f,
                                   0.1f, "%.2f");
       SliderLineComponent::render("Z-offset", material->zOffset, -10.f, 10.f,
@@ -84,9 +84,9 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
     static auto transparencyContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(transparencyContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TRANSPARENCY")) {
-      SliderLineComponent::render("Alpha", material->alpha(), 0.f, 1.f, 0.01f,
+      /*SliderLineComponent::render("Alpha", material->alpha(), 0.f, 1.f, 0.01f,
                                   [&](float value) { material->alpha = value; },
-                                  "%.3f");
+                                  "%.3f");*/
       auto pbrBaseMaterial
         = std::static_pointer_cast<PBRBaseMaterial>(material);
       if (pbrBaseMaterial) {

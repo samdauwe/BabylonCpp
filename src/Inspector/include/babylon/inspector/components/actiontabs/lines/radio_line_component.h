@@ -5,7 +5,6 @@
 #include <imgui.h>
 
 #include <babylon/babylon_api.h>
-#include <babylon/core/delegates/delegate.h>
 
 namespace BABYLON {
 
