@@ -1,6 +1,8 @@
 #ifndef BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_FLOAT_LINE_COMPONENT_H
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_LINES_FLOAT_LINE_COMPONENT_H
 
+#include <optional>
+
 // ImGui
 #include <imgui.h>
 
@@ -11,9 +13,23 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT FloatLineComponent {
 
-  static void render(const char* label, float& value)
+  static constexpr float Width = 241.f;
+
+  static std::optional<float> render(const char* label, float value)
   {
-    ImGui::InputFloat(label, &value, 0.01f, 0.1f, "%.3f");
+    std::optional<float> result = std::nullopt;
+
+    ImGui::TextWrapped("%s", label);
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
+                    - FloatLineComponent::Width);
+    ImGui::PushID(label);
+    ImGui::PushItemWidth(FloatLineComponent::Width);
+    if (ImGui::InputFloat(label, &value, 0.01f, 0.1f, "%.3f")) {
+      result = value;
+    }
+    ImGui::PopID();
+
+    return result;
   }
 
   static void render(const char* label, float value,

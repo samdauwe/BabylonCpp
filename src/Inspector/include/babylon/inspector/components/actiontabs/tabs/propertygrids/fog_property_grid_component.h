@@ -22,20 +22,33 @@ struct BABYLON_SHARED_EXPORT FogPropertyGridComponent {
 
     const auto& stateMode = scene->fogMode();
 
-    /*OptionsLineComponent::render(
-      "Fog mode", scene->fogMode(), fogModeOptions,
-      [&](unsigned int value) { scene->fogMode = value; });*/
+    auto optionChange
+      = OptionsLineComponent::render("Fog mode", stateMode, fogModeOptions);
+    if (optionChange) {
+      scene->fogMode = optionChange.value();
+    }
     if (stateMode != Scene::FOGMODE_NONE) {
       Color3LineComponent::render("Fog color", scene->fogColor);
     }
     if (stateMode == Scene::FOGMODE_EXP || stateMode == Scene::FOGMODE_EXP2) {
-      FloatLineComponent::render("Fog density", scene->fogDensity);
+      auto valueChange
+        = FloatLineComponent::render("Fog density", scene->fogDensity);
+      if (valueChange) {
+        scene->fogDensity = valueChange.value();
+      }
     }
     if (stateMode == Scene::FOGMODE_LINEAR) {
-      FloatLineComponent::render("Fog start", scene->fogStart);
+      auto valueChange
+        = FloatLineComponent::render("Fog start", scene->fogStart);
+      if (valueChange) {
+        scene->fogStart = valueChange.value();
+      }
     }
     if (stateMode == Scene::FOGMODE_LINEAR) {
-      FloatLineComponent::render("Fog end", scene->fogEnd);
+      auto valueChange = FloatLineComponent::render("Fog end", scene->fogEnd);
+      if (valueChange) {
+        scene->fogEnd = valueChange.value();
+      }
     }
   }
 

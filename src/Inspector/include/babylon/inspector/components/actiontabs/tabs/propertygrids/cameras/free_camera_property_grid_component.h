@@ -35,7 +35,10 @@ struct BABYLON_SHARED_EXPORT FreeCameraPropertyGridComponent {
     static auto controlsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(controlsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("CONTROLS")) {
-      FloatLineComponent::render("Speed", camera->speed);
+      auto valueChange = FloatLineComponent::render("Speed", camera->speed);
+      if (valueChange) {
+        camera->speed = valueChange.value();
+      }
       controlsContainerOpened = true;
     }
     else {
@@ -45,9 +48,14 @@ struct BABYLON_SHARED_EXPORT FreeCameraPropertyGridComponent {
     static auto collisionsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(collisionsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("COLLISIONS")) {
-      CheckBoxLineComponent::render("Check collisions",
-                                    camera->checkCollisions);
-      CheckBoxLineComponent::render("Apply gravity", camera->applyGravity);
+      if (CheckBoxLineComponent::render("Check collisions",
+                                        camera->checkCollisions)) {
+        camera->checkCollisions = !camera->checkCollisions;
+      }
+      if (CheckBoxLineComponent::render("Apply gravity",
+                                        camera->applyGravity)) {
+        camera->applyGravity = !camera->applyGravity;
+      }
       Vector3LineComponent::render("Ellipsoid", camera->ellipsoid);
       Vector3LineComponent::render("Ellipsoid offset", camera->ellipsoidOffset);
       collisionsContainerOpened = true;

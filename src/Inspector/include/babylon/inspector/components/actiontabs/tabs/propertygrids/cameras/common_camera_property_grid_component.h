@@ -31,28 +31,51 @@ struct BABYLON_SHARED_EXPORT CommonCameraPropertyGridComponent {
       TextLineComponent::render("ID", camera->id);
       TextLineComponent::render("Unique ID", std::to_string(camera->uniqueId));
       TextLineComponent::render("Class", camera->getClassName());
-      FloatLineComponent::render("Near plane", camera->minZ);
-      FloatLineComponent::render("Far plane", camera->maxZ);
-      SliderLineComponent::render("Inertia", camera->inertia, 0.f, 1.f, 0.01f,
-                                  "%.3f");
-      /*OptionsLineComponent::render(
-        "Mode", camera->mode, modeOptions,
-        [&](unsigned int value) { camera->mode = value; });*/
+      auto valueChange = FloatLineComponent::render("Near plane", camera->minZ);
+      if (valueChange) {
+        camera->minZ = valueChange.value();
+      }
+      valueChange = FloatLineComponent::render("Far plane", camera->maxZ);
+      if (valueChange) {
+        camera->maxZ = valueChange.value();
+      }
+      auto sliderChange = SliderLineComponent::render(
+        "Inertia", camera->inertia, 0.f, 1.f, 0.01f, "%.3f");
+      if (sliderChange) {
+        camera->inertia = sliderChange.value();
+      }
+      auto optionChange
+        = OptionsLineComponent::render("Mode", camera->mode, modeOptions);
+      if (optionChange) {
+        camera->mode = optionChange.value();
+      }
       if (camera->mode == Camera::PERSPECTIVE_CAMERA) {
         SliderLineComponent::render("Field of view", camera->fov, 0.1f,
                                     Math::PI, 0.1f, "%.2f");
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-        FloatLineComponent::render("Left", camera->orthoLeft);
+        valueChange = FloatLineComponent::render("Left", camera->orthoLeft);
+        if (valueChange) {
+          camera->orthoLeft = valueChange.value();
+        }
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-        FloatLineComponent::render("Top", camera->orthoTop);
+        valueChange = FloatLineComponent::render("Top", camera->orthoTop);
+        if (valueChange) {
+          camera->orthoTop = valueChange.value();
+        }
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-        FloatLineComponent::render("Right", camera->orthoRight);
+        valueChange = FloatLineComponent::render("Right", camera->orthoRight);
+        if (valueChange) {
+          camera->orthoRight = valueChange.value();
+        }
       }
       if (camera->mode == Camera::ORTHOGRAPHIC_CAMERA) {
-        FloatLineComponent::render("Bottom", camera->orthoBottom);
+        valueChange = FloatLineComponent::render("Bottom", camera->orthoBottom);
+        if (valueChange) {
+          camera->orthoBottom = valueChange.value();
+        }
       }
       generalContainerOpened = true;
     }
