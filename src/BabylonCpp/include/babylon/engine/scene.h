@@ -944,6 +944,13 @@ public:
   BonePtr getBoneByID(const std::string& id);
 
   /**
+   * @brief Gets a bone with its auto-generated unique id.
+   * @param uniqueId defines the unique id to search for
+   * @return the found bone or null if not found at all.
+   */
+  BonePtr getBoneByUniqueID(size_t uniqueId);
+
+  /**
    * @brief Gets a bone using its id.
    * @param name defines the bone's name
    * @return the bone or null if not found
@@ -1028,6 +1035,13 @@ public:
    * @return the found transform node or null if not found at all.
    */
   TransformNodePtr getTransformNodeByID(const std::string& id);
+
+  /**
+   * @brief Gets a transform node with its auto-generated unique id.
+   * @param uniqueId defines the unique id to search for
+   * @return the found transform node or null if not found at all.
+   */
+  TransformNodePtr getTransformNodeByUniqueID(size_t uniqueId);
 
   /**
    * @brief Gets a list of transform nodes using their id.

@@ -501,12 +501,12 @@ protected:
   /**
    * @brief Gets current rotation quaternion (in local space).
    */
-  Quaternion& get_rotationQuaternion();
+  std::optional<Quaternion>& get_rotationQuaternion();
 
   /**
    * @brief Sets current rotation quaternion (in local space).
    */
-  void set_rotationQuaternion(const Quaternion& newRotation);
+  void set_rotationQuaternion(const std::optional<Quaternion>& newRotation);
 
   /**
    * @brief Gets current scaling (in local space).
@@ -570,7 +570,7 @@ public:
   /**
    * Current rotation quaternion (in local space)
    */
-  Property<Bone, Quaternion> rotationQuaternion;
+  Property<Bone, std::optional<Quaternion>> rotationQuaternion;
 
   /**
    * Current scaling (in local space)
@@ -603,7 +603,7 @@ private:
   float _scalingDeterminant;
   Matrix _worldTransform;
   std::optional<Vector3> _localScaling;
-  Quaternion _localRotation;
+  std::optional<Quaternion> _localRotation;
   Vector3 _localPosition;
   bool _needToDecompose;
   bool _needToCompose;

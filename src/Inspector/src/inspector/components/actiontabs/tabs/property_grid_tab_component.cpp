@@ -15,7 +15,9 @@
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/pbr_metallic_roughness_material_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/pbr_specular_glossiness_material_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/standard_material_property_grid_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/bone_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_property_grid_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/transform_node_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/scene_property_grid_component.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/lights/hemispheric_light.h>
@@ -79,9 +81,11 @@ void PropertyGridTabComponent::render()
     if (!mesh || mesh->uniqueId != entityId) {
       mesh = std::dynamic_pointer_cast<Mesh>(
         props.scene->getMeshByUniqueID(entityId));
+      _reservedDataStore.mesh[mesh->uniqueId] = MeshReservedDataStore{};
     }
     if (mesh && mesh->getTotalVertices() > 0) {
-      MeshPropertyGridComponent::render(mesh);
+      MeshPropertyGridComponent::render(
+        mesh, _reservedDataStore.mesh[mesh->uniqueId]);
     }
     return;
   }
@@ -154,6 +158,18 @@ void PropertyGridTabComponent::render()
     }
     if (spotLight) {
       SpotLightPropertyGridComponent::render(spotLight);
+    }
+    return;
+  }
+
+  if (entity->type == EntityType::TransformNode) {
+    auto& transformNode = _entityCache.transformNode;
+    if (!transformNode || transformNode->uniqueId != entityId) {
+      transformNode = std::dynamic_pointer_cast<TransformNode>(
+        props.scene->getTransformNodeByUniqueID(entityId));
+    }
+    if (transformNode) {
+      TransformNodePropertyGridComponent::render(transformNode);
     }
     return;
   }
@@ -234,6 +250,18 @@ void PropertyGridTabComponent::render()
     }
     if (material) {
       MaterialPropertyGridComponent::render(material);
+    }
+    return;
+  }
+
+  if (entity->type == EntityType::Bone) {
+    auto& bone = _entityCache.bone;
+    if (!bone || bone->uniqueId != entityId) {
+      bone = std::dynamic_pointer_cast<Bone>(
+        props.scene->getBoneByUniqueID(entityId));
+    }
+    if (bone) {
+      BonePropertyGridComponent::render(bone);
     }
     return;
   }

@@ -148,6 +148,7 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../BabylonCpp/include
     ${CMAKE_CURRENT_BINARY_DIR}/../BabylonCpp/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../MaterialsLibrary/include
     PUBLIC
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -159,6 +160,7 @@ target_link_libraries(${TARGET}
     PRIVATE
     glfw
     BabylonCpp
+    MaterialsLibrary
 )
 
 # Compile definitions

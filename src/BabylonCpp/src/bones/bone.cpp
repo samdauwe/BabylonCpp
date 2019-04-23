@@ -182,15 +182,17 @@ void Bone::set_rotation(const Vector3& newRotation)
   setRotation(newRotation);
 }
 
-Quaternion& Bone::get_rotationQuaternion()
+std::optional<Quaternion>& Bone::get_rotationQuaternion()
 {
   _decompose();
   return _localRotation;
 }
 
-void Bone::set_rotationQuaternion(const Quaternion& newRotation)
+void Bone::set_rotationQuaternion(const std::optional<Quaternion>& newRotation)
 {
-  setRotationQuaternion(newRotation);
+  if (newRotation) {
+    setRotationQuaternion(*newRotation);
+  }
 }
 
 std::optional<Vector3>& Bone::get_scaling()
@@ -236,7 +238,7 @@ void Bone::_compose()
   }
 
   _needToCompose = false;
-  Matrix::ComposeToRef(*_localScaling, _localRotation, _localPosition,
+  Matrix::ComposeToRef(*_localScaling, *_localRotation, _localPosition,
                        _localMatrix);
 }
 
@@ -601,7 +603,7 @@ void Bone::setRotationQuaternion(const Quaternion& quat, Space space,
 {
   if (space == Space::LOCAL) {
     _decompose();
-    _localRotation.copyFrom(quat);
+    _localRotation->copyFrom(quat);
 
     _markAsDirtyAndCompose();
 
@@ -865,7 +867,7 @@ void Bone::getRotationQuaternionToRef(Quaternion& result, const Space& space,
 {
   if (space == Space::LOCAL) {
     _decompose();
-    result.copyFrom(_localRotation);
+    result.copyFrom(*_localRotation);
   }
   else {
     auto& mat = Bone::_tmpMats[0];

@@ -2848,6 +2848,19 @@ BonePtr Scene::getBoneByID(const std::string& id)
   return nullptr;
 }
 
+BonePtr Scene::getBoneByUniqueID(size_t uniqueId)
+{
+  for (auto& skeleton : skeletons) {
+    for (auto& bone : skeleton->bones) {
+      if (bone->uniqueId == uniqueId) {
+        return bone;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
 BonePtr Scene::getBoneByName(const std::string& name)
 {
   for (auto& skeleton : skeletons) {
@@ -3012,6 +3025,16 @@ TransformNodePtr Scene::getTransformNodeByID(const std::string& id)
   auto it = std::find_if(transformNodes.begin(), transformNodes.end(),
                          [&id](const TransformNodePtr& transformNode) {
                            return transformNode->id == id;
+                         });
+
+  return (it == transformNodes.end()) ? nullptr : *it;
+}
+
+TransformNodePtr Scene::getTransformNodeByUniqueID(size_t uniqueId)
+{
+  auto it = std::find_if(transformNodes.begin(), transformNodes.end(),
+                         [&uniqueId](const TransformNodePtr& transformNode) {
+                           return transformNode->uniqueId == uniqueId;
                          });
 
   return (it == transformNodes.end()) ? nullptr : *it;

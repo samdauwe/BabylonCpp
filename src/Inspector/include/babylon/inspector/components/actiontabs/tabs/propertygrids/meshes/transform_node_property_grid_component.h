@@ -8,7 +8,6 @@
 #include <babylon/inspector/components/actiontabs/lines/quaternion_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/vector3_line_component.h>
-#include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/axes_viewer_component.h>
 #include <babylon/mesh/transform_node.h>
 
 namespace BABYLON {
@@ -28,9 +27,10 @@ struct BABYLON_SHARED_EXPORT TransformNodePropertyGridComponent {
       TextLineComponent::render("Unique ID",
                                 std::to_string(transformNode->uniqueId));
       TextLineComponent::render("Class", transformNode->getClassName());
-      CheckBoxLineComponent::render(
-        "IsEnabled", transformNode->isEnabled(),
-        [&transformNode](bool value) { transformNode->setEnabled(value); });
+      if (CheckBoxLineComponent::render("IsEnabled",
+                                        transformNode->isEnabled())) {
+        transformNode->setEnabled(!transformNode->isEnabled());
+      }
       generalContainerOpened = true;
     }
     else {
@@ -41,29 +41,19 @@ struct BABYLON_SHARED_EXPORT TransformNodePropertyGridComponent {
     ImGui::SetNextTreeNodeOpen(transformationsContainerOpened,
                                ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TRANSFORMATIONS")) {
-      Vector3LineComponent::render("Position", transformNode->position);
-      if (!transformNode->rotationQuaternion().has_value()) {
-        Vector3LineComponent::render("Rotation", transformNode->rotation);
+      Vector3LineComponent::render("Position", transformNode->position());
+      if (!transformNode->rotationQuaternion()) {
+        Vector3LineComponent::render("Rotation", transformNode->rotation());
       }
-      if (transformNode->rotationQuaternion().has_value()) {
-        QuaternionLineComponent::render("Rotation",
-                                        *transformNode->rotationQuaternion());
+      if (transformNode->rotationQuaternion()) {
+        QuaternionLineComponent::render(
+          "Rotation", transformNode->rotationQuaternion().value());
       }
-      Vector3LineComponent::render("Scaling", transformNode->scaling);
+      Vector3LineComponent::render("Scaling", transformNode->scaling());
       transformationsContainerOpened = true;
     }
     else {
       transformationsContainerOpened = false;
-    }
-    // --- DEBUG ---
-    static auto debugContainerOpened = true;
-    ImGui::SetNextTreeNodeOpen(debugContainerOpened, ImGuiCond_Always);
-    if (ImGui::CollapsingHeader("DEBUG")) {
-      AxesViewerComponent::render(transformNode);
-      debugContainerOpened = true;
-    }
-    else {
-      debugContainerOpened = false;
     }
   }
 
