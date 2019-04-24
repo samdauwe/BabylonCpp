@@ -50,6 +50,11 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.0)
         message(FATAL_ERROR "Clang version must be at least 4.0!")
     endif()
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+    # c++17 require at least clang 3.4
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0)
+        message(FATAL_ERROR "AppleClang version must be at least 10.0!")
+    endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # c++17 require at least Microsoft Visual Studio 2017
     if (MSVC_VERSION VERSION_LESS 1910)
