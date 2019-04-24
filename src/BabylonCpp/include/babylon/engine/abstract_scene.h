@@ -2,7 +2,7 @@
 #define BABYLON_ENGINE_ABSTRACT_SCENE_H
 
 #include <functional>
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <nlohmann/json_fwd.hpp>
 #include <optional>

@@ -2,7 +2,7 @@
 #define BABYLON_CAMERAS_CAMERA_INPUTS_MANAGER_H
 
 #include <functional>
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <nlohmann/json_fwd.hpp>
 

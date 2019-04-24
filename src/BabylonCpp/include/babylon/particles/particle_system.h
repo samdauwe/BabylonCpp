@@ -1,6 +1,7 @@
 #ifndef BABYLON_PARTICLES_PARTICLE_SYSTEM_H
 #define BABYLON_PARTICLES_PARTICLE_SYSTEM_H
 
+#include <unordered_map>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
 #include <babylon/particles/base_particle_system.h>

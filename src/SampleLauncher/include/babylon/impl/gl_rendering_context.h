@@ -1,6 +1,7 @@
 #ifndef BABYLON_IMPL_GL_RENDERING_CONTEXT_H
 #define BABYLON_IMPL_GL_RENDERING_CONTEXT_H
 
+#include <unordered_map>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {

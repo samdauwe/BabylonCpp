@@ -2,7 +2,7 @@
 #define BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_H
 
 #include <functional>
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <nlohmann/json_fwd.hpp>
 #include <variant>

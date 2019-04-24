@@ -1,6 +1,7 @@
 #ifndef BABYLON_GAMEPAD_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
 #define BABYLON_GAMEPAD_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
 
+#include <unordered_map>
 #include <babylon/babylon_api.h>
 #include <babylon/gamepad/controllers/web_vr_controller.h>
 
