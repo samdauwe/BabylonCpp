@@ -1,3 +1,4 @@
+#include <cmath>
 #include <babylon/extensions/hexplanetgeneration/terrain/tile.h>
 
 #include <sstream>

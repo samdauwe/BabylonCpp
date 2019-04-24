@@ -1,6 +1,7 @@
 #ifndef BABYLON_EXTENSIONS_NOISE_GENERATION_SIMPLEX_NOISE_H
 #define BABYLON_EXTENSIONS_NOISE_GENERATION_SIMPLEX_NOISE_H
 
+#include <cmath>
 #include <array>
 #include <functional>
 
