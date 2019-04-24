@@ -1,6 +1,7 @@
 #ifndef BABYLON_SAMPLES_OPTIMIZATIONS_CUBE_CHAOS_SCENE_H
 #define BABYLON_SAMPLES_OPTIMIZATIONS_CUBE_CHAOS_SCENE_H
 
+#include <vector>
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {

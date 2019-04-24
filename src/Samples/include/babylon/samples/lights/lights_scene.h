@@ -1,6 +1,7 @@
 #ifndef BABYLON_SAMPLES_LIGHTS_LIGHTS_SCENE_H
 #define BABYLON_SAMPLES_LIGHTS_LIGHTS_SCENE_H
 
+#include <vector>
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
