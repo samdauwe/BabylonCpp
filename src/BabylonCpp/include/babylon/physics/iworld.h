@@ -10,6 +10,7 @@ class PhysicsJoint;
 class Vector3;
 
 struct BABYLON_SHARED_EXPORT IWorld {
+  virtual ~IWorld() = default;
 
   virtual void create(float timeStep, unsigned int broadPhaseType,
                       unsigned int iterations, bool noStat)
