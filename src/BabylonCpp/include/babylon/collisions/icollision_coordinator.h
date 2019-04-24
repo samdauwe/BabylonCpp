@@ -18,6 +18,7 @@ class Vector3;
  * @brief Hidden
  */
 struct BABYLON_SHARED_EXPORT ICollisionCoordinator {
+  virtual ~ICollisionCoordinator() = default;
   virtual void getNewPosition(
     Vector3& position, Vector3& displacement, Collider* collider,
     unsigned int maximumRetry, AbstractMesh* excludedMesh,
