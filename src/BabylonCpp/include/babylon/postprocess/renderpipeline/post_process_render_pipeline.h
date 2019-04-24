@@ -1,6 +1,7 @@
 #ifndef BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_H
 #define BABYLON_POSTPROCESS_RENDERPIPELINE_POST_PROCESS_RENDER_PIPELINE_H
 
+#include <string>
 #include <memory>
 #include <unordered_map>
 #include <vector>

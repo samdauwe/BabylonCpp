@@ -1,6 +1,7 @@
 #ifndef BABYLON_SAMPLES_SAMPLES_COMMON_H
 #define BABYLON_SAMPLES_SAMPLES_COMMON_H
 
+#include <string>
 #include <functional>
 #include <memory>
 #include <unordered_map>
