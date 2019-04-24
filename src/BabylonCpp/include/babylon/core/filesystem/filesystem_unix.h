@@ -1,7 +1,9 @@
 #ifndef BABYLON_CORE_FILESYSTEM_FILESYSTEM_UNIX_H
 #define BABYLON_CORE_FILESYSTEM_FILESYSTEM_UNIX_H
 
+#if !(defined(__APPLE__))
 #include <linux/limits.h>
+#endif
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>

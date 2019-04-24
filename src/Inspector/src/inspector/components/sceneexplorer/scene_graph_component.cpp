@@ -103,7 +103,7 @@ SceneGraphComponent::_createMaterialTreeItem(const MaterialPtr& material)
 {
   TreeItem treeItem;
   std::string label;
-  size_t key;
+  size_t key = 0;
 
   if (material) {
     IMaterialTreeItemComponentProps props;
@@ -123,7 +123,7 @@ TreeItem SceneGraphComponent::_createNodeTreeItem(const NodePtr& node)
 {
   TreeItem treeItem;
   std::string label;
-  size_t key;
+  size_t key = 0;
 
   if (node) {
     if (String::contains(node->getClassName(), "Bone")) {

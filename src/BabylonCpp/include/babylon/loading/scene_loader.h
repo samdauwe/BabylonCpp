@@ -3,7 +3,7 @@
 
 #include <optional>
 #include <variant>
-
+#include <unordered_map>
 #include <babylon/babylon_api.h>
 #include <babylon/tools/observable.h>
 

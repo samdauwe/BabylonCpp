@@ -1,6 +1,7 @@
 #ifndef BABYLON_MATERIALS_SHADER_MATERIAL_H
 #define BABYLON_MATERIALS_SHADER_MATERIAL_H
 
+#include <unordered_map>
 #include <babylon/babylon_api.h>
 #include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/material.h>

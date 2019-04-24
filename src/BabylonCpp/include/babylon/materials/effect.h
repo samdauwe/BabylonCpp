@@ -1,6 +1,7 @@
 #ifndef BABYLON_MATERIALS_EFFECT_H
 #define BABYLON_MATERIALS_EFFECT_H
 
+#include <unordered_map>
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/tools/observable.h>

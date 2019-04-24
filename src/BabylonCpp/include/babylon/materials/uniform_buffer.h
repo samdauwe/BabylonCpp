@@ -1,6 +1,7 @@
 #ifndef BABYLON_MATERIALS_UNIFORM_BUFFER_H
 #define BABYLON_MATERIALS_UNIFORM_BUFFER_H
 
+#include <unordered_map>
 #include <functional>
 #include <memory>
 

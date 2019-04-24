@@ -1,6 +1,7 @@
 #ifndef BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_MATERIAL_H
 #define BABYLON_MATERIALS_LIBRARY_CUSTOM_CUSTOM_MATERIAL_H
 
+#include <unordered_map>
 #include <babylon/babylon_api.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materialslibrary/custom/shader_special_parts.h>

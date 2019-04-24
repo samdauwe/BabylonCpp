@@ -1,7 +1,7 @@
 #ifndef BABYLON_LAYER_EFFECT_LAYER_H
 #define BABYLON_LAYER_EFFECT_LAYER_H
 
-#include <map>
+#include <unordered_map>
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>

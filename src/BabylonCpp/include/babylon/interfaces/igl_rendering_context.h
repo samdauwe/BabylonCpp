@@ -746,6 +746,7 @@ public:
   int TRANSFORM_FEEDBACK_BUFFER;
 
 public:
+  virtual ~IGLRenderingContext() = default;
   virtual bool initialize(bool enableGLDebugging = false) = 0;
   virtual void backupGLState()                            = 0;
   virtual void restoreGLState()                           = 0;

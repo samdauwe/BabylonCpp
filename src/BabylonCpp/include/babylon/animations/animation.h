@@ -1,7 +1,7 @@
 #ifndef BABYLON_ANIMATIONS_ANIMATION_H
 #define BABYLON_ANIMATIONS_ANIMATION_H
 
-#include <map>
+#include <unordered_map>
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/animations/animation_event.h>

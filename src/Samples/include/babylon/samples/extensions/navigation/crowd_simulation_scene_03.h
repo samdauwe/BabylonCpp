@@ -1,6 +1,7 @@
 #ifndef BABYLON_SAMPLES_CROWD_SIMULATION_SCENE_03_H
 #define BABYLON_SAMPLES_CROWD_SIMULATION_SCENE_03_H
 
+#include <vector>
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {

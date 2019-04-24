@@ -1,6 +1,7 @@
 #ifndef BABYLON_SPRITES_ISPRITE_MANAGER_H
 #define BABYLON_SPRITES_ISPRITE_MANAGER_H
 
+#include <vector>
 #include <functional>
 #include <memory>
 #include <optional>

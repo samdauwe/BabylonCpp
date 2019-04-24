@@ -1,3 +1,4 @@
+#include <vector>
 #include <babylon/samples/loaders/import_suzanne_scene.h>
 
 #include <babylon/engine/scene.h>

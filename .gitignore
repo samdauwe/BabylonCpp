@@ -55,3 +55,6 @@ src/InspectorV1
 
 # Dolphin files
 .directory
+
+# vscode
+.vscode/

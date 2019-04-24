@@ -1996,7 +1996,7 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
         throw std::runtime_error(String::printf(
           "%s: %s", context.c_str(),
           !exception.empty() ?
-            exception :
+            exception.c_str() :
             !message.empty() ? message.c_str() : "Failed to load texture"));
       }
     });
@@ -2085,7 +2085,7 @@ ArrayBufferView GLTFLoader::loadUriAsync(const std::string& context,
 
   if (Tools::IsBase64(uri)) {
     const auto data = Tools::DecodeBase64(uri);
-    log(String::printf("Decoded %s... (%ld bytes)", uri.substr(0, 64),
+    log(String::printf("Decoded %s... (%ld bytes)", uri.substr(0, 64).c_str(),
                        data.size()));
     return data;
   }
