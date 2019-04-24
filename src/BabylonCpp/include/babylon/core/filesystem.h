@@ -3,7 +3,7 @@
 
 #include <babylon/core/filesystem/filesystem_common.h>
 
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 // Unix filesystem functions
 #include <babylon/core/filesystem/filesystem_unix.h>
 #elif _WIN32
