@@ -24,7 +24,11 @@ struct BABYLON_SHARED_EXPORT CommonLightPropertyGridComponent {
       TextLineComponent::render("ID", light->id);
       TextLineComponent::render("Unique ID", std::to_string(light->uniqueId));
       TextLineComponent::render("Class", light->getClassName());
-      FloatLineComponent::render("Intensity", light->intensity);
+      auto valueChange
+        = FloatLineComponent::render("Intensity", light->intensity);
+      if (valueChange) {
+        light->intensity = valueChange.value();
+      }
       generalContainerOpened = true;
     }
     else {

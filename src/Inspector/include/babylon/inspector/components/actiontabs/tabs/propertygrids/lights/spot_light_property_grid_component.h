@@ -30,10 +30,14 @@ struct BABYLON_SHARED_EXPORT SpotLightPropertyGridComponent {
       Color3LineComponent::render("Specular", light->specular);
       Vector3LineComponent::render("Position", light->position);
       Vector3LineComponent::render("Direction", light->direction);
-      FloatLineComponent::render(
-        "Angle", light->angle(),
-        [&light](float value) { light->angle = value; });
-      FloatLineComponent::render("Exponent", light->exponent);
+      auto valueChange = FloatLineComponent::render("Angle", light->angle());
+      if (valueChange) {
+        light->angle = valueChange.value();
+      }
+      valueChange = FloatLineComponent::render("Exponent", light->exponent);
+      if (valueChange) {
+        light->exponent = valueChange.value();
+      }
       setupContainerOpened = true;
     }
     else {

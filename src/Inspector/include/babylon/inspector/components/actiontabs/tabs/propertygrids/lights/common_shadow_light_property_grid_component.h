@@ -15,15 +15,16 @@ using IShadowLightPtr = std::shared_ptr<IShadowLight>;
 
 struct BABYLON_SHARED_EXPORT CommonShadowLightPropertyGridComponent {
 
-  static void render(const IShadowLightPtr& /*light*/)
+  static void render(const IShadowLightPtr& light)
   {
     // --- SHADOWS ---
     static auto shadowsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(shadowsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("SHADOWS")) {
-      /*CheckBoxLineComponent::render(
-        "Shadows enabled", light->shadowEnabled(),
-        [&light](bool value) { light->shadowEnabled = value; });*/
+      if (CheckBoxLineComponent::render("Shadows enabled",
+                                        light->shadowEnabled())) {
+        light->shadowEnabled = !light->shadowEnabled();
+      }
       shadowsContainerOpened = true;
     }
     else {

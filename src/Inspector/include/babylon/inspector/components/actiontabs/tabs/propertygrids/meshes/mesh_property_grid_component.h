@@ -6,7 +6,9 @@
 #include <imgui.h>
 
 #include <babylon/babylon_api.h>
+#include <babylon/engine/scene.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
+#include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/float_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/quaternion_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
@@ -203,6 +205,12 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
           mesh->useVertexColors = !mesh->useVertexColors();
         }
       }
+      auto scene = mesh->getScene();
+      if (scene->fogMode != Scene::FOGMODE_NONE) {
+        if (CheckBoxLineComponent::render("Apply fog", mesh->applyFog())) {
+          mesh->applyFog = !mesh->applyFog();
+        }
+      }
       if (!mesh->parent) {
         if (CheckBoxLineComponent::render("Infinite distance",
                                           mesh->infiniteDistance)) {
@@ -274,6 +282,49 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
       else {
         physicsOpened = false;
       }
+    }
+    // --- EDGE RENDERING ---
+    static auto edgeRenderingOpened = false;
+    ImGui::SetNextTreeNodeOpen(edgeRenderingOpened, ImGuiCond_Always);
+    if (ImGui::CollapsingHeader("EDGE RENDERING")) {
+      auto edgesRendererEnabled = (mesh->edgesRenderer() != nullptr);
+      if (CheckBoxLineComponent::render("Enable", edgesRendererEnabled)) {
+        if (edgesRendererEnabled) {
+          mesh->disableEdgesRendering();
+        }
+        else {
+          mesh->enableEdgesRendering();
+        }
+      }
+      auto sliderChange = SliderLineComponent::render(
+        "Edge width", mesh->edgesWidth, 0.f, 10.f, 0.1f, "%.2f");
+      if (sliderChange) {
+        mesh->edgesWidth = sliderChange.value();
+      }
+      Color3LineComponent::render("Edge color", mesh->edgesColor);
+      edgeRenderingOpened = true;
+    }
+    else {
+      edgeRenderingOpened = false;
+    }
+    // --- OUTLINE & OVERLAY ---
+    static auto outlineAndOverlay = false;
+    ImGui::SetNextTreeNodeOpen(outlineAndOverlay, ImGuiCond_Always);
+    if (ImGui::CollapsingHeader("OUTLINE & OVERLAY")) {
+      if (CheckBoxLineComponent::render("Render overlay",
+                                        mesh->renderOverlay())) {
+        mesh->renderOverlay = !mesh->renderOverlay();
+      }
+      Color3LineComponent::render("Overlay color", mesh->overlayColor);
+      if (CheckBoxLineComponent::render("Render outline",
+                                        mesh->renderOutline())) {
+        mesh->renderOutline = !mesh->renderOutline();
+      }
+      Color3LineComponent::render("Outline color", mesh->outlineColor);
+      outlineAndOverlay = true;
+    }
+    else {
+      outlineAndOverlay = false;
     }
     // --- DEBUG ---
     static auto debugOpened = false;
