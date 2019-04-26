@@ -21,9 +21,9 @@ DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBuffer>& iArrayBuffer)
 {
   const auto arrayBuffer = ToArrayBuffer(iArrayBuffer);
 
-  Int32Array header
+  auto header
     = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt);
-  Int32Array extendedHeader
+  auto extendedHeader
     = stl_util::to_array<int32_t>(arrayBuffer, 0, DDS::headerLengthInt + 4);
 
   int mipmapCount = 1;

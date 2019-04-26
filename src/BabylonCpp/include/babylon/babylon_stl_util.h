@@ -130,20 +130,19 @@ T& from_bytes(const std::array<byte, sizeof(T)>& bytes, T& object)
 }
 
 template <typename C, typename T>
-std::vector<C> to_array(const std::vector<T> buffer, size_t byteOffset,
-                        size_t byteLength)
+std::vector<C> to_array(const std::vector<T>& buffer, size_t byteOffset,
+                        size_t length)
 {
-  std::vector<C> bytes(byteLength);
-  std::memcpy(bytes.data(), buffer.data() + byteOffset,
-              bytes.size() * sizeof(C));
+  std::vector<C> bytes(length);
+  std::memcpy(bytes.data(), buffer.data() + byteOffset, length * sizeof(C));
   return bytes;
 }
 
 template <typename C, typename T>
-std::vector<C> to_array(const std::vector<T> buffer, size_t byteOffset)
+std::vector<C> to_array(const std::vector<T>& buffer, size_t byteOffset)
 {
   return to_array<C>(buffer, byteOffset,
-                     (buffer.size() * sizeof(T)) / sizeof(C));
+                     (buffer.size() * sizeof(T) - byteOffset) / sizeof(C));
 }
 
 template <typename C, typename T>
