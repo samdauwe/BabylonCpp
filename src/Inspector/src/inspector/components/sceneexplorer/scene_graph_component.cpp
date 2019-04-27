@@ -180,7 +180,7 @@ float SceneGraphComponent::_calculateOffset(unsigned int nodeLevel)
     return ImGui::IconSize;
   }
 
-  return (10.f * (nodeLevel - 2.f + 0.5f));
+  return (ImGui::IconSizeDouble * nodeLevel);
 }
 
 void SceneGraphComponent::notifySelectionChange(EntityInfo& entityInfo)
@@ -199,6 +199,9 @@ void SceneGraphComponent::_renderSelectableTreeItem(TreeNode<TreeItem>& node)
     if (node.isRoot()) {
       ImGui::Unindent(nodeData.offset);
     }
+    else {
+      ImGui::Unindent(ImGui::GetStyle().ItemSpacing.x);
+    }
     // Make tree item selectable
     ImGui::PushID(nodeData.key);
     if (ImGui::Selectable("", nodeData.isSelected)) {
@@ -212,6 +215,7 @@ void SceneGraphComponent::_renderSelectableTreeItem(TreeNode<TreeItem>& node)
     // Expandable children
     ImGui::SetItemAllowOverlap();
     if (!node.isRoot() && node.arity() > 0) {
+      ImGui::SameLine(nodeData.offset - ImGui::IconSizeDouble);
       ImGui::PushID("TreeItemChildren");
       ImGui::TextWrapped("%s", nodeData.isExpanded ? faMinus : faPlus);
       ImGui::PopID();
@@ -222,14 +226,16 @@ void SceneGraphComponent::_renderSelectableTreeItem(TreeNode<TreeItem>& node)
         // Switch expanded state
         nodeData.isExpanded = !nodeData.isExpanded;
       }
-      ImGui::SameLine();
     }
-    ImGui::SameLine();
+    ImGui::SameLine(nodeData.offset);
     // Render specialized tree item
     ImGui::SetItemAllowOverlap();
     nodeData.component->render();
     if (node.isRoot()) {
       ImGui::Indent(nodeData.offset);
+    }
+    else {
+      ImGui::Indent(ImGui::GetStyle().ItemSpacing.x);
     }
   }
 }
@@ -244,12 +250,10 @@ void SceneGraphComponent::_renderChildren(TreeNode<TreeItem>& node)
     return;
   }
 
-  ImGui::Indent(nodeData.offset);
   for (const auto& child : node.children()) {
     child->data().mustExpand = nodeData.mustExpand;
     _renderChildren(*child);
   }
-  ImGui::Unindent(nodeData.offset);
 }
 
 void SceneGraphComponent::_renderTree(TreeNode<TreeItem>& node)
