@@ -3,6 +3,9 @@
 #include <iomanip>
 #include <sstream>
 
+// GLXW
+#include <GLXW/glxw.h>
+
 // GLFW
 #include <GLFW/glfw3.h>
 #ifdef _WIN32
@@ -16,7 +19,8 @@
 #include <imgui.h>
 
 // ImGui GL2
-#include <babylon/imgui/imgui_impl_glfw_gl2.h>
+#include <babylon/imgui/imgui_impl_glfw.h>
+#include <babylon/imgui/imgui_impl_opengl3.h>
 
 // ImGUI bindings and utils
 #include <babylon/imgui/icons_font_awesome_5.h>
@@ -77,9 +81,14 @@ void Inspector::setScene(Scene* scene)
 
 void Inspector::intialize()
 {
-  // Setup ImGui binding
+  // Initialize GLXW
+  if (glxwInit() != 0) {
+    fprintf(stderr, "Failed to initialize GLXW\n");
+    return;
+  }
+
+  // Setup Dear ImGui context
   ImGui::CreateContext();
-  ImGui_ImplGlfwGL2_Init(_glfwWindow, true);
   // Loads fonts
   ImGuiIO& io = ImGui::GetIO();
   io.Fonts->AddFontDefault();
@@ -94,16 +103,28 @@ void Inspector::intialize()
     = String::concat("../assets/fonts/", FONT_ICON_FILE_NAME_FAS);
   _fontSolid = io.Fonts->AddFontFromFileTTF(fontSolidPath.c_str(),
                                             ImGui::IconSize, &config, ranges);
-  // Setup style
+  // Setup Dear ImGui style
   ImGui::StyleColorsDark();
+  // Setup Platform/Renderer bindings
+  ImGui_ImplGlfw_InitForOpenGL(_glfwWindow, true);
+#if __APPLE__
+  // GL 3.2 + GLSL 150
+  const char* glsl_version = "#version 150";
+#else
+  // GL 3.2 + GLSL 150
+  const char* glsl_version = "#version 150";
+#endif
+  ImGui_ImplOpenGL3_Init(glsl_version);
   // Actions
   _addActions();
 }
 
 void Inspector::render()
 {
-  // New ImGUI frame
-  ImGui_ImplGlfwGL2_NewFrame();
+  // Start the Dear ImGui frame
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
   // Push Font
   _pushFonts();
   // Render main menu bar
@@ -130,14 +151,16 @@ void Inspector::render()
   _popFonts();
   // Rendering
   ImGui::Render();
-  ImGui_ImplGlfwGL2_RenderDrawData(ImGui::GetDrawData());
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void Inspector::dispose()
 {
-  // Shutdown ImGui
-  ImGui_ImplGlfwGL2_Shutdown();
+  // Cleanup ImGui
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
+
   glfwDestroyWindow(_glfwWindow);
 }
 

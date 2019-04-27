@@ -29,17 +29,19 @@ endif()
 #                       Sources                                                #
 # ============================================================================ #
 
-# Sources
+# Header files
 file(GLOB_RECURSE HEADER_FILES
     ${GLXW_INCLUDE_DIRS}/GL/*.h
     ${GLXW_INCLUDE_DIRS}/GLXW/glxw.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
+# Source files
 file(GLOB_RECURSE SOURCE_FILES
     ${GLXW_SOURCE_DIRS}/glxw.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
+# Sources
 set(BABYLON_SAMPLES_SOURCES
     ${HEADER_FILES}
     ${SOURCE_FILES}

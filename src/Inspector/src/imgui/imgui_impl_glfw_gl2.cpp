@@ -49,7 +49,9 @@
 //  shaders (not ideal). 2016-09-05: OpenGL: Fixed save and restore of current
 //  scissor rectangle.
 
-#include "imgui.h"
+#if 0
+
+#include <imgui.h>
 
 // ImGui GL2
 #include <babylon/imgui/imgui_impl_glfw_gl2.h>
@@ -428,3 +430,5 @@ void ImGui_ImplGlfwGL2_NewFrame()
   // your application.
   ImGui::NewFrame();
 }
+
+#endif

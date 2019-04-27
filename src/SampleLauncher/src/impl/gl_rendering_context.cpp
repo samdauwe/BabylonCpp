@@ -108,7 +108,7 @@ GLRenderingContext::~GLRenderingContext()
 
 bool GLRenderingContext::initialize(bool enableGLDebugging)
 {
-  // Initialize GLEW
+  // Initialize GLXW
   if (glxwInit() != 0) {
     fprintf(stderr, "Failed to initialize GLXW\n");
     return false;

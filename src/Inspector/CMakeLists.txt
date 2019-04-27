@@ -39,7 +39,7 @@ string(SUBSTRING "${GIT_SHA1}" 0 12 GIT_REV)
 
 # Meta information about the project
 set(META_PROJECT_NAME        "Inspector")
-set(META_PROJECT_DESCRIPTION "")
+set(META_PROJECT_DESCRIPTION "Inspector for BabylonCpp")
 set(META_AUTHOR_ORGANIZATION "")
 set(META_AUTHOR_DOMAIN       "")
 set(META_AUTHOR_MAINTAINER   "")
@@ -64,24 +64,31 @@ set(SOURCE_PATH  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(TESTS_PATH   "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 # Header files
-file(GLOB_RECURSE INSPECTOR_HDR_FILES   ${INCLUDE_PATH}/*.h)
-
-set(BABYLON_INSPECTOR_HEADERS
-    ${INSPECTOR_HDR_FILES}
+file(GLOB_RECURSE INSPECTOR_HDR_FILES
+    ${GLXW_INCLUDE_DIRS}/GL/*.h
+    ${GLXW_INCLUDE_DIRS}/GLXW/glxw.h
     ${IMGUI_INCLUDE_DIRS}/imgui.h
     ${IMGUI_INCLUDE_DIRS}/imconfig.h
     ${IMGUI_INCLUDE_DIRS}/imgui_internal.h
+    ${INCLUDE_PATH}/*.h
+)
+
+set(BABYLON_INSPECTOR_HEADERS
+    ${INSPECTOR_HDR_FILES}
 )
 
 # Source files
-file(GLOB_RECURSE INSPECTOR_SRC_FILES   ${SOURCE_PATH}/*.cpp)
-
-set(BABYLON_INSPECTOR_SOURCES
-    ${INSPECTOR_SRC_FILES}
+file(GLOB_RECURSE INSPECTOR_SRC_FILES
+    ${GLXW_SOURCE_DIRS}/glxw.c
     ${IMGUI_SOURCE_DIRS}/imgui.cpp
     ${IMGUI_SOURCE_DIRS}/imgui_draw.cpp
     ${IMGUI_SOURCE_DIRS}/imgui_demo.cpp
     ${IMGUI_SOURCE_DIRS}/imgui_widgets.cpp
+    ${SOURCE_PATH}/*.cpp
+)
+
+set(BABYLON_INSPECTOR_SOURCES
+    ${INSPECTOR_SRC_FILES}
 )
 
 # Group source files
@@ -142,6 +149,7 @@ set_target_properties(${TARGET}
 target_include_directories(${TARGET}
     PRIVATE
     ${GLFW_INCLUDE_DIRS}
+    ${GLXW_INCLUDE_DIRS}
     ${IMGUI_INCLUDE_DIRS}
     ${JSON_HPP_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}/include

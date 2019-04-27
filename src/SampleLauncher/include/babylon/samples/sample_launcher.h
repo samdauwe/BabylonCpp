@@ -96,8 +96,6 @@ private:
   // Inspector
   std::unique_ptr<Inspector> _inspector;
 #endif
-  // Other settings
-  bool _useOpenGLES;
 
 }; // end of class SampleLauncher
 
