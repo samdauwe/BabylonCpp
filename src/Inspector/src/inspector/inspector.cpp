@@ -49,6 +49,12 @@ Inspector::Inspector(GLFWwindow* glfwWindow, Scene* scene)
     , _sceneExplorerHost{nullptr}
     , _actionTabsHost{nullptr}
 {
+  // Create action tabs
+  IActionTabsComponentProps actionTabsComponentProps;
+  actionTabsComponentProps.scene       = scene;
+  actionTabsComponentProps.globalState = _globalState;
+  _actionTabsHost
+    = std::make_unique<ActionTabsComponent>(actionTabsComponentProps);
 }
 
 Inspector::~Inspector()
@@ -72,11 +78,7 @@ void Inspector::setScene(Scene* scene)
     = std::make_unique<SceneExplorerComponent>(sceneExplorerComponentProps);
 
   // Create action tabs
-  IActionTabsComponentProps actionTabsComponentProps;
-  actionTabsComponentProps.scene       = scene;
-  actionTabsComponentProps.globalState = _globalState;
-  _actionTabsHost
-    = std::make_unique<ActionTabsComponent>(actionTabsComponentProps);
+  _actionTabsHost->setScene(scene);
 }
 
 void Inspector::intialize()
@@ -145,7 +147,7 @@ void Inspector::render()
     _menuHeight = static_cast<int>(ImGui::GetWindowSize().y);
     ImGui::EndMainMenuBar();
   }
-  // Render dock widgets
+  // Render inspector
   _renderInspector();
   // Pop font
   _popFonts();

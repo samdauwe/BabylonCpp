@@ -4,6 +4,7 @@
 
 #include <babylon/core/string.h>
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/logs_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/property_grid_tab_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/statistics_tab_component.h>
 #include <babylon/inspector/components/global_state.h>
@@ -18,6 +19,7 @@ ActionTabsComponent::ActionTabsComponent(
     , _propertyGridTabComponent{nullptr}
     , _debugTabComponent{nullptr}
     , _statisticsTabComponent{nullptr}
+    , _logsTabComponent{nullptr}
     , _onSelectionChangeObserver{nullptr}
 {
   componentWillMount();
@@ -26,6 +28,18 @@ ActionTabsComponent::ActionTabsComponent(
 ActionTabsComponent::~ActionTabsComponent()
 {
   componentWillUnmount();
+}
+
+void ActionTabsComponent::setScene(Scene* scene)
+{
+  // Create tab widgets
+  props.scene      = scene;
+  _paneProps.scene = props.scene;
+  _propertyGridTabComponent
+    = std::make_unique<PropertyGridTabComponent>(_paneProps);
+  _debugTabComponent = std::make_unique<DebugTabComponent>(_paneProps);
+  _statisticsTabComponent
+    = std::make_unique<StatisticsTabComponent>(_paneProps);
 }
 
 void ActionTabsComponent::componentWillMount()
@@ -39,13 +53,8 @@ void ActionTabsComponent::componentWillMount()
         }
       });
 
-  // Create tab widgets
-  _paneProps.scene = props.scene;
-  _propertyGridTabComponent
-    = std::make_unique<PropertyGridTabComponent>(_paneProps);
-  _debugTabComponent = std::make_unique<DebugTabComponent>(_paneProps);
-  _statisticsTabComponent
-    = std::make_unique<StatisticsTabComponent>(_paneProps);
+  // Create logs tab widget
+  _logsTabComponent = std::make_unique<LogsTabComponent>(_paneProps);
 }
 
 void ActionTabsComponent::componentWillUnmount()
@@ -90,6 +99,18 @@ void ActionTabsComponent::render()
       if (ImGui::BeginTabItem(statisticsTabLabel.c_str())) {
         if (ImGui::BeginChild("scrollingArea")) {
           _statisticsTabComponent->render();
+          ImGui::EndChild();
+        }
+        ImGui::EndTabItem();
+      }
+    }
+    // Logs Tab
+    if (_logsTabComponent) {
+      static const auto logsTabLabel
+        = String::concat(faInfoCircle, " ", "Logs");
+      if (ImGui::BeginTabItem(logsTabLabel.c_str())) {
+        if (ImGui::BeginChild("scrollingArea")) {
+          _logsTabComponent->render();
           ImGui::EndChild();
         }
         ImGui::EndTabItem();

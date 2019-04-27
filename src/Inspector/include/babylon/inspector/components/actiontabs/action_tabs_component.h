@@ -14,6 +14,7 @@ namespace BABYLON {
 
 class DebugTabComponent;
 class GlobalState;
+class LogsTabComponent;
 class PropertyGridTabComponent;
 class Scene;
 class StatisticsTabComponent;
@@ -28,15 +29,17 @@ class BABYLON_SHARED_EXPORT ActionTabsComponent {
 
 public:
   /** Font Awesome Icon Unicodes **/
-  static constexpr const char* faFileAlt  = ICON_FA_FILE_ALT;
-  static constexpr const char* faWrench   = ICON_FA_WRENCH;
-  static constexpr const char* faBug      = ICON_FA_BUG;
-  static constexpr const char* faChartBar = ICON_FA_CHART_BAR;
+  static constexpr const char* faFileAlt    = ICON_FA_FILE_ALT;
+  static constexpr const char* faWrench     = ICON_FA_WRENCH;
+  static constexpr const char* faBug        = ICON_FA_BUG;
+  static constexpr const char* faChartBar   = ICON_FA_CHART_BAR;
+  static constexpr const char* faInfoCircle = ICON_FA_INFO_CIRCLE;
 
 public:
   ActionTabsComponent(const IActionTabsComponentProps& props);
   virtual ~ActionTabsComponent();
 
+  void setScene(Scene* scene);
   void componentWillMount();
   void componentWillUnmount();
   void render();
@@ -51,6 +54,7 @@ private:
   std::unique_ptr<PropertyGridTabComponent> _propertyGridTabComponent;
   std::unique_ptr<DebugTabComponent> _debugTabComponent;
   std::unique_ptr<StatisticsTabComponent> _statisticsTabComponent;
+  std::unique_ptr<LogsTabComponent> _logsTabComponent;
   // Observers
   Observer<EntityInfo>::Ptr _onSelectionChangeObserver;
 
