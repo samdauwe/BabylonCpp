@@ -44,8 +44,12 @@ struct BABYLON_SHARED_EXPORT TexturePropertyGridComponent {
       TextLineComponent::render("Is cube", texture->isCube ? "Yes" : "No");
       TextLineComponent::render("Is render target",
                                 texture->isRenderTarget ? "Yes" : "No");
-      SliderLineComponent::render("UV set", texture->coordinatesIndex, 0, 3, 1,
-                                  "%.3f");
+      auto sliderChange = SliderLineComponent::render(
+        "UV set", texture->coordinatesIndex, 0, 3, 1, "%.3f");
+      if (sliderChange) {
+        texture->coordinatesIndex
+          = static_cast<unsigned int>(sliderChange.value());
+      }
     }
     else {
       generalContainerOpened = false;

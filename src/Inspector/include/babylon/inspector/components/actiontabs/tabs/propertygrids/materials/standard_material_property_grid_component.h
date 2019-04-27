@@ -63,8 +63,11 @@ struct BABYLON_SHARED_EXPORT StandardMaterialPropertyGridComponent {
     if (ImGui::CollapsingHeader("LIGHTING & COLORS")) {
       Color3LineComponent::render("Diffuse", material->diffuseColor);
       Color3LineComponent::render("Specular", material->specularColor);
-      SliderLineComponent::render("Specular power", material->specularPower,
-                                  0.f, 128.f, 0.1f, "%.2f");
+      auto sliderChange = SliderLineComponent::render(
+        "Specular power", material->specularPower, 0.f, 128.f, 0.1f, "%.2f");
+      if (sliderChange) {
+        material->specularPower = sliderChange.value();
+      }
       Color3LineComponent::render("Emissive", material->emissiveColor);
       Color3LineComponent::render("Ambient", material->ambientColor);
       lightingAndColorsOpened = true;
@@ -77,49 +80,76 @@ struct BABYLON_SHARED_EXPORT StandardMaterialPropertyGridComponent {
     ImGui::SetNextTreeNodeOpen(levelsOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
       if (material->diffuseTexture()) {
-        SliderLineComponent::render("Diffuse level",
-                                    material->diffuseTexture()->level, 0.f, 2.f,
-                                    0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Diffuse level", material->diffuseTexture()->level, 0.f, 2.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          material->diffuseTexture()->level = sliderChange.value();
+        }
       }
       if (material->specularTexture()) {
-        SliderLineComponent::render("Specular level",
-                                    material->specularTexture()->level, 0.f,
-                                    2.f, 0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Specular level", material->specularTexture()->level, 0.f, 2.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          material->specularTexture()->level = sliderChange.value();
+        }
       }
       if (material->reflectionTexture()) {
-        SliderLineComponent::render("Reflection level",
-                                    material->reflectionTexture()->level, 0.f,
-                                    2.f, 0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Reflection level", material->reflectionTexture()->level, 0.f, 2.f,
+          0.01f, "%.2f");
+        if (sliderChange) {
+          material->reflectionTexture()->level = sliderChange.value();
+        }
       }
       if (material->refractionTexture()) {
-        SliderLineComponent::render("Refraction level",
-                                    material->refractionTexture()->level, 0.f,
-                                    2.f, 0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Refraction level", material->refractionTexture()->level, 0.f, 2.f,
+          0.01f, "%.2f");
+        if (sliderChange) {
+          material->refractionTexture()->level = sliderChange.value();
+        }
       }
       if (material->emissiveTexture()) {
-        SliderLineComponent::render("Emissive level",
-                                    material->emissiveTexture()->level, 0.f,
-                                    2.f, 0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Emissive level", material->emissiveTexture()->level, 0.f, 2.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          material->emissiveTexture()->level = sliderChange.value();
+        }
       }
       if (material->bumpTexture()) {
-        SliderLineComponent::render("Bump level",
-                                    material->bumpTexture()->level, 0.f, 2.f,
-                                    0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Bump level", material->bumpTexture()->level, 0.f, 2.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          material->bumpTexture()->level = sliderChange.value();
+        }
       }
       if (material->opacityTexture()) {
-        SliderLineComponent::render("Opacity level",
-                                    material->opacityTexture()->level, 0.f, 2.f,
-                                    0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Opacity level", material->opacityTexture()->level, 0.f, 2.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          material->opacityTexture()->level = sliderChange.value();
+        }
       }
       if (material->ambientTexture()) {
-        SliderLineComponent::render("Ambient level",
-                                    material->ambientTexture()->level, 0.f, 2.f,
-                                    0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Ambient level", material->ambientTexture()->level, 0.f, 2.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          material->ambientTexture()->level = sliderChange.value();
+        }
       }
       if (material->lightmapTexture()) {
-        SliderLineComponent::render("Lightmap level",
-                                    material->lightmapTexture()->level, 0.f,
-                                    2.f, 0.01f, "%.2f");
+        auto sliderChange = SliderLineComponent::render(
+          "Lightmap level", material->lightmapTexture()->level, 0.f, 2.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          material->lightmapTexture()->level = sliderChange.value();
+        }
       }
       levelsOpened = true;
     }

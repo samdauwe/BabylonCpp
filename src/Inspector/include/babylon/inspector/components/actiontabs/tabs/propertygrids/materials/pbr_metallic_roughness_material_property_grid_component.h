@@ -29,7 +29,7 @@ struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
     if (ImGui::CollapsingHeader("TEXTURES")) {
       TextureLinkLineComponent::render("Base", material, material->baseTexture);
       TextureLinkLineComponent::render("Metallic roughness", material,
-                                       material->metallicRoughnessTexture);
+                                       material->metallicRoughnessTexture());
       TextureLinkLineComponent::render("Environment", material,
                                        material->environmentTexture());
       TextureLinkLineComponent::render("Emissive", material,
@@ -52,7 +52,7 @@ struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
     ImGui::SetNextTreeNodeOpen(lightingAndColorsContainerOpened,
                                ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LIGHTING & COLORS")) {
-      Color3LineComponent::render("Base", material->baseColor);
+      Color3LineComponent::render("Base", material->baseColor());
       Color3LineComponent::render(
         "Emissive", material->emissiveColor(),
         [&material](const Color3& color) { material->emissiveColor = color; });
@@ -65,12 +65,16 @@ struct BABYLON_SHARED_EXPORT PBRMetallicRoughnessMaterialPropertyGridComponent {
     static auto levelsContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(levelsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
-      /*SliderLineComponent::render(
-        "Metallic", material->metallic(), 0.f, 1.f, 0.01f,
-        [&](float value) { material->metallic = value; }, "%.2f");
-      SliderLineComponent::render(
-        "Roughness", material->roughness(), 0.f, 1.f, 0.01f,
-        [&](float value) { material->roughness = value; }, "%.2f");*/
+      auto sliderChange = SliderLineComponent::render(
+        "Metallic", material->metallic(), 0.f, 1.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->metallic = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render(
+        "Roughness", material->roughness(), 0.f, 1.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->roughness = sliderChange.value();
+      }
       levelsContainerOpened = true;
     }
     else {

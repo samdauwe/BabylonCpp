@@ -52,29 +52,41 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
       TextLineComponent::render("Unique ID",
                                 std::to_string(material->uniqueId));
       TextLineComponent::render("Class", material->getClassName());
-      /*CheckBoxLineComponent::render(
-        "Backface culling", material->backFaceCulling(),
-        [&material](bool value) { material->backFaceCulling = value; });*/
-      /*OptionsLineComponent::render(
+      if (CheckBoxLineComponent::render("Backface culling",
+                                        material->backFaceCulling())) {
+        material->backFaceCulling = !material->backFaceCulling();
+      }
+      auto optionChange = OptionsLineComponent::render(
         "Orientation", static_cast<unsigned int>(material->sideOrientation),
-        orientationOptions, [&](unsigned int value) {
-          material->sideOrientation = static_cast<int>(value);
-        });*/
-      CheckBoxLineComponent::render("Disable depth write",
-                                    material->disableDepthWrite);
-      /*CheckBoxLineComponent::render(
-        "Need depth pre-pass", material->needDepthPrePass(),
-        [&material](bool value) { material->needDepthPrePass = value; });
-      CheckBoxLineComponent::render(
-        "Wireframe", material->wireframe(),
-        [&material](bool value) { material->wireframe = value; });
-      CheckBoxLineComponent::render(
-        "Point cloud", material->pointsCloud(),
-        [&material](bool value) { material->pointsCloud = value; });*/
-      SliderLineComponent::render("Point size", material->pointSize, 0.f, 100.f,
-                                  0.1f, "%.2f");
-      SliderLineComponent::render("Z-offset", material->zOffset, -10.f, 10.f,
-                                  0.1f, "%.2f");
+        orientationOptions);
+      if (optionChange) {
+        material->sideOrientation = static_cast<int>(optionChange.value());
+      }
+      if (CheckBoxLineComponent::render("Disable depth write",
+                                        material->disableDepthWrite)) {
+        material->disableDepthWrite = !material->disableDepthWrite;
+      }
+      if (CheckBoxLineComponent::render("Need depth pre-pass",
+                                        material->needDepthPrePass())) {
+        material->needDepthPrePass = !material->needDepthPrePass();
+      }
+      if (CheckBoxLineComponent::render("Wireframe", material->wireframe())) {
+        material->wireframe = !material->wireframe();
+      }
+      if (CheckBoxLineComponent::render("Point cloud",
+                                        material->pointsCloud())) {
+        material->pointsCloud = !material->pointsCloud();
+      }
+      auto sliderChange = SliderLineComponent::render(
+        "Point size", material->pointSize, 0.f, 100.f, 0.1f, "%.2f");
+      if (sliderChange) {
+        material->pointSize = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render("Z-offset", material->zOffset,
+                                                 -10.f, 10.f, 0.1f, "%.2f");
+      if (sliderChange) {
+        material->zOffset = sliderChange.value();
+      }
       generalContainerOpened = true;
     }
     else {
@@ -84,23 +96,30 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
     static auto transparencyContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(transparencyContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("TRANSPARENCY")) {
-      /*SliderLineComponent::render("Alpha", material->alpha(), 0.f, 1.f, 0.01f,
-                                  [&](float value) { material->alpha = value; },
-                                  "%.3f");*/
+      auto sliderChange = SliderLineComponent::render(
+        "Alpha", material->alpha(), 0.f, 1.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->alpha = sliderChange.value();
+      }
       auto pbrBaseMaterial
         = std::static_pointer_cast<PBRBaseMaterial>(material);
       if (pbrBaseMaterial) {
-        /*OptionsLineComponent::render(
+        auto optionChange = OptionsLineComponent::render(
           "Transparency mode", *pbrBaseMaterial->transparencyMode(),
-          transparencyModeOptions, [&](unsigned int value) {
-            pbrBaseMaterial->transparencyMode = value;
-          });*/
+          transparencyModeOptions);
+        if (optionChange) {
+          pbrBaseMaterial->transparencyMode = optionChange.value();
+        }
       }
-      /*OptionsLineComponent::render(
-        "Alpha mode", material->alphaMode(), alphaModeOptions,
-        [&](unsigned int value) { material->alphaMode = value; });*/
-      CheckBoxLineComponent::render("Separate culling pass",
-                                    material->separateCullingPass);
+      auto optionChange = OptionsLineComponent::render(
+        "Alpha mode", material->alphaMode(), alphaModeOptions);
+      if (optionChange) {
+        material->alphaMode = optionChange.value();
+      }
+      if (CheckBoxLineComponent::render("Separate culling pass",
+                                        material->separateCullingPass)) {
+        material->separateCullingPass = !material->separateCullingPass;
+      }
       transparencyContainerOpened = true;
     }
     else {

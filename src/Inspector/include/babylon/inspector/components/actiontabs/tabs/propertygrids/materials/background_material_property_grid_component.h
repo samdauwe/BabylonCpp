@@ -29,9 +29,12 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
       TextureLinkLineComponent::render("Reflection", material,
                                        material->reflectionTexture());
       if (material->reflectionTexture()) {
-        /*SliderLineComponent::render(
+        auto sliderChange = SliderLineComponent::render(
           "Reflection blur", material->reflectionBlur(), 0.f, 1.f, 0.01f,
-          [&](float value) { material->reflectionBlur = value; }, "%.2f");*/
+          "%.2f");
+        if (sliderChange) {
+          material->reflectionBlur = sliderChange.value();
+        }
       }
       texturesContainerOpened = true;
     }
@@ -51,17 +54,18 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
       Color3LineComponent::render(
         "Primary", material->primaryColor(),
         [&material](const Color3& color) { material->primaryColor = color; });
-      /*SliderLineComponent::render(
+      auto sliderChange = SliderLineComponent::render(
         "Shadow level", material->primaryColorShadowLevel(), 0.f, 1.f, 0.01f,
-        [&material](float value) { material->primaryColorShadowLevel = value; },
         "%.2f");
-      SliderLineComponent::render(
+      if (sliderChange) {
+        material->primaryColorShadowLevel = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render(
         "Highlight level", material->primaryColorHighlightLevel(), 0.f, 1.f,
-        0.01f,
-        [&material](float value) {
-          material->primaryColorHighlightLevel = value;
-        },
-        "%.2f");*/
+        0.01f, "%.2f");
+      if (sliderChange) {
+        material->primaryColorHighlightLevel = sliderChange.value();
+      }
       lightingAndColorsContainerOpened = true;
     }
     else {
@@ -71,19 +75,24 @@ struct BABYLON_SHARED_EXPORT BackgroundMaterialPropertyGridComponent {
     static auto renderingContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(renderingContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("RENDERING")) {
-      /*CheckBoxLineComponent::render(
-        "Enable noise", material->enableNoise(),
-        [&material](bool value) { material->enableNoise = value; });
-      CheckBoxLineComponent::render(
-        "Opacity fresnel", material->opacityFresnel(),
-        [&material](bool value) { material->opacityFresnel = value; });
-      CheckBoxLineComponent::render(
-        "Reflection fresnel", material->reflectionFresnel(),
-        [&material](bool value) { material->reflectionFresnel = value; });*/
-      /*SliderLineComponent::render(
+      if (CheckBoxLineComponent::render("Enable noise",
+                                        material->enableNoise())) {
+        material->enableNoise = !material->enableNoise();
+      }
+      if (CheckBoxLineComponent::render("Opacity fresnel",
+                                        material->opacityFresnel())) {
+        material->opacityFresnel = !material->opacityFresnel();
+      }
+      if (CheckBoxLineComponent::render("Reflection fresnel",
+                                        material->reflectionFresnel())) {
+        material->reflectionFresnel = !material->reflectionFresnel();
+      }
+      auto sliderChange = SliderLineComponent::render(
         "Reflection amount", material->reflectionAmount(), 0.f, 1.f, 0.01f,
-        [&material](float value) { material->reflectionAmount = value; },
-        "%.2f");*/
+        "%.2f");
+      if (sliderChange) {
+        material->reflectionAmount = sliderChange.value();
+      }
       renderingContainerOpened = true;
     }
     else {

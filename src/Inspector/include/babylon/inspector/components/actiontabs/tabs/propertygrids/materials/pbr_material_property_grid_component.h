@@ -86,37 +86,55 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto levelsContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(levelsContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("LEVELS")) {
-      /*SliderLineComponent::render(
+      auto sliderChange = SliderLineComponent::render(
         "Environment", material->environmentIntensity(), 0.f, 1.f, 0.01f,
-        [&material](float value) { material->environmentIntensity = value; },
         "%.2f");
-      SliderLineComponent::render(
-        "Metallic", *material->metallic(), 0.f, 1.f, 0.01f,
-        [&material](float value) { material->metallic = value; }, "%.2f");
-      SliderLineComponent::render(
-        "Roughness", *material->roughness(), 0.f, 1.f, 0.01f,
-        [&material](float value) { material->roughness = value; }, "%.2f");
-      SliderLineComponent::render(
-        "Micro-surface", material->microSurface(), 0.f, 1.f, 0.01f,
-        [&material](float value) { material->microSurface = value; }, "%.2f");
-      SliderLineComponent::render(
-        "Specular", material->specularIntensity(), 0.f, 1.f, 0.01f,
-        [&material](float value) { material->specularIntensity = value; },
-        "%.2f");*/
+      if (sliderChange) {
+        material->environmentIntensity = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render(
+        "Metallic", *material->metallic(), 0.f, 1.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->metallic = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render(
+        "Roughness", *material->roughness(), 0.f, 1.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->roughness = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render(
+        "Micro-surface", material->microSurface(), 0.f, 1.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->microSurface = sliderChange.value();
+      }
+      sliderChange = SliderLineComponent::render(
+        "Specular", material->specularIntensity(), 0.f, 1.f, 0.01f, "%.2f");
+      if (sliderChange) {
+        material->specularIntensity = sliderChange.value();
+      }
       if (material->bumpTexture()) {
-        /*SliderLineComponent::render("Bump strength",
-                                    material->bumpTexture()->level, 0.f, 1.f,
-                                    0.01f, "%.2f");*/
+        sliderChange = SliderLineComponent::render(
+          "Bump strength", material->bumpTexture()->level, 0.f, 1.f, 0.01f,
+          "%.2f");
+        if (sliderChange) {
+          material->bumpTexture()->level = sliderChange.value();
+        }
       }
       if (material->ambientTexture()) {
-        /*SliderLineComponent::render("Ambient strength",
-                                    material->ambientTexture()->level, 0.f, 1.f,
-                                    0.01f, "%.2f");*/
+        sliderChange = SliderLineComponent::render(
+          "Ambient strength", material->ambientTexture()->level, 0.f, 1.f,
+          0.01f, "%.2f");
+        if (sliderChange) {
+          material->ambientTexture()->level = sliderChange.value();
+        }
       }
       if (material->reflectionTexture()) {
-        /*SliderLineComponent::render("Reflection strength",
-                                    material->reflectionTexture()->level, 0.f,
-                                    1.f, 0.01f, "%.2f");*/
+        sliderChange = SliderLineComponent::render(
+          "Reflection strength", material->reflectionTexture()->level, 0.f, 1.f,
+          0.01f, "%.2f");
+        if (sliderChange) {
+          material->reflectionTexture()->level = sliderChange.value();
+        }
       }
       levelsContainerOpened = true;
     }
@@ -127,36 +145,40 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto renderingContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(renderingContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("RENDERING")) {
-      /*CheckBoxLineComponent::render(
-        "Alpha from albedo", material->useAlphaFromAlbedoTexture(),
-        [&material](bool value) {
-          material->useAlphaFromAlbedoTexture = value;
-        });
-      CheckBoxLineComponent::render(
-        "Ambient in grayscale", material->useAmbientInGrayScale(),
-        [&material](bool value) { material->useAmbientInGrayScale = value; });
-      CheckBoxLineComponent::render(
-        "Radiance over alpha", material->useRadianceOverAlpha(),
-        [&material](bool value) { material->useRadianceOverAlpha = value; });
-      CheckBoxLineComponent::render(
-        "Link refraction with transparency",
-        material->linkRefractionWithTransparency(), [&material](bool value) {
-          material->linkRefractionWithTransparency = value;
-        });
-      CheckBoxLineComponent::render(
-        "Micro-surface from ref. map alpha",
-        material->useMicroSurfaceFromReflectivityMapAlpha(),
-        [&material](bool value) {
-          material->useMicroSurfaceFromReflectivityMapAlpha = value;
-        });
-      CheckBoxLineComponent::render(
-        "Specular over alpha", material->useSpecularOverAlpha(),
-        [&material](bool value) { material->useSpecularOverAlpha = value; });
-      CheckBoxLineComponent::render(
-        "Specular anti-aliasing", material->enableSpecularAntiAliasing(),
-        [&material](bool value) {
-          material->enableSpecularAntiAliasing = value;
-        });*/
+      if (CheckBoxLineComponent::render(
+            "Alpha from albedo", material->useAlphaFromAlbedoTexture())) {
+        material->useAlphaFromAlbedoTexture
+          = !material->useAlphaFromAlbedoTexture();
+      }
+      if (CheckBoxLineComponent::render("Ambient in grayscale",
+                                        material->useAmbientInGrayScale())) {
+        material->useAmbientInGrayScale = !material->useAmbientInGrayScale();
+      }
+      if (CheckBoxLineComponent::render("Radiance over alpha",
+                                        material->useRadianceOverAlpha())) {
+        material->useRadianceOverAlpha = !material->useRadianceOverAlpha();
+      }
+      if (CheckBoxLineComponent::render(
+            "Link refraction with transparency",
+            material->linkRefractionWithTransparency())) {
+        material->linkRefractionWithTransparency
+          = !material->linkRefractionWithTransparency();
+      }
+      if (CheckBoxLineComponent::render(
+            "Micro-surface from ref. map alpha",
+            material->useMicroSurfaceFromReflectivityMapAlpha())) {
+        material->useMicroSurfaceFromReflectivityMapAlpha
+          = !material->useMicroSurfaceFromReflectivityMapAlpha();
+      }
+      if (CheckBoxLineComponent::render("Specular over alpha",
+                                        material->useSpecularOverAlpha())) {
+        material->useSpecularOverAlpha = !material->useSpecularOverAlpha();
+      }
+      if (CheckBoxLineComponent::render(
+            "Specular anti-aliasing", material->enableSpecularAntiAliasing())) {
+        material->enableSpecularAntiAliasing
+          = !material->enableSpecularAntiAliasing();
+      }
       renderingContainerOpened = true;
     }
     else {
@@ -166,15 +188,17 @@ struct BABYLON_SHARED_EXPORT PBRMaterialPropertyGridComponent {
     static auto advancedContainerOpened = false;
     ImGui::SetNextTreeNodeOpen(advancedContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("ADVANCED")) {
-      /*CheckBoxLineComponent::render(
-        "Radiance occlusion", material->useRadianceOcclusion(),
-        [&material](bool value) { material->useRadianceOcclusion = value; });
-      CheckBoxLineComponent::render(
-        "Horizon occlusion", material->useHorizonOcclusion(),
-        [&material](bool value) { material->useHorizonOcclusion = value; });
-      CheckBoxLineComponent::render(
-        "Unlit", material->unlit(),
-        [&material](bool value) { material->unlit = value; });*/
+      if (CheckBoxLineComponent::render("Radiance occlusion",
+                                        material->useRadianceOcclusion())) {
+        material->useRadianceOcclusion = !material->useRadianceOcclusion();
+      }
+      if (CheckBoxLineComponent::render("Horizon occlusion",
+                                        material->useHorizonOcclusion())) {
+        material->useHorizonOcclusion = !material->useHorizonOcclusion();
+      }
+      if (CheckBoxLineComponent::render("Unlit", material->unlit())) {
+        material->unlit = !material->unlit();
+      }
       advancedContainerOpened = true;
     }
     else {
