@@ -51,7 +51,11 @@ public:
   template <typename... Ts>
   static GlowLayerPtr New(Ts&&... args)
   {
-    return std::shared_ptr<GlowLayer>(new GlowLayer(std::forward<Ts>(args)...));
+    auto layer
+      = std::shared_ptr<GlowLayer>(new GlowLayer(std::forward<Ts>(args)...));
+    layer->addToScene(layer);
+
+    return layer;
   }
   ~GlowLayer() override;
 

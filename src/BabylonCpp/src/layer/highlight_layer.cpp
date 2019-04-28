@@ -432,7 +432,7 @@ bool HighlightLayer::hasMesh(AbstractMesh* mesh) const
   return _meshes.find(mesh->uniqueId) != _meshes.end();
 }
 
-void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
+void HighlightLayer::addMesh(const MeshPtr& mesh, const Color3& color,
                              bool glowEmissiveOnly)
 {
   if (_meshes.empty()) {
@@ -464,7 +464,9 @@ void HighlightLayer::addMesh(Mesh* mesh, const Color3& color,
     _meshes[mesh->uniqueId]  = newMesh;
 
     mesh->onDisposeObservable.add(
-      [this, mesh](Node* /*node*/, EventState& /*es*/) { _disposeMesh(mesh); });
+      [this, mesh](Node* /*node*/, EventState& /*es*/) {
+        _disposeMesh(mesh.get());
+      });
   }
 
   _shouldRender = true;

@@ -45,7 +45,6 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
 
   _engine  = scene->getEngine();
   _maxSize = _engine->getCaps().maxTextureSize;
-  _scene->effectLayers.emplace_back(shared_from_this());
 
   // Generate Buffers
   _generateIndexBuffer();
@@ -54,6 +53,11 @@ EffectLayer::EffectLayer(const std::string& iName, Scene* scene)
 
 EffectLayer::~EffectLayer()
 {
+}
+
+void EffectLayer::addToScene(const EffectLayerPtr& newEffectLayer)
+{
+  _scene->effectLayers.emplace_back(newEffectLayer);
 }
 
 CameraPtr& EffectLayer::get_camera()

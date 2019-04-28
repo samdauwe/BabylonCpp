@@ -9,6 +9,7 @@
 #include <babylon/samples/specialfx/fresnel_scene.h>
 #include <babylon/samples/specialfx/glass_wubble_ball_scene.h>
 #include <babylon/samples/specialfx/heat_wave_scene.h>
+#include <babylon/samples/specialfx/highlight_layer_scene.h>
 #include <babylon/samples/specialfx/infinite_loader_scene.h>
 #include <babylon/samples/specialfx/kernel_based_blur_scene.h>
 #include <babylon/samples/specialfx/lens_flares_scene.h>
@@ -86,6 +87,12 @@ _SpecialFXSamplesIndex::_SpecialFXSamplesIndex()
                       [](ICanvas* iCanvas) {                             //
                         return std::make_unique<HeatWaveScene>(iCanvas); //
                       });                                                //
+  // Highlight Layer Scene
+  _samples["HighlightLayerScene"] = std::make_tuple(
+    true,                                                    //
+    [](ICanvas* iCanvas) {                                   //
+      return std::make_unique<HighlightLayerScene>(iCanvas); //
+    });                                                      //
   // Infinite Loader Scene
   _samples["InfiniteLoaderScene"] = std::make_tuple(
     false,                                                   //

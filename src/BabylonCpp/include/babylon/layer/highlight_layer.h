@@ -56,8 +56,11 @@ public:
   template <typename... Ts>
   static HighlightLayerPtr New(Ts&&... args)
   {
-    return std::shared_ptr<HighlightLayer>(
+    auto layer = std::shared_ptr<HighlightLayer>(
       new HighlightLayer(std::forward<Ts>(args)...));
+    layer->addToScene(layer);
+
+    return layer;
   }
   ~HighlightLayer() override;
 
@@ -119,7 +122,8 @@ public:
    * @param color The color of the highlight
    * @param glowEmissiveOnly Extract the glow from the emissive texture
    */
-  void addMesh(Mesh* mesh, const Color3& color, bool glowEmissiveOnly = false);
+  void addMesh(const MeshPtr& mesh, const Color3& color,
+               bool glowEmissiveOnly = false);
 
   /**
    * @brief Remove a mesh from the highlight layer in order to make it stop

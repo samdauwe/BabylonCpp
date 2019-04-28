@@ -1,8 +1,8 @@
 #ifndef BABYLON_LAYER_EFFECT_LAYER_H
 #define BABYLON_LAYER_EFFECT_LAYER_H
 
-#include <unordered_map>
 #include <nlohmann/json_fwd.hpp>
+#include <unordered_map>
 
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/igl_rendering_context.h>
@@ -18,6 +18,7 @@ namespace BABYLON {
 class AbstractMesh;
 class BaseTexture;
 class Effect;
+class EffectLayer;
 class Engine;
 class Material;
 class Mesh;
@@ -28,6 +29,7 @@ class SubMesh;
 class VertexBuffer;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using EffectPtr              = std::shared_ptr<Effect>;
+using EffectLayerPtr         = std::shared_ptr<EffectLayer>;
 using MaterialPtr            = std::shared_ptr<Material>;
 using MeshPtr                = std::shared_ptr<Mesh>;
 using PostProcessPtr         = std::shared_ptr<PostProcess>;
@@ -54,11 +56,16 @@ struct EmissiveTextureAndColor {
  * The effect layer class can not be used directly and is intented to inherited
  * from to be customized per effects.
  */
-class BABYLON_SHARED_EXPORT EffectLayer
-    : public std::enable_shared_from_this<EffectLayer> {
+class BABYLON_SHARED_EXPORT EffectLayer {
 
 public:
   virtual ~EffectLayer();
+
+  /**
+   * @brief Adds an effect layer to the scene.
+   * @param newEffectLayer the effect layer to add to the scene
+   */
+  void addToScene(const EffectLayerPtr& newEffectLayer);
 
   /**
    * @brief Get the effect name of the layer.

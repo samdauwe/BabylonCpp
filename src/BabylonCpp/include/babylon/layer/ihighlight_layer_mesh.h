@@ -8,6 +8,7 @@
 namespace BABYLON {
 
 class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief Storage interface grouping all the information required for glowing a
@@ -18,7 +19,7 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerMesh {
   /**
    * The glowy mesh
    */
-  Mesh* mesh = nullptr;
+  MeshPtr mesh = nullptr;
 
   /**
    * The color of the glow
