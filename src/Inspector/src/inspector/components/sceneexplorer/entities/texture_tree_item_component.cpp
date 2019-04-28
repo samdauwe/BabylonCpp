@@ -17,6 +17,7 @@ TextureTreeItemComponent::TextureTreeItemComponent(
 
   // Set the entity info
   const auto className = texture->getClassName();
+  entityInfo.name      = texture->name;
   if (String::contains(className, "Texture")) {
     entityInfo.type = EntityType::Texture;
   }

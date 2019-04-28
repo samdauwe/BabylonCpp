@@ -4,9 +4,8 @@
 #include <optional>
 
 // ImGui
-#include <imgui.h>
-
 #include <babylon/babylon_api.h>
+#include <babylon/imgui/imgui_utils.h>
 
 namespace BABYLON {
 

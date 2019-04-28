@@ -15,6 +15,7 @@
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/pbr_metallic_roughness_material_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/pbr_specular_glossiness_material_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/standard_material_property_grid_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/texture_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/bone_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/transform_node_property_grid_component.h>
@@ -61,13 +62,14 @@ void PropertyGridTabComponent::render()
 {
   const auto& entity = props.selectedEntity;
 
-  if (!entity) {
+  if (!entity && (!entity->uniqueId || entity->name.empty())) {
     // Info message
     ImGui::TextWrapped("%s", "Please select an entity in the scene explorer.");
     return;
   }
 
-  auto entityId = *entity->uniqueId;
+  auto entityId    = entity->uniqueId ? *entity->uniqueId : 0ull;
+  auto& entityName = entity->name;
 
   if (entity->type == EntityType::Scene) {
     if (_scenePropertyGridComponent) {
@@ -250,6 +252,22 @@ void PropertyGridTabComponent::render()
     }
     if (material) {
       MaterialPropertyGridComponent::render(material);
+    }
+    return;
+  }
+
+  if (entity->type == EntityType::Texture) {
+    auto& texture = _entityCache.texture;
+    if (!texture || texture->name != entityName) {
+      auto it = std::find_if(props.scene->textures.begin(),
+                             props.scene->textures.end(),
+                             [&entityName](const BaseTexturePtr& texture) {
+                               return texture->name == entityName;
+                             });
+      texture = (it == props.scene->textures.end()) ? nullptr : *it;
+    }
+    if (texture) {
+      TexturePropertyGridComponent::render(texture);
     }
     return;
   }

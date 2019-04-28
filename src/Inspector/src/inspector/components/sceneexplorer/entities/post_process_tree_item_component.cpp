@@ -16,7 +16,7 @@ PostProcessTreeItemComponent::PostProcessTreeItemComponent(
   sprintf(label, "%s", postProcess->name.c_str());
 
   // Set the entity info
-  // entityInfo.uniqueId  = postProcess->uniqueId;
+  entityInfo.name = postProcess->name;
   entityInfo.type = EntityType::PostProcess;
 }
 

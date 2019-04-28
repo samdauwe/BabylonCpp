@@ -50,6 +50,7 @@ enum class EntityType {
 struct EntityInfo {
   EntityType type                = EntityType::Unknown;
   std::optional<size_t> uniqueId = std::nullopt;
+  std::string name               = "";
 }; // end of struct SpecializedComponentInfo
 
 } // end of namespace BABYLON

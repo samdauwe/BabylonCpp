@@ -4,6 +4,7 @@
 
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/core/string.h>
 #include <babylon/engine/node.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/light.h>
@@ -31,8 +32,8 @@ SceneGraphComponent::SceneGraphComponent(const SceneGraphComponentProps& iProps)
     , _initialized{false}
 {
   _treeItemComparator = [](const TreeItem& a, const TreeItem& b) -> bool {
-    const auto labelA = std::string(a.label);
-    const auto labelB = std::string(b.label);
+    const auto labelA = String::toLowerCase(a.label);
+    const auto labelB = String::toLowerCase(b.label);
     return labelA < labelB;
   };
 }
@@ -203,6 +204,7 @@ SceneGraphComponent::_createTextureTreeItem(const BaseTexturePtr& texture)
     ITextureTreeItemComponentProps props;
     props.texture = texture;
     sprintf(treeItem.label, "%s", texture->name.c_str());
+    sprintf(treeItem.key, "%s", texture->name.c_str());
     treeItem.component = std::make_shared<TextureTreeItemComponent>(props);
   }
 

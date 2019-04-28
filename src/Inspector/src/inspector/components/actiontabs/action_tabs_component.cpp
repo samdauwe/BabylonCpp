@@ -48,8 +48,9 @@ void ActionTabsComponent::componentWillMount()
   _onSelectionChangeObserver
     = props.globalState->onSelectionChangedObservable.add(
       [this](EntityInfo* entity, EventState & /*es*/) -> void {
-        if (entity && entity->uniqueId.has_value()) {
-          _paneProps.selectedEntity = {entity->type, *entity->uniqueId};
+        if (entity && (entity->uniqueId.has_value() || !entity->name.empty())) {
+          _paneProps.selectedEntity
+            = {entity->type, *entity->uniqueId, entity->name};
         }
       });
 

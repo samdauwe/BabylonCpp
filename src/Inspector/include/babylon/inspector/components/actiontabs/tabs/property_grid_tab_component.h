@@ -12,6 +12,7 @@ namespace BABYLON {
 
 class ArcRotateCamera;
 class BackgroundMaterial;
+class BaseTexture;
 class Bone;
 class DirectionalLight;
 class FreeCamera;
@@ -28,6 +29,7 @@ class StandardMaterial;
 class TransformNode;
 using ArcRotateCameraPtr    = std::shared_ptr<ArcRotateCamera>;
 using BackgroundMaterialPtr = std::shared_ptr<BackgroundMaterial>;
+using BaseTexturePtr        = std::shared_ptr<BaseTexture>;
 using BonePtr               = std::shared_ptr<Bone>;
 using DirectionalLightPtr   = std::shared_ptr<DirectionalLight>;
 using FreeCameraPtr         = std::shared_ptr<FreeCamera>;
@@ -65,6 +67,8 @@ struct EntityCache {
   // Meshes
   MeshPtr mesh                   = nullptr;
   TransformNodePtr transformNode = nullptr;
+  // Texture
+  BaseTexturePtr texture = nullptr;
 }; // end of struct EntityCache
 
 struct ReservedDataStore {

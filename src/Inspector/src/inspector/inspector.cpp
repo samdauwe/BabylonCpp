@@ -113,8 +113,8 @@ void Inspector::intialize()
   // GL 3.2 + GLSL 150
   const char* glsl_version = "#version 150";
 #else
-  // GL 3.2 + GLSL 150
-  const char* glsl_version = "#version 150";
+  // GL 3.0 + GLSL 130
+  const char* glsl_version = "#version 130";
 #endif
   ImGui_ImplOpenGL3_Init(glsl_version);
   // Actions

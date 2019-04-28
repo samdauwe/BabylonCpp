@@ -17,6 +17,7 @@ SkeletonTreeItemComponent::SkeletonTreeItemComponent(
           !skeleton->name.empty() ? skeleton->name.c_str() : "no name");
 
   // Set the entity info
+  entityInfo.name = skeleton->name;
   entityInfo.type = EntityType::Skeleton;
 }
 

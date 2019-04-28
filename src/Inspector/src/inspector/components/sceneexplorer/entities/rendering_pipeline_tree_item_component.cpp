@@ -16,7 +16,6 @@ RenderingPipelineTreeItemComponent::RenderingPipelineTreeItemComponent(
   sprintf(label, "%s", "renderPipeline->name.c_str()");
 
   // Set the entity info
-  // entityInfo.uniqueId  = renderPipeline->uniqueId;
   const auto className = renderPipeline->getClassName();
   if (String::contains(className, "DefaultRenderingPipeline")) {
     entityInfo.type = EntityType::DefaultRenderingPipeline;

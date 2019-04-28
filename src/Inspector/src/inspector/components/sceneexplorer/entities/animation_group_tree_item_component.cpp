@@ -16,7 +16,7 @@ AnimationGroupTreeItemComponent::AnimationGroupTreeItemComponent(
   sprintf(label, "%s", animationGroup->name.c_str());
 
   // Set the entity info
-  // entityInfo.uniqueId = animationGroup->uniqueId;
+  entityInfo.name = animationGroup->name;
   entityInfo.type = EntityType::Bone;
 }
 
