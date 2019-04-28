@@ -46,7 +46,7 @@ public:
   IMeshTreeItemComponentProps props;
   MeshTreeItemComponentState state;
 
-}; // end of class LightTreeItemComponent
+}; // end of class MeshTreeItemComponent
 
 } // end of namespace BABYLON
 

@@ -2,11 +2,13 @@
 
 #include <imgui.h>
 
+#include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/node.h>
 #include <babylon/engine/scene.h>
 #include <babylon/lights/light.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/mesh/mesh.h>
 
 #include <babylon/imgui/imgui_utils.h>
@@ -17,6 +19,7 @@
 #include <babylon/inspector/components/sceneexplorer/entities/material_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/mesh_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/entities/scene_tree_item_component.h>
+#include <babylon/inspector/components/sceneexplorer/entities/texture_tree_item_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_expandable_header_component.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_root_header_component.h>
 
@@ -40,21 +43,38 @@ SceneGraphComponent::SceneGraphComponent::~SceneGraphComponent()
 
 void SceneGraphComponent::reinitialize()
 {
+  const auto& scene = props.scene;
+
+  std::vector<BaseTexturePtr> textures;
+  for (auto& texture : scene->textures) {
+    if (texture->getClassName() != "AdvancedDynamicTexture") {
+      textures.emplace_back(texture);
+    }
+  }
+
   // Nodes
-  const auto& rootNodes = props.scene->rootNodes;
+  const auto& rootNodes = scene->rootNodes;
   auto& nodesTreeItem   = _sceneGraph.root().addChild(_createTreeItem("Nodes"));
   for (const auto& rootNode : rootNodes) {
     _initializeNodesTreeItem(nodesTreeItem, rootNode->getAsNodePtr());
   }
   // Materials
-  const auto& materials = props.scene->materials;
+  const auto& materials = scene->materials;
   auto& materialsTreeItem
     = _sceneGraph.root().addChild(_createTreeItem("Materials"));
   for (const auto& material : materials) {
-    _initializeTreeItem(materialsTreeItem, material);
+    materialsTreeItem.addChildSorted(
+      _createMaterialTreeItem(std::static_pointer_cast<Material>(material)),
+      _treeItemComparator);
   }
   // Textures
-  _sceneGraph.root().addChild(_createTreeItem("Textures"));
+  auto& texturesTreeItem
+    = _sceneGraph.root().addChild(_createTreeItem("Textures"));
+  for (const auto& texture : textures) {
+    texturesTreeItem.addChildSorted(
+      _createTextureTreeItem(std::static_pointer_cast<BaseTexture>(texture)),
+      _treeItemComparator);
+  }
   // Rendering pipelines
   _sceneGraph.root().addChild(_createTreeItem("Rendering pipelines"));
 
@@ -169,6 +189,21 @@ TreeItem SceneGraphComponent::_createSceneTreeItem(Scene* scene)
     props.scene = scene;
     sprintf(treeItem.key, "%s", "Scene");
     treeItem.component = std::make_shared<SceneTreeItemComponent>(props);
+  }
+
+  return treeItem;
+}
+
+TreeItem
+SceneGraphComponent::_createTextureTreeItem(const BaseTexturePtr& texture)
+{
+  TreeItem treeItem;
+
+  if (texture) {
+    ITextureTreeItemComponentProps props;
+    props.texture = texture;
+    sprintf(treeItem.label, "%s", texture->name.c_str());
+    treeItem.component = std::make_shared<TextureTreeItemComponent>(props);
   }
 
   return treeItem;

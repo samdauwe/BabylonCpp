@@ -10,15 +10,19 @@
 
 namespace BABYLON {
 
+class BaseTexture;
 struct EntityInfo;
 class GlobalState;
 class Material;
 class Node;
 class Scene;
+class Skeleton;
 struct TreeItemComponent;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
 using GlobalStatePtr = std::shared_ptr<GlobalState>;
 using MaterialPtr    = std::shared_ptr<Material>;
 using NodePtr        = std::shared_ptr<Node>;
+using SkeletonPtr    = std::shared_ptr<Skeleton>;
 using TreeItem       = TreeItemComponent;
 
 struct SceneGraphComponentProps {
@@ -47,19 +51,6 @@ public:
 
 private:
   /**
-   * @brief Initializes a subtree.
-   */
-  template <typename T>
-  void _initializeTreeItem(TreeNode<TreeItem>& parentTreeItem, const T& entity)
-  {
-    if (String::contains(entity->getClassName(), "Material")) {
-      parentTreeItem.addChildSorted(
-        _createMaterialTreeItem(std::static_pointer_cast<Material>(entity)),
-        _treeItemComparator);
-    }
-  }
-
-  /**
    * @brief Initializes the "Nodes" subtree.
    */
   void _initializeNodesTreeItem(TreeNode<TreeItem>& parentTreeItem,
@@ -69,6 +60,7 @@ private:
   TreeItem _createMaterialTreeItem(const MaterialPtr& material);
   TreeItem _createNodeTreeItem(const NodePtr& node);
   TreeItem _createSceneTreeItem(Scene* scene);
+  TreeItem _createTextureTreeItem(const BaseTexturePtr& texture);
 
   float _calculateOffset(unsigned int nodeLevel);
 

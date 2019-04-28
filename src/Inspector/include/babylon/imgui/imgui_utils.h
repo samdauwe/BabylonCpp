@@ -15,11 +15,16 @@ static constexpr float IconSizeHalf   = 4.5f;
 
 static constexpr float IsNotActiveOpacity = 0.5f;
 
-static ImVec4 dodgerblue = ImColor(0.12f, 0.56f, 1.0f, 1.0f); // #1E90FF
-static ImVec4 green      = ImColor(0.0f, 0.5f, 0.0f, 1.0f);
-static ImVec4 orange     = ImColor(1.0f, 0.65f, 0.0f, 1.0f);
-static ImVec4 red        = ImColor(1.0f, 0.0f, 0.0f, 1.0f);
-static ImVec4 yellow     = ImColor(1.0f, 1.0f, 0.0f, 1.0f);
+static ImVec4 cornflowerblue = ImColor(0.39f, 0.58f, 0.93f, 1.0f); // #6495ED
+static ImVec4 dodgerblue     = ImColor(0.12f, 0.56f, 1.00f, 1.0f); // #1E90FF
+static ImVec4 gray           = ImColor(0.50f, 0.50f, 0.50f, 1.0f); // #808080
+static ImVec4 green          = ImColor(0.00f, 0.50f, 0.00f, 1.0f); // #008000
+static ImVec4 lightgray      = ImColor(0.83f, 0.83f, 0.83f, 1.0f); // #D3D3D3
+static ImVec4 orange         = ImColor(1.00f, 0.65f, 0.00f, 1.0f); // #FFA500
+static ImVec4 orangered      = ImColor(1.00f, 0.27f, 0.00f, 1.0f); // #FF4500
+static ImVec4 mediumpurple   = ImColor(0.58f, 0.44f, 0.86f, 1.0f); // #9370DB
+static ImVec4 red            = ImColor(1.00f, 0.00f, 0.00f, 1.0f); // #FF0000
+static ImVec4 yellow         = ImColor(1.00f, 1.00f, 0.00f, 1.0f); // #FFFF00
 
 /**
  * @brief Returns color "color-bot" #5db0d7 -> rgba(93, 176, 215, 1)

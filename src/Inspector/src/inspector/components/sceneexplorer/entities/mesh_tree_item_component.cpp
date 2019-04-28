@@ -14,7 +14,7 @@ MeshTreeItemComponent::MeshTreeItemComponent(
 {
   const auto& mesh = props.mesh;
 
-  sprintf(label, "%s", props.mesh->name.c_str());
+  sprintf(label, "%s", mesh->name.c_str());
   state.isBoundingBoxEnabled = mesh->showBoundingBox();
   state.isVisible            = mesh->isVisible;
 
