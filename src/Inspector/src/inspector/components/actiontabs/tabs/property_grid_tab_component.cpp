@@ -264,7 +264,9 @@ void PropertyGridTabComponent::render()
                              [&entityName](const BaseTexturePtr& texture) {
                                return texture->name == entityName;
                              });
-      texture = (it == props.scene->textures.end()) ? nullptr : *it;
+      texture = (it == props.scene->textures.end()) ?
+                  nullptr :
+                  std::static_pointer_cast<Texture>(*it);
     }
     if (texture) {
       TexturePropertyGridComponent::render(texture);
