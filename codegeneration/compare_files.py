@@ -58,17 +58,11 @@ def fileComparisonToStr(fileComparisonDict):
 
 def main():
     # Versions to compare
-    current, previous = "3.3.0-alpha.9", "3.3.0-alpha.2"
-    current, previous = "3.3.0-alpha.13", "3.3.0-alpha.9"
-    current, previous = "3.3.0-beta.3", "3.3.0-alpha.13"
-    current, previous = "3.3.0", "3.3.0-beta.3"
+    current, previous = "4.0.0", "3.3.0"
     # Dictionary mapping from BabylonJs version to relative path
     BabylonJsVersions = {
-        "3.3.0-alpha.2" : "3.3.0_2018_05_24",
-        "3.3.0-alpha.9" : "3.3.0_2018_06_24",
-        "3.3.0-alpha.13": "3.3.0_2018_07_24",
-        "3.3.0-beta.3"  : "3.3.0_2018_08_24",
         "3.3.0"         : "3.3.0_2018_10_02",
+        "4.0.0"         : "4.0.0_2019_04_30",
     }
     # List containing the files to ignore
     whiteList = ["babylon.nullEngine.ts", "babylon.cannonJSPlugin.ts",
@@ -86,7 +80,7 @@ def main():
                  "babylon.sound.ts", "babylon.ktxTextureLoader.ts",
                  "babylon.tgaTextureLoader.ts", "babylon.videoRecorder.ts",
                  "babylon.weightedsound.ts", "babylon.audioEngine.ts",
-                 "babylon.soundtrack.ts"]
+                 "babylon.soundtrack.ts", "index.ts"]
     # Create mapping from BabylonJs version to full path
     for version in BabylonJsVersions:
         modules = {
