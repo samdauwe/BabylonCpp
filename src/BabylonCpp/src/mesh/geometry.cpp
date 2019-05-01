@@ -32,6 +32,8 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
     , _engine{scene->getEngine()}
     , _totalVertices{0}
     , _isDisposed{false}
+    , _extend{MinMax{Vector3::Zero(), Vector3::Zero()}}
+    , _boundingBias{std::nullopt}
     , _indexBuffer{nullptr}
     , _indexBufferIsUpdatable{false}
 {

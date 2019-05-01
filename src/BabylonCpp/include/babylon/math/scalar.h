@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_constants.h>
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
 #include <babylon/core/string.h>
 
@@ -348,7 +349,7 @@ constexpr float Hermite(float value1, float tangent1, float value2,
  */
 inline float RandomRange(float min, float max)
 {
-  if (min == max) {
+  if (stl_util::almost_equal(min, max)) {
     return min;
   }
   return ((Math::random() * (max - min)) + min);
@@ -397,7 +398,7 @@ inline float NormalizeRadians(float angle)
   // angle = (angle + Tools.TwoPi) % Tools.TwoPi;
 
   // if (angle > Math.PI) {
-  //	angle -= Tools.TwoPi;
+  //   angle -= Tools.TwoPi;
   //}
 
   angle -= (Scalar::TwoPi() * std::floor((angle + Math::PI) / Scalar::TwoPi()));

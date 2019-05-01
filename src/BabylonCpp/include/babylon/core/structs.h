@@ -144,14 +144,14 @@ struct MinMagFilter {
 }; // end of struct MinMagFilter
 
 struct MinMax {
-  Vector3 min;
-  Vector3 max;
+  Vector3 min = Vector3::Zero();
+  Vector3 max = Vector3::Zero();
 }; // end of struct MinMax
 
 struct MinMaxDistance {
-  Vector3 min;
-  Vector3 max;
-  float distance;
+  Vector3 min    = Vector3::Zero();
+  Vector3 max    = Vector3::Zero();
+  float distance = 0.f;
 }; // end of struct MinMaxDistance
 
 struct MinMaxVector2 {
@@ -174,33 +174,33 @@ struct NodeCache {
   // AbstractMesh
   Vector3 position;
   Vector3 scaling;
-  bool pivotMatrixUpdated;
+  bool pivotMatrixUpdated       = false;
   Quaternion rotationQuaternion = Quaternion::Zero();
-  bool localMatrixUpdated;
+  bool localMatrixUpdated       = false;
   Vector3 rotation;
   Vector3 upVector;
-  unsigned int billboardMode;
+  unsigned int billboardMode = 0;
   // Camera
-  unsigned int mode;
-  float minZ;
-  float maxZ;
-  float fov;
-  unsigned int fovMode;
-  float aspectRatio;
-  float orthoLeft;
-  float orthoRight;
-  float orthoTop;
-  float orthoBottom;
-  int renderWidth;
-  int renderHeight;
+  unsigned int mode    = 0;
+  float minZ           = 0.f;
+  float maxZ           = 0.f;
+  float fov            = 0.f;
+  unsigned int fovMode = 0;
+  float aspectRatio    = 0.f;
+  float orthoLeft      = 0.f;
+  float orthoRight     = 0.f;
+  float orthoTop       = 0.f;
+  float orthoBottom    = 0.f;
+  int renderWidth      = 0;
+  int renderHeight     = 0;
   // TargetCamera
-  std::unique_ptr<Vector3> lockedTarget;
+  std::unique_ptr<Vector3> lockedTarget = nullptr;
   // ArcRotateCamera
   Vector3 _target;
-  float alpha;
-  float beta;
-  float gamma;
-  float radius;
+  float alpha  = 0.f;
+  float beta   = 0.f;
+  float gamma  = 0.f;
+  float radius = 0.f;
   Vector2 targetScreenOffset;
 }; // end of struct NodeCache
 

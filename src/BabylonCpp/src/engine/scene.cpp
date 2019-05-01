@@ -285,6 +285,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _useAlternateCameraConfiguration{false}
     , _alternateRendering{false}
     , _frustumPlanesSet{false}
+    , _frustumPlanes{}
     , _selectionOctree{nullptr}
     , _pointerOverMesh{nullptr}
     , _debugLayer{nullptr}
