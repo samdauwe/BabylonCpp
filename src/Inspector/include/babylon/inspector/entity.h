@@ -2,6 +2,7 @@
 #define BABYLON_INSPECTOR_ENTITY_H
 
 #include <optional>
+#include <string>
 
 namespace BABYLON {
 
