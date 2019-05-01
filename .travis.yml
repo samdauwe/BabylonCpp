@@ -24,9 +24,27 @@ matrix:
     # Build with the main configuration on all the supported compilers #
     ####################################################################
 
-    # GCC 6
+    # Clang 4.0
     - os: linux
-      compiler: gcc
+      compiler: clang++-4.0
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - libxi-dev
+            - libxcursor-dev
+            - libxinerama-dev
+            - libxrandr-dev
+            - libgl1-mesa-dev
+            - mesa-common-dev
+            - clang-4.0
+      env: CC_VERSION=clang-4.0 CXX_VERSION=clang++-4.0
+
+    # GCC 7
+    - os: linux
+      compiler: g++-7
       addons:
         apt:
           sources:
@@ -60,11 +78,35 @@ install:
     fi
   - cmake --version
 
-  ############################
-  # Set the compiler version #
-  ############################
+  ############################################################################
+  # Install libc++ and libc++abi if needed
+  ############################################################################
+  - |
+    if [[ "${CXX%%+*}" == "clang" ]]; then
+      elif [[ "${CXX}" == "clang++-4.0" ]]; then LLVM_VERSION="4.0.1";
+      elif [[ "${CXX}" == "clang++-5.0" ]]; then LLVM_VERSION="5.0.1";
+      fi
+      LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
+      LIBCXX_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
+      LIBCXXABI_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxxabi-${LLVM_VERSION}.src.tar.xz"
+      mkdir -p llvm llvm/build llvm/projects/libcxx llvm/projects/libcxxabi
+      travis_retry wget -O - ${LLVM_URL} | tar --strip-components=1 -xJ -C llvm || exit 1
+      travis_retry wget -O - ${LIBCXX_URL} | tar --strip-components=1 -xJ -C llvm/projects/libcxx || exit 1
+      travis_retry wget -O - ${LIBCXXABI_URL} | tar --strip-components=1 -xJ -C llvm/projects/libcxxabi || exit 1
+      (cd llvm/build && cmake .. -DCMAKE_INSTALL_PREFIX=${DEPS_DIR}/llvm/install) || exit 1
+      (cd llvm/build/projects/libcxx && make install -j2) || exit 1
+      (cd llvm/build/projects/libcxxabi && make install -j2) || exit 1
+      export CXXFLAGS="-isystem ${DEPS_DIR}/llvm/install/include/c++/v1"
+      export LDFLAGS="-L ${DEPS_DIR}/llvm/install/lib -l c++ -l c++abi"
+      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DEPS_DIR}/llvm/install/lib"
+    fi
+
+  ####################################
+  # Set the default compiler version #
+  ####################################
   - if [[ "${CC_VERSION}" != "" ]]; then export CC=${CC_VERSION}; fi
   - if [[ "${CXX_VERSION}" != "" ]]; then export CXX=${CXX_VERSION}; fi
+  - ${CXX} --version
 
 before_script:
   ####################################################################
