@@ -62,10 +62,17 @@ matrix:
 
 install:
   ###################################################################
-  # All the dependencies are installed in ${TRAVIS_BUILD_DIR}/deps/ #
+  # All the dependencies are installed in ${HOME}/deps/ #
   ###################################################################
-  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - DEPS_DIR="${HOME}/deps"
   - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+
+  ###################################################################
+  # Setup default versions and override CXX set by Travis if needed #
+  ###################################################################
+  - if [[ "${CC_VERSION}" != "" ]]; then export CC=${CC_VERSION}; fi
+  - if [[ "${CXX_VERSION}" != "" ]]; then export CXX=${CXX_VERSION}; fi
+  - ${CXX} --version
   
   ##########################
   # Install a recent CMake #
@@ -101,18 +108,11 @@ install:
       export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DEPS_DIR}/llvm/install/lib"
     fi
 
-  ####################################
-  # Set the default compiler version #
-  ####################################
-  - if [[ "${CC_VERSION}" != "" ]]; then export CC=${CC_VERSION}; fi
-  - if [[ "${CXX_VERSION}" != "" ]]; then export CXX=${CXX_VERSION}; fi
-  - ${CXX} --version
-
 before_script:
   ####################################################################
   # Go back to the root of the project and setup the build directory #
   ####################################################################
-  - cd ${TRAVIS_BUILD_DIR}
+  - cd "${TRAVIS_BUILD_DIR}"
   - mkdir build && cd build && cmake ../
 
 # Build steps
