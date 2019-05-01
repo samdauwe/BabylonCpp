@@ -24,14 +24,14 @@ matrix:
     # Build with the main configuration on all the supported compilers #
     ####################################################################
 
-    # Clang 4.0
+    # Clang 5.0
     - os: linux
-      compiler: clang++-4.0
+      compiler: clang++-5.0
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
+            - llvm-toolchain-trusty-5.0
           packages:
             - libxi-dev
             - libxcursor-dev
@@ -39,8 +39,8 @@ matrix:
             - libxrandr-dev
             - libgl1-mesa-dev
             - mesa-common-dev
-            - clang-4.0
-      env: CC_VERSION=clang-4.0 CXX_VERSION=clang++-4.0
+            - clang-5.0
+      env: CC_VERSION=clang-5.0 CXX_VERSION=clang++-5.0
 
     # GCC 7
     - os: linux
@@ -90,8 +90,8 @@ install:
   ############################################################################
   - |
     if [[ "${CXX%%+*}" == "clang" ]]; then
-      if   [[ "${CXX}" == "clang++-4.0" ]]; then LLVM_VERSION="4.0.1";
-      elif [[ "${CXX}" == "clang++-5.0" ]]; then LLVM_VERSION="5.0.1";
+      if   [[ "${CXX}" == "clang++-5.0" ]]; then LLVM_VERSION="5.0.1";
+      elif [[ "${CXX}" == "clang++-6.0" ]]; then LLVM_VERSION="6.0.1";
       fi
       LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
       LIBCXX_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
