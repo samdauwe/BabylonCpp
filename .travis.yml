@@ -90,7 +90,7 @@ install:
   ############################################################################
   - |
     if [[ "${CXX%%+*}" == "clang" ]]; then
-      elif [[ "${CXX}" == "clang++-4.0" ]]; then LLVM_VERSION="4.0.1";
+      if   [[ "${CXX}" == "clang++-4.0" ]]; then LLVM_VERSION="4.0.1";
       elif [[ "${CXX}" == "clang++-5.0" ]]; then LLVM_VERSION="5.0.1";
       fi
       LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
