@@ -392,6 +392,10 @@ int SampleLauncher::run(long runTime)
     return 1;
   }
 
+#ifdef WITH_INSPECTOR
+  auto previousTimestamp = Time::highresTimepointNow();
+#endif
+
   // Run sample
   bool windowClosed = false, maxRunTimeReached = false;
   while (_sampleLauncherState == State::RUNNING) {
@@ -408,11 +412,14 @@ int SampleLauncher::run(long runTime)
     }
     //*** Inspector Window ***//
 #ifdef WITH_INSPECTOR
-    if (_showInspectorWindow && _inspector) {
+    auto currentTimestamp = Time::highresTimepointNow();
+    auto diffMillis = Time::fpTimeDiff<size_t, std::milli>(previousTimestamp,
+                                                           currentTimestamp);
+    if (_showInspectorWindow && _inspector && diffMillis >= 100ul) {
+      previousTimestamp = currentTimestamp;
       // Make the window's context current
       glfwMakeContextCurrent(_inspectorWindow.glfwWindow);
       // Render inspector window
-
       _inspector->render();
       // Swap front and back buffers
       glfwSwapBuffers(_inspectorWindow.glfwWindow);
