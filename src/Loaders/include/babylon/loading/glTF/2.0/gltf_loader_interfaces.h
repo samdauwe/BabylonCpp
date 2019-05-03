@@ -1496,7 +1496,7 @@ struct IMaterialPbrMetallicRoughness
 }; // end of struct IMaterialPbrMetallicRoughness
 
 struct IMaterialData {
-  MaterialPtr babylonMaterial;
+  MaterialPtr babylonMaterial = nullptr;
   std::vector<AbstractMeshPtr> babylonMeshes;
   std::function<void()> promise = nullptr;
 }; // end of struct IMaterialData
