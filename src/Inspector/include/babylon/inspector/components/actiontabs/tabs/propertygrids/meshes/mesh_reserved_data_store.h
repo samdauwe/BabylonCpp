@@ -7,16 +7,20 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
 class LinesMesh;
 class Material;
-using LinesMeshPtr = std::shared_ptr<LinesMesh>;
-using MaterialPtr  = std::shared_ptr<Material>;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using LinesMeshPtr    = std::shared_ptr<LinesMesh>;
+using MaterialPtr     = std::shared_ptr<Material>;
 
 struct BABYLON_SHARED_EXPORT MeshReservedDataStore {
   bool displayNormals          = false;
+  bool renderGridEnabled       = false;
   bool renderNormalVectors     = false;
   bool renderWireframeOver     = false;
   bool normalMaterialHidden    = true;
+  AbstractMeshPtr gridMesh     = nullptr;
   LinesMeshPtr normalLines     = nullptr;
   MaterialPtr originalMaterial = nullptr;
 }; // end of struct MeshReservedDataStore
