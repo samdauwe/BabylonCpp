@@ -19,8 +19,8 @@ class BABYLON_SHARED_EXPORT Plane {
 
 public:
   /**
-   * `BABYLON.CSG.Plane.EPSILON` is the tolerance used by `splitPolygon()` to
-   * decide if a point is on the plane
+   * `CSG.Plane.EPSILON` is the tolerance used by `splitPolygon()` to decide if
+   * a point is on the plane
    */
   static const float EPSILON;
   // Polygon types

@@ -63,7 +63,14 @@ void Sprite::playAnimation(int from, int to, bool loop, float delay,
   _delay            = delay;
   _animationStarted = true;
 
-  _direction = from < to ? 1 : -1;
+  if (from < to) {
+    _direction = 1;
+  }
+  else {
+    _direction = -1;
+    _toIndex   = from;
+    _fromIndex = to;
+  }
 
   cellIndex = from;
   _time     = 0.f;
@@ -86,9 +93,10 @@ void Sprite::_animate(float deltaTime)
   if (_time > _delay) {
     _time = std::fmod(_time, _delay);
     cellIndex += _direction;
-    if (cellIndex > _toIndex) {
+    if ((_direction > 0 && cellIndex > _toIndex)
+        || (_direction < 0 && cellIndex < _fromIndex)) {
       if (_loopAnimation) {
-        cellIndex = _fromIndex;
+        cellIndex = _direction > 0 ? _fromIndex : _toIndex;
       }
       else {
         cellIndex         = _toIndex;

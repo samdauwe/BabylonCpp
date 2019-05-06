@@ -9,9 +9,8 @@ namespace BABYLON {
 namespace CSG {
 
 /**
- * @brief class Vertex
- * Represents a vertex of a polygon. Use your own vertex class instead of this
- * one to provide additional features like texture coordinates and vertex
+ * @brief Represents a vertex of a polygon. Use your own vertex class instead of
+ * this one to provide additional features like texture coordinates and vertex
  * colors. Custom vertex classes need to provide a `pos` property and `clone()`,
  * `flip()`, and `interpolate()` methods that behave analogous to the ones
  * defined by `BABYLON.CSG.Vertex`. This class provides `normal` so convenience

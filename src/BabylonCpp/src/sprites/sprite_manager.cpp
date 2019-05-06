@@ -13,6 +13,7 @@
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
+#include <babylon/math/tmp.h>
 #include <babylon/mesh/buffer.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/sprites/sprite_scene_component.h>
@@ -208,6 +209,7 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
   auto max                 = Vector3::Zero();
   auto distance            = std::numeric_limits<float>::max();
   Sprite* currentSprite    = nullptr;
+  auto pickedPoint         = Vector3::Zero();
   auto cameraSpacePosition = Vector3::Zero();
   auto cameraView          = camera->getViewMatrix();
 
@@ -255,9 +257,20 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
   if (currentSprite) {
     PickingInfo result;
 
+    cameraView.invertToRef(Tmp::MatrixArray[0]);
     result.hit          = true;
     result.pickedSprite = currentSprite;
     result.distance     = distance;
+
+    // Get picked point
+    auto& direction = Tmp::Vector3Array[0];
+    direction.copyFrom(ray.direction);
+    direction.normalize();
+    direction.scaleInPlace(distance);
+
+    ray.origin.addToRef(direction, pickedPoint);
+    result.pickedPoint
+      = Vector3::TransformCoordinates(pickedPoint, Tmp::MatrixArray[0]);
 
     return std::move(result);
   }
@@ -269,7 +282,7 @@ void SpriteManager::render()
 {
   // Check
   if (!_effectBase->isReady() || !_effectFog->isReady() || !_spriteTexture
-      || !_spriteTexture->isReady()) {
+      || !_spriteTexture->isReady() || sprites.empty()) {
     return;
   }
 
@@ -281,7 +294,8 @@ void SpriteManager::render()
   size_t max     = std::min(_capacity, sprites.size());
   int rowSize    = baseSize.width / cellWidth;
 
-  unsigned int offset = 0;
+  auto offset   = 0u;
+  auto noSprite = true;
   for (size_t index = 0; index < max; index++) {
     auto& sprite = sprites[index];
 
@@ -289,6 +303,7 @@ void SpriteManager::render()
       continue;
     }
 
+    noSprite = false;
     sprite->_animate(deltaTime);
 
     _appendSpriteVertex(offset++, *sprite, 0, 0, rowSize);
@@ -296,6 +311,11 @@ void SpriteManager::render()
     _appendSpriteVertex(offset++, *sprite, 1, 1, rowSize);
     _appendSpriteVertex(offset++, *sprite, 0, 1, rowSize);
   }
+
+  if (noSprite) {
+    return;
+  }
+
   _buffer->update(_vertexData);
 
   // Render
@@ -338,7 +358,6 @@ void SpriteManager::render()
   effect->setBool("alphaTest", false);
 
   engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
-
   engine->drawElementsType(Material::TriangleFillMode(), 0,
                            static_cast<int>((offset / 4.f) * 6));
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);

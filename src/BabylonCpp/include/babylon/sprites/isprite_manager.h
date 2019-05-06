@@ -1,10 +1,10 @@
 #ifndef BABYLON_SPRITES_ISPRITE_MANAGER_H
 #define BABYLON_SPRITES_ISPRITE_MANAGER_H
 
-#include <vector>
 #include <functional>
 #include <memory>
 #include <optional>
+#include <vector>
 
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
@@ -29,20 +29,20 @@ struct BABYLON_SHARED_EXPORT ISpriteManager : public IDisposable {
    * A camera with a layerMask of 1 will render spriteManager.layerMask &
    * camera.layerMask!== 0
    */
-  unsigned int layerMask;
+  unsigned int layerMask = 0x0FFFFFFF;
 
   /**
    * Gets or sets a boolean indicating if the mesh can be picked (by scene.pick
    * for instance or through actions). Default is true
    */
-  bool isPickable;
+  bool isPickable = false;
 
   /**
    * Specifies the rendering group id for this mesh (0 by default).
    * @see
    * http://doc.babylonjs.com/resources/transparency_and_how_meshes_are_rendered#rendering-groups
    */
-  unsigned int renderingGroupId;
+  unsigned int renderingGroupId = 0;
 
   /**
    * Defines the list of sprites managed by the manager.
