@@ -26,6 +26,13 @@ using OutlineRendererPtr = std::shared_ptr<OutlineRenderer>;
  */
 class BABYLON_SHARED_EXPORT OutlineRenderer : public ISceneComponent {
 
+private:
+  /**
+   * Stencil value used to avoid outline being seen within the mesh when the
+   * mesh is transparent
+   */
+  static constexpr int _StencilReference = 0x04;
+
 public:
   /**
    *The name of the component. Each component must have a unique name.

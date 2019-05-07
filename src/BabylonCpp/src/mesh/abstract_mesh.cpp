@@ -55,6 +55,8 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , onCollisionPositionChange{this,
                                 &AbstractMesh::set_onCollisionPositionChange}
     , definedFacingForward{true} // orientation for POV movement & rotation
+    , _occlusionQuery{nullptr}
+    , _renderingGroup{nullptr}
     , _occlusionDataStorage{this, &AbstractMesh::get__occlusionDataStorage}
     , occlusionRetryCount{this, &AbstractMesh::get_occlusionRetryCount,
                           &AbstractMesh::set_occlusionRetryCount}
@@ -159,7 +161,6 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _physicsImpostor{nullptr}
     , _disposePhysicsObserver{nullptr}
     , __occlusionDataStorage{nullptr}
-    , _occlusionQuery{nullptr}
     , _collisionsTransformMatrix{Matrix::Zero()}
     , _collisionsScalingMatrix{Matrix::Zero()}
     , _skeleton{nullptr}

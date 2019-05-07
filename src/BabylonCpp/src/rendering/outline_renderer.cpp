@@ -3,6 +3,7 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/string.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -166,7 +167,7 @@ bool OutlineRenderer::isReady(SubMesh* subMesh, bool useInstances)
     defines.emplace_back(
       "#define BonesPerMesh "
       + std::to_string(
-          (mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0)));
+        (mesh->skeleton() ? mesh->skeleton()->bones.size() + 1 : 0)));
   }
   else {
     defines.emplace_back("#define NUM_BONE_INFLUENCERS 0");
@@ -207,29 +208,54 @@ void OutlineRenderer::_beforeRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
   // Outline - step 1
   _savedDepthWrite = _engine->getDepthWrite();
   if (mesh->renderOutline) {
+    auto material = subMesh->getMaterial();
+    if (material && material->needAlphaBlending()) {
+      _engine->cacheStencilState();
+      // Draw only to stencil buffer for the original mesh
+      // The resulting stencil buffer will be used so the outline is not visible
+      // inside the mesh when the mesh is transparent
+      _engine->setDepthWrite(false);
+      _engine->setColorWrite(false);
+      _engine->setStencilBuffer(true);
+      _engine->setStencilOperationPass(Constants::REPLACE);
+      _engine->setStencilFunction(Constants::ALWAYS);
+      _engine->setStencilMask(OutlineRenderer::_StencilReference);
+      _engine->setStencilFunctionReference(OutlineRenderer::_StencilReference);
+      render(subMesh, batch, /* This sets offset to 0 */ true);
+
+      _engine->setColorWrite(true);
+      _engine->setStencilFunction(Constants::NOTEQUAL);
+    }
+
+    // Draw the outline using the above stencil if needed to avoid drawing
+    // within the mesh
     _engine->setDepthWrite(false);
     render(subMesh, batch);
     _engine->setDepthWrite(_savedDepthWrite);
+
+    if (material && material->needAlphaBlending()) {
+      _engine->restoreStencilState();
+    }
   }
 }
 
 void OutlineRenderer::_afterRenderingMesh(AbstractMesh* mesh, SubMesh* subMesh,
                                           const _InstancesBatchPtr& batch)
 {
-  // Outline - step 2
-  if (mesh->renderOutline && _savedDepthWrite) {
-    _engine->setDepthWrite(true);
-    _engine->setColorWrite(false);
-    render(subMesh, batch);
-    _engine->setColorWrite(true);
-  }
-
   // Overlay
   if (mesh->renderOverlay) {
     auto currentMode = _engine->getAlphaMode();
     _engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
     render(subMesh, batch, true);
     _engine->setAlphaMode(currentMode);
+  }
+
+  // Outline - step 2
+  if (mesh->renderOutline && _savedDepthWrite) {
+    _engine->setDepthWrite(true);
+    _engine->setColorWrite(false);
+    render(subMesh, batch);
+    _engine->setColorWrite(true);
   }
 }
 

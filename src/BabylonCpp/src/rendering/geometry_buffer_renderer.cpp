@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/string.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -23,6 +24,8 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , isSupported{this, &GeometryBufferRenderer::get_isSupported}
     , enablePosition{this, &GeometryBufferRenderer::get_enablePosition,
                      &GeometryBufferRenderer::set_enablePosition}
+    , enableVelocity{this, &GeometryBufferRenderer::get_enableVelocity,
+                     &GeometryBufferRenderer::set_enableVelocity}
     , scene{this, &GeometryBufferRenderer::get_scene}
     , ratio{this, &GeometryBufferRenderer::get_ratio}
     , samples{this, &GeometryBufferRenderer::get_samples,
@@ -31,6 +34,9 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
     , _cachedDefines{""}
     , _multiRenderTarget{nullptr}
     , _enablePosition{false}
+    , _enableVelocity{false}
+    , _positionIndex{-1}
+    , _velocityIndex{-1}
 {
   _scene = scene;
   _ratio = ratio;
@@ -51,6 +57,18 @@ GeometryBufferRenderer::GeometryBufferRenderer(Scene* scene, float ratio)
 
 GeometryBufferRenderer::~GeometryBufferRenderer()
 {
+}
+
+int GeometryBufferRenderer::getTextureIndex(unsigned int textureType)
+{
+  switch (textureType) {
+    case GeometryBufferRenderer::POSITION_TEXTURE_TYPE:
+      return _positionIndex;
+    case GeometryBufferRenderer::VELOCITY_TEXTURE_TYPE:
+      return _velocityIndex;
+    default:
+      return -1;
+  }
 }
 
 void GeometryBufferRenderer::set_renderList(const std::vector<MeshPtr>& meshes)
@@ -75,6 +93,23 @@ bool GeometryBufferRenderer::get_enablePosition() const
 void GeometryBufferRenderer::set_enablePosition(bool enable)
 {
   _enablePosition = enable;
+  dispose();
+  _createRenderTargets();
+}
+
+bool GeometryBufferRenderer::get_enableVelocity() const
+{
+  return _enableVelocity;
+}
+
+void GeometryBufferRenderer::set_enableVelocity(bool enable)
+{
+  _enableVelocity = enable;
+
+  if (!enable) {
+    _previousTransformationMatrices = {};
+  }
+
   dispose();
   _createRenderTargets();
 }
@@ -120,6 +155,17 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
   // Buffers
   if (_enablePosition) {
     defines.emplace_back("#define POSITION");
+    defines.emplace_back("#define POSITION_INDEX "
+                         + std::to_string(_positionIndex));
+  }
+
+  if (_enableVelocity) {
+    defines.emplace_back("#define VELOCITY");
+    defines.emplace_back("#define VELOCITY_INDEX "
+                         + std::to_string(_velocityIndex));
+    if (stl_util::contains(excludedSkinnedMeshesFromVelocity, mesh)) {
+      defines.emplace_back("#define BONES_VELOCITY_ENABLED");
+    }
   }
 
   // Bones
@@ -150,6 +196,10 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     attribs.emplace_back(VertexBuffer::World3Kind);
   }
 
+  // Setup textures count
+  defines.emplace_back("#define RENDER_TARGET_COUNT "
+                       + std::to_string(_multiRenderTarget->textures().size()));
+
   // Get correct effect
   auto join = String::join(defines, '\n');
   if (_cachedDefines != join) {
@@ -161,7 +211,8 @@ bool GeometryBufferRenderer::isReady(SubMesh* subMesh, bool useInstances)
     EffectCreationOptions options;
     options.attributes = std::move(attribs);
     options.uniformsNames
-      = {"world", "mBones", "viewProjection", "diffuseMatrix", "view"};
+      = {"world", "mBones",        "viewProjection",         "diffuseMatrix",
+         "view",  "previousWorld", "previousViewProjection", "mPreviousBones"};
     options.samplers        = {"diffuseSampler"};
     options.defines         = std::move(join);
     options.indexParameters = std::move(indexParameters);
@@ -196,13 +247,24 @@ void GeometryBufferRenderer::dispose()
 void GeometryBufferRenderer::_createRenderTargets()
 {
   auto engine = _scene->getEngine();
-  auto count  = _enablePosition ? 3 : 2;
+
+  auto count = 2;
+
+  if (_enablePosition) {
+    _positionIndex = count;
+    ++count;
+  }
+
+  if (_enableVelocity) {
+    _velocityIndex = count;
+    ++count;
+  }
 
   // Render target
   IMultiRenderTargetOptions options;
   options.generateMipMaps      = false;
   options.generateDepthTexture = true;
-  options.defaultType          = EngineConstants::TEXTURETYPE_FLOAT;
+  options.defaultType          = Constants::TEXTURETYPE_FLOAT;
   _multiRenderTarget           = std::make_shared<MultiRenderTarget>(
     "gBuffer",
     Size{static_cast<int>(engine->getRenderWidth() * _ratio),
@@ -251,16 +313,35 @@ void GeometryBufferRenderer::_createRenderTargets()
 void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 {
   auto mesh     = subMesh->getRenderingMesh();
-  auto engine   = _scene->getEngine();
+  auto scene    = _scene;
+  auto engine   = scene->getEngine();
   auto material = subMesh->getMaterial();
 
   if (!material) {
     return;
   }
 
+  // Velocity
+  if (_enableVelocity
+      && !stl_util::contains(_previousTransformationMatrices, mesh->uniqueId)) {
+    _previousTransformationMatrices[mesh->uniqueId]
+      = ISavedTransformationMatrix{
+        Matrix::Identity(),         // world
+        scene->getTransformMatrix() // viewProjection
+      };
+
+    if (mesh->skeleton()) {
+      const auto bonesTransformations
+        = mesh->skeleton()->getTransformMatrices(mesh.get());
+      Float32Array dest(bonesTransformations.size());
+      _previousBonesTransformationMatrices[mesh->uniqueId]
+        = _copyBonesTransformationMatrices(bonesTransformations, dest);
+    }
+  }
+
   // Culling
   engine->setState(material->backFaceCulling(), 0, false,
-                   _scene->useRightHandedSystem());
+                   scene->useRightHandedSystem());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -278,8 +359,8 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     engine->enableEffect(_effect);
     mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
-    _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
-    _effect->setMatrix("view", _scene->getViewMatrix());
+    _effect->setMatrix("viewProjection", scene->getTransformMatrix());
+    _effect->setMatrix("view", scene->getViewMatrix());
 
     // Alpha test
     if (material && material->needAlphaTesting()) {
@@ -295,6 +376,20 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
         && mesh->skeleton()) {
       _effect->setMatrices("mBones",
                            mesh->skeleton()->getTransformMatrices(mesh.get()));
+      if (_enableVelocity) {
+        _effect->setMatrices(
+          "mPreviousBones",
+          _previousBonesTransformationMatrices[mesh->uniqueId]);
+      }
+    }
+
+    // Velocity
+    if (_enableVelocity) {
+      _effect->setMatrix("previousWorld",
+                         _previousTransformationMatrices[mesh->uniqueId].world);
+      _effect->setMatrix(
+        "previousViewProjection",
+        _previousTransformationMatrices[mesh->uniqueId].viewProjection);
     }
 
     // Draw
@@ -305,6 +400,29 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
                               _effect->setMatrix("world", world);
                             });
   }
+
+  // Velocity
+  if (_enableVelocity) {
+    _previousTransformationMatrices[mesh->uniqueId].world
+      = mesh->getWorldMatrix();
+    _previousTransformationMatrices[mesh->uniqueId].viewProjection
+      = _scene->getTransformMatrix();
+    if (mesh->skeleton()) {
+      _copyBonesTransformationMatrices(
+        mesh->skeleton()->getTransformMatrices(mesh.get()),
+        _previousBonesTransformationMatrices[mesh->uniqueId]);
+    }
+  }
+}
+
+Float32Array& GeometryBufferRenderer::_copyBonesTransformationMatrices(
+  const Float32Array& source, Float32Array& target)
+{
+  for (size_t i = 0; i < source.size(); ++i) {
+    target[i] = source[i];
+  }
+
+  return target;
 }
 
 } // end of namespace BABYLON

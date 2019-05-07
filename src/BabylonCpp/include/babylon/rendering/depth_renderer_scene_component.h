@@ -17,7 +17,7 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Defines the Depth Renderer scene component responsible to manage a
- * depth buffer usefull in several rendering techniques.
+ * depth buffer useful in several rendering techniques.
  */
 class BABYLON_SHARED_EXPORT DepthRendererSceneComponent
     : public ISceneComponent {

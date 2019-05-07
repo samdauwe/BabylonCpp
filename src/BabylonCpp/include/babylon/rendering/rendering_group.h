@@ -192,6 +192,9 @@ protected:
     const std::function<int(const SubMesh* a, const SubMesh* b)>& value);
 
 public:
+  /** Hidden */
+  std::vector<IEdgesRenderer*> _edgesRenderers;
+
   unsigned int index;
   std::function<void()> onBeforeTransparentRendering;
 
@@ -238,8 +241,6 @@ private:
   std::function<void(const std::vector<SubMesh*>& subMeshes)> _renderAlphaTest;
   std::function<void(const std::vector<SubMesh*>& subMeshes)>
     _renderTransparent;
-
-  std::vector<IEdgesRenderer*> _edgesRenderers;
 
 }; // end of class RenderingGroup
 

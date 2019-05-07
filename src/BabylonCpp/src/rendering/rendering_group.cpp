@@ -4,6 +4,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
@@ -158,7 +159,7 @@ void RenderingGroup::render(
   // Transparent
   if (!_transparentSubMeshes.empty()) {
     _renderTransparent(_transparentSubMeshes);
-    engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+    engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
 
   // Set back stencil to false in case it changes before the edge renderer.
@@ -170,7 +171,7 @@ void RenderingGroup::render(
       edgesRenderer->render();
     }
 
-    engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+    engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
 
   // Restore Stencil state.
@@ -225,7 +226,7 @@ void RenderingGroup::renderSorted(
       if (material && material->needDepthPrePass()) {
         auto engine = material->getScene()->getEngine();
         engine->setColorWrite(false);
-        engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+        engine->setAlphaMode(Constants::ALPHA_DISABLE);
         subMesh->render(false);
         engine->setColorWrite(true);
       }
@@ -336,6 +337,8 @@ void RenderingGroup::dispatch(SubMesh* subMesh, AbstractMesh* mesh,
     }
     _opaqueSubMeshes.emplace_back(subMesh); // Opaque
   }
+
+  mesh->_renderingGroup = this;
 
   if (mesh->_edgesRenderer != nullptr && mesh->_edgesRenderer->isEnabled) {
     _edgesRenderers.emplace_back(mesh->_edgesRenderer.get());

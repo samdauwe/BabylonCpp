@@ -657,6 +657,28 @@ void Engine::setDepthFunctionToLess()
   _depthCullingState->depthFunc = GL::LESS;
 }
 
+void Engine::cacheStencilState()
+{
+  _cachedStencilBuffer             = getStencilBuffer();
+  _cachedStencilFunction           = getStencilFunction();
+  _cachedStencilMask               = getStencilMask();
+  _cachedStencilOperationPass      = getStencilOperationPass();
+  _cachedStencilOperationFail      = getStencilOperationFail();
+  _cachedStencilOperationDepthFail = getStencilOperationDepthFail();
+  _cachedStencilReference          = getStencilFunctionReference();
+}
+
+void Engine::restoreStencilState()
+{
+  setStencilFunction(_cachedStencilFunction);
+  setStencilMask(_cachedStencilMask);
+  setStencilBuffer(_cachedStencilBuffer);
+  setStencilOperationPass(_cachedStencilOperationPass);
+  setStencilOperationFail(_cachedStencilOperationFail);
+  setStencilOperationDepthFail(_cachedStencilOperationDepthFail);
+  setStencilFunctionReference(_cachedStencilReference);
+}
+
 void Engine::setDepthFunctionToLessOrEqual()
 {
   _depthCullingState->depthFunc = GL::LEQUAL;
@@ -4319,8 +4341,8 @@ InternalTexturePtr Engine::createCubeTexture(
   auto lastDot   = String::lastIndexOf(rootUrl, ".");
   auto extension = !forcedExtension.empty() ?
                      forcedExtension :
-                     (lastDot > -1 ? String::toLowerCase(rootUrl.substr(
-                                       static_cast<unsigned long>(lastDot))) :
+                     (lastDot > -1 ? String::toLowerCase(
+                        rootUrl.substr(static_cast<unsigned long>(lastDot))) :
                                      "");
 
   IInternalTextureLoaderPtr loader = nullptr;
@@ -4367,10 +4389,9 @@ InternalTexturePtr Engine::createCubeTexture(
     _cascadeLoadImgs(
       rootUrl, scene,
       [&](const std::vector<Image>& imgs) {
-        auto width = needPOTTextures() ?
-                       Tools::GetExponentOfTwo(imgs[0].width,
-                                               _caps.maxCubemapTextureSize) :
-                       imgs[0].width;
+        auto width = needPOTTextures() ? Tools::GetExponentOfTwo(
+                       imgs[0].width, _caps.maxCubemapTextureSize) :
+                                         imgs[0].width;
         auto height = width;
 
         _prepareWorkingCanvas();
@@ -4705,12 +4726,13 @@ InternalTexturePtr Engine::createRawCubeTextureFromUrl(
     }
   };
 
-  _loadFile(url,
-            [&](const std::variant<std::string, ArrayBuffer>& data,
-                const std::string& responseURL) -> void {
-              internalCallback(data, responseURL);
-            },
-            nullptr, true, onerror);
+  _loadFile(
+    url,
+    [&](const std::variant<std::string, ArrayBuffer>& data,
+        const std::string& responseURL) -> void {
+      internalCallback(data, responseURL);
+    },
+    nullptr, true, onerror);
 
   return texture;
 }

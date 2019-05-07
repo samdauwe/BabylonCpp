@@ -383,6 +383,16 @@ public:
   void setDepthFunctionToLess();
 
   /**
+   * @brief Caches the the state of the stencil buffer.
+   */
+  void cacheStencilState();
+
+  /**
+   * @brief Restores the state of the stencil buffer.
+   */
+  void restoreStencilState();
+
+  /**
    * @brief Sets the current depth function to LEQUAL.
    */
   void setDepthFunctionToLessOrEqual();
@@ -2792,6 +2802,14 @@ private:
   std::unordered_map<int, GL::IGLUniformLocation*> _boundUniforms;
   Vector4 _viewportCached;
   std::optional<bool> _unpackFlipYCached;
+
+  bool _cachedStencilBuffer;
+  unsigned int _cachedStencilFunction;
+  unsigned int _cachedStencilMask;
+  unsigned int _cachedStencilOperationPass;
+  unsigned int _cachedStencilOperationFail;
+  unsigned int _cachedStencilOperationDepthFail;
+  int _cachedStencilReference;
 
 }; // end of class Engine
 

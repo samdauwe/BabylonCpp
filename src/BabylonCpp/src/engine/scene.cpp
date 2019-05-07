@@ -25,6 +25,7 @@
 #include <babylon/culling/ray.h>
 #include <babylon/debug/debug_layer.h>
 #include <babylon/engine/click_info.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/iscene_component.h>
 #include <babylon/engine/iscene_serializable_component.h>
@@ -695,8 +696,7 @@ void Scene::set_simplificationQueue(const SimplificationQueuePtr& value)
   _simplificationQueue = value;
 }
 
-std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>&
-Scene::get_depthRenderer()
+std::unordered_map<std::string, DepthRendererPtr>& Scene::get_depthRenderer()
 {
   return _depthRenderer;
 }
@@ -1256,7 +1256,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
       }
       if (clickInfo.doubleClick() && !clickInfo.ignore()
           && _pickedUpMesh->actionManager->hasSpecificTrigger(
-               ActionManager::OnDoublePickTrigger)) {
+            ActionManager::OnDoublePickTrigger)) {
         _pickedUpMesh->actionManager->processTrigger(
           ActionManager::OnDoublePickTrigger,
           ActionEvent::CreateNew(_pickedUpMesh, evt));
@@ -1274,7 +1274,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
 
   if (_pickedDownMesh && _pickedDownMesh->actionManager
       && _pickedDownMesh->actionManager->hasSpecificTrigger(
-           ActionManager::OnPickOutTrigger)
+        ActionManager::OnPickOutTrigger)
       && _pickedDownMesh != _pickedUpMesh) {
     _pickedDownMesh->actionManager->processTrigger(
       ActionManager::OnPickOutTrigger,
@@ -1287,7 +1287,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
       if (!clickInfo.hasSwiped()) {
         if (clickInfo.singleClick()
             && onPointerObservable.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERTAP))) {
+              static_cast<int>(PointerEventTypes::POINTERTAP))) {
           auto iType = PointerEventTypes::POINTERTAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1295,7 +1295,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
         }
         if (clickInfo.doubleClick()
             && onPointerObservable.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
           auto iType = PointerEventTypes::POINTERDOUBLETAP;
           PointerInfo pi(iType, evt, *pickResult);
           _setRayOnPointerInfo(pi);
@@ -1371,13 +1371,13 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
     auto checkPicking
       = obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERPICK))
         || obs2.hasSpecificMask(
-             static_cast<int>(PointerEventTypes::POINTERPICK))
+          static_cast<int>(PointerEventTypes::POINTERPICK))
         || obs1.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERTAP))
         || obs2.hasSpecificMask(static_cast<int>(PointerEventTypes::POINTERTAP))
         || obs1.hasSpecificMask(
-             static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
+          static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
         || obs2.hasSpecificMask(
-             static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+          static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
     if (!checkPicking && ActionManager::HasPickTriggers()) {
       act = _initActionManager(act, clickInfo);
       if (act) {
@@ -1396,11 +1396,11 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
             = !obs1.hasSpecificMask(
                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
               && !obs2.hasSpecificMask(
-                   static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+                static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
 
           if (checkSingleClickImmediately
               && !ActionManager::HasSpecificTrigger(
-                   ActionManager::OnDoublePickTrigger)) {
+                ActionManager::OnDoublePickTrigger)) {
             act = _initActionManager(act, clickInfo);
             if (act) {
               checkSingleClickImmediately
@@ -1433,10 +1433,10 @@ void Scene::attachControl(bool attachUp, bool attachDown, bool attachMove)
           = obs1.hasSpecificMask(
               static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))
             || obs2.hasSpecificMask(
-                 static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
+              static_cast<int>(PointerEventTypes::POINTERDOUBLETAP));
         if (!checkDoubleClick
             && ActionManager::HasSpecificTrigger(
-                 ActionManager::OnDoublePickTrigger)) {
+              ActionManager::OnDoublePickTrigger)) {
           act = _initActionManager(act, clickInfo);
           if (act) {
             checkDoubleClick
@@ -1683,7 +1683,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
           if (!clickInfo.hasSwiped) {
             if (clickInfo.singleClick
                 && onPrePointerObservable.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERTAP))) {
+                  static_cast<int>(PointerEventTypes::POINTERTAP))) {
               if (_checkPrePointerObservable(std::nullopt, evt,
                                              PointerEventTypes::POINTERTAP)) {
                 return;
@@ -1691,7 +1691,7 @@ void Scene::_onPointerUpEvent(PointerEvent&& evt)
             }
             if (clickInfo.doubleClick
                 && onPrePointerObservable.hasSpecificMask(
-                     static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
+                  static_cast<int>(PointerEventTypes::POINTERDOUBLETAP))) {
               if (_checkPrePointerObservable(
                     std::nullopt, evt, PointerEventTypes::POINTERDOUBLETAP)) {
                 return;
@@ -3415,8 +3415,8 @@ void Scene::_evaluateActiveMeshes()
     // Intersections
     if (mesh->actionManager
         && mesh->actionManager->hasSpecificTriggers2(
-             ActionManager::OnIntersectionEnterTrigger,
-             ActionManager::OnIntersectionExitTrigger)) {
+          ActionManager::OnIntersectionEnterTrigger,
+          ActionManager::OnIntersectionExitTrigger)) {
       if (std::find(_meshesForIntersections.begin(),
                     _meshesForIntersections.end(), mesh)
           == _meshesForIntersections.end()) {
@@ -3966,7 +3966,7 @@ void Scene::set_headphone(const std::optional<bool>& value)
   }
 }
 
-DepthRenderer* Scene::enableDepthRenderer(const CameraPtr& camera)
+DepthRendererPtr Scene::enableDepthRenderer(const CameraPtr& camera)
 {
   auto _camera = camera ? camera : activeCamera;
   if (!_camera) {
@@ -3974,22 +3974,22 @@ DepthRenderer* Scene::enableDepthRenderer(const CameraPtr& camera)
   }
   if (!stl_util::contains(_depthRenderer, _camera->id)
       || !_depthRenderer[_camera->id]) {
-    unsigned int textureType = 0;
+    auto textureType = 0u;
     if (_engine->getCaps().textureHalfFloatRender) {
-      textureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+      textureType = Constants::TEXTURETYPE_HALF_FLOAT;
     }
     else if (_engine->getCaps().textureFloatRender) {
-      textureType = EngineConstants::TEXTURETYPE_FLOAT;
+      textureType = Constants::TEXTURETYPE_FLOAT;
     }
     else {
       throw std::runtime_error(
         "Depth renderer does not support int texture type");
     }
     _depthRenderer[_camera->id]
-      = std::make_unique<DepthRenderer>(this, textureType, _camera);
+      = std::make_shared<DepthRenderer>(this, textureType, _camera);
   }
 
-  return _depthRenderer[_camera->id].get();
+  return _depthRenderer[_camera->id];
 }
 
 void Scene::disableDepthRenderer(const CameraPtr& camera)

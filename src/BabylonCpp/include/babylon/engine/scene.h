@@ -73,6 +73,7 @@ using AnimatablePtr             = std::shared_ptr<Animatable>;
 using BoundingBoxRendererPtr    = std::shared_ptr<BoundingBoxRenderer>;
 using BonePtr                   = std::shared_ptr<Bone>;
 using EffectPtr                 = std::shared_ptr<Effect>;
+using DepthRendererPtr          = std::shared_ptr<DepthRenderer>;
 using GeometryBufferRendererPtr = std::shared_ptr<GeometryBufferRenderer>;
 using IAnimatablePtr            = std::shared_ptr<IAnimatable>;
 using IPhysicsEnginePtr         = std::shared_ptr<IPhysicsEngine>;
@@ -1230,7 +1231,7 @@ public:
    * active camera)
    * @returns the created depth renderer
    */
-  DepthRenderer* enableDepthRenderer(const CameraPtr& camera = nullptr);
+  DepthRendererPtr enableDepthRenderer(const CameraPtr& camera = nullptr);
 
   /**
    * @brief Disables a depth renderer for a given camera.
@@ -2019,8 +2020,7 @@ protected:
   /**
    * @brief Hidden (Backing field)
    */
-  std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>&
-  get_depthRenderer();
+  std::unordered_map<std::string, DepthRendererPtr>& get_depthRenderer();
 
   /**
    * @brief Gets the current geometry buffer associated to the scene.
@@ -3010,8 +3010,7 @@ public:
   /**
    * Gets the depth renderer object.
    */
-  ReadOnlyProperty<
-    Scene, std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>>
+  ReadOnlyProperty<Scene, std::unordered_map<std::string, DepthRendererPtr>>
     depthRenderer;
 
   /**
@@ -3442,8 +3441,7 @@ private:
   Vector2 _unTranslatedPointer;
   AbstractMesh* _pointerOverMesh;
   std::unique_ptr<DebugLayer> _debugLayer;
-  std::unordered_map<std::string, std::unique_ptr<DepthRenderer>>
-    _depthRenderer;
+  std::unordered_map<std::string, DepthRendererPtr> _depthRenderer;
   GeometryBufferRendererPtr _geometryBufferRenderer;
   AbstractMesh* _pickedDownMesh;
   AbstractMesh* _pickedUpMesh;

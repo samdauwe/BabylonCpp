@@ -34,6 +34,7 @@ class Material;
 struct MaterialDefines;
 class PickingInfo;
 struct PhysicsParams;
+class RenderingGroup;
 class Skeleton;
 class SolidParticle;
 using _OcclusionDataStoragePtr = std::shared_ptr<_OcclusionDataStorage>;
@@ -1345,6 +1346,12 @@ public:
    */
   bool definedFacingForward;
 
+  /** Hidden */
+  std::unique_ptr<GL::IGLQuery> _occlusionQuery;
+
+  /** Hidden */
+  RenderingGroup* _renderingGroup;
+
   /**
    * Access property
    * Hidden
@@ -1752,8 +1759,6 @@ private:
   Observer<Node>::Ptr _disposePhysicsObserver;
   /** Hidden */
   _OcclusionDataStoragePtr __occlusionDataStorage;
-  /** Hidden */
-  std::unique_ptr<GL::IGLQuery> _occlusionQuery;
   // Cache
   Matrix _collisionsTransformMatrix;
   Matrix _collisionsScalingMatrix;
