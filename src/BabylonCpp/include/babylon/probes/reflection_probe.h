@@ -1,10 +1,14 @@
 #ifndef BABYLON_PROBES_REFLECTION_PROBE_H
 #define BABYLON_PROBES_REFLECTION_PROBE_H
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
+
+using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -18,7 +22,7 @@ using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
- * @brief Class used to generate realtime reflection / refraction cube textures
+ * @brief Class used to generate realtime reflection / refraction cube textures.
  * @see http://doc.babylonjs.com/how_to/how_to_use_reflection_probes
  */
 class BABYLON_SHARED_EXPORT ReflectionProbe {
@@ -69,6 +73,42 @@ public:
    * @brief Clean all associated resources
    */
   void dispose();
+
+  /**
+   * @brief Converts the reflection probe information to a readable string for
+   * debug purpose.
+   * @param fullDetails Supports for multiple levels of logging within scene
+   * loading
+   * @returns the human readable reflection probe info
+   */
+  std::string toString(bool fullDetails = false);
+
+  /**
+   * @brief Get the class name of the relfection probe.
+   * @returns "ReflectionProbe"
+   */
+  std::string getClassName() const;
+
+  /**
+   * @brief Serialize the reflection probe to a JSON representation we can
+   * easily use in the resepective Parse function.
+   * @returns The JSON representation of the texture
+   */
+  void serialize(json& serializationObject);
+
+  /**
+   * @brief Parse the JSON representation of a reflection probe in order to
+   * recreate the reflection probe in the given scene.
+   * @param parsedReflectionProbe Define the JSON representation of the
+   * reflection probe
+   * @param scene Define the scene the parsed reflection probe should be
+   * instantiated in
+   * @param rootUrl Define the root url of the parsing sequence in the case of
+   * relative dependencies
+   * @returns The parsed reflection probe if successful
+   */
+  static ReflectionProbePtr Parse(const json& parsedReflectionProbe,
+                                  Scene* scene, const std::string& rootUrl);
 
 protected:
   /**

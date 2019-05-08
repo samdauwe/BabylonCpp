@@ -282,4 +282,21 @@ LensFlareSystemPtr AbstractScene::getLensFlareSystemByID(const std::string& id)
   return (it == lensFlareSystems.end()) ? nullptr : (*it);
 }
 
+int AbstractScene::removeReflectionProbe(const ReflectionProbePtr& toRemove)
+{
+  auto it
+    = std::find(reflectionProbes.begin(), reflectionProbes.end(), toRemove);
+  int index = static_cast<int>(it - reflectionProbes.begin());
+  if (it != reflectionProbes.end()) {
+    reflectionProbes.erase(it);
+  }
+  return index;
+}
+
+void AbstractScene::addReflectionProbe(
+  const ReflectionProbePtr& newReflectionProbe)
+{
+  reflectionProbes.emplace_back(newReflectionProbe);
+}
+
 } // end of namespace BABYLON

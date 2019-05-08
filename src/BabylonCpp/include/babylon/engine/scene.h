@@ -63,7 +63,6 @@ class PostProcessManager;
 class PostProcessRenderPipelineManager;
 class ProceduralTexture;
 struct RenderingGroupInfo;
-class ReflectionProbe;
 class RenderingManager;
 class RuntimeAnimation;
 class SimplificationQueue;
@@ -89,7 +88,6 @@ using MeshPtr                = std::shared_ptr<Mesh>;
 using OutlineRendererPtr     = std::shared_ptr<OutlineRenderer>;
 using PostProcessPtr         = std::shared_ptr<PostProcess>;
 using ProceduralTexturePtr   = std::shared_ptr<ProceduralTexture>;
-using ReflectionProbePtr     = std::shared_ptr<ReflectionProbe>;
 using SimplificationQueuePtr = std::shared_ptr<SimplificationQueue>;
 using SoundTrackPtr          = std::shared_ptr<SoundTrack>;
 using SubMeshPtr             = std::shared_ptr<SubMesh>;
@@ -2880,12 +2878,6 @@ public:
    * Gets or sets a boolean indicating if probes are enabled on this scene
    */
   bool probesEnabled;
-
-  /**
-   * The list of reflection probes added to the scene
-   * @see http://doc.babylonjs.com/how_to/how_to_use_reflection_probes
-   */
-  std::vector<ReflectionProbePtr> reflectionProbes;
 
   // Database
 

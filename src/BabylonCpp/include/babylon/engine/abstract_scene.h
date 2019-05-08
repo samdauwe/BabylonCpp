@@ -2,10 +2,10 @@
 #define BABYLON_ENGINE_ABSTRACT_SCENE_H
 
 #include <functional>
-#include <unordered_map>
 #include <memory>
 #include <nlohmann/json_fwd.hpp>
 #include <optional>
+#include <unordered_map>
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/any.h>
@@ -33,6 +33,7 @@ class Material;
 class MorphTargetManager;
 class MultiMaterial;
 class Node;
+class ReflectionProbe;
 class Scene;
 class Skeleton;
 class Sound;
@@ -56,6 +57,7 @@ using MaterialPtr           = std::shared_ptr<Material>;
 using MorphTargetManagerPtr = std::shared_ptr<MorphTargetManager>;
 using MultiMaterialPtr      = std::shared_ptr<MultiMaterial>;
 using NodePtr               = std::shared_ptr<Node>;
+using ReflectionProbePtr    = std::shared_ptr<ReflectionProbe>;
 using SkeletonPtr           = std::shared_ptr<Skeleton>;
 using SoundPtr              = std::shared_ptr<Sound>;
 using TransformNodePtr      = std::shared_ptr<TransformNode>;
@@ -189,6 +191,19 @@ public:
    */
   LensFlareSystemPtr getLensFlareSystemByID(const std::string& id);
 
+  /**
+   * @brief Removes the given reflection probe from this scene.
+   * @param toRemove The reflection probe to remove
+   * @returns The index of the removed reflection probe
+   */
+  int removeReflectionProbe(const ReflectionProbePtr& toRemove);
+
+  /**
+   * @brief Adds the given reflection probe to this scene.
+   * @param newReflectionProbe The reflection probe to add
+   */
+  void addReflectionProbe(const ReflectionProbePtr& newReflectionProbe);
+
 private:
   /**
    * @brief Adds the individual component parser to the scene parsers.
@@ -304,7 +319,13 @@ public:
   std::vector<LensFlareSystemPtr> lensFlareSystems;
 
   /**
-   * The list of sounds used in the scene.
+   * The list of reflection probes added to the scene
+   * @see http://doc.babylonjs.com/how_to/how_to_use_reflection_probes
+   */
+  std::vector<ReflectionProbePtr> reflectionProbes;
+
+  /**
+   * The list of sounds used in the scene
    */
   std::vector<SoundPtr> sounds;
 
