@@ -1,9 +1,9 @@
-#include <babylon/lensflare/lens_flare_system_scene_component.h>
+#include <babylon/lensflares/lens_flare_system_scene_component.h>
 
 #include <babylon/cameras/camera.h>
 #include <babylon/engine/abstract_scene.h>
 #include <babylon/engine/scene.h>
-#include <babylon/lensflare/lens_flare_system.h>
+#include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {
@@ -37,18 +37,21 @@ void LensFlareSystemSceneComponent::addFromContainer(AbstractScene* container)
   }
   for (const auto& o : container->lensFlareSystems) {
     scene->addLensFlareSystem(o);
-  };
+  }
 }
 
 void LensFlareSystemSceneComponent::removeFromContainer(
-  AbstractScene* container)
+  AbstractScene* container, bool dispose)
 {
   if (container->lensFlareSystems.empty()) {
     return;
   }
   for (const auto& o : container->lensFlareSystems) {
     scene->removeLensFlareSystem(o);
-  };
+    if (dispose) {
+      o->dispose();
+    }
+  }
 }
 
 void LensFlareSystemSceneComponent::serialize(json& /*serializationObject*/)

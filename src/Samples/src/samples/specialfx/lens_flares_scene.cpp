@@ -2,8 +2,8 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engine/scene.h>
-#include <babylon/lensflare/lens_flare.h>
-#include <babylon/lensflare/lens_flare_system.h>
+#include <babylon/lensflares/lens_flare.h>
+#include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/cube_texture.h>

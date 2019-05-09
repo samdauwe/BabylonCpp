@@ -10,7 +10,7 @@
 #include <babylon/layer/effect_layer.h>
 #include <babylon/layer/glow_layer.h>
 #include <babylon/layer/highlight_layer.h>
-#include <babylon/lensflare/lens_flare_system.h>
+#include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/particles/gpu_particle_system.h>
 #include <babylon/particles/particle_system.h>

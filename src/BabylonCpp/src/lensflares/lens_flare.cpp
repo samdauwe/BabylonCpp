@@ -1,7 +1,8 @@
-#include <babylon/lensflare/lens_flare.h>
+#include <babylon/lensflares/lens_flare.h>
 
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
-#include <babylon/lensflare/lens_flare_system.h>
+#include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
@@ -12,7 +13,7 @@ LensFlare::LensFlare(float iSize, float iPosition, const Color3& iColor,
     : color{iColor}
     , texture{!imgUrl.empty() ? Texture::New(imgUrl, system->getScene(), true) :
                                 nullptr}
-    , alphaMode{EngineConstants::ALPHA_ONEONE}
+    , alphaMode{Constants::ALPHA_ONEONE}
     , size{iSize}
     , position{iPosition}
     , _system{system}

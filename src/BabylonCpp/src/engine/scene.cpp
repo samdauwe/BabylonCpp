@@ -40,7 +40,7 @@
 #include <babylon/layer/glow_layer.h>
 #include <babylon/layer/highlight_layer.h>
 #include <babylon/layer/layer.h>
-#include <babylon/lensflare/lens_flare_system.h>
+#include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>

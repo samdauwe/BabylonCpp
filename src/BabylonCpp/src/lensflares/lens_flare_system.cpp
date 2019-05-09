@@ -1,14 +1,15 @@
-#include <babylon/lensflare/lens_flare_system.h>
+#include <babylon/lensflares/lens_flare_system.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/engine/scene_component_constants.h>
-#include <babylon/lensflare/lens_flare.h>
-#include <babylon/lensflare/lens_flare_system_scene_component.h>
+#include <babylon/lensflares/lens_flare.h>
+#include <babylon/lensflares/lens_flare_system_scene_component.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
@@ -281,7 +282,7 @@ bool LensFlareSystem::render()
   engine->enableEffect(_effect);
   engine->setState(false);
   engine->setDepthBuffer(false);
-  engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
+  engine->setAlphaMode(Constants::ALPHA_ONEONE);
 
   // VBOs
   engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), _effect);
@@ -320,7 +321,7 @@ bool LensFlareSystem::render()
   }
 
   engine->setDepthBuffer(true);
-  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+  engine->setAlphaMode(Constants::ALPHA_DISABLE);
   return true;
 }
 

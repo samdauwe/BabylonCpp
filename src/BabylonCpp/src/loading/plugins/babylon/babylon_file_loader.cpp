@@ -12,7 +12,7 @@
 #include <babylon/engine/asset_container.h>
 #include <babylon/engine/scene.h>
 #include <babylon/engine/scene_component_constants.h>
-#include <babylon/lensflare/lens_flare_system.h>
+#include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/loading/scene_loader.h>
@@ -833,10 +833,9 @@ void BabylonFileLoader::finally(const std::string& producer,
   const auto _log = log.str();
   if (!_log.empty() && SceneLoader::LoggingLevel() != SceneLoader::NO_LOGGING) {
     const auto msg
-      = json_util::has_key(parsedData, "producer") ?
-          logOperation(producer, json_util::get_string(parsedData, "producer",
-                                                       "Unknown")) :
-          logOperation(producer);
+      = json_util::has_key(parsedData, "producer") ? logOperation(
+          producer, json_util::get_string(parsedData, "producer", "Unknown")) :
+                                                     logOperation(producer);
     const auto logStr
       = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
     BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());

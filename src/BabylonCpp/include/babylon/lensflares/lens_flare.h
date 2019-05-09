@@ -1,5 +1,5 @@
-#ifndef BABYLON_LENSFLARE_LENS_FLARE_H
-#define BABYLON_LENSFLARE_LENS_FLARE_H
+#ifndef BABYLON_LENSFLARES_LENS_FLARE_H
+#define BABYLON_LENSFLARES_LENS_FLARE_H
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/color3.h>
@@ -15,7 +15,7 @@ using LensFlareSystemPtr = std::shared_ptr<LensFlareSystem>;
 using TexturePtr         = std::shared_ptr<Texture>;
 
 /**
- * @brief This represents one of the lens effect in a `BABYLON.lensFlareSystem`.
+ * @brief This represents one of the lens effect in a `lensFlareSystem`.
  * It controls one of the indiviual texture used in the effect.
  * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
  */
@@ -40,7 +40,7 @@ public:
 
   /**
    * @brief Creates a new Lens Flare.
-   * This represents one of the lens effect in a `BABYLON.lensFlareSystem`.
+   * This represents one of the lens effect in a `lensFlareSystem`.
    * It controls one of the indiviual texture used in the effect.
    * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
    * @param size Define the size of the lens flare (a floating value between 0
@@ -66,7 +66,7 @@ public:
 protected:
   /**
    * @brief Instantiates a new Lens Flare.
-   * This represents one of the lens effect in a `BABYLON.lensFlareSystem`.
+   * This represents one of the lens effect in a `lensFlareSystem`.
    * It controls one of the indiviual texture used in the effect.
    * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
    * @param size Define the size of the lens flare in the system (a floating
@@ -120,4 +120,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LENSFLARE_LENS_FLARE_H
+#endif // end of BABYLON_LENSFLARES_LENS_FLARE_H

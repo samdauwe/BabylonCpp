@@ -1,10 +1,10 @@
-#ifndef BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_H
-#define BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_H
+#ifndef BABYLON_LENSFLARES_LENS_FLARE_SYSTEM_H
+#define BABYLON_LENSFLARES_LENS_FLARE_SYSTEM_H
 
 #include <functional>
-#include <unordered_map>
 #include <memory>
 #include <nlohmann/json_fwd.hpp>
+#include <unordered_map>
 #include <variant>
 
 #include <babylon/babylon_api.h>
@@ -45,7 +45,7 @@ class IGLBuffer;
 /**
  * @brief This represents a Lens Flare System or the shiny effect created by the
  * light reflection on the  camera lenses. It is usually composed of several
- * `BABYLON.lensFlare`.
+ * `lensFlare`.
  * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
  */
 class BABYLON_SHARED_EXPORT LensFlareSystem {
@@ -141,7 +141,7 @@ protected:
    * @brief Instantiates a lens flare system.
    * This represents a Lens Flare System or the shiny effect created by the
    * light reflection on the  camera lenses. It is usually composed of several
-   * `BABYLON.lensFlare`.
+   * `lensFlare`.
    * @see http://doc.babylonjs.com/how_to/how_to_use_lens_flares
    * @param name Define the name of the lens flare system in the scene
    * @param emitter Define the source (the emitter) of the lens flares (it can
@@ -215,4 +215,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_H
+#endif // end of BABYLON_LENSFLARES_LENS_FLARE_SYSTEM_H

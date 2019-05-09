@@ -1,5 +1,5 @@
-#ifndef BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
-#define BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
+#ifndef BABYLON_LENSFLARES_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
+#define BABYLON_LENSFLARES_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
 
 #include <map>
 #include <nlohmann/json_fwd.hpp>
@@ -63,8 +63,9 @@ public:
   /**
    * @brief Removes all the elements in the container from the scene
    * @param container contains the elements to remove
+   * @param dispose if the removed element should be disposed (default: false)
    */
-  void removeFromContainer(AbstractScene* container);
+  void removeFromContainer(AbstractScene* container, bool dispose = true);
 
   /**
    * @brief Serializes the component data to the specified json object
@@ -91,4 +92,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_LENSFLARE_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
+#endif // end of BABYLON_LENSFLARES_LENS_FLARE_SYSTEM_SCENE_COMPONENT_H
