@@ -1,12 +1,14 @@
 ﻿#ifndef BABYLON_SHADERS_GPU_RENDER_PARTICLES_VERTEX_FX_H
 #define BABYLON_SHADERS_GPU_RENDER_PARTICLES_VERTEX_FX_H
 
+#include <babylon/shaders/shadersinclude/glsl_version_3.h>
+
 namespace BABYLON {
 
 extern const char* gpuRenderParticlesVertexShader;
 
 const char* gpuRenderParticlesVertexShader
-  = "#version 300 es\n"
+  = BABYLONCPP_GLSL_VERSION_3
     "\n"
     "\n"
     "uniform mat4 view;\n"

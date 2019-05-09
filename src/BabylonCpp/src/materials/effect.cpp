@@ -15,6 +15,7 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector4.h>
+#include <babylon/shaders/shadersinclude/glsl_version_3.h>
 #include <babylon/tools/tools.h>
 #include <babylon/utils/base64.h>
 
@@ -372,7 +373,7 @@ void Effect::_dumpShadersSource(std::string vertexCode,
 {
   // Rebuild shaders source code
   auto shaderVersion
-    = (_engine->webGLVersion() > 1.f) ? "#version 300 es\n" : "";
+    = (_engine->webGLVersion() > 1.f) ? BABYLONCPP_GLSL_VERSION_3 : "";
   auto prefix  = shaderVersion + (!iDefines.empty() ? iDefines + "\n" : "");
   vertexCode   = prefix + vertexCode;
   fragmentCode = prefix + fragmentCode;
@@ -414,7 +415,7 @@ void Effect::_processShaderConversion(
 
   // Already converted
   if (String::contains(preparedSourceCode, "#version 3")) {
-    String::replaceInPlace(preparedSourceCode, "#version 300 es", "");
+    String::replaceInPlace(preparedSourceCode, BABYLONCPP_GLSL_VERSION_3, "");
     callback(preparedSourceCode);
     return;
   }

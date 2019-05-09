@@ -1,12 +1,14 @@
 ﻿#ifndef BABYLON_SHADERS_GPU_UPDATE_PARTICLES_FRAGMENT_FX_H
 #define BABYLON_SHADERS_GPU_UPDATE_PARTICLES_FRAGMENT_FX_H
 
+#include <babylon/shaders/shadersinclude/glsl_version_3.h>
+
 namespace BABYLON {
 
 extern const char* gpuUpdateParticlesPixelShader;
 
 const char* gpuUpdateParticlesPixelShader
-  = "#version 300 es\n"
+  = BABYLONCPP_GLSL_VERSION_3
     "\n"
     "void main() {\n"
     "  discard;\n"
