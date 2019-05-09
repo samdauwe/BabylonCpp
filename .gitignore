@@ -58,3 +58,8 @@ src/InspectorV1
 
 # vscode
 .vscode/
+
+# CLion
+.idea/
+cmake-build-debug/
+cmake-build-release/
