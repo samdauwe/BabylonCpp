@@ -153,6 +153,11 @@ json MorphTarget::serialize() const
   return nullptr;
 }
 
+std::string MorphTarget::getClassName() const
+{
+  return "MorphTarget";
+}
+
 std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
 {
   auto result = std::make_unique<MorphTarget>(
@@ -161,6 +166,10 @@ std::unique_ptr<MorphTarget> MorphTarget::Parse(const json& serializationObject)
 
   result->setPositions(
     json_util::get_array<float>(serializationObject, "positions"));
+
+  if (json_util::has_valid_key_value(serializationObject, "id")) {
+    result->id = json_util::get_string(serializationObject, "id");
+  }
 
   if (json_util::has_key(serializationObject, "normals")) {
     result->setNormals(

@@ -96,6 +96,12 @@ public:
    */
   json serialize() const;
 
+  /**
+   * @brief Returns the string "MorphTarget".
+   * @returns "MorphTarget"
+   */
+  std::string getClassName() const;
+
   // Statics
 
   /**
@@ -159,6 +165,7 @@ public:
    * @brief Creates a new MorphTarget.
    * @param name defines the name of the target
    * @param influence defines the influence to use
+   * @param scene defines the scene the morphtarget belongs to
    */
   MorphTarget(const std::string& name, float influence = 0.f,
               Scene* scene = nullptr);
@@ -182,6 +189,11 @@ public:
    * Influence of this target (ie. its weight in the overall morphing).
    */
   Property<MorphTarget, float> influence;
+
+  /**
+   * Gets or sets the id of the morph Target
+   */
+  std::string id;
 
   /**
    * Animation properties override
