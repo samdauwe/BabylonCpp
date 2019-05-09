@@ -6,9 +6,9 @@ sudo: required
 language: cpp
 
 # The branch to build
-branches:
-  only:
-    - master
+# branches:
+#   only:
+#     - master
 
 env:
   # Workaround for https://github.com/travis-ci/travis-ci/issues/4681
@@ -60,6 +60,11 @@ matrix:
             - gcc-7
       env: CC_VERSION=gcc-7 CXX_VERSION=g++-7
 
+    # OSX
+    - os: osx
+      osx_image: xcode10.2
+      env: OSX="On" CC_VERSION=clang CXX_VERSION=clang++
+
 install:
   ###################################################################
   # All the dependencies are installed in ${HOME}/deps/ #
@@ -73,7 +78,7 @@ install:
   - if [[ "${CC_VERSION}" != "" ]]; then export CC=${CC_VERSION}; fi
   - if [[ "${CXX_VERSION}" != "" ]]; then export CXX=${CXX_VERSION}; fi
   - ${CXX} --version
-  
+
   ##########################
   # Install a recent CMake #
   ##########################
@@ -89,7 +94,7 @@ install:
   # Install libc++ and libc++abi if needed
   ############################################################################
   - |
-    if [[ "${CXX%%+*}" == "clang" ]]; then
+    if [[ "${CXX%%+*}" == "clang" && "${TRAVIS_OS_NAME}" == "linux" ]]; then
       if   [[ "${CXX}" == "clang++-5.0" ]]; then LLVM_VERSION="5.0.1";
       elif [[ "${CXX}" == "clang++-6.0" ]]; then LLVM_VERSION="6.0.1";
       fi
@@ -113,11 +118,12 @@ before_script:
   # Go back to the root of the project and setup the build directory #
   ####################################################################
   - cd "${TRAVIS_BUILD_DIR}"
+  - cmake --version
   - mkdir build && cd build && cmake ../
 
 # Build steps
 script:
-  - make all
+  - make all -j 4
 
 # Notifications settings
 notifications:
