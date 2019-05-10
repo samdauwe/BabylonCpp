@@ -144,7 +144,7 @@ Vector3 Tools::setLength(Vector3&& v, float len)
 {
   v.normalize();
   v *= len;
-  return v;
+  return std::move(v);
 }
 
 Color4 Tools::ocv(unsigned int val)
