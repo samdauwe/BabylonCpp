@@ -13,7 +13,8 @@ namespace BABYLON {
 class Mesh;
 class Scene;
 class TransformNode;
-using MeshPtr = std::shared_ptr<Mesh>;
+using MeshPtr          = std::shared_ptr<Mesh>;
+using TransformNodePtr = std::shared_ptr<TransformNode>;
 
 /**
  * @brief A behavior that when attached to a mesh will will place a specified
@@ -34,7 +35,7 @@ public:
    * face of the box to a camera
    * @param ui The transform node that should be attched to the mesh
    */
-  AttachToBoxBehavior(TransformNode* ui);
+  AttachToBoxBehavior(const TransformNodePtr& ui);
   virtual ~AttachToBoxBehavior();
 
   /**
@@ -72,7 +73,7 @@ public:
   float distanceAwayFromBottomOfFace;
 
 private:
-  TransformNode* ui;
+  TransformNodePtr ui;
   std::array<FaceDirectionInfo, 6> _faceVectors;
   MeshPtr _target;
   Scene* _scene;

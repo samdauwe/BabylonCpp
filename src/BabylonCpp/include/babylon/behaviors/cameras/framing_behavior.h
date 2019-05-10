@@ -21,10 +21,10 @@ using AnimationPtr       = std::shared_ptr<Animation>;
 using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
 /**
- * @brief The framing behavior (BABYLON.FramingBehavior) is designed to
- * automatically position an ArcRotateCamera when its target is set to a mesh.
- * It is also useful if you want to prevent the camera to go under a virtual
- * horizontal plane.
+ * @brief The framing behavior (FramingBehavior) is designed to automatically
+ * position an ArcRotateCamera when its target is set to a mesh. It is also
+ * useful if you want to prevent the camera to go under a virtual horizontal
+ * plane.
  * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
  */
 class BABYLON_SHARED_EXPORT FramingBehavior : public Behavior<ArcRotateCamera> {

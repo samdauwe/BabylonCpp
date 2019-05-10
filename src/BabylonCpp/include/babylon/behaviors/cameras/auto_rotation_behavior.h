@@ -14,9 +14,8 @@ class PointerInfoPre;
 using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
 
 /**
- * @brief The autoRotation behavior (BABYLON.AutoRotationBehavior) is designed
- * to create a smooth rotation of an ArcRotateCamera when there is no user
- * interaction.
+ * @brief The autoRotation behavior (AutoRotationBehavior) is designed to create
+ * a smooth rotation of an ArcRotateCamera when there is no user interaction.
  * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
  */
 class BABYLON_SHARED_EXPORT AutoRotationBehavior
