@@ -3,6 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/engine/constants.h>
 
 namespace BABYLON {
 
@@ -11,6 +12,22 @@ class IGLRenderingContext;
 } // end of namespace GL
 
 class BABYLON_SHARED_EXPORT _StencilState {
+
+public:
+  /**
+   * Passed to depthFunction or stencilFunction to specify depth or stencil
+   * tests will always pass. i.e. Pixels will be drawn in the order they are
+   * drawn
+   */
+  static constexpr unsigned int ALWAYS = Constants::ALWAYS;
+  /**
+   * Passed to stencilOperation to specify that stencil value must be kept
+   */
+  static constexpr unsigned int KEEP = Constants::KEEP;
+  /**
+   * Passed to stencilOperation to specify that stencil value must be replaced
+   */
+  static constexpr unsigned int REPLACE = Constants::REPLACE;
 
 public:
   /**

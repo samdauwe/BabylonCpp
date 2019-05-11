@@ -267,9 +267,11 @@ void PropertyGridTabComponent::render()
       texture = (it == props.scene->textures.end()) ?
                   nullptr :
                   std::static_pointer_cast<Texture>(*it);
+      _reservedDataStore.texture[texture->name] = TextureReservedDataStore{};
     }
     if (texture) {
-      TexturePropertyGridComponent::render(texture);
+      TexturePropertyGridComponent::render(
+        texture, _reservedDataStore.texture[texture->name]);
     }
     return;
   }

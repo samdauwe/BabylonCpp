@@ -6,7 +6,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/mesh/mesh.h>
-#include <babylon/postprocess/post_process.h>
+#include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 namespace Samples {

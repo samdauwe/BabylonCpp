@@ -6,6 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/inspector/components/actiontabs/pane_component.h>
+#include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/texture_reserved_data_store.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_reserved_data_store.h>
 
 namespace BABYLON {
@@ -73,6 +74,7 @@ struct EntityCache {
 
 struct ReservedDataStore {
   std::unordered_map<size_t, MeshReservedDataStore> mesh;
+  std::unordered_map<std::string, TextureReservedDataStore> texture;
 };
 
 class BABYLON_SHARED_EXPORT PropertyGridTabComponent : public PaneComponent {

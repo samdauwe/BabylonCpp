@@ -4,11 +4,11 @@
 #include <babylon/engine/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/mesh/mesh.h>
-#include <babylon/postprocess/black_and_white_post_process.h>
-#include <babylon/postprocess/blur_post_process.h>
-#include <babylon/postprocess/renderpipeline/post_process_render_effect.h>
-#include <babylon/postprocess/renderpipeline/post_process_render_pipeline.h>
-#include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
+#include <babylon/postprocesses/black_and_white_post_process.h>
+#include <babylon/postprocesses/blur_post_process.h>
+#include <babylon/postprocesses/renderpipeline/post_process_render_effect.h>
+#include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
+#include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager.h>
 
 namespace BABYLON {
 namespace Samples {

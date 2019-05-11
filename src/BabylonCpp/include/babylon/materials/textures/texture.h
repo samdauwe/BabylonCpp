@@ -249,6 +249,7 @@ protected:
   void set_isBlocking(bool value) override;
   bool get_isBlocking() const override;
   unsigned int get_samplingMode() const;
+  bool get_invertY() const;
   Observable<Texture>& get_onLoadObservable();
 
 private:
@@ -339,6 +340,12 @@ public:
    * Get the current sampling mode associated with the texture.
    */
   ReadOnlyProperty<Texture, unsigned int> samplingMode;
+
+  /**
+   * Gets a boolean indicating if the texture needs to be inverted on the y axis
+   * during loading
+   */
+  ReadOnlyProperty<Texture, bool> invertY;
 
   /**
    * Observable triggered once the texture has been loaded.

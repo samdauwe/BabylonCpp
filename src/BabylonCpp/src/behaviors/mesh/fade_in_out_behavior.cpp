@@ -72,7 +72,7 @@ void FadeInOutBehavior::_setAllVisibility(const AbstractMeshPtr& mesh,
   mesh->visibility = value;
   for (const auto& c : mesh->getChildMeshes()) {
     _setAllVisibility(c, value);
-  };
+  }
 }
 
 } // end of namespace BABYLON

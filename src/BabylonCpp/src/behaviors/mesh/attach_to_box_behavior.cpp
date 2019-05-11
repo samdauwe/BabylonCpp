@@ -7,7 +7,7 @@
 
 namespace BABYLON {
 
-AttachToBoxBehavior::AttachToBoxBehavior(TransformNode* iUi)
+AttachToBoxBehavior::AttachToBoxBehavior(const TransformNodePtr& iUi)
     : distanceAwayFromFace{0.15f}
     , distanceAwayFromBottomOfFace{0.15f}
     , ui{iUi}
@@ -50,7 +50,7 @@ AttachToBoxBehavior::_closestFace(const Vector3& targetDirection)
     v.diff = Vector3::GetAngleBetweenVectors(
       v.rotatedDirection, targetDirection,
       Vector3::Cross(v.rotatedDirection, targetDirection));
-  };
+  }
 
   // Return the face information of the one with the normal closeset to target
   // direction

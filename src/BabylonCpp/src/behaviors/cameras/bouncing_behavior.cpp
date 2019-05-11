@@ -12,9 +12,9 @@ BackEasePtr BouncingBehavior::_EasingFunction = BackEase::New(0.3f);
 unsigned int BouncingBehavior::EasingMode = EasingFunction::EASINGMODE_EASEOUT;
 
 BouncingBehavior::BouncingBehavior()
-    : transitionDuration{450}
-    , lowerRadiusTransitionRange{2}
-    , upperRadiusTransitionRange{-2}
+    : transitionDuration{450.f}
+    , lowerRadiusTransitionRange{2.f}
+    , upperRadiusTransitionRange{-2.f}
     , autoTransitionRange{this, &BouncingBehavior::get_autoTransitionRange,
                           &BouncingBehavior::set_autoTransitionRange}
     , _autoTransitionRange{false}
@@ -141,9 +141,9 @@ void BouncingBehavior::_applyBoundRadiusAnimation(float radiusDelta)
                                    60, BouncingBehavior::_EasingFunction);
   }
   // Prevent zoom until bounce has completed
-  _cachedWheelPrecision                 = _attachedCamera->wheelPrecision;
-  _attachedCamera->wheelPrecision       = std::numeric_limits<float>::infinity();
-  _attachedCamera->inertialRadiusOffset = 0;
+  _cachedWheelPrecision           = _attachedCamera->wheelPrecision;
+  _attachedCamera->wheelPrecision = std::numeric_limits<float>::infinity();
+  _attachedCamera->inertialRadiusOffset = 0.f;
 
   // Animate to the radius limit
   stopAllAnimations();

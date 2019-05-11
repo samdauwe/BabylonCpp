@@ -27,10 +27,10 @@
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
-#include <babylon/postprocess/blur_post_process.h>
-#include <babylon/postprocess/pass_post_process.h>
-#include <babylon/postprocess/post_process.h>
-#include <babylon/postprocess/post_process_manager.h>
+#include <babylon/postprocesses/blur_post_process.h>
+#include <babylon/postprocesses/pass_post_process.h>
+#include <babylon/postprocesses/post_process.h>
+#include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

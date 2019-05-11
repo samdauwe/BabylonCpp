@@ -5,12 +5,11 @@
 #include <imgui.h>
 
 #include <babylon/babylon_api.h>
+#include <babylon/imgui/imgui_utils.h>
 
 namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT CheckBoxLineComponent {
-
-  static constexpr float Width = 19.f;
 
   /**
    * @brief Renders a checkbox widget.
@@ -22,10 +21,10 @@ struct BABYLON_SHARED_EXPORT CheckBoxLineComponent {
   {
     bool origValue = isSelected;
     ImGui::TextWrapped("%s", label);
-    ImGui::SameLine(ImGui::GetWindowContentRegionWidth()
-                    - CheckBoxLineComponent::Width);
+    auto width = ImGui::GetFrameHeight() * 1.55f;
+    ImGui::SameLine(ImGui::GetWindowContentRegionWidth() - width);
     ImGui::PushID(label);
-    ImGui::Checkbox("", &isSelected);
+    ImGui::SwitchButton("", &isSelected);
     ImGui::PopID();
     return origValue != isSelected;
   }

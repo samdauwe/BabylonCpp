@@ -6,8 +6,8 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/postprocess/pass_post_process.h>
-#include <babylon/postprocess/post_process_manager.h>
+#include <babylon/postprocesses/pass_post_process.h>
+#include <babylon/postprocesses/post_process_manager.h>
 
 namespace BABYLON {
 

@@ -1,0 +1,37 @@
+#include <babylon/postprocesses/depth_of_field_blur_post_process.h>
+
+#include <babylon/cameras/camera.h>
+#include <babylon/engine/scene.h>
+#include <babylon/materials/effect.h>
+
+namespace BABYLON {
+
+DepthOfFieldBlurPostProcess::DepthOfFieldBlurPostProcess(
+  const std::string& name, Scene* scene, const Vector2& direction, float kernel,
+  const std::variant<float, PostProcessOptions>& options,
+  const CameraPtr& camera, PostProcess* circleOfConfusion,
+  PostProcess* imageToBlur, unsigned int samplingMode, Engine* engine,
+  bool reusable, unsigned int textureType, bool blockCompilation)
+    : BlurPostProcess{
+        name,        direction,           kernel,          options,
+        camera,      samplingMode,        engine,          reusable,
+        textureType, "#define DOF 1\r\n", blockCompilation}
+{
+  onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
+    if (imageToBlur != nullptr) {
+      effect->setTextureFromPostProcess("textureSampler", imageToBlur);
+    }
+    effect->setTextureFromPostProcessOutput("circleOfConfusionSampler",
+                                            circleOfConfusion);
+    if (scene->activeCamera) {
+      effect->setFloat2("cameraMinMaxZ", scene->activeCamera->minZ,
+                        scene->activeCamera->maxZ);
+    }
+  });
+}
+
+DepthOfFieldBlurPostProcess::~DepthOfFieldBlurPostProcess()
+{
+}
+
+} // end of namespace BABYLON

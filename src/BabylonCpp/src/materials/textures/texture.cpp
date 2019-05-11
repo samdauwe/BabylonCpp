@@ -39,6 +39,7 @@ Texture::Texture(
     , _invertY{invertY}
     , _samplingMode{samplingMode}
     , samplingMode{this, &Texture::get_samplingMode}
+    , invertY{this, &Texture::get_invertY}
     , onLoadObservable{this, &Texture::get_onLoadObservable}
     , _format{format}
     , _isBlocking{true}
@@ -135,6 +136,11 @@ bool Texture::get_isBlocking() const
 unsigned int Texture::get_samplingMode() const
 {
   return _samplingMode;
+}
+
+bool Texture::get_invertY() const
+{
+  return _invertY;
 }
 
 bool Texture::get_noMipmap() const
@@ -417,13 +423,14 @@ void Texture::dispose()
 }
 
 TexturePtr Texture::CreateFromBase64String(
-  const std::string& data, const std::string& name, Scene* scene, bool noMipmap,
-  bool invertY, unsigned int samplingMode, const std::function<void()>& onLoad,
+  const std::string& data, const std::string& iName, Scene* scene,
+  bool noMipmap, bool invertY, unsigned int samplingMode,
+  const std::function<void()>& onLoad,
   const std::function<void(const std::string& message,
                            const std::string& exception)>& onError,
   unsigned int format)
 {
-  return Texture::New("data:" + name, scene, noMipmap, invertY, samplingMode,
+  return Texture::New("data:" + iName, scene, noMipmap, invertY, samplingMode,
                       onLoad, onError, data, false, format);
 }
 
@@ -462,7 +469,7 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
         mirrorTexture->mirrorPlane = Plane::FromArray(
           json_util::get_array<float>(parsedTexture, "mirrorPlane"));
 
-        return std::move(mirrorTexture);
+        return mirrorTexture;
       }
       else if (json_util::has_key(parsedTexture, "isRenderTarget")
                && !json_util::is_null(parsedTexture["isRenderTarget"])
@@ -474,7 +481,7 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
         renderTargetTexture->_waitingRenderList
           = json_util::get_array<std::string>(parsedTexture, "renderList");
 
-        return std::move(renderTargetTexture);
+        return renderTargetTexture;
       }
       else {
         TexturePtr texture = nullptr;
@@ -521,7 +528,7 @@ BaseTexturePtr Texture::Parse(const json& parsedTexture, Scene* scene,
     }
   }
 
-  return std::move(texture);
+  return texture;
 }
 
 TexturePtr Texture::LoadFromDataString(

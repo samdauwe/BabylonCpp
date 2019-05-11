@@ -272,7 +272,7 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
     result.pickedPoint
       = Vector3::TransformCoordinates(pickedPoint, Tmp::MatrixArray[0]);
 
-    return std::move(result);
+    return result;
   }
 
   return std::nullopt;

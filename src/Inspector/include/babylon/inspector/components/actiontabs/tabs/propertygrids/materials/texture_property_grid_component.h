@@ -10,6 +10,7 @@
 #include <babylon/inspector/components/actiontabs/lines/options_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/slider_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
+#include <babylon/inspector/components/actiontabs/lines/texture_line_component.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/hdr_cube_texture.h>
 #include <babylon/materials/textures/texture.h>
@@ -19,7 +20,8 @@ namespace BABYLON {
 
 struct BABYLON_SHARED_EXPORT TexturePropertyGridComponent {
 
-  static void render(const BaseTexturePtr& texture)
+  static void render(const BaseTexturePtr& texture,
+                     TextureReservedDataStore& textureReservedDataStore)
   {
     static std::vector<std::pair<const char*, unsigned int>> samplingMode{
       {"Nearest", TextureConstants::NEAREST_NEAREST},
@@ -47,6 +49,7 @@ struct BABYLON_SHARED_EXPORT TexturePropertyGridComponent {
     static auto previewContainerOpened = true;
     ImGui::SetNextTreeNodeOpen(previewContainerOpened, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("PREVIEW")) {
+      TextureLineComponent::render(texture, textureReservedDataStore);
       previewContainerOpened = true;
     }
     else {

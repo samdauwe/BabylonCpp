@@ -12,8 +12,8 @@
 #include <babylon/mesh/mesh.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/particles/particle_system.h>
-#include <babylon/postprocess/post_process.h>
-#include <babylon/postprocess/post_process_manager.h>
+#include <babylon/postprocesses/post_process.h>
+#include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/rendering/rendering_manager.h>
 #include <babylon/tools/tools.h>
 
@@ -495,9 +495,9 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
   for (auto& particleSystem : scene->particleSystems) {
     if (!particleSystem->isStarted() || !particleSystem->hasEmitter()
-        || !(std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
-             && std::get<AbstractMeshPtr>(particleSystem->emitter)
-                  ->isEnabled())) {
+        || !(
+          std::holds_alternative<AbstractMeshPtr>(particleSystem->emitter)
+          && std::get<AbstractMeshPtr>(particleSystem->emitter)->isEnabled())) {
       continue;
     }
     if (stl_util::index_of(

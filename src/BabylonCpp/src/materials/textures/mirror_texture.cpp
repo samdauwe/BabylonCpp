@@ -8,7 +8,7 @@
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/image_processing_configuration.h>
-#include <babylon/postprocess/blur_post_process.h>
+#include <babylon/postprocesses/blur_post_process.h>
 
 namespace BABYLON {
 
