@@ -17,7 +17,7 @@
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
-#include <babylon/postprocess/post_process.h>
+#include <babylon/postprocesses/post_process.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

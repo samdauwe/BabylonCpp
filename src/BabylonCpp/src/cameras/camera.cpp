@@ -17,8 +17,8 @@
 #include <babylon/engine/scene.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
-#include <babylon/postprocess/pass_post_process.h>
-#include <babylon/postprocess/post_process.h>
+#include <babylon/postprocesses/pass_post_process.h>
+#include <babylon/postprocesses/post_process.h>
 #include <babylon/tools/serialization_helper.h>
 #include <babylon/tools/tools.h>
 

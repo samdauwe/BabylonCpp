@@ -67,10 +67,10 @@
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/physics/physics_engine_component.h>
-#include <babylon/postprocess/post_process.h>
-#include <babylon/postprocess/post_process_manager.h>
-#include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager.h>
-#include <babylon/postprocess/renderpipeline/post_process_render_pipeline_manager_scene_component.h>
+#include <babylon/postprocesses/post_process.h>
+#include <babylon/postprocesses/post_process_manager.h>
+#include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager.h>
+#include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager_scene_component.h>
 #include <babylon/probes/reflection_probe.h>
 #include <babylon/rendering/bounding_box_renderer.h>
 #include <babylon/rendering/depth_renderer.h>

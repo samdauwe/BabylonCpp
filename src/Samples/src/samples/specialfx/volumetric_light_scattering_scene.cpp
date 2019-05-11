@@ -8,7 +8,7 @@
 //#include <babylon/materials/textures/texture_constants.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/mesh/mesh.h>
-#include <babylon/postprocess/volumetric_light_scattering_post_process.h>
+#include <babylon/postprocesses/volumetric_light_scattering_post_process.h>
 
 namespace BABYLON {
 namespace Samples {

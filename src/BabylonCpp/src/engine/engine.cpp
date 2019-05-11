@@ -38,9 +38,9 @@
 #include <babylon/mesh/abstract_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
 #include <babylon/particles/particle_system.h>
-#include <babylon/postprocess/pass_post_process.h>
-#include <babylon/postprocess/post_process.h>
-#include <babylon/postprocess/post_process_manager.h>
+#include <babylon/postprocesses/pass_post_process.h>
+#include <babylon/postprocesses/post_process.h>
+#include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/states/_alpha_state.h>
 #include <babylon/states/_depth_culling_state.h>
 #include <babylon/states/_stencil_state.h>

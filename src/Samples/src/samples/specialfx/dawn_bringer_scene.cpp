@@ -7,7 +7,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/mesh/mesh.h>
-#include <babylon/postprocess/post_process.h>
+#include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 namespace Samples {

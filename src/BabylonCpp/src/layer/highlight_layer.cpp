@@ -19,10 +19,10 @@
 #include <babylon/mesh/_instances_batch.h>
 #include <babylon/mesh/sub_mesh.h>
 #include <babylon/mesh/vertex_buffer.h>
-#include <babylon/postprocess/blur_post_process.h>
-#include <babylon/postprocess/glow_blur_post_process.h>
-#include <babylon/postprocess/pass_post_process.h>
-#include <babylon/postprocess/post_process_manager.h>
+#include <babylon/postprocesses/blur_post_process.h>
+#include <babylon/postprocesses/glow_blur_post_process.h>
+#include <babylon/postprocesses/pass_post_process.h>
+#include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/states/_stencil_state.h>
 #include <babylon/tools/tools.h>
 

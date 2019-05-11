@@ -1592,7 +1592,7 @@ VertexBufferPtr& GLTFLoader::_loadVertexAccessorAsync(
   else if (accessor.byteOffset
            && static_cast<unsigned int>(*accessor.byteOffset)
                   % VertexBuffer::GetTypeByteLength(
-                      static_cast<unsigned int>(accessor.componentType))
+                    static_cast<unsigned int>(accessor.componentType))
                 != 0) {
     BABYLON_LOG_WARN(
       "GLTFLoader",
@@ -1748,7 +1748,7 @@ MaterialPtr GLTFLoader::_createDefaultMaterial(const std::string& name,
   babylonMaterial->transparencyMode           = PBRMaterial::PBRMATERIAL_OPAQUE;
   babylonMaterial->metallic                   = 1.f;
   babylonMaterial->roughness                  = 1.f;
-  return std::move(babylonMaterial);
+  return babylonMaterial;
 }
 
 MaterialPtr GLTFLoader::createMaterial(const std::string& context,
@@ -2025,7 +2025,7 @@ BaseTexturePtr GLTFLoader::_loadTextureAsync(
     promise();
   }
 
-  return std::move(babylonTexture);
+  return babylonTexture;
 }
 
 _ISamplerData GLTFLoader::_loadSampler(const std::string& context,

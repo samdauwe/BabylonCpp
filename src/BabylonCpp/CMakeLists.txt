@@ -133,9 +133,9 @@ file(GLOB PHYSICS_HDR_FILES         ${INCLUDE_PATH}/physics/*.h
                                     ${INCLUDE_PATH}/physics/helper/*.h
                                     ${INCLUDE_PATH}/physics/joint/*.h
                                     ${INCLUDE_PATH}/physics/plugins/*.h)
-file(GLOB POSTPROCESS_HDR_FILES     ${INCLUDE_PATH}/postprocess/*.h
-                                    ${INCLUDE_PATH}/postprocess/renderpipeline/*.h
-                                    ${INCLUDE_PATH}/postprocess/renderpipeline/pipelines/*.h)
+file(GLOB POSTPROCESSES_HDR_FILES   ${INCLUDE_PATH}/postprocesses/*.h
+                                    ${INCLUDE_PATH}/postprocesses/renderpipeline/*.h
+                                    ${INCLUDE_PATH}/postprocesses/renderpipeline/pipelines/*.h)
 file(GLOB PROBES_HDR_FILES          ${INCLUDE_PATH}/probes/*.h)
 file(GLOB RENDERING_HDR_FILES       ${INCLUDE_PATH}/rendering/*.h)
 file(GLOB SHADERS_HDR_FILES         ${INCLUDE_PATH}/shaders/*.h
@@ -191,7 +191,7 @@ set(BABYLON_HEADERS
     ${MORPH_HDR_FILES}
     ${PARTICLES_HDR_FILES}
     ${PHYSICS_HDR_FILES}
-    ${POSTPROCESS_HDR_FILES}
+    ${POSTPROCESSES_HDR_FILES}
     ${PROBES_HDR_FILES}
     ${RENDERING_HDR_FILES}
     ${SHADERS_HDR_FILES}
@@ -259,9 +259,9 @@ file(GLOB PHYSICS_SRC_FILES         ${SOURCE_PATH}/physics/*.cpp
                                     ${SOURCE_PATH}/physics/helper/*.cpp
                                     ${SOURCE_PATH}/physics/joint/*.cpp
                                     ${SOURCE_PATH}/physics/plugins/*.cpp)
-file(GLOB POSTPROCESS_SRC_FILES     ${SOURCE_PATH}/postprocess/*.cpp
-                                    ${SOURCE_PATH}/postprocess/renderpipeline/*.cpp
-                                    ${SOURCE_PATH}/postprocess/renderpipeline/pipelines/*.cpp)
+file(GLOB POSTPROCESSES_SRC_FILES   ${SOURCE_PATH}/postprocesses/*.cpp
+                                    ${SOURCE_PATH}/postprocesses/renderpipeline/*.cpp
+                                    ${SOURCE_PATH}/postprocesses/renderpipeline/pipelines/*.cpp)
 file(GLOB PROBES_SRC_FILES          ${SOURCE_PATH}/probes/*.cpp)
 file(GLOB RENDERING_SRC_FILES       ${SOURCE_PATH}/rendering/*.cpp)
 file(GLOB SPRITES_SRC_FILES         ${SOURCE_PATH}/sprites/*.cpp)
@@ -313,7 +313,7 @@ set(BABYLON_SOURCES
     ${MORPH_SRC_FILES}
     ${PARTICLES_SRC_FILES}
     ${PHYSICS_SRC_FILES}
-    ${POSTPROCESS_SRC_FILES}
+    ${POSTPROCESSES_SRC_FILES}
     ${PROBES_SRC_FILES}
     ${RENDERING_SRC_FILES}
     ${SHADERS_SRC_FILES}

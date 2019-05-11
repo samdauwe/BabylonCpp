@@ -16,8 +16,8 @@
 #include <babylon/math/scalar.h>
 #include <babylon/math/spherical_polynomial.h>
 #include <babylon/math/vector3.h>
-#include <babylon/postprocess/post_process.h>
-#include <babylon/postprocess/post_process_manager.h>
+#include <babylon/postprocesses/post_process.h>
+#include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/tools/environment_texture_info.h>
 #include <babylon/tools/tools.h>
 
