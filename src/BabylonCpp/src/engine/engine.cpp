@@ -41,6 +41,7 @@
 #include <babylon/postprocesses/pass_post_process.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
+#include <babylon/shaders/shadersinclude/glsl_version_3.h>
 #include <babylon/states/_alpha_state.h>
 #include <babylon/states/_depth_culling_state.h>
 #include <babylon/states/_stencil_state.h>
@@ -2076,7 +2077,7 @@ std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
   onBeforeShaderCompilationObservable.notifyObservers(this);
 
   const std::string shaderVersion
-    = (_webGLVersion > 1.f) ? "#version 300 es\n#define WEBGL2 \n" : "";
+    = (_webGLVersion > 1.f) ? BABYLONCPP_GLSL_VERSION_3 "#define WEBGL2 \n" : "";
   auto vertexShader
     = _compileShader(vertexCode, "vertex", defines, shaderVersion);
   auto fragmentShader

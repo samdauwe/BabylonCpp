@@ -38,6 +38,9 @@ TEST(TestFutureThen, AsyncContinuation)
 {
   using namespace BABYLON;
 
+#ifndef __APPLE__
+  // TODO: these tests may fail under OSX (with a 30% chance of failure)
+  // thread_id might sometimes be the same (even if forcing std::launch::async policy)
   {
     auto task1
       = std::async([] { return thread_id_string(std::this_thread::get_id()); });
@@ -56,6 +59,7 @@ TEST(TestFutureThen, AsyncContinuation)
 
     task3.wait();
   }
+#endif
 
   {
     auto task1 = std::async(std::launch::async, [] { return 1; });

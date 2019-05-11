@@ -1,12 +1,14 @@
 ﻿#ifndef BABYLON_SHADERS_GPU_RENDER_PARTICLES_FRAGMENT_FX_H
 #define BABYLON_SHADERS_GPU_RENDER_PARTICLES_FRAGMENT_FX_H
 
+#include <babylon/shaders/shadersinclude/glsl_version_3.h>
+
 namespace BABYLON {
 
 extern const char* gpuRenderParticlesPixelShader;
 
 const char* gpuRenderParticlesPixelShader
-  = "#version 300 es\n"
+  = BABYLONCPP_GLSL_VERSION_3
     "\n"
     "uniform sampler2D textureSampler;\n"
     "\n"

@@ -35,7 +35,7 @@ Debug build:
 python cmake_build.py all --mode=debug
 ```
 
-## <img src="./assets/images/linuxlogo.png" alt="" height="32px"> Linux ##
+## <img src="./assets/images/linuxlogo.png" alt="" height="32px"> Linux / OSX
 
 [![Build Status](https://travis-ci.org/samdauwe/BabylonCpp.svg?branch=master)](https://travis-ci.org/samdauwe/BabylonCpp)
 
