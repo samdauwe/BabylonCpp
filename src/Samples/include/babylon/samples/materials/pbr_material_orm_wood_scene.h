@@ -24,7 +24,7 @@ struct PBRMaterialORMWoodScene : public IRenderableScene {
   const char* getName() override;
   void initializeScene(ICanvas* canvas, Scene* scene) override;
 
-}; // end of struct PBRMaterialScene
+}; // end of struct PBRMaterialORMWoodScene
 
 } // end of namespace Samples
 } // end of namespace BABYLON
