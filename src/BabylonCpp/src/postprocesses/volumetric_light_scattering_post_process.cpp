@@ -6,6 +6,7 @@
 #include <babylon/core/string.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/effect.h>
@@ -22,13 +23,13 @@ namespace BABYLON {
 
 VolumetricLightScatteringPostProcess::VolumetricLightScatteringPostProcess(
   const std::string& iName, float ratio, const CameraPtr& camera,
-  const MeshPtr& iMesh, unsigned int samples, unsigned int samplingMode,
+  const MeshPtr& iMesh, unsigned int iSamples, unsigned int samplingMode,
   Engine* engine, bool reusable, Scene* scene)
     : PostProcess(
       iName, "volumetricLightScattering",
       {"decay", "exposure", "weight", "meshPositionOnScreen", "density"},
       {"lightScatteringSampler"}, ratio, camera, samplingMode, engine, reusable,
-      "#define NUM_SAMPLES " + std::to_string(samples))
+      "#define NUM_SAMPLES " + std::to_string(iSamples))
     , attachedNode{nullptr}
     , customMeshPosition{Vector3::Zero()}
     , useCustomMeshPosition{false}
@@ -211,7 +212,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
     ISize(
       static_cast<int>(static_cast<float>(engine->getRenderWidth()) * ratio),
       static_cast<int>(static_cast<float>(engine->getRenderHeight()) * ratio)),
-    scene, false, true, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    scene, false, true, Constants::TEXTURETYPE_UNSIGNED_INT);
   _volumetricLightScatteringRTT->wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->wrapV = TextureConstants::CLAMP_ADDRESSMODE;
   _volumetricLightScatteringRTT->renderList().clear();
@@ -383,11 +384,11 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
                     });
 
           // Render sub meshes
-          pEngine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+          pEngine->setAlphaMode(Constants::ALPHA_COMBINE);
           for (const auto& subMesh : sortedArray) {
             renderSubMesh(subMesh);
           }
-          pEngine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+          pEngine->setAlphaMode(Constants::ALPHA_DISABLE);
         }
       };
 }
@@ -421,14 +422,13 @@ void VolumetricLightScatteringPostProcess::_updateMeshScreenCoordinates(
   }
 }
 
-MeshPtr
-VolumetricLightScatteringPostProcess::CreateDefaultMesh(const std::string& name,
-                                                        Scene* scene)
+MeshPtr VolumetricLightScatteringPostProcess::CreateDefaultMesh(
+  const std::string& iName, Scene* scene)
 {
-  auto mesh           = Mesh::CreatePlane(name, 1.f, scene);
+  auto mesh           = Mesh::CreatePlane(iName, 1.f, scene);
   mesh->billboardMode = AbstractMesh::BILLBOARDMODE_ALL;
 
-  auto material           = StandardMaterial::New(name + "Material", scene);
+  auto material           = StandardMaterial::New(iName + "Material", scene);
   material->emissiveColor = Color3(1.f, 1.f, 1.f);
 
   mesh->material = material;

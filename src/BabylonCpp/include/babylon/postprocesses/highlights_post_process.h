@@ -2,7 +2,7 @@
 #define BABYLON_POSTPROCESSES_HIGHLIGHTS_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/engine_constants.h>
+#include <babylon/engine/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
@@ -34,7 +34,7 @@ public:
                         const CameraPtr& camera, unsigned int samplingMode,
                         Engine* engine, bool reusable = false,
                         unsigned int textureType
-                        = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+                        = Constants::TEXTURETYPE_UNSIGNED_INT);
   ~HighlightsPostProcess();
 
 }; // end of class HighlightsPostProcess

@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESSES_TONEMAP_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/engine/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
@@ -28,10 +29,10 @@ public:
                      const TonemappingOperator& operator_,
                      float exposureAdjustment, const CameraPtr& camera,
                      unsigned int samplingMode
-                     = TextureConstants::BILINEAR_SAMPLINGMODE,
+                     = Constants::TEXTURE_BILINEAR_SAMPLINGMODE,
                      Engine* engine = nullptr,
                      unsigned int textureFormat
-                     = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+                     = Constants::TEXTURETYPE_UNSIGNED_INT);
   virtual ~TonemapPostProcess();
 
 private:

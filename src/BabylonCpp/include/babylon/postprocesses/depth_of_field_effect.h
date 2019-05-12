@@ -43,6 +43,12 @@ public:
   ~DepthOfFieldEffect();
 
   /**
+   * @brief Get the current class name of the current effet.
+   * @returns "DepthOfFieldEffect"
+   */
+  std::string getClassName() const;
+
+  /**
    * @brief Disposes each of the internal effects for a given camera.
    * @param camera The camera to dispose the effect on.
    */
@@ -87,7 +93,7 @@ protected:
   float get_focalLength() const;
 
   /**
-   * @brief F-Stop of the effect's camera. The diamater of the resulting
+   * @brief F-Stop of the effect's camera. The diameter of the resulting
    * aperture can be computed by lensSize/fStop. (default: 1.4).
    */
   void set_fStop(float value);
@@ -132,7 +138,7 @@ public:
   Property<DepthOfFieldEffect, float> focalLength;
 
   /**
-   * F-Stop of the effect's camera. The diamater of the resulting aperture can
+   * F-Stop of the effect's camera. The diameter of the resulting aperture can
    * be computed by lensSize/fStop. (default: 1.4)
    */
   Property<DepthOfFieldEffect, float> fStop;

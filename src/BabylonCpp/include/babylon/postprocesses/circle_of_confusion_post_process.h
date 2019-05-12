@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESSES_CIRCLE_OF_CONFUSION_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/engine/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
@@ -43,7 +44,7 @@ public:
     const std::variant<float, PostProcessOptions>& options,
     const CameraPtr& camera, unsigned int samplingMode = 0,
     Engine* engine = nullptr, bool reusable = false,
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
     bool blockCompilation    = false);
   ~CircleOfConfusionPostProcess();
 

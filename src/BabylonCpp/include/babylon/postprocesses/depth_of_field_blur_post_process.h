@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESSES_DEPTH_OF_FIELD_BLUR_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/engine/constants.h>
 #include <babylon/postprocesses/blur_post_process.h>
 
 namespace BABYLON {
@@ -63,9 +64,9 @@ protected:
     float kernel, const std::variant<float, PostProcessOptions>& options,
     const CameraPtr& camera, PostProcess* circleOfConfusion,
     PostProcess* imageToBlur  = nullptr,
-    unsigned int samplingMode = TextureConstants::BILINEAR_SAMPLINGMODE,
+    unsigned int samplingMode = Constants::TEXTURE_BILINEAR_SAMPLINGMODE,
     Engine* engine = nullptr, bool reusable = false,
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
     bool blockCompilation    = false);
 
 }; // end of class DepthOfFieldBlurPostProcess

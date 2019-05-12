@@ -102,16 +102,12 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
   }
 
   // Merge blurred images with original image based on circleOfConfusion
-#if 0
-  _dofMerge = std::make_unique<DepthOfFieldMergePostProcess>(
-    "dofMerge", _circleOfConfusion.get(), _circleOfConfusion.get(),
-    stl_util::to_raw_ptr_vector(_depthOfFieldBlurX),
-    ToVariant<float, PostProcessOptions>(ratio), nullptr,
-    TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    pipelineTextureType, blockCompilation);
+  _dofMerge = DepthOfFieldMergePostProcess::New(
+    "dofMerge", _circleOfConfusion, _circleOfConfusion, _depthOfFieldBlurX,
+    ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(),
+    false, pipelineTextureType, blockCompilation);
   _dofMerge->autoClear = false;
-  _effects.emplace_back(_dofMerge.get());
-#endif
+  _effects.emplace_back(_dofMerge);
 }
 
 DepthOfFieldEffect::~DepthOfFieldEffect()
@@ -156,6 +152,11 @@ void DepthOfFieldEffect::set_lensSize(float value)
 float DepthOfFieldEffect::get_lensSize() const
 {
   return _circleOfConfusion->lensSize;
+}
+
+std::string DepthOfFieldEffect::getClassName() const
+{
+  return "DepthOfFieldEffect";
 }
 
 void DepthOfFieldEffect::set_depthTexture(const RenderTargetTexturePtr& value)

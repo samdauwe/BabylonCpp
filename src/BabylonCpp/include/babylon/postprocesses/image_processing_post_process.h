@@ -2,7 +2,7 @@
 #define BABYLON_POSTPROCESSES_IMAGE_PROCESSING_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/engine_constants.h>
+#include <babylon/engine/constants.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/postprocesses/post_process.h>
 
@@ -47,7 +47,7 @@ protected:
   ImageProcessingPostProcess(
     const std::string& name, float renderRatio, const CameraPtr& camera,
     unsigned int samplingMode, Engine* engine, bool reusable = false,
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
     ImageProcessingConfiguration* imageProcessingConfiguration = nullptr);
 
   /**
@@ -128,6 +128,16 @@ protected:
    * @brief Sets wether tonemapping is enabled or not
    */
   void set_toneMappingEnabled(bool value);
+
+  /**
+   * @brief Gets the type of tone mapping effect.
+   */
+  unsigned int get_toneMappingType() const;
+
+  /**
+   * @brief Sets the type of tone mapping effect.
+   */
+  void set_toneMappingType(unsigned int value);
 
   /**
    * @brief Gets contrast used in the effect.
@@ -276,9 +286,14 @@ public:
   Property<ImageProcessingPostProcess, float> exposure;
 
   /**
-   * Wwether tonemapping is enabled or not.
+   * Wether tonemapping is enabled or not.
    */
   Property<ImageProcessingPostProcess, bool> toneMappingEnabled;
+
+  /**
+   * The type of tone mapping effect
+   */
+  Property<ImageProcessingPostProcess, unsigned int> toneMappingType;
 
   /**
    * Contrast used in the effect.

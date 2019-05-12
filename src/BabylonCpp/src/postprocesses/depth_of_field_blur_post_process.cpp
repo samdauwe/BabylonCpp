@@ -7,15 +7,15 @@
 namespace BABYLON {
 
 DepthOfFieldBlurPostProcess::DepthOfFieldBlurPostProcess(
-  const std::string& name, Scene* scene, const Vector2& direction, float kernel,
-  const std::variant<float, PostProcessOptions>& options,
+  const std::string& iName, Scene* scene, const Vector2& iDirection,
+  float iKernel, const std::variant<float, PostProcessOptions>& options,
   const CameraPtr& camera, PostProcess* circleOfConfusion,
   PostProcess* imageToBlur, unsigned int samplingMode, Engine* engine,
   bool reusable, unsigned int textureType, bool blockCompilation)
     : BlurPostProcess{
-        name,        direction,           kernel,          options,
-        camera,      samplingMode,        engine,          reusable,
-        textureType, "#define DOF 1\r\n", blockCompilation}
+      iName,       iDirection,          iKernel,         options,
+      camera,      samplingMode,        engine,          reusable,
+      textureType, "#define DOF 1\r\n", blockCompilation}
 {
   onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
     if (imageToBlur != nullptr) {

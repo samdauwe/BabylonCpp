@@ -9,11 +9,11 @@
 namespace BABYLON {
 
 CircleOfConfusionPostProcess::CircleOfConfusionPostProcess(
-  const std::string& name, RenderTargetTexture* depthTexture,
+  const std::string& iName, RenderTargetTexture* depthTexture,
   const std::variant<float, PostProcessOptions>& options,
   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
   bool reusable, unsigned int textureType, bool blockCompilation)
-    : PostProcess{name,
+    : PostProcess{iName,
                   "circleOfConfusion",
                   {"cameraMinMaxZ", "focusDistance", "cocPrecalculation"},
                   {"depthSampler"},

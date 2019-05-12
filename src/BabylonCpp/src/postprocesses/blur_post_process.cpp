@@ -243,7 +243,7 @@ float BlurPostProcess::_nearestBestKernel(float idealKernel) const
 
 float BlurPostProcess::_gaussianWeight(float x) const
 {
-  // reference: Engine/ImageProcessingBlur.cpp #dcc760
+  // reference: Engines/ImageProcessingBlur.cpp #dcc760
   // We are evaluating the Gaussian (normal) distribution over a kernel
   // parameter space of [-1,1], so we truncate at three standard deviations by
   // setting stddev (sigma) to 1/3. The choice of 3-sigma truncation is common

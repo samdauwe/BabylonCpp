@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESSES_FXAA_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/engine/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/postprocesses/post_process.h>
 
@@ -35,7 +36,7 @@ protected:
                   = TextureConstants::BILINEAR_SAMPLINGMODE,
                   Engine* engine = nullptr, bool reusable = false,
                   unsigned int textureType
-                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+                  = Constants::TEXTURETYPE_UNSIGNED_INT);
 
 private:
   std::string _getDefines();

@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/materials/material.h>
@@ -199,7 +200,7 @@ void PostProcessManager::_finalizeFrame(
   // Restore states
   engine->setDepthBuffer(true);
   engine->setDepthWrite(true);
-  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+  engine->setAlphaMode(Constants::ALPHA_DISABLE);
 }
 
 void PostProcessManager::dispose()

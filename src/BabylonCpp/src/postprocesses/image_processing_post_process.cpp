@@ -38,6 +38,8 @@ ImageProcessingPostProcess::ImageProcessingPostProcess(
     , toneMappingEnabled{this,
                          &ImageProcessingPostProcess::get_toneMappingEnabled,
                          &ImageProcessingPostProcess::set_toneMappingEnabled}
+    , toneMappingType{this, &ImageProcessingPostProcess::get_toneMappingType,
+                      &ImageProcessingPostProcess::set_toneMappingType}
     , contrast{this, &ImageProcessingPostProcess::get_contrast,
                &ImageProcessingPostProcess::set_contrast}
     , vignetteStretch{this, &ImageProcessingPostProcess::get_vignetteStretch,
@@ -216,6 +218,16 @@ bool ImageProcessingPostProcess::get_toneMappingEnabled() const
 void ImageProcessingPostProcess::set_toneMappingEnabled(bool value)
 {
   _imageProcessingConfiguration->toneMappingEnabled = value;
+}
+
+unsigned int ImageProcessingPostProcess::get_toneMappingType() const
+{
+  return _imageProcessingConfiguration->toneMappingType();
+}
+
+void ImageProcessingPostProcess::set_toneMappingType(unsigned int value)
+{
+  _imageProcessingConfiguration->toneMappingType = value;
 }
 
 float ImageProcessingPostProcess::get_contrast() const

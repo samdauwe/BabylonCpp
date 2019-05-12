@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESSES_GRAIN_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/engine/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
@@ -50,7 +51,7 @@ protected:
                    const CameraPtr& camera, unsigned int samplingMode,
                    Engine* engine, bool reusable = false,
                    unsigned int textureType
-                   = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+                   = Constants::TEXTURETYPE_UNSIGNED_INT,
                    bool blockCompilation = false);
 
 public:

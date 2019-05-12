@@ -2,6 +2,7 @@
 #define BABYLON_POSTPROCESSES_BLUR_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/engine/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/vector2.h>
 #include <babylon/postprocesses/post_process.h>
@@ -84,7 +85,7 @@ protected:
                   std::optional<unsigned int> samplingMode = std::nullopt,
                   Engine* engine = nullptr, bool reusable = false,
                   unsigned int textureType
-                  = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+                  = Constants::TEXTURETYPE_UNSIGNED_INT,
                   const std::string& defines = "",
                   bool blockCompilation      = false);
 

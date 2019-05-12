@@ -2,9 +2,14 @@
 #define BABYLON_POSTPROCESSES_DEPTH_OF_FIELD_MERGE_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/engine/constants.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
+
+class DepthOfFieldMergePostProcess;
+using DepthOfFieldMergePostProcessPtr
+  = std::shared_ptr<DepthOfFieldMergePostProcess>;
 
 /**
  * @brief The DepthOfFieldMergePostProcess merges blurred images with the
@@ -13,38 +18,12 @@ namespace BABYLON {
 class BABYLON_SHARED_EXPORT DepthOfFieldMergePostProcess : public PostProcess {
 
 public:
-  /**
-   * @brief Creates a new instance of DepthOfFieldMergePostProcess.
-   * @param name The name of the effect.
-   * @param originalFromInput Post process which's input will be used for the
-   * merge.
-   * @param circleOfConfusion Circle of confusion post process which's output
-   * will be used to blur each pixel.
-   * @param blurSteps Blur post processes from low to high which will be mixed
-   * with the original image.
-   * @param options The required width/height ratio to downsize to before
-   * computing the render pass.
-   * @param camera The camera to apply the render pass to.
-   * @param samplingMode The sampling mode to be used when computing the pass.
-   * (default: 0)
-   * @param engine The engine which the post process will be applied. (default:
-   * current engine)
-   * @param reusable If the post process can be reused on the same frame.
-   * (default: false)
-   * @param textureType Type of textures used when performing the post process.
-   * (default: 0)
-   * @param blockCompilation If compilation of the shader should not be done in
-   * the constructor. The updateEffect method can be used to compile the shader
-   * at a later time. (default: false)
-   */
-  DepthOfFieldMergePostProcess(
-    const std::string& name, PostProcess* originalFromInput,
-    PostProcess* circleOfConfusion, const std::vector<PostProcess*>& blurSteps,
-    const std::variant<float, PostProcessOptions>& options,
-    const CameraPtr& camera, unsigned int samplingMode = 0,
-    Engine* engine = nullptr, bool reusable = false,
-    unsigned int textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
-    bool blockCompilation    = false);
+  template <typename... Ts>
+  static DepthOfFieldMergePostProcessPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<DepthOfFieldMergePostProcess>(
+      new DepthOfFieldMergePostProcess(std::forward<Ts>(args)...));
+  }
   ~DepthOfFieldMergePostProcess() override;
 
   /**
@@ -72,8 +51,43 @@ public:
       onError
     = nullptr) override;
 
+protected:
+  /**
+   * @brief Creates a new instance of DepthOfFieldMergePostProcess.
+   * @param name The name of the effect.
+   * @param originalFromInput Post process which's input will be used for the
+   * merge.
+   * @param circleOfConfusion Circle of confusion post process which's output
+   * will be used to blur each pixel.
+   * @param blurSteps Blur post processes from low to high which will be mixed
+   * with the original image.
+   * @param options The required width/height ratio to downsize to before
+   * computing the render pass.
+   * @param camera The camera to apply the render pass to.
+   * @param samplingMode The sampling mode to be used when computing the pass.
+   * (default: 0)
+   * @param engine The engine which the post process will be applied. (default:
+   * current engine)
+   * @param reusable If the post process can be reused on the same frame.
+   * (default: false)
+   * @param textureType Type of textures used when performing the post process.
+   * (default: 0)
+   * @param blockCompilation If compilation of the shader should not be done in
+   * the constructor. The updateEffect method can be used to compile the shader
+   * at a later time. (default: false)
+   */
+  DepthOfFieldMergePostProcess(
+    const std::string& name, const PostProcessPtr& originalFromInput,
+    const PostProcessPtr& circleOfConfusion,
+    const std::vector<PostProcessPtr>& blurSteps,
+    const std::variant<float, PostProcessOptions>& options,
+    const CameraPtr& camera, unsigned int samplingMode = 0,
+    Engine* engine = nullptr, bool reusable = false,
+    unsigned int textureType = Constants::TEXTURETYPE_UNSIGNED_INT,
+    bool blockCompilation    = false);
+
 private:
-  std::vector<PostProcess*> blurSteps;
+  std::vector<PostProcessPtr> blurSteps;
 
 }; // end of class DepthOfFieldMergePostProcess
 

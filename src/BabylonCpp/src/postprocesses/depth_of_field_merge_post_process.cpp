@@ -5,12 +5,13 @@
 namespace BABYLON {
 
 DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
-  const std::string& name, PostProcess* originalFromInput,
-  PostProcess* circleOfConfusion, const std::vector<PostProcess*>& iBlurSteps,
+  const std::string& iName, const PostProcessPtr& originalFromInput,
+  const PostProcessPtr& circleOfConfusion,
+  const std::vector<PostProcessPtr>& iBlurSteps,
   const std::variant<float, PostProcessOptions>& options,
   const CameraPtr& camera, unsigned int samplingMode, Engine* engine,
   bool reusable, unsigned int textureType, bool blockCompilation)
-    : PostProcess{name,
+    : PostProcess{iName,
                   "depthOfFieldMerge",
                   {},
                   {"circleOfConfusionSampler", "blurStep0", "blurStep1",
@@ -29,11 +30,13 @@ DepthOfFieldMergePostProcess::DepthOfFieldMergePostProcess(
 {
   onApplyObservable.add([&](Effect* effect, EventState& /*es*/) {
     effect->setTextureFromPostProcessOutput("circleOfConfusionSampler",
-                                            circleOfConfusion);
-    effect->setTextureFromPostProcess("textureSampler", originalFromInput);
+                                            circleOfConfusion.get());
+    effect->setTextureFromPostProcess("textureSampler",
+                                      originalFromInput.get());
     for (size_t index = 0; index < blurSteps.size(); ++index)
       effect->setTextureFromPostProcessOutput(
-        "blurStep" + std::to_string(blurSteps.size() - 1), blurSteps[index]);
+        "blurStep" + std::to_string(blurSteps.size() - 1),
+        blurSteps[index].get());
   });
 
   if (!blockCompilation) {
