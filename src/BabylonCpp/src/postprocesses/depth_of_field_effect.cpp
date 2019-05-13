@@ -101,9 +101,16 @@ DepthOfFieldEffect::DepthOfFieldEffect(Scene* scene,
     _effects.emplace_back(_depthOfFieldBlurX[i]);
   }
 
+  // Cast DepthOfFieldBlurPostProcess to PostProcess
+  std::vector<PostProcessPtr> castedDepthOfFieldBlurX;
+  for (const auto& depthOfFieldBlurX : _depthOfFieldBlurX) {
+    castedDepthOfFieldBlurX.emplace_back(
+      std::static_pointer_cast<PostProcess>(depthOfFieldBlurX));
+  }
+
   // Merge blurred images with original image based on circleOfConfusion
   _dofMerge = DepthOfFieldMergePostProcess::New(
-    "dofMerge", _circleOfConfusion, _circleOfConfusion, _depthOfFieldBlurX,
+    "dofMerge", _circleOfConfusion, _circleOfConfusion, castedDepthOfFieldBlurX,
     ratio, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(),
     false, pipelineTextureType, blockCompilation);
   _dofMerge->autoClear = false;

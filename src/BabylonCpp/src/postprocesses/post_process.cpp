@@ -29,10 +29,10 @@ PostProcess::PostProcess(
     , height{-1}
     , _outputTexture{nullptr}
     , autoClear{true}
-    , alphaMode{EngineConstants::ALPHA_DISABLE}
+    , alphaMode{Constants::ALPHA_DISABLE}
     , enablePixelPerfectMode{false}
     , forceFullscreenViewport{true}
-    , scaleMode{EngineConstants::SCALEMODE_FLOOR}
+    , scaleMode{Constants::SCALEMODE_FLOOR}
     , alwaysForcePOT{false}
     , samples{this, &PostProcess::get_samples, &PostProcess::set_samples}
     , onActivate{this, &PostProcess::set_onActivate}
@@ -98,10 +98,18 @@ void PostProcess::add(const PostProcessPtr& newPostProcess)
 {
   if (_camera) {
     _camera->attachPostProcess(newPostProcess);
+
+    _engine->postProcesses.emplace_back(newPostProcess);
+    uniqueId = _scene->getUniqueId();
   }
   else if (_engine) {
     _engine->postProcesses.emplace_back(newPostProcess);
   }
+}
+
+std::string PostProcess::getEffectName() const
+{
+  return _fragmentUrl;
 }
 
 unsigned int PostProcess::get_samples() const
@@ -194,6 +202,11 @@ Vector2 PostProcess::texelSize()
   }
 
   return _texelSize;
+}
+
+std::string PostProcess::getClassName() const
+{
+  return "PostProcess";
 }
 
 Engine* PostProcess::getEngine()
@@ -296,7 +309,7 @@ PostProcess::activate(const CameraPtr& camera,
       }
     }
 
-    if (renderTargetSamplingMode != TextureConstants::TRILINEAR_SAMPLINGMODE
+    if (renderTargetSamplingMode != Constants::TEXTURE_TRILINEAR_SAMPLINGMODE
         || alwaysForcePOT) {
       if (!std::holds_alternative<PostProcessOptions>(_options)) {
         desiredWidth
@@ -387,7 +400,7 @@ PostProcess::activate(const CameraPtr& camera,
   onActivateObservable.notifyObservers(camera.get());
 
   // Clear
-  if (autoClear && alphaMode == EngineConstants::ALPHA_DISABLE) {
+  if (autoClear && alphaMode == Constants::ALPHA_DISABLE) {
     _engine->clear(clearColor ? *clearColor : scene->clearColor,
                    scene->_allowPostProcessClearColor, true, true);
   }

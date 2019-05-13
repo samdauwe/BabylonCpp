@@ -5,9 +5,10 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/engine/engine_constants.h>
+#include <babylon/engine/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/color4.h>
+#include <babylon/misc/iinspectable.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
 
@@ -38,10 +39,10 @@ public:
       const std::vector<std::string>& samplers,
       const std::variant<float, PostProcessOptions>& options,
       const CameraPtr& camera,
-      unsigned int samplingMode = TextureConstants::NEAREST_SAMPLINGMODE,
+      unsigned int samplingMode = Constants::TEXTURE_NEAREST_SAMPLINGMODE,
       Engine* engine = nullptr, bool reusable = false,
       const std::string& defines   = "",
-      unsigned int textureType     = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+      unsigned int textureType     = Constants::TEXTURETYPE_UNSIGNED_INT,
       const std::string& vertexUrl = "postprocess",
       const std::unordered_map<std::string, unsigned int>& indexParameters = {},
       bool blockCompilation = false)
@@ -59,6 +60,12 @@ public:
   void add(const PostProcessPtr& newPostProcess);
 
   /**
+   * @brief Returns the fragment url or shader name used in the post process.
+   * @returns the fragment url or name in the shader store.
+   */
+  std::string getEffectName() const;
+
+  /**
    * @brief Gets the camera which post process is applied to.
    * @returns The camera the post process is applied to.
    */
@@ -69,6 +76,12 @@ public:
    * See https://en.wikipedia.org/wiki/Texel_(graphics)
    */
   Vector2 texelSize();
+
+  /**
+   * @brief Gets a string idenfifying the name of the class.
+   * @returns "PostProcess" string
+   */
+  std::string getClassName() const;
 
   /**
    * @brief Gets the engine which this post process belongs to.
@@ -283,6 +296,11 @@ protected:
 
 public:
   /**
+   * Gets or sets the unique id of the post process
+   */
+  size_t uniqueId;
+
+  /**
    * Name of the PostProcess
    */
   std::string name;
@@ -349,6 +367,13 @@ public:
    * Force the postprocess to be applied without taking in account viewport
    */
   bool forceFullscreenViewport;
+
+  /**
+   * List of inspectable custom properties (used by the Inspector)
+   * @see https://doc.babylonjs.com/how_to/debug_layer#extensibility
+   */
+  std::vector<IInspectable> inspectableCustomProperties;
+
   /**
    * Scale mode for the post process (default: Engine.SCALEMODE_FLOOR)
    *

@@ -511,6 +511,16 @@ protected:
 
   virtual bool _restoreStateValues();
 
+  /**
+   * @brief Gets the left camera of a rig setup in case of Rigged Camera.
+   */
+  bool get_isLeftCamera() const;
+
+  /**
+   * @brief Gets the right camera of a rig setup in case of Rigged Camera.
+   */
+  bool get_isRightCamera() const;
+
 private:
   /**
    * @brief Gets the current world space position of the camera.
@@ -690,6 +700,22 @@ public:
 
   /** Hidden */
   ReadOnlyProperty<Camera, Vector3> globalPosition;
+
+  /** Hidden */
+  bool _isLeftCamera;
+
+  /**
+   * Gets the left camera of a rig setup in case of Rigged Camera
+   */
+  ReadOnlyProperty<Camera, bool> isLeftCamera;
+
+  /** Hidden */
+  bool _isRightCamera;
+
+  /**
+   * Gets the right camera of a rig setup in case of Rigged Camera
+   */
+  ReadOnlyProperty<Camera, bool> isRightCamera;
 
 protected:
   Matrix _webvrViewMatrix;

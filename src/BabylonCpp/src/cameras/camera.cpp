@@ -50,6 +50,10 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , _alternateCamera{nullptr}
     , _projectionMatrix{Matrix()}
     , globalPosition{this, &Camera::get_globalPosition}
+    , _isLeftCamera{false}
+    , isLeftCamera{this, &Camera::get_isLeftCamera}
+    , _isRightCamera{true}
+    , isRightCamera{this, &Camera::get_isRightCamera}
     , _webvrViewMatrix{Matrix::Identity()}
     , _globalPosition{Vector3::Zero()}
     , _computedViewMatrix{Matrix::Identity()}
@@ -321,7 +325,7 @@ int Camera::attachPostProcess(const PostProcessPtr& postProcess, int insertAt)
       && stl_util::index_of(_postProcesses, postProcess) > -1) {
     BABYLON_LOG_WARN(
       "Camera",
-      "You're trying to reuse a post process not defined as reusable.");
+      "You're trying to reuse a post process not defined as reusable.")
     return 0;
   }
 
@@ -614,6 +618,16 @@ FreeCameraPtr Camera::rightCamera()
   return std::static_pointer_cast<FreeCamera>(_rigCameras[1]);
 }
 
+bool Camera::get_isLeftCamera() const
+{
+  return _isLeftCamera;
+}
+
+bool Camera::get_isRightCamera() const
+{
+  return _isRightCamera;
+}
+
 Vector3* Camera::getLeftTarget()
 {
   if (_rigCameras.size() < 1) {
@@ -654,21 +668,11 @@ void Camera::_updateWebVRCameraRotationMatrix()
   // Here for WebVR
 }
 
-/**
- * This function MUST be overwritten by the different WebVR cameras available.
- * The context in which it is running is the RIG camera. So 'this' is the
- * TargetCamera, left or right.
- */
 Matrix& Camera::_getWebVRProjectionMatrix()
 {
   return _webvrProjectionMatrix;
 }
 
-/**
- * This function MUST be overwritten by the different WebVR cameras available.
- * The context in which it is running is the RIG camera. So 'this' is the
- * TargetCamera, left or right.
- */
 Matrix& Camera::_getWebVRViewMatrix()
 {
   return _webvrViewMatrix;
@@ -683,19 +687,12 @@ void Camera::setCameraRigParameter(const std::string& _name, float value)
   }
 }
 
-/**
- * May needs to be overridden by children so sub has required properties
- * to be copied
- */
 CameraPtr Camera::createRigCamera(const std::string& /*name*/,
                                   int /*cameraIndex*/)
 {
   return nullptr;
 }
 
-/**
- * May needs to be overridden by children
- */
 void Camera::_updateRigCameras()
 {
   for (auto& rigCamera : _rigCameras) {
