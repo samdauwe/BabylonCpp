@@ -13,10 +13,12 @@ namespace BABYLON {
 
 struct DepthSortedParticle;
 class Mesh;
+class SolidParticleSystem;
 class Scene;
 class TargetCamera;
-using MeshPtr         = std::shared_ptr<Mesh>;
-using TargetCameraPtr = std::shared_ptr<TargetCamera>;
+using MeshPtr                = std::shared_ptr<Mesh>;
+using TargetCameraPtr        = std::shared_ptr<TargetCamera>;
+using SolidParticleSystemPtr = std::shared_ptr<SolidParticleSystem>;
 
 struct SolidParticleSystemOptions {
   bool updatable            = true;
@@ -58,31 +60,12 @@ struct SolidParticleSystemMeshBuilderOptions {
 class BABYLON_SHARED_EXPORT SolidParticleSystem : public IDisposable {
 
 public:
-  /**
-   * @brief Creates a SPS (Solid Particle System) object.
-   * @param name (String) is the SPS name, this will be the underlying mesh
-   * name.
-   * @param scene (Scene) is the scene in which the SPS is added.
-   * @param updatable (optional boolean, default true) : if the SPS must be
-   * updatable or immutable.
-   * @param isPickable (optional boolean, default false) : if the solid
-   * particles must be pickable.
-   * @param enableDepthSort (optional boolean, default false) : if the solid
-   * particles must be sorted in the geometry according to their distance to the
-   * camera.
-   * @param particleIntersection (optional boolean, default false) : if the
-   * solid particle intersections must be computed.
-   * @param boundingSphereOnly (optional boolean, default false) : if the
-   * particle intersection must be computed only with the bounding sphere (no
-   * bounding box computation, so faster).
-   * @param bSphereRadiusFactor (optional float, default 1.0) : a number to
-   * multiply the boundind sphere radius by in order to reduce it for instance.
-   * Example: bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere
-   * exactly matches a spherical mesh.
-   */
-  SolidParticleSystem(const std::string& name, Scene* scene,
-                      const std::optional<SolidParticleSystemOptions>& options
-                      = std::nullopt);
+  template <typename... Ts>
+  static SolidParticleSystemPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<SolidParticleSystem>(
+      new SolidParticleSystem(std::forward<Ts>(args)...));
+  }
   virtual ~SolidParticleSystem();
 
   /**
@@ -368,6 +351,33 @@ public:
    */
   virtual void afterUpdateParticles(unsigned int start, unsigned int stop,
                                     bool update);
+
+protected:
+  /**
+   * @brief Creates a SPS (Solid Particle System) object.
+   * @param name (String) is the SPS name, this will be the underlying mesh
+   * name.
+   * @param scene (Scene) is the scene in which the SPS is added.
+   * @param updatable (optional boolean, default true) : if the SPS must be
+   * updatable or immutable.
+   * @param isPickable (optional boolean, default false) : if the solid
+   * particles must be pickable.
+   * @param enableDepthSort (optional boolean, default false) : if the solid
+   * particles must be sorted in the geometry according to their distance to the
+   * camera.
+   * @param particleIntersection (optional boolean, default false) : if the
+   * solid particle intersections must be computed.
+   * @param boundingSphereOnly (optional boolean, default false) : if the
+   * particle intersection must be computed only with the bounding sphere (no
+   * bounding box computation, so faster).
+   * @param bSphereRadiusFactor (optional float, default 1.0) : a number to
+   * multiply the boundind sphere radius by in order to reduce it for instance.
+   * Example: bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere
+   * exactly matches a spherical mesh.
+   */
+  SolidParticleSystem(const std::string& name, Scene* scene,
+                      const std::optional<SolidParticleSystemOptions>& options
+                      = std::nullopt);
 
 private:
   /**

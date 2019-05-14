@@ -43,7 +43,7 @@ MeshPtr SPSTreeGenerator::CreateTree(
   // Create solid particle system for leaves
   SolidParticleSystemOptions spsOptions;
   spsOptions.updatable = false;
-  auto _leaves_SPS     = new SolidParticleSystem("leaveSPS", scene, spsOptions);
+  auto _leaves_SPS = SolidParticleSystem::New("leaveSPS", scene, spsOptions);
 
   // Function to position leaves on base tree
   auto _set_leaves = [&](SolidParticle* particle, unsigned int /*i*/,
@@ -101,11 +101,11 @@ MeshPtr SPSTreeGenerator::CreateTree(
   _leaf->dispose();
 
   // Create SPS to use with base tree mesh base.tree
-  auto _mini_trees_SPS = new SolidParticleSystem("miniSPS", scene, spsOptions);
+  auto _mini_trees_SPS = SolidParticleSystem::New("miniSPS", scene, spsOptions);
 
   // create SPS to use with leaves mesh
   auto _mini_leaves_SPS
-    = new SolidParticleSystem("minileavesSPS", scene, spsOptions);
+    = SolidParticleSystem::New("minileavesSPS", scene, spsOptions);
 
   // The mini base trees and leaves added to both the SPS systems have to be
   // positioned at the same places and angles.

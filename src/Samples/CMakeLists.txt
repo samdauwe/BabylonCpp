@@ -94,6 +94,7 @@ file(GLOB MATERIALS_LIBRARY_HDR_FILES               ${INCLUDE_PATH}/materialslib
 file(GLOB MESHES_HDR_FILES                          ${INCLUDE_PATH}/meshes/*.h
                                                     ${INCLUDE_PATH}/meshes/polygonmesh/*.h)
 file(GLOB OPTIMIZATIONS_HDR_FILES                   ${INCLUDE_PATH}/optimizations/*.h)
+file(GLOB PARTICLES_HDR_FILES                       ${INCLUDE_PATH}/particles/*.h)
 file(GLOB PROCEDURAL_TEXTURES_LIBRARY_HDR_FILES     ${INCLUDE_PATH}/proceduraltextureslibrary/*.h)
 file(GLOB SHADOWS_HDR_FILES                         ${INCLUDE_PATH}/shadows/*.h)
 file(GLOB SPECIAL_FX_HDR_FILES                      ${INCLUDE_PATH}/specialfx/*.h)
@@ -111,6 +112,7 @@ set(BABYLON_SAMPLES_HEADERS
     ${MATERIALS_LIBRARY_HDR_FILES}
     ${MESHES_HDR_FILES}
     ${OPTIMIZATIONS_HDR_FILES}
+    ${PARTICLES_HDR_FILES}
     ${PROCEDURAL_TEXTURES_LIBRARY_HDR_FILES}
     ${SHADOWS_HDR_FILES}
     ${SPECIAL_FX_HDR_FILES}
@@ -142,6 +144,7 @@ file(GLOB MATERIALS_LIBRARY_SRC_FILES               ${SOURCE_PATH}/materialslibr
 file(GLOB MESHES_SRC_FILES                          ${SOURCE_PATH}/meshes/*.cpp
                                                     ${SOURCE_PATH}/meshes/polygonmesh/*.cpp)
 file(GLOB OPTIMIZATIONS_SRC_FILES                   ${SOURCE_PATH}/optimizations/*.cpp)
+file(GLOB PARTICLES_SRC_FILES                       ${SOURCE_PATH}/particles/*.cpp)
 file(GLOB PROCEDURAL_TEXTURES_LIBRARY_SRC_FILES     ${SOURCE_PATH}/proceduraltextureslibrary/*.cpp)
 file(GLOB SHADOWS_SRC_FILES                         ${SOURCE_PATH}/shadows/*.cpp)
 file(GLOB SPECIAL_FX_SRC_FILES                      ${SOURCE_PATH}/specialfx/*.cpp)
@@ -159,6 +162,7 @@ set(BABYLON_SAMPLES_SOURCES
     ${MATERIALS_LIBRARY_SRC_FILES}
     ${MESHES_SRC_FILES}
     ${OPTIMIZATIONS_SRC_FILES}
+    ${PARTICLES_SRC_FILES}
     ${PROCEDURAL_TEXTURES_LIBRARY_SRC_FILES}
     ${SHADOWS_SRC_FILES}
     ${SPECIAL_FX_SRC_FILES}
