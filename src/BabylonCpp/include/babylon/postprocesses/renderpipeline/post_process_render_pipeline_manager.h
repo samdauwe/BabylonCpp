@@ -23,11 +23,16 @@ class BABYLON_SHARED_EXPORT PostProcessRenderPipelineManager {
 
 public:
   /**
-   * Initializes a PostProcessRenderPipelineManager.
+   * @brief Initializes a PostProcessRenderPipelineManager.
    * @see https://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
    */
   PostProcessRenderPipelineManager();
   ~PostProcessRenderPipelineManager();
+
+  /**
+   * @brief Gets the list of supported render pipelines.
+   */
+  std::vector<PostProcessRenderPipelinePtr> supportedPipelines();
 
   /**
    * @brief Adds a pipeline to the manager.

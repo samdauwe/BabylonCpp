@@ -97,9 +97,12 @@ void PostProcessRenderEffect::_detachCameras(
   for (auto& camera : cams) {
     auto cameraName = camera->name;
 
-    const auto cameraKey = _singleInstance ? "0" : cameraName;
-    for (auto& postProcess : _postProcesses[cameraKey]) {
-      camera->detachPostProcess(postProcess);
+    const auto cameraKey      = _singleInstance ? "0" : cameraName;
+    const auto& postProcesses = _postProcesses[cameraKey];
+    if (!postProcesses.empty()) {
+      for (auto& postProcess : postProcesses) {
+        camera->detachPostProcess(postProcess);
+      }
     }
 
     if (stl_util::contains(_cameras, cameraName)) {

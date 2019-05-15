@@ -64,8 +64,7 @@ protected:
   PostProcessRenderPipelineManagerSceneComponent(Scene* scene);
 
 private:
-  void _gatherRenderTargets(
-    const std::vector<RenderTargetTexturePtr>& renderTargets);
+  void _gatherRenderTargets();
 
 }; // end of class PostProcessRenderPipelineManagerSceneComponent
 

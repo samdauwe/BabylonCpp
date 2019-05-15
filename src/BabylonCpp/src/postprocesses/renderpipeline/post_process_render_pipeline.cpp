@@ -11,7 +11,10 @@ namespace BABYLON {
 PostProcessRenderPipeline::PostProcessRenderPipeline(Engine* iEngine,
                                                      const std::string& name)
 
-    : _name{name}, engine{iEngine}
+    : _name{name}
+    , name{this, &PostProcessRenderPipeline::get_name}
+    , isSupported{this, &PostProcessRenderPipeline::get_isSupported}
+    , engine{iEngine}
 {
 }
 
@@ -24,7 +27,12 @@ const char* PostProcessRenderPipeline::getClassName() const
   return "PostProcessRenderPipeline";
 }
 
-bool PostProcessRenderPipeline::isSupported() const
+std::string PostProcessRenderPipeline::get_name() const
+{
+  return _name;
+}
+
+bool PostProcessRenderPipeline::get_isSupported() const
 {
   for (auto& item : _renderEffects) {
     if (!item.second->isSupported()) {
@@ -158,7 +166,12 @@ bool PostProcessRenderPipeline::_enableMSAAOnFirstPostProcess(
   // anti-aliasing in browsers that support webGL 2.0 (See:
   // https://github.com/BabylonJS/Babylon.js/issues/3754)
   auto effectKeys = stl_util::extract_keys(_renderEffects);
-  if (engine->webGLVersion() >= 2.f && !effectKeys.empty()) {
+
+  if (engine->webGLVersion() == 1.f) {
+    return false;
+  }
+
+  if (!effectKeys.empty()) {
     auto postProcesses = _renderEffects[effectKeys[0]]->getPostProcesses();
     if (!postProcesses.empty()) {
       postProcesses[0]->samples = sampleCount;

@@ -13,6 +13,21 @@ PostProcessRenderPipelineManager::~PostProcessRenderPipelineManager()
 {
 }
 
+std::vector<PostProcessRenderPipelinePtr>
+PostProcessRenderPipelineManager::supportedPipelines()
+{
+  std::vector<PostProcessRenderPipelinePtr> result;
+
+  for (auto& renderPipelineItem : _renderPipelines) {
+    auto pipeline = renderPipelineItem.second;
+    if (pipeline->isSupported) {
+      result.emplace_back(pipeline);
+    }
+  }
+
+  return result;
+}
+
 void PostProcessRenderPipelineManager::addPipeline(
   const PostProcessRenderPipelinePtr& renderPipeline)
 {

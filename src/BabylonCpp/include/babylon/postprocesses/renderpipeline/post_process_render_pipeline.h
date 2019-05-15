@@ -7,7 +7,9 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/misc/iinspectable.h>
 
 namespace BABYLON {
 
@@ -35,17 +37,12 @@ public:
   virtual ~PostProcessRenderPipeline();
 
   /**
-   * "PostProcessRenderPipeline"
+   * @brief Gets the class name.
    * @returns "PostProcessRenderPipeline"
    */
   const char* getClassName() const;
 
   std::vector<CameraPtr> getCameras() const;
-
-  /**
-   * @brief If all the render effects in the pipeline are support.
-   */
-  bool isSupported() const;
 
   /**
    * @brief Adds an effect to the pipeline.
@@ -104,13 +101,39 @@ protected:
    */
   PostProcessRenderPipeline(Engine* engine, const std::string& name);
 
+  /**
+   * @brief Gets pipeline name.
+   */
+  std::string get_name() const;
+
+  /**
+   * @brief If all the render effects in the pipeline are supported.
+   */
+  bool get_isSupported() const;
+
   bool _enableMSAAOnFirstPostProcess(unsigned int sampleCount);
 
 public:
   /**
+   * List of inspectable custom properties (used by the Inspector)
+   * @see https://doc.babylonjs.com/how_to/debug_layer#extensibility
+   */
+  std::vector<IInspectable> inspectableCustomProperties;
+
+  /**
    * Hidden
    */
   std::string _name;
+
+  /**
+   * Gets pipeline name
+   */
+  ReadOnlyProperty<PostProcessRenderPipeline, std::string> name;
+
+  /**
+   * If all the render effects in the pipeline are supported
+   */
+  ReadOnlyProperty<PostProcessRenderPipeline, bool> isSupported;
 
 protected:
   /**
