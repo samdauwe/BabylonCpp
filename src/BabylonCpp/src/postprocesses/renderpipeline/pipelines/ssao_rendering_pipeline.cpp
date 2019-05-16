@@ -1,6 +1,7 @@
 #include <babylon/postprocesses/renderpipeline/pipelines/ssao_rendering_pipeline.h>
 
 #include <babylon/core/random.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
@@ -19,16 +20,16 @@
 namespace BABYLON {
 
 SSAORenderingPipeline::SSAORenderingPipeline(
-  const std::string& name, Scene* scene, float ratio,
+  const std::string& iName, Scene* scene, float ratio,
   const std::vector<CameraPtr>& cameras)
-    : SSAORenderingPipeline(name, scene, {ratio, ratio}, cameras)
+    : SSAORenderingPipeline(iName, scene, {ratio, ratio}, cameras)
 {
 }
 
 SSAORenderingPipeline::SSAORenderingPipeline(
-  const std::string& name, Scene* scene, const SSARatio& ratio,
+  const std::string& iName, Scene* scene, const SSARatio& ratio,
   const std::vector<CameraPtr>& cameras)
-    : PostProcessRenderPipeline(scene->getEngine(), name)
+    : PostProcessRenderPipeline(scene->getEngine(), iName)
     , totalStrength{1.f}
     , radius{0.0001f}
     , area{0.0075f}
@@ -94,6 +95,16 @@ void SSAORenderingPipeline::addToScene(
   }
 }
 
+Scene* SSAORenderingPipeline::scene() const
+{
+  return _scene;
+}
+
+std::string SSAORenderingPipeline::getClassName() const
+{
+  return "SSAORenderingPipeline";
+}
+
 void SSAORenderingPipeline::dispose(bool disableDepthRender,
                                     bool /*disposeMaterialAndTextures*/)
 {
@@ -112,9 +123,8 @@ void SSAORenderingPipeline::dispose(bool disableDepthRender,
     _scene->disableDepthRenderer();
   }
 
-  // TODO FIXME
-  //_scene->postProcessRenderPipelineManager->detachCamerasFromRenderPipeline(
-  //  _name, _scene->cameras);
+  _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
+    _name, _scene->cameras);
 
   PostProcessRenderPipeline::dispose(disableDepthRender);
 }
@@ -126,11 +136,11 @@ void SSAORenderingPipeline::_createBlurPostProcess(float ratio)
   _blurHPostProcess = BlurPostProcess::New(
     "BlurH", Vector2(1.f, 0.f), size, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    Constants::TEXTURETYPE_UNSIGNED_INT);
   _blurVPostProcess = BlurPostProcess::New(
     "BlurV", Vector2(0.f, 1.f), size, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine(), false,
-    EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    Constants::TEXTURETYPE_UNSIGNED_INT);
 
   _blurHPostProcess->onActivateObservable.add([&, size](Camera*, EventState&) {
     auto dw = static_cast<float>(_blurHPostProcess->width)

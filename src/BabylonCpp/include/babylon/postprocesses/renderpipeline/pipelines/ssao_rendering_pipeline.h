@@ -73,6 +73,17 @@ public:
   /** Methods */
   void addToScene(const SSAORenderingPipelinePtr& ssao2RenderingPipeline);
 
+  /**
+   * @brief Gets active scene.
+   */
+  Scene* scene() const;
+
+  /**
+   * @brief Get the class name.
+   * @returns "SSAORenderingPipeline"
+   */
+  std::string getClassName() const;
+
   /** Hidden */
   void _rebuild() override;
 

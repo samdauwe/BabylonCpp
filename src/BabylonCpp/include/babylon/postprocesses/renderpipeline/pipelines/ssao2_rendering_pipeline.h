@@ -77,6 +77,17 @@ public:
 
   void addToScene(const SSAO2RenderingPipelinePtr& ssao2RenderingPipeline);
 
+  /**
+   * @brief Gets active scene.
+   */
+  Scene* scene() const;
+
+  /**
+   * @brief Get the class name.
+   * @returns "SSAO2RenderingPipeline"
+   */
+  std::string getClassName() const;
+
   /** Methods */
   static bool IsSupported();
   /** Hidden */

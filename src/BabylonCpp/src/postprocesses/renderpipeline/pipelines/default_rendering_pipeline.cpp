@@ -5,6 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
+#include <babylon/engine/constants.h>
 #include <babylon/engine/engine.h>
 #include <babylon/engine/scene.h>
 #include <babylon/interfaces/icanvas.h>
@@ -68,6 +69,7 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
                                set_imageProcessingEnabled}
     , glowLayerEnabled{this, &DefaultRenderingPipeline::get_glowLayerEnabled,
                        &DefaultRenderingPipeline::set_glowLayerEnabled}
+    , glowLayer{this, &DefaultRenderingPipeline::get_glowLayer}
     , chromaticAberrationEnabled{this,
                                  &DefaultRenderingPipeline::
                                    get_chromaticAberrationEnabled,
@@ -109,14 +111,14 @@ DefaultRenderingPipeline::DefaultRenderingPipeline(
   // Misc
   if (hdr) {
     if (caps.textureHalfFloatRender) {
-      _defaultPipelineTextureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+      _defaultPipelineTextureType = Constants::TEXTURETYPE_HALF_FLOAT;
     }
     else if (caps.textureFloatRender) {
-      _defaultPipelineTextureType = EngineConstants::TEXTURETYPE_FLOAT;
+      _defaultPipelineTextureType = Constants::TEXTURETYPE_FLOAT;
     }
   }
   else {
-    _defaultPipelineTextureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+    _defaultPipelineTextureType = Constants::TEXTURETYPE_UNSIGNED_INT;
   }
 
   auto iEngine = _scene->getEngine();
@@ -179,6 +181,16 @@ void DefaultRenderingPipeline::addToScene(
 
   // Build the pipeline
   renderingPipeline->_buildPipeline();
+}
+
+Scene* DefaultRenderingPipeline::scene() const
+{
+  return _scene;
+}
+
+std::string DefaultRenderingPipeline::getClassName() const
+{
+  return "DefaultRenderingPipeline";
 }
 
 void DefaultRenderingPipeline::set_sharpenEnabled(bool enabled)
@@ -387,7 +399,12 @@ void DefaultRenderingPipeline::set_glowLayerEnabled(bool enabled)
 
 bool DefaultRenderingPipeline::get_glowLayerEnabled() const
 {
-  return _glowLayer == nullptr;
+  return _glowLayer != nullptr;
+}
+
+GlowLayerPtr& DefaultRenderingPipeline::get_glowLayer()
+{
+  return _glowLayer;
 }
 
 void DefaultRenderingPipeline::set_chromaticAberrationEnabled(bool enabled)

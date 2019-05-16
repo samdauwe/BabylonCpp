@@ -90,6 +90,17 @@ public:
   void addToScene(const DefaultRenderingPipelinePtr& renderingPipeline);
 
   /**
+   * @brief Gets active scene.
+   */
+  Scene* scene() const;
+
+  /**
+   * @brief Get the class name.
+   * @returns "DefaultRenderingPipeline"
+   */
+  std::string getClassName() const;
+
+  /**
    * @brief Force the compilation of the entire pipeline.
    */
   void prepare();
@@ -223,6 +234,11 @@ private:
   bool get_glowLayerEnabled() const;
 
   /**
+   * @brief Gets the glow layer (or null if not defined).
+   */
+  GlowLayerPtr& get_glowLayer();
+
+  /**
    * @brief Enable or disable the chromaticAberration process from the pipeline.
    */
   void set_chromaticAberrationEnabled(bool enabled);
@@ -342,6 +358,11 @@ public:
   Property<DefaultRenderingPipeline, bool> glowLayerEnabled;
 
   /**
+   * Gets the glow layer (or null if not defined)
+   */
+  ReadOnlyProperty<DefaultRenderingPipeline, GlowLayerPtr> glowLayer;
+
+  /**
    * Enable or disable the chromaticAberration process from the pipeline
    */
   Property<DefaultRenderingPipeline, bool> chromaticAberrationEnabled;
@@ -359,7 +380,7 @@ private:
   PostProcessRenderEffectPtr _grainEffect;
 
   /**
-   * Glow post process which adds a glow to emmisive areas of the image
+   * Glow post process which adds a glow to emissive areas of the image
    */
   GlowLayerPtr _glowLayer;
 
