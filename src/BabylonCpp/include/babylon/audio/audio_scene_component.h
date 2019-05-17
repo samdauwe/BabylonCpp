@@ -61,7 +61,8 @@ public:
    * @brief Removes all the elements in the container from the scene.
    * @param container contains the elements to remove
    */
-  void removeFromContainer(AbstractScene& container) override;
+  void removeFromContainer(AbstractScene& container,
+                           bool dispose = false) override;
 
   /**
    * @brief Disposes the component and the associated resources.

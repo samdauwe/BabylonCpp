@@ -16,6 +16,35 @@ AnimationRange::AnimationRange(const AnimationRange& other)
 {
 }
 
+AnimationRange::AnimationRange(AnimationRange&& other)
+    : name{std::move(other.name)}
+    , from{std::move(other.from)}
+    , to{std::move(other.to)}
+{
+}
+
+AnimationRange& AnimationRange::operator=(const AnimationRange& other)
+{
+  if (&other != this) {
+    name = other.name;
+    from = other.from;
+    to   = other.to;
+  }
+
+  return *this;
+}
+
+AnimationRange& AnimationRange::operator=(AnimationRange&& other)
+{
+  if (&other != this) {
+    name = std::move(other.name);
+    from = std::move(other.from);
+    to   = std::move(other.to);
+  }
+
+  return *this;
+}
+
 AnimationRange::~AnimationRange()
 {
 }

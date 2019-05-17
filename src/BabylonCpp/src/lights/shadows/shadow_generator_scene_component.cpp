@@ -42,7 +42,7 @@ void ShadowGeneratorSceneComponent::addFromContainer(
 }
 
 void ShadowGeneratorSceneComponent::removeFromContainer(
-  AbstractScene& /*container*/)
+  AbstractScene& /*container*/, bool /*dispose*/)
 {
   // Nothing To Do Here. (directly attached to a light)
 }

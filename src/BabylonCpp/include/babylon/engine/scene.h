@@ -1778,14 +1778,14 @@ protected:
    * and so on), this is easier to reference from here than from all the
    * materials.
    */
-  BaseTexturePtr& get_environmentTexture();
+  BaseTexturePtr& get_environmentTexture() override;
 
   /**
    * @brief Sets the texture used in all pbr material as the reflection texture.
    * As in the majority of the scene they are the same (exception for multi room
    * and so on), this is easier to set here than in all the materials.
    */
-  void set_environmentTexture(const BaseTexturePtr& value);
+  void set_environmentTexture(const BaseTexturePtr& value) override;
 
   /**
    * @brief Default image processing configuration used either in the rendering
@@ -2179,15 +2179,6 @@ public:
 
   /** Hidden */
   BaseTexturePtr _environmentBRDFTexture;
-
-  /**
-   * Returns the texture used in all pbr material as the reflection
-   * texture.
-   * As in the majority of the scene they are the same (exception for multi room
-   * and so on), this is easier to reference from here than from all the
-   * materials.
-   */
-  Property<Scene, BaseTexturePtr> environmentTexture;
 
   /**
    * Default image processing configuration used either in the rendering

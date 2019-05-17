@@ -37,6 +37,11 @@ public:
   void removeAllFromScene();
 
   /**
+   * @brief Disposes all the assets in the container.
+   */
+  void dispose();
+
+  /**
    * @brief Adds all meshes in the asset container to a root mesh that can be
    * used to position all the contained meshes. The root mesh is then added to
    * the front of the meshes in the assetContainer.

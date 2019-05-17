@@ -55,10 +55,11 @@ void AudioSceneComponent::addFromContainer(AbstractScene& container)
     sound->play();
     sound->autoplay = true;
     scene->mainSoundTrack()->AddSound(sound);
-  };
+  }
 }
 
-void AudioSceneComponent::removeFromContainer(AbstractScene& container)
+void AudioSceneComponent::removeFromContainer(AbstractScene& container,
+                                              bool /*dispose*/)
 {
   if (container.sounds.empty()) {
     return;
@@ -67,7 +68,7 @@ void AudioSceneComponent::removeFromContainer(AbstractScene& container)
     sound->stop();
     sound->autoplay = false;
     scene->mainSoundTrack()->RemoveSound(sound);
-  };
+  }
 }
 
 void AudioSceneComponent::dispose()

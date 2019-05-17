@@ -44,6 +44,17 @@ using ActiveMeshStageAction
 using CameraStageAction = std::function<void(Camera* camera)>;
 
 /**
+ * Strong typing of a Camera Frame buffer related stage step action
+ */
+using CameraStageFrameBufferAction = std::function<bool(Camera* camera)>;
+
+/**
+ * Strong typing of a Render Target related stage step action
+ */
+using RenderTargetStageAction
+  = std::function<void(const RenderTargetTexturePtr& renderTarget)>;
+
+/**
  * Strong typing of a RenderingGroup related stage step action
  */
 using RenderingGroupStageAction = std::function<void(int renderingGroupId)>;

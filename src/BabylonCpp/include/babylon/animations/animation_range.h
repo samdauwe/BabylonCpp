@@ -21,6 +21,9 @@ public:
   AnimationRange();
   AnimationRange(const std::string& name, float from, float to);
   AnimationRange(const AnimationRange& other);
+  AnimationRange(AnimationRange&& other);
+  AnimationRange& operator=(const AnimationRange& other);
+  AnimationRange& operator=(AnimationRange&& other);
   ~AnimationRange();
 
   AnimationRange copy() const;

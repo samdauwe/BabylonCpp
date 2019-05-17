@@ -101,8 +101,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
     , _environmentBRDFTexture{nullptr}
-    , environmentTexture{this, &Scene::get_environmentTexture,
-                         &Scene::set_environmentTexture}
     , imageProcessingConfiguration{this,
                                    &Scene::get_imageProcessingConfiguration}
     , onDispose{this, &Scene::set_onDispose}

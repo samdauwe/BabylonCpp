@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 #include <babylon/babylon_api.h>
+#include <babylon/babylon_common.h>
 #include <babylon/core/any.h>
 
 using json = nlohmann::json;
@@ -329,6 +330,22 @@ public:
    */
   std::vector<SoundPtr> sounds;
 
+  /**
+   * Environment texture for the scene
+   */
+  Property<AbstractScene, BaseTexturePtr> environmentTexture;
+
+protected:
+  /**
+   * @brief Returns the environment texture for the scene.
+   */
+  virtual BaseTexturePtr& get_environmentTexture();
+
+  /**
+   * @brief Sets the environment texture for the scene.
+   */
+  virtual void set_environmentTexture(const BaseTexturePtr& value);
+
 private:
   /**
    * Stores the list of available parsers in the application.
@@ -340,6 +357,9 @@ private:
    */
   static std::unordered_map<std::string, IndividualBabylonFileParser>
     _IndividualBabylonFileParsers;
+
+  /** Hidden */
+  BaseTexturePtr _environmentTexture;
 
 }; // end of class AbstractScene
 

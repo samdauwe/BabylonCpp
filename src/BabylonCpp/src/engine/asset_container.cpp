@@ -1,10 +1,24 @@
 #include <babylon/engine/asset_container.h>
 
+#include <babylon/actions/action_manager.h>
+#include <babylon/animations/animation.h>
+#include <babylon/animations/animation_group.h>
 #include <babylon/audio/sound.h>
 #include <babylon/audio/sound_track.h>
+#include <babylon/bones/skeleton.h>
+#include <babylon/cameras/camera.h>
 #include <babylon/engine/iscene_serializable_component.h>
 #include <babylon/engine/scene.h>
+#include <babylon/lights/light.h>
+#include <babylon/materials/material.h>
+#include <babylon/materials/multi_material.h>
+#include <babylon/materials/textures/texture.h>
+#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/mesh/geometry.h>
 #include <babylon/mesh/mesh.h>
+#include <babylon/mesh/transform_node.h>
+#include <babylon/morph/morph_target_manager.h>
+#include <babylon/probes/reflection_probe.h>
 
 namespace BABYLON {
 
@@ -57,9 +71,16 @@ void AssetContainer::addAllToScene()
   for (const auto& o : textures) {
     scene->addTexture(o);
   }
+  for (const auto& o : reflectionProbes) {
+    scene->addReflectionProbe(o);
+  }
+
+  if (environmentTexture()) {
+    scene->environmentTexture = environmentTexture();
+  }
 
   for (const auto& component : scene->_serializableComponents) {
-    component->addFromContainer(*scene);
+    component->addFromContainer(*this);
   }
 }
 
@@ -104,9 +125,88 @@ void AssetContainer::removeAllFromScene()
   for (const auto& o : textures) {
     scene->removeTexture(o);
   }
+  for (const auto& o : reflectionProbes) {
+    scene->removeReflectionProbe(o);
+  }
+
+  if (environmentTexture() == scene->environmentTexture()) {
+    scene->environmentTexture = nullptr;
+  }
 
   for (const auto& component : scene->_serializableComponents) {
-    component->removeFromContainer(*scene);
+    component->removeFromContainer(*this);
+  }
+}
+
+void AssetContainer::dispose()
+{
+  for (const auto& o : cameras) {
+    o->dispose();
+  }
+  cameras.clear();
+
+  for (const auto& o : lights) {
+    o->dispose();
+  }
+  lights.clear();
+
+  for (const auto& o : meshes) {
+    scene->removeMesh(o);
+  }
+  meshes.clear();
+
+  for (const auto& o : skeletons) {
+    o->dispose();
+  }
+  skeletons.clear();
+
+  for (const auto& o : animationGroups) {
+    o->dispose();
+  }
+  animationGroups.clear();
+
+  for (const auto& o : multiMaterials) {
+    o->dispose();
+  }
+  multiMaterials.clear();
+
+  for (const auto& o : materials) {
+    o->dispose();
+  }
+  materials.clear();
+
+  for (const auto& o : geometries) {
+    o->dispose();
+  }
+  geometries.clear();
+
+  for (const auto& o : transformNodes) {
+    o->dispose();
+  }
+  transformNodes.clear();
+
+  for (const auto& o : actionManagers) {
+    o->dispose();
+  }
+  actionManagers.clear();
+
+  for (const auto& o : textures) {
+    o->dispose();
+  }
+  textures.clear();
+
+  for (const auto& o : reflectionProbes) {
+    o->dispose();
+  }
+  reflectionProbes.clear();
+
+  if (environmentTexture()) {
+    environmentTexture()->dispose();
+    environmentTexture = nullptr;
+  }
+
+  for (const auto& component : scene->_serializableComponents) {
+    component->removeFromContainer(*this, true);
   }
 }
 

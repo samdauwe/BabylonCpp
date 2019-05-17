@@ -23,6 +23,9 @@ std::unordered_map<std::string, IndividualBabylonFileParser>
   AbstractScene::_IndividualBabylonFileParsers;
 
 AbstractScene::AbstractScene()
+    : environmentTexture{this, &AbstractScene::get_environmentTexture,
+                         &AbstractScene::set_environmentTexture}
+    , _environmentTexture{nullptr}
 {
   _addIndividualParsers();
   _addParsers();
@@ -297,6 +300,16 @@ void AbstractScene::addReflectionProbe(
   const ReflectionProbePtr& newReflectionProbe)
 {
   reflectionProbes.emplace_back(newReflectionProbe);
+}
+
+BaseTexturePtr& AbstractScene::get_environmentTexture()
+{
+  return _environmentTexture;
+}
+
+void AbstractScene::set_environmentTexture(const BaseTexturePtr& value)
+{
+  _environmentTexture = value;
 }
 
 } // end of namespace BABYLON
