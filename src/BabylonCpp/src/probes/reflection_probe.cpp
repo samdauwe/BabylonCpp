@@ -2,11 +2,11 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/core/json_util.h>
-#include <babylon/engine/constants.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 

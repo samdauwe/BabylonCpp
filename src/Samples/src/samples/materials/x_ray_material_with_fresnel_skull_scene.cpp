@@ -4,8 +4,8 @@
 #include <babylon/loading/scene_loader.h>
 #include <babylon/materials/fresnel_parameters.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 namespace Samples {

@@ -6,8 +6,8 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/random.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/image_processing_configuration.h>
@@ -18,9 +18,9 @@
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/tmp.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/buffer.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/buffer.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 #include <babylon/particles/particle_system.h>

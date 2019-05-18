@@ -1,8 +1,8 @@
 #include <babylon/cameras/inputs/arc_rotate_camera_pointers_input.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/events/pointer_event_types.h>
 #include <babylon/interfaces/icanvas.h>
 

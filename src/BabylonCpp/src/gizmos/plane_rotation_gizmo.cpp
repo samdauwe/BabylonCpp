@@ -1,12 +1,12 @@
 #include <babylon/gizmos/plane_rotation_gizmo.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/behaviors/mesh/pointer_drag_behavior.h>
+#include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/lines_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {

@@ -4,7 +4,7 @@
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

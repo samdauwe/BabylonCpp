@@ -3,8 +3,8 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/core/array_buffer_view.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>

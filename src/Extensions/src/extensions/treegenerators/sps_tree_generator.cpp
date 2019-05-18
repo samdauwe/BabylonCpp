@@ -3,8 +3,8 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
 #include <babylon/math/axis.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/particles/solid_particle.h>
 #include <babylon/particles/solid_particle_system.h>
 

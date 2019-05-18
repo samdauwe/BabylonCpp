@@ -3,9 +3,9 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
-#include <babylon/engine/scene_component_constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
+#include <babylon/engines/scene_component_constants.h>
 #include <babylon/layer/effect_layer_scene_component.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
@@ -13,9 +13,9 @@
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/mesh/_instances_batch.h>
-#include <babylon/mesh/sub_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/_instances_batch.h>
+#include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/tools/tools.h>

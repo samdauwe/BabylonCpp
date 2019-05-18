@@ -3,9 +3,9 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/engine_constants.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>

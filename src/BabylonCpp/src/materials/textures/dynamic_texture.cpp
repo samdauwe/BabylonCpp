@@ -3,8 +3,8 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
 

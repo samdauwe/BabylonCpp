@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/cameras/arc_rotate_camera_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/cameras/free_camera_property_grid_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/lights/directional_light_property_grid_component.h>
@@ -30,7 +30,7 @@
 #include <babylon/materials/pbr/pbr_metallic_roughness_material.h>
 #include <babylon/materials/pbr/pbr_specular_glossiness_material.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 

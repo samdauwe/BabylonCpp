@@ -2,7 +2,7 @@
 
 #include <babylon/bones/bone.h>
 #include <babylon/math/axis.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Debug {

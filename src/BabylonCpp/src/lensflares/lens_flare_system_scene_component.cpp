@@ -1,8 +1,8 @@
 #include <babylon/lensflares/lens_flare_system_scene_component.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/abstract_scene.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/abstract_scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/tools/tools.h>
 

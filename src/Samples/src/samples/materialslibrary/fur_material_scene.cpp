@@ -1,12 +1,12 @@
 #include <babylon/samples/materialslibrary/fur_material_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materialslibrary/fur/fur_material.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

@@ -5,10 +5,10 @@
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/math/vector3.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/physics/iphysics_enabled_object.h>
 #include <babylon/physics/iphysics_engine.h>
 #include <babylon/physics/iphysics_engine_plugin.h>

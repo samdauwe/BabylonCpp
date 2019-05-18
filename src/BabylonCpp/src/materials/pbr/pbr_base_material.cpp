@@ -2,8 +2,8 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -17,12 +17,12 @@
 #include <babylon/materials/textures/refraction_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/spherical_polynomial.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/base_sub_mesh.h>
-#include <babylon/mesh/geometry.h>
-#include <babylon/mesh/instanced_mesh.h>
-#include <babylon/mesh/sub_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/base_sub_mesh.h>
+#include <babylon/meshes/geometry.h>
+#include <babylon/meshes/instanced_mesh.h>
+#include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/tools/texture_tools.h>
 
 namespace BABYLON {

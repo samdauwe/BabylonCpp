@@ -5,7 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/engine/constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/color4.h>
 #include <babylon/misc/iinspectable.h>

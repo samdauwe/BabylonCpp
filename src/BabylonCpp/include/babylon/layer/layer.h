@@ -2,7 +2,7 @@
 #define BABYLON_LAYER_LAYER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
 #include <babylon/tools/observable.h>

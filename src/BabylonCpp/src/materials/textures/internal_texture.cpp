@@ -1,8 +1,8 @@
 #include <babylon/materials/textures/internal_texture.h>
 
 #include <babylon/core/array_buffer_view.h>
-#include <babylon/engine/depth_texture_creation_options.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engines/depth_texture_creation_options.h>
+#include <babylon/engines/engine.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/iinternal_texture_loader.h>
 #include <babylon/materials/textures/irender_target_options.h>

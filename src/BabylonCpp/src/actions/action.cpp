@@ -9,8 +9,8 @@
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/node.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/node.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

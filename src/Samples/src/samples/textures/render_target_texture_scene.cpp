@@ -1,11 +1,11 @@
 #include <babylon/samples/textures/render_target_texture_scene.h>
 
 #include <babylon/cameras/free_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

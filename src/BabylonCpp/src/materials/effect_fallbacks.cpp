@@ -2,11 +2,11 @@
 
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/sub_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/sub_mesh.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

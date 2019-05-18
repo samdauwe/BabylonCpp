@@ -2,7 +2,7 @@
 #define BABYLON_HELPERS_PHOTO_DOME_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/mesh/transform_node.h>
+#include <babylon/meshes/transform_node.h>
 
 namespace BABYLON {
 

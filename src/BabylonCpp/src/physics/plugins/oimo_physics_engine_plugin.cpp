@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 #include <babylon/physics/iphysics_body.h>
 #include <babylon/physics/iworld.h>
 #include <babylon/physics/joint/physics_joint.h>

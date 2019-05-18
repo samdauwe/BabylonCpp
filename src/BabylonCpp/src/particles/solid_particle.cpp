@@ -1,6 +1,7 @@
 #include <babylon/particles/solid_particle.h>
 
-#include <babylon/mesh/mesh.h>
+#include <babylon/math/tmp.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/particles/solid_particle_system.h>
 
 namespace BABYLON {
@@ -31,6 +32,7 @@ SolidParticle::SolidParticle(
     , _stillInvisible{false}
     , _rotationMatrix{{1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f}}
     , parentId{std::nullopt}
+    , cullingStrategy{AbstractMesh::CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY}
     , _globalPosition{Vector3::Zero()}
 {
   if (modelBoundingInfo) {
@@ -67,6 +69,28 @@ bool SolidParticle::intersectsMesh(SolidParticle* target) const
                                       target->_boundingInfo->boundingSphere);
   }
   return _boundingInfo->intersects(*target->_boundingInfo, false);
+}
+
+bool SolidParticle::isInFrustum(const std::array<Plane, 6>& frustumPlanes)
+{
+  return _boundingInfo != nullptr
+         && _boundingInfo->isInFrustum(frustumPlanes, cullingStrategy);
+}
+
+void SolidParticle::getRotationMatrix(Matrix& m) const
+{
+  Quaternion quaternion;
+  if (rotationQuaternion) {
+    quaternion = *rotationQuaternion;
+  }
+  else {
+    quaternion            = Tmp::QuaternionArray[0];
+    const auto& _rotation = rotation;
+    Quaternion::RotationYawPitchRollToRef(_rotation.y, _rotation.x, _rotation.z,
+                                          quaternion);
+  }
+
+  quaternion.toRotationMatrix(m);
 }
 
 } // end of namespace BABYLON

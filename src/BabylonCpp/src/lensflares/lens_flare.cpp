@@ -1,7 +1,7 @@
 #include <babylon/lensflares/lens_flare.h>
 
-#include <babylon/engine/constants.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
 #include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/materials/textures/texture.h>
 

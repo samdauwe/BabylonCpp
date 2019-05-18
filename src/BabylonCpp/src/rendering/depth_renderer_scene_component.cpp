@@ -1,7 +1,7 @@
 #include <babylon/rendering/depth_renderer_scene_component.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/rendering/depth_renderer.h>
 
 namespace BABYLON {

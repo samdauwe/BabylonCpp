@@ -1,6 +1,6 @@
 #include <babylon/states/_stencil_state.h>
 
-#include <babylon/engine/engine.h>
+#include <babylon/engines/engine.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {

@@ -8,7 +8,7 @@
 #include <babylon/inspector/components/actiontabs/lines/quaternion_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/vector3_line_component.h>
-#include <babylon/mesh/transform_node.h>
+#include <babylon/meshes/transform_node.h>
 
 namespace BABYLON {
 

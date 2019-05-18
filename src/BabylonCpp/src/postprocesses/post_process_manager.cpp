@@ -2,11 +2,11 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/constants.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {

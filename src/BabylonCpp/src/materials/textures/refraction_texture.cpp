@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

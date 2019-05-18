@@ -1,6 +1,6 @@
 #include <babylon/tools/optimization/lens_flares_optimization.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

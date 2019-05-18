@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engines/engine.h>
 #include <babylon/materials/effect.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector4.h>

@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
 
 namespace BABYLON {

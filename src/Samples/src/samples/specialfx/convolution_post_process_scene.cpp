@@ -1,12 +1,12 @@
 #include <babylon/samples/specialfx/convolution_post_process_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/postprocesses/convolution_post_process.h>
 
 namespace BABYLON {

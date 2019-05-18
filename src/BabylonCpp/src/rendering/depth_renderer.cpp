@@ -3,8 +3,8 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -12,9 +12,9 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/color4.h>
-#include <babylon/mesh/_instances_batch.h>
-#include <babylon/mesh/sub_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/_instances_batch.h>
+#include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/rendering/depth_renderer.h>
 #include <babylon/rendering/depth_renderer_scene_component.h>
 

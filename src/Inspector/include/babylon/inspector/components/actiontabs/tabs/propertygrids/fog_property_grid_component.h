@@ -2,7 +2,7 @@
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_FOG_PROPERTY_GRID_COMPONENT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/float_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/options_line_component.h>

@@ -1,6 +1,6 @@
 #include <babylon/rendering/geometry_buffer_renderer_scene_component.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
 

@@ -1,8 +1,8 @@
 #include <babylon/inspector/components/actiontabs/tabs/statistics_tab_component.h>
 
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/line_container_component.h>
 #include <babylon/inspector/components/actiontabs/lines/boolean_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/text_line_component.h>

@@ -2,14 +2,14 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/sub_mesh.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/sub_mesh.h>
 
 namespace BABYLON {
 namespace Samples {

@@ -1,7 +1,7 @@
 #include <babylon/materials/textures/loaders/dds_texture_loader.h>
 
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/tools/dds.h>
 

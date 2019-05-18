@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/engine/engine_options.h>
+#include <babylon/engines/engine_options.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 
 namespace BABYLON {

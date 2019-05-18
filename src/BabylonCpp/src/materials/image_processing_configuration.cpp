@@ -4,7 +4,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engines/engine.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>

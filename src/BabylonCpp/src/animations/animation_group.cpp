@@ -5,8 +5,8 @@
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/animations/targeted_animation.h>
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

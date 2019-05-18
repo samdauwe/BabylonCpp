@@ -4,8 +4,8 @@
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/asset_container.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/asset_container.h>
+#include <babylon/engines/scene.h>
 #include <babylon/loading/glTF/2.0/gltf_loader.h>
 #include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 #include <babylon/loading/glTF/binary_reader.h>

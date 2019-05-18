@@ -1,7 +1,7 @@
 #include <babylon/postprocesses/vr_multiview_to_singleview_post_process.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 
 namespace BABYLON {

@@ -3,8 +3,8 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -15,9 +15,9 @@
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

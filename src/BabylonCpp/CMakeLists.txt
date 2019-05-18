@@ -84,7 +84,7 @@ file(GLOB ANIMATIONS_HDR_FILES      ${INCLUDE_PATH}/animations/*.h
 file(GLOB AUDIO_HDR_FILES           ${INCLUDE_PATH}/audio/*.h)
 file(GLOB BEHAVIORS_HDR_FILES       ${INCLUDE_PATH}/behaviors/*.h
                                     ${INCLUDE_PATH}/behaviors/cameras/*.h
-                                    ${INCLUDE_PATH}/behaviors/mesh/*.h)
+                                    ${INCLUDE_PATH}/behaviors/meshes/*.h)
 file(GLOB BONES_HDR_FILES           ${INCLUDE_PATH}/bones/*.h)
 file(GLOB CAMERAS_HDR_FILES         ${INCLUDE_PATH}/cameras/*.h
                                     ${INCLUDE_PATH}/cameras/inputs/*.h
@@ -99,9 +99,9 @@ file(GLOB CORE_HDR_FILES            ${INCLUDE_PATH}/core/*.h
 file(GLOB CULLING_HDR_FILES         ${INCLUDE_PATH}/culling/*.h
                                     ${INCLUDE_PATH}/culling/octrees/*.h)
 file(GLOB DEBUG_HDR_FILES           ${INCLUDE_PATH}/debug/*.h)
-file(GLOB ENGINE_HDR_FILES          ${INCLUDE_PATH}/engine/*.h)
+file(GLOB ENGINES_HDR_FILES         ${INCLUDE_PATH}/engines/*.h)
 file(GLOB EVENTS_HDR_FILES          ${INCLUDE_PATH}/events/*.h)
-file(GLOB GAMEPAD_HDR_FILES         ${INCLUDE_PATH}/gamepad/*.h
+file(GLOB GAMEPADS_HDR_FILES        ${INCLUDE_PATH}/gamepads/*.h
                                     ${INCLUDE_PATH}/gamepad/controllers/*.h)
 file(GLOB GIZMOS_HDR_FILES          ${INCLUDE_PATH}/gizmos/*.h)
 file(GLOB HELPERS_HDR_FILES         ${INCLUDE_PATH}/helpers/*.h)
@@ -120,11 +120,10 @@ file(GLOB MATERIALS_HDR_FILES       ${INCLUDE_PATH}/materials/*.h
                                     ${INCLUDE_PATH}/materials/textures/loaders/*.h
                                     ${INCLUDE_PATH}/materials/textures/procedurals/*.h)
 file(GLOB MATH_HDR_FILES            ${INCLUDE_PATH}/math/*.h)
-file(GLOB MESH_HDR_FILES            ${INCLUDE_PATH}/mesh/*.h
-                                    ${INCLUDE_PATH}/mesh/csg/*.h
-                                    ${INCLUDE_PATH}/mesh/polygonmesh/*.h
-                                    ${INCLUDE_PATH}/mesh/primitivegeometries/*.h
-                                    ${INCLUDE_PATH}/mesh/simplification/*.h)
+file(GLOB MESHES_HDR_FILES          ${INCLUDE_PATH}/meshes/*.h
+                                    ${INCLUDE_PATH}/meshes/csg/*.h
+                                    ${INCLUDE_PATH}/meshes/polygonmesh/*.h
+                                    ${INCLUDE_PATH}/meshes/simplification/*.h)
 file(GLOB MISC_HDR_FILES            ${INCLUDE_PATH}/misc/*.h)
 file(GLOB MORPH_HDR_FILES           ${INCLUDE_PATH}/morph/*.h)
 file(GLOB PARTICLES_HDR_FILES       ${INCLUDE_PATH}/particles/*.h
@@ -173,9 +172,9 @@ set(BABYLON_HEADERS
     ${CORE_HDR_FILES}
     ${CULLING_HDR_FILES}
     ${DEBUG_HDR_FILES}
-    ${ENGINE_HDR_FILES}
+    ${ENGINES_HDR_FILES}
     ${EVENTS_HDR_FILES}
-    ${GAMEPAD_HDR_FILES}
+    ${GAMEPADS_HDR_FILES}
     ${GIZMOS_HDR_FILES}
     ${HELPERS_HDR_FILES}
     ${INSTRUMENTATION_HDR_FILES}
@@ -186,7 +185,7 @@ set(BABYLON_HEADERS
     ${LOADING_HDR_FILES}
     ${MATERIALS_HDR_FILES}
     ${MATH_HDR_FILES}
-    ${MESH_HDR_FILES}
+    ${MESHES_HDR_FILES}
     ${MISC_HDR_FILES}
     ${MORPH_HDR_FILES}
     ${PARTICLES_HDR_FILES}
@@ -212,7 +211,7 @@ file(GLOB ANIMATIONS_SRC_FILES      ${SOURCE_PATH}/animations/*.cpp
 file(GLOB AUDIO_SRC_FILES           ${SOURCE_PATH}/audio/*.cpp)
 file(GLOB BEHAVIORS_SRC_FILES       ${SOURCE_PATH}/behaviors/*.cpp
                                     ${SOURCE_PATH}/behaviors/cameras/*.cpp
-                                    ${SOURCE_PATH}/behaviors/mesh/*.cpp)
+                                    ${SOURCE_PATH}/behaviors/meshes/*.cpp)
 file(GLOB BONES_SRC_FILES           ${SOURCE_PATH}/bones/*.cpp)
 file(GLOB CAMERAS_SRC_FILES         ${SOURCE_PATH}/cameras/*.cpp
                                     ${SOURCE_PATH}/cameras/inputs/*.cpp
@@ -225,9 +224,9 @@ file(GLOB CORE_SRC_FILES            ${SOURCE_PATH}/core/*.cpp
 file(GLOB CULLING_SRC_FILES         ${SOURCE_PATH}/culling/*.cpp
                                     ${SOURCE_PATH}/culling/octrees/*.cpp)
 file(GLOB DEBUG_SRC_FILES           ${SOURCE_PATH}/debug/*.cpp)
-file(GLOB ENGINE_SRC_FILES          ${SOURCE_PATH}/engine/*.cpp)
+file(GLOB ENGINES_SRC_FILES         ${SOURCE_PATH}/engines/*.cpp)
 file(GLOB EVENTS_SRC_FILES          ${SOURCE_PATH}/events/*.cpp)
-file(GLOB GAMEPAD_SRC_FILES         ${SOURCE_PATH}/gamepad/*.cpp
+file(GLOB GAMEPADS_SRC_FILES        ${SOURCE_PATH}/gamepads/*.cpp
                                     ${SOURCE_PATH}/gamepad/controllers/*.cpp)
 file(GLOB GIZMOS_SRC_FILES          ${SOURCE_PATH}/gizmos/*.cpp)
 file(GLOB HELPERS_SRC_FILES         ${SOURCE_PATH}/helpers/*.cpp)
@@ -246,11 +245,10 @@ file(GLOB MATERIALS_SRC_FILES       ${SOURCE_PATH}/materials/*.cpp
                                     ${SOURCE_PATH}/materials/textures/loaders/*.cpp
                                     ${SOURCE_PATH}/materials/textures/procedurals/*.cpp)
 file(GLOB MATH_SRC_FILES            ${SOURCE_PATH}/math/*.cpp)
-file(GLOB MESH_SRC_FILES            ${SOURCE_PATH}/mesh/*.cpp
-                                    ${SOURCE_PATH}/mesh/csg/*.cpp
-                                    ${SOURCE_PATH}/mesh/polygonmesh/*.cpp
-                                    ${SOURCE_PATH}/mesh/primitivegeometries/*.cpp
-                                    ${SOURCE_PATH}/mesh/simplification/*.cpp)
+file(GLOB MESHES_SRC_FILES          ${SOURCE_PATH}/meshes/*.cpp
+                                    ${SOURCE_PATH}/meshes/csg/*.cpp
+                                    ${SOURCE_PATH}/meshes/polygonmesh/*.cpp
+                                    ${SOURCE_PATH}/meshes/simplification/*.cpp)
 file(GLOB MISC_SRC_FILES            ${SOURCE_PATH}/misc/*.cpp)
 file(GLOB MORPH_SRC_FILES           ${SOURCE_PATH}/morph/*.cpp)
 file(GLOB PARTICLES_SRC_FILES       ${SOURCE_PATH}/particles/*.cpp
@@ -295,9 +293,9 @@ set(BABYLON_SOURCES
     ${CORE_SRC_FILES}
     ${CULLING_SRC_FILES}
     ${DEBUG_SRC_FILES}
-    ${ENGINE_SRC_FILES}
+    ${ENGINES_SRC_FILES}
     ${EVENTS_SRC_FILES}
-    ${GAMEPAD_SRC_FILES}
+    ${GAMEPADS_SRC_FILES}
     ${GIZMOS_SRC_FILES}
     ${HELPERS_SRC_FILES}
     ${INSTRUMENTATION_SRC_FILES}
@@ -308,7 +306,7 @@ set(BABYLON_SOURCES
     ${LOADING_SRC_FILES}
     ${MATERIALS_SRC_FILES}
     ${MATH_SRC_FILES}
-    ${MESH_SRC_FILES}
+    ${MESHES_SRC_FILES}
     ${MISC_SRC_FILES}
     ${MORPH_SRC_FILES}
     ${PARTICLES_SRC_FILES}

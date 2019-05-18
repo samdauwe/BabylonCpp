@@ -5,12 +5,12 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/node.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/node.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/light.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 #include <babylon/imgui/imgui_utils.h>
 

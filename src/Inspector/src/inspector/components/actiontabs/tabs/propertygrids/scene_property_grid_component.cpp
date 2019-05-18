@@ -1,6 +1,6 @@
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/scene_property_grid_component.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/options_line_component.h>

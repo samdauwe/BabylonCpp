@@ -2,7 +2,7 @@
 
 #include <babylon/audio/sound.h>
 #include <babylon/audio/sound_track.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

@@ -3,7 +3,7 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/helpers/iscene_size.h>
 #include <babylon/materials/background/background_material.h>
 #include <babylon/materials/image_processing_configuration.h>
@@ -11,7 +11,7 @@
 #include <babylon/materials/textures/mirror_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 

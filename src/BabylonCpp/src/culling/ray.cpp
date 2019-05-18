@@ -7,7 +7,7 @@
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/math/plane.h>
 #include <babylon/math/tmp.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 

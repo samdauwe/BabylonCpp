@@ -1,11 +1,11 @@
 #include <babylon/postprocesses/motion_blur_post_process.h>
 
 #include <babylon/core/logging.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/multi_render_target.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 #include <babylon/rendering/geometry_buffer_renderer.h>
 
 namespace BABYLON {

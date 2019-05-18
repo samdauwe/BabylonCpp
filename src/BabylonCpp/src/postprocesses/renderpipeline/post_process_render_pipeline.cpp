@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engines/engine.h>
 #include <babylon/postprocesses/display_pass_post_process.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_effect.h>
 

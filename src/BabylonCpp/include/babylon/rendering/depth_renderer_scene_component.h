@@ -4,8 +4,8 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/iscene_component.h>
-#include <babylon/engine/scene_component_constants.h>
+#include <babylon/engines/iscene_component.h>
+#include <babylon/engines/scene_component_constants.h>
 
 namespace BABYLON {
 

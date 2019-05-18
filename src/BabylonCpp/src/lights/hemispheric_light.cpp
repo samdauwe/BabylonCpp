@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/uniform_buffer.h>

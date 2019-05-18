@@ -9,9 +9,9 @@
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/asset_container.h>
-#include <babylon/engine/scene.h>
-#include <babylon/engine/scene_component_constants.h>
+#include <babylon/engines/asset_container.h>
+#include <babylon/engines/scene.h>
+#include <babylon/engines/scene_component_constants.h>
 #include <babylon/lensflares/lens_flare_system.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
@@ -20,9 +20,8 @@
 #include <babylon/materials/multi_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/hdr_cube_texture.h>
-#include <babylon/mesh/geometry.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/primitive_geometries.h>
+#include <babylon/meshes/geometry.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/tools/tools.h>
@@ -157,28 +156,7 @@ bool BabylonFileLoader::importMesh(
                     = json_util::get_string(parsedGeometryData, "id");
                   if (!parsedGeometryDataId.empty()
                       && (parsedGeometryDataId == parsedMeshGeometryId)) {
-                    if (geometryType == "boxes") {
-                      BoxGeometry::Parse(parsedGeometryData, scene);
-                    }
-                    else if (geometryType == "spheres") {
-                      SphereGeometry::Parse(parsedGeometryData, scene);
-                    }
-                    else if (geometryType == "cylinders") {
-                      CylinderGeometry::Parse(parsedGeometryData, scene);
-                    }
-                    else if (geometryType == "toruses") {
-                      TorusGeometry::Parse(parsedGeometryData, scene);
-                    }
-                    else if (geometryType == "grounds") {
-                      GroundGeometry::Parse(parsedGeometryData, scene);
-                    }
-                    else if (geometryType == "planes") {
-                      PlaneGeometry::Parse(parsedGeometryData, scene);
-                    }
-                    else if (geometryType == "torusKnots") {
-                      TorusKnotGeometry::Parse(parsedGeometryData, scene);
-                    }
-                    else if (geometryType == "vertexData") {
+                    if (geometryType == "vertexData") {
                       Geometry::Parse(parsedGeometryData, scene, rootUrl);
                     }
                     found = true;
@@ -189,7 +167,7 @@ bool BabylonFileLoader::importMesh(
             if (!found) {
               BABYLON_LOGF_WARN("BabylonFileLoader",
                                 "Geometry not found for mesh %s",
-                                parsedMeshId.c_str());
+                                parsedMeshId.c_str())
             }
           }
         }
@@ -241,7 +219,7 @@ bool BabylonFileLoader::importMesh(
             if (!mat) {
               BABYLON_LOGF_WARN("BabylonFileLoader",
                                 "Material not found for mesh %s",
-                                parsedMeshId.c_str());
+                                parsedMeshId.c_str())
             }
             else {
               log << "\n\tMaterial " << mat->toString(fullDetails);
@@ -344,7 +322,7 @@ bool BabylonFileLoader::importMesh(
       onError(msg, err.what());
     }
     else {
-      BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", msg.c_str());
+      BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", msg.c_str())
     }
   }
   catch (...) {
@@ -511,7 +489,7 @@ bool BabylonFileLoader::load(
       onError(msg, err.what());
     }
     else {
-      BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", msg.c_str());
+      BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", msg.c_str())
     }
   }
   catch (...) {
@@ -615,50 +593,6 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
     if (json_util::has_valid_key_value(parsedData, "geometries")) {
       const auto geometries = parsedData["geometries"];
       std::vector<GeometryPtr> addedGeometry;
-
-      // Boxes
-      for (const auto& parsedBox :
-           json_util::get_array<json>(geometries, "boxes")) {
-        addedGeometry.emplace_back(BoxGeometry::Parse(parsedBox, scene));
-      }
-
-      // Spheres
-      for (const auto& parsedSphere :
-           json_util::get_array<json>(geometries, "spheres")) {
-        addedGeometry.emplace_back(SphereGeometry::Parse(parsedSphere, scene));
-      }
-
-      // Cylinders
-      for (const auto& parsedCylinder :
-           json_util::get_array<json>(geometries, "cylinders")) {
-        addedGeometry.emplace_back(
-          CylinderGeometry::Parse(parsedCylinder, scene));
-      }
-
-      // Toruses
-      for (const auto& parsedTorus :
-           json_util::get_array<json>(geometries, "toruses")) {
-        addedGeometry.emplace_back(TorusGeometry::Parse(parsedTorus, scene));
-      }
-
-      // Grounds
-      for (const auto& parsedGround :
-           json_util::get_array<json>(geometries, "grounds")) {
-        addedGeometry.emplace_back(GroundGeometry::Parse(parsedGround, scene));
-      }
-
-      // Planes
-      for (const auto& parsedPlane :
-           json_util::get_array<json>(geometries, "planes")) {
-        addedGeometry.emplace_back(PlaneGeometry::Parse(parsedPlane, scene));
-      }
-
-      // TorusKnots
-      for (const auto& parsedTorusKnot :
-           json_util::get_array<json>(geometries, "torusKnots")) {
-        addedGeometry.emplace_back(
-          TorusKnotGeometry::Parse(parsedTorusKnot, scene));
-      }
 
       // VertexData
       for (const auto& parsedVertexData :
@@ -815,7 +749,7 @@ AssetContainerPtr BabylonFileLoader::loadAssetContainer(
       onError(msg, err.what());
     }
     else {
-      BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", msg.c_str());
+      BABYLON_LOGF_ERROR("BabylonFileLoader", "%s", msg.c_str())
     }
   }
   catch (...) {
@@ -838,7 +772,7 @@ void BabylonFileLoader::finally(const std::string& producer,
                                                      logOperation(producer);
     const auto logStr
       = SceneLoader::LoggingLevel() != SceneLoader::MINIMAL_LOGGING ? _log : "";
-    BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str());
+    BABYLON_LOGF_INFO("BabylonFileLoader", "%s%s", msg.c_str(), logStr.c_str())
   }
 }
 

@@ -1,10 +1,10 @@
 #include <babylon/particles/base_particle_system.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/image_processing_configuration_defines.h>
 #include <babylon/materials/textures/raw_texture.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/cone_particle_emitter.h>
 #include <babylon/particles/emittertypes/cylinder_directed_particle_emitter.h>

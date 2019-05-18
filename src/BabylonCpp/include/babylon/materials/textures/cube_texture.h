@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_CUBE_TEXTURE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/engine_constants.h>
+#include <babylon/engines/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {

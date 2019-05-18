@@ -4,10 +4,10 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
-#include <babylon/engine/constants.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
-#include <babylon/engine/scene_component_constants.h>
+#include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
+#include <babylon/engines/scene_component_constants.h>
 #include <babylon/lensflares/lens_flare.h>
 #include <babylon/lensflares/lens_flare_system_scene_component.h>
 #include <babylon/lights/ishadow_light.h>
@@ -19,8 +19,8 @@
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

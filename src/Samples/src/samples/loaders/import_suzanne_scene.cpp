@@ -1,10 +1,10 @@
 #include <vector>
 #include <babylon/samples/loaders/import_suzanne_scene.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/helpers/environment_helper.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 namespace Samples {

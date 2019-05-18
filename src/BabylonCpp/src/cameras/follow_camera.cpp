@@ -1,6 +1,6 @@
 #include <babylon/cameras/follow_camera.h>
 
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

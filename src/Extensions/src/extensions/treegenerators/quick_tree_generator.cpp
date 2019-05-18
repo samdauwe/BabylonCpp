@@ -2,10 +2,10 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
-#include <babylon/mesh/vertex_data.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/vertex_data.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

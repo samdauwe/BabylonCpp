@@ -1,6 +1,6 @@
 #include <babylon/gizmos/position_gizmo.h>
 
-#include <babylon/behaviors/mesh/pointer_drag_behavior.h>
+#include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
 #include <babylon/gizmos/axis_drag_gizmo.h>
 #include <babylon/math/color3.h>

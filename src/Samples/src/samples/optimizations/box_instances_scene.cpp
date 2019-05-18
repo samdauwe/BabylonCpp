@@ -2,8 +2,8 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/lights/hemispheric_light.h>
-#include <babylon/mesh/instanced_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/instanced_mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

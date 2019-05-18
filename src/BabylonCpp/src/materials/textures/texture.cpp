@@ -2,13 +2,13 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/mirror_texture.h>
-#include <babylon/mesh/buffer.h>
+#include <babylon/meshes/buffer.h>
 #include <babylon/tools/serialization_helper.h>
 #include <babylon/tools/tools.h>
 

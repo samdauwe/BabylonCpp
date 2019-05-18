@@ -2,12 +2,12 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/shader_material.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/rendering/face_adjacencies.h>
 
 namespace BABYLON {

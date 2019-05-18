@@ -1,9 +1,9 @@
 #include <babylon/materials/push_material.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/sub_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/sub_mesh.h>
 
 namespace BABYLON {
 

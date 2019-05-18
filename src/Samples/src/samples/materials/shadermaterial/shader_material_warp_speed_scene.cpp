@@ -1,11 +1,11 @@
 #include <babylon/samples/materials/shadermaterial/shader_material_warp_speed_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/shader_material.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

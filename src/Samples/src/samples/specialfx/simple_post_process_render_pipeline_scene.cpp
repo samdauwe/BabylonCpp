@@ -1,9 +1,9 @@
 #include <babylon/samples/specialfx/simple_post_process_render_pipeline_scene.h>
 
 #include <babylon/cameras/free_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/postprocesses/black_and_white_post_process.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_effect.h>

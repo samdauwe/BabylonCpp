@@ -5,8 +5,8 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/octrees/octree_block.h>
 #include <babylon/math/vector3.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/sub_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/sub_mesh.h>
 
 namespace BABYLON {
 

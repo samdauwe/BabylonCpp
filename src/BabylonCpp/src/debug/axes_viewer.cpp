@@ -2,8 +2,8 @@
 
 #include <babylon/materials/material.h>
 #include <babylon/math/vector3.h>
-#include <babylon/mesh/lines_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Debug {

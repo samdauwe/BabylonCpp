@@ -1,6 +1,6 @@
 #include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 
-#include <babylon/engine/engine_constants.h>
+#include <babylon/engines/engine_constants.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/scalar.h>

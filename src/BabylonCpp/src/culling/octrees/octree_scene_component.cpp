@@ -2,8 +2,8 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/collisions/collider.h>
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 

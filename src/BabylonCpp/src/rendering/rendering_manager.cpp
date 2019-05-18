@@ -1,11 +1,11 @@
 #include <babylon/rendering/rendering_manager.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/rendering_group_info.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/rendering_group_info.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
-#include <babylon/mesh/sub_mesh.h>
+#include <babylon/meshes/sub_mesh.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/rendering/irendering_manager_auto_clear_setup.h>
 #include <babylon/rendering/rendering_group.h>

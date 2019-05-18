@@ -1,7 +1,7 @@
 #include <babylon/samples/meshes/mesh_utils.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/mesh/vertex_data.h>
+#include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {
 namespace Samples {

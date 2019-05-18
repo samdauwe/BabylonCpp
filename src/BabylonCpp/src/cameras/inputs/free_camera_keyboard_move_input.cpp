@@ -1,7 +1,7 @@
 #include <babylon/cameras/inputs/free_camera_keyboard_move_input.h>
 
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/events/keyboard_event_types.h>
 #include <babylon/events/keyboard_info.h>
 #include <babylon/interfaces/icanvas.h>

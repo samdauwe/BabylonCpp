@@ -1,7 +1,7 @@
 #include <babylon/samples/specialfx/kernel_based_blur_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/loading/scene_loader.h>
 #include <babylon/postprocesses/blur_post_process.h>

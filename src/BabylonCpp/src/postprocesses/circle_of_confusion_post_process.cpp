@@ -2,7 +2,7 @@
 
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/render_target_texture.h>
 

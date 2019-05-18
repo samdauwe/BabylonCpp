@@ -1,12 +1,12 @@
 #include <babylon/extensions/hexplanetgeneration/simple_planet.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/extensions/hexplanetgeneration/icosphere.h>
 #include <babylon/extensions/hexplanetgeneration/terrain/terrain.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/lines_mesh.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_data.h>
+#include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {
 namespace Extensions {

@@ -4,8 +4,8 @@
 #include <babylon/bones/skeleton.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
@@ -18,9 +18,9 @@
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/plane.h>
 #include <babylon/math/tmp.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
 
 namespace BABYLON {

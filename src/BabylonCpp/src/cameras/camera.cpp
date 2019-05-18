@@ -13,8 +13,8 @@
 #include <babylon/core/string.h>
 #include <babylon/culling/icullable.h>
 #include <babylon/culling/ray.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
 #include <babylon/postprocesses/pass_post_process.h>

@@ -5,9 +5,9 @@
 #include <imgui.h>
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/constants.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/materials/texture_reserved_data_store.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/base_texture.h>

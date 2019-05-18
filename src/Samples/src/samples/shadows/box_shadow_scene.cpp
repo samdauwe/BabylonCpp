@@ -5,7 +5,7 @@
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

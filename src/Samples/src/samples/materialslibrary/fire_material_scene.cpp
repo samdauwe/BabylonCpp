@@ -4,7 +4,7 @@
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/lights/spot_light.h>
@@ -16,7 +16,7 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/materialslibrary/fire/fire_material.h>
 #include <babylon/math/scalar.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

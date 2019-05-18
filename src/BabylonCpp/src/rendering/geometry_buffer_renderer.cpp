@@ -3,18 +3,18 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/skeleton.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/constants.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/multi_render_target.h>
-#include <babylon/mesh/_instances_batch.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/sub_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/_instances_batch.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/rendering/geometry_buffer_renderer_scene_component.h>
 
 namespace BABYLON {

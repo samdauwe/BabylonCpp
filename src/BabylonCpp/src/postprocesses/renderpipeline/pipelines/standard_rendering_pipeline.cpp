@@ -5,8 +5,8 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/light.h>

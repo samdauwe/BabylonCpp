@@ -1,8 +1,8 @@
 #include <babylon/instrumentation/scene_instrumentation.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

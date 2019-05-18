@@ -1,7 +1,7 @@
 #include <babylon/tools/optimization/hardware_scaling_optimization.h>
 
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

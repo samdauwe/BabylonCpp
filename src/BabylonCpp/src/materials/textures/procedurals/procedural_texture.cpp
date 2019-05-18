@@ -1,9 +1,9 @@
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
-#include <babylon/engine/scene_component_constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
+#include <babylon/engines/scene_component_constants.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -12,7 +12,7 @@
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/procedurals/procedural_texture_scene_component.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

@@ -2,8 +2,8 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/engine_constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/engine_constants.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/math/scalar.h>

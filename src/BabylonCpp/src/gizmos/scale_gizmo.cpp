@@ -1,12 +1,12 @@
 #include <babylon/gizmos/scale_gizmo.h>
 
-#include <babylon/behaviors/mesh/pointer_drag_behavior.h>
+#include <babylon/behaviors/meshes/pointer_drag_behavior.h>
 #include <babylon/core/logging.h>
 #include <babylon/gizmos/axis_scale_gizmo.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 

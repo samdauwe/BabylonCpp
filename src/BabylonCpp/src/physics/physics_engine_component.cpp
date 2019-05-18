@@ -1,6 +1,6 @@
 #include <babylon/physics/physics_engine_component.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/physics/physics_engine.h>
 
 namespace BABYLON {

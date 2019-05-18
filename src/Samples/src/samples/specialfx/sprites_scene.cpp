@@ -2,7 +2,7 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/sprites/sprite_manager.h>
 

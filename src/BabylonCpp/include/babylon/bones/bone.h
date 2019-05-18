@@ -3,7 +3,7 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
-#include <babylon/engine/node.h>
+#include <babylon/engines/node.h>
 
 namespace BABYLON {
 

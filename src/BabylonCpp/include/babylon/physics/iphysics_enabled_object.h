@@ -2,7 +2,7 @@
 #define BABYLON_PHYSICS_IPHYSICS_ENABLED_OBJECT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 

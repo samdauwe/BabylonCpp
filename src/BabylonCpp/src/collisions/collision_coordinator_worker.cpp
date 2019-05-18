@@ -12,13 +12,13 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/geometry.h>
-#include <babylon/mesh/instanced_mesh.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/sub_mesh.h>
-#include <babylon/mesh/transform_node.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/geometry.h>
+#include <babylon/meshes/instanced_mesh.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/transform_node.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

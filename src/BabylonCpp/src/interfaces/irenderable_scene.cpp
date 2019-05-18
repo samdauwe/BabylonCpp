@@ -1,5 +1,5 @@
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {

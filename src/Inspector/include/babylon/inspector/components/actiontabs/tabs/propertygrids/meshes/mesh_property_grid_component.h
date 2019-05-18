@@ -6,7 +6,7 @@
 #include <imgui.h>
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/color3_line_component.h>
 #include <babylon/inspector/components/actiontabs/lines/float_line_component.h>
@@ -17,11 +17,11 @@
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_reserved_data_store.h>
 #include <babylon/materials/material.h>
 #include <babylon/materialslibrary/normal/normal_material.h>
-#include <babylon/mesh/lines_mesh.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_buffer.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 

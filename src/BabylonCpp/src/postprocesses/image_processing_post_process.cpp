@@ -1,8 +1,8 @@
 #include <babylon/postprocesses/image_processing_post_process.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/materials/image_processing_configuration.h>

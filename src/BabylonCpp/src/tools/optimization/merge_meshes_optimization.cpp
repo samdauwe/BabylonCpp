@@ -1,9 +1,9 @@
 #include <babylon/tools/optimization/merge_meshes_optimization.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 

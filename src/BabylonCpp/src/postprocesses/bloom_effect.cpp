@@ -1,6 +1,6 @@
 #include <babylon/postprocesses/bloom_effect.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/postprocesses/bloom_merge_post_process.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/extract_highlights_post_process.h>

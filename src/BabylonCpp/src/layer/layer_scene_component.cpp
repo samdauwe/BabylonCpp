@@ -1,8 +1,8 @@
 #include <babylon/layer/layer_scene_component.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/layer/layer.h>
 
 namespace BABYLON {

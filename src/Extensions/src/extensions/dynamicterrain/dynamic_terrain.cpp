@@ -3,13 +3,13 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/extensions/dynamicterrain/dynamic_terrain_options.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_buffer.h>
-#include <babylon/mesh/vertex_data.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/vertex_data.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

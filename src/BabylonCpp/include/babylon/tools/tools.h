@@ -6,7 +6,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
-#include <babylon/engine/engine_constants.h>
+#include <babylon/engines/engine_constants.h>
 #include <babylon/tools/ivalue_gradient.h>
 
 namespace BABYLON {

@@ -1,6 +1,6 @@
 #include <babylon/extensions/navigation/crowd_mesh_updater_system.h>
 
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 namespace Extensions {

@@ -1,7 +1,7 @@
 #include <babylon/physics/helper/physics_gravitational_field_event.h>
 
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/physics/helper/physics_gravitational_field_event_data.h>
 #include <babylon/physics/helper/physics_helper.h>
 #include <babylon/physics/helper/physics_radial_explosion_event.h>

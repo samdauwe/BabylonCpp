@@ -1,8 +1,8 @@
 #include <babylon/gizmos/gizmo.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {

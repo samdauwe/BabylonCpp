@@ -4,12 +4,12 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/culling/bounding_sphere.h>
-#include <babylon/engine/constants.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/sub_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/sub_mesh.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/rendering/edges_renderer.h>
 #include <babylon/sprites/sprite_manager.h>

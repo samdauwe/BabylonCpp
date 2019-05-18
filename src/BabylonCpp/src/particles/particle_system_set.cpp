@@ -3,9 +3,9 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/particles/iparticle_system.h>
 
 namespace BABYLON {

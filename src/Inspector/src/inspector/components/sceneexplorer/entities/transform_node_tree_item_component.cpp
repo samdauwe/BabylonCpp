@@ -3,7 +3,7 @@
 #include <babylon/core/string.h>
 #include <babylon/imgui/imgui_utils.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_label_component.h>
-#include <babylon/mesh/transform_node.h>
+#include <babylon/meshes/transform_node.h>
 
 namespace BABYLON {
 

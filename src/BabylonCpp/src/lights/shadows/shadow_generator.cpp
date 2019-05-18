@@ -7,8 +7,8 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/ishadow_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/lights/shadows/shadow_generator_scene_component.h>
@@ -22,10 +22,10 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/vector2.h>
-#include <babylon/mesh/_instances_batch.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/sub_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/_instances_batch.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>

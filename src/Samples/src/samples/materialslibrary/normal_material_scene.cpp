@@ -3,7 +3,7 @@
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materialslibrary/normal/normal_material.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

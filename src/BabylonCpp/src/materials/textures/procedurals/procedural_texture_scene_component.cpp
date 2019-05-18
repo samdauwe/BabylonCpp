@@ -1,6 +1,6 @@
 #include <babylon/materials/textures/procedurals/procedural_texture_scene_component.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
 #include <babylon/tools/tools.h>
 

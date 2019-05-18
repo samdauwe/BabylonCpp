@@ -2,8 +2,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/perlinnoise/perlin_noise_procedural_texture_fragment_fx.h>
 

@@ -1,6 +1,6 @@
 #include <babylon/inspector/components/actiontabs/tabs/debug_tab_component.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/line_container_component.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/materials/standard_material.h>

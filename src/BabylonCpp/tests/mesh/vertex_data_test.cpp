@@ -1,9 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <babylon/mesh/geometry.h>
-#include <babylon/mesh/vertex_data.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/geometry.h>
+#include <babylon/meshes/vertex_data.h>
+#include <babylon/meshes/vertex_data_options.h>
 
 TEST(TestVertexData, CreateBox)
 {

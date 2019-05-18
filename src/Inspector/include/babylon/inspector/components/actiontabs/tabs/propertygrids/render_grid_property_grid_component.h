@@ -2,12 +2,12 @@
 #define BABYLON_INSPECTOR_COMPONENTS_ACTION_TABS_TABS_PROPERTY_GRIDS_SCENE_PROPERTY_GRID_COMPONENT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/actiontabs/lines/check_box_line_component.h>
 #include <babylon/inspector/components/actiontabs/tabs/propertygrids/meshes/mesh_reserved_data_store.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/grid/grid_material.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {

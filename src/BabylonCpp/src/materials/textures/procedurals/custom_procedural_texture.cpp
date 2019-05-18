@@ -3,7 +3,7 @@
 #include <babylon/core/filesystem.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

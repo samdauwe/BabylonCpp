@@ -5,9 +5,9 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/pbr/pbr_material.h>
 #include <babylon/materials/textures/hdr_cube_texture.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
-#include <babylon/mesh/vertex_data.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/vertex_data.h>
 #include <babylon/morph/morph_target_manager.h>
 
 namespace BABYLON {

@@ -4,7 +4,7 @@
 #include <babylon/culling/bounding_info.h>
 #include <babylon/extensions/navigation/crowd_roadmap_vertex.h>
 #include <babylon/extensions/navigation/rvo2/rvo_simulator.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 namespace Extensions {

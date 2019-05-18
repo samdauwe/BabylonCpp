@@ -1,7 +1,7 @@
 #include <babylon/particles/particle_helper.h>
 
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
+#include <babylon/engines/engine.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/particles/gpu_particle_system.h>
 #include <babylon/particles/particle_system.h>

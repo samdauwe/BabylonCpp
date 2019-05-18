@@ -3,8 +3,8 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/loading/ifileInfo.h>
 #include <babylon/loading/iregistered_plugin.h>
 #include <babylon/loading/iscene_loader_plugin.h>

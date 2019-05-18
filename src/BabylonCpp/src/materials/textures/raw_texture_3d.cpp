@@ -1,7 +1,7 @@
 #include <babylon/materials/textures/raw_texture_3d.h>
 
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/textures/internal_texture.h>
 
 namespace BABYLON {

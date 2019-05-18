@@ -3,11 +3,11 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/bones/bone.h>
 #include <babylon/bones/skeleton.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/math/tmp.h>
-#include <babylon/mesh/lines_mesh.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Debug {

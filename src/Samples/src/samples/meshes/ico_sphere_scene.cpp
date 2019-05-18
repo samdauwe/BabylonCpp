@@ -1,12 +1,12 @@
 #include <babylon/samples/meshes/ico_sphere_scene.h>
 
 #include <babylon/cameras/free_camera.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/lights/hemispheric_light.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {

@@ -3,8 +3,8 @@
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materialslibrary/gradient/gradient_material.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {

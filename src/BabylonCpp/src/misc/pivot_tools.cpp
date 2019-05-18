@@ -1,6 +1,6 @@
 #include <babylon/misc/pivot_tools.h>
 
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 

@@ -8,9 +8,9 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/abstract_mesh.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

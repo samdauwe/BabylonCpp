@@ -7,7 +7,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/quaternion.h>
@@ -15,8 +15,8 @@
 #include <babylon/math/size.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/tools/tools.h>
 
 namespace BABYLON {

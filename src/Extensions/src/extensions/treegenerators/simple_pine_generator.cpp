@@ -2,7 +2,7 @@
 
 #include <babylon/core/random.h>
 #include <babylon/math/vector3.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Extensions {

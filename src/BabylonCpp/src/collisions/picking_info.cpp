@@ -3,8 +3,8 @@
 #include <babylon/math/matrix.h>
 #include <babylon/math/tmp.h>
 #include <babylon/math/vector2.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

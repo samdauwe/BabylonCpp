@@ -1,7 +1,7 @@
 #include <babylon/samples/textures/spherical_panning_scene.h>
 
 #include <babylon/cameras/free_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/helpers/photo_dome.h>
 #include <babylon/helpers/photo_dome_options.h>
 #include <babylon/interfaces/icanvas.h>

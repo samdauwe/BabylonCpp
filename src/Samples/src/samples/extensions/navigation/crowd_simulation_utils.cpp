@@ -2,7 +2,7 @@
 
 #include <babylon/materials/standard_material.h>
 #include <babylon/math/color3.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

@@ -1,13 +1,13 @@
 #include <babylon/gizmos/axis_scale_gizmo.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/behaviors/mesh/pointer_drag_behavior.h>
-#include <babylon/engine/scene.h>
+#include <babylon/behaviors/meshes/pointer_drag_behavior.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/lines_mesh.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {

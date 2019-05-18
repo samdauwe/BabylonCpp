@@ -1,13 +1,13 @@
 #include <babylon/samples/specialfx/volumetric_light_scattering_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-//#include <babylon/engine/scene.h>
+//#include <babylon/engines/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
 //#include <babylon/materials/textures/texture_constants.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/postprocesses/volumetric_light_scattering_post_process.h>
 
 namespace BABYLON {

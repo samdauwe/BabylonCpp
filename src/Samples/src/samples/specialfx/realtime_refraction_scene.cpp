@@ -1,13 +1,13 @@
 #include <babylon/samples/specialfx/realtime_refraction_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/fresnel_parameters.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/mirror_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/probes/reflection_probe.h>
 
 namespace BABYLON {

@@ -5,7 +5,7 @@
 #include <babylon/materials/pbr/pbr_specular_glossiness_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

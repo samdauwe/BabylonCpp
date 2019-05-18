@@ -4,7 +4,7 @@
 #include <babylon/animations/animation_value.h>
 #include <babylon/animations/runtime_animation.h>
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

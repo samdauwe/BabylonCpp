@@ -5,7 +5,7 @@
 #include <babylon/extensions/treegenerators/quick_tree_generator.h>
 #include <babylon/lights/directional_light.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

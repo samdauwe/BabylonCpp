@@ -1,13 +1,13 @@
 #include <babylon/helpers/photo_dome.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/helpers/photo_dome_options.h>
 #include <babylon/materials/background/background_material.h>
 #include <babylon/materials/push_material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 

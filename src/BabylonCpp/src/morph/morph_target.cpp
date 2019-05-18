@@ -3,10 +3,10 @@
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/json_util.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

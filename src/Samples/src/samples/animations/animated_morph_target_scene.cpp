@@ -2,11 +2,11 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/core/random.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/morph/morph_target_manager.h>
 
 namespace BABYLON {

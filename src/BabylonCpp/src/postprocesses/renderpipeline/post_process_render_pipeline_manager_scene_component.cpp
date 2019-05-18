@@ -1,6 +1,6 @@
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager_scene_component.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline_manager.h>
 
 namespace BABYLON {

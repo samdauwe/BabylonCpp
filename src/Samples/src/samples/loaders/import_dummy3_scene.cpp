@@ -1,6 +1,6 @@
 #include <babylon/samples/loaders/import_dummy3_scene.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/helpers/environment_helper.h>
 #include <babylon/loading/scene_loader.h>
 

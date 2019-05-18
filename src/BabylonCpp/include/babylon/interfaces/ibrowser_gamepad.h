@@ -2,7 +2,7 @@
 #define BABYLON_INTERFACES_IBROWSER_GAMEPAD_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/gamepad/gamepad_pose.h>
+#include <babylon/gamepads/gamepad_pose.h>
 
 namespace BABYLON {
 

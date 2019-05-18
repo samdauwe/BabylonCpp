@@ -6,10 +6,10 @@
 #include <babylon/behaviors/cameras/framing_behavior.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/core/string.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 

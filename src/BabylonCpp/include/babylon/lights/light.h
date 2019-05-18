@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/engine/node.h>
+#include <babylon/engines/node.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>

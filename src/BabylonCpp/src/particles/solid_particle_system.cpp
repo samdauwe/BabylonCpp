@@ -5,16 +5,16 @@
 #include <babylon/cameras/target_camera.h>
 #include <babylon/core/random.h>
 #include <babylon/culling/bounding_info.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/math/axis.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/tmp.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_buffer.h>
-#include <babylon/mesh/vertex_data.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/vertex_data.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/particles/depth_sorted_particle.h>
 #include <babylon/particles/model_shape.h>
 

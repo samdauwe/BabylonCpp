@@ -7,7 +7,7 @@
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/materialslibrary/water/water_material.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

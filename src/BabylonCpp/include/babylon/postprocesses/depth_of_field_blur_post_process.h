@@ -2,7 +2,7 @@
 #define BABYLON_POSTPROCESSES_DEPTH_OF_FIELD_BLUR_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/postprocesses/blur_post_process.h>
 
 namespace BABYLON {

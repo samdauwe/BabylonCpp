@@ -2,7 +2,7 @@
 #define BABYLON_PHYSICS_HELPER_PHYSICS_RADIAL_EXPLOSION_EVENT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/physics/helper/physics_helper_enums.h>
 
 namespace BABYLON {

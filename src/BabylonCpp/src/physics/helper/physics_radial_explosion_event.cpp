@@ -2,8 +2,8 @@
 
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/mesh_builder.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/mesh_builder.h>
 #include <babylon/physics/helper/physics_force_and_contact_point.h>
 #include <babylon/physics/helper/physics_radial_explosion_event_data.h>
 #include <babylon/physics/iphysics_enabled_object.h>

@@ -4,11 +4,11 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_info.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/uniform_buffer.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 

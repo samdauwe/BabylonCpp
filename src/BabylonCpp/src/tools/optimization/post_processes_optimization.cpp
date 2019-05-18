@@ -1,6 +1,6 @@
 #include <babylon/tools/optimization/post_processes_optimization.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

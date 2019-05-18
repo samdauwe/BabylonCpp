@@ -6,8 +6,8 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/scalar.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_data.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_data.h>
 
 namespace BABYLON {
 namespace Samples {

@@ -3,7 +3,7 @@
 #include <babylon/cameras/free_camera.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 #include <babylon/proceduraltextureslibrary/cloud/cloud_procedural_texture.h>
 
 namespace BABYLON {

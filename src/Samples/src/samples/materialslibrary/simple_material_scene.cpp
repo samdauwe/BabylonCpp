@@ -4,8 +4,8 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materialslibrary/simple/simple_material.h>
-#include <babylon/mesh/ground_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/ground_mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

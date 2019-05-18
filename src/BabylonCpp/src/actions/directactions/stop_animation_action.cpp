@@ -4,7 +4,7 @@
 
 #include <babylon/actions/action_manager.h>
 #include <babylon/animations/ianimatable.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

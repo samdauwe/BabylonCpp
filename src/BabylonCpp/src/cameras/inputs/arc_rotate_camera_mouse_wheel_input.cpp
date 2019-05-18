@@ -1,7 +1,7 @@
 #include <babylon/cameras/inputs/arc_rotate_camera_mouse_wheel_input.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/events/pointer_event_types.h>
 
 namespace BABYLON {

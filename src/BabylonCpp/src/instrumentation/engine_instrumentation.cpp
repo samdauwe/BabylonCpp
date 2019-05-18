@@ -1,6 +1,6 @@
 #include <babylon/instrumentation/engine_instrumentation.h>
 
-#include <babylon/engine/engine.h>
+#include <babylon/engines/engine.h>
 
 namespace BABYLON {
 

@@ -3,9 +3,9 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/collisions/picking_info.h>
 #include <babylon/culling/ray.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
-#include <babylon/engine/scene_component_constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
+#include <babylon/engines/scene_component_constants.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
@@ -14,8 +14,8 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/tmp.h>
-#include <babylon/mesh/buffer.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/buffer.h>
+#include <babylon/meshes/vertex_buffer.h>
 #include <babylon/sprites/sprite_scene_component.h>
 #include <babylon/tools/tools.h>
 

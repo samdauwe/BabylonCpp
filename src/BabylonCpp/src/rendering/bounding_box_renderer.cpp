@@ -2,14 +2,14 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_box.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/shader_material.h>
-#include <babylon/mesh/sub_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
-#include <babylon/mesh/vertex_data.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/vertex_data.h>
+#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 

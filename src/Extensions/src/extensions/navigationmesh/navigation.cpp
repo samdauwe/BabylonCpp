@@ -4,9 +4,9 @@
 #include <babylon/extensions/navigationmesh/channel.h>
 #include <babylon/math/plane.h>
 #include <babylon/math/vector3.h>
-#include <babylon/mesh/geometry.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/geometry.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 #include <babylon/extensions/pathfinding/a_star_search.h>
 

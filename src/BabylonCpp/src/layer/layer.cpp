@@ -1,8 +1,8 @@
 #include <babylon/layer/layer.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene_component_constants.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene_component_constants.h>
 #include <babylon/layer/layer_scene_component.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
@@ -10,7 +10,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/matrix.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

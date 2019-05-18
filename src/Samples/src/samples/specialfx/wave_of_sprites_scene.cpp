@@ -1,7 +1,7 @@
 #include <babylon/samples/specialfx/wave_of_sprites_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/sprites/sprite_manager.h>
 

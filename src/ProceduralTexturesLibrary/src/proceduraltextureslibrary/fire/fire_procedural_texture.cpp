@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
 #include <babylon/proceduraltextureslibrary/fire/fire_procedural_texture_fragment_fx.h>
 

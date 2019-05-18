@@ -1,10 +1,10 @@
 #include <babylon/physics/helper/physics_vortex_event.h>
 
 #include <babylon/culling/ray.h>
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/mesh.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/mesh.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/physics/helper/physics_force_and_contact_point.h>
 #include <babylon/physics/helper/physics_vortex_event_data.h>
 #include <babylon/physics/iphysics_enabled_object.h>

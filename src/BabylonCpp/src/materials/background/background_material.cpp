@@ -2,9 +2,9 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/engine_constants.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/background/background_material_defines.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/effect.h>
@@ -16,8 +16,8 @@
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/materials/uniform_buffer.h>
-#include <babylon/mesh/sub_mesh.h>
-#include <babylon/mesh/vertex_buffer.h>
+#include <babylon/meshes/sub_mesh.h>
+#include <babylon/meshes/vertex_buffer.h>
 
 namespace BABYLON {
 

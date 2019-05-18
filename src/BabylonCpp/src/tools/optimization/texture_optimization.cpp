@@ -1,6 +1,6 @@
 #include <babylon/tools/optimization/texture_optimization.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {

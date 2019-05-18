@@ -1,11 +1,11 @@
 #include <babylon/samples/materials/fresnel_parameters_torus_knot_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/engine_constants.h>
+#include <babylon/engines/engine_constants.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/fresnel_parameters.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 namespace Samples {

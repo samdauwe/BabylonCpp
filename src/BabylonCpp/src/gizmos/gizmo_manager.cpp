@@ -1,13 +1,13 @@
 #include <babylon/gizmos/gizmo_manager.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/behaviors/mesh/six_dof_drag_behavior.h>
-#include <babylon/engine/scene.h>
+#include <babylon/behaviors/meshes/six_dof_drag_behavior.h>
+#include <babylon/engines/scene.h>
 #include <babylon/gizmos/bounding_box_gizmo.h>
 #include <babylon/gizmos/position_gizmo.h>
 #include <babylon/gizmos/rotation_gizmo.h>
 #include <babylon/gizmos/scale_gizmo.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 #include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {

@@ -2,9 +2,9 @@
 #define BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_SCENE_COMPONENT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/iscene_component.h>
-#include <babylon/engine/iscene_serializable_component.h>
-#include <babylon/engine/scene_component_constants.h>
+#include <babylon/engines/iscene_component.h>
+#include <babylon/engines/iscene_serializable_component.h>
+#include <babylon/engines/scene_component_constants.h>
 
 using json = nlohmann::json;
 

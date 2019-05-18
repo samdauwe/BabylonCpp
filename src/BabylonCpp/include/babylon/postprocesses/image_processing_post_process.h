@@ -2,7 +2,7 @@
 #define BABYLON_POSTPROCESSES_IMAGE_PROCESSING_POST_PROCESS_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engine/constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/postprocesses/post_process.h>
 

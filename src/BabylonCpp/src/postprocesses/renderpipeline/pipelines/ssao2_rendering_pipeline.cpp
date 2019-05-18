@@ -6,8 +6,8 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/random.h>
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas_rendering_context2D.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/textures/dynamic_texture.h>

@@ -5,7 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/cameras/camera_inputs_manager.h>
-#include <babylon/engine/node.h>
+#include <babylon/engines/node.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>

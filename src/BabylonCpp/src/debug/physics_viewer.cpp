@@ -1,12 +1,12 @@
 #include <babylon/debug/physics_viewer.h>
 
-#include <babylon/engine/engine.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/engine.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/standard_material.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/instanced_mesh.h>
-#include <babylon/mesh/mesh_builder.h>
-#include <babylon/mesh/vertex_data_options.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/instanced_mesh.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/physics/iphysics_engine_plugin.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/physics/physics_impostor.h>

@@ -1,7 +1,7 @@
 #include <babylon/samples/loaders/gltf/import_animated_triangle_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/helpers/environment_helper.h>
 #include <babylon/lights/light.h>
 #include <babylon/loading/glTF/gltf_file_loader.h>

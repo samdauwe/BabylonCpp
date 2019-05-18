@@ -1,7 +1,7 @@
 #include <babylon/samples/textures/environment_texture_scene.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/materials/image_processing_configuration.h>
 #include <babylon/materials/textures/cube_texture.h>
 

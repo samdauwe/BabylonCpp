@@ -35,6 +35,7 @@ public:
    * @param shapeId (integer) is the model shape identifier in the SPS.
    * @param idxInShape (integer) is the index of the particle in the current
    * model (ex: the 10th box of addShape(box, 30))
+   * @param sps defines the sps it is associated to
    * @param modelBoundingInfo is the reference to the model BoundingInfo used
    * for intersection computations.
    */
@@ -55,6 +56,21 @@ public:
    */
   bool intersectsMesh(Mesh* target) const;
   bool intersectsMesh(SolidParticle* target) const;
+
+  /**
+   * @brief Returns `true` if the solid particle is within the frustum defined
+   * by the passed array of planes. A particle is in the frustum if its bounding
+   * box intersects the frustum
+   * @param frustumPlanes defines the frustum to test
+   * @returns true if the particle is in the frustum planes
+   */
+  bool isInFrustum(const std::array<Plane, 6>& frustumPlanes);
+
+  /**
+   * @brief Get the rotation matrix of the particle.
+   * @hidden
+   */
+  void getRotationMatrix(Matrix& m) const;
 
 public:
   /**
@@ -160,6 +176,19 @@ public:
    * Default null.
    */
   std::optional<unsigned int> parentId;
+  /**
+   * The culling strategy to use to check whether the solid particle must be
+   * culled or not when using isInFrustum(). The possible values are :
+   * - AbstractMesh.CULLINGSTRATEGY_STANDARD
+   * - AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
+   * - AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION
+   * - AbstractMesh.CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY
+   * The default value for solid particles is
+   * AbstractMesh.CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY Please read each static
+   * variable documentation in the class AbstractMesh to get details about the
+   * culling process.
+   * */
+  unsigned int cullingStrategy;
   /**
    * Internal global position in the SPS.
    * Hidden

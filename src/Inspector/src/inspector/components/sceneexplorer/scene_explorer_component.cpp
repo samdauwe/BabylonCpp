@@ -6,7 +6,7 @@
 // ImGui
 #include <imgui.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/inspector/components/sceneexplorer/scene_graph_component.h>
 
 namespace BABYLON {

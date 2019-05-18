@@ -1,10 +1,10 @@
 #include <babylon/samples/meshes/circle_curves_from_beziers.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/math/curve3.h>
-#include <babylon/mesh/lines_mesh.h>
+#include <babylon/meshes/lines_mesh.h>
 
 namespace BABYLON {
 namespace Samples {

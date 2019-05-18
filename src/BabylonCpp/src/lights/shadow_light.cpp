@@ -1,7 +1,7 @@
 #include <babylon/lights/shadow_light.h>
 
 #include <babylon/cameras/camera.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/math/axis.h>
 #include <babylon/math/vector3.h>
 

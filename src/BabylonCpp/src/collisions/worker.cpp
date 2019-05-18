@@ -2,7 +2,7 @@
 
 #include <babylon/collisions/babylon_message.h>
 #include <babylon/collisions/worker_reply.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

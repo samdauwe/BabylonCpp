@@ -1,6 +1,6 @@
 #include <babylon/lights/shadows/shadow_generator_scene_component.h>
 
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 #include <babylon/lights/light.h>
 #include <babylon/lights/shadows/shadow_generator.h>
 #include <babylon/materials/textures/render_target_texture.h>

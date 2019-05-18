@@ -9,7 +9,7 @@
 #include <babylon/animations/ianimation_key.h>
 #include <babylon/audio/sound.h>
 #include <babylon/core/logging.h>
-#include <babylon/engine/scene.h>
+#include <babylon/engines/scene.h>
 
 namespace BABYLON {
 

@@ -1,9 +1,9 @@
 #include <babylon/debug/ray_helper.h>
 
-#include <babylon/engine/scene.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/lines_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/engines/scene.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/lines_mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 
