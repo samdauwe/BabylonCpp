@@ -2956,21 +2956,33 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
       // positions
       size_t lp      = positions.size();
       unsigned int l = static_cast<unsigned>(lp / 3);
+      if (positions.size() < 2 * lp) {
+        positions.resize(2 * lp);
+      }
       for (unsigned int p = 0; p < lp; ++p) {
         positions[lp + p] = positions[p];
       }
       // indices
+      if (indices.size() < 2 * li) {
+        indices.resize(2 * li);
+      }
       for (i = 0; i < li; i += 3) {
         indices[i + li]     = indices[i + 2] + l;
         indices[i + 1 + li] = indices[i + 1] + l;
         indices[i + 2 + li] = indices[i] + l;
       }
       // normals
+      if (normals.size() < 2 * ln) {
+        normals.resize(2 * ln);
+      }
       for (n = 0; n < ln; ++n) {
         normals[ln + n] = -normals[n];
       }
       // uvs
       const std::size_t lu = uvs.size();
+      if (uvs.size() < 2 * lu) {
+        uvs.resize(2 * lu);
+      }
       for (std::size_t u = 0; u < lu; ++u) {
         uvs[u + lu] = uvs[u];
       }

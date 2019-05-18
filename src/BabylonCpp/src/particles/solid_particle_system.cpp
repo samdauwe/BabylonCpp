@@ -108,6 +108,7 @@ MeshPtr SolidParticleSystem::buildMesh()
     triangle->dispose();
   }
 
+  _indices32   = IndicesArray(_indices);
   _positions32 = Float32Array(_positions);
   _uvs32       = Float32Array(_uvs);
   _colors32    = Float32Array(_colors);
@@ -191,7 +192,7 @@ SolidParticleSystem::digest(Mesh* _mesh,
   while (f < totalFacets) {
     size = sizeO
            + static_cast<size_t>(
-               std::floor((1.f + static_cast<float>(delta)) * Math::random()));
+             std::floor((1.f + static_cast<float>(delta)) * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -469,11 +470,11 @@ int SolidParticleSystem::addShape(
   const MeshPtr& iMesh, size_t nb,
   const SolidParticleSystemMeshBuilderOptions& options)
 {
-  Float32Array meshPos = iMesh->getVerticesData(VertexBuffer::PositionKind);
-  Uint32Array meshInd  = iMesh->getIndices();
-  Float32Array meshUV  = iMesh->getVerticesData(VertexBuffer::UVKind);
-  Float32Array meshCol = iMesh->getVerticesData(VertexBuffer::ColorKind);
-  Float32Array meshNor = iMesh->getVerticesData(VertexBuffer::NormalKind);
+  auto meshPos = iMesh->getVerticesData(VertexBuffer::PositionKind);
+  auto meshInd = iMesh->getIndices();
+  auto meshUV  = iMesh->getVerticesData(VertexBuffer::UVKind);
+  auto meshCol = iMesh->getVerticesData(VertexBuffer::ColorKind);
+  auto meshNor = iMesh->getVerticesData(VertexBuffer::NormalKind);
   BoundingInfo bbInfo{Vector3::Zero(), Vector3::Zero()};
   if (_particlesIntersect) {
     bbInfo = iMesh->getBoundingInfo();
