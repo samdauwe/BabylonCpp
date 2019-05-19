@@ -5,6 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/camera.h>
 #include <babylon/core/logging.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
@@ -33,7 +34,8 @@ unsigned int StandardRenderingPipeline::LuminanceSteps = 6;
 
 StandardRenderingPipeline::StandardRenderingPipeline(
   const std::string& iName, Scene* scene, float ratio,
-  PostProcess* iOriginalPostProcess, const std::vector<CameraPtr>& cameras)
+  const PostProcessPtr& iOriginalPostProcess,
+  const std::vector<CameraPtr>& cameras)
     : PostProcessRenderPipeline{scene->getEngine(), iName}
     , originalPostProcess{iOriginalPostProcess}
     , downSampleX4PostProcess{nullptr}
@@ -57,7 +59,10 @@ StandardRenderingPipeline::StandardRenderingPipeline(
     , brightThreshold{1.f}
     , blurWidth{512.f}
     , horizontalBlur{false}
-    , exposure{1.f}
+    , exposure{this, &StandardRenderingPipeline::get_exposure,
+               &StandardRenderingPipeline::set_exposure}
+    , hdrAutoExposure{this, &StandardRenderingPipeline::get_hdrAutoExposure,
+                      &StandardRenderingPipeline::set_hdrAutoExposure}
     , lensTexture{nullptr}
     , volumetricLightCoefficient{0.2f}
     , volumetricLightPower{4.f}
@@ -100,14 +105,12 @@ StandardRenderingPipeline::StandardRenderingPipeline(
                         &StandardRenderingPipeline::set_motionBlurSamples}
     , samples{this, &StandardRenderingPipeline::get_samples,
               &StandardRenderingPipeline::set_samples}
-    , _scene{scene}
     , _currentDepthOfFieldSource{nullptr}
     , _basePostProcess{iOriginalPostProcess}
+    , _fixedExposure{1.f}
+    , _currentExposure{1.f}
+    , _hdrAutoExposure{false}
     , _hdrCurrentLuminance{1.f}
-    , _floatTextureType{scene->getEngine()->getCaps().textureFloatRender ?
-                          EngineConstants::TEXTURETYPE_FLOAT :
-                          EngineConstants::TEXTURETYPE_HALF_FLOAT}
-    , _ratio{ratio}
     , _bloomEnabled{false}
     , _depthOfFieldEnabled{false}
     , _vlsEnabled{false}
@@ -122,6 +125,16 @@ StandardRenderingPipeline::StandardRenderingPipeline(
   for (auto& camera : cameras) {
     _cameras[camera->name] = camera;
   }
+
+  // Initialize
+  _scene           = scene;
+  _basePostProcess = iOriginalPostProcess;
+  _ratio           = ratio;
+
+  // Misc
+  _floatTextureType = scene->getEngine()->getCaps().textureFloatRender ?
+                        Constants::TEXTURETYPE_FLOAT :
+                        Constants::TEXTURETYPE_HALF_FLOAT;
 }
 
 StandardRenderingPipeline::~StandardRenderingPipeline()
@@ -193,6 +206,35 @@ float StandardRenderingPipeline::operator[](const std::string& key) const
   }
 
   return 0.f;
+}
+
+float StandardRenderingPipeline::get_exposure() const
+{
+  return _fixedExposure;
+}
+
+void StandardRenderingPipeline::set_exposure(float value)
+{
+  _fixedExposure   = value;
+  _currentExposure = value;
+}
+
+bool StandardRenderingPipeline::get_hdrAutoExposure() const
+{
+  return _hdrAutoExposure;
+}
+
+void StandardRenderingPipeline::set_hdrAutoExposure(bool value)
+{
+  _hdrAutoExposure = value;
+  if (hdrPostProcess) {
+    std::vector<std::string> defines{"#define HDR"};
+    if (value) {
+      defines.emplace_back("#define AUTO_EXPOSURE");
+    }
+    auto joinedDefines = String::join(defines, '\n');
+    hdrPostProcess->updateEffect(joinedDefines);
+  }
 }
 
 bool StandardRenderingPipeline::get_bloomEnabled() const
@@ -369,7 +411,7 @@ void StandardRenderingPipeline::_buildPipeline()
   if (!_basePostProcess) {
     originalPostProcess = PostProcess::New(
       "HDRPass", "standard", {}, {}, ratio, nullptr,
-      TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
+      Constants::TEXTURE_BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
       "#define PASS_POST_PROCESS", _floatTextureType);
     originalPostProcess->onApply = [&](Effect* /*effect*/, EventState& /*es*/) {
       _currentDepthOfFieldSource = originalPostProcess;
@@ -406,7 +448,7 @@ void StandardRenderingPipeline::_buildPipeline()
     textureAdderFinalPostProcess = PostProcess::New(
       "HDRDepthOfFieldSource", "standard", {}, {}, ratio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-      "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+      "#define PASS_POST_PROCESS", Constants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(PostProcessRenderEffect::New(
       scene->getEngine(), "HDRBaseDepthOfFieldSource",
       [this]() -> std::vector<PostProcessPtr> {
@@ -423,7 +465,7 @@ void StandardRenderingPipeline::_buildPipeline()
     volumetricLightFinalPostProcess = PostProcess::New(
       "HDRVLSFinal", "standard", {}, {}, ratio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-      "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+      "#define PASS_POST_PROCESS", Constants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(PostProcessRenderEffect::New(
       scene->getEngine(), "HDRVLSFinal",
       [this]() -> std::vector<PostProcessPtr> {
@@ -441,7 +483,7 @@ void StandardRenderingPipeline::_buildPipeline()
     lensFlareFinalPostProcess = PostProcess::New(
       "HDRPostLensFlareDepthOfFieldSource", "standard", {}, {}, ratio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-      "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+      "#define PASS_POST_PROCESS", Constants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(PostProcessRenderEffect::New(
       scene->getEngine(), "HDRPostLensFlareDepthOfFieldSource",
       [this]() -> std::vector<PostProcessPtr> {
@@ -461,7 +503,7 @@ void StandardRenderingPipeline::_buildPipeline()
     hdrFinalPostProcess = PostProcess::New(
       "HDRPostHDReDepthOfFieldSource", "standard", {}, {}, ratio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-      "#define PASS_POST_PROCESS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+      "#define PASS_POST_PROCESS", Constants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(PostProcessRenderEffect::New(
       scene->getEngine(), "HDRPostHDReDepthOfFieldSource",
       [this]() -> std::vector<PostProcessPtr> { return {hdrFinalPostProcess}; },
@@ -485,7 +527,7 @@ void StandardRenderingPipeline::_buildPipeline()
     // Create fxaa post-process
     fxaaPostProcess = FxaaPostProcess::New(
       "fxaa", 1.f, nullptr, TextureConstants::BILINEAR_SAMPLINGMODE,
-      scene->getEngine(), false, EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+      scene->getEngine(), false, Constants::TEXTURETYPE_UNSIGNED_INT);
     addEffect(PostProcessRenderEffect::New(
       scene->getEngine(), "HDRFxaa",
       [this]() -> std::vector<PostProcessPtr> { return {fxaaPostProcess}; },
@@ -511,7 +553,7 @@ void StandardRenderingPipeline::_createDownSampleX4PostProcess(Scene* scene,
   downSampleX4PostProcess = PostProcess::New(
     "HDRDownSampleX4", "standard", {"dsOffsets"}, {}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define DOWN_SAMPLE_X4", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    "#define DOWN_SAMPLE_X4", Constants::TEXTURETYPE_UNSIGNED_INT);
 
   downSampleX4PostProcess->onApply = [&](Effect* effect, EventState&) {
     Float32Array downSampleX4Offsets(32);
@@ -541,7 +583,7 @@ void StandardRenderingPipeline::_createBrightPassPostProcess(Scene* scene,
   brightPassPostProcess = PostProcess::New(
     "HDRBrightPass", "standard", {"dsOffsets", "brightThreshold"}, {}, ratio,
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define BRIGHT_PASS", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    "#define BRIGHT_PASS", Constants::TEXTURETYPE_UNSIGNED_INT);
 
   brightPassPostProcess->onApply = [&](Effect* effect, EventState&) {
     const float sU = (1.f / brightPassPostProcess->width);
@@ -580,12 +622,12 @@ void StandardRenderingPipeline::_createBlurPostProcesses(
     "HDRBlurH" + underscore + indiceStr, Vector2(1.f, 0.f),
     (*this)[blurWidthKey], ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    Constants::TEXTURETYPE_UNSIGNED_INT);
   auto blurY = BlurPostProcess::New(
     "HDRBlurV" + underscore + indiceStr, Vector2(0.f, 1.f),
     (*this)[blurWidthKey], ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    Constants::TEXTURETYPE_UNSIGNED_INT);
 
   blurX->onActivateObservable.add([&](Camera* /*camera*/, EventState& /*es*/) {
     auto dw = static_cast<float>(blurX->width)
@@ -617,14 +659,14 @@ void StandardRenderingPipeline::_createTextureAdderPostProcess(Scene* scene,
     "HDRTextureAdder", "standard", {"exposure"},
     {"otherSampler", "lensSampler"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define TEXTURE_ADDER", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    "#define TEXTURE_ADDER", Constants::TEXTURETYPE_UNSIGNED_INT);
   textureAdderPostProcess->onApply = [&](Effect* effect, EventState& /*es*/) {
     effect->setTextureFromPostProcess(
       "otherSampler", _vlsEnabled ? _currentDepthOfFieldSource.get() :
                                     originalPostProcess.get());
     effect->setTexture("lensSampler", lensTexture);
 
-    effect->setFloat("exposure", exposure);
+    effect->setFloat("exposure", _currentExposure);
 
     _currentDepthOfFieldSource = textureAdderFinalPostProcess;
   };
@@ -817,15 +859,20 @@ void StandardRenderingPipeline::_createLuminancePostProcesses(
       scene->getEngine(), "HDRLuminanceDownSample" + indexStr,
       [&]() -> std::vector<PostProcessPtr> { return {pp}; }, true));
     ++index;
-  };
+  }
 }
 
 void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
 {
-  hdrPostProcess = PostProcess::New(
+  std::vector<std::string> defines{"#define HDR"};
+  if (_hdrAutoExposure) {
+    defines.emplace_back("#define AUTO_EXPOSURE");
+  }
+  auto joinedDefines = String::join(defines, '\n');
+  hdrPostProcess     = PostProcess::New(
     "HDR", "standard", {"averageLuminance"}, {"textureAdderSampler"}, ratio,
     nullptr, TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define HDR", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    joinedDefines, Constants::TEXTURETYPE_UNSIGNED_INT);
 
   float outputLiminance = 1.f;
   float time            = 0.f;
@@ -854,10 +901,15 @@ void StandardRenderingPipeline::_createHdrPostProcess(Scene* scene, float ratio)
       }
     }
 
-    outputLiminance
-      = Scalar::Clamp(outputLiminance, hdrMinimumLuminance, 1e20f);
+    if (hdrAutoExposure) {
+      _currentExposure = _fixedExposure / outputLiminance;
+    }
+    else {
+      outputLiminance
+        = Scalar::Clamp(outputLiminance, hdrMinimumLuminance, 1e20f);
 
-    effect->setFloat("averageLuminance", outputLiminance);
+      effect->setFloat("averageLuminance", outputLiminance);
+    }
 
     lastTime = time;
 
@@ -878,7 +930,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
      "distortionStrength"},
     {"lensColorSampler"}, ratio / 2.f, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), true,
-    "#define LENS_FLARE", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    "#define LENS_FLARE", Constants::TEXTURETYPE_UNSIGNED_INT);
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), "HDRLensFlare",
     [&]() -> std::vector<PostProcessPtr> { return {lensFlarePostProcess}; },
@@ -890,7 +942,7 @@ void StandardRenderingPipeline::_createLensFlarePostProcess(Scene* scene,
     "HDRLensFlareCompose", "standard", {"lensStarMatrix"},
     {"otherSampler", "lensDirtSampler", "lensStarSampler"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define LENS_FLARE_COMPOSE", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    "#define LENS_FLARE_COMPOSE", Constants::TEXTURETYPE_UNSIGNED_INT);
   addEffect(PostProcessRenderEffect::New(
     scene->getEngine(), "HDRLensFlareCompose",
     [&]() -> std::vector<PostProcessPtr> {
@@ -970,7 +1022,7 @@ void StandardRenderingPipeline::_createDepthOfFieldPostProcess(Scene* scene,
     "HDRDepthOfField", "standard", {"distance"},
     {"otherSampler", "depthSampler"}, ratio, nullptr,
     TextureConstants::BILINEAR_SAMPLINGMODE, scene->getEngine(), false,
-    "#define DEPTH_OF_FIELD", EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    "#define DEPTH_OF_FIELD", Constants::TEXTURETYPE_UNSIGNED_INT);
   depthOfFieldPostProcess->onApply = [&](Effect* effect, EventState&) {
     effect->setTextureFromPostProcess("otherSampler",
                                       textureAdderFinalPostProcess.get());
@@ -998,7 +1050,7 @@ void StandardRenderingPipeline::_createMotionBlurPostProcess(Scene* scene,
     scene->getEngine(), false,
     "#define MOTION_BLUR\n#define MAX_MOTION_SAMPLES "
       + std::to_string(motionBlurSamples()),
-    EngineConstants::TEXTURETYPE_UNSIGNED_INT);
+    Constants::TEXTURETYPE_UNSIGNED_INT);
 
   motionBlurPostProcess->onApply = [&](Effect* effect, EventState&) {
     auto motionScale        = 0.f;

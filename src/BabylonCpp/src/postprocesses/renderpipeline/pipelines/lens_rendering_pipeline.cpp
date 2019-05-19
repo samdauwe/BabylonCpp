@@ -18,11 +18,35 @@
 namespace BABYLON {
 
 LensRenderingPipeline::LensRenderingPipeline(
-  const std::string& name, const LensRenderingPipelineParameters& parameters,
+  const std::string& iName, const LensRenderingPipelineParameters& parameters,
   Scene* scene, float ratio, const std::vector<CameraPtr>& cameras)
-    : PostProcessRenderPipeline(scene->getEngine(), name)
+    : PostProcessRenderPipeline(scene->getEngine(), iName)
+    , scene{this, &LensRenderingPipeline::get_scene}
+    , edgeBlur{this, &LensRenderingPipeline::get_edgeBlur,
+               &LensRenderingPipeline::set_edgeBlur}
+    , grainAmount{this, &LensRenderingPipeline::get_grainAmount,
+                  &LensRenderingPipeline::set_grainAmount}
+    , chromaticAberration{this, &LensRenderingPipeline::get_chromaticAberration,
+                          &LensRenderingPipeline::set_chromaticAberration}
+    , dofAperture{this, &LensRenderingPipeline::get_dofAperture,
+                  &LensRenderingPipeline::set_dofAperture}
+    , edgeDistortion{this, &LensRenderingPipeline::get_edgeDistortion,
+                     &LensRenderingPipeline::set_edgeDistortion}
+    , dofDistortion{this, &LensRenderingPipeline::get_dofDistortion,
+                    &LensRenderingPipeline::set_dofDistortion}
+    , darkenOutOfFocus{this, &LensRenderingPipeline::get_darkenOutOfFocus,
+                       &LensRenderingPipeline::set_darkenOutOfFocus}
+    , blurNoise{this, &LensRenderingPipeline::get_blurNoise,
+                &LensRenderingPipeline::set_blurNoise}
+    , pentagonBokeh{this, &LensRenderingPipeline::get_pentagonBokeh,
+                    &LensRenderingPipeline::set_pentagonBokeh}
+    , highlightsGain{this, &LensRenderingPipeline::get_highlightsGain,
+                     &LensRenderingPipeline::set_highlightsGain}
+    , highlightsThreshold{this, &LensRenderingPipeline::get_highlightsThreshold,
+                          &LensRenderingPipeline::set_highlightsThreshold}
     , _scene{scene}
     , _cameraList{cameras}
+    , _pentagonBokehIsEnabled{false}
 {
   // Fetch texture samplers
   _depthTexture
@@ -89,6 +113,131 @@ void LensRenderingPipeline::addToScene(
   }
 }
 
+std::string LensRenderingPipeline::getClassName() const
+{
+  return "LensRenderingPipeline";
+}
+
+Scene*& LensRenderingPipeline::get_scene()
+{
+  return _scene;
+}
+
+float LensRenderingPipeline::get_edgeBlur() const
+{
+  return _edgeBlur;
+}
+
+void LensRenderingPipeline::set_edgeBlur(float value)
+{
+  setEdgeBlur(value);
+}
+
+float LensRenderingPipeline::get_grainAmount() const
+{
+  return _grainAmount;
+}
+
+void LensRenderingPipeline::set_grainAmount(float value)
+{
+  setGrainAmount(value);
+}
+
+float LensRenderingPipeline::get_chromaticAberration() const
+{
+  return _chromaticAberration;
+}
+
+void LensRenderingPipeline::set_chromaticAberration(float value)
+{
+  setChromaticAberration(value);
+}
+
+float LensRenderingPipeline::get_dofAperture() const
+{
+  return _dofAperture;
+}
+
+void LensRenderingPipeline::set_dofAperture(float value)
+{
+  setAperture(value);
+}
+
+float LensRenderingPipeline::get_edgeDistortion() const
+{
+  return _distortion;
+}
+
+void LensRenderingPipeline::set_edgeDistortion(float value)
+{
+  setEdgeDistortion(value);
+}
+
+float LensRenderingPipeline::get_dofDistortion() const
+{
+  return _dofDistance;
+}
+
+void LensRenderingPipeline::set_dofDistortion(float value)
+{
+  setFocusDistance(value);
+}
+
+float LensRenderingPipeline::get_darkenOutOfFocus() const
+{
+  return _dofDarken;
+}
+
+void LensRenderingPipeline::set_darkenOutOfFocus(float value)
+{
+  setDarkenOutOfFocus(value);
+}
+
+bool LensRenderingPipeline::get_blurNoise() const
+{
+  return _blurNoise;
+}
+
+void LensRenderingPipeline::set_blurNoise(bool value)
+{
+  _blurNoise = value;
+}
+
+bool LensRenderingPipeline::get_pentagonBokeh() const
+{
+  return _pentagonBokehIsEnabled;
+}
+
+void LensRenderingPipeline::set_pentagonBokeh(bool value)
+{
+  if (value) {
+    enablePentagonBokeh();
+  }
+  else {
+    disablePentagonBokeh();
+  }
+}
+
+float LensRenderingPipeline::get_highlightsGain() const
+{
+  return _highlightsGain;
+}
+
+void LensRenderingPipeline::set_highlightsGain(float value)
+{
+  setHighlightsGain(value);
+}
+
+float LensRenderingPipeline::get_highlightsThreshold() const
+{
+  return _highlightsThreshold;
+}
+
+void LensRenderingPipeline::set_highlightsThreshold(float value)
+{
+  setHighlightsThreshold(value);
+}
+
 void LensRenderingPipeline::setEdgeBlur(float amount)
 {
   _edgeBlur = amount;
@@ -152,10 +301,12 @@ void LensRenderingPipeline::setDarkenOutOfFocus(float amount)
 void LensRenderingPipeline::enablePentagonBokeh()
 {
   _highlightsPostProcess->updateEffect("#define PENTAGON\n");
+  _pentagonBokehIsEnabled = true;
 }
 
 void LensRenderingPipeline::disablePentagonBokeh()
 {
+  _pentagonBokehIsEnabled = false;
   _highlightsPostProcess->updateEffect();
 }
 
@@ -190,9 +341,8 @@ void LensRenderingPipeline::disableHighlights()
 void LensRenderingPipeline::dispose(bool disableDepthRender,
                                     bool /*disposeMaterialAndTextures */)
 {
-  // TODO FIXME
-  // _scene->postProcessRenderPipelineManager->detachCamerasFromRenderPipeline(
-  //  _name, _scene->cameras);
+  _scene->postProcessRenderPipelineManager()->detachCamerasFromRenderPipeline(
+    _name, _scene->cameras);
 
   _chromaticAberrationPostProcess = nullptr;
   _highlightsPostProcess          = nullptr;

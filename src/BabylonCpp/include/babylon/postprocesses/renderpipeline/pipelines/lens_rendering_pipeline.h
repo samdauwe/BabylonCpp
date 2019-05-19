@@ -84,6 +84,12 @@ public:
 
   void addToScene(const LensRenderingPipelinePtr& lensRenderingPipeline);
 
+  /**
+   * @brief Get the class name.
+   * @returns "LensRenderingPipeline"
+   */
+  std::string getClassName() const;
+
   // public methods (self explanatory)
 
   /**
@@ -205,27 +211,27 @@ protected:
    *
    * Effect parameters are as follow:
    * {
-   *      chromatic_aberration: number;       // from 0 to x (1 for realism)
-   *      edge_blur: number;                  // from 0 to x (1 for realism)
-   *      distortion: number;                 // from 0 to x (1 for realism)
+   *      chromatic_aberration const;         // from 0 to x (1 for realism)
+   *      edge_blur const;                    // from 0 to x (1 for realism)
+   *      distortion const;                   // from 0 to x (1 for realism)
    *      grain_float amount ;                // from 0 to 1
    *      grain_texture: BABYLON.Texture;     // texture to use for grain
    *                                          // effect; if unset, use random
    *                                          // B&W noise
-   *      dof_focus_distance: number;         // depth-of-field: focus distance;
+   *      dof_focus_distance const;           // depth-of-field: focus distance;
    *                                          // unset to disable (disabled by
    *                                          // default)
-   *      dof_aperture: number;               // depth-of-field: focus blur bias
+   *      dof_aperture const;                 // depth-of-field: focus blur bias
    *                                          // (default: 1)
-   *      dof_darken: number;                 // depth-of-field: darken that
+   *      dof_darken const;                   // depth-of-field: darken that
    *                                          // which is out of focus (from 0
    *                                          // to 1, disabled by default)
    *      dof_pentagon: boolean;              // depth-of-field: makes a
    *                                          // pentagon-like "bokeh" effect
-   *      dof_gain: number;                   // depth-of-field: highlights
+   *      dof_gain const;                     // depth-of-field: highlights
    *                                          // gain; unset to disable
    *                                          // (disabled by default)
-   *      dof_threshold: number;              // depth-of-field: highlights
+   *      dof_threshold const;                // depth-of-field: highlights
    *                                          // threshold (default: 1)
    *      blur_noise: boolean;                // add a little bit of noise to
    *                                          // the blur (default: true)
@@ -245,6 +251,79 @@ protected:
                         Scene* scene, float ratio = 1.f,
                         const std::vector<CameraPtr>& cameras = {});
 
+  // Properties
+
+  /**
+   * @brief Gets associated scene
+   */
+  Scene*& get_scene();
+
+  /**
+   * @brief Gets or sets the edge blur
+   */
+  float get_edgeBlur() const;
+  void set_edgeBlur(float value);
+
+  /**
+   * @brief Gets or sets the grain amount
+   */
+  float get_grainAmount() const;
+  void set_grainAmount(float value);
+
+  /**
+   * @brief Gets or sets the chromatic aberration amount
+   */
+  float get_chromaticAberration() const;
+  void set_chromaticAberration(float value);
+
+  /**
+   * @brief Gets or sets the depth of field aperture
+   */
+  float get_dofAperture() const;
+  void set_dofAperture(float value);
+
+  /**
+   * @brief Gets or sets the edge distortion
+   */
+  float get_edgeDistortion() const;
+  void set_edgeDistortion(float value);
+
+  /**
+   * @brief Gets or sets the depth of field distortion
+   */
+  float get_dofDistortion() const;
+  void set_dofDistortion(float value);
+
+  /**
+   * @brief Gets or sets the darken out of focus amount
+   */
+  float get_darkenOutOfFocus() const;
+  void set_darkenOutOfFocus(float value);
+
+  /**
+   * @brief Gets or sets a boolean indicating if blur noise is enabled
+   */
+  bool get_blurNoise() const;
+  void set_blurNoise(bool value);
+
+  /**
+   * @brief Gets or sets a boolean indicating if pentagon bokeh is enabled
+   */
+  bool get_pentagonBokeh() const;
+  void set_pentagonBokeh(bool value);
+
+  /**
+   * @brief Gets or sets the highlight grain amount
+   */
+  float get_highlightsGain() const;
+  void set_highlightsGain(float value);
+
+  /**
+   * @brief Gets or sets the highlight threshold
+   */
+  float get_highlightsThreshold() const;
+  void set_highlightsThreshold(float value);
+
 private:
   /**
    * colors shifting and distortion
@@ -262,6 +341,67 @@ private:
    * creates a black and white random noise texture, 512x512
    */
   void _createGrainTexture();
+
+public:
+  /**
+   * Gets associated scene
+   */
+  ReadOnlyProperty<LensRenderingPipeline, Scene*> scene;
+
+  /**
+   * Gets or sets the edge blur
+   */
+  Property<LensRenderingPipeline, float> edgeBlur;
+
+  /**
+   * Gets or sets the grain amount
+   */
+  Property<LensRenderingPipeline, float> grainAmount;
+
+  /**
+   * Gets or sets the chromatic aberration amount
+   */
+  Property<LensRenderingPipeline, float> chromaticAberration;
+
+  /**
+   * Gets or sets the depth of field aperture
+   */
+  Property<LensRenderingPipeline, float> dofAperture;
+
+  /**
+   * Gets or sets the edge distortion
+   */
+  Property<LensRenderingPipeline, float> edgeDistortion;
+
+  /**
+   * Gets or sets the depth of field distortion
+   */
+  Property<LensRenderingPipeline, float> dofDistortion;
+
+  /**
+   * Gets or sets the darken out of focus amount
+   */
+  Property<LensRenderingPipeline, float> darkenOutOfFocus;
+
+  /**
+   * Gets or sets a boolean indicating if blur noise is enabled
+   */
+  Property<LensRenderingPipeline, bool> blurNoise;
+
+  /**
+   * Gets or sets a boolean indicating if pentagon bokeh is enabled
+   */
+  Property<LensRenderingPipeline, bool> pentagonBokeh;
+
+  /**
+   * Gets or sets the highlight grain amount
+   */
+  Property<LensRenderingPipeline, float> highlightsGain;
+
+  /**
+   * Gets or sets the highlight threshold
+   */
+  Property<LensRenderingPipeline, float> highlightsThreshold;
 
 private:
   Scene* _scene;
@@ -284,6 +424,7 @@ private:
   float _dofDarken;
   bool _dofPentagon;
   bool _blurNoise;
+  bool _pentagonBokehIsEnabled;
 
 }; // end of class LensRenderingPipeline
 

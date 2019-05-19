@@ -98,8 +98,30 @@ protected:
    * attached to
    */
   StandardRenderingPipeline(const std::string& name, Scene* scene, float ratio,
-                            PostProcess* originalPostProcess      = nullptr,
-                            const std::vector<CameraPtr>& cameras = {});
+                            const PostProcessPtr& originalPostProcess = nullptr,
+                            const std::vector<CameraPtr>& cameras     = {});
+
+  /**
+   * @brief Gets the overall exposure used by the pipeline.
+   */
+  float get_exposure() const;
+
+  /**
+   * @brief Sets the overall exposure used by the pipeline.
+   */
+  void set_exposure(float value);
+
+  /**
+   * @brief Gets wether or not the exposure of the overall pipeline should be
+   * automatically adjusted by the HDR post-process
+   */
+  bool get_hdrAutoExposure() const;
+
+  /**
+   * @brief Sets wether or not the exposure of the overall pipeline should be
+   * automatically adjusted by the HDR post-process
+   */
+  void set_hdrAutoExposure(bool value);
 
   bool get_bloomEnabled() const;
   void set_bloomEnabled(bool enabled);
@@ -281,9 +303,15 @@ public:
   bool horizontalBlur;
 
   /**
-   * Sets the overall exposure used by the pipeline
+   * The overall exposure used by the pipeline
    */
-  float exposure;
+  Property<StandardRenderingPipeline, float> exposure;
+
+  /**
+   * Wether or not the exposure of the overall pipeline should be automatically
+   * adjusted by the HDR post-process
+   */
+  Property<StandardRenderingPipeline, bool> hdrAutoExposure;
 
   /**
    * Texture used typically to simulate "dirty" on camera lens
@@ -436,6 +464,9 @@ private:
   Scene* _scene;
   PostProcessPtr _currentDepthOfFieldSource;
   PostProcessPtr _basePostProcess;
+  float _fixedExposure;
+  float _currentExposure;
+  bool _hdrAutoExposure;
   float _hdrCurrentLuminance;
   unsigned int _floatTextureType;
   float _ratio;
