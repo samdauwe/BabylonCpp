@@ -89,11 +89,10 @@ public:
    */
   void reset();
 
-protected:
+private:
   bool _enabled;
   RollingAverage _rollingFrameTime;
   std::optional<high_res_time_point_t> _lastFrameTimeMs;
-  std::optional<high_res_time_point_t> _lastChangeTimeMs;
 
 }; // end of struct PerformanceMonitor
 

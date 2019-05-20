@@ -218,6 +218,28 @@ private:
 
 public:
   /**
+   * @brief Moves the observable to the top of the observer list making it get
+   * called first when notified.
+   * @param observer the observer to move
+   */
+  void makeObserverTopPriority(typename Observer<T>::Ptr& observer)
+  {
+    _remove(observer);
+    _observers.insert(_observers.begin(), observer);
+  }
+
+  /**
+   * @brief Moves the observable to the bottom of the observer list making it
+   * get called last when notified.
+   * @param observer the observer to move
+   */
+  void makeObserverBottomPriority(typename Observer<T>::Ptr& observer)
+  {
+    _remove(observer);
+    _observers.emplace_back(observer);
+  }
+
+  /**
    * @brief Notify all Observers by calling their respective callback with the
    * given data. Will return true if all observers were executed, false if an
    * observer set skipNextObservers to true, then prevent the subsequent ones to
