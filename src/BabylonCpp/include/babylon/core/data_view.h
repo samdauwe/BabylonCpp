@@ -105,6 +105,14 @@ public:
    */
   float getFloat32(size_t byteOffset, bool littleEndian = true) const;
 
+  /**
+   * @brief Revert the endianness of a value.
+   * Not as fast hardware based, but will probably never need to use
+   * @param val defines the value to convert
+   * @returns the new value
+   */
+  static int switchEndianness(int val);
+
 private:
   /**
    * The ArrayBuffer referenced by this view

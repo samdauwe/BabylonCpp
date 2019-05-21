@@ -1,6 +1,7 @@
 #include <babylon/tools/khronos_texture_container.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/data_view.h>
 #include <babylon/core/logging.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
@@ -15,6 +16,7 @@ KhronosTextureContainer::KhronosTextureContainer(
     , facesExpected{iFacesExpected}
     , threeDExpected{iThreeDExpected}
     , textureArrayExpected{iTextureArrayExpected}
+    , isInvalid{false}
 {
   // Test that it is a ktx formatted file, based on the first 12 bytes,
   // character representation is: '�', 'K', 'T', 'X', ' ', '1', '1', '�', '\r',
@@ -26,95 +28,80 @@ KhronosTextureContainer::KhronosTextureContainer(
       || identifier[6] != 0x31 || identifier[7] != 0xBB || identifier[8] != 0x0D
       || identifier[9] != 0x0A || identifier[10] != 0x1A
       || identifier[11] != 0x0A) {
+    isInvalid = true;
     BABYLON_LOG_ERROR("KhronosTextureContainer",
-                      "texture missing KTX identifier");
+                      "texture missing KTX identifier")
     return;
   }
 
-  // load the reset of the header in native 32 bit int
-  auto header = stl_util::to_array<int32_t>(arrayBuffer, 12, 13);
+  // load the reset of the header in native 32 bit uint
+  auto dataSize = sizeof(uint32_t); // Uint32Array.BYTES_PER_ELEMENT;
+  DataView headerDataView(arrayBuffer, 12, 13 * dataSize);
+  auto endianness   = headerDataView.getUint32(0, true);
+  auto littleEndian = endianness == 0x04030201;
 
-  // determine of the remaining header values are recorded in the opposite
-  // endianness & require conversion
-  auto oppositeEndianess = header[0] == 0x01020304;
-
-  // read all the header elements in order they exist in the file, without
-  // modification (sans endainness)
-  glType = oppositeEndianess ? switchEndianness(header[1]) :
-                               header[1]; // must be 0 for compressed textures
-  glTypeSize = oppositeEndianess ?
-                 switchEndianness(header[2]) :
-                 header[2]; // must be 1 for compressed textures
-  glFormat = oppositeEndianess ? switchEndianness(header[3]) :
-                                 header[3]; // must be 0 for compressed textures
-  glInternalFormat
-    = oppositeEndianess ?
-        static_cast<uint32_t>(switchEndianness(header[4])) :
-        static_cast<uint32_t>(header[4]); // the value of arg passed to
-                                          // gl.compressedTexImage2D(,,x,,,,)
-  glBaseInternalFormat = oppositeEndianess ?
-                           switchEndianness(header[5]) :
-                           header[5]; // specify GL_RGB, GL_RGBA, GL_ALPHA, etc
-                                      // (un-compressed only)
-  pixelWidth = oppositeEndianess ?
-                 switchEndianness(header[6]) :
-                 header[6]; // level 0 value of arg passed to
-                            // gl.compressedTexImage2D(,,,x,,,)
-  pixelHeight = oppositeEndianess ?
-                  switchEndianness(header[7]) :
-                  header[7]; // level 0 value of arg passed to
-                             // gl.compressedTexImage2D(,,,,x,,)
-  pixelDepth = oppositeEndianess ?
-                 switchEndianness(header[8]) :
-                 header[8]; // level 0 value of arg passed to
-                            // gl.compressedTexImage3D(,,,,,x,,)
-  numberOfArrayElements = oppositeEndianess ?
-                            switchEndianness(header[9]) :
-                            header[9]; // used for texture arrays
-  numberOfFaces
-    = oppositeEndianess ?
-        static_cast<uint32_t>(switchEndianness(header[10])) :
-        static_cast<uint32_t>(
-          header[10]); // used for cubemap textures, should either be 1 or 6
-  numberOfMipmapLevels
-    = oppositeEndianess ? switchEndianness(header[11]) :
-                          header[11]; // number of levels; disregard possibility
-                                      // of 0 for compressed textures
-  bytesOfKeyValueData
-    = oppositeEndianess ?
-        static_cast<uint32_t>(switchEndianness(header[12])) :
-        static_cast<uint32_t>(
-          header[12]); // the amount of space after the header for meta-data
+  glType = headerDataView.getUint32(
+    1 * dataSize, littleEndian); // must be 0 for compressed textures
+  glTypeSize = headerDataView.getUint32(
+    2 * dataSize, littleEndian); // must be 1 for compressed textures
+  glFormat = headerDataView.getUint32(
+    3 * dataSize, littleEndian); // must be 0 for compressed textures
+  glInternalFormat = headerDataView.getUint32(
+    4 * dataSize, littleEndian); // the value of arg passed to
+                                 // gl.compressedTexImage2D(,,x,,,,)
+  glBaseInternalFormat = headerDataView.getUint32(
+    5 * dataSize, littleEndian); // specify GL_RGB, GL_RGBA, GL_ALPHA, etc
+                                 // (un-compressed only)
+  pixelWidth = headerDataView.getUint32(
+    6 * dataSize, littleEndian); // level 0 value of arg passed to
+                                 // gl.compressedTexImage2D(,,,x,,,)
+  pixelHeight = headerDataView.getUint32(
+    7 * dataSize, littleEndian); // level 0 value of arg passed to
+                                 // gl.compressedTexImage2D(,,,,x,,)
+  pixelDepth = headerDataView.getUint32(
+    8 * dataSize, littleEndian); // level 0 value of arg passed to
+                                 // gl.compressedTexImage3D(,,,,,x,,)
+  numberOfArrayElements = headerDataView.getUint32(
+    9 * dataSize, littleEndian); // used for texture arrays
+  numberOfFaces = headerDataView.getUint32(
+    10 * dataSize,
+    littleEndian); // used for cubemap textures, should either be 1 or 6
+  numberOfMipmapLevels = headerDataView.getUint32(
+    11 * dataSize, littleEndian); // number of levels; disregard possibility of
+                                  // 0 for compressed textures
+  bytesOfKeyValueData = headerDataView.getUint32(
+    12 * dataSize,
+    littleEndian); // the amount of space after the header for meta-data
 
   // Make sure we have a compressed type.  Not only reduces work, but probably
   // better to let dev know they are not compressing.
   if (glType != 0) {
     BABYLON_LOG_ERROR("KhronosTextureContainer",
-                      "only compressed formats currently supported");
+                      "only compressed formats currently supported")
     return;
   }
   else {
     // value of zero is an indication to generate mipmaps @ runtime.  Not
     // usually allowed for compressed, so disregard.
-    numberOfMipmapLevels = std::max(1, numberOfMipmapLevels);
+    numberOfMipmapLevels = std::max(1u, numberOfMipmapLevels);
   }
 
   if (pixelHeight == 0 || pixelDepth != 0) {
     BABYLON_LOG_ERROR("KhronosTextureContainer",
-                      "only 2D textures currently supported");
+                      "only 2D textures currently supported")
     return;
   }
 
   if (numberOfArrayElements != 0) {
     BABYLON_LOG_ERROR("KhronosTextureContainer",
-                      "texture arrays not currently supported");
+                      "texture arrays not currently supported")
     return;
   }
 
   if (static_cast<int>(numberOfFaces) != facesExpected) {
     BABYLON_LOGF_ERROR("KhronosTextureContainer",
                        "number of faces expected %d, but found %d",
-                       facesExpected, numberOfFaces);
+                       facesExpected, numberOfFaces)
     return;
   }
 
@@ -126,14 +113,6 @@ KhronosTextureContainer::KhronosTextureContainer(
 
 KhronosTextureContainer::~KhronosTextureContainer()
 {
-}
-
-int KhronosTextureContainer::switchEndianness(int val) const
-{
-  return ((val & 0xFF) << 24)    //
-         | ((val & 0xFF00) << 8) //
-         | ((val >> 8) & 0xFF00) //
-         | ((val >> 24) & 0xFF); //
 }
 
 void KhronosTextureContainer::uploadLevels(const InternalTexturePtr& texture,
@@ -159,7 +138,7 @@ void KhronosTextureContainer::_upload2DCompressedLevels(
   auto height     = pixelHeight;
 
   auto mipmapCount = loadMipmaps ? numberOfMipmapLevels : 1;
-  for (auto level = 0; level < mipmapCount; ++level) {
+  for (auto level = 0u; level < mipmapCount; ++level) {
     // size per face, since not supporting array cubemaps
     auto imageSize = stl_util::to_array<int32_t>(arrayBuffer, dataOffset, 1)[0];
     dataOffset += 4; // image data starts from next multiple of 4 offset. Each
@@ -171,15 +150,15 @@ void KhronosTextureContainer::_upload2DCompressedLevels(
       auto engine = texture->getEngine();
       engine->_uploadCompressedDataToTextureDirectly(
         texture, glInternalFormat, static_cast<float>(width),
-        static_cast<float>(height), byteArray, face, level);
+        static_cast<float>(height), byteArray, face, static_cast<int>(level));
 
       dataOffset += static_cast<size_t>(
         imageSize); // add size of the image for the next face/mipmap
       dataOffset
         += 3 - ((imageSize + 3) % 4); // add padding for odd sized image
     }
-    width  = static_cast<int>(std::max(1.f, width * 0.5f));
-    height = static_cast<int>(std::max(1.f, height * 0.5f));
+    width  = static_cast<uint32_t>(std::max(1.f, width * 0.5f));
+    height = static_cast<uint32_t>(std::max(1.f, height * 0.5f));
   }
 }
 

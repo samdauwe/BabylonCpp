@@ -83,4 +83,12 @@ float DataView::getFloat32(size_t /*byteOffset*/, bool /*littleEndian*/) const
   return float{0};
 }
 
+int DataView::switchEndianness(int val)
+{
+  return ((val & 0xFF) << 24)    //
+         | ((val & 0xFF00) << 8) //
+         | ((val >> 8) & 0xFF00) //
+         | ((val >> 24) & 0xFF); //
+}
+
 } // end of namespace BABYLON

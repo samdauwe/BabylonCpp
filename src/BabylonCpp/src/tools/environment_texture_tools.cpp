@@ -7,6 +7,7 @@
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
@@ -44,7 +45,7 @@ EnvironmentTextureTools::GetEnvInfo(const ArrayBuffer& data)
        ++i) {
     if (dataView[pos++] != EnvironmentTextureTools::_MagicBytes[i]) {
       BABYLON_LOG_ERROR("EnvironmentTextureTools",
-                        "Not a babylon environment map");
+                        "Not a babylon environment map")
       return nullptr;
     }
   }
@@ -133,10 +134,10 @@ void EnvironmentTextureTools::UploadLevels(
   std::unordered_map<size_t, BaseTexturePtr> lodTextures;
   const auto& caps = engine->getCaps();
 
-  texture->format          = EngineConstants::TEXTUREFORMAT_RGBA;
-  texture->type            = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  texture->format          = Constants::TEXTUREFORMAT_RGBA;
+  texture->type            = Constants::TEXTURETYPE_UNSIGNED_INT;
   texture->generateMipMaps = true;
-  engine->updateTextureSamplingMode(TextureConstants::TRILINEAR_SAMPLINGMODE,
+  engine->updateTextureSamplingMode(Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
                                     texture);
 
   // Add extra process if texture lod is not supported
@@ -154,12 +155,12 @@ void EnvironmentTextureTools::UploadLevels(
   else if (caps.textureHalfFloatRender
            && caps.textureHalfFloatLinearFiltering) {
     expandTexture = true;
-    texture->type = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+    texture->type = Constants::TEXTURETYPE_HALF_FLOAT;
   }
   // If full float available we can uncompress the texture
   else if (caps.textureFloatRender && caps.textureFloatLinearFiltering) {
     expandTexture = true;
-    texture->type = EngineConstants::TEXTURETYPE_FLOAT;
+    texture->type = Constants::TEXTURETYPE_FLOAT;
   }
 
   // Expand the texture if possible
@@ -167,7 +168,7 @@ void EnvironmentTextureTools::UploadLevels(
     // Simply run through the decode PP
     rgbdPostProcess
       = PostProcess::New("rgbdDecode", "rgbdDecode", {}, {}, 1.f, nullptr,
-                         TextureConstants::TRILINEAR_SAMPLINGMODE, engine,
+                         Constants::TEXTURE_TRILINEAR_SAMPLINGMODE, engine,
                          false, "", texture->type, "", {}, false);
 
     texture->_isRGBD = false;
@@ -177,9 +178,9 @@ void EnvironmentTextureTools::UploadLevels(
     options.generateDepthBuffer   = false;
     options.generateMipMaps       = true;
     options.generateStencilBuffer = false;
-    options.samplingMode          = TextureConstants::TRILINEAR_SAMPLINGMODE;
+    options.samplingMode          = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE;
     options.type                  = texture->type;
-    options.format                = EngineConstants::TEXTUREFORMAT_RGBA;
+    options.format                = Constants::TEXTUREFORMAT_RGBA;
 
     cubeRtt = engine->createRenderTargetCubeTexture(texture->width, options);
   }
@@ -213,7 +214,7 @@ void EnvironmentTextureTools::UploadLevels(
         glTextureFromLod->isCube          = true;
         glTextureFromLod->invertY         = true;
         glTextureFromLod->generateMipMaps = false;
-        engine->updateTextureSamplingMode(TextureConstants::LINEAR_LINEAR,
+        engine->updateTextureSamplingMode(Constants::TEXTURE_LINEAR_LINEAR,
                                           glTextureFromLod);
 
         // Wrap in a base texture for easy binding.
@@ -240,7 +241,7 @@ void EnvironmentTextureTools::UploadLevels(
   // All mipmaps up to provided number of images
   for (size_t i = 0; i < imageData.size(); ++i) {
     // All faces
-    for (unsigned int face = 0; face < 6; face++) {
+    for (unsigned int face = 0; face < 6; ++face) {
       // Constructs an image element from image data
       const auto& bytes = imageData[i][face];
       auto image        = Tools::ArrayBufferToImage(bytes);
@@ -248,7 +249,7 @@ void EnvironmentTextureTools::UploadLevels(
       // Upload to the texture.
       if (expandTexture) {
         auto tempTexture = engine->createTexture(
-          "", true, true, nullptr, TextureConstants::NEAREST_SAMPLINGMODE,
+          "", true, true, nullptr, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
           nullptr,
           [](const std::string& message, const std::string& /*exception*/) {
             throw std::runtime_error(message);
@@ -292,15 +293,15 @@ void EnvironmentTextureTools::UploadLevels(
     auto size       = std::pow(2, mipmapsCount - 1 - imageData.size());
     auto dataLength = static_cast<size_t>(size * size * 4);
     switch (texture->type) {
-      case EngineConstants::TEXTURETYPE_UNSIGNED_INT: {
+      case Constants::TEXTURETYPE_UNSIGNED_INT: {
         data = Uint8Array(dataLength);
         break;
       }
-      case EngineConstants::TEXTURETYPE_HALF_FLOAT: {
+      case Constants::TEXTURETYPE_HALF_FLOAT: {
         data = Uint16Array(dataLength);
         break;
       }
-      case EngineConstants::TEXTURETYPE_FLOAT: {
+      case Constants::TEXTURETYPE_FLOAT: {
         data = Float32Array(dataLength);
         break;
       }
@@ -344,7 +345,7 @@ void EnvironmentTextureTools::UploadEnvSpherical(
   if (info.version != 1) {
     BABYLON_LOGF_WARN("EnvironmentTextureTools",
                       "Unsupported babylon environment map version \"%u\"",
-                      info.version);
+                      info.version)
   }
 
   auto irradianceInfo = info.irradiance;

@@ -53,14 +53,6 @@ public:
   ~KhronosTextureContainer();
 
   /**
-   * @brief Revert the endianness of a value.
-   * Not as fast hardware based, but will probably never need to use
-   * @param val defines the value to convert
-   * @returns the new value
-   */
-  int switchEndianness(int val) const;
-
-  /**
    * @brief Uploads KTX content to a Babylon Texture.
    * It is assumed that the texture has already been created & is currently
    * bound
@@ -73,6 +65,7 @@ private:
                                  bool loadMipmaps);
 
 public:
+  /** Contents of the KTX container file */
   ArrayBuffer arrayBuffer;
   int facesExpected;
   std::optional<bool> threeDExpected;
@@ -82,55 +75,60 @@ public:
   /**
    * Gets the openGL type
    */
-  int glType;
+  uint32_t glType;
   /**
    * Gets the openGL type size
    */
-  int glTypeSize;
+  uint32_t glTypeSize;
   /**
    * Gets the openGL format
    */
-  int glFormat;
+  uint32_t glFormat;
   /**
    * Gets the openGL internal format
    */
-  unsigned int glInternalFormat;
+  uint32_t glInternalFormat;
   /**
    * Gets the base internal format
    */
-  int glBaseInternalFormat;
+  uint32_t glBaseInternalFormat;
   /**
    * Gets image width in pixel
    */
-  int pixelWidth;
+  uint32_t pixelWidth;
   /**
    * Gets image height in pixel
    */
-  int pixelHeight;
+  uint32_t pixelHeight;
   /**
    * Gets image depth in pixels
    */
-  int pixelDepth;
+  uint32_t pixelDepth;
   /**
    * Gets the number of array elements
    */
-  int numberOfArrayElements;
+  uint32_t numberOfArrayElements;
   /**
    * Gets the number of faces
    */
-  unsigned int numberOfFaces;
+  uint32_t numberOfFaces;
   /**
    * Gets the number of mipmap levels
    */
-  int numberOfMipmapLevels;
+  uint32_t numberOfMipmapLevels;
   /**
    * Gets the bytes of key value data
    */
-  unsigned int bytesOfKeyValueData;
+  uint32_t bytesOfKeyValueData;
   /**
    * Gets the load type
    */
   int loadType;
+  /**
+   * If the container has been made invalid (eg. constructor failed to correctly
+   * load array buffer)
+   */
+  bool isInvalid;
 
 }; // end of class KhronosTextureContainer
 

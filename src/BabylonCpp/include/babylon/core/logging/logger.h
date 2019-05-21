@@ -38,6 +38,10 @@ struct LogMessageHandler {
   unsigned int _minLevel, _maxLevel;
 };
 
+/**
+ * @brief Logger used througouht the application to allow configuration of
+ * the log level required for the messages.
+ */
 class BABYLON_SHARED_EXPORT Logger {
 
 public:
