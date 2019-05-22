@@ -432,20 +432,13 @@ float Vector4::lengthSquared() const
 /** Methods **/
 Vector4& Vector4::normalize()
 {
-  const float len = length();
+  const auto len = length();
 
   if (stl_util::almost_equal(len, 0.f)) {
     return *this;
   }
 
-  const float num = 1.f / len;
-
-  x *= num;
-  y *= num;
-  z *= num;
-  w *= num;
-
-  return *this;
+  return scaleInPlace(1.f / len);
 }
 
 Vector3 Vector4::toVector3() const
@@ -476,6 +469,12 @@ Vector4& Vector4::copyFromFloats(float ix, float iy, float iz, float iw)
 Vector4& Vector4::set(float ix, float iy, float iz, float iw)
 {
   return copyFromFloats(ix, iy, iz, iw);
+}
+
+Vector4& Vector4::setAll(float v)
+{
+  x = y = z = w = v;
+  return *this;
 }
 
 /** Statics **/
@@ -547,17 +546,17 @@ float Vector4::Distance(const Vector4& value1, const Vector4& value2)
 
 float Vector4::DistanceSquared(const Vector4& value1, const Vector4& value2)
 {
-  const float x = value1.x - value2.x;
-  const float y = value1.y - value2.y;
-  const float z = value1.z - value2.z;
-  const float w = value1.w - value2.w;
+  const auto x = value1.x - value2.x;
+  const auto y = value1.y - value2.y;
+  const auto z = value1.z - value2.z;
+  const auto w = value1.w - value2.w;
 
   return (x * x) + (y * y) + (z * z) + (w * w);
 }
 
 Vector4 Vector4::Center(const Vector4& value1, const Vector4& value2)
 {
-  Vector4 center = value1.add(value2);
+  auto center = value1.add(value2);
   center.scaleInPlace(0.5f);
   return center;
 }
@@ -565,7 +564,7 @@ Vector4 Vector4::Center(const Vector4& value1, const Vector4& value2)
 Vector4 Vector4::TransformNormal(const Vector4& vector,
                                  const Matrix& transformation)
 {
-  Vector4 result = Vector4::Zero();
+  auto result = Vector4::Zero();
   Vector4::TransformNormalToRef(vector, transformation, result);
   return result;
 }
@@ -574,26 +573,30 @@ void Vector4::TransformNormalToRef(const Vector4& vector,
                                    const Matrix& transformation,
                                    Vector4& result)
 {
-  result.x = (vector.x * transformation.m[0]) + (vector.y * transformation.m[4])
-             + (vector.z * transformation.m[8]);
-  result.y = (vector.x * transformation.m[1]) + (vector.y * transformation.m[5])
-             + (vector.z * transformation.m[9]);
-  result.z = (vector.x * transformation.m[2]) + (vector.y * transformation.m[6])
-             + (vector.z * transformation.m[10]);
-  result.w = vector.w;
+  const auto& m = transformation.m;
+  const auto x  = (vector.x * m[0]) + (vector.y * m[4]) + (vector.z * m[8]);
+  const auto y  = (vector.x * m[1]) + (vector.y * m[5]) + (vector.z * m[9]);
+  const auto z  = (vector.x * m[2]) + (vector.y * m[6]) + (vector.z * m[10]);
+  result.x      = x;
+  result.y      = y;
+  result.z      = z;
+  result.w      = vector.w;
 }
 
-void TransformNormalFromFloatsToRef(float x, float y, float z, float w,
-                                    const Matrix& transformation,
-                                    Vector4& result)
+void Vector4::TransformNormalFromFloatsToRef(float x, float y, float z, float w,
+                                             const Matrix& transformation,
+                                             Vector4& result)
 {
-  result.x = (x * transformation.m[0]) + (y * transformation.m[4])
-             + (z * transformation.m[8]);
-  result.y = (x * transformation.m[1]) + (y * transformation.m[5])
-             + (z * transformation.m[9]);
-  result.z = (x * transformation.m[2]) + (y * transformation.m[6])
-             + (z * transformation.m[10]);
-  result.w = w;
+  const auto& m = transformation.m;
+  result.x      = (x * m[0]) + (y * m[4]) + (z * m[8]);
+  result.y      = (x * m[1]) + (y * m[5]) + (z * m[9]);
+  result.z      = (x * m[2]) + (y * m[6]) + (z * m[10]);
+  result.w      = w;
+}
+
+Vector4 Vector4::FromVector3(const Vector3& source, float w)
+{
+  return Vector4(source.x, source.y, source.z, w);
 }
 
 } // end of namespace BABYLON

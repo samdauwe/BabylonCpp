@@ -308,6 +308,14 @@ public:
   static Quaternion Inverse(const Quaternion& q);
 
   /**
+   * @brief Inverse a given quaternion.
+   * @param q defines the source quaternion
+   * @param result the quaternion the result will be stored in
+   * @returns the result quaternion
+   */
+  static Quaternion& InverseToRef(const Quaternion& q, Quaternion& result);
+
+  /**
    * @brief Creates an identity quaternion
    * @returns the identity quaternion
    */
@@ -350,6 +358,42 @@ public:
                               unsigned int offset = 0);
 
   /**
+   * @brief Create a quaternion from Euler rotation angles.
+   * @param x Pitch
+   * @param y Yaw
+   * @param z Roll
+   * @returns the new Quaternion
+   */
+  static Quaternion FromEulerAngles(float x, float y, float z);
+
+  /**
+   * @brief Updates a quaternion from Euler rotation angles.
+   * @param x Pitch
+   * @param y Yaw
+   * @param z Roll
+   * @param result the quaternion to store the result
+   * @returns the updated quaternion
+   */
+  static Quaternion FromEulerAnglesToRef(float x, float y, float z,
+                                         Quaternion& result);
+
+  /**
+   * @brief Create a quaternion from Euler rotation vector.
+   * @param vec the Euler vector (x Pitch, y Yaw, z Roll)
+   * @returns the new Quaternion
+   */
+  static Quaternion FromEulerVector(const Vector3& vec);
+
+  /**
+   * @brief Updates a quaternion from Euler rotation vector.
+   * @param vec the Euler vector (x Pitch, y Yaw, z Roll)
+   * @param result the quaternion to store the result
+   * @returns the updated quaternion
+   */
+  static Quaternion FromEulerVectorToRef(const Vector3& vec,
+                                         Quaternion& result);
+
+  /**
    * @brief Creates a new quaternion from the given Euler float angles (y, x,
    * z).
    * @param yaw defines the rotation around Y axis
@@ -360,14 +404,13 @@ public:
   static Quaternion RotationYawPitchRoll(float yaw, float pitch, float roll);
 
   /**
-
-           * @brief Creates a new rotation from the given Euler float angles (y,
-     x, z) and stores it in the target quaternion.
-           * @param yaw defines the rotation around Y axis
-           * @param pitch defines the rotation around X axis
-           * @param roll defines the rotation around Z axis
-           * @param result defines the target quaternion
-           */
+   * @brief Creates a new rotation from the given Euler float angles (y, x, z)
+   * and stores it in the target quaternion.
+   * @param yaw defines the rotation around Y axis
+   * @param pitch defines the rotation around X axis
+   * @param roll defines the rotation around Z axis
+   * @param result defines the target quaternion
+   */
   static void RotationYawPitchRollToRef(float yaw, float pitch, float roll,
                                         Quaternion& result);
 

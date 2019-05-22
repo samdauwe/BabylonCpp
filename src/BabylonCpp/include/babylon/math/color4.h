@@ -83,6 +83,13 @@ public:
   const Color4& toArray(Float32Array& array, unsigned int index = 0) const;
 
   /**
+   * @brief Determines equality between Color4 objects.
+   * @param otherColor defines the second operand
+   * @returns true if the rgba values are equal to the given ones
+   */
+  bool equals(const Color4& otherColor) const;
+
+  /**
    * @brief Creates a new Color4 set with the added values of the current Color4
    * and of the given one.
    * @param right defines the second operand
@@ -168,11 +175,6 @@ public:
    * @returns The result Color4.
    */
   const Color4 multiplyToRef(const Color4& color, Color4& result) const;
-
-  /**
-   * @brief Returns true if the rgb values are equal to the passed ones.
-   */
-  bool equals(const Color4& otherColor) const;
 
   /**
    * @brief Creates a string with the Color4 current values.

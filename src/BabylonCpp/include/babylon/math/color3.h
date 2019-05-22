@@ -15,6 +15,9 @@ class Color4;
  */
 class BABYLON_SHARED_EXPORT Color3 {
 
+private:
+  static const Color3 _BlackReadOnly;
+
 public:
   /**
    * @brief Creates a new Color3 object from red, green, blue values, all
@@ -275,7 +278,7 @@ public:
   static Color3 FromHexString(const std::string& hex);
 
   /**
-   * @brief Creates a new Vector3 from the starting index of the given array.
+   * @brief Creates a new Color3 from the starting index of the given array.
    * @param array defines the source array
    * @param offset defines an offset in the source array
    * @returns a new Color3 object
@@ -342,6 +345,12 @@ public:
    * @returns a new Color3 object
    */
   static Color3 Black();
+
+  /**
+   * @brief Gets a Color3 value containing a black color that must not be
+   * updated.
+   */
+  static Color3 BlackReadOnly();
 
   /**
    * @brief Returns a Color3 value containing a white color.

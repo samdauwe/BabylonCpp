@@ -565,12 +565,11 @@ Vector2 Vector2::Transform(const Vector2& vector, const Matrix& transformation)
 void Vector2::TransformToRef(const Vector2& vector,
                              const Matrix& transformation, Vector2& result)
 {
-  const float x = (vector.x * transformation.m[0])
-                  + (vector.y * transformation.m[4]) + transformation.m[12];
-  const float y = (vector.x * transformation.m[1])
-                  + (vector.y * transformation.m[5]) + transformation.m[13];
-  result.x = x;
-  result.y = y;
+  const auto& m = transformation.m;
+  const auto x  = (vector.x * m[0]) + (vector.y * m[4]) + m[12];
+  const auto y  = (vector.x * m[1]) + (vector.y * m[5]) + m[13];
+  result.x      = x;
+  result.y      = y;
 }
 
 bool Vector2::PointInTriangle(const Vector2& p, const Vector2& p0,

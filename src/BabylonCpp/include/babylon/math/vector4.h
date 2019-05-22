@@ -371,6 +371,13 @@ public:
    */
   Vector4& set(float x, float y, float z, float w);
 
+  /**
+   * @brief Copies the given float to the current Vector3 coordinates.
+   * @param v defines the x, y, z and w coordinates of the operand
+   * @returns the current updated Vector3
+   */
+  Vector4& setAll(float v);
+
   /** Statics **/
 
   /**
@@ -512,6 +519,14 @@ public:
   static void TransformNormalFromFloatsToRef(float x, float y, float z, float w,
                                              const Matrix& transformation,
                                              Vector4& result);
+
+  /**
+   * @brief Creates a new Vector4 from a Vector3.
+   * @param source defines the source data
+   * @param w defines the 4th component (default is 0)
+   * @returns a new Vector4
+   */
+  static Vector4 FromVector3(const Vector3& source, float w = 0.f);
 
 public:
   /**

@@ -1,4 +1,4 @@
-#ifndef BABYLON_MATH_VECTOR3_H
+﻿#ifndef BABYLON_MATH_VECTOR3_H
 #define BABYLON_MATH_VECTOR3_H
 
 #include <array>
@@ -15,12 +15,16 @@ class Quaternion;
 class Viewport;
 
 /**
- * @brief Classed used to store (x,y,z) vector representation.
- * A Vector3 is the main object used in 3D geometry.
+ * @brief Classed used to store (x,y,z) vector representation
+ * A Vector3 is the main object used in 3D geometry
  * It can represent etiher the coordinates of a point the space, either a
- * direction Reminder: Babylon.js uses a left handed forward facing system
+ * direction
+ * Reminder: js uses a left handed forward facing system
  */
 class BABYLON_SHARED_EXPORT Vector3 {
+
+private:
+  static const Vector3 _UpReadOnly;
 
 public:
   /**
@@ -93,6 +97,15 @@ public:
    * @returns the current updated Vector3
    */
   Vector3& addInPlace(const Vector3& otherVector);
+
+  /**
+   * @brief Adds the given coordinates to the current Vector3.
+   * @param x defines the x coordinate of the operand
+   * @param y defines the y coordinate of the operand
+   * @param z defines the z coordinate of the operand
+   * @returns the current updated Vector3
+   */
+  Vector3& addInPlaceFromFloats(float x, float y, float z);
 
   /**
    * @brief Gets a new Vector3, result of the addition the current Vector3 and
@@ -293,7 +306,7 @@ public:
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
-  const Vector3& divideToRef(const Vector3& otherVector, Vector3& result) const;
+  Vector3& divideToRef(const Vector3& otherVector, Vector3& result) const;
 
   /**
    * @brief Divides the current Vector3 coordinates by the given ones.
@@ -337,6 +350,16 @@ public:
    * @returns the current updated Vector3
    */
   Vector3& maximizeInPlaceFromFloats(float x, float y, float z);
+
+  /**
+   * @brief Due to float precision, scale of a mesh could be uniform but float
+   * values are off by a small fraction Check if is non uniform within a certain
+   * amount of decimal places to account for this.
+   * @param epsilon the amount the values can differ
+   * @returns if the the vector is non uniform to a certain number of decimal
+   * places
+   */
+  bool isNonUniformWithinEpsilon(float epsilon);
 
   /**
    * @brief Gets a boolean indicating that the vector is non uniform meaning x,
@@ -398,6 +421,14 @@ public:
   Vector3& normalize();
 
   /**
+   * @brief Reorders the x y z properties of the vector in place.
+   * @param order new ordering of the properties (eg. for vector 1,2,3 with
+   * "ZYX" will produce 3,2,1)
+   * @returns the current updated vector
+   */
+  Vector3& reorderInPlace(std::string order);
+
+  /**
    * @brief Rotates the vector around 0,0,0 by a quaternion.
    * @param quaternion the rotation quaternion
    * @param result vector to store the result
@@ -405,6 +436,25 @@ public:
    */
   Vector3& rotateByQuaternionToRef(const Quaternion& quaternion,
                                    Vector3& result);
+
+  /**
+   * @brief Rotates a vector around a given point.
+   * @param quaternion the rotation quaternion
+   * @param point the point to rotate around
+   * @param result vector to store the result
+   * @returns the resulting vector
+   */
+  Vector3& rotateByQuaternionAroundPointToRef(const Quaternion& quaternion,
+                                              const Vector3& point,
+                                              Vector3& result);
+
+  /**
+   * @brief Normalize the current Vector3 with the given input length.
+   * Please note that this is an in place operation.
+   * @param len the length of the vector
+   * @returns the current updated Vector3
+   */
+  Vector3& normalizeFromLength(float len);
 
   /**
    * @brief Normalize the current Vector3 to a new vector.
@@ -443,6 +493,13 @@ public:
    * @returns the current updated Vector3
    */
   Vector3& set(float x, float y, float z);
+
+  /**
+   * @brief Copies the given float to the current Vector3 coordinates.
+   * @param v defines the x, y and z coordinates of the operand
+   * @returns the current updated Vector3
+   */
+  Vector3& setAll(float v);
 
   /** Statics **/
 
@@ -545,6 +602,11 @@ public:
    * @returns a new up Vector3
    */
   static Vector3 Up();
+
+  /**
+   * @brief Gets a up Vector3 that must not be updated.
+   */
+  static Vector3 UpReadOnly();
 
   /**
    * @brief Returns a new Vector3 set to (0.0, -1.0, 0.0).
@@ -687,6 +749,21 @@ public:
                        const Vector3& max);
 
   /**
+   * @brief Sets the given vector "result" with the coordinates of "value", if
+   * the vector "value" is in the cube defined by the vectors "min" and "max" If
+   * a coordinate value of "value" is lower than one of the "min" coordinate,
+   * then this "value" coordinate is set with the "min" one If a coordinate
+   * value of "value" is greater than one of the "max" coordinate, then this
+   * "value" coordinate is set with the "max" one
+   * @param value defines the current value
+   * @param min defines the lower range value
+   * @param max defines the upper range value
+   * @param result defines the Vector3 where to store the result
+   */
+  static void ClampToRef(const Vector3& value, const Vector3& min,
+                         const Vector3& max, Vector3& result);
+
+  /**
    * @brief Returns a new Vector3 located for "amount" (float) on the Hermite
    * interpolation spline defined by the vectors "value1", "tangent1", "value2",
    * "tangent2".
@@ -776,6 +853,13 @@ public:
    */
   static Vector3 Project(const Vector3& vector, Matrix& world,
                          Matrix& transform, const Viewport& viewport);
+
+  /**
+   * @brief Hidden
+   */
+  static void _UnprojectFromInvertedMatrixToRef(const Vector3& source,
+                                                const Matrix& matrix,
+                                                Vector3& result);
 
   /**
    * @brief Unproject from screen space to object space.

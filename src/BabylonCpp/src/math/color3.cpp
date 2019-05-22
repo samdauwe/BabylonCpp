@@ -8,6 +8,8 @@
 
 namespace BABYLON {
 
+const Color3 Color3::_BlackReadOnly = Color3::Black();
+
 Color3::Color3(float red, float green, float blue) : r{red}, g{green}, b{blue}
 {
 }
@@ -382,6 +384,11 @@ Color3 Color3::Blue()
 Color3 Color3::Black()
 {
   return Color3(0.f, 0.f, 0.f);
+}
+
+Color3 Color3::BlackReadOnly()
+{
+  return Color3::_BlackReadOnly;
 }
 
 Color3 Color3::White()

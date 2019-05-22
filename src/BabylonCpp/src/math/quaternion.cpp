@@ -238,21 +238,25 @@ float Quaternion::length() const
 
 Quaternion& Quaternion::normalize()
 {
-  const float val = 1.f / length();
-  x *= val;
-  y *= val;
-  z *= val;
-  w *= val;
+  const auto len = length();
+
+  if (len == 0.f) {
+    return *this;
+  }
+
+  const auto inv = 1.f / len;
+  x *= inv;
+  y *= inv;
+  z *= inv;
+  w *= inv;
 
   return *this;
 }
 
-Vector3 Quaternion::toEulerAngles(const std::string& order) const
+Vector3 Quaternion::toEulerAngles(const std::string& /*order*/) const
 {
-  Vector3 result = Vector3::Zero();
-
-  toEulerAnglesToRef(result, order);
-
+  auto result = Vector3::Zero();
+  toEulerAnglesToRef(result);
   return result;
 }
 
@@ -294,34 +298,7 @@ Quaternion::toEulerAnglesToRef(Vector3& result,
 
 const Quaternion& Quaternion::toRotationMatrix(Matrix& result) const
 {
-  const float xx = x * x;
-  const float yy = y * y;
-  const float zz = z * z;
-  const float xy = x * y;
-  const float zw = z * w;
-  const float zx = z * x;
-  const float yw = y * w;
-  const float yz = y * z;
-  const float xw = x * w;
-
-  result.m[0]  = 1.f - (2.f * (yy + zz));
-  result.m[1]  = 2.f * (xy + zw);
-  result.m[2]  = 2.f * (zx - yw);
-  result.m[3]  = 0;
-  result.m[4]  = 2.f * (xy - zw);
-  result.m[5]  = 1.f - (2.f * (zz + xx));
-  result.m[6]  = 2.f * (yz + xw);
-  result.m[7]  = 0;
-  result.m[8]  = 2.f * (zx + yw);
-  result.m[9]  = 2.f * (yz - xw);
-  result.m[10] = 1.f - (2.f * (yy + xx));
-  result.m[11] = 0;
-  result.m[12] = 0;
-  result.m[13] = 0;
-  result.m[14] = 0;
-  result.m[15] = 1.f;
-
-  result._markAsUpdated();
+  Matrix::FromQuaternionToRef(*this, result);
 
   return *this;
 }
@@ -329,6 +306,7 @@ const Quaternion& Quaternion::toRotationMatrix(Matrix& result) const
 Quaternion& Quaternion::fromRotationMatrix(const Matrix& matrix)
 {
   Quaternion::FromRotationMatrixToRef(matrix, *this);
+
   return *this;
 }
 
@@ -435,7 +413,7 @@ float Quaternion::Dot(const Quaternion& left, const Quaternion& right)
 
 bool Quaternion::AreClose(const Quaternion& quat0, const Quaternion& quat1)
 {
-  const float dot = Quaternion::Dot(quat0, quat1);
+  const auto dot = Quaternion::Dot(quat0, quat1);
   return dot >= 0.f;
 }
 
@@ -447,6 +425,12 @@ Quaternion Quaternion::Zero()
 Quaternion Quaternion::Inverse(const Quaternion& q)
 {
   return Quaternion(-q.x, -q.y, -q.z, q.w);
+}
+
+Quaternion& Quaternion::InverseToRef(const Quaternion& q, Quaternion& result)
+{
+  result.set(-q.x, -q.y, -q.z, q.w);
+  return result;
 }
 
 Quaternion Quaternion::Identity()
@@ -469,15 +453,12 @@ Quaternion Quaternion::RotationAxis(Vector3& axis, float angle)
 Quaternion Quaternion::RotationAxisToRef(Vector3& axis, float angle,
                                          Quaternion& result)
 {
-  const float _sin = std::sin(angle / 2.f);
-
+  const auto _sin = std::sin(angle / 2.f);
   axis.normalize();
-
   result.w = std::cos(angle / 2.f);
   result.x = axis.x * _sin;
   result.y = axis.y * _sin;
   result.z = axis.z * _sin;
-
   return result;
 }
 
@@ -487,12 +468,38 @@ Quaternion Quaternion::FromArray(const Float32Array& array, unsigned int offset)
                     array[offset + 3]);
 }
 
+Quaternion Quaternion::FromEulerAngles(float x, float y, float z)
+{
+  Quaternion q;
+  Quaternion::RotationYawPitchRollToRef(y, x, z, q);
+  return q;
+}
+
+Quaternion Quaternion::FromEulerAnglesToRef(float x, float y, float z,
+                                            Quaternion& result)
+{
+  Quaternion::RotationYawPitchRollToRef(y, x, z, result);
+  return result;
+}
+
+Quaternion Quaternion::FromEulerVector(const Vector3& vec)
+{
+  Quaternion q;
+  Quaternion::RotationYawPitchRollToRef(vec.y, vec.x, vec.z, q);
+  return q;
+}
+
+Quaternion Quaternion::FromEulerVectorToRef(const Vector3& vec,
+                                            Quaternion& result)
+{
+  Quaternion::RotationYawPitchRollToRef(vec.y, vec.x, vec.z, result);
+  return result;
+}
+
 Quaternion Quaternion::RotationYawPitchRoll(float yaw, float pitch, float roll)
 {
   Quaternion result;
-
   Quaternion::RotationYawPitchRollToRef(yaw, pitch, roll, result);
-
   return result;
 }
 

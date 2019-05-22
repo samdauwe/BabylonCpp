@@ -143,6 +143,14 @@ const Color4& Color4::toArray(Float32Array& array, unsigned int index) const
   return *this;
 }
 
+bool Color4::equals(const Color4& otherColor) const
+{
+  return stl_util::almost_equal(r, otherColor.r)
+         && stl_util::almost_equal(g, otherColor.g)
+         && stl_util::almost_equal(b, otherColor.b)
+         && stl_util::almost_equal(a, otherColor.a);
+}
+
 Color4 Color4::add(const Color4& right) const
 {
   return Color4(r + right.r, g + right.g, b + right.b, a + right.a);
@@ -220,14 +228,6 @@ const Color4 Color4::multiplyToRef(const Color4& color, Color4& result) const
   result.a = a * color.a;
 
   return result;
-}
-
-bool Color4::equals(const Color4& otherColor) const
-{
-  return stl_util::almost_equal(r, otherColor.r)
-         && stl_util::almost_equal(g, otherColor.g)
-         && stl_util::almost_equal(b, otherColor.b)
-         && stl_util::almost_equal(a, otherColor.a);
 }
 
 std::string Color4::toString() const
