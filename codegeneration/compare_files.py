@@ -81,7 +81,7 @@ def main():
                  "babylon.tgaTextureLoader.ts", "babylon.videoRecorder.ts",
                  "babylon.weightedsound.ts", "babylon.audioEngine.ts",
                  "babylon.soundtrack.ts", "index.ts"]
-    # Create mapping from BabylonJs version to full path
+    # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:
         modules = {
           "Babylonjs": os.path.join(os.path.expanduser('~'), "Projects",
