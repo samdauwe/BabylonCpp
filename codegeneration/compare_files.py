@@ -65,22 +65,46 @@ def main():
         "4.0.0"         : "4.0.0_2019_04_30",
     }
     # List containing the files to ignore
-    whiteList = ["babylon.nullEngine.ts", "babylon.cannonJSPlugin.ts",
-                 "babylon.assetsManager.ts", "babylon.virtualJoystick.ts",
-                 "babylon.decorators.ts", "babylon.andOrNotEvaluator.ts",
-                 "babylon.dracoCompression.ts", "babylon.vrExperienceHelper.ts",
-                 "babylon.webVRCamera.ts", "babylon.analyser.ts",
-                 "babylon.stereoscopicCameras.ts", "babylon.sceneSerializer.ts",
-                 "babylon.videoTexture.ts", "babylon.database.ts",
-                 "babylon.promise.ts", "babylon.videoDome.ts", "babylon.tga.ts",
-                 "babylon.arcRotateCameraVRDeviceOrientationInput.ts",
-                 "babylon.vrDeviceOrientationGamepadCamera.ts",
-                 "babylon.vrDeviceOrientationFreeCamera.ts", "babylon.webvr.ts",
-                 "babylon.vrDeviceOrientationArcRotateCamera.ts",
-                 "babylon.sound.ts", "babylon.ktxTextureLoader.ts",
-                 "babylon.tgaTextureLoader.ts", "babylon.videoRecorder.ts",
-                 "babylon.weightedsound.ts", "babylon.audioEngine.ts",
-                 "babylon.soundtrack.ts", "index.ts"]
+    whiteList = [
+        # Common
+        "index.ts",
+        # Audio
+        "analyser.ts", "audioEngine.ts", "audioSceneComponent.ts", "sound.ts",
+        "soundTrack.ts", "weightedsound.ts",
+        # Cameras / RigModes
+        "vrRigMode.ts", "webVRRigMode.ts",
+        # Cameras / VR
+        "vrCameraMetrics.ts", "vrDeviceOrientationArcRotateCamera.ts",
+        "vrDeviceOrientationFreeCamera.ts", "vrExperienceHelper.ts",
+        "vrDeviceOrientationGamepadCamera.ts", "webVRCamera.ts",
+        # Cameras / XR
+        "webXRCamera.ts", "webXREnterExitUI.ts", "webXRInput.ts",
+        "webXRExperienceHelper.ts", "webXRManagedOutputCanvas.ts",
+        "webXRSessionManager.ts",
+        # Engines
+        "nullEngine.ts",
+        # Engines / Extensions
+        "engine.webVR.ts",
+        # Helpers
+        "videoDome.ts",
+        # Materials / Textures
+        "htmlElementTexture.ts", "videoTexture.ts",
+        # Materials / Textures / Loaders
+        "ktxTextureLoader.ts", "tgaTextureLoader.ts",
+        # Meshes / Compression
+        "dracoCompression.ts",
+        # Misc
+        "andOrNotEvaluator.ts", "assetsManager.ts", "decorators.ts",
+        "deepCopier.ts", "deferred.ts", "domManagement.ts", "filesInput.ts",
+        "filesInputStore.ts", "logger.ts", "precisionDate.ts", "promise.ts",
+        "smartArray.ts", "stringDictionary.ts", "tags.ts", "typeStore.ts",
+        "videoRecorder.ts", "virtualJoystick.ts", "webRequest.ts",
+        "workerPool.ts",
+        # Offline
+        "database.ts", "IOfflineProvider.ts",
+        # Physics / Plugins
+        "ammoJSPlugin.ts", "cannonJSPlugin.ts", "oimoJSPlugin.ts"
+    ]
     # Create mapping from BabylonJS version to full path
     for version in BabylonJsVersions:
         modules = {
