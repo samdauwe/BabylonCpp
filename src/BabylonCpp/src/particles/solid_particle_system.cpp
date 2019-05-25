@@ -263,30 +263,34 @@ SolidParticleSystem::digest(Mesh* _mesh,
 
 void SolidParticleSystem::_unrotateFixedNormals()
 {
-  size_t index = 0;
-  size_t idx   = 0;
-  for (auto& iParticle : particles) {
-    _shape = iParticle->_model->_shape;
-    if (iParticle->rotationQuaternion) {
-      _quaternion.copyFrom(*iParticle->rotationQuaternion);
+  unsigned int index      = 0;
+  unsigned int idx        = 0;
+  auto& tmpNormal         = Tmp::Vector3Array[0];
+  auto& quaternion        = Tmp::QuaternionArray[0];
+  auto& invertedRotMatrix = Tmp::MatrixArray[0];
+  for (const auto& particle : particles) {
+    const auto& shape = particle->_model->_shape;
+
+    // computing the inverse of the rotation matrix from the quaternion
+    // is equivalent to computing the matrix of the inverse quaternion, i.e of
+    // the conjugate quaternion
+    if (particle->rotationQuaternion) {
+      particle->rotationQuaternion->conjugateToRef(quaternion);
     }
     else {
-      _yaw   = iParticle->rotation.y;
-      _pitch = iParticle->rotation.x;
-      _roll  = iParticle->rotation.z;
-      _quaternionRotationYPR();
+      const auto& rotation = particle->rotation;
+      Quaternion::RotationYawPitchRollToRef(rotation.y, rotation.x, rotation.z,
+                                            quaternion);
+      quaternion.conjugateInPlace();
     }
-    _quaternionToRotationMatrix();
-    _rotMatrix.invertToRef(_invertMatrix);
+    quaternion.toRotationMatrix(invertedRotMatrix);
 
-    for (size_t pt = 0; pt < _shape.size(); ++pt) {
+    for (unsigned int pt = 0; pt < shape.size(); ++pt) {
       idx = index + pt * 3;
       Vector3::TransformNormalFromFloatsToRef(
         _normals32[idx], _normals32[idx + 1], _normals32[idx + 2],
-        _invertMatrix, _normal);
-      _fixedNormal32[idx]     = _normal.x;
-      _fixedNormal32[idx + 1] = _normal.y;
-      _fixedNormal32[idx + 2] = _normal.z;
+        invertedRotMatrix, tmpNormal);
+      tmpNormal.toArray(_fixedNormal32, idx);
     }
     index = idx + 3;
   }
@@ -295,22 +299,14 @@ void SolidParticleSystem::_unrotateFixedNormals()
 // reset copy
 void SolidParticleSystem::_resetCopy()
 {
-  _copy->position.x         = 0.f;
-  _copy->position.y         = 0.f;
-  _copy->position.z         = 0.f;
-  _copy->rotation.x         = 0.f;
-  _copy->rotation.y         = 0.f;
-  _copy->rotation.z         = 0.f;
-  _copy->rotationQuaternion = nullptr;
-  _copy->scaling.x          = 1.f;
-  _copy->scaling.y          = 1.f;
-  _copy->scaling.z          = 1.f;
-  _copy->uvs.x              = 0.f;
-  _copy->uvs.y              = 0.f;
-  _copy->uvs.z              = 1.f;
-  _copy->uvs.w              = 1.f;
-  _copy->color              = std::nullopt;
-  _copy->translateFromPivot = false;
+  const auto& copy = _copy;
+  copy->position.setAll(0.f);
+  copy->rotation.setAll(0.f);
+  copy->rotationQuaternion = nullptr;
+  copy->scaling.setAll(1.f);
+  copy->uvs.copyFromFloats(0.f, 0.f, 1.f, 1.f);
+  copy->color              = std::nullopt;
+  copy->translateFromPivot = false;
 }
 
 SolidParticle* SolidParticleSystem::_meshBuilder(
@@ -340,7 +336,6 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
     _roll  = _copy->rotation.z;
     _quaternionRotationYPR();
   }
-  _quaternionToRotationMatrix();
 
   _scaledPivot.x = _copy->pivot.x * _copy->scaling.x;
   _scaledPivot.y = _copy->pivot.y * _copy->scaling.y;
@@ -540,7 +535,6 @@ void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
     _roll  = _copy->rotation.z;
     _quaternionRotationYPR();
   }
-  _quaternionToRotationMatrix();
 
   _scaledPivot.x = _particle->pivot.x * _particle->scaling.x;
   _scaledPivot.y = _particle->pivot.y * _particle->scaling.y;
@@ -648,8 +642,9 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
     Vector3::TransformNormalToRef(_camDir, _invertMatrix, _cam_axisZ);
     _cam_axisZ.normalize();
     // same for camera up vector extracted from the cam view matrix
-    auto view = _camera->getViewMatrix(true);
-    Vector3::TransformNormalFromFloatsToRef(view.m[1], view.m[5], view.m[9],
+    auto view         = _camera->getViewMatrix(true);
+    const auto& viewM = view.m();
+    Vector3::TransformNormalFromFloatsToRef(viewM[1], viewM[5], viewM[9],
                                             _invertMatrix, _cam_axisY);
     Vector3::CrossToRef(_cam_axisY, _cam_axisZ, _cam_axisX);
     _cam_axisY.normalize();
@@ -760,7 +755,6 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
           _roll  = _particle->rotation.z;
           _quaternionRotationYPR();
         }
-        _quaternionToRotationMatrix();
       }
 
       if (_particleHasParent && _particle->parentId < particles.size()) {
@@ -780,42 +774,43 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _particle->_globalPosition.z = _parent->_globalPosition.z + _rotated.z;
 
         if (_computeParticleRotation || billboard) {
+          const auto& _rotMatrixM = _rotMatrix.m();
           _particle->_rotationMatrix[0]
-            = _rotMatrix.m[0] * _parent->_rotationMatrix[0]
-              + _rotMatrix.m[1] * _parent->_rotationMatrix[3]
-              + _rotMatrix.m[2] * _parent->_rotationMatrix[6];
+            = _rotMatrixM[0] * _parent->_rotationMatrix[0]
+              + _rotMatrixM[1] * _parent->_rotationMatrix[3]
+              + _rotMatrixM[2] * _parent->_rotationMatrix[6];
           _particle->_rotationMatrix[1]
-            = _rotMatrix.m[0] * _parent->_rotationMatrix[1]
-              + _rotMatrix.m[1] * _parent->_rotationMatrix[4]
-              + _rotMatrix.m[2] * _parent->_rotationMatrix[7];
+            = _rotMatrixM[0] * _parent->_rotationMatrix[1]
+              + _rotMatrixM[1] * _parent->_rotationMatrix[4]
+              + _rotMatrixM[2] * _parent->_rotationMatrix[7];
           _particle->_rotationMatrix[2]
-            = _rotMatrix.m[0] * _parent->_rotationMatrix[2]
-              + _rotMatrix.m[1] * _parent->_rotationMatrix[5]
-              + _rotMatrix.m[2] * _parent->_rotationMatrix[8];
+            = _rotMatrixM[0] * _parent->_rotationMatrix[2]
+              + _rotMatrixM[1] * _parent->_rotationMatrix[5]
+              + _rotMatrixM[2] * _parent->_rotationMatrix[8];
           _particle->_rotationMatrix[3]
-            = _rotMatrix.m[4] * _parent->_rotationMatrix[0]
-              + _rotMatrix.m[5] * _parent->_rotationMatrix[3]
-              + _rotMatrix.m[6] * _parent->_rotationMatrix[6];
+            = _rotMatrixM[4] * _parent->_rotationMatrix[0]
+              + _rotMatrixM[5] * _parent->_rotationMatrix[3]
+              + _rotMatrixM[6] * _parent->_rotationMatrix[6];
           _particle->_rotationMatrix[4]
-            = _rotMatrix.m[4] * _parent->_rotationMatrix[1]
-              + _rotMatrix.m[5] * _parent->_rotationMatrix[4]
-              + _rotMatrix.m[6] * _parent->_rotationMatrix[7];
+            = _rotMatrixM[4] * _parent->_rotationMatrix[1]
+              + _rotMatrixM[5] * _parent->_rotationMatrix[4]
+              + _rotMatrixM[6] * _parent->_rotationMatrix[7];
           _particle->_rotationMatrix[5]
-            = _rotMatrix.m[4] * _parent->_rotationMatrix[2]
-              + _rotMatrix.m[5] * _parent->_rotationMatrix[5]
-              + _rotMatrix.m[6] * _parent->_rotationMatrix[8];
+            = _rotMatrixM[4] * _parent->_rotationMatrix[2]
+              + _rotMatrixM[5] * _parent->_rotationMatrix[5]
+              + _rotMatrixM[6] * _parent->_rotationMatrix[8];
           _particle->_rotationMatrix[6]
-            = _rotMatrix.m[8] * _parent->_rotationMatrix[0]
-              + _rotMatrix.m[9] * _parent->_rotationMatrix[3]
-              + _rotMatrix.m[10] * _parent->_rotationMatrix[6];
+            = _rotMatrixM[8] * _parent->_rotationMatrix[0]
+              + _rotMatrixM[9] * _parent->_rotationMatrix[3]
+              + _rotMatrixM[10] * _parent->_rotationMatrix[6];
           _particle->_rotationMatrix[7]
-            = _rotMatrix.m[8] * _parent->_rotationMatrix[1]
-              + _rotMatrix.m[9] * _parent->_rotationMatrix[4]
-              + _rotMatrix.m[10] * _parent->_rotationMatrix[7];
+            = _rotMatrixM[8] * _parent->_rotationMatrix[1]
+              + _rotMatrixM[9] * _parent->_rotationMatrix[4]
+              + _rotMatrixM[10] * _parent->_rotationMatrix[7];
           _particle->_rotationMatrix[8]
-            = _rotMatrix.m[8] * _parent->_rotationMatrix[2]
-              + _rotMatrix.m[9] * _parent->_rotationMatrix[5]
-              + _rotMatrix.m[10] * _parent->_rotationMatrix[8];
+            = _rotMatrixM[8] * _parent->_rotationMatrix[2]
+              + _rotMatrixM[9] * _parent->_rotationMatrix[5]
+              + _rotMatrixM[10] * _parent->_rotationMatrix[8];
         }
       }
       else {
@@ -824,15 +819,16 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         _particle->_globalPosition.z = _particle->position.z;
 
         if (_computeParticleRotation || billboard) {
-          _particle->_rotationMatrix[0] = _rotMatrix.m[0];
-          _particle->_rotationMatrix[1] = _rotMatrix.m[1];
-          _particle->_rotationMatrix[2] = _rotMatrix.m[2];
-          _particle->_rotationMatrix[3] = _rotMatrix.m[4];
-          _particle->_rotationMatrix[4] = _rotMatrix.m[5];
-          _particle->_rotationMatrix[5] = _rotMatrix.m[6];
-          _particle->_rotationMatrix[6] = _rotMatrix.m[8];
-          _particle->_rotationMatrix[7] = _rotMatrix.m[9];
-          _particle->_rotationMatrix[8] = _rotMatrix.m[10];
+          const auto& _rotMatrixM       = _rotMatrix.m();
+          _particle->_rotationMatrix[0] = _rotMatrixM[0];
+          _particle->_rotationMatrix[1] = _rotMatrixM[1];
+          _particle->_rotationMatrix[2] = _rotMatrixM[2];
+          _particle->_rotationMatrix[3] = _rotMatrixM[4];
+          _particle->_rotationMatrix[4] = _rotMatrixM[5];
+          _particle->_rotationMatrix[5] = _rotMatrixM[6];
+          _particle->_rotationMatrix[6] = _rotMatrixM[8];
+          _particle->_rotationMatrix[7] = _rotMatrixM[9];
+          _particle->_rotationMatrix[8] = _rotMatrixM[10];
         }
       }
 
@@ -1142,38 +1138,6 @@ void SolidParticleSystem::_quaternionRotationYPR()
     = _cosYaw * _cosPitch * _sinRoll - _sinYaw * _sinPitch * _cosRoll;
   _quaternion.w
     = _cosYaw * _cosPitch * _cosRoll + _sinYaw * _sinPitch * _sinRoll;
-}
-
-void SolidParticleSystem::_quaternionToRotationMatrix()
-{
-  _rotMatrix.m[0]
-    = 1.f
-      - (2.f * (_quaternion.y * _quaternion.y + _quaternion.z * _quaternion.z));
-  _rotMatrix.m[1]
-    = 2.f * (_quaternion.x * _quaternion.y + _quaternion.z * _quaternion.w);
-  _rotMatrix.m[2]
-    = 2.f * (_quaternion.z * _quaternion.x - _quaternion.y * _quaternion.w);
-  _rotMatrix.m[3] = 0.f;
-  _rotMatrix.m[4]
-    = 2.f * (_quaternion.x * _quaternion.y - _quaternion.z * _quaternion.w);
-  _rotMatrix.m[5]
-    = 1.f
-      - (2.f * (_quaternion.z * _quaternion.z + _quaternion.x * _quaternion.x));
-  _rotMatrix.m[6]
-    = 2.f * (_quaternion.y * _quaternion.z + _quaternion.x * _quaternion.w);
-  _rotMatrix.m[7] = 0.f;
-  _rotMatrix.m[8]
-    = 2.f * (_quaternion.z * _quaternion.x + _quaternion.y * _quaternion.w);
-  _rotMatrix.m[9]
-    = 2.f * (_quaternion.y * _quaternion.z - _quaternion.x * _quaternion.w);
-  _rotMatrix.m[10]
-    = 1.f
-      - (2.f * (_quaternion.y * _quaternion.y + _quaternion.x * _quaternion.x));
-  _rotMatrix.m[11] = 0.f;
-  _rotMatrix.m[12] = 0.f;
-  _rotMatrix.m[13] = 0.f;
-  _rotMatrix.m[14] = 0.f;
-  _rotMatrix.m[15] = 1.f;
 }
 
 void SolidParticleSystem::dispose(bool /*doNotRecurse*/,

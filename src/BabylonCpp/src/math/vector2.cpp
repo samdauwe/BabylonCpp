@@ -565,7 +565,7 @@ Vector2 Vector2::Transform(const Vector2& vector, const Matrix& transformation)
 void Vector2::TransformToRef(const Vector2& vector,
                              const Matrix& transformation, Vector2& result)
 {
-  const auto& m = transformation.m;
+  const auto& m = transformation.m();
   const auto x  = (vector.x * m[0]) + (vector.y * m[4]) + m[12];
   const auto y  = (vector.x * m[1]) + (vector.y * m[5]) + m[13];
   result.x      = x;

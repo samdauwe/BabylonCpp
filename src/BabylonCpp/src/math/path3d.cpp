@@ -190,9 +190,9 @@ void Path3D::_compute(const std::optional<Vector3>& firstNormal)
 
   // normals and binormals at first point : arbitrary vector with
   // _normalVector()
-  const auto& tg0   = _tangents[0];
-  const Vector3 pp0 = _normalVector(_curve[0], tg0, firstNormal);
-  _normals[0]       = pp0;
+  const auto& tg0 = _tangents[0];
+  const auto pp0  = _normalVector(tg0, firstNormal);
+  _normals[0]     = pp0;
   if (!_raw) {
     _normals[0].normalize();
   }
@@ -257,7 +257,7 @@ Vector3 Path3D::_getLastNonNullVector(unsigned int index)
   return nLVector;
 }
 
-Vector3 Path3D::_normalVector(const Vector3& /*v0*/, const Vector3& vt,
+Vector3 Path3D::_normalVector(const Vector3& vt,
                               const std::optional<Vector3>& va)
 {
   Vector3 normal0;

@@ -82,4 +82,14 @@ Viewport Viewport::toGlobal(int renderWidth, int renderHeight) const
                   height * renderHeight);
 }
 
+Viewport& Viewport::toGlobalToRef(int renderWidth, int renderHeight,
+                                  Viewport& ref)
+{
+  ref.x      = x * renderWidth;
+  ref.y      = y * renderHeight;
+  ref.width  = width * renderWidth;
+  ref.height = height * renderHeight;
+  return *this;
+}
+
 } // end of namespace BABYLON

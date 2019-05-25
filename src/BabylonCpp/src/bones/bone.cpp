@@ -389,10 +389,9 @@ void Bone::translate(const Vector3& vec, Space space, AbstractMesh* mesh)
   auto& lm = getLocalMatrix();
 
   if (space == Space::LOCAL) {
-
-    lm.m[12] += vec.x;
-    lm.m[13] += vec.y;
-    lm.m[14] += vec.z;
+    lm.addAtIndex(12, vec.x);
+    lm.addAtIndex(13, vec.y);
+    lm.addAtIndex(14, vec.z);
   }
   else {
 
@@ -417,16 +416,13 @@ void Bone::translate(const Vector3& vec, Space space, AbstractMesh* mesh)
       }
     }
 
-    tmat.m[12] = 0.f;
-    tmat.m[13] = 0.f;
-    tmat.m[14] = 0.f;
-
+    tmat.setTranslationFromFloats(0.f, 0.f, 0.f);
     tmat.invert();
     Vector3::TransformCoordinatesToRef(vec, tmat, tvec);
 
-    lm.m[12] += tvec.x;
-    lm.m[13] += tvec.y;
-    lm.m[14] += tvec.z;
+    lm.addAtIndex(12, tvec.x);
+    lm.addAtIndex(13, tvec.y);
+    lm.addAtIndex(14, tvec.z);
   }
 
   _markAsDirtyAndDecompose();
@@ -438,10 +434,7 @@ void Bone::setPosition(const Vector3& iPosition, Space space,
   auto& lm = getLocalMatrix();
 
   if (space == Space::LOCAL) {
-
-    lm.m[12] = iPosition.x;
-    lm.m[13] = iPosition.y;
-    lm.m[14] = iPosition.z;
+    lm.setTranslationFromFloats(iPosition.x, iPosition.y, iPosition.z);
   }
   else {
 
@@ -469,10 +462,7 @@ void Bone::setPosition(const Vector3& iPosition, Space space,
 
     tmat.invert();
     Vector3::TransformCoordinatesToRef(iPosition, tmat, vec);
-
-    lm.m[12] = vec.x;
-    lm.m[13] = vec.y;
-    lm.m[14] = vec.z;
+    lm.setTranslationFromFloats(vec.x, vec.y, vec.z);
   }
 
   _markAsDirtyAndDecompose();
@@ -498,9 +488,10 @@ void Bone::scale(float x, float y, float z, bool scaleChildren)
   for (auto& child : children) {
     auto& cm = child->getLocalMatrix();
     cm.multiplyToRef(scaleMat, cm);
-    cm.m[12] *= x;
-    cm.m[13] *= y;
-    cm.m[14] *= z;
+    cm.multiplyToRef(scaleMat, cm);
+    cm.multiplyAtIndex(12, x);
+    cm.multiplyAtIndex(13, y);
+    cm.multiplyAtIndex(14, z);
 
     child->_markAsDirtyAndDecompose();
   }
@@ -560,12 +551,8 @@ void Bone::setYawPitchRoll(float yaw, float pitch, float roll, Space space,
 void Bone::rotate(Vector3& axis, float amount, Space space, AbstractMesh* mesh)
 {
   auto& rmat = Bone::_tmpMats[0];
-  rmat.m[12] = 0.f;
-  rmat.m[13] = 0.f;
-  rmat.m[14] = 0.f;
-
+  rmat.setTranslationFromFloats(0.f, 0.f, 0.f);
   Matrix::RotationAxisToRef(axis, amount, rmat);
-
   _rotateWithMatrix(rmat, space, mesh);
 }
 
@@ -650,9 +637,10 @@ void Bone::_rotateWithMatrix(const Matrix& rmat, Space space,
                              AbstractMesh* mesh)
 {
   auto& lmat           = getLocalMatrix();
-  float lx             = lmat.m[12];
-  float ly             = lmat.m[13];
-  float lz             = lmat.m[14];
+  const auto& lmatM    = lmat.m();
+  auto lx              = lmatM[12];
+  auto ly              = lmatM[13];
+  auto lz              = lmatM[14];
   auto parentBone      = getParent();
   auto& parentScale    = Bone::_tmpMats[3];
   auto& parentScaleInv = Bone::_tmpMats[4];
@@ -686,9 +674,7 @@ void Bone::_rotateWithMatrix(const Matrix& rmat, Space space,
     }
   }
 
-  lmat.m[12] = lx;
-  lmat.m[13] = ly;
-  lmat.m[14] = lz;
+  lmat.setTranslationFromFloats(lx, ly, lz);
 
   computeAbsoluteTransforms();
   _markAsDirtyAndDecompose();
@@ -706,13 +692,13 @@ bool Bone::_getNegativeRotationToRef(Matrix& rotMatInv, AbstractMesh* mesh)
   }
 
   rotMatInv.invert();
-  if (std::isnan(rotMatInv.m[0])) {
+  if (std::isnan(rotMatInv.m()[0])) {
     // Matrix failed to invert.
     // This can happen if scale is zero for example.
     return false;
   }
 
-  scaleMatrix.m[0] *= _scalingDeterminant;
+  scaleMatrix.multiplyAtIndex(0, _scalingDeterminant);
   rotMatInv.multiplyToRef(scaleMatrix, rotMatInv);
 
   return true;
@@ -734,9 +720,10 @@ void Bone::getPositionToRef(Vector3& result, Space space,
 
     auto& lm = getLocalMatrix();
 
-    result.x = lm.m[12];
-    result.y = lm.m[13];
-    result.z = lm.m[14];
+    const auto& lmM = lm.m();
+    result.x        = lmM[12];
+    result.y        = lmM[13];
+    result.z        = lmM[14];
   }
   else {
 
@@ -759,9 +746,10 @@ void Bone::getPositionToRef(Vector3& result, Space space,
       tmat = getAbsoluteTransform();
     }
 
-    result.x = tmat.m[12];
-    result.y = tmat.m[13];
-    result.z = tmat.m[14];
+    const auto& tmatM = tmat.m();
+    result.x          = tmatM[12];
+    result.y          = tmatM[13];
+    result.z          = tmatM[14];
   }
 }
 
@@ -880,11 +868,11 @@ void Bone::getRotationQuaternionToRef(Quaternion& result, const Space& space,
       mat.copyFrom(amat);
     }
 
-    mat.m[0] *= _scalingDeterminant;
-    mat.m[1] *= _scalingDeterminant;
-    mat.m[2] *= _scalingDeterminant;
+    mat.multiplyAtIndex(0, _scalingDeterminant);
+    mat.multiplyAtIndex(1, _scalingDeterminant);
+    mat.multiplyAtIndex(2, _scalingDeterminant);
 
-    mat.decompose(Bone::_tmpVecs[0], result, Bone::_tmpVecs[1]);
+    mat.decompose(std::nullopt, result, std::nullopt);
   }
 }
 
@@ -914,9 +902,9 @@ void Bone::getRotationMatrixToRef(Matrix& result, Space space,
       mat.copyFrom(amat);
     }
 
-    mat.m[0] *= _scalingDeterminant;
-    mat.m[1] *= _scalingDeterminant;
-    mat.m[2] *= _scalingDeterminant;
+    mat.multiplyAtIndex(0, _scalingDeterminant);
+    mat.multiplyAtIndex(1, _scalingDeterminant);
+    mat.multiplyAtIndex(2, _scalingDeterminant);
 
     mat.getRotationMatrixToRef(result);
   }

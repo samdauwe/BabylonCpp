@@ -44,7 +44,7 @@ void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
 {
   defines._needUVs     = true;
   defines.boolDef[key] = true;
-  if (texture->getTextureMatrix()->isIdentity(true)) {
+  if (texture->getTextureMatrix()->isIdentityAs3x2()) {
     defines.intDef[key + "DIRECTUV"] = texture->coordinatesIndex + 1;
     if (texture->coordinatesIndex == 0) {
       defines.boolDef["MAINUV1"] = true;
@@ -64,7 +64,7 @@ void MaterialHelper::BindTextureMatrix(BaseTexture& texture,
 {
   auto matrix = *texture.getTextureMatrix();
 
-  if (!matrix.isIdentity(true)) {
+  if (!matrix.isIdentityAs3x2()) {
     uniformBuffer.updateMatrix(key + "Matrix", matrix);
   }
 }

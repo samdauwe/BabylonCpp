@@ -190,9 +190,9 @@ void BoundingBox::_update(const Matrix& world)
   maximumWorld.addToRef(minimumWorld, centerWorld);
   centerWorld.scaleInPlace(0.5f);
 
-  Vector3::FromFloatArrayToRef(world.m, 0, directions[0]);
-  Vector3::FromFloatArrayToRef(world.m, 4, directions[1]);
-  Vector3::FromFloatArrayToRef(world.m, 8, directions[2]);
+  Vector3::FromFloatArrayToRef(world.m(), 0, directions[0]);
+  Vector3::FromFloatArrayToRef(world.m(), 4, directions[1]);
+  Vector3::FromFloatArrayToRef(world.m(), 8, directions[2]);
 
   _worldMatrix = world;
 }

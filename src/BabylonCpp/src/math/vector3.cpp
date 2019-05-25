@@ -705,7 +705,7 @@ void Vector3::TransformCoordinatesFromFloatsToRef(float x, float y, float z,
   SIMD::SIMDVector3::TransformCoordinatesFromFloatsToRefSIMD(
     x, y, z, transformation, result);
 #else
-  const auto& m = transformation.m;
+  const auto& m = transformation.m();
   const auto rx = x * m[0] + y * m[4] + z * m[8] + m[12];
   const auto ry = x * m[1] + y * m[5] + z * m[9] + m[13];
   const auto rz = x * m[2] + y * m[6] + z * m[10] + m[14];
@@ -737,7 +737,7 @@ void Vector3::TransformNormalFromFloatsToRef(float x, float y, float z,
                                              const Matrix& transformation,
                                              Vector3& result)
 {
-  const auto& m = transformation.m;
+  const auto& m = transformation.m();
   result.x      = x * m[0] + y * m[4] + z * m[8];
   result.y      = x * m[1] + y * m[5] + z * m[9];
   result.z      = x * m[2] + y * m[6] + z * m[10];
@@ -910,7 +910,7 @@ void Vector3::_UnprojectFromInvertedMatrixToRef(const Vector3& source,
                                                 Vector3& result)
 {
   Vector3::TransformCoordinatesToRef(source, matrix, result);
-  const auto& m  = matrix.m;
+  const auto& m  = matrix.m();
   const auto num = source.x * m[3] + source.y * m[7] + source.z * m[11] + m[15];
   if (Scalar::WithinEpsilon(num, 1.f)) {
     result.scaleInPlace(1.f / num);

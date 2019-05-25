@@ -512,10 +512,10 @@ void ArcRotateCamera::set_useAutoRotationBehavior(bool value)
 Matrix ArcRotateCamera::_getViewMatrix()
 {
   // Compute
-  const float cosa = std::cos(alpha);
-  const float sina = std::sin(alpha);
-  const float cosb = std::cos(beta);
-  float sinb       = std::sin(beta);
+  const auto cosa = std::cos(alpha);
+  const auto sina = std::sin(alpha);
+  const auto cosb = std::cos(beta);
+  auto sinb       = std::sin(beta);
 
   if (sinb == 0.f) {
     sinb = 0.0001f;
@@ -549,8 +549,8 @@ Matrix ArcRotateCamera::_getViewMatrix()
 
     _computeViewMatrix(position, target, up);
 
-    _viewMatrix.m[12] += targetScreenOffset.x;
-    _viewMatrix.m[13] += targetScreenOffset.y;
+    _viewMatrix.addAtIndex(12, targetScreenOffset.x);
+    _viewMatrix.addAtIndex(13, targetScreenOffset.y);
   }
   _currentTarget = targetPostion;
 
@@ -577,10 +577,10 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   }
 
   // Recompute because of constraints
-  const float cosa = std::cos(alpha);
-  const float sina = std::sin(alpha);
-  const float cosb = std::cos(beta);
-  float sinb       = std::sin(beta);
+  const auto cosa = std::cos(alpha);
+  const auto sina = std::sin(alpha);
+  const auto cosb = std::cos(beta);
+  auto sinb       = std::sin(beta);
 
   if (sinb == 0.f) {
     sinb = 0.0001f;
@@ -598,8 +598,8 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   }
 
   _computeViewMatrix(position, target, up);
-  _viewMatrix.m[12] += targetScreenOffset.x;
-  _viewMatrix.m[13] += targetScreenOffset.y;
+  _viewMatrix.addAtIndex(12, targetScreenOffset.x);
+  _viewMatrix.addAtIndex(13, targetScreenOffset.y);
 
   _collisionTriggered = false;
 }

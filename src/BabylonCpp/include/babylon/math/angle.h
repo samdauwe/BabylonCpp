@@ -17,6 +17,7 @@ class BABYLON_SHARED_EXPORT Angle {
 public:
   /**
    * @brief Creates an Angle object of "radians" radians (float).
+   * @param radians the angle in radians
    */
   Angle();
   Angle(float radians);

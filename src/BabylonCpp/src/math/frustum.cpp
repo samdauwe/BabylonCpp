@@ -11,63 +11,67 @@ std::array<Plane, 6> Frustum::GetPlanes(const Matrix& transform)
     {Plane(0.f, 0.f, 0.f, 0.f), Plane(0.f, 0.f, 0.f, 0.f),
      Plane(0.f, 0.f, 0.f, 0.f), Plane(0.f, 0.f, 0.f, 0.f),
      Plane(0.f, 0.f, 0.f, 0.f), Plane(0.f, 0.f, 0.f, 0.f)}};
-
   Frustum::GetPlanesToRef(transform, frustumPlanes);
-
   return frustumPlanes;
 }
 
 void Frustum::GetNearPlaneToRef(const Matrix& transform, Plane& frustumPlane)
 {
-  frustumPlane.normal.x = transform.m[3] + transform.m[2];
-  frustumPlane.normal.y = transform.m[7] + transform.m[6];
-  frustumPlane.normal.z = transform.m[11] + transform.m[10];
-  frustumPlane.d        = transform.m[15] + transform.m[14];
+  const auto& m         = transform.m();
+  frustumPlane.normal.x = m[3] + m[2];
+  frustumPlane.normal.y = m[7] + m[6];
+  frustumPlane.normal.z = m[11] + m[10];
+  frustumPlane.d        = m[15] + m[14];
   frustumPlane.normalize();
 }
 
 void Frustum::GetFarPlaneToRef(const Matrix& transform, Plane& frustumPlane)
 {
-  frustumPlane.normal.x = transform.m[3] - transform.m[2];
-  frustumPlane.normal.y = transform.m[7] - transform.m[6];
-  frustumPlane.normal.z = transform.m[11] - transform.m[10];
-  frustumPlane.d        = transform.m[15] - transform.m[14];
+  const auto& m         = transform.m();
+  frustumPlane.normal.x = m[3] - m[2];
+  frustumPlane.normal.y = m[7] - m[6];
+  frustumPlane.normal.z = m[11] - m[10];
+  frustumPlane.d        = m[15] - m[14];
   frustumPlane.normalize();
 }
 
 void Frustum::GetLeftPlaneToRef(const Matrix& transform, Plane& frustumPlane)
 {
-  frustumPlane.normal.x = transform.m[3] + transform.m[0];
-  frustumPlane.normal.y = transform.m[7] + transform.m[4];
-  frustumPlane.normal.z = transform.m[11] + transform.m[8];
-  frustumPlane.d        = transform.m[15] + transform.m[12];
+  const auto& m         = transform.m();
+  frustumPlane.normal.x = m[3] + m[0];
+  frustumPlane.normal.y = m[7] + m[4];
+  frustumPlane.normal.z = m[11] + m[8];
+  frustumPlane.d        = m[15] + m[12];
   frustumPlane.normalize();
 }
 
 void Frustum::GetRightPlaneToRef(const Matrix& transform, Plane& frustumPlane)
 {
-  frustumPlane.normal.x = transform.m[3] - transform.m[0];
-  frustumPlane.normal.y = transform.m[7] - transform.m[4];
-  frustumPlane.normal.z = transform.m[11] - transform.m[8];
-  frustumPlane.d        = transform.m[15] - transform.m[12];
+  const auto& m         = transform.m();
+  frustumPlane.normal.x = m[3] - m[0];
+  frustumPlane.normal.y = m[7] - m[4];
+  frustumPlane.normal.z = m[11] - m[8];
+  frustumPlane.d        = m[15] - m[12];
   frustumPlane.normalize();
 }
 
 void Frustum::GetTopPlaneToRef(const Matrix& transform, Plane& frustumPlane)
 {
-  frustumPlane.normal.x = transform.m[3] - transform.m[1];
-  frustumPlane.normal.y = transform.m[7] - transform.m[5];
-  frustumPlane.normal.z = transform.m[11] - transform.m[9];
-  frustumPlane.d        = transform.m[15] - transform.m[13];
+  const auto& m         = transform.m();
+  frustumPlane.normal.x = m[3] - m[1];
+  frustumPlane.normal.y = m[7] - m[5];
+  frustumPlane.normal.z = m[11] - m[9];
+  frustumPlane.d        = m[15] - m[13];
   frustumPlane.normalize();
 }
 
 void Frustum::GetBottomPlaneToRef(const Matrix& transform, Plane& frustumPlane)
 {
-  frustumPlane.normal.x = transform.m[3] + transform.m[1];
-  frustumPlane.normal.y = transform.m[7] + transform.m[5];
-  frustumPlane.normal.z = transform.m[11] + transform.m[9];
-  frustumPlane.d        = transform.m[15] + transform.m[13];
+  const auto& m         = transform.m();
+  frustumPlane.normal.x = m[3] + m[1];
+  frustumPlane.normal.y = m[7] + m[5];
+  frustumPlane.normal.z = m[11] + m[9];
+  frustumPlane.d        = m[15] + m[13];
   frustumPlane.normalize();
 }
 

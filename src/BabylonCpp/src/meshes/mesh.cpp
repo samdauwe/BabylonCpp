@@ -1727,7 +1727,8 @@ Mesh& Mesh::bakeTransformIntoVertices(const Matrix& transform)
   }
 
   // flip faces?
-  if (transform.m[0] * transform.m[5] * transform.m[10] < 0) {
+  const auto& transformM = transform.m();
+  if (transformM[0] * transformM[5] * transformM[10] < 0.f) {
     flipFaces();
   }
 

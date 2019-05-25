@@ -104,24 +104,24 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
   std::vector<IAnimationKey> rotationKeys;
   frame = 0;
   for (unsigned int index = 0; index < curve.size() - 1; ++index) {
-    Vector3 pointToRotateTo = curve[index + 1];
-    Vector3 axis1 = curve[index].subtract(pointToRotateTo).normalize();
-    Vector3 axis2 = Vector3::Cross(axis1, Vector3(0.f, 1.f, 0.f)).normalize();
-    Vector3 axis3 = Vector3::Cross(axis1, axis2).normalize();
+    auto pointToRotateTo = curve[index + 1];
+    auto axis1           = curve[index].subtract(pointToRotateTo).normalize();
+    auto axis2 = Vector3::Cross(axis1, Vector3(0.f, 1.f, 0.f)).normalize();
+    auto axis3 = Vector3::Cross(axis1, axis2).normalize();
 
-    Matrix matrix = Matrix::Identity();
+    auto matrix = Matrix::Identity();
 
-    matrix.m[0] = axis1.x;
-    matrix.m[1] = axis1.y;
-    matrix.m[2] = axis1.z;
+    matrix.setAtIndex(0, axis1.x);
+    matrix.setAtIndex(1, axis1.y);
+    matrix.setAtIndex(2, axis1.z);
 
-    matrix.m[4] = axis2.x;
-    matrix.m[5] = axis2.y;
-    matrix.m[6] = axis2.z;
+    matrix.setAtIndex(4, axis2.x);
+    matrix.setAtIndex(5, axis2.y);
+    matrix.setAtIndex(6, axis2.z);
 
-    matrix.m[8]  = axis3.x;
-    matrix.m[9]  = axis3.y;
-    matrix.m[10] = axis3.z;
+    matrix.setAtIndex(8, axis3.x);
+    matrix.setAtIndex(9, axis3.y);
+    matrix.setAtIndex(10, axis3.z);
 
     auto rotation = Quaternion::FromRotationMatrix(matrix);
     rotationKeys.emplace_back(IAnimationKey(frame, AnimationValue(rotation)));

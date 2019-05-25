@@ -364,12 +364,12 @@ Quaternion Quaternion::FromRotationMatrix(const Matrix& matrix)
 void Quaternion::FromRotationMatrixToRef(const Matrix& matrix,
                                          Quaternion& result)
 {
-  const std::array<float, 16>& data = matrix.m;
-  const float m11 = data[0], m12 = data[4], m13 = data[8];
-  const float m21 = data[1], m22 = data[5], m23 = data[9];
-  const float m31 = data[2], m32 = data[6], m33 = data[10];
-  const float trace = m11 + m22 + m33;
-  float s;
+  const auto& data = matrix.m();
+  const auto m11 = data[0], m12 = data[4], m13 = data[8];
+  const auto m21 = data[1], m22 = data[5], m23 = data[9];
+  const auto m31 = data[2], m32 = data[6], m33 = data[10];
+  const auto trace = m11 + m22 + m33;
+  float s          = 0.f;
 
   if (trace > 0.f) {
     s = 0.5f / std::sqrt(trace + 1.f);

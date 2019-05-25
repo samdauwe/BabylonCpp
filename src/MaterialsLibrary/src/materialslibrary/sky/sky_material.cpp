@@ -191,10 +191,10 @@ void SkyMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   // Sky
   auto camera = scene->activeCamera;
   if (camera) {
-    auto cameraWorldMatrix = camera->getWorldMatrix();
-    _cameraPosition.x      = cameraWorldMatrix.m[12];
-    _cameraPosition.y      = cameraWorldMatrix.m[13];
-    _cameraPosition.z      = cameraWorldMatrix.m[14];
+    const auto& cameraWorldMatrixM = camera->getWorldMatrix().m();
+    _cameraPosition.x              = cameraWorldMatrixM[12];
+    _cameraPosition.y              = cameraWorldMatrixM[13];
+    _cameraPosition.z              = cameraWorldMatrixM[14];
     _activeEffect->setVector3("cameraPosition", _cameraPosition);
   }
 

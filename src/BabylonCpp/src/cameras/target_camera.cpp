@@ -181,7 +181,7 @@ void TargetCamera::setTarget(const Vector3& target)
   Matrix::LookAtLHToRef(position, target, _defaultUp, _camMatrix);
   _camMatrix.invert();
 
-  rotation->x = std::atan(_camMatrix.m[6] / _camMatrix.m[10]);
+  rotation->x = std::atan(_camMatrix.m()[6] / _camMatrix.m()[10]);
 
   auto vDir = target.subtract(position);
 

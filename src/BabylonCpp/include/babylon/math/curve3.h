@@ -24,7 +24,7 @@ public:
    * @brief A Curve3 object is a logical object, so not a mesh, to handle curves
    * in the 3D geometric space. A Curve3 is designed from a series of successive
    * Vector3. Tuto :
-   * http://doc.babylonjs.com/tutorials/How_to_use_Curve3#curve3-object
+   * https://doc.babylonjs.com/how_to/how_to_use_curve3#curve3-object
    * @param points points which make up the curve
    */
   Curve3(const std::vector<Vector3>& points);
@@ -61,7 +61,7 @@ public:
 
   /**
    * @brief Returns a Curve3 object along a Quadratic Bezier curve :
-   * http://doc.babylonjs.com/tutorials/How_to_use_Curve3#quadratic-bezier-curve
+   * https://doc.babylonjs.com/how_to/how_to_use_curve3#quadratic-bezier-curve
    * @param v0 (Vector3) the origin point of the Quadratic Bezier
    * @param v1 (Vector3) the control point
    * @param v2 (Vector3) the end point of the Quadratic Bezier
@@ -73,7 +73,7 @@ public:
 
   /**
    * @brief Returns a Curve3 object along a Cubic Bezier curve :
-   * http://doc.babylonjs.com/tutorials/How_to_use_Curve3#cubic-bezier-curve
+   * https://doc.babylonjs.com/how_to/how_to_use_curve3#cubic-bezier-curve
    * @param v0 (Vector3) the origin point of the Cubic Bezier
    * @param v1 (Vector3) the first control point
    * @param v2 (Vector3) the second control point
@@ -87,7 +87,7 @@ public:
 
   /**
    * @brief Returns a Curve3 object along a Hermite Spline curve :
-   * http://doc.babylonjs.com/tutorials/How_to_use_Curve3#hermite-spline
+   * https://doc.babylonjs.com/how_to/how_to_use_curve3#hermite-spline
    * @param p1 (Vector3) the origin point of the Hermite Spline
    * @param t1 (Vector3) the tangent vector at the origin point
    * @param p2 (Vector3) the end point of the Hermite Spline

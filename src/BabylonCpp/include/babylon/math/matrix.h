@@ -57,6 +57,11 @@ public:
   int getHashCode() const;
 
   /**
+   * @brief Gets the internal data of the matrix.
+   */
+  const std::array<float, 16>& m() const;
+
+  /**
    * @brief Mark matrix as updated.
    */
   void _markAsUpdated();
@@ -64,12 +69,17 @@ public:
   /** Properties **/
 
   /**
-   * @brief Check if the current matrix is indentity.
-   * @param considerAsTextureMatrix defines if the current matrix must be
-   * considered as a texture matrix (3x2)
+   * @brief Check if the current matrix is identity.
    * @returns true is the matrix is the identity matrix
    */
-  bool isIdentity(bool considerAsTextureMatrix = false);
+  bool isIdentity();
+
+  /**
+   * @brief Check if the current matrix is identity as a texture matrix (3x2
+   * store in 4x4).
+   * @returns true is the matrix is the identity matrix
+   */
+  bool isIdentityAs3x2();
 
   /**
    * @brief Gets the determinant of the matrix.
@@ -139,6 +149,30 @@ public:
   Matrix& invertToRef(Matrix& other);
 
   /**
+   * @brief Add a value at the specified position in the current Matrix.
+   * @param index the index of the value within the matrix. between 0 and 15.
+   * @param value the value to be added
+   * @returns the current updated matrix
+   */
+  Matrix& addAtIndex(size_t index, float value);
+
+  /**
+   * @brief Mutiply the specified position in the current Matrix by a value.
+   * @param index the index of the value within the matrix. between 0 and 15.
+   * @param value the value to be added
+   * @returns the current updated matrix
+   */
+  Matrix& multiplyAtIndex(size_t index, float value);
+
+  /**
+   * @brief Sets a value at the specified position in the current Matrix.
+   * @param index the index of the value within the matrix. between 0 and 15.
+   * @param value the value to be added
+   * @returns the current updated matrix
+   */
+  Matrix& setAtIndex(size_t index, float value);
+
+  /**
    * @brief Inserts the translation vector (using 3 floats) in the current
    * matrix.
    * @param x defines the 1st component of the translation
@@ -147,6 +181,15 @@ public:
    * @returns the current updated matrix
    */
   Matrix& setTranslationFromFloats(float x, float y, float z);
+
+  /**
+   * @brief Adds the translation vector (using 3 floats) in the current matrix.
+   * @param x defines the 1st component of the translation
+   * @param y defines the 2nd component of the translation
+   * @param z defines the 3rd component of the translation
+   * @returns the current updated matrix
+   */
+  Matrix& addTranslationFromFloats(float x, float y, float z);
 
   /**
    * @brief Inserts the translation vector in the current matrix.
@@ -258,7 +301,7 @@ public:
    * @returns true is the current matrix and the given one values are strictly
    * equal
    */
-  bool equals(const Matrix& other) const;
+  bool equals(const Matrix& value) const;
 
   /**
    * @brief Decomposes the current Matrix into a translation, rotation and
@@ -363,6 +406,18 @@ public:
    */
   const Matrix& getRotationMatrixToRef(Matrix& result) const;
 
+  /**
+   * @brief Toggles model matrix from being right handed to left handed in place
+   * and vice versa.
+   */
+  void toggleModelMatrixHandInPlace();
+
+  /**
+   * @brief Toggles projection matrix from being right handed to left handed in
+   * place and vice versa.
+   */
+  void toggleProjectionMatrixHandInPlace();
+
   /** Operator overloading **/
   friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix);
   Matrix operator+(const Matrix& other);
@@ -406,6 +461,11 @@ public:
                                           Matrix& result);
 
   /**
+   * @brief Gets an identity matrix that must not be updated.
+   */
+  static Matrix IdentityReadOnly();
+
+  /**
    * @brief Stores a list of values (16) inside a given matrix.
    * @param initialM11 defines 1st value of 1st row
    * @param initialM12 defines 2nd value of 1st row
@@ -432,11 +492,6 @@ public:
                   float initialM32, float initialM33, float initialM34,
                   float initialM41, float initialM42, float initialM43,
                   float initialM44, Matrix& result);
-
-  /**
-   * @brief Gets an identity matrix that must not be updated.
-   */
-  static Matrix IdentityReadOnly();
 
   /**
    * @brief Creates new matrix from a list of values (16).
@@ -575,6 +630,17 @@ public:
    * @param result defines the target matrix
    */
   static void RotationAxisToRef(Vector3& axis, float angle, Matrix& result);
+
+  /**
+   * @brief Takes normalised vectors and returns a rotation matrix to align
+   * "from" with "to". Taken from
+   * http://www.iquilezles.org/www/articles/noacos/noacos.htm
+   * @param from defines the vector to align
+   * @param to defines the vector to align to
+   * @param result defines the target matrix
+   */
+  static void RotationAlignToRef(const Vector3& from, const Vector3& to,
+                                 Matrix& result);
 
   /**
    * @brief Creates a rotation matrix.
@@ -964,6 +1030,12 @@ public:
    */
   static void FromQuaternionToRef(const Quaternion& quat, Matrix& result);
 
+private:
+  /** @hidden */
+  void _updateIdentityStatus(bool isIdentity, bool isIdentityDirty = false,
+                             bool isIdentity3x2      = false,
+                             bool isIdentity3x2Dirty = true);
+
 public:
   /**
    * Gets the update flag of the matrix which is an unique number for the
@@ -972,24 +1044,19 @@ public:
    */
   int updateFlag;
 
-  /**
-   * Gets or sets the internal data of the matrix
-   */
-  std::array<float, 16> m;
-
 #if BABYLONCPP_OPTION_ENABLE_SIMD == true
   SIMD::SIMDMatrix simdMatrix;
 #endif
 
 private:
-  static Quaternion _tempQuaternion;
-  static Vector3 _xAxis;
-  static Vector3 _yAxis;
-  static Vector3 _zAxis;
   static int _updateFlagSeed;
   static Matrix _identityReadOnly;
   bool _isIdentity;
   bool _isIdentityDirty;
+  bool _isIdentity3x2;
+  bool _isIdentity3x2Dirty;
+
+  std::array<float, 16> _m;
 
 }; // end of class Matrix
 

@@ -9,7 +9,8 @@ namespace BABYLON {
 std::array<Vector3, 6> MathTmp::Vector3Array{
   {Vector3::Zero(), Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
    Vector3::Zero(), Vector3::Zero()}};
-std::array<Matrix, 2> MathTmp::MatrixArray{{Matrix::Zero(), Matrix::Zero()}};
+std::array<Matrix, 2> MathTmp::MatrixArray{
+  {Matrix::Identity(), Matrix::Identity()}};
 std::array<Quaternion, 3> MathTmp::QuaternionArray{
   {Quaternion::Zero(), Quaternion::Zero(), Quaternion::Zero()}};
 

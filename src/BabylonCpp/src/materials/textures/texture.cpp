@@ -272,18 +272,11 @@ Matrix* Texture::getTextureMatrix()
   _t1.subtractInPlace(_t0);
   _t2.subtractInPlace(_t0);
 
-  Matrix::IdentityToRef(*_cachedTextureMatrix);
-  _cachedTextureMatrix->m[0] = _t1.x;
-  _cachedTextureMatrix->m[1] = _t1.y;
-  _cachedTextureMatrix->m[2] = _t1.z;
-
-  _cachedTextureMatrix->m[4] = _t2.x;
-  _cachedTextureMatrix->m[5] = _t2.y;
-  _cachedTextureMatrix->m[6] = _t2.z;
-
-  _cachedTextureMatrix->m[8]  = _t0.x;
-  _cachedTextureMatrix->m[9]  = _t0.y;
-  _cachedTextureMatrix->m[10] = _t0.z;
+  Matrix::FromValuesToRef(_t1.x, _t1.y, _t1.z, 0.f, //
+                          _t2.x, _t2.y, _t2.z, 0.f, //
+                          _t0.x, _t0.y, _t0.z, 0.f, //
+                          0.f, 0.f, 0.f, 1.f,       //
+                          *_cachedTextureMatrix);
 
   auto scene = getScene();
   if (!scene) {
@@ -336,23 +329,19 @@ Matrix* Texture::getReflectionTextureMatrix()
   _cachedCoordinatesMode = coordinatesMode();
 
   switch (coordinatesMode()) {
-    case TextureConstants::PLANAR_MODE:
+    case TextureConstants::PLANAR_MODE: {
       Matrix::IdentityToRef(*_cachedTextureMatrix);
-      _cachedTextureMatrix->m[0]  = uScale;
-      _cachedTextureMatrix->m[5]  = vScale;
-      _cachedTextureMatrix->m[12] = uOffset;
-      _cachedTextureMatrix->m[13] = vOffset;
-      break;
+      _cachedTextureMatrix->setAtIndex(0, uScale);
+      _cachedTextureMatrix->setAtIndex(5, vScale);
+      _cachedTextureMatrix->setAtIndex(12, uOffset);
+      _cachedTextureMatrix->setAtIndex(13, vOffset);
+    } break;
     case TextureConstants::PROJECTION_MODE: {
-      Matrix::IdentityToRef(*_projectionModeMatrix);
-
-      _projectionModeMatrix->m[0]  = 0.5f;
-      _projectionModeMatrix->m[5]  = -0.5f;
-      _projectionModeMatrix->m[10] = 0.f;
-      _projectionModeMatrix->m[12] = 0.5f;
-      _projectionModeMatrix->m[13] = 0.5f;
-      _projectionModeMatrix->m[14] = 1.f;
-      _projectionModeMatrix->m[15] = 1.f;
+      Matrix::FromValuesToRef(0.5f, 0.f, 0.f, 0.f,  //
+                              0.f, -0.5f, 0.f, 0.f, //
+                              0.f, 0.f, 0.f, 0.f,   //
+                              0.5f, 0.5f, 1.f, 1.f, //
+                              *_projectionModeMatrix);
 
       auto projectionMatrix     = scene->getProjectionMatrix();
       _cachedProjectionMatrixId = projectionMatrix.updateFlag;

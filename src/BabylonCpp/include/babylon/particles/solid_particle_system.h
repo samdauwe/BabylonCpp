@@ -428,7 +428,6 @@ private:
    */
   void _rebuildParticle(SolidParticle* particle);
   void _quaternionRotationYPR();
-  void _quaternionToRotationMatrix();
 
 public:
   /**

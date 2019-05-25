@@ -44,11 +44,21 @@ public:
   /**
    * @brief Creates a new viewport using absolute sizing (from 0-> width, 0->
    * height instead of 0->1).
-   * @param renderWidthOrEngine defines either an engine or the rendering width
+   * @param renderWidth defines the rendering width
    * @param renderHeight defines the rendering height
    * @returns a new Viewport
    */
   Viewport toGlobal(int renderWidth, int renderHeight) const;
+
+  /**
+   * @brief Stores absolute viewport value into a target viewport (from 0->
+   * width, 0-> height instead of 0->1).
+   * @param renderWidth defines the rendering width
+   * @param renderHeight defines the rendering height
+   * @param ref defines the target viewport
+   * @returns the current viewport
+   */
+  Viewport& toGlobalToRef(int renderWidth, int renderHeight, Viewport& ref);
 
 public:
   /**

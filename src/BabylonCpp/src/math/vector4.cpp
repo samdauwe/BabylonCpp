@@ -573,7 +573,7 @@ void Vector4::TransformNormalToRef(const Vector4& vector,
                                    const Matrix& transformation,
                                    Vector4& result)
 {
-  const auto& m = transformation.m;
+  const auto& m = transformation.m();
   const auto x  = (vector.x * m[0]) + (vector.y * m[4]) + (vector.z * m[8]);
   const auto y  = (vector.x * m[1]) + (vector.y * m[5]) + (vector.z * m[9]);
   const auto z  = (vector.x * m[2]) + (vector.y * m[6]) + (vector.z * m[10]);
@@ -587,7 +587,7 @@ void Vector4::TransformNormalFromFloatsToRef(float x, float y, float z, float w,
                                              const Matrix& transformation,
                                              Vector4& result)
 {
-  const auto& m = transformation.m;
+  const auto& m = transformation.m();
   result.x      = (x * m[0]) + (y * m[4]) + (z * m[8]);
   result.y      = (x * m[1]) + (y * m[5]) + (z * m[9]);
   result.z      = (x * m[2]) + (y * m[6]) + (z * m[10]);

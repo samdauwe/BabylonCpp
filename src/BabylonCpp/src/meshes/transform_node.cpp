@@ -492,9 +492,10 @@ Vector3 TransformNode::getPivotPoint()
 
 TransformNode& TransformNode::getPivotPointToRef(Vector3& result)
 {
-  result.x = -_pivotMatrix.m[12];
-  result.y = -_pivotMatrix.m[13];
-  result.z = -_pivotMatrix.m[14];
+  const auto& _pivotMatrixM = _pivotMatrix.m();
+  result.x                  = -_pivotMatrixM[12];
+  result.y                  = -_pivotMatrixM[13];
+  result.z                  = -_pivotMatrixM[14];
   return *this;
 }
 
@@ -507,9 +508,10 @@ Vector3 TransformNode::getAbsolutePivotPoint()
 
 TransformNode& TransformNode::getAbsolutePivotPointToRef(Vector3& result)
 {
-  result.x = _pivotMatrix.m[12];
-  result.y = _pivotMatrix.m[13];
-  result.z = _pivotMatrix.m[14];
+  const auto& _pivotMatrixM = _pivotMatrix.m();
+  result.x                  = _pivotMatrixM[12];
+  result.y                  = _pivotMatrixM[13];
+  result.z                  = _pivotMatrixM[14];
   getPivotPointToRef(result);
   Vector3::TransformCoordinatesToRef(result, getWorldMatrix(), result);
   return *this;
@@ -767,9 +769,9 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
 
     auto cameraWorldMatrix = camera->getWorldMatrix();
 
-    Vector3 cameraGlobalPosition(cameraWorldMatrix.m[12],
-                                 cameraWorldMatrix.m[13],
-                                 cameraWorldMatrix.m[14]);
+    const auto& cameraWorldMatrixM = cameraWorldMatrix.m();
+    Vector3 cameraGlobalPosition(cameraWorldMatrixM[12], cameraWorldMatrixM[13],
+                                 cameraWorldMatrixM[14]);
 
     Matrix::TranslationToRef(position().x + cameraGlobalPosition.x,
                              position().y + cameraGlobalPosition.y,
@@ -905,8 +907,9 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
   _afterComputeWorldMatrix();
 
   // Absolute position
-  _absolutePosition.copyFromFloats(_worldMatrix.m[12], _worldMatrix.m[13],
-                                   _worldMatrix.m[14]);
+  const auto& _worldMatrixM = _worldMatrix.m();
+  _absolutePosition.copyFromFloats(_worldMatrixM[12], _worldMatrixM[13],
+                                   _worldMatrixM[14]);
 
   // Callbacks
   onAfterWorldMatrixUpdateObservable.notifyObservers(this);

@@ -256,8 +256,9 @@ VertexData& VertexData::_update(IGetSetVerticesData* meshOrGeometry,
 
 VertexData& VertexData::transform(const Matrix& matrix)
 {
-  bool flip        = matrix.m[0] * matrix.m[5] * matrix.m[10] < 0.f;
-  auto transformed = Vector3::Zero();
+  const auto& matrixM = matrix.m();
+  bool flip           = matrixM[0] * matrixM[5] * matrixM[10] < 0.f;
+  auto transformed    = Vector3::Zero();
   if (!positions.empty()) {
     auto position = Vector3::Zero();
 

@@ -48,7 +48,7 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
   if (cameraTarget->rotationQuaternion()) {
     Matrix rotMatrix;
     cameraTarget->rotationQuaternion()->toRotationMatrix(rotMatrix);
-    yRotation = std::atan2(rotMatrix.m[8], rotMatrix.m[10]);
+    yRotation = std::atan2(rotMatrix.m()[8], rotMatrix.m()[10]);
   }
   else {
     yRotation = cameraTarget->rotation().y;

@@ -67,9 +67,7 @@ void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone,
       || !stl_util::almost_equal(z, 0.f)) {
     auto& tmat2 = Tmp::MatrixArray[1];
     Matrix::IdentityToRef(tmat2);
-    tmat2.m[12] = x;
-    tmat2.m[13] = y;
-    tmat2.m[14] = z;
+    tmat2.setTranslationFromFloats(x, y, z);
     tmat2.multiplyToRef(tmat, tmat);
   }
 
@@ -79,9 +77,10 @@ void SkeletonViewer::_getBonePosition(Vector3& position, const Bone& bone,
 
   tmat.multiplyToRef(meshMat, tmat);
 
-  position.x = tmat.m[12];
-  position.y = tmat.m[13];
-  position.z = tmat.m[14];
+  const auto& tmatM = tmat.m();
+  position.x        = tmatM[12];
+  position.y        = tmatM[13];
+  position.z        = tmatM[14];
 }
 
 void SkeletonViewer::_getLinesForBonesWithLength(
@@ -142,7 +141,8 @@ void SkeletonViewer::update()
     skeleton->computeAbsoluteTransforms();
   }
 
-  if (!skeleton->bones.empty() && skeleton->bones[0]->length == -1) {
+  if (!skeleton->bones.empty()
+      && stl_util::almost_equal(skeleton->bones[0]->length, -1.f)) {
     _getLinesForBonesNoLength(skeleton->bones, mesh->getWorldMatrix());
   }
   else {
