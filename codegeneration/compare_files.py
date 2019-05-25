@@ -87,6 +87,8 @@ def main():
         "engine.webVR.ts",
         # Helpers
         "videoDome.ts",
+        # LibDeclarations
+        "browser.d.ts", "webgl.d.ts", "webgl2.d.ts", "webvr.d.ts", "webxr.d.ts",
         # Materials / Textures
         "htmlElementTexture.ts", "videoTexture.ts",
         # Materials / Textures / Loaders
