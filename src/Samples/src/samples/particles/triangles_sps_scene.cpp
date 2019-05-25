@@ -14,7 +14,7 @@ namespace Samples {
 
 TrianglesSPSScene::TrianglesSPSScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
-    , _nb{160000} // nb of triangles
+    , _nb{60000} // nb of triangles
     , _fact{100}  // cube size
     , _enableHemisphericLight{false}
     , _camera{nullptr}

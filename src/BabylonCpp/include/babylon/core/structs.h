@@ -206,7 +206,7 @@ struct NodeCache {
 
 struct PickedParticle {
   unsigned int idx;
-  unsigned int faceId;
+  size_t faceId;
 }; // end of struct PickedParticle
 
 struct PointerEvent : public Event {

@@ -13,7 +13,7 @@ struct BABYLON_SHARED_EXPORT DepthSortedParticle {
   /**
    * Index of the particle in the "indices" array
    */
-  unsigned int ind = 0;
+  size_t ind = 0;
   /**
    * Index of the particle in the "indices" array
    */

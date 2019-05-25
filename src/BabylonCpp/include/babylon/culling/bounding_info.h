@@ -22,14 +22,24 @@ public:
    * @param minimum min vector of the bounding box/sphere
    * @param maximum max vector of the bounding box/sphere
    */
-  BoundingInfo(const Vector3& minimum, const Vector3& maximum);
+  BoundingInfo(const Vector3& minimum, const Vector3& maximum,
+               const std::optional<Matrix>& worldMatrix = std::nullopt);
   BoundingInfo(const BoundingInfo& boundingInfo);
   BoundingInfo(BoundingInfo&& other);
   BoundingInfo& operator=(const BoundingInfo& other);
   BoundingInfo& operator=(BoundingInfo&& other);
   virtual ~BoundingInfo();
 
-  /** Methods **/
+  /**
+   * @brief Recreates the entire bounding info from scratch as if we call the
+   * constructor in place.
+   * @param min defines the new minimum vector (in local space)
+   * @param max defines the new maximum vector (in local space)
+   * @param worldMatrix defines the new world matrix
+   */
+  void reConstruct(const Vector3& min, const Vector3& max,
+                   const std::optional<Matrix>& worldMatrix = std::nullopt);
+
   /**
    * @brief Updates the boudning sphere and box.
    * @param world world matrix to be used to update

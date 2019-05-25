@@ -81,7 +81,8 @@ BoundingSphere::~BoundingSphere()
 {
 }
 
-void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max)
+void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max,
+                                 const std::optional<Matrix>& worldMatrix)
 {
   minimum.copyFrom(min);
   maximum.copyFrom(max);
@@ -91,8 +92,7 @@ void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max)
   Vector3::LerpToRef(min, max, 0.5f, center);
   radius = distance * 0.5f;
 
-  centerWorld.set(0.f, 0.f, 0.f);
-  _update(_identityMatrix);
+  _update(worldMatrix ? worldMatrix.value() : Matrix::IdentityReadOnly());
 }
 
 BoundingSphere& BoundingSphere::scale(float factor)

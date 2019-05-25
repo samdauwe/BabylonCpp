@@ -8,7 +8,8 @@
 
 namespace BABYLON {
 
-BoundingInfo::BoundingInfo(const Vector3& iMinimum, const Vector3& iMaximum)
+BoundingInfo::BoundingInfo(const Vector3& iMinimum, const Vector3& iMaximum,
+                           const std::optional<Matrix>& /*worldMatrix*/)
     : boundingBox{BoundingBox(iMinimum, iMaximum)}
     , boundingSphere{BoundingSphere(iMinimum, iMaximum)}
     , minimum{this, &BoundingInfo::get_minimum}
@@ -82,6 +83,13 @@ bool BoundingInfo::get_isLocked() const
 void BoundingInfo::set_isLocked(bool value)
 {
   _isLocked = value;
+}
+
+void BoundingInfo::reConstruct(const Vector3& min, const Vector3& max,
+                               const std::optional<Matrix>& worldMatrix)
+{
+  boundingBox.reConstruct(min, max, worldMatrix);
+  boundingSphere.reConstruct(min, max, worldMatrix);
 }
 
 // Methods

@@ -29,44 +29,30 @@ BoundingBox::BoundingBox(const Vector3& min, const Vector3& max)
   reConstruct(min, max);
 }
 
-void BoundingBox::reConstruct(const Vector3& min, const Vector3& max)
+void BoundingBox::reConstruct(const Vector3& min, const Vector3& max,
+                              const std::optional<Matrix>& worldMatrix)
 {
-  minimum.copyFrom(min);
-  maximum.copyFrom(max);
+  const auto minX = min.x, minY = min.y, minZ = min.z, maxX = max.x,
+             maxY = max.y, maxZ = max.z;
 
-  // Bounding vectors
-  vectors[0].copyFrom(minimum);
-  vectors[1].copyFrom(maximum);
-  vectors[2].copyFrom(minimum);
-  vectors[3].copyFrom(minimum);
-  vectors[4].copyFrom(minimum);
-  vectors[5].copyFrom(maximum);
-  vectors[6].copyFrom(maximum);
-  vectors[7].copyFrom(maximum);
-
-  vectors[2].x = maximum.x;
-  vectors[3].y = maximum.y;
-  vectors[4].z = maximum.z;
-  vectors[5].z = minimum.z;
-  vectors[6].x = minimum.x;
-  vectors[7].y = minimum.y;
+  minimum.copyFromFloats(minX, minY, minZ);
+  maximum.copyFromFloats(maxX, maxY, maxZ);
+  vectors[0].copyFromFloats(minX, minY, minZ);
+  vectors[1].copyFromFloats(maxX, maxY, maxZ);
+  vectors[2].copyFromFloats(maxX, minY, minZ);
+  vectors[3].copyFromFloats(minX, maxY, minZ);
+  vectors[4].copyFromFloats(minX, minY, maxZ);
+  vectors[5].copyFromFloats(maxX, maxY, minZ);
+  vectors[6].copyFromFloats(minX, maxY, maxZ);
+  vectors[7].copyFromFloats(maxX, minY, maxZ);
 
   // OBB
-  center.copyFrom(maximum).addInPlace(minimum).scaleInPlace(0.5f);
-  extendSize.copyFrom(maximum).subtractInPlace(minimum).scaleInPlace(0.5f);
-  for (unsigned int index = 0; index < 3; ++index) {
-    directions[index].copyFromFloats(0.f, 0.f, 0.f);
-  }
+  auto _max = max.addToRef(min, center);
+  _max.scaleInPlace(0.5f);
+  auto _min = _max.subtractToRef(min, extendSize);
+  _min.scaleInPlace(0.5);
 
-  // World
-  for (unsigned int index = 0; index < 8; ++index) {
-    vectorsWorld[index].copyFromFloats(0.f, 0.f, 0.f);
-  }
-
-  minimumWorld.copyFromFloats(0.f, 0.f, 0.f);
-  maximumWorld.copyFromFloats(0.f, 0.f, 0.f);
-  centerWorld.copyFromFloats(0.f, 0.f, 0.f);
-  extendSizeWorld.copyFromFloats(0.f, 0.f, 0.f);
+  _worldMatrix = worldMatrix ? worldMatrix.value() : Matrix::IdentityReadOnly();
 
   _update(_worldMatrix);
 }

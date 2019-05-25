@@ -21,12 +21,12 @@ using TargetCameraPtr        = std::shared_ptr<TargetCamera>;
 using SolidParticleSystemPtr = std::shared_ptr<SolidParticleSystem>;
 
 struct SolidParticleSystemOptions {
-  bool updatable            = true;
-  bool isPickable           = false;
-  bool particleIntersection = false;
-  bool boundingSphereOnly   = false;
-  bool enableDepthSort      = false;
-  float bSphereRadiusFactor = 1.f;
+  std::optional<bool> updatable            = std::nullopt;
+  bool isPickable                          = false;
+  bool enableDepthSort                     = false;
+  bool particleIntersection                = false;
+  bool boundingSphereOnly                  = false;
+  std::optional<float> bSphereRadiusFactor = std::nullopt;
 }; // end of struct SolidParticleSystemOptions
 
 struct SolidParticleSystemDigestOptions {
@@ -38,8 +38,7 @@ struct SolidParticleSystemDigestOptions {
 struct SolidParticleSystemMeshBuilderOptions {
   std::function<void(SolidParticle* particle, unsigned int i, unsigned int s)>
     positionFunction = nullptr;
-  std::function<void(SolidParticle* particle, const Vector3& vertex,
-                     unsigned int i)>
+  std::function<void(SolidParticle* particle, const Vector3& vertex, size_t i)>
     vertexFunction = nullptr;
 }; // end of struct SolidParticleSystemMeshBuilderOptions
 
@@ -324,7 +323,7 @@ public:
    * @returns the updated vertex
    */
   virtual Vector3 updateParticleVertex(SolidParticle* particle,
-                                       const Vector3& vertex, unsigned int pt);
+                                       const Vector3& vertex, size_t pt);
 
   /**
    * @brief This will be called before any other treatment by `setParticles()`
@@ -358,21 +357,22 @@ protected:
    * @param name (String) is the SPS name, this will be the underlying mesh
    * name.
    * @param scene (Scene) is the scene in which the SPS is added.
-   * @param updatable (optional boolean, default true) : if the SPS must be
-   * updatable or immutable.
-   * @param isPickable (optional boolean, default false) : if the solid
-   * particles must be pickable.
-   * @param enableDepthSort (optional boolean, default false) : if the solid
+   * @param options defines the options of the sps e.g.
+   * * updatable (optional boolean, default true) : if the SPS must be updatable
+   * or immutable.
+   * * isPickable (optional boolean, default false) : if the solid particles
+   * must be pickable.
+   * * enableDepthSort (optional boolean, default false) : if the solid
    * particles must be sorted in the geometry according to their distance to the
    * camera.
-   * @param particleIntersection (optional boolean, default false) : if the
-   * solid particle intersections must be computed.
-   * @param boundingSphereOnly (optional boolean, default false) : if the
-   * particle intersection must be computed only with the bounding sphere (no
-   * bounding box computation, so faster).
-   * @param bSphereRadiusFactor (optional float, default 1.0) : a number to
-   * multiply the boundind sphere radius by in order to reduce it for instance.
-   * Example: bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere
+   * * particleIntersection (optional boolean, default false) : if the solid
+   * particle intersections must be computed.
+   * * boundingSphereOnly (optional boolean, default false) : if the particle
+   * intersection must be computed only with the bounding sphere (no bounding
+   * box computation, so faster).
+   * * bSphereRadiusFactor (optional float, default 1.0) : a number to multiply
+   * the boundind sphere radius by in order to reduce it for instance.
+   * @example bSphereRadiusFactor = 1.0 / Math.sqrt(3.0) => the bounding sphere
    * exactly matches a spherical mesh.
    */
   SolidParticleSystem(const std::string& name, Scene* scene,
@@ -427,7 +427,6 @@ private:
    * recomputes the custom positions and vertices.
    */
   void _rebuildParticle(SolidParticle* particle);
-  void _quaternionRotationYPR();
 
 public:
   /**
@@ -526,8 +525,6 @@ private:
   bool _depthSort;
   int _shapeCounter;
   std::unique_ptr<SolidParticle> _copy;
-  std::vector<Vector3> _shape;
-  Float32Array _shapeUV;
   std::unique_ptr<Color4> _color;
   bool _computeParticleColor;
   bool _computeParticleTexture;
@@ -535,50 +532,15 @@ private:
   bool _computeParticleVertex;
   bool _computeBoundingBox;
   bool _depthSortParticles;
-  Vector3 _cam_axisZ;
-  Vector3 _cam_axisY;
-  Vector3 _cam_axisX;
-  Vector3 _axisX;
-  Vector3 _axisY;
-  Vector3 _axisZ;
   TargetCameraPtr _camera;
-  SolidParticle* _particle;
-  Vector3 _camDir;
-  Vector3 _camInvertedPosition;
-  Matrix _rotMatrix;
-  Matrix _invertMatrix;
-  Vector3 _rotated;
-  Quaternion _quaternion;
-  Vector3 _vertex;
-  Vector3 _normal;
-  float _yaw;
-  float _pitch;
-  float _roll;
-  float _halfroll;
-  float _halfpitch;
-  float _halfyaw;
-  float _sinRoll;
-  float _cosRoll;
-  float _sinPitch;
-  float _cosPitch;
-  float _sinYaw;
-  float _cosYaw;
   bool _mustUnrotateFixedNormals;
-  Vector3 _minimum;
-  Vector3 _maximum;
   Vector3 _scale;
   Vector3 _translation;
-  Vector3 _minBbox;
-  Vector3 _maxBbox;
   bool _particlesIntersect;
   std::function<int(const DepthSortedParticle& p1,
                     const DepthSortedParticle& p2)>
     _depthSortFunction;
   bool _needs32Bits;
-  Vector3 _pivotBackTranslation;
-  Vector3 _scaledPivot;
-  bool _particleHasParent;
-  SolidParticle* _parent;
 
 }; // end of class SolidParticleSystem
 

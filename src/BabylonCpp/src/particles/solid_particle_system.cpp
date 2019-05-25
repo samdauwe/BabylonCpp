@@ -27,17 +27,13 @@ SolidParticleSystem::SolidParticleSystem(
     , billboard{false}
     , recomputeNormals{true}
     , counter{0}
-    , name{iName}
     , mesh{nullptr}
-    , _bSphereOnly{options ? (*options).boundingSphereOnly : false}
-    , _bSphereRadiusFactor{options ? (*options).bSphereRadiusFactor : 1.f}
-    , _scene{scene ? scene : Engine::LastCreatedScene()}
     , _index{0}
-    , _updatable{options ? (*options).updatable : true}
-    , _pickable{options ? (*options).isPickable : false}
+    , _updatable{true}
+    , _pickable{false}
     , _isVisibilityBoxLocked{false}
     , _alwaysVisible{false}
-    , _depthSort{options ? (*options).enableDepthSort : false}
+    , _depthSort{false}
     , _shapeCounter{0}
     , _copy{std::make_unique<SolidParticle>(
         0, 0, 0, nullptr, 0, 0, this,
@@ -49,44 +45,28 @@ SolidParticleSystem::SolidParticleSystem(
     , _computeParticleVertex{false}
     , _computeBoundingBox{false}
     , _depthSortParticles{true}
-    , _cam_axisZ{Vector3::Zero()}
-    , _cam_axisY{Vector3::Zero()}
-    , _cam_axisX{Vector3::Zero()}
-    , _axisX{Axis::X()}
-    , _axisY{Axis::Y()}
-    , _axisZ{Axis::Z()}
-    , _camera{std::static_pointer_cast<TargetCamera>(scene->activeCamera)}
-    , _camDir{Vector3::Zero()}
-    , _camInvertedPosition{Vector3::Zero()}
-    , _rotated{Vector3::Zero()}
-    , _vertex{Vector3::Zero()}
-    , _normal{Vector3::Zero()}
-    , _yaw{0.f}
-    , _pitch{0.f}
-    , _roll{0.f}
-    , _halfroll{0.f}
-    , _halfpitch{0.f}
-    , _halfyaw{0.f}
-    , _sinRoll{0.f}
-    , _cosRoll{0.f}
-    , _sinPitch{0.f}
-    , _cosPitch{0.f}
-    , _sinYaw{0.f}
-    , _cosYaw{0.f}
     , _mustUnrotateFixedNormals{false}
-    , _minimum{Vector3::Zero()}
-    , _maximum{Vector3::Zero()}
     , _scale{Tmp::Vector3Array[2]}
     , _translation{Tmp::Vector3Array[3]}
-    , _minBbox{Vector3::Zero()}
-    , _maxBbox{Vector3::Zero()}
-    , _particlesIntersect{options ? (*options).particleIntersection : false}
     , _needs32Bits{false}
-    , _pivotBackTranslation{Vector3::Zero()}
-    , _scaledPivot{Vector3::Zero()}
-    , _particleHasParent{false}
-    , _parent{nullptr}
 {
+  name       = iName;
+  _scene     = scene ? scene : Engine::LastCreatedScene();
+  _camera    = std::static_pointer_cast<TargetCamera>(_scene->activeCamera);
+  _pickable  = options ? options->isPickable : false;
+  _depthSort = options ? options->enableDepthSort : false;
+  _particlesIntersect  = options ? options->particleIntersection : false;
+  _bSphereOnly         = options ? options->boundingSphereOnly : false;
+  _bSphereRadiusFactor = (options && options->bSphereRadiusFactor) ?
+                           options->bSphereRadiusFactor.value() :
+                           1.f;
+  if (options && options->updatable.has_value()) {
+    _updatable = options->updatable.value();
+  }
+  else {
+    _updatable = true;
+  }
+
   _depthSortFunction
     = [](const DepthSortedParticle& p1, const DepthSortedParticle& p2) {
         return static_cast<int>(p2.sqDistance - p1.sqDistance);
@@ -159,16 +139,16 @@ SolidParticleSystem&
 SolidParticleSystem::digest(Mesh* _mesh,
                             const SolidParticleSystemDigestOptions& options)
 {
-  size_t size          = options.facetNb;
-  size_t number        = options.number;
-  int delta            = options.delta;
-  Float32Array meshPos = _mesh->getVerticesData(VertexBuffer::PositionKind);
-  Uint32Array meshInd  = _mesh->getIndices();
-  Float32Array meshUV  = _mesh->getVerticesData(VertexBuffer::UVKind);
-  Float32Array meshCol = _mesh->getVerticesData(VertexBuffer::ColorKind);
-  Float32Array meshNor = mesh->getVerticesData(VertexBuffer::NormalKind);
+  auto size    = options.facetNb;
+  auto number  = options.number;
+  auto delta   = options.delta;
+  auto meshPos = _mesh->getVerticesData(VertexBuffer::PositionKind);
+  auto meshInd = _mesh->getIndices();
+  auto meshUV  = _mesh->getVerticesData(VertexBuffer::UVKind);
+  auto meshCol = _mesh->getVerticesData(VertexBuffer::ColorKind);
+  auto meshNor = mesh->getVerticesData(VertexBuffer::NormalKind);
 
-  size_t f = 0; // facet counter
+  auto f = 0ull; // facet counter
   // a facet is a triangle, so 3 indices
   size_t totalFacets = meshInd.size() / 3;
   // compute size from number
@@ -269,7 +249,7 @@ void SolidParticleSystem::_unrotateFixedNormals()
   auto& quaternion        = Tmp::QuaternionArray[0];
   auto& invertedRotMatrix = Tmp::MatrixArray[0];
   for (const auto& particle : particles) {
-    const auto& shape = particle->_model->_shape;
+    auto& shape = particle->_model->_shape;
 
     // computing the inverse of the rotation matrix from the quaternion
     // is equivalent to computing the matrix of the inverse quaternion, i.e of
@@ -285,7 +265,7 @@ void SolidParticleSystem::_unrotateFixedNormals()
     }
     quaternion.toRotationMatrix(invertedRotMatrix);
 
-    for (unsigned int pt = 0; pt < shape.size(); ++pt) {
+    for (unsigned int pt = 0; pt < shape.size(); pt++) {
       idx = index + pt * 3;
       Vector3::TransformNormalFromFloatsToRef(
         _normals32[idx], _normals32[idx + 1], _normals32[idx + 2],
@@ -322,86 +302,73 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   size_t n = 0;
 
   _resetCopy();
+  auto& copy = *_copy;
   if (options.positionFunction) { // call to custom
     options.positionFunction(_copy.get(), idx, idxInShape);
     _mustUnrotateFixedNormals = true;
   }
 
-  if (_copy->rotationQuaternion) {
-    _quaternion.copyFrom(*_copy->rotationQuaternion);
+  auto& rotMatrix            = Tmp::MatrixArray[0];
+  auto& tmpVertex            = Tmp::Vector3Array[0];
+  auto& tmpRotated           = Tmp::Vector3Array[1];
+  auto& pivotBackTranslation = Tmp::Vector3Array[2];
+  auto& scaledPivot          = Tmp::Vector3Array[3];
+  copy.getRotationMatrix(rotMatrix);
+
+  copy.pivot.multiplyToRef(copy.scaling, scaledPivot);
+
+  if (copy.translateFromPivot) {
+    pivotBackTranslation.setAll(0.0);
   }
   else {
-    _yaw   = _copy->rotation.y;
-    _pitch = _copy->rotation.x;
-    _roll  = _copy->rotation.z;
-    _quaternionRotationYPR();
+    pivotBackTranslation.copyFrom(scaledPivot);
   }
 
-  _scaledPivot.x = _copy->pivot.x * _copy->scaling.x;
-  _scaledPivot.y = _copy->pivot.y * _copy->scaling.y;
-  _scaledPivot.z = _copy->pivot.z * _copy->scaling.z;
-
-  if (_copy->translateFromPivot) {
-    _pivotBackTranslation.copyFromFloats(0.f, 0.f, 0.f);
-  }
-  else {
-    _pivotBackTranslation.copyFrom(_scaledPivot);
-  }
-
-  for (unsigned int si = 0; si < shape.size(); ++si) {
-    _vertex.x = shape[si].x;
-    _vertex.y = shape[si].y;
-    _vertex.z = shape[si].z;
-
+  for (i = 0; i < shape.size(); i++) {
+    tmpVertex.copyFrom(shape[i]);
     if (options.vertexFunction) {
-      options.vertexFunction(_copy.get(), _vertex, si);
+      options.vertexFunction(&copy, tmpVertex, i);
     }
 
-    _vertex.x *= _copy->scaling.x;
-    _vertex.y *= _copy->scaling.y;
-    _vertex.z *= _copy->scaling.z;
-
-    _vertex.x -= _scaledPivot.x;
-    _vertex.y -= _scaledPivot.y;
-    _vertex.z -= _scaledPivot.z;
-
-    Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
-
-    _rotated.addInPlace(_pivotBackTranslation);
-    stl_util::concat(positions, {_copy->position.x + _rotated.x,
-                                 _copy->position.y + _rotated.y,
-                                 _copy->position.z + _rotated.z});
+    tmpVertex.multiplyInPlace(copy.scaling).subtractInPlace(scaledPivot);
+    Vector3::TransformCoordinatesToRef(tmpVertex, rotMatrix, tmpRotated);
+    tmpRotated.addInPlace(pivotBackTranslation).addInPlace(copy.position);
+    stl_util::concat(positions, {tmpRotated.x, tmpRotated.y, tmpRotated.z});
     if (!meshUV.empty()) {
-      stl_util::concat(
-        uvs, {(_copy->uvs.z - _copy->uvs.x) * meshUV[u] + _copy->uvs.x,
-              (_copy->uvs.w - _copy->uvs.y) * meshUV[u + 1] + _copy->uvs.y});
+      auto copyUvs = copy.uvs;
+      stl_util::concat(uvs,
+                       {(copyUvs.z - copyUvs.x) * meshUV[u] + copyUvs.x,
+                        (copyUvs.w - copyUvs.y) * meshUV[u + 1] + copyUvs.y});
       u += 2;
     }
 
-    if (_copy->color) {
-      _color = std::make_unique<Color4>(*_copy->color);
-    }
-    else if (!meshCol.empty() && (c + 3 < meshCol.size())) {
-      _color->r = meshCol[c];
-      _color->g = meshCol[c + 1];
-      _color->b = meshCol[c + 2];
-      _color->a = meshCol[c + 3];
+    if (copy.color) {
+      _color = std::make_unique<Color4>(copy.color.value());
     }
     else {
-      _color->r = 1.f;
-      _color->g = 1.f;
-      _color->b = 1.f;
-      _color->a = 1.f;
+      auto& color = *_color;
+      if (!meshCol.empty() && (c + 3) < meshCol.size()) {
+        color.r = meshCol[c];
+        color.g = meshCol[c + 1];
+        color.b = meshCol[c + 2];
+        color.a = meshCol[c + 3];
+      }
+      else {
+        color.r = 1.f;
+        color.g = 1.f;
+        color.b = 1.f;
+        color.a = 1.f;
+      }
     }
     stl_util::concat(colors, {_color->r, _color->g, _color->b, _color->a});
     c += 4;
 
-    if (!recomputeNormals && (n + 3 < meshNor.size())) {
-      _normal.x = meshNor[n];
-      _normal.y = meshNor[n + 1];
-      _normal.z = meshNor[n + 2];
-      Vector3::TransformNormalToRef(_normal, _rotMatrix, _normal);
-      stl_util::concat(normals, {_normal.x, _normal.y, _normal.z});
+    if (!recomputeNormals && (n + 2) < meshNor.size()) {
+      tmpVertex.x = meshNor[n];
+      tmpVertex.y = meshNor[n + 1];
+      tmpVertex.z = meshNor[n + 2];
+      Vector3::TransformNormalToRef(tmpVertex, rotMatrix, tmpVertex);
+      stl_util::concat(normals, {tmpVertex.x, tmpVertex.y, tmpVertex.z});
       n += 3;
     }
   }
@@ -415,27 +382,28 @@ SolidParticle* SolidParticleSystem::_meshBuilder(
   }
 
   if (_pickable) {
-    size_t nbfaces = meshInd.size() / 3;
+    auto nbfaces = meshInd.size() / 3;
     for (i = 0; i < nbfaces; ++i) {
-      PickedParticle pp{idx, static_cast<unsigned int>(i)};
-      pickedParticles.emplace_back(pp);
+      pickedParticles.emplace_back(PickedParticle{
+        idx, // idx
+        i    // faceId
+      });
     }
   }
 
   if (_depthSort) {
-    depthSortedParticles.emplace_back(DepthSortedParticle());
+    depthSortedParticles.emplace_back(DepthSortedParticle{});
   }
 
-  return _copy.get();
+  return &copy;
 }
 
 std::vector<Vector3>
 SolidParticleSystem::_posToShape(const Float32Array& positions)
 {
   std::vector<Vector3> shape;
-  for (size_t i = 0; i < positions.size(); i += 3) {
-    shape.emplace_back(
-      Vector3(positions[i], positions[i + 1], positions[i + 2]));
+  for (unsigned int i = 0; i < positions.size(); i += 3) {
+    shape.emplace_back(Vector3::FromArray(positions, i));
   }
   return shape;
 }
@@ -485,8 +453,8 @@ int SolidParticleSystem::addShape(
     _shapeCounter, shape, meshInd.size(), shapeUV, posfunc, vtxfunc);
 
   // particles
-  SolidParticle* sp;
-  unsigned int idx = nbParticles;
+  SolidParticle* sp = nullptr;
+  auto idx          = nbParticles;
   for (unsigned int i = 0; i < nb; ++i) {
     auto currentPos = static_cast<unsigned int>(_positions.size());
     auto currentInd = static_cast<unsigned int>(_indices.size());
@@ -513,83 +481,58 @@ int SolidParticleSystem::addShape(
     ++idx;
   }
   nbParticles += static_cast<unsigned int>(nb);
-  _shapeCounter++;
+  ++_shapeCounter;
   return _shapeCounter - 1;
 }
 
 void SolidParticleSystem::_rebuildParticle(SolidParticle* particle)
 {
   _resetCopy();
+  auto& copy = *_copy;
   if (particle->_model
         ->_positionFunction) { // recall to stored custom positionFunction
-    particle->_model->_positionFunction(_copy.get(), particle->idx,
+    particle->_model->_positionFunction(&copy, particle->idx,
                                         particle->idxInShape);
   }
 
-  if (_copy->rotationQuaternion) {
-    _quaternion.copyFrom(*_copy->rotationQuaternion);
+  auto& rotMatrix            = Tmp::MatrixArray[0];
+  auto& tmpVertex            = Tmp::Vector3Array[0];
+  auto& tmpRotated           = Tmp::Vector3Array[1];
+  auto& pivotBackTranslation = Tmp::Vector3Array[2];
+  auto& scaledPivot          = Tmp::Vector3Array[3];
+
+  copy.getRotationMatrix(rotMatrix);
+
+  particle->pivot.multiplyToRef(particle->scaling, scaledPivot);
+
+  if (copy.translateFromPivot) {
+    pivotBackTranslation.copyFromFloats(0.f, 0.f, 0.f);
   }
   else {
-    _yaw   = _copy->rotation.y;
-    _pitch = _copy->rotation.x;
-    _roll  = _copy->rotation.z;
-    _quaternionRotationYPR();
+    pivotBackTranslation.copyFrom(scaledPivot);
   }
 
-  _scaledPivot.x = _particle->pivot.x * _particle->scaling.x;
-  _scaledPivot.y = _particle->pivot.y * _particle->scaling.y;
-  _scaledPivot.z = _particle->pivot.z * _particle->scaling.z;
+  auto& shape = particle->_model->_shape;
 
-  if (_copy->translateFromPivot) {
-    _pivotBackTranslation.copyFromFloats(0.f, 0.f, 0.f);
-  }
-  else {
-    _pivotBackTranslation.copyFrom(_scaledPivot);
-  }
-
-  _shape = particle->_model->_shape;
-  for (unsigned int pt = 0; pt < _shape.size(); ++pt) {
-    _vertex.x = _shape[pt].x;
-    _vertex.y = _shape[pt].y;
-    _vertex.z = _shape[pt].z;
-
+  for (unsigned int pt = 0; pt < shape.size(); ++pt) {
+    tmpVertex.copyFrom(shape[pt]);
     if (particle->_model->_vertexFunction) {
-      // recall to stored vertexFunction
-      particle->_model->_vertexFunction(_copy.get(), _vertex, pt);
+      particle->_model->_vertexFunction(&copy, tmpVertex,
+                                        pt); // recall to stored vertexFunction
     }
 
-    _vertex.x *= _copy->scaling.x;
-    _vertex.y *= _copy->scaling.y;
-    _vertex.z *= _copy->scaling.z;
-
-    _vertex.x -= _scaledPivot.x;
-    _vertex.y -= _scaledPivot.y;
-    _vertex.z -= _scaledPivot.z;
-
-    Vector3::TransformCoordinatesToRef(_vertex, _rotMatrix, _rotated);
-    _rotated.addInPlace(_pivotBackTranslation);
-
-    _positions32[particle->_pos + pt * 3]     = _copy->position.x + _rotated.x;
-    _positions32[particle->_pos + pt * 3 + 1] = _copy->position.y + _rotated.y;
-    _positions32[particle->_pos + pt * 3 + 2] = _copy->position.z + _rotated.z;
+    tmpVertex.multiplyInPlace(copy.scaling).subtractInPlace(scaledPivot);
+    Vector3::TransformCoordinatesToRef(tmpVertex, rotMatrix, tmpRotated);
+    tmpRotated.addInPlace(pivotBackTranslation)
+      .addInPlace(copy.position)
+      .toArray(_positions32, particle->_pos + pt * 3);
   }
-  particle->position.x         = 0.f;
-  particle->position.y         = 0.f;
-  particle->position.z         = 0.f;
-  particle->rotation.x         = 0.f;
-  particle->rotation.y         = 0;
-  particle->rotation.z         = 0.f;
+  particle->position.setAll(0.f);
+  particle->rotation.setAll(0.f);
   particle->rotationQuaternion = nullptr;
-  particle->scaling.x          = 1.f;
-  particle->scaling.y          = 1.f;
-  particle->scaling.z          = 1.f;
-  particle->uvs.x              = 0.f;
-  particle->uvs.y              = 0.f;
-  particle->uvs.z              = 1.f;
-  particle->uvs.w              = 1.f;
-  particle->pivot.x            = 0.f;
-  particle->pivot.y            = 0.f;
-  particle->pivot.z            = 0.f;
+  particle->scaling.setAll(1.f);
+  particle->uvs.setAll(0.f);
+  particle->pivot.setAll(0.f);
   particle->translateFromPivot = false;
   particle->parentId           = std::nullopt;
 }
@@ -608,72 +551,71 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
                                                        unsigned int end,
                                                        bool update)
 {
-  unsigned int _end
-    = (end < start) ? nbParticles - 1 : static_cast<unsigned>(end);
-
   if (!_updatable) {
     return *this;
   }
 
   // custom beforeUpdate
-  beforeUpdateParticles(start, _end, update);
+  beforeUpdateParticles(start, end, update);
 
-  _cam_axisX.x = 1.f;
-  _cam_axisX.y = 0.f;
-  _cam_axisX.z = 0.f;
+  auto& rotMatrix      = Tmp::MatrixArray[0];
+  auto& invertedMatrix = Tmp::MatrixArray[1];
+  auto& colors32       = _colors32;
+  auto& positions32    = _positions32;
+  auto& normals32      = _normals32;
+  auto& uvs32          = _uvs32;
+  auto& indices32      = _indices32;
+  auto& indices        = _indices;
+  auto& fixedNormal32  = _fixedNormal32;
 
-  _cam_axisY.x = 0.f;
-  _cam_axisY.y = 1.f;
-  _cam_axisY.z = 0.f;
-
-  _cam_axisZ.x = 0.f;
-  _cam_axisZ.y = 0.f;
-  _cam_axisZ.z = 1.f;
+  auto& tempVectors = Tmp::Vector3Array;
+  auto& camAxisX    = tempVectors[5].copyFromFloats(1.f, 0.f, 0.f);
+  auto& camAxisY    = tempVectors[6].copyFromFloats(0.f, 1.f, 0.f);
+  auto& camAxisZ    = tempVectors[7].copyFromFloats(0.f, 0.f, 1.f);
+  auto& minimum     = tempVectors[8].setAll(std::numeric_limits<float>::max());
+  auto& maximum     = tempVectors[9].setAll(std::numeric_limits<float>::min());
+  auto& camInvertedPosition = tempVectors[10].setAll(0);
 
   // cases when the World Matrix is to be computed first
   if (billboard || _depthSort) {
     mesh->computeWorldMatrix(true);
-    mesh->_worldMatrix.invertToRef(_invertMatrix);
+    mesh->_worldMatrix.invertToRef(invertedMatrix);
   }
   // if the particles will always face the camera
   if (billboard) {
     // compute the camera position and un-rotate it by the current mesh rotation
-    _camera->getDirectionToRef(_axisZ, _camDir);
-    Vector3::TransformNormalToRef(_camDir, _invertMatrix, _cam_axisZ);
-    _cam_axisZ.normalize();
+    auto& tmpVertex = tempVectors[0];
+    _camera->getDirectionToRef(Axis::Z(), tmpVertex);
+    Vector3::TransformNormalToRef(tmpVertex, invertedMatrix, camAxisZ);
+    camAxisZ.normalize();
     // same for camera up vector extracted from the cam view matrix
-    auto view         = _camera->getViewMatrix(true);
+    auto& view        = _camera->getViewMatrix(true);
     const auto& viewM = view.m();
     Vector3::TransformNormalFromFloatsToRef(viewM[1], viewM[5], viewM[9],
-                                            _invertMatrix, _cam_axisY);
-    Vector3::CrossToRef(_cam_axisY, _cam_axisZ, _cam_axisX);
-    _cam_axisY.normalize();
-    _cam_axisX.normalize();
+                                            invertedMatrix, camAxisY);
+    Vector3::CrossToRef(camAxisY, camAxisZ, camAxisX);
+    camAxisY.normalize();
+    camAxisX.normalize();
   }
 
   // if depthSort, compute the camera global position in the mesh local system
   if (_depthSort) {
     Vector3::TransformCoordinatesToRef(
-      _camera->globalPosition(), _invertMatrix,
-      _camInvertedPosition); // then un-rotate the camera
+      _camera->globalPosition(), invertedMatrix,
+      camInvertedPosition); // then un-rotate the camera
   }
 
-  Matrix::IdentityToRef(_rotMatrix);
-  // current position index in the global array positions32
-  unsigned int idx = 0;
-  // position start index in the global array positions32 of the current
-  // particle
-  unsigned int index = 0;
-  // current color index in the global array colors32
-  unsigned int colidx = 0;
-  // color start index in the global array colors32 of the current particle
-  unsigned int colorIndex = 0;
-  // current uv index in the global array uvs32
-  unsigned int uvidx = 0;
-  // uv start index in the global array uvs32 of the current particle
-  unsigned int uvIndex = 0;
-  // current index in the particle model shape
-  unsigned int pt = 0;
+  Matrix::IdentityToRef(rotMatrix);
+  auto idx   = 0ull; // current position index in the global array positions32
+  auto index = 0ull; // position start index in the global array positions32 of
+                     // the current particle
+  auto colidx     = 0ull; // current color index in the global array colors32
+  auto colorIndex = 0ull; // color start index in the global array colors32 of
+                          // the current particle
+  auto uvidx = 0ull;      // current uv index in the global array uvs32
+  auto uvIndex
+    = 0ull; // uv start index in the global array uvs32 of the current particle
+  auto pt = 0ull; // current index in the particle model shape
 
   if (mesh->isFacetDataEnabled()) {
     _computeBoundingBox = true;
@@ -681,376 +623,333 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
 
   end = (end >= nbParticles) ? nbParticles - 1 : end;
   if (_computeBoundingBox) {
-    // all the particles are updated, then recompute the BBox from scratch
-    if (start == 0 && end == nbParticles - 1) {
-      Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
-                               std::numeric_limits<float>::max(),
-                               std::numeric_limits<float>::max(), _minimum);
-      Vector3::FromFloatsToRef(std::numeric_limits<float>::lowest(),
-                               std::numeric_limits<float>::lowest(),
-                               std::numeric_limits<float>::lowest(), _maximum);
-    }
-    // only some particles are updated, then use the current existing BBox
-    // basis. Note : it can only increase.
-    else {
-      _minimum.copyFrom(mesh->_boundingInfo->boundingBox.minimum);
-      _maximum.copyFrom(mesh->_boundingInfo->boundingBox.maximum);
+    if (start != 0
+        || end != nbParticles - 1) { // only some particles are updated, then
+                                     // use the current existing BBox basis.
+                                     // Note : it can only increase.
+      auto& boundingInfo = mesh->_boundingInfo;
+      if (boundingInfo) {
+        minimum.copyFrom(boundingInfo->minimum);
+        maximum.copyFrom(boundingInfo->maximum);
+      }
     }
   }
 
   // particle loop
   index      = particles[start]->_pos;
-  auto vpos  = (index / 3) | 0;
+  auto vpos  = (index / 3);
   colorIndex = vpos * 4;
   uvIndex    = vpos * 2;
-  for (unsigned int p = start; p <= _end; ++p) {
-    _particle = particles[p].get();
-    _shape    = _particle->_model->_shape;
-    _shapeUV  = _particle->_model->_shapeUV;
+
+  for (unsigned int p = start; p <= end; p++) {
+    auto particle = particles[p].get();
 
     // call to custom user function to update the particle properties
-    updateParticle(_particle);
+    updateParticle(particle);
+
+    auto& shape                  = particle->_model->_shape;
+    auto& shapeUV                = particle->_model->_shapeUV;
+    auto& particleRotationMatrix = particle->_rotationMatrix;
+    auto& particlePosition       = particle->position;
+    auto& particleRotation       = particle->rotation;
+    auto& particleScaling        = particle->scaling;
+    auto& particleGlobalPosition = particle->_globalPosition;
 
     // camera-particle distance for depth sorting
     if (_depthSort && _depthSortParticles) {
       auto& dsp         = depthSortedParticles[p];
-      dsp.ind           = _particle->_ind;
-      dsp.indicesLength = _particle->_model->_indicesLength;
+      dsp.ind           = particle->_ind;
+      dsp.indicesLength = particle->_model->_indicesLength;
       dsp.sqDistance
-        = Vector3::DistanceSquared(_particle->position, _camInvertedPosition);
+        = Vector3::DistanceSquared(particle->position, camInvertedPosition);
     }
 
     // skip the computations for inactive or already invisible particles
-    if (!_particle->alive
-        || (_particle->_stillInvisible && !_particle->isVisible)) {
+    if (!particle->alive
+        || (particle->_stillInvisible && !particle->isVisible)) {
       // increment indexes for the next particle
-      pt = static_cast<unsigned int>(_shape.size());
+      pt = shape.size();
       index += pt * 3;
       colorIndex += pt * 4;
       uvIndex += pt * 2;
       continue;
     }
 
-    if (_particle->isVisible) {
-      _particle->_stillInvisible = false; // un-mark permanent invisibility
+    if (particle->isVisible) {
+      particle->_stillInvisible = false; // un-mark permanent invisibility
 
-      _particleHasParent = (_particle->parentId != std::nullopt);
-
-      _scaledPivot.x = _particle->pivot.x * _particle->scaling.x;
-      _scaledPivot.y = _particle->pivot.y * _particle->scaling.y;
-      _scaledPivot.z = _particle->pivot.z * _particle->scaling.z;
+      auto& scaledPivot = tempVectors[12];
+      particle->pivot.multiplyToRef(particleScaling, scaledPivot);
 
       // particle rotation matrix
       if (billboard) {
-        _particle->rotation.x = 0.f;
-        _particle->rotation.y = 0.f;
+        particleRotation.x = 0.f;
+        particleRotation.y = 0.f;
       }
       if (_computeParticleRotation || billboard) {
-        if (_particle->rotationQuaternion) {
-          _quaternion.copyFrom(*_particle->rotationQuaternion);
-        }
-        else {
-          _yaw   = _particle->rotation.y;
-          _pitch = _particle->rotation.x;
-          _roll  = _particle->rotation.z;
-          _quaternionRotationYPR();
-        }
+        particle->getRotationMatrix(rotMatrix);
       }
 
-      if (_particleHasParent && _particle->parentId < particles.size()) {
-        _parent    = particles[*_particle->parentId].get();
-        _rotated.x = _particle->position.x * _parent->_rotationMatrix[0]
-                     + _particle->position.y * _parent->_rotationMatrix[3]
-                     + _particle->position.z * _parent->_rotationMatrix[6];
-        _rotated.y = _particle->position.x * _parent->_rotationMatrix[1]
-                     + _particle->position.y * _parent->_rotationMatrix[4]
-                     + _particle->position.z * _parent->_rotationMatrix[7];
-        _rotated.z = _particle->position.x * _parent->_rotationMatrix[2]
-                     + _particle->position.y * _parent->_rotationMatrix[5]
-                     + _particle->position.z * _parent->_rotationMatrix[8];
+      auto particleHasParent = particle->parentId.has_value();
+      if (particleHasParent) {
+        auto& parent               = particles[particle->parentId.value()];
+        auto& parentRotationMatrix = parent->_rotationMatrix;
+        auto& parentGlobalPosition = parent->_globalPosition;
 
-        _particle->_globalPosition.x = _parent->_globalPosition.x + _rotated.x;
-        _particle->_globalPosition.y = _parent->_globalPosition.y + _rotated.y;
-        _particle->_globalPosition.z = _parent->_globalPosition.z + _rotated.z;
+        auto rotatedY = particlePosition.x * parentRotationMatrix[1]
+                        + particlePosition.y * parentRotationMatrix[4]
+                        + particlePosition.z * parentRotationMatrix[7];
+        auto rotatedX = particlePosition.x * parentRotationMatrix[0]
+                        + particlePosition.y * parentRotationMatrix[3]
+                        + particlePosition.z * parentRotationMatrix[6];
+        auto rotatedZ = particlePosition.x * parentRotationMatrix[2]
+                        + particlePosition.y * parentRotationMatrix[5]
+                        + particlePosition.z * parentRotationMatrix[8];
+
+        particleGlobalPosition.x = parentGlobalPosition.x + rotatedX;
+        particleGlobalPosition.y = parentGlobalPosition.y + rotatedY;
+        particleGlobalPosition.z = parentGlobalPosition.z + rotatedZ;
 
         if (_computeParticleRotation || billboard) {
-          const auto& _rotMatrixM = _rotMatrix.m();
-          _particle->_rotationMatrix[0]
-            = _rotMatrixM[0] * _parent->_rotationMatrix[0]
-              + _rotMatrixM[1] * _parent->_rotationMatrix[3]
-              + _rotMatrixM[2] * _parent->_rotationMatrix[6];
-          _particle->_rotationMatrix[1]
-            = _rotMatrixM[0] * _parent->_rotationMatrix[1]
-              + _rotMatrixM[1] * _parent->_rotationMatrix[4]
-              + _rotMatrixM[2] * _parent->_rotationMatrix[7];
-          _particle->_rotationMatrix[2]
-            = _rotMatrixM[0] * _parent->_rotationMatrix[2]
-              + _rotMatrixM[1] * _parent->_rotationMatrix[5]
-              + _rotMatrixM[2] * _parent->_rotationMatrix[8];
-          _particle->_rotationMatrix[3]
-            = _rotMatrixM[4] * _parent->_rotationMatrix[0]
-              + _rotMatrixM[5] * _parent->_rotationMatrix[3]
-              + _rotMatrixM[6] * _parent->_rotationMatrix[6];
-          _particle->_rotationMatrix[4]
-            = _rotMatrixM[4] * _parent->_rotationMatrix[1]
-              + _rotMatrixM[5] * _parent->_rotationMatrix[4]
-              + _rotMatrixM[6] * _parent->_rotationMatrix[7];
-          _particle->_rotationMatrix[5]
-            = _rotMatrixM[4] * _parent->_rotationMatrix[2]
-              + _rotMatrixM[5] * _parent->_rotationMatrix[5]
-              + _rotMatrixM[6] * _parent->_rotationMatrix[8];
-          _particle->_rotationMatrix[6]
-            = _rotMatrixM[8] * _parent->_rotationMatrix[0]
-              + _rotMatrixM[9] * _parent->_rotationMatrix[3]
-              + _rotMatrixM[10] * _parent->_rotationMatrix[6];
-          _particle->_rotationMatrix[7]
-            = _rotMatrixM[8] * _parent->_rotationMatrix[1]
-              + _rotMatrixM[9] * _parent->_rotationMatrix[4]
-              + _rotMatrixM[10] * _parent->_rotationMatrix[7];
-          _particle->_rotationMatrix[8]
-            = _rotMatrixM[8] * _parent->_rotationMatrix[2]
-              + _rotMatrixM[9] * _parent->_rotationMatrix[5]
-              + _rotMatrixM[10] * _parent->_rotationMatrix[8];
+          const auto& rotMatrixValues = rotMatrix.m();
+          particleRotationMatrix[0]
+            = rotMatrixValues[0] * parentRotationMatrix[0]
+              + rotMatrixValues[1] * parentRotationMatrix[3]
+              + rotMatrixValues[2] * parentRotationMatrix[6];
+          particleRotationMatrix[1]
+            = rotMatrixValues[0] * parentRotationMatrix[1]
+              + rotMatrixValues[1] * parentRotationMatrix[4]
+              + rotMatrixValues[2] * parentRotationMatrix[7];
+          particleRotationMatrix[2]
+            = rotMatrixValues[0] * parentRotationMatrix[2]
+              + rotMatrixValues[1] * parentRotationMatrix[5]
+              + rotMatrixValues[2] * parentRotationMatrix[8];
+          particleRotationMatrix[3]
+            = rotMatrixValues[4] * parentRotationMatrix[0]
+              + rotMatrixValues[5] * parentRotationMatrix[3]
+              + rotMatrixValues[6] * parentRotationMatrix[6];
+          particleRotationMatrix[4]
+            = rotMatrixValues[4] * parentRotationMatrix[1]
+              + rotMatrixValues[5] * parentRotationMatrix[4]
+              + rotMatrixValues[6] * parentRotationMatrix[7];
+          particleRotationMatrix[5]
+            = rotMatrixValues[4] * parentRotationMatrix[2]
+              + rotMatrixValues[5] * parentRotationMatrix[5]
+              + rotMatrixValues[6] * parentRotationMatrix[8];
+          particleRotationMatrix[6]
+            = rotMatrixValues[8] * parentRotationMatrix[0]
+              + rotMatrixValues[9] * parentRotationMatrix[3]
+              + rotMatrixValues[10] * parentRotationMatrix[6];
+          particleRotationMatrix[7]
+            = rotMatrixValues[8] * parentRotationMatrix[1]
+              + rotMatrixValues[9] * parentRotationMatrix[4]
+              + rotMatrixValues[10] * parentRotationMatrix[7];
+          particleRotationMatrix[8]
+            = rotMatrixValues[8] * parentRotationMatrix[2]
+              + rotMatrixValues[9] * parentRotationMatrix[5]
+              + rotMatrixValues[10] * parentRotationMatrix[8];
         }
       }
       else {
-        _particle->_globalPosition.x = _particle->position.x;
-        _particle->_globalPosition.y = _particle->position.y;
-        _particle->_globalPosition.z = _particle->position.z;
+        particleGlobalPosition.x = particlePosition.x;
+        particleGlobalPosition.y = particlePosition.y;
+        particleGlobalPosition.z = particlePosition.z;
 
         if (_computeParticleRotation || billboard) {
-          const auto& _rotMatrixM       = _rotMatrix.m();
-          _particle->_rotationMatrix[0] = _rotMatrixM[0];
-          _particle->_rotationMatrix[1] = _rotMatrixM[1];
-          _particle->_rotationMatrix[2] = _rotMatrixM[2];
-          _particle->_rotationMatrix[3] = _rotMatrixM[4];
-          _particle->_rotationMatrix[4] = _rotMatrixM[5];
-          _particle->_rotationMatrix[5] = _rotMatrixM[6];
-          _particle->_rotationMatrix[6] = _rotMatrixM[8];
-          _particle->_rotationMatrix[7] = _rotMatrixM[9];
-          _particle->_rotationMatrix[8] = _rotMatrixM[10];
+          const auto& rotMatrixValues = rotMatrix.m();
+          particleRotationMatrix[0]   = rotMatrixValues[0];
+          particleRotationMatrix[1]   = rotMatrixValues[1];
+          particleRotationMatrix[2]   = rotMatrixValues[2];
+          particleRotationMatrix[3]   = rotMatrixValues[4];
+          particleRotationMatrix[4]   = rotMatrixValues[5];
+          particleRotationMatrix[5]   = rotMatrixValues[6];
+          particleRotationMatrix[6]   = rotMatrixValues[8];
+          particleRotationMatrix[7]   = rotMatrixValues[9];
+          particleRotationMatrix[8]   = rotMatrixValues[10];
         }
       }
 
-      if (_particle->translateFromPivot) {
-        _pivotBackTranslation.x = 0.f;
-        _pivotBackTranslation.y = 0.f;
-        _pivotBackTranslation.z = 0.f;
+      auto& pivotBackTranslation = tempVectors[11];
+      if (particle->translateFromPivot) {
+        pivotBackTranslation.setAll(0.f);
       }
       else {
-        _pivotBackTranslation.x = _scaledPivot.x;
-        _pivotBackTranslation.y = _scaledPivot.y;
-        _pivotBackTranslation.z = _scaledPivot.z;
+        pivotBackTranslation.copyFrom(scaledPivot);
       }
 
       // particle vertex loop
-      for (pt = 0; pt < _shape.size(); ++pt) {
+      for (pt = 0; pt < shape.size(); ++pt) {
         idx    = index + pt * 3;
         colidx = colorIndex + pt * 4;
         uvidx  = uvIndex + pt * 2;
 
-        _vertex.x = _shape[pt].x;
-        _vertex.y = _shape[pt].y;
-        _vertex.z = _shape[pt].z;
-
+        auto& tmpVertex = tempVectors[0];
+        tmpVertex.copyFrom(shape[pt]);
         if (_computeParticleVertex) {
-          updateParticleVertex(_particle, _vertex, pt);
+          updateParticleVertex(particle, tmpVertex, pt);
         }
 
         // positions
-        _vertex.x *= _particle->scaling.x;
-        _vertex.y *= _particle->scaling.y;
-        _vertex.z *= _particle->scaling.z;
+        auto vertexX = tmpVertex.x * particleScaling.x - scaledPivot.x;
+        auto vertexY = tmpVertex.y * particleScaling.y - scaledPivot.y;
+        auto vertexZ = tmpVertex.z * particleScaling.z - scaledPivot.z;
 
-        _vertex.x -= _scaledPivot.x;
-        _vertex.y -= _scaledPivot.y;
-        _vertex.z -= _scaledPivot.z;
+        auto rotatedX = vertexX * particleRotationMatrix[0]
+                        + vertexY * particleRotationMatrix[3]
+                        + vertexZ * particleRotationMatrix[6];
+        auto rotatedY = vertexX * particleRotationMatrix[1]
+                        + vertexY * particleRotationMatrix[4]
+                        + vertexZ * particleRotationMatrix[7];
+        auto rotatedZ = vertexX * particleRotationMatrix[2]
+                        + vertexY * particleRotationMatrix[5]
+                        + vertexZ * particleRotationMatrix[8];
 
-        _rotated.x = _vertex.x * _particle->_rotationMatrix[0]
-                     + _vertex.y * _particle->_rotationMatrix[3]
-                     + _vertex.z * _particle->_rotationMatrix[6];
-        _rotated.y = _vertex.x * _particle->_rotationMatrix[1]
-                     + _vertex.y * _particle->_rotationMatrix[4]
-                     + _vertex.z * _particle->_rotationMatrix[7];
-        _rotated.z = _vertex.x * _particle->_rotationMatrix[2]
-                     + _vertex.y * _particle->_rotationMatrix[5]
-                     + _vertex.z * _particle->_rotationMatrix[8];
+        rotatedX += pivotBackTranslation.x;
+        rotatedY += pivotBackTranslation.y;
+        rotatedZ += pivotBackTranslation.z;
 
-        _rotated.x += _pivotBackTranslation.x;
-        _rotated.y += _pivotBackTranslation.y;
-        _rotated.z += _pivotBackTranslation.z;
-
-        _positions32[idx]
-          = _particle->_globalPosition.x + _cam_axisX.x * _rotated.x
-            + _cam_axisY.x * _rotated.y + _cam_axisZ.x * _rotated.z;
-        _positions32[idx + 1]
-          = _particle->_globalPosition.y + _cam_axisX.y * _rotated.x
-            + _cam_axisY.y * _rotated.y + _cam_axisZ.y * _rotated.z;
-        _positions32[idx + 2]
-          = _particle->_globalPosition.z + _cam_axisX.z * _rotated.x
-            + _cam_axisY.z * _rotated.y + _cam_axisZ.z * _rotated.z;
+        auto px = positions32[idx]
+          = particleGlobalPosition.x + camAxisX.x * rotatedX
+            + camAxisY.x * rotatedY + camAxisZ.x * rotatedZ;
+        auto py = positions32[idx + 1]
+          = particleGlobalPosition.y + camAxisX.y * rotatedX
+            + camAxisY.y * rotatedY + camAxisZ.y * rotatedZ;
+        auto pz = positions32[idx + 2]
+          = particleGlobalPosition.z + camAxisX.z * rotatedX
+            + camAxisY.z * rotatedY + camAxisZ.z * rotatedZ;
 
         if (_computeBoundingBox) {
-          if (_positions32[idx] < _minimum.x) {
-            _minimum.x = _positions32[idx];
-          }
-          if (_positions32[idx] > _maximum.x) {
-            _maximum.x = _positions32[idx];
-          }
-          if (_positions32[idx + 1] < _minimum.y) {
-            _minimum.y = _positions32[idx + 1];
-          }
-          if (_positions32[idx + 1] > _maximum.y) {
-            _maximum.y = _positions32[idx + 1];
-          }
-          if (_positions32[idx + 2] < _minimum.z) {
-            _minimum.z = _positions32[idx + 2];
-          }
-          if (_positions32[idx + 2] > _maximum.z) {
-            _maximum.z = _positions32[idx + 2];
-          }
+          minimum.minimizeInPlaceFromFloats(px, py, pz);
+          maximum.maximizeInPlaceFromFloats(px, py, pz);
         }
 
         // normals : if the particles can't be morphed then just rotate the
         // normals, what is much more faster than ComputeNormals()
         if (!_computeParticleVertex) {
-          _normal.x = _fixedNormal32[idx];
-          _normal.y = _fixedNormal32[idx + 1];
-          _normal.z = _fixedNormal32[idx + 2];
+          const auto& normalx = fixedNormal32[idx];
+          const auto& normaly = fixedNormal32[idx + 1];
+          const auto& normalz = fixedNormal32[idx + 2];
 
-          _rotated.x = _normal.x * _particle->_rotationMatrix[0]
-                       + _normal.y * _particle->_rotationMatrix[3]
-                       + _normal.z * _particle->_rotationMatrix[6];
-          _rotated.y = _normal.x * _particle->_rotationMatrix[1]
-                       + _normal.y * _particle->_rotationMatrix[4]
-                       + _normal.z * _particle->_rotationMatrix[7];
-          _rotated.z = _normal.x * _particle->_rotationMatrix[2]
-                       + _normal.y * _particle->_rotationMatrix[5]
-                       + _normal.z * _particle->_rotationMatrix[8];
+          const auto rotatedx = normalx * particleRotationMatrix[0]
+                                + normaly * particleRotationMatrix[3]
+                                + normalz * particleRotationMatrix[6];
+          const auto rotatedy = normalx * particleRotationMatrix[1]
+                                + normaly * particleRotationMatrix[4]
+                                + normalz * particleRotationMatrix[7];
+          const auto rotatedz = normalx * particleRotationMatrix[2]
+                                + normaly * particleRotationMatrix[5]
+                                + normalz * particleRotationMatrix[8];
 
-          _normals32[idx] = _cam_axisX.x * _rotated.x
-                            + _cam_axisY.x * _rotated.y
-                            + _cam_axisZ.x * _rotated.z;
-          _normals32[idx + 1] = _cam_axisX.y * _rotated.x
-                                + _cam_axisY.y * _rotated.y
-                                + _cam_axisZ.y * _rotated.z;
-          _normals32[idx + 2] = _cam_axisX.z * _rotated.x
-                                + _cam_axisY.z * _rotated.y
-                                + _cam_axisZ.z * _rotated.z;
+          normals32[idx] = camAxisX.x * rotatedx + camAxisY.x * rotatedy
+                           + camAxisZ.x * rotatedz;
+          normals32[idx + 1] = camAxisX.y * rotatedx + camAxisY.y * rotatedy
+                               + camAxisZ.y * rotatedz;
+          normals32[idx + 2] = camAxisX.z * rotatedx + camAxisY.z * rotatedy
+                               + camAxisZ.z * rotatedz;
         }
 
-        if (_computeParticleColor) {
-          const auto& particleColor = *_particle->color;
-          _colors32[colidx]         = particleColor.r;
-          _colors32[colidx + 1]     = particleColor.g;
-          _colors32[colidx + 2]     = particleColor.b;
-          _colors32[colidx + 3]     = particleColor.a;
+        if (_computeParticleColor && particle->color.has_value()) {
+          const auto& color    = particle->color.value();
+          auto& colors32       = _colors32;
+          colors32[colidx]     = color.r;
+          colors32[colidx + 1] = color.g;
+          colors32[colidx + 2] = color.b;
+          colors32[colidx + 3] = color.a;
         }
 
         if (_computeParticleTexture) {
-          _uvs32[uvidx]
-            = _shapeUV[pt * 2] * (_particle->uvs.z - _particle->uvs.x)
-              + _particle->uvs.x;
-          _uvs32[uvidx + 1]
-            = _shapeUV[pt * 2 + 1] * (_particle->uvs.w - _particle->uvs.y)
-              + _particle->uvs.y;
+          const auto& uvs  = particle->uvs;
+          uvs32[uvidx]     = shapeUV[pt * 2] * (uvs.z - uvs.x) + uvs.x;
+          uvs32[uvidx + 1] = shapeUV[pt * 2 + 1] * (uvs.w - uvs.y) + uvs.y;
         }
       }
     }
     // particle just set invisible : scaled to zero and positioned at the origin
     else {
-      _particle->_stillInvisible = true; // mark the particle as invisible
-      for (pt = 0; pt < _shape.size(); ++pt) {
+      particle->_stillInvisible = true; // mark the particle as invisible
+      for (pt = 0; pt < shape.size(); pt++) {
         idx    = index + pt * 3;
         colidx = colorIndex + pt * 4;
         uvidx  = uvIndex + pt * 2;
 
-        _positions32[idx]     = 0.f;
-        _positions32[idx + 1] = 0.f;
-        _positions32[idx + 2] = 0.f;
-        _normals32[idx]       = 0.f;
-        _normals32[idx + 1]   = 0.f;
-        _normals32[idx + 2]   = 0.f;
-        if (_computeParticleColor) {
-          const auto& particleColor = *_particle->color;
-          _colors32[colidx]         = particleColor.r;
-          _colors32[colidx + 1]     = particleColor.g;
-          _colors32[colidx + 2]     = particleColor.b;
-          _colors32[colidx + 3]     = particleColor.a;
+        positions32[idx] = positions32[idx + 1] = positions32[idx + 2] = 0;
+        normals32[idx] = normals32[idx + 1] = normals32[idx + 2] = 0;
+        if (_computeParticleColor && particle->color.has_value()) {
+          const auto& color    = particle->color.value();
+          colors32[colidx]     = color.r;
+          colors32[colidx + 1] = color.g;
+          colors32[colidx + 2] = color.b;
+          colors32[colidx + 3] = color.a;
         }
         if (_computeParticleTexture) {
-          _uvs32[uvidx]
-            = _shapeUV[pt * 2] * (_particle->uvs.z - _particle->uvs.x)
-              + _particle->uvs.x;
-          _uvs32[uvidx + 1]
-            = _shapeUV[pt * 2 + 1] * (_particle->uvs.w - _particle->uvs.y)
-              + _particle->uvs.y;
+          const auto& uvs  = particle->uvs;
+          uvs32[uvidx]     = shapeUV[pt * 2] * (uvs.z - uvs.x) + uvs.x;
+          uvs32[uvidx + 1] = shapeUV[pt * 2 + 1] * (uvs.w - uvs.y) + uvs.y;
         }
       }
     }
 
     // if the particle intersections must be computed : update the bbInfo
     if (_particlesIntersect) {
-      auto bInfo    = _particle->_boundingInfo.get();
-      auto& bBox    = bInfo->boundingBox;
-      auto& bSphere = bInfo->boundingSphere;
+      auto& bInfo             = particle->_boundingInfo;
+      auto& bBox              = bInfo->boundingBox;
+      auto& bSphere           = bInfo->boundingSphere;
+      auto& modelBoundingInfo = particle->_modelBoundingInfo;
       if (!_bSphereOnly) {
         // place, scale and rotate the particle bbox within the SPS local
         // system, then update it
-        for (size_t b = 0; b < bBox.vectors.size(); ++b) {
-          _vertex.x = _particle->_modelBoundingInfo->boundingBox.vectors[b].x
-                      * _particle->scaling.x;
-          _vertex.y = _particle->_modelBoundingInfo->boundingBox.vectors[b].y
-                      * _particle->scaling.y;
-          _vertex.z = _particle->_modelBoundingInfo->boundingBox.vectors[b].z
-                      * _particle->scaling.z;
-          _rotated.x = _vertex.x * _particle->_rotationMatrix[0]
-                       + _vertex.y * _particle->_rotationMatrix[3]
-                       + _vertex.z * _particle->_rotationMatrix[6];
-          _rotated.y = _vertex.x * _particle->_rotationMatrix[1]
-                       + _vertex.y * _particle->_rotationMatrix[4]
-                       + _vertex.z * _particle->_rotationMatrix[7];
-          _rotated.z = _vertex.x * _particle->_rotationMatrix[2]
-                       + _vertex.y * _particle->_rotationMatrix[5]
-                       + _vertex.z * _particle->_rotationMatrix[8];
-          bBox.vectors[b].x = _particle->position.x + _cam_axisX.x * _rotated.x
-                              + _cam_axisY.x * _rotated.y
-                              + _cam_axisZ.x * _rotated.z;
-          bBox.vectors[b].y = _particle->position.y + _cam_axisX.y * _rotated.x
-                              + _cam_axisY.y * _rotated.y
-                              + _cam_axisZ.y * _rotated.z;
-          bBox.vectors[b].z = _particle->position.z + _cam_axisX.z * _rotated.x
-                              + _cam_axisY.z * _rotated.y
-                              + _cam_axisZ.z * _rotated.z;
+        auto& modelBoundingInfoVectors = modelBoundingInfo->boundingBox.vectors;
+
+        auto& tempMin = tempVectors[1];
+        auto& tempMax = tempVectors[2];
+        tempMin.setAll(std::numeric_limits<float>::max());
+        tempMax.setAll(std::numeric_limits<float>::min());
+        for (unsigned int b = 0; b < 8; b++) {
+          const auto scaledX
+            = modelBoundingInfoVectors[b].x * particleScaling.x;
+          const auto scaledY
+            = modelBoundingInfoVectors[b].y * particleScaling.y;
+          const auto scaledZ
+            = modelBoundingInfoVectors[b].z * particleScaling.z;
+          const auto rotatedX = scaledX * particleRotationMatrix[0]
+                                + scaledY * particleRotationMatrix[3]
+                                + scaledZ * particleRotationMatrix[6];
+          const auto rotatedY = scaledX * particleRotationMatrix[1]
+                                + scaledY * particleRotationMatrix[4]
+                                + scaledZ * particleRotationMatrix[7];
+          const auto rotatedZ = scaledX * particleRotationMatrix[2]
+                                + scaledY * particleRotationMatrix[5]
+                                + scaledZ * particleRotationMatrix[8];
+          const auto x = particlePosition.x + camAxisX.x * rotatedX
+                         + camAxisY.x * rotatedY + camAxisZ.x * rotatedZ;
+          const auto y = particlePosition.y + camAxisX.y * rotatedX
+                         + camAxisY.y * rotatedY + camAxisZ.y * rotatedZ;
+          const auto z = particlePosition.z + camAxisX.z * rotatedX
+                         + camAxisY.z * rotatedY + camAxisZ.z * rotatedZ;
+          tempMin.minimizeInPlaceFromFloats(x, y, z);
+          tempMax.maximizeInPlaceFromFloats(x, y, z);
         }
-        bBox._update(mesh->_worldMatrix);
+
+        bBox.reConstruct(tempMin, tempMax, mesh->_worldMatrix);
       }
+
       // place and scale the particle bouding sphere in the SPS local system,
       // then update it
-      _minBbox.x
-        = _particle->_modelBoundingInfo->minimum().x * _particle->scaling.x;
-      _minBbox.y
-        = _particle->_modelBoundingInfo->minimum().y * _particle->scaling.y;
-      _minBbox.z
-        = _particle->_modelBoundingInfo->minimum().z * _particle->scaling.z;
-      _maxBbox.x
-        = _particle->_modelBoundingInfo->maximum().x * _particle->scaling.x;
-      _maxBbox.y
-        = _particle->_modelBoundingInfo->maximum().y * _particle->scaling.y;
-      _maxBbox.z
-        = _particle->_modelBoundingInfo->maximum().z * _particle->scaling.z;
-      bSphere.center.x
-        = _particle->_globalPosition.x + (_minBbox.x + _maxBbox.x) * 0.5f;
-      bSphere.center.y
-        = _particle->_globalPosition.y + (_minBbox.y + _maxBbox.y) * 0.5f;
-      bSphere.center.z
-        = _particle->_globalPosition.z + (_minBbox.z + _maxBbox.z) * 0.5f;
-      bSphere.radius
-        = _bSphereRadiusFactor * 0.5f
-          * std::sqrt((_maxBbox.x - _minBbox.x) * (_maxBbox.x - _minBbox.x)
-                      + (_maxBbox.y - _minBbox.y) * (_maxBbox.y - _minBbox.y)
-                      + (_maxBbox.z - _minBbox.z) * (_maxBbox.z - _minBbox.z));
-      bSphere._update(mesh->_worldMatrix);
+      auto minBbox = modelBoundingInfo->minimum().multiplyToRef(particleScaling,
+                                                                tempVectors[1]);
+      auto maxBbox = modelBoundingInfo->maximum().multiplyToRef(particleScaling,
+                                                                tempVectors[2]);
+
+      const auto bSphereCenter = maxBbox.addToRef(minBbox, tempVectors[3])
+                                   .scaleInPlace(0.5f)
+                                   .addInPlace(particleGlobalPosition);
+      const auto halfDiag = maxBbox.subtractToRef(minBbox, tempVectors[4])
+                              .scaleInPlace(0.5f * _bSphereRadiusFactor);
+      const auto bSphereMinBbox
+        = bSphereCenter.subtractToRef(halfDiag, tempVectors[1]);
+      const auto bSphereMaxBbox
+        = bSphereCenter.addToRef(halfDiag, tempVectors[2]);
+      bSphere.reConstruct(bSphereMinBbox, bSphereMaxBbox, mesh->_worldMatrix);
     }
 
     // increment indexes for the next particle
@@ -1062,82 +961,61 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
   // if the VBO must be updated
   if (update) {
     if (_computeParticleColor) {
-      mesh->updateVerticesData(VertexBuffer::ColorKind, _colors32, false,
-                               false);
+      mesh->updateVerticesData(VertexBuffer::ColorKind, colors32, false, false);
     }
     if (_computeParticleTexture) {
-      mesh->updateVerticesData(VertexBuffer::UVKind, _uvs32, false, false);
+      mesh->updateVerticesData(VertexBuffer::UVKind, uvs32, false, false);
     }
-    mesh->updateVerticesData(VertexBuffer::PositionKind, _positions32, false,
+    mesh->updateVerticesData(VertexBuffer::PositionKind, positions32, false,
                              false);
-    if (!mesh->areNormalsFrozen() || mesh->isFacetDataEnabled()) {
-      if (_computeParticleVertex || mesh->isFacetDataEnabled()) {
+    if (!mesh->areNormalsFrozen || mesh->isFacetDataEnabled) {
+      if (_computeParticleVertex || mesh->isFacetDataEnabled) {
         // recompute the normals only if the particles can be morphed, update
         // then also the normal reference array _fixedNormal32[]
-        if (mesh->isFacetDataEnabled()) {
-          auto params = mesh->getFacetDataParameters();
-          VertexData::ComputeNormals(_positions32, _indices32, _normals32,
-                                     params);
+        if (mesh->isFacetDataEnabled) {
+          VertexData::ComputeNormals(positions32, indices32, normals32,
+                                     mesh->getFacetDataParameters());
         }
         else {
-          VertexData::ComputeNormals(_positions32, _indices32, _normals32);
+          VertexData::ComputeNormals(positions32, indices32, normals32,
+                                     std::nullopt);
         }
-        for (size_t i = 0; i < _normals32.size(); ++i) {
-          _fixedNormal32[i] = _normals32[i];
+        for (size_t i = 0; i < normals32.size(); ++i) {
+          fixedNormal32[i] = normals32[i];
         }
       }
-      if (!mesh->areNormalsFrozen()) {
-        mesh->updateVerticesData(VertexBuffer::NormalKind, _normals32, false,
+      if (!mesh->areNormalsFrozen) {
+        mesh->updateVerticesData(VertexBuffer::NormalKind, normals32, false,
                                  false);
       }
     }
     if (_depthSort && _depthSortParticles) {
       std::sort(depthSortedParticles.begin(), depthSortedParticles.end(),
                 _depthSortFunction);
-      auto dspl     = depthSortedParticles.size();
-      size_t sorted = 0;
-      size_t lind   = 0;
-      size_t sind   = 0;
-      size_t sid    = 0;
-      for (sorted = 0; sorted < dspl; ++sorted) {
-        lind = depthSortedParticles[sorted].indicesLength;
-        sind = depthSortedParticles[sorted].ind;
-        for (size_t i = 0; i < lind; ++i) {
-          _indices32[sid] = _indices[sind + i];
-          ++sid;
+      const auto dspl = depthSortedParticles.size();
+      auto sid        = 0ll;
+      for (size_t sorted = 0; sorted < dspl; ++sorted) {
+        const auto lind = depthSortedParticles[sorted].indicesLength;
+        const auto sind = depthSortedParticles[sorted].ind;
+        for (size_t i = 0; i < lind; i++) {
+          indices32[sid] = indices[sind + i];
+          sid++;
         }
       }
-      mesh->updateIndices(_indices32);
+      mesh->updateIndices(indices32);
     }
   }
   if (_computeBoundingBox) {
-    mesh->_boundingInfo.reset(new BoundingInfo(_minimum, _maximum));
-    mesh->_boundingInfo->update(mesh->_worldMatrix);
+    if (mesh->_boundingInfo) {
+      mesh->_boundingInfo->reConstruct(minimum, maximum, mesh->_worldMatrix);
+    }
+    else {
+      mesh->_boundingInfo
+        = std::make_unique<BoundingInfo>(minimum, maximum, mesh->_worldMatrix);
+    }
   }
-  afterUpdateParticles(start, _end, update);
-
+  afterUpdateParticles(start, end, update);
   return *this;
-}
-
-void SolidParticleSystem::_quaternionRotationYPR()
-{
-  _halfroll  = _roll * 0.5f;
-  _halfpitch = _pitch * 0.5f;
-  _halfyaw   = _yaw * 0.5f;
-  _sinRoll   = std::sin(_halfroll);
-  _cosRoll   = std::cos(_halfroll);
-  _sinPitch  = std::sin(_halfpitch);
-  _cosPitch  = std::cos(_halfpitch);
-  _sinYaw    = std::sin(_halfyaw);
-  _cosYaw    = std::cos(_halfyaw);
-  _quaternion.x
-    = _cosYaw * _sinPitch * _cosRoll + _sinYaw * _cosPitch * _sinRoll;
-  _quaternion.y
-    = _sinYaw * _cosPitch * _cosRoll - _cosYaw * _sinPitch * _sinRoll;
-  _quaternion.z
-    = _cosYaw * _cosPitch * _sinRoll - _sinYaw * _sinPitch * _cosRoll;
-  _quaternion.w
-    = _cosYaw * _cosPitch * _cosRoll + _sinYaw * _sinPitch * _sinRoll;
 }
 
 void SolidParticleSystem::dispose(bool /*doNotRecurse*/,
@@ -1169,7 +1047,7 @@ SolidParticleSystem& SolidParticleSystem::refreshVisibleSize()
 
 void SolidParticleSystem::setVisibilityBox(float size)
 {
-  float vis = size / 2.f;
+  auto vis = size / 2.f;
   mesh->_boundingInfo.reset(
     new BoundingInfo(Vector3(-vis, -vis, -vis), Vector3(vis, vis, vis)));
 }
@@ -1275,7 +1153,7 @@ SolidParticle* SolidParticleSystem::updateParticle(SolidParticle* particle)
 
 Vector3 SolidParticleSystem::updateParticleVertex(SolidParticle* /*particle*/,
                                                   const Vector3& vertex,
-                                                  unsigned int /*pt*/)
+                                                  size_t /*pt*/)
 {
   return vertex;
 }

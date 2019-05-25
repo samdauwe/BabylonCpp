@@ -135,6 +135,12 @@ Vector3 Vector3::add(const Vector3& otherVector) const
   return Vector3(x + otherVector.x, y + otherVector.y, z + otherVector.z);
 }
 
+Vector3& Vector3::addToRef(const Vector3& otherVector, Vector3& result)
+{
+  return result.copyFromFloats(x + otherVector.x, y + otherVector.y,
+                               z + otherVector.z);
+}
+
 const Vector3& Vector3::addToRef(const Vector3& otherVector,
                                  Vector3& result) const
 {
@@ -156,6 +162,12 @@ Vector3 Vector3::subtract(const Vector3& otherVector) const
   return Vector3(x - otherVector.x, y - otherVector.y, z - otherVector.z);
 }
 
+Vector3& Vector3::subtractToRef(const Vector3& otherVector, Vector3& result)
+{
+  return subtractFromFloatsToRef(otherVector.x, otherVector.y, otherVector.z,
+                                 result);
+}
+
 const Vector3& Vector3::subtractToRef(const Vector3& otherVector,
                                       Vector3& result) const
 {
@@ -166,6 +178,12 @@ const Vector3& Vector3::subtractToRef(const Vector3& otherVector,
 Vector3 Vector3::subtractFromFloats(float ix, float iy, float iz) const
 {
   return Vector3(x - ix, y - iy, z - iz);
+}
+
+Vector3& Vector3::subtractFromFloatsToRef(float ix, float iy, float iz,
+                                          Vector3& result)
+{
+  return result.copyFromFloats(x - ix, y - iy, z - iz);
 }
 
 const Vector3& Vector3::subtractFromFloatsToRef(float ix, float iy, float iz,

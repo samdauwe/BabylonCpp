@@ -122,6 +122,15 @@ public:
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
+  Vector3& addToRef(const Vector3& otherVector, Vector3& result);
+
+  /**
+   * @brief Adds the current Vector3 to the given one and stores the result in
+   * the vector "result".
+   * @param otherVector defines the second operand
+   * @param result defines the Vector3 object where to store the result
+   * @returns the current Vector3
+   */
   const Vector3& addToRef(const Vector3& otherVector, Vector3& result) const;
 
   /**
@@ -146,6 +155,15 @@ public:
    * @param result defines the Vector3 object where to store the result
    * @returns the current Vector3
    */
+  Vector3& subtractToRef(const Vector3& otherVector, Vector3& result);
+
+  /**
+   * @brief Subtracts the given vector from the current Vector3 and stores the
+   * result in the vector "result".
+   * @param otherVector defines the second operand
+   * @param result defines the Vector3 object where to store the result
+   * @returns the current Vector3
+   */
   const Vector3& subtractToRef(const Vector3& otherVector,
                                Vector3& result) const;
 
@@ -158,6 +176,17 @@ public:
    * @returns the resulting Vector3
    */
   Vector3 subtractFromFloats(float x, float y, float z) const;
+
+  /**
+   * @brief Subtracts the given floats from the current Vector3 coordinates and
+   * set the given vector "result" with this result.
+   * @param x defines the x coordinate of the operand
+   * @param y defines the y coordinate of the operand
+   * @param z defines the z coordinate of the operand
+   * @param result defines the Vector3 object where to store the result
+   * @returns the current Vector3
+   */
+  Vector3& subtractFromFloatsToRef(float x, float y, float z, Vector3& result);
 
   /**
    * @brief Subtracts the given floats from the current Vector3 coordinates and

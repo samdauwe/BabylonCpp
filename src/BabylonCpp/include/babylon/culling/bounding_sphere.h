@@ -26,11 +26,14 @@ public:
   ~BoundingSphere();
 
   /**
-   * @brief Recreates the entire bounding sphere from scratch.
+   * @brief Recreates the entire bounding sphere from scratch as if we call the
+   * constructor in place.
    * @param min defines the new minimum vector (in local space)
    * @param max defines the new maximum vector (in local space)
+   * @param worldMatrix defines the new world matrix
    */
-  void reConstruct(const Vector3& min, const Vector3& max);
+  void reConstruct(const Vector3& min, const Vector3& max,
+                   const std::optional<Matrix>& worldMatrix = std::nullopt);
 
   /**
    * @brief Scale the current bounding sphere by applying a scale factor.
