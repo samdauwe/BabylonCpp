@@ -182,7 +182,7 @@ struct BABYLON_SHARED_EXPORT Tools {
    * @return the decoded image
    */
   static Image ArrayBufferToImage(const ArrayBuffer& buffer,
-                                  bool flipVertically = true);
+                                  bool flipVertically = false);
 
   static void LoadImageFromUrl(
     std::string url, const std::function<void(const Image& img)>& onLoad,

@@ -417,14 +417,16 @@ Image Tools::ArrayBufferToImage(const ArrayBuffer& buffer, bool flipVertically)
     = std::unique_ptr<unsigned char, std::function<void(unsigned char*)>>;
 
   auto bufferSize = static_cast<int>(buffer.size());
-  int w = -1, h = -1, n = -1;
+  auto w = -1, h = -1, n = -1;
+  auto req_comp = STBI_rgb_alpha;
   stbi_set_flip_vertically_on_load(flipVertically);
-  stbi_ptr data(stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, 0),
-                [](unsigned char* _data) {
-                  if (_data) {
-                    stbi_image_free(_data);
-                  }
-                });
+  stbi_ptr data(
+    stbi_load_from_memory(buffer.data(), bufferSize, &w, &h, &n, req_comp),
+    [](unsigned char* _data) {
+      if (_data) {
+        stbi_image_free(_data);
+      }
+    });
 
   if (!data) {
     return Image();
@@ -532,7 +534,7 @@ void Tools::ReadFile(
 {
   if (!Filesystem::exists(fileToLoad)) {
     BABYLON_LOGF_ERROR("Tools", "Error while reading file: %s",
-                       fileToLoad.c_str());
+                       fileToLoad.c_str())
     if (callback) {
       callback("", "");
     }

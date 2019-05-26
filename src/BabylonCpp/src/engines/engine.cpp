@@ -155,14 +155,14 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
 
   if (!_gl) {
     if (!canvas) {
-      BABYLON_LOG_ERROR("Engine", "The provided canvas is null or undefined");
+      BABYLON_LOG_ERROR("Engine", "The provided canvas is null or undefined")
       return;
     }
     _gl = canvas->getContext3d(options);
   }
 
   if (!_gl) {
-    BABYLON_LOG_ERROR("Engine", "GL not supported");
+    BABYLON_LOG_ERROR("Engine", "GL not supported")
     return;
   }
 
@@ -213,7 +213,7 @@ Engine::Engine(ICanvas* canvas, const EngineOptions& options)
   //}
 
   BABYLON_LOGF_INFO("Engine", "BabylonCpp engine (v%s) launched",
-                    Engine::Version().c_str());
+                    Engine::Version().c_str())
 }
 
 Engine::~Engine()
@@ -610,7 +610,7 @@ EngineCapabilities& Engine::getCaps()
 size_t Engine::drawCalls() const
 {
   BABYLON_LOG_WARN(
-    "Engine", "drawCalls is deprecated. Please use SceneInstrumentation class");
+    "Engine", "drawCalls is deprecated. Please use SceneInstrumentation class")
   return 0;
 }
 
@@ -618,7 +618,7 @@ std::optional<PerfCounter> Engine::drawCallsPerfCounter()
 {
   BABYLON_LOG_WARN("Engine",
                    "drawCallsPerfCounter is deprecated. Please use "
-                   "SceneInstrumentation class");
+                   "SceneInstrumentation class")
   return std::nullopt;
 }
 
@@ -1258,7 +1258,7 @@ Engine::createUniformBuffer(const Float32Array& elements)
 {
   auto ubo = _gl->createBuffer();
   if (!ubo) {
-    BABYLON_LOG_ERROR("Engine", "Unable to create uniform buffer");
+    BABYLON_LOG_ERROR("Engine", "Unable to create uniform buffer")
     return nullptr;
   }
 
@@ -1277,7 +1277,7 @@ Engine::createDynamicUniformBuffer(const Float32Array& elements)
 {
   auto ubo = _gl->createBuffer();
   if (!ubo) {
-    BABYLON_LOG_ERROR("Engine", "Unable to create dynamic uniform buffer");
+    BABYLON_LOG_ERROR("Engine", "Unable to create dynamic uniform buffer")
     return nullptr;
   }
 
@@ -1325,7 +1325,7 @@ Engine::GLBufferPtr Engine::createVertexBuffer(const Float32Array& vertices)
 {
   auto vbo = _gl->createBuffer();
   if (!vbo) {
-    BABYLON_LOG_ERROR("Engine", "Unable to create vertex buffer");
+    BABYLON_LOG_ERROR("Engine", "Unable to create vertex buffer")
     return nullptr;
   }
 
@@ -1343,7 +1343,7 @@ Engine::createDynamicVertexBuffer(const Float32Array& vertices)
 {
   auto vbo = _gl->createBuffer();
   if (!vbo) {
-    BABYLON_LOG_ERROR("Engine", "Unable to create dynamic vertex buffer");
+    BABYLON_LOG_ERROR("Engine", "Unable to create dynamic vertex buffer")
     return nullptr;
   }
 
@@ -1403,7 +1403,7 @@ Engine::GLBufferPtr Engine::createIndexBuffer(const IndicesArray& indices,
 {
   auto vbo = _gl->createBuffer();
   if (!vbo) {
-    BABYLON_LOG_ERROR("Engine", "Unable to create index buffer");
+    BABYLON_LOG_ERROR("Engine", "Unable to create index buffer")
     return nullptr;
   }
 
@@ -1742,7 +1742,7 @@ Engine::GLBufferPtr Engine::createInstancesBuffer(unsigned int capacity)
 {
   auto buffer = _gl->createBuffer();
   if (!buffer) {
-    BABYLON_LOG_ERROR("Engine", "Unable to create instance buffer");
+    BABYLON_LOG_ERROR("Engine", "Unable to create instance buffer")
     return nullptr;
   }
 
@@ -2034,7 +2034,7 @@ Engine::_compileRawShader(const std::string& source, const std::string& type)
 
   if (!shader) {
     BABYLON_LOG_ERROR("Engine",
-                      "Something went wrong while compile the shader.");
+                      "Something went wrong while compile the shader.")
     return nullptr;
   }
 
@@ -2044,8 +2044,8 @@ Engine::_compileRawShader(const std::string& source, const std::string& type)
   if (!_gl->getShaderParameter(shader, GL::COMPILE_STATUS)) {
     auto log = _gl->getShaderInfoLog(shader);
     if (!log.empty()) {
-      BABYLON_LOG_ERROR("Engine", log);
-      BABYLON_LOG_ERROR("Engine", source);
+      BABYLON_LOG_ERROR("Engine", log)
+      BABYLON_LOG_ERROR("Engine", source)
     }
     return nullptr;
   }
@@ -2077,7 +2077,8 @@ std::unique_ptr<GL::IGLProgram> Engine::createShaderProgram(
   onBeforeShaderCompilationObservable.notifyObservers(this);
 
   const std::string shaderVersion
-    = (_webGLVersion > 1.f) ? BABYLONCPP_GLSL_VERSION_3 "#define WEBGL2 \n" : "";
+    = (_webGLVersion > 1.f) ? BABYLONCPP_GLSL_VERSION_3 "#define WEBGL2 \n" :
+                              "";
   auto vertexShader
     = _compileShader(vertexCode, "vertex", defines, shaderVersion);
   auto fragmentShader
@@ -2099,7 +2100,7 @@ std::unique_ptr<GL::IGLProgram> Engine::_createShaderProgram(
 {
   auto shaderProgram = context->createProgram();
   if (!shaderProgram) {
-    BABYLON_LOG_ERROR("Engine", "Unable to create program");
+    BABYLON_LOG_ERROR("Engine", "Unable to create program")
     return nullptr;
   }
 
@@ -2140,7 +2141,7 @@ void Engine::_finalizeProgram(
   if (!linked) {
     const auto error = context->getProgramInfoLog(shaderProgram);
     if (!error.empty()) {
-      BABYLON_LOG_ERROR("Engine", error);
+      BABYLON_LOG_ERROR("Engine", error)
     }
   }
 
@@ -2151,7 +2152,7 @@ void Engine::_finalizeProgram(
     if (!validated) {
       const auto error = context->getProgramInfoLog(shaderProgram);
       if (!error.empty()) {
-        BABYLON_LOG_ERROR("Engine", error);
+        BABYLON_LOG_ERROR("Engine", error)
       }
     }
   }
@@ -2787,7 +2788,7 @@ std::unique_ptr<GL::IGLTexture> Engine::_createTexture()
   auto texture = _gl->createTexture();
 
   if (!texture) {
-    BABYLON_LOG_ERROR("Engine", "Unable to create texture");
+    BABYLON_LOG_ERROR("Engine", "Unable to create texture")
   }
 
   return texture;
@@ -2831,7 +2832,7 @@ InternalTexturePtr Engine::createTexture(
 
   // establish the file extension, if possible
   auto lastDotTmp = String::lastIndexOf(url, ".");
-  size_t lastDot  = lastDotTmp >= 0 ? static_cast<size_t>(lastDotTmp) : 0;
+  auto lastDot    = lastDotTmp >= 0 ? static_cast<size_t>(lastDotTmp) : 0ull;
   auto extension
     = (lastDot > 0) ? String::toLowerCase(url.substr(lastDot, url.size())) : "";
 
@@ -3261,8 +3262,8 @@ void Engine::updateDynamicTexture(const InternalTexturePtr& texture,
     _gl->pixelStorei(GL::UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
   }
   auto internalFormat = format ? _getInternalFormat(format) : GL::RGBA;
-  _gl->texImage2D(GL::TEXTURE_2D, 0, internalFormat, internalFormat,
-                  GL::UNSIGNED_BYTE, canvas);
+  _gl->texImage2D(GL::TEXTURE_2D, 0, static_cast<int>(internalFormat),
+                  internalFormat, GL::UNSIGNED_BYTE, canvas);
   if (texture->generateMipMaps) {
     _gl->generateMipmap(GL::TEXTURE_2D);
   }
@@ -3278,7 +3279,7 @@ void Engine::updateTextureComparisonFunction(const InternalTexturePtr& texture,
                                              int comparisonFunction)
 {
   if (webGLVersion() == 1.f) {
-    BABYLON_LOG_ERROR("Engine", "WebGL 1 does not support texture comparison.");
+    BABYLON_LOG_ERROR("Engine", "WebGL 1 does not support texture comparison.")
     return;
   }
 
@@ -3391,7 +3392,7 @@ Engine::_createDepthStencilTexture(const std::variant<int, ISize>& size,
 
   if (!_caps.depthTextureExtension) {
     BABYLON_LOG_ERROR(
-      "Engine", "Depth texture is not supported by your browser or hardware.");
+      "Engine", "Depth texture is not supported by your browser or hardware.")
     return internalTexture;
   }
 
@@ -3451,7 +3452,7 @@ InternalTexturePtr Engine::_createDepthStencilCubeTexture(
 
   if (webGLVersion() == 1.f) {
     BABYLON_LOG_ERROR("Engine",
-                      "Depth cube texture is not supported by WebGL 1.");
+                      "Depth cube texture is not supported by WebGL 1.")
     return internalTexture;
   }
 
@@ -3596,7 +3597,7 @@ Engine::createRenderTargetTexture(const std::variant<ISize, float>& size,
     BABYLON_LOG_WARN(
       "Engine",
       "Float textures are not supported. Render target forced to "
-      "TEXTURETYPE_UNSIGNED_BYTE type");
+      "TEXTURETYPE_UNSIGNED_BYTE type")
   }
 
   _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_MAG_FILTER, filters.mag);
@@ -3705,7 +3706,7 @@ Engine::createMultipleRenderTarget(ISize size,
       type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
       BABYLON_LOG_WARN("Engine",
                        "Float textures are not supported. Render target forced "
-                       "to TEXTURETYPE_UNSIGNED_BYTE type");
+                       "to TEXTURETYPE_UNSIGNED_BYTE type")
     }
 
     auto texture = std::make_shared<InternalTexture>(
@@ -3724,7 +3725,8 @@ Engine::createMultipleRenderTarget(ISize size,
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_S, GL::CLAMP_TO_EDGE);
     _gl->texParameteri(GL::TEXTURE_2D, GL::TEXTURE_WRAP_T, GL::CLAMP_TO_EDGE);
 
-    _gl->texImage2D(GL::TEXTURE_2D, 0, _getRGBABufferInternalSizedFormat(type),
+    _gl->texImage2D(GL::TEXTURE_2D, 0,
+                    static_cast<int>(_getRGBABufferInternalSizedFormat(type)),
                     width, height, 0, GL::RGBA, _getWebGLTextureType(type),
                     nullptr);
 
@@ -3889,7 +3891,7 @@ Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
     auto framebuffer = _gl->createFramebuffer();
 
     if (!framebuffer) {
-      BABYLON_LOG_ERROR("Engine", "Unable to create multi sampled framebuffer");
+      BABYLON_LOG_ERROR("Engine", "Unable to create multi sampled framebuffer")
       return 0;
     }
 
@@ -3899,7 +3901,7 @@ Engine::updateRenderTargetTextureSampleCount(const InternalTexturePtr& texture,
     auto colorRenderbuffer = _gl->createRenderbuffer();
 
     if (!colorRenderbuffer) {
-      BABYLON_LOG_ERROR("Engine", "Unable to create multi sampled framebuffer");
+      BABYLON_LOG_ERROR("Engine", "Unable to create multi sampled framebuffer")
       return 0;
     }
 
@@ -3965,7 +3967,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
     auto framebuffer = _gl->createFramebuffer();
 
     if (!framebuffer) {
-      BABYLON_LOG_ERROR("Engine", "Unable to create multi sampled framebuffer");
+      BABYLON_LOG_ERROR("Engine", "Unable to create multi sampled framebuffer")
       return 0;
     }
 
@@ -3988,7 +3990,7 @@ unsigned int Engine::updateMultipleRenderTargetTextureSampleCount(
 
       if (!colorRenderbuffer) {
         BABYLON_LOG_ERROR("Engine",
-                          "Unable to create multi sampled framebuffer");
+                          "Unable to create multi sampled framebuffer")
         return 0;
       }
 
@@ -4143,7 +4145,7 @@ InternalTexturePtr Engine::createRenderTargetCubeTexture(
     fullOptions.type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
     BABYLON_LOG_WARN("Engine",
                      "Float textures are not supported. Cube render target "
-                     "forced to TEXTURETYPE_UNESIGNED_BYTE type");
+                     "forced to TEXTURETYPE_UNESIGNED_BYTE type")
   }
 
   _gl->texParameteri(GL::TEXTURE_CUBE_MAP, GL::TEXTURE_MAG_FILTER, filters.mag);
@@ -4287,7 +4289,7 @@ InternalTexturePtr Engine::createPrefilteredCubeTexture(
       }
       else {
         BABYLON_LOG_WARN(
-          "Engine", "DDS is the only prefiltered cube map supported so far.");
+          "Engine", "DDS is the only prefiltered cube map supported so far.")
       }
 
       _bindTextureDirectly(GL::TEXTURE_CUBE_MAP, nullptr);
@@ -4384,7 +4386,7 @@ InternalTexturePtr Engine::createCubeTexture(
   else {
     if (files.empty()) {
       BABYLON_LOG_ERROR("Engine",
-                        "Cannot load cubemap because files were not defined");
+                        "Cannot load cubemap because files were not defined")
     }
 
     _cascadeLoadImgs(
@@ -4573,7 +4575,7 @@ InternalTexturePtr Engine::createRawCubeTexture(
     BABYLON_LOG_WARN("Engine",
                      "Float texture filtering is not supported. Mipmap "
                      "generation and sampling mode are forced to false and "
-                     "TEXTURE_NEAREST_SAMPLINGMODE, respectively.");
+                     "TEXTURE_NEAREST_SAMPLINGMODE, respectively.")
   }
   else if (textureType == GL::HALF_FLOAT_OES
            && !_caps.textureHalfFloatLinearFiltering) {
@@ -4582,19 +4584,19 @@ InternalTexturePtr Engine::createRawCubeTexture(
     BABYLON_LOG_WARN("Engine",
                      "Half float texture filtering is not supported. Mipmap "
                      "generation and sampling mode are forced to false and "
-                     "TEXTURE_NEAREST_SAMPLINGMODE, respectively.");
+                     "TEXTURE_NEAREST_SAMPLINGMODE, respectively.")
   }
   else if (textureType == GL::FLOAT && !_caps.textureFloatRender) {
     generateMipMaps = false;
     BABYLON_LOG_WARN("Engine",
                      "Render to float textures is not supported. Mipmap "
-                     "generation forced to false.");
+                     "generation forced to false.")
   }
   else if (textureType == GL::HALF_FLOAT && !_caps.colorBufferFloat) {
     generateMipMaps = false;
     BABYLON_LOG_WARN("Engine",
                      "Render to half float textures is not supported. Mipmap "
-                     "generation forced to false.");
+                     "generation forced to false.")
   }
 
   int width  = size;
@@ -5665,7 +5667,7 @@ std::string Engine::getVertexShaderSource(GL::IGLProgram* program)
   if (shaders.empty()) {
     BABYLON_LOGF_ERROR("Engine",
                        "Unable to get vertex shader source for program %d",
-                       program->value);
+                       program->value)
     return "";
   }
 
@@ -5678,7 +5680,7 @@ std::string Engine::getFragmentShaderSource(GL::IGLProgram* program)
   if (shaders.size() < 2) {
     BABYLON_LOGF_ERROR("Engine",
                        "Unable to get fragment shader source for program %d",
-                       program->value);
+                       program->value)
     return "";
   }
 

@@ -152,7 +152,7 @@ void Texture::updateURL(
   const std::string& iUrl,
   const std::optional<std::variant<std::string, ArrayBuffer, Image>>& buffer)
 {
-  if (iUrl.empty()) {
+  if (!url.empty()) {
     throw std::runtime_error("URL is already set");
   }
 

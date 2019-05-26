@@ -127,7 +127,7 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
                       });                                                     //
   // Import Duck Scene (glTF)
   _samples["ImportDuckScene"]
-    = std::make_tuple(false,                                               //
+    = std::make_tuple(true,                                                //
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<ImportDuckScene>(iCanvas); //
                       });                                                  //
