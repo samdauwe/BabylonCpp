@@ -40,10 +40,10 @@ void ImportAnimatedTriangleScene::initializeScene(ICanvas* /*canvas*/,
       auto camera
         = std::static_pointer_cast<ArcRotateCamera>(scene->activeCamera);
       if (camera) {
-        camera->setTarget(Vector3(-0.5f, 0.5f, 0.f));
+        camera->setTarget(Vector3(0.f, 0.0f, 0.f));
         camera->alpha  = Math::PI_2;
         camera->beta   = Math::PI_2;
-        camera->radius = 2.121f;
+        camera->radius = Math::PI;
       }
     });
 }
