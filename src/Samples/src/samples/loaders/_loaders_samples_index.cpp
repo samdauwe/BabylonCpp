@@ -11,6 +11,7 @@
 // Loaders plugins
 #ifdef WITH_LOADERS
 #include <babylon/samples/loaders/gltf/import_2cylinder_engine_scene.h>
+#include <babylon/samples/loaders/gltf/import_animated_morph_cube.h>
 #include <babylon/samples/loaders/gltf/import_animated_triangle_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_interleaved_scene.h>
 #include <babylon/samples/loaders/gltf/import_box_scene.h>
@@ -83,9 +84,15 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
     [](ICanvas* iCanvas) {                                          //
       return std::make_unique<Import2CylinderEngineScene>(iCanvas); //
     });                                                             //
+  // Import Animated Morph Cube (glTF)
+  _samples["ImportAnimatedMorphCubeScene"] = std::make_tuple(
+    true,                                                             //
+    [](ICanvas* iCanvas) {                                            //
+      return std::make_unique<ImportAnimatedMorphCubeScene>(iCanvas); //
+    });                                                               //
   // Import Animated Triangle Scene (glTF)
   _samples["ImportAnimatedTriangleScene"] = std::make_tuple(
-    true,                                                           //
+    true,                                                            //
     [](ICanvas* iCanvas) {                                           //
       return std::make_unique<ImportAnimatedTriangleScene>(iCanvas); //
     });                                                              //

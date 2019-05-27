@@ -40,9 +40,8 @@ void GLTFLoader::RegisterExtension(
   const std::function<IGLTFLoaderExtensionPtr(GLTFLoader& loader)>& factory)
 {
   if (GLTFLoader::UnregisterExtension(name)) {
-    BABYLON_LOGF_WARN("GLTFLoader",
-                      "Extension with the name '%s' already exists",
-                      name.c_str());
+    BABYLON_LOGF_WARN(
+      "GLTFLoader", "Extension with the name '%s' already exists", name.c_str())
   }
 
   GLTFLoader::_ExtensionFactories[name] = factory;
@@ -238,13 +237,13 @@ void GLTFLoader::_loadData(const IGLTFLoaderData& data)
         BABYLON_LOGF_WARN("GLTFLoader",
                           "Binary buffer length (%ld) from JSON does not match "
                           "chunk length (%ld)",
-                          binaryBuffer.byteLength, data.bin->byteLength());
+                          binaryBuffer.byteLength, data.bin->byteLength())
       }
 
       // binaryBuffer._data = data.bin;
     }
     else {
-      BABYLON_LOG_WARN("GLTFLoader", "Unexpected BIN chunk");
+      BABYLON_LOG_WARN("GLTFLoader", "Unexpected BIN chunk")
     }
   }
 }
@@ -313,9 +312,9 @@ void GLTFLoader::_checkExtensions()
   }
 }
 
-void GLTFLoader::_setState(const GLTFLoaderState& state)
+void GLTFLoader::_setState(const GLTFLoaderState& iState)
 {
-  _state = state;
+  _state = iState;
 }
 
 INodePtr GLTFLoader::_createRootNode()
@@ -480,7 +479,7 @@ void GLTFLoader::_startAnimations()
       break;
     }
     default: {
-      BABYLON_LOG_ERROR("GLTFLoader", "Invalid animation start mode");
+      BABYLON_LOG_ERROR("GLTFLoader", "Invalid animation start mode")
       return;
     }
   }
@@ -1304,6 +1303,15 @@ void GLTFLoader::_loadAnimationChannelAsync(
       auto babylonAnimation
         = Animation::New(animationName, targetPath, 1, animationType);
       std::vector<IAnimationKey> values;
+      for (const auto& key : keys) {
+        values.emplace_back(
+          IAnimationKey(key.frame,                                  // frame
+                        key.value.get<Float32Array>()[targetIndex], // value,
+                        key.inTangent,                              // inTangent
+                        key.outTangent,   // outTangent
+                        key.interpolation // interpolation
+                        ));
+      }
       babylonAnimation->setKeys(values);
 
       _forEachPrimitive(
@@ -1596,7 +1604,7 @@ VertexBufferPtr& GLTFLoader::_loadVertexAccessorAsync(
                 != 0) {
     BABYLON_LOG_WARN(
       "GLTFLoader",
-      "Accessor byte offset is not a multiple of component type byte length");
+      "Accessor byte offset is not a multiple of component type byte length")
     auto data = _loadFloatAccessorAsync(
       String::printf("/accessors/%ld", accessor.index), accessor);
     accessor._babylonVertexBuffer = std::make_unique<VertexBuffer>(
@@ -2158,7 +2166,7 @@ GLTFLoader::_GetTextureWrapMode(const std::string& context,
     case IGLTF2::TextureWrapMode::REPEAT:
       return TextureConstants::WRAP_ADDRESSMODE;
     default:
-      BABYLON_LOGF_WARN("GLTFLoader", "%s: Invalid value", context.c_str());
+      BABYLON_LOGF_WARN("GLTFLoader", "%s: Invalid value", context.c_str())
       return TextureConstants::WRAP_ADDRESSMODE;
   }
 }
@@ -2188,7 +2196,7 @@ unsigned int GLTFLoader::_GetTextureSamplingMode(const std::string& context,
         return TextureConstants::LINEAR_LINEAR_MIPLINEAR;
       default:
         BABYLON_LOGF_WARN("GLTFLoader", "%s/minFilter: Invalid value",
-                          context.c_str());
+                          context.c_str())
         return TextureConstants::LINEAR_LINEAR_MIPLINEAR;
     }
   }
@@ -2213,7 +2221,7 @@ unsigned int GLTFLoader::_GetTextureSamplingMode(const std::string& context,
         return TextureConstants::NEAREST_LINEAR_MIPLINEAR;
       default:
         BABYLON_LOGF_WARN("GLTFLoader", "%s/minFilter: Invalid value",
-                          context.c_str());
+                          context.c_str())
         return TextureConstants::NEAREST_NEAREST_MIPNEAREST;
     }
   }

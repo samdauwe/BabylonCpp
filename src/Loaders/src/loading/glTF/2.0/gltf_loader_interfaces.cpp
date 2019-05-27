@@ -532,6 +532,22 @@ IMeshPrimitive IMeshPrimitive::Parse(const json& parsedMeshPrimitive)
       json_util::get_number<size_t>(parsedMeshPrimitive, "mode"));
   }
 
+  // Targets
+  if (json_util::has_valid_key_value(parsedMeshPrimitive, "targets")) {
+    for (const auto& target :
+         json_util::get_array<json>(parsedMeshPrimitive, "targets")) {
+      std::unordered_map<std::string, size_t> newTarget;
+      for (const auto& targetElement : target.items()) {
+        auto key   = targetElement.key();
+        auto value = targetElement.value();
+        if (value.is_number_unsigned()) {
+          newTarget[key] = value.get<size_t>();
+        }
+      }
+      meshPrimitive.targets.emplace_back(newTarget);
+    }
+  }
+
   return meshPrimitive;
 }
 
