@@ -24,6 +24,7 @@
 #include <babylon/samples/loaders/gltf/import_interpolation_test_scene.h>
 #include <babylon/samples/loaders/gltf/import_reciprocating_saw_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_meshes_scene.h>
+#include <babylon/samples/loaders/gltf/import_simple_morph_scene.h>
 #include <babylon/samples/loaders/gltf/import_simple_sparse_accessor_scene.h>
 #include <babylon/samples/loaders/gltf/import_triangle_scene.h>
 #include <babylon/samples/loaders/gltf/import_triangle_without_indices_scene.h>
@@ -163,6 +164,12 @@ _LoadersSamplesIndex::_LoadersSamplesIndex()
     [](ICanvas* iCanvas) {                                       //
       return std::make_unique<ImportSimpleMeshesScene>(iCanvas); //
     });                                                          //
+  // Import Simple Morph Scene (glTF)
+  _samples["ImportSimpleMorphScene"] = std::make_tuple(
+    true,                                                       //
+    [](ICanvas* iCanvas) {                                      //
+      return std::make_unique<ImportSimpleMorphScene>(iCanvas); //
+    });                                                         //
   // Import Simple Sparse Accessor Scene (glTF)
   _samples["ImportSimpleSparseAccessorScene"] = std::make_tuple(
     true,                                                                //
