@@ -8,6 +8,7 @@
 #include <babylon/samples/loaders/gltf/simplemodels/animated_triangle_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/cameras_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/interpolation_test_scene.h>
+#include <babylon/samples/loaders/gltf/simplemodels/simple_material_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_meshes_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_morph_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_sparse_accessor_scene.h>
@@ -65,7 +66,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
     [](ICanvas* iCanvas) {                                      //
       return std::make_unique<InterpolationTestScene>(iCanvas); //
     });                                                         //
-
+  // Simple Material Scene (glTF)
+  _samples["SimpleMaterialGLTFScene"] = std::make_tuple(
+    true,                                                        //
+    [](ICanvas* iCanvas) {                                       //
+      return std::make_unique<SimpleMaterialGLTFScene>(iCanvas); //
+    });                                                          //
   // Simple Meshes Scene (glTF)
   _samples["SimpleMeshesGLTFScene"]
     = std::make_tuple(true,                                                  //
