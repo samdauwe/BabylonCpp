@@ -11,6 +11,7 @@
 #include <babylon/samples/loaders/gltf/simplemodels/simple_material_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_meshes_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_morph_scene.h>
+#include <babylon/samples/loaders/gltf/simplemodels/simple_skin_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_sparse_accessor_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_texture_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/triangle_scene.h>
@@ -85,6 +86,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
                       [](ICanvas* iCanvas) {                                //
                         return std::make_unique<SimpleMorphScene>(iCanvas); //
                       });                                                   //
+  // Simple Skin Scene (glTF)
+  _samples["SimpleSkinGLTFScene"]
+    = std::make_tuple(false,                                               //
+                      [](ICanvas* iCanvas) {                               //
+                        return std::make_unique<SimpleSkinScene>(iCanvas); //
+                      });                                                  //
   // Simple Sparse Accessor Scene (glTF)
   _samples["SimpleSparseAccessorGLTFScene"] = std::make_tuple(
     true,                                                          //
