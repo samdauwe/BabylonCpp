@@ -84,9 +84,13 @@ file(GLOB EXTENSIONS_HDR_FILES                      ${INCLUDE_PATH}/extensions/*
 file(GLOB LIGHTS_HDR_FILES                          ${INCLUDE_PATH}/lights/*.h)
 if (OPTION_BUILD_LOADERS)
     file(GLOB LOADERS_HDR_FILES                     ${INCLUDE_PATH}/loaders/*.h
-                                                    ${INCLUDE_PATH}/loaders/gltf/*.h)
+                                                    ${INCLUDE_PATH}/loaders/babylon/*.h
+                                                    ${INCLUDE_PATH}/loaders/gltf/*.h
+                                                    ${INCLUDE_PATH}/loaders/gltf/morecomplexmodels/*.h
+                                                    ${INCLUDE_PATH}/loaders/gltf/simplemodels/*.h)
 else()
-    file(GLOB LOADERS_HDR_FILES                     ${INCLUDE_PATH}/loaders/*.h)
+    file(GLOB LOADERS_HDR_FILES                     ${INCLUDE_PATH}/loaders/*.h
+                                                    ${INCLUDE_PATH}/loaders/babylon/*.h)
 endif()
 file(GLOB MATERIALS_HDR_FILES                       ${INCLUDE_PATH}/materials/*.h
                                                     ${INCLUDE_PATH}/materials/shadermaterial/*.h)
@@ -134,9 +138,13 @@ file(GLOB EXTENSIONS_SRC_FILES                      ${SOURCE_PATH}/extensions/*.
 file(GLOB LIGHTS_SRC_FILES                          ${SOURCE_PATH}/lights/*.cpp)
 if (OPTION_BUILD_LOADERS)
     file(GLOB LOADERS_SRC_FILES                     ${SOURCE_PATH}/loaders/*.cpp
-                                                    ${SOURCE_PATH}/loaders/gltf/*.cpp)
+                                                    ${SOURCE_PATH}/loaders/babylon/*.cpp
+                                                    ${SOURCE_PATH}/loaders/gltf/*.cpp
+                                                    ${SOURCE_PATH}/loaders/gltf/morecomplexmodels/*.cpp
+                                                    ${SOURCE_PATH}/loaders/gltf/simplemodels/*.cpp)
 else()
-    file(GLOB LOADERS_SRC_FILES                     ${SOURCE_PATH}/loaders/*.cpp)
+    file(GLOB LOADERS_SRC_FILES                     ${SOURCE_PATH}/loaders/*.cpp
+                                                    ${SOURCE_PATH}/loaders/babylon/*.cpp)
 endif()
 file(GLOB MATERIALS_SRC_FILES                       ${SOURCE_PATH}/materials/*.cpp
                                                     ${SOURCE_PATH}/materials/shadermaterial/*.cpp)

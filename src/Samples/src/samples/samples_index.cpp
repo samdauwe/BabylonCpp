@@ -37,8 +37,13 @@ SamplesIndex::SamplesIndex()
     {_ExtensionsSamplesIndex::CategoryName(), _ExtensionsSamplesIndex()},
     // Lights samples
     {_LightsSamplesIndex::CategoryName(), _LightsSamplesIndex()},
-    // Loaders samples
-    {_LoadersSamplesIndex::CategoryName(), _LoadersSamplesIndex()},
+    // Loaders - babylon format
+    {_LoadersBabylonSamplesIndex::CategoryName(),
+     _LoadersBabylonSamplesIndex()},
+#ifdef WITH_LOADERS
+    // Loaders - glTF format
+    {_LoadersGLTFSamplesIndex::CategoryName(), _LoadersGLTFSamplesIndex()},
+#endif
     // Materials samples
     {_MaterialsSamplesIndex::CategoryName(), _MaterialsSamplesIndex()},
     // // Materials Library samples
