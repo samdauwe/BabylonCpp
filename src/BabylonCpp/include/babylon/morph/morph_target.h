@@ -37,6 +37,18 @@ public:
   Type type() const override;
 
   /**
+   * @brief Gets a property.
+   */
+  virtual AnimationValue
+  getProperty(const std::vector<std::string>& targetPropertyPath) override;
+
+  /**
+   * @brief Sets a property.
+   */
+  virtual void setProperty(const std::vector<std::string>& targetPropertyPath,
+                           const AnimationValue& value) override;
+
+  /**
    * @brief Affects position data to this target.
    * @param data defines the position data to use
    */

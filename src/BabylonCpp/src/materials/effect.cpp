@@ -396,9 +396,9 @@ void Effect::_dumpShadersSource(std::string vertexCode,
 
   // Dump shaders name and formatted source code
   BABYLON_LOGF_ERROR("Effect", "Vertex shader: %s%s", name.c_str(),
-                     formattedVertexCode.c_str());
+                     formattedVertexCode.c_str())
   BABYLON_LOGF_ERROR("Effect", "Fragment shader: %s%s", name.c_str(),
-                     formattedFragmentCode.c_str());
+                     formattedFragmentCode.c_str())
 }
 
 void Effect::_processShaderConversion(
@@ -748,14 +748,14 @@ void Effect::_prepareEffect()
     _compilationError = e.what();
 
     // Let's go through fallbacks then
-    BABYLON_LOG_ERROR("Effect", "Unable to compile effect: ");
-    BABYLON_LOGF_ERROR("Effect", "Defines: %s", defines.c_str());
+    BABYLON_LOG_ERROR("Effect", "Unable to compile effect: ")
+    BABYLON_LOGF_ERROR("Effect", "Defines: %s", defines.c_str())
     // _dumpShadersSource(_vertexSourceCode, _fragmentSourceCode, defines);
     BABYLON_LOGF_ERROR("Effect", "Uniforms: %s",
-                       String::join(_uniformsNames, ' ').c_str());
+                       String::join(_uniformsNames, ' ').c_str())
     BABYLON_LOGF_ERROR("Effect", "Attributes: %s",
-                       String::join(attributesNames, ' ').c_str());
-    BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str());
+                       String::join(attributesNames, ' ').c_str())
+    BABYLON_LOGF_ERROR("Effect", "Error: %s", _compilationError.c_str())
     if (previousProgram) {
       _program = std::move(previousProgram);
       _isReady = true;
@@ -766,7 +766,7 @@ void Effect::_prepareEffect()
     }
 
     if (!fallbacks && fallbacks->isMoreFallbacks()) {
-      BABYLON_LOG_ERROR("Effect", "Trying next fallback.");
+      BABYLON_LOG_ERROR("Effect", "Trying next fallback.")
       defines = fallbacks->reduce(defines, this);
       _prepareEffect();
     }
