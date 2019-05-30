@@ -1601,6 +1601,9 @@ struct ISkin : public IGLTF2::ISkin, IArrayItem {
 
   /** @hidden */
   std::optional<ISkinData> _data = std::nullopt;
+
+  static ISkin Parse(const json& parsedSkin);
+
 }; // end of struct ISkin
 
 /**

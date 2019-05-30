@@ -637,6 +637,32 @@ IScene IScene::Parse(const json& parsedScene)
   return scene;
 }
 
+ISkin ISkin::Parse(const json& parsedSkin)
+{
+  ISkin skin;
+
+  // InverseBindMatrices
+  if (json_util::has_valid_key_value(parsedSkin, "inverseBindMatrices")) {
+    skin.inverseBindMatrices
+      = json_util::get_number<size_t>(parsedSkin, "inverseBindMatrices");
+  }
+
+  // Skeleton
+  if (json_util::has_valid_key_value(parsedSkin, "skeleton")) {
+    skin.skeleton = json_util::get_number<size_t>(parsedSkin, "skeleton");
+  }
+
+  // Joints
+  skin.joints = json_util::get_array<uint32_t>(parsedSkin, "joints");
+
+  // Name
+  if (json_util::has_valid_key_value(parsedSkin, "name")) {
+    skin.name = json_util::get_string(parsedSkin, "name");
+  }
+
+  return skin;
+}
+
 ITexture ITexture::Parse(const json& parsedTexture)
 {
   ITexture texture;
@@ -748,6 +774,12 @@ std::unique_ptr<IGLTF> IGLTF::Parse(const json& parsedGLTFObject)
   for (const auto& scene :
        json_util::get_array<json>(parsedGLTFObject, "scenes")) {
     glTFObject.scenes.emplace_back(IScene::Parse(scene));
+  }
+
+  // Skins
+  for (const auto& skin :
+       json_util::get_array<json>(parsedGLTFObject, "skins")) {
+    glTFObject.skins.emplace_back(ISkin::Parse(skin));
   }
 
   // Textures
