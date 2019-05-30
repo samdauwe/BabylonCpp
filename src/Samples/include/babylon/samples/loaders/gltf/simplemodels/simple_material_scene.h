@@ -7,7 +7,7 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Triangle Scene (glTF).
+ * @brief Simple Material Scene (glTF).
  * @see https://doc.babylonjs.com/how_to/load_from_any_file_type
  * @see
  * https://github.com/cx20/gltf-test/tree/master/tutorialModels/SimpleMaterial

@@ -1,4 +1,4 @@
-#include <babylon/samples/loaders/gltf/simplemodels/simple_material_scene.h>
+#include <babylon/samples/loaders/gltf/simplemodels/simple_texture_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
@@ -10,25 +10,25 @@
 namespace BABYLON {
 namespace Samples {
 
-SimpleMaterialGLTFScene::SimpleMaterialGLTFScene(ICanvas* iCanvas)
+SimpleTextureScene::SimpleTextureScene(ICanvas* iCanvas)
     : IRenderableScene(iCanvas)
 {
   GLTF2::GLTFFileLoader::RegisterAsSceneLoaderPlugin();
 }
 
-SimpleMaterialGLTFScene::~SimpleMaterialGLTFScene()
+SimpleTextureScene::~SimpleTextureScene()
 {
 }
 
-const char* SimpleMaterialGLTFScene::getName()
+const char* SimpleTextureScene::getName()
 {
-  return "Simple Material Scene (glTF)";
+  return "Simple Texture Scene (glTF)";
 }
 
-void SimpleMaterialGLTFScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
+void SimpleTextureScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
 {
   SceneLoader::ImportMesh(
-    {}, "glTF-Sample-Models/2.0/SimpleMaterial/glTF/", "SimpleMaterial.gltf",
+    {}, "glTF-Sample-Models/2.0/SimpleTexture/glTF/", "SimpleTexture.gltf",
     scene,
     [scene](const std::vector<AbstractMeshPtr>& /*meshes*/,
             const std::vector<IParticleSystemPtr>& /*particleSystems*/,

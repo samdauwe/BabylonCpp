@@ -12,6 +12,7 @@
 #include <babylon/samples/loaders/gltf/simplemodels/simple_meshes_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_morph_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/simple_sparse_accessor_scene.h>
+#include <babylon/samples/loaders/gltf/simplemodels/simple_texture_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/triangle_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/triangle_without_indices_scene.h>
 
@@ -90,6 +91,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
     [](ICanvas* iCanvas) {                                         //
       return std::make_unique<SimpleSparseAccessorScene>(iCanvas); //
     });                                                            //
+  // Simple Texture Scene (glTF)
+  _samples["SimpleTextureGLTFScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<SimpleTextureScene>(iCanvas); //
+                      });                                                     //
   // Triangle Scene (glTF)
   _samples["TriangleGLTFScene"]
     = std::make_tuple(true,                                              //
