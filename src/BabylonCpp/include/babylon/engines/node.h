@@ -75,7 +75,8 @@ public:
    * @param name the name and id to be given to this node
    * @param scene the scene this node will be added to
    */
-  Node(const std::string& name, Scene* scene = nullptr);
+  Node(const std::string& name, Scene* scene = nullptr,
+       bool addToRootNodes = true);
   virtual ~Node() override;
 
   template <typename Derived>
@@ -482,6 +483,7 @@ public:
 
   int _currentRenderId;
   std::string parentId;
+  int _childUpdateId;
   std::string _waitingParentId;
 
   /** Hidden */

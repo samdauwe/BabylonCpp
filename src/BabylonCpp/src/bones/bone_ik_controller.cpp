@@ -57,7 +57,7 @@ BoneIKController::BoneIKController(
     }
   }
 
-  if (_bone1->length) {
+  if (_bone1->length > 0.f) {
 
     auto boneScale1 = *_bone1->getScale();
     auto boneScale2 = *_bone2->getScale();

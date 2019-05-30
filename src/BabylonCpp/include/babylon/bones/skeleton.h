@@ -1,14 +1,15 @@
 #ifndef BABYLON_BONES_SKELETON_H
 #define BABYLON_BONES_SKELETON_H
 
-#include <unordered_map>
 #include <nlohmann/json_fwd.hpp>
+#include <unordered_map>
 
 #include <babylon/animations/animation_range.h>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
+#include <babylon/misc/iinspectable.h>
 #include <babylon/tools/observable.h>
 
 using json = nlohmann::json;
@@ -20,11 +21,14 @@ class Animatable;
 struct AnimationPropertiesOverride;
 class Bone;
 class IAnimatable;
+class RawTexture;
 class Scene;
 class Skeleton;
-using IAnimatablePtr = std::shared_ptr<IAnimatable>;
-using BonePtr        = std::shared_ptr<Bone>;
-using SkeletonPtr    = std::shared_ptr<Skeleton>;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using IAnimatablePtr  = std::shared_ptr<IAnimatable>;
+using BonePtr         = std::shared_ptr<Bone>;
+using RawTexturePtr   = std::shared_ptr<RawTexture>;
+using SkeletonPtr     = std::shared_ptr<Skeleton>;
 
 /**
  * @brief Class used to handle skinning animations.
@@ -48,6 +52,18 @@ public:
 
   void addToScene(const SkeletonPtr& newSkeleton);
 
+  /**
+   * @brief Gets the current object class name.
+   * @return the class name
+   */
+  const std::string getClassName() const;
+
+  /**
+   * @brief Returns an array containing the root bones.
+   * @returns an array containing the root bones
+   */
+  std::vector<BonePtr> getChildren() const;
+
   /** Members **/
 
   /**
@@ -58,6 +74,13 @@ public:
    * @returns a Float32Array containing matrices data
    */
   Float32Array& getTransformMatrices(AbstractMesh* mesh);
+
+  /**
+   * @brief Gets the list of transform matrices to send to shaders inside a
+   * texture (one matrix per bone).
+   * @returns a raw texture containing the data
+   */
+  RawTexturePtr& getTransformMatrixTexture();
 
   /**
    * @brief Gets the current hosting scene.
@@ -144,10 +167,6 @@ public:
   void _markAsDirty();
   void _registerMeshWithPoseMatrix(AbstractMesh* mesh);
   void _unregisterMeshWithPoseMatrix(AbstractMesh* mesh);
-  void _computeTransformMatrices(Float32Array& targetMatrix);
-  void _computeTransformMatrices(Float32Array& targetMatrix,
-                                 const Matrix& initialSkinMatrix,
-                                 bool initialSkinMatrixSet = true);
 
   /**
    * @brief Build all resources required to render a skeleton.
@@ -165,7 +184,7 @@ public:
   /**
    * @brief Clone the current skeleton.
    * @param name defines the name of the new skeleton
-   * @param id defines the id of the enw skeleton
+   * @param id defines the id of the new skeleton
    * @returns the new skeleton
    */
   std::unique_ptr<Skeleton> clone(const std::string& name,
@@ -228,6 +247,22 @@ protected:
   Skeleton(const std::string& name, const std::string& id, Scene* scene);
 
   /**
+   * @brief Gets a boolean indicating that bone matrices should be stored as a
+   * texture instead of using shader uniforms (default is true). Please note
+   * that this option is not available when needInitialSkinMatrix === true or if
+   * the hardware does not support it
+   */
+  bool get_useTextureToStoreBoneMatrices() const;
+
+  /**
+   * @brief Sets a boolean indicating that bone matrices should be stored as a
+   * texture instead of using shader uniforms (default is true). Please note
+   * that this option is not available when needInitialSkinMatrix === true or if
+   * the hardware does not support it
+   */
+  void set_useTextureToStoreBoneMatrices(bool value);
+
+  /**
    * @brief Gets the animation properties override.
    */
   AnimationPropertiesOverride*& get_animationPropertiesOverride();
@@ -238,31 +273,61 @@ protected:
   void
   set_animationPropertiesOverride(AnimationPropertiesOverride* const& value);
 
+  /**
+   * @brief Gets a boolean indicating that the skeleton effectively stores
+   * matrices into a texture.
+   */
+  bool get_isUsingTextureForMatrices() const;
+
+  /**
+   * @brief Gets the unique ID of this skeleton.
+   */
+  size_t get_uniqueId() const;
+
 private:
   float _getHighestAnimationFrame();
+  void _computeTransformMatrices(Float32Array& targetMatrix,
+                                 const std::optional<Matrix>& initialSkinMatrix
+                                 = std::nullopt);
   void _sortBones(unsigned int index, std::vector<BonePtr>& bones,
                   std::vector<bool>& visited);
 
 public:
   /**
-   * Gets the list of child bones
+   * Defines the list of child bones
    */
   std::vector<BonePtr> bones;
 
   /**
-   * Gets an estimate of the dimension of the skeleton at rest
+   * Defines an estimate of the dimension of the skeleton at rest
    */
   std::unique_ptr<Vector3> dimensionsAtRest;
 
   /**
-   * Gets a boolean indicating if the root matrix is provided by meshes or by
+   * Defines a boolean indicating if the root matrix is provided by meshes or by
    * the current skeleton (this is the default value)
    */
   bool needInitialSkinMatrix;
 
+  /**
+   * Defines a mesh that override the matrix used to get the world matrix (null
+   * by default).
+   */
+  AbstractMeshPtr overrideMesh;
+
+  /**
+   * Gets the list of animations attached to this skeleton
+   */
   std::vector<Animation*> animations;
+
   std::string name;
   std::string id;
+
+  /** Hidden */
+  size_t _numBonesWithLinkedTransformNode;
+
+  /** Hidden */
+  std::optional<bool> _hasWaitingData;
 
   /**
    * Specifies if the skeleton should be serialized
@@ -270,9 +335,23 @@ public:
   bool doNotSerialize;
 
   /**
+   * Gets or sets a boolean indicating that bone matrices should be stored as a
+   * texture instead of using shader uniforms (default is true). Please note
+   * that this option is not available when needInitialSkinMatrix === true or if
+   * the hardware does not support it
+   */
+  Property<Skeleton, bool> useTextureToStoreBoneMatrices;
+
+  /**
    * Animation properties override
    */
   Property<Skeleton, AnimationPropertiesOverride*> animationPropertiesOverride;
+
+  /**
+   * List of inspectable custom properties (used by the Inspector)
+   * @see https://doc.babylonjs.com/how_to/debug_layer#extensibility
+   */
+  std::vector<IInspectable> inspectableCustomProperties;
 
   // Events
   /**
@@ -280,16 +359,31 @@ public:
    */
   Observable<Skeleton> onBeforeComputeObservable;
 
+  /**
+   * Gets a boolean indicating that the skeleton effectively stores matrices
+   * into a texture.
+   */
+  ReadOnlyProperty<Skeleton, bool> isUsingTextureForMatrices;
+
+  /**
+   * Gets the unique ID of this skeleton.
+   */
+  ReadOnlyProperty<Skeleton, size_t> uniqueId;
+
 private:
   Scene* _scene;
   bool _isDirty;
   Float32Array _transformMatrices;
+  RawTexturePtr _transformMatrixTexture;
   std::vector<AbstractMesh*> _meshesWithPoseMatrix;
   std::vector<IAnimatablePtr> _animatables;
   Matrix _identity;
   AbstractMesh* _synchronizedWithMesh;
   std::unordered_map<std::string, AnimationRange> _ranges;
   int _lastAbsoluteTransformsUpdateId;
+  bool _canUseTextureForBones;
+  size_t _uniqueId;
+  bool _useTextureToStoreBoneMatrices;
   AnimationPropertiesOverride* _animationPropertiesOverride;
 
 }; // end of class Bone

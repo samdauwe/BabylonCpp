@@ -37,12 +37,13 @@ std::function<NodePtr()> Node::Construct(const std::string& type,
   };
 }
 
-Node::Node(const std::string& iName, Scene* scene)
+Node::Node(const std::string& iName, Scene* scene, bool /*addToRootNodes*/)
     : name{iName}
     , id{iName}
     , doNotSerialize{false}
     , _isDisposed{false}
     , _currentRenderId{-1}
+    , _childUpdateId{-1}
     , _worldMatrix{Matrix::Identity()}
     , _worldMatrixDeterminant{0.f}
     , animationPropertiesOverride{this, &Node::get_animationPropertiesOverride,

@@ -33,6 +33,12 @@ public:
   /** Members **/
 
   /**
+   * @brief Gets the current object class name.
+   * @return the class name
+   */
+  const std::string getClassName() const override;
+
+  /**
    * @brief Gets the parent skeleton.
    * @returns a skeleton
    */
@@ -43,6 +49,12 @@ public:
    * @returns a bone or null if the bone is the root of the bone hierarchy
    */
   Bone* getParent() const;
+
+  /**
+   * @brief Returns an array containing the root bones.
+   * @returns an array containing the root bones
+   */
+  std::vector<Bone*>& getChildren();
 
   /**
    * @brief Sets the parent bone.
@@ -552,9 +564,13 @@ public:
    */
   std::optional<int> _index;
 
-  /**
-   * Hidden
-   */
+  /** Hidden  */
+  TransformNodePtr _linkedTransformNode;
+
+  /** Hidden  */
+  std::string _waitingTransformNodeId;
+
+  /** Hidden  */
   Property<Bone, Matrix> _matrix;
 
   /**

@@ -554,6 +554,8 @@ public:
   // Cache
   /** Hidden */
   std::unique_ptr<Matrix> _poseMatrix;
+  /** Hidden */
+  Matrix _localMatrix;
 
   /**
    * Gets or set the node position (default is (0.0, 0.0, 0.0))

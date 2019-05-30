@@ -14,18 +14,18 @@ class AbstractMesh;
 class Bone;
 
 struct BABYLON_SHARED_EXPORT BoneLookControllerOptions {
-  std::optional<float> maxYaw;
-  std::optional<float> minYaw;
-  std::optional<float> maxPitch;
-  std::optional<float> minPitch;
-  std::optional<float> slerpAmount;
-  std::optional<Vector3> upAxis;
-  std::optional<Space> upAxisSpace;
-  std::optional<Vector3> yawAxis;
-  std::optional<Vector3> pitchAxis;
-  std::optional<float> adjustYaw;
-  std::optional<float> adjustPitch;
-  std::optional<float> adjustRoll;
+  std::optional<float> maxYaw      = std::nullopt;
+  std::optional<float> minYaw      = std::nullopt;
+  std::optional<float> maxPitch    = std::nullopt;
+  std::optional<float> minPitch    = std::nullopt;
+  std::optional<float> slerpAmount = std::nullopt;
+  std::optional<Vector3> upAxis    = std::nullopt;
+  std::optional<Space> upAxisSpace = std::nullopt;
+  std::optional<Vector3> yawAxis   = std::nullopt;
+  std::optional<Vector3> pitchAxis = std::nullopt;
+  std::optional<float> adjustYaw   = std::nullopt;
+  std::optional<float> adjustPitch = std::nullopt;
+  std::optional<float> adjustRoll  = std::nullopt;
 }; // end of struct BoneLookControllerOptions
 
 /**
@@ -41,7 +41,7 @@ public:
    * @param mesh the mesh that the bone belongs to
    * @param bone the bone that will be looking to the target
    * @param target the target Vector3 to look at
-   * @param settings optional settings:
+   * @param options optional settings:
    * * maxYaw: the maximum angle the bone will yaw to
    * * minYaw: the minimum angle the bone will yaw to
    * * maxPitch: the maximum angle the bone will pitch to
@@ -49,8 +49,8 @@ public:
    * * slerpAmount: set the between 0 and 1 to make the bone slerp to the
    *target.
    * * upAxis: the up axis of the coordinate system
-   * * upAxisSpace: the space that the up axis is in - BABYLON.Space.BONE,
-   *BABYLON.Space.LOCAL (default), or BABYLON.Space.WORLD.
+   * * upAxisSpace: the space that the up axis is in - Space.BONE, Space.LOCAL
+   *(default), or Space.WORLD.
    * * yawAxis: set yawAxis if the bone does not yaw on the y axis
    * * pitchAxis: set pitchAxis if the bone does not pitch on the x axis
    * * adjustYaw: used to make an adjustment to the yaw of the bone
@@ -136,8 +136,8 @@ public:
   Vector3 upAxis;
 
   /**
-   * The space that the up axis is in - BABYLON.Space.BONE, BABYLON.Space.LOCAL
-   * (default), or BABYLON.Space.WORLD
+   * The space that the up axis is in - Space.BONE, Space.LOCAL (default), or
+   * Space.WORLD
    */
   Space upAxisSpace;
 

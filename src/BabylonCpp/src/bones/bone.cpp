@@ -18,9 +18,10 @@ Bone::Bone(const std::string& iName, Skeleton* skeleton, Bone* parentBone,
            const std::optional<Matrix>& localMatrix,
            const std::optional<Matrix>& restPose,
            const std::optional<Matrix>& baseMatrix, std::optional<int> index)
-    : Node{iName, skeleton->getScene()}
+    : Node{iName, skeleton->getScene(), false}
     , length{-1}
     , _index{index}
+    , _linkedTransformNode{nullptr}
     , _matrix{this, &Bone::get__matrix, &Bone::set__matrix}
     , position{this, &Bone::get_position, &Bone::set_position}
     , rotation{this, &Bone::get_rotation, &Bone::set_rotation}
@@ -75,6 +76,11 @@ void Bone::set__matrix(const Matrix& value)
   _needToDecompose = true;
 }
 
+const std::string Bone::getClassName() const
+{
+  return "Bone";
+}
+
 Skeleton* Bone::getSkeleton() const
 {
   return _skeleton;
@@ -83,6 +89,11 @@ Skeleton* Bone::getSkeleton() const
 Bone* Bone::getParent() const
 {
   return _parent;
+}
+
+std::vector<Bone*>& Bone::getChildren()
+{
+  return children;
 }
 
 void Bone::setParent(Bone* iParent, bool updateDifferenceMatrix)
@@ -154,8 +165,17 @@ const Matrix& Bone::getAbsoluteTransform() const
   return _absoluteTransform;
 }
 
-void Bone::linkTransformNode(const TransformNodePtr& /*transformNode*/)
+void Bone::linkTransformNode(const TransformNodePtr& transformNode)
 {
+  if (_linkedTransformNode) {
+    --_skeleton->_numBonesWithLinkedTransformNode;
+  }
+
+  _linkedTransformNode = transformNode;
+
+  if (_linkedTransformNode) {
+    ++_skeleton->_numBonesWithLinkedTransformNode;
+  }
 }
 
 Vector3& Bone::get_position()
@@ -287,7 +307,7 @@ void Bone::_updateDifferenceMatrix(const std::optional<Matrix>& rootMatrix,
 Bone& Bone::markAsDirty(const std::string& /*property*/)
 {
   ++_currentRenderId;
-  ++_childRenderId;
+  ++_childUpdateId;
   _skeleton->_markAsDirty();
 
   return *this;
@@ -439,6 +459,7 @@ void Bone::setPosition(const Vector3& iPosition, Space space,
   else {
 
     std::optional<Matrix> wm = std::nullopt;
+
     // mesh.getWorldMatrix() needs to be called before
     // skeleton.computeAbsoluteTransforms()
     if (mesh) {
@@ -487,7 +508,6 @@ void Bone::scale(float x, float y, float z, bool scaleChildren)
 
   for (auto& child : children) {
     auto& cm = child->getLocalMatrix();
-    cm.multiplyToRef(scaleMat, cm);
     cm.multiplyToRef(scaleMat, cm);
     cm.multiplyAtIndex(12, x);
     cm.multiplyAtIndex(13, y);
@@ -726,7 +746,6 @@ void Bone::getPositionToRef(Vector3& result, Space space,
     result.z        = lmM[14];
   }
   else {
-
     std::optional<Matrix> wm = std::nullopt;
     // mesh.getWorldMatrix() needs to be called before
     // skeleton.computeAbsoluteTransforms()
@@ -802,6 +821,7 @@ void Bone::getDirectionToRef(const Vector3& localAxis, Vector3& result,
                              AbstractMesh* mesh) const
 {
   std::optional<Matrix> wm = std::nullopt;
+
   // mesh.getWorldMatrix() needs to be called before
   // skeleton.computeAbsoluteTransforms()
   if (mesh) {
@@ -925,6 +945,7 @@ void Bone::getAbsolutePositionFromLocalToRef(const Vector3& iPosition,
                                              Vector3& result) const
 {
   std::optional<Matrix> wm = std::nullopt;
+
   // mesh.getWorldMatrix() needs to be called before
   // skeleton.computeAbsoluteTransforms()
   if (mesh) {
@@ -961,6 +982,7 @@ void Bone::getLocalPositionFromAbsoluteToRef(const Vector3& iPosition,
                                              Vector3& result) const
 {
   std::optional<Matrix> wm = std::nullopt;
+
   // mesh.getWorldMatrix() needs to be called before
   // skeleton.computeAbsoluteTransforms()
   if (mesh) {

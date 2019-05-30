@@ -5,8 +5,10 @@
 #include <babylon/bones/bone.h>
 #include <babylon/core/json_util.h>
 #include <babylon/core/logging.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
+#include <babylon/materials/textures/raw_texture.h>
 #include <babylon/math/tmp.h>
 #include <babylon/meshes/abstract_mesh.h>
 
@@ -15,21 +17,42 @@ namespace BABYLON {
 Skeleton::Skeleton(const std::string& iName, const std::string& iId,
                    Scene* scene)
     : needInitialSkinMatrix{false}
+    , overrideMesh{nullptr}
     , name{iName}
     , id{iId}
+    , _numBonesWithLinkedTransformNode{0}
+    , _hasWaitingData{std::nullopt}
     , doNotSerialize{false}
+    , useTextureToStoreBoneMatrices{this,
+                                    &Skeleton::
+                                      get_useTextureToStoreBoneMatrices,
+                                    &Skeleton::
+                                      set_useTextureToStoreBoneMatrices}
     , animationPropertiesOverride{this,
                                   &Skeleton::get_animationPropertiesOverride,
                                   &Skeleton::set_animationPropertiesOverride}
-    , _scene{scene ? scene : Engine::LastCreatedScene()}
+    , isUsingTextureForMatrices{this, &Skeleton::get_isUsingTextureForMatrices}
+    , uniqueId{this, &Skeleton::get_uniqueId}
     , _isDirty{true}
+    , _transformMatrixTexture{nullptr}
     , _identity{Matrix::Identity()}
     , _lastAbsoluteTransformsUpdateId{-1}
+    , _canUseTextureForBones{false}
+    , _uniqueId{0}
+    , _useTextureToStoreBoneMatrices{true}
     , _animationPropertiesOverride{nullptr}
 {
   bones.clear();
+
+  _scene    = scene ? scene : Engine::LastCreatedScene();
+  _uniqueId = _scene->getUniqueId();
+
   // make sure it will recalculate the matrix next time prepare is called.
   _isDirty = true;
+
+  const auto& engineCaps = _scene->getEngine()->getCaps();
+  _canUseTextureForBones
+    = engineCaps.textureFloat && engineCaps.maxVertexTextureImageUnits > 0;
 }
 
 Skeleton::~Skeleton()
@@ -46,6 +69,33 @@ void Skeleton::addToScene(const SkeletonPtr& newSkeleton)
   _scene->skeletons.emplace_back(newSkeleton);
 }
 
+const std::string Skeleton::getClassName() const
+{
+  return "Skeleton";
+}
+
+std::vector<BonePtr> Skeleton::getChildren() const
+{
+  std::vector<BonePtr> children;
+  for (const auto& b : bones) {
+    if (!b->getParent()) {
+      children.emplace_back(b);
+    }
+  }
+  return children;
+}
+
+bool Skeleton::get_useTextureToStoreBoneMatrices() const
+{
+  return _useTextureToStoreBoneMatrices;
+}
+
+void Skeleton::set_useTextureToStoreBoneMatrices(bool value)
+{
+  _useTextureToStoreBoneMatrices = value;
+  _markAsDirty();
+}
+
 AnimationPropertiesOverride*& Skeleton::get_animationPropertiesOverride()
 {
   if (!_animationPropertiesOverride) {
@@ -60,6 +110,17 @@ void Skeleton ::set_animationPropertiesOverride(
   _animationPropertiesOverride = value;
 }
 
+bool Skeleton::get_isUsingTextureForMatrices() const
+{
+  return useTextureToStoreBoneMatrices && _canUseTextureForBones
+         && !needInitialSkinMatrix;
+}
+
+size_t Skeleton::get_uniqueId() const
+{
+  return _uniqueId;
+}
+
 // Members
 Float32Array& Skeleton::getTransformMatrices(AbstractMesh* mesh)
 {
@@ -72,6 +133,11 @@ Float32Array& Skeleton::getTransformMatrices(AbstractMesh* mesh)
   }
 
   return _transformMatrices;
+}
+
+RawTexturePtr& Skeleton::getTransformMatrixTexture()
+{
+  return _transformMatrixTexture;
 }
 
 Scene* Skeleton::getScene()
@@ -192,15 +258,14 @@ bool Skeleton::copyAnimationRange(Skeleton* source, const std::string& _name,
   for (auto& bone : bones) {
     if (stl_util::contains(boneDict, bone->name)) {
       ret = ret
-            && bone->copyAnimationRange(boneDict[bone->name], _name,
-                                        static_cast<int>(frameOffset),
-                                        rescaleAsRequired, skelDimensionsRatio,
-                                        hasSkelDimensionsRatio);
+            && bone->copyAnimationRange(
+              boneDict[bone->name], _name, static_cast<int>(frameOffset),
+              rescaleAsRequired, skelDimensionsRatio, hasSkelDimensionsRatio);
     }
     else {
       BABYLON_LOGF_WARN(
         "Skeleton", "copyAnimationRange: not same rig, missing source bone %s",
-        bone->name.c_str());
+        bone->name.c_str())
       ret = false;
     }
   }
@@ -268,19 +333,14 @@ void Skeleton::_unregisterMeshWithPoseMatrix(AbstractMesh* mesh)
   stl_util::erase(_meshesWithPoseMatrix, mesh);
 }
 
-void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix)
-{
-  _computeTransformMatrices(targetMatrix, Matrix(), false);
-}
-
-void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
-                                         const Matrix& initialSkinMatrix,
-                                         bool initialSkinMatrixSet)
+void Skeleton::_computeTransformMatrices(
+  Float32Array& targetMatrix, const std::optional<Matrix>& initialSkinMatrix)
 {
   onBeforeComputeObservable.notifyObservers(this);
 
   unsigned int index = 0;
   for (const auto& bone : bones) {
+    ++bone->_childUpdateId;
     auto parentBone = bone->getParent();
 
     if (parentBone) {
@@ -288,8 +348,8 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
                                            bone->getWorldMatrix());
     }
     else {
-      if (initialSkinMatrixSet) {
-        bone->getLocalMatrix().multiplyToRef(initialSkinMatrix,
+      if (initialSkinMatrix.has_value()) {
+        bone->getLocalMatrix().multiplyToRef(*initialSkinMatrix,
                                              bone->getWorldMatrix());
       }
       else {
@@ -313,6 +373,18 @@ void Skeleton::_computeTransformMatrices(Float32Array& targetMatrix,
 
 void Skeleton::prepare()
 {
+  // Update the local matrix of bones with linked transform nodes.
+  if (_numBonesWithLinkedTransformNode > 0) {
+    for (const auto& bone : bones) {
+      if (bone->_linkedTransformNode) {
+        // Computing the world matrix also computes the local matrix.
+        bone->_linkedTransformNode->computeWorldMatrix();
+        bone->_matrix = bone->_linkedTransformNode->_localMatrix;
+        bone->markAsDirty();
+      }
+    }
+  }
+
   if (!_isDirty) {
     return;
   }
@@ -345,9 +417,24 @@ void Skeleton::prepare()
   else {
     if (_transformMatrices.size() != 16 * (bones.size() + 1)) {
       _transformMatrices.resize(16 * (bones.size() + 1));
+
+      if (isUsingTextureForMatrices) {
+        if (_transformMatrixTexture) {
+          _transformMatrixTexture->dispose();
+        }
+
+        _transformMatrixTexture = RawTexture::CreateRGBATexture(
+          _transformMatrices, static_cast<int>((bones.size() + 1) * 4), 1,
+          _scene, false, false, Constants::TEXTURE_NEAREST_SAMPLINGMODE,
+          Constants::TEXTURETYPE_FLOAT);
+      }
     }
 
     _computeTransformMatrices(_transformMatrices);
+
+    if (isUsingTextureForMatrices && _transformMatrixTexture) {
+      _transformMatrixTexture->update(_transformMatrices);
+    }
   }
 
   _isDirty = false;
@@ -399,8 +486,8 @@ std::unique_ptr<Skeleton> Skeleton::clone(const std::string& /*iName*/,
 
 void Skeleton::enableBlending(float blendingSpeed)
 {
-  for (auto& bone : bones) {
-    for (auto& animation : bone->animations) {
+  for (const auto& bone : bones) {
+    for (const auto& animation : bone->animations) {
       animation->enableBlending = true;
       animation->blendingSpeed  = blendingSpeed;
     }
@@ -417,6 +504,11 @@ void Skeleton::dispose(bool /*doNotRecurse*/,
 
   // Remove from scene
   getScene()->removeSkeleton(this);
+
+  if (_transformMatrixTexture) {
+    _transformMatrixTexture->dispose();
+    _transformMatrixTexture = nullptr;
+  }
 }
 
 json Skeleton::serialize() const
@@ -429,8 +521,7 @@ SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
   auto skeleton = Skeleton::New(
     json_util::get_string(parsedSkeleton, "name"),
     std::to_string(json_util::get_number(parsedSkeleton, "id", -1)), scene);
-  if (json_util::has_key(parsedSkeleton, "dimensionsAtRest")
-      && !json_util::is_null(parsedSkeleton["dimensionsAtRest"])) {
+  if (json_util::has_valid_key_value(parsedSkeleton, "dimensionsAtRest")) {
     skeleton->dimensionsAtRest = std::make_unique<Vector3>(Vector3::FromArray(
       json_util::get_array<float>(parsedSkeleton, "dimensionsAtRest")));
   }
@@ -458,24 +549,26 @@ SkeletonPtr Skeleton::Parse(const json& parsedSkeleton, Scene* scene)
       Matrix::FromArray(json_util::get_array<float>(parsedBone, "matrix")),
       rest);
 
-    if (json_util::has_key(parsedBone, "id")
-        && !json_util::is_null(parsedBone["id"])) {
+    if (json_util::has_valid_key_value(parsedBone, "id")) {
       bone->id = json_util::get_string(parsedBone, "id");
     }
 
-    if (json_util::has_key(parsedBone, "length")
-        && !json_util::is_null(parsedBone["length"])) {
+    if (json_util::has_valid_key_value(parsedBone, "length")) {
       bone->length = json_util::get_number<float>(parsedBone, "length");
     }
 
-    if (json_util::has_key(parsedBone, "metadata")
-        && !json_util::is_null(parsedBone["metadata"])) {
+    if (json_util::has_valid_key_value(parsedBone, "metadata")) {
       bone->metadata = parsedBone["metadata"];
     }
 
-    if (json_util::has_key(parsedBone, "animation")
-        && !json_util::is_null(parsedBone["animation"])) {
+    if (json_util::has_valid_key_value(parsedBone, "animation")) {
       bone->animations.emplace_back(Animation::Parse(parsedBone["animation"]));
+    }
+
+    if (json_util::has_valid_key_value(parsedBone, "linkedTransformNodeId")) {
+      skeleton->_hasWaitingData = true;
+      bone->_waitingTransformNodeId
+        = json_util::get_string(parsedBone, "linkedTransformNodeId");
     }
   }
 

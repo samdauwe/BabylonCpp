@@ -17,13 +17,15 @@ std::unique_ptr<Vector3> TransformNode::_lookAtVectorCache
 std::unique_ptr<Quaternion> TransformNode::_rotationAxisCache
   = std::make_unique<Quaternion>();
 
-TransformNode::TransformNode(const std::string& name, Scene* scene, bool isPure)
-    : Node{name, scene}
+TransformNode::TransformNode(const std::string& iName, Scene* scene,
+                             bool isPure)
+    : Node{iName, scene}
     , billboardMode{TransformNode::BILLBOARDMODE_NONE}
     , scalingDeterminant{1.f}
     , infiniteDistance{false}
     , ignoreNonUniformScaling{false}
     , _poseMatrix{std::make_unique<Matrix>(Matrix::Zero())}
+    , _localMatrix{Matrix::Zero()}
     , position{this, &TransformNode::get_position, &TransformNode::set_position}
     , rotation{this, &TransformNode::get_rotation, &TransformNode::set_rotation}
     , scaling{this, &TransformNode::get_scaling, &TransformNode::set_scaling}
