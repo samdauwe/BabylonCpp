@@ -5005,10 +5005,11 @@ void Scene::markAllMaterialsAsDirty(
   }
 }
 
-IFileRequest Scene::_loadFile(
-  const std::string& /*url*/,
-  const std::function<void(std::variant<std::string, ArrayBuffer>&,
-                           const std::string&)>& /*onSuccess*/)
+IFileRequest
+Scene::_loadFile(const std::string& /*url*/,
+                 const std::function<
+                   void(const std::variant<std::string, ArrayBuffer>& /*data*/,
+                        const std::string&)>& /*onSuccess*/)
 {
   return IFileRequest();
 }

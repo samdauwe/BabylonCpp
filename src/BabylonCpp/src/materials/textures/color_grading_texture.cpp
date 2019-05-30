@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/core/string.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/effect.h>
@@ -26,9 +27,9 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
   hasAlpha       = false;
   isCube         = false;
   is3D           = _engine->webGLVersion() > 1.f;
-  wrapU          = TextureConstants::CLAMP_ADDRESSMODE;
-  wrapV          = TextureConstants::CLAMP_ADDRESSMODE;
-  wrapR          = TextureConstants::CLAMP_ADDRESSMODE;
+  wrapU          = Constants::TEXTURE_CLAMP_ADDRESSMODE;
+  wrapV          = Constants::TEXTURE_CLAMP_ADDRESSMODE;
+  wrapR          = Constants::TEXTURE_CLAMP_ADDRESSMODE;
 
   anisotropicFilteringLevel = 1;
 
@@ -39,7 +40,7 @@ ColorGradingTexture::ColorGradingTexture(const std::string& iUrl, Scene* scene)
       loadTexture();
     }
     else {
-      delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
+      delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
     }
   }
 }
@@ -58,24 +59,24 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
   InternalTexturePtr texture = nullptr;
   if (_engine->webGLVersion() == 1.f) {
     texture = _engine->createRawTexture(
-      Uint8Array(), 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
+      Uint8Array(), 1, 1, Constants::TEXTUREFORMAT_RGBA, false, false,
       TextureConstants::BILINEAR_SAMPLINGMODE);
   }
-#if 0
   else {
     texture = _engine->createRawTexture3D(
-      Uint8Array(), 1, 1, 1, EngineConstants::TEXTUREFORMAT_RGBA, false, false,
+      Uint8Array(), 1, 1, 1, Constants::TEXTUREFORMAT_RGBA, false, false,
       TextureConstants::BILINEAR_SAMPLINGMODE);
   }
 
   _texture = texture;
 
-  const auto callback = [&](Variant<std::string, ArrayBuffer>& iText) {
-    if (!iText.is<std::string>()) {
+  const auto callback = [&](const std::variant<std::string, ArrayBuffer>& iText,
+                            const std::string & /*onSuccess*/) -> void {
+    if (!std::holds_alternative<std::string>(iText)) {
       return;
     }
 
-    auto text = iText.get<std::string>();
+    auto text = std::get<std::string>(iText);
 
     Uint8Array data;
     Float32Array tempData;
@@ -107,9 +108,9 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
       }
 
       if (size != 0) {
-        int r = std::max(std::stoi(words[0]), 0);
-        int g = std::max(std::stoi(words[1]), 0);
-        int b = std::max(std::stoi(words[2]), 0);
+        const auto r = std::max(std::stoi(words[0]), 0);
+        const auto g = std::max(std::stoi(words[1]), 0);
+        const auto b = std::max(std::stoi(words[2]), 0);
 
         maxColor = std::max(r, maxColor);
         maxColor = std::max(g, maxColor);
@@ -125,13 +126,13 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
           tempData[pixelStorageIndex + 2] = static_cast<float>(b);
         }
 
-        ++pixelIndexSlice;
-        if (pixelIndexSlice % size == 0) {
-          ++pixelIndexH;
-          pixelIndexSlice = 0;
-          if (pixelIndexH % size == 0) {
+        ++pixelIndexH;
+        if (pixelIndexH % size == 0) {
+          ++pixelIndexSlice;
+          pixelIndexH = 0;
+          if (pixelIndexSlice % size == 0) {
             ++pixelIndexW;
-            pixelIndexH = 0;
+            pixelIndexSlice = 0;
           }
         }
       }
@@ -143,7 +144,7 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
           data[i] = 255;
         }
         else {
-          float value = tempData[i];
+          auto value = tempData[i];
           value /= static_cast<float>(maxColor * 255);
           data[i] = static_cast<std::uint8_t>(value);
         }
@@ -153,23 +154,22 @@ InternalTexturePtr ColorGradingTexture::load3dlTexture()
     const auto _size = static_cast<int>(size);
     if (_texture->is3D) {
       _texture->updateSize(_size, _size, _size);
-      _engine->updateRawTexture3D(_texture, data,
-                                  EngineConstants::TEXTUREFORMAT_RGBA, false);
+      _engine->updateRawTexture3D(_texture, data, Constants::TEXTUREFORMAT_RGBA,
+                                  false);
     }
     else {
       _texture->updateSize(_size * _size, _size);
-      _engine->updateRawTexture(_texture, data,
-                                EngineConstants::TEXTUREFORMAT_RGBA, false);
+      _engine->updateRawTexture(_texture, data, Constants::TEXTUREFORMAT_RGBA,
+                                false);
     }
   };
-#endif
 
   auto scene = getScene();
   if (scene) {
-    // scene->_loadFile(url, callback);
+    scene->_loadFile(url, callback);
   }
   else {
-    // _engine->_loadFile(url, callback);
+    _engine->_loadFile(url, callback);
   }
 
   return _texture;
@@ -194,12 +194,12 @@ std::unique_ptr<ColorGradingTexture> ColorGradingTexture::clone() const
 
 void ColorGradingTexture::delayLoad()
 {
-  if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
+  if (delayLoadState != Constants::DELAYLOADSTATE_NOTLOADED) {
     return;
   }
 
-  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
-  _texture       = nullptr; // _getFromCache(url, true);
+  delayLoadState = Constants::DELAYLOADSTATE_LOADED;
+  _texture       = _getFromCache(url, true);
 
   if (!_texture) {
     loadTexture();

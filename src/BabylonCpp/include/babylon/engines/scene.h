@@ -1686,7 +1686,7 @@ public:
    */
   IFileRequest _loadFile(
     const std::string& url,
-    const std::function<void(std::variant<std::string, ArrayBuffer>& data,
+    const std::function<void(const std::variant<std::string, ArrayBuffer>& data,
                              const std::string& responseURL)>& onSuccess);
 
   /**

@@ -2,11 +2,13 @@
 
 #include <nlohmann/json.hpp>
 
+#include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
-#include <babylon/engines/engine_constants.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/material.h>
+#include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
 #include <babylon/tools/hdr/hdr_tools.h>
@@ -70,10 +72,23 @@ HDRCubeTexture::HDRCubeTexture(
       delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
     }
   }
+  else if (onLoad) {
+    if (_texture->isReady) {
+      Tools::SetImmediate([&onLoad]() -> void { onLoad(); });
+    }
+    else {
+      // _texture->onLoadedObservable.add(onLoad);
+    }
+  }
 }
 
 HDRCubeTexture::~HDRCubeTexture()
 {
+}
+
+const std::string HDRCubeTexture::getClassName() const
+{
+  return "HDRCubeTexture";
 }
 
 void HDRCubeTexture::set_isBlocking(bool value)
@@ -89,7 +104,8 @@ bool HDRCubeTexture::get_isBlocking() const
 void HDRCubeTexture::set_rotationY(float value)
 {
   _rotationY = value;
-  setReflectionTextureMatrix(Matrix::RotationY(_rotationY));
+  auto mat   = Matrix::RotationY(_rotationY);
+  setReflectionTextureMatrix(mat);
 }
 
 float HDRCubeTexture::get_rotationY() const
@@ -109,7 +125,7 @@ void HDRCubeTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
   _boundingBoxSize = value;
   auto scene       = getScene();
   if (scene) {
-    scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+    scene->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
   }
 }
 
@@ -250,9 +266,25 @@ Matrix* HDRCubeTexture::getReflectionTextureMatrix()
   return &_textureMatrix;
 }
 
-void HDRCubeTexture::setReflectionTextureMatrix(const Matrix& value)
+void HDRCubeTexture::setReflectionTextureMatrix(Matrix& value)
 {
   _textureMatrix = value;
+
+  if (value.updateFlag == _textureMatrix.updateFlag) {
+    return;
+  }
+
+  if (value.isIdentity() != _textureMatrix.isIdentity()) {
+    getScene()->markAllMaterialsAsDirty(
+      Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) -> bool {
+        auto it = std::find_if(mat->getActiveTextures().begin(),
+                               mat->getActiveTextures().end(),
+                               [this](const BaseTexturePtr& texture) {
+                                 return texture.get() == this;
+                               });
+        return it != mat->getActiveTextures().end();
+      });
+  }
 }
 
 HDRCubeTexture* HDRCubeTexture::Parse(const json& /*parsedTexture*/,

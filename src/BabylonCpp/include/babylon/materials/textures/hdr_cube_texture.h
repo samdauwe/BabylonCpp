@@ -29,6 +29,13 @@ public:
   }
   ~HDRCubeTexture() override;
 
+  /**
+   * @brief Get the current class name of the texture useful for serialization
+   * or dynamic coding.
+   * @returns "HDRCubeTexture"
+   */
+  const std::string getClassName() const;
+
   HDRCubeTexturePtr clone() const;
 
   /** Methods **/
@@ -46,7 +53,7 @@ public:
    * reflection.
    * @param value Define the reflection matrix to set
    */
-  void setReflectionTextureMatrix(const Matrix& value);
+  void setReflectionTextureMatrix(Matrix& value);
 
   /**
    * @brief Parses a JSON representation of an HDR Texture in order to create
