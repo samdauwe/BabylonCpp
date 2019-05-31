@@ -43,7 +43,7 @@ release_build
 /install
 
 # Not yet finished code
-src/Editor
+src/Studio
 
 # Absolete code
 src/InspectorV1

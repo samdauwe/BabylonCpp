@@ -13,7 +13,7 @@ endif()
 #                            Sub-projects                                      #
 # ============================================================================ #
 
-#### Libraries ####
+#-- Libraries --##
 set(IDE_FOLDER "")
 # - Oimo CPP
 add_subdirectory(OimoCpp)
@@ -37,6 +37,8 @@ endif()
 # - Samples
 add_subdirectory(Samples)
 
-#### Applications ####
+#-- Applications --##
 # - Sample Launcher
 add_subdirectory(SampleLauncher)
+# - Studio
+# add_subdirectory(Studio)
