@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_DYNAMIC_TEXTURE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/materials/textures/texture.h>
 
 namespace BABYLON {
@@ -35,6 +35,13 @@ public:
     return texture;
   }
   ~DynamicTexture() override;
+
+  /**
+   * @brief Get the current class name of the texture useful for serialization
+   * or dynamic coding.
+   * @returns "DynamicTexture"
+   */
+  const std::string getClassName() const;
 
   /**
    * @brief Scales the texture.
@@ -109,7 +116,7 @@ public:
 
 protected:
   /**
-   * @brief Creates a DynamicTexture
+   * @brief Creates a DynamicTexture.
    * @param name defines the name of the texture
    * @param options provides 3 alternatives for width and height of texture, a
    * canvas, object with width and height properties, number for both width and
@@ -117,15 +124,15 @@ protected:
    * @param scene defines the scene where you want the texture
    * @param generateMipMaps defines the use of MinMaps or not (default is false)
    * @param samplingMode defines the sampling mode to use (default is
-   * BABYLON.Texture.TRILINEAR_SAMPLINGMODE)
+   * Texture.TRILINEAR_SAMPLINGMODE)
    * @param format defines the texture format to use (default is
-   * BABYLON.Engine.TEXTUREFORMAT_RGBA)
+   * Engine.TEXTUREFORMAT_RGBA)
    */
   DynamicTexture(const std::string& name, const DynamicTextureOptions& options,
                  Scene* scene, bool generateMipMaps,
                  unsigned int samplingMode
-                 = TextureConstants::TRILINEAR_SAMPLINGMODE,
-                 unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+                 = Constants::TEXTURE_TRILINEAR_SAMPLINGMODE,
+                 unsigned int format = Constants::TEXTUREFORMAT_RGBA);
 
   /**
    * @brief Gets the current state of canRescale.

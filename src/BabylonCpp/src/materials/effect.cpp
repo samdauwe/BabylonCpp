@@ -1236,6 +1236,11 @@ Effect& Effect::setDirectColor4(const std::string& uniformName,
   return *this;
 }
 
+void Effect::dispose()
+{
+  _engine->_releaseEffect(this);
+}
+
 void Effect::RegisterShader(const std::string& name,
                             const std::optional<std::string>& pixelShader,
                             const std::optional<std::string>& vertexShader)

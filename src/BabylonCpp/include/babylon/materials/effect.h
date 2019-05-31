@@ -1,11 +1,11 @@
 #ifndef BABYLON_MATERIALS_EFFECT_H
 #define BABYLON_MATERIALS_EFFECT_H
 
-#include <unordered_map>
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/tools/observable.h>
 #include <babylon/tools/observer.h>
+#include <unordered_map>
 
 namespace BABYLON {
 
@@ -528,6 +528,11 @@ public:
    * @returns this effect.
    */
   Effect& setDirectColor4(const std::string& uniformName, const Color4& color4);
+
+  /**
+   * @brief Release all associated resources.
+   */
+  void dispose();
 
   // Statics
 

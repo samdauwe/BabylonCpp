@@ -66,7 +66,7 @@ void ENVTextureLoader::loadCubeData(
       if (onLoad) {
         // onLoad();
       }
-    };
+    }
   }
   else if (onError) {
     onError("Can not parse the environment file", "");
@@ -84,9 +84,9 @@ void ENVTextureLoader::loadCubeData(
 
 void ENVTextureLoader::loadData(
   const ArrayBuffer& /*data*/, const InternalTexturePtr& /*texture*/,
-  const std::function<void(int /*width*/, int /*height*/, bool /*loadMipmap*/,
-                           bool /*isCompressed*/,
-                           const std::function<void()>& done)>& /*callback*/)
+  const std::function<void(
+    int /*width*/, int /*height*/, bool /*loadMipmap*/, bool /*isCompressed*/,
+    const std::function<void()>& done, bool loadFailed)>& /*callback*/)
 {
   throw std::runtime_error(".env not supported in 2d.");
 }

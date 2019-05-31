@@ -115,11 +115,11 @@ struct BABYLON_SHARED_EXPORT IInternalTextureLoader {
    * @param texture defines the BabylonJS internal texture
    * @param callback defines the method to call once ready to upload
    */
-  virtual void loadData(
-    const ArrayBuffer& data, const InternalTexturePtr& texture,
-    const std::function<void(int width, int height, bool loadMipmap,
-                             bool isCompressed,
-                             const std::function<void()>& done)>& callback)
+  virtual void
+  loadData(const ArrayBuffer& data, const InternalTexturePtr& texture,
+           const std::function<void(
+             int width, int height, bool loadMipmap, bool isCompressed,
+             const std::function<void()>& done, bool loadFailed)>& callback)
     = 0;
 
 }; // end of struct IInternalTextureLoader

@@ -9,20 +9,20 @@ namespace BABYLON {
 
 RawTexture::RawTexture(const ArrayBufferView& data, int width, int height,
                        unsigned int iFormat, Scene* scene, bool generateMipMaps,
-                       bool invertY, unsigned int samplingMode,
+                       bool iInvertY, unsigned int iSamplingMode,
                        unsigned int iType)
-    : Texture{nullptr, scene, !generateMipMaps, invertY}
+    : Texture{nullptr, scene, !generateMipMaps, iInvertY}
     , format{iFormat}
     , type{iType}
 {
   _engine  = scene->getEngine();
   _texture = scene->getEngine()->createRawTexture(
-    data.uint8Array, width, height, format, generateMipMaps, invertY,
-    samplingMode, nullptr, iType);
+    data.uint8Array, width, height, format, generateMipMaps, iInvertY,
+    iSamplingMode, nullptr, iType);
 
   _texture = scene->getEngine()->createRawTexture(
-    data.uint8Array, width, height, iFormat, generateMipMaps, invertY,
-    samplingMode);
+    data.uint8Array, width, height, iFormat, generateMipMaps, iInvertY,
+    iSamplingMode);
 
   wrapU = TextureConstants::CLAMP_ADDRESSMODE;
   wrapV = TextureConstants::CLAMP_ADDRESSMODE;
@@ -42,61 +42,61 @@ void RawTexture::update(const ArrayBufferView& data)
 
 std::unique_ptr<RawTexture> RawTexture::CreateLuminanceTexture(
   const ArrayBufferView& data, int width, int height, Scene* scene,
-  bool generateMipMaps, bool invertY, unsigned int samplingMode)
+  bool generateMipMaps, bool iInvertY, unsigned int iSamplingMode)
 {
-  return std::make_unique<RawTexture>(
-    data, width, height, EngineConstants::TEXTUREFORMAT_LUMINANCE, scene,
-    generateMipMaps, invertY, samplingMode);
+  return std::make_unique<RawTexture>(data, width, height,
+                                      Constants::TEXTUREFORMAT_LUMINANCE, scene,
+                                      generateMipMaps, iInvertY, iSamplingMode);
 }
 
 std::unique_ptr<RawTexture> RawTexture::CreateLuminanceAlphaTexture(
   const ArrayBufferView& data, int width, int height, Scene* scene,
-  bool generateMipMaps, bool invertY, unsigned int samplingMode)
+  bool generateMipMaps, bool iInvertY, unsigned int iSamplingMode)
 {
   return std::make_unique<RawTexture>(
-    data, width, height, EngineConstants::TEXTUREFORMAT_LUMINANCE_ALPHA, scene,
-    generateMipMaps, invertY, samplingMode);
+    data, width, height, Constants::TEXTUREFORMAT_LUMINANCE_ALPHA, scene,
+    generateMipMaps, iInvertY, iSamplingMode);
 }
 
 std::unique_ptr<RawTexture>
 RawTexture::CreateAlphaTexture(const ArrayBufferView& data, int width,
                                int height, Scene* scene, bool generateMipMaps,
-                               bool invertY, unsigned int samplingMode)
+                               bool iInvertY, unsigned int iSamplingMode)
 {
-  return std::make_unique<RawTexture>(
-    data, width, height, EngineConstants::TEXTUREFORMAT_ALPHA, scene,
-    generateMipMaps, invertY, samplingMode);
+  return std::make_unique<RawTexture>(data, width, height,
+                                      Constants::TEXTUREFORMAT_ALPHA, scene,
+                                      generateMipMaps, iInvertY, iSamplingMode);
 }
 
 std::unique_ptr<RawTexture>
 RawTexture::CreateRGBTexture(const ArrayBufferView& data, int width, int height,
-                             Scene* scene, bool generateMipMaps, bool invertY,
-                             unsigned int samplingMode, unsigned int type)
+                             Scene* scene, bool generateMipMaps, bool iInvertY,
+                             unsigned int iSamplingMode, unsigned int type)
 {
   return std::make_unique<RawTexture>(
-    data, width, height, EngineConstants::TEXTUREFORMAT_RGB, scene,
-    generateMipMaps, invertY, samplingMode, type);
+    data, width, height, Constants::TEXTUREFORMAT_RGB, scene, generateMipMaps,
+    iInvertY, iSamplingMode, type);
 }
 
 std::unique_ptr<RawTexture>
 RawTexture::CreateRGBATexture(const ArrayBufferView& data, int width,
                               int height, Scene* scene, bool generateMipMaps,
-                              bool invertY, unsigned int samplingMode,
+                              bool iInvertY, unsigned int iSamplingMode,
                               unsigned int type)
 {
   return std::make_unique<RawTexture>(
-    data, width, height, EngineConstants::TEXTUREFORMAT_RGBA, scene,
-    generateMipMaps, invertY, samplingMode, type);
+    data, width, height, Constants::TEXTUREFORMAT_RGBA, scene, generateMipMaps,
+    iInvertY, iSamplingMode, type);
 }
 
 std::unique_ptr<RawTexture>
 RawTexture::CreateRTexture(const ArrayBufferView& data, int width, int height,
-                           Scene* scene, bool generateMipMaps, bool invertY,
-                           unsigned int samplingMode, unsigned int type)
+                           Scene* scene, bool generateMipMaps, bool iInvertY,
+                           unsigned int iSamplingMode, unsigned int type)
 {
   return std::make_unique<RawTexture>(
-    data, width, height, EngineConstants::TEXTUREFORMAT_R, scene,
-    generateMipMaps, invertY, samplingMode, type);
+    data, width, height, Constants::TEXTUREFORMAT_R, scene, generateMipMaps,
+    iInvertY, iSamplingMode, type);
 }
 
 } // end of namespace BABYLON

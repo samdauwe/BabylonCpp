@@ -12,8 +12,10 @@
 
 namespace BABYLON {
 
+class MirrorTexture;
 class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+using MirrorTexturePtr = std::shared_ptr<MirrorTexture>;
+using TexturePtr       = std::shared_ptr<Texture>;
 
 /**
  * @brief This represents a texture in babylon. It can be easily loaded from a
@@ -208,6 +210,14 @@ public:
                              const std::string& exception)>& onError
     = nullptr,
     unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA);
+
+  /**
+   * @brief Hidden
+   */
+  static MirrorTexturePtr
+  _CreateMirror(const std::string& name,
+                const std::variant<ISize, float>& renderTargetSize,
+                Scene* scene, bool generateMipMaps);
 
 protected:
   /**

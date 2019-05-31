@@ -133,19 +133,21 @@ void DDSTextureLoader::loadCubeData(
 void DDSTextureLoader::loadData(
   const ArrayBuffer& data, const InternalTexturePtr& texture,
   const std::function<void(int width, int height, bool loadMipmap,
-                           bool isCompressed,
-                           const std::function<void()>& done)>& callback)
+                           bool isCompressed, const std::function<void()>& done,
+                           bool loadFailed)>& callback)
 {
   auto info = DDSTools::GetDDSInfo(data);
 
   auto loadMipmap = (info.isRGB || info.isLuminance || info.mipmapCount > 1)
                     && texture->generateMipMaps
                     && ((info.width >> (info.mipmapCount - 1)) == 1);
-  callback(info.width, info.height, loadMipmap, info.isFourCC,
-           [&texture, &data, &info, &loadMipmap]() {
-             DDSTools::UploadDDSLevels(texture->getEngine(), texture, data,
-                                       info, loadMipmap, 1);
-           });
+  callback(
+    info.width, info.height, loadMipmap, info.isFourCC,
+    [&texture, &data, &info, &loadMipmap]() {
+      DDSTools::UploadDDSLevels(texture->getEngine(), texture, data, info,
+                                loadMipmap, 1);
+    },
+    false);
 }
 
 } // end of namespace BABYLON

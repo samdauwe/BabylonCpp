@@ -46,11 +46,11 @@ public:
   /**
    * Define the reflection plane we want to use. The refractionPlane is usually
    * set to the constructed refractor. It is possible to directly set the
-   * refractionPlane by directly using a BABYLON.Plane(a, b, c, d) where a, b
-   * and c give the plane normal vector (a, b, c) and d is a scalar displacement
-   * from the refractionPlane to the origin. However in all but the very
-   * simplest of situations it is more straight forward to set it to the
-   * refractor as stated in the doc.
+   * refractionPlane by directly using a Plane(a, b, c, d) where a, b and c give
+   * the plane normal vector (a, b, c) and d is a scalar displacement from the
+   * refractionPlane to the origin. However in all but the very simplest of
+   * situations it is more straight forward to set it to the refractor as stated
+   * in the doc.
    * @see https://doc.babylonjs.com/how_to/reflect#refraction
    */
   Plane refractionPlane;

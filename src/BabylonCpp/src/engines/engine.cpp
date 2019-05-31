@@ -1916,9 +1916,16 @@ unsigned int Engine::_drawMode(unsigned int fillMode)
 }
 
 // Shaders
-void Engine::_releaseEffect(const EffectPtr& effect)
+void Engine::_releaseEffect(Effect* effect)
 {
-  if (stl_util::contains(_compiledEffects, effect->_key)) {
+  bool hasEffect = false;
+  for (const auto& compiledEffectItem : _compiledEffects) {
+    if (compiledEffectItem.second.get() == effect) {
+      hasEffect = true;
+      break;
+    }
+  }
+  if (hasEffect) {
     _deleteProgram(effect->getProgram());
     _compiledEffects.erase(effect->_key);
   }
@@ -2912,7 +2919,7 @@ InternalTexturePtr Engine::createTexture(
       loader->loadData(
         std::get<ArrayBuffer>(data), texture,
         [&](int width, int height, bool loadMipmap, bool isCompressed,
-            const std::function<void()>& done) -> void {
+            const std::function<void()>& done, bool /*loadFailed*/) -> void {
           _prepareWebGLTexture(
             texture, scene, width, height, invertY, !loadMipmap, isCompressed,
             [&](

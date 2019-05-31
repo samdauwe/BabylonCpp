@@ -26,6 +26,7 @@ RefractionTexture::~RefractionTexture()
 std::unique_ptr<RefractionTexture> RefractionTexture::clone()
 {
   auto scene = getScene();
+
   if (!scene) {
     return nullptr;
   }

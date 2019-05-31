@@ -964,7 +964,7 @@ public:
   /**
    * @brief Hidden
    */
-  void _releaseEffect(const EffectPtr& effect);
+  void _releaseEffect(Effect* effect);
 
   /**
    * @brief Hidden

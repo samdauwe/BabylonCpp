@@ -44,7 +44,7 @@ void CustomProceduralTexture::_loadJson(const std::string& jsonUrl)
     catch (...) {
       BABYLON_LOG_ERROR("CustomProceduralTexture",
                         "No json or ShaderStore or DOM element found for "
-                        "CustomProceduralTexture");
+                        "CustomProceduralTexture")
     }
   };
 

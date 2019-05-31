@@ -199,7 +199,7 @@ void ProceduralTexture::reset()
     return;
   }
 
-  _engine->_releaseEffect(_effect);
+  _effect->dispose();
 }
 
 std::string ProceduralTexture::_getDefines() const

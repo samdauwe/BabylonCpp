@@ -2,6 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_MIRROR_TEXTURE_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine_constants.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/matrix.h>
@@ -74,7 +75,7 @@ protected:
    */
   MirrorTexture(const std::string& name, const std::variant<ISize, float>& size,
                 Scene* scene, bool generateMipMaps = false,
-                unsigned int type = EngineConstants::TEXTURETYPE_UNSIGNED_INT,
+                unsigned int type = Constants::TEXTURETYPE_UNSIGNED_INT,
                 unsigned int samplingMode
                 = TextureConstants::BILINEAR_SAMPLINGMODE,
                 bool generateDepthBuffer = true);
@@ -99,9 +100,9 @@ public:
   /**
    * Define the reflection plane we want to use. The mirrorPlane is usually set
    * to the constructed reflector. It is possible to directly set the
-   * mirrorPlane by directly using a BABYLON.Plane(a, b, c, d) where a, b and c
-   * give the plane normal vector (a, b, c) and d is a scalar displacement from
-   * the mirrorPlane to the origin. However in all but the very simplest of
+   * mirrorPlane by directly using a Plane(a, b, c, d) where a, b and c give the
+   * plane normal vector (a, b, c) and d is a scalar displacement from the
+   * mirrorPlane to the origin. However in all but the very simplest of
    * situations it is more straight forward to set it to the reflector as stated
    * in the doc.
    * @see https://doc.babylonjs.com/how_to/reflect#mirrors
@@ -142,6 +143,10 @@ public:
 
 private:
   Scene* scene;
+
+  Observer<ImageProcessingConfiguration>::Ptr
+    _imageProcessingConfigChangeObserver;
+
   Matrix _transformMatrix;
   Matrix _mirrorMatrix;
   Matrix _savedViewMatrix;
@@ -152,9 +157,6 @@ private:
   float _blurKernelX;
   float _blurKernelY;
   float _blurRatio;
-
-  Observer<ImageProcessingConfiguration>::Ptr
-    _imageProcessingConfigChangeObserver;
 
 }; // end of class MirrorTexture
 

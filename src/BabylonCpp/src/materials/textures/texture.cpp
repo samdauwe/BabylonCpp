@@ -538,4 +538,12 @@ TexturePtr Texture::LoadFromDataString(
                       onError, buffer, deleteBuffer, format);
 }
 
+MirrorTexturePtr
+Texture::_CreateMirror(const std::string& iName,
+                       const std::variant<ISize, float>& renderTargetSize,
+                       Scene* scene, bool generateMipMaps)
+{
+  return MirrorTexture::New(iName, renderTargetSize, scene, generateMipMaps);
+}
+
 } // end of namespace BABYLON

@@ -5,11 +5,11 @@
 
 namespace BABYLON {
 
-NoiseProceduralTexture::NoiseProceduralTexture(const std::string& name,
+NoiseProceduralTexture::NoiseProceduralTexture(const std::string& iName,
                                                int size, Scene* scene,
                                                Texture* fallbackTexture,
                                                bool generateMipMaps)
-    : ProceduralTexture(name, size, "noise",
+    : ProceduralTexture(iName, size, "noise",
                         scene ? scene : Engine::LastCreatedScene(),
                         fallbackTexture, generateMipMaps)
     , brightness{0.2f}
@@ -59,7 +59,7 @@ json NoiseProceduralTexture::serialize() const
 
 NoiseProceduralTexturePtr
 NoiseProceduralTexture::Parse(const json& /*serializationObject*/,
-                              Scene* /*scene*/, const std::string& /*rootUrl*/)
+                              Scene* /*scene*/)
 {
   return nullptr;
 }

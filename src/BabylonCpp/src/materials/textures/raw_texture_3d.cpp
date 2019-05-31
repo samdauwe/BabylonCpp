@@ -1,4 +1,4 @@
-#include <babylon/materials/textures/raw_texture_3d.h>
+﻿#include <babylon/materials/textures/raw_texture_3d.h>
 
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
@@ -8,9 +8,10 @@ namespace BABYLON {
 
 RawTexture3D::RawTexture3D(const ArrayBufferView& data, int width, int height,
                            int depth, unsigned int iFormat, Scene* scene,
-                           bool generateMipMaps, bool invertY,
-                           unsigned int samplingMode, unsigned int textureType)
-    : Texture{nullptr, scene, !generateMipMaps, invertY}, format{iFormat}
+                           bool generateMipMaps, bool iInvertY,
+                           unsigned int iSamplingMode,
+                           unsigned int iTextureType)
+    : Texture{nullptr, scene, !generateMipMaps, iInvertY}, format{iFormat}
 {
   _engine = scene->getEngine();
 
@@ -21,9 +22,9 @@ RawTexture3D::RawTexture3D(const ArrayBufferView& data, int width, int height,
                                                     iFormat,         //
                                                     generateMipMaps, //
                                                     invertY,         //
-                                                    samplingMode,    //
+                                                    iSamplingMode,   //
                                                     "",              //
-                                                    textureType      //
+                                                    iTextureType     //
   );
 
   is3D = true;

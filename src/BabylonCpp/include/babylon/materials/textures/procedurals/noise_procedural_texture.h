@@ -46,13 +46,10 @@ public:
    * texture data
    * @param parsedTexture defines parsed texture data
    * @param scene defines the current scene
-   * @param rootUrl defines the root URL containing noise procedural texture
-   * information
    * @returns a parsed NoiseProceduralTexture
    */
   static NoiseProceduralTexturePtr Parse(const json& serializationObject,
-                                         Scene* scene,
-                                         const std::string& rootUrl);
+                                         Scene* scene);
 
 protected:
   /**

@@ -15,11 +15,11 @@ namespace BABYLON {
 MirrorTexture::MirrorTexture(const std::string& iName,
                              const std::variant<ISize, float>& size,
                              Scene* iScene, bool generateMipMaps,
-                             unsigned int type, unsigned int samplingMode,
+                             unsigned int type, unsigned int iSamplingMode,
                              bool generateDepthBuffer)
 
-    : RenderTargetTexture{iName, size,  iScene,       generateMipMaps,    true,
-                          type,  false, samplingMode, generateDepthBuffer}
+    : RenderTargetTexture{iName, size,  iScene,        generateMipMaps,    true,
+                          type,  false, iSamplingMode, generateDepthBuffer}
     , mirrorPlane{Plane(0.f, 1.f, 0.f, 1.f)}
     , blurRatio{this, &MirrorTexture::get_blurRatio,
                 &MirrorTexture::set_blurRatio}
@@ -30,6 +30,7 @@ MirrorTexture::MirrorTexture(const std::string& iName,
     , blurKernelY{this, &MirrorTexture::get_blurKernelY,
                   &MirrorTexture::set_blurKernelY}
     , scene{iScene}
+    , _imageProcessingConfigChangeObserver{nullptr}
     , _transformMatrix{Matrix::Zero()}
     , _mirrorMatrix{Matrix::Zero()}
     , _savedViewMatrix{Matrix::Zero()}
@@ -67,6 +68,8 @@ MirrorTexture::MirrorTexture(const std::string& iName,
     scene->setTransformMatrix(_savedViewMatrix, scene->getProjectionMatrix());
     scene->getEngine()->cullBackFaces = true;
     scene->_mirroredCameraPosition.reset(nullptr);
+
+    scene->clipPlane = std::nullopt;
   });
 }
 
@@ -171,8 +174,8 @@ void MirrorTexture::_preparePostProcesses()
     auto engine = getScene()->getEngine();
 
     auto iTextureType = engine->getCaps().textureFloatRender ?
-                          EngineConstants::TEXTURETYPE_FLOAT :
-                          EngineConstants::TEXTURETYPE_HALF_FLOAT;
+                          Constants::TEXTURETYPE_FLOAT :
+                          Constants::TEXTURETYPE_HALF_FLOAT;
 
     _blurX = BlurPostProcess::New(
       "horizontal blur", Vector2(1.f, 0.f), _blurKernelX, _blurRatio, nullptr,

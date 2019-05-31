@@ -13,8 +13,8 @@ namespace BABYLON {
 DynamicTexture::DynamicTexture(const std::string& iName,
                                const DynamicTextureOptions& options,
                                Scene* scene, bool generateMipMaps,
-                               unsigned int samplingMode, unsigned int format)
-    : Texture{nullptr, scene,   !generateMipMaps, true,  samplingMode,
+                               unsigned int iSamplingMode, unsigned int format)
+    : Texture{nullptr, scene,   !generateMipMaps, true,  iSamplingMode,
               nullptr, nullptr, std::nullopt,     false, format}
     , canRescale{this, &DynamicTexture::get_canRescale}
     , _generateMipMaps{generateMipMaps}
@@ -48,6 +48,11 @@ DynamicTexture::~DynamicTexture()
 {
 }
 
+const std::string DynamicTexture::getClassName() const
+{
+  return "DynamicTexture";
+}
+
 bool DynamicTexture::get_canRescale() const
 {
   return true;
@@ -61,7 +66,7 @@ void DynamicTexture::_recreate(const ISize& textureSize)
   releaseInternalTexture();
 
   _texture = _engine->createDynamicTexture(
-    textureSize.width, textureSize.height, _generateMipMaps, _samplingMode);
+    textureSize.width, textureSize.height, _generateMipMaps, samplingMode());
 }
 
 void DynamicTexture::scale(float ratio)
@@ -94,15 +99,15 @@ void DynamicTexture::clear()
   _context->fillRect(0, 0, size.width, size.height);
 }
 
-void DynamicTexture::update(bool invertY, bool premulAlpha)
+void DynamicTexture::update(bool iInvertY, bool premulAlpha)
 {
-  _engine->updateDynamicTexture(_texture, _canvas, invertY, premulAlpha,
+  _engine->updateDynamicTexture(_texture, _canvas, iInvertY, premulAlpha,
                                 *_format);
 }
 
 void DynamicTexture::drawText(const std::string& text, int x, int y,
                               const std::string& font, const std::string& color,
-                              const std::string& clearColor, bool invertY,
+                              const std::string& clearColor, bool iInvertY,
                               bool _update)
 {
   auto size = getSize();
@@ -130,7 +135,7 @@ void DynamicTexture::drawText(const std::string& text, int x, int y,
   _context->fillText(text, x, y);
 
   if (_update) {
-    update(invertY);
+    update(iInvertY);
   }
 }
 

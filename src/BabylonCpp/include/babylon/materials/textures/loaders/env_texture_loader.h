@@ -95,10 +95,11 @@ struct BABYLON_SHARED_EXPORT ENVTextureLoader : public IInternalTextureLoader {
    * @param texture defines the BabylonJS internal texture
    * @param callback defines the method to call once ready to upload
    */
-  void loadData(const ArrayBuffer& data, const InternalTexturePtr& texture,
-                const std::function<void(
-                  int width, int height, bool loadMipmap, bool isCompressed,
-                  const std::function<void()>& done)>& callback) override;
+  void loadData(
+    const ArrayBuffer& data, const InternalTexturePtr& texture,
+    const std::function<void(
+      int width, int height, bool loadMipmap, bool isCompressed,
+      const std::function<void()>& done, bool loadFailed)>& callback) override;
 
 }; // end of struct ENVTextureLoader
 

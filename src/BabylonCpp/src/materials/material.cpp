@@ -650,7 +650,8 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
           for (auto& subMesh : mesh->subMeshes) {
             geometry->_releaseVertexArrayObject(subMesh->_materialEffect);
             if (forceDisposeEffect && subMesh->_materialEffect) {
-              _scene->getEngine()->_releaseEffect(subMesh->_materialEffect);
+              _scene->getEngine()->_releaseEffect(
+                subMesh->_materialEffect.get());
             }
           }
         }
@@ -667,7 +668,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
   // using forceDisposeEffect
   if (forceDisposeEffect && _effect) {
     if (!storeEffectOnSubMeshes) {
-      _scene->getEngine()->_releaseEffect(_effect);
+      _scene->getEngine()->_releaseEffect(_effect.get());
     }
 
     _effect = nullptr;
