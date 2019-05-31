@@ -3,7 +3,7 @@
 namespace BABYLON {
 
 AnimationEvent::AnimationEvent(
-  int iFrame, const std::function<void(float currentFrame)>& iAction,
+  float iFrame, const std::function<void(float currentFrame)>& iAction,
   bool iOnlyOnce)
     : frame{iFrame}, action{iAction}, onlyOnce{iOnlyOnce}, isDone{false}
 {

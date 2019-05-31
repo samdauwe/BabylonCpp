@@ -29,10 +29,10 @@ public:
   AnimationRange copy() const;
 
   /**
-   * Makes a copy of the animation range.
+   * @brief Makes a copy of the animation range.
    * @returns A copy of the animation range
    */
-  std::unique_ptr<AnimationRange> clone() const;
+  AnimationRange clone() const;
 
 public:
   /** The name of the animation range **/

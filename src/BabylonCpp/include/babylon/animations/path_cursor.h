@@ -23,6 +23,9 @@ public:
    */
   PathCursor(const Path2& path);
   PathCursor(const PathCursor& otherPathCursor);
+  PathCursor(PathCursor&& otherPathCursor);
+  PathCursor& operator=(const PathCursor& otherPathCursor);
+  PathCursor& operator=(PathCursor&& otherPathCursor);
   ~PathCursor();
 
   /**
@@ -53,7 +56,11 @@ public:
    */
   PathCursor& move(float step);
 
-  // used by animation engine
+  /**
+   * @brief Executes a function on change.
+   * @param f A path cursor onchange callback
+   * @returns This path cursor
+   */
   PathCursor& onchange(const std::function<void(const PathCursor& cursor)>& f);
 
 private:
@@ -71,9 +78,7 @@ private:
 
 private:
   /**
-   * @brief Executes a function on change.
-   * @param f A path cursor onchange callback
-   * @returns This path cursor
+   * Stores path cursor callbacks for when an onchange event is triggered
    */
   std::vector<std::function<void(const PathCursor& cursor)>> _onchange;
 

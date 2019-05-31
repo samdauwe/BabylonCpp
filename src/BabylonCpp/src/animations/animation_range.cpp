@@ -54,9 +54,9 @@ AnimationRange AnimationRange::copy() const
   return AnimationRange(name, from, to);
 }
 
-std::unique_ptr<AnimationRange> AnimationRange::clone() const
+AnimationRange AnimationRange::clone() const
 {
-  return std::make_unique<AnimationRange>(name, from, to);
+  return AnimationRange(name, from, to);
 }
 
 } // end of namespace BABYLON

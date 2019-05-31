@@ -18,6 +18,38 @@ PathCursor::PathCursor(const PathCursor& otherPathCursor)
 {
 }
 
+PathCursor::PathCursor(PathCursor&& otherPathCursor)
+    : _onchange{std::move(otherPathCursor._onchange)}
+    , path{std::move(otherPathCursor.path)}
+    , value{std::move(otherPathCursor.value)}
+    , animations{std::move(otherPathCursor.animations)}
+{
+}
+
+PathCursor& PathCursor::operator=(const PathCursor& otherPathCursor)
+{
+  if (&otherPathCursor != this) {
+    _onchange  = otherPathCursor._onchange;
+    path       = otherPathCursor.path;
+    value      = otherPathCursor.value;
+    animations = otherPathCursor.animations;
+  }
+
+  return *this;
+}
+
+PathCursor& PathCursor::operator=(PathCursor&& otherPathCursor)
+{
+  if (&otherPathCursor != this) {
+    _onchange  = std::move(otherPathCursor._onchange);
+    path       = std::move(otherPathCursor.path);
+    value      = std::move(otherPathCursor.value);
+    animations = std::move(otherPathCursor.animations);
+  }
+
+  return *this;
+}
+
 PathCursor::~PathCursor()
 {
 }
@@ -44,8 +76,8 @@ PathCursor& PathCursor::moveBack(float step)
 
 PathCursor& PathCursor::move(float step)
 {
-  if (std::abs(step) > 1) {
-    BABYLON_LOG_ERROR("PathCursor", "Step size should be less than 1.");
+  if (std::abs(step) > 1.f) {
+    BABYLON_LOG_ERROR("PathCursor", "Step size should be less than 1.")
     return *this;
   }
 
