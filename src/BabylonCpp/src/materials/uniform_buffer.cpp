@@ -78,16 +78,16 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
       _updateFloatForUniform(name, x);
     };
     updateFloat2 = [this](const std::string& name, float x, float y,
-                          const std::string& suffix = "") {
-      _updateFloat2ForUniform(name, x, y, suffix);
+                          const std::string& /*suffix*/ = "") {
+      _updateFloat2ForUniform(name, x, y);
     };
     updateFloat3 = [this](const std::string& name, float x, float y, float z,
-                          const std::string& suffix = "") {
-      _updateFloat3ForUniform(name, x, y, z, suffix);
+                          const std::string& /*suffix*/ = "") {
+      _updateFloat3ForUniform(name, x, y, z);
     };
     updateFloat4 = [this](const std::string& name, float x, float y, float z,
-                          float w, const std::string& suffix = "") {
-      _updateFloat4ForUniform(name, x, y, z, w, suffix);
+                          float w, const std::string& /*suffix*/ = "") {
+      _updateFloat4ForUniform(name, x, y, z, w);
     };
     updateMatrix = [this](const std::string& name, const Matrix& mat) {
       _updateMatrixForUniform(name, mat);
@@ -99,12 +99,12 @@ UniformBuffer::UniformBuffer(Engine* engine, const Float32Array& data,
       _updateVector4ForUniform(name, vector);
     };
     updateColor3 = [this](const std::string& name, const Color3& color,
-                          const std::string& suffix = "") {
-      _updateColor3ForUniform(name, color, suffix);
+                          const std::string& /*suffix*/ = "") {
+      _updateColor3ForUniform(name, color);
     };
     updateColor4 = [this](const std::string& name, const Color3& color,
-                          float alpha, const std::string& suffix = "") {
-      _updateColor4ForUniform(name, color, alpha, suffix);
+                          float alpha, const std::string& /*suffix*/ = "") {
+      _updateColor4ForUniform(name, color, alpha);
     };
   }
 }
@@ -163,35 +163,8 @@ void UniformBuffer::_fillAlignment(size_t size)
   }
 }
 
-void UniformBuffer::addUniform(const std::string& name, size_t size)
-{
-  if (_noUBO) {
-    return;
-  }
-
-  if (stl_util::contains(_uniformLocations, name)) {
-    // Already existing uniform
-    return;
-  }
-
-  // This function must be called in the order of the shader layout !
-  // size can be the size of the uniform, or data directly
-  auto data = Float32Array(size, 0);
-
-  _fillAlignment(size);
-  _uniformSizes[name]     = size;
-  _uniformLocations[name] = _uniformLocationPointer;
-  _uniformLocationPointer += size;
-
-  for (size_t i = 0; i < size; ++i) {
-    _data.emplace_back(data[i]);
-  }
-
-  _needSync = true;
-}
-
 void UniformBuffer::addUniform(const std::string& name,
-                               const Float32Array& size)
+                               const std::variant<size_t, Float32Array>& size)
 {
   if (_noUBO) {
     return;
@@ -204,8 +177,18 @@ void UniformBuffer::addUniform(const std::string& name,
 
   // This function must be called in the order of the shader layout !
   // size can be the size of the uniform, or data directly
-  auto data    = size;
-  size_t _size = data.size();
+  Float32Array data;
+  size_t _size = 0;
+  if (std::holds_alternative<Float32Array>(size)) {
+    data  = std::get<Float32Array>(size);
+    _size = data.size();
+  }
+  else {
+    _size = std::get<size_t>(size);
+
+    // Fill with zeros
+    data = Float32Array(_size, 0.f);
+  }
 
   _fillAlignment(_size);
   _uniformSizes[name]     = _size;
@@ -226,13 +209,13 @@ void UniformBuffer::addMatrix(const std::string& name, const Matrix& mat)
 
 void UniformBuffer::addFloat2(const std::string& name, float x, float y)
 {
-  addUniform(name, {x, y});
+  addUniform(name, Float32Array{x, y});
 }
 
 void UniformBuffer::addFloat3(const std::string& name, float x, float y,
                               float z)
 {
-  addUniform(name, {x, y, z});
+  addUniform(name, Float32Array{x, y, z});
 }
 
 void UniformBuffer::addColor3(const std::string& name, const Color3& color)
@@ -288,7 +271,7 @@ void UniformBuffer::create()
 
 void UniformBuffer::_rebuild()
 {
-  if (_noUBO) {
+  if (_noUBO || _bufferData.empty()) {
     return;
   }
 
@@ -326,7 +309,7 @@ void UniformBuffer::updateUniform(const std::string& uniformName,
     if (_buffer) {
       // Cannot add an uniform if the buffer is already created
       BABYLON_LOG_ERROR("UniformBuffer",
-                        "Cannot add an uniform after UBO has been created.");
+                        "Cannot add an uniform after UBO has been created.")
       return;
     }
     addUniform(uniformName, size);
@@ -415,8 +398,7 @@ void UniformBuffer::_updateFloat2ForEffect(const std::string& name, float x,
 }
 
 void UniformBuffer::_updateFloat2ForUniform(const std::string& name, float x,
-                                            float y,
-                                            const std::string& /*suffix*/)
+                                            float y)
 {
   UniformBuffer::_tempBuffer[0] = x;
   UniformBuffer::_tempBuffer[1] = y;
@@ -431,8 +413,7 @@ void UniformBuffer::_updateFloat3ForEffect(const std::string& name, float x,
 }
 
 void UniformBuffer::_updateFloat3ForUniform(const std::string& name, float x,
-                                            float y, float z,
-                                            const std::string& /*suffix*/)
+                                            float y, float z)
 {
   UniformBuffer::_tempBuffer[0] = x;
   UniformBuffer::_tempBuffer[1] = y;
@@ -448,8 +429,7 @@ void UniformBuffer::_updateFloat4ForEffect(const std::string& name, float x,
 }
 
 void UniformBuffer::_updateFloat4ForUniform(const std::string& name, float x,
-                                            float y, float z, float w,
-                                            const std::string& /*suffix*/)
+                                            float y, float z, float w)
 {
   UniformBuffer::_tempBuffer[0] = x;
   UniformBuffer::_tempBuffer[1] = y;
@@ -504,8 +484,7 @@ void UniformBuffer::_updateColor3ForEffect(const std::string& name,
 }
 
 void UniformBuffer::_updateColor3ForUniform(const std::string& name,
-                                            const Color3& color,
-                                            const std::string& /*suffix*/)
+                                            const Color3& color)
 {
   color.toArray(UniformBuffer::_tempBuffer);
   updateUniform(name, UniformBuffer::_tempBuffer, 3);
@@ -519,8 +498,7 @@ void UniformBuffer::_updateColor4ForEffect(const std::string& name,
 }
 
 void UniformBuffer::_updateColor4ForUniform(const std::string& name,
-                                            const Color3& color, float alpha,
-                                            const std::string& /*suffix*/)
+                                            const Color3& color, float alpha)
 {
   color.toArray(UniformBuffer::_tempBuffer);
   UniformBuffer::_tempBuffer[3] = alpha;

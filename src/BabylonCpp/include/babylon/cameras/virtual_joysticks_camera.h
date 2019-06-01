@@ -10,7 +10,7 @@ class VirtualJoysticksCamera;
 using VirtualJoysticksCameraPtr = std::shared_ptr<VirtualJoysticksCamera>;
 
 /**
- * @brief This represents a free type of camera. It can be usefull in First
+ * @brief This represents a free type of camera. It can be useful in First
  * Person Shooter game for instance. It is identical to the Free Camera and
  * simply adds by default a virtual joystick. Virtual Joysticks are on-screen 2D
  * graphics that are used to control the camera or other scene items.
@@ -41,7 +41,7 @@ public:
 
 protected:
   /**
-   * @brief Intantiates a VirtualJoysticksCamera. It can be usefull in First
+   * @brief Intantiates a VirtualJoysticksCamera. It can be useful in First
    * Person Shooter game for instance. It is identical to the Free Camera and
    * simply adds by default a virtual joystick. Virtual Joysticks are on-screen
    * 2D graphics that are used to control the camera or other scene items.

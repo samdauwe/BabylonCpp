@@ -1,9 +1,10 @@
 #ifndef BABYLON_MATERIALS_UNIFORM_BUFFER_H
 #define BABYLON_MATERIALS_UNIFORM_BUFFER_H
 
-#include <unordered_map>
 #include <functional>
 #include <memory>
+#include <unordered_map>
+#include <variant>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
@@ -98,8 +99,8 @@ public:
    * shader.
    * @param size Data size, or data directly.
    */
-  void addUniform(const std::string& name, size_t size);
-  void addUniform(const std::string& name, const Float32Array& size);
+  void addUniform(const std::string& name,
+                  const std::variant<size_t, Float32Array>& size);
 
   /**
    * @brief Adds a Matrix 4x4 to the uniform buffer.
@@ -247,17 +248,15 @@ private:
   void _updateFloatForUniform(const std::string& name, float x);
   void _updateFloat2ForEffect(const std::string& name, float x, float y,
                               const std::string& suffix = "");
-  void _updateFloat2ForUniform(const std::string& name, float x, float y,
-                               const std::string& suffix = "");
+  void _updateFloat2ForUniform(const std::string& name, float x, float y);
   void _updateFloat3ForEffect(const std::string& name, float x, float y,
                               float z, const std::string& suffix = "");
   void _updateFloat3ForUniform(const std::string& name, float x, float y,
-                               float z, const std::string& suffix = "");
+                               float z);
   void _updateFloat4ForEffect(const std::string& name, float x, float y,
                               float z, float w, const std::string& suffix = "");
   void _updateFloat4ForUniform(const std::string& name, float x, float y,
-                               float z, float w,
-                               const std::string& suffix = "");
+                               float z, float w);
   void _updateMatrixForEffect(const std::string& name, const Matrix& mat);
   void _updateMatrixForUniform(const std::string& name, const Matrix& mat);
   void _updateVector3ForEffect(const std::string& name, const Vector3& vector);
@@ -266,12 +265,11 @@ private:
   void _updateVector4ForUniform(const std::string& name, const Vector4& vector);
   void _updateColor3ForEffect(const std::string& name, const Color3& color,
                               const std::string& suffix = "");
-  void _updateColor3ForUniform(const std::string& name, const Color3& color,
-                               const std::string& suffix = "");
+  void _updateColor3ForUniform(const std::string& name, const Color3& color);
   void _updateColor4ForEffect(const std::string& name, const Color3& color,
                               float alpha, const std::string& suffix = "");
   void _updateColor4ForUniform(const std::string& name, const Color3& color,
-                               float alpha, const std::string& suffix = "");
+                               float alpha);
 
 public:
   /**

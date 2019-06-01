@@ -17,10 +17,10 @@ void GamepadCamera::AddNodeConstructor()
   GamepadCamera::NodeConstructorAdded = true;
 }
 
-GamepadCamera::GamepadCamera::GamepadCamera(const std::string& name,
-                                            const Vector3& position,
+GamepadCamera::GamepadCamera::GamepadCamera(const std::string& iName,
+                                            const Vector3& iPosition,
                                             Scene* scene)
-    : UniversalCamera{name, position, scene}
+    : UniversalCamera{iName, iPosition, scene}
 {
 }
 

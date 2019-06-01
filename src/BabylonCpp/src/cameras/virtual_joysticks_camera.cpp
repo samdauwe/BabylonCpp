@@ -14,10 +14,10 @@ void VirtualJoysticksCamera::AddNodeConstructor()
   VirtualJoysticksCamera::NodeConstructorAdded = true;
 }
 
-VirtualJoysticksCamera::VirtualJoysticksCamera(const std::string& name,
-                                               const Vector3& position,
+VirtualJoysticksCamera::VirtualJoysticksCamera(const std::string& iName,
+                                               const Vector3& iPosition,
                                                Scene* scene)
-    : FreeCamera{name, position, scene}
+    : FreeCamera{iName, iPosition, scene}
 {
   inputs->addVirtualJoystick();
 }

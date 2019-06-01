@@ -74,9 +74,9 @@ void TouchCamera::set_touchMoveSensibility(float value)
 
 //-- end properties for backward compatibility for inputs
 
-TouchCamera::TouchCamera::TouchCamera(const std::string& name,
-                                      const Vector3& position, Scene* scene)
-    : FreeCamera{name, position, scene}
+TouchCamera::TouchCamera::TouchCamera(const std::string& iName,
+                                      const Vector3& iPosition, Scene* scene)
+    : FreeCamera{iName, iPosition, scene}
     , touchAngularSensibility{this, &TouchCamera::get_touchAngularSensibility,
                               &TouchCamera::set_touchAngularSensibility}
     , touchMoveSensibility{this, &TouchCamera::get_touchMoveSensibility,
