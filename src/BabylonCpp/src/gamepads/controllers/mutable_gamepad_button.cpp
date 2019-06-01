@@ -1,4 +1,4 @@
-#include <babylon/gamepad/controllers/mutable_gamepad_button.h>
+#include <babylon/gamepads/controllers/mutable_gamepad_button.h>
 
 #include <sstream>
 
@@ -9,9 +9,9 @@ MutableGamepadButton::MutableGamepadButton()
 {
 }
 
-MutableGamepadButton::MutableGamepadButton(int value, bool touched,
-                                           bool pressed)
-    : _value{value}, _touched{touched}, _pressed{pressed}
+MutableGamepadButton::MutableGamepadButton(int iValue, bool touched,
+                                           bool iPressed)
+    : _value{iValue}, _touched{touched}, _pressed{iPressed}
 {
 }
 

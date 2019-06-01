@@ -1,17 +1,31 @@
-#include <babylon/gamepad/controllers/gear_vr_controller.h>
+#include <babylon/gamepads/controllers/gear_vr_controller.h>
 
+#include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 
-GearVRController::GearVRController(
-  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
+bool GearVRControllerFactory::canCreate(
+  const IBrowserGamepadPtr& gamepadInfo) const
+{
+  return String::startsWith(gamepadInfo->id,
+                            GearVRController::GAMEPAD_ID_PREFIX)
+         || String::contains(gamepadInfo->id, "Oculus Go");
+}
+
+WebVRControllerPtr
+GearVRControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const
+{
+  return GearVRController::New(gamepadInfo);
+}
+
+GearVRController::GearVRController(const IBrowserGamepadPtr& vrGamepad)
     : WebVRController{vrGamepad}
     , _buttonIndexToObservableNameMap{{
-        "onTrackpadChangedObservable",    // Trackpad
+        "onPadStateChangedObservable",    // Pad
         "onTriggerStateChangedObservable" // Trigger}
       }}
 {
@@ -41,7 +55,7 @@ void GearVRController::initControllerMesh(
       auto mesh                  = Mesh::New("", scene);
       newMeshes[1]->parent       = mesh.get();
       newMeshes[1]->position().z = -0.15f;
-      _defaultModel              = newMeshes[1];
+      _defaultModel              = mesh;
       attachToMesh(_defaultModel);
       if (meshLoaded) {
         meshLoaded(_defaultModel.get());
@@ -58,8 +72,8 @@ void GearVRController::_handleButtonChange(
 
     // Only emit events for buttons that we know how to map from index to
     // observable
-    auto observable = (observableName == "onTrackpadChangedObservable") ?
-                        onTrackpadChangedObservable :
+    auto observable = (observableName == "onPadStateChangedObservable") ?
+                        onPadStateChangedObservable :
                         onTriggerStateChangedObservable;
     {
       ExtendedGamepadButton stateCopy{state};

@@ -1,4 +1,4 @@
-#include <babylon/gamepad/controllers/extended_gamepad_button.h>
+#include <babylon/gamepads/controllers/extended_gamepad_button.h>
 
 namespace BABYLON {
 

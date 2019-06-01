@@ -1,10 +1,11 @@
-#include <babylon/gamepad/controllers/windows_motion_controller.h>
+#include <babylon/gamepads/controllers/windows_motion_controller.h>
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
+#include <babylon/core/string.h>
 #include <babylon/culling/ray.h>
-#include <babylon/mesh/abstract_mesh.h>
-#include <babylon/mesh/mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/mesh.h>
 
 namespace BABYLON {
 
@@ -18,8 +19,21 @@ const std::string WindowsMotionController::GAMEPAD_ID_PREFIX
 const std::string WindowsMotionController::GAMEPAD_ID_PATTERN
   = "([0-9a-zA-Z]+-[0-9a-zA-Z]+)";
 
+bool WindowsMotionControllerFactory::canCreate(
+  const IBrowserGamepadPtr& gamepadInfo) const
+{
+  return String::startsWith(gamepadInfo->id,
+                            WindowsMotionController::GAMEPAD_ID_PREFIX);
+}
+
+WebVRControllerPtr WindowsMotionControllerFactory::create(
+  const IBrowserGamepadPtr& gamepadInfo) const
+{
+  return WindowsMotionController::New(gamepadInfo);
+}
+
 WindowsMotionController::WindowsMotionController(
-  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
+  const IBrowserGamepadPtr& vrGamepad)
     : WebVRController{vrGamepad}
     , onTriggerButtonStateChangedObservable{this,
          &WindowsMotionController::get_onTriggerButtonStateChangedObservable}
@@ -268,7 +282,7 @@ WindowsMotionController::processModel(Scene* scene,
   }
   else {
     BABYLON_LOG_WARN("WindowsMotionController",
-                     "Could not find root node in model file.");
+                     "Could not find root node in model file.")
   }
 
   return loadedMeshInfo;

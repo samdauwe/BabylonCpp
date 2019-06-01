@@ -1,10 +1,37 @@
-#ifndef BABYLON_GAMEPAD_CONTROLLERS_VIVE_CONTROLLER_H
-#define BABYLON_GAMEPAD_CONTROLLERS_VIVE_CONTROLLER_H
+#ifndef BABYLON_GAMEPADS_CONTROLLERS_VIVE_CONTROLLER_H
+#define BABYLON_GAMEPADS_CONTROLLERS_VIVE_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/gamepad/controllers/web_vr_controller.h>
+#include <babylon/gamepads/controllers/_game_pad_factory.h>
+#include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
+
+class ViveController;
+using ViveControllerPtr = std::shared_ptr<ViveController>;
+
+/**
+ * @brief Vive Controller factory.
+ */
+struct ViveControllerFactory : public _GamePadFactory {
+  /**
+   * @brief Returns wether or not the current gamepad can be created for this
+   * type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns true if it can be created, otherwise false
+   */
+  bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
+
+  /**
+   * @brief Creates a new instance of the Gamepad.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns the new gamepad instance
+   */
+  WebVRControllerPtr
+  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+}; // end of struct ViveControllerFactory
 
 /**
  * @brief Vive Controller.
@@ -23,11 +50,12 @@ public:
   static constexpr const char* MODEL_FILENAME = "wand.babylon";
 
 public:
-  /**
-   * @brief Creates a new ViveController from a gamepad.
-   * @param vrGamepad the gamepad that the controller should be created from
-   */
-  ViveController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
+  template <typename... Ts>
+  static ViveControllerPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<ViveController>(
+      new ViveController(std::forward<Ts>(args)...));
+  }
   ~ViveController() override;
 
   /**
@@ -42,6 +70,12 @@ public:
     const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
+  /**
+   * @brief Creates a new ViveController from a gamepad.
+   * @param vrGamepad the gamepad that the controller should be created from
+   */
+  ViveController(const IBrowserGamepadPtr& vrGamepad);
+
   /**
    * @brief Fired when the left button on this controller is modified.
    */
@@ -95,4 +129,4 @@ public:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GAMEPAD_CONTROLLERS_VIVE_CONTROLLER_H
+#endif // end of BABYLON_GAMEPADS_CONTROLLERS_VIVE_CONTROLLER_H

@@ -20,7 +20,7 @@ public:
    * @param browserGamepad The browser gamepad
    */
   GenericPad(const std::string& id, int index,
-             const std::shared_ptr<IBrowserGamepad>& browserGamepad);
+             const IBrowserGamepadPtr& browserGamepad);
   virtual ~GenericPad() override;
 
   /**

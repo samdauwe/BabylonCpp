@@ -1,13 +1,12 @@
-#include <babylon/gamepad/controllers/web_vr_controller.h>
+#include <babylon/gamepads/controllers/web_vr_controller.h>
 
 #include <babylon/babylon_stl_util.h>
-#include <babylon/gamepad/controllers/extended_gamepad_button.h>
+#include <babylon/gamepads/controllers/extended_gamepad_button.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
 
 namespace BABYLON {
 
-WebVRController::WebVRController(
-  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
+WebVRController::WebVRController(const IBrowserGamepadPtr& vrGamepad)
     : PoseEnabledController(vrGamepad)
     , pad{StickValues(0.f, 0.f)}
     , hand{vrGamepad->hand}
@@ -47,7 +46,7 @@ void WebVRController::update()
   PoseEnabledController::update();
   for (unsigned int _index = 0; _index < _buttons.size(); ++_index) {
     // _setButtonValue(browserGamepad->buttons[index], _buttons[index], index);
-  };
+  }
   const auto& pLeftStick = *leftStick();
   if (!stl_util::almost_equal(pLeftStick.x, pad.x)
       || !stl_util::almost_equal(pLeftStick.y, pad.y)) {

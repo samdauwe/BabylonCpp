@@ -1,13 +1,25 @@
-#include <babylon/gamepad/controllers/vive_controller.h>
+#include <babylon/gamepads/controllers/vive_controller.h>
 
-#include <babylon/gamepad/controllers/extended_gamepad_button.h>
+#include <babylon/core/string.h>
+#include <babylon/gamepads/controllers/extended_gamepad_button.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
-ViveController::ViveController(
-  const std::shared_ptr<IBrowserGamepad>& vrGamepad)
+bool ViveControllerFactory::canCreate(
+  const IBrowserGamepadPtr& gamepadInfo) const
+{
+  return String::contains(String::toLowerCase(gamepadInfo->id), "openvr");
+}
+
+WebVRControllerPtr
+ViveControllerFactory::create(const IBrowserGamepadPtr& gamepadInfo) const
+{
+  return ViveController::New(gamepadInfo);
+}
+
+ViveController::ViveController(const IBrowserGamepadPtr& vrGamepad)
     : WebVRController{vrGamepad}
     , onLeftButtonStateChangedObservable{this,
                                          &ViveController::

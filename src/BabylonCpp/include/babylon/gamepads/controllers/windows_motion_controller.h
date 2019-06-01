@@ -1,11 +1,17 @@
-#ifndef BABYLON_GAMEPAD_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
-#define BABYLON_GAMEPAD_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
+#ifndef BABYLON_GAMEPADS_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
+#define BABYLON_GAMEPADS_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
 
 #include <unordered_map>
+
 #include <babylon/babylon_api.h>
-#include <babylon/gamepad/controllers/web_vr_controller.h>
+#include <babylon/gamepads/controllers/_game_pad_factory.h>
+#include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
+
+class TransformNode;
+class WindowsMotionController;
+using WindowsMotionControllerPtr = std::shared_ptr<WindowsMotionController>;
 
 /**
  * Defines the IMeshInfo object that describes information a webvr controller
@@ -19,7 +25,7 @@ struct BABYLON_SHARED_EXPORT IMeshInfo {
   /**
    * The mesh
    */
-  AbstractMesh* value = nullptr;
+  TransformNode* value = nullptr;
 }; // end of struct IMeshInfo
 
 /**
@@ -29,11 +35,11 @@ struct BABYLON_SHARED_EXPORT IButtonMeshInfo : public IMeshInfo {
   /**
    * The mesh that should be displayed when pressed
    */
-  AbstractMesh* pressed = nullptr;
+  TransformNode* pressed = nullptr;
   /**
    * The mesh that should be displayed when not pressed
    */
-  AbstractMesh* unpressed = nullptr;
+  TransformNode* unpressed = nullptr;
 }; // end of struct IButtonMeshInfo
 
 /**
@@ -43,11 +49,11 @@ struct BABYLON_SHARED_EXPORT IAxisMeshInfo : public IMeshInfo {
   /**
    * The mesh that should be set when at its min
    */
-  AbstractMesh* min = nullptr;
+  TransformNode* min = nullptr;
   /**
    * The mesh that should be set when at its max
    */
-  AbstractMesh* max = nullptr;
+  TransformNode* max = nullptr;
 }; // end of struct IAxisMeshInfo
 
 /**
@@ -75,8 +81,31 @@ struct BABYLON_SHARED_EXPORT LoadedMeshInfo {
 }; // end of struct LoadedMeshInfo
 
 /**
- * Defines the WindowsMotionController object that the state of the windows
- * motion controller
+ * @brief Windows motion Controller factory.
+ */
+struct WindowsMotionControllerFactory : public _GamePadFactory {
+  /**
+   * @brief Returns wether or not the current gamepad can be created for this
+   * type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns true if it can be created, otherwise false
+   */
+  bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
+
+  /**
+   * @brief Creates a new instance of the Gamepad.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns the new gamepad instance
+   */
+  WebVRControllerPtr
+  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+}; // end of struct WindowsMotionControllerFactory
+
+/**
+ * @brief Defines the WindowsMotionController object that the state of the
+ * windows motion controller
  */
 class BABYLON_SHARED_EXPORT WindowsMotionController : public WebVRController {
 
@@ -104,11 +133,12 @@ public:
   static const std::string GAMEPAD_ID_PATTERN;
 
 public:
-  /**
-   * Creates a new WindowsMotionController from a gamepad.
-   * @param vrGamepad the gamepad that the controller should be created from
-   */
-  WindowsMotionController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
+  template <typename... Ts>
+  static WindowsMotionControllerPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<WindowsMotionController>(
+      new WindowsMotionController(std::forward<Ts>(args)...));
+  }
   ~WindowsMotionController() override;
 
   /**
@@ -164,6 +194,12 @@ public:
     const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
+  /**
+   * @brief Creates a new WindowsMotionController from a gamepad.
+   * @param vrGamepad the gamepad that the controller should be created from
+   */
+  WindowsMotionController(const IBrowserGamepadPtr& vrGamepad);
+
   /**
    * @brief Called once for each button that changed state since the last frame
    * @param buttonIdx Which button index changed
@@ -293,4 +329,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GAMEPAD_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H
+#endif // end of BABYLON_GAMEPADS_CONTROLLERS_WINDOWS_MOTION_CONTROLLER_H

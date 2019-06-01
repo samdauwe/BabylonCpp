@@ -1,8 +1,8 @@
-#ifndef BABYLON_GAMEPAD_CONTROLLERS_EXTENDED_GAMEPAD_BUTTON_H
-#define BABYLON_GAMEPAD_CONTROLLERS_EXTENDED_GAMEPAD_BUTTON_H
+#ifndef BABYLON_GAMEPADS_CONTROLLERS_EXTENDED_GAMEPAD_BUTTON_H
+#define BABYLON_GAMEPADS_CONTROLLERS_EXTENDED_GAMEPAD_BUTTON_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/gamepad/controllers/mutable_gamepad_button.h>
+#include <babylon/gamepads/controllers/mutable_gamepad_button.h>
 
 namespace BABYLON {
 
@@ -37,4 +37,4 @@ public:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GAMEPAD_CONTROLLERS_EXTENDED_GAMEPAD_BUTTON_H
+#endif // end of BABYLON_GAMEPADS_CONTROLLERS_EXTENDED_GAMEPAD_BUTTON_H

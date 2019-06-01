@@ -1,10 +1,37 @@
-#ifndef BABYLON_GAMEPAD_CONTROLLERS_GEAR_VR_CONTROLLER_H
-#define BABYLON_GAMEPAD_CONTROLLERS_GEAR_VR_CONTROLLER_H
+#ifndef BABYLON_GAMEPADS_CONTROLLERS_GEAR_VR_CONTROLLER_H
+#define BABYLON_GAMEPADS_CONTROLLERS_GEAR_VR_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/gamepad/controllers/web_vr_controller.h>
+#include <babylon/gamepads/controllers/_game_pad_factory.h>
+#include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
+
+class GearVRController;
+using GearVRControllerPtr = std::shared_ptr<GearVRController>;
+
+/**
+ * @brief Gear VR Controller factory.
+ */
+struct GearVRControllerFactory : public _GamePadFactory {
+  /**
+   * @brief Returns wether or not the current gamepad can be created for this
+   * type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns true if it can be created, otherwise false
+   */
+  bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
+
+  /**
+   * @brief Creates a new instance of the Gamepad.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns the new gamepad instance
+   */
+  WebVRControllerPtr
+  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+}; // end of struct GearVRControllerFactory
 
 /**
  * @brief Gear VR Controller.
@@ -29,11 +56,12 @@ public:
   static constexpr const char* GAMEPAD_ID_PREFIX = "Gear VR";
 
 public:
-  /**
-   * @brief Creates a new GearVRController from a gamepad.
-   * @param vrGamepad the gamepad that the controller should be created from
-   */
-  GearVRController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
+  template <typename... Ts>
+  static GearVRControllerPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<GearVRController>(
+      new GearVRController(std::forward<Ts>(args)...));
+  }
   ~GearVRController() override;
 
   /**
@@ -48,6 +76,12 @@ public:
     const std::function<void(AbstractMesh* mesh)>& meshLoaded) override;
 
 protected:
+  /**
+   * @brief Creates a new GearVRController from a gamepad.
+   * @param vrGamepad the gamepad that the controller should be created from
+   */
+  GearVRController(const IBrowserGamepadPtr& vrGamepad);
+
   /**
    * @brief Called once for each button that changed state since the last frame.
    * @param buttonIdx Which button index changed
@@ -65,4 +99,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GAMEPAD_CONTROLLERS_GEAR_VR_CONTROLLER_H
+#endif // end of BABYLON_GAMEPADS_CONTROLLERS_GEAR_VR_CONTROLLER_H

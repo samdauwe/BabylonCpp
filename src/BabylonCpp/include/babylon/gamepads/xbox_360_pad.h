@@ -65,8 +65,7 @@ public:
    * @param xboxOne defines if it is a XBox One gamepad
    */
   Xbox360Pad(const std::string& id, int index,
-             const std::shared_ptr<IBrowserGamepad>& gamepad,
-             bool xboxOne = false);
+             const IBrowserGamepadPtr& gamepad, bool xboxOne = false);
   ~Xbox360Pad() override;
 
   /**

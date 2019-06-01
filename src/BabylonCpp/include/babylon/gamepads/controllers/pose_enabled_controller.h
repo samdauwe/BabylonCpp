@@ -1,9 +1,9 @@
-#ifndef BABYLON_GAMEPAD_CONTROLLERS_POSE_ENABLED_CONTROLLER_H
-#define BABYLON_GAMEPAD_CONTROLLERS_POSE_ENABLED_CONTROLLER_H
+#ifndef BABYLON_GAMEPADS_CONTROLLERS_POSE_ENABLED_CONTROLLER_H
+#define BABYLON_GAMEPADS_CONTROLLERS_POSE_ENABLED_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
 #include <babylon/cameras/vr/pose_controlled.h>
-#include <babylon/gamepad/generic_pad.h>
+#include <babylon/gamepads/generic_pad.h>
 #include <babylon/math/matrix.h>
 
 namespace BABYLON {
@@ -11,15 +11,20 @@ namespace BABYLON {
 class AbstractMesh;
 class Ray;
 class TargetCamera;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
+using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
 
 /**
- * @brief Defines the types of pose enabled controllers that are supported.
+ * @brief Defines the PoseEnabledController object that contains state of a vr
+ * capable controller.
  */
 class BABYLON_SHARED_EXPORT PoseEnabledController : public Gamepad,
                                                     public PoseControlled {
 
 public:
+  /**
+   * Defines the types of pose enabled controllers that are supported.
+   */
   enum class PoseEnabledControllerType {
     /**
      * HTC Vive
@@ -53,7 +58,7 @@ public:
    * @param browserGamepad the gamepad that the PoseEnabledController should be
    * created from
    */
-  PoseEnabledController(const std::shared_ptr<IBrowserGamepad>& browserGamepad);
+  PoseEnabledController(const IBrowserGamepadPtr& browserGamepad);
   ~PoseEnabledController() override;
 
   /**
@@ -175,4 +180,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GAMEPAD_CONTROLLERS_POSE_ENABLED_CONTROLLER_H
+#endif // end of BABYLON_GAMEPADS_CONTROLLERS_POSE_ENABLED_CONTROLLER_H

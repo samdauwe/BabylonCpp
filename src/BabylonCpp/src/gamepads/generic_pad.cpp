@@ -5,7 +5,7 @@
 namespace BABYLON {
 
 GenericPad::GenericPad(const std::string& iId, int iIndex,
-                       const std::shared_ptr<IBrowserGamepad>& iBrowserGamepad)
+                       const IBrowserGamepadPtr& iBrowserGamepad)
     : Gamepad(iId, iIndex, iBrowserGamepad)
 {
   type     = Gamepad::GENERIC;

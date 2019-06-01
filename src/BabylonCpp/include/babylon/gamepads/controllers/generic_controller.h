@@ -1,13 +1,39 @@
-#ifndef BABYLON_GAMEPAD_CONTROLLERS_GENERIC_CONTROLLER_H
-#define BABYLON_GAMEPAD_CONTROLLERS_GENERIC_CONTROLLER_H
+#ifndef BABYLON_GAMEPADS_CONTROLLERS_GENERIC_CONTROLLER_H
+#define BABYLON_GAMEPADS_CONTROLLERS_GENERIC_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/gamepad/controllers/web_vr_controller.h>
+#include <babylon/gamepads/controllers/_game_pad_factory.h>
+#include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
+class GenericController;
 class IBrowserGamepad;
-using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
+using GenericControllerPtr = std::shared_ptr<GenericController>;
+using IBrowserGamepadPtr   = std::shared_ptr<IBrowserGamepad>;
+
+/**
+ * @brief Generic Controller factory.
+ */
+struct GenericControllerFactory : public _GamePadFactory {
+  /**
+   * @brief Returns wether or not the current gamepad can be created for this
+   * type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns true if it can be created, otherwise false
+   */
+  bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
+
+  /**
+   * @brief Creates a new instance of the Gamepad.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns the new gamepad instance
+   */
+  WebVRControllerPtr
+  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+}; // end of struct GenericControllerFactory
 
 /**
  *@brief  Generic Controller.
@@ -26,11 +52,12 @@ private:
   static constexpr const char* MODEL_FILENAME = "generic.babylon";
 
 public:
-  /**
-   * @brief Creates a new GenericController from a gamepad.
-   * @param vrGamepad the gamepad that the controller should be created from
-   */
-  GenericController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
+  template <typename... Ts>
+  static GenericControllerPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<GenericController>(
+      new GenericController(std::forward<Ts>(args)...));
+  }
   ~GenericController() override;
 
   /**
@@ -46,6 +73,12 @@ public:
 
 protected:
   /**
+   * @brief Creates a new GenericController from a gamepad.
+   * @param vrGamepad the gamepad that the controller should be created from
+   */
+  GenericController(const IBrowserGamepadPtr& vrGamepad);
+
+  /**
    * @brief Called once for each button that changed state since the last frame.
    * @param buttonIdx Which button index changed
    * @param state New state of the button
@@ -59,4 +92,4 @@ protected:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GAMEPAD_CONTROLLERS_GENERIC_CONTROLLER_H
+#endif // end of BABYLON_GAMEPADS_CONTROLLERS_GENERIC_CONTROLLER_H

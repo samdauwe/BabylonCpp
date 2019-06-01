@@ -1,23 +1,22 @@
-#include <babylon/gamepad/controllers/pose_enabled_controller.h>
+#include <babylon/gamepads/controllers/pose_enabled_controller.h>
 
 #include <babylon/culling/ray.h>
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/ibrowser_gamepad.h>
 #include <babylon/math/tmp.h>
-#include <babylon/mesh/abstract_mesh.h>
+#include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
 PoseEnabledController::PoseEnabledController(
-  const std::shared_ptr<IBrowserGamepad>& browserGamepad)
-    : Gamepad(browserGamepad->id, browserGamepad->index, browserGamepad)
+  const IBrowserGamepadPtr& iBrowserGamepad)
+    : Gamepad(iBrowserGamepad->id, iBrowserGamepad->index, iBrowserGamepad)
     , _mesh{nullptr}
     , _deviceToWorld{Matrix::Identity()}
     , _pointingPoseNode{nullptr}
     , mesh{this, &PoseEnabledController::get_mesh}
-    , _trackPosition{true}
-    , _maxRotationDistFromHeadset{Math::PI / 5.f}
-    , _draggedRoomRotation{0}
+    , _deviceRoomPosition{Vector3::Zero()}
+    , _poseControlledCamera{nullptr}
     , _workingMatrix{Matrix::Identity()}
 {
   type              = Gamepad::POSE_ENABLED;
@@ -25,6 +24,11 @@ PoseEnabledController::PoseEnabledController(
   devicePosition    = Vector3::Zero();
   deviceScaleFactor = 1.f;
   position          = Vector3::Zero();
+
+  // Used to convert 6dof controllers to 3dof
+  _trackPosition              = true;
+  _maxRotationDistFromHeadset = Math::PI / 5.f;
+  _draggedRoomRotation        = 0.f;
 
   _calculatedPosition = Vector3::Zero();
   Quaternion::RotationYawPitchRollToRef(Math::PI, 0, 0,

@@ -1,11 +1,11 @@
-#ifndef BABYLON_GAMEPAD_CONTROLLERS_WEB_VR_CONTROLLER_H
-#define BABYLON_GAMEPAD_CONTROLLERS_WEB_VR_CONTROLLER_H
+#ifndef BABYLON_GAMEPADS_CONTROLLERS_WEB_VR_CONTROLLER_H
+#define BABYLON_GAMEPADS_CONTROLLERS_WEB_VR_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/gamepad/controllers/extended_gamepad_button.h>
-#include <babylon/gamepad/controllers/pose_enabled_controller.h>
-#include <babylon/gamepad/gamepad_button_changes.h>
-#include <babylon/gamepad/stick_values.h>
+#include <babylon/gamepads/controllers/extended_gamepad_button.h>
+#include <babylon/gamepads/controllers/pose_enabled_controller.h>
+#include <babylon/gamepads/gamepad_button_changes.h>
+#include <babylon/gamepads/stick_values.h>
 #include <babylon/tools/observable.h>
 
 namespace BABYLON {
@@ -24,7 +24,7 @@ public:
    * @param vrGamepad the gamepad that the WebVRController should be created
    * from
    */
-  WebVRController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
+  WebVRController(const IBrowserGamepadPtr& vrGamepad);
   ~WebVRController() override;
 
   /**
@@ -33,7 +33,7 @@ public:
    */
   void setOnButtonStateChange(
     const std::function<void(int controlledIndex, unsigned int buttonIndex,
-                               const ExtendedGamepadButton& state)>& callback);
+                             const ExtendedGamepadButton& state)>& callback);
 
   /**
    * @brief Updates the state of the controller and mesh based on the current
@@ -51,8 +51,9 @@ public:
    * @param scene the scene the mesh should be added to
    * @param meshLoaded callback for when the mesh has been loaded
    */
-  virtual void initControllerMesh(
-    Scene* scene, const std::function<void(AbstractMesh* mesh)>& meshLoaded)
+  virtual void
+  initControllerMesh(Scene* scene,
+                     const std::function<void(AbstractMesh* mesh)>& meshLoaded)
     = 0;
 
 protected:
@@ -133,7 +134,7 @@ protected:
 
 private:
   std::function<void(int controlledIndex, unsigned int buttonIndex,
-                       const ExtendedGamepadButton& state)>
+                     const ExtendedGamepadButton& state)>
     _onButtonStateChange;
   GamepadButtonChanges _changes;
 
@@ -141,4 +142,4 @@ private:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GAMEPAD_CONTROLLERS_WEB_VR_CONTROLLER_H
+#endif // end of BABYLON_GAMEPADS_CONTROLLERS_WEB_VR_CONTROLLER_H

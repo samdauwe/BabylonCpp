@@ -1,13 +1,39 @@
-#ifndef BABYLON_GAMEPAD_CONTROLLERS_DAYDREAM_CONTROLLER_H
-#define BABYLON_GAMEPAD_CONTROLLERS_DAYDREAM_CONTROLLER_H
+#ifndef BABYLON_GAMEPADS_CONTROLLERS_DAYDREAM_CONTROLLER_H
+#define BABYLON_GAMEPADS_CONTROLLERS_DAYDREAM_CONTROLLER_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/gamepad/controllers/web_vr_controller.h>
+#include <babylon/gamepads/controllers/_game_pad_factory.h>
+#include <babylon/gamepads/controllers/web_vr_controller.h>
 
 namespace BABYLON {
 
+class DaydreamController;
 class IBrowserGamepad;
-using IBrowserGamepadPtr = std::shared_ptr<IBrowserGamepad>;
+using DaydreamControllerPtr = std::shared_ptr<DaydreamController>;
+using IBrowserGamepadPtr    = std::shared_ptr<IBrowserGamepad>;
+
+/**
+ * @brief Google Daydream controller factory.
+ */
+struct DaydreamControllerFactory : public _GamePadFactory {
+  /**
+   * @brief Returns wether or not the current gamepad can be created for this
+   * type of controller.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns true if it can be created, otherwise false
+   */
+  bool canCreate(const IBrowserGamepadPtr& gamepadInfo) const override;
+
+  /**
+   * @brief Creates a new instance of the Gamepad.
+   * @param gamepadInfo Defines the gamepad info as receveid from the controller
+   * APIs.
+   * @returns the new gamepad instance
+   */
+  WebVRControllerPtr
+  create(const IBrowserGamepadPtr& gamepadInfo) const override;
+}; // end of struct DaydreamControllerFactory
 
 /**
  * @brief Google Daydream controller.
@@ -33,11 +59,12 @@ public:
   static constexpr const char* GAMEPAD_ID_PREFIX = "Daydream";
 
 public:
-  /**
-   * @brief Creates a new DaydreamController from a gamepad.
-   * @param vrGamepad the gamepad that the controller should be created from
-   */
-  DaydreamController(const std::shared_ptr<IBrowserGamepad>& vrGamepad);
+  template <typename... Ts>
+  static DaydreamControllerPtr New(Ts&&... args)
+  {
+    return std::shared_ptr<DaydreamController>(
+      new DaydreamController(std::forward<Ts>(args)...));
+  }
   ~DaydreamController() override;
 
   /**
@@ -53,6 +80,12 @@ public:
 
 protected:
   /**
+   * @brief Creates a new DaydreamController from a gamepad.
+   * @param vrGamepad the gamepad that the controller should be created from
+   */
+  DaydreamController(const IBrowserGamepadPtr& vrGamepad);
+
+  /**
    * @brief Called once for each button that changed state since the last frame.
    * @param buttonIdx Which button index changed
    * @param state New state of the button
@@ -66,4 +99,4 @@ protected:
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_GAMEPAD_CONTROLLERS_DAYDREAM_CONTROLLER_H
+#endif // end of BABYLON_GAMEPADS_CONTROLLERS_DAYDREAM_CONTROLLER_H
