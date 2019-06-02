@@ -979,7 +979,7 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect,
 }
 
 void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
-                 bool alternate)
+                 bool /*alternate*/)
 {
   if (!_geometry || !_geometry->getVertexBuffers().size()
       || (!_unIndexed && !_geometry->getIndexBuffer())) {
@@ -1008,25 +1008,6 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
     engine->drawElementsType(_fillMode, static_cast<int>(subMesh->indexStart),
                              static_cast<int>(subMesh->indexCount),
                              static_cast<int>(instancesCount));
-  }
-
-  if (scene->_isAlternateRenderingEnabled() && !alternate) {
-    auto effect
-      = subMesh->effect() ? subMesh->effect() : _effectiveMaterial->getEffect();
-    if (!effect || !scene->activeCamera) {
-      return;
-    }
-    scene->_switchToAlternateCameraConfiguration(true);
-    _effectiveMaterial->bindView(effect.get());
-    _effectiveMaterial->bindViewProjection(effect);
-
-    engine->setViewport(scene->activeCamera->_alternateCamera->viewport);
-    _draw(subMesh, fillMode, instancesCount, true);
-    engine->setViewport(scene->activeCamera->viewport);
-
-    scene->_switchToAlternateCameraConfiguration(false);
-    _effectiveMaterial->bindView(effect.get());
-    _effectiveMaterial->bindViewProjection(effect);
   }
 }
 

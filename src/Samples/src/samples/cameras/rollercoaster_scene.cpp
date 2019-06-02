@@ -268,7 +268,7 @@ void RollercoasterScene::initializeScene(ICanvas* canvas, Scene* scene)
         // followCam->radius = 50.f + 200.f * Math::random();
       }
     }
-    _followCam->position.y = 50.f;
+    _followCam->position().y = 50.f;
   });
 }
 

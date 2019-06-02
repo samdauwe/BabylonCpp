@@ -68,7 +68,7 @@ Vector3* TargetCamera::_getLockedTargetPosition()
 
 Camera& TargetCamera::storeState()
 {
-  _storedPosition = position.copy();
+  _storedPosition = position().copy();
   _storedRotation = rotation->copy();
   if (rotationQuaternion) {
     _storedRotationQuaternion = rotationQuaternion->copy();
@@ -174,8 +174,8 @@ void TargetCamera::setTarget(const Vector3& target)
 {
   upVector.normalize();
 
-  if (stl_util::almost_equal(position.z, target.z)) {
-    position.z += Math::Epsilon;
+  if (stl_util::almost_equal(position().z, target.z)) {
+    position().z += Math::Epsilon;
   }
 
   Matrix::LookAtLHToRef(position, target, _defaultUp, _camMatrix);
@@ -230,10 +230,10 @@ void TargetCamera::_updatePosition()
     parent()->getWorldMatrix().invertToRef(Tmp::MatrixArray[0]);
     Vector3::TransformNormalToRef(*cameraDirection, Tmp::MatrixArray[0],
                                   Tmp::Vector3Array[0]);
-    position.addInPlace(Tmp::Vector3Array[0]);
+    position().addInPlace(Tmp::Vector3Array[0]);
     return;
   }
-  position.addInPlace(*cameraDirection);
+  position().addInPlace(*cameraDirection);
 }
 
 void TargetCamera::_checkInputs()
@@ -346,7 +346,7 @@ Matrix TargetCamera::_getViewMatrix()
                                      _transformedReferencePoint);
 
   // Computing target and final matrix
-  position.addToRef(_transformedReferencePoint, _currentTarget);
+  position().addToRef(_transformedReferencePoint, _currentTarget);
 
   _computeViewMatrix(position, _currentTarget, upVector);
 
@@ -439,8 +439,8 @@ void TargetCamera::_updateRigCameras()
         camLeft->rotation->copyFrom(*rotation);
         camRight->rotation->copyFrom(*rotation);
       }
-      camLeft->position.copyFrom(position);
-      camRight->position.copyFrom(position);
+      camLeft->position().copyFrom(position);
+      camRight->position().copyFrom(position);
     } break;
     default:
       break;

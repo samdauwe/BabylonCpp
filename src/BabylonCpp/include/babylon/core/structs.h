@@ -27,6 +27,7 @@ struct VRMetrics {
 }; // end of struct VRMetrics
 
 struct CameraRigParams {
+  float interaxialDistance;
   float stereoHalfAngle;
   Matrix vrHMatrix;
   Matrix vrWorkMatrix;

@@ -103,9 +103,9 @@ void CubeChaosScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
     scene->clearColor.b = std::cos(_time / 2.f + 4.f) / 3.f + 0.6f;
 
     // Move camera
-    _camera->position.x = std::cos(_time / 10.f) * 10.f;
-    _camera->position.z = std::sin(_time / 10.f) * 10.f;
-    _camera->position.y = std::cos(_time / 5.f) * 5.f + 7.f;
+    _camera->position().x = std::cos(_time / 10.f) * 10.f;
+    _camera->position().z = std::sin(_time / 10.f) * 10.f;
+    _camera->position().y = std::cos(_time / 5.f) * 5.f + 7.f;
 
     // Look camera to scene center
     _camera->setTarget(Vector3::Zero());

@@ -35,6 +35,12 @@ public:
   virtual Type type() const override;
 
   /**
+   * @brief Enabled turning on the y axis when the orientation sensor is active.
+   * @param dragFactor the factor that controls the turn speed (default: 1/300)
+   */
+  void enableHorizontalDragging(float dragFactor = 1.f / 300.f);
+
+  /**
    * @brief Gets the current instance class name ("DeviceOrientationCamera").
    * This helps avoiding instanceof at run time.
    * @returns the class name
@@ -64,9 +70,18 @@ protected:
   DeviceOrientationCamera(const std::string& name, const Vector3& position,
                           Scene* scene);
 
+public:
+  /**
+   * Hidden
+   * Disabled pointer input on first orientation sensor update (Default: true)
+   */
+  bool _disablePointerInputWhenUsingDeviceOrientation;
+
 private:
   std::unique_ptr<Quaternion> _initialQuaternion;
   std::unique_ptr<Quaternion> _quaternionCache;
+  std::unique_ptr<Quaternion> _tmpDragQuaternion;
+  float _dragFactor;
 
   static bool NodeConstructorAdded;
 

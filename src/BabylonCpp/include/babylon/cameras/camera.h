@@ -39,6 +39,11 @@ struct RigParamaters {
 class BABYLON_SHARED_EXPORT Camera : public Node {
 
 public:
+  /** Hidden */
+  static CameraPtr _createDefaultParsedCamera(const std::string& name,
+                                              Scene* scene);
+
+public:
   /**
    * This is the default projection mode used by the cameras.
    * It helps recreating a feeling of perspective and better appreciate depth.
@@ -106,15 +111,16 @@ public:
   static constexpr unsigned int RIG_MODE_WEBVR = 21;
 
   /**
+   * Custom rig mode allowing rig cameras to be populated manually with any
+   * number of cameras.
+   */
+  static constexpr unsigned int RIG_MODE_CUSTOM = 22;
+
+  /**
    * Defines if by default attaching controls should prevent the default
    * javascript event to continue.
    */
   static bool ForceAttachControlToAlwaysPreventDefault;
-
-  /**
-   * Might be removed once multiview will be a thing
-   */
-  static bool UseAlternateWebVRRendering;
 
 public:
   virtual ~Camera() override;
@@ -135,8 +141,7 @@ public:
   bool restoreState();
 
   /**
-   * @brief Gets a string representation of the camera usefull for debug
-   * purpose.
+   * @brief Gets a string representation of the camera useful for debug purpose.
    * @param fullDetails Defines that a more verboe level of logging is required
    * @returns the string representation
    */
@@ -320,13 +325,15 @@ public:
   Matrix& getTransformationMatrix();
 
   /**
-   * @brief Checks if a cullable object (mesh...) is in the camera frustum.
+   * @brief Checks if a cullable object (mesh...) is in the camera frustum
    * This checks the bounding box center. See isCompletelyInFrustum for a full
    * bounding check
    * @param target The object to check
+   * @param checkRigCameras If the rig cameras should be checked (eg. with webVR
+   * camera both eyes should be checked) (Default: false)
    * @returns true if the object is in frustum otherwise false
    */
-  bool isInFrustum(ICullable* target);
+  bool isInFrustum(ICullable* target, bool checkRigCameras = false);
 
   /**
    * @brief Checks if a cullable object (mesh...) is in the camera frustum.
@@ -400,7 +407,26 @@ public:
   /**
    * @brief Hidden
    */
-  void setCameraRigMode(int mode, const RigParamaters& rigParams);
+  void setCameraRigMode(unsigned int mode, const RigParamaters& rigParams);
+
+  /**
+   * @brief Hidden
+   */
+  virtual Matrix& _getVRProjectionMatrix();
+
+  /**
+   * @brief This function MUST be overwritten by the different WebVR cameras
+   * available. The context in which it is running is the RIG camera. So 'this'
+   * is the TargetCamera, left or right. Hidden
+   */
+  virtual Matrix& _getWebVRProjectionMatrix();
+
+  /**
+   * @brief This function MUST be overwritten by the different WebVR cameras
+   * available. The context in which it is running is the RIG camera. So 'this'
+   * is the TargetCamera, left or right. Hidden
+   */
+  virtual Matrix& _getWebVRViewMatrix();
 
   /**
    * @brief Hidden
@@ -464,6 +490,18 @@ public:
   Matrix& computeWorldMatrix(bool force             = false,
                              bool useWasUpdatedFlag = false) override;
 
+  /** Hidden */
+  static void _setStereoscopicRigMode(Camera* camera);
+
+  /** Hidden */
+  static void _setStereoscopicAnaglyphRigMode(Camera* camera);
+
+  /** Hidden */
+  static void _setVRRigMode(Camera* camera, const RigParamaters& rigParams);
+
+  /** Hidden */
+  static void _setWebVRRigMode(Camera* camera, const RigParamaters& rigParams);
+
   /**
    * @brief Gets a camera constructor for a given camera type
    * @param type The type of the camera to construct (should be equal to one of
@@ -512,6 +550,16 @@ protected:
   virtual bool _restoreStateValues();
 
   /**
+   * @brief Gets the current local position of the camera in the scene.
+   */
+  Vector3& get_position();
+
+  /**
+   * @brief Sets the current local position of the camera in the scene.
+   */
+  void set_position(const Vector3& newPosition);
+
+  /**
    * @brief Gets the left camera of a rig setup in case of Rigged Camera.
    */
   bool get_isLeftCamera() const;
@@ -528,11 +576,8 @@ private:
   Vector3& get_globalPosition();
   void _cascadePostProcessesToRigCams();
   void _updateFrustumPlanes();
-  Matrix& _getVRProjectionMatrix();
   virtual void _updateCameraRotationMatrix();
   virtual void _updateWebVRCameraRotationMatrix();
-  virtual Matrix& _getWebVRProjectionMatrix();
-  virtual Matrix& _getWebVRViewMatrix();
 
 public:
   /**
@@ -543,7 +588,7 @@ public:
   /**
    * Define the current local position of the camera in the scene
    */
-  Vector3 position;
+  Property<Camera, Vector3> position;
 
   /**
    * The vector the camera should consider as up.
@@ -608,7 +653,7 @@ public:
 
   /**
    * Define wether the camera is intermediate.
-   * This is usefull to not present the output directly to the screen in case of
+   * This is useful to not present the output directly to the screen in case of
    * rig without post process for instance
    */
   bool isIntermediate;
@@ -635,7 +680,7 @@ public:
 
   /**
    * Rig mode of the camera.
-   * This is usefull to create the camera with two "eyes" instead of one to
+   * This is useful to create the camera with two "eyes" instead of one to
    * create VR or stereoscopic scenes. This is normally controlled byt the
    * camera themselves as internal use.
    */
@@ -652,11 +697,18 @@ public:
   bool isStereoscopicSideBySide;
 
   /**
-   * Defines the list of custom render target the camera should render to.
-   * This is pretty helpfull if you wish to make a camera render to a texture
-   * you could reuse somewhere else in the scene.
+   * Defines the list of custom render target which are rendered to and then
+   * used as the input to this camera's render. Eg. display another camera view
+   * on a TV in the main scene This is pretty helpfull if you wish to make a
+   * camera render to a texture you could reuse somewhere else in the scene.
    */
   std::vector<RenderTargetTexturePtr> customRenderTargets;
+
+  /**
+   * When set, the camera will render to this render target instead of the
+   * default canvas
+   */
+  RenderTargetTexturePtr outputRenderTarget;
 
   /**
    * Observable triggered when the camera view matrix has changed.
@@ -683,8 +735,6 @@ public:
   PostProcess* _rigPostProcess;
   /** Hidden */
   bool _skipRendering;
-  /** Hidden */
-  Camera* _alternateCamera;
 
   /** Cache **/
   Matrix _projectionMatrix;
@@ -698,8 +748,13 @@ public:
   /** Hidden */
   std::vector<AbstractMesh*> _activeMeshes;
 
+  Matrix _computedViewMatrix;
+
   /** Hidden */
   ReadOnlyProperty<Camera, Vector3> globalPosition;
+
+  /** Hidden */
+  const bool _isCamera;
 
   /** Hidden */
   bool _isLeftCamera;
@@ -722,7 +777,7 @@ protected:
   Vector3 _globalPosition;
 
 private:
-  Matrix _computedViewMatrix;
+  Vector3 _position;
   bool _doNotComputeProjectionMatrix;
   Matrix _transformMatrix;
   Matrix _webvrProjectionMatrix;

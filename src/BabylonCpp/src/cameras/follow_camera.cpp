@@ -58,9 +58,9 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
   float targetX       = targetPosition.x + std::sin(radians) * radius;
   float targetZ       = targetPosition.z + std::cos(radians) * radius;
 
-  float dx = targetX - position.x;
-  float dy = (targetPosition.y + heightOffset) - position.y;
-  float dz = targetZ - position.z;
+  float dx = targetX - position().x;
+  float dy = (targetPosition.y + heightOffset) - position().y;
+  float dz = targetZ - position().z;
   float vx = dx * cameraAcceleration * 2.f; // this is set to .05
   float vy = dy * cameraAcceleration;
   float vz = dz * cameraAcceleration * 2.f;
@@ -77,7 +77,7 @@ void FollowCamera::_follow(const AbstractMeshPtr& cameraTarget)
     vz = vz < 1.f ? -maxCameraSpeed : maxCameraSpeed;
   }
 
-  position = Vector3(position.x + vx, position.y + vy, position.z + vz);
+  position = Vector3(position().x + vx, position().y + vy, position().z + vz);
   setTarget(targetPosition);
 }
 

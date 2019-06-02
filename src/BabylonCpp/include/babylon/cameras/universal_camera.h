@@ -19,6 +19,9 @@ using UniversalCameraPtr = std::shared_ptr<UniversalCamera>;
 class BABYLON_SHARED_EXPORT UniversalCamera : public TouchCamera {
 
 public:
+  static void AddNodeConstructor();
+
+public:
   template <typename... Ts>
   static UniversalCameraPtr New(Ts&&... args)
   {
@@ -70,6 +73,10 @@ public:
    * prevent jittering.
    */
   Property<UniversalCamera, float> gamepadMoveSensibility;
+
+private:
+  /** Hidden */
+  static bool NodeConstructorAdded;
 
 }; // end of class UniversalCamera
 

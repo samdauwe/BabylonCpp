@@ -109,7 +109,7 @@ void ShaderMaterialCloudsScene::initializeScene(ICanvas* /*canvas*/,
   scene->registerBeforeRender([this](Scene* /*scene*/, EventState& /*es*/) {
     float cameraDepth
       = std::fmod((Time::unixtimeInMs() - _startTime) * 0.03f, 8000.f);
-    _camera->position.z = cameraDepth;
+    _camera->position().z = cameraDepth;
   });
 }
 

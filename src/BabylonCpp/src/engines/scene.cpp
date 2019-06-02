@@ -2314,13 +2314,13 @@ void Scene::setTransformMatrix(Matrix& view, Matrix& projection)
     Frustum::GetPlanesToRef(_transformMatrix, _frustumPlanes);
   }
 
-  if (activeCamera && activeCamera->_alternateCamera) {
+  /*if (activeCamera && activeCamera->_alternateCamera) {
     auto& otherCamera = activeCamera->_alternateCamera;
     otherCamera->getViewMatrix().multiplyToRef(
       otherCamera->getProjectionMatrix(), Tmp::MatrixArray[0]);
     // Replace right plane by second camera right plane
     Frustum::GetRightPlaneToRef(Tmp::MatrixArray[0], _frustumPlanes[3]);
-  }
+  }*/
 
   if (_sceneUbo->useUbo()) {
     _sceneUbo->updateMatrix("viewProjection", _transformMatrix);
@@ -3528,7 +3528,7 @@ void Scene::_renderForCamera(const CameraPtr& camera,
   activeCamera = camera;
 
   if (!activeCamera) {
-    BABYLON_LOG_ERROR("Scene", "Active camera not set");
+    BABYLON_LOG_ERROR("Scene", "Active camera not set")
     return;
   }
 
@@ -3540,10 +3540,10 @@ void Scene::_renderForCamera(const CameraPtr& camera,
   ++_renderId;
   updateTransformMatrix();
 
-  if (camera->_alternateCamera) {
+  /*if (camera->_alternateCamera) {
     updateAlternateTransformMatrix(camera->_alternateCamera);
     _alternateRendering = true;
-  }
+  }*/
 
   onBeforeCameraRenderObservable.notifyObservers(activeCamera.get());
 
@@ -3791,7 +3791,7 @@ void Scene::render(bool updateCameras)
                                                     activeCamera;
 
         if (!activeCamera) {
-          BABYLON_LOG_ERROR("Scene", "Active camera not set");
+          BABYLON_LOG_ERROR("Scene", "Active camera not set")
           return;
         }
 
@@ -3856,7 +3856,7 @@ void Scene::render(bool updateCameras)
   }
   else {
     if (!activeCamera) {
-      BABYLON_LOG_ERROR("Scene", "No camera defined");
+      BABYLON_LOG_ERROR("Scene", "No camera defined")
       return;
     }
 
@@ -4372,7 +4372,7 @@ Scene& Scene::createPickingRayToRef(int x, int y,
 
   if (!camera) {
     if (!activeCamera) {
-      BABYLON_LOG_ERROR("Scene", "Active camera not set");
+      BABYLON_LOG_ERROR("Scene", "Active camera not set")
       return *this;
     }
 
@@ -4417,7 +4417,7 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
 
   if (!camera) {
     if (!activeCamera) {
-      BABYLON_LOG_ERROR("Scene", "Active camera not set");
+      BABYLON_LOG_ERROR("Scene", "Active camera not set")
       return *this;
     }
 
@@ -4885,7 +4885,7 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
 {
   if (!environmentTexture()) {
     BABYLON_LOG_WARN(
-      "Scene", "Can not create default skybox without environment texture.");
+      "Scene", "Can not create default skybox without environment texture.")
     return nullptr;
   }
 

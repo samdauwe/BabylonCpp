@@ -78,7 +78,7 @@ void ShaderMaterialScene::initializeScene(ICanvas* canvas, Scene* scene)
     ++_j;
     _polyhedron->rotation().x += 0.03f;
     _camera->alpha += 0.01f;
-    _camera->position.x += 0.01f;
+    _camera->position().x += 0.01f;
   });
 }
 

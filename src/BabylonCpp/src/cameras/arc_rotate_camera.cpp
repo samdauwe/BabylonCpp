@@ -353,7 +353,7 @@ void ArcRotateCamera::_checkLimits()
 
 void ArcRotateCamera::rebuildAnglesAndRadius()
 {
-  position.subtractToRef(_getTargetPosition(), _computationVector);
+  position().subtractToRef(_getTargetPosition(), _computationVector);
   radius = _computationVector.length();
 
   if (radius == 0.f) {
@@ -377,11 +377,11 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
 
 void ArcRotateCamera::setPosition(const Vector3& iPosition)
 {
-  if (position.equals(iPosition)) {
+  if (position().equals(iPosition)) {
     return;
   }
 
-  position.copyFrom(iPosition);
+  position().copyFrom(iPosition);
 
   rebuildAnglesAndRadius();
 }
@@ -540,7 +540,7 @@ Matrix ArcRotateCamera::_getViewMatrix()
       static_cast<unsigned>(uniqueId));
   }
   else {
-    position.copyFrom(_newPosition);
+    position().copyFrom(_newPosition);
 
     auto up = upVector;
     if (allowUpsideDown && sinb < 0.f) {
@@ -590,7 +590,7 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
   _computationVector.copyFromFloats(radius * cosa * sinb, radius * cosb,
                                     radius * sina * sinb);
   targetPostion.addToRef(_computationVector, _newPosition);
-  position.copyFrom(_newPosition);
+  position().copyFrom(_newPosition);
 
   auto up = upVector;
   if (allowUpsideDown && beta < 0.f) {

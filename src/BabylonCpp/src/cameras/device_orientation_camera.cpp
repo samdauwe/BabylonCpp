@@ -15,11 +15,14 @@ void DeviceOrientationCamera::AddNodeConstructor()
 }
 
 DeviceOrientationCamera::DeviceOrientationCamera(const std::string& iName,
-                                                 const Vector3& position,
+                                                 const Vector3& iPosition,
                                                  Scene* scene)
-    : FreeCamera{iName, position, scene}
+    : FreeCamera{iName, iPosition, scene}
+    , _disablePointerInputWhenUsingDeviceOrientation{true}
     , _initialQuaternion{nullptr}
     , _quaternionCache{std::make_unique<Quaternion>()}
+    , _tmpDragQuaternion{std::make_unique<Quaternion>()}
+    , _dragFactor{0.f}
 {
   inputs->addDeviceOrientation();
 }
@@ -31,6 +34,11 @@ DeviceOrientationCamera::~DeviceOrientationCamera()
 Type DeviceOrientationCamera::type() const
 {
   return Type::DEVICEORIENTATIONCAMERA;
+}
+
+void DeviceOrientationCamera::enableHorizontalDragging(float dragFactor)
+{
+  _dragFactor = dragFactor;
 }
 
 const std::string DeviceOrientationCamera::getClassName() const

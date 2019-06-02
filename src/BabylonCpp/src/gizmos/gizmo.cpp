@@ -121,7 +121,7 @@ void Gizmo::_update()
     if (_updateScale && gizmoLayer->utilityLayerScene->activeCamera
         && attachedMesh()) {
       auto cameraPosition
-        = gizmoLayer->utilityLayerScene->activeCamera->position;
+        = gizmoLayer->utilityLayerScene->activeCamera->position();
       /*
       if((<WebVRFreeCamera>gizmoLayer.utilityLayerScene.activeCamera).devicePosition){
           cameraPosition =

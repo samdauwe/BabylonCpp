@@ -135,7 +135,7 @@ void FreeCamera::_onCollisionPositionChange(int /*collisionId*/,
     _newPosition.subtractToRef(_oldPosition, _diffPosition);
 
     if (_diffPosition.length() > Engine::CollisionsEpsilon) {
-      position.addInPlace(_diffPosition);
+      position().addInPlace(_diffPosition);
       if (onCollide && collidedMesh) {
         onCollide(collidedMesh);
       }

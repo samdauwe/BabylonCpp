@@ -96,7 +96,7 @@ void AttachToBoxBehavior::attach(const MeshPtr& target)
       }
 
       // Find the face closest to the cameras position
-      auto cameraPos = _scene->activeCamera->position;
+      auto cameraPos = _scene->activeCamera->position();
       auto facing    = _closestFace(cameraPos.subtract(target->position()));
       if (_scene->activeCamera->leftCamera()) {
         _scene->activeCamera->leftCamera()
