@@ -122,12 +122,10 @@ A summary of the development roadmap can be found on [this page](https://github.
 
 ## Supported Compilers ##
 The compiler should implement all the features of the [ISO C++ 2017 standard](https://www.iso.org/standard/68564.html):
-| Compiler      | Version       |
-| ------------- |:-------------:|
-| GCC           | >= 7.0.0      |
-| Clang         | >= 5.0.0      |
-| AppleClang    | >= 10.0       |
-| MSVC          | >= 2017       |
+* GCC >= 7.0.0
+* Clang >= 5.0.0
+* AppleClang >= 10.0
+* MSVC >= 2017
 
 ## Supported Operating Systems ##
 * Linux
