@@ -2,7 +2,7 @@
 #define BABYLON_LAYER_IHIGHLIGHT_LAYER_EXCLUDED_MESH_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

@@ -8,8 +8,8 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/math/matrix.h>
-#include <babylon/tools/serialization_helper.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/serialization_helper.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

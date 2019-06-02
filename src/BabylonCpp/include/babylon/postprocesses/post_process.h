@@ -9,8 +9,8 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/color4.h>
 #include <babylon/misc/iinspectable.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

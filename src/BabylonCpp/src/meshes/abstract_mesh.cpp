@@ -31,7 +31,7 @@
 #include <babylon/physics/physics_engine.h>
 #include <babylon/rendering/bounding_box_renderer.h>
 #include <babylon/rendering/edges_renderer.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

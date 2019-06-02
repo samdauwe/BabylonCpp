@@ -10,7 +10,7 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/matrix.h>
 #include <babylon/misc/iinspectable.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 using json = nlohmann::json;
 

@@ -5,8 +5,8 @@
 #include <babylon/engines/scene.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

@@ -3,7 +3,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/morph/morph_target.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

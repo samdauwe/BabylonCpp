@@ -3,8 +3,8 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
-#include <babylon/tools/observer.h>
-#include <babylon/tools/perf_counter.h>
+#include <babylon/misc/observer.h>
+#include <babylon/misc/perf_counter.h>
 
 namespace BABYLON {
 

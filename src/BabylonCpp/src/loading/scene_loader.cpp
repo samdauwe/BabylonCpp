@@ -12,7 +12,7 @@
 #include <babylon/loading/iscene_loader_plugin_factory.h>
 #include <babylon/loading/plugins/babylon/babylon_file_loader.h>
 #include <babylon/loading/scene_loader_progress_event.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

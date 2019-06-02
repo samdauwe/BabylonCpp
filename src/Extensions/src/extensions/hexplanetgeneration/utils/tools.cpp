@@ -7,7 +7,7 @@
 #include <babylon/math/quaternion.h>
 #include <babylon/math/scalar.h>
 #include <babylon/math/vector3.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 namespace Extensions {

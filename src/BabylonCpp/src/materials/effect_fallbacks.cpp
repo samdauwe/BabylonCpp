@@ -7,7 +7,7 @@
 #include <babylon/materials/material.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

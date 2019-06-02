@@ -19,8 +19,8 @@
 #include <babylon/math/frustum.h>
 #include <babylon/postprocesses/pass_post_process.h>
 #include <babylon/postprocesses/post_process.h>
-#include <babylon/tools/serialization_helper.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/serialization_helper.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

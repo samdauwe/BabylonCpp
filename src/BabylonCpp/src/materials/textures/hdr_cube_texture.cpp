@@ -10,9 +10,9 @@
 #include <babylon/materials/material.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
-#include <babylon/tools/hdr/cube_map_to_spherical_polynomial_tools.h>
-#include <babylon/tools/hdr/hdr_tools.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/highdynamicrange/cube_map_to_spherical_polynomial_tools.h>
+#include <babylon/misc/highdynamicrange/hdr_tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

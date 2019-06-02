@@ -6,8 +6,8 @@
 #include <babylon/babylon_api.h>
 #include <babylon/particles/base_particle_system.h>
 #include <babylon/particles/iparticle_system.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

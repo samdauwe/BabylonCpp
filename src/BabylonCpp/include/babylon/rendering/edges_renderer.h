@@ -6,7 +6,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/math/vector3.h>
 #include <babylon/rendering/iedges_renderer.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

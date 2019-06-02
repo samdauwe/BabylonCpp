@@ -10,7 +10,7 @@
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data_options.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

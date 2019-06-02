@@ -5,8 +5,8 @@
 #include <babylon/engines/engine_constants.h>
 #include <babylon/materials/textures/irender_target_options.h>
 #include <babylon/materials/textures/texture.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

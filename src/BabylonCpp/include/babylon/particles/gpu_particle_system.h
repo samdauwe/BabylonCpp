@@ -4,7 +4,7 @@
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
 #include <babylon/particles/base_particle_system.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 

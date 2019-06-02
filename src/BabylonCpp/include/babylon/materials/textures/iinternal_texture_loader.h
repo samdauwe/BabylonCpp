@@ -7,7 +7,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/tools/dds_info.h>
+#include <babylon/misc/dds_info.h>
 
 namespace BABYLON {
 

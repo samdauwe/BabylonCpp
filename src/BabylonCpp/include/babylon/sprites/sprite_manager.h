@@ -5,8 +5,8 @@
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/sprites/isprite_manager.h>
 #include <babylon/sprites/sprite.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

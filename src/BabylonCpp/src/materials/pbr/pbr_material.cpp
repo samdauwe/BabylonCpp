@@ -5,7 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/image_processing_configuration.h>
-#include <babylon/tools/texture_tools.h>
+#include <babylon/misc/texture_tools.h>
 
 namespace BABYLON {
 

@@ -9,7 +9,7 @@
 #include <babylon/layer/ieffect_layer_options.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/size.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 using json = nlohmann::json;
 

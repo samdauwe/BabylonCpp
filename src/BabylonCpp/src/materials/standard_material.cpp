@@ -31,7 +31,7 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/tools/serialization_helper.h>
+#include <babylon/misc/serialization_helper.h>
 
 namespace BABYLON {
 

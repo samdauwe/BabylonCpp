@@ -6,7 +6,7 @@
 #include <babylon/cameras/icamera_input.h>
 #include <babylon/core/structs.h>
 #include <babylon/events/pointer_info.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

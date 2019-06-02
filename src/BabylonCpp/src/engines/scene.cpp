@@ -80,7 +80,7 @@
 #include <babylon/rendering/outline_renderer.h>
 #include <babylon/rendering/rendering_manager.h>
 #include <babylon/sprites/sprite_manager.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -100,7 +100,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , autoClearDepthAndStencil{true}
     , clearColor{Color4(0.2f, 0.2f, 0.3f, 1.f)}
     , ambientColor{Color3(0.f, 0.f, 0.f)}
-    , _environmentBRDFTexture{nullptr}
+    , environmentBRDFTexture{nullptr}
     , imageProcessingConfiguration{this,
                                    &Scene::get_imageProcessingConfiguration}
     , onDispose{this, &Scene::set_onDispose}

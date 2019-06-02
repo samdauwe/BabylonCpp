@@ -7,7 +7,7 @@
 #include <babylon/babylon_common.h>
 #include <babylon/core/structs.h>
 #include <babylon/materials/textures/iinternal_texture_tracker.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 

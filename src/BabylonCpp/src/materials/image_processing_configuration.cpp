@@ -9,7 +9,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/iimage_processing_configuration_defines.h>
 #include <babylon/materials/textures/base_texture.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

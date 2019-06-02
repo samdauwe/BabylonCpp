@@ -20,10 +20,10 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
-#include <babylon/tools/ifile_request.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
-#include <babylon/tools/perf_counter.h>
+#include <babylon/misc/ifile_request.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
+#include <babylon/misc/perf_counter.h>
 
 using json = nlohmann::json;
 
@@ -2177,8 +2177,22 @@ public:
    */
   Color3 ambientColor;
 
-  /** Hidden */
-  BaseTexturePtr _environmentBRDFTexture;
+  /**
+   * This is use to store the default BRDF lookup for PBR materials in your
+   * scene. It should only be one of the following (if not the default embedded
+   * one):
+   * * For uncorrelated BRDF (pbr.brdf.useEnergyConservation = false and
+   * pbr.brdf.useSmithVisibilityHeightCorrelated = false) :
+   * https://assets.babylonjs.com/environments/uncorrelatedBRDF.dds
+   * * For correlated BRDF (pbr.brdf.useEnergyConservation = false and
+   * pbr.brdf.useSmithVisibilityHeightCorrelated = true) :
+   * https://assets.babylonjs.com/environments/correlatedBRDF.dds
+   * * For correlated multi scattering BRDF (pbr.brdf.useEnergyConservation =
+   * true and pbr.brdf.useSmithVisibilityHeightCorrelated = true) :
+   * https://assets.babylonjs.com/environments/correlatedMSBRDF.dds The material
+   * properties need to be setup according to the type of texture in use.
+   */
+  BaseTexturePtr environmentBRDFTexture;
 
   /**
    * Default image processing configuration used either in the rendering

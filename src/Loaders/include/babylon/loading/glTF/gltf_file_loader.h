@@ -10,7 +10,7 @@
 #include <babylon/loading/glTF/igltf_loader.h>
 #include <babylon/loading/iscene_loader_plugin_async.h>
 #include <babylon/loading/iscene_loader_plugin_factory.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 

@@ -13,7 +13,7 @@
 #include <babylon/particles/emittertypes/point_particle_emitter.h>
 #include <babylon/particles/emittertypes/sphere_directed_particle_emitter.h>
 #include <babylon/particles/particle_system.h>
-#include <babylon/tools/color3_gradient.h>
+#include <babylon/misc/color3_gradient.h>
 
 namespace BABYLON {
 

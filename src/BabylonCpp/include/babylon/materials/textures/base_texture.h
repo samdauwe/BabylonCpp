@@ -7,8 +7,8 @@
 #include <babylon/core/array_buffer_view.h>
 #include <babylon/core/structs.h>
 #include <babylon/math/isize.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

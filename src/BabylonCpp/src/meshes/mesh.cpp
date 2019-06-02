@@ -43,7 +43,7 @@
 #include <babylon/physics/physics_engine.h>
 #include <babylon/physics/physics_impostor.h>
 #include <babylon/rendering/outline_renderer.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

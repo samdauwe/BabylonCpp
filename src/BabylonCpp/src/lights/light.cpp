@@ -11,7 +11,7 @@
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/tools/serialization_helper.h>
+#include <babylon/misc/serialization_helper.h>
 
 namespace BABYLON {
 

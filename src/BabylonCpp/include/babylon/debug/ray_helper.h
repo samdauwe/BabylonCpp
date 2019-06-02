@@ -6,7 +6,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/culling/ray.h>
 #include <babylon/math/vector3.h>
-#include <babylon/tools/event_state.h>
+#include <babylon/misc/event_state.h>
 
 namespace BABYLON {
 

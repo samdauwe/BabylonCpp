@@ -8,7 +8,7 @@
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
 #include <babylon/math/matrix.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 

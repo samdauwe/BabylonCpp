@@ -5,7 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/inspector/entity.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 

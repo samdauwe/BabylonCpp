@@ -4,7 +4,7 @@
 #include <babylon/core/random.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/scalar.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

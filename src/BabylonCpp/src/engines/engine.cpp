@@ -45,8 +45,8 @@
 #include <babylon/states/_alpha_state.h>
 #include <babylon/states/_depth_culling_state.h>
 #include <babylon/states/_stencil_state.h>
-#include <babylon/tools/dds.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/dds.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

@@ -6,7 +6,7 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 namespace Samples {

@@ -10,7 +10,7 @@
 #include <babylon/loading/glTF/2.0/gltf_loader_interfaces.h>
 #include <babylon/loading/glTF/binary_reader.h>
 #include <babylon/loading/scene_loader.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 namespace GLTF2 {

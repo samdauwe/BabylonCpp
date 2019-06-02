@@ -3,8 +3,8 @@
 #include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
-#include <babylon/tools/environment_texture_info.h>
-#include <babylon/tools/environment_texture_tools.h>
+#include <babylon/misc/environment_texture_info.h>
+#include <babylon/misc/environment_texture_tools.h>
 
 namespace BABYLON {
 

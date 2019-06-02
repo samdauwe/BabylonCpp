@@ -4,7 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/math/color3.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

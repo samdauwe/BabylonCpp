@@ -6,8 +6,8 @@
 #include <babylon/behaviors/meshes/pointer_drag_behavior_options.h>
 #include <babylon/core/structs.h>
 #include <babylon/culling/ray.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

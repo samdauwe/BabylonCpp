@@ -2,7 +2,7 @@
 
 #include <babylon/engines/scene.h>
 #include <babylon/materials/textures/procedurals/procedural_texture.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

@@ -6,7 +6,7 @@
 #include <babylon/behaviors/meshes/face_direction_info.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

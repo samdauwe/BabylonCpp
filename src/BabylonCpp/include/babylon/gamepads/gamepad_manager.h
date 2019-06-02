@@ -4,7 +4,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/core/structs.h>
 #include <babylon/gamepads/gamepad.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 

@@ -3,7 +3,7 @@
 #include <babylon/core/string.h>
 #include <babylon/engines/engine.h>
 #include <babylon/materials/textures/internal_texture.h>
-#include <babylon/tools/dds.h>
+#include <babylon/misc/dds.h>
 
 namespace BABYLON {
 

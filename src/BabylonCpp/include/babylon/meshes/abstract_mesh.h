@@ -18,8 +18,8 @@
 #include <babylon/meshes/iget_set_vertices_data.h>
 #include <babylon/meshes/transform_node.h>
 #include <babylon/physics/physics_impostor.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/observer.h>
 
 using json = nlohmann::json;
 

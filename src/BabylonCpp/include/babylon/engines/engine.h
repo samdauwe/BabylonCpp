@@ -17,10 +17,10 @@
 #include <babylon/math/vector4.h>
 #include <babylon/math/viewport.h>
 #include <babylon/meshes/buffer_pointer.h>
-#include <babylon/tools/ifile_request.h>
-#include <babylon/tools/observable.h>
-#include <babylon/tools/perf_counter.h>
-#include <babylon/tools/performance_monitor.h>
+#include <babylon/misc/ifile_request.h>
+#include <babylon/misc/observable.h>
+#include <babylon/misc/perf_counter.h>
+#include <babylon/misc/performance_monitor.h>
 
 namespace BABYLON {
 

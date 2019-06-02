@@ -10,7 +10,7 @@
 #include <babylon/lights/light.h>
 #include <babylon/math/matrix.h>
 #include <babylon/meshes/abstract_mesh.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

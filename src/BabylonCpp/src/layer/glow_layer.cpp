@@ -17,7 +17,7 @@
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

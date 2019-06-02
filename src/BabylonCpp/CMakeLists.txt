@@ -124,7 +124,9 @@ file(GLOB MESHES_HDR_FILES          ${INCLUDE_PATH}/meshes/*.h
                                     ${INCLUDE_PATH}/meshes/csg/*.h
                                     ${INCLUDE_PATH}/meshes/polygonmesh/*.h
                                     ${INCLUDE_PATH}/meshes/simplification/*.h)
-file(GLOB MISC_HDR_FILES            ${INCLUDE_PATH}/misc/*.h)
+file(GLOB MISC_HDR_FILES            ${INCLUDE_PATH}/misc/*.h
+                                    ${INCLUDE_PATH}/misc/highdynamicrange/*.h
+                                    ${INCLUDE_PATH}/misc/optimization/*.h)
 file(GLOB MORPH_HDR_FILES           ${INCLUDE_PATH}/morph/*.h)
 file(GLOB PARTICLES_HDR_FILES       ${INCLUDE_PATH}/particles/*.h
                                     ${INCLUDE_PATH}/particles/emittertypes/*.h)
@@ -141,9 +143,6 @@ file(GLOB SHADERS_HDR_FILES         ${INCLUDE_PATH}/shaders/*.h
                                     ${INCLUDE_PATH}/shaders/shadersinclude/*.h)
 file(GLOB SPRITES_HDR_FILES         ${INCLUDE_PATH}/sprites/*.h)
 file(GLOB STATES_HDR_FILES          ${INCLUDE_PATH}/states/*.h)
-file(GLOB TOOLS_HDR_FILES           ${INCLUDE_PATH}/tools/*.h
-                                    ${INCLUDE_PATH}/tools/hdr/*.h
-                                    ${INCLUDE_PATH}/tools/optimization/*.h)
 file(GLOB UTILS_HDR_FILES           ${INCLUDE_PATH}/utils/*.h)
 
 if (UNIX)
@@ -196,7 +195,6 @@ set(BABYLON_HEADERS
     ${SHADERS_HDR_FILES}
     ${SPRITES_HDR_FILES}
     ${STATES_HDR_FILES}
-    ${TOOLS_HDR_FILES}
     ${UTILS_HDR_FILES}
 )
 
@@ -249,7 +247,9 @@ file(GLOB MESHES_SRC_FILES          ${SOURCE_PATH}/meshes/*.cpp
                                     ${SOURCE_PATH}/meshes/csg/*.cpp
                                     ${SOURCE_PATH}/meshes/polygonmesh/*.cpp
                                     ${SOURCE_PATH}/meshes/simplification/*.cpp)
-file(GLOB MISC_SRC_FILES            ${SOURCE_PATH}/misc/*.cpp)
+file(GLOB MISC_SRC_FILES            ${SOURCE_PATH}/misc/*.cpp
+                                    ${SOURCE_PATH}/misc/highdynamicrange/*.cpp
+                                    ${SOURCE_PATH}/misc/optimization/*.cpp)
 file(GLOB MORPH_SRC_FILES           ${SOURCE_PATH}/morph/*.cpp)
 file(GLOB PARTICLES_SRC_FILES       ${SOURCE_PATH}/particles/*.cpp
                                     ${SOURCE_PATH}/particles/emittertypes/*.cpp)
@@ -264,9 +264,6 @@ file(GLOB PROBES_SRC_FILES          ${SOURCE_PATH}/probes/*.cpp)
 file(GLOB RENDERING_SRC_FILES       ${SOURCE_PATH}/rendering/*.cpp)
 file(GLOB SPRITES_SRC_FILES         ${SOURCE_PATH}/sprites/*.cpp)
 file(GLOB STATES_SRC_FILES          ${SOURCE_PATH}/states/*.cpp)
-file(GLOB TOOLS_SRC_FILES           ${SOURCE_PATH}/tools/*.cpp
-                                    ${SOURCE_PATH}/tools/hdr/*.cpp
-                                    ${SOURCE_PATH}/tools/optimization/*.cpp)
 file(GLOB UTILS_SRC_FILES           ${SOURCE_PATH}/utils/*.cpp)
 
 if (UNIX)
@@ -317,7 +314,6 @@ set(BABYLON_SOURCES
     ${SHADERS_SRC_FILES}
     ${SPRITES_SRC_FILES}
     ${STATES_SRC_FILES}
-    ${TOOLS_SRC_FILES}
     ${UTILS_SRC_FILES}
 )
 

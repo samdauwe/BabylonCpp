@@ -7,7 +7,7 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

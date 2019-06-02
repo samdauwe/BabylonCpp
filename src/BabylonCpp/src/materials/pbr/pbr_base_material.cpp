@@ -23,7 +23,7 @@
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/tools/texture_tools.h>
+#include <babylon/misc/texture_tools.h>
 
 namespace BABYLON {
 
@@ -1507,7 +1507,7 @@ void PBRBaseMaterial::dispose(bool forceDisposeEffect,
     }
 
     if (_environmentBRDFTexture
-        && getScene()->_environmentBRDFTexture != _environmentBRDFTexture) {
+        && getScene()->environmentBRDFTexture != _environmentBRDFTexture) {
       _environmentBRDFTexture->dispose();
     }
 

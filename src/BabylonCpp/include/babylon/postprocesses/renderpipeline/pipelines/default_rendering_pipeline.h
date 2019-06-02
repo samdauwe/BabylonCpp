@@ -9,7 +9,7 @@
 #include <babylon/interfaces/idisposable.h>
 #include <babylon/postprocesses/depth_of_field_effect_blur_level.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 using json = nlohmann::json;
 

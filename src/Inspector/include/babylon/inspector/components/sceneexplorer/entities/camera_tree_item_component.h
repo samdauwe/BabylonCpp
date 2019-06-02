@@ -7,7 +7,7 @@
 #include <babylon/babylon_api.h>
 #include <babylon/imgui/icons_font_awesome_5.h>
 #include <babylon/inspector/components/sceneexplorer/tree_item_specialized_component.h>
-#include <babylon/tools/observer.h>
+#include <babylon/misc/observer.h>
 
 namespace BABYLON {
 

@@ -6,7 +6,7 @@
 #include <babylon/gamepads/controllers/pose_enabled_controller.h>
 #include <babylon/gamepads/gamepad_button_changes.h>
 #include <babylon/gamepads/stick_values.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 

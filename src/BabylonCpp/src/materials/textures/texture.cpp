@@ -9,8 +9,8 @@
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/materials/textures/mirror_texture.h>
 #include <babylon/meshes/buffer.h>
-#include <babylon/tools/serialization_helper.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/serialization_helper.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

@@ -5,7 +5,7 @@
 #include <variant>
 #include <unordered_map>
 #include <babylon/babylon_api.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 

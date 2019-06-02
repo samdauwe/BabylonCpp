@@ -11,7 +11,7 @@
 #include <babylon/math/plane.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/viewport.h>
-#include <babylon/tools/observable.h>
+#include <babylon/misc/observable.h>
 
 using json = nlohmann::json;
 

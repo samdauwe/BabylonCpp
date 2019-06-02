@@ -18,7 +18,7 @@
 #include <babylon/extensions/hexplanetgeneration/utils/tools.h>
 #include <babylon/extensions/hexplanetgeneration/utils/xor_shift_128.h>
 #include <babylon/math/color4.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 namespace Extensions {

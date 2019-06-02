@@ -2,7 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/math/scalar.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 

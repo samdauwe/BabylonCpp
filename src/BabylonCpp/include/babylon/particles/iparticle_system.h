@@ -10,8 +10,8 @@
 #include <babylon/math/color4.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
-#include <babylon/tools/color_gradient.h>
-#include <babylon/tools/factor_gradient.h>
+#include <babylon/misc/color_gradient.h>
+#include <babylon/misc/factor_gradient.h>
 
 using json = nlohmann::json;
 

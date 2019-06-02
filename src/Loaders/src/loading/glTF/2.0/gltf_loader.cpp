@@ -25,7 +25,7 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
-#include <babylon/tools/tools.h>
+#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 namespace GLTF2 {
