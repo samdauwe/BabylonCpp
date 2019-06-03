@@ -2,6 +2,7 @@
 #define BABYLON_MISC_BRDF_TEXTURE_TOOLS_H
 
 #include <memory>
+#include <string>
 
 #include <babylon/babylon_api.h>
 
