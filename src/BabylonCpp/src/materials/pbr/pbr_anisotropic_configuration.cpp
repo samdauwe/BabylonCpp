@@ -25,7 +25,6 @@ PBRAnisotropicConfiguration::PBRAnisotropicConfiguration(
     , _texture{nullptr}
     , _internalMarkAllSubMeshesAsTexturesDirty{markAllSubMeshesAsTexturesDirty}
 {
-  isEnabled = false;
 }
 
 PBRAnisotropicConfiguration::~PBRAnisotropicConfiguration()

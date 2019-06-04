@@ -1,43 +1,41 @@
-#ifndef BABYLON_MATERIALS_PBR_PBR_ANISOTROPIC_CONFIGURATION_H
-#define BABYLON_MATERIALS_PBR_PBR_ANISOTROPIC_CONFIGURATION_H
+#ifndef BABYLON_MATERIALS_PBR_PBR_SHEEN_CONFIGURATION_H
+#define BABYLON_MATERIALS_PBR_PBR_SHEEN_CONFIGURATION_H
 
 #include <functional>
+
 #include <nlohmann/json_fwd.hpp>
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
-#include <babylon/math/vector2.h>
+#include <babylon/math/color3.h>
 
 using json = nlohmann::json;
 
 namespace BABYLON {
 
-class AbstractMesh;
-class IAnimatable;
 class BaseTexture;
 class EffectFallbacks;
-struct IMaterialAnisotropicDefines;
+class IAnimatable;
+struct IMaterialSheenDefines;
 class Scene;
 class UniformBuffer;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using IAnimatablePtr  = std::shared_ptr<IAnimatable>;
-using BaseTexturePtr  = std::shared_ptr<BaseTexture>;
+using BaseTexturePtr = std::shared_ptr<BaseTexture>;
+using IAnimatablePtr = std::shared_ptr<IAnimatable>;
 
 /**
- * @brief Define the code related to the anisotropic parameters of the pbr
- * material.
+ * @brief Define the code related to the BRDF parameters of the pbr material.
  */
-class BABYLON_SHARED_EXPORT PBRAnisotropicConfiguration {
+class BABYLON_SHARED_EXPORT PBRSheenConfiguration {
 
 public:
   /**
-   * @brief Instantiate a new istance of anisotropy configuration.
+   * @brief Instantiate a new istance of clear coat configuration.
    * @param markAllSubMeshesAsTexturesDirty Callback to flag the material to
    * dirty
    */
-  PBRAnisotropicConfiguration(
+  PBRSheenConfiguration(
     const std::function<void()>& markAllSubMeshesAsTexturesDirty);
-  ~PBRAnisotropicConfiguration();
+  ~PBRSheenConfiguration();
 
   /**
    * @brief Hidden
@@ -50,17 +48,15 @@ public:
    * @param scene defines the scene the material belongs to.
    * @returns - boolean indicating that the submesh is ready or not.
    */
-  bool isReadyForSubMesh(const IMaterialAnisotropicDefines& defines,
+  bool isReadyForSubMesh(const IMaterialSheenDefines& defines,
                          Scene* scene) const;
 
   /**
    * @brief Checks to see if a texture is used in the material.
    * @param defines the list of "defines" to update.
-   * @param mesh the mesh we are preparing the defines for.
    * @param scene defines the scene the material belongs to.
    */
-  void prepareDefines(IMaterialAnisotropicDefines& defines,
-                      const AbstractMeshPtr& mesh, Scene* scene);
+  void prepareDefines(IMaterialSheenDefines& defines, Scene* scene);
 
   /**
    * @brief Binds the material data.
@@ -99,7 +95,7 @@ public:
   /**
    * @brief Get the current class name of the texture useful for serialization
    * or dynamic coding.
-   * @returns "PBRAnisotropicConfiguration"
+   * @returns "PBRSheenConfiguration"
    */
   const std::string getClassName() const;
 
@@ -110,7 +106,7 @@ public:
    * @param currentRank defines the current fallback rank.
    * @returns the new fallback rank.
    */
-  static unsigned int AddFallbacks(const IMaterialAnisotropicDefines& defines,
+  static unsigned int AddFallbacks(const IMaterialSheenDefines& defines,
                                    EffectFallbacks& fallbacks,
                                    unsigned int currentRank);
 
@@ -134,18 +130,18 @@ public:
 
   /**
    * @brief Makes a duplicate of the current configuration into another one.
-   * @param anisotropicConfiguration define the config where to copy the info
+   * @param sheenConfiguration define the config where to copy the info
    */
-  void copyTo(PBRAnisotropicConfiguration& anisotropicConfiguration);
+  void copyTo(PBRSheenConfiguration& sheenConfiguration);
 
   /**
-   * @brief Serializes this anisotropy configuration.
+   * @brief Serializes this BRDF configuration.
    * @returns - An object with the serialized config.
    */
   json serialize() const;
 
   /**
-   * @brief Parses a anisotropy Configuration from a serialized object.
+   * @brief Parses a Sheen Configuration from a serialized object.
    * @param source - Serialized object.
    */
   void parse(const json& source);
@@ -153,42 +149,47 @@ public:
 protected:
   bool get_isEnabled() const;
   void set_isEnabled(bool value);
+  bool get_linkSheenWithAlbedo() const;
+  void set_linkSheenWithAlbedo(bool value);
   BaseTexturePtr& get_texture();
   void set_texture(const BaseTexturePtr& value);
 
 public:
   /**
-   * Defines if the anisotropy is enabled in the material.
+   * Defines if the material uses sheen.
    */
-  Property<PBRAnisotropicConfiguration, bool> isEnabled;
+  Property<PBRSheenConfiguration, bool> isEnabled;
 
   /**
-   * Defines the anisotropy strength (between 0 and 1) it defaults to 1.
+   * Defines if the sheen is linked to the sheen color.
+   */
+  Property<PBRSheenConfiguration, bool> linkSheenWithAlbedo;
+
+  /**
+   * Defines the sheen intensity.
    */
   float intensity;
 
   /**
-   * Defines if the effect is along the tangents, bitangents or in between.
-   * By default, the effect is "strectching" the highlights along the tangents.
+   * Defines the sheen color.
    */
-  Vector2 direction;
+  Color3 color;
 
   /**
-   * Stores the anisotropy values in a texture.
-   * rg is direction (like normal from -1 to 1)
-   * b is a intensity
+   * Stores the sheen tint values in a texture.
+   * rgb is tint
+   * a is a intensity
    */
-  Property<PBRAnisotropicConfiguration, BaseTexturePtr> texture;
+  Property<PBRSheenConfiguration, BaseTexturePtr> texture;
 
 private:
   bool _isEnabled;
+  bool _linkSheenWithAlbedo;
   BaseTexturePtr _texture;
-
-  /** Hidden */
   std::function<void()> _internalMarkAllSubMeshesAsTexturesDirty;
 
-}; // end of class PBRAnisotropicConfiguration
+}; // end of class PBRSheenConfiguration
 
 } // end of namespace BABYLON
 
-#endif // end of BABYLON_MATERIALS_PBR_PBR_ANISOTROPIC_CONFIGURATION_H
+#endif // end of BABYLON_MATERIALS_PBR_PBR_SHEEN_CONFIGURATION_H
