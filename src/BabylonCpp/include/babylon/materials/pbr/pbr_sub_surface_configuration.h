@@ -156,7 +156,7 @@ public:
   static void AddSamplers(std::vector<std::string>& samplers);
 
   /**
-   * @brief dd the required uniforms to the current buffer.
+   * @brief Add the required uniforms to the current buffer.
    * @param uniformBuffer defines the current uniform buffer.
    */
   static void PrepareUniformBuffer(UniformBuffer& uniformBuffer);
