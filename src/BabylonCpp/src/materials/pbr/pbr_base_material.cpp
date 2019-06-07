@@ -1487,7 +1487,8 @@ BaseTexturePtr PBRBaseMaterial::_getRefractionTexture() const
 }
 
 void PBRBaseMaterial::dispose(bool forceDisposeEffect,
-                              bool forceDisposeTextures)
+                              bool forceDisposeTextures,
+                              bool /*notBoundToMesh*/)
 {
   if (forceDisposeTextures) {
     if (_albedoTexture) {

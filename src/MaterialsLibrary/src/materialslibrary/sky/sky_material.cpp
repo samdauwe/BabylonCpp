@@ -226,7 +226,8 @@ std::vector<IAnimatablePtr> SkyMaterial::getAnimatables()
   return std::vector<IAnimatablePtr>();
 }
 
-void SkyMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void SkyMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                          bool /*notBoundToMesh*/)
 {
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }

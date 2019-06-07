@@ -531,7 +531,8 @@ bool TerrainMaterial::hasTexture(const BaseTexturePtr& texture) const
 }
 
 void TerrainMaterial::dispose(bool forceDisposeEffect,
-                              bool forceDisposeTextures)
+                              bool forceDisposeTextures,
+                              bool /*notBoundToMesh*/)
 {
   if (_mixTexture) {
     _mixTexture->dispose();

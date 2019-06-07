@@ -453,7 +453,8 @@ bool FurMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-void FurMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void FurMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                          bool /*notBoundToMesh*/)
 {
   if (_diffuseTexture) {
     _diffuseTexture->dispose();

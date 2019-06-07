@@ -30,12 +30,14 @@ public:
   virtual ~MultiMaterial() override;
 
   /**
-   * @brief Gets the current class name of the material e.g. "MultiMaterial"
-   * Mainly use in serialization.
-   * @returns the class name
+   * @brief Function used to align with Node.getChildren().
+   * @returns the list of Materials used within the multi material
    */
-  const std::string getClassName() const override;
+  std::vector<MaterialPtr>& getChildren();
 
+  /**
+   * @brief Hidden
+   */
   Type type() const override;
 
   /**
@@ -50,6 +52,13 @@ public:
    * @returns All the textures that will be used during the rendering
    */
   std::vector<BaseTexturePtr> getActiveTextures() const override;
+
+  /**
+   * @brief Gets the current class name of the material e.g. "MultiMaterial"
+   * Mainly use in serialization.
+   * @returns the class name
+   */
+  const std::string getClassName() const override;
 
   /**
    * @brief Checks if the material is ready to render the requested sub mesh.
@@ -86,9 +95,22 @@ public:
    * @param forceDisposeTextures Define if we want to force disposing the
    * associated textures (if false, they will not be disposed and can still be
    * use elsewhere in the app)
+   * @param forceDisposeChildren Define if we want to force disposing the
+   * associated submaterials (if false, they will not be disposed and can still
+   * be use elsewhere in the app)
    */
   void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false) override;
+               bool forceDisposeTextures = false,
+               bool forceDisposeChildren = false) override;
+
+  /**
+   * @brief Creates a MultiMaterial from parsed MultiMaterial data.
+   * @param parsedMultiMaterial defines parsed MultiMaterial data.
+   * @param scene defines the hosting scene
+   * @returns a new MultiMaterial
+   */
+  static MultiMaterialPtr ParseMultiMaterial(const json& parsedMultiMaterial,
+                                             Scene* scene);
 
 protected:
   /**

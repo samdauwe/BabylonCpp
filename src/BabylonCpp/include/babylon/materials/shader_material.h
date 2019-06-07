@@ -1,7 +1,6 @@
 #ifndef BABYLON_MATERIALS_SHADER_MATERIAL_H
 #define BABYLON_MATERIALS_SHADER_MATERIAL_H
 
-#include <unordered_map>
 #include <babylon/babylon_api.h>
 #include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/material.h>
@@ -11,6 +10,7 @@
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
 #include <babylon/math/vector4.h>
+#include <unordered_map>
 
 namespace BABYLON {
 
@@ -42,6 +42,12 @@ public:
     return material;
   }
   virtual ~ShaderMaterial() override;
+
+  /**
+   * @brief Gets the options used to compile the shader.
+   * They can be modified to trigger a new compilation
+   */
+  IShaderMaterialOptions& options();
 
   /**
    * @brief Gets the current class name of the material e.g. "ShaderMaterial"
@@ -202,6 +208,16 @@ public:
                             const Float32Array& value);
 
   /**
+   * @brief Specifies that the submesh is ready to be used.
+   * @param mesh defines the mesh to check
+   * @param subMesh defines which submesh to check
+   * @param useInstances specifies that instances should be used
+   * @returns a boolean indicating that the submesh is ready or not
+   */
+  bool isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
+                         bool useInstances = false) override;
+
+  /**
    * @brief Checks if the material is ready to render the requested mesh.
    * @param mesh Define the mesh to render
    * @param useInstances Define whether or not the material is used with
@@ -251,9 +267,12 @@ public:
    * disposed
    * @param forceDisposeTextures specifies if textures should be forcefully
    * disposed
+   * @param notBoundToMesh specifies if the material that is being disposed is
+   * known to be not bound to any mesh
    */
   virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false) override;
+                       bool forceDisposeTextures = false,
+                       bool notBoundToMesh       = false) override;
 
   /**
    * @brief Serializes this material in a JSON representation.
@@ -285,8 +304,8 @@ protected:
    * @param shaderPath Defines  the route to the shader code in one of three
    * ways:
    *     - object - { vertex: "custom", fragment: "custom" }, used with
-   * BABYLON.Effect.ShadersStore["customVertexShader"] and
-   * BABYLON.Effect.ShadersStore["customFragmentShader"]
+   * Effect.ShadersStore["customVertexShader"] and
+   * Effect.ShadersStore["customFragmentShader"]
    *     - object - { vertexElement: "vertexShaderCode", fragmentElement:
    * "fragmentShaderCode" }, used with shader code in <script> tags
    *     - string - "./COMMON_NAME", used with external files
@@ -298,7 +317,7 @@ protected:
                  const IShaderMaterialOptions& options);
 
 private:
-  bool _checkCache(Scene* scene, AbstractMesh* mesh, bool useInstances = false);
+  bool _checkCache(AbstractMesh* mesh, bool useInstances = false);
   void _checkUniform(const std::string& uniformName);
 
 private:

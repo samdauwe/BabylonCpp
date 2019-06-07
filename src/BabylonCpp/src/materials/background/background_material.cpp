@@ -1176,7 +1176,8 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 }
 
 void BackgroundMaterial::dispose(bool forceDisposeEffect,
-                                 bool forceDisposeTextures)
+                                 bool forceDisposeTextures,
+                                 bool /*notBoundToMesh*/)
 {
   if (forceDisposeTextures) {
     if (diffuseTexture()) {

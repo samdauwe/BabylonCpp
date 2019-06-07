@@ -263,7 +263,8 @@ std::vector<IAnimatablePtr> GradientMaterial::getAnimatables()
 }
 
 void GradientMaterial::dispose(bool forceDisposeEffect,
-                               bool forceDisposeTextures)
+                               bool forceDisposeTextures,
+                               bool /*notBoundToMesh*/)
 {
   PushMaterial::dispose(forceDisposeEffect, forceDisposeTextures);
 }

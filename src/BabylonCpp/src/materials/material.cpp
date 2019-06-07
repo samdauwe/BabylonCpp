@@ -27,7 +27,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
                       &Material::set_backFaceCulling}
     , hasRenderTargetTextures{this, &Material::get_hasRenderTargetTextures}
     , doNotSerialize{false}
-    , storeEffectOnSubMeshes{false}
+    , _storeEffectOnSubMeshes{false}
     , onDispose{this, &Material::set_onDispose}
     , onBindObservable{this, &Material::get_onBindObservable}
     , onBind{this, &Material::set_onBind}
@@ -494,7 +494,7 @@ void Material::forceCompilation(
       scene->clipPlane = Plane(0.f, 0.f, 0.f, 1.f);
     }
 
-    if (storeEffectOnSubMeshes) {
+    if (_storeEffectOnSubMeshes) {
       if (isReadyForSubMesh(mesh, subMesh.get())) {
         if (iOnCompiled) {
           iOnCompiled(this);
@@ -621,7 +621,8 @@ void Material::_markAllSubMeshesAsTexturesAndMiscDirty()
   });
 }
 
-void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
+void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
+                       bool /*notBoundToMesh*/)
 {
   // Animations
   getScene()->stopAnimation(this);
@@ -646,7 +647,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
       _mesh = static_cast<Mesh*>(mesh.get());
       if (_mesh && _mesh->geometry()) {
         auto geometry = _mesh->geometry();
-        if (storeEffectOnSubMeshes) {
+        if (_storeEffectOnSubMeshes) {
           for (auto& subMesh : mesh->subMeshes) {
             geometry->_releaseVertexArrayObject(subMesh->_materialEffect);
             if (forceDisposeEffect && subMesh->_materialEffect) {
@@ -667,7 +668,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/)
   // Shader are kept in cache for further use but we can get rid of this by
   // using forceDisposeEffect
   if (forceDisposeEffect && _effect) {
-    if (!storeEffectOnSubMeshes) {
+    if (!_storeEffectOnSubMeshes) {
       _scene->getEngine()->_releaseEffect(_effect.get());
     }
 

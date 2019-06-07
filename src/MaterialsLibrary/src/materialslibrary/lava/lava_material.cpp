@@ -395,7 +395,8 @@ bool LavaMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-void LavaMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void LavaMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                           bool /*notBoundToMesh*/)
 {
   if (_diffuseTexture) {
     _diffuseTexture->dispose();

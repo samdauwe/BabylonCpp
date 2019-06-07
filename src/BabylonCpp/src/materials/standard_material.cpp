@@ -1495,7 +1495,8 @@ bool StandardMaterial::hasTexture(const BaseTexturePtr& texture) const
 }
 
 void StandardMaterial::dispose(bool forceDisposeEffect,
-                               bool forceDisposeTextures)
+                               bool forceDisposeTextures,
+                               bool /*notBoundToMesh*/)
 {
   if (forceDisposeTextures) {
     if (_diffuseTexture) {

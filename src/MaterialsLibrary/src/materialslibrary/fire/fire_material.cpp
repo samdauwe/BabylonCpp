@@ -363,7 +363,8 @@ const std::string FireMaterial::getClassName() const
   return "FireMaterial";
 }
 
-void FireMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void FireMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                           bool /*notBoundToMesh*/)
 {
   if (_diffuseTexture) {
     _diffuseTexture->dispose();

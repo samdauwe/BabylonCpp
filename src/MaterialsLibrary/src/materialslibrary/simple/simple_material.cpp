@@ -341,7 +341,8 @@ bool SimpleMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-void SimpleMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void SimpleMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                             bool /*notBoundToMesh*/)
 {
   if (_diffuseTexture) {
     _diffuseTexture->dispose();

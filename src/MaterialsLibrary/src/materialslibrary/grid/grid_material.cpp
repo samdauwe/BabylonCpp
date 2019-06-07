@@ -178,7 +178,8 @@ void GridMaterial::bindForSubMesh(Matrix& world, Mesh* mesh, SubMesh* subMesh)
   _afterBind(mesh, _activeEffect);
 }
 
-void GridMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void GridMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                           bool /*notBoundToMesh*/)
 {
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
 }

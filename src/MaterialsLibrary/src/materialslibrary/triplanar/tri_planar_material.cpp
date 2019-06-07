@@ -518,7 +518,8 @@ bool TriPlanarMaterial::hasTexture(const BaseTexturePtr& texture) const
 }
 
 void TriPlanarMaterial::dispose(bool forceDisposeEffect,
-                                bool forceDisposeTextures)
+                                bool forceDisposeTextures,
+                                bool /*notBoundToMesh*/)
 {
 
   if (_mixTexture) {

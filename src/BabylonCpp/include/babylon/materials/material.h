@@ -378,7 +378,8 @@ public:
    * disposed
    */
   virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false);
+                       bool forceDisposeTextures = false,
+                       bool notBoundToMesh       = false);
 
   /**
    * Serializes this material.
@@ -700,7 +701,7 @@ public:
   /**
    * Specifies if the effect should be stored on sub meshes
    */
-  bool storeEffectOnSubMeshes;
+  bool _storeEffectOnSubMeshes;
 
   /**
    * Stores the animations for the material

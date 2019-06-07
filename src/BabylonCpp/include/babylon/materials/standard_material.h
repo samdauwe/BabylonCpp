@@ -137,7 +137,8 @@ public:
    * disposed
    */
   virtual void dispose(bool forceDisposeEffect   = false,
-                       bool forceDisposeTextures = false) override;
+                       bool forceDisposeTextures = false,
+                       bool notBoundToMesh       = false) override;
 
   /**
    * @brief Makes a duplicate of the material, and gives it a new name.

@@ -628,7 +628,8 @@ bool MixMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-void MixMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void MixMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                          bool /*notBoundToMesh*/)
 {
   if (_mixTexture1) {
     _mixTexture1->dispose();

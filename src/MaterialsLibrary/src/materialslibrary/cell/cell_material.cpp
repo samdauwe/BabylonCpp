@@ -357,7 +357,8 @@ bool CellMaterial::hasTexture(const BaseTexturePtr& texture) const
   return (_diffuseTexture == texture);
 }
 
-void CellMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void CellMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                           bool /*notBoundToMesh*/)
 {
   if (_diffuseTexture) {
     _diffuseTexture->dispose();

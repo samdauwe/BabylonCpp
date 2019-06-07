@@ -345,6 +345,9 @@ void ImageProcessingConfiguration::prepareDefines(
     case ImageProcessingConfiguration::TONEMAPPING_ACES:
       defines.TONEMAPPING_ACES = true;
       break;
+    default:
+      defines.TONEMAPPING_ACES = false;
+      break;
   }
 
   defines.CONTRAST     = (contrast() != 1.f);

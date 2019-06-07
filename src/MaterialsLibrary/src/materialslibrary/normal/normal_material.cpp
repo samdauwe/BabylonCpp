@@ -345,7 +345,8 @@ bool NormalMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-void NormalMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void NormalMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                             bool /*notBoundToMesh*/)
 {
   if (_diffuseTexture) {
     _diffuseTexture->dispose();

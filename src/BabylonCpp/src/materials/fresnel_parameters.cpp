@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include <babylon/engines/engine.h>
-#include <babylon/materials/material.h>
+#include <babylon/engines/constants.h>
 
 namespace BABYLON {
 
@@ -82,8 +82,8 @@ void FresnelParameters::set_isEnabled(bool value)
   }
 
   _isEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag
-                                  | Material::MiscDirtyFlag);
+
+   Engine::MarkAllMaterialsAsDirty(Constants::MATERIAL_FresnelDirtyFlag | Constants::MATERIAL_MiscDirtyFlag);
 }
 
 std::unique_ptr<FresnelParameters> FresnelParameters::clone() const

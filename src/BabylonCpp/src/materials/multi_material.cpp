@@ -1,8 +1,7 @@
 #include <babylon/materials/multi_material.h>
 
-#include <nlohmann/json.hpp>
-
 #include <babylon/babylon_stl_util.h>
+#include <babylon/core/json_util.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/standard_material.h>
 
@@ -14,16 +13,16 @@ MultiMaterial::MultiMaterial(const std::string iName, Scene* scene)
                    &MultiMaterial::set_subMaterials}
 {
   // multimaterial is considered like a push material
-  storeEffectOnSubMeshes = true;
+  _storeEffectOnSubMeshes = true;
 }
 
 MultiMaterial::~MultiMaterial()
 {
 }
 
-const std::string MultiMaterial::getClassName() const
+std::vector<MaterialPtr>& MultiMaterial::getChildren()
 {
-  return "MultiMaterial";
+  return subMaterials;
 }
 
 Type MultiMaterial::type() const
@@ -65,12 +64,17 @@ std::vector<BaseTexturePtr> MultiMaterial::getActiveTextures() const
   return activeTextures;
 }
 
+const std::string MultiMaterial::getClassName() const
+{
+  return "MultiMaterial";
+}
+
 bool MultiMaterial::isReadyForSubMesh(AbstractMesh* mesh, BaseSubMesh* subMesh,
                                       bool useInstances)
 {
   for (auto& subMaterial : _subMaterials) {
     if (subMaterial) {
-      if (subMaterial->storeEffectOnSubMeshes) {
+      if (subMaterial->_storeEffectOnSubMeshes) {
         if (!subMaterial->isReadyForSubMesh(mesh, subMesh, useInstances)) {
           return false;
         }
@@ -110,11 +114,20 @@ json MultiMaterial::serialize() const
   return nullptr;
 }
 
-void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                            bool forceDisposeChildren)
 {
   auto scene = getScene();
   if (!scene) {
     return;
+  }
+
+  if (forceDisposeChildren) {
+    for (auto& subMaterial : subMaterials()) {
+      if (subMaterial) {
+        subMaterial->dispose(forceDisposeEffect, forceDisposeTextures);
+      }
+    }
   }
 
   // Remove from scene
@@ -126,6 +139,29 @@ void MultiMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
     scene->multiMaterials.end());
 
   Material::dispose(forceDisposeEffect, forceDisposeTextures);
+}
+
+MultiMaterialPtr
+MultiMaterial::ParseMultiMaterial(const json& parsedMultiMaterial, Scene* scene)
+{
+  auto multiMaterial = MultiMaterial::New(
+    json_util::get_string(parsedMultiMaterial, "name"), scene);
+
+  multiMaterial->id = json_util::get_string(parsedMultiMaterial, "id");
+
+  for (const auto& subMatId :
+       json_util::get_array<json>(parsedMultiMaterial, "materials")) {
+
+    if (subMatId.is_string()) {
+      multiMaterial->subMaterials().emplace_back(
+        scene->getMaterialByID(subMatId.get<std::string>()));
+    }
+    else {
+      multiMaterial->subMaterials().emplace_back(nullptr);
+    }
+  }
+
+  return multiMaterial;
 }
 
 } // end of namespace BABYLON

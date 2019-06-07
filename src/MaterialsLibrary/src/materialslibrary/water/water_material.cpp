@@ -659,7 +659,8 @@ bool WaterMaterial::hasTexture(const BaseTexturePtr& texture) const
   return false;
 }
 
-void WaterMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void WaterMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                            bool /*notBoundToMesh*/)
 {
   if (_bumpTexture) {
     _bumpTexture->dispose();

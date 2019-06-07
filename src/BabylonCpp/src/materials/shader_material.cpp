@@ -40,6 +40,11 @@ ShaderMaterial::~ShaderMaterial()
 {
 }
 
+IShaderMaterialOptions& ShaderMaterial::options()
+{
+  return _options;
+}
+
 const std::string ShaderMaterial::getClassName() const
 {
   return "ShaderMaterial";
@@ -222,8 +227,7 @@ ShaderMaterial& ShaderMaterial::setArray3(const std::string& iName,
   return *this;
 }
 
-bool ShaderMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
-                                 bool useInstances)
+bool ShaderMaterial::_checkCache(AbstractMesh* mesh, bool useInstances)
 {
   if (!mesh) {
     return true;
@@ -238,6 +242,13 @@ bool ShaderMaterial::_checkCache(Scene* /*scene*/, AbstractMesh* mesh,
   return false;
 }
 
+bool ShaderMaterial::isReadyForSubMesh(AbstractMesh* mesh,
+                                       BaseSubMesh* /*subMesh*/,
+                                       bool useInstances)
+{
+  return isReady(mesh, useInstances);
+}
+
 bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 {
   auto scene  = getScene();
@@ -245,7 +256,7 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
 
   if (!checkReadyOnEveryCall) {
     if (_renderId == scene->getRenderId()) {
-      if (_checkCache(scene, mesh, useInstances)) {
+      if (_checkCache(mesh, useInstances)) {
         return true;
       }
     }
@@ -260,8 +271,8 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
     defines.emplace_back(_define);
   }
 
-  for (std::size_t index = 0; index < _options.attributes.size(); ++index) {
-    attribs.emplace_back(_options.attributes[index]);
+  for (auto& _attrib : _options.attributes) {
+    attribs.emplace_back(_attrib);
   }
 
   if (mesh && mesh->isVerticesDataPresent(VertexBuffer::ColorKind)) {
@@ -283,14 +294,31 @@ bool ShaderMaterial::isReady(AbstractMesh* mesh, bool useInstances)
       attribs.emplace_back(VertexBuffer::MatricesIndicesExtraKind);
       attribs.emplace_back(VertexBuffer::MatricesWeightsExtraKind);
     }
+
+    const auto& skeleton = mesh->skeleton();
+
     defines.emplace_back("#define NUM_BONE_INFLUENCERS "
                          + std::to_string(mesh->numBoneInfluencers()));
-    defines.emplace_back("#define BonesPerMesh "
-                         + std::to_string(mesh->skeleton()->bones.size() + 1));
     fallbacks->addCPUSkinningFallback(0, mesh);
 
-    if (!stl_util::contains(_options.uniforms, "mBones")) {
-      _options.uniforms.emplace_back("mBones");
+    if (skeleton->isUsingTextureForMatrices()) {
+      defines.emplace_back("#define BONETEXTURE");
+
+      if (!stl_util::contains(_options.uniforms, "boneTextureWidth")) {
+        _options.uniforms.emplace_back("boneTextureWidth");
+      }
+
+      if (!stl_util::contains(_options.samplers, "boneSampler")) {
+        _options.samplers.emplace_back("boneSampler");
+      }
+    }
+    else {
+      defines.emplace_back("#define BonesPerMesh "
+                           + std::to_string(skeleton->bones.size() + 1));
+
+      if (!stl_util::contains(_options.uniforms, "mBones")) {
+        _options.uniforms.emplace_back("mBones");
+      }
     }
   }
   else {
@@ -518,7 +546,8 @@ MaterialPtr ShaderMaterial::clone(const std::string& iName,
   return ShaderMaterial::New(iName, getScene(), _shaderPath, _options);
 }
 
-void ShaderMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
+void ShaderMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures,
+                             bool notBoundToMesh)
 {
   if (forceDisposeTextures) {
     for (auto& kv : _textures) {
@@ -534,7 +563,7 @@ void ShaderMaterial::dispose(bool forceDisposeEffect, bool forceDisposeTextures)
 
   _textures.clear();
 
-  Material::dispose(forceDisposeEffect, forceDisposeTextures);
+  Material::dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
 }
 
 json ShaderMaterial::serialize() const

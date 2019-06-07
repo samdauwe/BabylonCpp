@@ -139,7 +139,8 @@ public:
    * @param forceDisposeTextures - Forces the disposal of all textures.
    */
   void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false) override;
+               bool forceDisposeTextures = false,
+               bool notBoundToMesh       = false) override;
 
 protected:
   /**

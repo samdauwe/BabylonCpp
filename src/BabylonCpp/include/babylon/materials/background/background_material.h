@@ -101,7 +101,8 @@ public:
    * @param forceDisposeTextures Force disposal of the associated textures.
    */
   void dispose(bool forceDisposeEffect   = false,
-               bool forceDisposeTextures = false) override;
+               bool forceDisposeTextures = false,
+               bool notBoundToMesh       = false) override;
 
   /**
    * @brief Clones the material.
