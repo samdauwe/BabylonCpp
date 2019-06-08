@@ -192,7 +192,7 @@ std::unique_ptr<ColorGradingTexture> ColorGradingTexture::clone() const
   return newTexture;
 }
 
-void ColorGradingTexture::delayLoad()
+void ColorGradingTexture::delayLoad(const std::string& /*forcedExtension*/)
 {
   if (delayLoadState != Constants::DELAYLOADSTATE_NOTLOADED) {
     return;

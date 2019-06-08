@@ -162,7 +162,7 @@ void Texture::updateURL(
   delayLoad();
 }
 
-void Texture::delayLoad()
+void Texture::delayLoad(const std::string& /*forcedExtension*/)
 {
   if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
     return;

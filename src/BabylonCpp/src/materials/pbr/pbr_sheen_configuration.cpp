@@ -143,7 +143,7 @@ void PBRSheenConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
 
   // Textures
   if (scene->texturesEnabled()) {
-    if (_texture && &MaterialFlags::SheenTextureEnabled) {
+    if (_texture && MaterialFlags::SheenTextureEnabled()) {
       uniformBuffer.setTexture("sheenSampler", _texture);
     }
   }

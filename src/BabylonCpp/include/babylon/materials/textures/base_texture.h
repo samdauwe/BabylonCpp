@@ -145,7 +145,7 @@ public:
   /**
    * @brief Triggers the load sequence in delayed load mode.
    */
-  virtual void delayLoad();
+  virtual void delayLoad(const std::string& forcedExtension = "");
 
   std::vector<AnimationPtr> getAnimations() override;
 
@@ -232,6 +232,11 @@ protected:
   BaseTexturePtr& get__lodTextureLow();
 
 public:
+  /**
+   * Gets or sets the unique id of the texture
+   */
+  size_t uniqueId;
+
   /**
    * Define the name of the texture.
    */

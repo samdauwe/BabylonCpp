@@ -118,6 +118,14 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
                                           bool useVertexAlpha  = true);
 
   /**
+   * @brief Prepares the defines related to multiview.
+   * @param scene The scene we are intending to draw
+   * @param defines The defines to update
+   */
+  static void PrepareDefinesForMultiview(Scene* scene,
+                                         MaterialDefines& defines);
+
+  /**
    * @brief Prepares the defines related to the light information passed in
    * parameter
    * @param scene The scene we are intending to draw

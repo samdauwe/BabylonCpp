@@ -25,13 +25,13 @@
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
+#include <babylon/misc/tools.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/particles/solid_particle.h>
 #include <babylon/physics/joint/physics_joint.h>
 #include <babylon/physics/physics_engine.h>
 #include <babylon/rendering/bounding_box_renderer.h>
 #include <babylon/rendering/edges_renderer.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -129,6 +129,7 @@ AbstractMesh::AbstractMesh(const std::string& iName, Scene* scene)
     , _renderId{0}
     , _submeshesOctree{nullptr}
     , _unIndexed{false}
+    , lightSources{this, &AbstractMesh::get_lightSources}
     , _waitingFreezeWorldMatrix{std::nullopt}
     , _positions{this, &AbstractMesh::get__positions}
     , skeleton{this, &AbstractMesh::get_skeleton, &AbstractMesh::set_skeleton}
@@ -502,6 +503,11 @@ int AbstractMesh::get_collisionGroup() const
 void AbstractMesh::set_collisionGroup(int mask)
 {
   _collisionGroup = !isNan(mask) ? mask : -1;
+}
+
+std::vector<LightPtr>& AbstractMesh::get_lightSources()
+{
+  return _lightSources;
 }
 
 const std::string AbstractMesh::getClassName() const

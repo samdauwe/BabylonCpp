@@ -231,6 +231,13 @@ public:
    */
   void freeRenderingGroups();
 
+  /**
+   * @brief Gets the number of views the corresponding to the texture (eg. a
+   * MultiviewRenderTarget will have > 1).
+   * @returns the view count
+   */
+  unsigned int getViewCount() const;
+
 protected:
   /**
    * @brief Instantiate a render target texture. This is mainly used to render

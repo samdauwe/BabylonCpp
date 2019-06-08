@@ -11,11 +11,11 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/misc/tools.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/postprocesses/post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
 #include <babylon/rendering/rendering_manager.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -769,6 +769,11 @@ void RenderTargetTexture::freeRenderingGroups()
   if (_renderingManager) {
     _renderingManager->freeRenderingGroups();
   }
+}
+
+unsigned int RenderTargetTexture::getViewCount() const
+{
+  return 1;
 }
 
 } // end of namespace BABYLON

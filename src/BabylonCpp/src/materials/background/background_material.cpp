@@ -2,14 +2,15 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
-#include <babylon/engines/engine_constants.h>
 #include <babylon/engines/scene.h>
 #include <babylon/materials/background/background_material_defines.h>
 #include <babylon/materials/color_curves.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -655,6 +656,9 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                           _maxSimultaneousLights);
   defines._needNormals = true;
 
+  // Multiview
+  MaterialHelper::PrepareDefinesForMultiview(scene, defines);
+
   // Textures
   if (defines._areTexturesDirty) {
     defines._needUVs = false;
@@ -663,7 +667,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         defines.boolDef["TEXTURELODSUPPORT"] = true;
       }
 
-      if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
         if (!_diffuseTexture->isReadyOrNotBlocking()) {
           return false;
         }
@@ -682,7 +686,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       }
 
       auto iReflectionTexture = _reflectionTexture;
-      if (iReflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
+      if (iReflectionTexture && MaterialFlags::ReflectionTextureEnabled()) {
         if (!iReflectionTexture->isReadyOrNotBlocking()) {
           return false;
         }
@@ -782,8 +786,8 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     }
 
     defines.boolDef["PREMULTIPLYALPHA"]
-      = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
-         || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
+      = (alphaMode() == Constants::ALPHA_PREMULTIPLIED
+         || alphaMode() == Constants::ALPHA_PREMULTIPLIED_PORTERDUFF);
     defines.boolDef["USERGBCOLOR"] = _useRGBColor;
     defines.boolDef["NOISE"]       = _enableNoise;
   }
@@ -822,7 +826,7 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
         BABYLON_LOGF_WARN(
           "BackgroundMaterial",
           "BackgroundMaterial: Normals have been created for the mesh: %s",
-          mesh->name.c_str());
+          mesh->name.c_str())
       }
     }
   }
@@ -840,6 +844,10 @@ bool BackgroundMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 
     if (defines["POINTSIZE"]) {
       fallbacks->addFallback(1, "POINTSIZE");
+    }
+
+    if (defines["MULTIVIEW"]) {
+      fallbacks->addFallback(0, "MULTIVIEW");
     }
 
     MaterialHelper::HandleFallbacksForShadows(defines, *fallbacks,
@@ -1060,7 +1068,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
       // Texture uniforms
       if (scene->texturesEnabled()) {
-        if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+        if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
           _uniformBuffer->updateFloat2(
             "vDiffuseInfos",
             static_cast<float>(_diffuseTexture->coordinatesIndex),
@@ -1069,8 +1077,7 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
                                             "diffuse");
         }
 
-        if (iReflectionTexture
-            && StandardMaterial::ReflectionTextureEnabled()) {
+        if (iReflectionTexture && MaterialFlags::ReflectionTextureEnabled()) {
           _uniformBuffer->updateMatrix(
             "reflectionMatrix",
             *iReflectionTexture->getReflectionTextureMatrix());
@@ -1110,11 +1117,11 @@ void BackgroundMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
     // Textures
     if (scene->texturesEnabled()) {
-      if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
+      if (_diffuseTexture && MaterialFlags::DiffuseTextureEnabled()) {
         _uniformBuffer->setTexture("diffuseSampler", _diffuseTexture);
       }
 
-      if (iReflectionTexture && StandardMaterial::ReflectionTextureEnabled()) {
+      if (iReflectionTexture && MaterialFlags::ReflectionTextureEnabled()) {
         if (defines["REFLECTIONBLUR"] && defines["TEXTURELODSUPPORT"]) {
           _uniformBuffer->setTexture("reflectionSampler", iReflectionTexture);
         }

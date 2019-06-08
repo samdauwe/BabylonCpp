@@ -39,7 +39,7 @@ public:
   HDRCubeTexturePtr clone() const;
 
   /** Methods **/
-  void delayLoad() override;
+  void delayLoad(const std::string& forcedExtension = "") override;
 
   /**
    * @brief Get the texture reflection matrix used to rotate/transform the

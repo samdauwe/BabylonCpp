@@ -45,7 +45,7 @@ public:
   /**
    * @brief Called during delayed load for textures.
    */
-  void delayLoad() override;
+  void delayLoad(const std::string& forcedExtension = "") override;
 
   /**
    * @brief Parses a color grading texture serialized by Babylon.

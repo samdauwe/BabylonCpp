@@ -291,7 +291,7 @@ void BaseTexture::_rebuild()
 {
 }
 
-void BaseTexture::delayLoad()
+void BaseTexture::delayLoad(const std::string& /*forcedExtension*/)
 {
 }
 

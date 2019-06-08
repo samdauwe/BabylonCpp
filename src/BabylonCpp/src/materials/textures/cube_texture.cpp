@@ -51,7 +51,10 @@ CubeTexture::CubeTexture(
     , url{rootUrl}
     , boundingBoxPosition{Vector3::Zero()}
     , rotationY{this, &CubeTexture::get_rotationY, &CubeTexture::set_rotationY}
+    , noMipmap{this, &CubeTexture::get_noMipmap}
     , _prefiltered{false}
+    , isPrefiltered{this, &CubeTexture::get_isPrefiltered}
+    , _delayedOnLoad{nullptr}
     , _boundingBoxSize{std::nullopt}
     , _rotationY{0.f}
     , _noMipmap{noMipmap}
@@ -129,7 +132,7 @@ CubeTexture::CubeTexture(
       }
     }
     else {
-      delayLoadState = EngineConstants::DELAYLOADSTATE_NOTLOADED;
+      delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
     }
   }
   else if (onLoad) {
@@ -157,7 +160,7 @@ void CubeTexture::set_boundingBoxSize(const std::optional<Vector3>& value)
   _boundingBoxSize = value;
   auto scene       = getScene();
   if (scene) {
-    scene->markAllMaterialsAsDirty(Material::TextureDirtyFlag);
+    scene->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
   }
 }
 
@@ -177,9 +180,44 @@ float CubeTexture::get_rotationY() const
   return _rotationY;
 }
 
-void CubeTexture::delayLoad()
+bool CubeTexture::get_noMipmap() const
 {
-  if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
+  return _noMipmap;
+}
+
+bool CubeTexture::get_isPrefiltered() const
+{
+  return _prefiltered;
+}
+
+const std::string CubeTexture::getClassName() const
+{
+  return "CubeTexture";
+}
+
+void CubeTexture::updateURL(
+  const std::string& iUrl, const std::string& forcedExtension,
+  const std::function<void(const std::optional<CubeTextureData>& data)>& onLoad)
+{
+  if (!url.empty()) {
+    releaseInternalTexture();
+    getScene()->markAllMaterialsAsDirty(Constants::MATERIAL_TextureDirtyFlag);
+  }
+
+  url            = iUrl;
+  delayLoadState = Constants::DELAYLOADSTATE_NOTLOADED;
+  _prefiltered   = false;
+
+  if (onLoad) {
+    _delayedOnLoad = onLoad;
+  }
+
+  delayLoad(forcedExtension);
+}
+
+void CubeTexture::delayLoad(const std::string& forcedExtension)
+{
+  if (delayLoadState != Constants::DELAYLOADSTATE_NOTLOADED) {
     return;
   }
 
@@ -189,19 +227,20 @@ void CubeTexture::delayLoad()
     return;
   }
 
-  delayLoadState = EngineConstants::DELAYLOADSTATE_LOADED;
+  delayLoadState = Constants::DELAYLOADSTATE_LOADED;
   _texture       = _getFromCache(url, _noMipmap);
 
   if (!_texture) {
     if (_prefiltered) {
       _texture = scene->getEngine()->createPrefilteredCubeTexture(
-        url, scene, lodGenerationScale, lodGenerationOffset, nullptr, nullptr,
-        _format, "", _createPolynomials);
+        url, scene, lodGenerationScale, lodGenerationOffset, _delayedOnLoad,
+        nullptr, _format, "", _createPolynomials);
     }
     else {
 
       _texture = scene->getEngine()->createCubeTexture(
-        url, scene, _files, _noMipmap, nullptr, nullptr, _format);
+        url, scene, _files, _noMipmap, _delayedOnLoad, nullptr, _format,
+        forcedExtension);
     }
   }
 }
@@ -211,8 +250,24 @@ Matrix* CubeTexture::getReflectionTextureMatrix()
   return _textureMatrix.get();
 }
 
-void CubeTexture::setReflectionTextureMatrix(const Matrix& value)
+void CubeTexture::setReflectionTextureMatrix(Matrix value)
 {
+  if (value.updateFlag == _textureMatrix->updateFlag) {
+    return;
+  }
+
+  if (value.isIdentity() != _textureMatrix->isIdentity()) {
+    getScene()->markAllMaterialsAsDirty(
+      Constants::MATERIAL_TextureDirtyFlag, [this](Material* mat) -> bool {
+        auto it = std::find_if(mat->getActiveTextures().begin(),
+                               mat->getActiveTextures().end(),
+                               [this](const BaseTexturePtr& baseTexture) {
+                                 return baseTexture.get() == this;
+                               });
+        return it != mat->getActiveTextures().end();
+      });
+  }
+
   _textureMatrix = std::make_unique<Matrix>(value);
 }
 
@@ -264,11 +319,11 @@ CubeTexturePtr CubeTexture::clone() const
     return nullptr;
   }
 
-  auto newTexture = CubeTexture::New(
+  auto newCubeTexture = CubeTexture::New(
     url, scene, _extensions, _noMipmap, _files, nullptr, nullptr, _format,
     _prefiltered, _forcedExtension, _createPolynomials, _lodScale, _lodOffset);
 
-  return newTexture;
+  return newCubeTexture;
 }
 
 } // end of namespace BABYLON

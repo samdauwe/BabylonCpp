@@ -90,6 +90,7 @@ BackgroundMaterialDefines::BackgroundMaterialDefines() : MaterialDefines{}
     {"SAMPLER3DBGRMAP", false},            //
     {"IMAGEPROCESSINGPOSTPROCESS", false}, //
     {"EXPOSURE", false},                   //
+    {"MULTIVIEW", false},                  //
 
     // Reflection.
     {"REFLECTION", false},                                  //

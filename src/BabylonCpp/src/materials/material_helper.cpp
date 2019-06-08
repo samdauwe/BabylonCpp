@@ -219,6 +219,20 @@ bool MaterialHelper::PrepareDefinesForAttributes(
   return true;
 }
 
+void MaterialHelper::PrepareDefinesForMultiview(Scene* scene,
+                                                MaterialDefines& defines)
+{
+  if (scene->activeCamera) {
+    auto previousMultiview = defines["MULTIVIEW"];
+    defines.boolDef["MULTIVIEW"]
+      = (scene->activeCamera->outputRenderTarget != nullptr
+         && scene->activeCamera->outputRenderTarget->getViewCount() > 1);
+    if (defines["MULTIVIEW"] != previousMultiview) {
+      defines.markAsUnprocessed();
+    }
+  }
+}
+
 bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
                                              MaterialDefines& defines,
                                              bool specularSupported,

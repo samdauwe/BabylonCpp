@@ -247,7 +247,7 @@ HDRCubeTexturePtr HDRCubeTexture::clone() const
   return newTexture;
 }
 
-void HDRCubeTexture::delayLoad()
+void HDRCubeTexture::delayLoad(const std::string& /*forcedExtension*/)
 {
   if (delayLoadState != EngineConstants::DELAYLOADSTATE_NOTLOADED) {
     return;

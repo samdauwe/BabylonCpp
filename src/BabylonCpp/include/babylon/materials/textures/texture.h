@@ -63,7 +63,7 @@ public:
    * @brief Finish the loading sequence of a texture flagged as delayed load.
    * @hidden
    */
-  void delayLoad() override;
+  void delayLoad(const std::string& forcedExtension = "") override;
 
   /**
    * @brief Update the sampling mode of the texture.

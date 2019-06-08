@@ -2,7 +2,7 @@
 #define BABYLON_MATERIALS_TEXTURES_CUBE_TEXTURE_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/materials/textures/base_texture.h>
 
 namespace BABYLON {
@@ -29,9 +29,30 @@ public:
   ~CubeTexture() override;
 
   /**
+   * @brief Get the current class name of the texture useful for serialization
+   * or dynamic coding.
+   * @returns "CubeTexture"
+   */
+  const std::string getClassName() const;
+
+  /**
+   * @brief Update the url (and optional buffer) of this texture if url was null
+   * during construction.
+   * @param url the url of the texture
+   * @param forcedExtension defines the extension to use
+   * @param onLoad callback called when the texture is loaded  (defaults to
+   * null)
+   */
+  void updateURL(
+    const std::string& url, const std::string& forcedExtension = "",
+    const std::function<void(const std::optional<CubeTextureData>& data)>&
+      onLoad
+    = nullptr);
+
+  /**
    * @brief Delays loading of the cube texture.
    */
-  void delayLoad() override;
+  void delayLoad(const std::string& forcedExtension = "") override;
 
   /**
    * @brief Returns the reflection texture matrix.
@@ -43,7 +64,7 @@ public:
    * @brief Sets the reflection texture matrix.
    * @param value Reflection texture matrix
    */
-  void setReflectionTextureMatrix(const Matrix& value);
+  void setReflectionTextureMatrix(Matrix value);
 
   /**
    * @brief Makes a clone, or deep copy, of the cube texture.
@@ -97,7 +118,8 @@ protected:
    * @param extensions defines the suffixes add to the picture name in case six
    * images are in use like _px.jpg...
    * @param noMipmap defines if mipmaps should be created or not
-   * @param files defines the six files to load for the different faces
+   * @param files defines the six files to load for the different faces in that
+   * order: px, py, pz, nx, ny, nz
    * @param onLoad defines a callback triggered at the end of the file load if
    * no errors occured
    * @param onError defines a callback triggered in case of error during load
@@ -124,7 +146,7 @@ protected:
               const std::function<void(const std::string& message,
                                        const std::string& exception)>& onError
               = nullptr,
-              unsigned int format = EngineConstants::TEXTUREFORMAT_RGBA,
+              unsigned int format = Constants::TEXTUREFORMAT_RGBA,
               bool prefiltered = false, const std::string& forcedExtension = "",
               bool createPolynomials = false, float lodScale = 0.8f,
               float lodOffset = 0.f);
@@ -156,6 +178,17 @@ protected:
    */
   float get_rotationY() const;
 
+  /**
+   * @brief Are mip maps generated for this texture or not.
+   */
+  bool get_noMipmap() const;
+
+  /**
+   * @brief Gets a boolean indicating if the cube texture contains prefiltered
+   * mips (used to simulate roughness with PBR).
+   */
+  bool get_isPrefiltered() const;
+
 public:
   /**
    * The url of the texture
@@ -174,10 +207,23 @@ public:
    */
   Property<CubeTexture, float> rotationY;
 
+  /**
+   * Are mip maps generated for this texture or not
+   */
+  ReadOnlyProperty<CubeTexture, bool> noMipmap;
+
   /** Hidden */
   bool _prefiltered;
 
+  /**
+   * Gets a boolean indicating if the cube texture contains prefiltered mips
+   * (used to simulate roughness with PBR)
+   */
+  ReadOnlyProperty<CubeTexture, bool> isPrefiltered;
+
 private:
+  std::function<void(const std::optional<CubeTextureData>& data)>
+    _delayedOnLoad;
   std::optional<Vector3> _boundingBoxSize;
   float _rotationY;
   bool _noMipmap;
