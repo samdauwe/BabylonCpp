@@ -4,9 +4,9 @@
 
 namespace BABYLON {
 
-DoNothingAction::DoNothingAction(unsigned int triggerOptions,
+DoNothingAction::DoNothingAction(unsigned int iTtriggerOptions,
                                  Condition* condition)
-    : Action(triggerOptions, condition)
+    : Action(iTtriggerOptions, condition)
 {
 }
 

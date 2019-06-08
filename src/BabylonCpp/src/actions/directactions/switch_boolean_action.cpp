@@ -8,11 +8,11 @@
 
 namespace BABYLON {
 
-SwitchBooleanAction::SwitchBooleanAction(unsigned int triggerOptions,
+SwitchBooleanAction::SwitchBooleanAction(unsigned int iTtriggerOptions,
                                          const IAnimatablePtr& target,
                                          const std::string& iPropertyPath,
                                          Condition* condition)
-    : Action(triggerOptions, condition)
+    : Action(iTtriggerOptions, condition)
     , propertyPath{iPropertyPath}
     , _target{target}
     , _effectiveTarget{target}

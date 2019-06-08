@@ -4,10 +4,10 @@
 
 namespace BABYLON {
 
-CombineAction::CombineAction(unsigned int triggerOptions,
+CombineAction::CombineAction(unsigned int iTriggerOptions,
                              const std::vector<Action*>& iChildren,
                              Condition* condition)
-    : Action(triggerOptions, condition), children{iChildren}
+    : Action(iTriggerOptions, condition), children{iChildren}
 {
 }
 

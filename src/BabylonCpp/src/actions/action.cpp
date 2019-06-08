@@ -14,17 +14,18 @@
 
 namespace BABYLON {
 
-Action::Action(unsigned int triggerOptions, Condition* condition)
-    : trigger{triggerOptions}, _nextActiveAction{this}, _condition{condition}
+Action::Action(unsigned int iTriggerOptions, Condition* condition)
+    : _nextActiveAction{this}, _condition{condition}
 {
+  trigger = iTriggerOptions;
 }
 
-Action::Action(const TriggerOptions& triggerOptions, Condition* condition)
-    : trigger{triggerOptions.trigger}
-    , _nextActiveAction{this}
+Action::Action(const TriggerOptions& iTriggerOptions, Condition* condition)
+    : _nextActiveAction{this}
     , _condition{condition}
     , _triggerParameter{triggerOptions.parameter}
 {
+  triggerOptions = iTriggerOptions;
 }
 
 Action::~Action()

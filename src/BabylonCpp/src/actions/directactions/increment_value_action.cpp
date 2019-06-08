@@ -5,12 +5,12 @@
 
 namespace BABYLON {
 
-IncrementValueAction::IncrementValueAction(unsigned int triggerOptions,
+IncrementValueAction::IncrementValueAction(unsigned int iTtriggerOptions,
                                            const IAnimatablePtr& target,
                                            const std::string& iPropertyPath,
                                            AnimationValue* iValue,
                                            Condition* condition)
-    : Action(triggerOptions, condition)
+    : Action(iTtriggerOptions, condition)
     , propertyPath{iPropertyPath}
     , value{iValue}
     , _target{target}

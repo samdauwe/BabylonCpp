@@ -1,14 +1,9 @@
 #ifndef BABYLON_ACTIONS_ACTION_H
 #define BABYLON_ACTIONS_ACTION_H
 
-#include <map>
-#include <nlohmann/json_fwd.hpp>
-
+#include <babylon/actions/iaction.h>
 #include <babylon/babylon_api.h>
-#include <babylon/core/structs.h>
 #include <babylon/misc/observable.h>
-
-using json = nlohmann::json;
 
 namespace BABYLON {
 
@@ -26,7 +21,8 @@ using IAnimatablePtr = std::shared_ptr<IAnimatable>;
  * @see http://doc.babylonjs.com/how_to/how_to_use_actions#available-actions
  */
 class BABYLON_SHARED_EXPORT Action
-    : public std::enable_shared_from_this<Action> {
+    : public std::enable_shared_from_this<Action>,
+      public IAction {
 
 public:
   template <typename... Ts>
@@ -50,18 +46,18 @@ public:
   /**
    * @brief Internal only.
    */
-  virtual void _prepare();
+  virtual void _prepare() override;
 
   /**
    * @brief Gets the trigger parameters.
    * @returns the trigger parameters
    */
-  std::string getTriggerParameter() const;
+  std::string getTriggerParameter() const override;
 
   /**
    * @brief Internal only - executes current action event.
    */
-  void _executeCurrent(const ActionEvent& evt);
+  void _executeCurrent(const ActionEvent& evt) override;
 
   /**
    * @brief Execute placeholder for child classes.
@@ -98,7 +94,7 @@ public:
    * @param parent of child
    * @returns the serialized object
    */
-  virtual json serialize(json& parent) const;
+  virtual json serialize(json& parent) const override;
 
   /** Statics **/
 
@@ -119,16 +115,6 @@ protected:
   json _serialize(const json& serializedAction, json& parent) const;
 
 public:
-  /**
-   * Trigger for the action
-   */
-  unsigned int trigger;
-
-  /**
-   * Internal only - manager for action
-   */
-  ActionManager* _actionManager;
-
   /**
    * An event triggered prior to action being executed.
    */

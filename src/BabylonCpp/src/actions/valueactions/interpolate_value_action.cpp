@@ -14,11 +14,11 @@
 namespace BABYLON {
 
 InterpolateValueAction::InterpolateValueAction(
-  unsigned int triggerOptions, const IAnimatablePtr& target,
+  unsigned int iTriggerOptions, const IAnimatablePtr& target,
   const std::string& iPropertyPath, AnimationValue* iValue, int iDuration,
   Condition* condition, bool iStopOtherAnimations,
   const std::function<void()>& iOnInterpolationDone)
-    : Action(triggerOptions, condition)
+    : Action(iTriggerOptions, condition)
     , propertyPath{iPropertyPath}
     , value{iValue}
     , duration{iDuration}
@@ -49,13 +49,14 @@ void InterpolateValueAction::execute(const ActionEvent& /*evt*/)
   auto dataType = value->animationType();
   if (!dataType.has_value()) {
     BABYLON_LOG_WARN("InterpolateValueAction",
-                     "InterpolateValueAction: Unsupported type");
+                     "InterpolateValueAction: Unsupported type")
   }
 
-  AnimationPtr animation
+  auto animation
     = Animation::New("InterpolateValueAction", _property,
                      static_cast<size_t>(100 * (1000.f / duration)),
                      dataType.value(), Animation::ANIMATIONLOOPMODE_CONSTANT());
+
   animation->setKeys(keys);
 
   if (stopOtherAnimations) {

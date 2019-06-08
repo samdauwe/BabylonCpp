@@ -6,10 +6,10 @@
 
 namespace BABYLON {
 
-SetStateAction::SetStateAction(unsigned int triggerOptions,
+SetStateAction::SetStateAction(unsigned int iTtriggerOptions,
                                const IAnimatablePtr& target,
                                const std::string& iValue, Condition* condition)
-    : Action(triggerOptions, condition), value{iValue}, _target{target}
+    : Action(iTtriggerOptions, condition), value{iValue}, _target{target}
 {
 }
 

@@ -2,8 +2,8 @@
 #define BABYLON_ACTIONS_DIRECTACTIONS_DO_NOTHING_ACTION_H
 
 #include <babylon/actions/action.h>
-#include <babylon/actions/action_manager.h>
 #include <babylon/babylon_api.h>
+#include <babylon/engines/constants.h>
 
 namespace BABYLON {
 
@@ -19,8 +19,9 @@ public:
    * @param triggerOptions defines the trigger options
    * @param condition defines the trigger related conditions
    */
-  DoNothingAction(unsigned int triggerOptions = ActionManager::NothingTrigger,
-                  Condition* condition        = nullptr);
+  DoNothingAction(unsigned int triggerOptions
+                  = Constants::ACTION_NothingTrigger,
+                  Condition* condition = nullptr);
   ~DoNothingAction() override;
 
   /**

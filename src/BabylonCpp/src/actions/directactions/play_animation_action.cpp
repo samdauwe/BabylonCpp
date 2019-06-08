@@ -9,11 +9,11 @@
 
 namespace BABYLON {
 
-PlayAnimationAction::PlayAnimationAction(unsigned int triggerOptions,
+PlayAnimationAction::PlayAnimationAction(unsigned int iTtriggerOptions,
                                          const IAnimatablePtr& target,
                                          float iFrom, float iTo, bool iLoop,
                                          Condition* condition)
-    : Action(triggerOptions, condition)
+    : Action(iTtriggerOptions, condition)
     , from{iFrom}
     , to{iTo}
     , loop{iLoop}

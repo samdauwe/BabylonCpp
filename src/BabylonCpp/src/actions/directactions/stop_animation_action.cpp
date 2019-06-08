@@ -8,10 +8,10 @@
 
 namespace BABYLON {
 
-StopAnimationAction::StopAnimationAction(unsigned int triggerOptions,
+StopAnimationAction::StopAnimationAction(unsigned int iTtriggerOptions,
                                          const IAnimatablePtr& target,
                                          Condition* condition)
-    : Action(triggerOptions, condition), _target{target}
+    : Action(iTtriggerOptions, condition), _target{target}
 {
 }
 
