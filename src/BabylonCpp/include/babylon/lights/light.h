@@ -291,7 +291,7 @@ public:
 protected:
   /**
    * @brief Creates a Light object in the scene.
-   * Documentation : http://doc.babylonjs.com/tutorials/lights
+   * Documentation : https://doc.babylonjs.com/babylon101/lights
    * @param name The firendly name of the light
    * @param scene The scene the light belongs too
    */
@@ -464,7 +464,7 @@ public:
    * light are falling off base on range or angle. This can be set to any values
    * in Light.FALLOFF_x.
    *
-   * Note: This is only usefull for PBR Materials at the moment. This could be
+   * Note: This is only useful for PBR Materials at the moment. This could be
    * extended if required to other types of materials.
    */
   unsigned int falloffType;
@@ -545,6 +545,9 @@ public:
    * Lightmap mode of this light
    */
   Property<Light, unsigned int> lightmapMode;
+
+  /** Hidden */
+  const bool _isLight;
 
 protected:
   float _inverseSquaredRange;

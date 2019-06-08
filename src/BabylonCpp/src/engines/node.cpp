@@ -46,6 +46,7 @@ Node::Node(const std::string& iName, Scene* scene, bool /*addToRootNodes*/)
     , _childUpdateId{-1}
     , _worldMatrix{Matrix::Identity()}
     , _worldMatrixDeterminant{0.f}
+    , _worldMatrixDeterminantIsDirty{true}
     , animationPropertiesOverride{this, &Node::get_animationPropertiesOverride,
                                   &Node::set_animationPropertiesOverride}
     , onDispose{this, &Node::set_onDispose}

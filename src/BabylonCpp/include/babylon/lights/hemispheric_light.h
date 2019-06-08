@@ -94,7 +94,7 @@ protected:
    * passed direction (Vector3). The HemisphericLight simulates the ambient
    * environment light, so the passed direction is the light reflection
    * direction, not the incoming direction. The HemisphericLight can't cast
-   * shadows. Documentation : http://doc.babylonjs.com/tutorials/lights
+   * shadows. Documentation : https://doc.babylonjs.com/babylon101/lights
    * @param name The friendly name of the light
    * @param direction The direction of the light reflection
    * @param scene The scene the light belongs to

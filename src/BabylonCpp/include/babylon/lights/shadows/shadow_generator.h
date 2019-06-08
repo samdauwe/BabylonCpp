@@ -2,16 +2,20 @@
 #define BABYLON_LIGHTS_SHADOWS_SHADOW_GENERATOR_H
 
 #include <babylon/babylon_api.h>
+#include <babylon/lights/shadows/icustom_shader_options.h>
 #include <babylon/lights/shadows/ishadow_generator.h>
 #include <babylon/math/isize.h>
 #include <babylon/math/matrix.h>
 #include <babylon/math/vector3.h>
+#include <babylon/misc/observable.h>
 
 namespace BABYLON {
 
 class AbstractMesh;
 class Effect;
 class IShadowLight;
+struct ICustomShaderOptions;
+class Mesh;
 class PostProcess;
 class Scene;
 class ShadowGenerator;
@@ -323,18 +327,18 @@ protected:
    * @brief Creates a ShadowGenerator object.
    * A ShadowGenerator is the required tool to use the shadows.
    * Each light casting shadows needs to use its own ShadowGenerator.
-   * Documentation : http://doc.babylonjs.com/tutorials/shadows
+   * Documentation : https://doc.babylonjs.com/babylon101/shadows
    * @param mapSize The size of the texture what stores the shadows. Example :
    * 1024.
    * @param light The light object generating the shadows.
-   * @param useFullFloatFirst By default the generator will try to use half
-   * float textures but if you need precision (for self shadowing for instance),
-   * you can use this option to enforce full float texture.
+   * @param usefulFloatFirst By default the generator will try to use half float
+   * textures but if you need precision (for self shadowing for instance), you
+   * can use this option to enforce full float texture.
    */
   ShadowGenerator(int mapSize, const IShadowLightPtr& light,
-                  bool useFullFloatFirst = false);
+                  bool usefulFloatFirst = false);
   ShadowGenerator(const ISize& mapSize, const IShadowLightPtr& light,
-                  bool useFullFloatFirst = false);
+                  bool usefulFloatFirst = false);
 
   /**
    * @brief Gets the bias: offset applied on the depth preventing acnea (in
@@ -364,13 +368,13 @@ protected:
 
   /**
    * @brief Gets the blur box offset: offset applied during the blur pass.
-   * Only usefull if useKernelBlur = false
+   * Only useful if useKernelBlur = false
    */
   int get_blurBoxOffset() const;
 
   /**
    * @brief Sets the blur box offset: offset applied during the blur pass.
-   * Only usefull if useKernelBlur = false
+   * Only useful if useKernelBlur = false
    */
   void set_blurBoxOffset(int value);
 
@@ -388,25 +392,25 @@ protected:
 
   /**
    * @brief Gets the blur kernel: kernel size of the blur pass.
-   * Only usefull if useKernelBlur = true
+   * Only useful if useKernelBlur = true
    */
   float get_blurKernel() const;
 
   /**
    * @brief Sets the blur kernel: kernel size of the blur pass.
-   * Only usefull if useKernelBlur = true
+   * Only useful if useKernelBlur = true
    */
   void set_blurKernel(float value);
 
   /**
    * @brief Gets whether the blur pass is a kernel blur (if true) or box blur.
-   * Only usefull in filtered mode (useBlurExponentialShadowMap...)
+   * Only useful in filtered mode (useBlurExponentialShadowMap...)
    */
   bool get_useKernelBlur() const;
 
   /**
    * @brief Sets whether the blur pass is a kernel blur (if true) or box blur.
-   * Only usefull in filtered mode (useBlurExponentialShadowMap...)
+   * Only useful in filtered mode (useBlurExponentialShadowMap...)
    */
   void set_useKernelBlur(bool value);
 
@@ -444,30 +448,6 @@ protected:
    * @brief Sets the current filter to Poisson Sampling.
    */
   void set_usePoissonSampling(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to VSM.
-   * DEPRECATED. Should use useExponentialShadowMap instead.
-   */
-  bool get_useVarianceShadowMap() const;
-
-  /**
-   * @brief Sets the current filter is to VSM.
-   * DEPRECATED. Should use useExponentialShadowMap instead.
-   */
-  void set_useVarianceShadowMap(bool value);
-
-  /**
-   * @brief Gets if the current filter is set to blurred VSM.
-   * DEPRECATED. Should use useBlurExponentialShadowMap instead.
-   */
-  bool get_useBlurVarianceShadowMap() const;
-
-  /**
-   * @brief Sets the current filter is to blurred VSM.
-   * DEPRECATED. Should use useBlurExponentialShadowMap instead.
-   */
-  void set_useBlurVarianceShadowMap(bool value);
 
   /**
    * @brief Gets if the current filter is set to ESM.
@@ -588,6 +568,24 @@ private:
 
 public:
   /**
+   * Gets or sets the custom shader name to use
+   */
+  std::optional<ICustomShaderOptions> customShaderOptions;
+
+  /**
+   * Observable triggered before the shadow is rendered. Can be used to update
+   * internal effect state
+   */
+  Observable<Effect> onBeforeShadowMapRenderObservable;
+
+  /**
+   * Observable triggered before a mesh is rendered in the shadow map.
+   * Can be used to update internal effect state (that you can get from the
+   * onBeforeShadowMapRenderObservable)
+   */
+  Observable<Mesh> onBeforeShadowMapRenderMeshObservable;
+
+  /**
    * Gets the bias: offset applied on the depth preventing acnea (in light
    * direction)
    */
@@ -601,7 +599,7 @@ public:
 
   /**
    * The blur box offset: offset applied during the blur pass
-   * Only usefull if useKernelBlur = false
+   * Only useful if useKernelBlur = false
    */
   Property<ShadowGenerator, int> blurBoxOffset;
 
@@ -613,13 +611,13 @@ public:
 
   /**
    * The blur kernel: kernel size of the blur pass
-   * Only usefull if useKernelBlur = true
+   * Only useful if useKernelBlur = true
    */
   Property<ShadowGenerator, float> blurKernel;
 
   /**
    * Whether the blur pass is a kernel blur (if true) or box blur
-   * Only usefull in filtered mode (useBlurExponentialShadowMap...)
+   * Only useful in filtered mode (useBlurExponentialShadowMap...)
    */
   Property<ShadowGenerator, bool> useKernelBlur;
 
@@ -639,18 +637,6 @@ public:
    * If the current filter is set to Poisson Sampling
    */
   Property<ShadowGenerator, bool> usePoissonSampling;
-
-  /**
-   * If the current filter is set to VSM
-   * DEPRECATED. Should use useExponentialShadowMap instead.
-   */
-  Property<ShadowGenerator, bool> useVarianceShadowMap;
-
-  /**
-   * If the current filter is set to blurred VSM
-   * DEPRECATED. Should use useBlurExponentialShadowMap instead.
-   */
-  Property<ShadowGenerator, bool> useBlurVarianceShadowMap;
 
   /**
    * If the current filter is set to ESM

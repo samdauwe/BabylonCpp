@@ -5,6 +5,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
+#include <babylon/materials/textures/texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/axis.h>
 
@@ -167,8 +168,18 @@ BaseTexturePtr& SpotLight::get_projectionTexture()
 
 void SpotLight::set_projectionTexture(const BaseTexturePtr& value)
 {
+  if (_projectionTexture == value) {
+    return;
+  }
   _projectionTexture      = value;
   _projectionTextureDirty = true;
+  if (_projectionTexture && !_projectionTexture->isReady()) {
+    auto texture = std::static_pointer_cast<Texture>(_projectionTexture);
+    if (texture) {
+      texture->onLoadObservable().addOnce(
+        [this](Texture*, EventState&) -> void { _markMeshesAsLightDirty(); });
+    }
+  }
 }
 
 void SpotLight::_setDirection(const Vector3& value)
@@ -337,7 +348,7 @@ void SpotLight::prepareLightSpecificDefines(MaterialDefines& defines,
 
   defines.boolDef["SPOTLIGHT" + lightIndexStr] = true;
   defines.boolDef["PROJECTEDLIGHTTEXTURE" + lightIndexStr]
-    = projectionTexture() ? true : false;
+    = projectionTexture() && projectionTexture()->isReady() ? true : false;
 }
 
 } // end of namespace BABYLON

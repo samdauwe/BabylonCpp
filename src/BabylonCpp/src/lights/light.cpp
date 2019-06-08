@@ -38,6 +38,7 @@ Light::Light(const std::string& iName, Scene* scene)
     , includeOnlyWithLayerMask{this, &Light::get_includeOnlyWithLayerMask,
                                &Light::set_includeOnlyWithLayerMask}
     , lightmapMode{this, &Light::get_lightmapMode, &Light::set_lightmapMode}
+    , _isLight{true}
     , _inverseSquaredRange{0.f}
     , _range{std::numeric_limits<float>::max()}
     , _photometricScale{1.f}
@@ -375,12 +376,12 @@ json Light::serialize() const
   return nullptr;
 }
 
-std::function<LightPtr()> Light::GetConstructorFromName(unsigned int type,
-                                                        const std::string& name,
-                                                        Scene* scene)
+std::function<LightPtr()>
+Light::GetConstructorFromName(unsigned int type, const std::string& iName,
+                              Scene* scene)
 {
   auto constructorFunc
-    = Node::Construct("Light_Type_" + std::to_string(type), name, scene);
+    = Node::Construct("Light_Type_" + std::to_string(type), iName, scene);
 
   if (constructorFunc) {
     return [constructorFunc]() {
@@ -405,22 +406,31 @@ LightPtr Light::Parse(const json& parsedLight, Scene* scene)
   auto light = SerializationHelper::Parse(constructor, parsedLight, scene);
 
   // Inclusion / exclusions
-  if (json_util::has_key(parsedLight, "excludedMeshesIds")
-      && !json_util::is_null(parsedLight["excludedMeshesIds"])) {
+  if (json_util::has_valid_key_value(parsedLight, "excludedMeshesIds")) {
     light->_excludedMeshesIds
       = json_util::get_array<std::string>(parsedLight, "excludedMeshesIds");
   }
 
-  if (json_util::has_key(parsedLight, "includedOnlyMeshesIds")
-      && !json_util::is_null(parsedLight["includedOnlyMeshesIds"])) {
+  if (json_util::has_valid_key_value(parsedLight, "includedOnlyMeshesIds")) {
     light->_includedOnlyMeshesIds
       = json_util::get_array<std::string>(parsedLight, "includedOnlyMeshesIds");
   }
 
   // Parent
-  if (json_util::has_key(parsedLight, "parentId")
-      && !json_util::is_null(parsedLight["parentId"])) {
+  if (json_util::has_valid_key_value(parsedLight, "parentId")) {
     light->_waitingParentId = json_util::get_string(parsedLight, "parentId");
+  }
+
+  // Falloff
+  if (json_util::has_valid_key_value(parsedLight, "falloffType")) {
+    light->falloffType
+      = json_util::get_number<unsigned int>(parsedLight, "falloffType");
+  }
+
+  // Lightmaps
+  if (json_util::has_valid_key_value(parsedLight, "lightmapMode")) {
+    light->lightmapMode
+      = json_util::get_number<unsigned int>(parsedLight, "lightmapMode");
   }
 
   // Animations
@@ -463,9 +473,9 @@ void Light::_markMeshesAsLightDirty()
 {
   for (auto& mesh : getScene()->meshes) {
     if (std::find_if(
-          mesh->_lightSources.begin(), mesh->_lightSources.end(),
+          mesh->lightSources().begin(), mesh->lightSources().end(),
           [this](const LightPtr& light) { return light.get() == this; })
-        != mesh->_lightSources.end()) {
+        != mesh->lightSources().end()) {
       mesh->_markSubMeshesAsLightDirty();
     }
   }

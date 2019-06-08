@@ -13,13 +13,14 @@
 #include <babylon/math/color4.h>
 #include <babylon/math/matrix.h>
 #include <babylon/meshes/_facet_data_storage.h>
+#include <babylon/meshes/_internal_abstract_mesh_data_info.h>
 #include <babylon/meshes/abstract_mesh_constants.h>
 #include <babylon/meshes/facet_parameters.h>
 #include <babylon/meshes/iget_set_vertices_data.h>
 #include <babylon/meshes/transform_node.h>
-#include <babylon/physics/physics_impostor.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
+#include <babylon/physics/physics_impostor.h>
 
 using json = nlohmann::json;
 
@@ -1147,6 +1148,11 @@ protected:
   void set_collisionGroup(int mask);
 
   /**
+   * @brief Gets the list of lights affecting that mesh
+   */
+  std::vector<LightPtr>& get_lightSources();
+
+  /**
    * @brief Hidden
    * @return
    */
@@ -1271,6 +1277,12 @@ private:
   AbstractMesh& _initFacetData();
 
 public:
+  /**
+   * Internal data
+   * Hidden
+   */
+  _InternalAbstractMeshDataInfo _internalAbstractMeshDataInfo;
+
   /**
    * Gets ot sets the culling strategy to use to find visible meshes
    */
@@ -1662,6 +1674,11 @@ public:
 
   /** Hidden */
   std::vector<LightPtr> _lightSources;
+
+  /**
+   * Gets the list of lights affecting that mesh
+   */
+  ReadOnlyProperty<AbstractMesh, std::vector<LightPtr>> lightSources;
 
   // Loading properties
 

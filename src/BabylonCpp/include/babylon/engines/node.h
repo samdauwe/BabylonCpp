@@ -496,6 +496,8 @@ public:
   Matrix _worldMatrix;
   /** Hidden */
   float _worldMatrixDeterminant;
+  /** Hidden */
+  bool _worldMatrixDeterminantIsDirty;
 
   /**
    * Animation properties override.

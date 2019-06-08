@@ -65,8 +65,9 @@ public:
   void addFromContainer(AbstractScene& container) override;
 
   /**
-   * Removes all the elements in the container from the scene
+   * @brief Removes all the elements in the container from the scene.
    * @param container contains the elements to remove
+   * @param dispose if the removed element should be disposed (default: false)
    */
   void removeFromContainer(AbstractScene& container,
                            bool dispose = false) override;

@@ -68,7 +68,7 @@ public:
 
   /**
    * @brief Sets the ShadowLight direction toward the passed target.
-   * @param target The point tot target in local space
+   * @param target The point to target in local space
    * @returns the updated ShadowLight direction
    */
   Vector3 setDirectionToTarget(const Vector3& target);
@@ -243,7 +243,6 @@ protected:
 private:
   std::optional<float> _shadowMinZ;
   std::optional<float> _shadowMaxZ;
-  std::unique_ptr<Matrix> _worldMatrix;
   bool _needProjectionMatrixCompute;
 
 }; // end of class ShadowLight

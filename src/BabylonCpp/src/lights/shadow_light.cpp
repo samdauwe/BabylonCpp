@@ -7,8 +7,8 @@
 
 namespace BABYLON {
 
-ShadowLight::ShadowLight(const std::string& name, Scene* scene)
-    : IShadowLight{name, scene}
+ShadowLight::ShadowLight(const std::string& iName, Scene* scene)
+    : IShadowLight{iName, scene}
     , shadowMinZ{this, &ShadowLight::get_shadowMinZ,
                  &ShadowLight::set_shadowMinZ}
     , shadowMaxZ{this, &ShadowLight::get_shadowMaxZ,
@@ -174,29 +174,25 @@ Matrix& ShadowLight::computeWorldMatrix(bool force, bool /*useWasUpdatedFlag*/)
 {
   if (!force && isSynchronized()) {
     _currentRenderId = getScene()->getRenderId();
-    return *_worldMatrix;
+    return _worldMatrix;
   }
 
   _updateCache();
   _cache.position.copyFrom(position);
 
-  if (!_worldMatrix) {
-    _worldMatrix = std::make_unique<Matrix>(Matrix::Identity());
-  }
-
   Matrix::TranslationToRef(position().x, position().y, position().z,
-                           *_worldMatrix);
+                           _worldMatrix);
 
   if (parent) {
-    _worldMatrix->multiplyToRef(parent()->getWorldMatrix(), *_worldMatrix);
+    _worldMatrix.multiplyToRef(parent()->getWorldMatrix(), _worldMatrix);
 
     _markSyncedWithParent();
   }
 
   // Cache the determinant
-  _worldMatrixDeterminant = _worldMatrix->determinant();
+  _worldMatrixDeterminantIsDirty = true;
 
-  return *_worldMatrix;
+  return _worldMatrix;
 }
 
 float ShadowLight::getDepthMinZ(const Camera& activeCamera) const
