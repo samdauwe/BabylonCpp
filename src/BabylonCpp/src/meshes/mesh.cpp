@@ -2166,7 +2166,7 @@ void Mesh::minimizeVertices()
   _vertexData->applyToMesh(*this);
 }
 
-void Mesh::serialize(json& /*serializationObject*/)
+void Mesh::serialize(json& /*serializationObject*/) const
 {
 }
 

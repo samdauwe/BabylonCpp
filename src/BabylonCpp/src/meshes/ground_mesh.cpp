@@ -228,9 +228,8 @@ GroundMesh& GroundMesh::_computeHeightQuads()
   return *this;
 }
 
-json GroundMesh::serialize(json& /*serializationObject*/) const
+void GroundMesh::serialize(json& /*serializationObject*/) const
 {
-  return json();
 }
 
 GroundMeshPtr GroundMesh::Parse(const json& parsedMesh, Scene* scene)

@@ -879,7 +879,7 @@ public:
    * @param serializationObject defines the object which will receive the
    * serialization data
    */
-  void serialize(json& serializationObject);
+  virtual void serialize(json& serializationObject) const;
 
   /**
    * @brief Hidden

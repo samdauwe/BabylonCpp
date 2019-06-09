@@ -93,7 +93,7 @@ public:
    * @brief Serializes this ground mesh.
    * @param serializationObject object to write serialization to
    */
-  json serialize(json& serializationObject) const;
+  void serialize(json& serializationObject) const override;
 
   /**
    * @brief Parses a serialized ground mesh.
