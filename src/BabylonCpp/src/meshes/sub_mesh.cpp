@@ -273,8 +273,7 @@ SubMesh::intersects(Ray& ray, const std::vector<Vector3>& positions,
       const auto& p0 = positions[indices[index]];
       const auto& p1 = positions[indices[index + 1]];
 
-      length
-        = ray.intersectionSegment(p0, p1, lineMesh->intersectionThreshold());
+      length = ray.intersectionSegment(p0, p1, lineMesh->intersectionThreshold);
       if (length < 0.f) {
         continue;
       }

@@ -1,11 +1,14 @@
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>
 
 #include <babylon/babylon_stl_util.h>
+#include <babylon/engines/engine.h>
 #include <babylon/math/path2.h>
 #include <babylon/math/vector2.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/polygonmesh/indexed_vector2.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/meshes/vertex_data.h>
+
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 // Conversion from int to char
@@ -30,8 +33,10 @@ namespace BABYLON {
 
 PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
                                        const Path2& contours, Scene* scene)
-    : _name{name}, _scene{scene}
+    : _name{name}
 {
+  _scene = scene ? scene : Engine::LastCreatedScene();
+
   auto points = contours.getPoints();
   _addToepoint(points);
 
@@ -42,8 +47,10 @@ PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
 PolygonMeshBuilder::PolygonMeshBuilder(const std::string& name,
                                        const std::vector<Vector2>& contours,
                                        Scene* scene)
-    : _name{name}, _scene{scene}
+    : _name{name}
 {
+  _scene = scene ? scene : Engine::LastCreatedScene();
+
   _addToepoint(contours);
 
   _points.add(contours);
@@ -69,6 +76,7 @@ PolygonMeshBuilder::addHole(const std::vector<Vector2>& hole)
   PolygonPoints holepoints;
   holepoints.add(hole);
   _holes.emplace_back(holepoints);
+
   _eholes.emplace_back(static_cast<int32_t>(_epoints.size()));
   _addToepoint(hole);
 
@@ -78,6 +86,22 @@ PolygonMeshBuilder::addHole(const std::vector<Vector2>& hole)
 MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
 {
   auto result = Mesh::New(_name, _scene);
+
+  const auto vertexData = buildVertexData(depth);
+
+  result->setVerticesData(VertexBuffer::PositionKind, vertexData->positions,
+                          updatable);
+  result->setVerticesData(VertexBuffer::NormalKind, vertexData->normals,
+                          updatable);
+  result->setVerticesData(VertexBuffer::UVKind, vertexData->uvs, updatable);
+  result->setIndices(vertexData->indices);
+
+  return result;
+}
+
+std::unique_ptr<VertexData> PolygonMeshBuilder::buildVertexData(float depth)
+{
+  auto result = std::make_unique<VertexData>();
 
   Float32Array normals;
   Float32Array positions;
@@ -133,10 +157,10 @@ MeshPtr PolygonMeshBuilder::build(bool updatable, float depth)
     }
   }
 
-  result->setVerticesData(VertexBuffer::PositionKind, positions, updatable);
-  result->setVerticesData(VertexBuffer::NormalKind, normals, updatable);
-  result->setVerticesData(VertexBuffer::UVKind, uvs, updatable);
-  result->setIndices(indices);
+  result->indices   = std::move(indices);
+  result->positions = std::move(positions);
+  result->normals   = std::move(normals);
+  result->uvs       = std::move(uvs);
 
   return result;
 }
@@ -156,7 +180,7 @@ PolygonMeshBuilder::buildWall(const Vector3& wall0Corner,
   for (const auto& p : pointElements) {
     stl_util::concat(positions, {p.x * std::cos(angle) + wall0Corner.x, p.y,
                                  p.x * std::sin(angle) + wall0Corner.z});
-  };
+  }
   std::vector<std::vector<Point2D>> polygon;
   // Earcut.hpp has no 'holes' argument, adding the holes to the input array
   addHoles(_epoints, _eholes, polygon);

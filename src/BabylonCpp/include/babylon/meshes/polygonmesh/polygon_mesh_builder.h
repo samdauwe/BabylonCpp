@@ -10,6 +10,7 @@ namespace BABYLON {
 class Mesh;
 class Path2;
 class Scene;
+class VertexData;
 using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
@@ -26,7 +27,7 @@ public:
    * @brief Creates a PolygonMeshBuilder.
    * @param name name of the builder
    * @param contours Path of the polygon
-   * @param scene scene to add to
+   * @param scene scene to add to when creating the mesh
    */
   PolygonMeshBuilder(const std::string& name, const Path2& contours,
                      Scene* scene);
@@ -48,9 +49,16 @@ public:
    * @returns the created mesh
    */
   MeshPtr build(bool updatable = false, float depth = 0.f);
+
+  /**
+   * @brief Creates the polygon.
+   * @param depth The depth of the mesh created
+   * @returns the created VertexData
+   */
+  std::unique_ptr<VertexData> buildVertexData(float depth = 0.f);
+
   std::pair<Float32Array, Uint32Array> buildWall(const Vector3& wall0Corner,
                                                  const Vector3& wall1Corner);
-
   PolygonPoints& points();
   const PolygonPoints& points() const;
 

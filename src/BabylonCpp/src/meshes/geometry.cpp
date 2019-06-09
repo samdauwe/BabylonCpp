@@ -59,7 +59,7 @@ Geometry::Geometry(const std::string& iId, Scene* scene, VertexData* vertexData,
   if (mesh) {
     if (mesh->type() == Type::LINESMESH) {
       auto linesMesh = static_cast<LinesMesh*>(mesh);
-      boundingBias   = Vector2(0, linesMesh->intersectionThreshold());
+      boundingBias   = Vector2(0, linesMesh->intersectionThreshold);
       _updateExtend(Float32Array());
     }
 

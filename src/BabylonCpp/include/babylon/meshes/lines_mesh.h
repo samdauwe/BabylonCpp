@@ -7,8 +7,10 @@
 
 namespace BABYLON {
 
+class InstancedLinesMesh;
 class ShaderMaterial;
-using ShaderMaterialPtr = std::shared_ptr<ShaderMaterial>;
+using ShaderMaterialPtr     = std::shared_ptr<ShaderMaterial>;
+using InstancedLinesMeshPtr = std::shared_ptr<InstancedLinesMesh>;
 
 /**
  * @brief Line mesh
@@ -29,10 +31,19 @@ public:
   ~LinesMesh() override;
 
   /**
+   * @brief Hidden
+   */
+  bool isReady(bool completeCheck        = false,
+               bool forceInstanceSupport = false) override;
+
+  /**
    * @brief Returns the string "LineMesh".
    */
   const std::string getClassName() const override;
 
+  /**
+   * @brief Hidden
+   */
   Type type() const override;
 
   /**
@@ -61,6 +72,14 @@ public:
    */
   LinesMeshPtr clone(const std::string& name, Node* newParent = nullptr,
                      bool doNotCloneChildren = false);
+
+  /**
+   * @brief Creates a new InstancedLinesMesh object from the mesh model.
+   * @see http://doc.babylonjs.com/how_to/how_to_use_instances
+   * @param name defines the name of the new instance
+   * @returns a new InstancedLinesMesh
+   */
+  InstancedLinesMeshPtr createInstance(const std::string& name);
 
 protected:
   /**
@@ -94,22 +113,9 @@ protected:
    */
   bool get_checkCollisions() const override;
 
-  /**
-   * @brief The intersection Threshold is the margin applied when intersection a
-   * segment of the LinesMesh with a Ray.
-   * This margin is expressed in world space coordinates, so its value may vary.
-   * Default value is 0.1
-   * @returns the intersection Threshold value.
-   */
-  float get_intersectionThreshold() const;
-
-  /**
-   * @brief The intersection Threshold is the margin applied when intersection a
-   * segment of the LinesMesh with a Ray.
-   * This margin is expressed in world space coordinates, so its value may vary.
-   * @param value the new threshold to apply
-   */
-  void set_intersectionThreshold(float value);
+private:
+  void _addClipPlaneDefine(const std::string& label);
+  void _removeClipPlaneDefine(const std::string& label);
 
 public:
   float dashSize;
@@ -126,6 +132,13 @@ public:
   float alpha;
 
   /**
+   * The intersection Threshold is the margin applied when intersection a
+   * segment of the LinesMesh with a Ray. This margin is expressed in world
+   * space coordinates, so its value may vary. Default value is 0.1
+   */
+  float intersectionThreshold;
+
+  /**
    * If vertex color should be applied to the mesh
    */
   bool useVertexColor;
@@ -135,13 +148,7 @@ public:
    */
   bool useVertexAlpha;
 
-  /**
-   * The margin applied when intersection a segment of the LinesMesh with a Ray
-   */
-  Property<LinesMesh, float> intersectionThreshold;
-
 private:
-  float _intersectionThreshold;
   MaterialPtr _colorShaderMaterial;
   ShaderMaterialPtr _colorShader;
 
