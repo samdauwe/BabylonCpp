@@ -127,10 +127,13 @@ The compiler should implement all the features of the [ISO C++ 2017 standard](ht
 * AppleClang >= 10.0
 * MSVC >= 2017
 
-## Supported Operating Systems ##
+# Supported Operating Platforms #
 * Linux
 * MacOSX
 * Windows >= 7
+
+Graphics APIs:
+*  <img src="./assets/images/OpenGLLogo.png" alt="" height="28px"> 2.1 through 4.6, core profile functionality and modern extensions
 
 # License
 Open-source under [Apache 2.0 license](http://www.tldrlegal.com/license/apache-license-2.0-%28apache-2.0%29).
