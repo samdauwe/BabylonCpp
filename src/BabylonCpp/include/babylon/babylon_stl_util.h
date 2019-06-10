@@ -295,9 +295,9 @@ to_raw_ptr_map(const std::unordered_map<K, std::unique_ptr<V>>& c)
 }
 
 /**
- * The concat() method is used to join two or more arrays.
- * Note: This method does not change the existing arrays, but returns a new
- * array, containing the values of the joined arrays.
+ * @brief The concat() method is used to join two or more arrays.
+ * Note: This method changes the existing arrays, returning the array a,
+ * containing the values of the joined arrays.
  * @param a Required. The first array to be joined.
  * @param b Required. The first array to be joined.
  * @return An Array object, representing the joined array.
@@ -503,6 +503,20 @@ inline std::vector<T> filter(const std::vector<T>& original,
 }
 
 /**
+ * @brief Creates a new array with all sub-array elements concatenated.
+ * @return A new array with the sub-array elements concatenated into it.
+ */
+template <typename T>
+inline std::vector<T> flatten(const std::vector<std::vector<T>>& orig)
+{
+  std::vector<T> ret;
+  for (const std::vector<T>& v : orig) {
+    ret.insert(ret.end(), v.begin(), v.end());
+  }
+  return ret;
+}
+
+/**
  * @brief Applies an operation sequentially to the elements of the input vector
  * using the mapping function.
  * @param original Vector to map.
@@ -517,6 +531,34 @@ inline std::vector<T> map(const std::vector<T>& original,
   std::transform(original.begin(), original.end(), std::back_inserter(mapped),
                  mappingFunction);
   return mapped;
+}
+
+/**
+ * @brief Removes the last element from an array and returns that element. This
+ * method changes the length of the array.
+ * @return The removed element from the array; std::nullopt if the array is
+ * empty.
+ */
+template <typename T>
+inline std::optional<T> pop(std::vector<T>& arr)
+{
+  std::optional<T> result = std::nullopt;
+  if (!arr.empty()) {
+    result = arr.back();
+    arr.pop_back();
+  }
+  return result;
+}
+
+/**
+ * @brief Adds one element to the beginning of an array.
+ * @return Reference to the input array.
+ */
+template <typename T>
+inline std::vector<T>& push_front(std::vector<T>& arr, const T& elem)
+{
+  arr.insert(arr.begin(), elem);
+  return arr;
 }
 
 /**

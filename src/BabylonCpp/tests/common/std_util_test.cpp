@@ -275,6 +275,19 @@ TEST(TestStdUtil, filter)
   EXPECT_THAT(filtered, ::testing::ContainerEq(expected));
 }
 
+TEST(TestStdUtil, flatten)
+{
+  using namespace BABYLON;
+
+  std::vector<std::vector<int>> v;
+  v.push_back(std::vector<int>{1, 2, 3});
+  v.push_back(std::vector<int>{10, 20});
+
+  auto flattened = stl_util::flatten(v);
+  const std::vector<int> expected{1, 2, 3, 10, 20};
+  EXPECT_THAT(flattened, ::testing::ContainerEq(expected));
+}
+
 TEST(TestStdUtil, index_of)
 {
   using namespace BABYLON;
@@ -318,6 +331,38 @@ TEST(TestStdUtil, max)
     stl_util::max(std::string{"var1"}, static_cast<char const*>("var2")),
     "var2");
   EXPECT_EQ(stl_util::max("var1", std::string{"var2"}), "var2");
+}
+
+TEST(TestStdUtil, pop)
+{
+  using namespace BABYLON;
+
+  {
+    std::vector<int> input;
+    auto output = stl_util::pop(input);
+
+    EXPECT_THAT(output, std::nullopt);
+  }
+
+  {
+    std::vector<int> input{1, 2, 3};
+    auto output = stl_util::pop(input);
+
+    const std::vector<int> expected{1, 2};
+    EXPECT_THAT(input, ::testing::ContainerEq(expected));
+    EXPECT_THAT(output.value(), 3);
+  }
+}
+
+TEST(TestStdUtil, push_front)
+{
+  using namespace BABYLON;
+
+  std::vector<int> input{1, 2, 3};
+  auto output = stl_util::push_front(input, 4);
+
+  const std::vector<int> expected{4, 1, 2, 3};
+  EXPECT_THAT(output, ::testing::ContainerEq(expected));
 }
 
 TEST(TestStdUtil, remove_duplicates)
