@@ -5,6 +5,7 @@
 #include <cstring>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <unordered_map>
