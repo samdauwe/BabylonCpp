@@ -98,6 +98,20 @@ public:
    */
   static constexpr unsigned int CAP_ALL = 4;
 
+  /**
+   * @brief Gets the default side orientation.
+   * @param orientation the orientation to value to attempt to get
+   * @returns the default orientation
+   * Hidden
+   */
+  static constexpr unsigned int
+  _GetDefaultSideOrientation(const std::optional<unsigned int>& orientation
+                             = std::nullopt)
+  {
+    // works as Mesh.FRONTSIDE is 0
+    return orientation.value_or(Mesh::FRONTSIDE);
+  }
+
 public:
   template <typename... Ts>
   static MeshPtr New(Ts&&... args)
