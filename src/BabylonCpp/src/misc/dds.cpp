@@ -2,8 +2,8 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/logging.h>
+#include <babylon/engines/constants.h>
 #include <babylon/engines/engine.h>
-#include <babylon/engines/engine_constants.h>
 #include <babylon/interfaces/igl_rendering_context.h>
 #include <babylon/materials/textures/internal_texture.h>
 #include <babylon/math/scalar.h>
@@ -34,18 +34,18 @@ DDSTools::GetDDSInfo(const std::variant<std::string, ArrayBuffer>& iArrayBuffer)
   auto fourCC = header[off_pfFourCC];
   auto dxgiFormat
     = (fourCC == DDS::FOURCC_DX10) ? extendedHeader[off_dxgiFormat] : 0;
-  auto textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  auto textureType = Constants::TEXTURETYPE_UNSIGNED_INT;
 
   switch (fourCC) {
     case DDS::FOURCC_D3DFMT_R16G16B16A16F:
-      textureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+      textureType = Constants::TEXTURETYPE_HALF_FLOAT;
       break;
     case DDS::FOURCC_D3DFMT_R32G32B32A32F:
-      textureType = EngineConstants::TEXTURETYPE_FLOAT;
+      textureType = Constants::TEXTURETYPE_FLOAT;
       break;
     case DDS::FOURCC_DX10:
       if (dxgiFormat == DDS::DXGI_FORMAT_R16G16B16A16_FLOAT) {
-        textureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+        textureType = Constants::TEXTURETYPE_HALF_FLOAT;
         break;
       }
   }
@@ -383,19 +383,19 @@ void DDSTools::UploadDDSLevels(
   size_t dataLength = 0;
 
   if (header[off_magic] != DDS_MAGIC) {
-    BABYLON_LOG_ERROR("DDSTools", "Invalid magic number in DDS header");
+    BABYLON_LOG_ERROR("DDSTools", "Invalid magic number in DDS header")
     return;
   }
 
   if (!info.isFourCC && !info.isRGB && !info.isLuminance) {
     BABYLON_LOG_ERROR("DDSTools",
-                      "Unsupported format, must contain a FourCC code");
+                      "Unsupported format, must contain a FourCC code")
     return;
   }
 
   if (info.isCompressed && !ext) {
-    BABYLON_LOG_ERROR(
-      "DDSTools", "Compressed textures are not supported on this platform.");
+    BABYLON_LOG_ERROR("DDSTools",
+                      "Compressed textures are not supported on this platform.")
     return;
   }
 
@@ -447,7 +447,7 @@ void DDSTools::UploadDDSLevels(
       } break;
       default:
         BABYLON_LOG_ERROR("DDSTools",
-                          "Unsupported FourCC code: ", Int32ToFourCC(fourCC));
+                          "Unsupported FourCC code: ", Int32ToFourCC(fourCC))
         return;
     }
   }
@@ -467,7 +467,9 @@ void DDSTools::UploadDDSLevels(
     mipmapCount = std::max(1, header[off_mipmapCount]);
   }
 
-  for (unsigned int face = 0; face < faces; ++face) {
+  const auto startFace
+    = currentFace >= 0 ? static_cast<unsigned>(currentFace) : 0u;
+  for (unsigned int face = startFace; face < faces; ++face) {
     width  = static_cast<float>(header[off_width]);
     height = static_cast<float>(header[off_height]);
 
@@ -477,7 +479,7 @@ void DDSTools::UploadDDSLevels(
         const int i = (lodIndex == -1) ? mip : 0;
 
         if (!info.isCompressed && info.isFourCC) {
-          texture->format = EngineConstants::TEXTUREFORMAT_RGBA;
+          texture->format = Constants::TEXTUREFORMAT_RGBA;
           dataLength      = static_cast<size_t>(width * height * 4);
           ArrayBufferView floatArray;
 
@@ -506,11 +508,11 @@ void DDSTools::UploadDDSLevels(
               }
             }
 
-            texture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+            texture->type = Constants::TEXTURETYPE_UNSIGNED_INT;
           }
           else {
             if (bpp == 128) {
-              texture->type = EngineConstants::TEXTURETYPE_FLOAT;
+              texture->type = Constants::TEXTURETYPE_FLOAT;
               floatArray    = DDSTools::_GetFloatRGBAArrayBuffer(
                 width, height, dataOffset, dataLength, arrayBuffer, i);
               if (i == 0) {
@@ -518,7 +520,7 @@ void DDSTools::UploadDDSLevels(
               }
             }
             else if (bpp == 64 && !engine->getCaps().textureHalfFloat) {
-              texture->type = EngineConstants::TEXTURETYPE_FLOAT;
+              texture->type = Constants::TEXTURETYPE_FLOAT;
               floatArray    = DDSTools::_GetHalfFloatAsFloatRGBAArrayBuffer(
                 width, height, dataOffset, dataLength, arrayBuffer, i);
               if (i == 0) {
@@ -526,7 +528,7 @@ void DDSTools::UploadDDSLevels(
               }
             }
             else { // 64
-              texture->type = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+              texture->type = Constants::TEXTURETYPE_HALF_FLOAT;
               floatArray    = DDSTools::_GetHalfFloatRGBAArrayBuffer(
                 width, height, dataOffset, dataLength, arrayBuffer, i);
               if (i == 0) {
@@ -542,9 +544,9 @@ void DDSTools::UploadDDSLevels(
           }
         }
         else if (info.isRGB) {
-          texture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+          texture->type = Constants::TEXTURETYPE_UNSIGNED_INT;
           if (bpp == 24) {
-            texture->format = EngineConstants::TEXTUREFORMAT_RGB;
+            texture->format = Constants::TEXTUREFORMAT_RGB;
             dataLength      = static_cast<size_t>(width * height * 3);
             byteArray = DDSTools::_GetRGBArrayBuffer(width, height, dataOffset,
                                                      dataLength, arrayBuffer,
@@ -552,7 +554,7 @@ void DDSTools::UploadDDSLevels(
             engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
           }
           else { // 32
-            texture->format = EngineConstants::TEXTUREFORMAT_RGBA;
+            texture->format = Constants::TEXTUREFORMAT_RGBA;
             dataLength      = static_cast<size_t>(width * height * 4);
             byteArray       = DDSTools::_GetRGBAArrayBuffer(
               width, height, dataOffset, dataLength, arrayBuffer, rOffset,
@@ -572,18 +574,18 @@ void DDSTools::UploadDDSLevels(
           byteArray = DDSTools::_GetLuminanceArrayBuffer(
             width, height, dataOffset, dataLength, arrayBuffer);
 
-          texture->format = EngineConstants::TEXTUREFORMAT_LUMINANCE;
-          texture->type   = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+          texture->format = Constants::TEXTUREFORMAT_LUMINANCE;
+          texture->type   = Constants::TEXTURETYPE_UNSIGNED_INT;
 
           engine->_uploadDataToTextureDirectly(texture, byteArray, face, i);
         }
         else {
           dataLength = static_cast<size_t>(
             std::max(4.f, width) / 4 * std::max(4.f, height) / 4 * blockBytes);
-          byteArray
-            = stl_util::to_array<uint8_t>(arrayBuffer, dataOffset, dataLength);
+          byteArray = stl_util::to_array<uint8_t>(
+            arrayBuffer, static_cast<size_t>(dataOffset), dataLength);
 
-          texture->type = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+          texture->type = Constants::TEXTURETYPE_UNSIGNED_INT;
           engine->_uploadCompressedDataToTextureDirectly(
             texture, internalCompressedFormat, width, height, byteArray, face,
             i);
@@ -612,8 +614,8 @@ void DDSTools::UploadDDSLevels(
     cubeInfo.down       = sphericalPolynomialFaces[3];
     cubeInfo.front      = sphericalPolynomialFaces[4];
     cubeInfo.back       = sphericalPolynomialFaces[5];
-    cubeInfo.format     = EngineConstants::TEXTUREFORMAT_RGBA;
-    cubeInfo.type       = EngineConstants::TEXTURETYPE_FLOAT;
+    cubeInfo.format     = Constants::TEXTUREFORMAT_RGBA;
+    cubeInfo.type       = Constants::TEXTURETYPE_FLOAT;
     cubeInfo.gammaSpace = false;
 
     info.sphericalPolynomial
