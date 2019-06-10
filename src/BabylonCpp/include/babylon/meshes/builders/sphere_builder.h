@@ -2,6 +2,7 @@
 #define BABYLON_MESHES_BUILDERS_SPHERE_BUILDER_H
 
 #include <memory>
+#include <string>
 
 #include <babylon/babylon_api.h>
 

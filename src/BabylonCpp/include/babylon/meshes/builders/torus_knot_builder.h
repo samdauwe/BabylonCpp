@@ -2,6 +2,7 @@
 #define BABYLON_MESHES_BUILDERS_TORUS_KNOT_BUILDER_H
 
 #include <memory>
+#include <string>
 
 #include <babylon/babylon_api.h>
 
