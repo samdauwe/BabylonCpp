@@ -7,8 +7,8 @@
 #include <babylon/math/color3.h>
 #include <babylon/math/quaternion.h>
 #include <babylon/math/vector3.h>
-#include <babylon/rendering/utility_layer_renderer.h>
 #include <babylon/misc/observable.h>
+#include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
@@ -36,12 +36,12 @@ public:
   /**
    * @brief Hidden
    */
-  static void _RemoveAndStorePivotPoint(AbstractMesh* mesh);
+  static void _RemoveAndStorePivotPoint(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Hidden
    */
-  static void _RestorePivotPoint(AbstractMesh* mesh);
+  static void _RestorePivotPoint(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Updates the bounding box information for the Gizmo.
@@ -78,7 +78,7 @@ public:
                      bool useGizmoMaterial = false) override;
 
 protected:
-  void _attachedMeshChanged(AbstractMesh* value) override;
+  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
 
 private:
   void _selectNode(const MeshPtr& selectedMesh);

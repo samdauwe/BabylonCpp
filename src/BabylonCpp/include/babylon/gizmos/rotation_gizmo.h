@@ -8,6 +8,8 @@
 namespace BABYLON {
 
 class PlaneRotationGizmo;
+class UtilityLayerRenderer;
+using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 /**
  * @brief Gizmo that enables rotating a mesh along 3 axis.
@@ -21,7 +23,7 @@ public:
    * @param tessellation Amount of tessellation to be used when creating
    * rotation circles
    */
-  RotationGizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
+  RotationGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer(),
                 unsigned int tessellation = 32);
   ~RotationGizmo() override;
@@ -43,7 +45,8 @@ public:
                      bool useGizmoMaterial = false) override;
 
 protected:
-  void set_attachedMesh(AbstractMesh* const& mesh) override;
+  AbstractMeshPtr& get_attachedMesh() override;
+  void set_attachedMesh(const AbstractMeshPtr& mesh) override;
   void set_updateGizmoRotationToMatchAttachedMesh(bool value) override;
   bool get_updateGizmoRotationToMatchAttachedMesh() const override;
   void set_snapDistance(float value);

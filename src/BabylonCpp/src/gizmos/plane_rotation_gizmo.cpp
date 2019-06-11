@@ -190,7 +190,7 @@ PlaneRotationGizmo::PlaneRotationGizmo(
           std::static_pointer_cast<LinesMesh>(m)->color
             = material->emissiveColor;
         }
-      };
+      }
     });
 }
 
@@ -198,7 +198,7 @@ PlaneRotationGizmo::~PlaneRotationGizmo()
 {
 }
 
-void PlaneRotationGizmo::_attachedMeshChanged(AbstractMesh* value)
+void PlaneRotationGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (dragBehavior) {
     dragBehavior->enabled = value ? true : false;

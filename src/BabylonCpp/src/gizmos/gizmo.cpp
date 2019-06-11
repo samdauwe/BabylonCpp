@@ -44,12 +44,12 @@ float Gizmo::get_scaleRatio() const
   return _scaleRatio;
 }
 
-AbstractMesh*& Gizmo::get_attachedMesh()
+AbstractMeshPtr& Gizmo::get_attachedMesh()
 {
   return _attachedMesh;
 }
 
-void Gizmo::set_attachedMesh(AbstractMesh* const& value)
+void Gizmo::set_attachedMesh(const AbstractMeshPtr& value)
 {
   _attachedMesh = value;
   _rootMesh->setEnabled(value ? true : false);
@@ -80,7 +80,7 @@ void Gizmo::setCustomMesh(const MeshPtr& mesh, bool /*useGizmoMaterial*/)
   _customMeshSet = true;
 }
 
-void Gizmo::_attachedMeshChanged(AbstractMesh* /*value*/)
+void Gizmo::_attachedMeshChanged(const AbstractMeshPtr& /*value*/)
 {
 }
 

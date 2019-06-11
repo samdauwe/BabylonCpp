@@ -123,7 +123,7 @@ AxisDragGizmo::AxisDragGizmo(
         if (linesMesh) {
           linesMesh->color = material->emissiveColor;
         }
-      };
+      }
     });
 }
 
@@ -131,7 +131,7 @@ AxisDragGizmo::~AxisDragGizmo()
 {
 }
 
-void AxisDragGizmo::_attachedMeshChanged(AbstractMesh* value)
+void AxisDragGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (dragBehavior) {
     dragBehavior->enabled = value ? true : false;

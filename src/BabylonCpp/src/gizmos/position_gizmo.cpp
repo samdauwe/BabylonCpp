@@ -8,18 +8,18 @@
 
 namespace BABYLON {
 
-PositionGizmo::PositionGizmo(
-  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
+PositionGizmo::PositionGizmo(const UtilityLayerRendererPtr& iGizmoLayer)
     : Gizmo{iGizmoLayer}
-    , xGizmo{std::make_unique<AxisDragGizmo>(
-        Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
-    , yGizmo{std::make_unique<AxisDragGizmo>(
-        Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}
-    , zGizmo{std::make_unique<AxisDragGizmo>(
-        Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
     , snapDistance{this, &PositionGizmo::get_snapDistance,
                    &PositionGizmo::set_snapDistance}
 {
+  xGizmo = std::make_unique<AxisDragGizmo>(
+    Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer);
+  yGizmo = std::make_unique<AxisDragGizmo>(
+    Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer);
+  zGizmo = std::make_unique<AxisDragGizmo>(
+    Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer);
+
   // Relay drag events
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
     gizmo->dragBehavior->onDragStartObservable.add(
@@ -39,7 +39,12 @@ PositionGizmo::~PositionGizmo()
 {
 }
 
-void PositionGizmo::set_attachedMesh(AbstractMesh* const& mesh)
+AbstractMeshPtr& PositionGizmo::get_attachedMesh()
+{
+  return xGizmo->attachedMesh;
+}
+
+void PositionGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   if (xGizmo) {
     xGizmo->attachedMesh = mesh;
@@ -105,7 +110,7 @@ void PositionGizmo::setCustomMesh(const MeshPtr& /*mesh*/,
   BABYLON_LOG_ERROR("PositionGizmo",
                     "Custom meshes are not supported on this gizmo, please set "
                     "the custom meshes on the gizmos contained within this one "
-                    "(gizmo.xGizmo, gizmo.yGizmo, gizmo.zGizmo)");
+                    "(gizmo.xGizmo, gizmo.yGizmo, gizmo.zGizmo)")
 }
 
 } // end of namespace BABYLON

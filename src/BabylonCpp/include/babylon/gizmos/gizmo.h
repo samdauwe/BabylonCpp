@@ -13,8 +13,9 @@ class AbstractMesh;
 class Mesh;
 class Scene;
 class UtilityLayerRenderer;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using MeshPtr         = std::shared_ptr<Mesh>;
+using AbstractMeshPtr         = std::shared_ptr<AbstractMesh>;
+using MeshPtr                 = std::shared_ptr<Mesh>;
+using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 /**
  * @brief Renders gizmos on top of an existing scene which provide controls for
@@ -27,7 +28,7 @@ public:
    * @brief Creates a gizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
-  Gizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer);
+  Gizmo(const UtilityLayerRendererPtr& gizmoLayer);
   virtual ~Gizmo();
 
   /**
@@ -61,13 +62,13 @@ protected:
    * @brief Gets the mesh that the gizmo will be attached to. (eg. on a drag
    * gizmo the mesh that will be dragged).
    */
-  AbstractMesh*& get_attachedMesh();
+  virtual AbstractMeshPtr& get_attachedMesh();
 
   /**
    * @brief Sets the mesh that the gizmo will be attached to. (eg. on a drag
    * gizmo the mesh that will be dragged).
    */
-  virtual void set_attachedMesh(AbstractMesh* const& value);
+  virtual void set_attachedMesh(const AbstractMeshPtr& value);
 
   /**
    * @brief Sets if set the gizmo's position will be updated to match the
@@ -84,7 +85,7 @@ protected:
   /**
    * @brief Hidden
    */
-  virtual void _attachedMeshChanged(AbstractMesh* value);
+  virtual void _attachedMeshChanged(const AbstractMeshPtr& value);
 
   /**
    * Hidden
@@ -103,12 +104,12 @@ public:
    * will be dragged)
    * * When set, interactions will be enabled
    */
-  Property<Gizmo, AbstractMesh*> attachedMesh;
+  Property<Gizmo, AbstractMeshPtr> attachedMesh;
 
   /**
    * The utility layer the gizmo will be added to
    */
-  std::shared_ptr<UtilityLayerRenderer> gizmoLayer;
+  UtilityLayerRendererPtr gizmoLayer;
 
   /**
    * If set the gizmo's rotation will be updated to match the attached mesh each
@@ -143,7 +144,7 @@ protected:
 private:
   float _scaleRatio;
   bool _updateGizmoRotationToMatchAttachedMesh;
-  AbstractMesh* _attachedMesh;
+  AbstractMeshPtr _attachedMesh;
   Matrix _tmpMatrix;
   Vector3 _tempVector;
   Observer<Scene>::Ptr _beforeRenderObserver;

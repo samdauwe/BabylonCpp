@@ -51,7 +51,7 @@ public:
    * @brief Attaches a set of gizmos to the specified mesh.
    * @param mesh The mesh the gizmo's should be attached to
    */
-  void attachToMesh(AbstractMesh* mesh);
+  void attachToMesh(const AbstractMeshPtr& mesh);
 
   /**
    * @brief Disposes of the gizmo manager.
@@ -133,7 +133,7 @@ private:
   Scene* _scene;
   GizmosEnabledSettings _gizmosEnabled;
   Observer<PointerInfo>::Ptr _pointerObserver;
-  AbstractMesh* _attachedMesh;
+  AbstractMeshPtr _attachedMesh;
   Color3 _boundingBoxColor;
   UtilityLayerRendererPtr _defaultUtilityLayer;
   UtilityLayerRendererPtr _defaultKeepDepthUtilityLayer;

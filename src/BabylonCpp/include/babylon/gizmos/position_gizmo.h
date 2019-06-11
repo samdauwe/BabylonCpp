@@ -8,6 +8,8 @@
 namespace BABYLON {
 
 class AxisDragGizmo;
+class UtilityLayerRenderer;
+using UtilityLayerRendererPtr = std::shared_ptr<UtilityLayerRenderer>;
 
 /**
  * @brief Gizmo that enables dragging a mesh along 3 axis.
@@ -19,7 +21,7 @@ public:
    * @brief Creates a PositionGizmo.
    * @param gizmoLayer The utility layer the gizmo will be added to
    */
-  PositionGizmo(const std::shared_ptr<UtilityLayerRenderer>& gizmoLayer
+  PositionGizmo(const UtilityLayerRendererPtr& gizmoLayer
                 = UtilityLayerRenderer::DefaultUtilityLayer());
   ~PositionGizmo() override;
 
@@ -40,7 +42,8 @@ public:
                      bool useGizmoMaterial = false) override;
 
 protected:
-  void set_attachedMesh(AbstractMesh* const& mesh) override;
+  AbstractMeshPtr& get_attachedMesh() override;
+  void set_attachedMesh(const AbstractMeshPtr& mesh) override;
   void set_updateGizmoRotationToMatchAttachedMesh(bool value) override;
   bool get_updateGizmoRotationToMatchAttachedMesh() const override;
   void set_snapDistance(float value);

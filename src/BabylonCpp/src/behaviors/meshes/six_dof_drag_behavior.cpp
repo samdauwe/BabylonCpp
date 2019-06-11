@@ -82,7 +82,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
         }
 
         pickedMesh = _ownerNode;
-        BoundingBoxGizmo::_RemoveAndStorePivotPoint(pickedMesh.get());
+        BoundingBoxGizmo::_RemoveAndStorePivotPoint(pickedMesh);
         lastSixDofOriginPosition.copyFrom((*pointerInfo->pickInfo.ray).origin);
 
         // Set position and orientation of the controller
@@ -126,7 +126,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
             attachedElement = nullptr;
           }
         }
-        BoundingBoxGizmo::_RestorePivotPoint(pickedMesh.get());
+        BoundingBoxGizmo::_RestorePivotPoint(pickedMesh);
         onDragStartObservable.notifyObservers({});
       }
     }
@@ -211,7 +211,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
   _sceneRenderObserver = ownerNode->getScene()->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
       if (dragging && _moving && pickedMesh) {
-        BoundingBoxGizmo::_RemoveAndStorePivotPoint(pickedMesh.get());
+        BoundingBoxGizmo::_RemoveAndStorePivotPoint(pickedMesh);
         // Slowly move mesh to avoid jitter
         pickedMesh->position().addInPlace(
           _targetPosition.subtract(pickedMesh->position())
@@ -235,7 +235,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
                                dragDeltaRatio,
                                *pickedMesh->rotationQuaternion());
         pickedMesh->setParent(oldParent);
-        BoundingBoxGizmo::_RestorePivotPoint(pickedMesh.get());
+        BoundingBoxGizmo::_RestorePivotPoint(pickedMesh);
       }
     });
 }

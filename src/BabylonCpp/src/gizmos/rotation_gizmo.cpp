@@ -8,22 +8,22 @@
 
 namespace BABYLON {
 
-RotationGizmo::RotationGizmo(
-  const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer,
-  unsigned int tessellation)
+RotationGizmo::RotationGizmo(const UtilityLayerRendererPtr& iGizmoLayer,
+                             unsigned int tessellation)
     : Gizmo{iGizmoLayer}
-    , xGizmo{std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f),
-                                                  Color3::Red().scale(0.5f),
-                                                  iGizmoLayer, tessellation)}
-    , yGizmo{std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 1.f, 0.f),
-                                                  Color3::Green().scale(0.5f),
-                                                  iGizmoLayer, tessellation)}
-    , zGizmo{std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 0.f, 1.f),
-                                                  Color3::Blue().scale(0.5f),
-                                                  iGizmoLayer, tessellation)}
     , snapDistance{this, &RotationGizmo::get_snapDistance,
                    &RotationGizmo::set_snapDistance}
 {
+  xGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(1.f, 0.f, 0.f),
+                                                Color3::Red().scale(0.5f),
+                                                iGizmoLayer, tessellation);
+  yGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 1.f, 0.f),
+                                                Color3::Green().scale(0.5f),
+                                                iGizmoLayer, tessellation);
+  zGizmo = std::make_unique<PlaneRotationGizmo>(Vector3(0.f, 0.f, 1.f),
+                                                Color3::Blue().scale(0.5f),
+                                                iGizmoLayer, tessellation);
+
   // Relay drag events
   for (const auto& gizmo : {xGizmo.get(), yGizmo.get(), zGizmo.get()}) {
     gizmo->dragBehavior->onDragStartObservable.add(
@@ -43,7 +43,12 @@ RotationGizmo::~RotationGizmo()
 {
 }
 
-void RotationGizmo::set_attachedMesh(AbstractMesh* const& mesh)
+AbstractMeshPtr& RotationGizmo::get_attachedMesh()
+{
+  return xGizmo->attachedMesh;
+}
+
+void RotationGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   if (xGizmo) {
     xGizmo->attachedMesh = mesh;
@@ -109,7 +114,7 @@ void RotationGizmo::setCustomMesh(const MeshPtr& /*mesh*/,
   BABYLON_LOG_ERROR("RotationGizmo",
                     "Custom meshes are not supported on this gizmo, please set "
                     "the custom meshes on the gizmos contained within this one "
-                    "(gizmo.xGizmo, gizmo.yGizmo, gizmo.zGizmo)");
+                    "(gizmo.xGizmo, gizmo.yGizmo, gizmo.zGizmo)")
 }
 
 } // end of namespace BABYLON

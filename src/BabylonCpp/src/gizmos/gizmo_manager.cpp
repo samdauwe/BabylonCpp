@@ -67,8 +67,9 @@ GizmoManager::GizmoManager(Scene* iScene)
             }
           }
           if (node && node->type() == Type::ABSTRACTMESH) {
-            if (_attachedMesh != node) {
-              attachToMesh(static_cast<AbstractMesh*>(node));
+            if (_attachedMesh.get() != node) {
+              attachToMesh(std::static_pointer_cast<AbstractMesh>(
+                node->shared_from_this()));
             }
           }
           else {
@@ -86,7 +87,7 @@ GizmoManager::~GizmoManager()
 {
 }
 
-void GizmoManager::attachToMesh(AbstractMesh* mesh)
+void GizmoManager::attachToMesh(const AbstractMeshPtr& mesh)
 {
   if (_attachedMesh) {
     // _attachedMesh->removeBehavior(boundingBoxDragBehavior);

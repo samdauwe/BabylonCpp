@@ -162,14 +162,14 @@ void PointerDragBehavior::attach(const MeshPtr& ownerNode)
   _beforeRenderObserver = _scene->onBeforeRenderObservable.add(
     [&](Scene* /*scene*/, EventState& /*es*/) {
       if (_moving && moveAttached) {
-        BoundingBoxGizmo::_RemoveAndStorePivotPoint(_attachedNode.get());
+        BoundingBoxGizmo::_RemoveAndStorePivotPoint(_attachedNode);
         // Slowly move mesh to avoid jitter
         _targetPosition.subtractToRef((_attachedNode)->absolutePosition,
                                       _tmpVector);
         _tmpVector.scaleInPlace(dragDeltaRatio);
         (_attachedNode)->getAbsolutePosition().addToRef(_tmpVector, _tmpVector);
         (_attachedNode)->setAbsolutePosition(_tmpVector);
-        BoundingBoxGizmo::_RestorePivotPoint(_attachedNode.get());
+        BoundingBoxGizmo::_RestorePivotPoint(_attachedNode);
       }
     });
 }
@@ -220,7 +220,7 @@ void PointerDragBehavior::_startDrag(
     return;
   }
 
-  BoundingBoxGizmo::_RemoveAndStorePivotPoint(_attachedNode.get());
+  BoundingBoxGizmo::_RemoveAndStorePivotPoint(_attachedNode);
   // Create start ray from the camera to the object
   if (fromRay) {
     _startDragRay.direction.copyFrom(fromRay->direction);
@@ -263,7 +263,7 @@ void PointerDragBehavior::_startDrag(
       }
     }
   }
-  BoundingBoxGizmo::_RestorePivotPoint(_attachedNode.get());
+  BoundingBoxGizmo::_RestorePivotPoint(_attachedNode);
 }
 
 void PointerDragBehavior::_moveDrag(const Ray& ray)

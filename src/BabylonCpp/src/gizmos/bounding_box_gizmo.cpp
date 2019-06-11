@@ -335,7 +335,7 @@ BoundingBoxGizmo::~BoundingBoxGizmo()
 {
 }
 
-void BoundingBoxGizmo::_RemoveAndStorePivotPoint(AbstractMesh* mesh)
+void BoundingBoxGizmo::_RemoveAndStorePivotPoint(const AbstractMeshPtr& mesh)
 {
   if (mesh && BoundingBoxGizmo::_PivotCached == 0) {
     // Save old pivot and set pivot to 0,0,0
@@ -354,7 +354,7 @@ void BoundingBoxGizmo::_RemoveAndStorePivotPoint(AbstractMesh* mesh)
   ++BoundingBoxGizmo::_PivotCached;
 }
 
-void BoundingBoxGizmo::_RestorePivotPoint(AbstractMesh* mesh)
+void BoundingBoxGizmo::_RestorePivotPoint(const AbstractMeshPtr& mesh)
 {
   if (mesh && !BoundingBoxGizmo::_OldPivotPoint.equalsToFloats(0.f, 0.f, 0.f)
       && BoundingBoxGizmo::_PivotCached == 1) {
@@ -368,7 +368,7 @@ void BoundingBoxGizmo::_RestorePivotPoint(AbstractMesh* mesh)
   --_PivotCached;
 }
 
-void BoundingBoxGizmo::_attachedMeshChanged(AbstractMesh* value)
+void BoundingBoxGizmo::_attachedMeshChanged(const AbstractMeshPtr& value)
 {
   if (value) {
     // Reset anchor mesh to match attached mesh's scale

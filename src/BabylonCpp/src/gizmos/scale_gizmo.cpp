@@ -12,15 +12,16 @@ namespace BABYLON {
 
 ScaleGizmo::ScaleGizmo(const std::shared_ptr<UtilityLayerRenderer>& iGizmoLayer)
     : Gizmo{iGizmoLayer}
-    , xGizmo{std::make_unique<AxisScaleGizmo>(
-        Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer)}
-    , yGizmo{std::make_unique<AxisScaleGizmo>(
-        Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer)}
-    , zGizmo{std::make_unique<AxisScaleGizmo>(
-        Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer)}
     , snapDistance{this, &ScaleGizmo::get_snapDistance,
                    &ScaleGizmo::set_snapDistance}
 {
+  xGizmo = std::make_unique<AxisScaleGizmo>(
+    Vector3(1.f, 0.f, 0.f), Color3::Red().scale(0.5f), iGizmoLayer);
+  yGizmo = std::make_unique<AxisScaleGizmo>(
+    Vector3(0.f, 1.f, 0.f), Color3::Green().scale(0.5f), iGizmoLayer);
+  zGizmo = std::make_unique<AxisScaleGizmo>(
+    Vector3(0.f, 0.f, 1.f), Color3::Blue().scale(0.5f), iGizmoLayer);
+
   // Create uniform scale gizmo
   uniformScaleGizmo = std::make_unique<AxisScaleGizmo>(
     Vector3(0.f, 1.f, 0.f), Color3::Yellow().scale(0.5f), iGizmoLayer);
@@ -58,7 +59,12 @@ ScaleGizmo::~ScaleGizmo()
 {
 }
 
-void ScaleGizmo::set_attachedMesh(AbstractMesh* const& mesh)
+AbstractMeshPtr& ScaleGizmo::get_attachedMesh()
+{
+  return xGizmo->attachedMesh;
+}
+
+void ScaleGizmo::set_attachedMesh(const AbstractMeshPtr& mesh)
 {
   if (xGizmo) {
     xGizmo->attachedMesh            = mesh;
@@ -73,7 +79,7 @@ void ScaleGizmo::set_updateGizmoRotationToMatchAttachedMesh(bool value)
   if (!value) {
     BABYLON_LOG_WARN("ScaleGizmo",
                      "Setting updateGizmoRotationToMatchAttachedMesh = false "
-                     "on scaling gizmo is not supported.");
+                     "on scaling gizmo is not supported.")
   }
   if (xGizmo) {
     xGizmo->updateGizmoRotationToMatchAttachedMesh = value;

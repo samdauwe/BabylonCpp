@@ -5,8 +5,8 @@
 #include <babylon/core/structs.h>
 #include <babylon/gizmos/gizmo.h>
 #include <babylon/math/color3.h>
-#include <babylon/rendering/utility_layer_renderer.h>
 #include <babylon/misc/observable.h>
+#include <babylon/rendering/utility_layer_renderer.h>
 
 namespace BABYLON {
 
@@ -36,7 +36,7 @@ public:
                bool disposeMaterialAndTextures = false) override;
 
 protected:
-  void _attachedMeshChanged(AbstractMesh* value) override;
+  void _attachedMeshChanged(const AbstractMeshPtr& value) override;
 
 public:
   /**
