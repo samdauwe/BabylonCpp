@@ -1,6 +1,9 @@
 #ifndef BABYLON_SAMPLES_MESHES_CUBES_SCENE_H
 #define BABYLON_SAMPLES_MESHES_CUBES_SCENE_H
 
+#include <tuple>
+#include <vector>
+
 #include <babylon/interfaces/irenderable_scene.h>
 
 namespace BABYLON {
