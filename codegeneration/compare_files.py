@@ -89,6 +89,8 @@ def main():
         "videoDome.ts",
         # LibDeclarations
         "browser.d.ts", "webgl.d.ts", "webgl2.d.ts", "webvr.d.ts", "webxr.d.ts",
+        # Loading
+        "loadingScreen.ts",
         # Materials / Textures
         "htmlElementTexture.ts", "videoTexture.ts",
         # Materials / Textures / Loaders
