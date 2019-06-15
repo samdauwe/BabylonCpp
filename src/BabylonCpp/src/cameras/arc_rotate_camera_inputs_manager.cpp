@@ -1,5 +1,6 @@
 #include <babylon/cameras/arc_rotate_camera_inputs_manager.h>
 
+#include <babylon/cameras/inputs/arc_rotate_camera_gamepad_input.h>
 #include <babylon/cameras/inputs/arc_rotate_camera_keyboard_move_input.h>
 #include <babylon/cameras/inputs/arc_rotate_camera_mouse_wheel_input.h>
 #include <babylon/cameras/inputs/arc_rotate_camera_pointers_input.h>
@@ -36,7 +37,7 @@ ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addKeyboard()
 
 ArcRotateCameraInputsManager& ArcRotateCameraInputsManager::addGamepad()
 {
-  // add(std::make_shared<ArcRotateCameraGamepadInput>());
+  add(std::make_shared<ArcRotateCameraGamepadInput>());
   return *this;
 }
 

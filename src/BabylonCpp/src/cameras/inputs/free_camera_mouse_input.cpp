@@ -34,7 +34,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
   _noPreventDefault = noPreventDefault;
 
   if (!_pointerInput) {
-    _pointerInput = [this](PointerInfo* p, EventState&) {
+    _pointerInput = [this](PointerInfo* p, EventState&) -> void {
       auto& evt = p->pointerEvent;
 
       if (_engine->isInVRExclusivePointerMode()) {
@@ -113,7 +113,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
     };
   }
 
-  _onMouseMove = [this](MouseEvent& evt) {
+  _onMouseMove = [this](MouseEvent& evt) -> void {
     if (!_engine->isPointerLock) {
       return;
     }

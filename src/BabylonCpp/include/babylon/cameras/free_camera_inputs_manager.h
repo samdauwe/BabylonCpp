@@ -7,6 +7,8 @@
 namespace BABYLON {
 
 class FreeCamera;
+class FreeCameraMouseInput;
+using FreeCameraMouseInputPtr = std::shared_ptr<FreeCameraMouseInput>;
 
 /**
  * @brief Default Inputs manager for the FreeCamera.
@@ -38,16 +40,22 @@ struct BABYLON_SHARED_EXPORT FreeCameraInputsManager
   FreeCameraInputsManager& addMouse(bool touchEnabled = true);
 
   /**
+   * @brief Removes the mouse input support from the manager
+   * @returns the current input manager
+   */
+  FreeCameraInputsManager& removeMouse();
+
+  /**
+-   * @brief Add orientation input support to the input manager.
+   * @returns the current input manager
+   */
+  FreeCameraInputsManager& addDeviceOrientation();
+
+  /**
    * @brief Adds gamepad input support to the input manager.
    * @returns the current input manager
    */
   FreeCameraInputsManager& addGamepad();
-
-  /**
-   * @brief Add orientation input support to the input manager.
-   * @returns the current input manager
-   */
-  FreeCameraInputsManager& addDeviceOrientation();
 
   /**
    * @brief Add touch input support to the input manager.
@@ -60,6 +68,16 @@ struct BABYLON_SHARED_EXPORT FreeCameraInputsManager
    * @returns the current input manager
    */
   FreeCameraInputsManager& addVirtualJoystick();
+
+  /**
+   * @brief Remove all attached input methods from a camera.
+   */
+  void clear();
+
+  /**
+   * Hidden
+   */
+  FreeCameraMouseInputPtr _mouseInput;
 
 }; // end of struct FreeCameraInputsManager
 

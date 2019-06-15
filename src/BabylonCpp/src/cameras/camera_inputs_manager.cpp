@@ -5,6 +5,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/cameras/camera.h>
+#include <babylon/cameras/fly_camera.h>
 #include <babylon/core/logging.h>
 
 namespace BABYLON {
@@ -42,7 +43,7 @@ void CameraInputsManager<TCamera>::add(
   if (stl_util::contains(attached, type)) {
     BABYLON_LOGF_WARN("CameraInputsManager",
                       "camera input of type %s already exists on camera",
-                      type.c_str());
+                      type.c_str())
     return;
   }
 
@@ -164,6 +165,7 @@ void CameraInputsManager<TCamera>::parse(const json& /*parsedCamera*/)
 
 template class CameraInputsManager<ArcRotateCamera>;
 template class CameraInputsManager<Camera>;
+template class CameraInputsManager<FlyCamera>;
 template class CameraInputsManager<FreeCamera>;
 
 } // end of namespace BABYLON
