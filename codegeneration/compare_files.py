@@ -71,6 +71,8 @@ def main():
         # Audio
         "analyser.ts", "audioEngine.ts", "audioSceneComponent.ts", "sound.ts",
         "soundTrack.ts", "weightedsound.ts",
+        # Cameras / Inputs
+        "freeCameraDeviceOrientationInput.ts", "freeCameraVirtualJoystickInput.ts",
         # Cameras / RigModes
         "vrRigMode.ts", "webVRRigMode.ts",
         # Cameras / VR
