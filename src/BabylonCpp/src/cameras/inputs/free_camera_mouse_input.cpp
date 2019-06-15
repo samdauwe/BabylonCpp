@@ -11,13 +11,14 @@ FreeCameraMouseInput::FreeCameraMouseInput(bool iTouchEnabled)
     : buttons{{MouseButtonType::LEFT, MouseButtonType::MIDDLE,
                MouseButtonType::RIGHT}}
     , angularSensibility{2000.f}
+    , _allowCameraRotation{true}
     , touchEnabled{iTouchEnabled}
     , _canvas{nullptr}
     , _engine{nullptr}
     , _pointerInput{nullptr}
     , _onMouseMove{nullptr}
     , _observer{nullptr}
-    , _previousPositionDefined{false}
+    , previousPosition{std::nullopt}
     , _noPreventDefault{false}
 {
 }
@@ -34,7 +35,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
 
   if (!_pointerInput) {
     _pointerInput = [this](PointerInfo* p, EventState&) {
-      auto evt = p->pointerEvent;
+      auto& evt = p->pointerEvent;
 
       if (_engine->isInVRExclusivePointerMode()) {
         return;
@@ -56,9 +57,10 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
           srcElement->setPointerCapture(evt.pointerId);
         }
 
-        _previousPosition.x      = evt.clientX;
-        _previousPosition.y      = evt.clientY;
-        _previousPositionDefined = true;
+        previousPosition = PositionCoord{
+          evt.clientX, // x
+          evt.clientY  // y
+        };
 
         if (!_noPreventDefault) {
           evt.preventDefault();
@@ -68,18 +70,19 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
       else if (p->type == PointerEventTypes::POINTERUP && srcElement) {
         srcElement->releasePointerCapture(evt.pointerId);
 
-        _previousPositionDefined = false;
+        previousPosition = std::nullopt;
         if (!_noPreventDefault) {
           evt.preventDefault();
         }
       }
 
       else if (p->type == PointerEventTypes::POINTERMOVE) {
-        if (!_previousPositionDefined && !_engine->isPointerLock) {
+        if (!previousPosition.has_value() && !_engine->isPointerLock) {
           return;
         }
 
-        float offsetX = static_cast<float>(evt.clientX - _previousPosition.x);
+        auto offsetX = static_cast<float>(evt.clientX - previousPosition->x);
+        auto offsetY = static_cast<float>(evt.clientY - previousPosition->y);
         if (camera->getScene()->useRightHandedSystem()) {
           offsetX *= -1.f;
         }
@@ -87,14 +90,21 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
             && camera->parent()->_getWorldMatrixDeterminant() < 0.f) {
           offsetX *= -1.f;
         }
-        camera->cameraRotation->y += offsetX / angularSensibility;
 
-        float offsetY = static_cast<float>(evt.clientY - _previousPosition.y);
-        camera->cameraRotation->x += offsetY / angularSensibility;
+        if (_allowCameraRotation) {
+          camera->cameraRotation->y += offsetX / angularSensibility;
+          camera->cameraRotation->x += offsetY / angularSensibility;
+        }
 
-        _previousPosition.x      = evt.clientX;
-        _previousPosition.y      = evt.clientY;
-        _previousPositionDefined = true;
+        PointerEvent pointerEvent;
+        pointerEvent.offsetX = static_cast<int>(offsetX);
+        pointerEvent.offsetY = static_cast<int>(offsetY);
+        onPointerMovedObservable.notifyObservers(&pointerEvent);
+
+        previousPosition = PositionCoord{
+          evt.clientX, // x
+          evt.clientY  // y
+        };
 
         if (!_noPreventDefault) {
           evt.preventDefault();
@@ -112,7 +122,7 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
       return;
     }
 
-    float offsetX = static_cast<float>(evt.movementX);
+    auto offsetX = static_cast<float>(evt.movementX);
     if (camera->getScene()->useRightHandedSystem()) {
       offsetX *= -1.f;
     }
@@ -122,10 +132,10 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
     }
     camera->cameraRotation->y += offsetX / angularSensibility;
 
-    float offsetY = static_cast<float>(evt.movementY);
+    auto offsetY = static_cast<float>(evt.movementY);
     camera->cameraRotation->x += offsetY / angularSensibility;
 
-    _previousPositionDefined = false;
+    previousPosition = std::nullopt;
 
     if (!_noPreventDefault) {
       evt.preventDefault();
@@ -138,13 +148,23 @@ void FreeCameraMouseInput::attachControl(ICanvas* canvas, bool noPreventDefault)
                      | static_cast<int>(PointerEventTypes::POINTERMOVE));
 }
 
+void FreeCameraMouseInput::onContextMenu(PointerEvent& evt)
+{
+  evt.preventDefault();
+}
+
 void FreeCameraMouseInput::detachControl(ICanvas* canvas)
 {
   if (_observer && canvas) {
     camera->getScene()->onPointerObservable.remove(_observer);
-    _observer                = nullptr;
-    _onMouseMove             = nullptr;
-    _previousPositionDefined = false;
+
+    {
+      onPointerMovedObservable.clear();
+    }
+
+    _observer        = nullptr;
+    _onMouseMove     = nullptr;
+    previousPosition = std::nullopt;
   }
 }
 
@@ -152,12 +172,12 @@ void FreeCameraMouseInput::checkInputs()
 {
 }
 
-const char* FreeCameraMouseInput::getClassName() const
+const std::string FreeCameraMouseInput::getClassName() const
 {
   return "FreeCameraMouseInput";
 }
 
-const char* FreeCameraMouseInput::getSimpleName() const
+const std::string FreeCameraMouseInput::getSimpleName() const
 {
   return "mouse";
 }

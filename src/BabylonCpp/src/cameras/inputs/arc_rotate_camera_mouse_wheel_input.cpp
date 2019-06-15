@@ -3,6 +3,7 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/engines/scene.h>
 #include <babylon/events/pointer_event_types.h>
+#include <babylon/math/scalar.h>
 
 namespace BABYLON {
 
@@ -20,6 +21,22 @@ ArcRotateCameraMouseWheelInput::~ArcRotateCameraMouseWheelInput()
 {
 }
 
+float ArcRotateCameraMouseWheelInput::computeDeltaFromMouseWheelLegacyEvent(
+  const MouseWheelEvent& mouseWheelLegacyEvent, float radius) const
+{
+  auto delta = 0.f;
+  const auto wheelDelta
+    = (mouseWheelLegacyEvent.wheelDelta * 0.01f * wheelDeltaPercentage)
+      * radius;
+  if (mouseWheelLegacyEvent.wheelDelta > 0.f) {
+    delta = wheelDelta / (1.f + wheelDeltaPercentage);
+  }
+  else {
+    delta = wheelDelta * (1.f + wheelDeltaPercentage);
+  }
+  return delta;
+}
+
 void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
                                                    bool noPreventDefault)
 {
@@ -32,24 +49,38 @@ void ArcRotateCameraMouseWheelInput::attachControl(ICanvas* canvas,
       return;
     }
     const auto& event = p->mouseWheelEvent;
-    float delta       = 0.f;
-    if (!stl_util::almost_equal(event.wheelDelta, 0.f)) {
+    auto delta        = 0.f;
+
+    const auto& mouseWheelLegacyEvent = event;
+    if (!stl_util::almost_equal(mouseWheelLegacyEvent.wheelDelta, 0.f)) {
       if (!stl_util::almost_equal(wheelDeltaPercentage, 0.f)) {
-        const auto wheelDelta
-          = (event.wheelDelta * 0.01f * wheelDeltaPercentage) * camera->radius;
-        if (event.wheelDelta > 0.f) {
-          delta = wheelDelta / (1.f + wheelDeltaPercentage);
-        }
-        else {
-          delta = wheelDelta * (1.f + wheelDeltaPercentage);
+        delta = computeDeltaFromMouseWheelLegacyEvent(mouseWheelLegacyEvent,
+                                                      camera->radius);
+
+        // If zooming in, estimate the target radius and use that to compute the
+        // delta for inertia this will stop multiple scroll events zooming in
+        // from adding too much inertia
+        if (delta > 0.f) {
+          auto estimatedTargetRadius = camera->radius;
+          auto targetInertia         = camera->inertialRadiusOffset + delta;
+          for (uint32_t i = 0; i < 20 && std::abs(targetInertia) > 0.001f;
+               ++i) {
+            estimatedTargetRadius -= targetInertia;
+            targetInertia *= camera->inertia;
+          }
+          estimatedTargetRadius = Scalar::Clamp(
+            estimatedTargetRadius, 0.f, std::numeric_limits<float>::max());
+          delta = computeDeltaFromMouseWheelLegacyEvent(mouseWheelLegacyEvent,
+                                                        estimatedTargetRadius);
         }
       }
       else {
-        delta = event.wheelDelta / (wheelPrecision * 40.f);
+        delta = mouseWheelLegacyEvent.wheelDelta / (wheelPrecision * 40.f);
       }
     }
-    else if (!stl_util::almost_equal(event.detail, 0.f)) {
-      delta = -event.detail / wheelPrecision;
+    else {
+      const auto deltaValue = event.detail;
+      delta                 = -deltaValue / wheelPrecision;
     }
 
     if (!stl_util::almost_equal(delta, 0.f)) {
@@ -78,12 +109,12 @@ void ArcRotateCameraMouseWheelInput::checkInputs()
 {
 }
 
-const char* ArcRotateCameraMouseWheelInput::getClassName() const
+const std::string ArcRotateCameraMouseWheelInput::getClassName() const
 {
   return "ArcRotateCameraMouseWheelInput";
 }
 
-const char* ArcRotateCameraMouseWheelInput::getSimpleName() const
+const std::string ArcRotateCameraMouseWheelInput::getSimpleName() const
 {
   return "mousewheel";
 }

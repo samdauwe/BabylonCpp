@@ -51,13 +51,13 @@ public:
    * @brief Gets the class name of the current intput.
    * @returns the class name
    */
-  const char* getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Get the friendly name associated with the input class.
    * @returns the input friendly name
    */
-  const char* getSimpleName() const override;
+  const std::string getSimpleName() const override;
 
 public:
   /**
@@ -79,7 +79,10 @@ private:
   Int32Array _pointerPressed;
   std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
   Observer<PointerInfo>::Ptr _observer;
-  std::function<std::string(FocusEvent& e)> _onLostFocus;
+  std::function<void(FocusEvent& e)> _onLostFocus;
+
+  std::optional<PositionCoord> previousPosition;
+  bool noPreventDefault;
 
 }; // end of class FreeCameraTouchInput
 

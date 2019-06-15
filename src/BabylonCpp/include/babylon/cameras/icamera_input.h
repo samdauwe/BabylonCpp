@@ -1,6 +1,8 @@
 #ifndef BABYLON_CAMERAS_ICAMERA_INPUT_H
 #define BABYLON_CAMERAS_ICAMERA_INPUT_H
 
+#include <string>
+
 #include <babylon/babylon_api.h>
 
 namespace BABYLON {
@@ -28,13 +30,13 @@ struct BABYLON_SHARED_EXPORT ICameraInput {
    * @brief Gets the class name of the current intput.
    * @returns the class name
    */
-  virtual const char* getClassName() const = 0;
+  virtual const std::string getClassName() const = 0;
 
   /**
    * @brief Get the friendly name associated with the input class.
    * @returns the input friendly name
    */
-  virtual const char* getSimpleName() const = 0;
+  virtual const std::string getSimpleName() const = 0;
 
   /**
    * @brief Attach the input controls to a specific dom element to get the input

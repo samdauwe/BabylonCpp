@@ -47,15 +47,16 @@ void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
   _onCanvasBlurObserver = _engine->onCanvasBlurObservable.add(
     [this](Engine*, EventState&) { _keys.clear(); });
 
-  _onKeyboardObserver
-    = _scene->onKeyboardObservable.add([this](KeyboardInfo* info, EventState&) {
-        const auto& evt = info->event;
+  _onKeyboardObserver = _scene->onKeyboardObservable.add(
+    [this](KeyboardInfo* info, EventState&) {
+      const auto& evt = info->event;
 
+      if (!evt.metaKey) {
         if (info->type == KeyboardEventTypes::KEYDOWN) {
           _ctrlPressed = evt.ctrlKey;
           _altPressed  = evt.altKey;
 
-          const int keyCode = evt.keyCode;
+          const auto keyCode = evt.keyCode;
           if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
               || (std::find(keysDown.begin(), keysDown.end(), keyCode)
                   != keysDown.end())
@@ -76,7 +77,7 @@ void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
           }
         }
         else {
-          const int keyCode = evt.keyCode;
+          const auto keyCode = evt.keyCode;
           if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
               || (std::find(keysDown.begin(), keysDown.end(), keyCode)
                   != keysDown.end())
@@ -95,7 +96,8 @@ void ArcRotateCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
             }
           }
         }
-      });
+      }
+    });
 }
 
 void ArcRotateCameraKeyboardMoveInput::detachControl(ICanvas* /*canvas*/)
@@ -170,12 +172,12 @@ void ArcRotateCameraKeyboardMoveInput::checkInputs()
   }
 }
 
-const char* ArcRotateCameraKeyboardMoveInput::getClassName() const
+const std::string ArcRotateCameraKeyboardMoveInput::getClassName() const
 {
   return "ArcRotateCameraKeyboardMoveInput";
 }
 
-const char* ArcRotateCameraKeyboardMoveInput::getSimpleName() const
+const std::string ArcRotateCameraKeyboardMoveInput::getSimpleName() const
 {
   return "keyboard";
 }

@@ -53,13 +53,20 @@ public:
    * @brief Gets the class name of the current intput.
    * @returns the class name
    */
-  const char* getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Get the friendly name associated with the input class.
    * @returns the input friendly name
    */
-  const char* getSimpleName() const override;
+  const std::string getSimpleName() const override;
+
+protected:
+  /**
+   * @brief Called on JS contextmenu event.
+   * Override this method to provide functionality.
+   */
+  virtual void onContextMenu(PointerEvent& evt);
 
 public:
   /**
@@ -74,6 +81,17 @@ public:
   float angularSensibility;
 
   /**
+   * Observable for when a pointer move event occurs containing the move offset
+   */
+  Observable<PointerEvent> onPointerMovedObservable;
+
+  /**
+   * Hidden
+   * If the camera should be rotated automatically based on pointer movement
+   */
+  bool _allowCameraRotation;
+
+  /**
    * Define if touch is enabled in the mouse input
    */
   bool touchEnabled;
@@ -84,8 +102,7 @@ private:
   std::function<void(PointerInfo* p, EventState& es)> _pointerInput;
   std::function<void(MouseEvent& e)> _onMouseMove;
   Observer<PointerInfo>::Ptr _observer;
-  PositionCoord _previousPosition;
-  bool _previousPositionDefined;
+  std::optional<PositionCoord> previousPosition;
   bool _noPreventDefault;
 
 }; // end of class FreeCameraMouseInput

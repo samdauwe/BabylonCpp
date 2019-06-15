@@ -46,40 +46,42 @@ void FreeCameraKeyboardMoveInput::attachControl(ICanvas* canvas,
     [this](KeyboardInfo* info, EventState&) {
       const auto& evt = info->event;
 
-      if (info->type == KeyboardEventTypes::KEYDOWN) {
-        const int keyCode = evt.keyCode;
-        if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-            || (std::find(keysDown.begin(), keysDown.end(), keyCode)
-                != keysDown.end())
-            || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
-                != keysLeft.end())
-            || (std::find(keysRight.begin(), keysRight.end(), keyCode)
-                != keysRight.end())) {
+      if (!evt.metaKey) {
+        if (info->type == KeyboardEventTypes::KEYDOWN) {
+          const int keyCode = evt.keyCode;
+          if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+              || (std::find(keysDown.begin(), keysDown.end(), keyCode)
+                  != keysDown.end())
+              || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+                  != keysLeft.end())
+              || (std::find(keysRight.begin(), keysRight.end(), keyCode)
+                  != keysRight.end())) {
 
-          if (std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
-            _keys.emplace_back(keyCode);
-          }
+            if (std::find(_keys.begin(), _keys.end(), keyCode) == _keys.end()) {
+              _keys.emplace_back(keyCode);
+            }
 
-          if (!_noPreventDefault) {
-            evt.preventDefault();
+            if (!_noPreventDefault) {
+              evt.preventDefault();
+            }
           }
         }
-      }
-      else {
-        const int keyCode = evt.keyCode;
-        if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
-            || (std::find(keysDown.begin(), keysDown.end(), keyCode)
-                != keysDown.end())
-            || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
-                != keysLeft.end())
-            || (std::find(keysRight.begin(), keysRight.end(), keyCode)
-                != keysRight.end())) {
+        else {
+          const auto keyCode = evt.keyCode;
+          if ((std::find(keysUp.begin(), keysUp.end(), keyCode) != keysUp.end())
+              || (std::find(keysDown.begin(), keysDown.end(), keyCode)
+                  != keysDown.end())
+              || (std::find(keysLeft.begin(), keysLeft.end(), keyCode)
+                  != keysLeft.end())
+              || (std::find(keysRight.begin(), keysRight.end(), keyCode)
+                  != keysRight.end())) {
 
-          _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode),
-                      _keys.end());
+            _keys.erase(std::remove(_keys.begin(), _keys.end(), keyCode),
+                        _keys.end());
 
-          if (!_noPreventDefault) {
-            evt.preventDefault();
+            if (!_noPreventDefault) {
+              evt.preventDefault();
+            }
           }
         }
       }
@@ -138,19 +140,19 @@ void FreeCameraKeyboardMoveInput::checkInputs()
   }
 }
 
-const char* FreeCameraKeyboardMoveInput::getClassName() const
+const std::string FreeCameraKeyboardMoveInput::getClassName() const
 {
   return "FreeCameraKeyboardMoveInput";
 }
 
-const char* FreeCameraKeyboardMoveInput::getSimpleName() const
-{
-  return "keyboard";
-}
-
-void FreeCameraKeyboardMoveInput::_onLostFocus(const FocusEvent& /*e*/)
+void FreeCameraKeyboardMoveInput::_onLostFocus()
 {
   _keys.clear();
+}
+
+const std::string FreeCameraKeyboardMoveInput::getSimpleName() const
+{
+  return "keyboard";
 }
 
 } // end of namespace BABYLON
