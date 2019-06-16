@@ -1979,6 +1979,9 @@ protected:
    */
   bool get_skeletonsEnabled() const;
 
+  /** Hidden */
+  std::unique_ptr<ICollisionCoordinator>& get_collisionCoordinator();
+
   /**
    * @brief Gets the postprocess render pipeline manager.
    * @see http://doc.babylonjs.com/how_to/how_to_use_postprocessrenderpipeline
@@ -2792,7 +2795,8 @@ public:
   bool collisionsEnabled;
 
   /** Hidden */
-  std::unique_ptr<ICollisionCoordinator> collisionCoordinator;
+  ReadOnlyProperty<Scene, std::unique_ptr<ICollisionCoordinator>>
+    collisionCoordinator;
 
   /**
    * Defines the gravity applied to this scene (used only for collisions)
@@ -3342,6 +3346,9 @@ private:
   // Postprocesses
   std::unique_ptr<PostProcessRenderPipelineManager>
     _postProcessRenderPipelineManager;
+  // Collisions
+  /** Hidden */
+  std::unique_ptr<ICollisionCoordinator> _collisionCoordinator;
   // Actions
   std::vector<AbstractMesh*> _meshesForIntersections;
   // Sound Tracks

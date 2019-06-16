@@ -262,7 +262,7 @@ void FlyCamera::_collideWithWorld(const Vector3& displacement)
 
   globalPosition.subtractFromFloatsToRef(0, ellipsoid.y, 0, _oldPosition);
   _oldPosition.addInPlace(ellipsoidOffset);
-  auto& coordinator = getScene()->collisionCoordinator;
+  auto& coordinator = getScene()->collisionCoordinator();
 
   if (!_collider) {
     _collider = coordinator->createCollider();

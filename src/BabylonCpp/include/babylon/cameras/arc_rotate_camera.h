@@ -51,6 +51,12 @@ public:
   virtual Type type() const override;
 
   /**
+   * @brief Sets the Y-up to camera up-vector rotation matrix, and the up-vector
+   * to Y-up rotation matrix.
+   */
+  void setMatUp();
+
+  /**
    * @brief Hidden
    */
   void _initCache() override;
@@ -129,21 +135,8 @@ public:
    * @param allowSamePosition If false, prevents reapplying the new computed
    * position if it is identical to the current one (optim)
    */
-  void setTarget(AbstractMesh* target, bool toBoundingCenter = false,
-                 bool allowSamePosition = false);
-
-  /**
-   * @brief Defines the target the camera should look at.
-   * This will automatically adapt alpha beta and radius to fit within the new
-   * target.
-   * @param target Defines the new target as a Vector or a mesh
-   * @param toBoundingCenter In case of a mesh target, defines wether to target
-   * the mesh position or its bounding information center
-   * @param allowSamePosition If false, prevents reapplying the new computed
-   * position if it is identical to the current one (optim)
-   */
-  void setTarget(const Vector3& target, bool toBoundingCenter = false,
-                 bool allowSamePosition = false);
+  void setTarget(const std::variant<AbstractMeshPtr, Vector3>& target,
+                 bool toBoundingCenter = false, bool allowSamePosition = false);
 
   /**
    * @brief Hidden
@@ -216,20 +209,67 @@ protected:
 
   Vector3 _getTargetPosition();
   void _checkLimits();
-  void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
+  void _onCollisionPositionChange(size_t collisionId, Vector3& newPosition,
                                   const AbstractMeshPtr& collidedMesh
                                   = nullptr);
 
-private:
+  /**
+   * @brief Defines the target point of the camera.
+   * The camera looks towards it form the radius distance.
+   */
   Vector3& get_target();
   void set_target(const Vector3& value);
+
+  /**
+   * @brief The vector the camera should consider as up. (default is Vector3(0,
+   * 1, 0) as returned by Vector3.Up()) Setting this will copy the given vector
+   * to the camera's upVector, and set rotation matrices to and from Y up. DO
+   * NOT set the up vector using copyFrom or copyFromFloats, as this bypasses
+   * setting the above matrices.
+   */
+  Vector3& get_upVector();
+  void set_upVector(const Vector3& vec);
+
+  /**
+   * @brief Gets the bouncing behavior of the camera if it has been enabled.
+   * @see http://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
+   */
   std::unique_ptr<BouncingBehavior>& get_bouncingBehavior();
+
+  /**
+   * @brief Defines if the bouncing behavior of the camera is enabled on the
+   * camera.
+   * @see http://doc.babylonjs.com/how_to/camera_behaviors#bouncing-behavior
+   */
   bool get_useBouncingBehavior() const;
   void set_useBouncingBehavior(bool value);
+
+  /**
+   * @brief Gets the framing behavior of the camera if it has been enabled.
+   * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
+   */
   std::unique_ptr<FramingBehavior>& get_framingBehavior();
+
+  /**
+   * @brief Defines if the framing behavior of the camera is enabled on the
+   * camera.
+   * @see http://doc.babylonjs.com/how_to/camera_behaviors#framing-behavior
+   */
   bool get_useFramingBehavior() const;
   void set_useFramingBehavior(bool value);
+
+  /**
+   * @brief Gets the auto rotation behavior of the camera if it has been
+   * enabled.
+   * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
+   */
   std::unique_ptr<AutoRotationBehavior>& get_autoRotationBehavior();
+
+  /**
+   * @brief Defines if the auto rotation behavior of the camera is enabled on
+   * the camera.
+   * @see http://doc.babylonjs.com/how_to/camera_behaviors#autorotation-behavior
+   */
   bool get_useAutoRotationBehavior() const;
   void set_useAutoRotationBehavior(bool value);
 
@@ -254,6 +294,15 @@ public:
    * The camera looks towards it form the radius distance.
    */
   Property<ArcRotateCamera, Vector3> target;
+
+  /**
+   * The vector the camera should consider as up. (default is Vector3(0, 1, 0)
+   * as returned by Vector3.Up()) Setting this will copy the given vector to the
+   * camera's upVector, and set rotation matrices to and from Y up. DO NOT set
+   * the up vector using copyFrom or copyFromFloats, as this bypasses setting
+   * the above matrices.
+   */
+  Property<ArcRotateCamera, Vector3> upVector;
 
   /**
    * Current inertia value on the longitudinal axis.
@@ -386,7 +435,7 @@ public:
   MouseButtonType _panningMouseButton;
 
   /**
-   * Defines the inpute associated to the camera.
+   * Defines the input associated to the camera.
    */
   std::unique_ptr<ArcRotateCameraInputsManager> inputs;
 
@@ -443,7 +492,7 @@ public:
   /**
    * Event raised when the camera is colliding with a mesh.
    */
-  std::function<void(AbstractMesh* collidedMesh)> onCollide;
+  std::function<void(const AbstractMeshPtr& collidedMesh)> onCollide;
 
   /**
    * Defines whether the camera should check collision with the objects oh the
@@ -463,7 +512,10 @@ public:
 
 protected:
   Vector3 _target;
-  AbstractMesh* _targetHost;
+  AbstractMeshPtr _targetHost;
+  Vector3 _upVector;
+  Matrix _upToYMatrix;
+  Matrix _YToUpMatrix;
   // Panning
   std::unique_ptr<Vector3> _localDirection;
   Vector3 _transformedDirection;

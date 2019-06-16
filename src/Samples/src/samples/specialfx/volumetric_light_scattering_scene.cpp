@@ -48,7 +48,7 @@ void VolumetricLightScatteringScene::initializeScene(ICanvas* canvas,
            const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
       // Set the target of the camera to the first imported mesh
       if (!newMeshes.empty()) {
-        auto firstMesh     = newMeshes[0].get();
+        auto firstMesh     = newMeshes[0];
         auto mat           = StandardMaterial::New("skull", _scene.get());
         mat->emissiveColor = Color3(0.2f, 0.2f, 0.2f);
 

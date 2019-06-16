@@ -35,13 +35,15 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , beta{0.f}
     , radius{0.f}
     , target{this, &ArcRotateCamera::get_target, &ArcRotateCamera::set_target}
+    , upVector{this, &ArcRotateCamera::get_upVector,
+               &ArcRotateCamera::set_upVector}
     , inertialAlphaOffset{0.f}
     , inertialBetaOffset{0.f}
     , inertialRadiusOffset{0.f}
     , lowerAlphaLimit{std::nullopt}
     , upperAlphaLimit{std::nullopt}
     , lowerBetaLimit{0.01f}
-    , upperBetaLimit{Math::PI}
+    , upperBetaLimit{Math::PI - 0.01f}
     , lowerRadiusLimit{std::nullopt}
     , upperRadiusLimit{std::nullopt}
     , inertialPanningX{0.f}
@@ -68,6 +70,7 @@ ArcRotateCamera::ArcRotateCamera(const std::string& iName, float iAlpha,
     , checkCollisions{false}
     , collisionRadius{std::make_unique<Vector3>(0.5f, 0.5f, 0.5f)}
     , _targetHost{nullptr}
+    , _upVector{Vector3::Up()}
     , _collider{nullptr}
     , _previousPosition{Vector3::Zero()}
     , _collisionVelocity{Vector3::Zero()}
@@ -101,6 +104,117 @@ Type ArcRotateCamera::type() const
   return Type::ARCROTATECAMERA;
 }
 
+Vector3& ArcRotateCamera::get_target()
+{
+  return _target;
+}
+
+void ArcRotateCamera::set_target(const Vector3& value)
+{
+  setTarget(value);
+}
+
+Vector3& ArcRotateCamera::get_upVector()
+{
+  return _upVector;
+}
+
+void ArcRotateCamera::set_upVector(const Vector3& vec)
+{
+  auto _vec = vec;
+  _vec.normalize();
+  _upVector.copyFrom(_vec);
+  setMatUp();
+}
+
+void ArcRotateCamera::setMatUp()
+{
+  // from y-up to custom-up (used in _getViewMatrix)
+  Matrix::RotationAlignToRef(Vector3::UpReadOnly(), _upVector, _YToUpMatrix);
+
+  // from custom-up to y-up (used in rebuildAnglesAndRadius)
+  Matrix::RotationAlignToRef(_upVector, Vector3::UpReadOnly(), _upToYMatrix);
+}
+
+std::unique_ptr<BouncingBehavior>& ArcRotateCamera::get_bouncingBehavior()
+{
+  return _bouncingBehavior;
+}
+
+bool ArcRotateCamera::get_useBouncingBehavior() const
+{
+  return _bouncingBehavior != nullptr;
+}
+
+void ArcRotateCamera::set_useBouncingBehavior(bool value)
+{
+  if (value == useBouncingBehavior()) {
+    return;
+  }
+
+  if (value) {
+    _bouncingBehavior = std::make_unique<BouncingBehavior>();
+    addBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
+  }
+  else if (_bouncingBehavior) {
+    removeBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
+    _bouncingBehavior = nullptr;
+  }
+}
+
+std::unique_ptr<FramingBehavior>& ArcRotateCamera::get_framingBehavior()
+{
+  return _framingBehavior;
+}
+
+bool ArcRotateCamera::get_useFramingBehavior() const
+{
+  return _framingBehavior != nullptr;
+}
+
+void ArcRotateCamera::set_useFramingBehavior(bool value)
+{
+  if (value == useFramingBehavior()) {
+    return;
+  }
+
+  if (value) {
+    _framingBehavior = std::make_unique<FramingBehavior>();
+    addBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
+  }
+  else if (_framingBehavior) {
+    removeBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
+    _framingBehavior = nullptr;
+  }
+}
+
+std::unique_ptr<AutoRotationBehavior>&
+ArcRotateCamera::get_autoRotationBehavior()
+{
+  return _autoRotationBehavior;
+}
+
+bool ArcRotateCamera::get_useAutoRotationBehavior() const
+{
+  return _autoRotationBehavior != nullptr;
+}
+
+void ArcRotateCamera::set_useAutoRotationBehavior(bool value)
+{
+  if (value == useAutoRotationBehavior()) {
+    return;
+  }
+
+  if (value) {
+    _autoRotationBehavior = std::make_unique<AutoRotationBehavior>();
+    addBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
+  }
+  else if (_autoRotationBehavior) {
+    removeBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
+    _autoRotationBehavior = nullptr;
+  }
+}
+
 void ArcRotateCamera::_initCache()
 {
   TargetCamera::_initCache();
@@ -125,6 +239,27 @@ void ArcRotateCamera::_updateCache(bool ignoreParentClass)
   _cache.beta   = beta;
   _cache.radius = radius;
   _cache.targetScreenOffset.copyFrom(targetScreenOffset);
+}
+
+Vector3 ArcRotateCamera::_getTargetPosition()
+{
+  if (_targetHost) {
+    auto pos = _targetHost->absolutePosition();
+    if (_targetBoundingCenter) {
+      pos.addToRef(*_targetBoundingCenter, _target);
+    }
+    else {
+      _target.copyFrom(pos);
+    }
+  }
+
+  auto lockedTargetPosition = _getLockedTargetPosition();
+
+  if (lockedTargetPosition) {
+    return *lockedTargetPosition;
+  }
+
+  return _target;
 }
 
 Camera& ArcRotateCamera::storeState()
@@ -155,27 +290,6 @@ bool ArcRotateCamera::_restoreStateValues()
   inertialPanningY     = 0.f;
 
   return true;
-}
-
-Vector3 ArcRotateCamera::_getTargetPosition()
-{
-  if (_targetHost) {
-    auto pos = _targetHost->getAbsolutePosition();
-    if (_targetBoundingCenter) {
-      pos.addToRef(*_targetBoundingCenter, _target);
-    }
-    else {
-      _target.copyFrom(pos);
-    }
-  }
-
-  auto lockedTargetPosition = _getLockedTargetPosition();
-
-  if (lockedTargetPosition) {
-    return *lockedTargetPosition;
-  }
-
-  return _target;
 }
 
 bool ArcRotateCamera::_isSynchronizedViewMatrix()
@@ -344,16 +458,25 @@ void ArcRotateCamera::_checkLimits()
   }
 
   if (lowerRadiusLimit.has_value() && radius < lowerRadiusLimit) {
-    radius = *lowerRadiusLimit;
+    radius               = *lowerRadiusLimit;
+    inertialRadiusOffset = 0.f;
   }
   if (upperRadiusLimit.has_value() && radius > upperRadiusLimit) {
-    radius = *upperRadiusLimit;
+    radius               = *upperRadiusLimit;
+    inertialRadiusOffset = 0.f;
   }
 }
 
 void ArcRotateCamera::rebuildAnglesAndRadius()
 {
-  position().subtractToRef(_getTargetPosition(), _computationVector);
+  _position.subtractToRef(_getTargetPosition(), _computationVector);
+
+  // need to rotate to Y up equivalent if up vector not Axis.Y
+  if (_upVector.x != 0.f || _upVector.y != 1.f || _upVector.z != 0.f) {
+    Vector3::TransformCoordinatesToRef(_computationVector, _upToYMatrix,
+                                       _computationVector);
+  }
+
   radius = _computationVector.length();
 
   if (radius == 0.f) {
@@ -361,9 +484,15 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
   }
 
   // Alpha
-  alpha = std::acos(_computationVector.x
-                    / std::sqrt(std::pow(_computationVector.x, 2.f)
-                                + std::pow(_computationVector.z, 2.f)));
+  if (_computationVector.x == 0.f && _computationVector.z == 0.f) {
+    alpha = Math::PI_2; // avoid division by zero when looking along up axis,
+                        // and set to acos(0)
+  }
+  else {
+    alpha = std::acos(_computationVector.x
+                      / std::sqrt(std::pow(_computationVector.x, 2.f)
+                                  + std::pow(_computationVector.z, 2.f)));
+  }
 
   if (_computationVector.z < 0.f) {
     alpha = Math::PI2 - alpha;
@@ -377,136 +506,47 @@ void ArcRotateCamera::rebuildAnglesAndRadius()
 
 void ArcRotateCamera::setPosition(const Vector3& iPosition)
 {
-  if (position().equals(iPosition)) {
+  if (_position.equals(iPosition)) {
     return;
   }
 
-  position().copyFrom(iPosition);
+  _position.copyFrom(iPosition);
 
   rebuildAnglesAndRadius();
 }
 
-Vector3& ArcRotateCamera::get_target()
+void ArcRotateCamera::setTarget(
+  const std::variant<AbstractMeshPtr, Vector3>& iTarget, bool toBoundingCenter,
+  bool allowSamePosition)
 {
-  return _target;
-}
+  if (std::holds_alternative<AbstractMeshPtr>(iTarget)) {
+    const auto& newTarget = std::get<AbstractMeshPtr>(iTarget);
+    if (toBoundingCenter) {
+      _targetBoundingCenter
+        = newTarget->getBoundingInfo().boundingBox.centerWorld.clone();
+    }
+    else {
+      _targetBoundingCenter.reset(nullptr);
+    }
+    newTarget->computeWorldMatrix();
+    _targetHost = newTarget;
+    _target     = _getTargetPosition();
 
-void ArcRotateCamera::set_target(const Vector3& value)
-{
-  setTarget(value);
-}
-
-void ArcRotateCamera::setTarget(AbstractMesh* iTarget, bool toBoundingCenter,
-                                bool /*allowSamePosition*/)
-{
-  if (toBoundingCenter) {
-    _targetBoundingCenter
-      = iTarget->getBoundingInfo().boundingBox.centerWorld.clone();
+    onMeshTargetChangedObservable.notifyObservers(_targetHost.get());
   }
   else {
-    _targetBoundingCenter.reset(nullptr);
+    const auto& newTarget = std::get<Vector3>(iTarget);
+    auto currentTarget    = _getTargetPosition();
+    if (!allowSamePosition && currentTarget.equals(newTarget)) {
+      return;
+    }
+    _targetHost           = nullptr;
+    _target               = newTarget;
+    _targetBoundingCenter = nullptr;
+    onMeshTargetChangedObservable.notifyObservers(nullptr);
   }
-  _targetHost = iTarget;
-  _target     = _getTargetPosition();
-
-  onMeshTargetChangedObservable.notifyObservers(_targetHost);
 
   rebuildAnglesAndRadius();
-}
-
-void ArcRotateCamera::setTarget(const Vector3& iTarget,
-                                bool /*toBoundingCenter*/,
-                                bool allowSamePosition)
-{
-  Vector3 newTarget{iTarget};
-  if (!allowSamePosition && _getTargetPosition().equals(newTarget)) {
-    return;
-  }
-  _targetHost           = nullptr;
-  _target               = newTarget;
-  _targetBoundingCenter = nullptr;
-  onMeshTargetChangedObservable.notifyObservers(nullptr);
-
-  rebuildAnglesAndRadius();
-}
-
-std::unique_ptr<BouncingBehavior>& ArcRotateCamera::get_bouncingBehavior()
-{
-  return _bouncingBehavior;
-}
-
-bool ArcRotateCamera::get_useBouncingBehavior() const
-{
-  return _bouncingBehavior != nullptr;
-}
-
-void ArcRotateCamera::set_useBouncingBehavior(bool value)
-{
-  if (value == useBouncingBehavior()) {
-    return;
-  }
-
-  if (value) {
-    _bouncingBehavior = std::make_unique<BouncingBehavior>();
-    addBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
-  }
-  else if (_bouncingBehavior) {
-    removeBehavior(dynamic_cast<Behavior<Node>*>(_bouncingBehavior.get()));
-    _bouncingBehavior = nullptr;
-  }
-}
-
-std::unique_ptr<FramingBehavior>& ArcRotateCamera::get_framingBehavior()
-{
-  return _framingBehavior;
-}
-
-bool ArcRotateCamera::get_useFramingBehavior() const
-{
-  return _framingBehavior != nullptr;
-}
-
-void ArcRotateCamera::set_useFramingBehavior(bool value)
-{
-  if (value == useFramingBehavior()) {
-    return;
-  }
-
-  if (value) {
-    _framingBehavior = std::make_unique<FramingBehavior>();
-    addBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
-  }
-  else if (_framingBehavior) {
-    removeBehavior(dynamic_cast<Behavior<Node>*>(_framingBehavior.get()));
-    _framingBehavior = nullptr;
-  }
-}
-
-std::unique_ptr<AutoRotationBehavior>&
-ArcRotateCamera::get_autoRotationBehavior()
-{
-  return _autoRotationBehavior;
-}
-
-bool ArcRotateCamera::get_useAutoRotationBehavior() const
-{
-  return _autoRotationBehavior != nullptr;
-}
-
-void ArcRotateCamera::set_useAutoRotationBehavior(bool value)
-{
-  if (value == useAutoRotationBehavior()) {
-    return;
-  }
-
-  if (value) {
-    _autoRotationBehavior = std::make_unique<AutoRotationBehavior>();
-    addBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
-  }
-  else if (_autoRotationBehavior) {
-    removeBehavior(dynamic_cast<Behavior<Node>*>(_autoRotationBehavior.get()));
-    _autoRotationBehavior = nullptr;
-  }
 }
 
 Matrix ArcRotateCamera::_getViewMatrix()
@@ -524,16 +564,24 @@ Matrix ArcRotateCamera::_getViewMatrix()
   auto targetPostion = _getTargetPosition();
   _computationVector.copyFromFloats(radius * cosa * sinb, radius * cosb,
                                     radius * sina * sinb);
+
+  // Rotate according to up vector
+  if (_upVector.x != 0.f || _upVector.y != 1.f || _upVector.z != 0.f) {
+    Vector3::TransformCoordinatesToRef(_computationVector, _YToUpMatrix,
+                                       _computationVector);
+  }
+
   targetPostion.addToRef(_computationVector, _newPosition);
   if (getScene()->collisionsEnabled && checkCollisions) {
+    auto& coordinator = getScene()->collisionCoordinator();
     if (!_collider) {
-      _collider = std::make_shared<Collider>();
+      _collider = coordinator->createCollider();
     }
     _collider->_radius = *collisionRadius;
-    _newPosition.subtractToRef(position, _collisionVelocity);
+    _newPosition.subtractToRef(_position, _collisionVelocity);
     _collisionTriggered = true;
-    getScene()->collisionCoordinator->getNewPosition(
-      position, _collisionVelocity, _collider, 3, nullptr,
+    coordinator->getNewPosition(
+      _position, _collisionVelocity, _collider, 3, nullptr,
       [&](size_t collisionId, Vector3& newPosition,
           const AbstractMeshPtr& collidedMesh) {
         _onCollisionPositionChange(collisionId, newPosition, collidedMesh);
@@ -541,14 +589,14 @@ Matrix ArcRotateCamera::_getViewMatrix()
       static_cast<unsigned>(uniqueId));
   }
   else {
-    position().copyFrom(_newPosition);
+    _position.copyFrom(_newPosition);
 
-    auto up = upVector;
+    auto up = upVector();
     if (allowUpsideDown && sinb < 0.f) {
       up = up.negate();
     }
 
-    _computeViewMatrix(position, target, up);
+    _computeViewMatrix(_position, target, up);
 
     _viewMatrix.addAtIndex(12, targetScreenOffset.x);
     _viewMatrix.addAtIndex(13, targetScreenOffset.y);
@@ -559,21 +607,17 @@ Matrix ArcRotateCamera::_getViewMatrix()
 }
 
 void ArcRotateCamera::_onCollisionPositionChange(
-  int /*collisionId*/, Vector3& newPosition,
+  size_t /*collisionId*/, Vector3& newPosition,
   const AbstractMeshPtr& collidedMesh)
 {
-  if (checkCollisions) {
-    newPosition.multiplyInPlace(_collider->_radius);
-  }
-
   if (!collidedMesh) {
-    _previousPosition.copyFrom(position);
+    _previousPosition.copyFrom(_position);
   }
   else {
     setPosition(newPosition);
 
     if (onCollide) {
-      // onCollide(collidedMesh);
+      onCollide(collidedMesh);
     }
   }
 
@@ -591,14 +635,14 @@ void ArcRotateCamera::_onCollisionPositionChange(
   _computationVector.copyFromFloats(radius * cosa * sinb, radius * cosb,
                                     radius * sina * sinb);
   targetPostion.addToRef(_computationVector, _newPosition);
-  position().copyFrom(_newPosition);
+  _position.copyFrom(_newPosition);
 
-  auto up = upVector;
+  auto up = upVector();
   if (allowUpsideDown && beta < 0.f) {
     up = up.negate();
   }
 
-  _computeViewMatrix(position, target, up);
+  _computeViewMatrix(_position, target, up);
   _viewMatrix.addAtIndex(12, targetScreenOffset.x);
   _viewMatrix.addAtIndex(13, targetScreenOffset.y);
 
@@ -660,7 +704,6 @@ void ArcRotateCamera::_updateRigCameras()
   auto camRight = std::static_pointer_cast<ArcRotateCamera>(_rigCameras[1]);
 
   camLeft->beta = camRight->beta = beta;
-  camLeft->radius = camRight->radius = radius;
 
   switch (cameraRigMode) {
     case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
@@ -694,7 +737,7 @@ const std::string ArcRotateCamera::getClassName() const
 
 json ArcRotateCamera::serialize() const
 {
-  return nullptr;
+  return json();
 }
 
 } // end of namespace BABYLON

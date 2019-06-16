@@ -17,10 +17,10 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/math/frustum.h>
-#include <babylon/postprocesses/pass_post_process.h>
-#include <babylon/postprocesses/post_process.h>
 #include <babylon/misc/serialization_helper.h>
 #include <babylon/misc/tools.h>
+#include <babylon/postprocesses/pass_post_process.h>
+#include <babylon/postprocesses/post_process.h>
 
 namespace BABYLON {
 
@@ -35,6 +35,7 @@ CameraPtr Camera::_createDefaultParsedCamera(const std::string& iName,
 Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
                bool setActiveOnSceneIfNoneActive)
     : Node(iName, scene)
+    , _position{Vector3::Zero()}
     , position{this, &Camera::get_position, &Camera::set_position}
     , upVector{Vector3::Up()}
     , orthoLeft{0.f}
@@ -63,7 +64,6 @@ Camera::Camera(const std::string& iName, const Vector3& iPosition, Scene* scene,
     , isRightCamera{this, &Camera::get_isRightCamera}
     , _webvrViewMatrix{Matrix::Identity()}
     , _globalPosition{Vector3::Zero()}
-    , _position{Vector3::Zero()}
     , _doNotComputeProjectionMatrix{false}
     , _transformMatrix{Matrix::Zero()}
     , _webvrProjectionMatrix{Matrix::Identity()}

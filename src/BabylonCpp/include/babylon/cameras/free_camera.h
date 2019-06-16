@@ -14,7 +14,7 @@ using ColliderPtr   = std::shared_ptr<Collider>;
 using FreeCameraPtr = std::shared_ptr<FreeCamera>;
 
 /**
- * @brief This represents a free type of camera. It can be usefull in First
+ * @brief This represents a free type of camera. It can be useful in First
  * Person Shooter game for instance. Please consider using the new
  * UniversalCamera instead as it adds more functionality like the gamepad.
  * @see http://doc.babylonjs.com/features/cameras#universal-camera
@@ -94,14 +94,14 @@ public:
 private:
   int get_collisionMask() const;
   void set_collisionMask(int mask);
-  void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
+  void _onCollisionPositionChange(size_t collisionId, Vector3& newPosition,
                                   const AbstractMeshPtr& collidedMesh
                                   = nullptr);
 
 protected:
   /**
    * @brief Instantiates a Free Camera.
-   * This represents a free type of camera. It can be usefull in First Person
+   * This represents a free type of camera. It can be useful in First Person
    * Shooter game for instance. Please consider using the new UniversalCamera
    * instead as it adds more functionality like touch to this camera.
    * @see http://doc.babylonjs.com/features/cameras#universal-camera
@@ -113,6 +113,66 @@ protected:
    */
   FreeCamera(const std::string& name, const Vector3& position, Scene* scene,
              bool setActiveOnSceneIfNoneActive = true);
+
+  /**
+   * @brief Gets the input sensibility for a mouse input. (default is 2000.0)
+   * Higher values reduce sensitivity.
+   */
+  float get_angularSensibility() const;
+
+  /**
+   * @brief Sets the input sensibility for a mouse input. (default is 2000.0)
+   * Higher values reduce sensitivity.
+   */
+  void set_angularSensibility(float value);
+
+  /**
+   * @brief Gets the list of keyboard keys used to control the forward move of
+   * the camera.
+   */
+  Int32Array& get_keysUp();
+
+  /**
+   * @brief Sets the list of keyboard keys used to control the forward move of
+   * the camera.
+   */
+  void set_keysUp(const Int32Array& value);
+
+  /**
+   * @brief Gets the list of keyboard keys used to control the backward move of
+   * the camera.
+   */
+  Int32Array& get_keysDown();
+
+  /**
+   * @brief Sets the list of keyboard keys used to control the backward move of
+   * the camera.
+   */
+  void set_keysDown(const Int32Array& value);
+
+  /**
+   * @brief Gets the list of keyboard keys used to control the left strafe move
+   * of the camera.
+   */
+  Int32Array& get_keysLeft();
+
+  /**
+   * @brief Sets the list of keyboard keys used to control the left strafe move
+   * of the camera.
+   */
+  void set_keysLeft(const Int32Array& value);
+
+  /**
+   * @brief Gets the list of keyboard keys used to control the right strafe move
+   * of the camera.
+   */
+  Int32Array& get_keysRight();
+
+  /**
+   * @brief Sets the list of keyboard keys used to control the right strafe move
+   * of the camera.
+   */
+  void set_keysRight(const Int32Array& value);
 
 public:
   /**
@@ -148,6 +208,36 @@ public:
   std::unique_ptr<FreeCameraInputsManager> inputs;
 
   /**
+   * The input sensibility for a mouse input. (default is 2000.0)
+   * Higher values reduce sensitivity.
+   */
+  Property<FreeCamera, float> angularSensibility;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the forward move of
+   * the camera.
+   */
+  Property<FreeCamera, Int32Array> keysUp;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the backward move of
+   * the camera.
+   */
+  Property<FreeCamera, Int32Array> keysDown;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the left strafe move
+   * of the camera.
+   */
+  Property<FreeCamera, Int32Array> keysLeft;
+
+  /**
+   * Gets or Set the list of keyboard keys used to control the right strafe move
+   * of the camera.
+   */
+  Property<FreeCamera, Int32Array> keysRight;
+
+  /**
    * Event raised when the camera collide with a mesh in the scene.
    */
   std::function<void(const AbstractMeshPtr& collidedMesh)> onCollide;
@@ -176,6 +266,7 @@ private:
   Vector3 _oldPosition;
   Vector3 _diffPosition;
   Vector3 _newPosition;
+  Int32Array _emptyKeyboardKeys;
 
   static bool NodeConstructorAdded;
 

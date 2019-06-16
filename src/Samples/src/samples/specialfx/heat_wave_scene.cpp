@@ -54,7 +54,7 @@ void HeatWaveScene::initializeScene(ICanvas* canvas, Scene* scene)
            const std::vector<AnimationGroupPtr>& /*newAnimationGroups*/) {
       // Set the target of the camera to the first imported mesh
       if (!newMeshes.empty()) {
-        _camera->setTarget(newMeshes[0].get());
+        _camera->setTarget(newMeshes[0]);
       }
     });
 

@@ -157,7 +157,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
                        &Scene::set_skeletonsEnabled}
     , lensFlaresEnabled{true}
     , collisionsEnabled{true}
-    , collisionCoordinator{nullptr}
+    , collisionCoordinator{this, &Scene::get_collisionCoordinator}
     , gravity{Vector3(0.f, -9.807f, 0.f)}
     , postProcessesEnabled{true}
     , postProcessManager{nullptr}
@@ -252,6 +252,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , _texturesEnabled{true}
     , _skeletonsEnabled{true}
     , _postProcessRenderPipelineManager{nullptr}
+    , _collisionCoordinator{nullptr}
     , _hasAudioEngine{false}
     , _mainSoundTrack{nullptr}
     , _engine{engine ? engine : Engine::LastCreatedEngine()}
@@ -630,6 +631,16 @@ void Scene::set_skeletonsEnabled(bool value)
 bool Scene::get_skeletonsEnabled() const
 {
   return _skeletonsEnabled;
+}
+
+std::unique_ptr<ICollisionCoordinator>& Scene::get_collisionCoordinator()
+{
+  if (!_collisionCoordinator) {
+    _collisionCoordinator = std::make_unique<DefaultCollisionCoordinator>();
+    _collisionCoordinator->init(this);
+  }
+
+  return _collisionCoordinator;
 }
 
 std::unique_ptr<PostProcessRenderPipelineManager>&

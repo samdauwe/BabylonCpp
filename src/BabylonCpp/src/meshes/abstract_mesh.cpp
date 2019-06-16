@@ -1230,7 +1230,7 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
 
   _collider->_radius = ellipsoid;
 
-  getScene()->collisionCoordinator->getNewPosition(
+  getScene()->collisionCoordinator()->getNewPosition(
     _oldPositionForCollisions, displacement, _collider, 3,
     shared_from_base<AbstractMesh>(),
     [this](int collisionId, Vector3& newPosition,

@@ -585,6 +585,9 @@ public:
    */
   CameraInputsManager<Camera> inputs;
 
+  /** Hidden */
+  Vector3 _position;
+
   /**
    * Define the current local position of the camera in the scene
    */
@@ -777,7 +780,6 @@ protected:
   Vector3 _globalPosition;
 
 private:
-  Vector3 _position;
   bool _doNotComputeProjectionMatrix;
   Matrix _transformMatrix;
   Matrix _webvrProjectionMatrix;

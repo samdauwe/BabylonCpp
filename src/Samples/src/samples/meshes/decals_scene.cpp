@@ -53,7 +53,7 @@ void DecalsScene::initializeScene(ICanvas* canvas, Scene* scene)
         auto cat = newMeshes[0];
 
         // Set the target of the camera to the first imported mesh
-        _camera->setTarget(cat.get());
+        _camera->setTarget(cat);
 
         _decalMaterial           = StandardMaterial::New("decalMat", scene);
         auto diffuseTexture      = Texture::New("/textures/impact.png", scene);
