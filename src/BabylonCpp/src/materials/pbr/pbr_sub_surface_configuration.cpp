@@ -208,9 +208,9 @@ bool PBRSubSurfaceConfiguration::isReadyForSubMesh(
         }
       }
 
-      auto refractionTexture = _getRefractionTexture(scene);
-      if (refractionTexture && MaterialFlags::RefractionTextureEnabled()) {
-        if (!refractionTexture->isReadyOrNotBlocking()) {
+      auto iRefractionTexture = _getRefractionTexture(scene);
+      if (iRefractionTexture && MaterialFlags::RefractionTextureEnabled()) {
+        if (!iRefractionTexture->isReadyOrNotBlocking()) {
           return false;
         }
       }
@@ -257,16 +257,16 @@ void PBRSubSurfaceConfiguration::prepareDefines(
 
     if (_isRefractionEnabled) {
       if (scene->texturesEnabled()) {
-        auto refractionTexture = _getRefractionTexture(scene);
-        if (refractionTexture && MaterialFlags::RefractionTextureEnabled()) {
+        auto refractTexture = _getRefractionTexture(scene);
+        if (refractTexture && MaterialFlags::RefractionTextureEnabled()) {
           defines.boolDef["SS_REFRACTION"]       = true;
-          defines.boolDef["SS_REFRACTIONMAP_3D"] = refractionTexture->isCube;
-          defines.boolDef["SS_GAMMAREFRACTION"] = refractionTexture->gammaSpace;
-          defines.boolDef["SS_RGBDREFRACTION"]  = refractionTexture->isRGBD;
+          defines.boolDef["SS_REFRACTIONMAP_3D"] = refractTexture->isCube;
+          defines.boolDef["SS_GAMMAREFRACTION"]  = refractTexture->gammaSpace;
+          defines.boolDef["SS_RGBDREFRACTION"]   = refractTexture->isRGBD;
           defines.boolDef["SS_REFRACTIONMAP_OPPOSITEZ"]
-            = refractionTexture->invertZ;
+            = refractTexture->invertZ;
           defines.boolDef["SS_LODINREFRACTIONALPHA"]
-            = refractionTexture->lodLevelInAlpha;
+            = refractTexture->lodLevelInAlpha;
           defines.boolDef["SS_LINKREFRACTIONTOTRANSPARENCY"]
             = _linkRefractionWithTransparency;
         }
@@ -281,13 +281,14 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
                                                 bool isFrozen,
                                                 bool lodBasedMicrosurface)
 {
-  auto refractionTexture = _getRefractionTexture(scene);
+  auto refractTexture = _getRefractionTexture(scene);
 
   if (!uniformBuffer.useUbo() || !isFrozen || !uniformBuffer.isSync()) {
     if (_thicknessTexture && MaterialFlags::ThicknessTextureEnabled()) {
-      uniformBuffer.updateFloat2("vThicknessInfos",
-                                 _thicknessTexture->coordinatesIndex,
-                                 _thicknessTexture->level, "");
+      uniformBuffer.updateFloat2(
+        "vThicknessInfos",
+        static_cast<float>(_thicknessTexture->coordinatesIndex),
+        _thicknessTexture->level, "");
       MaterialHelper::BindTextureMatrix(*_thicknessTexture, uniformBuffer,
                                         "thickness");
     }
@@ -295,23 +296,24 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
     uniformBuffer.updateFloat2("vThicknessParam", minimumThickness,
                                maximumThickness - minimumThickness, "");
 
-    if (refractionTexture && MaterialFlags::RefractionTextureEnabled()) {
-      uniformBuffer.updateMatrix(
-        "refractionMatrix", *refractionTexture->getReflectionTextureMatrix());
+    if (refractTexture && MaterialFlags::RefractionTextureEnabled()) {
+      uniformBuffer.updateMatrix("refractionMatrix",
+                                 *refractTexture->getReflectionTextureMatrix());
 
       auto depth = 1.f;
-      if (!refractionTexture->isCube) {
+      if (!refractTexture->isCube) {
         /*if (refractionTexture.depth) {
             depth = refractionTexture.depth;
         }*/
       }
-      uniformBuffer.updateFloat4("vRefractionInfos", refractionTexture->level,
+      uniformBuffer.updateFloat4("vRefractionInfos", refractTexture->level,
                                  1.f / _indexOfRefraction, depth,
                                  _invertRefractionY ? -1.f : 1.f, "");
-      uniformBuffer.updateFloat3("vRefractionMicrosurfaceInfos",
-                                 refractionTexture->getSize().width,
-                                 refractionTexture->lodGenerationScale,
-                                 refractionTexture->lodGenerationOffset, "");
+      uniformBuffer.updateFloat3(
+        "vRefractionMicrosurfaceInfos",
+        static_cast<float>(refractTexture->getSize().width),
+        refractTexture->lodGenerationScale, refractTexture->lodGenerationOffset,
+        "");
     }
 
     uniformBuffer.updateColor3("vDiffusionDistance", diffusionDistance, "");
@@ -329,23 +331,23 @@ void PBRSubSurfaceConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
       uniformBuffer.setTexture("thicknessSampler", _thicknessTexture);
     }
 
-    if (refractionTexture && MaterialFlags::RefractionTextureEnabled()) {
+    if (refractTexture && MaterialFlags::RefractionTextureEnabled()) {
       if (lodBasedMicrosurface) {
-        uniformBuffer.setTexture("refractionSampler", refractionTexture);
+        uniformBuffer.setTexture("refractionSampler", refractTexture);
       }
       else {
         uniformBuffer.setTexture("refractionSampler",
-                                 refractionTexture->_lodTextureMid() ?
-                                   refractionTexture->_lodTextureMid() :
-                                   refractionTexture);
+                                 refractTexture->_lodTextureMid() ?
+                                   refractTexture->_lodTextureMid() :
+                                   refractTexture);
         uniformBuffer.setTexture("refractionSamplerLow",
-                                 refractionTexture->_lodTextureLow() ?
-                                   refractionTexture->_lodTextureLow() :
-                                   refractionTexture);
+                                 refractTexture->_lodTextureLow() ?
+                                   refractTexture->_lodTextureLow() :
+                                   refractTexture);
         uniformBuffer.setTexture("refractionSamplerHigh",
-                                 refractionTexture->_lodTextureHigh() ?
-                                   refractionTexture->_lodTextureHigh() :
-                                   refractionTexture);
+                                 refractTexture->_lodTextureHigh() ?
+                                   refractTexture->_lodTextureHigh() :
+                                   refractTexture);
       }
     }
   }

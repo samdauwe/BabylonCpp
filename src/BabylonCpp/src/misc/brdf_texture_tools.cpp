@@ -53,8 +53,8 @@ void BRDFTextureTools::_ExpandDefaultBRDFTexture(
     options.samplingMode          = Constants::TEXTURE_BILINEAR_SAMPLINGMODE;
     options.type                  = texture->type;
     options.format                = Constants::TEXTUREFORMAT_RGBA;
-    auto expandedTexture
-      = engine->createRenderTargetTexture(texture->width, options);
+    auto expandedTexture          = engine->createRenderTargetTexture(
+      static_cast<float>(texture->width), options);
 
     rgbdPostProcess->getEffect()->executeWhenCompiled(
       [&texture, &expandedTexture, &rgbdPostProcess,

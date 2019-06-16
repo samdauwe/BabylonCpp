@@ -172,7 +172,7 @@ SolidParticleSystem::digest(Mesh* _mesh,
   while (f < totalFacets) {
     size = sizeO
            + static_cast<size_t>(
-             std::floor((1.f + static_cast<float>(delta)) * Math::random()));
+               std::floor((1.f + static_cast<float>(delta)) * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -849,12 +849,11 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
         }
 
         if (_computeParticleColor && particle->color.has_value()) {
-          const auto& color    = particle->color.value();
-          auto& colors32       = _colors32;
-          colors32[colidx]     = color.r;
-          colors32[colidx + 1] = color.g;
-          colors32[colidx + 2] = color.b;
-          colors32[colidx + 3] = color.a;
+          const auto& color     = particle->color.value();
+          _colors32[colidx]     = color.r;
+          _colors32[colidx + 1] = color.g;
+          _colors32[colidx + 2] = color.b;
+          _colors32[colidx + 3] = color.a;
         }
 
         if (_computeParticleTexture) {

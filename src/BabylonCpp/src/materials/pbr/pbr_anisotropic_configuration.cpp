@@ -116,7 +116,8 @@ void PBRAnisotropicConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
 {
   if (!uniformBuffer.useUbo() || !isFrozen || !uniformBuffer.isSync()) {
     if (_texture && MaterialFlags::AnisotropicTextureEnabled()) {
-      uniformBuffer.updateFloat2("vAnisotropyInfos", _texture->coordinatesIndex,
+      uniformBuffer.updateFloat2("vAnisotropyInfos",
+                                 static_cast<float>(_texture->coordinatesIndex),
                                  _texture->level, "");
       MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "anisotropy");
     }
@@ -135,9 +136,9 @@ void PBRAnisotropicConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
 }
 
 bool PBRAnisotropicConfiguration::hasTexture(
-  const BaseTexturePtr& texture) const
+  const BaseTexturePtr& iTexture) const
 {
-  if (_texture == texture) {
+  if (_texture == iTexture) {
     return true;
   }
 

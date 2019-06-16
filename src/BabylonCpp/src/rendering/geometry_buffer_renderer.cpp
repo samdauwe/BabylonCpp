@@ -313,8 +313,7 @@ void GeometryBufferRenderer::_createRenderTargets()
 void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 {
   auto mesh     = subMesh->getRenderingMesh();
-  auto scene    = _scene;
-  auto engine   = scene->getEngine();
+  auto engine   = _scene->getEngine();
   auto material = subMesh->getMaterial();
 
   if (!material) {
@@ -326,8 +325,8 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
       && !stl_util::contains(_previousTransformationMatrices, mesh->uniqueId)) {
     _previousTransformationMatrices[mesh->uniqueId]
       = ISavedTransformationMatrix{
-        Matrix::Identity(),         // world
-        scene->getTransformMatrix() // viewProjection
+        Matrix::Identity(),          // world
+        _scene->getTransformMatrix() // viewProjection
       };
 
     if (mesh->skeleton()) {
@@ -341,7 +340,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
   // Culling
   engine->setState(material->backFaceCulling(), 0, false,
-                   scene->useRightHandedSystem());
+                   _scene->useRightHandedSystem());
 
   // Managing instances
   auto batch = mesh->_getInstancesRenderList(subMesh->_id);
@@ -359,8 +358,8 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     engine->enableEffect(_effect);
     mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
 
-    _effect->setMatrix("viewProjection", scene->getTransformMatrix());
-    _effect->setMatrix("view", scene->getViewMatrix());
+    _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
+    _effect->setMatrix("view", _scene->getViewMatrix());
 
     // Alpha test
     if (material && material->needAlphaTesting()) {

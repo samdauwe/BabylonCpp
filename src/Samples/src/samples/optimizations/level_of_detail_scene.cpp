@@ -50,7 +50,7 @@ void LevelOfDetailScene::initializeScene(ICanvas* canvas, Scene* scene)
   materialRed->emissiveColor = Color3(0.5f, 0.f, 0.f);
 
   // Create a wall of knots
-  auto count = 3ull;
+  auto count = 3;
   auto scale = 4.f;
 
   auto knot00
@@ -77,8 +77,8 @@ void LevelOfDetailScene::initializeScene(ICanvas* canvas, Scene* scene)
   knot00->addLODLevel(45, knot03);
   knot00->addLODLevel(55, nullptr);
 
-  for (size_t x = -count; x <= count; x++) {
-    for (size_t y = -count; y <= count; y++) {
+  for (int x = -count; x <= count; x++) {
+    for (int y = -count; y <= count; y++) {
       for (size_t z = 5; z < 10; z++) {
         auto knot      = knot00->createInstance("knotI");
         knot->position = Vector3(x * scale, y * scale, z * scale);

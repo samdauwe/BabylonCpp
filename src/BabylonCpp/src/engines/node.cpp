@@ -83,9 +83,9 @@ bool Node::isDisposed() const
   return _isDisposed;
 }
 
-void Node::set_parent(Node* const& parent)
+void Node::set_parent(Node* const& iParent)
 {
-  if (_parentNode == parent) {
+  if (_parentNode == iParent) {
     return;
   }
 
@@ -100,13 +100,13 @@ void Node::set_parent(Node* const& parent)
                                                 }),
                                  _parentNode->_children.end());
 
-    if (!parent) {
+    if (!iParent) {
       addToSceneRootNodes();
     }
   }
 
   // Store new parent
-  _parentNode = parent;
+  _parentNode = iParent;
 
   // Add as child to new parent
   if (_parentNode) {

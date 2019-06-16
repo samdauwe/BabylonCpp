@@ -49,7 +49,8 @@ MotionBlurPostProcess::MotionBlurPostProcess(
     _geometryBufferRenderer->enableVelocity = true;
 
     onApply = [&](Effect* effect, EventState & /*es*/) -> void {
-      effect->setVector2("screenSize", Vector2(width, height));
+      effect->setVector2("screenSize", Vector2(static_cast<float>(width),
+                                               static_cast<float>(height)));
 
       effect->setFloat("motionScale", scene->getAnimationRatio());
       effect->setFloat("motionStrength", motionStrength);

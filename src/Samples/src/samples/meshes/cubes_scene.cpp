@@ -89,7 +89,7 @@ void CubesScene::initializeScene(ICanvas* canvas, Scene* scene)
     [this](Scene* /*scene*/, EventState & /*es*/) -> void {
       _t += _scene->getEngine()->getDeltaTime();
       auto val = (1.f + std::sin(_t / 500.f));
-      for (unsigned int boxIndex; boxIndex < _boxes.size(); ++boxIndex) {
+      for (unsigned int boxIndex = 0; boxIndex < _boxes.size(); ++boxIndex) {
         auto& box        = _boxes[boxIndex];
         auto& boxIndices = _indices[boxIndex];
         auto i = std::get<0>(boxIndices), j = std::get<1>(boxIndices),

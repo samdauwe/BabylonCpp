@@ -245,7 +245,7 @@ int FlyCamera::get_collisionMask() const
 
 void FlyCamera::set_collisionMask(int mask)
 {
-  _collisionMask = !std::isnan(mask) ? mask : -1;
+  _collisionMask = !isNan(mask) ? mask : -1;
 }
 
 void FlyCamera::_collideWithWorld(const Vector3& /*displacement*/)

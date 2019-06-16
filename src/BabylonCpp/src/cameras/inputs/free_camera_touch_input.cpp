@@ -96,8 +96,8 @@ void FreeCameraTouchInput::attachControl(ICanvas* /*canvas*/,
           return;
         }
 
-        _offsetX = evt.clientX - previousPosition->x;
-        _offsetY = -(evt.clientY - previousPosition->y);
+        _offsetX = static_cast<float>(evt.clientX) - previousPosition->x;
+        _offsetY = -(static_cast<float>(evt.clientY) - previousPosition->y);
       }
     };
   }

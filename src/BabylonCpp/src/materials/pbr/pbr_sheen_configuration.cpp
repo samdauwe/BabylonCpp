@@ -131,7 +131,8 @@ void PBRSheenConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
 {
   if (!uniformBuffer.useUbo() || !isFrozen || !uniformBuffer.isSync()) {
     if (_texture && MaterialFlags::SheenTextureEnabled()) {
-      uniformBuffer.updateFloat2("vSheenInfos", _texture->coordinatesIndex,
+      uniformBuffer.updateFloat2("vSheenInfos",
+                                 static_cast<float>(_texture->coordinatesIndex),
                                  _texture->level, "");
       MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "sheen");
     }
@@ -149,9 +150,9 @@ void PBRSheenConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
   }
 }
 
-bool PBRSheenConfiguration::hasTexture(const BaseTexturePtr& texture) const
+bool PBRSheenConfiguration::hasTexture(const BaseTexturePtr& iTexture) const
 {
-  if (_texture == texture) {
+  if (_texture == iTexture) {
     return true;
   }
 

@@ -237,16 +237,18 @@ void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
 {
   if (!uniformBuffer.useUbo() || !isFrozen || !uniformBuffer.isSync()) {
     if (_texture && MaterialFlags::ClearCoatTextureEnabled()) {
-      uniformBuffer.updateFloat2("vClearCoatInfos", _texture->coordinatesIndex,
+      uniformBuffer.updateFloat2("vClearCoatInfos",
+                                 static_cast<float>(_texture->coordinatesIndex),
                                  _texture->level, "");
       MaterialHelper::BindTextureMatrix(*_texture, uniformBuffer, "clearCoat");
     }
 
     if (_bumpTexture && engine->getCaps().standardDerivatives
         && MaterialFlags::ClearCoatTextureEnabled() && !disableBumpMap) {
-      uniformBuffer.updateFloat2("vClearCoatBumpInfos",
-                                 _bumpTexture->coordinatesIndex,
-                                 _bumpTexture->level, "");
+      uniformBuffer.updateFloat2(
+        "vClearCoatBumpInfos",
+        static_cast<float>(_bumpTexture->coordinatesIndex), _bumpTexture->level,
+        "");
       MaterialHelper::BindTextureMatrix(*_bumpTexture, uniformBuffer,
                                         "clearCoatBump");
 
@@ -263,9 +265,10 @@ void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
     }
 
     if (_tintTexture && MaterialFlags::ClearCoatTintTextureEnabled()) {
-      uniformBuffer.updateFloat2("vClearCoatTintInfos",
-                                 _tintTexture->coordinatesIndex,
-                                 _tintTexture->level, "");
+      uniformBuffer.updateFloat2(
+        "vClearCoatTintInfos",
+        static_cast<float>(_tintTexture->coordinatesIndex), _tintTexture->level,
+        "");
       MaterialHelper::BindTextureMatrix(*_tintTexture, uniformBuffer,
                                         "clearCoatTint");
     }
@@ -309,17 +312,17 @@ void PBRClearCoatConfiguration::bindForSubMesh(UniformBuffer& uniformBuffer,
   }
 }
 
-bool PBRClearCoatConfiguration::hasTexture(const BaseTexturePtr& texture) const
+bool PBRClearCoatConfiguration::hasTexture(const BaseTexturePtr& iTexture) const
 {
-  if (_texture == texture) {
+  if (_texture == iTexture) {
     return true;
   }
 
-  if (_bumpTexture == texture) {
+  if (_bumpTexture == iTexture) {
     return true;
   }
 
-  if (_tintTexture == texture) {
+  if (_tintTexture == iTexture) {
     return true;
   }
 
