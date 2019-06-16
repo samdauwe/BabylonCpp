@@ -527,14 +527,15 @@ Matrix ArcRotateCamera::_getViewMatrix()
   targetPostion.addToRef(_computationVector, _newPosition);
   if (getScene()->collisionsEnabled && checkCollisions) {
     if (!_collider) {
-      _collider = std::make_unique<Collider>();
+      _collider = std::make_shared<Collider>();
     }
     _collider->_radius = *collisionRadius;
     _newPosition.subtractToRef(position, _collisionVelocity);
     _collisionTriggered = true;
     getScene()->collisionCoordinator->getNewPosition(
-      position, _collisionVelocity, _collider.get(), 3, nullptr,
-      [&](int collisionId, Vector3& newPosition, AbstractMesh* collidedMesh) {
+      position, _collisionVelocity, _collider, 3, nullptr,
+      [&](size_t collisionId, Vector3& newPosition,
+          const AbstractMeshPtr& collidedMesh) {
         _onCollisionPositionChange(collisionId, newPosition, collidedMesh);
       },
       static_cast<unsigned>(uniqueId));
@@ -557,11 +558,11 @@ Matrix ArcRotateCamera::_getViewMatrix()
   return _viewMatrix;
 }
 
-void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
-                                                 Vector3& newPosition,
-                                                 AbstractMesh* collidedMesh)
+void ArcRotateCamera::_onCollisionPositionChange(
+  int /*collisionId*/, Vector3& newPosition,
+  const AbstractMeshPtr& collidedMesh)
 {
-  if (getScene()->workerCollisions() && checkCollisions) {
+  if (checkCollisions) {
     newPosition.multiplyInPlace(_collider->_radius);
   }
 
@@ -572,7 +573,7 @@ void ArcRotateCamera::_onCollisionPositionChange(int /*collisionId*/,
     setPosition(newPosition);
 
     if (onCollide) {
-      onCollide(collidedMesh);
+      // onCollide(collidedMesh);
     }
   }
 

@@ -1155,12 +1155,9 @@ bool AbstractMesh::get_checkCollisions() const
 void AbstractMesh::set_checkCollisions(bool collisionEnabled)
 {
   _checkCollisions = collisionEnabled;
-  if (getScene()->workerCollisions()) {
-    getScene()->collisionCoordinator->onMeshUpdated(this);
-  }
 }
 
-std::unique_ptr<Collider>& AbstractMesh::get_collider()
+ColliderPtr& AbstractMesh::get_collider()
 {
   return _collider;
 }
@@ -1228,14 +1225,16 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
   globalPosition.addToRef(ellipsoidOffset, _oldPositionForCollisions);
 
   if (!_collider) {
-    _collider = std::make_unique<Collider>();
+    _collider = std::make_shared<Collider>();
   }
 
   _collider->_radius = ellipsoid;
 
   getScene()->collisionCoordinator->getNewPosition(
-    _oldPositionForCollisions, displacement, _collider.get(), 3, this,
-    [this](int collisionId, Vector3& newPosition, AbstractMesh* collidedMesh) {
+    _oldPositionForCollisions, displacement, _collider, 3,
+    shared_from_base<AbstractMesh>(),
+    [this](int collisionId, Vector3& newPosition,
+           const AbstractMeshPtr& collidedMesh) {
       _onCollisionPositionChange(collisionId, newPosition, collidedMesh);
     },
     static_cast<unsigned int>(uniqueId));
@@ -1243,14 +1242,10 @@ AbstractMesh& AbstractMesh::moveWithCollisions(Vector3& displacement)
   return *this;
 }
 
-void AbstractMesh::_onCollisionPositionChange(int /*collisionId*/,
-                                              Vector3& newPosition,
-                                              AbstractMesh* collidedMesh)
+void AbstractMesh::_onCollisionPositionChange(
+  int /*collisionId*/, Vector3& newPosition,
+  const AbstractMeshPtr& collidedMesh)
 {
-  if (getScene()->workerCollisions()) {
-    newPosition.multiplyInPlace(_collider->_radius);
-  }
-
   newPosition.subtractToRef(_oldPositionForCollisions,
                             _diffPositionForCollisions);
 
@@ -1259,7 +1254,7 @@ void AbstractMesh::_onCollisionPositionChange(int /*collisionId*/,
   }
 
   if (collidedMesh) {
-    onCollideObservable.notifyObservers(collidedMesh);
+    onCollideObservable.notifyObservers(collidedMesh.get());
   }
 
   onCollisionPositionChangeObservable.notifyObservers(&position());
@@ -1298,7 +1293,7 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
 
 AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
                                                const Matrix& transformMatrix,
-                                               Collider* iCollider)
+                                               Collider& iCollider)
 {
   _generatePointsArray();
 
@@ -1320,28 +1315,28 @@ AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
     }
   }
   // Collide
-  iCollider->_collide(
+  iCollider._collide(
     subMesh->_trianglePlanes, subMesh->_lastColliderWorldVertices, getIndices(),
     subMesh->indexStart, subMesh->indexStart + subMesh->indexCount,
     subMesh->verticesStart, subMesh->getMaterial() != nullptr);
-  if (iCollider->collisionFound) {
-    iCollider->collidedMesh = this;
+  if (iCollider.collisionFound) {
+    iCollider.collidedMesh = shared_from_base<AbstractMesh>();
   }
   return *this;
 }
 
 AbstractMesh&
-AbstractMesh::_processCollisionsForSubMeshes(Collider* iCollider,
+AbstractMesh::_processCollisionsForSubMeshes(Collider& iCollider,
                                              const Matrix& transformMatrix)
 {
-  auto iSubMeshes = _scene->getCollidingSubMeshCandidates(this, *iCollider);
+  auto iSubMeshes = _scene->getCollidingSubMeshCandidates(this, iCollider);
   auto len        = iSubMeshes.size();
 
   for (size_t index = 0; index < len; index++) {
     auto& subMesh = iSubMeshes[index];
 
     // Bounding test
-    if (len > 1 && !subMesh->_checkCollision(*iCollider)) {
+    if (len > 1 && !subMesh->_checkCollision(iCollider)) {
       continue;
     }
 
@@ -1350,18 +1345,18 @@ AbstractMesh::_processCollisionsForSubMeshes(Collider* iCollider,
   return *this;
 }
 
-AbstractMesh& AbstractMesh::_checkCollision(Collider* iCollider)
+AbstractMesh& AbstractMesh::_checkCollision(Collider& iCollider)
 {
   // Bounding box test
-  if (!_boundingInfo->_checkCollision(*iCollider)) {
+  if (!_boundingInfo->_checkCollision(iCollider)) {
     return *this;
   }
 
   // Transformation matrix
   auto& collisionsScalingMatrix   = Tmp::MatrixArray[0];
   auto& collisionsTransformMatrix = Tmp::MatrixArray[1];
-  Matrix::ScalingToRef(1.f / iCollider->_radius.x, 1.f / iCollider->_radius.y,
-                       1.f / iCollider->_radius.z, collisionsScalingMatrix);
+  Matrix::ScalingToRef(1.f / iCollider._radius.x, 1.f / iCollider._radius.y,
+                       1.f / iCollider._radius.z, collisionsScalingMatrix);
   worldMatrixFromCache().multiplyToRef(collisionsScalingMatrix,
                                        collisionsTransformMatrix);
   _processCollisionsForSubMeshes(iCollider, collisionsTransformMatrix);
@@ -1408,7 +1403,7 @@ PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck)
       if (fastCheck || !intersectInfo
           || currentIntersectInfo->distance < intersectInfo->distance) {
         intersectInfo            = currentIntersectInfo;
-        intersectInfo->subMeshId = static_cast<int>(index);
+        intersectInfo->subMeshId = index;
 
         if (fastCheck) {
           break;
@@ -1431,9 +1426,9 @@ PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck)
     pickingInfo.hit         = true;
     pickingInfo.distance    = Vector3::Distance(worldOrigin, pickedPoint);
     pickingInfo.pickedPoint = pickedPoint;
-    pickingInfo.pickedMesh  = this;
-    pickingInfo.bu          = intersectInfo->bu;
-    pickingInfo.bv          = intersectInfo->bv;
+    pickingInfo.pickedMesh  = shared_from_base<AbstractMesh>();
+    pickingInfo.bu          = intersectInfo->bu.value_or(0.f);
+    pickingInfo.bv          = intersectInfo->bv.value_or(0.f);
     pickingInfo.faceId      = static_cast<unsigned>(intersectInfo->faceId);
     pickingInfo.subMeshId   = static_cast<unsigned>(intersectInfo->subMeshId);
     return pickingInfo;

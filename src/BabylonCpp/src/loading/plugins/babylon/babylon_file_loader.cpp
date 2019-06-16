@@ -22,9 +22,9 @@
 #include <babylon/materials/textures/hdr_cube_texture.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -414,8 +414,6 @@ bool BabylonFileLoader::load(
       scene->collisionsEnabled
         = json_util::get_bool(parsedData, "collisionsEnabled", true);
     }
-    scene->workerCollisions
-      = json_util::get_bool(parsedData, "workerCollisions");
 
     if (json_util::get_bool(parsedData, "autoAnimate", false)) {
 #if 0

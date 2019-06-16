@@ -13,6 +13,8 @@ Collider::Collider()
     , _radius{Vector3::One()}
     , _retry{0}
     , _basePointWorld{Vector3::Zero()}
+    , collisionMask{this, &Collider::get_collisionMask,
+                    &Collider::set_collisionMask}
     , _collisionPoint{Vector3::Zero()}
     , _planeIntersectionPoint{Vector3::Zero()}
     , _tempVector{Vector3::Zero()}
@@ -69,26 +71,26 @@ bool Collider::IntersectBoxAASphere(const Vector3& boxMin,
 LowestRoot Collider::GetLowestRoot(float a, float b, float c, float maxR)
 {
   LowestRoot result{0.f, false};
-  const float determinant = b * b - 4.f * a * c;
+  const auto determinant = b * b - 4.f * a * c;
   if (determinant < 0.f) {
     return result;
   }
 
-  const float sqrtD = std::sqrt(determinant);
-  float r1          = (-b - sqrtD) / (2.f * a);
-  float r2          = (-b + sqrtD) / (2.f * a);
+  const auto sqrtD = std::sqrt(determinant);
+  auto r1          = (-b - sqrtD) / (2.f * a);
+  auto r2          = (-b + sqrtD) / (2.f * a);
 
   if (r1 > r2) {
     std::swap(r1, r2);
   }
 
-  if (r1 > 0 && r1 < maxR) {
+  if (r1 > 0.f && r1 < maxR) {
     result.root  = r1;
     result.found = true;
     return result;
   }
 
-  if (r2 > 0 && r2 < maxR) {
+  if (r2 > 0.f && r2 < maxR) {
     result.root  = r2;
     result.found = true;
     return result;
@@ -97,12 +99,12 @@ LowestRoot Collider::GetLowestRoot(float a, float b, float c, float maxR)
   return result;
 }
 
-int Collider::collisionMask() const
+int Collider::get_collisionMask() const
 {
   return _collisionMask;
 }
 
-void Collider::setCollisionMask(int mask)
+void Collider::set_collisionMask(int mask)
 {
   _collisionMask = !isNan(mask) ? mask : -1;
 }
@@ -156,9 +158,9 @@ bool Collider::_canDoCollision(const Vector3& sphereCenter, float sphereRadius,
                                const Vector3& vecMin,
                                const Vector3& vecMax) const
 {
-  float distance = Vector3::Distance(_basePointWorld, sphereCenter);
+  auto distance = Vector3::Distance(_basePointWorld, sphereCenter);
 
-  float max = stl_util::max(_radius.x, _radius.y, _radius.z);
+  auto max = stl_util::max(_radius.x, _radius.y, _radius.z);
 
   if (distance > _velocityWorldLength + max + sphereRadius) {
     return false;
@@ -177,8 +179,8 @@ void Collider::_testTriangle(size_t faceIndex,
                              const Vector3& p1, const Vector3& p2,
                              const Vector3& p3, bool hasMaterial)
 {
-  float f, t0;
-  bool embeddedInPlane = false;
+  auto f = 0.f, t0 = 0.f;
+  auto embeddedInPlane = false;
 
   if (faceIndex >= trianglePlaneArray.size()) {
     for (size_t i = trianglePlaneArray.size(); i <= faceIndex; ++i) {
@@ -194,8 +196,8 @@ void Collider::_testTriangle(size_t faceIndex,
     return;
   }
 
-  float signedDistToTrianglePlane = trianglePlane.signedDistanceTo(_basePoint);
-  float normalDotVelocity = Vector3::Dot(trianglePlane.normal, _velocity);
+  auto signedDistToTrianglePlane = trianglePlane.signedDistanceTo(_basePoint);
+  auto normalDotVelocity = Vector3::Dot(trianglePlane.normal, _velocity);
 
   if (stl_util::almost_equal(normalDotVelocity, 0.f)) {
     if (std::abs(signedDistToTrianglePlane) >= 1.f) {
@@ -205,8 +207,8 @@ void Collider::_testTriangle(size_t faceIndex,
     t0              = 0;
   }
   else {
-    t0       = (-1.f - signedDistToTrianglePlane) / normalDotVelocity;
-    float t1 = (1.f - signedDistToTrianglePlane) / normalDotVelocity;
+    t0      = (-1.f - signedDistToTrianglePlane) / normalDotVelocity;
+    auto t1 = (1.f - signedDistToTrianglePlane) / normalDotVelocity;
 
     if (t0 > t1) {
       std::swap(t0, t1);
@@ -226,8 +228,8 @@ void Collider::_testTriangle(size_t faceIndex,
 
   _collisionPoint.copyFromFloats(0.f, 0.f, 0.f);
 
-  bool found = false;
-  float t    = 1.f;
+  auto found = false;
+  auto t     = 1.f;
 
   if (!embeddedInPlane) {
     _basePoint.subtractToRef(trianglePlane.normal, _planeIntersectionPoint);
@@ -243,13 +245,13 @@ void Collider::_testTriangle(size_t faceIndex,
   }
 
   if (!found) {
-    float velocitySquaredLength = _velocity.lengthSquared();
+    auto velocitySquaredLength = _velocity.lengthSquared();
 
-    float a = velocitySquaredLength;
+    auto a = velocitySquaredLength;
 
     _basePoint.subtractToRef(p1, _tempVector);
-    float b = 2.f * (Vector3::Dot(_velocity, _tempVector));
-    float c = _tempVector.lengthSquared() - 1.f;
+    auto b = 2.f * (Vector3::Dot(_velocity, _tempVector));
+    auto c = _tempVector.lengthSquared() - 1.f;
 
     auto lowestRoot = GetLowestRoot(a, b, c, t);
     if (lowestRoot.found) {
@@ -282,9 +284,9 @@ void Collider::_testTriangle(size_t faceIndex,
 
     p2.subtractToRef(p1, _edge);
     p1.subtractToRef(_basePoint, _baseToVertex);
-    float edgeSquaredLength   = _edge.lengthSquared();
-    float edgeDotVelocity     = Vector3::Dot(_edge, _velocity);
-    float edgeDotBaseToVertex = Vector3::Dot(_edge, _baseToVertex);
+    auto edgeSquaredLength   = _edge.lengthSquared();
+    auto edgeDotVelocity     = Vector3::Dot(_edge, _velocity);
+    auto edgeDotBaseToVertex = Vector3::Dot(_edge, _baseToVertex);
 
     a = edgeSquaredLength * (-velocitySquaredLength)
         + edgeDotVelocity * edgeDotVelocity;
@@ -295,8 +297,8 @@ void Collider::_testTriangle(size_t faceIndex,
 
     lowestRoot = GetLowestRoot(a, b, c, t);
     if (lowestRoot.found) {
-      float _f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex)
-                 / edgeSquaredLength;
+      auto _f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex)
+                / edgeSquaredLength;
 
       if (_f >= 0.f && _f <= 1.f) {
         t     = lowestRoot.root;
@@ -320,8 +322,8 @@ void Collider::_testTriangle(size_t faceIndex,
         + edgeDotBaseToVertex * edgeDotBaseToVertex;
     lowestRoot = GetLowestRoot(a, b, c, t);
     if (lowestRoot.found) {
-      float _f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex)
-                 / edgeSquaredLength;
+      auto _f = (edgeDotVelocity * lowestRoot.root - edgeDotBaseToVertex)
+                / edgeSquaredLength;
 
       if (_f >= 0.f && _f <= 1.f) {
         t     = lowestRoot.root;
@@ -359,7 +361,7 @@ void Collider::_testTriangle(size_t faceIndex,
   }
 
   if (found) {
-    float distToCollision = t * _velocity.length();
+    auto distToCollision = t * _velocity.length();
 
     if (!collisionFound || distToCollision < _nearestDistance) {
       if (!intersectionPointSet) {

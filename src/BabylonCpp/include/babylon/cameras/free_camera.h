@@ -10,6 +10,7 @@ namespace BABYLON {
 
 class Collider;
 class FreeCamera;
+using ColliderPtr   = std::shared_ptr<Collider>;
 using FreeCameraPtr = std::shared_ptr<FreeCamera>;
 
 /**
@@ -94,7 +95,8 @@ private:
   int get_collisionMask() const;
   void set_collisionMask(int mask);
   void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
-                                  AbstractMesh* collidedMesh = nullptr);
+                                  const AbstractMeshPtr& collidedMesh
+                                  = nullptr);
 
 protected:
   /**
@@ -148,7 +150,7 @@ public:
   /**
    * Event raised when the camera collide with a mesh in the scene.
    */
-  std::function<void(AbstractMesh* collidedMesh)> onCollide;
+  std::function<void(const AbstractMeshPtr& collidedMesh)> onCollide;
 
   /**
    * Hidden
@@ -168,7 +170,7 @@ public:
 
 private:
   // Collisions
-  std::unique_ptr<Collider> _collider;
+  ColliderPtr _collider;
   int _collisionMask;
   bool _needMoveForGravity;
   Vector3 _oldPosition;

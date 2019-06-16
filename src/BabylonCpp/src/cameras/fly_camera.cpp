@@ -5,7 +5,7 @@
 #include <babylon/cameras/inputs/fly_camera_keyboard_input.h>
 #include <babylon/cameras/inputs/fly_camera_mouse_input.h>
 #include <babylon/collisions/collider.h>
-#include <babylon/collisions/collision_coordinator_legacy.h>
+#include <babylon/collisions/collision_coordinator.h>
 #include <babylon/engines/engine.h>
 #include <babylon/engines/scene.h>
 
@@ -248,10 +248,8 @@ void FlyCamera::set_collisionMask(int mask)
   _collisionMask = !isNan(mask) ? mask : -1;
 }
 
-void FlyCamera::_collideWithWorld(const Vector3& /*displacement*/)
+void FlyCamera::_collideWithWorld(const Vector3& displacement)
 {
-  // TODO FIXME
-#if 0
   Vector3 globalPosition;
 
   if (parent) {
@@ -283,12 +281,16 @@ void FlyCamera::_collideWithWorld(const Vector3& /*displacement*/)
     actualDisplacement = displacement.add(getScene()->gravity);
   }
 
-  coordinator->getNewPosition(_oldPosition, actualDisplacement, _collider, 3,
-                              nullptr, _onCollisionPositionChange, uniqueId);
-#endif
+  coordinator->getNewPosition(
+    _oldPosition, actualDisplacement, _collider, 3, nullptr,
+    [this](size_t collisionIndex, Vector3& newPosition,
+           const AbstractMeshPtr& collidedMesh) {
+      _onCollisionPositionChange(collisionIndex, newPosition, collidedMesh);
+    },
+    uniqueId);
 }
 
-void FlyCamera::_onCollisionPositionChange(int /*collisionId*/,
+void FlyCamera::_onCollisionPositionChange(size_t /*collisionId*/,
                                            const Vector3& newPosition,
                                            const AbstractMeshPtr& collidedMesh)
 {

@@ -115,11 +115,8 @@ AxisScaleGizmo::AxisScaleGizmo(
       }
 
       auto pickedMesh = pointerInfo->pickInfo.pickedMesh;
-      auto it         = std::find_if(_rootMesh->getChildMeshes().begin(),
-                             _rootMesh->getChildMeshes().end(),
-                             [&pickedMesh](const AbstractMeshPtr& mesh) {
-                               return mesh.get() == pickedMesh;
-                             });
+      auto it         = std::find(_rootMesh->getChildMeshes().begin(),
+                          _rootMesh->getChildMeshes().end(), pickedMesh);
       auto isHovered  = (it != _rootMesh->getChildMeshes().end());
 
       auto material = isHovered ? hoverMaterial : _coloredMaterial;

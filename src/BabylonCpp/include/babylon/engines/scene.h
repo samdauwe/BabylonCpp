@@ -1468,13 +1468,13 @@ public:
    * @brief Force the sprite under the pointer.
    * @param sprite defines the sprite to use
    */
-  void setPointerOverSprite(Sprite* sprite);
+  void setPointerOverSprite(const SpritePtr& sprite);
 
   /**
    * @brief Gets the sprite under the pointer.
    * @returns a Sprite or null if no sprite is under the pointer
    */
-  Sprite* getPointerOverSprite() const;
+  SpritePtr& getPointerOverSprite();
 
   /** Physics **/
 
@@ -2035,22 +2035,6 @@ protected:
    * @see http://doc.babylonjs.com/features/playground_debuglayer
    */
   std::unique_ptr<DebugLayer>& get_debugLayer();
-
-  /**
-   * @brief Sets a boolean indicating if collisions are processed on a web
-   * worker.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#web-worker-based-collision-system-since-21
-   */
-  void set_workerCollisions(bool enabled);
-
-  /**
-   * @brief Gets a boolean indicating if collisions are processed on a web
-   * worker.
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#web-worker-based-collision-system-since-21
-   */
-  bool get_workerCollisions() const;
 
   /**
    * @brief Gets the octree used to boost mesh selection (picking).
@@ -2764,12 +2748,12 @@ public:
   /**
    * Hidden
    */
-  Sprite* _pointerOverSprite;
+  SpritePtr _pointerOverSprite;
 
   /**
    * Hidden
    */
-  Sprite* _pickedDownSprite;
+  SpritePtr _pickedDownSprite;
 
   /**
    * Hidden
@@ -3020,14 +3004,6 @@ public:
    * @see http://doc.babylonjs.com/features/playground_debuglayer
    */
   ReadOnlyProperty<Scene, std::unique_ptr<DebugLayer>> debugLayer;
-
-  /**
-   * Gets a boolean indicating if collisions are processed on a web
-   * worker
-   * @see
-   * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity#web-worker-based-collision-system-since-21
-   */
-  Property<Scene, bool> workerCollisions;
 
   /**
    * Gets the octree used to boost mesh selection (picking)
@@ -3366,8 +3342,6 @@ private:
   // Postprocesses
   std::unique_ptr<PostProcessRenderPipelineManager>
     _postProcessRenderPipelineManager;
-  // Collisions
-  bool _workerCollisions;
   // Actions
   std::vector<AbstractMesh*> _meshesForIntersections;
   // Sound Tracks

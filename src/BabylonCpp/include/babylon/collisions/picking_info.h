@@ -11,6 +11,7 @@ class AbstractMesh;
 class Sprite;
 class Vector2;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using SpritePtr       = std::shared_ptr<Sprite>;
 
 /**
  * Information about the result of picking within a scene
@@ -45,6 +46,11 @@ public:
 
 public:
   /**
+   * Hidden
+   */
+  bool _pickingUnavailable;
+
+  /**
    * If the pick collided with an object
    */
   bool hit;
@@ -62,7 +68,7 @@ public:
   /**
    * The mesh corresponding the the pick collision
    */
-  AbstractMesh* pickedMesh = nullptr;
+  AbstractMeshPtr pickedMesh;
 
   /**
    * (See getTextureCoordinates) The barycentric U coordinate that is used when
@@ -77,7 +83,8 @@ public:
   float bv;
 
   /**
-   * The id of the face on the mesh that was picked
+   * The index of the face on the mesh that was picked, or the index of the Line
+   * if the picked Mesh is a LinesMesh
    */
   unsigned int faceId;
 
@@ -89,13 +96,13 @@ public:
   /**
    * If a sprite was picked, this will be the sprite the pick collided with
    */
-  Sprite* pickedSprite;
+  SpritePtr pickedSprite;
 
   /**
    * If a mesh was used to do the picking (eg. 6dof controller) this will be
    * populated.
    */
-  AbstractMesh* originMesh;
+  AbstractMeshPtr originMesh;
 
   /**
    * The ray that was used to perform the picking.

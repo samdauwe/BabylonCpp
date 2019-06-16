@@ -8,6 +8,7 @@
 namespace BABYLON {
 
 class AbstractMesh;
+using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
 
 /**
  * @brief Hidden
@@ -23,9 +24,6 @@ public:
                                    const Vector3& sphereCenter,
                                    float sphereRadius);
   static LowestRoot GetLowestRoot(float a, float b, float c, float maxR);
-
-  int collisionMask() const;
-  void setCollisionMask(int mask);
 
   /**
    * @brief Gets the plane normal used to compute the sliding response (in local
@@ -55,6 +53,10 @@ public:
   /** Hidden */
   void _getResponse(Vector3& pos, Vector3& vel);
 
+protected:
+  int get_collisionMask() const;
+  void set_collisionMask(int mask);
+
 public:
   /**
    * Define if a collision was found
@@ -70,7 +72,7 @@ public:
   /**
    * Define last collided mesh
    */
-  AbstractMesh* collidedMesh;
+  AbstractMeshPtr collidedMesh;
 
   unsigned int collidedMeshId;
   /** Hidden */
@@ -85,6 +87,8 @@ public:
   Vector3 _initialVelocity;
   /** Hidden */
   Vector3 _initialPosition;
+
+  Property<Collider, int> collisionMask;
 
 private:
   Vector3 _collisionPoint;

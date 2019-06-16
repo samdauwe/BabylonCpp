@@ -16,8 +16,8 @@
 #include <babylon/math/tmp.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/vertex_buffer.h>
-#include <babylon/sprites/sprite_scene_component.h>
 #include <babylon/misc/tools.h>
+#include <babylon/sprites/sprite_scene_component.h>
 
 namespace BABYLON {
 
@@ -208,7 +208,7 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
   auto min                 = Vector3::Zero();
   auto max                 = Vector3::Zero();
   auto distance            = std::numeric_limits<float>::max();
-  Sprite* currentSprite    = nullptr;
+  SpritePtr currentSprite  = nullptr;
   auto pickedPoint         = Vector3::Zero();
   auto cameraSpacePosition = Vector3::Zero();
   auto cameraView          = camera->getViewMatrix();
@@ -245,7 +245,7 @@ SpriteManager::intersects(const Ray ray, const CameraPtr& camera,
 
       if (distance > currentDistance) {
         distance      = currentDistance;
-        currentSprite = sprite.get();
+        currentSprite = sprite;
 
         if (fastCheck) {
           break;

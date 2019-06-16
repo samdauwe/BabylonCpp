@@ -100,8 +100,8 @@ void FreeCamera::_collideWithWorld(Vector3& displacement)
     _collider = std::make_unique<Collider>();
   }
 
-  _collider->_radius = ellipsoid;
-  _collider->setCollisionMask(_collisionMask);
+  _collider->_radius       = ellipsoid;
+  _collider->collisionMask = _collisionMask;
 
   // no need for clone, as long as gravity is not on.
   auto actualDisplacement = displacement;
@@ -114,8 +114,9 @@ void FreeCamera::_collideWithWorld(Vector3& displacement)
   }
 
   getScene()->collisionCoordinator->getNewPosition(
-    _oldPosition, actualDisplacement, _collider.get(), 3, nullptr,
-    [&](int collisionId, Vector3& newPosition, AbstractMesh* collidedMesh) {
+    _oldPosition, actualDisplacement, _collider, 3, nullptr,
+    [&](int collisionId, Vector3& newPosition,
+        const AbstractMeshPtr& collidedMesh) {
       _onCollisionPositionChange(collisionId, newPosition, collidedMesh);
     },
     static_cast<unsigned>(uniqueId));
@@ -123,12 +124,8 @@ void FreeCamera::_collideWithWorld(Vector3& displacement)
 
 void FreeCamera::_onCollisionPositionChange(int /*collisionId*/,
                                             Vector3& newPosition,
-                                            AbstractMesh* collidedMesh)
+                                            const AbstractMeshPtr& collidedMesh)
 {
-  if (getScene()->workerCollisions()) {
-    newPosition.multiplyInPlace(_collider->_radius);
-  }
-
   auto updatePosition = [&](Vector3& newPos) {
     _newPosition.copyFrom(newPos);
 

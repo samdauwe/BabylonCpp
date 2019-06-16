@@ -10,6 +10,7 @@ class AbstractMesh;
 class Scene;
 class Sprite;
 using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
+using SpritePtr       = std::shared_ptr<Sprite>;
 
 /**
  * @brief ActionEvent is the event being sent when an action is triggered.
@@ -55,7 +56,7 @@ public:
    * @param additionalData additional data for the event
    * @returns the new ActionEvent
    */
-  static ActionEvent CreateNewFromSprite(Sprite* source, Scene* scene,
+  static ActionEvent CreateNewFromSprite(const SpritePtr& source, Scene* scene,
                                          const Event& evt);
 
   /**
@@ -84,7 +85,7 @@ public:
   /** The mesh that triggered the action */
   AbstractMeshPtr source;
   /** The sprite that triggered the action */
-  Sprite* sprite;
+  SpritePtr sprite;
   /** The X mouse cursor position at the time of the event */
   int pointerX;
   /** The Y mouse cursor position at the time of the event */

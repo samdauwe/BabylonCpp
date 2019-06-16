@@ -10,6 +10,7 @@ class Collider;
 class FlyCamera;
 struct FlyCameraInputsManager;
 class ICanvas;
+using ColliderPtr  = std::shared_ptr<Collider>;
 using FlyCameraPtr = std::shared_ptr<FlyCamera>;
 
 /**
@@ -188,9 +189,9 @@ private:
   /**
    * @brief Hidden
    */
-  void _onCollisionPositionChange(int collisionId, const Vector3& newPosition,
-                                  const AbstractMeshPtr& collidedMesh
-                                  = nullptr);
+  void
+  _onCollisionPositionChange(size_t collisionId, const Vector3& newPosition,
+                             const AbstractMeshPtr& collidedMesh = nullptr);
 
 public:
   /**
@@ -303,7 +304,7 @@ public:
   Property<FlyCamera, int> collisionMask;
 
 private:
-  std::unique_ptr<Collider> _collider;
+  ColliderPtr _collider;
   bool _needMoveForGravity;
   Vector3 _oldPosition;
   Vector3 _diffPosition;

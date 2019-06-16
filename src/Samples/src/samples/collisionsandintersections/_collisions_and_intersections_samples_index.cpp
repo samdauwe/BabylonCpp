@@ -13,7 +13,7 @@ _CollisionsAndIntersectionsSamplesIndex::
 
   // Collisions Scene
   _samples["CollisionsScene"]
-    = std::make_tuple(true,                                                //
+    = std::make_tuple(false,                                               //
                       [](ICanvas* iCanvas) {                               //
                         return std::make_unique<CollisionsScene>(iCanvas); //
                       });                                                  //

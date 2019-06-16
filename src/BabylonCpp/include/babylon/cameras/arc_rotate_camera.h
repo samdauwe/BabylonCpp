@@ -17,6 +17,7 @@ class BouncingBehavior;
 class Collider;
 class FramingBehavior;
 using ArcRotateCameraPtr = std::shared_ptr<ArcRotateCamera>;
+using ColliderPtr        = std::shared_ptr<Collider>;
 
 /**
  * @brief This represents an orbital type of camera.
@@ -216,7 +217,8 @@ protected:
   Vector3 _getTargetPosition();
   void _checkLimits();
   void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
-                                  AbstractMesh* collidedMesh = nullptr);
+                                  const AbstractMeshPtr& collidedMesh
+                                  = nullptr);
 
 private:
   Vector3& get_target();
@@ -466,7 +468,7 @@ protected:
   std::unique_ptr<Vector3> _localDirection;
   Vector3 _transformedDirection;
   // Collisions
-  std::unique_ptr<Collider> _collider;
+  ColliderPtr _collider;
   Vector3 _previousPosition;
   Vector3 _collisionVelocity;
   Vector3 _newPosition;

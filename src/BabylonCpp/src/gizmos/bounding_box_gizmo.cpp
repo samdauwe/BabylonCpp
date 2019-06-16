@@ -298,7 +298,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
           const auto changeHoverColor
             = [&](const std::vector<AbstractMeshPtr>& meshes) {
                 for (auto& mesh : meshes) {
-                  if (pointerInfo->pickInfo.pickedMesh == mesh.get()) {
+                  if (pointerInfo->pickInfo.pickedMesh == mesh) {
                     pointerIds[(pointerInfo->pointerEvent).pointerId] = mesh;
                     mesh->material = hoverColoredMaterial;
                   }
@@ -311,7 +311,7 @@ BoundingBoxGizmo::BoundingBoxGizmo(
           if (stl_util::contains(pointerIds,
                                  (pointerInfo->pointerEvent).pointerId)
               && pointerInfo->pickInfo.pickedMesh
-                   != pointerIds[(pointerInfo->pointerEvent).pointerId].get()) {
+                   != pointerIds[(pointerInfo->pointerEvent).pointerId]) {
             pointerIds[(pointerInfo->pointerEvent).pointerId]->material
               = coloredMaterial;
             pointerIds.erase((pointerInfo->pointerEvent).pointerId);
@@ -578,7 +578,7 @@ MeshPtr BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
     root->isPickable = false;
     for (auto& c : root->getChildMeshes()) {
       makeNotPickable(c.get());
-    };
+    }
   };
   makeNotPickable(mesh);
 
@@ -617,7 +617,7 @@ void BoundingBoxGizmo::setCustomMesh(const MeshPtr& /*mesh*/,
                                      bool /*useGizmoMaterial*/)
 {
   BABYLON_LOG_ERROR("BoundingBoxGizmo",
-                    "Custom meshes are not supported on this gizmo");
+                    "Custom meshes are not supported on this gizmo")
 }
 
 } // end of namespace BABYLON

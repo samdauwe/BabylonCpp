@@ -115,7 +115,7 @@ void PointerDragBehavior::attach(const MeshPtr& ownerNode)
       if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
         if (!dragging && _pickInfo.hit && _pickInfo.pickedMesh
             && _pickInfo.pickedPoint && _pickInfo.ray
-            && pickPredicate(_pickInfo.pickedMesh)) {
+            && pickPredicate(_pickInfo.pickedMesh.get())) {
           _startDrag(pointerInfo->pointerEvent.pointerId,
                      pointerInfo->pickInfo.ray,
                      pointerInfo->pickInfo.pickedPoint);

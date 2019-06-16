@@ -82,8 +82,8 @@ ActionEvent ActionEvent::CreateNew(AbstractMesh* iSource,
                      scene->meshUnderPointer(), evt);
 }
 
-ActionEvent ActionEvent::CreateNewFromSprite(Sprite* source, Scene* scene,
-                                             const Event& evt)
+ActionEvent ActionEvent::CreateNewFromSprite(const SpritePtr& source,
+                                             Scene* scene, const Event& evt)
 {
   ActionEvent actionEvent(nullptr, scene->pointerX(), scene->pointerY(),
                           scene->meshUnderPointer(), evt);

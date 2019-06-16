@@ -43,9 +43,9 @@ GizmoManager::GizmoManager(Scene* iScene)
       }
       if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
         if (pointerInfo->pickInfo.pickedMesh) {
-          Node* node = pointerInfo->pickInfo.pickedMesh ?
-                         pointerInfo->pickInfo.pickedMesh :
-                         nullptr;
+          auto node = pointerInfo->pickInfo.pickedMesh ?
+                        pointerInfo->pickInfo.pickedMesh :
+                        nullptr;
           if (attachableMeshes == std::nullopt) {
             // Attach to the most parent node
             while (node && node->parent() != nullptr) {
@@ -56,9 +56,8 @@ GizmoManager::GizmoManager(Scene* iScene)
             // Attach to the parent node that is an attachableMesh
             auto found = false;
             for (auto& mesh : *attachableMeshes) {
-              if (node
-                  && (node == mesh.get() || node->isDescendantOf(mesh.get()))) {
-                node  = mesh.get();
+              if (node && (node == mesh || node->isDescendantOf(mesh.get()))) {
+                node  = mesh;
                 found = true;
               }
             }
@@ -67,7 +66,7 @@ GizmoManager::GizmoManager(Scene* iScene)
             }
           }
           if (node && node->type() == Type::ABSTRACTMESH) {
-            if (_attachedMesh.get() != node) {
+            if (_attachedMesh != node) {
               attachToMesh(std::static_pointer_cast<AbstractMesh>(
                 node->shared_from_this()));
             }

@@ -29,6 +29,7 @@ namespace BABYLON {
 struct _OcclusionDataStorage;
 class ActionManager;
 class Camera;
+class Collider;
 struct IEdgesRenderer;
 class Light;
 class Material;
@@ -39,6 +40,7 @@ class RenderingGroup;
 class Skeleton;
 class SolidParticle;
 using _OcclusionDataStoragePtr = std::shared_ptr<_OcclusionDataStorage>;
+using ColliderPtr              = std::shared_ptr<Collider>;
 using CameraPtr                = std::shared_ptr<Camera>;
 using LightPtr                 = std::shared_ptr<Light>;
 using MaterialPtr              = std::shared_ptr<Material>;
@@ -570,18 +572,18 @@ public:
    */
   AbstractMesh& _collideForSubMesh(SubMesh* subMesh,
                                    const Matrix& transformMatrix,
-                                   Collider* collider);
+                                   Collider& collider);
 
   /**
    * @brief Hidden
    */
-  AbstractMesh& _processCollisionsForSubMeshes(Collider* collider,
+  AbstractMesh& _processCollisionsForSubMeshes(Collider& collider,
                                                const Matrix& transformMatrix);
 
   /**
    * @brief Hidden
    */
-  AbstractMesh& _checkCollision(Collider* collider);
+  AbstractMesh& _checkCollision(Collider& collider);
 
   /** Picking **/
 
@@ -1221,7 +1223,7 @@ protected:
    * @see
    * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
-  std::unique_ptr<Collider>& get_collider();
+  ColliderPtr& get_collider();
 
   /** Physics **/
 
@@ -1268,7 +1270,8 @@ private:
    * @brief Hidden
    */
   void _onCollisionPositionChange(int collisionId, Vector3& newPosition,
-                                  AbstractMesh* collidedMesh = nullptr);
+                                  const AbstractMeshPtr& collidedMesh
+                                  = nullptr);
   // Facet data
 
   /**
@@ -1741,7 +1744,7 @@ public:
    * @see
    * http://doc.babylonjs.com/babylon101/cameras,_mesh_collisions_and_gravity
    */
-  ReadOnlyProperty<AbstractMesh, std::unique_ptr<Collider>> collider;
+  ReadOnlyProperty<AbstractMesh, ColliderPtr> collider;
 
 private:
   _FacetDataStorage _facetData;
@@ -1767,7 +1770,7 @@ private:
   bool _checkCollisions;
   int _collisionMask;
   int _collisionGroup;
-  std::unique_ptr<Collider> _collider;
+  ColliderPtr _collider;
   Vector3 _oldPositionForCollisions;
   Vector3 _diffPositionForCollisions;
   /** Hidden */

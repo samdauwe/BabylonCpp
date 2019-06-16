@@ -15,8 +15,7 @@
 #include <babylon/cameras/camera.h>
 #include <babylon/cameras/free_camera.h>
 #include <babylon/cameras/target_camera.h>
-#include <babylon/collisions/collision_coordinator_legacy.h>
-#include <babylon/collisions/collision_coordinator_worker.h>
+#include <babylon/collisions/collision_coordinator.h>
 #include <babylon/collisions/icollision_coordinator.h>
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_box.h>
@@ -63,6 +62,7 @@
 #include <babylon/meshes/simplification/simplification_queue.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/physics/physics_engine.h>
@@ -80,7 +80,6 @@
 #include <babylon/rendering/outline_renderer.h>
 #include <babylon/rendering/rendering_manager.h>
 #include <babylon/sprites/sprite_manager.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -187,8 +186,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
     , geometryBufferRenderer{this, &Scene::get_geometryBufferRenderer,
                              &Scene::set_geometryBufferRenderer}
     , debugLayer{this, &Scene::get_debugLayer}
-    , workerCollisions{this, &Scene::get_workerCollisions,
-                       &Scene::set_workerCollisions}
     , selectionOctree{this, &Scene::get_selectionOctree}
     , meshUnderPointer{this, &Scene::get_meshUnderPointer}
     , pointerX{this, &Scene::get_pointerX}
@@ -308,9 +305,6 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
   }
 
   attachControl();
-
-  // Collision coordinator initialization.
-  workerCollisions = false;
 
   // Uniform Buffer
   _createUbo();
@@ -748,29 +742,6 @@ std::unique_ptr<DebugLayer>& Scene::get_debugLayer()
   return _debugLayer;
 }
 
-void Scene::set_workerCollisions(bool enabled)
-{
-  _workerCollisions = enabled;
-  if (collisionCoordinator) {
-    collisionCoordinator->destroy();
-    collisionCoordinator.reset(nullptr);
-  }
-
-  if (enabled) {
-    collisionCoordinator = std::make_unique<CollisionCoordinatorWorker>();
-  }
-  else {
-    collisionCoordinator = std::make_unique<CollisionCoordinatorLegacy>();
-  }
-
-  collisionCoordinator->init(this);
-}
-
-bool Scene::get_workerCollisions() const
-{
-  return _workerCollisions;
-}
-
 std::vector<AbstractMeshPtr> Scene::getMeshes() const
 {
   std::vector<AbstractMeshPtr> _meshes;
@@ -1034,7 +1005,7 @@ Scene& Scene::_processPointerMove(std::optional<PickingInfo>& pickResult,
   auto isMeshPicked
     = (pickResult && pickResult->hit && pickResult->pickedMesh) ? true : false;
   if (isMeshPicked) {
-    setPointerOverMesh(pickResult->pickedMesh);
+    setPointerOverMesh(pickResult->pickedMesh.get());
 
     if (_pointerOverMesh && _pointerOverMesh->actionManager
         && _pointerOverMesh->actionManager->hasPointerTriggers()) {
@@ -1122,7 +1093,7 @@ Scene& Scene::_processPointerDown(std::optional<PickingInfo>& pickResult,
                                   const PointerEvent& evt)
 {
   if (pickResult && (*pickResult).hit && (*pickResult).pickedMesh) {
-    _pickedDownMesh     = (*pickResult).pickedMesh;
+    _pickedDownMesh     = (*pickResult).pickedMesh.get();
     auto iActionManager = _pickedDownMesh->actionManager;
     if (iActionManager) {
       if (iActionManager->hasPickTriggers()) {
@@ -1227,7 +1198,7 @@ Scene& Scene::_processPointerUp(std::optional<PickingInfo>& pickResult,
 {
   if (pickResult && pickResult && (*pickResult).pickedMesh) {
     const auto& _pickResult = *pickResult;
-    _pickedUpMesh           = _pickResult.pickedMesh;
+    _pickedUpMesh           = _pickResult.pickedMesh.get();
     if (_pickedDownMesh == _pickedUpMesh) {
       if (onPointerPick) {
         onPointerPick(evt, pickResult);
@@ -2377,10 +2348,6 @@ void Scene::addMesh(const AbstractMeshPtr& newMesh, bool recursive)
 {
   meshes.emplace_back(newMesh);
 
-  // notify the collision coordinator
-  if (collisionCoordinator) {
-    collisionCoordinator->onMeshAdded(newMesh.get());
-  }
   newMesh->_resyncLightSources();
 
   onNewMeshAddedObservable.notifyObservers(newMesh.get());
@@ -2937,11 +2904,6 @@ bool Scene::pushGeometry(const GeometryPtr& geometry, bool force)
 
   addGeometry(geometry);
 
-  // Notify the collision coordinator
-  if (collisionCoordinator) {
-    collisionCoordinator->onGeometryAdded(geometry.get());
-  }
-
   onNewGeometryAddedObservable.notifyObservers(geometry.get());
 
   return true;
@@ -2982,11 +2944,6 @@ bool Scene::removeGeometry(Geometry* geometry)
   }
 
   geometries.pop_back();
-
-  // notify the collision coordinator
-  if (collisionCoordinator) {
-    collisionCoordinator->onGeometryDeleted(geometry);
-  }
 
   onGeometryRemovedObservable.notifyObservers(geometry);
 
@@ -4695,7 +4652,7 @@ void Scene::setPointerOverMesh(AbstractMesh* mesh)
   }
 }
 
-void Scene::setPointerOverSprite(Sprite* sprite)
+void Scene::setPointerOverSprite(const SpritePtr& sprite)
 {
   if (_pointerOverSprite == sprite) {
     return;
@@ -4717,7 +4674,7 @@ void Scene::setPointerOverSprite(Sprite* sprite)
   }
 }
 
-Sprite* Scene::getPointerOverSprite() const
+SpritePtr& Scene::getPointerOverSprite()
 {
   return _pointerOverSprite;
 }

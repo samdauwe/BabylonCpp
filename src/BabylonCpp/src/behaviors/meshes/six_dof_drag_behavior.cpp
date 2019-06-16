@@ -73,7 +73,7 @@ void SixDofDragBehavior::attach(const MeshPtr& ownerNode)
     if (pointerInfo->type == PointerEventTypes::POINTERDOWN) {
       if (!dragging && pointerInfo->pickInfo.hit
           && pointerInfo->pickInfo.pickedMesh && pointerInfo->pickInfo.ray
-          && pickPredicate(pointerInfo->pickInfo.pickedMesh)) {
+          && pickPredicate(pointerInfo->pickInfo.pickedMesh.get())) {
         if (_scene->activeCamera
             && _scene->activeCamera->cameraRigMode == Camera::RIG_MODE_NONE) {
           auto ray = *pointerInfo->pickInfo.ray;
