@@ -22,11 +22,11 @@ void AnaglyphGamepadCamera::AddNodeConstructor()
   AnaglyphGamepadCamera::NodeConstructorAdded = true;
 }
 
-AnaglyphGamepadCamera::AnaglyphGamepadCamera(const std::string& name,
-                                             const Vector3& position,
+AnaglyphGamepadCamera::AnaglyphGamepadCamera(const std::string& iName,
+                                             const Vector3& iPosition,
                                              float iInteraxialDistance,
                                              Scene* scene)
-    : GamepadCamera{name, position, scene}
+    : GamepadCamera{iName, iPosition, scene}
 {
   interaxialDistance = iInteraxialDistance;
   RigParamaters rigParams;

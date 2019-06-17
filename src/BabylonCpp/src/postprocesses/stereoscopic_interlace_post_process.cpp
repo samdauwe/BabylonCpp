@@ -22,7 +22,7 @@ StereoscopicInterlacePostProcess::StereoscopicInterlacePostProcess(
                         1.f / static_cast<float>(height));
   });
   onApplyObservable.add([&](Effect* effect, EventState&) {
-    effect->setTextureFromPostProcess("camASampler", _passedProcess);
+    effect->setTextureFromPostProcess("camASampler", _passedProcess.get());
     effect->setFloat2("stepSize", _stepSize.x, _stepSize.y);
   });
 }

@@ -19,8 +19,10 @@
 #include <babylon/math/frustum.h>
 #include <babylon/misc/serialization_helper.h>
 #include <babylon/misc/tools.h>
+#include <babylon/postprocesses/anaglyph_post_process.h>
 #include <babylon/postprocesses/pass_post_process.h>
 #include <babylon/postprocesses/post_process.h>
+#include <babylon/postprocesses/stereoscopic_interlace_post_process.h>
 
 namespace BABYLON {
 
@@ -296,7 +298,7 @@ const std::vector<CameraPtr>& Camera::rigCameras() const
   return _rigCameras;
 }
 
-PostProcess* Camera::rigPostProcess()
+PostProcessPtr& Camera::rigPostProcess()
 {
   return _rigPostProcess;
 }
@@ -732,18 +734,18 @@ void Camera::setCameraRigMode(unsigned int iMode,
 
   switch (cameraRigMode) {
     case Camera::RIG_MODE_STEREOSCOPIC_ANAGLYPH:
-      Camera::_setStereoscopicAnaglyphRigMode(this);
+      Camera::_setStereoscopicAnaglyphRigMode(*this);
       break;
     case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL:
     case Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED:
     case Camera::RIG_MODE_STEREOSCOPIC_OVERUNDER:
-      Camera::_setStereoscopicRigMode(this);
+      Camera::_setStereoscopicRigMode(*this);
       break;
     case Camera::RIG_MODE_VR:
-      Camera::_setVRRigMode(this, rigParams);
+      Camera::_setVRRigMode(*this, rigParams);
       break;
     case Camera::RIG_MODE_WEBVR:
-      Camera::_setWebVRRigMode(this, rigParams);
+      Camera::_setWebVRRigMode(*this, rigParams);
       break;
   }
 
@@ -751,20 +753,35 @@ void Camera::setCameraRigMode(unsigned int iMode,
   update();
 }
 
-void Camera::_setStereoscopicRigMode(Camera* /*camera*/)
+void Camera::_setStereoscopicRigMode(Camera& camera)
 {
+  const auto isStereoscopicHoriz
+    = camera.cameraRigMode == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_PARALLEL
+      || camera.cameraRigMode
+           == Camera::RIG_MODE_STEREOSCOPIC_SIDEBYSIDE_CROSSEYED;
+
+  camera._rigCameras[0]->_rigPostProcess = PassPostProcess::New(
+    camera.name + "_passthru", 1.f, camera._rigCameras[0]);
+  camera._rigCameras[1]->_rigPostProcess
+    = StereoscopicInterlacePostProcess::New(camera.name + "_stereoInterlace",
+                                            camera._rigCameras,
+                                            isStereoscopicHoriz);
 }
 
-void Camera::_setStereoscopicAnaglyphRigMode(Camera* /*camera*/)
+void Camera::_setStereoscopicAnaglyphRigMode(Camera& camera)
 {
+  camera._rigCameras[0]->_rigPostProcess = PassPostProcess::New(
+    camera.name + "_passthru", 1.f, camera._rigCameras[0]);
+  camera._rigCameras[1]->_rigPostProcess = AnaglyphPostProcess::New(
+    camera.name + "_anaglyph", 1.f, camera._rigCameras);
 }
 
-void Camera::_setVRRigMode(Camera* /*camera*/,
+void Camera::_setVRRigMode(Camera& /*camera*/,
                            const RigParamaters& /*rigParams*/)
 {
 }
 
-void Camera::_setWebVRRigMode(Camera* /*camera*/,
+void Camera::_setWebVRRigMode(Camera& /*camera*/,
                               const RigParamaters& /*rigParams*/)
 {
 }

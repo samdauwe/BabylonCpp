@@ -22,11 +22,11 @@ void AnaglyphUniversalCamera::AddNodeConstructor()
   AnaglyphUniversalCamera::NodeConstructorAdded = true;
 }
 
-AnaglyphUniversalCamera::AnaglyphUniversalCamera(const std::string& name,
-                                                 const Vector3& position,
+AnaglyphUniversalCamera::AnaglyphUniversalCamera(const std::string& iName,
+                                                 const Vector3& iPosition,
                                                  float iInteraxialDistance,
                                                  Scene* scene)
-    : UniversalCamera{name, position, scene}
+    : UniversalCamera{iName, iPosition, scene}
 {
   interaxialDistance = iInteraxialDistance;
   RigParamaters rigParams;

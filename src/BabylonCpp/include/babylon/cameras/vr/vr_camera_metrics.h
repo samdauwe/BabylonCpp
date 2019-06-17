@@ -131,6 +131,11 @@ public:
    */
   bool compensateDistortion;
 
+  /**
+   * Defines if multiview should be enabled when rendering (Default: false)
+   */
+  bool multiviewEnabled;
+
 }; // end of class VRCameraMetrics
 
 } // end of namespace BABYLON

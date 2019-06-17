@@ -26,12 +26,12 @@ void StereoscopicFreeCamera::AddNodeConstructor()
   StereoscopicFreeCamera::NodeConstructorAdded = true;
 }
 
-StereoscopicFreeCamera::StereoscopicFreeCamera(const std::string& name,
-                                               const Vector3& position,
+StereoscopicFreeCamera::StereoscopicFreeCamera(const std::string& iName,
+                                               const Vector3& iPosition,
                                                float iInteraxialDistance,
                                                bool iIsStereoscopicSideBySide,
                                                Scene* scene)
-    : FreeCamera{name, position, scene}
+    : FreeCamera{iName, iPosition, scene}
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;

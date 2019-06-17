@@ -40,11 +40,12 @@ protected:
    */
   AnaglyphPostProcess(const std::string& name, float ratio,
                       const std::vector<CameraPtr>& rigCameras,
-                      unsigned int samplingMode, Engine* engine,
-                      bool reusable = false);
+                      unsigned int samplingMode
+                      = TextureConstants::NEAREST_SAMPLINGMODE,
+                      Engine* engine = nullptr, bool reusable = false);
 
 private:
-  PostProcess* _passedProcess;
+  PostProcessPtr _passedProcess;
 
 }; // end of class AnaglyphPostProcess
 

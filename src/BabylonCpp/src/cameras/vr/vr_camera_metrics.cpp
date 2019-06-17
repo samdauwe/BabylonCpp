@@ -20,6 +20,7 @@ VRCameraMetrics::VRCameraMetrics()
     , postProcessScaleFactor{1.714605507808412f}
     , lensCenterOffset{0.151976421f}
     , compensateDistortion{true}
+    , multiviewEnabled{false}
 {
 }
 
@@ -37,6 +38,7 @@ VRCameraMetrics::VRCameraMetrics(VRCameraMetrics& other)
     , postProcessScaleFactor{other.postProcessScaleFactor}
     , lensCenterOffset{other.lensCenterOffset}
     , compensateDistortion{other.compensateDistortion}
+    , multiviewEnabled{other.multiviewEnabled}
 {
 }
 
@@ -54,6 +56,7 @@ VRCameraMetrics::VRCameraMetrics(VRCameraMetrics&& other)
     , postProcessScaleFactor{std::move(other.postProcessScaleFactor)}
     , lensCenterOffset{std::move(other.lensCenterOffset)}
     , compensateDistortion{std::move(other.compensateDistortion)}
+    , multiviewEnabled{std::move(other.multiviewEnabled)}
 {
 }
 
@@ -73,6 +76,7 @@ VRCameraMetrics& VRCameraMetrics::operator=(const VRCameraMetrics& other)
     postProcessScaleFactor = other.postProcessScaleFactor;
     lensCenterOffset       = other.lensCenterOffset;
     compensateDistortion   = other.compensateDistortion;
+    multiviewEnabled       = other.multiviewEnabled;
   }
 
   return *this;
@@ -94,6 +98,7 @@ VRCameraMetrics& VRCameraMetrics::operator=(VRCameraMetrics&& other)
     postProcessScaleFactor = std::move(other.postProcessScaleFactor);
     lensCenterOffset       = std::move(other.lensCenterOffset);
     compensateDistortion   = std::move(other.compensateDistortion);
+    multiviewEnabled       = std::move(other.multiviewEnabled);
   }
 
   return *this;

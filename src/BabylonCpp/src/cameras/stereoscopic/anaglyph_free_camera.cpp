@@ -22,10 +22,10 @@ void AnaglyphFreeCamera::AddNodeConstructor()
   AnaglyphFreeCamera::NodeConstructorAdded = true;
 }
 
-AnaglyphFreeCamera::AnaglyphFreeCamera(const std::string& name,
-                                       const Vector3& position,
+AnaglyphFreeCamera::AnaglyphFreeCamera(const std::string& iName,
+                                       const Vector3& iPosition,
                                        float iInteraxialDistance, Scene* scene)
-    : FreeCamera{name, position, scene}
+    : FreeCamera{iName, iPosition, scene}
 {
   interaxialDistance = iInteraxialDistance;
   RigParamaters rigParams;

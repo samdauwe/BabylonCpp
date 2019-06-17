@@ -27,9 +27,9 @@ void StereoscopicUniversalCamera::AddNodeConstructor()
 }
 
 StereoscopicUniversalCamera::StereoscopicUniversalCamera(
-  const std::string& name, const Vector3& position, float iInteraxialDistance,
+  const std::string& iName, const Vector3& iPosition, float iInteraxialDistance,
   bool iIsStereoscopicSideBySide, Scene* scene)
-    : UniversalCamera{name, position, scene}
+    : UniversalCamera{iName, iPosition, scene}
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;

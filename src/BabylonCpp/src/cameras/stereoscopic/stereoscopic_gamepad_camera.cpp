@@ -27,9 +27,9 @@ void StereoscopicGamepadCamera::AddNodeConstructor()
 }
 
 StereoscopicGamepadCamera::StereoscopicGamepadCamera(
-  const std::string& name, const Vector3& position, float iInteraxialDistance,
+  const std::string& iName, const Vector3& iPosition, float iInteraxialDistance,
   bool iIsStereoscopicSideBySide, Scene* scene)
-    : GamepadCamera{name, position, scene}
+    : GamepadCamera{iName, iPosition, scene}
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;

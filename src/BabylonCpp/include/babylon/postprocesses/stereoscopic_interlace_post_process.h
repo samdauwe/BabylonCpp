@@ -7,6 +7,10 @@
 
 namespace BABYLON {
 
+class StereoscopicInterlacePostProcess;
+using StereoscopicInterlacePostProcessPtr
+  = std::shared_ptr<StereoscopicInterlacePostProcess>;
+
 /**
  * @brief StereoscopicInterlacePostProcess used to render stereo views from a
  * rigged camera.
@@ -15,6 +19,18 @@ class BABYLON_SHARED_EXPORT StereoscopicInterlacePostProcess
     : public PostProcess {
 
 public:
+  template <typename... Ts>
+  static StereoscopicInterlacePostProcessPtr New(Ts&&... args)
+  {
+    auto postProcess = std::shared_ptr<StereoscopicInterlacePostProcess>(
+      new StereoscopicInterlacePostProcess(std::forward<Ts>(args)...));
+    postProcess->add(postProcess);
+
+    return postProcess;
+  }
+  virtual ~StereoscopicInterlacePostProcess();
+
+protected:
   /**
    * @brief Initializes a StereoscopicInterlacePostProcess.
    * @param name The name of the effect.
@@ -31,13 +47,13 @@ public:
   StereoscopicInterlacePostProcess(const std::string& name,
                                    const std::vector<CameraPtr>& rigCameras,
                                    bool isStereoscopicHoriz,
-                                   unsigned int samplingMode, Engine* engine,
-                                   bool reusable = false);
-  virtual ~StereoscopicInterlacePostProcess();
+                                   unsigned int samplingMode = 0,
+                                   Engine* engine            = nullptr,
+                                   bool reusable             = false);
 
 private:
   Vector2 _stepSize;
-  PostProcess* _passedProcess;
+  PostProcessPtr _passedProcess;
 
 }; // end of class StereoscopicInterlacePostProcess
 

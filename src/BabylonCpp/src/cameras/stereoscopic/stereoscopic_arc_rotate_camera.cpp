@@ -27,10 +27,10 @@ void StereoscopicArcRotateCamera::AddNodeConstructor()
 }
 
 StereoscopicArcRotateCamera::StereoscopicArcRotateCamera(
-  const std::string& name, float alpha, float beta, float radius,
-  const Vector3& target, float iInteraxialDistance,
+  const std::string& iName, float iAlpha, float iBeta, float iRadius,
+  const Vector3& iTarget, float iInteraxialDistance,
   bool iIsStereoscopicSideBySide, Scene* scene)
-    : ArcRotateCamera{name, alpha, beta, radius, target, scene}
+    : ArcRotateCamera{iName, iAlpha, iBeta, iRadius, iTarget, scene}
 {
   interaxialDistance       = iInteraxialDistance;
   isStereoscopicSideBySide = iIsStereoscopicSideBySide;

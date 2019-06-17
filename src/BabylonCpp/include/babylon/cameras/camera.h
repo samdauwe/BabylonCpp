@@ -239,7 +239,7 @@ public:
   /**
    * @brief Gets the post process used by the rig cameras.
    */
-  PostProcess* rigPostProcess();
+  PostProcessPtr& rigPostProcess();
 
   /**
    * @brief Internal, gets the first post proces.
@@ -491,16 +491,16 @@ public:
                              bool useWasUpdatedFlag = false) override;
 
   /** Hidden */
-  static void _setStereoscopicRigMode(Camera* camera);
+  static void _setStereoscopicRigMode(Camera& camera);
 
   /** Hidden */
-  static void _setStereoscopicAnaglyphRigMode(Camera* camera);
+  static void _setStereoscopicAnaglyphRigMode(Camera& camera);
 
   /** Hidden */
-  static void _setVRRigMode(Camera* camera, const RigParamaters& rigParams);
+  static void _setVRRigMode(Camera& camera, const RigParamaters& rigParams);
 
   /** Hidden */
-  static void _setWebVRRigMode(Camera* camera, const RigParamaters& rigParams);
+  static void _setWebVRRigMode(Camera& camera, const RigParamaters& rigParams);
 
   /**
    * @brief Gets a camera constructor for a given camera type
@@ -735,7 +735,7 @@ public:
   /** Hidden */
   std::vector<CameraPtr> _rigCameras;
   /** Hidden */
-  PostProcess* _rigPostProcess;
+  PostProcessPtr _rigPostProcess;
   /** Hidden */
   bool _skipRendering;
 
