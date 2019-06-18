@@ -126,9 +126,10 @@ struct Image {
 }; // end of struct Image
 
 struct KeyboardEvent : public Event {
-  bool ctrlKey = false;
-  bool altKey  = false;
-  bool metaKey = false;
+  bool ctrlKey  = false;
+  bool altKey   = false;
+  bool metaKey  = false;
+  bool shiftKey = false;
   std::string code;
   void preventDefault() const
   {
