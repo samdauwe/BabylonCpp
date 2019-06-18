@@ -1,5 +1,6 @@
 #include <babylon/samples/particles/_particles_samples_index.h>
 
+#include <babylon/samples/particles/buildings_sps_scene.h>
 #include <babylon/samples/particles/lighted_sps_scene.h>
 #include <babylon/samples/particles/triangles_sps_scene.h>
 
@@ -10,6 +11,12 @@ _ParticlesSamplesIndex::_ParticlesSamplesIndex()
 {
   // -- Particles examples --
 
+  // Buildings SPS Scene
+  _samples["BuldingsSPSScene"]
+    = std::make_tuple(true,                                                 //
+                      [](ICanvas* iCanvas) {                                //
+                        return std::make_unique<BuldingsSPSScene>(iCanvas); //
+                      });                                                   //
   // Lighted SPS Scene
   _samples["LightedSPSScene"]
     = std::make_tuple(false,                                               //
