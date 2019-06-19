@@ -85,7 +85,10 @@ public:
   Vector3& getRotation();
 
   /**
-   * @brief Hidden
+   * @brief Defines the target the camera should look at.
+   * This will automatically adapt alpha beta and radius to fit within the new
+   * target.
+   * @param target Defines the new target as a Vector or a mesh
    */
   void setTarget(const Vector3& target);
 
@@ -161,7 +164,7 @@ private:
    */
   TargetCamera& _rotateUpVectorWithCameraRotationMatrix();
 
-  void _getRigCamPosition(float halfSpace, Vector3& result);
+  void _getRigCamPositionAndTarget(float halfSpace, TargetCamera& rigCamera);
   void _updateCameraRotationMatrix() override;
 
 public:
@@ -169,10 +172,17 @@ public:
    * Define the current direction the camera is moving to
    */
   std::unique_ptr<Vector3> cameraDirection;
+
   /**
    * Define the current rotation the camera is rotating to
    */
   std::unique_ptr<Vector2> cameraRotation;
+
+  /**
+   * When set, the up vector of the camera will be updated by the rotation of
+   * the camera
+   */
+  bool updateUpVectorFromRotation;
 
   /**
    * Define the current rotation of the camera
@@ -205,6 +215,10 @@ public:
    * Hidden
    */
   Vector3 _currentTarget;
+  /**
+   * Hidden
+   */
+  float _initialFocalDistance;
   /**
    * Hidden
    */
@@ -242,7 +256,10 @@ protected:
   Vector3 _globalCurrentUpVector;
 
 private:
-  Matrix _rigCamTransformMatrix;
+  static Matrix _RigCamTransformMatrix;
+  static Matrix _TargetTransformMatrix;
+  static Vector3 _TargetFocalPoint;
+  Quaternion _tmpQuaternion;
   Vector3 _defaultUp;
   float _cachedRotationZ;
   float _cachedQuaternionRotationZ;
