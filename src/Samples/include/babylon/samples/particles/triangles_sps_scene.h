@@ -45,7 +45,7 @@ private:
   PointLightPtr _pl;
   SolidParticleSystemPtr _sps;
 
-}; // end of struct TrianglesSPSScene
+}; // end of class TrianglesSPSScene
 
 } // end of namespace Samples
 } // end of namespace BABYLON

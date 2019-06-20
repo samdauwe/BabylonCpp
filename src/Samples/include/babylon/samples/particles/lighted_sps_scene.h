@@ -42,7 +42,7 @@ private:
   PointLightPtr _pl;
   SolidParticleSystemPtr _sps;
 
-}; // end of struct LightedSPSScene
+}; // end of class LightedSPSScene
 
 } // end of namespace Samples
 } // end of namespace BABYLON
