@@ -40,7 +40,7 @@ public:
    * @brief Gets the class name.
    * @returns "PostProcessRenderPipeline"
    */
-  const char* getClassName() const;
+  virtual const std::string getClassName() const;
 
   std::vector<CameraPtr> getCameras() const;
 

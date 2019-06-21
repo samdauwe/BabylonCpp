@@ -188,7 +188,7 @@ Scene* DefaultRenderingPipeline::scene() const
   return _scene;
 }
 
-std::string DefaultRenderingPipeline::getClassName() const
+const std::string DefaultRenderingPipeline::getClassName() const
 {
   return "DefaultRenderingPipeline";
 }

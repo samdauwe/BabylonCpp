@@ -22,7 +22,7 @@ PostProcessRenderPipeline::~PostProcessRenderPipeline()
 {
 }
 
-const char* PostProcessRenderPipeline::getClassName() const
+const std::string PostProcessRenderPipeline::getClassName() const
 {
   return "PostProcessRenderPipeline";
 }

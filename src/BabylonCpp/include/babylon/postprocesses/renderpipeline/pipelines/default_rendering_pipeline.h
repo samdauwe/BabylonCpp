@@ -7,9 +7,9 @@
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/misc/observer.h>
 #include <babylon/postprocesses/depth_of_field_effect_blur_level.h>
 #include <babylon/postprocesses/renderpipeline/post_process_render_pipeline.h>
-#include <babylon/misc/observer.h>
 
 using json = nlohmann::json;
 
@@ -98,7 +98,7 @@ public:
    * @brief Get the class name.
    * @returns "DefaultRenderingPipeline"
    */
-  std::string getClassName() const;
+  const std::string getClassName() const override;
 
   /**
    * @brief Force the compilation of the entire pipeline.

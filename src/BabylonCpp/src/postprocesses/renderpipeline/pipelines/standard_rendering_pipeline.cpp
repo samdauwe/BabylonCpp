@@ -543,7 +543,7 @@ void StandardRenderingPipeline::_buildPipeline()
   if (!_enableMSAAOnFirstPostProcess(_samples) && _samples > 1) {
     BABYLON_LOG_WARN("StandardRenderingPipeline",
                      "MSAA failed to enable, MSAA is only supported in "
-                     "browsers that support webGL >= 2.0");
+                     "browsers that support webGL >= 2.0")
   }
 }
 
@@ -1198,6 +1198,11 @@ void StandardRenderingPipeline::_disposePostProcesses()
   luminanceDownSamplePostProcesses.clear();
   blurHPostProcesses.clear();
   blurVPostProcesses.clear();
+}
+
+const std::string StandardRenderingPipeline::getClassName() const
+{
+  return "StandardRenderingPipeline";
 }
 
 void StandardRenderingPipeline::dispose(bool doNotRecurse,

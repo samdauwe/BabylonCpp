@@ -82,7 +82,7 @@ public:
    * @brief Get the class name.
    * @returns "SSAORenderingPipeline"
    */
-  std::string getClassName() const;
+  const std::string getClassName() const override;
 
   /** Hidden */
   void _rebuild() override;
