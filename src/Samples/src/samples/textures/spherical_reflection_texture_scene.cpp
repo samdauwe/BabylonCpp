@@ -36,7 +36,7 @@ void SphericalReflectionTextureScene::initializeScene(ICanvas* canvas,
   scene->ambientColor = Color3(1.f, 1.f, 1.f);
 
   auto light
-    = HemisphericLight::New("hemiLight", Vector3(-1.f, 10.f - 10.f), scene);
+    = HemisphericLight::New("hemiLight", Vector3(-1.f, 10.f, -10.f), scene);
   light->diffuse   = Color3(1.f, 1.f, 1.f);
   light->intensity = 0.5f;
 

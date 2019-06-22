@@ -18,6 +18,10 @@ namespace BABYLON {
 
 const Vector3 Vector3::_UpReadOnly = Vector3::Up();
 
+Vector3::Vector3() : x{0.f}, y{0.f}, z{0.f}
+{
+}
+
 Vector3::Vector3(float ix, float iy, float iz) : x{ix}, y{iy}, z{iz}
 {
 }
@@ -436,6 +440,11 @@ Vector3 Vector3::operator*(const Vector3& otherVector) const
 Vector3& Vector3::operator*=(const Vector3& otherVector)
 {
   return multiplyInPlace(otherVector);
+}
+
+Vector3 Vector3::operator/(float value) const
+{
+  return Vector3(x / value, y / value, z / value);
 }
 
 Vector3 Vector3::operator/(const Vector3& otherVector) const

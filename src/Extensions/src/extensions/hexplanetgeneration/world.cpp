@@ -201,8 +201,8 @@ bool World::generatePlanetTopology(const IcosahedronMesh& mesh, Topology& ret)
     tile.area   = area;
     tile.normal = tile.position;
     tile.normal.normalize();
-    tile.boundingSphere
-      = BoundingSphere(tile.averagePosition, maxDistanceToCorner);
+    tile.boundingSphere = BoundingSphere(
+      tile.averagePosition, Vector3(maxDistanceToCorner, 0.f, 0.f));
     ++i;
   }
 
@@ -231,7 +231,7 @@ void World::generatePlanetPartition(std::vector<Tile>& tiles,
     auto radius = std::max(
       Vector3::Distance(center, p0),
       std::max(Vector3::Distance(center, p2), Vector3::Distance(center, p2)));
-    face.boundingSphere = BoundingSphere(center, radius);
+    face.boundingSphere = BoundingSphere(center, Vector3(radius, 0.f, 0.f));
   }
 
   std::vector<Tile*> unparentedTiles;
@@ -257,8 +257,8 @@ void World::generatePlanetPartition(std::vector<Tile>& tiles,
     }
   }
 
-  rootPartition.boundingSphere
-    = BoundingSphere(Vector3(0.f, 0.f, 0.f), maxDistanceFromOrigin);
+  rootPartition.boundingSphere = BoundingSphere(
+    Vector3(0.f, 0.f, 0.f), Vector3(maxDistanceFromOrigin, 0.f, 0.f));
   rootPartition.tiles = unparentedTiles;
   for (auto& face : icosahedron.faces) {
     rootPartition.partitions.emplace_back(
@@ -886,7 +886,7 @@ void World::generateAirCurrentWhorls(float planetRadius,
   whorls.reserve(1
                  + layerCount
                      * static_cast<size_t>(std::ceil(
-                         planetRadius * fullRevolution / baseWhorlRadius))
+                       planetRadius * fullRevolution / baseWhorlRadius))
                      / 2
                  + 1);
 

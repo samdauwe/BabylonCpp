@@ -1961,7 +1961,7 @@ Vector2 SimplexNoise::dfBm(float x, uint8_t octaves, float lacunarity,
 Vector3 SimplexNoise::dfBm(const Vector2& v, uint8_t octaves, float lacunarity,
                            float gain)
 {
-  Vector3 sum = Vector3(0.0f);
+  Vector3 sum = Vector3(0.f, 0.f, 0.f);
   float freq  = 1.0f;
   float amp   = 0.5f;
 

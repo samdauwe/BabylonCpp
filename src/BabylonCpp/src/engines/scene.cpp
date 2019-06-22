@@ -166,6 +166,7 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
                                          get_postProcessRenderPipelineManager}
     , renderTargetsEnabled{true}
     , dumpNextRenderTargets{false}
+    , useDelayedTextureLoading{false}
     , probesEnabled{true}
     , actionManager{nullptr}
     , proceduralTexturesEnabled{true}

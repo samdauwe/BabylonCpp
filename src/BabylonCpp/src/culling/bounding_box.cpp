@@ -50,7 +50,7 @@ void BoundingBox::reConstruct(const Vector3& min, const Vector3& max,
   auto _max = max.addToRef(min, center);
   _max.scaleInPlace(0.5f);
   auto _min = _max.subtractToRef(min, extendSize);
-  _min.scaleInPlace(0.5);
+  _min.scaleInPlace(0.5f);
 
   _worldMatrix = worldMatrix ? worldMatrix.value() : Matrix::IdentityReadOnly();
 

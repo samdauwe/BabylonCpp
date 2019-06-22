@@ -34,7 +34,8 @@ public:
    * @param y defines the second coordinates (on Y axis)
    * @param z defines the third coordinates (on Z axis)
    */
-  Vector3(float x = 0.f, float y = 0.f, float z = 0.f);
+  Vector3();
+  Vector3(float x, float y, float z);
   Vector3(const Vector3& otherVector);
   Vector3(Vector3&& otherVector);
   ~Vector3();
@@ -419,6 +420,7 @@ public:
   Vector3& operator*=(float scaleVal);
   Vector3 operator*(const Vector3& otherVector) const;
   Vector3& operator*=(const Vector3& otherVector);
+  Vector3 operator/(float value) const;
   Vector3 operator/(const Vector3& otherVector) const;
   Vector3& operator/=(float scaleVal);
   Vector3& operator/=(const Vector3& otherVector);
