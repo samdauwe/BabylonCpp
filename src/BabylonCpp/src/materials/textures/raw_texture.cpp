@@ -11,14 +11,14 @@ RawTexture::RawTexture(const ArrayBufferView& data, int width, int height,
                        unsigned int iFormat, Scene* scene, bool generateMipMaps,
                        bool iInvertY, unsigned int iSamplingMode,
                        unsigned int iType)
-    : Texture{nullptr, scene, !generateMipMaps, iInvertY}
+    : Texture{"", scene, !generateMipMaps, iInvertY}
     , format{iFormat}
     , type{iType}
 {
   _engine  = scene->getEngine();
   _texture = scene->getEngine()->createRawTexture(
     data.uint8Array, width, height, format, generateMipMaps, iInvertY,
-    iSamplingMode, nullptr, iType);
+    iSamplingMode, "", iType);
 
   _texture = scene->getEngine()->createRawTexture(
     data.uint8Array, width, height, iFormat, generateMipMaps, iInvertY,

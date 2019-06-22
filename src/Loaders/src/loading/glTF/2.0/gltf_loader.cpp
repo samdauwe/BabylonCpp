@@ -500,8 +500,6 @@ TransformNodePtr GLTFLoader::loadNodeAsync(
       String::printf("%s: Invalid recursive node hierarchy", context.c_str()));
   }
 
-  std::vector<std::function<void()>> promises;
-
   logOpen(String::printf("%s %s", context.c_str(), node.name.c_str()));
 
   const auto loadNode
@@ -513,12 +511,10 @@ TransformNodePtr GLTFLoader::loadNodeAsync(
       const auto& camera
         = ArrayItem::Get(String::printf("%s/camera", context.c_str()),
                          gltf->cameras, *node.camera);
-      promises.emplace_back([&]() -> void {
-        loadCameraAsync(String::printf("/cameras/%ld", camera.index), camera,
-                        [&](const CameraPtr& babylonCamera) -> void {
-                          babylonCamera->parent = babylonTransformNode.get();
-                        });
-      });
+      loadCameraAsync(String::printf("/cameras/%ld", camera.index), camera,
+                      [&](const CameraPtr& babylonCamera) -> void {
+                        babylonCamera->parent = babylonTransformNode.get();
+                      });
     }
 
     if (!node.children.empty()) {
@@ -526,13 +522,11 @@ TransformNodePtr GLTFLoader::loadNodeAsync(
         auto& childNode = ArrayItem::Get(
           String::printf("%s/children/%ld", context.c_str(), index),
           gltf->nodes, index);
-        promises.emplace_back([&]() -> void {
-          loadNodeAsync(String::printf("/nodes/%ld", childNode->index),
-                        *childNode,
-                        [&](const TransformNodePtr& childBabylonMesh) -> void {
-                          childBabylonMesh->parent = babylonTransformNode.get();
-                        });
-        });
+        loadNodeAsync(String::printf("/nodes/%ld", childNode->index),
+                      *childNode,
+                      [&](const TransformNodePtr& childBabylonMesh) -> void {
+                        childBabylonMesh->parent = babylonTransformNode.get();
+                      });
       }
     }
 
@@ -549,17 +543,11 @@ TransformNodePtr GLTFLoader::loadNodeAsync(
   else {
     auto& mesh = ArrayItem::Get(String::printf("%s/mesh", context.c_str()),
                                 gltf->meshes, *node.mesh);
-    promises.emplace_back([&]() -> void {
-      _loadMeshAsync(String::printf("/meshes/%ld", mesh.index), node, mesh,
-                     loadNode);
-    });
+    _loadMeshAsync(String::printf("/meshes/%ld", mesh.index), node, mesh,
+                   loadNode);
   }
 
   logClose();
-
-  for (auto&& promise : promises) {
-    promise();
-  }
 
   _forEachPrimitive(node, [](const AbstractMeshPtr& babylonMesh) -> void {
     babylonMesh->refreshBoundingInfo(true);
@@ -596,7 +584,7 @@ TransformNodePtr GLTFLoader::_loadMeshAsync(
       _loadMeshPrimitiveAsync(
         String::printf("%s/primitives/%ld", context.c_str(), primitive.index),
         name, node, mesh, primitive,
-        [&](const TransformNodePtr& babylonMesh) -> void {
+        [&node](const TransformNodePtr& babylonMesh) -> void {
           node._babylonTransformNode = babylonMesh;
           node._primitiveBabylonMeshes
             = {std::static_pointer_cast<AbstractMesh>(babylonMesh)};
@@ -608,7 +596,8 @@ TransformNodePtr GLTFLoader::_loadMeshAsync(
       = std::make_shared<TransformNode>(name, babylonScene);
     node._primitiveBabylonMeshes.clear();
     for (auto& primitive : primitives) {
-      promises.emplace_back([&]() -> void {
+      promises.emplace_back([this, &context, &mesh, &name, &node,
+                             &primitive]() -> void {
         _loadMeshPrimitiveAsync(
           String::printf("%s/primitives/%ld", context.c_str(), primitive.index),
           String::printf("%s_primitive%ld", name.c_str(), primitive.index),
@@ -625,7 +614,7 @@ TransformNodePtr GLTFLoader::_loadMeshAsync(
   if (node.skin.has_value()) {
     auto& skin = ArrayItem::Get(String::printf("%s/skin", context.c_str()),
                                 gltf->skins, *node.skin);
-    promises.emplace_back([&]() -> void {
+    promises.emplace_back([this, &node, &skin]() -> void {
       _loadSkinAsync(String::printf("/skins/%ld", skin.index), node, skin);
     });
   }
@@ -991,7 +980,9 @@ void GLTFLoader::_loadSkinAsync(const std::string& context, const INode& node,
     _updateBoneMatrices(babylonSkeleton, inverseBindMatricesData);
   };
 
-  skin._data->babylonSkeleton = babylonSkeleton;
+  skin._data = ISkin::ISkinData{
+    babylonSkeleton // babylonSkeleton
+  };
 
   promise();
 }
@@ -1219,7 +1210,7 @@ void GLTFLoader::_loadAnimationChannelAsync(
     return;
   }
 
-  const auto targetNode
+  const auto& targetNode
     = ArrayItem::Get(String::printf("%s/target/node", context.c_str()),
                      gltf->nodes, *channel.target.node);
 
