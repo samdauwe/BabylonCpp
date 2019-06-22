@@ -384,7 +384,7 @@ bool PBRBaseMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     mesh->createNormals(true);
     BABYLON_LOGF_WARN("PBRBaseMaterial",
                       "PBRMaterial: Normals have been created for the mesh: %s",
-                      mesh->name.c_str());
+                      mesh->name.c_str())
   }
 
   auto effect

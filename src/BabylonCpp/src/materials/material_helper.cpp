@@ -541,7 +541,7 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
       if (attribs.size() > maxAttributesCount) {
         BABYLON_LOGF_ERROR("MaterialHelper",
                            "Cannot add more vertex attributes for mesh %s",
-                           mesh->name.c_str());
+                           mesh->name.c_str())
       }
     }
   }

@@ -23,9 +23,9 @@
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
+#include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target.h>
 #include <babylon/morph/morph_target_manager.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 namespace GLTF2 {
@@ -807,7 +807,7 @@ GeometryPtr GLTFLoader::_loadVertexDataAsync(const std::string& context,
 }
 
 void GLTFLoader::_createMorphTargets(const std::string& context, INode& node,
-                                     const IMesh& /*mesh*/,
+                                     const IMesh& mesh,
                                      const IMeshPrimitive& primitive,
                                      const MeshPtr& babylonMesh)
 {
@@ -827,7 +827,9 @@ void GLTFLoader::_createMorphTargets(const std::string& context, INode& node,
   babylonMesh->morphTargetManager = MorphTargetManager::New(babylonScene);
   for (size_t index = 0; index < primitive.targets.size(); ++index) {
     const auto weight
-      = (index < node.weights.size()) ? node.weights[index] : 0.f;
+      = (index < node.weights.size()) ?
+          node.weights[index] :
+          (index < mesh.weights.size()) ? mesh.weights[index] : 0.f;
     babylonMesh->morphTargetManager()->addTarget(
       MorphTarget::New(String::printf("morphTarget%ld", index), weight));
     // TODO: tell the target whether it has positions, normals, tangents
@@ -843,28 +845,80 @@ void GLTFLoader::_loadMorphTargetsAsync(const std::string& context,
     return;
   }
 
-  std::vector<std::function<void()>> promises;
-
   const auto& morphTargetManager = babylonMesh->morphTargetManager();
   for (size_t index = 0; index < morphTargetManager->numTargets; ++index) {
     const auto babylonMorphTarget = morphTargetManager->getTarget(index);
-    promises.emplace_back([&]() -> void {
-      _loadMorphTargetVertexDataAsync(
-        String::printf("%s/targets/%ld", context.c_str(), index),
-        babylonGeometry, primitive.targets[index], babylonMorphTarget);
-    });
-  }
-
-  for (auto&& promise : promises) {
-    promise();
+    _loadMorphTargetVertexDataAsync(
+      String::printf("%s/targets/%ld", context.c_str(), index), babylonGeometry,
+      primitive.targets[index], babylonMorphTarget);
   }
 }
 
 void GLTFLoader::_loadMorphTargetVertexDataAsync(
-  const std::string& /*context*/, const GeometryPtr& /*babylonGeometry*/,
-  const std::unordered_map<std::string, size_t>& /*attributes*/,
-  const MorphTargetPtr& /*babylonMorphTarget*/)
+  const std::string& context, const GeometryPtr& babylonGeometry,
+  const std::unordered_map<std::string, size_t>& attributes,
+  const MorphTargetPtr& babylonMorphTarget)
 {
+  const auto loadAttribute
+    = [this, &attributes, &babylonGeometry, &context](
+        std::string attribute, const std::string& kind,
+        const std::function<void(const VertexBufferPtr& babylonVertexBuffer,
+                                 Float32Array& data)>& setData) -> void {
+    if (!stl_util::contains(attributes, attribute)) {
+      return;
+    }
+
+    const auto babylonVertexBuffer = babylonGeometry->getVertexBuffer(kind);
+    if (!babylonVertexBuffer) {
+      return;
+    }
+
+    auto& accessor = ArrayItem::Get(
+      String::printf("%s/%s", context.c_str(), attribute.c_str()),
+      gltf->accessors, attributes.at(attribute));
+    auto& data = _loadFloatAccessorAsync(
+      String::printf("/accessors/%ld", accessor.index), accessor);
+    setData(babylonVertexBuffer, data);
+  };
+
+  loadAttribute("POSITION", VertexBuffer::PositionKind,
+                [&](const VertexBufferPtr& babylonVertexBuffer,
+                    Float32Array& data) -> void {
+                  babylonVertexBuffer->forEach(
+                    data.size(), [&](float value, size_t index) -> void {
+                      data[index] += value;
+                    });
+
+                  babylonMorphTarget->setPositions(data);
+                });
+
+  loadAttribute("NORMAL", VertexBuffer::NormalKind,
+                [&](const VertexBufferPtr& babylonVertexBuffer,
+                    Float32Array& data) -> void {
+                  babylonVertexBuffer->forEach(
+                    data.size(), [&](float value, size_t index) -> void {
+                      data[index] += value;
+                    });
+
+                  babylonMorphTarget->setNormals(data);
+                });
+
+  loadAttribute("TANGENT", VertexBuffer::TangentKind,
+                [&](const VertexBufferPtr& babylonVertexBuffer,
+                    Float32Array& data) -> void {
+                  auto dataIndex = 0ull;
+                  babylonVertexBuffer->forEach(
+                    data.size() / 3 * 4,
+                    [&](float value, size_t index) -> void {
+                      // Tangent data for morph targets is stored as xyz delta.
+                      // The vertexData.tangent is stored as xyzw.
+                      // So we need to skip every fourth vertexData.tangent.
+                      if (((index + 1) % 4) != 0) {
+                        data[dataIndex++] += value;
+                      }
+                    });
+                  babylonMorphTarget->setTangents(data);
+                });
 }
 
 void GLTFLoader::_LoadTransform(const INode& node,

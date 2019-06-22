@@ -160,7 +160,7 @@ void MorphTargetManager::_syncActiveTargets(bool needUpdate)
         BABYLON_LOG_ERROR(
           "MorphTargetManager",
           "Incompatible target. Targets must all have the same vertices "
-          "count.");
+          "count.")
         return;
       }
     }
