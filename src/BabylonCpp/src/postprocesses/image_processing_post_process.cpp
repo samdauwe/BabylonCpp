@@ -90,7 +90,7 @@ ImageProcessingPostProcess::~ImageProcessingPostProcess()
 {
 }
 
-const char* ImageProcessingPostProcess::getClassName() const
+const std::string ImageProcessingPostProcess::getClassName() const
 {
   return "ImageProcessingPostProcess";
 }

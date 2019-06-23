@@ -26,7 +26,7 @@ struct BABYLON_SHARED_EXPORT Vector3LineComponent {
     ImGui::TextWrapped("%s", valueStr);
   }
 
-}; // end of struct Color3LineComponent
+}; // end of struct Vector3LineComponent
 
 } // end of namespace BABYLON
 

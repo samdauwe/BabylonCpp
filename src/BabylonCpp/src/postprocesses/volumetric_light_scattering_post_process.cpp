@@ -81,7 +81,7 @@ VolumetricLightScatteringPostProcess::~VolumetricLightScatteringPostProcess()
 {
 }
 
-const char* VolumetricLightScatteringPostProcess::getClassName() const
+const std::string VolumetricLightScatteringPostProcess::getClassName() const
 {
   return "VolumetricLightScatteringPostProcess";
 }

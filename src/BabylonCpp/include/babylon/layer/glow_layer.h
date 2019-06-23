@@ -229,9 +229,10 @@ public:
                            const MaterialPtr& material)>
     customEmissiveTextureSelector;
 
-private:
   Property<GlowLayer, float> blurKernelSize;
   Property<GlowLayer, float> intensity;
+
+private:
   IGlowLayerOptions _options;
   float _intensity;
   BlurPostProcessPtr _horizontalBlurPostprocess1;

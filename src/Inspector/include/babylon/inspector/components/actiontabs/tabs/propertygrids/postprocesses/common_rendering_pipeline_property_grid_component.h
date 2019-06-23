@@ -65,7 +65,7 @@ struct BABYLON_SHARED_EXPORT CommonRenderingPipelinePropertyGridComponent {
     }
   }
 
-}; // end of struct CommonLightPropertyGridComponent
+}; // end of struct CommonRenderingPipelinePropertyGridComponent
 
 } // end of namespace BABYLON
 

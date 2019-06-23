@@ -33,15 +33,15 @@ public:
 
     return postProcess;
   }
-  ~ImageProcessingPostProcess();
+  ~ImageProcessingPostProcess() override;
 
   /**
    * "ImageProcessingPostProcess"
    * @returns "ImageProcessingPostProcess"
    */
-  const char* getClassName() const;
+  const std::string getClassName() const override;
 
-  void dispose(Camera* camera = nullptr);
+  void dispose(Camera* camera = nullptr) override;
 
 protected:
   ImageProcessingPostProcess(

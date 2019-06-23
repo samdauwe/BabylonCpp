@@ -37,13 +37,13 @@ public:
 
     return postProcess;
   }
-  ~VolumetricLightScatteringPostProcess();
+  ~VolumetricLightScatteringPostProcess() override;
 
   /**
    * @brief Returns the string "VolumetricLightScatteringPostProcess".
    * @returns "VolumetricLightScatteringPostProcess"
    */
-  const char* getClassName() const;
+  const std::string getClassName() const override;
 
   /**
    * @brief Sets the new light position for light scattering effect.
