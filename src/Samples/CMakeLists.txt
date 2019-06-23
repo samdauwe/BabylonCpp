@@ -86,6 +86,7 @@ if (OPTION_BUILD_LOADERS)
     file(GLOB LOADERS_HDR_FILES                     ${INCLUDE_PATH}/loaders/*.h
                                                     ${INCLUDE_PATH}/loaders/babylon/*.h
                                                     ${INCLUDE_PATH}/loaders/gltf/*.h
+                                                    ${INCLUDE_PATH}/loaders/gltf/furtherpbrmodels/*.h
                                                     ${INCLUDE_PATH}/loaders/gltf/morecomplexmodels/*.h
                                                     ${INCLUDE_PATH}/loaders/gltf/simplemodels/*.h)
 else()
@@ -140,6 +141,7 @@ if (OPTION_BUILD_LOADERS)
     file(GLOB LOADERS_SRC_FILES                     ${SOURCE_PATH}/loaders/*.cpp
                                                     ${SOURCE_PATH}/loaders/babylon/*.cpp
                                                     ${SOURCE_PATH}/loaders/gltf/*.cpp
+                                                    ${SOURCE_PATH}/loaders/gltf/furtherpbrmodels/*.cpp
                                                     ${SOURCE_PATH}/loaders/gltf/morecomplexmodels/*.cpp
                                                     ${SOURCE_PATH}/loaders/gltf/simplemodels/*.cpp)
 else()

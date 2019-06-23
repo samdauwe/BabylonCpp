@@ -17,7 +17,7 @@
 #include <babylon/samples/loaders/gltf/simplemodels/triangle_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/triangle_without_indices_scene.h>
 
-// -- Simple models for testing individual features --
+// -- More complex models --
 #include <babylon/samples/loaders/gltf/morecomplexmodels/2cylinder_engine_scene.h>
 #include <babylon/samples/loaders/gltf/morecomplexmodels/box_interleaved_scene.h>
 #include <babylon/samples/loaders/gltf/morecomplexmodels/box_scene.h>
@@ -26,6 +26,9 @@
 #include <babylon/samples/loaders/gltf/morecomplexmodels/box_vertex_colors_scene.h>
 #include <babylon/samples/loaders/gltf/morecomplexmodels/duck_scene.h>
 #include <babylon/samples/loaders/gltf/morecomplexmodels/reciprocating_saw_scene.h>
+
+// -- Further PBR models --
+#include <babylon/samples/loaders/gltf/furtherpbrmodels/two_sided_plane_scene.h>
 
 #endif
 
@@ -167,6 +170,15 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
     [](ICanvas* iCanvas) {                                     //
       return std::make_unique<ReciprocatingSawScene>(iCanvas); //
     });                                                        //
+
+  // -- Further PBR models --
+
+  // Two Sided Plane Scene (glTF)
+  _samples["TwoSidedPlaneGLTFScene"]
+    = std::make_tuple(true,                                                   //
+                      [](ICanvas* iCanvas) {                                  //
+                        return std::make_unique<TwoSidedPlaneScene>(iCanvas); //
+                      });                                                     //
 #endif
 }
 

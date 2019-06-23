@@ -1994,7 +1994,7 @@ BaseTexturePtr GLTFLoader::loadTextureInfoAsync(
     = ArrayItem::Get(String::printf("%s/index", context.c_str()),
                      gltf->textures, textureInfo.index);
   const auto promise = _loadTextureAsync(
-    String::printf("/textures/%s", textureInfo.index), texture,
+    String::printf("/textures/%ld", textureInfo.index), texture,
     [&](const BaseTexturePtr& babylonTexture) -> void {
       babylonTexture->coordinatesIndex = textureInfo.texCoord.value_or(0u);
 
