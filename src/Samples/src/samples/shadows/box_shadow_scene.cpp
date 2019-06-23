@@ -26,7 +26,6 @@ const char* BoxShadowScene::getName()
 
 void BoxShadowScene::initializeScene(ICanvas* canvas, Scene* scene)
 {
-
   // Box
   auto box      = Mesh::CreateBox("Box", 6, scene);
   box->position = Vector3(6.f, -3.f, 5.f);

@@ -8,7 +8,7 @@ namespace Samples {
 
 /**
  * @brief Box Shadow Scene. Example scene demonstrating how to setup a scene
- * with q light and box mesh to cast a shadow.
+ * with a light and box mesh to cast a shadow.
  */
 struct BoxShadowScene : public IRenderableScene {
 
