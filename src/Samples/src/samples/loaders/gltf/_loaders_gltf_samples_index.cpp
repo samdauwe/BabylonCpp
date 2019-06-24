@@ -30,6 +30,7 @@
 // -- Further PBR models --
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/animated_cube_scene.h>
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/cube_scene.h>
+#include <babylon/samples/loaders/gltf/furtherpbrmodels/suzanne_scene.h>
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/two_sided_plane_scene.h>
 
 #endif
@@ -187,6 +188,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
                       [](ICanvas* iCanvas) {                         //
                         return std::make_unique<CubeScene>(iCanvas); //
                       });                                            //
+  // Suzanne Scene (glTF)
+  _samples["SuzanneGLTFScene"]
+    = std::make_tuple(true,                                             //
+                      [](ICanvas* iCanvas) {                            //
+                        return std::make_unique<SuzanneScene>(iCanvas); //
+                      });                                               //
   // Two Sided Plane Scene (glTF)
   _samples["TwoSidedPlaneGLTFScene"]
     = std::make_tuple(true,                                                   //
