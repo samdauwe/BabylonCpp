@@ -28,6 +28,7 @@
 #include <babylon/samples/loaders/gltf/morecomplexmodels/reciprocating_saw_scene.h>
 
 // -- Further PBR models --
+#include <babylon/samples/loaders/gltf/furtherpbrmodels/cube_scene.h>
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/two_sided_plane_scene.h>
 
 #endif
@@ -179,6 +180,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
                       [](ICanvas* iCanvas) {                                  //
                         return std::make_unique<TwoSidedPlaneScene>(iCanvas); //
                       });                                                     //
+  // Cube Scene (glTF)
+  _samples["CubeGLTFScene"]
+    = std::make_tuple(true,                                          //
+                      [](ICanvas* iCanvas) {                         //
+                        return std::make_unique<CubeScene>(iCanvas); //
+                      });                                            //
 #endif
 }
 
