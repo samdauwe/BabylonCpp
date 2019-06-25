@@ -31,6 +31,7 @@
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/animated_cube_scene.h>
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/antique_camera_scene.h>
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/cube_scene.h>
+#include <babylon/samples/loaders/gltf/furtherpbrmodels/sci_fi_helmet_scene.h>
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/suzanne_scene.h>
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/two_sided_plane_scene.h>
 
@@ -195,6 +196,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
                       [](ICanvas* iCanvas) {                         //
                         return std::make_unique<CubeScene>(iCanvas); //
                       });                                            //
+  // Sci Fi Helmet Scene (glTF)
+  _samples["SciFiHelmetGLTFScene"]
+    = std::make_tuple(true,                                                 //
+                      [](ICanvas* iCanvas) {                                //
+                        return std::make_unique<SciFiHelmetScene>(iCanvas); //
+                      });                                                   //
   // Suzanne Scene (glTF)
   _samples["SuzanneGLTFScene"]
     = std::make_tuple(true,                                             //
