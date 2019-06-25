@@ -3,8 +3,8 @@
 // Loaders plugins
 #ifdef WITH_LOADERS
 // -- Simple models for testing individual features --
-#include <babylon/samples/loaders/gltf/simplemodels/animated_morph_cube.h>
-#include <babylon/samples/loaders/gltf/simplemodels/animated_morph_sphere.h>
+#include <babylon/samples/loaders/gltf/simplemodels/animated_morph_cube_scene.h>
+#include <babylon/samples/loaders/gltf/simplemodels/animated_morph_sphere_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/animated_triangle_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/cameras_scene.h>
 #include <babylon/samples/loaders/gltf/simplemodels/interpolation_test_scene.h>
@@ -46,13 +46,13 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
 #ifdef WITH_LOADERS
   // -- Simple models for testing individual features --
 
-  // Animated Morph Cube (glTF)
+  // Animated Morph Cube Scene (glTF)
   _samples["AnimatedMorphCubeGLTFScene"] = std::make_tuple(
     true,                                                       //
     [](ICanvas* iCanvas) {                                      //
       return std::make_unique<AnimatedMorphCubeScene>(iCanvas); //
     });                                                         //
-  // Animated Morph Sphere (glTF)
+  // Animated Morph Sphere Scene (glTF)
   _samples["AnimatedMorphSphereGLTFScene"] = std::make_tuple(
     true,                                                         //
     [](ICanvas* iCanvas) {                                        //

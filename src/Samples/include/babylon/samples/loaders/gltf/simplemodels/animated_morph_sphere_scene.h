@@ -7,8 +7,8 @@ namespace BABYLON {
 namespace Samples {
 
 /**
- * @brief Animated Morph Sphere (glTF). The sphere contains two morph targets in
- * it:
+ * @brief Animated Morph Sphere Scene (glTF). The sphere contains two morph
+ * targets in it:
  * * blob : moves the vertices so that it becomes a somewhat amorphous fat, blob
  *          shape.
  * * ship : moves the vertices so that it looks a bit like a spaceship, the goal

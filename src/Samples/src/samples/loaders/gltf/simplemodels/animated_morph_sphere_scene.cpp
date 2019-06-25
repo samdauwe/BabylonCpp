@@ -1,4 +1,4 @@
-#include <babylon/samples/loaders/gltf/simplemodels/animated_morph_sphere.h>
+#include <babylon/samples/loaders/gltf/simplemodels/animated_morph_sphere_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
@@ -22,7 +22,7 @@ AnimatedMorphSphereScene::~AnimatedMorphSphereScene()
 
 const char* AnimatedMorphSphereScene::getName()
 {
-  return "Animated Morph Sphere (glTF)";
+  return "Animated Morph Sphere Scene (glTF)";
 }
 
 void AnimatedMorphSphereScene::initializeScene(ICanvas* /*canvas*/,

@@ -1,4 +1,4 @@
-#include <babylon/samples/loaders/gltf/simplemodels/animated_morph_cube.h>
+#include <babylon/samples/loaders/gltf/simplemodels/animated_morph_cube_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>
@@ -22,7 +22,7 @@ AnimatedMorphCubeScene::~AnimatedMorphCubeScene()
 
 const char* AnimatedMorphCubeScene::getName()
 {
-  return "Animated Morph Cube (glTF)";
+  return "Animated Morph Cube Scene (glTF)";
 }
 
 void AnimatedMorphCubeScene::initializeScene(ICanvas* /*canvas*/, Scene* scene)
