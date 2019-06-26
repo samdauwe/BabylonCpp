@@ -1,4 +1,4 @@
-#include <babylon/samples/loaders/gltf/pbrmodels/barramundi_fish.h>
+#include <babylon/samples/loaders/gltf/pbrmodels/barramundi_fish_scene.h>
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/engines/scene.h>

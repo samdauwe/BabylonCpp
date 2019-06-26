@@ -29,7 +29,7 @@
 
 // -- PBR models --
 #include <babylon/samples/loaders/gltf/pbrmodels/avocado_scene.h>
-#include <babylon/samples/loaders/gltf/pbrmodels/barramundi_fish.h>
+#include <babylon/samples/loaders/gltf/pbrmodels/barramundi_fish_scene.h>
 
 // -- Further PBR models --
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/animated_cube_scene.h>
