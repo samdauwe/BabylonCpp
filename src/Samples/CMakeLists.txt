@@ -88,6 +88,7 @@ if (OPTION_BUILD_LOADERS)
                                                     ${INCLUDE_PATH}/loaders/gltf/*.h
                                                     ${INCLUDE_PATH}/loaders/gltf/furtherpbrmodels/*.h
                                                     ${INCLUDE_PATH}/loaders/gltf/morecomplexmodels/*.h
+                                                    ${INCLUDE_PATH}/loaders/gltf/pbrmodels/*.h
                                                     ${INCLUDE_PATH}/loaders/gltf/simplemodels/*.h)
 else()
     file(GLOB LOADERS_HDR_FILES                     ${INCLUDE_PATH}/loaders/*.h
@@ -143,6 +144,7 @@ if (OPTION_BUILD_LOADERS)
                                                     ${SOURCE_PATH}/loaders/gltf/*.cpp
                                                     ${SOURCE_PATH}/loaders/gltf/furtherpbrmodels/*.cpp
                                                     ${SOURCE_PATH}/loaders/gltf/morecomplexmodels/*.cpp
+                                                    ${SOURCE_PATH}/loaders/gltf/pbrmodels/*.cpp
                                                     ${SOURCE_PATH}/loaders/gltf/simplemodels/*.cpp)
 else()
     file(GLOB LOADERS_SRC_FILES                     ${SOURCE_PATH}/loaders/*.cpp
