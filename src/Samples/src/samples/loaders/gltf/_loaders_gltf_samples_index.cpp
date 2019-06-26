@@ -31,6 +31,7 @@
 #include <babylon/samples/loaders/gltf/pbrmodels/avocado_scene.h>
 #include <babylon/samples/loaders/gltf/pbrmodels/barramundi_fish_scene.h>
 #include <babylon/samples/loaders/gltf/pbrmodels/boom_box_scene.h>
+#include <babylon/samples/loaders/gltf/pbrmodels/corset_scene.h>
 
 // -- Further PBR models --
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/animated_cube_scene.h>
@@ -201,6 +202,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
                       [](ICanvas* iCanvas) {                            //
                         return std::make_unique<BoomBoxScene>(iCanvas); //
                       });                                               //
+  // Corset Scene (glTF)
+  _samples["CorsetGLTFScene"]
+    = std::make_tuple(true,                                            //
+                      [](ICanvas* iCanvas) {                           //
+                        return std::make_unique<CorsetScene>(iCanvas); //
+                      });                                              //
 
   // -- Further PBR models --
 
