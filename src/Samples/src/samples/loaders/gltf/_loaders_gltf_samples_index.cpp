@@ -33,6 +33,7 @@
 #include <babylon/samples/loaders/gltf/pbrmodels/boom_box_scene.h>
 #include <babylon/samples/loaders/gltf/pbrmodels/corset_scene.h>
 #include <babylon/samples/loaders/gltf/pbrmodels/damaged_helmet_scene.h>
+#include <babylon/samples/loaders/gltf/pbrmodels/flight_helmet_scene.h>
 
 // -- Further PBR models --
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/animated_cube_scene.h>
@@ -215,6 +216,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
                       [](ICanvas* iCanvas) {                                  //
                         return std::make_unique<DamagedHelmetScene>(iCanvas); //
                       });                                                     //
+  // Flight Helmet Scene (glTF)
+  _samples["FlightHelmetGLTFScene"]
+    = std::make_tuple(true,                                                  //
+                      [](ICanvas* iCanvas) {                                 //
+                        return std::make_unique<FlightHelmetScene>(iCanvas); //
+                      });                                                    //
 
   // -- Further PBR models --
 
