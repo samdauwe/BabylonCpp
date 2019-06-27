@@ -35,6 +35,7 @@
 #include <babylon/samples/loaders/gltf/pbrmodels/damaged_helmet_scene.h>
 #include <babylon/samples/loaders/gltf/pbrmodels/flight_helmet_scene.h>
 #include <babylon/samples/loaders/gltf/pbrmodels/lantern_scene.h>
+#include <babylon/samples/loaders/gltf/pbrmodels/water_bottle_scene.h>
 
 // -- Further PBR models --
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/animated_cube_scene.h>
@@ -229,6 +230,12 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
                       [](ICanvas* iCanvas) {                            //
                         return std::make_unique<LanternScene>(iCanvas); //
                       });                                               //
+  // Water Bottle Scene (glTF)
+  _samples["WaterBottleGLTFScene"]
+    = std::make_tuple(true,                                                 //
+                      [](ICanvas* iCanvas) {                                //
+                        return std::make_unique<WaterBottleScene>(iCanvas); //
+                      });                                                   //
 
   // -- Further PBR models --
 
