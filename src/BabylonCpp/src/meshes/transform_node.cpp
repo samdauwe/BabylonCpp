@@ -206,9 +206,10 @@ void TransformNode::set_rotationQuaternion(
 {
   _rotationQuaternion = quaternion;
   // reset the rotation vector.
-  if (quaternion && !stl_util::almost_equal(rotation().length(), 0.f)) {
-    rotation().copyFromFloats(0.f, 0.f, 0.f);
+  if (quaternion) {
+    _rotation.setAll(0.f);
   }
+  _isDirty = true;
 }
 
 Vector3& TransformNode::get_forward()
@@ -718,12 +719,13 @@ TransformNode& TransformNode::addRotation(float x, float y, float z)
 Matrix& TransformNode::computeWorldMatrix(bool force,
                                           bool /*useWasUpdatedFlag*/)
 {
-  if (_isWorldMatrixFrozen) {
+  if (_isWorldMatrixFrozen && !_isDirty) {
     return _worldMatrix;
   }
 
-  if (!force && isSynchronized()) {
-    _currentRenderId = getScene()->getRenderId();
+  const auto currentRenderId = getScene()->getRenderId();
+  if (!_isDirty && !force && isSynchronized()) {
+    _currentRenderId = currentRenderId;
     return _worldMatrix;
   }
 
