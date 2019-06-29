@@ -29,8 +29,8 @@ struct ICullable {
    * @param frustumPlanes Camera near/planes
    * @returns true if the object is in frustum otherwise false
    */
-  virtual bool
-  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) const = 0;
+  virtual bool isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes)
+    = 0;
 }; // end of struct ICullable
 
 } // end of namespace BABYLON

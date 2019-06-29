@@ -60,10 +60,11 @@ void RaycastOnHeightMapScene::initializeScene(ICanvas* canvas, Scene* scene)
     _angle += 0.01f;
 
     // Casting a ray to get height
-    Ray ray(Vector3(_sphere->position().x,
-                    _ground->getBoundingInfo().boundingBox.maximumWorld.y + 1.f,
-                    _sphere->position().z),
-            Vector3(0.f, -1.f, 0.f)); // Direction
+    Ray ray(
+      Vector3(_sphere->position().x,
+              _ground->getBoundingInfo()->boundingBox.maximumWorld.y + 1.f,
+              _sphere->position().z),
+      Vector3(0.f, -1.f, 0.f)); // Direction
 
     Matrix worldInverse;
     _ground->getWorldMatrix().invertToRef(worldInverse);

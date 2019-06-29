@@ -136,8 +136,8 @@ void Octree<T>::CreationFuncForMeshes(AbstractMesh* entry,
 {
   const auto boundingInfo = entry->getBoundingInfo();
   if (!entry->isBlocked()
-      && boundingInfo.boundingBox.intersectsMinMax(block.minPoint(),
-                                                   block.maxPoint())) {
+      && boundingInfo->boundingBox.intersectsMinMax(block.minPoint(),
+                                                    block.maxPoint())) {
     block.entries.emplace_back(entry);
   }
 }
@@ -147,8 +147,8 @@ void Octree<T>::CreationFuncForSubMeshes(SubMesh* entry,
                                          OctreeBlock<SubMesh*>& block)
 {
   const auto boundingInfo = entry->getBoundingInfo();
-  if (boundingInfo.boundingBox.intersectsMinMax(block.minPoint(),
-                                                block.maxPoint())) {
+  if (boundingInfo->boundingBox.intersectsMinMax(block.minPoint(),
+                                                 block.maxPoint())) {
     block.entries.emplace_back(entry);
   }
 }

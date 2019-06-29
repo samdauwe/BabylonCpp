@@ -4283,7 +4283,7 @@ MinMax Scene::getWorldExtends(
       continue;
     }
     mesh->computeWorldMatrix(true);
-    auto boundingInfo = mesh->getBoundingInfo();
+    const auto& boundingInfo = *mesh->getBoundingInfo();
 
     auto minBox = boundingInfo.boundingBox.minimumWorld;
     auto maxBox = boundingInfo.boundingBox.maximumWorld;

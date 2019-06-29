@@ -523,7 +523,7 @@ void ArcRotateCamera::setTarget(
     const auto& newTarget = std::get<AbstractMeshPtr>(iTarget);
     if (toBoundingCenter) {
       _targetBoundingCenter
-        = newTarget->getBoundingInfo().boundingBox.centerWorld.clone();
+        = newTarget->getBoundingInfo()->boundingBox.centerWorld.clone();
     }
     else {
       _targetBoundingCenter.reset(nullptr);

@@ -78,8 +78,8 @@ public:
    * @param frustumPlanes defines the frustum planes to test
    * @returns true if there is an inclusion
    */
-  bool isCompletelyInFrustum(
-    const std::array<Plane, 6>& frustumPlanes) const override;
+  bool
+  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Tests if a point is inside the bounding box.

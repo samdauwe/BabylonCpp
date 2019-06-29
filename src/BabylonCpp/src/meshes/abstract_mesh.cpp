@@ -812,7 +812,7 @@ bool AbstractMesh::isVerticesDataPresent(const std::string& /*kind*/) const
   return false;
 }
 
-BoundingInfo& AbstractMesh::getBoundingInfo()
+BoundingInfoPtr& AbstractMesh::getBoundingInfo()
 {
   if (_masterMesh) {
     return _masterMesh->getBoundingInfo();
@@ -823,7 +823,7 @@ BoundingInfo& AbstractMesh::getBoundingInfo()
     _updateBoundingInfo();
   }
   // cannot be null.
-  return *_boundingInfo;
+  return _boundingInfo;
 }
 
 AbstractMesh& AbstractMesh::normalizeToUnitCube(bool includeDescendants)
@@ -938,7 +938,7 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
 
   Vector3 min;
   Vector3 max;
-  auto boundingInfo = getBoundingInfo();
+  const auto& boundingInfo = *getBoundingInfo();
 
   if (subMeshes.empty()) {
     min = Vector3(std::numeric_limits<float>::max(),
@@ -971,8 +971,8 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
         continue;
       }
 
-      auto childBoundingInfo  = childMesh->getBoundingInfo();
-      const auto& boundingBox = childBoundingInfo.boundingBox;
+      const auto& childBoundingInfo = *childMesh->getBoundingInfo();
+      const auto& boundingBox       = childBoundingInfo.boundingBox;
 
       auto minBox = boundingBox.minimumWorld;
       auto maxBox = boundingBox.maximumWorld;
@@ -1034,7 +1034,7 @@ bool AbstractMesh::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
 }
 
 bool AbstractMesh::isCompletelyInFrustum(
-  const std::array<Plane, 6>& frustumPlanes) const
+  const std::array<Plane, 6>& frustumPlanes)
 {
   return _boundingInfo != nullptr
          && _boundingInfo->isCompletelyInFrustum(frustumPlanes);
@@ -1280,7 +1280,7 @@ AbstractMesh::createOrUpdateSubmeshesOctree(size_t maxCapacity, size_t maxDepth)
 
   computeWorldMatrix(true);
 
-  auto boundingInfo = getBoundingInfo();
+  const auto& boundingInfo = *getBoundingInfo();
 
   // Update octree
   auto& bbox          = boundingInfo.boundingBox;
@@ -1303,11 +1303,12 @@ AbstractMesh& AbstractMesh::_collideForSubMesh(SubMesh* subMesh,
 
   // Transformation
   if (subMesh->_lastColliderWorldVertices.empty()
-      || !subMesh->_lastColliderTransformMatrix.equals(transformMatrix)) {
-    subMesh->_lastColliderTransformMatrix = transformMatrix;
-    subMesh->_lastColliderWorldVertices   = {};
-    subMesh->_trianglePlanes              = {};
-    auto start                            = subMesh->verticesStart;
+      || !subMesh->_lastColliderTransformMatrix->equals(transformMatrix)) {
+    subMesh->_lastColliderTransformMatrix
+      = std::make_unique<Matrix>(transformMatrix);
+    subMesh->_lastColliderWorldVertices = {};
+    subMesh->_trianglePlanes            = {};
+    auto start                          = subMesh->verticesStart;
     auto end = (subMesh->verticesStart + subMesh->verticesCount);
     for (unsigned int i = start; i < end; i++) {
       subMesh->_lastColliderWorldVertices.emplace_back(
@@ -1396,8 +1397,9 @@ PickingInfo AbstractMesh::intersects(Ray& ray, bool fastCheck)
       continue;
     }
 
-    auto currentIntersectInfo
-      = subMesh->intersects(ray, _positions(), getIndices(), fastCheck);
+    std::optional<IntersectionInfo> currentIntersectInfo
+      = std::nullopt; // subMesh->intersects(ray, _positions(), getIndices(),
+                      // fastCheck);
 
     if (currentIntersectInfo) {
       if (fastCheck || !intersectInfo
@@ -1618,10 +1620,10 @@ AbstractMesh& AbstractMesh::updateFacetData()
   if (!data.facetDataEnabled) {
     _initFacetData();
   }
-  auto positions = getVerticesData(VertexBuffer::PositionKind);
-  auto indices   = getIndices();
-  auto normals   = getVerticesData(VertexBuffer::NormalKind);
-  auto bInfo     = getBoundingInfo();
+  auto positions    = getVerticesData(VertexBuffer::PositionKind);
+  auto indices      = getIndices();
+  auto normals      = getVerticesData(VertexBuffer::NormalKind);
+  const auto& bInfo = *getBoundingInfo();
 
   if (data.facetDepthSort && !data.facetDepthSortEnabled) {
     // init arrays, matrix and sort function on first call
@@ -1768,8 +1770,8 @@ AbstractMesh& AbstractMesh::getFacetNormalToRef(unsigned int i, Vector3& ref)
 
 Uint32Array AbstractMesh::getFacetsAtLocalCoordinates(float x, float y, float z)
 {
-  auto bInfo = getBoundingInfo();
-  auto& data = _facetData;
+  const auto& bInfo = *getBoundingInfo();
+  auto& data        = _facetData;
 
   int ox = static_cast<int>(
     std::floor((x - bInfo.minimum().x * data.partitioningBBoxRatio)

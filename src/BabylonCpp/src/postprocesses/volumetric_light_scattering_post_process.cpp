@@ -348,7 +348,7 @@ void VolumetricLightScatteringPostProcess::_createPass(Scene* scene,
         if (!transparentSubMeshes.empty()) {
           // Sort sub meshes
           for (auto& submesh : transparentSubMeshes) {
-            auto boundingInfo = submesh->getBoundingInfo();
+            auto& boundingInfo = *submesh->getBoundingInfo();
 
             if (scene->activeCamera) {
               submesh->_alphaIndex = submesh->getMesh()->alphaIndex;

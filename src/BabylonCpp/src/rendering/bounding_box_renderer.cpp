@@ -61,7 +61,7 @@ void BoundingBoxRenderer::_register()
 void BoundingBoxRenderer::_evaluateSubMesh(AbstractMesh* mesh, SubMesh* subMesh)
 {
   if (mesh->showSubMeshesBoundingBox) {
-    auto& boundingInfo            = subMesh->getBoundingInfo();
+    auto& boundingInfo            = *subMesh->getBoundingInfo();
     boundingInfo.boundingBox._tag = mesh->renderingGroupId;
     renderList.emplace_back(boundingInfo.boundingBox);
   }
@@ -71,7 +71,7 @@ void BoundingBoxRenderer::_activeMesh(AbstractMesh* sourceMesh,
                                       AbstractMesh* mesh)
 {
   if (sourceMesh->showBoundingBox || scene->forceShowBoundingBoxes) {
-    auto& boundingInfo            = sourceMesh->getBoundingInfo();
+    auto& boundingInfo            = *sourceMesh->getBoundingInfo();
     boundingInfo.boundingBox._tag = mesh->renderingGroupId;
     renderList.emplace_back(boundingInfo.boundingBox);
   }

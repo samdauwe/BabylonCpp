@@ -24,11 +24,15 @@ class IGLBuffer;
 class BABYLON_SHARED_EXPORT SubMesh : public BaseSubMesh, public ICullable {
 
 public:
+  using TrianglePickingPredicate = std::function<bool(
+    const Vector3& p0, const Vector3& p1, const Vector3& p2, const Ray& ray)>;
+
+public:
   template <typename... Ts>
-  static std::shared_ptr<SubMesh> New(Ts&&... args)
+  static SubMeshPtr New(Ts&&... args)
   {
-    auto subMeshRawPtr = new SubMesh(std::forward<Ts>(args)...);
-    auto subMesh       = static_cast<std::shared_ptr<SubMesh>>(subMeshRawPtr);
+    auto subMesh
+      = std::shared_ptr<SubMesh>(new SubMesh(std::forward<Ts>(args)...));
     subMesh->addToMesh(subMesh);
 
     return subMesh;
@@ -41,7 +45,7 @@ public:
   /**
    * @brief Returns the submesh BoudingInfo object.
    */
-  BoundingInfo& getBoundingInfo() const;
+  BoundingInfoPtr& getBoundingInfo();
 
   /**
    * @brief Sets the submesh BoundingInfo.
@@ -68,9 +72,11 @@ public:
 
   /**
    * @brief Sets a new updated BoundingInfo object to the submesh.
-   * @returns The SubMesh.
+   * @param data defines an optional position array to use to determine the
+   * bounding info
+   * @returns the SubMesh
    */
-  SubMesh& refreshBoundingInfo();
+  SubMesh& refreshBoundingInfo(const Float32Array& data = {});
 
   /**
    * @brief Hidden
@@ -94,8 +100,8 @@ public:
    * @brief Returns if the submesh bounding box is completely inside the frustum
    * defined by the passed array of planes.
    */
-  bool isCompletelyInFrustum(
-    const std::array<Plane, 6>& frustumPlanes) const override;
+  bool
+  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Renders the submesh.
@@ -107,20 +113,28 @@ public:
    * @brief Returns a new Index Buffer.
    * @returns The WebGLBuffer.
    */
-  GL::IGLBuffer* _getLinesIndexBuffer(const Uint32Array& indices,
-                                      Engine* engine);
+  std::unique_ptr<GL::IGLBuffer>&
+  _getLinesIndexBuffer(const IndicesArray& indices, Engine* engine);
 
   /**
    * @brief Returns if the passed Ray intersects the submesh bounding box.
    */
-  bool canIntersects(const Ray& ray) const;
+  bool canIntersects(const Ray& ray);
 
   /**
-   * @brief Returns an object IntersectionInfo.
+   * @brief Intersects current submesh with a ray.
+   * @param ray defines the ray to test
+   * @param positions defines mesh's positions array
+   * @param indices defines mesh's indices array
+   * @param fastCheck defines if only bounding info should be used
+   * @param trianglePredicate defines an optional predicate used to select faces
+   * when a mesh intersection is detected
+   * @returns intersection info or null if no intersection
    */
   std::optional<IntersectionInfo>
   intersects(Ray& ray, const std::vector<Vector3>& positions,
-             const Uint32Array& indices, bool fastCheck);
+             const IndicesArray& indices, bool fastCheck = false,
+             const TrianglePickingPredicate& trianglePredicate = nullptr);
 
   /**
    * @brief Hidden
@@ -133,7 +147,7 @@ public:
    * @brief Creates a new Submesh from the passed Mesh.
    */
   SubMeshPtr clone(const AbstractMeshPtr& newMesh,
-                   Mesh* newRenderingMesh) const;
+                   const MeshPtr& newRenderingMesh);
 
   /** Dispose **/
 
@@ -142,14 +156,20 @@ public:
    */
   void dispose();
 
+  /**
+   * @brief Gets the class name
+   * @returns the string "SubMesh".
+   */
+  const std::string getClassName() const;
+
   /** Statics **/
 
   static SubMeshPtr AddToMesh(unsigned int materialIndex,
                               unsigned int verticesStart, size_t verticesCount,
                               unsigned int indexStart, size_t indexCount,
                               const AbstractMeshPtr& mesh,
-                              Mesh* renderingMesh    = nullptr,
-                              bool createBoundingBox = true);
+                              const MeshPtr& renderingMesh = nullptr,
+                              bool createBoundingBox       = true);
 
   /**
    * @brief Creates a new Submesh from the passed parameters.
@@ -166,19 +186,47 @@ public:
                                       unsigned int startIndex,
                                       size_t indexCount,
                                       const AbstractMeshPtr& mesh,
-                                      Mesh* renderingMesh = nullptr);
+                                      const MeshPtr& renderingMesh = nullptr);
 
 protected:
   SubMesh(unsigned int materialIndex, unsigned int verticesStart,
           size_t verticesCount, unsigned int indexStart, size_t indexCount,
-          const AbstractMeshPtr& mesh, Mesh* renderingMesh = nullptr,
+          const AbstractMeshPtr& mesh, const MeshPtr& renderingMesh = nullptr,
           bool createBoundingBox = true);
 
+private:
+  /** Hidden */
+  std::optional<IntersectionInfo>
+  _intersectLines(Ray& ray, const std::vector<Vector3>& positions,
+                  const IndicesArray& indices, float intersectionThreshold,
+                  bool fastCheck = false);
+  /** Hidden */
+  std::optional<IntersectionInfo>
+  _intersectUnIndexedLines(Ray& ray, const std::vector<Vector3>& positions,
+                           const IndicesArray& indices,
+                           float intersectionThreshold, bool fastCheck = false);
+  /** Hidden */
+  std::optional<IntersectionInfo>
+  _intersectTriangles(Ray& ray, const std::vector<Vector3>& positions,
+                      const IndicesArray& indices, bool fastCheck = false,
+                      const TrianglePickingPredicate& trianglePredicate
+                      = nullptr);
+  /** Hidden */
+  std::optional<IntersectionInfo> _intersectUnIndexedTriangles(
+    Ray& ray, const std::vector<Vector3>& positions,
+    const IndicesArray& indices, bool fastCheck = false,
+    const TrianglePickingPredicate& trianglePredicate = nullptr);
+
 public:
+  /** the material index to use */
   unsigned int materialIndex;
+  /** vertex index start */
   unsigned int verticesStart;
+  /** vertices count */
   size_t verticesCount;
+  /** index start */
   unsigned int indexStart;
+  /** indices count */
   size_t indexCount;
   bool createBoundingBox;
   size_t _linesIndexCount;
@@ -187,7 +235,7 @@ public:
   /** Hidden */
   std::vector<Plane> _trianglePlanes;
   /** Hidden */
-  Matrix _lastColliderTransformMatrix;
+  std::unique_ptr<Matrix> _lastColliderTransformMatrix;
   /** Hidden */
   int _renderId;
   /** Hidden */
@@ -200,7 +248,7 @@ public:
 private:
   AbstractMeshPtr _mesh;
   MeshPtr _renderingMesh;
-  std::unique_ptr<BoundingInfo> _boundingInfo;
+  BoundingInfoPtr _boundingInfo;
   std::unique_ptr<GL::IGLBuffer> _linesIndexBuffer;
   MaterialPtr _currentMaterial;
 

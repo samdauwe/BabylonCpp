@@ -53,7 +53,7 @@ size_t CrowdSimulation::addAgent(const AbstractMeshPtr& mesh,
   auto& agentComp = agent.addComponent<CrowdAgent>(_simulator.get(), position);
 
   // Set the agent radius
-  const auto& bbox  = mesh->getBoundingInfo().boundingBox;
+  const auto& bbox  = mesh->getBoundingInfo()->boundingBox;
   const auto& min   = bbox.minimumWorld;
   const auto& max   = bbox.maximumWorld;
   const auto box    = max.subtract(min).scale(0.5f);
@@ -90,8 +90,8 @@ void CrowdSimulation::addObstacleByBoundingBox(const AbstractMeshPtr& mesh,
   mesh->position  = position;
   mesh->isVisible = isVisible;
 
-  mesh->getBoundingInfo().update(mesh->getWorldMatrix());
-  const auto bbox = mesh->getBoundingInfo().boundingBox;
+  mesh->getBoundingInfo()->update(mesh->getWorldMatrix());
+  const auto bbox = mesh->getBoundingInfo()->boundingBox;
   const auto min  = bbox.minimumWorld;
   const auto max  = bbox.maximumWorld;
 

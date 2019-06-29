@@ -588,11 +588,12 @@ MinMax Node::getHierarchyBoundingVectors(
   Vector3 max;
 
   auto thisAbstractMesh = static_cast<AbstractMesh*>(this);
-  if (!thisAbstractMesh->subMeshes.empty()) {
+  if (thisAbstractMesh->getBoundingInfo()
+      && !thisAbstractMesh->subMeshes.empty()) {
     // If this is an abstract mesh get its bounding info
-    auto boundingInfo = thisAbstractMesh->getBoundingInfo();
-    min               = boundingInfo.boundingBox.minimumWorld;
-    max               = boundingInfo.boundingBox.maximumWorld;
+    const auto& boundingInfo = *thisAbstractMesh->getBoundingInfo();
+    min                      = boundingInfo.boundingBox.minimumWorld;
+    max                      = boundingInfo.boundingBox.maximumWorld;
   }
   else {
     min = Vector3(std::numeric_limits<float>::max(),
@@ -620,8 +621,8 @@ MinMax Node::getHierarchyBoundingVectors(
         continue;
       }
 
-      auto childBoundingInfo = childMesh->getBoundingInfo();
-      auto boundingBox       = childBoundingInfo.boundingBox;
+      const auto& childBoundingInfo = *childMesh->getBoundingInfo();
+      auto boundingBox              = childBoundingInfo.boundingBox;
 
       auto minBox = boundingBox.minimumWorld;
       auto maxBox = boundingBox.maximumWorld;

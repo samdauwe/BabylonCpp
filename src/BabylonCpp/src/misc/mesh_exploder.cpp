@@ -47,7 +47,7 @@ void MeshExploder::_setCenterMesh()
   float shortestToCenter = std::numeric_limits<float>::max();
   for (const auto& mesh : _meshes) {
     if (mesh) {
-      const auto& boundingInfo = mesh->getBoundingInfo();
+      const auto& boundingInfo = *mesh->getBoundingInfo();
       /*if (boundingInfo)*/ {
         totalCenters.addInPlace(boundingInfo.boundingBox.centerWorld);
       }
@@ -56,7 +56,7 @@ void MeshExploder::_setCenterMesh()
   averageCenter = totalCenters.scale(1.f / _meshes.size());
   for (const auto& mesh : _meshes) {
     if (mesh) {
-      const auto& boundingInfo = mesh->getBoundingInfo();
+      const auto& boundingInfo = *mesh->getBoundingInfo();
       /*if (boundingInfo)*/ {
         auto distanceToCenter
           = boundingInfo.boundingBox.centerWorld.subtract(averageCenter)

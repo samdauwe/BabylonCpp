@@ -20,18 +20,6 @@ EffectPtr& BaseSubMesh::get_effect()
   return _materialEffect;
 }
 
-void BaseSubMesh::setEffect(const EffectPtr& iEffect)
-{
-  if (_materialEffect == iEffect) {
-    if (!iEffect) {
-      _materialDefines = nullptr;
-    }
-    return;
-  }
-  _materialDefines = nullptr;
-  _materialEffect  = iEffect;
-}
-
 void BaseSubMesh::setEffect(const EffectPtr& iEffect,
                             const MaterialDefinesPtr& defines)
 {

@@ -360,7 +360,7 @@ AbstractMesh* Mesh::getLOD(const CameraPtr& camera,
   else {
     auto boundingInfo = getBoundingInfo();
 
-    bSphere = &boundingInfo.boundingSphere;
+    bSphere = &boundingInfo->boundingSphere;
   }
 
   auto distanceToCamera
@@ -964,9 +964,11 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect,
       case Material::PointFillMode():
         indexToBind = nullptr;
         break;
-      case Material::WireFrameFillMode():
-        indexToBind = subMesh->_getLinesIndexBuffer(getIndices(), engine);
-        break;
+      case Material::WireFrameFillMode(): {
+        const auto& linesIndexBuffer
+          = subMesh->_getLinesIndexBuffer(getIndices(), engine);
+        indexToBind = linesIndexBuffer ? linesIndexBuffer.get() : nullptr;
+      } break;
       default:
       case Material::TriangleFillMode():
         indexToBind = _unIndexed ? nullptr : _geometry->getIndexBuffer();
@@ -2244,7 +2246,7 @@ void Mesh::_syncGeometryWithMorphTargetManager()
 std::vector<Vector3> Mesh::createInnerPoints(size_t pointsNb)
 {
   const auto& boundInfo = getBoundingInfo();
-  const auto diameter   = 2.f * boundInfo.boundingSphere.radius;
+  const auto diameter   = 2.f * boundInfo->boundingSphere.radius;
   updateFacetData();
 
   auto positions = getVerticesData(VertexBuffer::PositionKind);
@@ -2349,9 +2351,9 @@ std::vector<Vector3> Mesh::createInnerPoints(size_t pointsNb)
 bool Mesh::pointIsInside(Vector3 point)
 {
   auto boundInfo = getBoundingInfo();
-  auto max       = boundInfo.maximum();
-  auto min       = boundInfo.minimum();
-  auto diameter  = 2.f * boundInfo.boundingSphere.radius;
+  auto max       = boundInfo->maximum();
+  auto min       = boundInfo->minimum();
+  auto diameter  = 2.f * boundInfo->boundingSphere.radius;
   if (point.x < min.x || point.x > max.x) {
     return false;
   }
@@ -3193,7 +3195,7 @@ MinMax Mesh::GetMinMax(const std::vector<AbstractMeshPtr>& meshes)
   Vector3 minVector;
   Vector3 maxVector;
   for (auto& mesh : meshes) {
-    const BoundingBox& boundingBox = mesh->getBoundingInfo().boundingBox;
+    const BoundingBox& boundingBox = mesh->getBoundingInfo()->boundingBox;
     if (!minVectorSet) {
       minVector    = boundingBox.minimumWorld;
       maxVector    = boundingBox.maximumWorld;

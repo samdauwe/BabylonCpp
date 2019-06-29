@@ -159,7 +159,7 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
     positionFunction(positions);
     instance->setBoundingInfo(
       BoundingInfo(Tmp::Vector3Array[2], Tmp::Vector3Array[3]));
-    instance->getBoundingInfo().update(instance->_worldMatrix);
+    instance->getBoundingInfo()->update(instance->_worldMatrix);
     instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
                                  false);
     if (!options.colors.empty()) {

@@ -190,7 +190,7 @@ bool BoundingBox::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
 }
 
 bool BoundingBox::isCompletelyInFrustum(
-  const std::array<Plane, 6>& frustumPlanes) const
+  const std::array<Plane, 6>& frustumPlanes)
 {
   return BoundingBox::IsCompletelyInFrustum(vectorsWorld, frustumPlanes);
 }

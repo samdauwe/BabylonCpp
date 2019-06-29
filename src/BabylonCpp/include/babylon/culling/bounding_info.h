@@ -86,8 +86,8 @@ public:
    * @param frustumPlanes Camera near/planes
    * @returns true if the object is in frustum otherwise false
    */
-  bool isCompletelyInFrustum(
-    const std::array<Plane, 6>& frustumPlanes) const override;
+  bool
+  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief Hidden

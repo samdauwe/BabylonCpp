@@ -28,6 +28,7 @@ namespace BABYLON {
 
 struct _OcclusionDataStorage;
 class ActionManager;
+class BoundingInfo;
 class Camera;
 class Collider;
 struct IEdgesRenderer;
@@ -40,6 +41,7 @@ class RenderingGroup;
 class Skeleton;
 class SolidParticle;
 using _OcclusionDataStoragePtr = std::shared_ptr<_OcclusionDataStorage>;
+using BoundingInfoPtr          = std::shared_ptr<BoundingInfo>;
 using ColliderPtr              = std::shared_ptr<Collider>;
 using CameraPtr                = std::shared_ptr<Camera>;
 using LightPtr                 = std::shared_ptr<Light>;
@@ -309,7 +311,7 @@ public:
    * returns if it was undefined.
    * @returns a BoundingInfo
    */
-  BoundingInfo& getBoundingInfo();
+  BoundingInfoPtr& getBoundingInfo();
 
   /**
    * @brief Uniformly scales the mesh to fit inside of a unit cube (1 X 1 X 1
@@ -455,8 +457,8 @@ public:
    * @param frustumPlanes defines the frustum to test
    * @returns true if the mesh is completely in the frustum planes
    */
-  bool isCompletelyInFrustum(
-    const std::array<Plane, 6>& frustumPlanes) const override;
+  bool
+  isCompletelyInFrustum(const std::array<Plane, 6>& frustumPlanes) override;
 
   /**
    * @brief True if the mesh intersects another mesh or a SolidParticle object.
@@ -1655,7 +1657,7 @@ public:
   std::unique_ptr<MaterialDefines> _materialDefines;
 
   /** Hidden */
-  std::unique_ptr<BoundingInfo> _boundingInfo;
+  BoundingInfoPtr _boundingInfo;
 
   /** Hidden */
   int _renderId;

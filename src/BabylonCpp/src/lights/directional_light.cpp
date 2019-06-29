@@ -138,7 +138,7 @@ void DirectionalLight::_setDefaultAutoExtendShadowProjectionMatrix(
         continue;
       }
 
-      const auto& boundingInfo = mesh->getBoundingInfo();
+      const auto& boundingInfo = *mesh->getBoundingInfo();
       const auto& boundingBox  = boundingInfo.boundingBox;
 
       for (const auto& vector : boundingBox.vectorsWorld) {

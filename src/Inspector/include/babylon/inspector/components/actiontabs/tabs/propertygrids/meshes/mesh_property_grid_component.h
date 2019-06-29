@@ -52,7 +52,7 @@ struct BABYLON_SHARED_EXPORT MeshPropertyGridComponent {
     auto positions = mesh->getVerticesData(VertexBuffer::PositionKind);
 
     const auto color = Color3::White();
-    const auto size  = mesh->getBoundingInfo().diagonalLength() * 0.05f;
+    const auto size  = mesh->getBoundingInfo()->diagonalLength() * 0.05f;
 
     std::vector<std::vector<Vector3>> lines;
     for (unsigned int i = 0; i < normals.size(); i += 3) {

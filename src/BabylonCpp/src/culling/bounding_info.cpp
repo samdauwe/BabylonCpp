@@ -145,7 +145,7 @@ float BoundingInfo::diagonalLength() const
 }
 
 bool BoundingInfo::isCompletelyInFrustum(
-  const std::array<Plane, 6>& frustumPlanes) const
+  const std::array<Plane, 6>& frustumPlanes)
 {
   return boundingBox.isCompletelyInFrustum(frustumPlanes);
 }

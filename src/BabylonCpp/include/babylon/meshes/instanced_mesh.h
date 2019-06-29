@@ -7,7 +7,9 @@
 namespace BABYLON {
 
 class InstancedMesh;
+class Mesh;
 using InstancedMeshPtr = std::shared_ptr<InstancedMesh>;
+using MeshPtr          = std::shared_ptr<Mesh>;
 
 /**
  * @brief Creates an instance based on a source mesh.
@@ -251,16 +253,16 @@ protected:
   /**
    * @brief Gets the source mesh of the instance.
    */
-  Mesh*& get_sourceMesh();
+  MeshPtr& get_sourceMesh();
 
 public:
   /**
    * The source mesh of the instance.
    */
-  ReadOnlyProperty<InstancedMesh, Mesh*> sourceMesh;
+  ReadOnlyProperty<InstancedMesh, MeshPtr> sourceMesh;
 
 private:
-  Mesh* _sourceMesh;
+  MeshPtr _sourceMesh;
   Mesh* _currentLOD;
 
 }; // end of class InstancedMesh

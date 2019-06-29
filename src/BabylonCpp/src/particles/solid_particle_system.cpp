@@ -172,7 +172,7 @@ SolidParticleSystem::digest(Mesh* _mesh,
   while (f < totalFacets) {
     size = sizeO
            + static_cast<size_t>(
-               std::floor((1.f + static_cast<float>(delta)) * Math::random()));
+             std::floor((1.f + static_cast<float>(delta)) * Math::random()));
     if (f > totalFacets - size) {
       size = totalFacets - f;
     }
@@ -438,7 +438,8 @@ int SolidParticleSystem::addShape(
   auto meshUV  = iMesh->getVerticesData(VertexBuffer::UVKind);
   auto meshCol = iMesh->getVerticesData(VertexBuffer::ColorKind);
   auto meshNor = iMesh->getVerticesData(VertexBuffer::NormalKind);
-  BoundingInfo bbInfo{Vector3::Zero(), Vector3::Zero()};
+  auto bbInfo
+    = std::make_shared<BoundingInfo>(Vector3::Zero(), Vector3::Zero());
   if (_particlesIntersect) {
     bbInfo = iMesh->getBoundingInfo();
   }
@@ -463,7 +464,7 @@ int SolidParticleSystem::addShape(
                      meshCol, _colors, meshNor, _normals, idx, i, options);
     if (_updatable) {
       sp = _addParticle(idx, currentPos, currentInd, std::move(modelShape),
-                        _shapeCounter, i, bbInfo);
+                        _shapeCounter, i, *bbInfo);
       sp->position.copyFrom(currentCopy->position);
       sp->rotation.copyFrom(currentCopy->rotation);
       if (currentCopy->rotationQuaternion) {
@@ -992,7 +993,7 @@ SolidParticleSystem& SolidParticleSystem::setParticles(unsigned int start,
       std::sort(depthSortedParticles.begin(), depthSortedParticles.end(),
                 _depthSortFunction);
       const auto dspl = depthSortedParticles.size();
-      auto sid        = 0ll;
+      auto sid        = 0ull;
       for (size_t sorted = 0; sorted < dspl; ++sorted) {
         const auto lind = depthSortedParticles[sorted].indicesLength;
         const auto sind = depthSortedParticles[sorted].ind;
@@ -1066,7 +1067,7 @@ void SolidParticleSystem::setIsVisibilityBoxLocked(bool val)
 {
   _isVisibilityBoxLocked = val;
 
-  auto boundingInfo = mesh->getBoundingInfo();
+  auto& boundingInfo = *mesh->getBoundingInfo();
 
   boundingInfo.isLocked = val;
 }

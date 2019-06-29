@@ -49,7 +49,7 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject,
   // Sanity check!
   if (!object) {
     BABYLON_LOG_ERROR("PhysicsImpostor",
-                      "No object was provided. A physics object is obligatory");
+                      "No object was provided. A physics object is obligatory")
     return;
   }
 
@@ -66,7 +66,7 @@ PhysicsImpostor::PhysicsImpostor(IPhysicsEnabledObject* iObject,
   if (!_physicsEngine) {
     BABYLON_LOG_ERROR("PhysicsImpostor",
                       "Physics not enabled. Please use "
-                      "scene.enablePhysics(...) before creating impostors.");
+                      "scene.enablePhysics(...) before creating impostors.")
   }
   else {
     // Set the object's quaternion, if not set
@@ -178,7 +178,7 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
     // calculate the world matrix with no rotation
     object->computeWorldMatrix();
     object->computeWorldMatrix(true);
-    auto& boundingInfo = object->getBoundingInfo();
+    auto& boundingInfo = *object->getBoundingInfo();
     auto size          = boundingInfo.boundingBox.extendSizeWorld.scale(2.f);
 
     // bring back the rotation
@@ -197,7 +197,7 @@ Vector3 PhysicsImpostor::getObjectExtendSize()
 Vector3 PhysicsImpostor::getObjectCenter()
 {
   if (object->hasBoundingInfo()) {
-    const auto& boundingInfo = object->getBoundingInfo();
+    const auto& boundingInfo = *object->getBoundingInfo();
     return boundingInfo.boundingBox.centerWorld;
   }
   else {

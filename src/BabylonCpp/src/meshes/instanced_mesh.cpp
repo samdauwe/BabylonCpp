@@ -92,7 +92,7 @@ size_t InstancedMesh::getTotalVertices() const
   return _sourceMesh->getTotalVertices();
 }
 
-Mesh*& InstancedMesh::get_sourceMesh()
+MeshPtr& InstancedMesh::get_sourceMesh()
 {
   return _sourceMesh;
 }
@@ -116,7 +116,7 @@ InstancedMesh::setVerticesData(const std::string& kind,
   if (sourceMesh()) {
     sourceMesh()->setVerticesData(kind, data, updatable, stride);
   }
-  return sourceMesh();
+  return sourceMesh().get();
 }
 
 AbstractMesh* InstancedMesh::updateVerticesData(const std::string& kind,
@@ -127,7 +127,7 @@ AbstractMesh* InstancedMesh::updateVerticesData(const std::string& kind,
   if (sourceMesh()) {
     sourceMesh()->updateVerticesData(kind, data, updateExtends, makeItUnique);
   }
-  return sourceMesh();
+  return sourceMesh().get();
 }
 
 AbstractMesh* InstancedMesh::setIndices(const IndicesArray& indices,
@@ -137,7 +137,7 @@ AbstractMesh* InstancedMesh::setIndices(const IndicesArray& indices,
   if (sourceMesh()) {
     sourceMesh()->setIndices(indices, totalVertices);
   }
-  return sourceMesh();
+  return sourceMesh().get();
 }
 
 bool InstancedMesh::isVerticesDataPresent(const std::string& kind) const
@@ -158,10 +158,10 @@ std::vector<Vector3>& InstancedMesh::_positions()
 
 InstancedMesh& InstancedMesh::refreshBoundingInfo()
 {
-  auto meshBB = _sourceMesh->getBoundingInfo();
+  const auto& meshBB = *_sourceMesh->getBoundingInfo();
 
   _boundingInfo
-    = std::make_unique<BoundingInfo>(meshBB.minimum, meshBB.maximum);
+    = std::make_shared<BoundingInfo>(meshBB.minimum, meshBB.maximum);
 
   _updateBoundingInfo();
 
@@ -189,13 +189,13 @@ AbstractMesh* InstancedMesh::getLOD(const CameraPtr& camera,
     return this;
   }
 
-  auto boundingInfo = getBoundingInfo();
+  const auto& boundingInfo = getBoundingInfo();
 
   auto currentLOD = sourceMesh()->getLOD(getScene()->activeCamera,
-                                         &boundingInfo.boundingSphere);
+                                         &boundingInfo->boundingSphere);
   _currentLOD     = dynamic_cast<Mesh*>(currentLOD);
 
-  if (_currentLOD == sourceMesh()) {
+  if (_currentLOD == sourceMesh().get()) {
     return this;
   }
 

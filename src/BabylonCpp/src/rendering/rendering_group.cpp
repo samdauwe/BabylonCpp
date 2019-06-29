@@ -208,7 +208,7 @@ void RenderingGroup::renderSorted(
     subMesh->_alphaIndex = subMesh->getMesh()->alphaIndex;
     subMesh->_distanceToCamera
       = subMesh->getBoundingInfo()
-          .boundingSphere.centerWorld.subtract(cameraPosition)
+          ->boundingSphere.centerWorld.subtract(cameraPosition)
           .length();
   }
 

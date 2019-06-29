@@ -27,8 +27,8 @@ public:
    * @param effect defines the effect to associate with
    * @param defines defines the set of defines used to compile this effect
    */
-  void setEffect(const EffectPtr& effect);
-  void setEffect(const EffectPtr& effect, const MaterialDefinesPtr& defines);
+  void setEffect(const EffectPtr& effect,
+                 const MaterialDefinesPtr& defines = nullptr);
 
 protected:
   /**
