@@ -10,6 +10,7 @@
 #include <babylon/behaviors/ibehavior_aware.h>
 #include <babylon/core/structs.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/misc/iinspectable.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 
@@ -17,17 +18,21 @@ using json = nlohmann::json;
 
 namespace BABYLON {
 
+class AbstractActionManager;
 class AbstractMesh;
 class Animatable;
 struct AnimationPropertiesOverride;
+class AnimationRange;
 class Engine;
 class Node;
 class Scene;
 class TransformNode;
-using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;
-using AnimatablePtr    = std::shared_ptr<Animatable>;
-using NodePtr          = std::shared_ptr<Node>;
-using TransformNodePtr = std::shared_ptr<TransformNode>;
+using AbstractActionManagerPtr = std::shared_ptr<AbstractActionManager>;
+using AbstractMeshPtr          = std::shared_ptr<AbstractMesh>;
+using AnimatablePtr            = std::shared_ptr<Animatable>;
+using AnimationRangePtr        = std::shared_ptr<AnimationRange>;
+using NodePtr                  = std::shared_ptr<Node>;
+using TransformNodePtr         = std::shared_ptr<TransformNode>;
 
 /**
  * Defines how a node can be built from a string name.
@@ -71,9 +76,10 @@ public:
 
 public:
   /**
-   * @brief Creates a new Node
+   * @brief Creates a new Node.
    * @param name the name and id to be given to this node
    * @param scene the scene this node will be added to
+   * @param addToRootNodes the node will be added to scene.rootNodes
    */
   Node(const std::string& name, Scene* scene = nullptr,
        bool addToRootNodes = true);
@@ -110,12 +116,6 @@ public:
    * @returns a {BABYLON.Engine}
    */
   Engine* getEngine();
-
-  /**
-   * @brief Gets the shared pointer to this object.
-   * @return the shared pointer to this object
-   */
-  NodePtr getAsNodePtr();
 
   // Behaviors
   /**
@@ -154,7 +154,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual float _getWorldMatrixDeterminant() const;
+  virtual float _getWorldMatrixDeterminant();
 
   /**
    * @brief Returns directly the latest state of the mesh World matrix.
@@ -171,6 +171,13 @@ public:
    * @brief Hidden
    */
   virtual void updateCache(bool force = false);
+
+  /**
+   * @brief Hidden
+   */
+  virtual AbstractActionManagerPtr
+  _getActionManagerForTrigger(const std::optional<int>& trigger = std::nullopt,
+                              bool initialCall                  = true);
 
   /**
    * @brief Hidden
@@ -273,7 +280,7 @@ public:
    * @param directDescendantsOnly defines if true only direct descendants of
    * 'this' will be considered, if false direct and also indirect (children of
    * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered
+   * considered (Default: false)
    * @param predicate defines an optional predicate that will be called on every
    * evaluated child, the predicate must return true for a given child to be
    * part of the result, otherwise it will be ignored
@@ -285,30 +292,20 @@ public:
                  = nullptr);
 
   /**
-   * @brief Get all child-transformNodes of this node.
-   * @param directDescendantsOnly defines if true only direct descendants of
-   * 'this' will be considered, if false direct and also indirect (children of
-   * children, an so on in a recursive manner) descendants of 'this' will be
-   * considered
-   * @param predicate defines an optional predicate that will be called on every
-   * evaluated child, the predicate must return true for a given child to be
-   * part of the result, otherwise it will be ignored
-   * @returns an array of TransformNode
-   */
-  virtual std::vector<TransformNodePtr> getChildTransformNodes(
-    bool directDescendantsOnly                                = false,
-    const std::function<bool(const NodePtr& node)>& predicate = nullptr);
-
-  /**
    * @brief Get all direct children of this node.
    * @param predicate defines an optional predicate that will be called on every
    * evaluated child, the predicate must return true for a given child to be
    * part of the result, otherwise it will be ignored
+   * @param directDescendantsOnly defines if true only direct descendants of
+   * 'this' will be considered, if false direct and also indirect (children of
+   * children, an so on in a recursive manner) descendants of 'this' will be
+   * considered (Default: true)
    * @returns an array of Node
    */
   std::vector<NodePtr>
   getChildren(const std::function<bool(const NodePtr& node)>& predicate
-              = nullptr);
+              = nullptr,
+              bool directDescendantsOnly = true);
 
   /**
    * @brief Hidden
@@ -348,7 +345,13 @@ public:
    * @param name defines the name of the animation range to look for
    * @returns null if not found else the requested animation range
    */
-  AnimationRange* getAnimationRange(const std::string& name);
+  AnimationRangePtr getAnimationRange(const std::string& name);
+
+  /**
+   * @brief Gets the list of all animation ranges defined on this node.
+   * @returns an array
+   */
+  std::vector<AnimationRangePtr> getAnimationRanges();
 
   /**
    * @brief Will start the animation sequence.
@@ -400,14 +403,33 @@ public:
   static void ParseAnimationRanges(Node& node, const json& parsedNode,
                                    Scene* scene);
 
+  /**
+   * @brief Return the minimum and maximum world vectors of the entire hierarchy
+   * under current node
+   * @param includeDescendants Include bounding info from descendants as well
+   * (true by default)
+   * @param predicate defines a callback function that can be customize to
+   * filter what meshes should be included in the list used to compute the
+   * bounding vectors
+   * @returns the new bounding vectors
+   */
+  MinMax getHierarchyBoundingVectors(
+    bool includeDescendants = true,
+    const std::function<bool(const AbstractMeshPtr& abstractMesh)>& predicate
+    = nullptr);
+
 protected:
   /**
-   * @brief Sets the parent of the node.
+   * @brief Sets the parent of the node (without keeping the current position in
+   * the scene).
+   * @see https://doc.babylonjs.com/how_to/parenting
    */
   void set_parent(Node* const& parent) override;
 
   /**
-   * @brief Gets the parent of the node.
+   * @brief Gets the parent of the node (without keeping the current position in
+   * the scene).
+   * @see https://doc.babylonjs.com/how_to/parenting
    */
   Node*& get_parent() override;
 
@@ -439,8 +461,12 @@ protected:
    */
   virtual void _syncParentEnabledState();
 
-private:
+  /**
+   * @brief Hidden
+   */
   void addToSceneRootNodes();
+
+private:
   void removeFromSceneRootNodes();
 
 public:
@@ -465,10 +491,17 @@ public:
   json metadata;
 
   /**
+   * List of inspectable custom properties (used by the Inspector)
+   * @see https://doc.babylonjs.com/how_to/debug_layer#extensibility
+   */
+  std::vector<IInspectable> inspectableCustomProperties;
+
+  /**
    * Gets or sets a boolean used to define if the node must be serialized
    */
   bool doNotSerialize;
 
+  /** Hidden */
   bool _isDisposed;
 
   /**
@@ -520,20 +553,23 @@ public:
    */
   ReadOnlyProperty<Node, std::vector<Behavior<Node>*>> behaviors;
 
+  /** Hidden */
+  const bool _isNode;
+
 protected:
-  std::unordered_map<std::string, std::unique_ptr<AnimationRange>> _ranges;
-  int _childRenderId;
+  std::unordered_map<std::string, AnimationRangePtr> _ranges;
 
 private:
   bool _isEnabled;
   bool _isParentEnabled;
   bool _isReady;
-  int _parentRenderId;
+  int _parentUpdateId;
   Node* _parentNode;
   std::vector<NodePtr> _children;
   int _sceneRootNodesIndex;
   AnimationPropertiesOverride* _animationPropertiesOverride;
   Observer<Node>::Ptr _onDisposeObserver;
+  bool _addToRootNodes;
 
   // Behaviors
   std::vector<Behavior<Node>*> _behaviors;

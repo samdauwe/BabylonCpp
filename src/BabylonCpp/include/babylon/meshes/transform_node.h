@@ -7,6 +7,8 @@
 namespace BABYLON {
 
 class Bone;
+class Camera;
+using CameraPtr = std::shared_ptr<Camera>;
 
 /**
  * @brief A TransformNode is an object that is not rendered but can be used as a
@@ -232,6 +234,17 @@ public:
   TransformNode& getDirectionToRef(const Vector3& localAxis, Vector3& result);
 
   /**
+   * @brief Sets this transform node rotation to the given local axis.
+   * @param localAxis the axis in local space
+   * @param yawCor optional yaw (y-axis) correction in radians
+   * @param pitchCor optional pitch (x-axis) correction in radians
+   * @param rollCor optional roll (z-axis) correction in radians
+   * @returns this TransformNode
+   */
+  TransformNode& setDirection(const Vector3& localAxis, float yawCor = 0.f,
+                              float pitchCor = 0.f, float rollCor = 0.f);
+
+  /**
    * @brief Sets a new pivot point to the current node
    * @param point defines the new pivot point to use
    * @param space defines if the point is in world or local space (local by
@@ -274,6 +287,7 @@ public:
    * @brief Defines the passed node as the parent of the current node.
    * The node will remain exactly where it is and its position / rotation will
    * be updated accordingly
+   * @see https://doc.babylonjs.com/how_to/parenting
    * @param node the node ot set as the parent
    * @returns this TransformNode.
    */
@@ -300,12 +314,12 @@ public:
   TransformNode& detachFromBone();
 
   /**
-   * @brief  Rotates the mesh around the axis vector for the passed angle
+   * @brief Rotates the mesh around the axis vector for the passed angle
    * (amount) expressed in radians, in the given space. space (default LOCAL)
-   * can be either BABYLON.Space.LOCAL, either BABYLON.Space.WORLD. Note that
-   * the property `rotationQuaternion` is then automatically updated and the
-   * property `rotation` is set to (0,0,0) and no longer used. The passed axis
-   * is also normalized.
+   * can be either Space.LOCAL, either Space.WORLD. Note that the property
+   * `rotationQuaternion` is then automatically updated and the property
+   * `rotation` is set to (0,0,0) and no longer used. The passed axis is also
+   * normalized.
    * @param axis the axis to rotate around
    * @param amount the amount to rotate in radians
    * @param space Space to rotate in (Default: local)
@@ -330,8 +344,8 @@ public:
 
   /**
    * @brief Translates the mesh along the axis vector for the passed distance in
-   * the given space. space (default LOCAL) can be either BABYLON.Space.LOCAL,
-   * either BABYLON.Space.WORLD.
+   * the given space. space (default LOCAL) can be either Space.LOCAL, either
+   * Space.WORLD.
    * @param axis the axis to translate in
    * @param distance the distance to translate
    * @param space Space to rotate in (Default: local)
@@ -390,6 +404,20 @@ public:
     const std::function<void(TransformNode* mesh, EventState& es)>& func);
 
   /**
+   * @brief Gets the position of the current mesh in camera space.
+   * @param camera defines the camera to use
+   * @returns a position
+   */
+  Vector3 getPositionInCameraSpace(const CameraPtr& camera = nullptr) const;
+
+  /**
+   * @brief Returns the distance from the mesh to the active camera.
+   * @param camera defines the camera to use
+   * @returns the distance
+   */
+  float getDistanceToCamera(const CameraPtr& camera = nullptr);
+
+  /**
    * @brief Clone the current transform node
    * @param name Name of the new clone
    * @param newParent New parent for the clone
@@ -419,6 +447,21 @@ public:
                                 const std::string& rootUrl);
 
   /**
+   * @brief Get all child-transformNodes of this node.
+   * @param directDescendantsOnly defines if true only direct descendants of
+   * 'this' will be considered, if false direct and also indirect (children of
+   * children, an so on in a recursive manner) descendants of 'this' will be
+   * considered
+   * @param predicate defines an optional predicate that will be called on every
+   * evaluated child, the predicate must return true for a given child to be
+   * part of the result, otherwise it will be ignored
+   * @returns an array of TransformNode
+   */
+  virtual std::vector<TransformNodePtr> getChildTransformNodes(
+    bool directDescendantsOnly                                = false,
+    const std::function<bool(const NodePtr& node)>& predicate = nullptr);
+
+  /**
    * @brief Releases resources associated with this transform node.
    * @param doNotRecurse Set to true to not recurse into each children (recurse
    * into each children by default)
@@ -430,6 +473,49 @@ public:
 
 protected:
   virtual void _afterComputeWorldMatrix();
+
+  /**
+   * @brief Gets the billboard mode. Default is 0.
+   *
+   * | Value | Type | Description |
+   * | --- | --- | --- |
+   * | 0 | BILLBOARDMODE_NONE |  |
+   * | 1 | BILLBOARDMODE_X |  |
+   * | 2 | BILLBOARDMODE_Y |  |
+   * | 4 | BILLBOARDMODE_Z |  |
+   * | 7 | BILLBOARDMODE_ALL |  |
+   *
+   */
+  unsigned int get_billboardMode() const;
+
+  /**
+   * @brief Sets the billboard mode. Default is 0.
+   */
+  void set_billboardMode(unsigned int value);
+
+  /**
+   * @brief Gets or sets a boolean indicating that parent rotation should be
+   * preserved when using billboards. This could be useful for glTF objects
+   * where parent rotation helps converting from right handed to left handed.
+   */
+  bool get_preserveParentRotationForBillboard() const;
+
+  /**
+   * @brief Sets a boolean indicating that parent rotation should be preserved
+   * when using billboards. This could be useful for glTF objects where parent
+   * rotation helps converting from right handed to left handed.
+   */
+  void set_preserveParentRotationForBillboard(bool value);
+
+  /**
+   * @brief Gets the distance of the object to max, often used by skybox.
+   */
+  bool get_infiniteDistance() const;
+
+  /**
+   * @brief Sets the distance of the object to max, often used by skybox
+   */
+  void set_infiniteDistance(bool value);
 
   /**
    * @brief Gets the position property.
@@ -471,17 +557,17 @@ protected:
 
   /**
    * @brief Gets the rotation Quaternion property : this a Quaternion object
-   * defining the node rotation by using a unit quaternion (null by default). If
-   * set, only the rotationQuaternion is then used to compute the node rotation
-   * (ie. node.rotation will be ignored).
+   * defining the node rotation by using a unit quaternion (undefined by
+   * default, but can be null). If set, only the rotationQuaternion is then used
+   * to compute the node rotation (ie. node.rotation will be ignored).
    */
   std::optional<Quaternion>& get_rotationQuaternion();
 
   /**
    * @brief Sets the rotation Quaternion property : this a Quaternion object
-   * defining the node rotation by using a unit quaternion (null by default). If
-   * set, only the rotationQuaternion is then used to compute the node rotation
-   * (ie. node.rotation will be ignored).
+   * defining the node rotation by using a unit quaternion (undefined by
+   * default, but can be null). If set, only the rotationQuaternion is then used
+   * to compute the node rotation (ie. node.rotation will be ignored).
    */
   void set_rotationQuaternion(const std::optional<Quaternion>& quaternion);
 
@@ -518,9 +604,14 @@ protected:
    */
   bool get_nonUniformScaling() const;
 
+  /**
+   * @brief Hidden
+   */
+  Node* _getEffectiveParent() const;
+
 public:
   /**
-   * Set the billboard mode. Default is 0.
+   * Gets or sets the billboard mode. Default is 0.
    *
    * | Value | Type | Description |
    * | --- | --- | --- |
@@ -531,7 +622,19 @@ public:
    * | 7 | BILLBOARDMODE_ALL |  |
    *
    */
-  unsigned int billboardMode;
+  Property<TransformNode, unsigned int> billboardMode;
+
+  /**
+   * Gets or sets a boolean indicating that parent rotation should be preserved
+   * when using billboards. This could be useful for glTF objects where parent
+   * rotation helps converting from right handed to left handed
+   */
+  Property<TransformNode, bool> preserveParentRotationForBillboard;
+
+  /**
+   * Gets or sets the distance of the object to max, often used by skybox
+   */
+  Property<TransformNode, bool> infiniteDistance;
 
   /**
    * Multiplication factor on scale x/y/z when computing the world matrix. Eg.
@@ -540,22 +643,26 @@ public:
   float scalingDeterminant;
 
   /**
-   * Sets the distance of the object to max, often used by skybox
-   */
-  bool infiniteDistance;
-
-  /**
    * Gets or sets a boolean indicating that non uniform scaling (when at least
    * one component is different from others) should be ignored. By default the
    * system will update normals to compensate
    */
   bool ignoreNonUniformScaling;
 
+  /**
+   * Gets or sets a boolean indicating that even if rotationQuaternion is
+   * defined, you can keep updating rotation property and Babylon.js will just
+   * mix both
+   */
+  bool reIntegrateRotationIntoRotationQuaternion;
+
   // Cache
   /** Hidden */
   std::unique_ptr<Matrix> _poseMatrix;
   /** Hidden */
   Matrix _localMatrix;
+  /** Hidden */
+  int _indexInSceneTransformNodesArray;
 
   /**
    * Gets or set the node position (default is (0.0, 0.0, 0.0))
@@ -578,9 +685,9 @@ public:
 
   /**
    * Gets or sets the rotation Quaternion property : this a Quaternion object
-   * defining the node rotation by using a unit quaternion (null by default). If
-   * set, only the rotationQuaternion is then used to compute the node rotation
-   * (ie. node.rotation will be ignored)
+   * defining the node rotation by using a unit quaternion (undefined by
+   * default, but can be null). If set, only the rotationQuaternion is then used
+   * to compute the node rotation (ie. node.rotation will be ignored)
    */
   Property<TransformNode, std::optional<Quaternion>> rotationQuaternion;
 
@@ -618,6 +725,7 @@ protected:
   // Properties
   Vector3 _scaling;
   bool _isDirty;
+  bool _postMultiplyPivotMatrix;
   // Cache
   bool _isWorldMatrixFrozen;
 
@@ -646,11 +754,14 @@ private:
   Vector3 _rotation;
   std::optional<Quaternion> _rotationQuaternion;
   TransformNode* _transformToBoneReferal;
+  unsigned int _billboardMode;
+  bool _preserveParentRotationForBillboard;
+  bool _infiniteDistance;
   Matrix _localWorld;
+  bool _usePivotMatrix;
   Vector3 _absolutePosition;
   Matrix _pivotMatrix;
   std::unique_ptr<Matrix> _pivotMatrixInverse;
-  bool _postMultiplyPivotMatrix;
   bool _nonUniformScaling;
 
 }; // end of class TransformNode

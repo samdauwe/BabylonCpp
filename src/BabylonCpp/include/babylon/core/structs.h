@@ -183,6 +183,7 @@ struct NodeCache {
   Vector3 rotation;
   Vector3 upVector;
   unsigned int billboardMode = 0;
+  bool infiniteDistance      = false;
   // Camera
   unsigned int mode    = 0;
   float minZ           = 0.f;

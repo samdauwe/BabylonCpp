@@ -351,7 +351,7 @@ public:
   /**
    * @brief Hidden
    */
-  float _getWorldMatrixDeterminant() const override;
+  float _getWorldMatrixDeterminant() override;
 
   // ========================= Point of View Movement ==========================
 

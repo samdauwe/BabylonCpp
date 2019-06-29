@@ -37,11 +37,12 @@ std::function<NodePtr()> Node::Construct(const std::string& type,
   };
 }
 
-Node::Node(const std::string& iName, Scene* scene, bool /*addToRootNodes*/)
+Node::Node(const std::string& iName, Scene* scene, bool addToRootNodes)
     : name{iName}
     , id{iName}
     , doNotSerialize{false}
     , _isDisposed{false}
+    , onReady{nullptr}
     , _currentRenderId{-1}
     , _childUpdateId{-1}
     , _worldMatrix{Matrix::Identity()}
@@ -51,11 +52,11 @@ Node::Node(const std::string& iName, Scene* scene, bool /*addToRootNodes*/)
                                   &Node::set_animationPropertiesOverride}
     , onDispose{this, &Node::set_onDispose}
     , behaviors{this, &Node::get_behaviors}
-    , _childRenderId{-1}
+    , _isNode{true}
     , _isEnabled{true}
     , _isParentEnabled{true}
     , _isReady{true}
-    , _parentRenderId{-1}
+    , _parentUpdateId{-1}
     , _parentNode{nullptr}
     , _sceneRootNodesIndex{-1}
     , _animationPropertiesOverride{nullptr}
@@ -66,7 +67,9 @@ Node::Node(const std::string& iName, Scene* scene, bool /*addToRootNodes*/)
   uniqueId = _scene->getUniqueId();
   _initCache();
 
-  addToSceneRootNodes();
+  if (addToRootNodes) {
+    addToSceneRootNodes();
+  }
 }
 
 Node::~Node()
@@ -100,7 +103,7 @@ void Node::set_parent(Node* const& iParent)
                                                 }),
                                  _parentNode->_children.end());
 
-    if (!iParent) {
+    if (!iParent && !_isDisposed) {
       addToSceneRootNodes();
     }
   }
@@ -137,7 +140,7 @@ void Node::addToSceneRootNodes()
 void Node::removeFromSceneRootNodes()
 {
   if (_sceneRootNodesIndex != -1) {
-    auto rootNodes                                       = _scene->rootNodes;
+    auto& rootNodes                                      = _scene->rootNodes;
     auto lastIdx                                         = rootNodes.size() - 1;
     rootNodes[static_cast<size_t>(_sceneRootNodesIndex)] = rootNodes[lastIdx];
     rootNodes[static_cast<size_t>(_sceneRootNodesIndex)]->_sceneRootNodesIndex
@@ -185,11 +188,6 @@ Engine* Node::getEngine()
   return _scene->getEngine();
 }
 
-NodePtr Node::getAsNodePtr()
-{
-  return shared_from_this();
-}
-
 Node& Node::addBehavior(Behavior<Node>* behavior, bool attachImmediately)
 {
   auto it = std::find(_behaviors.begin(), _behaviors.end(), behavior);
@@ -199,7 +197,6 @@ Node& Node::addBehavior(Behavior<Node>* behavior, bool attachImmediately)
   }
 
   behavior->init();
-
   if (_scene->isLoading() && !attachImmediately) {
     // We defer the attach when the scene will be loaded
     _scene->onDataLoadedObservable.addOnce(
@@ -252,8 +249,12 @@ Matrix& Node::getWorldMatrix()
   return _worldMatrix;
 }
 
-float Node::_getWorldMatrixDeterminant() const
+float Node::_getWorldMatrixDeterminant()
 {
+  if (_worldMatrixDeterminantIsDirty) {
+    _worldMatrixDeterminantIsDirty = false;
+    _worldMatrixDeterminant        = _worldMatrix.determinant();
+  }
   return _worldMatrixDeterminant;
 }
 
@@ -278,6 +279,17 @@ void Node::updateCache(bool force)
   _updateCache();
 }
 
+AbstractActionManagerPtr
+Node::_getActionManagerForTrigger(const std::optional<int>& trigger,
+                                  bool /*initialCall*/)
+{
+  if (!parent()) {
+    return nullptr;
+  }
+
+  return parent()->_getActionManagerForTrigger(trigger, false);
+}
+
 void Node::_updateCache(bool /*ignoreParentClass*/)
 {
 }
@@ -290,7 +302,7 @@ bool Node::_isSynchronized()
 void Node::_markSyncedWithParent()
 {
   if (_parentNode) {
-    _parentRenderId = _parentNode->_childRenderId;
+    _parentUpdateId = _parentNode->_childUpdateId;
   }
 }
 
@@ -300,7 +312,7 @@ bool Node::isSynchronizedWithParent() const
     return true;
   }
 
-  if (_parentRenderId != _parentNode->_childRenderId) {
+  if (_parentUpdateId != _parentNode->_childUpdateId) {
     return false;
   }
 
@@ -414,23 +426,11 @@ Node::getChildMeshes(bool directDescendantsOnly,
   return results;
 }
 
-std::vector<TransformNodePtr> Node::getChildTransformNodes(
-  bool directDescendantsOnly,
-  const std::function<bool(const NodePtr& node)>& predicate)
-{
-  std::vector<TransformNodePtr> results;
-  _getDescendants(results, directDescendantsOnly,
-                  [&predicate](const NodePtr& node) {
-                    return ((!predicate || predicate(node))
-                            && (std::static_pointer_cast<TransformNode>(node)));
-                  });
-  return results;
-}
-
 std::vector<NodePtr>
-Node::getChildren(const std::function<bool(const NodePtr& node)>& predicate)
+Node::getChildren(const std::function<bool(const NodePtr& node)>& predicate,
+                  bool directDescendantsOnly)
 {
-  return getDescendants(true, predicate);
+  return getDescendants(directDescendantsOnly, predicate);
 }
 
 void Node::_setReady(bool iState)
@@ -470,7 +470,7 @@ void Node::createAnimationRange(const std::string& iName, float from, float to)
 {
   // check name not already in use
   if (!stl_util::contains(_ranges, iName)) {
-    _ranges[iName] = std::make_unique<AnimationRange>(iName, from, to);
+    _ranges[iName] = std::make_shared<AnimationRange>(iName, from, to);
     for (auto& animation : animations) {
       if (animation) {
         animation->createRange(iName, from, to);
@@ -490,13 +490,22 @@ void Node::deleteAnimationRange(const std::string& iName, bool deleteFrames)
   _ranges.erase(iName);
 }
 
-AnimationRange* Node::getAnimationRange(const std::string& iName)
+AnimationRangePtr Node::getAnimationRange(const std::string& iName)
 {
   if (stl_util::contains(_ranges, iName)) {
-    return _ranges[iName].get();
+    return _ranges[iName];
   }
 
   return nullptr;
+}
+
+std::vector<AnimationRangePtr> Node::getAnimationRanges()
+{
+  std::vector<AnimationRangePtr> animationRanges;
+  for (const auto& item : _ranges) {
+    animationRanges.emplace_back(item.second);
+  }
+  return animationRanges;
 }
 
 AnimatablePtr Node::beginAnimation(const std::string& iName, bool loop,
@@ -518,9 +527,9 @@ AnimatablePtr Node::beginAnimation(const std::string& iName, bool loop,
 std::vector<AnimationRange> Node::serializeAnimationRanges()
 {
   std::vector<AnimationRange> serializationRanges;
-  for (auto& item : _ranges) {
+  for (const auto& [name, range] : _ranges) {
     serializationRanges.emplace_back(
-      AnimationRange(item.first, item.second->from, item.second->to));
+      AnimationRange(name, range->from, range->to));
   }
 
   return serializationRanges;
@@ -533,17 +542,12 @@ Matrix& Node::computeWorldMatrix(bool /*force*/, bool /*useWasUpdatedFlag*/)
 
 void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
+  _isDisposed = true;
+
   if (!doNotRecurse) {
     auto nodes = getDescendants(true);
-    for (auto& node : nodes) {
+    for (const auto& node : nodes) {
       node->dispose(doNotRecurse, disposeMaterialAndTextures);
-    }
-  }
-  else {
-    auto transformNodes = getChildTransformNodes(true);
-    for (auto& transformNode : transformNodes) {
-      transformNode->setParent(nullptr);
-      transformNode->computeWorldMatrix(true);
     }
   }
 
@@ -564,12 +568,73 @@ void Node::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   }
 
   _behaviors.clear();
-  _isDisposed = true;
 }
 
 void Node::ParseAnimationRanges(Node& /*node*/, const json& /*parsedNode*/,
                                 Scene* /*scene*/)
 {
+}
+
+MinMax Node::getHierarchyBoundingVectors(
+  bool includeDescendants,
+  const std::function<bool(const AbstractMeshPtr& abstractMesh)>& predicate)
+{
+  // Ensures that all world matrix will be recomputed.
+  getScene()->incrementRenderId();
+
+  computeWorldMatrix(true);
+
+  Vector3 min;
+  Vector3 max;
+
+  auto thisAbstractMesh = static_cast<AbstractMesh*>(this);
+  if (!thisAbstractMesh->subMeshes.empty()) {
+    // If this is an abstract mesh get its bounding info
+    auto boundingInfo = thisAbstractMesh->getBoundingInfo();
+    min               = boundingInfo.boundingBox.minimumWorld;
+    max               = boundingInfo.boundingBox.maximumWorld;
+  }
+  else {
+    min = Vector3(std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max(),
+                  std::numeric_limits<float>::max());
+    max = Vector3(std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest(),
+                  std::numeric_limits<float>::lowest());
+  }
+
+  if (includeDescendants) {
+    auto descendants = getDescendants(false);
+
+    for (const auto& descendant : descendants) {
+      auto childMesh = std::static_pointer_cast<AbstractMesh>(descendant);
+      childMesh->computeWorldMatrix(true);
+
+      // Filters meshes based on custom predicate function.
+      if (predicate && !predicate(childMesh)) {
+        continue;
+      }
+
+      // make sure we have the needed params to get mix and max
+      if (childMesh->getTotalVertices() == 0) {
+        continue;
+      }
+
+      auto childBoundingInfo = childMesh->getBoundingInfo();
+      auto boundingBox       = childBoundingInfo.boundingBox;
+
+      auto minBox = boundingBox.minimumWorld;
+      auto maxBox = boundingBox.maximumWorld;
+
+      Tools::CheckExtends(minBox, min, max);
+      Tools::CheckExtends(maxBox, min, max);
+    }
+  }
+
+  return {
+    min, // min
+    max  // max
+  };
 }
 
 template void Node::_getDescendants<Node>(

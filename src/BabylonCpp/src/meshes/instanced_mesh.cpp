@@ -24,7 +24,7 @@ InstancedMesh::InstancedMesh(const std::string& _name, Mesh* source)
     rotationQuaternion = source->rotationQuaternion();
   }
 
-  infiniteDistance = source->infiniteDistance;
+  infiniteDistance = source->infiniteDistance();
 
   setPivotMatrix(source->getPivotMatrix());
 
@@ -84,7 +84,7 @@ void InstancedMesh::set_renderingGroupId(int value)
   // no-op with warning
   BABYLON_LOG_WARN("InstancedMesh",
                    "Note - setting renderingGroupId of an instanced mesh has "
-                   "no effect on the scene");
+                   "no effect on the scene")
 }
 
 size_t InstancedMesh::getTotalVertices() const

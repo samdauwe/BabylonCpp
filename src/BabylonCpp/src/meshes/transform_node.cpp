@@ -20,12 +20,21 @@ std::unique_ptr<Quaternion> TransformNode::_rotationAxisCache
 TransformNode::TransformNode(const std::string& iName, Scene* scene,
                              bool isPure)
     : Node{iName, scene}
-    , billboardMode{TransformNode::BILLBOARDMODE_NONE}
+    , billboardMode{this, &TransformNode::get_billboardMode,
+                    &TransformNode::set_billboardMode}
+    , preserveParentRotationForBillboard{this,
+                                         &TransformNode::
+                                           get_preserveParentRotationForBillboard,
+                                         &TransformNode::
+                                           set_preserveParentRotationForBillboard}
+    , infiniteDistance{this, &TransformNode::get_infiniteDistance,
+                       &TransformNode::set_infiniteDistance}
     , scalingDeterminant{1.f}
-    , infiniteDistance{false}
     , ignoreNonUniformScaling{false}
-    , _poseMatrix{std::make_unique<Matrix>(Matrix::Zero())}
+    , reIntegrateRotationIntoRotationQuaternion{false}
+    , _poseMatrix{std::make_unique<Matrix>(Matrix::Identity())}
     , _localMatrix{Matrix::Zero()}
+    , _indexInSceneTransformNodesArray{-1}
     , position{this, &TransformNode::get_position, &TransformNode::set_position}
     , rotation{this, &TransformNode::get_rotation, &TransformNode::set_rotation}
     , scaling{this, &TransformNode::get_scaling, &TransformNode::set_scaling}
@@ -39,6 +48,7 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene,
     , nonUniformScaling{this, &TransformNode::get_nonUniformScaling}
     , _scaling{Vector3::One()}
     , _isDirty{false}
+    , _postMultiplyPivotMatrix{false}
     , _isWorldMatrixFrozen{false}
     , _isPure{isPure}
     , _forward{Vector3{0.f, 0.f, 1.f}}
@@ -53,11 +63,14 @@ TransformNode::TransformNode(const std::string& iName, Scene* scene,
     , _rotation{Vector3::Zero()}
     , _rotationQuaternion{std::nullopt}
     , _transformToBoneReferal{nullptr}
+    , _billboardMode{TransformNode::BILLBOARDMODE_NONE}
+    , _preserveParentRotationForBillboard(false)
+    , _infiniteDistance{false}
     , _localWorld{Matrix::Zero()}
+    , _usePivotMatrix{false}
     , _absolutePosition{Vector3::Zero()}
     , _pivotMatrix{Matrix::Identity()}
     , _pivotMatrixInverse{nullptr}
-    , _postMultiplyPivotMatrix{false}
     , _nonUniformScaling{false}
 {
 }
@@ -69,6 +82,7 @@ TransformNode::~TransformNode()
 void TransformNode::addToScene(const TransformNodePtr& transformNode)
 {
   if (transformNode->_isPure) {
+    transformNode->addToSceneRootNodes();
     transformNode->getScene()->addTransformNode(transformNode);
   }
 }
@@ -163,6 +177,46 @@ const std::string TransformNode::getClassName() const
   return "TransformNode";
 }
 
+unsigned int TransformNode::get_billboardMode() const
+{
+  return _billboardMode;
+}
+
+void TransformNode::set_billboardMode(unsigned int value)
+{
+  if (_billboardMode == value) {
+    return;
+  }
+  _billboardMode = value;
+}
+
+bool TransformNode::get_preserveParentRotationForBillboard() const
+{
+  return _preserveParentRotationForBillboard;
+}
+
+void TransformNode::set_preserveParentRotationForBillboard(bool value)
+{
+  if (value == _preserveParentRotationForBillboard) {
+    return;
+  }
+  _preserveParentRotationForBillboard = value;
+}
+
+bool TransformNode::get_infiniteDistance() const
+{
+  return _infiniteDistance;
+}
+
+void TransformNode::set_infiniteDistance(bool value)
+{
+  if (_infiniteDistance == value) {
+    return;
+  }
+
+  _infiniteDistance = value;
+}
+
 Vector3& TransformNode::get_position()
 {
   return _position;
@@ -181,8 +235,9 @@ Vector3& TransformNode::get_rotation()
 
 void TransformNode::set_rotation(const Vector3& newRotation)
 {
-  _rotation = newRotation;
-  _isDirty  = true;
+  _rotation           = newRotation;
+  _rotationQuaternion = std::nullopt;
+  _isDirty            = true;
 }
 
 Vector3& TransformNode::get_scaling()
@@ -241,6 +296,10 @@ Vector3& TransformNode::get_right()
 
 TransformNode& TransformNode::updatePoseMatrix(const Matrix& matrix)
 {
+  if (!_poseMatrix) {
+    _poseMatrix = matrix.clone();
+    return *this;
+  }
   _poseMatrix->copyFrom(matrix);
   return *this;
 }
@@ -256,16 +315,14 @@ const Matrix& TransformNode::getPoseMatrix() const
 
 bool TransformNode::_isSynchronized()
 {
-  if (_isDirty) {
-    return false;
-  }
+  auto& cache = _cache;
 
-  if (billboardMode != _cache.billboardMode
+  if (billboardMode != cache.billboardMode
       || billboardMode != TransformNode::BILLBOARDMODE_NONE) {
     return false;
   }
 
-  if (_cache.pivotMatrixUpdated) {
+  if (cache.pivotMatrixUpdated) {
     return false;
   }
 
@@ -273,21 +330,20 @@ bool TransformNode::_isSynchronized()
     return false;
   }
 
-  if (!_cache.position.equals(_position)) {
+  if (!cache.position.equals(_position)) {
     return false;
   }
 
   if (_rotationQuaternion.has_value()) {
-    if (!_cache.rotationQuaternion.equals(*_rotationQuaternion)) {
+    if (!cache.rotationQuaternion.equals(*_rotationQuaternion)) {
       return false;
     }
   }
-
-  if (!_cache.rotation.equals(_rotation)) {
+  else if (!cache.rotation.equals(_rotation)) {
     return false;
   }
 
-  if (!_cache.scaling.equals(_scaling)) {
+  if (!cache.scaling.equals(_scaling)) {
     return false;
   }
 
@@ -298,19 +354,18 @@ void TransformNode::_initCache()
 {
   Node::_initCache();
 
-  _cache.localMatrixUpdated = false;
-  _cache.position           = Vector3::Zero();
-  _cache.scaling            = Vector3::Zero();
-  _cache.rotation           = Vector3::Zero();
-  _cache.rotationQuaternion = Quaternion(0.f, 0.f, 0.f, 0.f);
-  _cache.billboardMode      = AbstractMesh::BILLBOARDMODE_NONE;
+  auto& cache              = _cache;
+  cache.localMatrixUpdated = false;
+  cache.position           = Vector3::Zero();
+  cache.scaling            = Vector3::Zero();
+  cache.rotation           = Vector3::Zero();
+  cache.rotationQuaternion = Quaternion(0.f, 0.f, 0.f, 0.f);
+  cache.billboardMode      = AbstractMesh::BILLBOARDMODE_NONE;
+  cache.infiniteDistance   = false;
 }
 
-TransformNode& TransformNode::markAsDirty(const std::string& property)
+TransformNode& TransformNode::markAsDirty(const std::string& /*property*/)
 {
-  if (property == "rotation") {
-    rotationQuaternion = std::nullopt;
-  }
   _currentRenderId = std::numeric_limits<int>::max();
   _isDirty         = true;
   return *this;
@@ -329,7 +384,9 @@ TransformNode& TransformNode::setPreTransformMatrix(Matrix& matrix)
 TransformNode& TransformNode::setPivotMatrix(Matrix matrix,
                                              bool postMultiplyPivotMatrix)
 {
-  _pivotMatrix              = matrix;
+  _pivotMatrix.copyFrom(matrix);
+  _usePivotMatrix = !_pivotMatrix.isIdentity();
+
   _cache.pivotMatrixUpdated = true;
   _postMultiplyPivotMatrix  = postMultiplyPivotMatrix;
 
@@ -393,12 +450,11 @@ TransformNode& TransformNode::setAbsolutePosition(
   auto absolutePositionZ = (*iAbsolutePosition).z;
 
   if (parent()) {
-    auto invertParentWorldMatrix = parent()->getWorldMatrix();
-    invertParentWorldMatrix.invert();
-    Vector3 worldPosition{absolutePositionX, absolutePositionY,
-                          absolutePositionZ};
-    position
-      = Vector3::TransformCoordinates(worldPosition, invertParentWorldMatrix);
+    auto& invertParentWorldMatrix = Tmp::MatrixArray[0];
+    parent()->getWorldMatrix().invertToRef(invertParentWorldMatrix);
+    Vector3::TransformCoordinatesFromFloatsToRef(
+      absolutePositionX, absolutePositionY, absolutePositionZ,
+      invertParentWorldMatrix, position);
   }
   else {
     position().x = absolutePositionX;
@@ -411,23 +467,22 @@ TransformNode& TransformNode::setAbsolutePosition(
 TransformNode& TransformNode::setPositionWithLocalVector(const Vector3& vector3)
 {
   computeWorldMatrix();
-  position = Vector3::TransformNormal(vector3, _localWorld);
+  position = Vector3::TransformNormal(vector3, _localMatrix);
   return *this;
 }
 
 Vector3 TransformNode::getPositionExpressedInLocalSpace()
 {
   computeWorldMatrix();
-  auto invLocalWorldMatrix = _localWorld;
-  invLocalWorldMatrix.invert();
-
+  auto& invLocalWorldMatrix = Tmp::MatrixArray[0];
+  _localMatrix.invertToRef(invLocalWorldMatrix);
   return Vector3::TransformNormal(position, invLocalWorldMatrix);
 }
 
 TransformNode& TransformNode::locallyTranslate(const Vector3& vector3)
 {
   computeWorldMatrix(true);
-  position = Vector3::TransformCoordinates(vector3, _localWorld);
+  position = Vector3::TransformCoordinates(vector3, _localMatrix);
   return *this;
 }
 
@@ -437,18 +492,41 @@ TransformNode& TransformNode::lookAt(const Vector3& targetPoint, float yawCor,
   auto& dv = *TransformNode::_lookAtVectorCache;
   auto pos = (space == Space::LOCAL) ? position : getAbsolutePosition();
   targetPoint.subtractToRef(pos, dv);
-  auto yaw   = -std::atan2(dv.z, dv.x) - Math::PI_2;
-  auto len   = std::sqrt(dv.x * dv.x + dv.z * dv.z);
-  auto pitch = std::atan2(dv.y, len);
-  if (rotationQuaternion()) {
-    Quaternion::RotationYawPitchRollToRef(yaw + yawCor, pitch + pitchCor,
-                                          rollCor, *rotationQuaternion());
+  setDirection(dv, yawCor, pitchCor, rollCor);
+
+  // Correct for parent's rotation offset
+  if (space == Space::WORLD && parent()) {
+    if (rotationQuaternion().has_value()) {
+      // Get local rotation matrix of the looking object
+      auto& rotationMatrix = Tmp::MatrixArray[0];
+      rotationQuaternion()->toRotationMatrix(rotationMatrix);
+
+      // Offset rotation by parent's inverted rotation matrix to correct in
+      // world space
+      auto& parentRotationMatrix = Tmp::MatrixArray[1];
+      parent()->getWorldMatrix().getRotationMatrixToRef(parentRotationMatrix);
+      parentRotationMatrix.invert();
+      rotationMatrix.multiplyToRef(parentRotationMatrix, rotationMatrix);
+      rotationQuaternion()->fromRotationMatrix(rotationMatrix);
+    }
+    else {
+      // Get local rotation matrix of the looking object
+      auto& quaternionRotation = Tmp::QuaternionArray[0];
+      Quaternion::FromEulerVectorToRef(rotation, quaternionRotation);
+      auto& rotationMatrix = Tmp::MatrixArray[0];
+      quaternionRotation.toRotationMatrix(rotationMatrix);
+
+      // Offset rotation by parent's inverted rotation matrix to correct in
+      // world space
+      auto& parentRotationMatrix = Tmp::MatrixArray[1];
+      parent()->getWorldMatrix().getRotationMatrixToRef(parentRotationMatrix);
+      parentRotationMatrix.invert();
+      rotationMatrix.multiplyToRef(parentRotationMatrix, rotationMatrix);
+      quaternionRotation.fromRotationMatrix(rotationMatrix);
+      quaternionRotation.toEulerAnglesToRef(rotation());
+    }
   }
-  else {
-    rotation().x = pitch + pitchCor;
-    rotation().y = yaw + yawCor;
-    rotation().z = rollCor;
-  }
+
   return *this;
 }
 
@@ -465,6 +543,26 @@ TransformNode& TransformNode::getDirectionToRef(const Vector3& localAxis,
                                                 Vector3& result)
 {
   Vector3::TransformNormalToRef(localAxis, getWorldMatrix(), result);
+  return *this;
+}
+
+TransformNode& TransformNode::setDirection(const Vector3& localAxis,
+                                           float yawCor, float pitchCor,
+                                           float rollCor)
+{
+  const auto yaw = -std::atan2(localAxis.z, localAxis.x) + Math::PI_2;
+  const auto len
+    = std::sqrt(localAxis.x * localAxis.x + localAxis.z * localAxis.z);
+  const auto pitch = -std::atan2(localAxis.y, len);
+  if (rotationQuaternion().has_value()) {
+    Quaternion::RotationYawPitchRollToRef(yaw + yawCor, pitch + pitchCor,
+                                          rollCor, *rotationQuaternion());
+  }
+  else {
+    rotation().x = pitch + pitchCor;
+    rotation().y = yaw + yawCor;
+    rotation().z = rollCor;
+  }
   return *this;
 }
 
@@ -525,36 +623,19 @@ TransformNode& TransformNode::setParent(Node* node)
   if (!node && !parent()) {
     return *this;
   }
-  if (!node) {
-    auto& iRotation   = Tmp::QuaternionArray[0];
-    auto& newPosition = Tmp::Vector3Array[0];
-    auto& scale       = Tmp::Vector3Array[1];
 
+  auto& quatRotation = Tmp::QuaternionArray[0];
+  auto& newPosition  = Tmp::Vector3Array[0];
+  auto& scale        = Tmp::Vector3Array[1];
+
+  if (!node) {
     if (parent()) {
       parent()->computeWorldMatrix(true);
     }
     computeWorldMatrix(true);
-    getWorldMatrix().decompose(scale, iRotation, newPosition);
-
-    if (rotationQuaternion()) {
-      (*rotationQuaternion()).copyFrom(iRotation);
-    }
-    else {
-      iRotation.toEulerAnglesToRef(this->rotation());
-    }
-
-    scaling().x = scale.x;
-    scaling().y = scale.y;
-    scaling().z = scale.z;
-
-    position().x = newPosition.x;
-    position().y = newPosition.y;
-    position().z = newPosition.z;
+    getWorldMatrix().decompose(scale, quatRotation, newPosition);
   }
   else {
-    auto& iRotation       = Tmp::QuaternionArray[0];
-    auto& newPosition     = Tmp::Vector3Array[0];
-    auto& scale           = Tmp::Vector3Array[1];
     auto& diffMatrix      = Tmp::MatrixArray[0];
     auto& invParentMatrix = Tmp::MatrixArray[1];
 
@@ -563,23 +644,18 @@ TransformNode& TransformNode::setParent(Node* node)
 
     node->getWorldMatrix().invertToRef(invParentMatrix);
     getWorldMatrix().multiplyToRef(invParentMatrix, diffMatrix);
-    diffMatrix.decompose(scale, iRotation, newPosition);
-
-    if (rotationQuaternion()) {
-      (*rotationQuaternion()).copyFrom(iRotation);
-    }
-    else {
-      iRotation.toEulerAnglesToRef(this->rotation());
-    }
-
-    position().x = newPosition.x;
-    position().y = newPosition.y;
-    position().z = newPosition.z;
-
-    scaling().x = scale.x;
-    scaling().y = scale.y;
-    scaling().z = scale.z;
+    diffMatrix.decompose(scale, quatRotation, newPosition);
   }
+
+  if (rotationQuaternion()) {
+    rotationQuaternion()->copyFrom(quatRotation);
+  }
+  else {
+    quatRotation.toEulerAnglesToRef(rotation());
+  }
+
+  scaling().copyFrom(scale);
+  position().copyFrom(newPosition);
 
   Node::set_parent(node);
   return *this;
@@ -630,9 +706,8 @@ TransformNode& TransformNode::rotate(Vector3 axis, float amount, Space space)
 {
   axis.normalize();
   if (!rotationQuaternion()) {
-    rotationQuaternion = Quaternion::RotationYawPitchRoll(
-      rotation().y, rotation().x, rotation().z);
-    rotation = Vector3::Zero();
+    rotationQuaternion = rotation().toQuaternion();
+    rotation().setAll(0.f);
   }
   Quaternion iRotationQuaternion;
   if (space == Space::LOCAL) {
@@ -643,8 +718,8 @@ TransformNode& TransformNode::rotate(Vector3 axis, float amount, Space space)
   }
   else {
     if (parent()) {
-      auto invertParentWorldMatrix = parent()->getWorldMatrix();
-      invertParentWorldMatrix.invert();
+      auto& invertParentWorldMatrix = Tmp::MatrixArray[0];
+      parent()->getWorldMatrix().invertToRef(invertParentWorldMatrix);
       axis = Vector3::TransformNormal(axis, invertParentWorldMatrix);
     }
     iRotationQuaternion = Quaternion::RotationAxisToRef(
@@ -659,25 +734,37 @@ TransformNode& TransformNode::rotateAround(const Vector3& point, Vector3& axis,
                                            float amount)
 {
   axis.normalize();
-  if (!rotationQuaternion()) {
+  if (!rotationQuaternion().has_value()) {
     rotationQuaternion = Quaternion::RotationYawPitchRoll(
       rotation().y, rotation().x, rotation().z);
-    rotation().copyFromFloats(0.f, 0.f, 0.f);
+    rotation().setAll(0.f);
   }
-  point.subtractToRef(position, Tmp::Vector3Array[0]);
-  Matrix::TranslationToRef(Tmp::Vector3Array[0].x, Tmp::Vector3Array[0].y,
-                           Tmp::Vector3Array[0].z, Tmp::MatrixArray[0]);
-  Tmp::MatrixArray[0].invertToRef(Tmp::MatrixArray[2]);
-  Matrix::RotationAxisToRef(axis, amount, Tmp::MatrixArray[1]);
-  Tmp::MatrixArray[2].multiplyToRef(Tmp::MatrixArray[1], Tmp::MatrixArray[2]);
-  Tmp::MatrixArray[2].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[2]);
 
-  Tmp::MatrixArray[2].decompose(Tmp::Vector3Array[0], Tmp::QuaternionArray[0],
-                                Tmp::Vector3Array[1]);
+  auto& tmpVector        = Tmp::Vector3Array[0];
+  auto& finalScale       = Tmp::Vector3Array[1];
+  auto& finalTranslation = Tmp::Vector3Array[2];
 
-  position().addInPlace(Tmp::Vector3Array[1]);
-  Tmp::QuaternionArray[0].multiplyToRef(*rotationQuaternion(),
-                                        *rotationQuaternion());
+  auto& finalRotation = Tmp::QuaternionArray[0];
+
+  auto& translationMatrix    = Tmp::MatrixArray[0]; // T
+  auto& translationMatrixInv = Tmp::MatrixArray[1]; // T'
+  auto& rotationMatrix       = Tmp::MatrixArray[2]; // R
+  auto& finalMatrix          = Tmp::MatrixArray[3]; // T' x R x T
+
+  point.subtractToRef(position, tmpVector);
+  Matrix::TranslationToRef(tmpVector.x, tmpVector.y, tmpVector.z,
+                           translationMatrix); // T
+  Matrix::TranslationToRef(-tmpVector.x, -tmpVector.y, -tmpVector.z,
+                           translationMatrixInv);          // T'
+  Matrix::RotationAxisToRef(axis, amount, rotationMatrix); // R
+
+  translationMatrixInv.multiplyToRef(rotationMatrix, finalMatrix); // T' x R
+  finalMatrix.multiplyToRef(translationMatrix, finalMatrix);       // T' x R x T
+
+  finalMatrix.decompose(finalScale, finalRotation, finalTranslation);
+
+  position().addInPlace(finalTranslation);
+  finalRotation.multiplyToRef(*rotationQuaternion(), *rotationQuaternion());
 
   return *this;
 }
@@ -716,6 +803,11 @@ TransformNode& TransformNode::addRotation(float x, float y, float z)
   return *this;
 }
 
+Node* TransformNode::_getEffectiveParent() const
+{
+  return parent();
+}
+
 Matrix& TransformNode::computeWorldMatrix(bool force,
                                           bool /*useWasUpdatedFlag*/)
 {
@@ -730,175 +822,181 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
   }
 
   updateCache();
-  _cache.position.copyFrom(position);
-  _cache.scaling.copyFrom(scaling());
-  _cache.pivotMatrixUpdated = false;
-  _cache.billboardMode      = billboardMode;
-  _currentRenderId          = getScene()->getRenderId();
-  _childRenderId            = getScene()->getRenderId();
-  _isDirty                  = false;
+  auto& cache              = _cache;
+  cache.pivotMatrixUpdated = false;
+  cache.billboardMode      = billboardMode();
+  cache.infiniteDistance   = infiniteDistance();
 
-  // Scaling
-  Matrix::ScalingToRef(scaling().x * scalingDeterminant,
-                       scaling().y * scalingDeterminant,
-                       scaling().z * scalingDeterminant, Tmp::MatrixArray[1]);
-
-  // Rotation
-
-  // rotate, if quaternion is set and rotation was used
-  if (rotationQuaternion()) {
-    auto len = rotation().length();
-    if (len != 0.f) {
-      (*rotationQuaternion())
-        .multiplyInPlace(Quaternion::RotationYawPitchRoll(
-          rotation().y, rotation().x, rotation().z));
-      rotation().copyFromFloats(0.f, 0.f, 0.f);
-    }
-  }
-
-  if (rotationQuaternion()) {
-    (*rotationQuaternion()).toRotationMatrix(Tmp::MatrixArray[0]);
-    _cache.rotationQuaternion.copyFrom(*rotationQuaternion());
-  }
-  else {
-    Matrix::RotationYawPitchRollToRef(rotation().y, rotation().x, rotation().z,
-                                      Tmp::MatrixArray[0]);
-    _cache.rotation.copyFrom(rotation());
-  }
-
-  // Translation
+  _currentRenderId = currentRenderId;
+  _childUpdateId++;
+  _isDirty              = false;
+  auto iParent          = _getEffectiveParent();
+  auto useBillboardPath = _billboardMode != TransformNode::BILLBOARDMODE_NONE
+                          && !preserveParentRotationForBillboard();
   auto& camera = getScene()->activeCamera;
 
-  if (infiniteDistance && !parent() && camera) {
+  // Scaling
+  auto& iScaling     = cache.scaling;
+  auto& iTranslation = cache.position;
 
-    auto cameraWorldMatrix = camera->getWorldMatrix();
+  // Translation
+  if (_infiniteDistance) {
+    if (!parent() && camera) {
+      auto cameraWorldMatrix = camera->getWorldMatrix();
+      auto cameraGlobalPosition
+        = Vector3(cameraWorldMatrix.m()[12], cameraWorldMatrix.m()[13],
+                  cameraWorldMatrix.m()[14]);
 
-    const auto& cameraWorldMatrixM = cameraWorldMatrix.m();
-    Vector3 cameraGlobalPosition(cameraWorldMatrixM[12], cameraWorldMatrixM[13],
-                                 cameraWorldMatrixM[14]);
-
-    Matrix::TranslationToRef(position().x + cameraGlobalPosition.x,
-                             position().y + cameraGlobalPosition.y,
-                             position().z + cameraGlobalPosition.z,
-                             Tmp::MatrixArray[2]);
+      iTranslation.copyFromFloats(_position.x + cameraGlobalPosition.x,
+                                  _position.y + cameraGlobalPosition.y,
+                                  _position.z + cameraGlobalPosition.z);
+    }
+    else {
+      iTranslation.copyFrom(_position);
+    }
   }
   else {
-    Matrix::TranslationToRef(position().x, position().y, position().z,
-                             Tmp::MatrixArray[2]);
+    iTranslation.copyFrom(_position);
   }
 
-  // Composing transformations
-  _pivotMatrix.multiplyToRef(Tmp::MatrixArray[1], Tmp::MatrixArray[4]);
-  Tmp::MatrixArray[4].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[5]);
+  // Scaling
+  iScaling.copyFromFloats(_scaling.x * scalingDeterminant,
+                          _scaling.y * scalingDeterminant,
+                          _scaling.z * scalingDeterminant);
 
-  // Billboarding (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
-  if (billboardMode != TransformNode::BILLBOARDMODE_NONE && camera) {
-    if ((billboardMode & TransformNode::BILLBOARDMODE_ALL)
-        != AbstractMesh::BILLBOARDMODE_ALL) {
-      // Need to decompose each rotation here
-      auto& currentPosition = Tmp::Vector3Array[3];
-
-      if (parent()) {
-        if (_transformToBoneReferal) {
-          parent()->getWorldMatrix().multiplyToRef(
-            _transformToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
-          Vector3::TransformCoordinatesToRef(position, Tmp::MatrixArray[6],
-                                             currentPosition);
-        }
-        else {
-          Vector3::TransformCoordinatesToRef(
-            position, parent()->getWorldMatrix(), currentPosition);
-        }
+  // Rotation
+  auto& iRotation = cache.rotationQuaternion;
+  if (_rotationQuaternion.has_value()) {
+    if (reIntegrateRotationIntoRotationQuaternion) {
+      const auto len = rotation().lengthSquared();
+      if (len != 0.f) {
+        _rotationQuaternion->multiplyInPlace(Quaternion::RotationYawPitchRoll(
+          _rotation.y, _rotation.x, _rotation.z));
+        _rotation.copyFromFloats(0.f, 0.f, 0.f);
       }
-      else {
-        currentPosition.copyFrom(position);
-      }
-
-      currentPosition.subtractInPlace(camera->globalPosition());
-
-      auto finalEuler = Tmp::Vector3Array[4].copyFromFloats(0.f, 0.f, 0.f);
-      if ((billboardMode & TransformNode::BILLBOARDMODE_X)
-          == TransformNode::BILLBOARDMODE_X) {
-        finalEuler.x = std::atan2(-currentPosition.y, currentPosition.z);
-      }
-
-      if ((billboardMode & TransformNode::BILLBOARDMODE_Y)
-          == TransformNode::BILLBOARDMODE_Y) {
-        finalEuler.y = std::atan2(currentPosition.x, currentPosition.z);
-      }
-
-      if ((billboardMode & TransformNode::BILLBOARDMODE_Z)
-          == TransformNode::BILLBOARDMODE_Z) {
-        finalEuler.z = std::atan2(currentPosition.y, currentPosition.x);
-      }
-
-      Matrix::RotationYawPitchRollToRef(finalEuler.y, finalEuler.x,
-                                        finalEuler.z, Tmp::MatrixArray[0]);
     }
-    else {
-      Tmp::MatrixArray[1].copyFrom(camera->getViewMatrix());
+    iRotation.copyFrom(*_rotationQuaternion);
+  }
+  else {
+    Quaternion::RotationYawPitchRollToRef(_rotation.y, _rotation.x, _rotation.z,
+                                          iRotation);
+    cache.rotation.copyFrom(_rotation);
+  }
 
-      Tmp::MatrixArray[1].setTranslationFromFloats(0, 0, 0);
-      Tmp::MatrixArray[1].invertToRef(Tmp::MatrixArray[0]);
+  // Compose
+  if (_usePivotMatrix) {
+    auto& scaleMatrix = Tmp::MatrixArray[1];
+    Matrix::ScalingToRef(iScaling.x, iScaling.y, iScaling.z, scaleMatrix);
+
+    // Rotation
+    auto& rotationMatrix = Tmp::MatrixArray[0];
+    iRotation.toRotationMatrix(rotationMatrix);
+
+    // Composing transformations
+    _pivotMatrix.multiplyToRef(scaleMatrix, Tmp::MatrixArray[4]);
+    Tmp::MatrixArray[4].multiplyToRef(rotationMatrix, _localMatrix);
+
+    // Post multiply inverse of pivotMatrix
+    if (_postMultiplyPivotMatrix) {
+      _localMatrix.multiplyToRef(*_pivotMatrixInverse, _localMatrix);
     }
 
-    Tmp::MatrixArray[1].copyFrom(Tmp::MatrixArray[5]);
-    Tmp::MatrixArray[1].multiplyToRef(Tmp::MatrixArray[0], Tmp::MatrixArray[5]);
+    _localMatrix.addTranslationFromFloats(iTranslation.x, iTranslation.y,
+                                          iTranslation.z);
   }
-
-  // Post multiply inverse of pivotMatrix
-  if (_postMultiplyPivotMatrix) {
-    Tmp::MatrixArray[5].multiplyToRef(*_pivotMatrixInverse,
-                                      Tmp::MatrixArray[5]);
+  else {
+    Matrix::ComposeToRef(iScaling, iRotation, iTranslation, _localMatrix);
   }
-
-  // Local world
-  Tmp::MatrixArray[5].multiplyToRef(Tmp::MatrixArray[2], _localWorld);
 
   // Parent
-  if (parent()) {
-    if (billboardMode != TransformNode::BILLBOARDMODE_NONE) {
+  if (iParent) {
+    if (useBillboardPath) {
       if (_transformToBoneReferal) {
-        parent()->getWorldMatrix().multiplyToRef(
-          _transformToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[6]);
-        Tmp::MatrixArray[5].copyFrom(Tmp::MatrixArray[6]);
+        iParent->getWorldMatrix().multiplyToRef(
+          _transformToBoneReferal->getWorldMatrix(), Tmp::MatrixArray[7]);
       }
       else {
-        Tmp::MatrixArray[5].copyFrom(parent()->getWorldMatrix());
+        Tmp::MatrixArray[7].copyFrom(iParent->getWorldMatrix());
       }
 
-      _localWorld.getTranslationToRef(Tmp::Vector3Array[5]);
-      Vector3::TransformCoordinatesToRef(
-        Tmp::Vector3Array[5], Tmp::MatrixArray[5], Tmp::Vector3Array[5]);
-      _worldMatrix.copyFrom(_localWorld);
-      _worldMatrix.setTranslation(Tmp::Vector3Array[5]);
+      // Extract scaling and translation from parent
+      auto& translation = Tmp::Vector3Array[5];
+      auto& scale       = Tmp::Vector3Array[6];
+      Tmp::MatrixArray[7].decompose(scale, std::nullopt, translation);
+      Matrix::ScalingToRef(scale.x, scale.y, scale.z, Tmp::MatrixArray[7]);
+      Tmp::MatrixArray[7].setTranslation(translation);
+
+      _localMatrix.multiplyToRef(Tmp::MatrixArray[7], _worldMatrix);
     }
     else {
       if (_transformToBoneReferal) {
-        _localWorld.multiplyToRef(parent()->getWorldMatrix(),
-                                  Tmp::MatrixArray[6]);
+        _localMatrix.multiplyToRef(iParent->getWorldMatrix(),
+                                   Tmp::MatrixArray[6]);
         Tmp::MatrixArray[6].multiplyToRef(
           _transformToBoneReferal->getWorldMatrix(), _worldMatrix);
       }
       else {
-        _localWorld.multiplyToRef(parent()->getWorldMatrix(), _worldMatrix);
+        _localMatrix.multiplyToRef(iParent->getWorldMatrix(), _worldMatrix);
       }
     }
     _markSyncedWithParent();
   }
   else {
-    _worldMatrix.copyFrom(_localWorld);
+    _worldMatrix.copyFrom(_localMatrix);
+  }
+
+  // Billboarding (testing PG:http://www.babylonjs-playground.com/#UJEIL#13)
+  if (useBillboardPath && camera) {
+    auto& storedTranslation = Tmp::Vector3Array[0];
+    _worldMatrix.getTranslationToRef(storedTranslation); // Save translation
+
+    // Cancel camera rotation
+    Tmp::MatrixArray[1].copyFrom(camera->getViewMatrix());
+    Tmp::MatrixArray[1].setTranslationFromFloats(0.f, 0.f, 0.f);
+    Tmp::MatrixArray[1].invertToRef(Tmp::MatrixArray[0]);
+
+    if ((billboardMode & TransformNode::BILLBOARDMODE_ALL)
+        != TransformNode::BILLBOARDMODE_ALL) {
+      Tmp::MatrixArray[0].decompose(std::nullopt, Tmp::QuaternionArray[0],
+                                    std::nullopt);
+      auto& eulerAngles = Tmp::Vector3Array[1];
+      Tmp::QuaternionArray[0].toEulerAnglesToRef(eulerAngles);
+
+      if ((billboardMode & TransformNode::BILLBOARDMODE_X)
+          != TransformNode::BILLBOARDMODE_X) {
+        eulerAngles.x = 0;
+      }
+
+      if ((billboardMode & TransformNode::BILLBOARDMODE_Y)
+          != TransformNode::BILLBOARDMODE_Y) {
+        eulerAngles.y = 0;
+      }
+
+      if ((billboardMode & TransformNode::BILLBOARDMODE_Z)
+          != TransformNode::BILLBOARDMODE_Z) {
+        eulerAngles.z = 0;
+      }
+
+      Matrix::RotationYawPitchRollToRef(eulerAngles.y, eulerAngles.x,
+                                        eulerAngles.z, Tmp::MatrixArray[0]);
+    }
+    _worldMatrix.setTranslationFromFloats(0.f, 0.f, 0.f);
+    _worldMatrix.multiplyToRef(Tmp::MatrixArray[0], _worldMatrix);
+
+    // Restore translation
+    _worldMatrix.setTranslation(Tmp::Vector3Array[0]);
   }
 
   // Normal matrix
   if (!ignoreNonUniformScaling) {
-    if (scaling().isNonUniform()) {
+    if (_scaling.isNonUniform()) {
       _updateNonUniformScalingState(true);
     }
-    else if (parent() && static_cast<TransformNode*>(parent())
-             && (static_cast<TransformNode*>(parent()))->_nonUniformScaling) {
-      const auto parentTransformNode = static_cast<TransformNode*>(parent());
-      _updateNonUniformScalingState(parentTransformNode->_nonUniformScaling);
+    else if (iParent) {
+      auto tnParent = static_cast<TransformNode*>(iParent);
+      if (tnParent && tnParent->_nonUniformScaling) {
+        _updateNonUniformScalingState(tnParent->_nonUniformScaling);
+      }
     }
     else {
       _updateNonUniformScalingState(false);
@@ -911,9 +1009,8 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
   _afterComputeWorldMatrix();
 
   // Absolute position
-  const auto& _worldMatrixM = _worldMatrix.m();
-  _absolutePosition.copyFromFloats(_worldMatrixM[12], _worldMatrixM[13],
-                                   _worldMatrixM[14]);
+  _absolutePosition.copyFromFloats(_worldMatrix.m()[12], _worldMatrix.m()[13],
+                                   _worldMatrix.m()[14]);
 
   // Callbacks
   onAfterWorldMatrixUpdateObservable.notifyObservers(this);
@@ -923,7 +1020,7 @@ Matrix& TransformNode::computeWorldMatrix(bool force,
   }
 
   // Cache the determinant
-  _worldMatrixDeterminant = _worldMatrix.determinant();
+  _worldMatrixDeterminantIsDirty = true;
 
   return _worldMatrix;
 }
@@ -946,6 +1043,30 @@ TransformNode& TransformNode::unregisterAfterWorldMatrixUpdate(
   return *this;
 }
 
+Vector3 TransformNode::getPositionInCameraSpace(const CameraPtr& camera) const
+{
+  if (!camera) {
+    return Vector3::TransformCoordinates(
+      absolutePosition(), getScene()->activeCamera->getViewMatrix());
+  }
+  else {
+    return Vector3::TransformCoordinates(absolutePosition(),
+                                         camera->getViewMatrix());
+  }
+}
+
+float TransformNode::getDistanceToCamera(const CameraPtr& camera)
+{
+  if (!camera) {
+    return absolutePosition()
+      .subtract(getScene()->activeCamera->globalPosition())
+      .length();
+  }
+  else {
+    return absolutePosition().subtract(camera->globalPosition()).length();
+  }
+}
+
 TransformNodePtr TransformNode::clone(const std::string& /*name*/,
                                       Node* /*newParent*/,
                                       bool /*doNotCloneChildren*/)
@@ -965,6 +1086,19 @@ TransformNodePtr TransformNode::Parse(const json& /*parsedTransformNode*/,
   return nullptr;
 }
 
+std::vector<TransformNodePtr> TransformNode::getChildTransformNodes(
+  bool directDescendantsOnly,
+  const std::function<bool(const NodePtr& node)>& predicate)
+{
+  std::vector<TransformNodePtr> results;
+  _getDescendants(results, directDescendantsOnly,
+                  [&predicate](const NodePtr& node) {
+                    return ((!predicate || predicate(node))
+                            && (std::static_pointer_cast<TransformNode>(node)));
+                  });
+  return results;
+}
+
 void TransformNode::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   // Animations
@@ -974,6 +1108,14 @@ void TransformNode::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   getScene()->removeTransformNode(this);
 
   onAfterWorldMatrixUpdateObservable.clear();
+
+  if (doNotRecurse) {
+    const auto& transformNodes = getChildTransformNodes(true);
+    for (const auto& transformNode : transformNodes) {
+      transformNode->parent = nullptr;
+      transformNode->computeWorldMatrix(true);
+    }
+  }
 
   Node::dispose(doNotRecurse, disposeMaterialAndTextures);
 }

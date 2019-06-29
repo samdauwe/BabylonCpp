@@ -54,11 +54,11 @@ void SceneGraphComponent::reinitialize()
   }
 
   // Nodes
-  const auto& rootNodes = scene->rootNodes;
+  /*const auto& rootNodes = scene->rootNodes;
   auto& nodesTreeItem   = _sceneGraph.root().addChild(_createTreeItem("Nodes"));
   for (const auto& rootNode : rootNodes) {
-    _initializeNodesTreeItem(nodesTreeItem, rootNode->getAsNodePtr());
-  }
+    _initializeNodesTreeItem(nodesTreeItem, rootNode);
+  }*/
   // Materials
   const auto& materials = scene->materials;
   auto& materialsTreeItem

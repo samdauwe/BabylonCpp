@@ -878,7 +878,7 @@ Matrix& AbstractMesh::getWorldMatrix()
   return TransformNode::getWorldMatrix();
 }
 
-float AbstractMesh::_getWorldMatrixDeterminant() const
+float AbstractMesh::_getWorldMatrixDeterminant()
 {
   if (_masterMesh) {
     return _masterMesh->_getWorldMatrixDeterminant();
