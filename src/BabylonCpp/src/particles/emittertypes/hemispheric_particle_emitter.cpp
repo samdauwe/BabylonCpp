@@ -66,12 +66,12 @@ void HemisphericParticleEmitter::applyToShader(Effect* effect)
   effect->setFloat("directionRandomizer", directionRandomizer);
 }
 
-const char* HemisphericParticleEmitter::getEffectDefines() const
+const std::string HemisphericParticleEmitter::getEffectDefines() const
 {
   return "#define HEMISPHERICEMITTER";
 }
 
-const char* HemisphericParticleEmitter::getClassName() const
+const std::string HemisphericParticleEmitter::getClassName() const
 {
   return "HemisphericParticleEmitter";
 }

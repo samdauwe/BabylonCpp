@@ -64,13 +64,13 @@ struct BABYLON_SHARED_EXPORT IParticleEmitterType {
    * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containng the defines string
    */
-  virtual const char* getEffectDefines() const = 0;
+  virtual const std::string getEffectDefines() const = 0;
 
   /**
    * @brief Returns the string "SphereDirectedParticleEmitter".
    * @returns a string containing the class name
    */
-  virtual const char* getClassName() const = 0;
+  virtual const std::string getClassName() const = 0;
 
   /**
    * @brief Serializes the particle system to a JSON object.

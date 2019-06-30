@@ -61,13 +61,13 @@ public:
    * @brief Returns a string to use to update the GPU particles update shader
    * @returns a string containng the defines string
    */
-  const char* getEffectDefines() const override;
+  const std::string getEffectDefines() const override;
 
   /**
    * @brief Returns the string "CylinderDirectedParticleEmitter".
    * @returns a string containing the class name
    */
-  const char* getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Serializes the particle system to a JSON object.

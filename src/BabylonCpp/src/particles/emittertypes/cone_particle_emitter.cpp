@@ -65,7 +65,7 @@ void ConeParticleEmitter::startDirectionFunction(const Matrix& worldMatrix,
                                                  Particle* particle)
 {
   if (std::abs(std::cos(_angle)) == 1.f) {
-    Vector3::TransformNormalFromFloatsToRef(0, 1.0, 0, worldMatrix,
+    Vector3::TransformNormalFromFloatsToRef(0.f, 1.0, 0.f, worldMatrix,
                                             directionToUpdate);
   }
   else {
@@ -90,7 +90,7 @@ void ConeParticleEmitter::startPositionFunction(const Matrix& worldMatrix,
                                                 Particle* /*particle*/)
 {
   const auto s = Scalar::RandomRange(0.f, Math::PI2);
-  float h      = 0.f;
+  auto h       = 0.f;
 
   if (!emitFromSpawnPointOnly) {
     h = Scalar::RandomRange(0.f, heightRange);
@@ -127,7 +127,7 @@ void ConeParticleEmitter::applyToShader(Effect* effect)
   effect->setFloat("directionRandomizer", directionRandomizer);
 }
 
-const char* ConeParticleEmitter::getEffectDefines() const
+const std::string ConeParticleEmitter::getEffectDefines() const
 {
   std::string defines = "#define CONEEMITTER";
 
@@ -138,7 +138,7 @@ const char* ConeParticleEmitter::getEffectDefines() const
   return defines.c_str();
 }
 
-const char* ConeParticleEmitter::getClassName() const
+const std::string ConeParticleEmitter::getClassName() const
 {
   return "ConeParticleEmitter";
 }

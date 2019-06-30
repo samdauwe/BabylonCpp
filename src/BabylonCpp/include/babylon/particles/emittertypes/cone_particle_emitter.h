@@ -17,9 +17,9 @@ class BABYLON_SHARED_EXPORT ConeParticleEmitter : public IParticleEmitterType {
 
 public:
   /**
-   * @brief Creates a new instance of ConeParticleEmitter.
+   * @brief Creates a new instance ConeParticleEmitter.
    * @param radius the radius of the emission cone (1 by default)
-   * @param angles the cone base angle (PI by default)
+   * @param angle the cone base angle (PI by default)
    * @param directionRandomizer defines how much to randomize the particle
    * direction [0-1] (default is 0)
    */
@@ -65,13 +65,13 @@ public:
    * @brief Returns a string to use to update the GPU particles update shader.
    * @returns a string containng the defines string
    */
-  const char* getEffectDefines() const override;
+  const std::string getEffectDefines() const override;
 
   /**
    * @brief Returns the string "ConeParticleEmitter".
    * @returns a string containing the class name
    */
-  const char* getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Serializes the particle system to a JSON object.

@@ -45,12 +45,12 @@ void SphereDirectedParticleEmitter::applyToShader(Effect* effect)
   effect->setVector3("direction2", direction2);
 }
 
-const char* SphereDirectedParticleEmitter::getEffectDefines() const
+const std::string SphereDirectedParticleEmitter::getEffectDefines() const
 {
   return "#define SPHEREEMITTER\n#define DIRECTEDSPHEREEMITTER";
 }
 
-const char* SphereDirectedParticleEmitter::getClassName() const
+const std::string SphereDirectedParticleEmitter::getClassName() const
 {
   return "SphereDirectedParticleEmitter";
 }

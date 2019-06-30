@@ -70,12 +70,12 @@ void SphereParticleEmitter::applyToShader(Effect* effect)
   effect->setFloat("directionRandomizer", directionRandomizer);
 }
 
-const char* SphereParticleEmitter::getEffectDefines() const
+const std::string SphereParticleEmitter::getEffectDefines() const
 {
   return "#define SPHEREEMITTER";
 }
 
-const char* SphereParticleEmitter::getClassName() const
+const std::string SphereParticleEmitter::getClassName() const
 {
   return "SphereParticleEmitter";
 }

@@ -79,12 +79,12 @@ void CylinderParticleEmitter::applyToShader(Effect* effect)
   effect->setFloat("directionRandomizer", directionRandomizer);
 }
 
-const char* CylinderParticleEmitter::getEffectDefines() const
+const std::string CylinderParticleEmitter::getEffectDefines() const
 {
   return "#define CYLINDEREMITTER";
 }
 
-const char* CylinderParticleEmitter::getClassName() const
+const std::string CylinderParticleEmitter::getClassName() const
 {
   return "CylinderParticleEmitter";
 }

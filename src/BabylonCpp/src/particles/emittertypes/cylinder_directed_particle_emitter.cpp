@@ -49,12 +49,12 @@ void CylinderDirectedParticleEmitter::applyToShader(Effect* effect)
   effect->setVector3("direction2", direction2);
 }
 
-const char* CylinderDirectedParticleEmitter::getEffectDefines() const
+const std::string CylinderDirectedParticleEmitter::getEffectDefines() const
 {
   return "#define CYLINDEREMITTER\n#define DIRECTEDCYLINDEREMITTER";
 }
 
-const char* CylinderDirectedParticleEmitter::getClassName() const
+const std::string CylinderDirectedParticleEmitter::getClassName() const
 {
   return "CylinderDirectedParticleEmitter";
 }
@@ -64,8 +64,17 @@ json CylinderDirectedParticleEmitter::serialize() const
   return nullptr;
 }
 
-void CylinderDirectedParticleEmitter::parse(const json& /*serializationObject*/)
+void CylinderDirectedParticleEmitter::parse(const json& serializationObject)
 {
+  CylinderParticleEmitter::parse(serializationObject);
+  if (json_util::has_key(serializationObject, "direction1")) {
+    direction1.copyFrom(Vector3::FromArray(
+      json_util::get_array<float>(serializationObject, "direction1")));
+  }
+  if (json_util::has_key(serializationObject, "direction2")) {
+    direction2.copyFrom(Vector3::FromArray(
+      json_util::get_array<float>(serializationObject, "direction2")));
+  }
 }
 
 } // end of namespace BABYLON
