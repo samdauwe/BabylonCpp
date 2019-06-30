@@ -1,4 +1,4 @@
-#include <babylon/meshes/sub_mesh.h>
+﻿#include <babylon/meshes/sub_mesh.h>
 
 #include <babylon/animations/animation.h>
 #include <babylon/babylon_stl_util.h>
@@ -662,73 +662,6 @@ Mesh& Mesh::_refreshBoundingInfo(bool applySkeleton)
   _updateBoundingInfo();
 
   return *this;
-}
-
-Float32Array Mesh::_getPositionData(bool applySkeleton)
-{
-  auto data = getVerticesData(VertexBuffer::PositionKind);
-
-  if (!data.empty() && applySkeleton && skeleton()) {
-    auto matricesIndicesData
-      = getVerticesData(VertexBuffer::MatricesIndicesKind);
-    auto matricesWeightsData
-      = getVerticesData(VertexBuffer::MatricesWeightsKind);
-    if (!matricesWeightsData.empty() && !matricesIndicesData.empty()) {
-      auto needExtras = numBoneInfluencers() > 4;
-      auto matricesIndicesExtraData
-        = needExtras ? getVerticesData(VertexBuffer::MatricesIndicesExtraKind) :
-                       Float32Array();
-      auto matricesWeightsExtraData
-        = needExtras ? getVerticesData(VertexBuffer::MatricesWeightsExtraKind) :
-                       Float32Array();
-
-      auto skeletonMatrices = skeleton()->getTransformMatrices(this);
-
-      auto& tempVector  = Tmp::Vector3Array[0];
-      auto& finalMatrix = Tmp::MatrixArray[0];
-      auto& tempMatrix  = Tmp::MatrixArray[1];
-
-      unsigned int matWeightIdx = 0;
-      for (unsigned int index = 0; index < data.size();
-           index += 3, matWeightIdx += 4) {
-        finalMatrix.reset();
-
-        unsigned int inf = 0;
-        float weight     = 0.f;
-        for (inf = 0; inf < 4; inf++) {
-          weight = matricesWeightsData[matWeightIdx + inf];
-          if (weight > 0) {
-            Matrix::FromFloat32ArrayToRefScaled(
-              skeletonMatrices,
-              static_cast<unsigned int>(
-                std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
-              weight, tempMatrix);
-            finalMatrix.addToSelf(tempMatrix);
-          }
-        }
-        if (needExtras) {
-          for (inf = 0; inf < 4; inf++) {
-            weight = matricesWeightsExtraData[matWeightIdx + inf];
-            if (weight > 0) {
-              Matrix::FromFloat32ArrayToRefScaled(
-                skeletonMatrices,
-                static_cast<unsigned int>(std::floor(
-                  matricesIndicesExtraData[matWeightIdx + inf] * 16)),
-                weight, tempMatrix);
-              finalMatrix.addToSelf(tempMatrix);
-            }
-          }
-        }
-
-        Vector3::TransformCoordinatesFromFloatsToRef(
-          data[index], data[index + 1], data[index + 2], finalMatrix,
-          tempVector);
-        tempVector.toArray(data, index);
-      }
-    }
-  }
-
-  return data;
 }
 
 SubMeshPtr Mesh::_createGlobalSubMesh(bool force)
@@ -3325,6 +3258,29 @@ MeshPtr Mesh::MergeMeshes(const std::vector<MeshPtr>& meshes,
   }
 
   return meshSubclass;
+}
+
+void Mesh::addInstance(InstancedMesh* instance)
+{
+  instance->_indexInSourceMeshInstanceArray
+    = static_cast<int>(instances.size());
+  instances.emplace_back(instance);
+}
+
+void Mesh::removeInstance(InstancedMesh* instance)
+{
+  // Remove from mesh
+  const auto index = instance->_indexInSourceMeshInstanceArray;
+  if (index != -1) {
+    if (index != static_cast<int>(instances.size()) - 1) {
+      const auto& last                      = instances.back();
+      instances[static_cast<size_t>(index)] = last;
+      last->_indexInSourceMeshInstanceArray = index;
+    }
+
+    instance->_indexInSourceMeshInstanceArray = -1;
+    instances.pop_back();
+  }
 }
 
 } // end of namespace BABYLON

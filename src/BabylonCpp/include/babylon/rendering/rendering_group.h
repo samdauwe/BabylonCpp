@@ -18,10 +18,11 @@ struct ISpriteManager;
 class Material;
 class Scene;
 class SubMesh;
-using AbstractMeshPtr = std::shared_ptr<AbstractMesh>;
-using CameraPtr       = std::shared_ptr<Camera>;
-using MaterialPtr     = std::shared_ptr<Material>;
-using SubMeshPtr      = std::shared_ptr<SubMesh>;
+using AbstractMeshPtr   = std::shared_ptr<AbstractMesh>;
+using CameraPtr         = std::shared_ptr<Camera>;
+using IEdgesRendererPtr = std::shared_ptr<IEdgesRenderer>;
+using MaterialPtr       = std::shared_ptr<Material>;
+using SubMeshPtr        = std::shared_ptr<SubMesh>;
 
 /**
  * @brief This represents the object necessary to create a rendering group.
@@ -193,7 +194,7 @@ protected:
 
 public:
   /** Hidden */
-  std::vector<IEdgesRenderer*> _edgesRenderers;
+  std::vector<IEdgesRendererPtr> _edgesRenderers;
 
   unsigned int index;
   std::function<void()> onBeforeTransparentRendering;

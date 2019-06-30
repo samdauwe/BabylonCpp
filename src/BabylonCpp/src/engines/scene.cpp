@@ -3406,9 +3406,9 @@ void Scene::_evaluateActiveMeshes()
       _activeMeshes.emplace_back(mesh);
       activeCamera->_activeMeshes.emplace_back(_activeMeshes.back());
 
-      mesh->_activate(_renderId);
+      mesh->_activate(_renderId, false);
       if (meshLOD != mesh) {
-        meshLOD->_activate(_renderId);
+        meshLOD->_activate(_renderId, false);
       }
 
       _activeMesh(mesh, meshLOD);

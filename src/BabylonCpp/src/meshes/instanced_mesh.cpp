@@ -3,18 +3,23 @@
 #include <babylon/core/logging.h>
 #include <babylon/culling/bounding_info.h>
 #include <babylon/engines/scene.h>
+#include <babylon/math/tmp.h>
+#include <babylon/meshes/geometry.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
+#include <babylon/rendering/edges_renderer.h>
+#include <babylon/rendering/rendering_group.h>
 
 namespace BABYLON {
 
-InstancedMesh::InstancedMesh(const std::string& _name, Mesh* source)
-    : AbstractMesh(_name, source->getScene())
+InstancedMesh::InstancedMesh(const std::string& iName, Mesh* source)
+    : AbstractMesh(iName, source->getScene())
+    , _indexInSourceMeshInstanceArray{-1}
     , sourceMesh{this, &InstancedMesh::get_sourceMesh}
     , _sourceMesh{source}
     , _currentLOD{nullptr}
 {
-  source->instances.emplace_back(this);
+  source->addInstance(this);
 
   position().copyFrom(source->position());
   rotation().copyFrom(source->rotation());
@@ -48,6 +53,21 @@ const std::string InstancedMesh::getClassName() const
 Type InstancedMesh::type() const
 {
   return Type::INSTANCEDMESH;
+}
+
+void InstancedMesh::_resyncLightSources()
+{
+  // Do nothing as all the work will be done by source mesh
+}
+
+void InstancedMesh::_resyncLighSource(const LightPtr& /*light*/)
+{
+  // Do nothing as all the work will be done by source mesh
+}
+
+void InstancedMesh::_removeLightSource(const LightPtr& /*light*/)
+{
+  // Do nothing as all the work will be done by source mesh
 }
 
 bool InstancedMesh::get_receiveShadows() const
@@ -90,6 +110,11 @@ void InstancedMesh::set_renderingGroupId(int value)
 size_t InstancedMesh::getTotalVertices() const
 {
   return _sourceMesh->getTotalVertices();
+}
+
+size_t InstancedMesh::getTotalIndices() const
+{
+  return _sourceMesh->getTotalIndices();
 }
 
 MeshPtr& InstancedMesh::get_sourceMesh()
@@ -156,15 +181,16 @@ std::vector<Vector3>& InstancedMesh::_positions()
   return _sourceMesh->_positions();
 }
 
-InstancedMesh& InstancedMesh::refreshBoundingInfo()
+InstancedMesh& InstancedMesh::refreshBoundingInfo(bool applySkeleton)
 {
-  const auto& meshBB = *_sourceMesh->getBoundingInfo();
+  if (_boundingInfo && _boundingInfo->isLocked()) {
+    return *this;
+  }
 
-  _boundingInfo
-    = std::make_shared<BoundingInfo>(meshBB.minimum, meshBB.maximum);
-
-  _updateBoundingInfo();
-
+  const auto bias = _sourceMesh->geometry() ?
+                      _sourceMesh->geometry()->boundingBias() :
+                      std::nullopt;
+  _refreshBoundingInfo(_sourceMesh->_getPositionData(applySkeleton), bias);
   return *this;
 }
 
@@ -175,11 +201,54 @@ void InstancedMesh::_preActivate()
   }
 }
 
-void InstancedMesh::_activate(int renderId)
+bool InstancedMesh::_activate(int renderId, bool intermediateRendering)
 {
   if (_currentLOD) {
     _currentLOD->_registerInstanceForRenderId(this, renderId);
   }
+
+  if (intermediateRendering) {
+    if (!_currentLOD->_internalAbstractMeshDataInfo._isActiveIntermediate) {
+      _currentLOD->_internalAbstractMeshDataInfo._onlyForInstancesIntermediate
+        = true;
+      return true;
+    }
+  }
+  else {
+    if (!_currentLOD->_internalAbstractMeshDataInfo._isActive) {
+      _currentLOD->_internalAbstractMeshDataInfo._onlyForInstances = true;
+      return true;
+    }
+  }
+  return false;
+}
+
+void InstancedMesh::_postActivate()
+{
+  if (_edgesRenderer && _edgesRenderer->isEnabled
+      && _sourceMesh->_renderingGroup) {
+    _sourceMesh->_renderingGroup->_edgesRenderers.emplace_back(_edgesRenderer);
+  }
+}
+
+Matrix& InstancedMesh::getWorldMatrix()
+{
+  if (_currentLOD
+      && _currentLOD->billboardMode() != TransformNode::BILLBOARDMODE_NONE
+      && _currentLOD->_masterMesh != this) {
+    const auto& tempMaster   = _currentLOD->_masterMesh;
+    _currentLOD->_masterMesh = this;
+    Tmp::MatrixArray[0].copyFrom(_currentLOD->computeWorldMatrix(true));
+    _currentLOD->_masterMesh = tempMaster;
+    return Tmp::MatrixArray[0];
+  }
+
+  return AbstractMesh::getWorldMatrix();
+}
+
+bool InstancedMesh::isAnInstance() const
+{
+  return true;
 }
 
 AbstractMesh* InstancedMesh::getLOD(const CameraPtr& camera,
@@ -196,7 +265,7 @@ AbstractMesh* InstancedMesh::getLOD(const CameraPtr& camera,
   _currentLOD     = dynamic_cast<Mesh*>(currentLOD);
 
   if (_currentLOD == sourceMesh().get()) {
-    return this;
+    return sourceMesh().get();
   }
 
   return _currentLOD;
@@ -206,7 +275,7 @@ InstancedMesh& InstancedMesh::_syncSubMeshes()
 {
   releaseSubMeshes();
   if (!_sourceMesh->subMeshes.empty()) {
-    for (auto& subMesh : _sourceMesh->subMeshes) {
+    for (const auto& subMesh : _sourceMesh->subMeshes) {
       subMesh->clone(shared_from_base<InstancedMesh>(), _sourceMesh);
     }
   }
@@ -252,10 +321,7 @@ InstancedMeshPtr InstancedMesh::clone(const std::string& /*iNname*/,
 void InstancedMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
 {
   // Remove from mesh
-  _sourceMesh->instances.erase(std::remove(_sourceMesh->instances.begin(),
-                                           _sourceMesh->instances.end(), this),
-                               _sourceMesh->instances.end());
-
+  _sourceMesh->removeInstance(this);
   AbstractMesh::dispose(doNotRecurse, disposeMaterialAndTextures);
 }
 

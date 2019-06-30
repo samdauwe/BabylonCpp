@@ -1552,6 +1552,16 @@ public:
                              MeshPtr meshSubclass        = nullptr,
                              bool subdivideWithSubMeshes = false);
 
+  /**
+   * @brief Hidden
+   */
+  void addInstance(InstancedMesh* instance);
+
+  /**
+   * @brief Hidden
+   */
+  void removeInstance(InstancedMesh* instance);
+
 protected:
   /**
    * @brief Constructor
@@ -1651,7 +1661,6 @@ protected:
 
 private:
   void _sortLODLevels();
-  Float32Array _getPositionData(bool applySkeleton);
   Mesh& _onBeforeDraw(bool isInstance, Matrix& world,
                       Material* effectiveMaterial);
   // Faster 4 weight version

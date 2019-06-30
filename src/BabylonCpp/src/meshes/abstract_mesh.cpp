@@ -733,7 +733,7 @@ AbstractMesh& AbstractMesh::disableEdgesRendering()
 {
   if (_edgesRenderer) {
     _edgesRenderer->dispose();
-    _edgesRenderer.reset(nullptr);
+    _edgesRenderer = nullptr;
   }
   return *this;
 }
@@ -750,7 +750,7 @@ AbstractMesh::enableEdgesRendering(float epsilon,
   return *this;
 }
 
-std::unique_ptr<IEdgesRenderer>& AbstractMesh::get_edgesRenderer()
+IEdgesRendererPtr& AbstractMesh::get_edgesRenderer()
 {
   return _edgesRenderer;
 }
@@ -864,9 +864,10 @@ void AbstractMesh::_preActivateForIntermediateRendering(int /*renderId*/)
 {
 }
 
-void AbstractMesh::_activate(int renderId)
+bool AbstractMesh::_activate(int renderId, bool /*intermediateRendering*/)
 {
   _renderId = renderId;
+  return true;
 }
 
 Matrix& AbstractMesh::getWorldMatrix()
@@ -988,6 +989,95 @@ MinMax AbstractMesh::getHierarchyBoundingVectors(
 AbstractMesh& AbstractMesh::refreshBoundingInfo(bool /*applySkeleton*/)
 {
   return *this;
+}
+
+void AbstractMesh::_refreshBoundingInfo(const Float32Array& data,
+                                        const std::optional<Vector2>& bias)
+{
+  if (!data.empty()) {
+    auto extend = Tools::ExtractMinAndMax(data, 0, getTotalVertices(), bias);
+    if (_boundingInfo) {
+      _boundingInfo->reConstruct(extend.min, extend.max);
+    }
+    else {
+      _boundingInfo = std::make_shared<BoundingInfo>(extend.min, extend.max);
+    }
+  }
+
+  if (!subMeshes.empty()) {
+    for (const auto& subMesh : subMeshes) {
+      subMesh->refreshBoundingInfo(data);
+    }
+  }
+
+  _updateBoundingInfo();
+}
+
+Float32Array AbstractMesh::_getPositionData(bool applySkeleton)
+{
+  auto data = getVerticesData(VertexBuffer::PositionKind);
+
+  if (!data.empty() && applySkeleton && skeleton()) {
+    auto matricesIndicesData
+      = getVerticesData(VertexBuffer::MatricesIndicesKind);
+    auto matricesWeightsData
+      = getVerticesData(VertexBuffer::MatricesWeightsKind);
+    if (!matricesWeightsData.empty() && !matricesIndicesData.empty()) {
+      auto needExtras = numBoneInfluencers() > 4;
+      auto matricesIndicesExtraData
+        = needExtras ? getVerticesData(VertexBuffer::MatricesIndicesExtraKind) :
+                       Float32Array();
+      auto matricesWeightsExtraData
+        = needExtras ? getVerticesData(VertexBuffer::MatricesWeightsExtraKind) :
+                       Float32Array();
+
+      auto skeletonMatrices = skeleton()->getTransformMatrices(this);
+
+      auto& tempVector  = Tmp::Vector3Array[0];
+      auto& finalMatrix = Tmp::MatrixArray[0];
+      auto& tempMatrix  = Tmp::MatrixArray[1];
+
+      unsigned int matWeightIdx = 0;
+      for (unsigned int index = 0; index < data.size();
+           index += 3, matWeightIdx += 4) {
+        finalMatrix.reset();
+
+        unsigned int inf = 0;
+        float weight     = 0.f;
+        for (inf = 0; inf < 4; inf++) {
+          weight = matricesWeightsData[matWeightIdx + inf];
+          if (weight > 0) {
+            Matrix::FromFloat32ArrayToRefScaled(
+              skeletonMatrices,
+              static_cast<unsigned int>(
+                std::floor(matricesIndicesData[matWeightIdx + inf] * 16)),
+              weight, tempMatrix);
+            finalMatrix.addToSelf(tempMatrix);
+          }
+        }
+        if (needExtras) {
+          for (inf = 0; inf < 4; inf++) {
+            weight = matricesWeightsExtraData[matWeightIdx + inf];
+            if (weight > 0) {
+              Matrix::FromFloat32ArrayToRefScaled(
+                skeletonMatrices,
+                static_cast<unsigned int>(std::floor(
+                  matricesIndicesExtraData[matWeightIdx + inf] * 16)),
+                weight, tempMatrix);
+              finalMatrix.addToSelf(tempMatrix);
+            }
+          }
+        }
+
+        Vector3::TransformCoordinatesFromFloatsToRef(
+          data[index], data[index + 1], data[index + 2], finalMatrix,
+          tempVector);
+        tempVector.toArray(data, index);
+      }
+    }
+  }
+
+  return data;
 }
 
 AbstractMesh& AbstractMesh::_updateBoundingInfo()
@@ -1521,7 +1611,7 @@ void AbstractMesh::dispose(bool doNotRecurse, bool disposeMaterialAndTextures)
   // Edges
   if (_edgesRenderer) {
     _edgesRenderer->dispose();
-    _edgesRenderer.reset(nullptr);
+    _edgesRenderer = nullptr;
   }
 
   // SubMeshes

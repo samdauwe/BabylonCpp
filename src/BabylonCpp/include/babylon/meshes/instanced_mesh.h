@@ -40,10 +40,21 @@ public:
 
   /** Methods **/
 
+  void _resyncLightSources();
+  void _resyncLighSource(const LightPtr& light);
+  void _removeLightSource(const LightPtr& light);
+
   /**
    * @brief Returns the total number of vertices (integer).
    */
   size_t getTotalVertices() const override;
+
+  /**
+   * @brief Returns a positive integer : the total number of indices in this
+   * mesh geometry.
+   * @returns the numner of indices or zero if the mesh has no geometry.
+   */
+  size_t getTotalIndices() const;
 
   /**
    * @brief Is this node ready to be used/rendered.
@@ -84,18 +95,18 @@ public:
    * the bounding box and sphere, and the mesh World Matrix is recomputed.
    *
    * Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    *
    * @returns The Mesh.
    */
@@ -117,18 +128,18 @@ public:
    * from this positions and is set to the mesh.
    *
    * Possible `kind` values :
-   * - BABYLON.VertexBuffer.PositionKind
-   * - BABYLON.VertexBuffer.UVKind
-   * - BABYLON.VertexBuffer.UV2Kind
-   * - BABYLON.VertexBuffer.UV3Kind
-   * - BABYLON.VertexBuffer.UV4Kind
-   * - BABYLON.VertexBuffer.UV5Kind
-   * - BABYLON.VertexBuffer.UV6Kind
-   * - BABYLON.VertexBuffer.ColorKind
-   * - BABYLON.VertexBuffer.MatricesIndicesKind
-   * - BABYLON.VertexBuffer.MatricesIndicesExtraKind
-   * - BABYLON.VertexBuffer.MatricesWeightsKind
-   * - BABYLON.VertexBuffer.MatricesWeightsExtraKind
+   * - VertexBuffer.PositionKind
+   * - VertexBuffer.UVKind
+   * - VertexBuffer.UV2Kind
+   * - VertexBuffer.UV3Kind
+   * - VertexBuffer.UV4Kind
+   * - VertexBuffer.UV5Kind
+   * - VertexBuffer.UV6Kind
+   * - VertexBuffer.ColorKind
+   * - VertexBuffer.MatricesIndicesKind
+   * - VertexBuffer.MatricesIndicesExtraKind
+   * - VertexBuffer.MatricesWeightsKind
+   * - VertexBuffer.MatricesWeightsExtraKind
    *
    * @returns The Mesh.
    */
@@ -168,10 +179,14 @@ public:
   std::vector<Vector3>& _positions();
 
   /**
-   * @brief Sets a new updated BoundingInfo to the mesh.
-   * @returns the mesh.
+   * @brief This method recomputes and sets a new BoundingInfo to the mesh
+   * unless it is locked. This means the mesh underlying bounding box and sphere
+   * are recomputed.
+   * @param applySkeleton defines whether to apply the skeleton before computing
+   * the bounding info
+   * @returns the current mesh
    */
-  InstancedMesh& refreshBoundingInfo();
+  InstancedMesh& refreshBoundingInfo(bool applySkeleton = false);
 
   /**
    * @brief Hidden
@@ -181,7 +196,16 @@ public:
   /**
    * @brief Hidden
    */
-  void _activate(int renderId) override;
+  bool _activate(int renderId, bool intermediateRendering) override;
+
+  /**
+   * @brief Hidden
+   */
+  void _postActivate();
+
+  Matrix& getWorldMatrix() override;
+
+  bool isAnInstance() const;
 
   /**
    * @brief Returns the current associated LOD AbstractMesh.
@@ -256,6 +280,9 @@ protected:
   MeshPtr& get_sourceMesh();
 
 public:
+  /** Hidden */
+  int _indexInSourceMeshInstanceArray;
+
   /**
    * The source mesh of the instance.
    */

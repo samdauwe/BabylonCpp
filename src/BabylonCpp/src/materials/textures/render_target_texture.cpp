@@ -484,7 +484,7 @@ void RenderTargetTexture::render(bool useCameraPostProcess, bool dumpForDebug)
 
       if (mesh->isEnabled() && mesh->isVisible && (!mesh->subMeshes.empty())
           && !isMasked) {
-        mesh->_activate(scene->getRenderId());
+        mesh->_activate(scene->getRenderId(), false);
         for (auto& subMesh : mesh->subMeshes) {
           scene->_activeIndices.addCount(subMesh->indexCount, false);
           _renderingManager->dispatch(subMesh.get(), mesh);

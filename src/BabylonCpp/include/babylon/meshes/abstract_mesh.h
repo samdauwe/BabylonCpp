@@ -44,6 +44,7 @@ using _OcclusionDataStoragePtr = std::shared_ptr<_OcclusionDataStorage>;
 using BoundingInfoPtr          = std::shared_ptr<BoundingInfo>;
 using ColliderPtr              = std::shared_ptr<Collider>;
 using CameraPtr                = std::shared_ptr<Camera>;
+using IEdgesRendererPtr        = std::shared_ptr<IEdgesRenderer>;
 using LightPtr                 = std::shared_ptr<Light>;
 using MaterialPtr              = std::shared_ptr<Material>;
 using PhysicsImpostorPtr       = std::shared_ptr<PhysicsImpostor>;
@@ -342,7 +343,7 @@ public:
   /**
    * @brief Hidden
    */
-  virtual void _activate(int renderId);
+  virtual bool _activate(int renderId, bool intermediateRendering);
 
   /**
    * @brief Gets the current world matrix.
@@ -429,6 +430,17 @@ public:
    * @returns the current mesh
    */
   AbstractMesh& refreshBoundingInfo(bool applySkeleton = false);
+
+  /**
+   * @brief Hidden
+   */
+  void _refreshBoundingInfo(const Float32Array& data,
+                            const std::optional<Vector2>& bias);
+
+  /**
+   * @brief Hidden
+   */
+  Float32Array _getPositionData(bool applySkeleton);
 
   /**
    * @brief Hidden
@@ -1189,7 +1201,7 @@ protected:
   /**
    * @brief Gets the edgesRenderer associated with the mesh.
    */
-  std::unique_ptr<IEdgesRenderer>& get_edgesRenderer();
+  IEdgesRendererPtr& get_edgesRenderer();
 
   /**
    * @brief Returns true if the mesh is blocked. Implemented by child classes.
@@ -1646,7 +1658,7 @@ public:
   Color4 edgesColor;
 
   /** Hidden */
-  std::unique_ptr<IEdgesRenderer> _edgesRenderer;
+  IEdgesRendererPtr _edgesRenderer;
 
   // Cache
 
@@ -1719,7 +1731,7 @@ public:
   /**
    * Gets the edgesRenderer associated with the mesh
    */
-  ReadOnlyProperty<AbstractMesh, std::unique_ptr<IEdgesRenderer>> edgesRenderer;
+  ReadOnlyProperty<AbstractMesh, IEdgesRendererPtr> edgesRenderer;
 
   /**
    * Returns true if the mesh is blocked. Implemented by child classes
