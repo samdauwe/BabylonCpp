@@ -639,13 +639,13 @@ MinMax Node::getHierarchyBoundingVectors(
 }
 
 template void Node::_getDescendants<Node>(
-  std::vector<NodePtr>& results, bool directDescendantsOnly = false,
-  const std::function<bool(const NodePtr& node)>& predicate = nullptr);
+  std::vector<NodePtr>& results, bool directDescendantsOnly,
+  const std::function<bool(const NodePtr& node)>& predicate);
 template void Node::_getDescendants<AbstractMesh>(
-  std::vector<AbstractMeshPtr>& results, bool directDescendantsOnly = false,
-  const std::function<bool(const NodePtr& node)>& predicate = nullptr);
+  std::vector<AbstractMeshPtr>& results, bool directDescendantsOnly,
+  const std::function<bool(const NodePtr& node)>& predicate);
 template void Node::_getDescendants<TransformNode>(
-  std::vector<TransformNodePtr>& results, bool directDescendantsOnly = false,
-  const std::function<bool(const NodePtr& node)>& predicate = nullptr);
+  std::vector<TransformNodePtr>& results, bool directDescendantsOnly,
+  const std::function<bool(const NodePtr& node)>& predicate);
 
 } // end of namespace BABYLON
