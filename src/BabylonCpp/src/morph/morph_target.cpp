@@ -116,6 +116,11 @@ bool MorphTarget::get_hasTangents() const
   return !_tangents.empty();
 }
 
+std::vector<AnimationPtr> MorphTarget::getAnimations()
+{
+  return animations;
+}
+
 void MorphTarget::setPositions(const Float32Array& data)
 {
   const auto hadPositions = hasPositions();

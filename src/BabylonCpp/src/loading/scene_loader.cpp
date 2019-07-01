@@ -100,7 +100,7 @@ SceneLoader::_getPluginForExtension(const std::string& extension)
     "Unable to find a plugin to load %s files. Trying to use .babylon default "
     "plugin. To load from a specific filetype (eg. gltf) see: "
     "http://doc.babylonjs.com/how_to/load_from_any_file_type",
-    extension.c_str());
+    extension.c_str())
   return SceneLoader::_getDefaultPlugin();
 }
 
@@ -263,7 +263,7 @@ SceneLoader::_getFileInfo(std::string rootUrl, const std::string& sceneFilename)
   }
   else {
     if (sceneFilename.substr(0, 1) == "/") {
-      BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter");
+      BABYLON_LOG_ERROR("SceneLoader", "Wrong sceneFilename parameter")
       return std::nullopt;
     }
 
@@ -339,7 +339,7 @@ SceneLoader::ImportMesh(
   scene = scene ? scene : Engine::LastCreatedScene();
 
   if (!scene) {
-    BABYLON_LOG_ERROR("SceneLoader", "No scene available to import mesh to");
+    BABYLON_LOG_ERROR("SceneLoader", "No scene available to import mesh to")
     return std::nullopt;
   }
 
@@ -360,7 +360,7 @@ SceneLoader::ImportMesh(
           onError(scene, errorMessage, exception);
         }
         else {
-          BABYLON_LOG_ERROR("SceneLoader", errorMessage);
+          BABYLON_LOG_ERROR("SceneLoader", errorMessage)
           // should the exception be thrown?
         }
 
@@ -463,7 +463,7 @@ SceneLoader::Append(
   scene = scene ? scene : Engine::LastCreatedScene();
 
   if (!scene) {
-    BABYLON_LOG_ERROR("SceneLoader", "No scene available to append to");
+    BABYLON_LOG_ERROR("SceneLoader", "No scene available to append to")
     return std::nullopt;
   }
 
@@ -488,7 +488,7 @@ SceneLoader::Append(
           onError(scene, errorMessage, exception);
         }
         else {
-          BABYLON_LOG_ERROR("SceneLoader", errorMessage);
+          BABYLON_LOG_ERROR("SceneLoader", errorMessage)
           // should the exception be thrown?
         }
 

@@ -49,6 +49,11 @@ public:
                            const AnimationValue& value) override;
 
   /**
+   * @brief Gets the animations.
+   */
+  std::vector<AnimationPtr> getAnimations() override;
+
+  /**
    * @brief Affects position data to this target.
    * @param data defines the position data to use
    */
