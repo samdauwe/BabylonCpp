@@ -46,6 +46,9 @@ struct ClientRect {
   int width;
 }; // end of struct CameraRigParams
 
+struct ClipboardEvent {
+}; // end of struct ClipboardEvent
+
 struct DeviceOrientationEvent {
   float gamma;
   float beta;

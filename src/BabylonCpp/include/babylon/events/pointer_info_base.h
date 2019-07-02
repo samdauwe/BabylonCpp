@@ -15,7 +15,7 @@ class BABYLON_SHARED_EXPORT PointerInfoBase {
 public:
   /**
    * @brief Instantiates the base class of pointers info.
-   * @param type Defines the type of event (BABYLON.PointerEventTypes)
+   * @param type Defines the type of event (PointerEventTypes)
    * @param event Defines the related dom event
    */
   PointerInfoBase(PointerEventTypes type, const PointerEvent& event);
@@ -24,7 +24,7 @@ public:
 
 public:
   /**
-   * Defines the type of event (BABYLON.PointerEventTypes)
+   * Defines the type of event (PointerEventTypes)
    */
   PointerEventTypes type;
 

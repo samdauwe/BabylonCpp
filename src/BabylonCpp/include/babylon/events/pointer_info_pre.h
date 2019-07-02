@@ -21,7 +21,7 @@ public:
   /**
    * @brief Instantiates a PointerInfoPre to store pointer related info to the
    * onPrePointerObservable event.
-   * @param type Defines the type of event (BABYLON.PointerEventTypes)
+   * @param type Defines the type of event (PointerEventTypes)
    * @param event Defines the related dom event
    * @param localX Defines the local x coordinates of the pointer when the event
    * occured

@@ -21,7 +21,7 @@ public:
   /**
    * @brief Instantiates a PointerInfo to store pointer related info to the
    * onPointerObservable event.
-   * @param type Defines the type of event (BABYLON.PointerEventTypes)
+   * @param type Defines the type of event (PointerEventTypes)
    * @param event Defines the related dom event
    * @param pickInfo Defines the picking info associated to the info (if any)\
    */

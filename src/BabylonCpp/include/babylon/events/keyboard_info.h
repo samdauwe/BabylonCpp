@@ -17,7 +17,7 @@ public:
    * @brief Instantiates a new keyboard info.
    * This class is used to store keyboard related info for the
    * onKeyboardObservable event.
-   * @param type Defines the type of event (BABYLON.KeyboardEventTypes)
+   * @param type Defines the type of event (KeyboardEventTypes)
    * @param event Defines the related dom event
    */
   KeyboardInfo(unsigned int type, const KeyboardEvent& event);
@@ -25,7 +25,7 @@ public:
 
 public:
   /**
-   * Defines the type of event (BABYLON.KeyboardEventTypes)
+   * Defines the type of event (KeyboardEventTypes)
    */
   unsigned int type;
 
