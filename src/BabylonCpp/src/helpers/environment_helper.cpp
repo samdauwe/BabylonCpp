@@ -200,7 +200,7 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
   options.groundMirrorAmount          = 1;
   options.groundMirrorFresnelWeight   = 1;
   options.groundMirrorFallOffDistance = 0;
-  options.groundMirrorTextureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+  options.groundMirrorTextureType     = Constants::TEXTURETYPE_UNSIGNED_INT;
 
   options.groundYBias = 0.00001f;
 
@@ -209,7 +209,7 @@ IEnvironmentHelperOptions EnvironmentHelper::_getDefaultOptions()
   options.skyboxTexture = preprocessCDNUrl(_skyboxTextureCDNUrl);
   options.skyboxColor   = Color3(0.2f, 0.2f, 0.3f).toLinearSpace().scale(3.f);
 
-  options.backgroundYRotation = 0;
+  options.backgroundYRotation = 0.f;
   options.sizeAuto            = true;
   options.rootPosition        = Vector3::Zero();
 
@@ -342,8 +342,8 @@ void EnvironmentHelper::_setupGroundMaterial()
     _groundMaterial
       = BackgroundMaterial::New("BackgroundPlaneMaterial", _scene);
   }
-  _groundMaterial->alpha     = _options.groundOpacity;
-  _groundMaterial->alphaMode = EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF;
+  _groundMaterial->alpha        = _options.groundOpacity;
+  _groundMaterial->alphaMode    = Constants::ALPHA_PREMULTIPLIED_PORTERDUFF;
   _groundMaterial->shadowLevel  = _options.groundShadowLevel;
   _groundMaterial->primaryColor = _options.groundColor;
   _groundMaterial->useRGBColor  = false;

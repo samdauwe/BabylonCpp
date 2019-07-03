@@ -4893,6 +4893,7 @@ MeshPtr Scene::createDefaultSkybox(BaseTexturePtr iEnvironmentTexture, bool pbr,
     hdrSkybox->material             = skyboxMaterial;
   }
 
+  hdrSkybox->isPickable = false;
   return hdrSkybox;
 }
 

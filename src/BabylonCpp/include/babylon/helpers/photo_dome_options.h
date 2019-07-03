@@ -11,6 +11,7 @@ struct BABYLON_SHARED_EXPORT PhotoDomeOptions {
   std::optional<unsigned int> resolution = std::nullopt;
   std::optional<unsigned int> size       = std::nullopt;
   std::optional<bool> useDirectMapping   = std::nullopt;
+  std::optional<bool> faceForward        = std::nullopt;
 }; // end of struct PhotoDomeOptions
 
 } // end of namespace BABYLON

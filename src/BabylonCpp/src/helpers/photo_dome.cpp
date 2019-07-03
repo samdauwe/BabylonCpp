@@ -39,6 +39,10 @@ PhotoDome::PhotoDome(
     _useDirectMapping = *options.useDirectMapping;
   }
 
+  if (!options.faceForward.has_value()) {
+    options.faceForward = true;
+  }
+
   _setReady(false);
 
   // create
@@ -61,6 +65,17 @@ PhotoDome::PhotoDome(
   // configure mesh
   _mesh->material = material;
   _mesh->parent   = this;
+
+  // Initial rotation
+  if (*options.faceForward && scene->activeCamera) {
+    auto& camera = scene->activeCamera;
+
+    auto forward   = Vector3::Forward();
+    auto direction = Vector3::TransformNormal(forward, camera->getViewMatrix());
+    direction.normalize();
+
+    rotation().y = std::acos(Vector3::Dot(forward, direction));
+  }
 }
 
 PhotoDome::~PhotoDome()
