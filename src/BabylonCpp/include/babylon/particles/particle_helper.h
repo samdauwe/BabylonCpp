@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <babylon/babylon_api.h>
+#include <babylon/engines/constants.h>
 
 namespace BABYLON {
 
@@ -27,7 +28,7 @@ struct BABYLON_SHARED_EXPORT ParticleHelper {
    * Gets or sets base Assets URL
    */
   static constexpr const char* BaseAssetsUrl
-    = "https://assets.babylonjs.com/particles";
+    = Constants::PARTICLES_BaseAssetsUrl;
 
   /**
    * @brief Create a default particle system that you can tweak.
