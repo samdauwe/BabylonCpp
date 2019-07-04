@@ -20,7 +20,7 @@ class GroundMesh;
 class IAnimatable;
 class IcoSphereOptions;
 class InstancedMesh;
-struct IParticleSystem;
+class IParticleSystem;
 class LinesMesh;
 class Mesh;
 class MeshLODLevel;

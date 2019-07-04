@@ -13,7 +13,7 @@ using json = nlohmann::json;
 namespace BABYLON {
 
 class AbstractMesh;
-struct IParticleSystem;
+class IParticleSystem;
 class Scene;
 class TransformNode;
 using AbstractMeshPtr  = std::shared_ptr<AbstractMesh>;

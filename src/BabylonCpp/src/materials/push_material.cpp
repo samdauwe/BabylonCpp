@@ -8,7 +8,9 @@
 namespace BABYLON {
 
 PushMaterial::PushMaterial(const std::string& iName, Scene* scene)
-    : Material{iName, scene}, _activeEffect{nullptr}
+    : Material{iName, scene}
+    , allowShaderHotSwapping{true}
+    , _activeEffect{nullptr}
 {
   _storeEffectOnSubMeshes = true;
 }

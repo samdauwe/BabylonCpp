@@ -14,7 +14,7 @@ namespace BABYLON {
 
 class AbstractMesh;
 class AssetContainer;
-struct IParticleSystem;
+class IParticleSystem;
 class Scene;
 class Skeleton;
 using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;

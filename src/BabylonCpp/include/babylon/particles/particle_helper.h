@@ -11,7 +11,7 @@
 namespace BABYLON {
 
 class AbstractMesh;
-struct IParticleSystem;
+class IParticleSystem;
 class ParticleSystem;
 class ParticleSystemSet;
 class Scene;

@@ -18,7 +18,7 @@ class AbstractMesh;
 class AnimationGroup;
 struct ArrayBufferView;
 struct ImportedMeshes;
-struct IParticleSystem;
+class IParticleSystem;
 class ProgressEvent;
 class Scene;
 class SceneLoaderProgressEvent;

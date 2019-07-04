@@ -13,7 +13,7 @@ class AbstractMesh;
 class Camera;
 class EdgesRenderer;
 struct IEdgesRenderer;
-struct IParticleSystem;
+class IParticleSystem;
 struct ISpriteManager;
 class Material;
 class Scene;

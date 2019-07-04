@@ -3,8 +3,8 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
-#include <babylon/particles/base_particle_system.h>
 #include <babylon/misc/observable.h>
+#include <babylon/particles/base_particle_system.h>
 
 namespace BABYLON {
 
@@ -264,7 +264,7 @@ public:
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
-  IParticleSystem& removeColorRemapGradient(float gradient) override;
+  IParticleSystem& removeColorRemapGradient(float gradient = 0.f) override;
 
   /**
    * @brief Not supported by GPUParticleSystem.
@@ -297,7 +297,7 @@ public:
    * @param gradient defines the gradient to remove
    * @returns the current particle system
    */
-  IParticleSystem& removeRampGradient(float gradient) override;
+  IParticleSystem& removeRampGradient(float gradient= 0.f) override;
 
   /**
    * @brief Not supported by GPUParticleSystem

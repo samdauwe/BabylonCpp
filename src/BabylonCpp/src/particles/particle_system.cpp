@@ -23,6 +23,8 @@
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/color3_gradient.h>
+#include <babylon/misc/tools.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/cone_particle_emitter.h>
 #include <babylon/particles/emittertypes/hemispheric_particle_emitter.h>
@@ -31,14 +33,12 @@
 #include <babylon/particles/emittertypes/sphere_particle_emitter.h>
 #include <babylon/particles/particle.h>
 #include <babylon/particles/sub_emitter.h>
-#include <babylon/misc/color3_gradient.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
 ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
                                Scene* scene, const EffectPtr& customEffect,
-                               bool isAnimationSheetEnabled, float epsilon)
+                               bool iIsAnimationSheetEnabled, float epsilon)
     : BaseParticleSystem{iName}
     , onDispose{this, &ParticleSystem::set_onDispose}
     , _currentEmitRateGradient{std::nullopt}
@@ -69,7 +69,7 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
   _capacity = capacity;
 
   _epsilon                 = epsilon;
-  _isAnimationSheetEnabled = isAnimationSheetEnabled;
+  _isAnimationSheetEnabled = iIsAnimationSheetEnabled;
 
   _scene = scene ? scene : Engine::LastCreatedScene();
 
@@ -93,9 +93,9 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
     std::optional<ISize> noiseTextureSize = std::nullopt;
     std::optional<Uint8Array> noiseTextureData;
 
-    if (noiseTexture) { // We need to get texture data back to CPU
-      noiseTextureSize = noiseTexture->getSize();
-      noiseTextureData = noiseTexture->getContent().uint8Array;
+    if (noiseTexture()) { // We need to get texture data back to CPU
+      noiseTextureSize = noiseTexture()->getSize();
+      noiseTextureData = noiseTexture()->getContent().uint8Array;
     }
 
     for (unsigned int index = 0; index < _particles.size(); ++index) {
@@ -226,7 +226,8 @@ ParticleSystem::ParticleSystem(const std::string& iName, size_t capacity,
       particle->position.addInPlace(_scaledDirection);
 
       // Noise
-      if (noiseTextureData && noiseTextureSize) {
+      if (noiseTextureData && noiseTextureSize
+          && particle->_randomNoiseCoordinates1.has_value()) {
         auto fetchedColorR = _fetchR(
           particle->_randomNoiseCoordinates1->x,
           particle->_randomNoiseCoordinates1->y,
@@ -919,9 +920,9 @@ void ParticleSystem::_appendParticleVertex(unsigned int index,
 {
   unsigned int offset = index * _vertexBufferSize;
 
-  _vertexData[offset++] = particle->position.x;
-  _vertexData[offset++] = particle->position.y;
-  _vertexData[offset++] = particle->position.z;
+  _vertexData[offset++] = particle->position.x + worldOffset.x;
+  _vertexData[offset++] = particle->position.y + worldOffset.y;
+  _vertexData[offset++] = particle->position.z + worldOffset.z;
   _vertexData[offset++] = particle->color.r;
   _vertexData[offset++] = particle->color.g;
   _vertexData[offset++] = particle->color.b;
@@ -1283,7 +1284,7 @@ void ParticleSystem::_update(int newParticles)
     }
 
     // Noise texture coordinates
-    if (noiseTexture) {
+    if (noiseTexture()) {
       if (particle->_randomNoiseCoordinates1.has_value()) {
         particle->_randomNoiseCoordinates1->copyFromFloats(
           Math::random(), Math::random(), Math::random());
@@ -1305,21 +1306,21 @@ void ParticleSystem::_update(int newParticles)
 }
 
 std::vector<std::string> ParticleSystem::_GetAttributeNamesOrOptions(
-  bool isAnimationSheetEnabled, bool isBillboardBased, bool useRampGradients)
+  bool iIsAnimationSheetEnabled, bool iIsBillboardBased, bool iUseRampGradients)
 {
   std::vector<std::string> attributeNamesOrOptions{VertexBuffer::PositionKind,
                                                    VertexBuffer::ColorKind,
                                                    "angle", "offset", "size"};
 
-  if (isAnimationSheetEnabled) {
+  if (iIsAnimationSheetEnabled) {
     attributeNamesOrOptions.emplace_back("cellIndex");
   }
 
-  if (!isBillboardBased) {
+  if (!iIsBillboardBased) {
     attributeNamesOrOptions.emplace_back("direction");
   }
 
-  if (useRampGradients) {
+  if (iUseRampGradients) {
     attributeNamesOrOptions.emplace_back("remapData");
   }
 
@@ -1327,14 +1328,14 @@ std::vector<std::string> ParticleSystem::_GetAttributeNamesOrOptions(
 }
 
 std::vector<std::string>
-ParticleSystem::_GetEffectCreationOptions(bool isAnimationSheetEnabled)
+ParticleSystem::_GetEffectCreationOptions(bool iIsAnimationSheetEnabled)
 {
   std::vector<std::string> effectCreationOption{
     "invView",          "view",        "projection",  "vClipPlane",
     "vClipPlane2",      "vClipPlane3", "vClipPlane4", "textureMask",
     "translationPivot", "eyePosition"};
 
-  if (isAnimationSheetEnabled) {
+  if (iIsAnimationSheetEnabled) {
     effectCreationOption.emplace_back("particlesInfos");
   }
 
@@ -1345,7 +1346,7 @@ EffectPtr ParticleSystem::_getEffect(unsigned int iBlendMode)
 {
   if (_customEffect) {
     return _customEffect;
-  };
+  }
 
   std::vector<std::string> defines;
 
@@ -1447,10 +1448,10 @@ void ParticleSystem::animate(bool preWarmOnly)
       return;
     }
 
-    if (_currentRenderId == _scene->getRenderId()) {
+    if (_currentRenderId == _scene->getFrameId()) {
       return;
     }
-    _currentRenderId = _scene->getRenderId();
+    _currentRenderId = _scene->getFrameId();
   }
 
   _scaledUpdateSpeed = static_cast<int>(
@@ -1642,16 +1643,16 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   // Draw order
   switch (iBlendMode) {
     case ParticleSystem::BLENDMODE_ADD:
-      engine->setAlphaMode(EngineConstants::ALPHA_ADD);
+      engine->setAlphaMode(Constants::ALPHA_ADD);
       break;
     case ParticleSystem::BLENDMODE_ONEONE:
-      engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
+      engine->setAlphaMode(Constants::ALPHA_ONEONE);
       break;
     case ParticleSystem::BLENDMODE_STANDARD:
-      engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+      engine->setAlphaMode(Constants::ALPHA_COMBINE);
       break;
     case ParticleSystem::BLENDMODE_MULTIPLY:
-      engine->setAlphaMode(EngineConstants::ALPHA_MULTIPLY);
+      engine->setAlphaMode(Constants::ALPHA_MULTIPLY);
       break;
   }
 
@@ -1690,7 +1691,7 @@ size_t ParticleSystem::render(bool /*preWarm*/)
   outparticles = _render(blendMode);
 
   engine->unbindInstanceAttributes();
-  engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+  engine->setAlphaMode(Constants::ALPHA_DISABLE);
 
   return outparticles;
 }
@@ -1718,8 +1719,8 @@ void ParticleSystem::dispose(bool disposeTexture,
     particleTexture = nullptr;
   }
 
-  if (disposeTexture && noiseTexture) {
-    noiseTexture->dispose();
+  if (disposeTexture && noiseTexture()) {
+    noiseTexture()->dispose();
     noiseTexture = nullptr;
   }
 

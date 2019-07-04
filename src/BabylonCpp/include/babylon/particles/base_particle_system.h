@@ -279,6 +279,16 @@ public:
 
 protected:
   /**
+   * @brief Gets a texture used to add random noise to particle positions.
+   */
+  ProceduralTexturePtr& get_noiseTexture() override;
+
+  /**
+   * @brief Sets a texture used to add random noise to particle positions.
+   */
+  void set_noiseTexture(const ProceduralTexturePtr& value) override;
+
+  /**
    * @brief Gets whether an animation sprite sheet is enabled or not on the
    * particle system.
    */
@@ -419,6 +429,11 @@ public:
   bool forceDepthWrite;
 
   /**
+   * Gets or sets a world offset applied to all particles
+   */
+  Vector3 worldOffset;
+
+  /**
    * An optional mask to filter some colors out of the texture, or filter a part
    * of the alpha channel
    */
@@ -501,6 +516,7 @@ protected:
   std::vector<FactorGradient> _alphaRemapGradients;
 
 private:
+  ProceduralTexturePtr _noiseTexture;
   Vector3 _zeroVector3;
 
 }; // end of struct BaseParticleSystem

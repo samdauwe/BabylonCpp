@@ -5,6 +5,7 @@
 #include <babylon/materials/image_processing_configuration_defines.h>
 #include <babylon/materials/textures/raw_texture.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/misc/color3_gradient.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/cone_particle_emitter.h>
 #include <babylon/particles/emittertypes/cylinder_directed_particle_emitter.h>
@@ -13,7 +14,6 @@
 #include <babylon/particles/emittertypes/point_particle_emitter.h>
 #include <babylon/particles/emittertypes/sphere_directed_particle_emitter.h>
 #include <babylon/particles/particle_system.h>
-#include <babylon/misc/color3_gradient.h>
 
 namespace BABYLON {
 
@@ -21,6 +21,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     : manualEmitCount{-1}
     , onAnimationEnd{nullptr}
     , forceDepthWrite{false}
+    , worldOffset{Vector3(0.f, 0.f, 0.f)}
     , textureMask{Color4(1.f, 1.f, 1.f, 1.f)}
     , direction1{this, &BaseParticleSystem::get_direction1,
                  &BaseParticleSystem::set_direction1}
@@ -36,6 +37,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     , _isBillboardBased{true}
     , _imageProcessingConfigurationDefines{std::make_shared<
         ImageProcessingConfigurationDefines>()}
+    , _noiseTexture{nullptr}
     , _zeroVector3{Vector3::Zero()}
 {
   // IParticleSystem
@@ -49,7 +51,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     targetStopDuration    = 0;
     disposeOnStop         = false;
     particleTexture       = nullptr;
-    blendMode             = ParticleSystem::BLENDMODE_ONEONE;
+    blendMode             = BaseParticleSystem::BLENDMODE_ONEONE;
     minLifeTime           = 1.f;
     maxLifeTime           = 1.f;
     minSize               = 1.f;
@@ -85,7 +87,7 @@ BaseParticleSystem::BaseParticleSystem(const std::string& iName)
     beginAnimationLoop    = false;
     noiseTexture          = nullptr;
     noiseStrength         = Vector3(10.f, 10.f, 10.f);
-    billboardMode         = ParticleSystem::BILLBOARDMODE_ALL;
+    billboardMode         = Constants::PARTICLES_BILLBOARDMODE_ALL;
     limitVelocityDamping  = 0.4f;
     startDelay            = 0;
   }
@@ -104,6 +106,21 @@ bool BaseParticleSystem::hasEmitter() const
 Scene* BaseParticleSystem::getScene() const
 {
   return _scene;
+}
+
+ProceduralTexturePtr& BaseParticleSystem::get_noiseTexture()
+{
+  return _noiseTexture;
+}
+
+void BaseParticleSystem::set_noiseTexture(const ProceduralTexturePtr& value)
+{
+  if (_noiseTexture == value) {
+    return;
+  }
+
+  _noiseTexture = value;
+  _reset();
 }
 
 bool BaseParticleSystem::get_isAnimationSheetEnabled() const

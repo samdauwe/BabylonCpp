@@ -21,11 +21,11 @@
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/color3_gradient.h>
+#include <babylon/misc/tools.h>
 #include <babylon/particles/emittertypes/box_particle_emitter.h>
 #include <babylon/particles/emittertypes/iparticle_emitter_Type.h>
 #include <babylon/particles/particle_system.h>
-#include <babylon/misc/color3_gradient.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -39,7 +39,8 @@ bool GPUParticleSystem::IsSupported()
 
 GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
                                      std::optional<size_t> randomTextureSize,
-                                     Scene* scene, bool isAnimationSheetEnabled)
+                                     Scene* scene,
+                                     bool iIsAnimationSheetEnabled)
     : BaseParticleSystem{iName}
     , activeParticleCount{this, &GPUParticleSystem::get_activeParticleCount,
                           &GPUParticleSystem::set_activeParticleCount}
@@ -82,7 +83,7 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   _capacity                = capacity;
   _activeCount             = capacity;
   _currentActiveCount      = 0;
-  _isAnimationSheetEnabled = isAnimationSheetEnabled;
+  _isAnimationSheetEnabled = iIsAnimationSheetEnabled;
 
   scene->particleSystems.emplace_back(this);
 
@@ -137,8 +138,8 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   }
   _randomTexture = std::make_unique<RawTexture>(
     ArrayBufferView(d), static_cast<int>(maxTextureSize), 1,
-    EngineConstants::TEXTUREFORMAT_RGBA, _scene, false, false,
-    TextureConstants::NEAREST_SAMPLINGMODE, EngineConstants::TEXTURETYPE_FLOAT);
+    Constants::TEXTUREFORMAT_RGBA, _scene, false, false,
+    Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
   _randomTexture->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
@@ -151,8 +152,8 @@ GPUParticleSystem::GPUParticleSystem(const std::string& iName, size_t capacity,
   }
   _randomTexture2 = std::make_unique<RawTexture>(
     ArrayBufferView(d), static_cast<int>(maxTextureSize), 1,
-    EngineConstants::TEXTUREFORMAT_RGBA, _scene, false, false,
-    TextureConstants::NEAREST_SAMPLINGMODE, EngineConstants::TEXTURETYPE_FLOAT);
+    Constants::TEXTUREFORMAT_RGBA, _scene, false, false,
+    Constants::TEXTURE_NEAREST_SAMPLINGMODE, Constants::TEXTURETYPE_FLOAT);
   _randomTexture2->wrapU = TextureConstants::WRAP_ADDRESSMODE;
   _randomTexture2->wrapV = TextureConstants::WRAP_ADDRESSMODE;
 
@@ -618,7 +619,7 @@ GPUParticleSystem::_createUpdateVAO(Buffer* source)
     }
   }
 
-  if (noiseTexture) {
+  if (noiseTexture()) {
     updateVertexBuffers["noiseCoordinates1"] = source->createVertexBuffer(
       VertexBuffer::NoiseCoordinates1Kind, offset, 3);
     offset += 3;
@@ -691,7 +692,7 @@ GPUParticleSystem::_createRenderVAO(Buffer* source, Buffer* spriteSource)
     }
   }
 
-  if (noiseTexture) {
+  if (noiseTexture()) {
     renderVertexBuffers["noiseCoordinates1"]
       = source->createVertexBuffer(VertexBuffer::NoiseCoordinates1Kind, offset,
                                    3, _attributesStrideSize, true);
@@ -723,6 +724,9 @@ void GPUParticleSystem::_initialize(bool force)
   auto engine = _scene->getEngine();
   Float32Array data;
 
+  _attributesStrideSize = 21;
+  _targetIndex          = 0;
+
   if (!isBillboardBased) {
     _attributesStrideSize += 3;
   }
@@ -742,7 +746,7 @@ void GPUParticleSystem::_initialize(bool force)
     }
   }
 
-  if (noiseTexture) {
+  if (noiseTexture()) {
     _attributesStrideSize += 6;
   }
 
@@ -802,7 +806,7 @@ void GPUParticleSystem::_initialize(bool force)
       }
     }
 
-    if (noiseTexture) { // Random coordinates for reading into noise texture
+    if (noiseTexture()) { // Random coordinates for reading into noise texture
       data.emplace_back(Math::random());
       data.emplace_back(Math::random());
       data.emplace_back(Math::random());
@@ -886,7 +890,7 @@ void GPUParticleSystem::_recreateUpdateEffect()
     }
   }
 
-  if (noiseTexture) {
+  if (noiseTexture()) {
     definesStream << "\n#define NOISE";
   }
 
@@ -921,7 +925,7 @@ void GPUParticleSystem::_recreateUpdateEffect()
     }
   }
 
-  if (noiseTexture) {
+  if (noiseTexture()) {
     _updateEffectOptions->transformFeedbackVaryings.emplace_back(
       "outNoiseCoordinates1");
     _updateEffectOptions->transformFeedbackVaryings.emplace_back(
@@ -990,9 +994,9 @@ void GPUParticleSystem::_recreateRenderEffect()
   }
 
   std::vector<std::string> uniforms{
-    "view",       "projection",       "colorDead",   "invView",
-    "vClipPlane", "vClipPlane2",      "vClipPlane3", "vClipPlane4",
-    "sheetInfos", "translationPivot", "eyePosition"};
+    "worldOffset", "view",       "projection",       "colorDead",
+    "invView",     "vClipPlane", "vClipPlane2",      "vClipPlane3",
+    "vClipPlane4", "sheetInfos", "translationPivot", "eyePosition"};
   std::vector<std::string> samplers{"textureSampler", "colorGradientSampler"};
 
   // if (ImageProcessingConfiguration)
@@ -1184,11 +1188,11 @@ size_t GPUParticleSystem::render(bool preWarm)
       _preWarmDone = true;
     }
 
-    if (_currentRenderId == _scene->getRenderId()) {
+    if (_currentRenderId == _scene->getFrameId()) {
       return 0;
     }
 
-    _currentRenderId = _scene->getRenderId();
+    _currentRenderId = _scene->getFrameId();
   }
 
   // Get everything ready to render
@@ -1261,8 +1265,8 @@ size_t GPUParticleSystem::render(bool preWarm)
                              spriteCellChangeSpeed);
   }
 
-  if (noiseTexture) {
-    _updateEffect->setTexture("noiseSampler", noiseTexture);
+  if (noiseTexture()) {
+    _updateEffect->setTexture("noiseSampler", noiseTexture());
     _updateEffect->setVector3("noiseStrength", noiseStrength);
   }
 
@@ -1299,6 +1303,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     _renderEffect->setMatrix("projection", _scene->getProjectionMatrix());
     _renderEffect->setTexture("textureSampler", particleTexture);
     _renderEffect->setVector2("translationPivot", translationPivot);
+    _renderEffect->setVector3("worldOffset", worldOffset);
     if (_colorGradientsTexture) {
       _renderEffect->setTexture("colorGradientSampler", _colorGradientsTexture);
     }
@@ -1340,16 +1345,16 @@ size_t GPUParticleSystem::render(bool preWarm)
     // Draw order
     switch (blendMode) {
       case ParticleSystem::BLENDMODE_ADD:
-        _engine->setAlphaMode(EngineConstants::ALPHA_ADD);
+        _engine->setAlphaMode(Constants::ALPHA_ADD);
         break;
       case ParticleSystem::BLENDMODE_ONEONE:
-        _engine->setAlphaMode(EngineConstants::ALPHA_ONEONE);
+        _engine->setAlphaMode(Constants::ALPHA_ONEONE);
         break;
       case ParticleSystem::BLENDMODE_STANDARD:
-        _engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
+        _engine->setAlphaMode(Constants::ALPHA_COMBINE);
         break;
       case ParticleSystem::BLENDMODE_MULTIPLY:
-        _engine->setAlphaMode(EngineConstants::ALPHA_MULTIPLY);
+        _engine->setAlphaMode(Constants::ALPHA_MULTIPLY);
         break;
     }
 
@@ -1363,7 +1368,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     // Render
     _engine->drawArraysType(Material::TriangleFanDrawMode(), 0, 4,
                             static_cast<int>(_currentActiveCount));
-    _engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+    _engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
 
   // Switch VAOs
@@ -1476,8 +1481,8 @@ void GPUParticleSystem::dispose(bool disposeTexture,
     particleTexture = nullptr;
   }
 
-  if (disposeTexture && noiseTexture) {
-    noiseTexture->dispose();
+  if (disposeTexture && noiseTexture()) {
+    noiseTexture()->dispose();
     noiseTexture = nullptr;
   }
 

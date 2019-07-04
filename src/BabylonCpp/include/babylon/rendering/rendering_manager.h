@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 class AbstractMesh;
-struct IParticleSystem;
+class IParticleSystem;
 struct IRenderingManagerAutoClearSetup;
 struct ISpriteManager;
 class Material;

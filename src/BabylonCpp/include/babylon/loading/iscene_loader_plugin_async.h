@@ -14,7 +14,7 @@ namespace BABYLON {
 class AbstractMesh;
 class AnimationGroup;
 class AssetContainer;
-struct IParticleSystem;
+class IParticleSystem;
 class Scene;
 class SceneLoaderProgressEvent;
 class Skeleton;

@@ -1,13 +1,14 @@
 #ifndef BABYLON_PARTICLES_PARTICLE_SYSTEM_H
 #define BABYLON_PARTICLES_PARTICLE_SYSTEM_H
 
-#include <unordered_map>
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
-#include <babylon/particles/base_particle_system.h>
-#include <babylon/particles/iparticle_system.h>
+#include <babylon/engines/constants.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
+#include <babylon/particles/base_particle_system.h>
+#include <babylon/particles/iparticle_system.h>
+#include <unordered_map>
 
 namespace BABYLON {
 
@@ -39,16 +40,19 @@ public:
   /**
    * Billboard mode will only apply to Y axis
    */
-  static constexpr unsigned int BILLBOARDMODE_Y = 2;
+  static constexpr unsigned int BILLBOARDMODE_Y
+    = Constants::PARTICLES_BILLBOARDMODE_Y;
   /**
    * Billboard mode will apply to all axes
    */
-  static constexpr unsigned int BILLBOARDMODE_ALL = 7;
+  static constexpr unsigned int BILLBOARDMODE_ALL
+    = Constants::PARTICLES_BILLBOARDMODE_ALL;
   /**
    * Special billboard mode where the particle will be biilboard to the camera
    * but rotated to align with direction
    */
-  static constexpr unsigned int BILLBOARDMODE_STRETCHED = 8;
+  static constexpr unsigned int BILLBOARDMODE_STRETCHED
+    = Constants::PARTICLES_BILLBOARDMODE_STRETCHED;
 
 public:
   /**

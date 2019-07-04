@@ -26,7 +26,7 @@ class EffectLayer;
 class Geometry;
 class GlowLayer;
 class HighlightLayer;
-struct IParticleSystem;
+class IParticleSystem;
 class Layer;
 class LensFlareSystem;
 class Light;

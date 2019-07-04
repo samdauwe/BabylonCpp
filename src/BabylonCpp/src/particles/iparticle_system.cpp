@@ -10,6 +10,8 @@ IParticleSystem::IParticleSystem()
     , isAnimationSheetEnabled{this,
                               &IParticleSystem::get_isAnimationSheetEnabled,
                               &IParticleSystem::set_isAnimationSheetEnabled}
+    , noiseTexture{this, &IParticleSystem::get_noiseTexture,
+                   &IParticleSystem::set_noiseTexture}
     , useRampGradients{this, &IParticleSystem::get_useRampGradients,
                        &IParticleSystem::set_useRampGradients}
 {

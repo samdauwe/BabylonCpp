@@ -57,8 +57,9 @@ using TexturePtr               = std::shared_ptr<Texture>;
  * to create a particle system. A particle system represents a way to manage
  * particles from their emission to their animation and rendering.
  */
-struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
+class BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
 
+public:
   IParticleSystem();
   virtual ~IParticleSystem();
 
@@ -82,18 +83,6 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    * system to.
    */
   std::variant<AbstractMeshPtr, Vector3> emitter;
-
-  /**
-   * @brief Gets or sets a boolean indicating if the particles must be rendered
-   * as billboard or aligned with the direction.
-   */
-  virtual bool get_isBillboardBased() const = 0;
-
-  /**
-   * @brief Sets a boolean indicating if the particles must be rendered as
-   * billboard or aligned with the direction.
-   */
-  virtual void set_isBillboardBased(bool value) = 0;
 
   /**
    * Gets or sets a boolean indicating if the particles must be rendered as
@@ -297,18 +286,6 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   bool spriteRandomStartCell;
 
   /**
-   * @brief Gets whether an animation sprite sheet is enabled or not on the
-   * particle system.
-   */
-  virtual bool get_isAnimationSheetEnabled() const = 0;
-
-  /**
-   * @brief Sets whether an animation sprite sheet is enabled or not on the
-   * particle system.
-   */
-  virtual void set_isAnimationSheetEnabled(bool value) = 0;
-
-  /**
    * Gets or sets a boolean indicating if a spritesheet is used to animate the
    * particles texture
    */
@@ -323,7 +300,7 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    *
    * Gets or sets a texture used to add random noise to particle positions
    */
-  ProceduralTexturePtr noiseTexture = nullptr;
+  Property<IParticleSystem, ProceduralTexturePtr> noiseTexture;
 
   /**
    * Gets or sets the strength to apply to the noise value (default is (10, 10,
@@ -736,20 +713,6 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
   virtual std::vector<Color3Gradient>& getRampGradients() = 0;
 
   /**
-   * @brief Not supported by GPUParticleSystem.
-   * Gets a boolean indicating that ramp gradients must be used
-   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
-   */
-  virtual bool get_useRampGradients() const = 0;
-
-  /**
-   * Not supported by GPUParticleSystem
-   * Sets a boolean indicating that ramp gradients must be used
-   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
-   */
-  virtual void set_useRampGradients(bool value) = 0;
-
-  /**
    * @brief Gets or sets a boolean indicating that ramp gradients must be used.
    * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
    */
@@ -930,7 +893,56 @@ struct BABYLON_SHARED_EXPORT IParticleSystem : public IDisposable {
    */
   virtual Scene* getScene() const = 0;
 
-}; // end of struct IParticleSystem
+protected:
+  /**
+   * @brief Gets or sets a boolean indicating if the particles must be rendered
+   * as billboard or aligned with the direction.
+   */
+  virtual bool get_isBillboardBased() const = 0;
+
+  /**
+   * @brief Sets a boolean indicating if the particles must be rendered as
+   * billboard or aligned with the direction.
+   */
+  virtual void set_isBillboardBased(bool value) = 0;
+
+  /**
+   * @brief Gets whether an animation sprite sheet is enabled or not on the
+   * particle system.
+   */
+  virtual bool get_isAnimationSheetEnabled() const = 0;
+
+  /**
+   * @brief Sets whether an animation sprite sheet is enabled or not on the
+   * particle system.
+   */
+  virtual void set_isAnimationSheetEnabled(bool value) = 0;
+
+  /**
+   * @brief Gets a texture used to add random noise to particle positions.
+   */
+  virtual ProceduralTexturePtr& get_noiseTexture() = 0;
+
+  /**
+   * @brief Sets a texture used to add random noise to particle positions.
+   */
+  virtual void set_noiseTexture(const ProceduralTexturePtr& value) = 0;
+
+  /**
+   * @brief Not supported by GPUParticleSystem.
+   * Gets a boolean indicating that ramp gradients must be used
+   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   */
+  virtual bool get_useRampGradients() const = 0;
+
+  /**
+   * Not supported by GPUParticleSystem
+   * Sets a boolean indicating that ramp gradients must be used
+   * @see http://doc.babylonjs.com/babylon101/particles#ramp-gradients
+   */
+  virtual void set_useRampGradients(bool value) = 0;
+
+}; // end of class IParticleSystem
 
 } // end of namespace BABYLON
 

@@ -60,6 +60,15 @@ protected:
   bool _mustRebind(Scene* scene, const EffectPtr& effect,
                    float visibility = 1.f);
 
+public:
+  /**
+   * Gets or sets a boolean indicating that the material is allowed to do shader
+   * hot swapping. This means that the material can keep using a previous shader
+   * while a new one is being compiled. This is mostly used when shader parallel
+   * compilation is supported (true by default)
+   */
+  bool allowShaderHotSwapping;
+
 protected:
   EffectPtr _activeEffect;
   Matrix _normalMatrix;
