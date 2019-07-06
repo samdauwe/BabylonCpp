@@ -511,7 +511,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
       }
 
       // Draw order
-      engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
+      engine->drawElementsType(Material::TriangleFillMode, 0, 6);
 
       // Mipmaps
       if (face == 5) {
@@ -531,7 +531,7 @@ void ProceduralTexture::render(bool /*useCameraPostProcess*/)
     }
 
     // Draw order
-    engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode, 0, 6);
   }
 
   // Unbind

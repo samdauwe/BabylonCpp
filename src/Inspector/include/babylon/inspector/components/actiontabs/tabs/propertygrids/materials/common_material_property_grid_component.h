@@ -23,8 +23,8 @@ struct BABYLON_SHARED_EXPORT CommonMaterialPropertyGridComponent {
   static void render(const MaterialPtr& material)
   {
     static std::vector<std::pair<const char*, unsigned int>> orientationOptions{
-      {"Clockwise", Material::ClockWiseSideOrientation()},
-      {"Counterclockwise", Material::CounterClockWiseSideOrientation()}};
+      {"Clockwise", Material::ClockWiseSideOrientation},
+      {"Counterclockwise", Material::CounterClockWiseSideOrientation}};
 
     static std::vector<std::pair<const char*, unsigned int>>
       transparencyModeOptions{

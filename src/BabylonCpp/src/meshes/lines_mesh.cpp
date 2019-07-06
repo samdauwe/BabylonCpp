@@ -170,14 +170,14 @@ void LinesMesh::_draw(SubMesh* subMesh, int /*fillMode*/, size_t instancesCount,
 
   // Draw order
   if (_unIndexed) {
-    engine.drawArraysType(Material::LineListDrawMode(),
+    engine.drawArraysType(Material::LineListDrawMode,
                           static_cast<int>(subMesh->verticesStart),
                           static_cast<int>(subMesh->verticesCount),
                           static_cast<int>(instancesCount));
   }
   else {
     engine.drawElementsType(
-      Material::LineListDrawMode(), static_cast<int>(subMesh->indexStart),
+      Material::LineListDrawMode, static_cast<int>(subMesh->indexStart),
       static_cast<int>(subMesh->indexCount), static_cast<int>(instancesCount));
   }
 }

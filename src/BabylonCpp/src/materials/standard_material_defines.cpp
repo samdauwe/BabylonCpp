@@ -42,6 +42,7 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
     {"UV2", false},                                         //
     {"VERTEXCOLOR", false},                                 //
     {"VERTEXALPHA", false},                                 //
+    {"BONETEXTURE", false},                                 //
     {"INSTANCES", false},                                   //
     {"GLOSSINESS", false},                                  //
     {"ROUGHNESS", false},                                   //
@@ -89,6 +90,7 @@ StandardMaterialDefines::StandardMaterialDefines() : MaterialDefines{}
     {"SAMPLER3DGREENDEPTH", false},        //
     {"SAMPLER3DBGRMAP", false},            //
     {"IMAGEPROCESSINGPOSTPROCESS", false}, //
+    {"MULTIVIEW", false},                  //
     /**
      * If the reflection texture on this material is in linear color space
      * @hidden

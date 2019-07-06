@@ -169,11 +169,11 @@ void Layer::render()
   // Draw order
   if (!alphaTest) {
     engine->setAlphaMode(alphaBlendingMode);
-    engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode, 0, 6);
     engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
   }
   else {
-    engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode, 0, 6);
   }
 
   onAfterRenderObservable.notifyObservers(this);

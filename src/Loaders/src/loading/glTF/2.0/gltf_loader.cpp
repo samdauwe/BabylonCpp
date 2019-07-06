@@ -1792,8 +1792,8 @@ MaterialPtr GLTFLoader::_createDefaultMaterial(const std::string& name,
   auto babylonMaterial = PBRMaterial::New(name, babylonScene);
   babylonMaterial->sideOrientation
     = babylonScene->useRightHandedSystem ?
-        Material::CounterClockWiseSideOrientation() :
-        Material::ClockWiseSideOrientation();
+        Material::CounterClockWiseSideOrientation :
+        Material::ClockWiseSideOrientation;
   babylonMaterial->fillMode                   = babylonDrawMode;
   babylonMaterial->enableSpecularAntiAliasing = true;
   babylonMaterial->useRadianceOverAlpha       = !_parent.transparencyAsCoverage;
@@ -2248,7 +2248,7 @@ unsigned int GLTFLoader::_GetTextureSamplingMode(const std::string& context,
   else {
     if (magFilter != IGLTF2::TextureMagFilter::NEAREST) {
       BABYLON_LOGF_WARN("GLTFLoader", "%s/magFilter: Invalid value",
-                        context.c_str());
+                        context.c_str())
     }
 
     switch (minFilter) {
@@ -2375,19 +2375,19 @@ GLTFLoader::_GetDrawMode(const std::string& context,
 
   switch (*mode) {
     case IGLTF2::MeshPrimitiveMode::POINTS:
-      return Material::PointListDrawMode();
+      return Material::PointListDrawMode;
     case IGLTF2::MeshPrimitiveMode::LINES:
-      return Material::LineListDrawMode();
+      return Material::LineListDrawMode;
     case IGLTF2::MeshPrimitiveMode::LINE_LOOP:
-      return Material::LineLoopDrawMode();
+      return Material::LineLoopDrawMode;
     case IGLTF2::MeshPrimitiveMode::LINE_STRIP:
-      return Material::LineStripDrawMode();
+      return Material::LineStripDrawMode;
     case IGLTF2::MeshPrimitiveMode::TRIANGLES:
-      return Material::TriangleFillMode();
+      return Material::TriangleFillMode;
     case IGLTF2::MeshPrimitiveMode::TRIANGLE_STRIP:
-      return Material::TriangleStripDrawMode();
+      return Material::TriangleStripDrawMode;
     case IGLTF2::MeshPrimitiveMode::TRIANGLE_FAN:
-      return Material::TriangleFanDrawMode();
+      return Material::TriangleFanDrawMode;
     default:
       break;
   }

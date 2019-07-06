@@ -1289,7 +1289,7 @@ size_t GPUParticleSystem::render(bool preWarm)
   _engine->bindTransformFeedbackBuffer(_targetBuffer->getBuffer());
   _engine->setRasterizerState(false);
   _engine->beginTransformFeedback();
-  _engine->drawArraysType(Material::PointListDrawMode(), 0,
+  _engine->drawArraysType(Material::PointListDrawMode, 0,
                           static_cast<int>(_currentActiveCount));
   _engine->endTransformFeedback();
   _engine->setRasterizerState(true);
@@ -1366,7 +1366,7 @@ size_t GPUParticleSystem::render(bool preWarm)
     _engine->bindVertexArrayObject(_renderVAO[_targetIndex].get(), nullptr);
 
     // Render
-    _engine->drawArraysType(Material::TriangleFanDrawMode(), 0, 4,
+    _engine->drawArraysType(Material::TriangleFanDrawMode, 0, 4,
                             static_cast<int>(_currentActiveCount));
     _engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }

@@ -768,6 +768,7 @@ public:
    * @returns The index of the removed material
    */
   int removeMaterial(const MaterialPtr& toRemove);
+  int removeMaterial(Material* toRemove);
 
   /**
    * @brief Removes the given action manager from this scene.
@@ -2979,6 +2980,16 @@ public:
    * simulteanous authorized
    */
   bool requireLightSorting;
+
+  /**
+   * Hidden
+   */
+  const bool useMaterialMeshMap;
+
+  /**
+   * Hidden
+   */
+  const bool useClonedMeshhMap;
 
   /**
    * Backing store of defined scene components

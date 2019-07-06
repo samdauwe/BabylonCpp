@@ -15,9 +15,9 @@
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/tools.h>
 #include <babylon/postprocesses/blur_post_process.h>
 #include <babylon/postprocesses/post_process_manager.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -261,7 +261,7 @@ void GlowLayer::_internalRender(const EffectPtr& effect)
   // Draw order
   engine->setStencilBuffer(false);
 
-  engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
+  engine->drawElementsType(Material::TriangleFillMode, 0, 6);
 
   // Draw order
   engine->setStencilBuffer(previousStencilBuffer);

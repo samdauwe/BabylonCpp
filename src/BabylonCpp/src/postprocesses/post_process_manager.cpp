@@ -124,7 +124,7 @@ void PostProcessManager::directRender(
       engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
 
       // Draw order
-      engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
+      engine->drawElementsType(Material::TriangleFillMode, 0, 6);
 
       pp->onAfterRenderObservable.notifyObservers(effect.get());
     }
@@ -191,7 +191,7 @@ void PostProcessManager::_finalizeFrame(
       engine->bindBuffers(_vertexBuffers, _indexBuffer.get(), effect);
 
       // Draw order
-      engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
+      engine->drawElementsType(Material::TriangleFillMode, 0, 6);
 
       pp->onAfterRenderObservable.notifyObservers(effect.get());
     }

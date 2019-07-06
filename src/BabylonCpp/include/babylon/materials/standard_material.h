@@ -156,11 +156,11 @@ public:
 
   /**
    * @brief Creates a standard material from parsed material data.
-   * @param source defines the JSON represnetation of the material
+   * @param source defines the JSON representation of the material
    * @param scene defines the hosting scene
    * @param rootUrl defines the root URL to use to load textures and relative
    * dependencies
-   * @returns a new material
+   * @returns a new standard material
    */
   static StandardMaterialPtr Parse(const json& source, Scene* scene,
                                    const std::string& rootUrl);
@@ -621,7 +621,7 @@ public:
 
   /**
    * Invert the refraction texture alongside the y axis.
-   * It can be usefull with procedural textures or probe for instance.
+   * It can be useful with procedural textures or probe for instance.
    * @see
    * http://doc.babylonjs.com/how_to/reflect#how-to-obtain-reflections-and-refractions
    */

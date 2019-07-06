@@ -734,7 +734,7 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
       && (!batch->visibleInstances[subMesh->_id].empty());
   if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
-    mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
+    mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
 
     _effect->setFloat3("biasAndScale", bias(), normalBias(), depthScale());
 
@@ -799,8 +799,8 @@ void ShadowGenerator::_renderSubMeshForShadowMap(SubMesh* subMesh)
     onBeforeShadowMapRenderObservable.notifyObservers(_effect.get());
 
     // Draw
-    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
-                            batch, hardwareInstancedRendering,
+    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode, batch,
+                            hardwareInstancedRendering,
                             [&](bool /*isInstance*/, const Matrix& world,
                                 Material* /*effectiveMaterial*/) {
                               _effect->setMatrix("world", world);

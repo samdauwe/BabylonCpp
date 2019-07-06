@@ -894,16 +894,16 @@ void Mesh::_bind(SubMesh* subMesh, const EffectPtr& effect,
   }
   else {
     switch (fillMode) {
-      case Material::PointFillMode():
+      case Material::PointFillMode:
         indexToBind = nullptr;
         break;
-      case Material::WireFrameFillMode(): {
+      case Material::WireFrameFillMode: {
         const auto& linesIndexBuffer
           = subMesh->_getLinesIndexBuffer(getIndices(), engine);
         indexToBind = linesIndexBuffer ? linesIndexBuffer.get() : nullptr;
       } break;
       default:
-      case Material::TriangleFillMode():
+      case Material::TriangleFillMode:
         indexToBind = _unIndexed ? nullptr : _geometry->getIndexBuffer();
         break;
     }
@@ -927,13 +927,13 @@ void Mesh::_draw(SubMesh* subMesh, int fillMode, size_t instancesCount,
   auto engine = scene->getEngine();
 
   const auto _fillMode = static_cast<unsigned int>(fillMode);
-  if (_unIndexed || _fillMode == Material::PointFillMode()) {
+  if (_unIndexed || _fillMode == Material::PointFillMode) {
     // or triangles as points
     engine->drawArraysType(_fillMode, static_cast<int>(subMesh->verticesStart),
                            static_cast<int>(subMesh->verticesCount),
                            static_cast<int>(instancesCount));
   }
-  else if (_fillMode == Material::WireFrameFillMode()) {
+  else if (_fillMode == Material::WireFrameFillMode) {
     // Triangles as wireframe
     engine->drawElementsType(_fillMode, 0,
                              static_cast<int>(subMesh->_linesIndexCount),
@@ -1228,11 +1228,10 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
   if (!sideOrientation.has_value()) {
     sideOrientation
       = static_cast<unsigned>(_effectiveMaterial->sideOrientation);
-    if (_getWorldMatrixDeterminant() < 0) {
-      sideOrientation
-        = (sideOrientation == Material::ClockWiseSideOrientation() ?
-             Material::CounterClockWiseSideOrientation() :
-             Material::ClockWiseSideOrientation());
+    if (_getWorldMatrixDeterminant() < 0.f) {
+      sideOrientation = (sideOrientation == Material::ClockWiseSideOrientation ?
+                           Material::CounterClockWiseSideOrientation :
+                           Material::ClockWiseSideOrientation);
     }
   }
 
@@ -1244,8 +1243,8 @@ Mesh& Mesh::render(SubMesh* subMesh, bool enableAlphaMode)
 
   // Bind
   auto fillMode = scene->forcePointsCloud() ?
-                    Material::PointFillMode() :
-                    (scene->forceWireframe() ? Material::WireFrameFillMode() :
+                    Material::PointFillMode :
+                    (scene->forceWireframe() ? Material::WireFrameFillMode :
                                                _effectiveMaterial->fillMode());
 
   // Binding will be done later because we need to add more info to the VB

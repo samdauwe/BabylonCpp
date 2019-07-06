@@ -356,7 +356,7 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
 
   if (isReady(subMesh, hardwareInstancedRendering)) {
     engine->enableEffect(_effect);
-    mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
+    mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
 
     _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
     _effect->setMatrix("view", _scene->getViewMatrix());
@@ -392,8 +392,8 @@ void GeometryBufferRenderer::renderSubMesh(SubMesh* subMesh)
     }
 
     // Draw
-    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
-                            batch, hardwareInstancedRendering,
+    mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode, batch,
+                            hardwareInstancedRendering,
                             [this](bool /*isInstance*/, Matrix world,
                                    Material* /*effectiveMaterial*/) {
                               _effect->setMatrix("world", world);

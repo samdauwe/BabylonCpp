@@ -183,6 +183,8 @@ Scene::Scene(Engine* engine, const std::optional<SceneOptions>& options)
                                    &Scene::get_isAlternateRenderingEnabled}
     , frustumPlanes{this, &Scene::get_frustumPlanes}
     , requireLightSorting{false}
+    , useMaterialMeshMap{false}
+    , useClonedMeshhMap{false}
     , depthRenderer{this, &Scene::get_depthRenderer}
     , geometryBufferRenderer{this, &Scene::get_geometryBufferRenderer,
                              &Scene::set_geometryBufferRenderer}
@@ -2569,12 +2571,20 @@ int Scene::removeMultiMaterial(const MultiMaterialPtr& toRemove)
 
 int Scene::removeMaterial(const MaterialPtr& toRemove)
 {
-  auto it   = std::find(materials.begin(), materials.end(), toRemove);
+  return removeMaterial(toRemove.get());
+}
+
+int Scene::removeMaterial(Material* toRemove)
+{
+  auto it   = std::find_if(materials.begin(), materials.end(),
+                         [toRemove](const MaterialPtr& material) {
+                           return material.get() == toRemove;
+                         });
   int index = static_cast<int>(it - materials.begin());
   if (it != materials.end()) {
     materials.erase(it);
   }
-  onMaterialRemovedObservable.notifyObservers(toRemove.get());
+  onMaterialRemovedObservable.notifyObservers(toRemove);
 
   return index;
 }

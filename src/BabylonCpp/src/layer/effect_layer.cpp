@@ -16,9 +16,9 @@
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/tools.h>
 #include <babylon/morph/morph_target_manager.h>
 #include <babylon/postprocesses/post_process.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -441,7 +441,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
                _emissiveTextureAndColor.texture)) {
     engine->enableEffect(_effectLayerMapGenerationEffect);
     mesh->_bind(subMesh, _effectLayerMapGenerationEffect,
-                Material::TriangleFillMode());
+                Material::TriangleFillMode);
 
     _effectLayerMapGenerationEffect->setMatrix("viewProjection",
                                                scene->getTransformMatrix());
@@ -491,7 +491,7 @@ void EffectLayer::_renderSubMesh(SubMesh* subMesh)
 
     // Draw
     mesh->_processRendering(
-      subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode(),
+      subMesh, _effectLayerMapGenerationEffect, Material::TriangleFillMode,
       batch, hardwareInstancedRendering,
       [&](bool /*isInstance*/, const Matrix& world,
           Material* /*effectiveMaterial*/) {

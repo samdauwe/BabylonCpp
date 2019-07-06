@@ -6,7 +6,9 @@
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>
+#include <babylon/engines/constants.h>
 #include <babylon/interfaces/idisposable.h>
+#include <babylon/misc/iinspectable.h>
 #include <babylon/misc/observable.h>
 #include <babylon/misc/observer.h>
 
@@ -26,6 +28,7 @@ class RenderTargetTexture;
 class Scene;
 class SubMesh;
 class UniformBuffer;
+using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using EffectPtr              = std::shared_ptr<Effect>;
 using MaterialPtr            = std::shared_ptr<Material>;
@@ -38,146 +41,109 @@ using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 class BABYLON_SHARED_EXPORT Material : public IAnimatable {
 
 private:
-  // Triangle views
-  static constexpr unsigned int _TriangleFillMode  = 0;
-  static constexpr unsigned int _WireFrameFillMode = 1;
-  static constexpr unsigned int _PointFillMode     = 2;
-  // Draw modes
-  static constexpr unsigned int _PointListDrawMode     = 3;
-  static constexpr unsigned int _LineListDrawMode      = 4;
-  static constexpr unsigned int _LineLoopDrawMode      = 5;
-  static constexpr unsigned int _LineStripDrawMode     = 6;
-  static constexpr unsigned int _TriangleStripDrawMode = 7;
-  static constexpr unsigned int _TriangleFanDrawMode   = 8;
-
-  /**
-   * Stores the clock-wise side orientation
-   */
-  static constexpr unsigned int _ClockWiseSideOrientation = 0;
-
-  /**
-   * Stores the counter clock-wise side orientation
-   */
-  static constexpr unsigned int _CounterClockWiseSideOrientation = 1;
+  using MaterialDefinesCallback = std::function<void(MaterialDefines& defines)>;
 
 public:
   /**
    * @brief Returns the triangle fill mode.
    */
-  static constexpr unsigned int TriangleFillMode()
-  {
-    return Material::_TriangleFillMode;
-  }
+  static constexpr unsigned int TriangleFillMode
+    = Constants::MATERIAL_TriangleFillMode;
 
   /**
    * @brief Returns the wireframe mode.
    */
-  static constexpr unsigned int WireFrameFillMode()
-  {
-    return Material::_WireFrameFillMode;
-  }
+  static constexpr unsigned int WireFrameFillMode
+    = Constants::MATERIAL_WireFrameFillMode;
 
   /**
    * @brief Returns the point fill mode.
    */
-  static constexpr unsigned int PointFillMode()
-  {
-    return Material::_PointFillMode;
-  }
+  static constexpr unsigned int PointFillMode
+    = Constants::MATERIAL_PointFillMode;
 
   /**
    * @brief Returns the point list draw mode.
    */
-  static constexpr unsigned int PointListDrawMode()
-  {
-    return Material::_PointListDrawMode;
-  }
+  static constexpr unsigned int PointListDrawMode
+    = Constants::MATERIAL_PointListDrawMode;
 
   /**
    * @brief Returns the line list draw mode.
    */
-  static constexpr unsigned int LineListDrawMode()
-  {
-    return Material::_LineListDrawMode;
-  }
+  static constexpr unsigned int LineListDrawMode
+    = Constants::MATERIAL_LineListDrawMode;
 
   /**
    * @brief Returns the line loop draw mode.
    */
-  static constexpr unsigned int LineLoopDrawMode()
-  {
-    return Material::_LineLoopDrawMode;
-  }
+  static constexpr unsigned int LineLoopDrawMode
+    = Constants::MATERIAL_LineLoopDrawMode;
 
   /**
    * @brief Returns the line strip draw mode.
    */
-  static constexpr unsigned int LineStripDrawMode()
-  {
-    return Material::_LineStripDrawMode;
-  }
+  static constexpr unsigned int LineStripDrawMode
+    = Constants::MATERIAL_LineStripDrawMode;
 
   /**
    * @brief Returns the triangle strip draw mode.
    */
-  static constexpr unsigned int TriangleStripDrawMode()
-  {
-    return Material::_TriangleStripDrawMode;
-  }
+  static constexpr unsigned int TriangleStripDrawMode
+    = Constants::MATERIAL_TriangleStripDrawMode;
 
   /**
    * @brief Returns the triangle fan draw mode.
    */
-  static constexpr unsigned int TriangleFanDrawMode()
-  {
-    return Material::_TriangleFanDrawMode;
-  }
+  static constexpr unsigned int TriangleFanDrawMode
+    = Constants::MATERIAL_TriangleFanDrawMode;
 
   /**
    * @brief Returns the clock-wise side orientation.
    */
-  static constexpr unsigned int ClockWiseSideOrientation()
-  {
-    return Material::_ClockWiseSideOrientation;
-  }
+  static constexpr unsigned int ClockWiseSideOrientation
+    = Constants::MATERIAL_ClockWiseSideOrientation;
 
   /**
    * @brief Returns the counter clock-wise side orientation.
    */
-  static constexpr unsigned int CounterClockWiseSideOrientation()
-  {
-    return Material::_CounterClockWiseSideOrientation;
-  }
+  static constexpr unsigned int CounterClockWiseSideOrientation
+    = Constants::MATERIAL_CounterClockWiseSideOrientation;
 
   /**
    * The dirty texture flag value
    */
-  static constexpr unsigned int TextureDirtyFlag = 1;
+  static constexpr unsigned int TextureDirtyFlag
+    = Constants::MATERIAL_TextureDirtyFlag;
 
   /**
    * The dirty light flag value
    */
-  static constexpr unsigned int LightDirtyFlag = 2;
+  static constexpr unsigned int LightDirtyFlag
+    = Constants::MATERIAL_LightDirtyFlag;
 
   /**
    * The dirty fresnel flag value
    */
-  static constexpr unsigned int FresnelDirtyFlag = 4;
+  static constexpr unsigned int FresnelDirtyFlag
+    = Constants::MATERIAL_FresnelDirtyFlag;
 
   /**
    * The dirty attribute flag value
    */
-  static constexpr unsigned int AttributesDirtyFlag = 8;
+  static constexpr unsigned int AttributesDirtyFlag
+    = Constants::MATERIAL_AttributesDirtyFlag;
 
   /**
    * The dirty misc flag value
    */
-  static constexpr unsigned int MiscDirtyFlag = 16;
+  static constexpr unsigned int MiscDirtyFlag
+    = Constants::MATERIAL_MiscDirtyFlag;
 
   /**
    * The all dirty flag value
    */
-  static constexpr unsigned int AllDirtyFlag = 31;
+  static constexpr unsigned int AllDirtyFlag = Constants::MATERIAL_AllDirtyFlag;
 
   virtual ~Material() override;
 
@@ -348,7 +314,7 @@ public:
    * @brief Gets the meshes bound to the material.
    * @returns an array of meshes bound to the material
    */
-  std::vector<AbstractMesh*> getBindedMeshes();
+  std::vector<AbstractMeshPtr> getBindedMeshes();
 
   /**
    * @brief Force shader compilation
@@ -371,11 +337,13 @@ public:
   virtual void markAsDirty(unsigned int flag) override;
 
   /**
-   * @brief Disposes the material
+   * @brief Disposes the material.
    * @param forceDisposeEffect specifies if effects should be forcefully
    * disposed
    * @param forceDisposeTextures specifies if textures should be forcefully
    * disposed
+   * @param notBoundToMesh specifies if the material that is being disposed is
+   * known to be not bound to any mesh
    */
   virtual void dispose(bool forceDisposeEffect   = false,
                        bool forceDisposeTextures = false,
@@ -579,8 +547,7 @@ protected:
    * @param func defines a function which checks material defines against the
    * submeshes
    */
-  void _markAllSubMeshesAsDirty(
-    const std::function<void(MaterialDefines& defines)>& func);
+  void _markAllSubMeshesAsDirty(const MaterialDefinesCallback& func);
 
   /**
    * @brief Indicates that image processing needs to be re-calculated for all
@@ -626,6 +593,10 @@ protected:
    */
   void _markAllSubMeshesAsTexturesAndMiscDirty();
 
+private:
+  void releaseVertexArrayObject(const AbstractMeshPtr& mesh,
+                                bool forceDisposeEffect = false);
+
 public:
   // Events
   /**
@@ -657,6 +628,12 @@ public:
    * Specifies if the ready state should be checked once
    */
   bool checkReadyOnlyOnce;
+
+  /**
+   * List of inspectable custom properties (used by the Inspector)
+   * @see https://doc.babylonjs.com/how_to/debug_layer#extensibility
+   */
+  std::vector<IInspectable> inspectableCustomProperties;
 
   /**
    * The alpha value of the material
@@ -798,6 +775,16 @@ public:
   bool _wasPreviouslyReady;
 
   /**
+   * Hidden
+   */
+  int _indexInSceneMaterialArray;
+
+  /**
+   * Hidden
+   */
+  std::unordered_map<std::string, AbstractMeshPtr> meshMap;
+
+  /**
    * The logarithmic depth setting.
    */
   Property<Material, bool> useLogarithmicDepth;
@@ -868,6 +855,18 @@ private:
    * Specifies if the depth write state should be cached
    */
   bool _cachedDepthWriteState;
+
+  static const MaterialDefinesCallback _ImageProcessingDirtyCallBack;
+  static const MaterialDefinesCallback _TextureDirtyCallBack;
+  static const MaterialDefinesCallback _FresnelDirtyCallBack;
+  static const MaterialDefinesCallback _MiscDirtyCallBack;
+  static const MaterialDefinesCallback _LightsDirtyCallBack;
+  static const MaterialDefinesCallback _AttributeDirtyCallBack;
+  static const MaterialDefinesCallback _FresnelAndMiscDirtyCallBack;
+  static const MaterialDefinesCallback _TextureAndMiscDirtyCallBack;
+
+  static std::vector<MaterialDefinesCallback> _DirtyCallbackArray;
+  static const MaterialDefinesCallback _RunDirtyCallBacks;
 
 }; // end of class Material
 

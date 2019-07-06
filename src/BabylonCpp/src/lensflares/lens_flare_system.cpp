@@ -317,7 +317,7 @@ bool LensFlareSystem::render()
                        1.f);
 
     // Draw order
-    engine->drawElementsType(Material::TriangleFillMode(), 0, 6);
+    engine->drawElementsType(Material::TriangleFillMode, 0, 6);
   }
 
   engine->setDepthBuffer(true);

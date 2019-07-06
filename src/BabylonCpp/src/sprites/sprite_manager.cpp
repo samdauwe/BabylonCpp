@@ -352,13 +352,13 @@ void SpriteManager::render()
   engine->setDepthFunctionToLessOrEqual();
   effect->setBool("alphaTest", true);
   engine->setColorWrite(false);
-  engine->drawElementsType(Material::TriangleFillMode(), 0,
+  engine->drawElementsType(Material::TriangleFillMode, 0,
                            static_cast<int>((offset / 4.f) * 6));
   engine->setColorWrite(true);
   effect->setBool("alphaTest", false);
 
   engine->setAlphaMode(EngineConstants::ALPHA_COMBINE);
-  engine->drawElementsType(Material::TriangleFillMode(), 0,
+  engine->drawElementsType(Material::TriangleFillMode, 0,
                            static_cast<int>((offset / 4.f) * 6));
   engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
 }

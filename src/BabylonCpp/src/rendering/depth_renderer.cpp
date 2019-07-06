@@ -88,7 +88,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
     auto camera = (!_camera) ? _camera : scene->activeCamera;
     if (isReady(subMesh, hardwareInstancedRendering) && camera) {
       engine->enableEffect(_effect);
-      mesh->_bind(subMesh, _effect, Material::TriangleFillMode());
+      mesh->_bind(subMesh, _effect, Material::TriangleFillMode);
 
       _effect->setMatrix("viewProjection", _scene->getTransformMatrix());
 
@@ -113,7 +113,7 @@ DepthRenderer::DepthRenderer(Scene* scene, unsigned int type,
       }
 
       // Draw
-      mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode(),
+      mesh->_processRendering(subMesh, _effect, Material::TriangleFillMode,
                               batch, hardwareInstancedRendering,
                               [this](bool /*isInstance*/, Matrix world,
                                      Material* /*effectiveMaterial*/) {

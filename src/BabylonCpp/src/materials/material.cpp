@@ -11,11 +11,46 @@
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/geometry.h>
+#include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/misc/tools.h>
 
 namespace BABYLON {
+
+const Material::MaterialDefinesCallback Material::_ImageProcessingDirtyCallBack
+  = [](MaterialDefines& defines) -> void {
+  defines.markAsImageProcessingDirty();
+};
+const Material::MaterialDefinesCallback Material::_TextureDirtyCallBack
+  = [](MaterialDefines& defines) -> void { defines.markAsTexturesDirty(); };
+const Material::MaterialDefinesCallback Material::_FresnelDirtyCallBack
+  = [](MaterialDefines& defines) -> void { defines.markAsFresnelDirty(); };
+const Material::MaterialDefinesCallback Material::_MiscDirtyCallBack
+  = [](MaterialDefines& defines) -> void { defines.markAsMiscDirty(); };
+const Material::MaterialDefinesCallback Material::_LightsDirtyCallBack
+  = [](MaterialDefines& defines) -> void { defines.markAsLightDirty(); };
+const Material::MaterialDefinesCallback Material::_AttributeDirtyCallBack
+  = [](MaterialDefines& defines) -> void { defines.markAsAttributesDirty(); };
+
+const Material::MaterialDefinesCallback Material::_FresnelAndMiscDirtyCallBack
+  = [](MaterialDefines& defines) -> void {
+  Material::_FresnelDirtyCallBack(defines);
+  Material::_MiscDirtyCallBack(defines);
+};
+const Material::MaterialDefinesCallback Material::_TextureAndMiscDirtyCallBack
+  = [](MaterialDefines& defines) -> void {
+  Material::_TextureDirtyCallBack(defines);
+  Material::_MiscDirtyCallBack(defines);
+};
+
+std::vector<Material::MaterialDefinesCallback> Material::_DirtyCallbackArray{};
+const Material::MaterialDefinesCallback Material::_RunDirtyCallBacks
+  = [](MaterialDefines& defines) -> void {
+  for (const auto& cb : Material::_DirtyCallbackArray) {
+    cb(defines);
+  }
+};
 
 Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     : id{!iName.empty() ? iName : Tools::RandomId()}
@@ -26,6 +61,9 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , backFaceCulling{this, &Material::get_backFaceCulling,
                       &Material::set_backFaceCulling}
     , hasRenderTargetTextures{this, &Material::get_hasRenderTargetTextures}
+    , onCompiled{nullptr}
+    , onError{nullptr}
+    , getRenderTargetTextures{nullptr}
     , doNotSerialize{false}
     , _storeEffectOnSubMeshes{false}
     , onDispose{this, &Material::set_onDispose}
@@ -46,6 +84,7 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , fillMode{this, &Material::get_fillMode, &Material::set_fillMode}
     , _effect{nullptr}
     , _wasPreviouslyReady{false}
+    , _indexInSceneMaterialArray{-1}
     , useLogarithmicDepth{this, &Material::get_useLogarithmicDepth,
                           &Material::set_useLogarithmicDepth}
     , _alpha{1.f}
@@ -54,26 +93,31 @@ Material::Material(const std::string& iName, Scene* scene, bool doNotAdd)
     , _onDisposeObserver{nullptr}
     , _onUnBindObservable{nullptr}
     , _onBindObserver{nullptr}
-    , _alphaMode{EngineConstants::ALPHA_COMBINE}
+    , _alphaMode{Constants::ALPHA_COMBINE}
     , _needDepthPrePass{false}
     , _fogEnabled{true}
     , _useUBO{false}
     , _scene{scene ? scene : Engine::LastCreatedScene()}
-    , _fillMode{Material::TriangleFillMode()}
+    , _fillMode{Material::TriangleFillMode}
+    , _cachedDepthWriteState{false}
 {
   uniqueId = _scene->getUniqueId();
 
   if (_scene->useRightHandedSystem()) {
-    sideOrientation = Material::ClockWiseSideOrientation();
+    sideOrientation = Material::ClockWiseSideOrientation;
   }
   else {
-    sideOrientation = Material::CounterClockWiseSideOrientation();
+    sideOrientation = Material::CounterClockWiseSideOrientation;
   }
 
   _useUBO = getScene()->getEngine()->supportsUniformBuffers();
 
   if (!doNotAdd) {
     // _scene->materials.emplace_back(this);
+  }
+
+  if (_scene->useMaterialMeshMap) {
+    meshMap = {};
   }
 }
 
@@ -220,17 +264,16 @@ Observable<Material>& Material::get_onUnBindObservable()
 
 void Material::set_wireframe(bool value)
 {
-  fillMode
-    = value ? Material::WireFrameFillMode() : Material::TriangleFillMode();
+  fillMode = value ? Material::WireFrameFillMode : Material::TriangleFillMode;
 }
 
 bool Material::get_wireframe() const
 {
   switch (_fillMode) {
-    case Material::WireFrameFillMode():
-    case Material::LineListDrawMode():
-    case Material::LineLoopDrawMode():
-    case Material::LineStripDrawMode():
+    case Material::WireFrameFillMode:
+    case Material::LineListDrawMode:
+    case Material::LineLoopDrawMode:
+    case Material::LineStripDrawMode:
       return true;
   }
 
@@ -239,14 +282,14 @@ bool Material::get_wireframe() const
 
 void Material::set_pointsCloud(bool value)
 {
-  fillMode = value ? Material::PointFillMode() : Material::TriangleFillMode();
+  fillMode = value ? Material::PointFillMode : Material::TriangleFillMode;
 }
 
 bool Material::get_pointsCloud() const
 {
   switch (_fillMode) {
-    case Material::PointFillMode():
-    case Material::PointListDrawMode():
+    case Material::PointFillMode:
+    case Material::PointListDrawMode:
       return true;
   }
 
@@ -360,7 +403,7 @@ bool Material::_preBind(const EffectPtr& effect,
   auto orientation = (!overrideOrientation.has_value()) ?
                        static_cast<unsigned>(sideOrientation) :
                        *overrideOrientation;
-  const bool reverse = orientation == Material::ClockWiseSideOrientation();
+  const bool reverse = orientation == Material::ClockWiseSideOrientation;
 
   engine->enableEffect(effect ? effect : _effect);
   engine->setState(backFaceCulling(), zOffset, false, reverse);
@@ -458,13 +501,23 @@ MaterialPtr Material::clone(const std::string& /*name*/,
   return nullptr;
 }
 
-std::vector<AbstractMesh*> Material::getBindedMeshes()
+std::vector<AbstractMeshPtr> Material::getBindedMeshes()
 {
-  std::vector<AbstractMesh*> result;
+  std::vector<AbstractMeshPtr> result;
 
-  for (auto& mesh : _scene->meshes) {
-    if (mesh->material().get() == this) {
-      result.emplace_back(mesh.get());
+  if (!meshMap.empty()) {
+    for (const auto& meshItem : meshMap) {
+      const auto& mesh = meshItem.second;
+      if (mesh) {
+        result.emplace_back(mesh);
+      }
+    }
+  }
+  else {
+    for (const auto& mesh : _scene->meshes) {
+      if (mesh->material().get() == this) {
+        result.emplace_back(mesh);
+      }
     }
   }
 
@@ -505,7 +558,7 @@ void Material::forceCompilation(
       }
     }
     else {
-      if (isReady(mesh)) {
+      if (isReady()) {
         if (iOnCompiled) {
           iOnCompiled(this);
         }
@@ -515,7 +568,7 @@ void Material::forceCompilation(
       }
     }
 
-    if (clipPlane.has_value() && (*clipPlane)) {
+    if (clipPlane.has_value()) {
       scene->clipPlane = clipPlaneState;
     }
   };
@@ -525,33 +578,49 @@ void Material::forceCompilation(
 
 void Material::markAsDirty(unsigned int flag)
 {
+  if (getScene()->blockMaterialDirtyMechanism()) {
+    return;
+  }
+
+  Material::_DirtyCallbackArray.clear();
+
   if (flag & Material::TextureDirtyFlag) {
-    _markAllSubMeshesAsTexturesDirty();
+    Material::_DirtyCallbackArray.emplace_back(Material::_TextureDirtyCallBack);
   }
 
   if (flag & Material::LightDirtyFlag) {
-    _markAllSubMeshesAsLightsDirty();
+    Material::_DirtyCallbackArray.emplace_back(Material::_LightsDirtyCallBack);
   }
 
   if (flag & Material::FresnelDirtyFlag) {
-    _markAllSubMeshesAsFresnelDirty();
+    Material::_DirtyCallbackArray.emplace_back(Material::_FresnelDirtyCallBack);
   }
 
   if (flag & Material::AttributesDirtyFlag) {
-    _markAllSubMeshesAsAttributesDirty();
+    Material::_DirtyCallbackArray.emplace_back(
+      Material::_AttributeDirtyCallBack);
   }
 
   if (flag & Material::MiscDirtyFlag) {
-    _markAllSubMeshesAsMiscDirty();
+    Material::_DirtyCallbackArray.emplace_back(Material::_MiscDirtyCallBack);
+  }
+
+  if (!Material::_DirtyCallbackArray.empty()) {
+    _markAllSubMeshesAsDirty(Material::_RunDirtyCallBacks);
   }
 
   getScene()->resetCachedMaterial();
 }
 
 void Material::_markAllSubMeshesAsDirty(
-  const std::function<void(MaterialDefines& defines)>& func)
+  const Material::MaterialDefinesCallback& func)
 {
-  for (auto& mesh : getScene()->meshes) {
+  if (getScene()->blockMaterialDirtyMechanism()) {
+    return;
+  }
+
+  const auto& meshes = getScene()->meshes;
+  for (const auto& mesh : meshes) {
     if (mesh->subMeshes.empty()) {
       continue;
     }
@@ -571,93 +640,76 @@ void Material::_markAllSubMeshesAsDirty(
 
 void Material::_markAllSubMeshesAsImageProcessingDirty()
 {
-  _markAllSubMeshesAsDirty(
-    [](MaterialDefines& defines) { defines.markAsImageProcessingDirty(); });
+  _markAllSubMeshesAsDirty(Material::_ImageProcessingDirtyCallBack);
 }
 
 void Material::_markAllSubMeshesAsTexturesDirty()
 {
-  _markAllSubMeshesAsDirty(
-    [](MaterialDefines& defines) { defines.markAsTexturesDirty(); });
+  _markAllSubMeshesAsDirty(Material::_TextureDirtyCallBack);
 }
 
 void Material::_markAllSubMeshesAsFresnelDirty()
 {
-  _markAllSubMeshesAsDirty(
-    [](MaterialDefines& defines) { defines.markAsFresnelDirty(); });
+  _markAllSubMeshesAsDirty(Material::_FresnelDirtyCallBack);
 }
 
 void Material::_markAllSubMeshesAsFresnelAndMiscDirty()
 {
-  _markAllSubMeshesAsDirty([](MaterialDefines& defines) {
-    defines.markAsFresnelDirty();
-    defines.markAsMiscDirty();
-  });
+  _markAllSubMeshesAsDirty(Material::_FresnelAndMiscDirtyCallBack);
 }
 
 void Material::_markAllSubMeshesAsLightsDirty()
 {
-  _markAllSubMeshesAsDirty(
-    [](MaterialDefines& defines) { defines.markAsLightDirty(); });
+  _markAllSubMeshesAsDirty(Material::_LightsDirtyCallBack);
 }
 
 void Material::_markAllSubMeshesAsAttributesDirty()
 {
-  _markAllSubMeshesAsDirty(
-    [](MaterialDefines& defines) { defines.markAsAttributesDirty(); });
+  _markAllSubMeshesAsDirty(Material::_AttributeDirtyCallBack);
 }
 
 void Material::_markAllSubMeshesAsMiscDirty()
 {
-  _markAllSubMeshesAsDirty(
-    [](MaterialDefines& defines) { defines.markAsMiscDirty(); });
+  _markAllSubMeshesAsDirty(Material::_MiscDirtyCallBack);
 }
 
 void Material::_markAllSubMeshesAsTexturesAndMiscDirty()
 {
-  _markAllSubMeshesAsDirty([](MaterialDefines& defines) {
-    defines.markAsTexturesDirty();
-    defines.markAsMiscDirty();
-  });
+  _markAllSubMeshesAsDirty(Material::_TextureAndMiscDirtyCallBack);
 }
 
 void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
-                       bool /*notBoundToMesh*/)
+                       bool notBoundToMesh)
 {
+  auto& scene = *getScene();
   // Animations
-  getScene()->stopAnimation(this);
-  getScene()->freeProcessedMaterials();
+  scene.stopAnimation(this);
+  scene.freeProcessedMaterials();
 
   // Remove from scene
-  _scene->materials.erase(std::remove_if(_scene->materials.begin(),
-                                         _scene->materials.end(),
-                                         [this](const MaterialPtr& material) {
-                                           return material.get() == this;
-                                         }),
-                          _scene->materials.end());
+  scene.removeMaterial(this);
 
-  _scene->onMaterialRemovedObservable.notifyObservers(this);
-
-  // Remove from meshes
-  Mesh* _mesh = nullptr;
-  for (auto& mesh : _scene->meshes) {
-    if (mesh->material().get() == this) {
-      mesh->material = nullptr;
-
-      _mesh = static_cast<Mesh*>(mesh.get());
-      if (_mesh && _mesh->geometry()) {
-        auto geometry = _mesh->geometry();
-        if (_storeEffectOnSubMeshes) {
-          for (auto& subMesh : mesh->subMeshes) {
-            geometry->_releaseVertexArrayObject(subMesh->_materialEffect);
-            if (forceDisposeEffect && subMesh->_materialEffect) {
-              _scene->getEngine()->_releaseEffect(
-                subMesh->_materialEffect.get());
-            }
-          }
+  if (notBoundToMesh != true) {
+    // Remove from meshes
+    if (meshMap.empty()) {
+      for (const auto& meshItem : meshMap) {
+        const auto& mesh = meshItem.second;
+        if (mesh) {
+          mesh->material
+            = nullptr; // will set the entry in the map to undefined
+          releaseVertexArrayObject(mesh, forceDisposeEffect);
         }
-        else {
-          geometry->_releaseVertexArrayObject(_effect);
+      }
+    }
+    else {
+      const auto& meshes = scene.meshes;
+      for (const auto& mesh : meshes) {
+        if (mesh->material().get() == this) {
+        }
+        auto instancedMesh = std::static_pointer_cast<InstancedMesh>(mesh);
+        if (instancedMesh && !instancedMesh->sourceMesh()) {
+          mesh->material = nullptr;
+          releaseVertexArrayObject(mesh, forceDisposeEffect);
         }
       }
     }
@@ -669,7 +721,7 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
   // using forceDisposeEffect
   if (forceDisposeEffect && _effect) {
     if (!_storeEffectOnSubMeshes) {
-      _scene->getEngine()->_releaseEffect(_effect.get());
+      _effect->dispose();
     }
 
     _effect = nullptr;
@@ -679,8 +731,28 @@ void Material::dispose(bool forceDisposeEffect, bool /*forceDisposeTextures*/,
   onDisposeObservable.notifyObservers(this);
 
   onDisposeObservable.clear();
-  onBindObservable().clear();
-  onUnBindObservable().clear();
+  _onBindObservable.clear();
+  _onUnBindObservable.clear();
+}
+
+void Material::releaseVertexArrayObject(const AbstractMeshPtr& iMesh,
+                                        bool forceDisposeEffect)
+{
+  auto mesh = std::static_pointer_cast<Mesh>(iMesh);
+  if (mesh && mesh->geometry()) {
+    const auto& geometry = mesh->geometry();
+    if (_storeEffectOnSubMeshes) {
+      for (const auto& subMesh : mesh->subMeshes) {
+        geometry->_releaseVertexArrayObject(subMesh->_materialEffect);
+        if (forceDisposeEffect && subMesh->_materialEffect) {
+          subMesh->_materialEffect->dispose();
+        }
+      }
+    }
+    else {
+      geometry->_releaseVertexArrayObject(_effect);
+    }
+  }
 }
 
 void Material::copyTo(Material* other) const

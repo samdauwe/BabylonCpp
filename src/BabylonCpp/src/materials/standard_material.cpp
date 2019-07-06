@@ -19,6 +19,7 @@
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/fresnel_parameters.h>
 #include <babylon/materials/image_processing_configuration.h>
+#include <babylon/materials/material_flags.h>
 #include <babylon/materials/material_helper.h>
 #include <babylon/materials/standard_material_defines.h>
 #include <babylon/materials/textures/base_texture.h>
@@ -511,6 +512,9 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   defines._needNormals = MaterialHelper::PrepareDefinesForLights(
     scene, mesh, defines, true, _maxSimultaneousLights, _disableLighting);
 
+  // Multiview
+  MaterialHelper::PrepareDefinesForMultiview(scene, defines);
+
   // Textures
   if (defines._areTexturesDirty) {
     defines._needUVs           = false;
@@ -714,8 +718,8 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
     defines.boolDef["SPECULAROVERALPHA"] = _useSpecularOverAlpha;
 
     defines.boolDef["PREMULTIPLYALPHA"]
-      = (alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED
-         || alphaMode() == EngineConstants::ALPHA_PREMULTIPLIED_PORTERDUFF);
+      = (alphaMode() == Constants::ALPHA_PREMULTIPLIED
+         || alphaMode() == Constants::ALPHA_PREMULTIPLIED_PORTERDUFF);
   }
 
   if (defines._areImageProcessingDirty && _imageProcessingConfiguration) {
@@ -786,7 +790,6 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
   // Get correct effect
   if (defines.isDirty()) {
     defines.markAsProcessed();
-    scene->resetCachedMaterial();
 
     // Fallbacks
     auto fallbacks = std::make_unique<EffectFallbacks>();
@@ -853,6 +856,10 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
       fallbacks->addFallback(4, "FRESNEL");
     }
 
+    if (defines["MULTIVIEW"]) {
+      fallbacks->addFallback(0, "MULTIVIEW");
+    }
+
     // Attributes
     std::vector<std::string> attribs{VertexBuffer::PositionKind};
 
@@ -888,6 +895,7 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                       "vDiffuseColor",
                                       "vSpecularColor",
                                       "vEmissiveColor",
+                                      "visibility",
                                       "vFogInfos",
                                       "vFogColor",
                                       "pointSize",
@@ -928,12 +936,13 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                       "vReflectionSize",
                                       "logarithmicDepthConstant",
                                       "vTangentSpaceParams",
-                                      "alphaCutOff"};
+                                      "alphaCutOff",
+                                      "boneTextureWidth"};
     std::vector<std::string> samplers{
       "diffuseSampler",        "ambientSampler",      "opacitySampler",
       "reflectionCubeSampler", "reflection2DSampler", "emissiveSampler",
       "specularSampler",       "bumpSampler",         "lightmapSampler",
-      "refractionCubeSampler", "refraction2DSampler"};
+      "refractionCubeSampler", "refraction2DSampler", "boneSampler"};
     std::vector<std::string> uniformBuffers{"Material", "Scene"};
 
     ImageProcessingConfiguration::PrepareUniforms(uniforms, defines);
@@ -963,11 +972,21 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
                                            samplers, defines);
     }
 
-    subMesh->setEffect(
-      scene->getEngine()->createEffect(shaderName, options, engine),
-      definesPtr);
+    auto& previousEffect = subMesh->effect();
+    auto effect = scene->getEngine()->createEffect(shaderName, options, engine);
 
-    buildUniformLayout();
+    if (effect) {
+      // Use previous effect while new one is compiling
+      if (allowShaderHotSwapping && previousEffect && !effect->isReady()) {
+        effect = previousEffect;
+        defines.markAsUnprocessed();
+      }
+      else {
+        scene->resetCachedMaterial();
+        subMesh->setEffect(effect, definesPtr);
+        buildUniformLayout();
+      }
+    }
   }
 
   if (!subMesh->effect() || !subMesh->effect()->isReady()) {
@@ -983,44 +1002,46 @@ bool StandardMaterial::isReadyForSubMesh(AbstractMesh* mesh,
 void StandardMaterial::buildUniformLayout()
 {
   // Order is important !
-  _uniformBuffer->addUniform("diffuseLeftColor", 4);
-  _uniformBuffer->addUniform("diffuseRightColor", 4);
-  _uniformBuffer->addUniform("opacityParts", 4);
-  _uniformBuffer->addUniform("reflectionLeftColor", 4);
-  _uniformBuffer->addUniform("reflectionRightColor", 4);
-  _uniformBuffer->addUniform("refractionLeftColor", 4);
-  _uniformBuffer->addUniform("refractionRightColor", 4);
-  _uniformBuffer->addUniform("emissiveLeftColor", 4);
-  _uniformBuffer->addUniform("emissiveRightColor", 4);
+  auto& ubo = *_uniformBuffer;
+  ubo.addUniform("diffuseLeftColor", 4);
+  ubo.addUniform("diffuseRightColor", 4);
+  ubo.addUniform("opacityParts", 4);
+  ubo.addUniform("reflectionLeftColor", 4);
+  ubo.addUniform("reflectionRightColor", 4);
+  ubo.addUniform("refractionLeftColor", 4);
+  ubo.addUniform("refractionRightColor", 4);
+  ubo.addUniform("emissiveLeftColor", 4);
+  ubo.addUniform("emissiveRightColor", 4);
 
-  _uniformBuffer->addUniform("vDiffuseInfos", 2);
-  _uniformBuffer->addUniform("vAmbientInfos", 2);
-  _uniformBuffer->addUniform("vOpacityInfos", 2);
-  _uniformBuffer->addUniform("vReflectionInfos", 2);
-  _uniformBuffer->addUniform("vReflectionPosition", 3);
-  _uniformBuffer->addUniform("vReflectionSize", 3);
-  _uniformBuffer->addUniform("vEmissiveInfos", 2);
-  _uniformBuffer->addUniform("vLightmapInfos", 2);
-  _uniformBuffer->addUniform("vSpecularInfos", 2);
-  _uniformBuffer->addUniform("vBumpInfos", 3);
+  ubo.addUniform("vDiffuseInfos", 2);
+  ubo.addUniform("vAmbientInfos", 2);
+  ubo.addUniform("vOpacityInfos", 2);
+  ubo.addUniform("vReflectionInfos", 2);
+  ubo.addUniform("vReflectionPosition", 3);
+  ubo.addUniform("vReflectionSize", 3);
+  ubo.addUniform("vEmissiveInfos", 2);
+  ubo.addUniform("vLightmapInfos", 2);
+  ubo.addUniform("vSpecularInfos", 2);
+  ubo.addUniform("vBumpInfos", 3);
 
-  _uniformBuffer->addUniform("diffuseMatrix", 16);
-  _uniformBuffer->addUniform("ambientMatrix", 16);
-  _uniformBuffer->addUniform("opacityMatrix", 16);
-  _uniformBuffer->addUniform("reflectionMatrix", 16);
-  _uniformBuffer->addUniform("emissiveMatrix", 16);
-  _uniformBuffer->addUniform("lightmapMatrix", 16);
-  _uniformBuffer->addUniform("specularMatrix", 16);
-  _uniformBuffer->addUniform("bumpMatrix", 16);
-  _uniformBuffer->addUniform("vTangentSpaceParams", 2);
-  _uniformBuffer->addUniform("refractionMatrix", 16);
-  _uniformBuffer->addUniform("vRefractionInfos", 4);
-  _uniformBuffer->addUniform("vSpecularColor", 4);
-  _uniformBuffer->addUniform("vEmissiveColor", 3);
-  _uniformBuffer->addUniform("vDiffuseColor", 4);
-  _uniformBuffer->addUniform("pointSize", 1);
+  ubo.addUniform("diffuseMatrix", 16);
+  ubo.addUniform("ambientMatrix", 16);
+  ubo.addUniform("opacityMatrix", 16);
+  ubo.addUniform("reflectionMatrix", 16);
+  ubo.addUniform("emissiveMatrix", 16);
+  ubo.addUniform("lightmapMatrix", 16);
+  ubo.addUniform("specularMatrix", 16);
+  ubo.addUniform("bumpMatrix", 16);
+  ubo.addUniform("vTangentSpaceParams", 2);
+  ubo.addUniform("pointSize", 1);
+  ubo.addUniform("refractionMatrix", 16);
+  ubo.addUniform("vRefractionInfos", 4);
+  ubo.addUniform("vSpecularColor", 4);
+  ubo.addUniform("vEmissiveColor", 3);
+  ubo.addUniform("visibility", 1);
+  ubo.addUniform("vDiffuseColor", 4);
 
-  _uniformBuffer->create();
+  ubo.create();
 }
 
 void StandardMaterial::unbind()
@@ -1064,7 +1085,9 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
   _activeEffect = effect;
 
   // Matrices
-  bindOnlyWorldMatrix(world);
+  if (!defines["INSTANCES"]) {
+    bindOnlyWorldMatrix(world);
+  }
 
   // Normal Matrix
   if (defines["OBJECTSPACE_NORMALMAP"]) {
@@ -1076,27 +1099,28 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
   // Bones
   MaterialHelper::BindBonesParameters(mesh, effect);
+  auto& ubo = *_uniformBuffer;
   if (mustRebind) {
-    _uniformBuffer->bindToEffect(effect.get(), "Material");
+    ubo.bindToEffect(effect.get(), "Material");
 
     bindViewProjection(effect);
-    if (!_uniformBuffer->useUbo() || !isFrozen() || !_uniformBuffer->isSync()) {
+    if (!ubo.useUbo() || !isFrozen() || !ubo.isSync()) {
 
       if (StandardMaterial::FresnelEnabled() && defines["FRESNEL"]) {
         // Fresnel
         if (_diffuseFresnelParameters
             && _diffuseFresnelParameters->isEnabled()) {
-          _uniformBuffer->updateColor4("diffuseLeftColor",
-                                       _diffuseFresnelParameters->leftColor,
-                                       _diffuseFresnelParameters->power, "");
-          _uniformBuffer->updateColor4("diffuseRightColor",
-                                       _diffuseFresnelParameters->rightColor,
-                                       _diffuseFresnelParameters->bias, "");
+          ubo.updateColor4("diffuseLeftColor",
+                           _diffuseFresnelParameters->leftColor,
+                           _diffuseFresnelParameters->power, "");
+          ubo.updateColor4("diffuseRightColor",
+                           _diffuseFresnelParameters->rightColor,
+                           _diffuseFresnelParameters->bias, "");
         }
 
         if (_opacityFresnelParameters
             && _opacityFresnelParameters->isEnabled()) {
-          _uniformBuffer->updateColor4(
+          ubo.updateColor4(
             "opacityParts",
             Color3(_opacityFresnelParameters->leftColor.toLuminance(),
                    _opacityFresnelParameters->rightColor.toLuminance(),
@@ -1106,44 +1130,43 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
 
         if (_reflectionFresnelParameters
             && _reflectionFresnelParameters->isEnabled()) {
-          _uniformBuffer->updateColor4("reflectionLeftColor",
-                                       _reflectionFresnelParameters->leftColor,
-                                       _reflectionFresnelParameters->power, "");
-          _uniformBuffer->updateColor4("reflectionRightColor",
-                                       _reflectionFresnelParameters->rightColor,
-                                       _reflectionFresnelParameters->bias, "");
+          ubo.updateColor4("reflectionLeftColor",
+                           _reflectionFresnelParameters->leftColor,
+                           _reflectionFresnelParameters->power, "");
+          ubo.updateColor4("reflectionRightColor",
+                           _reflectionFresnelParameters->rightColor,
+                           _reflectionFresnelParameters->bias, "");
         }
 
         if (_refractionFresnelParameters
             && _refractionFresnelParameters->isEnabled()) {
-          _uniformBuffer->updateColor4("refractionLeftColor",
-                                       _refractionFresnelParameters->leftColor,
-                                       _refractionFresnelParameters->power, "");
-          _uniformBuffer->updateColor4("refractionRightColor",
-                                       _refractionFresnelParameters->rightColor,
-                                       _refractionFresnelParameters->bias, "");
+          ubo.updateColor4("refractionLeftColor",
+                           _refractionFresnelParameters->leftColor,
+                           _refractionFresnelParameters->power, "");
+          ubo.updateColor4("refractionRightColor",
+                           _refractionFresnelParameters->rightColor,
+                           _refractionFresnelParameters->bias, "");
         }
 
         if (_emissiveFresnelParameters
             && _emissiveFresnelParameters->isEnabled()) {
-          _uniformBuffer->updateColor4("emissiveLeftColor",
-                                       _emissiveFresnelParameters->leftColor,
-                                       _emissiveFresnelParameters->power, "");
-          _uniformBuffer->updateColor4("emissiveRightColor",
-                                       _emissiveFresnelParameters->rightColor,
-                                       _emissiveFresnelParameters->bias, "");
+          ubo.updateColor4("emissiveLeftColor",
+                           _emissiveFresnelParameters->leftColor,
+                           _emissiveFresnelParameters->power, "");
+          ubo.updateColor4("emissiveRightColor",
+                           _emissiveFresnelParameters->rightColor,
+                           _emissiveFresnelParameters->bias, "");
         }
       }
 
       // Textures
       if (scene->texturesEnabled()) {
         if (_diffuseTexture && StandardMaterial::DiffuseTextureEnabled()) {
-          _uniformBuffer->updateFloat2(
+          ubo.updateFloat2(
             "vDiffuseInfos",
             static_cast<float>(_diffuseTexture->coordinatesIndex),
             static_cast<float>(_diffuseTexture->level), "");
-          MaterialHelper::BindTextureMatrix(*_diffuseTexture, *_uniformBuffer,
-                                            "diffuse");
+          MaterialHelper::BindTextureMatrix(*_diffuseTexture, ubo, "diffuse");
 
           if (_diffuseTexture->hasAlpha()) {
             effect->setFloat("alphaCutOff", alphaCutOff);
@@ -1151,85 +1174,78 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
         }
 
         if (_ambientTexture && StandardMaterial::AmbientTextureEnabled()) {
-          _uniformBuffer->updateFloat2(
+          ubo.updateFloat2(
             "vAmbientInfos",
             static_cast<float>(_ambientTexture->coordinatesIndex),
             static_cast<float>(_ambientTexture->level), "");
-          MaterialHelper::BindTextureMatrix(*_ambientTexture, *_uniformBuffer,
-                                            "ambient");
+          MaterialHelper::BindTextureMatrix(*_ambientTexture, ubo, "ambient");
         }
 
         if (_opacityTexture && StandardMaterial::OpacityTextureEnabled()) {
-          _uniformBuffer->updateFloat2(
+          ubo.updateFloat2(
             "vOpacityInfos",
             static_cast<float>(_opacityTexture->coordinatesIndex),
             static_cast<float>(_opacityTexture->level), "");
-          MaterialHelper::BindTextureMatrix(*_opacityTexture, *_uniformBuffer,
-                                            "opacity");
+          MaterialHelper::BindTextureMatrix(*_opacityTexture, ubo, "opacity");
         }
 
         if (_reflectionTexture
             && StandardMaterial::ReflectionTextureEnabled()) {
-          _uniformBuffer->updateFloat2(
-            "vReflectionInfos", _reflectionTexture->level, _roughness, "");
-          _uniformBuffer->updateMatrix(
-            "reflectionMatrix",
-            *_reflectionTexture->getReflectionTextureMatrix());
+          ubo.updateFloat2("vReflectionInfos", _reflectionTexture->level,
+                           _roughness, "");
+          ubo.updateMatrix("reflectionMatrix",
+                           *_reflectionTexture->getReflectionTextureMatrix());
 
           if (_reflectionTexture->boundingBoxSize()) {
             if (auto cubeTexture
                 = std::static_pointer_cast<CubeTexture>(_reflectionTexture)) {
-              _uniformBuffer->updateVector3("vReflectionPosition",
-                                            cubeTexture->boundingBoxPosition);
-              _uniformBuffer->updateVector3("vReflectionSize",
-                                            *cubeTexture->boundingBoxSize());
+              ubo.updateVector3("vReflectionPosition",
+                                cubeTexture->boundingBoxPosition);
+              ubo.updateVector3("vReflectionSize",
+                                *cubeTexture->boundingBoxSize());
             }
           }
         }
 
         if (_emissiveTexture && StandardMaterial::EmissiveTextureEnabled()) {
-          _uniformBuffer->updateFloat2(
+          ubo.updateFloat2(
             "vEmissiveInfos",
             static_cast<float>(_emissiveTexture->coordinatesIndex),
             static_cast<float>(_emissiveTexture->level), "");
-          MaterialHelper::BindTextureMatrix(*_emissiveTexture, *_uniformBuffer,
-                                            "emissive");
+          MaterialHelper::BindTextureMatrix(*_emissiveTexture, ubo, "emissive");
         }
 
         if (_lightmapTexture && StandardMaterial::LightmapTextureEnabled()) {
-          _uniformBuffer->updateFloat2(
+          ubo.updateFloat2(
             "vLightmapInfos",
             static_cast<float>(_lightmapTexture->coordinatesIndex),
             static_cast<float>(_lightmapTexture->level), "");
-          MaterialHelper::BindTextureMatrix(*_lightmapTexture, *_uniformBuffer,
-                                            "lightmap");
+          MaterialHelper::BindTextureMatrix(*_lightmapTexture, ubo, "lightmap");
         }
 
         if (_specularTexture && StandardMaterial::SpecularTextureEnabled()) {
-          _uniformBuffer->updateFloat2(
+          ubo.updateFloat2(
             "vSpecularInfos",
             static_cast<float>(_specularTexture->coordinatesIndex),
             static_cast<float>(_specularTexture->level), "");
-          MaterialHelper::BindTextureMatrix(*_specularTexture, *_uniformBuffer,
-                                            "specular");
+          MaterialHelper::BindTextureMatrix(*_specularTexture, ubo, "specular");
         }
 
         if (_bumpTexture && scene->getEngine()->getCaps().standardDerivatives
             && StandardMaterial::BumpTextureEnabled()) {
-          _uniformBuffer->updateFloat3(
-            "vBumpInfos", static_cast<float>(_bumpTexture->coordinatesIndex),
-            1.f / _bumpTexture->level, parallaxScaleBias, "");
-          MaterialHelper::BindTextureMatrix(*_bumpTexture, *_uniformBuffer,
-                                            "bump");
+          ubo.updateFloat3("vBumpInfos",
+                           static_cast<float>(_bumpTexture->coordinatesIndex),
+                           1.f / _bumpTexture->level, parallaxScaleBias, "");
+          MaterialHelper::BindTextureMatrix(*_bumpTexture, ubo, "bump");
           if (scene->_mirroredCameraPosition) {
-            _uniformBuffer->updateFloat2("vTangentSpaceParams",
-                                         _invertNormalMapX ? 1.f : -1.f,
-                                         _invertNormalMapY ? 1.f : -1.f, "");
+            ubo.updateFloat2("vTangentSpaceParams",
+                             _invertNormalMapX ? 1.f : -1.f,
+                             _invertNormalMapY ? 1.f : -1.f, "");
           }
           else {
-            _uniformBuffer->updateFloat2("vTangentSpaceParams",
-                                         _invertNormalMapX ? -1.f : 1.f,
-                                         _invertNormalMapY ? -1.f : 1.f, "");
+            ubo.updateFloat2("vTangentSpaceParams",
+                             _invertNormalMapX ? -1.f : 1.f,
+                             _invertNormalMapY ? -1.f : 1.f, "");
           }
         }
 
@@ -1237,34 +1253,39 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
             && StandardMaterial::RefractionTextureEnabled()) {
           float depth = 1.f;
           if (!_refractionTexture->isCube) {
-            _uniformBuffer->updateMatrix(
-              "refractionMatrix",
-              *_refractionTexture->getReflectionTextureMatrix());
+            ubo.updateMatrix("refractionMatrix",
+                             *_refractionTexture->getReflectionTextureMatrix());
             auto refractionTextureTmp
               = std::static_pointer_cast<RefractionTexture>(_refractionTexture);
             if (refractionTextureTmp) {
               depth = refractionTextureTmp->depth;
             }
           }
-          _uniformBuffer->updateFloat4(
-            "vRefractionInfos", _refractionTexture->level, indexOfRefraction,
-            depth, invertRefractionY ? -1.f : 1.f, "");
+          ubo.updateFloat4("vRefractionInfos", _refractionTexture->level,
+                           indexOfRefraction, depth,
+                           invertRefractionY ? -1.f : 1.f, "");
         }
       }
 
       // Point size
       if (pointsCloud()) {
-        _uniformBuffer->updateFloat("pointSize", pointSize);
+        ubo.updateFloat("pointSize", pointSize);
       }
 
       if (defines["SPECULARTERM"]) {
-        _uniformBuffer->updateColor4("vSpecularColor", specularColor,
-                                     specularPower, "");
+        ubo.updateColor4("vSpecularColor", specularColor, specularPower, "");
       }
-      _uniformBuffer->updateColor3("vEmissiveColor", emissiveColor, "");
+      ubo.updateColor3("vEmissiveColor",
+                       StandardMaterial::EmissiveTextureEnabled() ?
+                         emissiveColor :
+                         Color3::BlackReadOnly(),
+                       "");
+
+      // Visibility
+      ubo.updateFloat("visibility", mesh->visibility());
+
       // Diffuse
-      _uniformBuffer->updateColor4("vDiffuseColor", diffuseColor,
-                                   alpha() * mesh->visibility(), "");
+      ubo.updateColor4("vDiffuseColor", diffuseColor, alpha(), "");
     }
 
     // Textures
@@ -1359,7 +1380,7 @@ void StandardMaterial::bindForSubMesh(Matrix& world, Mesh* mesh,
     }
   }
 
-  _uniformBuffer->update();
+  ubo.update();
   _afterBind(mesh, _activeEffect);
 }
 
@@ -2180,167 +2201,112 @@ StandardMaterialPtr StandardMaterial::Parse(const json& source, Scene* scene,
 
 bool StandardMaterial::DiffuseTextureEnabled()
 {
-  return StandardMaterial::_DiffuseTextureEnabled;
+  return MaterialFlags::DiffuseTextureEnabled();
 }
 
 void StandardMaterial::SetDiffuseTextureEnabled(bool value)
 {
-  if (StandardMaterial::_DiffuseTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_DiffuseTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setDiffuseTextureEnabled(value);
 }
 
 bool StandardMaterial::AmbientTextureEnabled()
 {
-  return StandardMaterial::_AmbientTextureEnabled;
+  return MaterialFlags::AmbientTextureEnabled();
 }
 
 void StandardMaterial::SetAmbientTextureEnabled(bool value)
 {
-  if (StandardMaterial::_AmbientTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_AmbientTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setAmbientTextureEnabled(value);
 }
 
 bool StandardMaterial::OpacityTextureEnabled()
 {
-  return StandardMaterial::_OpacityTextureEnabled;
+  return MaterialFlags::OpacityTextureEnabled();
 }
 
 void StandardMaterial::SetOpacityTextureEnabled(bool value)
 {
-  if (StandardMaterial::_OpacityTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_OpacityTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setOpacityTextureEnabled(value);
 }
 
 bool StandardMaterial::ReflectionTextureEnabled()
 {
-  return StandardMaterial::_ReflectionTextureEnabled;
+  return MaterialFlags::ReflectionTextureEnabled();
 }
 
 void StandardMaterial::SetReflectionTextureEnabled(bool value)
 {
-  if (StandardMaterial::_ReflectionTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_ReflectionTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setReflectionTextureEnabled(value);
 }
 
 bool StandardMaterial::EmissiveTextureEnabled()
 {
-  return StandardMaterial::_EmissiveTextureEnabled;
+  return MaterialFlags::EmissiveTextureEnabled();
 }
 
 void StandardMaterial::SetEmissiveTextureEnabled(bool value)
 {
-  if (StandardMaterial::_EmissiveTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_EmissiveTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setEmissiveTextureEnabled(value);
 }
 
 bool StandardMaterial::SpecularTextureEnabled()
 {
-  return StandardMaterial::_SpecularTextureEnabled;
+  return MaterialFlags::SpecularTextureEnabled();
 }
 
 void StandardMaterial::SetSpecularTextureEnabled(bool value)
 {
-  if (StandardMaterial::_SpecularTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_SpecularTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setSpecularTextureEnabled(value);
 }
 
 bool StandardMaterial::BumpTextureEnabled()
 {
-  return StandardMaterial::_BumpTextureEnabled;
+  return MaterialFlags::BumpTextureEnabled();
 }
 
 void StandardMaterial::SetBumpTextureEnabled(bool value)
 {
-  if (StandardMaterial::_BumpTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_BumpTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setBumpTextureEnabled(value);
 }
 
 bool StandardMaterial::LightmapTextureEnabled()
 {
-  return StandardMaterial::_LightmapTextureEnabled;
+  return MaterialFlags::LightmapTextureEnabled();
 }
 
 void StandardMaterial::SetLightmapTextureEnabled(bool value)
 {
-  if (StandardMaterial::_LightmapTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_LightmapTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setLightmapTextureEnabled(value);
 }
 
 bool StandardMaterial::RefractionTextureEnabled()
 {
-  return StandardMaterial::_RefractionTextureEnabled;
+  return MaterialFlags::RefractionTextureEnabled();
 }
 
 void StandardMaterial::SetRefractionTextureEnabled(bool value)
 {
-  if (StandardMaterial::_RefractionTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_RefractionTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setRefractionTextureEnabled(value);
 }
 
 bool StandardMaterial::ColorGradingTextureEnabled()
 {
-  return StandardMaterial::_ColorGradingTextureEnabled;
+  return MaterialFlags::ColorGradingTextureEnabled();
 }
 
 void StandardMaterial::SetColorGradingTextureEnabled(bool value)
 {
-  if (StandardMaterial::_ColorGradingTextureEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_ColorGradingTextureEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::TextureDirtyFlag);
+  MaterialFlags::setColorGradingTextureEnabled(value);
 }
 
 bool StandardMaterial::FresnelEnabled()
 {
-  return StandardMaterial::_FresnelEnabled;
+  return MaterialFlags::FresnelEnabled();
 }
 
 void StandardMaterial::SetFresnelEnabled(bool value)
 {
-  if (StandardMaterial::_FresnelEnabled == value) {
-    return;
-  }
-
-  StandardMaterial::_FresnelEnabled = value;
-  Engine::MarkAllMaterialsAsDirty(Material::FresnelDirtyFlag);
+  MaterialFlags::setFresnelEnabled(value);
 }
 
 } // end of namespace BABYLON

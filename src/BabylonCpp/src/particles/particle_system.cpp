@@ -1657,11 +1657,11 @@ size_t ParticleSystem::_render(unsigned int iBlendMode)
   }
 
   if (_useInstancing) {
-    engine->drawArraysType(Material::TriangleFanDrawMode(), 0, 4,
+    engine->drawArraysType(Material::TriangleFanDrawMode, 0, 4,
                            static_cast<int>(_particles.size()));
   }
   else {
-    engine->drawElementsType(Material::TriangleFillMode(), 0,
+    engine->drawElementsType(Material::TriangleFillMode, 0,
                              static_cast<int>(_particles.size() * 6));
   }
 

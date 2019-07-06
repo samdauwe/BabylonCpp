@@ -37,6 +37,8 @@
 #include <babylon/math/scalar.h>
 #include <babylon/meshes/abstract_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
+#include <babylon/misc/dds.h>
+#include <babylon/misc/tools.h>
 #include <babylon/particles/particle_system.h>
 #include <babylon/postprocesses/pass_post_process.h>
 #include <babylon/postprocesses/post_process.h>
@@ -45,8 +47,6 @@
 #include <babylon/states/_alpha_state.h>
 #include <babylon/states/_depth_culling_state.h>
 #include <babylon/states/_stencil_state.h>
-#include <babylon/misc/dds.h>
-#include <babylon/misc/tools.h>
 
 namespace BABYLON {
 
@@ -1827,23 +1827,23 @@ void Engine::applyStates()
 void Engine::draw(bool useTriangles, int indexStart, int indexCount,
                   int instancesCount)
 {
-  drawElementsType(useTriangles ? Material::TriangleFillMode() :
-                                  Material::WireFrameFillMode(),
+  drawElementsType(useTriangles ? Material::TriangleFillMode :
+                                  Material::WireFrameFillMode,
                    indexStart, indexCount, instancesCount);
 }
 
 void Engine::drawPointClouds(int verticesStart, int verticesCount,
                              int instancesCount)
 {
-  drawArraysType(Material::PointFillMode(), verticesStart, verticesCount,
+  drawArraysType(Material::PointFillMode, verticesStart, verticesCount,
                  instancesCount);
 }
 
 void Engine::drawUnIndexed(bool useTriangles, int verticesStart,
                            int verticesCount, int instancesCount)
 {
-  drawArraysType(useTriangles ? Material::TriangleFillMode() :
-                                Material::WireFrameFillMode(),
+  drawArraysType(useTriangles ? Material::TriangleFillMode :
+                                Material::WireFrameFillMode,
                  verticesStart, verticesCount, instancesCount);
 }
 
@@ -1891,24 +1891,24 @@ unsigned int Engine::_drawMode(unsigned int fillMode)
 {
   switch (fillMode) {
     // Triangle views
-    case Material::TriangleFillMode():
+    case Material::TriangleFillMode:
       return GL::TRIANGLES;
-    case Material::PointFillMode():
+    case Material::PointFillMode:
       return GL::POINTS;
-    case Material::WireFrameFillMode():
+    case Material::WireFrameFillMode:
       return GL::LINES;
     // Draw modes
-    case Material::PointListDrawMode():
+    case Material::PointListDrawMode:
       return GL::POINTS;
-    case Material::LineListDrawMode():
+    case Material::LineListDrawMode:
       return GL::LINES;
-    case Material::LineLoopDrawMode():
+    case Material::LineLoopDrawMode:
       return GL::LINE_LOOP;
-    case Material::LineStripDrawMode():
+    case Material::LineStripDrawMode:
       return GL::LINE_STRIP;
-    case Material::TriangleStripDrawMode():
+    case Material::TriangleStripDrawMode:
       return GL::TRIANGLE_STRIP;
-    case Material::TriangleFanDrawMode():
+    case Material::TriangleFanDrawMode:
       return GL::TRIANGLE_FAN;
     default:
       return GL::TRIANGLES;
