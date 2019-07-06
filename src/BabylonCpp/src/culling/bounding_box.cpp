@@ -3,11 +3,14 @@
 #include <babylon/babylon_stl_util.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/math/plane.h>
-#include <babylon/math/tmp.h>
 
 namespace BABYLON {
 
-BoundingBox::BoundingBox(const Vector3& min, const Vector3& max)
+std::array<Vector3, 3> BoundingBox::TmpVector3{Vector3::Zero(), Vector3::Zero(),
+                                               Vector3::Zero()};
+
+BoundingBox::BoundingBox(const Vector3& min, const Vector3& max,
+                         const std::optional<Matrix>& worldMatrix)
     : vectors{{Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
                Vector3::Zero(), Vector3::Zero(), Vector3::Zero(),
                Vector3::Zero(), Vector3::Zero()}}
@@ -26,10 +29,10 @@ BoundingBox::BoundingBox(const Vector3& min, const Vector3& max)
     , _tag{-1}
     , _worldMatrix{Matrix::Identity()}
 {
-  reConstruct(min, max);
+  reConstruct(min, max, worldMatrix);
 }
 
-void BoundingBox::reConstruct(const Vector3& min, const Vector3& max,
+void BoundingBox::reConstruct(Vector3 min, Vector3 max,
                               const std::optional<Matrix>& worldMatrix)
 {
   const auto minX = min.x, minY = min.y, minZ = min.z, maxX = max.x,
@@ -47,12 +50,10 @@ void BoundingBox::reConstruct(const Vector3& min, const Vector3& max,
   vectors[7].copyFromFloats(maxX, minY, maxZ);
 
   // OBB
-  auto _max = max.addToRef(min, center);
-  _max.scaleInPlace(0.5f);
-  auto _min = _max.subtractToRef(min, extendSize);
-  _min.scaleInPlace(0.5f);
+  max.addToRef(min, center).scaleInPlace(0.5f);
+  max.subtractToRef(min, extendSize).scaleInPlace(0.5f);
 
-  _worldMatrix = worldMatrix ? worldMatrix.value() : Matrix::IdentityReadOnly();
+  _worldMatrix = worldMatrix.value_or(Matrix::IdentityReadOnly());
 
   _update(_worldMatrix);
 }
@@ -127,16 +128,17 @@ BoundingBox::~BoundingBox()
 
 BoundingBox& BoundingBox::scale(float factor)
 {
-  auto diff = Tmp::Vector3Array[0].copyFrom(maximum).subtractInPlace(minimum);
-  auto distance = diff.length() * factor;
-  diff.normalize();
-  auto newRadius = diff.scaleInPlace(distance * 0.5f);
+  auto& tmpVectors = BoundingBox::TmpVector3;
+  auto& diff       = maximum.subtractToRef(minimum, tmpVectors[0]);
+  const auto len   = diff.length();
+  diff.normalizeFromLength(len);
+  const auto distance  = len * factor;
+  const auto newRadius = diff.scaleInPlace(distance * 0.5f);
 
-  const auto min
-    = Tmp::Vector3Array[1].copyFrom(center).subtractInPlace(newRadius);
-  const auto max = Tmp::Vector3Array[2].copyFrom(center).addInPlace(newRadius);
+  auto& min = center.subtractToRef(newRadius, tmpVectors[1]);
+  auto& max = center.addToRef(newRadius, tmpVectors[2]);
 
-  reConstruct(min, max);
+  reConstruct(min, max, _worldMatrix);
 
   return *this;
 }
@@ -146,39 +148,42 @@ Matrix& BoundingBox::getWorldMatrix()
   return _worldMatrix;
 }
 
-BoundingBox& BoundingBox::setWorldMatrix(const Matrix& matrix)
-{
-  _worldMatrix.copyFrom(matrix);
-  return *this;
-}
-
 void BoundingBox::_update(const Matrix& world)
 {
-  Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
-                           std::numeric_limits<float>::max(),
-                           std::numeric_limits<float>::max(), minimumWorld);
-  Vector3::FromFloatsToRef(std::numeric_limits<float>::lowest(),
-                           std::numeric_limits<float>::lowest(),
-                           std::numeric_limits<float>::lowest(), maximumWorld);
+  auto& minWorld = minimumWorld;
+  auto& maxWorld = maximumWorld;
 
-  for (unsigned int index = 0; index < 8; ++index) {
-    auto& v = vectorsWorld[index];
-    Vector3::TransformCoordinatesToRef(vectors[index], world, v);
-    minimumWorld.minimizeInPlace(v);
-    maximumWorld.maximizeInPlace(v);
+  auto _world = world;
+  if (!_world.isIdentity()) {
+    minWorld.setAll(std::numeric_limits<float>::max());
+    maxWorld.setAll(std::numeric_limits<float>::lowest());
+
+    for (auto index = 0u; index < 8; ++index) {
+      auto& v = vectorsWorld[index];
+      Vector3::TransformCoordinatesToRef(vectors[index], world, v);
+      minWorld.minimizeInPlace(v);
+      maxWorld.maximizeInPlace(v);
+    }
+
+    // Extend
+    maxWorld.subtractToRef(minWorld, extendSizeWorld).scaleInPlace(0.5f);
+    maxWorld.addToRef(minWorld, centerWorld).scaleInPlace(0.5f);
+  }
+  else {
+    minWorld.copyFrom(minimum);
+    maxWorld.copyFrom(maximum);
+    for (auto index = 0u; index < 8; ++index) {
+      vectorsWorld[index].copyFrom(vectors[index]);
+    }
+
+    // Extend
+    extendSizeWorld.copyFrom(extendSize);
+    centerWorld.copyFrom(center);
   }
 
-  // Extend
-  maximumWorld.subtractToRef(minimumWorld, extendSizeWorld);
-  extendSizeWorld.scaleInPlace(0.5f);
-
-  // OBB
-  maximumWorld.addToRef(minimumWorld, centerWorld);
-  centerWorld.scaleInPlace(0.5f);
-
-  Vector3::FromFloatArrayToRef(world.m(), 0, directions[0]);
-  Vector3::FromFloatArrayToRef(world.m(), 4, directions[1]);
-  Vector3::FromFloatArrayToRef(world.m(), 8, directions[2]);
+  Vector3::FromArrayToRef(world.m(), 0, directions[0]);
+  Vector3::FromArrayToRef(world.m(), 4, directions[1]);
+  Vector3::FromArrayToRef(world.m(), 8, directions[2]);
 
   _worldMatrix = world;
 }
@@ -197,17 +202,22 @@ bool BoundingBox::isCompletelyInFrustum(
 
 bool BoundingBox::intersectsPoint(const Vector3& point)
 {
-  float delta = -Math::Epsilon;
+  const auto& min = minimumWorld;
+  const auto& max = maximumWorld;
+  const auto minX = min.x, minY = min.y, minZ = min.z, maxX = max.x,
+             maxY = max.y, maxZ = max.z;
+  const auto pointX = point.x, pointY = point.y, pointZ = point.z;
+  const auto delta = -Math::Epsilon;
 
-  if (maximumWorld.x - point.x < delta || delta > point.x - minimumWorld.x) {
+  if (maxX - pointX < delta || delta > pointX - minX) {
     return false;
   }
 
-  if (maximumWorld.y - point.y < delta || delta > point.y - minimumWorld.y) {
+  if (maxY - pointY < delta || delta > pointY - minY) {
     return false;
   }
 
-  if (maximumWorld.z - point.z < delta || delta > point.z - minimumWorld.z) {
+  if (maxZ - pointZ < delta || delta > pointZ - minZ) {
     return false;
   }
 
@@ -222,15 +232,21 @@ bool BoundingBox::intersectsSphere(const BoundingSphere& sphere)
 
 bool BoundingBox::intersectsMinMax(const Vector3& min, const Vector3& max) const
 {
-  if (maximumWorld.x < min.x || minimumWorld.x > max.x) {
+  const auto& myMin = minimumWorld;
+  const auto& myMax = maximumWorld;
+  const auto myMinX = myMin.x, myMinY = myMin.y, myMinZ = myMin.z,
+             myMaxX = myMax.x, myMaxY = myMax.y, myMaxZ = myMax.z;
+  const auto minX = min.x, minY = min.y, minZ = min.z, maxX = max.x,
+             maxY = max.y, maxZ = max.z;
+  if (myMaxX < minX || myMinX > maxX) {
     return false;
   }
 
-  if (maximumWorld.y < min.y || minimumWorld.y > max.y) {
+  if (myMaxY < minY || myMinY > maxY) {
     return false;
   }
 
-  if (maximumWorld.z < min.z || minimumWorld.z > max.z) {
+  if (myMaxZ < minZ || myMinZ > maxZ) {
     return false;
   }
 
@@ -240,22 +256,7 @@ bool BoundingBox::intersectsMinMax(const Vector3& min, const Vector3& max) const
 // Statics
 bool BoundingBox::Intersects(const BoundingBox& box0, const BoundingBox& box1)
 {
-  if (box0.maximumWorld.x < box1.minimumWorld.x
-      || box0.minimumWorld.x > box1.maximumWorld.x) {
-    return false;
-  }
-
-  if (box0.maximumWorld.y < box1.minimumWorld.y
-      || box0.minimumWorld.y > box1.maximumWorld.y) {
-    return false;
-  }
-
-  if (box0.maximumWorld.z < box1.minimumWorld.z
-      || box0.minimumWorld.z > box1.maximumWorld.z) {
-    return false;
-  }
-
-  return true;
+  return box0.intersectsMinMax(box1.minimumWorld, box1.maximumWorld);
 }
 
 bool BoundingBox::IntersectsSphere(const Vector3& minPoint,
@@ -263,8 +264,9 @@ bool BoundingBox::IntersectsSphere(const Vector3& minPoint,
                                    const Vector3& sphereCenter,
                                    float sphereRadius)
 {
-  auto vector = Vector3::Clamp(sphereCenter, minPoint, maxPoint);
-  auto num    = Vector3::DistanceSquared(sphereCenter, vector);
+  auto& vector = BoundingBox::TmpVector3[0];
+  Vector3::ClampToRef(sphereCenter, minPoint, maxPoint, vector);
+  const auto num = Vector3::DistanceSquared(sphereCenter, vector);
   return (num <= (sphereRadius * sphereRadius));
 }
 
@@ -272,9 +274,10 @@ bool BoundingBox::IsCompletelyInFrustum(
   const std::array<Vector3, 8>& boundingVectors,
   const std::array<Plane, 6>& frustumPlanes)
 {
-  for (unsigned int p = 0; p < 6; ++p) {
-    for (unsigned int i = 0; i < 8; ++i) {
-      if (frustumPlanes[p].dotCoordinate(boundingVectors[i]) < 0) {
+  for (auto p = 0u; p < 6; ++p) {
+    const auto& frustumPlane = frustumPlanes[p];
+    for (auto i = 0u; i < 8; ++i) {
+      if (frustumPlane.dotCoordinate(boundingVectors[i]) < 0.f) {
         return false;
       }
     }
@@ -285,18 +288,16 @@ bool BoundingBox::IsCompletelyInFrustum(
 bool BoundingBox::IsInFrustum(const std::array<Vector3, 8>& boundingVectors,
                               const std::array<Plane, 6>& frustumPlanes)
 {
-  for (size_t p = 0; p < 6; ++p) {
-    auto inCount = 8;
-
-    for (size_t i = 0; i < 8; ++i) {
-      if (frustumPlanes[p].dotCoordinate(boundingVectors[i]) < 0) {
-        --inCount;
-      }
-      else {
+  for (auto p = 0u; p < 6; ++p) {
+    auto canReturnFalse      = true;
+    const auto& frustumPlane = frustumPlanes[p];
+    for (auto i = 0u; i < 8; ++i) {
+      if (frustumPlane.dotCoordinate(boundingVectors[i]) >= 0) {
+        canReturnFalse = false;
         break;
       }
     }
-    if (inCount == 0) {
+    if (canReturnFalse) {
       return false;
     }
   }

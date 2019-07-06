@@ -571,24 +571,19 @@ bool Camera::isCompletelyInFrustum(ICullable* target)
   return target->isCompletelyInFrustum(_frustumPlanes);
 }
 
-Ray Camera::getForwardRay(float length)
+Ray Camera::getForwardRay(float length, const std::optional<Matrix>& iTransform,
+                          const std::optional<Vector3>& iOrigin)
 {
-  return getForwardRay(length, getWorldMatrix(), position);
-}
+  const auto transform
+    = iTransform.has_value() ? *iTransform : getWorldMatrix();
 
-Ray Camera::getForwardRay(float length, const Matrix& transform)
-{
-  return getForwardRay(length, transform, position);
-}
+  const auto origin = iOrigin.has_value() ? *iOrigin : position();
 
-Ray Camera::getForwardRay(float length, const Matrix& transform,
-                          const Vector3& origin)
-{
-  auto forward = _scene->useRightHandedSystem ? Vector3(0.f, 0.f, -1.f) :
-                                                Vector3(0.f, 0.f, 1.f);
-  auto forwardWorld = Vector3::TransformNormal(forward, transform);
+  const auto forward = _scene->useRightHandedSystem ? Vector3(0.f, 0.f, -1.f) :
+                                                      Vector3(0.f, 0.f, 1.f);
+  const auto forwardWorld = Vector3::TransformNormal(forward, transform);
 
-  auto direction = Vector3::Normalize(forwardWorld);
+  const auto direction = Vector3::Normalize(forwardWorld);
 
   return Ray(origin, direction, length);
 }

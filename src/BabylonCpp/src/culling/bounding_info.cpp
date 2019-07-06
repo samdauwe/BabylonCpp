@@ -3,15 +3,17 @@
 #include <babylon/collisions/collider.h>
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_sphere.h>
-#include <babylon/math/tmp.h>
 #include <babylon/meshes/abstract_mesh.h>
 
 namespace BABYLON {
 
+std::array<Vector3, 2> BoundingInfo::TmpVector3{Vector3::Zero(),
+                                                Vector3::Zero()};
+
 BoundingInfo::BoundingInfo(const Vector3& iMinimum, const Vector3& iMaximum,
-                           const std::optional<Matrix>& /*worldMatrix*/)
-    : boundingBox{BoundingBox(iMinimum, iMaximum)}
-    , boundingSphere{BoundingSphere(iMinimum, iMaximum)}
+                           const std::optional<Matrix>& worldMatrix)
+    : boundingBox{BoundingBox(iMinimum, iMaximum, worldMatrix)}
+    , boundingSphere{BoundingSphere(iMinimum, iMaximum, worldMatrix)}
     , minimum{this, &BoundingInfo::get_minimum}
     , maximum{this, &BoundingInfo::get_maximum}
     , isLocked{this, &BoundingInfo::get_isLocked, &BoundingInfo::set_isLocked}
@@ -92,7 +94,6 @@ void BoundingInfo::reConstruct(const Vector3& min, const Vector3& max,
   boundingSphere.reConstruct(min, max, worldMatrix);
 }
 
-// Methods
 void BoundingInfo::update(const Matrix& world)
 {
   if (_isLocked) {
@@ -105,13 +106,13 @@ void BoundingInfo::update(const Matrix& world)
 BoundingInfo& BoundingInfo::centerOn(const Vector3& center,
                                      const Vector3& extend)
 {
-  const auto iMinimum
-    = Tmp::Vector3Array[0].copyFrom(center).subtractInPlace(extend);
-  const auto iMaximum
-    = Tmp::Vector3Array[1].copyFrom(center).addInPlace(extend);
+  auto& minimum
+    = BoundingInfo::TmpVector3[0].copyFrom(center).subtractInPlace(extend);
+  auto& maximum
+    = BoundingInfo::TmpVector3[1].copyFrom(center).addInPlace(extend);
 
-  boundingBox.reConstruct(iMinimum, iMaximum);
-  boundingSphere.reConstruct(iMinimum, iMaximum);
+  boundingBox.reConstruct(minimum, maximum, boundingBox.getWorldMatrix());
+  boundingSphere.reConstruct(minimum, maximum, boundingBox.getWorldMatrix());
 
   return *this;
 }
@@ -127,11 +128,27 @@ BoundingInfo& BoundingInfo::scale(float factor)
 bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                                unsigned int strategy)
 {
+  const auto inclusionTest
+    = (strategy == Constants::MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION
+       || strategy
+            == Constants::
+              MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
+  if (inclusionTest) {
+    if (boundingSphere.isCenterInFrustum(frustumPlanes)) {
+      return true;
+    }
+  }
+
   if (!boundingSphere.isInFrustum(frustumPlanes)) {
     return false;
   }
 
-  if (strategy == AbstractMesh::CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY) {
+  const auto bSphereOnlyTest
+    = (strategy == Constants::MESHES_CULLINGSTRATEGY_BOUNDINGSPHERE_ONLY
+       || strategy
+            == Constants::
+              MESHES_CULLINGSTRATEGY_OPTIMISTIC_INCLUSION_THEN_BSPHERE_ONLY);
+  if (bSphereOnlyTest) {
     return true;
   }
 
@@ -140,8 +157,9 @@ bool BoundingInfo::isInFrustum(const std::array<Plane, 6>& frustumPlanes,
 
 float BoundingInfo::diagonalLength() const
 {
-  auto size = boundingBox.maximumWorld.subtract(boundingBox.minimumWorld);
-  return size.length();
+  const auto& diag = boundingBox.maximumWorld.subtractToRef(
+    boundingBox.minimumWorld, BoundingInfo::TmpVector3[0]);
+  return diag.length();
 }
 
 bool BoundingInfo::isCompletelyInFrustum(
@@ -246,35 +264,31 @@ bool BoundingInfo::intersects(const BoundingInfo& boundingInfo, bool precise)
   return true;
 }
 
-Extents BoundingInfo::computeBoxExtents(const Vector3& axis,
-                                        const BoundingBox& box) const
+void BoundingInfo::computeBoxExtents(const Vector3& axis,
+                                     const BoundingBox& box, Extents& result)
 {
-  const float p = Vector3::Dot(box.centerWorld, axis);
+  const auto p = Vector3::Dot(box.centerWorld, axis);
 
-  const float r0
+  const auto r0
     = std::abs(Vector3::Dot(box.directions[0], axis)) * box.extendSize.x;
-  const float r1
+  const auto r1
     = std::abs(Vector3::Dot(box.directions[1], axis)) * box.extendSize.y;
-  const float r2
+  const auto r2
     = std::abs(Vector3::Dot(box.directions[2], axis)) * box.extendSize.z;
 
-  float r = r0 + r1 + r2;
-  return {p - r, p + r};
-}
-
-bool BoundingInfo::extentsOverlap(float min0, float max0, float min1,
-                                  float max1) const
-{
-  return !(min0 > max1 || min1 > max0);
+  const auto r = r0 + r1 + r2;
+  result.min   = p - r;
+  result.max   = p + r;
 }
 
 bool BoundingInfo::axisOverlap(const Vector3& axis, const BoundingBox& box0,
-                               const BoundingBox& box1) const
+                               const BoundingBox& box1)
 {
-  auto result0 = computeBoxExtents(axis, box0);
-  auto result1 = computeBoxExtents(axis, box1);
-
-  return extentsOverlap(result0.min, result0.max, result1.min, result1.max);
+  Extents _result0{0.f, 0.f};
+  Extents _result1{0.f, 0.f};
+  computeBoxExtents(axis, box0, _result0);
+  computeBoxExtents(axis, box1, _result1);
+  return !(_result0.min > _result1.max || _result1.min > _result0.max);
 }
 
 } // end of namespace BABYLON

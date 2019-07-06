@@ -4,21 +4,23 @@
 
 #include <babylon/math/matrix.h>
 #include <babylon/math/plane.h>
-#include <babylon/math/tmp.h>
 
 namespace BABYLON {
 
-BoundingSphere::BoundingSphere(const Vector3& min, const Vector3& max)
+std::array<Vector3, 3> BoundingSphere::TmpVector3{
+  Vector3::Zero(), Vector3::Zero(), Vector3::Zero()};
+
+BoundingSphere::BoundingSphere(const Vector3& min, const Vector3& max,
+                               const std::optional<Matrix>& worldMatrix)
     : center{Vector3::Zero()}
     , radius{0.f}
     , centerWorld{Vector3::Zero()}
     , radiusWorld{0.f}
     , minimum{Vector3::Zero()}
     , maximum{Vector3::Zero()}
-    , _identityMatrix{Matrix::Identity()}
-    , _tempRadiusVector{Vector3::Zero()}
+    , _worldMatrix{Matrix::Identity()}
 {
-  reConstruct(min, max);
+  reConstruct(min, max, worldMatrix);
 }
 
 BoundingSphere::BoundingSphere(const BoundingSphere& other)
@@ -28,8 +30,7 @@ BoundingSphere::BoundingSphere(const BoundingSphere& other)
     , radiusWorld{other.radiusWorld}
     , minimum{other.minimum}
     , maximum{other.maximum}
-    , _identityMatrix{other._identityMatrix}
-    , _tempRadiusVector{other._tempRadiusVector}
+    , _worldMatrix{other._worldMatrix}
 {
 }
 
@@ -40,22 +41,20 @@ BoundingSphere::BoundingSphere(BoundingSphere&& other)
     , radiusWorld{std::move(other.radiusWorld)}
     , minimum{std::move(other.minimum)}
     , maximum{std::move(other.maximum)}
-    , _identityMatrix{std::move(other._identityMatrix)}
-    , _tempRadiusVector{std::move(other._tempRadiusVector)}
+    , _worldMatrix{std::move(other._worldMatrix)}
 {
 }
 
 BoundingSphere& BoundingSphere::operator=(const BoundingSphere& other)
 {
   if (&other != this) {
-    center            = other.center;
-    radius            = other.radius;
-    centerWorld       = other.centerWorld;
-    radiusWorld       = other.radiusWorld;
-    minimum           = other.minimum;
-    maximum           = other.maximum;
-    _identityMatrix   = other._identityMatrix;
-    _tempRadiusVector = other._tempRadiusVector;
+    center       = other.center;
+    radius       = other.radius;
+    centerWorld  = other.centerWorld;
+    radiusWorld  = other.radiusWorld;
+    minimum      = other.minimum;
+    maximum      = other.maximum;
+    _worldMatrix = other._worldMatrix;
   }
 
   return *this;
@@ -64,14 +63,13 @@ BoundingSphere& BoundingSphere::operator=(const BoundingSphere& other)
 BoundingSphere& BoundingSphere::operator=(BoundingSphere&& other)
 {
   if (&other != this) {
-    center            = std::move(other.center);
-    radius            = std::move(other.radius);
-    centerWorld       = std::move(other.centerWorld);
-    radiusWorld       = std::move(other.radiusWorld);
-    minimum           = std::move(other.minimum);
-    maximum           = std::move(other.maximum);
-    _identityMatrix   = std::move(other._identityMatrix);
-    _tempRadiusVector = std::move(other._tempRadiusVector);
+    center       = std::move(other.center);
+    radius       = std::move(other.radius);
+    centerWorld  = std::move(other.centerWorld);
+    radiusWorld  = std::move(other.radiusWorld);
+    minimum      = std::move(other.minimum);
+    maximum      = std::move(other.maximum);
+    _worldMatrix = std::move(other._worldMatrix);
   }
 
   return *this;
@@ -81,7 +79,7 @@ BoundingSphere::~BoundingSphere()
 {
 }
 
-void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max,
+void BoundingSphere::reConstruct(const Vector3& min, Vector3 max,
                                  const std::optional<Matrix>& worldMatrix)
 {
   minimum.copyFrom(min);
@@ -89,60 +87,78 @@ void BoundingSphere::reConstruct(const Vector3& min, const Vector3& max,
 
   auto distance = Vector3::Distance(min, max);
 
-  Vector3::LerpToRef(min, max, 0.5f, center);
+  max.addToRef(min, center).scaleInPlace(0.5f);
   radius = distance * 0.5f;
 
-  _update(worldMatrix ? worldMatrix.value() : Matrix::IdentityReadOnly());
+  _update(worldMatrix.value_or(Matrix::IdentityReadOnly()));
 }
 
 BoundingSphere& BoundingSphere::scale(float factor)
 {
-  const auto newRadius = radius * factor;
-  const auto tempRadiusVector
-    = Tmp::Vector3Array[0].set(newRadius, newRadius, newRadius);
-  const auto min
-    = Tmp::Vector3Array[1].copyFrom(center).subtractInPlace(tempRadiusVector);
-  const auto max
-    = Tmp::Vector3Array[2].copyFrom(center).addInPlace(tempRadiusVector);
+  const auto newRadius   = radius * factor;
+  auto& tmpVectors       = BoundingSphere::TmpVector3;
+  auto& tempRadiusVector = tmpVectors[0].setAll(newRadius);
+  auto& min = center.subtractToRef(tempRadiusVector, tmpVectors[1]);
+  auto& max = center.addToRef(tempRadiusVector, tmpVectors[2]);
 
-  reConstruct(min, max);
+  reConstruct(min, max, _worldMatrix);
 
   return *this;
 }
 
-// Methods
-void BoundingSphere::_update(const Matrix& world)
+Matrix& BoundingSphere::getWorldMatrix()
 {
-  Vector3::TransformCoordinatesToRef(center, world, centerWorld);
-  auto& tempVector = Tmp::Vector3Array[0];
-  Vector3::TransformNormalFromFloatsToRef(1.f, 1.f, 1.f, world, tempVector);
-  radiusWorld
-    = std::max(std::abs(tempVector.x),
-               std::max(std::abs(tempVector.y), std::abs(tempVector.z)))
-      * radius;
+  return _worldMatrix;
+}
+
+void BoundingSphere::_update(const Matrix& worldMatrix)
+{
+  auto _worldMatrix = worldMatrix;
+  if (!_worldMatrix.isIdentity()) {
+    Vector3::TransformCoordinatesToRef(center, worldMatrix, centerWorld);
+    auto& tempVector = BoundingSphere::TmpVector3[0];
+    Vector3::TransformNormalFromFloatsToRef(1.f, 1.f, 1.f, worldMatrix,
+                                            tempVector);
+    radiusWorld
+      = std::max(std::max(std::abs(tempVector.x), std::abs(tempVector.y)),
+                 std::abs(tempVector.z))
+        * radius;
+  }
+  else {
+    centerWorld.copyFrom(center);
+    radiusWorld = radius;
+  }
 }
 
 bool BoundingSphere::isInFrustum(
   const std::array<Plane, 6>& frustumPlanes) const
 {
-  for (unsigned int i = 0; i < 6; ++i) {
-    if (frustumPlanes[i].dotCoordinate(centerWorld) <= -radiusWorld) {
+  const auto& center = centerWorld;
+  const auto& radius = radiusWorld;
+  for (auto i = 0u; i < 6; ++i) {
+    if (frustumPlanes[i].dotCoordinate(center) <= -radius) {
       return false;
     }
   }
+  return true;
+}
 
+bool BoundingSphere::isCenterInFrustum(
+  const std::array<Plane, 6>& frustumPlanes) const
+{
+  const auto& center = centerWorld;
+  for (auto i = 0u; i < 6; ++i) {
+    if (frustumPlanes[i].dotCoordinate(center) < 0.f) {
+      return false;
+    }
+  }
   return true;
 }
 
 bool BoundingSphere::intersectsPoint(const Vector3& point)
 {
-  const auto x = centerWorld.x - point.x;
-  const auto y = centerWorld.y - point.y;
-  const auto z = centerWorld.z - point.z;
-
-  const auto distance = std::sqrt((x * x) + (y * y) + (z * z));
-
-  if (radiusWorld < distance) {
+  const auto squareDistance = Vector3::DistanceSquared(centerWorld, point);
+  if (radiusWorld * radiusWorld < squareDistance) {
     return false;
   }
 
@@ -152,13 +168,11 @@ bool BoundingSphere::intersectsPoint(const Vector3& point)
 bool BoundingSphere::Intersects(const BoundingSphere& sphere0,
                                 const BoundingSphere& sphere1)
 {
-  const auto x = sphere0.centerWorld.x - sphere1.centerWorld.x;
-  const auto y = sphere0.centerWorld.y - sphere1.centerWorld.y;
-  const auto z = sphere0.centerWorld.z - sphere1.centerWorld.z;
+  const auto squareDistance
+    = Vector3::DistanceSquared(sphere0.centerWorld, sphere1.centerWorld);
+  const auto radiusSum = sphere0.radiusWorld + sphere1.radiusWorld;
 
-  const auto distance = std::sqrt((x * x) + (y * y) + (z * z));
-
-  if (sphere0.radiusWorld + sphere1.radiusWorld < distance) {
+  if (radiusSum * radiusSum < squareDistance) {
     return false;
   }
 

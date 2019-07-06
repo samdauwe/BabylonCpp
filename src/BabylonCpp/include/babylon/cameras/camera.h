@@ -346,30 +346,15 @@ public:
   /**
    * @brief Gets a ray in the forward direction from the camera.
    * @param length Defines the length of the ray to create
-   * @returns the forward ray
-   */
-  Ray getForwardRay(float length = 100.f);
-
-  /**
-   * @brief Gets a ray in the forward direction from the camera.
-   * @param length Defines the length of the ray to create
-   * @param transform Defines the transform to apply to the ray, by default the
-   * world matrx is used to create a workd space ray
-   * @returns the forward ray
-   */
-  Ray getForwardRay(float length, const Matrix& transform);
-
-  /**
-   * @brief Gets a ray in the forward direction from the camera.
-   * @param length Defines the length of the ray to create
    * @param transform Defines the transform to apply to the ray, by default the
    * world matrx is used to create a workd space ray
    * @param origin Defines the start point of the ray which defaults to the
    * camera position
    * @returns the forward ray
    */
-  Ray getForwardRay(float length, const Matrix& transform,
-                    const Vector3& origin);
+  Ray getForwardRay(float length                           = 100.f,
+                    const std::optional<Matrix>& transform = std::nullopt,
+                    const std::optional<Vector3>& origin   = std::nullopt);
 
   /**
    * @brief Releases resources associated with this node.

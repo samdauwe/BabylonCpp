@@ -6,6 +6,7 @@
 #include <babylon/culling/bounding_box.h>
 #include <babylon/culling/bounding_sphere.h>
 #include <babylon/culling/icullable.h>
+#include <babylon/engines/constants.h>
 
 namespace BABYLON {
 
@@ -21,6 +22,7 @@ public:
    * @brief Constructs bounding info.
    * @param minimum min vector of the bounding box/sphere
    * @param maximum max vector of the bounding box/sphere
+   * @param worldMatrix defines the new world matrix
    */
   BoundingInfo(const Vector3& minimum, const Vector3& maximum,
                const std::optional<Matrix>& worldMatrix = std::nullopt);
@@ -41,7 +43,7 @@ public:
                    const std::optional<Matrix>& worldMatrix = std::nullopt);
 
   /**
-   * @brief Updates the boudning sphere and box.
+   * @brief Updates the bounding sphere and box.
    * @param world world matrix to be used to update
    */
   void update(const Matrix& world);
@@ -67,12 +69,12 @@ public:
    * the passed array of planes.
    * @param frustumPlanes defines the frustum to test
    * @param strategy defines the strategy to use for the culling (default is
-   * BABYLON.Scene.CULLINGSTRATEGY_STANDARD)
+   * BABYLON.AbstractMesh.CULLINGSTRATEGY_STANDARD)
    * @returns true if the bounding info is in the frustum planes
    */
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes,
                    unsigned int strategy
-                   = 0 /*AbstractMesh::CULLINGSTRATEGY_STANDARD*/) override;
+                   = Constants::MESHES_CULLINGSTRATEGY_STANDARD) override;
 
   /**
    * @brief Gets the world distance between the min and max points of the
@@ -120,10 +122,10 @@ protected:
   void set_isLocked(bool value);
 
 private:
-  Extents computeBoxExtents(const Vector3& axis, const BoundingBox& box) const;
-  bool extentsOverlap(float min0, float max0, float min1, float max1) const;
+  void computeBoxExtents(const Vector3& axis, const BoundingBox& box,
+                         Extents& result);
   bool axisOverlap(const Vector3& axis, const BoundingBox& box0,
-                   const BoundingBox& box1) const;
+                   const BoundingBox& box1);
 
 public:
   /**
@@ -153,6 +155,7 @@ public:
 
 private:
   bool _isLocked;
+  static std::array<Vector3, 2> TmpVector3;
 
 }; // end of class BoundingInfo
 

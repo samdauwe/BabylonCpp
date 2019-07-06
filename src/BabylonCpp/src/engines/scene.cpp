@@ -4348,8 +4348,8 @@ Scene& Scene::createPickingRayToRef(int x, int y,
     camera = activeCamera;
   }
 
-  auto cameraViewport = camera->viewport;
-  auto viewport       = cameraViewport.toGlobal(engine->getRenderWidth(),
+  auto& cameraViewport = camera->viewport;
+  auto viewport        = cameraViewport.toGlobal(engine->getRenderWidth(),
                                           engine->getRenderHeight());
 
   auto identity = Matrix::Identity();
@@ -4393,10 +4393,10 @@ Scene& Scene::createPickingRayInCameraSpaceToRef(int x, int y, Ray& result,
     camera = activeCamera;
   }
 
-  auto cameraViewport = camera->viewport;
-  auto viewport       = cameraViewport.toGlobal(engine->getRenderWidth(),
+  auto& cameraViewport = camera->viewport;
+  auto viewport        = cameraViewport.toGlobal(engine->getRenderWidth(),
                                           engine->getRenderHeight());
-  auto identity       = Matrix::Identity();
+  auto identity        = Matrix::Identity();
 
   // Moving coordinates to local viewport world
   float _x = static_cast<float>(x);
@@ -4418,7 +4418,7 @@ std::optional<PickingInfo> Scene::_internalPick(
 {
   std::optional<PickingInfo> pickingInfo = std::nullopt;
 
-  for (auto& mesh : meshes) {
+  for (const auto& mesh : meshes) {
     if (predicate) {
       if (!predicate(mesh)) {
         continue;
@@ -4457,7 +4457,7 @@ std::vector<std::optional<PickingInfo>> Scene::_internalMultiPick(
 {
   std::vector<std::optional<PickingInfo>> pickingInfos;
 
-  for (auto& mesh : meshes) {
+  for (const auto& mesh : meshes) {
     if (predicate) {
       if (!predicate(mesh.get())) {
         continue;

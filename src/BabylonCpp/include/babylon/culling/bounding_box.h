@@ -1,4 +1,4 @@
-#ifndef BABYLON_CULLING_BOUNDING_BOX_H
+﻿#ifndef BABYLON_CULLING_BOUNDING_BOX_H
 #define BABYLON_CULLING_BOUNDING_BOX_H
 
 #include <babylon/babylon_api.h>
@@ -17,11 +17,13 @@ class BABYLON_SHARED_EXPORT BoundingBox : public ICullable {
 
 public:
   /**
-   * @brief Creates a new bounding box.
+   * @brief Creates a new bounding box
    * @param min defines the minimum vector (in local space)
    * @param max defines the maximum vector (in local space)
+   * @param worldMatrix defines the new world matrix
    */
-  BoundingBox(const Vector3& min, const Vector3& max);
+  BoundingBox(const Vector3& min, const Vector3& max,
+              const std::optional<Matrix>& worldMatrix = std::nullopt);
   BoundingBox(const BoundingBox& other);
   BoundingBox(BoundingBox&& other);
   BoundingBox& operator=(const BoundingBox& other);
@@ -37,7 +39,7 @@ public:
    * @param max defines the new maximum vector (in local space)
    * @param worldMatrix defines the new world matrix
    */
-  void reConstruct(const Vector3& min, const Vector3& max,
+  void reConstruct(Vector3 min, Vector3 max,
                    const std::optional<Matrix>& worldMatrix = std::nullopt);
 
   /**
@@ -52,13 +54,6 @@ public:
    * @returns a matrix
    */
   Matrix& getWorldMatrix();
-
-  /**
-   * @brief Sets the world matrix stored in the bounding box.
-   * @param matrix defines the matrix to store
-   * @returns current bounding box
-   */
-  BoundingBox& setWorldMatrix(const Matrix& matrix);
 
   /**
    * @brief Hidden
@@ -211,6 +206,7 @@ public:
 
 private:
   Matrix _worldMatrix;
+  static std::array<Vector3, 3> TmpVector3;
 
 }; // end of class BoundingBox
 

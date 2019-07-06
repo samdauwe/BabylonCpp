@@ -17,8 +17,10 @@ public:
    * @brief Creates a new bounding sphere
    * @param min defines the minimum vector (in local space)
    * @param max defines the maximum vector (in local space)
+   * @param worldMatrix defines the new world matrix
    */
-  BoundingSphere(const Vector3& min, const Vector3& max);
+  BoundingSphere(const Vector3& min, const Vector3& max,
+                 const std::optional<Matrix>& worldMatrix = std::nullopt);
   BoundingSphere(const BoundingSphere& other);
   BoundingSphere(BoundingSphere&& other);
   BoundingSphere& operator=(const BoundingSphere& other);
@@ -32,7 +34,7 @@ public:
    * @param max defines the new maximum vector (in local space)
    * @param worldMatrix defines the new world matrix
    */
-  void reConstruct(const Vector3& min, const Vector3& max,
+  void reConstruct(const Vector3& min, Vector3 max,
                    const std::optional<Matrix>& worldMatrix = std::nullopt);
 
   /**
@@ -42,12 +44,18 @@ public:
    */
   BoundingSphere& scale(float factor);
 
+  /**
+   * @brief Gets the world matrix of the bounding box.
+   * @returns a matrix
+   */
+  Matrix& getWorldMatrix();
+
   /** Methods **/
 
   /**
    * @brief Hidden
    */
-  void _update(const Matrix& world);
+  void _update(const Matrix& worldMatrix);
 
   /**
    * @brief Tests if the bounding sphere is intersecting the frustum planes.
@@ -55,6 +63,14 @@ public:
    * @returns true if there is an intersection
    */
   bool isInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
+
+  /**
+   * @brief Tests if the bounding sphere center is in between the frustum
+   * planes. Used for optimistic fast inclusion.
+   * @param frustumPlanes defines the frustum planes to test
+   * @returns true if the sphere center is in between the frustum planes
+   */
+  bool isCenterInFrustum(const std::array<Plane, 6>& frustumPlanes) const;
 
   /**
    * @brief Tests if a point is inside the bounding sphere.
@@ -105,9 +121,8 @@ public:
   Vector3 maximum;
 
 private:
-  // This matrix is used as a value to reset the bounding box.
-  Matrix _identityMatrix;
-  Vector3 _tempRadiusVector;
+  Matrix _worldMatrix;
+  static std::array<Vector3, 3> TmpVector3;
 
 }; // end of class BoundingSphere
 

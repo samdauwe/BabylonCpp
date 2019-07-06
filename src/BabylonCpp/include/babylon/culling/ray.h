@@ -46,24 +46,30 @@ public:
    * @brief Checks if the ray intersects a box.
    * @param minimum bound of the box
    * @param maximum bound of the box
+   * @param intersectionTreshold extra extend to be added to the box in all
+   * direction
    * @returns if the box was hit
    */
-  bool intersectsBoxMinMax(const Vector3& minimum,
-                           const Vector3& maximum) const;
+  bool intersectsBoxMinMax(const Vector3& minimum, const Vector3& maximum,
+                           float intersectionTreshold = 0.f) const;
 
   /**
    * @brief Checks if the ray intersects a box.
    * @param box the bounding box to check
+   * @param intersectionTreshold extra extend to be added to the BoundingBox in
+   * all direction
    * @returns if the box was hit
    */
-  bool intersectsBox(const BoundingBox& box) const;
+  bool intersectsBox(const BoundingBox& box,
+                     float intersectionTreshold = 0.f) const;
 
   /**
    * @brief If the ray hits a sphere.
    * @param sphere the bounding sphere to check
    * @returns true if it hits the sphere
    */
-  bool intersectsSphere(const BoundingSphere& sphere) const;
+  bool intersectsSphere(const BoundingSphere& sphere,
+                        float intersectionTreshold = 0.f) const;
 
   /**
    * @brief If the ray hits a triange.
@@ -141,6 +147,21 @@ public:
   Ray& update(float x, float y, float viewportWidth, float viewportHeight,
               Matrix& world, Matrix& view, Matrix& projection);
 
+  /**
+   * @brief Unproject a ray from screen space to object space.
+   * @param sourceX defines the screen space x coordinate to use
+   * @param sourceY defines the screen space y coordinate to use
+   * @param viewportWidth defines the current width of the viewport
+   * @param viewportHeight defines the current height of the viewport
+   * @param world defines the world matrix to use (can be set to Identity to go
+   * to world space)
+   * @param view defines the view matrix to use
+   * @param projection defines the projection matrix to use
+   */
+  void unprojectRayToRef(float sourceX, float sourceY, float viewportWidth,
+                         float viewportHeight, Matrix& world,
+                         const Matrix& view, const Matrix& projection);
+
   /** Statics **/
   /**
    * @brief Creates a ray with origin and direction of 0,0,0.
@@ -213,13 +234,7 @@ public:
   float length;
 
 private:
-  bool _vectorsSet;
-  Vector3 _edge1;
-  Vector3 _edge2;
-  Vector3 _pvec;
-  Vector3 _tvec;
-  Vector3 _qvec;
-
+  static std::array<Vector3, 6> TmpVector3;
   std::unique_ptr<Ray> _tmpRay;
 
 }; // end of class Ray
