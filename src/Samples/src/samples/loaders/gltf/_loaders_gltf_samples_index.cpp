@@ -45,6 +45,9 @@
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/suzanne_scene.h>
 #include <babylon/samples/loaders/gltf/furtherpbrmodels/two_sided_plane_scene.h>
 
+// -- Feature Test Models --
+#include <babylon/samples/loaders/gltf/featuretestmodels/alpha_blend_mode_test_scene.h>
+
 #endif
 
 namespace BABYLON {
@@ -275,6 +278,15 @@ _LoadersGLTFSamplesIndex::_LoadersGLTFSamplesIndex()
                       [](ICanvas* iCanvas) {                                  //
                         return std::make_unique<TwoSidedPlaneScene>(iCanvas); //
                       });                                                     //
+
+  // -- Feature Test Models --
+
+  // Alpha Blend Mode Test Scene (glTF)
+  _samples["AlphaBlendModeTestGLTFScene"] = std::make_tuple(
+    true,                                                        //
+    [](ICanvas* iCanvas) {                                       //
+      return std::make_unique<AlphaBlendModeTestScene>(iCanvas); //
+    });                                                          //
 #endif
 }
 
