@@ -14,6 +14,7 @@
 #include <babylon/materials/effect_creation_options.h>
 #include <babylon/materials/effect_fallbacks.h>
 #include <babylon/materials/material_defines.h>
+#include <babylon/materials/textures/raw_texture.h>
 #include <babylon/materials/textures/render_target_texture.h>
 #include <babylon/materials/uniform_buffer.h>
 #include <babylon/math/plane.h>
@@ -33,9 +34,11 @@ void MaterialHelper::BindEyePosition(const EffectPtr& effect, Scene* scene)
     effect->setVector3("vEyePosition", *scene->_forcedViewPosition.get());
     return;
   }
+  const auto& globalPosition = scene->activeCamera->globalPosition();
+
   effect->setVector3("vEyePosition", scene->_mirroredCameraPosition ?
                                        *scene->_mirroredCameraPosition.get() :
-                                       scene->activeCamera->globalPosition());
+                                       globalPosition);
 }
 
 void MaterialHelper::PrepareDefinesForMergedUV(const BaseTexturePtr& texture,
@@ -187,8 +190,17 @@ bool MaterialHelper::PrepareDefinesForAttributes(
     if (mesh->useBones() && mesh->computeBonesUsingShaders()
         && mesh->skeleton()) {
       defines.intDef["NUM_BONE_INFLUENCERS"] = mesh->numBoneInfluencers();
-      defines.intDef["BonesPerMesh"]
-        = static_cast<unsigned>(mesh->skeleton()->bones.size() + 1);
+
+      const auto materialSupportsBoneTexture = defines["BONETEXTURE"];
+
+      if (mesh->skeleton()->isUsingTextureForMatrices
+          && materialSupportsBoneTexture) {
+        defines.boolDef["BONETEXTURE"] = true;
+      }
+      else {
+        defines.boolDef["BonesPerMesh"] = (mesh->skeleton()->bones.size() + 1);
+        defines.boolDef["BONETEXTURE"]  = false;
+      }
     }
     else {
       defines.intDef["NUM_BONE_INFLUENCERS"] = 0;
@@ -223,7 +235,7 @@ void MaterialHelper::PrepareDefinesForMultiview(Scene* scene,
                                                 MaterialDefines& defines)
 {
   if (scene->activeCamera) {
-    auto previousMultiview = defines["MULTIVIEW"];
+    const auto previousMultiview = defines["MULTIVIEW"];
     defines.boolDef["MULTIVIEW"]
       = (scene->activeCamera->outputRenderTarget != nullptr
          && scene->activeCamera->outputRenderTarget->getViewCount() > 1);
@@ -243,15 +255,15 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
     return defines._needNormals;
   }
 
-  unsigned int lightIndex = 0;
-  bool needNormals        = false;
-  bool needRebuild        = false;
-  bool lightmapMode       = false;
-  bool shadowEnabled      = false;
-  bool specularEnabled    = false;
+  auto lightIndex      = 0u;
+  auto needNormals     = false;
+  auto needRebuild     = false;
+  auto lightmapMode    = false;
+  auto shadowEnabled   = false;
+  auto specularEnabled = false;
 
   if (scene->lightsEnabled() && !disableLighting) {
-    for (auto& light : mesh->_lightSources) {
+    for (const auto& light : mesh->_lightSources) {
       needNormals = true;
 
       auto lightIndexStr = std::to_string(lightIndex);
@@ -342,12 +354,19 @@ bool MaterialHelper::PrepareDefinesForLights(Scene* scene, AbstractMesh* mesh,
        ++index) {
     auto indexStr = std::to_string(index);
     if (stl_util::contains(defines.boolDef, "LIGHT" + indexStr)) {
-      defines.boolDef["LIGHT" + indexStr]           = false;
-      defines.boolDef["HEMILIGHT" + lightIndexStr]  = false;
-      defines.boolDef["POINTLIGHT" + lightIndexStr] = false;
-      defines.boolDef["DIRLIGHT" + lightIndexStr]   = false;
-      defines.boolDef["SPOTLIGHT" + lightIndexStr]  = false;
-      defines.boolDef["SHADOW" + lightIndexStr]     = false;
+      defines.boolDef["LIGHT" + indexStr]               = false;
+      defines.boolDef["HEMILIGHT" + indexStr]           = false;
+      defines.boolDef["POINTLIGHT" + indexStr]          = false;
+      defines.boolDef["DIRLIGHT" + indexStr]            = false;
+      defines.boolDef["SPOTLIGHT" + indexStr]           = false;
+      defines.boolDef["SHADOW" + indexStr]              = false;
+      defines.boolDef["SHADOWPCF" + indexStr]           = false;
+      defines.boolDef["SHADOWPCSS" + indexStr]          = false;
+      defines.boolDef["SHADOWPOISSON" + indexStr]       = false;
+      defines.boolDef["SHADOWESM" + indexStr]           = false;
+      defines.boolDef["SHADOWCUBE" + indexStr]          = false;
+      defines.boolDef["SHADOWLOWQUALITY" + indexStr]    = false;
+      defines.boolDef["SHADOWMEDIUMQUALITY" + indexStr] = false;
     }
   }
 
@@ -380,7 +399,7 @@ void MaterialHelper::PrepareUniformsAndSamplersList(
 
   for (unsigned int lightIndex = 0; lightIndex < maxSimultaneousLights;
        ++lightIndex) {
-    const std::string lightIndexStr = std::to_string(lightIndex);
+    const auto lightIndexStr = std::to_string(lightIndex);
 
     if (!stl_util::contains(defines.boolDef, "LIGHT" + lightIndexStr)) {
       break;
@@ -520,13 +539,13 @@ void MaterialHelper::PrepareAttributesForMorphTargets(
 
   auto engine = Engine::LastCreatedEngine();
   auto _mesh  = static_cast<Mesh*>(mesh);
-  if (influencers > 0 && engine && mesh) {
+  if (influencers > 0 && engine && _mesh) {
     auto maxAttributesCount
       = static_cast<unsigned>(engine->getCaps().maxVertexAttribs);
     auto manager = _mesh->morphTargetManager();
     auto normal  = manager && manager->supportsNormals() && defines["NORMAL"];
     auto tangent = manager && manager->supportsNormals() && defines["TANGENT"];
-    for (unsigned int index = 0; index < influencers; ++index) {
+    for (auto index = 0u; index < influencers; ++index) {
       const auto indexStr = std::to_string(index);
       attribs.emplace_back(VertexBuffer::PositionKind + indexStr);
 
@@ -585,15 +604,14 @@ void MaterialHelper::PrepareAttributesForInstances(
   }
 }
 
-void MaterialHelper::BindLightShadow(Light& light, Scene* /*scene*/,
-                                     AbstractMesh& mesh,
-                                     unsigned int lightIndex,
+void MaterialHelper::BindLightShadow(Light& light, AbstractMesh& mesh,
+                                     const std::string& lightIndex,
                                      const EffectPtr& effect)
 {
   if (light.shadowEnabled && mesh.receiveShadows()) {
     auto shadowGenerator = light.getShadowGenerator();
     if (shadowGenerator) {
-      shadowGenerator->bindShadowLight(std::to_string(lightIndex), effect);
+      shadowGenerator->bindShadowLight(lightIndex, effect);
     }
   }
 }
@@ -610,12 +628,12 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
                                 unsigned int maxSimultaneousLights,
                                 bool usePhysicalLightFalloff)
 {
-  auto len = std::min(mesh->_lightSources.size(),
+  auto len = std::min(mesh->lightSources().size(),
                       static_cast<size_t>(maxSimultaneousLights));
 
-  for (unsigned int i = 0; i < len; ++i) {
+  for (auto i = 0u; i < len; ++i) {
 
-    auto& light    = mesh->_lightSources[i];
+    auto& light    = mesh->lightSources()[i];
     auto iAsString = std::to_string(i);
 
     auto scaledIntensity = light->getScaledIntensity();
@@ -635,7 +653,7 @@ void MaterialHelper::BindLights(Scene* scene, AbstractMesh* mesh,
 
     // Shadows
     if (scene->shadowsEnabled()) {
-      BindLightShadow(*light, scene, *mesh, i, effect);
+      BindLightShadow(*light, *mesh, iAsString, effect);
     }
     light->_uniformBuffer->update();
   }
@@ -674,10 +692,21 @@ void MaterialHelper::BindBonesParameters(AbstractMesh* mesh,
 
   if (mesh->useBones() && mesh->computeBonesUsingShaders()
       && mesh->skeleton()) {
-    const auto& matrices = mesh->skeleton()->getTransformMatrices(mesh);
+    const auto& skeleton = mesh->skeleton();
 
-    if (!matrices.empty()) {
-      effect->setMatrices("mBones", matrices);
+    if (skeleton->isUsingTextureForMatrices
+        && effect->getUniformIndex("boneTextureWidth") > -1) {
+      const auto& boneTexture = skeleton->getTransformMatrixTexture();
+      effect->setTexture("boneSampler", boneTexture);
+      effect->setFloat("boneTextureWidth",
+                       4.f * (skeleton->bones.size() + 1.f));
+    }
+    else {
+      const auto& matrices = skeleton->getTransformMatrices(mesh);
+
+      if (!matrices.empty()) {
+        effect->setMatrices("mBones", matrices);
+      }
     }
   }
 }

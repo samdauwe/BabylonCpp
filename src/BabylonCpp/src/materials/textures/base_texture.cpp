@@ -386,7 +386,7 @@ SphericalPolynomialPtr& BaseTexture::get_sphericalPolynomial()
 
   if (!_texture->_sphericalPolynomial) {
     _texture->_sphericalPolynomial = CubeMapToSphericalPolynomialTools::
-      ConvertCubeMapTextureToSphericalPolynomial(this);
+      ConvertCubeMapTextureToSphericalPolynomial(*this);
   }
 
   return _texture->_sphericalPolynomial;

@@ -1,6 +1,6 @@
 #include <babylon/misc/highdynamicrange/cube_map_to_spherical_polynomial_tools.h>
 
-#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/constants.h>
 #include <babylon/materials/textures/base_texture.h>
 #include <babylon/math/color3.h>
 #include <babylon/math/scalar.h>
@@ -28,37 +28,37 @@ std::array<FileFaceOrientation, 6> CubeMapToSphericalPolynomialTools::FileFaces
 
 SphericalPolynomialPtr
 CubeMapToSphericalPolynomialTools::ConvertCubeMapTextureToSphericalPolynomial(
-  BaseTexture* texture)
+  BaseTexture& texture)
 {
-  if (!texture->isCube) {
+  if (!texture.isCube) {
     // Only supports cube Textures currently.
     return nullptr;
   }
 
-  auto size  = static_cast<std::size_t>(texture->getSize().width);
-  auto right = texture->readPixels(0);
-  auto left  = texture->readPixels(1);
+  auto size  = static_cast<std::size_t>(texture.getSize().width);
+  auto right = texture.readPixels(0);
+  auto left  = texture.readPixels(1);
 
   ArrayBufferView up;
   ArrayBufferView down;
-  if (texture->isRenderTarget) {
-    up   = texture->readPixels(3);
-    down = texture->readPixels(2);
+  if (texture.isRenderTarget) {
+    up   = texture.readPixels(3);
+    down = texture.readPixels(2);
   }
   else {
-    up   = texture->readPixels(2);
-    down = texture->readPixels(3);
+    up   = texture.readPixels(2);
+    down = texture.readPixels(3);
   }
 
-  auto front = texture->readPixels(4);
-  auto back  = texture->readPixels(5);
+  auto front = texture.readPixels(4);
+  auto back  = texture.readPixels(5);
 
-  auto gammaSpace = texture->gammaSpace;
+  auto gammaSpace = texture.gammaSpace;
   // Always read as RGBA.
-  auto format = EngineConstants::TEXTUREFORMAT_RGBA;
-  auto type   = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
-  if (texture->textureType() != EngineConstants::TEXTURETYPE_UNSIGNED_INT) {
-    type = EngineConstants::TEXTURETYPE_FLOAT;
+  auto format = Constants::TEXTUREFORMAT_RGBA;
+  auto type   = Constants::TEXTURETYPE_UNSIGNED_INT;
+  if (texture.textureType() != Constants::TEXTURETYPE_UNSIGNED_INT) {
+    type = Constants::TEXTURETYPE_FLOAT;
   }
 
   CubeMapInfo cubeInfo{
@@ -82,29 +82,29 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   const CubeMapInfo& cubeInfo)
 {
   SphericalHarmonics sphericalHarmonics;
-  float totalSolidAngle = 0.f;
+  auto totalSolidAngle = 0.f;
 
   // The (u,v) range is [-1,+1], so the distance between each texel is 2/Size.
-  float du = 2.f / static_cast<float>(cubeInfo.size);
-  float dv = du;
+  auto du = 2.f / static_cast<float>(cubeInfo.size);
+  auto dv = du;
 
   // The (u,v) of the first texel is half a texel from the corner (-1,-1).
-  float minUV = du * 0.5f - 1.f;
+  auto minUV = du * 0.5f - 1.f;
 
-  for (unsigned int faceIndex = 0; faceIndex < 6; ++faceIndex) {
-    const auto& fileFace = FileFaces[faceIndex];
-    const auto dataArray = cubeInfo[fileFace.name].float32Array;
-    float v              = minUV;
+  for (auto faceIndex = 0u; faceIndex < 6; ++faceIndex) {
+    const auto& fileFace  = FileFaces[faceIndex];
+    const auto& dataArray = cubeInfo[fileFace.name].float32Array;
+    auto v                = minUV;
 
     // TODO: we could perform the summation directly into a SphericalPolynomial
     // (SP), which is more efficient than SphericalHarmonic (SH).
     // This is possible because during the summation we do not need the
     // SH-specific properties, e.g. orthogonality.
     // Because SP is still linear, so summation is fine in that basis.
-    const unsigned int stride
-      = cubeInfo.format == EngineConstants::TEXTUREFORMAT_RGBA ? 4 : 3;
-    for (size_t y = 0; y < cubeInfo.size; ++y) {
-      float u = minUV;
+    const auto stride
+      = cubeInfo.format == Constants::TEXTUREFORMAT_RGBA ? 4u : 3u;
+    for (auto y = 0ull; y < cubeInfo.size; ++y) {
+      auto u = minUV;
 
       for (size_t x = 0; x < cubeInfo.size; ++x) {
         // World direction (not normalised)
@@ -113,14 +113,14 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
                                 .add(fileFace.worldAxisForNormal);
         worldDirection.normalize();
 
-        float deltaSolidAngle = std::pow(1.f + u * u + v * v, -3.f / 2.f);
+        auto deltaSolidAngle = std::pow(1.f + u * u + v * v, -3.f / 2.f);
 
-        float r = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 0];
-        float g = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 1];
-        float b = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 2];
+        auto r = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 0];
+        auto g = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 1];
+        auto b = dataArray[(y * cubeInfo.size * stride) + (x * stride) + 2];
 
         // Handle Integer types.
-        if (cubeInfo.type == EngineConstants::TEXTURETYPE_UNSIGNED_INT) {
+        if (cubeInfo.type == Constants::TEXTURETYPE_UNSIGNED_INT) {
           r /= 255.f;
           g /= 255.f;
           b /= 255.f;
@@ -147,19 +147,19 @@ CubeMapToSphericalPolynomialTools::ConvertCubeMapToSphericalPolynomial(
   }
 
   // Solid angle for entire sphere is 4*pi
-  float sphereSolidAngle = 4.f * Math::PI;
+  auto sphereSolidAngle = 4.f * Math::PI;
 
   // Adjust the solid angle to allow for how many faces we processed.
-  float facesProcessed     = 6.f;
-  float expectedSolidAngle = sphereSolidAngle * facesProcessed / 6.f;
+  auto facesProcessed     = 6.f;
+  auto expectedSolidAngle = sphereSolidAngle * facesProcessed / 6.f;
 
   // Adjust the harmonics so that the accumulated solid angle matches the
   // expected solid angle. This is needed because the numerical integration over
   // the cube uses a small angle approximation of solid angle for each texel
   // (see deltaSolidAngle), and also to compensate for accumulative error due to
   // float precision in the summation.
-  float correctionFactor = expectedSolidAngle / totalSolidAngle;
-  sphericalHarmonics.scale(correctionFactor);
+  auto correctionFactor = expectedSolidAngle / totalSolidAngle;
+  sphericalHarmonics.scaleInPlace(correctionFactor);
 
   sphericalHarmonics.convertIncidentRadianceToIrradiance();
   sphericalHarmonics.convertIrradianceToLambertianRadiance();

@@ -59,17 +59,17 @@ HDRInfo HDRTools::RGBE_ReadHeader(const Uint8Array& uint8array)
 {
   HDRInfo headerInfo;
 
-  size_t height = 0;
-  size_t width  = 0;
+  auto height = 0ull;
+  auto width  = 0ull;
 
-  std::string line = readStringLine(uint8array, 0);
+  auto line = readStringLine(uint8array, 0);
   if (line.at(0) != '#' || line.at(1) != '?') {
     throw std::runtime_error("Bad HDR Format.");
   }
 
-  bool endOfHeader = false;
-  bool findFormat  = false;
-  size_t lineIndex = 0;
+  auto endOfHeader = false;
+  auto findFormat  = false;
+  auto lineIndex   = 0ull;
 
   do {
     lineIndex += (line.size() + 1);
@@ -135,19 +135,19 @@ Float32Array HDRTools::RGBE_ReadPixels(const Uint8Array& uint8array,
 Float32Array HDRTools::RGBE_ReadPixels_RLE(const Uint8Array& uint8array,
                                            const HDRInfo& hdrInfo)
 {
-  size_t num_scanlines  = hdrInfo.height;
-  size_t scanline_width = hdrInfo.width;
+  auto num_scanlines  = hdrInfo.height;
+  auto scanline_width = hdrInfo.width;
 
   std::uint8_t a, b, c, d, count;
-  size_t dataIndex = hdrInfo.dataPosition;
-  size_t index = 0, endIndex = 0, i = 0;
+  auto dataIndex = hdrInfo.dataPosition;
+  auto index = 0ull, endIndex = 0ull, i = 0ull;
 
   ArrayBuffer scanLineArrayBuffer(scanline_width * 4); // four channel R G B E
-  Uint8Array scanLineArray = stl_util::to_array<uint8_t>(scanLineArrayBuffer);
+  auto scanLineArray = stl_util::to_array<uint8_t>(scanLineArrayBuffer);
 
   // 3 channels of 4 bytes per pixel in float.
   ArrayBuffer resultBuffer(hdrInfo.width * hdrInfo.height * 4 * 3);
-  Float32Array resultArray = stl_util::to_array<float>(resultBuffer);
+  auto resultArray = stl_util::to_array<float>(resultBuffer);
 
   // read in each successive scanline
   while (num_scanlines > 0) {

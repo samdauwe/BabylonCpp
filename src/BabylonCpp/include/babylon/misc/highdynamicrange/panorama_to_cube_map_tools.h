@@ -9,7 +9,7 @@
 namespace BABYLON {
 
 /**
- * @brief Helper class usefull to convert panorama picture to their cubemap
+ * @brief Helper class useful to convert panorama picture to their cubemap
  * representation in 6 faces.
  */
 class BABYLON_SHARED_EXPORT PanoramaToCubeMapTools {

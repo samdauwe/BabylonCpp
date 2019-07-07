@@ -5,6 +5,7 @@
 
 #include <babylon/babylon_api.h>
 #include <babylon/babylon_common.h>
+#include <babylon/math/spherical_harmonics.h>
 #include <babylon/math/vector3.h>
 
 namespace BABYLON {
@@ -29,6 +30,11 @@ public:
   std::unique_ptr<SphericalPolynomial> clone() const;
 
   /**
+   * @brief Gets the spherical harmonics used to create the polynomials.
+   */
+  SphericalHarmonics& preScaledHarmonics();
+
+  /**
    * @brief Adds an ambient color to the spherical polynomial.
    * @param color the color to add
    */
@@ -38,7 +44,7 @@ public:
    * @brief Scales the spherical polynomial by the given amount.
    * @param scale the amount to scale
    */
-  void scale(float iScale);
+  void scaleInPlace(float scale);
 
   /** Statics **/
 
@@ -101,6 +107,9 @@ public:
    * The zx coefficients of the spherical polynomial
    */
   Vector3 zx;
+
+private:
+  std::optional<SphericalHarmonics> _harmonics;
 
 }; // end of class SphericalPolynomial
 

@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include <babylon/core/logging.h>
-#include <babylon/engines/engine_constants.h>
+#include <babylon/engines/constants.h>
 
 namespace BABYLON {
 
@@ -56,7 +56,7 @@ CubeMapInfo PanoramaToCubeMapTools::ConvertPanoramaToCubemap(
 
   if (float32Array.size() != inputWidth * inputHeight * 3) {
     BABYLON_LOG_ERROR("PanoramaToCubeMapTools",
-                      "ConvertPanoramaToCubemap: input size is wrong");
+                      "ConvertPanoramaToCubemap: input size is wrong")
     return cubeMapInfo;
   }
 
@@ -73,8 +73,8 @@ CubeMapInfo PanoramaToCubeMapTools::ConvertPanoramaToCubemap(
   cubeMapInfo.down       = CreateCubemapTexture(size, FACE_DOWN, float32Array,
                                           inputWidth, inputHeight);
   cubeMapInfo.size       = size;
-  cubeMapInfo.type       = EngineConstants::TEXTURETYPE_FLOAT;
-  cubeMapInfo.format     = EngineConstants::TEXTUREFORMAT_RGB;
+  cubeMapInfo.type       = Constants::TEXTURETYPE_FLOAT;
+  cubeMapInfo.format     = Constants::TEXTUREFORMAT_RGB;
   cubeMapInfo.gammaSpace = false;
 
   return cubeMapInfo;
@@ -86,12 +86,12 @@ Float32Array PanoramaToCubeMapTools::CreateCubemapTexture(
 {
   Float32Array textureArray(texSize * texSize * 4 * 3);
 
-  float texSizef = static_cast<float>(texSize);
-  auto rotDX1    = faceData[1].subtract(faceData[0]).scale(1.f / texSizef);
-  auto rotDX2    = faceData[3].subtract(faceData[2]).scale(1.f / texSizef);
+  auto texSizef = static_cast<float>(texSize);
+  auto rotDX1   = faceData[1].subtract(faceData[0]).scale(1.f / texSizef);
+  auto rotDX2   = faceData[3].subtract(faceData[2]).scale(1.f / texSizef);
 
-  float dy = 1.f / static_cast<float>(texSize);
-  float fy = 0.f;
+  auto dy = 1.f / static_cast<float>(texSize);
+  auto fy = 0.f;
 
   for (size_t y = 0; y < texSize; ++y) {
     auto xv1 = faceData[0];
@@ -123,8 +123,8 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
   const Vector3& vDir, const Float32Array& float32Array, size_t inputWidth,
   size_t inputHeight)
 {
-  float theta = std::atan2(vDir.z, vDir.x);
-  float phi   = std::acos(vDir.y);
+  auto theta = std::atan2(vDir.z, vDir.x);
+  auto phi   = std::acos(vDir.y);
 
   while (theta < -Math::PI) {
     theta += 2.f * Math::PI;
@@ -133,13 +133,13 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
     theta -= 2.f * Math::PI;
   }
 
-  float dx = theta / Math::PI;
-  float dy = phi / Math::PI;
+  auto dx = theta / Math::PI;
+  auto dy = phi / Math::PI;
 
   // recenter.
   dx = dx * 0.5f + 0.5f;
 
-  int px = static_cast<int>(std::round(dx * static_cast<float>(inputWidth)));
+  auto px = static_cast<int>(std::round(dx * static_cast<float>(inputWidth)));
   if (px < 0) {
     px = 0;
   }
@@ -147,7 +147,7 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
     px = static_cast<int>(inputWidth) - 1;
   }
 
-  int py = static_cast<int>(std::round(dy * static_cast<float>(inputHeight)));
+  auto py = static_cast<int>(std::round(dy * static_cast<float>(inputHeight)));
   if (py < 0) {
     py = 0;
   }
@@ -155,11 +155,11 @@ Color3 PanoramaToCubeMapTools::CalcProjectionSpherical(
     py = static_cast<int>(inputHeight) - 1;
   }
 
-  size_t inputY = (inputHeight - static_cast<size_t>(py) - 1);
-  size_t _px    = static_cast<size_t>(px);
-  float r       = float32Array[inputY * inputWidth * 3 + (_px * 3) + 0];
-  float g       = float32Array[inputY * inputWidth * 3 + (_px * 3) + 1];
-  float b       = float32Array[inputY * inputWidth * 3 + (_px * 3) + 2];
+  auto inputY = (inputHeight - static_cast<size_t>(py) - 1);
+  auto _px    = static_cast<size_t>(px);
+  auto r      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 0];
+  auto g      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 1];
+  auto b      = float32Array[inputY * inputWidth * 3 + (_px * 3) + 2];
 
   return Color3(r, g, b);
 }

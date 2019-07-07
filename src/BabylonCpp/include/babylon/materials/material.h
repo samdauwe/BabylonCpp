@@ -3,6 +3,7 @@
 
 #include <map>
 #include <nlohmann/json_fwd.hpp>
+#include <unordered_map>
 
 #include <babylon/animations/ianimatable.h>
 #include <babylon/babylon_api.h>

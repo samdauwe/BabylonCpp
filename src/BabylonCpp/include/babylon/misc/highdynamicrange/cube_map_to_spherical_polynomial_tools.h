@@ -30,7 +30,7 @@ public:
    * @return The Spherical Polynomial data.
    */
   static SphericalPolynomialPtr
-  ConvertCubeMapTextureToSphericalPolynomial(BaseTexture* texture);
+  ConvertCubeMapTextureToSphericalPolynomial(BaseTexture& texture);
 
   /**
    * @brief Converts a cubemap to the according Spherical Polynomial data.

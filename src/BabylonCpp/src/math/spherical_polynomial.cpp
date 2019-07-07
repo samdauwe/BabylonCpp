@@ -1,7 +1,6 @@
 #include <babylon/math/spherical_polynomial.h>
 
 #include <babylon/math/color3.h>
-#include <babylon/math/spherical_harmonics.h>
 
 namespace BABYLON {
 
@@ -15,6 +14,7 @@ SphericalPolynomial::SphericalPolynomial()
     , xy{Vector3::Zero()}
     , yz{Vector3::Zero()}
     , zx{Vector3::Zero()}
+    , _harmonics{std::nullopt}
 {
 }
 
@@ -28,6 +28,7 @@ SphericalPolynomial::SphericalPolynomial(const SphericalPolynomial& other)
     , xy{other.xy}
     , yz{other.yz}
     , zx{other.zx}
+    , _harmonics{other._harmonics}
 {
 }
 
@@ -41,6 +42,7 @@ SphericalPolynomial::SphericalPolynomial(SphericalPolynomial&& other)
     , xy{std::move(other.xy)}
     , yz{std::move(other.yz)}
     , zx{std::move(other.zx)}
+    , _harmonics{std::move(other._harmonics)}
 {
 }
 
@@ -48,15 +50,16 @@ SphericalPolynomial& SphericalPolynomial::
 operator=(const SphericalPolynomial& other)
 {
   if (&other != this) {
-    x  = other.x;
-    y  = other.y;
-    z  = other.z;
-    xx = other.xx;
-    yy = other.yy;
-    zz = other.zz;
-    xy = other.xy;
-    yz = other.yz;
-    zx = other.zx;
+    x          = other.x;
+    y          = other.y;
+    z          = other.z;
+    xx         = other.xx;
+    yy         = other.yy;
+    zz         = other.zz;
+    xy         = other.xy;
+    yz         = other.yz;
+    zx         = other.zx;
+    _harmonics = other._harmonics;
   }
 
   return *this;
@@ -65,15 +68,16 @@ operator=(const SphericalPolynomial& other)
 SphericalPolynomial& SphericalPolynomial::operator=(SphericalPolynomial&& other)
 {
   if (&other != this) {
-    x  = std::move(other.x);
-    y  = std::move(other.y);
-    z  = std::move(other.z);
-    xx = std::move(other.xx);
-    yy = std::move(other.yy);
-    zz = std::move(other.zz);
-    xy = std::move(other.xy);
-    yz = std::move(other.yz);
-    zx = std::move(other.zx);
+    x          = std::move(other.x);
+    y          = std::move(other.y);
+    z          = std::move(other.z);
+    xx         = std::move(other.xx);
+    yy         = std::move(other.yy);
+    zz         = std::move(other.zz);
+    xy         = std::move(other.xy);
+    yz         = std::move(other.yz);
+    zx         = std::move(other.zx);
+    _harmonics = std::move(other._harmonics);
   }
 
   return *this;
@@ -93,6 +97,17 @@ std::unique_ptr<SphericalPolynomial> SphericalPolynomial::clone() const
   return std::make_unique<SphericalPolynomial>(*this);
 }
 
+SphericalHarmonics& SphericalPolynomial::preScaledHarmonics()
+{
+  if (!_harmonics.has_value()) {
+    _harmonics = SphericalHarmonics::FromPolynomial(*this);
+  }
+  if (!_harmonics->preScaled) {
+    _harmonics->preScaleForRendering();
+  }
+  return *_harmonics;
+}
+
 void SphericalPolynomial::addAmbient(const Color3& color)
 {
   const Vector3 colorVector(color.r, color.g, color.b);
@@ -101,42 +116,43 @@ void SphericalPolynomial::addAmbient(const Color3& color)
   zz = zz.add(colorVector);
 }
 
-void SphericalPolynomial::scale(float iScale)
+void SphericalPolynomial::scaleInPlace(float scale)
 {
-  x  = x.scale(iScale);
-  y  = y.scale(iScale);
-  z  = z.scale(iScale);
-  xx = xx.scale(iScale);
-  yy = yy.scale(iScale);
-  zz = zz.scale(iScale);
-  yz = yz.scale(iScale);
-  zx = zx.scale(iScale);
-  xy = xy.scale(iScale);
+  x.scaleInPlace(scale);
+  y.scaleInPlace(scale);
+  z.scaleInPlace(scale);
+  xx.scaleInPlace(scale);
+  yy.scaleInPlace(scale);
+  zz.scaleInPlace(scale);
+  yz.scaleInPlace(scale);
+  zx.scaleInPlace(scale);
+  xy.scaleInPlace(scale);
 }
 
 SphericalPolynomial
 SphericalPolynomial::FromHarmonics(const SphericalHarmonics& harmonics)
 {
   SphericalPolynomial result;
+  result._harmonics = harmonics;
 
-  result.x = harmonics.l11.scale(1.02333f);
-  result.y = harmonics.l1_1.scale(1.02333f);
+  result.x = harmonics.l11.scale(1.02333f).scale(-1.f);
+  result.y = harmonics.l1_1.scale(1.02333f).scale(-1.f);
   result.z = harmonics.l10.scale(1.02333f);
 
   result.xx = harmonics.l00.scale(0.886277f)
                 .subtract(harmonics.l20.scale(0.247708f))
-                .add(harmonics.lL22.scale(0.429043f));
+                .add(harmonics.l22.scale(0.429043f));
   result.yy = harmonics.l00.scale(0.886277f)
                 .subtract(harmonics.l20.scale(0.247708f))
-                .subtract(harmonics.lL22.scale(0.429043f));
+                .subtract(harmonics.l22.scale(0.429043f));
   result.zz
     = harmonics.l00.scale(0.886277f).add(harmonics.l20.scale(0.495417f));
 
-  result.yz = harmonics.l2_1.scale(0.858086f);
-  result.zx = harmonics.l21.scale(0.858086f);
+  result.yz = harmonics.l2_1.scale(0.858086f).scale(-1.f);
+  result.zx = harmonics.l21.scale(0.858086f).scale(-1.f);
   result.xy = harmonics.l2_2.scale(0.858086f);
 
-  result.scale(1.f / Math::PI);
+  result.scaleInPlace(1.f / Math::PI);
 
   return result;
 }
@@ -158,7 +174,6 @@ SphericalPolynomial::FromArray(const std::vector<Float32Array>& data)
   Vector3::FromArrayToRef(data[6], 0, sp.yz);
   Vector3::FromArrayToRef(data[7], 0, sp.zx);
   Vector3::FromArrayToRef(data[8], 0, sp.xy);
-
   return sp;
 }
 

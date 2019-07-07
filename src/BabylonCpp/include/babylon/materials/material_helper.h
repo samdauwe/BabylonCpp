@@ -234,13 +234,13 @@ struct BABYLON_SHARED_EXPORT MaterialHelper {
   /**
    * @brief Binds the light shadow information to the effect for the given mesh.
    * @param light The light containing the generator
-   * @param scene The scene the lights belongs to
    * @param mesh The mesh we are binding the information to render
    * @param lightIndex The light index in the effect used to render the mesh
    * @param effect The effect we are binding the data to
    */
-  static void BindLightShadow(Light& light, Scene* scene, AbstractMesh& mesh,
-                              unsigned int lightIndex, const EffectPtr& effect);
+  static void BindLightShadow(Light& light, AbstractMesh& mesh,
+                              const std::string& lightIndex,
+                              const EffectPtr& effect);
 
   /**
    * @brief Binds the light information to the effect.
