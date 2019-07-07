@@ -21,8 +21,8 @@
 
 namespace BABYLON {
 
-GlowLayer::GlowLayer(const std::string& name, Scene* scene)
-    : GlowLayer(name, scene,
+GlowLayer::GlowLayer(const std::string& iName, Scene* scene)
+    : GlowLayer(iName, scene,
                 IGlowLayerOptions{
                   GlowLayer::DefaultTextureRatio, // mainTextureRatio;
                   std::nullopt,                   // mainTextureFixedSize
@@ -61,7 +61,7 @@ GlowLayer::GlowLayer(const std::string& iName, Scene* scene,
 
   // Initialize the layer
   IEffectLayerOptions effectLayerOptions;
-  effectLayerOptions.alphaBlendingMode    = EngineConstants::ALPHA_ADD;
+  effectLayerOptions.alphaBlendingMode    = Constants::ALPHA_ADD;
   effectLayerOptions.camera               = _options.camera;
   effectLayerOptions.mainTextureFixedSize = _options.mainTextureFixedSize;
   effectLayerOptions.mainTextureRatio     = _options.mainTextureRatio;
@@ -96,7 +96,7 @@ float GlowLayer::get_intensity() const
   return _intensity;
 }
 
-std::string GlowLayer::getEffectName() const
+const std::string GlowLayer::getEffectName() const
 {
   return GlowLayer::EffectName;
 }
@@ -125,12 +125,12 @@ void GlowLayer::_createTextureAndPostProcesses()
                         Tools::GetExponentOfTwo(blurTextureHeight, _maxSize) :
                         blurTextureHeight;
 
-  unsigned int textureType = 0;
+  auto textureType = 0u;
   if (_engine->getCaps().textureHalfFloatRender) {
-    textureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+    textureType = Constants::TEXTURETYPE_HALF_FLOAT;
   }
   else {
-    textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+    textureType = Constants::TEXTURETYPE_UNSIGNED_INT;
   }
 
   _blurTexture1 = RenderTargetTexture::New(
@@ -142,8 +142,8 @@ void GlowLayer::_createTextureAndPostProcesses()
   _blurTexture1->renderParticles      = false;
   _blurTexture1->ignoreCameraViewport = true;
 
-  int blurTextureWidth2  = static_cast<int>(std::floor(blurTextureWidth / 2));
-  int blurTextureHeight2 = static_cast<int>(std::floor(blurTextureHeight / 2));
+  auto blurTextureWidth2  = static_cast<int>(std::floor(blurTextureWidth / 2));
+  auto blurTextureHeight2 = static_cast<int>(std::floor(blurTextureHeight / 2));
 
   _blurTexture2 = RenderTargetTexture::New(
     "GlowLayerBlurRTT2", ISize{blurTextureWidth2, blurTextureHeight2}, _scene,
@@ -247,6 +247,12 @@ bool GlowLayer::needStencil() const
   return false;
 }
 
+bool GlowLayer::_canRenderMesh(const AbstractMeshPtr& /*mesh*/,
+                               const MaterialPtr& /*material*/) const
+{
+  return true;
+}
+
 void GlowLayer::_internalRender(const EffectPtr& effect)
 {
   // Texture
@@ -304,7 +310,7 @@ void GlowLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh,
         material->emissiveColor.r * textureLevel, //
         material->emissiveColor.g * textureLevel, //
         material->emissiveColor.b * textureLevel, //
-        1.f);
+        material->alpha());
     }
     else {
       _emissiveTextureAndColor.color.set(neutralColor.r, //
@@ -315,9 +321,14 @@ void GlowLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh,
   }
 }
 
-bool GlowLayer::_shouldRenderMesh(const MeshPtr& mesh) const
+bool GlowLayer::_shouldRenderMesh(AbstractMesh* mesh) const
 {
-  return hasMesh(mesh.get());
+  return hasMesh(mesh);
+}
+
+void GlowLayer::_addCustomEffectDefines(std::vector<std::string>& defines)
+{
+  defines.emplace_back("#define GLOW");
 }
 
 void GlowLayer::addExcludedMesh(Mesh* mesh)
@@ -374,7 +385,7 @@ void GlowLayer::_disposeMesh(Mesh* mesh)
   removeExcludedMesh(mesh);
 }
 
-std::string GlowLayer::getClassName() const
+const std::string GlowLayer::getClassName() const
 {
   return "GlowLayer";
 }

@@ -37,7 +37,7 @@ void EffectLayerSceneComponent::_register()
 
   scene->_beforeCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_BEFORECAMERADRAW_EFFECTLAYER, this,
-    [this](Camera* camera) { _setStencil(camera); });
+    [this](Camera* /*camera*/) { _setStencil(); });
 
   scene->_afterRenderingGroupDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERRENDERINGGROUPDRAW_EFFECTLAYER_DRAW,
@@ -46,15 +46,15 @@ void EffectLayerSceneComponent::_register()
 
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER, this,
-    [this](Camera* camera) { _setStencilBack(camera); });
+    [this](Camera* /*camera*/) { _setStencilBack(); });
   scene->_afterCameraDrawStage.registerStep(
     SceneComponentConstants::STEP_AFTERCAMERADRAW_EFFECTLAYER_DRAW, this,
-    [this](Camera* camera) { _drawCamera(camera); });
+    [this](Camera* /*camera*/) { _drawCamera(); });
 }
 
 void EffectLayerSceneComponent::rebuild()
 {
-  auto& layers = scene->effectLayers;
+  const auto& layers = scene->effectLayers;
   for (const auto& effectLayer : layers) {
     effectLayer->_rebuild();
   }
@@ -74,13 +74,17 @@ void EffectLayerSceneComponent::addFromContainer(AbstractScene* container)
   }
 }
 
-void EffectLayerSceneComponent::removeFromContainer(AbstractScene* container)
+void EffectLayerSceneComponent::removeFromContainer(AbstractScene* container,
+                                                    bool dispose)
 {
   if (container->effectLayers.empty()) {
     return;
   }
   for (const auto& o : container->effectLayers) {
     scene->removeEffectLayer(o);
+    if (dispose) {
+      o->dispose();
+    }
   }
 }
 
@@ -96,7 +100,7 @@ void EffectLayerSceneComponent::dispose()
 bool EffectLayerSceneComponent::_isReadyForMesh(AbstractMesh* mesh,
                                                 bool hardwareInstancedRendering)
 {
-  auto& layers = scene->effectLayers;
+  const auto& layers = scene->effectLayers;
   for (const auto& layer : layers) {
     if (!layer->hasMesh(mesh)) {
       continue;
@@ -111,10 +115,12 @@ bool EffectLayerSceneComponent::_isReadyForMesh(AbstractMesh* mesh,
   return true;
 }
 
-void EffectLayerSceneComponent::_renderMainTexture(Camera* camera)
+bool EffectLayerSceneComponent::_renderMainTexture(Camera* camera)
 {
   _renderEffects = false;
   _needStencil   = false;
+
+  auto needRebind = false;
 
   auto& layers = scene->effectLayers;
   if (!layers.empty()) {
@@ -135,15 +141,18 @@ void EffectLayerSceneComponent::_renderMainTexture(Camera* camera)
         if (renderTarget->_shouldRender()) {
           scene->incrementRenderId();
           renderTarget->render(false, false);
+          needRebind = true;
         }
       }
     }
 
     scene->incrementRenderId();
   }
+
+  return needRebind;
 }
 
-void EffectLayerSceneComponent::_setStencil(Camera* /*camera*/)
+void EffectLayerSceneComponent::_setStencil()
 {
   // Activate effect Layer stencil
   if (_needStencil) {
@@ -151,7 +160,7 @@ void EffectLayerSceneComponent::_setStencil(Camera* /*camera*/)
   }
 }
 
-void EffectLayerSceneComponent::_setStencilBack(Camera* /*camera*/)
+void EffectLayerSceneComponent::_setStencilBack()
 {
   // Restore effect Layer stencil
   if (_needStencil) {
@@ -176,7 +185,7 @@ void EffectLayerSceneComponent::_draw(int renderingGroupId)
   }
 }
 
-void EffectLayerSceneComponent::_drawCamera(Camera* /*camera*/)
+void EffectLayerSceneComponent::_drawCamera()
 {
   if (_renderEffects) {
     _draw(-1);

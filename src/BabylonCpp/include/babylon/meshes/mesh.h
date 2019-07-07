@@ -1673,6 +1673,8 @@ private:
 public:
   /** Events **/
 
+  Observable<Mesh> onBeforeBindObservable;
+
   /**
    * An event triggered before rendering the mesh
    */

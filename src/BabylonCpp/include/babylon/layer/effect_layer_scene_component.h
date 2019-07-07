@@ -66,10 +66,11 @@ public:
   void addFromContainer(AbstractScene* container);
 
   /**
-   * @brief Removes all the elements in the container from the scene.
+   * @brief Removes all the elements in the container from the scene
    * @param container contains the elements to remove
+   * @param dispose if the removed element should be disposed (default: false)
    */
-  void removeFromContainer(AbstractScene* container);
+  void removeFromContainer(AbstractScene* container, bool dispose = false);
 
   /**
    * @brief Disposes the component and the associated resources.
@@ -85,11 +86,11 @@ protected:
 
 private:
   bool _isReadyForMesh(AbstractMesh* mesh, bool hardwareInstancedRendering);
-  void _renderMainTexture(Camera* camera);
-  void _setStencil(Camera* camera);
-  void _setStencilBack(Camera* camera);
+  bool _renderMainTexture(Camera* camera);
+  void _setStencil();
+  void _setStencilBack();
   void _draw(int renderingGroupId);
-  void _drawCamera(Camera* camera);
+  void _drawCamera();
   void _drawRenderingGroup(int index);
 
 private:

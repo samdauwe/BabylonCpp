@@ -3161,6 +3161,12 @@ public:
   Stage<CameraStageAction> _beforeCameraDrawStage;
 
   /**
+   * Defines the actions happening just before a render target is drawing.
+   * Hidden
+   */
+  Stage<RenderTargetStageAction> _beforeRenderTargetDrawStage;
+
+  /**
    * Defines the actions happening just before a rendering group is drawing
    * Hidden
    */
@@ -3189,6 +3195,12 @@ public:
    * Hidden
    */
   Stage<CameraStageAction> _afterCameraDrawStage;
+
+  /**
+   * Defines the actions happening just after a render target has been drawn.
+   * Hidden
+   */
+  Stage<RenderTargetStageAction> _afterRenderTargetDrawStage;
 
   /**
    * Defines the actions happening just after rendering all cameras and

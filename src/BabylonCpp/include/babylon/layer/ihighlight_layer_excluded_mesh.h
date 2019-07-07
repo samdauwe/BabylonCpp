@@ -21,7 +21,7 @@ struct BABYLON_SHARED_EXPORT IHighlightLayerExcludedMesh {
   /**
    * The mesh render callback use to prevent stencil use
    */
-  Observer<Mesh>::Ptr beforeRender;
+  Observer<Mesh>::Ptr beforeBind;
   /**
    * The mesh render callback use to restore previous stencil use
    */

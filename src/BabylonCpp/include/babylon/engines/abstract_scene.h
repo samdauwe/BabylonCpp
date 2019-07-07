@@ -93,7 +93,7 @@ public:
    * @brief Constructor
    */
   AbstractScene();
-  ~AbstractScene();
+  virtual ~AbstractScene();
 
   /**
    * @brief Adds a parser in the list of available ones.

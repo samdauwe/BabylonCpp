@@ -1,5 +1,7 @@
-#ifndef BABYLON_LAYER_LAYER_SCENE_COMPONENT_H
+﻿#ifndef BABYLON_LAYER_LAYER_SCENE_COMPONENT_H
 #define BABYLON_LAYER_LAYER_SCENE_COMPONENT_H
+
+#include <functional>
 
 #include <babylon/babylon_api.h>
 #include <babylon/engines/iscene_component.h>
@@ -9,8 +11,11 @@ namespace BABYLON {
 
 class Camera;
 class Engine;
+class Layer;
 class LayerSceneComponent;
+class RenderTargetTexture;
 using LayerSceneComponentPtr = std::shared_ptr<LayerSceneComponent>;
+using RenderTargetTexturePtr = std::shared_ptr<RenderTargetTexture>;
 
 /**
  * @brief Defines the layer scene component responsible to manage any layers
@@ -51,9 +56,16 @@ public:
   void dispose() override;
 
 private:
-  void _draw(Camera* camera, bool isBackground);
-  void _drawBackground(Camera* camera);
-  void _drawForeground(Camera* camera);
+  void _draw(const std::function<bool(const Layer& layer)>& predicate);
+  bool _drawCameraPredicate(const Layer& layer, bool isBackground,
+                            unsigned int cameraLayerMask) const;
+  void _drawCameraBackground(Camera* camera);
+  void _drawCameraForeground(Camera* camera);
+  bool _drawRenderTargetPredicate(
+    const Layer& layer, bool isBackground, unsigned int cameraLayerMask,
+    const RenderTargetTexturePtr& renderTargetTexture) const;
+  void _drawRenderTargetBackground(const RenderTargetTexturePtr& renderTarget);
+  void _drawRenderTargetForeground(const RenderTargetTexturePtr& renderTarget);
 
 protected:
   /**

@@ -27,6 +27,7 @@ class RenderTargetTexture;
 class Scene;
 class SubMesh;
 class VertexBuffer;
+using AbstractMeshPtr        = std::shared_ptr<AbstractMesh>;
 using BaseTexturePtr         = std::shared_ptr<BaseTexture>;
 using EffectPtr              = std::shared_ptr<Effect>;
 using EffectLayerPtr         = std::shared_ptr<EffectLayer>;
@@ -71,7 +72,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  virtual std::string getEffectName() const = 0;
+  virtual const std::string getEffectName() const = 0;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -138,7 +139,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  virtual std::string getClassName() const;
+  virtual const std::string getClassName() const;
 
   /**
    * @brief Creates an effect layer from parsed effect layer data.
@@ -211,6 +212,12 @@ protected:
   void _createMainTexture();
 
   /**
+   * @brief Adds specific effects defines.
+   * @param defines The defines to add specifics to.
+   */
+  virtual void _addCustomEffectDefines(std::vector<std::string>& defines);
+
+  /**
    * @brief Checks for the readiness of the element composing the layer.
    * @param subMesh the mesh to check for
    * @param useInstances specify wether or not to use instances to render the
@@ -227,19 +234,27 @@ protected:
    * @param mesh The mesh to render
    * @returns true if it should render otherwise false
    */
-  virtual bool _shouldRenderMesh(const MeshPtr& mesh) const;
+  virtual bool _shouldRenderMesh(AbstractMesh* mesh) const;
+
+  /**
+   * @brief Returns true if the mesh can be rendered, otherwise false.
+   * @param mesh The mesh to render
+   * @param material The material used on the mesh
+   * @returns true if it can be rendered otherwise false
+   */
+  virtual bool _canRenderMesh(const AbstractMeshPtr& mesh,
+                              const MaterialPtr& material) const;
 
   /**
    * @brief Returns true if the mesh should render, otherwise false.
-   * @param mesh The mesh to render
    * @returns true if it should render otherwise false
    */
-  virtual bool _shouldRenderEmissiveTextureForMesh(Mesh* mesh) const;
+  virtual bool _shouldRenderEmissiveTextureForMesh() const;
 
   /**
    * @brief Renders the submesh passed in parameter to the generation map.
    */
-  void _renderSubMesh(SubMesh* subMesh);
+  void _renderSubMesh(SubMesh* subMesh, bool enableAlphaMode = false);
 
 private:
   /**

@@ -32,18 +32,18 @@ Color4 HighlightLayer::NeutralColor             = Color4(0.f, 0.f, 0.f, 0.f);
 int HighlightLayer::GlowingMeshStencilReference = 0x02;
 int HighlightLayer::NormalMeshStencilReference  = 0x01;
 
-HighlightLayer::HighlightLayer(const std::string& name, Scene* scene)
-    : HighlightLayer(name, scene,
+HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene)
+    : HighlightLayer(iName, scene,
                      IHighlightLayerOptions{
-                       0.5f,                           // mainTextureRatio
-                       std::nullopt,                   // mainTextureFixedSize
-                       0.5f,                           // blurTextureSizeRatio
-                       1.f,                            // blurVerticalSize
-                       1.f,                            // blurHorizontalSize
-                       EngineConstants::ALPHA_COMBINE, // alphaBlendingMode
-                       nullptr,                        // camera
-                       std::nullopt,                   // isStroke
-                       -1                              // renderingGroupId
+                       0.5f,                     // mainTextureRatio
+                       std::nullopt,             // mainTextureFixedSize
+                       0.5f,                     // blurTextureSizeRatio
+                       1.f,                      // blurVerticalSize
+                       1.f,                      // blurHorizontalSize
+                       Constants::ALPHA_COMBINE, // alphaBlendingMode
+                       nullptr,                  // camera
+                       std::nullopt,             // isStroke
+                       -1                        // renderingGroupId
                      })
 {
 }
@@ -69,7 +69,7 @@ HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene,
     BABYLON_LOG_WARN(
       "HighlightLayer",
       "Rendering the Highlight Layer requires the stencil to be active on the "
-      "canvas.");
+      "canvas.")
   }
 
   // Adapt options
@@ -83,7 +83,7 @@ HighlightLayer::HighlightLayer(const std::string& iName, Scene* scene,
 
   // Initialize the layer
   IEffectLayerOptions effectLayerOptions;
-  effectLayerOptions.alphaBlendingMode    = EngineConstants::ALPHA_ADD;
+  effectLayerOptions.alphaBlendingMode    = Constants::ALPHA_ADD;
   effectLayerOptions.camera               = _options.camera;
   effectLayerOptions.mainTextureFixedSize = _options.mainTextureFixedSize;
   effectLayerOptions.mainTextureRatio     = _options.mainTextureRatio;
@@ -118,7 +118,7 @@ float HighlightLayer::get_blurVerticalSize() const
   return _verticalBlurPostprocess->kernel;
 }
 
-std::string HighlightLayer::getEffectName() const
+const std::string HighlightLayer::getEffectName() const
 {
   return HighlightLayer::EffectName;
 }
@@ -138,10 +138,10 @@ EffectPtr HighlightLayer::_createMergeEffect()
 
 void HighlightLayer::_createTextureAndPostProcesses()
 {
-  int blurTextureWidth
+  auto blurTextureWidth
     = static_cast<int>(static_cast<float>(_mainTextureDesiredSize.width)
                        * _options.blurTextureSizeRatio);
-  int blurTextureHeight
+  auto blurTextureHeight
     = static_cast<int>(static_cast<float>(_mainTextureDesiredSize.height)
                        * _options.blurTextureSizeRatio);
   blurTextureWidth = _engine->needPOTTextures() ?
@@ -151,12 +151,12 @@ void HighlightLayer::_createTextureAndPostProcesses()
                         Tools::GetExponentOfTwo(blurTextureHeight, _maxSize) :
                         blurTextureHeight;
 
-  unsigned int textureType = 0;
+  auto textureType = 0u;
   if (_engine->getCaps().textureHalfFloatRender) {
-    textureType = EngineConstants::TEXTURETYPE_HALF_FLOAT;
+    textureType = Constants::TEXTURETYPE_HALF_FLOAT;
   }
   else {
-    textureType = EngineConstants::TEXTURETYPE_UNSIGNED_INT;
+    textureType = Constants::TEXTURETYPE_UNSIGNED_INT;
   }
 
   _blurTexture = RenderTargetTexture::New(
@@ -171,7 +171,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
 
   _textures = {_blurTexture};
 
-  if (_options.alphaBlendingMode == EngineConstants::ALPHA_COMBINE) {
+  if (_options.alphaBlendingMode == Constants::ALPHA_COMBINE) {
     _downSamplePostprocess = PassPostProcess::New(
       "HighlightLayerPPP", _options.blurTextureSizeRatio, nullptr,
       TextureConstants::BILINEAR_SAMPLINGMODE, _scene->getEngine());
@@ -242,7 +242,7 @@ void HighlightLayer::_createTextureAndPostProcesses()
     });
 
   // Prevent autoClear.
-  for (auto& pp : _postProcesses) {
+  for (const auto& pp : _postProcesses) {
     pp->autoClear = false;
   }
 }
@@ -278,20 +278,13 @@ void HighlightLayer::_internalRender(const EffectPtr& effect)
   effect->setTexture("textureSampler", _blurTexture);
 
   // Cache
-  auto engine                       = _engine;
-  auto previousStencilBuffer        = engine->getStencilBuffer();
-  auto previousStencilFunction      = engine->getStencilFunction();
-  auto previousStencilMask          = engine->getStencilMask();
-  auto previousStencilOperationPass = engine->getStencilOperationPass();
-  auto previousStencilOperationFail = engine->getStencilOperationFail();
-  auto previousStencilOperationDepthFail
-    = engine->getStencilOperationDepthFail();
-  auto previousStencilReference = engine->getStencilFunctionReference();
+  auto engine = _engine;
+  engine->cacheStencilState();
 
   // Stencil operations
-  engine->setStencilOperationPass(EngineConstants::REPLACE);
-  engine->setStencilOperationFail(EngineConstants::KEEP);
-  engine->setStencilOperationDepthFail(EngineConstants::KEEP);
+  engine->setStencilOperationPass(Constants::REPLACE);
+  engine->setStencilOperationFail(Constants::KEEP);
+  engine->setStencilOperationDepthFail(Constants::KEEP);
 
   // Draw order
   engine->setStencilMask(0x00);
@@ -302,23 +295,17 @@ void HighlightLayer::_internalRender(const EffectPtr& effect)
   // 2 passes inner outer
   if (outerGlow) {
     effect->setFloat("offset", 0);
-    engine->setStencilFunction(EngineConstants::NOTEQUAL);
+    engine->setStencilFunction(Constants::NOTEQUAL);
     engine->drawElementsType(Material::TriangleFillMode, 0, 6);
   }
   if (innerGlow) {
     effect->setFloat("offset", 1);
-    engine->setStencilFunction(EngineConstants::EQUAL);
+    engine->setStencilFunction(Constants::EQUAL);
     engine->drawElementsType(Material::TriangleFillMode, 0, 6);
   }
 
   // Restore Cache
-  engine->setStencilFunction(previousStencilFunction);
-  engine->setStencilMask(previousStencilMask);
-  engine->setStencilBuffer(previousStencilBuffer);
-  engine->setStencilOperationPass(previousStencilOperationPass);
-  engine->setStencilOperationFail(previousStencilOperationFail);
-  engine->setStencilOperationDepthFail(previousStencilOperationDepthFail);
-  engine->setStencilFunctionReference(previousStencilReference);
+  engine->restoreStencilState();
 }
 
 bool HighlightLayer::shouldRender() const
@@ -330,15 +317,15 @@ bool HighlightLayer::shouldRender() const
   return false;
 }
 
-bool HighlightLayer::_shouldRenderMesh(const MeshPtr& mesh) const
+bool HighlightLayer::_shouldRenderMesh(AbstractMesh* mesh) const
 {
   // Excluded Mesh
   if (!_excludedMeshes.empty()
       && (_excludedMeshes.find(mesh->uniqueId) != _excludedMeshes.end())) {
     return false;
-  };
+  }
 
-  if (!EffectLayer::hasMesh(mesh.get())) {
+  if (!EffectLayer::hasMesh(mesh)) {
     return false;
   }
 
@@ -368,10 +355,10 @@ void HighlightLayer::_setEmissiveTextureAndColor(const MeshPtr& mesh,
       && material && (material->type() == Type::STANDARDMATERIAL)) {
     _emissiveTextureAndColor.texture
       = std::static_pointer_cast<StandardMaterial>(material)->emissiveTexture();
-    _emissiveTextureAndColor.color.set(1.0, //
-                                       1.0, //
-                                       1.0, //
-                                       1.0);
+    _emissiveTextureAndColor.color.set(1.f, //
+                                       1.f, //
+                                       1.f, //
+                                       1.f);
   }
   else {
     _emissiveTextureAndColor.texture = nullptr;
@@ -387,8 +374,8 @@ void HighlightLayer::addExcludedMesh(Mesh* mesh)
   if (!stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     IHighlightLayerExcludedMesh meshExcluded;
     meshExcluded.mesh = mesh;
-    meshExcluded.beforeRender
-      = mesh->onBeforeRenderObservable().add([](Mesh* mesh, EventState&) {
+    meshExcluded.beforeBind
+      = mesh->onBeforeBindObservable.add([](Mesh* mesh, EventState&) {
           mesh->getEngine()->setStencilBuffer(false);
         });
     meshExcluded.afterRender
@@ -407,8 +394,8 @@ void HighlightLayer::removeExcludedMesh(Mesh* mesh)
 
   if (stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
     auto& meshExcluded = _excludedMeshes[mesh->uniqueId];
-    if (meshExcluded.beforeRender) {
-      mesh->onBeforeRenderObservable().remove(meshExcluded.beforeRender);
+    if (meshExcluded.beforeBind) {
+      mesh->onBeforeBindObservable.remove(meshExcluded.beforeBind);
     }
 
     if (meshExcluded.afterRender) {
@@ -448,7 +435,7 @@ void HighlightLayer::addMesh(const MeshPtr& mesh, const Color3& color,
     newMesh.color = color;
     // Lambda required for capture due to Observable this context
     newMesh.observerHighlight
-      = mesh->onBeforeRenderObservable().add([&](Mesh* mesh, EventState&) {
+      = mesh->onBeforeBindObservable.add([&](Mesh* mesh, EventState&) {
           if (!_excludedMeshes.empty()
               && stl_util::contains(_excludedMeshes, mesh->uniqueId)) {
             _defaultStencilReference(mesh);
@@ -481,13 +468,12 @@ void HighlightLayer::removeMesh(Mesh* mesh)
   if (stl_util::contains(_meshes, mesh->uniqueId)) {
     auto& meshHighlight = _meshes[mesh->uniqueId];
     if (meshHighlight.observerHighlight) {
-      mesh->onBeforeRenderObservable().remove(meshHighlight.observerHighlight);
+      mesh->onBeforeBindObservable.remove(meshHighlight.observerHighlight);
     }
 
     if (meshHighlight.observerDefault) {
       mesh->onAfterRenderObservable().remove(meshHighlight.observerDefault);
     }
-
     _meshes.erase(mesh->uniqueId);
   }
 
@@ -520,7 +506,7 @@ void HighlightLayer::dispose()
       auto& meshHighlight = item.second;
       if (meshHighlight.mesh) {
         if (meshHighlight.observerHighlight) {
-          meshHighlight.mesh->onBeforeRenderObservable().remove(
+          meshHighlight.mesh->onBeforeBindObservable.remove(
             meshHighlight.observerHighlight);
         }
         if (meshHighlight.observerDefault) {
@@ -535,9 +521,9 @@ void HighlightLayer::dispose()
   if (_excludedMeshes.empty()) {
     for (auto item : _excludedMeshes) {
       auto& meshHighlight = item.second;
-      if (meshHighlight.beforeRender) {
-        meshHighlight.mesh->onBeforeRenderObservable().remove(
-          meshHighlight.beforeRender);
+      if (meshHighlight.beforeBind) {
+        meshHighlight.mesh->onBeforeBindObservable.remove(
+          meshHighlight.beforeBind);
       }
       if (meshHighlight.afterRender) {
         meshHighlight.mesh->onAfterRenderObservable().remove(
@@ -550,7 +536,7 @@ void HighlightLayer::dispose()
   EffectLayer::dispose();
 }
 
-std::string HighlightLayer::getClassName() const
+const std::string HighlightLayer::getClassName() const
 {
   return "HighlightLayer";
 }

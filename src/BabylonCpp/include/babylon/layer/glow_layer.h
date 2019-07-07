@@ -7,12 +7,14 @@
 
 namespace BABYLON {
 
+class AbstractMesh;
 class BlurPostProcess;
 class GlowLayer;
 class Material;
 class Mesh;
 class SubMesh;
 class Texture;
+using AbstractMeshPtr    = std::shared_ptr<AbstractMesh>;
 using BlurPostProcessPtr = std::shared_ptr<BlurPostProcess>;
 using GlowLayerPtr       = std::shared_ptr<GlowLayer>;
 using MaterialPtr        = std::shared_ptr<Material>;
@@ -63,7 +65,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  std::string getEffectName() const override;
+  const std::string getEffectName() const override;
 
   /**
    * @brief Checks for the readiness of the element composing the layer.
@@ -129,7 +131,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  std::string getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Serializes this glow layer.
@@ -160,6 +162,26 @@ protected:
             const IGlowLayerOptions& options);
 
   /**
+   * @brief Sets the kernel size of the blur.
+   */
+  void set_blurKernelSize(float value);
+
+  /**
+   * @brief Gets the kernel size of the blur.
+   */
+  float get_blurKernelSize() const;
+
+  /**
+   * @brief Sets the glow intensity.
+   */
+  void set_intensity(float value);
+
+  /**
+   * @brief Gets the glow intensity.
+   */
+  float get_intensity() const;
+
+  /**
    * @brief Create the merge effect. This is the shader use to blit the
    * information back to the main canvas at the end of the scene rendering.
    */
@@ -170,6 +192,15 @@ protected:
    * glow layer.
    */
   void _createTextureAndPostProcesses() override;
+
+  /**
+   * @brief Returns true if the mesh can be rendered, otherwise false.
+   * @param mesh The mesh to render
+   * @param material The material used on the mesh
+   * @returns true if it can be rendered otherwise false
+   */
+  bool _canRenderMesh(const AbstractMeshPtr& mesh,
+                      const MaterialPtr& material) const override;
 
   /**
    * @brief Implementation specific of rendering the generating effect on the
@@ -190,28 +221,13 @@ protected:
    * @param mesh The mesh to render
    * @returns true if it should render otherwise false
    */
-  bool _shouldRenderMesh(const MeshPtr& mesh) const override;
-
-private:
-  /**
-   * @brief Sets the kernel size of the blur.
-   */
-  void set_blurKernelSize(float value);
+  bool _shouldRenderMesh(AbstractMesh* mesh) const override;
 
   /**
-   * @brief Gets the kernel size of the blur.
+   * @brief Adds specific effects defines.
+   * @param defines The defines to add specifics to.
    */
-  float get_blurKernelSize() const;
-
-  /**
-   * @brief Sets the glow intensity.
-   */
-  void set_intensity(float value);
-
-  /**
-   * @brief Gets the glow intensity.
-   */
-  float get_intensity() const;
+  void _addCustomEffectDefines(std::vector<std::string>& defines) override;
 
 public:
   /**

@@ -68,7 +68,7 @@ public:
    * @brief Get the effect name of the layer.
    * @return The effect name
    */
-  std::string getEffectName() const override;
+  const std::string getEffectName() const override;
 
   /**
    * @brief Returns wether or nood the layer needs stencil enabled during the
@@ -149,7 +149,7 @@ public:
    * @brief Gets the class name of the effect layer.
    * @returns the string with the class name of the effect layer
    */
-  std::string getClassName() const override;
+  const std::string getClassName() const override;
 
   /**
    * @brief Serializes this Highlight layer.
@@ -204,7 +204,7 @@ protected:
    * @param mesh The mesh to render
    * @returns true if it should render otherwise false
    */
-  bool _shouldRenderMesh(const MeshPtr& mesh) const override;
+  bool _shouldRenderMesh(AbstractMesh* mesh) const override;
 
   /**
    * @brief Sets the required values for both the emissive texture and and the

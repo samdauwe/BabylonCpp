@@ -20,8 +20,9 @@ Layer::Layer(const std::string& name, const std::string& imgUrl, Scene* scene,
     , color{iColor}
     , scale{Vector2(1.f, 1.f)}
     , offset{Vector2(0.f, 0.f)}
-    , alphaBlendingMode{EngineConstants::ALPHA_COMBINE}
+    , alphaBlendingMode{Constants::ALPHA_COMBINE}
     , layerMask{0x0FFFFFFF}
+    , renderOnlyInRenderTargetTextures{false}
     , onDispose{this, &Layer::set_onDispose}
     , onBeforeRender{this, &Layer::set_onBeforeRender}
     , onAfterRender{this, &Layer::set_onAfterRender}
@@ -83,7 +84,6 @@ Layer::~Layer()
 {
 }
 
-// Events
 void Layer::set_onDispose(const LayerCallbackType& callback)
 {
   if (_onDisposeObserver) {
@@ -121,6 +121,7 @@ void Layer::_createIndexBuffer()
     2, //
     3  //
   };
+
   _indexBuffer = engine->createIndexBuffer(indices);
 }
 
@@ -170,7 +171,7 @@ void Layer::render()
   if (!alphaTest) {
     engine->setAlphaMode(alphaBlendingMode);
     engine->drawElementsType(Material::TriangleFillMode, 0, 6);
-    engine->setAlphaMode(EngineConstants::ALPHA_DISABLE);
+    engine->setAlphaMode(Constants::ALPHA_DISABLE);
   }
   else {
     engine->drawElementsType(Material::TriangleFillMode, 0, 6);
@@ -198,6 +199,9 @@ void Layer::dispose()
     texture->dispose();
     texture = nullptr;
   }
+
+  // Clean RTT list
+  renderTargetTextures.clear();
 
   // Remove from scene
   auto& layers = _scene->layers;
