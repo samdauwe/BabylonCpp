@@ -97,8 +97,6 @@ def main():
         "loadingScreen.ts",
         # Materials / Textures
         "htmlElementTexture.ts", "videoTexture.ts",
-        # Materials / Textures / Loaders
-        "ktxTextureLoader.ts", "tgaTextureLoader.ts",
         # Meshes / Compression
         "dracoCompression.ts",
         # Misc
