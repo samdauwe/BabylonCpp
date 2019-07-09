@@ -4,6 +4,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -137,7 +138,8 @@ MaterialPtr PhysicsViewer::_getDebugMaterial(Scene* scene)
 AbstractMeshPtr PhysicsViewer::_getDebugBoxMesh(Scene* scene)
 {
   if (!_debugBoxMesh) {
-    BoxOptions options(1.f);
+    BoxOptions options;
+    options.size = 1.f;
     _debugBoxMesh
       = MeshBuilder::CreateBox("physicsBodyBoxViewMesh", options, scene);
     _debugBoxMesh->renderingGroupId   = 1;

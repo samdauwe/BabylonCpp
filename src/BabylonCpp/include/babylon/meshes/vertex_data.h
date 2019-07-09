@@ -1,6 +1,8 @@
 #ifndef BABYLON_MESHES_VERTEX_DATA_H
 #define BABYLON_MESHES_VERTEX_DATA_H
 
+#include <optional>
+
 #include <babylon/babylon_api.h>
 #include <babylon/math/vector4.h>
 #include <babylon/meshes/mesh.h>
@@ -28,6 +30,25 @@ class TorusOptions;
 class BABYLON_SHARED_EXPORT VertexData {
 
 public:
+  /**
+   * Mesh side orientation : usually the external or front surface
+   */
+  static constexpr unsigned int FRONTSIDE = 0;
+  /**
+   * Mesh side orientation : usually the internal or back surface
+   */
+  static constexpr unsigned int BACKSIDE = 1;
+  /**
+   * Mesh side orientation : both internal and external or front and back
+   * surfaces
+   */
+  static constexpr unsigned int DOUBLESIDE = 2;
+  /**
+   * Mesh side orientation : by default, `FRONTSIDE`
+   */
+  static constexpr unsigned int DEFAULTSIDE = 0;
+
+public:
   VertexData();
   ~VertexData();
 
@@ -47,7 +68,8 @@ public:
    * update the vertexData
    * @returns the VertexData
    */
-  VertexData& applyToMesh(Mesh& mesh, bool updatable = false);
+  VertexData& applyToMesh(Mesh& mesh,
+                          const std::optional<bool>& updatable = std::nullopt);
 
   /**
    * @brief Associates the vertexData to the passed Geometry.
@@ -570,7 +592,7 @@ public:
 
 private:
   VertexData& _applyTo(IGetSetVerticesData& meshOrGeometry,
-                       bool updatable = false);
+                       const std::optional<bool>& updatable = std::nullopt);
   VertexData& _update(IGetSetVerticesData* meshOrGeometry,
                       bool updateExtends = false, bool makeItUnique = false);
   Float32Array _mergeElement(const Float32Array& source,

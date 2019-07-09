@@ -7,6 +7,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -51,10 +52,11 @@ void ShaderMaterialMorningCityScene::initializeScene(ICanvas* canvas,
   // Create a built-in "box" shape
   const float ratio = static_cast<float>(getEngine()->getRenderWidth())
                       / static_cast<float>(getEngine()->getRenderHeight());
-  BoxOptions options(5.f);
+  BoxOptions options;
+  options.size            = 5.f;
   options.sideOrientation = Mesh::DEFAULTSIDE;
   options.updatable       = false;
-  options.width           = options.width * ratio;
+  options.width           = *options.size * ratio;
   auto skybox             = MeshBuilder::CreateBox("skybox", options, scene);
 
   // Create shader material

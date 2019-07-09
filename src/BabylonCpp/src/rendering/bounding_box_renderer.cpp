@@ -6,6 +6,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/ishader_material_options.h>
 #include <babylon/materials/shader_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/sub_mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
@@ -91,7 +92,8 @@ void BoundingBoxRenderer::_prepareResources()
     = ShaderMaterial::New("colorShader", scene, "color", shaderMaterialOptions);
 
   auto engine = scene->getEngine();
-  BoxOptions options(1.f);
+  BoxOptions options;
+  options.size                               = 1.f;
   auto boxdata                               = VertexData::CreateBox(options);
   _vertexBuffers[VertexBuffer::PositionKind] = std::make_shared<VertexBuffer>(
     engine, boxdata->positions, VertexBuffer::PositionKind, false);

@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/vertex_data.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -10,8 +11,9 @@ TEST(TestVertexData, CreateBox)
   using namespace BABYLON;
   // Create test data
   const float size = 3.f;
-  BoxOptions options(size);
-  auto box = VertexData::CreateBox(options);
+  BoxOptions options;
+  options.size = size;
+  auto box     = VertexData::CreateBox(options);
   // Set expected results
   Uint32Array expectedIndices{
     0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,                         //

@@ -5,6 +5,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
@@ -63,7 +64,8 @@ void BouncingCubeScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto initialVel = Vector3(0.5f, 2.f, 0.f);
   _velocity.addInPlace(initialVel);
 
-  BoxOptions boxOptions(boxSize);
+  BoxOptions boxOptions;
+  boxOptions.size            = boxSize;
   boxOptions.sideOrientation = Mesh::BACKSIDE;
   auto box                   = MeshBuilder::CreateBox("b", boxOptions, scene);
   auto boxmat                = StandardMaterial::New("boxmat", scene);
@@ -71,16 +73,18 @@ void BouncingCubeScene::initializeScene(ICanvas* canvas, Scene* scene)
   boxmat->specularColor      = Color3::Black();
   box->material              = boxmat;
 
-  BoxOptions marioOptions(marioSize);
+  BoxOptions marioOptions;
+  marioOptions.size       = marioSize;
   _mario                  = MeshBuilder::CreateBox("m", marioOptions, scene);
   auto marioMat           = StandardMaterial::New("marioMat", scene);
   marioMat->diffuseColor  = Color3::Red();
   marioMat->specularColor = Color3::Black();
   _mario->material        = marioMat;
 
-  BoxOptions platformOptions(1.f);
-  auto platform    = MeshBuilder::CreateBox("p", platformOptions, scene);
-  auto platformMat = StandardMaterial::New("platform0", scene);
+  BoxOptions platformOptions;
+  platformOptions.size = 1.f;
+  auto platform        = MeshBuilder::CreateBox("p", platformOptions, scene);
+  auto platformMat     = StandardMaterial::New("platform0", scene);
   platformMat->diffuseColor  = Color3::Green();
   platformMat->specularColor = Color3::Black();
   platformMat->alpha         = 0.7f;

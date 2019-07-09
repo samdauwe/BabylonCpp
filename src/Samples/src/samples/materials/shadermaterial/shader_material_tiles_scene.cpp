@@ -7,6 +7,7 @@
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -73,14 +74,15 @@ void ShaderMaterialTilesScene::initializeScene(ICanvas* canvas, Scene* scene)
   for (unsigned int i = 0; i < boxPositions.size(); ++i) {
     // Create box
     auto id = std::to_string(i + 1);
-    BoxOptions options(1.5f);
+    BoxOptions options;
+    options.size            = 1.5f;
     options.sideOrientation = Mesh::DEFAULTSIDE;
     options.updatable       = false;
-    options.height          = options.height * 0.01f;
+    options.height          = *options.height * 0.01f;
     auto box               = MeshBuilder::CreateBox("box" + id, options, scene);
     box->position          = boxPositions[i];
     box->edgesWidth        = 2.f;
-    _boxTopFaceResolution  = Vector2(options.width, options.depth);
+    _boxTopFaceResolution  = Vector2(*options.width, *options.depth);
     _boxTopFaceAspectRatio = _boxTopFaceResolution.x / _boxTopFaceResolution.y;
     // Create shader material
     IShaderMaterialOptions shaderMaterialOptions;

@@ -6,6 +6,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/texture.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/instanced_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
@@ -80,7 +81,8 @@ void FollowCameraScene::initializeScene(ICanvas* canvas, Scene* scene)
   }
 
   // Shape to follow
-  BoxOptions boxOptions(2.f);
+  BoxOptions boxOptions;
+  boxOptions.size   = 2.f;
   boxOptions.faceUV = faceUV;
   _box              = MeshBuilder::CreateBox("box", boxOptions, scene);
   _box->position    = Vector3(20.f, 0.f, 10.f);
@@ -93,9 +95,10 @@ void FollowCameraScene::initializeScene(ICanvas* canvas, Scene* scene)
                    -50.f + Math::random() * 100.f);
   };
 
-  boxOptions    = BoxOptions(2.f);
-  auto box      = MeshBuilder::CreateBox("box_0", boxOptions, scene);
-  box->position = getRandomPosition();
+  boxOptions      = BoxOptions();
+  boxOptions.size = 2.f;
+  auto box        = MeshBuilder::CreateBox("box_0", boxOptions, scene);
+  box->position   = getRandomPosition();
 
   for (unsigned int i = 1; i < 400; ++i) {
     const auto iStr       = std::to_string(i);

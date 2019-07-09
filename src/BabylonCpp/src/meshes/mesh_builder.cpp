@@ -9,6 +9,8 @@
 #include <babylon/math/position_normal_vertex.h>
 #include <babylon/math/tmp.h>
 #include <babylon/meshes/_creation_data_storage.h>
+#include <babylon/meshes/builders/box_builder.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>
@@ -22,17 +24,7 @@ namespace BABYLON {
 MeshPtr MeshBuilder::CreateBox(const std::string& name, BoxOptions& options,
                                Scene* scene)
 {
-  auto box = Mesh::New(name, scene);
-
-  options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation);
-  box->_originalBuilderSideOrientation = options.sideOrientation;
-
-  auto vertexData = VertexData::CreateBox(options);
-
-  vertexData->applyToMesh(*box, options.updatable);
-
-  return box;
+  return BoxBuilder::CreateBox(name, options, scene);
 }
 
 MeshPtr MeshBuilder::CreateSphere(const std::string& name,
@@ -602,7 +594,7 @@ GroundMeshPtr MeshBuilder::CreateGroundFromHeightMap(
 
   const auto onError
     = [](const std::string& msg, const std::string& /*exception*/) {
-        BABYLON_LOG_ERROR("Tools", msg);
+        BABYLON_LOG_ERROR("Tools", msg)
       };
 
   Tools::LoadImageFromUrl(url, onload, onError, false);

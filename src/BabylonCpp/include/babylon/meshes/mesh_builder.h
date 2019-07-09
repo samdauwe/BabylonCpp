@@ -46,18 +46,17 @@ public:
    * using the parameters `faceColors` (an array of 6 Color3 elements) and
    * `faceUV` (an array of 6 Vector4 elements)
    * * Please read this tutorial :
-   * http://doc.babylonjs.com/tutorials/CreateBox_Per_Face_Textures_And_Colors
+   * https://doc.babylonjs.com/how_to/createbox_per_face_textures_and_colors
    * * You can also set the mesh side orientation with the values :
    * BABYLON.Mesh.FRONTSIDE (default), BABYLON.Mesh.BACKSIDE or
    * BABYLON.Mesh.DOUBLESIDE
    * * If you create a double-sided mesh, you can choose what parts of the
    * texture image to crop and stick respectively on the front and the back
    * sides with the parameters `frontUVs` and `backUVs` (Vector4). Detail here :
-   * http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
+   * https://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation
    * * The mesh can be set to updatable with the boolean parameter `updatable`
    * (default false) if its internal geometry is supposed to change once created
-   * @see
-   * http://doc.babylonjs.com/tutorials/Mesh_CreateXXX_Methods_With_Options_Parameter#box
+   * @see https://doc.babylonjs.com/how_to/set_shapes#box
    * @param name defines the name of the mesh
    * @param options defines the options used to create the mesh
    * @param scene defines the hosting scene

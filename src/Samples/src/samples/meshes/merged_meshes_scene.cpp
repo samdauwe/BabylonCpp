@@ -5,6 +5,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/core/string.h>
 #include <babylon/lights/hemispheric_light.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -73,7 +74,8 @@ void MergedMeshesScene::initializeScene(ICanvas* canvas, Scene* scene)
           Color4(),                                   // Face 6
         }};
         // Create the box with height, width and depth of 5
-        BoxOptions options(5.f);
+        BoxOptions options;
+        options.size       = 5.f;
         options.faceColors = std::move(faceColors);
         return MeshBuilder::CreateBox(name, options, scene);
       };

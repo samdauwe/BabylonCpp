@@ -5,6 +5,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -35,8 +36,9 @@ AxisScaleGizmo::AxisScaleGizmo(
 
   // Build mesh on root node
   auto arrow = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
-  BoxOptions boxOptions{0.4f};
-  auto arrowMesh = MeshBuilder::CreateBox("yPosMesh", boxOptions,
+  BoxOptions boxOptions;
+  boxOptions.size = 0.4f;
+  auto arrowMesh  = MeshBuilder::CreateBox("yPosMesh", boxOptions,
                                           gizmoLayer->utilityLayerScene.get());
 
   LinesOptions arrowTailOptions;

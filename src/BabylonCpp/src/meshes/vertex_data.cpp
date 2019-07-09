@@ -6,6 +6,7 @@
 #include <babylon/math/axis.h>
 #include <babylon/math/vector2.h>
 #include <babylon/math/vector3.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/facet_parameters.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -68,7 +69,8 @@ void VertexData::set(const Float32Array& data, const std::string& kind)
   }
 }
 
-VertexData& VertexData::applyToMesh(Mesh& mesh, bool updatable)
+VertexData& VertexData::applyToMesh(Mesh& mesh,
+                                    const std::optional<bool>& updatable)
 {
   _applyTo(mesh, updatable);
   return *this;
@@ -95,8 +97,10 @@ VertexData& VertexData::updateGeometry(Geometry* geometry, bool updateExtends,
 }
 
 VertexData& VertexData::_applyTo(IGetSetVerticesData& meshOrGeometry,
-                                 bool updatable)
+                                 const std::optional<bool>& iUpdatable)
 {
+  const auto updatable = iUpdatable.value_or(false);
+
   if (!positions.empty()) {
     meshOrGeometry.setVerticesData(VertexBuffer::PositionKind, positions,
                                    updatable);
@@ -791,84 +795,98 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 
 std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 {
-  std::vector<Vector3> normalsSource = {
-    Vector3(0.f, 0.f, 1.f),  //
-    Vector3(0.f, 0.f, -1.f), //
-    Vector3(1.f, 0.f, 0.f),  //
-    Vector3(-1.f, 0.f, 0.f), //
-    Vector3(0.f, 1.f, 0.f),  //
-    Vector3(0.f, -1.f, 0.f)  //
-  };
-
-  Uint32Array indices;
-  Float32Array positions;
-  Float32Array normals;
+  unsigned int nbFaces = 6;
+  IndicesArray indices{0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,
+                       8,  9,  10, 8,  10, 11, 12, 13, 14, 12, 14, 15,
+                       16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
+  Float32Array normals{0,  0,  1,  0, 0,  1,  0,  0,  1,  0,  0,  1, 0,  0, -1,
+                       0,  0,  -1, 0, 0,  -1, 0,  0,  -1, 1,  0,  0, 1,  0, 0,
+                       1,  0,  0,  1, 0,  0,  -1, 0,  0,  -1, 0,  0, -1, 0, 0,
+                       -1, 0,  0,  0, 1,  0,  0,  1,  0,  0,  1,  0, 0,  1, 0,
+                       0,  -1, 0,  0, -1, 0,  0,  -1, 0,  0,  -1, 0};
   Float32Array uvs;
+  Float32Array positions;
+  auto width        = options.width.value_or(options.size.value_or(1.f));
+  auto height       = options.height.value_or(options.size.value_or(1.f));
+  auto depth        = options.depth.value_or(options.size.value_or(1.f));
+  auto wrap         = options.wrap.value_or(false);
+  auto topBaseAt    = options.topBaseAt.value_or(1u);
+  auto bottomBaseAt = options.bottomBaseAt.value_or(0u);
+  topBaseAt         = (topBaseAt + 4) % 4;    // places values as 0 to 3
+  bottomBaseAt      = (bottomBaseAt + 4) % 4; // places values as 0 to 3
+  Int32Array topOrder{2, 0, 3, 1};
+  Int32Array bottomOrder{2, 0, 1, 3};
+  auto topIndex    = topOrder[topBaseAt];
+  auto bottomIndex = bottomOrder[bottomBaseAt];
+  Float32Array basePositions{
+    1,  -1, 1,  -1, -1, 1,  -1, 1,  1,  1,  1,  1,  1,  1,  -1, -1, 1,  -1,
+    -1, -1, -1, 1,  -1, -1, 1,  1,  -1, 1,  -1, -1, 1,  -1, 1,  1,  1,  1,
+    -1, 1,  1,  -1, -1, 1,  -1, -1, -1, -1, 1,  -1, -1, 1,  1,  -1, 1,  -1,
+    1,  1,  -1, 1,  1,  1,  1,  -1, 1,  1,  -1, -1, -1, -1, -1, -1, -1, 1};
+  if (wrap) {
+    indices = {2, 3,  0,  2, 0,  1, 4,  5,  6,  4,  6,  7,
+               9, 10, 11, 9, 11, 8, 12, 14, 15, 12, 13, 14};
+    basePositions
+      = {-1, 1,  1,  1,  1,  1, 1,  -1, 1, -1, -1, 1,  1, 1,  -1, -1,
+         1,  -1, -1, -1, -1, 1, -1, -1, 1, 1,  1,  1,  1, -1, 1,  -1,
+         -1, 1,  -1, 1,  -1, 1, -1, -1, 1, 1,  -1, -1, 1, -1, -1, -1};
+    std::vector<Float32Array> topFaceBase{
+      {1, 1, 1}, {-1, 1, 1}, {-1, 1, -1}, {1, 1, -1}};
+    std::vector<Float32Array> bottomFaceBase{
+      {-1, -1, 1}, {1, -1, 1}, {1, -1, -1}, {-1, -1, -1}};
+    IndicesArray topFaceOrder{17, 18, 19, 16};
+    IndicesArray bottomFaceOrder{22, 23, 20, 21};
+    while (topIndex > 0) {
+      stl_util::push_front(topFaceBase, topFaceBase.back());
+      topFaceBase.pop_back();
+      stl_util::push_front(topFaceOrder, topFaceOrder.back());
+      topFaceOrder.pop_back();
+      --topIndex;
+    }
+    while (bottomIndex > 0) {
+      stl_util::push_front(bottomFaceBase, bottomFaceBase.back());
+      bottomFaceBase.pop_back();
+      stl_util::push_front(bottomFaceOrder, bottomFaceOrder.back());
+      bottomFaceOrder.pop_back();
+      --bottomIndex;
+    }
+    auto topFaceBaseFlat    = stl_util::flatten(topFaceBase);
+    auto bottomFaceBaseFlat = stl_util::flatten(bottomFaceBase);
 
-  const auto& width           = options.width;
-  const auto& height          = options.height;
-  const auto& depth           = options.depth;
-  const auto& sideOrientation = options.sideOrientation;
-  const auto& faceUV          = options.faceUV;
-  const auto& faceColors      = options.faceColors;
+    stl_util::concat(basePositions,
+                     stl_util::concat(topFaceBaseFlat, bottomFaceBaseFlat));
+    stl_util::concat(indices,
+                     {topFaceOrder[0], topFaceOrder[2], topFaceOrder[3],
+                      topFaceOrder[0], topFaceOrder[1], topFaceOrder[2]});
+    stl_util::concat(indices, {bottomFaceOrder[0], bottomFaceOrder[2],
+                               bottomFaceOrder[3], bottomFaceOrder[0],
+                               bottomFaceOrder[1], bottomFaceOrder[2]});
+  }
+  Float32Array scaleArray{width / 2, height / 2.f, depth / 2.f};
+  for (auto currentIndex = 0ull; currentIndex < basePositions.size();
+       ++currentIndex) {
+    positions.emplace_back(basePositions[currentIndex]
+                           * scaleArray[currentIndex % 3]);
+  }
 
+  auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+
+  const auto& faceUV     = options.faceUV;
+  const auto& faceColors = options.faceColors;
   Float32Array colors;
 
-  Vector3 scaleVector(width / 2.f, height / 2.f, depth / 2.f);
-
   // Create each face in turn.
-  for (unsigned int index = 0; index < normalsSource.size(); ++index) {
-    auto& normal = normalsSource[index];
-
-    // Get two vectors perpendicular to the face normal and to each other.
-    Vector3 side1(normal.y, normal.z, normal.x);
-    auto side2 = Vector3::Cross(normal, side1);
-
-    // Six indices (two triangles) per face.
-    int32_t verticesLength = static_cast<int32_t>(positions.size() / 3);
-    indices.emplace_back(verticesLength);
-    indices.emplace_back(verticesLength + 1);
-    indices.emplace_back(verticesLength + 2);
-
-    indices.emplace_back(verticesLength);
-    indices.emplace_back(verticesLength + 2);
-    indices.emplace_back(verticesLength + 3);
-
-    // Four vertices per face.
-    auto vertex = normal.subtract(side1).subtract(side2).multiply(scaleVector);
-    stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-    stl_util::concat(normals, {normal.x, normal.y, normal.z});
+  for (auto index = 0u; index < nbFaces; index++) {
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].w});
-    if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
-    }
-
-    vertex = normal.subtract(side1).add(side2).multiply(scaleVector);
-    stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-    stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].w});
-    if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
-    }
-
-    vertex = normal.add(side1).add(side2).multiply(scaleVector);
-    stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-    stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].x, faceUV[index].y});
-    if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
-    }
-
-    vertex = normal.add(side1).subtract(side2).multiply(scaleVector);
-    stl_util::concat(positions, {vertex.x, vertex.y, vertex.z});
-    stl_util::concat(normals, {normal.x, normal.y, normal.z});
     stl_util::concat(uvs, {faceUV[index].z, faceUV[index].y});
     if (!faceColors.empty()) {
-      stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
-                                faceColors[index].b, faceColors[index].a});
+      for (auto c = 0u; c < 4; c++) {
+        stl_util::concat(colors, {faceColors[index].r, faceColors[index].g,
+                                  faceColors[index].b, faceColors[index].a});
+      }
     }
   }
 
@@ -885,10 +903,10 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
   vertexData->uvs       = std::move(uvs);
 
   if (!faceColors.empty()) {
-    if (sideOrientation == Mesh::DOUBLESIDE) {
-      colors.insert(colors.end(), colors.begin(), colors.end());
-    }
-    vertexData->colors = std::move(colors);
+    auto totalColors = (sideOrientation == VertexData::DOUBLESIDE) ?
+                         stl_util::concat(colors, colors) :
+                         colors;
+    vertexData->colors = totalColors;
   }
 
   return vertexData;

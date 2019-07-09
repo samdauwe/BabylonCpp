@@ -9,6 +9,7 @@
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
 #include <babylon/particles/solid_particle_system.h>

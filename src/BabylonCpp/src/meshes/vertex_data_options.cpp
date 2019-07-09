@@ -5,51 +5,6 @@
 namespace BABYLON {
 
 //------------------------------------------------------------------------------
-// Box mesh options
-//------------------------------------------------------------------------------
-
-std::array<Vector4, 6> BoxOptions::DefaultBoxFaceUV{
-  {Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
-   Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
-   Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f)}};
-std::array<Color4, 6> BoxOptions::DefaultBoxFaceColors{
-  {Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
-   Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
-   Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f)}};
-Vector4 BoxOptions::DefaultFrontUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-Vector4 BoxOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-
-BoxOptions::BoxOptions()
-    : width{1.f}
-    , height{1.f}
-    , depth{1.f}
-    , faceUV{DefaultBoxFaceUV}
-    , faceColors{DefaultBoxFaceColors}
-    , sideOrientation{Mesh::DEFAULTSIDE}
-    , frontUVs{DefaultFrontUVs}
-    , backUVs{DefaultBackUVs}
-    , updatable{false}
-{
-}
-
-BoxOptions::BoxOptions(float size)
-    : width{size}
-    , height{size}
-    , depth{size}
-    , faceUV{DefaultBoxFaceUV}
-    , faceColors{DefaultBoxFaceColors}
-    , sideOrientation{Mesh::DEFAULTSIDE}
-    , frontUVs{DefaultFrontUVs}
-    , backUVs{DefaultBackUVs}
-    , updatable{false}
-{
-}
-
-BoxOptions::~BoxOptions()
-{
-}
-
-//------------------------------------------------------------------------------
 // Cylinder or cone mesh options
 //------------------------------------------------------------------------------
 

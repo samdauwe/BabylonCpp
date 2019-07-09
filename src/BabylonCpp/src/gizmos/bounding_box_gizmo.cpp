@@ -8,6 +8,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/meshes/abstract_mesh.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
@@ -210,10 +211,11 @@ BoundingBoxGizmo::BoundingBoxGizmo(
   for (unsigned int i = 0; i < 2; i++) {
     for (unsigned int j = 0; j < 2; j++) {
       for (unsigned int k = 0; k < 2; k++) {
-        BoxOptions boxOptions{0.1f};
-        auto box      = MeshBuilder::CreateBox("", boxOptions,
+        BoxOptions boxOptions;
+        boxOptions.size = 0.1f;
+        auto box        = MeshBuilder::CreateBox("", boxOptions,
                                           gizmoLayer->utilityLayerScene.get());
-        box->material = coloredMaterial;
+        box->material   = coloredMaterial;
 
         // Dragging logic
         auto dragAxis = Vector3(i == 0 ? -1.f : 1.f, j == 0 ? -1.f : 1.f,
@@ -593,8 +595,9 @@ MeshPtr BoundingBoxGizmo::MakeNotPickableAndWrapInBoundingBox(Mesh* mesh)
   mesh->position().set(0.f, 0.f, 0.f);
 
   // Update bounding dimensions/positions
-  BoxOptions options(1.f);
-  auto box = MeshBuilder::CreateBox("box", options, mesh->getScene());
+  BoxOptions options;
+  options.size = 1.f;
+  auto box     = MeshBuilder::CreateBox("box", options, mesh->getScene());
   auto boundingMinMax = mesh->getHierarchyBoundingVectors();
   boundingMinMax.max.subtractToRef(boundingMinMax.min, box->scaling());
   box->position().set((boundingMinMax.max.x + boundingMinMax.min.x) / 2.f,

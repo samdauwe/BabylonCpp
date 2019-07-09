@@ -6,6 +6,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -44,7 +45,8 @@ void AnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   auto box1          = Mesh::CreateBox("Box1", 10.f, scene);
   box1->position().x = -20.f;
   // - Box 2
-  BoxOptions options(10.f);
+  BoxOptions options;
+  options.size          = 10.f;
   options.faceColors[0] = Color4(1.f, 0.f, 0.f, 1.f);   // Red
   options.faceColors[5] = Color4(1.f, 1.f, 0.f, 1.f);   // Yellow
   options.faceColors[1] = Color4(0.f, 1.f, 0.f, 1.f);   // Green

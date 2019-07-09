@@ -991,9 +991,10 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr CreateBox(const std::string& name, float size = 1.f,
-                           Scene* = nullptr, bool updatable = false,
-                           unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static MeshPtr
+  CreateBox(const std::string& name, float size = 1.f, Scene* = nullptr,
+            const std::optional<bool>& updatable               = std::nullopt,
+            const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a sphere mesh. Please consider using the same method from

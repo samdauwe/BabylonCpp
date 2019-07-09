@@ -29,6 +29,8 @@
 #include <babylon/meshes/_instances_batch.h>
 #include <babylon/meshes/_visible_instances.h>
 #include <babylon/meshes/buffer.h>
+#include <babylon/meshes/builders/box_builder.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/instanced_mesh.h>
@@ -2663,13 +2665,15 @@ MeshPtr Mesh::CreateDisc(const std::string& iName, float radius,
 }
 
 MeshPtr Mesh::CreateBox(const std::string& iName, float size, Scene* scene,
-                        bool updatable, unsigned int sideOrientation)
+                        const std::optional<bool>& updatable,
+                        const std::optional<unsigned int>& sideOrientation)
 {
-  BoxOptions options(size);
+  BoxOptions options;
+  options.size            = size;
   options.sideOrientation = sideOrientation;
   options.updatable       = updatable;
 
-  return MeshBuilder::CreateBox(iName, options, scene);
+  return BoxBuilder::CreateBox(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateSphere(const std::string& iName, unsigned int segments,

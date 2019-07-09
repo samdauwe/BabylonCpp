@@ -20,40 +20,6 @@ using LinesMeshPtr = std::shared_ptr<LinesMesh>;
 using MeshPtr      = std::shared_ptr<Mesh>;
 
 //------------------------------------------------------------------------------
-// Box mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to create a box mesh.
- */
-class BABYLON_SHARED_EXPORT BoxOptions {
-
-public:
-  /** Statics **/
-  static std::array<Vector4, 6> DefaultBoxFaceUV;
-  static std::array<Color4, 6> DefaultBoxFaceColors;
-  static Vector4 DefaultFrontUVs;
-  static Vector4 DefaultBackUVs;
-
-public:
-  BoxOptions();
-  BoxOptions(float size);
-  ~BoxOptions();
-
-public:
-  float width;
-  float height;
-  float depth;
-  std::array<Vector4, 6> faceUV;
-  std::array<Color4, 6> faceColors;
-  unsigned int sideOrientation;
-  Vector4 frontUVs;
-  Vector4 backUVs;
-  bool updatable;
-
-}; // end of class BoxOptions
-
-//------------------------------------------------------------------------------
 // Cylinder or cone mesh options
 //------------------------------------------------------------------------------
 

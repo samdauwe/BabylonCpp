@@ -10,6 +10,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/math/quaternion.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -73,7 +74,8 @@ void TubeAnimationScene::initializeScene(ICanvas* canvas, Scene* scene)
   mat1->alpha        = 1.f;
   mat1->diffuseColor = Color3(0.5f, 0.5f, 1.f);
 
-  BoxOptions options(2.f);
+  BoxOptions options;
+  options.size             = 2.f;
   options.faceColors[3]    = Color4(1.f, 0.f, 0.f, 1.f); // Red
   auto cube                = MeshBuilder::CreateBox("box", options, scene);
   cube->rotationQuaternion = Quaternion::Identity();

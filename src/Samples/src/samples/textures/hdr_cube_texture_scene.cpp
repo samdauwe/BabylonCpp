@@ -5,6 +5,7 @@
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/hdr_cube_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
 
@@ -36,7 +37,8 @@ void HDRCubeTextureScene::initializeScene(ICanvas* canvas, Scene* scene)
   PointLight::New("point", Vector3(20.f, 20.f, 10.f), scene);
 
   // Skybox
-  BoxOptions boxOptions(1000.f);
+  BoxOptions boxOptions;
+  boxOptions.size     = 1000.f;
   auto skybox         = MeshBuilder::CreateBox("SkyBox", boxOptions, scene);
   auto skyboxMaterial = StandardMaterial::New("skyBox", scene);
   skyboxMaterial->backFaceCulling = false;

@@ -4,6 +4,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -67,7 +68,8 @@ void MultiViewsScene::initializeScene(ICanvas* canvas, Scene* scene)
     Color3::Yellow(), // faceColors[5]
   }};
 
-  BoxOptions boxOptions(2.f);
+  BoxOptions boxOptions;
+  boxOptions.size       = 2.f;
   boxOptions.faceColors = std::move(faceColors);
   auto box              = MeshBuilder::CreateBox("Box", boxOptions, scene);
   box->material         = StandardMaterial::New("", scene);
