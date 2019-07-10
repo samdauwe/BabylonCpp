@@ -30,6 +30,9 @@
 #include <babylon/meshes/_visible_instances.h>
 #include <babylon/meshes/buffer.h>
 #include <babylon/meshes/builders/box_builder.h>
+#include <babylon/meshes/builders/cylinder_builder.h>
+#include <babylon/meshes/builders/decal_builder.h>
+#include <babylon/meshes/builders/disc_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/ground_mesh.h>
@@ -2653,7 +2656,8 @@ MeshPtr Mesh::CreateRibbon(const std::string& iName,
 
 MeshPtr Mesh::CreateDisc(const std::string& iName, float radius,
                          unsigned int tessellation, Scene* scene,
-                         bool updatable, unsigned int sideOrientation)
+                         const std::optional<bool>& updatable,
+                         const std::optional<unsigned int>& sideOrientation)
 {
   DiscOptions options;
   options.radius          = radius;
@@ -2661,7 +2665,7 @@ MeshPtr Mesh::CreateDisc(const std::string& iName, float radius,
   options.sideOrientation = sideOrientation;
   options.updatable       = updatable;
 
-  return MeshBuilder::CreateDisc(iName, options, scene);
+  return DiscBuilder::CreateDisc(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateBox(const std::string& iName, float size, Scene* scene,
@@ -2696,7 +2700,8 @@ MeshPtr Mesh::CreateCylinder(const std::string& iName, float height,
                              float diameterTop, float diameterBottom,
                              unsigned int tessellation,
                              unsigned int subdivisions, Scene* scene,
-                             bool updatable, unsigned int sideOrientation)
+                             const std::optional<bool>& updatable,
+                             const std::optional<unsigned int>& sideOrientation)
 {
   CylinderOptions options;
   options.height          = height;
@@ -2707,7 +2712,7 @@ MeshPtr Mesh::CreateCylinder(const std::string& iName, float height,
   options.sideOrientation = sideOrientation;
   options.updatable       = updatable;
 
-  return MeshBuilder::CreateCylinder(iName, options, scene);
+  return CylinderBuilder::CreateCylinder(iName, options, scene);
 }
 
 // Torus
@@ -2967,7 +2972,7 @@ MeshPtr Mesh::CreateDecal(const std::string& iName,
   options.size     = size;
   options.angle    = angle;
 
-  return MeshBuilder::CreateDecal(iName, sourceMesh, options);
+  return DecalBuilder::CreateDecal(iName, sourceMesh, options);
 }
 
 Float32Array& Mesh::setPositionsForCPUSkinning()

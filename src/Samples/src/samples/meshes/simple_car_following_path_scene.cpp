@@ -5,6 +5,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
 #include <babylon/math/axis.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
@@ -84,7 +85,8 @@ void SimpleCarFollowingPathScene::initializeScene(ICanvas* canvas, Scene* scene)
                             &wheelMaterial](const std::string& wheelName,
                                             const Vector3& position) {
     // Create wheel front inside and apply material
-    CylinderOptions cylinderOptions(3.f);
+    CylinderOptions cylinderOptions;
+    cylinderOptions.diameter     = 3.f;
     cylinderOptions.height       = 1.f;
     cylinderOptions.tessellation = 24;
     // - Set color for wheel tread as black

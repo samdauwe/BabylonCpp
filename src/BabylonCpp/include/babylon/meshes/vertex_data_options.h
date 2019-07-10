@@ -20,50 +20,6 @@ using LinesMeshPtr = std::shared_ptr<LinesMesh>;
 using MeshPtr      = std::shared_ptr<Mesh>;
 
 //------------------------------------------------------------------------------
-// Cylinder or cone mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to create a cylinder or cone mesh.
- */
-class BABYLON_SHARED_EXPORT CylinderOptions {
-
-public:
-  /** Statics **/
-  static std::vector<Vector4> DefaultCylinderFaceUV;
-  static std::vector<Color4> DefaultCylinderFaceColors;
-  static Vector4 DefaultFrontUVs;
-  static Vector4 DefaultBackUVs;
-
-public:
-  CylinderOptions();
-  CylinderOptions(float diameter);
-  ~CylinderOptions();
-
-  float arc() const;
-  void setArc(float value);
-
-public:
-  float height;
-  float diameterTop;
-  float diameterBottom;
-  unsigned int tessellation;
-  unsigned int subdivisions;
-  bool hasRings;
-  bool enclose;
-  std::vector<Vector4> faceUV;
-  std::vector<Color4> faceColors;
-  unsigned int sideOrientation;
-  Vector4 frontUVs;
-  Vector4 backUVs;
-  bool updatable;
-
-private:
-  float _arc;
-
-}; // end of class CylinderOptions
-
-//------------------------------------------------------------------------------
 // Dashed lines mesh options
 //------------------------------------------------------------------------------
 
@@ -85,62 +41,6 @@ public:
   LinesMeshPtr instance;
 
 }; // end of class DashedLinesOptions
-
-//------------------------------------------------------------------------------
-// Decal mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to create a decal mesh.
- */
-class BABYLON_SHARED_EXPORT DecalOptions {
-
-public:
-  DecalOptions();
-  ~DecalOptions();
-
-public:
-  Vector3 position;
-  Vector3 normal;
-  Vector3 size;
-  float angle;
-  bool calculateNormal;
-
-}; // end of class DecalOptions
-
-//------------------------------------------------------------------------------
-// Disc mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to create a disc mesh.
- */
-class BABYLON_SHARED_EXPORT DiscOptions {
-
-public:
-  /** Statics **/
-  static Vector4 DefaultFrontUVs;
-  static Vector4 DefaultBackUVs;
-
-public:
-  DiscOptions();
-  ~DiscOptions();
-
-  float arc() const;
-  void setArc(float value);
-
-public:
-  float radius;
-  unsigned int tessellation;
-  unsigned int sideOrientation;
-  Vector4 frontUVs;
-  Vector4 backUVs;
-  bool updatable;
-
-private:
-  float _arc;
-
-}; // end of class DiscOptions
 
 //------------------------------------------------------------------------------
 // Extrude shape mesh options

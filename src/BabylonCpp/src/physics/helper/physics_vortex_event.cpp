@@ -2,6 +2,7 @@
 
 #include <babylon/culling/ray.h>
 #include <babylon/engines/scene.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -143,14 +144,15 @@ void PhysicsVortexEvent::_tick()
 
     impostor->applyForce(impostorForceAndContactPoint->force,
                          impostorForceAndContactPoint->contactPoint);
-  };
+  }
 }
 
 void PhysicsVortexEvent::_prepareCylinder()
 {
   if (!_cylinder) {
-    CylinderOptions options(_radius * 2.f);
-    options.height = _height;
+    CylinderOptions options;
+    options.diameter = _radius * 2.f;
+    options.height   = _height;
     _cylinder
       = MeshBuilder::CreateCylinder("vortexEventCylinder", options, _scene);
     _cylinder->isVisible = false;

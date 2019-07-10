@@ -977,8 +977,9 @@ public:
    */
   static MeshPtr CreateDisc(const std::string& name, float radius = 0.5f,
                             unsigned int tessellation = 64, Scene* = nullptr,
-                            bool updatable               = false,
-                            unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+                            const std::optional<bool>& updatable = std::nullopt,
+                            const std::optional<unsigned int>& sideOrientation
+                            = std::nullopt);
 
   /**
    * @brief Creates a box mesh. Please consider using the same method from the
@@ -1033,12 +1034,12 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr
-  CreateCylinder(const std::string& name, float height = 2.f,
-                 float diameterTop = 1.f, float diameterBottom = 1.f,
-                 unsigned int tessellation = 24, unsigned int subdivisions = 1,
-                 Scene* = nullptr, bool updatable = false,
-                 unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static MeshPtr CreateCylinder(
+    const std::string& name, float height = 2.f, float diameterTop = 1.f,
+    float diameterBottom = 1.f, unsigned int tessellation = 24,
+    unsigned int subdivisions = 1, Scene* = nullptr,
+    const std::optional<bool>& updatable               = std::nullopt,
+    const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   // Torus  (Code from SharpDX.org)
   /**

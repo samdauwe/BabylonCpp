@@ -39,6 +39,83 @@ public:
 
 }; // end of class BoxOptions
 
+//------------------------------------------------------------------------------
+// Cylinder or cone mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a cylinder or cone mesh.
+ */
+class BABYLON_SHARED_EXPORT CylinderOptions {
+
+public:
+  CylinderOptions();
+  ~CylinderOptions();
+
+public:
+  std::optional<float> height;
+  std::optional<float> diameterTop;
+  std::optional<float> diameterBottom;
+  std::optional<float> diameter;
+  std::optional<unsigned int> tessellation;
+  std::optional<unsigned int> subdivisions;
+  std::optional<float> arc;
+  std::vector<Color4> faceColors;
+  std::vector<Vector4> faceUV;
+  std::optional<bool> updatable;
+  std::optional<bool> hasRings;
+  std::optional<bool> enclose;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
+
+}; // end of class CylinderOptions
+
+//------------------------------------------------------------------------------
+// Decal mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a decal mesh.
+ */
+class BABYLON_SHARED_EXPORT DecalOptions {
+
+public:
+  DecalOptions();
+  ~DecalOptions();
+
+public:
+  std::optional<Vector3> position;
+  std::optional<Vector3> normal;
+  std::optional<Vector3> size;
+  std::optional<float> angle;
+
+}; // end of class DecalOptions
+
+//------------------------------------------------------------------------------
+// Disc mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a disc mesh.
+ */
+class BABYLON_SHARED_EXPORT DiscOptions {
+
+public:
+  DiscOptions();
+  ~DiscOptions();
+
+public:
+  std::optional<float> radius;
+  std::optional<unsigned int> tessellation;
+  std::optional<float> arc;
+  std::optional<bool> updatable;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
+
+}; // end of class DiscOptions
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MESHES_BUILDERS_BOX_BUILDER_H

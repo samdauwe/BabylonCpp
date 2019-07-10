@@ -81,7 +81,7 @@ void DecalsScene::initializeScene(ICanvas* canvas, Scene* scene)
             newDecal->material = _decalMaterial;
           }
         };
-      };
+      }
 
       canvas->addMouseEventListener(EventType::MOUSE_BUTTON_DOWN,
                                     _onPointerDown, false);

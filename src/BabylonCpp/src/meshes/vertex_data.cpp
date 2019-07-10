@@ -266,7 +266,7 @@ VertexData& VertexData::transform(const Matrix& matrix)
   if (!positions.empty()) {
     auto position = Vector3::Zero();
 
-    for (unsigned int index = 0; index < positions.size(); index += 3) {
+    for (uint32_t index = 0; index < positions.size(); index += 3) {
       Vector3::FromArrayToRef(positions, index, position);
 
       Vector3::TransformCoordinatesToRef(position, matrix, transformed);
@@ -279,7 +279,7 @@ VertexData& VertexData::transform(const Matrix& matrix)
   if (!normals.empty()) {
     auto normal = Vector3::Zero();
 
-    for (unsigned int index = 0; index < normals.size(); index += 3) {
+    for (uint32_t index = 0; index < normals.size(); index += 3) {
       Vector3::FromArrayToRef(normals, index, normal);
 
       Vector3::TransformNormalToRef(normal, matrix, transformed);
@@ -293,7 +293,7 @@ VertexData& VertexData::transform(const Matrix& matrix)
     auto tangent            = Vector4::Zero();
     auto tangentTransformed = Vector4::Zero();
 
-    for (unsigned int index = 0; index < tangents.size(); index += 4) {
+    for (uint32_t index = 0; index < tangents.size(); index += 4) {
       Vector4::FromArrayToRef(tangents, index, tangent);
 
       Vector4::TransformNormalToRef(tangent, matrix, tangentTransformed);
@@ -319,7 +319,7 @@ VertexData& VertexData::merge(VertexData& other, bool /*use32BitsIndices*/)
   other._validate();
 
   if (!other.indices.empty()) {
-    unsigned int offset
+    uint32_t offset
       = (!positions.empty()) ? static_cast<unsigned>(positions.size()) / 3 : 0;
     for (auto& index : other.indices) {
       indices.emplace_back(static_cast<int32_t>(index + offset));
@@ -631,7 +631,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
       uTotalDistance[p] = dist;
     }
 
-    lg[p]  = static_cast<unsigned int>(l + closePathCorr);
+    lg[p]  = static_cast<uint32_t>(l + closePathCorr);
     idx[p] = static_cast<uint32_t>(idc);
     idc += (l + closePathCorr);
   }
@@ -696,12 +696,12 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   }
 
   // indices
-  p                 = 0;
-  unsigned int pi   = 0;
-  unsigned int l1   = lg[p] - 1;           // path1 length
-  unsigned int l2   = lg[p + 1] - 1;       // path2 length
-  unsigned int min  = (l1 < l2) ? l1 : l2; // current path stop index
-  unsigned int shft = idx[1] - idx[0];     // shift
+  p             = 0;
+  uint32_t pi   = 0;
+  uint32_t l1   = lg[p] - 1;           // path1 length
+  uint32_t l2   = lg[p + 1] - 1;       // path2 length
+  uint32_t min  = (l1 < l2) ? l1 : l2; // current path stop index
+  uint32_t shft = idx[1] - idx[0];     // shift
   size_t path1nb
     = closeArray ? lg.size() : lg.size() - 1; // number of path1 to iterate on
 
@@ -766,7 +766,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   Float32Array colors;
   if (!customColors.empty()) {
     colors.resize(customColors.size() * 4);
-    for (unsigned int c = 0; c < customColors.size(); ++c) {
+    for (uint32_t c = 0; c < customColors.size(); ++c) {
       colors[c * 4]     = customColors[c].r;
       colors[c * 4 + 1] = customColors[c].g;
       colors[c * 4 + 2] = customColors[c].b;
@@ -795,7 +795,7 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 
 std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 {
-  unsigned int nbFaces = 6;
+  uint32_t nbFaces = 6;
   IndicesArray indices{0,  1,  2,  0,  2,  3,  4,  5,  6,  4,  6,  7,
                        8,  9,  10, 8,  10, 11, 12, 13, 14, 12, 14, 15,
                        16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
@@ -924,21 +924,21 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 
   Vector3 radius(diameterX / 2.f, diameterY / 2.f, diameterZ / 2.f);
 
-  const unsigned int totalZRotationSteps = 2 + segments;
-  const unsigned int totalYRotationSteps = 2 * totalZRotationSteps;
+  const uint32_t totalZRotationSteps = 2 + segments;
+  const uint32_t totalYRotationSteps = 2 * totalZRotationSteps;
 
   IndicesArray indices;
   Float32Array positions;
   Float32Array normals;
   Float32Array uvs;
 
-  for (unsigned int zRotationStep = 0; zRotationStep <= totalZRotationSteps;
+  for (uint32_t zRotationStep = 0; zRotationStep <= totalZRotationSteps;
        ++zRotationStep) {
     float normalizedZ = static_cast<float>(zRotationStep)
                         / static_cast<float>(totalZRotationSteps);
     float angleZ = normalizedZ * Math::PI * slice;
 
-    for (unsigned int yRotationStep = 0; yRotationStep <= totalYRotationSteps;
+    for (uint32_t yRotationStep = 0; yRotationStep <= totalYRotationSteps;
          ++yRotationStep) {
       float normalizedY = static_cast<float>(yRotationStep)
                           / static_cast<float>(totalYRotationSteps);
@@ -993,23 +993,29 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 // Cylinder and cone
 std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 {
-  const auto& height          = options.height;
-  const auto& diameterTop     = options.diameterTop;
-  const auto& diameterBottom  = options.diameterBottom;
-  const auto& tessellation    = options.tessellation;
-  const auto& subdivisions    = options.subdivisions;
-  const auto& hasRings        = options.hasRings;
-  const auto& enclose         = options.enclose;
-  const auto arc              = options.arc();
-  const auto& sideOrientation = options.sideOrientation;
-  auto& faceUV                = options.faceUV;
-  auto& faceColors            = options.faceColors;
-
+  auto height = options.height.value_or(2.f);
+  auto diameterTop
+    = options.diameterTop.value_or(options.diameter.value_or(1.f));
+  auto diameterBottom
+    = options.diameterBottom.value_or(options.diameter.value_or(1.f));
+  auto tessellation = options.tessellation.value_or(24);
+  auto subdivisions = options.subdivisions.value_or(1.f);
+  auto hasRings     = options.hasRings.value_or(false);
+  auto enclose      = options.enclose.value_or(false);
+  auto arc
+    = options.arc.has_value() ?
+        ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+        1.f;
+  auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  auto& faceUV     = options.faceUV;
+  auto& faceColors = options.faceColors;
   // default face colors and UV if undefined
-  unsigned int quadNb    = (arc != 1.f && enclose) ? 2 : 0;
-  unsigned int ringNb    = (hasRings) ? subdivisions : 1;
-  unsigned int surfaceNb = 2 + (1 + quadNb) * ringNb;
-  unsigned int f;
+  uint32_t quadNb    = (arc != 1.f && enclose) ? 2 : 0;
+  uint32_t ringNb    = (hasRings) ? subdivisions : 1;
+  uint32_t surfaceNb = 2 + (1 + quadNb) * ringNb;
+  uint32_t f;
+
   for (f = 0; f < surfaceNb; ++f) {
     if (!faceColors.empty() && f >= faceColors.size()) {
       faceColors.emplace_back(Color4(1.f, 1.f, 1.f, 1.f));
@@ -1027,11 +1033,11 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   Float32Array uvs;
   Float32Array colors;
 
-  float angle_step = Math::PI * 2.f * arc / static_cast<float>(tessellation);
-  float angle;
-  float h;
-  float radius;
-  float _tan           = (diameterBottom - diameterTop) / 2.f / height;
+  auto angle_step      = Math::PI2 * arc / static_cast<float>(tessellation);
+  auto angle           = 0.f;
+  auto h               = 0.f;
+  auto radius          = 0.f;
+  auto _tan            = (diameterBottom - diameterTop) / 2.f / height;
   auto ringVertex      = Vector3::Zero();
   auto ringNormal      = Vector3::Zero();
   auto ringFirstVertex = Vector3::Zero();
@@ -1040,13 +1046,13 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
   auto Y               = Axis::Y();
 
   // positions, normals, uvs
-  unsigned int i;
-  unsigned int j;
-  unsigned int r;
-  unsigned int ringIdx = 1;
-  unsigned int s       = 1; // surface index
-  unsigned int cs      = 0;
-  float v              = 0.f;
+  uint32_t i;
+  uint32_t j;
+  uint32_t r;
+  uint32_t ringIdx = 1;
+  uint32_t s       = 1; // surface index
+  uint32_t cs      = 0;
+  float v          = 0.f;
 
   for (i = 0; i <= subdivisions; ++i) {
     h       = static_cast<float>(i) / static_cast<float>(subdivisions);
@@ -1157,12 +1163,12 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
 
   // indices
   // correction of number of iteration if enclose
-  unsigned int e = (!stl_util::almost_equal(arc, 1.f) && enclose) ?
-                     tessellation + 4 :
-                     tessellation;
+  uint32_t e = (!stl_util::almost_equal(arc, 1.f) && enclose) ?
+                 tessellation + 4 :
+                 tessellation;
   i = 0;
   for (s = 0; s < subdivisions; ++s) {
-    unsigned int i0 = 0, i1 = 0, i2 = 0, i3 = 0;
+    uint32_t i0 = 0, i1 = 0, i2 = 0, i3 = 0;
     for (j = 0; j < tessellation; ++j) {
       i0 = i * (e + 1) + j;
       i1 = (i + 1) * (e + 1) + j;
@@ -1192,7 +1198,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     float _angle;
     Vector3 circleVector;
     Vector2 textureCoordinate;
-    Vector4 u               = (isTop) ? faceUV[surfaceNb - 1] : faceUV[0];
+    Vector4 u               = isTop ? faceUV[surfaceNb - 1] : faceUV[0];
     std::optional<Color4> c = std::nullopt;
     if (!faceColors.empty()) {
       c = (isTop) ? faceColors[surfaceNb - 1] : faceColors[0];
@@ -1202,19 +1208,19 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
     float offset   = isTop ? height / 2.f : -height / 2.f;
     Vector3 center(0.f, offset, 0.f);
     stl_util::concat(positions, {center.x, center.y, center.z});
-    stl_util::concat(normals, {0, isTop ? 1.f : -1.f, 0.f});
+    stl_util::concat(normals, {0.f, isTop ? 1.f : -1.f, 0.f});
     stl_util::concat(uvs, {u.x + (u.z - u.x) * 0.5f, u.y + (u.w - u.y) * 0.5f});
     if (c) {
-      auto& _c = *c;
+      const auto& _c = *c;
       stl_util::concat(colors, {_c.r, _c.g, _c.b, _c.a});
     }
 
     Vector2 textureScale(0.5f, 0.5f);
     for (i = 0; i <= tessellation; ++i) {
-      _angle = Math::PI * 2.f * static_cast<float>(i) * arc
+      _angle = Math::PI2 * static_cast<float>(i) * arc
                / static_cast<float>(tessellation);
-      float _cos   = std::cos(-_angle);
-      float _sin   = std::sin(-_angle);
+      auto _cos    = std::cos(-_angle);
+      auto _sin    = std::sin(-_angle);
       circleVector = Vector3(_cos * _radius, offset, _sin * _radius);
       textureCoordinate
         = Vector2(_cos * textureScale.x + 0.5f, _sin * textureScale.y + 0.5f);
@@ -1224,7 +1230,7 @@ std::unique_ptr<VertexData> VertexData::CreateCylinder(CylinderOptions& options)
       stl_util::concat(uvs, {u.x + (u.z - u.x) * textureCoordinate.x,
                              u.y + (u.w - u.y) * textureCoordinate.y});
       if (c) {
-        auto& _c = *c;
+        const auto& _c = *c;
         stl_util::concat(colors, {_c.r, _c.g, _c.b, _c.a});
       }
     }
@@ -1280,7 +1286,7 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
 
   auto tessellationf = static_cast<float>(tessellation);
 
-  for (unsigned int i = 0; i <= tessellation; ++i) {
+  for (uint32_t i = 0; i <= tessellation; ++i) {
     float u = static_cast<float>(i) / tessellationf;
 
     float outerAngle
@@ -1290,7 +1296,7 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
     auto transform
       = Matrix::Translation(diameter / 2.f, 0.f, 0.f).multiply(rotationY);
 
-    for (unsigned int j = 0; j <= tessellation; ++j) {
+    for (uint32_t j = 0; j <= tessellation; ++j) {
       float v = 1.f - static_cast<float>(j) / tessellationf;
 
       float innerAngle
@@ -1311,8 +1317,8 @@ std::unique_ptr<VertexData> VertexData::CreateTorus(TorusOptions& options)
       stl_util::concat(uvs, {textureCoordinate.x, textureCoordinate.y});
 
       // And create indices for two triangles.
-      unsigned int nextI = (i + 1) % stride;
-      unsigned int nextJ = (j + 1) % stride;
+      uint32_t nextI = (i + 1) % stride;
+      uint32_t nextJ = (j + 1) % stride;
 
       indices.emplace_back(i * stride + j);
       indices.emplace_back(i * stride + nextJ);
@@ -1347,7 +1353,7 @@ VertexData::CreateLineSystem(LineSystemOptions& options)
   const auto& lines  = options.lines;
   const auto& colors = options.colors;
   Float32Array vertexColors;
-  unsigned int idx = 0;
+  uint32_t idx = 0;
 
   for (size_t l = 0; l < lines.size(); ++l) {
     const auto& points = lines[l];
@@ -1392,14 +1398,14 @@ VertexData::CreateDashedLines(DashedLinesOptions& options)
   Float32Array positions;
   Uint32Array indices;
 
-  auto curvect     = Vector3::Zero();
-  auto lg          = 0.f;
-  auto nb          = 0.f;
-  auto shft        = 0.f;
-  auto dashshft    = 0.f;
-  auto curshft     = 0.f;
-  unsigned int idx = 0;
-  size_t i         = 0;
+  auto curvect  = Vector3::Zero();
+  auto lg       = 0.f;
+  auto nb       = 0.f;
+  auto shft     = 0.f;
+  auto dashshft = 0.f;
+  auto curshft  = 0.f;
+  uint32_t idx  = 0;
+  size_t i      = 0;
   for (i = 0; i < points.size() - 1; ++i) {
     points[i + 1].subtractToRef(points[i], curvect);
     lg += curvect.length();
@@ -1508,17 +1514,17 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
   Float32Array positions;
   Float32Array normals;
   Float32Array uvs;
-  unsigned int row, col, tileRow, tileCol;
+  uint32_t row, col, tileRow, tileCol;
 
   subdivisions.height = (subdivisions.width < 1) ? 1 : subdivisions.height;
   subdivisions.width  = (subdivisions.width < 1) ? 1 : subdivisions.width;
   precision.width     = (precision.width < 1) ? 1 : precision.width;
   precision.height    = (precision.height < 1) ? 1 : precision.height;
 
-  unsigned int subdivisions_h = static_cast<unsigned>(subdivisions.height);
-  unsigned int subdivisions_w = static_cast<unsigned>(subdivisions.width);
-  unsigned int precision_h    = static_cast<unsigned>(precision.height);
-  unsigned int precision_w    = static_cast<unsigned>(precision.width);
+  uint32_t subdivisions_h = static_cast<unsigned>(subdivisions.height);
+  uint32_t subdivisions_w = static_cast<unsigned>(subdivisions.width);
+  uint32_t precision_h    = static_cast<unsigned>(precision.height);
+  uint32_t precision_w    = static_cast<unsigned>(precision.width);
 
   SizeF tileSize = {(xmax - xmin) / static_cast<float>(subdivisions.width), //
                     (zmax - zmin) / static_cast<float>(subdivisions.height)};
@@ -1526,11 +1532,11 @@ VertexData::CreateTiledGround(TiledGroundOptions& options)
   auto applyTile
     = [&](float xTileMin, float zTileMin, float xTileMax, float zTileMax) {
         // Indices
-        unsigned int base      = static_cast<unsigned>(positions.size() / 3);
-        unsigned int rowLength = precision_w + 1;
+        uint32_t base      = static_cast<unsigned>(positions.size() / 3);
+        uint32_t rowLength = precision_w + 1;
         for (row = 0; row < precision_h; ++row) {
           for (col = 0; col < precision_w; ++col) {
-            std::array<unsigned int, 4> square
+            std::array<uint32_t, 4> square
               = {{base + col + row * rowLength,             //
                   base + (col + 1) + row * rowLength,       //
                   base + (col + 1) + (row + 1) * rowLength, //
@@ -1597,7 +1603,7 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
   Float32Array positions;
   Float32Array normals;
   Float32Array uvs;
-  unsigned int row, col;
+  uint32_t row, col;
   float rowf, colf;
 
   const auto& width        = options.width;
@@ -1624,17 +1630,16 @@ VertexData::CreateGroundFromHeightMap(GroundFromHeightMapOptions& options)
       );
 
       // Compute height
-      unsigned int heightMapX = static_cast<unsigned>(
+      uint32_t heightMapX = static_cast<unsigned>(
         ((position.x + width / 2.f) / width) * (bufferWidth - 1.f));
-      unsigned int heightMapY = static_cast<unsigned>(
+      uint32_t heightMapY = static_cast<unsigned>(
         (1.f - (position.z + height / 2.f) / height) * (bufferHeight - 1.f));
 
-      const unsigned int pos
-        = (heightMapX + heightMapY * options.bufferWidth) * 4;
-      const auto r = static_cast<float>(buffer[pos]) / 255.f;
-      const auto g = static_cast<float>(buffer[pos + 1]) / 255.f;
-      const auto b = static_cast<float>(buffer[pos + 2]) / 255.f;
-      const auto a = static_cast<float>(buffer[pos + 3]) / 255.f;
+      const uint32_t pos = (heightMapX + heightMapY * options.bufferWidth) * 4;
+      const auto r       = static_cast<float>(buffer[pos]) / 255.f;
+      const auto g       = static_cast<float>(buffer[pos + 1]) / 255.f;
+      const auto b       = static_cast<float>(buffer[pos + 2]) / 255.f;
+      const auto a       = static_cast<float>(buffer[pos + 3]) / 255.f;
 
       const auto gradient = r * filter.r + g * filter.g + b * filter.b;
 
@@ -1760,22 +1765,26 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  const auto& radius          = options.radius;
-  const auto& tessellation    = options.tessellation;
-  const auto arc              = options.arc();
-  const auto& sideOrientation = options.sideOrientation;
+  auto radius       = options.radius.value_or(0.5f);
+  auto tessellation = options.tessellation.value_or(64);
+  auto arc
+    = options.arc.has_value() ?
+        ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+        1.f;
+  auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   // positions and uvs
   stl_util::concat(positions, {0.f, 0.f, 0.f}); // disc center first
   stl_util::concat(uvs, {0.5f, 0.5f});
 
-  float theta = Math::PI2 * arc;
-  float step  = theta / static_cast<float>(tessellation);
-  for (float a = 0.f; a < theta; a += step) {
-    float x = std::cos(a);
-    float y = std::sin(a);
-    float u = (x + 1.f) / 2.f;
-    float v = (1.f - y) / 2.f;
+  auto theta = Math::PI2 * arc;
+  auto step  = theta / static_cast<float>(tessellation);
+  for (auto a = 0.f; a < theta; a += step) {
+    auto x = std::cos(a);
+    auto y = std::sin(a);
+    auto u = (x + 1.f) / 2.f;
+    auto v = (1.f - y) / 2.f;
     stl_util::concat(positions, {radius * x, radius * y, 0.f});
     stl_util::concat(uvs, {u, v});
   }
@@ -1787,7 +1796,7 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
 
   // indices
   size_t vertexNb = positions.size() / 3;
-  for (unsigned int i = 1; i < vertexNb - 1; ++i) {
+  for (uint32_t i = 1; i < vertexNb - 1; ++i) {
     stl_util::concat(indices, {i + 1, 0, i});
   }
 
@@ -1808,7 +1817,7 @@ std::unique_ptr<VertexData> VertexData::CreateDisc(DiscOptions& options)
 }
 
 std::unique_ptr<VertexData> VertexData::CreatePolygon(
-  Mesh* polygon, unsigned int sideOrientation, const std::vector<Vector4>& fUV,
+  Mesh* polygon, uint32_t sideOrientation, const std::vector<Vector4>& fUV,
   const std::vector<Color4>& fColors, Vector4& frontUVs, Vector4& backUVs)
 {
   auto faceUV     = fUV;
@@ -1819,7 +1828,7 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
   faceColors.resize(3);
 
   // default face colors and UV if undefined
-  for (unsigned int f = 0; f < 3; ++f) {
+  for (uint32_t f = 0; f < 3; ++f) {
     if (f >= fUV.size()) {
       faceUV[f] = Vector4(0, 0, 1, 1);
     }
@@ -1834,9 +1843,9 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
   auto indices   = polygon->getIndices();
 
   // set face colours and textures
-  unsigned int idx  = 0;
-  unsigned int face = 0;
-  for (unsigned int index = 0; index < normals.size(); index += 3) {
+  uint32_t idx  = 0;
+  uint32_t face = 0;
+  for (uint32_t index = 0; index < normals.size(); index += 3) {
     // Edge Face  no. 1
     if (std::abs(normals[index + 1]) < 0.001f) {
       face = 1;
@@ -1903,7 +1912,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   }};
 
   // index of 3 vertex makes a face of icopshere
-  const std::array<unsigned int, 60> ico_indices = {{
+  const std::array<uint32_t, 60> ico_indices = {{
     0,  11, 5,  0,  5,  1,  0,  1,  7,  0,  7,  10, 12, 22, 23, //
     1,  5,  20, 5,  11, 4,  23, 22, 13, 22, 18, 6,  7,  1,  8,  //
     14, 21, 4,  14, 4,  2,  16, 13, 6,  15, 6,  19, 3,  8,  9,  //
@@ -1911,7 +1920,7 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   }};
 
   // vertex for uv have aliased position, not for UV
-  const std::array<unsigned int, 24> vertices_unalias_id = {{
+  const std::array<uint32_t, 24> vertices_unalias_id = {{
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
     // vertex alias
     0,  // 12: 0 + 12
@@ -2011,22 +2020,22 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  unsigned int current_indice = 0;
+  uint32_t current_indice = 0;
   // prepare array of 3 vector (empty) (to be worked in place, shared for each
   // face)
   std::array<Vector3, 3> face_vertex_pos;
   std::array<Vector2, 3> face_vertex_uv;
-  unsigned int v012;
+  uint32_t v012;
   for (v012 = 0; v012 < 3; ++v012) {
     face_vertex_pos[v012] = Vector3::Zero();
     face_vertex_uv[v012]  = Vector2::Zero();
   }
   // create all with normals
-  for (unsigned int face = 0; face < 20; ++face) {
+  for (uint32_t face = 0; face < 20; ++face) {
     // 3 vertex per face
     for (v012 = 0; v012 < 3; ++v012) {
       // look up vertex 0,1,2 to its index in 0 to 11 (or 23 including alias)
-      const unsigned int v_id = ico_indices[3 * face + v012];
+      const uint32_t v_id = ico_indices[3 * face + v012];
       // vertex have 3D position (x,y,z)
       face_vertex_pos[v012].copyFromFloats(
         ico_vertices[3 * vertices_unalias_id[v_id]],
@@ -2084,69 +2093,68 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
      *  (c1,c2) are used for centroid location
      */
 
-    const auto interp_vertex
-      = [&](float i1, unsigned int i2, float c1, float c2) {
-          // vertex is interpolated from
-          //   - face_vertex_pos[0..2]
-          //   - face_vertex_uv[0..2]
-          const auto _div = static_cast<float>(i2) / subdivisionsf;
-          const auto pos_x0
-            = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2], _div);
-          const auto pos_x1
-            = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2], _div);
-          auto pos_interp
-            = (subdivisions == i2) ?
-                face_vertex_pos[2] :
-                Vector3::Lerp(pos_x0, pos_x1,
-                              i1 / static_cast<float>(subdivisions - i2));
-          pos_interp.normalize();
+    const auto interp_vertex = [&](float i1, uint32_t i2, float c1, float c2) {
+      // vertex is interpolated from
+      //   - face_vertex_pos[0..2]
+      //   - face_vertex_uv[0..2]
+      const auto _div = static_cast<float>(i2) / subdivisionsf;
+      const auto pos_x0
+        = Vector3::Lerp(face_vertex_pos[0], face_vertex_pos[2], _div);
+      const auto pos_x1
+        = Vector3::Lerp(face_vertex_pos[1], face_vertex_pos[2], _div);
+      auto pos_interp
+        = (subdivisions == i2) ?
+            face_vertex_pos[2] :
+            Vector3::Lerp(pos_x0, pos_x1,
+                          i1 / static_cast<float>(subdivisions - i2));
+      pos_interp.normalize();
 
-          Vector3 vertex_normal;
-          if (flat) {
-            // in flat mode, recalculate normal as face centroid normal
-            const auto centroid_x0 = Vector3::Lerp(
-              face_vertex_pos[0], face_vertex_pos[2], c2 / subdivisionsf);
-            const auto centroid_x1 = Vector3::Lerp(
-              face_vertex_pos[1], face_vertex_pos[2], c2 / subdivisionsf);
-            vertex_normal = Vector3::Lerp(centroid_x0, centroid_x1,
-                                          c1 / (subdivisionsf - c2));
-          }
-          else {
-            // in smooth mode, recalculate normal from each single vertex
-            // position
-            vertex_normal = Vector3(pos_interp.x, pos_interp.y, pos_interp.z);
-          }
-          // Vertex normal need correction due to X,Y,Z radius scaling
-          vertex_normal.x /= radiusX;
-          vertex_normal.y /= radiusY;
-          vertex_normal.z /= radiusZ;
-          vertex_normal.normalize();
+      Vector3 vertex_normal;
+      if (flat) {
+        // in flat mode, recalculate normal as face centroid normal
+        const auto centroid_x0 = Vector3::Lerp(
+          face_vertex_pos[0], face_vertex_pos[2], c2 / subdivisionsf);
+        const auto centroid_x1 = Vector3::Lerp(
+          face_vertex_pos[1], face_vertex_pos[2], c2 / subdivisionsf);
+        vertex_normal
+          = Vector3::Lerp(centroid_x0, centroid_x1, c1 / (subdivisionsf - c2));
+      }
+      else {
+        // in smooth mode, recalculate normal from each single vertex
+        // position
+        vertex_normal = Vector3(pos_interp.x, pos_interp.y, pos_interp.z);
+      }
+      // Vertex normal need correction due to X,Y,Z radius scaling
+      vertex_normal.x /= radiusX;
+      vertex_normal.y /= radiusY;
+      vertex_normal.z /= radiusZ;
+      vertex_normal.normalize();
 
-          const auto uv_x0
-            = Vector2::Lerp(face_vertex_uv[0], face_vertex_uv[2], _div);
-          const auto uv_x1
-            = Vector2::Lerp(face_vertex_uv[1], face_vertex_uv[2], _div);
-          const auto uv_interp
-            = (subdivisions == i2) ?
-                face_vertex_uv[2] :
-                Vector2::Lerp(uv_x0, uv_x1,
-                              i1 / (subdivisionsf - static_cast<float>(i2)));
-          stl_util::concat(positions,
-                           {pos_interp.x * radiusX, pos_interp.y * radiusY,
-                            pos_interp.z * radiusZ});
-          stl_util::concat(normals,
-                           {vertex_normal.x, vertex_normal.y, vertex_normal.z});
-          stl_util::concat(uvs, {uv_interp.x, uv_interp.y});
-          // push each vertex has member of a face
-          // Same vertex can bleong to multiple face, it is pushed multiple time
-          // (duplicate vertex are present)
-          indices.emplace_back(current_indice);
-          ++current_indice;
-        };
+      const auto uv_x0
+        = Vector2::Lerp(face_vertex_uv[0], face_vertex_uv[2], _div);
+      const auto uv_x1
+        = Vector2::Lerp(face_vertex_uv[1], face_vertex_uv[2], _div);
+      const auto uv_interp
+        = (subdivisions == i2) ?
+            face_vertex_uv[2] :
+            Vector2::Lerp(uv_x0, uv_x1,
+                          i1 / (subdivisionsf - static_cast<float>(i2)));
+      stl_util::concat(positions,
+                       {pos_interp.x * radiusX, pos_interp.y * radiusY,
+                        pos_interp.z * radiusZ});
+      stl_util::concat(normals,
+                       {vertex_normal.x, vertex_normal.y, vertex_normal.z});
+      stl_util::concat(uvs, {uv_interp.x, uv_interp.y});
+      // push each vertex has member of a face
+      // Same vertex can bleong to multiple face, it is pushed multiple time
+      // (duplicate vertex are present)
+      indices.emplace_back(current_indice);
+      ++current_indice;
+    };
 
-    for (unsigned int i2 = 0; i2 < subdivisions; ++i2) {
+    for (uint32_t i2 = 0; i2 < subdivisions; ++i2) {
       const auto i2f = static_cast<float>(i2);
-      for (unsigned int i1 = 0; i1 + i2 < subdivisions; ++i1) {
+      for (uint32_t i1 = 0; i1 + i2 < subdivisions; ++i1) {
         const auto i1f = static_cast<float>(i1);
         // face : (i1,i2)  for /\  :
         // interp for : (i1,i2),(i1+1,i2),(i1,i2+1)
@@ -2501,11 +2509,11 @@ VertexData::CreatePolyhedron(PolyhedronOptions& options)
   Float32Array normals;
   Float32Array uvs;
   Float32Array colors;
-  unsigned int index = 0;
-  size_t faceIdx     = 0; // face cursor in the array "indexes"
+  uint32_t index = 0;
+  size_t faceIdx = 0; // face cursor in the array "indexes"
   Uint32Array indexes;
-  unsigned int i = 0;
-  unsigned int f = 0;
+  uint32_t i = 0;
+  uint32_t f = 0;
   float u, v, ang, x, y, tmp;
 
   // default face colors and UV if undefined
@@ -2621,12 +2629,12 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
   };
 
   // Vertices
-  unsigned int i;
-  unsigned int j;
-  unsigned int modJ;
+  uint32_t i;
+  uint32_t j;
+  uint32_t modJ;
   float v, cx, cy;
   for (i = 0; i <= radialSegments; ++i) {
-    unsigned int modI = i % radialSegments;
+    uint32_t modI = i % radialSegments;
 
     auto u    = static_cast<float>(modI) / radialSegmentsf * 2.f * p * Math::PI;
     auto p1   = getPos(u);
@@ -2656,8 +2664,8 @@ VertexData::CreateTorusKnot(TorusKnotOptions& options)
     }
   }
 
-  unsigned int jNext;
-  unsigned int a, b, c, d;
+  uint32_t jNext;
+  uint32_t a, b, c, d;
   for (i = 0; i < radialSegments; ++i) {
     for (j = 0; j < tubularSegments; ++j) {
       jNext = (j + 1) % tubularSegments;
@@ -2705,7 +2713,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   }
 
   // temporary scalar variables
-  unsigned int index         = 0;   // facet index
+  uint32_t index             = 0;   // facet index
   float p1p2x                = 0.f; // p1p2 vector x coordinate
   float p1p2y                = 0.f; // p1p2 vector y coordinate
   float p1p2z                = 0.f; // p1p2 vector z coordinate
@@ -2716,15 +2724,15 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   float faceNormaly          = 0.f; // facet normal y coordinate
   float faceNormalz          = 0.f; // facet normal z coordinate
   float length               = 0.f; // facet normal length before normalization
-  unsigned int v1x           = 0;   // vector1 x index in the positions array
-  unsigned int v1y           = 0;   // vector1 y index in the positions array
-  unsigned int v1z           = 0;   // vector1 z index in the positions array
-  unsigned int v2x           = 0;   // vector2 x index in the positions array
-  unsigned int v2y           = 0;   // vector2 y index in the positions array
-  unsigned int v2z           = 0;   // vector2 z index in the positions array
-  unsigned int v3x           = 0;   // vector3 x index in the positions array
-  unsigned int v3y           = 0;   // vector3 y index in the positions array
-  unsigned int v3z           = 0;   // vector3 z index in the positions array
+  uint32_t v1x               = 0;   // vector1 x index in the positions array
+  uint32_t v1y               = 0;   // vector1 y index in the positions array
+  uint32_t v1z               = 0;   // vector1 z index in the positions array
+  uint32_t v2x               = 0;   // vector2 x index in the positions array
+  uint32_t v2y               = 0;   // vector2 y index in the positions array
+  uint32_t v2z               = 0;   // vector2 z index in the positions array
+  uint32_t v3x               = 0;   // vector3 x index in the positions array
+  uint32_t v3y               = 0;   // vector3 y index in the positions array
+  uint32_t v3z               = 0;   // vector3 z index in the positions array
   bool computeFacetNormals   = false;
   bool computeFacetPositions = false;
   bool computeFacetPartitioning     = false;
@@ -2751,27 +2759,27 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   }
 
   // facetPartitioning reinit if needed
-  float xSubRatio    = 0.f;
-  float ySubRatio    = 0.f;
-  float zSubRatio    = 0.f;
-  unsigned int subSq = 0;
+  float xSubRatio = 0.f;
+  float ySubRatio = 0.f;
+  float zSubRatio = 0.f;
+  uint32_t subSq  = 0;
 
-  unsigned int ox           = 0; // X partitioning index for facet position
-  unsigned int oy           = 0; // Y partinioning index for facet position
-  unsigned int oz           = 0; // Z partinioning index for facet position
-  unsigned int b1x          = 0; // X partitioning index for facet v1 vertex
-  unsigned int b1y          = 0; // Y partitioning index for facet v1 vertex
-  unsigned int b1z          = 0; // z partitioning index for facet v1 vertex
-  unsigned int b2x          = 0; // X partitioning index for facet v2 vertex
-  unsigned int b2y          = 0; // Y partitioning index for facet v2 vertex
-  unsigned int b2z          = 0; // Z partitioning index for facet v2 vertex
-  unsigned int b3x          = 0; // X partitioning index for facet v3 vertex
-  unsigned int b3y          = 0; // Y partitioning index for facet v3 vertex
-  unsigned int b3z          = 0; // Z partitioning index for facet v3 vertex
-  unsigned int block_idx_o  = 0; // facet barycenter block index
-  unsigned int block_idx_v1 = 0; // v1 vertex block index
-  unsigned int block_idx_v2 = 0; // v2 vertex block index
-  unsigned int block_idx_v3 = 0; // v3 vertex block index
+  uint32_t ox           = 0; // X partitioning index for facet position
+  uint32_t oy           = 0; // Y partinioning index for facet position
+  uint32_t oz           = 0; // Z partinioning index for facet position
+  uint32_t b1x          = 0; // X partitioning index for facet v1 vertex
+  uint32_t b1y          = 0; // Y partitioning index for facet v1 vertex
+  uint32_t b1z          = 0; // z partitioning index for facet v1 vertex
+  uint32_t b2x          = 0; // X partitioning index for facet v2 vertex
+  uint32_t b2y          = 0; // Y partitioning index for facet v2 vertex
+  uint32_t b2z          = 0; // Z partitioning index for facet v2 vertex
+  uint32_t b3x          = 0; // X partitioning index for facet v3 vertex
+  uint32_t b3y          = 0; // Y partitioning index for facet v3 vertex
+  uint32_t b3z          = 0; // Z partitioning index for facet v3 vertex
+  uint32_t block_idx_o  = 0; // facet barycenter block index
+  uint32_t block_idx_v1 = 0; // v1 vertex block index
+  uint32_t block_idx_v2 = 0; // v2 vertex block index
+  uint32_t block_idx_v3 = 0; // v3 vertex block index
 
   if (computeFacetPartitioning && options && (*options).bbSize) {
     const auto& bbSize = *options->bbSize;
@@ -2879,7 +2887,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
       block_idx_v3 = b3x + options->subDiv.max * b3y + subSq * b3z;
       block_idx_o  = ox + options->subDiv.max * oy + subSq * oz;
 
-      const std::array<unsigned int, 4> block_idxs{
+      const std::array<uint32_t, 4> block_idxs{
         {block_idx_o, block_idx_v1, block_idx_v2, block_idx_v3}};
       for (auto& block_idx : block_idxs) {
         // Check if facetPartitioning needs to be resized
@@ -2942,7 +2950,7 @@ void VertexData::ComputeNormals(const Float32Array& positions,
   }
 }
 
-void VertexData::_ComputeSides(unsigned int sideOrientation,
+void VertexData::_ComputeSides(uint32_t sideOrientation,
                                Float32Array& positions, Uint32Array& indices,
                                Float32Array& normals, Float32Array& uvs,
                                const std::optional<Vector4>& iFrontUVs,
@@ -2973,12 +2981,12 @@ void VertexData::_ComputeSides(unsigned int sideOrientation,
       break;
     case Mesh::DOUBLESIDE:
       // positions
-      size_t lp      = positions.size();
-      unsigned int l = static_cast<unsigned>(lp / 3);
+      size_t lp  = positions.size();
+      uint32_t l = static_cast<unsigned>(lp / 3);
       if (positions.size() < 2 * lp) {
         positions.resize(2 * lp);
       }
-      for (unsigned int p = 0; p < lp; ++p) {
+      for (uint32_t p = 0; p < lp; ++p) {
         positions[lp + p] = positions[p];
       }
       // indices

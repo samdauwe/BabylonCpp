@@ -10,6 +10,7 @@
 #include <babylon/math/axis.h>
 #include <babylon/math/color4.h>
 #include <babylon/math/tmp.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_buffer.h>

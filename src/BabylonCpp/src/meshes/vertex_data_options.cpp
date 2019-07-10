@@ -5,67 +5,6 @@
 namespace BABYLON {
 
 //------------------------------------------------------------------------------
-// Cylinder or cone mesh options
-//------------------------------------------------------------------------------
-
-std::vector<Vector4> CylinderOptions::DefaultCylinderFaceUV{
-  {Vector4(0.f, 0.f, 1.f, 1.f), Vector4(0.f, 0.f, 1.f, 1.f),
-   Vector4(0.f, 0.f, 1.f, 1.f)}};
-std::vector<Color4> CylinderOptions::DefaultCylinderFaceColors{
-  {Color4(1.f, 1.f, 1.f, 1.f), Color4(1.f, 1.f, 1.f, 1.f),
-   Color4(1.f, 1.f, 1.f, 1.f)}};
-Vector4 CylinderOptions::DefaultFrontUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-Vector4 CylinderOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-
-CylinderOptions::CylinderOptions()
-    : height{2.f}
-    , diameterTop{1.f}
-    , diameterBottom{1.f}
-    , tessellation{24}
-    , subdivisions{1}
-    , hasRings{false}
-    , enclose{false}
-    , faceUV{DefaultCylinderFaceUV}
-    , sideOrientation{Mesh::DEFAULTSIDE}
-    , frontUVs{DefaultFrontUVs}
-    , backUVs{DefaultBackUVs}
-    , updatable{false}
-    , _arc{1.f}
-{
-}
-
-CylinderOptions::CylinderOptions(float diameter)
-    : height{2.f}
-    , diameterTop{diameter}
-    , diameterBottom{diameter}
-    , tessellation{24}
-    , subdivisions{1}
-    , hasRings{false}
-    , enclose{false}
-    , faceUV{DefaultCylinderFaceUV}
-    , sideOrientation{Mesh::DEFAULTSIDE}
-    , frontUVs{DefaultFrontUVs}
-    , backUVs{DefaultBackUVs}
-    , updatable{false}
-    , _arc{1.f}
-{
-}
-
-CylinderOptions::~CylinderOptions()
-{
-}
-
-float CylinderOptions::arc() const
-{
-  return _arc;
-}
-
-void CylinderOptions::setArc(float value)
-{
-  _arc = (value <= 0 || value > 1) ? 1.f : value;
-}
-
-//------------------------------------------------------------------------------
 // Dashed lines mesh options
 //------------------------------------------------------------------------------
 
@@ -80,55 +19,6 @@ DashedLinesOptions::DashedLinesOptions()
 
 DashedLinesOptions::~DashedLinesOptions()
 {
-}
-
-//------------------------------------------------------------------------------
-// Decal mesh options
-//------------------------------------------------------------------------------
-
-DecalOptions::DecalOptions()
-    : position{Vector3::Zero()}
-    , normal{Vector3::Up()}
-    , size{Vector3::One()}
-    , angle{0.f}
-    , calculateNormal{false}
-{
-}
-
-DecalOptions::~DecalOptions()
-{
-}
-
-//------------------------------------------------------------------------------
-// Disc mesh options
-//------------------------------------------------------------------------------
-
-Vector4 DiscOptions::DefaultFrontUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-Vector4 DiscOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-
-DiscOptions::DiscOptions()
-    : radius{0.5f}
-    , tessellation{64}
-    , sideOrientation{Mesh::DEFAULTSIDE}
-    , frontUVs{DefaultFrontUVs}
-    , backUVs{DefaultBackUVs}
-    , updatable{false}
-    , _arc{1.f}
-{
-}
-
-DiscOptions::~DiscOptions()
-{
-}
-
-float DiscOptions::arc() const
-{
-  return _arc;
-}
-
-void DiscOptions::setArc(float value)
-{
-  _arc = (value <= 0 || value > 1) ? 1.f : value;
 }
 
 //------------------------------------------------------------------------------

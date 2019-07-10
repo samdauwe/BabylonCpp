@@ -35,13 +35,12 @@ struct BABYLON_SHARED_EXPORT DecalBuilder {
    * @param name defines the name of the mesh
    * @param sourceMesh defines the mesh where the decal must be applied
    * @param options defines the options used to create the mesh
-   * @param scene defines the hosting scene
    * @returns the decal mesh
    * @see https://doc.babylonjs.com/how_to/decals
    */
   static MeshPtr CreateDecal(const std::string& name,
-                             const AbstractMesh& sourceMesh,
-                             DecalOptions& options, Scene* scene = nullptr);
+                             const AbstractMeshPtr& sourceMesh,
+                             DecalOptions& options);
 
 }; // end of struct DecalBuilder
 

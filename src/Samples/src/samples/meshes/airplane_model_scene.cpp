@@ -4,6 +4,7 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/spot_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data.h>
@@ -70,7 +71,8 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   const auto createCylinderOptions1
     = [](float diameter, float diameterTop, float height,
          unsigned int tessellation) -> CylinderOptions {
-    CylinderOptions options(diameter);
+    CylinderOptions options;
+    options.diameter     = diameter;
     options.diameterTop  = diameterTop;
     options.height       = height;
     options.tessellation = tessellation;
@@ -80,7 +82,8 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   const auto createCylinderOptions2
     = [](float diameter, float height,
          unsigned int tessellation) -> CylinderOptions {
-    CylinderOptions options(diameter);
+    CylinderOptions options;
+    options.diameter     = diameter;
     options.height       = height;
     options.tessellation = tessellation;
     return options;
