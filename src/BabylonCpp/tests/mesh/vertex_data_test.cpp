@@ -139,7 +139,8 @@ TEST(TestVertexData, CreateSphere)
   // Create test data
   const unsigned int segments = 1;
   const float diameter        = 0.01f;
-  SphereOptions options(diameter);
+  SphereOptions options;
+  options.diameter = diameter;
   options.segments = segments;
   auto sphere      = VertexData::CreateSphere(options);
   // Set expected results

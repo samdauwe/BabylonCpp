@@ -62,8 +62,9 @@ void CartoonAnimationsScene::initializeScene(ICanvas* canvas, Scene* scene)
   door->position().x  = -1.f;
 
   // Lights
-  SphereOptions spereOptions(0.2f);
-  auto sphereLight = MeshBuilder::CreateSphere("sphere", spereOptions, scene);
+  SphereOptions sphereOptions;
+  sphereOptions.diameter = 0.2f;
+  auto sphereLight = MeshBuilder::CreateSphere("sphere", sphereOptions, scene);
   auto sphereMaterial           = StandardMaterial::New("", scene);
   sphereMaterial->emissiveColor = Color3(1.f, 1.f, 1.f);
   sphereLight->material         = sphereMaterial;

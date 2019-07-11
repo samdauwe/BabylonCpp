@@ -1010,10 +1010,10 @@ public:
    * (http://doc.babylonjs.com/babylon101/discover_basic_elements#side-orientation)
    * @returns a new Mesh
    */
-  static MeshPtr CreateSphere(const std::string& name,
-                              unsigned int segments = 32, float diameter = 1.f,
-                              Scene* = nullptr, bool updatable = false,
-                              unsigned int sideOrientation = Mesh::DEFAULTSIDE);
+  static MeshPtr CreateSphere(
+    const std::string& name, unsigned int segments = 32, float diameter = 1.f,
+    Scene* = nullptr, const std::optional<bool>& updatable = std::nullopt,
+    const std::optional<unsigned int>& sideOrientation = std::nullopt);
 
   /**
    * @brief Creates a cylinder or a cone mesh. Please consider using the same
@@ -1357,6 +1357,13 @@ public:
     unsigned int maxHeight, Scene*, bool updatable = false,
     const std::function<void(GroundMesh* mesh)>& onReady = nullptr,
     std::optional<float> alphaFilter                     = std::nullopt);
+
+  /**
+   * @brief Creates a hemisphere mesh.
+   */
+  static MeshPtr CreateHemisphere(const std::string& name,
+                                  unsigned int segments, float diameter,
+                                  Scene* scene = nullptr);
 
   /**
    * @brief Creates a tube mesh.

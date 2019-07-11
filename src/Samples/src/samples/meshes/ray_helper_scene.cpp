@@ -4,6 +4,7 @@
 #include <babylon/engines/scene.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -65,8 +66,9 @@ void RayHelperScene::initializeScene(ICanvas* canvas, Scene* scene)
   _boxTarget->showBoundingBox = true;
   _ground->showBoundingBox    = true;
 
-  SphereOptions options(0.15f);
-  _sphere = MeshBuilder::CreateSphere("sphere", options, scene);
+  SphereOptions options;
+  options.diameter = 0.15f;
+  _sphere          = MeshBuilder::CreateSphere("sphere", options, scene);
   _sphere->setEnabled(false);
 
   _meshes = {_boxTarget.get(), _ground.get()};

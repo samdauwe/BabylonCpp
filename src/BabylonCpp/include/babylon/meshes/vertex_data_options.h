@@ -162,78 +162,6 @@ public:
 }; // end of class GroundOptions
 
 //------------------------------------------------------------------------------
-// Icosphere mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to create a icosphere mesh.
- */
-class BABYLON_SHARED_EXPORT IcoSphereOptions {
-
-public:
-  /** Statics **/
-  static Vector4 DefaultFrontUVs;
-  static Vector4 DefaultBackUVs;
-
-public:
-  IcoSphereOptions();
-  IcoSphereOptions(float radius);
-  ~IcoSphereOptions();
-
-public:
-  float radius;
-  float radiusX;
-  float radiusY;
-  float radiusZ;
-  bool flat;
-  unsigned int subdivisions;
-  unsigned int sideOrientation;
-  Vector4 frontUVs;
-  Vector4 backUVs;
-  bool updatable;
-
-}; // end of class IcoSphereOptions
-
-//------------------------------------------------------------------------------
-// Lathe mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to a lathe mesh.
- */
-class BABYLON_SHARED_EXPORT LatheOptions {
-
-public:
-  /** Statics **/
-  static Vector4 DefaultFrontUVs;
-  static Vector4 DefaultBackUVs;
-
-public:
-  LatheOptions();
-  ~LatheOptions();
-
-  float arc() const;
-  void setArc(float value);
-
-public:
-  std::vector<Vector3> shape;
-  float radius;
-  unsigned int tessellation;
-  unsigned int clip;
-  bool closed;
-  bool updatable;
-  unsigned int sideOrientation;
-  Vector4 frontUVs;
-  Vector4 backUVs;
-  unsigned int cap;
-  bool invertUV;
-
-private:
-  float _arc;
-
-}; // end of class LatheOptions
-
-//------------------------------------------------------------------------------
 // Lines mesh options
 //------------------------------------------------------------------------------
 
@@ -410,46 +338,6 @@ private:
   size_t _offset;
 
 }; // end of class RibbonOptions
-
-//------------------------------------------------------------------------------
-// Sphere mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to create a sphere mesh.
- */
-class BABYLON_SHARED_EXPORT SphereOptions {
-
-public:
-  /** Statics **/
-  static Vector4 DefaultFrontUVs;
-  static Vector4 DefaultBackUVs;
-
-public:
-  SphereOptions();
-  SphereOptions(float diameter);
-  ~SphereOptions();
-
-  float arc() const;
-  void setArc(float value);
-  float slice() const;
-  void setSlice(float value);
-
-public:
-  unsigned int segments;
-  float diameterX;
-  float diameterY;
-  float diameterZ;
-  unsigned int sideOrientation;
-  Vector4 frontUVs;
-  Vector4 backUVs;
-  bool updatable;
-
-private:
-  float _arc;
-  float _slice;
-
-}; // end of class SphereOptions
 
 //------------------------------------------------------------------------------
 // Tiled ground mesh options

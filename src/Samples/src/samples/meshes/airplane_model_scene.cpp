@@ -50,8 +50,9 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   const auto createSphereOptions1
     = [](float diameter, float slice, unsigned int segments, bool updatable,
          unsigned int sideOrientation) -> SphereOptions {
-    SphereOptions options(diameter);
-    options.setSlice(slice);
+    SphereOptions options;
+    options.diameter        = diameter;
+    options.slice           = slice;
     options.segments        = segments;
     options.updatable       = updatable;
     options.sideOrientation = sideOrientation;
@@ -61,7 +62,8 @@ void AirplaneModelScene::initializeScene(ICanvas* canvas, Scene* scene)
   const auto createSphereOptions2
     = [](float diameter, unsigned int segments, bool updatable,
          unsigned int sideOrientation) -> SphereOptions {
-    SphereOptions options(diameter);
+    SphereOptions options;
+    options.diameter        = diameter;
     options.segments        = segments;
     options.updatable       = updatable;
     options.sideOrientation = sideOrientation;

@@ -2,16 +2,18 @@
 #define BABYLON_PHYSICS_HELPER_PHYSICS_RADIAL_EXPLOSION_EVENT_H
 
 #include <babylon/babylon_api.h>
-#include <babylon/meshes/vertex_data_options.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/physics/helper/physics_helper_enums.h>
 
 namespace BABYLON {
 
+class Mesh;
 struct PhysicsForceAndContactPoint;
 class PhysicsImpostor;
 struct PhysicsRadialExplosionEventData;
 class Ray;
 class Scene;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 /**
  * @brief Represents a physics radial explosion event.

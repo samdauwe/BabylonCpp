@@ -109,8 +109,9 @@ BoundingBoxGizmo::BoundingBoxGizmo(
     = AbstractMesh::New("", gizmoLayer->utilityLayerScene.get());
   _rotateSpheresParent->rotationQuaternion = Quaternion();
   for (unsigned int i = 0; i < 12; ++i) {
-    SphereOptions sphereOptions{1.f};
-    auto sphere = MeshBuilder::CreateSphere(
+    SphereOptions sphereOptions;
+    sphereOptions.diameter = 1.f;
+    auto sphere            = MeshBuilder::CreateSphere(
       "", sphereOptions, gizmoLayer->utilityLayerScene.get());
     sphere->rotationQuaternion = Quaternion();
     sphere->material           = coloredMaterial;

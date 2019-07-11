@@ -13,7 +13,10 @@
 #include <babylon/meshes/builders/cylinder_builder.h>
 #include <babylon/meshes/builders/decal_builder.h>
 #include <babylon/meshes/builders/disc_builder.h>
+#include <babylon/meshes/builders/ico_sphere_builder.h>
+#include <babylon/meshes/builders/lathe_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/sphere_builder.h>
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>
@@ -33,17 +36,7 @@ MeshPtr MeshBuilder::CreateBox(const std::string& name, BoxOptions& options,
 MeshPtr MeshBuilder::CreateSphere(const std::string& name,
                                   SphereOptions& options, Scene* scene)
 {
-  auto sphere = Mesh::New(name, scene);
-
-  options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation);
-  sphere->_originalBuilderSideOrientation = options.sideOrientation;
-
-  auto vertexData = VertexData::CreateSphere(options);
-
-  vertexData->applyToMesh(*sphere, options.updatable);
-
-  return sphere;
+  return SphereBuilder::CreateSphere(name, options, scene);
 }
 
 MeshPtr MeshBuilder::CreateDisc(const std::string& name, DiscOptions& options,
@@ -55,17 +48,7 @@ MeshPtr MeshBuilder::CreateDisc(const std::string& name, DiscOptions& options,
 MeshPtr MeshBuilder::CreateIcoSphere(const std::string& name,
                                      IcoSphereOptions& options, Scene* scene)
 {
-  auto sphere = Mesh::New(name, scene);
-
-  options.sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation);
-  sphere->_originalBuilderSideOrientation = options.sideOrientation;
-
-  auto vertexData = VertexData::CreateIcoSphere(options);
-
-  vertexData->applyToMesh(*sphere, options.updatable);
-
-  return sphere;
+  return IcoSphereBuilder::CreateIcoSphere(name, options, scene);
 }
 
 MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
@@ -420,54 +403,7 @@ MeshPtr MeshBuilder::ExtrudeShapeCustom(const std::string& name,
 MeshPtr MeshBuilder::CreateLathe(const std::string& name, LatheOptions& options,
                                  Scene* scene)
 {
-  const auto arc          = options.arc();
-  const auto& closed      = options.closed;
-  const auto& shape       = options.shape;
-  const auto& radius      = options.radius;
-  const auto tessellation = static_cast<float>(options.tessellation);
-  const auto clip         = static_cast<float>(options.clip);
-  const auto& updatable   = options.updatable;
-
-  const unsigned int sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation);
-  const auto& cap = options.cap;
-  const auto& pi2 = Math::PI2;
-  std::vector<std::vector<Vector3>> paths;
-  const auto& invertUV = options.invertUV;
-
-  const float step = pi2 / tessellation * arc;
-  Vector3 rotated;
-  for (float i = 0.f; i <= tessellation - clip; ++i) {
-    std::vector<Vector3> path;
-    if (cap == Mesh::CAP_START || cap == Mesh::CAP_ALL) {
-      path.emplace_back(Vector3(0.f, shape[0].y, 0.f));
-      path.emplace_back(Vector3(std::cos(i * step) * shape[0].x * radius,
-                                shape[0].y,
-                                std::sin(i * step) * shape[0].x * radius));
-    }
-    for (std::size_t p = 0; p < shape.size(); ++p) {
-      rotated = Vector3(std::cos(i * step) * shape[p].x * radius, shape[p].y,
-                        std::sin(i * step) * shape[p].x * radius);
-      path.emplace_back(rotated);
-    }
-    if (cap == Mesh::CAP_END || cap == Mesh::CAP_ALL) {
-      path.emplace_back(
-        Vector3(std::cos(i * step) * shape[shape.size() - 1].x * radius,
-                shape[shape.size() - 1].y,
-                std::sin(i * step) * shape[shape.size() - 1].x * radius));
-      path.emplace_back(Vector3(0.f, shape[shape.size() - 1].y, 0.f));
-    }
-    paths.emplace_back(path);
-  }
-
-  // lathe ribbon
-  RibbonOptions ribbonOptions(paths);
-  ribbonOptions.closeArray      = closed;
-  ribbonOptions.sideOrientation = sideOrientation;
-  ribbonOptions.updatable       = updatable;
-  ribbonOptions.invertUV        = invertUV;
-  auto lathe = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
-  return lathe;
+  return LatheBuilder::CreateLathe(name, options, scene);
 }
 
 MeshPtr MeshBuilder::CreatePlane(const std::string& name, PlaneOptions& options,

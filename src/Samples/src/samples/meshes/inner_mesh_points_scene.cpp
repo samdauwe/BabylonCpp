@@ -4,8 +4,8 @@
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/point_light.h>
 #include <babylon/materials/standard_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_data_options.h>
 #include <babylon/samples/meshes/mesh_utils.h>
 
 namespace BABYLON {
@@ -44,7 +44,8 @@ void InnerMeshPointsScene::initializeScene(ICanvas* canvas, Scene* scene)
 
   auto nbParticles = 5000ull;
   auto points      = tps->createInnerPoints(nbParticles);
-  SphereOptions options(0.05f);
+  SphereOptions options;
+  options.diameter = 0.05f;
   options.segments = 6u;
   auto sphere      = MeshBuilder::CreateSphere("point", options, scene);
   for (size_t p = 0; p < nbParticles; ++p) {

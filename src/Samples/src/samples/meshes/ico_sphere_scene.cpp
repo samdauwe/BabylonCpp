@@ -5,8 +5,8 @@
 #include <babylon/engines/scene.h>
 #include <babylon/interfaces/icanvas.h>
 #include <babylon/lights/hemispheric_light.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
-#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -42,7 +42,8 @@ void IcoSphereScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->intensity = 0.7f;
 
   // Create an icosphere
-  IcoSphereOptions options(2.f);
+  IcoSphereOptions options;
+  options.radius       = 2.f;
   options.flat         = true;
   options.subdivisions = 16;
   Mesh::CreateIcoSphere("icosphere", options, scene);

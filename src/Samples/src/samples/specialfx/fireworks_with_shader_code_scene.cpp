@@ -8,6 +8,7 @@
 #include <babylon/materials/effect.h>
 #include <babylon/materials/effect_shaders_store.h>
 #include <babylon/materials/shader_material.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
@@ -62,7 +63,8 @@ void FireworksWithShaderCodeScene::initializeScene(ICanvas* canvas,
   _shaderMaterial->backFaceCulling = false;
 
   // Create a built-in "sphere" shape
-  SphereOptions sphereOptions(10.f);
+  SphereOptions sphereOptions;
+  sphereOptions.diameter = 10.f;
   auto sphere = MeshBuilder::CreateSphere("sphere", sphereOptions, scene);
   sphere->convertToFlatShadedMesh();
   sphere->material = _shaderMaterial;

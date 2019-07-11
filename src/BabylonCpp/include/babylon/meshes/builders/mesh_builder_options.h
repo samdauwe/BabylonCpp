@@ -116,6 +116,110 @@ public:
 
 }; // end of class DiscOptions
 
+//------------------------------------------------------------------------------
+// Hemisphere mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a hemisphere mesh.
+ */
+class BABYLON_SHARED_EXPORT HemisphereOptions {
+
+public:
+  HemisphereOptions();
+  ~HemisphereOptions();
+
+public:
+  std::optional<unsigned int> segments;
+  std::optional<float> diameter;
+  std::optional<unsigned int> sideOrientation;
+
+}; // end of class HemisphereOptions
+
+//------------------------------------------------------------------------------
+// Icosphere mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a icosphere mesh.
+ */
+class BABYLON_SHARED_EXPORT IcoSphereOptions {
+
+public:
+  IcoSphereOptions();
+  ~IcoSphereOptions();
+
+public:
+  std::optional<float> radius;
+  std::optional<float> radiusX;
+  std::optional<float> radiusY;
+  std::optional<float> radiusZ;
+  std::optional<bool> flat;
+  std::optional<unsigned int> subdivisions;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
+  std::optional<bool> updatable;
+
+}; // end of class IcoSphereOptions
+
+//------------------------------------------------------------------------------
+// Lathe mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to a lathe mesh.
+ */
+class BABYLON_SHARED_EXPORT LatheOptions {
+
+public:
+  LatheOptions();
+  ~LatheOptions();
+
+public:
+  std::vector<Vector3> shape;
+  std::optional<float> radius;
+  std::optional<unsigned int> tessellation;
+  std::optional<unsigned int> clip;
+  std::optional<float> arc;
+  std::optional<bool> closed;
+  std::optional<bool> updatable;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
+  std::optional<unsigned int> cap;
+  std::optional<bool> invertUV;
+
+}; // end of class LatheOptions
+
+//------------------------------------------------------------------------------
+// Sphere mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a sphere mesh.
+ */
+class BABYLON_SHARED_EXPORT SphereOptions {
+
+public:
+  SphereOptions();
+  ~SphereOptions();
+
+public:
+  std::optional<unsigned int> segments;
+  std::optional<float> diameter;
+  std::optional<float> diameterX;
+  std::optional<float> diameterY;
+  std::optional<float> diameterZ;
+  std::optional<float> arc;
+  std::optional<float> slice;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
+  std::optional<bool> updatable;
+
+}; // end of class SphereOptions
+
 } // end of namespace BABYLON
 
 #endif // end of BABYLON_MESHES_BUILDERS_BOX_BUILDER_H

@@ -914,13 +914,19 @@ std::unique_ptr<VertexData> VertexData::CreateBox(BoxOptions& options)
 
 std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
 {
-  const auto& segments        = options.segments;
-  const auto& diameterX       = options.diameterX;
-  const auto& diameterY       = options.diameterY;
-  const auto& diameterZ       = options.diameterZ;
-  const auto arc              = options.arc();
-  const auto slice            = options.slice();
-  const auto& sideOrientation = options.sideOrientation;
+  auto segments  = options.segments.value_or(32);
+  auto diameterX = options.diameterX.value_or(options.diameter.value_or(1.f));
+  auto diameterY = options.diameterY.value_or(options.diameter.value_or(1.f));
+  auto diameterZ = options.diameterZ.value_or(options.diameter.value_or(1.f));
+  auto arc
+    = options.arc.has_value() ?
+        ((*options.arc <= 0.f || options.arc > 1.f) ? 1.f : *options.arc) :
+        1.f;
+  auto slice = options.slice.has_value() ?
+                 ((*options.slice <= 0.f) ? 1.f : *options.slice) :
+                 1.f;
+  auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
 
   Vector3 radius(diameterX / 2.f, diameterY / 2.f, diameterZ / 2.f);
 
@@ -932,18 +938,18 @@ std::unique_ptr<VertexData> VertexData::CreateSphere(SphereOptions& options)
   Float32Array normals;
   Float32Array uvs;
 
-  for (uint32_t zRotationStep = 0; zRotationStep <= totalZRotationSteps;
+  for (auto zRotationStep = 0u; zRotationStep <= totalZRotationSteps;
        ++zRotationStep) {
-    float normalizedZ = static_cast<float>(zRotationStep)
-                        / static_cast<float>(totalZRotationSteps);
-    float angleZ = normalizedZ * Math::PI * slice;
+    auto normalizedZ = static_cast<float>(zRotationStep)
+                       / static_cast<float>(totalZRotationSteps);
+    auto angleZ = normalizedZ * Math::PI * slice;
 
-    for (uint32_t yRotationStep = 0; yRotationStep <= totalYRotationSteps;
+    for (auto yRotationStep = 0u; yRotationStep <= totalYRotationSteps;
          ++yRotationStep) {
-      float normalizedY = static_cast<float>(yRotationStep)
-                          / static_cast<float>(totalYRotationSteps);
+      auto normalizedY = static_cast<float>(yRotationStep)
+                         / static_cast<float>(totalYRotationSteps);
 
-      float angleY = normalizedY * Math::PI * 2.f * arc;
+      auto angleY = normalizedY * Math::PI * 2.f * arc;
 
       auto rotationZ = Matrix::RotationZ(-angleZ);
       auto rotationY = Matrix::RotationY(angleY);
@@ -1893,16 +1899,17 @@ std::unique_ptr<VertexData> VertexData::CreatePolygon(
 std::unique_ptr<VertexData>
 VertexData::CreateIcoSphere(IcoSphereOptions& options)
 {
-  const auto& sideOrientation = options.sideOrientation;
-  const auto& radius          = options.radius;
-  const auto& flat            = options.flat;
-  const auto& subdivisions    = options.subdivisions;
-  const auto subdivisionsf    = static_cast<float>(subdivisions);
-  const auto& radiusX         = options.radiusX;
-  const auto& radiusY         = options.radiusY;
-  const auto& radiusZ         = options.radiusZ;
+  auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  auto radius        = options.radius.value_or(1.f);
+  auto flat          = options.flat.value_or(true);
+  auto subdivisions  = options.subdivisions.value_or(4);
+  auto subdivisionsf = static_cast<float>(subdivisions);
+  auto radiusX       = options.radiusX.value_or(radius);
+  auto radiusY       = options.radiusY.value_or(radius);
+  auto radiusZ       = options.radiusZ.value_or(radius);
 
-  const float t = (1.f + std::sqrt(5.f)) / 2.f;
+  const auto t = (1.f + std::sqrt(5.f)) / 2.f;
 
   // 12 vertex x,y,z
   const std::array<float, 36> ico_vertices = {{
@@ -1998,14 +2005,14 @@ VertexData::CreateIcoSphere(IcoSphereOptions& options)
    */
 
   // uv step is u:1 or 0.5, v:cos(30)=sqrt(3)/2, ratio approx is 84/97
-  const float ustep   = 138.f / 1024.f;
-  const float vstep   = 239.f / 1024.f;
-  const float uoffset = 60.f / 1024.f;
-  const float voffset = 26.f / 1024.f;
+  const auto ustep   = 138.f / 1024.f;
+  const auto vstep   = 239.f / 1024.f;
+  const auto uoffset = 60.f / 1024.f;
+  const auto voffset = 26.f / 1024.f;
   // Second island should have margin, not to touch the first island
   // avoid any borderline artefact in pixel rounding
-  const float island_u_offset = -40.f / 1024.f;
-  const float island_v_offset = +20.f / 1024.f;
+  const auto island_u_offset = -40.f / 1024.f;
+  const auto island_v_offset = +20.f / 1024.f;
   // face is either island 0 or 1 :
   // second island is for faces : [4, 7, 8, 12, 13, 16, 17, 18]
   std::array<float, 20> island = {{

@@ -154,7 +154,8 @@ AbstractMeshPtr PhysicsViewer::_getDebugBoxMesh(Scene* scene)
 AbstractMeshPtr PhysicsViewer::_getDebugSphereMesh(Scene* scene)
 {
   if (!_debugSphereMesh) {
-    SphereOptions options(1.f);
+    SphereOptions options;
+    options.diameter = 1.f;
     _debugSphereMesh
       = MeshBuilder::CreateSphere("physicsBodySphereViewMesh", options, scene);
     _debugSphereMesh->renderingGroupId   = 1;

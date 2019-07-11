@@ -95,4 +95,87 @@ DiscOptions::~DiscOptions()
 {
 }
 
+//------------------------------------------------------------------------------
+// Hemisphere mesh options
+//------------------------------------------------------------------------------
+
+HemisphereOptions::HemisphereOptions()
+    : segments{std::nullopt}
+    , diameter{std::nullopt}
+    , sideOrientation{std::nullopt}
+{
+}
+
+HemisphereOptions::~HemisphereOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Icosphere mesh options
+//------------------------------------------------------------------------------
+
+IcoSphereOptions::IcoSphereOptions()
+    : radius{std::nullopt}
+    , radiusX{std::nullopt}
+    , radiusY{std::nullopt}
+    , radiusZ{std::nullopt}
+    , flat{std::nullopt}
+    , subdivisions{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+    , updatable{std::nullopt}
+{
+}
+
+IcoSphereOptions::~IcoSphereOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Lathe mesh options
+//------------------------------------------------------------------------------
+
+LatheOptions::LatheOptions()
+    : radius{std::nullopt}
+    , tessellation{std::nullopt}
+    , clip{std::nullopt}
+    , arc{std::nullopt}
+    , closed{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+    , cap{std::nullopt}
+    , invertUV{std::nullopt}
+{
+}
+
+LatheOptions::~LatheOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Sphere mesh options
+//------------------------------------------------------------------------------
+
+SphereOptions::SphereOptions()
+    : segments{std::nullopt}
+    , diameter{std::nullopt}
+    , diameterX{std::nullopt}
+    , diameterY{std::nullopt}
+    , diameterZ{std::nullopt}
+    , arc{std::nullopt}
+    , slice{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+    , updatable{std::nullopt}
+{
+}
+
+SphereOptions::~SphereOptions()
+{
+}
+
 } // end of namespace BABYLON

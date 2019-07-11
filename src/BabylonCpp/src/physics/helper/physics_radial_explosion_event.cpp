@@ -14,7 +14,8 @@ namespace BABYLON {
 PhysicsRadialExplosionEvent::PhysicsRadialExplosionEvent(Scene* scene)
     : _scene{scene}, _sphere{nullptr}, _dataFetched{false}
 {
-  _sphereOptions          = SphereOptions(1.f);
+  _sphereOptions          = SphereOptions();
+  _sphereOptions.diameter = 1.f;
   _sphereOptions.segments = 32;
 }
 

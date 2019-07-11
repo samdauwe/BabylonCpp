@@ -2,6 +2,7 @@
 
 #include <babylon/cameras/arc_rotate_camera.h>
 #include <babylon/lights/point_light.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_data_options.h>
 
@@ -32,7 +33,8 @@ void PointLightScene::initializeScene(ICanvas* canvas, Scene* scene)
   light->diffuse  = Color3(1.f, 0.f, 0.f);
   light->specular = Color3(0.f, 1.f, 0.f);
 
-  SphereOptions options(1.5f);
+  SphereOptions options;
+  options.diameter     = 1.5f;
   auto sphere          = MeshBuilder::CreateSphere("sphere", options, scene);
   sphere->position().z = 1.25f;
 }

@@ -2,6 +2,7 @@
 
 #include <babylon/babylon_stl_util.h>
 #include <babylon/core/random.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/vertex_buffer.h>
 #include <babylon/meshes/vertex_data.h>
@@ -22,7 +23,8 @@ MeshPtr QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
 
   auto leaves = Mesh::New("leaves", scene);
 
-  SphereOptions options(sizeBranch);
+  SphereOptions options;
+  options.diameter = sizeBranch;
   options.segments = 4;
   auto vertexData  = VertexData::CreateSphere(options);
 
@@ -81,7 +83,7 @@ MeshPtr QuickTreeGenerator::CreateTree(float sizeBranch, float sizeTrunk,
       positions[i + 1] += ry;
       positions[i + 2] += rz;
     }
-  };
+  }
 
   leaves->setVerticesData(VertexBuffer::PositionKind, positions);
   Float32Array normals(positions.size());

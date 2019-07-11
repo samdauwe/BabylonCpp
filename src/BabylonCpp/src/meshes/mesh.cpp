@@ -33,7 +33,10 @@
 #include <babylon/meshes/builders/cylinder_builder.h>
 #include <babylon/meshes/builders/decal_builder.h>
 #include <babylon/meshes/builders/disc_builder.h>
+#include <babylon/meshes/builders/hemisphere_builder.h>
+#include <babylon/meshes/builders/ico_sphere_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/sphere_builder.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/instanced_mesh.h>
@@ -2681,8 +2684,9 @@ MeshPtr Mesh::CreateBox(const std::string& iName, float size, Scene* scene,
 }
 
 MeshPtr Mesh::CreateSphere(const std::string& iName, unsigned int segments,
-                           float diameter, Scene* scene, bool updatable,
-                           unsigned int sideOrientation)
+                           float diameter, Scene* scene,
+                           const std::optional<bool>& updatable,
+                           const std::optional<unsigned int>& sideOrientation)
 {
   SphereOptions options;
   options.segments        = segments;
@@ -2692,7 +2696,7 @@ MeshPtr Mesh::CreateSphere(const std::string& iName, unsigned int segments,
   options.sideOrientation = sideOrientation;
   options.updatable       = updatable;
 
-  return MeshBuilder::CreateSphere(iName, options, scene);
+  return SphereBuilder::CreateSphere(iName, options, scene);
 }
 
 // Cylinder and cone
@@ -2949,6 +2953,16 @@ MeshPtr Mesh::CreateTube(
   return MeshBuilder::CreateTube(iName, options, scene);
 }
 
+MeshPtr Mesh::CreateHemisphere(const std::string& iName, unsigned int segments,
+                               float diameter, Scene* scene)
+{
+  HemisphereOptions options;
+  options.segments = segments;
+  options.diameter = diameter;
+
+  return HemisphereBuilder::CreateHemisphere(iName, options, scene);
+}
+
 MeshPtr Mesh::CreatePolyhedron(const std::string& iName,
                                PolyhedronOptions& options, Scene* scene)
 {
@@ -2958,7 +2972,7 @@ MeshPtr Mesh::CreatePolyhedron(const std::string& iName,
 MeshPtr Mesh::CreateIcoSphere(const std::string& iName,
                               IcoSphereOptions& options, Scene* scene)
 {
-  return MeshBuilder::CreateIcoSphere(iName, options, scene);
+  return IcoSphereBuilder::CreateIcoSphere(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateDecal(const std::string& iName,
