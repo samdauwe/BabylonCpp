@@ -36,7 +36,9 @@
 #include <babylon/meshes/builders/hemisphere_builder.h>
 #include <babylon/meshes/builders/ico_sphere_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/ribbon_builder.h>
 #include <babylon/meshes/builders/sphere_builder.h>
+#include <babylon/meshes/builders/tube_builder.h>
 #include <babylon/meshes/geometry.h>
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/instanced_mesh.h>
@@ -66,6 +68,7 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , onLODLevelSelection{nullptr}
     , morphTargetManager{this, &Mesh::get_morphTargetManager,
                          &Mesh::set_morphTargetManager}
+    , _creationDataStorage{std::make_shared<_CreationDataStorage>()}
     , _geometry{nullptr}
     , _shouldGenerateFlatShading{false}
     , _originalBuilderSideOrientation{Mesh::DEFAULTSIDE}
@@ -78,7 +81,6 @@ Mesh::Mesh(const std::string& iName, Scene* scene, Node* iParent, Mesh* source,
     , overridenInstanceCount{this, &Mesh::set_overridenInstanceCount}
     , _onBeforeDrawObserver{nullptr}
     , _morphTargetManager{nullptr}
-    , _creationDataStorage{std::make_shared<_CreationDataStorage>()}
     , _instanceDataStorage{std::make_unique<_InstanceDataStorage>()}
     , _effectiveMaterial{nullptr}
     , _preActivateId{-1}
@@ -2643,18 +2645,20 @@ MeshPtr Mesh::Parse(const json& parsedMesh, Scene* scene,
 MeshPtr Mesh::CreateRibbon(const std::string& iName,
                            const std::vector<std::vector<Vector3>>& pathArray,
                            bool closeArray, bool closePath, int offset,
-                           Scene* scene, bool updatable,
-                           unsigned int sideOrientation,
+                           Scene* scene, const std::optional<bool>& updatable,
+                           const std::optional<unsigned int>& sideOrientation,
                            const MeshPtr& instance)
 {
-  RibbonOptions options(pathArray, offset);
+  RibbonOptions options;
+  options.pathArray       = pathArray;
   options.closeArray      = closeArray;
   options.closePath       = closePath;
+  options.offset          = offset;
   options.updatable       = updatable;
   options.sideOrientation = sideOrientation;
   options.instance        = instance;
 
-  return MeshBuilder::CreateRibbon(iName, options, scene);
+  return RibbonBuilder::CreateRibbon(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateDisc(const std::string& iName, float radius,
@@ -2936,21 +2940,21 @@ MeshPtr Mesh::CreateTube(
   const std::string& iName, const std::vector<Vector3>& path, float radius,
   unsigned int tessellation,
   const std::function<float(unsigned int i, float distance)>& radiusFunction,
-  unsigned int cap, Scene* scene, bool updatable, unsigned int sideOrientation,
-  const MeshPtr& instance)
+  unsigned int cap, Scene* scene, const std::optional<bool>& updatable,
+  const std::optional<unsigned int>& sideOrientation, const MeshPtr& instance)
 {
   TubeOptions options;
-  options.path           = path;
-  options.radius         = radius;
-  options.tessellation   = tessellation;
-  options.radiusFunction = radiusFunction;
-  options.setArc(1.f);
+  options.path            = path;
+  options.radius          = radius;
+  options.tessellation    = tessellation;
+  options.radiusFunction  = radiusFunction;
+  options.arc             = 1.f;
   options.cap             = cap;
   options.updatable       = updatable;
   options.sideOrientation = sideOrientation;
   options.instance        = instance;
 
-  return MeshBuilder::CreateTube(iName, options, scene);
+  return TubeBuilder::CreateTube(iName, options, scene);
 }
 
 MeshPtr Mesh::CreateHemisphere(const std::string& iName, unsigned int segments,

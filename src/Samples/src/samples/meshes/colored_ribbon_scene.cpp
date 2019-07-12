@@ -5,12 +5,12 @@
 #include <babylon/extensions/noisegeneration/perlin_noise.h>
 #include <babylon/lights/hemispheric_light.h>
 #include <babylon/lights/point_light.h>
-#include <babylon/meshes/mesh_builder.h>
-#include <babylon/meshes/vertex_data_options.h>
-
 #include <babylon/materials/standard_material.h>
 #include <babylon/materials/textures/cube_texture.h>
 #include <babylon/materials/textures/texture_constants.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/mesh_builder.h>
+#include <babylon/meshes/vertex_data_options.h>
 
 namespace BABYLON {
 namespace Samples {
@@ -101,7 +101,8 @@ void ColoredRibbonScene::initializeScene(ICanvas* canvas, Scene* scene)
     paths.emplace_back(path);
   }
 
-  RibbonOptions options(paths);
+  RibbonOptions options;
+  options.pathArray       = paths;
   options.colors          = std::move(colors);
   options.sideOrientation = 1;
   auto map                = MeshBuilder::CreateRibbon("m", options, scene);

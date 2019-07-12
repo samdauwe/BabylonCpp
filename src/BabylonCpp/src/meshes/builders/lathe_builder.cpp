@@ -53,7 +53,6 @@ MeshPtr LatheBuilder::CreateLathe(const std::string& name,
   }
 
   // lathe ribbon
-#if 0
   RibbonOptions ribbonOptions;
   ribbonOptions.pathArray       = paths;
   ribbonOptions.closeArray      = closed;
@@ -64,9 +63,6 @@ MeshPtr LatheBuilder::CreateLathe(const std::string& name,
   ribbonOptions.backUVs         = options.backUVs;
   auto lathe = RibbonBuilder::CreateRibbon(name, ribbonOptions, scene);
   return lathe;
-#else
-  return nullptr;
-#endif
 }
 
 } // end of namespace BABYLON

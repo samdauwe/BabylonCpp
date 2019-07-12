@@ -5,6 +5,7 @@
 #include <babylon/core/logging.h>
 #include <babylon/engines/scene.h>
 #include <babylon/extensions/dynamicterrain/dynamic_terrain_options.h>
+#include <babylon/meshes/builders/mesh_builder_options.h>
 #include <babylon/meshes/mesh.h>
 #include <babylon/meshes/mesh_builder.h>
 #include <babylon/meshes/vertex_buffer.h>
@@ -170,7 +171,8 @@ DynamicTerrain::DynamicTerrain(const std::string& iName,
   _averageSubSizeX = _mapSizeX / _mapSubX;
   _averageSubSizeZ = _mapSizeZ / _mapSubZ;
 
-  RibbonOptions ribbonOptions(terrainData);
+  RibbonOptions ribbonOptions;
+  ribbonOptions.pathArray = terrainData;
   ribbonOptions.sideOrientation
     = (options.invertSide) ? Mesh::FRONTSIDE : Mesh::BACKSIDE;
   ribbonOptions.colors    = terrainColor;

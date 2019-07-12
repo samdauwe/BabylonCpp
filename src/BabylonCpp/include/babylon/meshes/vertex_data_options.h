@@ -304,42 +304,6 @@ public:
 }; // end of class PolyhedronOptions
 
 //------------------------------------------------------------------------------
-// Ribbon mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to create a ribbon mesh.
- */
-class BABYLON_SHARED_EXPORT RibbonOptions {
-
-public:
-  RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
-                int offset = -1);
-  ~RibbonOptions();
-
-  std::vector<std::vector<Vector3>>& pathArray();
-  const std::vector<std::vector<Vector3>>& pathArray() const;
-  size_t offset() const;
-
-public:
-  bool closeArray;
-  bool closePath;
-  bool invertUV;
-  unsigned int sideOrientation;
-  std::optional<Vector4> frontUVs;
-  std::optional<Vector4> backUVs;
-  bool updatable;
-  MeshPtr instance;
-  std::vector<Vector2> uvs;
-  std::vector<Color4> colors;
-
-private:
-  std::vector<std::vector<Vector3>> _pathArray;
-  size_t _offset;
-
-}; // end of class RibbonOptions
-
-//------------------------------------------------------------------------------
 // Tiled ground mesh options
 //------------------------------------------------------------------------------
 
@@ -421,45 +385,6 @@ public:
   bool updatable;
 
 }; // end of class TorusOptions
-
-//------------------------------------------------------------------------------
-// Tube mesh options
-//------------------------------------------------------------------------------
-
-/**
- * @brief Options used to create a tube mesh.
- */
-class BABYLON_SHARED_EXPORT TubeOptions {
-
-public:
-  /** Statics **/
-  static Vector4 DefaultFrontUVs;
-  static Vector4 DefaultBackUVs;
-
-public:
-  TubeOptions();
-  ~TubeOptions();
-
-  float arc() const;
-  void setArc(float value);
-
-public:
-  std::vector<Vector3> path;
-  std::optional<float> radius;
-  unsigned int tessellation;
-  std::function<float(unsigned int i, float distance)> radiusFunction;
-  unsigned int cap;
-  unsigned int sideOrientation;
-  Vector4 frontUVs;
-  Vector4 backUVs;
-  MeshPtr instance;
-  bool invertUV;
-  bool updatable;
-
-private:
-  float _arc;
-
-}; // end of class TubeOptions
 
 } // end of namespace BABYLON
 

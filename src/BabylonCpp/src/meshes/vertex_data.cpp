@@ -544,14 +544,19 @@ VertexData::_ExtractFrom(IGetSetVerticesData* meshOrGeometry,
 
 std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
 {
-  auto& pathArray             = options.pathArray();
-  const auto offset           = options.offset();
-  const auto& closeArray      = options.closeArray;
-  const auto& closePath       = options.closePath;
-  const auto& invertUV        = options.invertUV;
-  const auto& sideOrientation = options.sideOrientation;
-  const auto& customUV        = options.uvs;
-  const auto& customColors    = options.colors;
+  auto& pathArray    = options.pathArray;
+  auto closeArray    = options.closeArray.value_or(false);
+  auto closePath     = options.closePath.value_or(false);
+  auto invertUV      = options.invertUV.value_or(false);
+  auto defaultOffset = static_cast<size_t>(std::floor(pathArray[0].size() / 2));
+  auto offset        = options.offset.value_or(defaultOffset);
+  // offset max allowed : defaultOffset
+  offset = offset > defaultOffset ? defaultOffset :
+                                    static_cast<size_t>(std::floor(offset));
+  auto sideOrientation
+    = options.sideOrientation.value_or(VertexData::DEFAULTSIDE);
+  const auto& customUV     = options.uvs;
+  const auto& customColors = options.colors;
 
   Float32Array positions;
   Uint32Array indices;
@@ -781,7 +786,6 @@ std::unique_ptr<VertexData> VertexData::CreateRibbon(RibbonOptions& options)
   vertexData->positions = std::move(positions);
   vertexData->normals   = std::move(normals);
   vertexData->uvs       = std::move(uvs);
-
   if (!colors.empty()) {
     vertexData->set(colors, VertexBuffer::ColorKind);
   }

@@ -156,6 +156,27 @@ LatheOptions::~LatheOptions()
 }
 
 //------------------------------------------------------------------------------
+// Ribbon mesh options
+//------------------------------------------------------------------------------
+
+RibbonOptions::RibbonOptions()
+    : closeArray{std::nullopt}
+    , closePath{std::nullopt}
+    , offset{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+    , instance{nullptr}
+    , invertUV{std::nullopt}
+{
+}
+
+RibbonOptions::~RibbonOptions()
+{
+}
+
+//------------------------------------------------------------------------------
 // Sphere mesh options
 //------------------------------------------------------------------------------
 
@@ -175,6 +196,29 @@ SphereOptions::SphereOptions()
 }
 
 SphereOptions::~SphereOptions()
+{
+}
+
+//------------------------------------------------------------------------------
+// Tube mesh options
+//------------------------------------------------------------------------------
+
+TubeOptions::TubeOptions()
+    : radius{std::nullopt}
+    , tessellation{std::nullopt}
+    , radiusFunction{nullptr}
+    , cap{std::nullopt}
+    , arc{std::nullopt}
+    , updatable{std::nullopt}
+    , sideOrientation{std::nullopt}
+    , frontUVs{std::nullopt}
+    , backUVs{std::nullopt}
+    , instance{nullptr}
+    , invertUV{std::nullopt}
+{
+}
+
+TubeOptions::~TubeOptions()
 {
 }
 

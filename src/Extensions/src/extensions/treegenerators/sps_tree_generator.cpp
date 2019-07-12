@@ -319,7 +319,8 @@ SPSTreeBranch SPSTreeGenerator::createBranch(
   }
 
   // Create ribbon mesh to repreent the branch.
-  RibbonOptions options(_cross_section_paths);
+  RibbonOptions options;
+  options.pathArray  = _cross_section_paths;
   options.closeArray = true;
 
   auto _branch = MeshBuilder::CreateRibbon("branch", options, scene);

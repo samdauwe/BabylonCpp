@@ -953,13 +953,12 @@ public:
    * (http://doc.babylonjs.com/how_to/How_to_dynamically_morph_a_mesh#ribbon)
    * @returns a new Mesh
    */
-  static MeshPtr
-  CreateRibbon(const std::string& name,
-               const std::vector<std::vector<Vector3>>& pathArray,
-               bool closeArray = false, bool closePath = false, int offset = -1,
-               Scene* = nullptr, bool updatable = false,
-               unsigned int sideOrientation  = Mesh::DEFAULTSIDE,
-               const MeshPtr& ribbonInstance = nullptr);
+  static MeshPtr CreateRibbon(
+    const std::string& name, const std::vector<std::vector<Vector3>>& pathArray,
+    bool closeArray = false, bool closePath = false, int offset = -1,
+    Scene* = nullptr, const std::optional<bool>& updatable = std::nullopt,
+    const std::optional<unsigned int>& sideOrientation = std::nullopt,
+    const MeshPtr& ribbonInstance                      = nullptr);
 
   /**
    * @brief Creates a plane polygonal mesh.  By default, this is a disc. Please
@@ -1398,9 +1397,10 @@ public:
     float radius = 1.f, unsigned int tessellation = 64,
     const std::function<float(unsigned int i, float distance)>& radiusFunction
     = nullptr,
-    unsigned int cap = Mesh::NO_CAP, Scene* = nullptr, bool updatable = false,
-    unsigned int sideOrientation = Mesh::DEFAULTSIDE,
-    const MeshPtr& instance      = nullptr);
+    unsigned int cap = Mesh::NO_CAP, Scene* = nullptr,
+    const std::optional<bool>& updatable               = std::nullopt,
+    const std::optional<unsigned int>& sideOrientation = std::nullopt,
+    const MeshPtr& instance                            = nullptr);
 
   /**
    * @brief Creates a polyhedron mesh.
@@ -1742,6 +1742,11 @@ public:
   Property<Mesh, MorphTargetManagerPtr> morphTargetManager;
 
   /**
+   * Hidden
+   */
+  _CreationDataStoragePtr _creationDataStorage;
+
+  /**
    * Gets the mesh internal Geometry object
    */
   Geometry* _geometry;
@@ -1816,7 +1821,6 @@ private:
   // Morph
   MorphTargetManagerPtr _morphTargetManager;
   std::vector<VertexBuffer*> _delayInfo;
-  _CreationDataStoragePtr _creationDataStorage;
   std::unique_ptr<_InstanceDataStorage> _instanceDataStorage;
   MaterialPtr _effectiveMaterial;
   int _preActivateId;

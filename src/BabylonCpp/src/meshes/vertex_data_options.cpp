@@ -241,49 +241,6 @@ PolyhedronOptions::~PolyhedronOptions()
 }
 
 //------------------------------------------------------------------------------
-// Ribbon mesh options
-//------------------------------------------------------------------------------
-
-RibbonOptions::RibbonOptions(const std::vector<std::vector<Vector3>>& pathArray,
-                             int offset)
-    : closeArray{false}
-    , closePath{false}
-    , invertUV{false}
-    , sideOrientation{Mesh::DEFAULTSIDE}
-    , frontUVs{std::nullopt}
-    , backUVs{std::nullopt}
-    , updatable{false}
-    , instance{nullptr}
-    , _pathArray{pathArray}
-{
-  size_t defaultOffset = 0;
-  if (!_pathArray.empty()) {
-    defaultOffset = _pathArray[0].size() / 2;
-  }
-  _offset = (offset == -1) ? defaultOffset : _offset;
-  _offset = _offset > defaultOffset ? defaultOffset : _offset;
-}
-
-RibbonOptions::~RibbonOptions()
-{
-}
-
-std::vector<std::vector<Vector3>>& RibbonOptions::pathArray()
-{
-  return _pathArray;
-}
-
-const std::vector<std::vector<Vector3>>& RibbonOptions::pathArray() const
-{
-  return _pathArray;
-}
-
-size_t RibbonOptions::offset() const
-{
-  return _offset;
-}
-
-//------------------------------------------------------------------------------
 // Tiled ground mesh options
 //------------------------------------------------------------------------------
 
@@ -347,42 +304,6 @@ TorusOptions::TorusOptions()
 
 TorusOptions::~TorusOptions()
 {
-}
-
-//------------------------------------------------------------------------------
-// Tube mesh options
-//------------------------------------------------------------------------------
-
-Vector4 TubeOptions::DefaultFrontUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-Vector4 TubeOptions::DefaultBackUVs{Vector4(0.f, 0.f, 1.f, 1.f)};
-
-TubeOptions::TubeOptions()
-    : radius{1.f}
-    , tessellation{64}
-    , radiusFunction{nullptr}
-    , cap{Mesh::NO_CAP}
-    , sideOrientation{Mesh::DEFAULTSIDE}
-    , frontUVs{DefaultFrontUVs}
-    , backUVs{DefaultBackUVs}
-    , instance{nullptr}
-    , invertUV{false}
-    , updatable{false}
-    , _arc{1.f}
-{
-}
-
-TubeOptions::~TubeOptions()
-{
-}
-
-float TubeOptions::arc() const
-{
-  return _arc;
-}
-
-void TubeOptions::setArc(float value)
-{
-  _arc = (value <= 0 || value > 1) ? 1.f : value;
 }
 
 } // end of namespace BABYLON

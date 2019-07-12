@@ -2,12 +2,17 @@
 #define BABYLON_MESHES_BUILDERS_MESH_BUILDER_OPTIONS_H
 
 #include <array>
+#include <functional>
 
 #include <babylon/babylon_api.h>
 #include <babylon/math/color4.h>
+#include <babylon/math/vector2.h>
 #include <babylon/math/vector4.h>
 
 namespace BABYLON {
+
+class Mesh;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 //------------------------------------------------------------------------------
 // Box mesh options
@@ -193,6 +198,35 @@ public:
 }; // end of class LatheOptions
 
 //------------------------------------------------------------------------------
+// Ribbon mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a ribbon mesh.
+ */
+class BABYLON_SHARED_EXPORT RibbonOptions {
+
+public:
+  RibbonOptions();
+  ~RibbonOptions();
+
+public:
+  std::vector<std::vector<Vector3>> pathArray;
+  std::optional<bool> closeArray;
+  std::optional<bool> closePath;
+  std::optional<size_t> offset;
+  std::optional<bool> updatable;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
+  MeshPtr instance;
+  std::optional<bool> invertUV;
+  std::vector<Vector2> uvs;
+  std::vector<Color4> colors;
+
+}; // end of class RibbonOptions
+
+//------------------------------------------------------------------------------
 // Sphere mesh options
 //------------------------------------------------------------------------------
 
@@ -219,6 +253,35 @@ public:
   std::optional<bool> updatable;
 
 }; // end of class SphereOptions
+
+//------------------------------------------------------------------------------
+// Tube mesh options
+//------------------------------------------------------------------------------
+
+/**
+ * @brief Options used to create a tube mesh.
+ */
+class BABYLON_SHARED_EXPORT TubeOptions {
+
+public:
+  TubeOptions();
+  ~TubeOptions();
+
+public:
+  std::vector<Vector3> path;
+  std::optional<float> radius;
+  std::optional<unsigned int> tessellation;
+  std::function<float(unsigned int i, float distance)> radiusFunction;
+  std::optional<unsigned int> cap;
+  std::optional<float> arc;
+  std::optional<bool> updatable;
+  std::optional<unsigned int> sideOrientation;
+  std::optional<Vector4> frontUVs;
+  std::optional<Vector4> backUVs;
+  MeshPtr instance;
+  std::optional<bool> invertUV;
+
+}; // end of class TubeOptions
 
 } // end of namespace BABYLON
 

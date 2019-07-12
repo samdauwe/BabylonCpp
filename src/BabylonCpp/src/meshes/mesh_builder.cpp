@@ -16,7 +16,9 @@
 #include <babylon/meshes/builders/ico_sphere_builder.h>
 #include <babylon/meshes/builders/lathe_builder.h>
 #include <babylon/meshes/builders/mesh_builder_options.h>
+#include <babylon/meshes/builders/ribbon_builder.h>
 #include <babylon/meshes/builders/sphere_builder.h>
+#include <babylon/meshes/builders/tube_builder.h>
 #include <babylon/meshes/ground_mesh.h>
 #include <babylon/meshes/lines_mesh.h>
 #include <babylon/meshes/polygonmesh/polygon_mesh_builder.h>
@@ -55,159 +57,7 @@ MeshPtr MeshBuilder::CreateRibbon(const std::string& name,
                                   RibbonOptions& options, Scene* scene)
 
 {
-  const auto& pathArray  = options.pathArray();
-  const auto& closeArray = options.closeArray;
-  const auto& closePath  = options.closePath;
-
-  const auto sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation);
-  const auto& instance  = options.instance;
-  const auto& updatable = options.updatable;
-
-  if (instance) { // existing ribbon instance update
-                  // positionFunction : ribbon case
-    // only pathArray and sideOrientation parameters are taken into account for
-    // positions update
-    Vector3::FromFloatsToRef(std::numeric_limits<float>::max(),
-                             std::numeric_limits<float>::max(),
-                             std::numeric_limits<float>::max(),
-                             Tmp::Vector3Array[0]); // minimum
-    Vector3::FromFloatsToRef(std::numeric_limits<float>::lowest(),
-                             std::numeric_limits<float>::lowest(),
-                             std::numeric_limits<float>::lowest(),
-                             Tmp::Vector3Array[1]);
-    const auto positionFunction = [&](Float32Array& positions) {
-      auto minlg     = pathArray[0].size();
-      auto& mesh     = instance;
-      unsigned int i = 0;
-      unsigned int ns
-        = (mesh->_originalBuilderSideOrientation == Mesh::DOUBLESIDE) ? 2 : 1;
-      for (std::size_t si = 1; si <= ns; ++si) {
-        for (std::size_t p = 0; p < pathArray.size(); ++p) {
-          const auto& path = pathArray[p];
-          const auto l     = path.size();
-          minlg            = (minlg < l) ? minlg : l;
-          unsigned int j   = 0;
-          while (j < minlg) {
-            positions[i]     = path[j].x;
-            positions[i + 1] = path[j].y;
-            positions[i + 2] = path[j].z;
-            if (path[j].x < Tmp::Vector3Array[0].x) {
-              Tmp::Vector3Array[0].x = path[j].x;
-            }
-            if (path[j].x > Tmp::Vector3Array[1].x) {
-              Tmp::Vector3Array[1].x = path[j].x;
-            }
-            if (path[j].y < Tmp::Vector3Array[0].y) {
-              Tmp::Vector3Array[0].y = path[j].y;
-            }
-            if (path[j].y > Tmp::Vector3Array[1].y) {
-              Tmp::Vector3Array[1].y = path[j].y;
-            }
-            if (path[j].z < Tmp::Vector3Array[0].z) {
-              Tmp::Vector3Array[0].z = path[j].z;
-            }
-            if (path[j].z > Tmp::Vector3Array[1].z) {
-              Tmp::Vector3Array[1].z = path[j].z;
-            }
-            ++j;
-            i += 3;
-          }
-          if (mesh->_creationDataStorage
-              && mesh->_creationDataStorage->closePath) {
-            positions[i + 0] = path[0].x;
-            positions[i + 1] = path[0].y;
-            positions[i + 2] = path[0].z;
-            i += 3;
-          }
-        }
-      }
-    };
-    auto positions = instance->getVerticesData(VertexBuffer::PositionKind);
-    positionFunction(positions);
-    instance->setBoundingInfo(
-      BoundingInfo(Tmp::Vector3Array[2], Tmp::Vector3Array[3]));
-    instance->getBoundingInfo()->update(instance->_worldMatrix);
-    instance->updateVerticesData(VertexBuffer::PositionKind, positions, false,
-                                 false);
-    if (!options.colors.empty()) {
-      auto colors = instance->getVerticesData(VertexBuffer::ColorKind);
-      for (size_t c = 0; c < options.colors.size(); ++c) {
-        colors[c * 4]     = options.colors[c].r;
-        colors[c * 4 + 1] = options.colors[c].g;
-        colors[c * 4 + 2] = options.colors[c].b;
-        colors[c * 4 + 3] = options.colors[c].a;
-      }
-      instance->updateVerticesData(VertexBuffer::ColorKind, colors, false,
-                                   false);
-    }
-    if (!options.uvs.empty()) {
-      auto uvs = instance->getVerticesData(VertexBuffer::UVKind);
-      for (size_t i = 0; i < options.uvs.size(); ++i) {
-        uvs[i * 2]     = options.uvs[i].x;
-        uvs[i * 2 + 1] = options.uvs[i].y;
-      }
-      instance->updateVerticesData(VertexBuffer::UVKind, uvs, false, false);
-    }
-    if (!instance->areNormalsFrozen() || instance->isFacetDataEnabled()) {
-      auto indices = instance->getIndices();
-      auto normals = instance->getVerticesData(VertexBuffer::NormalKind);
-      if (instance->isFacetDataEnabled()) {
-        auto params = instance->getFacetDataParameters();
-        VertexData::ComputeNormals(positions, indices, normals, params);
-      }
-      else {
-        VertexData::ComputeNormals(positions, indices, normals);
-      }
-
-      if (instance->_creationDataStorage
-          && instance->_creationDataStorage->closePath) {
-        unsigned int indexFirst = 0;
-        size_t indexLast        = 0;
-        for (std::size_t p = 0; p < pathArray.size(); ++p) {
-          indexFirst = instance->_creationDataStorage->idx[p] * 3;
-          if (p + 1 < pathArray.size()) {
-            indexLast = (instance->_creationDataStorage->idx[p + 1] - 1) * 3;
-          }
-          else {
-            indexLast = normals.size() - 3;
-          }
-          normals[indexFirst]
-            = (normals[indexFirst] + normals[indexLast]) * 0.5f;
-          normals[indexFirst + 1]
-            = (normals[indexFirst + 1] + normals[indexLast + 1]) * 0.5f;
-          normals[indexFirst + 2]
-            = (normals[indexFirst + 2] + normals[indexLast + 2]) * 0.5f;
-          normals[indexLast]     = normals[indexFirst];
-          normals[indexLast + 1] = normals[indexFirst + 1];
-          normals[indexLast + 2] = normals[indexFirst + 2];
-        }
-      }
-
-      if (!instance->areNormalsFrozen()) {
-        instance->updateVerticesData(VertexBuffer::NormalKind, normals, false,
-                                     false);
-      }
-    }
-
-    return instance;
-  }
-  else { // new ribbon creation
-    auto ribbon                             = Mesh::New(name, scene);
-    ribbon->_originalBuilderSideOrientation = sideOrientation;
-    ribbon->_creationDataStorage = std::make_shared<_CreationDataStorage>();
-
-    auto vertexData = VertexData::CreateRibbon(options);
-    if (closePath) {
-      ribbon->_creationDataStorage->idx = vertexData->_idx;
-    }
-    ribbon->_creationDataStorage->closePath  = closePath;
-    ribbon->_creationDataStorage->closeArray = closeArray;
-
-    vertexData->applyToMesh(*ribbon, updatable);
-
-    return ribbon;
-  }
+  return RibbonBuilder::CreateRibbon(name, options, scene);
 }
 
 MeshPtr MeshBuilder::CreateCylinder(const std::string& name,
@@ -566,139 +416,7 @@ MeshPtr MeshBuilder::ExtrudePolygon(const std::string& name,
 MeshPtr MeshBuilder::CreateTube(const std::string& name, TubeOptions& options,
                                 Scene* scene)
 {
-  const auto& path = options.path;
-  auto radius      = 1.f;
-  if (options.radius.has_value()) {
-    radius = *options.radius;
-  }
-  else if (options.instance) {
-    radius = options.instance->_creationDataStorage->radius;
-  }
-  const auto& tessellation
-    = options.tessellation == 0 ? 64 : options.tessellation;
-  const auto& radiusFunction = options.radiusFunction;
-  auto cap                   = options.cap;
-  const auto& invertUV       = options.invertUV;
-  const auto& updatable      = options.updatable;
-  const auto sideOrientation
-    = MeshBuilder::updateSideOrientation(options.sideOrientation);
-  auto instance  = options.instance;
-  const auto arc = options.arc();
-
-  // tube geometry
-  const auto tubePathArray
-    = [](const std::vector<Vector3>& _path, Path3D& path3D,
-         std::vector<std::vector<Vector3>>& circlePaths, float _radius,
-         unsigned int _tessellation,
-         const std::function<float(unsigned int i, float distance)>&
-           _radiusFunction,
-         unsigned int _cap, float _arc) {
-        auto& tangents        = path3D.getTangents();
-        const auto& normals   = path3D.getNormals();
-        const auto& distances = path3D.getDistances();
-        const auto& pi2       = Math::PI2;
-        const auto step       = pi2 / static_cast<float>(_tessellation) * _arc;
-
-        auto rad = 0.f;
-        Vector3 normal;
-        Vector3 rotated;
-        Matrix rotationMatrix = Tmp::MatrixArray[0];
-        // TODO FIXME
-        unsigned int index
-          = (_cap == Mesh::NO_CAP || _cap == Mesh::CAP_END) ? 0 : 0;
-        circlePaths.resize(_path.size() + index);
-        for (unsigned int i = 0; i < _path.size(); ++i) {
-          rad = (_radiusFunction == nullptr) ?
-                  _radius :
-                  _radiusFunction(i, distances[i]); // current radius
-          std::vector<Vector3> circlePath;          // current circle array
-          normal = normals[i];                      // current normal
-          for (std::size_t t = 0; t < _tessellation; ++t) {
-            Matrix::RotationAxisToRef(tangents[i], step * static_cast<float>(t),
-                                      rotationMatrix);
-            rotated
-              = (t + 1 <= circlePath.size()) ? circlePath[t] : Vector3::Zero();
-            Vector3::TransformCoordinatesToRef(normal, rotationMatrix, rotated);
-            rotated.scaleInPlace(rad).addInPlace(_path[i]);
-            circlePath.emplace_back(rotated);
-          }
-          circlePaths[index] = circlePath;
-          ++index;
-        }
-        // cap
-        const auto capPath
-          = [_path](unsigned int nbPoints, unsigned int pathIndex) {
-              std::vector<Vector3> pointCap;
-              for (std::size_t i = 0; i < nbPoints; ++i) {
-                pointCap.emplace_back(_path[pathIndex]);
-              }
-              return pointCap;
-            };
-        switch (_cap) {
-          case Mesh::NO_CAP:
-            break;
-          case Mesh::CAP_START:
-            circlePaths[0] = capPath(_tessellation, 0);
-            circlePaths[1] = circlePaths[2];
-            break;
-          case Mesh::CAP_END:
-            circlePaths[index]     = circlePaths[index - 1];
-            circlePaths[index + 1] = capPath(
-              _tessellation, static_cast<unsigned int>(_path.size() - 1));
-            break;
-          case Mesh::CAP_ALL:
-            circlePaths[0]         = capPath(_tessellation, 0);
-            circlePaths[1]         = circlePaths[2];
-            circlePaths[index]     = circlePaths[index - 1];
-            circlePaths[index + 1] = capPath(
-              _tessellation, static_cast<unsigned int>(_path.size() - 1));
-            break;
-          default:
-            break;
-        }
-        return circlePaths;
-      };
-  Path3D path3D;
-  std::vector<std::vector<Vector3>> pathArray;
-  if (instance) {
-    // tube update
-    auto& storage = instance->_creationDataStorage;
-    auto iArc     = (options.arc() != 0.f) ? options.arc() : storage->arc;
-    path3D        = storage->path3D.update(path);
-    pathArray     = tubePathArray(path, path3D, storage->pathArray, radius,
-                              storage->tessellation, radiusFunction,
-                              storage->cap, iArc);
-    RibbonOptions ribbonOptions(pathArray);
-    instance = MeshBuilder::CreateRibbon("", ribbonOptions, scene);
-    // Update mode, no need to recreate the storage.
-    storage->path3D    = path3D;
-    storage->pathArray = pathArray;
-    storage->arc       = iArc;
-    storage->radius    = radius;
-
-    return instance;
-  }
-  // tube creation
-  path3D = Path3D(path);
-  std::vector<std::vector<Vector3>> newPathArray;
-  cap       = (cap > 3) ? 0 : cap;
-  pathArray = tubePathArray(path, path3D, newPathArray, radius, tessellation,
-                            radiusFunction, cap, arc);
-  RibbonOptions ribbonOptions(pathArray);
-  ribbonOptions.closePath       = true;
-  ribbonOptions.closeArray      = false;
-  ribbonOptions.updatable       = updatable;
-  ribbonOptions.sideOrientation = sideOrientation;
-  ribbonOptions.invertUV        = invertUV;
-  auto tube = MeshBuilder::CreateRibbon(name, ribbonOptions, scene);
-  tube->_creationDataStorage->pathArray    = pathArray;
-  tube->_creationDataStorage->path3D       = path3D;
-  tube->_creationDataStorage->tessellation = tessellation;
-  tube->_creationDataStorage->cap          = cap;
-  tube->_creationDataStorage->arc          = options.arc();
-  tube->_creationDataStorage->radius       = radius;
-
-  return tube;
+  return TubeBuilder::CreateTube(name, options, scene);
 }
 
 MeshPtr MeshBuilder::CreatePolyhedron(const std::string& name,
@@ -836,7 +554,8 @@ MeshPtr MeshBuilder::_ExtrudeShapeGeneric(
   pathArray
     = extrusionPathArray(shape, curve, path3D, newShapePaths, scale, rotation,
                          scaleFunction, rotateFunction, _cap, custom);
-  RibbonOptions ribbonOptions(pathArray);
+  RibbonOptions ribbonOptions;
+  ribbonOptions.pathArray       = pathArray;
   ribbonOptions.closeArray      = rbCA;
   ribbonOptions.closePath       = rbCP;
   ribbonOptions.updatable       = updtbl;
